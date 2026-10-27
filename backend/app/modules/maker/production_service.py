@@ -381,6 +381,7 @@ async def create_order(
         output_storage_location_id=data.output_location_id,
         production_date=data.production_date,
         notes=data.notes,
+        output_lot_name=data.output_lot_name,
         created_by=user.id,
         status='DRAFT',
         short_at_create=bool(shortages),
@@ -866,6 +867,19 @@ async def _receive_output(
     inherited_category_id = await core_api.items.inherited_category_async(
         db, organization_id, template_id=order.output_template_id
     )
+    # The batch the person named for the output, opened on first use: two
+    # runs naming the same batch fill one batch, the way two receipts do.
+    output_lot_id = (
+        await core_api.stock.get_or_create_lot_async(
+            db,
+            organization_id,
+            order.output_template_id,
+            order.output_lot_name,
+            production_date=order.production_date,
+        )
+        if order.output_lot_name
+        else None
+    )
     produced_item = await core_api.items.create_async(
         db,
         organization_id,
@@ -878,6 +892,7 @@ async def _receive_output(
             uom_id=template.uom_id if template else None,
             description=template.description if template else None,
             purchase_price=unit_cost if unit_cost > 0 else None,
+            lot_id=output_lot_id,
         ),
         user=user,
         post_the_change=False,
@@ -889,6 +904,7 @@ async def _receive_output(
         order.output_template_id,
         actual_qty,
         to_location_id=order.output_storage_location_id,
+        lot_id=output_lot_id,
         reference_type='maker_production',
         reference_id=order.id,
         created_by=user.id,

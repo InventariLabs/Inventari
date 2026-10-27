@@ -295,6 +295,11 @@ class ProductionOrder(Base):
     result_per_batch: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
     production_date: Mapped[date | None] = mapped_column(Date())
     notes: Mapped[str | None] = mapped_column(String(500))
+    # The batch the run's output goes into, as the person named it. NULL
+    # puts the output on the shelf without a batch, as runs always did. A
+    # named batch is what lets a recall of an ingredient follow the run to
+    # the goods it made and on to their customers.
+    output_lot_name: Mapped[str | None] = mapped_column(String(100))
     created_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey('users.id'),
         nullable=True,
