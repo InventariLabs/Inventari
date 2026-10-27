@@ -110,7 +110,7 @@ function EntryRow({
 }) {
   const { t } = useTranslation("inventory");
   return (
-    <li className="px-4 py-3 grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)_minmax(0,1.5fr)_auto] gap-x-4 gap-y-1 items-start">
+    <li className="px-4 py-3 grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)_minmax(0,1.5fr)_8rem] gap-x-4 gap-y-1 items-start">
       <span className="text-sm tabular-nums text-on-secondary whitespace-nowrap">
         {formatDate(entry.moved_at)}
       </span>
@@ -125,11 +125,13 @@ function EntryRow({
               </span>
             )}
           </>
-        ) : (
+        ) : entry.reference_type === "document" ? (
+          // A document without a partner is the gap a recall asks about; a
+          // production run or a count never had one, and saying so is noise.
           <span className="text-on-muted italic">
             {t("inventory:lot.trace.noPartner")}
           </span>
-        )}
+        ) : null}
         <Made entry={entry} quantity={quantity} />
       </span>
       <span className="text-sm tabular-nums text-on whitespace-nowrap sm:text-right">
