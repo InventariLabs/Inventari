@@ -324,6 +324,29 @@ of restating it. So the path to a reason is: ledger row → stock-take
 report → the line, which shows the reason code and the free text beside
 the two numbers.
 
+### A batch's trace reads the ledger by source
+
+`GET /stock-lots/{id}/trace` (`app/services/lot_trace_service.py`) answers a
+recall's two questions — who supplied the batch and who it went to — from
+the ledger alone. Every movement of the batch under one
+`(reference_type, reference_id)` nets into one entry, in when positive and
+out when negative: a receipt landed on two locations is one line, a run
+undone (its inverse posted under the same reference) is none. A movement
+with both ends set never left the organization and is not read at all, which
+also keeps a multi-line transfer of several batches out of the trace.
+
+Core cannot name a document, so the module that wrote a reference type names
+it, through `register_lot_trace_source` (`app/core/lot_trace.py`, exported by
+the module SDK): a number and a partner per reference. The warehouse module
+names its documents with the partner snapshot they took when confirmed; the
+trace falls back to the partner record for a document that has none. A
+source that declares `transforms = True` turns batches into others under one
+reference — maker's production runs — and the trace follows each batch that
+came in under such a reference, netted the same way, to its own trace, up to
+50 batches. A reference nobody names still appears, with its kind, date and
+quantity. A run's output is a batch only when the run named one
+(`output_lot_name`); without it the trace stops at the run.
+
 ## Aging says what is still on the shelf
 
 Aging entries are receipts (in-moves), aged from the movement's
