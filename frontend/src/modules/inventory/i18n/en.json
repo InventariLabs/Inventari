@@ -129,6 +129,19 @@
     "empty": {
       "title": "Nothing was recorded under this batch",
       "description": "Receipts, issues and transfers that name this batch will show up here."
+    },
+    "trace": {
+      "heading": "Trace for a recall",
+      "caption": "Who supplied this batch and who it went to, with dates and quantities. Moves between your own locations are left out; a production run leads to the batch it made.",
+      "cameIn": "Came in",
+      "wentOut": "Went out",
+      "nothingCameIn": "Nothing came in under this batch from outside.",
+      "nothingWentOut": "None of it has gone out yet.",
+      "noPartner": "No partner named",
+      "unknownSource": "Unknown source",
+      "madeInto": "Made into",
+      "madeFrom": "Made from {{lot}}:",
+      "truncated": "More batches were made from this one than one trace follows. Open each batch above to trace the rest."
     }
   },
   "stock": {
