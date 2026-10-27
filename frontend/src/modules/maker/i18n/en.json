@@ -84,6 +84,7 @@
     "notesPlaceholder": "Internal notes about this run…",
     "outputLotLabel": "Batch of the output (optional)",
     "outputLotHint": "Name a batch so a recall of an ingredient can follow this run to whoever received what it made. Leave empty if you do not track batches.",
+    "guardName": "The production run",
     "hints": {
       "product": "Pick an output product to enable preview.",
       "quantity": "Enter a planned quantity greater than zero to enable preview.",

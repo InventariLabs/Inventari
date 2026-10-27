@@ -84,6 +84,7 @@
     "notesPlaceholder": "Interne Notizen zu diesem Auftrag…",
     "outputLotLabel": "Charge des Erzeugnisses (optional)",
     "outputLotHint": "Benennen Sie eine Charge, damit ein Rückruf einer Zutat über diesen Auftrag bis zu den Empfängern des Erzeugnisses reicht. Leer lassen, wenn Sie keine Chargen führen.",
+    "guardName": "Der Produktionsauftrag",
     "hints": {
       "product": "Wählen Sie ein Ausgabeprodukt aus, um die Vorschau zu aktivieren.",
       "quantity": "Geben Sie eine geplante Menge größer als null ein, um die Vorschau zu aktivieren.",

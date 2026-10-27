@@ -86,6 +86,7 @@
     "notesPlaceholder": "Wewnętrzne notatki o tym zleceniu…",
     "outputLotLabel": "Partia wyrobu (opcjonalnie)",
     "outputLotHint": "Nazwij partię, a wycofanie składnika dojdzie przez to zlecenie do odbiorców wyrobu. Zostaw puste, jeśli nie prowadzisz partii.",
+    "guardName": "Zlecenie produkcji",
     "hints": {
       "product": "Wybierz produkt wyjściowy, aby włączyć podgląd.",
       "quantity": "Wpisz planowaną ilość większą od zera, aby włączyć podgląd.",
