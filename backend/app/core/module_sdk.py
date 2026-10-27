@@ -6,8 +6,9 @@ module may use: the API key scope registration, the lifecycle and context types,
 interceptor and contribution classes, the HTTP exception surface, the FastAPI
 dependencies, a logger, the model bases, the system event names a subscription
 needs, the migration helpers a revision uses, the field type a scanned code
-arrives in, the pagination envelopes with the helper that pages a query
-into one, and the helper that writes a location's path. Anything under ``app.`` that is not
+arrives in, the lot-trace source a module names its movements through, the
+pagination envelopes with the helper that pages a query into one, and the
+helper that writes a location's path. Anything under ``app.`` that is not
 re-exported here is Core's own business: it may be renamed, split or deleted
 between releases.
 
@@ -107,6 +108,7 @@ from app.core.file_reference import (
 from app.core.interceptors import InterceptorPipeline, interceptor_pipeline
 from app.core.location_path import join_location_path
 from app.core.logging import get_logger
+from app.core.lot_trace import LotTraceSource, register_lot_trace_source
 from app.core.migration_helpers import (
     convert_naive_timestamps_to_utc,
     create_index_if_absent,
@@ -160,6 +162,7 @@ __all__ = [
     'InterceptorPipeline',
     'ItemInterceptor',
     'KeysetPaginatedResponse',
+    'LotTraceSource',
     'ModuleContext',
     'ModuleMetadata',
     'ModuleModelBase',
@@ -205,6 +208,7 @@ __all__ = [
     'paginate_async',
     'record_settings',
     'register_api_key_scope',
+    'register_lot_trace_source',
     'relation_exists',
     'require_module',
     'require_org',

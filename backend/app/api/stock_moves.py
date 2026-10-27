@@ -185,7 +185,7 @@ async def list_stock_moves(
     )
 
 
-def _client_timezone(name: str | None) -> ZoneInfo | None:
+def client_timezone(name: str | None) -> ZoneInfo | None:
     """The clock the person who clicked Export is reading, if they said.
 
     The screens format timestamps in the browser's zone, so a sheet built in
@@ -252,7 +252,7 @@ async def export_stock_moves_xlsx(
         raise catalogue_refusal(
             'stock_moves_export_too_many', total=total, limit=EXPORT_ROW_LIMIT
         )
-    clock = _client_timezone(tz) or await org_timezone_async(db, org_id)
+    clock = client_timezone(tz) or await org_timezone_async(db, org_id)
     return to_xlsx_response(
         rows_to_export_frame(rows, clock),
         sheet_name='Movements',

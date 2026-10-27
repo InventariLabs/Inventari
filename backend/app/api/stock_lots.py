@@ -6,10 +6,12 @@ that left went to. All three facts were already recorded — the receipt, the
 records, the dispatches — and nothing put them together, so answering meant
 opening a database session.
 
-This endpoint answers the first two. The third is the movement ledger,
-which already narrows by batch (``GET /api/v1/stock-moves?lot_id=``), and
-keeping them apart is deliberate: the trail is a page of rows that grows
-without limit, and the batch is one small record.
+This endpoint answers the first two. The third is the trace
+(``GET /api/v1/stock-lots/{lot_id}/trace``): the ledger read by source rather
+than by row — who supplied the batch and who it went to, with dates and
+quantities, and the same for each batch a production run made of it. The raw
+rows stay in the movement ledger, which already narrows by batch
+(``GET /api/v1/stock-moves?lot_id=``).
 
 Read-only. A batch changes state through the quarantine and release
 operations the stock service owns, never through this route.
@@ -17,6 +19,7 @@ operations the stock service owns, never through this route.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
@@ -24,8 +27,10 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.stock_moves import client_timezone
 from app.core.contracts import (
     LotStatus,
+    LotTraceDTO,
     StockLotDetailDTO,
     StockLotDTO,
     SystemPermission,
@@ -39,8 +44,11 @@ from app.core.deps import (
 )
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.public_api import core_api
+from app.core.xlsx_export import to_xlsx_response
 from app.i18n.service import get_current_lang
 from app.schemas.pagination import PaginatedResponse
+from app.services.analytics._common import org_timezone_async
+from app.services.lot_trace_service import trace_to_export_frame
 
 router = APIRouter()
 
@@ -144,3 +152,84 @@ async def get_stock_lot(
         # explain — it is a batch this organization does not have.
         raise NotFoundException('stock_lot', get_current_lang())
     return lot
+
+
+async def _trace_or_404(
+    db: AsyncSession, current_user: UserContextDTO, lot_id: UUID
+) -> LotTraceDTO:
+    org_id = require_org(current_user)
+    trace = await core_api.stock.trace_lot_async(
+        db, org_id, lot_id, lang=get_current_lang()
+    )
+    if trace is None:
+        raise NotFoundException('stock_lot', get_current_lang())
+    return trace
+
+
+@router.get('/stock-lots/{lot_id}/trace', response_model=LotTraceDTO)
+async def trace_stock_lot(
+    lot_id: UUID,
+    _: object = require_permission(SystemPermission.ITEMS_READ),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+) -> Any:
+    """Who supplied the batch and who it went to — and the same for what was made of it.
+
+    One step back and one step forward, the way a recall asks: each document
+    or run that brought the batch in or sent it out, with its partner, date
+    and quantity. A production run that consumed the batch leads to the batch
+    it made, whose own trace follows.
+    """
+    return await _trace_or_404(db, current_user, lot_id)
+
+
+@router.get('/stock-lots/{lot_id}/trace/export/xlsx', response_model=None)
+async def export_stock_lot_trace_xlsx(
+    lot_id: UUID,
+    tz: str | None = Query(
+        None,
+        max_length=64,
+        description=(
+            "The reader's own IANA time zone, so the sheet agrees with the "
+            'screen it was exported from. Falls back to the organization.'
+        ),
+    ),
+    _: object = require_permission(SystemPermission.ITEMS_READ),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+) -> Any:
+    """The trace as a spreadsheet to hand to an inspector.
+
+    The data sheet is a row per crossing; the second sheet says which batch
+    the file is about and when it was made, because a file forwarded twice
+    loses the screen it came from.
+    """
+    import pandas as pd
+
+    trace = await _trace_or_404(db, current_user, lot_id)
+    clock = client_timezone(tz) or await org_timezone_async(
+        db, require_org(current_user)
+    )
+    root = trace.lots[0]
+    about = [
+        ('Batch', root.lot_name),
+        ('Product', root.product_name),
+        ('Expiry date', root.expiry_date.isoformat() if root.expiry_date else None),
+        ('Batches made from it', str(len(trace.lots) - 1)),
+        ('Generated', datetime.now(clock).strftime('%Y-%m-%d %H:%M')),
+    ]
+    if trace.truncated:
+        about.append(
+            (
+                'Incomplete',
+                'More batches were made from it than one trace follows; '
+                'trace each listed batch on its own for the rest.',
+            )
+        )
+    return to_xlsx_response(
+        trace_to_export_frame(trace, clock),
+        sheet_name='Trace',
+        filename_stem='inventari_batch_trace',
+        readme=pd.DataFrame(about, columns=['Field', 'Value']),
+        readme_sheet='Batch',
+    )

@@ -97,7 +97,7 @@ def _setup_timezone(name: str | None) -> str | None:
     strands them on the wizard. An unreadable name is dropped and the
     organization keeps its UTC default, the degradation
     ``org_timezone_async`` would perform on every read anyway. The same
-    answer ``stock_moves._client_timezone`` gives the export's zone hint.
+    answer ``stock_moves.client_timezone`` gives the export's zone hint.
     """
     if not name:
         return None

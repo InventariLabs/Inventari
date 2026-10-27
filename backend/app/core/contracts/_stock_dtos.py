@@ -385,6 +385,83 @@ class StockLotDetailDTO(StockLotDTO):
     status_history: list[LotStatusEventDTO] = []
 
 
+class LotTraceReferenceDTO(BaseModel):
+    """What the module that wrote a movement says its source is.
+
+    Answered by a ``LotTraceSource`` (``app.core.lot_trace``) for one
+    reference: the number a person finds on the paper, and the partner on the
+    other side. The partner's name and address are the ones the source
+    recorded at the time when it has them (a document's snapshot); left empty,
+    the trace reads them from the partner record.
+    """
+
+    label: str | None = None
+    partner_id: UUID | None = None
+    partner_name: str | None = None
+    partner_address: dict[str, Any] | None = None
+
+
+class LotTraceProducedLotDTO(BaseModel):
+    """A batch a transforming source made, and how much of it."""
+
+    lot_id: UUID
+    lot_name: str
+    product_name: str | None = None
+    uom_symbol: str | None = None
+    quantity: Decimal
+
+
+class LotTraceEntryDTO(BaseModel):
+    """One source that brought the batch in or sent it out, netted.
+
+    Every movement of the batch under one reference is summed: a run undone
+    nets to nothing and is not listed, and a delivery picked from three shelves
+    is one line. Movements between two shelves of the organization are not
+    here at all — the goods stayed in the house.
+    """
+
+    direction: str  # 'in' | 'out'
+    reference_type: str | None = None
+    reference_id: UUID | None = None
+    label: str | None = None
+    partner_id: UUID | None = None
+    partner_name: str | None = None
+    partner_address: str | None = None
+    #: The last movement under the reference — when the goods crossed.
+    moved_at: datetime
+    quantity: Decimal
+    #: The batches a transforming source made from this one.
+    produced: list[LotTraceProducedLotDTO] = []
+
+
+class LotTraceLotDTO(BaseModel):
+    """One batch's step back and step forward."""
+
+    lot_id: UUID
+    lot_name: str
+    product_name: str | None = None
+    uom_symbol: str | None = None
+    expiry_date: date | None = None
+    #: The batch this one was made from; None for the batch asked about.
+    made_from_lot_id: UUID | None = None
+    received: list[LotTraceEntryDTO] = []
+    sent: list[LotTraceEntryDTO] = []
+
+
+class LotTraceDTO(BaseModel):
+    """A batch's trace for a recall: the batch first, then what was made of it.
+
+    ``lots`` is breadth-first: the batch asked about, then every batch a
+    production run made from it, then theirs. ``truncated`` says the walk
+    stopped at its limit — the reader is told rather than handed a trace that
+    looks complete.
+    """
+
+    lot_id: UUID
+    lots: list[LotTraceLotDTO]
+    truncated: bool = False
+
+
 class StockAsOfRowDTO(BaseModel):
     """One product, as it stood on a given day."""
 
