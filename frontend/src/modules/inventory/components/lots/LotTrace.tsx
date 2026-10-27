@@ -13,7 +13,6 @@
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { TFunction } from "i18next";
 import { FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -35,13 +34,6 @@ import {
 } from "@/lib/api/stockLots";
 import { useLotTrace } from "../../hooks/useStockLot";
 import { useMoveSourceLink } from "../../moveSourceLink";
-
-type Quantity = (value: string | number, uom?: string | null) => string;
-
-function useQuantity(t: TFunction): Quantity {
-  return (value, uom) =>
-    formatQuantityLocalized(t, formatDecimalQty(value), uom ?? null);
-}
 
 function Source({ entry }: { entry: LotTraceEntry }) {
   const { t } = useTranslation("inventory");
@@ -69,13 +61,7 @@ function Source({ entry }: { entry: LotTraceEntry }) {
   );
 }
 
-function Made({
-  entry,
-  quantity,
-}: {
-  entry: LotTraceEntry;
-  quantity: Quantity;
-}) {
+function Made({ entry }: { entry: LotTraceEntry }) {
   const { t } = useTranslation("inventory");
   if (!entry.produced?.length) return null;
   return (
@@ -91,7 +77,11 @@ function Made({
           </Link>
           {made.product_name ? ` · ${made.product_name}` : ""} ·{" "}
           <span className="tabular-nums">
-            {quantity(made.quantity, made.uom_symbol)}
+            {formatQuantityLocalized(
+              t,
+              formatDecimalQty(made.quantity),
+              made.uom_symbol,
+            )}
           </span>
         </li>
       ))}
@@ -102,11 +92,9 @@ function Made({
 function EntryRow({
   entry,
   uom,
-  quantity,
 }: {
   entry: LotTraceEntry;
   uom: string | null | undefined;
-  quantity: Quantity;
 }) {
   const { t } = useTranslation("inventory");
   return (
@@ -132,10 +120,10 @@ function EntryRow({
             {t("inventory:lot.trace.noPartner")}
           </span>
         ) : null}
-        <Made entry={entry} quantity={quantity} />
+        <Made entry={entry} />
       </span>
       <span className="text-sm tabular-nums text-on whitespace-nowrap sm:text-right">
-        {quantity(entry.quantity, uom)}
+        {formatQuantityLocalized(t, formatDecimalQty(entry.quantity), uom)}
       </span>
     </li>
   );
@@ -145,13 +133,11 @@ function EntryList({
   heading,
   entries,
   uom,
-  quantity,
   empty,
 }: {
   heading: string;
   entries: LotTraceEntry[];
   uom: string | null | undefined;
-  quantity: Quantity;
   empty: string;
 }) {
   return (
@@ -168,7 +154,6 @@ function EntryList({
               key={`${entry.reference_type}-${entry.reference_id}`}
               entry={entry}
               uom={uom}
-              quantity={quantity}
             />
           ))}
         </ul>
@@ -180,11 +165,9 @@ function EntryList({
 function LotSteps({
   lot,
   madeFromName,
-  quantity,
 }: {
   lot: LotTraceLot;
   madeFromName: string | null;
-  quantity: Quantity;
 }) {
   const { t } = useTranslation("inventory");
   return (
@@ -205,14 +188,12 @@ function LotSteps({
         heading={t("inventory:lot.trace.cameIn")}
         entries={lot.received ?? []}
         uom={lot.uom_symbol}
-        quantity={quantity}
         empty={t("inventory:lot.trace.nothingCameIn")}
       />
       <EntryList
         heading={t("inventory:lot.trace.wentOut")}
         entries={lot.sent ?? []}
         uom={lot.uom_symbol}
-        quantity={quantity}
         empty={t("inventory:lot.trace.nothingWentOut")}
       />
     </Card>
@@ -221,7 +202,6 @@ function LotSteps({
 
 export function LotTrace({ lotId }: { lotId: string }) {
   const { t } = useTranslation(["inventory", "common"]);
-  const quantity = useQuantity(t);
   const { data: trace, isLoading, isError, refetch } = useLotTrace(lotId);
 
   const handleExport = useCallback(async () => {
@@ -277,7 +257,6 @@ export function LotTrace({ lotId }: { lotId: string }) {
                   ? (names.get(lot.made_from_lot_id) ?? null)
                   : null
               }
-              quantity={quantity}
             />
           ))}
           {trace.truncated && (
