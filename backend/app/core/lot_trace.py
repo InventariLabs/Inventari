@@ -73,8 +73,3 @@ def get_lot_trace_source(reference_type: str | None) -> LotTraceSource | None:
     if reference_type is None:
         return None
     return _sources.get(reference_type)
-
-
-def unregister_lot_trace_source(reference_type: str) -> None:
-    """Remove the source for *reference_type* — test isolation only."""
-    _sources.pop(reference_type, None)

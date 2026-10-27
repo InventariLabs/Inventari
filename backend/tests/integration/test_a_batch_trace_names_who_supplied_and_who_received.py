@@ -25,12 +25,9 @@ from httpx import AsyncClient
 from openpyxl import load_workbook
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core import lot_trace
 from app.core.contracts import LotTraceReferenceDTO
-from app.core.lot_trace import (
-    LotTraceSource,
-    register_lot_trace_source,
-    unregister_lot_trace_source,
-)
+from app.core.lot_trace import LotTraceSource, register_lot_trace_source
 from app.core.testing import ModuleTestHelper
 from app.models.organization import Organization
 from app.models.partner import Partner
@@ -93,8 +90,12 @@ class _Recall:
 
 
 @pytest.fixture
-async def recall(real_async_db_session: AsyncSession) -> AsyncIterator[_Recall]:
+async def recall(
+    real_async_db_session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> AsyncIterator[_Recall]:
     db = real_async_db_session
+    # The test's sources live in a copy of the registry, gone with the test.
+    monkeypatch.setattr(lot_trace, '_sources', dict(lot_trace._sources))
     paper, run = _Paper(), _Run()
     register_lot_trace_source(paper)
     register_lot_trace_source(run)
@@ -223,8 +224,6 @@ async def recall(real_async_db_session: AsyncSession) -> AsyncIterator[_Recall]:
     )
     await db.commit()
     yield fx
-    unregister_lot_trace_source(_PAPER)
-    unregister_lot_trace_source(_RUN)
 
 
 async def _trace(client: AsyncClient, fx: _Recall) -> dict:
