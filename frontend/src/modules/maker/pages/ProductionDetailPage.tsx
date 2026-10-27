@@ -242,15 +242,6 @@ export default function ProductionDetailPage() {
         <>
           <ProductionOrderStats order={order} />
 
-          {order.output_lot_name && (
-            <Card className="p-4">
-              <div className="text-xs uppercase tracking-widest text-on-muted font-medium mb-2">
-                {t("detail.card.outputLot")}
-              </div>
-              <p className="text-sm text-on">{order.output_lot_name}</p>
-            </Card>
-          )}
-
           {order.notes && (
             <Card className="p-4">
               <div className="text-xs uppercase tracking-widest text-on-muted font-medium mb-2">
