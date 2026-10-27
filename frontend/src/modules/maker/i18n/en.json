@@ -82,6 +82,8 @@
     "storageEmpty": "No location matches",
     "notesLabel": "Notes (optional)",
     "notesPlaceholder": "Internal notes about this run…",
+    "outputLotLabel": "Batch of the output (optional)",
+    "outputLotHint": "Name a batch so a recall of an ingredient can follow this run to whoever received what it made. Leave empty if you do not track batches.",
     "hints": {
       "product": "Pick an output product to enable preview.",
       "quantity": "Enter a planned quantity greater than zero to enable preview.",
@@ -181,6 +183,7 @@
       "confirm": "Yes, undo run"
     },
     "card": {
+      "outputLot": "Output batch",
       "totalCost": "Total cost",
       "totalCostUndone": "Cost before the run was undone",
       "created": "Created",

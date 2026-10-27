@@ -46,6 +46,7 @@ interface PayloadInput {
   storageId: string;
   productionDate: string;
   notes: string;
+  outputLotName: string;
   preselectedProduct?: PreselectedProduct;
 }
 
@@ -56,6 +57,7 @@ function buildPayload({
   storageId,
   productionDate,
   notes,
+  outputLotName,
   preselectedProduct,
 }: PayloadInput): ProductionOrderCreateInput | null {
   if (!selected || !storageId) return null;
@@ -65,6 +67,7 @@ function buildPayload({
     planned_qty: String(parsedQty),
     output_location_id: storageId,
     notes: notes.trim() || null,
+    output_lot_name: outputLotName.trim() || null,
     // A plan is for a day — the day it appears in To do. A run already
     // made is dated by its recording.
     ...(mode === "planned" && productionDate
@@ -101,6 +104,7 @@ export function useProductionForm(
   const [storageId, setStorageId] = useState("");
   const [productionDate, setProductionDate] = useState(todayIso);
   const [notes, setNotes] = useState("");
+  const [outputLotName, setOutputLotName] = useState("");
 
   useEffect(() => {
     if (open) return;
@@ -110,6 +114,7 @@ export function useProductionForm(
     setStorageId("");
     setProductionDate(todayIso());
     setNotes("");
+    setOutputLotName("");
   }, [open]);
 
   // The only warehouse location is the answer; asking for it is a chore.
@@ -141,6 +146,7 @@ export function useProductionForm(
     storageId,
     productionDate,
     notes,
+    outputLotName,
     preselectedProduct,
   });
   const previewKey = useDebounce(
@@ -187,6 +193,8 @@ export function useProductionForm(
     setProductionDate,
     notes,
     setNotes,
+    outputLotName,
+    setOutputLotName,
     requirements,
     canPreview: requirements.length === 0,
     payload,

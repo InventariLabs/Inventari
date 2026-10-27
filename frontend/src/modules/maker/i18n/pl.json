@@ -84,6 +84,8 @@
     "storageEmpty": "Brak pasujących miejsc",
     "notesLabel": "Notatki (opcjonalnie)",
     "notesPlaceholder": "Wewnętrzne notatki o tym zleceniu…",
+    "outputLotLabel": "Partia wyrobu (opcjonalnie)",
+    "outputLotHint": "Nazwij partię, a wycofanie składnika dojdzie przez to zlecenie do odbiorców wyrobu. Zostaw puste, jeśli nie prowadzisz partii.",
     "hints": {
       "product": "Wybierz produkt wyjściowy, aby włączyć podgląd.",
       "quantity": "Wpisz planowaną ilość większą od zera, aby włączyć podgląd.",
@@ -183,6 +185,7 @@
       "confirm": "Tak, cofnij przebieg"
     },
     "card": {
+      "outputLot": "Partia wyrobu",
       "totalCost": "Koszt całkowity",
       "totalCostUndone": "Koszt przed cofnięciem przebiegu",
       "created": "Utworzone",

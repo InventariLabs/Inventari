@@ -71,6 +71,17 @@ export function ProductionRunFields({
 
       {locationField}
 
+      {/* A named batch is what lets a recall of an ingredient follow this
+          run on to the customers of what it made. */}
+      <Input
+        label={t("create.outputLotLabel")}
+        description={t("create.outputLotHint")}
+        value={form.outputLotName}
+        onChange={(e) => form.setOutputLotName(e.target.value)}
+        maxLength={100}
+        data-testid="maker-create-output-lot-input"
+      />
+
       {form.mode === "planned" && (
         <DateInput
           label={t("create.dateLabel")}

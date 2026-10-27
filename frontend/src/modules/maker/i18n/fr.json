@@ -82,6 +82,8 @@
     "storageEmpty": "Aucun emplacement correspondant",
     "notesLabel": "Notes (optionnel)",
     "notesPlaceholder": "Notes internes sur cet ordre…",
+    "outputLotLabel": "Lot de la production (facultatif)",
+    "outputLotHint": "Nommez un lot pour qu'un rappel d'ingrédient remonte, par cet ordre, jusqu'aux destinataires de ce qu'il a fabriqué. Laissez vide si vous ne suivez pas les lots.",
     "hints": {
       "product": "Sélectionnez un produit de sortie pour activer l’aperçu.",
       "quantity": "Saisissez une quantité prévue supérieure à zéro pour activer l’aperçu.",
@@ -181,6 +183,7 @@
       "confirm": "Oui, annuler la production"
     },
     "card": {
+      "outputLot": "Lot de la production",
       "totalCost": "Coût total",
       "totalCostUndone": "Coût avant l'annulation de la production",
       "created": "Créé",

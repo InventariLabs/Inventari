@@ -601,6 +601,21 @@ describe("ProductionCreateSheet — already made, in one step", () => {
     ).toBeInTheDocument();
   });
 
+  it("sends the batch named for the output, and none when the field is left empty", () => {
+    renderSheet();
+    typeQuantity("20");
+    pickStorage("Warehouse");
+    fireEvent.click(screen.getByRole("button", { name: "Save as made" }));
+    expect(mocks.madeMutate.mock.calls[0][0].output_lot_name).toBeNull();
+
+    fireEvent.change(screen.getByLabelText("Batch of the output (optional)"), {
+      target: { value: "  B-01 " },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save as made" }));
+
+    expect(mocks.madeMutate.mock.calls[1][0].output_lot_name).toBe("B-01");
+  });
+
   it("shows need, have and short before saving, and says the shortfall gets counted", () => {
     renderSheet();
     typeQuantity("20");
