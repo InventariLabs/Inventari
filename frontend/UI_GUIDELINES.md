@@ -308,26 +308,12 @@ declared.** A width, a height, a margin or a share of a flex row that the
 component states is not yours to restate from outside — either the component
 offers a variant for what you need, or it needs one adding.
 
-`cn()` is `twMerge`, which resolves conflicts **within a variant group**: `h-auto` on
-`<Button size="sm">` (`h-11 … md:h-8`) wins below `md` and loses on every desktop. A class moved to
-the wrapper changes meaning too — `w-fit` where you meant "as wide as its content",
-`focus-within:` where you had `focus:` (a box never takes focus itself).
-
-#### What to do instead
-
-- **A size you need does not exist** → add it to the variant, free of responsive
-  modifiers so it cannot be half-overridden (`iconSm`, `inline`, `row`, `content`,
-  `contentSm` on `<Button>`).
-- **The box, not the control** → `wrapperClassName`. Every field component
-  (`Input`, `Textarea`, `Select`, `NativeSelect`, `DateInput`, `SearchableCombobox`) renders its box
-  every time, labelled or not, so the prop always lands.
-- **A row of actions** → `<SheetFooter>` + `<SheetActions>` (§4.3).
-- **A field label** → the control's `label` prop; where the control has none, the
-  `<label>` needs `block` of its own.
-
-`npm run lint:ui` fails `make check-frontend` (the commit hook does not run it) when one of these
-breaks (`button-size-override`, `field-box-class`, `label-line-box`), each detector printing why;
-`npm run scan:ui` lists every finding. The detectors live in `frontend/scripts/ui-patterns/`.
+`npm run lint:ui` (in `make check-frontend`; the commit hook does not run it) fails on a class that
+restates one (`button-size-override`, `field-box-class`, `label-line-box`, `footer-half-width`), each
+detector printing why and the variant or prop to use instead; `npm run scan:ui` lists every finding
+(`frontend/scripts/ui-patterns/`). What the messages do not say: a class moved to the wrapper changes
+meaning — `w-fit` where you meant "as wide as its content", `focus-within:` where you had `focus:` (a
+box never takes focus itself).
 
 ### 2.1 Mandatory Components — ALWAYS use these
 
@@ -399,16 +385,10 @@ that _does_ something is `primary` (the one main action), or `outline` / `ghost`
 by weight. Where several buttons form a set and one of them is chosen, `success`
 may mark the chosen one.
 
-**Never shrink an icon button with a class — pick the smaller size.** `icon` keepsa 44px touch target below `md:` and drops to 40px above it, and that `md:` prefix
-is exactly what makes `className="h-8 w-8"` fail: `cn()` is `twMerge`, which does
-not drop a class carrying a responsive modifier for an override that has none.
-The override wins on phones and loses on every desktop, so the button _looks_
-resized in the code and renders 40px in the browser. Use `iconSm` for a compact
-control in a row or an action bar, and `inline` for something that reads as an
-icon inside content — a colour swatch, a star on a tile — where the size comes
-from the element itself. `inline` sits below the 44px touch floor deliberately,
-so use it only next to a larger target or on a surface that is clickable as a
-whole. `npm run lint:ui` fails the build on a geometry class over `size="icon"`.
+**Never shrink an icon button with a class — pick the smaller size** (`lint:ui`,
+`button-size-override`, says why). `iconSm` is for a compact control in a row or an action bar;
+`inline` for an icon inside content — a colour swatch, a star on a tile — sits below the 44px touch
+floor deliberately, so use it only next to a larger target or on a surface clickable as a whole.
 
 ### 2.3 Card compound components
 
@@ -734,10 +714,8 @@ Controls that do the same job must **look** like they do the same job. Every for
   that wants another label voice changes the shared one for everyone. Margins belong to the
   wrapper's `space-y-1.5` — a label adding `mb-*` stacks its own gap on top.
 - **One disclosure indicator** — lucide `ChevronDown` at `size={18}`, `text-on-muted`, trailing
-  edge, on anything that opens a list or expands a section; a `<select>` carries `appearance-none`
-  and `pr-10` and stays native, so a phone keeps its system picker. A section header that reads as
-  a control takes this table's height, growing only for a genuine second line. `lint:ui`
-  (`disclosure-indicator`).
+  edge, on anything that opens a list or expands a section; `lint:ui` (`disclosure-indicator`)
+  says how a native `<select>` and a section header follow it.
 
 ### 2.11 Heading levels — never skip one
 
@@ -778,24 +756,19 @@ own tabs; one that must not goes inside a `<ScrollRow>` (`lint:ui`, `overflow-ro
 
 ### 2.13a Destructive actions in a row are separated and coloured
 
-On a touch screen there is no hover, so a destructive action that warns only on hover warns after
-the tap.
+`lint:ui` enforces both sides and prints the variant and the divider to use:
+`destructive-outside-confirm` (a filled red button outside a dialog) and `destructive-as-neutral` (a
+destructive i18n key on a neutral variant; a variant given as an expression is skipped). What the
+messages do not say:
 
-- Put a divider (`<span aria-hidden className="w-px h-5 shrink-0 bg-border mx-1" />`)
-  between the safe actions and the destructive one. Give it an explicit height —
-  `self-stretch` collapses to nothing inside the `items-center` row it sits in.
-- Give the destructive action `variant="ghostDanger"`; the filled `danger`/`destructive`
-  variants are for the confirmation dialog.
+- The divider keeps its explicit `h-5` — `self-stretch` collapses to nothing inside the
+  `items-center` row it sits in — and follows the axis it separates: `h-px w-full my-1` where the
+  actions stack (below `sm`, a full-width block).
 - An action that is destructive **in one state only** (deactivate/activate)
   switches variants with the state.
-- **Match the divider to the axis it separates**: `w-px h-5 mx-1` in a row,
-  `h-px w-full my-1` where the actions stack (below `sm`, a full-width block).
 - **In a sheet**, a destructive action leaves the footer for the header's `ActionMenu` (§4.3).
 
-`lint:ui` enforces both sides, each detector saying why: `destructive-outside-confirm` (a filled red
-button outside a dialog) and `destructive-as-neutral` (a destructive i18n key on a neutral variant;
-a variant given as an expression is skipped). A filled red button that is right says so at the call
-site, with a reason of five words or more:
+A filled red button that is right says so at the call site, with a reason of five words or more:
 
 ```tsx
 {/* ui-pattern: filled-destructive — the section has already expanded into its
@@ -823,9 +796,8 @@ the window width.
 
 ### 2.13c A control hidden by transparency comes back on focus
 
-Hide a row's actions only above the hover breakpoint and bring them back on focus:
-`md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100` (as in `RecipeCard`).
-`lint:ui` (`hover-only-reveal`) enforces it and says why; a tooltip (`pointer-events-none`) is exempt.
+`lint:ui` (`hover-only-reveal`) enforces it and prints the classes; a tooltip
+(`pointer-events-none`) is exempt.
 
 ### 2.14 Module navigation bar — from two items up
 
@@ -1030,28 +1002,22 @@ focus trap and Escape handling built in. Compose it — never hand-roll the `fix
 </Sheet>
 ```
 
-**`SheetActions` owns the footer's widths** — full width below `sm`, compact and right-aligned above
-it, Cancel (`variant="outline"`) before the primary action — so a `<Button>` inside it sets no width
-(`lint:ui`, `footer-half-width`). A button that must keep its own width says `!flex-none` (the row's
-selector outranks a plain utility); content that belongs on the left — a count of what is about to be
-saved — takes `mr-auto`.
-
-**One row of actions, and it is about this edit.** A `SheetFooter` holds exactly one `SheetActions`:
-Cancel and the primary action, primary last. Actions on the _record_ — Delete, Archive, Duplicate —
-go to the `ActionMenu` in the sheet header, beside the close button, non-destructive first and the
-destructive ones after the separator. `FormSheetFooter` writes the row for a form; `lint:ui`
-(`footer-action-rows`) says why.
+**`SheetActions` owns the footer's widths, and a footer holds one row about this edit** — `lint:ui`
+(`footer-half-width`, `footer-action-rows`) says why and where the record's own actions go. Cancel
+(`variant="outline"`) comes before the primary action; in the header's `ActionMenu` the
+non-destructive actions come first and the destructive ones after the separator. A button that must
+keep its own width says `!flex-none` (the row's selector outranks a plain utility); content that
+belongs on the left — a count of what is about to be saved — takes `mr-auto`.
 
 `SheetFooter` is the chrome around it: the separator, the padding, and the bottom safe-area inset. Use
 it even where the surface is not a `Sheet` — a page whose footer is pinned to the bottom of the
 viewport gets the same inset; never hand-roll one.
 
 **The scroll layer is `SheetBody`** (`flex-1 min-h-0 overflow-y-auto`), with the header and footer
-outside it so they keep their place while the body scrolls. `min-h-0` is mandatory: without it a
-flex child refuses to shrink below its content and `overflow-y-auto` never engages. `lint:ui`
-(`sheet-scroll-layer`) fails on a file that renders a `<Sheet>` with no `SheetBody` and no
-`overflow-auto` / `overflow-y-auto` anywhere in it — a hand-written scroll `div` satisfies it, so the
-layer itself is a review check.
+outside it so they keep their place while the body scrolls (`lint:ui`, `sheet-scroll-layer` — any
+`overflow-auto` / `overflow-y-auto` in the file satisfies it, so the layer itself is a review check).
+`min-h-0` is mandatory: without it a flex child refuses to shrink below its content and
+`overflow-y-auto` never engages.
 
 **Backdrop-click-to-close requires the press to have _started_ on the backdrop.**
 Guarding `onClick` with `e.target === e.currentTarget` alone is not enough: when an
