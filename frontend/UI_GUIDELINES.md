@@ -10,7 +10,7 @@
 Read this section for any UI change, then the sections below for what your change touches.
 The rest of the file is reference: you do not need it end to end.
 
-1. **Use the component, never hand-rolled markup** — §2.1 lists them, §12 maps "I need to…" to
+1. **Use the component, never hand-rolled markup** — §2.1 lists them, §0.2 maps "I need to…" to
    one, §13 lists the helpers (`<Sheet>`, `<StatusBadge>`, `<EmptyState>`, `<QueryResult>`,
    `runWithToast`).
 2. **`className` is appearance, never geometry the component already declares** — a width, a
@@ -30,15 +30,59 @@ The rest of the file is reference: you do not need it end to end.
 
 **What the gates already catch.** These run in `make check-frontend` (and `npm run lint:ui` /
 `npm run scan:ui`), and each prints the rule it enforces; the sections below give the why only where
-the message does not: sizes off the type scale (`check-type-scale`),
-`border-2`, a `<select>` without `appearance-none`, a mis-sized `ChevronDown` in `components/ui/`, geometry over
-`size="icon"`, a filled destructive button in a row (§2.10, §2.13a — `lint:ui`), a label without a
-field, a destructive action in a neutral variant, a hover-only reveal (`lint:ui`), a `<Sheet>`
-without a scroll layer, a footer with widths on its buttons or two action rows (§4.3 — `lint:ui`),
-a page `<EmptyState>` without a description (`check:empty-state`), `...` in a catalogue string
+the message does not: sizes off the type scale (`check-type-scale`), `border-2`, a `<select>` without
+`appearance-none`, a mis-sized `ChevronDown` in `components/ui/`, geometry over `size="icon"`, a
+filled destructive button in a row (§2.10, §2.13a — `lint:ui`), a label without a field, a
+destructive action in a neutral variant, a hover-only reveal (`lint:ui`), a `<Sheet>` without a
+scroll layer, a footer with widths on its buttons or two action rows (§4.3 — `lint:ui`), a page
+`<EmptyState>` without a description (`check:empty-state`), `...` in a catalogue string
 (`check-i18n-keys`), a native `input[type=date]` (§2.8), a hand-written z-index number (§4.1), a raw
-`slate-*` or `emerald-*` class (§1.1) and a `Button` icon off the sizes its button allows (§6 —
-all `lint:ui`). `npm run scan:ui` reports every detector, blocking or not, and never fails.
+`slate-*` or `emerald-*` class (§1.1) and a `Button` icon off the sizes its button allows (§6 — all
+`lint:ui`). `npm run scan:ui` reports every detector, blocking or not, and never fails. Why a rule
+is what it is — the measurements behind it — is in [`UI_RATIONALE.md`](UI_RATIONALE.md), not here.
+
+### 0.1 What to read for your change
+
+| Your change                                 | Read                                                    |
+| ------------------------------------------- | ------------------------------------------------------- |
+| A new list page                             | §11.1, §2.7, §11.6, §11.7, §13.4, §14.1, §14.1a         |
+| A detail page                               | §11.8, §2.6, §11.4                                      |
+| A form, or a field in one                   | §2.10, §2.8, §2.0, §5                                   |
+| A modal, a sheet or a picker                | §4.3, §4.1, §13.3                                       |
+| Buttons and the actions on a row            | §2.2, §2.13a, §2.13b, §2.13c, §11.4                     |
+| A settings page or a module's navigation    | §11.9, §2.14, §2.14a                                    |
+| Colour, type, spacing, borders              | §1, §2.9, §2.12                                         |
+| A status, a badge, a count                  | §2.4, §13.2                                             |
+| Words the reader sees                       | §14, `frontend/AGENTS.md` §4                            |
+| A row that scrolls sideways, or tabs        | §2.13, §2.5                                             |
+| Headings, icons, motion, accessibility      | §2.11, §6, §7, §8                                       |
+
+### 0.2 Quick decision matrix
+
+| "I need to..."                    | Use this                                                   |
+| --------------------------------- | ---------------------------------------------------------- |
+| Show a clickable action           | `<Button variant="..." size="...">`                        |
+| Wrap content in a box             | `<Card>` + `CardHeader/Content/Footer`                     |
+| Show status text                  | `<Badge variant="...">`                                    |
+| Collect text input                | `<Input label="..." error={...}>`                          |
+| Choose from a list                | `<Select>` (few items) or `<SearchableCombobox>` (many)    |
+| Display an icon                   | Lucide import or `<DynamicIcon name="...">`                |
+| Confirm a destructive action      | `<ConfirmDialog>` from `components/ui/`                    |
+| Show a full-screen loading state  | `<LoadingSpinner>`                                         |
+| Layout 2 fields side by side      | `grid grid-cols-1 md:grid-cols-2 gap-4`                    |
+| Start a new list/dashboard page   | Copy the canonical layout from §11.1                       |
+| Write a page title                | `text-lg md:text-xl font-semibold text-on tracking-tight` (§11.2) |
+| Add a "Create" CTA to page header | `<Button leftIcon={<Plus size={16} />}>` rightmost (§11.4) |
+| Add search + filters bar          | Follow toolbar pattern from §11.6                          |
+| Show an empty list state          | `<EmptyState>` (§11.7, §13.4)                              |
+| Create a detail page with "back"  | Follow detail header pattern from §11.8                    |
+| Create a new modal/sheet          | `<Sheet>` from `components/ui/` (§13.3)                    |
+| Show an entity status             | `<StatusBadge status={...}>` (§13.2)                       |
+| Run one-off action + toast        | `runWithToast(fn, {...})` (§13.1)                          |
+| Render loading/error/data states  | `<QueryResult query={...}>` (§13.4)                        |
+| Resize or reposition a component  | A variant, or `wrapperClassName` — not `className` (§2.0)  |
+| Add an action row to a modal      | `<SheetFooter>` + `<SheetActions>` (§4.3)                  |
+
 
 ---
 
@@ -134,11 +178,6 @@ label on the neutral `text-on`, which is high-contrast in both themes by constru
 
 #### ⛔ RULE: each weight has one job
 
-Weight stopped carrying information once `font-semibold` covered twelve sizes
-from 7px to 24px — 613 call sites, 45% of every weight declaration, the page
-title and a 10px caption alike. With one weight spanning the range, hierarchy
-rested on size and colour alone and the product read as flat.
-
 | Weight              | Its one job                                                                                           |
 | ------------------- | ----------------------------------------------------------------------------------------------------- |
 | `font-semibold` 600 | **Titles only**: page (20), card (18), section (16), **record name (14)** — and the selected state (§1.1). |
@@ -146,9 +185,8 @@ rested on size and colour alone and the product read as flat.
 | (none) 400          | Content and data. Digits get `tabular-nums`, not weight.                                              |
 | `font-bold` 700     | **Retired**, except a monospace code — there weight is the only thing separating a serial from prose. |
 
-- **Nothing below `text-sm` may carry `font-semibold`** (`check-type-scale` fails on it). A micro-label is the
-  smaller and lesser of the two label roles; giving it the heavier weight —
-  as this table used to — inverts the pair it belongs to.
+- **Nothing below `text-sm` may carry `font-semibold`** (`check-type-scale` fails on it). A
+  micro-label is the smaller and lesser of the two label roles; the heavier weight inverts the pair.
 - **A monospace code is exempt from both weight rules.** On a serial, SKU or
   label, weight is the only thing separating the code from prose, so
   `font-mono` lines follow the Code/mono token above and the type-scale gate
@@ -171,13 +209,8 @@ rested on size and colour alone and the product read as flat.
 #### ⛔ RULE: uppercase is a label role, a column header or a status, nothing else
 
 The label roles are the three uppercase rows of the table above — form label, micro label,
-navigation label. Content is never uppercase.
-
-Counted as visible runs of uppercase on one screen: `maker` 51, `recipes` 47,
-`inventory` 6 — one product, an eightfold spread. Uppercase means "this is a
-label, not content", and the signal dies when fifty things are labels, while
-the costs stay: no word shape to read by, Polish diacritics losing definition
-at 10px, and truncation eating whole words (`PCS.` → `PC…`).
+navigation label. Content is never uppercase: the signal "this is a label" dies when fifty
+things are labels.
 
 - `<Badge>` is sentence case. `<StatusBadge>` adds the uppercase back.
 - Counters, meta, chips, buttons and section captions are sentence case.
@@ -276,48 +309,26 @@ declared.** A width, a height, a margin or a share of a flex row that the
 component states is not yours to restate from outside — either the component
 offers a variant for what you need, or it needs one adding.
 
-#### Why an override is not simply an override
-
-`cn()` is `twMerge`, and twMerge resolves conflicts **within a variant group**.
-A class with no responsive modifier does not displace the same class with one:
-
-```tsx
-// size="sm" is `h-11 … md:h-8`
-<Button size="sm" className="h-auto">   // ⛔
-```
-
-`h-auto` beats `h-11` and leaves `md:h-8` standing. The button obeys below `md`
-and ignores you on every desktop. Nothing errors, nothing looks wrong in the
-diff, and a unit test asserting the className passes — which is why this exact
-shape shipped three times before a rule caught it.
-
-The same asymmetry is why a class moved to the wrapper is not the same class.
-`w-auto` on a `<select>` is the width of the chosen option; on the `<div>` around
-it, `width: auto` is the whole row. Use `w-fit` when you meant "as wide as its
-content", and `focus-within:` where you had `focus:` — a box never takes focus
-itself.
+`cn()` is `twMerge`, which resolves conflicts **within a variant group**: `h-auto` on
+`<Button size="sm">` (`h-11 … md:h-8`) wins below `md` and loses on every desktop. A class moved to
+the wrapper changes meaning too — `w-fit` where you meant "as wide as its content",
+`focus-within:` where you had `focus:` (a box never takes focus itself).
 
 #### What to do instead
 
 - **A size you need does not exist** → add it to the variant, free of responsive
-  modifiers so it cannot be half-overridden. `iconSm`, `inline`, `row`, `content`
-  and `contentSm` on `<Button>` all exist for exactly this reason.
+  modifiers so it cannot be half-overridden (`iconSm`, `inline`, `row`, `content`,
+  `contentSm` on `<Button>`).
 - **The box, not the control** → `wrapperClassName`. Every field component
   (`Input`, `Textarea`, `Select`, `NativeSelect`, `DateInput`, `SearchableCombobox`) renders its box
   every time, labelled or not, so the prop always lands.
-- **A row of actions** → `<SheetFooter>` + `<SheetActions>` (§4.3), which state
-  both halves of the phone/desktop width rule so no call site has to.
-- **A field label** → the control's `label` prop. A hand-rolled `<label>` is
-  inline by default, so it sits in a line box the wrapper's inherited
-  line-height sizes — about 8px taller than the text — and the field under it
-  lands that much lower than the `DateInput` beside it in the same grid row.
-  Where the control has no `label` prop, the label needs `block` of its own.
+- **A row of actions** → `<SheetFooter>` + `<SheetActions>` (§4.3).
+- **A field label** → the control's `label` prop; where the control has none, the
+  `<label>` needs `block` of its own.
 
-Each of these has a rule behind it — `npm run lint:ui` fails `make check-frontend`
-when one breaks (the commit hook does not run it), and `npm run scan:ui` prints every pattern the detectors know
-about, blocking or not, so two runs can be compared while a class is being
-drained. The detectors live in `frontend/scripts/ui-patterns/`, one file per
-class of mistake, each carrying the sentence it prints when it finds one.
+`npm run lint:ui` fails `make check-frontend` (the commit hook does not run it) when one of these
+breaks (`button-size-override`, `field-box-class`, `label-line-box`), each detector printing why;
+`npm run scan:ui` lists every finding. The detectors live in `frontend/scripts/ui-patterns/`.
 
 ### 2.1 Mandatory Components — ALWAYS use these
 
@@ -687,12 +698,7 @@ role in §1.2); `check-type-scale.mjs` fails on a smaller one.
 
 ### 2.10 Form control geometry — one scale
 
-Controls that do the same job must **look** like they do the same job. In the
-"New document" dialog, as measured, one section held a 40px/8px-radius
-select, a second identical select, and a 44px/12px-radius date field directly
-below them — plus a border that was 1px on lists and 2px in dialogs.
-
-Every form control — `Input`, `Textarea`, `NativeSelect`, `Select`, `DateInput`,
+Controls that do the same job must **look** like they do the same job. Every form control — `Input`, `Textarea`, `NativeSelect`, `Select`, `DateInput`,
 `SearchableCombobox` — uses one scale:
 
 | Property        | Value                                                        |
@@ -706,14 +712,9 @@ Every form control — `Input`, `Textarea`, `NativeSelect`, `Select`, `DateInput
 | Label display   | `block` — an inline label inherits the wrapper's line-height |
 | Error message   | `text-xs text-red-600 font-medium ml-1`, below the control (`Select` shows it inside its trigger) |
 
-- **Pass `label` to the control; never hand-roll a `<label>` beside it.** The
-  wrapper owns the label-to-field gap — the measured rhythm of 12 / 0 / 19 / 7px
-  came from forms spacing their own labels. Every control above accepts `label`.
-  It is also the only thing that puts the name in the accessibility tree: a
-  `<label>` written above a field with neither `htmlFor` nor the control inside
-  it is styled text, and the field is announced without a name. Where the layout
-  puts the label _beside_ the field, give the control an `id` and point
-  `htmlFor` at it. `npm run lint:ui` fails on `label-without-field`.
+- **Pass `label` to the control; never hand-roll a `<label>` beside it** — the wrapper owns the
+  gap, and only the prop puts the name in the accessibility tree. `lint:ui` (`label-without-field`)
+  says why and what to do where the label sits beside the field.
 - **A group of options is labelled as a group, not with a `<label>`.** A row of
   chips where exactly one is chosen has no single field for a label to point at.
   `ChoiceGroup` (`components/ui/ChoiceGroup.tsx`) names the group through
@@ -724,45 +725,25 @@ Every form control — `Input`, `Textarea`, `NativeSelect`, `Select`, `DateInput
   read as the same kind of field, and only `error` and `:focus` may tint the
   frame. The placeholder-vs-value distinction is carried by text colour alone
   (`text-on-muted` / `data-[placeholder]` vs `text-on`), exactly like `Input`.
-- **Do not raise a border to `border-2` for emphasis.** Emphasis is colour
-  (`border-primary-500`) plus a tint, not thickness — a 2px border changes the
-  control's outer box and breaks alignment with its neighbours. This holds for
-  cards and selection tiles too, not only for form controls: a 2px card wrapping
-  a 1px card shows both weights in one tile. `npm run lint:ui` fails on
-  `border-2`; the single exception it allows is a _transparent_ one used as
-  geometry rather than as a frame, such as the inset a switch knob travels
-  within.
+- **No `border-2` for emphasis** — on controls, cards and selection tiles alike; emphasis is
+  colour plus a tint. `lint:ui` (`border-weight`) names its one exception.
 - `size="sm"` on `Select` is the one compact variant (`h-9`, `text-xs`); it keeps
   the same radius and border weight.
-- **Label geometry is shared, not negotiated per screen.** Every
-  control draws its label from one class string; `labelClassName` exists for
-  what is _not_ geometry — today, responsive visibility, where a label folds
-  away because a column header takes over (`xl:sr-only` in `LineItemsEditor`).
-  It is not a way to re-decide size, case, weight, tracking, colour or margins:
-  a screen that wants another label voice changes the shared one for everyone
-  or leaves a second voice in the app, which is the defect this section exists
-  to prevent. Nine call sites once used the prop to undo the canonical geometry
-  and were snapped back to it; margins especially belong to the wrapper's
-  `space-y-1.5` — a label adding `mb-*` stacks its own gap on top.
-- **One disclosure indicator.** Anything that opens a list or expands a section —
-  `Select`, `NativeSelect`, a collapsible section header — draws the same
-  `ChevronDown` from lucide at `size={18}`, `text-on-muted`, at the trailing
-  edge. A `<select>` therefore always carries `appearance-none` and `pr-10`:
-  left to the platform it renders whatever arrow the OS and the browser agree
-  on, and one storage sheet showed a system arrow, a lucide chevron and a third
-  one within a single column. The indicator is ours, the control is not — the
-  element stays a native `<select>` so a phone keeps opening the system picker.
-- **A section header that reads as a control is a control.** A collapsed
-  disclosure box standing in a form column takes the height, radius and padding
-  from this table; it may only grow past that height when it genuinely carries a
-  second line. `npm run lint:ui` fails on a `<select>` without
-  `appearance-none`, and on a `ChevronDown` in `components/ui/` drawn at another
-  size or hung off a control that states no height.
+- **Label geometry is shared, not negotiated per screen.** `labelClassName` exists for what is
+  _not_ geometry — today, responsive visibility (`xl:sr-only` in `LineItemsEditor`, where a column
+  header takes over). It never re-decides size, case, weight, tracking, colour or margins; a screen
+  that wants another label voice changes the shared one for everyone. Margins belong to the
+  wrapper's `space-y-1.5` — a label adding `mb-*` stacks its own gap on top.
+- **One disclosure indicator** — lucide `ChevronDown` at `size={18}`, `text-on-muted`, trailing
+  edge, on anything that opens a list or expands a section; a `<select>` carries `appearance-none`
+  and `pr-10` and stays native, so a phone keeps its system picker. A section header that reads as
+  a control takes this table's height, growing only for a genuine second line. `lint:ui`
+  (`disclosure-indicator`).
 
 ### 2.11 Heading levels — never skip one
 
-A screen-reader user navigates a page by its heading outline. Six screens across
-the trade modules went `h1` → `h3` with no `h2`, which reads as a missing level.
+A screen-reader user navigates a page by its heading outline; a skipped level reads as a
+missing one.
 
 | Level | Who renders it                                                       |
 | ----- | -------------------------------------------------------------------- |
@@ -778,9 +759,7 @@ the trade modules went `h1` → `h3` with no `h2`, which reads as a missing leve
 
 ### 2.12 Borders — only where a layer ends
 
-A documents list at 390px carried **109 outlined elements**: one per card, one
-per badge inside those cards, one per filter chip, plus every control. Nothing
-stood out, because everything was framed.
+When everything is framed nothing stands out.
 
 - **Keep the outline** where one layer ends and another begins: a card on the
   page, a dialog over the page, a form control the user can type into.
@@ -793,68 +772,36 @@ stood out, because everything was framed.
 ### 2.13 Horizontal scrollers announce themselves
 
 A row with `overflow-x-auto` and nothing else hides its overflow behind a hard
-edge — the status filters ended at "Confirmed" with no sign that "Completed" and
-"Cancelled" were one swipe away — while the browser's own scrollbar renders as a
-thick grey bar that reads like a UI element.
-
-Use `<ScrollRow>` (`@/components/ui/ScrollRow`) for any horizontally scrolling
+edge, while the browser's own scrollbar reads like a UI element. Use `<ScrollRow>` (`@/components/ui/ScrollRow`) for any horizontally scrolling
 row of controls. It hides the scrollbar and fades the content at whichever end
-still has content behind it, using a mask so it works on any background.
+still has content behind it, using a mask so it works on any background. A `TabsList` scrolls its
+own tabs; one that must not goes inside a `<ScrollRow>` (`lint:ui`, `overflow-row`).
 
 ### 2.13a Destructive actions in a row are separated and coloured
 
-Three modules have now shipped the same row: `Edit | Deactivate`,
-`Edit | Confirm | Cancel` — the destructive action flush against the safe one,
-in the same weight, with the warning appearing only on hover. On a touch screen
-there is no hover, so the first signal arrives after the tap.
+On a touch screen there is no hover, so a destructive action that warns only on hover warns after
+the tap.
 
 - Put a divider (`<span aria-hidden className="w-px h-5 shrink-0 bg-border mx-1" />`)
   between the safe actions and the destructive one. Give it an explicit height —
   `self-stretch` collapses to nothing inside the `items-center` row it sits in.
-- Give the destructive action `variant="ghostDanger"` — the label carries the
-  colour at rest, not on hover. Reserve the filled `danger`/`destructive`
-  variants for the confirmation dialog, where the action is the point of the
-  screen; inside a row a filled red button outweighs the row's own content.
+- Give the destructive action `variant="ghostDanger"`; the filled `danger`/`destructive`
+  variants are for the confirmation dialog.
 - An action that is destructive **in one state only** (deactivate/activate)
   switches variants with the state.
-- **Match the divider to the axis it separates.** The rule above assumes a
-  horizontal row. Where the actions stack — a full-width action block in a
-  card, the row below `sm` — a `w-px` divider is a zero-width element on a
-  line of its own, and reads as an unexplained gap. Turn it with the layout:
-  `h-px w-full my-1` in a stack, `w-px h-5 mx-1` in a row.
-- **In a sheet footer, give it its own row instead of the divider.** The footer
-  stacks below `sm` (§4.3), so a delete sitting in the action row lands
-  directly under the primary button — a mis-click waiting for a hurried thumb.
-  Its own row, aligned to the far end from Save (`sm:justify-start`), keeps the
-  separation the divider provides in a horizontal row.
+- **Match the divider to the axis it separates**: `w-px h-5 mx-1` in a row,
+  `h-px w-full my-1` where the actions stack (below `sm`, a full-width block).
+- **In a sheet**, a destructive action leaves the footer for the header's `ActionMenu` (§4.3).
 
-`npm run lint:ui` enforces this on `<Button>`. Some filled red buttons are
-right anyway — a screen that expands into its own confirmation step instead of
-opening a dialog, a remove chip sitting on a photo where a ghost button
-disappears into whatever the user photographed. Those say so at the call site,
-in the shape the backend's architecture linter already uses:
+`lint:ui` enforces both sides, each detector saying why: `destructive-outside-confirm` (a filled red
+button outside a dialog) and `destructive-as-neutral` (a destructive i18n key on a neutral variant;
+a variant given as an expression is skipped). A filled red button that is right says so at the call
+site, with a reason of five words or more:
 
 ```tsx
-{
-  /* ui-pattern: filled-destructive — the section has already expanded into its
-    confirmation step, so this button is the confirm and not the trigger */
-}
-<Button variant="destructive" onClick={doArchive}>
-  Archive
-</Button>;
+{/* ui-pattern: filled-destructive — the section has already expanded into its
+    confirmation step, so this button is the confirm and not the trigger */}
 ```
-
-The reason has to be a sentence — five words or more, or the gate ignores the
-marker. A list of exempt paths with no argument attached is where a rule goes
-to be forgotten.
-
-The opposite failure is a destructive action wearing a neutral variant —
-`Edit | Delete` with `Delete` in `ghost`, the warning arriving only on hover,
-which a touch screen never sends. `npm run lint:ui` fails these under
-`destructive-as-neutral`: it cannot read the variant, so it reads the i18n
-key, because the label is translated and the key is not. Variants given as an
-expression are skipped — the state switch above is a judgement a static read
-cannot make. The class is drained and the detector blocks.
 
 ### 2.13b Card-row actions hug the right edge in both layouts
 
@@ -877,22 +824,9 @@ the window width.
 
 ### 2.13c A control hidden by transparency comes back on focus
 
-`opacity-0 group-hover:opacity-100` on a row's actions hides the whole control
-from a finger (which never sends a hover) and leaves it focusable at
-`opacity: 0` for a keyboard.
-
-- Hide it **only above the hover breakpoint**: `md:opacity-0`. Below it — which
-  is to say on a touch screen — the action is simply visible.
-- Bring it back on focus: `md:group-focus-within:opacity-100` beside the hover
-  class. Both guards, not one: a focus reveal alone still leaves a finger with
-  nothing to tap, and a breakpoint alone still hides the control from a
-  keyboard on a laptop.
-- The canonical spelling, already in `RecipeCard` and `CollectionsPanel`:
-  `md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100`.
-- A tooltip is not a control — nothing focuses it and nothing taps it — so
-  `pointer-events-none` is the marker that exempts it.
-
-`npm run lint:ui` enforces this as `hover-only-reveal`.
+Hide a row's actions only above the hover breakpoint and bring them back on focus:
+`md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100` (as in `RecipeCard`).
+`lint:ui` (`hover-only-reveal`) enforces it and says why; a tooltip (`pointer-events-none`) is exempt.
 
 ### 2.14 Module navigation bar — from two items up
 
@@ -1097,46 +1031,28 @@ focus trap and Escape handling built in. Compose it — never hand-roll the `fix
 </Sheet>
 ```
 
-**Form footer (convention):** compact buttons, right-aligned, Cancel (`variant="outline"`) before the primary action; never 50/50 full-width on desktop. On mobile (<sm) the buttons are full-width for touch comfort — but on desktop always compact and right-aligned.
+**`SheetActions` owns the footer's widths** — full width below `sm`, compact and right-aligned above
+it, Cancel (`variant="outline"`) before the primary action — so a `<Button>` inside it sets no width
+(`lint:ui`, `footer-half-width`). A button that must keep its own width says `!flex-none` (the row's
+selector outranks a plain utility); content that belongs on the left — a count of what is about to be
+saved — takes `mr-auto`.
 
-**Do not write those widths at the call site — `SheetActions` owns them.** Every
-footer that hand-rolled this row wrote `flex-1` and stopped: that is the phone half
-of the rule, and without the `sm:` half the dialog splits down the middle on a
-desktop. `SheetActions` states both halves on the row, so a `<Button>` inside it
-sets no width at all; `npm run lint:ui` fails on one that does. A button that must
-keep its own width says `!flex-none` (the row's selector outranks a plain utility);
-content that belongs on the left — a count of what is about to be saved — takes
-`mr-auto`.
+**One row of actions, and it is about this edit.** A `SheetFooter` holds exactly one `SheetActions`:
+Cancel and the primary action, primary last. Actions on the _record_ — Delete, Archive, Duplicate —
+go to the `ActionMenu` in the sheet header, beside the close button, non-destructive first and the
+destructive ones after the separator. `FormSheetFooter` writes the row for a form; `lint:ui`
+(`footer-action-rows`) says why.
 
-**One row of actions, and it is about this edit.** A `SheetFooter` holds exactly
-one `SheetActions` — `Cancel` and the primary action, primary last. Actions that
-act on the _record_ rather than on the edit in progress — Delete, Archive,
-Duplicate — go to the `ActionMenu` in the sheet header, beside the close button,
-non-destructive first and the destructive ones after the separator. Save and
-Cancel speak about changes that exist only while the dialog is open; deleting
-speaks about something that outlives it, and the two do not share a block.
+`SheetFooter` is the chrome around it: the separator, the padding, and the bottom safe-area inset. Use
+it even where the surface is not a `Sheet` — a page whose footer is pinned to the bottom of the
+viewport gets the same inset; never hand-roll one.
 
-That is also the only shape that fits: `SheetActions` gives every button
-`flex-1` below `sm`, so a fourth action on a 390px screen leaves four ~90px
-buttons. `FormSheetFooter` writes this row for you — prefer it over spelling out
-`SheetFooter` + `SheetActions` for a form. `npm run lint:ui` fails on a footer
-with more than one action row.
-
-`SheetFooter` is the chrome around it: the separator, the padding, and the bottom
-safe-area inset. Use it even where the surface is not a `Sheet` — a page whose
-footer is pinned to the bottom of the viewport is the same thing and gets the same
-inset. Hand-rolling that inset is how footers ended up with `pb-safe-bottom`, a
-utility this project does not define and which therefore did nothing.
-
-**The scroll layer is `SheetBody`.** The `Sheet` panel is `max-h-[90vh] overflow-hidden`, so content taller than the
-panel needs a scroll layer of its own: `SheetBody` (`flex-1 min-h-0 overflow-y-auto`).
-Without it the tail of the content is clipped and **unreachable** — a `Sheet` locks
-`body` scrolling while it is open, so the page underneath will not move either.
-`min-h-0` is mandatory: without it a flex child refuses to shrink below its content
-size and `overflow-y-auto` never engages. Header and footer stay outside `SheetBody`
-so they keep their place while the body scrolls. `npm run lint:ui` fails on a
-file that renders a `<Sheet>` with no `SheetBody` and no `overflow-auto` / `overflow-y-auto`
-anywhere in it — a hand-written scroll `div` satisfies it, so the layer itself is a review check.
+**The scroll layer is `SheetBody`** (`flex-1 min-h-0 overflow-y-auto`), with the header and footer
+outside it so they keep their place while the body scrolls. `min-h-0` is mandatory: without it a
+flex child refuses to shrink below its content and `overflow-y-auto` never engages. `lint:ui`
+(`sheet-scroll-layer`) fails on a file that renders a `<Sheet>` with no `SheetBody` and no
+`overflow-auto` / `overflow-y-auto` anywhere in it — a hand-written scroll `div` satisfies it, so the
+layer itself is a review check.
 
 **Backdrop-click-to-close requires the press to have _started_ on the backdrop.**
 Guarding `onClick` with `e.target === e.currentTarget` alone is not enough: when an
@@ -1149,12 +1065,7 @@ must repeat it.
 **One Escape closes one layer.** A `Sheet` opened from inside a dialog — the date
 picker below `sm:` is the common case — closes itself from its own `document`
 listener, while Radix listens for the same key in the capture phase and registered
-first. Measured at 390px, one press took down the picker _and_ the campaign dialog
-behind it, with everything typed. The same shape appears the other way round: a
-sheet opened from inside another sheet — the location list under the storage
-wizard's first step — where one press used to close the list _and_ raise the
-wizard's discard question over it, with a destructive Discard a click away.
-`Sheet` therefore announces itself through `components/ui/overlayStack.ts` while
+first, so one press would take down both layers. `Sheet` therefore announces itself through `components/ui/overlayStack.ts` while
 open, and **only the highest sheet acts on the key**: one standing under another
 stands idle, and `DialogContent` prevents the Escape it is handed while a sheet is
 stacked above. Any new overlay shell that can be opened from inside a dialog must
@@ -1169,14 +1080,10 @@ dialog remembers the element as it opens and restores it on the way out, falling
 back to `getTopmostOverlaySheetPanel()` — which is why a `Sheet` panel carries
 `tabIndex={-1}`.
 
-**A panel that fills the screen is a sheet on a phone, never a popover.**
-`SearchableCombobox` was a Radix popover in both places. Its panel is around 550px
-of header, search field and list — more than fits under a trigger halfway down a
-form — so Radix flipped it above the trigger and clamped it against the top of the
-_layout_ viewport, which on a phone is behind the browser's own chrome. Measured at
-390x620: the panel started at -118px and the search field, the first thing the
-reader is meant to type into, sat entirely off-screen between -48px and -4px. Below
-`sm:` such a panel is a `Sheet` — `DateInput` and `SearchableCombobox` both are.
+**A panel that fills the screen is a sheet on a phone, never a popover.** A popover
+taller than the space under its trigger is flipped above it and clamped against the
+top of the _layout_ viewport, which on a phone is behind the browser's own chrome.
+Below `sm:` such a panel is a `Sheet` — `DateInput` and `SearchableCombobox` both are.
 Above it, the popover states `collisionPadding` and caps its height with
 `--radix-popover-content-available-height`, so a short window shrinks the list
 instead of pushing the panel off the top of the screen.
@@ -1185,9 +1092,7 @@ instead of pushing the panel off the top of the screen.
 not the screen.** `DialogContent` centres itself with `translate-x-[-50%]
 translate-y-[-50%]`, and a transform makes an element the containing block for every
 `position: fixed` descendant — so the sheet's `inset-0` resolves to the dialog's box
-rather than the viewport. Measured at 390x620 in the putaway-rule dialog, the panel
-ran 88px below the bottom of the screen; the date picker has the same geometry there
-today. A form that holds a picker belongs in a `Sheet` or a `ModalShell`, neither of
+rather than the viewport, and the panel runs off the bottom of the screen. A form that holds a picker belongs in a `Sheet` or a `ModalShell`, neither of
 which transforms, until `DialogContent` centres without one.
 
 ### 4.4 Centered modal pattern (desktop-only)
@@ -1623,29 +1528,7 @@ Where a page cannot meet a rule yet, the gap is tracked as an issue, not left as
 
 ## 12. Quick Decision Matrix
 
-| "I need to..."                    | Use this                                                   |
-| --------------------------------- | ---------------------------------------------------------- |
-| Show a clickable action           | `<Button variant="..." size="...">`                        |
-| Wrap content in a box             | `<Card>` + `CardHeader/Content/Footer`                     |
-| Show status text                  | `<Badge variant="...">`                                    |
-| Collect text input                | `<Input label="..." error={...}>`                          |
-| Choose from a list                | `<Select>` (few items) or `<SearchableCombobox>` (many)    |
-| Display an icon                   | Lucide import or `<DynamicIcon name="...">`                |
-| Confirm a destructive action      | `<ConfirmDialog>` from `components/ui/`                    |
-| Show a full-screen loading state  | `<LoadingSpinner>`                                         |
-| Layout 2 fields side by side      | `grid grid-cols-1 md:grid-cols-2 gap-4`                    |
-| Start a new list/dashboard page   | Copy the canonical layout from §11.1                       |
-| Write a page title                | `text-lg md:text-xl font-semibold text-on tracking-tight` (§11.2) |
-| Add a "Create" CTA to page header | `<Button leftIcon={<Plus size={16} />}>` rightmost (§11.4) |
-| Add search + filters bar          | Follow toolbar pattern from §11.6                          |
-| Show an empty list state          | `<EmptyState>` (§11.7, §13.4)                              |
-| Create a detail page with "back"  | Follow detail header pattern from §11.8                    |
-| Create a new modal/sheet          | `<Sheet>` from `components/ui/` (§13.3)                    |
-| Show an entity status             | `<StatusBadge status={...}>` (§13.2)                       |
-| Run one-off action + toast        | `runWithToast(fn, {...})` (§13.1)                          |
-| Render loading/error/data states  | `<QueryResult query={...}>` (§13.4)                        |
-| Resize or reposition a component  | A variant, or `wrapperClassName` — not `className` (§2.0)  |
-| Add an action row to a modal      | `<SheetFooter>` + `<SheetActions>` (§4.3)                  |
+Moved under §0, as §0.2.
 
 ---
 
@@ -1760,10 +1643,6 @@ A record row on the desktop list is built for reading many at once, not for
 looking at one. Its cells carry `py-2` and its thumbnail is `w-10 h-10`
 — together under 60px a row, a dozen or more rows on a 900px screen.
 
-The list this rule was written for showed six rows out of 584 records, because
-it had grown a `py-4` cell around a 48px thumbnail. Six rows is a viewer, not a
-list: the reader scrolls past a hundred screens to reach the end of a warehouse.
-
 - The card branch used on a phone keeps its height — there the row is a touch
   target and 44px is a floor, not a budget.
 - If a density switch (comfortable / compact) is ever added, it changes this
@@ -1771,20 +1650,11 @@ list: the reader scrolls past a hundred screens to reach the end of a warehouse.
 
 ### 14.1b The phone card's content target is measured in width
 
-`ItemMobileCard`'s row button — the thing that opens the product — is left under
-the 44px floor on purpose, and this section is the reason written down. Measured
-at 390px it is **228 × 38**: five times the floor on the axis a thumb travels
-along, and six pixels short on the other. Its height is what the row carries —
-name, identifiers, metadata — and the card around it is 118px tall, set not by
-the row but by its neighbours: a 44×44 quantity badge on the left, two stacked
-44×44 actions on the right.
-
-The floor is written for controls: `h-11 md:h-10`, a height a call site
-declares. A full-width row between two columns of controls is not that — the
-reader aims at the row, and the 44px targets are already at both ends of it.
-Padding the button to 44 would add 6px to every product in a list built for
-scrolling, or need a negative margin to hide the padding again. 228 × 38 on
-`/inventory/items` is the decision, not a regression.
+`ItemMobileCard`'s row button — the thing that opens the product — stays under the
+44px floor on purpose: 228 × 38 at 390px, between a 44×44 quantity badge and two
+stacked 44×44 actions. The floor is for controls that declare a height
+(`h-11 md:h-10`); a full-width row the reader aims at is not one. Do not pad it
+to 44 — the measurement is in `UI_RATIONALE.md` §14.1b.
 
 ### 14.2 Location vocabulary — one word for a place
 
@@ -1799,11 +1669,8 @@ A place stock is kept has one word, at every level of the tree:
 | es       | **Ubicación** | `Cámara frigorífica`, `Recepción`, `Estante A`  |
 
 "Storage", "place", "room", "zone", "spot" and "shelf" (as a generic noun) are not
-synonyms to reach for — one concept, one word. The app used to say Storages / storage
-location / target location / Locations / Warehouse for the same thing, leaving no way to
-tell whether those were five things or one. In Polish, "magazyn" and "lokalizacja" are
-retired for a place as well: "Magazyn" is the name of the warehouse module, which
-received the word when the container lost it.
+synonyms to reach for — one concept, one word. In Polish, "magazyn" and "lokalizacja" are
+retired for a place as well: "Magazyn" is the name of the warehouse module.
 
 Applies to page titles, section headings, counters, empty states, toasts and search
 placeholders, in all five languages. Internal identifiers (`zone` in component and
@@ -1817,11 +1684,7 @@ not.
 | Where stock lands      | **To location**   | `To location`, `Do miejsca`, `Ziel-Lagerort`   |
 
 "Output" names the produced _thing_, never the place — "Output product" is right,
-"Output location" is a destination wearing the word for a source. The production sheet
-and the cook-for-stock window carried "Magazyn wyjściowy" / "Stockage de sortie" /
-"Almacén de salida" one line under a subtitle promising a _target_ place; in Polish
-that is the exact reverse of the movement, and the mistake is silent — nothing
-downstream questions it.
+"Output location" is a destination wearing the word for a source.
 
 Guarded by `src/i18n/__tests__/movementDirectionVocabulary.test.ts`, which holds the
 two windows to the wording the warehouse documents already use (`fields.targetLocation`).
@@ -1829,10 +1692,7 @@ two windows to the wording the warehouse documents already use (`fields.targetLo
 ### 14.3 The record is a Product
 
 The thing on a shelf is a **Product**, in every user-visible string and all five
-languages. It used to be two things at once: the sidebar and the page title said
-"Items" while the subtitle directly beneath them said "Browse and manage your
-products", and one sentence in the bulk-edit window used both nouns in a single
-breath — "applied to all 3 selected products … unchanged for each item".
+languages — never "item" beside it.
 
 Guarded by `src/i18n/__tests__/productVocabulary.test.ts` over the core catalogues
 (`items`, `common`, `locations`, `labels` and the `inventory` module in every maintained
@@ -1858,17 +1718,7 @@ in the content — the chips listing child locations already did.
 
 ### 14.5 One ellipsis — the character, not three dots
 
-A placeholder, a loading label and a "show the rest" line all trail off the same way,
-and the catalogue writes that with the ellipsis character:
-
-```json
-"selectUnit": "Wybierz jednostkę…",
-"searching": "Szukam…"
-```
-
-**`…` (U+2026), never `...`.** Three periods wrap and truncate as three glyphs, and a
-screen reader may read them out as "dot dot dot". `check-i18n-keys.mjs` fails a run on a catalogue string containing `...`, so a new
-label cannot pick the losing side by accident.
+**`…` (U+2026), never `...`**, in every catalogue string — `check-i18n-keys.mjs` fails a run on three dots.
 
 ### 14.6 The WMS session row — one line, in both sessions
 
@@ -1876,10 +1726,7 @@ The picking session and the receiving session lay a document line out the same
 way, because the same person works both with the same phone, often one after
 the other: the product name and its context (location, lot, planned shelf) on
 the left, the quantity, the status Badge and the icon actions on the right, all
-in one flex row. The receiving row used to stack name, quantity, an uppercase
-10px status and then the actions underneath — four lines for facts the picking
-row held in one, with a second vocabulary for the state and the actions out of
-the place the eye had learned.
+in one flex row.
 
 Action icons in both rows are `size="icon"` (44px below `md`) and carry an
 `aria-label` and the same `title`: two of them sit side by side, and neither has

@@ -412,7 +412,7 @@ export function useDocumentWorkspaceState({
     const cleanLines = lines.map(mapReceiptLineToPayload);
 
     // An empty field the user emptied is a clearing instruction, and a null
-    // is how the wire spells one (backend AGENTS.md §2b). Turning it into
+    // is how the wire spells one (backend/AGENTS.md §2b). Turning it into
     // undefined dropped the key, so the save answered "updated" over a value
     // that never changed.
     return {

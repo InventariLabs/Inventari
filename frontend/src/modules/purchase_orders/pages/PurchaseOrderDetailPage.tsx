@@ -125,8 +125,8 @@ export default function PurchaseOrderDetailPage() {
   const [actionType, setActionType] = useState<POActionType>(null);
   // cancel restricted to admin/manager (backend enforces too).
   // The backend checks purchase_orders:manage; asking for role names
-  // instead refused a custom role holding the key (AGENTS.md: gate on a
-  // permission, never on a role name).
+  // instead refused a custom role holding the key (backend/AGENTS.md §7:
+  // gate on a permission, never on a role name).
   const canManage = useCanManage("purchase_orders");
   const canWrite = useCanWrite("purchase_orders");
   // Approve/Reject answer to `approvals:approve`, not to manage: the bar was

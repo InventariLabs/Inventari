@@ -121,65 +121,29 @@ async def create_endpoint(
 For single-resource lookups, fetch via service and raise `NotFoundException(resource, lang)` when missing (see §3).
 
 ### 2b. Partial updates: "named null" clears, "absent key" leaves alone
-An `XUpdate` schema types every field optional because a PATCH is partial —
-but "optional in the schema" and "nullable in the column" are two different
-sets. The contract (same as the PO settings endpoint):
+An `XUpdate` schema types every field optional because a PATCH is partial — but "optional in the
+schema" and "nullable in the column" are two different sets:
 
-- **Presence is decided where the payload's key set is still visible.**
-  The decision reads `data.model_fields_set` (or
-  `model_dump(exclude_unset=True)` for dict-shaped services). Most endpoints
-  make it at the router, where Pydantic hands the DTO over; a service that
-  receives the DTO directly — the PO order update — makes it there instead.
-  The place is not the contract: the contract is that the decision happens
-  before presence is lost, that an absent key reaches the rest of the code
-  as "don't touch" rather than `None`, and that no later layer re-filters
-  with a blanket `if value is not None`.
-- **A named null is a clearing instruction** for a nullable column: it
-  reaches the column as `NULL`.
-- **A named null is refused with 400** on a column that cannot take NULL:
-  the router names the field — it never forwards the null to `setattr`,
-  where the driver turns it into a 500.
-- **Value-sentinels only where "clear" means "store a special value"** (an
-  empty string, a zero) — not as a substitute for the null the client sent.
-- Do **not** re-filter in the service with a blanket `if value is not None`:
-  it silently erases the clearing instruction the router already decided.
-- **The service-kwargs shape: presence travels as the `UNSET` sentinel.**
-  When the update flows into service keyword arguments, the router passes a
-  named value straight through and a module-level `UNSET` singleton for every
-  **clearable** key the payload omitted: `x=data.x if 'x' in sent else UNSET`.
-  A field the refusal already answers (a column that cannot take NULL) needs
-  no sentinel — its service parameter stays `T | None = None`, because the
-  refusal guarantees `None` never carries an answer there. The clearable
-  service parameter is typed `T | None | _Unset` and the branch reads
-  `if not isinstance(x, _Unset)` — `None` is a real answer there (the cleared
-  nullable column), so `if x is not None` cannot do the branching: it erases
-  the difference between "clear it" and "don't touch it".
-  `purchase_orders._service_settings` owns the reference implementation, and
-  the pricelist and reorder services take the same shape.
-- **The refusal speaks one shape, held module-locally.** A §2b refusal is
-  the 400 naming every field the payload nulled on a column that cannot take
-  NULL. Modules do not import from one another, so the shape is held per
-  module, in whichever form fits: `purchase_orders` keeps a
-  `refuse_named_nulls(data, {'min_quantity', ...})` helper; `warehouse`
-  (putaway rules) and `stock_takes` (cycle counts) raise the same answer inline. What they share — and what the
-  tests pin — is the identical message and the refusal set, not the helper.
-  Run it at the top of the update endpoint, before the presence-decides
-  plumbing.
-- **A nullable column can still be refused — as a recorded exception.**
-  When the cleared state has no honest answer yet, refuse the named null
-  like a column that cannot take NULL, and write the reason both next to
-  the call and here. Recorded: `purchase_order.scheduled_date` — the column
-  is nullable, but the order number carries the date's period: the number
-  is dated by it on create and renumbered when a value change moves the
-  date, while the engine's answer for an absent date is "today". Clearing
-  the date would strand the number in the old period — or, on the next
-  renumber, re-file the order in the current one — behind a PATCH the
-  operator read as a date edit. Re-dating by value does that explicitly and
-  stays legal; clearing waits for an explicit decision.
+- **Presence is decided where the payload's key set is still visible** — `data.model_fields_set` (or
+  `model_dump(exclude_unset=True)`), at the router, or in the service that receives the DTO itself (the
+  PO order update). An absent key reaches the rest of the code as "don't touch", never as `None`.
+- **A named null clears** a nullable column: it reaches the column as `NULL`.
+- **A named null is refused with 400** on a column that cannot take NULL: the router names the field and
+  never forwards the null to `setattr`, where the driver turns it into a 500.
+- **Value-sentinels only where "clear" means "store a special value"** (an empty string, a zero).
+- **No blanket `if value is not None` in a later layer** — it erases the clearing instruction.
+- **Into service kwargs, presence travels as `UNSET`**: `x=data.x if 'x' in sent else UNSET` for every
+  clearable key; the parameter is `T | None | _Unset` and the branch reads `if not isinstance(x, _Unset)`.
+  A field the refusal already answers keeps `T | None = None`. Reference: `purchase_orders._service_settings`.
+- **The refusal speaks one shape, held module-locally** — the 400 naming every field nulled on a column
+  that cannot take NULL, run at the top of the update endpoint. Modules share the message and the refusal
+  set, not a helper (`purchase_orders` has `refuse_named_nulls`; `warehouse` and `stock_takes` raise it inline).
+- **A nullable column can still be refused, as a recorded exception**: the reason goes next to the call
+  and is listed here. Recorded: `purchase_order.scheduled_date` — the order number carries the date's
+  period (the reason is at the call, `purchase_orders/_router_po.py`).
 
-Tests pin both halves: a named null reaches the column, and a key left out
-leaves it alone (a test that passes in both directions guards only the half
-it names — say which in its docstring).
+Tests pin both halves: a named null reaches the column, and a key left out leaves it alone (a test that
+passes in both directions guards only the half it names — say which in its docstring).
 
 ### 3. Error Handling Rules
 - **In routers**: answer through the typed `AppException` subclasses in `app/core/exceptions.py` —
@@ -246,15 +210,9 @@ Every query MUST be scoped to `organization_id`. Never return data without filte
 - **Module tables live in module migrations**: tables defined in `app/modules/<M>/models.py` are created by
   `app/modules/<M>/migrations/versions/`, **never** in core `migrations/versions/baseline_002_full_schema.py` —
   `tests/integration/test_table_ownership.py` fails the suite otherwise. See `docs/subsystems/MIGRATION_OWNERSHIP.md`.
-- **Enums are text, never a native PostgreSQL type.** Core stores every enumerated value as text and the
-  application owns the vocabulary. A migration creates the column as `varchar` with a
-  `CHECK (<column> IN (...))` over the PyEnum members' **values** (lowercase for a `StrEnum`), and the model column
-  persists those same values: `Enum(MyEnum, values_callable=lambda x: [e.value for e in x], native_enum=False,
-  length=20, create_constraint=True, name='ck_<table>_<column>')`. Never `postgresql.ENUM` / `CREATE TYPE`: a label
-  added to a native type later is `ALTER TYPE ... ADD VALUE`, which cannot run in the migration's transaction, in
-  every installation, and a renamed one is a type rebuild. A plain `Enum(MyEnum)` would also send member **names**
-  (`'DAILY'`), so keep `values_callable`. `tests/integration/test_no_native_enum_types_exist.py` fails on a native
-  `Enum` column in the models and on any enum type a migration chain leaves in the database.
+- **Enums are text, never a native PostgreSQL type** — a `varchar` with a `CHECK` over the members'
+  values; the model spelling and the reason are in `docs/subsystems/MIGRATION_OWNERSHIP.md`, "No native
+  enum types", and `tests/integration/test_no_native_enum_types_exist.py` enforces it.
 
 ### 6. Backend Testing Conventions
 - **Location**: Module tests go in `backend/app/modules/<module>/tests/integration/`. Core tests go in `backend/tests/integration/`.
@@ -284,9 +242,7 @@ lowering the ratchet after it. `python -m app.core.architecture_lint --write-bas
 only way to change the record, so a suppression always arrives as its own one-line diff.
 
 ### 8. File Size & Complexity
-
-No hard LOC limit on files; the guards are function-level — ruff `C901` (complexity ≤ 15) and `PLR0915`
-(≤ 50 statements). Split files by responsibility, not by line count.
+No LOC limit on files; function size is ruff's (`C901`, `PLR0915`) — split files by responsibility.
 
 ---
 
@@ -305,11 +261,9 @@ If you generate any of these patterns, correct them immediately:
 
 ## ⚡ Sync/Async Rule
 
-New service functions MUST be async-only. If a sync caller needs access, use an `asyncio.run()` wrapper or
-call the async variant directly. Do NOT create parallel sync/async file variants (`foo_sync.py` +
-`foo_async.py`) or duplicate sync/async function pairs in the same file — the architecture linter flags them.
-
-**Exceptions**: CLI commands (`app/cli/`) and bulk import (`app/modules/nutrition/import_parquet.py`) may remain sync — this is architecturally correct.
+New service functions are async-only (a sync caller wraps one in `asyncio.run()`); a sync/async twin (a `foo_sync.py` + `foo_async.py` pair, or `foo` beside
+`foo_async`) is refused by the architecture lint. CLI commands (`app/cli/`) and the bulk import
+(`app/modules/nutrition/import_parquet.py`) stay sync.
 
 ---
 
@@ -317,21 +271,11 @@ call the async variant directly. Do NOT create parallel sync/async file variants
 - **Item**: Unique instance (`STM-XXXX`) or Stock Item (Barcode).
 - **StorageLocation**: A tree of any depth, described by `parent_id` alone (ADR-018).
 - **Organization**: Top-level tenant container.
-- **Item.quantity / StockMove — one model, in every organization** ([ADR-022](../docs/adr/ADR-022-one-number-of-stock.md)).
-  **The records** (`Item.quantity`, one record per batch per owner) are the stock — the only number of
-  it; `stock_quants_from_records` sums them per (product_template, location, lot, owner) — physical,
-  reserved, available — and a "quant" is such a sum (the `stock_quants` table is gone, archived `quantdrop01`).
-  **StockMove** is the journal — every change to a record's stock has a movement explaining it,
-  posted in the same transaction (see *Stock Posting Rules*).
-  - It holds whatever modules are enabled. An organization without a module that reads the register
-    (`consumes_stock_quant` — today warehouse, maker, purchase_orders, stock_takes) keeps the same
-    movements; only the screens that show them stay behind that list, so a household sees no change.
-  - The stock a shelf held before the register knew it was posted once as an opening balance
-    (archived `openbal01`, movement `reference_type='opening_balance'`). A record that predates its card adopts
-    it on its first change — or on an edit that writes a field to its card — and posts what it held as
-    an opening (`opening_balance` movement, layer), then the change as a movement of its own.
-  - A record that changes shelves takes its stock with it through one call,
-    `_stock_relocation.carry_record_stock_async`, whichever door wrote the shelf.
+- **Item.quantity / StockMove — one model, in every organization** ([ADR-022](../docs/adr/ADR-022-one-number-of-stock.md)):
+  the records (`Item.quantity`, one per batch per owner) are the only number of stock, a quant is their sum
+  (`stock_quants_from_records`), and `StockMove` is the journal that explains every change, posted in the same
+  transaction. How it behaves — opening balances, a record that changes shelves, reconciliation:
+  `docs/subsystems/STOCK.md`.
 
 ### 🔄 Stock Posting Rules
 
@@ -346,26 +290,13 @@ caller) **or, for an outbound draw planned from the records, `core_api.stock.tak
 `stock_moves.create_async` as two separate steps, because two calls are two chances to write one. The
 receipt, the transfer and the production run's output go through the first; a dispatch, a scrap and the
 ingredients a production run draws across shelves go through the second. Stock-take finalize writes
-each counted record through its own posting — `reference_type='adjustment'` and the count as the
-reference — so the record, the movement and the cost layer move as one write, under
-`core_api.stock.lock_async` on the groups it settles. The difference the count found is measured on the
-records, which are the state, and the movement ledger is not read to find it — a mismatch the ledger
-was already carrying travels with the count, neither cured nor widened, which is what the
-reconciliation pairs are there to show. `GET /api/v1/stats/reconciliation` measures the records against
-the movement ledger and against the cost layers (**Inventory → Statistics → Reconciliation**); the
-scheduled reconciliation warns the organization's admins when a figure changes, and again once a week
-while a non-zero one stands unchanged.
+each counted record through its own posting (`reference_type='adjustment'`, the count as the reference)
+under `core_api.stock.lock_async` on the groups it settles.
 
 **An operation that writes more than one group of stock locks them all first, in one order:
 `core_api.stock.lock_async(db, org_id, keys=[(template_id, location_id | None), ...])`** before its
-first write. What it locks is each group's anchor (`stock_anchors`); a group is otherwise locked by
-whoever writes it, when they get there, and two operations taking the same groups in opposite orders
-deadlock — the database aborts one, and a person gets an error for a document or a move nothing was
-wrong with. Documents (confirm, complete, cancel, the lines), `post_movement_async`, the record move and
-the reservation paths already do; the draws (`take_from_the_records_async`, the reservation finders)
-take the same lock before their own ordered read. `None` as the location means every shelf of the
-product, the grain a document needs because the cost layers it drains are kept per product. Production
-runs are serialized per organization by the maker settings lock, which is why they do not need it.
+first write — two operations taking the same groups in opposite orders deadlock. `None` as the location
+means every shelf of the product. Who already locks, and why: `docs/subsystems/STOCK.md`, "Locking".
 
 ---
 

@@ -105,7 +105,7 @@ writes it and the reviewer checks it.
    - **CI runs after the push, the local gates before it.** `ci.yml` triggers on pushes and pull requests to `dev` and `main`, and on `workflow_dispatch`; the weekly dead-code and licence crons are off. **The local gates are the authoritative gates for `dev`** — CI only reports on a commit that has already landed. Put new checks in `make lint` / `make check-frontend` first, and in CI only as a copy of a local step; a CI step with no local equivalent is a gate no branch meets before it leaves.
    - **API contract gate** (`make check-api-types`, also run near the end of `make check-frontend`, just before `perf-phone`, which needs a built `frontend/dist/` and a running stack): `frontend/src/types/api-generated.ts` and `api-routes.ts` are generated — never hand-edit them; run `make generate-api-types` after changing any endpoint or response model. `docs/api/openapi.json` is the same kind of artifact for the outside world (Postman/Insomnia import; production serves no `/openapi.json`): `make generate-openapi` refreshes it, and `make check-openapi-fresh` (one step earlier in `make check-frontend`) fails when it drifts.
 7. **Code & Documentation Language**: Code, comments, docstrings, and documentation files — **English only**.
-8. **Frontend UI**: conventions live in [`frontend/AGENTS.md`](frontend/AGENTS.md). **MANDATORY** before creating or modifying a UI component: §0 of [`frontend/UI_GUIDELINES.md`](frontend/UI_GUIDELINES.md), and the sections it names for what you touch.
+8. **Frontend UI**: before creating or modifying a UI component, read what [`frontend/AGENTS.md`](frontend/AGENTS.md) names in its first paragraph.
 
 ---
 
@@ -113,13 +113,15 @@ writes it and the reviewer checks it.
 
 - **Test-Driven Development (TDD):** Tests are the specification. Write the failing test FIRST, implement the minimal code to pass, refactor only once green. The red–green loop runs **the test you are writing** — one file or a `-k <expr>`, seconds each — never the suite (see *The Mandatory Gate*).
 - **Commits are rollback points, not measurements**, so a commit has no test gate of its own (see *The Mandatory Gate*).
-- **The smallest change that does the job.** Read the flow the change touches end to end first;
-  then reuse what the codebase already has before writing something new, fix a defect in the
-  shared function every caller goes through rather than at the one call site a report names, and
-  add no abstraction, option or file that has no second caller. This never overrides the rules
-  that keep data correct and the product usable: organization scoping, transaction ownership and
-  the stock posting rules (`backend/AGENTS.md`), TDD and a test that fails without the fix,
-  the five maintained languages, accessibility, and the coverage floors.
+- **The smallest change that does the job.** First ask whether the change needs to exist at all;
+  when it does not, say so in one sentence instead of building it. Then read the flow the change
+  touches end to end; reuse what the codebase already has before writing something new, and a
+  dependency already installed before adding one — a new dependency only when a few lines cannot
+  do the job; fix a defect in the shared function every caller goes through rather than at the one
+  call site a report names; and add no abstraction, option or file that has no second caller. This
+  never overrides the rules that keep data correct and the product usable: organization scoping,
+  transaction ownership and the stock posting rules (`backend/AGENTS.md`), TDD and a test that
+  fails without the fix, the five maintained languages, accessibility, and the coverage floors.
 
 ### The Mandatory Gate (the pre-push gate — once per branch, before it leaves)
 
