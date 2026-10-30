@@ -1616,10 +1616,9 @@ looking at one. Its cells carry `py-2` and its thumbnail is `w-10 h-10`
 ### 14.1b The phone card's content target is measured in width
 
 `ItemMobileCard`'s row button — the thing that opens the product — stays under the
-44px floor on purpose: 228 × 38 at 390px, between a 44×44 quantity badge and two
-stacked 44×44 actions. The floor is for controls that declare a height
-(`h-11 md:h-10`); a full-width row the reader aims at is not one. Do not pad it
-to 44 — the measurement is in `UI_RATIONALE.md` §14.1b.
+44px floor on purpose. The floor is for controls that declare a height
+(`h-11 md:h-10`); a full-width row between the card's touch-sized controls is not
+one. Do not pad it to 44 — the measurement is in `UI_RATIONALE.md` §14.1b.
 
 ### 14.2 Location vocabulary — one word for a place
 
