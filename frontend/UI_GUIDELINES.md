@@ -139,8 +139,7 @@ The success button marks the chosen member of a set; it is never a call to actio
 The status tints flip to **dark tints** under `.dark` — `success-50…400`, and `red-`, `amber-`,
 `blue-` `50…200` (their higher steps are plain Tailwind colours that do not flip) — because they carry
 backgrounds. A component that also reads a step from that range for its text gets a
-dark-on-dark pair in dark mode: `bg-success-50 text-success-400` measured **1.9:1** — the
-APPROVED badge was effectively invisible.
+dark-on-dark pair in dark mode (the measurement is in `UI_RATIONALE.md` §1.1).
 
 - Pair the status tint — `bg-<status>-100` for a badge, `bg-<status>-50` for a larger fill
   such as a callout — with **`text-on-success` / `text-on-danger` / `text-on-warning` /
@@ -153,7 +152,7 @@ APPROVED badge was effectively invisible.
 
 Brand-coloured text on a brand-coloured tint cannot be made safe centrally: product profiles
 repaint the whole `primary-*` ramp with their own hue (ADR-013), so the pair's contrast
-depends on data the shell does not control. The active filter chip measured **1.55:1** this way.
+depends on data the shell does not control (`UI_RATIONALE.md` §1.1).
 
 Carry the state with `bg-primary-50` + `border-primary-500` + `font-semibold` and leave the
 label on the neutral `text-on`, which is high-contrast in both themes by construction.

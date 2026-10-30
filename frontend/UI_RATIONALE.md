@@ -4,6 +4,15 @@ The record behind [`UI_GUIDELINES.md`](UI_GUIDELINES.md): the measurements and i
 grew from. The rules themselves live in the guidelines and nowhere else; this file only says why, so a
 rule can be read and applied without it. Sections are numbered after the rule they explain.
 
+## §1.1 Colour pairs
+
+**Text on a tint.** A component that read its text from the `50…400` range of a status ramp, which
+flips to dark tints under `.dark`, got a dark-on-dark pair in dark mode: `bg-success-50
+text-success-400` measured **1.9:1**, and the APPROVED badge was effectively invisible.
+
+**Active state.** Brand-coloured text on a brand-coloured tint is repainted by every product
+profile's `primary-*` ramp; the active filter chip measured **1.55:1** this way.
+
 ## §1.2 Typography
 
 **Each weight has one job.** Weight stopped carrying information once `font-semibold` covered twelve
