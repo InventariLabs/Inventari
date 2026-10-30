@@ -261,9 +261,9 @@ If you generate any of these patterns, correct them immediately:
 
 ## ⚡ Sync/Async Rule
 
-New service functions are async-only (a sync caller wraps one in `asyncio.run()`); a sync/async twin (a `foo_sync.py` + `foo_async.py` pair, or `foo` beside
-`foo_async`) is refused by the architecture lint. CLI commands (`app/cli/`) and the bulk import
-(`app/modules/nutrition/import_parquet.py`) stay sync.
+New service functions are async-only (a sync caller wraps one in `asyncio.run()`); a sync/async twin
+(a `foo_sync.py` + `foo_async.py` pair, or `foo` beside `foo_async`) is refused by the architecture lint.
+CLI commands (`app/cli/`) and the bulk import (`app/modules/nutrition/import_parquet.py`) stay sync.
 
 ---
 
