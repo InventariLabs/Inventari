@@ -1,0 +1,44 @@
+{
+  "navigation": {
+    "widgets": "Widgets"
+  },
+  "page": {
+    "title": "Beispiel-Widgets",
+    "description": "Verwalten Sie Ihre Widgets — ein Referenzmodul für Inventari-Entwickler."
+  },
+  "actions": {
+    "add": "Widget hinzufügen",
+    "delete": "Löschen",
+    "increase": "Menge erhöhen",
+    "decrease": "Menge verringern",
+    "copyIds": "IDs kopieren"
+  },
+  "fields": {
+    "name": "Name",
+    "color": "Farbe",
+    "quantity": "Menge"
+  },
+  "colors": {
+    "blue": "Blau",
+    "green": "Grün",
+    "amber": "Bernstein",
+    "red": "Rot",
+    "violet": "Violett",
+    "slate": "Schiefer"
+  },
+  "messages": {
+    "empty": "Noch keine Widgets. Legen Sie das erste an!",
+    "confirmDeleteTitle": "Dieses Widget löschen?",
+    "confirmDelete": "„{{name}}“ wird entfernt. Das lässt sich nicht rückgängig machen.",
+    "idsCopied": "Die Kennungen der ausgewählten Produkte wurden in die Zwischenablage kopiert."
+  },
+  "validation": {
+    "nameLooksLikeBarcode": "Das sieht nach einem Produktcode aus. Geben Sie hier einen Namen ein — der Produktcode hat nach dem Speichern ein eigenes Feld."
+  },
+  "permissions": {
+    "read": "Widgets ansehen",
+    "readDesc": "Kann die Widget-Liste durchsehen",
+    "write": "Widgets verwalten",
+    "writeDesc": "Kann Widgets anlegen, bearbeiten und löschen"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "navigation": {
+    "dashboard": "Approvals",
+    "workflows": "Workflows"
+  },
+  "dashboard": {
+    "title": "Approval Requests",
+    "subtitle": "Review and manage pending approval requests"
+  },
+  "launcher": {
+    "title": "Approvals",
+    "description": "Multi-stage configurable approval workflows"
+  },
+  "workflows": {
+    "title": "Workflows",
+    "subtitle": "Configure approval stages and approvers",
+    "create": "Create Workflow",
+    "edit": "Edit Workflow",
+    "empty": "No workflows yet",
+    "emptyHint": "Create your first workflow to get started",
+    "name": "Workflow Name",
+    "namePlaceholder": "e.g., Equipment Checkout Approval",
+    "nameRequired": "Workflow name is required",
+    "saveChanges": "Save Changes",
+    "created": "Workflow created successfully",
+    "updated": "Workflow updated successfully",
+    "deleted": "Workflow deleted",
+    "deleteFailed": "Failed to delete workflow",
+    "saveFailed": "Failed to save workflow",
+    "mutationGuard": "Cannot modify this workflow while requests are pending",
+    "duplicateTarget": "A workflow for this target type already exists",
+    "addStage": "Add Stage",
+    "removeStage": "Remove Stage",
+    "stageLabel": "Stage Label",
+    "stageRole": "Role",
+    "addApprover": "Add Approver",
+    "removeApprover": "Remove",
+    "searchUsers": "Search users...",
+    "selectApprovers": "Select approvers for this stage",
+    "noUsersFound": "No users found"
+  },
+  "permissions": {
+    "approve": "Approve Requests",
+    "approveDesc": "Approve or reject pending approval requests",
+    "configure": "Configure Workflows",
+    "configureDesc": "Create and modify approval workflow definitions"
+  }
+}

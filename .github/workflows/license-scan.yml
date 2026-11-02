@@ -1,0 +1,60 @@
+name: Dependency Licences
+
+# Manual trigger only: the pull_request and weekly-cron triggers are off to
+# save runner minutes (see the note in ci.yml). The licence gate still runs
+# locally — `make lint` checks licence-report freshness. Restore the triggers
+# below to run it on every pull request again.
+on:
+  workflow_dispatch:
+
+jobs:
+  dependency-licenses:
+    # Checks the licence of everything we install and that
+    # THIRD_PARTY_LICENSES.md matches it. It belongs on every pull request — a
+    # PR adding a GPL dependency merges long before a Monday cron would see
+    # it — but the trigger above is dispatch-only to save runner minutes, so
+    # this job runs when someone starts it by hand; in front of a commit the
+    # report is held by the pre-commit hook and `make lint`.
+    name: Dependency Licence Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python
+        working-directory: ./backend
+        run: uv python install 3.14
+
+      - name: Install backend runtime dependencies
+        working-directory: ./backend
+        run: uv sync --frozen
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend production dependencies
+        working-directory: ./frontend
+        run: npm ci --omit=dev
+
+      - name: Check dependency licences
+        working-directory: ./backend
+        run: uv run python manage.py audit scan-dependencies --write
+
+      - name: Fail if THIRD_PARTY_LICENSES.md is out of date
+        run: |
+          if ! git diff --quiet -- THIRD_PARTY_LICENSES.md; then
+            echo "::error::THIRD_PARTY_LICENSES.md is stale. Regenerate it with:"
+            echo "::error::  cd backend && uv run python manage.py audit scan-dependencies --write"
+            git --no-pager diff -- THIRD_PARTY_LICENSES.md
+            exit 1
+          fi

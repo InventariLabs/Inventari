@@ -1,0 +1,217 @@
+{
+  "enabled": "Activado",
+  "errors": {
+    "updateFailed": "Error al actualizar el estado del módulo"
+  },
+  "success": {
+    "enabled": "Módulo {{name}} activado",
+    "disabled": "Módulo {{name}} desactivado"
+  },
+  "modules": {
+    "core": {
+      "title": "Hogar y cocina",
+      "desc": "Nevera, despensa y productos básicos."
+    },
+    "shopping_lists": {
+      "name": "Listas de compras",
+      "description": "Cree y administre listas de compras con sugerencias automáticas."
+    },
+    "vision": {
+      "name": "Reconocimiento fotográfico",
+      "description": "Lee el nombre, la marca y la fecha de caducidad de un producto en la foto de su etiqueta. Desactivado, añadir un producto pierde la pestaña de foto y las tablas nutricionales hay que escribirlas a mano."
+    },
+    "stats": {
+      "name": "Estadísticas",
+      "description": "Análisis avanzado de consumo y seguimiento de residuos."
+    },
+    "stock_takes": {
+      "name": "Conteos de inventario",
+      "description": "Verificaciones periódicas de inventario para comprobar la precisión del stock."
+    },
+    "partners": {
+      "name": "Socios",
+      "description": "Gestione proveedores, clientes y prestadores de servicios para flujos B2B."
+    },
+    "recipes": {
+      "name": "Recetas",
+      "description": "Cree y administre recetas con seguimiento de ingredientes."
+    },
+    "equipment": {
+      "name": "Seguimiento de equipos",
+      "description": "Realice el seguimiento de activos de TI y físicos con gestión del ciclo de vida."
+    },
+    "example_widgets": {
+      "name": "Widgets de ejemplo",
+      "description": "Módulo de referencia que demuestra los patrones de módulos de Inventari: gestione widgets simples con nombre, color y cantidad."
+    },
+    "warehouse": {
+      "name": "Almacén",
+      "description": "Con la cámara del teléfono o un escáner: recibe, entrega, mueve y cuenta existencias; los documentos numerados se crean en segundo plano, con reglas de ubicación."
+    },
+    "purchase_orders": {
+      "name": "Órdenes de compra",
+      "description": "Cree y realice el seguimiento de órdenes de compra con proveedores."
+    },
+    "printing": {
+      "name": "Impresión de etiquetas",
+      "description": "Genere e imprima etiquetas para productos y ubicaciones."
+    },
+    "nutrition": {
+      "name": "Información nutricional",
+      "description": "Muestre datos nutricionales e ingredientes de Open Food Facts."
+    },
+    "approvals": {
+      "name": "Aprobaciones",
+      "description": "Flujos de aprobación en varias etapas para operaciones críticas."
+    },
+    "webhooks": {
+      "name": "Webhooks",
+      "description": "Notificaciones HTTP salientes sobre los eventos de tu espacio de trabajo."
+    },
+    "api_keys": {
+      "name": "Claves API",
+      "description": "Acceso programático mediante claves de API REST."
+    },
+    "maker": {
+      "name": "Fabricación",
+      "description": "Gestión de fabricación y listas de materiales (BOM)."
+    },
+    "items": {
+      "name": "Inventario"
+    }
+  },
+  "config": {
+    "connectionsTitle": "Conexiones de IA",
+    "connectionsDescription": "Conjunto de conexiones LLM compartidas por todos los módulos. Asigne una a cada propósito abajo.",
+    "addConnection": "Añadir conexión",
+    "editConnection": "Editar conexión",
+    "deleteConnection": "Eliminar conexión",
+    "deleteConfirm": "¿Eliminar «{{name}}»? Esta acción no se puede deshacer.",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "formDescription": "Configure un endpoint LLM. El conjunto se comparte entre todas las funciones de IA.",
+    "fieldName": "Nombre",
+    "fieldNamePlaceholder": "p. ej. Sensor del estante de la despensa",
+    "fieldProvider": "Proveedor",
+    "fieldApiKey": "Clave API",
+    "fieldApiKeyDocs": "Dónde conseguir tu clave de {{provider}}",
+    "fieldApiKeyPlaceholder": "sk-or-v1-…",
+    "fieldBaseUrl": "URL base de la API",
+    "localEngineHint": "Un motor local funciona en una dirección privada, que el servidor rechaza hasta que un operador lo permita: establece LLM_ALLOW_PRIVATE_NETWORKS=true y reinicia el backend. Mantén la dirección host.docker.internal: desde dentro del contenedor, localhost es el propio contenedor.",
+    "fieldModel": "Modelo",
+    "fieldCapabilities": "Capacidades",
+    "capability": {
+      "vision": "Visión",
+      "text": "Texto",
+      "url_fetch": "Lectura de páginas"
+    },
+    "noConnections": "Sin conexiones",
+    "noConnectionsHint": "Añada una conexión para usar las funciones de IA (Visión, Recetas, …).",
+    "bindingsTitle": "Por defecto por propósito",
+    "boundHere": "Activo para este propósito",
+    "noBinding": "Sin configurar",
+    "cannotDeleteBound": "Esta conexión está asignada a un propósito. Desasígnela primero.",
+    "noEligibleConnections": "No hay conexiones con la capacidad «{{capability}}».",
+    "noEligibleConnectionsCta": "Configurar una",
+    "serverDefaultOption": "Modelo predeterminado del servidor",
+    "serverDefaultHint": "Lo atiende el modelo predeterminado del servidor. Elija una conexión para usar la suya.",
+    "noConnectionsServerDefaultHint": "Algunas funciones de IA ya funcionan con el modelo predeterminado del servidor. Añada una conexión para usar la suya.",
+    "createFailed": "No se pudo crear la conexión",
+    "updateFailed": "No se pudo actualizar la conexión",
+    "deleteFailed": "No se pudo eliminar la conexión",
+    "bindingFailed": "No se pudo actualizar la asignación",
+    "deleteSuccess": "Conexión eliminada",
+    "loading": "Cargando conexiones…",
+    "errorNameRequired": "El nombre es obligatorio",
+    "errorNameTaken": "Ya existe una conexión con este nombre",
+    "errorCapabilityRequired": "Seleccione al menos una capacidad",
+    "groupCloud": "Nube",
+    "groupAggregator": "Agregador",
+    "groupSpecialist": "Especializado",
+    "groupLocal": "Local",
+    "groupCustom": "Personalizado",
+    "testConnection": "Probar conexión",
+    "testing": "Probando…",
+    "testFailed": "Falló la prueba. Verifica la clave y la URL.",
+    "testNeedsApiKey": "Escribe primero la clave API en el campo de arriba: la prueba envía lo que hay en este formulario, no una clave guardada.",
+    "testNeedsBaseUrl": "Rellena primero la URL base de la API de arriba: este proveedor se alcanza por HTTP, así que la prueba necesita su dirección.",
+    "testContractOk": "La conexión funciona — el modelo respondió con la forma esperada. {{count}} modelos disponibles.",
+    "testReadAll": "La conexión funciona — el modelo leyó los {{of}} campos de la etiqueta de muestra.",
+    "testReadPartial": "La respuesta tenía la forma correcta, pero el modelo solo leyó {{matched}} de {{of}} campos de la etiqueta de muestra: puede estar inventando valores que no vio.",
+    "testContractOk_one": "La conexión funciona — el modelo leyó la etiqueta de muestra. {{count}} modelo disponible.",
+    "testContractOk_other": "La conexión funciona — el modelo leyó la etiqueta de muestra. {{count}} modelos disponibles.",
+    "testContractFailed": "La clave funciona, pero el modelo no devolvió datos utilizables. Respondió: {{preview}}",
+    "testUnchecked": "Las credenciales funcionan — {{count}} modelos disponibles. No se comprobó la forma de la respuesta para estas capacidades.",
+    "testUnchecked_one": "Las credenciales funcionan — {{count}} modelo disponible. No se comprobó la forma de la respuesta para estas capacidades.",
+    "testUnchecked_other": "Las credenciales funcionan — {{count}} modelos disponibles. No se comprobó la forma de la respuesta para estas capacidades.",
+    "testShapeNotEnforced": "Este proveedor no impone la forma de la respuesta, así que el resultado depende del analizador y de un reintento. Puede fallar más adelante.",
+    "testReaderOk": "La clave funciona — el lector descargó una página de prueba.",
+    "testReaderFreeTier": "Esta conexión no tiene clave — funciona en el nivel gratuito del lector, no hay nada que probar.",
+    "testReaderEmpty": "La clave funciona, pero el lector no trajo nada de la página de prueba.",
+    "providerName": {
+      "custom": "Personalizado (compatible con OpenAI)"
+    },
+    "providerDescription": {
+      "openai": "GPT-4o, GPT-4o-mini. Multimodal.",
+      "anthropic": "Modelos Claude. Multimodal con visión.",
+      "google": "Gemini 2.0 Flash / Pro. Con nivel gratuito.",
+      "openrouter": "Más de 100 modelos con una sola clave.",
+      "groq": "La inferencia más rápida. Llama, Mixtral.",
+      "deepseek": "DeepSeek V3 / R1.",
+      "mistral": "Mistral Large, Codestral.",
+      "together": "Alojamiento de modelos de código abierto.",
+      "xai": "Modelos Grok. Multimodal.",
+      "minimax": "MiniMax-M3 (contexto de 1M, multimodal). Accesible desde China.",
+      "glm": "GLM-4V, multimodal. Nivel gratuito con glm-4v-flash. Principal en China.",
+      "mimo": "MiMo-V2.5 (310B MoE, multimodal). Modelo de razonamiento insignia de Xiaomi.",
+      "jina": "Lee una página web como texto limpio — en eso se apoya la importación de recetas.",
+      "ollama": "Servidor local compatible con OpenAI en el puerto 11434.",
+      "lm_studio": "Servidor local compatible con OpenAI en el puerto 1234.",
+      "vllm": "Servidor compatible con OpenAI autoalojado.",
+      "custom": "Cualquier otro punto final con formato OpenAI."
+    },
+    "fieldCapabilitiesHint": "Para qué se puede usar este modelo. Las marcas son una sugerencia del proveedor — lo decide la prueba de conexión.",
+    "purposeUnavailable": "Módulo desactivado",
+    "purposeUnavailableHint": "Este propósito pertenece al módulo {{module}}, que está desactivado. La vinculación surtirá efecto cuando se active.",
+    "capabilityUnverified": "Declarada, sin comprobar — ejecuta la prueba de conexión",
+    "capabilityConfirmed": "Confirmada por la prueba de conexión",
+    "capabilityFailed": "El modelo no superó esta prueba",
+    "capabilityFailedHint": "El modelo no cumplió lo que esta conexión declara. Hasta que pase la prueba no se ofrece para los usos que lo necesitan.",
+    "connectionFailedCapability": "{{names}} no está en esta lista: no superó la prueba «{{capability}}»."
+  },
+  "fieldBuilder": {
+    "title": "Definiciones de campos personalizados",
+    "fieldsCount": "{{count}} campos definidos",
+    "fieldsCount_one": "{{count}} campo definido",
+    "fieldsCount_other": "{{count}} campos definidos",
+    "fieldLabel": "Etiqueta del campo",
+    "placeholder": "ej. Voltaje",
+    "dataType": "Tipo de dato",
+    "addField": "Agregar campo",
+    "addCustomField": "Agregar campo personalizado",
+    "types": {
+      "text": "Texto",
+      "number": "Número",
+      "date": "Fecha",
+      "textarea": "Texto largo",
+      "file": "Archivo / Adjunto",
+      "money": "Dinero",
+      "select": "Lista desplegable",
+      "multi-select": "Selección múltiple",
+      "boolean": "Sí / No"
+    },
+    "options": {
+      "label": "Opciones",
+      "placeholder": "Añadir una opción y pulsar Enter",
+      "empty": "Se requiere al menos una opción",
+      "remove": "Quitar la opción {{name}}"
+    },
+    "errors": {
+      "alreadyExists": "Ya existe un campo con este nombre",
+      "optionsRequired": "Este tipo de campo requiere al menos una opción"
+    }
+  },
+  "disabled": "Desactivado"
+}

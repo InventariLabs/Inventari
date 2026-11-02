@@ -1,0 +1,168 @@
+{
+  "title": "Statistiques",
+  "subtitle": "Aperçu de vos stocks",
+  "records": "Enregistrements",
+  "places": "Lieux, tous niveaux",
+  "expiringSoon": "Expire bientôt",
+  "expired": "Expiré",
+  "storageDistribution": "Répartition des produits par emplacement",
+  "categoryDistribution": "Répartition des produits par catégorie",
+  "expiryForecast": "Prévision d'expiration",
+  "noData": "Aucune donnée",
+  "noExpiryData": "Aucune donnée sur les dates d'expiration",
+  "costAnalysis": {
+    "title": "Analyse des coûts",
+    "subtitle": "Résumé des dépenses et du gaspillage",
+    "spent": "Dépensé",
+    "wasted": "Gaspillé",
+    "waste": "Gaspillage (% de la valeur)",
+    "savings": "Économies",
+    "topCategories": "Catégories les plus chères",
+    "savingsOpportunities": "Suggestions d'économies",
+    "monthlyTrend": "Tendance mensuelle",
+    "excludedOtherCurrency_one": "Un produit est libellé dans une autre devise et n'entre pas dans ce total.",
+    "excludedOtherCurrency_other": "{{count}} produits sont libellés dans une autre devise et n'entrent pas dans ce total.",
+    "notValuedYet": "Aucune valorisation enregistrée pour cette période",
+    "categoriesPricedFromRecords": "Les catégories sont valorisées d'après le prix d'achat de chaque enregistrement.",
+    "categoriesPricedFromLedger": "Les catégories sont valorisées d'après le livre des coûts.",
+    "categoryUnpriced_one": "Une position n'a pas de prix sur son enregistrement et n'entre pas dans la somme.",
+    "categoryUnpriced_other": "{{count}} positions n'ont pas de prix sur leur enregistrement et n'entrent pas dans la somme."
+  },
+  "tabs": {
+    "overview": "Aperçu",
+    "analytics": "Analyses",
+    "reconciliation": "Rapprochement"
+  },
+  "analytics": {
+    "rotation": {
+      "avgRotation": "Âge moyen du stock",
+      "medianRotation": "Âge médian du stock",
+      "slowMovers": "Rotation lente",
+      "deadStock": "Stock mort",
+      "deadStockValue": "Valeur du stock mort",
+      "byCategory": "Âge du stock par catégorie",
+      "days": "jours",
+      "noData": "Aucune donnée d'âge du stock disponible",
+      "noMovement": "Aucun mouvement pour le moment"
+    },
+    "alerts": {
+      "total": "Total des alertes",
+      "types": {
+        "forgotten": "Articles oubliés",
+        "staple": "Articles de base manquants",
+        "expiring": "Expire bientôt",
+        "expired": "Expiré",
+        "lowStock": "Stock faible",
+        "spike": "Pic de prix"
+      },
+      "messages": {
+        "forgotten_one": "Intact depuis {{count}} jour — à utiliser avant d’en racheter.",
+        "forgotten_many": "Intact depuis {{count}} jours — à utiliser avant d’en racheter.",
+        "forgotten_other": "Intact depuis {{count}} jours — à utiliser avant d’en racheter.",
+        "staple_one": "Dernier achat il y a {{count}} jour, plus de deux fois l’intervalle habituel.",
+        "staple_many": "Dernier achat il y a {{count}} jours, plus de deux fois l’intervalle habituel.",
+        "staple_other": "Dernier achat il y a {{count}} jours, plus de deux fois l’intervalle habituel.",
+        "expiring": "Expire le {{date}}.",
+        "expired": "Périmé depuis le {{date}}."
+      },
+      "noAlerts": "Aucune alerte - votre inventaire a l'air bon !",
+      "noData": "Rien à vérifier pour l’instant — ajoutez des articles et les alertes suivront"
+    },
+    "forecast": {
+      "predicted": "Dépenses prévues",
+      "historical": "Moyenne historique",
+      "trend": "Tendance",
+      "wasteReduction": "Potentiel de réduction du gaspillage",
+      "noData": "Historique d'achat insuffisant",
+      "monthlyAvg": "Moyenne mensuelle",
+      "wasteReductionHint": "Économies possibles en réduisant les pertes",
+      "confidence": "Fiabilité de la prévision",
+      "quarter": "Trimestre",
+      "trends": {
+        "increasing": "En hausse",
+        "decreasing": "En baisse",
+        "stable": "Stable",
+        "no_data": "Pas assez de données"
+      },
+      "notEnoughData": "Historique d'achats insuffisant pour une prévision",
+      "dataProgress": "{{have}} sur {{need}} semaines d'historique d'achats"
+    },
+    "patterns": {
+      "recurring": "Principaux produits récurrents",
+      "seasonal": "Produits saisonniers",
+      "bulk": "Opportunités d'achat en gros",
+      "potential": "Économies potentielles",
+      "noBulk": "Aucune opportunité d'achat en gros identifiée",
+      "noPatterns": "Historique d'achat insuffisant",
+      "seasonalityUnknown": "Trop peu de saisons"
+    }
+  },
+  "errors": {
+    "failedToLoadRotationAnalysis": "Échec du chargement de l'analyse de rotation",
+    "failedToLoadAlerts": "Échec du chargement des alertes",
+    "failedToLoadStorageDistribution": "Échec du chargement de la répartition par emplacement",
+    "failedToLoadCategoryDistribution": "Échec du chargement de la répartition par catégorie",
+    "failedToLoadExpiryForecast": "Échec du chargement des prévisions d'expiration",
+    "failedToLoadCostAnalysis": "Échec du chargement de l’analyse des coûts",
+    "failedToLoadReconciliation": "Impossible de charger le rapprochement des stocks"
+  },
+  "health": {
+    "title": "Contrôle de l'état des stocks",
+    "needsAttention": "Nécessite attention",
+    "needsAttentionHint": "Enregistrements périmés ou bientôt périmés, et tous ceux des produits en stock faible.",
+    "runningLow": "Stock faible",
+    "runningLowHint": "Produits à leur seuil ou en dessous. Leurs enregistrements comptent aussi dans « Nécessite attention ».",
+    "totalValue": "Valeur estimée",
+    "totalValueHint": "Valeur totale approximative de tous les articles.",
+    "totalValueHintLedger": "Ce que le stock en main a coûté, d'après le livre des coûts — toute l'organisation, pas seulement les emplacements comptés ci-dessus.",
+    "actionsHint": "Utilisez-le comme vérification quotidienne rapide. Ouvrez les détails seulement si nécessaire.",
+    "hideDetails": "Masquer les statistiques détaillées",
+    "showDetails": "Afficher les statistiques détaillées",
+    "subtitle_one": "Un signal pour voir d'un coup d'œil ce qui demande votre attention.",
+    "subtitle_other": "{{count}} signaux pour voir d'un coup d'œil ce qui demande votre attention.",
+    "unvaluedStock": "Réceptions en stock sans prix : {{total}}. Cette valeur est sous-estimée.",
+    "valueUnknown": "Inconnue",
+    "valueUnknownHint": "Aucun produit n'a encore de prix, il n'y a donc rien à additionner.",
+    "unpricedItems": "Articles sans prix : {{total}}. Cette valeur est sous-estimée."
+  },
+  "permissions": {
+    "read": "Consulter les analyses",
+    "readDesc": "Voit les chiffres de toute l'organisation : consommation, rotation, prévisions et coûts"
+  },
+  "settings": {
+    "enableAnalytics": "Activer l'analytique",
+    "enableAnalyticsDescription": "Afficher l'onglet analytique (rotation, prévisions de dépenses, habitudes d'achat). Désactiver pour les petits inventaires domestiques dont l'historique est insuffisant pour des analyses pertinentes.",
+    "showInventoryValue": "Afficher la valeur du stock",
+    "showInventoryValueDescription": "Afficher la valeur totale du stock dans l'aperçu des statistiques. C'est une métrique d'entreprise — désactiver pour les inventaires domestiques qui ne conservent pas de prix d'achat à additionner."
+  },
+  "navigation": {
+    "settings": "Analytique"
+  },
+  "reconciliation": {
+    "title": "Rapprochement des stocks",
+    "subtitle_one": "Mesuré à l'ouverture de cet écran, sur {{count}} fiche produit.",
+    "subtitle_other": "Mesuré à l'ouverture de cet écran, sur {{count}} fiches produit.",
+    "tableCaption": "Les deux comparaisons de paires et ce qu’elles ont trouvé",
+    "expectedGap": "Un écart permanent est ici voulu ; celui qui inquiète est celui qui grandit.",
+    "columns": {
+      "pair": "Comparaison",
+      "count": "Divergences",
+      "total": "Écart total"
+    },
+    "pairs": {
+      "quantMove": {
+        "name": "Étagère vs journal des mouvements",
+        "meaning": "Ce que totalisent les mouvements face à ce que tient l’étagère."
+      },
+      "layerQuant": {
+        "name": "Historique des coûts vs étagère",
+        "meaning": "Quelle part de l’étagère les couches de coût ne couvrent pas."
+      }
+    },
+    "previousLine": "Mesure précédente ({{when}}) : {{howMany}} · {{howMuch}}",
+    "grown": "en hausse",
+    "shrunk": "en baisse",
+    "standing": "stable",
+    "noPrevious": "Rien encore à quoi comparer ces chiffres — la tâche planifiée enregistre une mesure qui montrera si un écart grandit."
+  }
+}

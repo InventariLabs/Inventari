@@ -1,0 +1,35 @@
+# Override for load testing with a configuration identical to the production VPS.
+#
+# Usage (stop the backend first so the image is rebuilt):
+#   docker compose stop backend
+#   docker compose -f docker-compose.yml -f docker-compose.loadtest-backend.yml up -d --build backend
+#
+# Restore dev mode afterwards:
+#   docker compose up -d backend
+#
+# Target VPS spec (8 GB RAM, 4 cores):
+#   - 2 cores reserved for PostgreSQL x2 + Redis
+#   - WEB_CONCURRENCY=4 gunicorn+UvicornWorker workers
+#   - 4 workers × (pool_size=15 + overflow=15) → PgBouncer → PG (max_connections=30)
+
+services:
+  backend:
+    # Overrides "command: uvicorn --reload" from docker-compose.yml
+    # Forces the same command as the Dockerfile CMD (gunicorn + UvicornWorker)
+    command: >
+      gunicorn app.main:app
+      --config gunicorn.conf.py
+      --worker-class uvicorn.workers.UvicornWorker
+      --workers 4
+      --bind 0.0.0.0:8000
+      --timeout 300
+      --graceful-timeout 30
+    environment:
+      WEB_CONCURRENCY: "4"
+      DEBUG: "false"
+      # Rate limiter off, so the numbers measure the app and not slowapi. With
+      # DEBUG=false the config refuses this combination unless it is acknowledged
+      # explicitly — that guard is what keeps LOAD_TESTING=true from silently
+      # reaching a real deployment (app/config.py).
+      LOAD_TESTING: "true"
+      LOAD_TESTING_ACK_UNSAFE: "true"

@@ -1,0 +1,91 @@
+{
+  "title": "API Keys",
+  "subtitle": "Allow external systems to authenticate with Inventari",
+  "generateKey": "Generate New Key",
+  "noKeys": "No API keys",
+  "noKeysDescription": "Generate an API key to allow scripts, Home Assistant, or other automations to connect.",
+  "table": {
+    "name": "Name",
+    "key": "Key",
+    "created": "Created",
+    "lastUsed": "Last used",
+    "expires": "Expires",
+    "expired": "Expired",
+    "expiredOn": "Expired",
+    "actions": "Actions",
+    "never": "Never",
+    "issuedBy": "Issued by",
+    "issuedByUnknown": "Account since removed",
+    "noExpiry": "Does not expire",
+    "notUsedYet": "Not yet used",
+    "revokedTrace": "A revoked key leaves this list. The revocation is recorded in the audit log.",
+    "revokedTraceLink": "Open the audit log",
+    "permissions": "Permissions",
+    "noPermissions": "No permissions"
+  },
+  "revoke": "Revoke",
+  "revokeConfirm": {
+    "title": "Revoke API Key",
+    "message": "Are you sure you want to revoke the key \"{{name}}\"? It will stop working immediately.",
+    "confirm": "Revoke",
+    "cancel": "Cancel"
+  },
+  "form": {
+    "title": "Generate New API Key",
+    "namePlaceholder": "e.g. Home Assistant, Backup Script",
+    "expiration": "Expiration",
+    "expirationOptions": {
+      "never": "No expiry — works until it is revoked",
+      "30days": "30 days",
+      "90days": "90 days",
+      "1year": "1 year"
+    },
+    "generate": "Generate Key",
+    "scope": "What the key is for",
+    "scopeOptions": {
+      "everything": "Ordinary key"
+    },
+    "scopeExplain": {
+      "printing": "A printing key works only for the Inventari Print Agent: it can register the agent, take print jobs, fetch their labels and report how they went. It cannot read or change anything else.",
+      "other": "A {{scope}} key reaches only the endpoints that guard these permissions, and cannot read or change anything else:"
+    },
+    "scopesLoadFailed": "What a key may carry could not be loaded, so no key can be issued right now.",
+    "permissions": "What the key may do",
+    "permissionsHint": "Only what you hold yourself can be given to a key.",
+    "readOnlyHint": "A new key starts read-only. Tick a write permission only if the key must change data — it can then change whatever that permission covers, such as adding products or changing stock levels."
+  },
+  "copyDialog": {
+    "title": "API Key Generated",
+    "warning": "Make sure to copy your API key now. You won't be able to see it again!",
+    "copy": "Copy to clipboard",
+    "copied": "Copied!",
+    "done": "Close"
+  },
+  "capabilities": {
+    "title": "What a key can carry",
+    "intro": "Each key carries the permissions ticked when it is issued — at most what the person issuing it holds. Its list stands beside it below. A printing key reaches only the print agent's endpoints.",
+    "withheldTitle": "Never on a key",
+    "adminBlocked": "Anything administrative — roles, invitations, modules, other API keys — stays closed to a key. The team list does not: a key holding \"Read the organization's details\" can read every member's name, e-mail and role.",
+    "unknown": "Permission {{key}}",
+    "permissions": {
+      "items_read": "Read products and stock levels",
+      "items_write": "Add products and change stock levels",
+      "items_delete": "Delete products",
+      "categories_read": "Read the category list",
+      "locations_read": "Read locations",
+      "org_read": "Read the organization's details",
+      "org_settings_write": "Administer the organization: AI connections, equipment document templates, the organization-wide SKU naming and the API key register"
+    },
+    "loadFailed": "What a key can do could not be loaded."
+  },
+  "usage": {
+    "title": "How to send it",
+    "hint": "The key travels in the {{header}} header. Sent as Authorization: Bearer it still works until the next minor release, and every answer then carries a Deprecation header.",
+    "copy": "Copy the example",
+    "copied": "Example copied"
+  },
+  "revokedToast": "Key revoked — recorded in the audit log",
+  "scopes": {
+    "printing": "Printing only"
+  }
+}

@@ -1,0 +1,17 @@
+[
+  "api_keys",
+  "approvals",
+  "warehouse",
+  "equipment",
+  "maker",
+  "nutrition",
+  "partners",
+  "printing",
+  "purchase_orders",
+  "recipes",
+  "shopping_lists",
+  "stats",
+  "stock_takes",
+  "vision",
+  "webhooks"
+]

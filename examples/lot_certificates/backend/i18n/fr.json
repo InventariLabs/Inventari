@@ -1,0 +1,5 @@
+{
+  "number_missing": "Saisissez le numéro de certificat du lot {lot}.",
+  "number_too_long": "Le numéro de certificat du lot {lot} dépasse {limit} caractères.",
+  "certificate_not_on_file": "Le certificat {number} n’est pas enregistré. Enregistrez-le avant que la marchandise soit comptabilisée."
+}

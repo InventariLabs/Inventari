@@ -1,0 +1,7 @@
+# Module migrations baseline
+# Modules whose table migrations have NOT yet been extracted from core
+# baseline_002 into per-module versions/001_initial.py.
+#
+# These emit ::notice (non-blocking, visible in PR review) instead of ::error.
+# Remove a module from this file ONCE it has versions/001_initial.py.
+#

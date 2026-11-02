@@ -1,0 +1,30 @@
+# CODEOWNERS — auto-requests review based on file paths.
+# Expand the teams/individuals below as additional maintainers join.
+#
+# Syntax: https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner — fallback for everything not matched below.
+*                           @jerzypiatek
+
+# Core domain model & public API — sensitive surface, any change here
+# ripples across all modules.
+/backend/app/core/          @jerzypiatek
+/backend/app/models/        @jerzypiatek
+/backend/app/database.py    @jerzypiatek
+/backend/migrations/        @jerzypiatek
+
+# Backend modules — each module is self-contained.
+/backend/app/modules/       @jerzypiatek
+
+# Frontend core / shared shell.
+/frontend/src/core/         @jerzypiatek
+/frontend/src/components/   @jerzypiatek
+
+# CI / security-sensitive infra.
+/.github/workflows/         @jerzypiatek
+/docker-compose*.yml        @jerzypiatek
+/backend/Dockerfile         @jerzypiatek
+
+# Architecture linting & conventions.
+/backend/app/core/architecture_lint*  @jerzypiatek
+/AGENTS.md                  @jerzypiatek

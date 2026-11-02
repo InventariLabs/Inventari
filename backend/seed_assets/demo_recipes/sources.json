@@ -1,0 +1,86 @@
+{
+  "retrieved": "2026-10-06",
+  "photos": [
+    {
+      "recipe": "Tomato and Chickpea Stew",
+      "file": "chickpea-stew.jpg",
+      "author": null,
+      "licence": "CC0-1.0",
+      "source": "rawpixel",
+      "page": "https://www.rawpixel.com/image/5918870/image-public-domain-leaves-black-background",
+      "original": "https://images.rawpixel.com/editor_1024/cHJpdmF0ZS9zdGF0aWMvaW1hZ2Uvd2Vic2l0ZS8yMDIyLTA0L2xyL2ZmMzA0MC1pbWFnZS1rd3Z4Mmo2NS5qcGc.jpg"
+    },
+    {
+      "recipe": "Spaghetti with Garlic and Oil",
+      "file": "spaghetti-garlic-oil.jpg",
+      "author": "Astha Jain",
+      "licence": "CC0-1.0",
+      "source": "wordpress",
+      "page": "https://wordpress.org/photos/photo/35066acafc/",
+      "original": "https://pd.w.org/2024/08/35066acafce29dfc5.10097036-1536x2048.jpg"
+    },
+    {
+      "recipe": "Chicken Curry with Jasmine Rice",
+      "file": "chicken-curry.jpg",
+      "author": "毒島みるく",
+      "licence": "CC0-1.0",
+      "source": "wikimedia",
+      "page": "https://commons.wikimedia.org/wiki/File:Chicken_Spicy_Curry_of_Yoshinoya.jpg",
+      "original": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Chicken_Spicy_Curry_of_Yoshinoya.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+    },
+    {
+      "recipe": "Penne with Red Pesto",
+      "file": "penne-red-pesto.jpg",
+      "author": "Jakub Kapusnak",
+      "licence": "CC0-1.0",
+      "source": "rawpixel",
+      "page": "https://www.rawpixel.com/image/447639/free-photo-image-penne-tomato-sauce-spaghetti-food",
+      "original": "https://images.rawpixel.com/editor_1024/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvYTAxOS1qYWt1YmstMDExMi1wZW5uZS1hbGwtYXJyYWJiaWF0YS5qcGc.jpg"
+    },
+    {
+      "recipe": "Overnight Oats with Blueberries",
+      "file": "overnight-oats.jpg",
+      "author": null,
+      "licence": "CC0-1.0",
+      "source": "rawpixel",
+      "page": "https://www.rawpixel.com/image/5918109/photo-image-public-domain-hand-blue",
+      "original": "https://images.rawpixel.com/editor_1024/cHJpdmF0ZS9zdGF0aWMvaW1hZ2Uvd2Vic2l0ZS8yMDIyLTA0L2xyL2ZyZWVyYW5nZXBleGVsczA1MjgwLWltYWdlLWt3dnd6NHZnLmpwZw.jpg"
+    },
+    {
+      "recipe": "Banana Bread",
+      "file": "banana-bread.jpg",
+      "author": "cogdogblog",
+      "licence": "CC0-1.0",
+      "source": "flickr",
+      "page": "https://www.flickr.com/photos/37996646802@N01/33276667233",
+      "original": "https://live.staticflickr.com/2913/33276667233_485a2158ef_b.jpg"
+    },
+    {
+      "recipe": "Shakshuka",
+      "file": "shakshuka.jpg",
+      "author": null,
+      "licence": "CC0-1.0",
+      "source": "rawpixel",
+      "page": "https://www.rawpixel.com/image/5924077/photo-image-public-domain-food-free",
+      "original": "https://images.rawpixel.com/editor_1024/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcHgxNDE3ODk2LWltYWdlLWt3dnh6NDV4LmpwZw.jpg"
+    },
+    {
+      "recipe": "Pancakes with Strawberries",
+      "file": "pancakes-strawberries.jpg",
+      "author": "Herson Rodriguez",
+      "licence": "CC0-1.0",
+      "source": "stocksnap",
+      "page": "https://stocksnap.io/photo/strawberry-pancake-KBEYS7KRA3",
+      "original": "https://cdn.stocksnap.io/img-thumbs/960w/KBEYS7KRA3.jpg"
+    },
+    {
+      "recipe": "Tuna Pasta Salad",
+      "file": "tuna-pasta-salad.jpg",
+      "author": "Alabama Extension",
+      "licence": "CC0-1.0",
+      "source": "flickr",
+      "page": "https://www.flickr.com/photos/184594136@N08/50594190623",
+      "original": "https://live.staticflickr.com/65535/50594190623_136aba5931_b.jpg"
+    }
+  ]
+}

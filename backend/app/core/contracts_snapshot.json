@@ -1,0 +1,5121 @@
+{
+  "contracts": {
+    "AIUsageDailyStatDTO": {
+      "fields": {
+        "cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "date": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AIUsageModelStatDTO": {
+      "fields": {
+        "cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "model": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "tokens": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AIUsageProviderStatDTO": {
+      "fields": {
+        "cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "provider": {
+          "required": true,
+          "type": "str | None"
+        },
+        "requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "tokens": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AIUsageTopOrgDTO": {
+      "fields": {
+        "cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "tokens": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ActivityDTO": {
+      "fields": {
+        "action": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "details": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "item_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_name": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "AdminOrgMemberDTO": {
+      "fields": {
+        "actions_30d": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "email": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "full_name": {
+          "required": true,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_active": {
+          "required": true,
+          "type": "<class 'bool'>"
+        },
+        "is_blocked": {
+          "required": true,
+          "type": "<class 'bool'>"
+        },
+        "role": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AdminOrgMetricsDTO": {
+      "fields": {
+        "activity_30d": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "allowed_modules": {
+          "required": false,
+          "type": "list[str]"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "currency": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "item_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "location_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "member_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "members": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.AdminOrgMemberDTO]"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "short_id": {
+          "required": true,
+          "type": "str | None"
+        },
+        "total_value": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "waste_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AiConnectionCreateDTO": {
+      "fields": {
+        "api_base_url": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "api_key": {
+          "required": false,
+          "type": "str | None"
+        },
+        "capabilities": {
+          "required": false,
+          "type": "list[str]"
+        },
+        "max_tokens": {
+          "required": false,
+          "type": "int | None"
+        },
+        "model_name": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "provider": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "temperature": {
+          "required": false,
+          "type": "float | None"
+        },
+        "top_p": {
+          "required": false,
+          "type": "float | None"
+        }
+      },
+      "kind": "model"
+    },
+    "AiConnectionDTO": {
+      "fields": {
+        "api_base_url": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "api_key": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "capabilities": {
+          "required": false,
+          "type": "list[str]"
+        },
+        "capability_checks": {
+          "required": false,
+          "type": "dict[str, dict[str, typing.Any]]"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "max_tokens": {
+          "required": false,
+          "type": "int | None"
+        },
+        "model_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "provider": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "temperature": {
+          "required": false,
+          "type": "float | None"
+        },
+        "top_p": {
+          "required": false,
+          "type": "float | None"
+        },
+        "updated_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AiConnectionUpdateDTO": {
+      "fields": {
+        "api_base_url": {
+          "required": false,
+          "type": "str | None"
+        },
+        "api_key": {
+          "required": false,
+          "type": "str | None"
+        },
+        "capabilities": {
+          "required": false,
+          "type": "list[str] | None"
+        },
+        "max_tokens": {
+          "required": false,
+          "type": "int | None"
+        },
+        "model_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "temperature": {
+          "required": false,
+          "type": "float | None"
+        },
+        "top_p": {
+          "required": false,
+          "type": "float | None"
+        }
+      },
+      "kind": "model"
+    },
+    "AiPurposeDTO": {
+      "fields": {
+        "bound_connection_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "capability": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "description_key": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "key": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "label_key": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "owner_module": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "usable": {
+          "required": false,
+          "type": "<class 'bool'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AnnouncementCreateDTO": {
+      "fields": {
+        "active_until": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "content": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "title": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "type": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AnnouncementDTO": {
+      "fields": {
+        "active_from": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "active_until": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "content": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "created_by": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_active": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "title": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "type": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "AuditAction": {
+      "kind": "enum",
+      "members": [
+        "CREATE",
+        "DISPOSE",
+        "HARD_DELETE",
+        "MOVE",
+        "PURGE",
+        "QUANTITY_CHANGE",
+        "RESTORE",
+        "SOFT_DELETE",
+        "UPDATE",
+        "USE"
+      ]
+    },
+    "AuditLogDTO": {
+      "fields": {
+        "action": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "reason": {
+          "required": false,
+          "type": "str | None"
+        },
+        "snapshot": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "target_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "target_type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_email": {
+          "required": false,
+          "type": "str | None"
+        },
+        "user_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "AuditTargetType": {
+      "kind": "enum",
+      "members": [
+        "API_KEY",
+        "APPROVAL_REQUEST",
+        "CATEGORY",
+        "CYCLE_COUNT_SCHEDULE",
+        "DOCUMENT",
+        "DOCUMENT_TEMPLATE",
+        "EQUIPMENT_ASSET",
+        "EQUIPMENT_ASSIGNMENT",
+        "EQUIPMENT_ATTESTATION",
+        "EQUIPMENT_MAINTENANCE",
+        "EQUIPMENT_MODEL",
+        "INVENTORY_PERIOD",
+        "INVITATION",
+        "ITEM",
+        "MAKER_PRODUCTION_ORDER",
+        "MAKER_RECIPE",
+        "MEAL_PLAN",
+        "MODULE",
+        "ORGANIZATION",
+        "ORG_MEMBER",
+        "PRODUCT_PROFILE",
+        "PRODUCT_TEMPLATE",
+        "PURCHASE_ORDER",
+        "RECIPE",
+        "ROLE",
+        "SHOPPING_LIST",
+        "STOCK_LOT",
+        "STOCK_TAKE",
+        "STORAGE",
+        "WEBHOOK_ENDPOINT",
+        "WORK_ITEM"
+      ]
+    },
+    "CategoryConsumptionDTO": {
+      "fields": {
+        "category": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "category_code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "total_quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "total_value": {
+          "required": true,
+          "type": "<class 'float'>"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryCostDTO": {
+      "fields": {
+        "category_code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "category_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "items_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_spent": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "total_wasted": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "unpriced_count": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "value_source": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryCreateDTO": {
+      "fields": {
+        "code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "color": {
+          "required": false,
+          "type": "str | None"
+        },
+        "context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "default_removal_strategy": {
+          "required": false,
+          "type": "typing.Literal['FIFO', 'FEFO'] | None"
+        },
+        "emoji": {
+          "required": false,
+          "type": "str | None"
+        },
+        "field_definitions": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]] | None"
+        },
+        "group_label": {
+          "required": false,
+          "type": "str | None"
+        },
+        "icon": {
+          "required": false,
+          "type": "str | None"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "sort_order": {
+          "required": false,
+          "type": "int | None"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryCreatedPayload": {
+      "fields": {
+        "category_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryDTO": {
+      "fields": {
+        "code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "color": {
+          "required": false,
+          "type": "str | None"
+        },
+        "context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "default_removal_strategy": {
+          "required": false,
+          "type": "typing.Literal['FIFO', 'FEFO'] | None"
+        },
+        "emoji": {
+          "required": false,
+          "type": "str | None"
+        },
+        "field_definitions": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]] | None"
+        },
+        "group_label": {
+          "required": false,
+          "type": "str | None"
+        },
+        "icon": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_active": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "is_module_owned": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "items_count": {
+          "required": false,
+          "type": "int | None"
+        },
+        "module_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "sort_order": {
+          "required": false,
+          "type": "int | None"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryDeletedPayload": {
+      "fields": {
+        "category_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryRotationDTO": {
+      "fields": {
+        "average_days": {
+          "required": true,
+          "type": "float | None"
+        },
+        "category_code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "category_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "item_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryStatsDTO": {
+      "fields": {
+        "category_code": {
+          "required": true,
+          "type": "str | None"
+        },
+        "category_icon": {
+          "required": true,
+          "type": "str | None"
+        },
+        "category_id": {
+          "required": true,
+          "type": "uuid.UUID | None"
+        },
+        "category_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "items_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_value": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "unpriced_count": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "value_source": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryUpdateDTO": {
+      "fields": {
+        "color": {
+          "required": false,
+          "type": "str | None"
+        },
+        "context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "default_removal_strategy": {
+          "required": false,
+          "type": "typing.Literal['FIFO', 'FEFO'] | None"
+        },
+        "emoji": {
+          "required": false,
+          "type": "str | None"
+        },
+        "field_definitions": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]] | None"
+        },
+        "group_label": {
+          "required": false,
+          "type": "str | None"
+        },
+        "icon": {
+          "required": false,
+          "type": "str | None"
+        },
+        "is_active": {
+          "required": false,
+          "type": "bool | None"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "sort_order": {
+          "required": false,
+          "type": "int | None"
+        }
+      },
+      "kind": "model"
+    },
+    "CategoryUpdatedPayload": {
+      "fields": {
+        "category_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ConsumptionItemDTO": {
+      "fields": {
+        "category": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "category_code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "value": {
+          "required": true,
+          "type": "<class 'float'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ConsumptionStatsDTO": {
+      "fields": {
+        "consumption_by_category": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.CategoryConsumptionDTO]"
+        },
+        "most_consumed": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.ConsumptionItemDTO]"
+        },
+        "most_wasted": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.ConsumptionItemDTO]"
+        },
+        "total_consumed_value": {
+          "required": true,
+          "type": "float | None"
+        },
+        "total_wasted_value": {
+          "required": true,
+          "type": "float | None"
+        },
+        "waste_event_rate": {
+          "required": false,
+          "type": "float | None"
+        }
+      },
+      "kind": "model"
+    },
+    "CostSummaryDTO": {
+      "fields": {
+        "excluded_other_currency_count": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "monthly_trend": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.MonthlyTrendDTO]"
+        },
+        "savings_opportunities": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.SavingsOpportunityDTO]"
+        },
+        "top_expensive_categories": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.CategoryCostDTO]"
+        },
+        "total_spent": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "total_wasted": {
+          "required": true,
+          "type": "float | None"
+        },
+        "value_source": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "waste_value_percentage": {
+          "required": false,
+          "type": "float | None"
+        }
+      },
+      "kind": "model"
+    },
+    "CountDifferenceDTO": {
+      "fields": {
+        "batch_number": {
+          "required": false,
+          "type": "str | None"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "quantity_delta": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "CursorPaginatedDTO": {
+      "fields": {
+        "has_more": {
+          "required": true,
+          "type": "<class 'bool'>"
+        },
+        "items": {
+          "required": true,
+          "type": "list[~T]"
+        },
+        "next_cursor": {
+          "required": true,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentCancelledPayload": {
+      "fields": {
+        "document_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "document_type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "lines": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]]"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentCompletedPayload": {
+      "fields": {
+        "document_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "document_type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "lines": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]]"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentConfirmedPayload": {
+      "fields": {
+        "document_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "document_type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "lines": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]]"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentFilterDTO": {
+      "fields": {
+        "line_meta_data": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]]"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentLineToPostDTO": {
+      "fields": {
+        "batch_number": {
+          "required": false,
+          "type": "str | None"
+        },
+        "done_quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "expected_quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "item_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "line_number": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, dict[str, typing.Any]]"
+        },
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "serial_number": {
+          "required": false,
+          "type": "str | None"
+        },
+        "source_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "source_po_line_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "target_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentReservationHoldDTO": {
+      "fields": {
+        "document_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "product_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentStateDTO": {
+      "fields": {
+        "confirmed_by": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "held_by": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "number": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "status": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "type": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "DocumentToPostDTO": {
+      "fields": {
+        "confirmed_by": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "external_reference": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "lines": {
+          "required": false,
+          "type": "list[app.core.contracts._documents_dtos.DocumentLineToPostDTO]"
+        },
+        "may_exceed_over_receipt": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, dict[str, typing.Any]]"
+        },
+        "number": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "partner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "scheduled_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "source_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "stage": {
+          "required": true,
+          "type": "typing.Literal['confirm', 'post']"
+        },
+        "target_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "type": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "EquipmentCheckinPayload": {
+      "fields": {
+        "assigned_to_name": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "assignment_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "checkin_condition": {
+          "required": false,
+          "type": "str | None"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "item_name": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "new_status": {
+          "required": false,
+          "type": "str | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_id": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "EquipmentCheckoutPayload": {
+      "fields": {
+        "assigned_to_name": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "assignment_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "item_name": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_id": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "EventPayload": {
+      "fields": {},
+      "kind": "model"
+    },
+    "ExpenseForecastDTO": {
+      "fields": {
+        "confidence": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "forecast_period": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "historical_avg": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "predicted_spending": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "top_cost_drivers": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.CategoryCostDTO]"
+        },
+        "trend": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "trend_percentage": {
+          "required": true,
+          "type": "float | None"
+        },
+        "value_source": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "waste_reduction_potential": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "weeks_of_data": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "weeks_required": {
+          "required": false,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ExpiryBucketDTO": {
+      "fields": {
+        "count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "period": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "GlobalAIUsageStatsDTO": {
+      "fields": {
+        "by_model": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.AIUsageModelStatDTO]"
+        },
+        "by_provider": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.AIUsageProviderStatDTO]"
+        },
+        "daily": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.AIUsageDailyStatDTO]"
+        },
+        "estimated_cost_ratio": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "period_days": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "top_orgs": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.AIUsageTopOrgDTO]"
+        },
+        "total_cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "total_requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_tokens": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "GlobalAdminStatsDTO": {
+      "fields": {
+        "active_items": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "dau": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_llm_cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "total_organizations": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_scans_30d": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_users": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "wau": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemAction": {
+      "kind": "enum",
+      "members": [
+        "CREATED",
+        "CREATED_VIA_SCAN",
+        "DELETED",
+        "DISPOSED",
+        "MOVED",
+        "OPENED",
+        "QUANTITY_CHANGED",
+        "QUANTITY_INCREASED_VIA_SCAN",
+        "RESTORED",
+        "STATUS_CHANGED",
+        "UPDATED",
+        "USED"
+      ]
+    },
+    "ItemAttachmentDTO": {
+      "fields": {
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "file_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "file_path": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "file_size": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "file_type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemCreateDTO": {
+      "fields": {
+        "added_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "barcode": {
+          "required": false,
+          "type": "str | None"
+        },
+        "brand": {
+          "required": false,
+          "type": "str | None"
+        },
+        "category_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "currency": {
+          "required": false,
+          "type": "str | None"
+        },
+        "description": {
+          "required": false,
+          "type": "str | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "freeze_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "image_url": {
+          "required": false,
+          "type": "str | None"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "metadata": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "min_quantity": {
+          "required": false,
+          "type": "float | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "purchase_price": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "serial_number": {
+          "required": false,
+          "type": "str | None"
+        },
+        "shelf_location": {
+          "required": false,
+          "type": "str | None"
+        },
+        "template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "volume_uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "volume_value": {
+          "required": false,
+          "type": "float | None"
+        },
+        "weight_uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "weight_value": {
+          "required": false,
+          "type": "float | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemCreatedPayload": {
+      "fields": {
+        "item": {
+          "required": false,
+          "type": "typing.Any"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_id": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemDTO": {
+      "fields": {
+        "added_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "barcode": {
+          "required": false,
+          "type": "str | None"
+        },
+        "brand": {
+          "required": false,
+          "type": "str | None"
+        },
+        "category": {
+          "required": false,
+          "type": "app.core.contracts._core_dtos.CategoryDTO | None"
+        },
+        "category_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "currency": {
+          "required": false,
+          "type": "str | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "image_url": {
+          "required": false,
+          "type": "str | None"
+        },
+        "is_deleted": {
+          "required": true,
+          "type": "<class 'bool'>"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "purchase_price": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "quantity": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "serial_number": {
+          "required": false,
+          "type": "str | None"
+        },
+        "shelf_location": {
+          "required": false,
+          "type": "str | None"
+        },
+        "template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "template_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "uom": {
+          "required": false,
+          "type": "ForwardRef('UomDTO | None', is_class=True)"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        },
+        "updated_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemDeletedPayload": {
+      "fields": {
+        "item_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_id": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemHistoryDTO": {
+      "fields": {
+        "action": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "changes": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "source_document_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "user_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemMovedPayload": {
+      "fields": {
+        "changes": {
+          "required": false,
+          "type": "dict[str, typing.Any]"
+        },
+        "item": {
+          "required": false,
+          "type": "typing.Any"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_id": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemQuantityEventPayload": {
+      "fields": {
+        "item": {
+          "required": false,
+          "type": "typing.Any"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "user_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemUpdateDTO": {
+      "fields": {
+        "barcode": {
+          "required": false,
+          "type": "str | None"
+        },
+        "brand": {
+          "required": false,
+          "type": "str | None"
+        },
+        "category_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "currency": {
+          "required": false,
+          "type": "str | None"
+        },
+        "description": {
+          "required": false,
+          "type": "str | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "freeze_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "image_url": {
+          "required": false,
+          "type": "str | None"
+        },
+        "location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "metadata": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "min_quantity": {
+          "required": false,
+          "type": "float | None"
+        },
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "purchase_price": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "quantity": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "serial_number": {
+          "required": false,
+          "type": "str | None"
+        },
+        "shelf_location": {
+          "required": false,
+          "type": "str | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ItemUpdatedPayload": {
+      "fields": {
+        "changes": {
+          "required": false,
+          "type": "dict[str, typing.Any]"
+        },
+        "item": {
+          "required": false,
+          "type": "typing.Any"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user_id": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "LabelBatchExportedPayload": {
+      "fields": {
+        "count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "height_mm": {
+          "required": false,
+          "type": "float | None"
+        },
+        "label_ids": {
+          "required": false,
+          "type": "list[str]"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "width_mm": {
+          "required": false,
+          "type": "float | None"
+        }
+      },
+      "kind": "model"
+    },
+    "LabelBatchGeneratedPayload": {
+      "fields": {
+        "count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "created_by": {
+          "required": false,
+          "type": "str | None"
+        },
+        "label_ids": {
+          "required": false,
+          "type": "list[str]"
+        },
+        "label_type": {
+          "required": false,
+          "type": "str | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "prefix": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "LabelCodeItemDTO": {
+      "fields": {
+        "description": {
+          "required": false,
+          "type": "str | None"
+        },
+        "short_code": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "LabelPoolCreateDTO": {
+      "fields": {
+        "context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "count": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "description": {
+          "required": false,
+          "type": "str | None"
+        },
+        "label_type": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "prefix": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "target_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "LabelPoolDTO": {
+      "fields": {
+        "assigned_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "assigned_item_context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "assigned_item_expiry": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "assigned_item_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "assigned_item_quantity": {
+          "required": false,
+          "type": "float | None"
+        },
+        "assigned_item_unit": {
+          "required": false,
+          "type": "str | None"
+        },
+        "context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "description": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_assigned": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "is_item_deleted": {
+          "required": false,
+          "type": "bool | None"
+        },
+        "item_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "label_type": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "printed_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "scan_count": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "short_code": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "target_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "LabelScanDTO": {
+      "fields": {
+        "action": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "document": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "document_mode": {
+          "required": false,
+          "type": "str | None"
+        },
+        "item": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "label_code": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "location": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "message_key": {
+          "required": false,
+          "type": "str | None"
+        },
+        "message_params": {
+          "required": false,
+          "type": "dict[str, str] | None"
+        },
+        "quick_actions": {
+          "required": false,
+          "type": "list[str] | None"
+        },
+        "status": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "stock_summary": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        }
+      },
+      "kind": "model"
+    },
+    "LlmCapability": {
+      "kind": "enum",
+      "members": [
+        "TEXT",
+        "URL_FETCH",
+        "VISION"
+      ]
+    },
+    "LotLocationDTO": {
+      "fields": {
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "reserved_quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        }
+      },
+      "kind": "model"
+    },
+    "LotStatus": {
+      "kind": "enum",
+      "members": [
+        "ACTIVE",
+        "EXPIRED",
+        "HELD",
+        "QUARANTINED",
+        "RECALLED"
+      ]
+    },
+    "LotStatusEventDTO": {
+      "fields": {
+        "at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "by_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "reason": {
+          "required": false,
+          "type": "str | None"
+        },
+        "status": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "LowStockProductDTO": {
+      "fields": {
+        "item_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "minimum": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "on_hand": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ModuleDisabledPayload": {
+      "fields": {
+        "module_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ModuleEnabledPayload": {
+      "fields": {
+        "module_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "MonthlyTrendDTO": {
+      "fields": {
+        "month": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "spent": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "wasted": {
+          "required": true,
+          "type": "<class 'float'>"
+        }
+      },
+      "kind": "model"
+    },
+    "NotificationDTO": {
+      "fields": {
+        "content": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_read": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "link": {
+          "required": false,
+          "type": "str | None"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "title": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "type": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "user_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        }
+      },
+      "kind": "model"
+    },
+    "NotificationDedupKey": {
+      "fields": {
+        "meta_type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "ref_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "ref_key": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "OrgAIUsageActionStatDTO": {
+      "fields": {
+        "action": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "OrgAIUsageMonthUsageDTO": {
+      "fields": {
+        "ai_requests_monthly": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "ai_scans_monthly": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "OrgAIUsageStatsDTO": {
+      "fields": {
+        "by_action": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.OrgAIUsageActionStatDTO]"
+        },
+        "by_provider": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.AIUsageProviderStatDTO]"
+        },
+        "by_user": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.OrgAIUsageUserStatDTO]"
+        },
+        "daily": {
+          "required": true,
+          "type": "list[app.core.contracts._admin_dtos.AIUsageDailyStatDTO]"
+        },
+        "limits": {
+          "required": true,
+          "type": "dict[str, typing.Any]"
+        },
+        "month_usage": {
+          "required": true,
+          "type": "<class 'app.core.contracts._admin_dtos.OrgAIUsageMonthUsageDTO'>"
+        },
+        "period_days": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "total_requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "OrgAIUsageUserStatDTO": {
+      "fields": {
+        "cost_usd": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "display_name": {
+          "required": true,
+          "type": "str | None"
+        },
+        "email": {
+          "required": true,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "uuid.UUID | None"
+        },
+        "requests": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "tokens": {
+          "required": true,
+          "type": "<class 'int'>"
+        }
+      },
+      "kind": "model"
+    },
+    "OrganizationDTO": {
+      "fields": {
+        "active_profile_id": {
+          "required": false,
+          "type": "str | None"
+        },
+        "address": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "allowed_modules": {
+          "required": false,
+          "type": "list[str] | None"
+        },
+        "country": {
+          "required": false,
+          "type": "str | None"
+        },
+        "created_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "created_by": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "currency": {
+          "required": false,
+          "type": "str | None"
+        },
+        "enabled_modules": {
+          "required": false,
+          "type": "list[str] | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "logo_url": {
+          "required": false,
+          "type": "str | None"
+        },
+        "member_count": {
+          "required": false,
+          "type": "int | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "onboarding_completed": {
+          "required": false,
+          "type": "bool | None"
+        },
+        "print_page_size": {
+          "required": false,
+          "type": "str | None"
+        },
+        "settings": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "short_id": {
+          "required": false,
+          "type": "str | None"
+        },
+        "tax_id": {
+          "required": false,
+          "type": "str | None"
+        },
+        "timezone": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "OverviewDTO": {
+      "fields": {
+        "excluded_other_currency_count": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "expired": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "expiring_soon": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "low_stock": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_items": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_locations": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "total_value": {
+          "required": false,
+          "type": "<class 'float'>"
+        },
+        "tracks_expiry": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "value_scope": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "value_source": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PartnerActivatedPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "partner_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PartnerCreateDTO": {
+      "fields": {
+        "address": {
+          "required": false,
+          "type": "app.core.contracts._core_dtos.PartnerAddressDTO | None"
+        },
+        "code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "contact_person": {
+          "required": false,
+          "type": "str | None"
+        },
+        "email": {
+          "required": false,
+          "type": "str | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "phone": {
+          "required": false,
+          "type": "str | None"
+        },
+        "tax_id": {
+          "required": false,
+          "type": "str | None"
+        },
+        "type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "website": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PartnerDTO": {
+      "fields": {
+        "address": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "contact_person": {
+          "required": false,
+          "type": "str | None"
+        },
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "email": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_active": {
+          "required": true,
+          "type": "<class 'bool'>"
+        },
+        "is_consumer": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "phone": {
+          "required": false,
+          "type": "str | None"
+        },
+        "tax_id": {
+          "required": false,
+          "type": "str | None"
+        },
+        "type": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "updated_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "website": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PartnerDeactivatedPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "partner_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PartnerPricelistDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "currency": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "min_quantity": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "partner_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "unit_price": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "updated_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "valid_from": {
+          "required": true,
+          "type": "<class 'datetime.date'>"
+        },
+        "valid_to": {
+          "required": false,
+          "type": "datetime.date | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PartnerUpdateDTO": {
+      "fields": {
+        "address": {
+          "required": false,
+          "type": "app.core.contracts._core_dtos.PartnerAddressDTO | None"
+        },
+        "code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "contact_person": {
+          "required": false,
+          "type": "str | None"
+        },
+        "email": {
+          "required": false,
+          "type": "str | None"
+        },
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "phone": {
+          "required": false,
+          "type": "str | None"
+        },
+        "tax_id": {
+          "required": false,
+          "type": "str | None"
+        },
+        "type": {
+          "required": false,
+          "type": "str | None"
+        },
+        "website": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PickGroupDTO": {
+      "fields": {
+        "anchor_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PickOrderLineDTO": {
+      "fields": {
+        "bin_location": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "location_path": {
+          "required": false,
+          "type": "list[app.core.contracts._documents_dtos.PickOrderLocationDTO]"
+        },
+        "lot_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PickOrderLocationDTO": {
+      "fields": {
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "sequence": {
+          "required": false,
+          "type": "int | None"
+        },
+        "short_code": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PreviousMeasurementDTO": {
+      "fields": {
+        "layer_quant_drift_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "layer_quant_drift_total": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "measured_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "quant_move_drift_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "quant_move_drift_total": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ProductTemplateCandidateDTO": {
+      "fields": {
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ProductTemplateDTO": {
+      "fields": {
+        "barcode": {
+          "required": false,
+          "type": "str | None"
+        },
+        "brand": {
+          "required": false,
+          "type": "str | None"
+        },
+        "description": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "image_url": {
+          "required": false,
+          "type": "str | None"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "min_quantity": {
+          "required": false,
+          "type": "float | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "removal_strategy": {
+          "required": false,
+          "type": "str | None"
+        },
+        "sku": {
+          "required": false,
+          "type": "str | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "volume_uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "volume_value": {
+          "required": false,
+          "type": "float | None"
+        },
+        "weight_uom": {
+          "required": false,
+          "type": "ForwardRef('UomDTO | None', is_class=True)"
+        },
+        "weight_uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "weight_value": {
+          "required": false,
+          "type": "float | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PurchaseOrderCancelledPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_number": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PurchaseOrderCompletedPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_number": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PurchaseOrderConfirmedPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_number": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PurchaseOrderCreateInput": {
+      "fields": {
+        "currency": {
+          "required": false,
+          "type": "str | None"
+        },
+        "lines": {
+          "required": true,
+          "type": "list[app.core.contracts._documents_dtos.PurchaseOrderLineInput]"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "partner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "scheduled_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PurchaseOrderDTO": {
+      "fields": {
+        "created_by": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "currency": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "number": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "partner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "scheduled_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "status": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "PurchaseOrderLineInput": {
+      "fields": {
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "quantity_ordered": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "tax_rate": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "unit_price": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "PutawayCandidateDTO": {
+      "fields": {
+        "category_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "location_ids": {
+          "required": false,
+          "type": "list[uuid.UUID]"
+        },
+        "product_template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "quantity": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        }
+      },
+      "kind": "model"
+    },
+    "QuantConsumptionDTO": {
+      "fields": {
+        "consumed": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "record_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ReceiptCreatedFromPOPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "po_number": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "receipt_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "receipt_number": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ReceiptLineFromPODTO": {
+      "fields": {
+        "name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "source_po_line_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "tax_rate": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "unit_price": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ReconciliationDTO": {
+      "fields": {
+        "items_scanned": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "layer_quant_drift_count": {
+          "required": false,
+          "type": "int | None"
+        },
+        "layer_quant_drift_total": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "quant_move_drift_count": {
+          "required": false,
+          "type": "int | None"
+        },
+        "quant_move_drift_total": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        }
+      },
+      "kind": "model"
+    },
+    "RecordPostDTO": {
+      "fields": {
+        "history": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "new_quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "source_document_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ReorderRuleDTO": {
+      "fields": {
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "max_quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "min_quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "preferred_partner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "safety_stock": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ReplenishmentAlertDTO": {
+      "fields": {
+        "available_quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "max_quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "min_quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "preferred_partner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "preferred_partner_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "proposed_move_quantity": {
+          "required": false,
+          "type": "<class 'float'>"
+        },
+        "remaining_to_buy": {
+          "required": false,
+          "type": "float | None"
+        },
+        "reorder_rule_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "reserve_available_quantity": {
+          "required": false,
+          "type": "<class 'float'>"
+        },
+        "safety_stock": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "shortage": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "sku": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "suggested_reorder_quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ReplenishmentMoveLineDTO": {
+      "fields": {
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "lot_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "source_location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "source_location_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ReplenishmentProposalDTO": {
+      "fields": {
+        "lines": {
+          "required": false,
+          "type": "list[app.core.contracts._documents_dtos.ReplenishmentMoveLineDTO]"
+        },
+        "product_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "reorder_rule_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "target_location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "target_location_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "unit": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ReservationDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "document_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "document_line_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "product_template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ReservationResultDTO": {
+      "fields": {
+        "message": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "reserved": {
+          "required": false,
+          "type": "list[app.core.contracts._stock_dtos.ReservedSliceDTO]"
+        },
+        "success": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "unreserved_quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ReservedSliceDTO": {
+      "fields": {
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "reservation_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "RoleDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_system": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "member_count": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "permissions": {
+          "required": false,
+          "type": "list[str]"
+        }
+      },
+      "kind": "model"
+    },
+    "RoleHolderDTO": {
+      "fields": {
+        "email": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "full_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        }
+      },
+      "kind": "model"
+    },
+    "RotationAnalysisDTO": {
+      "fields": {
+        "active_items_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "average_days_to_consume": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "average_stock_age_days": {
+          "required": false,
+          "type": "float | None"
+        },
+        "consumed_items_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "dead_stock": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.RotationItemDTO]"
+        },
+        "dead_stock_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "dead_stock_value": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "median_days_to_consume": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "median_stock_age_days": {
+          "required": false,
+          "type": "float | None"
+        },
+        "rotation_by_category": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.CategoryRotationDTO]"
+        },
+        "slow_movers": {
+          "required": true,
+          "type": "list[app.core.contracts._analytics_dtos.RotationItemDTO]"
+        },
+        "slow_movers_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "slow_movers_value": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "value_source": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "RotationItemDTO": {
+      "fields": {
+        "brand": {
+          "required": true,
+          "type": "str | None"
+        },
+        "category": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "category_code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "days_in_storage": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "item_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "location": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'float'>"
+        },
+        "value": {
+          "required": true,
+          "type": "<class 'float'>"
+        }
+      },
+      "kind": "model"
+    },
+    "SavingsOpportunityDTO": {
+      "fields": {
+        "category_code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "category_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "product_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "suggestion": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "wasted_amount": {
+          "required": true,
+          "type": "<class 'float'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ShoppingListDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "created_by": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        }
+      },
+      "kind": "model"
+    },
+    "ShoppingListItemCreateDTO": {
+      "fields": {
+        "category_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "estimated_price": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "item_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "note_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "priority": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "source": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "ShoppingListItemDTO": {
+      "fields": {
+        "category_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "estimated_price": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "item_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "note_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "notes": {
+          "required": false,
+          "type": "str | None"
+        },
+        "priority": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "shopping_list_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "source": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "template_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "uom_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockAgeBucketDTO": {
+      "fields": {
+        "label": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "max_days": {
+          "required": false,
+          "type": "int | None"
+        },
+        "min_days": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "move_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        }
+      },
+      "kind": "model"
+    },
+    "StockAgeEntryDTO": {
+      "fields": {
+        "days_in_stock": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "move_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "received_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "reference_type": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockAsOfReportDTO": {
+      "fields": {
+        "as_of": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "complete_from": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "currency": {
+          "required": false,
+          "type": "str | None"
+        },
+        "excluded_currency_rows": {
+          "required": false,
+          "type": "<class 'int'>"
+        },
+        "generated_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "items": {
+          "required": false,
+          "type": "list[app.core.contracts._stock_dtos.StockAsOfRowDTO]"
+        },
+        "organization_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "total_value": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "value_source": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockAsOfRowDTO": {
+      "fields": {
+        "product_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        },
+        "value": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockLotDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_serial": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "production_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "removal_strategy": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "status": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "status_reason": {
+          "required": false,
+          "type": "str | None"
+        },
+        "use_by_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockLotDetailDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_serial": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "locations": {
+          "required": false,
+          "type": "list[app.core.contracts._stock_dtos.LotLocationDTO]"
+        },
+        "meta_data": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "on_hand": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "product_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "production_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "removal_strategy": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "status": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "status_history": {
+          "required": false,
+          "type": "list[app.core.contracts._stock_dtos.LotStatusEventDTO]"
+        },
+        "status_reason": {
+          "required": false,
+          "type": "str | None"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        },
+        "use_by_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockMoveDTO": {
+      "fields": {
+        "completed_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "created_by": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "from_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "reference_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "reference_type": {
+          "required": false,
+          "type": "str | None"
+        },
+        "state": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "to_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "updated_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockMovePostedGroupDTO": {
+      "fields": {
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "posted_at": {
+          "required": true,
+          "type": "<class 'datetime.datetime'>"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "to_location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        }
+      },
+      "kind": "model"
+    },
+    "StockMoveReferenceType": {
+      "kind": "enum",
+      "members": [
+        "ADJUSTMENT",
+        "DOCUMENT",
+        "ITEM",
+        "ITEM_HISTORY",
+        "LOCATION_RELOCATION",
+        "MAKER_PRODUCTION",
+        "OPENING_BALANCE",
+        "RECIPE_PICKING"
+      ]
+    },
+    "StockMoveRowDTO": {
+      "fields": {
+        "completed_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "created_by": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "from_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "from_location_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "lot_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "product_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": true,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "reference_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "reference_type": {
+          "required": false,
+          "type": "str | None"
+        },
+        "relocated_from_path": {
+          "required": false,
+          "type": "str | None"
+        },
+        "relocated_location_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "relocated_to_path": {
+          "required": false,
+          "type": "str | None"
+        },
+        "state": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "to_location_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "to_location_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        },
+        "updated_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "user_name": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockMoveState": {
+      "kind": "enum",
+      "members": [
+        "DONE"
+      ]
+    },
+    "StockQuantDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "owner_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "removal_strategy": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "reserved_quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "updated_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StockQuantRowDTO": {
+      "fields": {
+        "available_quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "expiry_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "lot_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "lot_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "lot_status": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "product_template_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "reserved_quantity": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "uom_symbol": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageCreatedPayload": {
+      "fields": {
+        "location_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageDTO": {
+      "fields": {
+        "behavior_mode": {
+          "required": false,
+          "type": "str | None"
+        },
+        "context_schema": {
+          "required": false,
+          "type": "list[str] | None"
+        },
+        "context_tag": {
+          "required": false,
+          "type": "str | None"
+        },
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "description": {
+          "required": false,
+          "type": "str | None"
+        },
+        "field_definitions": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]] | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_details": {
+          "required": false,
+          "type": "str | None"
+        },
+        "location_type": {
+          "required": false,
+          "type": "app.core.contracts._system_dtos.StorageTypeDTO | None"
+        },
+        "location_type_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "parent_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "sequence": {
+          "required": false,
+          "type": "int | None"
+        },
+        "settings": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "short_code": {
+          "required": false,
+          "type": "str | None"
+        },
+        "usage": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "warehouse_config": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageDeletedPayload": {
+      "fields": {
+        "location_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageStatsDTO": {
+      "fields": {
+        "expiring_soon": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "items_count": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "location_name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "location_type": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageTypeCreateDTO": {
+      "fields": {
+        "behavior_mode": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "context_schema": {
+          "required": false,
+          "type": "list[str] | None"
+        },
+        "default_settings": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "field_definitions": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]] | None"
+        },
+        "icon": {
+          "required": false,
+          "type": "str | None"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "type_code": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageTypeDTO": {
+      "fields": {
+        "behavior_mode": {
+          "required": false,
+          "type": "<class 'str'>"
+        },
+        "context_schema": {
+          "required": false,
+          "type": "list[str]"
+        },
+        "created_by": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "default_settings": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "field_definitions": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]]"
+        },
+        "icon": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_system": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "type_code": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageTypeUpdateDTO": {
+      "fields": {
+        "behavior_mode": {
+          "required": false,
+          "type": "str | None"
+        },
+        "context_schema": {
+          "required": false,
+          "type": "list[str] | None"
+        },
+        "default_settings": {
+          "required": false,
+          "type": "dict[str, typing.Any] | None"
+        },
+        "field_definitions": {
+          "required": false,
+          "type": "list[dict[str, typing.Any]] | None"
+        },
+        "icon": {
+          "required": false,
+          "type": "str | None"
+        },
+        "name": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "StorageUpdatedPayload": {
+      "fields": {
+        "changes": {
+          "required": false,
+          "type": "dict[str, typing.Any]"
+        },
+        "location_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "SystemEvent": {
+      "kind": "enum",
+      "members": [
+        "CATEGORY_CREATED",
+        "CATEGORY_DELETED",
+        "CATEGORY_UPDATED",
+        "ITEM_CREATED",
+        "ITEM_DEACTIVATED",
+        "ITEM_DELETED",
+        "ITEM_DISPOSED",
+        "ITEM_MOVED",
+        "ITEM_STATUS_CHANGED",
+        "ITEM_TRANSFERRED",
+        "ITEM_UPDATED",
+        "ITEM_USED",
+        "LABEL_ASSIGNED",
+        "LABEL_BATCH_EXPORTED",
+        "LABEL_BATCH_GENERATED",
+        "LABEL_SCANNED",
+        "MODULE_DISABLED",
+        "MODULE_ENABLED",
+        "ORGANIZATION_CREATED",
+        "ORGANIZATION_UPDATED",
+        "PARTNER_ACTIVATED",
+        "PARTNER_DEACTIVATED",
+        "STORAGE_CREATED",
+        "STORAGE_DELETED",
+        "STORAGE_UPDATED",
+        "USER_JOINED_ORG",
+        "USER_LEFT_ORG",
+        "USER_REGISTERED"
+      ]
+    },
+    "SystemPermission": {
+      "kind": "enum",
+      "members": [
+        "ADMIN_ACCESS",
+        "CATEGORIES_READ",
+        "CATEGORIES_WRITE",
+        "ITEMS_DELETE",
+        "ITEMS_PURGE",
+        "ITEMS_READ",
+        "ITEMS_WRITE",
+        "ORG_MEMBERS_WRITE",
+        "ORG_READ",
+        "ORG_SETTINGS_WRITE",
+        "PARTNERS_READ",
+        "PARTNERS_WRITE",
+        "STORAGES_READ",
+        "STORAGES_WRITE",
+        "SYSTEM_CONFIG_WRITE"
+      ]
+    },
+    "TenantEventPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "UomCategoryDTO": {
+      "fields": {
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "uoms": {
+          "required": false,
+          "type": "list[app.core.contracts._core_dtos.UomDTO]"
+        }
+      },
+      "kind": "model"
+    },
+    "UomDTO": {
+      "fields": {
+        "category_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "factor": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_reference": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "is_system": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "rounding": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "symbol": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "UomInfoDTO": {
+      "fields": {
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "name": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "rounding": {
+          "required": false,
+          "type": "<class 'decimal.Decimal'>"
+        },
+        "symbol": {
+          "required": true,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "UserContextDTO": {
+      "fields": {
+        "email": {
+          "required": false,
+          "type": "str | None"
+        },
+        "extra_permissions": {
+          "required": false,
+          "type": "set[str]"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_superuser": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "organization": {
+          "required": false,
+          "type": "app.core.contracts._core_dtos.OrganizationDTO | None"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "permissions": {
+          "required": false,
+          "type": "set[app.core.contracts._system_dtos.SystemPermission]"
+        },
+        "role": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "UserDTO": {
+      "fields": {
+        "created_at": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "email": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "full_name": {
+          "required": false,
+          "type": "str | None"
+        },
+        "id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "is_active": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "is_blocked": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "is_superuser": {
+          "required": false,
+          "type": "<class 'bool'>"
+        },
+        "organization_id": {
+          "required": false,
+          "type": "uuid.UUID | None"
+        },
+        "preferred_language": {
+          "required": false,
+          "type": "str | None"
+        },
+        "role": {
+          "required": false,
+          "type": "<class 'str'>"
+        }
+      },
+      "kind": "model"
+    },
+    "UserJoinedOrgPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user": {
+          "required": false,
+          "type": "typing.Any"
+        }
+      },
+      "kind": "model"
+    },
+    "UserLeftOrgPayload": {
+      "fields": {
+        "organization_id": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "user": {
+          "required": false,
+          "type": "typing.Any"
+        }
+      },
+      "kind": "model"
+    },
+    "UserProfileDTO": {
+      "fields": {
+        "email": {
+          "required": true,
+          "type": "'str'"
+        },
+        "full_name": {
+          "required": true,
+          "type": "'str | None'"
+        },
+        "id": {
+          "required": true,
+          "type": "'UUID'"
+        },
+        "organization_id": {
+          "required": true,
+          "type": "'UUID | None'"
+        },
+        "preferred_language": {
+          "required": true,
+          "type": "'str'"
+        },
+        "role": {
+          "required": true,
+          "type": "'str'"
+        }
+      },
+      "kind": "model"
+    },
+    "WorkItemDTO": {
+      "fields": {
+        "action_href": {
+          "required": false,
+          "type": "str | None"
+        },
+        "action_label": {
+          "required": false,
+          "type": "str | None"
+        },
+        "count": {
+          "required": false,
+          "type": "decimal.Decimal | None"
+        },
+        "due_date": {
+          "required": false,
+          "type": "datetime.date | None"
+        },
+        "kind": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "next_action": {
+          "required": false,
+          "type": "str | None"
+        },
+        "number": {
+          "required": false,
+          "type": "str | None"
+        },
+        "place": {
+          "required": false,
+          "type": "str | None"
+        },
+        "sentence": {
+          "required": false,
+          "type": "str | None"
+        },
+        "source_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        },
+        "source_kind": {
+          "required": true,
+          "type": "<class 'str'>"
+        },
+        "state": {
+          "required": false,
+          "type": "typing.Literal['todo', 'in_progress', 'done']"
+        },
+        "subject": {
+          "required": false,
+          "type": "str | None"
+        },
+        "unit": {
+          "required": false,
+          "type": "str | None"
+        }
+      },
+      "kind": "model"
+    },
+    "WorkItemQueryDTO": {
+      "fields": {
+        "date_to": {
+          "required": true,
+          "type": "<class 'datetime.date'>"
+        },
+        "done_since": {
+          "required": false,
+          "type": "datetime.datetime | None"
+        },
+        "limit": {
+          "required": true,
+          "type": "<class 'int'>"
+        },
+        "user_id": {
+          "required": true,
+          "type": "<class 'uuid.UUID'>"
+        }
+      },
+      "kind": "model"
+    }
+  },
+  "version": 1
+}

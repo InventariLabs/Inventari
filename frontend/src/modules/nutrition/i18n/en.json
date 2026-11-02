@@ -1,0 +1,74 @@
+{
+  "title": "Food & Health Info",
+  "scanTable": "Scan Table",
+  "noData": "No data available for this product. Use the 'Scan Table' button to add nutritional values and ingredients using the camera.",
+  "noDataRoutes": "No data for this product yet. Scan the label with the camera, or type the values in below.",
+  "noDataManual": "No data for this product yet. Type the values in below.",
+  "noDataNone": "No data for this product yet.",
+  "nutriScore": "Nutri-Score",
+  "nutrientLevels": "Nutrient Levels",
+  "ingredients": "Ingredients / Info",
+  "energy": "energy",
+  "proteins": "proteins",
+  "fat": "fat",
+  "fiber": "fiber",
+  "levels": {
+    "sugars": {
+      "low": "Low sugar content",
+      "moderate": "Moderate sugar content",
+      "high": "High sugar content"
+    },
+    "salt": {
+      "low": "Low salt content",
+      "moderate": "Moderate salt content",
+      "high": "High salt content"
+    },
+    "fat": {
+      "low": "Low fat content",
+      "moderate": "Moderate fat content",
+      "high": "High fat content"
+    },
+    "saturated_fat": {
+      "low": "Low saturated fat",
+      "moderate": "Moderate saturated fat",
+      "high": "High saturated fat"
+    }
+  },
+  "scanner": {
+    "title": "Nutrition Scanner",
+    "subtitle": "Take a photo of the nutrition table from the package",
+    "howItWorksTitle": "How does it work?",
+    "howItWorksDesc": "Take a clear photo of the 'Nutrition Facts' table on the package. AI can extract kcal and macronutrients for you.",
+    "takePhoto": "TAKE PHOTO",
+    "success": "AI analyzed the table!",
+    "checkData": "Check if the data below is correct.",
+    "energy": "Energy (kcal)",
+    "carbs": "Carbohydrates",
+    "sugars": "Sugars",
+    "salt": "Salt",
+    "retry": "Try again",
+    "save": "Save to product",
+    "recognizing": "AI is analyzing…",
+    "error": "Failed to read the table. Try taking a clearer photo.",
+    "saveSuccess": "Nutritional data saved!",
+    "saveError": "Failed to save scan result",
+    "howItWorksNoAi": "Take a clear photo of the 'Nutrition Facts' table on the package. Without an AI connection nothing is extracted — the values stay yours to fill in."
+  },
+  "carbohydrates": "Carbohydrates",
+  "sugars": "Sugars",
+  "salt": "Salt",
+  "nutritionForm": {
+    "saved": "Nutrition saved",
+    "saveError": "Failed to save nutrition",
+    "title": "Enter values by hand",
+    "hint": "Nutritional values per 100 g/ml."
+  },
+  "source": {
+    "learnMore": "Learn more →",
+    "visionCapture": "Read from the label",
+    "communityNote": "From Open Food Facts, a community database, so treat the values as an estimate. Check them against the label."
+  },
+  "productPage": {
+    "title": "Nutrition per 100 g"
+  }
+}

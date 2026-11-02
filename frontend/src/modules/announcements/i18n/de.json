@@ -1,0 +1,12 @@
+{
+  "region": "Ankündigungen",
+  "actions": {
+    "dismiss": "Schließen"
+  },
+  "types": {
+    "info": "Hinweis",
+    "warning": "Warnung",
+    "critical": "Kritisch",
+    "downtime": "Wartung"
+  }
+}

@@ -1,0 +1,66 @@
+# Logging configuration for the SERVER processes.
+#
+# Why this file exists: app/core/logging.py can only fix processes that import
+# the app.  Two do not — the uvicorn `--reload` supervisor (which prints
+# "Will watch for changes…" before any app code runs) and the gunicorn arbiter
+# (which boots workers).  Their lines land in the same `docker compose logs`
+# stream, so they need the same clock.
+#
+# Used by:
+#   dev   uvicorn --log-config log_config.yaml          (docker-compose.yml)
+#   prod  gunicorn --config gunicorn.conf.py            (Dockerfile)
+#
+# There is no format string here on purpose: the formatter is built by
+# app.core.logging.build_formatter, so this file cannot drift away from the
+# format the application itself uses.
+#
+# `level: INFO` is the boot default.  Once the app is imported,
+# configure_logging() re-reads LOG_LEVEL and applies it to the root logger.
+
+version: 1
+
+# Third-party libraries configure loggers at import time; disabling them here
+# would silence everything imported before this config is applied.
+disable_existing_loggers: false
+
+filters:
+  request_id:
+    (): app.core.logging.RequestIdFilter
+
+formatters:
+  standard:
+    (): app.core.logging.build_formatter
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+    formatter: standard
+    filters: [request_id]
+
+# This block REPLACES gunicorn's CONFIG_DEFAULTS entry, which points its two
+# loggers at handlers in gunicorn's own format.
+#
+# They are wired to `console` directly rather than left to propagate, because
+# gunicorn.glogging.Logger.__init__ sets `propagate = False` on both before
+# this config is applied — with errorlog/accesslog disabled in
+# gunicorn.conf.py (they would add a SECOND handler), a propagating logger
+# with no handler of its own is a silent one, and the arbiter's lines
+# disappear entirely.
+#
+# In a worker the app then calls adopt_server_loggers(), which drops these
+# handlers and restores propagation to the root logger — same format either
+# way, and never two copies of a line.
+loggers:
+  gunicorn.error:
+    level: INFO
+    handlers: [console]
+    propagate: false
+  gunicorn.access:
+    level: INFO
+    handlers: [console]
+    propagate: false
+
+root:
+  level: INFO
+  handlers: [console]

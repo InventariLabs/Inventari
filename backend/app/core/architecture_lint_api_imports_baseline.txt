@@ -1,0 +1,3 @@
+# Architecture lint baseline
+# Format: relative/path.py::import.path
+

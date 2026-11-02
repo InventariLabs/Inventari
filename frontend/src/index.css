@@ -1,0 +1,587 @@
+/* Plus Jakarta Sans self-hosted (latin + latin-ext, weights 400/500/600/700
+   — the four weights used by UI_GUIDELINES §1.2). Removes the render-blocking
+   Google Fonts @import: no external requests, PWA works offline.
+
+   Typeface: Plus Jakarta Sans by Tokotype (https://github.com/tokotype/PlusJakartaSans),
+   SIL Open Font License 1.1. Serving these files from the bundle is redistribution,
+   and OFL 1.1 §2 requires the license to travel with them — the copy lives next to
+   the .woff2 files in public/fonts/OFL.txt and ships as /fonts/OFL.txt. */
+/* latin-ext */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-400-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-400-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-500-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-500-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-600-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-600-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-700-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-700-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family:
+    "Plus Jakarta Sans",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+
+  /* Plus Jakarta Sans draws an unusually narrow space: 170/1000 em, which
+     Chrome lays out as 2.00px at our 14px body size, against 3.64px for
+     system-ui. At that width the gap disappears into the antialiasing and
+     words run together — "Browse andmanage yourproducts", "3locations ·
+     96products" — on every screen, in both themes, at DPR 1 and DPR 2.
+     It is the space glyph, not the tracking: at `letter-spacing: normal`
+     the words merge identically, so the -0.01em above stays as designed.
+     0.06em brings the gap to 2.84px, still tighter than system-ui, and the
+     text reflows by under 1px per space (a four-word label grows 3.4px). */
+  word-spacing: 0.06em;
+
+  color-scheme: light;
+  color: rgba(17, 24, 39, 1);
+  background-color: #fafafa;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* === PRIMARY (Teal) === */
+  --color-primary-50: 240 253 250;
+  --color-primary-100: 204 251 241;
+  --color-primary-200: 153 246 228;
+  --color-primary-300: 94 234 212;
+  --color-primary-400: 45 212 191;
+  --color-primary-500: 20 184 166;
+  --color-primary-600: 13 148 136;
+  --color-primary-700: 15 118 110;
+  --color-primary-800: 17 94 89;
+  --color-primary-900: 19 78 74;
+  --color-primary-950: 4 47 46;
+
+  /* === ACCENT (Emerald) === */
+  --color-accent-50: 236 253 245;
+  --color-accent-100: 209 250 229;
+  --color-accent-200: 167 243 208;
+  --color-accent-300: 110 231 183;
+  --color-accent-400: 52 211 153;
+  --color-accent-500: 16 185 129;
+  --color-accent-600: 5 150 105;
+  --color-accent-700: 4 120 87;
+  --color-accent-800: 6 95 70;
+  --color-accent-900: 6 78 59;
+
+  /* === SUCCESS (Emerald, semantic) === */
+  /* ADR-013: product profiles repaint `accent-*` (and `primary-*`)
+     with the profile's identity colour, so accent cannot carry the semantic
+     "it worked" signal anymore. `success-*` stays emerald for every profile
+     and is the only token allowed for success badges/messages. Values mirror
+     the accent ramp so the Food Home profile renders exactly as before. */
+  --color-success-50: 236 253 245;
+  --color-success-100: 209 250 229;
+  --color-success-200: 167 243 208;
+  --color-success-300: 110 231 183;
+  --color-success-400: 52 211 153;
+  --color-success-500: 16 185 129;
+  --color-success-600: 5 150 105;
+  --color-success-700: 4 120 87;
+  --color-success-800: 6 95 70;
+  --color-success-900: 6 78 59;
+
+  /* === GRAY (Zinc) === */
+  --color-gray-50: 250 250 250;
+  --color-gray-100: 244 244 245;
+  --color-gray-200: 228 228 231;
+  --color-gray-300: 212 212 216;
+  --color-gray-400: 161 161 170;
+  --color-gray-500: 113 113 122;
+  --color-gray-600: 82 82 91;
+  --color-gray-700: 63 63 70;
+  --color-gray-800: 39 39 42;
+  --color-gray-900: 24 24 27;
+  --color-gray-950: 9 9 11;
+
+  /* === STATUS COLORS (light shades — theme-aware via dark override) === */
+  --color-red-50: 254 242 242;
+  --color-red-100: 254 226 226;
+  --color-red-200: 254 202 202;
+  --color-amber-50: 255 251 235;
+  --color-amber-100: 254 243 199;
+  --color-amber-200: 253 230 138;
+  --color-blue-50: 239 246 255;
+  --color-blue-100: 219 234 254;
+  --color-blue-200: 191 219 254;
+
+  /* === SURFACE TOKENS === */
+  --surface-bg: 250 250 250;
+  --surface-card: 255 255 255;
+  --surface-raised: 244 244 245;
+  --surface-inset: 228 228 231;
+
+  /* === COMPOSITION BAR === */
+  /* The neutral mass of a composition bar — the part of a zone with nothing
+     to report. It is most of the bar most days, so it has to stand out from
+     the `--surface-inset` track at 3:1 (non-text contrast): the zinc-300 the
+     mockup started from made a full zone read as an empty one. */
+  --bar-ok: 113 113 122;
+  /* The part of a bar that is in someone's hands — issued, handed out. Blue
+     600 in light and 500 in dark: in each theme it clears 3:1 against the
+     track and stays a visible step away from the blue-400 of the "info"
+     segment that can stand next to it. */
+  --bar-active: 37 99 235;
+
+  /* === TEXT TOKENS === */
+  /* secondary/muted raised one zinc step (zinc-600/zinc-500) to meet
+     WCAG AA ≥4.5:1 for sub-18px text on surface-bg/card. Hierarchy kept:
+     light 17.7 / 7.7 / 4.8. */
+  --text-primary: 24 24 27;
+  --text-secondary: 82 82 91;
+  --text-muted: 113 113 122;
+
+  /* === STATUS FOREGROUNDS === */
+  /* The status ramps 50…400 flip to dark tints in `.dark` because they carry
+     backgrounds — which leaves no light step for text sitting on top of one.
+     A badge asking for `text-success-400` therefore rendered emerald-700 on
+     a dark surface (1.9:1). These four tokens are the text half of each pair
+     and flip with the theme, so a component pairs `bg-<status>-50` with
+     `text-on-<status>` and needs no `dark:` override to stay readable.
+     Light values are the -700/-800 steps; dark values are the -300/-400 steps,
+     each ≥4.5:1 on its own tint in both themes. */
+  --on-success: 4 120 87;
+  --on-danger: 185 28 28;
+  --on-warning: 146 64 14;
+  --on-info: 29 78 216;
+
+  /* === BORDER TOKENS === */
+  --border-default: 228 228 231;
+
+  /* === SHADCN SEMANTIC ALIASES === */
+  --background: var(--surface-bg);
+  --foreground: var(--text-primary);
+  --card: var(--surface-card);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface-card);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--color-primary-600);
+  --primary-foreground: 255 255 255;
+  --secondary: var(--surface-raised);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--surface-inset);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--color-accent-600);
+  --accent-foreground: 255 255 255;
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  --border: var(--border-default);
+  --input: var(--border-default);
+  --ring: var(--color-primary-500);
+  --radius: 0.75rem;
+
+  /* === SPACING === */
+  --spacing-page: 2rem;
+  --spacing-page-mobile: 1rem;
+
+  /* === MOBILE NAV === */
+  /* single source of truth for the bottom bar height — AppShell
+     compensates content padding from the same variable. */
+  --mobile-nav-height: 4rem;
+
+  /* === RADIUS === */
+  --radius-sm: 0.5rem; /* 8px - Buttons, small cards */
+  --radius-md: 0.75rem; /* 12px - Inputs */
+  --radius-lg: 1rem; /* 16px - Medium cards */
+  --radius-xl: 1.5rem; /* 24px - Large cards */
+  --radius-2xl: 2rem; /* 32px - Feature cards */
+
+  /* === SHADOWS === */
+  /* light values match the Tailwind defaults (no visual change);
+     the .dark block remaps them so elevation stays readable on dark. */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* === TYPOGRAPHY === */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* === TRANSITIONS === */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* === Z-INDEX LAYER SYSTEM === */
+  --z-sticky: 10;
+  --z-module-nav: 40;
+  --z-app-bar: 50;
+  --z-modal: 100;
+  --z-popover: 105;
+  --z-modal-nested: 110;
+  --z-confirm: 200;
+  --z-fullscreen: 400;
+  --z-notification: 1000;
+}
+
+/* The bar is fixed and the module tabs stick under it, so a field the browser
+   scrolls into view (a focus with the keyboard open, in a low window) would
+   land beneath them. The tabs show from `md:`, as in ModuleShell. */
+html {
+  scroll-padding-top: calc(3.5rem + var(--app-notice-height, 0px));
+}
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: calc(6.25rem + var(--app-notice-height, 0px));
+  }
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  /* dvh tracks the *dynamic* viewport — on mobile Safari 100vh
+     ignores the collapsing address bar and causes layout jumps. */
+  min-height: 100dvh;
+  background: rgb(var(--surface-bg));
+}
+
+/* The browser gives form controls `word-spacing: normal` rather than
+   inheriting it, and preflight hands back only the font and the tracking —
+   so the button labels, the search box and every <option> kept the narrow
+   space the :root declaration exists to widen ("Searchorjumpto…"). */
+button,
+input,
+optgroup,
+select,
+textarea {
+  word-spacing: inherit;
+}
+
+/* Dark mode overrides */
+.dark {
+  color-scheme: dark;
+  color: rgb(var(--text-primary));
+
+  --surface-bg: 24 24 27;
+  --surface-card: 39 39 42;
+  --surface-raised: 63 63 70;
+  --surface-inset: 52 52 56;
+
+  --bar-ok: 161 161 170;
+  --bar-active: 59 130 246;
+
+  --text-primary: 250 250 250;
+  /* raised one zinc step (zinc-300/zinc-400) for WCAG AA on dark
+     surfaces; hierarchy dark: 14.3 / 10.1 / 5.8. */
+  --text-secondary: 212 212 216;
+  --text-muted: 161 161 170;
+
+  /* The light end of each status ramp — the counterpart of the dark tints
+     below, which the same components use as backgrounds. */
+  --on-success: 52 211 153;
+  --on-danger: 252 165 165;
+  --on-warning: 252 211 77;
+  --on-info: 147 197 253;
+  /* Brand-coloured text (a link, the wordmark, an icon) on a card. The ramp
+     steps cannot carry it in dark: 400 is a dark tint there and 700 is dark
+     teal, and a profile palette remaps them differently again. A profile
+     sets this inline for dark mode (useProfileTheme); light mode needs no
+     value — the token falls back to the ramp's 700. */
+  --on-primary: 45 212 191;
+
+  --border-default: 63 63 70;
+
+  /* black-on-near-black is invisible — heavier shadows restore the
+     elevated-card signal that the light values give. */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.55), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+
+  /* Light palette → dark tints (prevents near-white blobs on dark surfaces) */
+  --color-primary-50: 4 47 46;
+  --color-primary-100: 19 78 74;
+  --color-primary-200: 17 94 89;
+  --color-primary-300: 15 118 110;
+  --color-primary-400: 15 118 110;
+  --color-accent-50: 2 44 34;
+  --color-accent-100: 6 78 59;
+  --color-accent-200: 6 95 70;
+  --color-accent-300: 4 120 87;
+  --color-accent-400: 4 120 87;
+  /* emerald-700 on surface-card (39 39 42) was 2.72:1 — below WCAG
+     AA even for large text. Bumped to emerald-500 for 5.87:1 (AA ≥4.5:1).
+     Token-only change: fixes every text-accent-700 without a dark: override. */
+  --color-accent-700: 16 185 129;
+  /* ADR-013: success mirrors the accent dark remaps 1:1 so the
+     semantic token behaves identically to what accent does today. */
+  --color-success-50: 2 44 34;
+  --color-success-100: 6 78 59;
+  --color-success-200: 6 95 70;
+  --color-success-300: 4 120 87;
+  --color-success-400: 4 120 87;
+  --color-success-700: 16 185 129;
+  --color-gray-50: 46 46 51;
+  --color-gray-100: 63 63 70;
+  --color-gray-200: 82 82 91;
+  --color-gray-300: 113 113 122;
+  --color-red-50: 69 10 10;
+  --color-red-100: 127 29 29;
+  --color-red-200: 153 27 27;
+  --color-amber-50: 69 26 3;
+  --color-amber-100: 120 53 15;
+  --color-amber-200: 146 64 14;
+  --color-blue-50: 23 37 84;
+  --color-blue-100: 30 58 138;
+  --color-blue-200: 30 64 175;
+}
+
+/* Date input theming: hide native arrow, keep picker clickable, match light scheme */
+input[type="date"] {
+  color-scheme: light;
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  /* neutral grays from the token ramp — the hardcoded indigo shades
+     ignored profile themes and brand remapping. */
+  background: rgb(var(--color-gray-300));
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--color-gray-400));
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Reduced motion: respect OS-level accessibility preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print: hide the app chrome; only elements with `print:block` survive.
+   Uses visibility so fixed/absolute shell elements cannot bleed through. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print\:block,
+  .print\:block * {
+    visibility: visible;
+  }
+  .print\:block {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  @page {
+    margin: 12mm;
+  }
+}
+
+/* brief highlight after selecting a product from the search —
+   makes the "which card did I just pick" moment visible at the rack. */
+@keyframes stock-take-highlight {
+  0% {
+    box-shadow: 0 0 0 3px rgb(16 185 129 / 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(16 185 129 / 0);
+  }
+}
+.stock-take-card-highlight {
+  animation: stock-take-highlight 1.2s ease-out;
+}
+
+/* The close button on a toast, at the size a thumb needs.
+   Sonner draws it 20x20 — under half the 44px touch floor (UI_GUIDELINES
+   §2.2), on the one control a reader has to find before the message leaves.
+   A transparent pseudo-element used to grow only the reachable area: the
+   thumb could reach 44px, but the element itself still measured 20x20 to
+   anything that asked it — which is how a touch-target measurement still
+   reported the close button at 20x20 with the fix already on screen. So the box
+   is now 44x44 and the circle it paints stays 20px, drawn inside it: a 44px
+   painted disc would sit over the first line of the message it exists to let
+   you read.
+
+   The box hangs out of the toast's leading corner by 30% of its own width —
+   13px, inside the 16px a phone leaves between the toast and the screen
+   edge, where sonner's own -35% of a 44px box would have hung 15px out and
+   lost the last of it off-screen. The circle lands 1.2px outside the corner,
+   where sonner's 20px one used to sit 7px out. */
+[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"]
+  [data-close-button][data-close-button] {
+  width: 44px;
+  height: 44px;
+  transform: translate(-30%, -30%);
+  background: transparent;
+  border: none;
+}
+
+[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"]
+  [data-close-button][data-close-button]::before {
+  content: "";
+  position: absolute;
+  /* Where sonner's own disc was: 6px in from a box that starts 13px out of
+     the corner, so the disc still hangs 7px over the edge and stops where
+     the toast's leading icon begins. Centring it in the box would have put
+     it on top of that icon. */
+  left: 6px;
+  top: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--normal-bg);
+  border: 1px solid var(--normal-border);
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+/* The X is a 12px svg sonner centres in whatever box it is given; the disc
+   it belongs on is no longer in the middle of that box. */
+[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"]
+  [data-close-button][data-close-button]
+  > svg {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+[data-sonner-toaster]
+  [data-sonner-toast][data-styled="true"]
+  [data-close-button][data-close-button]:hover::before {
+  background: var(--normal-bg-hover, var(--gray2));
+  border-color: var(--normal-border-hover, var(--gray5));
+}

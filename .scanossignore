@@ -1,0 +1,7 @@
+.git
+.terraform
+frontend/node_modules
+node_modules
+.venv
+.ruff_cache/
+*.pyc

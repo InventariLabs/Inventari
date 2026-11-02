@@ -1,0 +1,7 @@
+{
+  "recipe.not_found": "Przepis nie został znaleziony",
+  "ingredient.not_in_recipe": "Ten produkt nie jest składnikiem tego przepisu",
+  "picking.session_not_found": "Sesja zbierania nie została znaleziona",
+  "picking.already_active": "Istnieje już aktywna sesja zbierania dla tego przepisu",
+  "picking.already_picked": "{name} został już zebrany"
+}

@@ -1,0 +1,3373 @@
+{
+  "names": {
+    "AppException": {
+      "bases": [
+        "HTTPException"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "status_code",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "code",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "message",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "field",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "extra",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "headers",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "BaseContribution": {
+      "bases": [
+        "ABC"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {}
+    },
+    "BaseModule": {
+      "bases": [
+        "ABC"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "enable_preview": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        },
+        "focus_background_modules": {
+          "kind": "attribute"
+        },
+        "get_default_settings": {
+          "abstract": false,
+          "kind": "method",
+          "params": []
+        },
+        "get_secret_columns": {
+          "abstract": false,
+          "kind": "method",
+          "params": []
+        },
+        "get_settings_schema": {
+          "abstract": false,
+          "kind": "method",
+          "params": []
+        },
+        "metadata": {
+          "abstract": true,
+          "kind": "property"
+        },
+        "on_disable": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_enable": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_install": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_install_async": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_modules_ready": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_startup": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_startup_async": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_uninstall": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_upgrade": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "old_version",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "on_upgrade_async": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "old_version",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "register_contributions": {
+          "abstract": false,
+          "kind": "method",
+          "params": []
+        },
+        "register_routes": {
+          "abstract": true,
+          "kind": "method",
+          "params": []
+        },
+        "register_services": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "container",
+              "required": true
+            }
+          ]
+        },
+        "system_on_disable": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        },
+        "system_on_enable": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "user",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    "CategoryInterceptor": {
+      "bases": [
+        "ABC"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "after_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "priority": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "ConflictException": {
+      "bases": [
+        "AppException"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "code",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "message",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "details",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "ContributionRegistry": {
+      "bases": [
+        "object"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "EXPERIMENTAL_POINTS": {
+          "kind": "attribute"
+        },
+        "KNOWN_POINTS": {
+          "kind": "attribute"
+        },
+        "check_quota": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit_type",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        },
+        "get": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "point",
+              "required": true
+            }
+          ]
+        },
+        "register": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "point",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "contribution",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    "CoreModelBase": {
+      "bases": [
+        "DeclarativeBase"
+      ],
+      "init": [
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "metadata": {
+          "kind": "attribute"
+        },
+        "registry": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "CursorPaginatedResponse": {
+      "bases": [
+        "BaseModel",
+        "Generic"
+      ],
+      "init": [
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "next_cursor",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "has_more",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "from_cursor_page": {
+          "abstract": false,
+          "kind": "class_method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "cls",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "items",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "encode_cursor",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "transform",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    "EntityNotFoundError": {
+      "bases": [
+        "LookupError"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "resource",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "detail",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "ForbiddenException": {
+      "bases": [
+        "AppException"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "message",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "InterceptorError": {
+      "bases": [
+        "Exception"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "message",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "error_code",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "details",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "InterceptorPipeline": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "_item_interceptors",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "_storage_interceptors",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "_category_interceptors",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "register_category_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        },
+        "register_item_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        },
+        "register_storage_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        },
+        "run_after_category_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_category_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_category_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_consume": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_discard": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_storage_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_storage_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_storage_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_category_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_category_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_category_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_consume": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_discard": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_purge": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_storage_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_storage_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_storage_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "unregister_item_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    "ItemInterceptor": {
+      "bases": [
+        "ABC"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "after_consume": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_discard": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_consume": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_create": {
+          "abstract": true,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_discard": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_purge": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_update": {
+          "abstract": true,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "priority": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "KeysetPaginatedResponse": {
+      "bases": [
+        "PaginatedResponse[TypeVar]",
+        "Generic"
+      ],
+      "init": [
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "total",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "limit",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "offset",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "has_more",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "total_capped",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "next_cursor",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "from_keyset": {
+          "abstract": false,
+          "kind": "class_method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "cls",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "items",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "offset",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "total",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "next_cursor",
+              "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "total_capped",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    "ModuleContext": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "event_bus",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "organization_id",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "user",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "db",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "enabled_modules",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "emit": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "event_name",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "payload",
+              "required": true
+            }
+          ]
+        },
+        "global_session": {
+          "abstract": false,
+          "kind": "method",
+          "params": []
+        },
+        "migrate_settings": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "module_name",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "migrate",
+              "required": true
+            }
+          ]
+        },
+        "subscribe": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "event_name",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "handler",
+              "required": true
+            }
+          ]
+        },
+        "tenant_session": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    "ModuleMetadata": {
+      "bases": [
+        "BaseModel"
+      ],
+      "init": [
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "name",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "version",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "display_name",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "description",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "icon",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "module_type",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "category",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "requires",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "optional_requires",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "capabilities",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "author",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "license",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "homepage",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "requires_api_key",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "is_trusted",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "is_premium",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "is_reference",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "categories",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "storage_types",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "default_storage_locations",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "consumes_stock_quant",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "permissions",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "ModuleModelBase": {
+      "bases": [
+        "DeclarativeBase"
+      ],
+      "init": [
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "metadata": {
+          "kind": "attribute"
+        },
+        "registry": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "ModuleScheduledTask": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "name",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "interval",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "handler",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "is_persistent",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "is_persistent": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "NotFoundException": {
+      "bases": [
+        "AppException"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "resource",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "OwnedFileMeta": {
+      "bases": [
+        "BaseContribution"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "content_type",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "display_name",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "PaginatedResponse": {
+      "bases": [
+        "BaseModel",
+        "Generic"
+      ],
+      "init": [
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "total",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "limit",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "offset",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "has_more",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "total_capped",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "from_full_list": {
+          "abstract": false,
+          "kind": "class_method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "cls",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "items",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "offset",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit",
+              "required": true
+            }
+          ]
+        },
+        "from_slice": {
+          "abstract": false,
+          "kind": "class_method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "cls",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "items",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "offset",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "total",
+              "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "count_cap",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    "PeriodClosedError": {
+      "bases": [
+        "ValueError"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {}
+    },
+    "QuotaExceededError": {
+      "bases": [
+        "PermissionError"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {}
+    },
+    "QuotaProvider": {
+      "bases": [
+        "BaseContribution"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "check_organization_limit": {
+          "abstract": true,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit_type",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        },
+        "get_limit_value": {
+          "abstract": true,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit_type",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    "RoleInUseError": {
+      "bases": [
+        "ValueError"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "role_name",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "holders",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "ScanProvider": {
+      "bases": [
+        "Protocol"
+      ],
+      "init": [
+        {
+          "kind": "VAR_POSITIONAL",
+          "name": "args",
+          "required": false
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "can_handle": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "code",
+              "required": true
+            }
+          ]
+        },
+        "handle": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "code",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "user",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    "ScannedCode": {
+      "kind": "value",
+      "type": "_AnnotatedAlias"
+    },
+    "ServiceRejectionError": {
+      "bases": [
+        "ValueError"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_ONLY",
+          "name": "key",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "plural",
+          "required": false
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "code": {
+          "abstract": false,
+          "kind": "property"
+        },
+        "sentence": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "lang",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    "StockUnavailableError": {
+      "bases": [
+        "ValueError"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "code",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "message",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "product_template_id",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "storage_location_id",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "ALL_HELD": {
+          "kind": "attribute"
+        },
+        "NOT_ENOUGH": {
+          "kind": "attribute"
+        },
+        "NO_STOCK": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "StorageInterceptor": {
+      "bases": [
+        "ABC"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "after_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "after_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "before_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "priority": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "SystemEvent": {
+      "bases": [
+        "StrEnum"
+      ],
+      "init": [
+        {
+          "kind": "VAR_POSITIONAL",
+          "name": "values",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "CATEGORY_CREATED": {
+          "kind": "attribute"
+        },
+        "CATEGORY_DELETED": {
+          "kind": "attribute"
+        },
+        "CATEGORY_UPDATED": {
+          "kind": "attribute"
+        },
+        "ITEM_CREATED": {
+          "kind": "attribute"
+        },
+        "ITEM_DEACTIVATED": {
+          "kind": "attribute"
+        },
+        "ITEM_DELETED": {
+          "kind": "attribute"
+        },
+        "ITEM_DISPOSED": {
+          "kind": "attribute"
+        },
+        "ITEM_MOVED": {
+          "kind": "attribute"
+        },
+        "ITEM_STATUS_CHANGED": {
+          "kind": "attribute"
+        },
+        "ITEM_TRANSFERRED": {
+          "kind": "attribute"
+        },
+        "ITEM_UPDATED": {
+          "kind": "attribute"
+        },
+        "ITEM_USED": {
+          "kind": "attribute"
+        },
+        "LABEL_ASSIGNED": {
+          "kind": "attribute"
+        },
+        "LABEL_BATCH_EXPORTED": {
+          "kind": "attribute"
+        },
+        "LABEL_BATCH_GENERATED": {
+          "kind": "attribute"
+        },
+        "LABEL_SCANNED": {
+          "kind": "attribute"
+        },
+        "MODULE_DISABLED": {
+          "kind": "attribute"
+        },
+        "MODULE_ENABLED": {
+          "kind": "attribute"
+        },
+        "ORGANIZATION_CREATED": {
+          "kind": "attribute"
+        },
+        "ORGANIZATION_UPDATED": {
+          "kind": "attribute"
+        },
+        "PARTNER_ACTIVATED": {
+          "kind": "attribute"
+        },
+        "PARTNER_DEACTIVATED": {
+          "kind": "attribute"
+        },
+        "STORAGE_CREATED": {
+          "kind": "attribute"
+        },
+        "STORAGE_DELETED": {
+          "kind": "attribute"
+        },
+        "STORAGE_UPDATED": {
+          "kind": "attribute"
+        },
+        "USER_JOINED_ORG": {
+          "kind": "attribute"
+        },
+        "USER_LEFT_ORG": {
+          "kind": "attribute"
+        },
+        "USER_REGISTERED": {
+          "kind": "attribute"
+        }
+      }
+    },
+    "UploadPathResolver": {
+      "bases": [
+        "BaseContribution"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "resolve": {
+          "abstract": true,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "file_path",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    "ValidationException": {
+      "bases": [
+        "AppException"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "message",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "field",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "extra",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "code",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "contribution_registry": {
+      "kind": "value",
+      "members": {
+        "EXPERIMENTAL_POINTS": {
+          "kind": "attribute"
+        },
+        "KNOWN_POINTS": {
+          "kind": "attribute"
+        },
+        "check_quota": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "limit_type",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        },
+        "get": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "point",
+              "required": true
+            }
+          ]
+        },
+        "register": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "point",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "contribution",
+              "required": true
+            }
+          ]
+        }
+      },
+      "type": "ContributionRegistry"
+    },
+    "convert_naive_timestamps_to_utc": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "columns",
+          "required": true
+        }
+      ]
+    },
+    "cover_extension": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "reference",
+          "required": true
+        }
+      ]
+    },
+    "create_index_if_absent": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "index_name",
+          "required": true
+        },
+        {
+          "kind": "VAR_POSITIONAL",
+          "name": "args",
+          "required": false
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ]
+    },
+    "create_table_if_absent": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "table_name",
+          "required": true
+        },
+        {
+          "kind": "VAR_POSITIONAL",
+          "name": "columns",
+          "required": false
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ]
+    },
+    "define_module": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "router",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "router_factory",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "interceptors",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "seed",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "schedules",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "register_services_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "register_contributions_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "on_startup_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "on_startup_async_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "on_install_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "on_install_async_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "on_uninstall_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "on_upgrade_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "consumes_stock_quant",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "settings_schema",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "default_settings",
+          "required": false
+        }
+      ]
+    },
+    "general_rows": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "hidden_tags",
+          "required": true
+        }
+      ]
+    },
+    "get_async_db": {
+      "kind": "function",
+      "params": []
+    },
+    "get_current_lang": {
+      "kind": "function",
+      "params": []
+    },
+    "get_current_user_context": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "current_user",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "db",
+          "required": false
+        }
+      ]
+    },
+    "get_logger": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "name",
+          "required": true
+        }
+      ]
+    },
+    "get_module_error_message": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "module_name",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "key",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": false
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ]
+    },
+    "hidden_module_tags_async": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "db",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "organization_id",
+          "required": true
+        }
+      ]
+    },
+    "interceptor_pipeline": {
+      "kind": "value",
+      "members": {
+        "register_category_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        },
+        "register_item_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        },
+        "register_storage_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        },
+        "run_after_category_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_category_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_category_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_consume": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_discard": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_item_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_storage_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_storage_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_after_storage_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_category_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_category_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_category_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "category_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_consume": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_discard": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "quantity",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_purge": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_item_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "item_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_storage_create": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "data",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_storage_delete": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_before_storage_update": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "changes",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "unregister_item_interceptor": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "interceptor",
+              "required": true
+            }
+          ]
+        }
+      },
+      "type": "InterceptorPipeline"
+    },
+    "journal_config_change": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "db",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "org_id",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "user_id",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "module",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "subject",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "keys",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "before",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "after",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "secret_paths",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "context",
+          "required": false
+        }
+      ]
+    },
+    "map_service_errors": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "func",
+          "required": true
+        }
+      ]
+    },
+    "paginate_async": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "db",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "stmt",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "limit",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "offset",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "count_cap",
+          "required": false
+        }
+      ]
+    },
+    "record_settings": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "record",
+          "required": true
+        }
+      ]
+    },
+    "register_api_key_scope": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "name",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "permissions",
+          "required": true
+        }
+      ]
+    },
+    "relation_exists": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "name",
+          "required": true
+        }
+      ]
+    },
+    "require_module": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "module_name",
+          "required": true
+        }
+      ]
+    },
+    "require_org": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "current_user",
+          "required": false
+        }
+      ]
+    },
+    "require_permission": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "permission",
+          "required": true
+        }
+      ]
+    },
+    "require_read_write": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "read_permission",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "write_permission",
+          "required": true
+        }
+      ]
+    },
+    "scan_registry": {
+      "kind": "value",
+      "members": {
+        "register": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "provider",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "priority",
+              "required": false
+            }
+          ]
+        },
+        "scan": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "code",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "user",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            }
+          ]
+        }
+      },
+      "type": "ScanRegistry"
+    },
+    "served_url": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "reference",
+          "required": true
+        }
+      ]
+    },
+    "stored_reference": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "value",
+          "required": true
+        }
+      ]
+    }
+  },
+  "version": 1
+}

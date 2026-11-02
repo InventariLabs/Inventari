@@ -1,0 +1,7 @@
+{# Compatibility shim. The letterhead block moved to the shared print
+   templates so all three print families draw one header instead of
+   three that had already drifted apart. Templates an organization seeded
+   before that move still say {% include 'issuer.html' %}, and includes
+   resolve at render time — so this file keeps them rendering the current
+   block rather than a frozen copy of the old one. #}
+{% include 'print_issuer.html' %}

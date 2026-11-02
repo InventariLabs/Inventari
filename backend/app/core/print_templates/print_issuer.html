@@ -1,0 +1,19 @@
+<!-- Issuer identity: name, tax ID, address and logo of the
+     organization the document is issued by. Shared by every print family; a
+     document without filled-in issuer data prints an empty letterhead block —
+     never a placeholder text, never a crash.
+
+     No rule of its own any more: it sits inside the shared header,
+     which draws the single line that separates the header from the body. Two
+     rules eight millimetres apart is what three separately-grown headers
+     looked like. -->
+<div style="display: flex; align-items: center; gap: 3mm; margin-bottom: 2.5mm;">
+  {% if issuer.logo %}
+  <img src="{{ issuer.logo }}" alt="{{ issuer.name or 'Organization logo' }}" style="max-height: 14mm; max-width: 48mm; object-fit: contain;" />
+  {% endif %}
+  <div style="flex: 1;">
+    {% if issuer.name %}<div style="font-size: 11pt; font-weight: bold; color: #1a1a2e;">{{ issuer.name }}</div>{% endif %}
+    {% if issuer.tax_id %}<div style="font-size: 8pt; color: #555;">{{ issuer.tax_id }}</div>{% endif %}
+    {% if issuer.address %}<div style="font-size: 8pt; color: #555;">{{ issuer.address }}</div>{% endif %}
+  </div>
+</div>

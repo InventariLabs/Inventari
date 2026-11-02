@@ -1,0 +1,421 @@
+{
+  "title": "Emplacements",
+  "subtitle": "Gérez où vos produits sont rangés",
+  "empty": {
+    "title": "Aucun emplacement défini",
+    "subtitle": "Ajoutez une étagère, un rayonnage ou une armoire pour commencer à organiser vos produits.",
+    "addFirst": "Ajouter le premier emplacement"
+  },
+  "hidden": {
+    "title": "Certains emplacements sont masqués",
+    "description": "Les emplacements qui appartiennent à un module n'apparaissent pas dans ces listes tant que « Données des modules dans les listes générales » est désactivé. Activez l'option dans les paramètres pour tout voir dans une seule liste.",
+    "inlineCount_one": "{{count}} emplacement est masqué — activez « Données des modules dans les listes générales » dans les paramètres pour le voir.",
+    "inlineCount_other": "{{count}} emplacements sont masqués — activez « Données des modules dans les listes générales » dans les paramètres pour les voir.",
+    "fieldHint": "Vos emplacements appartiennent à un module et n'apparaissent pas dans les listes générales. Créez-en un nouveau ici, ou activez « Données des modules dans les listes générales » dans les paramètres pour en choisir un existant.",
+    "openSettings": "Ouvrir les paramètres"
+  },
+  "picker": {
+    "moduleBadge": "Module : {{module}}"
+  },
+  "form": {
+    "location": "Comment s'y rendre (facultatif)",
+    "locationPlaceholder": "ex. Près de la porte, sous la fenêtre"
+  },
+  "actions": {
+    "openWizard": "Ajouter un emplacement"
+  },
+  "messages": {
+    "storageCreated": "Emplacement ajouté avec succès !",
+    "storageUpdated": "Emplacement mis à jour avec succès !",
+    "storageDeleted": "Emplacement supprimé avec succès !",
+    "storageArchived": "Emplacement archivé",
+    "nameTaken": "Un emplacement nommé « {{name}} » existe déjà ici.",
+    "shortCodeTaken": "Ce code d'emplacement est déjà utilisé par un autre emplacement.",
+    "storageRestored": "Emplacement restauré"
+  },
+  "detail": {
+    "products": "Produits ({{count}})",
+    "products_one": "Produits ({{count}})",
+    "products_other": "Produits ({{count}})",
+    "table": {
+      "product": "Produit",
+      "category": "Catégorie",
+      "quantity": "Quantité",
+      "freezeDate": "Date de congélation",
+      "storageDate": "Ajouté",
+      "expiryDate": "Expiration",
+      "location": "Étagère/Tiroir",
+      "actions": "Actions"
+    },
+    "empty": "Cet emplacement est vide",
+    "emptySubtitle": "Ajoutez votre premier produit à cet emplacement",
+    "backToList": "Retour à la liste",
+    "rename": "Renommer",
+    "renameLabel": "Nom de l’emplacement",
+    "saveName": "Enregistrer le nom",
+    "cancelRename": "Annuler le renommage",
+    "addInside": "Ajouter un emplacement à l’intérieur",
+    "addProductHere": "Ajouter un produit ici"
+  },
+  "errors": {
+    "cannotDelete": "Suppression impossible : retirez ou déplacez d'abord les produits.",
+    "cannotArchive": "Impossible d'archiver cet emplacement",
+    "cannotRestore": "Impossible de restaurer l'emplacement"
+  },
+  "wizard": {
+    "discardTitle": "Abandonner ce nouvel emplacement ?",
+    "discardMessage": "Les noms saisis et les champs de suivi choisis seront perdus.",
+    "discardConfirm": "Abandonner",
+    "discardCancel": "Continuer la saisie",
+    "title": "Assistant d'emplacement",
+    "fields": {
+      "name": {
+        "desc": "Nom de base (Requis)."
+      },
+      "quantity": {
+        "desc": "Nombre de pièces ou colis (Requis)."
+      },
+      "unit": {
+        "desc": "Unité de mesure (pcs, kg, l) (Requis)."
+      },
+      "expiry_date": {
+        "desc": "Suivez les dates de péremption. Crucial pour l'alimentaire."
+      },
+      "freeze_date": {
+        "desc": "Surveillez la durée de stockage au congélateur."
+      },
+      "weight": {
+        "desc": "Permet de spécifier le poids (kg/g) ou le volume (l/ml) du produit."
+      },
+      "barcode": {
+        "desc": "Prise en charge des codes-barres standard."
+      },
+      "label_code": {
+        "desc": "Prise en charge des QR codes internes (ex. STM-001)."
+      },
+      "brand": {
+        "desc": "Champ texte pour le nom du fabricant."
+      },
+      "description": {
+        "desc": "Notes supplémentaires sur le produit."
+      },
+      "purchase_price": {
+        "desc": "Suivez les coûts des produits."
+      },
+      "shelf_location": {
+        "desc": "Emplacement précis (ex. 2e étagère depuis le haut)."
+      },
+      "category_id": {
+        "desc": "Attribuer à une catégorie (ex. Produits laitiers, Viande)."
+      },
+      "production_date": {
+        "desc": "Suivez la date de production ou de lot."
+      },
+      "notes": {
+        "desc": "Champ de notes en texte libre."
+      },
+      "price": {
+        "desc": "Suivez le prix du produit."
+      },
+      "location": {
+        "desc": "Position exacte dans l'emplacement parent."
+      }
+    }
+  },
+  "suggestions": {
+    "zones": [
+      "Cuisine",
+      "Sous-sol",
+      "Garde-manger",
+      "Garage",
+      "Salon",
+      "Salle de bain",
+      "Chambre",
+      "Grenier",
+      "Balcon",
+      "Jardin",
+      "Bureau"
+    ],
+    "locations": ["Réfrigérateur", "Congélateur", "Armoire à pharmacie"],
+    "compartments": ["Étagère", "Tiroir", "Bac", "Boîte", "Panier"],
+    "profiles": {
+      "food_home": {
+        "zones": ["Cuisine", "Garde-manger", "Garage", "Sous-sol", "Grenier"],
+        "locations": [
+          "Réfrigérateur",
+          "Congélateur",
+          "Étagère",
+          "Tiroir",
+          "Placard"
+        ],
+        "compartments": ["Étagère", "Tiroir", "Bac", "Boîte", "Panier"]
+      },
+      "equipment_wms": {
+        "zones": ["Salle serveurs", "Atelier", "Réserve", "Entrepôt", "Bureau"],
+        "locations": ["Rayonnage", "Étagère", "Bac", "Armoire", "Établi"],
+        "compartments": ["Étagère", "Bac", "Emplacement palette", "Tiroir"]
+      },
+      "clean_core": {
+        "zones": [
+          "Zone A",
+          "Zone B",
+          "Chambre froide",
+          "Quarantaine",
+          "Réception"
+        ],
+        "locations": [
+          "Étagère A",
+          "Étagère B",
+          "Étagère haute",
+          "Étagère basse",
+          "Bac"
+        ],
+        "compartments": ["Étagère 1", "Étagère 2", "Boîte 1", "Boîte 2"]
+      }
+    }
+  },
+  "onboarding": {
+    "step1Title": "Où rangez-vous vos affaires ?",
+    "step1Desc": "Commencez par nommer votre premier emplacement – ex. Chambre froide, Réception.",
+    "step1Placeholder": "ex. Chambre froide",
+    "step2Title": "Que contient cet emplacement ?",
+    "step2Desc": "ex. Étagère A, Baie 3, Armoire 1",
+    "step2Placeholder": "ex. Étagère A",
+    "step3Title": "Comment suivre les produits ici ?",
+    "done": "Terminé",
+    "next": "Suivant",
+    "back": "Retour",
+    "parentLabel": "Emplacement existant",
+    "newLocation": "Nouvel emplacement",
+    "typeOrSelect": "Saisir ou sélectionner",
+    "trackingFieldsLabel": "Vous suivrez",
+    "onlyLocation": "Emplacement seul — aucun champ de suivi",
+    "customize": "personnaliser →",
+    "customFields": "Champs personnalisés",
+    "advancedOptions": "Options avancées",
+    "step3Desc": "Choisissez les informations à suivre pour chaque produit à cet emplacement.",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Brève description (facultatif)",
+    "labelCodeLabel": "Code d'étiquette",
+    "storageTypeLabel": "Type d'emplacement",
+    "storageTypeNone": "Aucun (champs personnalisés)",
+    "step1DescMore": "Nommez l'emplacement que vous ajoutez – ex. Chambre froide, Réception.",
+    "parentPlaceholder": "Choisir un emplacement"
+  },
+  "unknownError": "Erreur inconnue",
+  "edit": {
+    "nameLabel": "Nom",
+    "qrCodeLabel": "QR code",
+    "qrCodePlaceholder": "ex. LOC-001, GLN-1234567890123, WAREHOUSE-A-1",
+    "downloadQrLabel": "Télécharger",
+    "showDescriptionOnLabel": "Afficher la description sur l'étiquette",
+    "qrDownloadError": "Échec du téléchargement du code QR",
+    "trackedFields": "Champs suivis",
+    "customFields": "Champs personnalisés",
+    "sequenceLabel": "Ordre de passage",
+    "sequenceHint": "La préparation parcourt les emplacements à partir du plus petit numéro. Un emplacement sans numéro passe après les numérotés, dans l'ordre des codes.",
+    "noParentStorage": "Aucun emplacement parent",
+    "deleteMessage": "Supprimer « {{name}} » ? Les produits doivent d'abord être déplacés — et un emplacement traversé par des mouvements de stock ne peut plus être supprimé : archivez-le plutôt.",
+    "deleteMovesLocations_one": "1 emplacement enfant monte d'un niveau.",
+    "deleteMovesLocations_other": "{{count}} emplacements enfants montent d'un niveau.",
+    "deleteMovesRecords_one": "1 enregistrement monte d'un niveau.",
+    "deleteMovesRecords_other": "{{count}} enregistrements montent d'un niveau.",
+    "deleteNotListed_one": "Dont {{count}} n'apparaît pas dans cette liste.",
+    "deleteNotListed_other": "Dont {{count}} n'apparaissent pas dans cette liste.",
+    "generateCodeError": "Échec de la génération du code",
+    "generateCodeLabel": "Générer le code",
+    "noCodeWarning": "Aucun code défini — le scan ne fonctionnera pas pour cet emplacement.",
+    "archive": "Archiver",
+    "archiveTitle": "Archiver l'emplacement",
+    "archiveConfirmEmpty": "L'emplacement sera masqué des listes et sélecteurs. Les produits ne sont pas supprimés.",
+    "archiveConfirmItems": "Cet emplacement contient des produits. Choisissez où les déplacer — l'archivage les y transfère.",
+    "archiveConfirmUnknown": "Impossible de vérifier le contenu de cet emplacement. S'il contient quelque chose, choisissez où le déplacer — sinon l'archivage sera refusé.",
+    "archiveTargetLabel": "Déplacer les produits vers",
+    "archiveTargetNone": "Choisir un emplacement cible",
+    "archiveReversible": "Vous pouvez revenir en arrière : les emplacements archivés se restaurent depuis Emplacements archivés.",
+    "archivePutawayRules_one": "{{count}} règle de rangement pointe vers cet emplacement. Elle le conservera comme cible jusqu’à modification.",
+    "archivePutawayRules_other": "{{count}} règles de rangement pointent vers cet emplacement. Elles le conserveront comme cible jusqu’à modification."
+  },
+  "fieldLabels": {
+    "barcode": "Code produit",
+    "sku": "SKU",
+    "brand": "Marque / Fabricant",
+    "category_id": "Catégorie",
+    "description": "Description",
+    "expiry_date": "Date d'expiration",
+    "freeze_date": "Date de congélation",
+    "label_code": "QR code personnalisé",
+    "location": "Emplacement",
+    "name": "Nom",
+    "notes": "Notes",
+    "price": "Prix",
+    "production_date": "Date de production / Lot",
+    "purchase_price": "Prix d'achat",
+    "quantity": "Quantité",
+    "shelf_location": "Étagère / position",
+    "unit": "Unité",
+    "weight": "Poids / Volume"
+  },
+  "reorg": {
+    "noMoveTargets": "Nulle part où déplacer cet emplacement",
+    "moveTo": "Déplacer vers…",
+    "moveToTop": "Premier niveau"
+  },
+  "card": {
+    "unit_one": "produit",
+    "unit_other": "produits"
+  },
+  "counts": {
+    "inSublocations_one": "{{count}} dans les sous-emplacements",
+    "inSublocations_other": "{{count}} dans les sous-emplacements"
+  },
+  "stats": {},
+  "storageNotFound": "Emplacement introuvable",
+  "storageNotFoundDescription": "Il a peut-être été supprimé, ou le lien n'est plus à jour.",
+  "zoneModule": {
+    "title": "Cet emplacement appartient à un module",
+    "description": "« {{name}} » appartient à un module, il est donc absent de la liste des emplacements. Ouvrez-le ici pour voir ce qu'il contient."
+  },
+  "zoneVirtual": {
+    "title": "Il s'agit d'un emplacement système",
+    "description": "« {{name}} » est l'un des emplacements virtuels du système — son contenu ne compte pas dans le stock. Ouvrez-le ici pour voir ce qu'il contient."
+  },
+  "zoneArchived": {
+    "title": "Cet emplacement est archivé",
+    "description": "« {{name}} » est archivé et reste hors de la liste active. Ouvrez-le ici ou restaurez-le depuis l'archive."
+  },
+  "usage": {
+    "customer": "Client",
+    "inventory": "Ajustement d'inventaire",
+    "production": "Production",
+    "virtualNotice": "Emplacement système — son contenu ne compte pas dans les niveaux de stock."
+  },
+  "sort": {},
+  "required": {
+    "title": "Aucun emplacement",
+    "description": "Créez le premier et poursuivez sans quitter cet écran.",
+    "action": "Créer un emplacement"
+  },
+  "archived": {
+    "title": "Emplacements archivés",
+    "subtitle": "Emplacements masqués des listes et des sélecteurs",
+    "badge": "Archivé",
+    "name": "Emplacement",
+    "archivedAt": "Archivé le",
+    "actions": "Actions",
+    "restore": "Restaurer",
+    "emptyTitle": "Rien d’archivé",
+    "emptyDescription": "Les emplacements archivés apparaissent ici et peuvent être restaurés.",
+    "detailNotice": "Cet emplacement est archivé. Restaurez-le pour y stocker à nouveau des produits."
+  },
+  "masterDetailSubtitle": "Choisissez un emplacement pour voir son contenu, ses produits et ses réglages.",
+  "select": {
+    "title": "Choisir un emplacement",
+    "description": "L’arborescence à gauche liste tous les emplacements. Choisissez-en un pour voir son contenu."
+  },
+  "path": {
+    "label": "Chemin de l’emplacement",
+    "all": "Tous les emplacements"
+  },
+  "tabs": {
+    "contents": "Contenu",
+    "products": "Produits",
+    "settings": "Réglages",
+    "moves": "Mouvements"
+  },
+  "tree": {
+    "label": "Emplacements",
+    "searchPlaceholder": "Rechercher par nom ou code",
+    "scanPlaceholder": "Scannez une étiquette d’emplacement…",
+    "scanAction": "Sélectionner l’emplacement scanné",
+    "scanNotFound": "Aucun emplacement ne correspond à « {{code}} ».",
+    "scanNotLocation": "« {{code}} » n’est pas une étiquette d’emplacement.",
+    "noMatches": "Aucun emplacement ne correspond à la recherche",
+    "empty": "Aucun emplacement pour le moment.",
+    "rowActions": "Actions pour {{name}}",
+    "archivedLink": "Emplacements archivés",
+    "collapse": "Réduire {{name}}",
+    "expand": "Développer {{name}}"
+  },
+  "contents": {
+    "emptyTitle": "Rien à l’intérieur de cet emplacement",
+    "emptyDescription_one": "Son {{count}} produit est dans l’onglet Produits.",
+    "emptyDescription_other": "Ses {{count}} produits sont dans l’onglet Produits.",
+    "showProducts": "Afficher les produits",
+    "selected_one": "{{count}} emplacement sélectionné",
+    "selected_other": "{{count}} emplacements sélectionnés",
+    "clearSelection": "Effacer",
+    "selectColumn": "Sélectionner",
+    "selectRow": "Sélectionner {{name}}",
+    "name": "Emplacement",
+    "code": "Code",
+    "type": "Type",
+    "inside": "À l’intérieur",
+    "products": "Produits"
+  },
+  "products": {
+    "includeInside": "Inclure les emplacements à l’intérieur",
+    "includingInside_one": "Y compris 1 emplacement à l’intérieur",
+    "includingInside_other": "Y compris {{count}} emplacements à l’intérieur"
+  },
+  "settings": {
+    "basic": "Général",
+    "liesIn": "Se trouve dans",
+    "productFields": "Champs produit ici",
+    "warehouse": "Réapprovisionnement",
+    "reserve": "Emplacement de réserve",
+    "reserveHint": "La marchandise ici remplit les emplacements de prélèvement ; rien ne la réapprovisionne depuis un autre emplacement.",
+    "productFieldsHint": "Ce qu’enregistre un produit placé ici.",
+    "appliesHere": "S’applique à cet emplacement seulement.",
+    "appliesInside_one": "S’applique à cet emplacement et à 1 emplacement à l’intérieur.",
+    "appliesInside_other": "S’applique à cet emplacement et à {{count}} emplacements à l’intérieur.",
+    "inheritedFrom": "de {{name}}",
+    "inheritedFields": "Défini à un niveau supérieur",
+    "labelAndCode": "Étiquette et code",
+    "recordActions": "Actions pour {{name}}"
+  },
+  "move": {
+    "titleOne": "Déplacer vers…",
+    "searchPlaceholder": "Rechercher la destination",
+    "scanNotTarget": "« {{code}} » est déplacé ou se trouve à l’intérieur de ce qui est déplacé ; il ne peut donc pas être la destination.",
+    "targetsLabel": "Emplacements de destination",
+    "moved_one": "Emplacement déplacé",
+    "moved_other": "{{count}} emplacements déplacés",
+    "undo": "Annuler",
+    "undoDone": "Déplacement annulé",
+    "undoFailed": "Impossible d’annuler le déplacement",
+    "failed": "Impossible de déplacer l’emplacement",
+    "rejected": "Le serveur a refusé le déplacement",
+    "titleMany_one": "Déplacer {{count}} emplacement vers…",
+    "titleMany_other": "Déplacer {{count}} emplacements vers…"
+  },
+  "moves": {
+    "empty": "Aucun mouvement de stock par cet emplacement."
+  },
+  "moveQuestion": {
+    "title": "A-t-il été déplacé physiquement ?",
+    "description": "Les produits à l'intérieur restent à leur place dans l'emplacement. Indiquez si l'emplacement lui-même a été transporté ailleurs, ou si l'arborescence le plaçait seulement au mauvais endroit.",
+    "scope": "Vous déplacez {{name}} avec {{inside}} et {{products}} vers {{destination}}.",
+    "scopeNoInside": "Vous déplacez {{name}} avec {{products}} vers {{destination}}.",
+    "locationsInside_one": "{{count}} emplacement à l'intérieur",
+    "locationsInside_many": "{{count}} emplacements à l'intérieur",
+    "locationsInside_other": "{{count}} emplacements à l'intérieur",
+    "products_one": "{{count}} produit",
+    "products_many": "{{count}} produits",
+    "products_other": "{{count}} produits",
+    "topLevel": "le niveau supérieur",
+    "choiceLabel": "Ce qui est arrivé à {{name}}",
+    "correction": "Je corrige seulement l'organisation",
+    "physical": "Il a été déplacé physiquement",
+    "physicalHint": "Un déplacement physique enregistre un mouvement pour chaque produit à l'intérieur, afin que son historique et le stock à des dates passées montrent où il se trouvait.",
+    "confirm": "Déplacer"
+  },
+  "addNew": {
+    "title": "Ajouter un emplacement",
+    "nameLabel": "Nom",
+    "namePlaceholder": "p. ex. Étagère B",
+    "parentLabel": "À l'intérieur de (facultatif)",
+    "parentPlaceholder": "Niveau supérieur",
+    "created": "Emplacement créé"
+  }
+}

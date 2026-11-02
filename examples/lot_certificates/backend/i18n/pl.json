@@ -1,0 +1,5 @@
+{
+  "number_missing": "Podaj numer certyfikatu dla partii {lot}.",
+  "number_too_long": "Numer certyfikatu dla partii {lot} ma więcej niż {limit} znaków.",
+  "certificate_not_on_file": "Certyfikatu {number} nie ma w rejestrze. Zarejestruj go, zanim towar zostanie zaksięgowany."
+}

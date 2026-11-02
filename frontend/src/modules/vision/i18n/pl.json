@@ -1,0 +1,10 @@
+{
+  "ai": {
+    "purposeLabel": "Odczyt produktu ze zdjęcia",
+    "purposeDesc": "Wyciąga nazwę, markę, ilość i datę ważności ze zdjęcia etykiety, żeby dodać pozycję bez przepisywania."
+  },
+  "permissions": {
+    "extract": "Odczyt etykiet ze zdjęć",
+    "extractDesc": "Może wysyłać zdjęcia etykiet produktów i tabel wartości odżywczych do modelu AI — każde wywołanie kosztuje"
+  }
+}

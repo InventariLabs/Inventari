@@ -1,0 +1,301 @@
+"""Static template data for equipment handover/return protocols.
+
+Extracted from protocol_service.py to keep it under the 400 LOC quality
+gate. Pure data: available placeholders, i18n labels, and the default
+built-in HTML templates for checkout/checkin protocols.
+
+A checkout to a location is a placement, not a handover: whether the
+other side of the document is a person or a shelf decides the number of
+signature lines. That is a condition inside the CHECKOUT template, not a
+third document type — the editor already offers exactly two types, and a
+third would demand its own built-in, its own settings key and its own
+screen support before the first placement could print, while every
+organization with a saved checkout copy would additionally have to author
+the new type's layout. The person-versus-location fact is one
+``{% if checkout_location_name %}``, stated exactly where the signature
+block is drawn.
+"""
+
+AVAILABLE_PLACEHOLDERS: list[dict[str, str]] = [
+    {'key': '{{item_name}}', 'description': 'Asset name'},
+    {'key': '{{item_barcode}}', 'description': 'Asset barcode'},
+    {'key': '{{category_name}}', 'description': 'Category name'},
+    {
+        'key': '{{serial_number}}',
+        'description': 'Serial number (from meta_data.equipment)',
+    },
+    {'key': '{{asset_tag}}', 'description': 'Asset tag (from meta_data.equipment)'},
+    {
+        'key': '{{manufacturer}}',
+        'description': 'Manufacturer (from meta_data.equipment)',
+    },
+    {'key': '{{model}}', 'description': 'Model (from meta_data.equipment)'},
+    {
+        'key': '{{manufacturer_model}}',
+        'description': (
+            'Manufacturer and model as one value, for the row that pairs them; '
+            'the half nobody wrote down is left out rather than printed as a dash'
+        ),
+    },
+    {
+        'key': '{{custom.<key>}}',
+        'description': (
+            'A custom field of the asset category, by its key, read from '
+            'meta_data.equipment — the keys this organization can use are '
+            'listed by the placeholders endpoint'
+        ),
+    },
+    {
+        'key': '{{checkout_location_name}}',
+        'description': (
+            'Storage location the asset was deployed to; empty when the '
+            'checkout went to a person'
+        ),
+    },
+    {'key': '{{assigned_to_name}}', 'description': 'Person receiving the asset'},
+    {
+        'key': '{{assigned_to_email}}',
+        'description': 'Email of the person receiving the asset',
+    },
+    {'key': '{{checked_out_at}}', 'description': 'Checkout date and time'},
+    {'key': '{{checked_in_at}}', 'description': 'Check-in date and time (if returned)'},
+    {'key': '{{expected_return_at}}', 'description': 'Expected return date'},
+    {'key': '{{checkout_notes}}', 'description': 'Notes from checkout'},
+    {'key': '{{checkin_notes}}', 'description': 'Notes from check-in'},
+    {
+        'key': '{{checkin_condition}}',
+        'description': 'Condition on return (GOOD/DAMAGED/NEEDS_REPAIR)',
+    },
+    {
+        'key': '{{issued_by_name}}',
+        'description': 'Name of the person who issued the asset',
+    },
+    {
+        'key': '{{issued_by_email}}',
+        'description': 'Email of the person who issued the asset',
+    },
+    {'key': '{{organization_name}}', 'description': 'Organization name'},
+    {'key': '{{document_date}}', 'description': 'Date the document was generated'},
+    {
+        'key': '{{document_number}}',
+        'description': 'Auto-generated document reference number',
+    },
+]
+
+# Translation labels
+LABELS: dict[str, dict[str, str]] = {
+    'en': {
+        'checkout_title': 'Equipment Handover Protocol',
+        'checkin_title': 'Equipment Return Protocol',
+        'section_asset': 'Asset Details',
+        'section_assignment': 'Assignment',
+        'section_return': 'Return Details',
+        'section_notes': 'Notes',
+        'section_return_notes': 'Return Notes',
+        'field_name': 'Name',
+        'field_category': 'Category',
+        'field_serial': 'Serial Number',
+        'field_asset_tag': 'Asset Tag',
+        'field_manufacturer_model': 'Manufacturer / Model',
+        'field_barcode': 'Barcode',
+        'field_issued_to': 'Issued To',
+        'field_deployed_to': 'Deployed To',
+        'field_issued_by': 'Issued By',
+        'field_date_issue': 'Date of Issue',
+        'field_expected_return': 'Expected Return',
+        'field_returned_by': 'Returned By',
+        'field_originally_issued': 'Originally Issued',
+        'field_returned_on': 'Returned On',
+        'field_condition': 'Condition',
+        'condition_good': 'Good',
+        'condition_damaged': 'Damaged',
+        'condition_repair': 'Needs Repair',
+        'condition_unknown': 'Not assessed',
+        'sig_issuing': 'Issuing Party',
+        'sig_receiving': 'Receiving Party',
+        'sig_returning': 'Returning Party',
+        'footer': 'Generated by Inventari',
+    },
+    'pl': {
+        'checkout_title': 'Protokół przekazania sprzętu',
+        'checkin_title': 'Protokół zwrotu sprzętu',
+        'section_asset': 'Dane sprzętu',
+        'section_assignment': 'Przekazanie',
+        'section_return': 'Zwrot sprzętu',
+        'section_notes': 'Uwagi',
+        'section_return_notes': 'Uwagi do zwrotu',
+        'field_name': 'Nazwa',
+        'field_category': 'Kategoria',
+        'field_serial': 'Numer seryjny',
+        'field_asset_tag': 'Numer inwentarzowy',
+        'field_manufacturer_model': 'Producent / Model',
+        'field_barcode': 'Kod kreskowy',
+        'field_issued_to': 'Wydano dla',
+        'field_deployed_to': 'Wydano do',
+        'field_issued_by': 'Wydał',
+        'field_date_issue': 'Data wydania',
+        'field_expected_return': 'Planowany zwrot',
+        'field_returned_by': 'Zwrócono przez',
+        'field_originally_issued': 'Data wydania',
+        'field_returned_on': 'Data zwrotu',
+        'field_condition': 'Stan',
+        'condition_good': 'Dobry',
+        'condition_damaged': 'Uszkodzony',
+        'condition_repair': 'Do naprawy',
+        'condition_unknown': 'Nie oceniono',
+        'sig_issuing': 'Wydający',
+        'sig_receiving': 'Odbierający',
+        'sig_returning': 'Zwracający',
+        'footer': 'Wygenerowano przez Inventari',
+    },
+}
+
+DEFAULT_CHECKOUT_TEMPLATE = """\
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { margin: 2cm; }
+  body { font-family: sans-serif; font-size: 11pt; color: #1a1a1a; line-height: 1.5; }
+  @media screen { body { max-width: 21cm; margin: 0 auto; padding: 2cm; box-sizing: border-box; } }
+  h1 { font-size: 18pt; text-align: center; margin-bottom: 0.3cm; }
+  .subtitle { text-align: center; color: #666; font-size: 10pt; margin-bottom: 1cm; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 1cm; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 10pt; }
+  th { background: #f5f5f5; width: 35%; font-weight: 600; }
+  .section-title { font-size: 12pt; font-weight: 600; margin: 0.8cm 0 0.3cm; border-bottom: 2px solid #333; padding-bottom: 3px; }
+  .signatures { display: flex; justify-content: space-between; margin-top: 2cm; }
+  .sig-block { width: 45%; text-align: center; }
+  .sig-line { border-top: 1px solid #333; margin-top: 3cm; padding-top: 4px; font-size: 9pt; color: #666; }
+  .notes { background: #fafafa; border: 1px solid #ddd; padding: 10px; min-height: 2cm; font-size: 10pt; margin-bottom: 0.5cm; }
+  .footer { text-align: center; font-size: 8pt; color: #999; margin-top: 1.5cm; border-top: 1px solid #eee; padding-top: 4px; }
+</style>
+</head>
+<body>
+  <h1>{{L.checkout_title}}</h1>
+  <div class="subtitle">{{organization_name}} &mdash; {{document_date}}</div>
+  <div class="subtitle">Ref: {{document_number}}</div>
+
+  <div class="section-title">{{L.section_asset}}</div>
+  <table>
+    <tr><th>{{L.field_name}}</th><td>{{item_name}}</td></tr>
+    <tr><th>{{L.field_category}}</th><td>{{category_name}}</td></tr>
+    <tr><th>{{L.field_serial}}</th><td>{{serial_number}}</td></tr>
+    <tr><th>{{L.field_asset_tag}}</th><td>{{asset_tag}}</td></tr>
+    <tr><th>{{L.field_manufacturer_model}}</th><td>{{manufacturer_model}}</td></tr>
+    <tr><th>{{L.field_barcode}}</th><td>{{item_barcode}}</td></tr>
+  </table>
+
+  <div class="section-title">{{L.section_assignment}}</div>
+  <table>
+    {% if checkout_location_name %}
+    <tr><th>{{L.field_deployed_to}}</th><td>{{checkout_location_name}}</td></tr>
+    {% else %}
+    <tr><th>{{L.field_issued_to}}</th><td>{{assigned_to_name}} {% if assigned_to_email %}({{assigned_to_email}}){% endif %}</td></tr>
+    {% endif %}
+    <tr><th>{{L.field_issued_by}}</th><td>{{issued_by_name}} {% if issued_by_email %}({{issued_by_email}}){% endif %}</td></tr>
+    <tr><th>{{L.field_date_issue}}</th><td>{{checked_out_at}}</td></tr>
+    <tr><th>{{L.field_expected_return}}</th><td>{{expected_return_at}}</td></tr>
+  </table>
+
+  {% if checkout_notes %}
+  <div class="section-title">{{L.section_notes}}</div>
+  <div class="notes">{{checkout_notes}}</div>
+  {% endif %}
+
+  {# A person takes responsibility and signs; the issuing party
+     countersigns. A location does not sign — the row above already says
+     everything a placement establishes. #}
+  <div class="signatures">
+    <div class="sig-block">
+      <div class="sig-line">{{L.sig_issuing}} ({{issued_by_name}})</div>
+    </div>
+    {% if not checkout_location_name %}
+    <div class="sig-block">
+      <div class="sig-line">{{L.sig_receiving}} ({{assigned_to_name}})</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="footer">{{L.footer}} &mdash; {{document_date}}</div>
+</body>
+</html>
+"""
+
+DEFAULT_CHECKIN_TEMPLATE = """\
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { margin: 2cm; }
+  body { font-family: sans-serif; font-size: 11pt; color: #1a1a1a; line-height: 1.5; }
+  @media screen { body { max-width: 21cm; margin: 0 auto; padding: 2cm; box-sizing: border-box; } }
+  h1 { font-size: 18pt; text-align: center; margin-bottom: 0.3cm; }
+  .subtitle { text-align: center; color: #666; font-size: 10pt; margin-bottom: 1cm; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 1cm; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 10pt; }
+  th { background: #f5f5f5; width: 35%; font-weight: 600; }
+  .section-title { font-size: 12pt; font-weight: 600; margin: 0.8cm 0 0.3cm; border-bottom: 2px solid #333; padding-bottom: 3px; }
+  .signatures { display: flex; justify-content: space-between; margin-top: 2cm; }
+  .sig-block { width: 45%; text-align: center; }
+  .sig-line { border-top: 1px solid #333; margin-top: 3cm; padding-top: 4px; font-size: 9pt; color: #666; }
+  .notes { background: #fafafa; border: 1px solid #ddd; padding: 10px; min-height: 2cm; font-size: 10pt; margin-bottom: 0.5cm; }
+  .condition-good { color: #16a34a; font-weight: 600; }
+  .condition-damaged { color: #dc2626; font-weight: 600; }
+  .condition-repair { color: #d97706; font-weight: 600; }
+  .footer { text-align: center; font-size: 8pt; color: #999; margin-top: 1.5cm; border-top: 1px solid #eee; padding-top: 4px; }
+</style>
+</head>
+<body>
+  <h1>{{L.checkin_title}}</h1>
+  <div class="subtitle">{{organization_name}} &mdash; {{document_date}}</div>
+  <div class="subtitle">Ref: {{document_number}}</div>
+
+  <div class="section-title">{{L.section_asset}}</div>
+  <table>
+    <tr><th>{{L.field_name}}</th><td>{{item_name}}</td></tr>
+    <tr><th>{{L.field_category}}</th><td>{{category_name}}</td></tr>
+    <tr><th>{{L.field_serial}}</th><td>{{serial_number}}</td></tr>
+    <tr><th>{{L.field_asset_tag}}</th><td>{{asset_tag}}</td></tr>
+    <tr><th>{{L.field_manufacturer_model}}</th><td>{{manufacturer_model}}</td></tr>
+  </table>
+
+  <div class="section-title">{{L.section_return}}</div>
+  <table>
+    {% if checkout_location_name %}
+    <tr><th>{{L.field_deployed_to}}</th><td>{{checkout_location_name}}</td></tr>
+    {% else %}
+    <tr><th>{{L.field_returned_by}}</th><td>{{assigned_to_name}} {% if assigned_to_email %}({{assigned_to_email}}){% endif %}</td></tr>
+    {% endif %}
+    <tr><th>{{L.field_originally_issued}}</th><td>{{checked_out_at}}</td></tr>
+    <tr><th>{{L.field_returned_on}}</th><td>{{checked_in_at}}</td></tr>
+    <tr><th>{{L.field_condition}}</th><td>
+      {% if checkin_condition == 'GOOD' %}<span class="condition-good">{{L.condition_good}}</span>
+      {% elif checkin_condition == 'DAMAGED' %}<span class="condition-damaged">{{L.condition_damaged}}</span>
+      {% elif checkin_condition == 'NEEDS_REPAIR' %}<span class="condition-repair">{{L.condition_repair}}</span>
+      {% else %}{{L.condition_unknown}}{% endif %}
+    </td></tr>
+  </table>
+
+  {% if checkin_notes %}
+  <div class="section-title">{{L.section_return_notes}}</div>
+  <div class="notes">{{checkin_notes}}</div>
+  {% endif %}
+
+  <div class="signatures">
+    {% if not checkout_location_name %}
+    <div class="sig-block">
+      <div class="sig-line">{{L.sig_returning}} ({{assigned_to_name}})</div>
+    </div>
+    {% endif %}
+    <div class="sig-block">
+      <div class="sig-line">{{L.sig_receiving}} ({{issued_by_name}})</div>
+    </div>
+  </div>
+
+  <div class="footer">{{L.footer}} &mdash; {{document_date}}</div>
+</body>
+</html>
+"""

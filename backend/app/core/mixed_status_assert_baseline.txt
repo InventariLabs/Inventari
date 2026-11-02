@@ -1,0 +1,12 @@
+# Architecture lint baseline
+# Format: relative/path.py::test_name
+#
+# Assertions that accept a 2xx and a >= 4xx at once, so they pass
+# whichever the endpoint does. This list is empty, and that is the
+# point: the fix is to name the one code the application returns, never
+# to add a line here.
+#
+# It held two entries for the length of one branch. Both tests were
+# deleted or rewritten on fix/a-green-test-says-which-way-it-would-fail,
+# which has since landed in dev, so the exception expired exactly as its
+# own note said it would.

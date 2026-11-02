@@ -1,0 +1,44 @@
+{
+  "navigation": {
+    "widgets": "Widgety"
+  },
+  "page": {
+    "title": "Widgety",
+    "description": "Zarządzaj widgetami — moduł referencyjny dla deweloperów Inventari."
+  },
+  "actions": {
+    "add": "Dodaj widget",
+    "delete": "Usuń",
+    "increase": "Zwiększ ilość",
+    "decrease": "Zmniejsz ilość",
+    "copyIds": "Kopiuj ID"
+  },
+  "fields": {
+    "name": "Nazwa",
+    "color": "Kolor",
+    "quantity": "Ilość"
+  },
+  "colors": {
+    "blue": "Niebieski",
+    "green": "Zielony",
+    "amber": "Bursztynowy",
+    "red": "Czerwony",
+    "violet": "Fioletowy",
+    "slate": "Grafitowy"
+  },
+  "messages": {
+    "empty": "Brak widgetów. Stwórz pierwszy!",
+    "confirmDeleteTitle": "Usunąć ten widget?",
+    "confirmDelete": "„{{name}}” zostanie usunięty. Tej operacji nie można cofnąć.",
+    "idsCopied": "Identyfikatory zaznaczonych produktów zostały skopiowane do schowka."
+  },
+  "validation": {
+    "nameLooksLikeBarcode": "To wygląda na kod produktu. Wpisz tu nazwę — kod produktu ma własne pole po zapisaniu produktu."
+  },
+  "permissions": {
+    "read": "Podgląd widgetów",
+    "readDesc": "Może przeglądać listę widgetów",
+    "write": "Zarządzanie widgetami",
+    "writeDesc": "Może tworzyć, edytować i usuwać widgety"
+  }
+}

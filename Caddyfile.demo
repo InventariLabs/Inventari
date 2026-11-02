@@ -1,0 +1,41 @@
+# The demo stack's Caddy configuration.
+#
+# It imports the production one, so the site behaves exactly as it always did,
+# and adds the single route a demo has and an ordinary install does not: the
+# Mailpit inbox, at /mailpit, where every message the demo "sends" is caught.
+#
+# The import is why this exists rather than a copy of Caddyfile: the two must
+# not drift. docker-compose.demo.yml points Caddy at this file; a stack that
+# does not include that overlay never reads it.
+import /etc/caddy/Caddyfile
+
+{$DOMAIN}/mailpit* {
+    # TLS terminates here too, so the same policy as the site above has to
+    # ride on these responses as well.
+    header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # /mailpit is the path a visitor copies out of the docs; Mailpit itself
+    # lives under /mailpit/ (--webroot), so send them to the canonical one.
+    redir /mailpit /mailpit/
+
+    # Read-only from outside. The docs publish this route so a visitor can read
+    # the message the demo would have sent, and Mailpit's API answers writes on
+    # the same paths: POST /api/v1/send would let anyone on the internet drop a
+    # message into the inbox and hand out a link to it — a page served from this
+    # domain — while DELETE emptied it for every other visitor and PUT marked
+    # and tagged. No mail leaves the stack either way (no relay is configured
+    # and SMTP 1025 is on the app network only); this is about what a visitor
+    # can put in front of the next one.
+    @mailpitWrite not method GET HEAD
+    respond @mailpitWrite "Read-only demo inbox" 403
+
+    # The three endpoints that make Mailpit fetch an address taken from a
+    # message — the screenshot proxy, the link checker, the HTML checker. With
+    # the send API closed a visitor no longer chooses the address, but a route
+    # that fetches on a visitor's behalf is a stranger's tool first: it turns
+    # the demo server into a requester of whatever the message names.
+    @mailpitFetch path_regexp ^/mailpit/(proxy|api/v1/message/[^/]+/(link-check|html-check))
+    respond @mailpitFetch "Not available on the demo inbox" 403
+
+    reverse_proxy mailpit:8025
+}

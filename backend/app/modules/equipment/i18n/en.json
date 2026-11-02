@@ -1,0 +1,5 @@
+{
+  "campaign_cannot_delete_launched": "A launched campaign cannot be deleted — cancel it instead.",
+  "campaign_already_completed": "Campaign is already completed.",
+  "campaign_already_cancelled": "Campaign is already cancelled."
+}

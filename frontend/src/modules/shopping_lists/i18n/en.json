@@ -1,0 +1,135 @@
+{
+  "title": "Shopping Lists",
+  "launcher": {
+    "description": "Everyday shopping: what to buy at the store"
+  },
+  "subtitle": "Everyday shopping: plan what to buy, then shop from the list",
+  "newList": "New list",
+  "addFirst": "Create your first shopping list to start planning",
+  "modal": {
+    "title": "New shopping list",
+    "nameLabel": "List name",
+    "namePlaceholder": "e.g. Weekly shopping",
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating…",
+    "createSuccess": "List created!",
+    "createFailed": "Failed to create list",
+    "nameHint": "Leave it empty and the list takes today's date.",
+    "defaultName": "List {{date}}"
+  },
+  "completed": "Done",
+  "detail": {
+    "purchased": "purchased",
+    "addItem": "Add item",
+    "clearPurchased": "Clear purchased ({{count}})",
+    "clearPurchased_one": "Clear purchased ({{count}})",
+    "clearPurchased_other": "Clear purchased ({{count}})",
+    "empty": "List is empty",
+    "emptySubtitle": "Add items manually.",
+    "emptySubtitleRecipes": "Add items manually or from a recipe.",
+    "backToLists": "Back to lists",
+    "confirmClearPurchased": "Remove all purchased items?",
+    "confirmDeleteItem": "Remove this item from list?",
+    "listNotFound": "List not found",
+    "errorClearPurchased": "Failed to clear purchased items",
+    "errorDeleteItem": "Failed to delete item",
+    "errorUpdateItem": "Failed to update item",
+    "successClearPurchased": "Purchased items cleared",
+    "successDeleteItem": "Item deleted",
+    "convertToPo": "Convert to Purchase Order",
+    "convertToPoSuccess": "Purchase order {{number}} created",
+    "convertToPoError": "Failed to create purchase order",
+    "confirmConvertGrouped_one": "{{count}} item will be grouped into a draft purchase order.",
+    "confirmConvertGrouped_other": "{{count}} items will be grouped into a draft purchase order.",
+    "confirmConvertSkipped_one": "{{count}} item without a linked product will be skipped.",
+    "confirmConvertSkipped_other": "{{count}} items without a linked product will be skipped.",
+    "toBuyCount_one": "{{count}} to buy",
+    "toBuyCount_other": "{{count}} to buy",
+    "purchasedCount_one": "{{count}} purchased",
+    "purchasedCount_other": "{{count}} purchased",
+    "markPurchasedNamed": "Toggle purchased: {{name}}"
+  },
+  "addItem": {
+    "title": "Add to list",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Milk, Bread, Ice cream…",
+    "quantityLabel": "Quantity",
+    "unitLabel": "Unit",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "e.g. If on sale, the best one…",
+    "priorityLabel": "Priority",
+    "priority": {
+      "normal": "Normal",
+      "urgent": "Urgent"
+    },
+    "cancel": "Cancel",
+    "add": "Add",
+    "adding": "Adding…",
+    "addFailed": "Failed to add item",
+    "validation": {
+      "nameRequired": "Enter product name",
+      "quantityPositive": "Quantity must be greater than 0",
+      "quantityMax": "Quantity above {{max}} cannot be stored",
+      "unitRequired": "Choose a unit"
+    }
+  },
+  "addFromRecipes": {
+    "title": "From recipes",
+    "search": "Search recipes…",
+    "noRecipes": "No recipes found",
+    "recipesDisabled": "Recipes module is not enabled",
+    "addSelected": "Add {{count}} recipes",
+    "addSelected_one": "Add {{count}} recipe",
+    "addSelected_other": "Add {{count}} recipes",
+    "adding": "Adding…",
+    "failed": "Failed to add ingredients from the selected recipes",
+    "success": "Added {{count}} ingredients",
+    "success_one": "Added {{count}} ingredient",
+    "success_other": "Added {{count}} ingredients"
+  },
+  "card": {
+    "saveName": "Save name",
+    "editName": "Edit list name",
+    "deleteList": "Delete list",
+    "actionsFor": "Actions for {{name}}",
+    "emptyPreview": "Nothing on this list yet",
+    "morePreview_one": "and 1 more",
+    "morePreview_other": "and {{count}} more"
+  },
+  "actions": {
+    "open": "Open"
+  },
+  "searchPlaceholder": "Search lists…",
+  "loading": "Loading lists…",
+  "empty": {
+    "title": "No shopping lists yet"
+  },
+  "deleteModal": {
+    "title": "Delete list?",
+    "desc": "All products on this list will be permanently deleted."
+  },
+  "messages": {
+    "listDeleted": "List deleted",
+    "deleteError": "Error deleting list",
+    "nameChanged": "Name changed",
+    "nameChangeError": "Error changing name"
+  },
+  "permissions": {
+    "read": "View shopping lists",
+    "readDesc": "Can browse shopping lists and their suggestions",
+    "write": "Manage shopping lists",
+    "writeDesc": "Can create lists, add and tick off items"
+  },
+  "notes": {
+    "neededBy": "Needed by: {{date}}",
+    "checkStock": "Check stock: {{available}} in stock, recipe needs {{required}}",
+    "matchedByName": "Matched by name to \"{{product}}\"",
+    "convertedToPo": "On purchase order {{number}}",
+    "forRecipe": "For recipe: {{recipe}}"
+  },
+  "toasts": {
+    "addItemsFailed": "Failed to add products",
+    "shoppingListGone": "Shopping list no longer exists"
+  }
+}

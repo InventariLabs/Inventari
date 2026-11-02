@@ -1,0 +1,5 @@
+{
+  "number_missing": "Geben Sie die Zertifikatsnummer für die Charge {lot} ein.",
+  "number_too_long": "Die Zertifikatsnummer für die Charge {lot} ist länger als {limit} Zeichen.",
+  "certificate_not_on_file": "Das Zertifikat {number} liegt nicht vor. Hinterlegen Sie es, bevor die Ware gebucht wird."
+}

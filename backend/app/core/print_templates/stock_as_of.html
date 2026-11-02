@@ -1,0 +1,76 @@
+{# The stock-on-a-date report, printed.
+
+   The screen answers the question; this is the sheet that goes into a
+   binder, so it carries the three things a filed printout has to carry: the
+   date it is about, the date it was made, and whose warehouse it is. The
+   first two are different dates and the confusion between them is the whole
+   reason an audit rejects a printout.
+
+   It draws the shared header (print_header.html) — no barcode, because a
+   report identifies a date, not a record. #}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    @page { margin: 12mm 12mm 16mm 12mm; }
+    body { font-family: 'DejaVu Sans', sans-serif; font-size: 9pt; color: #1a1a2e; }
+    table.rows { width: 100%; border-collapse: collapse; margin-top: 4mm; }
+    table.rows th {
+      text-align: left; font-size: 7.5pt; text-transform: uppercase;
+      letter-spacing: 0.4pt; color: #555; border-bottom: 0.8pt solid #1a1a2e;
+      padding: 1.5mm 2mm;
+    }
+    table.rows td { padding: 1.2mm 2mm; border-bottom: 0.3pt solid #ddd; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    tr.total td { border-top: 1pt solid #1a1a2e; border-bottom: none; font-weight: bold; padding-top: 2mm; }
+    .note { margin-top: 4mm; font-size: 7.5pt; color: #666; }
+  </style>
+</head>
+<body>
+  {% include 'print_header.html' %}
+
+  <table class="rows">
+    <thead>
+      <tr>
+        <th>{{ labels.product }}</th>
+        <th class="num">{{ labels.quantity }}</th>
+        {% if show_value %}
+        <th class="num">{{ labels.value }}</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.product_name or '—' }}</td>
+        <td class="num">{{ row.quantity | format_qty }}{% if row.uom_symbol %} {{ row.uom_symbol }}{% endif %}</td>
+        {% if show_value %}
+        <td class="num">{% if row.value is not none %}{{ row.value | format_decimal }}{% else %}—{% endif %}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+      {% if show_value and total_value is not none %}
+      <tr class="total">
+        <td>{{ labels.total }}</td>
+        <td class="num"></td>
+        <td class="num">{{ total_value | format_decimal }} {{ currency }}</td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  {% if not rows %}
+  <p class="note">{{ labels.nothing }}</p>
+  {% endif %}
+
+  <p class="note">
+    {{ labels.complete_from }}: {{ complete_from_text }}
+    {% if show_value %}
+    {% if value_source is none %} · {{ labels.no_value_source }}{% endif %}
+    {% if unpriced_rows %} · {{ labels.unpriced }}: {{ unpriced_rows }}{% endif %}
+    {% if excluded_currency_rows %} · {{ labels.excluded }}: {{ excluded_currency_rows }}{% endif %}
+    {% endif %}
+  </p>
+</body>
+</html>

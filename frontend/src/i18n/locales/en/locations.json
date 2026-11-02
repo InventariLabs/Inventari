@@ -1,0 +1,419 @@
+{
+  "title": "Locations",
+  "subtitle": "Manage where your products are kept",
+  "empty": {
+    "title": "No locations defined",
+    "subtitle": "Add a shelf, a rack, or a cabinet to start organizing your products.",
+    "addFirst": "Add first location"
+  },
+  "hidden": {
+    "title": "Some locations are hidden",
+    "description": "Locations that belong to a module stay out of these lists while \"Module data in general lists\" is off. Turn it on in Settings to see everything in one list.",
+    "inlineCount_one": "{{count}} location is hidden — turn on Module data in Settings to see it.",
+    "inlineCount_other": "{{count}} locations are hidden — turn on Module data in Settings to see them.",
+    "fieldHint": "Your locations belong to a module and stay out of general lists. Create a new one here, or turn on \"Module data in general lists\" in Settings to pick an existing one.",
+    "openSettings": "Open settings"
+  },
+  "picker": {
+    "moduleBadge": "Module: {{module}}"
+  },
+  "form": {
+    "location": "How to get there (optional)",
+    "locationPlaceholder": "e.g., Near the door, under the window"
+  },
+  "actions": {
+    "openWizard": "Add location"
+  },
+  "messages": {
+    "storageCreated": "Location added successfully!",
+    "storageUpdated": "Location updated successfully!",
+    "storageDeleted": "Location deleted successfully!",
+    "storageArchived": "Location archived",
+    "nameTaken": "A location named \"{{name}}\" already exists here.",
+    "shortCodeTaken": "That location code is already used by another location.",
+    "storageRestored": "Location restored"
+  },
+  "detail": {
+    "products": "Products ({{count}})",
+    "products_one": "Products ({{count}})",
+    "products_other": "Products ({{count}})",
+    "table": {
+      "product": "Product",
+      "category": "Category",
+      "quantity": "Quantity",
+      "freezeDate": "Freezing Date",
+      "storageDate": "Added",
+      "expiryDate": "Expiry",
+      "location": "Shelf/Drawer",
+      "actions": "Actions"
+    },
+    "empty": "This location is empty",
+    "emptySubtitle": "Add your first product to this location",
+    "backToList": "Back to list",
+    "rename": "Rename",
+    "renameLabel": "Location name",
+    "saveName": "Save name",
+    "cancelRename": "Cancel rename",
+    "addInside": "Add location inside",
+    "addProductHere": "Add product here"
+  },
+  "errors": {
+    "cannotDelete": "Cannot delete: first remove or move the products.",
+    "cannotArchive": "Cannot archive this location",
+    "cannotRestore": "Could not restore this location"
+  },
+  "wizard": {
+    "discardTitle": "Discard this new location?",
+    "discardMessage": "The names and tracking fields you chose will be lost.",
+    "discardConfirm": "Discard",
+    "discardCancel": "Keep editing",
+    "title": "Location Wizard",
+    "fields": {
+      "name": {
+        "desc": "Basic name (Required)."
+      },
+      "quantity": {
+        "desc": "Number of pieces or packages (Required)."
+      },
+      "unit": {
+        "desc": "Measurement unit (pcs, kg, l) (Required)."
+      },
+      "expiry_date": {
+        "desc": "Track best-before dates. Crucial for food."
+      },
+      "freeze_date": {
+        "desc": "Monitor storage time in the freezer."
+      },
+      "weight": {
+        "desc": "Allows specifying weight (kg/g) or volume (l/ml) of the product."
+      },
+      "barcode": {
+        "desc": "Support for standard retail barcodes."
+      },
+      "label_code": {
+        "desc": "Support for internal QR codes (e.g. STM-001) on containers."
+      },
+      "brand": {
+        "desc": "Text field for manufacturer name."
+      },
+      "description": {
+        "desc": "Additional notes about the product."
+      },
+      "purchase_price": {
+        "desc": "Track product costs."
+      },
+      "shelf_location": {
+        "desc": "Precise location (e.g. 2nd shelf from top)."
+      },
+      "category_id": {
+        "desc": "Assign to a category (e.g. Dairy, Meat)."
+      },
+      "production_date": {
+        "desc": "Track production or batch date."
+      },
+      "notes": {
+        "desc": "Free-text notes field."
+      },
+      "price": {
+        "desc": "Track the price of the product."
+      },
+      "location": {
+        "desc": "Exact position inside the parent location."
+      }
+    }
+  },
+  "suggestions": {
+    "zones": [
+      "Kitchen",
+      "Basement",
+      "Pantry",
+      "Garage",
+      "Living room",
+      "Bathroom",
+      "Bedroom",
+      "Attic",
+      "Balcony",
+      "Garden",
+      "Office"
+    ],
+    "locations": ["Fridge", "Freezer", "Medicine cabinet"],
+    "compartments": ["Shelf", "Drawer", "Bin", "Box", "Basket"],
+    "profiles": {
+      "food_home": {
+        "zones": ["Kitchen", "Pantry", "Garage", "Basement", "Attic"],
+        "locations": ["Fridge", "Freezer", "Shelf", "Drawer", "Cupboard"],
+        "compartments": ["Shelf", "Drawer", "Bin", "Box", "Basket"]
+      },
+      "equipment_wms": {
+        "zones": [
+          "Server Room",
+          "Workshop",
+          "Stockroom",
+          "Warehouse Hall",
+          "Office"
+        ],
+        "locations": ["Rack", "Shelf", "Bin", "Cabinet", "Workbench"],
+        "compartments": ["Shelf", "Bin", "Pallet slot", "Drawer"]
+      },
+      "clean_core": {
+        "zones": [
+          "Zone A",
+          "Zone B",
+          "Cold Storage",
+          "Quarantine",
+          "Receiving"
+        ],
+        "locations": [
+          "Shelf A",
+          "Shelf B",
+          "Top Shelf",
+          "Bottom Shelf",
+          "Storage Bin"
+        ],
+        "compartments": ["Shelf 1", "Shelf 2", "Box 1", "Box 2"]
+      }
+    }
+  },
+  "onboarding": {
+    "step1Title": "Where do you keep your things?",
+    "step1Desc": "Start by naming your first location — e.g. Cold Storage, Receiving.",
+    "step1Placeholder": "e.g. Cold Storage",
+    "step2Title": "What is inside this location?",
+    "step2Desc": "e.g. Shelf A, Bay 3, Cabinet 1",
+    "step2Placeholder": "e.g. Shelf A",
+    "step3Title": "How to track products here?",
+    "done": "Done",
+    "next": "Next",
+    "back": "Back",
+    "parentLabel": "Existing location",
+    "newLocation": "New location",
+    "typeOrSelect": "Type or select",
+    "trackingFieldsLabel": "You will track",
+    "onlyLocation": "Location only — no tracking fields",
+    "customize": "customize →",
+    "customFields": "Custom fields",
+    "advancedOptions": "Advanced options",
+    "step3Desc": "Choose what information to track for each product in this location.",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Short description (optional)",
+    "labelCodeLabel": "Label code",
+    "storageTypeLabel": "Location type",
+    "storageTypeNone": "None (custom fields)",
+    "step1DescMore": "Name the location you are adding — e.g. Cold Storage, Receiving.",
+    "parentPlaceholder": "Choose a location"
+  },
+  "unknownError": "Unknown error",
+  "edit": {
+    "nameLabel": "Name",
+    "qrCodeLabel": "QR Code",
+    "qrCodePlaceholder": "e.g. LOC-001, GLN-1234567890123, WAREHOUSE-A-1",
+    "downloadQrLabel": "Download",
+    "showDescriptionOnLabel": "Show description on label",
+    "qrDownloadError": "Failed to download QR code",
+    "trackedFields": "Tracked fields",
+    "customFields": "Custom fields",
+    "sequenceLabel": "Walk order",
+    "sequenceHint": "Picking visits locations from the lowest number up. A location without a number comes after the numbered ones, in code order.",
+    "noParentStorage": "No parent location",
+    "deleteMessage": "Delete \"{{name}}\"? Products inside must be moved first — and once stock movements have passed through, the location cannot be deleted at all: archive it instead.",
+    "deleteMovesLocations_one": "{{count}} child location moves up a level.",
+    "deleteMovesLocations_other": "{{count}} child locations move up a level.",
+    "deleteMovesRecords_one": "{{count}} record moves up a level.",
+    "deleteMovesRecords_other": "{{count}} records move up a level.",
+    "deleteNotListed_one": "{{count}} of them is not shown on this list.",
+    "deleteNotListed_other": "{{count}} of them are not shown on this list.",
+    "generateCodeError": "Failed to generate code",
+    "generateCodeLabel": "Generate code",
+    "noCodeWarning": "No location code set — scanning will not work for this location.",
+    "archive": "Archive",
+    "archiveTitle": "Archive location",
+    "archiveConfirmEmpty": "This will hide the location from lists and pickers. Products are not deleted.",
+    "archiveConfirmItems": "This location holds products. Choose where to move them — archiving relocates them there.",
+    "archiveConfirmUnknown": "Could not check what this location holds. If it holds anything, choose where to move it — otherwise archiving will be refused.",
+    "archiveTargetLabel": "Move products to",
+    "archiveTargetNone": "Select a target location",
+    "archiveReversible": "You can undo this: archived locations can be restored from Archived locations.",
+    "archivePutawayRules_one": "{{count}} putaway rule points here. It will keep this location as its target until edited.",
+    "archivePutawayRules_other": "{{count}} putaway rules point here. They will keep this location as their target until edited."
+  },
+  "fieldLabels": {
+    "barcode": "Product code",
+    "sku": "SKU",
+    "brand": "Brand / Manufacturer",
+    "category_id": "Category",
+    "description": "Description",
+    "expiry_date": "Expiry Date",
+    "freeze_date": "Freeze Date",
+    "label_code": "Custom QR Code",
+    "location": "Location",
+    "name": "Name",
+    "notes": "Notes",
+    "price": "Price",
+    "production_date": "Production Date / Batch",
+    "purchase_price": "Purchase Price",
+    "quantity": "Quantity",
+    "shelf_location": "Shelf / position",
+    "unit": "Unit",
+    "weight": "Weight / Volume"
+  },
+  "reorg": {
+    "noMoveTargets": "Nowhere to move this location",
+    "moveTo": "Move to…",
+    "moveToTop": "Top level"
+  },
+  "card": {
+    "unit_one": "product",
+    "unit_other": "products"
+  },
+  "counts": {
+    "inSublocations_one": "{{count}} in sublocations",
+    "inSublocations_other": "{{count}} in sublocations"
+  },
+  "stats": {},
+  "storageNotFound": "Location not found",
+  "storageNotFoundDescription": "It may have been deleted, or the link may be out of date.",
+  "zoneModule": {
+    "title": "This location belongs to a module",
+    "description": "“{{name}}” is owned by a module, so it is kept out of the location list. Open it here to see what stands in it."
+  },
+  "zoneVirtual": {
+    "title": "This is a system location",
+    "description": "“{{name}}” is one of the system's virtual locations — its contents do not count as stock. Open it here to see what stands in it."
+  },
+  "zoneArchived": {
+    "title": "This location is archived",
+    "description": "“{{name}}” is archived and stays off the active list. Open it here, or restore it from the archive."
+  },
+  "usage": {
+    "customer": "Customer",
+    "inventory": "Inventory adjustment",
+    "production": "Production",
+    "virtualNotice": "System location — its contents do not count toward stock levels."
+  },
+  "sort": {},
+  "required": {
+    "title": "No locations yet",
+    "description": "Create the first one and carry on from here.",
+    "action": "Create location"
+  },
+  "archived": {
+    "title": "Archived locations",
+    "subtitle": "Locations hidden from lists and pickers",
+    "badge": "Archived",
+    "name": "Location",
+    "archivedAt": "Archived",
+    "actions": "Actions",
+    "restore": "Restore",
+    "emptyTitle": "Nothing archived",
+    "emptyDescription": "Archived locations appear here and can be restored.",
+    "detailNotice": "This location is archived. Restore it to store products here again."
+  },
+  "masterDetailSubtitle": "Pick a location to see what is inside it, its products and its settings.",
+  "select": {
+    "title": "Choose a location",
+    "description": "The tree on the left lists every location. Pick one to see what is inside it."
+  },
+  "path": {
+    "label": "Location path",
+    "all": "All locations"
+  },
+  "tabs": {
+    "contents": "Contents",
+    "products": "Products",
+    "settings": "Settings",
+    "moves": "Moves"
+  },
+  "tree": {
+    "label": "Locations",
+    "searchPlaceholder": "Search by name or code",
+    "scanPlaceholder": "Scan a location label…",
+    "scanAction": "Select the scanned location",
+    "scanNotFound": "No location matches “{{code}}”.",
+    "scanNotLocation": "“{{code}}” is not a location label.",
+    "noMatches": "No locations match the search",
+    "empty": "No locations yet.",
+    "rowActions": "Actions for {{name}}",
+    "archivedLink": "Archived locations",
+    "collapse": "Collapse {{name}}",
+    "expand": "Expand {{name}}"
+  },
+  "contents": {
+    "emptyTitle": "Nothing inside this location",
+    "emptyDescription_one": "Its {{count}} product is on the Products tab.",
+    "emptyDescription_other": "Its {{count}} products are on the Products tab.",
+    "showProducts": "Show products",
+    "selected_one": "{{count}} location selected",
+    "selected_other": "{{count}} locations selected",
+    "clearSelection": "Clear",
+    "selectColumn": "Select",
+    "selectRow": "Select {{name}}",
+    "name": "Location",
+    "code": "Code",
+    "type": "Type",
+    "inside": "Inside",
+    "products": "Products"
+  },
+  "products": {
+    "includeInside": "Include locations inside",
+    "includingInside_one": "Including 1 location inside",
+    "includingInside_other": "Including {{count}} locations inside"
+  },
+  "settings": {
+    "basic": "Basic",
+    "liesIn": "Lies in",
+    "productFields": "Product fields here",
+    "warehouse": "Replenishment",
+    "reserve": "Reserve location",
+    "reserveHint": "Stock here fills pick locations; nothing replenishes it from elsewhere.",
+    "productFieldsHint": "What a product placed in this location records.",
+    "appliesHere": "Applies to this location only.",
+    "appliesInside_one": "Applies to this location and 1 location inside.",
+    "appliesInside_other": "Applies to this location and {{count}} locations inside.",
+    "inheritedFrom": "from {{name}}",
+    "inheritedFields": "Set on a level above",
+    "labelAndCode": "Label and code",
+    "recordActions": "Actions for {{name}}"
+  },
+  "move": {
+    "titleOne": "Move to…",
+    "searchPlaceholder": "Search the destination",
+    "scanNotTarget": "“{{code}}” is being moved, or lies inside something that is, so it cannot be the destination.",
+    "targetsLabel": "Destination locations",
+    "moved_one": "Location moved",
+    "moved_other": "{{count}} locations moved",
+    "undo": "Undo",
+    "undoDone": "Move undone",
+    "undoFailed": "Could not undo the move",
+    "failed": "Could not move the location",
+    "rejected": "The server refused the move",
+    "titleMany_one": "Move {{count}} location to…",
+    "titleMany_other": "Move {{count}} locations to…"
+  },
+  "moves": {
+    "empty": "No stock movements through this location."
+  },
+  "moveQuestion": {
+    "title": "Did it physically move?",
+    "description": "The products inside stay where they are within the location. Say whether the location itself was carried somewhere else, or whether the tree only had it under the wrong parent.",
+    "scope": "You are moving {{name}} with {{inside}} and {{products}} to {{destination}}.",
+    "scopeNoInside": "You are moving {{name}} with {{products}} to {{destination}}.",
+    "locationsInside_one": "{{count}} location inside",
+    "locationsInside_other": "{{count}} locations inside",
+    "products_one": "{{count}} product",
+    "products_other": "{{count}} products",
+    "topLevel": "the top level",
+    "choiceLabel": "What happened to {{name}}",
+    "correction": "I am only correcting the layout",
+    "physical": "It physically moved",
+    "physicalHint": "A physical move records a move of every product inside, so its history and the stock on past dates show where it stood.",
+    "confirm": "Move"
+  },
+  "addNew": {
+    "title": "Add new location",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Shelf B",
+    "parentLabel": "Inside (optional)",
+    "parentPlaceholder": "Top level",
+    "created": "Location created"
+  }
+}

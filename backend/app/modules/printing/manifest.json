@@ -1,0 +1,31 @@
+{
+  "name": "printing",
+  "version": "0.4.0",
+  "inventari_min_version": "0.9.0",
+  "category": "integrations",
+  "display_name": "Label Printing",
+  "description": "Label pool management and QR/barcode PNG generation. Use the Inventari Print Agent for local printer integration.",
+  "icon": "printer",
+  "module_type": "core",
+  "requires": [],
+  "capabilities": [
+    "database",
+    "filesystem",
+    "process"
+  ],
+  "permissions": [
+    {
+      "key": "printing:agent",
+      "label_key": "printing:permissions.agent",
+      "description_key": "printing:permissions.agentDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    }
+  ],
+  "permission_action_exceptions": {
+    "printing:agent": "A part a machine plays rather than an action on the print queue: the print agent registers its printer, claims jobs, fetches their labels and reports how they went. It is one permission so that a key can be bound to exactly that work, which is what the printing API key scope is."
+  }
+}

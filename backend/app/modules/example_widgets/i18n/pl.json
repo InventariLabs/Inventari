@@ -1,0 +1,26 @@
+{
+  "navigation": {
+    "widgets": "Widgety"
+  },
+  "page": {
+    "title": "Widgety",
+    "description": "Zarządzaj widgetami — moduł referencyjny dla deweloperów Inventari."
+  },
+  "actions": {
+    "add": "Dodaj widget",
+    "edit": "Edytuj widget",
+    "delete": "Usuń widget",
+    "save": "Zapisz",
+    "cancel": "Anuluj"
+  },
+  "fields": {
+    "name": "Nazwa",
+    "color": "Kolor",
+    "quantity": "Ilość",
+    "created": "Utworzono"
+  },
+  "messages": {
+    "empty": "Brak widgetów. Stwórz pierwszy!",
+    "confirmDelete": "Na pewno chcesz usunąć ten widget?"
+  }
+}

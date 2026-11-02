@@ -1,0 +1,62 @@
+{
+  "name": "warehouse",
+  "version": "0.9.0",
+  "inventari_min_version": "0.9.0",
+  "category": "business",
+  "display_name": "Warehouse",
+  "description": "Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules.",
+  "icon": "file-check",
+  "module_type": "official",
+  "requires": [
+    "items",
+    "locations"
+  ],
+  "optional_requires": [
+    "approvals",
+    "purchase_orders"
+  ],
+  "capabilities": [
+    "database"
+  ],
+  "permissions": [
+    {
+      "key": "warehouse:read",
+      "label_key": "warehouse:permissions.read",
+      "description_key": "warehouse:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    },
+    {
+      "key": "warehouse:write",
+      "label_key": "warehouse:permissions.write",
+      "description_key": "warehouse:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "key": "warehouse:manage",
+      "label_key": "warehouse:permissions.manage",
+      "description_key": "warehouse:permissions.manageDesc",
+      "default_roles": [
+        "manager"
+      ]
+    },
+    {
+      "key": "warehouse:receive_over_tolerance",
+      "label_key": "warehouse:permissions.receiveOverTolerance",
+      "description_key": "warehouse:permissions.receiveOverToleranceDesc",
+      "default_roles": [
+        "manager"
+      ]
+    }
+  ],
+  "has_settings_schema": true,
+  "permission_action_exceptions": {
+    "warehouse:receive_over_tolerance": "An override of one rule, not an action on the warehouse's records: it lets a receipt post more than an order allows past its tolerance. It is granted apart from write, so a storekeeper can hold it without manage, and kept out of approve, so a later approval in this module does not carry it along."
+  }
+}

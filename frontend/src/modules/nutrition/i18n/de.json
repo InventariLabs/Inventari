@@ -1,0 +1,74 @@
+{
+  "title": "Lebensmittel- & Gesundheitsinfo",
+  "scanTable": "Tabelle scannen",
+  "noData": "Keine Daten für dieses Produkt verfügbar. Verwenden Sie die Schaltfläche 'Tabelle scannen', um Nährwerte und Zutaten mit der Kamera hinzuzufügen.",
+  "noDataRoutes": "Für dieses Produkt liegen noch keine Daten vor. Scannen Sie die Tabelle mit der Kamera oder tragen Sie die Werte unten ein.",
+  "noDataManual": "Für dieses Produkt liegen noch keine Daten vor. Tragen Sie die Werte unten ein.",
+  "noDataNone": "Für dieses Produkt liegen noch keine Daten vor.",
+  "nutriScore": "Nutri-Score",
+  "nutrientLevels": "Nährstoffgehalte",
+  "ingredients": "Zutaten / Info",
+  "energy": "Energie",
+  "proteins": "Proteine",
+  "fat": "Fett",
+  "fiber": "Ballaststoffe",
+  "levels": {
+    "sugars": {
+      "low": "Niedriger Zuckergehalt",
+      "moderate": "Moderater Zuckergehalt",
+      "high": "Hoher Zuckergehalt"
+    },
+    "salt": {
+      "low": "Niedriger Salzgehalt",
+      "moderate": "Moderater Salzgehalt",
+      "high": "Hoher Salzgehalt"
+    },
+    "fat": {
+      "low": "Niedriger Fettgehalt",
+      "moderate": "Moderater Fettgehalt",
+      "high": "Hoher Fettgehalt"
+    },
+    "saturated_fat": {
+      "low": "Niedriger Anteil gesättigter Fettsäuren",
+      "moderate": "Moderater Anteil gesättigter Fettsäuren",
+      "high": "Hoher Anteil gesättigter Fettsäuren"
+    }
+  },
+  "scanner": {
+    "title": "Nährwert-Scanner",
+    "subtitle": "Machen Sie ein Foto der Nährwerttabelle auf der Verpackung",
+    "howItWorksTitle": "Wie funktioniert es?",
+    "howItWorksDesc": "Machen Sie ein klares Foto der Tabelle „Nährwerte” auf der Verpackung. Die KI kann kcal und Makronährstoffe für Sie auslesen.",
+    "takePhoto": "FOTO AUFNEHMEN",
+    "success": "KI hat die Tabelle analysiert!",
+    "checkData": "Überprüfen Sie, ob die Daten unten korrekt sind.",
+    "energy": "Energie (kcal)",
+    "carbs": "Kohlenhydrate",
+    "sugars": "Zucker",
+    "salt": "Salz",
+    "retry": "Erneut versuchen",
+    "save": "Zum Produkt speichern",
+    "recognizing": "KI analysiert…",
+    "error": "Tabelle konnte nicht gelesen werden. Versuchen Sie ein klareres Foto.",
+    "saveSuccess": "Nährwertdaten gespeichert!",
+    "saveError": "Scan-Ergebnis konnte nicht gespeichert werden",
+    "howItWorksNoAi": "Machen Sie ein klares Foto der Tabelle „Nährwerte” auf der Verpackung. Ohne KI-Verbindung wird nichts automatisch ausgelesen — die Werte tragen Sie selbst ein."
+  },
+  "carbohydrates": "Kohlenhydrate",
+  "sugars": "Zucker",
+  "salt": "Salz",
+  "nutritionForm": {
+    "saved": "Nährwerte gespeichert",
+    "saveError": "Nährwerte konnten nicht gespeichert werden",
+    "title": "Werte manuell eingeben",
+    "hint": "Nährwerte pro 100 g/ml."
+  },
+  "source": {
+    "learnMore": "Mehr erfahren →",
+    "visionCapture": "Vom Etikett gelesen",
+    "communityNote": "Aus Open Food Facts, einer Community-Datenbank; die Werte sind daher eine Schätzung. Mit dem Etikett abgleichen."
+  },
+  "productPage": {
+    "title": "Nährwerte pro 100 g"
+  }
+}

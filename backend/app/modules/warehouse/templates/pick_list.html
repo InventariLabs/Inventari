@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page {
+      margin: 18mm 15mm 18mm 15mm;
+      @top-right {
+        content: counter(page) " / " counter(pages);
+        font-size: 8pt;
+        color: #999;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 10pt;
+      color: #222;
+      line-height: 1.4;
+    }
+    /* One code per dispatch: the scanner finds the document off the sheet. */
+    .documents {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4mm 8mm;
+      margin-bottom: 6mm;
+    }
+    .document { text-align: center; }
+    .document-number {
+      margin-top: 1mm;
+      font-family: 'DejaVu Sans Mono', monospace;
+      font-size: 8pt;
+      letter-spacing: 0.5pt;
+      color: #333;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #1a1a2e; color: #fff; }
+    thead th { padding: 5px 6px; text-align: left; font-size: 8pt; font-weight: 600; }
+    thead th.right { text-align: right; }
+    tbody tr { page-break-inside: avoid; border-bottom: 1px solid #ddd; }
+    tbody tr:nth-child(even) { background: #f7f7fb; }
+    tbody td { padding: 5px 6px; vertical-align: top; }
+    tbody td.right { text-align: right; }
+    /* The shelf is what a walker looks for first, so it is the biggest
+       thing on every row. */
+    .shelf-code {
+      font-size: 16pt;
+      font-weight: bold;
+      color: #1a1a2e;
+      white-space: nowrap;
+    }
+    .shelf-name { font-size: 8pt; color: #888; }
+    .quantity { font-size: 13pt; font-weight: bold; white-space: nowrap; }
+  </style>
+</head>
+<body>
+{% set print_title = labels.pick_list %}
+{% set print_subtitle = none %}
+{% include 'print_header.html' %}
+
+<div class="documents">
+  {% for document in documents %}
+  <div class="document">
+    <img class="code128" src="{{ document.code128_img }}" alt="{{ document.number }}"
+         style="width: {{ document.code128_width_mm }}mm; height: {{ document.code128_height_mm }}mm;" />
+    <div class="document-number">{{ document.number }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:38mm">{{ labels.shelf }}</th>
+      <th class="right" style="width:22mm">{{ labels.quantity }}</th>
+      <th style="width:14mm">{{ labels.unit }}</th>
+      <th>{{ labels.item }}</th>
+      {% if documents | length > 1 %}<th style="width:32mm">{{ labels.document }}</th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for line in pick_lines %}
+    <tr>
+      <td>
+        <div class="shelf-code">{{ line.shelf_code or '—' }}</div>
+        {% if line.shelf_name %}<div class="shelf-name">{{ line.shelf_name }}</div>{% endif %}
+      </td>
+      <td class="right quantity">{{ line.quantity | format_qty }}</td>
+      <td>{{ line.unit | unit_label if line.unit else '—' }}</td>
+      <td>
+        {{ line.name or '' }}
+        {% if line.sku %}<span style="color:#1a1a2e;font-size:9pt;font-weight:600;">{{ line.sku }}</span>{% endif %}
+        {% if line.lot %}<br/><span style="color:#888;font-size:8pt">{{ labels.batch }}: {{ line.lot }}</span>{% endif %}
+      </td>
+      {% if documents | length > 1 %}<td style="font-size:8pt;color:#555;">{{ line.document_number }}</td>{% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</body>
+</html>

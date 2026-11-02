@@ -1,0 +1,217 @@
+{
+  "enabled": "Activé",
+  "errors": {
+    "updateFailed": "Échec de la mise à jour du statut du module"
+  },
+  "success": {
+    "enabled": "Module {{name}} activé",
+    "disabled": "Module {{name}} désactivé"
+  },
+  "modules": {
+    "core": {
+      "title": "Maison & Cuisine",
+      "desc": "Réfrigérateur, garde-manger et produits de base."
+    },
+    "shopping_lists": {
+      "name": "Listes de courses",
+      "description": "Créez et gérez des listes de courses avec des suggestions automatiques."
+    },
+    "vision": {
+      "name": "Reconnaissance photo",
+      "description": "Lit le nom, la marque et la date de péremption d'un produit sur la photo de son étiquette. Désactivé, l'ajout d'un produit perd son onglet photo et les tableaux nutritionnels doivent être saisis à la main."
+    },
+    "stats": {
+      "name": "Statistiques",
+      "description": "Analyse avancée de la consommation et suivi du gaspillage."
+    },
+    "stock_takes": {
+      "name": "Inventaires",
+      "description": "Contrôles périodiques des stocks pour vérifier l'exactitude de l'inventaire."
+    },
+    "partners": {
+      "name": "Partenaires",
+      "description": "Gérez les fournisseurs, clients et prestataires de services pour les flux B2B."
+    },
+    "recipes": {
+      "name": "Recettes",
+      "description": "Créez et gérez des recettes avec suivi des ingrédients."
+    },
+    "equipment": {
+      "name": "Suivi des équipements",
+      "description": "Suivez les actifs informatiques et physiques avec gestion du cycle de vie."
+    },
+    "example_widgets": {
+      "name": "Widgets d'exemple",
+      "description": "Module de référence illustrant les patterns de modules Inventari : gérez de simples widgets avec nom, couleur et quantité."
+    },
+    "warehouse": {
+      "name": "Entrepôt",
+      "description": "Avec la caméra du téléphone ou un scanner : réceptionnez, sortez, déplacez et comptez le stock ; les documents numérotés se créent en arrière-plan — avec des règles de rangement."
+    },
+    "purchase_orders": {
+      "name": "Bons de commande",
+      "description": "Créez et suivez les bons de commande avec les fournisseurs."
+    },
+    "printing": {
+      "name": "Impression d'étiquettes",
+      "description": "Générez et imprimez des étiquettes pour les produits et les emplacements."
+    },
+    "nutrition": {
+      "name": "Informations nutritionnelles",
+      "description": "Affichez les données nutritionnelles et les ingrédients d'Open Food Facts."
+    },
+    "approvals": {
+      "name": "Approbations",
+      "description": "Flux d'approbation en plusieurs étapes pour les opérations critiques."
+    },
+    "webhooks": {
+      "name": "Webhooks",
+      "description": "Notifications HTTP sortantes sur les événements de votre espace de travail."
+    },
+    "api_keys": {
+      "name": "Clés API",
+      "description": "Accès programmatique via des clés d'API REST."
+    },
+    "maker": {
+      "name": "Fabrication",
+      "description": "Gestion de la fabrication et des nomenclatures."
+    },
+    "items": {
+      "name": "Inventaire"
+    }
+  },
+  "config": {
+    "connectionsTitle": "Connexions IA",
+    "connectionsDescription": "Réservoir de connexions LLM partagé entre les modules. Associez-en une à chaque objectif ci-dessous.",
+    "addConnection": "Ajouter une connexion",
+    "editConnection": "Modifier la connexion",
+    "deleteConnection": "Supprimer la connexion",
+    "deleteConfirm": "Supprimer « {{name}} » ? Cette action est irréversible.",
+    "delete": "Supprimer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "formDescription": "Configurez un point de terminaison LLM. Le réservoir est partagé entre toutes les fonctionnalités IA.",
+    "fieldName": "Nom",
+    "fieldNamePlaceholder": "ex. Capteur de l'étagère du garde-manger",
+    "fieldProvider": "Fournisseur",
+    "fieldApiKey": "Clé API",
+    "fieldApiKeyDocs": "Où obtenir votre clé {{provider}}",
+    "fieldApiKeyPlaceholder": "sk-or-v1-…",
+    "fieldBaseUrl": "URL de base de l'API",
+    "localEngineHint": "Un moteur local écoute sur une adresse privée, que le serveur refuse tant qu'un opérateur ne l'autorise pas : définissez LLM_ALLOW_PRIVATE_NETWORKS=true et redémarrez le backend. Conservez l'adresse host.docker.internal — depuis le conteneur, localhost désigne le conteneur lui-même.",
+    "fieldModel": "Modèle",
+    "fieldCapabilities": "Capacités",
+    "capability": {
+      "vision": "Vision",
+      "text": "Texte",
+      "url_fetch": "Lecture de pages"
+    },
+    "noConnections": "Aucune connexion",
+    "noConnectionsHint": "Ajoutez une connexion pour utiliser les fonctionnalités IA (Vision, Recettes, …).",
+    "bindingsTitle": "Par défaut par objectif",
+    "boundHere": "Actif pour cet objectif",
+    "noBinding": "Non configuré",
+    "cannotDeleteBound": "Cette connexion est associée à un objectif. Détachez-la d'abord.",
+    "noEligibleConnections": "Aucune connexion avec la capacité « {{capability}} ».",
+    "noEligibleConnectionsCta": "En configurer une",
+    "serverDefaultOption": "Modèle par défaut du serveur",
+    "serverDefaultHint": "Pris en charge par le modèle par défaut du serveur. Choisissez une connexion pour utiliser la vôtre.",
+    "noConnectionsServerDefaultHint": "Certaines fonctionnalités IA fonctionnent déjà avec le modèle par défaut du serveur. Ajoutez une connexion pour utiliser la vôtre.",
+    "createFailed": "Impossible de créer la connexion",
+    "updateFailed": "Impossible de mettre à jour la connexion",
+    "deleteFailed": "Impossible de supprimer la connexion",
+    "bindingFailed": "Impossible de mettre à jour l'association",
+    "deleteSuccess": "Connexion supprimée",
+    "loading": "Chargement des connexions…",
+    "errorNameRequired": "Le nom est requis",
+    "errorNameTaken": "Une connexion portant ce nom existe déjà",
+    "errorCapabilityRequired": "Sélectionnez au moins une capacité",
+    "groupCloud": "Cloud",
+    "groupAggregator": "Agrégateur",
+    "groupSpecialist": "Spécialisé",
+    "groupLocal": "Local",
+    "groupCustom": "Personnalisé",
+    "testConnection": "Tester la connexion",
+    "testing": "Test…",
+    "testFailed": "Échec du test. Vérifiez la clé et l'URL.",
+    "testNeedsApiKey": "Saisissez d'abord la clé API ci-dessus — le test envoie ce que contient ce formulaire, pas une clé enregistrée.",
+    "testNeedsBaseUrl": "Renseignez d'abord l'URL de base de l'API ci-dessus — ce fournisseur est joint par HTTP, le test a donc besoin de son adresse.",
+    "testContractOk": "La connexion fonctionne — le modèle a répondu dans la forme attendue. {{count}} modèles disponibles.",
+    "testReadAll": "La connexion fonctionne — le modèle a lu les {{of}} champs de l'étiquette de référence.",
+    "testReadPartial": "La réponse avait la bonne forme, mais le modèle n'a lu que {{matched}} champs sur {{of}} de l'étiquette de référence — il invente peut-être des valeurs qu'il n'a pas vues.",
+    "testContractOk_one": "La connexion fonctionne — le modèle a lu l'étiquette de référence. {{count}} modèle disponible.",
+    "testContractOk_other": "La connexion fonctionne — le modèle a lu l'étiquette de référence. {{count}} modèles disponibles.",
+    "testContractFailed": "La clé fonctionne, mais le modèle n'a pas renvoyé de données exploitables. Il a répondu : {{preview}}",
+    "testUnchecked": "Les identifiants fonctionnent — {{count}} modèles disponibles. La forme de la réponse n'a pas été vérifiée pour ces capacités.",
+    "testUnchecked_one": "Les identifiants fonctionnent — {{count}} modèle disponible. La forme de la réponse n'a pas été vérifiée pour ces capacités.",
+    "testUnchecked_other": "Les identifiants fonctionnent — {{count}} modèles disponibles. La forme de la réponse n'a pas été vérifiée pour ces capacités.",
+    "testShapeNotEnforced": "Ce fournisseur n'impose pas la forme de la réponse : le résultat repose sur l'analyseur et une nouvelle tentative. Cela peut échouer plus tard.",
+    "testReaderOk": "La clé fonctionne — le lecteur a récupéré une page de test.",
+    "testReaderFreeTier": "Aucune clé sur cette connexion — elle tourne sur le palier gratuit du lecteur, rien à tester.",
+    "testReaderEmpty": "La clé fonctionne, mais le lecteur n'a rien rapporté de la page de test.",
+    "providerName": {
+      "custom": "Personnalisé (compatible OpenAI)"
+    },
+    "providerDescription": {
+      "openai": "GPT-4o, GPT-4o-mini. Multimodal.",
+      "anthropic": "Modèles Claude. Multimodal, vision incluse.",
+      "google": "Gemini 2.0 Flash / Pro. Palier gratuit disponible.",
+      "openrouter": "Plus de 100 modèles avec une seule clé.",
+      "groq": "Inférence la plus rapide. Llama, Mixtral.",
+      "deepseek": "DeepSeek V3 / R1.",
+      "mistral": "Mistral Large, Codestral.",
+      "together": "Hébergement de modèles open source.",
+      "xai": "Modèles Grok. Multimodal.",
+      "minimax": "MiniMax-M3 (contexte 1M, multimodal). Accessible depuis la Chine.",
+      "glm": "GLM-4V, multimodal. Palier gratuit via glm-4v-flash. Référence en Chine.",
+      "mimo": "MiMo-V2.5 (310B MoE, multimodal). Modèle de raisonnement phare de Xiaomi.",
+      "jina": "Lit une page web comme texte propre — c'est ce que l'import de recettes utilise.",
+      "ollama": "Serveur local compatible OpenAI sur le port 11434.",
+      "lm_studio": "Serveur local compatible OpenAI sur le port 1234.",
+      "vllm": "Serveur compatible OpenAI auto-hébergé.",
+      "custom": "Tout autre point de terminaison au format OpenAI."
+    },
+    "fieldCapabilitiesHint": "Ce que ce modèle peut faire. Les cases cochées sont une suggestion du fournisseur — le test de connexion tranche.",
+    "purposeUnavailable": "Module désactivé",
+    "purposeUnavailableHint": "Cet usage appartient au module {{module}}, qui est désactivé. Une association prendra effet dès son activation.",
+    "capabilityUnverified": "Déclarée, pas encore vérifiée — lancez le test de connexion",
+    "capabilityConfirmed": "Confirmée par le test de connexion",
+    "capabilityFailed": "Le modèle a échoué à ce test",
+    "capabilityFailedHint": "Le modèle n'a pas tenu ce que cette connexion annonce. Tant que le test n'est pas réussi, elle n'est pas proposée pour les usages qui en ont besoin.",
+    "connectionFailedCapability": "{{names}} ne figure pas dans cette liste : le test « {{capability}} » a échoué."
+  },
+  "fieldBuilder": {
+    "title": "Définitions de champs personnalisés",
+    "fieldsCount": "{{count}} champs définis",
+    "fieldsCount_one": "{{count}} champ défini",
+    "fieldsCount_other": "{{count}} champs définis",
+    "fieldLabel": "Étiquette du champ",
+    "placeholder": "ex. Tension",
+    "dataType": "Type de données",
+    "addField": "Ajouter un champ",
+    "addCustomField": "Ajouter un champ personnalisé",
+    "types": {
+      "text": "Texte",
+      "number": "Nombre",
+      "date": "Date",
+      "textarea": "Texte long",
+      "file": "Fichier / Pièce jointe",
+      "money": "Argent",
+      "select": "Liste déroulante",
+      "multi-select": "Sélection multiple",
+      "boolean": "Oui / Non"
+    },
+    "options": {
+      "label": "Options",
+      "placeholder": "Ajouter une option et appuyer sur Entrée",
+      "empty": "Au moins une option est requise",
+      "remove": "Retirer l’option {{name}}"
+    },
+    "errors": {
+      "alreadyExists": "Un champ avec ce nom existe déjà",
+      "optionsRequired": "Ce type de champ nécessite au moins une option"
+    }
+  },
+  "disabled": "Désactivé"
+}

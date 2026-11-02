@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "agent": "Atuar como agente de impressão",
+    "agentDesc": "Pode registrar uma impressora, receber seus trabalhos de impressão, buscar as etiquetas e informar como foram — o que o Inventari Print Agent faz"
+  }
+}

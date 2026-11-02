@@ -1,0 +1,5 @@
+{
+  "campaign_cannot_delete_launched": "Eine gestartete Kampagne kann nicht gelöscht werden — brechen Sie sie stattdessen ab.",
+  "campaign_already_completed": "Die Kampagne ist bereits abgeschlossen.",
+  "campaign_already_cancelled": "Die Kampagne ist bereits abgebrochen."
+}

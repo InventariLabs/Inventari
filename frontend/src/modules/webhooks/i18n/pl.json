@@ -1,0 +1,177 @@
+{
+  "title": "Webhooki",
+  "subtitle": "Wychodzące powiadomienia HTTP o zdarzeniach w obszarze roboczym.",
+  "addWebhook": "Dodaj webhook",
+  "noWebhooks": "Brak skonfigurowanych webhooków",
+  "noWebhooksDescription": "Dodaj webhook, aby wysyłać powiadomienia HTTP, gdy wystąpią zdarzenia.",
+  "inactive": "Nieaktywny",
+  "inactiveCircuitBreaker": "Nieaktywny (circuit breaker)",
+  "inactiveModuleDisabled": "Nieaktywny (moduł wyłączony)",
+  "unknownEvents": "Nieznane nazwy zdarzeń",
+  "failuresSinceSuccess_one": "1 nieudana dostawa od ostatniej udanej.",
+  "failuresSinceSuccess_few": "{{count}} nieudane dostawy od ostatniej udanej.",
+  "failuresSinceSuccess_many": "{{count}} nieudanych dostaw od ostatniej udanej.",
+  "failuresSinceSuccess_other": "{{count}} nieudanej dostawy od ostatniej udanej.",
+  "consecutiveFailures": "Kolejne błędy",
+  "test": "Testuj",
+  "reactivate": "Reaktywuj",
+  "thresholdLink": "Ustaw próg błędów",
+  "delete": "Usuń",
+  "edit": "Edytuj",
+  "logs": "Logi dostarczeń",
+  "form": {
+    "titleCreate": "Dodaj webhook",
+    "titleEdit": "Edytuj webhook",
+    "namePlaceholder": "np. kanał incydentów na Slacku",
+    "url": "URL docelowy",
+    "urlPlaceholder": "https://example.com/webhook",
+    "secret": "Sekret (HMAC-SHA256)",
+    "secretPlaceholder": "Puste = brak podpisywania",
+    "secretMasked": "Sekret jest ustawiony (zostaw puste, aby zachować, lub wpisz nowy)",
+    "httpMethod": "Metoda HTTP",
+    "eventTypes": "Typy zdarzeń",
+    "eventTypesPlaceholder": "Wybierz zdarzenia do subskrypcji",
+    "maxRetries": "Maks. ponowień",
+    "timeoutSeconds": "Timeout (sekundy)",
+    "isActive": "Aktywny",
+    "urlHint": "Adres musi być osiągalny z internetu. Adresy prywatne i lokalne są odrzucane, chyba że operator tej instalacji je dopuści.",
+    "insecureUrlWarning": "Bez HTTPS dane jadą otwartym tekstem — przeczyta je wszystko po drodze.",
+    "noSecretWarning": "Bez sekretu odbiorca nie odróżni Twoich danych od cudzych.",
+    "eventNeedsModule": "wymaga modułu {{module}}",
+    "withdrawnEvents": "Nie ma ich już w katalogu",
+    "withdrawnEventsHint": "Te nazwy zniknęły z katalogu zdarzeń, więc nigdy nie zadziałają. Odznacz je i zapisz, aby usunąć subskrypcję.",
+    "eventsSelected": "(wybrano {{count}})",
+    "eventsSelected_one": "(wybrano {{count}})",
+    "eventsSelected_few": "(wybrano {{count}})",
+    "eventsSelected_many": "(wybrano {{count}})",
+    "eventsSelected_other": "(wybrano {{count}})"
+  },
+  "delivery": {
+    "title": "Logi dostarczeń",
+    "empty": "Brak dostarczeń",
+    "error": "Błąd",
+    "success": "Sukces",
+    "failed": "Błąd",
+    "pendingRetry": "Oczekuje na ponowienie",
+    "payload": "Payload",
+    "response": "Odpowiedź",
+    "nextRetry": "Następne ponowienie",
+    "page": "Strona {{page}}",
+    "close": "Zamknij",
+    "pending": "Wysyłanie",
+    "targetResponse": "Odpowiedź odbiorcy",
+    "truncated": "skrócono",
+    "abandonedByApp": "Porzucone przez Inventari — odbiorca nie odpowiedział",
+    "deliveryId": "Identyfikator doręczenia",
+    "abandon": {
+      "circuitBreaker": "Bezpiecznik odciął ten endpoint po powtarzających się porażkach.",
+      "webhookDisabled": "Endpoint został wyłączony ręcznie przez administratora.",
+      "webhookDeleted": "Endpoint został usunięty.",
+      "moduleDisabled": "Moduł webhooks jest wyłączony dla tej organizacji."
+    }
+  },
+  "testResult": {
+    "success": "Test ping wysłany pomyślnie ({{status}})",
+    "successStillOff": "Test ping przeszedł ({{status}}), ale ten webhook nadal jest wyłączony. Reaktywuj go, żeby wznowić dostawy.",
+    "failure": "Test ping nie powiódł się: {{error}}",
+    "rejected": "Test ping nie powiódł się: odbiorca odpowiedział {{status}}. Pełna odpowiedź jest w dzienniku dostaw."
+  },
+  "confirmDelete": "Usunąć webhook „{{name}}”?",
+  "confirmDeleteDescription": "Spowoduje to trwałe usunięcie webhooka i wszystkich jego logów.",
+  "deleteSuccess": "Webhook usunięty",
+  "reactivateSuccess": "Webhook reaktywowany",
+  "createSuccess": "Webhook utworzony",
+  "updateSuccess": "Webhook zaktualizowany",
+  "never": "Nigdy",
+  "statusActive": "Aktywny",
+  "statusFailing": "Z błędami",
+  "unknownError": "Nieznany błąd",
+  "navigation": {
+    "webhooks": "Webhooki"
+  },
+  "circuitBreakerWarning_one": "Ten webhook został automatycznie wyłączony po 1 kolejnym błędzie — przyczyna ostatniej próby jest zapisana w logach dostarczeń.",
+  "circuitBreakerWarning_few": "Ten webhook został automatycznie wyłączony po {{count}} kolejnych błędach — przyczyna ostatniej próby jest zapisana w logach dostarczeń.",
+  "circuitBreakerWarning_many": "Ten webhook został automatycznie wyłączony po {{count}} kolejnych błędach — przyczyna ostatniej próby jest zapisana w logach dostarczeń.",
+  "circuitBreakerWarning_other": "Ten webhook został automatycznie wyłączony po {{count}} kolejnych błędach — przyczyna ostatniej próby jest zapisana w logach dostarczeń.",
+  "eventsWhileOff": "Zdarzenia, które wystąpią, gdy webhook jest wyłączony, nie są dostarczane, kolejkowane ani zapisywane w logach, Reaktywuj ich nie odtwarza.",
+  "settings": {
+    "logRetentionDays": "Przechowywanie logów (dni)",
+    "logRetentionDaysDescription": "Jak długo przechowywać logi dostaw webhooków.",
+    "circuitBreakerThreshold": "Próg wyłącznika",
+    "circuitBreakerThresholdDescription": "Automatycznie wyłącz webhook po tej liczbie kolejnych nieudanych prób. Każda próba liczy się osobno — pierwsze doręczenie, każde ponowienie i przycisk Test zasilają ten sam licznik."
+  },
+  "events": {
+    "category": {
+      "created": "Kategoria została utworzona",
+      "deleted": "Kategoria została usunięta",
+      "updated": "Kategoria została zmieniona"
+    },
+    "document": {
+      "cancelled": "Dokument został anulowany",
+      "completed": "Dokument został zrealizowany",
+      "confirmed": "Dokument został potwierdzony"
+    },
+    "equipment": {
+      "checkin": "Sprzęt został zwrócony",
+      "checkout": "Sprzęt został wydany"
+    },
+    "item": {
+      "consumed": "Produkt został zużyty (stan zmniejszony)",
+      "created": "Produkt trafił na stan",
+      "deactivated": "Produkt został zdezaktywowany",
+      "deleted": "Produkt został usunięty",
+      "discarded": "Produkt trafił do odpadów",
+      "disposed": "Produkt został spisany ze stanu",
+      "moved": "Produkt zmienił miejsce",
+      "status_changed": "Produkt zmienił status",
+      "transferred": "Produkt został przeniesiony do innego miejsca",
+      "updated": "Produkt został zmieniony",
+      "used": "Produkt został zużyty do końca"
+    },
+    "label": {
+      "assigned": "Etykieta została przypisana do produktu",
+      "batch_exported": "Partia etykiet została wyeksportowana do druku",
+      "batch_generated": "Wygenerowano partię etykiet",
+      "scanned": "Etykieta została zeskanowana"
+    },
+    "location": {
+      "created": "Miejsce zostało utworzone",
+      "deleted": "Miejsce zostało usunięte",
+      "updated": "Miejsce zostało zmienione"
+    },
+    "module": {
+      "disabled": "Moduł został wyłączony w organizacji",
+      "enabled": "Moduł został włączony w organizacji"
+    },
+    "organization": {
+      "created": "Organizacja została utworzona",
+      "updated": "Organizacja została zaktualizowana"
+    },
+    "partner": {
+      "activated": "Kontrahent został aktywowany",
+      "deactivated": "Kontrahent został dezaktywowany"
+    },
+    "purchase_order": {
+      "cancelled": "Zamówienie zakupu zostało anulowane",
+      "completed": "Zamówienie zakupu zostało zrealizowane",
+      "confirmed": "Zamówienie zakupu zostało potwierdzone"
+    },
+    "receipt": {
+      "created_from_po": "Z zamówienia zakupu powstało przyjęcie"
+    },
+    "recipe": {
+      "created": "Przepis został utworzony",
+      "meal_plan_generated": "Wygenerowano jadłospis",
+      "picking_completed": "Kompletacja składników przepisu zakończona"
+    },
+    "user": {
+      "joined_organization": "Użytkownik dołączył do organizacji",
+      "left_organization": "Użytkownik opuścił organizację",
+      "registered": "Zarejestrował się nowy użytkownik"
+    }
+  },
+  "pagination": {
+    "prev": "‹ Poprzednia",
+    "next": "Następna ›"
+  }
+}

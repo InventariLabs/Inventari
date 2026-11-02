@@ -1,0 +1,528 @@
+# The project name is pinned: Compose names every volume <project>_<volume>
+# and would otherwise take the project from the checkout directory, so an
+# install cloned anywhere but /opt/inventari would hold differently named
+# volumes. COMPOSE_PROJECT_NAME and `-p` still override it (the dev stacks
+# rely on that).
+name: inventari
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+      - WWW_DOMAIN=${WWW_DOMAIN:-http://www.unused.invalid}
+      - DEMO_DOMAIN=${DEMO_DOMAIN:-http://demo.unused.invalid}
+      - DEMO_UPSTREAM=${DEMO_UPSTREAM:-demo-caddy:80}
+      - ACME_EMAIL=${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    # `edge` is how this Caddy reaches a demo stack on the same host
+    # (DEMO_DOMAIN): the demo's Caddy joins it too, publishing no port.
+    networks:
+      - app-network
+      - edge
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    # What the database may use on this host: DB_MEM_LIMIT, with
+    # DB_SHARED_BUFFERS and DB_EFFECTIVE_CACHE_SIZE set to match
+    # (DEPLOYMENT.md, "Sizing the services to the host"). The defaults are
+    # what the file always shipped.
+    #
+    # `jit=off`: PostgreSQL compiles a statement to machine code once its
+    # estimated cost passes `jit_above_cost`, and a list read over a large
+    # organization passes it. Measured at 100 000 products, the compiling
+    # took 0.3-1 s of each such statement and the statements then ran in
+    # less; nothing this application asks runs long enough to earn it back.
+    mem_limit: ${DB_MEM_LIMIT:-2g}
+    command: >
+      postgres
+      -c max_connections=50
+      -c jit=off
+      -c shared_buffers=${DB_SHARED_BUFFERS:-512MB}
+      -c effective_cache_size=${DB_EFFECTIVE_CACHE_SIZE:-2GB}
+      -c maintenance_work_mem=128MB
+      -c work_mem=16MB
+      -c wal_buffers=16MB
+      -c checkpoint_completion_target=0.9
+      -c min_wal_size=256MB
+      -c max_wal_size=1GB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+      -c max_worker_processes=4
+      -c max_parallel_workers=4
+      -c max_parallel_workers_per_gather=2
+      -c max_parallel_maintenance_workers=2
+      -c log_min_duration_statement=500
+    environment:
+      POSTGRES_DB: ${DB_NAME:-inventari_db}
+      POSTGRES_USER: ${DB_USER:-inventari_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-inventari_user} -d ${DB_NAME:-inventari_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # The application does not connect as DB_USER. The postgres image
+  # makes that role the bootstrap superuser, which can never lose SUPERUSER,
+  # so it stays the administrator (this service, backups, restores) and the
+  # application connects as DB_APP_USER: owner of the database and its schema,
+  # no SUPERUSER, CREATEDB or CREATEROLE. This one-shot service creates that
+  # role and hands it what it does not own yet — on an existing install, every
+  # table the old superuser owned — on each start, before PgBouncer and the
+  # backend. docker/postgres/app-role.sh says what it does and why.
+  db-app-role:
+    image: postgres:17-alpine
+    restart: "no"
+    environment:
+      PGHOST: db
+      PGUSER: ${DB_USER:-inventari_user}
+      PGPASSWORD: ${DB_PASSWORD}
+      PGDATABASE: ${DB_NAME:-inventari_db}
+      DB_APP_USER: ${DB_APP_USER:-inventari_app}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?set DB_APP_PASSWORD in .env — the application's database password, see DEPLOYMENT.md}
+    volumes:
+      - ./docker/postgres/app-role.sh:/app-role.sh:ro
+    command: ["sh", "/app-role.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # With AGE_RECIPIENT set, dumps are piped through age before they
+  # touch this volume, so ./backups holds ciphertext only. It is a PUBLIC key
+  # — the host can create backups but cannot read them; the private key stays
+  # off the server and is needed only to restore. Left empty, the stack still
+  # starts and the dumps are plain gzip, with a warning at every run: the key
+  # is a choice, made knowingly (`make backup-key`), not a startup gate.
+  # Key generation, restore and `make backup-verify`: DEPLOYMENT.md,
+  # "Database Backups".
+  #
+  # The same run archives the uploaded files (uploads_data, the backend's
+  # /app/uploads) under the same key: a database restored without them points
+  # at photographs and attachments that are gone. The volume is mounted
+  # read-only — the backup only ever reads it.
+  db-backup:
+    build:
+      context: ./docker/backup
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: ${DB_NAME:-inventari_db}
+      POSTGRES_USER: ${DB_USER:-inventari_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      AGE_RECIPIENT: ${AGE_RECIPIENT:-}
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 6
+      BACKUP_HOUR: 2
+    volumes:
+      - ./backups:/backups
+      - uploads_data:/uploads:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      # Unhealthy once no dump, or no archive of the files, has been written
+      # for 26 hours — a stale backup volume is a silent failure until the
+      # day it is needed. -type f: the -latest links beside them in last/ are
+      # not backups, and one left behind by a deleted file would read as fresh.
+      test: ["CMD-SHELL", "find /backups/last -maxdepth 1 -type f \\( -name '*.sql.gz' -o -name '*.sql.gz.age' \\) -mmin -1560 | grep -q . && find /backups/last -maxdepth 1 -type f \\( -name '*.tar.gz' -o -name '*.tar.gz.age' \\) -mmin -1560 | grep -q ."]
+      interval: 1h
+      timeout: 10s
+      retries: 3
+      start_period: 5m
+
+  # Optional off-host copy. It syncs the already-encrypted dumps and file
+  # archives in ./backups to an rclone remote, so losing the host does not lose the
+  # backups; a plain remote is enough, because the payload is ciphertext
+  # (rclone crypt would encrypt it twice). Only `*.age` files ever leave the
+  # host: it refuses to run without AGE_RECIPIENT, and the filter keeps a
+  # plain dump left from before the key out of the copy too. Enable it with
+  # `--profile offsite` and set up rclone.conf + BACKUP_RCLONE_REMOTE as
+  # described in DEPLOYMENT.md.
+  db-backup-offsite:
+    image: rclone/rclone:1.75.1
+    profiles: ["offsite"]
+    restart: unless-stopped
+    environment:
+      RCLONE_CONFIG: /config/rclone.conf
+      BACKUP_RCLONE_REMOTE: ${BACKUP_RCLONE_REMOTE:-}
+      AGE_RECIPIENT: ${AGE_RECIPIENT:-}
+    volumes:
+      - ./backups:/backups:ro
+      - ./rclone.conf:/config/rclone.conf:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        if [ -z "$$BACKUP_RCLONE_REMOTE" ]; then
+          echo "BACKUP_RCLONE_REMOTE is empty — set it in .env (see DEPLOYMENT.md)" >&2;
+          exit 1;
+        fi;
+        if [ -z "$$AGE_RECIPIENT" ]; then
+          echo "AGE_RECIPIENT is empty — the backups are not encrypted, and only encrypted ones leave the host. Run 'make backup-key' (see DEPLOYMENT.md)" >&2;
+          exit 1;
+        fi;
+        while :; do
+          rclone sync /backups "$$BACKUP_RCLONE_REMOTE" --include "*.age" --copy-links --log-level INFO;
+          sleep 3600;
+        done
+
+  products-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    mem_limit: 1g
+    profiles: ["food"]
+    command: >
+      postgres
+      -c max_connections=20
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c maintenance_work_mem=64MB
+      -c work_mem=4MB
+      -c wal_buffers=4MB
+      -c checkpoint_completion_target=0.9
+      -c min_wal_size=128MB
+      -c max_wal_size=512MB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+      -c max_worker_processes=2
+      -c max_parallel_workers=2
+      -c max_parallel_workers_per_gather=1
+      -c max_parallel_maintenance_workers=1
+    environment:
+      POSTGRES_DB: ${PRODUCTS_DB_NAME:-products_db}
+      POSTGRES_USER: ${PRODUCTS_DB_USER:-products_user}
+      POSTGRES_PASSWORD: ${PRODUCTS_DB_PASSWORD}
+    volumes:
+      - products_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PRODUCTS_DB_USER:-products_user} -d ${PRODUCTS_DB_NAME:-products_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # The same split as the main database (see db-app-role above): the postgres
+  # image makes PRODUCTS_DB_USER the bootstrap superuser, which can never give
+  # the attribute up, so it stays the administrator (this profile's setup and
+  # imports) and the application reaches the products database as
+  # PRODUCTS_DB_APP_USER — owner of the schema, no SUPERUSER, so an injection
+  # through the nutrition engine gets COPY ... TO PROGRAM and pg_read_file
+  # nowhere. docker/postgres/app-role.sh is the same script; only the
+  # variables it is handed differ. PROFILE-CONDITIONAL on purpose: compose
+  # interpolates the whole file before it looks at profiles, so an unset
+  # PRODUCTS_DB_APP_PASSWORD is a blank here and a refusal inside the script
+  # on the first start with `--profile food`, not a stack that will not start
+  # on an install that never wanted this profile.
+  products-app-role:
+    image: postgres:17-alpine
+    restart: "no"
+    profiles: ["food"]
+    environment:
+      PGHOST: products-db
+      PGUSER: ${PRODUCTS_DB_USER:-products_user}
+      PGPASSWORD: ${PRODUCTS_DB_PASSWORD}
+      PGDATABASE: ${PRODUCTS_DB_NAME:-products_db}
+      DB_APP_USER: ${PRODUCTS_DB_APP_USER:-products_app}
+      DB_APP_PASSWORD: ${PRODUCTS_DB_APP_PASSWORD:-}
+    volumes:
+      - ./docker/postgres/app-role.sh:/app-role.sh:ro
+    command: ["sh", "/app-role.sh"]
+    depends_on:
+      products-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # Valkey, not Redis — see the note in docker-compose.yml. Switching an
+  # existing deployment needs the volumes dropped: Valkey 8 refuses an RDB
+  # written by Redis 7.4 ("Can't handle RDB format version 12"). DEPLOYMENT.md
+  # has the procedure, including what losing the blacklist means.
+  redis:
+    image: valkey/valkey:9.1.2-alpine
+    restart: unless-stopped
+    mem_limit: 512m
+    # These instances hold the JWT blacklist and the rate-limit
+    # counters. They have no published ports, but network isolation was the
+    # only thing protecting them — anything that reaches app-network could
+    # read or flush revoked tokens.
+    command: >
+      valkey-server
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+      --maxmemory 384mb
+      --maxmemory-policy allkeys-lru
+      --save 3600 1
+      --save 300 100
+      --tcp-keepalive 60
+    environment:
+      # Consumed by the healthcheck below (valkey-cli -a).
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # S7: dedicated instance for eviction-critical keys (JWT blacklist, rate
+  # limiter). noeviction guarantees an LRU flush on the main instance can
+  # never drop revoked tokens (fail-open) or limiter buckets. Small footprint
+  # is intentional — these keys are tiny and TTL-bound.
+  redis-critical:
+    image: valkey/valkey:9.1.2-alpine
+    restart: unless-stopped
+    mem_limit: 96m
+    command: >
+      valkey-server
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+      --maxmemory 64mb
+      --maxmemory-policy noeviction
+      --save 900 1
+      --tcp-keepalive 60
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    volumes:
+      - redis_critical_data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgbouncer-main:
+    image: edoburu/pgbouncer:v1.25.2-p0
+    restart: unless-stopped
+    environment:
+      DB_USER: "${DB_APP_USER:-inventari_app}"
+      DB_PASSWORD: "${DB_APP_PASSWORD}"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: "${DB_NAME:-inventari_db}"
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 300
+      DEFAULT_POOL_SIZE: 30
+      MIN_POOL_SIZE: 4
+      RESERVE_POOL_SIZE: 5
+      IGNORE_STARTUP_PARAMETERS: extra_float_digits
+      AUTH_TYPE: scram-sha-256
+      LOG_CONNECTIONS: 0
+      LOG_DISCONNECTIONS: 0
+      LOG_POOLER_ERRORS: 1
+    depends_on:
+      db:
+        condition: service_healthy
+      db-app-role:
+        condition: service_completed_successfully
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 5432 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # BACKEND_MEM_LIMIT is what the workers share. A worker that has grown
+    # BACKEND_WORKER_MAX_GROWTH_MB past its start-up size, or sits idle
+    # BACKEND_WORKER_IDLE_RECYCLE_SECONDS more than a quarter over it, is
+    # replaced (backend/app/core/worker_recycle.py). The limits follow the
+    # host (DEPLOYMENT.md, "Sizing the services to the host"); the defaults
+    # are what the file always shipped.
+    mem_limit: ${BACKEND_MEM_LIMIT:-1536m}
+    # --forwarded-allow-ips: trust X-Forwarded-For from Caddy (the only hop;
+    # the backend port is not published outside app-network) so
+    # request.client.host is the real client IP and rate limiting buckets
+    # per client instead of one shared bucket per instance.
+    #
+    # The default stays '*' because that trust rests on 8000 not being
+    # published, not on the list — and a wrong list is silent: every request
+    # would bucket to the proxy's address, so one client's brute force would
+    # consume everyone's rate limit. FORWARDED_ALLOW_IPS is there for a
+    # deployment that does expose the port, or that puts something else in
+    # front, and can name the hop it actually has.
+    # --config gunicorn.conf.py: gives the arbiter the same log format as the
+    # app (replaces --access-logfile/--error-logfile, see backend/log_config.yaml).
+    command: gunicorn app.main:app --config gunicorn.conf.py --worker-class uvicorn.workers.UvicornWorker --workers ${WEB_CONCURRENCY:-4} --bind 0.0.0.0:8000 --timeout 300 --graceful-timeout 30 --forwarded-allow-ips "${FORWARDED_ALLOW_IPS:-*}"
+    environment:
+      # DB_APP_USER, not DB_USER: the application role has no SUPERUSER (see
+      # db-app-role above). Migrations run as it too — it owns the schema.
+      DATABASE_URL: postgresql://${DB_APP_USER:-inventari_app}:${DB_APP_PASSWORD}@pgbouncer-main:5432/${DB_NAME:-inventari_db}
+      # Migrations bypass PgBouncer. entrypoint.sh serialises replicas with
+      # pg_advisory_lock, which is session-scoped: through a transaction pooler
+      # the lock and the unlock can land on different server connections,
+      # leaving a lock nobody holds and every other replica waiting on it. Only
+      # the entrypoint reads this — the application keeps using the pooler.
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-*}
+      MIGRATION_DATABASE_URL: postgresql://${DB_APP_USER:-inventari_app}:${DB_APP_PASSWORD}@db:5432/${DB_NAME:-inventari_db}
+      PRODUCTS_DATABASE_URL: ${PRODUCTS_DATABASE_URL:-}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      REDIS_CRITICAL_URL: redis://:${REDIS_PASSWORD}@redis-critical:6379
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      # The default model for an organization that names none (config.py,
+      # llm/registry.py). Listed for the reason noted below: this service has
+      # no `env_file:`, so a variable the example documents and this block
+      # does not name never reaches the container — which is how LLM_MODEL
+      # shipped, an operator setting it to no effect at all, and how a
+      # DeepSeek key in .env went on being sent to OpenRouter's address.
+      LLM_PROVIDER: ${LLM_PROVIDER:-openrouter}
+      LLM_API_BASE_URL: ${LLM_API_BASE_URL:-https://openrouter.ai/api/v1}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_CAPABILITIES: ${LLM_CAPABILITIES:-}
+      LLM_REQUEST_TIMEOUT_SECONDS: ${LLM_REQUEST_TIMEOUT_SECONDS:-60}
+      LLM_LOCAL_REQUEST_TIMEOUT_SECONDS: ${LLM_LOCAL_REQUEST_TIMEOUT_SECONDS:-300}
+      # Where uploads live. Listed because this service has no `env_file:`: a
+      # name that is not here never reaches the container, so `s3` in .env
+      # alone left the files on local disk (docs/subsystems/FILE_STORAGE.md).
+      FILE_STORAGE_BACKEND: ${FILE_STORAGE_BACKEND:-local}
+      FILE_STORAGE_LOCAL_PATH: ${FILE_STORAGE_LOCAL_PATH:-/app/uploads}
+      FILE_STORAGE_S3_BUCKET: ${FILE_STORAGE_S3_BUCKET:-}
+      FILE_STORAGE_S3_ACCESS_KEY: ${FILE_STORAGE_S3_ACCESS_KEY:-}
+      FILE_STORAGE_S3_SECRET_KEY: ${FILE_STORAGE_S3_SECRET_KEY:-}
+      FILE_STORAGE_S3_REGION: ${FILE_STORAGE_S3_REGION:-us-east-1}
+      FILE_STORAGE_S3_ENDPOINT_URL: ${FILE_STORAGE_S3_ENDPOINT_URL:-}
+      SECRET_KEY: ${SECRET_KEY}
+      FERNET_SALT: ${FERNET_SALT:?Set FERNET_SALT in .env}
+      # The key organization secrets are encrypted with, and during a rotation
+      # the one being retired (DEPLOYMENT.md, "Rotating the encryption key").
+      # Optional so an install from before it existed still starts: empty, the
+      # secrets are encrypted under SECRET_KEY.
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      PREVIOUS_ENCRYPTION_KEY: ${PREVIOUS_ENCRYPTION_KEY:-}
+      FRONTEND_URL: https://${DOMAIN}
+      DEBUG: "false"
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-4}
+      BACKEND_WORKER_MAX_GROWTH_MB: ${BACKEND_WORKER_MAX_GROWTH_MB:-200}
+      BACKEND_WORKER_IDLE_RECYCLE_SECONDS: ${BACKEND_WORKER_IDLE_RECYCLE_SECONDS:-120}
+      # Listed so a self-hosted operator can turn them on from .env, the way
+      # the refusal on screen says to — this service has no `env_file:`, so an
+      # unlisted variable never reaches the container. Leave them off on any
+      # install serving more than one organization: an organization admin picks
+      # the URL, and on lets them aim this server at your internal network.
+      WEBHOOKS_ALLOW_PRIVATE_NETWORKS: ${WEBHOOKS_ALLOW_PRIVATE_NETWORKS:-false}
+      LLM_ALLOW_PRIVATE_NETWORKS: ${LLM_ALLOW_PRIVATE_NETWORKS:-false}
+      # The publisher keys `manage.py module install` trusts, listed for the
+      # same reason: an unlisted variable never reaches the container, and a
+      # signed install is refused as "no trusted signing keys".
+      MODULE_SIGNING_PUBLIC_KEYS: ${MODULE_SIGNING_PUBLIC_KEYS:-}
+      # The command the installer prints after it changes a module is a host
+      # command, and on this stack it must name this compose file — a bare
+      # `docker compose` would start the development stack. It also picks the
+      # frontend action that works here: an image rebuild, not the dev
+      # server's `npm run build` (the production image ships nginx, no npm).
+      INVENTARI_DEPLOYMENT: production
+      # `manage.py module install` writes both halves of a community module.
+      # The backend half lands under /app; the frontend half has nowhere to go
+      # unless this tree is mounted, and a module enabled with no screens is
+      # the failure that made a deployment install half a module. The mount is
+      # in `volumes:` below.
+      INVENTARI_FRONTEND_MODULES_DIR: /frontend-modules
+      # The About screen's source link. Running a modified version? AGPL-3.0
+      # §13 obliges you to offer your users its source: point this at it.
+      SOURCE_CODE_URL: ${SOURCE_CODE_URL:-https://github.com/InventariLabs/Inventari}
+      # Who runs this instance and how to reach them, as the public privacy
+      # page (/privacy) states it. Unset, the page says the operator has not
+      # published a contact.
+      OPERATOR_NAME: ${OPERATOR_NAME:-}
+      OPERATOR_CONTACT: ${OPERATOR_CONTACT:-}
+    volumes:
+      - uploads_data:/app/uploads
+      # Community modules are deployment state, not image content. Mounting
+      # the checkout's two module trees is what lets `module install`,
+      # `module upgrade` and `module uninstall` — run inside this container,
+      # where the database is reachable — write both halves where the next
+      # frontend build and the next container recreate find them. Without
+      # these, an install landed in the container layer and a `docker compose
+      # up -d` took it: the module's files were in the image the container was
+      # not built from. The mounted backend tree is the checkout's own, the
+      # same files the image was built from.
+      - ./backend/app/modules:/app/app/modules
+      - ./frontend/src/modules:/frontend-modules
+      # The tracking file (community_modules.json) is written by the same
+      # commands and read by every worker on boot. A named volume keeps it
+      # across `up -d`/recreate and rebuilds, and is owned by the image's
+      # appuser, so the container can write it without depending on the
+      # checkout's ownership on the host.
+      - module_data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+      db-app-role:
+        condition: service_completed_successfully
+      pgbouncer-main:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      redis-critical:
+        condition: service_healthy
+      # Optional (profile food): `required: false` is what lets an install
+      # that never enables the profile start without it, and still puts the
+      # products application role in place before the backend can log in as
+      # it when the profile is on.
+      products-app-role:
+        condition: service_completed_successfully
+        required: false
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    mem_limit: 128m
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  products_data:
+  redis_data:
+  redis_critical_data:
+  uploads_data:
+  module_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  app-network:
+    driver: bridge
+  edge:
+    name: inventari-edge

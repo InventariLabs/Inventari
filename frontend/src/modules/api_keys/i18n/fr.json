@@ -1,0 +1,91 @@
+{
+  "title": "Clés API",
+  "subtitle": "Permettre aux systèmes externes de s'authentifier auprès d'Inventari",
+  "generateKey": "Générer une nouvelle clé",
+  "noKeys": "Aucune clé API",
+  "noKeysDescription": "Générez une clé API pour permettre aux scripts, Home Assistant ou autres automatisations de se connecter.",
+  "table": {
+    "name": "Nom",
+    "key": "Clé",
+    "created": "Créée",
+    "lastUsed": "Dernière utilisation",
+    "expires": "Expire",
+    "expired": "Expirée",
+    "expiredOn": "Expirée le",
+    "actions": "Actions",
+    "never": "Jamais",
+    "issuedBy": "Délivrée par",
+    "issuedByUnknown": "Compte supprimé depuis",
+    "noExpiry": "N'expire pas",
+    "notUsedYet": "Pas encore utilisée",
+    "revokedTrace": "Une clé révoquée quitte cette liste. La révocation est consignée dans le journal d'audit.",
+    "revokedTraceLink": "Ouvrir le journal d'audit",
+    "permissions": "Permissions",
+    "noPermissions": "Aucune permission"
+  },
+  "revoke": "Révoquer",
+  "revokeConfirm": {
+    "title": "Révoquer la clé API",
+    "message": "Voulez-vous vraiment révoquer la clé \"{{name}}\" ? Elle cessera de fonctionner immédiatement.",
+    "confirm": "Révoquer",
+    "cancel": "Annuler"
+  },
+  "form": {
+    "title": "Générer une nouvelle clé API",
+    "namePlaceholder": "ex. Home Assistant, Script de sauvegarde",
+    "expiration": "Expiration",
+    "expirationOptions": {
+      "never": "Sans expiration — valable jusqu'à révocation",
+      "30days": "30 jours",
+      "90days": "90 jours",
+      "1year": "1 an"
+    },
+    "generate": "Générer la clé",
+    "scope": "À quoi sert la clé",
+    "scopeOptions": {
+      "everything": "Clé ordinaire"
+    },
+    "scopeExplain": {
+      "printing": "Une clé d'impression ne fonctionne que pour Inventari Print Agent : elle enregistre l'agent, prend les tâches d'impression, récupère leurs étiquettes et signale leur résultat. Elle ne peut rien lire ni modifier d'autre.",
+      "other": "Une clé de portée {{scope}} n'atteint que les points d'accès qui vérifient ces permissions, et ne peut rien lire ni modifier d'autre :"
+    },
+    "scopesLoadFailed": "Ce qu'une clé peut porter n'a pas pu être chargé ; aucune clé ne peut donc être émise pour l'instant.",
+    "permissions": "Ce que la clé peut faire",
+    "permissionsHint": "Une clé ne peut recevoir que ce que vous détenez vous-même.",
+    "readOnlyHint": "Une nouvelle clé commence en lecture seule. Ne cochez une permission d'écriture que si la clé doit modifier des données : elle pourra alors modifier tout ce que cette permission couvre, par exemple ajouter des produits ou changer les niveaux de stock."
+  },
+  "copyDialog": {
+    "title": "Clé API générée",
+    "warning": "Assurez-vous de copier votre clé API maintenant. Vous ne pourrez plus la voir !",
+    "copy": "Copier dans le presse-papier",
+    "copied": "Copié !",
+    "done": "Fermer"
+  },
+  "capabilities": {
+    "title": "Ce qu'une clé peut porter",
+    "intro": "Chaque clé porte les permissions cochées à son émission — au plus celles de la personne qui l'émet. Sa liste figure à côté d'elle ci-dessous. Une clé d'impression n'atteint que les points d'accès de l'agent d'impression.",
+    "withheldTitle": "Jamais sur une clé",
+    "adminBlocked": "Tout ce qui est administratif — rôles, invitations, modules, autres clés d'API — reste fermé à une clé. La liste de l'équipe ne l'est pas : une clé qui a « Lire les informations de l'organisation » peut lire le nom, l'adresse électronique et le rôle de chaque membre.",
+    "unknown": "Droit {{key}}",
+    "permissions": {
+      "items_read": "Lire les produits et les stocks",
+      "items_write": "Ajouter des produits et modifier les stocks",
+      "items_delete": "Supprimer des produits",
+      "categories_read": "Lire la liste des catégories",
+      "locations_read": "Lire les emplacements",
+      "org_read": "Lire les informations de l'organisation",
+      "org_settings_write": "Administrer l'organisation : connexions IA, modèles de documents d'équipement, nomenclature des SKU de toute l'organisation et registre des clés API"
+    },
+    "loadFailed": "Ce que peut faire une clé n'a pas pu être chargé."
+  },
+  "usage": {
+    "title": "Comment l'envoyer",
+    "hint": "La clé voyage dans l'en-tête {{header}}. Envoyée en Authorization: Bearer, elle fonctionne encore jusqu'à la prochaine version, et chaque réponse porte alors un en-tête Deprecation.",
+    "copy": "Copier l'exemple",
+    "copied": "Exemple copié"
+  },
+  "revokedToast": "Clé révoquée — consignée dans le journal d'audit",
+  "scopes": {
+    "printing": "Impression uniquement"
+  }
+}

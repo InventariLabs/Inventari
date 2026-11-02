@@ -1,0 +1,540 @@
+{
+  "launcher": {
+    "title": "Fertigung",
+    "description": "Fertigung für den Verkauf: Stücklisten, Kosten und Produktionsaufträge"
+  },
+  "navigation": {
+    "production": "Produktionsläufe",
+    "catalog": "Formeln",
+    "settings": "Einstellungen"
+  },
+  "productionList": {
+    "title": "Produktionsaufträge",
+    "subtitle": "Geplante und abgeschlossene Produktionsläufe mit Kosten und Ergebnis.",
+    "newProduction": "Neue Produktion",
+    "searchPlaceholder": "Nach Ausgangsprodukt suchen…",
+    "loading": "Aufträge werden geladen…",
+    "error": "Produktionsaufträge konnten nicht geladen werden",
+    "empty": {
+      "title": "Noch keine Produktionsaufträge",
+      "subtitle": "Plane einen Produktionsauftrag, um Zutaten zu verbrauchen und Output zu erzeugen."
+    },
+    "noMatches": {
+      "title": "Keine passenden Produktionsaufträge",
+      "subtitle": "Mit diesen Filtern wurde nichts gefunden. Erweitern Sie die Auswahl."
+    },
+    "card": {
+      "qty": "Geplant",
+      "cost": "Kosten",
+      "resultPerUnit": "({{amount}} pro Stück)",
+      "shortage_one": "Kein Bestand: {{count}} Zutat fehlt. Abschluss wird abgelehnt.",
+      "shortage_other": "Kein Bestand: {{count}} Zutaten fehlen. Abschluss wird abgelehnt."
+    },
+    "sortLabel": "Sortieren",
+    "sort": {
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst",
+      "costDesc": "Höchste Kosten"
+    },
+    "dateFrom": "Von",
+    "dateTo": "Bis",
+    "resetFilters": "Zurücksetzen",
+    "status": {
+      "all": "Alle",
+      "draft": "Entwurf",
+      "completed": "Abgeschlossen",
+      "cancelled": "Storniert",
+      "reversed": "Zurückgenommen"
+    },
+    "duplicate": "Duplizieren",
+    "viewRecipe": "Formel anzeigen",
+    "table": {
+      "product": "Produkt",
+      "status": "Status",
+      "date": "Erstellt",
+      "actions": "Aktionen"
+    }
+  },
+  "preview": {
+    "title": "Produktionsvorschau",
+    "subtitle": "Kosten und Zutatenverbrauch — keine Bestandsänderung.",
+    "loadFailed": "Die Kostenvorschau konnte nicht geladen werden",
+    "totalCost": "Gesamtkosten",
+    "unitCostHint": "Menge",
+    "missingTitle": "Zutaten ohne Preis",
+    "ingredients": "Zutaten",
+    "chart": {
+      "title": "Kostenanteil",
+      "empty": "Noch keine Zutat hat einen Preis — es gibt nichts darzustellen."
+    }
+  },
+  "create": {
+    "title": "Produktion erfassen",
+    "subtitle": "Erfassen Sie, was Sie hergestellt haben, oder planen Sie eine Produktion. Was sie verbraucht, was fehlt und was sie kostet, steht vor dem Speichern neben dem Formular.",
+    "productLabel": "Ausgabeprodukt",
+    "searchPlaceholder": "Nach Name, SKU oder Barcode suchen…",
+    "change": "Ändern",
+    "qtyLabel": "Wie viel herstellen?",
+    "storageLabel": "Ziel-Lagerort",
+    "storagePlaceholder": "Ziel-Lagerort auswählen",
+    "storageSearchPlaceholder": "Nach Name oder Pfad suchen…",
+    "storageEmpty": "Kein passender Lagerort",
+    "notesLabel": "Notizen (optional)",
+    "notesPlaceholder": "Interne Notizen zu diesem Auftrag…",
+    "hints": {
+      "product": "Wählen Sie ein Ausgabeprodukt aus, um die Vorschau zu aktivieren.",
+      "quantity": "Geben Sie eine geplante Menge größer als null ein, um die Vorschau zu aktivieren.",
+      "storage": "Wählen Sie einen Zielort aus, um die Vorschau zu aktivieren."
+    },
+    "preview": "Kosten anzeigen",
+    "creating": "Erstellen…",
+    "cancel": "Abbrechen",
+    "success": "Produktionsauftrag erstellt",
+    "errors": {
+      "missingFields": "Wählen Sie Produkt, Menge und Lagerort.",
+      "create": "Auftrag konnte nicht erstellt werden"
+    },
+    "hasBom": "Hat eine Formel",
+    "mode": {
+      "label": "Was erfassen Sie?",
+      "made": "Schon hergestellt",
+      "planned": "Geplant"
+    },
+    "qtyLabelMade": "Wie viel ist entstanden?",
+    "batchHintMade": "Die Formel ist für {{batch}}. Geben Sie ein, was entstanden ist, nicht die Zahl der Chargen.",
+    "batchHintPlanned": "Die Formel ist für {{batch}}. Geben Sie ein, wie viel hergestellt werden soll, nicht die Zahl der Chargen.",
+    "dateLabel": "Wann",
+    "submitMade": "Als hergestellt speichern",
+    "submitNeedsBom": "Zuerst wird eine Stückliste benötigt",
+    "submitNeedsIngredients": "Fügen Sie der Stückliste zuerst Zutaten hinzu",
+    "submitPlanned": "Produktion planen",
+    "successMade": "Produktion erfasst",
+    "needs": {
+      "pick": "Wählen Sie Produkt, Menge und Lagerort, um zu sehen, was die Produktion braucht.",
+      "loading": "Bestand wird geprüft…",
+      "headingMade": "Wird vom Bestand abgebucht",
+      "headingPlanned": "Wird benötigt",
+      "have": "{{have}} auf Lager",
+      "short": "{{have}} auf Lager, {{short}} fehlen",
+      "unknown": "{{have}} auf Lager, in einer Einheit, die sich nicht mit der Formel vergleichen lässt",
+      "unnamed": "Zutat ohne Namen",
+      "unitFallback": "Einheit",
+      "cost": "Kostet Sie {{unitCost}} pro {{unit}} · insgesamt {{total}}",
+      "marginLeft": "Sie verkaufen zu {{price}}, pro {{unit}} bleiben {{result}}.",
+      "marginLost": "Sie verkaufen zu {{price}}, das sind {{result}} pro {{unit}} unter den Kosten.",
+      "savingsLeft": "Im Laden kostet es {{price}}, pro {{unit}} sparen Sie {{result}}.",
+      "savingsLost": "Im Laden kostet es {{price}}, das sind {{result}} pro {{unit}} weniger als die Herstellung.",
+      "enough": "Alles ist auf Lager.",
+      "unmeasurable": "Die Einheit einer Zutat lässt sich nicht mit ihrem Bestand vergleichen, daher ist unklar, was abgebucht werden soll. Korrigieren Sie zuerst die Einheit in der Formel.",
+      "shortMade": "Es ist schon hergestellt, die Ware war also da — der Bestand ist zu niedrig erfasst. Die Produktion wird gespeichert, und die fehlenden Zutaten werden zur Zählung vorgemerkt.",
+      "shortPlanned": "Für diese Produktion fehlen einige Zutaten. Sie können sie jetzt planen und das Fehlende einkaufen.",
+      "addOne": "{{quantity}} {{name}} auf die Einkaufsliste setzen",
+      "addAll": "Fehlendes auf die Einkaufsliste setzen",
+      "added": "Zu {{name}} hinzugefügt",
+      "alreadyListed": "Steht schon auf der Einkaufsliste",
+      "addFailed": "Konnte nicht zur Einkaufsliste hinzugefügt werden"
+    }
+  },
+  "createRecipe": {
+    "title": "Neue Formel",
+    "subtitle": "Wählen Sie das Ausgabeprodukt und geben Sie der Formel einen Namen.",
+    "nameLabel": "Formelname",
+    "namePlaceholder": "Formelname…",
+    "batchYieldLabel": "Die Formel ergibt",
+    "create": "Formel erstellen",
+    "creating": "Erstellen…",
+    "success": "Formel erstellt",
+    "errors": {
+      "productRequired": "Wählen Sie zuerst das Ausgabeprodukt.",
+      "nameRequired": "Formelname ist erforderlich.",
+      "create": "Formel konnte nicht erstellt werden"
+    },
+    "batchYieldHint": "Wie viel eine Charge ergibt, in der Einheit des Produkts. Leer bedeutet 1.",
+    "unitLabel": "Einheit",
+    "unitFirst": "Wählen Sie zuerst die Einheit neben der Menge."
+  },
+  "detail": {
+    "title": "Produktionsauftrag",
+    "subtitle": "Zutaten, Kosten und Status prüfen.",
+    "back": "Zurück zur Liste",
+    "loading": "Auftrag wird geladen…",
+    "complete": "Auftrag abschließen",
+    "cancel": "Auftrag stornieren",
+    "completeSuccess": "Produktion abgeschlossen",
+    "cancelSuccess": "Produktion storniert",
+    "cancelNeedsManager": "Einen Produktionslauf zurückzunehmen ist Sache der Leitung — bitten Sie jemanden, der die Produktion verwalten darf.",
+    "completeConfirm": {
+      "title": "Auftrag abschließen?",
+      "description": "Verbraucht die aufgeführten Zutaten und erzeugt das Produkt. Solange nichts davon verwendet wurde, nimmt „Lauf zurücknehmen“ ihn zurück.",
+      "actualQtyLabel": "Tatsächliche Produktionsmenge (optional)",
+      "actualQtyHint": "Leer lassen für geplante Menge. Weniger für Ausschuss, mehr für Überproduktion. Zutaten werden wie geplant verbraucht, unabhängig von der tatsächlichen Menge."
+    },
+    "cancelConfirm": {
+      "title": "Auftrag stornieren?",
+      "description": "Stornierung markiert den Entwurf als storniert. Keine Bestandsänderung.",
+      "confirm": "Ja, stornieren"
+    },
+    "reverseConfirm": {
+      "title": "Diesen Produktionslauf zurücknehmen?",
+      "description": "Die Zutaten kehren auf die Lagerplätze und in die Chargen zurück, aus denen sie genommen wurden, und was der Lauf hergestellt hat, verlässt seinen Lagerplatz. Der Lauf bleibt erhalten und ist als zurückgenommen markiert.",
+      "confirm": "Ja, Lauf zurücknehmen"
+    },
+    "card": {
+      "totalCost": "Gesamtkosten",
+      "totalCostUndone": "Kosten vor dem Rückgängigmachen des Laufs",
+      "created": "Erstellt",
+      "productionDate": "Produktionsdatum",
+      "notes": "Notizen",
+      "actualQty": "Tatsächliche Menge",
+      "plannedSuffix": "geplant: {{qty}}",
+      "scrap": "Ausschuss",
+      "overproduced": "Mehrproduktion",
+      "resultPerUnit": "({{amount}} pro Stück)",
+      "totalCostAfterClosing": "Gesamtkosten nach Abschluss",
+      "unitCost": "{{amount}} pro erzeugter Einheit",
+      "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
+      "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann."
+    },
+    "ingredients": "Verbrauchte Zutaten",
+    "emptyLines": "Für diesen Lauf wurden keine Zutaten erfasst.",
+    "plannedIngredients": "Geplanter Verbrauch",
+    "plannedIngredientsHint": "So viel wird der Lauf entnehmen. Noch hat nichts das Lager verlassen. Die Mengen werden erst beim Abschluss aus der Formel gelesen — Änderungen an der Formel wirken sich auf offene Entwürfe aus.",
+    "emptyLinesPlanned": "Dieser Lauf würde nichts verbrauchen — seine Formel nennt keine Zutaten.",
+    "cancelReason": "Stornogrund",
+    "cancelReasonPlaceholder": "Grund (optional)…",
+    "producedItem": "Fertigprodukt",
+    "viewProducedItem": "Produkt anzeigen",
+    "stockMoves": "Bestandsbewegungen",
+    "stockMove": {
+      "dir": "Bewegung",
+      "product": "Produkt / Charge",
+      "lot": "Charge",
+      "unknownProduct": "Unbekanntes Produkt",
+      "qty": "Menge"
+    },
+    "line": {
+      "ingredient": "Zutat",
+      "qty": "Verbrauchte Menge",
+      "unitCost": "Stückkosten",
+      "lineCost": "Positionskosten",
+      "unknownLocation": "Unbekannter Lagerort",
+      "qtyLabel": "Menge pro Charge",
+      "yieldLabel": "Ertragsverlust %",
+      "saved": "Zeile aktualisiert",
+      "saveFailed": "Zeile konnte nicht aktualisiert werden",
+      "shortLabel": "fehlt",
+      "unmeasurableShort": "fehlt — mit der Bestandseinheit nicht vergleichbar",
+      "shortfall": "{{quantity}} nicht im Bestand erfasst — zu zählen"
+    },
+    "edit": "Bearbeiten",
+    "save": "Speichern",
+    "saveFailed": "Auftrag konnte nicht gespeichert werden",
+    "cancelEdit": "Änderungen verwerfen",
+    "duplicate": "Duplizieren",
+    "duplicated": "Auftrag dupliziert",
+    "duplicateFailed": "Auftrag konnte nicht dupliziert werden",
+    "plannedQty": "Geplante Menge",
+    "productionDate": "Produktionsdatum",
+    "notes": "Notizen",
+    "tabs": {
+      "composition": "Zusammensetzung",
+      "cost": "Kosten & Ergebnis",
+      "history": "Verlauf"
+    },
+    "sourceRecipe": "Basierend auf einem Rezept (Momentaufnahme vom {{date}})",
+    "setAsDefault": "Als Standard festlegen",
+    "setDefaultSuccess": "Standardformel festgelegt",
+    "setDefaultFailed": "Standardformel konnte nicht festgelegt werden",
+    "deleteRecipe": "Formel löschen",
+    "recipeDeleted": "Formel gelöscht",
+    "recipeDeleteFailed": "Formel konnte nicht gelöscht werden",
+    "processSteps": "Verarbeitungsschritte",
+    "cost": {
+      "fixedCosts": "Fixe Kosten / Charge",
+      "referencePrice": "Referenzpreis",
+      "perBatch": "pro Charge",
+      "perYieldUnit": "pro Einheit — eine Charge ergibt {{qty}}",
+      "noFixed": "Keine fixen Kosten festgelegt",
+      "ingredients": "Zutaten",
+      "emptyLines": "Nichts zu bewerten — Zutaten im Reiter Zusammensetzung hinzufügen.",
+      "total": "Gesamt",
+      "addLine": "Kostenposition hinzufügen",
+      "lineSaved": "Kostenposition gespeichert",
+      "lineSaveFailed": "Kostenposition konnte nicht gespeichert werden",
+      "lineDeleted": "Kostenposition gelöscht",
+      "lineDeleteFailed": "Kostenposition konnte nicht gelöscht werden",
+      "lineKind": "Art",
+      "lineLabel": "Bezeichnung",
+      "lineLabelPlaceholder": "z. B. Ofenstrom",
+      "lineAmount": "Betrag (pro Charge)",
+      "editReferencePrice": "Referenzpreis bearbeiten",
+      "referencePriceSaved": "Referenzpreis gespeichert",
+      "referencePriceSaveFailed": "Referenzpreis konnte nicht gespeichert werden",
+      "kind": {
+        "LABOR": "Arbeit",
+        "PACKAGING": "Verpackung",
+        "OVERHEAD": "Gemeinkosten",
+        "OTHER": "Sonstiges"
+      },
+      "deleteConfirm": {
+        "title": "Kostenposition löschen?",
+        "description": "\"{{label}}\" aus den Fixkosten entfernen?"
+      }
+    },
+    "history": {
+      "title": "Produktionsverlauf",
+      "empty": "Noch keine Produktionsläufe für diese Formel.",
+      "date": "Datum",
+      "status": "Status",
+      "made": "Hergestellt",
+      "unitCostColumn": "Stückkosten",
+      "resultColumn": "{{result}} pro Stück",
+      "totalColumn": "Chargenkosten",
+      "open": "Produktionsauftrag öffnen"
+    },
+    "completeFailed": "Produktion konnte nicht abgeschlossen werden",
+    "emptyBom": "Diese Formel enthält keine Zutaten — der Auftrag würde Ware aus dem Nichts erzeugen. Fügen Sie zuerst Zutaten hinzu.",
+    "emptyBomAction": "Zutaten hinzufügen",
+    "noBom": "Dieses Produkt hat keine Formel — der Auftrag hat nichts, woraus er ziehen kann. Erstellen Sie zuerst eine Formel.",
+    "noBomAction": "Formel erstellen",
+    "cancelFailed": "Produktion konnte nicht storniert werden",
+    "reverse": "Lauf zurücknehmen",
+    "reverseNeedsManager": "Einen Produktionslauf zurückzunehmen ist Sache der Leitung — wenden Sie sich an jemanden, der die Produktion verwalten darf.",
+    "reverseSuccess": "Produktionslauf zurückgenommen",
+    "reverseFailed": "Der Produktionslauf konnte nicht zurückgenommen werden",
+    "yieldSaved": "Ausbeute aktualisiert",
+    "yieldSaveFailed": "Ausbeute konnte nicht aktualisiert werden",
+    "processStepsEmpty": "Noch keine Arbeitsschritte",
+    "processStepsEdit": "Schritte bearbeiten",
+    "processStepsEditStep": "Schritt {{number}}",
+    "processStepsAdd": "Schritt hinzufügen",
+    "processStepsAddPlaceholder": "Schritt beschreiben — Enter für neue Zeile, Strg+Enter fügt hinzu",
+    "processStepsSaved": "Arbeitsschritte gespeichert",
+    "processStepsSaveFailed": "Arbeitsschritte konnten nicht gespeichert werden",
+    "processStepsAddFirst": "Schritte hinzufügen",
+    "plannedSummary": "Geplant {{qty}}",
+    "deleteConfirm": {
+      "title": "Diese Formel löschen?",
+      "description": "Zutaten und Prozessschritte verschwinden mit ihr. Bereits erfasste Produktionsaufträge bleiben erhalten."
+    },
+    "notFound": "Fertigungsauftrag nicht gefunden",
+    "plannedShortageHint_one": "Der geplante Verbrauch übersteigt den Bestand — {{count}} Zutat fehlt. Der Abschluss dieser Produktion wird abgelehnt.",
+    "plannedShortageHint_other": "Der geplante Verbrauch übersteigt den Bestand — {{count}} Zutaten fehlen. Der Abschluss dieser Produktion wird abgelehnt."
+  },
+  "bom": {
+    "childLabel": "Zutat",
+    "qtyLabel": "Menge",
+    "unitLabel": "Einheit",
+    "yieldLabel": "Verlust %",
+    "yieldHint": "Eine Planungsgröße: wie viel zusätzlich reserviert wird, damit die Planung aufgeht. 0 ist ein normaler Wert — der tatsächliche Verlust ergibt sich beim Abschluss des Auftrags aus der Menge, die wirklich herauskam.",
+    "notesLabel": "Notizen",
+    "notesPlaceholder": "Optionale Notizen…",
+    "add": "Zeile hinzufügen",
+    "adding": "Hinzufügen…",
+    "childPlaceholder": "Zutat suchen…",
+    "treeToggle": "Mehrstufige Ansicht",
+    "treeHint": "Die einzige Ansicht, die eine Formel in einer Formel zeigt, und der einzige Ort, an dem eine Zeile umgehängt werden kann. Lohnt sich, sobald eine Zutat selbst eine Formel hat.",
+    "childClear": "Leeren",
+    "unitMustBeConvertible": "Angeboten werden nur Einheiten, die sich als {{unit}} lesen lassen — eine Zeile, die die Produktion nicht umrechnen kann, wird abgelehnt."
+  },
+  "composition": {
+    "ingredientsTitle": "Zutaten",
+    "perBatchHint": "Mengen gelten pro Charge.",
+    "batchYield": "Die Formel ergibt {{qty}}",
+    "batchYieldLabel": "Die Formel ergibt",
+    "batchYieldEdit": "Ändern, wie viel die Formel ergibt",
+    "batchYieldHint": "Wie viel eine Charge dieser Formel ergibt. Stückkosten = Chargenkosten ÷ diese Zahl.",
+    "addIngredient": "Zutat hinzufügen",
+    "moreFields": "Mehr",
+    "removeIngredient": "Entfernen",
+    "ingredientAdded": "Zutat hinzugefügt",
+    "ingredientRemoved": "Zutat entfernt",
+    "emptyLines": "Noch keine Zutaten — füge unten die erste hinzu.",
+    "introduction": "Eine Formel ist die Liste dessen, was in einen Ansatz dieses Produkts geht. Daraus summieren sich die Kosten auf dem Tab „Kosten & Ergebnis“, und daraus wird beim Abschluss eines Produktionsauftrags Bestand entnommen.",
+    "removeConfirm": {
+      "title": "Zutat entfernen?",
+      "description": "\"{{name}}\" aus dieser Formel entfernen?"
+    },
+    "errors": {
+      "addIngredient": "Zutat konnte nicht hinzugefügt werden",
+      "duplicateIngredient": "Diese Formel enthält die Zutat bereits.",
+      "removeIngredient": "Zutat konnte nicht entfernt werden",
+      "yieldInvalid": "Die Menge, die die Formel ergibt, muss größer als null sein."
+    }
+  },
+  "tree": {
+    "title": "Mehrstufige Stückliste",
+    "hint": "Zeile auf eine andere ziehen, um sie zu verschachteln.",
+    "empty": "Noch keine Zutaten. Fügen Sie sie im Abschnitt darüber hinzu; sie erscheinen hier, sobald es etwas zu verschachteln gibt.",
+    "loading": "Baum wird geladen…",
+    "error": "Baum konnte nicht geladen werden",
+    "moved": "Zeile verschoben",
+    "moveError": "Verschieben fehlgeschlagen",
+    "dropHint": "Ziehen zum Verschieben"
+  },
+  "pricing": {
+    "title": "Verkaufspreisrechner",
+    "subtitle": "Bruttomarge-Modell — Schieberegler justieren, um den Verkaufspreis zu sehen.",
+    "currentDefault": "Gespeicherter Standard",
+    "isDefault": "(Systemstandard)",
+    "qtyLabel": "Produzierte Menge",
+    "marginLabel": "Zielmarge (%)",
+    "preview": "Preis berechnen",
+    "calculating": "Berechne…",
+    "totalCost": "Gesamtkosten",
+    "suggestedPrice": "Vorgeschlagener Verkaufspreis",
+    "close": "Schließen",
+    "saveDefault": "Als Standard speichern",
+    "saving": "Speichern…",
+    "saved": "Standardmarge gespeichert",
+    "saveFailed": "Standardmarge konnte nicht gespeichert werden",
+    "openButton": "Verkaufspreis",
+    "errors": {
+      "qty": "Menge muss > 0 sein.",
+      "compute": "Der Preis konnte nicht berechnet werden"
+    },
+    "unitCostEstimated": "Geschätzte Stückkosten"
+  },
+  "bomEntry": {
+    "columnHeader": "Formel",
+    "editRecipe": "Formel bearbeiten",
+    "createRecipe": "Formel erstellen",
+    "openRecipe": "Formel dieses Produkts öffnen"
+  },
+  "catalog": {
+    "title": "Formeln",
+    "subtitle": "Fertigung für den Verkauf: Produktionsformeln mit Kosten, Margen und Bestand",
+    "searchPlaceholder": "Formeln suchen…",
+    "sortLabel": "Sortieren nach",
+    "default": "Standard",
+    "produce": "Produzieren",
+    "addIngredients": "Zutaten hinzufügen",
+    "details": "Details",
+    "unitCost": "Stückkosten",
+    "unitCostIncomplete_one": "Für 1 Zutat des letzten Durchlaufs ist kein Einkaufspreis hinterlegt.",
+    "unitCostIncomplete_other": "Für {{count}} Zutaten des letzten Durchlaufs ist kein Einkaufspreis hinterlegt.",
+    "stock": "Bestand",
+    "lastProduced": "Zuletzt produziert",
+    "ingredientCount": "{{count}} Zutaten",
+    "ingredientCount_one": "{{count}} Zutat",
+    "ingredientCount_other": "{{count}} Zutaten",
+    "viewProduction": "Produktionsläufe",
+    "newRecipe": "Neue Formel",
+    "empty": {
+      "title": "Noch keine Formeln",
+      "subtitle": "Erstellen Sie Ihre erste Formel, um Produktionskosten zu verfolgen.",
+      "cta": "Neue Formel"
+    },
+    "sort": {
+      "newest": "Neueste",
+      "oldest": "Älteste",
+      "name": "Name"
+    },
+    "noMatches": {
+      "title": "Keine passende Formel",
+      "subtitle": "Nichts gefunden für „{{query}}“. Versuchen Sie einen kürzeren Begriff."
+    },
+    "table": {
+      "name": "Name",
+      "ingredients": "Zutaten",
+      "availability": "Verfügbarkeit",
+      "actions": "Aktionen"
+    },
+    "unitCostAfterRun": "Stückkosten nach letzter Produktion",
+    "unitCostEstimated": "Geschätzte Stückkosten",
+    "estimateCostIncomplete_one": "Für 1 Zutat dieser Schätzung ist kein Einkaufspreis hinterlegt.",
+    "estimateCostIncomplete_other": "Für {{count}} Zutaten dieser Schätzung ist kein Einkaufspreis hinterlegt."
+  },
+  "settings": {
+    "title": "Produktionseinstellungen",
+    "loading": "Einstellungen werden geladen…",
+    "referenceDirection": "Womit das Ergebnis verglichen wird",
+    "referenceDirectionHint": "Marge, wenn Sie verkaufen, was Sie herstellen; Ersparnis, wenn Sie etwas herstellen, statt es zu kaufen. Der Referenzpreis jeder Formel ist dann Ihr Verkaufspreis oder der Ladenpreis.",
+    "allowOverproduction": "Überproduktion erlauben",
+    "allowOverproductionHint": "Wenn aktiv, darf beim Abschluss mehr als geplant erfasst werden.",
+    "saved": "Einstellungen gespeichert",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "availabilityCheckScope": "Verfügbarkeitsprüfung",
+    "availabilityCheckScopeHint": "Global zählt den Bestand aller Standorte zusammen; pro Standort prüft jeden Standort einzeln.",
+    "scopeGlobal": "Global",
+    "scopePerLocation": "Pro Standort",
+    "createOnShortageStrategy": "Knappheitsstrategie",
+    "createOnShortageStrategyHint": "Was passiert, wenn ein Auftrag ohne genug Zutaten angelegt wird: erlauben, warnen oder sperren.",
+    "strategyAllow": "Erlauben",
+    "strategyWarn": "Warnen",
+    "strategyBlock": "Sperren",
+    "subtitle": "Was das Ergebnis bedeutet und wie die Produktion mit Fehlmengen umgeht.",
+    "whereReferenceDirection": "So heißt das Ergebnis auf den Formelkarten, in Aufträgen und in der Monatsübersicht.",
+    "immediateNote": "Jede Auswahl wird sofort gespeichert. Es gibt kein Rückgängig — stellen Sie sie ebenso zurück.",
+    "advanced": "Erweitert",
+    "advancedHint": "Regeln für Fehlmengen und Überproduktion. Die Standardwerte passen für eine kleine Werkstatt."
+  },
+  "availability": {
+    "maxBatches": "Max. Chargen aus Bestand",
+    "shortageList": "Fehlliste",
+    "ingredient": "Zutat",
+    "needed": "Benötigt",
+    "available": "Verfügbar",
+    "short": "Fehlt",
+    "notConvertible": "Einheiten inkonsistent",
+    "blocked": "Erstellung nicht möglich — Zutaten fehlen",
+    "blockedHint": "Füllen Sie diese Zutaten auf oder ändern Sie die Strategie in den Einstellungen.",
+    "warnTitle": "Einige Zutaten fehlen",
+    "warnHint": "Sie können den Entwurf dennoch erstellen — die Verfügbarkeit wird beim Abschluss erneut geprüft.",
+    "warnConfirm": "Trotzdem erstellen",
+    "completeShortage": "Abschluss nicht möglich — unzureichender Bestand",
+    "completeShortageHint": "Diese Zutaten sind seit der Erstellung des Entwurfs ausgelaufen.",
+    "unknown_one": "{{count}} Zutat ist nicht vergleichbar",
+    "unknown_other": "{{count}} Zutaten sind nicht vergleichbar",
+    "shortUnknown": "unbekannt",
+    "completeShortageHintNever": "Diese Zutaten reichten nie für diesen Lauf — der Auftrag wurde über Bestand angelegt."
+  },
+  "widget": {
+    "title": "{{result}} pro Monat",
+    "viewAll": "Produktion",
+    "hintSource": "Wird in den Einstellungen des Produktionsmoduls gesetzt",
+    "orders_one": "{{count}} Durchlauf",
+    "orders_other": "{{count}} Durchläufe",
+    "empty": "Noch keine abgeschlossenen Durchläufe mit Ergebnis."
+  },
+  "whereUsed": {
+    "title": "In Formeln verwendet",
+    "perBatch": "{{qty}} pro Charge"
+  },
+  "permissions": {
+    "read": "Produktion ansehen",
+    "readDesc": "Kann Formeln, Kosten und Fertigungsaufträge einsehen",
+    "write": "Produktion ausführen",
+    "writeDesc": "Kann Fertigungsaufträge anlegen und Läufe abschließen — das bewegt Bestand",
+    "manage": "Formeln und Einstellungen verwalten",
+    "manageDesc": "Kann Formeln, Prozessschritte und Moduleinstellungen bearbeiten sowie Läufe abbrechen — eine Formel entscheidet, was die Produktion dem Bestand entnimmt"
+  },
+  "bomDetail": {
+    "notFound": "Formel nicht gefunden",
+    "back": "Zurück zu den Formeln",
+    "loading": "Formel wird geladen…"
+  },
+  "costSource": {
+    "avco": "Schichtdurchschnitt",
+    "fifo": "Ist-Kosten (FIFO)",
+    "none": "für diesen Bestand ist kein Preis erfasst"
+  },
+  "cost": {
+    "gap": {
+      "partial_one": "Für 1 Zutat ist kein Satz hinterlegt, sie fehlt daher in diesem Betrag.",
+      "partial_other": "Für {{count}} Zutaten ist kein Satz hinterlegt, sie fehlen daher in diesem Betrag.",
+      "none_one": "Für die einzige Zutat ist kein Satz hinterlegt — es gibt nichts zu addieren.",
+      "none_other": "Für keine der {{count}} Zutaten ist ein Satz hinterlegt — es gibt nichts zu addieren."
+    }
+  },
+  "result": {
+    "margin": {
+      "label": "Marge",
+      "definition": "Verkaufspreis minus Herstellkosten"
+    },
+    "savings": {
+      "label": "Ersparnis ggü. Ladenpreis",
+      "definition": "Ladenpreis minus Herstellkosten"
+    }
+  }
+}

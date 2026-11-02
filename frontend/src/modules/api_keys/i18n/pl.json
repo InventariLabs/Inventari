@@ -1,0 +1,91 @@
+{
+  "title": "Klucze API",
+  "subtitle": "Pozwól zewnętrznym systemom uwierzytelniać się w Inventari",
+  "generateKey": "Wygeneruj klucz",
+  "noKeys": "Brak kluczy API",
+  "noKeysDescription": "Wygeneruj klucz API, aby skrypty, Home Assistant lub inne automatyzacje mogły się połączyć.",
+  "table": {
+    "name": "Nazwa",
+    "key": "Klucz",
+    "created": "Utworzono",
+    "lastUsed": "Ostatnio użyty",
+    "expires": "Wygasa",
+    "expired": "Wygasł",
+    "expiredOn": "Wygasł",
+    "actions": "Akcje",
+    "never": "Nigdy",
+    "issuedBy": "Wydał",
+    "issuedByUnknown": "Konto już usunięte",
+    "noExpiry": "Nie wygasa",
+    "notUsedYet": "Jeszcze nieużywany",
+    "revokedTrace": "Odwołany klucz znika z tej listy. Odwołanie zostaje zapisane w dzienniku audytu.",
+    "revokedTraceLink": "Otwórz dziennik audytu",
+    "permissions": "Uprawnienia",
+    "noPermissions": "Bez uprawnień"
+  },
+  "revoke": "Odwołaj",
+  "revokeConfirm": {
+    "title": "Odwołaj klucz API",
+    "message": "Czy na pewno chcesz odwołać klucz „{{name}}”? Przestanie działać natychmiast.",
+    "confirm": "Odwołaj",
+    "cancel": "Anuluj"
+  },
+  "form": {
+    "title": "Wygeneruj nowy klucz API",
+    "namePlaceholder": "np. Home Assistant, Skrypt backupu",
+    "expiration": "Wygaśnięcie",
+    "expirationOptions": {
+      "never": "Bez wygaśnięcia — działa, dopóki go nie odwołasz",
+      "30days": "30 dni",
+      "90days": "90 dni",
+      "1year": "1 rok"
+    },
+    "generate": "Wygeneruj klucz",
+    "scope": "Do czego jest klucz",
+    "scopeOptions": {
+      "everything": "Zwykły klucz"
+    },
+    "scopeExplain": {
+      "printing": "Klucz do drukowania działa tylko dla Inventari Print Agent: rejestruje agenta, pobiera zlecenia wydruku i ich etykiety oraz melduje, jak poszło. Niczego innego nie odczyta ani nie zmieni.",
+      "other": "Klucz z zakresem {{scope}} sięga tylko do punktów pilnujących tych uprawnień i niczego innego nie odczyta ani nie zmieni:"
+    },
+    "scopesLoadFailed": "Nie udało się wczytać, co może nosić klucz, więc teraz nie da się go wydać.",
+    "permissions": "Co może klucz",
+    "permissionsHint": "Klucz może dostać tylko to, co masz sam.",
+    "readOnlyHint": "Nowy klucz zaczyna jako tylko do odczytu. Zaznacz uprawnienie do zapisu tylko wtedy, gdy klucz ma zmieniać dane — może wtedy zmieniać wszystko, co to uprawnienie obejmuje, np. dodawać produkty czy zmieniać stany."
+  },
+  "copyDialog": {
+    "title": "Klucz API wygenerowany",
+    "warning": "Skopiuj teraz swój klucz API. Po zamknięciu tego okna nie będzie można go zobaczyć ponownie.",
+    "copy": "Kopiuj do schowka",
+    "copied": "Skopiowano!",
+    "done": "Zamknij"
+  },
+  "capabilities": {
+    "title": "Co może nosić klucz",
+    "intro": "Każdy klucz ma uprawnienia zaznaczone przy wydaniu — najwyżej te, które ma osoba go wydająca. Jego lista stoi przy nim poniżej. Klucz do drukowania sięga wyłącznie do adresów agenta druku.",
+    "withheldTitle": "Nigdy na kluczu",
+    "adminBlocked": "Wszystko administracyjne — role, zaproszenia, moduły, inne klucze API — pozostaje dla klucza zamknięte. Lista zespołu nie: klucz z uprawnieniem „Odczyt danych organizacji” odczyta imię i nazwisko, e-mail oraz rolę każdego członka.",
+    "unknown": "Uprawnienie {{key}}",
+    "permissions": {
+      "items_read": "Odczyt produktów i stanów",
+      "items_write": "Dodawanie produktów i zmiana stanów",
+      "items_delete": "Usuwanie produktów",
+      "categories_read": "Odczyt listy kategorii",
+      "locations_read": "Odczyt miejsc",
+      "org_read": "Odczyt danych organizacji",
+      "org_settings_write": "Administrowanie organizacją: połączenia AI, szablony dokumentów sprzętu, nazewnictwo SKU w całej organizacji i rejestr kluczy API"
+    },
+    "loadFailed": "Nie udało się wczytać, co może klucz."
+  },
+  "usage": {
+    "title": "Jak go wysłać",
+    "hint": "Klucz jedzie w nagłówku {{header}}. Wysłany jako Authorization: Bearer działa jeszcze do następnego wydania, a każda odpowiedź niesie wtedy nagłówek Deprecation.",
+    "copy": "Skopiuj przykład",
+    "copied": "Przykład skopiowany"
+  },
+  "revokedToast": "Klucz odwołany — zapisano w dzienniku audytu",
+  "scopes": {
+    "printing": "Tylko drukowanie"
+  }
+}

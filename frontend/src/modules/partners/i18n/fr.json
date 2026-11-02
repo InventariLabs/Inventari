@@ -1,0 +1,128 @@
+{
+  "title": "Partenaires",
+  "subtitle": "Fournisseurs, clients et prestataires de services",
+  "detail": {
+    "title": "Détails du partenaire",
+    "createdAt": "Créé",
+    "updatedAt": "Mis à jour",
+    "related": "Liens",
+    "relatedDocuments": "Documents d'entrepôt",
+    "relatedOrders": "Commandes d'achat"
+  },
+  "newPartner": "Nouveau partenaire",
+  "searchPlaceholder": "Rechercher par nom, code, ID fiscal, e-mail…",
+  "noPartners": "Aucun partenaire trouvé",
+  "noPartnersDesc": "Ajoutez votre premier partenaire pour commencer",
+  "stats": {
+    "documents_one": "{{count}} document",
+    "documents_other": "{{count}} documents",
+    "total": "Chiffre d'affaires",
+    "lastActivity": "Dernière activité",
+    "multipleCurrencies": "Plusieurs devises"
+  },
+  "filterAll": "Tous",
+  "filterActive": "Actif",
+  "filterInactive": "Inactif",
+  "columns": {
+    "name": "Nom",
+    "type": "Type",
+    "taxId": "N° fiscal",
+    "contact": "Contact",
+    "documents": "Documents",
+    "actions": "Actions"
+  },
+  "launcher": {
+    "description": "Gérer les fournisseurs, clients et partenaires commerciaux"
+  },
+  "types": {
+    "SUPPLIER": "Fournisseur",
+    "CUSTOMER": "Client",
+    "BOTH": "Fournisseur & Client",
+    "SERVICE_PROVIDER": "Prestataire de services",
+    "MANUFACTURER": "Fabricant",
+    "EMPLOYEE": "Employé"
+  },
+  "fields": {
+    "name": "Nom",
+    "fullName": "Nom complet",
+    "code": "Code partenaire",
+    "type": "Type",
+    "taxId": "ID fiscal / TVA",
+    "isConsumer": "Particulier (consommateur)",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "website": "Site web",
+    "contactPerson": "Personne de contact",
+    "position": "Poste / Département",
+    "address": "Adresse",
+    "notes": "Notes internes"
+  },
+  "address": {
+    "section": "Adresse",
+    "street": "Rue",
+    "city": "Ville",
+    "postalCode": "Code postal",
+    "country": "Pays",
+    "countrySelect": "Sélectionner un pays",
+    "otherCountry": "Autre : {{value}}"
+  },
+  "form": {
+    "createTitle": "Nouveau partenaire",
+    "editTitle": "Modifier le partenaire",
+    "namePlaceholder": "ex. ABC Grossiste",
+    "fullNamePlaceholder": "ex. Jean Dupont",
+    "codePlaceholder": "ex. FRN-001",
+    "taxIdPlaceholder": "ex. FR12345678901",
+    "isConsumerHint": "Sans identifiant fiscal : les documents se confirment sans lui, même là où la loi l'exige des entreprises.",
+    "emailPlaceholder": "contact@entreprise.fr",
+    "phonePlaceholder": "+33 1 23 45 67 89",
+    "websitePlaceholder": "https://entreprise.fr",
+    "contactPersonPlaceholder": "ex. Jean Dupont (Service Achats)",
+    "positionPlaceholder": "ex. Spécialiste IT, Département IT",
+    "notesPlaceholder": "Notes internes…",
+    "street_placeholder": "ex. 123 Rue Principale",
+    "city_placeholder": "ex. Paris",
+    "postal_placeholder": "ex. 75001",
+    "saving": "Enregistrement…"
+  },
+  "actions": {
+    "edit": "Modifier",
+    "deactivate": "Désactiver",
+    "activate": "Activer",
+    "addPartner": "Ajouter un partenaire"
+  },
+  "confirmDeactivateTitle": "Désactiver le partenaire",
+  "confirmDeactivate": "Désactiver ce partenaire ? Il n'apparaîtra plus dans les filtres par défaut.",
+  "status": {
+    "inactive": "Inactif"
+  },
+  "errors": {
+    "activateFailed": "Échec de l'activation du partenaire",
+    "deactivateFailed": "Échec de la désactivation du partenaire",
+    "saveFailed": "Échec de l'enregistrement du partenaire",
+    "createFailed": "Échec de la création du partenaire",
+    "invalidEmail": "Saisissez une adresse e-mail, par exemple nom@societe.fr.",
+    "invalidWebsite": "Saisissez une adresse web, par exemple https://societe.fr."
+  },
+  "inlineCreateHint": "Création rapide d'un partenaire",
+  "inlineCreateSuccess": "Partenaire « {{name}} » créé. Ajoutez son identifiant fiscal et son adresse avant d'émettre un document avec adresse.",
+  "import": {
+    "button": "Importer",
+    "title": "Importer des partenaires",
+    "formats": "XLSX / CSV",
+    "pleaseWait": "Veuillez patienter pendant que nous traitons vos partenaires.",
+    "closeAndView": "Fermer et voir les partenaires",
+    "added_one": "{{count}} partenaire ajouté.",
+    "added_other": "{{count}} partenaires ajoutés.",
+    "defaultType": "Type pour les lignes sans type",
+    "addOnlyNote": "L'import ne fait qu'ajouter des partenaires. Une ligne nommant un partenaire que vous avez déjà — le même nom quelle que soit la casse, ou le même numéro fiscal — est refusée et listée avec sa raison.",
+    "analyzeFailed": "Impossible de lire le fichier",
+    "failed": "L'import a échoué"
+  },
+  "toasts": {
+    "saved": "Partenaire enregistré",
+    "created": "Partenaire créé",
+    "activated": "Partenaire activé",
+    "deactivated": "Partenaire désactivé"
+  }
+}

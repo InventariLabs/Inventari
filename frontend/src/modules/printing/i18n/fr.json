@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "agent": "Agir comme agent d'impression",
+    "agentDesc": "Peut enregistrer une imprimante, prendre ses travaux d'impression, en récupérer les étiquettes et signaler leur résultat — ce que fait l'Inventari Print Agent"
+  }
+}

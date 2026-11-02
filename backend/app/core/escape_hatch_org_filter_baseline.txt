@@ -1,0 +1,11 @@
+# Escape-hatch org-filter baseline
+# Format: app/relative/path.py
+#
+# Files declaring `allow_direct_db_access` that never reference
+# organization_id. They emit ::notice (non-blocking); new violations
+# emit ::error (blocking). Remove entries when the file gains org-scoping.
+#
+# EMPTY since S-2026-08-01: the former 12 entries (all Alembic module
+# `migrations/env.py` files) are now exempt by rule — they import app.models
+# for metadata/autogenerate but never query tenant data, so the org-filter
+# requirement does not apply (see _quality_checks_tenancy._is_alembic_env).

@@ -1,0 +1,46 @@
+{
+  "name": "maker",
+  "version": "0.7.0",
+  "inventari_min_version": "0.9.0",
+  "category": "business",
+  "display_name": "Production",
+  "description": "Production runs, bills of materials (BOM), and cost rollup.",
+  "icon": "hammer",
+  "module_type": "official",
+  "requires": [
+    "items",
+    "locations"
+  ],
+  "capabilities": [
+    "database"
+  ],
+  "permissions": [
+    {
+      "key": "maker:read",
+      "label_key": "maker:permissions.read",
+      "description_key": "maker:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    },
+    {
+      "key": "maker:write",
+      "label_key": "maker:permissions.write",
+      "description_key": "maker:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "key": "maker:manage",
+      "label_key": "maker:permissions.manage",
+      "description_key": "maker:permissions.manageDesc",
+      "default_roles": [
+        "manager"
+      ]
+    }
+  ]
+}

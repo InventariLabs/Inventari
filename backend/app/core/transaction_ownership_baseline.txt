@@ -1,0 +1,5 @@
+# Architecture lint baseline
+# Format: relative/path.py::qualname@N (N = the Nth commit inside that function)
+# One entry per site. A second commit in a baselined function is a NEW
+# site, not coverage under the old key. Legal transaction owners live
+# in transaction_owner_allowlist.txt, not here.

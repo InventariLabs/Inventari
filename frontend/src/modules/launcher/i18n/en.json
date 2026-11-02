@@ -1,0 +1,59 @@
+{
+  "launcher": {
+    "title": "Home",
+    "description": "Your workspace overview",
+    "welcome": "Welcome, {{name}}",
+    "joinedOrganization": "You have joined {{organization}}",
+    "createdOrganization": "You set up {{organization}}",
+    "welcomeBack": "Welcome back, {{name}}",
+    "workspaceOverview": "Your workspace overview",
+    "alerts": "Alerts",
+    "recentItems": "Recently visited",
+    "browseApps": "Browse Apps",
+    "noActions": "All tasks complete",
+    "emptyRecent": "No recent items yet",
+    "actionItems": {
+      "title": "To do",
+      "subtitle": "{{count}} pending across enabled modules",
+      "subtitle_one": "{{count}} pending across enabled modules",
+      "subtitle_other": "{{count}} pending across enabled modules"
+    }
+  },
+  "sections": {
+    "core": "Essentials",
+    "business": "Business",
+    "analytics": "Analytics",
+    "integrations": "Integrations",
+    "system": "System"
+  },
+  "workspace": {
+    "current": "Current",
+    "apply": "Apply",
+    "reapply": "Apply again",
+    "reapplyHint": "Runs this profile's setup again — no modules are added or removed",
+    "target": "Target: {{name}}",
+    "loading": "Loading profiles…",
+    "empty": "No profiles available.",
+    "diffTitle": "What will change",
+    "diffSubtitle": "From {{from}} to {{to}}",
+    "diffEnable": "Enable",
+    "diffDisable": "Disable",
+    "diffCascade": "Cascade disable",
+    "diffUnchanged": "Unchanged",
+    "diffConfig": "Reset settings for",
+    "confirmTitle": "Switch to {{name}}?",
+    "confirmMessage": "Modules will be enabled and disabled for your organization. You can switch back at any time.",
+    "confirmApply": "Switch profile",
+    "confirmReapplyTitle": "Run {{name}} setup again?",
+    "confirmReapplyMessage": "No modules are added or removed. The workspace mode's setup runs again: its default settings are reset to the mode's values, and the names it seeded — location types included — are rewritten in the language of this session.",
+    "confirmReapply": "Run setup again",
+    "previewLoading": "Calculating changes…",
+    "diffManualKept": "Kept (added manually)",
+    "diffCascadeHint": "Disabled because they require a removed module",
+    "diffConfigHint": "Profile defaults will overwrite current settings",
+    "renumberOffer": "Your locations keep their codes and stickers. For codes that read like A-02-01, choose Renumber by template under Configuration → Location codes, labels and walk order; old stickers keep scanning."
+  },
+  "activeProfile": {
+    "change": "Change"
+  }
+}

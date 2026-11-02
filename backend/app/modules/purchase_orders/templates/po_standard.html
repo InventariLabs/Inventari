@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page {
+      margin: 18mm 15mm 18mm 15mm;
+      @top-right {
+        content: counter(page) " / " counter(pages);
+        font-size: 8pt;
+        color: #999;
+      }
+      @bottom-center {
+        content: "{{ labels.footer }}";
+        font-size: 8pt;
+        text-align: center;
+        padding: 0 4mm;
+        color: #999;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 9pt;
+      color: #222;
+      line-height: 1.4;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 20px;
+      margin-bottom: 12px;
+    }
+    .info-block {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+    .info-block h3 {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 3px;
+    }
+    .info-row {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 0 3mm;
+      margin-bottom: 2px;
+    }
+    .info-label {
+      color: #888;
+    }
+    .info-value {
+      font-weight: 500;
+    }
+    .lines-section h2 {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    thead th {
+      padding: 5px 6px;
+      text-align: left;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+    thead th.right {
+      text-align: right;
+    }
+    tbody tr:nth-child(even) {
+      background: #f7f7fb;
+    }
+    tbody tr:nth-child(odd) {
+      background: #fff;
+    }
+    tbody td {
+      padding: 4px 6px;
+      font-size: 9pt;
+    }
+    tbody td.right {
+      text-align: right;
+    }
+    .totals-section {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .totals-table {
+      width: 220px;
+      border: 1px solid #1a1a2e;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .totals-table tr td {
+      padding: 4px 10px;
+      font-size: 9pt;
+      border-bottom: 1px solid #eee;
+    }
+    .totals-table tr:last-child td {
+      border-bottom: none;
+    }
+    .totals-table .label { color: #555; }
+    .tax-by-rate {
+      margin-top: 10px;
+      margin-left: auto;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+    .tax-by-rate th, .tax-by-rate td {
+      padding: 3px 8px;
+      border-bottom: 1px solid #eee;
+      text-align: right;
+    }
+    .tax-by-rate th { color: #555; font-weight: 500; }
+    .totals-table .amount { text-align: right; font-weight: 500; }
+    .totals-table .grand-total td {
+      font-weight: bold;
+      font-size: 11pt;
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .notes-section {
+      margin-top: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+    .notes-section h3 {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    /* The blank above the rules is where somebody signs. */
+    .signatures {
+      margin-top: 10mm;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .sig-box {
+      border-top: 1px solid #555;
+      padding-top: 1.5mm;
+      text-align: center;
+      font-size: 8pt;
+      color: #555;
+    }
+    .sig-box .sig-hint {
+      display: block;
+      margin-top: 0.5mm;
+      font-size: 8pt;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Identity, identification and codes — one header for every print
+     family. This one used to print a bare organization name and a
+     barcode in a size the documented measurement had rejected. -->
+{% include 'print_header.html' %}
+
+<!-- Info grid: Supplier + Order details -->
+<div class="info-grid">
+  <div class="info-block">
+    <h3>{{ labels.partner }}</h3>
+    {% if partner.name %}
+    <div class="info-row">
+      <span class="info-label">{{ labels.name }}:</span>
+      <span class="info-value">{{ partner.name }}</span>
+    </div>
+    {% if partner.tax_id %}
+    <div class="info-row">
+      <span class="info-label">{{ labels.tax_id }}:</span>
+      <span class="info-value">{{ partner.tax_id }}</span>
+    </div>
+    {% endif %}
+    {% if partner.address %}
+    <div class="info-row">
+      <span class="info-label">{{ labels.address }}:</span>
+      <span class="info-value">{{ partner.address }}</span>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="info-row"><span class="info-value">—</span></div>
+    {% endif %}
+  </div>
+  <div class="info-block">
+    <h3>{{ labels.document }}</h3>
+    <div class="info-row"><span class="info-label">{{ labels.number }}:</span><span class="info-value">{{ po.number }}</span></div>
+    <div class="info-row"><span class="info-label">{{ labels.date }}:</span><span class="info-value">{{ scheduled_date_text }}</span></div>
+    <div class="info-row"><span class="info-label">{{ labels.created }}:</span><span class="info-value">{{ created_at_text }}</span></div>
+  </div>
+</div>
+
+<!-- Lines table -->
+<div class="lines-section">
+  <h2>{{ labels.line_items }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30px">#</th>
+        <th>{{ labels.product }}</th>
+        <th>{{ labels.sku }}</th>
+        <th class="right" style="width:60px">{{ labels.quantity }}</th>
+        <th style="width:50px">{{ labels.unit }}</th>
+        <th class="right" style="width:70px">{{ labels.unit_price }}</th>
+        <th class="right" style="width:70px">{{ labels.net_value }}</th>
+        <th class="right" style="width:50px">{{ labels.vat }}</th>
+        <th class="right" style="width:70px">{{ labels.gross_value }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in lines %}
+      <tr>
+        <td>{{ item.line.line_number }}</td>
+        <td>{{ item.line.name or '—' }}</td>
+        <td>{{ item.line.product_template.sku if item.line.product_template else '—' }}</td>
+        <td class="right">{{ item.line.quantity_ordered|format_qty }}</td>
+        <td>{{ item.line.uom.symbol | unit_label if item.line.uom else '—' }}</td>
+        <td class="right">{{ item.line.unit_price|format_decimal if item.line.unit_price else '—' }}</td>
+        <td class="right">{{ item.net|format_decimal }}</td>
+        <td class="right">{{ item.tax_pct|format_decimal if item.tax_pct else '0'|format_decimal }}%</td>
+        <td class="right">{{ item.gross|format_decimal }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Totals -->
+{% if tax_by_rate | length > 1 %}
+<table class="tax-by-rate">
+  <tr>
+    <th>{{ labels.vat }}</th>
+    <th>{{ labels.net_value }}</th>
+    <th>{{ labels.total_vat }}</th>
+    <th>{{ labels.gross_value }}</th>
+  </tr>
+  {% for row in tax_by_rate %}
+  <tr>
+    <td>{{ row.rate|format_decimal }}%</td>
+    <td>{{ row.net|format_decimal }}</td>
+    <td>{{ row.tax|format_decimal }}</td>
+    <td>{{ row.gross|format_decimal }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+<div class="totals-section">
+  <table class="totals-table">
+    <tr>
+      <td class="label">{{ labels.currency }}</td>
+      <td class="amount">{{ currency }}</td>
+    </tr>
+    <tr>
+      <td class="label">{{ labels.total_net }}</td>
+      <td class="amount">{{ total_net|format_decimal }}</td>
+    </tr>
+    <tr>
+      <td class="label">{{ labels.total_vat }}</td>
+      <td class="amount">{{ total_tax|format_decimal }}</td>
+    </tr>
+    <tr class="grand-total">
+      <td>{{ labels.total_gross }}</td>
+      <td class="amount">{{ total_gross|format_decimal }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Notes -->
+{% if po.notes %}
+<div class="notes-section">
+  <h3>{{ labels.notes }}</h3>
+  <p>{{ po.notes }}</p>
+</div>
+{% endif %}
+
+<!-- Signatures -->
+<div class="signatures">
+  <div class="sig-box">{{ labels.sig_prepared }}<span class="sig-hint">{{ labels.sig_hint }}</span></div>
+  <div class="sig-box">{{ labels.sig_approved }}<span class="sig-hint">{{ labels.sig_hint }}</span></div>
+</div>
+
+
+</body>
+</html>

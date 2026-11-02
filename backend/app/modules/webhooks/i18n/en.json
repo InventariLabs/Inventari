@@ -1,0 +1,18 @@
+{
+  "webhook.endpoint.created": "Webhook endpoint created",
+  "webhook.endpoint.updated": "Webhook endpoint updated",
+  "webhook.endpoint.deleted": "Webhook endpoint deleted",
+  "webhook.test.sent": "Test ping sent to {{name}}",
+  "webhook.reactivated": "Webhook reactivated",
+  "webhook.circuit_broken": "Webhook auto-disabled after repeated failures",
+  "events.item.created": "Item created",
+  "events.item.updated": "Item updated",
+  "events.item.deleted": "Item deleted",
+  "events.item.moved": "Item moved",
+  "events.location.created": "Location created",
+  "events.location.updated": "Location updated",
+  "events.location.deleted": "Location deleted",
+  "events.module.enabled": "Module enabled",
+  "events.module.disabled": "Module disabled",
+  "events.label.scanned": "Label scanned"
+}

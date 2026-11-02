@@ -1,0 +1,46 @@
+{
+  "name": "recipes",
+  "module_type": "official",
+  "version": "0.8.0",
+  "inventari_min_version": "0.9.0",
+  "capabilities": [
+    "database",
+    "filesystem",
+    "network"
+  ],
+  "permissions": [
+    "items:read",
+    {
+      "key": "recipes:read",
+      "label_key": "recipes:permissions.read",
+      "description_key": "recipes:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    },
+    {
+      "key": "recipes:write",
+      "label_key": "recipes:permissions.write",
+      "description_key": "recipes:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "key": "recipes:consume",
+      "label_key": "recipes:permissions.consume",
+      "description_key": "recipes:permissions.consumeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    }
+  ],
+  "has_settings_schema": true,
+  "optional_requires": [
+    "shopping_lists"
+  ]
+}

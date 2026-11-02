@@ -1,0 +1,135 @@
+{
+  "title": "Einkaufslisten",
+  "launcher": {
+    "description": "Tägliche Einkäufe: was eingekauft werden soll"
+  },
+  "subtitle": "Tägliche Einkäufe: planen Sie, was zu kaufen ist, und haken Sie ab",
+  "newList": "Neue Liste",
+  "addFirst": "Erstellen Sie Ihre erste Einkaufsliste, um mit der Planung zu beginnen",
+  "modal": {
+    "title": "Neue Einkaufsliste",
+    "nameLabel": "Listenname",
+    "namePlaceholder": "z.B. Wocheneinkauf",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "creating": "Wird erstellt…",
+    "createSuccess": "Liste erstellt!",
+    "createFailed": "Liste konnte nicht erstellt werden",
+    "nameHint": "Leer lassen — dann trägt die Liste das heutige Datum.",
+    "defaultName": "Liste {{date}}"
+  },
+  "completed": "Erledigt",
+  "detail": {
+    "purchased": "gekauft",
+    "addItem": "Artikel hinzufügen",
+    "clearPurchased": "Gekaufte löschen ({{count}})",
+    "clearPurchased_one": "Gekaufte löschen ({{count}})",
+    "clearPurchased_other": "Gekaufte löschen ({{count}})",
+    "empty": "Liste ist leer",
+    "emptySubtitle": "Artikel manuell hinzufügen.",
+    "emptySubtitleRecipes": "Artikel manuell oder aus einem Rezept hinzufügen.",
+    "backToLists": "Zurück zu Listen",
+    "confirmClearPurchased": "Alle gekauften Artikel entfernen?",
+    "confirmDeleteItem": "Diesen Artikel von der Liste entfernen?",
+    "listNotFound": "Liste nicht gefunden",
+    "errorClearPurchased": "Gekaufte Positionen konnten nicht geleert werden",
+    "errorDeleteItem": "Position konnte nicht gelöscht werden",
+    "errorUpdateItem": "Position konnte nicht aktualisiert werden",
+    "successClearPurchased": "Gekaufte Positionen geleert",
+    "successDeleteItem": "Position gelöscht",
+    "convertToPo": "In Bestellung umwandeln",
+    "convertToPoSuccess": "Bestellung {{number}} erstellt",
+    "convertToPoError": "Bestellung konnte nicht erstellt werden",
+    "confirmConvertGrouped_one": "{{count}} Position wird zu einer Bestellvorlage zusammengefasst.",
+    "confirmConvertGrouped_other": "{{count}} Positionen werden zu einer Bestellvorlage zusammengefasst.",
+    "confirmConvertSkipped_one": "{{count}} Position ohne verknüpftes Produkt wird übersprungen.",
+    "confirmConvertSkipped_other": "{{count}} Positionen ohne verknüpftes Produkt werden übersprungen.",
+    "toBuyCount_one": "{{count}} zu kaufen",
+    "toBuyCount_other": "{{count}} zu kaufen",
+    "purchasedCount_one": "{{count}} gekauft",
+    "purchasedCount_other": "{{count}} gekauft",
+    "markPurchasedNamed": "Als gekauft markieren: {{name}}"
+  },
+  "addItem": {
+    "title": "Zur Liste hinzufügen",
+    "nameLabel": "Name",
+    "namePlaceholder": "z.B. Milch, Brot, Eis…",
+    "quantityLabel": "Menge",
+    "unitLabel": "Einheit",
+    "noteLabel": "Notiz (optional)",
+    "notePlaceholder": "z.B. Wenn im Angebot, das beste…",
+    "priorityLabel": "Priorität",
+    "priority": {
+      "normal": "Normal",
+      "urgent": "Dringend"
+    },
+    "cancel": "Abbrechen",
+    "add": "Hinzufügen",
+    "adding": "Wird hinzugefügt…",
+    "addFailed": "Element konnte nicht hinzugefügt werden",
+    "validation": {
+      "nameRequired": "Produktname eingeben",
+      "quantityPositive": "Die Menge muss größer als 0 sein",
+      "quantityMax": "Eine Menge über {{max}} kann nicht gespeichert werden",
+      "unitRequired": "Einheit wählen"
+    }
+  },
+  "addFromRecipes": {
+    "title": "Aus Rezepten",
+    "search": "Rezepte suchen…",
+    "noRecipes": "Keine Rezepte gefunden",
+    "recipesDisabled": "Rezeptmodul ist nicht aktiviert",
+    "addSelected": "{{count}} Rezepte hinzufügen",
+    "addSelected_one": "{{count}} Rezept hinzufügen",
+    "addSelected_other": "{{count}} Rezepte hinzufügen",
+    "adding": "Wird hinzugefügt…",
+    "failed": "Zutaten aus den gewählten Rezepten konnten nicht hinzugefügt werden",
+    "success": "{{count}} Zutaten hinzugefügt",
+    "success_one": "{{count}} Zutat hinzugefügt",
+    "success_other": "{{count}} Zutaten hinzugefügt"
+  },
+  "card": {
+    "saveName": "Name speichern",
+    "editName": "Listenname bearbeiten",
+    "deleteList": "Liste löschen",
+    "actionsFor": "Aktionen für {{name}}",
+    "emptyPreview": "Noch nichts auf dieser Liste",
+    "morePreview_one": "und 1 weiteres",
+    "morePreview_other": "und {{count}} weitere"
+  },
+  "actions": {
+    "open": "Öffnen"
+  },
+  "searchPlaceholder": "Listen suchen…",
+  "loading": "Listen werden geladen…",
+  "empty": {
+    "title": "Noch keine Einkaufslisten"
+  },
+  "deleteModal": {
+    "title": "Liste löschen?",
+    "desc": "Alle Produkte dieser Liste werden dauerhaft gelöscht."
+  },
+  "messages": {
+    "listDeleted": "Liste gelöscht",
+    "deleteError": "Fehler beim Löschen der Liste",
+    "nameChanged": "Name geändert",
+    "nameChangeError": "Fehler beim Ändern des Namens"
+  },
+  "permissions": {
+    "read": "Einkaufslisten ansehen",
+    "readDesc": "Kann Einkaufslisten und deren Vorschläge einsehen",
+    "write": "Einkaufslisten verwalten",
+    "writeDesc": "Kann Listen anlegen sowie Positionen hinzufügen und abhaken"
+  },
+  "notes": {
+    "neededBy": "Benötigt bis: {{date}}",
+    "checkStock": "Bestand prüfen: {{available}} vorhanden, Rezept braucht {{required}}",
+    "matchedByName": "Über den Namen \"{{product}}\" zugeordnet",
+    "convertedToPo": "In Bestellung {{number}}",
+    "forRecipe": "Für Rezept: {{recipe}}"
+  },
+  "toasts": {
+    "addItemsFailed": "Produkte konnten nicht hinzugefügt werden",
+    "shoppingListGone": "Einkaufsliste existiert nicht mehr"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "region": "Komunikaty",
+  "actions": {
+    "dismiss": "Zamknij"
+  },
+  "types": {
+    "info": "Komunikat",
+    "warning": "Ostrzeżenie",
+    "critical": "Krytyczne",
+    "downtime": "Przerwa"
+  }
+}

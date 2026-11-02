@@ -1,0 +1,146 @@
+import React from "react";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { http, HttpResponse } from "msw";
+
+import { server } from "@/test/mocks/server";
+import { signInWith, signOut } from "@/test/auth";
+import { ModulesProvider } from "@/contexts/ModulesContext";
+import {
+  PageHeaderContext,
+  type PageHeaderData,
+} from "@/hooks/useModulePageHeader";
+import { onePage } from "@/test/mocks/page";
+
+import EquipmentCategoriesPage from "./EquipmentCategoriesPage";
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}));
+
+const CATEGORIES = [
+  {
+    id: "cat-1",
+    name: "Monitors",
+    code: null,
+    context_tag: "equipment",
+    items_count: 0,
+    field_definitions: [],
+  },
+  // A grocery category in the same organization: not this screen's to list.
+  {
+    id: "cat-2",
+    name: "Dairy",
+    code: null,
+    context_tag: null,
+    items_count: 4,
+    field_definitions: [],
+  },
+];
+
+beforeEach(() => {
+  signInWith(["equipment:read", "categories:read", "categories:write"]);
+  server.use(
+    http.get("/api/v1/categories", () =>
+      HttpResponse.json(onePage(CATEGORIES)),
+    ),
+  );
+});
+
+afterEach(() => {
+  signOut();
+});
+
+function PageHeaderHost({ children }: { children: React.ReactNode }) {
+  const [data, setData] = React.useState<PageHeaderData>({});
+  return (
+    <PageHeaderContext.Provider value={{ data, setHeader: setData }}>
+      {data.actions ? <div>{data.actions}</div> : null}
+      {children}
+    </PageHeaderContext.Provider>
+  );
+}
+
+function renderPage() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <ModulesProvider>
+        <MemoryRouter>
+          <PageHeaderHost>
+            <EquipmentCategoriesPage />
+          </PageHeaderHost>
+        </MemoryRouter>
+      </ModulesProvider>
+    </QueryClientProvider>,
+  );
+  return userEvent.setup();
+}
+
+/**
+ * The category screen lists the module's categories and acts on them
+ * through the shared form and a confirmation. The failures caught: a delete
+ * sent without the confirmation (or after a cancel), and the edit form
+ * opening empty instead of on the category that was clicked.
+ */
+describe("EquipmentCategoriesPage", () => {
+  it("lists only the module's categories", async () => {
+    renderPage();
+    expect((await screen.findAllByText("Monitors")).length).toBeGreaterThan(0);
+    expect(screen.queryByText("Dairy")).not.toBeInTheDocument();
+  });
+
+  it("deletes a category only once the confirmation is accepted", async () => {
+    const deleted = vi.fn();
+    server.use(
+      http.delete("/api/v1/categories/cat-1", () => {
+        deleted();
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    const user = renderPage();
+
+    const [deleteButton] = await screen.findAllByRole("button", {
+      name: "Delete Monitors",
+    });
+    await user.click(deleteButton);
+    let dialog = await screen.findByRole("alertdialog");
+    expect(
+      within(dialog).getByText('Delete category "Monitors"?'),
+    ).toBeInTheDocument();
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument(),
+    );
+    expect(deleted).not.toHaveBeenCalled();
+
+    await user.click(deleteButton);
+    dialog = await screen.findByRole("alertdialog");
+    await user.click(within(dialog).getByRole("button", { name: "Delete" }));
+    await waitFor(() => expect(deleted).toHaveBeenCalledTimes(1));
+  });
+
+  it("opens the form on the clicked category, and empty from the header", async () => {
+    const user = renderPage();
+
+    const [editButton] = await screen.findAllByRole("button", {
+      name: "Edit Monitors",
+    });
+    await user.click(editButton);
+    expect(await screen.findByText("Edit Category")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Monitors")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByText("Edit Category")).not.toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Add Category" }));
+    expect(await screen.findByText("Add New Category")).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("Monitors")).not.toBeInTheDocument();
+  });
+});

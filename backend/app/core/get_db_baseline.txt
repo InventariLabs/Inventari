@@ -1,0 +1,11 @@
+# get_db in async def baseline
+# These endpoints need deeper service-layer refactoring (A5 Kat.4)
+# to handle AsyncSession natively. Tracked on the backend-unified plan.
+#
+# All 4 baseline endpoints have been migrated in A5 Kat.4:
+# - scan_label: scan_registry + scan_providers now accept Session | AsyncSession
+# - toggle_module: ModuleService.toggle_module now accepts Session | AsyncSession
+# - join_organization: OrganizationService.join_organization now async-native
+# - invite_member: OrganizationService.add_member now async-native
+#
+# This file is kept for documentation purposes. No baselined endpoints remain.

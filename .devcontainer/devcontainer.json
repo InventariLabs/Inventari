@@ -1,0 +1,26 @@
+{
+  "name": "Inventari Dev",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/app",
+  "forwardPorts": [5173, 8005, 8025],
+  // The lifecycle command runs INSIDE the backend image, which has neither
+  // `make` nor the docker CLI, while the repository root — Makefile, README,
+  // CONTRIBUTING — is mounted read-only at /repo. The `make dev-up` this used
+  // to call therefore failed on its first line, on every machine, for anyone
+  // who clicked "Reopen in Container". The stack is the host's to start; what
+  // this can do is say so and say where the rest of the checkout is.
+  // CONTRIBUTING.md, "Opening it in a dev container", has the same order.
+  "postCreateCommand": "sh -c 'echo \"Inventari dev container: backend source at /app, repository root (Makefile, README, CONTRIBUTING) at /repo, read-only. This image has neither make nor the docker CLI, so the stack starts on the host — run make setup-hooks and make dev-up there, then reopen this folder.\"'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
+}

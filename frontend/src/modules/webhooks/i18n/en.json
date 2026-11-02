@@ -1,0 +1,171 @@
+{
+  "title": "Webhooks",
+  "subtitle": "Outbound HTTP notifications about events in your workspace.",
+  "addWebhook": "Add webhook",
+  "noWebhooks": "No webhooks configured",
+  "noWebhooksDescription": "Add a webhook to send HTTP notifications when events occur.",
+  "inactive": "Inactive",
+  "inactiveCircuitBreaker": "Inactive (circuit breaker)",
+  "inactiveModuleDisabled": "Inactive (module disabled)",
+  "unknownEvents": "Unknown event names",
+  "failuresSinceSuccess_one": "1 failed delivery since the last successful one.",
+  "failuresSinceSuccess_other": "{{count}} failed deliveries since the last successful one.",
+  "consecutiveFailures": "Consecutive failures",
+  "test": "Test",
+  "reactivate": "Reactivate",
+  "thresholdLink": "Set the failure threshold",
+  "delete": "Delete",
+  "edit": "Edit",
+  "logs": "Delivery logs",
+  "form": {
+    "titleCreate": "Add webhook",
+    "titleEdit": "Edit webhook",
+    "namePlaceholder": "e.g. Slack incident channel",
+    "url": "Target URL",
+    "urlPlaceholder": "https://example.com/webhook",
+    "secret": "Secret (HMAC-SHA256)",
+    "secretPlaceholder": "Leave empty for no signing",
+    "secretMasked": "Secret is set (leave blank to keep, or enter new value)",
+    "httpMethod": "HTTP method",
+    "eventTypes": "Event types",
+    "eventTypesPlaceholder": "Select events to subscribe to",
+    "maxRetries": "Max retries",
+    "timeoutSeconds": "Timeout (seconds)",
+    "isActive": "Active",
+    "urlHint": "Must be reachable from the internet. Private and local addresses are rejected unless the operator of this installation allows them.",
+    "insecureUrlWarning": "Without HTTPS the payload travels in clear text, readable by anything on the way.",
+    "noSecretWarning": "Without a secret the receiver cannot tell your payloads from anyone else's.",
+    "eventNeedsModule": "needs the {{module}} module",
+    "withdrawnEvents": "No longer in the catalogue",
+    "withdrawnEventsHint": "These names left the event catalogue, so they can never fire. Uncheck them and save to remove the subscription.",
+    "eventsSelected": "({{count}} selected)",
+    "eventsSelected_one": "({{count}} selected)",
+    "eventsSelected_other": "({{count}} selected)"
+  },
+  "delivery": {
+    "title": "Delivery logs",
+    "empty": "No deliveries yet",
+    "error": "Error",
+    "success": "Success",
+    "failed": "Failed",
+    "pendingRetry": "Pending retry",
+    "payload": "Payload",
+    "response": "Response",
+    "nextRetry": "Next retry",
+    "page": "Page {{page}}",
+    "close": "Close",
+    "pending": "Sending",
+    "targetResponse": "Response from the target",
+    "truncated": "shortened",
+    "abandonedByApp": "Abandoned by Inventari — the target never answered",
+    "deliveryId": "Delivery ID",
+    "abandon": {
+      "circuitBreaker": "The circuit breaker cut this endpoint off after repeated failures.",
+      "webhookDisabled": "The endpoint was switched off by an administrator.",
+      "webhookDeleted": "The endpoint was deleted.",
+      "moduleDisabled": "The webhooks module is switched off for this organization."
+    }
+  },
+  "testResult": {
+    "success": "Test ping sent successfully ({{status}})",
+    "successStillOff": "Test ping passed ({{status}}), but this webhook is still off. Reactivate it to resume deliveries.",
+    "failure": "Test ping failed: {{error}}",
+    "rejected": "Test ping failed: the receiver answered {{status}}. The full response is in the delivery log."
+  },
+  "confirmDelete": "Delete webhook \"{{name}}\"?",
+  "confirmDeleteDescription": "This will permanently delete the webhook and all its delivery logs.",
+  "deleteSuccess": "Webhook deleted",
+  "reactivateSuccess": "Webhook reactivated",
+  "createSuccess": "Webhook created",
+  "updateSuccess": "Webhook updated",
+  "never": "Never",
+  "statusActive": "Active",
+  "statusFailing": "Failing",
+  "unknownError": "Unknown error",
+  "navigation": {
+    "webhooks": "Webhooks"
+  },
+  "circuitBreakerWarning_one": "This webhook was auto-disabled after 1 consecutive failure — the cause of the last attempt is named in the delivery log.",
+  "circuitBreakerWarning_other": "This webhook was auto-disabled after {{count}} consecutive failures — the cause of the last attempt is named in the delivery log.",
+  "eventsWhileOff": "Events that happen while it is off are not delivered, queued or logged, and Reactivate does not replay them.",
+  "settings": {
+    "logRetentionDays": "Log retention (days)",
+    "logRetentionDaysDescription": "How long to keep webhook delivery logs.",
+    "circuitBreakerThreshold": "Circuit breaker threshold",
+    "circuitBreakerThresholdDescription": "Auto-disable a webhook after this many consecutive failed attempts. Every attempt counts on its own — the first delivery, each retry and the Test button all feed the same tally."
+  },
+  "events": {
+    "category": {
+      "created": "A category was created",
+      "deleted": "A category was deleted",
+      "updated": "A category was modified"
+    },
+    "document": {
+      "cancelled": "A document was cancelled",
+      "completed": "A document was completed",
+      "confirmed": "A document was confirmed"
+    },
+    "equipment": {
+      "checkin": "A piece of equipment was returned",
+      "checkout": "A piece of equipment was handed out"
+    },
+    "item": {
+      "consumed": "An item was consumed / decremented",
+      "created": "An item was added to inventory",
+      "deactivated": "An item was deactivated",
+      "deleted": "An item was removed",
+      "discarded": "An item was discarded as waste",
+      "disposed": "An item was written off",
+      "moved": "A product was moved to another location",
+      "status_changed": "An item changed status",
+      "transferred": "An item was transferred to another location",
+      "updated": "An item was modified",
+      "used": "An item was used up"
+    },
+    "label": {
+      "assigned": "A label was assigned to an item",
+      "batch_exported": "A batch of labels was exported for printing",
+      "batch_generated": "A batch of labels was generated",
+      "scanned": "A label was scanned"
+    },
+    "location": {
+      "created": "A location was created",
+      "deleted": "A location was deleted",
+      "updated": "A location was modified"
+    },
+    "module": {
+      "disabled": "A module was disabled for the organization",
+      "enabled": "A module was enabled for the organization"
+    },
+    "organization": {
+      "created": "An organization was created",
+      "updated": "An organization was updated"
+    },
+    "partner": {
+      "activated": "A partner was activated",
+      "deactivated": "A partner was deactivated"
+    },
+    "purchase_order": {
+      "cancelled": "A purchase order was cancelled",
+      "completed": "A purchase order was completed",
+      "confirmed": "A purchase order was confirmed"
+    },
+    "receipt": {
+      "created_from_po": "A receipt was created from a purchase order"
+    },
+    "recipe": {
+      "created": "A recipe was created",
+      "meal_plan_generated": "A meal plan was generated",
+      "picking_completed": "Ingredient picking for a recipe finished"
+    },
+    "user": {
+      "joined_organization": "A user joined the organization",
+      "left_organization": "A user left the organization",
+      "registered": "A new user registered"
+    }
+  },
+  "pagination": {
+    "prev": "‹ Prev",
+    "next": "Next ›"
+  }
+}

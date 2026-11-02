@@ -1,0 +1,88 @@
+{
+    email {$ACME_EMAIL}
+
+    # Whose X-Forwarded-For Caddy believes. Nobody's by default: Caddy is the
+    # first hop and a client's own header is overwritten. The demo stack sits
+    # behind this deployment's Caddy and sets TRUSTED_PROXIES=private_ranges,
+    # so the visitor's address reaches the backend's rate limits instead of
+    # the edge's.
+    servers {
+        trusted_proxies static {$TRUSTED_PROXIES:127.0.0.1/32}
+    }
+}
+
+{$DOMAIN} {
+    # HSTS belongs at the edge: TLS terminates here, so the policy has to ride
+    # on every response this site serves (the HTML document, the API, static
+    # files), not only on the ones the application signs. Enabling is a
+    # commitment — clearing a browser's pinned max-age takes far longer than
+    # setting it — which is why the value is written once, deliberately.
+    header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # One ceiling for every body this site forwards, and it sits above what
+    # the application accepts. The app refuses a body over
+    # MAX_REQUEST_BODY_SIZE — 51 MiB (53,477,376 B): the largest file it
+    # takes, the 50 MiB import, plus 1 MiB of multipart framing — with a
+    # message that names the limit, and the browser's gate refuses at the
+    # file's limit before the bytes are sent. A proxy ceiling under that
+    # refuses an upload both of them let through, with a bare 413 naming
+    # neither the file nor the endpoint: `10MB` read as 10,000,000 B fell
+    # under the 10,485,760 B a ten-megabyte photograph weighs. So the
+    # ceiling is 52 MiB (54,525,952 B) — the app's own ceiling plus a
+    # megabyte of headroom, which keeps the app's refusal the one a reader
+    # sees and leaves the proxy answering only what the app refuses anyway.
+    # The unit is part of the number: Caddy parses max_size through
+    # go-humanize, where `MB` is 10^6 and only `MiB` is 1024².
+    request_body {
+        max_size 52MiB
+    }
+
+    # Direct proxy to backend for API
+    reverse_proxy /api/* backend:8000
+
+    # Public, unauthenticated API calls (/public/invitation/<code>,
+    # /public/attestation/<token>). The attestation address is also a page of
+    # the SPA, so a browser navigation (Accept: text/html) stays with the
+    # frontend — the split vite.config.ts makes for the dev server. Without
+    # this, a fetch fell through to the SPA fallback and read index.html as
+    # a successful answer.
+    @publicApi {
+        path /public/*
+        not header Accept *text/html*
+    }
+    reverse_proxy @publicApi backend:8000
+
+    # Stored files are served from here (GET), not received: no upload route
+    # lives under /uploads/*. The block used to carry a larger max_size of
+    # its own, which could never have been the one to refuse anything —
+    # request_body runs before route in the middleware chain, so the site
+    # ceiling above wraps the body first and trips first — and the site
+    # ceiling is the only one left.
+    route /uploads/* {
+        reverse_proxy backend:8000
+    }
+
+    # Everything else to frontend
+    reverse_proxy * frontend:8080
+}
+
+# The www name, opt-in: a deployment with a www DNS record sets
+# WWW_DOMAIN=www.<domain> and gets a certificate for it plus a permanent
+# redirect to the apex. Left unset, the address below is a plain-HTTP name that
+# no visitor reaches and no certificate is ordered for, so a deployment with no
+# www record asks Let's Encrypt for nothing it cannot validate.
+{$WWW_DOMAIN:http://www.unused.invalid} {
+    header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    redir https://{$DOMAIN}{uri} permanent
+}
+
+# The demo, opt-in, on the same server: a demo stack (docker-compose.demo.yml)
+# is a project of its own and cannot also publish 80 and 443, so this Caddy
+# holds its name, orders its certificate and hands the traffic to the demo
+# stack's Caddy over the shared inventari-edge network, which publishes no port. Left unset, the address
+# below is a plain-HTTP name no visitor reaches and no certificate is ordered
+# for. DEMO_UPSTREAM defaults to the demo overlay's network alias.
+{$DEMO_DOMAIN:http://demo.unused.invalid} {
+    header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    reverse_proxy {$DEMO_UPSTREAM:demo-caddy:80}
+}

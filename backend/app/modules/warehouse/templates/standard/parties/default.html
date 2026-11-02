@@ -1,0 +1,63 @@
+<div class="info-block">
+  <h3>{{ labels.document_details }}</h3>
+  {% if document.external_reference or document.scheduled_date or source_location or target_location %}
+  {% if document.external_reference %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.reference }}:</span>
+    <span class="info-value">{{ document.external_reference }}</span>
+  </div>
+  {% endif %}
+  {% if document.scheduled_date %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.scheduled }}:</span>
+    <span class="info-value">{{ document.scheduled_date }}</span>
+  </div>
+  {% endif %}
+  {% if source_location %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.from_location }}:</span>
+    <span class="info-value">{{ source_location }}</span>
+  </div>
+  {% endif %}
+  {% if target_location %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.to_location }}:</span>
+    <span class="info-value">{{ target_location }}</span>
+  </div>
+  {% endif %}
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>
+
+<div class="info-block">
+  {% if is_external_in %}
+  <h3>{{ labels.supplier }}</h3>
+  {% elif is_external_out %}
+  <h3>{{ labels.customer }}</h3>
+  {% elif is_internal_in or is_internal_out %}
+  <h3>{{ labels.responsible }}</h3>
+  {% else %}
+  <h3>{{ labels.warehouse }}</h3>
+  {% endif %}
+  {% if partner %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.name }}:</span>
+    <span class="info-value">{{ partner.name }}</span>
+  </div>
+  {% if partner.tax_id %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.tax_id }}:</span>
+    <span class="info-value">{{ partner.tax_id }}</span>
+  </div>
+  {% endif %}
+  {% if partner.address %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.address }}:</span>
+    <span class="info-value">{{ partner.address }}</span>
+  </div>
+  {% endif %}
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

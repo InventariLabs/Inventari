@@ -1,0 +1,7 @@
+{
+  "recipe.not_found": "Receita não encontrada",
+  "ingredient.not_in_recipe": "Este produto não é um ingrediente desta receita",
+  "picking.session_not_found": "Sessão de separação não encontrada",
+  "picking.already_active": "Já existe uma sessão de separação ativa para esta receita",
+  "picking.already_picked": "{name} já foi separado"
+}

@@ -1,0 +1,272 @@
+# The public demo instance: an Inventari that rebuilds itself every night.
+#
+# A demo is a database strangers write to, and the interesting question is not
+# whether it fills up with their experiments — it does — but how long the mess
+# outlives the visit. Here, until the next reset.
+#
+# Layer this on top of the production compose file and nothing else changes:
+#
+#     COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml:docker-compose.demo.yml \
+#       docker compose --profile demo up -d
+#
+# The reset runs only where INVENTARI_DEMO says it may, so adding this file to
+# a real deployment by accident does nothing: the command refuses, says why,
+# and leaves the database alone. See docs/DEMO.md.
+
+# Layered on the production file, which pins the project to `inventari`; a
+# demo sharing a host with a production install must not be the same project
+# (same volumes, same containers), so it names its own.
+name: inventari-demo
+
+# The one piece of a visitor's data that outlives the nightly reset is the
+# address in the server's logs, and the json-file driver Docker defaults to
+# keeps those without limit. This caps the size of every container's log so a
+# flood cannot fill the disk; the time limit Docker cannot express is
+# scripts/demo-prune-logs.sh, run daily on the host (docs/DEMO.md, "Logs").
+x-demo-logging: &demo-logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+
+services:
+  # Every message the demo "sends" — a purchase order with its PDF, an
+  # invitation, a password reset — is caught here instead of a real relay, and
+  # the inbox is part of the demo: Caddy publishes it at /mailpit, so a visitor
+  # can read what would have gone out and see that nothing does.
+  #
+  # The two AUTH flags exist because the application logs in unconditionally
+  # (email_service._send_message); without them Mailpit advertises no AUTH
+  # mechanism over plaintext and every send fails. They only widen what this
+  # one container accepts on the private docker network.
+  mailpit:
+    profiles: ["demo"]
+    image: axllent/mailpit:v1.31.4
+    restart: unless-stopped
+    command:
+      - --smtp-auth-accept-any
+      - --smtp-auth-allow-insecure
+      # Mailpit serves its UI and API under the same prefix Caddy publishes, so
+      # every link it renders is one a visitor can follow.
+      - --webroot
+      - /mailpit
+    # The image's own probe asks the default webroot and gets a 404 from a
+    # Mailpit that serves /mailpit, which reads as unhealthy forever.
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz", "--webroot", "/mailpit"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging: *demo-logging
+    networks:
+      - app-network
+
+  # The demo's own Caddy configuration: the production one plus the inbox
+  # route. A host that never includes this file is exactly as it was.
+  caddy:
+    command:
+      - caddy
+      - run
+      - --config
+      - /etc/caddy/Caddyfile.demo
+      - --adapter
+      - caddyfile
+    volumes:
+      - ./Caddyfile.demo:/etc/caddy/Caddyfile.demo:ro
+    logging: *demo-logging
+
+  backend:
+    environment:
+      # The application knows it serves a demo: organization-level SMTP
+      # settings are refused on save and ignored on every send (see
+      # app/services/email_service.py), so the pinned relay below is the only
+      # one there is. The reset service carries the same marker for its guard.
+      INVENTARI_DEMO: "true"
+      # What visitors may upload between resets (docs/DEMO.md).
+      DEMO_UPLOAD_FILE_MB: ${DEMO_UPLOAD_FILE_MB:-2}
+      DEMO_UPLOAD_TOTAL_MB: ${DEMO_UPLOAD_TOTAL_MB:-200}
+      # The system SMTP, overwritten rather than defaulted: whatever .env says
+      # — a real relay, a customer's relay — the demo sends no mail outside the
+      # stack. An organization-level override is refused by the application
+      # itself on a demo, so this pair of door and lock closes both ways.
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_USER: demo
+      SMTP_PASSWORD: demo
+      SMTP_ENCRYPTION: none
+      # Where the sign-in screen tells a visitor to find the inbox.
+      DEMO_INBOX_URL: https://${DOMAIN:?set DOMAIN in .env}/mailpit/
+      # Every visitor gets a sandbox of their own (docs/DEMO.md): how many the
+      # instance hands out between two resets, and how often one address may
+      # ask. The defaults are the application's own.
+      DEMO_SANDBOX_DAILY_CAP: ${DEMO_SANDBOX_DAILY_CAP:-100}
+      DEMO_SANDBOX_RATE_LIMIT: ${DEMO_SANDBOX_RATE_LIMIT:-10/hour}
+    logging: *demo-logging
+
+  demo-reset:
+    profiles: ["demo"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      # The application role, not the superuser (see db-app-role in
+      # docker-compose.prod.yml): the reset drops and recreates the public
+      # schema, which its owner may do.
+      DATABASE_URL: postgresql://${DB_APP_USER:-inventari_app}:${DB_APP_PASSWORD}@db:5432/${DB_NAME:-inventari_db}
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: ${SECRET_KEY}
+      FERNET_SALT: ${FERNET_SALT:-}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      PREVIOUS_ENCRYPTION_KEY: ${PREVIOUS_ENCRYPTION_KEY:-}
+      # The declaration the reset command looks for. Nothing infers it from the
+      # database name: a database called inventari_demo on somebody's laptop is
+      # still their laptop.
+      INVENTARI_DEMO: "true"
+      # The reset runs only where the install says its data may go, and the
+      # production compose this file sits on turns DEBUG off and names no
+      # environment. "demo" is the answer only the demo reset accepts.
+      INVENTARI_ENV: demo
+      # Same address the backend gets from docker-compose.prod.yml. This
+      # container carries the application, which builds links from it, and
+      # without it the default (localhost) is what a link would point at.
+      FRONTEND_URL: https://${DOMAIN:?set DOMAIN in .env}
+      # Where the reset finds the inbox to empty. Mailpit is a service in this
+      # profile only, so the URL is set here and nowhere else; a reset run
+      # without it simply has no inbox to empty.
+      DEMO_INBOX_API_URL: http://mailpit:8025/mailpit
+      # Same system SMTP as the application: this container carries the
+      # application too, and a process that can send mail must not be able to
+      # reach anywhere but Mailpit.
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_USER: demo
+      SMTP_PASSWORD: demo
+      SMTP_ENCRYPTION: none
+      DEMO_RESET_HOUR: ${DEMO_RESET_HOUR:-3}
+      # The storage the backend writes to, so the reset empties that bucket and
+      # not a directory of its own: this service has no `env_file:` either.
+      FILE_STORAGE_BACKEND: ${FILE_STORAGE_BACKEND:-local}
+      FILE_STORAGE_LOCAL_PATH: ${FILE_STORAGE_LOCAL_PATH:-/app/uploads}
+      FILE_STORAGE_S3_BUCKET: ${FILE_STORAGE_S3_BUCKET:-}
+      FILE_STORAGE_S3_ACCESS_KEY: ${FILE_STORAGE_S3_ACCESS_KEY:-}
+      FILE_STORAGE_S3_SECRET_KEY: ${FILE_STORAGE_S3_SECRET_KEY:-}
+      FILE_STORAGE_S3_REGION: ${FILE_STORAGE_S3_REGION:-us-east-1}
+      FILE_STORAGE_S3_ENDPOINT_URL: ${FILE_STORAGE_S3_ENDPOINT_URL:-}
+      # No defaults: the credentials of a public instance are the operator's
+      # to choose, not the repository's to publish. `:?` fails the stack
+      # upfront instead of silently standing up an admin whose password is
+      # in the git history.
+      DEMO_ADMIN_EMAIL: ${DEMO_ADMIN_EMAIL:?set DEMO_ADMIN_EMAIL in .env}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:?set DEMO_ADMIN_PASSWORD in .env}
+      DEMO_ITEMS: ${DEMO_ITEMS:-500}
+      # The visitors' sandboxes this service keeps seeded in advance, and the
+      # cap past which it stops seeding them — the backend refuses beyond it.
+      DEMO_SANDBOX_POOL_SIZE: ${DEMO_SANDBOX_POOL_SIZE:-3}
+      DEMO_SANDBOX_DAILY_CAP: ${DEMO_SANDBOX_DAILY_CAP:-100}
+      # The monthly AI ceiling each rebuild writes into the default limits:
+      # the demo's AI runs on the environment's key, which nothing a visitor
+      # can reach bounds (docs/DEMO.md, "AI on the demo").
+      DEMO_AI_REQUESTS_MONTHLY: ${DEMO_AI_REQUESTS_MONTHLY:-20}
+      # The server's own model, the way the backend gets it: the rebuild
+      # switches on the photo recognition module only where this model serves
+      # it (app/cli/commands_demo.py), and this service has no `env_file:`,
+      # so a variable it does not name reads as "no model" here. All five go
+      # together with the backend's defaults — the application refuses to
+      # start on a key without the endpoint of its provider, and the rebuild
+      # would then fail and keep yesterday's data.
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openrouter}
+      LLM_API_BASE_URL: ${LLM_API_BASE_URL:-https://openrouter.ai/api/v1}
+      LLM_CAPABILITIES: ${LLM_CAPABILITIES:-}
+    # Sleep to the next scheduled hour, rebuild, repeat. A shell loop rather
+    # than cron because the container already has the application and its
+    # dependencies, and a second process supervisor would be one more thing
+    # that can be misconfigured without anybody noticing until the demo is a
+    # month stale.
+    #
+    # The first rebuild happens at start-up, so a freshly deployed demo is
+    # populated immediately instead of showing an empty instance until 03:00.
+    #
+    # Between rebuilds the loop wakes every minute to top up the pool of
+    # visitors' sandboxes: seeding one takes seconds, so they are seeded here
+    # rather than on the visitor's click. The same loop runs both, so a
+    # rebuild never drops the schema under a sandbox being seeded.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        run_reset() {
+          uv run python manage.py demo reset \
+            --items "$${DEMO_ITEMS}" \
+            --email "$${DEMO_ADMIN_EMAIL}" \
+            --password "$${DEMO_ADMIN_PASSWORD}" \
+            || echo "demo reset failed; the instance keeps yesterday's data until the next attempt"
+        }
+        fill_pool() {
+          uv run python manage.py demo fill-pool --items "$${DEMO_ITEMS}" \
+            || echo "demo fill-pool failed; the next round tries again"
+        }
+        echo "demo-reset: first rebuild at start-up, then daily at $${DEMO_RESET_HOUR}:00 UTC; sandboxes topped up every minute"
+        run_reset
+        fill_pool
+        while true; do
+          now_epoch=$$(date -u +%s)
+          next=$$(date -u -d "today $${DEMO_RESET_HOUR}:00" +%s 2>/dev/null || echo 0)
+          if [ "$${next}" -le "$${now_epoch}" ]; then
+            next=$$(date -u -d "tomorrow $${DEMO_RESET_HOUR}:00" +%s)
+          fi
+          if [ $$(( next - now_epoch )) -le 60 ]; then
+            sleep $$(( next - now_epoch ))
+            run_reset
+          else
+            sleep 60
+          fi
+          fill_pool
+        done
+    # The backend's uploads volume (docker-compose.prod.yml), so the reset can
+    # empty what visitors uploaded: the database rows that pointed at those
+    # files go with the schema, and the files would otherwise pile up unseen.
+    volumes:
+      - uploads_data:/app/uploads
+    logging: *demo-logging
+    depends_on:
+      db:
+        condition: service_healthy
+      db-app-role:
+        condition: service_completed_successfully
+      # The first rebuild is the most destructive thing this stack does, and
+      # the backend is starting its own services beside it — seeding system
+      # data, initializing modules. Wait until the backend answers its health
+      # check once before dropping the schema under it. That covers the
+      # start-up window; the migration advisory lock
+      # (app/cli/_migration_lock.py) covers a backend restarted while a later
+      # rebuild is running.
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # The remaining services come from the production file; only their log is
+  # bounded here.
+  db:
+    logging: *demo-logging
+  db-app-role:
+    logging: *demo-logging
+  db-backup:
+    logging: *demo-logging
+  db-backup-offsite:
+    logging: *demo-logging
+  products-db:
+    logging: *demo-logging
+  products-app-role:
+    logging: *demo-logging
+  redis:
+    logging: *demo-logging
+  redis-critical:
+    logging: *demo-logging
+  pgbouncer-main:
+    logging: *demo-logging
+  frontend:
+    logging: *demo-logging

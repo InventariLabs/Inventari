@@ -1,0 +1,236 @@
+{
+  "launcher": {
+    "title": "Inventar",
+    "description": "Produkte, Lagerorte und Etiketten verwalten"
+  },
+  "statusBadge": {
+    "needsAttention_one": "braucht Aufmerksamkeit",
+    "needsAttention_other": "brauchen Aufmerksamkeit"
+  },
+  "actions": {
+    "stockTakesInProgress": "Laufende Inventuren"
+  },
+  "nav": {
+    "overview": "Übersicht",
+    "items": "Produkte",
+    "storages": "Lagerorte",
+    "labels": "Etiketten",
+    "categories": "Kategorien",
+    "scan": "Scannen",
+    "moves": "Bewegungen",
+    "stock": "Bestände"
+  },
+  "toasts": {
+    "importFailedToAnalyze": "Datei konnte nicht analysiert werden",
+    "importGrocyMappingApplied": "Grocy-Zuordnung angewendet!",
+    "importFailed": "Import fehlgeschlagen",
+    "archivedLabelFreed": "Etikett ist nun wieder verwendbar"
+  },
+  "moves": {
+    "title": "Lagerbewegungen",
+    "subtitle": "Was einging, was ausging und was zwischen eigenen Lagerorten wechselte",
+    "outsideFrom": "von außen",
+    "expires": "Haltbar bis {{date}}",
+    "outsideTo": "nach außen",
+    "direction": {
+      "all": "Alle",
+      "in": "Eingänge",
+      "out": "Ausgänge",
+      "internal": "Umlagerungen"
+    },
+    "columns": {
+      "when": "Wann",
+      "product": "Produkt",
+      "quantity": "Menge",
+      "route": "Von → nach",
+      "batch": "Charge",
+      "source": "Quelle",
+      "who": "Wer"
+    },
+    "source": {
+      "document": "Beleg",
+      "item": "Von Hand",
+      "adjustment": "Inventur",
+      "maker_production": "Produktion",
+      "item_history": "Historischer Eintrag",
+      "opening_balance": "Anfangsbestand",
+      "recipe_picking": "Kochen",
+      "location_relocation": "Mit Lagerort umgezogen"
+    },
+    "filters": {
+      "location": "Lagerort",
+      "anyLocation": "Überall",
+      "since": "Von",
+      "until": "Bis",
+      "product": "Produkt:",
+      "oneProduct": "ein Produkt",
+      "oneStorage": "ein Lagerort"
+    },
+    "empty": {
+      "title": "Noch hat sich nichts bewegt",
+      "description": "Bewegungen entstehen beim Wareneingang, Warenausgang und beim Umlagern zwischen Lagerorten.",
+      "filtered_one": "Keine Bewegung passt zum gesetzten Filter ({{filters}}). Entfernen Sie ihn, um das Journal zu erweitern.",
+      "filtered_other": "Keine Bewegung passt zu den gesetzten Filtern ({{filters}}). Entfernen Sie einen, um das Journal zu erweitern.",
+      "filterNames": {
+        "direction": "Richtung: {{value}}",
+        "location": "Lagerort: {{value}}",
+        "dates": "Daten: {{from}} – {{to}}",
+        "datesFrom": "Daten: von {{date}}",
+        "datesUntil": "Daten: bis {{date}}",
+        "product": "Produkt: {{value}}"
+      },
+      "filteredTitle": "Keine Bewegung passt",
+      "productTitle": "Dieses Produkt hat sich hier nicht bewegt",
+      "productDescription": "Eingänge, Ausgänge und Umlagerungen dieses Produkts an diesem Lagerort erscheinen hier.",
+      "locationTitle": "Hier ist nichts durchgelaufen",
+      "locationDescription": "Bewegungen entstehen, wenn Ware hier eingeht, ausgegeben oder umgelagert wird.",
+      "documentTitle": "Dieses Dokument hat nichts bewegt",
+      "documentDescription": "Seine Positionen wurden nicht auf den Bestand gebucht, also trägt keine Bewegung seinen Namen."
+    },
+    "tab": "Bewegungen",
+    "itemCaption": "Bewegungen dieses Produkts in {{location}}. Zwei Datensätze desselben Produkts an einem Lagerort teilen sich diese Zeilen.",
+    "thisLocation": "diesem Lagerort",
+    "seeProductEverywhere": "Dieses Produkt überall",
+    "locationHeading": "Bewegungsverlauf",
+    "locationCaption": "Was hier eingegangen, ausgegangen und durchgelaufen ist — samt allem, was darin liegt.",
+    "seeFullLedger": "Vollständiges Journal öffnen",
+    "documentHeading": "Was dieses Dokument bewegt hat",
+    "documentCaption": "Die von diesem Dokument erfassten Bewegungen — wohin die Ware ging und aus welcher Charge.",
+    "movements_one": "Bewegung",
+    "movements_other": "Bewegungen",
+    "movedWith": "Mit {{name}} umgezogen",
+    "topLevel": "Oberste Ebene"
+  },
+  "lot": {
+    "notFound": "Diese Charge existiert nicht mehr",
+    "backToLots": "Zurück zu den Chargen",
+    "onHand": "Bestand",
+    "serial": "Seriennummer",
+    "batch": "Charge",
+    "whereHeading": "Wo sie liegt",
+    "nothingLeft": "Von dieser Charge liegt nichts mehr im Lager. Ihr Verlauf unten ist die ganze Geschichte.",
+    "trailHeading": "Alles, was mit ihr geschah",
+    "decisionsHeading": "Die Entscheidungen zu ihrem Zustand",
+    "trailCaption": "Jede unter dieser Chargennummer erfasste Bewegung, neueste zuerst.",
+    "status": {
+      "active": "Aktiv",
+      "quarantined": "In Quarantäne",
+      "held": "Gesperrt",
+      "expired": "Abgelaufen",
+      "recalled": "Zurückgerufen"
+    },
+    "fields": {
+      "expiry": "Haltbar bis",
+      "production": "Produktionsdatum",
+      "useBy": "Zu verbrauchen bis",
+      "kind": "Art"
+    },
+    "empty": {
+      "title": "Unter dieser Charge wurde nichts erfasst",
+      "description": "Eingänge, Ausgänge und Umlagerungen mit dieser Charge erscheinen hier."
+    }
+  },
+  "stock": {
+    "title": "Bestände",
+    "subtitle": "Was wo liegt, aus welcher Charge, und wie viel davon schon reserviert ist",
+    "searchPlaceholder": "Produkt oder Charge suchen…",
+    "reservedShort": "{{quantity}} reserviert",
+    "columns": {
+      "location": "Lagerort",
+      "product": "Produkt",
+      "batch": "Charge",
+      "quantity": "Bestand",
+      "reserved": "Reserviert",
+      "available": "Verfügbar"
+    },
+    "filters": {
+      "location": "Lagerort",
+      "anyLocation": "Überall",
+      "includeEmpty": "Lagerorte mit Nullbestand einbeziehen",
+      "includeEmptyHint": "Zeigt Bestandszeilen mit der Menge null — die Spur davon, dass hier etwas war. Ein Lagerort, an dem das Produkt nie war, hat keine Zeile.",
+      "oneStorage": "ein Lagerort",
+      "oneProduct": "ein Produkt"
+    },
+    "empty": {
+      "title": "Noch kein Bestand erfasst",
+      "description": "Bestand erscheint hier nach Eingang, Zählung oder Produktion.",
+      "filteredTitle": "Hier passt nichts",
+      "filtered_one": "Nichts passt zum gesetzten Filter ({{filters}}). Entfernen Sie ihn, um die Liste zu erweitern.",
+      "filtered_other": "Nichts passt zu den gesetzten Filtern ({{filters}}). Entfernen Sie einen, um die Liste zu erweitern.",
+      "filterNames": {
+        "location": "Lagerort: {{value}}",
+        "product": "Produkt: {{value}}",
+        "search": "Suche: {{value}}"
+      }
+    },
+    "whereItLies": "Wo es liegt",
+    "seeForProduct": "An allen Lagerorten",
+    "seeForLocation": "Bestände dieses Lagerorts",
+    "rows_one": "Bestandsposition",
+    "rows_other": "Bestandspositionen"
+  },
+  "lots": {
+    "title": "Chargen",
+    "subtitle": "Welche Chargen es gibt und welche nicht angefasst werden dürfen",
+    "statusChanged": "Charge markiert als {{status}}",
+    "reasonDialog": {
+      "title": "Charge {{name}} als {{status}} kennzeichnen?",
+      "message": "Der Grund bleibt bei der Charge und steht neben ihrem Status.",
+      "label": "Warum",
+      "placeholder": "Lieferantenmeldung 41/26 — Glas in Glas 12 gefunden",
+      "confirm": "Status ändern"
+    },
+    "actionsFor": "Aktionen für Charge {{name}}",
+    "columns": {
+      "batch": "Charge",
+      "product": "Produkt",
+      "status": "Status",
+      "expiry": "Haltbar bis",
+      "onHand": "Bestand",
+      "actions": "Aktionen"
+    },
+    "setTo": {
+      "active": "Freigeben — Entnahme erlauben",
+      "quarantined": "In Quarantäne",
+      "held": "Sperren",
+      "expired": "Als abgelaufen markieren",
+      "recalled": "Als zurückgerufen markieren"
+    },
+    "empty": {
+      "title": "Noch keine Chargen",
+      "filteredTitle": "Keine Charge in diesem Zustand",
+      "description": "Chargen entstehen, wenn Ware mit Chargen- oder Seriennummer eingeht.",
+      "filtered": "Nichts entspricht diesem Status. Setzen Sie die Statusfilter zurück, um alle Chargen zu sehen."
+    },
+    "count_one": "Charge",
+    "count_other": "Chargen"
+  },
+  "asOf": {
+    "title": "Bestand zum Stichtag",
+    "subtitle": "Was an einem Tag auf Lager war und was es wert war",
+    "subtitleNoValue": "Was an einem Tag auf Lager war",
+    "date": "Stand",
+    "location": "Lagerort",
+    "everywhere": "Überall",
+    "print": "Drucken",
+    "total": "Summe",
+    "caption": "Bestand von {{organization}} am {{date}}",
+    "completeFrom": "Das Bewegungsjournal beginnt am {{date}}. Davor ist nichts bekannt — und nicht null.",
+    "noValueSource": "Es wird keine Kostenhistorie geführt, daher wird kein Wert genannt. Ein Einkaufspreis ist heute ein Formularfeld; er kann nicht sagen, was ein Regal letzten Monat wert war.",
+    "excludedCurrency_one": "{{count}} Zeile nicht in der Summe: ihre Währung ist nicht die der Organisation.",
+    "excludedCurrency_other": "{{count}} Zeilen nicht in der Summe: ihre Währung ist nicht die der Organisation.",
+    "cannotAnswer": "Für dieses Datum gibt es keine Antwort.",
+    "empty": {
+      "title": "Nichts lag im Lager",
+      "description": "An diesem Tag war keines der geführten Produkte auf Lager.",
+      "descriptionAt": "{{location}} — an diesem Tag hielt es keines der geführten Produkte."
+    },
+    "columns": {
+      "product": "Produkt",
+      "quantity": "Menge",
+      "value": "Wert"
+    },
+    "unpriced_one": "{{count}} Produkt hat keine Kostenhistorie und bleibt aus der Summe.",
+    "unpriced_other": "{{count}} Produkte haben keine Kostenhistorie und bleiben aus der Summe."
+  }
+}

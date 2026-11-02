@@ -1,0 +1,413 @@
+{
+  "title": "Lagerorte",
+  "subtitle": "Verwalten Sie, wo Ihre Produkte aufbewahrt werden",
+  "empty": {
+    "title": "Keine Lagerorte definiert",
+    "subtitle": "Fügen Sie ein Regal, ein Gestell oder einen Schrank hinzu, um Ihre Produkte zu ordnen.",
+    "addFirst": "Ersten Lagerort hinzufügen"
+  },
+  "hidden": {
+    "title": "Einige Lagerorte sind ausgeblendet",
+    "description": "Lagerorte, die zu einem Modul gehören, erscheinen nicht in diesen Listen, solange „Moduldaten in allgemeinen Listen“ deaktiviert ist. Aktivieren Sie die Option in den Einstellungen, um alles in einer Liste zu sehen.",
+    "inlineCount_one": "{{count}} Lagerort ist ausgeblendet — aktivieren Sie „Moduldaten in allgemeinen Listen” in den Einstellungen, um ihn zu sehen.",
+    "inlineCount_other": "{{count}} Lagerorte sind ausgeblendet — aktivieren Sie „Moduldaten in allgemeinen Listen” in den Einstellungen, um sie zu sehen.",
+    "fieldHint": "Ihre Lagerorte gehören zu einem Modul und erscheinen nicht in allgemeinen Listen. Erstellen Sie hier einen neuen oder aktivieren Sie „Moduldaten in allgemeinen Listen“ in den Einstellungen, um einen vorhandenen zu wählen.",
+    "openSettings": "Einstellungen öffnen"
+  },
+  "picker": {
+    "moduleBadge": "Modul: {{module}}"
+  },
+  "form": {
+    "location": "Wegbeschreibung (optional)",
+    "locationPlaceholder": "z. B. Neben der Tür, unter dem Fenster"
+  },
+  "actions": {
+    "openWizard": "Lagerort hinzufügen"
+  },
+  "messages": {
+    "storageCreated": "Lagerort erfolgreich hinzugefügt!",
+    "storageUpdated": "Lagerort erfolgreich aktualisiert!",
+    "storageDeleted": "Lagerort erfolgreich gelöscht!",
+    "storageArchived": "Lagerort archiviert",
+    "nameTaken": "Ein Standort namens „{{name}}“ existiert hier bereits.",
+    "shortCodeTaken": "Dieser Standortcode wird bereits von einem anderen Standort verwendet.",
+    "storageRestored": "Lagerort wiederhergestellt"
+  },
+  "detail": {
+    "products": "Produkte ({{count}})",
+    "products_one": "Produkt ({{count}})",
+    "products_other": "Produkte ({{count}})",
+    "table": {
+      "product": "Produkt",
+      "category": "Kategorie",
+      "quantity": "Menge",
+      "freezeDate": "Einfrierdatum",
+      "storageDate": "Hinzugefügt",
+      "expiryDate": "Verfall",
+      "location": "Regal/Schublade",
+      "actions": "Aktionen"
+    },
+    "empty": "Dieser Lagerort ist leer",
+    "emptySubtitle": "Fügen Sie Ihr erstes Produkt zu diesem Lagerort hinzu",
+    "backToList": "Zurück zur Liste",
+    "rename": "Umbenennen",
+    "renameLabel": "Standortname",
+    "saveName": "Namen speichern",
+    "cancelRename": "Umbenennen abbrechen",
+    "addInside": "Standort darin hinzufügen",
+    "addProductHere": "Produkt hier hinzufügen"
+  },
+  "errors": {
+    "cannotDelete": "Löschen nicht möglich: Zuerst die Produkte entfernen oder verschieben.",
+    "cannotArchive": "Dieser Standort kann nicht archiviert werden",
+    "cannotRestore": "Lagerort konnte nicht wiederhergestellt werden"
+  },
+  "wizard": {
+    "discardTitle": "Diesen neuen Lagerort verwerfen?",
+    "discardMessage": "Die eingegebenen Namen und die gewählten Tracking-Felder gehen verloren.",
+    "discardConfirm": "Verwerfen",
+    "discardCancel": "Weiter bearbeiten",
+    "title": "Lagerort-Assistent",
+    "fields": {
+      "name": {
+        "desc": "Grundname (Erforderlich)."
+      },
+      "quantity": {
+        "desc": "Anzahl der Stücke oder Pakete (Erforderlich)."
+      },
+      "unit": {
+        "desc": "Maßeinheit (Stk., kg, l) (Erforderlich)."
+      },
+      "expiry_date": {
+        "desc": "Mindesthaltbarkeitsdaten verfolgen. Wichtig für Lebensmittel."
+      },
+      "freeze_date": {
+        "desc": "Lagerzeit im Gefrierschrank überwachen."
+      },
+      "weight": {
+        "desc": "Ermöglicht die Angabe von Gewicht (kg/g) oder Volumen (l/ml) des Artikels."
+      },
+      "barcode": {
+        "desc": "Unterstützung für Standard-Einzelhandels-Barcodes."
+      },
+      "label_code": {
+        "desc": "Unterstützung für interne QR-Codes (z. B. STM-001) auf Behältern."
+      },
+      "brand": {
+        "desc": "Textfeld für Herstellername."
+      },
+      "description": {
+        "desc": "Zusätzliche Notizen zum Produkt."
+      },
+      "purchase_price": {
+        "desc": "Produktkosten verfolgen."
+      },
+      "shelf_location": {
+        "desc": "Genauer Ort (z. B. 2. Regal von oben)."
+      },
+      "category_id": {
+        "desc": "Einer Kategorie zuweisen (z. B. Milchprodukte, Fleisch)."
+      },
+      "production_date": {
+        "desc": "Produktions- oder Chargendatum verfolgen."
+      },
+      "notes": {
+        "desc": "Freitext-Notizfeld."
+      },
+      "price": {
+        "desc": "Preis des Produkts verfolgen."
+      },
+      "location": {
+        "desc": "Genaue Position innerhalb des übergeordneten Lagerorts."
+      }
+    }
+  },
+  "suggestions": {
+    "zones": [
+      "Küche",
+      "Keller",
+      "Vorratskammer",
+      "Garage",
+      "Wohnzimmer",
+      "Badezimmer",
+      "Schlafzimmer",
+      "Dachboden",
+      "Balkon",
+      "Garten",
+      "Büro"
+    ],
+    "locations": ["Kühlschrank", "Gefrierschrank", "Medizinschrank"],
+    "compartments": ["Regal", "Schublade", "Behälter", "Kiste", "Korb"],
+    "profiles": {
+      "food_home": {
+        "zones": ["Küche", "Vorratskammer", "Garage", "Keller", "Dachboden"],
+        "locations": [
+          "Kühlschrank",
+          "Gefrierschrank",
+          "Regal",
+          "Schublade",
+          "Schrank"
+        ],
+        "compartments": ["Regal", "Schublade", "Behälter", "Kiste", "Korb"]
+      },
+      "equipment_wms": {
+        "zones": ["Serverraum", "Werkstatt", "Lager", "Lagerhalle", "Büro"],
+        "locations": ["Regal", "Fach", "Behälter", "Schrank", "Werkbank"],
+        "compartments": ["Regal", "Behälter", "Palettenplatz", "Schublade"]
+      },
+      "clean_core": {
+        "zones": ["Zone A", "Zone B", "Kühlhaus", "Quarantäne", "Warenannahme"],
+        "locations": [
+          "Fach A",
+          "Fach B",
+          "Oberes Fach",
+          "Unteres Fach",
+          "Behälter"
+        ],
+        "compartments": ["Regal 1", "Regal 2", "Kiste 1", "Kiste 2"]
+      }
+    }
+  },
+  "onboarding": {
+    "step1Title": "Wo bewahren Sie Ihre Sachen auf?",
+    "step1Desc": "Beginnen Sie mit der Benennung Ihres ersten Lagerorts – z. B. Kühllager, Wareneingang.",
+    "step1Placeholder": "z. B. Kühllager",
+    "step2Title": "Was gibt es in diesem Lagerort?",
+    "step2Desc": "z. B. Regal A, Bucht 3, Schrank 1",
+    "step2Placeholder": "z. B. Regal A",
+    "step3Title": "Wie sollen Produkte hier verfolgt werden?",
+    "done": "Fertig",
+    "next": "Weiter",
+    "back": "Zurück",
+    "parentLabel": "Vorhandener Standort",
+    "newLocation": "Neuer Standort",
+    "typeOrSelect": "Eingeben oder auswählen",
+    "trackingFieldsLabel": "Sie verfolgen",
+    "onlyLocation": "Nur Ort – keine Verfolgungsfelder",
+    "customize": "anpassen →",
+    "customFields": "Benutzerdefinierte Felder",
+    "advancedOptions": "Erweiterte Optionen",
+    "step3Desc": "Wählen Sie, welche Informationen für jedes Produkt an diesem Ort verfolgt werden sollen.",
+    "descriptionLabel": "Beschreibung",
+    "descriptionPlaceholder": "Kurze Beschreibung (optional)",
+    "labelCodeLabel": "Label-Code",
+    "storageTypeLabel": "Lagerorttyp",
+    "storageTypeNone": "Keiner (eigene Felder)",
+    "step1DescMore": "Benennen Sie den Lagerort, den Sie hinzufügen – z. B. Kühllager, Wareneingang.",
+    "parentPlaceholder": "Standort wählen"
+  },
+  "unknownError": "Unbekannter Fehler",
+  "edit": {
+    "nameLabel": "Name",
+    "qrCodeLabel": "QR-Code",
+    "qrCodePlaceholder": "z. B. LOC-001, GLN-1234567890123, WAREHOUSE-A-1",
+    "downloadQrLabel": "Herunterladen",
+    "showDescriptionOnLabel": "Beschreibung auf Label anzeigen",
+    "qrDownloadError": "QR-Code konnte nicht heruntergeladen werden",
+    "trackedFields": "Verfolgte Felder",
+    "customFields": "Benutzerdefinierte Felder",
+    "sequenceLabel": "Laufreihenfolge",
+    "sequenceHint": "Die Kommissionierung besucht Lagerorte ab der niedrigsten Nummer. Ein Lagerort ohne Nummer folgt nach den nummerierten, nach Code sortiert.",
+    "noParentStorage": "Kein übergeordneter Lagerort",
+    "deleteMessage": "„{{name}}“ löschen? Produkte darin müssen zuerst verschoben werden — und ein Ort, durch den Lagerbewegungen liefen, lässt sich gar nicht löschen: archivieren Sie ihn stattdessen.",
+    "deleteMovesLocations_one": "1 untergeordneter Standort rückt eine Ebene höher.",
+    "deleteMovesLocations_other": "{{count}} untergeordnete Standorte rücken eine Ebene höher.",
+    "deleteMovesRecords_one": "1 Datensatz rückt eine Ebene höher.",
+    "deleteMovesRecords_other": "{{count}} Datensätze rücken eine Ebene höher.",
+    "deleteNotListed_one": "Davon ist {{count}} in dieser Liste nicht zu sehen.",
+    "deleteNotListed_other": "Davon sind {{count}} in dieser Liste nicht zu sehen.",
+    "generateCodeError": "Code konnte nicht generiert werden",
+    "generateCodeLabel": "Code generieren",
+    "noCodeWarning": "Kein Standortcode festgelegt — Scannen funktioniert für diesen Standort nicht.",
+    "archive": "Archivieren",
+    "archiveTitle": "Standort archivieren",
+    "archiveConfirmEmpty": "Der Standort wird aus Listen und Auswahlen ausgeblendet. Produkte werden nicht gelöscht.",
+    "archiveConfirmItems": "An diesem Standort liegen Produkte. Wählen Sie, wohin sie verschoben werden sollen — beim Archivieren werden sie dorthin umgelagert.",
+    "archiveConfirmUnknown": "Der Inhalt dieses Standorts konnte nicht geprüft werden. Falls er etwas enthält, wählen Sie ein Ziel — sonst wird das Archivieren abgelehnt.",
+    "archiveTargetLabel": "Produkte verschieben nach",
+    "archiveTargetNone": "Zielstandort wählen",
+    "archiveReversible": "Das lässt sich rückgängig machen: Archivierte Lagerorte können unter „Archivierte Lagerorte\" wiederhergestellt werden.",
+    "archivePutawayRules_one": "{{count}} Einlagerungsregel zeigt hierher. Sie behält diesen Lagerort als Ziel, bis sie geändert wird.",
+    "archivePutawayRules_other": "{{count}} Einlagerungsregeln zeigen hierher. Sie behalten diesen Lagerort als Ziel, bis sie geändert werden."
+  },
+  "fieldLabels": {
+    "barcode": "Produktcode",
+    "sku": "SKU",
+    "brand": "Marke / Hersteller",
+    "category_id": "Kategorie",
+    "description": "Beschreibung",
+    "expiry_date": "Verfallsdatum",
+    "freeze_date": "Einfrierdatum",
+    "label_code": "Benutzerdefinierter QR-Code",
+    "location": "Ort",
+    "name": "Name",
+    "notes": "Notizen",
+    "price": "Preis",
+    "production_date": "Produktionsdatum / Charge",
+    "purchase_price": "Einkaufspreis",
+    "quantity": "Menge",
+    "shelf_location": "Regal / Position",
+    "unit": "Einheit",
+    "weight": "Gewicht / Volumen"
+  },
+  "reorg": {
+    "noMoveTargets": "Kein Ziel zum Verschieben dieses Standorts",
+    "moveTo": "Verschieben nach…",
+    "moveToTop": "Oberste Ebene"
+  },
+  "card": {
+    "unit_one": "Produkt",
+    "unit_other": "Produkte"
+  },
+  "counts": {
+    "inSublocations_one": "{{count}} in Unterorten",
+    "inSublocations_other": "{{count}} in Unterorten"
+  },
+  "stats": {},
+  "storageNotFound": "Lagerort nicht gefunden",
+  "storageNotFoundDescription": "Er wurde vielleicht gelöscht, oder der Link ist veraltet.",
+  "zoneModule": {
+    "title": "Dieser Lagerort gehört zu einem Modul",
+    "description": "„{{name}}“ gehört zu einem Modul und bleibt daher aus der Lagerortliste heraus. Hier öffnen, um zu sehen, was darin steht."
+  },
+  "zoneVirtual": {
+    "title": "Dies ist ein Systemlagerort",
+    "description": "„{{name}}“ ist einer der virtuellen Systemlagerorte — sein Inhalt zählt nicht zum Bestand. Hier öffnen, um zu sehen, was darin steht."
+  },
+  "zoneArchived": {
+    "title": "Dieser Lagerort ist archiviert",
+    "description": "„{{name}}“ ist archiviert und bleibt aus der aktiven Liste heraus. Hier öffnen oder aus dem Archiv wiederherstellen."
+  },
+  "usage": {
+    "customer": "Kunde",
+    "inventory": "Bestandskorrektur",
+    "production": "Produktion",
+    "virtualNotice": "Systemstandort — sein Inhalt zählt nicht zu den Lagerbeständen."
+  },
+  "sort": {},
+  "required": {
+    "title": "Noch keine Lagerorte",
+    "description": "Legen Sie das erste an und machen Sie hier weiter.",
+    "action": "Lagerort anlegen"
+  },
+  "archived": {
+    "title": "Archivierte Lagerorte",
+    "subtitle": "Aus Listen und Auswahlfeldern ausgeblendete Lagerorte",
+    "badge": "Archiviert",
+    "name": "Lagerort",
+    "archivedAt": "Archiviert",
+    "actions": "Aktionen",
+    "restore": "Wiederherstellen",
+    "emptyTitle": "Nichts archiviert",
+    "emptyDescription": "Archivierte Lagerorte erscheinen hier und lassen sich wiederherstellen.",
+    "detailNotice": "Dieser Lagerort ist archiviert. Stellen Sie ihn wieder her, um hier erneut Produkte zu lagern."
+  },
+  "masterDetailSubtitle": "Wählen Sie einen Standort, um seinen Inhalt, seine Produkte und Einstellungen zu sehen.",
+  "select": {
+    "title": "Standort wählen",
+    "description": "Der Baum links listet alle Standorte. Wählen Sie einen, um seinen Inhalt zu sehen."
+  },
+  "path": {
+    "label": "Standortpfad",
+    "all": "Alle Lagerorte"
+  },
+  "tabs": {
+    "contents": "Inhalt",
+    "products": "Produkte",
+    "settings": "Einstellungen",
+    "moves": "Bewegungen"
+  },
+  "tree": {
+    "label": "Lagerorte",
+    "searchPlaceholder": "Nach Name oder Code suchen",
+    "scanPlaceholder": "Standortetikett scannen…",
+    "scanAction": "Gescannten Standort wählen",
+    "scanNotFound": "Kein Standort passt zu „{{code}}“.",
+    "scanNotLocation": "„{{code}}“ ist kein Standortetikett.",
+    "noMatches": "Keine Standorte passen zur Suche",
+    "empty": "Noch keine Standorte.",
+    "rowActions": "Aktionen für {{name}}",
+    "archivedLink": "Archivierte Standorte",
+    "collapse": "{{name}} zuklappen",
+    "expand": "{{name}} aufklappen"
+  },
+  "contents": {
+    "emptyTitle": "In diesem Standort ist nichts",
+    "emptyDescription_one": "Sein {{count}} Produkt ist auf der Registerkarte Produkte.",
+    "emptyDescription_other": "Seine {{count}} Produkte sind auf der Registerkarte Produkte.",
+    "showProducts": "Produkte anzeigen",
+    "selected_one": "{{count}} Standort ausgewählt",
+    "selected_other": "{{count}} Standorte ausgewählt",
+    "clearSelection": "Zurücksetzen",
+    "selectColumn": "Auswählen",
+    "selectRow": "{{name}} auswählen",
+    "name": "Standort",
+    "code": "Code",
+    "type": "Typ",
+    "inside": "Darinnen",
+    "products": "Produkte"
+  },
+  "products": {
+    "includeInside": "Standorte darin einschließen",
+    "includingInside_one": "Einschließlich 1 Standort darin",
+    "includingInside_other": "Einschließlich {{count}} Standorten darin"
+  },
+  "settings": {
+    "basic": "Grundlagen",
+    "liesIn": "Liegt in",
+    "productFields": "Produktfelder hier",
+    "warehouse": "Nachschub",
+    "reserve": "Reserve-Regal",
+    "reserveHint": "Ware von hier füllt Kommissionierregale auf; nichts füllt dieses Regal von einem anderen auf.",
+    "productFieldsHint": "Was ein hier abgelegtes Produkt erfasst.",
+    "appliesHere": "Gilt nur für diesen Standort.",
+    "appliesInside_one": "Gilt für diesen Standort und 1 Standort darin.",
+    "appliesInside_other": "Gilt für diesen Standort und {{count}} Standorte darin.",
+    "inheritedFrom": "von {{name}}",
+    "inheritedFields": "Auf einer höheren Ebene festgelegt",
+    "labelAndCode": "Etikett und Code",
+    "recordActions": "Aktionen für {{name}}"
+  },
+  "move": {
+    "titleOne": "Verschieben nach…",
+    "searchPlaceholder": "Ziel suchen",
+    "scanNotTarget": "„{{code}}“ wird verschoben oder liegt in einem verschobenen Standort und kann daher kein Ziel sein.",
+    "targetsLabel": "Zielstandorte",
+    "moved_one": "Standort verschoben",
+    "moved_other": "{{count}} Standorte verschoben",
+    "undo": "Rückgängig",
+    "undoDone": "Verschieben rückgängig gemacht",
+    "undoFailed": "Verschieben konnte nicht rückgängig gemacht werden",
+    "failed": "Standort konnte nicht verschoben werden",
+    "rejected": "Der Server hat das Verschieben abgelehnt",
+    "titleMany_one": "{{count}} Standort verschieben nach…",
+    "titleMany_other": "{{count}} Standorte verschieben nach…"
+  },
+  "moves": {
+    "empty": "Keine Lagerbewegungen durch diesen Standort."
+  },
+  "moveQuestion": {
+    "title": "Wurde es physisch umgezogen?",
+    "description": "Die Produkte darin bleiben an ihrem Platz im Lagerort. Geben Sie an, ob der Lagerort selbst woanders hingebracht wurde oder ob er im Baum nur an der falschen Stelle stand.",
+    "scope": "Sie verschieben {{name}} mit {{inside}} und {{products}} nach {{destination}}.",
+    "scopeNoInside": "Sie verschieben {{name}} mit {{products}} nach {{destination}}.",
+    "locationsInside_one": "{{count}} Lagerort darin",
+    "locationsInside_other": "{{count}} Lagerorten darin",
+    "products_one": "{{count}} Produkt",
+    "products_other": "{{count}} Produkten",
+    "topLevel": "die oberste Ebene",
+    "choiceLabel": "Was ist mit {{name}} passiert",
+    "correction": "Ich korrigiere nur die Struktur",
+    "physical": "Es wurde physisch umgezogen",
+    "physicalHint": "Ein physischer Umzug erfasst eine Bewegung für jedes Produkt darin, damit seine Historie und der Bestand an früheren Tagen zeigen, wo es stand.",
+    "confirm": "Verschieben"
+  },
+  "addNew": {
+    "title": "Neuen Lagerort hinzufügen",
+    "nameLabel": "Name",
+    "namePlaceholder": "z. B. Regal B",
+    "parentLabel": "Innerhalb von (optional)",
+    "parentPlaceholder": "Oberste Ebene",
+    "created": "Lagerort angelegt"
+  }
+}

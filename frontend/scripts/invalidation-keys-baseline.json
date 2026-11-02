@@ -1,0 +1,60 @@
+{
+  "exceptions": [
+    {
+      "file": "src/modules/approvals/hooks/useApprovalRequests.ts",
+      "count": 5,
+      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    },
+    {
+      "file": "src/modules/approvals/hooks/useApprovalWorkflows.ts",
+      "count": 4,
+      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    },
+    {
+      "file": "src/modules/warehouse/hooks/useExtraCosts.ts",
+      "count": 3,
+      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    },
+    {
+      "file": "src/modules/example_widgets/hooks/useWidgets.ts",
+      "count": 4,
+      "reason": "example module with its own QUERY_KEY constant; moves to keys.ts when the example is rewritten",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    },
+    {
+      "file": "src/modules/inventory/hooks/useModuleListFilters.ts",
+      "count": 1,
+      "reason": "key forwarded from a module contributor prop, not built here",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    },
+    {
+      "file": "src/modules/recipes/hooks/useIngredientDefaults.ts",
+      "count": 5,
+      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    },
+    {
+      "file": "src/modules/recipes/hooks/useUnitConversions.ts",
+      "count": 4,
+      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    },
+    {
+      "file": "src/modules/shared/hooks/useLauncherStatusBadge.ts",
+      "count": 1,
+      "reason": "key forwarded from a typed QueryKey prop, not built here",
+      "owner": "jerzy",
+      "expiry": "2027-01-08"
+    }
+  ]
+}

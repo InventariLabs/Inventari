@@ -1,0 +1,252 @@
+{
+  "launcher": {
+    "title": "Inwentarz",
+    "description": "Zarządzaj produktami, miejscami i etykietami"
+  },
+  "statusBadge": {
+    "needsAttention_one": "wymaga uwagi",
+    "needsAttention_few": "wymagają uwagi",
+    "needsAttention_many": "wymaga uwagi",
+    "needsAttention_other": "wymaga uwagi"
+  },
+  "actions": {
+    "stockTakesInProgress": "Spisy z natury w toku"
+  },
+  "nav": {
+    "overview": "Przegląd",
+    "items": "Produkty",
+    "storages": "Miejsca",
+    "labels": "Etykiety",
+    "categories": "Kategorie",
+    "scan": "Skanuj",
+    "moves": "Ruchy",
+    "stock": "Stany"
+  },
+  "toasts": {
+    "importFailedToAnalyze": "Nie udało się przeanalizować pliku",
+    "importGrocyMappingApplied": "Mapowanie Grocy zastosowane!",
+    "importFailed": "Import nie powiódł się",
+    "archivedLabelFreed": "Etykieta jest teraz wolna do ponownego użycia"
+  },
+  "moves": {
+    "title": "Ruchy magazynowe",
+    "subtitle": "Co przyszło, co wyszło i co przeszło między własnymi miejscami",
+    "outsideFrom": "z zewnątrz",
+    "expires": "Ważne do {{date}}",
+    "outsideTo": "na zewnątrz",
+    "direction": {
+      "all": "Wszystkie",
+      "in": "Przyjęcia",
+      "out": "Wydania",
+      "internal": "Przesunięcia"
+    },
+    "columns": {
+      "when": "Kiedy",
+      "product": "Produkt",
+      "quantity": "Ilość",
+      "route": "Skąd → dokąd",
+      "batch": "Partia",
+      "source": "Źródło",
+      "who": "Kto"
+    },
+    "source": {
+      "document": "Dokument",
+      "item": "Ręcznie",
+      "adjustment": "Spis",
+      "maker_production": "Produkcja",
+      "item_history": "Zapis historyczny",
+      "opening_balance": "Bilans otwarcia",
+      "recipe_picking": "Gotowanie",
+      "location_relocation": "Przeniesione z miejscem"
+    },
+    "filters": {
+      "location": "Miejsce",
+      "anyLocation": "Wszędzie",
+      "since": "Od",
+      "until": "Do",
+      "product": "Produkt:",
+      "oneProduct": "jeden produkt",
+      "oneStorage": "jedno miejsce"
+    },
+    "empty": {
+      "title": "Nic się jeszcze nie ruszyło",
+      "description": "Ruchy zapisują się przy przyjęciu, wydaniu i przesunięciu towaru między miejscami.",
+      "filtered_one": "Żaden ruch nie pasuje do ustawionego filtra ({{filters}}). Wyczyść go, aby poszerzyć rejestr.",
+      "filtered_few": "Żaden ruch nie pasuje do ustawionych filtrów ({{filters}}). Wyczyść któryś, aby poszerzyć rejestr.",
+      "filtered_many": "Żaden ruch nie pasuje do ustawionych filtrów ({{filters}}). Wyczyść któryś, aby poszerzyć rejestr.",
+      "filtered_other": "Żaden ruch nie pasuje do ustawionych filtrów ({{filters}}). Wyczyść któryś, aby poszerzyć rejestr.",
+      "filterNames": {
+        "direction": "kierunek: {{value}}",
+        "location": "miejsce: {{value}}",
+        "dates": "daty: {{from}} – {{to}}",
+        "datesFrom": "daty: od {{date}}",
+        "datesUntil": "daty: do {{date}}",
+        "product": "produkt: {{value}}"
+      },
+      "filteredTitle": "Żaden ruch nie pasuje",
+      "productTitle": "Ten produkt się tu nie ruszał",
+      "productDescription": "Przyjęcia, wydania i przesunięcia tego produktu w tym miejscu pojawią się tutaj.",
+      "locationTitle": "Nic tędy nie przeszło",
+      "locationDescription": "Ruch zapisuje się, gdy towar tu trafia, stąd wychodzi albo przez to miejsce przechodzi.",
+      "documentTitle": "Ten dokument nic nie ruszył",
+      "documentDescription": "Jego pozycje nie zostały wykonane na stanie, więc żaden ruch nie nosi jego numeru."
+    },
+    "tab": "Ruchy",
+    "itemCaption": "Ruchy tego produktu w miejscu {{location}}. Dwa rekordy tego samego produktu w jednym miejscu mają wspólne wiersze.",
+    "thisLocation": "tego miejsca",
+    "seeProductEverywhere": "Ten produkt wszędzie",
+    "locationHeading": "Historia ruchów",
+    "locationCaption": "Co tu przyszło, co wyszło i co przez to miejsce przeszło — razem ze wszystkim, co jest w środku.",
+    "seeFullLedger": "Otwórz pełny rejestr",
+    "documentHeading": "Co ten dokument ruszył",
+    "documentCaption": "Ruchy zapisane przez ten dokument — dokąd towar poszedł i z której partii.",
+    "movements_one": "ruch",
+    "movements_few": "ruchy",
+    "movements_many": "ruchów",
+    "movements_other": "ruchu",
+    "movedWith": "Przeniesione z: {{name}}",
+    "topLevel": "Najwyższy poziom"
+  },
+  "lot": {
+    "notFound": "Ta partia już nie istnieje",
+    "backToLots": "Wróć do partii",
+    "onHand": "Na stanie",
+    "serial": "Numer seryjny",
+    "batch": "Partia",
+    "whereHeading": "Gdzie leży",
+    "nothingLeft": "Z tej partii nic nie zostało na żadnej półce. Jej ścieżka poniżej to cała historia.",
+    "trailHeading": "Wszystko, co się z nią działo",
+    "decisionsHeading": "Decyzje o jej statusie",
+    "trailCaption": "Każdy ruch zapisany pod tym numerem partii, od najnowszego.",
+    "status": {
+      "active": "Aktywna",
+      "quarantined": "Kwarantanna",
+      "held": "Wstrzymana",
+      "expired": "Przeterminowana",
+      "recalled": "Wycofana"
+    },
+    "fields": {
+      "expiry": "Termin ważności",
+      "production": "Data produkcji",
+      "useBy": "Spożyć do",
+      "kind": "Rodzaj"
+    },
+    "empty": {
+      "title": "Pod tą partią nic nie zapisano",
+      "description": "Przyjęcia, wydania i przesunięcia wskazujące tę partię pojawią się tutaj."
+    }
+  },
+  "stock": {
+    "title": "Stany magazynowe",
+    "subtitle": "Co gdzie leży, w jakiej partii i ile z tego jest już zarezerwowane",
+    "searchPlaceholder": "Szukaj produktu lub partii…",
+    "reservedShort": "{{quantity}} zarezerwowane",
+    "columns": {
+      "location": "Miejsce",
+      "product": "Produkt",
+      "batch": "Partia",
+      "quantity": "Na stanie",
+      "reserved": "Zarezerwowane",
+      "available": "Dostępne"
+    },
+    "filters": {
+      "location": "Miejsce",
+      "anyLocation": "Wszędzie",
+      "includeEmpty": "Pokaż też miejsca ze stanem zerowym",
+      "includeEmptyHint": "Pokazuje wpisy ze stanem zrównanym do zera — ślad po tym, że coś tu było. Miejsce, w którym produkt nigdy nie leżał, nie ma wpisu do pokazania.",
+      "oneStorage": "jedno miejsce",
+      "oneProduct": "jeden produkt"
+    },
+    "empty": {
+      "title": "Nie zapisano jeszcze żadnego stanu",
+      "description": "Stan pojawi się tutaj po przyjęciu, spisie albo produkcji.",
+      "filteredTitle": "Nic tu nie pasuje",
+      "filtered_one": "Nic nie pasuje do ustawionego filtra ({{filters}}). Wyczyść go, aby poszerzyć listę.",
+      "filtered_few": "Nic nie pasuje do ustawionych filtrów ({{filters}}). Wyczyść któryś, aby poszerzyć listę.",
+      "filtered_many": "Nic nie pasuje do ustawionych filtrów ({{filters}}). Wyczyść któryś, aby poszerzyć listę.",
+      "filtered_other": "Nic nie pasuje do ustawionych filtrów ({{filters}}). Wyczyść któryś, aby poszerzyć listę.",
+      "filterNames": {
+        "location": "miejsce: {{value}}",
+        "product": "produkt: {{value}}",
+        "search": "szukany tekst: {{value}}"
+      }
+    },
+    "whereItLies": "Gdzie leży",
+    "seeForProduct": "We wszystkich miejscach",
+    "seeForLocation": "Stany magazynowe tego miejsca",
+    "rows_one": "pozycja magazynowa",
+    "rows_few": "pozycje magazynowe",
+    "rows_many": "pozycji magazynowych",
+    "rows_other": "pozycji magazynowej"
+  },
+  "lots": {
+    "title": "Partie",
+    "subtitle": "Jakie partie istnieją i których nie wolno ruszać",
+    "statusChanged": "Partia oznaczona jako: {{status}}",
+    "reasonDialog": {
+      "title": "Oznaczyć partię {{name}} jako {{status}}?",
+      "message": "Powód zostaje przy partii i jest widoczny obok jej statusu.",
+      "label": "Dlaczego",
+      "placeholder": "Zawiadomienie dostawcy 41/26 — szkło w słoiku 12",
+      "confirm": "Zmień status"
+    },
+    "actionsFor": "Akcje dla partii {{name}}",
+    "columns": {
+      "batch": "Partia",
+      "product": "Produkt",
+      "status": "Status",
+      "expiry": "Termin ważności",
+      "onHand": "Na stanie",
+      "actions": "Akcje"
+    },
+    "setTo": {
+      "active": "Zwolnij — można pobierać",
+      "quarantined": "Kwarantanna",
+      "held": "Wstrzymaj",
+      "expired": "Oznacz jako przeterminowaną",
+      "recalled": "Oznacz jako wycofaną"
+    },
+    "empty": {
+      "title": "Nie ma jeszcze żadnej partii",
+      "filteredTitle": "Żadna partia nie jest w tym stanie",
+      "description": "Partie pojawiają się, gdy towar przyjmowany jest z numerem partii albo numerem seryjnym.",
+      "filtered": "Nic nie pasuje do tego stanu. Wyczyść filtr stanu, aby zobaczyć wszystkie partie."
+    },
+    "count_one": "partia",
+    "count_few": "partie",
+    "count_many": "partii",
+    "count_other": "partii"
+  },
+  "asOf": {
+    "title": "Stan na dzień",
+    "subtitle": "Co było na stanie danego dnia i ile to było warte",
+    "subtitleNoValue": "Co było na stanie danego dnia",
+    "date": "Stan na",
+    "location": "Miejsce",
+    "everywhere": "Wszędzie",
+    "print": "Drukuj",
+    "total": "Razem",
+    "caption": "Stan magazynu {{organization}} na {{date}}",
+    "completeFrom": "Rejestr ruchów zaczyna się {{date}}. Nic wcześniejszego nie jest znane — i nie jest zerem.",
+    "noValueSource": "Nie ma historii kosztów, więc wartość nie jest podawana. Cena zakupu to pole w formularzu dzisiaj; nie powie, ile półka była warta miesiąc temu.",
+    "excludedCurrency_one": "{{count}} wiersz pominięty w sumie: jego waluta nie jest walutą organizacji.",
+    "excludedCurrency_few": "{{count}} wiersze pominięte w sumie: ich waluta nie jest walutą organizacji.",
+    "excludedCurrency_many": "{{count}} wierszy pominiętych w sumie: ich waluta nie jest walutą organizacji.",
+    "excludedCurrency_other": "{{count}} wiersza pominiętego w sumie: jego waluta nie jest walutą organizacji.",
+    "cannotAnswer": "Na ten dzień nie da się odpowiedzieć.",
+    "empty": {
+      "title": "Nic nie stało na półce",
+      "description": "Tego dnia żaden z prowadzonych produktów nie był na stanie.",
+      "descriptionAt": "{{location}} — tego dnia nie było tu żadnego z prowadzonych produktów."
+    },
+    "columns": {
+      "product": "Produkt",
+      "quantity": "Ilość",
+      "value": "Wartość"
+    },
+    "unpriced_one": "{{count}} produkt nie ma historii kosztów i nie wchodzi do sumy.",
+    "unpriced_few": "{{count}} produkty nie mają historii kosztów i nie wchodzą do sumy.",
+    "unpriced_many": "{{count}} produktów nie ma historii kosztów i nie wchodzi do sumy.",
+    "unpriced_other": "{{count}} produktu nie ma historii kosztów i nie wchodzi do sumy."
+  }
+}

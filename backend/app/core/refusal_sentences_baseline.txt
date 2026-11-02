@@ -1,0 +1,34 @@
+# Ledger of sentence literals raised through refusal exceptions in ``app/``:
+# every class that descends from HTTPException/AppException, or from ValueError
+# through a class defined in ``app/`` (PeriodClosedError, FieldValueError,
+# ApprovalError, ...). The set is derived from the class graph, never listed;
+# ServiceRejectionError (keyed by contract) is excluded by name in
+# _quality_checks_rejections.py with its reason.
+#
+# The twin of value_error_sentences_baseline.txt, for the refusals that rule
+# never looks at. The gate (tests/unit/test_service_rejection_messages_i18n.py)
+# flags every such raise that carries a sentence instead of an i18n key or a
+# machine code; a line here is the only way a site passes. DEBT, not permission:
+#   * a new refusal carries a translation key (ServiceRejectionError, or
+#     get_error_message(key, lang) for an HTTP detail);
+#   * the file sits in the directory the baseline ratchet scans, so appending a
+#     line fails the build until `manage.py arch lint --write-baseline-sizes`
+#     is consciously run;
+#   * a regeneration (`manage.py arch lint --write-rejection-ledger`) REFUSES a
+#     new sentence — it only retires entries that were fixed;
+#   * entries are ``relpath::literal``, newlines stored escaped.
+#
+# Sized for the translation pass this debt is heading toward: the class of
+# sentences frontend/src/lib/errors.ts (extractApiError) can put on screen
+# verbatim — it renders every 4xx detail.message as it stands, translates
+# none of them by code, and answers a 5xx with its own fallback. That class is
+# this ledger's entries raised at 4xx (the 'Internal server error' ones are
+# 500s, never shown) plus value_error_sentences_baseline.txt's client-422
+# group; its client-400 group is empty since those refusals were given
+# catalogue keys, and boot-cli never fires during a request. Both files
+# count themselves between their BEGIN/END COUNTS lines, so the sizes live
+# there rather than in prose that drifts. Reachability stays what both
+# headers call it: per path, not proven per site.
+# BEGIN COUNTS (generated — do not edit by hand)
+# Refusals: 0.
+# END COUNTS (generated)

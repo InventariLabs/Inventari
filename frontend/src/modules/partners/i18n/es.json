@@ -1,0 +1,128 @@
+{
+  "title": "Socios",
+  "subtitle": "Proveedores, clientes y prestadores de servicios",
+  "detail": {
+    "title": "Detalles del socio",
+    "createdAt": "Creado",
+    "updatedAt": "Actualizado",
+    "related": "Relacionado",
+    "relatedDocuments": "Documentos de almacén",
+    "relatedOrders": "Pedidos de compra"
+  },
+  "newPartner": "Nuevo socio",
+  "searchPlaceholder": "Buscar por nombre, código, ID fiscal, correo…",
+  "noPartners": "No se encontraron socios",
+  "noPartnersDesc": "Añada su primer socio para comenzar",
+  "stats": {
+    "documents_one": "{{count}} documento",
+    "documents_other": "{{count}} documentos",
+    "total": "Volumen de negocio",
+    "lastActivity": "Última actividad",
+    "multipleCurrencies": "Varias monedas"
+  },
+  "filterAll": "Todos",
+  "filterActive": "Activo",
+  "filterInactive": "Inactivo",
+  "columns": {
+    "name": "Nombre",
+    "type": "Tipo",
+    "taxId": "NIF",
+    "contact": "Contacto",
+    "documents": "Documentos",
+    "actions": "Acciones"
+  },
+  "launcher": {
+    "description": "Gestionar proveedores, clientes y socios comerciales"
+  },
+  "types": {
+    "SUPPLIER": "Proveedor",
+    "CUSTOMER": "Cliente",
+    "BOTH": "Proveedor y Cliente",
+    "SERVICE_PROVIDER": "Prestador de servicios",
+    "MANUFACTURER": "Fabricante",
+    "EMPLOYEE": "Empleado"
+  },
+  "fields": {
+    "name": "Nombre",
+    "fullName": "Nombre completo",
+    "code": "Código de socio",
+    "type": "Tipo",
+    "taxId": "ID fiscal / IVA",
+    "isConsumer": "Particular (consumidor)",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "website": "Sitio web",
+    "contactPerson": "Persona de contacto",
+    "position": "Cargo / Departamento",
+    "address": "Dirección",
+    "notes": "Notas internas"
+  },
+  "address": {
+    "section": "Dirección",
+    "street": "Calle",
+    "city": "Ciudad",
+    "postalCode": "Código postal",
+    "country": "País",
+    "countrySelect": "Seleccionar país",
+    "otherCountry": "Otro: {{value}}"
+  },
+  "form": {
+    "createTitle": "Nuevo socio",
+    "editTitle": "Editar socio",
+    "namePlaceholder": "ej. ABC Mayorista",
+    "fullNamePlaceholder": "ej. Juan Pérez",
+    "codePlaceholder": "ej. PRO-001",
+    "taxIdPlaceholder": "ej. ESB12345678",
+    "isConsumerHint": "Sin identificador fiscal: los documentos se confirman sin él, incluso donde la ley lo exige a las empresas.",
+    "emailPlaceholder": "contacto@empresa.es",
+    "phonePlaceholder": "+34 123 456 789",
+    "websitePlaceholder": "https://empresa.es",
+    "contactPersonPlaceholder": "ej. Juan Pérez (Depto. Compras)",
+    "positionPlaceholder": "ej. Especialista IT, Departamento IT",
+    "notesPlaceholder": "Notas internas…",
+    "street_placeholder": "ej. Calle Mayor 123",
+    "city_placeholder": "ej. Madrid",
+    "postal_placeholder": "ej. 28001",
+    "saving": "Guardando…"
+  },
+  "actions": {
+    "edit": "Editar",
+    "deactivate": "Desactivar",
+    "activate": "Activar",
+    "addPartner": "Añadir socio"
+  },
+  "confirmDeactivateTitle": "Desactivar socio",
+  "confirmDeactivate": "¿Desactivar este socio? Ya no aparecerá en los filtros por defecto.",
+  "status": {
+    "inactive": "Inactivo"
+  },
+  "errors": {
+    "activateFailed": "Error al activar socio",
+    "deactivateFailed": "Error al desactivar socio",
+    "saveFailed": "Error al guardar socio",
+    "createFailed": "Error al crear socio",
+    "invalidEmail": "Introduce una dirección de correo, por ejemplo nombre@empresa.es.",
+    "invalidWebsite": "Introduce una dirección web, por ejemplo https://empresa.es."
+  },
+  "inlineCreateHint": "Creación rápida de socio",
+  "inlineCreateSuccess": "Socio «{{name}}» creado. Añada su ID fiscal y su dirección antes de emitir un documento con dirección.",
+  "import": {
+    "button": "Importar",
+    "title": "Importar socios",
+    "formats": "XLSX / CSV",
+    "pleaseWait": "Espere mientras procesamos sus socios.",
+    "closeAndView": "Cerrar y ver los socios",
+    "added_one": "Se añadió {{count}} socio.",
+    "added_other": "Se añadieron {{count}} socios.",
+    "defaultType": "Tipo para las filas sin tipo",
+    "addOnlyNote": "La importación solo añade socios. Una fila con un socio que ya tiene — el mismo nombre en cualquier combinación de mayúsculas o el mismo NIF — se rechaza y se muestra con su motivo.",
+    "analyzeFailed": "No se pudo leer el archivo",
+    "failed": "La importación ha fallado"
+  },
+  "toasts": {
+    "saved": "Socio guardado",
+    "created": "Socio creado",
+    "activated": "Socio activado",
+    "deactivated": "Socio desactivado"
+  }
+}

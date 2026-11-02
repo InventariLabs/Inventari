@@ -1,0 +1,217 @@
+{
+  "enabled": "Ativado",
+  "errors": {
+    "updateFailed": "Não foi possível atualizar o status do módulo"
+  },
+  "success": {
+    "enabled": "Módulo {{name}} ativado",
+    "disabled": "Módulo {{name}} desativado"
+  },
+  "modules": {
+    "core": {
+      "title": "Casa e cozinha",
+      "desc": "Geladeira, despensa e produtos básicos."
+    },
+    "shopping_lists": {
+      "name": "Listas de compras",
+      "description": "Crie e gerencie listas de compras com sugestões automáticas."
+    },
+    "vision": {
+      "name": "Reconhecimento por foto",
+      "description": "Lê o nome, a marca e a validade de um produto a partir da foto do rótulo. Desativado, o cadastro de produtos perde a aba de foto e as tabelas nutricionais precisam ser digitadas."
+    },
+    "stats": {
+      "name": "Estatísticas",
+      "description": "Análise avançada de consumo e acompanhamento de perdas."
+    },
+    "stock_takes": {
+      "name": "Contagens de estoque",
+      "description": "Conferências periódicas do estoque para verificar sua exatidão."
+    },
+    "partners": {
+      "name": "Parceiros",
+      "description": "Gerencie fornecedores, clientes e prestadores de serviço para fluxos B2B."
+    },
+    "recipes": {
+      "name": "Receitas",
+      "description": "Crie e gerencie receitas com controle de ingredientes."
+    },
+    "equipment": {
+      "name": "Controle de equipamentos",
+      "description": "Acompanhe ativos de TI e físicos com gestão do ciclo de vida."
+    },
+    "example_widgets": {
+      "name": "Widgets de exemplo",
+      "description": "Módulo de referência que demonstra os padrões de módulos do Inventari: gerencie widgets simples com nome, cor e quantidade."
+    },
+    "warehouse": {
+      "name": "Armazém",
+      "description": "Com a câmera do celular ou um leitor, receba, despache, mova e conte o estoque; os documentos numerados são gerados em segundo plano, com regras de armazenagem."
+    },
+    "purchase_orders": {
+      "name": "Pedidos de compra",
+      "description": "Crie e acompanhe pedidos de compra com fornecedores."
+    },
+    "printing": {
+      "name": "Impressão de etiquetas",
+      "description": "Gere e imprima etiquetas para produtos e locais."
+    },
+    "nutrition": {
+      "name": "Informações nutricionais",
+      "description": "Exibe dados nutricionais e ingredientes do Open Food Facts."
+    },
+    "approvals": {
+      "name": "Aprovações",
+      "description": "Fluxos de aprovação em várias etapas para operações críticas."
+    },
+    "webhooks": {
+      "name": "Webhooks",
+      "description": "Notificações HTTP de saída sobre eventos no seu espaço de trabalho."
+    },
+    "api_keys": {
+      "name": "Chaves de API",
+      "description": "Acesso programático por chaves da API REST."
+    },
+    "maker": {
+      "name": "Produção",
+      "description": "Ordens de produção, listas de materiais (BOM) e consolidação de custos."
+    },
+    "items": {
+      "name": "Estoque"
+    }
+  },
+  "config": {
+    "connectionsTitle": "Conexões de IA",
+    "connectionsDescription": "Conjunto de conexões de LLM compartilhado entre os módulos. Vincule uma a cada finalidade abaixo.",
+    "addConnection": "Adicionar conexão",
+    "editConnection": "Editar conexão",
+    "deleteConnection": "Excluir conexão",
+    "deleteConfirm": "Excluir \"{{name}}\"? Esta ação não pode ser desfeita.",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "formDescription": "Configure um endpoint de LLM. O conjunto é compartilhado por todos os recursos de IA.",
+    "fieldName": "Nome",
+    "fieldNamePlaceholder": "ex.: Sensor da prateleira do almoxarifado",
+    "fieldProvider": "Provedor",
+    "fieldApiKey": "Chave de API",
+    "fieldApiKeyDocs": "Onde obter sua chave de {{provider}}",
+    "fieldApiKeyPlaceholder": "sk-or-v1-…",
+    "fieldBaseUrl": "URL base da API",
+    "localEngineHint": "Um mecanismo local roda em um endereço privado, que o servidor recusa até que um operador o permita: defina LLM_ALLOW_PRIVATE_NETWORKS=true e reinicie o backend. Mantenha o endereço host.docker.internal — dentro do contêiner, localhost é o próprio contêiner.",
+    "fieldModel": "Modelo",
+    "fieldCapabilities": "Recursos",
+    "capability": {
+      "vision": "Visão",
+      "text": "Texto",
+      "url_fetch": "Leitura de páginas"
+    },
+    "noConnections": "Nenhuma conexão ainda",
+    "noConnectionsHint": "Adicione uma conexão para começar a usar os recursos de IA (Visão, Receitas, …).",
+    "bindingsTitle": "Padrão por finalidade",
+    "boundHere": "Ativa para esta finalidade",
+    "noBinding": "Não configurada",
+    "cannotDeleteBound": "Esta conexão está vinculada a uma finalidade. Desvincule-a primeiro.",
+    "noEligibleConnections": "Nenhuma conexão com o recurso {{capability}} ainda.",
+    "noEligibleConnectionsCta": "Configurar uma",
+    "serverDefaultOption": "Modelo padrão do servidor",
+    "serverDefaultHint": "Atendido pelo modelo padrão do servidor. Escolha uma conexão para usar a sua.",
+    "noConnectionsServerDefaultHint": "Alguns recursos de IA já funcionam com o modelo padrão do servidor. Adicione uma conexão para usar a sua.",
+    "createFailed": "Não foi possível criar a conexão",
+    "updateFailed": "Não foi possível atualizar a conexão",
+    "deleteFailed": "Não foi possível excluir a conexão",
+    "bindingFailed": "Não foi possível atualizar o vínculo",
+    "deleteSuccess": "Conexão excluída",
+    "loading": "Carregando conexões…",
+    "errorNameRequired": "O nome é obrigatório",
+    "errorNameTaken": "Já existe uma conexão com este nome",
+    "errorCapabilityRequired": "Selecione pelo menos um recurso",
+    "groupCloud": "Nuvem",
+    "groupAggregator": "Agregador",
+    "groupSpecialist": "Especializado",
+    "groupLocal": "Local",
+    "groupCustom": "Personalizado",
+    "testConnection": "Testar conexão",
+    "testing": "Testando…",
+    "testFailed": "O teste de conexão falhou. Verifique as credenciais e a URL base.",
+    "testNeedsApiKey": "Digite primeiro a chave de API no campo acima: o teste envia o que está neste formulário, não uma chave armazenada.",
+    "testNeedsBaseUrl": "Preencha primeiro a URL base da API acima: este provedor é acessado por HTTP, então o teste precisa do endereço.",
+    "testContractOk": "A conexão funciona — o modelo respondeu no formato esperado. {{count}} modelos disponíveis.",
+    "testReadAll": "A conexão funciona — o modelo leu todos os {{of}} campos do rótulo de exemplo.",
+    "testReadPartial": "A resposta veio no formato certo, mas o modelo leu apenas {{matched}} de {{of}} campos do rótulo de exemplo — ele pode estar preenchendo valores que nunca viu.",
+    "testContractOk_one": "A conexão funciona — o modelo leu o rótulo de exemplo. {{count}} modelo disponível.",
+    "testContractOk_other": "A conexão funciona — o modelo leu o rótulo de exemplo. {{count}} modelos disponíveis.",
+    "testContractFailed": "A chave funciona, mas o modelo não retornou dados utilizáveis. Ele respondeu: {{preview}}",
+    "testUnchecked": "As credenciais funcionam — {{count}} modelos disponíveis. A saída não foi verificada para estes recursos.",
+    "testUnchecked_one": "As credenciais funcionam — {{count}} modelo disponível. A saída não foi verificada para estes recursos.",
+    "testUnchecked_other": "As credenciais funcionam — {{count}} modelos disponíveis. A saída não foi verificada para estes recursos.",
+    "testShapeNotEnforced": "Este provedor não impõe o formato da resposta, então o resultado depende do interpretador e de uma nova tentativa. Ainda pode falhar depois.",
+    "testReaderOk": "A chave funciona — o leitor buscou uma página de teste.",
+    "testReaderFreeTier": "Esta conexão não tem chave — ela usa o plano gratuito do leitor, sem nada a testar.",
+    "testReaderEmpty": "A chave funciona, mas o leitor não trouxe nada da página de teste.",
+    "providerName": {
+      "custom": "Compatível com OpenAI (personalizado)"
+    },
+    "providerDescription": {
+      "openai": "GPT-4o, GPT-4o-mini. Multimodal.",
+      "anthropic": "Modelos Claude. Visão multimodal.",
+      "google": "Gemini 2.0 Flash / Pro. Plano gratuito disponível.",
+      "openrouter": "Mais de 100 modelos com uma só chave.",
+      "groq": "Inferência mais rápida. Llama, Mixtral.",
+      "deepseek": "DeepSeek V3 / R1.",
+      "mistral": "Mistral Large, Codestral.",
+      "together": "Hospedagem de modelos de código aberto.",
+      "xai": "Modelos Grok. Multimodal.",
+      "minimax": "MiniMax-M3 (contexto de 1M, multimodal). Disponível a partir da China.",
+      "glm": "GLM-4V, multimodal. Plano gratuito pelo glm-4v-flash. Principal na China.",
+      "mimo": "MiMo-V2.5 (310B MoE, multimodal). Modelo de raciocínio principal da Xiaomi.",
+      "jina": "Lê uma página da web como texto limpo — é o que a importação de receitas usa.",
+      "ollama": "Servidor local compatível com OpenAI na porta 11434.",
+      "lm_studio": "Servidor local compatível com OpenAI na porta 1234.",
+      "vllm": "Servidor próprio compatível com OpenAI.",
+      "custom": "Qualquer outro endpoint no formato OpenAI."
+    },
+    "fieldCapabilitiesHint": "O que se pode pedir a este modelo. As marcações são uma sugestão do provedor — quem decide é o teste de conexão.",
+    "purposeUnavailable": "Módulo desativado",
+    "purposeUnavailableHint": "Esta finalidade pertence a {{module}}, que está desativado. Um vínculo feito aqui passa a valer quando o módulo for ativado.",
+    "capabilityUnverified": "Declarado, ainda não verificado — execute o teste de conexão",
+    "capabilityConfirmed": "Confirmado pelo teste de conexão",
+    "capabilityFailed": "O modelo falhou neste teste",
+    "capabilityFailedHint": "O modelo não conseguiu o que esta conexão declara. Ela não é oferecida para finalidades que precisam disso até o teste passar.",
+    "connectionFailedCapability": "{{names}} não está nesta lista: falhou no teste de {{capability}}."
+  },
+  "fieldBuilder": {
+    "title": "Definições de campos personalizados",
+    "fieldsCount": "{{count}} campos definidos",
+    "fieldsCount_one": "{{count}} campo definido",
+    "fieldsCount_other": "{{count}} campos definidos",
+    "fieldLabel": "Rótulo do campo",
+    "placeholder": "ex.: Tensão",
+    "dataType": "Tipo de dado",
+    "addField": "Adicionar campo",
+    "addCustomField": "Adicionar campo personalizado",
+    "types": {
+      "text": "Texto",
+      "number": "Número",
+      "date": "Data",
+      "textarea": "Texto longo",
+      "file": "Arquivo / Anexo",
+      "money": "Valor monetário",
+      "select": "Lista suspensa",
+      "multi-select": "Seleção múltipla",
+      "boolean": "Sim / Não"
+    },
+    "options": {
+      "label": "Opções",
+      "placeholder": "Adicione uma opção e pressione Enter",
+      "empty": "É necessária pelo menos uma opção",
+      "remove": "Remover a opção {{name}}"
+    },
+    "errors": {
+      "alreadyExists": "Já existe um campo com este nome",
+      "optionsRequired": "Este tipo de campo exige pelo menos uma opção"
+    }
+  },
+  "disabled": "Desativado"
+}

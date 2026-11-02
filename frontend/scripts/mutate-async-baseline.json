@@ -1,0 +1,16 @@
+{
+  "unhandled": {
+    "modules/equipment/hooks/useAssetListActions.ts :: handleBulkArchive :: archiveMatchingMutation.mutateAsync": 1,
+    "modules/equipment/hooks/useAssetListActions.ts :: handleBulkArchive :: bulkArchiveMutation.mutateAsync": 1,
+    "modules/equipment/hooks/useAssetListActions.ts :: handleBulkPurge :: bulkPurgeMutation.mutateAsync": 1,
+    "modules/equipment/hooks/useAssetListActions.ts :: handleRestore :: restoreMutation.mutateAsync": 1,
+    "modules/equipment/hooks/useAssetListActions.ts :: handleSinglePurge :: bulkPurgeMutation.mutateAsync": 1,
+    "modules/equipment/hooks/useAssetListActions.ts :: retireSelected :: bulkRetireMutation.mutateAsync": 1,
+    "modules/equipment/hooks/useAssetListActions.ts :: retireSelected :: retireMatchingMutation.mutateAsync": 1,
+    "modules/inventory/hooks/useScanActions.ts :: useScanUsePartially :: mutation.mutateAsync": 1,
+    "modules/recipes/components/CookingMode.tsx :: requestEntry :: createHistoryEntry.mutateAsync": 1,
+    "modules/warehouse/components/DocumentLineExtra.tsx :: useSaveMetaData :: mutateAsync": 1,
+    "modules/warehouse/pages/ReceiveGoodsPage.tsx :: save :: createDraft.mutateAsync": 1,
+    "modules/warehouse/pages/ReceiveGoodsPage.tsx :: send :: postNew.mutateAsync": 1
+  }
+}

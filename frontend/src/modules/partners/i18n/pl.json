@@ -1,0 +1,132 @@
+{
+  "title": "Partnerzy",
+  "subtitle": "Dostawcy, klienci i usługodawcy",
+  "detail": {
+    "title": "Szczegóły partnera",
+    "createdAt": "Utworzono",
+    "updatedAt": "Zaktualizowano",
+    "related": "Powiązane",
+    "relatedDocuments": "Dokumenty magazynowe",
+    "relatedOrders": "Zamówienia zakupu"
+  },
+  "newPartner": "Nowy partner",
+  "searchPlaceholder": "Szukaj po nazwie, kodzie, NIP, emailu…",
+  "noPartners": "Brak partnerów",
+  "noPartnersDesc": "Dodaj pierwszego partnera, aby zacząć",
+  "stats": {
+    "documents_one": "{{count}} dokument",
+    "documents_few": "{{count}} dokumenty",
+    "documents_many": "{{count}} dokumentów",
+    "documents_other": "{{count}} dokumentów",
+    "total": "Obrót",
+    "lastActivity": "Ostatnia aktywność",
+    "multipleCurrencies": "Wiele walut"
+  },
+  "filterAll": "Wszyscy",
+  "filterActive": "Aktywni",
+  "filterInactive": "Nieaktywni",
+  "columns": {
+    "name": "Nazwa",
+    "type": "Typ",
+    "taxId": "NIP",
+    "contact": "Kontakt",
+    "documents": "Dokumenty",
+    "actions": "Akcje"
+  },
+  "launcher": {
+    "description": "Zarządzaj dostawcami, klientami i partnerami biznesowymi"
+  },
+  "types": {
+    "SUPPLIER": "Dostawca",
+    "CUSTOMER": "Klient",
+    "BOTH": "Dostawca i Klient",
+    "SERVICE_PROVIDER": "Usługodawca",
+    "MANUFACTURER": "Producent",
+    "EMPLOYEE": "Pracownik"
+  },
+  "fields": {
+    "name": "Nazwa",
+    "fullName": "Imię i nazwisko",
+    "code": "Kod partnera",
+    "type": "Typ",
+    "taxId": "NIP / VAT",
+    "isConsumer": "Osoba prywatna (konsument)",
+    "email": "Email",
+    "phone": "Telefon",
+    "website": "Strona WWW",
+    "contactPerson": "Osoba kontaktowa",
+    "position": "Stanowisko / Dział",
+    "address": "Adres",
+    "notes": "Notatki wewnętrzne"
+  },
+  "address": {
+    "section": "Adres",
+    "street": "Ulica",
+    "city": "Miasto",
+    "postalCode": "Kod pocztowy",
+    "country": "Kraj",
+    "countrySelect": "Wybierz kraj",
+    "otherCountry": "Inny: {{value}}"
+  },
+  "form": {
+    "createTitle": "Nowy partner",
+    "editTitle": "Edytuj partnera",
+    "namePlaceholder": "np. Hurtownia ABC",
+    "fullNamePlaceholder": "np. Jan Kowalski",
+    "codePlaceholder": "np. DOO-001",
+    "taxIdPlaceholder": "np. PL1234567890",
+    "isConsumerHint": "Nie ma NIP-u: dokumenty potwierdzają się bez niego, także tam, gdzie prawo wymaga go od firm.",
+    "emailPlaceholder": "kontakt@firma.pl",
+    "phonePlaceholder": "+48 123 456 789",
+    "websitePlaceholder": "https://firma.pl",
+    "contactPersonPlaceholder": "np. Jan Kowalski (dział zakupów)",
+    "positionPlaceholder": "np. Informatyk, Dział IT",
+    "notesPlaceholder": "Notatki wewnętrzne…",
+    "street_placeholder": "ul. Przykładowa 1",
+    "city_placeholder": "Warszawa",
+    "postal_placeholder": "00-000",
+    "saving": "Zapisywanie…"
+  },
+  "actions": {
+    "edit": "Edytuj",
+    "deactivate": "Dezaktywuj",
+    "activate": "Aktywuj",
+    "addPartner": "Dodaj partnera"
+  },
+  "confirmDeactivateTitle": "Dezaktywuj partnera",
+  "confirmDeactivate": "Dezaktywować tego partnera? Nie będzie domyślnie widoczny w filtrach.",
+  "status": {
+    "inactive": "Nieaktywny"
+  },
+  "errors": {
+    "activateFailed": "Nie udało się aktywować partnera",
+    "deactivateFailed": "Nie udało się dezaktywować partnera",
+    "saveFailed": "Nie udało się zapisać partnera",
+    "createFailed": "Nie udało się utworzyć partnera",
+    "invalidEmail": "Podaj adres e-mail, na przykład imie@firma.pl.",
+    "invalidWebsite": "Podaj adres strony, na przykład https://firma.pl."
+  },
+  "inlineCreateHint": "Szybkie tworzenie partnera",
+  "inlineCreateSuccess": "Partner „{{name}}” został utworzony. Przed wystawieniem dokumentu z adresem uzupełnij NIP i adres.",
+  "import": {
+    "button": "Importuj",
+    "title": "Import partnerów",
+    "formats": "XLSX / CSV",
+    "pleaseWait": "Proszę czekać, przetwarzamy partnerów.",
+    "closeAndView": "Zamknij i pokaż partnerów",
+    "added_one": "Dodano {{count}} partnera.",
+    "added_few": "Dodano {{count}} partnerów.",
+    "added_many": "Dodano {{count}} partnerów.",
+    "added_other": "Dodano {{count}} partnera.",
+    "defaultType": "Typ dla wierszy bez typu",
+    "addOnlyNote": "Import tylko dodaje partnerów. Wiersz z partnerem, którego już masz — ta sama nazwa niezależnie od wielkości liter albo ten sam NIP — jest odrzucany i pokazany z powodem.",
+    "analyzeFailed": "Nie udało się odczytać pliku",
+    "failed": "Import nie powiódł się"
+  },
+  "toasts": {
+    "saved": "Partner zapisany",
+    "created": "Partner utworzony",
+    "activated": "Partner aktywowany",
+    "deactivated": "Partner dezaktywowany"
+  }
+}

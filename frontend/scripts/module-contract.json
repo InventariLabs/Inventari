@@ -1,0 +1,3495 @@
+{
+  "frontendModule": {
+    "props": {
+      "backgroundFeatures": {
+        "optional": true,
+        "type": {
+          "args": [
+            "string",
+            {
+              "ext": "ComponentType"
+            }
+          ],
+          "ext": "Record"
+        }
+      },
+      "bulkActions": {
+        "optional": true,
+        "type": {
+          "array": {
+            "args": [
+              {
+                "obj": {
+                  "condition": {
+                    "optional": true,
+                    "type": {
+                      "union": [
+                        "undefined",
+                        {
+                          "fn": {
+                            "params": [
+                              {
+                                "name": "items",
+                                "optional": false,
+                                "type": {
+                                  "array": {
+                                    "obj": {
+                                      "id": {
+                                        "optional": false,
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ],
+                            "returns": "boolean"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "handler": {
+                    "optional": false,
+                    "type": {
+                      "fn": {
+                        "params": [
+                          {
+                            "name": "itemIds",
+                            "optional": false,
+                            "type": {
+                              "array": "string"
+                            }
+                          }
+                        ],
+                        "returns": {
+                          "args": [
+                            "void"
+                          ],
+                          "ext": "Promise"
+                        }
+                      }
+                    }
+                  },
+                  "icon": {
+                    "optional": false,
+                    "type": {
+                      "ext": "LucideIcon"
+                    }
+                  },
+                  "id": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "labelKey": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "moduleName": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "variant": {
+                    "optional": true,
+                    "type": {
+                      "union": [
+                        "undefined",
+                        {
+                          "literal": "danger"
+                        },
+                        {
+                          "literal": "default"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "literal": "moduleName"
+              }
+            ],
+            "ext": "Omit"
+          }
+        }
+      },
+      "columnContributors": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "hasValue": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "fn": {
+                        "params": [
+                          {
+                            "name": "item",
+                            "optional": false,
+                            "type": {
+                              "schema": "Item"
+                            }
+                          }
+                        ],
+                        "returns": "boolean"
+                      }
+                    }
+                  ]
+                }
+              },
+              "key": {
+                "optional": false,
+                "type": "string"
+              },
+              "label": {
+                "optional": false,
+                "type": "string"
+              },
+              "position": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "literal": "after-name"
+                    },
+                    {
+                      "literal": "before-actions"
+                    }
+                  ]
+                }
+              },
+              "render": {
+                "optional": false,
+                "type": {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "item",
+                        "optional": false,
+                        "type": {
+                          "schema": "Item"
+                        }
+                      }
+                    ],
+                    "returns": {
+                      "ext": "ReactNode"
+                    }
+                  }
+                }
+              },
+              "requiredModule": {
+                "optional": false,
+                "type": "string"
+              },
+              "useHasValues": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "fn": {
+                        "params": [
+                          {
+                            "name": "items",
+                            "optional": false,
+                            "type": {
+                              "array": {
+                                "schema": "Item"
+                              }
+                            }
+                          }
+                        ],
+                        "returns": {
+                          "union": [
+                            "boolean",
+                            "undefined"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "width": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "string",
+                    "undefined"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "documentActionContributors": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "icon": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "ext": "LucideIcon"
+                    }
+                  ]
+                }
+              },
+              "isAvailable": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "fn": {
+                        "params": [
+                          {
+                            "name": "doc",
+                            "optional": false,
+                            "type": {
+                              "obj": {
+                                "id": {
+                                  "optional": false,
+                                  "type": "string"
+                                },
+                                "lines": {
+                                  "optional": false,
+                                  "type": {
+                                    "array": {
+                                      "obj": {
+                                        "batchNumber": {
+                                          "optional": false,
+                                          "type": {
+                                            "union": [
+                                              "null",
+                                              "string"
+                                            ]
+                                          }
+                                        },
+                                        "id": {
+                                          "optional": false,
+                                          "type": "string"
+                                        },
+                                        "metaData": {
+                                          "optional": false,
+                                          "type": {
+                                            "index": [
+                                              {
+                                                "key": "string",
+                                                "value": {
+                                                  "args": [
+                                                    "string",
+                                                    "unknown"
+                                                  ],
+                                                  "ext": "Record"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "metaData": {
+                                  "optional": false,
+                                  "type": {
+                                    "index": [
+                                      {
+                                        "key": "string",
+                                        "value": {
+                                          "args": [
+                                            "string",
+                                            "unknown"
+                                          ],
+                                          "ext": "Record"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                "number": {
+                                  "optional": false,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "optional": false,
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "optional": false,
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "returns": "boolean"
+                      }
+                    }
+                  ]
+                }
+              },
+              "key": {
+                "optional": false,
+                "type": "string"
+              },
+              "label": {
+                "optional": false,
+                "type": "string"
+              },
+              "run": {
+                "optional": false,
+                "type": {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "doc",
+                        "optional": false,
+                        "type": {
+                          "obj": {
+                            "id": {
+                              "optional": false,
+                              "type": "string"
+                            },
+                            "lines": {
+                              "optional": false,
+                              "type": {
+                                "array": {
+                                  "obj": {
+                                    "batchNumber": {
+                                      "optional": false,
+                                      "type": {
+                                        "union": [
+                                          "null",
+                                          "string"
+                                        ]
+                                      }
+                                    },
+                                    "id": {
+                                      "optional": false,
+                                      "type": "string"
+                                    },
+                                    "metaData": {
+                                      "optional": false,
+                                      "type": {
+                                        "index": [
+                                          {
+                                            "key": "string",
+                                            "value": {
+                                              "args": [
+                                                "string",
+                                                "unknown"
+                                              ],
+                                              "ext": "Record"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "metaData": {
+                              "optional": false,
+                              "type": {
+                                "index": [
+                                  {
+                                    "key": "string",
+                                    "value": {
+                                      "args": [
+                                        "string",
+                                        "unknown"
+                                      ],
+                                      "ext": "Record"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "number": {
+                              "optional": false,
+                              "type": "string"
+                            },
+                            "status": {
+                              "optional": false,
+                              "type": "string"
+                            },
+                            "type": {
+                              "optional": false,
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returns": {
+                      "args": [
+                        {
+                          "union": [
+                            "string",
+                            "void"
+                          ]
+                        }
+                      ],
+                      "ext": "Promise"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "documentColumnContributors": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "hasValue": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "fn": {
+                        "params": [
+                          {
+                            "name": "doc",
+                            "optional": false,
+                            "type": {
+                              "obj": {
+                                "id": {
+                                  "optional": false,
+                                  "type": "string"
+                                },
+                                "lines": {
+                                  "optional": false,
+                                  "type": {
+                                    "array": {
+                                      "obj": {
+                                        "batchNumber": {
+                                          "optional": false,
+                                          "type": {
+                                            "union": [
+                                              "null",
+                                              "string"
+                                            ]
+                                          }
+                                        },
+                                        "id": {
+                                          "optional": false,
+                                          "type": "string"
+                                        },
+                                        "metaData": {
+                                          "optional": false,
+                                          "type": {
+                                            "index": [
+                                              {
+                                                "key": "string",
+                                                "value": {
+                                                  "args": [
+                                                    "string",
+                                                    "unknown"
+                                                  ],
+                                                  "ext": "Record"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "metaData": {
+                                  "optional": false,
+                                  "type": {
+                                    "index": [
+                                      {
+                                        "key": "string",
+                                        "value": {
+                                          "args": [
+                                            "string",
+                                            "unknown"
+                                          ],
+                                          "ext": "Record"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                "number": {
+                                  "optional": false,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "optional": false,
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "optional": false,
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "returns": "boolean"
+                      }
+                    }
+                  ]
+                }
+              },
+              "key": {
+                "optional": false,
+                "type": "string"
+              },
+              "label": {
+                "optional": false,
+                "type": "string"
+              },
+              "render": {
+                "optional": false,
+                "type": {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "doc",
+                        "optional": false,
+                        "type": {
+                          "obj": {
+                            "id": {
+                              "optional": false,
+                              "type": "string"
+                            },
+                            "lines": {
+                              "optional": false,
+                              "type": {
+                                "array": {
+                                  "obj": {
+                                    "batchNumber": {
+                                      "optional": false,
+                                      "type": {
+                                        "union": [
+                                          "null",
+                                          "string"
+                                        ]
+                                      }
+                                    },
+                                    "id": {
+                                      "optional": false,
+                                      "type": "string"
+                                    },
+                                    "metaData": {
+                                      "optional": false,
+                                      "type": {
+                                        "index": [
+                                          {
+                                            "key": "string",
+                                            "value": {
+                                              "args": [
+                                                "string",
+                                                "unknown"
+                                              ],
+                                              "ext": "Record"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "metaData": {
+                              "optional": false,
+                              "type": {
+                                "index": [
+                                  {
+                                    "key": "string",
+                                    "value": {
+                                      "args": [
+                                        "string",
+                                        "unknown"
+                                      ],
+                                      "ext": "Record"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "number": {
+                              "optional": false,
+                              "type": "string"
+                            },
+                            "status": {
+                              "optional": false,
+                              "type": "string"
+                            },
+                            "type": {
+                              "optional": false,
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returns": {
+                      "ext": "ReactNode"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "documentFilterContributors": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "key": {
+                "optional": false,
+                "type": "string"
+              },
+              "label": {
+                "optional": false,
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "i18nOverrides": {
+        "optional": true,
+        "type": {
+          "args": [
+            "string",
+            {
+              "args": [
+                "string",
+                "string"
+              ],
+              "ext": "Record"
+            }
+          ],
+          "ext": "Record"
+        }
+      },
+      "labelPurpose": {
+        "optional": true,
+        "type": {
+          "obj": {
+            "contextTag": {
+              "optional": false,
+              "type": "string"
+            },
+            "defaultPrefix": {
+              "optional": false,
+              "type": "string"
+            },
+            "icon": {
+              "optional": false,
+              "type": {
+                "ext": "LucideIcon"
+              }
+            },
+            "labelKey": {
+              "optional": false,
+              "type": "string"
+            }
+          }
+        }
+      },
+      "launcher": {
+        "optional": true,
+        "type": {
+          "obj": {
+            "category": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "undefined",
+                  {
+                    "literal": "analytics"
+                  },
+                  {
+                    "literal": "business"
+                  },
+                  {
+                    "literal": "core"
+                  },
+                  {
+                    "literal": "integrations"
+                  },
+                  {
+                    "literal": "system"
+                  }
+                ]
+              }
+            },
+            "color": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "string",
+                  "undefined"
+                ]
+              }
+            },
+            "description": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "string",
+                  "undefined"
+                ]
+              }
+            },
+            "displayName": {
+              "optional": false,
+              "type": "string"
+            },
+            "hidden": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "boolean",
+                  "undefined"
+                ]
+              }
+            },
+            "icon": {
+              "optional": false,
+              "type": {
+                "ext": "LucideIcon"
+              }
+            },
+            "linkTo": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "string",
+                  "undefined"
+                ]
+              }
+            },
+            "order": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "number",
+                  "undefined"
+                ]
+              }
+            },
+            "required": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "boolean",
+                  "undefined"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "listFilterContributors": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "fetchTemplateIds": {
+                "optional": false,
+                "type": {
+                  "fn": {
+                    "params": [],
+                    "returns": {
+                      "args": [
+                        {
+                          "array": "string"
+                        }
+                      ],
+                      "ext": "Promise"
+                    }
+                  }
+                }
+              },
+              "key": {
+                "optional": false,
+                "type": "string"
+              },
+              "label": {
+                "optional": false,
+                "type": "string"
+              },
+              "queryKey": {
+                "optional": false,
+                "type": {
+                  "array": "unknown"
+                }
+              },
+              "requiredModule": {
+                "optional": false,
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "moduleNav": {
+        "optional": true,
+        "type": {
+          "obj": {
+            "basePath": {
+              "optional": false,
+              "type": "string"
+            },
+            "items": {
+              "optional": false,
+              "type": {
+                "array": {
+                  "obj": {
+                    "Badge": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "undefined",
+                          {
+                            "args": [
+                              {
+                                "obj": {}
+                              },
+                              "any"
+                            ],
+                            "ext": "ComponentClass"
+                          },
+                          {
+                            "args": [
+                              {
+                                "obj": {}
+                              }
+                            ],
+                            "ext": "FunctionComponent"
+                          }
+                        ]
+                      }
+                    },
+                    "icon": {
+                      "optional": false,
+                      "type": {
+                        "ext": "LucideIcon"
+                      }
+                    },
+                    "labelKey": {
+                      "optional": false,
+                      "type": "string"
+                    },
+                    "mobileBar": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "boolean",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "mobileLabelKey": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "mobileOrder": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "number",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "order": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "number",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "path": {
+                      "optional": false,
+                      "type": "string"
+                    },
+                    "requiresModules": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "undefined",
+                          {
+                            "array": "string"
+                          }
+                        ]
+                      }
+                    },
+                    "roles": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "undefined",
+                          {
+                            "array": "string"
+                          }
+                        ]
+                      }
+                    },
+                    "showOnDesktop": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "boolean",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "showOnMobile": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "boolean",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "subtitleKey": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "titleKey": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "name": {
+        "optional": false,
+        "type": "string"
+      },
+      "navOverrides": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "hidden": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "boolean",
+                    "undefined"
+                  ]
+                }
+              },
+              "icon": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "ext": "LucideIcon"
+                    }
+                  ]
+                }
+              },
+              "labelKey": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "string",
+                    "undefined"
+                  ]
+                }
+              },
+              "targetPath": {
+                "optional": false,
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "routes": {
+        "optional": false,
+        "type": {
+          "array": {
+            "obj": {
+              "component": {
+                "optional": false,
+                "type": {
+                  "args": [
+                    {
+                      "args": [
+                        "string",
+                        "unknown"
+                      ],
+                      "ext": "Record"
+                    }
+                  ],
+                  "ext": "ComponentType"
+                }
+              },
+              "exact": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "boolean",
+                    "undefined"
+                  ]
+                }
+              },
+              "index": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "boolean",
+                    "undefined"
+                  ]
+                }
+              },
+              "path": {
+                "optional": false,
+                "type": "string"
+              },
+              "requiresModules": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "array": "string"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "searchProvider": {
+        "optional": true,
+        "type": {
+          "fn": {
+            "params": [
+              {
+                "name": "query",
+                "optional": false,
+                "type": "string"
+              }
+            ],
+            "returns": {
+              "args": [
+                {
+                  "array": {
+                    "obj": {
+                      "id": {
+                        "optional": false,
+                        "type": "string"
+                      },
+                      "module": {
+                        "optional": false,
+                        "type": "string"
+                      },
+                      "path": {
+                        "optional": false,
+                        "type": "string"
+                      },
+                      "subtitle": {
+                        "optional": true,
+                        "type": {
+                          "union": [
+                            "string",
+                            "undefined"
+                          ]
+                        }
+                      },
+                      "title": {
+                        "optional": false,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              ],
+              "ext": "Promise"
+            }
+          }
+        }
+      },
+      "settingsSections": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "component": {
+                "optional": false,
+                "type": {
+                  "ext": "ComponentType"
+                }
+              },
+              "icon": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "undefined",
+                    {
+                      "ext": "LucideIcon"
+                    }
+                  ]
+                }
+              },
+              "path": {
+                "optional": false,
+                "type": "string"
+              },
+              "title": {
+                "optional": false,
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "slots": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "component": {
+                "optional": false,
+                "type": {
+                  "args": [
+                    {
+                      "obj": {
+                        "data": {
+                          "optional": false,
+                          "type": "unknown"
+                        }
+                      }
+                    }
+                  ],
+                  "ext": "ComponentType"
+                }
+              },
+              "priority": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "number",
+                    "undefined"
+                  ]
+                }
+              },
+              "slot": {
+                "optional": false,
+                "type": {
+                  "union": [
+                    {
+                      "literal": "approval_decision_panel"
+                    },
+                    {
+                      "literal": "approval_parked_requests"
+                    },
+                    {
+                      "literal": "approval_request_badge"
+                    },
+                    {
+                      "literal": "approval_status_badge"
+                    },
+                    {
+                      "literal": "dashboard_replenish_modal"
+                    },
+                    {
+                      "literal": "dashboard_widgets"
+                    },
+                    {
+                      "literal": "document_approval_setup_notice"
+                    },
+                    {
+                      "literal": "document_detail_extra"
+                    },
+                    {
+                      "literal": "document_detail_line_extra"
+                    },
+                    {
+                      "literal": "document_form_extra"
+                    },
+                    {
+                      "literal": "document_line_form_extra"
+                    },
+                    {
+                      "literal": "global_notifications"
+                    },
+                    {
+                      "literal": "item_detail_extra"
+                    },
+                    {
+                      "literal": "item_edit_extra"
+                    },
+                    {
+                      "literal": "items_page_header_extra"
+                    },
+                    {
+                      "literal": "quick_action_extra"
+                    },
+                    {
+                      "literal": "quick_add_product_info"
+                    },
+                    {
+                      "literal": "settings_ai_module_config"
+                    },
+                    {
+                      "literal": "settings_module_card"
+                    },
+                    {
+                      "literal": "shopping_list_add_item"
+                    },
+                    {
+                      "literal": "stock_action_extra"
+                    },
+                    {
+                      "literal": "storage_detail_extra"
+                    },
+                    {
+                      "literal": "storage_item_edit_modal"
+                    },
+                    {
+                      "literal": "storage_moves"
+                    },
+                    {
+                      "literal": "storage_tree_row_extra"
+                    },
+                    {
+                      "literal": "storage_warehouse_strip"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "standalone": {
+        "optional": true,
+        "type": {
+          "obj": {
+            "backgroundFeatures": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "undefined",
+                  {
+                    "array": {
+                      "obj": {
+                        "feature": {
+                          "optional": false,
+                          "type": "string"
+                        },
+                        "labelKey": {
+                          "optional": false,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "optional": false,
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "coreSections": {
+              "optional": false,
+              "type": {
+                "args": [
+                  {
+                    "union": [
+                      {
+                        "literal": "archive"
+                      },
+                      {
+                        "literal": "labels"
+                      },
+                      {
+                        "literal": "scan"
+                      },
+                      {
+                        "literal": "stats"
+                      },
+                      {
+                        "literal": "stock_takes"
+                      }
+                    ]
+                  },
+                  {
+                    "union": [
+                      {
+                        "literal": "adopt"
+                      },
+                      {
+                        "literal": "renounce"
+                      }
+                    ]
+                  }
+                ],
+                "ext": "Record"
+              }
+            },
+            "keepCoreNav": {
+              "optional": true,
+              "type": {
+                "union": [
+                  "undefined",
+                  {
+                    "array": {
+                      "union": [
+                        {
+                          "literal": "categories"
+                        },
+                        {
+                          "literal": "items"
+                        },
+                        {
+                          "literal": "moves"
+                        },
+                        {
+                          "literal": "stock"
+                        },
+                        {
+                          "literal": "storages"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "theme": {
+        "optional": true,
+        "type": {
+          "obj": {
+            "cssVariables": {
+              "optional": false,
+              "type": {
+                "args": [
+                  "string",
+                  "string"
+                ],
+                "ext": "Record"
+              }
+            }
+          }
+        }
+      },
+      "useActionItems": {
+        "optional": true,
+        "type": {
+          "fn": {
+            "params": [],
+            "returns": {
+              "array": {
+                "obj": {
+                  "count": {
+                    "optional": true,
+                    "type": {
+                      "union": [
+                        "number",
+                        "undefined"
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "optional": false,
+                    "type": {
+                      "ext": "LucideIcon"
+                    }
+                  },
+                  "id": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "labelKey": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "labelValues": {
+                    "optional": true,
+                    "type": {
+                      "union": [
+                        "undefined",
+                        {
+                          "args": [
+                            "string",
+                            "unknown"
+                          ],
+                          "ext": "Record"
+                        }
+                      ]
+                    }
+                  },
+                  "linkTo": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "severity": {
+                    "optional": false,
+                    "type": {
+                      "union": [
+                        {
+                          "literal": "error"
+                        },
+                        {
+                          "literal": "info"
+                        },
+                        {
+                          "literal": "warning"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "useStatusBadge": {
+        "optional": true,
+        "type": {
+          "fn": {
+            "params": [],
+            "returns": {
+              "union": [
+                "null",
+                {
+                  "obj": {
+                    "count": {
+                      "optional": false,
+                      "type": "number"
+                    },
+                    "failed": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "boolean",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "label": {
+                      "optional": false,
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "validationRules": {
+        "optional": true,
+        "type": {
+          "array": {
+            "obj": {
+              "field": {
+                "optional": false,
+                "type": "string"
+              },
+              "form": {
+                "optional": false,
+                "type": {
+                  "union": [
+                    {
+                      "literal": "item_create"
+                    },
+                    {
+                      "literal": "item_edit"
+                    },
+                    {
+                      "literal": "storage_create"
+                    },
+                    {
+                      "literal": "storage_edit"
+                    }
+                  ]
+                }
+              },
+              "priority": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "number",
+                    "undefined"
+                  ]
+                }
+              },
+              "validator": {
+                "optional": false,
+                "type": {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "value",
+                        "optional": false,
+                        "type": "unknown"
+                      },
+                      {
+                        "name": "formData",
+                        "optional": false,
+                        "type": {
+                          "args": [
+                            "string",
+                            "unknown"
+                          ],
+                          "ext": "Record"
+                        }
+                      }
+                    ],
+                    "returns": {
+                      "union": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "slotContribution": {
+    "props": {
+      "component": {
+        "optional": false,
+        "type": {
+          "args": [
+            {
+              "obj": {
+                "data": {
+                  "optional": false,
+                  "type": "unknown"
+                }
+              }
+            }
+          ],
+          "ext": "ComponentType"
+        }
+      },
+      "priority": {
+        "optional": true,
+        "type": "number"
+      },
+      "slot": {
+        "optional": false,
+        "type": {
+          "union": [
+            {
+              "literal": "approval_decision_panel"
+            },
+            {
+              "literal": "approval_parked_requests"
+            },
+            {
+              "literal": "approval_request_badge"
+            },
+            {
+              "literal": "approval_status_badge"
+            },
+            {
+              "literal": "dashboard_replenish_modal"
+            },
+            {
+              "literal": "dashboard_widgets"
+            },
+            {
+              "literal": "document_approval_setup_notice"
+            },
+            {
+              "literal": "document_detail_extra"
+            },
+            {
+              "literal": "document_detail_line_extra"
+            },
+            {
+              "literal": "document_form_extra"
+            },
+            {
+              "literal": "document_line_form_extra"
+            },
+            {
+              "literal": "global_notifications"
+            },
+            {
+              "literal": "item_detail_extra"
+            },
+            {
+              "literal": "item_edit_extra"
+            },
+            {
+              "literal": "items_page_header_extra"
+            },
+            {
+              "literal": "quick_action_extra"
+            },
+            {
+              "literal": "quick_add_product_info"
+            },
+            {
+              "literal": "settings_ai_module_config"
+            },
+            {
+              "literal": "settings_module_card"
+            },
+            {
+              "literal": "shopping_list_add_item"
+            },
+            {
+              "literal": "stock_action_extra"
+            },
+            {
+              "literal": "storage_detail_extra"
+            },
+            {
+              "literal": "storage_item_edit_modal"
+            },
+            {
+              "literal": "storage_moves"
+            },
+            {
+              "literal": "storage_tree_row_extra"
+            },
+            {
+              "literal": "storage_warehouse_strip"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "slotDataMap": {
+    "props": {
+      "approval_decision_panel": {
+        "obj": {
+          "approval": {
+            "optional": false,
+            "type": {
+              "intersect": [
+                {
+                  "args": [
+                    {
+                      "schema": "ApprovalRequestSchema"
+                    },
+                    {
+                      "union": [
+                        {
+                          "literal": "target_summary"
+                        },
+                        {
+                          "literal": "undecidable_reason"
+                        }
+                      ]
+                    }
+                  ],
+                  "ext": "Omit"
+                },
+                {
+                  "obj": {
+                    "target_summary": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "undefined",
+                          {
+                            "obj": {
+                              "currency": {
+                                "optional": false,
+                                "type": {
+                                  "union": [
+                                    "null",
+                                    "string"
+                                  ]
+                                }
+                              },
+                              "id": {
+                                "optional": false,
+                                "type": "string"
+                              },
+                              "lines_count": {
+                                "optional": false,
+                                "type": "number"
+                              },
+                              "number": {
+                                "optional": false,
+                                "type": "string"
+                              },
+                              "partner_name": {
+                                "optional": false,
+                                "type": {
+                                  "union": [
+                                    "null",
+                                    "string"
+                                  ]
+                                }
+                              },
+                              "posts_on_approval": {
+                                "optional": true,
+                                "type": {
+                                  "union": [
+                                    "boolean",
+                                    "undefined"
+                                  ]
+                                }
+                              },
+                              "serial_number": {
+                                "optional": true,
+                                "type": {
+                                  "union": [
+                                    "null",
+                                    "string",
+                                    "undefined"
+                                  ]
+                                }
+                              },
+                              "source_location_name": {
+                                "optional": true,
+                                "type": {
+                                  "union": [
+                                    "null",
+                                    "string",
+                                    "undefined"
+                                  ]
+                                }
+                              },
+                              "target_location_name": {
+                                "optional": true,
+                                "type": {
+                                  "union": [
+                                    "null",
+                                    "string",
+                                    "undefined"
+                                  ]
+                                }
+                              },
+                              "total_value": {
+                                "optional": false,
+                                "type": {
+                                  "union": [
+                                    "null",
+                                    "string"
+                                  ]
+                                }
+                              },
+                              "type": {
+                                "optional": true,
+                                "type": {
+                                  "union": [
+                                    "null",
+                                    "string",
+                                    "undefined"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "undecidable_reason": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "undefined",
+                          {
+                            "literal": "named_approvers_cannot_decide"
+                          },
+                          {
+                            "literal": "no_approver_in_organization"
+                          },
+                          {
+                            "literal": "only_the_requester_can_decide"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "onApprove": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "request",
+                    "optional": false,
+                    "type": {
+                      "intersect": [
+                        {
+                          "args": [
+                            {
+                              "schema": "ApprovalRequestSchema"
+                            },
+                            {
+                              "union": [
+                                {
+                                  "literal": "target_summary"
+                                },
+                                {
+                                  "literal": "undecidable_reason"
+                                }
+                              ]
+                            }
+                          ],
+                          "ext": "Omit"
+                        },
+                        {
+                          "obj": {
+                            "target_summary": {
+                              "optional": true,
+                              "type": {
+                                "union": [
+                                  "null",
+                                  "undefined",
+                                  {
+                                    "obj": {
+                                      "currency": {
+                                        "optional": false,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string"
+                                          ]
+                                        }
+                                      },
+                                      "id": {
+                                        "optional": false,
+                                        "type": "string"
+                                      },
+                                      "lines_count": {
+                                        "optional": false,
+                                        "type": "number"
+                                      },
+                                      "number": {
+                                        "optional": false,
+                                        "type": "string"
+                                      },
+                                      "partner_name": {
+                                        "optional": false,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string"
+                                          ]
+                                        }
+                                      },
+                                      "posts_on_approval": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "boolean",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "serial_number": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "source_location_name": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "target_location_name": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "total_value": {
+                                        "optional": false,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string"
+                                          ]
+                                        }
+                                      },
+                                      "type": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "undecidable_reason": {
+                              "optional": true,
+                              "type": {
+                                "union": [
+                                  "null",
+                                  "undefined",
+                                  {
+                                    "literal": "named_approvers_cannot_decide"
+                                  },
+                                  {
+                                    "literal": "no_approver_in_organization"
+                                  },
+                                  {
+                                    "literal": "only_the_requester_can_decide"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "notes",
+                    "optional": true,
+                    "type": {
+                      "union": [
+                        "string",
+                        "undefined"
+                      ]
+                    }
+                  }
+                ],
+                "returns": {
+                  "args": [
+                    "void"
+                  ],
+                  "ext": "Promise"
+                }
+              }
+            }
+          },
+          "onReject": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "request",
+                    "optional": false,
+                    "type": {
+                      "intersect": [
+                        {
+                          "args": [
+                            {
+                              "schema": "ApprovalRequestSchema"
+                            },
+                            {
+                              "union": [
+                                {
+                                  "literal": "target_summary"
+                                },
+                                {
+                                  "literal": "undecidable_reason"
+                                }
+                              ]
+                            }
+                          ],
+                          "ext": "Omit"
+                        },
+                        {
+                          "obj": {
+                            "target_summary": {
+                              "optional": true,
+                              "type": {
+                                "union": [
+                                  "null",
+                                  "undefined",
+                                  {
+                                    "obj": {
+                                      "currency": {
+                                        "optional": false,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string"
+                                          ]
+                                        }
+                                      },
+                                      "id": {
+                                        "optional": false,
+                                        "type": "string"
+                                      },
+                                      "lines_count": {
+                                        "optional": false,
+                                        "type": "number"
+                                      },
+                                      "number": {
+                                        "optional": false,
+                                        "type": "string"
+                                      },
+                                      "partner_name": {
+                                        "optional": false,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string"
+                                          ]
+                                        }
+                                      },
+                                      "posts_on_approval": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "boolean",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "serial_number": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "source_location_name": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "target_location_name": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      },
+                                      "total_value": {
+                                        "optional": false,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string"
+                                          ]
+                                        }
+                                      },
+                                      "type": {
+                                        "optional": true,
+                                        "type": {
+                                          "union": [
+                                            "null",
+                                            "string",
+                                            "undefined"
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "undecidable_reason": {
+                              "optional": true,
+                              "type": {
+                                "union": [
+                                  "null",
+                                  "undefined",
+                                  {
+                                    "literal": "named_approvers_cannot_decide"
+                                  },
+                                  {
+                                    "literal": "no_approver_in_organization"
+                                  },
+                                  {
+                                    "literal": "only_the_requester_can_decide"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "notes",
+                    "optional": false,
+                    "type": "string"
+                  }
+                ],
+                "returns": {
+                  "args": [
+                    "void"
+                  ],
+                  "ext": "Promise"
+                }
+              }
+            }
+          }
+        }
+      },
+      "approval_parked_requests": {
+        "obj": {
+          "targetHref": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "targetId",
+                    "optional": false,
+                    "type": "string"
+                  }
+                ],
+                "returns": "string"
+              }
+            }
+          },
+          "targetType": {
+            "optional": false,
+            "type": "string"
+          }
+        }
+      },
+      "approval_request_badge": {
+        "obj": {
+          "status": {
+            "optional": false,
+            "type": "string"
+          }
+        }
+      },
+      "approval_status_badge": {
+        "obj": {
+          "approval": {
+            "optional": true,
+            "type": {
+              "union": [
+                "null",
+                "undefined",
+                {
+                  "intersect": [
+                    {
+                      "args": [
+                        {
+                          "schema": "ApprovalRequestSchema"
+                        },
+                        {
+                          "union": [
+                            {
+                              "literal": "target_summary"
+                            },
+                            {
+                              "literal": "undecidable_reason"
+                            }
+                          ]
+                        }
+                      ],
+                      "ext": "Omit"
+                    },
+                    {
+                      "obj": {
+                        "target_summary": {
+                          "optional": true,
+                          "type": {
+                            "union": [
+                              "null",
+                              "undefined",
+                              {
+                                "obj": {
+                                  "currency": {
+                                    "optional": false,
+                                    "type": {
+                                      "union": [
+                                        "null",
+                                        "string"
+                                      ]
+                                    }
+                                  },
+                                  "id": {
+                                    "optional": false,
+                                    "type": "string"
+                                  },
+                                  "lines_count": {
+                                    "optional": false,
+                                    "type": "number"
+                                  },
+                                  "number": {
+                                    "optional": false,
+                                    "type": "string"
+                                  },
+                                  "partner_name": {
+                                    "optional": false,
+                                    "type": {
+                                      "union": [
+                                        "null",
+                                        "string"
+                                      ]
+                                    }
+                                  },
+                                  "posts_on_approval": {
+                                    "optional": true,
+                                    "type": {
+                                      "union": [
+                                        "boolean",
+                                        "undefined"
+                                      ]
+                                    }
+                                  },
+                                  "serial_number": {
+                                    "optional": true,
+                                    "type": {
+                                      "union": [
+                                        "null",
+                                        "string",
+                                        "undefined"
+                                      ]
+                                    }
+                                  },
+                                  "source_location_name": {
+                                    "optional": true,
+                                    "type": {
+                                      "union": [
+                                        "null",
+                                        "string",
+                                        "undefined"
+                                      ]
+                                    }
+                                  },
+                                  "target_location_name": {
+                                    "optional": true,
+                                    "type": {
+                                      "union": [
+                                        "null",
+                                        "string",
+                                        "undefined"
+                                      ]
+                                    }
+                                  },
+                                  "total_value": {
+                                    "optional": false,
+                                    "type": {
+                                      "union": [
+                                        "null",
+                                        "string"
+                                      ]
+                                    }
+                                  },
+                                  "type": {
+                                    "optional": true,
+                                    "type": {
+                                      "union": [
+                                        "null",
+                                        "string",
+                                        "undefined"
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "undecidable_reason": {
+                          "optional": true,
+                          "type": {
+                            "union": [
+                              "null",
+                              "undefined",
+                              {
+                                "literal": "named_approvers_cannot_decide"
+                              },
+                              {
+                                "literal": "no_approver_in_organization"
+                              },
+                              {
+                                "literal": "only_the_requester_can_decide"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "onApprove": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "requestId",
+                        "optional": false,
+                        "type": "string"
+                      },
+                      {
+                        "name": "notes",
+                        "optional": true,
+                        "type": {
+                          "union": [
+                            "string",
+                            "undefined"
+                          ]
+                        }
+                      }
+                    ],
+                    "returns": {
+                      "args": [
+                        "void"
+                      ],
+                      "ext": "Promise"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "onReject": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "requestId",
+                        "optional": false,
+                        "type": "string"
+                      },
+                      {
+                        "name": "notes",
+                        "optional": false,
+                        "type": "string"
+                      }
+                    ],
+                    "returns": {
+                      "args": [
+                        "void"
+                      ],
+                      "ext": "Promise"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "onRequest": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "fn": {
+                    "params": [],
+                    "returns": {
+                      "args": [
+                        "void"
+                      ],
+                      "ext": "Promise"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "requestConsequence": {
+            "optional": true,
+            "type": {
+              "union": [
+                "string",
+                "undefined"
+              ]
+            }
+          },
+          "requestModule": {
+            "optional": true,
+            "type": {
+              "union": [
+                "string",
+                "undefined"
+              ]
+            }
+          },
+          "targetId": {
+            "optional": false,
+            "type": "string"
+          },
+          "targetType": {
+            "optional": false,
+            "type": "string"
+          }
+        }
+      },
+      "dashboard_replenish_modal": {
+        "obj": {
+          "isOpen": {
+            "optional": false,
+            "type": "boolean"
+          },
+          "onClose": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [],
+                "returns": "void"
+              }
+            }
+          }
+        }
+      },
+      "dashboard_widgets": {
+        "obj": {
+          "organizationId": {
+            "optional": false,
+            "type": "string"
+          }
+        }
+      },
+      "document_approval_setup_notice": {
+        "obj": {
+          "approvalRequested": {
+            "optional": false,
+            "type": "boolean"
+          }
+        }
+      },
+      "document_detail_extra": {
+        "obj": {
+          "documentId": {
+            "optional": false,
+            "type": "string"
+          },
+          "documentStatus": {
+            "optional": false,
+            "type": "string"
+          },
+          "metaData": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "index": [
+                    {
+                      "key": "string",
+                      "value": {
+                        "args": [
+                          "string",
+                          "unknown"
+                        ],
+                        "ext": "Record"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "saveMetaData": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "module",
+                        "optional": false,
+                        "type": "string"
+                      },
+                      {
+                        "name": "values",
+                        "optional": false,
+                        "type": {
+                          "union": [
+                            "null",
+                            {
+                              "args": [
+                                "string",
+                                "unknown"
+                              ],
+                              "ext": "Record"
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "returns": {
+                      "args": [
+                        "void"
+                      ],
+                      "ext": "Promise"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "document_detail_line_extra": {
+        "obj": {
+          "documentId": {
+            "optional": false,
+            "type": "string"
+          },
+          "documentStatus": {
+            "optional": false,
+            "type": "string"
+          },
+          "line": {
+            "optional": false,
+            "type": {
+              "obj": {
+                "batchNumber": {
+                  "optional": false,
+                  "type": {
+                    "union": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                },
+                "id": {
+                  "optional": false,
+                  "type": "string"
+                },
+                "itemId": {
+                  "optional": false,
+                  "type": {
+                    "union": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                },
+                "lineNumber": {
+                  "optional": false,
+                  "type": "number"
+                },
+                "metaData": {
+                  "optional": false,
+                  "type": {
+                    "index": [
+                      {
+                        "key": "string",
+                        "value": {
+                          "args": [
+                            "string",
+                            "unknown"
+                          ],
+                          "ext": "Record"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "name": {
+                  "optional": false,
+                  "type": {
+                    "union": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                },
+                "productTemplateId": {
+                  "optional": false,
+                  "type": {
+                    "union": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "saveMetaData": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "module",
+                    "optional": false,
+                    "type": "string"
+                  },
+                  {
+                    "name": "values",
+                    "optional": false,
+                    "type": {
+                      "union": [
+                        "null",
+                        {
+                          "args": [
+                            "string",
+                            "unknown"
+                          ],
+                          "ext": "Record"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "returns": {
+                  "args": [
+                    "void"
+                  ],
+                  "ext": "Promise"
+                }
+              }
+            }
+          }
+        }
+      },
+      "document_form_extra": {
+        "obj": {
+          "action": {
+            "optional": false,
+            "type": {
+              "union": [
+                {
+                  "literal": "document"
+                },
+                {
+                  "literal": "issue"
+                },
+                {
+                  "literal": "receive"
+                }
+              ]
+            }
+          },
+          "documentType": {
+            "optional": false,
+            "type": "string"
+          },
+          "lines": {
+            "optional": false,
+            "type": {
+              "array": {
+                "obj": {
+                  "batchNumber": {
+                    "optional": false,
+                    "type": {
+                      "union": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  },
+                  "itemId": {
+                    "optional": false,
+                    "type": {
+                      "union": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  },
+                  "key": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "metaData": {
+                    "optional": false,
+                    "type": {
+                      "index": [
+                        {
+                          "key": "string",
+                          "value": {
+                            "args": [
+                              "string",
+                              "unknown"
+                            ],
+                            "ext": "Record"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "name": {
+                    "optional": false,
+                    "type": "string"
+                  },
+                  "productTemplateId": {
+                    "optional": false,
+                    "type": {
+                      "union": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  },
+                  "quantity": {
+                    "optional": false,
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "metaData": {
+            "optional": false,
+            "type": {
+              "index": [
+                {
+                  "key": "string",
+                  "value": {
+                    "args": [
+                      "string",
+                      "unknown"
+                    ],
+                    "ext": "Record"
+                  }
+                }
+              ]
+            }
+          },
+          "partnerId": {
+            "optional": false,
+            "type": {
+              "union": [
+                "null",
+                "string"
+              ]
+            }
+          },
+          "registerBeforeSubmit": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "callback",
+                    "optional": false,
+                    "type": {
+                      "fn": {
+                        "params": [],
+                        "returns": {
+                          "union": [
+                            "void",
+                            {
+                              "args": [
+                                "void"
+                              ],
+                              "ext": "Promise"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returns": {
+                  "fn": {
+                    "params": [],
+                    "returns": "void"
+                  }
+                }
+              }
+            }
+          },
+          "setMetaData": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "module",
+                    "optional": false,
+                    "type": "string"
+                  },
+                  {
+                    "name": "values",
+                    "optional": false,
+                    "type": {
+                      "union": [
+                        "null",
+                        {
+                          "args": [
+                            "string",
+                            "unknown"
+                          ],
+                          "ext": "Record"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "returns": "void"
+              }
+            }
+          }
+        }
+      },
+      "document_line_form_extra": {
+        "obj": {
+          "action": {
+            "optional": false,
+            "type": {
+              "union": [
+                {
+                  "literal": "document"
+                },
+                {
+                  "literal": "issue"
+                },
+                {
+                  "literal": "receive"
+                }
+              ]
+            }
+          },
+          "documentType": {
+            "optional": false,
+            "type": "string"
+          },
+          "line": {
+            "optional": false,
+            "type": {
+              "obj": {
+                "batchNumber": {
+                  "optional": false,
+                  "type": {
+                    "union": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                },
+                "itemId": {
+                  "optional": false,
+                  "type": {
+                    "union": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                },
+                "key": {
+                  "optional": false,
+                  "type": "string"
+                },
+                "metaData": {
+                  "optional": false,
+                  "type": {
+                    "index": [
+                      {
+                        "key": "string",
+                        "value": {
+                          "args": [
+                            "string",
+                            "unknown"
+                          ],
+                          "ext": "Record"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "name": {
+                  "optional": false,
+                  "type": "string"
+                },
+                "productTemplateId": {
+                  "optional": false,
+                  "type": {
+                    "union": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                },
+                "quantity": {
+                  "optional": false,
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "registerBeforeSubmit": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "callback",
+                    "optional": false,
+                    "type": {
+                      "fn": {
+                        "params": [],
+                        "returns": {
+                          "union": [
+                            "void",
+                            {
+                              "args": [
+                                "void"
+                              ],
+                              "ext": "Promise"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returns": {
+                  "fn": {
+                    "params": [],
+                    "returns": "void"
+                  }
+                }
+              }
+            }
+          },
+          "setMetaData": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "module",
+                    "optional": false,
+                    "type": "string"
+                  },
+                  {
+                    "name": "values",
+                    "optional": false,
+                    "type": {
+                      "union": [
+                        "null",
+                        {
+                          "args": [
+                            "string",
+                            "unknown"
+                          ],
+                          "ext": "Record"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "returns": "void"
+              }
+            }
+          }
+        }
+      },
+      "global_notifications": {
+        "args": [
+          "string",
+          "never"
+        ],
+        "ext": "Record"
+      },
+      "item_detail_extra": {
+        "obj": {
+          "item": {
+            "optional": false,
+            "type": {
+              "schema": "Item"
+            }
+          }
+        }
+      },
+      "item_edit_extra": {
+        "obj": {
+          "formData": {
+            "optional": false,
+            "type": {
+              "args": [
+                "string",
+                "unknown"
+              ],
+              "ext": "Record"
+            }
+          },
+          "handleInputChange": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [
+                  {
+                    "name": "field",
+                    "optional": false,
+                    "type": "string"
+                  },
+                  {
+                    "name": "value",
+                    "optional": false,
+                    "type": "unknown"
+                  }
+                ],
+                "returns": "void"
+              }
+            }
+          },
+          "item": {
+            "optional": false,
+            "type": {
+              "schema": "Item"
+            }
+          },
+          "requestLeave": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "go",
+                        "optional": false,
+                        "type": {
+                          "fn": {
+                            "params": [],
+                            "returns": "void"
+                          }
+                        }
+                      }
+                    ],
+                    "returns": "void"
+                  }
+                }
+              ]
+            }
+          },
+          "storageType": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "schema": "StorageType"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "items_page_header_extra": {
+        "args": [
+          "string",
+          "never"
+        ],
+        "ext": "Record"
+      },
+      "quick_action_extra": {
+        "obj": {
+          "item": {
+            "optional": false,
+            "type": {
+              "schema": "Item"
+            }
+          }
+        }
+      },
+      "quick_add_product_info": {
+        "obj": {
+          "categoryContextTag": {
+            "optional": true,
+            "type": {
+              "union": [
+                "null",
+                "string",
+                "undefined"
+              ]
+            }
+          },
+          "formData": {
+            "optional": false,
+            "type": {
+              "args": [
+                "string",
+                "unknown"
+              ],
+              "ext": "Record"
+            }
+          },
+          "storageTypeCode": {
+            "optional": true,
+            "type": {
+              "union": [
+                "string",
+                "undefined"
+              ]
+            }
+          }
+        }
+      },
+      "settings_ai_module_config": {
+        "args": [
+          "string",
+          "never"
+        ],
+        "ext": "Record"
+      },
+      "settings_module_card": {
+        "args": [
+          "string",
+          "never"
+        ],
+        "ext": "Record"
+      },
+      "shopping_list_add_item": {
+        "obj": {
+          "listId": {
+            "optional": false,
+            "type": "string"
+          },
+          "onClose": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [],
+                "returns": "void"
+              }
+            }
+          },
+          "onSuccess": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [],
+                "returns": "void"
+              }
+            }
+          }
+        }
+      },
+      "stock_action_extra": {
+        "obj": {
+          "barcode": {
+            "optional": false,
+            "type": "string"
+          },
+          "template": {
+            "optional": false,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "obj": {
+                    "brand": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "category_id": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "id": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "image_url": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "location_id": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "metadata": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "undefined",
+                          {
+                            "args": [
+                              "string",
+                              "unknown"
+                            ],
+                            "ext": "Record"
+                          }
+                        ]
+                      }
+                    },
+                    "name": {
+                      "optional": false,
+                      "type": "string"
+                    },
+                    "sku": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "uom_id": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "volume_uom_id": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "volume_value": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "number",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "weight_uom_id": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "string",
+                          "undefined"
+                        ]
+                      }
+                    },
+                    "weight_value": {
+                      "optional": true,
+                      "type": {
+                        "union": [
+                          "null",
+                          "number",
+                          "undefined"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "storage_detail_extra": {
+        "obj": {
+          "storageId": {
+            "optional": false,
+            "type": "string"
+          },
+          "storageTypeCode": {
+            "optional": false,
+            "type": {
+              "union": [
+                "string",
+                "undefined"
+              ]
+            }
+          }
+        }
+      },
+      "storage_item_edit_modal": {
+        "obj": {
+          "itemId": {
+            "optional": false,
+            "type": "string"
+          },
+          "onClose": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [],
+                "returns": "void"
+              }
+            }
+          }
+        }
+      },
+      "storage_moves": {
+        "obj": {
+          "storageId": {
+            "optional": false,
+            "type": "string"
+          },
+          "storageTypeCode": {
+            "optional": false,
+            "type": {
+              "union": [
+                "string",
+                "undefined"
+              ]
+            }
+          }
+        }
+      },
+      "storage_tree_row_extra": {
+        "obj": {
+          "storageId": {
+            "optional": false,
+            "type": "string"
+          }
+        }
+      },
+      "storage_warehouse_strip": {
+        "obj": {
+          "fullPath": {
+            "optional": false,
+            "type": {
+              "union": [
+                "null",
+                "string"
+              ]
+            }
+          },
+          "sequence": {
+            "optional": false,
+            "type": {
+              "union": [
+                "null",
+                "number"
+              ]
+            }
+          },
+          "storageId": {
+            "optional": false,
+            "type": "string"
+          },
+          "storageName": {
+            "optional": false,
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "version": 2
+}

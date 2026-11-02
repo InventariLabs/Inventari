@@ -1,0 +1,91 @@
+{
+  "title": "Chaves de API",
+  "subtitle": "Permita que sistemas externos se autentiquem no Inventari",
+  "generateKey": "Gerar nova chave",
+  "noKeys": "Nenhuma chave de API",
+  "noKeysDescription": "Gere uma chave de API para permitir que scripts, o Home Assistant ou outras automações se conectem.",
+  "table": {
+    "name": "Nome",
+    "key": "Chave",
+    "created": "Criada em",
+    "lastUsed": "Último uso",
+    "expires": "Expira em",
+    "expired": "Expirada",
+    "expiredOn": "Expirada",
+    "actions": "Ações",
+    "never": "Nunca",
+    "issuedBy": "Emitida por",
+    "issuedByUnknown": "Conta já removida",
+    "noExpiry": "Não expira",
+    "notUsedYet": "Ainda não usada",
+    "revokedTrace": "Uma chave revogada sai desta lista. A revogação fica registrada no log de auditoria.",
+    "revokedTraceLink": "Abrir o log de auditoria",
+    "permissions": "Permissões",
+    "noPermissions": "Sem permissões"
+  },
+  "revoke": "Revogar",
+  "revokeConfirm": {
+    "title": "Revogar chave de API",
+    "message": "Tem certeza de que deseja revogar a chave \"{{name}}\"? Ela deixará de funcionar imediatamente.",
+    "confirm": "Revogar",
+    "cancel": "Cancelar"
+  },
+  "form": {
+    "title": "Gerar nova chave de API",
+    "namePlaceholder": "ex.: Home Assistant, script de backup",
+    "expiration": "Validade",
+    "expirationOptions": {
+      "never": "Sem validade — funciona até ser revogada",
+      "30days": "30 dias",
+      "90days": "90 dias",
+      "1year": "1 ano"
+    },
+    "generate": "Gerar chave",
+    "scope": "Para que serve a chave",
+    "scopeOptions": {
+      "everything": "Chave comum"
+    },
+    "scopeExplain": {
+      "printing": "Uma chave de impressão funciona apenas para o Inventari Print Agent: ela pode registrar o agente, receber trabalhos de impressão, buscar as etiquetas e informar como foram. Não pode ler nem alterar mais nada.",
+      "other": "Uma chave de {{scope}} acessa apenas os endpoints protegidos por estas permissões e não pode ler nem alterar mais nada:"
+    },
+    "scopesLoadFailed": "Não foi possível carregar o que uma chave pode ter, então nenhuma chave pode ser emitida agora.",
+    "permissions": "O que a chave pode fazer",
+    "permissionsHint": "Só é possível dar a uma chave o que você mesmo possui.",
+    "readOnlyHint": "Uma nova chave começa somente leitura. Marque uma permissão de escrita apenas se a chave precisar alterar dados — ela poderá então alterar tudo o que essa permissão abrange, como adicionar produtos ou mudar níveis de estoque."
+  },
+  "copyDialog": {
+    "title": "Chave de API gerada",
+    "warning": "Copie sua chave de API agora. Você não poderá vê-la novamente!",
+    "copy": "Copiar para a área de transferência",
+    "copied": "Copiado!",
+    "done": "Fechar"
+  },
+  "capabilities": {
+    "title": "O que uma chave pode ter",
+    "intro": "Cada chave carrega as permissões marcadas na hora da emissão — no máximo o que a pessoa que a emite possui. A lista dela aparece ao lado, abaixo. Uma chave de impressão acessa apenas os endpoints do agente de impressão.",
+    "withheldTitle": "Nunca em uma chave",
+    "adminBlocked": "Tudo o que é administrativo — funções, convites, módulos, outras chaves de API — fica fechado para uma chave. A lista da equipe não: uma chave com \"Ler os detalhes da organização\" pode ler o nome, o e-mail e a função de cada membro.",
+    "unknown": "Permissão {{key}}",
+    "permissions": {
+      "items_read": "Ler produtos e níveis de estoque",
+      "items_write": "Adicionar produtos e alterar níveis de estoque",
+      "items_delete": "Excluir produtos",
+      "categories_read": "Ler a lista de categorias",
+      "locations_read": "Ler locais",
+      "org_read": "Ler os detalhes da organização",
+      "org_settings_write": "Administrar a organização: conexões de IA, modelos de documentos de equipamentos, a nomenclatura de SKU de toda a organização e o registro de chaves de API"
+    },
+    "loadFailed": "Não foi possível carregar o que uma chave pode fazer."
+  },
+  "usage": {
+    "title": "Como enviar",
+    "hint": "A chave viaja no cabeçalho {{header}}. Enviada como Authorization: Bearer, ela continua funcionando até a próxima versão secundária, e toda resposta passa a trazer um cabeçalho Deprecation.",
+    "copy": "Copiar o exemplo",
+    "copied": "Exemplo copiado"
+  },
+  "revokedToast": "Chave revogada — registrada no log de auditoria",
+  "scopes": {
+    "printing": "Somente impressão"
+  }
+}

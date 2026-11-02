@@ -1,0 +1,19 @@
+{
+  "//": "Duplication report for `make scan-dead` — informational, never a gate.",
+  "threshold": 3,
+  "reporters": ["console"],
+  "absolute": false,
+  "gitignore": true,
+  "ignore": [
+    "**/tests/**",
+    "**/test_*.py",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "**/migrations/**",
+    "**/api-generated.ts",
+    "**/api-routes.ts",
+    "**/node_modules/**",
+    "**/__pycache__/**"
+  ]
+}

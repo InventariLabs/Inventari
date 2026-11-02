@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "agent": "Als Druckagent arbeiten",
+    "agentDesc": "Kann einen Drucker anmelden, seine Druckaufträge abholen, deren Etiketten laden und melden, wie sie gelaufen sind — was der Inventari Print Agent tut"
+  }
+}

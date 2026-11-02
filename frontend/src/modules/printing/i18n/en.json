@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "agent": "Act as a print agent",
+    "agentDesc": "Can register a printer, take its print jobs, fetch their labels and report how they went — what the Inventari Print Agent does"
+  }
+}

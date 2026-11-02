@@ -1,0 +1,135 @@
+{
+  "title": "Listas de compras",
+  "launcher": {
+    "description": "Compras del día a día: qué comprar en la tienda"
+  },
+  "subtitle": "Compras del día a día: planifique qué comprar y compre con la lista",
+  "newList": "Nueva lista",
+  "addFirst": "Cree su primera lista de compras para empezar a planificar",
+  "modal": {
+    "title": "Nueva lista de compras",
+    "nameLabel": "Nombre de la lista",
+    "namePlaceholder": "ej. Compra semanal",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "creating": "Creando…",
+    "createSuccess": "¡Lista creada!",
+    "createFailed": "Error al crear la lista",
+    "nameHint": "Déjalo vacío y la lista tomará la fecha de hoy.",
+    "defaultName": "Lista {{date}}"
+  },
+  "completed": "Hecho",
+  "detail": {
+    "purchased": "comprados",
+    "addItem": "Añadir artículo",
+    "clearPurchased": "Limpiar comprados ({{count}})",
+    "clearPurchased_one": "Limpiar comprados ({{count}})",
+    "clearPurchased_other": "Limpiar comprados ({{count}})",
+    "empty": "La lista está vacía",
+    "emptySubtitle": "Añada artículos manualmente.",
+    "emptySubtitleRecipes": "Añada artículos manualmente o desde una receta.",
+    "backToLists": "Volver a listas",
+    "confirmClearPurchased": "¿Eliminar todos los artículos comprados?",
+    "confirmDeleteItem": "¿Eliminar este artículo de la lista?",
+    "listNotFound": "Lista no encontrada",
+    "errorClearPurchased": "No se pudieron borrar los artículos comprados",
+    "errorDeleteItem": "No se pudo eliminar el artículo",
+    "errorUpdateItem": "No se pudo actualizar el artículo",
+    "successClearPurchased": "Artículos comprados borrados",
+    "successDeleteItem": "Artículo eliminado",
+    "convertToPo": "Convertir en orden de compra",
+    "convertToPoSuccess": "Orden de compra {{number}} creada",
+    "convertToPoError": "No se pudo crear la orden de compra",
+    "confirmConvertGrouped_one": "{{count}} línea se agrupará en un borrador de pedido.",
+    "confirmConvertGrouped_other": "{{count}} líneas se agruparán en un borrador de pedido.",
+    "confirmConvertSkipped_one": "{{count}} línea sin producto vinculado se omitirá.",
+    "confirmConvertSkipped_other": "{{count}} líneas sin producto vinculado se omitirán.",
+    "toBuyCount_one": "{{count}} por comprar",
+    "toBuyCount_other": "{{count}} por comprar",
+    "purchasedCount_one": "{{count}} comprado",
+    "purchasedCount_other": "{{count}} comprados",
+    "markPurchasedNamed": "Marcar como comprado: {{name}}"
+  },
+  "addItem": {
+    "title": "Añadir a la lista",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "ej. Leche, Pan, Helado…",
+    "quantityLabel": "Cantidad",
+    "unitLabel": "Unidad",
+    "noteLabel": "Nota (opcional)",
+    "notePlaceholder": "ej. Si está en oferta, el mejor…",
+    "priorityLabel": "Prioridad",
+    "priority": {
+      "normal": "Normal",
+      "urgent": "Urgente"
+    },
+    "cancel": "Cancelar",
+    "add": "Añadir",
+    "adding": "Añadiendo…",
+    "addFailed": "Error al añadir el artículo",
+    "validation": {
+      "nameRequired": "Ingrese el nombre del producto",
+      "quantityPositive": "La cantidad debe ser mayor que 0",
+      "quantityMax": "Una cantidad superior a {{max}} no se puede guardar",
+      "unitRequired": "Elige una unidad"
+    }
+  },
+  "addFromRecipes": {
+    "title": "Desde recetas",
+    "search": "Buscar recetas…",
+    "noRecipes": "No se encontraron recetas",
+    "recipesDisabled": "El módulo de recetas no está activado",
+    "addSelected": "Añadir {{count}} recetas",
+    "addSelected_one": "Añadir {{count}} receta",
+    "addSelected_other": "Añadir {{count}} recetas",
+    "adding": "Añadiendo…",
+    "failed": "No se pudieron añadir los ingredientes de las recetas seleccionadas",
+    "success": "{{count}} ingredientes añadidos",
+    "success_one": "{{count}} ingrediente añadido",
+    "success_other": "{{count}} ingredientes añadidos"
+  },
+  "card": {
+    "saveName": "Guardar nombre",
+    "editName": "Editar nombre de lista",
+    "deleteList": "Eliminar lista",
+    "actionsFor": "Acciones de {{name}}",
+    "emptyPreview": "Nada en esta lista todavía",
+    "morePreview_one": "y 1 más",
+    "morePreview_other": "y {{count}} más"
+  },
+  "actions": {
+    "open": "Abrir"
+  },
+  "searchPlaceholder": "Buscar listas…",
+  "loading": "Cargando listas…",
+  "empty": {
+    "title": "Aún no hay listas de compras"
+  },
+  "deleteModal": {
+    "title": "¿Eliminar lista?",
+    "desc": "Todos los productos de esta lista se eliminarán permanentemente."
+  },
+  "messages": {
+    "listDeleted": "Lista eliminada",
+    "deleteError": "Error al eliminar la lista",
+    "nameChanged": "Nombre cambiado",
+    "nameChangeError": "Error al cambiar el nombre"
+  },
+  "permissions": {
+    "read": "Ver listas de compra",
+    "readDesc": "Puede consultar las listas de compra y sus sugerencias",
+    "write": "Gestionar listas de compra",
+    "writeDesc": "Puede crear listas y añadir o marcar artículos"
+  },
+  "notes": {
+    "neededBy": "Necesario para: {{date}}",
+    "checkStock": "Comprobar existencias: {{available}} en stock, la receta necesita {{required}}",
+    "matchedByName": "Emparejado por nombre con «{{product}}»",
+    "convertedToPo": "En el pedido de compra {{number}}",
+    "forRecipe": "Para la receta: {{recipe}}"
+  },
+  "toasts": {
+    "addItemsFailed": "Error al añadir productos",
+    "shoppingListGone": "La lista de compras ya no existe"
+  }
+}

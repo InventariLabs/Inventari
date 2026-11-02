@@ -1,0 +1,448 @@
+{
+  "title": "Locais",
+  "subtitle": "Gerencie onde seus produtos são guardados",
+  "empty": {
+    "title": "Nenhum local definido",
+    "subtitle": "Adicione uma prateleira, um rack ou um armário para começar a organizar seus produtos.",
+    "addFirst": "Adicionar primeiro local"
+  },
+  "hidden": {
+    "title": "Alguns locais estão ocultos",
+    "description": "Os locais que pertencem a um módulo ficam fora destas listas enquanto \"Dados de módulos nas listas gerais\" estiver desativado. Ative nas Configurações para ver tudo em uma só lista.",
+    "inlineCount_one": "{{count}} local está oculto — ative Dados de módulos nas Configurações para vê-lo.",
+    "inlineCount_other": "{{count}} locais estão ocultos — ative Dados de módulos nas Configurações para vê-los.",
+    "fieldHint": "Seus locais pertencem a um módulo e ficam fora das listas gerais. Crie um novo aqui ou ative \"Dados de módulos nas listas gerais\" nas Configurações para escolher um existente.",
+    "openSettings": "Abrir configurações"
+  },
+  "picker": {
+    "moduleBadge": "Módulo: {{module}}"
+  },
+  "form": {
+    "location": "Como chegar lá (opcional)",
+    "locationPlaceholder": "ex.: Perto da porta, embaixo da janela"
+  },
+  "actions": {
+    "openWizard": "Adicionar local"
+  },
+  "messages": {
+    "storageCreated": "Local adicionado com sucesso!",
+    "storageUpdated": "Local atualizado com sucesso!",
+    "storageDeleted": "Local excluído com sucesso!",
+    "storageArchived": "Local arquivado",
+    "nameTaken": "Já existe aqui um local chamado \"{{name}}\".",
+    "shortCodeTaken": "Esse código de local já é usado por outro local.",
+    "storageRestored": "Local restaurado"
+  },
+  "detail": {
+    "products": "Produtos ({{count}})",
+    "products_one": "Produtos ({{count}})",
+    "products_other": "Produtos ({{count}})",
+    "table": {
+      "product": "Produto",
+      "category": "Categoria",
+      "quantity": "Quantidade",
+      "freezeDate": "Data de congelamento",
+      "storageDate": "Adicionado",
+      "expiryDate": "Validade",
+      "location": "Prateleira/Gaveta",
+      "actions": "Ações"
+    },
+    "empty": "Este local está vazio",
+    "emptySubtitle": "Adicione seu primeiro produto a este local",
+    "backToList": "Voltar à lista",
+    "rename": "Renomear",
+    "renameLabel": "Nome do local",
+    "saveName": "Salvar nome",
+    "cancelRename": "Cancelar renomeação",
+    "addInside": "Adicionar local dentro",
+    "addProductHere": "Adicionar produto aqui"
+  },
+  "errors": {
+    "cannotDelete": "Não é possível excluir: primeiro remova ou mova os produtos.",
+    "cannotArchive": "Não é possível arquivar este local",
+    "cannotRestore": "Não foi possível restaurar este local"
+  },
+  "wizard": {
+    "discardTitle": "Descartar este novo local?",
+    "discardMessage": "Os nomes e os campos de controle que você escolheu serão perdidos.",
+    "discardConfirm": "Descartar",
+    "discardCancel": "Continuar editando",
+    "title": "Assistente de locais",
+    "fields": {
+      "name": {
+        "desc": "Nome básico (obrigatório)."
+      },
+      "quantity": {
+        "desc": "Número de peças ou embalagens (obrigatório)."
+      },
+      "unit": {
+        "desc": "Unidade de medida (un, kg, l) (obrigatório)."
+      },
+      "expiry_date": {
+        "desc": "Controle as datas de validade. Essencial para alimentos."
+      },
+      "freeze_date": {
+        "desc": "Acompanhe o tempo de armazenamento no freezer."
+      },
+      "weight": {
+        "desc": "Permite informar o peso (kg/g) ou o volume (l/ml) do produto."
+      },
+      "barcode": {
+        "desc": "Suporte a códigos de barras padrão do varejo."
+      },
+      "label_code": {
+        "desc": "Suporte a códigos QR internos (ex.: STM-001) em recipientes."
+      },
+      "brand": {
+        "desc": "Campo de texto para o nome do fabricante."
+      },
+      "description": {
+        "desc": "Observações adicionais sobre o produto."
+      },
+      "purchase_price": {
+        "desc": "Acompanhe os custos dos produtos."
+      },
+      "shelf_location": {
+        "desc": "Posição exata (ex.: 2ª prateleira de cima para baixo)."
+      },
+      "category_id": {
+        "desc": "Atribua a uma categoria (ex.: Laticínios, Carnes)."
+      },
+      "production_date": {
+        "desc": "Acompanhe a data de produção ou do lote."
+      },
+      "notes": {
+        "desc": "Campo de observações em texto livre."
+      },
+      "price": {
+        "desc": "Acompanhe o preço do produto."
+      },
+      "location": {
+        "desc": "Posição exata dentro do local pai."
+      }
+    }
+  },
+  "suggestions": {
+    "zones": [
+      "Cozinha",
+      "Porão",
+      "Despensa",
+      "Garagem",
+      "Sala de estar",
+      "Banheiro",
+      "Quarto",
+      "Sótão",
+      "Varanda",
+      "Jardim",
+      "Escritório"
+    ],
+    "locations": ["Geladeira", "Freezer", "Armário de remédios"],
+    "compartments": [
+      "Prateleira",
+      "Gaveta",
+      "Caixa organizadora",
+      "Caixa",
+      "Cesta"
+    ],
+    "profiles": {
+      "food_home": {
+        "zones": ["Cozinha", "Despensa", "Garagem", "Porão", "Sótão"],
+        "locations": [
+          "Geladeira",
+          "Freezer",
+          "Prateleira",
+          "Gaveta",
+          "Armário"
+        ],
+        "compartments": [
+          "Prateleira",
+          "Gaveta",
+          "Caixa organizadora",
+          "Caixa",
+          "Cesta"
+        ]
+      },
+      "equipment_wms": {
+        "zones": [
+          "Sala de servidores",
+          "Oficina",
+          "Almoxarifado",
+          "Galpão do armazém",
+          "Escritório"
+        ],
+        "locations": [
+          "Rack",
+          "Prateleira",
+          "Caixa organizadora",
+          "Armário",
+          "Bancada"
+        ],
+        "compartments": [
+          "Prateleira",
+          "Caixa organizadora",
+          "Posição de palete",
+          "Gaveta"
+        ]
+      },
+      "clean_core": {
+        "zones": [
+          "Zona A",
+          "Zona B",
+          "Câmara fria",
+          "Quarentena",
+          "Recebimento"
+        ],
+        "locations": [
+          "Prateleira A",
+          "Prateleira B",
+          "Prateleira superior",
+          "Prateleira inferior",
+          "Caixa de armazenamento"
+        ],
+        "compartments": ["Prateleira 1", "Prateleira 2", "Caixa 1", "Caixa 2"]
+      }
+    }
+  },
+  "onboarding": {
+    "step1Title": "Onde você guarda suas coisas?",
+    "step1Desc": "Comece dando nome ao seu primeiro local — ex.: Câmara fria, Recebimento.",
+    "step1Placeholder": "ex.: Câmara fria",
+    "step2Title": "O que há dentro deste local?",
+    "step2Desc": "ex.: Prateleira A, Doca 3, Armário 1",
+    "step2Placeholder": "ex.: Prateleira A",
+    "step3Title": "Como controlar os produtos aqui?",
+    "done": "Concluir",
+    "next": "Avançar",
+    "back": "Voltar",
+    "parentLabel": "Local existente",
+    "newLocation": "Novo local",
+    "typeOrSelect": "Digite ou selecione",
+    "trackingFieldsLabel": "Você vai controlar",
+    "onlyLocation": "Somente o local — sem campos de controle",
+    "customize": "personalizar →",
+    "customFields": "Campos personalizados",
+    "advancedOptions": "Opções avançadas",
+    "step3Desc": "Escolha quais informações controlar para cada produto deste local.",
+    "descriptionLabel": "Descrição",
+    "descriptionPlaceholder": "Descrição curta (opcional)",
+    "labelCodeLabel": "Código da etiqueta",
+    "storageTypeLabel": "Tipo de local",
+    "storageTypeNone": "Nenhum (campos personalizados)",
+    "step1DescMore": "Dê nome ao local que você está adicionando — ex.: Câmara fria, Recebimento.",
+    "parentPlaceholder": "Escolha um local"
+  },
+  "unknownError": "Erro desconhecido",
+  "edit": {
+    "nameLabel": "Nome",
+    "qrCodeLabel": "Código QR",
+    "qrCodePlaceholder": "ex.: LOC-001, GLN-1234567890123, WAREHOUSE-A-1",
+    "downloadQrLabel": "Baixar",
+    "showDescriptionOnLabel": "Mostrar a descrição na etiqueta",
+    "qrDownloadError": "Não foi possível baixar o código QR",
+    "trackedFields": "Campos controlados",
+    "customFields": "Campos personalizados",
+    "sequenceLabel": "Ordem de percurso",
+    "sequenceHint": "A separação percorre os locais do menor número para o maior. Um local sem número vem depois dos numerados, na ordem do código.",
+    "noParentStorage": "Sem local pai",
+    "deleteMessage": "Excluir \"{{name}}\"? Os produtos dentro dele precisam ser movidos antes — e, depois que houve movimentações de estoque, o local não pode mais ser excluído: arquive-o.",
+    "deleteMovesLocations_one": "{{count}} local filho sobe um nível.",
+    "deleteMovesLocations_other": "{{count}} locais filhos sobem um nível.",
+    "deleteMovesRecords_one": "{{count}} registro sobe um nível.",
+    "deleteMovesRecords_other": "{{count}} registros sobem um nível.",
+    "deleteNotListed_one": "Destes, {{count}} não aparece nesta lista.",
+    "deleteNotListed_other": "Destes, {{count}} não aparecem nesta lista.",
+    "generateCodeError": "Não foi possível gerar o código",
+    "generateCodeLabel": "Gerar código",
+    "noCodeWarning": "Nenhum código de local definido — a leitura não funcionará para este local.",
+    "archive": "Arquivar",
+    "archiveTitle": "Arquivar local",
+    "archiveConfirmEmpty": "Isso oculta o local das listas e dos seletores. Os produtos não são excluídos.",
+    "archiveConfirmItems": "Este local contém produtos. Escolha para onde movê-los — ao arquivar, eles são realocados para lá.",
+    "archiveConfirmUnknown": "Não foi possível verificar o que este local contém. Se ele contiver algo, escolha para onde movê-lo — caso contrário, o arquivamento será recusado.",
+    "archiveTargetLabel": "Mover produtos para",
+    "archiveTargetNone": "Selecione um local de destino",
+    "archiveReversible": "Você pode desfazer: os locais arquivados podem ser restaurados em Locais arquivados.",
+    "archivePutawayRules_one": "{{count}} regra de armazenagem aponta para cá. Ela manterá este local como destino até ser editada.",
+    "archivePutawayRules_other": "{{count}} regras de armazenagem apontam para cá. Elas manterão este local como destino até serem editadas."
+  },
+  "fieldLabels": {
+    "barcode": "Código do produto",
+    "sku": "SKU",
+    "brand": "Marca / Fabricante",
+    "category_id": "Categoria",
+    "description": "Descrição",
+    "expiry_date": "Data de validade",
+    "freeze_date": "Data de congelamento",
+    "label_code": "Código QR personalizado",
+    "location": "Local",
+    "name": "Nome",
+    "notes": "Observações",
+    "price": "Preço",
+    "production_date": "Data de produção / Lote",
+    "purchase_price": "Preço de compra",
+    "quantity": "Quantidade",
+    "shelf_location": "Prateleira / posição",
+    "unit": "Unidade",
+    "weight": "Peso / Volume"
+  },
+  "reorg": {
+    "noMoveTargets": "Não há para onde mover este local",
+    "moveTo": "Mover para…",
+    "moveToTop": "Nível superior"
+  },
+  "card": {
+    "unit_one": "produto",
+    "unit_other": "produtos"
+  },
+  "counts": {
+    "inSublocations_one": "{{count}} em sublocais",
+    "inSublocations_other": "{{count}} em sublocais"
+  },
+  "stats": {},
+  "storageNotFound": "Local não encontrado",
+  "storageNotFoundDescription": "Ele pode ter sido excluído, ou o link pode estar desatualizado.",
+  "zoneModule": {
+    "title": "Este local pertence a um módulo",
+    "description": "“{{name}}” pertence a um módulo, por isso fica fora da lista de locais. Abra-o aqui para ver o que há nele."
+  },
+  "zoneVirtual": {
+    "title": "Este é um local do sistema",
+    "description": "“{{name}}” é um dos locais virtuais do sistema — seu conteúdo não conta como estoque. Abra-o aqui para ver o que há nele."
+  },
+  "zoneArchived": {
+    "title": "Este local está arquivado",
+    "description": "“{{name}}” está arquivado e fica fora da lista ativa. Abra-o aqui ou restaure-o a partir do arquivo."
+  },
+  "usage": {
+    "customer": "Cliente",
+    "inventory": "Ajuste de estoque",
+    "production": "Produção",
+    "virtualNotice": "Local do sistema — seu conteúdo não conta nos níveis de estoque."
+  },
+  "sort": {},
+  "required": {
+    "title": "Nenhum local ainda",
+    "description": "Crie o primeiro e continue a partir daqui.",
+    "action": "Criar local"
+  },
+  "archived": {
+    "title": "Locais arquivados",
+    "subtitle": "Locais ocultos das listas e dos seletores",
+    "badge": "Arquivado",
+    "name": "Local",
+    "archivedAt": "Arquivado",
+    "actions": "Ações",
+    "restore": "Restaurar",
+    "emptyTitle": "Nada arquivado",
+    "emptyDescription": "Os locais arquivados aparecem aqui e podem ser restaurados.",
+    "detailNotice": "Este local está arquivado. Restaure-o para guardar produtos aqui novamente."
+  },
+  "masterDetailSubtitle": "Escolha um local para ver o que há nele, seus produtos e suas configurações.",
+  "select": {
+    "title": "Escolha um local",
+    "description": "A árvore à esquerda lista todos os locais. Escolha um para ver o que há nele."
+  },
+  "path": {
+    "label": "Caminho do local",
+    "all": "Todos os locais"
+  },
+  "tabs": {
+    "contents": "Conteúdo",
+    "products": "Produtos",
+    "settings": "Configurações",
+    "moves": "Movimentações"
+  },
+  "tree": {
+    "label": "Locais",
+    "searchPlaceholder": "Buscar por nome ou código",
+    "scanPlaceholder": "Escaneie a etiqueta de um local…",
+    "scanAction": "Selecionar o local escaneado",
+    "scanNotFound": "Nenhum local corresponde a “{{code}}”.",
+    "scanNotLocation": "“{{code}}” não é uma etiqueta de local.",
+    "noMatches": "Nenhum local corresponde à busca",
+    "empty": "Nenhum local ainda.",
+    "rowActions": "Ações para {{name}}",
+    "archivedLink": "Locais arquivados",
+    "collapse": "Recolher {{name}}",
+    "expand": "Expandir {{name}}"
+  },
+  "contents": {
+    "emptyTitle": "Não há nada dentro deste local",
+    "emptyDescription_one": "O produto dele ({{count}}) está na aba Produtos.",
+    "emptyDescription_other": "Os {{count}} produtos dele estão na aba Produtos.",
+    "showProducts": "Mostrar produtos",
+    "selected_one": "{{count}} local selecionado",
+    "selected_other": "{{count}} locais selecionados",
+    "clearSelection": "Limpar",
+    "selectColumn": "Selecionar",
+    "selectRow": "Selecionar {{name}}",
+    "name": "Local",
+    "code": "Código",
+    "type": "Tipo",
+    "inside": "Dentro",
+    "products": "Produtos"
+  },
+  "products": {
+    "includeInside": "Incluir locais dentro",
+    "includingInside_one": "Incluindo 1 local dentro",
+    "includingInside_other": "Incluindo {{count}} locais dentro"
+  },
+  "settings": {
+    "basic": "Básico",
+    "liesIn": "Fica em",
+    "productFields": "Campos de produto aqui",
+    "warehouse": "Reabastecimento",
+    "reserve": "Local de reserva",
+    "reserveHint": "O estoque daqui abastece os locais de separação; nada o reabastece a partir de outro lugar.",
+    "productFieldsHint": "O que um produto colocado neste local registra.",
+    "appliesHere": "Vale somente para este local.",
+    "appliesInside_one": "Vale para este local e para 1 local dentro dele.",
+    "appliesInside_other": "Vale para este local e para {{count}} locais dentro dele.",
+    "inheritedFrom": "de {{name}}",
+    "inheritedFields": "Definido em um nível acima",
+    "labelAndCode": "Etiqueta e código",
+    "recordActions": "Ações para {{name}}"
+  },
+  "move": {
+    "titleOne": "Mover para…",
+    "searchPlaceholder": "Buscar o destino",
+    "scanNotTarget": "“{{code}}” está sendo movido, ou fica dentro de algo que está, então não pode ser o destino.",
+    "targetsLabel": "Locais de destino",
+    "moved_one": "Local movido",
+    "moved_other": "{{count}} locais movidos",
+    "undo": "Desfazer",
+    "undoDone": "Movimentação desfeita",
+    "undoFailed": "Não foi possível desfazer a movimentação",
+    "failed": "Não foi possível mover o local",
+    "rejected": "O servidor recusou a movimentação",
+    "titleMany_one": "Mover {{count}} local para…",
+    "titleMany_other": "Mover {{count}} locais para…"
+  },
+  "moves": {
+    "empty": "Nenhuma movimentação de estoque passou por este local."
+  },
+  "moveQuestion": {
+    "title": "Ele foi movido fisicamente?",
+    "description": "Os produtos dentro continuam onde estão dentro do local. Informe se o local em si foi levado para outro lugar ou se a árvore apenas o tinha sob o pai errado.",
+    "scope": "Você está movendo {{name}} com {{inside}} e {{products}} para {{destination}}.",
+    "scopeNoInside": "Você está movendo {{name}} com {{products}} para {{destination}}.",
+    "locationsInside_one": "{{count}} local dentro",
+    "locationsInside_other": "{{count}} locais dentro",
+    "products_one": "{{count}} produto",
+    "products_other": "{{count}} produtos",
+    "topLevel": "o nível superior",
+    "choiceLabel": "O que aconteceu com {{name}}",
+    "correction": "Estou apenas corrigindo a organização",
+    "physical": "Foi movido fisicamente",
+    "physicalHint": "Uma movimentação física registra a movimentação de cada produto dentro dele, para que o histórico e o estoque em datas passadas mostrem onde ele estava.",
+    "confirm": "Mover"
+  },
+  "addNew": {
+    "title": "Adicionar novo local",
+    "nameLabel": "Nome",
+    "namePlaceholder": "ex.: Prateleira B",
+    "parentLabel": "Dentro de (opcional)",
+    "parentPlaceholder": "Nível superior",
+    "created": "Local criado"
+  }
+}

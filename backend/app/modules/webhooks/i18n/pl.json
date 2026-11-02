@@ -1,0 +1,18 @@
+{
+  "webhook.endpoint.created": "Punkt webhook utworzony",
+  "webhook.endpoint.updated": "Punkt webhook zaktualizowany",
+  "webhook.endpoint.deleted": "Punkt webhook usunięty",
+  "webhook.test.sent": "Testowy ping wysłany do {{name}}",
+  "webhook.reactivated": "Webhook reaktywowany",
+  "webhook.circuit_broken": "Webhook automatycznie wyłączony po wielokrotnych błędach",
+  "events.item.created": "Przedmiot dodany",
+  "events.item.updated": "Przedmiot zaktualizowany",
+  "events.item.deleted": "Przedmiot usunięty",
+  "events.item.moved": "Przedmiot przeniesiony",
+  "events.location.created": "Miejsce utworzone",
+  "events.location.updated": "Miejsce zaktualizowane",
+  "events.location.deleted": "Miejsce usunięte",
+  "events.module.enabled": "Moduł włączony",
+  "events.module.disabled": "Moduł wyłączony",
+  "events.label.scanned": "Etykieta zeskanowana"
+}

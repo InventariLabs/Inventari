@@ -1,0 +1,17 @@
+# Secrets and runtime state never bake into the image: the build context is
+# this directory (docker-compose*.yml), and config.py reads env_file .env.
+.env
+.env.*
+logs
+dist
+uploads
+data
+.venv
+**/__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+coverage.json
+htmlcov

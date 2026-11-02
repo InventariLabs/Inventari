@@ -1,0 +1,31 @@
+{
+  "field": {
+    "label": "Certificate for lot {{lot}}",
+    "missing": "Enter the certificate number for lot {{lot}}."
+  },
+  "line": {
+    "certificate": "Certificate {{number}}",
+    "save": "Save certificate",
+    "saveFailed": "The certificate number was not saved. Try again."
+  },
+  "column": {
+    "certificate": "Certificate"
+  },
+  "filter": {
+    "certified": "Certified lots"
+  },
+  "action": {
+    "file": "File the certificates",
+    "filed": "The certificates are on file.",
+    "alreadyOnFile": "These certificates were already on file."
+  },
+  "pickOrderStrategies": {
+    "by_zone_then_weight": "Zone by zone, heaviest first"
+  },
+  "permissions": {
+    "read": "View certificates",
+    "readDesc": "See which lot certificates are on file.",
+    "write": "File certificates",
+    "writeDesc": "Put lot certificates on file so their receipts can be booked."
+  }
+}

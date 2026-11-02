@@ -1,0 +1,59 @@
+{
+  "launcher": {
+    "title": "Accueil",
+    "description": "Aperçu de votre espace de travail",
+    "welcome": "Bienvenue, {{name}}",
+    "joinedOrganization": "Vous avez rejoint {{organization}}",
+    "createdOrganization": "Vous avez créé {{organization}}",
+    "welcomeBack": "Bon retour, {{name}}",
+    "workspaceOverview": "Aperçu de votre espace de travail",
+    "alerts": "Alertes",
+    "recentItems": "Récemment visités",
+    "browseApps": "Parcourir les apps",
+    "noActions": "Toutes les tâches terminées",
+    "emptyRecent": "Aucun élément récent",
+    "actionItems": {
+      "title": "À faire",
+      "subtitle": "{{count}} en attente dans les modules activés",
+      "subtitle_one": "{{count}} en attente dans les modules activés",
+      "subtitle_other": "{{count}} en attente dans les modules activés"
+    }
+  },
+  "sections": {
+    "core": "Essentiels",
+    "business": "Métier",
+    "analytics": "Analytique",
+    "integrations": "Intégrations",
+    "system": "Système"
+  },
+  "workspace": {
+    "current": "Actuel",
+    "apply": "Appliquer",
+    "reapply": "Appliquer à nouveau",
+    "reapplyHint": "Relance la configuration de ce profil — aucun module n'est ajouté ni retiré",
+    "target": "Cible : {{name}}",
+    "loading": "Chargement des profils…",
+    "empty": "Aucun profil disponible.",
+    "diffTitle": "Ce qui va changer",
+    "diffSubtitle": "De {{from}} à {{to}}",
+    "diffEnable": "Activer",
+    "diffDisable": "Désactiver",
+    "diffCascade": "Désactivation en cascade",
+    "diffUnchanged": "Inchangé",
+    "diffConfig": "Réinitialiser les paramètres pour",
+    "confirmTitle": "Passer à {{name}} ?",
+    "confirmMessage": "Des modules seront activés et désactivés pour votre organisation. Vous pouvez revenir en arrière à tout moment.",
+    "confirmApply": "Changer de profil",
+    "confirmReapplyTitle": "Relancer la configuration de {{name}} ?",
+    "confirmReapplyMessage": "Aucun module n'est ajouté ni retiré. La configuration du profil s'exécute à nouveau : ses réglages par défaut reviennent aux valeurs du profil, et les noms qu'il a semés — types d'emplacement inclus — sont réécrits dans la langue de cette session.",
+    "confirmReapply": "Relancer la configuration",
+    "previewLoading": "Calcul des changements…",
+    "diffManualKept": "Conservés (ajoutés manuellement)",
+    "diffCascadeHint": "Désactivés car ils nécessitent un module supprimé",
+    "diffConfigHint": "Les valeurs par défaut du profil écraseront les paramètres actuels",
+    "renumberOffer": "Vos emplacements gardent codes et étiquettes. Pour des codes d'étagère (A-02-01), choisissez Renuméroter selon le modèle dans Entrepôt → Configuration → Codes, étiquettes et ordre de passage des emplacements ; les anciennes étiquettes se scannent encore."
+  },
+  "activeProfile": {
+    "change": "Changer"
+  }
+}

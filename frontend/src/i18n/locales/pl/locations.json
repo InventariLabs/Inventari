@@ -1,0 +1,451 @@
+{
+  "title": "Miejsca",
+  "subtitle": "Zarządzaj miejscami, w których trzymasz produkty",
+  "empty": {
+    "title": "Brak zdefiniowanych miejsc",
+    "subtitle": "Dodaj półkę, regał lub szafkę, aby zacząć porządkować produkty.",
+    "addFirst": "Dodaj pierwsze miejsce"
+  },
+  "hidden": {
+    "title": "Część miejsc jest ukryta",
+    "description": "Miejsca należące do modułu nie trafiają na te listy, dopóki opcja „Dane modułów na ogólnych listach” jest wyłączona. Włącz ją w Ustawieniach, aby zobaczyć wszystko na jednej liście.",
+    "inlineCount_one": "{{count}} miejsce jest ukryte — włącz „Dane modułów na ogólnych listach” w Ustawieniach, aby je zobaczyć.",
+    "inlineCount_few": "{{count}} miejsca są ukryte — włącz „Dane modułów na ogólnych listach” w Ustawieniach, aby je zobaczyć.",
+    "inlineCount_many": "{{count}} miejsc jest ukrytych — włącz „Dane modułów na ogólnych listach” w Ustawieniach, aby je zobaczyć.",
+    "inlineCount_other": "{{count}} miejsc jest ukrytych — włącz „Dane modułów na ogólnych listach” w Ustawieniach, aby je zobaczyć.",
+    "fieldHint": "Istniejące miejsca należą do modułu i nie trafiają na listy ogólne. Utwórz nowe tutaj albo włącz „Dane modułów na ogólnych listach” w Ustawieniach, aby wybrać istniejące.",
+    "openSettings": "Otwórz ustawienia"
+  },
+  "picker": {
+    "moduleBadge": "Moduł: {{module}}"
+  },
+  "form": {
+    "location": "Jak tu trafić (opcjonalnie)",
+    "locationPlaceholder": "np. Przy drzwiach, pod oknem"
+  },
+  "actions": {
+    "openWizard": "Dodaj miejsce"
+  },
+  "messages": {
+    "storageCreated": "Miejsce dodane!",
+    "storageUpdated": "Miejsce zaktualizowane!",
+    "storageDeleted": "Miejsce usunięte!",
+    "storageArchived": "Miejsce zarchiwizowane",
+    "nameTaken": "Miejsce o nazwie „{{name}}” już tu istnieje.",
+    "shortCodeTaken": "Ten kod miejsca jest już używany przez inne miejsce.",
+    "storageRestored": "Miejsce przywrócone"
+  },
+  "detail": {
+    "products": "Produkty ({{count}})",
+    "products_one": "Produkt ({{count}})",
+    "products_few": "Produkty ({{count}})",
+    "products_many": "Produktów ({{count}})",
+    "products_other": "Produktów ({{count}})",
+    "table": {
+      "product": "Produkt",
+      "category": "Kategoria",
+      "quantity": "Ilość",
+      "freezeDate": "Data mrożenia",
+      "storageDate": "Dodano",
+      "expiryDate": "Ważność",
+      "location": "Półka/Szuflada",
+      "actions": "Akcje"
+    },
+    "empty": "To miejsce jest puste",
+    "emptySubtitle": "Dodaj pierwszy produkt do tego miejsca",
+    "backToList": "Wróć do listy",
+    "rename": "Zmień nazwę",
+    "renameLabel": "Nazwa miejsca",
+    "saveName": "Zapisz nazwę",
+    "cancelRename": "Anuluj zmianę nazwy",
+    "addInside": "Dodaj miejsce wewnątrz",
+    "addProductHere": "Dodaj produkt tutaj"
+  },
+  "errors": {
+    "cannotDelete": "Nie można usunąć: najpierw usuń lub przenieś produkty.",
+    "cannotArchive": "Nie można zarchiwizować tego miejsca",
+    "cannotRestore": "Nie udało się przywrócić miejsca"
+  },
+  "wizard": {
+    "discardTitle": "Odrzucić nowe miejsce?",
+    "discardMessage": "Wpisane nazwy i wybrane pola śledzenia zostaną utracone.",
+    "discardConfirm": "Odrzuć",
+    "discardCancel": "Wróć do edycji",
+    "title": "Kreator miejsca",
+    "fields": {
+      "name": {
+        "desc": "Podstawowa nazwa (Wymagane)."
+      },
+      "quantity": {
+        "desc": "Liczba sztuk lub opakowań (Wymagane)."
+      },
+      "unit": {
+        "desc": "Jednostka miary (szt, kg, l) (Wymagane)."
+      },
+      "expiry_date": {
+        "desc": "Śledzenie terminów przydatności do spożycia. Kluczowe dla żywności."
+      },
+      "freeze_date": {
+        "desc": "Monitorowanie czasu przechowywania w zamrażarce."
+      },
+      "weight": {
+        "desc": "Pozwala określić wagę (kg/g) lub objętość (l/ml) produktu."
+      },
+      "barcode": {
+        "desc": "Obsługa standardowych kodów sklepowych."
+      },
+      "label_code": {
+        "desc": "Obsługa wewnętrznych kodów QR (np. STM-001) na pojemnikach."
+      },
+      "brand": {
+        "desc": "Pole tekstowe na nazwę producenta."
+      },
+      "description": {
+        "desc": "Dodatkowe uwagi o produkcie."
+      },
+      "purchase_price": {
+        "desc": "Śledzenie kosztów produktów."
+      },
+      "shelf_location": {
+        "desc": "Precyzyjne określenie miejsca (np. 2 półka od góry)."
+      },
+      "category_id": {
+        "desc": "Przypisanie do kategorii (np. Nabiał, Mięso)."
+      },
+      "production_date": {
+        "desc": "Śledź datę produkcji lub partię."
+      },
+      "notes": {
+        "desc": "Pole na notatki."
+      },
+      "price": {
+        "desc": "Śledź cenę produktu."
+      },
+      "location": {
+        "desc": "Dokładna pozycja w miejscu nadrzędnym."
+      }
+    }
+  },
+  "suggestions": {
+    "zones": [
+      "Kuchnia",
+      "Piwnica",
+      "Spiżarnia",
+      "Garaż",
+      "Salon",
+      "Łazienka",
+      "Sypialnia",
+      "Strych",
+      "Balkon",
+      "Ogród",
+      "Biuro"
+    ],
+    "locations": ["Lodówka", "Zamrażarka", "Apteczka"],
+    "compartments": ["Półka", "Szuflada", "Pojemnik", "Pudełko", "Koszyk"],
+    "profiles": {
+      "food_home": {
+        "zones": ["Kuchnia", "Spiżarnia", "Garaż", "Piwnica", "Strych"],
+        "locations": ["Lodówka", "Zamrażarka", "Półka", "Szuflada", "Szafka"],
+        "compartments": ["Półka", "Szuflada", "Pojemnik", "Pudełko", "Koszyk"]
+      },
+      "equipment_wms": {
+        "zones": [
+          "Serwerownia",
+          "Warsztat",
+          "Magazyn",
+          "Hala magazynowa",
+          "Biuro"
+        ],
+        "locations": ["Regał", "Półka", "Pojemnik", "Szafa", "Stanowisko"],
+        "compartments": ["Półka", "Pojemnik", "Miejsce paletowe", "Szuflada"]
+      },
+      "clean_core": {
+        "zones": [
+          "Strefa A",
+          "Strefa B",
+          "Chłodnia",
+          "Kwarantanna",
+          "Przyjęcia"
+        ],
+        "locations": [
+          "Półka A",
+          "Półka B",
+          "Górna półka",
+          "Dolna półka",
+          "Pojemnik"
+        ],
+        "compartments": ["Półka 1", "Półka 2", "Pudło 1", "Pudło 2"]
+      }
+    }
+  },
+  "onboarding": {
+    "step1Title": "Gdzie trzymasz swoje rzeczy?",
+    "step1Desc": "Zacznij od nazwania pierwszego miejsca — np. Chłodnia, Przyjęcia.",
+    "step1Placeholder": "np. Chłodnia",
+    "step2Title": "Co jest w tym miejscu?",
+    "step2Desc": "np. Półka A, Boks 3, Szafka 1",
+    "step2Placeholder": "np. Półka A",
+    "step3Title": "Jak śledzić produkty tutaj?",
+    "step3Desc": "Wybierz, jakie informacje chcesz śledzić dla produktów w tym miejscu.",
+    "done": "Gotowe",
+    "next": "Dalej",
+    "back": "Wstecz",
+    "parentLabel": "Istniejące miejsce",
+    "newLocation": "Nowe miejsce",
+    "typeOrSelect": "Wpisz lub wybierz",
+    "trackingFieldsLabel": "Będziesz śledzić",
+    "onlyLocation": "Tylko miejsce — bez pól śledzenia",
+    "customize": "dostosuj →",
+    "customFields": "Własne pola",
+    "advancedOptions": "Opcje zaawansowane",
+    "descriptionLabel": "Opis",
+    "descriptionPlaceholder": "Krótki opis (opcjonalne)",
+    "labelCodeLabel": "Kod etykiety",
+    "storageTypeLabel": "Typ miejsca",
+    "storageTypeNone": "Brak (własne pola)",
+    "step1DescMore": "Nazwij miejsce, które dodajesz — np. Chłodnia, Przyjęcia.",
+    "parentPlaceholder": "Wybierz miejsce"
+  },
+  "unknownError": "Nieznany błąd",
+  "edit": {
+    "nameLabel": "Nazwa",
+    "qrCodeLabel": "Kod QR",
+    "qrCodePlaceholder": "np. LOC-001, GLN-1234567890123, WAREHOUSE-A-1",
+    "downloadQrLabel": "Pobierz",
+    "showDescriptionOnLabel": "Pokaż opis na etykiecie",
+    "qrDownloadError": "Nie udało się pobrać kodu QR",
+    "trackedFields": "Śledzone pola",
+    "customFields": "Własne pola",
+    "sequenceLabel": "Kolejność obchodu",
+    "sequenceHint": "Kompletacja odwiedza miejsca od najniższego numeru. Miejsce bez numeru trafia za ponumerowane, według kodu.",
+    "noParentStorage": "Bez miejsca nadrzędnego",
+    "deleteMessage": "Usunąć „{{name}}”? Produkty wewnątrz trzeba najpierw przenieść — a miejsca, przez które przeszły ruchy magazynowe, nie da się usunąć wcale: zarchiwizuj je zamiast tego.",
+    "deleteMovesLocations_one": "Przeniesie się o poziom wyżej: {{count}} miejsce podrzędne.",
+    "deleteMovesLocations_few": "Przeniosą się o poziom wyżej: {{count}} miejsca podrzędne.",
+    "deleteMovesLocations_many": "Przeniesie się o poziom wyżej: {{count}} miejsc podrzędnych.",
+    "deleteMovesLocations_other": "Przeniesie się o poziom wyżej: {{count}} miejsc podrzędnych.",
+    "deleteMovesRecords_one": "Przejdzie do miejsca nadrzędnego: {{count}} rekord.",
+    "deleteMovesRecords_few": "Przejdą do miejsca nadrzędnego: {{count}} rekordy.",
+    "deleteMovesRecords_many": "Przejdzie do miejsca nadrzędnego: {{count}} rekordów.",
+    "deleteMovesRecords_other": "Przejdzie do miejsca nadrzędnego: {{count}} rekordów.",
+    "deleteNotListed_one": "Z tego {{count}} nie widać na tej liście.",
+    "deleteNotListed_few": "Z tego {{count}} nie widać na tej liście.",
+    "deleteNotListed_many": "Z tego {{count}} nie widać na tej liście.",
+    "deleteNotListed_other": "Z tego {{count}} nie widać na tej liście.",
+    "generateCodeError": "Nie udało się wygenerować kodu",
+    "generateCodeLabel": "Wygeneruj kod",
+    "noCodeWarning": "Brak kodu miejsca — skanowanie nie będzie działać dla tego miejsca.",
+    "archive": "Archiwizuj",
+    "archiveTitle": "Archiwizacja miejsca",
+    "archiveConfirmEmpty": "Miejsce zostanie ukryte z list i wyborów. Produkty nie są usuwane.",
+    "archiveConfirmItems": "W tym miejscu są produkty. Wybierz, dokąd je przenieść — archiwizacja przeniesie je do wskazanego miejsca.",
+    "archiveConfirmUnknown": "Nie udało się sprawdzić, co jest w tym miejscu. Jeśli coś w nim jest, wskaż, dokąd to przenieść — inaczej archiwizacja zostanie odrzucona.",
+    "archiveTargetLabel": "Przenieś produkty do",
+    "archiveTargetNone": "Wybierz miejsce docelowe",
+    "archiveReversible": "Można to cofnąć: zarchiwizowane miejsca przywrócisz w widoku Zarchiwizowane miejsca.",
+    "archivePutawayRules_one": "{{count}} reguła rozkładania kieruje tutaj. Zachowa to miejsce jako cel, dopóki nie zostanie zmieniona.",
+    "archivePutawayRules_few": "{{count}} reguły rozkładania kierują tutaj. Zachowają to miejsce jako cel, dopóki nie zostaną zmienione.",
+    "archivePutawayRules_many": "{{count}} reguł rozkładania kieruje tutaj. Zachowa to miejsce jako cel, dopóki nie zostanie zmienione.",
+    "archivePutawayRules_other": "{{count}} reguł rozkładania kieruje tutaj. Zachowa to miejsce jako cel, dopóki nie zostanie zmienione."
+  },
+  "fieldLabels": {
+    "barcode": "Kod produktu",
+    "sku": "SKU",
+    "brand": "Marka / Producent",
+    "category_id": "Kategoria",
+    "description": "Opis",
+    "expiry_date": "Data Ważności",
+    "freeze_date": "Data Zamrożenia",
+    "label_code": "Własny Kod QR",
+    "location": "Miejsce",
+    "name": "Nazwa",
+    "notes": "Notatki",
+    "price": "Cena",
+    "production_date": "Data produkcji / partii",
+    "purchase_price": "Cena Zakupu",
+    "quantity": "Ilość",
+    "shelf_location": "Półka / pozycja",
+    "unit": "Jednostka",
+    "weight": "Waga / Objętość"
+  },
+  "reorg": {
+    "noMoveTargets": "Nie ma dokąd przenieść tego miejsca",
+    "moveTo": "Przenieś do…",
+    "moveToTop": "Najwyższy poziom"
+  },
+  "card": {
+    "unit_one": "produkt",
+    "unit_few": "produkty",
+    "unit_many": "produktów",
+    "unit_other": "produktów"
+  },
+  "counts": {
+    "inSublocations_one": "{{count}} w miejscu podrzędnym",
+    "inSublocations_few": "{{count}} w miejscach podrzędnych",
+    "inSublocations_many": "{{count}} w miejscach podrzędnych",
+    "inSublocations_other": "{{count}} w miejscach podrzędnych"
+  },
+  "stats": {},
+  "storageNotFound": "Nie znaleziono miejsca",
+  "storageNotFoundDescription": "Mógł zostać usunięty albo link jest nieaktualny.",
+  "zoneModule": {
+    "title": "To miejsce należy do modułu",
+    "description": "„{{name}}” należy do modułu, więc nie trafia na listę miejsc. Otwórz je tutaj, aby zobaczyć, co się w nim znajduje."
+  },
+  "zoneVirtual": {
+    "title": "To miejsce systemowe",
+    "description": "„{{name}}” to jedno z miejsc systemowych — jego zawartość nie liczy się do stanów magazynowych. Otwórz je tutaj, aby zobaczyć, co się w nim znajduje."
+  },
+  "zoneArchived": {
+    "title": "To miejsce jest zarchiwizowane",
+    "description": "„{{name}}” jest zarchiwizowane i nie trafia na aktywną listę. Otwórz je tutaj albo przywróć z archiwum."
+  },
+  "usage": {
+    "customer": "Klient",
+    "inventory": "Korekta inwentaryzacji",
+    "production": "Produkcja",
+    "virtualNotice": "Miejsce systemowe — jego zawartość nie liczy się do stanów magazynowych."
+  },
+  "sort": {},
+  "required": {
+    "title": "Nie masz jeszcze miejsca",
+    "description": "Utwórz pierwsze i kontynuuj bez opuszczania tego miejsca.",
+    "action": "Utwórz miejsce"
+  },
+  "archived": {
+    "title": "Zarchiwizowane miejsca",
+    "subtitle": "Miejsca ukryte z list i wyborów",
+    "badge": "Zarchiwizowane",
+    "name": "Miejsce",
+    "archivedAt": "Zarchiwizowano",
+    "actions": "Akcje",
+    "restore": "Przywróć",
+    "emptyTitle": "Nic nie jest zarchiwizowane",
+    "emptyDescription": "Zarchiwizowane miejsca pojawią się tutaj i można je przywrócić.",
+    "detailNotice": "To miejsce jest zarchiwizowane. Przywróć je, aby znów przechowywać tu produkty."
+  },
+  "masterDetailSubtitle": "Wybierz miejsce, aby zobaczyć, co jest w środku, jego produkty i ustawienia.",
+  "select": {
+    "title": "Wybierz miejsce",
+    "description": "Drzewo po lewej wymienia wszystkie miejsca. Wybierz jedno, aby zobaczyć, co jest w środku."
+  },
+  "path": {
+    "label": "Ścieżka miejsca",
+    "all": "Wszystkie miejsca"
+  },
+  "tabs": {
+    "contents": "Zawartość",
+    "products": "Produkty",
+    "settings": "Ustawienia",
+    "moves": "Ruchy"
+  },
+  "tree": {
+    "label": "Miejsca",
+    "searchPlaceholder": "Szukaj po nazwie lub kodzie",
+    "scanPlaceholder": "Zeskanuj etykietę miejsca…",
+    "scanAction": "Wybierz zeskanowane miejsce",
+    "scanNotFound": "Żadne miejsce nie pasuje do „{{code}}”.",
+    "scanNotLocation": "„{{code}}” nie jest etykietą miejsca.",
+    "noMatches": "Żadne miejsce nie pasuje do wyszukiwania",
+    "empty": "Nie ma jeszcze miejsc.",
+    "rowActions": "Akcje dla {{name}}",
+    "archivedLink": "Zarchiwizowane miejsca",
+    "collapse": "Zwiń {{name}}",
+    "expand": "Rozwiń {{name}}"
+  },
+  "contents": {
+    "emptyTitle": "W tym miejscu nic nie ma",
+    "emptyDescription_one": "Jego {{count}} produkt jest na karcie Produkty.",
+    "emptyDescription_other": "Jego {{count}} produktów jest na karcie Produkty.",
+    "emptyDescription_few": "Jego {{count}} produkty są na karcie Produkty.",
+    "emptyDescription_many": "Jego {{count}} produktów jest na karcie Produkty.",
+    "showProducts": "Pokaż produkty",
+    "selected_one": "Wybrano {{count}} miejsce",
+    "selected_other": "Wybrano {{count}} miejsc",
+    "selected_few": "Wybrano {{count}} miejsca",
+    "selected_many": "Wybrano {{count}} miejsc",
+    "clearSelection": "Wyczyść",
+    "selectColumn": "Wybierz",
+    "selectRow": "Wybierz {{name}}",
+    "name": "Miejsce",
+    "code": "Kod",
+    "type": "Typ",
+    "inside": "W środku",
+    "products": "Produkty"
+  },
+  "products": {
+    "includeInside": "Uwzględnij miejsca wewnątrz",
+    "includingInside_one": "W tym 1 miejsce wewnątrz",
+    "includingInside_other": "W tym {{count}} miejsc wewnątrz",
+    "includingInside_few": "W tym {{count}} miejsca wewnątrz",
+    "includingInside_many": "W tym {{count}} miejsc wewnątrz"
+  },
+  "settings": {
+    "basic": "Podstawowe",
+    "liesIn": "Znajduje się w",
+    "productFields": "Pola produktu tutaj",
+    "warehouse": "Uzupełnianie",
+    "reserve": "Półka rezerwy",
+    "reserveHint": "Towar stąd uzupełnia półki zbiorcze; nic go tu nie uzupełnia.",
+    "productFieldsHint": "Co zapisuje produkt umieszczony bezpośrednio w tym miejscu.",
+    "appliesHere": "Dotyczy tylko tego miejsca.",
+    "appliesInside_one": "Dotyczy tego miejsca i 1 miejsca wewnątrz.",
+    "appliesInside_few": "Dotyczy tego miejsca i {{count}} miejsc wewnątrz.",
+    "appliesInside_many": "Dotyczy tego miejsca i {{count}} miejsc wewnątrz.",
+    "appliesInside_other": "Dotyczy tego miejsca i {{count}} miejsc wewnątrz.",
+    "inheritedFrom": "z: {{name}}",
+    "inheritedFields": "Ustawione poziom wyżej",
+    "labelAndCode": "Etykieta i kod",
+    "recordActions": "Akcje dla {{name}}"
+  },
+  "move": {
+    "titleOne": "Przenieś do…",
+    "searchPlaceholder": "Szukaj miejsca docelowego",
+    "scanNotTarget": "„{{code}}” jest przenoszone lub leży wewnątrz przenoszonego miejsca, więc nie może być celem.",
+    "targetsLabel": "Miejsca docelowe",
+    "moved_one": "Przeniesiono miejsce",
+    "moved_other": "Przeniesiono {{count}} miejsc",
+    "moved_few": "Przeniesiono {{count}} miejsca",
+    "moved_many": "Przeniesiono {{count}} miejsc",
+    "undo": "Cofnij",
+    "undoDone": "Cofnięto przeniesienie",
+    "undoFailed": "Nie udało się cofnąć przeniesienia",
+    "failed": "Nie udało się przenieść miejsca",
+    "rejected": "Serwer odrzucił przeniesienie",
+    "titleMany_one": "Przenieś {{count}} miejsce do…",
+    "titleMany_few": "Przenieś {{count}} miejsca do…",
+    "titleMany_many": "Przenieś {{count}} miejsc do…",
+    "titleMany_other": "Przenieś {{count}} miejsc do…"
+  },
+  "moves": {
+    "empty": "Brak ruchów magazynowych przez to miejsce."
+  },
+  "moveQuestion": {
+    "title": "Czy fizycznie się przeniosło?",
+    "description": "Produkty w środku zostają na swoich miejscach. Powiedz, czy samo miejsce zostało przeniesione gdzie indziej, czy tylko drzewo miało je w złym miejscu.",
+    "scope": "Przenosisz {{name}} z {{inside}} i {{products}} do {{destination}}.",
+    "scopeNoInside": "Przenosisz {{name}} z {{products}} do {{destination}}.",
+    "locationsInside_one": "{{count}} miejscem w środku",
+    "locationsInside_few": "{{count}} miejscami w środku",
+    "locationsInside_many": "{{count}} miejscami w środku",
+    "locationsInside_other": "{{count}} miejscami w środku",
+    "products_one": "{{count}} produktem",
+    "products_few": "{{count}} produktami",
+    "products_many": "{{count}} produktami",
+    "products_other": "{{count}} produktami",
+    "topLevel": "najwyższego poziomu",
+    "choiceLabel": "Co się stało z: {{name}}",
+    "correction": "Tylko poprawiam układ",
+    "physical": "Fizycznie się przeniosło",
+    "physicalHint": "Fizyczne przeniesienie zapisuje ruch każdego produktu ze środka, więc jego historia i stany na wcześniejsze dni pokazują, gdzie stał.",
+    "confirm": "Przenieś"
+  },
+  "addNew": {
+    "title": "Dodaj nowe miejsce",
+    "nameLabel": "Nazwa",
+    "namePlaceholder": "np. Regał B",
+    "parentLabel": "Wewnątrz (opcjonalnie)",
+    "parentPlaceholder": "Najwyższy poziom",
+    "created": "Miejsce dodane"
+  }
+}

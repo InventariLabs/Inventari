@@ -1,0 +1,283 @@
+{
+  "title": "Inventuren",
+  "subtitle": "Inventuren Ihrer Lagerorte verwalten",
+  "newStockTake": "Neue Inventur",
+  "all": "Alle",
+  "unknownPlace": "Unbekannter Lagerort",
+  "started": "Gestartet",
+  "progressLabel": "Fortschritt",
+  "progress": {
+    "title": "Inventurfortschritt",
+    "countedOf": "{{counted}} / {{total}} Artikel",
+    "discrepanciesDetected_one": "1 Abweichung erkannt",
+    "discrepanciesDetected_other": "{{count}} Abweichungen erkannt",
+    "unsaved_one": "1 Zählung eingetragen, aber nicht gespeichert",
+    "unsaved_other": "{{count}} Zählungen eingetragen, aber nicht gespeichert"
+  },
+  "differencesBadge_one": "{{count}} Unterschied",
+  "differencesBadge_other": "{{count}} Unterschiede",
+  "continue": "Fortsetzen",
+  "start": "Start",
+  "report": {
+    "summary": "Zusammenfassung",
+    "perfectMatches": "Übereinstimmungen",
+    "toleratedDifferences": "Innerhalb der Toleranz",
+    "withinTolerance": "In der Toleranz",
+    "overstock": "Überbestand",
+    "understock": "Fehlbestand",
+    "notCounted": "Nicht gezählt",
+    "itemNotCounted": "Nicht gezählt",
+    "duration": "Dauer",
+    "durationValue": "{{minutes}} Min.",
+    "discrepanciesTitle": "Abweichungen",
+    "showAll": "Alle Positionen anzeigen",
+    "showDifferencesOnly": "Nur Abweichungen und Ungezähltes anzeigen",
+    "exportCsv": "CSV exportieren",
+    "noDiscrepancies": "Keine Abweichungen — alle Positionen stimmen überein.",
+    "empty": "Keine Positionen in dieser Inventur.",
+    "difference": "Differenz",
+    "location": "Ort",
+    "notes": "Notizen",
+    "name": "Name",
+    "title": "Bericht",
+    "reason": "Grund",
+    "countedTwiceAgreed": "Zweimal gezählt, beide Male {{second}}",
+    "countedTwiceDisagreed": "Zweimal gezählt: {{first}}, dann {{second}}",
+    "unit": "Einheit",
+    "storage": "Lagerort",
+    "startedAt": "Begonnen am",
+    "completedAt": "Abgeschlossen am",
+    "startedBy": "Begonnen von",
+    "closedLocations": "Abgeschlossene Lagerorte",
+    "closedEmpty": "Leer",
+    "closedCounted": "Abgeschlossen",
+    "closedByAt": "{{name}}, {{at}}"
+  },
+  "empty": {
+    "title": "Keine Inventuren",
+    "noStatus": "Keine Inventuren mit Status \"{{status}}\"",
+    "addFirst": "Erstellen Sie Ihre erste Inventur, um Bestände zu verfolgen"
+  },
+  "modal": {
+    "title": "Neue Inventur",
+    "storageLabel": "Lagerort",
+    "storagePlaceholder": "Lagerort wählen…",
+    "nameLabel": "Inventurname",
+    "namePlaceholder": "z.B. Inventur Regal A - Januar 2026",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "creating": "Wird erstellt…",
+    "blindMode": "Blindmodus (erwartete Mengen ausblenden)",
+    "toleranceLabel": "Toleranz (% der erwarteten Menge, optional)",
+    "tolerancePlaceholder": "z.B. 2,0 um Abweichungen bis 2 % zu ignorieren",
+    "requireFullCount": "Vollzählung erforderlich (Abschluss blockiert, bis alle Artikel gezählt sind)"
+  },
+  "validation": {
+    "storageRequired": "Lagerort auswählen"
+  },
+  "confirmDelete": "Möchten Sie diese Inventur wirklich löschen?",
+  "notFound": "Inventur nicht gefunden",
+  "noItemsCounted": "Noch keine Artikel gezählt",
+  "searchToCount": "Suchen Sie oben nach Artikeln, um mit der Zählung zu beginnen",
+  "filters": {
+    "all": "Alle",
+    "discrepancies": "Abweichungen",
+    "locationLevel": "Ortsebene",
+    "allLevels": "Alle Ebenen"
+  },
+  "search": {
+    "placeholder": "Artikel nach Name oder Barcode suchen…",
+    "here": "In dieser Inventur",
+    "elsewhere": "An anderen Orten der Organisation",
+    "failed": "Die Suche ist fehlgeschlagen, daher wird hier nichts angezeigt. Versuchen Sie es erneut."
+  },
+  "item": {
+    "barcode": "Barcode",
+    "expected": "Erwartet",
+    "counted": "Gezählt",
+    "notePlaceholder": "Notiz hinzufügen…",
+    "decreaseCount": "Eins weniger: {{name}}",
+    "increaseCount": "Eins mehr: {{name}}",
+    "saveCount": "Zählung speichern: {{name}}",
+    "countFor": "Gezählte Menge: {{name}}",
+    "unsaved": "Nicht gespeichert",
+    "awaitingRecount": "Erneut zählen",
+    "countAgain": "{{name}} erneut zählen",
+    "countedPass": "Zählung {{sequence}}: {{quantity}} ({{name}})",
+    "someone": "jemand",
+    "noteFor": "Notiz zu {{name}}",
+    "decreaseCountInUnit": "Ein {{unit}} weniger: {{name}}",
+    "increaseCountInUnit": "Ein {{unit}} mehr: {{name}}",
+    "lot": "Charge {{lot}}",
+    "record": "Bestand {{position}} von {{of}}",
+    "added": "erfasst {{date}}"
+  },
+  "actions": {
+    "cancel": "Abbrechen",
+    "complete": "Inventur abschließen",
+    "completing": "Wird abgeschlossen…"
+  },
+  "confirm": {
+    "complete": {
+      "title": "Inventur abschließen",
+      "confirmLabel": "Abschließen",
+      "unsaved_one": "Eine gezählte Menge wurde nicht gespeichert und geht verloren.",
+      "unsaved_other": "{{count}} gezählte Mengen wurden nicht gespeichert und gehen verloren.",
+      "message_one": "Der Abschluss dieser Inventur überschreibt den Bestand eines Produkts mit der gezählten Zahl. Gezählte Positionen lassen sich danach nicht mehr ändern.",
+      "message_other": "Der Abschluss dieser Inventur überschreibt den Bestand von {{count}} Produkten mit den gezählten Zahlen. Gezählte Positionen lassen sich danach nicht mehr ändern."
+    },
+    "cancel": {
+      "title": "Inventur abbrechen",
+      "message": "Möchten Sie diese Inventur wirklich abbrechen? Alle Daten gehen verloren.",
+      "confirmLabel": "Inventur abbrechen"
+    },
+    "overCap": {
+      "title": "Deutlich mehr gezählt als im System",
+      "row": "{{name}} — gezählt {{counted}}, System {{system}}",
+      "confirmLabel": "Gezählte Mengen speichern",
+      "message_one": "Eine gezählte Menge liegt weit über dem Systembestand: {{rows}}. Die gezählte Zahl trotzdem speichern?",
+      "message_other": "{{count}} gezählte Mengen liegen weit über dem Systembestand: {{rows}}. Die gezählten Zahlen trotzdem speichern?"
+    },
+    "overTolerance": {
+      "title": "Über der Toleranz",
+      "confirmLabel": "Abweichungen annehmen",
+      "message_one": "Eine gezählte Menge weicht stärker vom Systembestand ab, als diese Inventur zulässt: {{rows}}. Annehmen und die gezählte Zahl buchen?",
+      "message_other": "{{count}} gezählte Mengen weichen stärker vom Systembestand ab, als diese Inventur zulässt: {{rows}}. Annehmen und die gezählten Zahlen buchen?"
+    }
+  },
+  "deleteAriaLabel": "Inventur löschen",
+  "errors": {
+    "createFailed": "Inventur konnte nicht erstellt werden",
+    "deleteFailed": "Inventur konnte nicht gelöscht werden",
+    "saveFailed": "Zählung konnte nicht gespeichert werden",
+    "addItemFailed": "Position konnte nicht hinzugefügt werden",
+    "completeFailed": "Inventur konnte nicht abgeschlossen werden",
+    "cancelFailed": "Inventur konnte nicht abgebrochen werden",
+    "reasonIncomplete": "Sagen Sie, was passiert ist, oder wählen Sie einen Grund",
+    "overToleranceNotAllowed": "Eine Abweichung über der Toleranz anzunehmen steht Ihnen nicht zu — fragen Sie jemanden, der Inventuren genehmigen darf.",
+    "overCapNotAllowed": "Eine Zählung weit über dem Systembestand anzunehmen steht Ihnen nicht zu — fragen Sie jemanden, der Inventuren genehmigen darf.",
+    "recountFailed": "Erneute Zählung konnte nicht angefordert werden",
+    "unitIsWhole": "{{unit}} wird ganz gezählt — ein Bruchteil lässt sich nicht speichern.",
+    "unitDecimals_one": "{{unit}} wird auf {{count}} Nachkommastelle gezählt — nicht genauer.",
+    "unitDecimals_other": "{{unit}} wird auf {{count}} Nachkommastellen gezählt — nicht genauer.",
+    "unexplainedDifferences_one": "Eine gezählte Menge weicht stärker ab als die Toleranz und nennt keinen Grund. Geben Sie einen Grund an und schließen Sie die Inventur dann ab.",
+    "unexplainedDifferences_other": "{{count}} gezählte Mengen weichen stärker ab als die Toleranz und nennen keinen Grund. Geben Sie für jede einen Grund an und schließen Sie die Inventur dann ab."
+  },
+  "blindModeActive": "Blindmodus aktiv — erwartete Mengen sind ausgeblendet.",
+  "statuses": {
+    "draft": "Entwurf",
+    "in_progress": "In Bearbeitung",
+    "completed": "Abgeschlossen",
+    "cancelled": "Abgebrochen"
+  },
+  "addNewItem": "Neuen Artikel hinzufügen",
+  "discrepancyMissing": "Fehlt",
+  "discrepancySurplus": "Überschuss",
+  "countedZero": "0 gezählt",
+  "surplusCount_one": "1 Überschuss",
+  "surplusCount_other": "{{count}} Überschüsse",
+  "outsideItems": {
+    "title_one": "1 Produkt außerhalb der Inventur befindet sich an diesem Ort",
+    "title_other": "{{count}} Produkte außerhalb der Inventur befinden sich an diesem Ort",
+    "add": "Als Überschuss hinzufügen"
+  },
+  "addNewItemForm": {
+    "nameLabel": "Name",
+    "barcodeLabel": "Barcode",
+    "quantityLabel": "Menge",
+    "categoryLabel": "Kategorie",
+    "categoryPlaceholder": "Kategorie wählen",
+    "uomLabel": "Einheit",
+    "uomPlaceholder": "Einheit wählen"
+  },
+  "statusFilters": {
+    "in_progress": "Laufend",
+    "completed": "Abgeschlossen",
+    "cancelled": "Abgebrochen"
+  },
+  "permissions": {
+    "read": "Inventuren ansehen",
+    "readDesc": "Kann Inventuren, deren Positionen und gefundene Differenzen einsehen",
+    "write": "Inventuren durchführen",
+    "writeDesc": "Kann eine Inventur starten, zählen und abschließen — der Abschluss korrigiert den Bestand",
+    "approve": "Abweichungen über der Toleranz annehmen",
+    "approveDesc": "Gezählte Abweichungen über der Inventurtoleranz annehmen, damit sie in den Bestand gelangen."
+  },
+  "form": {
+    "guardName": "Die Zählung"
+  },
+  "reasons": {
+    "discrepancy": {
+      "label": "Woher kommt die Differenz?",
+      "codes": {
+        "DAMAGE": "Beschädigt",
+        "EXPIRED": "Abgelaufen",
+        "LOSS": "Verlust oder Diebstahl",
+        "WRONG_LOCATION": "An anderer Stelle gefunden",
+        "WRONG_UNIT": "In falscher Einheit gezählt",
+        "MISCOUNT": "Frühere Zählung war falsch",
+        "SYSTEM_ERROR": "Nie im System erfasst",
+        "OTHER": "Anderer Grund"
+      }
+    }
+  },
+  "scan": {
+    "cameraOpen": "Mit Kamera scannen",
+    "cameraClose": "Kamera schließen",
+    "chooseTitle": "Welchen Artikel haben Sie gezählt?",
+    "chooseHint": "Dieser Code gehört zu mehreren Artikeln dieser Inventur. Wählen Sie den aus, den Sie in der Hand halten — er wird um eins erhöht und gespeichert.",
+    "expires": "haltbar bis {{date}}"
+  },
+  "shelf": {
+    "hint": "Scannen Sie ein Lagerortetikett, um Lagerort für Lagerort zu zählen.",
+    "counting": "Gezählter Lagerort:",
+    "leave": "Ganzer Lagerort",
+    "outside": "Dieser Lagerort gehört nicht zur Inventur von {{location}}.",
+    "empty": "An diesem Lagerort wurde nichts erwartet. Scannen Sie, was dort steht.",
+    "hidden": "Die Filter oben blenden die Zeilen dieses Lagerorts aus.",
+    "close": "Lagerort abschließen",
+    "closeTitle": "Diesen Lagerort abschließen?",
+    "closeUncounted_one": "Eine Zeile an {{location}} wurde nicht gezählt. Das Abschließen des Lagerorts zählt sie als 0 — ein Fehlbestand im Bericht.",
+    "closeUncounted_other": "{{count}} Zeilen an {{location}} wurden nicht gezählt. Das Abschließen des Lagerorts zählt sie als 0 — Fehlbestände im Bericht.",
+    "closeEmpty": "An {{location}} wurde nichts gefunden. Als gezählt und leer bestätigen?",
+    "closeCounted": "Alle Zeilen an {{location}} sind gezählt. Lagerort abschließen?",
+    "closeConfirm": "Lagerort abschließen",
+    "closeUnsaved_one": "Eine Zahl an diesem Lagerort ist nicht gespeichert. Speichern Sie sie, bevor Sie den Lagerort abschließen.",
+    "closeUnsaved_other": "{{count}} Zahlen an diesem Lagerort sind nicht gespeichert. Speichern Sie sie, bevor Sie den Lagerort abschließen.",
+    "closedDone_one": "{{location}} abgeschlossen: eine Zeile als 0 gezählt.",
+    "closedDone_other": "{{location}} abgeschlossen: {{count}} Zeilen als 0 gezählt.",
+    "closedEmptyDone": "{{location}} als leer bestätigt.",
+    "closedCountedDone": "{{location}} abgeschlossen.",
+    "closedBy": "Abgeschlossen von {{name}}",
+    "closedEmptyBy": "Als leer bestätigt von {{name}}"
+  },
+  "count": {
+    "action": "Lagerplatz zählen",
+    "title": "Lagerplatz zählen",
+    "intro": "Scannen Sie das Etikett des Lagerplatzes oder wählen Sie ihn aus der Liste. Sie zählen, was dort liegt; die Differenzen werden als eine Bestandskorrektur für das Büro gespeichert.",
+    "scanLabel": "Etikett des Lagerplatzes",
+    "searchLabel": "Lagerplatz finden",
+    "searchPlaceholder": "Lagerplätze suchen",
+    "noMatchTitle": "Kein Lagerplatz passt",
+    "noMatchDescription": "Versuchen Sie einen anderen Teil des Namens oder scannen Sie das Etikett des Lagerplatzes.",
+    "blind": "Blindzählung: erwartete Mengen ausblenden",
+    "start": "{{location}} zählen",
+    "chooseFirst": "Wählen Sie einen Lagerplatz zum Zählen",
+    "name": "Zählung: {{location}} — {{date}}",
+    "neverCounted": "Nie gezählt",
+    "countedToday": "Heute gezählt",
+    "lastCounted_one": "Zuletzt vor {{count}} Tag gezählt",
+    "lastCounted_other": "Zuletzt vor {{count}} Tagen gezählt",
+    "underWay": "Wird gezählt",
+    "noPlacesTitle": "Noch keine Lagerplätze zum Zählen",
+    "noPlacesDescription": "Legen Sie einen Lagerplatz an und lagern Sie Ware darauf, dann kann er hier gezählt werden."
+  },
+  "posting": {
+    "adjusted": "Die Differenzen wurden gebucht als Bestandskorrektur",
+    "noDifferences": "Gezählt, keine Differenzen: der Bestand stimmte bereits."
+  },
+  "settings": {
+    "countEveryDays": "Jeden Lagerplatz zählen alle (Tage)",
+    "countEveryDaysDescription": "Jeder Lagerplatz mit Bestand erscheint so viele Tage nach seiner letzten Zählung in „Zu erledigen“. 0 schaltet es aus."
+  }
+}

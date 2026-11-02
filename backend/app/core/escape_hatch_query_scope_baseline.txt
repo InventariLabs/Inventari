@@ -1,0 +1,14 @@
+# Escape-hatch query-scope baseline
+# Format: app/relative/path.py::function | owner=<who> | expires=<YYYY-MM-DD> | <reason>
+#
+# One entry per *function* inside an escape-hatch file whose query cannot be
+# org-scoped as written. The sibling list
+# (escape_hatch_org_filter_baseline.txt) answers a weaker question — whether
+# the file mentions an organization at all — and a docstring satisfies it.
+# This one is about the statement.
+#
+# EMPTY on purpose. The four debts the check found when it was written were
+# paid rather than listed: a private reorder helper that read a rule by bare
+# id, two shopping-suggestion reads keyed on an item id that came out of a
+# loop, and an equipment assignment batch scoped only by the ids of the page
+# above it.

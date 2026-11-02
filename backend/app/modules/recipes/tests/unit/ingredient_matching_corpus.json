@@ -1,0 +1,375 @@
+{
+  "catalog": [
+    "APC Smart-UPS 3000VA",
+    "Banany",
+    "Bazylia suszona",
+    "Boczek wedzony",
+    "Brokul",
+    "Bulion drobiowy",
+    "Chipsy ziemniaczane solone",
+    "Ciecierzyca w puszce",
+    "Cisco Catalyst 9200L",
+    "Cisco Meraki MR46",
+    "Corn Flakes",
+    "Cukier bialy 1kg",
+    "Cukier waniliowy",
+    "Curry proszek",
+    "Cynamon mielony",
+    "Czekolada gorzka 85%",
+    "Czosnek granulowany",
+    "Dell Latitude 5540",
+    "Dell OptiPlex 7010",
+    "Dell PowerEdge R750",
+    "Dell UltraSharp U2723QE",
+    "Drozdze suche",
+    "Dzem truskawkowy",
+    "Fasola biala w puszce",
+    "Filet z kurczaka",
+    "HP EliteBook 840 G10",
+    "HP ProDesk 400 G9",
+    "HPE ProLiant DL380 Gen10",
+    "Herbata Earl Grey",
+    "Herbatniki maslane",
+    "Hummus klasyczny",
+    "Imbir mielony",
+    "Jablka Fuji",
+    "Jabra Evolve2 65",
+    "Jajka M 10szt",
+    "Jogurt naturalny 400g",
+    "Kakao naturalne",
+    "Kasza gryczana",
+    "Kawa mielona Jacobs",
+    "Kawa ziarnista Lavazza",
+    "Ketchup Heinz",
+    "Kielbasa slaska",
+    "Koncentrat pomidorowy",
+    "Kukurydza konserwowa",
+    "LG 27UK850-W",
+    "Lenovo ThinkCentre M90q",
+    "Lody waniliowe",
+    "Logitech C920 HD Pro",
+    "Logitech MX Keys S",
+    "Logitech MX Master 3S",
+    "Losos wedzony",
+    "MacBook Pro 14 M3",
+    "Majonez Kielecki",
+    "Maka pszenna typ 550",
+    "Maka ziemniaczana",
+    "Makaron fusilli",
+    "Makaron penne",
+    "Makaron spaghetti 500g",
+    "Marchew 1kg",
+    "Maslo orzechowe",
+    "Masło Extra 82%",
+    "Mieso mielone wieprzowe",
+    "Migdaly",
+    "Miod wielokwiatowy",
+    "Mleko UHT 3.2%",
+    "Mrozona mieszanka warzywna",
+    "Mrozone borowki",
+    "Mrozone frytki",
+    "Mrozone wisnie",
+    "Mrozony grosek",
+    "Musli z owocami",
+    "Napoj czekoladowy",
+    "Ogorek",
+    "Olej slonecznikowy",
+    "Oliwa z oliwek extra virgin",
+    "Oregano suszone",
+    "Orzechy wloskie",
+    "Paluszki rybne",
+    "Papryka slodka mielona",
+    "Parowki wieprzowe",
+    "Passata pomidorowa",
+    "Pesto rosso",
+    "Pieprz czarny mielony",
+    "Pierogi ruskie",
+    "Pizza pepperoni mrozona",
+    "Platki owsiane",
+    "Pomidory cherry",
+    "Pomidory pelati 400g",
+    "Proszek do pieczenia",
+    "Rack 42U Open Frame",
+    "Ryz jasminowy 1kg",
+    "Samsung Galaxy S24",
+    "Samsung Odyssey G5",
+    "Ser zolty Gouda",
+    "Serek wiejski",
+    "Smietana 18%",
+    "Sok pomaranczowy NFC",
+    "Sol jodowana",
+    "Sos sojowy",
+    "Supermicro SYS-1029U",
+    "Szynka drobiowa",
+    "TP-Link TL-SG3428",
+    "ThinkPad T14s Gen 4",
+    "Truskawki",
+    "Tunczyk w oleju",
+    "Twarog chudy",
+    "Ubiquiti UniFi USW-Pro-48",
+    "Wafle ryzowe",
+    "Winogrona zielone",
+    "Zupa pomidorowa instant",
+    "iPad Air M2",
+    "iPhone 15 Pro"
+  ],
+  "ingredients": [
+    {
+      "name": "Mąka pszenna typ 750",
+      "occurrences": 1,
+      "expected": [
+        "Maka pszenna typ 550"
+      ]
+    },
+    {
+      "name": "Mąka żytnia typ 720",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Woda",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Zakwas żytni",
+      "occurrences": 2,
+      "expected": []
+    },
+    {
+      "name": "Sól",
+      "occurrences": 1,
+      "expected": [
+        "Sol jodowana"
+      ]
+    },
+    {
+      "name": "Ciecierzyca z puszki",
+      "occurrences": 1,
+      "expected": [
+        "Ciecierzyca w puszce"
+      ]
+    },
+    {
+      "name": "Mleko kokosowe",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Szpinak baby",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Pomidory krojone",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Cebula",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Pasta curry",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Schab wieprzowy",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Bułka tarta",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Jajka",
+      "occurrences": 5,
+      "expected": [
+        "Jajka M 10szt"
+      ]
+    },
+    {
+      "name": "Mąka pszenna",
+      "occurrences": 3,
+      "expected": [
+        "Maka pszenna typ 550"
+      ]
+    },
+    {
+      "name": "Masło klarowane",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Mleko",
+      "occurrences": 1,
+      "expected": [
+        "Mleko UHT 3.2%"
+      ]
+    },
+    {
+      "name": "Olej",
+      "occurrences": 1,
+      "expected": [
+        "Olej slonecznikowy"
+      ]
+    },
+    {
+      "name": "Bazylia świeża",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Orzeszki piniowe",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Parmezan",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Oliwa z oliwek",
+      "occurrences": 2,
+      "expected": [
+        "Oliwa z oliwek extra virgin"
+      ]
+    },
+    {
+      "name": "Czosnek",
+      "occurrences": 2,
+      "expected": [
+        "Czosnek granulowany"
+      ]
+    },
+    {
+      "name": "Kości wieprzowe",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Makaron ramen",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Boczek wieprzowy",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Sos sojowy",
+      "occurrences": 1,
+      "expected": [
+        "Sos sojowy"
+      ]
+    },
+    {
+      "name": "Pomidory",
+      "occurrences": 1,
+      "expected": [
+        "Pomidory cherry",
+        "Pomidory pelati 400g"
+      ]
+    },
+    {
+      "name": "Ogórek",
+      "occurrences": 1,
+      "expected": [
+        "Ogorek"
+      ]
+    },
+    {
+      "name": "Feta",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Oliwki kalamata",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Twaróg sernikowy",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Cukier",
+      "occurrences": 1,
+      "expected": [
+        "Cukier bialy 1kg",
+        "Cukier waniliowy"
+      ]
+    },
+    {
+      "name": "Masło",
+      "occurrences": 1,
+      "expected": [
+        "Masło Extra 82%",
+        "Maslo orzechowe"
+      ]
+    },
+    {
+      "name": "Budyń waniliowy",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Spaghetti",
+      "occurrences": 1,
+      "expected": [
+        "Makaron spaghetti 500g"
+      ]
+    },
+    {
+      "name": "Guanciale",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Żółtka jaj",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Pecorino Romano",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Pieprz czarny",
+      "occurrences": 1,
+      "expected": [
+        "Pieprz czarny mielony"
+      ]
+    },
+    {
+      "name": "Biała kiełbasa",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Śmietana 18%",
+      "occurrences": 1,
+      "expected": [
+        "Smietana 18%"
+      ]
+    },
+    {
+      "name": "Majeranek",
+      "occurrences": 1,
+      "expected": []
+    },
+    {
+      "name": "Włoszczyzna",
+      "occurrences": 1,
+      "expected": []
+    }
+  ]
+}

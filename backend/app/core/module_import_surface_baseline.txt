@@ -1,0 +1,328 @@
+# Module import-surface baseline
+#
+# A module reaches Core through three paths: app.core.module_sdk (registration,
+# hooks, interceptors, contributions, exceptions, dependencies, logging, the
+# model base, pagination), app.core.contracts (DTOs) and app.core.public_api
+# (data). The install-time safety scan allows a module installed from outside
+# this repository nothing else. The modules the repository ships were written
+# before that door existed, so each still imports core helpers directly; this
+# file freezes what each one reaches as it stands.
+#
+# A shipped module also reaches another module's public API — the
+# <name>_api / exceptions / schemas doors. That is the one cross-module door
+# this tree allows, but it is still an exception to the same surface, so it
+# is frozen here too: a new sibling dependency needs a written decision even
+# when the cross-module shape gate would admit it.
+#
+# Format, one block per module:
+#
+#   <module> | owner=<who> | expires=<YYYY-MM-DD> | <reason>
+#     <app path>
+#     <app path>
+#
+# The check fails on a path that is not listed under its module, on a module
+# without a block, on an entry whose import is gone (the list only shrinks),
+# and on an expired block. Moving an import to the SDK is the way a path
+# leaves this file — an additive change the SDK snapshot covers.
+api_keys | owner=core | expires=2027-06-30 | API key issuance and verification use the core auth and token helpers directly; the module predates the SDK.
+  app.core.api_key_auth
+  app.core.db_utils
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.logging
+  app.core.migration_helpers
+  app.core.modules
+  app.core.token_blacklist
+  app.database
+  app.i18n.service
+
+approvals | owner=core | expires=2027-06-30 | the approval routers and services use the core dependency and logging helpers directly, and one route reads the user model; the module predates the SDK. Its warehouse import is the warehouse public API.
+  app.core.db_facade
+  app.core.db_utils
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.logging
+  app.core.migration_helpers
+  app.core.modules
+  app.i18n.service
+  app.models.user
+  app.modules.warehouse.warehouse_api
+  app.schemas.pagination
+
+equipment | owner=core | expires=2027-06-30 | equipment screens use the core scan, template, import and upload helpers directly; the module predates the SDK. Its approvals imports are the approvals public API and exception types.
+  app.config
+  app.core.async_utils
+  app.core.cache
+  app.core.context
+  app.core.contributions
+  app.core.datetimes
+  app.core.db_facade
+  app.core.db_utils
+  app.core.deps
+  app.core.events
+  app.core.exceptions
+  app.core.export_enrichers
+  app.core.file_import
+  app.core.import_sheet
+  app.core.interceptors
+  app.core.limiter
+  app.core.logging
+  app.core.migration_helpers
+  app.core.module_ownership
+  app.core.module_scope
+  app.core.modules
+  app.core.money
+  app.core.print_page_size
+  app.core.template_schemas
+  app.core.upload_validation
+  app.i18n
+  app.i18n.service
+  app.models.item
+  app.modules.approvals.approvals_api
+  app.modules.approvals.exceptions
+  app.schemas.item
+  app.schemas.pagination
+
+maker | owner=core | expires=2027-06-30 | the recipe catalogue reads core cost and stock helpers directly; the module predates the SDK. Its recipes, shopping-lists, stock-takes and warehouse imports are those modules' public APIs.
+  app.core.context
+  app.core.cost_estimates
+  app.core.db_facade
+  app.core.db_utils
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.interceptors
+  app.core.logging
+  app.core.migration_helpers
+  app.core.modules
+  app.core.money
+  app.i18n
+  app.i18n.service
+  app.models.product_template
+  app.models.stock_quants_from_records
+  app.modules.recipes.recipes_api
+  app.modules.shopping_lists.shopping_lists_api
+  app.modules.stock_takes.stock_takes_api
+  app.modules.warehouse.warehouse_api
+  app.schemas.pagination
+
+nutrition | owner=core | expires=2027-06-30 | the label and scan code uses core barcode and cache helpers directly; the module predates the SDK. Its vision import is the vision public API.
+  app.core.barcode
+  app.core.container
+  app.core.context
+  app.core.db_facade
+  app.core.define_module
+  app.core.logging
+  app.core.scan_registry
+  app.core.utils
+  app.modules.vision.vision_api
+  app.schemas.label_pool
+
+printing | owner=core | expires=2027-06-30 | the print queue and label rendering use core helpers directly; the module predates the SDK.
+  app.config
+  app.core.barcode
+  app.core.datetimes
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.label_rendering
+  app.core.logging
+  app.core.migration_helpers
+  app.core.modules
+  app.core.scan_links
+  app.core.utils
+  app.database
+  app.i18n.service
+
+purchase_orders | owner=core | expires=2027-06-30 | purchasing uses core money, PDF, import and template helpers directly; the module predates the SDK. Its approvals and warehouse imports are those modules' public APIs, exceptions and schemas.
+  app.core.context
+  app.core.cost_estimates
+  app.core.datetimes
+  app.core.db_utils
+  app.core.deps
+  app.core.exceptions
+  app.core.file_import
+  app.core.import_sheet
+  app.core.logging
+  app.core.migration_helpers
+  app.core.modules
+  app.core.money
+  app.core.pdf_base_service
+  app.core.print_identity
+  app.core.print_page_size
+  app.core.scoped_session
+  app.core.settings_diff
+  app.core.template_schemas
+  app.core.uom_resolver
+  app.core.upload_validation
+  app.core.utils
+  app.database
+  app.i18n.service
+  app.models.product_template
+  app.modules.approvals.approvals_api
+  app.modules.approvals.exceptions
+  app.modules.approvals.schemas
+  app.modules.warehouse.warehouse_api
+  app.schemas.pagination
+  app.schemas.partner
+
+recipes | owner=core | expires=2027-06-30 | recipe valuation and unit conversion use core helpers directly; the module predates the SDK. Its shopping-lists and warehouse imports are those modules' public APIs and schemas.
+  app.core.contributions
+  app.core.cost_estimates
+  app.core.datetimes
+  app.core.db_utils
+  app.core.deps
+  app.core.exceptions
+  app.core.export_hygiene
+  app.core.file_signature
+  app.core.limiter
+  app.core.llm.errors
+  app.core.logging
+  app.core.migration_helpers
+  app.core.module_settings
+  app.core.modules
+  app.core.money
+  app.core.open_package
+  app.core.product_template_metadata
+  app.core.ssrf_guard
+  app.core.template_ranking
+  app.core.uom_resolver
+  app.core.upload_validation
+  app.core.utils
+  app.database
+  app.i18n
+  app.i18n.service
+  app.models
+  app.models.product_template
+  app.modules.shopping_lists.shopping_lists_api
+  app.modules.warehouse.schemas
+  app.modules.warehouse.warehouse_api
+  app.schemas.pagination
+
+shopping_lists | owner=core | expires=2027-06-30 | the list screens read item and storage models, and the core low-stock helper, directly; the module predates the SDK. Its purchase-orders import is that module's public API.
+  app.core.db_utils
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.migration_helpers
+  app.core.modules
+  app.database
+  app.i18n
+  app.i18n.service
+  app.models.item
+  app.models.item_history
+  app.models.product_template
+  app.models.storage_location
+  app.models.uom
+  app.modules.purchase_orders.purchase_orders_api
+  app.schemas.category
+  app.schemas.uom
+  app.schemas.validators
+  app.services.items.low_stock
+
+stats | owner=core | expires=2027-06-30 | the analytics screens read item models and the core analytics helpers directly; the module predates the SDK.
+  app.core.db_facade
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.logging
+  app.core.modules
+  app.core.money
+  app.models
+  app.models.category
+  app.models.item
+  app.models.item_history
+  app.models.organization
+  app.services.analytics._common
+  app.services.items.low_stock
+
+stock_takes | owner=core | expires=2027-06-30 | the count flow reads item, storage and user models, and the core scope helper, directly; the module predates the SDK. Its warehouse import is the warehouse public API.
+  app.core.context
+  app.core.db_utils
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.interceptors
+  app.core.migration_helpers
+  app.core.module_scope
+  app.core.modules
+  app.database
+  app.i18n.service
+  app.models.item
+  app.models.organization
+  app.models.storage_location
+  app.models.user
+  app.modules.warehouse.warehouse_api
+  app.schemas.validators
+
+vision | owner=core | expires=2027-06-30 | the vision probe uses core upload-validation and file-signature helpers directly; the module predates the SDK.
+  app.core.define_module
+  app.core.deps
+  app.core.exceptions
+  app.core.file_signature
+  app.core.limiter
+  app.core.logging
+  app.core.modules
+  app.core.scan_registry
+  app.core.upload_validation
+  app.i18n
+  app.i18n.service
+
+warehouse | owner=core | expires=2027-06-30 | warehouse documents use core scan, print, import and money helpers directly; the module predates the SDK. Its models, documents and stock reads now go through the public surface (contracts, core_api, module_sdk) — the register, queue and correction reads were the last reaches, and the block keeps only what remains. Packing sends a package's label to the print queue through printing_api: the label is the dispatch's to word, the queue and its printers are printing's.
+  app.config
+  app.core.async_utils
+  app.core.barcode
+  app.core.context
+  app.core.db_utils
+  app.core.define_module
+  app.core.deps
+  app.core.events
+  app.core.exceptions
+  app.core.export_hygiene
+  app.core.file_import
+  app.core.import_sheet
+  app.core.interceptors
+  app.core.label_rendering
+  app.core.logging
+  app.core.migration_helpers
+  app.core.module_scope
+  app.core.modules
+  app.core.money
+  app.core.pdf_base_service
+  app.core.period_guard
+  app.core.print_identity
+  app.core.print_page_size
+  app.core.scan_links
+  app.core.scan_registry
+  app.core.settings_diff
+  app.core.template_schemas
+  app.core.uom_resolver
+  app.core.upload_validation
+  app.core.utils
+  app.i18n
+  app.i18n.service
+  app.modules.approvals.approvals_api
+  app.modules.printing.printing_api
+  app.modules.purchase_orders.purchase_orders_api
+
+webhooks | owner=core | expires=2027-06-30 | delivery uses the core cursor, retry and claim helpers directly; the module predates the SDK.
+  app.api.dependencies
+  app.config
+  app.core.async_utils
+  app.core.context
+  app.core.cursor
+  app.core.db_claim
+  app.core.db_facade
+  app.core.db_retry
+  app.core.db_utils
+  app.core.deps
+  app.core.events
+  app.core.exceptions
+  app.core.logging
+  app.core.migration_helpers
+  app.core.modules
+  app.core.ssrf_guard
+  app.database
+  app.schemas.pagination

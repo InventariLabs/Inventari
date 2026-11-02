@@ -1,0 +1,283 @@
+{
+  "title": "Contagens de estoque",
+  "subtitle": "Gerencie as contagens de estoque dos seus locais",
+  "newStockTake": "Nova contagem de estoque",
+  "all": "Todas",
+  "unknownPlace": "Local desconhecido",
+  "started": "Iniciada",
+  "progressLabel": "Progresso",
+  "progress": {
+    "title": "Progresso da contagem de estoque",
+    "countedOf": "{{counted}} / {{total}} itens",
+    "discrepanciesDetected_one": "1 divergência detectada",
+    "discrepanciesDetected_other": "{{count}} divergências detectadas",
+    "unsaved_one": "1 contagem digitada e não salva",
+    "unsaved_other": "{{count}} contagens digitadas e não salvas"
+  },
+  "differencesBadge_one": "{{count}} diferença",
+  "differencesBadge_other": "{{count}} diferenças",
+  "continue": "Continuar",
+  "start": "Iniciar",
+  "report": {
+    "summary": "Resumo",
+    "perfectMatches": "Conferem exatamente",
+    "toleratedDifferences": "Dentro da tolerância",
+    "withinTolerance": "Dentro da tolerância",
+    "overstock": "Sobra",
+    "understock": "Falta",
+    "notCounted": "Não contados",
+    "itemNotCounted": "Não contado",
+    "duration": "Duração",
+    "durationValue": "{{minutes}} min",
+    "discrepanciesTitle": "Divergências",
+    "showAll": "Mostrar todos os itens",
+    "showDifferencesOnly": "Mostrar apenas diferenças e não contados",
+    "exportCsv": "Exportar CSV",
+    "noDiscrepancies": "Nenhuma divergência — todos os itens conferem.",
+    "empty": "Nenhum item nesta contagem de estoque.",
+    "difference": "Diferença",
+    "location": "Local",
+    "notes": "Observações",
+    "name": "Nome",
+    "title": "Relatório",
+    "reason": "Motivo",
+    "countedTwiceAgreed": "Contado duas vezes, nas duas vezes {{second}}",
+    "countedTwiceDisagreed": "Contado duas vezes: {{first}}, depois {{second}}",
+    "unit": "Unidade",
+    "storage": "Local",
+    "startedAt": "Iniciada em",
+    "completedAt": "Concluída em",
+    "startedBy": "Iniciada por",
+    "closedLocations": "Locais encerrados",
+    "closedEmpty": "Vazio",
+    "closedCounted": "Encerrado",
+    "closedByAt": "{{name}}, {{at}}"
+  },
+  "empty": {
+    "title": "Nenhuma contagem de estoque",
+    "noStatus": "Nenhuma contagem de estoque com status \"{{status}}\"",
+    "addFirst": "Crie sua primeira contagem de estoque para acompanhar os níveis do inventário"
+  },
+  "modal": {
+    "title": "Nova contagem de estoque",
+    "storageLabel": "Local",
+    "storagePlaceholder": "Selecione o local…",
+    "nameLabel": "Nome da contagem de estoque",
+    "namePlaceholder": "ex.: Contagem da prateleira A — janeiro de 2026",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "creating": "Criando…",
+    "blindMode": "Modo cego (ocultar quantidades esperadas)",
+    "toleranceLabel": "Tolerância (% da quantidade esperada, opcional)",
+    "tolerancePlaceholder": "ex.: 2.0 para ignorar diferenças de até 2%",
+    "requireFullCount": "Exigir contagem completa (impede a conclusão até que todos os itens sejam contados)"
+  },
+  "validation": {
+    "storageRequired": "Selecione o local"
+  },
+  "confirmDelete": "Tem certeza de que deseja excluir esta contagem de estoque?",
+  "notFound": "Contagem de estoque não encontrada",
+  "noItemsCounted": "Nenhum item contado ainda",
+  "searchToCount": "Pesquise itens acima para começar a contar",
+  "filters": {
+    "all": "Todos",
+    "discrepancies": "Divergências",
+    "locationLevel": "Nível do local",
+    "allLevels": "Todos os níveis"
+  },
+  "search": {
+    "placeholder": "Pesquisar item por nome ou código de barras…",
+    "here": "Nesta contagem",
+    "elsewhere": "Em outros pontos da organização",
+    "failed": "A pesquisa falhou, por isso nada é listado aqui. Tente novamente."
+  },
+  "item": {
+    "barcode": "Código de barras",
+    "expected": "Esperado",
+    "counted": "Contado",
+    "notePlaceholder": "Adicionar uma observação…",
+    "decreaseCount": "Um {{name}} a menos",
+    "increaseCount": "Um {{name}} a mais",
+    "saveCount": "Salvar a contagem de {{name}}",
+    "countFor": "Quantidade contada de {{name}}",
+    "unsaved": "Não salvo",
+    "awaitingRecount": "Contar novamente",
+    "countAgain": "Contar {{name}} novamente",
+    "countedPass": "Contagem {{sequence}}: {{quantity}} ({{name}})",
+    "someone": "alguém",
+    "noteFor": "Observação sobre {{name}}",
+    "decreaseCountInUnit": "Um {{unit}} a menos de {{name}}",
+    "increaseCountInUnit": "Um {{unit}} a mais de {{name}}",
+    "lot": "Lote {{lot}}",
+    "record": "Registo {{position}} de {{of}}",
+    "added": "adicionado em {{date}}"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "complete": "Concluir contagem de estoque",
+    "completing": "Concluindo…"
+  },
+  "confirm": {
+    "complete": {
+      "title": "Concluir contagem de estoque",
+      "confirmLabel": "Concluir",
+      "unsaved_one": "Um número contado não foi salvo e será perdido.",
+      "unsaved_other": "{{count}} números contados não foram salvos e serão perdidos.",
+      "message_one": "Concluir esta contagem de estoque substitui o estoque de um produto pelo número contado. Depois disso, não será possível editar os itens contados.",
+      "message_other": "Concluir esta contagem de estoque substitui o estoque de {{count}} produtos pelos números contados. Depois disso, não será possível editar os itens contados."
+    },
+    "cancel": {
+      "title": "Cancelar contagem de estoque",
+      "message": "Tem certeza de que deseja cancelar esta contagem de estoque? Todos os dados serão perdidos.",
+      "confirmLabel": "Cancelar contagem de estoque"
+    },
+    "overCap": {
+      "title": "Contado muito acima do que o sistema registra",
+      "row": "{{name}} — contado {{counted}}, sistema {{system}}",
+      "confirmLabel": "Salvar números contados",
+      "message_one": "Uma quantidade contada está muito acima do estoque do sistema: {{rows}}. Salvar o número contado mesmo assim?",
+      "message_other": "{{count}} quantidades contadas estão muito acima do estoque do sistema: {{rows}}. Salvar os números contados mesmo assim?"
+    },
+    "overTolerance": {
+      "title": "Além da tolerância",
+      "confirmLabel": "Aceitar as diferenças",
+      "message_one": "Uma quantidade contada difere do estoque do sistema além do que esta contagem de estoque permite: {{rows}}. Aceitar e lançar o número contado?",
+      "message_other": "{{count}} quantidades contadas diferem do estoque do sistema além do que esta contagem de estoque permite: {{rows}}. Aceitar e lançar os números contados?"
+    }
+  },
+  "deleteAriaLabel": "Excluir contagem de estoque",
+  "errors": {
+    "createFailed": "Falha ao criar a contagem de estoque",
+    "deleteFailed": "Falha ao excluir a contagem de estoque",
+    "saveFailed": "Falha ao salvar a contagem",
+    "addItemFailed": "Falha ao adicionar o item",
+    "completeFailed": "Falha ao concluir a contagem de estoque",
+    "cancelFailed": "Falha ao cancelar a contagem de estoque",
+    "reasonIncomplete": "Diga o que aconteceu ou escolha um motivo da lista",
+    "overToleranceNotAllowed": "Aceitar uma diferença além da tolerância não é permitido a você — peça a alguém com permissão para aprovar contagens de estoque.",
+    "overCapNotAllowed": "Aceitar uma contagem muito acima do estoque do sistema não é permitido a você — peça a alguém com permissão para aprovar contagens de estoque.",
+    "recountFailed": "Não foi possível solicitar uma nova contagem",
+    "unitIsWhole": "{{unit}} é contado por inteiro — não é possível salvar uma fração.",
+    "unitDecimals_one": "{{unit}} é contado com {{count}} casa decimal — não mais que isso.",
+    "unitDecimals_other": "{{unit}} é contado com {{count}} casas decimais — não mais que isso.",
+    "unexplainedDifferences_one": "Uma quantidade contada difere além da tolerância e não informa o motivo. Informe um motivo e conclua a contagem.",
+    "unexplainedDifferences_other": "{{count}} quantidades contadas diferem além da tolerância e não informam o motivo. Informe um motivo para cada uma e conclua a contagem."
+  },
+  "blindModeActive": "Modo cego ativo — as quantidades esperadas estão ocultas.",
+  "statuses": {
+    "draft": "Rascunho",
+    "in_progress": "Em andamento",
+    "completed": "Concluída",
+    "cancelled": "Cancelada"
+  },
+  "addNewItem": "Adicionar novo item",
+  "discrepancyMissing": "Falta",
+  "discrepancySurplus": "Sobra",
+  "countedZero": "contado 0",
+  "surplusCount_one": "1 sobra",
+  "surplusCount_other": "{{count}} sobras",
+  "outsideItems": {
+    "title_one": "1 produto fora da contagem de estoque está neste local",
+    "title_other": "{{count}} produtos fora da contagem de estoque estão neste local",
+    "add": "Adicionar como sobra"
+  },
+  "addNewItemForm": {
+    "nameLabel": "Nome",
+    "barcodeLabel": "Código de barras",
+    "quantityLabel": "Quantidade",
+    "categoryLabel": "Categoria",
+    "categoryPlaceholder": "Selecione a categoria",
+    "uomLabel": "Unidade",
+    "uomPlaceholder": "Selecione a unidade"
+  },
+  "statusFilters": {
+    "in_progress": "Em andamento",
+    "completed": "Concluídas",
+    "cancelled": "Canceladas"
+  },
+  "permissions": {
+    "read": "Ver contagens de estoque",
+    "readDesc": "Pode consultar as contagens de estoque, suas linhas e as diferenças encontradas",
+    "write": "Realizar contagens de estoque",
+    "writeDesc": "Pode iniciar uma contagem de estoque, contar e finalizá-la — a finalização corrige o estoque",
+    "approve": "Aceitar diferenças além da tolerância",
+    "approveDesc": "Aceita diferenças contadas que excedem a tolerância da contagem de estoque, para que cheguem ao estoque."
+  },
+  "form": {
+    "guardName": "A contagem"
+  },
+  "reasons": {
+    "discrepancy": {
+      "label": "Por que há diferença?",
+      "codes": {
+        "DAMAGE": "Danificado",
+        "EXPIRED": "Vencido",
+        "LOSS": "Perdido ou levado",
+        "WRONG_LOCATION": "Encontrado em outro lugar",
+        "WRONG_UNIT": "Contado na unidade errada",
+        "MISCOUNT": "A contagem anterior estava errada",
+        "SYSTEM_ERROR": "Nunca registrado no sistema",
+        "OTHER": "Outro"
+      }
+    }
+  },
+  "scan": {
+    "cameraOpen": "Escanear com a câmera",
+    "cameraClose": "Fechar câmera",
+    "chooseTitle": "Qual deles você contou?",
+    "chooseHint": "Este código corresponde a várias linhas desta contagem. Escolha a que está na sua mão — ela conta mais um e é salva.",
+    "expires": "vence em {{date}}"
+  },
+  "shelf": {
+    "hint": "Escaneie a etiqueta de um local para contar local por local.",
+    "counting": "Contando o local:",
+    "leave": "Local inteiro",
+    "outside": "Este local não faz parte da contagem de {{location}}.",
+    "empty": "Nada era esperado neste local. Escaneie o que estiver aí.",
+    "hidden": "Os filtros acima ocultam as linhas deste local.",
+    "close": "Encerrar local",
+    "closeTitle": "Encerrar este local?",
+    "closeUncounted_one": "Uma linha em {{location}} não foi contada. Encerrar o local a conta como 0 — uma falta no relatório.",
+    "closeUncounted_other": "{{count}} linhas em {{location}} não foram contadas. Encerrar o local as conta como 0 — faltas no relatório.",
+    "closeEmpty": "Nada foi encontrado em {{location}}. Confirmar como contado e vazio?",
+    "closeCounted": "Todas as linhas em {{location}} foram contadas. Encerrar o local?",
+    "closeConfirm": "Encerrar local",
+    "closeUnsaved_one": "Um número neste local não foi salvo. Salve-o antes de encerrar o local.",
+    "closeUnsaved_other": "{{count}} números neste local não foram salvos. Salve-os antes de encerrar o local.",
+    "closedDone_one": "{{location}} encerrado: uma linha contada como 0.",
+    "closedDone_other": "{{location}} encerrado: {{count}} linhas contadas como 0.",
+    "closedEmptyDone": "{{location}} confirmado como vazio.",
+    "closedCountedDone": "{{location}} encerrado.",
+    "closedBy": "Encerrado por {{name}}",
+    "closedEmptyBy": "Confirmado como vazio por {{name}}"
+  },
+  "count": {
+    "action": "Contar um local",
+    "title": "Contar um local",
+    "intro": "Escaneie a etiqueta do local ou escolha-o na lista. Você conta o que está lá; as diferenças são salvas como um único ajuste de estoque para o escritório.",
+    "scanLabel": "Etiqueta do local",
+    "searchLabel": "Encontrar um local",
+    "searchPlaceholder": "Pesquisar locais",
+    "noMatchTitle": "Nenhum local encontrado",
+    "noMatchDescription": "Tente outra parte do nome ou escaneie a etiqueta do local.",
+    "blind": "Contagem cega: ocultar o que o sistema espera",
+    "start": "Contar {{location}}",
+    "chooseFirst": "Escolha um local para contar",
+    "name": "Contagem: {{location}} — {{date}}",
+    "neverCounted": "Nunca contado",
+    "countedToday": "Contado hoje",
+    "lastCounted_one": "Última contagem há {{count}} dia",
+    "lastCounted_other": "Última contagem há {{count}} dias",
+    "underWay": "Sendo contado",
+    "noPlacesTitle": "Nenhum local para contar ainda",
+    "noPlacesDescription": "Adicione um local e coloque mercadorias nele, e ele poderá ser contado aqui."
+  },
+  "posting": {
+    "adjusted": "As diferenças foram lançadas como ajuste de estoque",
+    "noDifferences": "Contado, sem diferenças: o estoque já estava certo."
+  },
+  "settings": {
+    "countEveryDays": "Contar cada local a cada (dias)",
+    "countEveryDaysDescription": "Cada local que contém estoque aparece em A fazer depois desse número de dias desde a última contagem. 0 desativa."
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "launcher": {
+    "title": "Início",
+    "description": "Visão geral do seu espaço de trabalho",
+    "welcome": "Boas-vindas, {{name}}",
+    "joinedOrganization": "Você entrou em {{organization}}",
+    "createdOrganization": "Você configurou {{organization}}",
+    "welcomeBack": "Que bom ver você de novo, {{name}}",
+    "workspaceOverview": "Visão geral do seu espaço de trabalho",
+    "alerts": "Alertas",
+    "recentItems": "Visitados recentemente",
+    "browseApps": "Explorar aplicativos",
+    "noActions": "Todas as tarefas concluídas",
+    "emptyRecent": "Nenhum item recente ainda",
+    "actionItems": {
+      "title": "A fazer",
+      "subtitle": "{{count}} pendentes nos módulos ativados",
+      "subtitle_one": "{{count}} pendente nos módulos ativados",
+      "subtitle_other": "{{count}} pendentes nos módulos ativados"
+    }
+  },
+  "sections": {
+    "core": "Essenciais",
+    "business": "Negócios",
+    "analytics": "Análises",
+    "integrations": "Integrações",
+    "system": "Sistema"
+  },
+  "workspace": {
+    "current": "Atual",
+    "apply": "Aplicar",
+    "reapply": "Aplicar novamente",
+    "reapplyHint": "Executa a configuração deste perfil de novo — nenhum módulo é adicionado ou removido",
+    "target": "Destino: {{name}}",
+    "loading": "Carregando perfis…",
+    "empty": "Nenhum perfil disponível.",
+    "diffTitle": "O que vai mudar",
+    "diffSubtitle": "De {{from}} para {{to}}",
+    "diffEnable": "Ativar",
+    "diffDisable": "Desativar",
+    "diffCascade": "Desativação em cascata",
+    "diffUnchanged": "Sem alteração",
+    "diffConfig": "Redefinir configurações de",
+    "confirmTitle": "Mudar para {{name}}?",
+    "confirmMessage": "Módulos serão ativados e desativados para a sua organização. Você pode voltar atrás a qualquer momento.",
+    "confirmApply": "Mudar de perfil",
+    "confirmReapplyTitle": "Executar a configuração de {{name}} de novo?",
+    "confirmReapplyMessage": "Nenhum módulo é adicionado ou removido. A configuração do modo de trabalho é executada novamente: as configurações padrão voltam aos valores do modo, e os nomes que ela criou — inclusive os tipos de local — são reescritos no idioma desta sessão.",
+    "confirmReapply": "Executar configuração de novo",
+    "previewLoading": "Calculando alterações…",
+    "diffManualKept": "Mantidos (adicionados manualmente)",
+    "diffCascadeHint": "Desativados porque exigem um módulo removido",
+    "diffConfigHint": "Os padrões do perfil vão sobrescrever as configurações atuais",
+    "renumberOffer": "Seus locais mantêm os códigos e as etiquetas. Para códigos no formato A-02-01, escolha Renumerar por modelo em Configuração → Códigos, etiquetas e ordem de percurso dos locais; as etiquetas antigas continuam sendo escaneadas."
+  },
+  "activeProfile": {
+    "change": "Alterar"
+  }
+}

@@ -1,0 +1,540 @@
+{
+  "launcher": {
+    "title": "Fabrication",
+    "description": "Fabrication pour la vente : nomenclatures (BOM), coûts et ordres"
+  },
+  "navigation": {
+    "production": "Ordres de fabrication",
+    "catalog": "Formules",
+    "settings": "Paramètres"
+  },
+  "productionList": {
+    "title": "Ordres de fabrication",
+    "subtitle": "Ordres planifiés et terminés, avec leur coût et leur résultat.",
+    "newProduction": "Nouvelle production",
+    "searchPlaceholder": "Rechercher par produit fabriqué…",
+    "loading": "Chargement des ordres…",
+    "error": "Impossible de charger les ordres de production",
+    "empty": {
+      "title": "Aucun ordre de production",
+      "subtitle": "Planifiez un ordre pour consommer des ingrédients et créer la sortie."
+    },
+    "noMatches": {
+      "title": "Aucun ordre correspondant",
+      "subtitle": "Rien ne correspond à ces filtres. Essayez de les élargir."
+    },
+    "card": {
+      "qty": "Prévue",
+      "cost": "Coût",
+      "resultPerUnit": "({{amount}} / unité)",
+      "shortage_one": "Stock insuffisant : {{count}} ingrédient manquant. La clôture sera refusée.",
+      "shortage_other": "Stock insuffisant : {{count}} ingrédients manquants. La clôture sera refusée."
+    },
+    "sortLabel": "Trier",
+    "sort": {
+      "newest": "Plus récents",
+      "oldest": "Plus anciens",
+      "costDesc": "Coût le plus élevé"
+    },
+    "dateFrom": "De",
+    "dateTo": "À",
+    "resetFilters": "Réinitialiser",
+    "status": {
+      "all": "Tous",
+      "draft": "Brouillon",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "reversed": "Contrepassé"
+    },
+    "duplicate": "Dupliquer",
+    "viewRecipe": "Voir la formule",
+    "table": {
+      "product": "Produit",
+      "status": "Statut",
+      "date": "Créé le",
+      "actions": "Actions"
+    }
+  },
+  "preview": {
+    "title": "Aperçu de production",
+    "subtitle": "Coûts et consommation d'ingrédients — aucune modification du stock.",
+    "loadFailed": "Impossible de charger l'aperçu des coûts",
+    "totalCost": "Coût total",
+    "unitCostHint": "Quantité",
+    "missingTitle": "Ingrédients sans prix",
+    "ingredients": "Ingrédients",
+    "chart": {
+      "title": "Part du coût",
+      "empty": "Aucun ingrédient n'a encore de prix — rien à représenter."
+    }
+  },
+  "create": {
+    "title": "Enregistrer une production",
+    "subtitle": "Enregistrez ce que vous avez fabriqué, ou planifiez une production. Ce qu’elle consomme, ce qui manque et ce qu’elle coûte s’affichent à côté du formulaire avant l’enregistrement.",
+    "productLabel": "Produit de sortie",
+    "searchPlaceholder": "Rechercher par nom, SKU ou code-barres…",
+    "change": "Modifier",
+    "qtyLabel": "Combien fabriquer ?",
+    "storageLabel": "Emplacement cible",
+    "storagePlaceholder": "Sélectionner l'emplacement cible",
+    "storageSearchPlaceholder": "Rechercher par nom ou chemin…",
+    "storageEmpty": "Aucun emplacement correspondant",
+    "notesLabel": "Notes (optionnel)",
+    "notesPlaceholder": "Notes internes sur cet ordre…",
+    "hints": {
+      "product": "Sélectionnez un produit de sortie pour activer l’aperçu.",
+      "quantity": "Saisissez une quantité prévue supérieure à zéro pour activer l’aperçu.",
+      "storage": "Sélectionnez un emplacement de destination pour activer l’aperçu."
+    },
+    "preview": "Aperçu des coûts",
+    "creating": "Création…",
+    "cancel": "Annuler",
+    "success": "Ordre de production créé",
+    "errors": {
+      "missingFields": "Choisissez produit, quantité et emplacement.",
+      "create": "Impossible de créer l'ordre"
+    },
+    "hasBom": "A une formule",
+    "mode": {
+      "label": "Que voulez-vous enregistrer ?",
+      "made": "Déjà fabriqué",
+      "planned": "À fabriquer"
+    },
+    "qtyLabelMade": "Combien en est sorti ?",
+    "batchHintMade": "La formule est pour {{batch}}. Saisissez ce qui est sorti, pas le nombre de lots.",
+    "batchHintPlanned": "La formule est pour {{batch}}. Saisissez combien fabriquer, pas le nombre de lots.",
+    "dateLabel": "Quand",
+    "submitMade": "Enregistrer comme fabriqué",
+    "submitNeedsBom": "Il faut d'abord une nomenclature",
+    "submitNeedsIngredients": "Ajoutez d'abord des ingrédients à la nomenclature",
+    "submitPlanned": "Planifier",
+    "successMade": "Production enregistrée",
+    "needs": {
+      "pick": "Choisissez un produit, une quantité et un emplacement pour voir ce que la production demande.",
+      "loading": "Vérification du stock…",
+      "headingMade": "Sortira du stock",
+      "headingPlanned": "Sera nécessaire",
+      "have": "{{have}} en stock",
+      "short": "{{have}} en stock, il manque {{short}}",
+      "unknown": "{{have}} en stock, dans une unité impossible à comparer à la formule",
+      "unnamed": "Ingrédient sans nom",
+      "unitFallback": "unité",
+      "cost": "Vous coûte {{unitCost}} par {{unit}} · {{total}} au total",
+      "marginLeft": "Vous vendez à {{price}} : il reste {{result}} sur chaque {{unit}} fabriqué.",
+      "marginLost": "Vous vendez à {{price}}, soit {{result}} par {{unit}} sous le coût.",
+      "savingsLeft": "En magasin, il coûte {{price}} : vous économisez {{result}} sur chaque {{unit}} fabriqué.",
+      "savingsLost": "En magasin, il coûte {{price}}, soit {{result}} par {{unit}} de moins que la fabrication.",
+      "enough": "Tout est en stock.",
+      "unmeasurable": "L’unité d’un ingrédient ne peut pas être comparée à son stock : on ne sait pas quoi retirer. Corrigez d’abord l’unité dans la formule.",
+      "shortMade": "C’est déjà fabriqué, les ingrédients étaient donc là — le stock enregistré est trop bas. La production est enregistrée et les ingrédients manquants sont mis à compter.",
+      "shortPlanned": "Il manque des ingrédients pour cette production. Vous pouvez la planifier maintenant et acheter ce qui manque.",
+      "addOne": "Ajouter {{quantity}} de {{name}} à la liste de courses",
+      "addAll": "Ajouter ce qui manque à la liste de courses",
+      "added": "Ajouté à {{name}}",
+      "alreadyListed": "Déjà sur la liste de courses",
+      "addFailed": "Impossible d’ajouter à la liste de courses"
+    }
+  },
+  "createRecipe": {
+    "title": "Nouvelle formule",
+    "subtitle": "Choisissez le produit de sortie et donnez un nom à la formule.",
+    "nameLabel": "Nom de la formule",
+    "namePlaceholder": "Nom de la formule…",
+    "batchYieldLabel": "La formule donne",
+    "create": "Créer la formule",
+    "creating": "Création…",
+    "success": "Formule créée",
+    "errors": {
+      "productRequired": "Choisissez d'abord le produit de sortie.",
+      "nameRequired": "Le nom de la formule est requis.",
+      "create": "Impossible de créer la formule"
+    },
+    "batchYieldHint": "Ce que donne un lot, dans l'unité du produit. Vide signifie 1.",
+    "unitLabel": "Unité",
+    "unitFirst": "Choisissez d'abord l'unité à côté de la quantité."
+  },
+  "detail": {
+    "title": "Ordre de production",
+    "subtitle": "Vérifiez ingrédients, coûts et statut.",
+    "back": "Retour à la liste",
+    "loading": "Chargement de l'ordre…",
+    "complete": "Terminer l'ordre",
+    "cancel": "Annuler l'ordre",
+    "completeSuccess": "Production terminée",
+    "cancelSuccess": "Production annulée",
+    "cancelNeedsManager": "Annuler un ordre de production relève d'un responsable — demandez à quelqu'un qui peut gérer la production.",
+    "completeConfirm": {
+      "title": "Terminer l'ordre ?",
+      "description": "Consomme les ingrédients listés et fabrique le produit. Tant que rien de ce qu'elle a fabriqué n'a été utilisé, « Annuler la production » la reprend.",
+      "actualQtyLabel": "Quantité réelle produite (facultatif)",
+      "actualQtyHint": "Laisser vide pour la quantité prévue. Moins pour les pertes, plus pour la surproduction. Les ingrédients sont consommés comme prévu, quelle que soit la quantité réelle."
+    },
+    "cancelConfirm": {
+      "title": "Annuler l'ordre ?",
+      "description": "L'annulation marque le brouillon comme annulé. Aucun mouvement de stock.",
+      "confirm": "Oui, annuler"
+    },
+    "reverseConfirm": {
+      "title": "Annuler cette production ?",
+      "description": "Les ingrédients retournent aux emplacements et aux lots d'où ils ont été pris, et ce que la production a fabriqué quitte son emplacement. La production reste enregistrée, marquée comme contrepassée.",
+      "confirm": "Oui, annuler la production"
+    },
+    "card": {
+      "totalCost": "Coût total",
+      "totalCostUndone": "Coût avant l'annulation de la production",
+      "created": "Créé",
+      "productionDate": "Date de production",
+      "notes": "Notes",
+      "actualQty": "Production réelle",
+      "plannedSuffix": "prévu : {{qty}}",
+      "scrap": "Perte",
+      "overproduced": "Surproduction",
+      "resultPerUnit": "({{amount}} / unité)",
+      "totalCostAfterClosing": "Coût total après clôture",
+      "unitCost": "{{amount}} par unité produite",
+      "totalCostGap_one": "{{count}} ingrédient a été prélevé sur un stock sans coût, il manque donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
+      "totalCostGap_other": "{{count}} ingrédients ont été prélevés sur un stock sans coût, ils manquent donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs."
+    },
+    "ingredients": "Ingrédients consommés",
+    "emptyLines": "Aucun ingrédient n'a été enregistré pour cet ordre.",
+    "plannedIngredients": "Consommation prévue",
+    "plannedIngredientsHint": "Ce que cet ordre prendra. Rien n'est encore sorti du stock. Les quantités sont lues dans la formule au moment de la clôture : modifier la formule change un brouillon ouvert.",
+    "emptyLinesPlanned": "Cet ordre ne consommerait rien — sa formule ne liste aucun ingrédient.",
+    "cancelReason": "Motif d'annulation",
+    "cancelReasonPlaceholder": "Motif (facultatif)…",
+    "producedItem": "Produit fini",
+    "viewProducedItem": "Voir le produit",
+    "stockMoves": "Mouvements de stock",
+    "stockMove": {
+      "dir": "Mouvement",
+      "product": "Produit / lot",
+      "lot": "Lot",
+      "unknownProduct": "Produit inconnu",
+      "qty": "Qté"
+    },
+    "line": {
+      "ingredient": "Ingrédient",
+      "qty": "Quantité consommée",
+      "unitCost": "Coût unitaire",
+      "lineCost": "Coût de la ligne",
+      "unknownLocation": "Emplacement inconnu",
+      "qtyLabel": "Qté par lot",
+      "yieldLabel": "Perte de rendement %",
+      "saved": "Ligne mise à jour",
+      "saveFailed": "Échec de la mise à jour de la ligne",
+      "shortLabel": "manque",
+      "unmeasurableShort": "manquant — non comparable avec l'unité de stock",
+      "shortfall": "{{quantity}} hors du stock enregistré — à compter"
+    },
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "saveFailed": "Échec de l'enregistrement de l'ordre",
+    "cancelEdit": "Abandonner les modifications",
+    "duplicate": "Dupliquer",
+    "duplicated": "Commande dupliquée",
+    "duplicateFailed": "Échec de la duplication de l'ordre",
+    "plannedQty": "Quantité prévue",
+    "productionDate": "Date de production",
+    "notes": "Notes",
+    "tabs": {
+      "composition": "Composition",
+      "cost": "Coût & résultat",
+      "history": "Historique"
+    },
+    "sourceRecipe": "Basé sur une recette (instantané du {{date}})",
+    "setAsDefault": "Définir par défaut",
+    "setDefaultSuccess": "Formule par défaut définie",
+    "setDefaultFailed": "Impossible de définir la formule par défaut",
+    "deleteRecipe": "Supprimer la formule",
+    "recipeDeleted": "Formule supprimée",
+    "recipeDeleteFailed": "Échec de la suppression de la formule",
+    "processSteps": "Étapes de production",
+    "cost": {
+      "fixedCosts": "Coûts fixes / lot",
+      "referencePrice": "Prix de référence",
+      "perBatch": "par lot",
+      "perYieldUnit": "par unité — un lot donne {{qty}}",
+      "noFixed": "Aucun coût fixe défini",
+      "ingredients": "Ingrédients",
+      "emptyLines": "Rien à chiffrer — ajoutez des ingrédients dans l’onglet Composition.",
+      "total": "Total",
+      "addLine": "Ajouter une ligne de coût",
+      "lineSaved": "Ligne de coût enregistrée",
+      "lineSaveFailed": "Impossible d'enregistrer la ligne de coût",
+      "lineDeleted": "Ligne de coût supprimée",
+      "lineDeleteFailed": "Impossible de supprimer la ligne de coût",
+      "lineKind": "Type",
+      "lineLabel": "Libellé",
+      "lineLabelPlaceholder": "p. ex. électricité du four",
+      "lineAmount": "Montant (par lot)",
+      "editReferencePrice": "Modifier le prix de référence",
+      "referencePriceSaved": "Prix de référence enregistré",
+      "referencePriceSaveFailed": "Impossible d'enregistrer le prix de référence",
+      "kind": {
+        "LABOR": "Main-d'œuvre",
+        "PACKAGING": "Emballage",
+        "OVERHEAD": "Frais généraux",
+        "OTHER": "Autre"
+      },
+      "deleteConfirm": {
+        "title": "Supprimer la ligne de coût ?",
+        "description": "Retirer « {{label}} » des coûts fixes ?"
+      }
+    },
+    "history": {
+      "title": "Historique de production",
+      "empty": "Aucun ordre de production pour cette formule pour l'instant.",
+      "date": "Date",
+      "status": "Statut",
+      "made": "Produit",
+      "unitCostColumn": "Coût unitaire",
+      "resultColumn": "{{result}} / unité",
+      "totalColumn": "Coût du lot",
+      "open": "Ouvrir l'ordre de production"
+    },
+    "completeFailed": "Échec de la clôture de la production",
+    "emptyBom": "Cette formule ne contient aucun ingrédient — l'ordre produirait des biens à partir de rien. Ajoutez d'abord des ingrédients.",
+    "emptyBomAction": "Ajouter des ingrédients",
+    "noBom": "Ce produit n'a pas de formule — l'ordre n'a rien à consommer. Créez d'abord une formule.",
+    "noBomAction": "Créer une formule",
+    "cancelFailed": "Échec de l'annulation de la production",
+    "reverse": "Annuler la production",
+    "reverseNeedsManager": "Annuler une production terminée revient à un responsable — demandez à une personne qui peut gérer la production.",
+    "reverseSuccess": "Production annulée",
+    "reverseFailed": "Impossible d'annuler la production",
+    "yieldSaved": "Rendement mis à jour",
+    "yieldSaveFailed": "Impossible de mettre à jour le rendement",
+    "processStepsEmpty": "Aucune étape de processus",
+    "processStepsEdit": "Modifier les étapes",
+    "processStepsEditStep": "Étape {{number}}",
+    "processStepsAdd": "Ajouter une étape",
+    "processStepsAddPlaceholder": "Décrivez l'étape — Entrée = nouvelle ligne, Ctrl+Entrée ajoute",
+    "processStepsSaved": "Étapes de processus enregistrées",
+    "processStepsSaveFailed": "Impossible d'enregistrer les étapes de processus",
+    "processStepsAddFirst": "Ajouter des étapes",
+    "plannedSummary": "Prévu {{qty}}",
+    "deleteConfirm": {
+      "title": "Supprimer cette formule ?",
+      "description": "Ses ingrédients et ses étapes disparaissent avec elle. Les ordres de production déjà enregistrés sont conservés."
+    },
+    "notFound": "Ordre de production introuvable",
+    "plannedShortageHint_one": "La consommation prévue dépasse le stock — il manque {{count}} ingrédient. La clôture de cette production sera refusée.",
+    "plannedShortageHint_other": "La consommation prévue dépasse le stock — il manque {{count}} ingrédients. La clôture de cette production sera refusée."
+  },
+  "bom": {
+    "childLabel": "Ingrédient",
+    "qtyLabel": "Qté",
+    "unitLabel": "Unité",
+    "yieldLabel": "Perte %",
+    "yieldHint": "Une valeur de planification : combien réserver en plus pour que le plan tienne. Laisser 0 est normal — la perte réelle se mesure à la clôture de l'ordre, en saisissant la quantité réellement obtenue.",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Notes optionnelles…",
+    "add": "Ajouter une ligne",
+    "adding": "Ajout…",
+    "childPlaceholder": "Rechercher un ingrédient…",
+    "treeToggle": "Vue multi-niveaux",
+    "treeHint": "La seule vue qui montre une formule imbriquée dans une autre, et le seul endroit où une ligne peut changer de parent. Utile dès qu'un composant a lui-même une formule.",
+    "childClear": "Effacer",
+    "unitMustBeConvertible": "Seules les unités convertibles en {{unit}} sont proposées — une ligne que le fabricant ne peut pas convertir est refusée."
+  },
+  "composition": {
+    "ingredientsTitle": "Ingrédients",
+    "perBatchHint": "Quantités pour un lot.",
+    "batchYield": "La formule donne {{qty}}",
+    "batchYieldLabel": "La formule donne",
+    "batchYieldEdit": "Modifier ce que donne la formule",
+    "batchYieldHint": "Ce que donne un lot de cette formule. Coût unitaire = coût du lot ÷ ce nombre.",
+    "addIngredient": "Ajouter un ingrédient",
+    "moreFields": "Plus",
+    "removeIngredient": "Retirer",
+    "ingredientAdded": "Ingrédient ajouté",
+    "ingredientRemoved": "Ingrédient retiré",
+    "emptyLines": "Aucun ingrédient — ajoutez le premier ci-dessous.",
+    "introduction": "Une formule est la liste de ce qui entre dans un lot de ce produit. Les coûts de l'onglet « Coût et résultat » en sont issus, et le stock en est sorti à la clôture d'un ordre de production.",
+    "removeConfirm": {
+      "title": "Retirer l'ingrédient ?",
+      "description": "Retirer \"{{name}}\" de cette formule ?"
+    },
+    "errors": {
+      "addIngredient": "Impossible d'ajouter l'ingrédient",
+      "duplicateIngredient": "Cette formule contient déjà cet ingrédient.",
+      "removeIngredient": "Impossible de retirer l'ingrédient",
+      "yieldInvalid": "La quantité que donne la formule doit être supérieure à zéro."
+    }
+  },
+  "tree": {
+    "title": "Nomenclature multi-niveaux",
+    "hint": "Glissez une ligne sur une autre pour l'imbriquer.",
+    "empty": "Aucun composant pour l'instant. Ajoutez-les dans la section ci-dessus ; ils apparaissent ici dès qu'il y a quelque chose à imbriquer.",
+    "loading": "Chargement de l'arbre…",
+    "error": "Impossible de charger l'arbre",
+    "moved": "Ligne déplacée",
+    "moveError": "Échec du déplacement",
+    "dropHint": "Glisser pour déplacer"
+  },
+  "pricing": {
+    "title": "Calculateur de prix de vente",
+    "subtitle": "Modèle de marge brute — faites glisser le curseur pour voir le prix suggéré.",
+    "currentDefault": "Marge enregistrée",
+    "isDefault": "(par défaut système)",
+    "qtyLabel": "Quantité produite",
+    "marginLabel": "Marge cible (%)",
+    "preview": "Calculer le prix",
+    "calculating": "Calcul…",
+    "totalCost": "Coût total",
+    "suggestedPrice": "Prix de vente suggéré",
+    "close": "Fermer",
+    "saveDefault": "Enregistrer par défaut",
+    "saving": "Enregistrement…",
+    "saved": "Marge par défaut enregistrée",
+    "saveFailed": "Échec de l'enregistrement de la marge par défaut",
+    "openButton": "Prix de vente",
+    "errors": {
+      "qty": "La quantité doit être > 0.",
+      "compute": "Impossible de calculer le prix"
+    },
+    "unitCostEstimated": "Coût unitaire estimé"
+  },
+  "bomEntry": {
+    "columnHeader": "Formule",
+    "editRecipe": "Modifier la formule",
+    "createRecipe": "Créer la formule",
+    "openRecipe": "Ouvrir la formule de ce produit"
+  },
+  "catalog": {
+    "title": "Formules",
+    "subtitle": "Fabrication pour la vente : formules avec coûts, marges et stock",
+    "searchPlaceholder": "Rechercher des formules…",
+    "sortLabel": "Trier par",
+    "default": "Défaut",
+    "produce": "Produire",
+    "addIngredients": "Ajouter des ingrédients",
+    "details": "Détails",
+    "unitCost": "Coût unitaire",
+    "unitCostIncomplete_one": "1 ingrédient de la dernière production n'a pas de prix d'achat enregistré.",
+    "unitCostIncomplete_other": "{{count}} ingrédients de la dernière production n'ont pas de prix d'achat enregistré.",
+    "stock": "Stock",
+    "lastProduced": "Dernière production",
+    "ingredientCount": "{{count}} ingrédients",
+    "ingredientCount_one": "{{count}} ingrédient",
+    "ingredientCount_other": "{{count}} ingrédients",
+    "viewProduction": "Ordres de production",
+    "newRecipe": "Nouvelle formule",
+    "empty": {
+      "title": "Aucune formule pour l'instant",
+      "subtitle": "Créez votre première formule pour commencer à suivre les coûts de production.",
+      "cta": "Nouvelle formule"
+    },
+    "sort": {
+      "newest": "Plus récentes",
+      "oldest": "Plus anciennes",
+      "name": "Nom"
+    },
+    "noMatches": {
+      "title": "Aucune formule correspondante",
+      "subtitle": "Rien trouvé pour « {{query}} ». Essayez une phrase plus courte."
+    },
+    "table": {
+      "name": "Nom",
+      "ingredients": "Ingrédients",
+      "availability": "Disponibilité",
+      "actions": "Actions"
+    },
+    "unitCostAfterRun": "Coût unitaire après la dernière production",
+    "unitCostEstimated": "Coût unitaire estimé",
+    "estimateCostIncomplete_one": "1 ingrédient de cette estimation n'a pas de prix d'achat enregistré.",
+    "estimateCostIncomplete_other": "{{count}} ingrédients de cette estimation n'ont pas de prix d'achat enregistré."
+  },
+  "settings": {
+    "title": "Paramètres de production",
+    "loading": "Chargement des paramètres…",
+    "referenceDirection": "À quoi le résultat est comparé",
+    "referenceDirectionHint": "Marge si vous vendez ce que vous fabriquez ; économie si vous le fabriquez au lieu de l'acheter. Le prix de référence de chaque formule est alors votre prix de vente ou le prix en magasin.",
+    "allowOverproduction": "Autoriser la surproduction",
+    "allowOverproductionHint": "Si activé, la clôture d'un ordre peut enregistrer plus que prévu.",
+    "saved": "Paramètres enregistrés",
+    "saveFailed": "Échec de l'enregistrement",
+    "availabilityCheckScope": "Portée de la vérification",
+    "availabilityCheckScopeHint": "Global compte le stock de tous les emplacements ensemble ; par emplacement vérifie chaque emplacement séparément.",
+    "scopeGlobal": "Global",
+    "scopePerLocation": "Par emplacement",
+    "createOnShortageStrategy": "Stratégie de pénurie",
+    "createOnShortageStrategyHint": "Ce qui se passe quand un ordre est créé sans assez d'ingrédients : l'autoriser, avertir ou le bloquer.",
+    "strategyAllow": "Autoriser",
+    "strategyWarn": "Avertir",
+    "strategyBlock": "Bloquer",
+    "subtitle": "Ce que signifie le résultat et comment la production traite les manques.",
+    "whereReferenceDirection": "Le résultat porte ce nom sur les fiches des formules, les ordres de fabrication et le récapitulatif mensuel.",
+    "immediateNote": "Chaque choix est enregistré immédiatement. Il n'y a pas d'annulation — revenez en arrière de la même façon.",
+    "advanced": "Avancé",
+    "advancedHint": "Règles pour les manques et la surproduction. Les valeurs par défaut conviennent à un petit atelier."
+  },
+  "availability": {
+    "maxBatches": "Max. lots en stock",
+    "shortageList": "Liste des manques",
+    "ingredient": "Ingrédient",
+    "needed": "Besoin",
+    "available": "Disponible",
+    "short": "Manque",
+    "notConvertible": "unités incompatibles",
+    "blocked": "Création impossible — ingrédients manquants",
+    "blockedHint": "Réapprovisionnez ces ingrédients ou modifiez la stratégie dans les paramètres.",
+    "warnTitle": "Certains ingrédients manquent",
+    "warnHint": "Vous pouvez créer le brouillon — la disponibilité sera revérifiée à l'achèvement.",
+    "warnConfirm": "Créer quand même",
+    "completeShortage": "Achèvement impossible — stock insuffisant",
+    "completeShortageHint": "Ces ingrédients sont épuisés depuis la création du brouillon.",
+    "unknown_one": "{{count}} ingrédient non comparable",
+    "unknown_other": "{{count}} ingrédients non comparables",
+    "shortUnknown": "inconnu",
+    "completeShortageHintNever": "Ces ingrédients n'ont jamais suffi pour cette campagne — elle a été créée au-dessus du stock."
+  },
+  "widget": {
+    "title": "{{result}} par mois",
+    "viewAll": "Production",
+    "hintSource": "Défini dans les paramètres du module Production",
+    "orders_one": "{{count}} opération",
+    "orders_other": "{{count}} opérations",
+    "empty": "Aucune opération terminée avec résultat pour l'instant."
+  },
+  "whereUsed": {
+    "title": "Utilisé dans des formules",
+    "perBatch": "{{qty}} par lot"
+  },
+  "permissions": {
+    "read": "Consulter la production",
+    "readDesc": "Peut consulter les formules, coûts et ordres de fabrication",
+    "write": "Exécuter la production",
+    "writeDesc": "Peut créer des ordres de fabrication et clôturer des campagnes — cela déplace du stock",
+    "manage": "Gérer les formules et les réglages",
+    "manageDesc": "Peut modifier les formules, les étapes de processus et les réglages du module, et annuler des campagnes — une formule décide ce que la production prend du stock"
+  },
+  "bomDetail": {
+    "notFound": "Formule introuvable",
+    "back": "Retour aux formules",
+    "loading": "Chargement de la formule…"
+  },
+  "costSource": {
+    "avco": "moyenne des couches",
+    "fifo": "coût réel (FIFO)",
+    "none": "aucun coût enregistré pour ce stock"
+  },
+  "cost": {
+    "gap": {
+      "partial_one": "1 ingrédient n'a pas de taux, il manque donc dans ce montant.",
+      "partial_other": "{{count}} ingrédients n'ont pas de taux, ils manquent donc dans ce montant.",
+      "none_one": "Le seul ingrédient n'a pas de taux — il n'y a rien à additionner.",
+      "none_other": "Aucun des {{count}} ingrédients n'a de taux — il n'y a rien à additionner."
+    }
+  },
+  "result": {
+    "margin": {
+      "label": "Marge",
+      "definition": "Prix de vente moins le coût de fabrication"
+    },
+    "savings": {
+      "label": "Économie vs prix en magasin",
+      "definition": "Prix en magasin moins le coût de fabrication"
+    }
+  }
+}

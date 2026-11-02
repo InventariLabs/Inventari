@@ -1,0 +1,16 @@
+<div class="party-box">
+  <h3>Magazyn docelowy</h3>
+  {% if target_location %}
+  <div class="party-name">{{ target_location }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>
+<div class="party-box">
+  <h3>Osoba odpowiedzialna</h3>
+  {% if partner %}
+  <div class="party-name">{{ partner.name }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

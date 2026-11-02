@@ -1,0 +1,217 @@
+{
+  "enabled": "Enabled",
+  "errors": {
+    "updateFailed": "Failed to update module status"
+  },
+  "success": {
+    "enabled": "Module {{name}} enabled",
+    "disabled": "Module {{name}} disabled"
+  },
+  "modules": {
+    "core": {
+      "title": "Home & Kitchen",
+      "desc": "Fridge, Pantry, and basic products."
+    },
+    "shopping_lists": {
+      "name": "Shopping Lists",
+      "description": "Create and manage shopping lists with automatic suggestions."
+    },
+    "vision": {
+      "name": "Photo Recognition",
+      "description": "Reads a product's name, brand and expiry date off a photo of its label. Switched off, adding a product loses its photo tab and nutrition tables have to be typed in."
+    },
+    "stats": {
+      "name": "Statistics",
+      "description": "Advanced consumption analysis and waste tracking."
+    },
+    "stock_takes": {
+      "name": "Stock Takes",
+      "description": "Periodic inventory checks to verify stock accuracy."
+    },
+    "partners": {
+      "name": "Partners",
+      "description": "Manage suppliers, customers, and service providers for B2B workflows."
+    },
+    "recipes": {
+      "name": "Recipes",
+      "description": "Create and manage recipes with ingredient tracking."
+    },
+    "equipment": {
+      "name": "Equipment Tracking",
+      "description": "Track IT and physical assets with lifecycle management."
+    },
+    "example_widgets": {
+      "name": "Example Widgets",
+      "description": "Reference module demonstrating Inventari module patterns: manage simple widgets with a name, color, and quantity."
+    },
+    "warehouse": {
+      "name": "Warehouse",
+      "description": "Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules."
+    },
+    "purchase_orders": {
+      "name": "Purchase Orders",
+      "description": "Create and track purchase orders with suppliers."
+    },
+    "printing": {
+      "name": "Label Printing",
+      "description": "Generate and print labels for products and locations."
+    },
+    "nutrition": {
+      "name": "Nutrition Info",
+      "description": "Display nutritional data and ingredients from Open Food Facts."
+    },
+    "approvals": {
+      "name": "Approvals",
+      "description": "Multi-stage approval workflows for critical operations."
+    },
+    "webhooks": {
+      "name": "Webhooks",
+      "description": "Outbound HTTP notifications about events in your workspace."
+    },
+    "api_keys": {
+      "name": "API Keys",
+      "description": "Programmatic access via REST API keys."
+    },
+    "maker": {
+      "name": "Production",
+      "description": "Production runs, bills of materials (BOM), and cost rollup."
+    },
+    "items": {
+      "name": "Inventory"
+    }
+  },
+  "config": {
+    "connectionsTitle": "AI Connections",
+    "connectionsDescription": "Pool of LLM connections shared across modules. Bind one to each purpose below.",
+    "addConnection": "Add connection",
+    "editConnection": "Edit connection",
+    "deleteConnection": "Delete connection",
+    "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "formDescription": "Configure an LLM endpoint. The pool is shared across all AI features.",
+    "fieldName": "Name",
+    "fieldNamePlaceholder": "e.g. Storeroom shelf sensor",
+    "fieldProvider": "Provider",
+    "fieldApiKey": "API key",
+    "fieldApiKeyDocs": "Where to get your {{provider}} key",
+    "fieldApiKeyPlaceholder": "sk-or-v1-…",
+    "fieldBaseUrl": "API base URL",
+    "localEngineHint": "A local engine runs on a private address, which the server refuses until an operator allows it: set LLM_ALLOW_PRIVATE_NETWORKS=true and restart the backend. Keep the host.docker.internal address — from inside the container, localhost is the container itself.",
+    "fieldModel": "Model",
+    "fieldCapabilities": "Capabilities",
+    "capability": {
+      "vision": "Vision",
+      "text": "Text",
+      "url_fetch": "Page reading"
+    },
+    "noConnections": "No connections yet",
+    "noConnectionsHint": "Add a connection to start using AI features (Vision, Recipes, …).",
+    "bindingsTitle": "Default per purpose",
+    "boundHere": "Active for this purpose",
+    "noBinding": "Not configured",
+    "cannotDeleteBound": "This connection is bound to a purpose. Unbind it first.",
+    "noEligibleConnections": "No connections with the {{capability}} capability yet.",
+    "noEligibleConnectionsCta": "Set one up",
+    "serverDefaultOption": "Server default model",
+    "serverDefaultHint": "Served by the server's default model. Pick a connection to use your own instead.",
+    "noConnectionsServerDefaultHint": "Some AI features already run on the server's default model. Add a connection to use your own instead.",
+    "createFailed": "Could not create connection",
+    "updateFailed": "Could not update connection",
+    "deleteFailed": "Could not delete connection",
+    "bindingFailed": "Could not update binding",
+    "deleteSuccess": "Connection deleted",
+    "loading": "Loading connections…",
+    "errorNameRequired": "Name is required",
+    "errorNameTaken": "A connection with this name already exists",
+    "errorCapabilityRequired": "Select at least one capability",
+    "groupCloud": "Cloud",
+    "groupAggregator": "Aggregator",
+    "groupSpecialist": "Specialist",
+    "groupLocal": "Local",
+    "groupCustom": "Custom",
+    "testConnection": "Test connection",
+    "testing": "Testing…",
+    "testFailed": "Connection test failed. Check credentials and base URL.",
+    "testNeedsApiKey": "Type the API key into the field above first: the test sends what is in this form, not a stored key.",
+    "testNeedsBaseUrl": "Fill in the API base URL above first: this provider is reached over HTTP, so the test needs its address.",
+    "testContractOk": "Connection works — the model answered in the expected shape. {{count}} models available.",
+    "testReadAll": "Connection works — the model read all {{of}} fields on the sample label.",
+    "testReadPartial": "The answer had the right shape, but the model read only {{matched}} of {{of}} fields on the sample label — it may be filling in values it never saw.",
+    "testContractOk_one": "Connection works — the model read the sample label. {{count}} model available.",
+    "testContractOk_other": "Connection works — the model read the sample label. {{count}} models available.",
+    "testContractFailed": "The key works, but the model did not return usable data. It replied: {{preview}}",
+    "testUnchecked": "Credentials work — {{count}} models available. The output was not checked for these capabilities.",
+    "testUnchecked_one": "Credentials work — {{count}} model available. The output was not checked for these capabilities.",
+    "testUnchecked_other": "Credentials work — {{count}} models available. The output was not checked for these capabilities.",
+    "testShapeNotEnforced": "This provider does not enforce the response shape, so the result relies on the parser and one retry. It can still fail later.",
+    "testReaderOk": "The key works — the reader fetched a test page.",
+    "testReaderFreeTier": "No key on this connection — it runs on the reader's free tier, with nothing to test.",
+    "testReaderEmpty": "The key works, but the reader brought nothing back from the test page.",
+    "providerName": {
+      "custom": "Custom OpenAI-compatible"
+    },
+    "providerDescription": {
+      "openai": "GPT-4o, GPT-4o-mini. Multimodal.",
+      "anthropic": "Claude models. Multimodal vision.",
+      "google": "Gemini 2.0 Flash / Pro. Free tier available.",
+      "openrouter": "100+ models through one key.",
+      "groq": "Fastest inference. Llama, Mixtral.",
+      "deepseek": "DeepSeek V3 / R1.",
+      "mistral": "Mistral Large, Codestral.",
+      "together": "Hosting for open-source models.",
+      "xai": "Grok models. Multimodal.",
+      "minimax": "MiniMax-M3 (1M context, multimodal). Available from China.",
+      "glm": "GLM-4V, multimodal. Free tier via glm-4v-flash. Primary in China.",
+      "mimo": "MiMo-V2.5 (310B MoE, multimodal). Xiaomi's flagship reasoning model.",
+      "jina": "Reads a web page as clean text — what recipe import runs on.",
+      "ollama": "Local OpenAI-compatible server on port 11434.",
+      "lm_studio": "Local OpenAI-compatible server on port 1234.",
+      "vllm": "Self-hosted OpenAI-compatible server.",
+      "custom": "Any other OpenAI-shaped endpoint."
+    },
+    "fieldCapabilitiesHint": "What this model can be asked for. The ticks are a suggestion from the provider — the connection test is what settles it.",
+    "purposeUnavailable": "Module off",
+    "purposeUnavailableHint": "This purpose belongs to {{module}}, which is switched off. A binding made here takes effect once the module is enabled.",
+    "capabilityUnverified": "Declared, not yet checked — run the connection test",
+    "capabilityConfirmed": "Confirmed by the connection test",
+    "capabilityFailed": "The model failed this test",
+    "capabilityFailedHint": "The model did not manage what this connection claims. It is not offered for purposes that need it until the test passes.",
+    "connectionFailedCapability": "{{names}} is not on this list: it failed the {{capability}} test."
+  },
+  "fieldBuilder": {
+    "title": "Custom Field Definitions",
+    "fieldsCount": "{{count}} defined fields",
+    "fieldsCount_one": "{{count}} defined field",
+    "fieldsCount_other": "{{count}} defined fields",
+    "fieldLabel": "Field label",
+    "placeholder": "e.g. Voltage",
+    "dataType": "Data type",
+    "addField": "Add field",
+    "addCustomField": "Add custom field",
+    "types": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "textarea": "Long text",
+      "file": "File / Attachment",
+      "money": "Money",
+      "select": "Dropdown",
+      "multi-select": "Multi-select",
+      "boolean": "Yes / No"
+    },
+    "options": {
+      "label": "Options",
+      "placeholder": "Add an option and press Enter",
+      "empty": "At least one option is required",
+      "remove": "Remove option {{name}}"
+    },
+    "errors": {
+      "alreadyExists": "A field with this name already exists",
+      "optionsRequired": "This field type requires at least one option"
+    }
+  },
+  "disabled": "Disabled"
+}

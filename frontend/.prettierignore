@@ -1,0 +1,10 @@
+# Auto-generated artifacts — must stay as raw tool output so the
+# OpenAPI→TS contract check (openapi-typescript --check) matches.
+src/types/api-generated.ts
+src/types/api-routes.ts
+
+# Written by `npm run test:console-baseline` (src/test/consoleGateGlobal.ts).
+# The writer is the only author, and prettier and the writer disagree on when
+# a one-element array fits on one line — so every refresh would dirty the
+# tree for a formatting difference nobody decided.
+src/test/console-baseline.json

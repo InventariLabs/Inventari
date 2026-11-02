@@ -1,0 +1,16 @@
+<div class="party-box">
+  <h3>Magazyn źródłowy</h3>
+  {% if source_location %}
+  <div class="party-name">{{ source_location }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>
+<div class="party-box">
+  <h3>Osoba odpowiedzialna</h3>
+  {% if partner %}
+  <div class="party-name">{{ partner.name }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

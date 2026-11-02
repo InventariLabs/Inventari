@@ -1,0 +1,28 @@
+# Layered on top of docker-compose.demo.yml when the demo shares its host with
+# a production stack (docs/DEMO.md, "On the same server as a production
+# install"). A demo on a host of its own does not include this file and keeps
+# the public ports and its own certificate.
+#
+# The production stack's Caddy holds ports 80 and 443 and serves this domain
+# (DEMO_DOMAIN in *its* .env) with its own certificate, then forwards here. So
+# this Caddy speaks plain HTTP on the shared `inventari-edge` network that the
+# other one dials (no port is published), and trusts the private-range hop in
+# front of it for the visitor's address.
+services:
+  caddy:
+    ports: !reset []
+    networks:
+      app-network: {}
+      edge:
+        aliases:
+          - demo-caddy
+    environment:
+      DOMAIN: http://${DOMAIN:?set DOMAIN in .env}
+      TRUSTED_PROXIES: private_ranges
+
+networks:
+  # Created by the production stack (docker-compose.prod.yml); start that one
+  # first.
+  edge:
+    name: inventari-edge
+    external: true

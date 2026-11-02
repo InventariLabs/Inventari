@@ -1,0 +1,36 @@
+{
+  "name": "example_widgets",
+  "version": "0.2.0",
+  "inventari_min_version": "0.9.0",
+  "category": "system",
+  "display_name": "Example Widgets",
+  "description": "Reference module demonstrating Inventari module patterns. Manage simple widgets with name, color, and quantity.",
+  "icon": "shapes",
+  "module_type": "official",
+  "capabilities": [
+    "database"
+  ],
+  "requires": [],
+  "is_reference": true,
+  "permissions": [
+    {
+      "key": "example_widgets:read",
+      "label_key": "example_widgets:permissions.read",
+      "description_key": "example_widgets:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    },
+    {
+      "key": "example_widgets:write",
+      "label_key": "example_widgets:permissions.write",
+      "description_key": "example_widgets:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "title": "Listy zakupów",
+  "launcher": {
+    "description": "Zakupy do sklepu: co masz kupić"
+  },
+  "subtitle": "Zakupy do sklepu: planuj, co kupić, i kupuj według listy",
+  "newList": "Nowa lista",
+  "addFirst": "Utwórz swoją pierwszą listę zakupów, aby zacząć planowanie",
+  "modal": {
+    "title": "Nowa lista zakupów",
+    "nameLabel": "Nazwa listy",
+    "namePlaceholder": "np. Zakupy tygodniowe",
+    "cancel": "Anuluj",
+    "create": "Utwórz",
+    "creating": "Tworzenie…",
+    "createSuccess": "Lista utworzona!",
+    "createFailed": "Nie udało się utworzyć listy",
+    "nameHint": "Zostaw puste, a lista weźmie dzisiejszą datę.",
+    "defaultName": "Lista {{date}}"
+  },
+  "completed": "Gotowe",
+  "detail": {
+    "purchased": "kupionych",
+    "addItem": "Dodaj pozycję",
+    "clearPurchased": "Wyczyść kupione ({{count}})",
+    "clearPurchased_one": "Wyczyść kupione ({{count}})",
+    "clearPurchased_few": "Wyczyść kupione ({{count}})",
+    "clearPurchased_many": "Wyczyść kupione ({{count}})",
+    "clearPurchased_other": "Wyczyść kupione ({{count}})",
+    "empty": "Lista jest pusta",
+    "emptySubtitle": "Dodaj pozycje ręcznie.",
+    "emptySubtitleRecipes": "Dodaj pozycje ręcznie lub z przepisu.",
+    "backToLists": "Wróć do list",
+    "confirmClearPurchased": "Usunąć wszystkie kupione pozycje?",
+    "confirmDeleteItem": "Usunąć tę pozycję z listy?",
+    "listNotFound": "Lista nie znaleziona",
+    "errorClearPurchased": "Nie udało się wyczyścić zakupionych pozycji",
+    "errorDeleteItem": "Nie udało się usunąć pozycji",
+    "errorUpdateItem": "Nie udało się zaktualizować pozycji",
+    "successClearPurchased": "Wyczyszczono zakupione pozycje",
+    "successDeleteItem": "Usunięto pozycję",
+    "convertToPo": "Konwertuj do zamówienia zakupu",
+    "convertToPoSuccess": "Utworzono zamówienie zakupu {{number}}",
+    "convertToPoError": "Nie udało się utworzyć zamówienia zakupu",
+    "confirmConvertGrouped_one": "{{count}} pozycja zostanie zgrupowana w szkic zamówienia zakupu.",
+    "confirmConvertGrouped_few": "{{count}} pozycje zostaną zgrupowane w szkic zamówienia zakupu.",
+    "confirmConvertGrouped_many": "{{count}} pozycji zostanie zgrupowanych w szkic zamówienia zakupu.",
+    "confirmConvertGrouped_other": "{{count}} pozycji zostanie zgrupowanych w szkic zamówienia zakupu.",
+    "confirmConvertSkipped_one": "{{count}} pozycja bez powiązanego produktu zostanie pominięta.",
+    "confirmConvertSkipped_few": "{{count}} pozycje bez powiązanego produktu zostaną pominięte.",
+    "confirmConvertSkipped_many": "{{count}} pozycji bez powiązanego produktu zostanie pominiętych.",
+    "confirmConvertSkipped_other": "{{count}} pozycji bez powiązanego produktu zostanie pominiętych.",
+    "toBuyCount_one": "{{count}} do kupienia",
+    "toBuyCount_few": "{{count}} do kupienia",
+    "toBuyCount_many": "{{count}} do kupienia",
+    "toBuyCount_other": "{{count}} do kupienia",
+    "purchasedCount_one": "{{count}} kupiona",
+    "purchasedCount_few": "{{count}} kupione",
+    "purchasedCount_many": "{{count}} kupionych",
+    "purchasedCount_other": "{{count}} kupionych",
+    "markPurchasedNamed": "Oznacz jako kupione: {{name}}"
+  },
+  "addItem": {
+    "title": "Dodaj do listy",
+    "nameLabel": "Nazwa",
+    "namePlaceholder": "np. Mleko, Chleb, Lody…",
+    "quantityLabel": "Ilość",
+    "unitLabel": "Jednostka",
+    "noteLabel": "Notatka (opcjonalnie)",
+    "notePlaceholder": "np. Jeśli będzie promocja, Z Biedronki najlepsze…",
+    "priorityLabel": "Priorytet",
+    "priority": {
+      "normal": "Normalny",
+      "urgent": "Pilne"
+    },
+    "cancel": "Anuluj",
+    "add": "Dodaj",
+    "adding": "Dodawanie…",
+    "addFailed": "Nie udało się dodać pozycji",
+    "validation": {
+      "nameRequired": "Wpisz nazwę produktu",
+      "quantityPositive": "Ilość musi być większa od 0",
+      "quantityMax": "Ilość powyżej {{max}} nie może zostać zapisana",
+      "unitRequired": "Wybierz jednostkę"
+    }
+  },
+  "addFromRecipes": {
+    "title": "Z przepisów",
+    "search": "Szukaj przepisów…",
+    "noRecipes": "Nie znaleziono przepisów",
+    "recipesDisabled": "Moduł przepisów nie jest włączony",
+    "addSelected": "Dodaj {{count}} przepisów",
+    "addSelected_one": "Dodaj {{count}} przepis",
+    "addSelected_few": "Dodaj {{count}} przepisy",
+    "addSelected_many": "Dodaj {{count}} przepisów",
+    "addSelected_other": "Dodaj {{count}} przepisów",
+    "adding": "Dodawanie…",
+    "failed": "Nie udało się dodać składników z wybranych przepisów",
+    "success": "Dodano {{count}} składników",
+    "success_one": "Dodano {{count}} składnik",
+    "success_few": "Dodano {{count}} składniki",
+    "success_many": "Dodano {{count}} składników",
+    "success_other": "Dodano {{count}} składników"
+  },
+  "card": {
+    "saveName": "Zapisz nazwę",
+    "editName": "Edytuj nazwę listy",
+    "deleteList": "Usuń listę",
+    "actionsFor": "Akcje listy {{name}}",
+    "emptyPreview": "Nic jeszcze na tej liście",
+    "morePreview_one": "i jeszcze 1",
+    "morePreview_few": "i jeszcze {{count}}",
+    "morePreview_many": "i jeszcze {{count}}",
+    "morePreview_other": "i jeszcze {{count}}"
+  },
+  "actions": {
+    "open": "Otwórz"
+  },
+  "searchPlaceholder": "Szukaj list…",
+  "loading": "Ładowanie list…",
+  "empty": {
+    "title": "Brak list zakupów"
+  },
+  "deleteModal": {
+    "title": "Usunąć listę?",
+    "desc": "Wszystkie produkty z tej listy zostaną trwale usunięte."
+  },
+  "messages": {
+    "listDeleted": "Lista usunięta",
+    "deleteError": "Błąd podczas usuwania listy",
+    "nameChanged": "Zmieniono nazwę",
+    "nameChangeError": "Błąd podczas zmiany nazwy"
+  },
+  "permissions": {
+    "read": "Podgląd list zakupów",
+    "readDesc": "Może przeglądać listy zakupów i ich podpowiedzi",
+    "write": "Zarządzanie listami zakupów",
+    "writeDesc": "Może tworzyć listy oraz dodawać i odhaczać pozycje"
+  },
+  "notes": {
+    "neededBy": "Potrzebne do: {{date}}",
+    "checkStock": "Sprawdź stan: {{available}} na stanie, przepis wymaga {{required}}",
+    "matchedByName": "Dopasowano po nazwie do „{{product}}”",
+    "convertedToPo": "Na zamówieniu {{number}}",
+    "forRecipe": "Do przepisu: {{recipe}}"
+  },
+  "toasts": {
+    "addItemsFailed": "Nie udało się dodać produktów",
+    "shoppingListGone": "Lista zakupów już nie istnieje"
+  }
+}

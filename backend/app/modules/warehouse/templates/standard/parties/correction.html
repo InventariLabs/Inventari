@@ -1,0 +1,44 @@
+<div class="info-block">
+  <h3>{{ labels.corrected_document }}</h3>
+  {% if corrected_doc_number or document.external_reference or document.notes %}
+  {% if corrected_doc_number %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.reference }}:</span>
+    <span class="info-value">{{ corrected_doc_number }}</span>
+  </div>
+  {% endif %}
+  {% if document.external_reference %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.reference }}:</span>
+    <span class="info-value">{{ document.external_reference }}</span>
+  </div>
+  {% endif %}
+  {% if document.notes %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.notes }}:</span>
+    <span class="info-value">{{ document.notes }}</span>
+  </div>
+  {% endif %}
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>
+<div class="info-block">
+  <h3>{{ labels.document_details }}</h3>
+  {% if source_location or target_location %}
+  {% if source_location %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.from_location }}:</span>
+    <span class="info-value">{{ source_location }}</span>
+  </div>
+  {% endif %}
+  {% if target_location %}
+  <div class="info-row">
+    <span class="info-label">{{ labels.to_location }}:</span>
+    <span class="info-value">{{ target_location }}</span>
+  </div>
+  {% endif %}
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

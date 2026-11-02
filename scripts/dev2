@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#
+# Run any command against the SECONDARY Inventari stack ("second stack").
+#
+# It exports the two variables that make a stack independent and then execs the
+# command unchanged, so plain `docker compose` and every existing `make` target
+# work without modification:
+#
+#   COMPOSE_PROJECT_NAME  -> separate containers, network and named volumes
+#   COMPOSE_FILE          -> base + dev overrides + the dev2 port shift
+#
+# Examples:
+#   scripts/dev2 docker compose up -d --build
+#   scripts/dev2 docker compose logs -f backend
+#   scripts/dev2 make test
+#   scripts/dev2 make test-e2e
+#   scripts/dev2 docker compose down -v     # -v removes ONLY the second stack's volumes
+#
+# Override the project name to run a third stack:
+#   INVENTARI_STACK=inventari3 scripts/dev2 docker compose ps
+#
+# Note: COMPOSE_FILE replaces Compose's default file discovery, so
+# docker-compose.override.yml must be listed explicitly — it would otherwise be
+# dropped and the stack would come up without Mailhog.
+
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+export COMPOSE_PROJECT_NAME="${INVENTARI_STACK:-inventari2}"
+export COMPOSE_PATH_SEPARATOR=":"
+export COMPOSE_FILE="$repo_root/docker-compose.yml:$repo_root/docker-compose.override.yml:$repo_root/docker-compose.dev2.yml"
+
+# Playwright runs on the host, not in a container, so it needs the shifted port.
+export VITE_API_URL="${VITE_API_URL:-http://127.0.0.1:5273}"
+
+# This stack exists to be thrown away, so Postgres does not need to survive a
+# crash — and paying for that costs roughly 5x the suite runtime (502s -> 101s
+# measured). DROP DATABASE forces an immediate checkpoint and waits for it, and
+# the migration tests create and drop a database per test class.
+# Set POSTGRES_FSYNC=on before calling this script to opt back into durability.
+export POSTGRES_FSYNC="${POSTGRES_FSYNC:-off}"
+export POSTGRES_SYNCHRONOUS_COMMIT="${POSTGRES_SYNCHRONOUS_COMMIT:-off}"
+export POSTGRES_FULL_PAGE_WRITES="${POSTGRES_FULL_PAGE_WRITES:-off}"
+
+if [ "$#" -eq 0 ]; then
+  cat >&2 <<EOF
+usage: scripts/dev2 <command> [args...]
+
+stack:    $COMPOSE_PROJECT_NAME
+app:      http://localhost:5273
+api:      http://localhost:8105/docs
+mailhog:  http://localhost:8125
+postgres: 127.0.0.1:5533    redis: 127.0.0.1:6480
+
+examples:
+  scripts/dev2 docker compose up -d --build
+  scripts/dev2 make test
+  scripts/dev2 docker compose down -v
+EOF
+  exit 2
+fi
+
+for f in docker-compose.yml docker-compose.override.yml docker-compose.dev2.yml; do
+  if [ ! -f "$repo_root/$f" ]; then
+    echo "dev2: missing $repo_root/$f" >&2
+    exit 1
+  fi
+done
+
+exec "$@"

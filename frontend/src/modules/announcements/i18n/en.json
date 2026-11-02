@@ -1,0 +1,12 @@
+{
+  "region": "Announcements",
+  "actions": {
+    "dismiss": "Dismiss"
+  },
+  "types": {
+    "info": "Notice",
+    "warning": "Warning",
+    "critical": "Critical",
+    "downtime": "Downtime"
+  }
+}

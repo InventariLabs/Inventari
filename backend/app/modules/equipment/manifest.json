@@ -1,0 +1,31 @@
+{
+  "name": "equipment",
+  "module_type": "official",
+  "version": "0.9.0",
+  "inventari_min_version": "0.9.0",
+  "capabilities": [
+    "database"
+  ],
+  "permissions": [
+    {
+      "key": "equipment:read",
+      "label_key": "equipment:permissions.read",
+      "description_key": "equipment:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    },
+    {
+      "key": "equipment:write",
+      "label_key": "equipment:permissions.write",
+      "description_key": "equipment:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    }
+  ],
+  "has_settings_schema": true
+}

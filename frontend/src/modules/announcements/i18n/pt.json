@@ -1,0 +1,12 @@
+{
+  "region": "Avisos",
+  "actions": {
+    "dismiss": "Dispensar"
+  },
+  "types": {
+    "info": "Aviso",
+    "warning": "Atenção",
+    "critical": "Crítico",
+    "downtime": "Indisponibilidade"
+  }
+}

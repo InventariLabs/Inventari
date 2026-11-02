@@ -1,0 +1,48 @@
+{
+  "navigation": {
+    "dashboard": "Aprovações",
+    "workflows": "Fluxos de trabalho"
+  },
+  "dashboard": {
+    "title": "Solicitações de aprovação",
+    "subtitle": "Revise e gerencie as solicitações de aprovação pendentes"
+  },
+  "launcher": {
+    "title": "Aprovações",
+    "description": "Fluxos de aprovação configuráveis em várias etapas"
+  },
+  "workflows": {
+    "title": "Fluxos de trabalho",
+    "subtitle": "Configure as etapas de aprovação e os aprovadores",
+    "create": "Criar fluxo de trabalho",
+    "edit": "Editar fluxo de trabalho",
+    "empty": "Ainda não há fluxos de trabalho",
+    "emptyHint": "Crie seu primeiro fluxo de trabalho para começar",
+    "name": "Nome do fluxo de trabalho",
+    "namePlaceholder": "ex.: Aprovação de retirada de equipamento",
+    "nameRequired": "O nome do fluxo de trabalho é obrigatório",
+    "saveChanges": "Salvar alterações",
+    "created": "Fluxo de trabalho criado com sucesso",
+    "updated": "Fluxo de trabalho atualizado com sucesso",
+    "deleted": "Fluxo de trabalho excluído",
+    "deleteFailed": "Não foi possível excluir o fluxo de trabalho",
+    "saveFailed": "Não foi possível salvar o fluxo de trabalho",
+    "mutationGuard": "Não é possível modificar este fluxo de trabalho enquanto houver solicitações pendentes",
+    "duplicateTarget": "Já existe um fluxo de trabalho para este tipo de destino",
+    "addStage": "Adicionar etapa",
+    "removeStage": "Remover etapa",
+    "stageLabel": "Nome da etapa",
+    "stageRole": "Função",
+    "addApprover": "Adicionar aprovador",
+    "removeApprover": "Remover",
+    "searchUsers": "Buscar usuários...",
+    "selectApprovers": "Selecione os aprovadores desta etapa",
+    "noUsersFound": "Nenhum usuário encontrado"
+  },
+  "permissions": {
+    "approve": "Aprovar solicitações",
+    "approveDesc": "Aprovar ou rejeitar solicitações de aprovação pendentes",
+    "configure": "Configurar fluxos de trabalho",
+    "configureDesc": "Criar e modificar definições de fluxos de aprovação"
+  }
+}

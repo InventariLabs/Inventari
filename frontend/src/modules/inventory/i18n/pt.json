@@ -1,0 +1,236 @@
+{
+  "launcher": {
+    "title": "Estoque",
+    "description": "Gerencie produtos, locais e etiquetas"
+  },
+  "statusBadge": {
+    "needsAttention_one": "precisa de atenção",
+    "needsAttention_other": "precisam de atenção"
+  },
+  "actions": {
+    "stockTakesInProgress": "Inventários em andamento"
+  },
+  "nav": {
+    "overview": "Visão geral",
+    "items": "Produtos",
+    "storages": "Locais",
+    "labels": "Etiquetas",
+    "categories": "Categorias",
+    "scan": "Escanear",
+    "moves": "Movimentações",
+    "stock": "Estoque"
+  },
+  "toasts": {
+    "importFailedToAnalyze": "Não foi possível analisar o arquivo",
+    "importGrocyMappingApplied": "Mapeamento do Grocy aplicado!",
+    "importFailed": "Falha na importação",
+    "archivedLabelFreed": "A etiqueta agora está livre para reutilização"
+  },
+  "moves": {
+    "title": "Movimentações de estoque",
+    "subtitle": "O que entrou, o que saiu e o que foi movido entre os seus próprios locais",
+    "outsideFrom": "externo",
+    "expires": "Vence em {{date}}",
+    "outsideTo": "externo",
+    "direction": {
+      "all": "Todas",
+      "in": "Recebido",
+      "out": "Saída",
+      "internal": "Movido"
+    },
+    "columns": {
+      "when": "Quando",
+      "product": "Produto",
+      "quantity": "Quantidade",
+      "route": "De → para",
+      "batch": "Lote",
+      "source": "Origem",
+      "who": "Quem"
+    },
+    "source": {
+      "document": "Documento",
+      "item": "Manual",
+      "adjustment": "Inventário",
+      "maker_production": "Produção",
+      "item_history": "Registro histórico",
+      "opening_balance": "Saldo inicial",
+      "recipe_picking": "Cozinha",
+      "location_relocation": "Movido com o local"
+    },
+    "filters": {
+      "location": "Local",
+      "anyLocation": "Qualquer lugar",
+      "since": "De",
+      "until": "Até",
+      "product": "Produto:",
+      "oneProduct": "um produto",
+      "oneStorage": "um local"
+    },
+    "empty": {
+      "title": "Nada foi movimentado ainda",
+      "description": "As movimentações são registradas quando mercadorias são recebidas, saem ou são movidas entre locais.",
+      "filtered_one": "Nenhuma movimentação corresponde ao filtro definido ({{filters}}). Limpe-o para ampliar o registro.",
+      "filtered_other": "Nenhuma movimentação corresponde aos filtros definidos ({{filters}}). Limpe um deles para ampliar o registro.",
+      "filterNames": {
+        "direction": "sentido: {{value}}",
+        "location": "local: {{value}}",
+        "dates": "datas: {{from}} – {{to}}",
+        "datesFrom": "datas: a partir de {{date}}",
+        "datesUntil": "datas: até {{date}}",
+        "product": "produto: {{value}}"
+      },
+      "filteredTitle": "Nenhuma movimentação corresponde",
+      "productTitle": "Este produto não foi movimentado aqui",
+      "productDescription": "Recebimentos, saídas e transferências deste produto neste local aparecerão aqui.",
+      "locationTitle": "Nada passou por aqui",
+      "locationDescription": "As movimentações são registradas quando mercadorias são recebidas, saem ou passam por este local.",
+      "documentTitle": "Este documento não movimentou nada",
+      "documentDescription": "Suas linhas ainda não foram executadas no estoque, então nenhuma movimentação leva o nome dele."
+    },
+    "tab": "Movimentações",
+    "itemCaption": "Movimentações deste produto em {{location}}. Dois registros do mesmo produto em um local compartilham estas linhas.",
+    "thisLocation": "este local",
+    "seeProductEverywhere": "Este produto em todos os lugares",
+    "locationHeading": "Histórico de movimentações",
+    "locationCaption": "O que entrou, o que saiu e o que passou por este local e por tudo o que há dentro dele.",
+    "seeFullLedger": "Abrir o registro completo",
+    "documentHeading": "O que este documento movimentou",
+    "documentCaption": "As movimentações que este documento registrou — para onde foram as mercadorias e de qual lote saíram.",
+    "movements_one": "movimentação",
+    "movements_other": "movimentações",
+    "movedWith": "Movido com {{name}}",
+    "topLevel": "Nível principal"
+  },
+  "lot": {
+    "notFound": "Este lote não existe mais",
+    "backToLots": "Voltar aos lotes",
+    "onHand": "Em estoque",
+    "serial": "Número de série",
+    "batch": "Lote",
+    "whereHeading": "Onde está",
+    "nothingLeft": "Não resta nada deste lote em nenhuma prateleira. O histórico abaixo conta toda a história.",
+    "trailHeading": "Tudo o que aconteceu com ele",
+    "decisionsHeading": "As decisões sobre o seu estado",
+    "trailCaption": "Todas as movimentações registradas com este número de lote, das mais recentes às mais antigas.",
+    "status": {
+      "active": "Ativo",
+      "quarantined": "Em quarentena",
+      "held": "Retido",
+      "expired": "Vencido",
+      "recalled": "Recolhido"
+    },
+    "fields": {
+      "expiry": "Data de validade",
+      "production": "Data de produção",
+      "useBy": "Consumir até",
+      "kind": "Tipo"
+    },
+    "empty": {
+      "title": "Nada foi registrado neste lote",
+      "description": "Recebimentos, saídas e transferências que citarem este lote aparecerão aqui."
+    }
+  },
+  "stock": {
+    "title": "Níveis de estoque",
+    "subtitle": "O que está onde, em qual lote e quanto está reservado",
+    "searchPlaceholder": "Buscar um produto ou um lote…",
+    "reservedShort": "{{quantity}} reservado",
+    "columns": {
+      "location": "Local",
+      "product": "Produto",
+      "batch": "Lote",
+      "quantity": "Em estoque",
+      "reserved": "Reservado",
+      "available": "Disponível"
+    },
+    "filters": {
+      "location": "Local",
+      "anyLocation": "Qualquer lugar",
+      "includeEmpty": "Incluir locais zerados",
+      "includeEmptyHint": "Mostra registros com quantidade zero — o rastro de que algo já esteve aqui. Um local que nunca guardou o produto não tem linha para mostrar.",
+      "oneStorage": "um local",
+      "oneProduct": "um produto"
+    },
+    "empty": {
+      "title": "Nenhum estoque registrado ainda",
+      "description": "O estoque aparece aqui depois que mercadorias são recebidas, contadas ou produzidas.",
+      "filteredTitle": "Nada aqui corresponde",
+      "filtered_one": "Nada corresponde ao filtro definido ({{filters}}). Limpe-o para ampliar a lista.",
+      "filtered_other": "Nada corresponde aos filtros definidos ({{filters}}). Limpe um deles para ampliar a lista.",
+      "filterNames": {
+        "location": "local: {{value}}",
+        "product": "produto: {{value}}",
+        "search": "busca: {{value}}"
+      }
+    },
+    "whereItLies": "Onde está guardado",
+    "seeForProduct": "Em todos os locais",
+    "seeForLocation": "Níveis de estoque deste local",
+    "rows_one": "registro de estoque",
+    "rows_other": "registros de estoque"
+  },
+  "lots": {
+    "title": "Lotes",
+    "subtitle": "Quais lotes existem e quais deles não podem ser mexidos",
+    "statusChanged": "Lote marcado como {{status}}",
+    "reasonDialog": {
+      "title": "Marcar {{name}} como {{status}}?",
+      "message": "O motivo é guardado junto com o lote e exibido ao lado do status.",
+      "label": "Por quê",
+      "placeholder": "Aviso do fornecedor 41/26 — vidro encontrado no pote 12",
+      "confirm": "Alterar status"
+    },
+    "actionsFor": "Ações do lote {{name}}",
+    "columns": {
+      "batch": "Lote",
+      "product": "Produto",
+      "status": "Status",
+      "expiry": "Data de validade",
+      "onHand": "Em estoque",
+      "actions": "Ações"
+    },
+    "setTo": {
+      "active": "Liberar — permitir separação",
+      "quarantined": "Colocar em quarentena",
+      "held": "Reter",
+      "expired": "Marcar como vencido",
+      "recalled": "Marcar como recolhido"
+    },
+    "empty": {
+      "title": "Nenhum lote ainda",
+      "filteredTitle": "Nenhum lote está neste estado",
+      "description": "Os lotes aparecem quando mercadorias são recebidas com um número de lote ou de série.",
+      "filtered": "Nada corresponde a este status. Limpe o filtro de status para ver todos os lotes."
+    },
+    "count_one": "lote",
+    "count_other": "lotes"
+  },
+  "asOf": {
+    "title": "Estoque em uma data",
+    "subtitle": "O que havia em estoque em determinado dia e quanto valia",
+    "subtitleNoValue": "O que havia em estoque em determinado dia",
+    "date": "Em",
+    "location": "Local",
+    "everywhere": "Todos os locais",
+    "print": "Imprimir",
+    "total": "Total",
+    "caption": "Estoque de {{organization}} em {{date}}",
+    "completeFrom": "O registro de movimentações começa em {{date}}. Nada antes disso é conhecido — não é zero.",
+    "noValueSource": "Não há histórico de custos, então nenhum valor é informado. O preço de compra hoje é apenas um campo de formulário; ele não diz quanto valia uma prateleira no mês passado.",
+    "excludedCurrency_one": "{{count}} linha ficou fora do total: a moeda dela não é a da organização.",
+    "excludedCurrency_other": "{{count}} linhas ficaram fora do total: a moeda delas não é a da organização.",
+    "cannotAnswer": "Não é possível responder para esta data.",
+    "empty": {
+      "title": "Não havia nada na prateleira",
+      "description": "Nesta data, nenhum dos produtos cadastrados estava em estoque.",
+      "descriptionAt": "{{location}} — nesta data não guardava nenhum dos produtos cadastrados."
+    },
+    "columns": {
+      "product": "Produto",
+      "quantity": "Quantidade",
+      "value": "Valor"
+    },
+    "unpriced_one": "{{count}} produto não tem histórico de custos e ficou fora do total.",
+    "unpriced_other": "{{count}} produtos não têm histórico de custos e ficaram fora do total."
+  }
+}

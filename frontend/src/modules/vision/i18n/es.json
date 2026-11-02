@@ -1,0 +1,10 @@
+{
+  "ai": {
+    "purposeLabel": "Leer un producto desde una foto",
+    "purposeDesc": "Extrae el nombre, la marca, la cantidad y la fecha de caducidad de una foto de la etiqueta, para añadir un artículo sin escribir."
+  },
+  "permissions": {
+    "extract": "Leer etiquetas desde fotos",
+    "extractDesc": "Puede enviar fotos de etiquetas de productos y tablas nutricionales al modelo de IA — cada llamada se factura"
+  }
+}

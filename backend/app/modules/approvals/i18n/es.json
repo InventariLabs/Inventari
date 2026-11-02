@@ -1,0 +1,48 @@
+{
+  "navigation": {
+    "dashboard": "Aprobaciones",
+    "workflows": "Flujos de trabajo"
+  },
+  "dashboard": {
+    "title": "Solicitudes de aprobación",
+    "subtitle": "Revisar y gestionar las solicitudes de aprobación pendientes"
+  },
+  "launcher": {
+    "title": "Aprobaciones",
+    "description": "Flujos de trabajo de aprobación configurables de múltiples etapas"
+  },
+  "workflows": {
+    "title": "Flujos de trabajo",
+    "subtitle": "Configurar etapas de aprobación y aprobadores",
+    "create": "Crear flujo de trabajo",
+    "edit": "Editar flujo de trabajo",
+    "empty": "Aún no hay flujos de trabajo",
+    "emptyHint": "Cree su primer flujo de trabajo para comenzar",
+    "name": "Nombre del flujo de trabajo",
+    "namePlaceholder": "ej. Aprobación de salida de equipo",
+    "nameRequired": "El nombre del flujo de trabajo es obligatorio",
+    "saveChanges": "Guardar cambios",
+    "created": "Flujo de trabajo creado correctamente",
+    "updated": "Flujo de trabajo actualizado",
+    "deleted": "Flujo de trabajo eliminado",
+    "deleteFailed": "Error al eliminar el flujo de trabajo",
+    "saveFailed": "Error al guardar el flujo de trabajo",
+    "mutationGuard": "No se puede modificar este flujo de trabajo mientras haya solicitudes pendientes",
+    "duplicateTarget": "Ya existe un flujo de trabajo para este tipo de destino",
+    "addStage": "Agregar etapa",
+    "removeStage": "Eliminar etapa",
+    "stageLabel": "Etiqueta de etapa",
+    "stageRole": "Rol",
+    "addApprover": "Agregar aprobador",
+    "removeApprover": "Eliminar",
+    "searchUsers": "Buscar usuarios...",
+    "selectApprovers": "Seleccionar aprobadores para esta etapa",
+    "noUsersFound": "No se encontraron usuarios"
+  },
+  "permissions": {
+    "approve": "Aprobar solicitudes",
+    "approveDesc": "Aprobar o rechazar solicitudes de aprobación pendientes",
+    "configure": "Configurar flujos de trabajo",
+    "configureDesc": "Crear y modificar definiciones de flujos de aprobación"
+  }
+}

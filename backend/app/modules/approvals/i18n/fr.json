@@ -1,0 +1,48 @@
+{
+  "navigation": {
+    "dashboard": "Approbations",
+    "workflows": "Workflows"
+  },
+  "dashboard": {
+    "title": "Demandes d'approbation",
+    "subtitle": "Consulter et gérer les demandes d'approbation en attente"
+  },
+  "launcher": {
+    "title": "Approbations",
+    "description": "Workflows d'approbation configurables à plusieurs étapes"
+  },
+  "workflows": {
+    "title": "Workflows",
+    "subtitle": "Configurer les étapes d'approbation et les approbateurs",
+    "create": "Créer un workflow",
+    "edit": "Modifier le workflow",
+    "empty": "Aucun workflow pour le moment",
+    "emptyHint": "Créez votre premier workflow pour commencer",
+    "name": "Nom du workflow",
+    "namePlaceholder": "ex. Approbation de sortie d'équipement",
+    "nameRequired": "Le nom du workflow est requis",
+    "saveChanges": "Enregistrer les modifications",
+    "created": "Workflow créé avec succès",
+    "updated": "Workflow mis à jour",
+    "deleted": "Workflow supprimé",
+    "deleteFailed": "Échec de la suppression du workflow",
+    "saveFailed": "Échec de l'enregistrement du workflow",
+    "mutationGuard": "Impossible de modifier ce workflow tant que des demandes sont en attente",
+    "duplicateTarget": "Un workflow pour ce type de cible existe déjà",
+    "addStage": "Ajouter une étape",
+    "removeStage": "Supprimer l'étape",
+    "stageLabel": "Libellé de l'étape",
+    "stageRole": "Rôle",
+    "addApprover": "Ajouter un approbateur",
+    "removeApprover": "Supprimer",
+    "searchUsers": "Rechercher des utilisateurs...",
+    "selectApprovers": "Sélectionner les approbateurs pour cette étape",
+    "noUsersFound": "Aucun utilisateur trouvé"
+  },
+  "permissions": {
+    "approve": "Approuver les demandes",
+    "approveDesc": "Approuver ou rejeter les demandes d'approbation en attente",
+    "configure": "Configurer les workflows",
+    "configureDesc": "Créer et modifier les définitions de workflows d'approbation"
+  }
+}

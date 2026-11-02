@@ -1,0 +1,22 @@
+# Architecture lint baseline
+# Format: relative/path.py::Class::function
+app/services/_stock_lot_ops.py::<module>
+app/services/ai_connection_service.py::AiConnectionService::_probe_contract
+app/services/ai_connection_service.py::AiConnectionService::is_bound_to_any_purpose
+app/services/ai_connection_service.py::AiConnectionService::test_connection
+app/services/attachment_service.py::AttachmentService::create_attachment
+app/services/auth_service.py::AuthService::create_registration_request_async
+app/services/auth_service.py::AuthService::register_user_async
+app/services/bootstrap_service.py::<module>
+app/services/items/_bulk_update.py::bulk_update_items
+app/services/items/_import.py::_import_one_row
+app/services/items/_stock_quant.py::_adopt_card_async
+app/services/items/_update.py::update_quantity
+app/services/items/move_service.py::_reduce_quantity
+app/services/items/move_service.py::move_item
+app/services/items/scan_service.py::_increment_existing_item
+app/services/profile_module_config_service.py::apply_profile_module_config_async
+app/services/reconciliation_job.py::_record_pass_and_alert_admins_async
+app/services/reconciliation_job.py::_warn_admins_async
+app/services/reconciliation_job.py::read_previous_measurement_async
+app/services/storage/_writes.py::archive_storage

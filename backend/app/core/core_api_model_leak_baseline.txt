@@ -1,0 +1,13 @@
+# CoreAPI model leak baseline
+# Format: app/core/public_api/file.py::method_name  (return-type leaks)
+#         app/core/public_api/file.py::method_name#param_name  (param leaks)
+#
+# Public methods that return ORM models or accept them as parameters
+# instead of DTOs. Private (_-prefixed) helpers are exempt — they are
+# Core-internal and may handle ORM objects before converting to DTOs.
+# These emit ::notice (non-blocking). New leaks emit ::error (blocking).
+# Remove entries when the method is converted to DTOs.
+#
+# All 25 return-type entries cleared 2026-06-21:
+# - 19 methods fixed with DTO.model_validate() wrapping
+# - 6 methods fixed with new ItemAttachmentDTO

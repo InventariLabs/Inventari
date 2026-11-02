@@ -1,0 +1,168 @@
+{
+  "title": "Estadísticas",
+  "subtitle": "Resumen de sus suministros",
+  "records": "Registros",
+  "places": "Lugares, todos los niveles",
+  "expiringSoon": "Por caducar",
+  "expired": "Caducado",
+  "storageDistribution": "Distribución de productos por ubicación",
+  "categoryDistribution": "Distribución de productos por categoría",
+  "expiryForecast": "Previsión de caducidad",
+  "noData": "Sin datos",
+  "noExpiryData": "Sin datos sobre fechas de caducidad",
+  "costAnalysis": {
+    "title": "Análisis de costos",
+    "subtitle": "Resumen de gastos y desperdicio",
+    "spent": "Gastado",
+    "wasted": "Desperdiciado",
+    "waste": "Desperdicio (% del valor)",
+    "savings": "Ahorros",
+    "topCategories": "Categorías más caras",
+    "savingsOpportunities": "Sugerencias de ahorro",
+    "monthlyTrend": "Tendencia mensual",
+    "excludedOtherCurrency_one": "Un producto tiene el precio en otra moneda y no se cuenta aquí.",
+    "excludedOtherCurrency_other": "{{count}} productos tienen el precio en otra moneda y no se cuentan aquí.",
+    "notValuedYet": "No hay valoración registrada para este periodo",
+    "categoriesPricedFromRecords": "Las categorías se valoran con el precio de compra de cada registro.",
+    "categoriesPricedFromLedger": "Las categorías se valoran según el libro de costes.",
+    "categoryUnpriced_one": "Una posición no tiene precio en su registro y no entra en la suma.",
+    "categoryUnpriced_other": "{{count}} posiciones no tienen precio en su registro y no entran en la suma."
+  },
+  "tabs": {
+    "overview": "Resumen",
+    "analytics": "Analíticas",
+    "reconciliation": "Conciliación"
+  },
+  "analytics": {
+    "rotation": {
+      "avgRotation": "Edad promedio del stock",
+      "medianRotation": "Edad mediana del stock",
+      "slowMovers": "Rotación lenta",
+      "deadStock": "Stock muerto",
+      "deadStockValue": "Valor del stock muerto",
+      "byCategory": "Edad del stock por categoría",
+      "days": "días",
+      "noData": "Sin datos de edad del stock disponibles",
+      "noMovement": "Sin movimiento todavía"
+    },
+    "alerts": {
+      "total": "Total de alertas",
+      "types": {
+        "forgotten": "Artículos olvidados",
+        "staple": "Artículos básicos faltantes",
+        "expiring": "Por caducar",
+        "expired": "Caducado",
+        "lowStock": "Stock bajo",
+        "spike": "Pico de precio"
+      },
+      "messages": {
+        "forgotten_one": "Sin tocar desde hace {{count}} día — úsalo antes de volver a comprar.",
+        "forgotten_many": "Sin tocar desde hace {{count}} días — úsalo antes de volver a comprar.",
+        "forgotten_other": "Sin tocar desde hace {{count}} días — úsalo antes de volver a comprar.",
+        "staple_one": "Última compra hace {{count}} día, más del doble de lo habitual.",
+        "staple_many": "Última compra hace {{count}} días, más del doble de lo habitual.",
+        "staple_other": "Última compra hace {{count}} días, más del doble de lo habitual.",
+        "expiring": "Caduca el {{date}}.",
+        "expired": "Caducó el {{date}}."
+      },
+      "noAlerts": "Sin alertas - ¡su inventario se ve bien!",
+      "noData": "Aún no hay nada que revisar — añade artículos y llegarán los avisos"
+    },
+    "forecast": {
+      "predicted": "Gasto previsto",
+      "historical": "Promedio histórico",
+      "trend": "Tendencia",
+      "wasteReduction": "Potencial de reducción de desperdicio",
+      "noData": "Historial de compras insuficiente",
+      "monthlyAvg": "Media mensual",
+      "wasteReductionHint": "Ahorro posible al reducir el desperdicio",
+      "confidence": "Fiabilidad de la previsión",
+      "quarter": "Trimestre",
+      "trends": {
+        "increasing": "Al alza",
+        "decreasing": "A la baja",
+        "stable": "Estable",
+        "no_data": "Datos insuficientes"
+      },
+      "notEnoughData": "Historial de compras insuficiente para pronosticar",
+      "dataProgress": "{{have}} de {{need}} semanas de historial de compras"
+    },
+    "patterns": {
+      "recurring": "Principales productos recurrentes",
+      "seasonal": "Productos de temporada",
+      "bulk": "Oportunidades de compra al por mayor",
+      "potential": "Ahorros potenciales",
+      "noBulk": "Sin oportunidades de compra al por mayor identificadas",
+      "noPatterns": "Historial de compras insuficiente",
+      "seasonalityUnknown": "Muy pocas temporadas"
+    }
+  },
+  "errors": {
+    "failedToLoadRotationAnalysis": "Error al cargar el análisis de rotación",
+    "failedToLoadAlerts": "Error al cargar las alertas",
+    "failedToLoadStorageDistribution": "Error al cargar la distribución por ubicación",
+    "failedToLoadCategoryDistribution": "Error al cargar la distribución por categoría",
+    "failedToLoadExpiryForecast": "Error al cargar la previsión de caducidad",
+    "failedToLoadCostAnalysis": "Error al cargar el análisis de costes",
+    "failedToLoadReconciliation": "No se pudo cargar la conciliación de existencias"
+  },
+  "health": {
+    "title": "Control de salud del inventario",
+    "needsAttention": "Requiere atención",
+    "needsAttentionHint": "Registros vencidos o próximos a vencer, y todos los de productos con stock bajo.",
+    "runningLow": "Agotándose",
+    "runningLowHint": "Productos en su umbral o por debajo. Sus registros también cuentan en «Requiere atención».",
+    "totalValue": "Valor estimado",
+    "totalValueHint": "Valor total aproximado de todos los artículos.",
+    "totalValueHintLedger": "Lo que costó el stock disponible, según el libro de costes — toda la organización, no solo las ubicaciones contadas arriba.",
+    "actionsHint": "Úsalo como tu revisión diaria rápida. Abre los detalles solo cuando sea necesario.",
+    "hideDetails": "Ocultar estadísticas detalladas",
+    "showDetails": "Mostrar estadísticas detalladas",
+    "subtitle_one": "Una señal para ver de un vistazo qué requiere tu atención.",
+    "subtitle_other": "{{count}} señales para ver de un vistazo qué requiere tu atención.",
+    "unvaluedStock": "Recepciones en stock sin precio: {{total}}. Este valor se queda corto.",
+    "valueUnknown": "Desconocido",
+    "valueUnknownHint": "Ningún producto tiene precio todavía, así que no hay nada que sumar.",
+    "unpricedItems": "Artículos sin precio: {{total}}. Este valor se queda corto."
+  },
+  "permissions": {
+    "read": "Ver análisis",
+    "readDesc": "Ve las cifras de toda la organización: consumo, rotación, previsiones y costes"
+  },
+  "settings": {
+    "enableAnalytics": "Activar analítica",
+    "enableAnalyticsDescription": "Mostrar la pestaña de analítica (rotación, previsiones de gasto, patrones de compra). Desactivar para inventarios domésticos pequeños sin historial suficiente para que estos análisis sean útiles.",
+    "showInventoryValue": "Mostrar valor del inventario",
+    "showInventoryValueDescription": "Mostrar el valor total del stock en el resumen de estadísticas. Es una métrica de negocio — desactivar para inventarios domésticos que no guardan precios de compra con los que sumarlo."
+  },
+  "navigation": {
+    "settings": "Analíticas"
+  },
+  "reconciliation": {
+    "title": "Conciliación de existencias",
+    "subtitle_one": "Medido al abrir esta pantalla, sobre {{count}} registro de producto.",
+    "subtitle_other": "Medido al abrir esta pantalla, sobre {{count}} registros de producto.",
+    "tableCaption": "Las dos comparaciones de pares y lo que encontró cada una",
+    "expectedGap": "Una diferencia estable aquí es por diseño; la que preocupa es la que crece.",
+    "columns": {
+      "pair": "Comparación",
+      "count": "Discrepancias",
+      "total": "Diferencia total"
+    },
+    "pairs": {
+      "quantMove": {
+        "name": "Estante vs libro de movimientos",
+        "meaning": "Lo que suman los movimientos frente a lo que tiene el estante."
+      },
+      "layerQuant": {
+        "name": "Historial de coste vs estante",
+        "meaning": "Qué parte del estante no cubren las capas de coste."
+      }
+    },
+    "previousLine": "Medición anterior ({{when}}): {{howMany}} · {{howMuch}}",
+    "grown": "creció",
+    "shrunk": "bajó",
+    "standing": "se mantiene",
+    "noPrevious": "Aún no hay con qué comparar estas cifras: la tarea programada guarda una medición que mostrará si una diferencia crece."
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "launcher": {
+    "title": "Startseite",
+    "description": "Ihre Arbeitsbereich-Übersicht",
+    "welcome": "Willkommen, {{name}}",
+    "joinedOrganization": "Sie sind {{organization}} beigetreten",
+    "createdOrganization": "Sie haben {{organization}} eingerichtet",
+    "welcomeBack": "Willkommen zurück, {{name}}",
+    "workspaceOverview": "Ihre Arbeitsbereich-Übersicht",
+    "alerts": "Benachrichtigungen",
+    "recentItems": "Zuletzt besucht",
+    "browseApps": "Apps durchsuchen",
+    "noActions": "Alle Aufgaben erledigt",
+    "emptyRecent": "Noch keine kürzlich besuchten Elemente",
+    "actionItems": {
+      "title": "Zu erledigen",
+      "subtitle": "{{count}} ausstehend in aktivierten Modulen",
+      "subtitle_one": "{{count}} ausstehend in aktivierten Modulen",
+      "subtitle_other": "{{count}} ausstehend in aktivierten Modulen"
+    }
+  },
+  "sections": {
+    "core": "Grundlagen",
+    "business": "Geschäft",
+    "analytics": "Analytik",
+    "integrations": "Integrationen",
+    "system": "System"
+  },
+  "workspace": {
+    "current": "Aktuell",
+    "apply": "Anwenden",
+    "reapply": "Erneut anwenden",
+    "reapplyHint": "Richtet dieses Profil erneut ein — es werden keine Module hinzugefügt oder entfernt",
+    "target": "Ziel: {{name}}",
+    "loading": "Profile werden geladen…",
+    "empty": "Keine Profile verfügbar.",
+    "diffTitle": "Was sich ändert",
+    "diffSubtitle": "Von {{from}} zu {{to}}",
+    "diffEnable": "Aktivieren",
+    "diffDisable": "Deaktivieren",
+    "diffCascade": "Kaskaden-Deaktivierung",
+    "diffUnchanged": "Unverändert",
+    "diffConfig": "Einstellungen zurücksetzen für",
+    "confirmTitle": "Zu {{name}} wechseln?",
+    "confirmMessage": "Module werden für Ihre Organisation aktiviert und deaktiviert. Sie können jederzeit zurückwechseln.",
+    "confirmApply": "Profil wechseln",
+    "confirmReapplyTitle": "Einrichtung von {{name}} erneut ausführen?",
+    "confirmReapplyMessage": "Es werden keine Module hinzugefügt oder entfernt. Die Einrichtung des Profils läuft erneut: Seine Standardeinstellungen kehren zu den Profilwerten zurück, und die vom Profil gesäten Namen — einschließlich der Lagerorttypen — werden in der Sprache dieser Sitzung geschrieben.",
+    "confirmReapply": "Einrichtung erneut ausführen",
+    "previewLoading": "Änderungen werden berechnet…",
+    "diffManualKept": "Bleibt (manuell hinzugefügt)",
+    "diffCascadeHint": "Deaktiviert, weil sie ein entferntes Modul benötigen",
+    "diffConfigHint": "Profil-Standardwerte überschreiben aktuelle Einstellungen",
+    "renumberOffer": "Ihre Lagerorte behalten Codes und Etiketten. Regalcodes (A-02-01) vergeben Sie mit Nach Vorlage neu nummerieren unter Lager → Konfiguration → Lagerortcodes, Etiketten und Laufreihenfolge; alte Etiketten scannen weiter."
+  },
+  "activeProfile": {
+    "change": "Ändern"
+  }
+}

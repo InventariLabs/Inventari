@@ -1,0 +1,71 @@
+{# The header every printout shares.
+
+   Three families used to write this three times, and the copies had drifted:
+   codes on the left in one and on the right in another, two separating rules
+   eight millimetres apart, a barcode geometry that reached two families out
+   of three. A family may still differ in what it is allowed to differ in —
+   its wording, its page layout, its signatures — but not in where a reader
+   picks the codes off the page.
+
+   Context it reads (see core_api.pdf.print_header_context):
+     issuer            identity block — name, tax id, address, logo
+     print_title       what the document is called
+     print_subtitle    long-form description, optional
+     print_number      the document number
+     print_status      localized status, optional
+     print_dates       [{label, value}] — already deduplicated
+     code128_img / code128_width_mm / code128_height_mm
+     qr_img / qr_size_mm
+#}
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8mm; border-bottom: 1.5pt solid #1a1a2e; padding-bottom: 3mm; margin-bottom: 5mm;">
+
+  <div style="flex: 1; min-width: 0;">
+    {% include 'print_issuer.html' %}
+
+    <div style="font-size: 18pt; font-weight: bold; color: #1a1a2e; letter-spacing: 0.5pt; line-height: 1.1;">{{ print_title }}</div>
+    {% if print_subtitle %}
+    <div style="font-size: 9pt; color: #555; margin-top: 0.5mm;">{{ print_subtitle }}</div>
+    {% endif %}
+
+    <div style="margin-top: 1.5mm; font-size: 11pt; color: #1a1a2e;">
+      <span style="font-weight: 600;">{{ print_number }}</span>
+      {% if print_status %}
+      {# Two values are possible here — a printout exists only for a confirmed
+         or a completed record — so the status states itself and steps back,
+         instead of taking the top-right corner. #}
+      <span style="font-size: 8pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5pt; color: #555; margin-left: 3mm;">{{ print_status }}</span>
+      {% endif %}
+    </div>
+
+    {% if print_dates %}
+    <table style="margin-top: 1.5mm; border-collapse: collapse; font-size: 8pt; color: #555; font-variant-numeric: tabular-nums;">
+      {% for row in print_dates %}
+      <tr>
+        <td style="padding: 0 3mm 0 0; white-space: nowrap;">{{ row.label }}</td>
+        <td style="padding: 0; font-weight: 600; color: #333;">{{ row.value }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+
+  {# The codes, where somebody holding the sheet looks for them. A printout
+     that identifies no single record — a report about a date rather than a
+     document — has nothing to encode, and an empty <img> is a broken image,
+     so the whole block stands or falls with the barcode. #}
+  {% if code128_img %}
+  <div style="flex-shrink: 0; text-align: right;">
+    <div style="display: flex; align-items: flex-end; justify-content: flex-end; gap: 4mm;">
+      <img class="code128" src="{{ code128_img }}" alt="{{ print_number }}"
+           style="width: {{ code128_width_mm }}mm; height: {{ code128_height_mm }}mm;" />
+      <img class="qr" src="{{ qr_img }}" alt="{{ print_number }}"
+           style="width: {{ qr_size_mm }}mm; height: {{ qr_size_mm }}mm;" />
+    </div>
+    {# The number under the codes, in a fixed-width face: when the scan fails
+       this is what somebody types in, and 0/O and 1/l have to be told
+       apart. #}
+    <div style="margin-top: 1mm; font-family: 'DejaVu Sans Mono', monospace; font-size: 8pt; letter-spacing: 0.5pt; color: #333;">{{ print_number }}</div>
+  </div>
+  {% endif %}
+
+</div>

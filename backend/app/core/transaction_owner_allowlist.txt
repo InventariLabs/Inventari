@@ -1,0 +1,68 @@
+# Transaction owner allowlist
+# Format: relative/path.py::qualname
+#
+# Functions that OWN their transaction: they hold a session no caller
+# shared with them, so committing or rolling back inside them is the
+# convention, not a violation. The transaction-ownership gate stays
+# silent inside these functions, whatever the session is called and
+# however many times they commit.
+#
+# This is a positive grant, not debt: it does not ride the baseline
+# ratchet, and a new legal owner (a background job, a module router
+# holding its own session, a CLI entry point, a session wrapper, a test
+# helper) belongs here — never in transaction_ownership_baseline.txt.
+# Keep entries at function granularity; a commit in a nested helper is
+# not covered by its outer function's entry.
+bootstrap_service.py::run_startup_bootstrap_async
+warehouse/extra_costs_router.py::add_extra_cost
+warehouse/extra_costs_router.py::delete_extra_cost
+# One batch of the mail queue, on the session run_email_jobs_once opened for
+# it: each job commits on its own, and a job that crashes is rolled back so the
+# next one in the batch starts clean.
+email_jobs.py::process_email_jobs_batch
+email_jobs.py::_claim_batch
+email_jobs.py::_send_job
+email_jobs.py::enqueue_email_job
+email_jobs.py::run_email_jobs_once
+equipment/_attestation_scheduler.py::run_scheduled_reminder_check_async
+equipment/notification_worker.py::run_equipment_notification_check_async
+items/_import_job.py::_record_progress_async
+items/_import_job.py::run_job_async
+items/_retention.py::run_archive_retention_once
+module_test_plugin.py::module_org
+module_test_plugin.py::module_user
+nutrition/import_parquet.py::import_off_parquet
+outbox_relay.py::relay_outbox_batch
+outbox_relay.py::relay_outbox_once
+public_api/ai_usage.py::CoreAIUsageAPI.log_llm_usage_async
+recipes/migration.py::migrate_all_orgs_recipes_jina_key_async
+recipes/module.py::RecipesModule.on_startup_async
+reconciliation_job.py::run_reconciliation_once
+scoped_session.py::AsyncModuleScopedSession.commit
+scoped_session.py::AsyncModuleScopedSession.rollback
+stock_takes/router.py::request_recount
+testing.py::ModuleTestHelper.create_org
+testing.py::ModuleTestHelper.create_partner
+testing.py::ModuleTestHelper.create_storage_location
+testing.py::ModuleTestHelper.create_storage_type
+testing.py::ModuleTestHelper.create_template
+testing.py::ModuleTestHelper.create_user
+testing.py::ModuleTestHelper.grant_permissions
+testing.py::ModuleTestHelper.set_module_settings
+webhooks/_webhook_workers.py::_claim_batch
+webhooks/_webhook_workers.py::_requeue_stale_pending
+webhooks/_webhook_workers.py::cleanup_logs_per_organization_async
+webhooks/_webhook_workers.py::cleanup_old_logs
+webhooks/_webhook_workers.py::retry_failed_deliveries
+webhooks/migration.py::migrate_all_orgs_webhooks_settings_async
+# A purchase order recalculates its received quantities when a linked receipt
+# posts or is cancelled. The event handler runs after the receipt's request
+# has finished, on a tenant session of its own, and commits before the events
+# it raised leave.
+purchase_orders/module.py::PurchaseOrdersModule._recalc_po_from_event
+purchase_orders/module.py::PurchaseOrdersModule._notify_recalc_failure
+# Checks an API key in a session of its own, opened on the request session's
+# engine and committed there: refusing a key can revoke it (its owner left the
+# organization), and the 401 that follows rolls the request's session back.
+# The request's own session is never committed here.
+api_keys/module.py::_resolve_api_key

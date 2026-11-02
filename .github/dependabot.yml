@@ -1,0 +1,175 @@
+version: 2
+# Majors wait for a human: a major bump is a migration, not a chore. The parks
+# below use `update-types`, and those stop version-update PRs only: for security
+# updates dependabot-core builds ignored versions without the update-types
+# (IgnoreCondition#ignored_versions), so an advisory still opens its own PR.
+# Dependabot alerts and `make audit` keep reporting every CVE either way.
+#
+# Cadence: one grouped PR per ecosystem per month, majors included — so nothing
+# goes stale — and one grouped PR the moment an advisory lands, because security
+# updates ignore the schedule. Weekly opened ten PRs nobody had time to read;
+# a monthly batch is reviewed and gated in one sitting.
+updates:
+  # ── Backend (Python / uv) ──────────────────────────────────────
+  - package-ecosystem: uv
+    directory: /backend
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      backend-minor:
+        update-types: ['minor', 'patch']
+        patterns: ['*']
+      backend-major:
+        update-types: ['major']
+        patterns: ['*']
+      backend-security:
+        applies-to: security-updates
+        patterns: ['*']
+    open-pull-requests-limit: 3
+
+  # ── Print agent (Python / pip) ─────────────────────────────────
+  - package-ecosystem: pip
+    directory: /print-agent
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      print-agent-minor:
+        update-types: ['minor', 'patch']
+        patterns: ['*']
+      print-agent-major:
+        update-types: ['major']
+        patterns: ['*']
+      print-agent-security:
+        applies-to: security-updates
+        patterns: ['*']
+    open-pull-requests-limit: 2
+
+  # ── Frontend (npm) ─────────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      frontend-minor:
+        update-types: ['minor', 'patch']
+        patterns: ['*']
+      frontend-major:
+        update-types: ['major']
+        patterns: ['*']
+      frontend-security:
+        applies-to: security-updates
+        patterns: ['*']
+    open-pull-requests-limit: 3
+    ignore:
+      # React 19 = breaking migration, no automatic PR
+      - dependency-name: 'react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-dom'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@vitejs/plugin-react'
+        update-types: ['version-update:semver-major']
+      # eslint-plugin-react-hooks 5+ requires React 19
+      - dependency-name: 'eslint-plugin-react-hooks'
+        update-types: ['version-update:semver-major']
+      # Tailwind 4 = new CSS engine, requires a dedicated migration
+      - dependency-name: 'tailwindcss'
+        update-types: ['version-update:semver-major']
+      # vitest 2+ = breaking API changes, requires a dedicated migration
+      - dependency-name: 'vitest'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@vitest/coverage-v8'
+        update-types: ['version-update:semver-major']
+      # TypeScript 7 = new compiler; jest-dom 7 and lucide-react 2.x = breaking
+      # test/UI APIs — each needs a dedicated migration
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@testing-library/jest-dom'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'lucide-react'
+        update-types: ['version-update:semver-major']
+
+  # ── Docker (backend image) ─────────────────────────────────────
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 2
+    ignore:
+      # Python 3.14 = new interpreter: mypy target and native wheels need a pass.
+      # Minor is parked too, not just major: in docker tag terms 3.13 -> 3.14 is
+      # a semver-minor, so major alone would still propose the bump (that range starts
+      # at 4.a). 3.13.x patches still come.
+      - dependency-name: 'python'
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
+
+  # ── Docker (frontend images) ───────────────────────────────────
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 2
+    ignore:
+      # A Node major moves the whole frontend build with it
+      - dependency-name: 'node'
+        update-types: ['version-update:semver-major']
+
+  # ── Docker Compose (postgres, valkey, …) ───────────────────────
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      infra-images:
+        update-types: ['minor', 'patch']
+        patterns: ['*']
+      infra-major:
+        update-types: ['major']
+        patterns: ['*']
+      infra-security:
+        applies-to: security-updates
+        patterns: ['*']
+    open-pull-requests-limit: 3
+    ignore:
+      # Base images move in majors only with a deliberate migration
+      # (pg_upgrade, valkey protocol changes); minors and patches still come
+      - dependency-name: 'postgres'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'valkey/valkey'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'edoburu/pgbouncer'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'influxdb'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'caddy'
+        update-types: ['version-update:semver-major']
+
+  # ── GitHub Actions ─────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        update-types: ['minor', 'patch']
+        patterns: ['*']
+      actions-major:
+        update-types: ['major']
+        patterns: ['*']
+      actions-security:
+        applies-to: security-updates
+        patterns: ['*']
+    open-pull-requests-limit: 3

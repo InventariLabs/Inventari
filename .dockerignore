@@ -1,0 +1,17 @@
+.git
+.github
+.idea
+.vscode
+.venv
+__pycache__
+*.pyc
+node_modules
+.env
+.env.*
+docs/
+*.md
+!README.md
+backups/
+load_tests/
+screens/
+signatures/

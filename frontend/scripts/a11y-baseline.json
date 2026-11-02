@@ -1,0 +1,169 @@
+{
+  "generatedBy": "node scripts/check-a11y-baseline.mjs --write-baseline",
+  "note": "jsx-a11y findings frozen because the whole-file eslint relaxation for these files is still needed. A plain run of scripts/check-a11y-baseline.mjs fails on any mismatch in either direction; this snapshot is the only writer.",
+  "files": {
+    "src/components/ErrorDetails.tsx": {
+      "jsx-a11y/no-noninteractive-tabindex": 1
+    },
+    "src/components/ui/ChoiceGroup.tsx": {
+      "jsx-a11y/interactive-supports-focus": 1
+    },
+    "src/components/ui/DateInput.tsx": {
+      "jsx-a11y/no-static-element-interactions": 1,
+      "jsx-a11y/role-supports-aria-props": 1
+    },
+    "src/components/ui/EmojiPicker.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/components/ui/FieldBuilderFieldForm.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/components/ui/FieldBuilderFieldRow.tsx": {
+      "jsx-a11y/no-noninteractive-tabindex": 1
+    },
+    "src/components/ui/ModalShell.tsx": {
+      "jsx-a11y/click-events-have-key-events": 2,
+      "jsx-a11y/no-static-element-interactions": 2
+    },
+    "src/components/ui/SearchableCombobox.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-autofocus": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/components/ui/Sheet.tsx": {
+      "jsx-a11y/click-events-have-key-events": 2,
+      "jsx-a11y/heading-has-content": 1,
+      "jsx-a11y/no-noninteractive-element-interactions": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/announcements/components/NotificationTray.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/api_keys/components/CreateApiKeyModal.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/approvals/components/ApprovalStageStepper.tsx": {
+      "jsx-a11y/no-redundant-roles": 1
+    },
+    "src/modules/approvals/components/UserMultiSelect.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/equipment/components/ModelEditModal.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/equipment/pages/EquipmentLocationsPage.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/inventory/components/AttachLabelToItemSheet.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/inventory/components/CategoryCreateModal.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/inventory/components/CategoryGroupSheet.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/inventory/components/ConsumeDialog.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/inventory/components/QuickActionSheet.tsx": {
+      "jsx-a11y/img-redundant-alt": 1
+    },
+    "src/modules/inventory/components/ThresholdQuickSetSheet.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/inventory/components/labels/LabelCard.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/inventory/components/labels/LabelGenerateModal.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/inventory/components/lots/LotStatusDialog.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/launcher/components/Launcher.tsx": {
+      "jsx-a11y/no-redundant-roles": 2
+    },
+    "src/modules/purchase_orders/pages/LinkedReceiptsPage.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/recipes/components/CollectionsPanel.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/recipes/components/ImportModal.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/recipes/components/PickingActivePhase.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/recipes/components/PickingItemRow.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/recipes/components/RecipeIngredientRow.tsx": {
+      "jsx-a11y/no-autofocus": 2
+    },
+    "src/modules/recipes/components/TagRenameDialog.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/settings/components/roles/RolePermissionsSheet.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/settings/components/roles/RolesPage.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/shared/components/LabelPickerInput.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/shared/components/UomSelect.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/shopping_lists/components/AddItemModal.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/shopping_lists/components/CreateShoppingListModal.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/shopping_lists/components/ShoppingListCard.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/shopping_lists/components/ShoppingListItemCard.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/spaces/components/StorageItems/StorageItemsCards.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/spaces/components/StorageItems/StorageItemsTable.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/warehouse/components/DocumentImportModal.tsx": {
+      "jsx-a11y/click-events-have-key-events": 1,
+      "jsx-a11y/no-static-element-interactions": 1
+    },
+    "src/modules/warehouse/components/ImportPreviewSections.tsx": {
+      "jsx-a11y/label-has-associated-control": 1
+    },
+    "src/modules/warehouse/components/picking/WmsPickingActive.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/warehouse/components/picking/WmsShortPickDialog.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/warehouse/components/receiving/WmsReceivingActive.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/warehouse/components/receiving/WmsShortReceiveDialog.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    },
+    "src/modules/webhooks/components/WebhookForm.tsx": {
+      "jsx-a11y/no-autofocus": 1
+    }
+  }
+}

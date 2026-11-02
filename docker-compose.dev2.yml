@@ -1,0 +1,69 @@
+# Secondary development stack — "second stack".
+#
+# Purpose: run a second, fully isolated Inventari stack alongside the primary one
+# so two work streams (two branches, or dev + a long test run) never
+# share a database, a Redis instance, or a host port.
+#
+# Isolation comes from two independent mechanisms:
+#   1. COMPOSE_PROJECT_NAME — namespaces containers, networks and NAMED VOLUMES,
+#      so this stack gets its own postgres_data / redis_data / uploads_data.
+#      Without it, both stacks would write to the same database volume.
+#   2. This file — shifts every published host port by +100 so both stacks can
+#      listen simultaneously.
+#
+# `ports` uses the !override tag (Compose >= 2.24) because Compose CONCATENATES
+# sequence values on merge. A plain override would publish BOTH 5433 and 5533,
+# and the primary stack would lose the bind. Do not remove the tags.
+#
+# Nothing else is redefined here — services, images, build context and env stay
+# in docker-compose.yml / docker-compose.override.yml as the single source of truth.
+#
+# Usage (always via the wrapper, which sets project name and file list):
+#   scripts/dev2 docker compose up -d --build
+#   scripts/dev2 make test
+#   scripts/dev2 docker compose down -v      # -v drops ONLY the second stack's volumes
+#
+# Port map — primary -> secondary:
+#   frontend  5173 -> 5273        backend       8005 -> 8105
+#   postgres  5433 -> 5533        products-db   5434 -> 5534   (profile: food)
+#   redis     6380 -> 6480        mailhog  1025/8025 -> 1125/8125
+
+services:
+  db:
+    ports: !override
+      - "127.0.0.1:5533:5432"
+
+  products-db:
+    ports: !override
+      - "127.0.0.1:5534:5432"
+
+  redis:
+    ports: !override
+      - "127.0.0.1:6480:6379"
+
+  backend:
+    environment:
+      # CORS allow-list must follow the secondary frontend port.
+      FRONTEND_URL: http://localhost:5273
+      # Playwright's mobile project runs WebKit, which does not store a Secure
+      # cookie for plain http://127.0.0.1 (Chromium treats it as secure). The
+      # refresh cookie is Secure unless DEBUG is on, so with the DEBUG=false of
+      # a production-shaped .env every WebKit login is lost on the next reload.
+      # This stack never serves real traffic, so it pins DEBUG on whatever .env says.
+      DEBUG: "true"
+      # dev2 is the isolated E2E stack: the Playwright fixtures log in per
+      # test, so the 5/min login limit would break every full run. Keep the
+      # limiter off here (the acknowledgement flag below) — this stack never serves real traffic.
+      LOAD_TESTING: "true"
+      LOAD_TESTING_ACK_UNSAFE: "true"
+    ports: !override
+      - "127.0.0.1:8105:8000"
+
+  frontend:
+    ports: !override
+      - "127.0.0.1:5273:5173"
+
+  mailhog:
+    ports: !override
+      - "127.0.0.1:1125:1025"
+      - "127.0.0.1:8125:8025"

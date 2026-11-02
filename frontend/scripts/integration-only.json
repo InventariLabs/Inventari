@@ -1,0 +1,282 @@
+{
+  "_comment": [
+    "Backend routes with no caller in production frontend code, and what was",
+    "decided about each.",
+    "",
+    "`verdict` is the triage bucket:",
+    "  integration-only — no UI by design (operator lever, external surface)",
+    "  to-wire          — the UI is missing and should be built",
+    "  to-delete        — superseded by a route the UI already calls",
+    "  to-decide        — the product question is open",
+    "",
+    "Only integration-only is a resting state. The other three are scheduled",
+    "work, and `expires` is what schedules it: past that date the gate fails and",
+    "names the owner. An entry with no reason, no owner or no date is refused."
+  ],
+  "routes": {
+    "/api/v1/admin/stats/activity": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Installation-wide admin activity metrics. No frontend screen renders them; they are read through the API."
+    },
+    "/api/v1/admin/stats/ai-usage": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Token and cost accounting per AI purpose. No frontend screen renders it; it is read through the API."
+    },
+    "/api/v1/admin/stats/summary": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Installation-wide counts across organizations. No frontend screen renders them; they are read through the API."
+    },
+    "/api/v1/warehouse/documents/lookup/{number}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "integration-only",
+      "reason": "Finds a document by its printed number. The document scanner resolves numbers through the scan registry instead, so this route serves external systems that hold a number from a printout and need the record."
+    },
+    "/api/v1/warehouse/settings/type-configs": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Per-document-type configuration (numbering, defaults) with GET, PUT and DELETE. No settings screen calls it; it is configured through the API."
+    },
+    "/api/v1/warehouse/settings/type-configs/{document_type}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Read, update and delete of one document type's configuration. No settings screen calls it."
+    },
+    "/api/v1/warehouse/tax-rates": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Tax rate dictionary, create and list. No settings screen calls it; document lines carry the rate as entered."
+    },
+    "/api/v1/warehouse/tax-rates/{rate_id}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Read, update and delete for the tax rate dictionary. No screen calls it."
+    },
+    "/api/v1/warehouse/tax-summary": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Tax totals per rate over a period. No report screen calls it."
+    },
+    "/api/v1/warehouse/documents/{document_id}/picking/{session_id}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "Reads one picking session. The UI lists the sessions of a document and acts on one by id from that list, so it never fetches a single session."
+    },
+    "/api/v1/equipment/protocol/placeholders": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Placeholder list for handover protocol templates. The template editor reads /equipment/templates/placeholders only, so these placeholders are not offered in the UI."
+    },
+    "/api/v1/items/cursor-page": {
+      "owner": "maintainers",
+      "expires": "2027-08-31",
+      "verdict": "integration-only",
+      "reason": "Cursor pagination over items for external consumers and large exports. The UI pages by offset because it shows page numbers, which a cursor cannot provide. Both are canonical envelopes per AGENTS.md."
+    },
+    "/api/v1/items/expiring": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "Superseded by GET /items?expiring_days=N, which the item list and its expiry chip call."
+    },
+    "/api/v1/items/product-templates/sku-schema": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "GET and PUT for the organization's SKU numbering scheme. No screen calls it, so SKUs are entered free-form."
+    },
+    "/api/v1/items/product-templates/{template_id}/clone": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Duplicates a product template. The products UI has no clone action (equipment models have one, through their own route)."
+    },
+    "/api/v1/maker/bom/parents": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "Lists templates that have BoM lines. The UI gets the same answer from /maker/bom/summary and /maker/bom/template-ids."
+    },
+    "/api/v1/maker/bom/{line_id}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "DELETE of a BoM line. The editor deletes through the recipe-scoped /maker/recipes/{id}/bom-lines/{lineId} instead."
+    },
+    "/api/v1/maker/bom/{template_id}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "Flat BoM lines for a template. The editor reads /maker/bom/tree/{id}, which returns the same lines with their structure."
+    },
+    "/api/v1/organizations/current/defaults": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "integration-only",
+      "reason": "Operator lever: re-seeds the product profile's starting locations for an organization that lacks them. Enabled modules seed their own locations through system_on_enable, so no screen calls it."
+    },
+    "/api/v1/partners/{partner_id}/items": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Items a partner supplies or has bought. The partner detail page shows documents and contact data and does not call it."
+    },
+    "/api/v1/printing/agent/jobs/{job_id}/image": {
+      "owner": "printing",
+      "expires": "2027-06-30",
+      "verdict": "integration-only",
+      "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
+    },
+    "/api/v1/printing/agent/jobs/{job_id}/report": {
+      "owner": "printing",
+      "expires": "2027-06-30",
+      "verdict": "integration-only",
+      "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
+    },
+    "/api/v1/printing/agent/register": {
+      "owner": "printing",
+      "expires": "2027-06-30",
+      "verdict": "integration-only",
+      "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
+    },
+    "/api/v1/printing/agent/{agent_id}/claim": {
+      "owner": "printing",
+      "expires": "2027-06-30",
+      "verdict": "integration-only",
+      "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
+    },
+    "/api/v1/profiles/{profile_id}": {
+      "owner": "maintainers",
+      "expires": "2027-08-31",
+      "verdict": "integration-only",
+      "reason": "One product profile by id. The onboarding and settings screens list profiles and apply one; the packaging CLI is what addresses a single profile."
+    },
+    "/api/v1/purchase-orders/import/analyze": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Reads a supplier file and proposes purchase order lines. Purchase orders have no import screen, so no UI calls it."
+    },
+    "/api/v1/purchase-orders/{po_id}/approval": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "Proxy that reads the approval request for an order. The detail page reads it from the approvals module directly, through useApprovalRequests."
+    },
+    "/api/v1/purchase-orders/{po_id}/create-receipt": {
+      "owner": "maintainers",
+      "expires": "2027-08-31",
+      "verdict": "integration-only",
+      "reason": "Builds a confirmed receipt for an order in one call, for scripts and integrations that hand the floor a receipt to scan. The order screen receives through the one-screen receive, which posts with POST /warehouse/documents/post."
+    },
+    "/api/v1/purchase-orders/{po_id}/html": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Renders an order as HTML for preview and printing. The purchase order screens do not call it."
+    },
+    "/api/v1/purchase-orders/{po_id}/import-lines": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Commits the lines proposed by /purchase-orders/import/analyze. No import screen calls it."
+    },
+    "/api/v1/recipes/import": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "The commit step of recipe import. The UI calls /recipes/import/preview only and has no confirm action that calls this route."
+    },
+    "/api/v1/recipes/ingredient-defaults/seed": {
+      "owner": "maintainers",
+      "expires": "2027-08-31",
+      "verdict": "integration-only",
+      "reason": "Seeds the starter ingredient-to-product mapping for an organization. An operator lever, like the seed-defaults routes in purchase orders and equipment."
+    },
+    "/api/v1/recipes/meal-plans/{plan_id}/entries/bulk": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Adds several meal plan entries in one call. The planner adds entries one request at a time."
+    },
+    "/api/v1/recipes/meal-plans/{plan_id}/entries/{entry_id}/cook": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Starts a picking session from a planned meal. The meal planner has no cook action that calls it."
+    },
+    "/api/v1/roles/users/{user_id}/{role_id}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "Assigns a custom role by a path pair. The members list changes roles through the organization members endpoint, which also refuses an admin demoting themselves."
+    },
+    "/api/v1/shopping-lists/{list_id}/suggestions/add-all": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Accepts every shopping list suggestion in one call. The UI adds suggestions one by one."
+    },
+    "/api/v1/stats/activity": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Recent activity feed. No dashboard screen calls it."
+    },
+    "/api/v1/stats/consumption": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Consumption over time. No dashboard screen calls it."
+    },
+    "/api/v1/stats/overview/stream": {
+      "owner": "maintainers",
+      "expires": "2027-08-31",
+      "verdict": "integration-only",
+      "reason": "Server-sent stream of the overview numbers, for a wallboard or an external dashboard. The dashboard polls the plain /stats/overview instead."
+    },
+    "/api/v1/stats/shopping-suggestions": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-delete",
+      "reason": "Shopping suggestions from consumption history. The shopping lists module computes its own suggestions and the UI reads those."
+    },
+    "/api/v1/stock-takes/cycle-count-schedules": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-decide",
+      "reason": "Cycle count schedules, list and create. The backend is complete and no screen calls it; schedules are created through the API only."
+    },
+    "/api/v1/stock-takes/cycle-count-schedules/{schedule_id}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-decide",
+      "reason": "Cycle count schedules, read, update and delete. The backend is complete and no screen calls it; schedules are managed through the API only."
+    },
+    "/api/v1/stock-takes/{stock_take_id}/items/bulk-count": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Submits many counted lines in one call. The counting screen posts one line per item."
+    },
+    "/api/v1/location-types/{location_type_id}": {
+      "owner": "maintainers",
+      "expires": "2026-11-30",
+      "verdict": "to-wire",
+      "reason": "Read, update and delete one storage type. The UI lists and creates storage types but does not call this route."
+    }
+  }
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page {
+      margin: 18mm 15mm 18mm 15mm;
+      @top-right {
+        content: counter(page) " / " counter(pages);
+        font-size: 8pt;
+        color: #999;
+      }
+      @bottom-center {
+        content: "{{ labels.footer }}";
+        font-size: 8pt;
+        text-align: center;
+        padding: 0 4mm;
+        color: #999;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 9pt;
+      color: #222;
+      line-height: 1.4;
+    }
+    .correction-ref {
+      margin-top: 6px;
+      padding: 4px 8px;
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 3px;
+      font-size: 8pt;
+      color: #92400e;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 20px;
+      margin-bottom: 12px;
+    }
+    .info-block {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+    .info-block h3 {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 3px;
+    }
+    .info-row {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 0 3mm;
+      margin-bottom: 2px;
+    }
+    .info-label {
+      color: #888;
+    }
+    .info-value {
+      font-weight: 500;
+    }
+    .lines-section h2 {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    thead th {
+      padding: 5px 6px;
+      text-align: left;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+    thead th.right {
+      text-align: right;
+    }
+    tbody tr:nth-child(even) {
+      background: #f7f7fb;
+    }
+    tbody tr:nth-child(odd) {
+      background: #fff;
+    }
+    tbody td {
+      padding: 4px 6px;
+      font-size: 9pt;
+    }
+    tbody td.right {
+      text-align: right;
+    }
+    .delta-positive { color: #16a34a; font-weight: bold; }
+    .delta-negative { color: #dc2626; font-weight: bold; }
+    .line-status-done { color: #16a34a; }
+    .line-status-partial { color: #d97706; }
+    .line-status-exception { color: #dc2626; }
+    .line-status-pending { color: #888; }
+    .totals-section {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .totals-table {
+      width: 220px;
+      border: 1px solid #1a1a2e;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .totals-table tr td {
+      padding: 4px 10px;
+      font-size: 9pt;
+      border-bottom: 1px solid #eee;
+    }
+    .totals-table tr:last-child td {
+      border-bottom: none;
+    }
+    .totals-table .label { color: #555; }
+    .totals-table .amount { text-align: right; font-weight: 500; }
+    .totals-table .grand-total td {
+      font-weight: bold;
+      font-size: 11pt;
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .tax-by-rate {
+      margin-top: 10px;
+      margin-left: auto;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+    .tax-by-rate th, .tax-by-rate td {
+      padding: 3px 8px;
+      border-bottom: 1px solid #eee;
+      text-align: right;
+    }
+    .tax-by-rate th { color: #555; font-weight: 500; }
+    .notes-section {
+      margin-top: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+    .notes-section h3 {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    /* The blank above the rules is where somebody signs — it has
+       to be worth a pen, not a line of leading. */
+    .signatures {
+      margin-top: 10mm;
+      display: grid;
+      {% if doc_variant == 'correction' %}grid-template-columns: 1fr;{% else %}grid-template-columns: 1fr 1fr 1fr;{% endif %}
+      gap: 20px;
+    }
+    .sig-box {
+      border-top: 1px solid #555;
+      padding-top: 1.5mm;
+      text-align: center;
+      font-size: 8pt;
+      color: #555;
+    }
+    .sig-box .sig-hint {
+      display: block;
+      margin-top: 0.5mm;
+      font-size: 8pt;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Identity, identification and codes — one header for every print
+     family. What this family is free to differ in is below. -->
+{% include 'print_header.html' %}
+
+{% if corrected_doc_number %}
+<div class="correction-ref">{{ labels.correction_of }}: <strong>{{ corrected_doc_number }}</strong></div>
+{% endif %}
+{% if backorder_of_number %}
+<div class="correction-ref">{{ labels.backorder_of }}: <strong>{{ backorder_of_number }}</strong></div>
+{% endif %}
+{% if return_of_number %}
+<div class="correction-ref">{{ labels.return_of }}: <strong>{{ return_of_number }}</strong></div>
+{% endif %}
+{% if scrap_reason %}
+<div class="correction-ref">{{ labels.scrap_reason }}: <strong>{{ scrap_reason }}</strong></div>
+{% endif %}
+
+<!-- Info grid — conditional per type -->
+<div class="info-grid">
+  {% if is_correction %}
+  {% include 'standard/parties/correction.html' %}
+  {% else %}
+  {% include 'standard/parties/default.html' %}
+  {% endif %}
+</div>
+
+<!-- Lines table -->
+<div class="lines-section">
+  <h2>{{ labels.line_items }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30px">#</th>
+        <th>{{ labels.item }}</th>
+        {% if is_correction %}
+        <th class="right" style="width:70px">{{ labels.delta }}</th>
+        {% else %}
+        <th class="right" style="width:60px">{{ labels.expected }}</th>
+        <th class="right" style="width:60px">{{ labels.done }}</th>
+        {% endif %}
+        <th style="width:50px">{{ labels.unit }}</th>
+        {% if show_value_columns %}
+        <th class="right" style="width:70px">{{ labels.unit_price }}</th>
+        {% if is_correction %}
+        <th class="right" style="width:70px">{{ labels.financial_impact }}</th>
+        {% else %}
+        <th class="right" style="width:70px">{{ labels.line_gross }}</th>
+        {% if show_tax_column %}
+        <th class="right" style="width:50px">{{ labels.vat }}</th>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% if show_line_status %}
+        <th style="width:70px">{{ labels.status }}</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for line in document.lines %}
+      <tr>
+        <td>{{ line.line_number }}</td>
+        <td>
+          {{ line.name or '' }}
+          {% if line.product_snapshot and line.product_snapshot.sku %}<span style="color:#1a1a2e;font-size:9pt;font-weight:600;">{{ line.product_snapshot.sku }}</span> {% endif %}
+          {% if line.barcode %}<br/><span style="color:#555;font-size:9pt;font-weight:500;">EAN: {{ line.barcode }}</span>{% endif %}
+          {% if line.batch_number %}<br/><span style="color:#888;font-size:8pt">{{ labels.batch }}: {{ line.batch_number }}</span>{% endif %}
+          {% if line.expiry_date %}<br/><span style="color:#888;font-size:8pt">{{ labels.expiry }}: {{ line.expiry_date }}</span>{% endif %}
+        </td>
+        {% if is_correction %}
+        {% set qty_val = line.expected_quantity | format_qty %}
+        <td class="right {% if line.expected_quantity >= 0 %}delta-positive{% else %}delta-negative{% endif %}">
+          {% if line.expected_quantity >= 0 %}+{% endif %}{{ qty_val }}
+        </td>
+        {% else %}
+        <td class="right">{{ line.expected_quantity | format_qty }}</td>
+        <td class="right">{{ line.done_quantity | format_qty }}</td>
+        {% endif %}
+        <td>{{ line.uom.symbol | unit_label if line.uom else '—' }}</td>
+        {% if show_value_columns %}
+        <td class="right">{{ line.unit_price | format_decimal }}</td>
+        {% if is_correction %}
+        {% if line.unit_price %}
+        {% set delta_gross = line.expected_quantity * line.unit_price * (100 + (line.tax_rate or 0)) / 100 %}
+        <td class="right {% if delta_gross >= 0 %}delta-positive{% else %}delta-negative{% endif %}">{{ delta_gross | format_decimal }}</td>
+        {% else %}
+        <td class="right">—</td>
+        {% endif %}
+        {% else %}
+        <td class="right">{{ line.line_gross | format_decimal }}</td>
+        {% if show_tax_column %}
+        <td class="right">{{ line.tax_rate | format_pct if line.unit_price else '—' }}</td>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% if show_line_status %}
+        <td class="line-status-{{ line.line_status | lower }}">{{ line_status_map.get(line.line_status, line.line_status) }}</td>
+        {% endif %}
+      </tr>
+      {% if line.discrepancy_code and not is_correction %}
+      <tr style="background:#fff3f3;">
+        <td></td>
+        <td colspan="{{ 3 + (3 if show_tax_column else (2 if show_value_columns else 0)) + (1 if show_line_status else 0) }}">
+          <span style="color:#dc2626;font-size:8pt">⚠ {{ discrepancy_map.get(line.discrepancy_code, line.discrepancy_code) }}{% if line.discrepancy_reason %} — {{ line.discrepancy_reason }}{% endif %}</span>
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Totals -->
+{% if is_correction and show_value_columns %}
+<div class="totals-section">
+  <table class="totals-table">
+    {% set ns = namespace(total=0) %}
+    {% for line in document.lines %}
+    {% if line.unit_price %}
+    {% set line_impact = line.expected_quantity * line.unit_price * (100 + (line.tax_rate or 0)) / 100 %}
+    {% set ns.total = ns.total + line_impact %}
+    {% endif %}
+    {% endfor %}
+    <tr class="grand-total">
+      <td>{{ labels.financial_impact | upper }}</td>
+      <td class="amount {% if ns.total >= 0 %}delta-positive{% else %}delta-negative{% endif %}">
+        {% if ns.total >= 0 %}+{% endif %}{{ ns.total | format_decimal }} {{ document.currency or '' }}
+      </td>
+    </tr>
+  </table>
+</div>
+{% elif show_value_columns and document.total_gross and show_payment %}
+{% if tax_by_rate | length > 1 %}
+<table class="tax-by-rate" aria-label="{{ labels.tax_by_rate }}">
+  <tr>
+    <th>{{ labels.vat }}</th>
+    <th>{{ labels.total_net }}</th>
+    <th>{{ labels.total_tax }}</th>
+    <th>{{ labels.total_gross }}</th>
+  </tr>
+  {% for row in tax_by_rate %}
+  <tr>
+    <td>{{ row.rate | format_pct }}</td>
+    <td>{{ row.net | format_decimal }}</td>
+    <td>{{ row.tax | format_decimal }}</td>
+    <td>{{ row.gross | format_decimal }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+<div class="totals-section">
+  <table class="totals-table">
+    {% if document.total_net %}
+    <tr>
+      <td class="label">{{ labels.total_net }}</td>
+      <td class="amount">{{ document.total_net | format_decimal }} {{ document.currency or '' }}</td>
+    </tr>
+    {% endif %}
+    {% if document.total_tax %}
+    <tr>
+      <td class="label">{{ labels.total_tax }}</td>
+      <td class="amount">{{ document.total_tax | format_decimal }} {{ document.currency or '' }}</td>
+    </tr>
+    {% endif %}
+    <tr class="grand-total">
+      <td>{{ labels.total_due }}</td>
+      <td class="amount">{{ document.total_gross | format_decimal }} {{ document.currency or '' }}</td>
+    </tr>
+  </table>
+</div>
+{% elif is_scrap and document.total_net is not none %}
+<!-- A write-off is worth what the cost layers it drew were worth. -->
+<div class="totals-section">
+  <table class="totals-table">
+    <tr class="grand-total">
+      <td>{{ labels.scrap_cost }}</td>
+      <td class="amount">{{ document.total_net | format_decimal }} {{ document.currency or '' }}</td>
+    </tr>
+  </table>
+</div>
+{% endif %}
+
+<!-- Notes -->
+{% if document.notes and not is_correction %}
+<div class="notes-section">
+  <h3>{{ labels.notes }}</h3>
+  <p>{{ document.notes }}</p>
+</div>
+{% endif %}
+
+<!-- Signatures — conditional per type -->
+<div class="signatures">
+  {% include 'standard/signatures/' ~ doc_variant ~ '.html' %}
+</div>
+
+
+</body>
+</html>

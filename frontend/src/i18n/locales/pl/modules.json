@@ -1,0 +1,223 @@
+{
+  "enabled": "Włączony",
+  "errors": {
+    "updateFailed": "Nie udało się zaktualizować stanu modułu"
+  },
+  "success": {
+    "enabled": "Moduł {{name}} został włączony",
+    "disabled": "Moduł {{name}} został wyłączony"
+  },
+  "modules": {
+    "core": {
+      "title": "Dom i Kuchnia",
+      "desc": "Lodówka, Spiżarnia i podstawowe produkty."
+    },
+    "shopping_lists": {
+      "name": "Listy zakupów",
+      "description": "Twórz i zarządzaj listami zakupów, automatyczne sugestie."
+    },
+    "vision": {
+      "name": "Rozpoznawanie ze zdjęć",
+      "description": "Odczytuje nazwę, markę i datę przydatności produktu ze zdjęcia etykiety. Wyłączony — dodawanie produktu traci zakładkę ze zdjęciem, a tabele wartości odżywczych trzeba wpisać ręcznie."
+    },
+    "stats": {
+      "name": "Statystyki",
+      "description": "Zaawansowana analiza spożycia i śledzenie marnotrawstwa."
+    },
+    "stock_takes": {
+      "name": "Inwentaryzacja",
+      "description": "Okresowe kontrole zapasów w celu weryfikacji dokładności stanów."
+    },
+    "partners": {
+      "name": "Partnerzy",
+      "description": "Zarządzaj dostawcami, klientami i usługodawcami dla przepływów B2B."
+    },
+    "recipes": {
+      "name": "Przepisy",
+      "description": "Twórz i zarządzaj przepisami ze śledzeniem składników."
+    },
+    "equipment": {
+      "name": "Śledzenie sprzętu",
+      "description": "Śledź aktywa IT i fizyczne z zarządzaniem cyklem życia."
+    },
+    "example_widgets": {
+      "name": "Przykładowe widżety",
+      "description": "Moduł referencyjny pokazujący wzorce modułów Inventari: zarządzaj prostymi widżetami z nazwą, kolorem i liczbą."
+    },
+    "warehouse": {
+      "name": "Magazyn",
+      "description": "Aparatem telefonu lub skanerem przyjmuj, wydawaj, przenoś i licz towar; numerowane dokumenty powstają w tle — z regułami rozmieszczania."
+    },
+    "purchase_orders": {
+      "name": "Zamówienia zakupu",
+      "description": "Twórz i śledź zamówienia zakupu u dostawców."
+    },
+    "printing": {
+      "name": "Druk etykiet",
+      "description": "Generuj i drukuj etykiety dla produktów i miejsc."
+    },
+    "nutrition": {
+      "name": "Wartości odżywcze",
+      "description": "Wyświetlaj dane odżywcze i składniki z Open Food Facts."
+    },
+    "approvals": {
+      "name": "Zatwierdzenia",
+      "description": "Wieloetapowe przepływy zatwierdzeń dla krytycznych operacji."
+    },
+    "webhooks": {
+      "name": "Webhooki",
+      "description": "Wychodzące powiadomienia HTTP o zdarzeniach w obszarze roboczym."
+    },
+    "api_keys": {
+      "name": "Klucze API",
+      "description": "Programowy dostęp przez klucze REST API."
+    },
+    "maker": {
+      "name": "Produkcja",
+      "description": "Zarządzanie produkcją i listami materiałów (BOM)."
+    },
+    "items": {
+      "name": "Inwentarz"
+    }
+  },
+  "config": {
+    "connectionsTitle": "Połączenia AI",
+    "connectionsDescription": "Pula połączeń LLM współdzielona między modułami. Przypisz jedno do każdego celu poniżej.",
+    "addConnection": "Dodaj połączenie",
+    "editConnection": "Edytuj połączenie",
+    "deleteConnection": "Usuń połączenie",
+    "deleteConfirm": "Usunąć „{{name}}”? Tej operacji nie można cofnąć.",
+    "delete": "Usuń",
+    "cancel": "Anuluj",
+    "save": "Zapisz",
+    "saving": "Zapisywanie…",
+    "formDescription": "Skonfiguruj punkt końcowy LLM. Pula jest współdzielona między funkcjami AI.",
+    "fieldName": "Nazwa",
+    "fieldNamePlaceholder": "np. Czujnik na półce w spiżarni",
+    "fieldProvider": "Dostawca",
+    "fieldApiKey": "Klucz API",
+    "fieldApiKeyDocs": "Skąd wziąć klucz {{provider}}",
+    "fieldApiKeyPlaceholder": "sk-or-v1-…",
+    "fieldBaseUrl": "Bazowy URL API",
+    "localEngineHint": "Lokalny silnik stoi pod adresem prywatnym, a serwer go odrzuca, dopóki operator na to nie pozwoli: ustaw LLM_ALLOW_PRIVATE_NETWORKS=true i zrestartuj backend. Zostaw adres host.docker.internal — z wnętrza kontenera localhost to sam kontener.",
+    "fieldModel": "Model",
+    "fieldCapabilities": "Możliwości",
+    "capability": {
+      "vision": "Wizja",
+      "text": "Tekst",
+      "url_fetch": "Czytanie stron"
+    },
+    "noConnections": "Brak połączeń",
+    "noConnectionsHint": "Dodaj połączenie, aby korzystać z funkcji AI (Vision, Przepisy, …).",
+    "bindingsTitle": "Domyślne na cel",
+    "boundHere": "Aktywne dla tego celu",
+    "noBinding": "Nie skonfigurowano",
+    "cannotDeleteBound": "To połączenie jest przypisane do celu. Najpierw je odepnij.",
+    "noEligibleConnections": "Brak połączeń z możliwością „{{capability}}”.",
+    "noEligibleConnectionsCta": "Załóż połączenie",
+    "serverDefaultOption": "Model domyślny serwera",
+    "serverDefaultHint": "Obsługuje go model domyślny serwera. Wybierz połączenie, aby użyć własnego.",
+    "noConnectionsServerDefaultHint": "Niektóre funkcje AI już działają na modelu domyślnym serwera. Dodaj połączenie, aby użyć własnego.",
+    "createFailed": "Nie udało się utworzyć połączenia",
+    "updateFailed": "Nie udało się zaktualizować połączenia",
+    "deleteFailed": "Nie udało się usunąć połączenia",
+    "bindingFailed": "Nie udało się zaktualizować przypisania",
+    "deleteSuccess": "Połączenie usunięte",
+    "loading": "Ładowanie połączeń…",
+    "errorNameRequired": "Nazwa jest wymagana",
+    "errorNameTaken": "Połączenie o tej nazwie już istnieje",
+    "errorCapabilityRequired": "Wybierz co najmniej jedną możliwość",
+    "groupCloud": "Chmura",
+    "groupAggregator": "Agregator",
+    "groupSpecialist": "Wyspecjalizowane",
+    "groupLocal": "Lokalne",
+    "groupCustom": "Własne",
+    "testConnection": "Testuj połączenie",
+    "testing": "Testowanie…",
+    "testFailed": "Test połączenia nie powiódł się. Sprawdź klucz i URL.",
+    "testNeedsApiKey": "Najpierw wpisz klucz API w polu powyżej — test wysyła to, co jest w formularzu, a nie klucz zapisany przy połączeniu.",
+    "testNeedsBaseUrl": "Najpierw uzupełnij bazowy URL API powyżej — ten dostawca jest dostępny przez HTTP, więc test potrzebuje jego adresu.",
+    "testContractOk": "Połączenie działa — model odpowiedział w oczekiwanym kształcie. Dostępnych modeli: {{count}}.",
+    "testReadAll": "Połączenie działa — model odczytał wszystkie pola wzorcowej etykiety ({{of}}).",
+    "testReadPartial": "Odpowiedź miała właściwy kształt, ale model odczytał tylko {{matched}} z {{of}} pól wzorcowej etykiety — może wpisywać wartości, których nie widział.",
+    "testContractOk_one": "Połączenie działa — model odczytał wzorcową etykietę. Dostępny model: {{count}}.",
+    "testContractOk_few": "Połączenie działa — model odczytał wzorcową etykietę. Dostępne modele: {{count}}.",
+    "testContractOk_many": "Połączenie działa — model odczytał wzorcową etykietę. Dostępnych modeli: {{count}}.",
+    "testContractOk_other": "Połączenie działa — model odczytał wzorcową etykietę. Dostępnych modeli: {{count}}.",
+    "testContractFailed": "Klucz działa, ale model nie zwrócił danych w umówionej postaci. Odpowiedział: {{preview}}",
+    "testUnchecked": "Poświadczenia działają — dostępnych modeli: {{count}}. Nie sprawdzono kształtu odpowiedzi dla tych możliwości.",
+    "testUnchecked_one": "Poświadczenia działają — dostępny model: {{count}}. Nie sprawdzono kształtu odpowiedzi dla tych możliwości.",
+    "testUnchecked_few": "Poświadczenia działają — dostępne modele: {{count}}. Nie sprawdzono kształtu odpowiedzi dla tych możliwości.",
+    "testUnchecked_many": "Poświadczenia działają — dostępnych modeli: {{count}}. Nie sprawdzono kształtu odpowiedzi dla tych możliwości.",
+    "testUnchecked_other": "Poświadczenia działają — dostępnych modeli: {{count}}. Nie sprawdzono kształtu odpowiedzi dla tych możliwości.",
+    "testShapeNotEnforced": "Ten dostawca nie wymusza kształtu odpowiedzi, więc wynik opiera się na parserze i jednym ponowieniu. Może zawieść później.",
+    "testReaderOk": "Klucz działa — czytnik pobrał stronę próbną.",
+    "testReaderFreeTier": "To połączenie nie ma klucza — działa na darmowym limicie czytnika, nie ma czego testować.",
+    "testReaderEmpty": "Klucz działa, ale czytnik nie zwrócił nic ze strony próbnej.",
+    "providerName": {
+      "custom": "Własny (zgodny z OpenAI)"
+    },
+    "providerDescription": {
+      "openai": "GPT-4o, GPT-4o-mini. Multimodalny.",
+      "anthropic": "Modele Claude. Multimodalne, z obsługą obrazu.",
+      "google": "Gemini 2.0 Flash / Pro. Dostępny darmowy poziom.",
+      "openrouter": "Ponad 100 modeli przez jeden klucz.",
+      "groq": "Najszybsze wnioskowanie. Llama, Mixtral.",
+      "deepseek": "DeepSeek V3 / R1.",
+      "mistral": "Mistral Large, Codestral.",
+      "together": "Hosting modeli o otwartym kodzie.",
+      "xai": "Modele Grok. Multimodalne.",
+      "minimax": "MiniMax-M3 (kontekst 1M, multimodalny). Dostępny z Chin.",
+      "glm": "GLM-4V, multimodalny. Darmowy poziom przez glm-4v-flash. Podstawowy w Chinach.",
+      "mimo": "MiMo-V2.5 (310B MoE, multimodalny). Flagowy model rozumowania Xiaomi.",
+      "jina": "Czyta stronę internetową jako czysty tekst — na tym stoi import przepisów.",
+      "ollama": "Lokalny serwer zgodny z OpenAI na porcie 11434.",
+      "lm_studio": "Lokalny serwer zgodny z OpenAI na porcie 1234.",
+      "vllm": "Własny serwer zgodny z OpenAI.",
+      "custom": "Dowolny inny punkt końcowy w formacie OpenAI."
+    },
+    "fieldCapabilitiesHint": "O co można prosić ten model. Zaznaczenia to podpowiedź od dostawcy — rozstrzyga test połączenia.",
+    "purposeUnavailable": "Moduł wyłączony",
+    "purposeUnavailableHint": "Ten cel należy do modułu {{module}}, który jest wyłączony. Powiązanie zadziała po jego włączeniu.",
+    "capabilityUnverified": "Zadeklarowana, niesprawdzona — uruchom test połączenia",
+    "capabilityConfirmed": "Potwierdzona testem połączenia",
+    "capabilityFailed": "Model oblał ten test",
+    "capabilityFailedHint": "Model nie poradził sobie z tym, co połączenie deklaruje. Do czasu zdanego testu nie jest proponowany do celów, które tego wymagają.",
+    "connectionFailedCapability": "Połączenia {{names}} nie ma na tej liście: oblało test „{{capability}}”."
+  },
+  "fieldBuilder": {
+    "title": "Definicja pól własnych",
+    "fieldsCount": "{{count}} zdefiniowanych pól",
+    "fieldsCount_one": "{{count}} zdefiniowane pole",
+    "fieldsCount_few": "{{count}} zdefiniowane pola",
+    "fieldsCount_many": "{{count}} zdefiniowanych pól",
+    "fieldsCount_other": "{{count}} zdefiniowanych pól",
+    "fieldLabel": "Etykieta pola",
+    "placeholder": "np. Napięcie",
+    "dataType": "Typ danych",
+    "addField": "Dodaj pole",
+    "addCustomField": "Dodaj własne pole",
+    "types": {
+      "text": "Tekst",
+      "number": "Liczba",
+      "date": "Data",
+      "textarea": "Długi tekst",
+      "file": "Plik / Załącznik",
+      "money": "Pieniądze",
+      "select": "Lista rozwijana",
+      "multi-select": "Wielokrotny wybór",
+      "boolean": "Tak / Nie"
+    },
+    "options": {
+      "label": "Opcje",
+      "placeholder": "Dodaj opcję i naciśnij Enter",
+      "empty": "Wymagana co najmniej jedna opcja",
+      "remove": "Usuń opcję {{name}}"
+    },
+    "errors": {
+      "alreadyExists": "Pole z taką nazwą (kluczem) już istnieje",
+      "optionsRequired": "Ten typ pola wymaga co najmniej jednej opcji"
+    }
+  },
+  "disabled": "Wyłączony"
+}

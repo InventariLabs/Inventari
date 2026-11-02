@@ -1,0 +1,49 @@
+{
+  "name": "approvals",
+  "version": "0.7.0",
+  "inventari_min_version": "0.9.0",
+  "category": "business",
+  "display_name": "Approvals",
+  "description": "Multi-stage configurable approval workflows",
+  "icon": "check-check",
+  "module_type": "official",
+  "capabilities": [
+    "database"
+  ],
+  "permissions": [
+    {
+      "key": "approvals:read",
+      "label_key": "approvals:permissions.read",
+      "description_key": "approvals:permissions.readDesc",
+      "default_roles": [
+        "manager"
+      ]
+    },
+    {
+      "key": "approvals:write",
+      "label_key": "approvals:permissions.write",
+      "description_key": "approvals:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "key": "approvals:approve",
+      "label_key": "approvals:permissions.approve",
+      "description_key": "approvals:permissions.approveDesc",
+      "default_roles": [
+        "manager"
+      ]
+    },
+    {
+      "key": "approvals:configure",
+      "label_key": "approvals:permissions.configure",
+      "description_key": "approvals:permissions.configureDesc",
+      "default_roles": [
+        "manager"
+      ]
+    }
+  ],
+  "has_settings_schema": true
+}

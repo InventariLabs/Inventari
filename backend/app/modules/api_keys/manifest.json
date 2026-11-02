@@ -1,0 +1,14 @@
+{
+  "name": "api_keys",
+  "version": "0.3.0",
+  "inventari_min_version": "0.9.0",
+  "category": "integrations",
+  "display_name": "API Keys",
+  "description": "Personal access tokens for machine-to-machine authentication (Home Assistant, Make, n8n, Zapier, custom scripts).",
+  "icon": "key",
+  "module_type": "core",
+  "requires": [],
+  "capabilities": [
+    "database"
+  ]
+}

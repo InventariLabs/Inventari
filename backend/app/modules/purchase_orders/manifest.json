@@ -1,0 +1,45 @@
+{
+  "name": "purchase_orders",
+  "module_type": "official",
+  "version": "0.8.0",
+  "inventari_min_version": "0.9.0",
+  "display_name": "Purchase Orders",
+  "description": "Purchase order management for warehouse operations",
+  "requires": [
+    "items",
+    "locations",
+    "warehouse"
+  ],
+  "capabilities": [
+    "database"
+  ],
+  "permissions": [
+    {
+      "key": "purchase_orders:read",
+      "label_key": "purchase_orders:permissions.read",
+      "description_key": "purchase_orders:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    },
+    {
+      "key": "purchase_orders:write",
+      "label_key": "purchase_orders:permissions.write",
+      "description_key": "purchase_orders:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    },
+    {
+      "key": "purchase_orders:manage",
+      "label_key": "purchase_orders:permissions.manage",
+      "description_key": "purchase_orders:permissions.manageDesc",
+      "default_roles": [
+        "manager"
+      ]
+    }
+  ]
+}

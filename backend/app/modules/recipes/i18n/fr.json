@@ -1,0 +1,7 @@
+{
+  "recipe.not_found": "Recette introuvable",
+  "ingredient.not_in_recipe": "Ce produit n'est pas un ingrédient de cette recette",
+  "picking.session_not_found": "Session de préparation introuvable",
+  "picking.already_active": "Une session de préparation active existe déjà pour cette recette",
+  "picking.already_picked": "{name} a déjà été préparé"
+}

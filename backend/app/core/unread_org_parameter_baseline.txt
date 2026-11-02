@@ -1,0 +1,19 @@
+# Functions that take `organization_id` / `org_id` and never read it.
+# Format: app/relative/path.py::Qualname
+#
+# A parameter naming the tenant that the body ignores is the shape a
+# forgotten filter leaves behind. Entries emit ::notice, anything else is an
+# ::error. Each entry needs a reason on the line above it.
+#
+# EMPTY at the rule's birth: of the six functions it found, one now refuses
+# the mismatch (core_api.items.create_async), two routes hold require_org as a
+# gate in `dependencies=` instead of an unread parameter, and three helpers
+# working on data already fetched lost the parameter they never needed.
+#
+# app/modules/warehouse/pick_order_strategies.py::_order_by_location_sequence
+# The default pick-order strategy: every registered strategy is asked the
+# same three questions — the session, the organization, the lines — so a
+# module's own can read its tables scoped to the tenant. The default is a
+# pure sort of the lines it is handed and has no table to scope: the
+# parameter is the seam's shape, not a forgotten filter.
+app/modules/warehouse/pick_order_strategies.py::_order_by_location_sequence

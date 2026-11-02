@@ -1,0 +1,12 @@
+# Architecture lint baseline
+# Format: relative/path.py::import.path
+#
+# Entries below are NOT escape-hatch files (those have inline markers).
+# These are utility/service imports in module code that have not yet been
+# migrated to CoreAPI or relocated outside app.services/app.models.
+#
+# Adding new entries IS allowed when architecturally justified.
+# Pruning entries IS encouraged when CoreAPI gains the needed method.
+#
+# 2026-07-31: all 6 legacy app.services bypasses (templates/PDF)
+# migrated to core_api.templates / core_api.pdf — list intentionally empty.

@@ -1,0 +1,16 @@
+# Line endings that survive a Windows clone.
+#
+# Git on Windows defaults to core.autocrlf=true, which writes every text file
+# with CRLF. Shell scripts copied into images and executed there fail with
+# `exec /app/entrypoint.sh: no such file or directory` — a message about a
+# file that exists. Pin LF for everything a container or make consumes.
+*.sh text eol=lf
+Dockerfile* text eol=lf
+Makefile text eol=lf
+
+# Two branches that each add an entry at the top of the same CHANGELOG section
+# stop a merge with a conflict whose resolution is always "keep both lines" —
+# a quarter of the returns from review in one measured week. The built-in union
+# driver keeps both sides' lines instead. It can put the two entries in either
+# order and never drops a duplicate, so the merged section is still read.
+CHANGELOG.md merge=union

@@ -1,0 +1,10 @@
+{
+  "ai": {
+    "purposeLabel": "Read a product from a photo",
+    "purposeDesc": "Pulls the name, brand, quantity and expiry date off a photo of a label, so a new item can be added without typing."
+  },
+  "permissions": {
+    "extract": "Read labels from photos",
+    "extractDesc": "Can send photos of product labels and nutrition tables to the AI model — each call is billed"
+  }
+}

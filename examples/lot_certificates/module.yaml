@@ -1,0 +1,17 @@
+name: lot_certificates
+version: "0.1.0"
+inventari_min_version: "0.11.0"
+author: "Inventari maintainers"
+description: "Every received lot carries its certificate, and none is booked before the certificate is on file. The worked example of extending the warehouse through its seams."
+license: "AGPL-3.0"
+homepage: "https://github.com/InventariLabs/Inventari/tree/main/examples/lot_certificates"
+
+# The warehouse module this one extends. The installer refuses the package
+# when it is missing; the manifest says the same, and that is what opens
+# app.modules.warehouse.warehouse_api to this module's code.
+requires:
+  - warehouse
+
+components:
+  backend: true
+  frontend: true

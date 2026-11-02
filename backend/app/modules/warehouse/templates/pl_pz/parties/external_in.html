@@ -1,0 +1,22 @@
+<div class="party-box">
+  <h3>Dostawca</h3>
+  {% if partner %}
+  <div class="party-name">{{ partner.name }}</div>
+  {% if partner.tax_id %}
+  <div class="party-detail">NIP: {{ partner.tax_id }}</div>
+  {% endif %}
+  {% if partner.address %}
+  <div class="party-detail">{{ partner.address }}</div>
+  {% endif %}
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>
+<div class="party-box">
+  <h3>Magazyn docelowy</h3>
+  {% if target_location %}
+  <div class="party-name">{{ target_location }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

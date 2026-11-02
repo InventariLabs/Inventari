@@ -1,0 +1,720 @@
+{
+  "ran_at": "2026-09-05T18:57:34.385916+00:00",
+  "corpus": "vision_matrix_corpus.json",
+  "max_side_px": 1024,
+  "models": {
+    "meta/muse-glimmer-30b": {
+      "images": [
+        {
+          "barcode": "5449000000996",
+          "note": "Coca-Cola can, Turkish text ('ORIJINAL TAT'), the frame cuts off the left edge",
+          "seconds": 5.09,
+          "failure": null,
+          "prompt_tokens": 648,
+          "completion_tokens": 55,
+          "cost_usd": 0.00025464,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Coca-Cola",
+                "Coca Cola",
+                "Coca-Cola Orijinal Tat",
+                "Orijinal Tat"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Coca-Cola",
+                "Coca Cola"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 0,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        },
+        {
+          "barcode": "3033710065967",
+          "note": "Nesquik cocoa, French, close crop of a busy pack — the mascot takes half the frame",
+          "seconds": 3.6,
+          "failure": null,
+          "prompt_tokens": 1350,
+          "completion_tokens": 56,
+          "cost_usd": 0.00036988,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Nesquik",
+                "Nesquik Cacao",
+                "Cacao"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Nestle",
+                "Nestlé",
+                "Nesquik"
+              ],
+              "read": "Nestlé",
+              "matches": true
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 1,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": "other",
+          "category_off_list": false
+        },
+        {
+          "barcode": "20724696",
+          "note": "Lidl private label, Spanish and Portuguese on one bag; OFF names it in French",
+          "seconds": 1.93,
+          "failure": null,
+          "prompt_tokens": 1350,
+          "completion_tokens": 56,
+          "cost_usd": 0.00036988,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Almendras de California",
+                "Amendoas do California",
+                "Amêndoas do Califórnia",
+                "Almendras",
+                "Almonds",
+                "Californian almonds"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Alesto"
+              ],
+              "read": "Alesto",
+              "matches": true
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 1,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        },
+        {
+          "barcode": "7622210449283",
+          "note": "LU Prince, French; the brand is a two-letter logo in the corner",
+          "seconds": 1.74,
+          "failure": null,
+          "prompt_tokens": 1458,
+          "completion_tokens": 55,
+          "cost_usd": 0.00040118,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Prince",
+                "Prince Gout Chocolat",
+                "Prince Goût Chocolat",
+                "Prince Chocolat"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "LU"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 0,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        },
+        {
+          "barcode": "4008400402222",
+          "note": "amateur photograph of a Nutella jar on a table; the only quantity in frame is the promo '+50g GRATIS'",
+          "seconds": 1.44,
+          "failure": null,
+          "prompt_tokens": 1106,
+          "completion_tokens": 55,
+          "cost_usd": 0.00029558,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Nutella"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Nutella",
+                "Ferrero"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 0,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        },
+        {
+          "barcode": "8076809513753",
+          "note": "Barilla pesto in a glass jar, Italian, studio shot",
+          "seconds": 2.15,
+          "failure": null,
+          "prompt_tokens": 1134,
+          "completion_tokens": 56,
+          "cost_usd": 0.00030508,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Pesto alla Genovese",
+                "Pesto"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Barilla"
+              ],
+              "read": "Barilla",
+              "matches": true
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 1,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": "other",
+          "category_off_list": false
+        },
+        {
+          "barcode": "3229820129488",
+          "note": "Bjorg muesli, French; '375 g' is printed small, bottom right",
+          "seconds": 2.67,
+          "failure": null,
+          "prompt_tokens": 1451,
+          "completion_tokens": 59,
+          "cost_usd": 0.00040348,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Muesli sans sucres ajoutes",
+                "Muesli sans sucres ajoutés",
+                "Muesli",
+                "Muesli raisin figue datte abricot"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Bjorg"
+              ],
+              "read": "BjORG",
+              "matches": true
+            },
+            "weight": {
+              "legible": true,
+              "expected": "375 g",
+              "read": "375 g",
+              "matches": true
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 2,
+          "of": 3,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": "other",
+          "category_off_list": false
+        },
+        {
+          "barcode": "8000500037560",
+          "note": "Kinder Bueno bar photographed at an angle on a rubber mat; '21,5 g' in frame is the per-bar nutrition reference, NOT the net weight",
+          "seconds": 1.84,
+          "failure": null,
+          "prompt_tokens": 1044,
+          "completion_tokens": 55,
+          "cost_usd": 0.00027698,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Bueno",
+                "Kinder Bueno"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Kinder",
+                "Ferrero"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 0,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        },
+        {
+          "barcode": "8000500310427",
+          "note": "Nutella Biscuits pouch; 'x22' in frame is a count, not a weight",
+          "seconds": 2.35,
+          "failure": null,
+          "prompt_tokens": 1638,
+          "completion_tokens": 55,
+          "cost_usd": 0.00045518,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Nutella Biscuits",
+                "Biscuits",
+                "Nutella biscuits x22"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Nutella",
+                "Ferrero"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 0,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        },
+        {
+          "barcode": "3168930010265",
+          "note": "Quaker Cruesli box, French; '450g' is large and high-contrast",
+          "seconds": 2.56,
+          "failure": null,
+          "prompt_tokens": 1422,
+          "completion_tokens": 59,
+          "cost_usd": 0.00039478,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Cruesli Melange de noix",
+                "Cruesli Mélange de noix",
+                "Cruesli",
+                "Melange de noix",
+                "Mélange de noix"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Quaker"
+              ],
+              "read": "QUAKER",
+              "matches": true
+            },
+            "weight": {
+              "legible": true,
+              "expected": "450 g",
+              "read": "450g",
+              "matches": true
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 2,
+          "of": 3,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": "other",
+          "category_off_list": false
+        },
+        {
+          "barcode": "8076800195057",
+          "note": "Barilla spaghetti box at an angle; '500g e' is small print on a dark blue ground",
+          "seconds": 2.71,
+          "failure": null,
+          "prompt_tokens": 1747,
+          "completion_tokens": 60,
+          "cost_usd": 0.00049338,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Spaghetti N 5",
+                "Spaghetti N°5",
+                "Spaghetti no 5",
+                "Spaghetti"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Barilla"
+              ],
+              "read": "Barilla",
+              "matches": true
+            },
+            "weight": {
+              "legible": true,
+              "expected": "500 g",
+              "read": "500g e",
+              "matches": true
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 2,
+          "of": 3,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": "dry",
+          "category_off_list": false
+        },
+        {
+          "barcode": "3068320123264",
+          "note": "amateur photograph of a water bottle on a red cloth; '1,15 L' is on the transparent right edge and is the hardest legible quantity in the corpus",
+          "seconds": 1.59,
+          "failure": null,
+          "prompt_tokens": 1350,
+          "completion_tokens": 56,
+          "cost_usd": 0.00036988,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Eau minerale naturelle",
+                "Eau minérale naturelle",
+                "Eau minerale",
+                "La Salvetat"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "La Salvetat"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "weight": {
+              "legible": true,
+              "expected": "1.15 L",
+              "read": null,
+              "matches": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 0,
+          "of": 3,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": "drinks",
+          "category_off_list": false
+        },
+        {
+          "barcode": "7622300336738",
+          "note": "an opened Oreo pack lying on decking, strong daylight, the roll is deformed",
+          "seconds": 1.33,
+          "failure": null,
+          "prompt_tokens": 882,
+          "completion_tokens": 55,
+          "cost_usd": 0.00022838,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Oreo Original",
+                "Oreo"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Oreo"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 0,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        },
+        {
+          "barcode": "5411188119098",
+          "note": "alpro pot held in a hand, English text, fingers cover part of the label",
+          "seconds": 1.86,
+          "failure": null,
+          "prompt_tokens": 1155,
+          "completion_tokens": 56,
+          "cost_usd": 0.00031138,
+          "provider_calls": 1,
+          "fields": {
+            "name": {
+              "legible": true,
+              "expected": [
+                "Plain with Coconut",
+                "Alpro Plain with Coconut",
+                "Plain"
+              ],
+              "read": null,
+              "matches": false
+            },
+            "brand": {
+              "legible": true,
+              "expected": [
+                "Alpro"
+              ],
+              "read": "alpro",
+              "matches": true
+            },
+            "weight": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            },
+            "expiry_date": {
+              "legible": false,
+              "read": null,
+              "invented": false,
+              "tolerated": false
+            }
+          },
+          "read": 1,
+          "of": 2,
+          "invented": 0,
+          "contributed": {},
+          "contributed_count": 0,
+          "category": null,
+          "category_off_list": false
+        }
+      ],
+      "answered": 14,
+      "of_images": 14,
+      "read": 10,
+      "legible": 32,
+      "invented": 0,
+      "misfiled": 0,
+      "off_list_category": 0,
+      "median_seconds": 2.1,
+      "cost_usd": 0.00493,
+      "tokens": 18523,
+      "answered_legible": 32,
+      "contributed": 0
+    }
+  }
+}

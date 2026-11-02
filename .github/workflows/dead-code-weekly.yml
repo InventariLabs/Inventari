@@ -1,0 +1,77 @@
+name: Dead Code Weekly Report
+
+# Full dead-code scan (vulture, knip, i18n orphans, route reachability) in
+# NON-BLOCKING mode: findings land in the Job Summary + `::notice` GitHub
+# annotations (like `arch lint`), the job always passes. Fix findings in
+# regular PRs — the per-PR baseline gates (ci.yml) stay the blocker.
+#
+# Manual trigger only: the Monday cron is off to save runner minutes (see the
+# note in ci.yml). `make scan-dead` runs the same tools locally, non-blocking,
+# and finishes with the jscpd report. Restore the `schedule:` block to run it
+# weekly again.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: Dead-code full report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: uv sync --all-extras --dev
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+          cache-dependency-glob: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Dead-code report — backend (vulture)
+        working-directory: ./backend
+        run: |
+          out=$(uv run python scripts/check_vulture_baseline.py --full 2>&1) || true
+          echo "## Vulture (backend)" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          echo "$out" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "$out" | sed -n 's/^  - /::notice title=Vulture::/p'
+
+      - name: Dead-code report — frontend (knip, i18n, routes)
+        working-directory: ./frontend
+        run: |
+          report() {
+            local label="$1"
+            shift
+            local out
+            out=$("$@" 2>&1) || true
+            echo "## $label" >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            echo "$out" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            printf '%s\n' "$out" | grep -E '^  - |^UNUSED |^MISSING |^PLURAL ' \
+              | sed "s/^/::notice title=$label::/" || true
+          }
+          report "knip (dead code)" node scripts/check-knip-baseline.mjs --full
+          report "i18n orphans" node scripts/check-i18n-keys.mjs --unused
+          report "route reachability" node scripts/check-route-reachability.mjs

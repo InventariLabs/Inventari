@@ -1,0 +1,130 @@
+{
+  "title": "Parceiros",
+  "subtitle": "Fornecedores, clientes e prestadores de serviço",
+  "detail": {
+    "title": "Detalhes do parceiro",
+    "createdAt": "Criado em",
+    "updatedAt": "Atualizado em",
+    "related": "Relacionados",
+    "relatedDocuments": "Documentos de armazém",
+    "relatedOrders": "Pedidos de compra"
+  },
+  "newPartner": "Novo parceiro",
+  "searchPlaceholder": "Buscar por nome, código, CNPJ/CPF, e-mail…",
+  "noPartners": "Nenhum parceiro encontrado",
+  "noPartnersDesc": "Adicione seu primeiro parceiro para começar",
+  "stats": {
+    "documents_one": "{{count}} documento",
+    "documents_few": "{{count}} documentos",
+    "documents_many": "{{count}} documentos",
+    "documents_other": "{{count}} documentos",
+    "total": "Faturamento",
+    "lastActivity": "Última atividade",
+    "multipleCurrencies": "Várias moedas"
+  },
+  "filterAll": "Todos",
+  "filterActive": "Ativos",
+  "filterInactive": "Inativos",
+  "columns": {
+    "name": "Nome",
+    "type": "Tipo",
+    "taxId": "ID fiscal",
+    "contact": "Contato",
+    "documents": "Documentos",
+    "actions": "Ações"
+  },
+  "launcher": {
+    "description": "Gerencie fornecedores, clientes e parceiros de negócios"
+  },
+  "types": {
+    "SUPPLIER": "Fornecedor",
+    "CUSTOMER": "Cliente",
+    "BOTH": "Fornecedor e cliente",
+    "SERVICE_PROVIDER": "Prestador de serviço",
+    "MANUFACTURER": "Fabricante",
+    "EMPLOYEE": "Funcionário"
+  },
+  "fields": {
+    "name": "Nome",
+    "fullName": "Nome completo",
+    "code": "Código do parceiro",
+    "type": "Tipo",
+    "taxId": "ID fiscal / IVA",
+    "isConsumer": "Pessoa física (consumidor)",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "website": "Site",
+    "contactPerson": "Pessoa de contato",
+    "position": "Cargo / Departamento",
+    "address": "Endereço",
+    "notes": "Observações internas"
+  },
+  "address": {
+    "section": "Endereço",
+    "street": "Rua",
+    "city": "Cidade",
+    "postalCode": "CEP",
+    "country": "País",
+    "countrySelect": "Selecione o país",
+    "otherCountry": "Outro: {{value}}"
+  },
+  "form": {
+    "createTitle": "Novo parceiro",
+    "editTitle": "Editar parceiro",
+    "namePlaceholder": "ex.: Atacado ABC",
+    "fullNamePlaceholder": "ex.: João Silva",
+    "codePlaceholder": "ex.: SUP-001",
+    "taxIdPlaceholder": "ex.: PL1234567890",
+    "isConsumerHint": "Não tem ID fiscal: os documentos são confirmados sem ele, mesmo onde a lei o exige das empresas.",
+    "emailPlaceholder": "contato@empresa.com",
+    "phonePlaceholder": "+48 123 456 789",
+    "websitePlaceholder": "https://empresa.com",
+    "contactPersonPlaceholder": "ex.: Maria Souza (Depto. de Compras)",
+    "positionPlaceholder": "ex.: Especialista de TI, Departamento de TI",
+    "notesPlaceholder": "Observações internas…",
+    "street_placeholder": "ex.: Rua Principal, 123",
+    "city_placeholder": "ex.: São Paulo",
+    "postal_placeholder": "ex.: 12345",
+    "saving": "Salvando…"
+  },
+  "actions": {
+    "edit": "Editar",
+    "deactivate": "Desativar",
+    "activate": "Ativar",
+    "addPartner": "Adicionar parceiro"
+  },
+  "confirmDeactivateTitle": "Desativar parceiro",
+  "confirmDeactivate": "Desativar este parceiro? Ele não aparecerá mais nos filtros por padrão.",
+  "status": {
+    "inactive": "Inativo"
+  },
+  "errors": {
+    "activateFailed": "Não foi possível ativar o parceiro",
+    "deactivateFailed": "Não foi possível desativar o parceiro",
+    "saveFailed": "Não foi possível salvar o parceiro",
+    "createFailed": "Não foi possível criar o parceiro",
+    "invalidEmail": "Informe um endereço de e-mail, por exemplo nome@empresa.com.",
+    "invalidWebsite": "Informe um endereço da web, por exemplo https://empresa.com."
+  },
+  "inlineCreateHint": "Criar um parceiro rapidamente",
+  "inlineCreateSuccess": "Parceiro \"{{name}}\" criado. Adicione o ID fiscal e o endereço antes de emitir um documento com endereço.",
+  "import": {
+    "button": "Importar",
+    "title": "Importar parceiros",
+    "formats": "XLSX / CSV",
+    "pleaseWait": "Aguarde enquanto processamos seus parceiros.",
+    "closeAndView": "Fechar e ver parceiros",
+    "added_one": "{{count}} parceiro adicionado.",
+    "added_other": "{{count}} parceiros adicionados.",
+    "defaultType": "Tipo para linhas sem tipo",
+    "addOnlyNote": "A importação apenas adiciona parceiros. Uma linha com um parceiro que você já tem — o mesmo nome, com qualquer combinação de maiúsculas e minúsculas, ou o mesmo ID fiscal — é recusada e listada com o motivo.",
+    "analyzeFailed": "Não foi possível ler o arquivo",
+    "failed": "Falha na importação"
+  },
+  "toasts": {
+    "saved": "Parceiro salvo",
+    "created": "Parceiro criado",
+    "activated": "Parceiro ativado",
+    "deactivated": "Parceiro desativado"
+  }
+}

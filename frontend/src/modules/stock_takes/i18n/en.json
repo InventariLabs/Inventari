@@ -1,0 +1,283 @@
+{
+  "title": "Stock Takes",
+  "subtitle": "Manage stock takes of your locations",
+  "newStockTake": "New stock take",
+  "all": "All",
+  "unknownPlace": "Unknown location",
+  "started": "Started",
+  "progressLabel": "Progress",
+  "progress": {
+    "title": "Stock take progress",
+    "countedOf": "{{counted}} / {{total}} items",
+    "discrepanciesDetected_one": "1 discrepancy detected",
+    "discrepanciesDetected_other": "{{count}} discrepancies detected",
+    "unsaved_one": "1 count typed but not saved",
+    "unsaved_other": "{{count}} counts typed but not saved"
+  },
+  "differencesBadge_one": "{{count}} difference",
+  "differencesBadge_other": "{{count}} differences",
+  "continue": "Continue",
+  "start": "Start",
+  "report": {
+    "summary": "Summary",
+    "perfectMatches": "Perfect matches",
+    "toleratedDifferences": "Within tolerance",
+    "withinTolerance": "Within tolerance",
+    "overstock": "Overstock",
+    "understock": "Understock",
+    "notCounted": "Not counted",
+    "itemNotCounted": "Not counted",
+    "duration": "Duration",
+    "durationValue": "{{minutes}} min",
+    "discrepanciesTitle": "Discrepancies",
+    "showAll": "Show all items",
+    "showDifferencesOnly": "Show differences and uncounted only",
+    "exportCsv": "Export CSV",
+    "noDiscrepancies": "No discrepancies — every item matched.",
+    "empty": "No items in this stock take.",
+    "difference": "Difference",
+    "location": "Location",
+    "notes": "Notes",
+    "name": "Name",
+    "title": "Report",
+    "reason": "Reason",
+    "countedTwiceAgreed": "Counted twice, both times {{second}}",
+    "countedTwiceDisagreed": "Counted twice: {{first}}, then {{second}}",
+    "unit": "Unit",
+    "storage": "Location",
+    "startedAt": "Started at",
+    "completedAt": "Completed at",
+    "startedBy": "Started by",
+    "closedLocations": "Closed locations",
+    "closedEmpty": "Empty",
+    "closedCounted": "Closed",
+    "closedByAt": "{{name}}, {{at}}"
+  },
+  "empty": {
+    "title": "No stock takes",
+    "noStatus": "No stock takes with status \"{{status}}\"",
+    "addFirst": "Create your first stock take to track inventory levels"
+  },
+  "modal": {
+    "title": "New stock take",
+    "storageLabel": "Location",
+    "storagePlaceholder": "Select location…",
+    "nameLabel": "Stock take name",
+    "namePlaceholder": "e.g. Shelf A stock take — January 2026",
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating…",
+    "blindMode": "Blind mode (hide expected quantities)",
+    "toleranceLabel": "Tolerance (% of the expected quantity, optional)",
+    "tolerancePlaceholder": "e.g. 2.0 to ignore differences up to 2%",
+    "requireFullCount": "Require full count (block completion until all items counted)"
+  },
+  "validation": {
+    "storageRequired": "Select location"
+  },
+  "confirmDelete": "Are you sure you want to delete this stock take?",
+  "notFound": "Stock take not found",
+  "noItemsCounted": "No items counted yet",
+  "searchToCount": "Search for items above to start counting",
+  "filters": {
+    "all": "All",
+    "discrepancies": "Discrepancies",
+    "locationLevel": "Location level",
+    "allLevels": "All levels"
+  },
+  "search": {
+    "placeholder": "Search item by name or barcode…",
+    "here": "In this count",
+    "elsewhere": "Elsewhere in the organization",
+    "failed": "The search failed, so nothing is listed here. Try again."
+  },
+  "item": {
+    "barcode": "Barcode",
+    "expected": "Expected",
+    "counted": "Counted",
+    "notePlaceholder": "Add a note…",
+    "decreaseCount": "One fewer {{name}}",
+    "increaseCount": "One more {{name}}",
+    "saveCount": "Save the count for {{name}}",
+    "countFor": "Counted quantity of {{name}}",
+    "unsaved": "Not saved",
+    "awaitingRecount": "To count again",
+    "countAgain": "Count {{name}} again",
+    "countedPass": "Count {{sequence}}: {{quantity}} ({{name}})",
+    "someone": "someone",
+    "noteFor": "Note about {{name}}",
+    "decreaseCountInUnit": "One fewer {{unit}} of {{name}}",
+    "increaseCountInUnit": "One more {{unit}} of {{name}}",
+    "lot": "Batch {{lot}}",
+    "record": "Record {{position}} of {{of}}",
+    "added": "added {{date}}"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "complete": "Complete stock take",
+    "completing": "Completing…"
+  },
+  "confirm": {
+    "complete": {
+      "title": "Complete stock take",
+      "confirmLabel": "Complete",
+      "unsaved_one": "One counted number has not been saved and will be lost.",
+      "unsaved_other": "{{count}} counted numbers have not been saved and will be lost.",
+      "message_one": "Completing this stock take overwrites the stock of one product with the counted number. You won't be able to edit counted items afterwards.",
+      "message_other": "Completing this stock take overwrites the stock of {{count}} products with the counted numbers. You won't be able to edit counted items afterwards."
+    },
+    "cancel": {
+      "title": "Cancel stock take",
+      "message": "Are you sure you want to cancel this stock take? All data will be lost.",
+      "confirmLabel": "Cancel stock take"
+    },
+    "overCap": {
+      "title": "Counted much more than the system holds",
+      "row": "{{name}} — counted {{counted}}, system {{system}}",
+      "confirmLabel": "Save counted numbers",
+      "message_one": "One counted quantity is far above the system stock: {{rows}}. Save the counted number anyway?",
+      "message_other": "{{count}} counted quantities are far above the system stock: {{rows}}. Save the counted numbers anyway?"
+    },
+    "overTolerance": {
+      "title": "Beyond the tolerance",
+      "confirmLabel": "Accept the differences",
+      "message_one": "One counted quantity differs from the system stock by more than this stock take allows: {{rows}}. Accept it and post the counted number?",
+      "message_other": "{{count}} counted quantities differ from the system stock by more than this stock take allows: {{rows}}. Accept them and post the counted numbers?"
+    }
+  },
+  "deleteAriaLabel": "Delete stock take",
+  "errors": {
+    "createFailed": "Failed to create stock take",
+    "deleteFailed": "Failed to delete stock take",
+    "saveFailed": "Failed to save count",
+    "addItemFailed": "Failed to add item",
+    "completeFailed": "Failed to complete stock take",
+    "cancelFailed": "Failed to cancel stock take",
+    "reasonIncomplete": "Say what happened, or pick a named reason",
+    "overToleranceNotAllowed": "Accepting a difference beyond the tolerance is not yours to do — ask someone who may approve stock takes.",
+    "overCapNotAllowed": "Accepting a count far above the system stock is not yours to do — ask someone who may approve stock takes.",
+    "recountFailed": "Could not ask for a recount",
+    "unitIsWhole": "{{unit}} is counted whole — a fraction of one cannot be saved.",
+    "unitDecimals_one": "{{unit}} is counted to {{count}} decimal place — no finer.",
+    "unitDecimals_other": "{{unit}} is counted to {{count}} decimal places — no finer.",
+    "unexplainedDifferences_one": "One counted quantity differs by more than the tolerance and does not say why. Give it a reason, then finish the count.",
+    "unexplainedDifferences_other": "{{count}} counted quantities differ by more than the tolerance and do not say why. Give each one a reason, then finish the count."
+  },
+  "blindModeActive": "Blind mode active — expected quantities are hidden.",
+  "statuses": {
+    "draft": "Draft",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "addNewItem": "Add new item",
+  "discrepancyMissing": "Missing",
+  "discrepancySurplus": "Surplus",
+  "countedZero": "counted 0",
+  "surplusCount_one": "1 surplus",
+  "surplusCount_other": "{{count}} surplus",
+  "outsideItems": {
+    "title_one": "1 product outside the stock take is in this location",
+    "title_other": "{{count}} products outside the stock take are in this location",
+    "add": "Add as surplus"
+  },
+  "addNewItemForm": {
+    "nameLabel": "Name",
+    "barcodeLabel": "Barcode",
+    "quantityLabel": "Quantity",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Select category",
+    "uomLabel": "Unit",
+    "uomPlaceholder": "Select unit"
+  },
+  "statusFilters": {
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "permissions": {
+    "read": "View stock takes",
+    "readDesc": "Can browse stock takes, their lines and the differences found",
+    "write": "Carry out stock takes",
+    "writeDesc": "Can start a stock take, count and finalize it — finalizing corrects stock",
+    "approve": "Accept differences beyond tolerance",
+    "approveDesc": "Accept counted differences that exceed the stock take tolerance, so they reach the stock."
+  },
+  "form": {
+    "guardName": "The count"
+  },
+  "reasons": {
+    "discrepancy": {
+      "label": "Why does this differ?",
+      "codes": {
+        "DAMAGE": "Damaged",
+        "EXPIRED": "Past its date",
+        "LOSS": "Lost or taken",
+        "WRONG_LOCATION": "Found in another place",
+        "WRONG_UNIT": "Counted in the wrong unit",
+        "MISCOUNT": "Earlier count was wrong",
+        "SYSTEM_ERROR": "Never recorded in the system",
+        "OTHER": "Other"
+      }
+    }
+  },
+  "scan": {
+    "cameraOpen": "Scan with camera",
+    "cameraClose": "Close camera",
+    "chooseTitle": "Which one did you count?",
+    "chooseHint": "This code fits several lines of this count. Pick the one in your hand — it counts one more and is saved.",
+    "expires": "expires {{date}}"
+  },
+  "shelf": {
+    "hint": "Scan a location label to count location by location.",
+    "counting": "Counting location:",
+    "leave": "Whole location",
+    "outside": "This location is not part of the count of {{location}}.",
+    "empty": "Nothing was expected at this location. Scan what stands there.",
+    "hidden": "The filters above hide this location's rows.",
+    "close": "Close location",
+    "closeTitle": "Close this location?",
+    "closeUncounted_one": "One row at {{location}} was not counted. Closing the location counts it as 0 — a shortage in the report.",
+    "closeUncounted_other": "{{count}} rows at {{location}} were not counted. Closing the location counts them as 0 — shortages in the report.",
+    "closeEmpty": "Nothing was found at {{location}}. Confirm it as counted and empty?",
+    "closeCounted": "Every row at {{location}} is counted. Close the location?",
+    "closeConfirm": "Close location",
+    "closeUnsaved_one": "One number at this location has not been saved. Save it before closing the location.",
+    "closeUnsaved_other": "{{count}} numbers at this location have not been saved. Save them before closing the location.",
+    "closedDone_one": "{{location}} closed: one row counted as 0.",
+    "closedDone_other": "{{location}} closed: {{count}} rows counted as 0.",
+    "closedEmptyDone": "{{location}} confirmed as empty.",
+    "closedCountedDone": "{{location}} closed.",
+    "closedBy": "Closed by {{name}}",
+    "closedEmptyBy": "Confirmed empty by {{name}}"
+  },
+  "count": {
+    "action": "Count a location",
+    "title": "Count a location",
+    "intro": "Scan the location label or choose it from the list. You count what is there; the differences are saved as one stock adjustment for the office.",
+    "scanLabel": "Location label",
+    "searchLabel": "Find a location",
+    "searchPlaceholder": "Search locations",
+    "noMatchTitle": "No location matches",
+    "noMatchDescription": "Try another part of the name, or scan the location label.",
+    "blind": "Blind count: hide what the system expects",
+    "start": "Count {{location}}",
+    "chooseFirst": "Choose a location to count",
+    "name": "Count: {{location}} — {{date}}",
+    "neverCounted": "Never counted",
+    "countedToday": "Counted today",
+    "lastCounted_one": "Last counted {{count}} day ago",
+    "lastCounted_other": "Last counted {{count}} days ago",
+    "underWay": "Being counted",
+    "noPlacesTitle": "No locations to count yet",
+    "noPlacesDescription": "Add a location and put goods on it, and it can be counted here."
+  },
+  "posting": {
+    "adjusted": "The differences were posted as stock adjustment",
+    "noDifferences": "Counted, no differences: the stock was already right."
+  },
+  "settings": {
+    "countEveryDays": "Count every location every (days)",
+    "countEveryDaysDescription": "Each location that holds stock appears in To do this many days after it was last counted. 0 turns it off."
+  }
+}

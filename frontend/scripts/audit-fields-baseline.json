@@ -1,0 +1,5 @@
+{
+  "generatedBy": "node scripts/check-audit-fields.mjs --write-baseline",
+  "note": "Snapshot field names with no translation yet. The goal is an empty file.",
+  "gaps": []
+}

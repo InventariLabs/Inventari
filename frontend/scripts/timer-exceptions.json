@@ -1,0 +1,45 @@
+{
+  "description": "Files where a setTimeout/setInterval legitimately lives outside a useEffect/useLayoutEffect. Default is DENY: the rule flags every timer outside an effect, and only a file listed here — with the reason that says who owns the timer — passes. A reason must name the owner (id held in a ref, cleared on unmount, or equivalent). 'It only touches the DOM' is NOT a reason: after a test-environment teardown `document` disappears exactly like `window`, which is the failure this gate exists for. Granularity is per SITE: an entry declares `sites` — the exact number of unowned timer sites its reason covers — and the rule flags every site beyond that number, so a NEW timer in a listed file still turns the gate red.",
+  "exceptions": [
+    {
+      "path": "src/hooks/useAutoResetFlag.ts",
+      "sites": 1,
+      "reason": "The hook IS the owned pattern this gate wants: the id lives in timerRef, arm() clears the previous timer, and a dedicated unmount effect clears whatever is pending — timers armed through arm() are owned by the hook's caller's lifecycle."
+    },
+    {
+      "path": "src/hooks/useDebounce.ts",
+      "sites": 1,
+      "reason": "The debounced callback holds the id in timerRef, clears the previous timer before re-arming, and an unmount effect clears whatever is pending — the timer never outlives the component that owns the debounce."
+    },
+    {
+      "path": "src/hooks/useScanCamera.ts",
+      "sites": 1,
+      "reason": "The restart cooldown writes restartTimerRef and an unmount effect clears it whether or not the camera ever started; the in-effect camera-init timer is effect-owned already."
+    },
+    {
+      "path": "src/modules/shared/components/LineItemsEditor/LineItemRow.tsx",
+      "sites": 1,
+      "reason": "The blur timer writes blurTimerRef, clears the previous timer before re-arming, and an unmount effect clears whatever is pending — the row's 200 ms focus window is owned by the row."
+    },
+    {
+      "path": "src/modules/inventory/components/items/ItemMobileCard.tsx",
+      "sites": 1,
+      "reason": "scheduleUndoableDelete arms exactly one timer and hands it back as a cancel() (clears the timeout, dismisses the toast); the owning card releases the previous cancel before re-arming and holds the newest in pendingDeleteCancelRef, which an unmount effect runs — a pending delete never fires for a card that is gone."
+    },
+    {
+      "path": "src/components/ui/ConfirmDialog.tsx",
+      "sites": 1,
+      "reason": "The 0 ms focus hand-back writes focusTimerRef, re-arms clear the previous id, and an unmount effect clears whatever is pending — the restore never fires after teardown."
+    },
+    {
+      "path": "src/modules/stock_takes/pages/StockTakeCountingPage.tsx",
+      "sites": 2,
+      "reason": "Both scroll-and-highlight ids (the 100 ms scroll and the 1500 ms highlight) are pushed into scrollTimersRef; each call clears the previous ids first and an unmount effect clears whatever remains — the page owns the whole 1.6 s window."
+    },
+    {
+      "path": "src/lib/api/items.ts",
+      "sites": 1,
+      "reason": "The wait between two reads of a background import is a promise-sleep inside the awaited mutation function: nothing is held in a component, the sleep resolves on its own within 1.5 s, and the loop ends when the job reaches done or failed (the server marks a job nobody is working on as failed). It touches neither the DOM nor window."
+    }
+  ]
+}

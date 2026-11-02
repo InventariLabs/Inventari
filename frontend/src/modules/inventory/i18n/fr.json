@@ -1,0 +1,236 @@
+{
+  "launcher": {
+    "title": "Inventaire",
+    "description": "Gérer les produits, emplacements et étiquettes"
+  },
+  "statusBadge": {
+    "needsAttention_one": "demande votre attention",
+    "needsAttention_other": "demandent votre attention"
+  },
+  "actions": {
+    "stockTakesInProgress": "Inventaires en cours"
+  },
+  "nav": {
+    "overview": "Aperçu",
+    "items": "Produits",
+    "storages": "Emplacements",
+    "labels": "Étiquettes",
+    "categories": "Catégories",
+    "scan": "Scanner",
+    "moves": "Mouvements",
+    "stock": "Stock"
+  },
+  "toasts": {
+    "importFailedToAnalyze": "Échec de l'analyse du fichier",
+    "importGrocyMappingApplied": "Mappage Grocy appliqué !",
+    "importFailed": "Échec de l'import",
+    "archivedLabelFreed": "Étiquette de nouveau libre pour réutilisation"
+  },
+  "moves": {
+    "title": "Mouvements de stock",
+    "subtitle": "Ce qui est entré, ce qui est sorti et ce qui a changé d'emplacement",
+    "outsideFrom": "de l'extérieur",
+    "expires": "À consommer avant le {{date}}",
+    "outsideTo": "vers l'extérieur",
+    "direction": {
+      "all": "Tous",
+      "in": "Réceptions",
+      "out": "Sorties",
+      "internal": "Transferts"
+    },
+    "columns": {
+      "when": "Quand",
+      "product": "Produit",
+      "quantity": "Quantité",
+      "route": "De → vers",
+      "batch": "Lot",
+      "source": "Source",
+      "who": "Qui"
+    },
+    "source": {
+      "document": "Document",
+      "item": "À la main",
+      "adjustment": "Inventaire",
+      "maker_production": "Production",
+      "item_history": "Écriture historique",
+      "opening_balance": "Solde d’ouverture",
+      "recipe_picking": "Cuisine",
+      "location_relocation": "Déplacé avec l'emplacement"
+    },
+    "filters": {
+      "location": "Emplacement",
+      "anyLocation": "Partout",
+      "since": "Du",
+      "until": "Au",
+      "product": "Produit :",
+      "oneProduct": "un produit",
+      "oneStorage": "un emplacement"
+    },
+    "empty": {
+      "title": "Rien n'a encore bougé",
+      "description": "Les mouvements sont enregistrés lors des réceptions, des sorties et des transferts entre emplacements.",
+      "filtered_one": "Aucun mouvement ne correspond au filtre appliqué ({{filters}}). Retirez-le pour élargir le journal.",
+      "filtered_other": "Aucun mouvement ne correspond aux filtres appliqués ({{filters}}). Retirez-en un pour élargir le journal.",
+      "filterNames": {
+        "direction": "direction : {{value}}",
+        "location": "emplacement : {{value}}",
+        "dates": "dates : {{from}} – {{to}}",
+        "datesFrom": "dates : depuis le {{date}}",
+        "datesUntil": "dates : jusqu'au {{date}}",
+        "product": "produit : {{value}}"
+      },
+      "filteredTitle": "Aucun mouvement ne correspond",
+      "productTitle": "Ce produit n'a pas bougé ici",
+      "productDescription": "Les réceptions, sorties et transferts de ce produit à cet emplacement apparaîtront ici.",
+      "locationTitle": "Rien n'est passé par ici",
+      "locationDescription": "Un mouvement est enregistré quand des marchandises entrent, sortent ou transitent par cet emplacement.",
+      "documentTitle": "Ce document n'a rien déplacé",
+      "documentDescription": "Ses lignes n'ont pas été exécutées sur le stock, donc aucun mouvement ne porte son nom."
+    },
+    "tab": "Mouvements",
+    "itemCaption": "Mouvements de ce produit dans {{location}}. Deux enregistrements du même produit au même emplacement partagent ces lignes.",
+    "thisLocation": "cet emplacement",
+    "seeProductEverywhere": "Ce produit partout",
+    "locationHeading": "Historique des mouvements",
+    "locationCaption": "Ce qui est entré, sorti et passé par cet emplacement — et par tout ce qu'il contient.",
+    "seeFullLedger": "Ouvrir le journal complet",
+    "documentHeading": "Ce que ce document a déplacé",
+    "documentCaption": "Les mouvements enregistrés par ce document — où la marchandise est allée, et depuis quel lot.",
+    "movements_one": "mouvement",
+    "movements_other": "mouvements",
+    "movedWith": "Déplacé avec {{name}}",
+    "topLevel": "Niveau supérieur"
+  },
+  "lot": {
+    "notFound": "Ce lot n'existe plus",
+    "backToLots": "Retour aux lots",
+    "onHand": "En stock",
+    "serial": "Numéro de série",
+    "batch": "Lot",
+    "whereHeading": "Où il se trouve",
+    "nothingLeft": "Il ne reste rien de ce lot en rayon. Son parcours ci-dessous est toute l'histoire.",
+    "trailHeading": "Tout ce qui lui est arrivé",
+    "decisionsHeading": "Les décisions sur son état",
+    "trailCaption": "Chaque mouvement enregistré sous ce numéro de lot, du plus récent au plus ancien.",
+    "status": {
+      "active": "Actif",
+      "quarantined": "En quarantaine",
+      "held": "Bloqué",
+      "expired": "Périmé",
+      "recalled": "Rappelé"
+    },
+    "fields": {
+      "expiry": "Date de péremption",
+      "production": "Date de production",
+      "useBy": "À consommer avant",
+      "kind": "Type"
+    },
+    "empty": {
+      "title": "Rien n'a été enregistré sous ce lot",
+      "description": "Les réceptions, sorties et transferts nommant ce lot apparaîtront ici."
+    }
+  },
+  "stock": {
+    "title": "Niveaux de stock",
+    "subtitle": "Ce qui se trouve où, dans quel lot, et quelle part est déjà réservée",
+    "searchPlaceholder": "Rechercher un produit ou un lot…",
+    "reservedShort": "{{quantity}} réservé",
+    "columns": {
+      "location": "Emplacement",
+      "product": "Produit",
+      "batch": "Lot",
+      "quantity": "En stock",
+      "reserved": "Réservé",
+      "available": "Disponible"
+    },
+    "filters": {
+      "location": "Emplacement",
+      "anyLocation": "Partout",
+      "includeEmpty": "Inclure les emplacements à zéro",
+      "includeEmptyHint": "Affiche les lignes de stock dont la quantité est nulle — la trace de ce qui était ici. Un emplacement qui n'a jamais porté le produit n'a aucune ligne.",
+      "oneStorage": "un emplacement",
+      "oneProduct": "un produit"
+    },
+    "empty": {
+      "title": "Aucun stock enregistré",
+      "description": "Le stock apparaît ici après une réception, un inventaire ou une production.",
+      "filteredTitle": "Rien ne correspond ici",
+      "filtered_one": "Rien ne correspond au filtre appliqué ({{filters}}). Retirez-le pour élargir la liste.",
+      "filtered_other": "Rien ne correspond aux filtres appliqués ({{filters}}). Retirez-en un pour élargir la liste.",
+      "filterNames": {
+        "location": "emplacement : {{value}}",
+        "product": "produit : {{value}}",
+        "search": "recherche : {{value}}"
+      }
+    },
+    "whereItLies": "Où il se trouve",
+    "seeForProduct": "Dans tous les emplacements",
+    "seeForLocation": "Niveaux de stock de cet emplacement",
+    "rows_one": "ligne de stock",
+    "rows_other": "lignes de stock"
+  },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Quels lots existent et lesquels ne doivent pas être touchés",
+    "statusChanged": "Lot marqué comme {{status}}",
+    "reasonDialog": {
+      "title": "Marquer le lot {{name}} comme {{status}} ?",
+      "message": "La raison reste attachée au lot et apparaît à côté de son statut.",
+      "label": "Pourquoi",
+      "placeholder": "Avis fournisseur 41/26 — verre trouvé dans le pot 12",
+      "confirm": "Changer le statut"
+    },
+    "actionsFor": "Actions pour le lot {{name}}",
+    "columns": {
+      "batch": "Lot",
+      "product": "Produit",
+      "status": "Statut",
+      "expiry": "Date de péremption",
+      "onHand": "En stock",
+      "actions": "Actions"
+    },
+    "setTo": {
+      "active": "Libérer — autoriser le prélèvement",
+      "quarantined": "Mettre en quarantaine",
+      "held": "Bloquer",
+      "expired": "Marquer périmé",
+      "recalled": "Marquer rappelé"
+    },
+    "empty": {
+      "title": "Aucun lot pour l'instant",
+      "filteredTitle": "Aucun lot dans cet état",
+      "description": "Les lots apparaissent quand la marchandise est reçue sous un numéro de lot ou de série.",
+      "filtered": "Rien ne correspond à ce statut. Effacez le filtre de statut pour voir tous les lots."
+    },
+    "count_one": "lot",
+    "count_other": "lots"
+  },
+  "asOf": {
+    "title": "Stock à une date",
+    "subtitle": "Ce qui était en stock un jour donné, et ce que cela valait",
+    "subtitleNoValue": "Ce qui était en stock un jour donné",
+    "date": "Au",
+    "location": "Emplacement",
+    "everywhere": "Partout",
+    "print": "Imprimer",
+    "total": "Total",
+    "caption": "Stock de {{organization}} au {{date}}",
+    "completeFrom": "Le journal des mouvements commence le {{date}}. Rien avant n'est connu — et ce n'est pas zéro.",
+    "noValueSource": "Aucun historique des coûts n'est tenu, donc aucune valeur n'est indiquée. Un prix d'achat est un champ de formulaire aujourd'hui ; il ne peut pas dire ce qu'un rayon valait le mois dernier.",
+    "excludedCurrency_one": "{{count}} ligne exclue du total : sa devise n'est pas celle de l'organisation.",
+    "excludedCurrency_other": "{{count}} lignes exclues du total : leur devise n'est pas celle de l'organisation.",
+    "cannotAnswer": "Impossible de répondre pour cette date.",
+    "empty": {
+      "title": "Rien n'était en stock",
+      "description": "À cette date, aucun des produits suivis n'était en stock.",
+      "descriptionAt": "{{location}} — ce jour-là, il ne détenait aucun des produits qu'il suit."
+    },
+    "columns": {
+      "product": "Produit",
+      "quantity": "Quantité",
+      "value": "Valeur"
+    },
+    "unpriced_one": "{{count}} produit n'a pas d'historique des coûts et reste hors du total.",
+    "unpriced_other": "{{count}} produits n'ont pas d'historique des coûts et restent hors du total."
+  }
+}

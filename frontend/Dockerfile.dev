@@ -1,0 +1,43 @@
+# glibc, not Alpine, because node_modules is shared with the host (see below):
+# vite 8 builds with rolldown, whose native binding npm installs for the libc of
+# whoever ran `npm install`. On the host that is the -gnu build, and a musl
+# container cannot load it — the dev server died on "Cannot find native
+# binding". esbuild never showed this because its binary is static.
+FROM node:26-bookworm-slim
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci && chown -R node:node /app
+
+# Source code is mounted via docker-compose volume — no COPY needed for dev.
+#
+# That bind mount covers /app whole, `node_modules` from the layer above
+# included, so the install there only serves a run without the mount. What the
+# dev container actually uses is the host's `frontend/node_modules` — which is
+# also what `npx tsc --noEmit` reads when the pre-push gate runs it from the host.
+# One copy, two readers; an anonymous volume here would give them two copies
+# that drift.
+#
+# A fresh clone has no `node_modules` at all, and the container used to die on
+# `sh: vite: not found` in a restart loop. So install on start when the
+# directory is missing, or when either manifest is newer than it (a
+# colleague's `git pull` that added a dependency — and that is exactly the
+# case a stale lockfile arrives in: package.json moves, the lock does not, so
+# testing only the lock would skip the install and let the drift through
+# unnoticed).
+#
+# `npm ci`, not `npm install`: this command runs against the bind mount, the
+# host's own tree, so an install that finds a gap between package.json and
+# package-lock.json used to write the missing lines into a tracked file and
+# hand back a dirty `git status` after every `make dev-up` (regenerating the
+# lock fixed one such drift, but the command that caused it was still
+# here). `npm ci` never writes the lock; on a drift it refuses, and the
+# refusal below says which file to regenerate on the host.
+
+USER node
+
+EXPOSE 5173
+
+CMD ["sh", "-c", "if [ ! -d node_modules/.bin ] || [ package-lock.json -nt node_modules ] || [ package.json -nt node_modules ]; then echo '[frontend] installing dependencies with npm ci...'; if ! npm ci --no-audit --no-fund; then echo '[frontend] npm ci refused: package-lock.json is out of sync with package.json. Regenerate the lock on the host and commit it — the container does not write it.' >&2; exit 1; fi; fi; exec npm run dev"]

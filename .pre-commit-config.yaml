@@ -1,0 +1,144 @@
+# `pre-commit install` (make setup-hooks) installs both hook types below. The
+# file checks run when a commit is made; only the message check runs on the
+# message, so the default stage keeps the file checks off it.
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  # Backend: ruff format + lint (runs inside Docker to match CI environment)
+  # All hooks are CHECK-ONLY — they never modify files.
+  # To auto-fix, run: make format && git add -u
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff format (backend)
+        entry: docker compose exec -T backend uv run ruff format --check .
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: ruff-lint
+        name: ruff lint (backend)
+        entry: docker compose exec -T backend uv run ruff check .
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      # Fires on Python AND on the app/core baseline files themselves: a
+      # commit that only edits a baseline is exactly the decision the size
+      # ratchet (baseline_sizes.txt) wants to catch at commit time, and with
+      # types: [python] alone it slipped through to CI. The file patterns
+      # mirror the ratchet's own _BASELINE_GLOBS (*_baseline.txt,
+      # *_deferrals.txt).
+      # Coverage rule: the size ratchet (baseline_sizes.txt;
+      # --write-baseline-sizes to lower it after paying debt) covers ONLY the
+      # architectural baselines in app/core — both name patterns above. Every
+      # other suppression list in this repo falls into one of THREE kinds:
+      #   (a) differential baselines — vulture-baseline.txt,
+      #       mypy-baseline.json, knip, the reachability baselines (files,
+      #       routes, focus), module boundaries, i18n keys: their gate fails
+      #       on NEW findings and never watches the size of the list itself;
+      #   (b) registries with an owner and a date — suppressions.json,
+      #       integration-only.json, and the reserved-surface section of
+      #       vulture_whitelist.py: their gate does not compare findings at
+      #       all, it demands an owner, a reason and an unexpired date;
+      #   (c) a counter — invalidation-keys-baseline.json holds a bare number
+      #       (literalKeyCount) and fails when it grows;
+      #   (d) the rest of vulture_whitelist.py: counted from the parsed file
+      #       in baseline_sizes.txt, so growth fails like a counter.
+      - id: architecture-lint
+        name: architecture boundaries
+        entry: docker compose exec -T backend uv run python manage.py arch lint
+        language: system
+        files: (\.py$|/app/core/[^/]*(baseline|deferrals)[^/]*\.txt$)
+        pass_filenames: false
+
+      - id: mypy
+        name: mypy baseline (backend)
+        entry: docker compose exec -T backend uv run python scripts/check_mypy_baseline.py
+        language: system
+        types: [python]
+        pass_filenames: false
+
+  # Frontend: prettier + eslint (check-only)
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier (frontend)
+        entry: docker compose exec -T frontend npm run format:check
+        language: system
+        types_or: [ts, tsx, javascript, jsx, css]
+        pass_filenames: false
+
+      - id: eslint
+        name: eslint (frontend)
+        entry: docker compose exec -T frontend npm run lint
+        language: system
+        types_or: [ts, tsx, javascript, jsx]
+        pass_filenames: false
+
+      # The boundary gate reports a module reaching into another module's
+      # internals. It belongs here, not only in `make check-frontend`: the
+      # tree is red the moment such an import is committed, and every commit
+      # is where it can still be answered while its author is present.
+      - id: module-boundaries
+        name: module boundaries (frontend)
+        entry: docker compose exec -T frontend npm run check:boundaries
+        language: system
+        files: '^(frontend/src/modules/.*\.(ts|tsx)|frontend/scripts/check-module-boundaries\.mjs|frontend/scripts/module-boundaries-baseline\.json)$'
+        pass_filenames: false
+
+      # The eslint hook above holds every file outside the accessibility
+      # baseline to jsx-a11y; this one holds the files inside it, whose rules
+      # are relaxed, to the counts frozen for them — otherwise a second missing
+      # label in a listed file would pass until `make check-frontend`.
+      - id: a11y-baseline
+        name: accessibility baseline (frontend)
+        entry: docker compose exec -T frontend npm run check:a11y-baseline
+        language: system
+        files: '^(frontend/src/.*\.tsx|frontend/scripts/check-a11y-baseline\.mjs|frontend/scripts/a11y-baseline\.json|frontend/eslint\.config\.js)$'
+        pass_filenames: false
+
+  # Cross-tree contract. Runs on the host rather than in a container, because
+  # it is the only place both trees are visible: the frontend container mounts
+  # ./frontend and the backend container mounts ./backend, so neither can
+  # verify a fact that spans them. Keep it that way — the fix for this is not
+  # to mount one tree inside the other.
+  - repo: local
+    hooks:
+      - id: module-settings-snapshot
+        name: module settings snapshot matches the manifests
+        entry: node frontend/scripts/check-module-settings.mjs
+        language: system
+        files: '^(backend/app/modules/[^/]+/manifest\.json|frontend/scripts/module-settings\.json)$'
+        pass_filenames: false
+
+      - id: module-catalog-snapshot
+        name: module catalog snapshot matches the backend
+        entry: node frontend/scripts/check-module-catalog.mjs
+        language: system
+        files: '^(backend/app/modules/[^/]+/manifest\.json|backend/app/api/modules\.py|frontend/scripts/module-catalog\.json)$'
+        pass_filenames: false
+
+      # The frontend half of the report is a few hundred rows only the full
+      # generator writes, so the frontend manifest and lock belong in this
+      # pattern beside the backend's: a package-lock.json change is exactly
+      # what can leave that table quoting a tree nobody installs any more.
+      - id: licences-fresh
+        name: licence report matches the locks, the runtime and the bundled assets
+        entry: python3 backend/scripts/check_licences_fresh.py
+        language: system
+        files: '^(backend/pyproject\.toml|backend/uv\.lock|THIRD_PARTY_LICENSES\.md|frontend/package\.json|frontend/package-lock\.json|frontend/public/.*)$'
+        pass_filenames: false
+
+  # The history is published with the code: a commit message is prose, with
+  # no task or plan identifier, branch name or private word in it (see
+  # "Commit messages" in AGENTS.md). Runs on the host, where a maintainer's
+  # checkout keeps its private word lists.
+  - repo: local
+    hooks:
+      - id: commit-message-prose
+        name: commit message is prose
+        entry: python3 backend/scripts/check_internal_ids.py --commit-msg
+        language: system
+        stages: [commit-msg]

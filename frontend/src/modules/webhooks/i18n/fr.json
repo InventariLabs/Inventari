@@ -1,0 +1,171 @@
+{
+  "title": "Webhooks",
+  "subtitle": "Notifications HTTP sortantes sur les événements de votre espace de travail.",
+  "addWebhook": "Ajouter un webhook",
+  "noWebhooks": "Aucun webhook configuré",
+  "noWebhooksDescription": "Ajoutez un webhook pour envoyer des notifications HTTP lorsque des événements se produisent.",
+  "inactive": "Inactif",
+  "inactiveCircuitBreaker": "Inactif (disjoncteur)",
+  "inactiveModuleDisabled": "Inactif (module désactivé)",
+  "unknownEvents": "Noms d'événements inconnus",
+  "failuresSinceSuccess_one": "1 livraison échouée depuis la dernière réussie.",
+  "failuresSinceSuccess_other": "{{count}} livraisons échouées depuis la dernière réussie.",
+  "consecutiveFailures": "Échecs consécutifs",
+  "test": "Test",
+  "reactivate": "Réactiver",
+  "thresholdLink": "Régler le seuil d'échecs",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "logs": "Journaux de livraison",
+  "form": {
+    "titleCreate": "Ajouter un webhook",
+    "titleEdit": "Modifier le webhook",
+    "namePlaceholder": "ex. canal d'incidents Slack",
+    "url": "URL cible",
+    "urlPlaceholder": "https://example.com/webhook",
+    "secret": "Secret (HMAC-SHA256)",
+    "secretPlaceholder": "Laisser vide pour aucune signature",
+    "secretMasked": "Le secret est défini (laisser vide pour conserver ou saisir une nouvelle valeur)",
+    "httpMethod": "Méthode HTTP",
+    "eventTypes": "Types d'événements",
+    "eventTypesPlaceholder": "Sélectionner les événements à suivre",
+    "maxRetries": "Tentatives max",
+    "timeoutSeconds": "Délai d'expiration (secondes)",
+    "isActive": "Actif",
+    "urlHint": "L'adresse doit être joignable depuis Internet. Les adresses privées et locales sont refusées, sauf autorisation de l'exploitant de cette installation.",
+    "insecureUrlWarning": "Sans HTTPS, les données circulent en clair et sont lisibles en chemin.",
+    "noSecretWarning": "Sans secret, le destinataire ne peut pas distinguer vos données de celles d'un tiers.",
+    "eventNeedsModule": "nécessite le module {{module}}",
+    "withdrawnEvents": "Retirés du catalogue",
+    "withdrawnEventsHint": "Ces noms ne figurent plus dans le catalogue des événements et ne se déclencheront jamais. Décochez-les et enregistrez pour supprimer l'abonnement.",
+    "eventsSelected": "({{count}} sélectionné)",
+    "eventsSelected_one": "({{count}} sélectionné)",
+    "eventsSelected_other": "({{count}} sélectionnés)"
+  },
+  "delivery": {
+    "title": "Journaux de livraison",
+    "empty": "Aucune livraison pour l'instant",
+    "error": "Erreur",
+    "success": "Succès",
+    "failed": "Échec",
+    "pendingRetry": "Nouvelle tentative en attente",
+    "payload": "Charge utile",
+    "response": "Réponse",
+    "nextRetry": "Prochaine tentative",
+    "page": "Page {{page}}",
+    "close": "Fermer",
+    "pending": "Envoi en cours",
+    "targetResponse": "Réponse du destinataire",
+    "truncated": "abrégé",
+    "abandonedByApp": "Abandonné par Inventari — la cible n'a jamais répondu",
+    "deliveryId": "Identifiant de livraison",
+    "abandon": {
+      "circuitBreaker": "Le disjoncteur a coupé ce endpoint après des échecs répétés.",
+      "webhookDisabled": "Le endpoint a été désactivé par un administrateur.",
+      "webhookDeleted": "Le endpoint a été supprimé.",
+      "moduleDisabled": "Le module webhooks est désactivé pour cette organisation."
+    }
+  },
+  "testResult": {
+    "success": "Test ping envoyé avec succès ({{status}})",
+    "successStillOff": "Test ping réussi ({{status}}), mais ce webhook est toujours désactivé. Réactivez-le pour reprendre les livraisons.",
+    "failure": "Échec du test ping : {{error}}",
+    "rejected": "Échec du ping de test : le destinataire a répondu {{status}}. La réponse complète figure dans le journal des livraisons."
+  },
+  "confirmDelete": "Supprimer le webhook \"{{name}}\" ?",
+  "confirmDeleteDescription": "Cela supprimera définitivement le webhook et tous ses journaux de livraison.",
+  "deleteSuccess": "Webhook supprimé",
+  "reactivateSuccess": "Webhook réactivé",
+  "createSuccess": "Webhook créé",
+  "updateSuccess": "Webhook mis à jour",
+  "never": "Jamais",
+  "statusActive": "Actif",
+  "statusFailing": "En erreur",
+  "unknownError": "Erreur inconnue",
+  "navigation": {
+    "webhooks": "Webhooks"
+  },
+  "circuitBreakerWarning_one": "Ce webhook a été automatiquement désactivé après 1 échec consécutif — la cause de la dernière tentative figure dans les journaux de livraison.",
+  "circuitBreakerWarning_other": "Ce webhook a été automatiquement désactivé après {{count}} échecs consécutifs — la cause de la dernière tentative figure dans les journaux de livraison.",
+  "eventsWhileOff": "Les événements qui surviennent pendant qu'il est désactivé ne sont ni livrés, ni mis en file, ni consignés, et Réactiver ne les rejoue pas.",
+  "settings": {
+    "logRetentionDays": "Conservation des journaux (jours)",
+    "logRetentionDaysDescription": "Durée de conservation des journaux de livraison des webhooks.",
+    "circuitBreakerThreshold": "Seuil du disjoncteur",
+    "circuitBreakerThresholdDescription": "Désactive automatiquement un webhook après ce nombre d'échecs consécutifs. Chaque tentative compte séparément — la première livraison, chaque nouvelle tentative et le bouton Test alimentent le même compteur."
+  },
+  "events": {
+    "category": {
+      "created": "Une catégorie a été créée",
+      "deleted": "Une catégorie a été supprimée",
+      "updated": "Une catégorie a été modifiée"
+    },
+    "document": {
+      "cancelled": "Un document a été annulé",
+      "completed": "Un document a été terminé",
+      "confirmed": "Un document a été confirmé"
+    },
+    "equipment": {
+      "checkin": "Un équipement a été rendu",
+      "checkout": "Un équipement a été remis"
+    },
+    "item": {
+      "consumed": "Un article a été consommé (stock diminué)",
+      "created": "Un article a été ajouté au stock",
+      "deactivated": "Un article a été désactivé",
+      "deleted": "Un article a été supprimé",
+      "discarded": "Un article a été jeté",
+      "disposed": "Un article a été sorti du stock",
+      "moved": "Un article a changé d'emplacement",
+      "status_changed": "Un article a changé de statut",
+      "transferred": "Un article a été transféré vers un autre emplacement",
+      "updated": "Un article a été modifié",
+      "used": "Un article a été entièrement utilisé"
+    },
+    "label": {
+      "assigned": "Une étiquette a été attribuée à un article",
+      "batch_exported": "Un lot d'étiquettes a été exporté pour impression",
+      "batch_generated": "Un lot d'étiquettes a été généré",
+      "scanned": "Une étiquette a été scannée"
+    },
+    "location": {
+      "created": "Un emplacement a été créé",
+      "deleted": "Un emplacement a été supprimé",
+      "updated": "Un emplacement a été modifié"
+    },
+    "module": {
+      "disabled": "Un module a été désactivé pour l'organisation",
+      "enabled": "Un module a été activé pour l'organisation"
+    },
+    "organization": {
+      "created": "Une organisation a été créée",
+      "updated": "Une organisation a été mise à jour"
+    },
+    "partner": {
+      "activated": "Un partenaire a été activé",
+      "deactivated": "Un partenaire a été désactivé"
+    },
+    "purchase_order": {
+      "cancelled": "Une commande a été annulée",
+      "completed": "Une commande a été terminée",
+      "confirmed": "Une commande a été confirmée"
+    },
+    "receipt": {
+      "created_from_po": "Une réception a été créée depuis une commande"
+    },
+    "recipe": {
+      "created": "Une recette a été créée",
+      "meal_plan_generated": "Un plan de repas a été généré",
+      "picking_completed": "La préparation des ingrédients est terminée"
+    },
+    "user": {
+      "joined_organization": "Quelqu'un a rejoint l'organisation",
+      "left_organization": "Quelqu'un a quitté l'organisation",
+      "registered": "Une nouvelle personne s'est inscrite"
+    }
+  },
+  "pagination": {
+    "prev": "‹ Précédent",
+    "next": "Suivant ›"
+  }
+}

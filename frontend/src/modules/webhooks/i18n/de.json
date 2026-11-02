@@ -1,0 +1,171 @@
+{
+  "title": "Webhooks",
+  "subtitle": "Ausgehende HTTP-Benachrichtigungen über Ereignisse in Ihrem Arbeitsbereich.",
+  "addWebhook": "Webhook hinzufügen",
+  "noWebhooks": "Keine Webhooks konfiguriert",
+  "noWebhooksDescription": "Fügen Sie einen Webhook hinzu, um HTTP-Benachrichtigungen bei Ereignissen zu senden.",
+  "inactive": "Inaktiv",
+  "inactiveCircuitBreaker": "Inaktiv (Sicherung)",
+  "inactiveModuleDisabled": "Inaktiv (Modul deaktiviert)",
+  "unknownEvents": "Unbekannte Ereignisnamen",
+  "failuresSinceSuccess_one": "1 fehlgeschlagene Zustellung seit der letzten erfolgreichen.",
+  "failuresSinceSuccess_other": "{{count}} fehlgeschlagene Zustellungen seit der letzten erfolgreichen.",
+  "consecutiveFailures": "Aufeinanderfolgende Fehler",
+  "test": "Test",
+  "reactivate": "Reaktivieren",
+  "thresholdLink": "Fehlerschwelle einstellen",
+  "delete": "Löschen",
+  "edit": "Bearbeiten",
+  "logs": "Zustellprotokolle",
+  "form": {
+    "titleCreate": "Webhook hinzufügen",
+    "titleEdit": "Webhook bearbeiten",
+    "namePlaceholder": "z. B. Slack-Incident-Kanal",
+    "url": "Ziel-URL",
+    "urlPlaceholder": "https://example.com/webhook",
+    "secret": "Secret (HMAC-SHA256)",
+    "secretPlaceholder": "Leer lassen für keine Signierung",
+    "secretMasked": "Secret ist gesetzt (leer lassen zum Beibehalten oder neuen Wert eingeben)",
+    "httpMethod": "HTTP-Methode",
+    "eventTypes": "Ereignistypen",
+    "eventTypesPlaceholder": "Ereignisse zum Abonnieren auswählen",
+    "maxRetries": "Max. Wiederholungen",
+    "timeoutSeconds": "Timeout (Sekunden)",
+    "isActive": "Aktiv",
+    "urlHint": "Die Adresse muss aus dem Internet erreichbar sein. Private und lokale Adressen werden abgelehnt, sofern der Betreiber dieser Installation sie nicht erlaubt.",
+    "insecureUrlWarning": "Ohne HTTPS werden die Daten im Klartext übertragen und sind unterwegs mitlesbar.",
+    "noSecretWarning": "Ohne Secret kann die Gegenstelle Ihre Daten nicht von fremden unterscheiden.",
+    "eventNeedsModule": "erfordert das Modul {{module}}",
+    "withdrawnEvents": "Nicht mehr im Katalog",
+    "withdrawnEventsHint": "Diese Namen stehen nicht mehr im Ereigniskatalog und können nie ausgelöst werden. Abwählen und speichern, um das Abonnement zu entfernen.",
+    "eventsSelected": "({{count}} ausgewählt)",
+    "eventsSelected_one": "({{count}} ausgewählt)",
+    "eventsSelected_other": "({{count}} ausgewählt)"
+  },
+  "delivery": {
+    "title": "Zustellprotokolle",
+    "empty": "Noch keine Zustellungen",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "failed": "Fehlgeschlagen",
+    "pendingRetry": "Wiederholung ausstehend",
+    "payload": "Payload",
+    "response": "Antwort",
+    "nextRetry": "Nächste Wiederholung",
+    "page": "Seite {{page}}",
+    "close": "Schließen",
+    "pending": "Wird gesendet",
+    "targetResponse": "Antwort der Gegenstelle",
+    "truncated": "gekürzt",
+    "abandonedByApp": "Von Inventari abgebrochen — das Ziel hat nie geantwortet",
+    "deliveryId": "Zustellungs-ID",
+    "abandon": {
+      "circuitBreaker": "Der Schutzschalter hat diesen Endpunkt nach wiederholten Fehlern abgeschaltet.",
+      "webhookDisabled": "Der Endpunkt wurde von einem Administrator deaktiviert.",
+      "webhookDeleted": "Der Endpunkt wurde gelöscht.",
+      "moduleDisabled": "Das Webhooks-Modul ist für diese Organisation deaktiviert."
+    }
+  },
+  "testResult": {
+    "success": "Test-Ping erfolgreich gesendet ({{status}})",
+    "successStillOff": "Test-Ping erfolgreich ({{status}}), aber dieser Webhook ist weiterhin ausgeschaltet. Reaktivieren Sie ihn, um die Zustellungen fortzusetzen.",
+    "failure": "Test-Ping fehlgeschlagen: {{error}}",
+    "rejected": "Test-Ping fehlgeschlagen: Der Empfänger antwortete mit {{status}}. Die vollständige Antwort steht im Zustellprotokoll."
+  },
+  "confirmDelete": "Webhook \"{{name}}\" löschen?",
+  "confirmDeleteDescription": "Dies löscht den Webhook und alle seine Zustellprotokolle dauerhaft.",
+  "deleteSuccess": "Webhook gelöscht",
+  "reactivateSuccess": "Webhook reaktiviert",
+  "createSuccess": "Webhook erstellt",
+  "updateSuccess": "Webhook aktualisiert",
+  "never": "Nie",
+  "statusActive": "Aktiv",
+  "statusFailing": "Mit Fehlern",
+  "unknownError": "Unbekannter Fehler",
+  "navigation": {
+    "webhooks": "Webhooks"
+  },
+  "circuitBreakerWarning_one": "Dieser Webhook wurde nach 1 aufeinanderfolgendem Fehler automatisch deaktiviert — die Ursache des letzten Versuchs steht im Zustellprotokoll.",
+  "circuitBreakerWarning_other": "Dieser Webhook wurde nach {{count}} aufeinanderfolgenden Fehlern automatisch deaktiviert — die Ursache des letzten Versuchs steht im Zustellprotokoll.",
+  "eventsWhileOff": "Ereignisse, die eintreten, solange er ausgeschaltet ist, werden weder zugestellt noch eingereiht oder protokolliert, und Reaktivieren spielt sie nicht nach.",
+  "settings": {
+    "logRetentionDays": "Protokollaufbewahrung (Tage)",
+    "logRetentionDaysDescription": "Wie lange Zustellprotokolle der Webhooks aufbewahrt werden.",
+    "circuitBreakerThreshold": "Schutzschalter-Schwelle",
+    "circuitBreakerThresholdDescription": "Deaktiviert einen Webhook automatisch nach dieser Anzahl aufeinanderfolgender fehlgeschlagener Versuche. Jeder Versuch zählt einzeln — die erste Zustellung, jeder Wiederholungsversuch und die Test-Schaltfläche speisen denselben Zähler."
+  },
+  "events": {
+    "category": {
+      "created": "Eine Kategorie wurde angelegt",
+      "deleted": "Eine Kategorie wurde gelöscht",
+      "updated": "Eine Kategorie wurde geändert"
+    },
+    "document": {
+      "cancelled": "Ein Beleg wurde storniert",
+      "completed": "Ein Beleg wurde abgeschlossen",
+      "confirmed": "Ein Beleg wurde bestätigt"
+    },
+    "equipment": {
+      "checkin": "Ein Gerät wurde zurückgegeben",
+      "checkout": "Ein Gerät wurde ausgegeben"
+    },
+    "item": {
+      "consumed": "Ein Artikel wurde verbraucht (Bestand verringert)",
+      "created": "Ein Artikel wurde dem Bestand hinzugefügt",
+      "deactivated": "Ein Artikel wurde deaktiviert",
+      "deleted": "Ein Artikel wurde entfernt",
+      "discarded": "Ein Artikel wurde als Abfall entsorgt",
+      "disposed": "Ein Artikel wurde ausgebucht",
+      "moved": "Ein Artikel wurde an einen anderen Lagerort gebracht",
+      "status_changed": "Ein Artikel hat den Status gewechselt",
+      "transferred": "Ein Artikel wurde an einen anderen Ort umgebucht",
+      "updated": "Ein Artikel wurde geändert",
+      "used": "Ein Artikel wurde aufgebraucht"
+    },
+    "label": {
+      "assigned": "Ein Etikett wurde einem Artikel zugeordnet",
+      "batch_exported": "Ein Etikettenstapel wurde zum Druck exportiert",
+      "batch_generated": "Ein Etikettenstapel wurde erzeugt",
+      "scanned": "Ein Etikett wurde gescannt"
+    },
+    "location": {
+      "created": "Ein Lagerort wurde angelegt",
+      "deleted": "Ein Lagerort wurde gelöscht",
+      "updated": "Ein Lagerort wurde geändert"
+    },
+    "module": {
+      "disabled": "Ein Modul wurde für die Organisation deaktiviert",
+      "enabled": "Ein Modul wurde für die Organisation aktiviert"
+    },
+    "organization": {
+      "created": "Eine Organisation wurde angelegt",
+      "updated": "Eine Organisation wurde aktualisiert"
+    },
+    "partner": {
+      "activated": "Ein Geschäftspartner wurde aktiviert",
+      "deactivated": "Ein Geschäftspartner wurde deaktiviert"
+    },
+    "purchase_order": {
+      "cancelled": "Eine Bestellung wurde storniert",
+      "completed": "Eine Bestellung wurde abgeschlossen",
+      "confirmed": "Eine Bestellung wurde bestätigt"
+    },
+    "receipt": {
+      "created_from_po": "Aus einer Bestellung entstand ein Wareneingang"
+    },
+    "recipe": {
+      "created": "Ein Rezept wurde angelegt",
+      "meal_plan_generated": "Ein Speiseplan wurde erstellt",
+      "picking_completed": "Die Zutatenkommissionierung wurde abgeschlossen"
+    },
+    "user": {
+      "joined_organization": "Jemand ist der Organisation beigetreten",
+      "left_organization": "Jemand hat die Organisation verlassen",
+      "registered": "Eine neue Person hat sich registriert"
+    }
+  },
+  "pagination": {
+    "prev": "‹ Zurück",
+    "next": "Weiter ›"
+  }
+}

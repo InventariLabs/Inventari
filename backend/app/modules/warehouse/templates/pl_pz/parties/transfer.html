@@ -1,0 +1,16 @@
+<div class="party-box">
+  <h3>Z miejsca</h3>
+  {% if source_location %}
+  <div class="party-name">{{ source_location }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>
+<div class="party-box">
+  <h3>Do miejsca</h3>
+  {% if target_location %}
+  <div class="party-name">{{ target_location }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

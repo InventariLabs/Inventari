@@ -1,0 +1,40 @@
+# Sync/async function twin baseline
+# Format: app/relative/path.py::function_name
+#
+# Function pairs where both sync and _async variants exist.
+# These emit ::notice (non-blocking). New twins emit ::error (blocking).
+# Remove entries when the sync variant is deleted.
+#
+# Legitimate two-phase lifecycle (sync wiring + async DB work):
+app/core/_base_module.py::on_startup_async
+app/core/define_module.py::on_startup_async
+app/core/_base_module.py::on_install_async
+app/core/define_module.py::on_install_async
+app/core/_base_module.py::on_upgrade_async
+#
+# Legitimate sync-implementation + async-wrapper patterns.
+#
+# Reviewed on 2026-08-13 in an attempt to retire these. Each one
+# turned out to be a blocking-I/O offload rather than a duplicated query:
+#   scheduler.stop_all_async   — sync cancel plus an await on the tasks;
+#                                two different operations, not a twin.
+#   document_pdf / email x2    — WeasyPrint and SMTP block by nature and are
+#                                pushed to a thread pool. Retiring them means
+#                                adopting async SMTP/rendering, not deleting
+#                                a duplicate.
+#   seed_data.seed_all_async   — sync seeders, run once on first boot.
+# None of them holds a DB connection, so none costs connection budget. The one
+# entry that did — template_crud's pair, reached through db.run_sync from an
+# AsyncSession — is gone. Do not "clean up" the rest without replacing the
+# blocking library underneath.
+app/core/scheduler.py::stop_all_async
+app/modules/warehouse/document_pdf_service.py::generate_pdf_async
+app/seed_data.py::seed_all_async
+app/services/email_service.py::send_email_async
+#
+# Core DB utils (polymorphic Session | AsyncSession contract):
+app/core/db_utils.py::paginate_async
+app/core/db_utils.py::get_org_owned_or_404_async
+#
+# Testing factory fixtures (sync session wrapper + async variant):
+app/core/testing.py::create_user_async

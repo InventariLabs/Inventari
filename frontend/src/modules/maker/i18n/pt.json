@@ -1,0 +1,540 @@
+{
+  "launcher": {
+    "title": "Produção",
+    "description": "Fabricar para vender: listas de materiais, custos e produções"
+  },
+  "navigation": {
+    "production": "Produções",
+    "catalog": "Listas",
+    "settings": "Configurações"
+  },
+  "productionList": {
+    "title": "Produções",
+    "subtitle": "Produções que você agendou ou concluiu, com custo e resultado.",
+    "newProduction": "Nova produção",
+    "searchPlaceholder": "Buscar pelo produto final…",
+    "loading": "Carregando ordens…",
+    "error": "Não foi possível carregar as ordens de produção",
+    "empty": {
+      "title": "Nenhuma produção ainda",
+      "subtitle": "Agende uma produção para consumir ingredientes e gerar o produto final."
+    },
+    "noMatches": {
+      "title": "Nenhuma produção encontrada",
+      "subtitle": "Nada encontrado com esses filtros. Tente ampliá-los."
+    },
+    "card": {
+      "qty": "Planejado",
+      "cost": "Custo",
+      "resultPerUnit": "({{amount}} por unidade)",
+      "shortage_one": "Falta estoque: {{count}} ingrediente. A conclusão será recusada.",
+      "shortage_other": "Falta estoque: {{count}} ingredientes. A conclusão será recusada."
+    },
+    "sortLabel": "Ordenar",
+    "sort": {
+      "newest": "Mais recentes primeiro",
+      "oldest": "Mais antigas primeiro",
+      "costDesc": "Maior custo"
+    },
+    "dateFrom": "De",
+    "dateTo": "Até",
+    "resetFilters": "Limpar",
+    "status": {
+      "all": "Todas",
+      "draft": "Rascunho",
+      "completed": "Concluída",
+      "cancelled": "Cancelada",
+      "reversed": "Desfeita"
+    },
+    "duplicate": "Duplicar",
+    "viewRecipe": "Ver lista",
+    "table": {
+      "product": "Produto",
+      "status": "Status",
+      "date": "Criada em",
+      "actions": "Ações"
+    }
+  },
+  "preview": {
+    "title": "Prévia da produção",
+    "subtitle": "Detalhamento de custos e consumo de ingredientes — sem alterar o estoque.",
+    "loadFailed": "Não foi possível carregar a prévia de custos",
+    "totalCost": "Custo total",
+    "unitCostHint": "Qtd. produzida",
+    "missingTitle": "Ingredientes sem preço",
+    "ingredients": "Ingredientes",
+    "chart": {
+      "title": "Participação no custo",
+      "empty": "Nenhum ingrediente tem preço ainda, então não há o que exibir no gráfico."
+    }
+  },
+  "create": {
+    "title": "Registrar produção",
+    "subtitle": "Registre o que você fez ou planeje uma produção. O que ela consome, o que falta e quanto custa aparecem ao lado do formulário antes de salvar.",
+    "productLabel": "Produto final",
+    "searchPlaceholder": "Buscar por nome, SKU ou código de barras…",
+    "change": "Alterar",
+    "qtyLabel": "Quanto fazer?",
+    "storageLabel": "Para o local",
+    "storagePlaceholder": "Selecione o local de destino",
+    "storageSearchPlaceholder": "Buscar por nome ou caminho…",
+    "storageEmpty": "Nenhum local encontrado",
+    "notesLabel": "Observações (opcional)",
+    "notesPlaceholder": "Observações internas sobre esta produção…",
+    "hints": {
+      "product": "Escolha um produto final para habilitar a prévia.",
+      "quantity": "Informe uma quantidade planejada maior que zero para habilitar a prévia.",
+      "storage": "Selecione um local de destino para habilitar a prévia."
+    },
+    "preview": "Prévia do custo",
+    "creating": "Criando…",
+    "cancel": "Cancelar",
+    "success": "Ordem de produção criada",
+    "errors": {
+      "missingFields": "Escolha antes o produto, a quantidade e o local.",
+      "create": "Não foi possível criar a ordem de produção"
+    },
+    "hasBom": "Tem lista de materiais",
+    "mode": {
+      "label": "O que você está registrando?",
+      "made": "Já produzido",
+      "planned": "Quero produzir"
+    },
+    "qtyLabelMade": "Quanto saiu?",
+    "batchHintMade": "Um lote da lista de materiais produz {{batch}}. Informe o que saiu, não o número de lotes.",
+    "batchHintPlanned": "Um lote da lista de materiais produz {{batch}}. Informe quanto produzir, não o número de lotes.",
+    "dateLabel": "Quando",
+    "submitMade": "Salvar como produzido",
+    "submitNeedsBom": "É preciso primeiro uma lista de materiais",
+    "submitNeedsIngredients": "Adicione primeiro ingredientes à lista de materiais",
+    "submitPlanned": "Planejar a produção",
+    "successMade": "Produção registrada",
+    "needs": {
+      "pick": "Escolha um produto, a quantidade e o destino para ver o que a produção consome.",
+      "loading": "Verificando o estoque…",
+      "headingMade": "Sai do estoque",
+      "headingPlanned": "Será necessário",
+      "have": "{{have}} em estoque",
+      "short": "{{have}} em estoque, faltam {{short}}",
+      "unknown": "{{have}} em estoque, em uma unidade que não dá para comparar com a lista de materiais",
+      "unnamed": "Ingrediente sem nome",
+      "unitFallback": "unidade",
+      "cost": "Custa {{unitCost}} por {{unit}} · {{total}} no total",
+      "marginLeft": "Você vende a {{price}}, o que deixa {{result}} em cada {{unit}} que você produz.",
+      "marginLost": "Você vende a {{price}}, que fica {{result}} por {{unit}} abaixo do custo.",
+      "savingsLeft": "Na loja custa {{price}}; cada {{unit}} que você produz economiza {{result}}.",
+      "savingsLost": "Na loja custa {{price}}, {{result}} por {{unit}} a menos do que produzir.",
+      "enough": "Tudo está em estoque.",
+      "unmeasurable": "A unidade de um ingrediente não pode ser comparada com o estoque, então a produção não consegue dizer o que retirar. Corrija antes a unidade da linha da lista de materiais.",
+      "shortMade": "Já foi produzido, então os itens existiam — os registros de estoque estão com quantidade menor. A produção é salva e os ingredientes em falta ficam para contagem.",
+      "shortPlanned": "Esta produção está sem alguns ingredientes. Você pode planejá-la agora e comprar o que falta.",
+      "addOne": "Adicionar {{quantity}} de {{name}} à lista de compras",
+      "addAll": "Adicionar o que falta à lista de compras",
+      "added": "Adicionado a {{name}}",
+      "alreadyListed": "Já está na lista de compras",
+      "addFailed": "Não foi possível adicionar à lista de compras"
+    }
+  },
+  "createRecipe": {
+    "title": "Nova lista de materiais",
+    "subtitle": "Escolha o produto final e dê um nome à lista.",
+    "nameLabel": "Nome da lista",
+    "namePlaceholder": "Nome da lista…",
+    "batchYieldLabel": "Esta lista produz",
+    "create": "Criar lista",
+    "creating": "Criando…",
+    "success": "Lista criada",
+    "errors": {
+      "productRequired": "Escolha antes o produto final.",
+      "nameRequired": "O nome da lista é obrigatório.",
+      "create": "Não foi possível criar a lista"
+    },
+    "batchYieldHint": "Quanto um lote produz, contado na unidade do produto. Deixe em branco para 1.",
+    "unitLabel": "Unidade",
+    "unitFirst": "Escolha antes a unidade ao lado da quantidade."
+  },
+  "detail": {
+    "title": "Ordem de produção",
+    "subtitle": "Revise ingredientes, custos e o estado da produção.",
+    "back": "Voltar à lista",
+    "loading": "Carregando ordem…",
+    "complete": "Concluir produção",
+    "cancel": "Cancelar produção",
+    "completeSuccess": "Produção concluída",
+    "cancelSuccess": "Produção cancelada",
+    "cancelNeedsManager": "Cancelar uma produção é decisão de um gestor — peça a alguém que possa gerenciar a produção.",
+    "completeConfirm": {
+      "title": "Concluir a produção?",
+      "description": "Isso consome os ingredientes listados e gera o produto final. Enquanto nada do que foi produzido tiver sido usado, \"Desfazer produção\" reverte tudo.",
+      "actualQtyLabel": "Quantidade realmente produzida (opcional)",
+      "actualQtyHint": "Deixe em branco para usar a quantidade planejada. Informe menos em caso de perda, mais em caso de superprodução. Os ingredientes são consumidos conforme o planejado, independentemente da quantidade real."
+    },
+    "cancelConfirm": {
+      "title": "Cancelar a produção?",
+      "description": "Cancelar marca este rascunho como cancelado. Nenhum estoque será movimentado.",
+      "confirm": "Sim, cancelar produção"
+    },
+    "reverseConfirm": {
+      "title": "Desfazer esta produção?",
+      "description": "Os ingredientes voltam aos locais e lotes de onde foram retirados, e o que a produção gerou sai do local. A produção continua no registro, marcada como desfeita.",
+      "confirm": "Sim, desfazer produção"
+    },
+    "card": {
+      "totalCost": "Custo total",
+      "totalCostUndone": "Custo antes de desfazer a produção",
+      "created": "Criada em",
+      "productionDate": "Data de produção",
+      "notes": "Observações",
+      "actualQty": "Produção real",
+      "plannedSuffix": "planejado: {{qty}}",
+      "scrap": "Perda",
+      "overproduced": "Superprodução",
+      "resultPerUnit": "({{amount}} por unidade)",
+      "totalCostAfterClosing": "Custo total após o fechamento",
+      "unitCost": "{{amount}} por unidade produzida",
+      "totalCostGap_one": "{{count}} ingrediente saiu de estoque sem custo, então fica fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores.",
+      "totalCostGap_other": "{{count}} ingredientes saíram de estoque sem custo, então ficam fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores."
+    },
+    "ingredients": "Ingredientes consumidos",
+    "emptyLines": "Nenhum ingrediente foi registrado nesta produção.",
+    "plannedIngredients": "Consumo planejado",
+    "plannedIngredientsHint": "O que esta produção vai retirar. Nada saiu do estoque ainda. As quantidades são lidas da lista de materiais ao fechar a produção, então alterações na lista mudam um rascunho em aberto.",
+    "emptyLinesPlanned": "Esta produção não consumiria nada — a lista de materiais não tem ingredientes.",
+    "cancelReason": "Motivo do cancelamento",
+    "cancelReasonPlaceholder": "Motivo (opcional)…",
+    "producedItem": "Produto acabado",
+    "viewProducedItem": "Ver produto",
+    "stockMoves": "Movimentações de estoque",
+    "stockMove": {
+      "dir": "Movimento",
+      "product": "Produto / lote",
+      "lot": "Lote",
+      "unknownProduct": "Produto desconhecido",
+      "qty": "Qtd."
+    },
+    "line": {
+      "ingredient": "Ingrediente",
+      "qty": "Qtd. consumida",
+      "unitCost": "Custo unitário",
+      "lineCost": "Custo da linha",
+      "unknownLocation": "Local desconhecido",
+      "qtyLabel": "Qtd. por lote",
+      "yieldLabel": "Perda de rendimento %",
+      "saved": "Linha atualizada",
+      "saveFailed": "Não foi possível atualizar a linha",
+      "shortLabel": "faltam",
+      "unmeasurableShort": "faltam — as unidades não podem ser comparadas com o estoque",
+      "shortfall": "{{quantity}} fora dos registros — pendente de contagem"
+    },
+    "edit": "Editar",
+    "save": "Salvar",
+    "saveFailed": "Não foi possível salvar a ordem",
+    "cancelEdit": "Descartar alterações",
+    "duplicate": "Duplicar",
+    "duplicated": "Ordem duplicada",
+    "duplicateFailed": "Não foi possível duplicar a ordem",
+    "plannedQty": "Qtd. planejada",
+    "productionDate": "Data de produção",
+    "notes": "Observações",
+    "tabs": {
+      "composition": "Composição",
+      "cost": "Custo e resultado",
+      "history": "Histórico"
+    },
+    "sourceRecipe": "Baseada em uma receita (cópia de {{date}})",
+    "setAsDefault": "Definir como padrão",
+    "setDefaultSuccess": "Lista padrão definida",
+    "setDefaultFailed": "Não foi possível definir a lista padrão",
+    "deleteRecipe": "Excluir lista",
+    "recipeDeleted": "Lista excluída",
+    "recipeDeleteFailed": "Não foi possível excluir a lista",
+    "processSteps": "Etapas do processo",
+    "cost": {
+      "fixedCosts": "Custos fixos / lote",
+      "referencePrice": "Preço de referência",
+      "perBatch": "por lote",
+      "perYieldUnit": "por unidade — um lote produz {{qty}}",
+      "noFixed": "Nenhum custo fixo definido",
+      "ingredients": "Ingredientes",
+      "emptyLines": "Nada para precificar ainda — adicione ingredientes na aba Composição.",
+      "total": "Total",
+      "addLine": "Adicionar linha de custo",
+      "lineSaved": "Linha de custo salva",
+      "lineSaveFailed": "Não foi possível salvar a linha de custo",
+      "lineDeleted": "Linha de custo excluída",
+      "lineDeleteFailed": "Não foi possível excluir a linha de custo",
+      "lineKind": "Tipo",
+      "lineLabel": "Descrição",
+      "lineLabelPlaceholder": "ex.: Energia do forno",
+      "lineAmount": "Valor (por lote)",
+      "editReferencePrice": "Editar preço de referência",
+      "referencePriceSaved": "Preço de referência salvo",
+      "referencePriceSaveFailed": "Não foi possível salvar o preço de referência",
+      "kind": {
+        "LABOR": "Mão de obra",
+        "PACKAGING": "Embalagem",
+        "OVERHEAD": "Custos indiretos",
+        "OTHER": "Outros"
+      },
+      "deleteConfirm": {
+        "title": "Excluir linha de custo?",
+        "description": "Remover \"{{label}}\" dos custos fixos?"
+      }
+    },
+    "history": {
+      "title": "Histórico de produção",
+      "empty": "Nenhuma produção desta lista ainda.",
+      "date": "Data",
+      "status": "Status",
+      "made": "Produzido",
+      "unitCostColumn": "Custo unitário",
+      "resultColumn": "{{result}} por unidade",
+      "totalColumn": "Custo do lote",
+      "open": "Abrir produção"
+    },
+    "completeFailed": "Não foi possível concluir a produção",
+    "emptyBom": "Esta lista de materiais não tem ingredientes — a produção criaria produto do nada. Adicione ingredientes primeiro.",
+    "emptyBomAction": "Adicionar ingredientes",
+    "noBom": "Este produto não tem lista de materiais — a produção criaria produto do nada. Crie uma lista primeiro.",
+    "noBomAction": "Criar uma lista",
+    "cancelFailed": "Não foi possível cancelar a produção",
+    "reverse": "Desfazer produção",
+    "reverseNeedsManager": "Desfazer uma produção é decisão de um gestor — peça a alguém que possa gerenciar a produção.",
+    "reverseSuccess": "Produção desfeita",
+    "reverseFailed": "Não foi possível desfazer a produção",
+    "yieldSaved": "Rendimento atualizado",
+    "yieldSaveFailed": "Não foi possível atualizar o rendimento",
+    "processStepsEmpty": "Nenhuma etapa do processo ainda",
+    "processStepsEdit": "Editar etapas",
+    "processStepsEditStep": "Etapa {{number}}",
+    "processStepsAdd": "Adicionar etapa",
+    "processStepsAddPlaceholder": "Descreva a etapa — Enter inicia uma nova linha, Ctrl+Enter adiciona",
+    "processStepsSaved": "Etapas do processo salvas",
+    "processStepsSaveFailed": "Não foi possível salvar as etapas do processo",
+    "processStepsAddFirst": "Adicionar etapas",
+    "plannedSummary": "Planejado: {{qty}}",
+    "deleteConfirm": {
+      "title": "Excluir esta lista?",
+      "description": "Os ingredientes e as etapas do processo vão junto. As produções já registradas são mantidas."
+    },
+    "notFound": "Ordem de produção não encontrada",
+    "plannedShortageHint_one": "O consumo planejado excede o estoque — falta {{count}} ingrediente. A conclusão desta produção será recusada.",
+    "plannedShortageHint_other": "O consumo planejado excede o estoque — faltam {{count}} ingredientes. A conclusão desta produção será recusada."
+  },
+  "bom": {
+    "childLabel": "Produto ingrediente",
+    "qtyLabel": "Qtd.",
+    "unitLabel": "Unidade",
+    "yieldLabel": "Perda de rendimento %",
+    "yieldHint": "Um valor de planejamento: quanto reservar a mais para o plano fechar. Deixar em 0 é normal — o que realmente se perdeu é medido ao fechar a ordem, informando a quantidade que de fato saiu.",
+    "notesLabel": "Observações",
+    "notesPlaceholder": "Observações opcionais…",
+    "add": "Adicionar linha",
+    "adding": "Adicionando…",
+    "childPlaceholder": "Buscar ingrediente…",
+    "treeToggle": "Visão em vários níveis",
+    "treeHint": "A única visão que mostra uma lista dentro de outra, e o único lugar onde uma linha pode mudar de pai. Vale abrir quando um ingrediente tem lista própria.",
+    "childClear": "Limpar",
+    "unitMustBeConvertible": "Só são oferecidas unidades que podem ser lidas como {{unit}} — uma linha que o módulo de produção não consegue converter é recusada."
+  },
+  "composition": {
+    "ingredientsTitle": "Ingredientes",
+    "perBatchHint": "As quantidades são por lote.",
+    "batchYield": "Esta lista produz {{qty}}",
+    "batchYieldLabel": "Esta lista produz",
+    "batchYieldEdit": "Alterar quanto esta lista produz",
+    "batchYieldHint": "Quanto um lote desta lista produz. Custo unitário = custo do lote ÷ este número.",
+    "addIngredient": "Adicionar ingrediente",
+    "moreFields": "Mais",
+    "removeIngredient": "Remover",
+    "ingredientAdded": "Ingrediente adicionado",
+    "ingredientRemoved": "Ingrediente removido",
+    "emptyLines": "Nenhum ingrediente ainda — adicione o primeiro abaixo.",
+    "introduction": "Uma lista de materiais é a relação do que entra em um lote deste produto. Os custos da aba Custo e resultado são somados a partir dela, e o estoque é baixado com base nela quando uma ordem de produção é fechada.",
+    "removeConfirm": {
+      "title": "Remover ingrediente?",
+      "description": "Remover \"{{name}}\" desta lista?"
+    },
+    "errors": {
+      "addIngredient": "Não foi possível adicionar o ingrediente",
+      "duplicateIngredient": "Esta lista já tem esse ingrediente.",
+      "removeIngredient": "Não foi possível remover o ingrediente",
+      "yieldInvalid": "A quantidade que a lista produz deve ser maior que zero."
+    }
+  },
+  "tree": {
+    "title": "Lista de materiais em vários níveis",
+    "hint": "Arraste uma linha sobre outra para aninhá-la.",
+    "empty": "Nenhum ingrediente ainda. Adicione-os na seção de ingredientes acima; eles aparecem aqui assim que houver algo para aninhar.",
+    "loading": "Carregando árvore…",
+    "error": "Não foi possível carregar a árvore",
+    "moved": "Linha movida",
+    "moveError": "Não foi possível mover",
+    "dropHint": "Arraste para mover"
+  },
+  "pricing": {
+    "title": "Calculadora de preço de venda",
+    "subtitle": "Modelo de margem bruta — mova a margem para ver o preço de venda sugerido.",
+    "currentDefault": "Padrão salvo",
+    "isDefault": "(padrão do sistema)",
+    "qtyLabel": "Quantidade produzida",
+    "marginLabel": "Margem desejada (%)",
+    "preview": "Calcular preço",
+    "calculating": "Calculando…",
+    "totalCost": "Custo total",
+    "suggestedPrice": "Preço de venda sugerido",
+    "close": "Fechar",
+    "saveDefault": "Salvar como padrão",
+    "saving": "Salvando…",
+    "saved": "Margem padrão salva",
+    "saveFailed": "Não foi possível salvar a margem padrão",
+    "openButton": "Preço de venda",
+    "errors": {
+      "qty": "A quantidade deve ser maior que 0.",
+      "compute": "Não foi possível calcular o preço"
+    },
+    "unitCostEstimated": "Custo unitário estimado"
+  },
+  "bomEntry": {
+    "columnHeader": "Lista",
+    "editRecipe": "Editar lista",
+    "createRecipe": "Criar lista",
+    "openRecipe": "Abrir a lista de materiais deste produto"
+  },
+  "catalog": {
+    "title": "Listas de materiais",
+    "subtitle": "Fabricar para vender: cada lista com seus custos, margens e estoque",
+    "searchPlaceholder": "Buscar listas…",
+    "sortLabel": "Ordenar por",
+    "default": "Padrão",
+    "produce": "Produzir",
+    "addIngredients": "Adicionar ingredientes",
+    "details": "Detalhes",
+    "unitCost": "Custo unitário",
+    "unitCostIncomplete_one": "1 ingrediente da última produção estava sem custo de compra registrado.",
+    "unitCostIncomplete_other": "{{count}} ingredientes da última produção estavam sem custo de compra registrado.",
+    "stock": "Estoque",
+    "lastProduced": "Última produção",
+    "ingredientCount": "{{count}} ingredientes",
+    "ingredientCount_one": "{{count}} ingrediente",
+    "ingredientCount_other": "{{count}} ingredientes",
+    "viewProduction": "Produções",
+    "newRecipe": "Nova lista",
+    "empty": {
+      "title": "Nenhuma lista ainda",
+      "subtitle": "Crie sua primeira lista de materiais para acompanhar os custos de produção.",
+      "cta": "Nova lista"
+    },
+    "sort": {
+      "newest": "Mais recentes",
+      "oldest": "Mais antigas",
+      "name": "Nome"
+    },
+    "noMatches": {
+      "title": "Nenhuma lista encontrada",
+      "subtitle": "Nada encontrado para \"{{query}}\". Tente uma frase mais curta."
+    },
+    "table": {
+      "name": "Nome",
+      "ingredients": "Ingredientes",
+      "availability": "Disponibilidade",
+      "actions": "Ações"
+    },
+    "unitCostAfterRun": "Custo unitário após a última produção",
+    "unitCostEstimated": "Custo unitário estimado",
+    "estimateCostIncomplete_one": "1 ingrediente desta estimativa está sem custo de compra registrado.",
+    "estimateCostIncomplete_other": "{{count}} ingredientes desta estimativa estão sem custo de compra registrado."
+  },
+  "settings": {
+    "title": "Configurações de produção",
+    "loading": "Carregando configurações…",
+    "referenceDirection": "Com o que o resultado é medido",
+    "referenceDirectionHint": "Margem, se você vende o que produz; economia, se produz em vez de comprar. O preço de referência de cada lista passa então a ser seu preço de venda ou o preço da loja.",
+    "allowOverproduction": "Permitir superprodução",
+    "allowOverproductionHint": "Quando ativado, fechar uma ordem pode registrar mais do que foi planejado.",
+    "availabilityCheckScope": "Escopo da verificação de disponibilidade",
+    "availabilityCheckScopeHint": "Global conta o estoque de todos os locais; por local verifica cada local separadamente.",
+    "scopeGlobal": "Global",
+    "scopePerLocation": "Por local",
+    "createOnShortageStrategy": "Estratégia de falta ao criar",
+    "createOnShortageStrategyHint": "O que acontece quando uma ordem é criada sem ingredientes suficientes: permitir, avisar ou bloquear.",
+    "strategyAllow": "Permitir",
+    "strategyWarn": "Avisar",
+    "strategyBlock": "Bloquear",
+    "saved": "Configurações salvas",
+    "saveFailed": "Não foi possível salvar as configurações",
+    "subtitle": "O que o resultado significa e como a produção trata as faltas.",
+    "whereReferenceDirection": "O resultado recebe esse nome nos cartões de listas, nas ordens de produção e no resumo mensal.",
+    "immediateNote": "Cada escolha é salva na hora. Não há como desfazer — volte a configuração do mesmo jeito.",
+    "advanced": "Avançado",
+    "advancedHint": "Regras para faltas e superprodução. Os padrões servem para uma oficina pequena."
+  },
+  "availability": {
+    "maxBatches": "Máx. de lotes com o estoque",
+    "shortageList": "Lista de faltas",
+    "ingredient": "Ingrediente",
+    "needed": "Necessário",
+    "available": "Disponível",
+    "short": "Falta",
+    "notConvertible": "unidade incompatível",
+    "blocked": "Não é possível criar — faltam ingredientes",
+    "blockedHint": "Reponha esses ingredientes ou mude a estratégia de falta nas configurações.",
+    "warnTitle": "Faltam alguns ingredientes",
+    "warnHint": "Você ainda pode criar o rascunho — a disponibilidade será verificada de novo na conclusão.",
+    "warnConfirm": "Criar mesmo assim",
+    "completeShortage": "Não é possível concluir — estoque insuficiente",
+    "completeShortageHint": "Esses ingredientes acabaram desde que o rascunho foi criado.",
+    "unknown_one": "{{count}} ingrediente não pode ser comparado",
+    "unknown_other": "{{count}} ingredientes não podem ser comparados",
+    "shortUnknown": "desconhecido",
+    "completeShortageHintNever": "Esses ingredientes nunca foram suficientes para esta produção — ela foi criada acima do estoque."
+  },
+  "widget": {
+    "title": "{{result}} por mês",
+    "viewAll": "Produção",
+    "hintSource": "Definido nas configurações do módulo Produção",
+    "orders_one": "{{count}} produção",
+    "orders_other": "{{count}} produções",
+    "empty": "Nenhuma produção concluída com resultado ainda."
+  },
+  "whereUsed": {
+    "title": "Usado em listas de materiais",
+    "perBatch": "{{qty}} por lote"
+  },
+  "permissions": {
+    "read": "Ver produção",
+    "readDesc": "Pode consultar listas de materiais, custos e ordens de produção",
+    "write": "Executar produção",
+    "writeDesc": "Pode criar ordens de produção e fechar produções — isso movimenta o estoque",
+    "manage": "Gerenciar listas e configurações",
+    "manageDesc": "Pode editar listas de materiais, etapas do processo e configurações do módulo, e cancelar produções — uma lista de materiais define o que a produção retira do estoque"
+  },
+  "bomDetail": {
+    "notFound": "Lista não encontrada",
+    "back": "Voltar às listas",
+    "loading": "Carregando lista…"
+  },
+  "costSource": {
+    "avco": "média das camadas",
+    "fifo": "custo real (PEPS)",
+    "none": "sem custo registrado neste estoque"
+  },
+  "cost": {
+    "gap": {
+      "partial_one": "1 ingrediente está sem taxa, então fica fora deste valor.",
+      "partial_other": "{{count}} ingredientes estão sem taxa, então ficam fora deste valor.",
+      "none_one": "Sem taxa para o único ingrediente — não há o que somar.",
+      "none_other": "Sem taxa para nenhum dos {{count}} ingredientes — não há o que somar."
+    }
+  },
+  "result": {
+    "margin": {
+      "label": "Margem",
+      "definition": "Preço de venda menos o custo de produção"
+    },
+    "savings": {
+      "label": "Economia em relação ao preço da loja",
+      "definition": "Preço da loja menos o custo de produção"
+    }
+  }
+}

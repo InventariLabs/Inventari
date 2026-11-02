@@ -1,0 +1,31 @@
+{
+  "field": {
+    "label": "Certificat du lot {{lot}}",
+    "missing": "Saisissez le numéro de certificat du lot {{lot}}."
+  },
+  "line": {
+    "certificate": "Certificat {{number}}",
+    "save": "Enregistrer le certificat",
+    "saveFailed": "Le numéro de certificat n’a pas été enregistré. Réessayez."
+  },
+  "column": {
+    "certificate": "Certificat"
+  },
+  "filter": {
+    "certified": "Lots certifiés"
+  },
+  "action": {
+    "file": "Enregistrer les certificats",
+    "filed": "Les certificats sont enregistrés.",
+    "alreadyOnFile": "Ces certificats étaient déjà enregistrés."
+  },
+  "pickOrderStrategies": {
+    "by_zone_then_weight": "Zone par zone, le plus lourd d’abord"
+  },
+  "permissions": {
+    "read": "Voir les certificats",
+    "readDesc": "Voit quels certificats de lot sont enregistrés.",
+    "write": "Enregistrer les certificats",
+    "writeDesc": "Enregistre les certificats de lot pour que leurs réceptions puissent être comptabilisées."
+  }
+}

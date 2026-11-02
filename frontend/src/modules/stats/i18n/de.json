@@ -1,0 +1,166 @@
+{
+  "title": "Statistiken",
+  "subtitle": "Übersicht Ihrer Bestände",
+  "records": "Datensätze",
+  "places": "Orte, alle Ebenen",
+  "expiringSoon": "Läuft bald ab",
+  "expired": "Abgelaufen",
+  "storageDistribution": "Produktverteilung nach Lagerort",
+  "categoryDistribution": "Produktverteilung nach Kategorie",
+  "expiryForecast": "Ablaufprognose",
+  "noData": "Keine Daten",
+  "noExpiryData": "Keine Daten zu Ablaufdaten",
+  "costAnalysis": {
+    "title": "Kostenanalyse",
+    "subtitle": "Zusammenfassung von Ausgaben und Abfall",
+    "spent": "Ausgegeben",
+    "wasted": "Verschwendet",
+    "waste": "Verschwendung (% des Werts)",
+    "savings": "Einsparungen",
+    "topCategories": "Teuerste Kategorien",
+    "savingsOpportunities": "Einsparvorschläge",
+    "monthlyTrend": "Monatlicher Trend",
+    "excludedOtherCurrency_one": "Ein Produkt ist in einer anderen Währung ausgezeichnet und zählt hier nicht mit.",
+    "excludedOtherCurrency_other": "{{count}} Produkte sind in einer anderen Währung ausgezeichnet und zählen hier nicht mit.",
+    "notValuedYet": "Für diesen Zeitraum ist keine Bewertung erfasst",
+    "categoriesPricedFromRecords": "Kategorien werden mit dem Einkaufspreis des jeweiligen Datensatzes bewertet.",
+    "categoriesPricedFromLedger": "Kategorien werden laut Kostenbuch bewertet.",
+    "categoryUnpriced_one": "Eine Position hat keinen Preis auf ihrem Datensatz und zählt nicht in die Summe.",
+    "categoryUnpriced_other": "{{count}} Positionen haben keinen Preis auf ihren Datensätzen und zählen nicht in die Summe."
+  },
+  "tabs": {
+    "overview": "Übersicht",
+    "analytics": "Analysen",
+    "reconciliation": "Abgleich"
+  },
+  "analytics": {
+    "rotation": {
+      "avgRotation": "Durchschnittliches Bestandsalter",
+      "medianRotation": "Medianer Bestandsalter",
+      "slowMovers": "Langsamdreher",
+      "deadStock": "Totes Lager",
+      "deadStockValue": "Wert des toten Lagers",
+      "byCategory": "Bestandsalter nach Kategorie",
+      "days": "Tage",
+      "noData": "Keine Bestandsalterdaten verfügbar",
+      "noMovement": "Noch keine Bewegung"
+    },
+    "alerts": {
+      "total": "Benachrichtigungen gesamt",
+      "types": {
+        "forgotten": "Vergessene Artikel",
+        "staple": "Fehlende Grundartikel",
+        "expiring": "Läuft bald ab",
+        "expired": "Abgelaufen",
+        "lowStock": "Niedriger Bestand",
+        "spike": "Preissprung"
+      },
+      "messages": {
+        "forgotten_one": "Seit {{count}} Tag unberührt — vor dem nächsten Kauf aufbrauchen.",
+        "forgotten_other": "Seit {{count}} Tagen unberührt — vor dem nächsten Kauf aufbrauchen.",
+        "staple_one": "Zuletzt vor {{count}} Tag gekauft, mehr als doppelt so lange wie üblich.",
+        "staple_other": "Zuletzt vor {{count}} Tagen gekauft, mehr als doppelt so lange wie üblich.",
+        "expiring": "Läuft am {{date}} ab.",
+        "expired": "Abgelaufen am {{date}}."
+      },
+      "noAlerts": "Keine Benachrichtigungen - Ihr Bestand sieht gut aus!",
+      "noData": "Noch nichts zu prüfen — fügen Sie Artikel hinzu, dann folgen die Hinweise"
+    },
+    "forecast": {
+      "predicted": "Voraussichtliche Ausgaben",
+      "historical": "Historischer Durchschnitt",
+      "trend": "Trend",
+      "wasteReduction": "Abfallreduzierungspotenzial",
+      "noData": "Nicht genügend Kaufhistorie",
+      "monthlyAvg": "Monatsdurchschnitt",
+      "wasteReductionHint": "Mögliche Einsparungen durch weniger Verschwendung",
+      "confidence": "Prognosesicherheit",
+      "quarter": "Quartal",
+      "trends": {
+        "increasing": "Steigend",
+        "decreasing": "Fallend",
+        "stable": "Stabil",
+        "no_data": "Zu wenig Daten"
+      },
+      "notEnoughData": "Zu wenig Kaufhistorie für eine Prognose",
+      "dataProgress": "{{have}} von {{need}} Wochen Kaufhistorie"
+    },
+    "patterns": {
+      "recurring": "Häufigste wiederkehrende Produkte",
+      "seasonal": "Saisonprodukte",
+      "bulk": "Großeinkaufsmöglichkeiten",
+      "potential": "Mögliche Einsparungen",
+      "noBulk": "Keine Großeinkaufsmöglichkeiten erkannt",
+      "noPatterns": "Nicht genügend Kaufhistorie",
+      "seasonalityUnknown": "Zu wenige Saisons"
+    }
+  },
+  "errors": {
+    "failedToLoadRotationAnalysis": "Rotationsanalyse konnte nicht geladen werden",
+    "failedToLoadAlerts": "Benachrichtigungen konnten nicht geladen werden",
+    "failedToLoadStorageDistribution": "Verteilung nach Standort konnte nicht geladen werden",
+    "failedToLoadCategoryDistribution": "Verteilung nach Kategorie konnte nicht geladen werden",
+    "failedToLoadExpiryForecast": "Ablaufprognose konnte nicht geladen werden",
+    "failedToLoadCostAnalysis": "Kostenanalyse konnte nicht geladen werden",
+    "failedToLoadReconciliation": "Bestandsabgleich konnte nicht geladen werden"
+  },
+  "health": {
+    "title": "Lagerbestands-Check",
+    "needsAttention": "Braucht Aufmerksamkeit",
+    "needsAttentionHint": "Abgelaufene oder bald ablaufende Datensätze und alle Datensätze von Produkten mit niedrigem Bestand.",
+    "runningLow": "Wird knapp",
+    "runningLowHint": "Produkte auf oder unter ihrem Schwellenwert. Ihre Datensätze zählen auch unter „Braucht Aufmerksamkeit“.",
+    "totalValue": "Geschätzter Wert",
+    "totalValueHint": "Ungefährer Gesamtwert aller Positionen.",
+    "totalValueHintLedger": "Was der vorhandene Bestand gekostet hat, laut Kostenbuch — die ganze Organisation, nicht nur die oben gezählten Lagerorte.",
+    "actionsHint": "Nutzen Sie dies als schnellen Tagescheck. Details nur bei Bedarf öffnen.",
+    "hideDetails": "Detaillierte Statistiken ausblenden",
+    "showDetails": "Detaillierte Statistiken anzeigen",
+    "subtitle_one": "Ein Signal, das auf einen Blick zeigt, was Aufmerksamkeit braucht.",
+    "subtitle_other": "{{count}} Signale, die auf einen Blick zeigen, was Aufmerksamkeit braucht.",
+    "unvaluedStock": "Bestandszugänge ohne Preis: {{total}}. Dieser Wert ist zu niedrig.",
+    "valueUnknown": "Unbekannt",
+    "valueUnknownHint": "Noch kein Produkt hat einen Preis, es gibt also nichts zu addieren.",
+    "unpricedItems": "Positionen ohne Preis: {{total}}. Dieser Wert ist zu niedrig."
+  },
+  "permissions": {
+    "read": "Auswertungen ansehen",
+    "readDesc": "Sieht organisationsweite Zahlen: Verbrauch, Umschlag, Prognosen und Kosten"
+  },
+  "settings": {
+    "enableAnalytics": "Analytik aktivieren",
+    "enableAnalyticsDescription": "Analytik-Tab anzeigen (Rotation, Ausgabenprognosen, Einkaufsmuster). Für kleine Haushaltsbestände deaktivieren, bei denen nicht genügend Verlaufsdaten für aussagekräftige Analysen vorliegen.",
+    "showInventoryValue": "Inventarwert anzeigen",
+    "showInventoryValueDescription": "Den Gesamtwert des Bestands in der Statistikübersicht anzeigen. Eine betriebliche Kennzahl — für Haushaltsbestände deaktivieren, die keine Einkaufspreise speichern, aus denen er aufsummiert werden könnte."
+  },
+  "navigation": {
+    "settings": "Analytik"
+  },
+  "reconciliation": {
+    "title": "Bestandsabgleich",
+    "subtitle_one": "Beim Öffnen dieser Ansicht gemessen, über {{count}} Produktdatensatz.",
+    "subtitle_other": "Beim Öffnen dieser Ansicht gemessen, über {{count}} Produktdatensätze.",
+    "tableCaption": "Die zwei Paarvergleiche und was sie ergeben haben",
+    "expectedGap": "Eine dauerhafte Lücke ist hier beabsichtigt; auffällig ist eine, die wächst.",
+    "columns": {
+      "pair": "Verglichen",
+      "count": "Abweichungen",
+      "total": "Gesamtdifferenz"
+    },
+    "pairs": {
+      "quantMove": {
+        "name": "Regal vs. Bewegungsjournal",
+        "meaning": "Was die Bewegungen ergeben, gegen das, was im Regal liegt."
+      },
+      "layerQuant": {
+        "name": "Kostenhistorie vs. Regal",
+        "meaning": "Wie viel des Regals die Kostenschichten nicht abdecken."
+      }
+    },
+    "previousLine": "Vorherige Messung ({{when}}): {{howMany}} · {{howMuch}}",
+    "grown": "gestiegen",
+    "shrunk": "gesunken",
+    "standing": "stabil",
+    "noPrevious": "Noch nichts, womit sich diese Zahlen vergleichen lassen — der geplante Auftrag hält eine Messung fest, die zeigt, ob eine Lücke wächst."
+  }
+}

@@ -1,0 +1,560 @@
+{
+  "launcher": {
+    "title": "Produkcja",
+    "description": "Wytwarzanie na sprzedaż: receptury, koszty i zlecenia"
+  },
+  "navigation": {
+    "production": "Zlecenia",
+    "catalog": "Receptury",
+    "settings": "Ustawienia"
+  },
+  "productionList": {
+    "title": "Zlecenia produkcyjne",
+    "subtitle": "Zaplanowane i zakończone zlecenia wraz z kosztem i wynikiem.",
+    "newProduction": "Nowa produkcja",
+    "searchPlaceholder": "Szukaj po produkcie wyjściowym…",
+    "loading": "Wczytywanie zleceń…",
+    "error": "Nie udało się wczytać zleceń produkcyjnych",
+    "empty": {
+      "title": "Brak zleceń produkcyjnych",
+      "subtitle": "Zaplanuj zlecenie, aby zużyć składniki i wytworzyć produkt."
+    },
+    "noMatches": {
+      "title": "Brak pasujących zleceń",
+      "subtitle": "Nic nie pasuje do tych filtrów. Spróbuj je poszerzyć."
+    },
+    "card": {
+      "qty": "Planowane",
+      "cost": "Koszt",
+      "resultPerUnit": "({{amount}} za szt.)",
+      "shortage_one": "Brak zapasu: {{count}} składnik. Zamknięcie zostanie odrzucone.",
+      "shortage_few": "Brak zapasu: {{count}} składniki. Zamknięcie zostanie odrzucone.",
+      "shortage_many": "Brak zapasu: {{count}} składników. Zamknięcie zostanie odrzucone.",
+      "shortage_other": "Brak zapasu: {{count}} składników. Zamknięcie zostanie odrzucone."
+    },
+    "sortLabel": "Sortuj",
+    "sort": {
+      "newest": "Najnowsze",
+      "oldest": "Najstarsze",
+      "costDesc": "Najwyższy koszt"
+    },
+    "dateFrom": "Od",
+    "dateTo": "Do",
+    "resetFilters": "Wyczyść",
+    "status": {
+      "all": "Wszystkie",
+      "draft": "Szkic",
+      "completed": "Zakończone",
+      "cancelled": "Anulowane",
+      "reversed": "Cofnięte"
+    },
+    "duplicate": "Duplikuj",
+    "viewRecipe": "Zobacz recepturę",
+    "table": {
+      "product": "Produkt",
+      "status": "Status",
+      "date": "Utworzono",
+      "actions": "Akcje"
+    }
+  },
+  "preview": {
+    "title": "Podgląd produkcji",
+    "subtitle": "Koszty i zużycie składników — bez zmian w magazynie.",
+    "loadFailed": "Nie udało się wczytać podglądu kosztów",
+    "totalCost": "Koszt całkowity",
+    "unitCostHint": "Ilość",
+    "missingTitle": "Składniki bez ceny",
+    "ingredients": "Składniki",
+    "chart": {
+      "title": "Udział w kosztach",
+      "empty": "Żaden składnik nie ma jeszcze ceny — nie ma czego pokazać na wykresie."
+    }
+  },
+  "create": {
+    "title": "Zapisz produkcję",
+    "subtitle": "Zapisz to, co już zrobiłeś, albo zaplanuj produkcję. Co zejdzie ze stanu, czego brakuje i ile to kosztuje, widać obok formularza przed zapisem.",
+    "productLabel": "Produkt wyjściowy",
+    "searchPlaceholder": "Szukaj po nazwie, SKU lub kodzie kreskowym…",
+    "change": "Zmień",
+    "qtyLabel": "Ile zrobić?",
+    "storageLabel": "Do miejsca",
+    "storagePlaceholder": "Wybierz miejsce docelowe",
+    "storageSearchPlaceholder": "Szukaj po nazwie lub ścieżce…",
+    "storageEmpty": "Brak pasujących miejsc",
+    "notesLabel": "Notatki (opcjonalnie)",
+    "notesPlaceholder": "Wewnętrzne notatki o tym zleceniu…",
+    "hints": {
+      "product": "Wybierz produkt wyjściowy, aby włączyć podgląd.",
+      "quantity": "Wpisz planowaną ilość większą od zera, aby włączyć podgląd.",
+      "storage": "Wybierz miejsce docelowe, aby włączyć podgląd."
+    },
+    "preview": "Podgląd kosztów",
+    "creating": "Tworzenie…",
+    "cancel": "Anuluj",
+    "success": "Zlecenie produkcyjne utworzone",
+    "errors": {
+      "missingFields": "Wybierz produkt, ilość i miejsce.",
+      "create": "Nie udało się utworzyć zlecenia"
+    },
+    "hasBom": "Ma recepturę",
+    "mode": {
+      "label": "Co zapisujesz?",
+      "made": "Już zrobiłem",
+      "planned": "Planuję zrobić"
+    },
+    "qtyLabelMade": "Ile wyszło?",
+    "batchHintMade": "Receptura jest na {{batch}}. Wpisujesz tyle, ile wyszło, nie liczbę partii.",
+    "batchHintPlanned": "Receptura jest na {{batch}}. Wpisujesz, ile chcesz zrobić, nie liczbę partii.",
+    "dateLabel": "Kiedy",
+    "submitMade": "Zapisz wyprodukowane",
+    "submitNeedsBom": "Najpierw potrzebna jest lista składników (BOM)",
+    "submitNeedsIngredients": "Najpierw dodaj składniki do receptury",
+    "submitPlanned": "Zaplanuj",
+    "successMade": "Produkcja zapisana",
+    "needs": {
+      "pick": "Wybierz produkt, ilość i miejsce, a zobaczysz, czego potrzeba.",
+      "loading": "Sprawdzam stan…",
+      "headingMade": "Zejdzie ze stanu",
+      "headingPlanned": "Będzie potrzebne",
+      "have": "jest {{have}}",
+      "short": "w systemie jest {{have}}, brakuje {{short}}",
+      "unknown": "jest {{have}}, w jednostce, której nie da się porównać z recepturą",
+      "unnamed": "Składnik bez nazwy",
+      "unitFallback": "jednostkę",
+      "cost": "Kosztuje Cię {{unitCost}} za {{unit}} · razem {{total}}",
+      "marginLeft": "Sprzedajesz po {{price}}, na {{unit}} zostaje {{result}}.",
+      "marginLost": "Sprzedajesz po {{price}}, to {{result}} na {{unit}} poniżej kosztu.",
+      "savingsLeft": "W sklepie kosztuje {{price}}, więc na {{unit}} oszczędzasz {{result}}.",
+      "savingsLost": "W sklepie kosztuje {{price}}, to {{result}} na {{unit}} mniej niż koszt wytworzenia.",
+      "enough": "Wszystkiego wystarczy.",
+      "unmeasurable": "Jednostki składnika nie da się porównać z jego stanem, więc nie wiadomo, ile zdjąć. Najpierw popraw jednostkę w recepturze.",
+      "shortMade": "Skoro już zrobione, składniki były — w systemie jest ich za mało. Zapiszemy produkcję, a brakujące składniki oznaczymy do policzenia.",
+      "shortPlanned": "Do tej produkcji brakuje części składników. Możesz ją zaplanować już teraz i dokupić brak.",
+      "addOne": "Dodaj {{quantity}} ({{name}}) do listy zakupów",
+      "addAll": "Dodaj braki do listy zakupów",
+      "added": "Dodano do listy „{{name}}”",
+      "alreadyListed": "To już jest na liście zakupów",
+      "addFailed": "Nie udało się dodać do listy zakupów"
+    }
+  },
+  "createRecipe": {
+    "title": "Nowa receptura",
+    "subtitle": "Wybierz produkt wyjściowy i nadaj recepturze nazwę.",
+    "nameLabel": "Nazwa receptury",
+    "namePlaceholder": "Nazwa receptury…",
+    "batchYieldLabel": "Receptura daje",
+    "create": "Utwórz recepturę",
+    "creating": "Tworzenie…",
+    "success": "Receptura utworzona",
+    "errors": {
+      "productRequired": "Najpierw wybierz produkt wyjściowy.",
+      "nameRequired": "Nazwa receptury jest wymagana.",
+      "create": "Nie udało się utworzyć receptury"
+    },
+    "batchYieldHint": "Ile powstaje z jednej partii, w jednostce produktu. Puste pole oznacza 1.",
+    "unitLabel": "Jednostka",
+    "unitFirst": "Najpierw wybierz jednostkę obok ilości."
+  },
+  "detail": {
+    "title": "Zlecenie produkcyjne",
+    "subtitle": "Sprawdź składniki, koszty i stan zlecenia.",
+    "back": "Powrót do listy",
+    "loading": "Wczytywanie zlecenia…",
+    "complete": "Zakończ zlecenie",
+    "cancel": "Anuluj zlecenie",
+    "completeSuccess": "Produkcja zakończona",
+    "cancelSuccess": "Produkcja anulowana",
+    "cancelNeedsManager": "Anulowanie zlecenia produkcji należy do managera — poproś osobę, która może zarządzać produkcją.",
+    "completeConfirm": {
+      "title": "Zakończyć zlecenie?",
+      "description": "Zużyje wymienione składniki i wytworzy produkt. Dopóki nikt nie ruszył tego, co wytworzył, „Cofnij przebieg” go wycofa.",
+      "actualQtyLabel": "Rzeczywista ilość produktu (opcjonalnie)",
+      "actualQtyHint": "Pozostaw puste, aby użyć ilości planowanej. Wpisz mniej dla odpadu, więcej dla nadprodukcji. Składniki zużywane są według planu niezależnie od ilości faktycznej."
+    },
+    "cancelConfirm": {
+      "title": "Anulować zlecenie?",
+      "description": "Anulowanie oznacza szkic jako anulowany. Stan magazynu nie zmieni się.",
+      "confirm": "Tak, anuluj zlecenie"
+    },
+    "reverseConfirm": {
+      "title": "Cofnąć ten przebieg produkcji?",
+      "description": "Składniki wrócą na półki i do partii, z których je wzięto, a to, co przebieg wytworzył, zejdzie z półki. Przebieg zostanie w historii z oznaczeniem „Cofnięte”.",
+      "confirm": "Tak, cofnij przebieg"
+    },
+    "card": {
+      "totalCost": "Koszt całkowity",
+      "totalCostUndone": "Koszt przed cofnięciem przebiegu",
+      "created": "Utworzone",
+      "productionDate": "Data produkcji",
+      "notes": "Notatki",
+      "actualQty": "Rzeczywista produkcja",
+      "plannedSuffix": "planowano: {{qty}}",
+      "scrap": "Odpad",
+      "overproduced": "Nadprodukcja",
+      "resultPerUnit": "({{amount}} za szt.)",
+      "totalCostAfterClosing": "Koszt całkowity po zamknięciu",
+      "unitCost": "{{amount}} za wyprodukowaną sztukę",
+      "totalCostGap_one": "{{count}} składnik zszedł z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
+      "totalCostGap_few": "{{count}} składniki zeszły z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
+      "totalCostGap_many": "{{count}} składników zeszło z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
+      "totalCostGap_other": "{{count}} składnika zeszło z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców."
+    },
+    "ingredients": "Zużyte składniki",
+    "emptyLines": "Dla tego zlecenia nie zapisano żadnych składników.",
+    "plannedIngredients": "Planowane zużycie",
+    "plannedIngredientsHint": "Tyle zejdzie po zakończeniu. Na razie nic nie opuściło magazynu. Ilości czytane są z receptury w chwili zamykania zlecenia, więc edycja receptury zmienia otwarty szkic.",
+    "emptyLinesPlanned": "To zlecenie nic nie zużyje — jego receptura nie ma składników.",
+    "cancelReason": "Powód anulowania",
+    "cancelReasonPlaceholder": "Powód (opcjonalnie)…",
+    "producedItem": "Gotowy produkt",
+    "viewProducedItem": "Zobacz produkt",
+    "stockMoves": "Ruchy magazynowe",
+    "stockMove": {
+      "dir": "Ruch",
+      "product": "Produkt / partia",
+      "lot": "Partia",
+      "unknownProduct": "Nieznany produkt",
+      "qty": "Ilość"
+    },
+    "line": {
+      "ingredient": "Składnik",
+      "qty": "Zużyta ilość",
+      "unitCost": "Koszt jednostkowy",
+      "lineCost": "Koszt linii",
+      "unknownLocation": "Nieznane miejsce",
+      "qtyLabel": "Ilość na partię",
+      "yieldLabel": "Strata wydajności %",
+      "saved": "Pozycja zaktualizowana",
+      "saveFailed": "Nie udało się zaktualizować pozycji",
+      "shortLabel": "brakuje",
+      "unmeasurableShort": "brak — nie da się porównać z jednostką stanu",
+      "shortfall": "{{quantity}} poza ewidencją — do policzenia"
+    },
+    "edit": "Edytuj",
+    "save": "Zapisz",
+    "saveFailed": "Nie udało się zapisać zlecenia",
+    "cancelEdit": "Porzuć zmiany",
+    "duplicate": "Duplikuj",
+    "duplicated": "Zlecenie zduplikowane",
+    "duplicateFailed": "Nie udało się zduplikować zlecenia",
+    "plannedQty": "Planowana ilość",
+    "productionDate": "Data produkcji",
+    "notes": "Notatki",
+    "tabs": {
+      "composition": "Skład",
+      "cost": "Koszt i wynik",
+      "history": "Historia"
+    },
+    "sourceRecipe": "Na podstawie przepisu (migawka z {{date}})",
+    "setAsDefault": "Ustaw jako domyślną",
+    "setDefaultSuccess": "Domyślna receptura ustawiona",
+    "setDefaultFailed": "Nie udało się ustawić domyślnej receptury",
+    "deleteRecipe": "Usuń recepturę",
+    "recipeDeleted": "Receptura usunięta",
+    "recipeDeleteFailed": "Nie udało się usunąć receptury",
+    "processSteps": "Etapy procesu",
+    "cost": {
+      "fixedCosts": "Koszty stałe / partia",
+      "referencePrice": "Cena referencyjna",
+      "perBatch": "na partię",
+      "perYieldUnit": "za jednostkę — partia to {{qty}}",
+      "noFixed": "Brak ustawionych kosztów stałych",
+      "ingredients": "Składniki",
+      "emptyLines": "Nie ma czego wyceniać — dodaj składniki na zakładce Skład.",
+      "total": "Razem",
+      "addLine": "Dodaj linię kosztów",
+      "lineSaved": "Zapisano linię kosztów",
+      "lineSaveFailed": "Nie udało się zapisać linii kosztów",
+      "lineDeleted": "Usunięto linię kosztów",
+      "lineDeleteFailed": "Nie udało się usunąć linii kosztów",
+      "lineKind": "Rodzaj",
+      "lineLabel": "Opis",
+      "lineLabelPlaceholder": "np. energia pieca",
+      "lineAmount": "Kwota (na partię)",
+      "editReferencePrice": "Edytuj cenę referencyjną",
+      "referencePriceSaved": "Zapisano cenę referencyjną",
+      "referencePriceSaveFailed": "Nie udało się zapisać ceny referencyjnej",
+      "kind": {
+        "LABOR": "Robocizna",
+        "PACKAGING": "Opakowanie",
+        "OVERHEAD": "Koszty ogólne",
+        "OTHER": "Inne"
+      },
+      "deleteConfirm": {
+        "title": "Usunąć linię kosztów?",
+        "description": "Usunąć „{{label}}” z kosztów stałych?"
+      }
+    },
+    "history": {
+      "title": "Historia produkcji",
+      "empty": "Brak jeszcze zleceń produkcyjnych dla tej receptury.",
+      "date": "Data",
+      "status": "Status",
+      "made": "Wytworzono",
+      "unitCostColumn": "Koszt jedn.",
+      "resultColumn": "{{result}} na szt.",
+      "totalColumn": "Koszt partii",
+      "open": "Otwórz zlecenie"
+    },
+    "completeFailed": "Nie udało się zakończyć produkcji",
+    "emptyBom": "Ta receptura nie ma składników — zlecenie wyprodukowałoby towar z niczego. Najpierw dodaj składniki.",
+    "emptyBomAction": "Dodaj składniki",
+    "noBom": "Ten produkt nie ma receptury — zleceniu nie z czego czerpać. Najpierw utwórz recepturę.",
+    "noBomAction": "Utwórz recepturę",
+    "cancelFailed": "Nie udało się anulować produkcji",
+    "reverse": "Cofnij przebieg",
+    "reverseNeedsManager": "Cofnięcie przebiegu produkcji należy do managera — poproś osobę, która może zarządzać produkcją.",
+    "reverseSuccess": "Przebieg produkcji cofnięty",
+    "reverseFailed": "Nie udało się cofnąć przebiegu produkcji",
+    "yieldSaved": "Zaktualizowano wydajność",
+    "yieldSaveFailed": "Nie udało się zaktualizować wydajności",
+    "processStepsEmpty": "Brak kroków procesu",
+    "processStepsEdit": "Edytuj kroki",
+    "processStepsEditStep": "Krok {{number}}",
+    "processStepsAdd": "Dodaj krok",
+    "processStepsAddPlaceholder": "Opisz krok — Enter zaczyna nową linię, Ctrl+Enter dodaje",
+    "processStepsSaved": "Zapisano kroki procesu",
+    "processStepsSaveFailed": "Nie udało się zapisać kroków procesu",
+    "processStepsAddFirst": "Dodaj kroki",
+    "plannedSummary": "Planowano {{qty}}",
+    "deleteConfirm": {
+      "title": "Usunąć tę recepturę?",
+      "description": "Znikną razem z nią składniki i kroki procesu. Zapisane zlecenia produkcyjne zostają."
+    },
+    "notFound": "Nie znaleziono zlecenia produkcyjnego",
+    "plannedShortageHint_one": "Planowane zużycie przekracza stan — brakuje {{count}} składnika. Zakończenie zlecenia zostanie odrzucone.",
+    "plannedShortageHint_few": "Planowane zużycie przekracza stan — brakuje {{count}} składników. Zakończenie zlecenia zostanie odrzucone.",
+    "plannedShortageHint_many": "Planowane zużycie przekracza stan — brakuje {{count}} składników. Zakończenie zlecenia zostanie odrzucone.",
+    "plannedShortageHint_other": "Planowane zużycie przekracza stan — brakuje {{count}} składnika. Zakończenie zlecenia zostanie odrzucone."
+  },
+  "bom": {
+    "childLabel": "Składnik",
+    "qtyLabel": "Ilość",
+    "unitLabel": "Jednostka",
+    "yieldLabel": "Straty %",
+    "yieldHint": "Liczba planistyczna: ile surowca zarezerwować z zapasem, żeby plan się spiął. Zostawienie 0 jest normalne — rzeczywistą stratę mierzy się przy zamykaniu zlecenia, wpisując ilość, która faktycznie wyszła.",
+    "notesLabel": "Notatki",
+    "notesPlaceholder": "Opcjonalne notatki…",
+    "add": "Dodaj pozycję",
+    "adding": "Dodawanie…",
+    "childPlaceholder": "Szukaj składnika…",
+    "treeToggle": "Widok wielopoziomowy",
+    "treeHint": "Jedyny widok, w którym receptura siedzi w recepturze, i jedyne miejsce, gdzie linię można przepiąć pod inną. Przydaje się dopiero wtedy, gdy któryś składnik sam ma własną recepturę.",
+    "childClear": "Wyczyść",
+    "unitMustBeConvertible": "Oferowane są tylko jednostki, które da się przeliczyć na {{unit}} — wiersz, którego wytwórca nie przeliczy, jest odrzucany."
+  },
+  "composition": {
+    "ingredientsTitle": "Składniki",
+    "perBatchHint": "Ilości podane na jedną partię.",
+    "batchYield": "Receptura daje {{qty}}",
+    "batchYieldLabel": "Receptura daje",
+    "batchYieldEdit": "Zmień, ile daje receptura",
+    "batchYieldHint": "Ile powstaje z jednej partii tej receptury. Koszt jednostkowy = koszt partii ÷ ta liczba.",
+    "addIngredient": "Dodaj składnik",
+    "moreFields": "Więcej",
+    "removeIngredient": "Usuń",
+    "ingredientAdded": "Składnik dodany",
+    "ingredientRemoved": "Składnik usunięty",
+    "emptyLines": "Brak składników — dodaj pierwszy poniżej.",
+    "introduction": "Receptura to lista tego, co wchodzi w jedną partię tego produktu. Z niej liczą się koszty na zakładce „Koszt i wynik”, i z niej schodzi stan magazynowy przy zamykaniu zlecenia produkcyjnego.",
+    "removeConfirm": {
+      "title": "Usunąć składnik?",
+      "description": "Usunąć „{{name}}” z tej receptury?"
+    },
+    "errors": {
+      "addIngredient": "Nie udało się dodać składnika",
+      "duplicateIngredient": "Ten składnik jest już w recepturze.",
+      "removeIngredient": "Nie udało się usunąć składnika",
+      "yieldInvalid": "Ilość, którą daje receptura, musi być większa od zera."
+    }
+  },
+  "tree": {
+    "title": "Wielopoziomowy BOM",
+    "hint": "Przeciągnij wiersz na inny, aby go zagnieździć.",
+    "empty": "Brak składników. Dodaj je w sekcji składników powyżej — pojawią się tutaj, gdy będzie co zagnieżdżać.",
+    "loading": "Wczytywanie drzewa…",
+    "error": "Nie udało się wczytać drzewa",
+    "moved": "Pozycja przeniesiona",
+    "moveError": "Przeniesienie nie powiodło się",
+    "dropHint": "Przeciągnij, aby przenieść"
+  },
+  "pricing": {
+    "title": "Kalkulator ceny sprzedaży",
+    "subtitle": "Model marży brutto — przesuń suwak, aby zobaczyć sugerowaną cenę sprzedaży.",
+    "currentDefault": "Zapisana wartość",
+    "isDefault": "(domyślna systemowa)",
+    "qtyLabel": "Planowana ilość",
+    "marginLabel": "Marża docelowa (%)",
+    "preview": "Oblicz cenę",
+    "calculating": "Obliczanie…",
+    "totalCost": "Koszt całkowity",
+    "suggestedPrice": "Sugerowana cena sprzedaży",
+    "close": "Zamknij",
+    "saveDefault": "Zapisz jako domyślną",
+    "saving": "Zapisywanie…",
+    "saved": "Domyślna marża zapisana",
+    "saveFailed": "Nie udało się zapisać domyślnej marży",
+    "openButton": "Cena sprzedaży",
+    "errors": {
+      "qty": "Ilość musi być > 0.",
+      "compute": "Nie udało się policzyć ceny"
+    },
+    "unitCostEstimated": "Szacowany koszt jednostkowy"
+  },
+  "bomEntry": {
+    "columnHeader": "Receptura",
+    "editRecipe": "Edytuj recepturę",
+    "createRecipe": "Utwórz recepturę",
+    "openRecipe": "Otwórz recepturę tego produktu"
+  },
+  "catalog": {
+    "title": "Receptury",
+    "subtitle": "Wytwarzanie na sprzedaż: receptury (BOM) z kosztami, marżami i stanem",
+    "searchPlaceholder": "Szukaj receptur…",
+    "sortLabel": "Sortuj wg",
+    "default": "Domyślny",
+    "produce": "Produkuj",
+    "addIngredients": "Dodaj składniki",
+    "details": "Szczegóły",
+    "unitCost": "Koszt jednostkowy",
+    "unitCostIncomplete_one": "1 składnik z ostatniej produkcji nie ma zapisanej ceny zakupu.",
+    "unitCostIncomplete_few": "{{count}} składniki z ostatniej produkcji nie mają zapisanej ceny zakupu.",
+    "unitCostIncomplete_many": "{{count}} składników z ostatniej produkcji nie ma zapisanej ceny zakupu.",
+    "unitCostIncomplete_other": "{{count}} składnika z ostatniej produkcji nie ma zapisanej ceny zakupu.",
+    "stock": "Stan magazynu",
+    "lastProduced": "Ostatnia produkcja",
+    "ingredientCount": "{{count}} składników",
+    "ingredientCount_one": "{{count}} składnik",
+    "ingredientCount_few": "{{count}} składniki",
+    "ingredientCount_many": "{{count}} składników",
+    "ingredientCount_other": "{{count}} składników",
+    "viewProduction": "Zlecenia produkcyjne",
+    "newRecipe": "Nowa receptura",
+    "empty": {
+      "title": "Brak receptur",
+      "subtitle": "Utwórz pierwszą recepturę, aby zacząć śledzić koszty produkcji.",
+      "cta": "Nowa receptura"
+    },
+    "sort": {
+      "newest": "Najnowsze",
+      "oldest": "Najstarsze",
+      "name": "Nazwa"
+    },
+    "noMatches": {
+      "title": "Brak pasujących receptur",
+      "subtitle": "Nic nie znaleziono dla „{{query}}”. Spróbuj krótszej frazy."
+    },
+    "table": {
+      "name": "Nazwa",
+      "ingredients": "Składniki",
+      "availability": "Dostępność",
+      "actions": "Akcje"
+    },
+    "unitCostAfterRun": "Koszt jednostkowy po ostatniej produkcji",
+    "unitCostEstimated": "Szacowany koszt jednostkowy",
+    "estimateCostIncomplete_one": "1 składnik tego szacunku nie ma zapisanej ceny zakupu.",
+    "estimateCostIncomplete_few": "{{count}} składniki tego szacunku nie mają zapisanej ceny zakupu.",
+    "estimateCostIncomplete_many": "{{count}} składników tego szacunku nie ma zapisanej ceny zakupu.",
+    "estimateCostIncomplete_other": "{{count}} składnika tego szacunku nie ma zapisanej ceny zakupu."
+  },
+  "settings": {
+    "title": "Ustawienia produkcji",
+    "loading": "Wczytywanie ustawień…",
+    "referenceDirection": "Z czym porównujemy wynik",
+    "referenceDirectionHint": "Marża, jeśli sprzedajesz to, co robisz; oszczędność, jeśli robisz coś zamiast kupić. Cena referencyjna receptury to wtedy Twoja cena sprzedaży albo cena w sklepie.",
+    "allowOverproduction": "Zezwól na nadprodukcję",
+    "allowOverproductionHint": "Gdy włączone, przy zamykaniu zlecenia możesz wpisać więcej, niż planowano.",
+    "saved": "Ustawienia zapisane",
+    "saveFailed": "Nie udało się zapisać ustawień",
+    "availabilityCheckScope": "Zakres sprawdzania dostępności",
+    "availabilityCheckScopeHint": "Globalny liczy stan we wszystkich miejscach razem; per miejsce sprawdza każde miejsce osobno.",
+    "scopeGlobal": "Globalny",
+    "scopePerLocation": "Per miejsce",
+    "createOnShortageStrategy": "Strategia przy brakach",
+    "createOnShortageStrategyHint": "Co się dzieje, gdy zakładasz zlecenie bez wystarczających składników: pozwól, ostrzeż albo zablokuj.",
+    "strategyAllow": "Zezwól",
+    "strategyWarn": "Ostrzeż",
+    "strategyBlock": "Zablokuj",
+    "subtitle": "Co oznacza wynik i jak produkcja traktuje braki.",
+    "whereReferenceDirection": "Tak nazywa się wynik na kartach receptur, w zleceniach i w podsumowaniu miesięcy.",
+    "immediateNote": "Każdy wybór zapisuje się od razu. Nie ma cofnięcia — ustaw z powrotem tak samo.",
+    "advanced": "Zaawansowane",
+    "advancedHint": "Zasady dla braków i nadprodukcji. Ustawienia domyślne pasują do małej pracowni."
+  },
+  "availability": {
+    "maxBatches": "Maks. partii ze stanu",
+    "shortageList": "Lista braków",
+    "ingredient": "Składnik",
+    "needed": "Potrzeba",
+    "available": "Dostępne",
+    "short": "Brakuje",
+    "notConvertible": "niezgodne jednostki",
+    "blocked": "Nie można utworzyć — brak składników",
+    "blockedHint": "Uzupełnij te składniki lub zmień strategię w ustawieniach.",
+    "warnTitle": "Brakuje niektórych składników",
+    "warnHint": "Możesz utworzyć szkic — dostępność zostanie sprawdzona ponownie przy zakończeniu.",
+    "warnConfirm": "Utwórz mimo to",
+    "completeShortage": "Nie można ukończyć — brak stanu",
+    "completeShortageHint": "Te składniki skończyły się od utworzenia szkicu.",
+    "unknown_one": "{{count}} składnika nie da się porównać",
+    "unknown_few": "{{count}} składników nie da się porównać",
+    "unknown_many": "{{count}} składników nie da się porównać",
+    "unknown_other": "{{count}} składników nie da się porównać",
+    "shortUnknown": "nie wiadomo",
+    "completeShortageHintNever": "Te składniki nigdy nie starczyły na to zlecenie — zlecenie powstało ponad stan."
+  },
+  "widget": {
+    "title": "{{result}} miesięcznie",
+    "viewAll": "Produkcja",
+    "hintSource": "Ustawiane w ustawieniach modułu Produkcja",
+    "orders_one": "{{count}} zlecenie",
+    "orders_few": "{{count}} zlecenia",
+    "orders_many": "{{count}} zleceń",
+    "orders_other": "{{count}} zleceń",
+    "empty": "Brak ukończonych zleceń z wynikiem."
+  },
+  "whereUsed": {
+    "title": "Używany w recepturach produkcyjnych",
+    "perBatch": "{{qty}} na partię"
+  },
+  "permissions": {
+    "read": "Podgląd produkcji",
+    "readDesc": "Może przeglądać receptury, koszty i zlecenia produkcyjne",
+    "write": "Prowadzenie produkcji",
+    "writeDesc": "Może zakładać zlecenia produkcyjne i je zamykać — to rusza stan magazynu",
+    "manage": "Zarządzanie recepturami i ustawieniami",
+    "manageDesc": "Może edytować receptury, kroki procesu i ustawienia modułu oraz anulować zlecenia — receptura decyduje, co produkcja zabierze ze stanu"
+  },
+  "bomDetail": {
+    "notFound": "Nie znaleziono receptury",
+    "back": "Wróć do receptur",
+    "loading": "Wczytywanie receptury…"
+  },
+  "costSource": {
+    "avco": "średnia z warstw",
+    "fifo": "koszt rzeczywisty (FIFO)",
+    "none": "brak kosztu zapisanego dla tego zapasu"
+  },
+  "cost": {
+    "gap": {
+      "partial_one": "1 składnik nie ma stawki, więc nie ma go w tej kwocie.",
+      "partial_few": "{{count}} składniki nie mają stawki, więc nie ma ich w tej kwocie.",
+      "partial_many": "{{count}} składników nie ma stawki, więc nie ma ich w tej kwocie.",
+      "partial_other": "{{count}} składnika nie ma stawki, więc nie ma go w tej kwocie.",
+      "none_one": "Jedyny składnik nie ma stawki — nie ma z czego policzyć.",
+      "none_few": "Żaden z {{count}} składników nie ma stawki — nie ma z czego policzyć.",
+      "none_many": "Żaden z {{count}} składników nie ma stawki — nie ma z czego policzyć.",
+      "none_other": "Żaden z {{count}} składników nie ma stawki — nie ma z czego policzyć."
+    }
+  },
+  "result": {
+    "margin": {
+      "label": "Marża",
+      "definition": "Cena sprzedaży minus koszt wytworzenia"
+    },
+    "savings": {
+      "label": "Oszczędność wobec sklepu",
+      "definition": "Cena w sklepie minus koszt wytworzenia"
+    }
+  }
+}

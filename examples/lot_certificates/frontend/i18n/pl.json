@@ -1,0 +1,31 @@
+{
+  "field": {
+    "label": "Certyfikat partii {{lot}}",
+    "missing": "Podaj numer certyfikatu dla partii {{lot}}."
+  },
+  "line": {
+    "certificate": "Certyfikat {{number}}",
+    "save": "Zapisz certyfikat",
+    "saveFailed": "Numer certyfikatu nie został zapisany. Spróbuj ponownie."
+  },
+  "column": {
+    "certificate": "Certyfikat"
+  },
+  "filter": {
+    "certified": "Partie z certyfikatem"
+  },
+  "action": {
+    "file": "Zarejestruj certyfikaty",
+    "filed": "Certyfikaty są w rejestrze.",
+    "alreadyOnFile": "Te certyfikaty już były w rejestrze."
+  },
+  "pickOrderStrategies": {
+    "by_zone_then_weight": "Strefa po strefie, najcięższe najpierw"
+  },
+  "permissions": {
+    "read": "Podgląd certyfikatów",
+    "readDesc": "Widzi, które certyfikaty partii są w rejestrze.",
+    "write": "Rejestrowanie certyfikatów",
+    "writeDesc": "Rejestruje certyfikaty partii, żeby ich przyjęcia dało się zaksięgować."
+  }
+}

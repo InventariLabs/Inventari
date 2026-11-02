@@ -1,0 +1,7 @@
+# Architecture lint baseline — CoreAPI signature legality (Guardrail 4)
+# Format: relative/path.py::ClassName.method::TypeName
+# An audit of CoreAPI facade signatures listed every non-contract type a
+# public facade accepted or returned; each entry was removed as contracts
+# DTOs replaced it. New findings outside this list fail the lint run.
+#
+# Baseline is now EMPTY — all findings fixed.

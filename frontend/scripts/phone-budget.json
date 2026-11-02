@@ -1,0 +1,101 @@
+{
+  "profile": {
+    "device": "mid Android phone: 360x800 viewport, 4x CPU slowdown",
+    "network": "slow 4G: 1.6 Mbit/s down, 750 kbit/s up, 150 ms round trip",
+    "cache": "cold: new browser context for every screen"
+  },
+  "screens": {
+    "login": {
+      "chunks": ["LoginPage"],
+      "budget": {
+        "jsKiB": 395,
+        "loadMs": 5500
+      },
+      "measured": {
+        "loadMs": 3520,
+        "wireKiB": 360.7,
+        "date": "2026-10-21",
+        "runs": 3
+      }
+    },
+    "launcher": {
+      "chunks": ["Launcher"],
+      "budget": {
+        "jsKiB": 410,
+        "loadMs": 8500
+      },
+      "measured": {
+        "loadMs": 5665,
+        "wireKiB": 438.2,
+        "date": "2026-10-21",
+        "runs": 3
+      }
+    },
+    "start": {
+      "chunks": ["DocumentsTodoPage"],
+      "budget": {
+        "jsKiB": 620,
+        "loadMs": 8000
+      },
+      "measured": {
+        "loadMs": 4631,
+        "wireKiB": 613.5,
+        "date": "2026-10-21",
+        "runs": 3
+      }
+    },
+    "receive": {
+      "chunks": ["ReceiveGoodsPage"],
+      "budget": {
+        "jsKiB": 460,
+        "loadMs": 10000
+      },
+      "measured": {
+        "loadMs": 6629,
+        "wireKiB": 470.4,
+        "date": "2026-10-21",
+        "runs": 3
+      }
+    },
+    "issue": {
+      "chunks": ["IssueGoodsPage"],
+      "budget": {
+        "jsKiB": 570,
+        "loadMs": 11000
+      },
+      "measured": {
+        "loadMs": 6631,
+        "wireKiB": 576.8,
+        "date": "2026-10-21",
+        "runs": 3
+      }
+    },
+    "history": {
+      "chunks": ["DocumentHistoryPage"],
+      "budget": {
+        "jsKiB": 595,
+        "loadMs": 8000
+      },
+      "measured": {
+        "loadMs": 4616,
+        "wireKiB": 601.3,
+        "date": "2026-10-21",
+        "runs": 3
+      }
+    },
+    "products": {
+      "chunks": ["ItemsPage"],
+      "budget": {
+        "jsKiB": 500,
+        "loadMs": 7500
+      },
+      "measured": {
+        "loadMs": 4658,
+        "wireKiB": 514.9,
+        "date": "2026-10-21",
+        "runs": 3
+      }
+    }
+  },
+  "note": "budget.jsKiB is the gzip size of the scripts a screen needs, read from dist/ on every build by check-bundle-budget.mjs; it is a different figure from measured.wireKiB, the bytes that crossed the wire until the network went idle, which moves with the data and is recorded as information only. budget.loadMs is 1.5x the measured median load time (a timing drifts) and is enforced by `npm run perf:phone`, which `make check-frontend` runs against the stack. Raising a number needs the new measurement and the reason in the commit message."
+}

@@ -1,0 +1,122 @@
+{
+  "add-first-product": {
+    "desktop": {
+      "clicks": 5,
+      "fields": 1,
+      "screens": 4
+    },
+    "phone": {
+      "clicks": 5,
+      "fields": 1,
+      "screens": 4
+    }
+  },
+  "approve-a-document": {
+    "desktop": {
+      "clicks": 3,
+      "fields": 0,
+      "screens": 2
+    },
+    "phone": {
+      "clicks": 3,
+      "fields": 0,
+      "screens": 2
+    }
+  },
+  "count-a-shelf": {
+    "desktop": {
+      "clicks": 6,
+      "fields": 1,
+      "screens": 4
+    },
+    "phone": {
+      "clicks": 6,
+      "fields": 1,
+      "screens": 4
+    }
+  },
+  "find-a-product": {
+    "desktop": {
+      "clicks": 1,
+      "fields": 1,
+      "screens": 2
+    },
+    "phone": {
+      "clicks": 1,
+      "fields": 1,
+      "screens": 2
+    }
+  },
+  "issue-to-customer": {
+    "desktop": {
+      "clicks": 7,
+      "fields": 2,
+      "screens": 2
+    },
+    "phone": {
+      "clicks": 8,
+      "fields": 2,
+      "screens": 2
+    }
+  },
+  "move-between-locations": {
+    "desktop": {
+      "clicks": 7,
+      "fields": 2,
+      "screens": 2
+    },
+    "phone": {
+      "clicks": 8,
+      "fields": 2,
+      "screens": 2
+    }
+  },
+  "receive-delivery": {
+    "desktop": {
+      "clicks": 7,
+      "fields": 2,
+      "screens": 2
+    },
+    "phone": {
+      "clicks": 8,
+      "fields": 3,
+      "screens": 3
+    }
+  },
+  "receive-from-order": {
+    "desktop": {
+      "clicks": 4,
+      "fields": 0,
+      "screens": 2
+    },
+    "phone": {
+      "clicks": 5,
+      "fields": 1,
+      "screens": 3
+    }
+  },
+  "record-i-made-it": {
+    "desktop": {
+      "clicks": 5,
+      "fields": 1,
+      "screens": 3
+    },
+    "phone": {
+      "clicks": 5,
+      "fields": 1,
+      "screens": 3
+    }
+  },
+  "undo-a-mistake": {
+    "desktop": {
+      "clicks": 3,
+      "fields": 0,
+      "screens": 2
+    },
+    "phone": {
+      "clicks": 3,
+      "fields": 0,
+      "screens": 2
+    }
+  }
+}

@@ -1,0 +1,893 @@
+[project]
+name = "inventari-backend"
+version = "0.11.0"
+description = "Inventari — Modular Inventory Management API (FastAPI Core)"
+requires-python = ">=3.14"
+license = "AGPL-3.0-only"
+dependencies = [
+    "fastapi>=0.115.0",
+    "starlette>=1.3.1",  # the ASGI types and requests the app's own code uses
+    "uvicorn[standard]>=0.52.1",
+    "gunicorn>=22.0.0",
+    "sqlalchemy[asyncio]>=2.0.51",
+    "alembic>=1.13.1",
+    "psycopg2-binary>=2.9.10",
+    "asyncpg>=0.30.0,<1.0.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.4.0",
+    "python-dotenv>=1.0.0",
+    "httpx>=0.27.0",
+    "PyJWT>=2.8.0,<3.0.0",
+    "bcrypt>=4.2.0",
+    "cryptography>=50.0.0",  # secrets at rest and module signatures (crypto_service)
+    "redis>=5.0.8",
+    "pillow>=13.0.0",
+    "python-multipart>=0.0.9",
+    "nh3>=0.2.0,<1.0.0",
+    "email-validator>=2.2.0",
+    "qrcode>=8.0",
+    "python-barcode>=0.16",
+    "pandas>=2.2.2",
+    "pyarrow>=17.0.0",
+    "openpyxl>=3.1.5",
+    "slowapi>=0.1.9",
+    "google-genai>=1.0.0",
+    "aioboto3>=12.4.0",
+    "botocore>=1.40.61",  # the S3 client's error types are matched on in providers/s3
+    "typer[all]>=0.27.1",
+    "rich>=15.0.0",  # the CLI's own output; typer pulls it in only as a requirement
+    "anyascii>=0.3.2",  # ISC; replaces GPL-licensed unidecode
+    "beautifulsoup4>=4.12.0",
+    "pyyaml>=6.0.0",
+    "weasyprint>=70.0",
+    "jinja2>=3.1.6",
+    "markupsafe>=3.0.3",  # escape() is what keeps a name out of the email's markup
+    "sse-starlette>=2.0.0",
+    "babel>=2.18.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    # Only the document and PO tests read a generated PDF back.
+    "pypdf>=6.15.0",  # 6.14.x: CVE-2026-71870, CVE-2026-27025 (DoS)
+    "ruff>=0.1.5",
+    "mypy>=2.3.0,<3.0.0",
+    "pytest-xdist>=3.8.0",
+    "pre-commit>=3.8.0",
+    "vulture>=2.14",
+    # Diff-coverage gate on new/changed lines (part of the pre-push gate).
+    "diff-cover>=9.0.0",
+    # Only the sanitizer shell test parses like a browser: nh3 (html5ever)
+    # serializes the browser-implied <tbody> into its output, so the
+    # raw-vs-sanitized DOM comparison needs a parser that implies it too.
+    "html5lib>=1.1",
+    # The property-based stock posting tests: generated sequences of
+    # receive, issue, move, count, undo and reservations, with a fixed
+    # example budget so the suite stays bounded.
+    "hypothesis>=6.150.0",
+]
+
+# On demand only: the stock posting mutation run (`make mutate-stock`).
+# It is deliberately not part of the pre-push gate, so the tool and the
+# time it needs stay out of the normal dev sync.
+mutation = [
+    "mutmut>=3.8.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+[tool.pytest-asyncio]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+# Do not name "greenlet" here. The async ORM runs every statement through
+# greenlet_spawn, and the old line tracer, following threads only, lost an
+# async endpoint's frame at the first switch: every line past its first
+# `await db…` read as never run. "greenlet" fixed that, but it also keeps
+# coverage off its sys.monitoring core, and the full suite under --cov took
+# twice as long. sys.monitoring records lines by code object rather than by a
+# per-thread frame stack, so a greenlet switch loses nothing: without the
+# option the report is the same file for file, at half the time.
+# tests/unit/test_the_coverage_run_measures_with_sys_monitoring.py holds it.
+concurrency = ["thread"]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "migrations",
+    # `make mutate-stock` keeps its working copy here — a generated tree of
+    # mutants and copied tests, gitignored but still on disk. Linting it would
+    # report every deliberately broken mutant as a defect (and the tool is not
+    # a gate), so the working copy is outside the linter's reach.
+    "mutants",
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# The lint target stays 3.13 while the runtime moves to 3.14. On py314 ruff
+# turns on UP037 (quoted annotations made redundant by PEP 649) in 150 places
+# — a mechanical rewrite that is its own change, not this one. mypy targets
+# 3.14, the interpreter the image ships.
+target-version = "py313"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# BLE refuses `except Exception` that neither re-raises nor logs the traceback:
+# a broad catch that swallows an error says why on the line, as
+# `# noqa: BLE001 — <reason>`.
+select = ["E4", "E7", "E9", "F", "I", "N", "B", "BLE", "C4", "UP", "S", "C901", "PLR0915"]
+ignore = [
+    "B008", # Do not perform function call `Depends` in argument defaults (FastAPI standard)
+    "E711", # Comparison to `None` should be `cond is None` (SQLAlchemy standard)
+    "E712", # Avoid equality comparisons to `True` (SQLAlchemy standard)
+]
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.mccabe]
+# Cyclomatic complexity guard — the function-level replacement for the removed
+# backend file-size limit.
+# Existing offenders carry an explicit `# noqa: C901` with a justification.
+max-complexity = 15
+
+[tool.ruff.lint.pylint]
+# Statement-count guard per function — same role as C901: measure functions,
+# not file length. Existing offenders carry an explicit `# noqa: PLR0915`.
+max-statements = 50
+
+[tool.ruff.lint.per-file-ignores]
+# conftest.py must set settings.TESTING before app imports — late imports are intentional
+# conftest sets up schema with raw SQL queries (parameterized via bound params)
+"conftest.py" = ["E402", "S608"]
+# Abstract base classes use empty methods as default no-ops — not bugs, by design
+"app/core/modules.py" = ["B027"]
+"app/core/_base_module.py" = ["B027"]
+# Intentional abstract base without strict @abstractmethod decorator
+"app/core/contributions.py" = ["B024"]
+# Tests use assert natively + dummy passwords in fixtures + schema-query text() (parameterized)
+"**/tests/**" = ["S101", "S105", "S106", "S107", "S603", "S608"]
+"**/test_*.py" = ["S101", "S105", "S106", "S107", "S603", "S608"]
+# CLI entrypoints and scripts use subprocess; audited
+"app/cli/**" = ["S603", "S607"]
+"scripts/**" = ["S603", "S607", "S110", "S112"]
+"manage.py" = ["S110", "S112"]
+# Production asserts used for type narrowing after explicit None-check above
+"app/api/**" = ["S101"]
+# random() used for retry jitter, short-code generation, idempotency keys — not crypto
+# Try/except-pass in error-recovery paths is intentional; not silent failures
+# Assert used for post-None-check type narrowing (Python idiom)
+"app/**" = ["S101", "S311", "S110", "S112"]
+"seed_demo_data.py" = ["S311", "S110", "S112"]
+"seed_load_test_data.py" = ["S311", "S110", "S112"]
+# 0.0.0.0 bind-all-interfaces in dev server / docker compose — intentional
+# Placeholder/dummy password defaults in non-security contexts (e.g. SMTP placeholders)
+"app/config.py" = ["S104", "S105", "S107"]
+# Recipe hostname validator references '0.0.0.0' as a string, not a bind
+"app/modules/recipes/**" = ["S104"]
+# 'bearer' is a JWT standard token type, not a password (false positive)
+"app/api/auth/_tokens.py" = ["S105", "S106"]
+# Token type literal 'bearer' — JWT standard, not a password (false positive)
+"app/schemas/user.py" = ["S105"]
+# '__CLEAR__' sentinel — not a password (false positive on field name "secret")
+"app/modules/webhooks/webhook_crud_service.py" = ["S105", "S106"]
+# SQLAlchemy models use forward references (string annotations) for relationships — F821 is a false positive
+"app/models/*.py" = ["F821"]
+"app/modules/*/models.py" = ["F821"]
+
+[tool.ruff.format]
+# Use single quotes for strings.
+quote-style = "single"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.14"
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["pandas.*", "openpyxl.*", "pyarrow.*", "weasyprint.*", "qrcode.*", "barcode.*", "html5lib.*"]
+ignore_missing_imports = true
+
+# Per-module override for `app.core`.
+# Enables `mypy app/core` to be gated in CI without forcing strict on the
+# whole module. The narrower overrides below add per-leaf-module checks
+# (note: use individual strict options, NOT `strict = true` — see
+# python/mypy#16387, `strict` leaks to global options when used
+# in any [[tool.mypy.overrides]] block).
+[[tool.mypy.overrides]]
+module = "app.core"
+ignore_errors = false
+
+# Strict-like checks for `app.core.contracts.*` (DTOs — leaf
+# module, no downstream impact). Uses individual options + glob to avoid
+# the mypy #16387 `strict` leak bug.
+[[tool.mypy.overrides]]
+module = "app.core.contracts.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.core._base_module.*` (ABC for all
+# modules). Uses individual options + glob to avoid the mypy #16387
+# `strict` leak bug. Gates future regressions on the BaseModule contract.
+[[tool.mypy.overrides]]
+module = "app.core._base_module.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.core.public_api.*` (CoreAPI surface).
+# Same strategy as above (individual options + glob, no `strict = true`).
+# 36 errors fixed in one pass; CI will gate future regressions.
+[[tool.mypy.overrides]]
+module = "app.core.public_api.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.core._interceptor_pipeline.*`
+# (runtime-critical pipeline: items/storages/categories lifecycle).
+# Same strategy as above (individual options + glob, no `strict = true`).
+[[tool.mypy.overrides]]
+module = "app.core._interceptor_pipeline.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.core._event_bus.*`
+# (runtime-critical Redis Streams + Pub/Sub event bus).
+# Same strategy as above.
+[[tool.mypy.overrides]]
+module = "app.core._event_bus.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for the rest of `app/core/*` (catch-all).
+# The more specific `app.core.*` overrides above take precedence per
+# mypy's "most specific wins" rule. Strategy: same 7 options + glob,
+# no `strict = true` (avoids mypy #16387 leak).
+[[tool.mypy.overrides]]
+module = "app.core.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# ─── mypy strict — modules ────────────────────────────────────────
+# Strategy: each module gets one production override (strict) + one
+# tests-dir staging override (`ignore_errors = true`) until its tests
+# are typed. Production code (no tests/ in path) gets the full strict
+# check.
+
+# Smallest modules, nearly strict-ready.
+# Uses individual options + glob (not `strict = true`) to avoid
+# the mypy #16387 leak.
+
+# api_keys — production (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.api_keys.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# api_keys — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.api_keys.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# printing — production (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.printing.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# printing — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.printing.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# example_widgets — production (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.example_widgets.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# example_widgets — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.example_widgets.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Small modules (~95 errors). Per-module strict override + tests
+# staging (same pattern as above).
+
+# nutrition — production (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.nutrition.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# nutrition — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.nutrition.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# vision — production (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.vision.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# vision — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.vision.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# webhooks — production (strict)
+# Note: typed HMAC signing — type-safety critical for webhook security.
+[[tool.mypy.overrides]]
+module = "app.modules.webhooks.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# webhooks — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.webhooks.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# shopping_lists — production (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.shopping_lists.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# shopping_lists — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.shopping_lists.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.approvals.*` (cross-module API
+# surface imported by documents/equipment/stock_takes). Uses individual options
+# + glob to avoid the mypy #16387 `strict` leak bug.
+# 76 errors fixed in one pass; CI gates future regressions.
+[[tool.mypy.overrides]]
+module = "app.modules.approvals.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# approvals — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.approvals.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.equipment.*` (cross-module
+# webhook + attestation integration). Uses individual options + glob to avoid
+# the mypy #16387 `strict` leak bug. 94 errors fixed; CI gates regressions.
+[[tool.mypy.overrides]]
+module = "app.modules.equipment.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# equipment — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.equipment.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.recipes.*` (sync/async twins
+# in _meal_plan_helpers.py / _meal_plan_async_schema.py, LLM ingredient
+# parser, scrapers). Uses individual options + glob to avoid the mypy
+# #16387 `strict` leak bug. 124 errors fixed; CI gates regressions.
+[[tool.mypy.overrides]]
+module = "app.modules.recipes.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# recipes — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.recipes.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.warehouse.*` (biggest module,
+# 65+ files). Uses individual options + glob to avoid the mypy #16387
+# `strict` leak bug. 138 errors fixed; CI gates regressions.
+[[tool.mypy.overrides]]
+module = "app.modules.warehouse.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# documents — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.warehouse.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.purchase_orders.*`. Uses
+# individual options + glob to avoid the mypy #16387 `strict` leak bug.
+# 50 errors fixed in one pass; CI gates future regressions.
+[[tool.mypy.overrides]]
+module = "app.modules.purchase_orders.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# purchase_orders — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.purchase_orders.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.stock_takes.*`. Same
+# strategy as purchase_orders. 42 errors fixed in one pass.
+[[tool.mypy.overrides]]
+module = "app.modules.stock_takes.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# stock_takes — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.stock_takes.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.stats.*` (escape hatch
+# module — read-only, allow_direct_db_access). 40 errors fixed in one pass.
+[[tool.mypy.overrides]]
+module = "app.modules.stats.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# stats — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.stats.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# Strict-like checks for `app.modules.maker.*`
+# (BOM/pricing/production module). Same strategy as the other modules
+# (individual options + glob, no `strict = true` — mypy#16387).
+[[tool.mypy.overrides]]
+module = "app.modules.maker.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+# maker — tests (strict)
+[[tool.mypy.overrides]]
+module = "app.modules.maker.tests.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_return_any = true
+
+
+[tool.vulture]
+# Dead-code detection.
+# Baseline: scripts/vulture-baseline.txt (check_vulture_baseline.py).
+# The baseline must trend toward EMPTY — fix findings, don't grandfather them.
+# "scripts" is scanned too: a directory outside the gates becomes the place
+# rules silently stop applying — a dead parameter lived there because
+# vulture never looked. The baseline holds the residue of one-off helpers
+# nothing will ever import. Note the flip side: scripts import from app.*,
+# so anything a script touches counts as used — scanning the directory
+# widens the gate without weakening it for app code.
+paths = ["app", "scripts"]
+exclude = [
+    # NOTE: directory globs must start with "*/" — vulture matches exclude
+    # patterns against paths where a literal "app/..." prefix only works for
+    # exact files, not for "dir/*" globs.
+    "*/migrations/*",
+    "*/tests/*",
+    # Pure typed-content files: TypedDict keys / Literal tables vulture cannot
+    # see being used.
+    "app/i18n/_types.py",
+    "app/i18n/_email_content.py",
+    # Pydantic DTO/schema fields are consumed by (de)serialization, not by
+    # attribute access — inherent false positives. Functions still get
+    # scanned everywhere else, so real orphans in services are not masked.
+    "*/*schemas*.py",
+    "*/schemas/*",
+    "*/core/contracts/*",
+    # SQLAlchemy declarative models: columns/relationships/Enum vocabulary are
+    # consumed by the ORM and by string values in DB rows — inherent false
+    # positives, same class as schemas (one-time manual review on 2026-08-07:
+    # 2 real orphans removed). Module-level helpers defined in
+    # models files are NOT scanned anymore — accepted trade-off.
+    "*/models.py",
+    "*/models/*",
+    # Test-only infrastructure: used from tests/conftest (excluded above), so
+    # every factory looks orphaned to vulture.
+    "app/core/testing.py",
+]
+# MUST stay at 60: vulture reports unused functions/methods/classes at 60%
+# confidence. At 80 the gate would only catch variables
+# and imports — orphaned functions (the motivating bug class) would slip.
+min_confidence = 60
+# FastAPI/Typer/registry: functions wired by decorators or side-effect
+# registration are entry points, not dead code. Pydantic validators and
+# serializers are invoked by the framework, not called directly.
+ignore_decorators = [
+    "@*router*.*",
+    "@app.*",
+    "@*.command*",
+    "@pytest.fixture*",
+    "@event_bus*",
+    "@event.listens_for",
+    "@*.on_*",
+    "@field_validator",
+    "@model_validator",
+    "@field_serializer",
+    "@*.validator",
+]
+ignore_names = [
+    # TypedDict fields: consumers read them by dict key (module list,
+    # the tracking JSON), never by attribute — vulture cannot see that.
+    "signature_status",
+    "signature_key_id",
+    "signature_verified_at",
+    # ModuleTrackingEntry keys written by `module upgrade` and read back
+    # through the tracking JSON (app/cli/commands_module.py) — dict keys,
+    # invisible to both vulture's attribute scan and a whitelist pin.
+    "installed_at",
+    "inventari_min_version",
+    "previous_version",
+    "upgraded_at",
+    "on_enable",
+    "on_disable",
+    "system_on_enable",
+    "register_routes",
+    "get_settings_schema",
+    # Pydantic reads this class attribute itself.
+    "model_config",
+    # Settings fields read only through settings.model_dump() by the startup
+    # check that refuses example placeholders (app/config.py): the backend
+    # connects through DATABASE_URL and never names them.
+    "DB_PASSWORD",
+    "PRODUCTS_DB_PASSWORD",
+    # PEP 562 module-level hook, invoked implicitly on attribute access.
+    "__getattr__",
+    # logging.Formatter calls this on every record it renders; no call site of
+    # ours to find (UtcFormatter in app/core/logging.py).
+    "formatTime",
+    # Alembic's hooks: their only caller is migrations/env.py, and
+    # "*/migrations/*" is excluded above (app/core/autogenerate_scope.py).
+    "include_object",
+    "load_model_metadata",
+    # Used from app/models/item.py — models are excluded from the vulture
+    # scan, so these look orphaned although production code calls them.
+    "quantity_as_weight",
+    "CONTINUOUS_UOM_CATEGORIES",
+    # Same shape, one directory over: the only consumer is
+    # app/schemas/label_pool.py, where it is the `pattern=` of a Pydantic
+    # field, and "*/schemas/*" is excluded above. The sibling constants in
+    # app/core/label_codes.py are not listed here because each of them is
+    # also read inside that module, which is what makes this one the
+    # exception rather than the rule.
+    "LABEL_PREFIX_PATTERN",
+    # qrcode.QRCode.box_size is read by the qrcode library itself when
+    # rendering; label_print_service assigns it after construction to resize
+    # an already-fitted matrix — a public attribute of the library's API, not
+    # dead state of ours.
+    "box_size",
+    # A Pydantic DTO field the router fills after model_validate (it needs the
+    # storages' live states): the consumer is the rules page, which reads it
+    # from the API response — same class as the schema files excluded above,
+    # only the assignment sits in a scanned file.
+    "target_location_active",
+    # Same class as target_location_active: capacity/warning fields the
+    # routers stamp onto responses after model_validate (the capacity side
+    # of a (location, product) pair lives in the warehouse module, the
+    # reorder side in purchase_orders) — the consumers are the frontend
+    # capacity section and the rules/replenishment pages reading the API
+    # responses; no backend code reads them back.
+    "reorder_max_quantity",
+    "reorder_over_capacity",
+    "capacity_max_quantity",
+    # WebhookDeliveryLog row fields the delivery mechanics write
+    # (_webhook_workers.py, webhook_service.py) and the history screen
+    # reads through the delivery API — from_attributes reads are dynamic,
+    # and both the model and the response schema live in files excluded
+    # from the scan, so the writes are all vulture ever sees. Same class
+    # as the fields above, only the writer is a worker rather than a
+    # router. The gate keeps its teeth here: any other write-only
+    # attribute in these files still trips it (verified while landing
+    # this entry with a throwaway field), and the sibling delivery_id
+    # needs no entry — its name also appears as parameters/keyword
+    # arguments in scanned code, which vulture counts as usage.
+    "abandon_reason",
+    "last_attempt_at",
+    # A payload writer declares the schema/model pair its journal keys come
+    # from as a module-level constant; the only reader is the snapshot-key
+    # exporter (scripts/export_audit_snapshot_keys.py), which parses the
+    # declaring file's AST instead of importing it, so no Python-side use
+    # exists for vulture to see.
+    "AUDIT_PAYLOAD_SCHEMA",
+    # Transient document pointers the read path stamps onto the ORM row and
+    # ``DocumentSchema`` reads during serialization ("reversed by" on an
+    # undone receipt, issue or move). Same class as the schema fields the
+    # exclude above covers, only the assignment sits in a scanned service.
+    "reversed_by_id",
+    "reversed_by_number",
+]
+
+# ---------------------------------------------------------------------------
+# Mutation testing — on demand only (`make mutate-stock`), never in a gate.
+#
+# The stock posting path is where a wrong figure costs the most, and coverage
+# says only that the code ran. The four modules below are where a quantity,
+# a draw, a reservation and a movement are written; the doors (documents,
+# stock takes, production runs) call into them. `make mutate-stock` runs
+# mutmut over exactly these and the tests that pin them, and the committed
+# report is `docs/STOCK_MUTATION_REPORT.md`.
+# ---------------------------------------------------------------------------
+[tool.mutmut]
+source_paths = ["app"]
+only_mutate = [
+    "app/services/_stock_draw.py",
+    "app/services/_stock_quant_ops.py",
+    "app/services/_stock_reservation.py",
+    "app/services/items/_stock_quant.py",
+]
+pytest_add_cli_args_test_selection = [
+    "tests/integration/test_the_stock_posting_invariants_hold.py",
+    "tests/integration/test_a_stock_movement_writes_the_records_and_the_move.py",
+    "tests/integration/test_post_movement_writes_the_record.py",
+    "tests/integration/test_a_draw_reads_the_records.py",
+    "tests/integration/test_a_draw_writes_its_own_moves.py",
+    "tests/integration/test_the_draw_honours_the_grain_it_names.py",
+    "tests/integration/test_template_removal_strategy_fefo.py",
+    "tests/integration/test_a_refusal_names_the_goods_and_the_place.py",
+    "tests/integration/test_the_guards_on_stock_are_real.py",
+    "tests/integration/test_core_api_reservations.py",
+    "tests/integration/test_a_reservation_names_its_own_grain.py",
+    "tests/integration/test_a_reservation_holds_the_grain_it_names.py",
+    "tests/integration/test_stock_is_taken_from_every_shelf_in_order.py",
+    "tests/integration/test_a_group_of_stock_is_locked_through_its_anchor.py",
+    "tests/integration/test_the_draws_count_the_records_and_their_holds.py",
+    "tests/integration/test_a_hand_typed_quantity_joins_the_ledger.py",
+    "tests/integration/test_a_record_change_leaves_its_move_and_its_cost.py",
+    "tests/unit/test_an_opening_balance_has_one_writer.py",
+    "tests/integration/test_a_card_made_by_an_edit_books_the_shelf.py",
+    "tests/integration/test_stock_quant_consistency.py",
+]
+# The root conftest provisions the worker database and the seed snapshot;
+# pytest.ini carries testpaths, markers and the asyncio mode. Mutmut copies
+# only source_paths and its own defaults (the tests and the lock files among
+# them), so what lies outside those has to be named here.
+also_copy = ["conftest.py", "pytest.ini", "migrations"]
+# A database test is not fork-safe: the session-scoped sync engine is created
+# in the process that would fork the mutants. The fork server keeps pytest
+# imports in a child that never runs a test, so every worker starts clean.
+process_isolation = "forkserver"
+# A mutant that hangs is a survivor, not a reason to wait out the default
+# fifteen-times budget of the whole selected suite.
+timeout_multiplier = 4.0
+timeout_constant = 20.0

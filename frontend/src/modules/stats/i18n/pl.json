@@ -1,0 +1,178 @@
+{
+  "title": "Statystyki",
+  "subtitle": "Przegląd stanu Twoich zapasów",
+  "records": "Rekordów",
+  "places": "Miejsc, wszystkie poziomy",
+  "expiringSoon": "Wygasa wkrótce",
+  "expired": "Przeterminowane",
+  "storageDistribution": "Rozkład produktów według miejsca",
+  "categoryDistribution": "Rozkład produktów według kategorii",
+  "expiryForecast": "Prognoza wygasania",
+  "noData": "Brak danych",
+  "noExpiryData": "Brak danych o terminach ważności",
+  "costAnalysis": {
+    "title": "Analiza kosztów",
+    "subtitle": "Podsumowanie wydatków i marnotrawstwa",
+    "spent": "Wydatki",
+    "wasted": "Zmarnowane",
+    "waste": "Strata (% wartości)",
+    "savings": "Oszczędności",
+    "topCategories": "Najdroższe kategorie",
+    "savingsOpportunities": "Sugestie oszczędności",
+    "monthlyTrend": "Trend miesięczny",
+    "excludedOtherCurrency_one": "Jeden produkt ma cenę w innej walucie i nie wchodzi do tej sumy.",
+    "excludedOtherCurrency_few": "{{count}} produkty mają ceny w innej walucie i nie wchodzą do tej sumy.",
+    "excludedOtherCurrency_many": "{{count}} produktów ma ceny w innej walucie i nie wchodzi do tej sumy.",
+    "excludedOtherCurrency_other": "{{count}} produktu ma ceny w innej walucie i nie wchodzi do tej sumy.",
+    "notValuedYet": "Brak wyceny zapisanej dla tego okresu",
+    "categoriesPricedFromRecords": "Kategorie są wycenione po cenie zakupu z każdego rekordu.",
+    "categoriesPricedFromLedger": "Kategorie są wycenione według księgi kosztów.",
+    "categoryUnpriced_one": "Jedna pozycja nie ma ceny na rekordzie i nie wchodzi do sumy.",
+    "categoryUnpriced_few": "{{count}} pozycje nie mają ceny na rekordzie i nie wchodzą do sumy.",
+    "categoryUnpriced_many": "{{count}} pozycji nie ma ceny na rekordzie i nie wchodzi do sumy.",
+    "categoryUnpriced_other": "{{count}} pozycji nie ma ceny na rekordzie i nie wchodzi do sumy."
+  },
+  "tabs": {
+    "overview": "Przegląd",
+    "analytics": "Analityka",
+    "reconciliation": "Uzgodnienie"
+  },
+  "analytics": {
+    "rotation": {
+      "avgRotation": "Średni wiek zapasu",
+      "medianRotation": "Mediana wieku zapasu",
+      "slowMovers": "Wolno rotujące",
+      "deadStock": "Martwy zapas",
+      "deadStockValue": "Wartość martwego zapasu",
+      "byCategory": "Wiek zapasu wg kategorii",
+      "days": "dni",
+      "noData": "Brak danych o wieku zapasu",
+      "noMovement": "Jeszcze bez ruchu"
+    },
+    "alerts": {
+      "total": "Suma alertów",
+      "types": {
+        "forgotten": "Zapomniane produkty",
+        "staple": "Brakujące podstawy",
+        "expiring": "Wygasające wkrótce",
+        "expired": "Przeterminowane",
+        "lowStock": "Niski stan",
+        "spike": "Skok ceny"
+      },
+      "messages": {
+        "forgotten_one": "Nikt go nie ruszał od {{count}} dnia — zużyj go przed kolejnym zakupem.",
+        "forgotten_few": "Nikt go nie ruszał od {{count}} dni — zużyj go przed kolejnym zakupem.",
+        "forgotten_many": "Nikt go nie ruszał od {{count}} dni — zużyj go przed kolejnym zakupem.",
+        "forgotten_other": "Nikt go nie ruszał od {{count}} dnia — zużyj go przed kolejnym zakupem.",
+        "staple_one": "Ostatni zakup {{count}} dzień temu, ponad dwa razy dłużej niż zwykle.",
+        "staple_few": "Ostatni zakup {{count}} dni temu, ponad dwa razy dłużej niż zwykle.",
+        "staple_many": "Ostatni zakup {{count}} dni temu, ponad dwa razy dłużej niż zwykle.",
+        "staple_other": "Ostatni zakup {{count}} dnia temu, ponad dwa razy dłużej niż zwykle.",
+        "expiring": "Termin ważności: {{date}}.",
+        "expired": "Termin ważności minął {{date}}."
+      },
+      "noAlerts": "Brak alertów - Twoje zapasy wyglądają świetnie!",
+      "noData": "Nie ma jeszcze czego sprawdzać — dodaj produkty, a alerty się pojawią"
+    },
+    "forecast": {
+      "predicted": "Prognoza wydatków",
+      "historical": "Średnia historyczna",
+      "trend": "Trend",
+      "wasteReduction": "Potencjał redukcji marnotrawstwa",
+      "noData": "Za mało historii zakupów",
+      "monthlyAvg": "Średnia miesięczna",
+      "wasteReductionHint": "Możliwe oszczędności dzięki ograniczeniu strat",
+      "confidence": "Pewność prognozy",
+      "quarter": "Kwartał",
+      "trends": {
+        "increasing": "Rośnie",
+        "decreasing": "Spada",
+        "stable": "Stabilny",
+        "no_data": "Za mało danych"
+      },
+      "notEnoughData": "Za mało historii zakupów, żeby prognozować",
+      "dataProgress": "{{have}} z {{need}} tygodni historii zakupów"
+    },
+    "patterns": {
+      "recurring": "Najczęściej kupowane produkty",
+      "seasonal": "Produkty sezonowe",
+      "bulk": "Możliwości hurtowe",
+      "potential": "Potencjalne oszczędności",
+      "noBulk": "Nie znaleziono możliwości hurtowych",
+      "noPatterns": "Za mało historii zakupów",
+      "seasonalityUnknown": "Za mało sezonów"
+    }
+  },
+  "errors": {
+    "failedToLoadRotationAnalysis": "Nie udało się załadować analizy rotacji",
+    "failedToLoadAlerts": "Nie udało się załadować alertów",
+    "failedToLoadStorageDistribution": "Nie udało się załadować podziału według miejsc",
+    "failedToLoadCategoryDistribution": "Nie udało się załadować podziału według kategorii",
+    "failedToLoadExpiryForecast": "Nie udało się załadować prognozy terminów",
+    "failedToLoadCostAnalysis": "Nie udało się załadować analizy kosztów",
+    "failedToLoadReconciliation": "Nie udało się wczytać uzgodnienia stanu"
+  },
+  "health": {
+    "title": "Kontrola stanu zapasów",
+    "needsAttention": "Wymaga uwagi",
+    "needsAttentionHint": "Rekordy po terminie lub z kończącym się terminem i wszystkie rekordy produktów z niskim stanem.",
+    "runningLow": "Kończy się",
+    "runningLowHint": "Produkty na progu lub poniżej. Ich rekordy liczą się też w „Wymaga uwagi”.",
+    "totalValue": "Szacunkowa wartość",
+    "totalValueHint": "Przybliżona łączna wartość wszystkich pozycji.",
+    "totalValueHintLedger": "Koszt zapasu na stanie według księgi kosztów — cała organizacja, nie tylko miejsca liczone powyżej.",
+    "actionsHint": "Potraktuj to jako szybki codzienny przegląd. Szczegóły otwieraj tylko w razie potrzeby.",
+    "hideDetails": "Ukryj szczegółowe statystyki",
+    "showDetails": "Pokaż szczegółowe statystyki",
+    "subtitle_one": "Jeden sygnał, żeby szybko zobaczyć, co wymaga uwagi.",
+    "subtitle_few": "{{count}} sygnały, żeby szybko zobaczyć, co wymaga uwagi.",
+    "subtitle_many": "{{count}} sygnałów, żeby szybko zobaczyć, co wymaga uwagi.",
+    "subtitle_other": "{{count}} sygnału, żeby szybko zobaczyć, co wymaga uwagi.",
+    "unvaluedStock": "Przyjęcia na stanie bez ceny: {{total}}. Ta wartość jest zaniżona.",
+    "valueUnknown": "Nieznana",
+    "valueUnknownHint": "Żaden produkt nie ma jeszcze ceny, więc nie ma czego zsumować.",
+    "unpricedItems": "Pozycje bez ceny: {{total}}. Ta wartość jest zaniżona."
+  },
+  "permissions": {
+    "read": "Podgląd analiz",
+    "readDesc": "Widzi dane całej organizacji: zużycie, rotację, prognozy i koszty"
+  },
+  "settings": {
+    "enableAnalytics": "Włącz analitykę",
+    "enableAnalyticsDescription": "Pokazuj zakładkę analityki (rotacja, prognozy wydatków, wzorce zakupowe). Wyłącz dla małych domowych inwentarzy, gdzie historii jest za mało, by te analizy były sensowne.",
+    "showInventoryValue": "Pokaż wartość zapasów",
+    "showInventoryValueDescription": "Pokazuj łączną wartość zapasów w podsumowaniu statystyk. To metryka biznesowa — wyłącz dla domowych inwentarzy, które nie przechowują cen zakupu, z których można by ją zsumować."
+  },
+  "navigation": {
+    "settings": "Analityka"
+  },
+  "reconciliation": {
+    "title": "Uzgodnienie stanu",
+    "subtitle_one": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordzie produktu.",
+    "subtitle_few": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach produktów.",
+    "subtitle_many": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach produktów.",
+    "subtitle_other": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach produktów.",
+    "tableCaption": "Dwa porównania par i co każde z nich znalazło",
+    "expectedGap": "Stała różnica jest tu z założenia; niepokoi ta, która rośnie.",
+    "columns": {
+      "pair": "Porównanie",
+      "count": "Rozbieżności",
+      "total": "Suma różnic"
+    },
+    "pairs": {
+      "quantMove": {
+        "name": "Półka a rejestr ruchów",
+        "meaning": "To, co sumują ruchy, wobec tego, co trzyma półka."
+      },
+      "layerQuant": {
+        "name": "Historia kosztu a półka",
+        "meaning": "Jaka część półki nie ma pokrycia w warstwach kosztowych."
+      }
+    },
+    "previousLine": "Poprzedni pomiar ({{when}}): {{howMany}} · {{howMuch}}",
+    "grown": "urosło",
+    "shrunk": "zmalało",
+    "standing": "stoi",
+    "noPrevious": "Na razie nie ma z czym porównać tych liczb — zadanie okresowe zapisze pomiar, który pokaże, czy luka rośnie."
+  }
+}

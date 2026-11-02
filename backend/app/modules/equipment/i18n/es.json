@@ -1,0 +1,5 @@
+{
+  "campaign_cannot_delete_launched": "No se puede eliminar una campaña iniciada; cancélala en su lugar.",
+  "campaign_already_completed": "La campaña ya está completada.",
+  "campaign_already_cancelled": "La campaña ya está cancelada."
+}

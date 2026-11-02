@@ -1,0 +1,7 @@
+{
+  "recipe.not_found": "Rezept nicht gefunden",
+  "ingredient.not_in_recipe": "Dieses Produkt ist keine Zutat dieses Rezepts",
+  "picking.session_not_found": "Kommissioniersitzung nicht gefunden",
+  "picking.already_active": "Es gibt bereits eine aktive Kommissioniersitzung für dieses Rezept",
+  "picking.already_picked": "{name} wurde bereits kommissioniert"
+}

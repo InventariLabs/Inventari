@@ -1,0 +1,29 @@
+{
+  "name": "stats",
+  "version": "0.5.0",
+  "inventari_min_version": "0.8.0",
+  "category": "analytics",
+  "display_name": "Statistics",
+  "description": "Advanced consumption analysis and waste tracking.",
+  "icon": "bar-chart-3",
+  "module_type": "core",
+  "requires": [
+    "items"
+  ],
+  "capabilities": [
+    "database"
+  ],
+  "permissions": [
+    {
+      "key": "stats:read",
+      "label_key": "stats:permissions.read",
+      "description_key": "stats:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    }
+  ],
+  "has_settings_schema": true
+}

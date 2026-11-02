@@ -1,0 +1,284 @@
+{
+  "title": "Inventarios",
+  "subtitle": "Gestionar inventarios de sus ubicaciones",
+  "newStockTake": "Nuevo inventario",
+  "all": "Todos",
+  "unknownPlace": "Ubicación desconocida",
+  "started": "Iniciado",
+  "progressLabel": "Progreso",
+  "progress": {
+    "title": "Progreso del inventario",
+    "countedOf": "{{counted}} / {{total}} artículos",
+    "discrepanciesDetected_one": "1 discrepancia detectada",
+    "discrepanciesDetected_other": "{{count}} discrepancias detectadas",
+    "unsaved_one": "1 cantidad escrita pero sin guardar",
+    "unsaved_other": "{{count}} cantidades escritas pero sin guardar"
+  },
+  "differencesBadge_one": "{{count}} diferencia",
+  "differencesBadge_other": "{{count}} diferencias",
+  "continue": "Continuar",
+  "start": "Iniciar",
+  "report": {
+    "summary": "Resumen",
+    "perfectMatches": "Coincidencias",
+    "toleratedDifferences": "Dentro de la tolerancia",
+    "withinTolerance": "Dentro de la tolerancia",
+    "overstock": "Excedentes",
+    "understock": "Faltantes",
+    "notCounted": "Sin contar",
+    "itemNotCounted": "Sin contar",
+    "duration": "Duración",
+    "durationValue": "{{minutes}} min",
+    "discrepanciesTitle": "Discrepancias",
+    "showAll": "Mostrar todos los artículos",
+    "showDifferencesOnly": "Mostrar solo diferencias y sin contar",
+    "exportCsv": "Exportar CSV",
+    "noDiscrepancies": "Sin discrepancias: todos los artículos coinciden.",
+    "empty": "No hay artículos en este inventario.",
+    "difference": "Diferencia",
+    "location": "Ubicación",
+    "notes": "Notas",
+    "name": "Nombre",
+    "title": "Informe",
+    "reason": "Motivo",
+    "countedTwiceAgreed": "Contado dos veces, {{second}} las dos veces",
+    "countedTwiceDisagreed": "Contado dos veces: {{first}}, luego {{second}}",
+    "unit": "Unidad",
+    "storage": "Ubicación",
+    "startedAt": "Iniciado el",
+    "completedAt": "Finalizado el",
+    "startedBy": "Iniciado por",
+    "closedLocations": "Ubicaciones cerradas",
+    "closedEmpty": "Vacía",
+    "closedCounted": "Cerrada",
+    "closedByAt": "{{name}}, {{at}}"
+  },
+  "empty": {
+    "title": "Sin inventarios",
+    "noStatus": "Sin inventarios con estado \"{{status}}\"",
+    "addFirst": "Cree su primer inventario para controlar los niveles de existencias"
+  },
+  "modal": {
+    "title": "Nuevo inventario",
+    "storageLabel": "Ubicación",
+    "storagePlaceholder": "Elige una ubicación…",
+    "nameLabel": "Nombre del inventario",
+    "namePlaceholder": "ej. Inventario del estante A - Enero 2026",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "creating": "Creando…",
+    "blindMode": "Modo ciego (ocultar cantidades esperadas)",
+    "toleranceLabel": "Tolerancia (% de la cantidad esperada, opcional)",
+    "tolerancePlaceholder": "ej. 2,0 para ignorar diferencias de hasta 2 %",
+    "requireFullCount": "Requiere conteo completo (bloquea la finalización hasta contar todos los artículos)"
+  },
+  "validation": {
+    "storageRequired": "Seleccionar ubicación"
+  },
+  "confirmDelete": "¿Está seguro de que desea eliminar este inventario?",
+  "notFound": "Inventario no encontrado",
+  "noItemsCounted": "Aún no se han contado artículos",
+  "searchToCount": "Busque artículos arriba para comenzar a contar",
+  "filters": {
+    "all": "Todos",
+    "discrepancies": "Discrepancias",
+    "locationLevel": "Nivel de ubicación",
+    "allLevels": "Todos los niveles"
+  },
+  "search": {
+    "placeholder": "Buscar artículo por nombre o código de barras…",
+    "here": "En este inventario",
+    "elsewhere": "En otros lugares de la organización",
+    "failed": "La búsqueda ha fallado, por eso no aparece nada aquí. Inténtalo de nuevo."
+  },
+  "item": {
+    "barcode": "Código de barras",
+    "expected": "Esperado",
+    "counted": "Contado",
+    "notePlaceholder": "Añadir una nota…",
+    "decreaseCount": "Uno menos: {{name}}",
+    "increaseCount": "Uno más: {{name}}",
+    "saveCount": "Guardar el recuento: {{name}}",
+    "countFor": "Cantidad contada: {{name}}",
+    "unsaved": "Sin guardar",
+    "awaitingRecount": "Volver a contar",
+    "countAgain": "Contar {{name}} otra vez",
+    "countedPass": "Recuento {{sequence}}: {{quantity}} ({{name}})",
+    "someone": "alguien",
+    "noteFor": "Nota sobre {{name}}",
+    "decreaseCountInUnit": "Un {{unit}} menos: {{name}}",
+    "increaseCountInUnit": "Un {{unit}} más: {{name}}",
+    "lot": "Lote {{lot}}",
+    "record": "Registro {{position}} de {{of}}",
+    "added": "añadido el {{date}}"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "complete": "Completar inventario",
+    "completing": "Completando…"
+  },
+  "confirm": {
+    "complete": {
+      "title": "Completar inventario",
+      "confirmLabel": "Completar",
+      "unsaved_one": "Una cantidad contada no se ha guardado y se perderá.",
+      "unsaved_other": "{{count}} cantidades contadas no se han guardado y se perderán.",
+      "message_one": "Cerrar este inventario sobrescribe el stock de un producto con el número contado. Después no podrás editar las líneas contadas.",
+      "message_other": "Cerrar este inventario sobrescribe el stock de {{count}} productos con los números contados. Después no podrás editar las líneas contadas."
+    },
+    "cancel": {
+      "title": "Cancelar inventario",
+      "message": "¿Está seguro de que desea cancelar este inventario? Todos los datos se perderán.",
+      "confirmLabel": "Cancelar inventario"
+    },
+    "overCap": {
+      "title": "Se contó mucho más de lo que hay en el sistema",
+      "row": "{{name}} — contado {{counted}}, sistema {{system}}",
+      "confirmLabel": "Guardar cantidades contadas",
+      "message_one": "Una cantidad contada está muy por encima del stock del sistema: {{rows}}. ¿Guardar igualmente el número contado?",
+      "message_other": "{{count}} cantidades contadas están muy por encima del stock del sistema: {{rows}}. ¿Guardar igualmente los números contados?"
+    },
+    "overTolerance": {
+      "title": "Por encima de la tolerancia",
+      "confirmLabel": "Aceptar las diferencias",
+      "message_one": "Una cantidad contada difiere del stock del sistema más de lo que permite este inventario: {{rows}}. ¿Aceptarla y registrar el número contado?",
+      "message_other": "{{count}} cantidades contadas difieren del stock del sistema más de lo que permite este inventario: {{rows}}. ¿Aceptarlas y registrar los números contados?"
+    }
+  },
+  "deleteAriaLabel": "Eliminar inventario",
+  "errors": {
+    "createFailed": "No se pudo crear el inventario",
+    "deleteFailed": "No se pudo eliminar el inventario",
+    "saveFailed": "No se pudo guardar el recuento",
+    "addItemFailed": "No se pudo añadir el artículo",
+    "completeFailed": "No se pudo completar el inventario",
+    "cancelFailed": "No se pudo cancelar el inventario",
+    "reasonIncomplete": "Di qué ha pasado, o elige un motivo de la lista",
+    "overToleranceNotAllowed": "Aceptar una diferencia por encima de la tolerancia no te corresponde — pide a alguien que pueda aprobar inventarios.",
+    "overCapNotAllowed": "Aceptar un recuento muy superior al stock del sistema no te corresponde — pide a alguien que pueda aprobar inventarios.",
+    "recountFailed": "No se pudo pedir un recuento",
+    "unitIsWhole": "{{unit}} se cuenta entero — no se puede guardar una fracción.",
+    "unitDecimals_one": "{{unit}} se cuenta con {{count}} decimal — no más fino.",
+    "unitDecimals_other": "{{unit}} se cuenta con {{count}} decimales — no más fino.",
+    "unexplainedDifferences_one": "Una cantidad contada difiere más que la tolerancia y no indica el motivo. Dale un motivo y luego finaliza el inventario.",
+    "unexplainedDifferences_other": "{{count}} cantidades contadas difieren más que la tolerancia y no indican el motivo. Da un motivo a cada una y luego finaliza el inventario."
+  },
+  "blindModeActive": "Modo ciego activo — las cantidades esperadas están ocultas.",
+  "statuses": {
+    "draft": "Borrador",
+    "in_progress": "En curso",
+    "completed": "Completado",
+    "cancelled": "Cancelado"
+  },
+  "addNewItem": "Añadir nuevo artículo",
+  "discrepancyMissing": "Faltante",
+  "discrepancySurplus": "Excedente",
+  "countedZero": "contado 0",
+  "surplusCount_one": "1 excedente",
+  "surplusCount_other": "{{count}} excedentes",
+  "outsideItems": {
+    "title_one": "1 producto fuera del inventario está en esta ubicación",
+    "title_other": "{{count}} productos fuera del inventario están en esta ubicación",
+    "add": "Añadir como excedente"
+  },
+  "addNewItemForm": {
+    "nameLabel": "Nombre",
+    "barcodeLabel": "Código de barras",
+    "quantityLabel": "Cantidad",
+    "categoryLabel": "Categoría",
+    "categoryPlaceholder": "Seleccionar categoría",
+    "uomLabel": "Unidad",
+    "uomPlaceholder": "Seleccionar unidad"
+  },
+  "statusFilters": {
+    "in_progress": "En curso",
+    "completed": "Finalizados",
+    "cancelled": "Cancelados"
+  },
+  "permissions": {
+    "read": "Ver recuentos",
+    "readDesc": "Puede consultar recuentos, sus líneas y las diferencias encontradas",
+    "write": "Realizar recuentos",
+    "writeDesc": "Puede iniciar un recuento, contar y cerrarlo — el cierre corrige las existencias",
+    "approve": "Aceptar diferencias por encima de la tolerancia",
+    "approveDesc": "Aceptar diferencias contadas que superan la tolerancia del inventario, para que lleguen al stock."
+  },
+  "form": {
+    "guardName": "El recuento"
+  },
+  "reasons": {
+    "discrepancy": {
+      "label": "¿De dónde viene la diferencia?",
+      "codes": {
+        "DAMAGE": "Dañado",
+        "EXPIRED": "Caducado",
+        "LOSS": "Pérdida o robo",
+        "WRONG_LOCATION": "Encontrado en otro sitio",
+        "WRONG_UNIT": "Contado en la unidad equivocada",
+        "MISCOUNT": "El recuento anterior estaba mal",
+        "SYSTEM_ERROR": "Nunca se registró en el sistema",
+        "OTHER": "Otro"
+      }
+    }
+  },
+  "scan": {
+    "cameraOpen": "Escanear con la cámara",
+    "cameraClose": "Cerrar la cámara",
+    "chooseTitle": "¿Qué artículo has contado?",
+    "chooseHint": "Este código pertenece a varios artículos de este inventario. Elige el que tienes en la mano: suma una unidad y se guarda.",
+    "expires": "caduca el {{date}}"
+  },
+  "shelf": {
+    "hint": "Escanee la etiqueta de una ubicación para contar ubicación por ubicación.",
+    "counting": "Ubicación contada:",
+    "leave": "Ubicación completa",
+    "outside": "Esta ubicación no forma parte del inventario de {{location}}.",
+    "empty": "No se esperaba nada en esta ubicación. Escanee lo que hay en ella.",
+    "hidden": "Los filtros de arriba ocultan las filas de esta ubicación.",
+    "close": "Cerrar ubicación",
+    "closeTitle": "¿Cerrar esta ubicación?",
+    "closeUncounted_one": "Una fila de {{location}} no se ha contado. Cerrar la ubicación la cuenta como 0 — un faltante en el informe.",
+    "closeUncounted_other": "{{count}} filas de {{location}} no se han contado. Cerrar la ubicación las cuenta como 0 — faltantes en el informe.",
+    "closeEmpty": "No se encontró nada en {{location}}. ¿Confirmarla como contada y vacía?",
+    "closeCounted": "Todas las filas de {{location}} están contadas. ¿Cerrar la ubicación?",
+    "closeConfirm": "Cerrar ubicación",
+    "closeUnsaved_one": "Un número de esta ubicación no se ha guardado. Guárdelo antes de cerrar la ubicación.",
+    "closeUnsaved_other": "{{count}} números de esta ubicación no se han guardado. Guárdelos antes de cerrar la ubicación.",
+    "closedDone_one": "{{location}} cerrada: una fila contada como 0.",
+    "closedDone_other": "{{location}} cerrada: {{count}} filas contadas como 0.",
+    "closedEmptyDone": "{{location}} confirmada como vacía.",
+    "closedCountedDone": "{{location}} cerrada.",
+    "closedBy": "Cerrada por {{name}}",
+    "closedEmptyBy": "Confirmada vacía por {{name}}"
+  },
+  "count": {
+    "action": "Contar una ubicación",
+    "title": "Contar una ubicación",
+    "intro": "Escanea la etiqueta de la ubicación o elígela de la lista. Cuentas lo que hay; las diferencias se guardan como un único ajuste de existencias para la oficina.",
+    "scanLabel": "Etiqueta de la ubicación",
+    "searchLabel": "Buscar una ubicación",
+    "searchPlaceholder": "Buscar ubicaciones",
+    "noMatchTitle": "Ninguna ubicación coincide",
+    "noMatchDescription": "Prueba otra parte del nombre o escanea la etiqueta de la ubicación.",
+    "blind": "Recuento a ciegas: ocultar lo que espera el sistema",
+    "start": "Contar {{location}}",
+    "chooseFirst": "Elige una ubicación para contar",
+    "name": "Recuento: {{location}} — {{date}}",
+    "neverCounted": "Nunca contada",
+    "countedToday": "Contada hoy",
+    "lastCounted_one": "Contada por última vez hace {{count}} día",
+    "lastCounted_many": "Contada por última vez hace {{count}} días",
+    "lastCounted_other": "Contada por última vez hace {{count}} días",
+    "underWay": "En recuento",
+    "noPlacesTitle": "Aún no hay ubicaciones que contar",
+    "noPlacesDescription": "Añade una ubicación y coloca artículos en ella; después podrás contarla aquí."
+  },
+  "posting": {
+    "adjusted": "Las diferencias se registraron como ajuste de existencias",
+    "noDifferences": "Contada, sin diferencias: las existencias ya cuadraban."
+  },
+  "settings": {
+    "countEveryDays": "Contar cada ubicación cada (días)",
+    "countEveryDaysDescription": "Cada ubicación con existencias aparece en «Por hacer» tantos días después de su último recuento. 0 lo desactiva."
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "title": "Informacje o żywności i zdrowiu",
+  "scanTable": "Skanuj tabelę",
+  "noData": "Brak danych o produkcie. Użyj przycisku 'Skanuj tabelę', aby dodać wartości odżywcze i skład za pomocą aparatu.",
+  "noDataRoutes": "Brak danych o tym produkcie. Zeskanuj tabelę aparatem albo wpisz wartości poniżej.",
+  "noDataManual": "Brak danych o tym produkcie. Wpisz wartości poniżej.",
+  "noDataNone": "Brak danych o tym produkcie.",
+  "nutriScore": "Nutri-Score",
+  "nutrientLevels": "Poziomy składników",
+  "ingredients": "Skład / Informacje",
+  "energy": "energia",
+  "proteins": "białko",
+  "fat": "tłuszcz",
+  "fiber": "błonnik",
+  "levels": {
+    "sugars": {
+      "low": "Niska zawartość cukru",
+      "moderate": "Średnia zawartość cukru",
+      "high": "Wysoka zawartość cukru"
+    },
+    "salt": {
+      "low": "Niska zawartość soli",
+      "moderate": "Średnia zawartość soli",
+      "high": "Wysoka zawartość soli"
+    },
+    "fat": {
+      "low": "Niska zawartość tłuszczu",
+      "moderate": "Średnia zawartość tłuszczu",
+      "high": "Wysoka zawartość tłuszczu"
+    },
+    "saturated_fat": {
+      "low": "Mało tłuszczów nasyconych",
+      "moderate": "Średnio tłuszczów nasyconych",
+      "high": "Dużo tłuszczów nasyconych"
+    }
+  },
+  "scanner": {
+    "title": "Skaner Wartości",
+    "subtitle": "Zrób zdjęcie tabeli z opakowania",
+    "howItWorksTitle": "Jak to działa?",
+    "howItWorksDesc": "Zrób wyraźne zdjęcie tabeli „Wartości odżywcze” na opakowaniu. AI może odczytać za ciebie kcal i makroskładniki.",
+    "takePhoto": "ZRÓB ZDJĘCIE",
+    "success": "AI przeanalizowało tabelę!",
+    "checkData": "Sprawdź czy poniższe dane się zgadzają.",
+    "energy": "Energia (kcal)",
+    "carbs": "Węglowodany",
+    "sugars": "Cukry",
+    "salt": "Sól",
+    "retry": "Spróbuj ponownie",
+    "save": "Zapisz do produktu",
+    "recognizing": "AI analizuje…",
+    "error": "Nie udało się odczytać tabeli. Spróbuj wyraźniejszego zdjęcia.",
+    "saveSuccess": "Dane odżywcze zostały zapisane!",
+    "saveError": "Nie udało się zapisać wyniku skanowania",
+    "howItWorksNoAi": "Zrób wyraźne zdjęcie tabeli „Wartości odżywcze” na opakowaniu. Bez połączenia AI nic nie zostanie odczytane — wartości uzupełnisz samodzielnie."
+  },
+  "carbohydrates": "Węglowodany",
+  "sugars": "Cukry",
+  "salt": "Sól",
+  "nutritionForm": {
+    "saved": "Wartości odżywcze zapisane",
+    "saveError": "Nie udało się zapisać wartości odżywczych",
+    "title": "Wpisz wartości ręcznie",
+    "hint": "Wartości odżywcze na 100 g/ml."
+  },
+  "source": {
+    "learnMore": "Dowiedz się więcej →",
+    "visionCapture": "Odczytane z etykiety",
+    "communityNote": "Z Open Food Facts, bazy społecznościowej, więc traktuj wartości jako szacunek. Porównaj je z etykietą."
+  },
+  "productPage": {
+    "title": "Wartości odżywcze w 100 g"
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "source": "Open Food Facts (https://world.openfoodfacts.org). The photographs are fetched at run time and are CC-BY-SA; this file holds only barcodes and the product names and brands read off the packs, which are Open Food Facts product data under the ODbL (see NOTICE)",
+  "curated_on": "2026-09-05",
+  "how_to_read": [
+    "Every entry is one photograph, addressed by its barcode: the harness fetches",
+    "the front image from the Open Food Facts API, so nothing binary lives in this",
+    "repository and anybody can rebuild the same corpus.",
+    "",
+    "'expected' lists the spellings a correct reading may use. Null means the field",
+    "is NOT legible on that photograph — and those are the interesting ones: a model",
+    "that answers anyway is reciting what it knows about the product rather than",
+    "reading the picture in front of it, which is exactly the failure a matrix of",
+    "well-known brands has to be able to see.",
+    "",
+    "'tolerated' is for text that IS on the packaging but is not the field's",
+    "answer — the per-bar nutrition reference on a chocolate wrapper is not the",
+    "net weight, and a promotional '+50g' is not a quantity. A model answering",
+    "one of those read the picture and filed it in the wrong place; counting it",
+    "as invention would blame it for the opposite of what it did."
+  ],
+  "images": [
+    {
+      "barcode": "5449000000996",
+      "note": "Coca-Cola can, Turkish text ('ORIJINAL TAT'), the frame cuts off the left edge",
+      "expected": {
+        "name": [
+          "Coca-Cola",
+          "Coca Cola",
+          "Coca-Cola Orijinal Tat",
+          "Orijinal Tat"
+        ],
+        "brand": [
+          "Coca-Cola",
+          "Coca Cola"
+        ],
+        "weight": null,
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "3033710065967",
+      "note": "Nesquik cocoa, French, close crop of a busy pack — the mascot takes half the frame",
+      "expected": {
+        "name": [
+          "Nesquik",
+          "Nesquik Cacao",
+          "Cacao"
+        ],
+        "brand": [
+          "Nestle",
+          "Nestlé",
+          "Nesquik"
+        ],
+        "weight": null,
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "20724696",
+      "note": "Lidl private label, Spanish and Portuguese on one bag; OFF names it in French",
+      "expected": {
+        "name": [
+          "Almendras de California",
+          "Amendoas do California",
+          "Amêndoas do Califórnia",
+          "Almendras",
+          "Almonds",
+          "Californian almonds"
+        ],
+        "brand": [
+          "Alesto"
+        ],
+        "weight": null,
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "7622210449283",
+      "note": "LU Prince, French; the brand is a two-letter logo in the corner",
+      "expected": {
+        "name": [
+          "Prince",
+          "Prince Gout Chocolat",
+          "Prince Goût Chocolat",
+          "Prince Chocolat"
+        ],
+        "brand": [
+          "LU"
+        ],
+        "weight": null,
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "4008400402222",
+      "note": "amateur photograph of a Nutella jar on a table; the only quantity in frame is the promo '+50g GRATIS'",
+      "expected": {
+        "name": [
+          "Nutella"
+        ],
+        "brand": [
+          "Nutella",
+          "Ferrero"
+        ],
+        "weight": null,
+        "expiry_date": null
+      },
+      "tolerated": {
+        "weight": [
+          "50 g",
+          "50g"
+        ]
+      }
+    },
+    {
+      "barcode": "8076809513753",
+      "note": "Barilla pesto in a glass jar, Italian, studio shot",
+      "expected": {
+        "name": [
+          "Pesto alla Genovese",
+          "Pesto"
+        ],
+        "brand": [
+          "Barilla"
+        ],
+        "weight": null,
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "3229820129488",
+      "note": "Bjorg muesli, French; '375 g' is printed small, bottom right",
+      "expected": {
+        "name": [
+          "Muesli sans sucres ajoutes",
+          "Muesli sans sucres ajoutés",
+          "Muesli",
+          "Muesli raisin figue datte abricot"
+        ],
+        "brand": [
+          "Bjorg"
+        ],
+        "weight": "375 g",
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "8000500037560",
+      "note": "Kinder Bueno bar photographed at an angle on a rubber mat; '21,5 g' in frame is the per-bar nutrition reference, NOT the net weight",
+      "expected": {
+        "name": [
+          "Bueno",
+          "Kinder Bueno"
+        ],
+        "brand": [
+          "Kinder",
+          "Ferrero"
+        ],
+        "weight": null,
+        "expiry_date": null
+      },
+      "tolerated": {
+        "weight": [
+          "21.5 g",
+          "21,5 g",
+          "21.5g",
+          "43 g",
+          "43g"
+        ]
+      }
+    },
+    {
+      "barcode": "8000500310427",
+      "note": "Nutella Biscuits pouch; 'x22' in frame is a count, not a weight",
+      "expected": {
+        "name": [
+          "Nutella Biscuits",
+          "Biscuits",
+          "Nutella biscuits x22"
+        ],
+        "brand": [
+          "Nutella",
+          "Ferrero"
+        ],
+        "weight": null,
+        "expiry_date": null
+      },
+      "tolerated": {
+        "weight": [
+          "22",
+          "x22"
+        ]
+      }
+    },
+    {
+      "barcode": "3168930010265",
+      "note": "Quaker Cruesli box, French; '450g' is large and high-contrast",
+      "expected": {
+        "name": [
+          "Cruesli Melange de noix",
+          "Cruesli Mélange de noix",
+          "Cruesli",
+          "Melange de noix",
+          "Mélange de noix"
+        ],
+        "brand": [
+          "Quaker"
+        ],
+        "weight": "450 g",
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "8076800195057",
+      "note": "Barilla spaghetti box at an angle; '500g e' is small print on a dark blue ground",
+      "expected": {
+        "name": [
+          "Spaghetti N 5",
+          "Spaghetti N°5",
+          "Spaghetti no 5",
+          "Spaghetti"
+        ],
+        "brand": [
+          "Barilla"
+        ],
+        "weight": "500 g",
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "3068320123264",
+      "note": "amateur photograph of a water bottle on a red cloth; '1,15 L' is on the transparent right edge and is the hardest legible quantity in the corpus",
+      "expected": {
+        "name": [
+          "Eau minerale naturelle",
+          "Eau minérale naturelle",
+          "Eau minerale",
+          "La Salvetat"
+        ],
+        "brand": [
+          "La Salvetat"
+        ],
+        "weight": "1.15 L",
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "7622300336738",
+      "note": "an opened Oreo pack lying on decking, strong daylight, the roll is deformed",
+      "expected": {
+        "name": [
+          "Oreo Original",
+          "Oreo"
+        ],
+        "brand": [
+          "Oreo"
+        ],
+        "weight": null,
+        "expiry_date": null
+      }
+    },
+    {
+      "barcode": "5411188119098",
+      "note": "alpro pot held in a hand, English text, fingers cover part of the label",
+      "expected": {
+        "name": [
+          "Plain with Coconut",
+          "Alpro Plain with Coconut",
+          "Plain"
+        ],
+        "brand": [
+          "Alpro"
+        ],
+        "weight": null,
+        "expiry_date": null
+      }
+    }
+  ]
+}

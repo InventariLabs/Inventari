@@ -1,0 +1,208 @@
+{
+  "roles": {
+    "individual": "The one thing the equipment module tracks (added, edited, returned, held, assigned). Prose decision and the argument: docs/MODULE_NAMES.md, glossary entry: asset vs equipment vs record.",
+    "domain": "The module and its collection as a whole: titles, category/model names, permissions, the cross-module badge. Some languages keep two natural domain words; both are listed.",
+    "record": "A thing standing in a storage location, counted across every module's things — the equipment module's own included. Locations counts are never the module's word."
+  },
+  "stems": {
+    "en": {
+      "individual": ["asset"],
+      "domain": ["equipment"],
+      "record": ["record"],
+      "forbiddenInIndividual": ["equipment", "record", "item"]
+    },
+    "pl": {
+      "individual": ["zasob", "zasób"],
+      "domain": ["sprzęt"],
+      "record": ["rekord"],
+      "forbiddenInIndividual": ["sprzęt", "rekord"]
+    },
+    "de": {
+      "individual": ["gerät"],
+      "domain": ["ausrüst", "gerät"],
+      "record": ["datensatz", "datensät"],
+      "forbiddenInIndividual": [
+        "ausrüst",
+        "anlage",
+        "artikel",
+        "datensatz",
+        "eintrag"
+      ]
+    },
+    "fr": {
+      "individual": ["actif"],
+      "domain": ["équipement", "matériel"],
+      "record": ["enregistrement"],
+      "forbiddenInIndividual": [
+        "équipement",
+        "matériel",
+        "enregistrement",
+        "ressource",
+        "appareil",
+        "élément"
+      ]
+    },
+    "es": {
+      "individual": ["activo"],
+      "domain": ["equipamiento", "equipo"],
+      "record": ["registro"],
+      "forbiddenInIndividual": [
+        "equipamiento",
+        "equipo",
+        "registro",
+        "recurso",
+        "elemento"
+      ]
+    }
+  },
+  "retiredWords": {
+    "_why": "Words that once named the tracked thing and must not come back anywhere in the module's catalog: the German Anlagegut is the accounting word for a fixed asset, and the public attestation page asked an employee about an Artikel or an Element. Counted per file, so a stray one fails by name.",
+    "pl": ["element"],
+    "de": ["anlage", "artikel", "element"],
+    "fr": ["article", "élément"],
+    "es": ["elemento"]
+  },
+  "featureNames": {
+    "myAssets": {
+      "en": "My Assets",
+      "pl": "Mój sprzęt",
+      "de": "Mein Gerät",
+      "fr": "Mon matériel",
+      "es": "Mi equipo"
+    }
+  },
+  "individualKeys": {
+    "form.addTitle": true,
+    "form.editTitle": true,
+    "form.created": true,
+    "form.updated": true,
+    "form.guardName": true,
+    "form.labelAssignFailed": true,
+    "form.errors.loadFailed": true,
+    "form.image_from_model": false,
+    "dashboard.add_asset": true,
+    "my_assets.subtitle": true,
+    "my_assets.empty": true,
+    "my_assets.empty_hint": true,
+    "assignments.checkin_modal.condition": false,
+    "assignments.checkout_failed": true,
+    "assignments.checkin_failed": true,
+    "attestation.confirm.nothingToAttestMessage": true,
+    "attestation.public.issueTypeMissing": true,
+    "attestation.public.issueTypeDamaged": true,
+    "attestation.public.issueTypeWrongItem": true,
+    "attestation.public.statusAssignmentReturned": false,
+    "attestation.public.statusAssignmentReturnedDesc": true,
+    "attestation.public.statusCampaignClosedDesc": true,
+    "actions.edit": true,
+    "list.select_item": true,
+    "list.select_archived_item": true,
+    "list.showing_one": true,
+    "list.showing_other": true,
+    "list.bulk_edited_one": true,
+    "list.bulk_edited_other": true,
+    "list.bulk_retired_one": true,
+    "list.bulk_retired_other": true,
+    "list.bulk_purged_one": true,
+    "list.bulk_purged_other": true,
+    "list.bulk_archived_one": true,
+    "list.bulk_archived_other": true,
+    "list.bulk_returned_one": true,
+    "list.bulk_returned_other": true,
+    "list.confirm_bulk_retire_one": true,
+    "list.confirm_bulk_retire_other": true,
+    "list.confirm_bulk_retire_msg": true,
+    "list.confirm_bulk_purge_one": true,
+    "list.confirm_bulk_purge_other": true,
+    "list.confirm_bulk_archive_one": true,
+    "list.confirm_bulk_archive_other": true,
+    "list.confirm_bulk_archive_msg": true,
+    "list.selection_all_matching_one": true,
+    "list.selection_all_matching_other": true,
+    "list.selection_page_only_one": true,
+    "list.selection_page_only_other": true,
+    "list.bulk_return_failed": true,
+    "list.bulk_edit_failed": true,
+    "list.print_no_labels": true,
+    "list.gettingStarted.step1.title": true,
+    "list.gettingStarted.step1.description": true,
+    "list.gettingStarted.step1.cta": true,
+    "list.gettingStarted.stepImport.description": true,
+    "list.gettingStarted.step2.description": true,
+    "detail.confirm_retire_msg": true,
+    "detail.confirm_restore_msg": true,
+    "detail.confirm_archive": true,
+    "detail.confirm_archive_msg": true,
+    "detail.archived": true,
+    "models.subtitle": true,
+    "models.empty_hint": true,
+    "models.perUnitHint": true,
+    "models.createSubtitle": true,
+    "import.description": true,
+    "attestation.public.pageTitle": true,
+    "attestation.public.assetSection": true,
+    "attestation.public.instructions": true,
+    "attestation.public.confirmButton": true,
+    "attestation.public.statusConfirmedDesc": true,
+    "attestation.public.itemsSection": true,
+    "attestation.public.selectItem": true,
+    "attestation.response.asset": true,
+    "attestation.scope.all": true,
+    "attestation.scope.hintAll": true,
+    "attestation.scope.hintStorage": true,
+    "attestation.scope.hintCategory": true,
+    "attestation.scope.previewCount": true,
+    "attestation.scope.previewEmpty": false,
+    "attestation.confirm.launchMessageCounted": true,
+    "attestation.emptyDescription": true,
+    "attestation.emptyDescriptionViewer": true,
+    "bulk.create_one": true,
+    "bulk.create_other": true,
+    "bulk.defaultName": true,
+    "bulk.success_one": true,
+    "bulk.success_other": true,
+    "bulk.useSerialAsAssetTag": true,
+    "bulk.labelsAssigned": true,
+    "bulk.labelsAssigned_one": true,
+    "bulk.labelsAssigned_other": true,
+    "bulk.labelAssignFailed": true,
+    "bulk_edit.change_status_title_one": true,
+    "bulk_edit.change_status_title_other": true,
+    "bulk_edit.change_location_title_one": true,
+    "bulk_edit.change_location_title_other": true,
+    "bulk_edit.assign_to_title_one": true,
+    "bulk_edit.assign_to_title_other": true,
+    "bulk_return.title_one": true,
+    "bulk_return.title_other": true,
+    "bulk_return.condition_label": true,
+    "bulk_return.none_out": true,
+    "bulk_return.only_out_one": true,
+    "bulk_return.only_out_other": true,
+    "bulk_return.condition_hint": true,
+    "permissions.readDesc": true,
+    "permissions.writeDesc": true,
+    "categories.table.assets": true,
+    "locations.view_assets": true
+  },
+  "featureNameKeys": {
+    "assignments.checkout_modal.email_consequence": "myAssets",
+    "assignments.checkout_modal.email_unmatched": "myAssets",
+    "bulk_edit.no_email_warning": "myAssets"
+  },
+  "recordKeyPrefixes": [
+    "locations.holding",
+    "locations.holdingTotal",
+    "locations.cannotDeleteHolding"
+  ],
+  "recordExempt": {
+    "locations.holdingHereAndBelow": "A bare format of two counts ({{here}} · {{below}}) — no noun of its own; the counts are the holding counters above."
+  },
+  "exempt": {
+    "kindNames": ["categories.codes.*", "list.gettingStarted.description"],
+    "frozenFeatureNames": ["my_assets.title", "nav.my_assets"],
+    "mixedByDesign": [
+      "my_assets.who_returns",
+      "attestation.public.linkNotFoundNext"
+    ]
+  }
+}

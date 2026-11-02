@@ -1,0 +1,217 @@
+{
+  "enabled": "Aktiviert",
+  "errors": {
+    "updateFailed": "Fehler beim Aktualisieren des Modulstatus"
+  },
+  "success": {
+    "enabled": "Modul {{name}} aktiviert",
+    "disabled": "Modul {{name}} deaktiviert"
+  },
+  "modules": {
+    "core": {
+      "title": "Haus & Küche",
+      "desc": "Kühlschrank, Vorratskammer und grundlegende Produkte."
+    },
+    "shopping_lists": {
+      "name": "Einkaufslisten",
+      "description": "Einkaufslisten mit automatischen Vorschlägen erstellen und verwalten."
+    },
+    "vision": {
+      "name": "Fotoerkennung",
+      "description": "Liest Name, Marke und Haltbarkeitsdatum eines Produkts vom Foto seines Etiketts. Ausgeschaltet verliert das Anlegen eines Produkts den Foto-Tab, und Nährwerttabellen müssen eingetippt werden."
+    },
+    "stats": {
+      "name": "Statistiken",
+      "description": "Erweiterte Verbrauchsanalyse und Abfallverfolgung."
+    },
+    "stock_takes": {
+      "name": "Bestandsaufnahmen",
+      "description": "Regelmäßige Bestandskontrollen zur Überprüfung der Bestandsgenauigkeit."
+    },
+    "partners": {
+      "name": "Partner",
+      "description": "Lieferanten, Kunden und Dienstleister für B2B-Workflows verwalten."
+    },
+    "recipes": {
+      "name": "Rezepte",
+      "description": "Rezepte mit Zutatenverfolgung erstellen und verwalten."
+    },
+    "equipment": {
+      "name": "Geräteverfolgung",
+      "description": "IT- und physische Assets mit Lebenszyklusverwaltung verfolgen."
+    },
+    "example_widgets": {
+      "name": "Beispiel-Widgets",
+      "description": "Referenzmodul für die Inventari-Modulmuster: einfache Widgets mit Name, Farbe und Anzahl verwalten."
+    },
+    "warehouse": {
+      "name": "Lager",
+      "description": "Per Handykamera oder Scanner Ware annehmen, ausgeben, umlagern und zählen; die nummerierten Belege entstehen im Hintergrund — mit Einlagerungsregeln."
+    },
+    "purchase_orders": {
+      "name": "Einkaufsbestellungen",
+      "description": "Einkaufsbestellungen mit Lieferanten erstellen und verfolgen."
+    },
+    "printing": {
+      "name": "Etikettendruck",
+      "description": "Etiketten für Produkte und Standorte erstellen und drucken."
+    },
+    "nutrition": {
+      "name": "Nährwertinformationen",
+      "description": "Nährwertdaten und Zutaten von Open Food Facts anzeigen."
+    },
+    "approvals": {
+      "name": "Genehmigungen",
+      "description": "Mehrstufige Genehmigungsworkflows für kritische Vorgänge."
+    },
+    "webhooks": {
+      "name": "Webhooks",
+      "description": "Ausgehende HTTP-Benachrichtigungen über Ereignisse in Ihrem Arbeitsbereich."
+    },
+    "api_keys": {
+      "name": "API-Schlüssel",
+      "description": "Programmatischer Zugriff über REST-API-Schlüssel."
+    },
+    "maker": {
+      "name": "Fertigung",
+      "description": "Fertigungs- und Stücklistenverwaltung."
+    },
+    "items": {
+      "name": "Inventar"
+    }
+  },
+  "config": {
+    "connectionsTitle": "KI-Verbindungen",
+    "connectionsDescription": "Pool von LLM-Verbindungen, die von allen Modulen gemeinsam genutzt werden. Ordnen Sie unten jeweils eine einem Zweck zu.",
+    "addConnection": "Verbindung hinzufügen",
+    "editConnection": "Verbindung bearbeiten",
+    "deleteConnection": "Verbindung löschen",
+    "deleteConfirm": "„{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Speichern…",
+    "formDescription": "Konfigurieren Sie einen LLM-Endpunkt. Der Pool wird von allen KI-Funktionen gemeinsam genutzt.",
+    "fieldName": "Name",
+    "fieldNamePlaceholder": "z. B. Sensor im Vorratsregal",
+    "fieldProvider": "Anbieter",
+    "fieldApiKey": "API-Schlüssel",
+    "fieldApiKeyDocs": "Woher ein {{provider}}-Schlüssel kommt",
+    "fieldApiKeyPlaceholder": "sk-or-v1-…",
+    "fieldBaseUrl": "API-Basis-URL",
+    "localEngineHint": "Eine lokale Engine läuft auf einer privaten Adresse, die der Server ablehnt, bis ein Betreiber sie freigibt: LLM_ALLOW_PRIVATE_NETWORKS=true setzen und das Backend neu starten. Die Adresse host.docker.internal beibehalten — aus dem Container heraus ist localhost der Container selbst.",
+    "fieldModel": "Modell",
+    "fieldCapabilities": "Fähigkeiten",
+    "capability": {
+      "vision": "Bild",
+      "text": "Text",
+      "url_fetch": "Seitenlesen"
+    },
+    "noConnections": "Noch keine Verbindungen",
+    "noConnectionsHint": "Fügen Sie eine Verbindung hinzu, um KI-Funktionen zu nutzen.",
+    "bindingsTitle": "Standard je Zweck",
+    "boundHere": "Für diesen Zweck aktiv",
+    "noBinding": "Nicht konfiguriert",
+    "cannotDeleteBound": "Diese Verbindung ist einem Zweck zugeordnet. Bitte zuerst lösen.",
+    "noEligibleConnections": "Keine Verbindungen mit der Fähigkeit „{{capability}}“.",
+    "noEligibleConnectionsCta": "Verbindung einrichten",
+    "serverDefaultOption": "Standardmodell des Servers",
+    "serverDefaultHint": "Wird vom Standardmodell des Servers bedient. Wählen Sie eine Verbindung, um stattdessen Ihre eigene zu nutzen.",
+    "noConnectionsServerDefaultHint": "Einige KI-Funktionen laufen bereits über das Standardmodell des Servers. Fügen Sie eine Verbindung hinzu, um stattdessen Ihre eigene zu nutzen.",
+    "createFailed": "Verbindung konnte nicht erstellt werden",
+    "updateFailed": "Verbindung konnte nicht aktualisiert werden",
+    "deleteFailed": "Verbindung konnte nicht gelöscht werden",
+    "bindingFailed": "Zuordnung konnte nicht aktualisiert werden",
+    "deleteSuccess": "Verbindung gelöscht",
+    "loading": "Verbindungen werden geladen…",
+    "errorNameRequired": "Name ist erforderlich",
+    "errorNameTaken": "Eine Verbindung mit diesem Namen existiert bereits",
+    "errorCapabilityRequired": "Mindestens eine Fähigkeit auswählen",
+    "groupCloud": "Cloud",
+    "groupAggregator": "Aggregator",
+    "groupSpecialist": "Spezialisiert",
+    "groupLocal": "Lokal",
+    "groupCustom": "Eigene",
+    "testConnection": "Verbindung testen",
+    "testing": "Testen…",
+    "testFailed": "Verbindungstest fehlgeschlagen. Schlüssel und URL prüfen.",
+    "testNeedsApiKey": "Tragen Sie zuerst den API-Schlüssel oben ein — der Test sendet, was in diesem Formular steht, nicht einen gespeicherten Schlüssel.",
+    "testNeedsBaseUrl": "Tragen Sie zuerst die API-Basis-URL oben ein — dieser Anbieter wird über HTTP erreicht, der Test braucht also seine Adresse.",
+    "testContractOk": "Verbindung funktioniert — das Modell hat in der erwarteten Form geantwortet. {{count}} Modelle verfügbar.",
+    "testReadAll": "Verbindung funktioniert — das Modell hat alle {{of}} Felder des Musteretiketts gelesen.",
+    "testReadPartial": "Die Antwort hatte die richtige Form, aber das Modell hat nur {{matched}} von {{of}} Feldern des Musteretiketts gelesen — es könnte Werte einsetzen, die es nie gesehen hat.",
+    "testContractOk_one": "Verbindung funktioniert — das Modell hat das Musteretikett gelesen. {{count}} Modell verfügbar.",
+    "testContractOk_other": "Verbindung funktioniert — das Modell hat das Musteretikett gelesen. {{count}} Modelle verfügbar.",
+    "testContractFailed": "Der Schlüssel funktioniert, aber das Modell lieferte keine verwertbaren Daten. Es antwortete: {{preview}}",
+    "testUnchecked": "Zugangsdaten funktionieren — {{count}} Modelle verfügbar. Die Antwortform wurde für diese Fähigkeiten nicht geprüft.",
+    "testUnchecked_one": "Zugangsdaten funktionieren — {{count}} Modell verfügbar. Die Antwortform wurde für diese Fähigkeiten nicht geprüft.",
+    "testUnchecked_other": "Zugangsdaten funktionieren — {{count}} Modelle verfügbar. Die Antwortform wurde für diese Fähigkeiten nicht geprüft.",
+    "testShapeNotEnforced": "Dieser Anbieter erzwingt die Antwortform nicht; das Ergebnis beruht auf dem Parser und einem Wiederholungsversuch. Es kann später fehlschlagen.",
+    "testReaderOk": "Der Schlüssel funktioniert — der Reader hat eine Testseite geladen.",
+    "testReaderFreeTier": "Diese Verbindung hat keinen Schlüssel — sie läuft auf dem Free-Tier des Readers, es gibt nichts zu testen.",
+    "testReaderEmpty": "Der Schlüssel funktioniert, aber der Reader hat nichts von der Testseite mitgebracht.",
+    "providerName": {
+      "custom": "Eigener (OpenAI-kompatibel)"
+    },
+    "providerDescription": {
+      "openai": "GPT-4o, GPT-4o-mini. Multimodal.",
+      "anthropic": "Claude-Modelle. Multimodal mit Bildverarbeitung.",
+      "google": "Gemini 2.0 Flash / Pro. Kostenlose Stufe verfügbar.",
+      "openrouter": "Über 100 Modelle mit einem Schlüssel.",
+      "groq": "Schnellste Inferenz. Llama, Mixtral.",
+      "deepseek": "DeepSeek V3 / R1.",
+      "mistral": "Mistral Large, Codestral.",
+      "together": "Hosting für Open-Source-Modelle.",
+      "xai": "Grok-Modelle. Multimodal.",
+      "minimax": "MiniMax-M3 (1M Kontext, multimodal). Aus China erreichbar.",
+      "glm": "GLM-4V, multimodal. Kostenlose Stufe über glm-4v-flash. In China führend.",
+      "mimo": "MiMo-V2.5 (310B MoE, multimodal). Xiaomis Flaggschiff für Reasoning.",
+      "jina": "Liest eine Webseite als reinen Text — darauf beruht der Rezeptimport.",
+      "ollama": "Lokaler OpenAI-kompatibler Server auf Port 11434.",
+      "lm_studio": "Lokaler OpenAI-kompatibler Server auf Port 1234.",
+      "vllm": "Selbst gehosteter OpenAI-kompatibler Server.",
+      "custom": "Beliebiger anderer Endpunkt im OpenAI-Format."
+    },
+    "fieldCapabilitiesHint": "Wofür dieses Modell genutzt werden kann. Die Haken sind ein Vorschlag des Anbieters — entschieden wird es im Verbindungstest.",
+    "purposeUnavailable": "Modul aus",
+    "purposeUnavailableHint": "Dieser Zweck gehört zum Modul {{module}}, das ausgeschaltet ist. Eine Zuordnung wirkt, sobald das Modul aktiviert ist.",
+    "capabilityUnverified": "Angegeben, noch nicht geprüft — Verbindungstest ausführen",
+    "capabilityConfirmed": "Durch den Verbindungstest bestätigt",
+    "capabilityFailed": "Das Modell hat diesen Test nicht bestanden",
+    "capabilityFailedHint": "Das Modell hat nicht geliefert, was diese Verbindung angibt. Bis der Test besteht, wird sie für Zwecke, die das brauchen, nicht angeboten.",
+    "connectionFailedCapability": "{{names}} steht nicht auf dieser Liste: Test „{{capability}}“ nicht bestanden."
+  },
+  "fieldBuilder": {
+    "title": "Benutzerdefinierte Felddefinitionen",
+    "fieldsCount": "{{count}} definierte Felder",
+    "fieldsCount_one": "{{count}} definiertes Feld",
+    "fieldsCount_other": "{{count}} definierte Felder",
+    "fieldLabel": "Feldbezeichnung",
+    "placeholder": "z. B. Spannung",
+    "dataType": "Datentyp",
+    "addField": "Feld hinzufügen",
+    "addCustomField": "Benutzerdefiniertes Feld hinzufügen",
+    "types": {
+      "text": "Text",
+      "number": "Zahl",
+      "date": "Datum",
+      "textarea": "Langer Text",
+      "file": "Datei / Anhang",
+      "money": "Geld",
+      "select": "Auswahlliste",
+      "multi-select": "Mehrfachauswahl",
+      "boolean": "Ja / Nein"
+    },
+    "options": {
+      "label": "Optionen",
+      "placeholder": "Option hinzufügen und Enter drücken",
+      "empty": "Mindestens eine Option ist erforderlich",
+      "remove": "Option {{name}} entfernen"
+    },
+    "errors": {
+      "alreadyExists": "Ein Feld mit diesem Namen existiert bereits",
+      "optionsRequired": "Dieser Feldtyp erfordert mindestens eine Option"
+    }
+  },
+  "disabled": "Deaktiviert"
+}

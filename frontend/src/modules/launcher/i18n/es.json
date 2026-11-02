@@ -1,0 +1,59 @@
+{
+  "launcher": {
+    "title": "Inicio",
+    "description": "Resumen de su espacio de trabajo",
+    "welcome": "Te damos la bienvenida, {{name}}",
+    "joinedOrganization": "Te has unido a {{organization}}",
+    "createdOrganization": "Has creado {{organization}}",
+    "welcomeBack": "Bienvenido de nuevo, {{name}}",
+    "workspaceOverview": "Resumen de su espacio de trabajo",
+    "alerts": "Alertas",
+    "recentItems": "Visitados recientemente",
+    "browseApps": "Explorar apps",
+    "noActions": "Todas las tareas completadas",
+    "emptyRecent": "Aún no hay elementos recientes",
+    "actionItems": {
+      "title": "Por hacer",
+      "subtitle": "{{count}} pendientes en módulos activados",
+      "subtitle_one": "{{count}} pendiente en módulos activados",
+      "subtitle_other": "{{count}} pendientes en módulos activados"
+    }
+  },
+  "sections": {
+    "core": "Esenciales",
+    "business": "Negocio",
+    "analytics": "Analítica",
+    "integrations": "Integraciones",
+    "system": "Sistema"
+  },
+  "workspace": {
+    "current": "Actual",
+    "apply": "Aplicar",
+    "reapply": "Aplicar de nuevo",
+    "reapplyHint": "Vuelve a ejecutar la configuración de este perfil — no se añade ni se quita ningún módulo",
+    "target": "Objetivo: {{name}}",
+    "loading": "Cargando perfiles…",
+    "empty": "No hay perfiles disponibles.",
+    "diffTitle": "Qué va a cambiar",
+    "diffSubtitle": "De {{from}} a {{to}}",
+    "diffEnable": "Activar",
+    "diffDisable": "Desactivar",
+    "diffCascade": "Desactivación en cascada",
+    "diffUnchanged": "Sin cambios",
+    "diffConfig": "Restablecer ajustes para",
+    "confirmTitle": "¿Cambiar a {{name}}?",
+    "confirmMessage": "Se activarán y desactivarán módulos para tu organización. Puedes volver atrás en cualquier momento.",
+    "confirmApply": "Cambiar perfil",
+    "confirmReapplyTitle": "¿Volver a ejecutar la configuración de {{name}}?",
+    "confirmReapplyMessage": "No se añade ni se quita ningún módulo. La configuración del perfil se ejecuta de nuevo: sus ajustes predeterminados vuelven a los valores del perfil, y los nombres que sembró — incluidos los tipos de ubicación — se reescriben en el idioma de esta sesión.",
+    "confirmReapply": "Volver a ejecutar la configuración",
+    "previewLoading": "Calculando cambios…",
+    "diffManualKept": "Se mantiene (añadido manualmente)",
+    "diffCascadeHint": "Desactivados porque requieren un módulo eliminado",
+    "diffConfigHint": "Los valores predeterminados del perfil sobrescribirán la configuración actual",
+    "renumberOffer": "Sus ubicaciones conservan códigos y etiquetas. Para códigos de estante (A-02-01), elija Renumerar según la plantilla en Almacén → Configuración → Códigos, etiquetas y orden de recorrido de ubicaciones; las etiquetas antiguas se siguen escaneando."
+  },
+  "activeProfile": {
+    "change": "Cambiar"
+  }
+}

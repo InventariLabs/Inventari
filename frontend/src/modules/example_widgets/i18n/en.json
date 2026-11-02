@@ -1,0 +1,44 @@
+{
+  "navigation": {
+    "widgets": "Widgets"
+  },
+  "page": {
+    "title": "Example Widgets",
+    "description": "Manage your widgets — a reference module for Inventari developers."
+  },
+  "actions": {
+    "add": "Add Widget",
+    "delete": "Delete",
+    "increase": "Increase quantity",
+    "decrease": "Decrease quantity",
+    "copyIds": "Copy IDs"
+  },
+  "fields": {
+    "name": "Name",
+    "color": "Color",
+    "quantity": "Quantity"
+  },
+  "colors": {
+    "blue": "Blue",
+    "green": "Green",
+    "amber": "Amber",
+    "red": "Red",
+    "violet": "Violet",
+    "slate": "Slate"
+  },
+  "messages": {
+    "empty": "No widgets yet. Create your first one!",
+    "confirmDeleteTitle": "Delete this widget?",
+    "confirmDelete": "\"{{name}}\" will be removed. This cannot be undone.",
+    "idsCopied": "The identifiers of the selected products were copied to the clipboard."
+  },
+  "validation": {
+    "nameLooksLikeBarcode": "This looks like a product code. Enter a name here — the product code has a field of its own once the product is saved."
+  },
+  "permissions": {
+    "read": "View widgets",
+    "readDesc": "Can browse the widget list",
+    "write": "Manage widgets",
+    "writeDesc": "Can create, edit and delete widgets"
+  }
+}

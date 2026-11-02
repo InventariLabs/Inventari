@@ -1,0 +1,44 @@
+{
+  "navigation": {
+    "widgets": "Widgets"
+  },
+  "page": {
+    "title": "Widgets d'exemple",
+    "description": "Gérez vos widgets — un module de référence pour les développeurs Inventari."
+  },
+  "actions": {
+    "add": "Ajouter un widget",
+    "delete": "Supprimer",
+    "increase": "Augmenter la quantité",
+    "decrease": "Diminuer la quantité",
+    "copyIds": "Copier les ID"
+  },
+  "fields": {
+    "name": "Nom",
+    "color": "Couleur",
+    "quantity": "Quantité"
+  },
+  "colors": {
+    "blue": "Bleu",
+    "green": "Vert",
+    "amber": "Ambre",
+    "red": "Rouge",
+    "violet": "Violet",
+    "slate": "Ardoise"
+  },
+  "messages": {
+    "empty": "Aucun widget pour l'instant. Créez le premier !",
+    "confirmDeleteTitle": "Supprimer ce widget ?",
+    "confirmDelete": "« {{name}} » sera supprimé. Cette action est irréversible.",
+    "idsCopied": "Les identifiants des produits sélectionnés ont été copiés dans le presse-papiers."
+  },
+  "validation": {
+    "nameLooksLikeBarcode": "Cela ressemble à un code produit. Saisissez ici un nom — le code produit a son propre champ une fois le produit enregistré."
+  },
+  "permissions": {
+    "read": "Consulter les widgets",
+    "readDesc": "Peut parcourir la liste des widgets",
+    "write": "Gérer les widgets",
+    "writeDesc": "Peut créer, modifier et supprimer des widgets"
+  }
+}

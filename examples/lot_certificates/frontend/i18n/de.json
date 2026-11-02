@@ -1,0 +1,31 @@
+{
+  "field": {
+    "label": "Zertifikat für Charge {{lot}}",
+    "missing": "Geben Sie die Zertifikatsnummer für die Charge {{lot}} ein."
+  },
+  "line": {
+    "certificate": "Zertifikat {{number}}",
+    "save": "Zertifikat speichern",
+    "saveFailed": "Die Zertifikatsnummer wurde nicht gespeichert. Versuchen Sie es erneut."
+  },
+  "column": {
+    "certificate": "Zertifikat"
+  },
+  "filter": {
+    "certified": "Zertifizierte Chargen"
+  },
+  "action": {
+    "file": "Zertifikate hinterlegen",
+    "filed": "Die Zertifikate liegen vor.",
+    "alreadyOnFile": "Diese Zertifikate lagen bereits vor."
+  },
+  "pickOrderStrategies": {
+    "by_zone_then_weight": "Zone für Zone, das Schwerste zuerst"
+  },
+  "permissions": {
+    "read": "Zertifikate ansehen",
+    "readDesc": "Sieht, welche Chargenzertifikate vorliegen.",
+    "write": "Zertifikate hinterlegen",
+    "writeDesc": "Hinterlegt Chargenzertifikate, damit ihre Wareneingänge gebucht werden können."
+  }
+}

@@ -1,0 +1,4426 @@
+{
+  "approvals|de|dashboard.stepper.approversAssigned": {
+    "one": "7169b241f8b0",
+    "other": "7169b241f8b0"
+  },
+  "approvals|de|dashboard.targetSummary.linesCount": {
+    "one": "96787c6bb7f0",
+    "other": "5341ce8da2a1"
+  },
+  "approvals|de|launcher.actionItems.pendingLabel": {
+    "one": "3e8aca04990e",
+    "other": "cd79a08221c8"
+  },
+  "approvals|de|workflows.archived": {
+    "one": "96ef9cebc6b7",
+    "other": "0868c5ca0dba"
+  },
+  "approvals|de|workflows.summary": {
+    "one": "e6e4475e505c",
+    "other": "9a600897f0d5"
+  },
+  "approvals|en|dashboard.stepper.approversAssigned": {
+    "one": "87edd12f493d",
+    "other": "185502798a4f"
+  },
+  "approvals|en|dashboard.targetSummary.linesCount": {
+    "one": "84df0cdf8f86",
+    "other": "e90b5c8a4def"
+  },
+  "approvals|en|launcher.actionItems.pendingLabel": {
+    "one": "0dd7eab05bc3",
+    "other": "ddfa98e0a8d4"
+  },
+  "approvals|en|workflows.archived": {
+    "one": "aeff4b3c8d22",
+    "other": "9a220fa0e633"
+  },
+  "approvals|en|workflows.summary": {
+    "one": "116bc644bb42",
+    "other": "8d289b85d29c"
+  },
+  "approvals|es|dashboard.stepper.approversAssigned": {
+    "one": "a975f733b0b3",
+    "other": "cbd48e70ff68"
+  },
+  "approvals|es|dashboard.targetSummary.linesCount": {
+    "one": "8ac778ae6372",
+    "other": "a05cd7a88da1"
+  },
+  "approvals|es|launcher.actionItems.pendingLabel": {
+    "one": "1b99f937d761",
+    "other": "13c2eb84c001"
+  },
+  "approvals|es|workflows.archived": {
+    "one": "12be1d8faa93",
+    "other": "73890e24a0aa"
+  },
+  "approvals|es|workflows.summary": {
+    "one": "06f917747d2b",
+    "other": "16dda896d2e3"
+  },
+  "approvals|fr|dashboard.stepper.approversAssigned": {
+    "one": "92b7839cbe7b",
+    "other": "7d8100253f54"
+  },
+  "approvals|fr|dashboard.targetSummary.linesCount": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "approvals|fr|launcher.actionItems.pendingLabel": {
+    "one": "7064f0d03802",
+    "other": "1384fc52762e"
+  },
+  "approvals|fr|workflows.archived": {
+    "one": "53df9f8cb6b2",
+    "other": "da3ae616e86e"
+  },
+  "approvals|fr|workflows.summary": {
+    "one": "366f22cb8466",
+    "other": "afdfcf2b836f"
+  },
+  "approvals|pl|dashboard.stepper.approversAssigned": {
+    "few": "516ce5010b52",
+    "many": "516ce5010b52",
+    "one": "b08c62473869",
+    "other": "b08c62473869"
+  },
+  "approvals|pl|dashboard.targetSummary.linesCount": {
+    "few": "ff2017d64200",
+    "many": "57c007d4ffbe",
+    "one": "ccf87e22c565",
+    "other": "57c007d4ffbe"
+  },
+  "approvals|pl|launcher.actionItems.pendingLabel": {
+    "few": "8fef822f9202",
+    "many": "3f7815949111",
+    "one": "3f7815949111",
+    "other": "3f7815949111"
+  },
+  "approvals|pl|workflows.archived": {
+    "few": "fbadb04f947e",
+    "many": "bb6fcf1d0901",
+    "one": "86020cbd523a",
+    "other": "f0c2c7486c85"
+  },
+  "approvals|pl|workflows.summary": {
+    "few": "ff23f740b7df",
+    "many": "6a1d06af4db6",
+    "one": "d6b76ab4833a",
+    "other": "a2f03d7a1879"
+  },
+  "categories|de|hidden.description": {
+    "one": "e83002474ce5",
+    "other": "be090e49916b"
+  },
+  "categories|de|itemsCount": {
+    "one": "4435fcc2e763",
+    "other": "4435fcc2e763"
+  },
+  "categories|de|itemsCountAria": {
+    "one": "71a19b8d24c2",
+    "other": "c4f0c8792030"
+  },
+  "categories|de|messages.confirmDeleteWithCount": {
+    "one": "2f21e22546c7",
+    "other": "2f21e22546c7"
+  },
+  "categories|en|hidden.description": {
+    "one": "e455f858350c",
+    "other": "7f3ba869f122"
+  },
+  "categories|en|itemsCount": {
+    "one": "a8792157cb4f",
+    "other": "0a3e27b8ca81"
+  },
+  "categories|en|itemsCountAria": {
+    "one": "7f53ae026184",
+    "other": "353a76993076"
+  },
+  "categories|en|messages.confirmDeleteWithCount": {
+    "one": "30d7098cb538",
+    "other": "f9d01f0435aa"
+  },
+  "categories|es|hidden.description": {
+    "one": "9470ec27fd85",
+    "other": "4162f96308a6"
+  },
+  "categories|es|itemsCount": {
+    "one": "85dc0c638f09",
+    "other": "3064889c53e2"
+  },
+  "categories|es|itemsCountAria": {
+    "one": "d069f97b6921",
+    "other": "300676757eee"
+  },
+  "categories|es|messages.confirmDeleteWithCount": {
+    "one": "6e8595043e1f",
+    "other": "97ca456fb29f"
+  },
+  "categories|fr|hidden.description": {
+    "one": "488e4680769a",
+    "other": "479cd2df22c1"
+  },
+  "categories|fr|itemsCount": {
+    "one": "ac8d027d8f05",
+    "other": "128bfb0c2d1c"
+  },
+  "categories|fr|itemsCountAria": {
+    "one": "678128dc7766",
+    "other": "ee1520141f3d"
+  },
+  "categories|fr|messages.confirmDeleteWithCount": {
+    "one": "9ea8afa21dcf",
+    "other": "be77ef4dacf1"
+  },
+  "categories|pl|hidden.description": {
+    "few": "ea0e1e8592e8",
+    "many": "1253b7fdb02a",
+    "one": "ef54ff9af02a",
+    "other": "1253b7fdb02a"
+  },
+  "categories|pl|itemsCount": {
+    "few": "fc9b39bbf63c",
+    "many": "b65137487116",
+    "one": "91f3a8e81960",
+    "other": "b65137487116"
+  },
+  "categories|pl|itemsCountAria": {
+    "few": "7568b01744ac",
+    "many": "ca6456c36da7",
+    "one": "4d8cbab5df9b",
+    "other": "ca6456c36da7"
+  },
+  "categories|pl|messages.confirmDeleteWithCount": {
+    "few": "6dcb812b3e7c",
+    "many": "caf1a8515197",
+    "one": "367424263cee",
+    "other": "caf1a8515197"
+  },
+  "common|de|dashboard.addSelected": {
+    "one": "5c4b7c77021f",
+    "other": "5c4b7c77021f"
+  },
+  "common|de|dashboard.locationCount": {
+    "one": "f23c8f7761cc",
+    "other": "a376141738e0"
+  },
+  "common|de|dashboard.productCount": {
+    "one": "6206702d6cc6",
+    "other": "88d46d37a99e"
+  },
+  "common|de|notifications.unreadCount": {
+    "one": "414f1426decb",
+    "other": "414f1426decb"
+  },
+  "common|de|pagination.rows": {
+    "one": "96787c6bb7f0",
+    "other": "5341ce8da2a1"
+  },
+  "common|de|results": {
+    "one": "739f3e86cf85",
+    "other": "f89e0be9c1d1"
+  },
+  "common|de|selection.count": {
+    "one": "a91422bc04bb",
+    "other": "a91422bc04bb"
+  },
+  "common|de|selection.countOnPage": {
+    "one": "b23ea5a785cb",
+    "other": "1f8111e56dd6"
+  },
+  "common|de|stockCoverage.incomparable": {
+    "one": "06acc2984084",
+    "other": "c47f69167b29"
+  },
+  "common|de|templates.seeded_count": {
+    "one": "70ba7ffc080f",
+    "other": "d9dbf638cd31"
+  },
+  "common|en|dashboard.addSelected": {
+    "one": "d68af22dea29",
+    "other": "d68af22dea29"
+  },
+  "common|en|dashboard.locationCount": {
+    "one": "e3fed649c66a",
+    "other": "6408daf3e5d3"
+  },
+  "common|en|dashboard.productCount": {
+    "one": "d27897242d30",
+    "other": "22d3f8bf780a"
+  },
+  "common|en|notifications.unreadCount": {
+    "one": "7cf5ab0de921",
+    "other": "7cf5ab0de921"
+  },
+  "common|en|pagination.rows": {
+    "one": "d60902719410",
+    "other": "3d5889908e66"
+  },
+  "common|en|results": {
+    "one": "be0c64afb191",
+    "other": "b6c504e026b5"
+  },
+  "common|en|selection.count": {
+    "one": "c7f761b38b19",
+    "other": "c7f761b38b19"
+  },
+  "common|en|selection.countOnPage": {
+    "one": "a1083e199d39",
+    "other": "5da093a48837"
+  },
+  "common|en|stockCoverage.incomparable": {
+    "one": "c4727fff2bf4",
+    "other": "c4727fff2bf4"
+  },
+  "common|en|templates.seeded_count": {
+    "one": "b93a0b3abdfe",
+    "other": "1dff8b2fc63d"
+  },
+  "common|es|dashboard.addSelected": {
+    "one": "e5b80264a94d",
+    "other": "4d0428fb893a"
+  },
+  "common|es|dashboard.locationCount": {
+    "one": "83bb59b82d51",
+    "other": "17484d2e7d36"
+  },
+  "common|es|dashboard.productCount": {
+    "one": "a6fca23c06e9",
+    "other": "d97ab1f43a92"
+  },
+  "common|es|notifications.unreadCount": {
+    "one": "c833850b4dc4",
+    "other": "c833850b4dc4"
+  },
+  "common|es|pagination.rows": {
+    "one": "3d586bbf9eb8",
+    "other": "82d30e0c0843"
+  },
+  "common|es|results": {
+    "one": "da5095e4126b",
+    "other": "9e7c2ccdc310"
+  },
+  "common|es|selection.count": {
+    "one": "8ae176b6db9f",
+    "other": "044e8a762167"
+  },
+  "common|es|selection.countOnPage": {
+    "one": "11ff7f76cb1d",
+    "other": "3c791a5126f6"
+  },
+  "common|es|stockCoverage.incomparable": {
+    "one": "334cf9efffc1",
+    "other": "3428d0735f23"
+  },
+  "common|es|templates.seeded_count": {
+    "one": "d38d2c9a98b0",
+    "other": "95392c8646ef"
+  },
+  "common|fr|dashboard.addSelected": {
+    "one": "b842c96071ba",
+    "other": "b842c96071ba"
+  },
+  "common|fr|dashboard.locationCount": {
+    "one": "5506af132c94",
+    "other": "1a525f347110"
+  },
+  "common|fr|dashboard.productCount": {
+    "one": "ac9a28180b09",
+    "other": "337e44fea9d2"
+  },
+  "common|fr|notifications.unreadCount": {
+    "one": "9102cbad5b66",
+    "other": "48242974997d"
+  },
+  "common|fr|pagination.rows": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "common|fr|results": {
+    "one": "2fb5e2bfdb06",
+    "other": "aa21d7c2a599"
+  },
+  "common|fr|selection.count": {
+    "one": "e27d211a1113",
+    "other": "350263c1abed"
+  },
+  "common|fr|selection.countOnPage": {
+    "one": "6cc17ba2f303",
+    "other": "564a3992e253"
+  },
+  "common|fr|stockCoverage.incomparable": {
+    "one": "bff551565061",
+    "other": "bff551565061"
+  },
+  "common|fr|templates.seeded_count": {
+    "one": "1ed237509b44",
+    "other": "42c328118b7e"
+  },
+  "common|pl|dashboard.addSelected": {
+    "few": "ea497269265e",
+    "many": "ea497269265e",
+    "one": "ea497269265e",
+    "other": "ea497269265e"
+  },
+  "common|pl|dashboard.locationCount": {
+    "few": "2d4e530598aa",
+    "many": "cbb249d73059",
+    "one": "c28b91311e83",
+    "other": "cbb249d73059"
+  },
+  "common|pl|dashboard.productCount": {
+    "few": "2f53d0408400",
+    "many": "5b8f729e9f2b",
+    "one": "1de602f97acc",
+    "other": "5b8f729e9f2b"
+  },
+  "common|pl|notifications.unreadCount": {
+    "few": "84c4144d5955",
+    "many": "9273fe3a4c30",
+    "one": "84c4144d5955",
+    "other": "9273fe3a4c30"
+  },
+  "common|pl|pagination.rows": {
+    "few": "bf678e47b22e",
+    "many": "b9598f0c78ca",
+    "one": "c1f0efa8662f",
+    "other": "30b912d8c83c"
+  },
+  "common|pl|results": {
+    "few": "763ee4f36baa",
+    "many": "9f8fb0093b9f",
+    "one": "5802675c5b78",
+    "other": "9f8fb0093b9f"
+  },
+  "common|pl|selection.count": {
+    "few": "a4c02d9d4b01",
+    "many": "a4c02d9d4b01",
+    "one": "a4c02d9d4b01",
+    "other": "a4c02d9d4b01"
+  },
+  "common|pl|selection.countOnPage": {
+    "few": "ceebce296bc6",
+    "many": "ba7d2ce44a7e",
+    "one": "25496008ad0b",
+    "other": "a9059d877e1c"
+  },
+  "common|pl|stockCoverage.incomparable": {
+    "few": "4bb397b6abe0",
+    "many": "4bb397b6abe0",
+    "one": "9452b232965a",
+    "other": "4bb397b6abe0"
+  },
+  "common|pl|templates.seeded_count": {
+    "few": "c31ca4a9c86c",
+    "many": "706f73d22733",
+    "one": "79d3e46b2800",
+    "other": "a8e351766925"
+  },
+  "warehouse|de|approvalsQueue.bulkApprove": {
+    "one": "4a2ab84d7e11",
+    "other": "25949bd85896"
+  },
+  "warehouse|de|approvalsQueue.bulkApproveConfirmMessage": {
+    "one": "28c05f17075f",
+    "other": "62999cae37a8"
+  },
+  "warehouse|de|approvalsQueue.bulkApproveFailed": {
+    "one": "f52771aba64a",
+    "other": "c0211f4a0c0f"
+  },
+  "warehouse|de|approvalsQueue.bulkApproveSuccess": {
+    "one": "8b9c321cfb41",
+    "other": "13f82122ff22"
+  },
+  "warehouse|de|approvalsQueue.moreLines": {
+    "one": "ec4f27923afb",
+    "other": "dd4fc353ce13"
+  },
+  "warehouse|de|approvalsQueue.selectedCount": {
+    "one": "4cac0ad6d95a",
+    "other": "a91422bc04bb"
+  },
+  "warehouse|de|bulk.deleteConfirm": {
+    "one": "43af803123c1",
+    "other": "86c3d52d2957"
+  },
+  "warehouse|de|bulk.deleteDrafts": {
+    "one": "ccf6630a2128",
+    "other": "11c42cc63936"
+  },
+  "warehouse|de|bulk.deleteFailed": {
+    "one": "27c22c312261",
+    "other": "8a170c90f6ef"
+  },
+  "warehouse|de|bulk.deleteSuccess": {
+    "one": "364645cc4037",
+    "other": "877541cf13d6"
+  },
+  "warehouse|de|bulk.draftsCount": {
+    "one": "2553332edb02",
+    "other": "9cdd6bc92aeb"
+  },
+  "warehouse|de|bulk.exportSuccess": {
+    "one": "77715c2dcaf3",
+    "other": "56c688d65eb9"
+  },
+  "warehouse|de|bulk.selectedCount": {
+    "one": "4cac0ad6d95a",
+    "other": "a91422bc04bb"
+  },
+  "warehouse|de|corrections.createButton": {
+    "one": "bc83f15b688a",
+    "other": "c90769da4032"
+  },
+  "warehouse|de|detail.linesCount": {
+    "one": "4d1e1c15f6d6",
+    "other": "fbee80d20cb0"
+  },
+  "warehouse|de|detail.summaryDone": {
+    "one": "341e51fc746e",
+    "other": "02328bd4b383"
+  },
+  "warehouse|de|detail.summaryExceptions": {
+    "one": "e9907903c719",
+    "other": "6412f32065c6"
+  },
+  "warehouse|de|detail.summaryPartial": {
+    "one": "d3c473b0f813",
+    "other": "82e35f4566f1"
+  },
+  "warehouse|de|detail.summaryPending": {
+    "one": "8cba20bcdeeb",
+    "other": "84d8733ebb4a"
+  },
+  "warehouse|de|detail.summaryRemaining": {
+    "one": "ebc953c8b598",
+    "other": "8d58e3906022"
+  },
+  "warehouse|de|fields.linesCount": {
+    "one": "4d1e1c15f6d6",
+    "other": "fbee80d20cb0"
+  },
+  "warehouse|de|import.rowCount": {
+    "one": "96787c6bb7f0",
+    "other": "5341ce8da2a1"
+  },
+  "warehouse|de|import.stubsCreated": {
+    "one": "a74f15fc161f",
+    "other": "9fe82998179f"
+  },
+  "warehouse|de|import.success": {
+    "one": "08643f56d544",
+    "other": "f3dbffb4a793"
+  },
+  "warehouse|de|openingStock.added": {
+    "one": "57ae4bfd9a0e",
+    "other": "e13de9f689fc"
+  },
+  "warehouse|de|openingStock.stubsCreated": {
+    "one": "22f8b4a1413c",
+    "other": "b5d6de755599"
+  },
+  "warehouse|de|picker.lineCount": {
+    "one": "05f64e303294",
+    "other": "9ad8ddb497b4"
+  },
+  "warehouse|de|picker.selectedCount": {
+    "one": "678948d4d96f",
+    "other": "5e05e6cc3e0c"
+  },
+  "warehouse|de|picking.summary_picked": {
+    "one": "6d4266fd3a10",
+    "other": "0dd6436afaec"
+  },
+  "warehouse|de|picking.summary_short": {
+    "one": "159d8ca61667",
+    "other": "5cad2620a235"
+  },
+  "warehouse|de|picking.summary_skipped": {
+    "one": "507d5f097c76",
+    "other": "3b80defc3f05"
+  },
+  "warehouse|de|profile.numberPaddingDigits": {
+    "one": "b96685e6c601",
+    "other": "0cc8bc719b36"
+  },
+  "warehouse|de|returns.createButton": {
+    "one": "dab65f0fc727",
+    "other": "2a1b4d2b87b6"
+  },
+  "warehouse|de|targetSummary.linesCount": {
+    "one": "96787c6bb7f0",
+    "other": "5341ce8da2a1"
+  },
+  "warehouse|en|approvalsQueue.bulkApprove": {
+    "one": "26e389d2edfe",
+    "other": "88bace423895"
+  },
+  "warehouse|en|approvalsQueue.bulkApproveConfirmMessage": {
+    "one": "ca4754071cf3",
+    "other": "e35c94d0f472"
+  },
+  "warehouse|en|approvalsQueue.bulkApproveFailed": {
+    "one": "24e69572c3ab",
+    "other": "1a84355b8e33"
+  },
+  "warehouse|en|approvalsQueue.bulkApproveSuccess": {
+    "one": "b617ca607fd1",
+    "other": "e1b17d6f088e"
+  },
+  "warehouse|en|approvalsQueue.moreLines": {
+    "one": "cd72fd11f294",
+    "other": "e4db7ddb9cb7"
+  },
+  "warehouse|en|approvalsQueue.selectedCount": {
+    "one": "0e222355f523",
+    "other": "c7f761b38b19"
+  },
+  "warehouse|en|bulk.deleteConfirm": {
+    "one": "d6a89cef652e",
+    "other": "cf17cc0ee4e7"
+  },
+  "warehouse|en|bulk.deleteDrafts": {
+    "one": "5ee75200685d",
+    "other": "7d63bb24c109"
+  },
+  "warehouse|en|bulk.deleteFailed": {
+    "one": "9eebf2d69f4a",
+    "other": "a5c126ddd4e5"
+  },
+  "warehouse|en|bulk.deleteSuccess": {
+    "one": "5ee14ae69220",
+    "other": "416d7bd146d8"
+  },
+  "warehouse|en|bulk.draftsCount": {
+    "one": "19cc4a5058dd",
+    "other": "734c35790ee2"
+  },
+  "warehouse|en|bulk.exportSuccess": {
+    "one": "69ac728b608b",
+    "other": "c65c847e4d1d"
+  },
+  "warehouse|en|bulk.selectedCount": {
+    "one": "0e222355f523",
+    "other": "c7f761b38b19"
+  },
+  "warehouse|en|corrections.createButton": {
+    "one": "f1d85c501f30",
+    "other": "2094d2c32614"
+  },
+  "warehouse|en|detail.linesCount": {
+    "one": "84df0cdf8f86",
+    "other": "e90b5c8a4def"
+  },
+  "warehouse|en|detail.summaryDone": {
+    "one": "0fc391b62857",
+    "other": "fbdaa963475e"
+  },
+  "warehouse|en|detail.summaryExceptions": {
+    "one": "b3f3f402a565",
+    "other": "cfe3a27b5125"
+  },
+  "warehouse|en|detail.summaryPartial": {
+    "one": "2044b02ac973",
+    "other": "29aa3cd95328"
+  },
+  "warehouse|en|detail.summaryPending": {
+    "one": "bd8cbe8549b4",
+    "other": "055299ad9447"
+  },
+  "warehouse|en|detail.summaryRemaining": {
+    "one": "80b275b348d5",
+    "other": "e646024a89b1"
+  },
+  "warehouse|en|fields.linesCount": {
+    "one": "84df0cdf8f86",
+    "other": "e90b5c8a4def"
+  },
+  "warehouse|en|import.rowCount": {
+    "one": "d60902719410",
+    "other": "3d5889908e66"
+  },
+  "warehouse|en|import.stubsCreated": {
+    "one": "d6d127852252",
+    "other": "f1fec8a6f924"
+  },
+  "warehouse|en|import.success": {
+    "one": "d9b3de927701",
+    "other": "643483acafcb"
+  },
+  "warehouse|en|openingStock.added": {
+    "one": "1c591cb27ae9",
+    "other": "7e8515301bb4"
+  },
+  "warehouse|en|openingStock.stubsCreated": {
+    "one": "461aed25d1ef",
+    "other": "3792a4ffb953"
+  },
+  "warehouse|en|picker.lineCount": {
+    "one": "d1ecad4ae1d1",
+    "other": "34d726f8f741"
+  },
+  "warehouse|en|picker.selectedCount": {
+    "one": "d7f1bf9254f7",
+    "other": "34d93854c76b"
+  },
+  "warehouse|en|picking.summary_picked": {
+    "one": "7677b3faf247",
+    "other": "354f845bc458"
+  },
+  "warehouse|en|picking.summary_short": {
+    "one": "def3501c56ef",
+    "other": "36117da32c91"
+  },
+  "warehouse|en|picking.summary_skipped": {
+    "one": "1295031070ed",
+    "other": "dd5b4713afc4"
+  },
+  "warehouse|en|profile.numberPaddingDigits": {
+    "one": "f4670e85c427",
+    "other": "12cba34166cc"
+  },
+  "warehouse|en|returns.createButton": {
+    "one": "4e8840216199",
+    "other": "0cf97ff18ff7"
+  },
+  "warehouse|en|targetSummary.linesCount": {
+    "one": "84df0cdf8f86",
+    "other": "e90b5c8a4def"
+  },
+  "warehouse|es|approvalsQueue.bulkApprove": {
+    "one": "70f7c42f0ccb",
+    "other": "9c1762e1ffc7"
+  },
+  "warehouse|es|approvalsQueue.bulkApproveConfirmMessage": {
+    "one": "0b8acc0f2251",
+    "other": "d281de0dbcaa"
+  },
+  "warehouse|es|approvalsQueue.bulkApproveFailed": {
+    "one": "182e70959d7c",
+    "other": "9dc5631826a8"
+  },
+  "warehouse|es|approvalsQueue.bulkApproveSuccess": {
+    "one": "fdf27fa5df26",
+    "other": "598761755735"
+  },
+  "warehouse|es|approvalsQueue.moreLines": {
+    "one": "ad10aef7a82f",
+    "other": "4c19b42b8331"
+  },
+  "warehouse|es|approvalsQueue.selectedCount": {
+    "one": "5193a5ae8413",
+    "other": "044e8a762167"
+  },
+  "warehouse|es|bulk.deleteConfirm": {
+    "one": "dc92b895e40e",
+    "other": "9bf457908a58"
+  },
+  "warehouse|es|bulk.deleteDrafts": {
+    "one": "91be166f0f1d",
+    "other": "958d74d8fd85"
+  },
+  "warehouse|es|bulk.deleteFailed": {
+    "one": "f3c1d1b54227",
+    "other": "1c9e4739f31a"
+  },
+  "warehouse|es|bulk.deleteSuccess": {
+    "one": "7dbcd77a2aee",
+    "other": "a4bc41311fe4"
+  },
+  "warehouse|es|bulk.draftsCount": {
+    "one": "dde0b05e5556",
+    "other": "29e46229527e"
+  },
+  "warehouse|es|bulk.exportSuccess": {
+    "one": "c2d04fada4a5",
+    "other": "41306c7b417d"
+  },
+  "warehouse|es|bulk.selectedCount": {
+    "one": "5193a5ae8413",
+    "other": "044e8a762167"
+  },
+  "warehouse|es|corrections.createButton": {
+    "one": "5991675cb68a",
+    "other": "e83b879a63a8"
+  },
+  "warehouse|es|detail.linesCount": {
+    "one": "8ac778ae6372",
+    "other": "a05cd7a88da1"
+  },
+  "warehouse|es|detail.summaryDone": {
+    "one": "a3cec87e05fa",
+    "other": "76765f1a1462"
+  },
+  "warehouse|es|detail.summaryExceptions": {
+    "one": "e41ab1130455",
+    "other": "6a2a552fa486"
+  },
+  "warehouse|es|detail.summaryPartial": {
+    "one": "8aa70d94293d",
+    "other": "2894b85466fa"
+  },
+  "warehouse|es|detail.summaryPending": {
+    "one": "62cc5a534236",
+    "other": "8b53079a21f7"
+  },
+  "warehouse|es|detail.summaryRemaining": {
+    "one": "e8db3f889e37",
+    "other": "811b05978f36"
+  },
+  "warehouse|es|fields.linesCount": {
+    "one": "8ac778ae6372",
+    "other": "a05cd7a88da1"
+  },
+  "warehouse|es|import.rowCount": {
+    "one": "3d586bbf9eb8",
+    "other": "82d30e0c0843"
+  },
+  "warehouse|es|import.stubsCreated": {
+    "one": "78c41891cee6",
+    "other": "d4c97e1ef255"
+  },
+  "warehouse|es|import.success": {
+    "one": "05f1ae66e813",
+    "other": "1eac7778bd78"
+  },
+  "warehouse|es|openingStock.added": {
+    "one": "58c26212f843",
+    "other": "58d847032898"
+  },
+  "warehouse|es|openingStock.stubsCreated": {
+    "one": "c352853e93e5",
+    "other": "54c3c67aadee"
+  },
+  "warehouse|es|picker.lineCount": {
+    "one": "d8d8608508a6",
+    "other": "c48fcd9a97df"
+  },
+  "warehouse|es|picker.selectedCount": {
+    "one": "2048319eb975",
+    "other": "ee109852c0ac"
+  },
+  "warehouse|es|picking.summary_picked": {
+    "one": "6fdbc8c40b39",
+    "other": "1c5268151118"
+  },
+  "warehouse|es|picking.summary_short": {
+    "one": "4b8b5d33e84f",
+    "other": "519eff806e1e"
+  },
+  "warehouse|es|picking.summary_skipped": {
+    "one": "7cbd16ee71ee",
+    "other": "24cc995523a3"
+  },
+  "warehouse|es|profile.numberPaddingDigits": {
+    "one": "d3ed1105653a",
+    "other": "e281bd3b7e62"
+  },
+  "warehouse|es|returns.createButton": {
+    "one": "009736fce942",
+    "other": "e16d2ad42262"
+  },
+  "warehouse|es|targetSummary.linesCount": {
+    "one": "8ac778ae6372",
+    "other": "a05cd7a88da1"
+  },
+  "warehouse|fr|approvalsQueue.bulkApprove": {
+    "one": "93c73368f0c3",
+    "other": "dddd654690b9"
+  },
+  "warehouse|fr|approvalsQueue.bulkApproveConfirmMessage": {
+    "one": "d4035b0e7f5d",
+    "other": "3082254f9f0f"
+  },
+  "warehouse|fr|approvalsQueue.bulkApproveFailed": {
+    "one": "b6a97099cfb2",
+    "other": "3aa939b69fc2"
+  },
+  "warehouse|fr|approvalsQueue.bulkApproveSuccess": {
+    "one": "1394680721eb",
+    "other": "2669431b7d55"
+  },
+  "warehouse|fr|approvalsQueue.moreLines": {
+    "one": "0a2707b35a72",
+    "other": "5792cce5643a"
+  },
+  "warehouse|fr|approvalsQueue.selectedCount": {
+    "one": "1d45246c84e9",
+    "other": "350263c1abed"
+  },
+  "warehouse|fr|bulk.deleteConfirm": {
+    "one": "cab5d75b4ccf",
+    "other": "f9b952dab483"
+  },
+  "warehouse|fr|bulk.deleteDrafts": {
+    "one": "fecb0e450365",
+    "other": "419689df6c64"
+  },
+  "warehouse|fr|bulk.deleteFailed": {
+    "one": "3d15857b66ec",
+    "other": "7f9dc9852e4a"
+  },
+  "warehouse|fr|bulk.deleteSuccess": {
+    "one": "1659fc902d4c",
+    "other": "9b73fa00654d"
+  },
+  "warehouse|fr|bulk.draftsCount": {
+    "one": "ac4b33a874c9",
+    "other": "7db94fe8f546"
+  },
+  "warehouse|fr|bulk.exportSuccess": {
+    "one": "43d8b291139d",
+    "other": "0297a0bd59b6"
+  },
+  "warehouse|fr|bulk.selectedCount": {
+    "one": "1d45246c84e9",
+    "other": "350263c1abed"
+  },
+  "warehouse|fr|corrections.createButton": {
+    "one": "be80ad814727",
+    "other": "cddd081fa90b"
+  },
+  "warehouse|fr|detail.linesCount": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "warehouse|fr|detail.summaryDone": {
+    "one": "13872ad77a9f",
+    "other": "bc44b7866a6f"
+  },
+  "warehouse|fr|detail.summaryExceptions": {
+    "one": "108933c1acdc",
+    "other": "d756a9f697ee"
+  },
+  "warehouse|fr|detail.summaryPartial": {
+    "one": "e238e2488a2f",
+    "other": "5c6c4cf317f9"
+  },
+  "warehouse|fr|detail.summaryPending": {
+    "one": "6b159d92c12c",
+    "other": "c18022a5a985"
+  },
+  "warehouse|fr|detail.summaryRemaining": {
+    "one": "c4b02a537df5",
+    "other": "400e25d4ef5e"
+  },
+  "warehouse|fr|fields.linesCount": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "warehouse|fr|import.rowCount": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "warehouse|fr|import.stubsCreated": {
+    "one": "7665970cdcd3",
+    "other": "1413dcb711e5"
+  },
+  "warehouse|fr|import.success": {
+    "one": "220e0d254799",
+    "other": "22d9d41009bc"
+  },
+  "warehouse|fr|openingStock.added": {
+    "one": "39166f731b48",
+    "other": "b9bd57ced420"
+  },
+  "warehouse|fr|openingStock.stubsCreated": {
+    "one": "e464c44e8a5a",
+    "other": "d5ef4440b4ea"
+  },
+  "warehouse|fr|picker.lineCount": {
+    "one": "b0a381a4b254",
+    "other": "e0fa49931663"
+  },
+  "warehouse|fr|picker.selectedCount": {
+    "one": "e59463c28ebf",
+    "other": "bc78b249ba72"
+  },
+  "warehouse|fr|picking.summary_picked": {
+    "one": "627a8a5781c5",
+    "other": "0a798f923d27"
+  },
+  "warehouse|fr|picking.summary_short": {
+    "one": "879d3cf0b260",
+    "other": "a47d1a64172a"
+  },
+  "warehouse|fr|picking.summary_skipped": {
+    "one": "3feb93750c4b",
+    "other": "84f307f508c9"
+  },
+  "warehouse|fr|profile.numberPaddingDigits": {
+    "one": "9950e33c1baa",
+    "other": "fc7c3556ad36"
+  },
+  "warehouse|fr|returns.createButton": {
+    "one": "1556d4a1852b",
+    "other": "f9c8d732f072"
+  },
+  "warehouse|fr|targetSummary.linesCount": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "warehouse|pl|approvalsQueue.bulkApprove": {
+    "few": "802b766172b6",
+    "many": "eec2a2b231b7",
+    "one": "00593a0a870d",
+    "other": "eec2a2b231b7"
+  },
+  "warehouse|pl|approvalsQueue.bulkApproveConfirmMessage": {
+    "few": "9c7d22acf601",
+    "many": "6077446540bc",
+    "one": "32da4ef69cd1",
+    "other": "f0d901bf94f6"
+  },
+  "warehouse|pl|approvalsQueue.bulkApproveFailed": {
+    "few": "59c776c9b7a6",
+    "many": "59c776c9b7a6",
+    "one": "e7bcbc00b068",
+    "other": "225f0d0c86ae"
+  },
+  "warehouse|pl|approvalsQueue.bulkApproveSuccess": {
+    "few": "58b107ff21f5",
+    "many": "b40f5d8be601",
+    "one": "8d43e7f85f21",
+    "other": "b40f5d8be601"
+  },
+  "warehouse|pl|approvalsQueue.moreLines": {
+    "few": "98120a487aa3",
+    "many": "22f75cc0d098",
+    "one": "1ea0440ea456",
+    "other": "22f75cc0d098"
+  },
+  "warehouse|pl|approvalsQueue.selectedCount": {
+    "few": "f861a3eb4a72",
+    "many": "f861a3eb4a72",
+    "one": "7df90e05ff8b",
+    "other": "f861a3eb4a72"
+  },
+  "warehouse|pl|bulk.deleteConfirm": {
+    "few": "93bb318f48cb",
+    "many": "e45303186bec",
+    "one": "d85adb37cda8",
+    "other": "e45303186bec"
+  },
+  "warehouse|pl|bulk.deleteDrafts": {
+    "few": "500e7ea00596",
+    "many": "6975c1c80057",
+    "one": "86f0ac583dfe",
+    "other": "6975c1c80057"
+  },
+  "warehouse|pl|bulk.deleteFailed": {
+    "few": "11eec696a54a",
+    "many": "11eec696a54a",
+    "one": "018c87aa285e",
+    "other": "11eec696a54a"
+  },
+  "warehouse|pl|bulk.deleteSuccess": {
+    "few": "d5d5eb0abd81",
+    "many": "0eaedb42958b",
+    "one": "8de0ed54a15f",
+    "other": "0eaedb42958b"
+  },
+  "warehouse|pl|bulk.draftsCount": {
+    "few": "bcc8a2dcefe1",
+    "many": "d039075b8daf",
+    "one": "7c60d76f2230",
+    "other": "d039075b8daf"
+  },
+  "warehouse|pl|bulk.exportSuccess": {
+    "few": "f48a9edcd4ba",
+    "many": "f955d613a1bd",
+    "one": "19ef39291cf8",
+    "other": "f955d613a1bd"
+  },
+  "warehouse|pl|bulk.selectedCount": {
+    "few": "83c45589a992",
+    "many": "83c45589a992",
+    "one": "e95bf6293202",
+    "other": "83c45589a992"
+  },
+  "warehouse|pl|corrections.createButton": {
+    "few": "b230e3adaa2a",
+    "many": "05d330d175a3",
+    "one": "d9ef5d9f1022",
+    "other": "05d330d175a3"
+  },
+  "warehouse|pl|detail.linesCount": {
+    "few": "1575f1bb26ac",
+    "many": "b03d681402d6",
+    "one": "5982e5f0f1f4",
+    "other": "b03d681402d6"
+  },
+  "warehouse|pl|detail.summaryDone": {
+    "few": "31ae19d626fe",
+    "many": "31ae19d626fe",
+    "one": "fecf93138d22",
+    "other": "31ae19d626fe"
+  },
+  "warehouse|pl|detail.summaryExceptions": {
+    "few": "345cc1aaafbb",
+    "many": "345cc1aaafbb",
+    "one": "273fc56f7fdc",
+    "other": "345cc1aaafbb"
+  },
+  "warehouse|pl|detail.summaryPartial": {
+    "few": "001511619978",
+    "many": "001511619978",
+    "one": "b42b4a562e34",
+    "other": "001511619978"
+  },
+  "warehouse|pl|detail.summaryPending": {
+    "few": "c82fd4f305f9",
+    "many": "c82fd4f305f9",
+    "one": "90128c052ab1",
+    "other": "c82fd4f305f9"
+  },
+  "warehouse|pl|detail.summaryRemaining": {
+    "few": "60bcdb741765",
+    "many": "03c35233bf15",
+    "one": "032b1923cd07",
+    "other": "03c35233bf15"
+  },
+  "warehouse|pl|fields.linesCount": {
+    "few": "1575f1bb26ac",
+    "many": "b03d681402d6",
+    "one": "5982e5f0f1f4",
+    "other": "b03d681402d6"
+  },
+  "warehouse|pl|import.rowCount": {
+    "few": "bf678e47b22e",
+    "many": "b9598f0c78ca",
+    "one": "c1f0efa8662f",
+    "other": "b9598f0c78ca"
+  },
+  "warehouse|pl|import.stubsCreated": {
+    "few": "8e8216d820c2",
+    "many": "b35e30db9884",
+    "one": "fc0cec2da7e8",
+    "other": "b35e30db9884"
+  },
+  "warehouse|pl|import.success": {
+    "few": "fd7c9dfa2f2e",
+    "many": "42497bc0f163",
+    "one": "e4b397b6c15c",
+    "other": "42497bc0f163"
+  },
+  "warehouse|pl|openingStock.added": {
+    "few": "b280d349660f",
+    "many": "84ae140f1168",
+    "one": "c6fd9bc8062d",
+    "other": "84ae140f1168"
+  },
+  "warehouse|pl|openingStock.stubsCreated": {
+    "few": "b908bfda77c6",
+    "many": "697a22684d10",
+    "one": "8e1670dc617f",
+    "other": "daf32b7dcaf3"
+  },
+  "warehouse|pl|picker.lineCount": {
+    "few": "1575f1bb26ac",
+    "many": "b03d681402d6",
+    "one": "41e54a0c1620",
+    "other": "b03d681402d6"
+  },
+  "warehouse|pl|picker.selectedCount": {
+    "few": "4982e294bb5a",
+    "many": "cae0e9dc6754",
+    "one": "e3cc13dde463",
+    "other": "cae0e9dc6754"
+  },
+  "warehouse|pl|picking.summary_picked": {
+    "few": "0e12a324196d",
+    "many": "22a145fdddd5",
+    "one": "3f0c355a5264",
+    "other": "22a145fdddd5"
+  },
+  "warehouse|pl|picking.summary_short": {
+    "few": "926e20fad5dd",
+    "many": "926e20fad5dd",
+    "one": "986c53130c04",
+    "other": "926e20fad5dd"
+  },
+  "warehouse|pl|picking.summary_skipped": {
+    "few": "19de17690f05",
+    "many": "4416f8e7e60b",
+    "one": "3d7cc9f8b1a8",
+    "other": "4416f8e7e60b"
+  },
+  "warehouse|pl|profile.numberPaddingDigits": {
+    "few": "c491150284ea",
+    "many": "258e656cc8f2",
+    "one": "a99309431e8a",
+    "other": "258e656cc8f2"
+  },
+  "warehouse|pl|returns.createButton": {
+    "few": "d39b1d616eab",
+    "many": "516e82eeea8e",
+    "one": "c0a667e302f9",
+    "other": "516e82eeea8e"
+  },
+  "warehouse|pl|targetSummary.linesCount": {
+    "few": "ff2017d64200",
+    "many": "57c007d4ffbe",
+    "one": "ccf87e22c565",
+    "other": "57c007d4ffbe"
+  },
+  "equipment|de|assignments.show_remaining": {
+    "one": "1c28787c71b2",
+    "other": "4dca59cb8787"
+  },
+  "equipment|de|bulk_return.only_out": {
+    "one": "6cab3d81b24d",
+    "other": "60a781b58539"
+  },
+  "equipment|de|bulk_return.title": {
+    "one": "b96224245175",
+    "other": "dea85ad6075b"
+  },
+  "equipment|de|bulk.create": {
+    "one": "9e61417122cb",
+    "other": "44c4bc419ab1"
+  },
+  "equipment|de|bulk.detected": {
+    "one": "a0a821dd3ed5",
+    "other": "3b580f5004dd"
+  },
+  "equipment|de|bulk.generate": {
+    "one": "c3c1828802c9",
+    "other": "1f7ed9163bef"
+  },
+  "equipment|de|bulk.labelsAssigned": {
+    "one": "cfe2f077f4a9",
+    "other": "b61a48bddb0f"
+  },
+  "equipment|de|bulk.success": {
+    "one": "e21ff06f03f1",
+    "other": "fe10933dd904"
+  },
+  "equipment|de|dashboard.expires_in": {
+    "one": "541c047105b3",
+    "other": "d44ad9be96b5"
+  },
+  "equipment|de|import.rows_found": {
+    "one": "ebe3cbb4efcb",
+    "other": "511d7497e556"
+  },
+  "equipment|de|list.bulk_archived": {
+    "one": "f66589cb25bd",
+    "other": "815733a1eb97"
+  },
+  "equipment|de|list.bulk_done": {
+    "one": "0c89056c5cb4",
+    "other": "0c89056c5cb4"
+  },
+  "equipment|de|list.bulk_edited": {
+    "one": "697288412834",
+    "other": "5bfd6d863328"
+  },
+  "equipment|de|list.bulk_failed": {
+    "one": "f38220c25e55",
+    "other": "f38220c25e55"
+  },
+  "equipment|de|list.bulk_failed_more": {
+    "one": "c5e7e348fe29",
+    "other": "e5d4a351dfff"
+  },
+  "equipment|de|list.bulk_purged": {
+    "one": "fb52fef5408c",
+    "other": "fc20d246bebb"
+  },
+  "equipment|de|list.bulk_retired": {
+    "one": "da961683e3ad",
+    "other": "e9abb3067692"
+  },
+  "equipment|de|list.bulk_returned": {
+    "one": "558a4ee45703",
+    "other": "76d7c60631f2"
+  },
+  "equipment|de|list.confirm_bulk_archive": {
+    "one": "b45790fa965e",
+    "other": "aa051fa53288"
+  },
+  "equipment|de|list.confirm_bulk_purge": {
+    "one": "81d733d5c6fa",
+    "other": "2c2045206c0b"
+  },
+  "equipment|de|list.confirm_bulk_retire": {
+    "one": "9ee9232fa7c9",
+    "other": "05a5a2e25680"
+  },
+  "equipment|de|list.selected": {
+    "one": "a91422bc04bb",
+    "other": "a91422bc04bb"
+  },
+  "equipment|de|list.selection_all_matching": {
+    "one": "2726b7b23d3a",
+    "other": "32ae4f423f8c"
+  },
+  "equipment|de|list.selection_page_only": {
+    "one": "33edf2f37a94",
+    "other": "e4bdf17a887d"
+  },
+  "equipment|de|list.showing": {
+    "one": "b4b5bce55a66",
+    "other": "3ebd72e34636"
+  },
+  "equipment|de|locations.cannotDeleteHolding": {
+    "one": "df279c04ade9",
+    "other": "43feb2091a71"
+  },
+  "equipment|de|locations.holding": {
+    "one": "35c0009ccad5",
+    "other": "9cc626b230bd"
+  },
+  "equipment|de|locations.holdingTotal": {
+    "one": "8e164ff85052",
+    "other": "c70ca23cc819"
+  },
+  "equipment|de|valuation.excluded_note": {
+    "one": "680cb7df0ecd",
+    "other": "a65931a3bfa0"
+  },
+  "equipment|en|assignments.show_remaining": {
+    "one": "fc31f0f2c200",
+    "other": "d94a0e3b18cc"
+  },
+  "equipment|en|bulk_return.only_out": {
+    "one": "27348485989f",
+    "other": "09249864a35f"
+  },
+  "equipment|en|bulk_return.title": {
+    "one": "27227901c67e",
+    "other": "9eac2d1abcef"
+  },
+  "equipment|en|bulk.create": {
+    "one": "319c3bc80209",
+    "other": "9632df5220ca"
+  },
+  "equipment|en|bulk.detected": {
+    "one": "6100730ac2b3",
+    "other": "36052909292c"
+  },
+  "equipment|en|bulk.generate": {
+    "one": "45cd92f85d47",
+    "other": "786569bcc56b"
+  },
+  "equipment|en|bulk.labelsAssigned": {
+    "one": "886df67310cf",
+    "other": "00209ba28cde"
+  },
+  "equipment|en|bulk.success": {
+    "one": "a343088f951e",
+    "other": "0eec44f4e2b6"
+  },
+  "equipment|en|dashboard.expires_in": {
+    "one": "85a5c26aa6ba",
+    "other": "b068472ef673"
+  },
+  "equipment|en|import.rows_found": {
+    "one": "00cabdae00a0",
+    "other": "a3f4a4bd5bf1"
+  },
+  "equipment|en|list.bulk_archived": {
+    "one": "d9b53ee922ff",
+    "other": "f3581ff03cc4"
+  },
+  "equipment|en|list.bulk_done": {
+    "one": "222b035654ec",
+    "other": "222b035654ec"
+  },
+  "equipment|en|list.bulk_edited": {
+    "one": "ab998f8ad921",
+    "other": "9b1f73f09a8f"
+  },
+  "equipment|en|list.bulk_failed": {
+    "one": "4d0a375e62ef",
+    "other": "4d0a375e62ef"
+  },
+  "equipment|en|list.bulk_failed_more": {
+    "one": "16981f4b49fd",
+    "other": "25a067fd69ff"
+  },
+  "equipment|en|list.bulk_purged": {
+    "one": "a4bc8432d798",
+    "other": "21374ec942a3"
+  },
+  "equipment|en|list.bulk_retired": {
+    "one": "336e8cd620a9",
+    "other": "011f432a9e08"
+  },
+  "equipment|en|list.bulk_returned": {
+    "one": "faf6ab64eca0",
+    "other": "c5665f5fb306"
+  },
+  "equipment|en|list.confirm_bulk_archive": {
+    "one": "f61f1ef80207",
+    "other": "73c7040d0617"
+  },
+  "equipment|en|list.confirm_bulk_purge": {
+    "one": "2be3b6194c8f",
+    "other": "580afa90ffaa"
+  },
+  "equipment|en|list.confirm_bulk_retire": {
+    "one": "ddf4eeb436c0",
+    "other": "85a904aff54b"
+  },
+  "equipment|en|list.selected": {
+    "one": "c7f761b38b19",
+    "other": "c7f761b38b19"
+  },
+  "equipment|en|list.selection_all_matching": {
+    "one": "f4135dfcffe9",
+    "other": "3ec150ef8973"
+  },
+  "equipment|en|list.selection_page_only": {
+    "one": "4fc19d8ed3d3",
+    "other": "a500e3bb21b9"
+  },
+  "equipment|en|list.showing": {
+    "one": "54713993bc4b",
+    "other": "81f7a0f4511f"
+  },
+  "equipment|en|locations.cannotDeleteHolding": {
+    "one": "d7090c2d6719",
+    "other": "9fbc7eeb99cb"
+  },
+  "equipment|en|locations.holding": {
+    "one": "2d99f4f338b5",
+    "other": "c627c99d5c0f"
+  },
+  "equipment|en|locations.holdingTotal": {
+    "one": "62ff0ce69508",
+    "other": "ca68d9bddb01"
+  },
+  "equipment|en|valuation.excluded_note": {
+    "one": "fe9f1b4669f1",
+    "other": "fddef2899e1e"
+  },
+  "equipment|es|assignments.show_remaining": {
+    "one": "d393bda0b0e4",
+    "other": "06423299e152"
+  },
+  "equipment|es|bulk_return.only_out": {
+    "one": "91e9d97ee8fa",
+    "other": "4289544a5c19"
+  },
+  "equipment|es|bulk_return.title": {
+    "one": "ab0d1a0dca9f",
+    "other": "00a4fcbe4b37"
+  },
+  "equipment|es|bulk.create": {
+    "one": "0e05b4ba9fd3",
+    "other": "1c64dbd33642"
+  },
+  "equipment|es|bulk.detected": {
+    "one": "0e4546c163d9",
+    "other": "c18de04b2c9a"
+  },
+  "equipment|es|bulk.generate": {
+    "one": "0cba1047749f",
+    "other": "3075f87b24a3"
+  },
+  "equipment|es|bulk.labelsAssigned": {
+    "one": "f624ec48ea19",
+    "other": "9f15766e1aba"
+  },
+  "equipment|es|bulk.success": {
+    "one": "3835262c4897",
+    "other": "833907d5e1be"
+  },
+  "equipment|es|dashboard.expires_in": {
+    "one": "73f4ec9c49a9",
+    "other": "c955e80bb02a"
+  },
+  "equipment|es|import.rows_found": {
+    "one": "9a0be80e7cef",
+    "other": "704d1fa4997d"
+  },
+  "equipment|es|list.bulk_archived": {
+    "one": "a381b7df7346",
+    "other": "98ef9fce3759"
+  },
+  "equipment|es|list.bulk_done": {
+    "one": "7f82c1a28bd7",
+    "other": "7f82c1a28bd7"
+  },
+  "equipment|es|list.bulk_edited": {
+    "one": "92cc03fa14a4",
+    "other": "1ef432252fe4"
+  },
+  "equipment|es|list.bulk_failed": {
+    "one": "d7ed84d5e2fa",
+    "other": "d7ed84d5e2fa"
+  },
+  "equipment|es|list.bulk_failed_more": {
+    "one": "126d0f0809fd",
+    "other": "f37117519eb4"
+  },
+  "equipment|es|list.bulk_purged": {
+    "one": "e95fbbd2a7ad",
+    "other": "64da24df1c6a"
+  },
+  "equipment|es|list.bulk_retired": {
+    "one": "46bd1c5d6438",
+    "other": "2d33b95850b2"
+  },
+  "equipment|es|list.bulk_returned": {
+    "one": "3224123f0c5e",
+    "other": "cfc4ac9ec99c"
+  },
+  "equipment|es|list.confirm_bulk_archive": {
+    "one": "12917c081059",
+    "other": "8f7d303bebb4"
+  },
+  "equipment|es|list.confirm_bulk_purge": {
+    "one": "329833b403cc",
+    "other": "883b6524ccf3"
+  },
+  "equipment|es|list.confirm_bulk_retire": {
+    "one": "c9de04a59d4c",
+    "other": "e56ccbb53631"
+  },
+  "equipment|es|list.selected": {
+    "one": "8ae176b6db9f",
+    "other": "044e8a762167"
+  },
+  "equipment|es|list.selection_all_matching": {
+    "one": "111e949c8950",
+    "other": "4ad290155803"
+  },
+  "equipment|es|list.selection_page_only": {
+    "one": "c7f5d6e799e7",
+    "other": "8c80226e253f"
+  },
+  "equipment|es|list.showing": {
+    "one": "395c0889792b",
+    "other": "35acf7bf7340"
+  },
+  "equipment|es|locations.cannotDeleteHolding": {
+    "one": "525810faf69e",
+    "other": "d5d998bb29f7"
+  },
+  "equipment|es|locations.holding": {
+    "one": "bc56314d7f65",
+    "other": "d3757e4663ca"
+  },
+  "equipment|es|locations.holdingTotal": {
+    "one": "ef77ea5b1051",
+    "other": "56f484aa5f9c"
+  },
+  "equipment|es|valuation.excluded_note": {
+    "one": "413f9a826a99",
+    "other": "b11f38ce5887"
+  },
+  "equipment|fr|assignments.show_remaining": {
+    "one": "dffcf87fae2f",
+    "other": "2dfb12b2b885"
+  },
+  "equipment|fr|bulk_return.only_out": {
+    "one": "6397a51d63d3",
+    "other": "e11d8195e787"
+  },
+  "equipment|fr|bulk_return.title": {
+    "one": "02750c202d3c",
+    "other": "958e03e89df9"
+  },
+  "equipment|fr|bulk.create": {
+    "one": "a1a4c95cfff9",
+    "other": "c8ce7bebeef6"
+  },
+  "equipment|fr|bulk.detected": {
+    "one": "c75e23846de4",
+    "other": "e78387b9fbf5"
+  },
+  "equipment|fr|bulk.generate": {
+    "one": "4f4411b7d2ae",
+    "other": "3a2958ed6607"
+  },
+  "equipment|fr|bulk.labelsAssigned": {
+    "one": "d3dda8adea0e",
+    "other": "d78c5533f2a1"
+  },
+  "equipment|fr|bulk.success": {
+    "one": "f1e7bb9b7f65",
+    "other": "82371d90fe09"
+  },
+  "equipment|fr|dashboard.expires_in": {
+    "many": "860a34ac20b2",
+    "one": "502f0152ed65",
+    "other": "3d234565401c"
+  },
+  "equipment|fr|import.rows_found": {
+    "one": "bc34a80f5369",
+    "other": "fa14ed4b7da4"
+  },
+  "equipment|fr|list.bulk_archived": {
+    "one": "5694314f52cf",
+    "other": "c99e5d524bb2"
+  },
+  "equipment|fr|list.bulk_done": {
+    "one": "494288dd1e53",
+    "other": "f977b3e974ef"
+  },
+  "equipment|fr|list.bulk_edited": {
+    "one": "abde46103b8f",
+    "other": "2d05e1565e1b"
+  },
+  "equipment|fr|list.bulk_failed": {
+    "one": "13a49e78f31a",
+    "other": "2cf139a46595"
+  },
+  "equipment|fr|list.bulk_failed_more": {
+    "one": "6102887c6249",
+    "other": "70ade1cda63b"
+  },
+  "equipment|fr|list.bulk_purged": {
+    "one": "963b54ae9a49",
+    "other": "326de8de3077"
+  },
+  "equipment|fr|list.bulk_retired": {
+    "one": "e51749f24157",
+    "other": "864e6a2d17c6"
+  },
+  "equipment|fr|list.bulk_returned": {
+    "one": "0a51f4f6cd4a",
+    "other": "21d7a114021b"
+  },
+  "equipment|fr|list.confirm_bulk_archive": {
+    "one": "76c5bd19750d",
+    "other": "282eaa40612b"
+  },
+  "equipment|fr|list.confirm_bulk_purge": {
+    "one": "349df31b3241",
+    "other": "588801eab0e5"
+  },
+  "equipment|fr|list.confirm_bulk_retire": {
+    "one": "ec7eee5bba3d",
+    "other": "89f0aa3a5dcb"
+  },
+  "equipment|fr|list.selected": {
+    "one": "e27d211a1113",
+    "other": "350263c1abed"
+  },
+  "equipment|fr|list.selection_all_matching": {
+    "one": "6819a4eb881a",
+    "other": "383a5c0d83f5"
+  },
+  "equipment|fr|list.selection_page_only": {
+    "one": "a8fda4e21772",
+    "other": "e7d9a523dbee"
+  },
+  "equipment|fr|list.showing": {
+    "one": "463ead056ca6",
+    "other": "b5aed9427933"
+  },
+  "equipment|fr|locations.cannotDeleteHolding": {
+    "one": "1b796471616b",
+    "other": "3b1804047b50"
+  },
+  "equipment|fr|locations.holding": {
+    "one": "b51202218337",
+    "other": "c66a2465b95e"
+  },
+  "equipment|fr|locations.holdingTotal": {
+    "one": "5c8c61e8f314",
+    "other": "a287cb8b055e"
+  },
+  "equipment|fr|valuation.excluded_note": {
+    "one": "d33c7a6a1c42",
+    "other": "a270aead8a25"
+  },
+  "equipment|pl|assignments.show_remaining": {
+    "few": "e1b9ae3ecf05",
+    "many": "e1b9ae3ecf05",
+    "one": "dbe68fe0083f",
+    "other": "e1b9ae3ecf05"
+  },
+  "equipment|pl|bulk_return.only_out": {
+    "few": "dca77a7010ef",
+    "many": "1e1346a51fcb",
+    "one": "c75e5d4ba843",
+    "other": "1e1346a51fcb"
+  },
+  "equipment|pl|bulk_return.title": {
+    "few": "61d458dfa735",
+    "many": "8a952235eea9",
+    "one": "ebbf346fe323",
+    "other": "8a952235eea9"
+  },
+  "equipment|pl|bulk.create": {
+    "few": "f15f3926cde8",
+    "many": "e066afce5535",
+    "one": "f5eb6bc4aa54",
+    "other": "e066afce5535"
+  },
+  "equipment|pl|bulk.detected": {
+    "few": "db6efb9144f8",
+    "many": "7d07162a8053",
+    "one": "2c869cb41aba",
+    "other": "7d07162a8053"
+  },
+  "equipment|pl|bulk.generate": {
+    "few": "9e34c0004fde",
+    "many": "819c66cc613e",
+    "one": "08c7a8b58a68",
+    "other": "819c66cc613e"
+  },
+  "equipment|pl|bulk.labelsAssigned": {
+    "few": "2a826ddaaa66",
+    "many": "b21166a4f09c",
+    "one": "3c6f827bea8b",
+    "other": "b21166a4f09c"
+  },
+  "equipment|pl|bulk.success": {
+    "few": "9e7677242b98",
+    "many": "1ee0b7f920f3",
+    "one": "7b1b4794534d",
+    "other": "1ee0b7f920f3"
+  },
+  "equipment|pl|dashboard.expires_in": {
+    "few": "1a2f8721dea7",
+    "many": "1a2f8721dea7",
+    "one": "d075f88a66b9",
+    "other": "e67ef025683d"
+  },
+  "equipment|pl|import.rows_found": {
+    "few": "0dcd8451221a",
+    "many": "983deac2edff",
+    "one": "67a58941d12d",
+    "other": "983deac2edff"
+  },
+  "equipment|pl|list.bulk_archived": {
+    "few": "77a87267436f",
+    "many": "f24d897aed01",
+    "one": "f11c13160d41",
+    "other": "f24d897aed01"
+  },
+  "equipment|pl|list.bulk_done": {
+    "few": "a1a8abde6a5a",
+    "many": "6af568cd9036",
+    "one": "818fdaba4def",
+    "other": "6af568cd9036"
+  },
+  "equipment|pl|list.bulk_edited": {
+    "few": "c1b12d98d6af",
+    "many": "daf143c8f69f",
+    "one": "b68284828985",
+    "other": "daf143c8f69f"
+  },
+  "equipment|pl|list.bulk_failed": {
+    "few": "733da4da6af6",
+    "many": "d812a2657f25",
+    "one": "ce317e2dd57b",
+    "other": "d812a2657f25"
+  },
+  "equipment|pl|list.bulk_failed_more": {
+    "few": "001af65c2e51",
+    "many": "001af65c2e51",
+    "one": "b3319a5cccd3",
+    "other": "001af65c2e51"
+  },
+  "equipment|pl|list.bulk_purged": {
+    "few": "98b65dc9ceeb",
+    "many": "1a7ee5ccf92e",
+    "one": "9c5874da0fd2",
+    "other": "1a7ee5ccf92e"
+  },
+  "equipment|pl|list.bulk_retired": {
+    "few": "ac2e4e28427a",
+    "many": "554fc3ce91f5",
+    "one": "f805c87bd36a",
+    "other": "554fc3ce91f5"
+  },
+  "equipment|pl|list.bulk_returned": {
+    "few": "807bdc98317d",
+    "many": "56ac3a796886",
+    "one": "34f8c579d9d8",
+    "other": "56ac3a796886"
+  },
+  "equipment|pl|list.confirm_bulk_archive": {
+    "few": "e604e44d6127",
+    "many": "0cbd933f7872",
+    "one": "35cd5d627d48",
+    "other": "0cbd933f7872"
+  },
+  "equipment|pl|list.confirm_bulk_purge": {
+    "few": "08a8fd71333c",
+    "many": "956effabc9c9",
+    "one": "6f62098c6dc3",
+    "other": "956effabc9c9"
+  },
+  "equipment|pl|list.confirm_bulk_retire": {
+    "few": "dd880e4724cd",
+    "many": "3d45e875dce4",
+    "one": "a5271125a670",
+    "other": "3d45e875dce4"
+  },
+  "equipment|pl|list.selected": {
+    "few": "1ff11b9d095a",
+    "many": "1ff11b9d095a",
+    "one": "1ff11b9d095a",
+    "other": "1ff11b9d095a"
+  },
+  "equipment|pl|list.selection_all_matching": {
+    "few": "d9aedbdb323c",
+    "many": "32da83eff708",
+    "one": "9e3b576baa3d",
+    "other": "32da83eff708"
+  },
+  "equipment|pl|list.selection_page_only": {
+    "few": "52ee2b10191d",
+    "many": "5dc26eb1eef0",
+    "one": "9b6f0f995452",
+    "other": "5dc26eb1eef0"
+  },
+  "equipment|pl|list.showing": {
+    "few": "3dc0e4b909cd",
+    "many": "b5eda34aff5d",
+    "one": "9c2e08557e7d",
+    "other": "b5eda34aff5d"
+  },
+  "equipment|pl|locations.cannotDeleteHolding": {
+    "few": "3b358be0690d",
+    "many": "66916147d7e7",
+    "one": "29ae2a25557e",
+    "other": "66916147d7e7"
+  },
+  "equipment|pl|locations.holding": {
+    "few": "cfec3d721b26",
+    "many": "0648e12f6043",
+    "one": "6b16d7e3faf4",
+    "other": "0648e12f6043"
+  },
+  "equipment|pl|locations.holdingTotal": {
+    "few": "fb62e669492f",
+    "many": "fc42257dd81f",
+    "one": "3a91cd77f52a",
+    "other": "fc42257dd81f"
+  },
+  "equipment|pl|valuation.excluded_note": {
+    "few": "45b5cfff2fd3",
+    "many": "5f1ab1baf30c",
+    "one": "30bb6921d0e9",
+    "other": "5f1ab1baf30c"
+  },
+  "inventory|de|asOf.excludedCurrency": {
+    "one": "21a9a9eb2c28",
+    "other": "26ee87f719b6"
+  },
+  "inventory|de|asOf.unpriced": {
+    "one": "dd3cc648c3ec",
+    "other": "92baeb9c1e26"
+  },
+  "inventory|de|lots.count": {
+    "one": "ff9f88ce353a",
+    "other": "3bb5fa1f70f3"
+  },
+  "inventory|de|moves.movements": {
+    "one": "1eaa52d0db4d",
+    "other": "06e68223b9ab"
+  },
+  "inventory|de|stock.rows": {
+    "one": "0f451c4e866b",
+    "other": "5d4fc5898f1f"
+  },
+  "inventory|en|asOf.excludedCurrency": {
+    "one": "6107bba11a7b",
+    "other": "9f2dcc626252"
+  },
+  "inventory|en|asOf.unpriced": {
+    "one": "e9b4377eefe4",
+    "other": "ae4ae8421124"
+  },
+  "inventory|en|lots.count": {
+    "one": "4bb24efc9641",
+    "other": "467629e63dbc"
+  },
+  "inventory|en|moves.movements": {
+    "one": "a637996908ea",
+    "other": "6084535fcddc"
+  },
+  "inventory|en|stock.rows": {
+    "one": "8f8354e89bc2",
+    "other": "5c5d99c3fb55"
+  },
+  "inventory|es|asOf.excludedCurrency": {
+    "one": "914e4a2d834b",
+    "other": "c565be84bbd3"
+  },
+  "inventory|es|asOf.unpriced": {
+    "one": "cc1f8412d281",
+    "other": "a2a92438ce94"
+  },
+  "inventory|es|lots.count": {
+    "one": "cbcc76b499e3",
+    "other": "b1d1e3e6c0a9"
+  },
+  "inventory|es|moves.movements": {
+    "one": "15ac7820af7e",
+    "other": "adf9b154de50"
+  },
+  "inventory|es|stock.rows": {
+    "one": "ea22748bff23",
+    "other": "ba180ad3e7f9"
+  },
+  "inventory|fr|asOf.excludedCurrency": {
+    "one": "3d7b435807da",
+    "other": "e75ba2a911f9"
+  },
+  "inventory|fr|asOf.unpriced": {
+    "one": "e5a001582225",
+    "other": "e8f73ea51032"
+  },
+  "inventory|fr|lots.count": {
+    "one": "b7b30d6e4f8c",
+    "other": "5ed8d9d5d91e"
+  },
+  "inventory|fr|moves.movements": {
+    "one": "a877d5cbf6e4",
+    "other": "b5f74879bbb7"
+  },
+  "inventory|fr|stock.rows": {
+    "one": "b73cdac8163a",
+    "other": "bbfd35bd499e"
+  },
+  "inventory|pl|asOf.excludedCurrency": {
+    "few": "8fab02c24c9e",
+    "many": "17951997b7df",
+    "one": "de358f1bc3d6",
+    "other": "3fcdf9395cd3"
+  },
+  "inventory|pl|asOf.unpriced": {
+    "few": "a84531bd3fbd",
+    "many": "eb13a08cd2f2",
+    "one": "31c6485da8b5",
+    "other": "a6b41c6d9849"
+  },
+  "inventory|pl|lots.count": {
+    "few": "d7910c6961a5",
+    "many": "081dd81a2d1c",
+    "one": "836d27f31517",
+    "other": "081dd81a2d1c"
+  },
+  "inventory|pl|moves.movements": {
+    "few": "b2fbaef19d5e",
+    "many": "41214554b66d",
+    "one": "2016d624afef",
+    "other": "644b3d5e6ec5"
+  },
+  "inventory|pl|stock.rows": {
+    "few": "6f5c45e6227f",
+    "many": "96319b9ddbf0",
+    "one": "396277afa5dc",
+    "other": "2ee38f880e73"
+  },
+  "items|de|bulkEdit.successUpdated": {
+    "one": "6d4744038dfb",
+    "other": "e761c0ef60d4"
+  },
+  "items|de|bulkEdit.title": {
+    "one": "b4f2d4962bb6",
+    "other": "b4f2d4962bb6"
+  },
+  "items|de|bulkEdit.warningText": {
+    "one": "e578854ed3b0",
+    "other": "5324172f1137"
+  },
+  "items|de|history.createdWith": {
+    "one": "9aac0b37284b",
+    "other": "9aac0b37284b"
+  },
+  "items|de|history.daysAgo": {
+    "one": "b86120df9df8",
+    "other": "9e82cfa402d7"
+  },
+  "items|de|history.hoursAgo": {
+    "one": "124259305dc1",
+    "other": "124259305dc1"
+  },
+  "items|de|history.minutesAgo": {
+    "one": "6b63e19421f5",
+    "other": "6b63e19421f5"
+  },
+  "items|de|import.added": {
+    "one": "5671b08db18c",
+    "other": "aa1f59e0a4c9"
+  },
+  "items|de|import.foundedCategories": {
+    "one": "794440a5d1e1",
+    "other": "acd668f046b2"
+  },
+  "items|de|import.foundedLocations": {
+    "one": "ee42075d6c8d",
+    "other": "496eaf3b81c7"
+  },
+  "items|de|import.matchedSkipped": {
+    "one": "523ab6fa59da",
+    "other": "4108f71e6286"
+  },
+  "items|de|import.matchedUpdated": {
+    "one": "6d4744038dfb",
+    "other": "e761c0ef60d4"
+  },
+  "items|de|messages.confirmBulkDelete": {
+    "one": "e4904876583b",
+    "other": "82dce528369a"
+  },
+  "items|de|messages.consumedOne": {
+    "one": "36ad45872b0f",
+    "other": "36ad45872b0f"
+  },
+  "items|de|totals.positions": {
+    "one": "4d1e1c15f6d6",
+    "other": "fbee80d20cb0"
+  },
+  "items|de|totals.unpriced": {
+    "one": "7d4ef3253d47",
+    "other": "19397c2485ef"
+  },
+  "items|en|bulkEdit.successUpdated": {
+    "one": "34632483df9a",
+    "other": "e11aaefa9175"
+  },
+  "items|en|bulkEdit.title": {
+    "one": "7fc23a65cb93",
+    "other": "7fc23a65cb93"
+  },
+  "items|en|bulkEdit.warningText": {
+    "one": "1e0b5844f9dd",
+    "other": "f6570ced1305"
+  },
+  "items|en|history.createdWith": {
+    "one": "0d133676724e",
+    "other": "0d133676724e"
+  },
+  "items|en|history.daysAgo": {
+    "one": "47c2a06f6d2f",
+    "other": "0d0d0a848ddf"
+  },
+  "items|en|history.hoursAgo": {
+    "one": "ca9d0a520ede",
+    "other": "ca9d0a520ede"
+  },
+  "items|en|history.minutesAgo": {
+    "one": "0af99095bbb8",
+    "other": "0af99095bbb8"
+  },
+  "items|en|import.added": {
+    "one": "cbba938cd3a2",
+    "other": "e85f84bbb2e0"
+  },
+  "items|en|import.foundedCategories": {
+    "one": "0ff44d13ba14",
+    "other": "b288ada4e8fc"
+  },
+  "items|en|import.foundedLocations": {
+    "one": "1dcac2a2e8c0",
+    "other": "62fc6046fe7b"
+  },
+  "items|en|import.matchedSkipped": {
+    "one": "d0dcd4b818a2",
+    "other": "e29bbc3502d8"
+  },
+  "items|en|import.matchedUpdated": {
+    "one": "022bb66666b5",
+    "other": "41a8cd0a6c13"
+  },
+  "items|en|messages.confirmBulkDelete": {
+    "one": "f33a3b44b163",
+    "other": "ff781ba3f017"
+  },
+  "items|en|messages.consumedOne": {
+    "one": "cde608d40bc7",
+    "other": "cde608d40bc7"
+  },
+  "items|en|totals.positions": {
+    "one": "d1fbdd9ecdb9",
+    "other": "817000856db5"
+  },
+  "items|en|totals.unpriced": {
+    "one": "f4cf8251de4e",
+    "other": "163ce7148cdd"
+  },
+  "items|es|bulkEdit.successUpdated": {
+    "one": "9946bc31db2f",
+    "other": "75ffeed546bc"
+  },
+  "items|es|bulkEdit.title": {
+    "one": "907c75026d13",
+    "other": "907c75026d13"
+  },
+  "items|es|bulkEdit.warningText": {
+    "one": "f983b8a8bc4f",
+    "other": "f50dbba3bef6"
+  },
+  "items|es|history.createdWith": {
+    "one": "4efbd8b19e7d",
+    "other": "4efbd8b19e7d"
+  },
+  "items|es|history.daysAgo": {
+    "one": "b981d6eea093",
+    "other": "49786b07c2ba"
+  },
+  "items|es|history.hoursAgo": {
+    "one": "8525552a0db6",
+    "other": "8525552a0db6"
+  },
+  "items|es|history.minutesAgo": {
+    "one": "5f81fcc3c37c",
+    "other": "5f81fcc3c37c"
+  },
+  "items|es|import.added": {
+    "one": "304e65f4a9eb",
+    "other": "c9e16fce86a9"
+  },
+  "items|es|import.foundedCategories": {
+    "one": "504085bc773a",
+    "other": "a5c7bab22e20"
+  },
+  "items|es|import.foundedLocations": {
+    "one": "c3782a4ed832",
+    "other": "71b6293c2dcb"
+  },
+  "items|es|import.matchedSkipped": {
+    "one": "50bc7223ccc7",
+    "other": "f84ac9c28264"
+  },
+  "items|es|import.matchedUpdated": {
+    "one": "9946bc31db2f",
+    "other": "75ffeed546bc"
+  },
+  "items|es|messages.confirmBulkDelete": {
+    "one": "d50a9afc0339",
+    "other": "e30acba8c08b"
+  },
+  "items|es|messages.consumedOne": {
+    "one": "2264272e2852",
+    "other": "21456e77a980"
+  },
+  "items|es|totals.positions": {
+    "one": "a6fca23c06e9",
+    "other": "d97ab1f43a92"
+  },
+  "items|es|totals.unpriced": {
+    "one": "73ee0e2a0054",
+    "other": "59fc99bda491"
+  },
+  "items|fr|bulkEdit.successUpdated": {
+    "one": "397c2f04bad6",
+    "other": "ba2c30d65001"
+  },
+  "items|fr|bulkEdit.title": {
+    "one": "7d2995404149",
+    "other": "7d2995404149"
+  },
+  "items|fr|bulkEdit.warningText": {
+    "one": "385e60a50d40",
+    "other": "2b6060a300f7"
+  },
+  "items|fr|history.createdWith": {
+    "one": "95f63c4cd128",
+    "other": "95f63c4cd128"
+  },
+  "items|fr|history.daysAgo": {
+    "one": "ba05901b7ad9",
+    "other": "e87ff85c34e9"
+  },
+  "items|fr|history.hoursAgo": {
+    "one": "aebac0aa9a11",
+    "other": "aebac0aa9a11"
+  },
+  "items|fr|history.minutesAgo": {
+    "one": "2eae418a6ca8",
+    "other": "2eae418a6ca8"
+  },
+  "items|fr|import.added": {
+    "one": "80dcbe05ac58",
+    "other": "6639f2ed463a"
+  },
+  "items|fr|import.foundedCategories": {
+    "one": "cdbdba440d42",
+    "other": "2cb2bf72d6a5"
+  },
+  "items|fr|import.foundedLocations": {
+    "one": "d6f8d28a4a08",
+    "other": "e8ad08e1dbe8"
+  },
+  "items|fr|import.matchedSkipped": {
+    "one": "6b338e86339b",
+    "other": "930b4b8014d1"
+  },
+  "items|fr|import.matchedUpdated": {
+    "one": "397c2f04bad6",
+    "other": "ba2c30d65001"
+  },
+  "items|fr|messages.confirmBulkDelete": {
+    "one": "5798482f6069",
+    "other": "0e49570b787a"
+  },
+  "items|fr|messages.consumedOne": {
+    "one": "018e0354d26c",
+    "other": "390fdd37398d"
+  },
+  "items|fr|totals.positions": {
+    "one": "ac9a28180b09",
+    "other": "337e44fea9d2"
+  },
+  "items|fr|totals.unpriced": {
+    "one": "143f96341d5f",
+    "other": "5b018e752baf"
+  },
+  "items|pl|bulkEdit.successUpdated": {
+    "few": "f2440741d0bd",
+    "many": "e1989648ee97",
+    "one": "cbf518a4e5b0",
+    "other": "e1989648ee97"
+  },
+  "items|pl|bulkEdit.title": {
+    "few": "18ef40039758",
+    "many": "3372ec0cda85",
+    "one": "bc3f422b11a6",
+    "other": "3372ec0cda85"
+  },
+  "items|pl|bulkEdit.warningText": {
+    "few": "7f2b971d395a",
+    "many": "098ecfe5fece",
+    "one": "2579befdf36f",
+    "other": "098ecfe5fece"
+  },
+  "items|pl|history.createdWith": {
+    "few": "b01f55a2c04c",
+    "many": "b01f55a2c04c",
+    "one": "b01f55a2c04c",
+    "other": "b01f55a2c04c"
+  },
+  "items|pl|history.daysAgo": {
+    "few": "48129bf98e0c",
+    "many": "48129bf98e0c",
+    "one": "a3f00744923f",
+    "other": "48129bf98e0c"
+  },
+  "items|pl|history.hoursAgo": {
+    "few": "56b340f66de5",
+    "many": "56b340f66de5",
+    "one": "56b340f66de5",
+    "other": "56b340f66de5"
+  },
+  "items|pl|history.minutesAgo": {
+    "few": "362df2bd0369",
+    "many": "362df2bd0369",
+    "one": "362df2bd0369",
+    "other": "362df2bd0369"
+  },
+  "items|pl|import.added": {
+    "few": "7c15b39e5844",
+    "many": "0b68e5d36158",
+    "one": "af876a9187ca",
+    "other": "edaf5875e5cb"
+  },
+  "items|pl|import.foundedCategories": {
+    "few": "d8205a7fcaf6",
+    "many": "e5ca44d042de",
+    "one": "d0839ab9f1ce",
+    "other": "e5ca44d042de"
+  },
+  "items|pl|import.foundedLocations": {
+    "few": "c35705be98fb",
+    "many": "b5a2963250b7",
+    "one": "be27b5655c43",
+    "other": "b5a2963250b7"
+  },
+  "items|pl|import.matchedSkipped": {
+    "few": "54c3df00436a",
+    "many": "37d5c838b9a6",
+    "one": "a4ef0a079df8",
+    "other": "37d5c838b9a6"
+  },
+  "items|pl|import.matchedUpdated": {
+    "few": "f2440741d0bd",
+    "many": "e1989648ee97",
+    "one": "cbf518a4e5b0",
+    "other": "e1989648ee97"
+  },
+  "items|pl|messages.confirmBulkDelete": {
+    "few": "3a13bba119fd",
+    "many": "95a24e556339",
+    "one": "2de686480830",
+    "other": "95a24e556339"
+  },
+  "items|pl|messages.consumedOne": {
+    "few": "bbe7e7c26fb2",
+    "many": "bbe7e7c26fb2",
+    "one": "bbe7e7c26fb2",
+    "other": "bbe7e7c26fb2"
+  },
+  "items|pl|totals.positions": {
+    "few": "1575f1bb26ac",
+    "many": "b03d681402d6",
+    "one": "5982e5f0f1f4",
+    "other": "b03d681402d6"
+  },
+  "items|pl|totals.unpriced": {
+    "few": "b2d249287d40",
+    "many": "ec629fcd516c",
+    "one": "0b3ffcce7ef0",
+    "other": "ec629fcd516c"
+  },
+  "labels|de|filters.found": {
+    "one": "7e1c54731e1f",
+    "other": "847bcb49bc88"
+  },
+  "labels|de|generatedSuccess": {
+    "one": "f637248f29cd",
+    "other": "7d84675ad942"
+  },
+  "labels|en|filters.found": {
+    "one": "1aca80e8b55c",
+    "other": "d772ebb45902"
+  },
+  "labels|en|generatedSuccess": {
+    "one": "07392189f79a",
+    "other": "bcd39e3d0714"
+  },
+  "labels|es|filters.found": {
+    "one": "47a662da55f0",
+    "other": "2af9c5c984eb"
+  },
+  "labels|es|generatedSuccess": {
+    "one": "3a60eae7b71f",
+    "other": "90ff124ee9b6"
+  },
+  "labels|fr|filters.found": {
+    "one": "658f261ed0cd",
+    "other": "27c29e73efc2"
+  },
+  "labels|fr|generatedSuccess": {
+    "one": "189115a5c658",
+    "other": "8d6efbe5b7bc"
+  },
+  "labels|pl|filters.found": {
+    "few": "55db7a79eb69",
+    "many": "1458f04e00d7",
+    "one": "e517222b2402",
+    "other": "1458f04e00d7"
+  },
+  "labels|pl|generatedSuccess": {
+    "few": "6632bb52dda0",
+    "many": "d8c532f6c01f",
+    "one": "5b55a4fa94fb",
+    "other": "d8c532f6c01f"
+  },
+  "launcher|de|launcher.actionItems.subtitle": {
+    "one": "44033646eb12",
+    "other": "44033646eb12"
+  },
+  "launcher|en|launcher.actionItems.subtitle": {
+    "one": "0169b09618b0",
+    "other": "0169b09618b0"
+  },
+  "launcher|es|launcher.actionItems.subtitle": {
+    "one": "e578f289c7e5",
+    "other": "4182a71a28f6"
+  },
+  "launcher|fr|launcher.actionItems.subtitle": {
+    "one": "bcd407691ba2",
+    "other": "bcd407691ba2"
+  },
+  "launcher|pl|launcher.actionItems.subtitle": {
+    "few": "c3aeccefc770",
+    "many": "d2d1a3fc9e64",
+    "one": "c3aeccefc770",
+    "other": "d2d1a3fc9e64"
+  },
+  "maker|de|availability.unknown": {
+    "one": "5e9d403a9d5d",
+    "other": "b44fccc7ee17"
+  },
+  "maker|de|catalog.estimateCostIncomplete": {
+    "one": "349f4841611b",
+    "other": "4059ce96525c"
+  },
+  "maker|de|catalog.ingredientCount": {
+    "one": "5fed11e23e1b",
+    "other": "f1cafa34fe52"
+  },
+  "maker|de|catalog.unitCostIncomplete": {
+    "one": "b7ac3ac2a7d7",
+    "other": "cc34e5e43704"
+  },
+  "maker|de|cost.gap.none": {
+    "one": "fcc69210f8ef",
+    "other": "0663d9a6e7a4"
+  },
+  "maker|de|cost.gap.partial": {
+    "one": "7a7ca242ec64",
+    "other": "7989b24bb224"
+  },
+  "maker|de|detail.plannedShortageHint": {
+    "one": "5ca941d6d0f4",
+    "other": "d625ec2be8ef"
+  },
+  "maker|de|productionList.card.shortage": {
+    "one": "d3892d23d76b",
+    "other": "0d5456772e37"
+  },
+  "maker|de|widget.orders": {
+    "one": "606fc1667245",
+    "other": "061b7fc93649"
+  },
+  "maker|en|availability.unknown": {
+    "one": "8dc1bd56142e",
+    "other": "1953702cbfdb"
+  },
+  "maker|en|catalog.estimateCostIncomplete": {
+    "one": "d6433639567a",
+    "other": "3bafc3d4ac0b"
+  },
+  "maker|en|catalog.ingredientCount": {
+    "one": "48452dcddeed",
+    "other": "15df3ecd8e06"
+  },
+  "maker|en|catalog.unitCostIncomplete": {
+    "one": "5d4661f20d9a",
+    "other": "d1a63287aa12"
+  },
+  "maker|en|cost.gap.none": {
+    "one": "def6cc386e02",
+    "other": "d5ebc5cdffc0"
+  },
+  "maker|en|cost.gap.partial": {
+    "one": "cd4ec378f974",
+    "other": "d50b3f4d400f"
+  },
+  "maker|en|detail.plannedShortageHint": {
+    "one": "f478100aff5f",
+    "other": "0511d63b76df"
+  },
+  "maker|en|productionList.card.shortage": {
+    "one": "e6a3887ae9df",
+    "other": "362092f55f16"
+  },
+  "maker|en|widget.orders": {
+    "one": "d0e4b16000f7",
+    "other": "8b3ce3003800"
+  },
+  "maker|es|availability.unknown": {
+    "one": "dae65719e78e",
+    "other": "7c2b0ceb24d3"
+  },
+  "maker|es|catalog.estimateCostIncomplete": {
+    "one": "615efac2a84d",
+    "other": "edaba2ad0f8b"
+  },
+  "maker|es|catalog.ingredientCount": {
+    "one": "2b97d14edad7",
+    "other": "cdd3ee72d4a5"
+  },
+  "maker|es|catalog.unitCostIncomplete": {
+    "one": "5785ccde131b",
+    "other": "86017ab89ec3"
+  },
+  "maker|es|cost.gap.none": {
+    "one": "f32ca37b9765",
+    "other": "6770a992f313"
+  },
+  "maker|es|cost.gap.partial": {
+    "one": "b18f5e76f9b5",
+    "other": "dc5b724ab632"
+  },
+  "maker|es|detail.plannedShortageHint": {
+    "one": "b0cb75067a19",
+    "other": "07d17c826c84"
+  },
+  "maker|es|productionList.card.shortage": {
+    "one": "ac3e1c1f7d24",
+    "other": "79fc8983e551"
+  },
+  "maker|es|widget.orders": {
+    "one": "88fe0ee8f7a1",
+    "other": "57b3fc74843f"
+  },
+  "maker|fr|availability.unknown": {
+    "one": "c89ae0e73a7f",
+    "other": "00640595a4d7"
+  },
+  "maker|fr|catalog.estimateCostIncomplete": {
+    "one": "7d8a128697d8",
+    "other": "01e4913c0dd9"
+  },
+  "maker|fr|catalog.ingredientCount": {
+    "one": "bfc5045cf59b",
+    "other": "2ae62ecb951b"
+  },
+  "maker|fr|catalog.unitCostIncomplete": {
+    "one": "7b7a891f38e6",
+    "other": "b6407d12ec33"
+  },
+  "maker|fr|cost.gap.none": {
+    "one": "43c022c67093",
+    "other": "caee072966e3"
+  },
+  "maker|fr|cost.gap.partial": {
+    "one": "4c8c3b99b07f",
+    "other": "ac6b81aa7b89"
+  },
+  "maker|fr|detail.plannedShortageHint": {
+    "one": "482a71ff1600",
+    "other": "e80205fd2c83"
+  },
+  "maker|fr|productionList.card.shortage": {
+    "one": "b376758957ea",
+    "other": "79d2ba57cc7c"
+  },
+  "maker|fr|widget.orders": {
+    "one": "b1edbeda4bfe",
+    "other": "8f98a8776312"
+  },
+  "maker|pl|availability.unknown": {
+    "few": "196f71804f6f",
+    "many": "196f71804f6f",
+    "one": "25fe7b7bef16",
+    "other": "196f71804f6f"
+  },
+  "maker|pl|catalog.estimateCostIncomplete": {
+    "few": "c818b0bc5a09",
+    "many": "aeaf348625f5",
+    "one": "65ecbe19d820",
+    "other": "b79bffd7032c"
+  },
+  "maker|pl|catalog.ingredientCount": {
+    "few": "a61e82c0261d",
+    "many": "dc04929a81c1",
+    "one": "815b27a6043d",
+    "other": "dc04929a81c1"
+  },
+  "maker|pl|catalog.unitCostIncomplete": {
+    "few": "53dc0e874ea7",
+    "many": "4ec3793bfabf",
+    "one": "aa99e336b8d6",
+    "other": "9b004f620184"
+  },
+  "maker|pl|cost.gap.none": {
+    "few": "17fda4add1da",
+    "many": "17fda4add1da",
+    "one": "907af29d8d17",
+    "other": "17fda4add1da"
+  },
+  "maker|pl|cost.gap.partial": {
+    "few": "d1ebb1b5cc1c",
+    "many": "400758498e0c",
+    "one": "4449c1dc7a4d",
+    "other": "194e10916e9b"
+  },
+  "maker|pl|detail.plannedShortageHint": {
+    "few": "5b31a2b954d3",
+    "many": "5b31a2b954d3",
+    "one": "dc97e29e267e",
+    "other": "dc97e29e267e"
+  },
+  "maker|pl|productionList.card.shortage": {
+    "few": "4e81946ae6f4",
+    "many": "51351ec6c791",
+    "one": "adce2dc3c759",
+    "other": "51351ec6c791"
+  },
+  "maker|pl|widget.orders": {
+    "few": "fe67fcafa25d",
+    "many": "c9bfddfa81f4",
+    "one": "d00f830e373f",
+    "other": "c9bfddfa81f4"
+  },
+  "modules|de|config.testContractOk": {
+    "one": "e6b1d8f04ac4",
+    "other": "0aea3df1f369"
+  },
+  "modules|de|config.testUnchecked": {
+    "one": "fb67843de827",
+    "other": "7766785fc082"
+  },
+  "modules|de|fieldBuilder.fieldsCount": {
+    "one": "aad2ed3ef5cb",
+    "other": "acf1914966d8"
+  },
+  "modules|en|config.testContractOk": {
+    "one": "6756a9c63844",
+    "other": "f1ca7c3f451e"
+  },
+  "modules|en|config.testUnchecked": {
+    "one": "8bb0419b51fb",
+    "other": "b9b01fd20957"
+  },
+  "modules|en|fieldBuilder.fieldsCount": {
+    "one": "8f84f14cd847",
+    "other": "e64a461ad029"
+  },
+  "modules|es|config.testContractOk": {
+    "one": "30385c90da60",
+    "other": "5b384b958b8d"
+  },
+  "modules|es|config.testUnchecked": {
+    "one": "87640720757b",
+    "other": "8974734873b5"
+  },
+  "modules|es|fieldBuilder.fieldsCount": {
+    "one": "294a9560bb03",
+    "other": "fa08cce15a2c"
+  },
+  "modules|fr|config.testContractOk": {
+    "one": "9d143845af55",
+    "other": "bf4f2fe3cb5d"
+  },
+  "modules|fr|config.testUnchecked": {
+    "one": "1ac9e207af1d",
+    "other": "85087f1ccaf8"
+  },
+  "modules|fr|fieldBuilder.fieldsCount": {
+    "one": "5a232a9ac3d2",
+    "other": "6517693117b8"
+  },
+  "modules|pl|config.testContractOk": {
+    "few": "e1bdbc8cb5b1",
+    "many": "ee7853ab6367",
+    "one": "9b7e04acca09",
+    "other": "ee7853ab6367"
+  },
+  "modules|pl|config.testUnchecked": {
+    "few": "0d2746176b10",
+    "many": "b9f3b7a3fad8",
+    "one": "e6721615062b",
+    "other": "b9f3b7a3fad8"
+  },
+  "modules|pl|fieldBuilder.fieldsCount": {
+    "few": "cad314a0bca5",
+    "many": "fa98d9b7f443",
+    "one": "0a68f611024d",
+    "other": "fa98d9b7f443"
+  },
+  "partners|de|import.added": {
+    "one": "517ee5b23e97",
+    "other": "517ee5b23e97"
+  },
+  "partners|de|stats.documents": {
+    "one": "6af208392dcd",
+    "other": "81a1fd8801e4"
+  },
+  "partners|en|import.added": {
+    "one": "6b3be56fb67c",
+    "other": "1d7e1b91ee33"
+  },
+  "partners|en|stats.documents": {
+    "few": "f2b987b859e0",
+    "many": "f2b987b859e0",
+    "one": "9499192969d1",
+    "other": "f2b987b859e0"
+  },
+  "partners|es|import.added": {
+    "one": "9b9ec3c3b46f",
+    "other": "07dc8bd2cf5c"
+  },
+  "partners|es|stats.documents": {
+    "one": "753fa552b38b",
+    "other": "0016226c0daf"
+  },
+  "partners|fr|import.added": {
+    "one": "a6b34e25e1bb",
+    "other": "c8e25e9fbe7e"
+  },
+  "partners|fr|stats.documents": {
+    "one": "9499192969d1",
+    "other": "f2b987b859e0"
+  },
+  "partners|pl|import.added": {
+    "few": "02fbdf2451bc",
+    "many": "02fbdf2451bc",
+    "one": "48a6b1958291",
+    "other": "48a6b1958291"
+  },
+  "partners|pl|stats.documents": {
+    "few": "816f1fe24160",
+    "many": "185617a3ca0d",
+    "one": "c6f52773e031",
+    "other": "185617a3ca0d"
+  },
+  "purchase_orders|de|form.lineCount": {
+    "one": "9ad8ddb497b4",
+    "other": "9ad8ddb497b4"
+  },
+  "purchase_orders|de|lines": {
+    "one": "4d1e1c15f6d6",
+    "other": "fbee80d20cb0"
+  },
+  "purchase_orders|de|linesTitle": {
+    "one": "4d1e1c15f6d6",
+    "other": "fbee80d20cb0"
+  },
+  "purchase_orders|de|receipt.lineCountAll": {
+    "one": "0beaac788c59",
+    "other": "167b642f267a"
+  },
+  "purchase_orders|de|reorderRules.alertsTitle": {
+    "one": "ca6b7c3f2941",
+    "other": "7e15ee14e926"
+  },
+  "purchase_orders|de|reorderRules.count": {
+    "one": "4b09cd01cd32",
+    "other": "582936c918d2"
+  },
+  "purchase_orders|de|reorderRules.draftPosCreated": {
+    "one": "99d2c63cf3f6",
+    "other": "361be0833d16"
+  },
+  "purchase_orders|de|reorderRules.draftPosSkipped": {
+    "one": "68f7c9e5d150",
+    "other": "b7930eeb25aa"
+  },
+  "purchase_orders|en|form.lineCount": {
+    "one": "93c85e9a47e9",
+    "other": "34d726f8f741"
+  },
+  "purchase_orders|en|lines": {
+    "one": "84df0cdf8f86",
+    "other": "e90b5c8a4def"
+  },
+  "purchase_orders|en|linesTitle": {
+    "one": "9ec53fb81b1b",
+    "other": "6936f8ffa663"
+  },
+  "purchase_orders|en|receipt.lineCountAll": {
+    "one": "87027e7f77c3",
+    "other": "78d165309354"
+  },
+  "purchase_orders|en|reorderRules.alertsTitle": {
+    "one": "fe0689b7dc63",
+    "other": "1a3791f543d3"
+  },
+  "purchase_orders|en|reorderRules.count": {
+    "one": "7369949b47ef",
+    "other": "6c621d1a0513"
+  },
+  "purchase_orders|en|reorderRules.draftPosCreated": {
+    "one": "635789a4db0b",
+    "other": "787c50978dc5"
+  },
+  "purchase_orders|en|reorderRules.draftPosSkipped": {
+    "one": "9d05d13519ab",
+    "other": "613a1fc8a515"
+  },
+  "purchase_orders|es|form.lineCount": {
+    "one": "98cd2234954b",
+    "other": "c48fcd9a97df"
+  },
+  "purchase_orders|es|lines": {
+    "one": "8ac778ae6372",
+    "other": "a05cd7a88da1"
+  },
+  "purchase_orders|es|linesTitle": {
+    "one": "8ac778ae6372",
+    "other": "a05cd7a88da1"
+  },
+  "purchase_orders|es|receipt.lineCountAll": {
+    "one": "a641166b51d4",
+    "other": "7e18c2f28d70"
+  },
+  "purchase_orders|es|reorderRules.alertsTitle": {
+    "one": "4ade347dab4d",
+    "other": "f4e70c095063"
+  },
+  "purchase_orders|es|reorderRules.count": {
+    "one": "26ce006516b6",
+    "other": "342a6f5c0dec"
+  },
+  "purchase_orders|es|reorderRules.draftPosCreated": {
+    "one": "59e05d2387b0",
+    "other": "f6144b8d00e9"
+  },
+  "purchase_orders|es|reorderRules.draftPosSkipped": {
+    "one": "2c5d39398856",
+    "other": "acf18049dac2"
+  },
+  "purchase_orders|fr|form.lineCount": {
+    "one": "f2fb391a7557",
+    "other": "e0fa49931663"
+  },
+  "purchase_orders|fr|lines": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "purchase_orders|fr|linesTitle": {
+    "one": "d16276112f01",
+    "other": "011a5139cbd1"
+  },
+  "purchase_orders|fr|receipt.lineCountAll": {
+    "one": "06ebb87c0879",
+    "other": "3971a03280d3"
+  },
+  "purchase_orders|fr|reorderRules.alertsTitle": {
+    "one": "5408fb64bde7",
+    "other": "2f77334f5f1a"
+  },
+  "purchase_orders|fr|reorderRules.count": {
+    "one": "c527854a6660",
+    "other": "ab385d1b517c"
+  },
+  "purchase_orders|fr|reorderRules.draftPosCreated": {
+    "one": "f7686cc996ae",
+    "other": "4fbf549d8aa0"
+  },
+  "purchase_orders|fr|reorderRules.draftPosSkipped": {
+    "one": "d59d44425231",
+    "other": "492725eed379"
+  },
+  "purchase_orders|pl|form.lineCount": {
+    "few": "1575f1bb26ac",
+    "many": "b03d681402d6",
+    "one": "5982e5f0f1f4",
+    "other": "b03d681402d6"
+  },
+  "purchase_orders|pl|lines": {
+    "few": "1575f1bb26ac",
+    "many": "b03d681402d6",
+    "one": "5982e5f0f1f4",
+    "other": "b03d681402d6"
+  },
+  "purchase_orders|pl|linesTitle": {
+    "few": "1575f1bb26ac",
+    "many": "b03d681402d6",
+    "one": "5982e5f0f1f4",
+    "other": "b03d681402d6"
+  },
+  "purchase_orders|pl|receipt.lineCountAll": {
+    "few": "45c5664bd8a6",
+    "many": "944b7ca79923",
+    "one": "073b0d4825d7",
+    "other": "944b7ca79923"
+  },
+  "purchase_orders|pl|reorderRules.alertsTitle": {
+    "few": "043f3f41cc28",
+    "many": "dd57f2196f65",
+    "one": "a45bfc0da3da",
+    "other": "dd57f2196f65"
+  },
+  "purchase_orders|pl|reorderRules.count": {
+    "few": "a80497fd3838",
+    "many": "ef174bfef070",
+    "one": "15efc61abdc4",
+    "other": "ef174bfef070"
+  },
+  "purchase_orders|pl|reorderRules.draftPosCreated": {
+    "few": "91ed00fb44a3",
+    "many": "06e69e36af2b",
+    "one": "0b9eb42561c2",
+    "other": "06e69e36af2b"
+  },
+  "purchase_orders|pl|reorderRules.draftPosSkipped": {
+    "few": "35917bf50c7d",
+    "many": "0a46557ef96e",
+    "one": "0b4558bf849b",
+    "other": "0a46557ef96e"
+  },
+  "recipes|de|allergens.selected": {
+    "one": "9e7b39df20ab",
+    "other": "e989962773e3"
+  },
+  "recipes|de|availability.servings_available": {
+    "one": "ef08c7187e43",
+    "other": "162ded2a5d68"
+  },
+  "recipes|de|availability.unknown_inline": {
+    "one": "dda533df373a",
+    "other": "dda533df373a"
+  },
+  "recipes|de|bulk.delete_confirm": {
+    "one": "43ef0107b413",
+    "other": "d99f19e30374"
+  },
+  "recipes|de|bulk.deleted": {
+    "one": "805c7b2c38c6",
+    "other": "1b7cb369d08a"
+  },
+  "recipes|de|bulk.selected_count": {
+    "one": "a91422bc04bb",
+    "other": "a91422bc04bb"
+  },
+  "recipes|de|bulk.tag_title": {
+    "one": "5e3873922f01",
+    "other": "2bc3dd61e88b"
+  },
+  "recipes|de|bulk.toolbar_label": {
+    "one": "15456c472002",
+    "other": "2afd9f771a24"
+  },
+  "recipes|de|card.servings": {
+    "one": "b305f83c388f",
+    "other": "df55f61af00d"
+  },
+  "recipes|de|cooking_mode.deduct_done": {
+    "one": "642b59ef24cb",
+    "other": "5ddfbf73009c"
+  },
+  "recipes|de|cooking.rateSession": {
+    "one": "89cdcaf895b5",
+    "other": "60c68da1cd49"
+  },
+  "recipes|de|filters.results": {
+    "one": "cd8e22cf7439",
+    "other": "12ba6ae54b68"
+  },
+  "recipes|de|history.duration_minutes": {
+    "one": "c714324a7706",
+    "other": "c714324a7706"
+  },
+  "recipes|de|ingredient_defaults.import_added": {
+    "one": "056756aa6ef1",
+    "other": "056756aa6ef1"
+  },
+  "recipes|de|ingredient_defaults.import_errors": {
+    "one": "307c141519ab",
+    "other": "307c141519ab"
+  },
+  "recipes|de|ingredient_defaults.import_overridden": {
+    "one": "b2195a2de58b",
+    "other": "2fbd2dfa41e5"
+  },
+  "recipes|de|ingredient_defaults.import_unchanged": {
+    "one": "793b7750cf75",
+    "other": "793b7750cf75"
+  },
+  "recipes|de|ingredient_defaults.import_updated": {
+    "one": "49d1a91686e8",
+    "other": "49d1a91686e8"
+  },
+  "recipes|de|ingredient_defaults.scan_read": {
+    "one": "9d45e3d81cb9",
+    "other": "49cb78bd0da9"
+  },
+  "recipes|de|ingredient_defaults.showing": {
+    "one": "2e3bc5ba0ed9",
+    "other": "68945b962f09"
+  },
+  "recipes|de|meal_planner.copy_copied": {
+    "one": "6f2695cc5fd5",
+    "other": "2a0208855e64"
+  },
+  "recipes|de|meal_planner.copy_skipped": {
+    "one": "3b80defc3f05",
+    "other": "3b80defc3f05"
+  },
+  "recipes|de|meal_planner.entry_count": {
+    "one": "6981fc10a3d6",
+    "other": "15c190c4e29a"
+  },
+  "recipes|de|meal_planner.exclusions_count": {
+    "one": "48a95efd0767",
+    "other": "c2ffaf56686f"
+  },
+  "recipes|de|meal_planner.servings": {
+    "one": "b305f83c388f",
+    "other": "df55f61af00d"
+  },
+  "recipes|de|meal_planner.slot_conflict_entries": {
+    "one": "a8ea6dac87e6",
+    "other": "35da51e70c66"
+  },
+  "recipes|de|picking.spices_section": {
+    "one": "26eb7b4648c9",
+    "other": "ce2cae3c4069"
+  },
+  "recipes|de|picking.subtitle": {
+    "one": "b305f83c388f",
+    "other": "df55f61af00d"
+  },
+  "recipes|de|picking.unlinked_notice": {
+    "one": "26a3bb2c1db8",
+    "other": "6d2a3b524fa4"
+  },
+  "recipes|de|recipe.prep_time_minutes": {
+    "one": "c714324a7706",
+    "other": "c714324a7706"
+  },
+  "recipes|de|recipe.servings": {
+    "one": "b305f83c388f",
+    "other": "df55f61af00d"
+  },
+  "recipes|de|recipe.servings_unit": {
+    "one": "bb8a7db6cfa0",
+    "other": "48002c588df9"
+  },
+  "recipes|de|shopping.added_toast": {
+    "one": "af4068835a22",
+    "other": "add10f47d000"
+  },
+  "recipes|de|shopping.added_toast_no_list": {
+    "one": "6da68f3342df",
+    "other": "1a056f982582"
+  },
+  "recipes|de|tags_manager.count": {
+    "one": "b8ac286b23cc",
+    "other": "6674f0c0b35a"
+  },
+  "recipes|de|tags_manager.delete_success": {
+    "one": "da15e300cf23",
+    "other": "8fa9f90cc1af"
+  },
+  "recipes|de|tags_manager.merge_success": {
+    "one": "5943329cb0c7",
+    "other": "d7d880aabb56"
+  },
+  "recipes|de|tags_manager.rename_success": {
+    "one": "638ed0724767",
+    "other": "dddce190b856"
+  },
+  "recipes|de|unit_conversions.showing": {
+    "one": "5dd2228ffd39",
+    "other": "dc2e968b4fa7"
+  },
+  "recipes|en|allergens.selected": {
+    "one": "59f68ad2778c",
+    "other": "0bca3755beb1"
+  },
+  "recipes|en|availability.servings_available": {
+    "one": "0d0579cf007e",
+    "other": "d110f0a2d680"
+  },
+  "recipes|en|availability.unknown_inline": {
+    "one": "1197c6e62d64",
+    "other": "1197c6e62d64"
+  },
+  "recipes|en|bulk.delete_confirm": {
+    "one": "0b258d35852e",
+    "other": "f0850b4abe1d"
+  },
+  "recipes|en|bulk.deleted": {
+    "one": "6c8af5915f16",
+    "other": "247ea57da798"
+  },
+  "recipes|en|bulk.selected_count": {
+    "one": "c7f761b38b19",
+    "other": "c7f761b38b19"
+  },
+  "recipes|en|bulk.tag_title": {
+    "one": "ef9c91c74076",
+    "other": "65ff213f76d9"
+  },
+  "recipes|en|bulk.toolbar_label": {
+    "one": "ee5bbe76c1d3",
+    "other": "bde8e176be05"
+  },
+  "recipes|en|card.servings": {
+    "one": "5664b8229b1b",
+    "other": "f69517635c94"
+  },
+  "recipes|en|cooking_mode.deduct_done": {
+    "one": "7466ba8bdd1d",
+    "other": "68838547c027"
+  },
+  "recipes|en|cooking.rateSession": {
+    "one": "d6ef4575b4f2",
+    "other": "07dcc4bb71f2"
+  },
+  "recipes|en|filters.results": {
+    "one": "f6a214f7a5fc",
+    "other": "c099142bc318"
+  },
+  "recipes|en|history.duration_minutes": {
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|en|ingredient_defaults.import_added": {
+    "one": "0a377a1bbc3a",
+    "other": "0a377a1bbc3a"
+  },
+  "recipes|en|ingredient_defaults.import_errors": {
+    "one": "dd0728fcfb69",
+    "other": "f72bee75f247"
+  },
+  "recipes|en|ingredient_defaults.import_overridden": {
+    "one": "4c1060a89096",
+    "other": "8e481b3c6334"
+  },
+  "recipes|en|ingredient_defaults.import_unchanged": {
+    "one": "b0b38836323a",
+    "other": "b0b38836323a"
+  },
+  "recipes|en|ingredient_defaults.import_updated": {
+    "one": "e120226816b4",
+    "other": "e120226816b4"
+  },
+  "recipes|en|ingredient_defaults.scan_read": {
+    "one": "be15ade63988",
+    "other": "745ac8cdb62a"
+  },
+  "recipes|en|ingredient_defaults.showing": {
+    "one": "87ea934cef9d",
+    "other": "c5b57826ec6b"
+  },
+  "recipes|en|meal_planner.copy_copied": {
+    "one": "6e5cb112906f",
+    "other": "8c22265ebc05"
+  },
+  "recipes|en|meal_planner.copy_skipped": {
+    "one": "dd5b4713afc4",
+    "other": "dd5b4713afc4"
+  },
+  "recipes|en|meal_planner.entry_count": {
+    "one": "cd0485394aad",
+    "other": "398596e48309"
+  },
+  "recipes|en|meal_planner.exclusions_count": {
+    "one": "aef5e79b21ab",
+    "other": "ef74d0d2de7c"
+  },
+  "recipes|en|meal_planner.servings": {
+    "one": "5664b8229b1b",
+    "other": "f69517635c94"
+  },
+  "recipes|en|meal_planner.slot_conflict_entries": {
+    "one": "629cf73b05d6",
+    "other": "cd0a64c57efe"
+  },
+  "recipes|en|picking.spices_section": {
+    "one": "81422d4abd49",
+    "other": "7f7803fa972d"
+  },
+  "recipes|en|picking.subtitle": {
+    "one": "5664b8229b1b",
+    "other": "f69517635c94"
+  },
+  "recipes|en|picking.unlinked_notice": {
+    "one": "c95a18b2eda7",
+    "other": "4d9a3243cb05"
+  },
+  "recipes|en|recipe.prep_time_minutes": {
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|en|recipe.servings": {
+    "one": "5664b8229b1b",
+    "other": "f69517635c94"
+  },
+  "recipes|en|recipe.servings_unit": {
+    "one": "4dc69fae4535",
+    "other": "1b95ed258615"
+  },
+  "recipes|en|shopping.added_toast": {
+    "one": "e1610c036045",
+    "other": "86d6f5db59af"
+  },
+  "recipes|en|shopping.added_toast_no_list": {
+    "one": "48f5da3e9f7c",
+    "other": "d92e595d19d5"
+  },
+  "recipes|en|tags_manager.count": {
+    "one": "4064a6bd69fe",
+    "other": "53681a402f96"
+  },
+  "recipes|en|tags_manager.delete_success": {
+    "one": "cc1282aa90be",
+    "other": "3069a1bd2d30"
+  },
+  "recipes|en|tags_manager.merge_success": {
+    "one": "99be5dd64006",
+    "other": "981e3268dc7d"
+  },
+  "recipes|en|tags_manager.rename_success": {
+    "one": "2252cd392a27",
+    "other": "1171b06ce1ae"
+  },
+  "recipes|en|unit_conversions.showing": {
+    "one": "1abb7336d8fa",
+    "other": "375df80f5bd3"
+  },
+  "recipes|es|allergens.selected": {
+    "one": "3a66e66ee6d5",
+    "other": "26ff1eaf837e"
+  },
+  "recipes|es|availability.servings_available": {
+    "one": "9bc269db0121",
+    "other": "3bddd402ee7e"
+  },
+  "recipes|es|availability.unknown_inline": {
+    "one": "3674a05b3f61",
+    "other": "3674a05b3f61"
+  },
+  "recipes|es|bulk.delete_confirm": {
+    "one": "6476919954be",
+    "other": "84d894af2c5e"
+  },
+  "recipes|es|bulk.deleted": {
+    "one": "af8e40f3dad4",
+    "other": "1e6322e719d9"
+  },
+  "recipes|es|bulk.selected_count": {
+    "one": "0e65f4138cf6",
+    "other": "5659633d6b67"
+  },
+  "recipes|es|bulk.tag_title": {
+    "one": "6c9020de48b9",
+    "other": "4e45804ced3b"
+  },
+  "recipes|es|bulk.toolbar_label": {
+    "one": "87e908bd2bd2",
+    "other": "b121d102c60c"
+  },
+  "recipes|es|card.servings": {
+    "one": "514bc12b99c1",
+    "other": "a61a50a25af5"
+  },
+  "recipes|es|cooking_mode.deduct_done": {
+    "one": "930e951e4596",
+    "other": "706fb3fb7257"
+  },
+  "recipes|es|cooking.rateSession": {
+    "one": "7f3c1a7957ae",
+    "other": "ce8cdd0b3870"
+  },
+  "recipes|es|filters.results": {
+    "one": "7ada3b67c858",
+    "other": "18a54cbd476e"
+  },
+  "recipes|es|history.duration_minutes": {
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|es|ingredient_defaults.import_added": {
+    "one": "d93eb4f6b31b",
+    "other": "f9cb4dd47fc8"
+  },
+  "recipes|es|ingredient_defaults.import_errors": {
+    "one": "dd0728fcfb69",
+    "other": "fe4a47c78088"
+  },
+  "recipes|es|ingredient_defaults.import_overridden": {
+    "one": "7f9b9f00e0e8",
+    "other": "5e7bd9e19e4c"
+  },
+  "recipes|es|ingredient_defaults.import_unchanged": {
+    "one": "a0c9d4a699e5",
+    "other": "a0c9d4a699e5"
+  },
+  "recipes|es|ingredient_defaults.import_updated": {
+    "one": "ad84f08e3b01",
+    "other": "3b073b2bc2de"
+  },
+  "recipes|es|ingredient_defaults.scan_read": {
+    "one": "97a056f795ef",
+    "other": "cd893df8b46c"
+  },
+  "recipes|es|ingredient_defaults.showing": {
+    "one": "6c849f441d09",
+    "other": "08a3c5eea0ae"
+  },
+  "recipes|es|meal_planner.copy_copied": {
+    "one": "4dbd032c6ef0",
+    "other": "86ea0f298917"
+  },
+  "recipes|es|meal_planner.copy_skipped": {
+    "one": "91ae7356030f",
+    "other": "a2798a2f22bd"
+  },
+  "recipes|es|meal_planner.entry_count": {
+    "one": "50d6018a6bd1",
+    "other": "1177e2274104"
+  },
+  "recipes|es|meal_planner.exclusions_count": {
+    "one": "c08fd4208bde",
+    "other": "ef656f7a242d"
+  },
+  "recipes|es|meal_planner.servings": {
+    "one": "514bc12b99c1",
+    "other": "a61a50a25af5"
+  },
+  "recipes|es|meal_planner.slot_conflict_entries": {
+    "one": "0ed3e0a88afe",
+    "other": "c25fb6b4ec8d"
+  },
+  "recipes|es|picking.spices_section": {
+    "one": "1a63ae4aea4e",
+    "other": "249c51f2ca7d"
+  },
+  "recipes|es|picking.subtitle": {
+    "one": "514bc12b99c1",
+    "other": "a61a50a25af5"
+  },
+  "recipes|es|picking.unlinked_notice": {
+    "one": "f4e02164c942",
+    "other": "8a9454a3dd92"
+  },
+  "recipes|es|recipe.prep_time_minutes": {
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|es|recipe.servings": {
+    "one": "514bc12b99c1",
+    "other": "a61a50a25af5"
+  },
+  "recipes|es|recipe.servings_unit": {
+    "one": "1144d3148be6",
+    "other": "4c9390da28ef"
+  },
+  "recipes|es|shopping.added_toast": {
+    "one": "79c7f4e3e21a",
+    "other": "51f208130ef5"
+  },
+  "recipes|es|shopping.added_toast_no_list": {
+    "one": "7036d0413877",
+    "other": "a363705ef97b"
+  },
+  "recipes|es|tags_manager.count": {
+    "one": "84e1ecfbc684",
+    "other": "547c0abd426f"
+  },
+  "recipes|es|tags_manager.delete_success": {
+    "one": "49298fa3875c",
+    "other": "8544b7afd9cb"
+  },
+  "recipes|es|tags_manager.merge_success": {
+    "one": "d41ad4f39d8b",
+    "other": "6a104a3a7c81"
+  },
+  "recipes|es|tags_manager.rename_success": {
+    "one": "1ce39984dbee",
+    "other": "1df4378c8c01"
+  },
+  "recipes|es|unit_conversions.showing": {
+    "one": "c85bcaa55782",
+    "other": "b51ee5d1b52a"
+  },
+  "recipes|fr|allergens.selected": {
+    "one": "2e6f390e65d9",
+    "other": "9be5d958cd80"
+  },
+  "recipes|fr|availability.servings_available": {
+    "one": "040968c41591",
+    "other": "ad3c4eabdc22"
+  },
+  "recipes|fr|availability.unknown_inline": {
+    "one": "db523510c4b2",
+    "other": "db523510c4b2"
+  },
+  "recipes|fr|bulk.delete_confirm": {
+    "one": "39236b8d27f3",
+    "other": "2dbad1098315"
+  },
+  "recipes|fr|bulk.deleted": {
+    "one": "f0de516a2630",
+    "other": "40a848ebd719"
+  },
+  "recipes|fr|bulk.selected_count": {
+    "one": "e27d211a1113",
+    "other": "350263c1abed"
+  },
+  "recipes|fr|bulk.tag_title": {
+    "one": "74c82dd9514a",
+    "other": "5c5aac1963ec"
+  },
+  "recipes|fr|bulk.toolbar_label": {
+    "one": "c51640b5c93f",
+    "other": "81391f24bb76"
+  },
+  "recipes|fr|card.servings": {
+    "one": "8649320b0537",
+    "other": "063fd4bdbf99"
+  },
+  "recipes|fr|cooking_mode.deduct_done": {
+    "one": "a76b248419d4",
+    "other": "a3d989244bcb"
+  },
+  "recipes|fr|cooking.rateSession": {
+    "one": "9195558cc95d",
+    "other": "583e608bafa2"
+  },
+  "recipes|fr|filters.results": {
+    "one": "a444e10e599d",
+    "other": "828f4fae1181"
+  },
+  "recipes|fr|history.duration_minutes": {
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|fr|ingredient_defaults.import_added": {
+    "one": "454368e71071",
+    "other": "4255d0de23a5"
+  },
+  "recipes|fr|ingredient_defaults.import_errors": {
+    "one": "10f740cdbdcb",
+    "other": "9ab1ff8854ed"
+  },
+  "recipes|fr|ingredient_defaults.import_overridden": {
+    "one": "a80cd086c6df",
+    "other": "396c4b998e71"
+  },
+  "recipes|fr|ingredient_defaults.import_unchanged": {
+    "one": "90b14ea63a57",
+    "other": "0e6fc4343ac9"
+  },
+  "recipes|fr|ingredient_defaults.import_updated": {
+    "one": "b156fe1cc13a",
+    "other": "b156fe1cc13a"
+  },
+  "recipes|fr|ingredient_defaults.scan_read": {
+    "one": "7f44a1cc8974",
+    "other": "f049bab6c357"
+  },
+  "recipes|fr|ingredient_defaults.showing": {
+    "one": "4a6fb8ca4b00",
+    "other": "f8f619ca8152"
+  },
+  "recipes|fr|meal_planner.copy_copied": {
+    "one": "3021b26ca016",
+    "other": "9873a7d9ad6f"
+  },
+  "recipes|fr|meal_planner.copy_skipped": {
+    "one": "09e4a63c3bc7",
+    "other": "d4c54232dd2e"
+  },
+  "recipes|fr|meal_planner.entry_count": {
+    "one": "f77c583ee3fa",
+    "other": "f77c583ee3fa"
+  },
+  "recipes|fr|meal_planner.exclusions_count": {
+    "one": "5f416792e937",
+    "other": "abf3514e3acd"
+  },
+  "recipes|fr|meal_planner.servings": {
+    "one": "8649320b0537",
+    "other": "063fd4bdbf99"
+  },
+  "recipes|fr|meal_planner.slot_conflict_entries": {
+    "one": "ba5a264de1ac",
+    "other": "6eb6df496fec"
+  },
+  "recipes|fr|picking.spices_section": {
+    "one": "9cbff8cfd919",
+    "other": "fbf7e673dee0"
+  },
+  "recipes|fr|picking.subtitle": {
+    "one": "8649320b0537",
+    "other": "063fd4bdbf99"
+  },
+  "recipes|fr|picking.unlinked_notice": {
+    "one": "e733b4d1885c",
+    "other": "903ed41b4179"
+  },
+  "recipes|fr|recipe.prep_time_minutes": {
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|fr|recipe.servings": {
+    "one": "8649320b0537",
+    "other": "063fd4bdbf99"
+  },
+  "recipes|fr|recipe.servings_unit": {
+    "one": "83e01dda3eb5",
+    "other": "37f092e33b0f"
+  },
+  "recipes|fr|shopping.added_toast": {
+    "one": "2ebeed14c32f",
+    "other": "d41cab7ea493"
+  },
+  "recipes|fr|shopping.added_toast_no_list": {
+    "one": "4deb9557af1d",
+    "other": "a757421846bd"
+  },
+  "recipes|fr|tags_manager.count": {
+    "one": "0e349bba87b2",
+    "other": "f9ac68fa01f4"
+  },
+  "recipes|fr|tags_manager.delete_success": {
+    "one": "b959baa15ead",
+    "other": "8e782a1a23f4"
+  },
+  "recipes|fr|tags_manager.merge_success": {
+    "one": "882c32a9eab9",
+    "other": "6412fd71a334"
+  },
+  "recipes|fr|tags_manager.rename_success": {
+    "one": "7f350ebf528e",
+    "other": "77ee6d39a3bf"
+  },
+  "recipes|fr|unit_conversions.showing": {
+    "one": "eaac5d097c9b",
+    "other": "f1224c91538f"
+  },
+  "recipes|pl|allergens.selected": {
+    "few": "d7ae8344b29f",
+    "many": "b6f616ae8e35",
+    "one": "c6d284c66bbf",
+    "other": "b6f616ae8e35"
+  },
+  "recipes|pl|availability.servings_available": {
+    "few": "6ce2ca0bdafc",
+    "many": "3eb8ace8890d",
+    "one": "4957e41c43f2",
+    "other": "3eb8ace8890d"
+  },
+  "recipes|pl|availability.unknown_inline": {
+    "few": "1cbceb61a067",
+    "many": "1cbceb61a067",
+    "one": "1cbceb61a067",
+    "other": "1cbceb61a067"
+  },
+  "recipes|pl|bulk.delete_confirm": {
+    "few": "72240f1424ce",
+    "many": "e9d2560b5fee",
+    "one": "ee5953456262",
+    "other": "e9d2560b5fee"
+  },
+  "recipes|pl|bulk.deleted": {
+    "few": "4dc6c313290f",
+    "many": "bde43cea558b",
+    "one": "74313b762c46",
+    "other": "bde43cea558b"
+  },
+  "recipes|pl|bulk.selected_count": {
+    "few": "1ff11b9d095a",
+    "many": "1ff11b9d095a",
+    "one": "1ff11b9d095a",
+    "other": "1ff11b9d095a"
+  },
+  "recipes|pl|bulk.tag_title": {
+    "few": "d0bb0bb55b93",
+    "many": "5b66f9c72a12",
+    "one": "ef4a57df2c90",
+    "other": "5b66f9c72a12"
+  },
+  "recipes|pl|bulk.toolbar_label": {
+    "few": "e8c3f3384434",
+    "many": "8dc472d123ac",
+    "one": "88a439d3efb1",
+    "other": "677043748448"
+  },
+  "recipes|pl|card.servings": {
+    "few": "a32d784c3576",
+    "many": "f8b16e487dbf",
+    "one": "20afc15d92a3",
+    "other": "f8b16e487dbf"
+  },
+  "recipes|pl|cooking_mode.deduct_done": {
+    "few": "778453554548",
+    "many": "c3340420f066",
+    "one": "a1ffa97a76f6",
+    "other": "82d0d4d04ab5"
+  },
+  "recipes|pl|cooking.rateSession": {
+    "few": "58d953debbf6",
+    "many": "58d953debbf6",
+    "one": "dc027ac9e33a",
+    "other": "58d953debbf6"
+  },
+  "recipes|pl|filters.results": {
+    "few": "2080b1d8e359",
+    "many": "e31d41b918d5",
+    "one": "bc2e4bea2e33"
+  },
+  "recipes|pl|history.duration_minutes": {
+    "few": "70ff3490c559",
+    "many": "70ff3490c559",
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|pl|ingredient_defaults.import_added": {
+    "few": "5c89a1a6ea18",
+    "many": "5c89a1a6ea18",
+    "one": "5c89a1a6ea18",
+    "other": "5c89a1a6ea18"
+  },
+  "recipes|pl|ingredient_defaults.import_errors": {
+    "few": "d6f069b87e08",
+    "many": "7878f92f6b36",
+    "one": "d41d3067e09a",
+    "other": "7878f92f6b36"
+  },
+  "recipes|pl|ingredient_defaults.import_overridden": {
+    "few": "1b3b13b8fd2b",
+    "many": "f636e3dae336",
+    "one": "bb425770a2c8",
+    "other": "f636e3dae336"
+  },
+  "recipes|pl|ingredient_defaults.import_unchanged": {
+    "few": "9e04448dd05f",
+    "many": "9e04448dd05f",
+    "one": "9e04448dd05f",
+    "other": "9e04448dd05f"
+  },
+  "recipes|pl|ingredient_defaults.import_updated": {
+    "few": "ebbed4116e13",
+    "many": "ebbed4116e13",
+    "one": "ebbed4116e13",
+    "other": "ebbed4116e13"
+  },
+  "recipes|pl|ingredient_defaults.scan_read": {
+    "few": "f8c217925bd4",
+    "many": "f8c217925bd4",
+    "one": "086d28806bc2",
+    "other": "f8c217925bd4"
+  },
+  "recipes|pl|ingredient_defaults.showing": {
+    "few": "de931a6f1de8",
+    "many": "de931a6f1de8",
+    "one": "a765443561f1",
+    "other": "de931a6f1de8"
+  },
+  "recipes|pl|meal_planner.copy_copied": {
+    "few": "b34fb882e7a7",
+    "many": "e39751479e6c",
+    "one": "b746b250527d",
+    "other": "e39751479e6c"
+  },
+  "recipes|pl|meal_planner.copy_skipped": {
+    "few": "085ea68182c7",
+    "many": "085ea68182c7",
+    "one": "085ea68182c7",
+    "other": "085ea68182c7"
+  },
+  "recipes|pl|meal_planner.entry_count": {
+    "few": "bb6d804473c0",
+    "many": "f9f56c538bca",
+    "one": "a28780cba3ed",
+    "other": "f9f56c538bca"
+  },
+  "recipes|pl|meal_planner.exclusions_count": {
+    "few": "4130a5a38ab1",
+    "many": "4c3fc80e16c9",
+    "one": "6623f926da06",
+    "other": "4c3fc80e16c9"
+  },
+  "recipes|pl|meal_planner.servings": {
+    "few": "a32d784c3576",
+    "many": "f8b16e487dbf",
+    "one": "20afc15d92a3",
+    "other": "f8b16e487dbf"
+  },
+  "recipes|pl|meal_planner.slot_conflict_entries": {
+    "few": "257aaa135721",
+    "many": "dcd42834ab23",
+    "one": "3f42a035fcc7",
+    "other": "dcd42834ab23"
+  },
+  "recipes|pl|picking.spices_section": {
+    "few": "933bf9b5ceb2",
+    "many": "933bf9b5ceb2",
+    "one": "7f0890d8573b",
+    "other": "933bf9b5ceb2"
+  },
+  "recipes|pl|picking.subtitle": {
+    "few": "a32d784c3576",
+    "many": "f8b16e487dbf",
+    "one": "20afc15d92a3",
+    "other": "f8b16e487dbf"
+  },
+  "recipes|pl|picking.unlinked_notice": {
+    "few": "efbb80908b89",
+    "many": "f8722a7c4ef3",
+    "one": "054e451588f6",
+    "other": "f8722a7c4ef3"
+  },
+  "recipes|pl|recipe.prep_time_minutes": {
+    "few": "70ff3490c559",
+    "many": "70ff3490c559",
+    "one": "70ff3490c559",
+    "other": "70ff3490c559"
+  },
+  "recipes|pl|recipe.servings": {
+    "few": "a32d784c3576",
+    "many": "f8b16e487dbf",
+    "one": "20afc15d92a3",
+    "other": "f8b16e487dbf"
+  },
+  "recipes|pl|recipe.servings_unit": {
+    "few": "444f5d445a3b",
+    "many": "322efc7b2e95",
+    "one": "b20119339283",
+    "other": "322efc7b2e95"
+  },
+  "recipes|pl|shopping.added_toast": {
+    "few": "aaba9bbc68d1",
+    "many": "0dfc2968cba6",
+    "one": "1c82a1cf7a3d",
+    "other": "0dfc2968cba6"
+  },
+  "recipes|pl|shopping.added_toast_no_list": {
+    "few": "951c6c3b061b",
+    "many": "644e08a4812a",
+    "one": "92e07841dd54",
+    "other": "644e08a4812a"
+  },
+  "recipes|pl|tags_manager.count": {
+    "few": "448cec6ad51d",
+    "many": "f0a96987f6c8",
+    "one": "c31844019b17",
+    "other": "f0a96987f6c8"
+  },
+  "recipes|pl|tags_manager.delete_success": {
+    "few": "e45a0d1b275a",
+    "many": "15da82cfbf74",
+    "one": "370886d3d806",
+    "other": "15da82cfbf74"
+  },
+  "recipes|pl|tags_manager.merge_success": {
+    "few": "3b16546d5de7",
+    "many": "32dd24021e9c",
+    "one": "2c9ec7b74669",
+    "other": "32dd24021e9c"
+  },
+  "recipes|pl|tags_manager.rename_success": {
+    "few": "ef1754391331",
+    "many": "f19882d7643f",
+    "one": "0db112e9cb5e",
+    "other": "f19882d7643f"
+  },
+  "recipes|pl|unit_conversions.showing": {
+    "few": "facf66c6f61a",
+    "many": "84a7710ad99a",
+    "one": "83eca9b0a7a6",
+    "other": "84a7710ad99a"
+  },
+  "shopping_lists|de|addFromRecipes.addSelected": {
+    "one": "d3b96c898829",
+    "other": "6e68ca05a931"
+  },
+  "shopping_lists|de|addFromRecipes.success": {
+    "one": "fc3a6e9e912d",
+    "other": "4b8c895e34e2"
+  },
+  "shopping_lists|de|card.morePreview": {
+    "one": "56f99539d988",
+    "other": "e5d4a351dfff"
+  },
+  "shopping_lists|de|detail.clearPurchased": {
+    "one": "e34fa5f9ec99",
+    "other": "e34fa5f9ec99"
+  },
+  "shopping_lists|de|detail.confirmConvertGrouped": {
+    "one": "64d006895062",
+    "other": "73d4a3ab4c03"
+  },
+  "shopping_lists|de|detail.confirmConvertSkipped": {
+    "one": "fed8db2422be",
+    "other": "3e3e71ff6d2a"
+  },
+  "shopping_lists|de|detail.purchasedCount": {
+    "one": "56c05edae98e",
+    "other": "56c05edae98e"
+  },
+  "shopping_lists|de|detail.toBuyCount": {
+    "one": "de44f6508568",
+    "other": "de44f6508568"
+  },
+  "shopping_lists|en|addFromRecipes.addSelected": {
+    "one": "58ea55835761",
+    "other": "db1ad3d2a244"
+  },
+  "shopping_lists|en|addFromRecipes.success": {
+    "one": "ade4abba0338",
+    "other": "286d5e1d6310"
+  },
+  "shopping_lists|en|card.morePreview": {
+    "one": "e11abf04e922",
+    "other": "25a067fd69ff"
+  },
+  "shopping_lists|en|detail.clearPurchased": {
+    "one": "9ec74c554a6e",
+    "other": "9ec74c554a6e"
+  },
+  "shopping_lists|en|detail.confirmConvertGrouped": {
+    "one": "c64be7067ccf",
+    "other": "e7a5a95f6c86"
+  },
+  "shopping_lists|en|detail.confirmConvertSkipped": {
+    "one": "f33a5ca42822",
+    "other": "fc40c0c9546e"
+  },
+  "shopping_lists|en|detail.purchasedCount": {
+    "one": "acc709d5f2bc",
+    "other": "acc709d5f2bc"
+  },
+  "shopping_lists|en|detail.toBuyCount": {
+    "one": "beff13c86fcc",
+    "other": "beff13c86fcc"
+  },
+  "shopping_lists|es|addFromRecipes.addSelected": {
+    "one": "ff5f803b7982",
+    "other": "63f2b6a6e2cc"
+  },
+  "shopping_lists|es|addFromRecipes.success": {
+    "one": "5b7d77e30483",
+    "other": "a45e5a97afb9"
+  },
+  "shopping_lists|es|card.morePreview": {
+    "one": "8e6db19f94d8",
+    "other": "f37117519eb4"
+  },
+  "shopping_lists|es|detail.clearPurchased": {
+    "one": "44ec777a8bd0",
+    "other": "44ec777a8bd0"
+  },
+  "shopping_lists|es|detail.confirmConvertGrouped": {
+    "one": "dba82410e9fd",
+    "other": "26e77e297a90"
+  },
+  "shopping_lists|es|detail.confirmConvertSkipped": {
+    "one": "7629a84c4c54",
+    "other": "a0669e51e068"
+  },
+  "shopping_lists|es|detail.purchasedCount": {
+    "one": "9b4fe420844f",
+    "other": "76dc997736e0"
+  },
+  "shopping_lists|es|detail.toBuyCount": {
+    "one": "ae5e2415da5d",
+    "other": "ae5e2415da5d"
+  },
+  "shopping_lists|fr|addFromRecipes.addSelected": {
+    "one": "58b6ce9b4f30",
+    "other": "6566d3128ab9"
+  },
+  "shopping_lists|fr|addFromRecipes.success": {
+    "one": "056c0b21e728",
+    "other": "1e9d492ac0ab"
+  },
+  "shopping_lists|fr|card.morePreview": {
+    "one": "207a582001e9",
+    "other": "70ade1cda63b"
+  },
+  "shopping_lists|fr|detail.clearPurchased": {
+    "one": "5ba0286b4634",
+    "other": "5ba0286b4634"
+  },
+  "shopping_lists|fr|detail.confirmConvertGrouped": {
+    "one": "a4be38168986",
+    "other": "e96b0a922ce7"
+  },
+  "shopping_lists|fr|detail.confirmConvertSkipped": {
+    "one": "36e9de7f4f2a",
+    "other": "475c4a9759ab"
+  },
+  "shopping_lists|fr|detail.purchasedCount": {
+    "one": "8878cd167878",
+    "other": "f70a0c1667a5"
+  },
+  "shopping_lists|fr|detail.toBuyCount": {
+    "one": "f58ace6335ef",
+    "other": "f58ace6335ef"
+  },
+  "shopping_lists|pl|addFromRecipes.addSelected": {
+    "few": "b48f510c5f45",
+    "many": "b7bbad4c24e1",
+    "one": "d9e228a8a443",
+    "other": "b7bbad4c24e1"
+  },
+  "shopping_lists|pl|addFromRecipes.success": {
+    "few": "07268ba279e8",
+    "many": "a3f2df6bb460",
+    "one": "6ee35cce38f1",
+    "other": "a3f2df6bb460"
+  },
+  "shopping_lists|pl|card.morePreview": {
+    "few": "001af65c2e51",
+    "many": "001af65c2e51",
+    "one": "435b887edc8f",
+    "other": "001af65c2e51"
+  },
+  "shopping_lists|pl|detail.clearPurchased": {
+    "few": "8aa0beb904d5",
+    "many": "8aa0beb904d5",
+    "one": "8aa0beb904d5",
+    "other": "8aa0beb904d5"
+  },
+  "shopping_lists|pl|detail.confirmConvertGrouped": {
+    "few": "e7f6e8ad776b",
+    "many": "e33c862111e7",
+    "one": "d0c8e7289a09",
+    "other": "e33c862111e7"
+  },
+  "shopping_lists|pl|detail.confirmConvertSkipped": {
+    "few": "cb7c3307a8a3",
+    "many": "382434b7a22c",
+    "one": "a4605d3a0940",
+    "other": "382434b7a22c"
+  },
+  "shopping_lists|pl|detail.purchasedCount": {
+    "few": "5e3dc2f59888",
+    "many": "c0080a66f289",
+    "one": "2b9a912e770c",
+    "other": "c0080a66f289"
+  },
+  "shopping_lists|pl|detail.toBuyCount": {
+    "few": "2ffdef0db024",
+    "many": "2ffdef0db024",
+    "one": "2ffdef0db024",
+    "other": "2ffdef0db024"
+  },
+  "stats|de|costAnalysis.excludedOtherCurrency": {
+    "one": "d5cfac72c2eb",
+    "other": "3458859cf164"
+  },
+  "stats|de|health.subtitle": {
+    "one": "a484bd5a497b",
+    "other": "9ac37f9c373b"
+  },
+  "stats|de|reconciliation.subtitle": {
+    "one": "f67fa91d72a0",
+    "other": "85284c9e16d3"
+  },
+  "stats|en|costAnalysis.excludedOtherCurrency": {
+    "one": "b4d3b658c4cc",
+    "other": "778d62e1a223"
+  },
+  "stats|en|health.subtitle": {
+    "one": "2b4e9c08ed86",
+    "other": "32b6ea2ee3fa"
+  },
+  "stats|en|reconciliation.subtitle": {
+    "one": "504979786c4c",
+    "other": "c15324a43320"
+  },
+  "stats|es|costAnalysis.excludedOtherCurrency": {
+    "one": "a486caccc177",
+    "other": "f1b29e00a7bd"
+  },
+  "stats|es|health.subtitle": {
+    "one": "e54849b9fb87",
+    "other": "f7bdaca8539e"
+  },
+  "stats|es|reconciliation.subtitle": {
+    "one": "e35f6f4124e7",
+    "other": "86feeff6d1c2"
+  },
+  "stats|fr|costAnalysis.excludedOtherCurrency": {
+    "one": "ac4c3fc36cdf",
+    "other": "f8044742db2e"
+  },
+  "stats|fr|health.subtitle": {
+    "one": "d0f10607b8f0",
+    "other": "893facec7049"
+  },
+  "stats|fr|reconciliation.subtitle": {
+    "one": "61011e561cc6",
+    "other": "104cf8a70a28"
+  },
+  "stats|pl|costAnalysis.excludedOtherCurrency": {
+    "few": "2e89a20cd351",
+    "many": "16c02bc4234f",
+    "one": "9677d0e5f55f",
+    "other": "20a43cf4fce4"
+  },
+  "stats|pl|health.subtitle": {
+    "few": "bb4f7c44daa9",
+    "many": "c3a78eddb99b",
+    "one": "f37c1041088f",
+    "other": "38a69634c7bf"
+  },
+  "stats|pl|reconciliation.subtitle": {
+    "few": "0baaf406c5c7",
+    "many": "0baaf406c5c7",
+    "one": "bb768aa77a7c",
+    "other": "0baaf406c5c7"
+  },
+  "stock_takes|de|confirm.complete.message": {
+    "one": "a9095fa1ea8f",
+    "other": "b9db95f01002"
+  },
+  "stock_takes|de|confirm.complete.unsaved": {
+    "one": "5ee9be29037a",
+    "other": "255970b44df3"
+  },
+  "stock_takes|de|confirm.overCap.message": {
+    "one": "220dc81b0321",
+    "other": "04049e659bf7"
+  },
+  "stock_takes|de|confirm.overTolerance.message": {
+    "one": "3fd3eac9a562",
+    "other": "45d6261d6ed4"
+  },
+  "stock_takes|de|differencesBadge": {
+    "one": "74ad0921d1b7",
+    "other": "d4f3d5cd99bf"
+  },
+  "stock_takes|de|errors.unexplainedDifferences": {
+    "one": "4897d789c3e3",
+    "other": "d9a522052bbd"
+  },
+  "stock_takes|de|errors.unitDecimals": {
+    "one": "d749b4216c61",
+    "other": "352c45366848"
+  },
+  "stock_takes|de|outsideItems.title": {
+    "one": "d80e20d74a82",
+    "other": "700cbe3e5803"
+  },
+  "stock_takes|de|progress.discrepanciesDetected": {
+    "one": "aa3e9cd78a66",
+    "other": "6031113d58cd"
+  },
+  "stock_takes|de|progress.unsaved": {
+    "one": "991eaa1acb48",
+    "other": "ea2e4ee7a7ea"
+  },
+  "stock_takes|de|surplusCount": {
+    "one": "c5c37551929c",
+    "other": "d9aef4491e82"
+  },
+  "stock_takes|en|confirm.complete.message": {
+    "one": "2c4a71cebf3f",
+    "other": "952a58b5254c"
+  },
+  "stock_takes|en|confirm.complete.unsaved": {
+    "one": "618fef3f94a4",
+    "other": "2b46d619538a"
+  },
+  "stock_takes|en|confirm.overCap.message": {
+    "one": "3e165df5f07a",
+    "other": "c299137fb97f"
+  },
+  "stock_takes|en|confirm.overTolerance.message": {
+    "one": "e042cd9d3f25",
+    "other": "7aebf6f510e5"
+  },
+  "stock_takes|en|differencesBadge": {
+    "one": "4a3a1d080d6f",
+    "other": "0f7b1b212079"
+  },
+  "stock_takes|en|errors.unexplainedDifferences": {
+    "one": "d39d2391b1a7",
+    "other": "dcc1b8847439"
+  },
+  "stock_takes|en|errors.unitDecimals": {
+    "one": "1b270bd567a1",
+    "other": "48b9444dedb2"
+  },
+  "stock_takes|en|outsideItems.title": {
+    "one": "9e9bd52b07ab",
+    "other": "97d16a93fa19"
+  },
+  "stock_takes|en|progress.discrepanciesDetected": {
+    "one": "bb7633223686",
+    "other": "ff63c940e401"
+  },
+  "stock_takes|en|progress.unsaved": {
+    "one": "e592c7c0b7d6",
+    "other": "7997d02feea5"
+  },
+  "stock_takes|en|surplusCount": {
+    "one": "de9bf16dfae6",
+    "other": "d2d03d401e90"
+  },
+  "stock_takes|es|confirm.complete.message": {
+    "one": "31b232e37baf",
+    "other": "3679e1628075"
+  },
+  "stock_takes|es|confirm.complete.unsaved": {
+    "one": "3d955efb64f9",
+    "other": "cf2c3d8ecdce"
+  },
+  "stock_takes|es|confirm.overCap.message": {
+    "one": "b5cc3c246772",
+    "other": "ba51a23341d9"
+  },
+  "stock_takes|es|confirm.overTolerance.message": {
+    "one": "3cdef12a467d",
+    "other": "df353e162d3b"
+  },
+  "stock_takes|es|differencesBadge": {
+    "one": "bfa005a4955c",
+    "other": "8de8c7723440"
+  },
+  "stock_takes|es|errors.unexplainedDifferences": {
+    "one": "ceea72a2639d",
+    "other": "1f158370de80"
+  },
+  "stock_takes|es|errors.unitDecimals": {
+    "one": "273da0f5c39f",
+    "other": "95f89a9b8f70"
+  },
+  "stock_takes|es|outsideItems.title": {
+    "one": "77e6091d90aa",
+    "other": "fbbb224020ac"
+  },
+  "stock_takes|es|progress.discrepanciesDetected": {
+    "one": "339905bb3952",
+    "other": "1cd7473fd003"
+  },
+  "stock_takes|es|progress.unsaved": {
+    "one": "38b5e494faa9",
+    "other": "a06fd4fc6dad"
+  },
+  "stock_takes|es|surplusCount": {
+    "one": "fab8e9818bb1",
+    "other": "6f6111d8ec40"
+  },
+  "stock_takes|fr|confirm.complete.message": {
+    "one": "db93ec1d58fa",
+    "other": "684296974594"
+  },
+  "stock_takes|fr|confirm.complete.unsaved": {
+    "one": "2a8a299b5db2",
+    "other": "1d3d6aed4513"
+  },
+  "stock_takes|fr|confirm.overCap.message": {
+    "one": "11155e944f36",
+    "other": "44c2d26e418c"
+  },
+  "stock_takes|fr|confirm.overTolerance.message": {
+    "one": "a422f3bd174a",
+    "other": "5e7ab3166315"
+  },
+  "stock_takes|fr|differencesBadge": {
+    "one": "7a41cbcbd343",
+    "other": "2344305e66aa"
+  },
+  "stock_takes|fr|errors.unexplainedDifferences": {
+    "one": "f26eefdf47df",
+    "other": "93c6ab188bc8"
+  },
+  "stock_takes|fr|errors.unitDecimals": {
+    "one": "e1bcd6d6c8c5",
+    "other": "45981ef6f76d"
+  },
+  "stock_takes|fr|outsideItems.title": {
+    "one": "22924d44f6bf",
+    "other": "8b95914ca667"
+  },
+  "stock_takes|fr|progress.discrepanciesDetected": {
+    "one": "797546c32bc5",
+    "other": "d5e684565b70"
+  },
+  "stock_takes|fr|progress.unsaved": {
+    "one": "c7b71a974dc3",
+    "other": "588f701d2085"
+  },
+  "stock_takes|fr|surplusCount": {
+    "one": "de9bf16dfae6",
+    "other": "d2d03d401e90"
+  },
+  "stock_takes|pl|confirm.complete.message": {
+    "few": "3736bbc48359",
+    "many": "3736bbc48359",
+    "one": "a01fcd895e1a",
+    "other": "8d7394fe297e"
+  },
+  "stock_takes|pl|confirm.complete.unsaved": {
+    "few": "bbf1f7fe2d80",
+    "many": "89676be821cd",
+    "one": "f278660d3a9c",
+    "other": "89676be821cd"
+  },
+  "stock_takes|pl|confirm.overCap.message": {
+    "few": "07ea38a74c9b",
+    "many": "72e507bc24ca",
+    "one": "5498aec4d430",
+    "other": "56a30189f11f"
+  },
+  "stock_takes|pl|confirm.overTolerance.message": {
+    "few": "d8b89563caab",
+    "many": "f7bc04cae285",
+    "one": "b4f13a6921b9",
+    "other": "829c71e07ffd"
+  },
+  "stock_takes|pl|differencesBadge": {
+    "few": "effc4fefa91b",
+    "many": "bae29ef1d6cc",
+    "one": "201ed497e527",
+    "other": "3526153c7fea"
+  },
+  "stock_takes|pl|errors.unexplainedDifferences": {
+    "few": "5fa15cf31794",
+    "many": "761e6c149646",
+    "one": "35799f14ea64",
+    "other": "21e70eaed443"
+  },
+  "stock_takes|pl|errors.unitDecimals": {
+    "few": "c7ebc6296950",
+    "many": "c7ebc6296950",
+    "one": "c1733616267a",
+    "other": "c1733616267a"
+  },
+  "stock_takes|pl|outsideItems.title": {
+    "few": "f1b88d523efc",
+    "many": "cb2c61f1fe2d",
+    "one": "c0a87ef8106f",
+    "other": "cb2c61f1fe2d"
+  },
+  "stock_takes|pl|progress.discrepanciesDetected": {
+    "few": "13463bcbecf7",
+    "many": "13463bcbecf7",
+    "one": "7ef84a09a8be",
+    "other": "13463bcbecf7"
+  },
+  "stock_takes|pl|progress.unsaved": {
+    "few": "3b377858cf91",
+    "many": "b17a216bb3cb",
+    "one": "8d7f1320969a",
+    "other": "b17a216bb3cb"
+  },
+  "stock_takes|pl|surplusCount": {
+    "few": "c407170df84d",
+    "many": "756962ca8750",
+    "one": "f38db3f816eb",
+    "other": "756962ca8750"
+  },
+  "storages|de|card.unit": {
+    "one": "34b157607524",
+    "other": "ff09a8b6df04"
+  },
+  "storages|de|counts.directly": {
+    "one": "ecbf3789dc14",
+    "other": "ecbf3789dc14"
+  },
+  "storages|de|counts.inSublocations": {
+    "one": "5b7b2a9c5dad",
+    "other": "5b7b2a9c5dad"
+  },
+  "storages|de|detail.products": {
+    "one": "cca8f8095d86",
+    "other": "e936d03b65a0"
+  },
+  "storages|de|edit.deleteMovesLocations": {
+    "one": "ab4b365cc1e2",
+    "other": "9d4a41547426"
+  },
+  "storages|de|edit.deleteMovesRecords": {
+    "one": "e7450a2c3b5c",
+    "other": "e45e90920c67"
+  },
+  "storages|de|locationCount": {
+    "one": "f23c8f7761cc",
+    "other": "a376141738e0"
+  },
+  "storages|de|reorg.deleteBlockedWithItems": {
+    "one": "ef80916d98cd",
+    "other": "31e21b65c3ac"
+  },
+  "storages|de|stats.locations": {
+    "one": "ecf34cc8921a",
+    "other": "6a478e2b52be"
+  },
+  "storages|en|card.unit": {
+    "one": "a8792157cb4f",
+    "other": "0a3e27b8ca81"
+  },
+  "storages|en|counts.directly": {
+    "one": "9b4810423a68",
+    "other": "9b4810423a68"
+  },
+  "storages|en|counts.inSublocations": {
+    "one": "330ac536669e",
+    "other": "330ac536669e"
+  },
+  "storages|en|detail.products": {
+    "one": "c672af2b53ea",
+    "other": "c672af2b53ea"
+  },
+  "storages|en|edit.deleteMovesLocations": {
+    "one": "c3adb6277f7a",
+    "other": "50ebd1eaad1f"
+  },
+  "storages|en|edit.deleteMovesRecords": {
+    "one": "12a183270208",
+    "other": "dbf07ab833e6"
+  },
+  "storages|en|locationCount": {
+    "one": "e3fed649c66a",
+    "other": "6408daf3e5d3"
+  },
+  "storages|en|reorg.deleteBlockedWithItems": {
+    "one": "94681c777bef",
+    "other": "456688b897ac"
+  },
+  "storages|en|stats.locations": {
+    "one": "e6eaea18e885",
+    "other": "f0a5e562723a"
+  },
+  "storages|es|card.unit": {
+    "one": "85dc0c638f09",
+    "other": "3064889c53e2"
+  },
+  "storages|es|counts.directly": {
+    "one": "8ac70b0408cb",
+    "other": "8ac70b0408cb"
+  },
+  "storages|es|counts.inSublocations": {
+    "one": "206bb371e22c",
+    "other": "206bb371e22c"
+  },
+  "storages|es|detail.products": {
+    "one": "0653126e6633",
+    "other": "0653126e6633"
+  },
+  "storages|es|edit.deleteMovesLocations": {
+    "one": "cbdd1c979105",
+    "other": "bc15f08fd286"
+  },
+  "storages|es|edit.deleteMovesRecords": {
+    "one": "20ede65027ba",
+    "other": "9e3e51f7ca27"
+  },
+  "storages|es|locationCount": {
+    "one": "83bb59b82d51",
+    "other": "17484d2e7d36"
+  },
+  "storages|es|reorg.deleteBlockedWithItems": {
+    "one": "300bd33d2e2c",
+    "other": "02dea22f53b8"
+  },
+  "storages|es|stats.locations": {
+    "one": "917c05c85c7e",
+    "other": "286cc57d3e64"
+  },
+  "storages|fr|card.unit": {
+    "one": "ac8d027d8f05",
+    "other": "128bfb0c2d1c"
+  },
+  "storages|fr|counts.directly": {
+    "one": "90e224ba1a25",
+    "other": "90e224ba1a25"
+  },
+  "storages|fr|counts.inSublocations": {
+    "one": "76780964ef84",
+    "other": "76780964ef84"
+  },
+  "storages|fr|detail.products": {
+    "one": "5177d9d9543b",
+    "other": "5177d9d9543b"
+  },
+  "storages|fr|edit.deleteMovesLocations": {
+    "one": "adf5d0cc091d",
+    "other": "6d8db3842867"
+  },
+  "storages|fr|edit.deleteMovesRecords": {
+    "one": "1fcbfbe6d258",
+    "other": "83f8b15548b0"
+  },
+  "storages|fr|locationCount": {
+    "one": "5506af132c94",
+    "other": "1a525f347110"
+  },
+  "storages|fr|reorg.deleteBlockedWithItems": {
+    "one": "f56c4739d402",
+    "other": "b8f1dafce017"
+  },
+  "storages|fr|stats.locations": {
+    "one": "261e0e4b1222",
+    "other": "1a73f4905af4"
+  },
+  "storages|pl|card.unit": {
+    "few": "fc9b39bbf63c",
+    "many": "b65137487116",
+    "one": "91f3a8e81960",
+    "other": "b65137487116"
+  },
+  "storages|pl|counts.directly": {
+    "few": "93e291779614",
+    "many": "93e291779614",
+    "one": "93e291779614",
+    "other": "93e291779614"
+  },
+  "storages|pl|counts.inSublocations": {
+    "few": "13b3c987b952",
+    "many": "13b3c987b952",
+    "one": "13b3c987b952",
+    "other": "13b3c987b952"
+  },
+  "storages|pl|detail.products": {
+    "few": "c7e5a1c9ef2a",
+    "many": "79225b571cd6",
+    "one": "cca8f8095d86",
+    "other": "79225b571cd6"
+  },
+  "storages|pl|edit.deleteMovesLocations": {
+    "few": "6d7d672a6e28",
+    "many": "20b9ed3d1610",
+    "one": "dce021362b26",
+    "other": "20b9ed3d1610"
+  },
+  "storages|pl|edit.deleteMovesRecords": {
+    "few": "0afee2d138a9",
+    "many": "1f1100aa875a",
+    "one": "9079f93edd4b",
+    "other": "1f1100aa875a"
+  },
+  "storages|pl|locationCount": {
+    "few": "2d4e530598aa",
+    "many": "cbb249d73059",
+    "one": "c28b91311e83",
+    "other": "cbb249d73059"
+  },
+  "storages|pl|reorg.deleteBlockedWithItems": {
+    "few": "b48b90135d05",
+    "many": "ce524031e1b7",
+    "one": "0befa0837f11",
+    "other": "ce524031e1b7"
+  },
+  "storages|pl|stats.locations": {
+    "few": "3a5437589c7e",
+    "many": "ecd9290adf09",
+    "one": "3949a41101c0",
+    "other": "ecd9290adf09"
+  },
+  "webhooks|de|circuitBreakerWarning": {
+    "one": "b34cd13a11fb",
+    "other": "fcb8c0e655fe"
+  },
+  "webhooks|de|failuresSinceSuccess": {
+    "one": "272af4046f40",
+    "other": "cd3ed4ef489b"
+  },
+  "webhooks|de|form.eventsSelected": {
+    "one": "450f5c989a5f",
+    "other": "450f5c989a5f"
+  },
+  "webhooks|en|circuitBreakerWarning": {
+    "one": "0cd642388c87",
+    "other": "be96a0c62eb5"
+  },
+  "webhooks|en|failuresSinceSuccess": {
+    "one": "1a7517543c70",
+    "other": "d29b1488f5a8"
+  },
+  "webhooks|en|form.eventsSelected": {
+    "one": "a506e3e6a0f7",
+    "other": "a506e3e6a0f7"
+  },
+  "webhooks|es|circuitBreakerWarning": {
+    "one": "70305dfe354b",
+    "other": "6d846a378e2b"
+  },
+  "webhooks|es|failuresSinceSuccess": {
+    "one": "181e32d4bde6",
+    "other": "be4bf57b9edf"
+  },
+  "webhooks|es|form.eventsSelected": {
+    "one": "90036c91dc06",
+    "other": "0e718a853c7d"
+  },
+  "webhooks|fr|circuitBreakerWarning": {
+    "one": "6781913cd315",
+    "other": "e9fd5eba2742"
+  },
+  "webhooks|fr|failuresSinceSuccess": {
+    "one": "720ce0447879",
+    "other": "4b918fe9a0dd"
+  },
+  "webhooks|fr|form.eventsSelected": {
+    "one": "39501cb524eb",
+    "other": "4ffb6390e93a"
+  },
+  "webhooks|pl|circuitBreakerWarning": {
+    "few": "3519dde7da5f",
+    "many": "3519dde7da5f",
+    "one": "4c4761729a2a",
+    "other": "3519dde7da5f"
+  },
+  "webhooks|pl|failuresSinceSuccess": {
+    "few": "c9c542d2603f",
+    "many": "a726229a7a27",
+    "one": "18dc17393e77",
+    "other": "f9316ef6603b"
+  },
+  "webhooks|pl|form.eventsSelected": {
+    "few": "d4044c85ad08",
+    "many": "d4044c85ad08",
+    "one": "d4044c85ad08",
+    "other": "d4044c85ad08"
+  }
+}

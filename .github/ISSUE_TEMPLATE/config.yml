@@ -1,0 +1,11 @@
+# Issues are enabled, but we encourage discussions for questions and ideas.
+# This config adds a "Discussions" link on the issue-new page so that
+# support questions and feature ideas land in the right place.
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discussions / Questions / Ideas
+    url: https://github.com/InventariLabs/Inventari/discussions
+    about: Ask questions, share ideas, and discuss use cases in GitHub Discussions.
+  - name: 🔒 Security Report
+    url: https://github.com/InventariLabs/Inventari/security/policy
+    about: Found a security issue? Please report it privately via SECURITY.md (do NOT open a public issue).

@@ -1,0 +1,2 @@
+# Architecture lint baseline
+# Format: relative/path.py::qualname@N

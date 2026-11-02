@@ -1,0 +1,214 @@
+name: Load Test
+
+# k6 baseline run, MANUAL ONLY: p95 latencies and error rates land in the Job
+# Summary and as `::notice` annotations.
+#
+# The harness (load_tests/, docker-compose.loadtest.yml, four scenarios) is
+# here for the moment a number is actually wanted — before a release, after a
+# change to the hot queries, when a deployment starts serving real traffic.
+# Run it from the Actions tab, or with `gh workflow run loadtest.yml`.
+#
+# Not on a schedule. A recurring baseline measures load nobody is generating
+# and produces a trend nobody reads; the nightly version of this workflow ran
+# for ten days and produced not one usable data point. A scheduled run earns
+# its place once there is traffic whose regression someone would feel.
+#
+# The k6 step carries `|| true`, so a failed threshold reports without failing
+# the job — the numbers are the output here, not a verdict. Drop it once the
+# thresholds describe a normal that has been observed rather than guessed.
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "Scenario file under load_tests/scenarios/"
+        required: false
+        default: "browse_and_scan.js"
+      duration_profile:
+        description: "short (default) or full (the scenario's own stages)"
+        required: false
+        default: "short"
+
+permissions:
+  contents: read
+
+jobs:
+  loadtest:
+    name: k6 baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: inventari_user
+          POSTGRES_PASSWORD: inventari_pass
+          POSTGRES_DB: inventari_loadtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        # Valkey (BSD-3-Clause), matching the runtime stack — see docker-compose.yml.
+        image: valkey/valkey:9.1.1-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://inventari_user:inventari_pass@localhost:5432/inventari_loadtest
+      DB_USER: inventari_user
+      DB_PASSWORD: inventari_pass
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      SECRET_KEY: ci-loadtest-secret-key-not-for-production-use-only
+      DEBUG: "false"
+      REDIS_URL: redis://localhost:6379
+      FILE_STORAGE_LOCAL_PATH: /tmp/inventari-uploads
+      LOAD_TESTING: "true"
+      K6_USER_PASSWORD: LoadTest123!
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: uv sync --all-extras --dev
+
+      - name: Migrate and seed
+        working-directory: ./backend
+        run: |
+          uv run python manage.py db upgrade
+          uv run python manage.py db upgrade-modules
+          uv run python manage.py db seed || true
+
+      - name: Seed load-test users and data
+        working-directory: ./backend
+        run: |
+          PYRUN="uv run python" USER_COUNT=50 SEED_ARGS="--limit-orgs 3" \
+            K6_PASSWORD="$K6_USER_PASSWORD" ../load_tests/prepare.sh
+
+      - name: Start the API
+        working-directory: ./backend
+        run: |
+          uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2 \
+            > /tmp/api.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8000/health >/dev/null 2>&1; then
+              echo "API up after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "API did not become healthy; last log lines:"
+          tail -50 /tmp/api.log
+          exit 1
+
+      - name: Install k6
+        run: |
+          curl -fsSL https://dl.k6.io/key.gpg \
+            | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+            | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update && sudo apt-get install -y k6
+
+      - name: Run k6
+        id: k6
+        env:
+          SCENARIO: ${{ github.event.inputs.scenario || 'browse_and_scan.js' }}
+          PROFILE: ${{ github.event.inputs.duration_profile || 'short' }}
+          BASE_URL: http://localhost:8000
+          USERS_CSV: load_tests/users.csv
+        run: |
+          # The scenario's own stages run 15 minutes. The `short` profile uses a
+          # shorter ramp so it fits a reasonable window; --stage overrides `stages`.
+          if [ "$PROFILE" = "short" ]; then
+            STAGES="--stage 30s:10 --stage 2m:20 --stage 30s:0"
+          else
+            STAGES=""
+          fi
+          # `|| true`: k6 exits 99 when a threshold is missed, and this run
+          # reports rather than gates (see the header).
+          k6 run $STAGES \
+            --summary-export=/tmp/k6-summary.json \
+            "load_tests/scenarios/$SCENARIO" 2>&1 | tee /tmp/k6-output.txt || true
+          test -f /tmp/k6-summary.json
+
+      - name: Report
+        if: always()
+        run: |
+          {
+            echo "## k6 baseline — ${{ github.event.inputs.scenario || 'browse_and_scan.js' }}"
+            echo
+            echo '```text'
+            tail -40 /tmp/k6-output.txt 2>/dev/null || echo "no k6 output captured"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f /tmp/k6-summary.json ]; then
+            # The table is written to the summary file directly and the
+            # ::notice lines go to stdout — annotations are only picked up from
+            # step output, so redirecting everything into the summary would
+            # turn them into literal text in the middle of the table.
+            python3 - <<'PY'
+          import json
+          import os
+
+          with open('/tmp/k6-summary.json') as fh:
+              metrics = json.load(fh).get('metrics', {})
+
+          rows = [
+              (name, values['p(95)'], values.get('avg') or 0, values.get('max') or 0)
+              for name, values in sorted(metrics.items())
+              if values.get('p(95)') is not None
+          ]
+          failed = metrics.get('http_req_failed', {}).get('rate')
+
+          lines = ['', '| metric | p95 (ms) | avg (ms) | max (ms) |', '|---|---:|---:|---:|']
+          lines += [f'| {n} | {p:.0f} | {a:.0f} | {m:.0f} |' for n, p, a, m in rows]
+          if failed is not None:
+              lines += ['', f'**Request failure rate:** {failed * 100:.2f}%']
+
+          summary_path = os.environ.get('GITHUB_STEP_SUMMARY')
+          if summary_path:
+              with open(summary_path, 'a') as fh:
+                  fh.write('\n'.join(lines) + '\n')
+          else:
+              print('\n'.join(lines))
+
+          for name, p95, _avg, _max in rows:
+              print(f'::notice title=k6 {name}::p95={p95:.0f}ms')
+          if failed is not None:
+              print(f'::notice title=k6 failures::{failed * 100:.2f}%')
+          PY
+          fi
+
+      - name: API log on failure
+        if: failure()
+        run: tail -100 /tmp/api.log || true
+
+      - name: Upload k6 summary
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: k6-summary
+          path: |
+            /tmp/k6-summary.json
+            /tmp/k6-output.txt
+          retention-days: 30

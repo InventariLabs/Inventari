@@ -1,0 +1,30 @@
+# Places where a private backlog identifier is still in the public tree.
+# Format: <path relative to the repository root>:<identifier>:<line text> | owner=<who> | expires=<YYYY-MM-DD> | <reason>
+#
+# The list is meant to shrink. AGENTS.md says a task id appears nowhere in
+# this repository, and `check_internal_ids.py` is the part that keeps that
+# true: an identifier from the private backlog points a reader of this
+# repository at something they cannot open, and it stands in for the reason
+# rather than giving it.
+#
+# Owner and expiry are mandatory and both are checked; past the date the
+# checker fails and names the owner. The fix for a finding is never to add
+# a line here, it is to say what the comment was for: "we refuse the move
+# because the label outlives the record" tells the next reader something;
+# "see" followed by a task number tells them to go and ask somebody.
+#
+# One class of entries will not shrink by rewording: code-shaped fixture
+# data a regex cannot tell from a citation ("asset_tag": "INV-0042" in a
+# byte-level CSV, a short_code "INV-0001" next to its assertion). Renaming
+# legal test data to dodge the scanner is its own harm; those entries sit
+# here as a named, permanent class rather than pretending they are debt.
+#
+# The block below was taken on 2026-09-16, when the checker stopped skipping
+# test files: a module test or a frontend spec cites the task that fixed the
+# behaviour, and these references were already in the tree. They are
+# recorded with an owner and a date, not blessed. New references in a test
+# file fail like any other.
+#
+# Citations of published documents are not identifiers and are not matched:
+# AGENTS.md sections, UI_GUIDELINES sections, ADR numbers, RFCs. They name
+# something the reader can open.

@@ -1,0 +1,507 @@
+name: CI
+
+# Pull requests target `dev`, so the workflow runs there as well as on
+# `main`: without it a pull request to `dev` would get no check but the CLA.
+# While the repository was private a full run cost about 55 minutes of
+# billed runner time and `dev` took some twenty merges a day, so it ran on
+# `main` only; a public repository's runs are not billed. It does not replace
+# the local gates: the pre-push gate in AGENTS.md runs before a push, this
+# runs after it.
+on:
+  push:
+    branches: [ "dev", "main" ]
+  pull_request:
+    branches: [ "dev", "main" ]
+  workflow_dispatch:
+
+# A full run takes longer than the interval between merges to dev, so cancelling
+# it on every push can leave no completed verdict. Queue dev and main runs;
+# on a pull request a newer push makes the running verdict obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    name: What changed
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Fails open on purpose. When the base commit is unknown — a first push,
+      # a force-push, a re-run after history moved — everything runs. A gate
+      # that silently skips itself because it could not work out the diff is
+      # worse than one that costs a few minutes too many.
+      - name: Work out which side of the tree moved
+        id: filter
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          run_everything() {
+            echo "backend=true" >> "$GITHUB_OUTPUT"
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+            echo "Base commit unavailable — running every job." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          }
+
+          [ -n "$BASE" ] || run_everything
+          [ "$BASE" != "0000000000000000000000000000000000000000" ] || run_everything
+          git cat-file -e "${BASE}^{commit}" 2>/dev/null || run_everything
+
+          CHANGED="$(git diff --name-only "$BASE" "${{ github.sha }}")"
+          echo "$CHANGED" | sed 's/^/  /' >> "$GITHUB_STEP_SUMMARY"
+
+          # Anything outside backend/ and frontend/ — the workflow itself, the
+          # Makefile, docker-compose, docs that the drift checks read — could
+          # affect either side, so it wakes both.
+          if echo "$CHANGED" | grep -qvE '^(backend|frontend)/'; then
+            echo "backend=true" >> "$GITHUB_OUTPUT"
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "$CHANGED" | grep -qE '^backend/'  && B=true || B=false
+          echo "$CHANGED" | grep -qE '^frontend/' && F=true || F=false
+          echo "backend=$B" >> "$GITHUB_OUTPUT"
+          echo "frontend=$F" >> "$GITHUB_OUTPUT"
+
+  backend:
+    name: Backend (Python)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: inventari_user
+          POSTGRES_PASSWORD: inventari_pass
+          POSTGRES_DB: inventari_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        # Valkey (BSD-3-Clause), matching the runtime stack — see docker-compose.yml.
+        image: valkey/valkey:9.1.1-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://inventari_user:inventari_pass@localhost:5432/inventari_test
+      DB_USER: inventari_user
+      DB_PASSWORD: inventari_pass
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      DB_TEST_NAME: inventari_test
+      SECRET_KEY: ci-test-secret-key-not-for-production-use-only
+      DEBUG: "true"
+      REDIS_URL: redis://localhost:6379
+      TESTING: "true"
+      FILE_STORAGE_LOCAL_PATH: /tmp/inventari-uploads
+
+    steps:
+      # Full history: the changed-line gate at the end of this job diffs from
+      # the merge base of HEAD and its base ref, and a depth-1 checkout has a
+      # merge base with nothing. diff-cover died on that git error on every
+      # push, before it measured a single line.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # This database exists for the length of one job and is thrown away, so
+      # durability buys nothing and costs a lot: DROP DATABASE forces an
+      # immediate checkpoint and waits for it, and the migration tests create
+      # and drop a database per class. Measured locally on the same suite:
+      # 502s -> 101s. Safe here precisely because the data is disposable.
+      - name: Relax Postgres durability (throwaway test database)
+        run: |
+          PGPASSWORD=inventari_pass psql -h localhost -U inventari_user -d postgres \
+            -c "ALTER SYSTEM SET fsync = off" \
+            -c "ALTER SYSTEM SET synchronous_commit = off" \
+            -c "ALTER SYSTEM SET full_page_writes = off" \
+            -c "SELECT pg_reload_conf()"
+
+      # The service container starts with stock planner costs; the database
+      # the application runs on does not (docker-compose.yml, and the same
+      # values in docker-compose.prod.yml). Tests that assert a query plan —
+      # an index scan rather than a scan plus a sort — are claims about that
+      # database, and on stock costs (random_page_cost 4) the planner chooses
+      # differently. Unlike durability above, this makes CI more like the
+      # real thing, not less.
+      - name: Match the application database's planner settings
+        run: |
+          PGPASSWORD=inventari_pass psql -h localhost -U inventari_user -d postgres \
+            -c "ALTER SYSTEM SET random_page_cost = 1.1" \
+            -c "ALTER SYSTEM SET effective_io_concurrency = 200" \
+            -c "ALTER SYSTEM SET work_mem = '16MB'" \
+            -c "ALTER SYSTEM SET effective_cache_size = '1GB'" \
+            -c "SELECT pg_reload_conf()"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Dependency audit
+        run: uv audit
+
+      - name: Lint (Ruff)
+        run: uv run ruff check .
+
+      - name: Format (Ruff)
+        run: uv run ruff format --check .
+
+      - name: Architecture lint
+        run: uv run python manage.py arch lint
+
+      - name: Dead code (vulture, baseline)
+        run: uv run python scripts/check_vulture_baseline.py
+
+      # `!cancelled()` keeps the expensive steps running after a cheap gate
+      # fails. Without it a single dead-code finding aborts the job and nobody
+      # learns whether the tests pass — the job still goes red, it just reports
+      # everything it knows instead of only the first thing that broke.
+      - name: CoreAPI docs drift check
+        if: ${{ !cancelled() }}
+        run: uv run pytest tests/integration/test_core_api_docs_drift.py -v --no-cov
+
+      - name: Docs paths drift check
+        if: ${{ !cancelled() }}
+        run: uv run pytest tests/integration/test_docs_paths_drift.py -v --no-cov
+
+      - name: Type check (mypy)
+        if: ${{ !cancelled() }}
+        run: uv run python scripts/check_mypy_baseline.py
+
+      # The worker count is read from the runner by scripts/test-workers.py,
+      # the script the Makefile asks too: a fixed -n 8 on the two-CPU, 7 GB
+      # runner lost a worker to the out-of-memory killer. The suite waits on
+      # Postgres more than on the CPU, so the script oversubscribes the cores
+      # and lets free memory set the limit.
+      - name: Tests (coverage)
+        if: ${{ !cancelled() }}
+        run: uv run pytest -n "$(python3 ../scripts/test-workers.py pytest)" -q --tb=short --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
+
+      # Global coverage (70%) lets new code land untested — the WMS
+      # session services sat at ~22% for months. Gate the *changed* lines
+      # instead: every new/modified line must be ≥80% covered.
+      # Base ref: PRs diff against origin/dev; pushes diff against the
+      # previous commit (github.event.before). Both are already in the
+      # full-history checkout; fetching one again with --depth would cut
+      # that history back to a shallow one.
+      - name: Diff coverage on changed lines (>= 80%)
+        if: ${{ !cancelled() }}
+        env:
+          DIFF_BASE_REF: ${{ github.event_name == 'pull_request' && 'origin/dev' || github.event.before || 'origin/dev' }}
+        run: uv run diff-cover coverage.xml --compare-branch="$DIFF_BASE_REF" --fail-under=80
+
+  frontend:
+    name: Frontend (Node.js)
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Lint (i18n raw strings)
+        run: npm run lint:i18n
+
+      - name: Lint (test assertions)
+        run: npm run lint:tests
+
+      - name: Dead code (knip, baseline)
+        run: npm run check:dead:baseline
+
+      - name: i18n keys used vs defined (baseline)
+        run: npm run check:i18n
+
+      - name: i18n unused keys (baseline)
+        run: npm run check:i18n:unused
+
+      # `make check-frontend` and the pre-commit hook have run this for a
+      # while; CI had not, so a rule could reach `dev` red and only bite the
+      # next person to commit.
+      - name: UI conventions
+        run: npm run lint:ui
+
+      - name: Route reachability (baseline)
+        run: npm run check:routes
+
+      - name: File reachability from production roots (baseline)
+        run: npm run check:reachable
+
+      # Snapshot of FrontendModule, SlotContribution and SlotDataMap, plus the
+      # guide's slot table against the same map — the frontend half of the
+      # backend's DTO/core-API snapshots. The checkout carries docs/, so the
+      # guide is checked here even though the dev container mounts only
+      # frontend/.
+      - name: Module contract and guide slot table
+        run: npm run check:modules:contract
+
+      - name: API routes have a caller or a recorded reason
+        run: npm run check:consumers
+
+      - name: Suppressions have an owner and a live date
+        run: npm run check:suppressions
+
+      # See the backend job: a failed gate must not hide the test results.
+      - name: Type Check & Build
+        if: ${{ !cancelled() }}
+        run: npm run build:check
+
+      - name: Unit Tests (Vitest)
+        if: ${{ !cancelled() }}
+        run: npm run test:coverage
+
+  e2e:
+    name: E2E (Playwright)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: inventari_user
+          POSTGRES_PASSWORD: inventari_pass
+          POSTGRES_DB: inventari_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        # Valkey (BSD-3-Clause), matching the runtime stack — see docker-compose.yml.
+        image: valkey/valkey:9.1.1-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://inventari_user:inventari_pass@localhost:5432/inventari_e2e
+      SECRET_KEY: e2e-test-secret-key-do-not-use-in-production
+      DB_USER: inventari_user
+      DB_PASSWORD: inventari_pass
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      DB_NAME: inventari_e2e
+      REDIS_URL: redis://localhost:6379
+      FILE_STORAGE_LOCAL_PATH: /tmp/inventari-uploads
+      DEBUG: "true"
+      FRONTEND_URL: http://localhost:5173
+      PYTHONUNBUFFERED: "1"
+      TESTING: "true"
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # See the backend job: disposable database, so durability is pure cost.
+      - name: Relax Postgres durability (throwaway E2E database)
+        run: |
+          PGPASSWORD=inventari_pass psql -h localhost -U inventari_user -d postgres \
+            -c "ALTER SYSTEM SET fsync = off" \
+            -c "ALTER SYSTEM SET synchronous_commit = off" \
+            -c "ALTER SYSTEM SET full_page_writes = off" \
+            -c "SELECT pg_reload_conf()"
+
+      # ── Backend ────────────────────────────────────────────────────────────
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python
+        working-directory: ./backend
+        run: uv python install 3.14
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: uv sync --all-extras --dev
+
+      - name: Run DB migrations
+        working-directory: ./backend
+        run: uv run alembic upgrade heads
+
+      # Module tables (documents, recipes, ...) live in per-module migration
+      # chains (app/modules/<M>/migrations/), not in core alembic. The startup
+      # module-init hook that would normally apply them is disabled under
+      # TESTING=true, so the E2E database must get them explicitly — without
+      # them every module-backed endpoint dies with UndefinedTableError.
+      - name: Run module migrations
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://inventari_user:inventari_pass@localhost:5432/inventari_e2e
+        run: uv run python manage.py db upgrade-modules
+
+      # Migrations create the tables; they do not fill the system ones. A
+      # migrated-but-unseeded database has zero units of measure and zero
+      # storage types. `make test-e2e-isolated` has always seeded before
+      # running the specs; this keeps CI on the same starting state instead of
+      # a subtly emptier one. Runs after the module migrations so seeding sees
+      # the full schema.
+      - name: Seed system data
+        working-directory: ./backend
+        run: uv run python manage.py db seed
+
+      - name: Create admin user
+        working-directory: ./backend
+        run: |
+          uv run python manage.py user create-admin \
+            --email admin@example.com \
+            --password Admin123 \
+            --name "E2E Admin"
+
+      - name: Start backend
+        working-directory: ./backend
+        run: |
+          nohup uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 \
+            --log-config log_config.yaml \
+            > /tmp/backend.log 2>&1 &
+          disown
+          sleep 2
+
+      # ── Frontend ───────────────────────────────────────────────────────────
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      # The dev server, on purpose. Serving a production build (`vite build`, then
+      # `vite preview` behind the same /api proxy) was measured against it in the
+      # local rehearsal of this very job (a 2-CPU, 7 GB runner container with the
+      # postgres and valkey services, Node 26.11), two runs each on one commit
+      # that differed only in this step:
+      #   dev server      job 576 s and 563 s, E2E step 351 s and 366 s,
+      #                   first-attempt failures 0 and 5, all green on retry
+      #   build + preview job 426 s and 398 s, E2E step 193 s and 199 s (build
+      #                   4 s and 3 s), first-attempt failures 0 and 1 outside
+      #                   transient-module-load
+      # So the build is a third shorter and no worse, but two runs cannot show it
+      # removes the flakes (password-reset still failed its first attempt on the
+      # build once). The transient-module-load spec used to fail all three
+      # attempts against it; it now aborts the page's chunk on either server and
+      # the fixture recovers from a build's chunk failure, so that no longer
+      # stands in the way of switching.
+      - name: Start frontend dev server
+        working-directory: ./frontend
+        env:
+          VITE_BACKEND_TARGET: http://localhost:8000
+        run: |
+          nohup npm run dev > /tmp/frontend.log 2>&1 &
+          disown
+          sleep 2
+
+      # ── Wait & Test ────────────────────────────────────────────────────────
+      # `http-get://` forces GET — the default `http://` probes with HEAD, which
+      # /health does not declare, so the readiness check ate a 405 until timeout.
+      # The major is pinned: an unpinned `npx --yes` resolves to latest on every
+      # run, so a breaking release lands as a mysterious backend outage.
+      - name: Wait for services
+        run: npx --yes wait-on@9 http-get://localhost:8000/health http-get://localhost:5173 --timeout 180000
+
+      - name: Debug service logs (only on failure)
+        if: failure()
+        run: |
+          echo "===== /tmp/backend.log (last 100 lines) ====="
+          tail -n 100 /tmp/backend.log || echo "(no backend.log)"
+          echo "===== /tmp/frontend.log (last 50 lines) ====="
+          tail -n 50 /tmp/frontend.log || echo "(no frontend.log)"
+          echo "===== listening sockets ====="
+          ss -tlnp 2>&1 | grep -E ':(8000|5173)' || echo "(no listeners on 8000/5173)"
+
+      - name: Check generated API types vs backend schema (contract drift)
+        working-directory: ./frontend
+        run: BACKEND_URL=http://localhost:8000 npm run generate:api-types:check
+
+      # WebKit too: the `mobile` and `pl-PL` projects emulate an iPhone, and
+      # the projects that rewrite org-wide state depend on them.
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install chromium webkit --with-deps
+
+      # Every project, as `make test-e2e` runs them: a selection of three left
+      # the phone, Polish, profile-switch, value-tracking and announcement
+      # specs to the local run alone, and a green job said nothing of them.
+      - name: Run E2E tests
+        id: e2e
+        working-directory: ./frontend
+        env:
+          VITE_API_URL: http://localhost:5173
+          CI: "true"
+        run: npx playwright test --reporter=github
+
+      # The debug step above only fires when the readiness check fails, so a
+      # spec failing against a 500 showed the browser's view and nothing of the
+      # server's. Playwright reports the status code; the traceback lives here.
+      - name: Backend log (only when the specs fail)
+        if: ${{ failure() && steps.e2e.outcome == 'failure' }}
+        run: |
+          echo "===== /tmp/backend.log — tracebacks ====="
+          grep -B5 -A30 'Traceback' /tmp/backend.log | head -200 || echo "(no traceback logged)"
+          echo "===== /tmp/backend.log (last 150 lines) ====="
+          tail -n 150 /tmp/backend.log || echo "(no backend.log)"
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7

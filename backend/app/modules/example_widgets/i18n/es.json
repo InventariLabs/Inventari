@@ -1,0 +1,26 @@
+{
+  "navigation": {
+    "widgets": "Widgets"
+  },
+  "page": {
+    "title": "Example Widgets",
+    "description": "Manage your widgets — a reference module for Inventari developers."
+  },
+  "actions": {
+    "add": "Add Widget",
+    "edit": "Edit Widget",
+    "delete": "Delete Widget",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "fields": {
+    "name": "Name",
+    "color": "Color",
+    "quantity": "Quantity",
+    "created": "Created"
+  },
+  "messages": {
+    "empty": "No widgets yet. Create your first one!",
+    "confirmDelete": "Are you sure you want to delete this widget?"
+  }
+}

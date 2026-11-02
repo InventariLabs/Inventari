@@ -1,0 +1,74 @@
+{
+  "title": "Información alimentaria y salud",
+  "scanTable": "Escanear tabla",
+  "noData": "No hay datos disponibles para este producto. Use el botón 'Escanear tabla' para añadir valores nutricionales e ingredientes con la cámara.",
+  "noDataRoutes": "Aún no hay datos de este producto. Escanea la tabla con la cámara o introduce los valores abajo.",
+  "noDataManual": "Aún no hay datos de este producto. Introduce los valores abajo.",
+  "noDataNone": "Aún no hay datos de este producto.",
+  "nutriScore": "Nutri-Score",
+  "nutrientLevels": "Niveles nutricionales",
+  "ingredients": "Ingredientes / Info",
+  "energy": "energía",
+  "proteins": "proteínas",
+  "fat": "grasas",
+  "fiber": "fibra",
+  "levels": {
+    "sugars": {
+      "low": "Bajo contenido de azúcar",
+      "moderate": "Contenido moderado de azúcar",
+      "high": "Alto contenido de azúcar"
+    },
+    "salt": {
+      "low": "Bajo contenido de sal",
+      "moderate": "Contenido moderado de sal",
+      "high": "Alto contenido de sal"
+    },
+    "fat": {
+      "low": "Bajo contenido de grasas",
+      "moderate": "Contenido moderado de grasas",
+      "high": "Alto contenido de grasas"
+    },
+    "saturated_fat": {
+      "low": "Bajo contenido de grasas saturadas",
+      "moderate": "Contenido moderado de grasas saturadas",
+      "high": "Alto contenido de grasas saturadas"
+    }
+  },
+  "scanner": {
+    "title": "Escáner nutricional",
+    "subtitle": "Tome una foto de la tabla nutricional del paquete",
+    "howItWorksTitle": "¿Cómo funciona?",
+    "howItWorksDesc": "Toma una foto nítida de la tabla de información nutricional del envase. La IA puede extraer las kcal y los macronutrientes por ti.",
+    "takePhoto": "TOMAR FOTO",
+    "success": "¡La IA analizó la tabla!",
+    "checkData": "Verifique si los datos a continuación son correctos.",
+    "energy": "Energía (kcal)",
+    "carbs": "Carbohidratos",
+    "sugars": "Azúcares",
+    "salt": "Sal",
+    "retry": "Intentar de nuevo",
+    "save": "Guardar en producto",
+    "recognizing": "La IA está analizando…",
+    "error": "No se pudo leer la tabla. Intente con una foto más clara.",
+    "saveSuccess": "¡Datos nutricionales guardados!",
+    "saveError": "No se pudo guardar el resultado del escaneo",
+    "howItWorksNoAi": "Toma una foto nítida de la tabla de información nutricional del envase. Sin conexión de IA no se extrae nada: los valores los rellenas tú."
+  },
+  "carbohydrates": "Carbohidratos",
+  "sugars": "Azúcares",
+  "salt": "Sal",
+  "nutritionForm": {
+    "saved": "Valores nutricionales guardados",
+    "saveError": "No se pudieron guardar los valores nutricionales",
+    "title": "Introducir los valores a mano",
+    "hint": "Valores nutricionales por 100 g/ml."
+  },
+  "source": {
+    "learnMore": "Más información →",
+    "visionCapture": "Leído de la etiqueta",
+    "communityNote": "De Open Food Facts, una base de datos comunitaria, así que los valores son una estimación. Compáralos con la etiqueta."
+  },
+  "productPage": {
+    "title": "Valores nutricionales por 100 g"
+  }
+}

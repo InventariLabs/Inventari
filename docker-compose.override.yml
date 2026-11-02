@@ -1,0 +1,40 @@
+# Development overrides — loaded automatically by `docker compose up`.
+# NOT included in production deployments (docker-compose.prod.yml is used
+# explicitly with -f, and Compose skips this file whenever -f is given).
+#
+# What this adds:
+#   - Mailhog: catches outbound SMTP email in dev, so password-reset and
+#     registration links never leave the machine.
+#     Web UI: http://localhost:8025
+#     SMTP:   localhost:1025
+#
+# This file only *offers* Mailhog — it does not point the backend at it. Where
+# mail goes is decided in .env alone (SMTP_HOST/SMTP_PORT), and `make dev-up`
+# writes the Mailhog pair into a freshly generated .env. That separation is
+# deliberate: the override used to hardcode SMTP_HOST, so a self-hoster running
+# the base compose file with a real mail server in .env got it silently
+# replaced, and their mail piled up in a web UI they never opened.
+#
+# SMTP can also be configured per organization in the app's settings, which
+# takes precedence over the environment (backend/app/services/email_service.py).
+#
+# To stop Mailhog for a session:
+#   docker compose up --scale mailhog=0
+
+services:
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: unless-stopped
+    logging:
+      driver: none
+    ports:
+      # Loopback only — Mailhog holds every email the dev stack sends,
+      # including password-reset and registration links.
+      - "127.0.0.1:1025:1025"   # SMTP
+      - "127.0.0.1:8025:8025"   # Web UI
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,236 @@
+{
+  "launcher": {
+    "title": "Inventory",
+    "description": "Manage products, locations, and labels"
+  },
+  "statusBadge": {
+    "needsAttention_one": "needs attention",
+    "needsAttention_other": "need attention"
+  },
+  "actions": {
+    "stockTakesInProgress": "Stock takes in progress"
+  },
+  "nav": {
+    "overview": "Overview",
+    "items": "Products",
+    "storages": "Locations",
+    "labels": "Labels",
+    "categories": "Categories",
+    "scan": "Scan",
+    "moves": "Movements",
+    "stock": "Stock"
+  },
+  "toasts": {
+    "importFailedToAnalyze": "Failed to analyze file",
+    "importGrocyMappingApplied": "Grocy mapping applied!",
+    "importFailed": "Import failed",
+    "archivedLabelFreed": "Label is now free for reuse"
+  },
+  "moves": {
+    "title": "Stock movements",
+    "subtitle": "What came in, what left, and what moved between your own locations",
+    "outsideFrom": "outside",
+    "expires": "Expires {{date}}",
+    "outsideTo": "outside",
+    "direction": {
+      "all": "All",
+      "in": "Received",
+      "out": "Issued",
+      "internal": "Moved"
+    },
+    "columns": {
+      "when": "When",
+      "product": "Product",
+      "quantity": "Quantity",
+      "route": "From → to",
+      "batch": "Batch",
+      "source": "Source",
+      "who": "Who"
+    },
+    "source": {
+      "document": "Document",
+      "item": "By hand",
+      "adjustment": "Stock take",
+      "maker_production": "Production",
+      "item_history": "Historical record",
+      "opening_balance": "Opening balance",
+      "recipe_picking": "Cooking",
+      "location_relocation": "Moved with location"
+    },
+    "filters": {
+      "location": "Location",
+      "anyLocation": "Anywhere",
+      "since": "From",
+      "until": "To",
+      "product": "Product:",
+      "oneProduct": "one product",
+      "oneStorage": "one location"
+    },
+    "empty": {
+      "title": "Nothing has moved yet",
+      "description": "Movements are recorded when goods are received, issued or moved between locations.",
+      "filtered_one": "No movement matches the filter you set ({{filters}}). Clear it to widen the ledger.",
+      "filtered_other": "No movement matches the filters you set ({{filters}}). Clear one to widen the ledger.",
+      "filterNames": {
+        "direction": "direction: {{value}}",
+        "location": "location: {{value}}",
+        "dates": "dates: {{from}} – {{to}}",
+        "datesFrom": "dates: from {{date}}",
+        "datesUntil": "dates: until {{date}}",
+        "product": "product: {{value}}"
+      },
+      "filteredTitle": "No movement matches",
+      "productTitle": "This product has not moved here",
+      "productDescription": "Receipts, issues and transfers of this product in this location will show up here.",
+      "locationTitle": "Nothing has moved through here",
+      "locationDescription": "Movements are recorded when goods are received into, issued from or moved through this location.",
+      "documentTitle": "This document moved nothing",
+      "documentDescription": "Its lines have not been executed against stock, so no movement carries its name."
+    },
+    "tab": "Movements",
+    "itemCaption": "Movements of this product in {{location}}. Two records of the same product in one location share these rows.",
+    "thisLocation": "this location",
+    "seeProductEverywhere": "This product everywhere",
+    "locationHeading": "Movement history",
+    "locationCaption": "What came in, what left and what passed through this location and everything inside it.",
+    "seeFullLedger": "Open the full ledger",
+    "documentHeading": "What this document moved",
+    "documentCaption": "The movements this document recorded — where the goods went, and out of which batch.",
+    "movements_one": "movement",
+    "movements_other": "movements",
+    "movedWith": "Moved with {{name}}",
+    "topLevel": "Top level"
+  },
+  "lot": {
+    "notFound": "This batch no longer exists",
+    "backToLots": "Back to batches",
+    "onHand": "On hand",
+    "serial": "Serial number",
+    "batch": "Batch",
+    "whereHeading": "Where it is",
+    "nothingLeft": "None of this batch is left on any shelf. Its trail below is the whole story.",
+    "trailHeading": "Everything that happened to it",
+    "decisionsHeading": "The decisions about its state",
+    "trailCaption": "Every movement recorded under this batch number, newest first.",
+    "status": {
+      "active": "Active",
+      "quarantined": "Quarantined",
+      "held": "Held",
+      "expired": "Expired",
+      "recalled": "Recalled"
+    },
+    "fields": {
+      "expiry": "Expiry date",
+      "production": "Production date",
+      "useBy": "Use by",
+      "kind": "Kind"
+    },
+    "empty": {
+      "title": "Nothing was recorded under this batch",
+      "description": "Receipts, issues and transfers that name this batch will show up here."
+    }
+  },
+  "stock": {
+    "title": "Stock levels",
+    "subtitle": "What lies where, in which batch, and how much of it is reserved",
+    "searchPlaceholder": "Search a product or a batch…",
+    "reservedShort": "{{quantity}} reserved",
+    "columns": {
+      "location": "Location",
+      "product": "Product",
+      "batch": "Batch",
+      "quantity": "On hand",
+      "reserved": "Reserved",
+      "available": "Available"
+    },
+    "filters": {
+      "location": "Location",
+      "anyLocation": "Anywhere",
+      "includeEmpty": "Include locations at zero",
+      "includeEmptyHint": "Shows records whose quantity is zero — the trace that something used to be here. A location that never held the product has no row to show.",
+      "oneStorage": "one location",
+      "oneProduct": "one product"
+    },
+    "empty": {
+      "title": "No stock recorded yet",
+      "description": "Stock appears here once goods are received, counted or produced.",
+      "filteredTitle": "Nothing here matches",
+      "filtered_one": "Nothing matches the filter you set ({{filters}}). Clear it to widen the list.",
+      "filtered_other": "Nothing matches the filters you set ({{filters}}). Clear one to widen the list.",
+      "filterNames": {
+        "location": "location: {{value}}",
+        "product": "product: {{value}}",
+        "search": "search: {{value}}"
+      }
+    },
+    "whereItLies": "Where it lies",
+    "seeForProduct": "In every location",
+    "seeForLocation": "Stock levels for this location",
+    "rows_one": "stock entry",
+    "rows_other": "stock entries"
+  },
+  "lots": {
+    "title": "Batches",
+    "subtitle": "Which batches exist, and which of them may not be touched",
+    "statusChanged": "Batch marked as {{status}}",
+    "reasonDialog": {
+      "title": "Mark {{name}} as {{status}}?",
+      "message": "The reason is kept with the batch and shown beside its status.",
+      "label": "Why",
+      "placeholder": "Supplier notice 41/26 — glass found in jar 12",
+      "confirm": "Change status"
+    },
+    "actionsFor": "Actions for batch {{name}}",
+    "columns": {
+      "batch": "Batch",
+      "product": "Product",
+      "status": "Status",
+      "expiry": "Expiry date",
+      "onHand": "On hand",
+      "actions": "Actions"
+    },
+    "setTo": {
+      "active": "Release — allow picking",
+      "quarantined": "Quarantine",
+      "held": "Hold",
+      "expired": "Mark expired",
+      "recalled": "Mark recalled"
+    },
+    "empty": {
+      "title": "No batches yet",
+      "filteredTitle": "No batch is in this state",
+      "description": "Batches appear when goods are received under a batch or serial number.",
+      "filtered": "Nothing matches this status. Clear the status filter to see every batch."
+    },
+    "count_one": "batch",
+    "count_other": "batches"
+  },
+  "asOf": {
+    "title": "Stock on a date",
+    "subtitle": "What was in stock on a given day, and what it was worth",
+    "subtitleNoValue": "What was in stock on a given day",
+    "date": "As of",
+    "location": "Location",
+    "everywhere": "Everywhere",
+    "print": "Print",
+    "total": "Total",
+    "caption": "Stock held by {{organization}} on {{date}}",
+    "completeFrom": "The movement ledger starts on {{date}}. Nothing before that is known — not zero.",
+    "noValueSource": "No cost history is kept, so no value is stated. A purchase price is a field on a form today; it cannot say what a shelf was worth last month.",
+    "excludedCurrency_one": "{{count}} row left out of the total: its currency is not the organization's.",
+    "excludedCurrency_other": "{{count}} rows left out of the total: their currency is not the organization's.",
+    "cannotAnswer": "This date cannot be answered for.",
+    "empty": {
+      "title": "Nothing was on the shelf",
+      "description": "On this date none of the products it records were in stock.",
+      "descriptionAt": "{{location}} — on this date it held none of the products it records."
+    },
+    "columns": {
+      "product": "Product",
+      "quantity": "Quantity",
+      "value": "Value"
+    },
+    "unpriced_one": "{{count}} product has no cost history and is left out of the total.",
+    "unpriced_other": "{{count}} products have no cost history and are left out of the total."
+  }
+}

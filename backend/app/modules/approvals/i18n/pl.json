@@ -1,0 +1,48 @@
+{
+  "navigation": {
+    "dashboard": "Zatwierdzanie",
+    "workflows": "Przepływy pracy"
+  },
+  "dashboard": {
+    "title": "Żądania zatwierdzenia",
+    "subtitle": "Przeglądaj i zarządzaj oczekującymi żądaniami zatwierdzenia"
+  },
+  "launcher": {
+    "title": "Zatwierdzanie",
+    "description": "Wieloetapowe konfigurowalne przepływy zatwierdzania"
+  },
+  "workflows": {
+    "title": "Przepływy pracy",
+    "subtitle": "Konfiguruj etapy zatwierdzania i osoby zatwierdzające",
+    "create": "Utwórz przepływ pracy",
+    "edit": "Edytuj przepływ pracy",
+    "empty": "Brak przepływów pracy",
+    "emptyHint": "Utwórz swój pierwszy przepływ pracy",
+    "name": "Nazwa przepływu pracy",
+    "namePlaceholder": "np. Zatwierdzenie wypożyczenia sprzętu",
+    "nameRequired": "Nazwa przepływu pracy jest wymagana",
+    "saveChanges": "Zapisz zmiany",
+    "created": "Przepływ pracy utworzony pomyślnie",
+    "updated": "Przepływ pracy zaktualizowany",
+    "deleted": "Przepływ pracy usunięty",
+    "deleteFailed": "Nie udało się usunąć przepływu pracy",
+    "saveFailed": "Nie udało się zapisać przepływu pracy",
+    "mutationGuard": "Nie można modyfikować tego przepływu, gdy istnieją oczekujące żądania",
+    "duplicateTarget": "Przepływ pracy dla tego typu celu już istnieje",
+    "addStage": "Dodaj etap",
+    "removeStage": "Usuń etap",
+    "stageLabel": "Etykieta etapu",
+    "stageRole": "Rola",
+    "addApprover": "Dodaj osobę zatwierdzającą",
+    "removeApprover": "Usuń",
+    "searchUsers": "Szukaj użytkowników...",
+    "selectApprovers": "Wybierz osoby zatwierdzające dla tego etapu",
+    "noUsersFound": "Nie znaleziono użytkowników"
+  },
+  "permissions": {
+    "approve": "Zatwierdzanie żądań",
+    "approveDesc": "Zatwierdzaj lub odrzucaj oczekujące żądania zatwierdzenia",
+    "configure": "Konfiguracja przepływów pracy",
+    "configureDesc": "Twórz i modyfikuj definicje przepływów zatwierdzania"
+  }
+}

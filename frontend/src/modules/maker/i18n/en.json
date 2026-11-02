@@ -1,0 +1,540 @@
+{
+  "launcher": {
+    "title": "Production",
+    "description": "Making things to sell: bills of materials (BOM), costs and runs"
+  },
+  "navigation": {
+    "production": "Runs",
+    "catalog": "BOMs",
+    "settings": "Settings"
+  },
+  "productionList": {
+    "title": "Production runs",
+    "subtitle": "Runs you have scheduled or completed, with their cost and output.",
+    "newProduction": "New production",
+    "searchPlaceholder": "Search by output product…",
+    "loading": "Loading orders…",
+    "error": "Failed to load production orders",
+    "empty": {
+      "title": "No production runs yet",
+      "subtitle": "Schedule a production run to consume ingredients and create output."
+    },
+    "noMatches": {
+      "title": "No run matches",
+      "subtitle": "Nothing found with these filters. Try widening them."
+    },
+    "card": {
+      "qty": "Planned",
+      "cost": "Cost",
+      "resultPerUnit": "({{amount}} per unit)",
+      "shortage_one": "Short of stock: {{count}} ingredient. Completing will be refused.",
+      "shortage_other": "Short of stock: {{count}} ingredients. Completing will be refused."
+    },
+    "sortLabel": "Sort",
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "costDesc": "Highest cost"
+    },
+    "dateFrom": "From",
+    "dateTo": "To",
+    "resetFilters": "Reset",
+    "status": {
+      "all": "All",
+      "draft": "Draft",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "reversed": "Undone"
+    },
+    "duplicate": "Duplicate",
+    "viewRecipe": "View BOM",
+    "table": {
+      "product": "Product",
+      "status": "Status",
+      "date": "Created",
+      "actions": "Actions"
+    }
+  },
+  "preview": {
+    "title": "Production preview",
+    "subtitle": "Cost breakdown and ingredient consumption — no stock changes.",
+    "loadFailed": "Could not load the cost preview",
+    "totalCost": "Total cost",
+    "unitCostHint": "Produced qty",
+    "missingTitle": "Ingredients without a price",
+    "ingredients": "Ingredients",
+    "chart": {
+      "title": "Cost share",
+      "empty": "No ingredient has a price yet, so there is nothing to chart."
+    }
+  },
+  "create": {
+    "title": "Record production",
+    "subtitle": "Record what you made, or plan a run. What it takes, what is short and what it costs show beside the form before you save.",
+    "productLabel": "Output product",
+    "searchPlaceholder": "Search by name, SKU or barcode…",
+    "change": "Change",
+    "qtyLabel": "How much to make?",
+    "storageLabel": "To location",
+    "storagePlaceholder": "Select the To location",
+    "storageSearchPlaceholder": "Search by name or path…",
+    "storageEmpty": "No location matches",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "Internal notes about this run…",
+    "hints": {
+      "product": "Pick an output product to enable preview.",
+      "quantity": "Enter a planned quantity greater than zero to enable preview.",
+      "storage": "Select a target location to enable preview."
+    },
+    "preview": "Preview cost",
+    "creating": "Creating…",
+    "cancel": "Cancel",
+    "success": "Production order created",
+    "errors": {
+      "missingFields": "Pick a product, qty and location first.",
+      "create": "Failed to create production order"
+    },
+    "hasBom": "Has a BOM",
+    "mode": {
+      "label": "What are you recording?",
+      "made": "Already made",
+      "planned": "Planning to make"
+    },
+    "qtyLabelMade": "How much came out?",
+    "batchHintMade": "One batch of the BOM makes {{batch}}. Enter what came out, not the number of batches.",
+    "batchHintPlanned": "One batch of the BOM makes {{batch}}. Enter how much to make, not the number of batches.",
+    "dateLabel": "When",
+    "submitMade": "Save as made",
+    "submitNeedsBom": "Needs a BOM first",
+    "submitNeedsIngredients": "Add ingredients to the BOM first",
+    "submitPlanned": "Plan the run",
+    "successMade": "Production recorded",
+    "needs": {
+      "pick": "Pick a product, how much and where it goes to see what the run takes.",
+      "loading": "Checking stock…",
+      "headingMade": "Comes off stock",
+      "headingPlanned": "Will be needed",
+      "have": "{{have}} in stock",
+      "short": "{{have}} in stock, {{short}} short",
+      "unknown": "{{have}} in stock, in a unit the BOM cannot be compared with",
+      "unnamed": "Unnamed ingredient",
+      "unitFallback": "unit",
+      "cost": "Costs you {{unitCost}} per {{unit}} · {{total}} in total",
+      "marginLeft": "You sell at {{price}}, which leaves {{result}} on each {{unit}} you make.",
+      "marginLost": "You sell at {{price}}, which is {{result}} per {{unit}} below cost.",
+      "savingsLeft": "In a shop it costs {{price}}; each {{unit}} you make saves {{result}}.",
+      "savingsLost": "In a shop it costs {{price}}, {{result}} per {{unit}} less than making it.",
+      "enough": "Everything is in stock.",
+      "unmeasurable": "An ingredient's unit cannot be compared with its stock, so the run cannot say what to take. Fix the BOM line's unit first.",
+      "shortMade": "It is already made, so the goods were there — the stock records hold too little. The run is saved, and the short ingredients are put up for a count.",
+      "shortPlanned": "This run is short of some ingredients. You can plan it now and buy what is missing.",
+      "addOne": "Add {{quantity}} of {{name}} to the shopping list",
+      "addAll": "Add what is missing to the shopping list",
+      "added": "Added to {{name}}",
+      "alreadyListed": "Already on the shopping list",
+      "addFailed": "Could not add to the shopping list"
+    }
+  },
+  "createRecipe": {
+    "title": "New BOM",
+    "subtitle": "Pick the output product and give the BOM a name.",
+    "nameLabel": "BOM name",
+    "namePlaceholder": "BOM name…",
+    "batchYieldLabel": "This BOM makes",
+    "create": "Create BOM",
+    "creating": "Creating…",
+    "success": "BOM created",
+    "errors": {
+      "productRequired": "Pick the output product first.",
+      "nameRequired": "BOM name is required.",
+      "create": "Failed to create BOM"
+    },
+    "batchYieldHint": "How much one batch makes, counted in the product's unit. Leave it empty for 1.",
+    "unitLabel": "Unit",
+    "unitFirst": "Pick the unit next to the quantity first."
+  },
+  "detail": {
+    "title": "Production order",
+    "subtitle": "Review ingredients, costs and run state.",
+    "back": "Back to list",
+    "loading": "Loading order…",
+    "complete": "Complete run",
+    "cancel": "Cancel run",
+    "completeSuccess": "Production completed",
+    "cancelSuccess": "Production cancelled",
+    "cancelNeedsManager": "Cancelling a production run is a manager's call — ask someone who can manage production.",
+    "completeConfirm": {
+      "title": "Complete production run?",
+      "description": "This consumes the listed ingredients and produces the output. While nothing it made has been used, Undo run takes it back.",
+      "actualQtyLabel": "Actual quantity produced (optional)",
+      "actualQtyHint": "Leave empty to use planned quantity. Enter less for scrap, more for overproduction. Ingredients are consumed as planned regardless of the actual quantity."
+    },
+    "cancelConfirm": {
+      "title": "Cancel production run?",
+      "description": "Cancelling marks this draft as cancelled. No stock will be moved.",
+      "confirm": "Yes, cancel run"
+    },
+    "reverseConfirm": {
+      "title": "Undo this production run?",
+      "description": "The ingredients go back to the locations and batches they were taken from, and what the run made leaves its location. The run stays on record, marked as undone.",
+      "confirm": "Yes, undo run"
+    },
+    "card": {
+      "totalCost": "Total cost",
+      "totalCostUndone": "Cost before the run was undone",
+      "created": "Created",
+      "productionDate": "Production date",
+      "notes": "Notes",
+      "actualQty": "Actual output",
+      "plannedSuffix": "planned: {{qty}}",
+      "scrap": "Scrap",
+      "overproduced": "Overproduced",
+      "resultPerUnit": "({{amount}} per unit)",
+      "totalCostAfterClosing": "Total cost after closing",
+      "unitCost": "{{amount}} per unit produced",
+      "totalCostGap_one": "{{count}} ingredient was drawn from stock with no cost, so it is missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
+      "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers."
+    },
+    "ingredients": "Consumed ingredients",
+    "emptyLines": "No ingredients were recorded for this run.",
+    "plannedIngredients": "Planned consumption",
+    "plannedIngredientsHint": "What this run will take. Nothing has left stock yet. Quantities are read from the BOM when the run closes, so BOM edits change an open draft.",
+    "emptyLinesPlanned": "This run would consume nothing — its BOM lists no ingredients.",
+    "cancelReason": "Cancel reason",
+    "cancelReasonPlaceholder": "Reason (optional)…",
+    "producedItem": "Finished product",
+    "viewProducedItem": "View product",
+    "stockMoves": "Stock moves",
+    "stockMove": {
+      "dir": "Move",
+      "product": "Product / lot",
+      "lot": "Lot",
+      "unknownProduct": "Unknown product",
+      "qty": "Qty"
+    },
+    "line": {
+      "ingredient": "Ingredient",
+      "qty": "Consumed qty",
+      "unitCost": "Unit cost",
+      "lineCost": "Line cost",
+      "unknownLocation": "Unknown location",
+      "qtyLabel": "Qty per batch",
+      "yieldLabel": "Yield loss %",
+      "saved": "Line updated",
+      "saveFailed": "Failed to update line",
+      "shortLabel": "short",
+      "unmeasurableShort": "short — units cannot be compared with stock",
+      "shortfall": "{{quantity}} not in the records — due a count"
+    },
+    "edit": "Edit",
+    "save": "Save",
+    "saveFailed": "Failed to save the order",
+    "cancelEdit": "Discard changes",
+    "duplicate": "Duplicate",
+    "duplicated": "Order duplicated",
+    "duplicateFailed": "Failed to duplicate the order",
+    "plannedQty": "Planned qty",
+    "productionDate": "Production date",
+    "notes": "Notes",
+    "tabs": {
+      "composition": "Composition",
+      "cost": "Cost & result",
+      "history": "History"
+    },
+    "sourceRecipe": "Based on a recipe (snapshot from {{date}})",
+    "setAsDefault": "Set as default",
+    "setDefaultSuccess": "Default BOM set",
+    "setDefaultFailed": "Could not set the default BOM",
+    "deleteRecipe": "Delete BOM",
+    "recipeDeleted": "BOM deleted",
+    "recipeDeleteFailed": "Failed to delete the BOM",
+    "processSteps": "Process steps",
+    "cost": {
+      "fixedCosts": "Fixed costs / batch",
+      "referencePrice": "Reference price",
+      "perBatch": "per batch",
+      "perYieldUnit": "per unit — a batch makes {{qty}}",
+      "noFixed": "No fixed costs set",
+      "ingredients": "Ingredients",
+      "emptyLines": "Nothing to price yet — add ingredients on the Composition tab.",
+      "total": "Total",
+      "addLine": "Add cost line",
+      "lineSaved": "Cost line saved",
+      "lineSaveFailed": "Failed to save cost line",
+      "lineDeleted": "Cost line deleted",
+      "lineDeleteFailed": "Failed to delete cost line",
+      "lineKind": "Kind",
+      "lineLabel": "Label",
+      "lineLabelPlaceholder": "e.g. Oven electricity",
+      "lineAmount": "Amount (per batch)",
+      "editReferencePrice": "Edit reference price",
+      "referencePriceSaved": "Reference price saved",
+      "referencePriceSaveFailed": "Failed to save reference price",
+      "kind": {
+        "LABOR": "Labor",
+        "PACKAGING": "Packaging",
+        "OVERHEAD": "Overhead",
+        "OTHER": "Other"
+      },
+      "deleteConfirm": {
+        "title": "Delete cost line?",
+        "description": "Remove \"{{label}}\" from fixed costs?"
+      }
+    },
+    "history": {
+      "title": "Production history",
+      "empty": "No production runs for this BOM yet.",
+      "date": "Date",
+      "status": "Status",
+      "made": "Made",
+      "unitCostColumn": "Unit cost",
+      "resultColumn": "{{result}} per unit",
+      "totalColumn": "Batch cost",
+      "open": "Open production run"
+    },
+    "completeFailed": "Failed to complete production",
+    "emptyBom": "This BOM lists no ingredients — the run would create output out of nothing. Add ingredients first.",
+    "emptyBomAction": "Add ingredients",
+    "noBom": "This product has no BOM — the run would create output out of nothing. Create a BOM first.",
+    "noBomAction": "Create a BOM",
+    "cancelFailed": "Failed to cancel production",
+    "reverse": "Undo run",
+    "reverseNeedsManager": "Undoing a production run is a manager's call — ask someone who can manage production.",
+    "reverseSuccess": "Production run undone",
+    "reverseFailed": "Could not undo the production run",
+    "yieldSaved": "Yield updated",
+    "yieldSaveFailed": "Failed to update yield",
+    "processStepsEmpty": "No process steps yet",
+    "processStepsEdit": "Edit steps",
+    "processStepsEditStep": "Step {{number}}",
+    "processStepsAdd": "Add step",
+    "processStepsAddPlaceholder": "Describe the step — Enter starts a new line, Ctrl+Enter adds it",
+    "processStepsSaved": "Process steps saved",
+    "processStepsSaveFailed": "Failed to save process steps",
+    "processStepsAddFirst": "Add steps",
+    "plannedSummary": "Planned {{qty}}",
+    "deleteConfirm": {
+      "title": "Delete this BOM?",
+      "description": "Its ingredients and process steps go with it. Production runs already recorded are kept."
+    },
+    "notFound": "Production order not found",
+    "plannedShortageHint_one": "Planned consumption exceeds stock — {{count}} ingredient short. Completing this production will be refused.",
+    "plannedShortageHint_other": "Planned consumption exceeds stock — {{count}} ingredients short. Completing this production will be refused."
+  },
+  "bom": {
+    "childLabel": "Ingredient product",
+    "qtyLabel": "Qty",
+    "unitLabel": "Unit",
+    "yieldLabel": "Yield loss %",
+    "yieldHint": "A planning figure: how much extra to reserve so the plan adds up. Leaving it at 0 is normal — what was really lost is measured when the order is closed, by entering the quantity that actually came out.",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Optional notes…",
+    "add": "Add line",
+    "adding": "Adding…",
+    "childPlaceholder": "Search ingredient…",
+    "treeToggle": "Multi-level view",
+    "treeHint": "The only view that shows one BOM nested inside another, and the only place a line can be re-parented. Worth opening once an ingredient has a BOM of its own.",
+    "childClear": "Clear",
+    "unitMustBeConvertible": "Only units that can be read as {{unit}} are offered — a line the maker cannot convert is refused."
+  },
+  "composition": {
+    "ingredientsTitle": "Ingredients",
+    "perBatchHint": "Amounts are per one batch.",
+    "batchYield": "This BOM makes {{qty}}",
+    "batchYieldLabel": "This BOM makes",
+    "batchYieldEdit": "Change how much this BOM makes",
+    "batchYieldHint": "How much one batch of this BOM makes. Unit cost = batch cost ÷ this number.",
+    "addIngredient": "Add ingredient",
+    "moreFields": "More",
+    "removeIngredient": "Remove",
+    "ingredientAdded": "Ingredient added",
+    "ingredientRemoved": "Ingredient removed",
+    "emptyLines": "No ingredients yet — add the first one below.",
+    "introduction": "A BOM is the list of what goes into one batch of this product. The costs on the Cost & result tab are added up from it, and stock is issued against it when a production order is closed.",
+    "removeConfirm": {
+      "title": "Remove ingredient?",
+      "description": "Remove \"{{name}}\" from this BOM?"
+    },
+    "errors": {
+      "addIngredient": "Failed to add the ingredient",
+      "duplicateIngredient": "This BOM already lists that ingredient.",
+      "removeIngredient": "Failed to remove the ingredient",
+      "yieldInvalid": "How much the BOM makes must be greater than zero."
+    }
+  },
+  "tree": {
+    "title": "Multi-level BOM",
+    "hint": "Drag a row onto another to nest it.",
+    "empty": "No ingredients yet. Add them in the ingredients section above; they appear here as soon as there is something to nest.",
+    "loading": "Loading tree…",
+    "error": "Failed to load tree",
+    "moved": "Line moved",
+    "moveError": "Move failed",
+    "dropHint": "Drag to move"
+  },
+  "pricing": {
+    "title": "Sale price calculator",
+    "subtitle": "Gross-margin model — slide the margin to preview the suggested sale price.",
+    "currentDefault": "Stored default",
+    "isDefault": "(system default)",
+    "qtyLabel": "Produced quantity",
+    "marginLabel": "Target margin (%)",
+    "preview": "Calculate price",
+    "calculating": "Calculating…",
+    "totalCost": "Total cost",
+    "suggestedPrice": "Suggested sale price",
+    "close": "Close",
+    "saveDefault": "Save as default",
+    "saving": "Saving…",
+    "saved": "Default margin saved",
+    "saveFailed": "Failed to save the default margin",
+    "openButton": "Sale price",
+    "errors": {
+      "qty": "Quantity must be > 0.",
+      "compute": "Could not calculate the price"
+    },
+    "unitCostEstimated": "Estimated unit cost"
+  },
+  "bomEntry": {
+    "columnHeader": "BOM",
+    "editRecipe": "Edit BOM",
+    "createRecipe": "Create BOM",
+    "openRecipe": "Open this product's BOM"
+  },
+  "catalog": {
+    "title": "Bills of materials",
+    "subtitle": "Making things to sell: every BOM with its costs, margins and stock",
+    "searchPlaceholder": "Search BOMs…",
+    "sortLabel": "Sort by",
+    "default": "Default",
+    "produce": "Produce",
+    "addIngredients": "Add ingredients",
+    "details": "Details",
+    "unitCost": "Unit cost",
+    "unitCostIncomplete_one": "1 ingredient in the last run had no purchase cost recorded.",
+    "unitCostIncomplete_other": "{{count}} ingredients in the last run had no purchase cost recorded.",
+    "stock": "Stock",
+    "lastProduced": "Last produced",
+    "ingredientCount": "{{count}} ingredients",
+    "ingredientCount_one": "{{count}} ingredient",
+    "ingredientCount_other": "{{count}} ingredients",
+    "viewProduction": "Production runs",
+    "newRecipe": "New BOM",
+    "empty": {
+      "title": "No BOMs yet",
+      "subtitle": "Create your first BOM to start tracking production costs.",
+      "cta": "New BOM"
+    },
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "name": "Name"
+    },
+    "noMatches": {
+      "title": "No BOM matches",
+      "subtitle": "Nothing found for \"{{query}}\". Try a shorter phrase."
+    },
+    "table": {
+      "name": "Name",
+      "ingredients": "Ingredients",
+      "availability": "Availability",
+      "actions": "Actions"
+    },
+    "unitCostAfterRun": "Unit cost after last run",
+    "unitCostEstimated": "Estimated unit cost",
+    "estimateCostIncomplete_one": "1 ingredient in this estimate has no purchase cost recorded.",
+    "estimateCostIncomplete_other": "{{count}} ingredients in this estimate have no purchase cost recorded."
+  },
+  "settings": {
+    "title": "Production settings",
+    "loading": "Loading settings…",
+    "referenceDirection": "What the result is measured against",
+    "referenceDirectionHint": "Margin if you sell what you make; savings if you make it instead of buying it. The reference price on each BOM is then your sale price or the shop price.",
+    "allowOverproduction": "Allow overproduction",
+    "allowOverproductionHint": "When on, closing an order may record more than was planned.",
+    "availabilityCheckScope": "Availability check scope",
+    "availabilityCheckScopeHint": "Global counts stock across all locations; per location checks each location on its own.",
+    "scopeGlobal": "Global",
+    "scopePerLocation": "Per location",
+    "createOnShortageStrategy": "Shortage strategy on create",
+    "createOnShortageStrategyHint": "What happens when an order is created without enough ingredients: allow it, warn, or block it.",
+    "strategyAllow": "Allow",
+    "strategyWarn": "Warn",
+    "strategyBlock": "Block",
+    "saved": "Settings saved",
+    "saveFailed": "Failed to save settings",
+    "subtitle": "What the result means, and how production treats shortages.",
+    "whereReferenceDirection": "The result is named this way on BOM cards, production orders and the monthly summary.",
+    "immediateNote": "Each choice saves as you make it. There is no undo — set it back the same way.",
+    "advanced": "Advanced",
+    "advancedHint": "Rules for shortages and overproduction. The defaults suit a small workshop."
+  },
+  "availability": {
+    "maxBatches": "Max batches from stock",
+    "shortageList": "Shortage list",
+    "ingredient": "Ingredient",
+    "needed": "Needed",
+    "available": "Available",
+    "short": "Short",
+    "notConvertible": "unit mismatch",
+    "blocked": "Cannot create — ingredients missing",
+    "blockedHint": "Restock these ingredients or switch the shortage strategy in settings.",
+    "warnTitle": "Some ingredients are short",
+    "warnHint": "You can still create the draft — availability will be re-checked at completion.",
+    "warnConfirm": "Create anyway",
+    "completeShortage": "Cannot complete — insufficient stock",
+    "completeShortageHint": "These ingredients ran out since the draft was created.",
+    "unknown_one": "{{count}} ingredient cannot be compared",
+    "unknown_other": "{{count}} ingredients cannot be compared",
+    "shortUnknown": "unknown",
+    "completeShortageHintNever": "These ingredients were never enough for this run — it was created over stock."
+  },
+  "widget": {
+    "title": "{{result}} by month",
+    "viewAll": "Production",
+    "hintSource": "Set in the Production module's settings",
+    "orders_one": "{{count}} run",
+    "orders_other": "{{count}} runs",
+    "empty": "No completed runs with a result yet."
+  },
+  "whereUsed": {
+    "title": "Used in BOMs",
+    "perBatch": "{{qty}} per batch"
+  },
+  "permissions": {
+    "read": "View production",
+    "readDesc": "Can browse BOMs, costs and production orders",
+    "write": "Run production",
+    "writeDesc": "Can create production orders and close runs — this moves stock",
+    "manage": "Manage BOMs and settings",
+    "manageDesc": "Can edit BOMs, process steps and module settings, and cancel runs — a BOM decides what production takes from stock"
+  },
+  "bomDetail": {
+    "notFound": "BOM not found",
+    "back": "Back to BOMs",
+    "loading": "Loading BOM…"
+  },
+  "costSource": {
+    "avco": "average of layers",
+    "fifo": "actual cost (FIFO)",
+    "none": "no cost recorded for this stock"
+  },
+  "cost": {
+    "gap": {
+      "partial_one": "1 ingredient has no rate, so it is missing from this figure.",
+      "partial_other": "{{count}} ingredients have no rate, so they are missing from this figure.",
+      "none_one": "No rate for the only ingredient — there is nothing to add up.",
+      "none_other": "No rate for any of the {{count}} ingredients — there is nothing to add up."
+    }
+  },
+  "result": {
+    "margin": {
+      "label": "Margin",
+      "definition": "Sale price minus the cost to make it"
+    },
+    "savings": {
+      "label": "Savings vs shop price",
+      "definition": "Shop price minus the cost to make it"
+    }
+  }
+}

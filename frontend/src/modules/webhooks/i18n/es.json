@@ -1,0 +1,171 @@
+{
+  "title": "Webhooks",
+  "subtitle": "Notificaciones HTTP salientes sobre los eventos de tu espacio de trabajo.",
+  "addWebhook": "Añadir webhook",
+  "noWebhooks": "Sin webhooks configurados",
+  "noWebhooksDescription": "Añada un webhook para enviar notificaciones HTTP cuando ocurran eventos.",
+  "inactive": "Inactivo",
+  "inactiveCircuitBreaker": "Inactivo (disyuntor)",
+  "inactiveModuleDisabled": "Inactivo (módulo desactivado)",
+  "unknownEvents": "Nombres de eventos desconocidos",
+  "failuresSinceSuccess_one": "1 entrega fallida desde la última correcta.",
+  "failuresSinceSuccess_other": "{{count}} entregas fallidas desde la última correcta.",
+  "consecutiveFailures": "Fallos consecutivos",
+  "test": "Probar",
+  "reactivate": "Reactivar",
+  "thresholdLink": "Ajustar el umbral de fallos",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "logs": "Registros de entrega",
+  "form": {
+    "titleCreate": "Añadir webhook",
+    "titleEdit": "Editar webhook",
+    "namePlaceholder": "p. ej. canal de incidencias de Slack",
+    "url": "URL de destino",
+    "urlPlaceholder": "https://example.com/webhook",
+    "secret": "Secreto (HMAC-SHA256)",
+    "secretPlaceholder": "Dejar vacío para no firmar",
+    "secretMasked": "El secreto está establecido (dejar en blanco para mantener o ingresar nuevo valor)",
+    "httpMethod": "Método HTTP",
+    "eventTypes": "Tipos de eventos",
+    "eventTypesPlaceholder": "Seleccionar eventos a los que suscribirse",
+    "maxRetries": "Reintentos máx.",
+    "timeoutSeconds": "Timeout (segundos)",
+    "isActive": "Activo",
+    "urlHint": "La dirección debe ser accesible desde internet. Las direcciones privadas y locales se rechazan, salvo que quien opera esta instalación las permita.",
+    "insecureUrlWarning": "Sin HTTPS los datos viajan en texto plano y cualquiera en el camino puede leerlos.",
+    "noSecretWarning": "Sin secreto, quien recibe no puede distinguir tus datos de los de otra persona.",
+    "eventNeedsModule": "requiere el módulo {{module}}",
+    "withdrawnEvents": "Retirados del catálogo",
+    "withdrawnEventsHint": "Estos nombres ya no están en el catálogo de eventos, así que nunca se activarán. Desmárcalos y guarda para eliminar la suscripción.",
+    "eventsSelected": "({{count}} seleccionados)",
+    "eventsSelected_one": "({{count}} seleccionado)",
+    "eventsSelected_other": "({{count}} seleccionados)"
+  },
+  "delivery": {
+    "title": "Registros de entrega",
+    "empty": "Sin entregas aún",
+    "error": "Error",
+    "success": "Éxito",
+    "failed": "Fallido",
+    "pendingRetry": "Reintento pendiente",
+    "payload": "Carga útil",
+    "response": "Respuesta",
+    "nextRetry": "Próximo reintento",
+    "page": "Página {{page}}",
+    "close": "Cerrar",
+    "pending": "Enviando",
+    "targetResponse": "Respuesta del destinatario",
+    "truncated": "abreviado",
+    "abandonedByApp": "Abandonado por Inventari — el destino nunca respondió",
+    "deliveryId": "ID de entrega",
+    "abandon": {
+      "circuitBreaker": "El cortacircuitos desconectó este endpoint tras fallos repetidos.",
+      "webhookDisabled": "Un administrador desactivó el endpoint.",
+      "webhookDeleted": "El endpoint fue eliminado.",
+      "moduleDisabled": "El módulo de webhooks está desactivado para esta organización."
+    }
+  },
+  "testResult": {
+    "success": "Ping de prueba enviado con éxito ({{status}})",
+    "successStillOff": "Ping de prueba correcto ({{status}}), pero este webhook sigue desactivado. Reactívalo para reanudar las entregas.",
+    "failure": "Fallo del ping de prueba: {{error}}",
+    "rejected": "Falló el ping de prueba: el receptor respondió {{status}}. La respuesta completa está en el registro de entregas."
+  },
+  "confirmDelete": "¿Eliminar webhook \"{{name}}\"?",
+  "confirmDeleteDescription": "Esto eliminará permanentemente el webhook y todos sus registros de entrega.",
+  "deleteSuccess": "Webhook eliminado",
+  "reactivateSuccess": "Webhook reactivado",
+  "createSuccess": "Webhook creado",
+  "updateSuccess": "Webhook actualizado",
+  "never": "Nunca",
+  "statusActive": "Activo",
+  "statusFailing": "Con fallos",
+  "unknownError": "Error desconocido",
+  "navigation": {
+    "webhooks": "Webhooks"
+  },
+  "circuitBreakerWarning_one": "Este webhook se ha desactivado automáticamente tras 1 fallo consecutivo — la causa del último intento consta en los registros de entrega.",
+  "circuitBreakerWarning_other": "Este webhook se ha desactivado automáticamente tras {{count}} fallos consecutivos — la causa del último intento consta en los registros de entrega.",
+  "eventsWhileOff": "Los eventos que ocurren mientras está desactivado no se entregan, no se ponen en cola ni se registran, y Reactivar no los reproduce.",
+  "settings": {
+    "logRetentionDays": "Retención de registros (días)",
+    "logRetentionDaysDescription": "Cuánto tiempo conservar los registros de entrega de webhooks.",
+    "circuitBreakerThreshold": "Umbral del disyuntor",
+    "circuitBreakerThresholdDescription": "Desactiva automáticamente un webhook después de este número de intentos fallados consecutivos. Cada intento cuenta por separado: la primera entrega, cada reintento y el botón de prueba alimentan el mismo contador."
+  },
+  "events": {
+    "category": {
+      "created": "Se creó una categoría",
+      "deleted": "Se eliminó una categoría",
+      "updated": "Se modificó una categoría"
+    },
+    "document": {
+      "cancelled": "Se anuló un documento",
+      "completed": "Se completó un documento",
+      "confirmed": "Se confirmó un documento"
+    },
+    "equipment": {
+      "checkin": "Se devolvió un equipo",
+      "checkout": "Se entregó un equipo"
+    },
+    "item": {
+      "consumed": "Se consumió un producto (stock reducido)",
+      "created": "Se añadió un producto al inventario",
+      "deactivated": "Se desactivó un producto",
+      "deleted": "Se eliminó un producto",
+      "discarded": "Se desechó un producto",
+      "disposed": "Se dio de baja un producto",
+      "moved": "Un producto cambió de ubicación",
+      "status_changed": "Un producto cambió de estado",
+      "transferred": "Se transfirió un producto a otra ubicación",
+      "updated": "Se modificó un producto",
+      "used": "Se agotó un producto"
+    },
+    "label": {
+      "assigned": "Se asignó una etiqueta a un producto",
+      "batch_exported": "Se exportó un lote de etiquetas para imprimir",
+      "batch_generated": "Se generó un lote de etiquetas",
+      "scanned": "Se escaneó una etiqueta"
+    },
+    "location": {
+      "created": "Se creó una ubicación",
+      "deleted": "Se eliminó una ubicación",
+      "updated": "Se modificó una ubicación"
+    },
+    "module": {
+      "disabled": "Se desactivó un módulo en la organización",
+      "enabled": "Se activó un módulo en la organización"
+    },
+    "organization": {
+      "created": "Se creó una organización",
+      "updated": "Se actualizó una organización"
+    },
+    "partner": {
+      "activated": "Se activó un socio comercial",
+      "deactivated": "Se desactivó un socio comercial"
+    },
+    "purchase_order": {
+      "cancelled": "Se anuló un pedido de compra",
+      "completed": "Se completó un pedido de compra",
+      "confirmed": "Se confirmó un pedido de compra"
+    },
+    "receipt": {
+      "created_from_po": "Se creó una recepción a partir de un pedido"
+    },
+    "recipe": {
+      "created": "Se creó una receta",
+      "meal_plan_generated": "Se generó un plan de comidas",
+      "picking_completed": "Terminó la preparación de ingredientes"
+    },
+    "user": {
+      "joined_organization": "Alguien se unió a la organización",
+      "left_organization": "Alguien dejó la organización",
+      "registered": "Se registró una persona nueva"
+    }
+  },
+  "pagination": {
+    "prev": "‹ Anterior",
+    "next": "Siguiente ›"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "ai": {
+    "purposeLabel": "Lire un produit depuis une photo",
+    "purposeDesc": "Extrait le nom, la marque, la quantité et la date de péremption d'une photo d'étiquette, pour ajouter un article sans rien saisir."
+  },
+  "permissions": {
+    "extract": "Lire les étiquettes depuis des photos",
+    "extractDesc": "Peut envoyer des photos d'étiquettes de produits et de tableaux nutritionnels au modèle d'IA — chaque appel est facturé"
+  }
+}

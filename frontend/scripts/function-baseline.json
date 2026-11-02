@@ -1,0 +1,168 @@
+{
+  "generatedBy": "node scripts/check-function-baseline.mjs --write-baseline",
+  "note": "Per-function debt frozen because the whole-file eslint override for that rule is still needed. A plain run of scripts/check-function-baseline.mjs fails on any mismatch in either direction; this snapshot is the only writer.",
+  "complexity": {
+    "src/modules/approvals/pages/ApprovalsDashboard.tsx": {
+      "RequestCard": [
+        29
+      ]
+    },
+    "src/modules/equipment/pages/AssetListPage.tsx": {
+      "AssetListPage": [
+        47
+      ]
+    },
+    "src/modules/inventory/hooks/useItemForm.ts": {
+      "initialFormState": [
+        33
+      ]
+    },
+    "src/modules/nutrition/components/FoodAndHealthExtra.tsx": {
+      "Arrow function": [
+        30
+      ]
+    },
+    "src/modules/partners/components/PartnerFormModal.tsx": {
+      "Arrow function": [
+        29
+      ]
+    },
+    "src/modules/recipes/components/PickingActivePhase.tsx": {
+      "PickingActivePhase": [
+        33
+      ]
+    },
+    "src/modules/recipes/components/RecipeForm.tsx": {
+      "RecipeForm": [
+        34
+      ]
+    },
+    "src/modules/shared/components/LineItemsEditor/LineItemRow.tsx": {
+      "LineItemRow": [
+        31
+      ]
+    },
+    "src/modules/shared/components/LineItemsEditor/LineItemsEditor.tsx": {
+      "LineItemsEditor": [
+        34
+      ]
+    },
+    "src/modules/shared/components/UomSelect.tsx": {
+      "Arrow function": [
+        29
+      ]
+    },
+    "src/modules/stats/pages/StatsPage.tsx": {
+      "StatsPage": [
+        49
+      ]
+    },
+    "src/modules/warehouse/components/DocumentActionButtons.tsx": {
+      "DocumentActionButtons": [
+        37
+      ]
+    },
+    "src/modules/warehouse/components/DocumentFormModal.tsx": {
+      "DocumentFormModal": [
+        28
+      ]
+    },
+    "src/modules/warehouse/components/DocumentListItem.tsx": {
+      "DocumentListItem": [
+        33
+      ]
+    },
+    "src/modules/warehouse/components/DocumentMetadataGrid.tsx": {
+      "DocumentMetadataGrid": [
+        31
+      ]
+    },
+    "src/modules/warehouse/hooks/useDocumentScanner.ts": {
+      "Async arrow function": [
+        32
+      ]
+    },
+    "src/modules/warehouse/hooks/useDocumentWorkspaceState.ts": {
+      "useDocumentWorkspaceState": [
+        29
+      ]
+    },
+    "src/modules/warehouse/pages/DocumentDetailPage.tsx": {
+      "DocumentDetailPage": [
+        26
+      ]
+    },
+    "src/modules/webhooks/components/WebhookForm.tsx": {
+      "WebhookForm": [
+        42
+      ]
+    }
+  },
+  "maxLinesPerFunction": {
+    "src/modules/equipment/components/ImportEquipmentModal.tsx": {
+      "ImportEquipmentModal": [
+        308
+      ]
+    },
+    "src/modules/equipment/hooks/useAssetListActions.ts": {
+      "useAssetListActions": [
+        451
+      ]
+    },
+    "src/modules/equipment/pages/AssetListPage.tsx": {
+      "AssetListPage": [
+        485
+      ]
+    },
+    "src/modules/inventory/pages/ItemsPage.tsx": {
+      "ItemsPage": [
+        382
+      ]
+    },
+    "src/modules/inventory/pages/LabelPoolPage.tsx": {
+      "LabelPoolPage": [
+        319
+      ]
+    },
+    "src/modules/maker/pages/ProductionDetailPage.tsx": {
+      "ProductionDetailPage": [
+        323
+      ]
+    },
+    "src/modules/recipes/components/PickingActivePhase.tsx": {
+      "PickingActivePhase": [
+        305
+      ]
+    },
+    "src/modules/recipes/components/RecipeForm.tsx": {
+      "RecipeForm": [
+        367
+      ]
+    },
+    "src/modules/recipes/pages/MealPlanDetailPage.tsx": {
+      "MealPlanDetailPage": [
+        367
+      ]
+    },
+    "src/modules/recipes/pages/RecipesPage.tsx": {
+      "RecipesPage": [
+        495
+      ]
+    },
+    "src/modules/recipes/pages/UnitConversionsPage.tsx": {
+      "UnitConversionsPage": [
+        364
+      ]
+    },
+    "src/modules/warehouse/components/DocumentFormModal.tsx": {
+      "DocumentFormModal": [
+        393
+      ]
+    },
+    "src/modules/warehouse/pages/DocumentDetailPage.tsx": {
+      "DocumentDetailPage": [
+        380
+      ]
+    }
+  }
+}

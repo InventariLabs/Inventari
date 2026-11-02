@@ -1,0 +1,61 @@
+{
+  "launcher": {
+    "title": "Ekran główny",
+    "description": "Przegląd obszaru roboczego",
+    "welcome": "Witaj, {{name}}",
+    "joinedOrganization": "Dołączono do organizacji {{organization}}",
+    "createdOrganization": "Utworzono organizację {{organization}}",
+    "welcomeBack": "Witaj ponownie, {{name}}",
+    "workspaceOverview": "Przegląd obszaru roboczego",
+    "alerts": "Alerty",
+    "recentItems": "Ostatnio odwiedzone",
+    "browseApps": "Przeglądaj aplikacje",
+    "noActions": "Wszystkie zadania ukończone",
+    "emptyRecent": "Brak ostatnich elementów",
+    "actionItems": {
+      "title": "Do zrobienia",
+      "subtitle": "{{count}} oczekujących we włączonych modułach",
+      "subtitle_one": "{{count}} oczekujące we włączonych modułach",
+      "subtitle_few": "{{count}} oczekujące we włączonych modułach",
+      "subtitle_many": "{{count}} oczekujących we włączonych modułach",
+      "subtitle_other": "{{count}} oczekujących we włączonych modułach"
+    }
+  },
+  "sections": {
+    "core": "Podstawy",
+    "business": "Biznes",
+    "analytics": "Analityka",
+    "integrations": "Integracje",
+    "system": "System"
+  },
+  "workspace": {
+    "current": "Aktualny",
+    "apply": "Zastosuj",
+    "reapply": "Zastosuj ponownie",
+    "reapplyHint": "Wykonuje konfigurację tego profilu ponownie — żaden moduł nie zostanie dodany ani usunięty",
+    "target": "Cel: {{name}}",
+    "loading": "Ładowanie profili…",
+    "empty": "Brak dostępnych profili.",
+    "diffTitle": "Co się zmieni",
+    "diffSubtitle": "Z {{from}} na {{to}}",
+    "diffEnable": "Włącz",
+    "diffDisable": "Wyłącz",
+    "diffCascade": "Wyłącz kaskadowo",
+    "diffUnchanged": "Bez zmian",
+    "diffConfig": "Resetuj ustawienia dla",
+    "confirmTitle": "Przełączyć na {{name}}?",
+    "confirmMessage": "Moduły zostaną włączone i wyłączone dla Twojej organizacji. Możesz wrócić w każdej chwili.",
+    "confirmApply": "Przełącz profil",
+    "confirmReapplyTitle": "Ponowić konfigurację {{name}}?",
+    "confirmReapplyMessage": "Żaden moduł nie zostanie dodany ani usunięty. Konfiguracja profilu wykona się ponownie: jego ustawienia domyślne wrócą do wartości profilu, a zasiane przez niego nazwy — typy miejsc włącznie — zostaną zapisane w języku tej sesji.",
+    "confirmReapply": "Wykonaj ponownie",
+    "previewLoading": "Obliczanie zmian…",
+    "diffManualKept": "Zostaje (dodane ręcznie)",
+    "diffCascadeHint": "Wyłączone, bo wymagają usuwanego modułu",
+    "diffConfigHint": "Domyślne wartości profilu nadpiszą bieżące ustawienia",
+    "renumberOffer": "Twoje miejsca zachowują kody i naklejki. Kody półek (A-02-01) nadasz przez Przenumeruj według szablonu w Magazyn → Konfiguracja → Kody, etykiety i kolejność obchodu miejsc; stare naklejki dalej się skanują."
+  },
+  "activeProfile": {
+    "change": "Zmień"
+  }
+}

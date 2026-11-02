@@ -1,0 +1,5 @@
+# Architecture lint baseline
+# Format: relative/path.py::qualname@N (N = the Nth rollback inside that function)
+# One entry per site. A rollback mid-stack erases the caller's unit of
+# work; these sites wait for their conversion wave. Legal transaction
+# owners live in transaction_owner_allowlist.txt, not here.

@@ -1,0 +1,10 @@
+{
+  "ai": {
+    "purposeLabel": "Produkt vom Foto lesen",
+    "purposeDesc": "Liest Name, Marke, Menge und Haltbarkeitsdatum vom Foto eines Etiketts, damit ein neuer Artikel ohne Tippen entsteht."
+  },
+  "permissions": {
+    "extract": "Etiketten aus Fotos lesen",
+    "extractDesc": "Kann Fotos von Produktetiketten und Nährwerttabellen an das KI-Modell senden — jeder Aufruf wird abgerechnet"
+  }
+}

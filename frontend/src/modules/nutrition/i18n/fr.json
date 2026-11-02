@@ -1,0 +1,74 @@
+{
+  "title": "Infos alimentaires & santé",
+  "scanTable": "Scanner le tableau",
+  "noData": "Aucune donnée disponible pour ce produit. Utilisez le bouton 'Scanner le tableau' pour ajouter des valeurs nutritionnelles et des ingrédients avec la caméra.",
+  "noDataRoutes": "Aucune donnée pour ce produit. Scannez le tableau avec la caméra, ou saisissez les valeurs ci-dessous.",
+  "noDataManual": "Aucune donnée pour ce produit. Saisissez les valeurs ci-dessous.",
+  "noDataNone": "Aucune donnée pour ce produit.",
+  "nutriScore": "Nutri-Score",
+  "nutrientLevels": "Niveaux nutritionnels",
+  "ingredients": "Ingrédients / Info",
+  "energy": "énergie",
+  "proteins": "protéines",
+  "fat": "lipides",
+  "fiber": "fibres",
+  "levels": {
+    "sugars": {
+      "low": "Faible teneur en sucre",
+      "moderate": "Teneur modérée en sucre",
+      "high": "Teneur élevée en sucre"
+    },
+    "salt": {
+      "low": "Faible teneur en sel",
+      "moderate": "Teneur modérée en sel",
+      "high": "Teneur élevée en sel"
+    },
+    "fat": {
+      "low": "Faible teneur en lipides",
+      "moderate": "Teneur modérée en lipides",
+      "high": "Teneur élevée en lipides"
+    },
+    "saturated_fat": {
+      "low": "Faible teneur en acides gras saturés",
+      "moderate": "Teneur modérée en acides gras saturés",
+      "high": "Teneur élevée en acides gras saturés"
+    }
+  },
+  "scanner": {
+    "title": "Scanner nutritionnel",
+    "subtitle": "Prenez une photo du tableau nutritionnel sur l'emballage",
+    "howItWorksTitle": "Comment ça marche ?",
+    "howItWorksDesc": "Prenez une photo nette du tableau des valeurs nutritionnelles sur l'emballage. L'IA peut lire les kcal et les macronutriments pour vous.",
+    "takePhoto": "PRENDRE PHOTO",
+    "success": "L'IA a analysé le tableau !",
+    "checkData": "Vérifiez si les données ci-dessous sont correctes.",
+    "energy": "Énergie (kcal)",
+    "carbs": "Glucides",
+    "sugars": "Sucres",
+    "salt": "Sel",
+    "retry": "Réessayer",
+    "save": "Enregistrer au produit",
+    "recognizing": "L'IA analyse…",
+    "error": "Impossible de lire le tableau. Essayez une photo plus nette.",
+    "saveSuccess": "Données nutritionnelles enregistrées !",
+    "saveError": "Échec de l'enregistrement du résultat du scan",
+    "howItWorksNoAi": "Prenez une photo nette du tableau des valeurs nutritionnelles sur l'emballage. Sans connexion IA, rien n'est extrait — les valeurs restent à saisir."
+  },
+  "carbohydrates": "Glucides",
+  "sugars": "Sucres",
+  "salt": "Sel",
+  "nutritionForm": {
+    "saved": "Valeurs nutritionnelles enregistrées",
+    "saveError": "Échec de l'enregistrement des valeurs nutritionnelles",
+    "title": "Saisir les valeurs à la main",
+    "hint": "Valeurs nutritionnelles pour 100 g/ml."
+  },
+  "source": {
+    "learnMore": "En savoir plus →",
+    "visionCapture": "Lu sur l'étiquette",
+    "communityNote": "Issu d'Open Food Facts, une base communautaire : ces valeurs sont une estimation. À comparer avec l'étiquette."
+  },
+  "productPage": {
+    "title": "Valeurs nutritionnelles pour 100 g"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "title": "Partners",
+  "subtitle": "Suppliers, customers, and service providers",
+  "detail": {
+    "title": "Partner details",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "related": "Related",
+    "relatedDocuments": "Warehouse documents",
+    "relatedOrders": "Purchase orders"
+  },
+  "newPartner": "New partner",
+  "searchPlaceholder": "Search by name, code, tax ID, email…",
+  "noPartners": "No partners found",
+  "noPartnersDesc": "Add your first partner to get started",
+  "stats": {
+    "documents_one": "{{count}} document",
+    "documents_few": "{{count}} documents",
+    "documents_many": "{{count}} documents",
+    "documents_other": "{{count}} documents",
+    "total": "Turnover",
+    "lastActivity": "Last activity",
+    "multipleCurrencies": "Multiple currencies"
+  },
+  "filterAll": "All",
+  "filterActive": "Active",
+  "filterInactive": "Inactive",
+  "columns": {
+    "name": "Name",
+    "type": "Type",
+    "taxId": "Tax ID",
+    "contact": "Contact",
+    "documents": "Documents",
+    "actions": "Actions"
+  },
+  "launcher": {
+    "description": "Manage suppliers, customers, and business partners"
+  },
+  "types": {
+    "SUPPLIER": "Supplier",
+    "CUSTOMER": "Customer",
+    "BOTH": "Supplier & Customer",
+    "SERVICE_PROVIDER": "Service Provider",
+    "MANUFACTURER": "Manufacturer",
+    "EMPLOYEE": "Employee"
+  },
+  "fields": {
+    "name": "Name",
+    "fullName": "Full Name",
+    "code": "Partner Code",
+    "type": "Type",
+    "taxId": "Tax ID / VAT",
+    "isConsumer": "Private person (consumer)",
+    "email": "Email",
+    "phone": "Phone",
+    "website": "Website",
+    "contactPerson": "Contact Person",
+    "position": "Position / Department",
+    "address": "Address",
+    "notes": "Internal Notes"
+  },
+  "address": {
+    "section": "Address",
+    "street": "Street",
+    "city": "City",
+    "postalCode": "Postal Code",
+    "country": "Country",
+    "countrySelect": "Select country",
+    "otherCountry": "Other: {{value}}"
+  },
+  "form": {
+    "createTitle": "New Partner",
+    "editTitle": "Edit Partner",
+    "namePlaceholder": "e.g. ABC Wholesaler",
+    "fullNamePlaceholder": "e.g. John Smith",
+    "codePlaceholder": "e.g. SUP-001",
+    "taxIdPlaceholder": "e.g. PL1234567890",
+    "isConsumerHint": "Has no tax ID: documents confirm without one even where the law asks businesses for it.",
+    "emailPlaceholder": "contact@company.com",
+    "phonePlaceholder": "+48 123 456 789",
+    "websitePlaceholder": "https://company.com",
+    "contactPersonPlaceholder": "e.g. Jane Smith (Purchasing Dept.)",
+    "positionPlaceholder": "e.g. IT Specialist, IT Department",
+    "notesPlaceholder": "Internal notes…",
+    "street_placeholder": "e.g. 123 Main St",
+    "city_placeholder": "e.g. New York",
+    "postal_placeholder": "e.g. 12345",
+    "saving": "Saving…"
+  },
+  "actions": {
+    "edit": "Edit",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "addPartner": "Add Partner"
+  },
+  "confirmDeactivateTitle": "Deactivate partner",
+  "confirmDeactivate": "Deactivate this partner? They will no longer appear in filters by default.",
+  "status": {
+    "inactive": "Inactive"
+  },
+  "errors": {
+    "activateFailed": "Failed to activate partner",
+    "deactivateFailed": "Failed to deactivate partner",
+    "saveFailed": "Failed to save partner",
+    "createFailed": "Failed to create partner",
+    "invalidEmail": "Enter an email address, for example name@company.com.",
+    "invalidWebsite": "Enter a web address, for example https://company.com."
+  },
+  "inlineCreateHint": "Quick create a partner",
+  "inlineCreateSuccess": "Partner \"{{name}}\" created. Add their tax ID and address before issuing a document with an address.",
+  "import": {
+    "button": "Import",
+    "title": "Import partners",
+    "formats": "XLSX / CSV",
+    "pleaseWait": "Please wait while we process your partners.",
+    "closeAndView": "Close and view partners",
+    "added_one": "Added {{count}} partner.",
+    "added_other": "Added {{count}} partners.",
+    "defaultType": "Type for rows without one",
+    "addOnlyNote": "Import only adds partners. A row naming a partner you already have — the same name in any letter case, or the same tax ID — is refused and listed with its reason.",
+    "analyzeFailed": "Could not read the file",
+    "failed": "Import failed"
+  },
+  "toasts": {
+    "saved": "Partner saved",
+    "created": "Partner created",
+    "activated": "Partner activated",
+    "deactivated": "Partner deactivated"
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "title": "Partner",
+  "subtitle": "Lieferanten, Kunden und Dienstleister",
+  "detail": {
+    "title": "Partnerdetails",
+    "createdAt": "Erstellt",
+    "updatedAt": "Aktualisiert",
+    "related": "Verknüpft",
+    "relatedDocuments": "Lagerdokumente",
+    "relatedOrders": "Bestellungen"
+  },
+  "newPartner": "Neuer Partner",
+  "searchPlaceholder": "Nach Name, Code, Steuer-ID, E-Mail suchen…",
+  "noPartners": "Keine Partner gefunden",
+  "noPartnersDesc": "Fügen Sie Ihren ersten Partner hinzu, um zu beginnen",
+  "stats": {
+    "documents_one": "{{count}} Beleg",
+    "documents_other": "{{count}} Belege",
+    "total": "Umsatz",
+    "lastActivity": "Letzte Aktivität",
+    "multipleCurrencies": "Mehrere Währungen"
+  },
+  "filterAll": "Alle",
+  "filterActive": "Aktiv",
+  "filterInactive": "Inaktiv",
+  "columns": {
+    "name": "Name",
+    "type": "Typ",
+    "taxId": "Steuernummer",
+    "contact": "Kontakt",
+    "documents": "Dokumente",
+    "actions": "Aktionen"
+  },
+  "launcher": {
+    "description": "Lieferanten, Kunden und Geschäftspartner verwalten"
+  },
+  "types": {
+    "SUPPLIER": "Lieferant",
+    "CUSTOMER": "Kunde",
+    "BOTH": "Lieferant & Kunde",
+    "SERVICE_PROVIDER": "Dienstleister",
+    "MANUFACTURER": "Hersteller",
+    "EMPLOYEE": "Mitarbeiter"
+  },
+  "fields": {
+    "name": "Name",
+    "fullName": "Vollständiger Name",
+    "code": "Partner-Code",
+    "type": "Typ",
+    "taxId": "Steuer-ID / USt-IdNr.",
+    "isConsumer": "Privatperson (Verbraucher)",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "website": "Webseite",
+    "contactPerson": "Kontaktperson",
+    "position": "Position / Abteilung",
+    "address": "Adresse",
+    "notes": "Interne Notizen"
+  },
+  "address": {
+    "section": "Adresse",
+    "street": "Straße",
+    "city": "Stadt",
+    "postalCode": "Postleitzahl",
+    "country": "Land",
+    "countrySelect": "Land auswählen",
+    "otherCountry": "Andere: {{value}}"
+  },
+  "form": {
+    "createTitle": "Neuer Partner",
+    "editTitle": "Partner bearbeiten",
+    "namePlaceholder": "z.B. ABC Großhandel",
+    "fullNamePlaceholder": "z.B. Max Mustermann",
+    "codePlaceholder": "z.B. LIE-001",
+    "taxIdPlaceholder": "z.B. DE123456789",
+    "isConsumerHint": "Hat keine Steuer-ID: Belege werden ohne sie bestätigt, auch wo das Gesetz sie von Unternehmen verlangt.",
+    "emailPlaceholder": "kontakt@unternehmen.de",
+    "phonePlaceholder": "+49 123 456 789",
+    "websitePlaceholder": "https://unternehmen.de",
+    "contactPersonPlaceholder": "z.B. Max Mustermann (Einkauf)",
+    "positionPlaceholder": "z.B. IT-Spezialist, IT-Abteilung",
+    "notesPlaceholder": "Interne Notizen…",
+    "street_placeholder": "z.B. Hauptstr. 123",
+    "city_placeholder": "z.B. Berlin",
+    "postal_placeholder": "z.B. 12345",
+    "saving": "Wird gespeichert…"
+  },
+  "actions": {
+    "edit": "Bearbeiten",
+    "deactivate": "Deaktivieren",
+    "activate": "Aktivieren",
+    "addPartner": "Partner hinzufügen"
+  },
+  "confirmDeactivateTitle": "Partner deaktivieren",
+  "confirmDeactivate": "Diesen Partner deaktivieren? Er wird standardmäßig nicht mehr in Filtern angezeigt.",
+  "status": {
+    "inactive": "Inaktiv"
+  },
+  "errors": {
+    "activateFailed": "Partner konnte nicht aktiviert werden",
+    "deactivateFailed": "Partner konnte nicht deaktiviert werden",
+    "saveFailed": "Partner konnte nicht gespeichert werden",
+    "createFailed": "Partner konnte nicht erstellt werden",
+    "invalidEmail": "Geben Sie eine E-Mail-Adresse ein, zum Beispiel name@firma.de.",
+    "invalidWebsite": "Geben Sie eine Webadresse ein, zum Beispiel https://firma.de."
+  },
+  "inlineCreateHint": "Schnell einen Partner erstellen",
+  "inlineCreateSuccess": "Partner „{{name}}“ wurde erstellt. Ergänzen Sie Steuer-ID und Adresse, bevor Sie ein Dokument mit Adresse ausstellen.",
+  "import": {
+    "button": "Importieren",
+    "title": "Partner importieren",
+    "formats": "XLSX / CSV",
+    "pleaseWait": "Bitte warten Sie, während Ihre Partner verarbeitet werden.",
+    "closeAndView": "Schließen und Partner ansehen",
+    "added_one": "{{count}} Partner hinzugefügt.",
+    "added_other": "{{count}} Partner hinzugefügt.",
+    "defaultType": "Typ für Zeilen ohne Angabe",
+    "addOnlyNote": "Der Import fügt nur Partner hinzu. Eine Zeile mit einem Partner, den Sie bereits haben — derselbe Name in beliebiger Schreibweise oder dieselbe Steuernummer — wird abgelehnt und mit Begründung aufgeführt.",
+    "analyzeFailed": "Die Datei konnte nicht gelesen werden",
+    "failed": "Import fehlgeschlagen"
+  },
+  "toasts": {
+    "saved": "Partner gespeichert",
+    "created": "Partner erstellt",
+    "activated": "Partner aktiviert",
+    "deactivated": "Partner deaktiviert"
+  }
+}

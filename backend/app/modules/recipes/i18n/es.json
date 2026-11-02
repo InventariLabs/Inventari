@@ -1,0 +1,7 @@
+{
+  "recipe.not_found": "Receta no encontrada",
+  "ingredient.not_in_recipe": "Este producto no es un ingrediente de esta receta",
+  "picking.session_not_found": "Sesión de preparación no encontrada",
+  "picking.already_active": "Ya existe una sesión de preparación activa para esta receta",
+  "picking.already_picked": "{name} ya ha sido preparado"
+}

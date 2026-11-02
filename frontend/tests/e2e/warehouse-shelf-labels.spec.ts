@@ -1,0 +1,113 @@
+import { test, expect } from "./fixtures/auth";
+import { ApiHelper } from "./helpers/api";
+import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
+import { pickLocationSettingsPlace } from "./helpers/location-settings";
+
+/**
+ * Printing a shelf's label is daily work — a new shelf, a torn sticker — so
+ * it has to be on the surface of Warehouse: a menu entry that lists the
+ * shelves with their codes and prints their labels, and the sheet a scanned
+ * shelf opens offering the same label. Neither goes through Configuration.
+ */
+
+const UID = Date.now().toString(36);
+
+test.describe("Warehouse — shelf labels on the surface", () => {
+  let warehouseName: string;
+  let shelfName: string;
+  let shelfCode: string;
+
+  test.beforeAll(async ({ playwright, baseURL }) => {
+    const ctx = await playwright.request.newContext({ baseURL });
+    const api = new ApiHelper(ctx);
+    const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    const token = auth.access_token;
+    await api.enableAllModules(token);
+
+    warehouseName = `E2E-Labels-WH-${UID}`;
+    shelfName = `E2E-Labels-Shelf-${UID}`;
+    const warehouse = await api.createStorageIdempotent(token, {
+      name: warehouseName,
+    });
+    const shelf = (await api.createStorageIdempotent(token, {
+      name: shelfName,
+      parent_id: warehouse.id,
+    })) as { id: string; short_code?: string };
+    const read = await ctx.get(`/api/v1/locations/${shelf.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    shelfCode = (await read.json()).short_code;
+  });
+
+  test("the Warehouse menu lists the shelves with their codes and prints their labels", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    await page.goto("/warehouse/todo");
+
+    // Step 1: the entry in the module bar — no visit to Configuration.
+    await page
+      .getByRole("navigation", { name: "Module navigation" })
+      .getByRole("link", { name: "Codes and labels" })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Codes and labels", level: 1 }),
+    ).toBeVisible();
+
+    // A test database holds many warehouses; a person with one lands on it.
+    await pickLocationSettingsPlace(page, warehouseName);
+    await expect(
+      page
+        .getByRole("row")
+        .filter({ hasText: shelfName })
+        .getByText(shelfCode, { exact: true }),
+    ).toBeVisible();
+
+    // Step 2: print.
+    await page.getByRole("button", { name: "Print labels for this list" }).click();
+    const sheet = page.getByRole("dialog", { name: "Location labels" });
+    await expect(sheet).toBeVisible();
+    await expect(
+      sheet.getByRole("button", { name: /^Download \d+ labels?$/ }),
+    ).toBeEnabled({ timeout: 15000 });
+  });
+
+  test("on a phone the module menu reaches the same list", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/warehouse/todo");
+
+    await page.getByRole("button", { name: "More" }).click();
+    await page.getByRole("link", { name: "Codes and labels" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Codes and labels", level: 1 }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Print labels for this list" }),
+    ).toBeVisible();
+  });
+
+  test("a scanned shelf offers its own label", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    await page.goto("/warehouse/scan");
+
+    await page
+      .getByPlaceholder("Document number or scanned code…")
+      .fill(shelfCode);
+    await page.keyboard.press("Enter");
+
+    const contents = page.getByRole("dialog", { name: new RegExp(shelfName) });
+    await expect(contents).toBeVisible({ timeout: 15000 });
+    await contents.getByRole("button", { name: "Print label" }).click();
+
+    const sheet = page.getByRole("dialog", { name: "Location labels" });
+    await expect(sheet).toBeVisible();
+    await expect(
+      sheet.getByRole("button", { name: "Download 1 label" }),
+    ).toBeEnabled({ timeout: 15000 });
+  });
+});

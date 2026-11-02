@@ -1,0 +1,304 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: always
+    # Memory-heavy Postgres settings are env-overridable with conservative defaults
+    # so the DB starts on modest hardware (laptops, small VPS). On a beefy box,
+    # raise them in .env, e.g. POSTGRES_SHARED_BUFFERS=8GB.
+    # (8GB/32GB/2GB/64MB hard-coded here previously crashed postgres on <16GB hosts.)
+    # Prod keeps conservative tuning + PgBouncer in docker-compose.prod.yml.
+    #
+    # The three durability settings default to ON — this file also serves real
+    # dev data. Turn them off for a throwaway database and the suite runs ~5x
+    # faster (502s -> 101s measured): DROP DATABASE forces an immediate
+    # checkpoint and waits for it, and the migration tests create and drop a
+    # database per class, so with fsync on every one of them stalls behind a
+    # full flush of whatever the other xdist workers just wrote.
+    #   POSTGRES_FSYNC=off POSTGRES_SYNCHRONOUS_COMMIT=off POSTGRES_FULL_PAGE_WRITES=off
+    # A server started that way can lose or corrupt data if the host dies
+    # mid-write, so it is strictly for databases you can recreate.
+    command: >
+      postgres
+      -c max_connections=200
+      -c max_locks_per_transaction=256
+      -c shared_buffers=${POSTGRES_SHARED_BUFFERS:-256MB}
+      -c effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-1GB}
+      -c maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-256MB}
+      -c work_mem=${POSTGRES_WORK_MEM:-16MB}
+      -c wal_buffers=16MB
+      -c checkpoint_completion_target=0.9
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+      -c max_worker_processes=16
+      -c max_parallel_workers=8
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_maintenance_workers=4
+      -c log_min_duration_statement=500
+      -c fsync=${POSTGRES_FSYNC:-on}
+      -c synchronous_commit=${POSTGRES_SYNCHRONOUS_COMMIT:-on}
+      -c full_page_writes=${POSTGRES_FULL_PAGE_WRITES:-on}
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  products-db:
+    image: postgres:17-alpine
+    restart: always
+    profiles: ["food"]
+    command: >
+      postgres
+      -c max_connections=20
+      -c shared_buffers=1GB
+      -c effective_cache_size=4GB
+      -c maintenance_work_mem=512MB
+      -c work_mem=32MB
+      -c wal_buffers=16MB
+      -c checkpoint_completion_target=0.9
+      -c min_wal_size=512MB
+      -c max_wal_size=2GB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+      -c max_worker_processes=4
+      -c max_parallel_workers=4
+      -c max_parallel_workers_per_gather=2
+      -c max_parallel_maintenance_workers=2
+    environment:
+      POSTGRES_DB: ${PRODUCTS_DB_NAME:-products_db}
+      POSTGRES_USER: ${PRODUCTS_DB_USER:-products_user}
+      POSTGRES_PASSWORD: ${PRODUCTS_DB_PASSWORD:?Set PRODUCTS_DB_PASSWORD in .env}
+    volumes:
+      - products_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5434:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PRODUCTS_DB_USER:-products_user} -d ${PRODUCTS_DB_NAME:-products_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Valkey, not Redis: Redis is RSALv2/SSPL from 7.4 on, which makes it a
+  # non-open-source component to hand a customer along with the stack. Valkey
+  # is the BSD-3-Clause fork under the Linux Foundation and speaks the same
+  # protocol, so REDIS_URL and every client stay as they are. The tag is
+  # pinned — a moving tag means the deployed version is not recorded here.
+  redis:
+    image: valkey/valkey:9.1.2-alpine
+    restart: always
+    command: >
+      valkey-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 3600 1
+      --save 300 100
+      --tcp-keepalive 60
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:6380:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    # --log-config: without it uvicorn keeps its own handlers, and the reload
+    # supervisor prints its startup lines without a timestamp.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-config log_config.yaml
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      # Dev: direct connection to db (no PgBouncer). Prod still goes through pgbouncer-main.
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      PRODUCTS_DATABASE_URL: ${PRODUCTS_DATABASE_URL:-}
+      REDIS_URL: redis://redis:6379
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openrouter}
+      LLM_API_BASE_URL: ${LLM_API_BASE_URL:-https://openrouter.ai/api/v1}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_CAPABILITIES: ${LLM_CAPABILITIES:-}
+      LLM_REQUEST_TIMEOUT_SECONDS: ${LLM_REQUEST_TIMEOUT_SECONDS:-60}
+      LLM_LOCAL_REQUEST_TIMEOUT_SECONDS: ${LLM_LOCAL_REQUEST_TIMEOUT_SECONDS:-300}
+      SECRET_KEY: ${SECRET_KEY}
+      FERNET_SALT: ${FERNET_SALT:-}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      PREVIOUS_ENCRYPTION_KEY: ${PREVIOUS_ENCRYPTION_KEY:-}
+      FRONTEND_URL: http://localhost:5173
+      DEBUG: ${DEBUG:-true}
+      LOAD_TESTING: ${LOAD_TESTING:-false}
+      TESTING: ${TESTING:-false}
+      # TESTING is refused with DEBUG=false unless acknowledged (config.py).
+      TESTING_ACK_UNSAFE: ${TESTING_ACK_UNSAFE:-false}
+      # QA fault injection: lets a review session ask the API for a chosen
+      # error status via a cookie, so the "error" state of a screen can be
+      # looked at instead of guessed. The middleware registers only when this
+      # is true AND DEBUG is on, so it cannot reach a deployed install.
+      QA_FAULT_INJECTION: ${QA_FAULT_INJECTION:-false}
+      # Dev runs E2E suites that log in per spec file — keep the login bucket
+      # high here. Prod compose stays at the 5/minute default.
+      RATE_LIMIT_LOGIN: ${RATE_LIMIT_LOGIN:-1000 per minute}
+      # Every SPA boot refreshes; the refresh bucket keys on IP, which a whole
+      # parallel test run shares. Prod stays at 20/minute.
+      RATE_LIMIT_REFRESH: ${RATE_LIMIT_REFRESH:-1000 per minute}
+      # Global backstop bucket keys on JWT user — one admin account serves the
+      # whole parallel E2E run plus a developer working beside it, so 200/min stalls seeding.
+      # Prod compose stays at the code default.
+      RATE_LIMIT_PER_IP: ${RATE_LIMIT_PER_IP:-5000 per minute}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      EMAILS_FROM_EMAIL: ${EMAILS_FROM_EMAIL:-noreply@inventari.app}
+      EMAILS_FROM_NAME: ${EMAILS_FROM_NAME:-Inventari}
+      # Where uploads live. Listed because this service has no `env_file:`: a
+      # name that is not here never reaches the container, so `s3` in .env
+      # alone left the files on local disk (docs/subsystems/FILE_STORAGE.md).
+      FILE_STORAGE_BACKEND: ${FILE_STORAGE_BACKEND:-local}
+      FILE_STORAGE_LOCAL_PATH: ${FILE_STORAGE_LOCAL_PATH:-/app/uploads}
+      FILE_STORAGE_S3_BUCKET: ${FILE_STORAGE_S3_BUCKET:-}
+      FILE_STORAGE_S3_ACCESS_KEY: ${FILE_STORAGE_S3_ACCESS_KEY:-}
+      FILE_STORAGE_S3_SECRET_KEY: ${FILE_STORAGE_S3_SECRET_KEY:-}
+      FILE_STORAGE_S3_REGION: ${FILE_STORAGE_S3_REGION:-us-east-1}
+      FILE_STORAGE_S3_ENDPOINT_URL: ${FILE_STORAGE_S3_ENDPOINT_URL:-}
+      # A self-hosted install pointing a webhook at Home Assistant, or an AI
+      # connection at a model server on the same LAN, needs these — and the
+      # refusal on screen names them. This service has no `env_file:`, so a
+      # variable that is not listed here never reaches the container: without
+      # these two lines, following the instruction the application itself gives
+      # changes nothing at all. What it costs is in .env.example.
+      WEBHOOKS_ALLOW_PRIVATE_NETWORKS: ${WEBHOOKS_ALLOW_PRIVATE_NETWORKS:-false}
+      LLM_ALLOW_PRIVATE_NETWORKS: ${LLM_ALLOW_PRIVATE_NETWORKS:-false}
+      # The publisher keys `manage.py module install` trusts. Listed for the
+      # same reason: set in .env alone, it never reaches the container, and
+      # every signed install is refused as "no trusted signing keys".
+      MODULE_SIGNING_PUBLIC_KEYS: ${MODULE_SIGNING_PUBLIC_KEYS:-}
+      # `manage.py module install` writes both halves of a community module.
+      # The backend half lands under /app; the frontend half has nowhere to go
+      # unless the frontend module tree is mounted, and an install that silently
+      # lands half a module is how a module ends up enabled with no screens.
+      INVENTARI_FRONTEND_MODULES_DIR: /frontend-modules
+      # Where the three drift tests read the checkout from. They used to
+      # resolve it as two parents above their own file — `/app/../..`, i.e. the
+      # container's `/` — which holds none of it. See the `./:/repo:ro` mount
+      # below. Tests and gate scripts read this; the application does not.
+      INVENTARI_REPO_ROOT: /repo
+    volumes:
+      - ./backend:/app
+      - ./frontend/src/modules:/frontend-modules
+      # Where a module author's own package lives while they are writing it.
+      # Mounted so `module install` can reach it without the package having to
+      # sit inside the platform's own source tree.
+      - ./modules-workspace:/modules-workspace
+      - uploads_data:/app/uploads
+      - logs_data:/app/logs
+      # The three drift tests in tests/integration resolve the repository root
+      # as `/` — a file at backend/scripts/... sits two parents below it — so
+      # they need the repository at a path they can be told about, not a
+      # handful of files placed at the container's root. Without this they
+      # skip, and a skip inside a green pre-push gate reads as a pass for a check that
+      # measured nothing: that is how the docs-paths gate stayed red on dev for
+      # a stretch with nobody able to see it. `INVENTARI_REPO_ROOT` above names
+      # that path; backend/tests/integration and backend/scripts read it.
+      #
+      # Read-only, and the whole checkout rather than a list: the docs-paths
+      # check follows backticked paths wherever they point — backend, frontend,
+      # docs, scripts, load_tests, print-agent, .github — and any list of them
+      # here would go stale the first time a document named a new one while
+      # quietly shrinking what the check looks at. The cost is that the
+      # container can also read this checkout's own .env; it is read-only and
+      # this container is already handed those same values as environment
+      # variables, so nothing new is exposed to it.
+      - ./:/repo:ro
+    ports:
+      - "127.0.0.1:8005:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: always
+    environment:
+      INVENTARI_REPO_ROOT: /repo
+    volumes:
+      # /app is covered whole on purpose: the container and the host share one
+      # `frontend/node_modules`. See frontend/Dockerfile.dev for why there is no
+      # anonymous volume shielding it, and where a fresh clone gets it from.
+      - ./frontend:/app
+      # Two frontend gates are naming gates rather than component tests: they
+      # read the backend's own source — module manifests for the translation
+      # gate, the always-on module list for the routing one — so a module
+      # added without translations, or forced on for every organisation
+      # without a matching frontend route, fails here. They resolve the repo
+      # root as `<src>/../..`, which is `/` in here, and CI runs the same
+      # suite on the host where those paths exist. Without these read-only
+      # mounts `make test-frontend` fails on files the container simply
+      # cannot see, while CI stays green — a local gate that disagrees with
+      # CI is worse than no local gate.
+      - ./backend/app:/backend/app:ro
+      # The README gate reads the checkout through `INVENTARI_REPO_ROOT`. The
+      # directory is mounted, not the README alone: a single-file bind pins the
+      # host file's inode, git replaces a file by renaming a new one over it,
+      # and the container then reads the deleted original for good — the gate
+      # fails against content nobody has. A directory bind follows the rename.
+      - ./:/repo:ro
+    ports:
+      # Loopback, like every other dev service here. Published on 0.0.0.0 it
+      # was the one port on this stack that answered anyone on the network —
+      # a dev server with the source tree behind it and no auth in front.
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  products_data:
+  redis_data:
+  uploads_data:
+  logs_data:
+
+networks:
+  app-network:
+    driver: bridge

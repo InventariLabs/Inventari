@@ -1,0 +1,91 @@
+{
+  "title": "Claves API",
+  "subtitle": "Permitir que sistemas externos se autentiquen con Inventari",
+  "generateKey": "Generar nueva clave",
+  "noKeys": "Sin claves API",
+  "noKeysDescription": "Genere una clave API para permitir que scripts, Home Assistant u otras automatizaciones se conecten.",
+  "table": {
+    "name": "Nombre",
+    "key": "Clave",
+    "created": "Creada",
+    "lastUsed": "Último uso",
+    "expires": "Expira",
+    "expired": "Caducada",
+    "expiredOn": "Caducó el",
+    "actions": "Acciones",
+    "never": "Nunca",
+    "issuedBy": "Emitida por",
+    "issuedByUnknown": "Cuenta ya eliminada",
+    "noExpiry": "No caduca",
+    "notUsedYet": "Aún sin usar",
+    "revokedTrace": "Una clave revocada sale de esta lista. La revocación queda en el registro de auditoría.",
+    "revokedTraceLink": "Abrir el registro de auditoría",
+    "permissions": "Permisos",
+    "noPermissions": "Sin permisos"
+  },
+  "revoke": "Revocar",
+  "revokeConfirm": {
+    "title": "Revocar clave API",
+    "message": "¿Está seguro de que desea revocar la clave \"{{name}}\"? Dejará de funcionar inmediatamente.",
+    "confirm": "Revocar",
+    "cancel": "Cancelar"
+  },
+  "form": {
+    "title": "Generar nueva clave API",
+    "namePlaceholder": "ej. Home Assistant, Script de respaldo",
+    "expiration": "Expiración",
+    "expirationOptions": {
+      "never": "Sin caducidad: vale hasta que se revoque",
+      "30days": "30 días",
+      "90days": "90 días",
+      "1year": "1 año"
+    },
+    "generate": "Generar clave",
+    "scope": "Para qué es la clave",
+    "scopeOptions": {
+      "everything": "Clave normal"
+    },
+    "scopeExplain": {
+      "printing": "Una clave de impresión solo sirve para Inventari Print Agent: registra el agente, toma trabajos de impresión, obtiene sus etiquetas e informa de cómo fueron. No puede leer ni cambiar nada más.",
+      "other": "Una clave con el ámbito {{scope}} solo llega a los puntos de acceso que comprueban estos permisos y no puede leer ni cambiar nada más:"
+    },
+    "scopesLoadFailed": "No se pudo cargar qué puede llevar una clave, así que ahora no se puede emitir ninguna.",
+    "permissions": "Qué puede hacer la clave",
+    "permissionsHint": "A una clave solo se le puede dar lo que usted mismo tiene.",
+    "readOnlyHint": "Una clave nueva empieza solo con lectura. Marque un permiso de escritura solo si la clave debe cambiar datos: podrá entonces cambiar todo lo que ese permiso cubre, por ejemplo añadir productos o cambiar los niveles de stock."
+  },
+  "copyDialog": {
+    "title": "Clave API generada",
+    "warning": "¡Asegúrese de copiar su clave API ahora. No podrá verla de nuevo!",
+    "copy": "Copiar al portapapeles",
+    "copied": "¡Copiado!",
+    "done": "Cerrar"
+  },
+  "capabilities": {
+    "title": "Qué puede llevar una clave",
+    "intro": "Cada clave lleva los permisos marcados al emitirla, como mucho los de quien la emite. Su lista aparece a su lado más abajo. Una clave de impresión solo llega a los puntos de acceso del agente de impresión.",
+    "withheldTitle": "Nunca en una clave",
+    "adminBlocked": "Todo lo administrativo —roles, invitaciones, módulos, otras claves de API— queda cerrado a una clave. La lista del equipo no: una clave con «Leer los datos de la organización» puede leer el nombre, el correo y el rol de cada miembro.",
+    "unknown": "Permiso {{key}}",
+    "permissions": {
+      "items_read": "Leer productos y existencias",
+      "items_write": "Añadir productos y cambiar existencias",
+      "items_delete": "Borrar productos",
+      "categories_read": "Leer la lista de categorías",
+      "locations_read": "Leer las ubicaciones",
+      "org_read": "Leer los datos de la organización",
+      "org_settings_write": "Administrar la organización: conexiones de IA, plantillas de documentos de equipos, la nomenclatura de SKU de toda la organización y el registro de claves API"
+    },
+    "loadFailed": "No se pudo cargar lo que puede hacer una clave."
+  },
+  "usage": {
+    "title": "Cómo enviarla",
+    "hint": "La clave viaja en la cabecera {{header}}. Enviada como Authorization: Bearer aún funciona hasta la próxima versión, y cada respuesta lleva entonces una cabecera Deprecation.",
+    "copy": "Copiar el ejemplo",
+    "copied": "Ejemplo copiado"
+  },
+  "revokedToast": "Clave revocada: anotada en el registro de auditoría",
+  "scopes": {
+    "printing": "Solo impresión"
+  }
+}

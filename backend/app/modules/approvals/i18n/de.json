@@ -1,0 +1,48 @@
+{
+  "navigation": {
+    "dashboard": "Genehmigungen",
+    "workflows": "Workflows"
+  },
+  "dashboard": {
+    "title": "Genehmigungsanfragen",
+    "subtitle": "Ausstehende Genehmigungsanfragen prüfen und verwalten"
+  },
+  "launcher": {
+    "title": "Genehmigungen",
+    "description": "Mehrstufige konfigurierbare Genehmigungsworkflows"
+  },
+  "workflows": {
+    "title": "Workflows",
+    "subtitle": "Genehmigungsstufen und Genehmiger konfigurieren",
+    "create": "Workflow erstellen",
+    "edit": "Workflow bearbeiten",
+    "empty": "Noch keine Workflows",
+    "emptyHint": "Erstellen Sie Ihren ersten Workflow",
+    "name": "Workflow-Name",
+    "namePlaceholder": "z.B. Geräteausleihe-Genehmigung",
+    "nameRequired": "Workflow-Name ist erforderlich",
+    "saveChanges": "Änderungen speichern",
+    "created": "Workflow erfolgreich erstellt",
+    "updated": "Workflow aktualisiert",
+    "deleted": "Workflow gelöscht",
+    "deleteFailed": "Workflow konnte nicht gelöscht werden",
+    "saveFailed": "Workflow konnte nicht gespeichert werden",
+    "mutationGuard": "Dieser Workflow kann nicht geändert werden, solange Anfragen ausstehen",
+    "duplicateTarget": "Ein Workflow für diesen Zieltyp existiert bereits",
+    "addStage": "Stufe hinzufügen",
+    "removeStage": "Stufe entfernen",
+    "stageLabel": "Stufenbezeichnung",
+    "stageRole": "Rolle",
+    "addApprover": "Genehmiger hinzufügen",
+    "removeApprover": "Entfernen",
+    "searchUsers": "Benutzer suchen...",
+    "selectApprovers": "Genehmiger für diese Stufe auswählen",
+    "noUsersFound": "Keine Benutzer gefunden"
+  },
+  "permissions": {
+    "approve": "Anfragen genehmigen",
+    "approveDesc": "Ausstehende Genehmigungsanfragen genehmigen oder ablehnen",
+    "configure": "Workflows konfigurieren",
+    "configureDesc": "Genehmigungsworkflow-Definitionen erstellen und ändern"
+  }
+}

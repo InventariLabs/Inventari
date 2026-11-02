@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "agent": "Działanie jako agent druku",
+    "agentDesc": "Może zarejestrować drukarkę, pobierać jej zlecenia druku i etykiety oraz zgłaszać, jak poszły — to, co robi Inventari Print Agent"
+  }
+}

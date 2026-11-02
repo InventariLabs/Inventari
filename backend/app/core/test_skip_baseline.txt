@@ -1,0 +1,20 @@
+# Tests that skip because of where they run
+# Format: tests/relative/path.py::Class::test_name | owner=<who> | expires=<YYYY-MM-DD> | <reason>
+#
+# Only the environment belongs here. A test that skips on missing data passes
+# the day its feature is deleted; the fix for that is an assertion on a
+# precondition the test sets up itself, never an entry. Eleven of the fifteen
+# skips once in this suite fired in every run, and most were of that kind.
+#
+# Every entry below also says where the test does run. On dev none of them run
+# anywhere: CI is on main only. Past its date the lint fails and names the
+# owner, who rechecks whether the environment still differs.
+#
+# The three drift tests used to sit here — docs_paths, core_api_docs and
+# event_catalog — skipping because the repository root they read was not
+# mounted into the backend container. docker-compose.yml mounts it now and
+# names it in INVENTARI_REPO_ROOT, so they run there, which is why the entries
+# are gone rather than re-dated. The rate-limit test left the same way: the
+# limiter reads its default ceiling from settings on each request, so the test
+# sets a small one of its own and runs on every stack.
+

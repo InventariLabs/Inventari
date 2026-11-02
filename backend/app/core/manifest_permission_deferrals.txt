@@ -1,0 +1,18 @@
+# Manifest permissions with no enforcement point — deferrals, not a baseline.
+#
+# Format: <permission key> | owner=<who> | expires=<YYYY-MM-DD> | <reason>
+#
+# A key listed here is declared in a module manifest, reaches the roles matrix
+# as a switch an administrator can toggle, and today restricts nothing. Both
+# fields are mandatory and both are checked: a suppression with no owner and no
+# expiry is exactly how sixteen keys went unnoticed for months. Past the date
+# the lint fails and names the owner.
+#
+# The list is empty and meant to stay that way. Mounting
+# require_read_write('<module>:read', '<module>:write') on the module router
+# covers every endpoint of that module, including the ones added later.
+#
+# Enforcing a key is not free: a permission with no `default_roles` in the
+# manifest is granted to nobody but admins, so the switch has to be wired into
+# the role defaults in the same change or the module locks out every ordinary
+# member.

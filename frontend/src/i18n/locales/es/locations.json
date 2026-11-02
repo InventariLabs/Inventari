@@ -1,0 +1,427 @@
+{
+  "title": "Ubicaciones",
+  "subtitle": "Gestiona dónde se guardan tus productos",
+  "empty": {
+    "title": "No hay ubicaciones definidas",
+    "subtitle": "Añade un estante, una estantería o un armario para empezar a organizar tus productos.",
+    "addFirst": "Añadir primera ubicación"
+  },
+  "hidden": {
+    "title": "Algunas ubicaciones están ocultas",
+    "description": "Los almacenes que pertenecen a un módulo no aparecen en estas listas mientras \"Datos de módulos en las listas generales\" esté desactivado. Actívalo en Ajustes para ver todo en una sola lista.",
+    "inlineCount_one": "{{count}} ubicación está oculta: activa «Datos de módulos en las listas generales» en Ajustes para verla.",
+    "inlineCount_other": "{{count}} ubicaciones están ocultas: activa «Datos de módulos en las listas generales» en Ajustes para verlas.",
+    "fieldHint": "Tus almacenes pertenecen a un módulo y no aparecen en las listas generales. Crea uno nuevo aquí o activa \"Datos de módulos en las listas generales\" en Ajustes para elegir uno existente.",
+    "openSettings": "Abrir ajustes"
+  },
+  "picker": {
+    "moduleBadge": "Módulo: {{module}}"
+  },
+  "form": {
+    "location": "Cómo llegar (opcional)",
+    "locationPlaceholder": "ej. Cerca de la puerta, bajo la ventana"
+  },
+  "actions": {
+    "openWizard": "Añadir ubicación"
+  },
+  "messages": {
+    "storageCreated": "¡Ubicación añadida correctamente!",
+    "storageUpdated": "¡Ubicación actualizada correctamente!",
+    "storageDeleted": "¡Ubicación eliminada correctamente!",
+    "storageArchived": "Ubicación archivada",
+    "nameTaken": "Ya existe aquí una ubicación llamada «{{name}}».",
+    "shortCodeTaken": "Ese código de ubicación ya lo usa otra ubicación.",
+    "storageRestored": "Ubicación restaurada"
+  },
+  "detail": {
+    "products": "Productos ({{count}})",
+    "products_one": "Productos ({{count}})",
+    "products_other": "Productos ({{count}})",
+    "table": {
+      "product": "Producto",
+      "category": "Categoría",
+      "quantity": "Cantidad",
+      "freezeDate": "Fecha de congelación",
+      "storageDate": "Añadido",
+      "expiryDate": "Caducidad",
+      "location": "Estante/Cajón",
+      "actions": "Acciones"
+    },
+    "empty": "Esta ubicación está vacía",
+    "emptySubtitle": "Añade tu primer producto a esta ubicación",
+    "backToList": "Volver a la lista",
+    "rename": "Cambiar nombre",
+    "renameLabel": "Nombre de la ubicación",
+    "saveName": "Guardar nombre",
+    "cancelRename": "Cancelar cambio de nombre",
+    "addInside": "Añadir ubicación dentro",
+    "addProductHere": "Añadir producto aquí"
+  },
+  "errors": {
+    "cannotDelete": "No se puede eliminar: primero retira o mueve los productos.",
+    "cannotArchive": "No se puede archivar esta ubicación",
+    "cannotRestore": "No se pudo restaurar la ubicación"
+  },
+  "wizard": {
+    "discardTitle": "¿Descartar esta nueva ubicación?",
+    "discardMessage": "Se perderán los nombres introducidos y los campos de seguimiento elegidos.",
+    "discardConfirm": "Descartar",
+    "discardCancel": "Seguir editando",
+    "title": "Asistente de ubicación",
+    "fields": {
+      "name": {
+        "desc": "Nombre básico (Obligatorio)."
+      },
+      "quantity": {
+        "desc": "Número de piezas o paquetes (Obligatorio)."
+      },
+      "unit": {
+        "desc": "Unidad de medida (uds, kg, l) (Obligatorio)."
+      },
+      "expiry_date": {
+        "desc": "Sigue las fechas de consumo preferente. Crucial para alimentos."
+      },
+      "freeze_date": {
+        "desc": "Controla el tiempo de almacenamiento en el congelador."
+      },
+      "weight": {
+        "desc": "Permite especificar peso (kg/g) o volumen (l/ml) del producto."
+      },
+      "barcode": {
+        "desc": "Soporte para códigos de barras estándar."
+      },
+      "label_code": {
+        "desc": "Soporte para códigos QR internos (ej. STM-001)."
+      },
+      "brand": {
+        "desc": "Campo de texto para el nombre del fabricante."
+      },
+      "description": {
+        "desc": "Notas adicionales sobre el producto."
+      },
+      "purchase_price": {
+        "desc": "Sigue los costes del producto."
+      },
+      "shelf_location": {
+        "desc": "Ubicación precisa (ej. 2º estante desde arriba)."
+      },
+      "category_id": {
+        "desc": "Asignar a una categoría (ej. Lácteos, Carne)."
+      },
+      "production_date": {
+        "desc": "Sigue la fecha de producción o lote."
+      },
+      "notes": {
+        "desc": "Campo de notas de texto libre."
+      },
+      "price": {
+        "desc": "Sigue el precio del producto."
+      },
+      "location": {
+        "desc": "Posición exacta dentro de la ubicación superior."
+      }
+    }
+  },
+  "suggestions": {
+    "zones": [
+      "Cocina",
+      "Sótano",
+      "Despensa",
+      "Garaje",
+      "Salón",
+      "Baño",
+      "Dormitorio",
+      "Ático",
+      "Balcón",
+      "Jardín",
+      "Oficina"
+    ],
+    "locations": ["Nevera", "Congelador", "Botiquín"],
+    "compartments": ["Estantería", "Cajón", "Contenedor", "Caja", "Cesta"],
+    "profiles": {
+      "food_home": {
+        "zones": ["Cocina", "Despensa", "Garaje", "Sótano", "Ático"],
+        "locations": ["Nevera", "Congelador", "Estante", "Cajón", "Armario"],
+        "compartments": ["Estantería", "Cajón", "Contenedor", "Caja", "Cesta"]
+      },
+      "equipment_wms": {
+        "zones": [
+          "Sala de servidores",
+          "Taller",
+          "Almacén",
+          "Nave de almacén",
+          "Oficina"
+        ],
+        "locations": [
+          "Estantería",
+          "Balda",
+          "Contenedor",
+          "Armario",
+          "Banco de trabajo"
+        ],
+        "compartments": ["Estantería", "Contenedor", "Hueco de palet", "Cajón"]
+      },
+      "clean_core": {
+        "zones": [
+          "Zona A",
+          "Zona B",
+          "Cámara frigorífica",
+          "Cuarentena",
+          "Recepción"
+        ],
+        "locations": [
+          "Balda A",
+          "Balda B",
+          "Balda superior",
+          "Balda inferior",
+          "Contenedor"
+        ],
+        "compartments": ["Estantería 1", "Estantería 2", "Caja 1", "Caja 2"]
+      }
+    }
+  },
+  "onboarding": {
+    "step1Title": "¿Dónde guardas tus cosas?",
+    "step1Desc": "Empieza nombrando tu primera ubicación – ej. Cámara frigorífica, Recepción.",
+    "step1Placeholder": "ej. Cámara frigorífica",
+    "step2Title": "¿Qué hay en esta ubicación?",
+    "step2Desc": "ej. Estante A, Bahía 3, Armario 1",
+    "step2Placeholder": "ej. Estante A",
+    "step3Title": "¿Cómo seguir los productos aquí?",
+    "done": "Hecho",
+    "next": "Siguiente",
+    "back": "Volver",
+    "parentLabel": "Ubicación existente",
+    "newLocation": "Nueva ubicación",
+    "typeOrSelect": "Escribe o selecciona",
+    "trackingFieldsLabel": "Seguirás",
+    "onlyLocation": "Solo ubicación — sin campos de seguimiento",
+    "customize": "personalizar →",
+    "customFields": "Campos personalizados",
+    "advancedOptions": "Opciones avanzadas",
+    "step3Desc": "Elige qué información seguir para cada producto en esta ubicación.",
+    "descriptionLabel": "Descripción",
+    "descriptionPlaceholder": "Descripción breve (opcional)",
+    "labelCodeLabel": "Código de etiqueta",
+    "storageTypeLabel": "Tipo de ubicación",
+    "storageTypeNone": "Ninguno (campos personalizados)",
+    "step1DescMore": "Nombra la ubicación que estás añadiendo – ej. Cámara frigorífica, Recepción.",
+    "parentPlaceholder": "Elige una ubicación"
+  },
+  "unknownError": "Error desconocido",
+  "edit": {
+    "nameLabel": "Nombre",
+    "qrCodeLabel": "Código QR",
+    "qrCodePlaceholder": "ej. LOC-001, GLN-1234567890123, ALMACEN-A-1",
+    "downloadQrLabel": "Descargar",
+    "showDescriptionOnLabel": "Mostrar descripción en etiqueta",
+    "qrDownloadError": "Error al descargar el código QR",
+    "trackedFields": "Campos seguidos",
+    "customFields": "Campos personalizados",
+    "sequenceLabel": "Orden de recorrido",
+    "sequenceHint": "La preparación recorre las ubicaciones desde el número más bajo. Una ubicación sin número va después de las numeradas, por orden de código.",
+    "noParentStorage": "Sin ubicación superior",
+    "deleteMessage": "¿Eliminar «{{name}}»? Los productos de dentro deben moverse primero — y una ubicación por la que pasaron movimientos de stock no se puede eliminar: archívela en su lugar.",
+    "deleteMovesLocations_one": "1 ubicación secundaria sube un nivel.",
+    "deleteMovesLocations_other": "{{count}} ubicaciones secundarias suben un nivel.",
+    "deleteMovesRecords_one": "1 registro sube un nivel.",
+    "deleteMovesRecords_other": "{{count}} registros suben un nivel.",
+    "deleteNotListed_one": "De ellos, {{count}} no aparece en esta lista.",
+    "deleteNotListed_other": "De ellos, {{count}} no aparecen en esta lista.",
+    "generateCodeError": "No se pudo generar el código",
+    "generateCodeLabel": "Generar código",
+    "noCodeWarning": "Sin código definido: el escaneo no funcionará para esta ubicación.",
+    "archive": "Archivar",
+    "archiveTitle": "Archivar ubicación",
+    "archiveConfirmEmpty": "La ubicación se ocultará de listas y selectores. Los productos no se eliminan.",
+    "archiveConfirmItems": "Esta ubicación contiene productos. Elige adónde moverlos: al archivar se trasladan allí.",
+    "archiveConfirmUnknown": "No se pudo comprobar qué contiene esta ubicación. Si contiene algo, elige adónde moverlo; de lo contrario, se rechazará el archivado.",
+    "archiveTargetLabel": "Mover productos a",
+    "archiveTargetNone": "Elegir ubicación de destino",
+    "archiveReversible": "Puedes deshacerlo: las ubicaciones archivadas se restauran desde Ubicaciones archivadas.",
+    "archivePutawayRules_one": "{{count}} regla de ubicación apunta aquí. Mantendrá esta ubicación como destino hasta que se edite.",
+    "archivePutawayRules_other": "{{count}} reglas de ubicación apuntan aquí. Mantendrán esta ubicación como destino hasta que se editen."
+  },
+  "fieldLabels": {
+    "barcode": "Código de producto",
+    "sku": "SKU",
+    "brand": "Marca / Fabricante",
+    "category_id": "Categoría",
+    "description": "Descripción",
+    "expiry_date": "Fecha de caducidad",
+    "freeze_date": "Fecha de congelación",
+    "label_code": "Código QR personalizado",
+    "location": "Ubicación",
+    "name": "Nombre",
+    "notes": "Notas",
+    "price": "Precio",
+    "production_date": "Fecha de producción / Lote",
+    "purchase_price": "Precio de compra",
+    "quantity": "Cantidad",
+    "shelf_location": "Estante / posición",
+    "unit": "Unidad",
+    "weight": "Peso / Volumen"
+  },
+  "reorg": {
+    "noMoveTargets": "No hay dónde mover esta ubicación",
+    "moveTo": "Mover a…",
+    "moveToTop": "Nivel superior"
+  },
+  "card": {
+    "unit_one": "producto",
+    "unit_other": "productos"
+  },
+  "counts": {
+    "inSublocations_one": "{{count}} en sububicaciones",
+    "inSublocations_other": "{{count}} en sububicaciones"
+  },
+  "stats": {},
+  "storageNotFound": "Ubicación no encontrada",
+  "storageNotFoundDescription": "Puede que se haya eliminado o que el enlace esté desactualizado.",
+  "zoneModule": {
+    "title": "Esta ubicación pertenece a un módulo",
+    "description": "«{{name}}» pertenece a un módulo, por lo que queda fuera de la lista de ubicaciones. Ábrela aquí para ver qué contiene."
+  },
+  "zoneVirtual": {
+    "title": "Esta es una ubicación del sistema",
+    "description": "«{{name}}» es una de las ubicaciones virtuales del sistema — su contenido no cuenta como stock. Ábrela aquí para ver qué contiene."
+  },
+  "zoneArchived": {
+    "title": "Esta ubicación está archivada",
+    "description": "«{{name}}» está archivada y queda fuera de la lista activa. Ábrela aquí o restáurala desde el archivo."
+  },
+  "usage": {
+    "customer": "Cliente",
+    "inventory": "Ajuste de inventario",
+    "production": "Producción",
+    "virtualNotice": "Ubicación del sistema — su contenido no cuenta para los niveles de stock."
+  },
+  "sort": {},
+  "required": {
+    "title": "Aún no hay ubicaciones",
+    "description": "Crea el primero y continúa sin salir de aquí.",
+    "action": "Crear ubicación"
+  },
+  "archived": {
+    "title": "Ubicaciones archivadas",
+    "subtitle": "Ubicaciones ocultas de listas y selectores",
+    "badge": "Archivada",
+    "name": "Ubicación",
+    "archivedAt": "Archivado",
+    "actions": "Acciones",
+    "restore": "Restaurar",
+    "emptyTitle": "No hay nada archivado",
+    "emptyDescription": "Las ubicaciones archivadas aparecen aquí y se pueden restaurar.",
+    "detailNotice": "Esta ubicación está archivada. Restáurala para volver a guardar productos aquí."
+  },
+  "masterDetailSubtitle": "Elige una ubicación para ver su contenido, sus productos y su configuración.",
+  "select": {
+    "title": "Elige una ubicación",
+    "description": "El árbol de la izquierda enumera todas las ubicaciones. Elige una para ver su contenido."
+  },
+  "path": {
+    "label": "Ruta de la ubicación",
+    "all": "Todas las ubicaciones"
+  },
+  "tabs": {
+    "contents": "Contenido",
+    "products": "Productos",
+    "settings": "Configuración",
+    "moves": "Movimientos"
+  },
+  "tree": {
+    "label": "Ubicaciones",
+    "searchPlaceholder": "Buscar por nombre o código",
+    "scanPlaceholder": "Escanea una etiqueta de ubicación…",
+    "scanAction": "Seleccionar la ubicación escaneada",
+    "scanNotFound": "Ninguna ubicación coincide con «{{code}}».",
+    "scanNotLocation": "«{{code}}» no es una etiqueta de ubicación.",
+    "noMatches": "Ninguna ubicación coincide con la búsqueda",
+    "empty": "Aún no hay ubicaciones.",
+    "rowActions": "Acciones para {{name}}",
+    "archivedLink": "Ubicaciones archivadas",
+    "collapse": "Contraer {{name}}",
+    "expand": "Expandir {{name}}"
+  },
+  "contents": {
+    "emptyTitle": "No hay nada dentro de esta ubicación",
+    "emptyDescription_one": "Su {{count}} producto está en la pestaña Productos.",
+    "emptyDescription_other": "Sus {{count}} productos están en la pestaña Productos.",
+    "showProducts": "Mostrar productos",
+    "selected_one": "{{count}} ubicación seleccionada",
+    "selected_other": "{{count}} ubicaciones seleccionadas",
+    "clearSelection": "Limpiar",
+    "selectColumn": "Seleccionar",
+    "selectRow": "Seleccionar {{name}}",
+    "name": "Ubicación",
+    "code": "Código",
+    "type": "Tipo",
+    "inside": "Dentro",
+    "products": "Productos"
+  },
+  "products": {
+    "includeInside": "Incluir ubicaciones dentro",
+    "includingInside_one": "Incluyendo 1 ubicación dentro",
+    "includingInside_other": "Incluyendo {{count}} ubicaciones dentro"
+  },
+  "settings": {
+    "basic": "Básico",
+    "liesIn": "Se encuentra en",
+    "productFields": "Campos de producto aquí",
+    "warehouse": "Reposición",
+    "reserve": "Ubicación de reserva",
+    "reserveHint": "La mercancía de aquí llena las ubicaciones de surtido; nada la repone desde otra ubicación.",
+    "productFieldsHint": "Lo que registra un producto colocado aquí.",
+    "appliesHere": "Se aplica solo a esta ubicación.",
+    "appliesInside_one": "Se aplica a esta ubicación y a 1 ubicación dentro.",
+    "appliesInside_other": "Se aplica a esta ubicación y a {{count}} ubicaciones dentro.",
+    "inheritedFrom": "de {{name}}",
+    "inheritedFields": "Definido en un nivel superior",
+    "labelAndCode": "Etiqueta y código",
+    "recordActions": "Acciones para {{name}}"
+  },
+  "move": {
+    "titleOne": "Mover a…",
+    "searchPlaceholder": "Buscar el destino",
+    "scanNotTarget": "«{{code}}» se está moviendo o está dentro de algo que se mueve, así que no puede ser el destino.",
+    "targetsLabel": "Ubicaciones de destino",
+    "moved_one": "Ubicación movida",
+    "moved_other": "{{count}} ubicaciones movidas",
+    "undo": "Deshacer",
+    "undoDone": "Movimiento deshecho",
+    "undoFailed": "No se pudo deshacer el movimiento",
+    "failed": "No se pudo mover la ubicación",
+    "rejected": "El servidor rechazó el movimiento",
+    "titleMany_one": "Mover {{count}} ubicación a…",
+    "titleMany_other": "Mover {{count}} ubicaciones a…"
+  },
+  "moves": {
+    "empty": "No hay movimientos de stock por esta ubicación."
+  },
+  "moveQuestion": {
+    "title": "¿Se trasladó físicamente?",
+    "description": "Los productos de dentro siguen en su sitio dentro de la ubicación. Indica si la propia ubicación se llevó a otro lugar o si el árbol solo la tenía en el sitio equivocado.",
+    "scope": "Estás moviendo {{name}} con {{inside}} y {{products}} a {{destination}}.",
+    "scopeNoInside": "Estás moviendo {{name}} con {{products}} a {{destination}}.",
+    "locationsInside_one": "{{count}} ubicación dentro",
+    "locationsInside_many": "{{count}} ubicaciones dentro",
+    "locationsInside_other": "{{count}} ubicaciones dentro",
+    "products_one": "{{count}} producto",
+    "products_many": "{{count}} productos",
+    "products_other": "{{count}} productos",
+    "topLevel": "el nivel superior",
+    "choiceLabel": "Qué pasó con {{name}}",
+    "correction": "Solo estoy corrigiendo la organización",
+    "physical": "Se trasladó físicamente",
+    "physicalHint": "Un traslado físico registra un movimiento de cada producto de dentro, para que su historial y el stock en fechas pasadas muestren dónde estaba.",
+    "confirm": "Mover"
+  },
+  "addNew": {
+    "title": "Añadir ubicación",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "p. ej. Estantería B",
+    "parentLabel": "Dentro de (opcional)",
+    "parentPlaceholder": "Nivel superior",
+    "created": "Ubicación creada"
+  }
+}

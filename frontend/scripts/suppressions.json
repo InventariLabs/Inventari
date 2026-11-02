@@ -1,0 +1,16 @@
+{
+  "_comment": [
+    "Everything the frontend gates are currently told to ignore, and who owes",
+    "an answer by when.",
+    "",
+    "Keys are '<source>::<entry>'. The register is never written by a",
+    "--write-baseline run, so regenerating a baseline cannot lose it."
+  ],
+  "suppressions": {
+    "knip.json:ignore::src/types/api-generated.ts": {
+      "owner": "maintainers",
+      "expires": "2027-08-31",
+      "reason": "Structural: generated from the backend schema and checked in for the type checker, so nothing imports it at runtime. Dated anyway — a permanent exemption still deserves a yearly look."
+    }
+  }
+}

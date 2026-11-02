@@ -1,0 +1,166 @@
+{
+  "title": "Statistics",
+  "subtitle": "Overview of your supplies",
+  "records": "Records",
+  "places": "Locations, all levels",
+  "expiringSoon": "Expiring soon",
+  "expired": "Expired",
+  "storageDistribution": "Product distribution by location",
+  "categoryDistribution": "Product distribution by category",
+  "expiryForecast": "Expiry forecast",
+  "noData": "No data",
+  "noExpiryData": "No data about expiry dates",
+  "costAnalysis": {
+    "title": "Cost analysis",
+    "subtitle": "Summary of spending and waste",
+    "spent": "Spent",
+    "wasted": "Wasted",
+    "waste": "Waste (% of value)",
+    "savings": "Savings",
+    "topCategories": "Most expensive categories",
+    "savingsOpportunities": "Savings suggestions",
+    "monthlyTrend": "Monthly trend",
+    "excludedOtherCurrency_one": "One product is priced in another currency and is not counted here.",
+    "excludedOtherCurrency_other": "{{count}} products are priced in another currency and are not counted here.",
+    "notValuedYet": "No valuation recorded for this period",
+    "categoriesPricedFromRecords": "Categories are priced off the purchase price on each record.",
+    "categoriesPricedFromLedger": "Categories are priced from the cost ledger.",
+    "categoryUnpriced_one": "One position has no price on its record and is not counted in the sum.",
+    "categoryUnpriced_other": "{{count}} positions have no price on their records and are not counted in the sum."
+  },
+  "tabs": {
+    "overview": "Overview",
+    "analytics": "Analytics",
+    "reconciliation": "Reconciliation"
+  },
+  "analytics": {
+    "rotation": {
+      "avgRotation": "Average stock age",
+      "medianRotation": "Median stock age",
+      "slowMovers": "Slow movers",
+      "deadStock": "Dead stock",
+      "deadStockValue": "Dead stock value",
+      "byCategory": "Stock age by category",
+      "days": "days",
+      "noData": "No stock-age data available",
+      "noMovement": "No movement yet"
+    },
+    "alerts": {
+      "total": "Total alerts",
+      "types": {
+        "forgotten": "Forgotten items",
+        "staple": "Missing staples",
+        "expiring": "Expiring soon",
+        "expired": "Expired",
+        "lowStock": "Low stock",
+        "spike": "Price spike"
+      },
+      "messages": {
+        "forgotten_one": "Untouched for {{count}} day — use it before buying more.",
+        "forgotten_other": "Untouched for {{count}} days — use it before buying more.",
+        "staple_one": "Last bought {{count}} day ago, more than twice as long as usual.",
+        "staple_other": "Last bought {{count}} days ago, more than twice as long as usual.",
+        "expiring": "Expires on {{date}}.",
+        "expired": "Expired on {{date}}."
+      },
+      "noAlerts": "No alerts - your inventory looks good!",
+      "noData": "Nothing to check yet — add items and alerts will follow"
+    },
+    "forecast": {
+      "predicted": "Predicted spending",
+      "historical": "Historical average",
+      "trend": "Trend",
+      "wasteReduction": "Waste reduction potential",
+      "noData": "Not enough purchase history",
+      "monthlyAvg": "Monthly average",
+      "wasteReductionHint": "Potential savings from reducing waste",
+      "confidence": "Forecast confidence",
+      "quarter": "Quarter",
+      "trends": {
+        "increasing": "Rising",
+        "decreasing": "Falling",
+        "stable": "Stable",
+        "no_data": "Not enough data"
+      },
+      "notEnoughData": "Not enough purchase history to forecast",
+      "dataProgress": "{{have}} of {{need}} weeks of purchase history"
+    },
+    "patterns": {
+      "recurring": "Top recurring products",
+      "seasonal": "Seasonal products",
+      "bulk": "Bulk opportunities",
+      "potential": "Potential savings",
+      "noBulk": "No bulk opportunities identified",
+      "noPatterns": "Not enough purchase history",
+      "seasonalityUnknown": "Too few seasons"
+    }
+  },
+  "errors": {
+    "failedToLoadRotationAnalysis": "Failed to load rotation analysis",
+    "failedToLoadAlerts": "Failed to load alerts",
+    "failedToLoadStorageDistribution": "Failed to load the distribution by location",
+    "failedToLoadCategoryDistribution": "Failed to load the distribution by category",
+    "failedToLoadExpiryForecast": "Failed to load the expiry forecast",
+    "failedToLoadCostAnalysis": "Failed to load the cost analysis",
+    "failedToLoadReconciliation": "Failed to load the stock reconciliation"
+  },
+  "health": {
+    "title": "Inventory Health Check",
+    "needsAttention": "Needs Attention",
+    "needsAttentionHint": "Records expired or expiring soon, and every record of a product running low.",
+    "runningLow": "Running Low",
+    "runningLowHint": "Products at or below their threshold. Their records also count in Needs Attention.",
+    "totalValue": "Estimated Value",
+    "totalValueHint": "Approximate total value across all items.",
+    "totalValueHintLedger": "What the stock on hand cost, from the cost ledger — the whole organization, not only the locations counted above.",
+    "actionsHint": "Use this as your quick daily check. Open details only when needed.",
+    "hideDetails": "Hide detailed stats",
+    "showDetails": "Show detailed stats",
+    "subtitle_one": "One signal to quickly understand what needs your attention.",
+    "subtitle_other": "{{count}} signals to quickly understand what needs your attention.",
+    "unvaluedStock": "Receipts in stock posted without a price: {{total}}. This value is a lower bound.",
+    "valueUnknown": "Unknown",
+    "valueUnknownHint": "No product here has a price yet, so there is nothing to add up.",
+    "unpricedItems": "Records without a price: {{total}}. This value is a lower bound."
+  },
+  "permissions": {
+    "read": "View analytics",
+    "readDesc": "Can see organization-wide figures: consumption, rotation, forecasts and costs"
+  },
+  "settings": {
+    "enableAnalytics": "Enable analytics",
+    "enableAnalyticsDescription": "Show the analytics tab (rotation, spend forecasts, purchase patterns). Disable for small home inventories where there is not enough history for these to be meaningful.",
+    "showInventoryValue": "Show inventory value",
+    "showInventoryValueDescription": "Show the total stock value on the stats overview. It is a business metric — disable for home inventories that keep no purchase prices for it to add up."
+  },
+  "navigation": {
+    "settings": "Analytics"
+  },
+  "reconciliation": {
+    "title": "Stock reconciliation",
+    "subtitle_one": "Measured on opening this screen, over {{count}} product record.",
+    "subtitle_other": "Measured on opening this screen, over {{count}} product records.",
+    "tableCaption": "The two pair comparisons and what each found",
+    "expectedGap": "A standing gap here is by design; the figure to watch is one that grows.",
+    "columns": {
+      "pair": "Compared",
+      "count": "Disagreements",
+      "total": "Total gap"
+    },
+    "pairs": {
+      "quantMove": {
+        "name": "The shelf vs the movement ledger",
+        "meaning": "What the movements add up to against what the shelf holds."
+      },
+      "layerQuant": {
+        "name": "The cost history vs the shelf",
+        "meaning": "How much of the shelf the cost layers do not cover."
+      }
+    },
+    "previousLine": "Previous measurement ({{when}}): {{howMany}} · {{howMuch}}",
+    "grown": "grew",
+    "shrunk": "shrank",
+    "standing": "standing",
+    "noPrevious": "Nothing to compare these figures with yet — the scheduled job keeps a measurement that will show whether a gap grows."
+  }
+}

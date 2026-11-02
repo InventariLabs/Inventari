@@ -1,0 +1,28 @@
+# Endpoints that are global by design.
+# Format: relative/path.py::endpoint_function
+# Superuser views, pre-login flows, public token pages.
+app/api/admin.py::get_activity_stats
+app/api/admin.py::get_ai_usage_stats
+app/api/admin.py::get_system_summary
+app/api/announcements.py::delete_announcement
+app/api/announcements.py::get_active_announcements
+app/api/announcements.py::get_all_announcements
+app/api/auth/_registration.py::create_registration_request
+app/api/auth/_registration.py::get_init_status
+app/api/auth/_registration.py::list_registration_requests
+app/api/auth/_registration.py::register
+app/api/auth/_registration.py::register_complete
+app/api/auth/_registration.py::registration_link_info
+app/api/auth/_reset.py::confirm_password_reset
+app/api/auth/_tokens.py::login
+app/api/auth/_tokens.py::refresh_token
+app/api/demo.py::open_sandbox
+app/api/organizations.py::list_all_organizations
+app/api/users.py::activate_user
+app/api/users.py::block_user
+app/api/users.py::list_users
+app/api/users.py::unblock_user
+app/modules/equipment/router_public.py::confirm_attestation
+app/modules/equipment/router_public.py::dispute_attestation
+app/modules/equipment/router_public.py::get_attestation
+app/api/invitations_public.py::check_invitation

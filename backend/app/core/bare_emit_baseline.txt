@@ -1,0 +1,12 @@
+# Architecture lint baseline
+# Format: relative/path.py::function::event
+#
+# Two boundaries of this list, written down rather than fixed:
+#  - The key names a function and an event, not a call site. Two emits of the
+#    same event in one function share one entry, so a further one in that
+#    function is invisible. Keying by line would report every refactor as a new
+#    emit, which is the worse failure.
+#  - No owner or expiry per entry, unlike toctou_risk_baseline.txt. These are
+#    not judgement calls anyone made, only what the tree contained when the
+#    gate was written; the list only shrinks. An entry whose emit has gone is
+#    an error (stale baseline entry): delete it, then --write-baseline-sizes.

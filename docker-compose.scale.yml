@@ -1,0 +1,38 @@
+# Override for the warehouse-scale measurement (load_tests/README.md,
+# "Warehouse scale"): the database tuned as docker-compose.prod.yml tunes it.
+#
+# Used together with docker-compose.loadtest-backend.yml, which runs the
+# backend the way production does (gunicorn, four workers, DEBUG off):
+#
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.loadtest-backend.yml:docker-compose.scale.yml \
+#     docker compose up -d db redis backend
+#
+# The settings are production's, line for line, with two exceptions, both
+# because this stack has no PgBouncer in front of the database and no VPS
+# around it: max_connections is 200, enough for four workers' pools connected
+# directly, and there is no mem_limit — the database reads from the
+# measuring machine's memory, which the report names. The durability settings
+# are production's too (fsync on), so a write is timed as it would be there,
+# not as the faster throwaway stacks of the development pool write it.
+
+services:
+  db:
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=512MB
+      -c effective_cache_size=2GB
+      -c maintenance_work_mem=128MB
+      -c work_mem=16MB
+      -c wal_buffers=16MB
+      -c checkpoint_completion_target=0.9
+      -c min_wal_size=256MB
+      -c max_wal_size=1GB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+      -c max_worker_processes=4
+      -c max_parallel_workers=4
+      -c max_parallel_workers_per_gather=2
+      -c max_parallel_maintenance_workers=2
+      -c log_min_duration_statement=500

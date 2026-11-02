@@ -1,0 +1,313 @@
+{
+  "title": "Inwentaryzacje",
+  "subtitle": "Zarządzaj inwentaryzacjami swoich miejsc",
+  "newStockTake": "Nowa inwentaryzacja",
+  "all": "Wszystkie",
+  "unknownPlace": "Nieznane miejsce",
+  "started": "Rozpoczęta",
+  "progressLabel": "Postęp",
+  "progress": {
+    "title": "Postęp inwentaryzacji",
+    "countedOf": "{{counted}} / {{total}} pozycji",
+    "discrepanciesDetected_one": "wykryto 1 rozbieżność",
+    "discrepanciesDetected_few": "wykryto {{count}} rozbieżności",
+    "discrepanciesDetected_many": "wykryto {{count}} rozbieżności",
+    "discrepanciesDetected_other": "wykryto {{count}} rozbieżności",
+    "unsaved_one": "1 liczba wpisana, ale niezapisana",
+    "unsaved_few": "{{count}} liczby wpisane, ale niezapisane",
+    "unsaved_many": "{{count}} liczb wpisanych, ale niezapisanych",
+    "unsaved_other": "{{count}} liczb wpisanych, ale niezapisanych"
+  },
+  "differencesBadge_one": "{{count}} różnica",
+  "differencesBadge_few": "{{count}} różnice",
+  "differencesBadge_many": "{{count}} różnic",
+  "differencesBadge_other": "{{count}} różnicy",
+  "continue": "Kontynuuj",
+  "start": "Rozpocznij",
+  "report": {
+    "summary": "Podsumowanie",
+    "perfectMatches": "Zgodne",
+    "toleratedDifferences": "W granicach tolerancji",
+    "withinTolerance": "W tolerancji",
+    "overstock": "Nadwyżki",
+    "understock": "Niedobory",
+    "notCounted": "Niepoliczone",
+    "itemNotCounted": "Nie policzono",
+    "duration": "Czas trwania",
+    "durationValue": "{{minutes}} min",
+    "discrepanciesTitle": "Rozbieżności",
+    "showAll": "Pokaż wszystkie pozycje",
+    "showDifferencesOnly": "Pokaż tylko różnice i niepoliczone",
+    "exportCsv": "Eksport CSV",
+    "noDiscrepancies": "Brak rozbieżności — wszystkie pozycje się zgadzają.",
+    "empty": "Brak pozycji w tym spisie.",
+    "difference": "Różnica",
+    "location": "Miejsce",
+    "notes": "Notatki",
+    "name": "Nazwa",
+    "title": "Raport",
+    "reason": "Powód",
+    "countedTwiceAgreed": "Liczone dwa razy, oba razy {{second}}",
+    "countedTwiceDisagreed": "Liczone dwa razy: {{first}}, potem {{second}}",
+    "unit": "Jednostka",
+    "storage": "Miejsce",
+    "startedAt": "Rozpoczęto",
+    "completedAt": "Zakończono",
+    "startedBy": "Rozpoczął/-a",
+    "closedLocations": "Zamknięte miejsca",
+    "closedEmpty": "Puste",
+    "closedCounted": "Zamknięte",
+    "closedByAt": "{{name}}, {{at}}"
+  },
+  "empty": {
+    "title": "Brak inwentaryzacji",
+    "noStatus": "Brak inwentaryzacji o statusie „{{status}}”",
+    "addFirst": "Utwórz swoją pierwszą inwentaryzację, aby śledzić stany magazynowe"
+  },
+  "modal": {
+    "title": "Nowa inwentaryzacja",
+    "storageLabel": "Miejsce",
+    "storagePlaceholder": "Wybierz miejsce…",
+    "nameLabel": "Nazwa inwentaryzacji",
+    "namePlaceholder": "np. Inwentaryzacja regału A - styczeń 2026",
+    "cancel": "Anuluj",
+    "create": "Utwórz",
+    "creating": "Tworzenie…",
+    "blindMode": "Tryb ślepy (ukryj oczekiwane ilości)",
+    "toleranceLabel": "Tolerancja (% oczekiwanej ilości, opcjonalnie)",
+    "tolerancePlaceholder": "np. 2.0 aby ignorować różnice do 2%",
+    "requireFullCount": "Wymagaj pełnego przeliczenia (blokuj zakończenie do policzenia wszystkich)"
+  },
+  "validation": {
+    "storageRequired": "Wybierz miejsce"
+  },
+  "confirmDelete": "Czy na pewno chcesz usunąć tę inwentaryzację?",
+  "notFound": "Inwentaryzacja nie została znaleziona",
+  "noItemsCounted": "Nie policzono jeszcze żadnych produktów",
+  "searchToCount": "Wyszukaj produkty powyżej, aby rozpocząć liczenie",
+  "filters": {
+    "all": "Wszystkie",
+    "discrepancies": "Rozbieżności",
+    "locationLevel": "Poziom miejsca",
+    "allLevels": "Wszystkie poziomy"
+  },
+  "search": {
+    "placeholder": "Szukaj produktu po nazwie lub kodzie…",
+    "here": "W tej inwentaryzacji",
+    "elsewhere": "W innych miejscach organizacji",
+    "failed": "Wyszukiwanie się nie powiodło, więc nic tu nie widać. Spróbuj ponownie."
+  },
+  "item": {
+    "barcode": "Kod",
+    "expected": "Oczekiwana",
+    "counted": "Policzona",
+    "notePlaceholder": "Dodaj notatkę…",
+    "decreaseCount": "O jeden mniej: {{name}}",
+    "increaseCount": "O jeden więcej: {{name}}",
+    "saveCount": "Zapisz policzoną ilość: {{name}}",
+    "countFor": "Policzona ilość: {{name}}",
+    "unsaved": "Niezapisane",
+    "awaitingRecount": "Do przeliczenia",
+    "countAgain": "Policz {{name}} jeszcze raz",
+    "countedPass": "Liczenie {{sequence}}: {{quantity}} ({{name}})",
+    "someone": "ktoś",
+    "noteFor": "Notatka o {{name}}",
+    "decreaseCountInUnit": "Jeden {{unit}} mniej: {{name}}",
+    "increaseCountInUnit": "Jeden {{unit}} więcej: {{name}}",
+    "lot": "Partia {{lot}}",
+    "record": "Rekord {{position}} z {{of}}",
+    "added": "dodano {{date}}"
+  },
+  "actions": {
+    "cancel": "Anuluj",
+    "complete": "Zakończ inwentaryzację",
+    "completing": "Kończenie…"
+  },
+  "confirm": {
+    "complete": {
+      "title": "Zakończ inwentaryzację",
+      "confirmLabel": "Zakończ",
+      "unsaved_one": "Jedna policzona liczba nie została zapisana i przepadnie.",
+      "unsaved_few": "{{count}} policzone liczby nie zostały zapisane i przepadną.",
+      "unsaved_many": "{{count}} policzonych liczb nie zostało zapisanych i przepadnie.",
+      "unsaved_other": "{{count}} policzonych liczb nie zostało zapisanych i przepadnie.",
+      "message_one": "Zamknięcie spisu nadpisze stan jednego produktu policzoną liczbą. Policzonych pozycji nie będzie się już dało zmienić.",
+      "message_few": "Zamknięcie spisu nadpisze stan {{count}} produktów policzonymi liczbami. Policzonych pozycji nie będzie się już dało zmienić.",
+      "message_many": "Zamknięcie spisu nadpisze stan {{count}} produktów policzonymi liczbami. Policzonych pozycji nie będzie się już dało zmienić.",
+      "message_other": "Zamknięcie spisu nadpisze stan {{count}} produktu policzonymi liczbami. Policzonych pozycji nie będzie się już dało zmienić."
+    },
+    "cancel": {
+      "title": "Anuluj inwentaryzację",
+      "message": "Czy na pewno chcesz anulować tę inwentaryzację? Wszystkie dane zostaną utracone.",
+      "confirmLabel": "Anuluj inwentaryzację"
+    },
+    "overCap": {
+      "title": "Policzono znacznie więcej, niż jest w systemie",
+      "row": "{{name}} — policzono {{counted}}, w systemie {{system}}",
+      "confirmLabel": "Zapisz policzone liczby",
+      "message_one": "Jedna policzona ilość jest znacznie wyższa niż stan w systemie: {{rows}}. Zapisać policzoną liczbę mimo to?",
+      "message_few": "{{count}} policzone ilości są znacznie wyższe niż stan w systemie: {{rows}}. Zapisać policzone liczby mimo to?",
+      "message_many": "{{count}} policzonych ilości jest znacznie wyższych niż stan w systemie: {{rows}}. Zapisać policzone liczby mimo to?",
+      "message_other": "{{count}} policzonej ilości jest znacznie wyższych niż stan w systemie: {{rows}}. Zapisać policzone liczby mimo to?"
+    },
+    "overTolerance": {
+      "title": "Ponad tolerancję",
+      "confirmLabel": "Przyjmij różnice",
+      "message_one": "Jedna policzona ilość różni się od stanu w systemie bardziej, niż pozwala ten spis: {{rows}}. Przyjąć ją i zaksięgować policzoną liczbę?",
+      "message_few": "{{count}} policzone ilości różnią się od stanu w systemie bardziej, niż pozwala ten spis: {{rows}}. Przyjąć je i zaksięgować policzone liczby?",
+      "message_many": "{{count}} policzonych ilości różni się od stanu w systemie bardziej, niż pozwala ten spis: {{rows}}. Przyjąć je i zaksięgować policzone liczby?",
+      "message_other": "{{count}} policzonej ilości różni się od stanu w systemie bardziej, niż pozwala ten spis: {{rows}}. Przyjąć je i zaksięgować policzone liczby?"
+    }
+  },
+  "deleteAriaLabel": "Usuń inwentaryzację",
+  "errors": {
+    "createFailed": "Nie udało się utworzyć spisu",
+    "deleteFailed": "Nie udało się usunąć spisu",
+    "saveFailed": "Nie udało się zapisać liczenia",
+    "addItemFailed": "Nie udało się dodać pozycji",
+    "completeFailed": "Nie udało się zakończyć spisu",
+    "cancelFailed": "Nie udało się anulować spisu",
+    "reasonIncomplete": "Napisz, co się stało, albo wybierz powód z listy",
+    "overToleranceNotAllowed": "Przyjęcie różnicy ponad tolerancję nie należy do Ciebie — poproś kogoś, kto może akceptować spisy.",
+    "overCapNotAllowed": "Przyjęcie liczby znacznie powyżej stanu systemowego nie należy do Ciebie — poproś kogoś, kto może akceptować spisy.",
+    "recountFailed": "Nie udało się poprosić o przeliczenie",
+    "unitIsWhole": "{{unit}} liczy się w całościach — ułamka nie da się zapisać.",
+    "unitDecimals_one": "{{unit}} liczy się do {{count}} miejsca po przecinku — nie dokładniej.",
+    "unitDecimals_few": "{{unit}} liczy się do {{count}} miejsc po przecinku — nie dokładniej.",
+    "unitDecimals_many": "{{unit}} liczy się do {{count}} miejsc po przecinku — nie dokładniej.",
+    "unitDecimals_other": "{{unit}} liczy się do {{count}} miejsca po przecinku — nie dokładniej.",
+    "unexplainedDifferences_one": "Jedna policzona ilość różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód, a potem zakończ spis.",
+    "unexplainedDifferences_few": "{{count}} policzone ilości różnią się bardziej niż tolerancja i nie mówią dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
+    "unexplainedDifferences_many": "{{count}} policzonych ilości różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
+    "unexplainedDifferences_other": "{{count}} policzonej ilości różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód przy każdej, a potem zakończ spis."
+  },
+  "blindModeActive": "Tryb ślepy aktywny — oczekiwane ilości są ukryte.",
+  "statuses": {
+    "draft": "Szkic",
+    "in_progress": "W toku",
+    "completed": "Zakończony",
+    "cancelled": "Anulowany"
+  },
+  "addNewItem": "Dodaj nowy przedmiot",
+  "discrepancyMissing": "Brak",
+  "discrepancySurplus": "Nadwyżka",
+  "countedZero": "policzono 0",
+  "surplusCount_one": "1 nadwyżka",
+  "surplusCount_few": "{{count}} nadwyżki",
+  "surplusCount_many": "{{count}} nadwyżek",
+  "surplusCount_other": "{{count}} nadwyżek",
+  "outsideItems": {
+    "title_one": "1 produkt spoza spisu znajduje się w tym miejscu",
+    "title_few": "{{count}} produkty spoza spisu znajdują się w tym miejscu",
+    "title_many": "{{count}} produktów spoza spisu znajduje się w tym miejscu",
+    "title_other": "{{count}} produktów spoza spisu znajduje się w tym miejscu",
+    "add": "Dodaj jako nadwyżkę"
+  },
+  "addNewItemForm": {
+    "nameLabel": "Nazwa",
+    "barcodeLabel": "Kod",
+    "quantityLabel": "Ilość",
+    "categoryLabel": "Kategoria",
+    "categoryPlaceholder": "Wybierz kategorię",
+    "uomLabel": "Jednostka",
+    "uomPlaceholder": "Wybierz jednostkę"
+  },
+  "statusFilters": {
+    "in_progress": "W toku",
+    "completed": "Zakończone",
+    "cancelled": "Anulowane"
+  },
+  "permissions": {
+    "read": "Podgląd spisów",
+    "readDesc": "Może przeglądać spisy, ich pozycje i wykryte różnice",
+    "write": "Prowadzenie spisów",
+    "writeDesc": "Może rozpocząć spis, liczyć i go zamknąć — zamknięcie koryguje stan",
+    "approve": "Przyjmowanie różnic ponad tolerancję",
+    "approveDesc": "Przyjmowanie policzonych różnic przekraczających tolerancję spisu, żeby trafiły na stan."
+  },
+  "form": {
+    "guardName": "Spis"
+  },
+  "reasons": {
+    "discrepancy": {
+      "label": "Skąd ta różnica?",
+      "codes": {
+        "DAMAGE": "Uszkodzone",
+        "EXPIRED": "Po terminie",
+        "LOSS": "Ubytek lub kradzież",
+        "WRONG_LOCATION": "Znalezione w innym miejscu",
+        "WRONG_UNIT": "Policzone w złej jednostce",
+        "MISCOUNT": "Wcześniejszy spis się mylił",
+        "SYSTEM_ERROR": "Nigdy nie trafiło do systemu",
+        "OTHER": "Inny"
+      }
+    }
+  },
+  "scan": {
+    "cameraOpen": "Skanuj aparatem",
+    "cameraClose": "Zamknij aparat",
+    "chooseTitle": "Którą pozycję policzono?",
+    "chooseHint": "Ten kod należy do kilku pozycji tej inwentaryzacji. Wybierz tę, którą trzymasz — jej liczba wzrośnie o jeden i zostanie zapisana.",
+    "expires": "ważne do {{date}}"
+  },
+  "shelf": {
+    "hint": "Zeskanuj etykietę miejsca, aby liczyć miejsce po miejscu.",
+    "counting": "Liczone miejsce:",
+    "leave": "Całe miejsce",
+    "outside": "To miejsce nie należy do spisu miejsca {{location}}.",
+    "empty": "W tym miejscu nic nie było oczekiwane. Zeskanuj to, co w nim stoi.",
+    "hidden": "Filtry powyżej ukrywają wiersze tego miejsca.",
+    "close": "Zamknij miejsce",
+    "closeTitle": "Zamknąć to miejsce?",
+    "closeUncounted_one": "Jeden wiersz w {{location}} nie został policzony. Zamknięcie miejsca policzy go jako 0 — brak w raporcie.",
+    "closeUncounted_few": "{{count}} wiersze w {{location}} nie zostały policzone. Zamknięcie miejsca policzy je jako 0 — braki w raporcie.",
+    "closeUncounted_many": "{{count}} wierszy w {{location}} nie zostało policzonych. Zamknięcie miejsca policzy je jako 0 — braki w raporcie.",
+    "closeUncounted_other": "{{count}} wiersza w {{location}} nie zostało policzone. Zamknięcie miejsca policzy je jako 0 — braki w raporcie.",
+    "closeEmpty": "W {{location}} nic nie znaleziono. Potwierdzić je jako policzone i puste?",
+    "closeCounted": "Wszystkie wiersze w {{location}} są policzone. Zamknąć miejsce?",
+    "closeConfirm": "Zamknij miejsce",
+    "closeUnsaved_one": "Jedna liczba w tym miejscu nie została zapisana. Zapisz ją przed zamknięciem miejsca.",
+    "closeUnsaved_few": "{{count}} liczby w tym miejscu nie zostały zapisane. Zapisz je przed zamknięciem miejsca.",
+    "closeUnsaved_many": "{{count}} liczb w tym miejscu nie zostało zapisanych. Zapisz je przed zamknięciem miejsca.",
+    "closeUnsaved_other": "{{count}} liczby w tym miejscu nie zostało zapisane. Zapisz je przed zamknięciem miejsca.",
+    "closedDone_one": "Zamknięto {{location}}: jeden wiersz policzony jako 0.",
+    "closedDone_few": "Zamknięto {{location}}: {{count}} wiersze policzone jako 0.",
+    "closedDone_many": "Zamknięto {{location}}: {{count}} wierszy policzonych jako 0.",
+    "closedDone_other": "Zamknięto {{location}}: {{count}} wiersza policzone jako 0.",
+    "closedEmptyDone": "Potwierdzono, że {{location}} jest puste.",
+    "closedCountedDone": "Zamknięto {{location}}.",
+    "closedBy": "Zamknięte przez: {{name}}",
+    "closedEmptyBy": "Potwierdzone jako puste przez: {{name}}"
+  },
+  "count": {
+    "action": "Policz miejsce",
+    "title": "Policz miejsce",
+    "intro": "Zeskanuj etykietę miejsca albo wybierz je z listy. Liczysz to, co tam leży; różnice zapiszą się jako jedno wyrównanie stanu dla biura.",
+    "scanLabel": "Etykieta miejsca",
+    "searchLabel": "Znajdź miejsce",
+    "searchPlaceholder": "Szukaj miejsc",
+    "noMatchTitle": "Żadne miejsce nie pasuje",
+    "noMatchDescription": "Spróbuj innej części nazwy albo zeskanuj etykietę miejsca.",
+    "blind": "Liczenie na ślepo: ukryj, czego oczekuje system",
+    "start": "Policz: {{location}}",
+    "chooseFirst": "Wybierz miejsce do policzenia",
+    "name": "Liczenie: {{location}} — {{date}}",
+    "neverCounted": "Nigdy nie liczone",
+    "countedToday": "Policzone dziś",
+    "lastCounted_one": "Ostatnio liczone {{count}} dzień temu",
+    "lastCounted_few": "Ostatnio liczone {{count}} dni temu",
+    "lastCounted_many": "Ostatnio liczone {{count}} dni temu",
+    "lastCounted_other": "Ostatnio liczone {{count}} dnia temu",
+    "underWay": "W trakcie liczenia",
+    "noPlacesTitle": "Nie ma jeszcze miejsc do policzenia",
+    "noPlacesDescription": "Dodaj miejsce i połóż na nim towar, a będzie można je tu policzyć."
+  },
+  "posting": {
+    "adjusted": "Różnice zaksięgowano jako wyrównanie stanu",
+    "noDifferences": "Policzone, bez różnic: stan się zgadzał."
+  },
+  "settings": {
+    "countEveryDays": "Licz każde miejsce co (dni)",
+    "countEveryDaysDescription": "Każde miejsce, w którym leży towar, pojawi się w „Do zrobienia” po tylu dniach od ostatniego liczenia. 0 wyłącza."
+  }
+}

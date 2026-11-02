@@ -1,0 +1,30 @@
+{
+  "name": "vision",
+  "version": "0.3.0",
+  "inventari_min_version": "0.9.0",
+  "category": "integrations",
+  "display_name": "Photo Recognition",
+  "description": "Automatically recognize products from photos using AI.",
+  "icon": "camera",
+  "module_type": "official",
+  "requires": [
+    "items"
+  ],
+  "requires_api_key": true,
+  "capabilities": [
+    "database",
+    "network",
+    "filesystem"
+  ],
+  "permissions": [
+    {
+      "key": "vision:extract",
+      "label_key": "vision:permissions.extract",
+      "description_key": "vision:permissions.extractDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    }
+  ]
+}

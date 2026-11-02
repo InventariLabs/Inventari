@@ -1,0 +1,12 @@
+{
+  "region": "Annonces",
+  "actions": {
+    "dismiss": "Fermer"
+  },
+  "types": {
+    "info": "Information",
+    "warning": "Avertissement",
+    "critical": "Critique",
+    "downtime": "Interruption"
+  }
+}

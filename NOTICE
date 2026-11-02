@@ -1,0 +1,44 @@
+Inventari — Modular Inventory Management Platform
+Copyright (C) 2026 Jerzy Piątek <jerzy@inventari.app>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+The copyright holder reserves the right to offer the software under
+alternative commercial licenses. See https://inventari.app for details.
+
+Modules (plugins) that build only on Inventari's public extension points
+are covered by an additional permission granted by the copyright holder
+under section 7 of the AGPL-3.0: they may be licensed under any terms
+their author chooses, including proprietary ones. The grant, and the
+boundary it stops at, are in MODULE_LICENSING.md.
+
+---
+
+Third-Party Data
+
+This software can optionally import and use product data from Open Food
+Facts (https://world.openfoodfacts.org). That data is made available under
+the Open Database License (ODbL) v1.0:
+https://opendatacommons.org/licenses/odbl/1-0/
+
+When the nutrition module is enabled and a local copy of the Open
+Food Facts database is imported, scanned products are enriched with data
+from Open Food Facts. Items enriched this way are tagged with
+`off_enriched: true` in their metadata and attributed in the UI.
+
+The repository itself carries a small piece of that data: the evaluation
+corpus `backend/scripts/vision_matrix_corpus.json` lists 14 Open Food Facts
+barcodes with the product names and brands read off the packs (ODbL data,
+attributed in the file). The photographs it points to are not in the
+repository; the evaluation script fetches them from Open Food Facts at run
+time, and Open Food Facts publishes its product images under CC-BY-SA.

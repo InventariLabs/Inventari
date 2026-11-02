@@ -1,0 +1,26 @@
+<div class="party-box">
+  <h3>Korygowany dokument</h3>
+  {% if corrected_doc_number or document.external_reference %}
+  {% if corrected_doc_number %}
+  <div class="party-name">{{ corrected_doc_number }}</div>
+  {% endif %}
+  {% if document.external_reference %}
+  <div class="party-detail">Referencja: {{ document.external_reference }}</div>
+  {% endif %}
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>
+<div class="party-box">
+  <h3>Miejsce</h3>
+  {% if source_location or target_location %}
+  {% if source_location %}
+  <div class="party-name">{{ source_location }}</div>
+  {% endif %}
+  {% if target_location %}
+  <div class="party-detail">Docelowa: {{ target_location }}</div>
+  {% endif %}
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

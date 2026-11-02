@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page {
+      margin: 18mm 15mm 18mm 15mm;
+      @top-right {
+        content: "Strona " counter(page) " z " counter(pages);
+        font-size: 8pt;
+        color: #999;
+      }
+      @bottom-center {
+        content: "Dokument wewnętrzny — nie stanowi faktury VAT ani innego dokumentu księgowego w rozumieniu ustawy o rachunkowości.";
+        font-size: 8pt;
+        text-align: center;
+        padding: 0 4mm;
+        color: #999;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 9pt;
+      color: #111;
+      line-height: 1.45;
+    }
+    .correction-ref {
+      margin-top: 4px;
+      padding: 4px 8px;
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 3px;
+      font-size: 8pt;
+      color: #92400e;
+    }
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      padding: 6px 12px;
+      border-right: 1px solid #ddd;
+      background: #fafafa;
+      min-width: 90px;
+    }
+    .meta-item:last-child { border-right: none; }
+    .meta-item .meta-label {
+      color: #888;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 2px;
+    }
+    .meta-item .meta-value {
+      font-weight: bold;
+      font-size: 9pt;
+      color: #111;
+    }
+    .parties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 16px;
+      margin-bottom: 12px;
+    }
+    .party-box {
+      border: 1px solid #bbb;
+      padding: 8px 10px;
+    }
+    .party-box h3 {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 3px;
+      margin-bottom: 5px;
+    }
+    .party-name {
+      font-weight: bold;
+      font-size: 11pt;
+      margin-bottom: 3px;
+    }
+    .party-detail {
+      font-size: 8pt;
+      color: #444;
+      margin-bottom: 2px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+    thead tr {
+      background: #111;
+      color: #fff;
+    }
+    thead th {
+      padding: 5px 5px;
+      text-align: left;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+    thead th.right { text-align: right; }
+    tbody tr:nth-child(even) { background: #f9f9f9; }
+    tbody td { padding: 4px 5px; vertical-align: top; }
+    tbody td.right { text-align: right; }
+    tfoot tr { background: #f0f0f0; }
+    tfoot td {
+      padding: 5px;
+      font-weight: bold;
+      font-size: 9pt;
+      border-top: 2px solid #111;
+    }
+    tfoot td.right { text-align: right; }
+    .delta-positive { color: #16a34a; font-weight: bold; }
+    .delta-negative { color: #dc2626; font-weight: bold; }
+    .value-summary {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .vsum-table {
+      width: 260px;
+      border: 1px solid #bbb;
+    }
+    .vsum-table td {
+      padding: 4px 10px;
+      font-size: 9pt;
+      border-bottom: 1px solid #eee;
+    }
+    .vsum-table tr:last-child td { border-bottom: none; }
+    .vsum-table .lbl { color: #555; }
+    .vsum-table .amt { text-align: right; font-weight: 500; }
+    .vsum-table .grand { font-weight: bold; font-size: 11pt; }
+    .vsum-table .grand td { background: #111; color: #fff; }
+    .vat-by-rate {
+      margin-top: 10px;
+      margin-left: auto;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+    .vat-by-rate th, .vat-by-rate td {
+      padding: 3px 8px;
+      border: 1px solid #bbb;
+      text-align: right;
+    }
+    .vat-by-rate th { color: #555; font-weight: 500; }
+    .notes-box {
+      margin-top: 12px;
+      border: 1px solid #bbb;
+      padding: 7px 10px;
+      font-size: 9pt;
+    }
+    .notes-box .nlabel {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 3px;
+    }
+    /* The blank above the rules is where somebody signs — it used
+       to sit *below* them, between the rule and its own caption. */
+    .sig-section {
+      margin-top: 10mm;
+      display: grid;
+      grid-template-columns: {% if doc_variant == 'correction' %}1fr{% else %}1fr 1fr 1fr{% endif %};
+      gap: 20px;
+    }
+    .sig-field {
+      padding-top: 1.5mm;
+      border-top: 1px solid #555;
+      text-align: center;
+      font-size: 8pt;
+      color: #444;
+    }
+    .sig-field .sig-role {
+      font-weight: bold;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .sig-field .sig-line {
+      color: #888;
+      font-size: 8pt;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Identity, identification and codes — one header for every print
+     family. -->
+{% include 'print_header.html' %}
+
+{% if corrected_doc_number %}
+<div class="correction-ref">Korekta dokumentu: <strong>{{ corrected_doc_number }}</strong></div>
+{% endif %}
+{% if backorder_of_number %}
+<div class="correction-ref">Dostawa uzupełniająca do: <strong>{{ backorder_of_number }}</strong></div>
+{% endif %}
+{% if return_of_number %}
+<div class="correction-ref">Zwrot do: <strong>{{ return_of_number }}</strong></div>
+{% endif %}
+{% if scrap_reason %}
+<div class="correction-ref">Powód złomowania: <strong>{{ scrap_reason }}</strong></div>
+{% endif %}
+
+<!-- Parties — conditional per type -->
+<div class="parties">
+  {% include 'pl_pz/parties/' ~ doc_variant ~ '.html' %}
+</div>
+
+<!-- What is specific to this document and not already in the header: the
+     header carries the status and the date stamps, so repeating them
+     here would print the same fact twice on one page. -->
+{% if not is_correction and (document.scheduled_date or document.external_reference) %}
+<div class="meta-bar">
+  {% if document.scheduled_date %}
+  <div class="meta-item">
+    <span class="meta-label">{% if document.status == 'COMPLETED' %}Data dokumentu{% else %}Planowana data{% endif %}</span>
+    <span class="meta-value">{{ document.scheduled_date }}</span>
+  </div>
+  {% endif %}
+  {% if document.external_reference %}
+  <div class="meta-item">
+    <span class="meta-label">Referencja</span>
+    <span class="meta-value">{{ document.external_reference }}</span>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Lines table -->
+{# A quantity total is a total of one unit: the print used to add 123
+   pieces to 2,5 kg and sign the receipt "125,5". One entry per unit
+   instead, and the single sum when the whole document is in one unit. #}
+{% macro quantity_total(attribute, total) -%}
+{%- if totals_by_unit | length <= 1 -%}
+{{ total | format_qty }}
+{%- else -%}
+{%- for group in totals_by_unit -%}
+{{ group[attribute] | format_qty }}{% if group.symbol %}&nbsp;{{ group.symbol | unit_label }}{% endif %}{% if not loop.last %}<br/>{% endif %}
+{%- endfor -%}
+{%- endif -%}
+{%- endmacro %}
+<table>
+  <thead>
+    <tr>
+      <th style="width:25px">Lp.</th>
+      <th>Nazwa towaru</th>
+      {% if is_correction %}
+      <th class="right" style="width:70px">Delta (+/-)</th>
+      {% else %}
+      <th class="right" style="width:55px">{% if is_external_in %}Zamówiono{% elif is_external_out %}Zamówiono{% elif is_internal_in %}Plan{% elif is_internal_out %}Plan{% else %}Plan{% endif %}</th>
+      <th class="right" style="width:55px">{% if is_external_in %}Przyjęto{% elif is_external_out %}Wydano{% elif is_internal_in %}Przyjęto{% elif is_internal_out %}Wydano{% else %}Przeniesiono{% endif %}</th>
+      {% endif %}
+      <th style="width:40px">J.m.</th>
+      {% if show_value_columns %}
+      <th class="right" style="width:65px">Cena jedn.</th>
+      {% if is_correction %}
+      <th class="right" style="width:70px">Wpływ brutto</th>
+      {% else %}
+      <th class="right" style="width:65px">Wart. netto</th>
+      {% endif %}
+      {% if show_tax_column and not is_correction %}
+      <th class="right" style="width:45px">VAT%</th>
+      <th class="right" style="width:65px">Wart. brutto</th>
+      {% endif %}
+      {% endif %}
+      {% if show_line_status %}
+      <th style="width:60px">Status</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for line in document.lines %}
+    <tr>
+      <td>{{ line.line_number }}</td>
+      <td>
+        <strong>{{ line.name or '' }}</strong>
+        {% if line.product_snapshot and line.product_snapshot.sku %}<span style="color:#111;font-size:9pt;font-weight:600;margin-left:4px;">{{ line.product_snapshot.sku }}</span>{% endif %}
+        {% if line.barcode %}<br/><span style="color:#555;font-size:9pt;font-weight:500;">EAN: {{ line.barcode }}</span>{% endif %}
+        {% if line.batch_number %}<br/><span style="color:#888;font-size:8pt">Partia: {{ line.batch_number }}</span>{% endif %}
+        {% if line.expiry_date %}<br/><span style="color:#888;font-size:8pt">Termin: {{ line.expiry_date }}</span>{% endif %}
+        {% if line.notes %}<br/><span style="color:#666;font-style:italic;font-size:8pt">{{ line.notes }}</span>{% endif %}
+      </td>
+      {% if is_correction %}
+      {% set qty_val = line.expected_quantity | format_qty %}
+      <td class="right {% if line.expected_quantity >= 0 %}delta-positive{% else %}delta-negative{% endif %}">
+        {% if line.expected_quantity >= 0 %}+{% endif %}{{ qty_val }}
+      </td>
+      {% else %}
+      <td class="right">{{ line.expected_quantity | format_qty }}</td>
+      <td class="right"><strong>{{ line.done_quantity | format_qty }}</strong></td>
+      {% endif %}
+      <td>{{ line.uom.symbol | unit_label if line.uom else '—' }}</td>
+      {% if show_value_columns %}
+      <td class="right">{{ line.unit_price | format_decimal }}</td>
+      {% if is_correction %}
+      {% if line.unit_price %}
+      {% set delta_gross = line.expected_quantity * line.unit_price * (100 + (line.tax_rate or 0)) / 100 %}
+      <td class="right {% if delta_gross >= 0 %}delta-positive{% else %}delta-negative{% endif %}">{{ delta_gross | format_decimal }}</td>
+      {% else %}
+      <td class="right">—</td>
+      {% endif %}
+      {% else %}
+      <td class="right">{{ line.line_value | format_decimal }}</td>
+      {% if show_tax_column %}
+      <td class="right">{{ line.tax_rate | format_pct if line.unit_price else '—' }}</td>
+      <td class="right"><strong>{{ line.line_gross | format_decimal }}</strong></td>
+      {% endif %}
+      {% endif %}
+      {% endif %}
+      {% if show_line_status %}
+      <td style="font-size:8pt; color:{% if line.line_status == 'DONE' %}#16a34a{% elif line.line_status == 'EXCEPTION' %}#dc2626{% elif line.line_status == 'PARTIAL' %}#d97706{% else %}#888{% endif %};">
+        {{ line_status_map.get(line.line_status, line.line_status) }}
+      </td>
+      {% endif %}
+    </tr>
+    {% if line.discrepancy_code and not is_correction %}
+    <tr style="background:#fff0f0;">
+      <td></td>
+      <td colspan="{{ 3 + (4 if show_tax_column else (2 if show_value_columns else 0)) + (1 if show_line_status else 0) }}" style="font-size:8pt; color:#dc2626; padding:3px 5px;">
+        ⚠ Odchylenie: {{ discrepancy_map.get(line.discrepancy_code, line.discrepancy_code) }}{% if line.discrepancy_reason %} — {{ line.discrepancy_reason }}{% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+  {% if not is_correction %}
+  <tfoot>
+    <tr>
+      <td colspan="2"></td>
+      <td class="right">{{ quantity_total('expected', total_expected) }}</td>
+      <td class="right">{{ quantity_total('done', total_done) }}</td>
+      <td></td>
+      {% if show_value_columns %}
+      <td></td>
+      <td class="right">{{ document.total_net | format_decimal if document.total_net else '' }}</td>
+      {% if show_tax_column %}
+      <td></td>
+      <td class="right"><strong>{{ document.total_gross | format_decimal if document.total_gross else '' }}</strong></td>
+      {% endif %}
+      {% endif %}
+      {% if show_line_status %}
+      <td></td>
+      {% endif %}
+    </tr>
+  </tfoot>
+  {% endif %}
+</table>
+
+<!-- Value summary -->
+{% if is_correction and show_value_columns %}
+<div class="value-summary">
+  <table class="vsum-table">
+    {% set ns = namespace(total=0) %}
+    {% for line in document.lines %}
+    {% if line.unit_price %}
+    {% set line_impact = line.expected_quantity * line.unit_price * (100 + (line.tax_rate or 0)) / 100 %}
+    {% set ns.total = ns.total + line_impact %}
+    {% endif %}
+    {% endfor %}
+    <tr class="grand">
+      <td>WPŁYW KOREKTY:</td>
+      <td class="amt {% if ns.total >= 0 %}delta-positive{% else %}delta-negative{% endif %}">
+        {% if ns.total >= 0 %}+{% endif %}{{ ns.total | format_decimal }} {{ document.currency or 'PLN' }}
+      </td>
+    </tr>
+  </table>
+</div>
+{% elif show_value_columns and document.total_gross and show_payment %}
+{% if tax_by_rate | length > 1 %}
+<table class="vat-by-rate" aria-label="Zestawienie VAT według stawek">
+  <tr><th>Stawka VAT</th><th>Netto</th><th>VAT</th><th>Brutto</th></tr>
+  {% for row in tax_by_rate %}
+  <tr>
+    <td>{{ row.rate | format_pct }}</td>
+    <td>{{ row.net | format_decimal }}</td>
+    <td>{{ row.tax | format_decimal }}</td>
+    <td>{{ row.gross | format_decimal }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+<div class="value-summary">
+  <table class="vsum-table">
+    {% if document.total_net %}
+    <tr>
+      <td class="lbl">Wartość netto:</td>
+      <td class="amt">{{ document.total_net | format_decimal }} {{ document.currency or 'PLN' }}</td>
+    </tr>
+    {% endif %}
+    {% if document.total_tax %}
+    <tr>
+      <td class="lbl">VAT łącznie:</td>
+      <td class="amt">{{ document.total_tax | format_decimal }} {{ document.currency or 'PLN' }}</td>
+    </tr>
+    {% endif %}
+    <tr class="grand">
+      <td>DO ZAPŁATY:</td>
+      <td class="amt">{{ document.total_gross | format_decimal }} {{ document.currency or 'PLN' }}</td>
+    </tr>
+  </table>
+</div>
+{% elif is_scrap and document.total_net is not none %}
+<!-- A write-off is worth what the cost layers it drew were worth. -->
+<div class="value-summary">
+  <table class="vsum-table">
+    <tr class="grand">
+      <td>KOSZT ODPISU:</td>
+      <td class="amt">{{ document.total_net | format_decimal }} {{ document.currency or 'PLN' }}</td>
+    </tr>
+  </table>
+</div>
+{% endif %}
+
+<!-- Notes -->
+{% if document.notes %}
+<div class="notes-box">
+  <div class="nlabel">Uwagi</div>
+  <div>{{ document.notes }}</div>
+</div>
+{% endif %}
+
+<!-- Signatures — conditional per type -->
+<div class="sig-section">
+  {% include 'pl_pz/signatures/' ~ doc_variant ~ '.html' %}
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+{
+  "title": "API-Schlüssel",
+  "subtitle": "Externen Systemen die Authentifizierung mit Inventari ermöglichen",
+  "generateKey": "Neuen Schlüssel generieren",
+  "noKeys": "Keine API-Schlüssel",
+  "noKeysDescription": "Generieren Sie einen API-Schlüssel, um Skripten, Home Assistant oder anderen Automatisierungen die Verbindung zu ermöglichen.",
+  "table": {
+    "name": "Name",
+    "key": "Schlüssel",
+    "created": "Erstellt",
+    "lastUsed": "Zuletzt verwendet",
+    "expires": "Läuft ab",
+    "expired": "Abgelaufen",
+    "expiredOn": "Abgelaufen",
+    "actions": "Aktionen",
+    "never": "Nie",
+    "issuedBy": "Ausgestellt von",
+    "issuedByUnknown": "Konto inzwischen entfernt",
+    "noExpiry": "Läuft nicht ab",
+    "notUsedYet": "Noch nicht benutzt",
+    "revokedTrace": "Ein widerrufener Schlüssel verlässt diese Liste. Der Widerruf steht im Prüfprotokoll.",
+    "revokedTraceLink": "Prüfprotokoll öffnen",
+    "permissions": "Berechtigungen",
+    "noPermissions": "Keine Berechtigungen"
+  },
+  "revoke": "Widerrufen",
+  "revokeConfirm": {
+    "title": "API-Schlüssel widerrufen",
+    "message": "Möchten Sie den Schlüssel \"{{name}}\" wirklich widerrufen? Er funktioniert dann sofort nicht mehr.",
+    "confirm": "Widerrufen",
+    "cancel": "Abbrechen"
+  },
+  "form": {
+    "title": "Neuen API-Schlüssel generieren",
+    "namePlaceholder": "z.B. Home Assistant, Backup-Skript",
+    "expiration": "Ablauf",
+    "expirationOptions": {
+      "never": "Kein Ablauf — gilt, bis er widerrufen wird",
+      "30days": "30 Tage",
+      "90days": "90 Tage",
+      "1year": "1 Jahr"
+    },
+    "generate": "Schlüssel generieren",
+    "scope": "Wofür der Schlüssel ist",
+    "scopeOptions": {
+      "everything": "Gewöhnlicher Schlüssel"
+    },
+    "scopeExplain": {
+      "printing": "Ein Druckschlüssel funktioniert nur für den Inventari Print Agent: Er registriert den Agenten, übernimmt Druckaufträge, holt ihre Etiketten und meldet, wie es lief. Er kann nichts anderes lesen oder ändern.",
+      "other": "Ein Schlüssel mit dem Bereich {{scope}} erreicht nur die Endpunkte, die diese Berechtigungen prüfen, und kann nichts anderes lesen oder ändern:"
+    },
+    "scopesLoadFailed": "Was ein Schlüssel tragen kann, konnte nicht geladen werden; darum kann gerade kein Schlüssel ausgestellt werden.",
+    "permissions": "Was der Schlüssel darf",
+    "permissionsHint": "Einem Schlüssel kann nur gegeben werden, was Sie selbst haben.",
+    "readOnlyHint": "Ein neuer Schlüssel beginnt nur mit Leserechten. Haken Sie eine Schreibberechtigung nur an, wenn der Schlüssel Daten ändern soll – er kann dann alles ändern, was diese Berechtigung abdeckt, etwa Produkte anlegen oder Bestände ändern."
+  },
+  "copyDialog": {
+    "title": "API-Schlüssel generiert",
+    "warning": "Kopieren Sie Ihren API-Schlüssel jetzt. Sie können ihn später nicht mehr einsehen!",
+    "copy": "In die Zwischenablage kopieren",
+    "copied": "Kopiert!",
+    "done": "Schließen"
+  },
+  "capabilities": {
+    "title": "Was ein Schlüssel tragen kann",
+    "intro": "Jeder Schlüssel trägt die beim Ausstellen angehakten Berechtigungen — höchstens die der ausstellenden Person. Seine Liste steht unten neben ihm. Ein Druckschlüssel erreicht nur die Endpunkte des Druckagenten.",
+    "withheldTitle": "Nie auf einem Schlüssel",
+    "adminBlocked": "Alles Administrative — Rollen, Einladungen, Module, andere API-Schlüssel — bleibt einem Schlüssel verschlossen. Die Teamliste nicht: ein Schlüssel mit „Organisationsdaten lesen“ kann Name, E-Mail und Rolle jedes Mitglieds lesen.",
+    "unknown": "Recht {{key}}",
+    "permissions": {
+      "items_read": "Produkte und Bestände lesen",
+      "items_write": "Produkte anlegen und Bestände ändern",
+      "items_delete": "Produkte löschen",
+      "categories_read": "Kategorienliste lesen",
+      "locations_read": "Lagerorte lesen",
+      "org_read": "Organisationsdaten lesen",
+      "org_settings_write": "Die Organisation verwalten: KI-Verbindungen, Gerätedokumentvorlagen, die organisationsweite SKU-Benennung und das API-Schlüsselregister"
+    },
+    "loadFailed": "Was ein Schlüssel darf, konnte nicht geladen werden."
+  },
+  "usage": {
+    "title": "Wie er gesendet wird",
+    "hint": "Der Schlüssel reist im Header {{header}}. Als Authorization: Bearer gesendet funktioniert er bis zur nächsten Version noch, und jede Antwort trägt dann einen Deprecation-Header.",
+    "copy": "Beispiel kopieren",
+    "copied": "Beispiel kopiert"
+  },
+  "revokedToast": "Schlüssel widerrufen — im Prüfprotokoll vermerkt",
+  "scopes": {
+    "printing": "Nur Drucken"
+  }
+}

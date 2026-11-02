@@ -1,0 +1,7 @@
+{
+  "recipe.not_found": "Recipe not found",
+  "ingredient.not_in_recipe": "This product is not an ingredient of this recipe",
+  "picking.session_not_found": "Picking session not found",
+  "picking.already_active": "There is already an active picking session for this recipe",
+  "picking.already_picked": "{name} has already been picked"
+}

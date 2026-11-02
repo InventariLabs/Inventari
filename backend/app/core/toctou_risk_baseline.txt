@@ -1,0 +1,25 @@
+# TOCTOU risk function baseline
+# Format: app/relative/path.py:line:function_name | owner=<who> | expires=<YYYY-MM-DD> | <reason>
+#
+# Owner and expiry are mandatory and both are checked. An entry here is a
+# written premise -- "this looks like a race but is serialised by X" -- and a
+# premise nobody re-reads is the most convincing way to be wrong: a green gate
+# resting on it is more persuasive than no gate at all. One entry below said
+# the only true race was held by an advisory lock that, when the sentence was
+# written, hashed its key with Python's per-process hash() and serialised
+# nothing. Past its date the lint fails and names the owner.
+#
+# Functions with select + mutation without row locking.
+# These emit ::notice (non-blocking). New TOCTOU patterns emit ::error.
+# Remove entries when with_for_update() is added.
+#
+# The line number is part of the key (see _quality_checks_toctou.py:
+# `key = f'{rel}:{node.lineno}:{node.name}'`), so an entry whose function has
+# moved silently stops matching. Verify entries against the live detector
+# rather than assuming they still apply:
+#
+#   from app.core.architecture_lint._quality_checks_toctou import _check_toctou_risk
+#   from app.core.architecture_lint._constants import MODULES_ROOT
+#   list(_check_toctou_risk(MODULES_ROOT, set()))   # every detection, unbaselined
+
+
