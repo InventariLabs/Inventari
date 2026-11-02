@@ -1,6 +1,7 @@
 <div align="center">
 
 <img src="https://img.shields.io/github/v/release/InventariLabs/Inventari?include_prereleases&style=for-the-badge" alt="Latest release"/>
+<a href="https://github.com/InventariLabs/Inventari/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/InventariLabs/Inventari/ci.yml?branch=dev&style=for-the-badge&label=CI" alt="CI"/></a>
 <img src="https://img.shields.io/badge/License-AGPL%20v3-brightgreen?style=for-the-badge" alt="License: AGPL v3"/>
 <img src="https://img.shields.io/badge/Python-3.14+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.14+"/>
 <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18"/>
