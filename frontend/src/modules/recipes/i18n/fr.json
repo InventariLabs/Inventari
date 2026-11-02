@@ -743,7 +743,8 @@
   "print": {
     "print": "Imprimer",
     "printed_on": "Imprimé le {{date}}",
-    "per_serving": "Par portion"
+    "per_serving": "Par portion",
+    "calories_unknown": "Calories inconnues"
   },
   "bulk": {
     "select_mode": "Sélectionner des recettes",
