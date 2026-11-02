@@ -328,3 +328,46 @@ describe("WmsPickLineRow's date", () => {
     expect(screen.queryByText(/Expires/)).not.toBeInTheDocument();
   });
 });
+
+/**
+ * On a phone the name and the batch code are what the picker compares with
+ * the carton, so neither may be cut with an ellipsis. jsdom has no layout to
+ * measure, so the test pins the classes that decide it: no `truncate`, the
+ * name allowed two lines, the code allowed to break rather than be clipped.
+ */
+describe("WmsPickLineRow's text on a narrow screen", () => {
+  it("lets the name wrap and keeps the whole batch code", () => {
+    const productName =
+      "Espresso Blend Beans 1 kg Premium Roast Whole Arabica Bag";
+    const lotName = "LTC-2026-10-ESPRESSO-BLEND-000417";
+    render(
+      <WmsPickLineRow
+        line={{
+          ...pendingLine,
+          status: "picked",
+          picked_quantity: 5,
+          product_name: productName,
+          lot_name: lotName,
+          bin_location: "A-01-01 · Shelf A-01-01",
+        }}
+        onFullPick={vi.fn()}
+        onUndo={vi.fn()}
+        onShortPick={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+
+    const name = screen.getByText(productName);
+    expect(name).toHaveTextContent(productName);
+    expect(name).toHaveClass("line-clamp-2", "break-words");
+    expect(name).not.toHaveClass("truncate");
+
+    const lot = screen.getByText(new RegExp(lotName));
+    expect(lot).toHaveClass("break-all");
+    expect(lot).not.toHaveClass("truncate");
+
+    const location = screen.getByText(/A-01-01 · Shelf A-01-01/);
+    expect(location).toHaveClass("break-words");
+    expect(location).not.toHaveClass("truncate");
+  });
+});

@@ -76,12 +76,14 @@ const WmsPickLineRow = memo(function WmsPickLineRow({
               {line.document_number}
             </p>
           )}
-          <p className="text-sm font-medium text-on truncate">
+          {/* Two lines for the name, and the batch code whole: on a phone
+              both are read against the carton, so an ellipsis is no help. */}
+          <p className="text-sm font-medium text-on line-clamp-2 break-words">
             {line.product_name ?? t("picking.unknown_product")}
           </p>
           {line.bin_location && (
-            <p className="text-xs text-on-muted flex items-center gap-0.5 truncate">
-              <MapPin size={10} />
+            <p className="text-xs text-on-muted flex items-center gap-0.5 break-words">
+              <MapPin size={10} className="shrink-0" />
               {line.bin_location}
             </p>
           )}
@@ -89,14 +91,14 @@ const WmsPickLineRow = memo(function WmsPickLineRow({
             <ShelfConfirmation state={shelfState} kind="picking" />
           )}
           {line.lot_name && (
-            <p className="text-xs text-on-muted truncate">
+            <p className="text-xs text-on-muted break-all">
               {t("picking.lot", { name: line.lot_name })}
             </p>
           )}
           {/* The date of the pack the draw reaches first: the batch's, or
               the record's own where the stock carries no batch. */}
           {line.expiry_date && (
-            <p className="text-xs text-on-muted truncate">
+            <p className="text-xs text-on-muted break-words">
               {t("picking.expires", {
                 date: formatDateMedium(line.expiry_date),
               })}
