@@ -164,6 +164,8 @@ test.describe("Maker — completion lifecycle", () => {
       planned_qty: "2",
       output_location_id: sOut.id,
       notes: "deficit",
+      // The draft is short on purpose: only completion must refuse it.
+      confirm_shortage: true,
     });
     orderIds.push(draft.id);
 
@@ -190,6 +192,9 @@ test.describe("Maker — completion lifecycle", () => {
       output_template_id: output.id,
       planned_qty: "1",
       output_location_id: sOut.id,
+      // These tests exercise status handling and listing, not stock: the
+      // shortage warning is acknowledged so the draft exists.
+      confirm_shortage: true,
     });
     await api.cancelProductionOrder(token, draft.id);
     orderIds.push(draft.id);
@@ -209,6 +214,9 @@ test.describe("Maker — completion lifecycle", () => {
       output_template_id: output.id,
       planned_qty: "1",
       output_location_id: sOut.id,
+      // These tests exercise status handling and listing, not stock: the
+      // shortage warning is acknowledged so the draft exists.
+      confirm_shortage: true,
     });
     await api.cancelProductionOrder(token, draft.id);
     orderIds.push(draft.id);
@@ -236,6 +244,9 @@ test.describe("Maker — completion lifecycle", () => {
       output_template_id: output.id,
       planned_qty: "1",
       output_location_id: sOut.id,
+      // These tests exercise status handling and listing, not stock: the
+      // shortage warning is acknowledged so the draft exists.
+      confirm_shortage: true,
     });
     orderIds.push(draft.id);
 
