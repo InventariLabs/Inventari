@@ -822,7 +822,8 @@
   "print": {
     "print": "Drukuj",
     "printed_on": "Wydrukowano {{date}}",
-    "per_serving": "Na porcję"
+    "per_serving": "Na porcję",
+    "calories_unknown": "Kalorie nieznane"
   },
   "bulk": {
     "select_mode": "Zaznacz przepisy",

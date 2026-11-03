@@ -41,7 +41,7 @@ _DENSITY_G_PER_ML: dict[str, Decimal] = {
 }
 
 _MACRO_ALIASES: dict[str, list[str]] = {
-    'calories_kcal': ['calories_kcal', 'calories'],
+    'calories_kcal': ['calories_kcal', 'calories', 'energy_kcal'],
     'protein_g': ['protein_g', 'proteins'],
     'fat_g': ['fat_g', 'fat'],
     'carbs_g': ['carbs_g', 'carbohydrates'],
