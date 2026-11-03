@@ -1,6 +1,6 @@
 """The import finds the shelf the reader named.
 
-The app shows every location as a path ("Pantry → Dry Goods → Shelf A"), so
+The app shows every location as a path ("Pantry › Dry Goods › Shelf A"), so
 that is what a reader types into the sheet. The importer used to match the
 bare leaf name only, and founded a root location named after the whole path
 when it missed; an empty cell founded one named "nan".
@@ -129,7 +129,7 @@ class TestTheImportFindsTheShelfTheReaderNamed:
             db,
             _csv(
                 [
-                    {'Name': 'Cocoa', 'Storage': 'Pantry → Dry Goods → Shelf A'},
+                    {'Name': 'Cocoa', 'Storage': 'Pantry › Dry Goods › Shelf A'},
                     {'Name': 'Rice', 'Storage': 'Pantry -> Dry Goods -> Shelf A'},
                     {'Name': 'Oats', 'Storage': 'shelf a'},
                 ]
@@ -185,7 +185,7 @@ class TestTheImportFindsTheShelfTheReaderNamed:
         ).scalar_one()
         assert cellar.parent_id is None
         assert result['created_locations'] == [
-            'Pantry → Dry Goods → Shelf B',
+            'Pantry › Dry Goods › Shelf B',
             'Cellar',
         ]
         assert result['created_categories'] == ['Spices']

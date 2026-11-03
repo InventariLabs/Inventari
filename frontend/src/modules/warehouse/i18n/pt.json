@@ -1100,8 +1100,8 @@
         "setUp": "Configurar local"
       },
       "occupancy": {
-        "noLimit_one": "Sem limite · {{count}} registro",
-        "noLimit_other": "Sem limite · {{count}} registros",
+        "noLimit_one": "Sem limite · {{count}} produto",
+        "noLimit_other": "Sem limite · {{count}} produtos",
         "sharesSum_one": "{{fill}}% — a parcela de {{count}} produto com limite",
         "sharesSum_other": "{{fill}}% — as parcelas de {{count}} produtos com limite somadas",
         "unmeasured": "Um produto aqui não tem limite e não é contado",

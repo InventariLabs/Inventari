@@ -43,6 +43,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from app.core.db_utils import acquire_advisory_lock
 from app.core.exceptions import ValidationException, catalogue_refusal
 from app.core.label_codes import LABEL_PREFIX_MAX_LENGTH
+from app.core.location_path import join_location_path
 from app.core.product_profiles import DEFAULT_PROFILE_ID, get_profile
 from app.models.label_pool import LabelPool
 from app.models.organization import Organization
@@ -656,7 +657,9 @@ async def warehouse_codes_async(
     def path_of(row: StorageLocation) -> str:
         if row.id not in paths:
             parent = tree.by_id.get(row.parent_id) if row.parent_id else None
-            paths[row.id] = f'{path_of(parent)} → {row.name}' if parent else row.name
+            paths[row.id] = (
+                join_location_path([path_of(parent), row.name]) if parent else row.name
+            )
         return paths[row.id]
 
     reprint = [

@@ -206,7 +206,7 @@ test.describe("Picking — a skipped line on a phone", () => {
   }
 
   function summaryOf(page: Page) {
-    return page.getByRole("dialog", { name: "Picking Complete" });
+    return page.getByRole("dialog", { name: "Picking complete" });
   }
 
   const MUST_ANSWER =

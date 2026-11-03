@@ -3,10 +3,10 @@ import { storagesApi } from "@/lib/api/storages";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
 import type { StorageLocationSummary } from "@/types";
+import { LOCATION_PATH_SEPARATOR } from "@/utils/helpers";
 
 /** The longest text the search accepts (`q` on the locations list). */
 const SEARCH_MAX = 100;
-const PATH_SEPARATOR = " → ";
 
 /**
  * How many locations stand inside this one, at any depth.
@@ -24,7 +24,7 @@ export function useLocationsInside(
 ): number {
   const excludeModuleContexts = !useShowModuleData();
   const prefix = location.full_path
-    ? `${location.full_path}${PATH_SEPARATOR}`
+    ? `${location.full_path}${LOCATION_PATH_SEPARATOR}`
     : null;
   const askable =
     location.direct_children_count > 0 &&

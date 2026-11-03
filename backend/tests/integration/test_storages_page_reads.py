@@ -129,7 +129,7 @@ class TestTheListIsPagedInTheDatabase:
 
         assert sorted(_names(response)) == ['Shelf 3', 'Zone B']
         shelf = next(r for r in response.json()['items'] if r['name'] == 'Shelf 3')
-        assert shelf['full_path'] == 'Main warehouse → Zone B → Shelf 3'
+        assert shelf['full_path'] == 'Main warehouse › Zone B › Shelf 3'
 
     def test_the_children_of_one_place_and_the_top_of_the_tree(
         self, client, auth_headers, warehouse
@@ -234,7 +234,7 @@ class TestTheCountsFollowThePage:
         assert row['items_count'] == 0
         assert row['subtree_items_count'] == 0
         # What is not a count is still there: the place knows its path.
-        assert row['full_path'] == 'Main warehouse → Zone A → Shelf 1'
+        assert row['full_path'] == 'Main warehouse › Zone A › Shelf 1'
         assert row['is_leaf'] is True
 
 

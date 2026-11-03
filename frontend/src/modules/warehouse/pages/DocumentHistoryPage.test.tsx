@@ -330,7 +330,7 @@ describe("DocumentHistoryPage", () => {
     // menu's own labels: the hand-kept list promised five and the menu made
     // six, so the write-off read as an offer the panel never mentioned.
     expect(manual).toHaveTextContent(
-      "Receipt, Delivery, Transfer, Internal Receipt, Internal Issue, Scrap",
+      "Receipt, Delivery, Transfer, Internal receipt, Internal issue, Scrap",
     );
   });
 

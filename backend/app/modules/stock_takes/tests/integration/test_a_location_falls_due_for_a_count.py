@@ -170,8 +170,8 @@ class TestALocationFallsDueForACount:
 
         tasks = shop.tasks(client)
 
-        assert set(tasks) == {'Pantry / Shelf A'}
-        assert Decimal(tasks['Pantry / Shelf A']['count']) == 40
+        assert set(tasks) == {'Pantry › Shelf A'}
+        assert Decimal(tasks['Pantry › Shelf A']['count']) == 40
 
     def test_an_old_count_makes_a_due_task_with_the_days_since(
         self, client: TestClient, shop: _Shop
@@ -182,8 +182,8 @@ class TestALocationFallsDueForACount:
 
         tasks = shop.tasks(client)
 
-        assert set(tasks) == {'Pantry / Shelf A'}
-        task = tasks['Pantry / Shelf A']
+        assert set(tasks) == {'Pantry › Shelf A'}
+        task = tasks['Pantry › Shelf A']
         assert task['kind'] == 'count'
         assert task['state'] == 'todo'
         assert task['next_action'] == 'count'
@@ -207,12 +207,12 @@ class TestALocationFallsDueForACount:
         assert shop.tasks(client, date_to=their_today.isoformat()) == {}
         done = shop.tasks(client, date_to=their_today.isoformat(), include_done=True)
         assert {subject: Decimal(task['count']) for subject, task in done.items()} == {
-            'Pantry / Shelf A': 0,
-            'Pantry / Shelf B': 0,
+            'Pantry › Shelf A': 0,
+            'Pantry › Shelf B': 0,
         }
         # A finished count falls due on no day: the next period's day would
         # read as a task a day ahead.
-        assert done['Pantry / Shelf A']['due_date'] is None
+        assert done['Pantry › Shelf A']['due_date'] is None
 
     @pytest.mark.parametrize('reader_offset', [-1, 1])
     def test_a_count_a_day_old_is_due_on_any_readers_calendar(
@@ -227,9 +227,9 @@ class TestALocationFallsDueForACount:
 
         tasks = shop.tasks(client, date_to=their_today.isoformat())
 
-        assert set(tasks) == {'Pantry / Shelf A'}
-        assert Decimal(tasks['Pantry / Shelf A']['count']) == 1
-        assert tasks['Pantry / Shelf A']['due_date'] == their_today.isoformat()
+        assert set(tasks) == {'Pantry › Shelf A'}
+        assert Decimal(tasks['Pantry › Shelf A']['count']) == 1
+        assert tasks['Pantry › Shelf A']['due_date'] == their_today.isoformat()
 
     def test_a_location_never_counted_is_due_today(
         self, client: TestClient, shop: _Shop
@@ -239,9 +239,9 @@ class TestALocationFallsDueForACount:
         tasks = shop.tasks(client)
 
         # The bare shelf and the pantry itself hold nothing of their own.
-        assert set(tasks) == {'Pantry / Shelf A', 'Pantry / Shelf B'}
-        assert tasks['Pantry / Shelf B']['count'] is None
-        assert tasks['Pantry / Shelf B']['due_date'] == _TODAY.isoformat()
+        assert set(tasks) == {'Pantry › Shelf A', 'Pantry › Shelf B'}
+        assert tasks['Pantry › Shelf B']['count'] is None
+        assert tasks['Pantry › Shelf B']['due_date'] == _TODAY.isoformat()
 
     def test_a_module_owned_location_waits_for_the_organizations_say_so(
         self, client: TestClient, shop: _Shop
@@ -252,11 +252,11 @@ class TestALocationFallsDueForACount:
 
         # The general screens leave a module's places out by default, and so
         # does To do: the count screen would not offer the rack.
-        assert set(shop.tasks(client)) == {'Pantry / Shelf A'}
+        assert set(shop.tasks(client)) == {'Pantry › Shelf A'}
 
         shop.org.settings = {**(shop.org.settings or {}), 'show_module_data': True}
         shop.db.commit()
-        assert set(shop.tasks(client)) == {'Pantry / Shelf A', 'Pantry / Shelf B'}
+        assert set(shop.tasks(client)) == {'Pantry › Shelf A', 'Pantry › Shelf B'}
 
     def test_an_open_count_puts_the_task_under_way_and_a_closed_one_done(
         self, client: TestClient, shop: _Shop
@@ -265,7 +265,7 @@ class TestALocationFallsDueForACount:
         shop.counted(shop.shelf_b, 3)
         take = shop.counted(shop.pantry, 0, open_=True)
 
-        under_way = shop.tasks(client)['Pantry / Shelf A']
+        under_way = shop.tasks(client)['Pantry › Shelf A']
         assert under_way['state'] == 'in_progress'
         assert under_way['action_href'] == (
             f'/inventory/stock-takes/{take.id}/counting'
@@ -278,8 +278,8 @@ class TestALocationFallsDueForACount:
         assert shop.tasks(client) == {}
         done = shop.tasks(client, include_done=True)
         assert {subject: task['state'] for subject, task in done.items()} == {
-            'Pantry / Shelf A': 'done',
-            'Pantry / Shelf B': 'done',
+            'Pantry › Shelf A': 'done',
+            'Pantry › Shelf B': 'done',
         }
 
     def test_the_locations_say_when_they_were_last_counted(
@@ -337,7 +337,7 @@ class TestALocationFallsDueForACount:
         # A partial count of the pantry closed with shelf A's rows waiting.
         shop.counted(shop.pantry, 0, shelves=[shop.shelf_b], uncounted=[shop.shelf_a])
 
-        assert set(shop.tasks(client)) == {'Pantry / Shelf A'}
+        assert set(shop.tasks(client)) == {'Pantry › Shelf A'}
         response = client.get('/api/v1/stock-takes/locations', headers=shop.headers)
         assert str(shop.shelf_a.id) not in {
             row['location_id'] for row in response.json()['items']
@@ -356,7 +356,7 @@ class TestALocationFallsDueForACount:
         row.counted_quantity = None
         shop.db.commit()
 
-        assert set(shop.tasks(client)) == {'Pantry / Shelf A'}
+        assert set(shop.tasks(client)) == {'Pantry › Shelf A'}
 
     def test_a_count_from_a_schedule_dates_nothing(
         self, client: TestClient, shop: _Shop
@@ -371,7 +371,7 @@ class TestALocationFallsDueForACount:
         shop.db.commit()
         shop.counted(shop.pantry, 0, schedule_id=schedule.id)
 
-        assert set(shop.tasks(client)) == {'Pantry / Shelf A', 'Pantry / Shelf B'}
+        assert set(shop.tasks(client)) == {'Pantry › Shelf A', 'Pantry › Shelf B'}
 
     def test_a_shelf_added_after_the_count_is_due(
         self, client: TestClient, shop: _Shop
@@ -385,8 +385,8 @@ class TestALocationFallsDueForACount:
 
         tasks = shop.tasks(client)
 
-        assert set(tasks) == {'Pantry / Shelf C'}
-        assert tasks['Pantry / Shelf C']['count'] is None
+        assert set(tasks) == {'Pantry › Shelf C'}
+        assert tasks['Pantry › Shelf C']['count'] is None
 
     def test_a_shelf_the_counter_closed_is_counted_even_when_empty(
         self, client: TestClient, shop: _Shop
@@ -396,7 +396,7 @@ class TestALocationFallsDueForACount:
             StockTakeClosedLocation(
                 stock_take_id=take.id,
                 storage_location_id=shop.bare.id,
-                path='Pantry / Bare shelf',
+                path='Pantry › Bare shelf',
                 empty=True,
             )
         )

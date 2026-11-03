@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.module_sdk import join_location_path
 from app.core.public_api import core_api
 
 
@@ -66,6 +67,6 @@ async def get_storage_tree(
         while current_path is not None and current_path in by_id:
             chain.append(by_id[current_path].name)
             current_path = by_id[current_path].parent_id
-        paths[location_id] = ' / '.join(reversed(chain))
+        paths[location_id] = join_location_path(reversed(chain))
 
     return snapshot_ids, family_ids, paths

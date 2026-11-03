@@ -320,7 +320,7 @@ describe("the screens a session ending changes", () => {
     })) {
       await userEvent.click(button);
     }
-    expect(await screen.findByText("Picking Complete")).toBeInTheDocument();
+    expect(await screen.findByText("Picking complete")).toBeInTheDocument();
 
     for (const number of ["WZ/1", "WZ/2"]) {
       const covered = screen.getByRole("region", { name: number });

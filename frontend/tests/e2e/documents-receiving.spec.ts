@@ -82,16 +82,16 @@ test.describe("Documents — receiving reaches the stock ledger", () => {
     // which opens the barcode session.
     await page.getByRole("button", { name: "Receive stock" }).click();
     await expect(
-      page.getByRole("heading", { name: "Execute Document" }),
+      page.getByRole("heading", { name: "Execute document" }),
     ).toBeVisible();
 
     // The quantity that actually arrived. Typing it is the path a worker
-    // takes when the delivery does not match the order; "Fill Remaining" is
+    // takes when the delivery does not match the order; "Fill remaining" is
     // the shortcut for when it does.
-    const quantityField = page.getByLabel("Executed Quantity");
+    const quantityField = page.getByLabel("Executed quantity");
     await quantityField.fill(String(RECEIVED));
 
-    await page.getByRole("button", { name: "Confirm & Complete" }).click();
+    await page.getByRole("button", { name: "Confirm & complete" }).click();
     await expect(
       page.getByText("Document completed — stock updated"),
     ).toBeVisible({ timeout: 15000 });
@@ -133,7 +133,7 @@ test.describe("Documents — receiving reaches the stock ledger", () => {
       timeout: 15000,
     });
     await page.getByRole("button", { name: "Receive stock" }).click();
-    await page.getByLabel("Executed Quantity").fill(String(arrived));
+    await page.getByLabel("Executed quantity").fill(String(arrived));
 
     // Receiving less than ordered is a discrepancy, and the form requires it
     // to be named before it will close the document.
@@ -141,7 +141,7 @@ test.describe("Documents — receiving reaches the stock ledger", () => {
       .getByLabel("Discrepancy code")
       .selectOption({ label: "Shortage" });
 
-    await page.getByRole("button", { name: "Confirm & Complete" }).click();
+    await page.getByRole("button", { name: "Confirm & complete" }).click();
     await expect(page.getByText("Document completed")).toBeVisible({
       timeout: 15000,
     });

@@ -134,7 +134,7 @@ describe("PutawayRulesPage — edit, add and delete", () => {
     );
     act(() => (m.dialog.onClose as () => void)());
     render(headerActions());
-    await user.click(screen.getByRole("button", { name: "Add Rule" }));
+    await user.click(screen.getByRole("button", { name: "Add rule" }));
     expect(m.dialog.open).toBe(true);
     expect(m.dialog.rule).toBeNull();
     act(() => (m.dialog.onSubmit as (d: unknown) => void)(payload));

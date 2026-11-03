@@ -26,7 +26,7 @@
     "card": {
       "qty": "Planificada",
       "cost": "Coste",
-      "resultPerUnit": "({{amount}} por unidad)",
+      "resultPerUnit": "({{amount}} por {{unit}})",
       "shortage_one": "Falta stock: {{count}} ingrediente. La finalización será rechazada.",
       "shortage_other": "Falta stock: {{count}} ingredientes. La finalización será rechazada."
     },
@@ -189,7 +189,7 @@
       "plannedSuffix": "planificado: {{qty}}",
       "scrap": "Merma",
       "overproduced": "Sobreproducción",
-      "resultPerUnit": "({{amount}} por unidad)",
+      "resultPerUnit": "({{amount}} por {{unit}})",
       "totalCostAfterClosing": "Coste total tras el cierre",
       "unitCost": "{{amount}} por unidad producida",
       "totalCostGap_one": "{{count}} ingrediente salió de un stock sin coste, por lo que falta en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",

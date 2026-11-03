@@ -6,8 +6,8 @@ module may use: the registration helpers, the lifecycle and context types, the
 interceptor and contribution classes, the HTTP exception surface, the FastAPI
 dependencies, a logger, the model bases, the system event names a subscription
 needs, the migration helpers a revision uses, the field type a scanned code
-arrives in, and the pagination envelopes with the helper that pages a query
-into one. Anything under ``app.`` that is not
+arrives in, the pagination envelopes with the helper that pages a query
+into one, and the helper that writes a location's path. Anything under ``app.`` that is not
 re-exported here is Core's own business: it may be renamed, split or deleted
 between releases.
 
@@ -86,6 +86,7 @@ from app.core.exceptions import (
 )
 from app.core.file_reference import cover_extension, served_url, stored_reference
 from app.core.interceptors import InterceptorPipeline, interceptor_pipeline
+from app.core.location_path import join_location_path
 from app.core.logging import get_logger
 from app.core.migration_helpers import (
     convert_naive_timestamps_to_utc,
@@ -170,6 +171,7 @@ __all__ = [
     'get_module_error_message',
     'hidden_module_tags_async',
     'interceptor_pipeline',
+    'join_location_path',
     'journal_config_change',
     'map_service_errors',
     'paginate_async',

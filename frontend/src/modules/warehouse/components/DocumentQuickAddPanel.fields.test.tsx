@@ -78,7 +78,7 @@ describe("DocumentQuickAddPanel — each field reports under its own key", () =>
     fireEvent.change(screen.getByLabelText("Barcode"), {
       target: { value: "590" },
     });
-    fireEvent.change(screen.getByLabelText("Batch Number"), {
+    fireEvent.change(screen.getByLabelText("Batch number"), {
       target: { value: "B-7" },
     });
     expect(props.onChange).toHaveBeenCalledWith({ name: "Flour" });
@@ -90,7 +90,7 @@ describe("DocumentQuickAddPanel — each field reports under its own key", () =>
   it("reports the expiry date and the unit chosen", () => {
     const props = makeProps();
     render(<DocumentQuickAddPanel {...props} />);
-    fireEvent.change(screen.getByLabelText("Expiry Date"), {
+    fireEvent.change(screen.getByLabelText("Expiry date"), {
       target: { value: "2027-01-31" },
     });
     expect(props.onChange).toHaveBeenCalledWith({ expiry_date: "2027-01-31" });

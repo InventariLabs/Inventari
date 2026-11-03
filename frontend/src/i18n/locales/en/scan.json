@@ -19,6 +19,7 @@
   "errorAdding": "Error while adding",
   "errorCamera": "Camera error",
   "aimAtCode": "Aim at barcode or QR",
+  "closeCamera": "Close camera view",
   "dataFromHistory": "Data automatically matched from history",
   "dataFromOFFShort": "OFF Data",
   "dataFromVisionShort": "AI Scan Data",

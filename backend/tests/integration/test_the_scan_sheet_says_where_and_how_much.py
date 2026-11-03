@@ -121,7 +121,7 @@ class TestTheScanSheetRows:
         assert result is not None and result.stock_summary is not None
         [row] = result.stock_summary['items']
         assert row['location'] == 'Shelf 2'
-        assert row['location_path'] == 'Warehouse → Rack 4 → Shelf 2'
+        assert row['location_path'] == 'Warehouse › Rack 4 › Shelf 2'
         assert row['location_code'] == 'R4-S2'
         assert row['lot'] == 'LOT-77'
         assert row['reserved_quantity'] == 4.0

@@ -17,6 +17,7 @@ Two things were wrong with how a code was given:
 from __future__ import annotations
 
 import asyncio
+import time
 from uuid import UUID
 
 import pytest
@@ -34,6 +35,10 @@ from app.services.storage._codes import (
 from app.services.storage._queries import ensure_short_code_async
 
 pytestmark = pytest.mark.integration
+
+# Only for a change stuck on something else: nothing here takes this long, and
+# no test passes or fails on how close it comes.
+_NEVER_ARRIVES_AFTER = 120.0
 
 
 async def _warehouse(
@@ -103,7 +108,7 @@ async def test_a_location_that_has_a_code_keeps_it_and_writes_nothing(
     assert entries.all() == []
 
 
-async def _someone_is_waiting(db: AsyncSession) -> None:
+async def _someone_is_waiting(db: AsyncSession, renumber: asyncio.Task[None]) -> None:
     """Until another backend of this database waits on a lock.
 
     The create holds its transaction open until then, so the renumber is
@@ -111,8 +116,13 @@ async def _someone_is_waiting(db: AsyncSession) -> None:
     lock with the fix, on the unique index without it — before the create
     commits. Without the wait the renumber might simply start after the
     commit and pass for the wrong reason.
+
+    A renumber that raised is answered by its own exception. One that finished
+    without waiting read the codes before the create committed, so the codes
+    the test goes on to read say what that did.
     """
-    for _ in range(500):
+    deadline = time.monotonic() + _NEVER_ARRIVES_AFTER
+    while not renumber.done():
         # pg_stat_activity is a snapshot per transaction and this session's
         # stays open: drop it, or the loop rereads its first poll forever.
         await db.execute(text('SELECT pg_stat_clear_snapshot()'))
@@ -124,8 +134,20 @@ async def _someone_is_waiting(db: AsyncSession) -> None:
         )
         if waiting:
             return
+        if time.monotonic() > deadline:
+            raise AssertionError('the renumber never reached the lock')
         await asyncio.sleep(0.01)
-    raise AssertionError('the renumber never reached the lock')
+    renumber.result()
+
+
+async def test_a_renumber_that_fails_reports_its_own_failure(
+    real_async_db_session: AsyncSession,
+) -> None:
+    async def _breaks() -> None:
+        raise LookupError('the renumber broke')
+
+    with pytest.raises(LookupError, match='the renumber broke'):
+        await _someone_is_waiting(real_async_db_session, asyncio.create_task(_breaks()))
 
 
 async def _renumber(engine, org_id: UUID, user_id: UUID, warehouse_id: UUID) -> None:
@@ -173,7 +195,7 @@ async def test_a_renumber_and_a_create_at_once_both_succeed(
         await create.flush()
 
         renumber = asyncio.create_task(_renumber(engine, org_id, user_id, warehouse_id))
-        await _someone_is_waiting(db)
+        await _someone_is_waiting(db, renumber)
         await create.commit()
         await renumber
 

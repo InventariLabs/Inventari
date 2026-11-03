@@ -391,8 +391,8 @@ export function PutawayRuleEditorDialog({
         <DialogHeader className="shrink-0">
           <DialogTitle>
             {rule
-              ? t("putaway.edit_title", "Edit Putaway Rule")
-              : t("putaway.create_title", "New Putaway Rule")}
+              ? t("putaway.edit_title", "Edit putaway rule")
+              : t("putaway.create_title", "New putaway rule")}
           </DialogTitle>
         </DialogHeader>
         <form
@@ -503,7 +503,7 @@ export function PutawayRuleEditorDialog({
             <Button type="submit" disabled={isPending || !hasMatchKey}>
               {rule
                 ? t("common:actions.save", "Save")
-                : t("putaway.actions.create", "Create Rule")}
+                : t("putaway.actions.create", "Create rule")}
             </Button>
           </DialogFooter>
         </form>
