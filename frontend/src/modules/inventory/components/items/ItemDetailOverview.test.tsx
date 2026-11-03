@@ -77,7 +77,7 @@ describe("ItemDetailOverview — where the record is", () => {
     // place's own name means nothing to the person reading it.
     renderOverview({ item: item({}), storages: [shelf, consumed] });
 
-    expect(screen.getByText("Used up")).toBeInTheDocument();
+    expect(screen.getByText("Consumed")).toBeInTheDocument();
     expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
     // And the way back is named on the record itself, not left to a URL.
     expect(screen.getByText(/brings it back to a shelf/i)).toBeInTheDocument();

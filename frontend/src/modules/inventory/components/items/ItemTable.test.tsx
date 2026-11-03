@@ -669,7 +669,7 @@ describe("ItemTable — the storage cell is one click target", () => {
     it("says used up, not the system place's name, nor Unknown", () => {
       renderUsedUp();
 
-      expect(screen.getByText("Used up")).toBeInTheDocument();
+      expect(screen.getByText("Consumed")).toBeInTheDocument();
       expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
       expect(screen.queryByText("Unknown")).not.toBeInTheDocument();
     });

@@ -22,7 +22,7 @@ says what the release does rather than what changed since them.
   one piece off an issue reads "by +1", where it used to read "by −1".
 - A generated community module asks for its own read and write permissions on
   every route, and its manifest declares them with the usual default roles.
-- A product used up to zero reads "Used up" in the list and on its page rather
+- A product used up to zero reads "Consumed" in the list and on its page rather
   than "Consumed (Virtual)", and no longer offers "Add 1 unit", which was
   refused after the click. Move brings it back to a shelf.
 - Add product shows pieces on its unit button when no unit was chosen, which is

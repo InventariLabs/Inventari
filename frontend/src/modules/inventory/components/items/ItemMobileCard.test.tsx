@@ -582,7 +582,7 @@ describe("ItemMobileCard — a used-up record", () => {
       />,
     );
 
-    expect(screen.getByText("Used up")).toBeInTheDocument();
+    expect(screen.getByText("Consumed")).toBeInTheDocument();
     expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
   });
 });
