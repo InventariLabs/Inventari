@@ -27,6 +27,10 @@ says what the release does rather than what changed since them.
   file itself is the same, still without a limit on rows. Asked through the API
   for a period that ends before it starts, the export answers 400 with a sentence
   saying so instead of an empty file.
+- A product name longer than 100 characters can be searched: the search looks
+  for its opening, and a failed product search is reported as failed, with a
+  button to try again, rather than as "no results". A long name that only
+  shares its opening with an existing product can still be added as new.
 - A product whose nutrition came from Open Food Facts now counts its calories
   in recipe estimates and in the meal plan's daily totals. They used to go
   missing while its protein, fat and carbohydrates were counted, and the day
