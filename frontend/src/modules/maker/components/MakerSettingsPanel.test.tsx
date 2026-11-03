@@ -67,9 +67,15 @@ describe("MakerSettingsPanel", () => {
     signInWith(["maker:read"]);
     renderPanel();
 
+    // Nothing is shown read-only, so the page must not claim it can be viewed.
     expect(
-      await screen.findByText(/you can view this, not change it/i),
+      await screen.findByText(
+        /only an administrator can open module settings/i,
+      ),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/you can view this, not change it/i),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /margin/i }),
     ).not.toBeInTheDocument();

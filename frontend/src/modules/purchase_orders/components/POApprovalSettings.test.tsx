@@ -157,6 +157,21 @@ describe("POApprovalSettings", () => {
     );
   });
 
+  it("names the threshold field in the banner when only a threshold is set", async () => {
+    // arrange() has a threshold saved and the checkbox off: the requirement
+    // that is left is the threshold, so "turn the requirement off" would point
+    // at a checkbox that already is.
+    withWorkflows([]);
+    arrange(vi.fn());
+
+    render(<POApprovalSettings />);
+
+    expect(
+      await screen.findByText(/or clear the approval threshold/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/turn the requirement off/i)).toBeNull();
+  });
+
   it("sends the threshold it was given", async () => {
     const mutateAsync = vi.fn().mockResolvedValue({});
     arrange(mutateAsync);
@@ -257,12 +272,12 @@ describe("POApprovalSettings", () => {
         ["purchase_orders:read", "purchase_orders:write"],
         /only an administrator can open module settings/i,
       ],
-      // A viewer lacks the broader right, and is told that one — the same
-      // two sentences the Production settings give.
+      // A viewer sees no values either, so it gets the same sentence rather
+      // than "you can view this" above an empty page.
       [
         "a viewer",
         ["purchase_orders:read"],
-        /you can view this, not change it/i,
+        /only an administrator can open module settings/i,
       ],
     ])("offers no save surface to %s", async (_who, grants, notice) => {
       signInWith(grants);

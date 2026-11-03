@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { ReorderRule, ReplenishmentAlert } from "../api/reorder-rules";
 import { formatQuantityValue } from "@/utils/formatters";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface ReorderRulesTableProps {
   rules: ReorderRule[];
@@ -53,6 +54,7 @@ export function ReorderRulesTable({
   catalogEmpty,
 }: ReorderRulesTableProps) {
   const { t } = useTranslation("purchase_orders");
+  const isPhone = useMediaQuery("(max-width: 767px)");
 
   if (isLoading) {
     return (
@@ -90,6 +92,95 @@ export function ReorderRulesTable({
           )
         }
       />
+    );
+  }
+
+  const actions = (rule: ReorderRule) => (
+    <div className="flex justify-end gap-1">
+      <Button
+        variant="ghost"
+        size="iconSm"
+        aria-label={`${t("common:actions.edit")} ${rowName(rule)}`}
+        title={t("common:actions.edit")}
+        onClick={() => onEdit(rule)}
+      >
+        <Pencil size={14} />
+      </Button>
+      <Button
+        variant="ghostDanger"
+        size="iconSm"
+        aria-label={`${t("common:actions.delete")} ${rowName(rule)}`}
+        title={t("common:actions.delete")}
+        onClick={() => onDelete(rule)}
+      >
+        <Trash2 size={14} />
+      </Button>
+    </div>
+  );
+
+  // A phone gets one card per rule: the seven columns of the table pushed
+  // safety stock, the supplier and the edit and delete buttons off the right
+  // edge, announced only by a scrollbar.
+  if (isPhone) {
+    return (
+      <Card>
+        <CardContent className="p-0">
+          <ul className="divide-y divide-surface-inset/60">
+            {rules.map((rule) => {
+              const alert = alertByRule.get(rule.id);
+              return (
+                <li key={rule.id} className="flex items-start gap-3 px-4 py-3">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="text-sm font-medium text-on">
+                      {rowName(rule)}
+                      {alert && (
+                        <span className="ml-2 inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                          <AlertTriangle size={10} />
+                          {t("reorderRules.low")}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs text-on-secondary">
+                      {locationName(rule.location_id)}
+                    </p>
+                    <dl className="grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        <dt className="text-on-muted">
+                          {t("reorderRules.min")}
+                        </dt>
+                        <dd className="text-on">
+                          {formatQuantityValue(rule.min_quantity)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-on-muted">
+                          {t("reorderRules.max")}
+                        </dt>
+                        <dd className="text-on">
+                          {formatQuantityValue(rule.max_quantity)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-on-muted">
+                          {t("reorderRules.safety")}
+                        </dt>
+                        <dd className="text-on">
+                          {formatQuantityValue(rule.safety_stock)}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="text-xs text-on-secondary">
+                      {t("reorderRules.preferredPartner")}:{" "}
+                      {partnerName(rule.preferred_partner_id)}
+                    </p>
+                  </div>
+                  {!readOnly && <div className="shrink-0">{actions(rule)}</div>}
+                </li>
+              );
+            })}
+          </ul>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -159,28 +250,7 @@ export function ReorderRulesTable({
                         `aria-label` and a tooltip — and the label names the
                         product the rule is about, so one row can be told
                         from the next (§11.4). */}
-                    {!readOnly && (
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="iconSm"
-                          aria-label={`${t("common:actions.edit")} ${rowName(rule)}`}
-                          title={t("common:actions.edit")}
-                          onClick={() => onEdit(rule)}
-                        >
-                          <Pencil size={14} />
-                        </Button>
-                        <Button
-                          variant="ghostDanger"
-                          size="iconSm"
-                          aria-label={`${t("common:actions.delete")} ${rowName(rule)}`}
-                          title={t("common:actions.delete")}
-                          onClick={() => onDelete(rule)}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    )}
+                    {!readOnly && actions(rule)}
                   </td>
                 </tr>
               );

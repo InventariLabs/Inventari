@@ -187,6 +187,8 @@
       "description": "Für Bestellungen existiert kein Genehmigungsworkflow, daher wird die Bestätigung abgelehnt. Legen Sie einen Workflow an oder deaktivieren Sie die Anforderung.",
       "action": "Workflow anlegen",
       "moduleDescription": "Das Modul Genehmigungen ist deaktiviert, eine Bestellung hat also keinen Warteplatz. Aktivieren Sie das Modul oder deaktivieren Sie die Anforderung.",
+      "descriptionThreshold": "Für Bestellungen existiert kein Genehmigungsworkflow, daher wird die Bestätigung oberhalb der Schwelle abgelehnt. Legen Sie einen Workflow an oder leeren Sie die Genehmigungsschwelle.",
+      "moduleDescriptionThreshold": "Das Modul Genehmigungen ist deaktiviert, eine Bestellung oberhalb der Schwelle hat also keinen Warteplatz. Aktivieren Sie das Modul oder leeren Sie die Genehmigungsschwelle.",
       "moduleAction": "Apps öffnen"
     }
   },
@@ -278,6 +280,7 @@
     "alertsTitle_other": "{{count}} Produkte unter Mindestbestand",
     "deleteConfirmTitle": "Regel löschen?",
     "maxPositive": "Max muss größer als 0 sein",
+    "maxBelowMin": "Das Maximum ({{max}}) darf nicht unter dem Minimum ({{min}}) liegen",
     "minPositive": "Min muss größer als 0 sein — das ist die Schwelle, die die Regel auslöst",
     "count_one": "Regel",
     "count_other": "Regeln",

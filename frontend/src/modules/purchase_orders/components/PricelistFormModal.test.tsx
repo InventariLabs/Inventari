@@ -108,10 +108,36 @@ describe("PricelistFormModal validation", () => {
   });
 
   it("calls onSave when every API rule is satisfied", async () => {
-    const onSave = renderModal({ ...emptyForm, unitPrice: "10" });
+    const onSave = renderModal({
+      ...emptyForm,
+      product: {
+        product_template_id: "tpl-1",
+        name: "Latte cups",
+        sku: null,
+        barcode: null,
+        brand: null,
+        uom_id: "uom-1",
+        uom_symbol: "pcs",
+        image_url: null,
+        is_stub: false,
+      },
+      unitPrice: "10",
+    });
     await userEvent.click(saveButton());
 
     expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocks save without a product and marks the product field required", async () => {
+    const onSave = renderModal({ ...emptyForm, unitPrice: "10" });
+    await userEvent.click(saveButton());
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByText("Select a product first")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: /Product/ })).toHaveAttribute(
+      "aria-required",
+      "true",
+    );
   });
 
   it("offers currency from a dictionary instead of free text", () => {

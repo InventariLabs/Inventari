@@ -95,9 +95,29 @@ export function ReorderRuleFormModal({
     t("reorderRules.maxPositive"),
   );
 
+  // A MAX below MIN could never be reached: the refusal sits on MAX, in the
+  // reader's words, not in a toast quoting the server's field names.
+  const maxBelowMinError =
+    !minQuantityError &&
+    !maxQuantityError &&
+    Number(form.maxQuantity) < Number(form.minQuantity)
+      ? t("reorderRules.maxBelowMin", {
+          min: form.minQuantity,
+          max: form.maxQuantity,
+        })
+      : undefined;
+  const productError =
+    !form.id && !form.product ? t("reorderRules.productRequired") : undefined;
+
   const handleSubmit = () => {
     setSubmitted(true);
-    if (minQuantityError || maxQuantityError) return;
+    if (
+      productError ||
+      minQuantityError ||
+      maxQuantityError ||
+      maxBelowMinError
+    )
+      return;
     onSave();
   };
 
@@ -125,6 +145,8 @@ export function ReorderRuleFormModal({
             onClear={() => onChange({ ...form, product: null })}
             search={searchProducts}
             placeholder={t("productPicker.search")}
+            required
+            error={submitted ? productError : undefined}
             renderNoResults={(query) => (
               <div className="space-y-1 p-3">
                 <p className="text-sm text-on-muted">
@@ -172,7 +194,9 @@ export function ReorderRuleFormModal({
             type="number"
             min="0"
             value={form.maxQuantity}
-            error={submitted ? maxQuantityError : undefined}
+            error={
+              submitted ? (maxQuantityError ?? maxBelowMinError) : undefined
+            }
             onChange={(e) => onChange({ ...form, maxQuantity: e.target.value })}
           />
           <Input

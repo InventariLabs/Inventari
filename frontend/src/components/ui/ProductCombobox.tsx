@@ -87,6 +87,10 @@ interface ProductComboboxProps<T extends ProductComboboxOption> {
   /** Longest text the box takes — a caller that creates from it passes the
    *  name column's limit, so the reader meets it while typing. */
   maxLength?: number;
+  /** Marks the field as required (star + announcement) without the browser's own submit blocking. */
+  required?: boolean;
+  /** The refusal, shown on the field itself. */
+  error?: string;
 }
 
 /**
@@ -141,6 +145,48 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
   );
 }
 
+/** The picked product under the box: its picture, name, SKU and the way to clear it. */
+function PickedProduct({
+  product,
+  onClear,
+}: {
+  product: ProductComboboxOption;
+  onClear?: () => void;
+}) {
+  const { t } = useTranslation("common");
+  return (
+    <div className="mt-2 flex items-center gap-2">
+      <div className="flex items-center gap-2 text-sm">
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt=""
+            loading="lazy"
+            className="w-8 h-8 rounded-md object-cover"
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-md bg-surface-raised flex items-center justify-center">
+            <Package size={14} className="text-on-muted" />
+          </div>
+        )}
+        <div>
+          <span className="font-medium text-on">{product.name}</span>
+          {readableSku(product.sku) && (
+            <span className="ml-2 font-mono text-xs text-on-secondary">
+              {readableSku(product.sku)}
+            </span>
+          )}
+        </div>
+      </div>
+      {onClear && (
+        <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+          {t("actions.clear")}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 /**
  * A single product is the smallest unit every inventory module manipulates,
  * so the search for it was implemented three times — the pricelist and
@@ -171,6 +217,8 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   debounceMs = 250,
   initialQuery,
   maxLength,
+  required,
+  error,
 }: ProductComboboxProps<T>) {
   const { t } = useTranslation("common");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -367,6 +415,8 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         aria-label={label ? undefined : placeholder}
         label={label}
         labelClassName={labelClassName}
+        aria-required={required ? "true" : undefined}
+        error={error}
         value={value ? value.name : query}
         onChange={(e) => setQuery(e.target.value)}
         maxLength={maxLength}
@@ -382,37 +432,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         data-testid={testId ? `${testId}-input` : undefined}
       />
 
-      {value && (
-        <div className="mt-2 flex items-center gap-2">
-          <div className="flex items-center gap-2 text-sm">
-            {value.image_url ? (
-              <img
-                src={value.image_url}
-                alt=""
-                loading="lazy"
-                className="w-8 h-8 rounded-md object-cover"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-md bg-surface-raised flex items-center justify-center">
-                <Package size={14} className="text-on-muted" />
-              </div>
-            )}
-            <div>
-              <span className="font-medium text-on">{value.name}</span>
-              {readableSku(value.sku) && (
-                <span className="ml-2 font-mono text-xs text-on-secondary">
-                  {readableSku(value.sku)}
-                </span>
-              )}
-            </div>
-          </div>
-          {onClear && (
-            <Button type="button" variant="ghost" size="sm" onClick={onClear}>
-              {t("actions.clear")}
-            </Button>
-          )}
-        </div>
-      )}
+      {value && <PickedProduct product={value} onClear={onClear} />}
 
       {dropdownOpen &&
         panelPos &&

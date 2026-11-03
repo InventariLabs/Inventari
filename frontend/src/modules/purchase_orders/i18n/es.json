@@ -187,6 +187,8 @@
       "description": "No existe ningún flujo de aprobación para las órdenes de compra, así que confirmar una será rechazado. Cree el flujo o desactive el requisito.",
       "action": "Crear flujo",
       "moduleDescription": "El módulo Aprobaciones está desactivado, así que una orden no tiene dónde esperar. Actívelo o desactive el requisito.",
+      "descriptionThreshold": "No existe ningún flujo de aprobación para las órdenes de compra, así que confirmar una por encima del umbral será rechazado. Cree el flujo o vacíe el umbral de aprobación.",
+      "moduleDescriptionThreshold": "El módulo Aprobaciones está desactivado, así que una orden por encima del umbral no tiene dónde esperar. Actívelo o vacíe el umbral de aprobación.",
       "moduleAction": "Abrir aplicaciones"
     }
   },
@@ -278,6 +280,7 @@
     "alertsTitle_other": "{{count}} productos por debajo del stock mínimo",
     "deleteConfirmTitle": "¿Eliminar la regla?",
     "maxPositive": "El máximo debe ser mayor que 0",
+    "maxBelowMin": "El máximo ({{max}}) no puede ser inferior al mínimo ({{min}})",
     "minPositive": "El mínimo debe ser mayor que 0 — es el umbral que activa la regla",
     "count_one": "regla",
     "count_other": "reglas",
