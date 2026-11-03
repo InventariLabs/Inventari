@@ -87,6 +87,9 @@ export function useActionDraft(initialType: DocumentType) {
   const picker = useDocumentPartnerOptions({ type: docType }, partnerId);
   const [attempted, setAttempted] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
+  // "No lines" is a fact about the list, not a failed post: it holds only
+  // while the list is empty, and goes the moment a line exists.
+  const [noLinesAsked, setNoLinesAsked] = useState(false);
   const post = usePostNewDocument();
   // What other modules' fields on the screen save before the press is sent.
   const extensions = useDraftExtensions();
@@ -145,10 +148,8 @@ export function useActionDraft(initialType: DocumentType) {
     if (preparing.current) return;
     setAttempted(true);
     setPostError(null);
-    if (entered.length === 0) {
-      setPostError(t("lines.noLines"));
-      return;
-    }
+    setNoLinesAsked(entered.length === 0);
+    if (entered.length === 0) return;
     const refused = workspace.validateForm(picker.selectedPartnerOffered);
     if (Object.keys(refused).length > 0) {
       focusFirstInvalid();
@@ -212,7 +213,9 @@ export function useActionDraft(initialType: DocumentType) {
     extensions,
     entered,
     errors,
-    postError,
+    postError:
+      postError ??
+      (noLinesAsked && entered.length === 0 ? t("lines.noLines") : null),
     isPosting: post.isPending || isPreparing,
     submit,
   };
