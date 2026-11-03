@@ -110,7 +110,7 @@ describe("MyAssetsPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Show" }));
     expect(await screen.findByText("Old Phone")).toBeInTheDocument();
-    expect(screen.getByText("GOOD")).toBeInTheDocument();
+    expect(screen.getByText("Good")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Hide" }));
     expect(screen.queryByText("Old Phone")).not.toBeInTheDocument();
