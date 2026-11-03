@@ -417,7 +417,9 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
         </MemoryRouter>,
       );
 
-      expect(storageTrigger()).toHaveTextContent("Select the To location");
+      expect(storageTrigger()).toHaveTextContent(
+        "Choose where the output goes",
+      );
     });
 
     it("offers the location the last batch went to", () => {
@@ -483,7 +485,9 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
         </MemoryRouter>,
       );
 
-      expect(storageTrigger()).toHaveTextContent("Select the To location");
+      expect(storageTrigger()).toHaveTextContent(
+        "Choose where the output goes",
+      );
     });
 
     it("ignores a remembered location that no longer exists", () => {
@@ -502,7 +506,9 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
         </MemoryRouter>,
       );
 
-      expect(storageTrigger()).toHaveTextContent("Select the To location");
+      expect(storageTrigger()).toHaveTextContent(
+        "Choose where the output goes",
+      );
     });
   });
 

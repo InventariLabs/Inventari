@@ -76,7 +76,7 @@
     "change": "Change",
     "qtyLabel": "How much to make?",
     "storageLabel": "To location",
-    "storagePlaceholder": "Select the To location",
+    "storagePlaceholder": "Choose where the output goes",
     "storageSearchPlaceholder": "Search by name or path…",
     "storageEmpty": "No location matches",
     "notesLabel": "Notes (optional)",
