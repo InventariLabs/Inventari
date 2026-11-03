@@ -1374,7 +1374,7 @@
       "scanPrompt": "Skanuj następny produkt, w dowolnej kolejności",
       "scanLocation": "Zeskanuj etykietę miejsca",
       "scanned": "Zeskanowano",
-      "ordered": "Zamówiono {{quantity}}",
+      "ordered": "Pozostało {{quantity}}",
       "countedSoFar": "dotąd policzono {{quantity}}",
       "howMany": "Ile przyjechało: {{name}}",
       "arrived": "{{unit}} przyjechało",
@@ -1934,7 +1934,7 @@
     },
     "todo": {
       "count": "{{shown}} z {{total}}",
-      "footnote": "Zadania biorą się same z zamówień zakupu i sprzedaży, zleceń produkcji, akceptacji i harmonogramu liczenia."
+      "footnote": "Zadania biorą się same z zamówień zakupu, dokumentów wydania, zleceń produkcji, akceptacji i harmonogramu liczenia."
     },
     "feed": {
       "title": "Dziś w magazynie",
@@ -2201,7 +2201,7 @@
     "addPrices": "Dodaj ceny dla księgowości",
     "hidePrices": "Ukryj ceny",
     "product": "Produkt",
-    "ordered": "Zamówiono",
+    "ordered": "Pozostało",
     "received": "Przyjechało",
     "putOn": "Połóż na",
     "unitPrice": "Cena netto",

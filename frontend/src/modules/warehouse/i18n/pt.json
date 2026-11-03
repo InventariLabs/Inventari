@@ -1237,7 +1237,7 @@
       "scanPrompt": "Escaneie o próximo produto, em qualquer ordem",
       "scanLocation": "Escaneie a etiqueta do local",
       "scanned": "Escaneado",
-      "ordered": "Pedido {{quantity}}",
+      "ordered": "Pendente {{quantity}}",
       "countedSoFar": "{{quantity}} contados até agora",
       "howMany": "Quantos de {{name}} chegaram",
       "arrived": "{{unit}} chegaram",
@@ -1753,7 +1753,7 @@
     },
     "todo": {
       "count": "{{shown}} de {{total}}",
-      "footnote": "As tarefas surgem sozinhas a partir de pedidos de compra e de venda, ordens de produção, aprovações e do calendário de contagens."
+      "footnote": "As tarefas surgem sozinhas a partir de pedidos de compra, documentos de expedição, ordens de produção, aprovações e do calendário de contagens."
     },
     "feed": {
       "title": "Atividade de hoje",
@@ -1990,7 +1990,7 @@
     "addPrices": "Adicionar preços para a contabilidade",
     "hidePrices": "Ocultar preços",
     "product": "Produto",
-    "ordered": "Pedido",
+    "ordered": "Pendente",
     "received": "Chegou",
     "putOn": "Guardar em",
     "unitPrice": "Preço unitário",

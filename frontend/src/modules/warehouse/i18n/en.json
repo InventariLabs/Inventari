@@ -129,8 +129,8 @@
     "createNewPartner": "+ Create new partner",
     "enablePartnersNotice": "Enable the Partners module to assign a supplier or customer.",
     "enablePartnersLink": "Enable Partners",
-    "selectSource": "Select the From location",
-    "selectTarget": "Select the To location",
+    "selectSource": "Choose where the goods come from",
+    "selectTarget": "Choose where the goods go",
     "notesPlaceholder": "Add notes or remarks…",
     "missingValueWarning": "Some lines have no unit price — this document has no accounting value. A price can be suggested from your price books or past purchase documents when you pick a product.",
     "missingValueWarningNoSource": "Some lines have no unit price — this document has no accounting value. No price came from your price books or past purchases for these products, so enter it manually."
@@ -1262,7 +1262,7 @@
       "scanPrompt": "Scan the next product, in any order",
       "scanLocation": "Scan the location label",
       "scanned": "Scanned",
-      "ordered": "Ordered {{quantity}}",
+      "ordered": "Still due {{quantity}}",
       "countedSoFar": "{{quantity}} counted so far",
       "howMany": "How many of {{name}} arrived",
       "arrived": "{{unit}} arrived",
@@ -1808,7 +1808,7 @@
     },
     "todo": {
       "count": "{{shown}} of {{total}}",
-      "footnote": "Tasks come by themselves from purchase and sales orders, production orders, approvals and the count schedule."
+      "footnote": "Tasks come by themselves from purchase orders, dispatch documents, production orders, approvals and the count schedule."
     },
     "feed": {
       "title": "Today's activity",
@@ -2045,7 +2045,7 @@
     "addPrices": "Add prices for accounting",
     "hidePrices": "Hide prices",
     "product": "Product",
-    "ordered": "Ordered",
+    "ordered": "Still due",
     "received": "Arrived",
     "putOn": "Put on",
     "unitPrice": "Unit price",
