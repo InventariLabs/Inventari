@@ -26,7 +26,7 @@
     "card": {
       "qty": "Prévue",
       "cost": "Coût",
-      "resultPerUnit": "({{amount}} / unité)",
+      "resultPerUnit": "({{amount}} / {{unit}})",
       "shortage_one": "Stock insuffisant : {{count}} ingrédient manquant. La clôture sera refusée.",
       "shortage_other": "Stock insuffisant : {{count}} ingrédients manquants. La clôture sera refusée."
     },
@@ -189,7 +189,7 @@
       "plannedSuffix": "prévu : {{qty}}",
       "scrap": "Perte",
       "overproduced": "Surproduction",
-      "resultPerUnit": "({{amount}} / unité)",
+      "resultPerUnit": "({{amount}} / {{unit}})",
       "totalCostAfterClosing": "Coût total après clôture",
       "unitCost": "{{amount}} par unité produite",
       "totalCostGap_one": "{{count}} ingrédient a été prélevé sur un stock sans coût, il manque donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",

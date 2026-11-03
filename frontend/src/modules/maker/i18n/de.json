@@ -26,7 +26,7 @@
     "card": {
       "qty": "Geplant",
       "cost": "Kosten",
-      "resultPerUnit": "({{amount}} pro Stück)",
+      "resultPerUnit": "({{amount}} pro {{unit}})",
       "shortage_one": "Kein Bestand: {{count}} Zutat fehlt. Abschluss wird abgelehnt.",
       "shortage_other": "Kein Bestand: {{count}} Zutaten fehlen. Abschluss wird abgelehnt."
     },
@@ -189,7 +189,7 @@
       "plannedSuffix": "geplant: {{qty}}",
       "scrap": "Ausschuss",
       "overproduced": "Mehrproduktion",
-      "resultPerUnit": "({{amount}} pro Stück)",
+      "resultPerUnit": "({{amount}} pro {{unit}})",
       "totalCostAfterClosing": "Gesamtkosten nach Abschluss",
       "unitCost": "{{amount}} pro erzeugter Einheit",
       "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",

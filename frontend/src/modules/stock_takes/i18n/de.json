@@ -100,6 +100,7 @@
     "increaseCount": "Eins mehr: {{name}}",
     "saveCount": "Zählung speichern: {{name}}",
     "countFor": "Gezählte Menge: {{name}}",
+    "countMalformed": "Das ist keine Zahl. Geben Sie Ziffern mit höchstens einem Dezimalzeichen ein, zum Beispiel 12 oder 1,5.",
     "unsaved": "Nicht gespeichert",
     "awaitingRecount": "Erneut zählen",
     "countAgain": "{{name}} erneut zählen",
@@ -161,7 +162,9 @@
     "unitDecimals_one": "{{unit}} wird auf {{count}} Nachkommastelle gezählt — nicht genauer.",
     "unitDecimals_other": "{{unit}} wird auf {{count}} Nachkommastellen gezählt — nicht genauer.",
     "unexplainedDifferences_one": "Eine gezählte Menge weicht stärker ab als die Toleranz und nennt keinen Grund. Geben Sie einen Grund an und schließen Sie die Inventur dann ab.",
-    "unexplainedDifferences_other": "{{count}} gezählte Mengen weichen stärker ab als die Toleranz und nennen keinen Grund. Geben Sie für jede einen Grund an und schließen Sie die Inventur dann ab."
+    "unexplainedDifferences_other": "{{count}} gezählte Mengen weichen stärker ab als die Toleranz und nennen keinen Grund. Geben Sie für jede einen Grund an und schließen Sie die Inventur dann ab.",
+    "uncountedRemaining_one": "Ein Produkt ist noch nicht gezählt. Zählen Sie es und schließen Sie die Inventur dann ab.",
+    "uncountedRemaining_other": "{{count}} Produkte sind noch nicht gezählt. Zählen Sie sie und schließen Sie die Inventur dann ab."
   },
   "blindModeActive": "Blindmodus aktiv — erwartete Mengen sind ausgeblendet.",
   "statuses": {

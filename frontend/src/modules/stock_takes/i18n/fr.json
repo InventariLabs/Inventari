@@ -100,6 +100,7 @@
     "increaseCount": "Un de plus : {{name}}",
     "saveCount": "Enregistrer le comptage : {{name}}",
     "countFor": "Quantité comptée : {{name}}",
+    "countMalformed": "Ce n'est pas un nombre. Saisissez des chiffres avec un seul séparateur décimal, par exemple 12 ou 1,5.",
     "unsaved": "Non enregistré",
     "awaitingRecount": "À recompter",
     "countAgain": "Recompter {{name}}",
@@ -161,7 +162,9 @@
     "unitDecimals_one": "{{unit}} se compte à {{count}} décimale près — pas plus fin.",
     "unitDecimals_other": "{{unit}} se compte à {{count}} décimales près — pas plus fin.",
     "unexplainedDifferences_one": "Une quantité comptée s'écarte au-delà de la tolérance sans indiquer pourquoi. Donnez-lui un motif, puis terminez l'inventaire.",
-    "unexplainedDifferences_other": "{{count}} quantités comptées s'écartent au-delà de la tolérance sans indiquer pourquoi. Donnez un motif à chacune, puis terminez l'inventaire."
+    "unexplainedDifferences_other": "{{count}} quantités comptées s'écartent au-delà de la tolérance sans indiquer pourquoi. Donnez un motif à chacune, puis terminez l'inventaire.",
+    "uncountedRemaining_one": "Un produit n'est pas encore compté. Comptez-le, puis terminez l'inventaire.",
+    "uncountedRemaining_other": "{{count}} produits ne sont pas encore comptés. Comptez-les, puis terminez l'inventaire."
   },
   "blindModeActive": "Mode aveugle actif — les quantités attendues sont masquées.",
   "statuses": {

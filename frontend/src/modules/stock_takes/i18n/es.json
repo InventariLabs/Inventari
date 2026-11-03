@@ -100,6 +100,7 @@
     "increaseCount": "Uno más: {{name}}",
     "saveCount": "Guardar el recuento: {{name}}",
     "countFor": "Cantidad contada: {{name}}",
+    "countMalformed": "Eso no es un número. Escribe cifras con un solo separador decimal, por ejemplo 12 o 1,5.",
     "unsaved": "Sin guardar",
     "awaitingRecount": "Volver a contar",
     "countAgain": "Contar {{name}} otra vez",
@@ -161,7 +162,9 @@
     "unitDecimals_one": "{{unit}} se cuenta con {{count}} decimal — no más fino.",
     "unitDecimals_other": "{{unit}} se cuenta con {{count}} decimales — no más fino.",
     "unexplainedDifferences_one": "Una cantidad contada difiere más que la tolerancia y no indica el motivo. Dale un motivo y luego finaliza el inventario.",
-    "unexplainedDifferences_other": "{{count}} cantidades contadas difieren más que la tolerancia y no indican el motivo. Da un motivo a cada una y luego finaliza el inventario."
+    "unexplainedDifferences_other": "{{count}} cantidades contadas difieren más que la tolerancia y no indican el motivo. Da un motivo a cada una y luego finaliza el inventario.",
+    "uncountedRemaining_one": "Queda un producto sin contar. Cuéntalo y luego finaliza el inventario.",
+    "uncountedRemaining_other": "Quedan {{count}} productos sin contar. Cuéntalos y luego finaliza el inventario."
   },
   "blindModeActive": "Modo ciego activo — las cantidades esperadas están ocultas.",
   "statuses": {
