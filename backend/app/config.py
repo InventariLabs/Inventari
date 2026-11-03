@@ -333,9 +333,8 @@ elif settings.SECRET_KEY in _WEAK_SECRET_KEYS:
             'Generate a proper one: python -c "import secrets; print(secrets.token_urlsafe(32))"'
         )
     _logger.warning(
-        'SECRET_KEY is a known weak value (%s***). This is acceptable in '
-        'DEBUG/TESTING mode but must be changed for production.',
-        settings.SECRET_KEY[:4],
+        'SECRET_KEY is a known weak value. This is acceptable in '
+        'DEBUG/TESTING mode but must be changed for production.'
     )
 
 # Enforce minimum key length for HS256 (NIST SP 800-107: >= 256-bit / 32 bytes).
