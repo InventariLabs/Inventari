@@ -128,7 +128,7 @@ async def delete_item(
         snapshot={
             'name': item.name,
             'barcode': item.barcode,
-            'old_quantity': quantise(old_quantity or Decimal('0'), 3),
+            'old_quantity': quantise(Decimal(str(old_quantity or 0)), 3),
         },
         reason=reason,
         meta_data={'notes': notes} if notes else None,
