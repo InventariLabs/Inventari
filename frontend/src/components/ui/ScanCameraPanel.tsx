@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { RefreshCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { useTorchAvailable } from "@/hooks/useTorchAvailable";
 
 interface ScanCameraPanelProps {
   /** Whether the panel is on screen. The camera itself is the caller's hook. */
@@ -98,6 +99,7 @@ export function ScanCameraPanel({
 }: ScanCameraPanelProps) {
   const { t } = useTranslation(["scan", "common"]);
   const { slotRef, boxRef, pin, height } = usePinnedBox(pinned && open);
+  const hasTorch = useTorchAvailable();
 
   if (!open) return null;
 
@@ -126,7 +128,7 @@ export function ScanCameraPanel({
               and the button would land on the black beside it. */}
           <div className="relative mx-auto w-full max-w-sm">
             <div id="qr-reader" className="w-full" />
-            {isCameraActive && (
+            {isCameraActive && hasTorch && (
               <Button
                 type="button"
                 variant="ghost"

@@ -260,6 +260,7 @@
     "purchase_price": "Precio de compra por unidad",
     "barcode": "Código de producto",
     "generateCode": "Generar código",
+    "scanCode": "Escanear el código del producto",
     "sku": "SKU",
     "serial_number": "Número de serie",
     "purchasePriceUnitHint": "Por 1 {{unit}} — no el importe pagado por toda la cantidad.",

@@ -10,6 +10,11 @@ import type {
   LineItemsScanState,
 } from "./types";
 
+const torch = vi.hoisted(() => ({ available: true }));
+vi.mock("@/hooks/useTorchAvailable", () => ({
+  useTorchAvailable: () => torch.available,
+}));
+
 const makeLabels = (): LineItemsEditorLabels => ({
   lines: "Lines",
   addLine: "Add Line",
@@ -196,6 +201,16 @@ describe("LineItemsEditor", () => {
       screen.getByRole("button", { name: "Torch on" }),
     );
     expect(box).toContainElement(document.getElementById("qr-reader"));
+  });
+
+  it("draws no torch button on a camera that has no torch", () => {
+    torch.available = false;
+    const scan = makeScan({ open: true, cameraActive: true });
+    render(<LineItemsEditor {...makeProps()} scan={scan} />);
+    torch.available = true;
+    expect(
+      screen.queryByRole("button", { name: "Torch on" }),
+    ).not.toBeInTheDocument();
   });
 
   it("narrows the camera box so the square camera cannot fill a desktop dialog", () => {

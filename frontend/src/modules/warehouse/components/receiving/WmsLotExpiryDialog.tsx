@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
+import { ScanToFill } from "@/module-sdk";
 import { Sheet, SheetActions, SheetBody } from "@/components/ui/Sheet";
 
 interface Props {
@@ -39,9 +40,12 @@ export default function WmsLotExpiryDialog({
   const [batchNumber, setBatchNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
-  const lotRef = useRef<HTMLInputElement>(null);
-  // The lot is read first, so the cursor starts there.
-  useEffect(() => lotRef.current?.focus(), []);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  // The sheet focuses its first field, and on a phone that raises the
+  // keyboard over the expiry date the reader came to fill. The lot is read by
+  // the camera as readily as typed, so the title takes the focus instead —
+  // this runs after the sheet's own.
+  useEffect(() => titleRef.current?.focus(), []);
 
   const confirm = () => {
     if (!expiryDate) {
@@ -60,7 +64,11 @@ export default function WmsLotExpiryDialog({
       aria-label={t("receiving.lotExpiry.title")}
     >
       <SheetBody className="p-5">
-        <h3 className="text-base font-semibold text-on">
+        <h3
+          ref={titleRef}
+          tabIndex={-1}
+          className="text-base font-semibold text-on outline-none"
+        >
           {t("receiving.lotExpiry.title")}
         </h3>
         <p className="mt-1 text-sm text-on-secondary">
@@ -83,7 +91,10 @@ export default function WmsLotExpiryDialog({
             onChange={(e) => setBatchNumber(e.target.value)}
             placeholder={t("receiving.lotExpiry.lotPlaceholder")}
             maxLength={100}
-            ref={lotRef}
+          />
+          <ScanToFill
+            label={t("receiving.lotExpiry.scanLot")}
+            onCode={(code) => setBatchNumber(code.slice(0, 100))}
           />
           <DateInput
             label={t("receiving.lotExpiry.expiry")}

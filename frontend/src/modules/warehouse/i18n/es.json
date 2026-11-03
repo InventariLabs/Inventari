@@ -501,6 +501,8 @@
     "executionSummary": "Hecho {{done}} / Planificado {{expected}}",
     "executionSummaryPerUnit": "Hecho: {{progress}}",
     "correctionSummary": "Corrección: +{{added}} / −{{removed}}",
+    "correctionAddsToStock": "entra en el stock",
+    "correctionTakesFromStock": "sale del stock",
     "snapshotTitle": "Resumen operativo",
     "snapshotLines": "Líneas de artículo",
     "snapshotPlanned": "Cant. planificada",
@@ -738,6 +740,8 @@
     "createSubtitle": "Ajustar cantidades para documento {{number}}",
     "new": "Nueva corrección",
     "warning": "Esto creará un nuevo documento de corrección. Los niveles de stock se ajustarán al completarse.",
+    "directionReceipt": "Un cambio positivo añade mercancía al stock; uno negativo la retira.",
+    "directionDispatch": "Un cambio positivo significa que se entregó más y retira la mercancía del stock; uno negativo, que se entregó menos y la devuelve al stock.",
     "executed": "Ejecutado",
     "delta": "Cambio",
     "minDelta": "Puedes quitar como máximo {{max}}",
@@ -1362,6 +1366,7 @@
       "hint": "Este producto sale del estante por la caducidad más próxima. Lee ambos datos del envase.",
       "lot": "Lote",
       "lotPlaceholder": "Número de lote (opcional)",
+      "scanLot": "Escanear el número de lote",
       "expiry": "Fecha de caducidad",
       "expiryRequired": "Introduce la fecha de caducidad del envase",
       "confirm": "Recibir"
@@ -2149,6 +2154,13 @@
       "body": "La mercancía ha salido del stock.",
       "another": "Entregar más",
       "undoneTitle": "Salida deshecha"
+    },
+    "writeOff": {
+      "title_one": "{{count}} artículo desechado",
+      "title_other": "{{count}} artículos desechados",
+      "body": "La mercancía se ha dado de baja del stock.",
+      "another": "Desechar más",
+      "undoneTitle": "Baja deshecha"
     },
     "move": {
       "title_one": "{{count}} artículo trasladado",

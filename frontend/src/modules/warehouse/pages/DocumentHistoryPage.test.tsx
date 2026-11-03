@@ -204,6 +204,33 @@ describe("DocumentHistoryPage", () => {
     expect(screen.queryByText(/1[\s,.]?284/)).not.toBeInTheDocument();
   });
 
+  it("gives a transfer the same columns as the rows that quote an amount", () => {
+    // A row with one track fewer put its document and author further right
+    // than the rows around it.
+    valueTracking = true;
+    answer([
+      doc({
+        id: "receipt",
+        total_gross: "1284.00",
+        currency: "PLN",
+        lines: [line("A", "1")],
+      }),
+      doc({ id: "move", type: "INT", number: "MM/2026/031" }),
+    ]);
+
+    renderWithProviders(<DocumentHistoryPage />);
+
+    const rows = screen
+      .getAllByRole("listitem")
+      .filter((li) => li.className.includes("sm:grid"));
+    expect(rows).toHaveLength(2);
+    const tracks = rows.map((row) =>
+      [...row.className.matchAll(/sm:grid-cols-\[[^\]]+\]/g)].join(),
+    );
+    expect(tracks[1]).toBe(tracks[0]);
+    expect(rows[1].lastElementChild).toHaveTextContent("—");
+  });
+
   it("narrows by the kind of action", async () => {
     renderWithProviders(<DocumentHistoryPage />);
     await userEvent.click(screen.getByRole("tab", { name: "Receipts" }));

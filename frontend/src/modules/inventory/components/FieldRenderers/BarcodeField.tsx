@@ -1,6 +1,7 @@
 import { Barcode } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
+import { ScanToFill } from "@/module-sdk";
 import { useGenerateProductCode } from "@/modules/inventory/hooks/useItemMutations";
 import type { FieldDefinition } from "@/types";
 import { DefaultInputField } from "./DefaultInputField";
@@ -14,7 +15,8 @@ interface BarcodeFieldProps {
 }
 
 /**
- * The product code, with a way to get one for a product that came without.
+ * The product code: read off the pack by the camera, or — for a product that
+ * came without — generated.
  *
  * A workshop's own goods carry no manufacturer's code, and the field was the
  * one place a scan door looks a product up by — so "Generate code" fills it
@@ -34,29 +36,35 @@ export function BarcodeField({
   const empty = String(value ?? "").trim() === "";
 
   return (
-    <div className="flex items-start gap-2">
-      <div className="flex-1 min-w-0">
-        <DefaultInputField
-          id={id}
-          field={field}
-          value={value}
-          error={error}
-          onChange={onChange}
-        />
+    <div className="space-y-2">
+      <div className="flex items-start gap-2">
+        <div className="flex-1 min-w-0">
+          <DefaultInputField
+            id={id}
+            field={field}
+            value={value}
+            error={error}
+            onChange={onChange}
+          />
+        </div>
+        {empty && (
+          <Button
+            type="button"
+            variant="outline"
+            leftIcon={<Barcode size={16} />}
+            isLoading={generate.isPending}
+            onClick={() =>
+              generate.mutate(undefined, {
+                onSuccess: (code) => onChange(code),
+              })
+            }
+          >
+            {t("fields.generateCode")}
+          </Button>
+        )}
       </div>
-      {empty && (
-        <Button
-          type="button"
-          variant="outline"
-          leftIcon={<Barcode size={16} />}
-          isLoading={generate.isPending}
-          onClick={() =>
-            generate.mutate(undefined, { onSuccess: (code) => onChange(code) })
-          }
-        >
-          {t("fields.generateCode")}
-        </Button>
-      )}
+      {/* The code printed on the product is read, not retyped. */}
+      <ScanToFill label={t("fields.scanCode")} onCode={onChange} />
     </div>
   );
 }

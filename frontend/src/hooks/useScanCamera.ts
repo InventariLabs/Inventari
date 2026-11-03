@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useSyncExternalStore } from "react";
+import { setTorchAvailable } from "@/hooks/useTorchAvailable";
 import { logger } from "@/utils/logger";
 import { cameraErrorMessage } from "@/lib/cameraErrors";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
@@ -169,6 +170,13 @@ export function absorbReaderPlayAbort() {
   proto.play = absorbing;
 }
 
+/** Whether a camera track can switch a torch on, by what the track reports. */
+function hasTorch(track: MediaStreamTrack | null | undefined): boolean {
+  const capabilities = track?.getCapabilities?.() as
+    (MediaTrackCapabilities & { torch?: boolean }) | undefined;
+  return Boolean(capabilities?.torch);
+}
+
 const readerIsMounted = () => !!document.getElementById("qr-reader");
 
 function subscribeToReader(notify: () => void) {
@@ -266,6 +274,7 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
     }
     setScannerError(null);
     setIsTorchOn(false);
+    setTorchAvailable(false);
     setIsCameraRunning(false);
     setIsCameraActive(false);
     restartTimerRef.current = window.setTimeout(() => {
@@ -327,10 +336,8 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
         const stream = video?.srcObject;
         const track =
           stream instanceof MediaStream ? stream.getVideoTracks()[0] : null;
-        const capabilities = track?.getCapabilities?.() as
-          (MediaTrackCapabilities & { torch?: boolean }) | undefined;
 
-        if (!capabilities?.torch) {
+        if (!hasTorch(track)) {
           toast.error(tScan("flashlightNotSupported"));
           return;
         }
@@ -519,6 +526,7 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
                 if (isMounted) restartCameraRef.current();
               }),
             );
+            setTorchAvailable(hasTorch(stream?.getVideoTracks?.()[0]));
           }
         } catch (err) {
           logger.error("Camera start error:", err);
@@ -556,6 +564,7 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
       // or the component goes away, and in every one of those cases nothing is
       // delivering frames any more.
       setIsCameraRunning(false);
+      setTorchAvailable(false);
 
       if (!isStarting && scannerRef.current) {
         const stopScanner = async () => {

@@ -14,10 +14,7 @@ import { HistoryRow } from "@/modules/warehouse/components/HistoryRow";
 import { useDocumentHistory } from "@/modules/warehouse/hooks/useDocumentHistory";
 import { useDocumentProfile } from "@/modules/warehouse/hooks/useDocumentProfile";
 import { HISTORY_CHIPS } from "@/modules/warehouse/historyEntry";
-import {
-  showsDocumentValue,
-  type DocumentType,
-} from "@/modules/warehouse/types";
+import type { DocumentType } from "@/modules/warehouse/types";
 
 /**
  * Everything that moved goods, in plain words, with the document that proves
@@ -112,7 +109,7 @@ export default function DocumentHistoryPage() {
                   <HistoryRow
                     key={doc.id}
                     doc={doc}
-                    showValue={showsDocumentValue(doc.type, tracksValue)}
+                    tracksValue={tracksValue}
                     columns={history.moduleColumns}
                   />
                 ))}

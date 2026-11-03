@@ -114,6 +114,26 @@ describe("CorrectionFormModal", () => {
     expect(mutateMock).not.toHaveBeenCalled();
   });
 
+  it("says in the banner which way a difference moves stock", () => {
+    const { unmount } = render(
+      <CorrectionFormModal document={makeDocument()} onClose={vi.fn()} />,
+    );
+    expect(
+      screen.getByText(/A positive change adds goods to stock/),
+    ).toBeInTheDocument();
+    unmount();
+
+    render(
+      <CorrectionFormModal
+        document={makeDocument({ type: "OUT" })}
+        onClose={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByText(/more was issued and takes goods off stock/),
+    ).toBeInTheDocument();
+  });
+
   it("does not clamp a positive delta", async () => {
     render(<CorrectionFormModal document={makeDocument()} onClose={vi.fn()} />);
 

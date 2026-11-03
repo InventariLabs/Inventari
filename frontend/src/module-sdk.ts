@@ -117,6 +117,10 @@ export { SelectionToolbar } from "@/components/ui/SelectionToolbar";
 export { useFocusTrap } from "@/hooks/useFocusTrap";
 export { registerOverlaySheet } from "@/components/ui/overlayStack";
 export { ScanCameraPanel } from "@/components/ui/ScanCameraPanel";
+// A button that fills one field from a printed code with the camera, and the
+// fact a camera view needs to draw its own torch button only when there is one.
+export { ScanToFill } from "@/components/ui/ScanToFill";
+export { useTorchAvailable } from "@/hooks/useTorchAvailable";
 export { scanLookupError } from "@/lib/scan/toastScanError";
 
 // Where goods stand. A screen never holds the organization's locations: it

@@ -1,10 +1,7 @@
-import { useId, useState } from "react";
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import { Camera } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { ScanCameraPanel } from "@/components/ui/ScanCameraPanel";
-import { useScanCamera } from "@/hooks/useScanCamera";
+import { ScanToFill } from "@/module-sdk";
 import { useCarrierSuggestions } from "@/modules/warehouse/hooks/useCarrierSuggestions";
 import type { ShipmentDraft } from "./shipmentDraft";
 
@@ -33,20 +30,6 @@ export function ShipmentFields({ value, onChange, error }: Props) {
   // offered instead of passing for an organization with no carriers yet.
   const { data: carriers = [], isError } = useCarrierSuggestions();
   const listId = `${useId()}-carriers`;
-  const [cameraOpen, setCameraOpen] = useState(false);
-  const closeCamera = () => {
-    camera.setIsCameraActive(false);
-    setCameraOpen(false);
-  };
-  // One read fills the field and puts the camera away: a parcel has one
-  // number, and a camera left running would overwrite a correction.
-  const camera = useScanCamera({
-    onCodeScanned: (code) => {
-      onChange({ ...value, trackingNumber: code.trim().slice(0, 100) });
-      closeCamera();
-    },
-  });
-
   return (
     <fieldset className="space-y-3">
       <legend className="text-sm font-semibold text-on">
@@ -77,29 +60,12 @@ export function ShipmentFields({ value, onChange, error }: Props) {
           }
         />
       </div>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        leftIcon={<Camera size={16} />}
-        aria-pressed={cameraOpen}
-        onClick={() => {
-          if (cameraOpen) return closeCamera();
-          camera.restartCamera();
-          setCameraOpen(true);
-        }}
-      >
-        {t("shipping.scanTracking")}
-      </Button>
-      <ScanCameraPanel
-        open={cameraOpen}
+      <ScanToFill
         pinned
-        scannerError={camera.scannerError}
-        isCameraActive={camera.isCameraActive}
-        isTorchOn={camera.isTorchOn}
-        onRetry={camera.restartCamera}
-        onToggleTorch={camera.toggleTorch}
-        onClose={closeCamera}
+        label={t("shipping.scanTracking")}
+        onCode={(code) =>
+          onChange({ ...value, trackingNumber: code.slice(0, 100) })
+        }
       />
       <datalist id={listId}>
         {carriers.map((carrier) => (
