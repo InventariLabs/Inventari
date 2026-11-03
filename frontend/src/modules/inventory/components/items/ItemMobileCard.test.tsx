@@ -564,3 +564,25 @@ describe("ItemMobileCard — an account that cannot write", () => {
     expect(props.onOpenActions).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("ItemMobileCard — a used-up record", () => {
+  it("says used up, not the name of the system's place for it", () => {
+    render(
+      <ItemMobileCard
+        item={makeItem({
+          quantity: 0,
+          location_id: "consumed",
+        } as Partial<Item>)}
+        {...baseProps()}
+        storages={
+          [
+            { id: "consumed", name: "Consumed (Virtual)", usage: "customer" },
+          ] as never
+        }
+      />,
+    );
+
+    expect(screen.getByText("Used up")).toBeInTheDocument();
+    expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
+  });
+});

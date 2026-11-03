@@ -108,12 +108,14 @@ function CustomerField({ draft }: { draft: ActionDraft }) {
         title={t("issue.customer")}
       />
       {createPartner.open && (
-        <PartnerInlineCreate
-          initialName={createPartner.query}
-          roleTypes={picker.partnerTypes}
-          onCreated={createPartner.handleCreated}
-          onCancel={createPartner.handleCancel}
-        />
+        <div className="col-span-full">
+          <PartnerInlineCreate
+            initialName={createPartner.query}
+            roleTypes={picker.partnerTypes}
+            onCreated={createPartner.handleCreated}
+            onCancel={createPartner.handleCancel}
+          />
+        </div>
       )}
     </>
   );
