@@ -16,7 +16,10 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
  * person typing, and the line was never picked.
  */
 
-const UID = Date.now().toString(36);
+// Each worker loads this file on its own and runs the setup below side by
+// side: a clock reading alone is the same name in two workers that reach it
+// in one millisecond.
+const UID = `${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}`;
 const BARCODE = `29${Date.now().toString().slice(-11)}`;
 
 /**

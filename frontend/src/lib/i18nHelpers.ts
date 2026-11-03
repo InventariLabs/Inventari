@@ -50,6 +50,9 @@ export function unitLabel(
   return t(`common:units.${unit}`, { defaultValue: unit });
 }
 
+/** What the analytics API calls the bucket of products without a category. */
+const UNCATEGORIZED_BUCKET = "Uncategorized";
+
 /**
  * A product category as the reader's language names it.
  *
@@ -73,7 +76,12 @@ export function categoryLabel(
   code: string | null | undefined,
   name: string,
 ): string {
-  if (!code) return name;
+  // The statistics and rotation reports name the bucket of products with no
+  // category "Uncategorized" on the wire; it is a bucket, not a record, so
+  // there is no code to look up and the English word would reach every
+  // reader as it came.
+  if (!code)
+    return name === UNCATEGORIZED_BUCKET ? t("common:noCategory") : name;
   return t(`categories:codes.${code}`, { defaultValue: name });
 }
 

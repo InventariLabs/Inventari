@@ -24,7 +24,7 @@
   "continue": "Continuer",
   "back": "Retour",
   "singleModuleName": "Un seul module",
-  "singleModuleDescription": "Un module est toute l'application. Le reste s'efface ; vous pouvez en sortir à tout moment dans Paramètres → Mes modules.",
+  "singleModuleDescription": "Un module est toute l'application — par exemple Fabrication si vous fabriquez quelque chose. Le reste s'efface ; vous pouvez en sortir à tout moment dans Paramètres → Mes modules.",
   "focusChoiceTitle": "Quel module ?",
   "focusChoiceSubtitle": "Seuls les modules capables de fonctionner seuls sont listés. Rien ici n'est définitif."
 }

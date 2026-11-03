@@ -94,13 +94,14 @@ test.describe("Maker — recipe catalog & formula detail", () => {
     await expect(page).toHaveURL(new RegExp(`/maker/recipes/${recipe.id}`), {
       timeout: 10000,
     });
-    // Header (h1) and summary card (h2) both show the formula name.
+    // The page title carries the formula name; the summary card under it
+    // does not repeat it.
     await expect(
       page.getByRole("heading", { level: 1, name: recipe.name }),
     ).toBeVisible({ timeout: 10000 });
     await expect(
-      page.getByRole("heading", { level: 2, name: recipe.name }),
-    ).toBeVisible();
+      page.getByRole("heading", { name: recipe.name, exact: true }),
+    ).toHaveCount(1);
   });
 
   test("detail Composition tab lists ingredient names, not raw UUIDs", async ({
