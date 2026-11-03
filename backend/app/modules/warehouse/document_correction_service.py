@@ -15,7 +15,7 @@ from app.core.public_api import core_api
 
 from . import document_types as dt
 from ._document_workflow_helpers import (
-    _build_print_snapshot,
+    _freeze_print_details,
     build_document_event_payload,
 )
 from ._line_reversals import (
@@ -616,7 +616,7 @@ async def record_count_differences(
     # Written as done, so confirm_document never sees it: the same snapshot
     # a confirmed document takes, or this record would print the company and
     # the shelf as they are on the day it is reprinted.
-    doc.print_snapshot = _build_print_snapshot(
+    doc.print_snapshot = _freeze_print_details(
         doc, await core_api.organizations.get_async(db, org_id)
     )
 

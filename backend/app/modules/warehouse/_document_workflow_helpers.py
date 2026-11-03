@@ -121,7 +121,7 @@ def _build_partner_snapshot(partner: PartnerDTO) -> dict[str, Any]:
     }
 
 
-def _build_print_snapshot(doc: Document, organization: Any) -> dict[str, Any]:
+def _freeze_print_details(doc: Document, organization: Any) -> dict[str, Any]:
     """What the printout states about the issuer and the places, as of now."""
     return {
         'issuer': issuer_snapshot(organization),
