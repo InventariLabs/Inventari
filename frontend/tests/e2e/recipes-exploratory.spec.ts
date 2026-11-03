@@ -1055,7 +1055,10 @@ test.describe("Recipes — follow-ups", () => {
       .first()
       .click();
 
-    const dialog = page.locator('[role="dialog"]');
+    // Name the sheet: the unit picker below is a dialog too, and it stays in
+    // the page, closed, while it animates out — a bare `[role="dialog"]`
+    // then matches both and the hidden check fails on a strict-mode error.
+    const dialog = page.getByRole("dialog", { name: /new recipe/i });
     await expect(dialog).toBeVisible({ timeout: 10000 });
     await dialog.getByPlaceholder("e.g. Pasta Bolognese").fill(recipeName);
     await dialog.getByRole("button", { name: /add ingredient/i }).click();
@@ -1063,7 +1066,8 @@ test.describe("Recipes — follow-ups", () => {
     // Type the full unique name so leftover templates from previous runs
     // (search is capped at limit=10) can never push ours out of the list
     await dialog.getByPlaceholder("Ingredient name").first().fill(templateName);
-    const suggestion = dialog.getByText(templateName, { exact: true });
+    // The suggestion list is portalled out of the sheet, so look on the page.
+    const suggestion = page.getByText(templateName, { exact: true });
     await expect(suggestion).toBeVisible({ timeout: 10000 });
     await suggestion.click();
 
