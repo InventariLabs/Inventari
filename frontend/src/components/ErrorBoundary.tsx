@@ -61,7 +61,10 @@ class ErrorBoundary extends Component<Props, State> {
       const stale = isStaleChunkError(this.state.error);
 
       return (
-        <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center bg-surface-card rounded-xl shadow-sm border border-border">
+        <div
+          data-testid="app-error"
+          className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center bg-surface-card rounded-xl shadow-sm border border-border"
+        >
           <div className="w-16 h-16 bg-red-100 text-on-danger dark:bg-red-900/30 dark:text-red-300 rounded-full flex items-center justify-center mb-6">
             <AlertCircle className="w-10 h-10" />
           </div>
