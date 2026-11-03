@@ -72,14 +72,13 @@ function renderOverview(props: {
 }
 
 describe("ItemDetailOverview — where the record is", () => {
-  it("names the virtual location the system moved a used-up record to", () => {
-    // The record is alive and answers under its address, but the row used
-    // to vanish the moment its location left the internal list — the only
-    // screen that knew where it was went silent.
+  it("says a record is used up, not the name of the system's place for it", () => {
+    // The record is alive and answers under its address, so the row stays; the
+    // place's own name means nothing to the person reading it.
     renderOverview({ item: item({}), storages: [shelf, consumed] });
 
-    expect(screen.getByText("Consumed (Virtual)")).toBeInTheDocument();
-    expect(screen.getByText("Customer")).toBeInTheDocument();
+    expect(screen.getByText("Used up")).toBeInTheDocument();
+    expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
     // And the way back is named on the record itself, not left to a URL.
     expect(screen.getByText(/brings it back to a shelf/i)).toBeInTheDocument();
   });

@@ -545,6 +545,7 @@
     "keepTemplate": "Zostaw {{unit}}"
   },
   "showUsedUp": "Pokaż zużyte",
+  "usedUpPlace": "Zużyte",
   "removalStrategy": {
     "label": "Co wydawać najpierw",
     "fifoHelp": "FIFO: najpierw wychodzi to, co najwcześniej przyjęto.",

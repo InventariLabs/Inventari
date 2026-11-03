@@ -503,6 +503,7 @@
     "keepTemplate": "Manter {{unit}}"
   },
   "showUsedUp": "Mostrar esgotados",
+  "usedUpPlace": "Esgotado",
   "removalStrategy": {
     "label": "Qual estoque sai primeiro",
     "fifoHelp": "PEPS (FIFO): o que entrou primeiro sai primeiro.",

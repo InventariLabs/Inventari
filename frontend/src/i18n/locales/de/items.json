@@ -503,6 +503,7 @@
     "keepTemplate": "{{unit}} behalten"
   },
   "showUsedUp": "Verbrauchte anzeigen",
+  "usedUpPlace": "Verbraucht",
   "removalStrategy": {
     "label": "Was zuerst ausgegeben wird",
     "fifoHelp": "FIFO: Was zuerst eingegangen ist, geht zuerst hinaus.",

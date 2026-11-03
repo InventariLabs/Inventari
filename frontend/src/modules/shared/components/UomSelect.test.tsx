@@ -70,6 +70,20 @@ describe("UomSelect", () => {
    * replaced it in the name: a voice user saying "pcs" reached nothing
    * (WCAG 2.5.3). The field's name leads and the shown symbol follows.
    */
+  it("shows the unit a save will land on as chosen, not as an open question", () => {
+    render(
+      <UomSelect
+        compact
+        value={null}
+        unitWhenUnset="pcs"
+        onChange={() => {}}
+      />,
+    );
+    const trigger = screen.getByRole("button");
+    expect(trigger).toHaveTextContent("pcs");
+    expect(trigger).not.toHaveTextContent("Choose");
+  });
+
   it("keeps the shown symbol in the compact trigger's name", () => {
     render(<UomSelect compact value={PIECE.id} onChange={() => {}} />);
 

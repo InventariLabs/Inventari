@@ -503,6 +503,7 @@
     "keepTemplate": "Garder {{unit}}"
   },
   "showUsedUp": "Afficher les consommés",
+  "usedUpPlace": "Consommé",
   "removalStrategy": {
     "label": "Ce qui sort en premier",
     "fifoHelp": "FIFO : ce qui est entré en premier sort en premier.",
