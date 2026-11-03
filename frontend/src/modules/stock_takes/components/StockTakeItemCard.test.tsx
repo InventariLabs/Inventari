@@ -151,7 +151,11 @@ describe("StockTakeItemCard — two records of one product", () => {
 describe("StockTakeItemCard — identical records of one product", () => {
   const card = (
     position: number,
-    props: { discrepancy?: "missing" | null; reasonRequired?: boolean } = {},
+    props: {
+      discrepancy?: "missing" | null;
+      reasonRequired?: boolean;
+      note?: string;
+    } = {},
   ) => (
     <StockTakeItemCard
       itemId={`cable-${position}`}
@@ -174,7 +178,7 @@ describe("StockTakeItemCard — identical records of one product", () => {
       isUpdatePending={false}
       isInProgress={true}
       blindMode={true}
-      note=""
+      note={props.note ?? ""}
       awaitingRecount={false}
       counts={[]}
       onRequestRecount={() => {}}
@@ -227,6 +231,14 @@ describe("StockTakeItemCard — identical records of one product", () => {
     expect(screen.getAllByPlaceholderText(/note/i)).toHaveLength(1);
     rerender(card(1, { discrepancy: "missing" }));
     expect(screen.queryByPlaceholderText("Add a note…")).toBeNull();
+    expect(screen.getByTestId("discrepancy-reason-note")).toBeInTheDocument();
+  });
+
+  // A note typed before the Save is on the line when the difference shows up:
+  // it stays where the counter can read and change it, not hidden with the box.
+  it("keeps a note already on a line with a difference readable and editable", () => {
+    render(card(1, { discrepancy: "missing", note: "Dented box" }));
+    expect(screen.getByDisplayValue("Dented box")).toBeInTheDocument();
     expect(screen.getByTestId("discrepancy-reason-note")).toBeInTheDocument();
   });
 

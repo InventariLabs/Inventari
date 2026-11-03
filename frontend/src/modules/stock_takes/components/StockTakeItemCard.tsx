@@ -251,8 +251,10 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
       )}
 
       {/* A line with a difference has the reason field below, with a note of
-          its own; two note boxes on one line ask for the same remark twice. */}
-      {isInProgress && !discrepancy && (
+          its own; a second empty box would ask for the same remark twice. A
+          note already on the line — typed before the difference showed — stays
+          here to be read and changed, or the counter believes it was lost. */}
+      {isInProgress && (!discrepancy || note.trim() !== "") && (
         <div className="mt-3">
           <Input
             type="text"

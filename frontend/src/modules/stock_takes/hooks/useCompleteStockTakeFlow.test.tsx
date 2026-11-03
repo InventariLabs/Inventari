@@ -81,8 +81,20 @@ describe("useCompleteStockTakeFlow", () => {
   it("refuses before asking when a full count is required and lines are open", async () => {
     const open = [
       ...lines,
-      { ...lines[0], id: "sti-2", item_id: "item-2", counted_quantity: null },
-      { ...lines[0], id: "sti-3", item_id: "item-3", counted_quantity: null },
+      {
+        ...lines[0],
+        id: "sti-2",
+        item_id: "item-2",
+        item_name: "Bread",
+        counted_quantity: null,
+      },
+      {
+        ...lines[0],
+        id: "sti-3",
+        item_id: "item-3",
+        item_name: "Eggs",
+        counted_quantity: null,
+      },
     ] as unknown as StockTakeItem[];
     const { result } = renderHook(
       () => useCompleteStockTakeFlow("1", open, confirm, 0, true),
@@ -96,6 +108,31 @@ describe("useCompleteStockTakeFlow", () => {
     expect(confirm).not.toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringContaining("2 products are still uncounted"),
+    );
+  });
+
+  it("counts products, not records, and says when numbers are only unsaved", async () => {
+    // Two records of one product are one product to the reader; and a number
+    // still in its box is a Save away, which the refusal has to say.
+    const open = [
+      ...lines,
+      { ...lines[0], id: "sti-2", item_id: "item-2", counted_quantity: null },
+      { ...lines[0], id: "sti-3", item_id: "item-3", counted_quantity: null },
+    ] as unknown as StockTakeItem[];
+    const { result } = renderHook(
+      () => useCompleteStockTakeFlow("1", open, confirm, 2, true),
+      { wrapper },
+    );
+
+    await act(async () => {
+      await result.current.handleComplete();
+    });
+
+    expect(confirm).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /One product is still uncounted.*2 counted numbers have not been saved/,
+      ),
     );
   });
 
