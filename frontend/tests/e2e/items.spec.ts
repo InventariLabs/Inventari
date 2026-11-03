@@ -1,5 +1,5 @@
 import { test, expect } from "./fixtures/auth";
-import type { Locator, Page } from "@playwright/test";
+import type { Locator, Page, Request } from "@playwright/test";
 import { ApiHelper } from "./helpers/api";
 import { expectApiOk } from "./helpers/page-load";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
@@ -84,8 +84,42 @@ test.describe("Items — CRUD flow", () => {
   });
 
   test.beforeEach(async ({ page, authenticatedPage }) => {
+    // The low-stock chip belongs to a list that loaded: while its request fails
+    // the page shows an error panel and no such chip (an empty account has none
+    // either). A test that goes straight for a chip then reports a missing
+    // selector, and says nothing of the request that failed — so the screen
+    // is first held to showing a row, and a miss names the failed answers,
+    // the requests that died with no answer at all, and the page it ended on.
+    const failedLists: string[] = [];
+    const isListGet = (request: Request) =>
+      request.method() === "GET" &&
+      new URL(request.url()).pathname === "/api/v1/items";
+    page.on("response", (response) => {
+      if (isListGet(response.request()) && !response.ok()) {
+        failedLists.push(`${response.status()} ${response.url()}`);
+      }
+    });
+    page.on("requestfailed", (request) => {
+      if (isListGet(request)) {
+        failedLists.push(
+          `${request.failure()?.errorText ?? "failed"} ${request.url()}`,
+        );
+      }
+    });
     await page.goto("/inventory/items");
     await page.waitForLoadState("networkidle").catch(() => {});
+    try {
+      await expect(page.getByTestId("item-row").first()).toBeVisible({
+        timeout: 15000,
+      });
+    } catch (error) {
+      throw new Error(
+        `The item list showed no row on ${page.url()}. Failed list requests: ${
+          failedLists.join(", ") || "none"
+        }`,
+        { cause: error },
+      );
+    }
   });
 
   test("displays item list", async ({ page, authenticatedPage }) => {
