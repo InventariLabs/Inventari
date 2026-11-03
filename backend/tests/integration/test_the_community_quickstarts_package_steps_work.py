@@ -23,6 +23,7 @@ import re
 import sys
 from collections.abc import Iterator
 from pathlib import Path
+from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
@@ -152,7 +153,7 @@ def test_the_quickstart_documents_the_package_steps() -> None:
 def test_the_list_endpoint_the_quickstart_adds_answers_an_empty_page_then_the_rows(
     installed,
 ) -> None:
-    from app.core.deps import get_async_db, require_org
+    from app.core.deps import get_async_db, get_current_user_context, require_org
     from app.database import Base
     from app.models.organization import Organization
     from app.models.user import User
@@ -198,7 +199,17 @@ def test_the_list_endpoint_the_quickstart_adds_answers_an_empty_page_then_the_ro
         api.dependency_overrides[require_org] = lambda: org_id
         url = f'/api/v1/{MODULE.replace("_", "-")}'
 
+        # The scaffold's router asks for the module's own read key, so the
+        # endpoint the quickstart adds needs it without asking.
+        granted: set[str] = set()
+        api.dependency_overrides[get_current_user_context] = lambda: SimpleNamespace(
+            has_permission=granted.__contains__
+        )
+
         with TestClient(api) as client:
+            assert client.get(url).status_code == 403
+            granted.add(f'{MODULE}:read')
+
             empty = client.get(url)
             assert empty.status_code == 200, empty.text
             # The page the document says the endpoint answers, word for word.

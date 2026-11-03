@@ -22,11 +22,12 @@ function MacroBar({
   color,
 }: {
   label: string;
-  value: number;
+  /** `null` is a nutrient nobody measured: no bar, and a dash, never 0 g. */
+  value: number | null | undefined;
   max: number;
   color: string;
 }) {
-  const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
+  const pct = value != null && max > 0 ? Math.min(100, (value / max) * 100) : 0;
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-on-secondary w-14 shrink-0">{label}</span>
@@ -37,7 +38,7 @@ function MacroBar({
         />
       </div>
       <span className="text-xs font-medium text-on-secondary w-10 text-right tabular-nums">
-        {formatNumberLocale(value, 1)}g
+        {value != null ? `${formatNumberLocale(value, 1)}g` : "–"}
       </span>
     </div>
   );
@@ -74,7 +75,7 @@ export default function NutritionCard({ data, servings, onEditRecipe }: Props) {
           <span className="text-2xl font-semibold text-on">
             {n.calories_kcal != null
               ? formatNumberLocale(n.calories_kcal, 0)
-              : "—"}
+              : "–"}
           </span>
           <span className="text-sm text-on-secondary">kcal</span>
           {servings > 1 && n.calories_kcal != null && (
@@ -88,47 +89,38 @@ export default function NutritionCard({ data, servings, onEditRecipe }: Props) {
 
         {/* Macro bars */}
         <div className="space-y-1.5">
-          {n.carbs_g != null && (
-            <MacroBar
-              label={t("nutrition.carbs")}
-              value={n.carbs_g}
-              max={maxMacro}
-              color="bg-amber-400"
-            />
-          )}
-          {n.fat_g != null && (
-            <MacroBar
-              label={t("nutrition.fat")}
-              value={n.fat_g}
-              max={maxMacro}
-              color="bg-red-400"
-            />
-          )}
-          {n.protein_g != null && (
-            <MacroBar
-              label={t("nutrition.protein")}
-              value={n.protein_g}
-              max={maxMacro}
-              color="bg-primary-400"
-            />
-          )}
+          <MacroBar
+            label={t("nutrition.carbs")}
+            value={n.carbs_g}
+            max={maxMacro}
+            color="bg-amber-400"
+          />
+          <MacroBar
+            label={t("nutrition.fat")}
+            value={n.fat_g}
+            max={maxMacro}
+            color="bg-red-400"
+          />
+          <MacroBar
+            label={t("nutrition.protein")}
+            value={n.protein_g}
+            max={maxMacro}
+            color="bg-primary-400"
+          />
         </div>
 
         {/* Micro rows: fiber, sugar, salt */}
         {hasAnyMicro && (
           <div className="space-y-1 pt-1 border-t border-border">
-            {microRows.map(({ key, labelKey, color }) => {
-              const val = n[key] ?? 0;
-              return (
-                <MacroBar
-                  key={key}
-                  label={t(labelKey)}
-                  value={val}
-                  max={maxMacro}
-                  color={color}
-                />
-              );
-            })}
+            {microRows.map(({ key, labelKey, color }) => (
+              <MacroBar
+                key={key}
+                label={t(labelKey)}
+                value={n[key]}
+                max={maxMacro}
+                color={color}
+              />
+            ))}
           </div>
         )}
 

@@ -178,7 +178,7 @@ async def _build_daily_nutrition_async(
             continue
         servings = _get_effective_servings(entry, plan)
         nutrition = await get_recipe_nutrition(db, entry.recipe, org_id, servings)
-        total = nutrition.get('total') or {}
+        total = nutrition['measured_sums']
         if nutrition['generic_values']:
             generic_days.add(entry.date)
         row = totals.setdefault(entry.date, dict.fromkeys(keys))
