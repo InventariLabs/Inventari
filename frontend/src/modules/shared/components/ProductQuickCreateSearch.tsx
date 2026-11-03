@@ -133,7 +133,7 @@ export function ProductQuickCreateSearch<T extends ProductComboboxOption>({
       renderOptionMeta={renderOptionMeta}
       renderNoResults={(query, select) => (
         <div className="p-3 space-y-2">
-          <p className="text-xs text-on-muted">
+          <p className="text-xs text-on-muted [overflow-wrap:anywhere]">
             {t("productQuickCreate.noMatch", { query })}
           </p>
           {!formUnit && (
@@ -189,9 +189,13 @@ export function ProductQuickCreateSearch<T extends ProductComboboxOption>({
             className="w-full justify-start rounded-lg border border-dashed border-accent/40 bg-accent/10 px-3 py-2.5 text-left text-sm text-accent-700 hover:bg-accent/20 dark:text-accent-300"
             data-testid={`${testId}-create`}
           >
-            {creating
-              ? t("productQuickCreate.creating")
-              : t("productQuickCreate.addAsNew", { name: query })}
+            {/* A name with no space in it has nowhere to break: without its own
+                wrapping span it pushes the button past the panel. */}
+            <span className="min-w-0 whitespace-normal [overflow-wrap:anywhere]">
+              {creating
+                ? t("productQuickCreate.creating")
+                : t("productQuickCreate.addAsNew", { name: query })}
+            </span>
           </Button>
         </div>
       )}
