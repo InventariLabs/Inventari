@@ -116,7 +116,8 @@
     "condition_damaged": "Dañado",
     "condition_needs_repair": "Necesita reparación",
     "condition_effect_available": "Vuelve a Disponible.",
-    "condition_effect_service": "A Mantenimiento, con una reparación abierta.",
+    "condition_effect_damaged": "A Mantenimiento, con la entrada «Devuelto dañado».",
+    "condition_effect_needs_repair": "A Mantenimiento, con la entrada «Devuelto — necesita reparación».",
     "checkin_done": "Devuelto: {{asset}}",
     "checkin_done_status": "Devuelto: {{asset}} — ahora {{status}}",
     "checkout_modal": {
@@ -148,7 +149,9 @@
       "title": "Devolver activo",
       "condition": "Estado de devolución",
       "notes": "Notas",
-      "submit": "Devolver"
+      "submit": "Devolver",
+      "title_holder": "Devolver activo",
+      "submit_holder": "Devolver"
     },
     "returned": "Devuelto",
     "active": "Activo",

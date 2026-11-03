@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { SEARCH_MAX_LENGTH } from "@/lib/productSearch";
 import { readableSku } from "@/lib/readableSku";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -17,6 +18,72 @@ export interface ProductComboboxOption {
   brand?: string | null;
   image_url?: string | null;
   is_stub?: boolean;
+}
+
+/** The endpoint counts a query in code points, so one emoji is one character
+ *  to it though `String.length` says two. */
+function characterCount(text: string): number {
+  return Array.from(text).length;
+}
+
+/**
+ * A name past the search limit is searched by its opening, so a product that
+ * only shares that opening is listed and the "add as new" panel would
+ * otherwise be gone, leaving a long name with a different ending uncreatable.
+ * It stays unless a result is that very name.
+ */
+function createPanelBelow<T extends ProductComboboxOption>({
+  query,
+  results,
+  settled,
+  renderNoResults,
+  select,
+}: {
+  query: string;
+  results: T[];
+  settled: boolean;
+  renderNoResults?: (
+    query: string,
+    select: (product: T) => void,
+  ) => React.ReactNode;
+  select: (product: T) => void;
+}): React.ReactNode {
+  if (
+    !renderNoResults ||
+    !settled ||
+    characterCount(query) <= SEARCH_MAX_LENGTH
+  ) {
+    return null;
+  }
+  const wanted = query.toLowerCase();
+  if (results.some((r) => r.name.trim().toLowerCase() === wanted)) return null;
+  return renderNoResults(query, select);
+}
+
+/**
+ * Whether the panel has an empty answer to give: a finished search that found
+ * nothing, or text too short to search at all. The latter has nothing to look
+ * for and so nothing to find; if the caller can create from a name it is
+ * offered once the typing pauses, since a one-character name is a valid
+ * product that the search cannot reach.
+ */
+function hasEmptyAnswer({
+  searching,
+  typed,
+  searched,
+  settled,
+  resultCount,
+  canCreate,
+}: {
+  searching: boolean;
+  typed: string;
+  searched: string;
+  settled: string;
+  resultCount: number;
+  canCreate: boolean;
+}): boolean {
+  if (searching) return typed === searched && resultCount === 0;
+  return canCreate && typed !== "" && settled === typed;
 }
 
 /** Everything an option says about itself before any tie-breaker is added. */
@@ -52,8 +119,11 @@ interface ProductComboboxProps<T extends ProductComboboxOption> {
   /** Server-side product search, called with the debounced query. */
   search: (query: string) => Promise<T[]>;
   /**
-   * Rendered inside the popover when a finished search matched nothing.
-   * Receives the query and the combobox's own select handler, so an
+   * Rendered inside the popover when a finished search matched nothing, when
+   * the text is too short to search at all (a one-character name can still be
+   * created), and under the results when the text runs past the search limit
+   * and no result is that very name. Receives the query and the combobox's
+   * own select handler, so an
    * "add as new" flow can hand the fresh record straight into the pick.
    * Optional — without it a finished search with no matches closes.
    */
@@ -102,6 +172,7 @@ interface ProductComboboxProps<T extends ProductComboboxOption> {
 function ProductComboboxMessage<T extends ProductComboboxOption>({
   showLoading,
   failed,
+  onRetry,
   query,
   renderNoResults,
   onSelect,
@@ -110,6 +181,8 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
   showLoading: boolean;
   /** The search itself was refused or never ran — not an empty answer. */
   failed: boolean;
+  /** Asks again with the text that failed. */
+  onRetry: () => void;
   query: string;
   renderNoResults?: (
     query: string,
@@ -130,8 +203,14 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
     // Offering "add as new" here would invite a duplicate of a product the
     // search never got to look for.
     return (
-      <div role="alert" className="p-3 text-sm text-on-danger">
-        {t("combobox.searchFailed")}
+      <div
+        role="alert"
+        className="flex flex-wrap items-center gap-2 p-3 text-sm text-on-danger"
+      >
+        <span>{t("combobox.searchFailed")}</span>
+        <Button type="button" variant="ghost" size="sm" onClick={onRetry}>
+          {t("actions.retry")}
+        </Button>
       </div>
     );
   }
@@ -145,45 +224,120 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
   );
 }
 
-/** The picked product under the box: its picture, name, SKU and the way to clear it. */
-function PickedProduct({
+/** One result of the search: image, names, the code it is known by. */
+function ProductComboboxRow<T extends ProductComboboxOption>({
   product,
-  onClear,
+  results,
+  id,
+  active,
+  onPick,
+  testId,
+  renderOptionMeta,
 }: {
-  product: ProductComboboxOption;
-  onClear?: () => void;
+  product: T;
+  results: T[];
+  id: string;
+  active: boolean;
+  onPick: (product: T) => void;
+  testId?: string;
+  renderOptionMeta?: (product: T) => React.ReactNode;
 }) {
-  const { t } = useTranslation("common");
   return (
-    <div className="mt-2 flex items-center gap-2">
-      <div className="flex items-center gap-2 text-sm">
-        {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt=""
-            loading="lazy"
-            className="w-8 h-8 rounded-md object-cover"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-md bg-surface-raised flex items-center justify-center">
-            <Package size={14} className="text-on-muted" />
+    <Button
+      size="content"
+      id={id}
+      role="option"
+      aria-selected={active}
+      type="button"
+      variant="ghost"
+      onClick={() => onPick(product)}
+      data-testid={testId ? `${testId}-result` : undefined}
+      className={cn(
+        "w-full justify-start gap-3 px-3 py-2.5 rounded-none text-left border-b border-border last:border-b-0 transition-colors",
+        active
+          ? "bg-primary-50 dark:bg-primary-900/20 text-primary-900 dark:text-primary-100"
+          : "hover:bg-surface-raised text-on",
+      )}
+    >
+      {product.image_url ? (
+        <img
+          src={product.image_url}
+          alt=""
+          loading="lazy"
+          className="w-8 h-8 rounded-md object-cover shrink-0"
+        />
+      ) : (
+        <div className="w-8 h-8 rounded-md bg-surface-raised flex items-center justify-center shrink-0">
+          <Package size={14} className="text-on-muted" />
+        </div>
+      )}
+      <div className="flex-1 min-w-0 text-left">
+        <div className="text-sm font-medium text-on truncate">
+          {product.name}
+        </div>
+        {readableSku(product.sku) && (
+          <div className="font-mono text-xs text-on-secondary">
+            {readableSku(product.sku)}
           </div>
         )}
-        <div>
-          <span className="font-medium text-on">{product.name}</span>
-          {readableSku(product.sku) && (
-            <span className="ml-2 font-mono text-xs text-on-secondary">
-              {readableSku(product.sku)}
-            </span>
-          )}
-        </div>
+        {product.barcode && !readableSku(product.sku) && (
+          <div className="font-mono text-xs text-on-secondary">
+            {product.barcode}
+          </div>
+        )}
+        {twinHint(product, results) && (
+          <div className="font-mono text-xs text-on-secondary">
+            {twinHint(product, results)}
+          </div>
+        )}
       </div>
-      {onClear && (
-        <Button type="button" variant="ghost" size="sm" onClick={onClear}>
-          {t("actions.clear")}
-        </Button>
+      {renderOptionMeta?.(product) && (
+        <div className="shrink-0 self-center">{renderOptionMeta(product)}</div>
       )}
-    </div>
+    </Button>
+  );
+}
+
+/** The results as a listbox, with the caller's "add as new" panel under them
+ *  when the text is a name no result carries in full. */
+function ProductComboboxList<T extends ProductComboboxOption>({
+  id,
+  results,
+  optionId,
+  selectedIndex,
+  onPick,
+  testId,
+  renderOptionMeta,
+  footer,
+}: {
+  /** What the input's `aria-controls` names. */
+  id: string;
+  results: T[];
+  optionId: (index: number) => string;
+  selectedIndex: number;
+  onPick: (product: T) => void;
+  testId?: string;
+  renderOptionMeta?: (product: T) => React.ReactNode;
+  footer: React.ReactNode;
+}) {
+  return (
+    <>
+      <div id={id} role="listbox">
+        {results.map((product, idx) => (
+          <ProductComboboxRow
+            key={product.product_template_id}
+            product={product}
+            results={results}
+            id={optionId(idx)}
+            active={selectedIndex === idx}
+            onPick={onPick}
+            testId={testId}
+            renderOptionMeta={renderOptionMeta}
+          />
+        ))}
+      </div>
+      {footer}
+    </>
   );
 }
 
@@ -244,24 +398,28 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   // The search for `searchedQuery` threw: its empty `results` are no answer.
   const [searchFailed, setSearchFailed] = useState(false);
+  // Pressing "Try again" asks for the same text once more: the effect below
+  // runs on the text alone, which has not changed.
+  const [retryCount, setRetryCount] = useState(0);
 
   const trimmedQuery = query.trim();
   const settledQuery = useDebounce(trimmedQuery, debounceMs);
+  const queryLongEnough = characterCount(trimmedQuery) >= minQueryLength;
 
   // Emptying the box empties the list at once. Waiting out the debounce
   // first would leave the previous product's results under a blank field.
   useEffect(() => {
     setSelectedIndex(-1);
-    if (trimmedQuery.length < minQueryLength) {
+    if (!queryLongEnough) {
       setResults([]);
       setSearchedQuery("");
       setSearchFailed(false);
       setIsLoading(false);
     }
-  }, [trimmedQuery, minQueryLength]);
+  }, [trimmedQuery, queryLongEnough]);
 
   useEffect(() => {
-    if (settledQuery.length < minQueryLength) return;
+    if (characterCount(settledQuery) < minQueryLength) return;
     const seq = ++requestSeq.current;
     let cancelled = false;
     setIsLoading(true);
@@ -284,7 +442,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
     return () => {
       cancelled = true;
     };
-  }, [settledQuery, minQueryLength]);
+  }, [settledQuery, minQueryLength, retryCount]);
 
   function reset() {
     setQuery("");
@@ -299,7 +457,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
     reset();
   }
 
-  const searching = query.trim().length >= minQueryLength;
+  const searching = queryLongEnough;
   const showLoading = searching && isLoading;
   const showResults = searching && results.length > 0;
 
@@ -307,8 +465,14 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // (the query only matches once its results have landed), so the explicit
   // `!isLoading` here was redundant; dropping it keeps the panel below the
   // ESLint complexity gate. `showLoading` wins when both are true.
-  const showEmpty =
-    searching && query.trim() === searchedQuery && results.length === 0;
+  const showEmpty = hasEmptyAnswer({
+    searching,
+    typed: trimmedQuery,
+    searched: searchedQuery,
+    settled: settledQuery,
+    resultCount: results.length,
+    canCreate: !!renderNoResults,
+  });
   // The panel now opens for the in-between state too: a search that is still
   // running says "searching" instead of silently leaving the field looking
   // broken, and a search that finished empty always says so (/).
@@ -432,7 +596,37 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         data-testid={testId ? `${testId}-input` : undefined}
       />
 
-      {value && <PickedProduct product={value} onClear={onClear} />}
+      {value && (
+        <div className="mt-2 flex items-center gap-2">
+          <div className="flex items-center gap-2 text-sm">
+            {value.image_url ? (
+              <img
+                src={value.image_url}
+                alt=""
+                loading="lazy"
+                className="w-8 h-8 rounded-md object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-md bg-surface-raised flex items-center justify-center">
+                <Package size={14} className="text-on-muted" />
+              </div>
+            )}
+            <div>
+              <span className="font-medium text-on">{value.name}</span>
+              {readableSku(value.sku) && (
+                <span className="ml-2 font-mono text-xs text-on-secondary">
+                  {readableSku(value.sku)}
+                </span>
+              )}
+            </div>
+          </div>
+          {onClear && (
+            <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+              {t("actions.clear")}
+            </Button>
+          )}
+        </div>
+      )}
 
       {dropdownOpen &&
         panelPos &&
@@ -451,81 +645,49 @@ export function ProductCombobox<T extends ProductComboboxOption>({
               // every suggestion went dead to the mouse.
               pointerEvents: "auto",
             }}
-            id={listboxId}
             // Every open state of the panel — results, searching, empty —
             // carries the marker `Sheet` reads to leave Escape to the picker;
             // the listbox role alone covers only the one holding results.
             data-line-item-dropdown
-            role={showResults ? "listbox" : undefined}
             className="bg-surface-card border border-border rounded-lg shadow-lg z-[var(--z-modal-nested)] overflow-y-auto overflow-x-hidden ring-1 ring-black/5"
           >
             {showLoading || showEmpty ? (
-              <ProductComboboxMessage
-                showLoading={showLoading}
-                failed={searchFailed}
-                query={query.trim()}
-                renderNoResults={renderNoResults}
-                onSelect={select}
-                t={t}
-              />
+              <div id={listboxId}>
+                <ProductComboboxMessage
+                  showLoading={showLoading}
+                  failed={searchFailed}
+                  onRetry={() => {
+                    setRetryCount((n) => n + 1);
+                    // The button unmounts with the alert; without this the
+                    // focus falls to the page and typing no longer reaches
+                    // the box.
+                    inputRef.current?.focus();
+                  }}
+                  query={query.trim()}
+                  renderNoResults={renderNoResults}
+                  onSelect={select}
+                  t={t}
+                />
+              </div>
             ) : (
-              results.map((product, idx) => (
-                <Button
-                  size="content"
-                  key={product.product_template_id}
-                  id={optionId(idx)}
-                  role="option"
-                  aria-selected={selectedIndex === idx}
-                  type="button"
-                  variant="ghost"
-                  onClick={() => select(product)}
-                  data-testid={testId ? `${testId}-result` : undefined}
-                  className={cn(
-                    "w-full justify-start gap-3 px-3 py-2.5 rounded-none text-left border-b border-border last:border-b-0 transition-colors",
-                    selectedIndex === idx
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-900 dark:text-primary-100"
-                      : "hover:bg-surface-raised text-on",
-                  )}
-                >
-                  {product.image_url ? (
-                    <img
-                      src={product.image_url}
-                      alt=""
-                      loading="lazy"
-                      className="w-8 h-8 rounded-md object-cover shrink-0"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-md bg-surface-raised flex items-center justify-center shrink-0">
-                      <Package size={14} className="text-on-muted" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0 text-left">
-                    <div className="text-sm font-medium text-on truncate">
-                      {product.name}
-                    </div>
-                    {readableSku(product.sku) && (
-                      <div className="font-mono text-xs text-on-secondary">
-                        {readableSku(product.sku)}
-                      </div>
-                    )}
-                    {product.barcode && !readableSku(product.sku) && (
-                      <div className="font-mono text-xs text-on-secondary">
-                        {product.barcode}
-                      </div>
-                    )}
-                    {twinHint(product, results) && (
-                      <div className="font-mono text-xs text-on-secondary">
-                        {twinHint(product, results)}
-                      </div>
-                    )}
-                  </div>
-                  {renderOptionMeta?.(product) && (
-                    <div className="shrink-0 self-center">
-                      {renderOptionMeta(product)}
-                    </div>
-                  )}
-                </Button>
-              ))
+              <ProductComboboxList
+                id={listboxId}
+                results={results}
+                optionId={optionId}
+                selectedIndex={selectedIndex}
+                onPick={select}
+                testId={testId}
+                renderOptionMeta={renderOptionMeta}
+                footer={createPanelBelow({
+                  query: trimmedQuery,
+                  results,
+                  // Only a finished, successful search for this very text
+                  // has a say.
+                  settled: trimmedQuery === searchedQuery && !searchFailed,
+                  renderNoResults,
+                  select,
+                })}
+              />
             )}
           </div>,
           document.body,

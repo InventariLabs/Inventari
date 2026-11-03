@@ -370,6 +370,7 @@
       },
       "revoked": "Zurückgezogen",
       "invitationAccepted": "Angenommen",
+      "profileDefault": "Vorgabe des Arbeitsbereichs",
       "fields": {
         "address": "Adresse",
         "adjusted_items": "Korrigierte Positionen",

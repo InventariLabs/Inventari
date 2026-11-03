@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { labelsApi } from "@/lib/api/labels";
 import { equipmentApi } from "@/modules/equipment/api/equipment";
 import { queryKeys } from "@/hooks/queries/keys";
+import { invalidation } from "@/lib/api/invalidation";
 import { downloadBlob } from "@/utils/helpers";
 import type { BulkEquipmentEntry } from "@/modules/equipment/api/equipment";
 import type { EquipmentFormData } from "@/modules/equipment/pages/AddEquipmentPage";
@@ -62,6 +63,10 @@ export function useEquipmentBulkCreate(
         entries,
       });
 
+      // Whatever was created, the list, the overview counts and the category
+      // chart owe the new assets — with or without labels.
+      invalidation.equipment(queryClient);
+
       if (result.failed === 0) {
         toast.success(
           t("bulk.success", "Created {{count}} items", {
@@ -107,9 +112,6 @@ export function useEquipmentBulkCreate(
             ),
           );
           queryClient.invalidateQueries({ queryKey: queryKeys.labels.all });
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.equipment.assets.all,
-          });
           setBulkLabelResult({
             labelIds: labels.map((l) => l.id),
             count: labels.length,

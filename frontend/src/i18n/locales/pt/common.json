@@ -370,6 +370,7 @@
       },
       "revoked": "Revogado",
       "invitationAccepted": "Aceito",
+      "profileDefault": "Padrão do modo de trabalho",
       "fields": {
         "address": "Endereço",
         "adjusted_items": "Linhas ajustadas",

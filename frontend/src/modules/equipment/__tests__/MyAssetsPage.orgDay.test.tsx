@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -111,5 +111,34 @@ describe("My Assets — the return day reads the organization's clock", () => {
       expect(screen.getByText(/Sep 30, 2026/)).toBeInTheDocument();
       expect(screen.queryByText(/Sep 29, 2026/)).not.toBeInTheDocument();
     });
+  });
+});
+
+describe("My Assets — the assignment history reads in the interface language", () => {
+  it("prints both days in the card's style and the condition as a word", async () => {
+    server.use(
+      http.get("/api/v1/equipment/my-assets/history", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              assignment_id: "as-0",
+              item_id: "item-2",
+              item_name: "Dock",
+              checked_out_at: "2026-08-01T10:00:00Z",
+              checked_in_at: "2026-08-05T10:00:00Z",
+              checkin_condition: "NEEDS_REPAIR",
+            },
+          ]),
+        ),
+      ),
+    );
+
+    renderPage();
+    fireEvent.click(await screen.findByRole("button", { name: "Show" }));
+
+    expect(await screen.findByText("Dock")).toBeInTheDocument();
+    expect(screen.getByText("Aug 1, 2026 — Aug 5, 2026")).toBeInTheDocument();
+    expect(screen.getByText("Needs Repair")).toBeInTheDocument();
+    expect(screen.queryByText("NEEDS_REPAIR")).not.toBeInTheDocument();
   });
 });

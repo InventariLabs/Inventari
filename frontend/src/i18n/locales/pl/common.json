@@ -372,6 +372,7 @@
       },
       "revoked": "Cofnięte",
       "invitationAccepted": "Przyjęte",
+      "profileDefault": "Domyślne ustawienie trybu pracy",
       "fields": {
         "address": "Adres",
         "adjusted_items": "Skorygowane pozycje",

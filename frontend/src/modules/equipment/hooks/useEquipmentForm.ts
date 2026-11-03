@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { itemsApi } from "@/lib/api/items";
 import { labelsApi } from "@/lib/api/labels";
-import { queryKeys } from "@/hooks/queries/keys";
+import { invalidation } from "@/lib/api/invalidation";
 import { extractApiError, followUpError } from "@/lib/errors";
 import type { EquipmentModel } from "@/modules/equipment/api/equipment";
 import type { FieldDefinition, ItemCreate, ItemUpdate } from "@/types";
@@ -349,9 +349,7 @@ export function useEquipmentForm(
         // the freshly persisted item (including image_url). Without this,
         // React Query's 5-minute staleTime serves the pre-edit cached item
         // (image_url still null), so the uploaded image never renders.
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.equipment.assets.all,
-        });
+        invalidation.equipment(queryClient);
         toast.success(t("form.updated", "Asset updated successfully"));
         navigate(`/equipment/${editItemId}`);
       } else {
@@ -393,9 +391,7 @@ export function useEquipmentForm(
 
         // Invalidate the list so the new item (with its image) appears, and
         // the detail cache is primed fresh instead of a stale entry.
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.equipment.assets.all,
-        });
+        invalidation.equipment(queryClient);
         toast.success(t("form.created", "Asset added successfully"));
         navigate(`/equipment`);
       }
