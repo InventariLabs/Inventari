@@ -1,4 +1,4 @@
-import { extractApiError } from "@/lib/errors";
+import { extractApiError, followUpError } from "@/lib/errors";
 import { useDndA11y, useDndSensors } from "@/lib/dndA11y";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -473,10 +473,16 @@ export default function RecipesPage() {
       // the image endpoint needs an existing recipe id, so a photo
       // picked in the create form is uploaded right after creation.
       if (imageFile) {
-        await uploadImageMutation.mutateAsync({
-          id: created.id,
-          file: imageFile,
-        });
+        // The recipe exists by now: a photo that fails to go up must not
+        // read as "not saved" and invite a second, duplicate recipe.
+        try {
+          await uploadImageMutation.mutateAsync({
+            id: created.id,
+            file: imageFile,
+          });
+        } catch (error) {
+          toast.error(followUpError(error, t("errors.image_failed")));
+        }
       }
       toast.success(t("toasts.created"));
       setShowForm(false);
