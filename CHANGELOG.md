@@ -14,6 +14,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The audit log now writes the quantities and amounts of a production order,
+  its completion, a recipe and its ingredient and cost lines, and of an item's
+  creation, use, disposal, deletion and restoration, as the exact digits the
+  record holds. They used to be saved as rounded decimal numbers, so a
+  production order of 1,234.567 read 1,234.57 in the log. Saving a value again
+  with other trailing digits ("2.50" over "2.5") still writes no entry. Entries
+  written before this keep the numbers they were saved with.
 - Exporting the document register to CSV no longer loads every line, product
   and user of the period into memory: a file of 20 000 documents of ten lines
   takes half a second instead of seventeen and 40 MB instead of 1.2 GB. The

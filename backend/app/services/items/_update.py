@@ -13,6 +13,7 @@ from app.core.events import SystemEvent, TenantEventPayload, event_bus
 from app.core.exceptions import ServiceRejectionError
 from app.core.interceptors import interceptor_pipeline
 from app.core.logging import get_logger
+from app.core.money import quantise
 from app.core.posting_batch import current_batch
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.category import Category
@@ -465,8 +466,12 @@ _AUDITED_TEMPLATE_FIELDS = (
 def _coerce_template_value(field: str, value: Any) -> Any:
     if value is None:
         return None
-    if field in ('min_quantity', 'weight_value'):
+    if field == 'min_quantity':
+        # A DOUBLE PRECISION column: the float is what it keeps.
         return float(value)
+    if field == 'weight_value':
+        # NUMERIC(14, 6): the journal records the digits the column holds.
+        return quantise(Decimal(str(value)), 6)
     return value
 
 

@@ -126,6 +126,11 @@ async def log_action_async(
     not only its owner, is what the journal must be able to name. The rest of
     ``meta_data`` is the caller's and is kept: the actor is added to it, never
     in place of it.
+
+    The snapshot is passed through :func:`audit_value`, so a ``Decimal`` in it
+    is written as its exact digits whatever the caller built it from; a
+    caller that wants to *compare* two shapes first keeps the ``Decimal``s
+    and lets this function write them down.
     """
     actor = current_actor()
     if actor is not None:
@@ -136,7 +141,7 @@ async def log_action_async(
         action=action.value,
         target_type=target_type,
         target_id=target_id,
-        snapshot=snapshot,
+        snapshot=audit_value(snapshot),
         reason=reason,
         meta_data=meta_data,
     )

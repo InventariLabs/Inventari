@@ -408,22 +408,13 @@ def _stored_qty(qty: Decimal) -> Decimal:
 def _plan_shape(order: ProductionOrder) -> dict[str, object]:
     """The fields a draft's edit can move. A quantity stays a ``Decimal`` so
     comparing it is numeric (``4`` and ``4.000`` are one quantity); the
-    journal writes it as exact digits through :func:`_journal_shape`."""
+    journal writes it down as exact digits."""
     return {
         'planned_qty': _stored_qty(order.planned_qty),
         'production_date': (
             order.production_date.isoformat() if order.production_date else None
         ),
         'notes': order.notes,
-    }
-
-
-def _journal_shape(values: dict[str, object]) -> dict[str, object]:
-    """The plan fields as the snapshot records them: a ``Decimal`` as its exact
-    digits, never a float."""
-    return {
-        key: str(value) if isinstance(value, Decimal) else value
-        for key, value in values.items()
     }
 
 
@@ -1039,8 +1030,8 @@ async def complete_production(
             'old_status': 'DRAFT',
             'new_status': 'COMPLETED',
             'output': output.name if output else None,
-            'quantity': float(actual_qty),
-            'total_cost': float(total_cost),
+            'quantity': _stored_qty(actual_qty),
+            'total_cost': quantise(total_cost, 2),
         },
     )
 
@@ -1348,8 +1339,8 @@ async def update_order(
             target_id=order.id,
             snapshot={
                 'name': order.number,
-                'before': _journal_shape({key: before[key] for key in moved}),
-                'after': _journal_shape({key: after[key] for key in moved}),
+                'before': {key: before[key] for key in moved},
+                'after': {key: after[key] for key in moved},
             },
         )
     return order

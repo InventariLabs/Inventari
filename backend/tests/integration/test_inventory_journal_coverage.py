@@ -152,8 +152,8 @@ class TestItemMovementsAreRecorded:
 
         entries = await _entries(real_async_client, admin, target_type='item')
         entry = next(e for e in entries if e['action'] == 'USE')
-        assert entry['snapshot']['before'] == {'quantity': 4.0}
-        assert entry['snapshot']['after'] == {'quantity': 3.0}
+        assert entry['snapshot']['before'] == {'quantity': '4.000'}
+        assert entry['snapshot']['after'] == {'quantity': '3.000'}
         assert entry['reason'] == 'drunk'
         assert entry['meta_data'] == {'notes': 'breakfast'}
 
@@ -169,7 +169,7 @@ class TestItemMovementsAreRecorded:
 
         entries = await _entries(real_async_client, admin, target_type='item')
         entry = next(e for e in entries if e['action'] == 'DISPOSE')
-        assert entry['snapshot']['after'] == {'quantity': 3.0}
+        assert entry['snapshot']['after'] == {'quantity': '3.000'}
         assert entry['reason'] == 'expired'
 
     async def test_a_restore_pairs_the_soft_delete(
@@ -194,7 +194,7 @@ class TestItemMovementsAreRecorded:
         assert restore['snapshot']['after']['is_deleted'] is False
         # The quantity came back from the deletion history, and the journal
         # row says so.
-        assert restore['snapshot']['after']['quantity'] == 4.0
+        assert restore['snapshot']['after']['quantity'] == '4.000'
 
     async def test_a_create_carries_what_the_record_came_with(
         self, real_async_client, admin, created_item, async_test_storage_location
@@ -202,7 +202,7 @@ class TestItemMovementsAreRecorded:
         entries = await _entries(real_async_client, admin, target_type='item')
         entry = next(e for e in entries if e['action'] == 'CREATE')
         assert entry['snapshot']['name'] == 'Journal Milk'
-        assert entry['snapshot']['quantity'] == 4.0
+        assert entry['snapshot']['quantity'] == '4.000'
         assert entry['snapshot']['storage_location_id'] == str(
             async_test_storage_location.id
         )

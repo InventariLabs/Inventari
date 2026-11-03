@@ -9,6 +9,7 @@ item history never repeated it.
 
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any
 
 import pytest
@@ -138,7 +139,10 @@ class TestProductionRunAuditTrail:
         snapshot = completed[0]['snapshot']
         assert snapshot['name'] == number
         assert snapshot['output'] == 'Candle'
-        assert snapshot['quantity'] > 0
+        # Exact digits as text, never a float: the screen rounds a float to six figures.
+        assert isinstance(snapshot['quantity'], str)
+        assert Decimal(snapshot['quantity']) > 0
+        assert isinstance(snapshot['total_cost'], str)
 
         # The consequences: every mirrored quantity change says what took it.
         qty_changes = [

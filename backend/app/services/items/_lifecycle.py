@@ -11,6 +11,7 @@ from app.core.context import build_module_context
 from app.core.contracts import UserContextDTO
 from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.money import quantise
 from app.i18n.service import get_current_lang, get_error_message
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.item import Item
@@ -127,7 +128,7 @@ async def delete_item(
         snapshot={
             'name': item.name,
             'barcode': item.barcode,
-            'old_quantity': float(old_quantity) if old_quantity else 0.0,
+            'old_quantity': quantise(old_quantity or Decimal('0'), 3),
         },
         reason=reason,
         meta_data={'notes': notes} if notes else None,
@@ -218,7 +219,12 @@ async def restore_item(
         snapshot={
             'name': item.name,
             'before': {'is_deleted': True, 'deletion_reason': deleted_reason},
-            'after': {'is_deleted': False, 'quantity': float(item.quantity)},
+            'after': {
+                'is_deleted': False,
+                # The restored number was read back from the history as a float;
+                # the journal records the digits the column keeps.
+                'quantity': quantise(item.quantity, 3),
+            },
         },
     )
 
