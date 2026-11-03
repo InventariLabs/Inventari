@@ -570,7 +570,7 @@ describe("ItemMobileCard — a used-up record", () => {
     render(
       <ItemMobileCard
         item={makeItem({
-          quantity: 0,
+          quantity: "0",
           location_id: "consumed",
         } as Partial<Item>)}
         {...baseProps()}

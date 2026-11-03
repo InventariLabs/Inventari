@@ -179,7 +179,7 @@ describe("ItemActionsSheet — a used-up record", () => {
     render(
       <ItemActionsSheet
         {...baseProps()}
-        item={{ ...item, quantity: 0, location_id: "consumed" } as Item}
+        item={{ ...item, quantity: "0", location_id: "consumed" } as Item}
         storages={
           [
             { id: "consumed", name: "Consumed (Virtual)", usage: "customer" },
