@@ -1117,8 +1117,8 @@
         "setUp": "Ajustar la ubicación"
       },
       "occupancy": {
-        "noLimit_one": "Sin límite · {{count}} registro",
-        "noLimit_other": "Sin límite · {{count}} registros",
+        "noLimit_one": "Sin límite · {{count}} producto",
+        "noLimit_other": "Sin límite · {{count}} productos",
         "sharesSum_one": "{{fill}}% — la parte de {{count}} producto con límite",
         "sharesSum_other": "{{fill}}% — la suma de las partes de {{count}} productos con límite",
         "unmeasured": "Un producto aquí no tiene límite y no se cuenta",

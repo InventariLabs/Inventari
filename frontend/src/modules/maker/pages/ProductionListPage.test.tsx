@@ -11,6 +11,7 @@ import ProductionListPage from "./ProductionListPage";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 
 import { signInWith } from "@/test/auth";
+import { withLanguage } from "@/test/mocks/i18n";
 
 const header: { actions: ReactNode } = { actions: null };
 
@@ -254,6 +255,18 @@ describe("ProductionListPage run card result", () => {
     expect(
       screen.getByText(/^Savings vs shop price:/).closest("[title]"),
     ).toBeNull();
+  });
+
+  it("names a counted unit in the reader's word on the card", async () => {
+    listData = {
+      ...listData,
+      items: [{ ...listData.items[0], output_uom_symbol: "pcs" }],
+    };
+    await withLanguage("pl", () => {
+      renderPage();
+      expect(screen.getByText(/za szt\.\)/)).toBeInTheDocument();
+      expect(screen.queryByText(/za pcs/)).not.toBeInTheDocument();
+    });
   });
 });
 
