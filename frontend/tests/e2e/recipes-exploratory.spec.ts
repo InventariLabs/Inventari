@@ -874,13 +874,20 @@ test.describe("Recipes — follow-ups", () => {
     const recipeName = `E2E-Toast-${stamp}`;
     // Linked ingredient with no stock → status 'missing' (never 'unknown'),
     // so the Add-missing button is enabled.
+    // The line is named per run: the list a click adds to is the newest
+    // active one, which keeps what an earlier run put on it, and a name it
+    // already holds is answered with "already on the list" instead of
+    // "added" — so a fixed name only passed on a database nothing had used.
+    const ingredientName = `Zztoast Sesame ${stamp}`;
     const template = await api.createProductTemplate(token, {
-      name: `Zztoast Sesame ${stamp}`,
+      name: ingredientName,
     });
     const recipe = await api.createRecipe(token, {
       name: recipeName,
       servings: 2,
-      ingredients: [{ name: "Sesame", quantity: 2, template_id: template.id }],
+      ingredients: [
+        { name: ingredientName, quantity: 2, template_id: template.id },
+      ],
     });
     cleanupRecipeIds.push(recipe.id);
 
@@ -1055,7 +1062,10 @@ test.describe("Recipes — follow-ups", () => {
       .first()
       .click();
 
-    const dialog = page.locator('[role="dialog"]');
+    // Name the sheet: the unit picker below is a dialog too, and it stays in
+    // the page, closed, while it animates out — a bare `[role="dialog"]`
+    // then matches both and the hidden check fails on a strict-mode error.
+    const dialog = page.getByRole("dialog", { name: /new recipe/i });
     await expect(dialog).toBeVisible({ timeout: 10000 });
     await dialog.getByPlaceholder("e.g. Pasta Bolognese").fill(recipeName);
     await dialog.getByRole("button", { name: /add ingredient/i }).click();
@@ -1063,7 +1073,8 @@ test.describe("Recipes — follow-ups", () => {
     // Type the full unique name so leftover templates from previous runs
     // (search is capped at limit=10) can never push ours out of the list
     await dialog.getByPlaceholder("Ingredient name").first().fill(templateName);
-    const suggestion = dialog.getByText(templateName, { exact: true });
+    // The suggestion list is portalled out of the sheet, so look on the page.
+    const suggestion = page.getByText(templateName, { exact: true });
     await expect(suggestion).toBeVisible({ timeout: 10000 });
     await suggestion.click();
 

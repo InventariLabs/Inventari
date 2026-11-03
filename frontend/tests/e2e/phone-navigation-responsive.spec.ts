@@ -162,6 +162,17 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     // A chip is the reader's own tap: the place and category pickers stay
     // folded away instead of pushing the list down.
     await expect(page.locator("#items-domain-filters")).toHaveCount(0);
+    // The pressed state is read from the screen's state at once; the address
+    // is written a beat later. Reloading in between brings back no chips, so
+    // wait for the address the reload will read.
+    await expect
+      .poll(() =>
+        (new URL(page.url()).searchParams.get("filter") ?? "")
+          .split(",")
+          .sort()
+          .join(","),
+      )
+      .toBe("low-stock,used-up");
     await page.reload();
     await expect(lowStock).toHaveAttribute("aria-pressed", "true");
     await expect(usedUp).toHaveAttribute("aria-pressed", "true");
