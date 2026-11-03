@@ -229,7 +229,9 @@ describe("ProductCombobox", () => {
       expect(screen.getByRole("listbox")).toBeInTheDocument(),
     );
 
-    const list = screen.getByRole("listbox");
+    const list = screen
+      .getByRole("listbox")
+      .closest<HTMLElement>("[data-line-item-dropdown]")!;
     // Portalled to body, positioned fixed against the input — a modal's
     // overflow-y-auto cannot clip it.
     expect(list.style.position).toBe("fixed");
@@ -253,7 +255,7 @@ describe("ProductCombobox", () => {
     expect(input).toHaveAttribute("aria-expanded", "true");
     expect(input).toHaveAttribute(
       "aria-controls",
-      screen.getByRole("listbox").id,
+      screen.getByRole("listbox").closest("[data-line-item-dropdown]")!.id,
     );
   });
 
@@ -303,6 +305,73 @@ describe("ProductCombobox", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Search failed");
     expect(screen.queryByText('No results for "zz"')).not.toBeInTheDocument();
+    expect(screen.queryByText("Nothing found")).not.toBeInTheDocument();
+  });
+
+  it("counts a character above U+FFFF once, so one emoji sends no search and draws no alert", async () => {
+    // The endpoint counts code points: one emoji is one, so a gate on the
+    // string's UTF-16 length would send it and be answered with a refusal.
+    const user = userEvent.setup();
+    search.mockResolvedValue([]);
+    const renderEmpty = vi.fn(() => <div>Nothing found</div>);
+    render(<ProductCombobox {...baseProps} renderNoResults={renderEmpty} />);
+
+    await user.type(screen.getByRole("combobox"), "🍎");
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 400));
+    });
+
+    expect(search).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.queryByText("Nothing found")).not.toBeInTheDocument();
+  });
+
+  it("asks again with the same text when Try again is pressed after a failure", async () => {
+    const user = userEvent.setup();
+    search.mockRejectedValueOnce(new Error("503"));
+    search.mockResolvedValue([stub("Zzz")]);
+    render(<ProductCombobox {...baseProps} />);
+
+    await user.type(screen.getByRole("combobox"), "zz");
+    await screen.findByRole("alert");
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+
+    expect(await screen.findByRole("option")).toHaveTextContent("Zzz");
+    expect(search).toHaveBeenCalledTimes(2);
+    expect(search).toHaveBeenLastCalledWith("zz");
+  });
+
+  it("still offers the create panel under results when the text runs past the search limit and no result is that name", async () => {
+    const opening = "a".repeat(100);
+    search.mockResolvedValue([stub(`${opening}-red`)]);
+    render(
+      <ProductCombobox
+        {...baseProps}
+        renderNoResults={() => <div>Nothing found</div>}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: `${opening}-blue` },
+    });
+
+    expect(await screen.findByText("Nothing found")).toBeInTheDocument();
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+  });
+
+  it("offers no create panel under results when the long text is exactly a listed product", async () => {
+    const name = "a".repeat(120);
+    search.mockResolvedValue([stub(name)]);
+    render(
+      <ProductCombobox
+        {...baseProps}
+        renderNoResults={() => <div>Nothing found</div>}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: name } });
+
+    await screen.findByRole("option");
     expect(screen.queryByText("Nothing found")).not.toBeInTheDocument();
   });
 

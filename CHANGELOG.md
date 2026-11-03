@@ -14,6 +14,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A product name longer than 100 characters can be searched: the search looks
+  for its opening, and a failed product search is reported as failed, with a
+  button to try again, rather than as "no results". A long name that only
+  shares its opening with an existing product can still be added as new.
 - A product whose nutrition came from Open Food Facts now counts its calories
   in recipe estimates and in the meal plan's daily totals. They used to go
   missing while its protein, fat and carbohydrates were counted, and the day
