@@ -668,7 +668,8 @@ describe("mayBePlanned", () => {
     expect(mayBePlanned("IN", "2026-11-04", today)).toBe(true);
   });
 
-  it("does not offer a plan for a receipt dated today", () => {
+  it("does not offer a plan for a receipt or a move dated today", () => {
     expect(mayBePlanned("IN", today, today)).toBe(false);
+    expect(mayBePlanned("INT", today, today)).toBe(false);
   });
 });

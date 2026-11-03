@@ -86,7 +86,7 @@ interface DraftActionsProps {
 /**
  * What a draft offers. The one-step verb is the primary action; the old
  * confirm step survives as "Plan" in the row's menu for a future-dated
- * document, where a plan is the point, and for goods to be picked first.
+ * document, where a plan is the point, and for an issue to be picked first.
  */
 function DraftActions({
   isCorrection,

@@ -133,18 +133,16 @@ export function isPickedBeforePosting(type: string): boolean {
 
 /**
  * Whether a draft may be planned rather than posted now: a future date is a
- * plan by itself, and goods to be picked need one today too, since a picking
- * session starts on a planned document. Today's issue used to reach picking
- * only after the office dated it tomorrow.
+ * plan by itself, and an issue needs one today too, since a picking session
+ * starts on a planned document. Today's issue used to reach picking only after
+ * the office dated it tomorrow.
  */
 export function mayBePlanned(
   type: string,
   scheduledDate: string | null | undefined,
   today: string,
 ): boolean {
-  return (
-    (!!scheduledDate && scheduledDate > today) || isPickedBeforePosting(type)
-  );
+  return (!!scheduledDate && scheduledDate > today) || type === "OUT";
 }
 
 export type TaxHandling = "NONE" | "SIMPLE_RATE" | "PER_LINE_RATE";
