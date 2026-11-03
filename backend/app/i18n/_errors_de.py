@@ -850,7 +850,7 @@ ERRORS_DE: ErrorMessages = {
     'permanent_delete_disabled': (
         'Das dauerhafte Löschen ist für diese Organisation deaktiviert.'
     ),
-    'documents_approval_workflow_missing': 'Dieser Beleg braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
+    'documents_approval_workflow_missing': 'Dieses Dokument braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
     'category_delete_blocked_by_items': (
         'Kategorie kann nicht gelöscht werden — sie wird verwendet ({count}). Verschieben Sie ihre Produkte zuerst in eine andere Kategorie.'
     ),
