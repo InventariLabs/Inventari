@@ -102,18 +102,44 @@ describe("ProductCombobox", () => {
     );
   });
 
-  it("closes the list when the page scrolls under it, but not when the list itself scrolls", async () => {
+  it("closes the list when the page scrolls the input away, but not when the list itself scrolls", async () => {
     const user = userEvent.setup();
     search.mockResolvedValue([stub("Latte cups")]);
     render(<ProductCombobox {...baseProps} />);
-    await user.type(screen.getByRole("combobox"), "la");
+    const input = screen.getByRole("combobox");
+    let top = 100;
+    vi.spyOn(input, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({ top, bottom: top + 40, left: 0, right: 200, width: 200 }) as DOMRect,
+    );
+    await user.type(input, "la");
     const list = await screen.findByRole("listbox");
 
     fireEvent.scroll(list);
     expect(screen.getByRole("listbox")).toBeInTheDocument();
 
+    top = 60;
     fireEvent.scroll(document.body);
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("keeps the list and the typed text when a scroll leaves the input where it was", async () => {
+    // A scroll event is delivered a frame after the layout move that caused
+    // it — a sheet settling under the box, a focus scroll-into-view — so it
+    // can reach the listener of a list that opened after the move. The input
+    // has not budged, and wiping what the reader typed for it made the list
+    // vanish under a correct query.
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Latte cups")]);
+    render(<ProductCombobox {...baseProps} />);
+    const input = screen.getByRole("combobox");
+    await user.type(input, "la");
+    await screen.findByRole("listbox");
+
+    fireEvent.scroll(document);
+
+    expect(input).toHaveValue("la");
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
   it("keeps the typed text when the box scrolls its own long text sideways", async () => {

@@ -309,15 +309,26 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // does the input scrolling its own text sideways, which a long name does
   // when the focus comes back to it — that used to wipe the name the reader
   // had just been refused on.
+  //
+  // "Holding the input" is not enough: a scroll event reaches the listener a
+  // frame after the layout move that caused it (a sheet settling under the
+  // box, a focus scroll-into-view), so it can arrive for a list that opened
+  // after the move, with the input exactly where it was. Closing then wiped a
+  // correct query. The list closes only when the input really moved.
   useEffect(() => {
     if (!dropdownOpen) return;
+    const origin = inputRef.current?.getBoundingClientRect();
     const onScroll = (e: Event) => {
       const scrolled = e.target as Node;
       const input = inputRef.current;
-      const movesInput =
+      const holdsInput =
         scrolled === document ||
         (scrolled !== input && scrolled.contains(input));
-      if (movesInput) reset();
+      if (!holdsInput || !origin || !input) return;
+      const now = input.getBoundingClientRect();
+      if (Math.abs(now.top - origin.top) + Math.abs(now.left - origin.left) < 1)
+        return;
+      reset();
     };
     window.addEventListener("scroll", onScroll, true);
     return () => window.removeEventListener("scroll", onScroll, true);
