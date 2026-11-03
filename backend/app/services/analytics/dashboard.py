@@ -27,18 +27,12 @@ from app.models.storage_location import LocationUsage
 from app.services.items.expiry import is_expired, is_expiring_soon
 from app.services.storage._queries import list_storage_ids_async
 
-from ._common import get_org_currency_async, org_currency_filter, org_today_async
-
-
-async def _internal_storage_ids(db: AsyncSession, organization_id: UUID) -> list[UUID]:
-    """The ids of the organization's real shelves, virtual places left out."""
-    result = await db.scalars(
-        select(StorageLocation.id).where(
-            StorageLocation.organization_id == organization_id,
-            StorageLocation.usage == LocationUsage.INTERNAL,
-        )
-    )
-    return list(result.all())
+from ._common import (
+    get_internal_storage_ids_async,
+    get_org_currency_async,
+    org_currency_filter,
+    org_today_async,
+)
 
 
 async def get_stats_by_storage_async(
@@ -118,7 +112,7 @@ async def get_stats_by_category_async(
     shows module data, as its records stay out of the products list.
     """
     hidden = await hidden_module_tags_async(db, organization_id)
-    storage_ids = await _internal_storage_ids(db, organization_id)
+    storage_ids = await get_internal_storage_ids_async(db, organization_id, hidden)
     if not storage_ids:
         return []
 

@@ -29,7 +29,7 @@ says what the release does rather than what changed since them.
   other off.
 - Statistics count stock rows as records instead of pieces, name the products
   without a category in the reader's language, list the fullest places first
-  and leave out the system's empty consumed, loss and production places.
+  and leave out the system's consumed, loss and production places.
 - The meal plan dialog that has no plan yet now says the recipe is added to the
   first meal of the new plan at once, and closing the "Take from stock" dialog
   no longer marks the recipe as cooked.

@@ -170,32 +170,49 @@ def _build_accent_variants() -> dict[str, str]:
 _ACCENT_VARIANTS = _build_accent_variants()
 
 
-def _accent_tolerant_regex(folded: str) -> str:
-    """A regex matching *folded* in a name, whatever accents the name keeps."""
+def _accent_tolerant_regex(folded: str) -> str | None:
+    """A regex matching *folded* in a name that kept its accents.
+
+    ``None`` when no letter of *folded* has an accented spelling: the raw
+    pattern already finds it.
+    """
     parts = []
+    tolerant = False
     for char in folded:
         letters = _ACCENT_VARIANTS.get(char)
         if letters:
+            tolerant = True
             parts.append(f'[{char}{letters}]')
         else:
             parts.append(char if char.isalnum() else f'\\{char}')
-    return ''.join(parts)
+    return ''.join(parts) if tolerant else None
 
 
-def _name_contains(fragment: str) -> Any:
-    """``name`` contains *fragment* in its own spelling, or folded of accents.
+def _names_containing(fragments: list[str]) -> Any:
+    """``name`` contains one of *fragments* in its own spelling, or folded.
 
-    Two cheap conditions rather than a fold of the column: the raw pattern
-    covers every script and the multi-letter folds ("ß" for "ss"), the regex
-    covers a fragment the caller already folded ("ryz") against a name that
-    kept its letters ("Ryż 1 kg"). Both read the name as stored, so the
-    trigram index on it stays usable.
+    The raw pattern per fragment covers every script and the multi-letter
+    folds ("ß" for "ss"). The accent-tolerant regex covers a fragment the
+    caller already folded ("ryz") against a name that kept its letters
+    ("Ryż 1 kg"); all of them go into ONE regex, because PostgreSQL keeps 32
+    compiled regexes per session and a query naming more recompiles on every
+    row (a recipes page names about sixty fragments).
+
+    Both read the name as stored. The raw patterns alone stay on the trigram
+    index; the regex does not, so the query scans the catalogue whenever a
+    fragment has an accented spelling.
     """
-    folded = anyascii(fragment).lower()
-    return or_(
-        ProductTemplate.name.ilike(f'%{escape_ilike(fragment)}%'),
-        ProductTemplate.name.op('~*')(_accent_tolerant_regex(folded)),
+    conditions = [
+        ProductTemplate.name.ilike(f'%{escape_ilike(fragment)}%')
+        for fragment in fragments
+    ]
+    folded = {anyascii(fragment).lower() for fragment in fragments}
+    regexes = sorted(
+        {regex for fragment in folded if (regex := _accent_tolerant_regex(fragment))}
     )
+    if regexes:
+        conditions.append(ProductTemplate.name.op('~*')('|'.join(regexes)))
+    return or_(*conditions)
 
 
 async def search_fuzzy_many_async(
@@ -215,8 +232,12 @@ async def search_fuzzy_many_async(
     names travel back alongside the ids to make that possible.
 
     Matching is diacritic-insensitive: both the fragment and the template
-    name are folded to ASCII before comparison, so a catalogue stored as
-    "Maslo" answers a query spelled "Masło" and the other way round.
+    name are folded to ASCII for the verdict, so a catalogue stored as
+    "Maslo" answers a query spelled "Masło" and the other way round. The
+    database narrows by the fragment as given (any script, "ß", "œ") and by
+    its ASCII fold against the accented Latin letters of a name ("ryz" finds
+    "Ryż"); a name whose letters fold to several ("Weißbrot" for "weissbrot")
+    is reached by the fragment spelled with them, not by the folded one.
 
     Args:
         org_id: Calling organization scope.
@@ -236,7 +257,7 @@ async def search_fuzzy_many_async(
     # where the same fold is available on both sides.
     result = await db.execute(
         select(ProductTemplate.id, ProductTemplate.name).where(
-            or_(*[_name_contains(fragment) for fragment in cleaned]),
+            _names_containing(cleaned),
             or_(
                 ProductTemplate.organization_id == org_id,
                 ProductTemplate.organization_id.is_(None),

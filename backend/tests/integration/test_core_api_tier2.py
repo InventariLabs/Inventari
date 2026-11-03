@@ -574,6 +574,35 @@ class TestCoreProductTemplatesSearchFuzzyMany:
         )
         assert [c.name for c in result[name.lower()]] == [name]
 
+    async def test_many_fragments_still_find_every_accented_name(
+        self, real_async_db_session: AsyncSession, async_test_storage_location
+    ):
+        """More than thirty fragments in one query: the accent-tolerant
+        patterns share one regex, since PostgreSQL recompiles a query's
+        regexes on every row once it holds more than 32 of them."""
+        db = real_async_db_session
+        org_id = async_test_storage_location.organization_id
+        await _make_template(db, org_id, name='Ryż 1 kg')
+        await _make_template(db, org_id, name='Śmietana 18%')
+        await db.commit()
+
+        fragments = ['ryz', 'smie', *[f'zz{n:03d}' for n in range(45)]]
+        result = await core_api.product_templates.search_fuzzy_many_async(
+            db, org_id, fragments
+        )
+        assert [c.name for c in result['ryz']] == ['Ryż 1 kg']
+        assert [c.name for c in result['smie']] == ['Śmietana 18%']
+        assert result['zz044'] == []
+
+    async def test_accent_patterns_share_one_regex_whatever_the_fragment_count(self):
+        """The cliff is at 33 distinct regexes in a statement (about ten times
+        the cost per row); one alternation stays under it for any page."""
+        from app.services._product_template_search import _names_containing
+
+        fragments = [f'ryz{chr(97 + n % 26)}{n}' for n in range(60)]
+        sql = str(_names_containing(fragments).compile())
+        assert sql.count('~*') == 1
+
     async def test_org_scoping(
         self, real_async_db_session: AsyncSession, async_test_storage_location
     ):
