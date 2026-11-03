@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts.dtos import PartnerDTO
 from app.core.exceptions import AppException, ServiceRejectionError
+from app.core.print_identity import issuer_snapshot
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
@@ -117,6 +118,15 @@ def _build_partner_snapshot(partner: PartnerDTO) -> dict[str, Any]:
         'address': partner.address,
         'email': partner.email,
         'phone': partner.phone,
+    }
+
+
+def _freeze_print_details(doc: Document, organization: Any) -> dict[str, Any]:
+    """What the printout states about the issuer and the places, as of now."""
+    return {
+        'issuer': issuer_snapshot(organization),
+        'source_location': doc.source_location.name if doc.source_location else None,
+        'target_location': doc.target_location.name if doc.target_location else None,
     }
 
 
