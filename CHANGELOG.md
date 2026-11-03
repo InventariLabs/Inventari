@@ -12,6 +12,17 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Changed
+
+- A confirmed document now keeps your own company's name, tax number and
+  address and the names of the locations it refers to, as it already kept the
+  partner, so a reprint after the company moved or a shelf was renamed shows
+  what the original showed. The record a closed stock take leaves in the
+  register keeps them too. The layout, the document type's settings and the
+  logo are still read when the document is printed, and a document confirmed
+  before this change prints the current details. A module that prints its own
+  documents through the core print identity can freeze the same block with
+  `issuer_snapshot` and `IssuerContext.from_snapshot`.
 ### Added
 
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
