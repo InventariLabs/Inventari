@@ -599,17 +599,17 @@ describe("ItemTable — the storage cell is one click target", () => {
     );
 
     const link = screen.getByRole("link", {
-      name: "Pantry Building → Dry Goods → Shelf A - Bottom",
+      name: "Pantry Building › Dry Goods › Shelf A - Bottom",
     });
     const leaf = screen.getByText("Shelf A - Bottom");
     expect(link).toContainElement(leaf);
     expect(leaf.className).not.toContain("truncate");
     expect(
       leaf.compareDocumentPosition(
-        screen.getByText("Pantry Building → Dry Goods"),
+        screen.getByText("Pantry Building › Dry Goods"),
       ) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    expect(screen.getByText("Pantry Building → Dry Goods").className).toContain(
+    expect(screen.getByText("Pantry Building › Dry Goods").className).toContain(
       "truncate",
     );
   });
@@ -637,7 +637,7 @@ describe("ItemTable — the storage cell is one click target", () => {
     renderWithStorage();
 
     expect(
-      screen.getByRole("link", { name: "Main Warehouse → Bay 3" }),
+      screen.getByRole("link", { name: "Main Warehouse › Bay 3" }),
     ).toBeInTheDocument();
   });
 
@@ -678,7 +678,7 @@ describe("ItemTable — the storage cell is one click target", () => {
     renderWithStorage();
 
     const link = screen.getByRole("link", { name: /Main Warehouse/ });
-    expect(link).toHaveAttribute("title", "Main Warehouse → Bay 3");
+    expect(link).toHaveAttribute("title", "Main Warehouse › Bay 3");
   });
 });
 

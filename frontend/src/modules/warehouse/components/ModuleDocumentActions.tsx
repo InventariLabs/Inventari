@@ -88,6 +88,7 @@ export function DocumentHeaderActions({ doc, ...actions }: HeaderActionsProps) {
         isConfirmed={doc.status === "CONFIRMED"}
         docStatus={doc.status}
         docType={doc.type}
+        isReversed={!!doc.reversed_by_id}
         {...actions}
       />
       {actions.canStartPicking && (

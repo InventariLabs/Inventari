@@ -1,5 +1,6 @@
 import type { PutawayOccupancyOverview } from "@/modules/warehouse/api/putaway";
 import { formatQuantityLocale } from "@/utils/formatters";
+import { LOCATION_PATH_SEPARATOR } from "@/utils/helpers";
 
 export type OccupancyNode = PutawayOccupancyOverview["nodes"][number];
 export type OccupancyCell = NonNullable<OccupancyNode["cell"]>;
@@ -156,5 +157,5 @@ export function pathOf(
     names.unshift(current.name);
     current = current.parent_id ? byId.get(current.parent_id) : undefined;
   }
-  return names.join(" › ");
+  return names.join(LOCATION_PATH_SEPARATOR);
 }

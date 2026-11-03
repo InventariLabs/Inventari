@@ -8,6 +8,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
+from app.core.location_path import join_location_path
 from app.core.xlsx_export import rows_to_xlsx_response
 from app.models.category import Category
 from app.models.item import Item
@@ -162,7 +163,7 @@ def _location_paths(db: Session, organization_id: UUID | None) -> dict[UUID, str
             seen.add(current)
             names.append(by_id[current].name)
             current = by_id[current].parent_id
-        paths[location_id] = ' → '.join(reversed(names))
+        paths[location_id] = join_location_path(reversed(names))
     return paths
 
 

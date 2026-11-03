@@ -12,14 +12,14 @@ describe("storageLeafOption", () => {
     expect(storageLeafOption(fridge, all)).toEqual({
       id: "f",
       name: "Fridge A - Top Shelf",
-      path: "Main Warehouse → Cold Storage → Fridge A - Top Shelf",
+      path: "Main Warehouse › Cold Storage › Fridge A - Top Shelf",
     });
   });
 
   it("prefers the path the backend composed", () => {
     expect(
-      storageLeafOption({ ...fridge, full_path: "Elsewhere → Top" }, all).path,
-    ).toBe("Elsewhere → Top");
+      storageLeafOption({ ...fridge, full_path: "Elsewhere › Top" }, all).path,
+    ).toBe("Elsewhere › Top");
   });
 
   it("leaves a root location without a caption that only repeats its name", () => {

@@ -378,8 +378,8 @@ describe("DocumentsTemplatesPage — the dialog and the badge speak the document
       "Receipt",
       "Delivery",
       "Transfer",
-      "Internal Receipt",
-      "Internal Issue",
+      "Internal receipt",
+      "Internal issue",
       "Scrap",
     ]) {
       expect(labels).toContain(expected);

@@ -96,10 +96,10 @@ test.describe("Locations — tree and selected location", () => {
 
     // The zone stands at the top, the location inside it.
     await search(page, zoneName);
-    await expect(result(page, zoneName)).not.toContainText("→");
+    await expect(result(page, zoneName)).not.toContainText("›");
     await search(page, locationName);
     await expect(result(page, locationName)).toContainText(
-      `${zoneName} → ${locationName}`,
+      `${zoneName} › ${locationName}`,
     );
   });
 

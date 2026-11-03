@@ -1,4 +1,5 @@
 import type { StorageLocationSummary } from "@/types";
+import { LOCATION_PATH_SEPARATOR } from "@/utils/helpers";
 
 /** What a screen needs to know of a place Core named by id. */
 export interface LocationChoice {
@@ -16,8 +17,6 @@ export interface LocationChoice {
   leaf?: boolean;
 }
 
-const LOCATION_PATH_SEPARATOR = " › ";
-
 /**
  * A place Core named by id, as the choice a screen looks things up in: its
  * code, whether anything stands below it, and the way to it.
@@ -29,7 +28,7 @@ export function locationChoiceOf(
   >,
 ): LocationChoice {
   const chain = summary.full_path
-    ? summary.full_path.split(" → ")
+    ? summary.full_path.split(LOCATION_PATH_SEPARATOR)
     : [summary.name];
   return {
     id: summary.id,

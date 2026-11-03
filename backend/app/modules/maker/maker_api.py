@@ -15,6 +15,7 @@ from sqlalchemy import and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserContextDTO, WorkItemDTO, WorkItemQueryDTO
+from app.core.public_api import core_api
 
 from . import bom_service, cost_breakdown, cost_rollup, production_service
 from ._schemas_breakdown import CostBreakdownResponse
@@ -154,6 +155,15 @@ class MakerAPI:
             .scalars()
             .all()
         )
+        # A quantity of goods is meaningless without its measure.
+        symbols = (
+            {
+                uom.id: uom.symbol
+                for uom in await core_api.uoms.list_for_org_async(db, organization_id)
+            }
+            if orders
+            else {}
+        )
         runs = [
             WorkItemDTO(
                 kind='produce',
@@ -166,6 +176,11 @@ class MakerAPI:
                 count=order.actual_qty
                 if order.status == 'COMPLETED' and order.actual_qty is not None
                 else order.planned_qty,
+                unit=(
+                    symbols.get(order.output_template.uom_id)
+                    if order.output_template.uom_id
+                    else None
+                ),
                 next_action=None if order.status == 'COMPLETED' else 'produce',
                 done_at=order.completed_at if order.status == 'COMPLETED' else None,
             )

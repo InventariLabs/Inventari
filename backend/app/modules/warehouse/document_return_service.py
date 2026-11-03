@@ -11,6 +11,7 @@ from app.core.db_utils import acquire_advisory_lock
 from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
 from app.core.public_api import core_api
+from app.i18n.service import get_unit_label, stated_quantity
 
 from . import document_types as dt
 from ._line_reversals import reversible_quantity_async
@@ -112,12 +113,16 @@ async def create_return(
         # returned in full, or corrected away, has nothing left to send back.
         left = await reversible_quantity_async(db, org_id, orig_line)
         if return_qty > left:
+            unit = ''
+            if orig_line.uom_id is not None:
+                uom = await core_api.uoms.get_async(db, orig_line.uom_id, org_id)
+                unit = f' {get_unit_label(uom.symbol)}' if uom else ''
             raise ServiceRejectionError(
                 'document_return_quantity_exceeds_left',
-                quantity=return_qty,
+                quantity=f'{stated_quantity(return_qty)}{unit}',
                 line=orig_line_num,
-                left=left,
-                done=orig_line.done_quantity,
+                left=f'{stated_quantity(left)}{unit}',
+                done=f'{stated_quantity(orig_line.done_quantity)}{unit}',
             )
 
         new_line = DocumentLine(

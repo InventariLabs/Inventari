@@ -243,6 +243,9 @@ interface DocumentActionButtonsProps {
   /** A posted receipt, issue or move whose stock is still there to take
    * back: the page offers Undo beside Return. */
   canUndo?: boolean;
+  /** Undo has already put everything back: a return would have nothing left
+   * to send, so none is offered. */
+  isReversed?: boolean;
   isUndoPending?: boolean;
   onApplyCorrection: () => void;
   onEdit: () => void;
@@ -278,6 +281,7 @@ export function DocumentActionButtons({
   approvalRequiredNoRequest,
   approvalWorkflowMissing,
   canUndo,
+  isReversed = false,
   isUndoPending,
   onApplyCorrection,
   onEdit,
@@ -455,7 +459,7 @@ export function DocumentActionButtons({
           {t(undoLabelKey(docType))}
         </Button>
       )}
-      {canWrite && isCompleted && canReturn && (
+      {canWrite && isCompleted && canReturn && !isReversed && (
         <Button
           variant="outline"
           size="sm"

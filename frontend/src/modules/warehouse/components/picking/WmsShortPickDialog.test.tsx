@@ -58,7 +58,7 @@ describe("WmsShortPickDialog", () => {
   it("announces itself as a named dialog", () => {
     renderDialog();
 
-    expect(screen.getByRole("dialog", { name: "Short Pick" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: "Short pick" })).toBeVisible();
   });
 
   it("names its quantity field as the final total", () => {

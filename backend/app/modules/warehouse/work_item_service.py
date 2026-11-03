@@ -278,8 +278,13 @@ def _order(item: WorkItemSchema) -> tuple[Any, ...]:
     for a person, leads without a day. Among the decisions a backorder whose
     stock has arrived goes first: it is the one that can be issued now.
     """
+    if item.state == 'done':
+        # What was finished lately, the latest first; the sources each hand
+        # theirs over newest first, but their lists are merged here.
+        done_at = item.done_at.timestamp() if item.done_at else 0.0
+        return (True, -done_at, item.key)
     return (
-        item.state == 'done',
+        False,
         item.kind not in _DECISION_KINDS,
         item.stock_cover != 'full',
         item.due_date is None,

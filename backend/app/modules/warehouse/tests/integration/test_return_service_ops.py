@@ -25,6 +25,7 @@ from app.i18n.service import set_current_lang
 from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
 from app.models.storage_type import StorageType
+from app.models.uom import Uom, UomCategory
 from app.models.user import User
 from app.modules.warehouse.document_pdf_service import build_pdf_context
 from app.modules.warehouse.document_query_service import get_document
@@ -453,6 +454,52 @@ class TestCreateReturn:
         # The bound is what the line has left, which for a line nobody has
         # touched is everything it executed.
         with pytest.raises(ValueError, match='is more than what is left of line'):
+            await create_return(
+                real_async_db_session,
+                original.id,
+                [{'original_line_number': 1, 'return_quantity': Decimal('99')}],
+                ret_org.id,
+                ret_user.id,
+            )
+
+    @pytest.mark.asyncio
+    async def test_the_refusal_states_its_quantities_with_the_lines_unit(
+        self,
+        real_async_db_session: AsyncSession,
+        ret_org: Organization,
+        ret_user: User,
+        ret_target_location: StorageLocation,
+    ) -> None:
+        category = UomCategory(name='Mass', organization_id=ret_org.id)
+        real_async_db_session.add(category)
+        await real_async_db_session.flush()
+        kilo = Uom(
+            organization_id=ret_org.id,
+            category_id=category.id,
+            name='Kilogram',
+            symbol='kg',
+            rounding=Decimal('0.001'),
+        )
+        real_async_db_session.add(kilo)
+        await real_async_db_session.flush()
+        original = await _create_completed_document(
+            real_async_db_session,
+            ret_org,
+            ret_user,
+            doc_type='IN',
+            line_specs=[{'quantity': Decimal('10'), 'done_quantity': Decimal('10')}],
+            target_location_id=ret_target_location.id,
+        )
+        original.lines[0].uom_id = kilo.id
+        await real_async_db_session.flush()
+
+        # The store keeps three decimals ("10.000"); a reader never typed
+        # them and the line is counted in kilograms.
+        with pytest.raises(
+            ValueError,
+            match=r'A return of 99 kg is more than what is left of line 1 '
+            r'\(10 kg of 10 kg\)',
+        ):
             await create_return(
                 real_async_db_session,
                 original.id,
