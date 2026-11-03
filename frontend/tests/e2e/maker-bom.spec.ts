@@ -175,11 +175,14 @@ test.describe("Maker — recipe catalog & formula detail", () => {
     await expect(dialog).toBeVisible({ timeout: 5000 });
 
     // The search is debounced and answered over the network; wait for the
-    // search call itself, then for the result row. Waiting only on the row
-    // made this flaky when the response was slow (the 5s window ran out).
+    // search call for this very name, then for the result row. Waiting only
+    // on the row made this flaky when the response was slow (the 5s window
+    // ran out), and any other read of the catalogue satisfies a wait on the
+    // URL alone.
     const searchResponse = page.waitForResponse(
       (r) =>
         r.url().includes("/items/product-templates") &&
+        new URL(r.url()).searchParams.get("search") === product.name &&
         r.request().method() === "GET" &&
         r.ok(),
       { timeout: 10000 },
@@ -190,8 +193,8 @@ test.describe("Maker — recipe catalog & formula detail", () => {
     await searchResponse;
     // The result list is portalled to document.body so it can escape the
     // sheet's overflow — scope this to the page, not to the dialog. Filter
-    // by name: an earlier (empty-query) response can satisfy the wait above
-    // before the row for this product has rendered.
+    // by name: the response can land a render before the row for this
+    // product has been painted.
     const result = page
       .getByTestId("maker-recipe-create-product-result")
       .filter({ hasText: product.name })
