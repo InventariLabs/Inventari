@@ -224,6 +224,14 @@ class Document(CoreModelBase):
         JSONB, nullable=True
     )
 
+    #: The rest of what the printout states about the parties, frozen at
+    #: confirmation like the partner: ``issuer`` (the organization's name, tax
+    #: id and address, see ``core.print_identity.issuer_snapshot``) and the
+    #: ``source_location`` / ``target_location`` names. The logo and the
+    #: layout stay live. Empty on documents confirmed before it existed, which
+    #: print from live data.
+    print_snapshot: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+
     #: Other modules' own fields on this document, each under the module's
     #: name (``{'<module>': {...}}``): a field one customer needs is not a
     #: column here. Read by the pre-post checks; copied onto a correction or

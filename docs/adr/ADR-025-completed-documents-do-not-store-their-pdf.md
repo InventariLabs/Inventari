@@ -15,13 +15,18 @@ confirmed: lines, quantities and prices cannot be edited (a receipt line's
 target shelf can still be named until its goods are booked), the partner is
 copied onto the document as a snapshot (name, tax number, address), each line
 keeps the name and price it was written with, and a completed document
-changes only through a correction document. Other inputs are read live each
-time: the print template, the document type's settings (title and whether
-price and tax columns show), the issuer block at the top (the organization's
-own name, address and logo), and the names of the locations the document
-refers to. Two prints of the same document can therefore differ in layout,
-in the issuer block, in which columns show and in a renamed location, while
-the document's lines, quantities, prices and partner stay the same.
+changes only through a correction document. Confirmation also copies the
+issuer block (the organization's name, tax number and address) and the names
+of the source and target locations onto the document (`print_snapshot`), so a
+reprint after the company moved or a shelf was renamed shows the values of
+the day of confirmation. Other inputs are read live each time: the print
+template, the document type's settings (title and whether price and tax
+columns show) and the organization's logo (an image changed later is
+presentation, not a statement of the transaction). Two prints of the same
+document can therefore differ in layout, in which columns show and in the
+logo, while everything the document states stays the same. A document
+confirmed before the snapshot existed carries none and prints the issuer and
+the location names live.
 
 Some tax regimes keep a delivery note, or any document sent to the other side,
 as a commercial letter, for a number of years, in the form it was sent. The
@@ -37,8 +42,10 @@ Completing a document does **not** store a PDF, and does not record a template
 version. The stored record is the data; the PDF is a view of it.
 
 The user guide (10.11) says so in plain words: a reprint reads the template,
-the type's settings, the issuer details and the location names of the day; a business that must keep a document *as sent* saves the
-file when it sends it, or keeps the email it went out in.
+the type's settings and the logo of the day, while the partner, the issuer
+details and the location names are the ones frozen at confirmation; a
+business that must keep a document *as sent* saves the file when it sends it,
+or keeps the email it went out in.
 
 ## Why
 
@@ -59,15 +66,21 @@ file when it sends it, or keeps the email it went out in.
   Making a reprint faithful would mean freezing templates and issuer details
   too, which is a different feature.
 - **The risk is bounded and stated.** The document's lines, quantities,
-  prices and partner cannot change, so a reprint never states a different
-  transaction; what differs is presentation and the current names of the
-  issuer and locations, and the guide lists those inputs so the reader knows
-  where the exception lies.
+  prices, partner, issuer details and location names do not change, so a
+  reprint never states a different transaction; what differs is
+  presentation (layout, columns, logo), and the guide lists those inputs so
+  the reader knows where the exception lies.
 
 ## Consequences
 
-- Nothing in the schema changes, and no backup or erasure procedure gains a
-  file store.
+- The schema gains one JSON column on documents (`print_snapshot`), written
+  in the same step as the partner snapshot; no backup or erasure procedure
+  gains a file store. Core offers `issuer_snapshot` and
+  `IssuerContext.from_snapshot` for any module that prints its own
+  documents through the core print identity and keeps a snapshot of its own.
+  Purchase orders do not: they are rendered live from the order, which has no
+  confirmation step that freezes it, so they keep reading the organization's
+  current details.
 - The record-keeping page in the user guide carries the limit, so a business
   can put the rule "save what you send" into its own procedure description.
 - If a country analysis shows that a re-rendered copy does not satisfy a
