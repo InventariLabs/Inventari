@@ -76,27 +76,33 @@ const WmsPickLineRow = memo(function WmsPickLineRow({
               {line.document_number}
             </p>
           )}
-          <p className="text-sm font-medium text-on truncate">
+          {/* Two lines for the name, and the batch code whole: on a phone
+              both are read against the carton, so an ellipsis is no help. */}
+          <p className="text-sm font-medium text-on line-clamp-2 break-words">
             {line.product_name ?? t("picking.unknown_product")}
           </p>
           {line.bin_location && (
-            <p className="text-xs text-on-muted flex items-center gap-0.5 truncate">
-              <MapPin size={10} />
-              {line.bin_location}
+            // The text sits in its own span: a flex item has min-width:auto,
+            // so a long unbroken code (shelf and SKU joined by a slash) kept
+            // its full width and ran under the quantity column. min-w-0 lets
+            // the span shrink to the column and break-all splits the code.
+            <p className="text-xs text-on-muted flex items-start gap-0.5">
+              <MapPin size={10} className="mt-0.5 shrink-0" />
+              <span className="min-w-0 break-all">{line.bin_location}</span>
             </p>
           )}
           {shelfState && line.status === "pending" && (
             <ShelfConfirmation state={shelfState} kind="picking" />
           )}
           {line.lot_name && (
-            <p className="text-xs text-on-muted truncate">
+            <p className="text-xs text-on-muted break-all">
               {t("picking.lot", { name: line.lot_name })}
             </p>
           )}
           {/* The date of the pack the draw reaches first: the batch's, or
               the record's own where the stock carries no batch. */}
           {line.expiry_date && (
-            <p className="text-xs text-on-muted truncate">
+            <p className="text-xs text-on-muted break-words">
               {t("picking.expires", {
                 date: formatDateMedium(line.expiry_date),
               })}

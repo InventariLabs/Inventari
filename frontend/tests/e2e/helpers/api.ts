@@ -1028,16 +1028,20 @@ export class ApiHelper {
     return await response.json();
   }
 
-  async deletePurchaseOrder(token: string, id: string): Promise<void> {
-    const response = await this.request.delete(
-      `/api/v1/purchase-orders/${id}`,
+  /**
+   * The API deletes no purchase order. Cancelling is how a spec lets go of
+   * one, and what lets the partner behind it be deleted afterwards.
+   */
+  async cancelPurchaseOrder(token: string, id: string): Promise<void> {
+    const response = await this.request.post(
+      `/api/v1/purchase-orders/${id}/cancel`,
       {
         headers: { Authorization: `Bearer ${token}` },
       },
     );
     if (!response.ok() && response.status() !== 404)
       throw new Error(
-        `Failed to delete purchase order: ${await response.text()}`,
+        `Failed to cancel purchase order: ${await response.text()}`,
       );
   }
 

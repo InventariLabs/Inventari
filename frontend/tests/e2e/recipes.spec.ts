@@ -346,19 +346,28 @@ test.describe("Recipes — detail & sub-pages", () => {
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    const card = page.locator('[data-testid="recipe-card"]').first();
+    // Open this describe's own recipe by name. Taking whichever card is first
+    // lets a parallel worker's cleanup delete the clicked recipe mid-navigation.
+    await page
+      .getByPlaceholder(/search/i)
+      .first()
+      .fill(detailRecipeName);
+    const card = page
+      .locator('[data-testid="recipe-card"]')
+      .filter({ hasText: detailRecipeName })
+      .first();
     await expect(card).toBeVisible({ timeout: 15000 });
-    const cardName = (
-      await card.getByRole("heading").first().innerText()
-    ).trim();
 
-    const loaded = expectApiOk(page, /\/api\/v1\/recipes\/[0-9a-f-]{36}(\?|$)/);
+    const loaded = expectApiOk(
+      page,
+      new RegExp(`/api/v1/recipes/${detailRecipeId}(\\?|$)`),
+    );
     await card.click();
     await loaded;
 
-    // The heading has to be the recipe that was clicked, not just any heading.
+    await expect(page).toHaveURL(new RegExp(`/recipes/${detailRecipeId}$`));
     await expect(
-      page.getByRole("heading", { level: 1, name: cardName }),
+      page.getByRole("heading", { level: 1, name: detailRecipeName }),
     ).toBeVisible({ timeout: 15000 });
   });
 
