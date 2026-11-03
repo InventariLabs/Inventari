@@ -130,7 +130,7 @@ describe("CorrectionFormModal", () => {
       />,
     );
     expect(
-      screen.getByText(/more was issued and takes goods off stock/),
+      screen.getByText(/more was issued and removes goods from stock/),
     ).toBeInTheDocument();
   });
 

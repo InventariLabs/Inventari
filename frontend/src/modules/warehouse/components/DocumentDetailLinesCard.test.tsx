@@ -103,7 +103,7 @@ describe("DocumentDetailLinesCard — a correction's line", () => {
       corrects_document_type: "IN",
     });
     expect(screen.getAllByText("-2").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("taken off stock").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("removed from stock").length).toBeGreaterThan(0);
   });
 });
 
