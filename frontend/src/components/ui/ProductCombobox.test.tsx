@@ -308,7 +308,7 @@ describe("ProductCombobox", () => {
     expect(screen.queryByText("Nothing found")).not.toBeInTheDocument();
   });
 
-  it("counts a character above U+FFFF once, so one emoji sends no search and draws no alert", async () => {
+  it("counts a character above U+FFFF once, so one emoji sends no search, draws no alert and still offers to create it", async () => {
     // The endpoint counts code points: one emoji is one, so a gate on the
     // string's UTF-16 length would send it and be answered with a refusal.
     const user = userEvent.setup();
@@ -323,7 +323,23 @@ describe("ProductCombobox", () => {
 
     expect(search).not.toHaveBeenCalled();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.queryByText("Nothing found")).not.toBeInTheDocument();
+    // Too short to search is no reason to refuse the name: a one-character
+    // name is a valid product, and the panel is the only way to create it.
+    expect(renderEmpty).toHaveBeenLastCalledWith("🍎", expect.any(Function));
+    expect(screen.getByText("Nothing found")).toBeInTheDocument();
+  });
+
+  it("keeps the focus in the box when Try again is pressed, so typing and Escape still reach it", async () => {
+    const user = userEvent.setup();
+    search.mockRejectedValueOnce(new Error("503"));
+    search.mockResolvedValue([stub("Zzz")]);
+    render(<ProductCombobox {...baseProps} />);
+
+    await user.type(screen.getByRole("combobox"), "zz");
+    await user.click(await screen.findByRole("button", { name: "Try again" }));
+    await screen.findByRole("option");
+
+    expect(screen.getByRole("combobox")).toHaveFocus();
   });
 
   it("asks again with the same text when Try again is pressed after a failure", async () => {

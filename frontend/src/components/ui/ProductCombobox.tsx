@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { SEARCH_MAX_LENGTH } from "@/lib/productSearch";
 import { readableSku } from "@/lib/readableSku";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -24,9 +25,6 @@ export interface ProductComboboxOption {
 function characterCount(text: string): number {
   return Array.from(text).length;
 }
-
-/** The search endpoint reads at most this many characters of a query. */
-const SEARCH_LIMIT = 100;
 
 /**
  * A name past the search limit is searched by its opening, so a product that
@@ -50,12 +48,42 @@ function createPanelBelow<T extends ProductComboboxOption>({
   ) => React.ReactNode;
   select: (product: T) => void;
 }): React.ReactNode {
-  if (!renderNoResults || !settled || characterCount(query) <= SEARCH_LIMIT) {
+  if (
+    !renderNoResults ||
+    !settled ||
+    characterCount(query) <= SEARCH_MAX_LENGTH
+  ) {
     return null;
   }
   const wanted = query.toLowerCase();
   if (results.some((r) => r.name.trim().toLowerCase() === wanted)) return null;
   return renderNoResults(query, select);
+}
+
+/**
+ * Whether the panel has an empty answer to give: a finished search that found
+ * nothing, or text too short to search at all. The latter has nothing to look
+ * for and so nothing to find; if the caller can create from a name it is
+ * offered once the typing pauses, since a one-character name is a valid
+ * product that the search cannot reach.
+ */
+function hasEmptyAnswer({
+  searching,
+  typed,
+  searched,
+  settled,
+  resultCount,
+  canCreate,
+}: {
+  searching: boolean;
+  typed: string;
+  searched: string;
+  settled: string;
+  resultCount: number;
+  canCreate: boolean;
+}): boolean {
+  if (searching) return typed === searched && resultCount === 0;
+  return canCreate && typed !== "" && settled === typed;
 }
 
 /** Everything an option says about itself before any tie-breaker is added. */
@@ -91,8 +119,11 @@ interface ProductComboboxProps<T extends ProductComboboxOption> {
   /** Server-side product search, called with the debounced query. */
   search: (query: string) => Promise<T[]>;
   /**
-   * Rendered inside the popover when a finished search matched nothing.
-   * Receives the query and the combobox's own select handler, so an
+   * Rendered inside the popover when a finished search matched nothing, when
+   * the text is too short to search at all (a one-character name can still be
+   * created), and under the results when the text runs past the search limit
+   * and no result is that very name. Receives the query and the combobox's
+   * own select handler, so an
    * "add as new" flow can hand the fresh record straight into the pick.
    * Optional — without it a finished search with no matches closes.
    */
@@ -428,8 +459,14 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // (the query only matches once its results have landed), so the explicit
   // `!isLoading` here was redundant; dropping it keeps the panel below the
   // ESLint complexity gate. `showLoading` wins when both are true.
-  const showEmpty =
-    searching && query.trim() === searchedQuery && results.length === 0;
+  const showEmpty = hasEmptyAnswer({
+    searching,
+    typed: trimmedQuery,
+    searched: searchedQuery,
+    settled: settledQuery,
+    resultCount: results.length,
+    canCreate: !!renderNoResults,
+  });
   // The panel now opens for the in-between state too: a search that is still
   // running says "searching" instead of silently leaving the field looking
   // broken, and a search that finished empty always says so (/).
@@ -611,7 +648,13 @@ export function ProductCombobox<T extends ProductComboboxOption>({
                 <ProductComboboxMessage
                   showLoading={showLoading}
                   failed={searchFailed}
-                  onRetry={() => setRetryCount((n) => n + 1)}
+                  onRetry={() => {
+                    setRetryCount((n) => n + 1);
+                    // The button unmounts with the alert; without this the
+                    // focus falls to the page and typing no longer reaches
+                    // the box.
+                    inputRef.current?.focus();
+                  }}
                   query={query.trim()}
                   renderNoResults={renderNoResults}
                   onSelect={select}
