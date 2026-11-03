@@ -63,8 +63,9 @@ or keeps the email it went out in.
 - **A template version alone does not solve it.** Recording which template
   printed a document says what to look for, not how to reproduce it: templates
   are editable organization data, and the issuer block is not part of them.
-  Making a reprint faithful would mean freezing templates and issuer details
-  too, which is a different feature.
+  What a reprint states about the transaction — the issuer details and the
+  location names — is therefore copied onto the document, as the partner is;
+  the template stays live, as it is presentation.
 - **The risk is bounded and stated.** The document's lines, quantities,
   prices, partner, issuer details and location names do not change, so a
   reprint never states a different transaction; what differs is
@@ -80,7 +81,8 @@ or keeps the email it went out in.
   documents through the core print identity and keeps a snapshot of its own.
   Purchase orders do not: they are rendered live from the order, which has no
   confirmation step that freezes it, so they keep reading the organization's
-  current details.
+  current details. The pick list, which serves open documents and spans
+  several, keeps a live header too.
 - The record-keeping page in the user guide carries the limit, so a business
   can put the rule "save what you send" into its own procedure description.
 - If a country analysis shows that a re-rendered copy does not satisfy a

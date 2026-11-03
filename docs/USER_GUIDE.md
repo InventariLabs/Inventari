@@ -1426,7 +1426,8 @@ authority accepts, which is for the business and its adviser to settle.
   document list shows it when filtered by status. Nothing deletes it.
 - The partner's name, tax number and address, your own company's name, tax
   number and address, and the names of the locations the document refers to
-  are copied onto the document when it is confirmed. Editing any of them later
+  are copied onto the document when it is confirmed (the record of a closed
+  stock take, which is written as done, takes them at that moment). Editing any of them later
   does not change a document already issued, and a reprint shows the values
   of the day it was confirmed; each line keeps the product name and the price
   it was written with. What a reprint still reads as it is today: the print
@@ -1510,8 +1511,7 @@ current when it is made: the print template, the document type's settings
 (title, whether prices and tax are shown) and your logo, from **Settings**.
 A reprint can therefore differ in layout from the first print without the
 document having changed; a document confirmed before the company details
-were recorded with it shows them as they are now.
-A
+were recorded with it shows them as they are now. A
 business that must keep a delivery note or order *as sent* — because the law
 treats it as a business letter, or the customer was sent a file — should save
 the file at the moment it sends it (or keep the email it went out in) and

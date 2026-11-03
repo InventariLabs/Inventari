@@ -64,6 +64,7 @@ class TestPrintoutFreezesIssuerAndPlaces:
         location: StorageLocation,
     ) -> None:
         org.name = 'Moved Company Ltd'
+        org.tax_id = 'PL9999999999'
         org.address = {'street': 'New Street 99', 'city': 'Newtown'}
         location.name = 'Renamed Shelf'
         db_session.commit()
@@ -97,9 +98,11 @@ class TestPrintoutFreezesIssuerAndPlaces:
         text = _text_of(pdf.content)
 
         assert 'Original Company Ltd' in text
+        assert 'PL1234567890' in text
         assert 'Old Street 1' in text
         assert original_shelf in text
         assert 'Moved Company Ltd' not in text
+        assert 'PL9999999999' not in text
         assert 'New Street 99' not in text
         assert 'Renamed Shelf' not in text
 

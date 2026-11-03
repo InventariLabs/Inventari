@@ -15,11 +15,13 @@ with the warehouse module off the count closes exactly as it always did.
 from __future__ import annotations
 
 from decimal import Decimal
+from io import BytesIO
 from typing import Any, cast
 from uuid import UUID
 
 import pytest
 from fastapi import status
+from pypdf import PdfReader
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
@@ -134,6 +136,51 @@ def _documents(db_session: Session, org: Organization) -> list[Document]:
 
 @pytest.mark.integration
 class TestACountPostsItsDifferencesAsOneDocument:
+    def test_the_record_reprints_the_company_and_shelf_of_the_day_it_was_closed(
+        self, client: TestClient, db_session: Session
+    ) -> None:
+        org, user = _org(db_session, _WITH_DOCUMENTS)
+        org.name = 'Original Company Ltd'
+        org.tax_id = 'PL1234567890'
+        org.address = {'street': 'Old Street 1', 'city': 'Oldtown'}
+        db_session.commit()
+        headers = ModuleTestHelper(db_session).get_auth_headers(user)
+        shelf = _shelf(db_session, org, user)
+        rice = _record(
+            client,
+            headers,
+            db_session,
+            ModuleTestHelper(db_session).create_template(org, name='Rice'),
+            shelf,
+            10,
+        )
+        take_id = _count(db_session, org, user, shelf, [(rice, 10, 8)])
+        report = _close(client, headers, take_id)
+
+        org.name = 'Moved Company Ltd'
+        org.tax_id = 'PL9999999999'
+        org.address = {'street': 'New Street 99', 'city': 'Newtown'}
+        shelf.name = 'Renamed Shelf'
+        db_session.commit()
+
+        pdf = client.get(
+            f'/api/v1/warehouse/documents/{report["adjustment_document_id"]}/pdf',
+            headers=headers,
+        )
+        assert pdf.status_code == status.HTTP_200_OK, pdf.text
+        reader = PdfReader(BytesIO(pdf.content))
+        text = ' '.join(
+            ' '.join((page.extract_text() or '') for page in reader.pages).split()
+        )
+        assert 'Original Company Ltd' in text
+        assert 'PL1234567890' in text
+        assert 'Old Street 1' in text
+        assert 'Shelf A' in text
+        assert 'Moved Company Ltd' not in text
+        assert 'PL9999999999' not in text
+        assert 'New Street 99' not in text
+        assert 'Renamed Shelf' not in text
+
     def test_the_differences_become_one_completed_adjustment(
         self, client: TestClient, db_session: Session
     ) -> None:
