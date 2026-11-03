@@ -161,6 +161,17 @@ function problemMessage(
   return t(PROBLEM_KEYS[problem]);
 }
 
+/** The refusal that belongs to the location field, for the field to wear. */
+function targetProblem(
+  t: TFunction,
+  problem: ProblemKey | null,
+  source: ReceiveSource,
+): string | undefined {
+  return problem === "noWarehouse"
+    ? problemMessage(t, problem, source)
+    : undefined;
+}
+
 /** The sentence under the result: the count, and what the order still expects. */
 function successDetails(
   t: TFunction,
@@ -1207,13 +1218,7 @@ export default function ReceiveGoodsPage() {
   // A form whose every field is filled in before the refusal is work thrown
   // away: the account that cannot post is told so once, here, and sees no
   // pickers.
-  if (!canWrite) {
-    return (
-      <div className="space-y-4">
-        <ReadOnlyNotice module="warehouse" />
-      </div>
-    );
-  }
+  if (!canWrite) return <ReadOnlyNotice module="warehouse" />;
 
   return (
     <div className="space-y-4">
@@ -1234,6 +1239,7 @@ export default function ReceiveGoodsPage() {
           onPartnerChange={changePartner}
           targetLocationId={targetLocationId}
           onTargetChange={changeTarget}
+          targetError={targetProblem(t, problem, source)}
           locationsEmptyReason={emptyReason}
           locationsFailed={locationsFailed}
           externalReference={externalReference}
