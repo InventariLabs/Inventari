@@ -235,12 +235,13 @@ describe("StorageTree — rows a writer can act on", () => {
     const onMoveTo = vi.fn();
     const onOpenSettings = vi.fn();
     const onDragMove = vi.fn();
+    const onSelect = vi.fn();
     render(
       <StorageTree
         nodes={nodes}
         expanded={new Set()}
         onToggle={vi.fn()}
-        onSelect={vi.fn()}
+        onSelect={onSelect}
         canWrite
         onMoveTo={onMoveTo}
         onOpenSettings={onOpenSettings}
@@ -248,7 +249,7 @@ describe("StorageTree — rows a writer can act on", () => {
         label="Storage locations"
       />,
     );
-    return { onMoveTo, onOpenSettings, onDragMove };
+    return { onMoveTo, onOpenSettings, onDragMove, onSelect };
   };
   const dataTransfer = () => ({
     setData: vi.fn(),
@@ -272,16 +273,20 @@ describe("StorageTree — rows a writer can act on", () => {
   });
 
   it("lets a row's menu reach Archive and Delete, which live on the Settings tab", async () => {
-    const { onOpenSettings } = renderWritable();
+    const { onOpenSettings, onSelect } = renderWritable();
 
     await userEvent.click(
       screen.getByRole("button", { name: "Actions for Freezer" }),
     );
+    onSelect.mockClear();
     await userEvent.click(
       await screen.findByRole("button", { name: "Archive or delete…" }),
     );
 
     expect(onOpenSettings).toHaveBeenCalledWith("freezer");
+    // The menu is a portal; its click must not bubble into the row's own
+    // select, which navigates after the item did and drops the Settings tab.
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
   it("drops the highlight when the pointer leaves a row it was dragged over", () => {

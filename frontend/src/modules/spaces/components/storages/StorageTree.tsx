@@ -294,7 +294,14 @@ function TreeRow({
         {...(hasChildren ? { "aria-expanded": isExpanded } : {})}
         data-tree-node={node.id}
         tabIndex={tabStop === node.id ? 0 : -1}
-        onClick={() => onSelect(node.id)}
+        onClick={(event) => {
+          // The row's menu renders in a portal, outside this element in the
+          // DOM, yet React still bubbles its clicks here. A menu item that
+          // navigates (Archive or delete…) would be overwritten by this
+          // re-select of the row.
+          if (!event.currentTarget.contains(event.target as Node)) return;
+          onSelect(node.id);
+        }}
         onKeyDown={onKeyDown}
         draggable={canWrite && selectable}
         onDragStart={(event) => {
