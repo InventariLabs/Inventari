@@ -78,7 +78,7 @@ export default defineConfig({
       // removes organization-wide rows (the built-in templates) that a second
       // project running it side by side would pull from under it.
       testIgnore:
-        /(workspace-mode|maker-module-gate|approvals(-integration)?|announcement-publish|example-module|warehouse-office-output|phone-first-record-responsive)\.spec\.ts/,
+        /((warehouse-location-)?workspace-mode|maker-module-gate|approvals(-integration)?|announcement-publish|example-module|warehouse-office-output|phone-first-record-responsive)\.spec\.ts/,
     },
     {
       // Opt-in by file name: a spec whose name ends in `responsive` runs on
@@ -112,11 +112,17 @@ export default defineConfig({
       // Playwright skips a project whose dependency failed — an accepted trade
       // for not flaking the ~600 tests that just want a stable module list.
       //
-      // To iterate on this spec alone, pass --no-deps; without it, filtering
+      // Two files switch the profile: `workspace-mode` and
+      // `warehouse-location-workspace-mode`. The pattern names both, so the
+      // second one is here on purpose, and `workers: 1` keeps them from
+      // running side by side. A new spec that calls the profile switch joins
+      // this pattern and the `chromium` ignore list above.
+      //
+      // To iterate on these specs alone, pass --no-deps; without it, filtering
       // by file still runs every dependency project in full.
       name: "org-profile",
       use: { ...devices["Desktop Chrome"] },
-      testMatch: /workspace-mode\.spec\.ts/,
+      testMatch: /(warehouse-location-)?workspace-mode\.spec\.ts/,
       workers: 1,
       dependencies: [
         "chromium",
