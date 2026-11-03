@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { RELOAD_GUARD_KEY } from "../../src/lib/staleChunk";
 import { test, expect } from "./fixtures/auth";
 
@@ -67,5 +68,62 @@ test.describe("Transient module load failure", () => {
       timeout: 15000,
     });
     expect(aborted, "the fake abort never fired").toBeGreaterThan(0);
+  });
+});
+
+/**
+ * Navigation returns at the `load` event, seconds before the app has drawn
+ * anything on a loaded host, and a recovery reload starts that over. Neither
+ * belongs to the wait a spec writes after `goto`, nor to the test's clock
+ * (fixtures/base.ts). The hold on the boot's first request makes a loaded host
+ * of a quiet one: it is longer than the wait and than the test's whole budget.
+ */
+test.describe("Slow start of the app", () => {
+  const BOOT_REQUEST = "**/api/v1/auth/refresh";
+  const HOLD = 12_000;
+  const holdBoot = (page: Page) =>
+    page.route(BOOT_REQUEST, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, HOLD));
+      await route.continue().catch(() => {});
+    });
+
+  test("is charged neither to the wait after goto nor to the test", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    test.setTimeout(HOLD);
+    await holdBoot(page);
+
+    await page.goto("/inventory/items");
+
+    await expect(page.getByTestId("list-search-input")).toBeVisible({
+      timeout: HOLD - 2000,
+    });
+  });
+
+  test("a recovery reload inside the start is waited for too", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    test.setTimeout(HOLD);
+    // Spent, as above: the failure must reach the harness, not the app's own
+    // reload.
+    await page.addInitScript((key) => {
+      sessionStorage.setItem(key, String(Date.now()));
+    }, RELOAD_GUARD_KEY);
+    await holdBoot(page);
+    // The app's own chunk, which the boot imports before it draws anything:
+    // its failure is the error boundary, which is not a started app's page.
+    let aborted = 0;
+    await page.route(/\/src\/App\.tsx|\/assets\/App-[\w-]+\.js/, (route) =>
+      aborted++ === 0 ? route.abort("failed") : route.continue(),
+    );
+
+    await page.goto("/inventory/items");
+
+    await expect(page.getByTestId("list-search-input")).toBeVisible({
+      timeout: HOLD - 2000,
+    });
+    expect(aborted, "the fake abort never fired").toBeGreaterThan(1);
   });
 });

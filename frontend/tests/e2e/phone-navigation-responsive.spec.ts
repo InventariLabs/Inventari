@@ -221,9 +221,14 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
       // and the tile's name carries its "to do today" badge.
       await page.locator('a[href="/warehouse/todo"]').first().click();
       await expect(page).toHaveURL(/\/warehouse\/todo$/);
+      // The address changes before the screen does, and the launcher still on
+      // screen offers "Stock takes in progress" while any stock take is open.
+      await expect(
+        page.getByRole("navigation", { name: "Related screens" }),
+      ).toBeVisible({ timeout: 15000 });
 
       await page
-        .getByRole(entry.role, { name: entry.open, exact: false })
+        .getByRole(entry.role, { name: entry.open, exact: true })
         .first()
         .click();
       await expect(page).toHaveURL(entry.url);

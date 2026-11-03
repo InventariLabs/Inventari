@@ -12,6 +12,7 @@ export default function LoadingSpinner({
   if (fullScreen) {
     return (
       <div
+        data-testid="app-loading"
         role="status"
         aria-live="polite"
         aria-label={t("a11y.loading")}
