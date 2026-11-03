@@ -767,6 +767,12 @@ ignore_names = [
     "get_settings_schema",
     # Pydantic reads this class attribute itself.
     "model_config",
+    # Set on a response DTO after validation, because the document stores
+    # relations and the schema plain strings (warehouse/document_query_service.py,
+    # warehouse/_router_putaway.py). Only the serializer reads them; the schemas
+    # that declare them are excluded above.
+    "source_location_name",
+    "target_location_name",
     # Settings fields read only through settings.model_dump() by the startup
     # check that refuses example placeholders (app/config.py): the backend
     # connects through DATABASE_URL and never names them.
