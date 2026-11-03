@@ -342,3 +342,124 @@ describe("a session that ended under a request says so", () => {
     },
   );
 });
+
+describe("the sentence follows what the request was doing", () => {
+  const refuse = () =>
+    HttpResponse.json({ detail: "stale token" }, { status: 401 });
+  const ended = () => new HttpResponse(null, { status: 204 });
+  const readSentence = () => i18next.t("common:errors.sessionEndedRead");
+  const writeSentence = () => i18next.t("common:errors.sessionEnded");
+  const message = (run: Promise<unknown>) =>
+    run.then(
+      () => null,
+      (e: unknown) => extractApiError(e, "Failed"),
+    );
+
+  it.each([
+    "/printing/product-labels/png",
+    "/printing/location-labels/png",
+    "/warehouse/templates/preview",
+    "/maker/production/orders/preview",
+    "/warehouse/putaway/preview",
+    "/recipes/import/preview",
+    "/modules/focus/preview",
+    "/vision/extract",
+    "/vision/extract-nutrition",
+    "/items/import/analyze",
+    "/equipment/campaigns/scope-preview",
+  ])("does not tell a POST to %s that it saved nothing", async (url) => {
+    server.use(
+      http.post(`*/api/v1${url}`, refuse),
+      http.post("*/api/v1/auth/refresh", ended),
+    );
+    tokenStore.set("expired-token");
+
+    expect(await message(api.post(url, {}))).toBe(readSentence());
+  });
+
+  it("still tells a POST that saves, with a query string, that it did not", async () => {
+    server.use(
+      http.post("*/api/v1/items", refuse),
+      http.post("*/api/v1/auth/refresh", ended),
+    );
+    tokenStore.set("expired-token");
+
+    expect(await message(api.post("/items?dry=1", {}))).toBe(writeSentence());
+  });
+
+  it.each([
+    ["a POST behind a GET", "get", "post"],
+    ["a GET behind a POST", "post", "get"],
+  ] as const)(
+    "words %s by its own method, not by the request that started the refresh",
+    async (_name, starter, queued) => {
+      server.use(
+        http.all("*/api/v1/things", refuse),
+        http.all("*/api/v1/others", refuse),
+        http.post("*/api/v1/auth/refresh", async () => {
+          await new Promise((resolve) => setTimeout(resolve, 20));
+          return new HttpResponse(null, { status: 204 });
+        }),
+      );
+      tokenStore.set("expired-token");
+
+      const [first, second] = await Promise.all([
+        message(api.request({ url: "/things", method: starter })),
+        message(api.request({ url: "/others", method: queued })),
+      ]);
+
+      const sentence = (method: string) =>
+        method === "get" ? readSentence() : writeSentence();
+      expect(first).toBe(sentence(starter));
+      expect(second).toBe(sentence(queued));
+    },
+  );
+
+  it("announces the sign-out once for 401s that arrive after the refresh round closed", async () => {
+    let refreshes = 0;
+    server.use(
+      http.all("*/api/v1/things", refuse),
+      http.post("*/api/v1/auth/refresh", () => {
+        refreshes += 1;
+        return ended();
+      }),
+    );
+    tokenStore.set("expired-token");
+    let logouts = 0;
+    const count = () => {
+      logouts += 1;
+    };
+    window.addEventListener("auth:logout", count);
+    try {
+      await message(api.get("/things"));
+      // Requests sent before the round ended, answered after it.
+      const late = await Promise.all([
+        message(api.get("/things")),
+        message(api.post("/things", {})),
+      ]);
+      expect(late).toEqual([readSentence(), writeSentence()]);
+    } finally {
+      window.removeEventListener("auth:logout", count);
+    }
+
+    expect(refreshes).toBe(1);
+    expect(logouts).toBe(1);
+  });
+
+  it("refreshes again once a new token has been issued", async () => {
+    let refreshes = 0;
+    server.use(
+      http.all("*/api/v1/things", refuse),
+      http.post("*/api/v1/auth/refresh", () => {
+        refreshes += 1;
+        return ended();
+      }),
+    );
+    tokenStore.set("expired-token");
+    await message(api.get("/things"));
+    tokenStore.set("signed-in-again");
+    await message(api.get("/things"));
+
+    expect(refreshes).toBe(2);
+  });
+});
