@@ -121,10 +121,20 @@ const TARGET_ACTION_LABELS: Record<
 function actionLabel(
   action: string,
   t: (key: string) => string,
-  targetType?: string,
+  row?: Pick<AuditLogEntry, "target_type" | "snapshot">,
 ): string {
-  const own = targetType && TARGET_ACTION_LABELS[targetType]?.[action];
+  const own = row && TARGET_ACTION_LABELS[row.target_type]?.[action];
   if (own) return own(t);
+  // A profile writes its module settings when it is applied (onboarding, a
+  // switch), under the person who chose it. The row says so instead of
+  // passing for that person's own edit of a setting.
+  if (
+    action === "UPDATE" &&
+    row?.target_type === "module" &&
+    String(row.snapshot?.subject ?? "").startsWith("profile:")
+  ) {
+    return t("settings.audit.profileDefault");
+  }
   const translated = t(`settings.audit.actions.${action}`);
   return translated === `settings.audit.actions.${action}`
     ? action
@@ -485,7 +495,7 @@ export default function AuditLogPage() {
                     row={r}
                     changes={changesOf(r)}
                     actionVariant={ACTION_VARIANT[r.action] ?? "outline"}
-                    actionLabel={actionLabel(r.action, t, r.target_type)}
+                    actionLabel={actionLabel(r.action, t, r)}
                     expanded={expanded.has(r.id)}
                     onToggle={() => toggleExpanded(r.id)}
                     onCopy={onCopy}
@@ -532,7 +542,7 @@ export default function AuditLogPage() {
                           <Badge
                             variant={ACTION_VARIANT[r.action] ?? "outline"}
                           >
-                            {actionLabel(r.action, t, r.target_type)}
+                            {actionLabel(r.action, t, r)}
                           </Badge>
                         </td>
                         <td className="px-3 py-2 text-xs">

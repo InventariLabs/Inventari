@@ -419,6 +419,12 @@ describe("CheckoutModal — asking for the approval of this checkout", () => {
       name: "Request approval for this checkout",
     });
     expect(onClose).not.toHaveBeenCalled();
+    // Structure only (jsdom has no layout): the refusal is outside the
+    // scrolling form, so on a phone it cannot land below the fold while the
+    // footer's button stays in view.
+    expect(screen.getByTestId("checkout-modal-body")).not.toContainElement(
+      screen.getByRole("alert"),
+    );
     await user.click(ask);
 
     await waitFor(() => expect(posted).not.toBeNull());

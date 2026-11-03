@@ -1,5 +1,12 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
+import i18next from "i18next";
 import { toast } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
@@ -13,6 +20,7 @@ import { http, HttpResponse } from "msw";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import type { EquipmentAssignment } from "@/modules/equipment/api/equipment";
 import type { Item } from "@/types";
+import { useAuthStore } from "@/store/authStore";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -116,9 +124,13 @@ describe("CheckinModal", () => {
     render(<CheckinModal assignment={mockAssignment} onClose={onClose} />, {
       wrapper: createWrapper(),
     });
-    expect(screen.getByText(/good/i)).toBeInTheDocument();
-    expect(screen.getByText(/damaged/i)).toBeInTheDocument();
-    expect(screen.getByText(/needs repair/i)).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /^good/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /^damaged/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /^needs repair/i }),
+    ).toBeInTheDocument();
   });
 
   // A tap on the second radio took the asset out of circulation and filed a
@@ -128,9 +140,71 @@ describe("CheckinModal", () => {
       wrapper: createWrapper(),
     });
     expect(screen.getByText("Back to Available.")).toBeInTheDocument();
+    // The two service conditions open differently titled entries, and each
+    // radio names its own.
     expect(
-      screen.getAllByText("To Maintenance, with a repair entry."),
-    ).toHaveLength(2);
+      screen.getByText("To Maintenance, with an entry “Returned damaged”."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "To Maintenance, with an entry “Returned — needs repair”.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("speaks the verb of whoever is returning: the holder hands back, a manager receives", async () => {
+    await i18next.changeLanguage("pl");
+    try {
+      const { unmount } = render(
+        <CheckinModal assignment={mockAssignment} byHolder onClose={onClose} />,
+        { wrapper: createWrapper() },
+      );
+      expect(
+        screen.getByRole("dialog", { name: "Zwróć zasób" }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Zwróć" })).toBeInTheDocument();
+      unmount();
+
+      const second = render(
+        <CheckinModal assignment={mockAssignment} onClose={onClose} />,
+        { wrapper: createWrapper() },
+      );
+      expect(
+        screen.getByRole("dialog", { name: "Przyjmij zasób" }),
+      ).toBeInTheDocument();
+      second.unmount();
+    } finally {
+      await i18next.changeLanguage("en");
+    }
+  });
+
+  it("speaks the holder's verb on the asset page when the viewer holds it", async () => {
+    await i18next.changeLanguage("pl");
+    const before = useAuthStore.getState().user;
+    act(() => {
+      useAuthStore.setState({
+        user: { ...(before ?? {}), email: "JOHN@example.com" } as never,
+      });
+    });
+    let unmountView: (() => void) | undefined;
+    try {
+      ({ unmount: unmountView } = render(
+        <CheckinModal assignment={mockAssignment} onClose={onClose} />,
+        { wrapper: createWrapper() },
+      ));
+      expect(
+        screen.getByRole("dialog", { name: "Zwróć zasób" }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Zwróć" })).toBeInTheDocument();
+      // The holder is not told their own name in the third person.
+      expect(screen.queryByText(/John Doe/)).not.toBeInTheDocument();
+    } finally {
+      unmountView?.();
+      act(() => {
+        useAuthStore.setState({ user: before });
+      });
+      await i18next.changeLanguage("en");
+    }
   });
 
   it("names the status a damaged return moved the asset to", async () => {
@@ -242,6 +316,22 @@ describe("Equipment modal scrolling", () => {
     });
 
     expectScrollableModal("checkout-modal-card", "checkout-modal-body");
+  });
+
+  it("keeps the checkout buttons outside the scroll layer, submit still tied to the form", () => {
+    render(<CheckoutModal item={mockItem} onClose={onClose} />, {
+      wrapper: createWrapper(),
+    });
+
+    const body = screen.getByTestId("checkout-modal-body");
+    const submit = screen.getByRole("button", { name: "Check Out" });
+    const cancel = screen.getByRole("button", { name: "Cancel" });
+    // Inside the scrolling form they sat below the phone sheet's edge until
+    // the form was scrolled to its end.
+    expect(body).not.toContainElement(submit);
+    expect(body).not.toContainElement(cancel);
+    expect(submit).toHaveAttribute("form", body.id);
+    expect(body.id).not.toBe("");
   });
 
   it("constrains checkin content to a scrollable viewport", () => {

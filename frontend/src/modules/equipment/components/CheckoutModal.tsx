@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { SheetActions } from "@/components/ui/Sheet";
+import { SheetActions, SheetFooter } from "@/components/ui/Sheet";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Loader2, User, MapPin, Plus, ShieldCheck } from "lucide-react";
@@ -214,33 +214,42 @@ function CheckoutLocationPicker({
   );
 }
 
-/** The refusal's offer, when there is one, and the dialog's two buttons. */
+/**
+ * The dialog's two buttons, outside the scroll layer so they hold their place
+ * (UI_GUIDELINES §4.3): inside the form they sat wherever the form's end fell,
+ * which on a phone was below the sheet's edge until the form was scrolled.
+ * Submit reaches the form by its id. The refusal for want of an approval sits
+ * here too, above the buttons: it holds the only way forward, so it must
+ * appear where the finger was, not below the fold of the scrolling form.
+ */
 function CheckoutFooter({
+  formId,
   asking,
   pending,
-  incomplete,
   approvalNeeded,
-  onRequest,
+  onRequestApproval,
+  incomplete,
   onClose,
 }: {
+  formId: string;
   asking: boolean;
   pending: boolean;
-  incomplete: boolean;
   approvalNeeded: string | null;
-  onRequest: () => void;
+  onRequestApproval: () => void;
+  incomplete: boolean;
   onClose: () => void;
 }) {
   const { t } = useTranslation("equipment");
   return (
-    <>
+    <SheetFooter className="space-y-3">
       {approvalNeeded && (
         <ApprovalNeededNotice
           message={approvalNeeded}
           pending={pending}
-          onRequest={onRequest}
+          onRequest={onRequestApproval}
         />
       )}
-      <SheetActions className="pt-1">
+      <SheetActions>
         <Button
           type="button"
           variant="outline"
@@ -249,14 +258,14 @@ function CheckoutFooter({
         >
           {t("common:actions.cancel", "Cancel")}
         </Button>
-        <Button type="submit" disabled={pending || incomplete}>
+        <Button type="submit" form={formId} disabled={pending || incomplete}>
           {pending && <Loader2 size={14} className="animate-spin mr-2" />}
           {asking
             ? t("approvals.send_request")
             : t("assignments.checkout_modal.submit")}
         </Button>
       </SheetActions>
-    </>
+    </SheetFooter>
   );
 }
 
@@ -316,6 +325,7 @@ export function CheckoutModal({
   // The id the email field points at (`aria-describedby`), shared by the two
   // messages EmailNotice swaps between.
   const emailMessageId = useId();
+  const formId = useId();
 
   const setReturnDate = (value: string) => {
     // component-level validation with an i18n message instead of a
@@ -391,8 +401,8 @@ export function CheckoutModal({
   // canonical z-modal z-index. The nested QuickAddLocationModal is a
   // separate Radix Dialog instance; Radix manages stacking via its own
   // focus-management, no manual z-index juggling needed. The scroll contract is
-  // retained: form body has min-h-0 flex-1 overflow-y-auto so the action
-  // buttons always stay inside the viewport on small screens.
+  // retained: form body has min-h-0 flex-1 overflow-y-auto and the action
+  // buttons sit in a footer outside it, so they hold their place on small screens.
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent
@@ -453,6 +463,7 @@ export function CheckoutModal({
         </div>
 
         <form
+          id={formId}
           data-testid="checkout-modal-body"
           onSubmit={handleSubmit}
           className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 space-y-4 pt-3"
@@ -557,19 +568,20 @@ export function CheckoutModal({
             aria-label={t("assignments.checkout_modal.notes")}
             className="w-full rounded-lg border border-border bg-surface-card text-on px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 resize-none placeholder:text-on-muted"
           />
-
-          <CheckoutFooter
-            asking={asking}
-            pending={pending}
-            incomplete={
-              (mode === "person" && !form.assigned_to_name.trim()) ||
-              (mode === "location" && !form.checkout_location_id)
-            }
-            approvalNeeded={approvalNeeded}
-            onRequest={() => send("request")}
-            onClose={onClose}
-          />
         </form>
+
+        <CheckoutFooter
+          formId={formId}
+          asking={asking}
+          pending={pending}
+          approvalNeeded={approvalNeeded}
+          onRequestApproval={() => send("request")}
+          incomplete={
+            (mode === "person" && !form.assigned_to_name.trim()) ||
+            (mode === "location" && !form.checkout_location_id)
+          }
+          onClose={onClose}
+        />
 
         {/* QuickAddLocationModal is a separate Radix Dialog; Radix manages
             stacking and focus context between nested dialogs. */}

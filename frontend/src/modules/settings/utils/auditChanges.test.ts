@@ -147,6 +147,19 @@ describe("auditChanges value dictionaries", () => {
     ]);
   });
 
+  it("reads the condition an asset came back in as the return dialog words it", () => {
+    const changes = auditChanges(
+      { before: { condition: null }, after: { condition: "NEEDS_REPAIR" } },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([
+      { path: "condition", from: "—", to: "Wymaga naprawy" },
+    ]);
+  });
+
   it("writes the unit a product template recorded in the interface language", () => {
     // The shape the template writer produces: the id, and the unit's symbol
     // beside it as `uom_name`.
