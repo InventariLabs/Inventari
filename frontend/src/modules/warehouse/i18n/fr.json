@@ -616,8 +616,7 @@
     "plannedReceiving": "→ {{location}} · zone de réception, rangement plus tard"
   },
   "value": {
-    "unpricedLines_one": "{{count}} ligne n’a pas de prix : elle n’entre pas dans ces totaux, et ce stock n’a pas de coût enregistré.",
-    "unpricedLines_other": "{{count}} lignes n’ont pas de prix : elles n’entrent pas dans ces totaux, et ce stock n’a pas de coût enregistré.",
+    "unpricedLines": "Les lignes sans prix n’entrent pas dans ces totaux, et ce stock n’a pas de coût enregistré.",
     "totalsTitle": "Totaux du document",
     "totalNet": "Total net",
     "totalTax": "Total taxes",

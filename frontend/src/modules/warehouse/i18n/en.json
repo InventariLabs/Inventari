@@ -616,8 +616,7 @@
     "plannedReceiving": "→ {{location}} · receiving area, put away later"
   },
   "value": {
-    "unpricedLines_one": "{{count}} line has no price: it is not in these totals, and that stock has no recorded cost.",
-    "unpricedLines_other": "{{count}} lines have no price: they are not in these totals, and that stock has no recorded cost.",
+    "unpricedLines": "Lines with no price are not in these totals, and that stock has no recorded cost.",
     "totalsTitle": "Document totals",
     "totalNet": "Net total",
     "totalTax": "Tax total",

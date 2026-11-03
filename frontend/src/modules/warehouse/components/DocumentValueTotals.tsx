@@ -15,11 +15,12 @@ interface DocumentValueTotalsProps {
  * a phone does: the document's totals leave them out and the stock has no
  * recorded cost, which the totals alone do not say.
  */
-function receivedLinesWithoutPrice(document: WarehouseDocument): number {
-  if (document.status !== "COMPLETED") return 0;
-  if (!["IN", "INTERNAL_IN"].includes(document.type)) return 0;
-  return (document.lines ?? []).filter((line) => line.unit_price == null)
-    .length;
+function hasReceivedLineWithoutPrice(document: WarehouseDocument): boolean {
+  return (
+    document.status === "COMPLETED" &&
+    ["IN", "INTERNAL_IN"].includes(document.type) &&
+    (document.lines ?? []).some((line) => line.unit_price == null)
+  );
 }
 
 export function DocumentValueTotals({ document }: DocumentValueTotalsProps) {
@@ -46,12 +47,12 @@ export function DocumentValueTotals({ document }: DocumentValueTotalsProps) {
       </Card>
     );
   }
-  const unpriced = receivedLinesWithoutPrice(document);
+  const unpriced = hasReceivedLineWithoutPrice(document);
   if (!showValue) return null;
   if (!document.total_gross && !document.total_net) {
-    return unpriced > 0 ? (
+    return unpriced ? (
       <Card className="px-4 sm:px-6 py-4 text-sm text-on-secondary">
-        {t("value.unpricedLines", { count: unpriced })}
+        {t("value.unpricedLines")}
       </Card>
     ) : null;
   }
@@ -89,9 +90,9 @@ export function DocumentValueTotals({ document }: DocumentValueTotalsProps) {
             </dd>
           </div>
         </dl>
-        {unpriced > 0 && (
+        {unpriced && (
           <p className="mt-3 text-sm text-on-secondary">
-            {t("value.unpricedLines", { count: unpriced })}
+            {t("value.unpricedLines")}
           </p>
         )}
         {byRate.length > 1 && (

@@ -258,7 +258,7 @@ describe("DocumentValueTotals — a received line with no price", () => {
         document={posted([{ unit_price: "10.00" }, { unit_price: null }])}
       />,
     );
-    expect(screen.getByText(/1 line has no price/)).toBeInTheDocument();
+    expect(screen.getByText(/Lines with no price/)).toBeInTheDocument();
   });
 
   it("says so when no line has a price and there are no totals to show", () => {
@@ -270,7 +270,7 @@ describe("DocumentValueTotals — a received line with no price", () => {
         })}
       />,
     );
-    expect(screen.getByText(/2 lines have no price/)).toBeInTheDocument();
+    expect(screen.getByText(/Lines with no price/)).toBeInTheDocument();
   });
 
   it("says nothing of a draft, whose prices may still come", () => {
@@ -279,6 +279,6 @@ describe("DocumentValueTotals — a received line with no price", () => {
         document={posted([{ unit_price: null }], { status: "DRAFT" })}
       />,
     );
-    expect(screen.queryByText(/no price/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Lines with no price/)).not.toBeInTheDocument();
   });
 });

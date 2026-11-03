@@ -616,8 +616,7 @@
     "plannedReceiving": "→ {{location}} · área de recebimento, guardar depois"
   },
   "value": {
-    "unpricedLines_one": "{{count}} linha não tem preço: não entra nestes totais e esse estoque não tem custo registrado.",
-    "unpricedLines_other": "{{count}} linhas não têm preço: não entram nestes totais e esse estoque não tem custo registrado.",
+    "unpricedLines": "As linhas sem preço não entram nestes totais e esse estoque não tem custo registrado.",
     "totalsTitle": "Totais do documento",
     "totalNet": "Total líquido",
     "totalTax": "Total de impostos",

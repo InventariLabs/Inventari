@@ -616,8 +616,7 @@
     "plannedReceiving": "→ {{location}} · Wareneingangszone, später einlagern"
   },
   "value": {
-    "unpricedLines_one": "{{count}} Position hat keinen Preis: Sie ist in dieser Summe nicht enthalten, und für diesen Bestand sind keine Kosten erfasst.",
-    "unpricedLines_other": "{{count}} Positionen haben keinen Preis: Sie sind in dieser Summe nicht enthalten, und für diesen Bestand sind keine Kosten erfasst.",
+    "unpricedLines": "Positionen ohne Preis sind nicht in dieser Summe enthalten, und für diesen Bestand sind keine Kosten erfasst.",
     "totalsTitle": "Dokumentsummen",
     "totalNet": "Nettogesamt",
     "totalTax": "Steuergesamt",
