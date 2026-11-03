@@ -111,7 +111,7 @@ describe("EquipmentCategoriesPage", () => {
     await user.click(deleteButton);
     let dialog = await screen.findByRole("alertdialog");
     expect(
-      within(dialog).getByText('Delete category "Monitors"?'),
+      within(dialog).getByText(/^Delete category "Monitors"\?/),
     ).toBeInTheDocument();
     await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
     await waitFor(() =>
@@ -123,6 +123,40 @@ describe("EquipmentCategoriesPage", () => {
     dialog = await screen.findByRole("alertdialog");
     await user.click(within(dialog).getByRole("button", { name: "Delete" }));
     await waitFor(() => expect(deleted).toHaveBeenCalledTimes(1));
+  });
+
+  it("names what goes with the category: its field definitions and the assets that block it", async () => {
+    server.use(
+      http.get("/api/v1/categories", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              ...CATEGORIES[0],
+              items_count: 3,
+              field_definitions: [{ key: "a" }, { key: "b" }],
+            },
+          ]),
+        ),
+      ),
+    );
+    const user = renderPage();
+
+    const [deleteButton] = await screen.findAllByRole("button", {
+      name: "Delete Monitors",
+    });
+    await user.click(deleteButton);
+    const dialog = await screen.findByRole("alertdialog");
+
+    expect(
+      within(dialog).getByText(
+        /This permanently removes its 2 field definitions\./,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).getByText(
+        /3 assets are filed under it, so it cannot be deleted/,
+      ),
+    ).toBeInTheDocument();
   });
 
   it("opens the form on the clicked category, and empty from the header", async () => {

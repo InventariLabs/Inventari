@@ -242,6 +242,41 @@ class TestReplenishmentDraftPos:
         )
         assert orphan_pos == []
 
+    def test_a_rule_without_a_supplier_proposes_the_one_the_price_list_names(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+    ) -> None:
+        # No preferred supplier on the rule, but the price list holds an offer:
+        # the alert names that supplier instead of "none", and the draft order
+        # goes to it rather than being reported as `no_supplier`.
+        rule = _rule(db_session, po_org, po_template, po_location, partner_id=None)
+        _price(db_session, po_org, po_partner, po_template, '12.50')
+        _stock(client, po_auth_headers, po_template, po_location, '0')
+
+        alerts = client.get(
+            '/api/v1/purchase-orders/replenishment/alerts', headers=po_auth_headers
+        )
+        assert alerts.status_code == status.HTTP_200_OK
+        [alert] = [a for a in alerts.json() if a['reorder_rule_id'] == str(rule.id)]
+        assert alert['preferred_partner_id'] == str(po_partner.id)
+        assert alert['preferred_partner_name'] == po_partner.name
+
+        resp = client.post(
+            URL,
+            headers=po_auth_headers,
+            json={'reorder_rule_ids': [str(rule.id)]},
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        body = resp.json()
+        assert body['skipped'] == []
+        assert body['created'][0]['partner_id'] == str(po_partner.id)
+
     def test_missing_pricelist_leaves_unit_price_null(
         self,
         client: TestClient,

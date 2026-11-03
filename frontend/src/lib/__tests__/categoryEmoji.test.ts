@@ -7,6 +7,23 @@ import {
   resolveCategoryEmoji,
 } from "@/lib/categoryEmoji";
 
+// ── Equipment presets each get a glyph of their own ─────────────────────
+
+describe("resolveCategoryEmoji — the equipment presets", () => {
+  it.each([
+    ["Desktop Computer", "🖥️"],
+    ["Network Device", "🌐"],
+    ["Peripheral", "🕹️"],
+  ])(
+    "gives %s a glyph of its own instead of the last-resort box",
+    (name, emoji) => {
+      const resolved = resolveCategoryEmoji({ name, contextTag: "equipment" });
+      expect(resolved).toBe(emoji);
+      expect(resolved).not.toBe(LAST_RESORT_EMOJI);
+    },
+  );
+});
+
 // ── Layer 1: user override wins ─────────────────────────────────────────
 
 describe("resolveCategoryEmoji — Layer 1: user override", () => {

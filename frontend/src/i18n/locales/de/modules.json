@@ -81,7 +81,6 @@
     }
   },
   "config": {
-    "connectionsTitle": "KI-Verbindungen",
     "connectionsDescription": "Pool von LLM-Verbindungen, die von allen Modulen gemeinsam genutzt werden. Ordnen Sie unten jeweils eine einem Zweck zu.",
     "addConnection": "Verbindung hinzufügen",
     "editConnection": "Verbindung bearbeiten",

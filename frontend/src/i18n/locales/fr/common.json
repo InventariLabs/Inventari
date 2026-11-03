@@ -2,6 +2,7 @@
   "access": {
     "readOnly": "Vous pouvez consulter, pas modifier",
     "readOnlyHint": "Votre compte peut lire ce module. Adressez-vous à l'administration de votre organisation si vous devez apporter des modifications.",
+    "hiddenRecordsAdminOnly": "Seul un administrateur peut l’activer — demandez-lui.",
     "denied": "Vous n'avez pas accès à ceci",
     "deniedHint": "Votre compte ne peut pas lire ces données. Demandez l'accès à un administrateur de votre organisation."
   },
@@ -805,6 +806,10 @@
       "empty": "Aucun paramètre disponible",
       "emptyHint": "Ce module n'expose aucun paramètre.",
       "loadFailed": "Échec du chargement des paramètres du module",
+      "outOfRangeBetween": "Saisissez un nombre de {{min}} à {{max}}.",
+      "outOfRangeMin": "Saisissez un nombre supérieur ou égal à {{min}}.",
+      "outOfRangeMax": "Saisissez un nombre inférieur ou égal à {{max}}.",
+      "outOfRangeSave": "Corrigez le réglage hors plage, puis enregistrez à nouveau.",
       "loadFailedHint": "Les réglages n'ont pas pu être lus pour le moment. C'est généralement temporaire.",
       "forbidden": "Seule l'administration peut ouvrir les réglages du module",
       "forbiddenHint": "Votre compte peut utiliser ce module, mais pas modifier son fonctionnement. Adressez-vous à l'administration de votre organisation.",

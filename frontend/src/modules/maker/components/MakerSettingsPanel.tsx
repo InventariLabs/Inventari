@@ -170,6 +170,7 @@ export function MakerSettingsPanel() {
           <Button
             type="button"
             variant={direction === "SAVINGS" ? "success" : "outline"}
+            aria-pressed={direction === "SAVINGS"}
             onClick={() => {
               const old = direction;
               setDirection("SAVINGS");
@@ -185,6 +186,7 @@ export function MakerSettingsPanel() {
           <Button
             type="button"
             variant={direction === "MARGIN" ? "success" : "outline"}
+            aria-pressed={direction === "MARGIN"}
             onClick={() => {
               const old = direction;
               setDirection("MARGIN");
@@ -265,6 +267,7 @@ export function MakerSettingsPanel() {
             <Button
               type="button"
               variant={scope === "GLOBAL" ? "success" : "outline"}
+              aria-pressed={scope === "GLOBAL"}
               onClick={() => {
                 const old = scope;
                 setScope("GLOBAL");
@@ -280,6 +283,7 @@ export function MakerSettingsPanel() {
             <Button
               type="button"
               variant={scope === "PER_LOCATION" ? "success" : "outline"}
+              aria-pressed={scope === "PER_LOCATION"}
               onClick={() => {
                 const old = scope;
                 setScope("PER_LOCATION");
@@ -310,6 +314,7 @@ export function MakerSettingsPanel() {
                   key={s}
                   type="button"
                   variant={strategy === s ? "success" : "outline"}
+                  aria-pressed={strategy === s}
                   onClick={() => {
                     const old = strategy;
                     setStrategy(s);

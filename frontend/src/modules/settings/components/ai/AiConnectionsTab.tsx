@@ -98,12 +98,9 @@ export default function AiConnectionsTab() {
             <Brain size={20} />
           </div>
           <div>
-            {/* p, not h2: the shell header above already carries the page's
-                h1 with these exact words — the same name twice in the heading
-                hierarchy read as two sections that are one. */}
-            <p className="text-base font-semibold text-on">
-              {t("config.connectionsTitle")}
-            </p>
+            {/* No title of its own: the shell header above carries the page's
+                h1 with these exact words, and the same name twice on one
+                screen read as two sections that are one. */}
             <p className="text-xs text-on-muted">
               {t("config.connectionsDescription")}
             </p>

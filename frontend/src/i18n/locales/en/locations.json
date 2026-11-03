@@ -233,6 +233,8 @@
     "archiveTargetLabel": "Move products to",
     "archiveTargetNone": "Select a target location",
     "archiveReversible": "You can undo this: archived locations can be restored from Archived locations.",
+    "archiveSubLocations_one": "The {{count}} location inside it is not archived with it: it shows at the top level of the lists until this one is restored.",
+    "archiveSubLocations_other": "The {{count}} locations inside it are not archived with it: they show at the top level of the lists until this one is restored.",
     "archivePutawayRules_one": "{{count}} putaway rule points here. It will keep this location as its target until edited.",
     "archivePutawayRules_other": "{{count}} putaway rules point here. They will keep this location as their target until edited."
   },
@@ -339,6 +341,7 @@
   },
   "contents": {
     "emptyTitle": "Nothing inside this location",
+    "emptyDescriptionNone": "It holds no products and has no locations inside.",
     "emptyDescription_one": "Its {{count}} product is on the Products tab.",
     "emptyDescription_other": "Its {{count}} products are on the Products tab.",
     "showProducts": "Show products",

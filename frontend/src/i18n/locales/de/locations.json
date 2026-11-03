@@ -227,6 +227,8 @@
     "archiveTargetLabel": "Produkte verschieben nach",
     "archiveTargetNone": "Zielstandort wählen",
     "archiveReversible": "Das lässt sich rückgängig machen: Archivierte Lagerorte können unter „Archivierte Lagerorte\" wiederhergestellt werden.",
+    "archiveSubLocations_one": "Der {{count}} Lagerort darin wird nicht mit archiviert: Er erscheint in den Listen auf oberster Ebene, bis dieser wiederhergestellt wird.",
+    "archiveSubLocations_other": "Die {{count}} Lagerorte darin werden nicht mit archiviert: Sie erscheinen in den Listen auf oberster Ebene, bis dieser wiederhergestellt wird.",
     "archivePutawayRules_one": "{{count}} Einlagerungsregel zeigt hierher. Sie behält diesen Lagerort als Ziel, bis sie geändert wird.",
     "archivePutawayRules_other": "{{count}} Einlagerungsregeln zeigen hierher. Sie behalten diesen Lagerort als Ziel, bis sie geändert werden."
   },
@@ -333,6 +335,7 @@
   },
   "contents": {
     "emptyTitle": "In diesem Standort ist nichts",
+    "emptyDescriptionNone": "Hier sind keine Produkte und keine Standorte darin.",
     "emptyDescription_one": "Sein {{count}} Produkt ist auf der Registerkarte Produkte.",
     "emptyDescription_other": "Seine {{count}} Produkte sind auf der Registerkarte Produkte.",
     "showProducts": "Produkte anzeigen",

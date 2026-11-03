@@ -109,6 +109,9 @@ export const KEYWORD_EMOJI_MAP: EmojiEntry[] = [
   { keywords: ["cable", "kabel", "wire", "przewód"], emoji: "🔌" },
   { keywords: ["battery", "bateria", "akumulator"], emoji: "🔋" },
   { keywords: ["chip", "cpu", "procesor"], emoji: "🔩" },
+  { keywords: ["desktop", "stacjonarn"], emoji: "🖥️" },
+  { keywords: ["network", "router", "sieciow"], emoji: "🌐" },
+  { keywords: ["peripheral", "peryferi"], emoji: "🕹️" },
   // ── Tools ────────────────────────────────────────────────
   { keywords: ["tool", "narzędz"], emoji: "🧰" },
   { keywords: ["hammer", "młotek"], emoji: "🔨" },

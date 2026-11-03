@@ -14,6 +14,37 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Saving a supplier price or a reorder rule without a product now marks the
+  product field as required and says so on the field, and a reorder rule whose
+  maximum is below its minimum is refused on the Maximum field in plain words.
+  On a phone, the reorder rules are cards with their figures and actions in
+  view instead of a table that scrolled off the right edge.
+- A low-stock alert for a product with no preferred supplier now proposes the
+  supplier of its cheapest current price-list entry, and a draft purchase order
+  made from it goes to that supplier, instead of reporting "No supplier" beside
+  a price the module holds.
+- The purchase-order approval warning names the approval threshold when the
+  threshold is the requirement left, and a viewer opening the Production or
+  Purchase order settings is told that only an administrator can open them
+  instead of "You can view this" above an empty page.
+- Module settings with a bounded number (such as the equipment warning window)
+  answer a value out of range in the app's own language rather than in the
+  browser's.
+- Locations: an address that is not a location identifier shows the same "not
+  found" page as an unknown one, the archive confirmation says that the
+  locations inside stay in the lists, an empty location no longer offers a
+  button to an empty Products tab, the archived locations are reachable from a
+  phone, and Archive and Delete sit at the top of a location's settings. The
+  note about hidden locations tells a member who can turn the setting on
+  instead of sending them to a page that refuses them.
+- Choices drawn by colour alone (the Production settings groups and the
+  tracked fields of a location) now report which option is selected to
+  assistive technology.
+- Equipment categories: deleting one says what goes with it, and the Desktop
+  Computer, Network Device and Peripheral presets have icons of their own. In
+  Polish the Batches status tabs read as plurals and the category list says
+  "Sprzęt" for its count. The AI connections page no longer shows its title
+  twice.
 - A product whose nutrition came from Open Food Facts now counts its calories
   in recipe estimates and in the meal plan's daily totals. They used to go
   missing while its protein, fat and carbohydrates were counted, and the day

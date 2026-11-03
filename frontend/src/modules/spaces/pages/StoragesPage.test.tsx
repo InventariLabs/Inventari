@@ -1013,6 +1013,51 @@ describe("StoragesPage — one screen", () => {
     expect(screen.queryByText("Location not found")).not.toBeInTheDocument();
   });
 
+  it("gives an address that is not an identifier the same page as an unknown location", async () => {
+    // The server refuses a cut link with a validation error, not a 404; a
+    // retry could only be refused again, so it is "not found", not a failure.
+    server.use(
+      http.get("/api/v1/locations", ({ request }) =>
+        new URL(request.url).searchParams.getAll("ids").includes("zone-12")
+          ? HttpResponse.json(
+              {
+                detail: [
+                  {
+                    type: "uuid_parsing",
+                    loc: ["query", "ids", 0],
+                    msg: "Input should be a valid UUID",
+                  },
+                ],
+              },
+              { status: 422 },
+            )
+          : undefined,
+      ),
+    );
+    renderPage("/inventory/locations/zone/zone-12");
+
+    expect(await screen.findByText("Location not found")).toBeInTheDocument();
+    expect(screen.queryByText(/try again/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Back to list" }),
+    ).toBeInTheDocument();
+  });
+
+  it("reaches the archived locations from the phone's first level too, not only from the tree beside it", async () => {
+    renderPage("/inventory/locations");
+
+    await screen.findByRole("button", { name: /^Freezer/ });
+    // One link in the tree's aside (desktop), one under the phone's list of
+    // roots; the aside is not drawn on a phone.
+    const links = screen.getAllByRole("link", { name: "Archived locations" });
+    expect(links).toHaveLength(2);
+    expect(
+      links.every(
+        (l) => l.getAttribute("href") === "/inventory/locations/archived",
+      ),
+    ).toBe(true);
+  });
+
   it("opens a root from the phone's first level, which lists the roots themselves", async () => {
     renderPage("/inventory/locations");
 

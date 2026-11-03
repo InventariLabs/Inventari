@@ -611,7 +611,8 @@ class ReplenishmentDraftSkipped(BaseModel):
     ``not_found`` (no such rule in this org), ``not_alerting`` (stock is
     at or above the minimum right now), ``covered_by_reserve`` (the
     proposed internal move covers the whole shortage, so there is nothing
-    to buy), ``no_supplier`` (the rule has no preferred supplier —
+    to buy), ``no_supplier`` (neither the rule nor the price list names
+    a supplier —
     reported, never turned into an empty order).
     """
 
