@@ -405,10 +405,10 @@ describe("DocumentFormModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByLabelText("Select the From location"),
+        screen.getByLabelText("Choose where the goods come from"),
       ).toBeInTheDocument();
       expect(
-        screen.getByLabelText("Select the To location"),
+        screen.getByLabelText("Choose where the goods go"),
       ).toBeInTheDocument();
       expect(screen.queryByLabelText("Select partner")).not.toBeInTheDocument();
     });
@@ -1371,8 +1371,8 @@ describe("DocumentFormModal — which locations the pickers offer", () => {
 
     // The mocked combobox renders its options as a native select.
     for (const label of [
-      "Select the From location",
-      "Select the To location",
+      "Choose where the goods come from",
+      "Choose where the goods go",
     ]) {
       const picker = screen.getByLabelText(label);
       expect(await within(picker).findByText("Receiving")).toBeInTheDocument();
@@ -1399,11 +1399,11 @@ describe("DocumentFormModal — which locations the pickers offer", () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByLabelText("Select the From location")).toHaveValue(
-        "loc-1",
-      ),
+      expect(
+        screen.getByLabelText("Choose where the goods come from"),
+      ).toHaveValue("loc-1"),
     );
-    expect(screen.getByLabelText("Select the To location")).toHaveValue("");
+    expect(screen.getByLabelText("Choose where the goods go")).toHaveValue("");
   });
 
   it("closes a form it opened from a hold without asking to discard", () => {
@@ -1449,9 +1449,9 @@ describe("DocumentFormModal — which locations the pickers offer", () => {
     // the form still shows where the document moves from.
     await waitFor(() =>
       expect(
-        within(screen.getByLabelText("Select the From location")).getByText(
-          "Server Rack A",
-        ),
+        within(
+          screen.getByLabelText("Choose where the goods come from"),
+        ).getByText("Server Rack A"),
       ).toBeInTheDocument(),
     );
     expect(
@@ -1481,7 +1481,7 @@ describe("DocumentFormModal — which locations the pickers offer", () => {
 
     // The check could not be made, which does not say the place is gone.
     await waitFor(() =>
-      expect(screen.getByLabelText("Select the To location")).toHaveValue(
+      expect(screen.getByLabelText("Choose where the goods go")).toHaveValue(
         "loc-2",
       ),
     );
@@ -1511,7 +1511,7 @@ describe("DocumentFormModal — which locations the pickers offer", () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByLabelText("Select the To location")).toHaveValue(
+      expect(screen.getByLabelText("Choose where the goods go")).toHaveValue(
         "loc-1",
       ),
     );
@@ -1526,12 +1526,14 @@ describe("DocumentFormModal — which locations the pickers offer", () => {
     await act(async () => {
       render(<DocumentFormModal initialType="INT" onClose={vi.fn()} />);
     });
-    await within(screen.getByLabelText("Select the From location")).findByText(
-      "Receiving",
-    );
+    await within(
+      screen.getByLabelText("Choose where the goods come from"),
+    ).findByText("Receiving");
 
-    expect(screen.getByLabelText("Select the From location")).toHaveValue("");
-    expect(screen.getByLabelText("Select the To location")).toHaveValue("");
+    expect(
+      screen.getByLabelText("Choose where the goods come from"),
+    ).toHaveValue("");
+    expect(screen.getByLabelText("Choose where the goods go")).toHaveValue("");
   });
 });
 

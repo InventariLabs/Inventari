@@ -1266,7 +1266,7 @@
       "scanPrompt": "Escanea el siguiente producto, en cualquier orden",
       "scanLocation": "Escanea la etiqueta de la ubicación",
       "scanned": "Escaneado",
-      "ordered": "Pedido {{quantity}}",
+      "ordered": "Pendiente {{quantity}}",
       "countedSoFar": "{{quantity}} contados hasta ahora",
       "howMany": "Cuánto llegó de {{name}}",
       "arrived": "{{unit}} llegados",
@@ -1813,7 +1813,7 @@
     },
     "todo": {
       "count": "{{shown}} de {{total}}",
-      "footnote": "Las tareas surgen solas de los pedidos de compra y venta, las órdenes de producción, las aprobaciones y el calendario de recuentos."
+      "footnote": "Las tareas surgen solas de los pedidos de compra, los documentos de envío, las órdenes de producción, las aprobaciones y el calendario de recuentos."
     },
     "feed": {
       "title": "Hoy en el almacén",
@@ -2050,7 +2050,7 @@
     "addPrices": "Añadir precios para contabilidad",
     "hidePrices": "Ocultar precios",
     "product": "Producto",
-    "ordered": "Pedido",
+    "ordered": "Pendiente",
     "received": "Llegado",
     "putOn": "Colocar en",
     "unitPrice": "Precio unitario",

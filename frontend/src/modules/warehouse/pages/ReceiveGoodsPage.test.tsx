@@ -177,9 +177,11 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
     options,
     onChange,
     placeholder,
+    error,
     "aria-label": ariaLabel,
   }: {
     id?: string;
+    error?: string;
     label?: string;
     "aria-label"?: string;
     value: string;
@@ -192,6 +194,7 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
       <select
         id={id}
         aria-label={label ?? ariaLabel}
+        aria-invalid={error ? true : undefined}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -1122,6 +1125,12 @@ describe("ReceiveGoodsPage", () => {
       await screen.findByText("Choose the location the goods go to."),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("To location")).toHaveFocus();
+    // The field itself is marked, as Issue and Move mark theirs, and the
+    // mark goes once a location is chosen.
+    expect(screen.getByLabelText("To location")).toBeInvalid();
+    expect(screen.getByLabelText("From")).toBeValid();
+    await user.selectOptions(screen.getByLabelText("To location"), "loc-1");
+    expect(screen.getByLabelText("To location")).toBeValid();
     expect(state.postNew).not.toHaveBeenCalled();
   });
 

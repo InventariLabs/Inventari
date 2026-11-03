@@ -392,6 +392,24 @@ describe("IssueGoodsPage", () => {
     expect(screen.getByText("0 lines")).toBeInTheDocument();
   });
 
+  it("drops the empty-list message from the footer once a line exists", async () => {
+    const user = userEvent.setup();
+    storagesTree.calls = serveLocations([
+      { id: "wh", name: "Main Warehouse" },
+      { id: "cold", name: "Cold Store" },
+    ]);
+    renderPage();
+
+    await user.click(
+      screen.getByRole("button", { name: "Issue to the customer" }),
+    );
+    expect(screen.getByText("No lines added yet")).toBeInTheDocument();
+
+    await pickRice(user);
+
+    expect(screen.queryByText("No lines added yet")).not.toBeInTheDocument();
+  });
+
   it("keeps the server's refusal beside the button", async () => {
     const user = userEvent.setup();
     postMutate.mockImplementation((_payload, options) =>
