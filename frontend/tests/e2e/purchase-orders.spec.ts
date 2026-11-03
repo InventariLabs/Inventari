@@ -14,23 +14,22 @@ test.describe("Purchase Orders — page & navigation", () => {
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
 
-    const partners = await api.listPartners(token);
-    if (partners.length > 0) {
-      seedPartnerId = partners[0].id;
-    }
-    if (!seedPartnerId) {
-      const partner = await api.createPartner(token, {
-        name: `E2E-PO-Partner-${Date.now()}`,
-        type: "supplier",
-        email: "po@example.com",
-      });
-      seedPartnerId = partner.id;
-    }
+    // This setup runs once per worker, side by side, so each run owns a
+    // supplier of its own. A name from Date.now alone was the same in two
+    // workers that reached it in one millisecond, and the second create
+    // failed before any test ran. Borrowing the first partner on the list
+    // meant the afterAll below deleted one that other workers were using.
+    const partner = await api.createPartner(token, {
+      name: `E2E-PO-Partner-${crypto.randomUUID()}`,
+      type: "supplier",
+      email: "po@example.com",
+    });
+    seedPartnerId = partner.id;
   });
 
   test.afterAll(async () => {
     if (token && seedPartnerId) {
-      await api.deletePartner(token, seedPartnerId).catch(() => {});
+      await api.deletePartner(token, seedPartnerId);
     }
   });
 
@@ -91,8 +90,6 @@ test.describe("Purchase Orders — page & navigation", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!seedPartnerId) return;
-
     const poNumber = `E2E-PO-${Date.now()}`;
     let po: { id: string } | null = null;
     try {
@@ -119,7 +116,7 @@ test.describe("Purchase Orders — page & navigation", () => {
       await expect(poText).toBeVisible();
     }
 
-    await api.deletePurchaseOrder(token, po.id).catch(() => {});
+    await api.cancelPurchaseOrder(token, po.id);
   });
 
   test("navigates to templates page", async ({ page, authenticatedPage }) => {
@@ -145,6 +142,7 @@ test.describe("Purchase Orders — page & navigation", () => {
 test.describe("Purchase Orders — detail & linked receipts", () => {
   let api: ApiHelper;
   let token: string;
+  let partnerId: string;
   let poId: string;
   let poNumber: string;
 
@@ -154,15 +152,14 @@ test.describe("Purchase Orders — detail & linked receipts", () => {
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
 
-    const partnerId =
-      (await api.listPartners(token))[0]?.id ??
-      (
-        await api.createPartner(token, {
-          name: `E2E-PO-${Date.now()}`,
-          type: "SUPPLIER",
-          email: "po-detail@example.com",
-        })
-      ).id;
+    // Its own supplier for the same reason as the setup above.
+    partnerId = (
+      await api.createPartner(token, {
+        name: `E2E-PO-Detail-Partner-${crypto.randomUUID()}`,
+        type: "SUPPLIER",
+        email: "po-detail@example.com",
+      })
+    ).id;
     const po = await api.createPurchaseOrder(token, {
       number: `E2E-PO-Detail-${Date.now()}`,
       partner_id: partnerId,
@@ -183,7 +180,10 @@ test.describe("Purchase Orders — detail & linked receipts", () => {
 
   test.afterAll(async () => {
     if (token && poId) {
-      await api.deletePurchaseOrder(token, poId).catch(() => {});
+      await api.cancelPurchaseOrder(token, poId);
+    }
+    if (token && partnerId) {
+      await api.deletePartner(token, partnerId);
     }
   });
 

@@ -299,7 +299,7 @@ test.describe("Phone lists — the first record is above the fold", () => {
       status: "DRAFT",
       lines: [{ name: `${tag} line`, quantity_ordered: 1, unit_price: "1.00" }],
     });
-    cleanup.push(() => api.deletePurchaseOrder(token, order.id));
+    cleanup.push(() => api.cancelPurchaseOrder(token, order.id));
 
     const list = await api.createShoppingList(token, { name: `${tag} list` });
     cleanup.push(() => api.deleteShoppingList(token, list.id));
