@@ -346,7 +346,19 @@ describe("RecipesPage", () => {
     expect(
       await screen.findByText("Collections could not be loaded."),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /try again/i })).toBeVisible();
+
+    // The offer has to reach the read: the next answer clears the message.
+    server.use(
+      http.get("/api/v1/recipes/collections", () =>
+        HttpResponse.json(onePage([])),
+      ),
+    );
+    await userEvent.click(screen.getByRole("button", { name: /try again/i }));
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Collections could not be loaded."),
+      ).not.toBeInTheDocument(),
+    );
   });
 
   it("says the tags could not be loaded instead of showing no tag filter", async () => {

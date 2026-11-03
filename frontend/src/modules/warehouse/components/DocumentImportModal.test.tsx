@@ -247,6 +247,30 @@ describe("DocumentImportModal", () => {
     });
   });
 
+  it("goes back to the drop zone when the file could not be read", async () => {
+    renderModal();
+    post.mockRejectedValueOnce(new Error("nope"));
+    const input = document.getElementById(
+      "document-import-file-input",
+    ) as HTMLInputElement;
+    fireEvent.change(input, {
+      target: { files: [new File(["x"], "linie.csv")] },
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Failed to analyze file"),
+    );
+    expect(
+      await screen.findByText("Drop CSV or XLSX file here, or click to browse"),
+    ).toBeInTheDocument();
+    // An unread file is not an empty one: no name, no "0 rows", no mapping.
+    expect(screen.queryByText("linie.csv")).not.toBeInTheDocument();
+    expect(screen.queryByText(/\b0 rows\b/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "map name" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("hides the stub offer from an account without items:write", async () => {
     // Founding templates is items:write work; the modal does not offer a
     // checkbox the backend would refuse.
