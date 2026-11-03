@@ -25,10 +25,6 @@ test.beforeAll(async ({ playwright, baseURL }) => {
   const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
   token = auth.access_token;
   await api.enableAllModules(token);
-  // Deterministic: the check scope is one setting of the shared admin org, and
-  // PER_LOCATION reads the stock at the order's output location (Out) while
-  // this spec stocks the input (In) — "insufficient_stock, available 0".
-  await api.patchMakerSettings(token, { availability_check_scope: "GLOBAL" });
 
   stamp = `E2E-Result-${Date.now()}`;
   const output = await api.createProductTemplate(token, {

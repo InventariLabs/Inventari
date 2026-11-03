@@ -19,9 +19,6 @@ async function seedLifecycleContext(api: ApiHelper, ctx: APIRequestContext) {
   const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
   const token = auth.access_token;
   await api.enableAllModules(token);
-  // Deterministic: PER_LOCATION on the shared admin org checks the output
-  // location, where this spec has no stock (it stocks the input).
-  await api.patchMakerSettings(token, { availability_check_scope: "GLOBAL" });
 
   const stamp = Date.now();
   const output = await api.createProductTemplate(token, {
