@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChoiceGroup } from "@/components/ui/ChoiceGroup";
 import { InlineQueryError } from "@/components/ui/QueryResult";
@@ -8,10 +9,6 @@ import { LocationCombobox } from "@/module-sdk";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { PartnerOption } from "@/hooks/usePartnerPicker";
 import type { LocationPickerEmptyReason } from "@/modules/shared/lib/locationPickerOffer";
-import {
-  PartnerInlineCreate,
-  usePartnerCreateLayer,
-} from "@/modules/partners/moduleApi";
 import {
   partnerTypesFor,
   type ReceiveSource,
@@ -75,6 +72,10 @@ interface Props {
   onOrderChange: (id: string) => void;
 }
 
+const PartnerCreateLayer = lazy(
+  () => import("@/modules/warehouse/components/PartnerCreateLayer"),
+);
+
 /** Who the goods come from, with the way to add one that is not there yet. */
 function PartnerField({
   source,
@@ -93,11 +94,7 @@ function PartnerField({
   | "onPartnerChange"
 >) {
   const { t } = useTranslation("warehouse");
-  const roleTypes = partnerTypesFor(source);
-  const createPartner = usePartnerCreateLayer({
-    roleTypes,
-    onAccepted: onPartnerChange,
-  });
+  const [newPartnerName, setNewPartnerName] = useState<string | null>(null);
   return (
     <>
       <SearchableCombobox
@@ -121,19 +118,19 @@ function PartnerField({
           source === "return" ? "form.noCustomersFound" : "receive.noSuppliers",
         )}
         createLabel={t("form.createNewPartner")}
-        onCreateNew={createPartner.handleCreate}
+        onCreateNew={setNewPartnerName}
         title={t("receive.from")}
         required
       />
-      {createPartner.open && (
-        <div className="col-span-full">
-          <PartnerInlineCreate
-            initialName={createPartner.query}
-            roleTypes={roleTypes}
-            onCreated={createPartner.handleCreated}
-            onCancel={createPartner.handleCancel}
+      {newPartnerName !== null && (
+        <Suspense fallback={null}>
+          <PartnerCreateLayer
+            initialName={newPartnerName}
+            roleTypes={partnerTypesFor(source)}
+            onAccepted={onPartnerChange}
+            onClose={() => setNewPartnerName(null)}
           />
-        </div>
+        </Suspense>
       )}
     </>
   );

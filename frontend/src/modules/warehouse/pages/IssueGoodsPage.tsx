@@ -1,8 +1,4 @@
-import {
-  PartnerInlineCreate,
-  usePartnerCreateLayer,
-} from "@/modules/partners/moduleApi";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
@@ -78,14 +74,15 @@ function purposeOf(docType: DocumentType): Purpose {
   return "customer";
 }
 
+const PartnerCreateLayer = lazy(
+  () => import("@/modules/warehouse/components/PartnerCreateLayer"),
+);
+
 /** Who gets the goods — asked only when they go to a customer. */
 function CustomerField({ draft }: { draft: ActionDraft }) {
   const { t } = useTranslation("warehouse");
   const { workspace, picker, errors } = draft;
-  const createPartner = usePartnerCreateLayer({
-    roleTypes: picker.partnerTypes,
-    onAccepted: workspace.setPartnerId,
-  });
+  const [newPartnerName, setNewPartnerName] = useState<string | null>(null);
   return (
     <>
       <SearchableCombobox
@@ -104,18 +101,18 @@ function CustomerField({ draft }: { draft: ActionDraft }) {
         searchPlaceholder={t("form.searchPartner")}
         emptyMessage={t("form.noCustomersFound")}
         createLabel={t("form.createNewPartner")}
-        onCreateNew={createPartner.handleCreate}
+        onCreateNew={setNewPartnerName}
         title={t("issue.customer")}
       />
-      {createPartner.open && (
-        <div className="col-span-full">
-          <PartnerInlineCreate
-            initialName={createPartner.query}
+      {newPartnerName !== null && (
+        <Suspense fallback={null}>
+          <PartnerCreateLayer
+            initialName={newPartnerName}
             roleTypes={picker.partnerTypes}
-            onCreated={createPartner.handleCreated}
-            onCancel={createPartner.handleCancel}
+            onAccepted={workspace.setPartnerId}
+            onClose={() => setNewPartnerName(null)}
           />
-        </div>
+        </Suspense>
       )}
     </>
   );
