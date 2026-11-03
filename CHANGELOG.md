@@ -32,6 +32,9 @@ says what the release does rather than what changed since them.
   under the title only when it is called something else.
 - The onboarding card for working with a single module now names Production,
   so a person who came to make things can find it.
+- Saving two partners with the same name, or the same code, at the same moment
+  now refuses the second one with the usual "already exists" message instead
+  of failing with a server error.
 
 ## v0.11.0 - 2026-11-02
 

@@ -3,6 +3,7 @@ import uuid
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import ServiceRejectionError
 from app.models.organization import Organization
 from app.models.user import User
 from app.schemas.partner import PartnerCreate, PartnerUpdate
@@ -89,6 +90,115 @@ class TestPartnerCreate:
                 data2,
                 async_test_user.id,
             )
+
+
+@pytest.mark.integration
+class TestPartnerCreateLostRace:
+    """Two creates that both pass the look and meet at the unique key.
+
+    The look is blinded, so the second create reaches the database as it
+    would when the first one committed between its look and its write.
+    """
+
+    @pytest.fixture(autouse=True)
+    def _blind_the_look(self, monkeypatch: pytest.MonkeyPatch):
+        async def _nothing_seen(*_args, **_kwargs) -> None:
+            return None
+
+        monkeypatch.setattr(partner_service, '_check_unique_async', _nothing_seen)
+        monkeypatch.setattr(partner_service, '_check_code_unique_async', _nothing_seen)
+
+    @pytest.mark.asyncio
+    async def test_a_lost_race_for_a_name_is_the_ordinary_refusal(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+    ):
+        data = _make_create(name='Racers')
+        org_id = async_test_household.id
+        await partner_service.create_async(
+            real_async_db_session, org_id, data, async_test_user.id
+        )
+        with pytest.raises(ServiceRejectionError) as refused:
+            await partner_service.create_async(
+                real_async_db_session, org_id, data, async_test_user.id
+            )
+        assert refused.value.key == 'partner_name_exists'
+
+    @pytest.mark.asyncio
+    async def test_a_lost_race_for_a_code_is_the_ordinary_refusal(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+    ):
+        org_id = async_test_household.id
+        await partner_service.create_async(
+            real_async_db_session,
+            org_id,
+            _make_create(name='First', code='RACE-1'),
+            async_test_user.id,
+        )
+        with pytest.raises(ServiceRejectionError) as refused:
+            await partner_service.create_async(
+                real_async_db_session,
+                org_id,
+                _make_create(name='Second', code='RACE-1'),
+                async_test_user.id,
+            )
+        assert refused.value.key == 'partner_code_exists'
+
+    @pytest.mark.asyncio
+    async def test_the_transaction_stays_usable_after_the_refusal(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+    ):
+        org_id = async_test_household.id
+        data = _make_create(name='Usable')
+        await partner_service.create_async(
+            real_async_db_session, org_id, data, async_test_user.id
+        )
+        with pytest.raises(ServiceRejectionError):
+            await partner_service.create_async(
+                real_async_db_session, org_id, data, async_test_user.id
+            )
+        other = await partner_service.create_async(
+            real_async_db_session,
+            org_id,
+            _make_create(name='Another'),
+            async_test_user.id,
+        )
+        assert other.id is not None
+
+    @pytest.mark.asyncio
+    async def test_a_lost_race_on_a_rename_is_the_ordinary_refusal(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+    ):
+        org_id = async_test_household.id
+        await partner_service.create_async(
+            real_async_db_session,
+            org_id,
+            _make_create(name='Taken'),
+            async_test_user.id,
+        )
+        other = await partner_service.create_async(
+            real_async_db_session, org_id, _make_create(name='Free'), async_test_user.id
+        )
+        with pytest.raises(ServiceRejectionError) as refused:
+            await partner_service.update_async(
+                real_async_db_session,
+                org_id,
+                other.id,
+                PartnerUpdate(name='Taken'),
+                user_id=async_test_user.id,
+            )
+        assert refused.value.key == 'partner_name_exists'
 
 
 @pytest.mark.integration
