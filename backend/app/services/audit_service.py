@@ -214,7 +214,8 @@ def audit_value(value):
     and a container is walked rather than handed over as a Python object
     the encoder would refuse.
 
-    A ``Decimal`` becomes its **exact digits as a string**. The journal is
+    A ``Decimal`` -- and a ``float``, by its shortest round-trip digits --
+    becomes its **exact digits as a string**. The journal is
     the account of what the numbers were, and a float is a less precise copy
     of the data it describes -- the same rule the quantity path and
     ``docs/subsystems/AUDIT.md`` state. Use :func:`audit_key` to decide
@@ -250,6 +251,13 @@ def _render(value, *, decimal):
         return value
     if isinstance(value, Decimal):
         return decimal(value)
+    if isinstance(value, float):
+        # A float is a number to the audit screen, which prints it at six
+        # significant digits. Its shortest round-trip digits (`repr`) are
+        # what was typed, so it is treated as the Decimal of those digits:
+        # `min_quantity` is a DOUBLE column and its journal entry still reads
+        # `1234.567`. `audit_key` gets the same float back from them.
+        return decimal(Decimal(repr(value)))
     if isinstance(value, Enum):
         return _render(value.value, decimal=decimal)
     if isinstance(value, uuid.UUID):
