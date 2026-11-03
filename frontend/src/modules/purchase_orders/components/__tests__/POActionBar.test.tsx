@@ -169,7 +169,7 @@ describe("POActionBar", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("says why Send to Vendor is disabled on an order with no supplier", () => {
+  it("says why Send to supplier is disabled on an order with no supplier", () => {
     render(
       <POActionBar
         {...baseProps}
@@ -178,7 +178,7 @@ describe("POActionBar", () => {
       />,
     );
 
-    const send = screen.getByRole("button", { name: /send to vendor/i });
+    const send = screen.getByRole("button", { name: /send to supplier/i });
     expect(send).toBeDisabled();
     expect(send.parentElement).toHaveAttribute(
       "title",

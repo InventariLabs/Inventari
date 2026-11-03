@@ -47,8 +47,8 @@ test.describe("Purchase Orders — page & navigation", () => {
     ).toBeVisible({ timeout: 10000 });
   });
 
-  test("has Create Order button", async ({ page, authenticatedPage }) => {
-    // `.first()`: an empty list also renders a Create Order CTA in its
+  test("has Create order button", async ({ page, authenticatedPage }) => {
+    // `.first()`: an empty list also renders a Create order CTA in its
     // empty state, so the name matches two buttons.
     await expect(
       page.getByRole("button", { name: /create order/i }).first(),
@@ -65,7 +65,7 @@ test.describe("Purchase Orders — page & navigation", () => {
   });
 
   test("opens create order form", async ({ page, authenticatedPage }) => {
-    // `.first()`: an empty list also renders a Create Order CTA in its
+    // `.first()`: an empty list also renders a Create order CTA in its
     // empty state, so the name matches two buttons.
     const createBtn = page
       .getByRole("button", { name: /create order/i })

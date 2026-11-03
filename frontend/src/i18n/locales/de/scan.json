@@ -19,6 +19,7 @@
   "errorAdding": "Fehler beim Hinzufügen",
   "errorCamera": "Kamerafehler",
   "aimAtCode": "Auf Barcode oder QR zielen",
+  "closeCamera": "Kameraansicht schließen",
   "dataFromHistory": "Daten automatisch aus dem Verlauf zugeordnet",
   "dataFromOFFShort": "OFF-Daten",
   "dataFromVisionShort": "KI-Scandaten",

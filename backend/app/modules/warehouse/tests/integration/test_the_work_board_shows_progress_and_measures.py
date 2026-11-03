@@ -24,6 +24,7 @@ from app.models.user import User
 from app.modules.warehouse.models import (
     Document,
     DocumentLine,
+    DocumentRelation,
     WmsPickSession,
     WorkItemOverlay,
 )
@@ -474,3 +475,112 @@ class TestEveryColumnLooksThroughTheWholeSet:
         assert [item['source_id'] for item in mine['items']] == [str(documents[-1].id)]
         assert mine['total'] == 1
         assert late['total'] == 1001
+
+
+@pytest.mark.integration
+class TestDoneTodayIsWhatWasDone:
+    def test_the_column_runs_newest_first_whatever_made_the_card(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+    ) -> None:
+        now = datetime.now(UTC)
+        oldest = _document(
+            db_session, doc_org, doc_user,
+            doc_type='IN', status_word='COMPLETED',
+            completed_at=now - timedelta(minutes=30),
+        )  # fmt: skip
+        newest = _document(
+            db_session, doc_org, doc_user,
+            doc_type='OUT', status_word='COMPLETED',
+            completed_at=now - timedelta(minutes=2),
+        )  # fmt: skip
+        ticked = WorkItemOverlay(
+            organization_id=doc_org.id,
+            source_kind='custom',
+            title='Move the rack',
+            created_by=doc_user.id,
+            done_at=now - timedelta(minutes=10),
+        )
+        db_session.add(ticked)
+        db_session.commit()
+
+        section = _todo(client, doc_auth_headers, state='done', include_done=True)
+
+        assert [item['source_id'] for item in section['items']] == [
+            str(newest.id),
+            str(ticked.id),
+            str(oldest.id),
+        ]
+
+    def test_an_undone_document_and_its_reversal_are_not_work_done(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+    ) -> None:
+        now = datetime.now(UTC)
+        undone = _document(
+            db_session, doc_org, doc_user,
+            doc_type='OUT', status_word='COMPLETED',
+            completed_at=now - timedelta(minutes=20),
+        )  # fmt: skip
+        reversal = _document(
+            db_session, doc_org, doc_user,
+            doc_type='COR', status_word='COMPLETED',
+            completed_at=now - timedelta(minutes=19),
+        )  # fmt: skip
+        kept = _document(
+            db_session, doc_org, doc_user,
+            doc_type='IN', status_word='COMPLETED',
+            completed_at=now - timedelta(minutes=5),
+        )  # fmt: skip
+        db_session.add(
+            DocumentRelation(
+                source_document_id=reversal.id,
+                target_document_id=undone.id,
+                relation_type='reverses',
+            )
+        )
+        db_session.commit()
+
+        section = _todo(client, doc_auth_headers, state='done', include_done=True)
+
+        assert [item['source_id'] for item in section['items']] == [str(kept.id)]
+        assert section['total'] == 1
+
+    def test_a_reversal_still_waiting_for_approval_leaves_the_original_done(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+    ) -> None:
+        now = datetime.now(UTC)
+        original = _document(
+            db_session, doc_org, doc_user,
+            doc_type='OUT', status_word='COMPLETED',
+            completed_at=now - timedelta(minutes=20),
+        )  # fmt: skip
+        waiting = _document(
+            db_session, doc_org, doc_user,
+            doc_type='COR', status_word='PENDING_APPROVAL',
+        )  # fmt: skip
+        db_session.add(
+            DocumentRelation(
+                source_document_id=waiting.id,
+                target_document_id=original.id,
+                relation_type='reverses',
+            )
+        )
+        db_session.commit()
+
+        section = _todo(client, doc_auth_headers, state='done', include_done=True)
+
+        assert [item['source_id'] for item in section['items']] == [str(original.id)]

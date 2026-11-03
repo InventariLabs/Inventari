@@ -256,6 +256,10 @@ class TestAlreadyMade:
         seed = _plum_butter(
             db_session, client, org, headers, pantry, plums_on_shelf='18'
         )
+        kg = db_session.scalars(select(Uom).where(Uom.symbol == 'kg')).first()
+        assert kg is not None
+        seed['butter'].uom_id = kg.id
+        db_session.commit()
         made = client.post(
             '/api/v1/maker/production/orders/made',
             headers=headers,
@@ -302,6 +306,8 @@ class TestAlreadyMade:
         )
         assert run['state'] == 'done'
         assert run['done_at'] is not None
+        # ...and the quantity it made is a quantity of something.
+        assert run['unit'] == 'kg'
 
     def test_a_line_that_cannot_be_measured_is_still_refused(
         self,

@@ -245,8 +245,8 @@ class TestStorageUnarchive:
         ).json()['items']
 
         assert sorted(s['full_path'] for s in archived) == [
-            'IT Workshop → Shelf 1',
-            'Server Room → Shelf 1',
+            'IT Workshop › Shelf 1',
+            'Server Room › Shelf 1',
         ]
 
     def test_the_archived_listing_carries_the_date_the_journal_recorded(

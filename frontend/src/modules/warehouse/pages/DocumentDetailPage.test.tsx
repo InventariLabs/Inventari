@@ -774,7 +774,7 @@ describe("DocumentDetailPage", () => {
       screen.getByTestId("document-operational-snapshot"),
     );
 
-    expect(screen.getByText("Execution Summary")).toBeInTheDocument();
+    expect(screen.getByText("Execution summary")).toBeInTheDocument();
     expect(snapshot.getByText("Pending")).toBeInTheDocument();
     expect(snapshot.getByText("Partial")).toBeInTheDocument();
     expect(snapshot.getByText("Exception")).toBeInTheDocument();
@@ -784,7 +784,7 @@ describe("DocumentDetailPage", () => {
     // the headline names both counts, because the tiles beside it
     // count lines and the progress counts the summed quantity.
     expect(
-      screen.getByText("Lines 1/2 done · Quantity 5/7"),
+      screen.getByText("Lines 1/2 done · quantity 5/7"),
     ).toBeInTheDocument();
   });
 
@@ -1067,7 +1067,7 @@ describe("DocumentDetailPage", () => {
 
     await renderWithRoute();
 
-    const progressList = screen.getByRole("list", { name: /Status Progress/i });
+    const progressList = screen.getByRole("list", { name: /Status progress/i });
 
     expect(within(progressList).getByText("Draft")).toBeInTheDocument();
     expect(within(progressList).getByText("Cancelled")).toBeInTheDocument();
@@ -1156,7 +1156,7 @@ describe("DocumentDetailPage", () => {
 
     await renderWithRoute();
 
-    const progressList = screen.getByRole("list", { name: /Status Progress/i });
+    const progressList = screen.getByRole("list", { name: /Status progress/i });
     const dated = within(progressList)
       .getAllByRole("listitem")
       .map((li) => li.textContent ?? "")
@@ -1183,7 +1183,7 @@ describe("DocumentDetailPage", () => {
 
     await renderWithRoute();
 
-    const progressList = screen.getByRole("list", { name: /Status Progress/i });
+    const progressList = screen.getByRole("list", { name: /Status progress/i });
 
     expect(within(progressList).getByText("Draft")).toBeInTheDocument();
     expect(within(progressList).getByText("Confirmed")).toBeInTheDocument();
@@ -1222,7 +1222,7 @@ describe("DocumentDetailPage", () => {
 
     await renderWithRoute();
 
-    expect(screen.getByText("Execution Summary")).toBeInTheDocument();
+    expect(screen.getByText("Execution summary")).toBeInTheDocument();
     expect(
       screen.getByText("1 line still needs attention. Exceptions: 1."),
     ).toBeInTheDocument();
@@ -1234,9 +1234,9 @@ describe("DocumentDetailPage", () => {
     // The summary sentence prints in both variants now — the table row used
     // to carry it as a title only, and a title is gone since then; jsdom
     // renders both variants, so the sentence shows up twice.
-    expect(screen.getAllByText("Done 5 / Planned 8")).toHaveLength(2);
+    expect(screen.getAllByText("Done 5 / planned 8")).toHaveLength(2);
     expect(
-      screen.getByText("Lines 0/1 done · Quantity 5/8"),
+      screen.getByText("Lines 0/1 done · quantity 5/8"),
     ).toBeInTheDocument();
     expect(
       screen.getAllByText("Shortage: Supplier short shipped 3 pcs"),
@@ -1265,7 +1265,7 @@ describe("DocumentDetailPage", () => {
     // What was scrolled is the panel itself, not some other section of the
     // page that happens to mount at the same time.
     const panel = within(scrolled.mock.instances[0] as HTMLElement);
-    expect(panel.getByText("Execute Document")).toBeInTheDocument();
+    expect(panel.getByText("Execute document")).toBeInTheDocument();
   });
 
   it("requires a discrepancy code for partial execution and submits it with an optional note", async () => {
@@ -1299,14 +1299,14 @@ describe("DocumentDetailPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Pick items/i }));
 
-    expect(screen.getByText("Execute Document")).toBeInTheDocument();
+    expect(screen.getByText("Execute document")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Executed Quantity"), {
+    fireEvent.change(screen.getByLabelText("Executed quantity"), {
       target: { value: "3" },
     });
 
     fireEvent.click(
-      screen.getByRole("button", { name: /Confirm & Complete/i }),
+      screen.getByRole("button", { name: /Confirm & complete/i }),
     );
 
     // The message appears both globally and next to the field.
@@ -1316,17 +1316,17 @@ describe("DocumentDetailPage", () => {
       ).length,
     ).toBeGreaterThan(0);
 
-    fireEvent.change(screen.getByLabelText("Discrepancy Code"), {
+    fireEvent.change(screen.getByLabelText("Discrepancy code"), {
       target: { value: "SHORTAGE" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Add Note" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add note" }));
 
-    fireEvent.change(screen.getByLabelText("Discrepancy Reason"), {
+    fireEvent.change(screen.getByLabelText("Discrepancy reason"), {
       target: { value: "Supplier short shipped 5 pcs" },
     });
     fireEvent.click(
-      screen.getByRole("button", { name: /Confirm & Complete/i }),
+      screen.getByRole("button", { name: /Confirm & complete/i }),
     );
 
     expect(workflowMutations.complete).toHaveBeenCalledWith(
@@ -1456,7 +1456,7 @@ describe("DocumentDetailPage", () => {
     await renderWithRoute();
 
     expect(screen.queryByText(/123\.00/)).not.toBeInTheDocument();
-    expect(screen.queryByText("Unit Price")).not.toBeInTheDocument();
+    expect(screen.queryByText("Unit price")).not.toBeInTheDocument();
   });
   it("offers a way back when the document does not exist", async () => {
     // The not-found state rendered a single sentence: no heading, no link, no

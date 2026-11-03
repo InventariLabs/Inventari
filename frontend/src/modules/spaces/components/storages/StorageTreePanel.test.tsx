@@ -83,7 +83,7 @@ describe("StorageTreePanel — search is asked of the server", () => {
 
     const hit = await screen.findByRole("button", { name: /Bin 1/ });
     expect(hit).toHaveTextContent(
-      "Pantry Building → Dry Goods → Shelf A → Bin 1",
+      "Pantry Building › Dry Goods › Shelf A › Bin 1",
     );
     expect(requests.some((r) => r.get("q") === "Bin 1")).toBe(true);
     // Nothing read the tree whole to filter it in the browser.

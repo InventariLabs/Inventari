@@ -75,7 +75,7 @@ export default function PutawayRulesPage() {
             setEditorOpen(true);
           }}
         >
-          {t("putaway.actions.add", "Add Rule")}
+          {t("putaway.actions.add", "Add rule")}
         </Button>
       ) : undefined,
     });

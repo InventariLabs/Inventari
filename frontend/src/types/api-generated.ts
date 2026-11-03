@@ -11510,7 +11510,7 @@ export interface components {
          *     a name ("Shelf 1" under two different parents), and the archive is where
          *     picking wrong is costliest — the row is gone from every other screen
          *     until restored. ``full_path`` carries the shape
-         *     ``StorageLocationSummary`` gives it ("Server Room → Shelf 1").
+         *     ``StorageLocationSummary`` gives it ("Server Room › Shelf 1").
          *
          *     ``archived_at`` is the moment the location left the lists, read from the
          *     organization journal (``SOFT_DELETE`` / ``storage``): archiving writes no

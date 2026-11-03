@@ -8,7 +8,7 @@ import { useLocationPicker } from "./useLocationPicker";
 const shelf = {
   id: "loc-1",
   name: "Shelf A",
-  full_path: "Pantry → Shelf A",
+  full_path: "Pantry › Shelf A",
 };
 
 describe("useLocationPicker", () => {

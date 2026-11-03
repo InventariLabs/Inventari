@@ -68,8 +68,8 @@ vi.mock("@/modules/inventory/hooks/useStockQuants", () => ({
 // or matching the search. The screen asks for the places it shows and for what
 // the reader types; it never reads the organization's catalogue.
 const PLACES = [
-  { id: "l1", name: "Aisle 1", full_path: "Warehouse A → Aisle 1" },
-  { id: "l2", name: "Aisle 1", full_path: "Warehouse B → Aisle 1" },
+  { id: "l1", name: "Aisle 1", full_path: "Warehouse A › Aisle 1" },
+  { id: "l2", name: "Aisle 1", full_path: "Warehouse B › Aisle 1" },
   { id: "l-archived", name: "Fridge B", full_path: "Fridge B" },
 ];
 const placeAsks = vi.hoisted(() => [] as Array<Record<string, unknown>>);
@@ -217,7 +217,7 @@ describe("StockLevelsPage", () => {
 
     const table = screen.getByRole("table");
     expect(
-      await within(table).findByText("Warehouse A → Aisle 1"),
+      await within(table).findByText("Warehouse A › Aisle 1"),
     ).toBeInTheDocument();
   });
 
@@ -228,7 +228,7 @@ describe("StockLevelsPage", () => {
     renderPage();
 
     expect(
-      await screen.findByText(/location: Warehouse A → Aisle 1/),
+      await screen.findByText(/location: Warehouse A › Aisle 1/),
     ).toBeInTheDocument();
   });
 

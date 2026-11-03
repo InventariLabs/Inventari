@@ -62,6 +62,7 @@ vi.mock("@/modules/shared/hooks/useCategories", () => ({
 }));
 
 vi.mock("@/utils/helpers", () => ({
+  LOCATION_PATH_SEPARATOR: " › ",
   getStorageLocationPath: vi.fn((s: StorageLocation) => s.name),
   formatDate: vi.fn(() => ""),
   isExpired: vi.fn(() => false),

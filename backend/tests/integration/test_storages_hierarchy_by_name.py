@@ -198,6 +198,6 @@ class TestHierarchyByName:
         listed = client.get('/api/v1/locations', headers=auth_headers).json()['items']
         by_name = {row['name']: row for row in listed}
         assert by_name['Tray 5']['full_path'] == (
-            'Harbor → Shed 1 → Rack 2 → Bin 3 → Tray 5'
+            'Harbor › Shed 1 › Rack 2 › Bin 3 › Tray 5'
         )
         assert by_name['Tray 4']['parent_id'] == by_name['Tray 5']['parent_id']

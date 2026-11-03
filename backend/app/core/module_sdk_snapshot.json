@@ -3130,6 +3130,16 @@
       },
       "type": "InterceptorPipeline"
     },
+    "join_location_path": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "names",
+          "required": true
+        }
+      ]
+    },
     "journal_config_change": {
       "kind": "function",
       "params": [
@@ -3287,6 +3297,11 @@
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "permission",
           "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "message_key",
+          "required": false
         }
       ]
     },

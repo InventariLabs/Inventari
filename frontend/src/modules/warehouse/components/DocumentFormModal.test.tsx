@@ -82,7 +82,7 @@ vi.mock(
           createElement(
             "button",
             { type: "button", onClick: props.onAddEmptyLine as () => void },
-            "Add Line",
+            "Add line",
           ),
         );
       },
@@ -384,7 +384,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     expect(
@@ -479,10 +479,10 @@ describe("DocumentFormModal", () => {
   });
 
   it.each([
-    ["IN", "Create Receipt"],
-    ["OUT", "Create Dispatch"],
-    ["SCRAP", "Create Scrap"],
-    ["CORRECTION", "Create Correction"],
+    ["IN", "Create receipt"],
+    ["OUT", "Create dispatch"],
+    ["SCRAP", "Create scrap"],
+    ["CORRECTION", "Create correction"],
   ])(
     "names the submit button after what the type does (%s)",
     async (type, label) => {
@@ -524,7 +524,7 @@ describe("DocumentFormModal", () => {
       await pickWidget(user, lineNameInput);
     });
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Receipt" }));
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
     });
 
     await waitFor(() => {
@@ -562,7 +562,7 @@ describe("DocumentFormModal", () => {
       await user.selectOptions(partnerSelect, "partner-1");
       await user.selectOptions(targetSelect, "loc-2");
       await user.type(screen.getAllByPlaceholderText("Item")[0], "Widget");
-      await user.click(screen.getByRole("button", { name: "Create Receipt" }));
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
     });
 
     expect(createMutate).not.toHaveBeenCalled();
@@ -698,7 +698,7 @@ describe("DocumentFormModal", () => {
     // Default line has empty name and no item_id. Submit without touching
     // anything: partner + target + line-name should all be reported at once.
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Receipt" }));
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
     });
 
     expect(
@@ -721,7 +721,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Receipt" }));
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
     });
 
     // All three errors present.
@@ -824,7 +824,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Receipt" }));
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
     });
 
     // End-to-end smoke: the create mutation was invoked, the 422 response
@@ -848,7 +848,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     const lineNameInputs = screen.getAllByPlaceholderText("Item");
@@ -856,7 +856,7 @@ describe("DocumentFormModal", () => {
 
     await act(async () => {
       await user.type(lineNameInput, "Widget");
-      await user.click(screen.getByRole("button", { name: "Create Dispatch" }));
+      await user.click(screen.getByRole("button", { name: "Create dispatch" }));
     });
 
     expect(createMutate).not.toHaveBeenCalled();
@@ -965,7 +965,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Dispatch" }));
+      await user.click(screen.getByRole("button", { name: "Create dispatch" }));
     });
 
     await waitFor(() => {
@@ -1000,7 +1000,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Import Lines" }));
+      await user.click(screen.getByRole("button", { name: "Import lines" }));
     });
     expect(toastError).toHaveBeenCalledWith(
       expect.stringMatching(/source location first/),
@@ -1012,7 +1012,7 @@ describe("DocumentFormModal", () => {
     await act(async () => {
       await user.selectOptions(partnerSelect, "partner-1");
       await user.selectOptions(sourceSelect, "loc-1");
-      await user.click(screen.getByRole("button", { name: "Import Lines" }));
+      await user.click(screen.getByRole("button", { name: "Import lines" }));
     });
     await act(async () => {
       await user.click(
@@ -1020,7 +1020,7 @@ describe("DocumentFormModal", () => {
       );
     });
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Dispatch" }));
+      await user.click(screen.getByRole("button", { name: "Create dispatch" }));
     });
 
     // The blank line the form opened with gave way to the imported one.
@@ -1048,7 +1048,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     const lineNameInputs = screen.getAllByPlaceholderText("Item");
@@ -1056,7 +1056,7 @@ describe("DocumentFormModal", () => {
 
     await act(async () => {
       await user.type(lineNameInput, "Widget");
-      await user.click(screen.getByRole("button", { name: "Create Transfer" }));
+      await user.click(screen.getByRole("button", { name: "Create transfer" }));
     });
 
     expect(createMutate).not.toHaveBeenCalled();
@@ -1071,20 +1071,20 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
-    expect(screen.queryByLabelText("Batch Number")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Expiry Date")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Batch number")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Expiry date")).not.toBeInTheDocument();
 
     await act(async () => {
       await user.click(screen.getAllByTitle("More fields")[0]);
     });
 
-    expect(screen.getByLabelText("Batch Number")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Expiry Date")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Batch number")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Expiry date")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Add Expiry Date" }),
+      screen.getByRole("button", { name: "Add expiry date" }),
     ).toBeInTheDocument();
   });
 
@@ -1119,7 +1119,7 @@ describe("DocumentFormModal", () => {
 
     await act(async () => {
       await user.type(lineNotesInput, "Handle with care");
-      await user.click(screen.getByRole("button", { name: "Create Receipt" }));
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
     });
 
     await waitFor(() => {
@@ -1143,7 +1143,7 @@ describe("DocumentFormModal", () => {
     });
 
     expect(
-      screen.getByRole("button", { name: "Create Dispatch" }),
+      screen.getByRole("button", { name: "Create dispatch" }),
     ).toBeInTheDocument();
 
     await act(async () => {
@@ -1151,7 +1151,7 @@ describe("DocumentFormModal", () => {
     });
 
     expect(
-      screen.getByRole("button", { name: "Create Transfer" }),
+      screen.getByRole("button", { name: "Create transfer" }),
     ).toBeInTheDocument();
   });
 
@@ -1206,7 +1206,7 @@ describe("DocumentFormModal", () => {
     expect(screen.getByTestId("partner-inline-create")).toBeInTheDocument();
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Dispatch" }));
+      await user.click(screen.getByRole("button", { name: "Create dispatch" }));
     });
     expect(
       screen.getByText("Partner is required for this document type"),
@@ -1275,7 +1275,7 @@ describe("DocumentFormModal", () => {
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Create Receipt" }));
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
     });
 
     expect(onCreated).toHaveBeenCalledWith(created);
@@ -1290,7 +1290,7 @@ describe("DocumentFormModal validation accessibility", () => {
     // user pressed Create and nothing happened, with no way to find out why.
     render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Create Receipt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create receipt" }));
 
     const alerts = screen.getAllByRole("alert");
     expect(alerts.length).toBeGreaterThan(0);
@@ -1315,7 +1315,7 @@ describe("DocumentFormModal validation accessibility", () => {
     // was to look at the colour of a border.
     render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Create Receipt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create receipt" }));
 
     const firstInvalid = document.querySelector('[aria-invalid="true"]');
     expect(document.activeElement).toBe(firstInvalid);
@@ -1700,7 +1700,7 @@ describe("DocumentFormModal — the amounts it shows are the amounts it saves", 
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     // A placeholder, not a value: the field stays empty and editable, and
@@ -1722,7 +1722,7 @@ describe("DocumentFormModal — the amounts it shows are the amounts it saves", 
     });
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     // With no tax handling the field is not rendered at all; if it ever is,
@@ -1742,7 +1742,7 @@ describe("DocumentFormModal — the amounts it shows are the amounts it saves", 
       render(<DocumentFormModal initialType="INT" onClose={vi.fn()} />);
     });
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     // A move between shelves changes where the goods stand, not what they
@@ -1761,7 +1761,7 @@ describe("DocumentFormModal — the amounts it shows are the amounts it saves", 
       render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
     });
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     expect(screen.getAllByText(/unit price/i).length).toBeGreaterThan(0);
@@ -1777,7 +1777,7 @@ describe("DocumentFormModal — the amounts it shows are the amounts it saves", 
       render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
     });
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "Add Line" }));
+      await user.click(screen.getByRole("button", { name: "Add line" }));
     });
 
     expect(screen.queryByText(/unit price/i)).not.toBeInTheDocument();
@@ -1886,7 +1886,7 @@ describe("DocumentFormModal — the empty-price warning speaks for its lines", (
 
     // Line two: priced from the last purchase. The first line's emptiness
     // is still what the warning is about.
-    await user.click(screen.getByRole("button", { name: "Add Line" }));
+    await user.click(screen.getByRole("button", { name: "Add line" }));
     await act(async () => {
       editorStub.reportHint?.(editorStub.lineKeys[1], true);
     });

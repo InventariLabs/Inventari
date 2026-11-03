@@ -235,6 +235,8 @@ check-frontend: ## Run frontend typecheck + production build
 	docker compose exec frontend npm run check:en-spelling
 	@echo "$(BLUE)[INFO]$(NC) Checking the English catalogs use no retired domain word (baseline)..."
 	docker compose exec frontend npm run check:vocabulary
+	@echo "$(BLUE)[INFO]$(NC) Checking warehouse and purchase-order texts are sentence case (baseline)..."
+	docker compose exec frontend npm run check:title-case
 	@echo "$(BLUE)[INFO]$(NC) Checking route reachability (baseline)..."
 	docker compose exec frontend npm run check:routes
 	@echo "$(BLUE)[INFO]$(NC) Checking focus-mode reachability of core sections (baseline)..."

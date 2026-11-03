@@ -91,7 +91,7 @@ describe("DocumentExecutionSection — the summary names what it counted", () =>
     );
 
     expect(
-      screen.getByText("Lines 0/1 done · Quantity 0/5"),
+      screen.getByText("Lines 0/1 done · quantity 0/5"),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Units 0\/5/)).toBeNull();
   });
@@ -161,7 +161,7 @@ describe("DocumentExecutionSection — the summary names what it counted", () =>
     expect(screen.queryByText(/56\.5\/62\.5/)).toBeNull();
     expect(
       screen.getByText(
-        "Lines 1/3 done · Quantity 18/20 pcs. · 12.5/12.5 kg · 26/30 pack",
+        "Lines 1/3 done · quantity 18/20 pcs. · 12.5/12.5 kg · 26/30 pack",
       ),
     ).toBeInTheDocument();
     expect(container.querySelector(".bg-accent-600")).toBeNull();
