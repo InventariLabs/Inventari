@@ -11,8 +11,8 @@ vi.mock("@/lib/api/productTemplates", () => ({
 }));
 
 // The camera is a live device; what the field does with a read is tested.
-vi.mock("@/components/ui/ScanToFill", () => ({
-  ScanToFill: ({
+vi.mock("./ScanCodeButton", () => ({
+  ScanCodeButton: ({
     label,
     onCode,
   }: {

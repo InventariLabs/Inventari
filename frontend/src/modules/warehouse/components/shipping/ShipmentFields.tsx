@@ -1,7 +1,7 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/Input";
-import { ScanToFill } from "@/module-sdk";
+import { ScanToFill } from "../ScanToFill";
 import { useCarrierSuggestions } from "@/modules/warehouse/hooks/useCarrierSuggestions";
 import type { ShipmentDraft } from "./shipmentDraft";
 

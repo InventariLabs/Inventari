@@ -4,7 +4,7 @@ import { renderWithProviders, screen } from "@/test/utils";
 import WmsLotExpiryDialog from "./WmsLotExpiryDialog";
 
 // The camera is a live device; what the dialog does with a read is tested.
-vi.mock("@/components/ui/ScanToFill", () => ({
+vi.mock("../ScanToFill", () => ({
   ScanToFill: ({
     label,
     onCode,
