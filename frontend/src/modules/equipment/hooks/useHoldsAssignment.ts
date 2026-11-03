@@ -4,13 +4,12 @@
  * holder hands a thing back, a manager accepts it.
  */
 import { useIsSignedInAs } from "@/module-sdk";
-import type { EquipmentAssignment } from "@/modules/equipment/api/equipment";
 
 export function useHoldsAssignment(
-  assignment: Pick<
-    EquipmentAssignment,
-    "assigned_to_email" | "holder_kind"
-  > | null,
+  assignment: {
+    assigned_to_email?: string | null;
+    holder_kind?: string | null;
+  } | null,
 ): boolean {
   const same = useIsSignedInAs(assignment?.assigned_to_email);
   return same && assignment?.holder_kind !== "location";
