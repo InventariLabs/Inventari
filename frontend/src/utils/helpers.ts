@@ -109,12 +109,13 @@ const buildLocationPath = (options: LocationPathOptions): string => {
 /**
  * The one separator a location path is written with.
  *
- * The backend composes `full_path` with it (`storage_query_service`), so a
+ * The backend composes `full_path` with it (`core/location_path.py`), so a
  * screen that joins segments itself has to use the same one — two shelves
  * called "Top" are told apart by the path, and a path in two dialects reads
- * as two different places.
+ * as two different places. It is not an arrow: "→" says where a document's
+ * goods went, and a path written with it read as a journey.
  */
-export const LOCATION_PATH_SEPARATOR = " → ";
+export const LOCATION_PATH_SEPARATOR = " › ";
 
 /**
  * The path to show *under* a location's own name, or nothing.

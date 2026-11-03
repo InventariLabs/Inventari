@@ -139,7 +139,7 @@ describe("PutawayRulesPage server error surfacing", () => {
 
     await renderWithHeader(<PutawayRulesPage />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Add Rule" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add rule" }));
     expect(screen.getByTestId("putaway-dialog")).toBeInTheDocument();
 
     await act(async () => {
@@ -162,7 +162,7 @@ describe("PutawayRulesPage server error surfacing", () => {
 
     await renderWithHeader(<PutawayRulesPage />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Add Rule" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add rule" }));
 
     await act(async () => {
       dialogSubmitRef.current?.(validPayload);

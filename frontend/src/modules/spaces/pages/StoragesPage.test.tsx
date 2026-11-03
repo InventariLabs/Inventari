@@ -72,7 +72,7 @@ const summaries = [
     direct_children_count: 1,
     total_subtree_items_count: 5,
     is_leaf: false,
-    full_path: "Pantry Building → Dry Goods",
+    full_path: "Pantry Building › Dry Goods",
   },
   {
     id: "leaf",
@@ -86,7 +86,7 @@ const summaries = [
     direct_children_count: 0,
     total_subtree_items_count: 4,
     is_leaf: true,
-    full_path: "Pantry Building → Dry Goods → Shelf A",
+    full_path: "Pantry Building › Dry Goods › Shelf A",
   },
   {
     id: "freezer",
@@ -566,7 +566,7 @@ describe("StoragesPage — one screen", () => {
       id: "leaf-b",
       name: "Shelf B",
       short_code: "SB",
-      full_path: "Pantry Building → Dry Goods → Shelf B",
+      full_path: "Pantry Building › Dry Goods › Shelf B",
     };
     const floor = (shelves: Array<{ id: string; parent_id: string }>) => [
       ...summaries.filter((entry) => entry.id !== "leaf"),
@@ -816,7 +816,7 @@ describe("StoragesPage — one screen", () => {
 
     const results = await screen.findByRole("list", { name: "Locations" });
     const hit = within(results).getByRole("button", { name: /Shelf A/ });
-    expect(hit).toHaveTextContent("Pantry Building → Dry Goods → Shelf A");
+    expect(hit).toHaveTextContent("Pantry Building › Dry Goods › Shelf A");
     expect(
       within(results).queryByRole("button", { name: /Freezer/ }),
     ).toBeNull();

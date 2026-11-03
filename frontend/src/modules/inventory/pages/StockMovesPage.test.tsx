@@ -152,8 +152,8 @@ vi.mock("@/contexts/ModulesContext", async () => {
 // matching the search. The screen never reads the whole catalogue; the archived
 // shelf is nameable because the filter's link outlives the archive.
 const PLACES = [
-  { id: "l1", name: "Aisle 1", full_path: "Warehouse A → Aisle 1" },
-  { id: "l2", name: "Aisle 1", full_path: "Warehouse B → Aisle 1" },
+  { id: "l1", name: "Aisle 1", full_path: "Warehouse A › Aisle 1" },
+  { id: "l2", name: "Aisle 1", full_path: "Warehouse B › Aisle 1" },
   { id: "l-archived", name: "Fridge B", full_path: "Fridge B" },
 ];
 const placeAsks = vi.hoisted(() => [] as Array<Record<string, unknown>>);
@@ -264,10 +264,10 @@ describe("StockMovesPage", () => {
     // "Aisle 1" under Warehouse A and "Aisle 1" under Warehouse B: the bare
     // name read as the same place on both ends of the arrow.
     expect(
-      (await within(table).findAllByText("Warehouse A → Aisle 1")).length,
+      (await within(table).findAllByText("Warehouse A › Aisle 1")).length,
     ).toBeGreaterThan(0);
     expect(
-      within(table).getByText("Warehouse B → Aisle 1"),
+      within(table).getByText("Warehouse B › Aisle 1"),
     ).toBeInTheDocument();
   });
 
@@ -598,7 +598,7 @@ describe("StockMovesPage", () => {
     // Two aisles share the name; the hint says which one is the filter, the
     // way the picker above it does.
     expect(
-      await screen.findByText(/\(location: Warehouse A → Aisle 1\)/),
+      await screen.findByText(/\(location: Warehouse A › Aisle 1\)/),
     ).toBeInTheDocument();
     expect(screen.queryByText(/direction:/)).toBeNull();
   });

@@ -97,7 +97,7 @@ class TestACountPastTheFirstTwoThousandLocations:
         )
         assert detail.status_code == status.HTTP_200_OK
         assert [row['shelf_location'] for row in detail.json()['items']] == [
-            'Zz Rack / Zz Shelf'
+            'Zz Rack › Zz Shelf'
         ]
 
         counted = client.patch(

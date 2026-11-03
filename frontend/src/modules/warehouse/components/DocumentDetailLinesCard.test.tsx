@@ -578,8 +578,8 @@ describe("DocumentDetailLinesCard — price and VAT columns", () => {
   it("shows the columns on a receipt whose lines carry a price", () => {
     renderCard([line({ unit_price: "10.00", line_gross: "12.30" })]);
 
-    expect(screen.getByText("Unit Price")).toBeInTheDocument();
-    expect(screen.getByText("Gross Value")).toBeInTheDocument();
+    expect(screen.getByText("Unit price")).toBeInTheDocument();
+    expect(screen.getByText("Gross value")).toBeInTheDocument();
   });
 
   it("shows nothing of price or VAT on a transfer, whatever it holds", () => {
@@ -592,8 +592,8 @@ describe("DocumentDetailLinesCard — price and VAT columns", () => {
       target_location_id: "loc-2",
     });
 
-    expect(screen.queryByText("Unit Price")).not.toBeInTheDocument();
-    expect(screen.queryByText("Gross Value")).not.toBeInTheDocument();
+    expect(screen.queryByText("Unit price")).not.toBeInTheDocument();
+    expect(screen.queryByText("Gross value")).not.toBeInTheDocument();
     expect(screen.queryByText(/10\.00/)).not.toBeInTheDocument();
   });
 
@@ -602,7 +602,7 @@ describe("DocumentDetailLinesCard — price and VAT columns", () => {
 
     renderCard([line({ unit_price: "10.00", line_gross: "12.30" })]);
 
-    expect(screen.queryByText("Unit Price")).not.toBeInTheDocument();
+    expect(screen.queryByText("Unit price")).not.toBeInTheDocument();
     expect(screen.queryByText(/10\.00/)).not.toBeInTheDocument();
   });
 });

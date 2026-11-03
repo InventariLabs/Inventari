@@ -19,6 +19,7 @@
   "errorAdding": "Erreur lors de l'ajout",
   "errorCamera": "Erreur de caméra",
   "aimAtCode": "Visez le code-barres ou le QR",
+  "closeCamera": "Fermer la vue de la caméra",
   "dataFromHistory": "Données automatiquement associées depuis l'historique",
   "dataFromOFFShort": "Données OFF",
   "dataFromVisionShort": "Données de scan IA",

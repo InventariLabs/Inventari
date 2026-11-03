@@ -8,10 +8,10 @@ import { isInsidePath, LocationTargetPicker } from "./LocationTargetPicker";
 
 describe("isInsidePath", () => {
   it("takes a place and everything below it, and nothing that only starts alike", () => {
-    expect(isInsidePath("A → B", "A → B")).toBe(true);
-    expect(isInsidePath("A → B → C", "A → B")).toBe(true);
-    expect(isInsidePath("A → Bravo", "A → B")).toBe(false);
-    expect(isInsidePath("A", "A → B")).toBe(false);
+    expect(isInsidePath("A › B", "A › B")).toBe(true);
+    expect(isInsidePath("A › B › C", "A › B")).toBe(true);
+    expect(isInsidePath("A › Bravo", "A › B")).toBe(false);
+    expect(isInsidePath("A", "A › B")).toBe(false);
     expect(isInsidePath(null, "A")).toBe(false);
   });
 });

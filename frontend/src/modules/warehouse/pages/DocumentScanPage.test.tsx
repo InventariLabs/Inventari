@@ -327,7 +327,7 @@ describe("DocumentScanPage", () => {
       screen.queryByRole("button", { name: "Scanning…" }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Scan Document" }),
+      screen.getByRole("button", { name: "Scan document" }),
     ).toBeInTheDocument();
 
     unmount();

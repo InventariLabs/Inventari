@@ -486,7 +486,11 @@ class TestReturnDocument:
             },
         )
         assert return_resp.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'more than what is left' in return_resp.json()['detail']['message']
+        message = return_resp.json()['detail']['message']
+        assert 'more than what is left' in message
+        # Stated the way the screen states a quantity: no store scale.
+        assert 'A return of 99' in message
+        assert '.000' not in message
 
     def test_return_in_document_succeeds(
         self,

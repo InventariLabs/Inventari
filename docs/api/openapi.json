@@ -42176,7 +42176,7 @@
           "created_at"
         ],
         "title": "ArchivedStorageLocation",
-        "description": "One row of ``GET /locations/archived`` \u2014 the identity a restore needs.\n\nA location's identity is its path, not its name: two locations may share\na name (\"Shelf 1\" under two different parents), and the archive is where\npicking wrong is costliest \u2014 the row is gone from every other screen\nuntil restored. ``full_path`` carries the shape\n``StorageLocationSummary`` gives it (\"Server Room \u2192 Shelf 1\").\n\n``archived_at`` is the moment the location left the lists, read from the\norganization journal (``SOFT_DELETE`` / ``storage``): archiving writes no\ndate column of its own (the flag lives in ``settings``), so the journal\nis where that date lives. A row archived outside the API has no entry\nand answers ``None`` rather than a wrong date."
+        "description": "One row of ``GET /locations/archived`` \u2014 the identity a restore needs.\n\nA location's identity is its path, not its name: two locations may share\na name (\"Shelf 1\" under two different parents), and the archive is where\npicking wrong is costliest \u2014 the row is gone from every other screen\nuntil restored. ``full_path`` carries the shape\n``StorageLocationSummary`` gives it (\"Server Room \u203a Shelf 1\").\n\n``archived_at`` is the moment the location left the lists, read from the\norganization journal (``SOFT_DELETE`` / ``storage``): archiving writes no\ndate column of its own (the flag lives in ``settings``), so the journal\nis where that date lives. A row archived outside the API has no entry\nand answers ``None`` rather than a wrong date."
       },
       "AssetFilter": {
         "properties": {
