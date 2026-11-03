@@ -2,6 +2,8 @@
   "title": "Estatísticas",
   "subtitle": "Visão geral dos seus suprimentos",
   "records": "Registros",
+  "recordCount_one": "{{count}} registro",
+  "recordCount_other": "{{count}} registros",
   "places": "Locais, todos os níveis",
   "expiringSoon": "Vencendo em breve",
   "expired": "Vencidos",

@@ -692,7 +692,7 @@
     "select_plan": "Seleccionar plan",
     "select_day": "Seleccionar día",
     "select_slot": "Seleccionar comida",
-    "no_plans_add_to_plan": "Crea primero un plan de comidas: la receta podrá añadirse luego desde el planificador.",
+    "no_plans_add_to_plan": "Crea primero un plan de comidas: la receta se añadirá enseguida a la primera comida del primer día.",
     "more_actions": "Más acciones",
     "expiry_urgent": "Ingredientes que caducan pronto",
     "delete_plan": "Eliminar el plan",

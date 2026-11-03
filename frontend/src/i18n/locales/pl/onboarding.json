@@ -24,7 +24,7 @@
   "continue": "Dalej",
   "back": "Wstecz",
   "singleModuleName": "Tylko jeden moduł",
-  "singleModuleDescription": "Jeden moduł to cała aplikacja. Reszta schodzi na bok; wyjdziesz z tego w każdej chwili w Ustawienia → Moje moduły.",
+  "singleModuleDescription": "Jeden moduł to cała aplikacja — na przykład Produkcja, jeśli coś wytwarzasz. Reszta schodzi na bok; wyjdziesz z tego w każdej chwili w Ustawienia → Moje moduły.",
   "focusChoiceTitle": "Który moduł?",
   "focusChoiceSubtitle": "Na liście są tylko moduły, które mogą działać samodzielnie. Nic tu nie jest na stałe."
 }

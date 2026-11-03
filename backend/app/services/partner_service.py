@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Literal
 
 from sqlalchemy import select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import escape_ilike, paginate_async
@@ -83,8 +84,7 @@ async def create_async(
         created_by=user_id,
         **data.model_dump(),
     )
-    db.add(partner)
-    await db.flush()
+    await _flush_partner_async(db, partner)
     await db.refresh(partner)
     await log_action_async(
         db,
@@ -97,6 +97,36 @@ async def create_async(
     )
     logger.info('Partner created: %s (org=%s)', partner.id, org_id)
     return partner
+
+
+async def _flush_partner_async(db: AsyncSession, partner: Partner) -> None:
+    """Write the partner, answering a lost race for its name or code as a refusal.
+
+    The look in ``_check_unique_async`` and the write are two statements: two
+    requests that met the same new name or code both looked, found nothing and
+    wrote, and the second hit the organization's unique key. The savepoint
+    keeps the surrounding transaction usable, and the answer is the one a
+    request arriving a moment later gets from the look — not a 500.
+    """
+    # Read before the savepoint: its rollback expires the row, and a lazy load
+    # in the handler below would be I/O outside the event loop's greenlet.
+    name, partner_type, code = partner.name, partner.type, partner.code
+    try:
+        async with db.begin_nested():
+            # Added inside the savepoint, so that its rollback takes a row
+            # that lost the race out of the session with it; a no-op for a
+            # partner already there.
+            db.add(partner)
+            await db.flush()
+    except IntegrityError as exc:
+        detail = str(exc.orig)
+        if 'uq_partner_org_name_type' in detail:
+            raise ServiceRejectionError(
+                'partner_name_exists', name=name, partner_type=partner_type
+            ) from exc
+        if 'uq_partner_org_code' in detail:
+            raise ServiceRejectionError('partner_code_exists', code=code) from exc
+        raise
 
 
 async def _check_unique_async(
@@ -398,7 +428,7 @@ async def update_async(
     for field, value in updates.items():
         setattr(partner, field, value)
 
-    await db.flush()
+    await _flush_partner_async(db, partner)
     await db.refresh(partner)
     after = {f: getattr(partner, f) for f in audited}
     await _journal_change_async(db, partner, before, after, user_id)

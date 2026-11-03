@@ -26,7 +26,7 @@
     "card": {
       "qty": "Planejado",
       "cost": "Custo",
-      "resultPerUnit": "({{amount}} por unidade)",
+      "resultPerUnit": "({{amount}} por {{unit}})",
       "shortage_one": "Falta estoque: {{count}} ingrediente. A conclusão será recusada.",
       "shortage_other": "Falta estoque: {{count}} ingredientes. A conclusão será recusada."
     },
@@ -189,7 +189,7 @@
       "plannedSuffix": "planejado: {{qty}}",
       "scrap": "Perda",
       "overproduced": "Superprodução",
-      "resultPerUnit": "({{amount}} por unidade)",
+      "resultPerUnit": "({{amount}} por {{unit}})",
       "totalCostAfterClosing": "Custo total após o fechamento",
       "unitCost": "{{amount}} por unidade produzida",
       "totalCostGap_one": "{{count}} ingrediente saiu de estoque sem custo, então fica fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores.",

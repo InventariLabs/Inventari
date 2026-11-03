@@ -1117,8 +1117,8 @@
         "setUp": "Set up location"
       },
       "occupancy": {
-        "noLimit_one": "No limit · {{count}} record",
-        "noLimit_other": "No limit · {{count}} records",
+        "noLimit_one": "No limit · {{count}} product",
+        "noLimit_other": "No limit · {{count}} products",
         "sharesSum_one": "{{fill}}% — the share of {{count}} limited product",
         "sharesSum_other": "{{fill}}% — the shares of {{count}} limited products added up",
         "unmeasured": "A product here has no limit and is not counted",

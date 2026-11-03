@@ -2,6 +2,8 @@
   "title": "Statistiques",
   "subtitle": "Aperçu de vos stocks",
   "records": "Enregistrements",
+  "recordCount_one": "{{count}} enregistrement",
+  "recordCount_other": "{{count}} enregistrements",
   "places": "Lieux, tous niveaux",
   "expiringSoon": "Expire bientôt",
   "expired": "Expiré",

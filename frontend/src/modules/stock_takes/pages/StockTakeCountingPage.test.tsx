@@ -795,10 +795,10 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
         ),
       ),
       http.patch(
-        "/api/v1/stock-takes/1/items/sti-1/count",
-        async ({ request }) => {
+        "/api/v1/stock-takes/1/items/:lineId/count",
+        async ({ request, params }) => {
           patches.push((await request.json()) as Record<string, unknown>);
-          return HttpResponse.json({ id: "sti-1" });
+          return HttpResponse.json({ id: params.lineId });
         },
       ),
       http.post("/api/v1/items", async ({ request }) => {
@@ -861,16 +861,16 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
     await renderPage();
 
     await user.type(
-      screen.getByRole("textbox", { name: "Note about Milk" }),
+      screen.getByRole("textbox", { name: "Note about Bread" }),
       "Dented box",
     );
     const counted = screen.getByRole("textbox", {
-      name: "Counted quantity of Milk",
+      name: "Counted quantity of Bread",
     });
     await user.clear(counted);
     await user.type(counted, "7");
     await user.click(
-      screen.getByRole("button", { name: "Save the count for Milk" }),
+      screen.getByRole("button", { name: "Save the count for Bread" }),
     );
 
     await waitFor(() => expect(patches).toHaveLength(1));

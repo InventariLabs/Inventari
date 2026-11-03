@@ -482,7 +482,7 @@ test.describe("Scan — execution reads one presence", () => {
       storages.find((s) => s.name === "E2E-Kitchen") ?? storages[0];
     locationId = kitchen.id;
     const partner = await api.createPartner(token, {
-      name: `E2E-Camera-Customer-${Date.now().toString(36)}`,
+      name: `E2E-Camera-Customer-${crypto.randomUUID()}`,
       type: "CUSTOMER",
     });
     partnerId = partner.id;

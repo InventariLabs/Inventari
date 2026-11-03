@@ -692,7 +692,7 @@
     "select_plan": "Choisir un plan",
     "select_day": "Choisir un jour",
     "select_slot": "Choisir un repas",
-    "no_plans_add_to_plan": "Créez d'abord un plan de repas — la recette pourra ensuite être ajoutée depuis le planificateur.",
+    "no_plans_add_to_plan": "Créez d'abord un plan de repas — la recette sera aussitôt ajoutée au premier repas du premier jour.",
     "more_actions": "Plus d'actions",
     "expiry_urgent": "Ingrédients bientôt périmés",
     "delete_plan": "Supprimer le plan",

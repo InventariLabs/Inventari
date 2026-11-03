@@ -660,6 +660,8 @@
         "recipe_picking_undo": "Gotowanie — zwrot składnika",
         "recipe_picking_cancelled": "Gotowanie przerwane — zwrot stanu",
         "stock_take_adjustment": "Korekta z inwentaryzacji",
+        "production_run": "Zlecenie produkcyjne",
+        "production_run_reversed": "Zlecenie produkcyjne cofnięte",
         "circuit_breaker": "Odłączone przez bezpiecznik po powtarzających się niepowodzeniach dostawy"
       },
       "targetTypes": {
@@ -1291,6 +1293,7 @@
     "today": "Dziś",
     "yesterday": "Wczoraj",
     "plus1Week": "Za tydzień",
+    "plus2Weeks": "Za 2 tygodnie",
     "plus1Month": "Za miesiąc",
     "plus3Months": "Za 3 miesiące",
     "plus6Months": "Za pół roku",
