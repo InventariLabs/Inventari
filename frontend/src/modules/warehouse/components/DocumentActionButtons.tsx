@@ -205,6 +205,15 @@ function offersUndo(
   );
 }
 
+/** Whether the row offers a return: a document the server takes one of, and
+ * not one Undo has already put back in full, which has nothing left to send. */
+function offersReturn(
+  docType: string,
+  isReversed: boolean | undefined,
+): boolean {
+  return RETURNABLE_TYPES.has(docType) && !isReversed;
+}
+
 /** Cancelling is what releases a confirmed document's hold, so it stays
  * offered on a confirmed or parked document to whoever manages documents. */
 function cancelOffersItself(
@@ -281,7 +290,7 @@ export function DocumentActionButtons({
   approvalRequiredNoRequest,
   approvalWorkflowMissing,
   canUndo,
-  isReversed = false,
+  isReversed,
   isUndoPending,
   onApplyCorrection,
   onEdit,
@@ -311,7 +320,7 @@ export function DocumentActionButtons({
   const hintKey = executionHintKey(gate);
   const executionHint = hintKey ? t(hintKey) : undefined;
   const executeLabelKey = executeLabelKeyFor(docType);
-  const canReturn = RETURNABLE_TYPES.has(docType);
+  const canReturn = offersReturn(docType, isReversed);
   // a correction whose first completion failed stays CONFIRMED —
   // keep the apply button available so the user can retry completion.
   const showCorrectionApply =
@@ -459,7 +468,7 @@ export function DocumentActionButtons({
           {t(undoLabelKey(docType))}
         </Button>
       )}
-      {canWrite && isCompleted && canReturn && !isReversed && (
+      {canWrite && isCompleted && canReturn && (
         <Button
           variant="outline"
           size="sm"
