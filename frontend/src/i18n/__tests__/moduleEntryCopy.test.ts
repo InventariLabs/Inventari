@@ -168,6 +168,26 @@ const WAREHOUSE_PHONE_CAMERA = {
 } as const;
 const TILE_VISIBLE_CHARACTERS = 50;
 
+/**
+ * Where the term ends inside the blurb, or null when the blurb does not
+ * contain it. `indexOf` answers -1 for a missing term, so the end cannot be
+ * computed from it without checking first.
+ */
+function termEnd(blurb: string, term: string): number | null {
+  const start = blurb.indexOf(term);
+  return start < 0 ? null : start + term.length;
+}
+
+describe("termEnd", () => {
+  it("is null when the term is absent, however short the blurb", () => {
+    expect(termEnd("receive and issue stock", "phone's camera")).toBeNull();
+  });
+
+  it("is where the term ends when it is present", () => {
+    expect(termEnd("scan with the phone's camera", "phone's camera")).toBe(28);
+  });
+});
+
 describe("warehouse tile blurb", () => {
   it("names the phone's camera inside the two lines the tile shows", () => {
     for (const lang of MAINTAINED_LANGUAGES) {
@@ -175,8 +195,8 @@ describe("warehouse tile blurb", () => {
         resolveKey("warehouse:launcher.description", lang) ?? ""
       ).toLowerCase();
       const term = WAREHOUSE_PHONE_CAMERA[lang].toLowerCase();
-      const end = blurb.indexOf(term) + term.length;
-      expect(end, `${lang}: ${term} is in the blurb`).toBeGreaterThan(0);
+      const end = termEnd(blurb, term);
+      expect(end, `${lang}: ${term} is in the blurb`).not.toBeNull();
       expect(end, `${lang}: ${term} ends before the clamp`).toBeLessThanOrEqual(
         TILE_VISIBLE_CHARACTERS,
       );
