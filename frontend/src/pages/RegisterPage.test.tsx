@@ -6,7 +6,13 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BrowserRouter, MemoryRouter } from "react-router-dom";
+import {
+  BrowserRouter,
+  MemoryRouter,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import RegisterPage from "./RegisterPage";
 import { useAuthStore } from "@/store/authStore";
@@ -497,5 +503,46 @@ describe("RegisterPage", () => {
         )?.is_initialized,
       ).toBe(true),
     );
+  });
+  it("hands the address just used to the sign-in page", async () => {
+    useAuthStore.setState({
+      register: vi
+        .fn()
+        .mockResolvedValue(undefined) as unknown as AuthState["register"],
+    });
+    server.use(
+      http.get("/api/v1/auth/init-status", () =>
+        HttpResponse.json({ is_initialized: false }),
+      ),
+    );
+    const SignInStub = () => (
+      <p>
+        sign-in for {(useLocation().state as { email?: string } | null)?.email}
+      </p>
+    );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register"]}>
+          <Routes>
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<SignInStub />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    const password = await screen.findByLabelText(/^Password/i);
+    fireEvent.change(screen.getByLabelText(/Email/i), {
+      target: { value: "owner@example.com" },
+    });
+    fireEvent.change(password, { target: { value: "Str0ng!passphrase" } });
+    fireEvent.change(screen.getByLabelText(/Confirm password/i), {
+      target: { value: "Str0ng!passphrase" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /create/i }));
+
+    expect(
+      await screen.findByText("sign-in for owner@example.com"),
+    ).toBeInTheDocument();
   });
 });

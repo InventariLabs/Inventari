@@ -20,6 +20,17 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- Signing in right after creating the first account, joining an organization
+  by invitation or finishing an approved request has the address just used
+  filled in.
+- Pressing a name chip in the location wizard or the new-location sheet no
+  longer replaces a name already typed ("Rack A" stays when "Rack" is pressed).
+- A purchase order line picked from the catalogue starts from the price the
+  product last cost, when it has one; a price typed on the line is kept.
+- The product label dialog no longer shows "Lot and expiry date" ticked while
+  it is disabled for products that have neither, and the explanation of the
+  location codes describes the numbering in words rather than printing the
+  raw template.
 
 ## v0.11.0 - 2026-11-02
 

@@ -25,6 +25,8 @@ export interface LineItemProduct {
   brand?: string | null;
   image_url?: string | null;
   uom_id?: string | null;
+  /** Catalogue hits only: what the product last cost, when it has a price. */
+  purchase_price?: string | number | null;
 }
 
 /**

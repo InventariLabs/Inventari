@@ -147,7 +147,7 @@ export default function RegisterPage() {
           queryKey: queryKeys.admin.initStatus,
         });
         toast.success(t("accountCreated"));
-        navigate("/login");
+        navigate("/login", { state: { email } });
       } else if (inviteCode) {
         await registerDirect(
           email,
@@ -160,11 +160,13 @@ export default function RegisterPage() {
             defaultValue: "Account created & joined organization!",
           }),
         );
-        navigate("/login");
+        navigate("/login", { state: { email } });
       } else if (token) {
         await completeRegistration(token, password, fullName || undefined);
         toast.success(t("registrationCompleted"));
-        navigate("/login");
+        navigate("/login", {
+          state: { email: approvedRequest?.email ?? email },
+        });
       } else {
         await requestRegistration(email, fullName || undefined);
         // No toast: the card that replaces this form is the confirmation,

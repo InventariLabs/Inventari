@@ -81,3 +81,50 @@ describe("BarcodeLabelSheet — shelf labels", () => {
     expect(queued).not.toHaveProperty("details");
   });
 });
+
+describe("BarcodeLabelSheet — product labels", () => {
+  const previewWith = (withDetails: number) => {
+    window.URL.createObjectURL = vi.fn(() => "blob:products");
+    window.URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get("/api/v1/printing/agents", () => HttpResponse.json(onePage([]))),
+      http.post(
+        "/api/v1/printing/product-labels/png",
+        () =>
+          new HttpResponse(new Uint8Array([0x89, 0x50]), {
+            headers: {
+              "Content-Type": "image/png",
+              "X-Labels-Without-Code": "0",
+              "X-Labels-With-Details": String(withDetails),
+            },
+          }),
+      ),
+    );
+  };
+  const detailsBox = () =>
+    screen.getByRole("checkbox", { name: "Lot and expiry date" });
+
+  it("does not show the lot option ticked when no product has a lot or an expiry date", async () => {
+    previewWith(0);
+    render(
+      <BarcodeLabelSheet target={{ itemIds: ["i-1"] }} onClose={vi.fn()} />,
+    );
+
+    await screen.findByText(/nothing to add/);
+
+    expect(detailsBox()).toBeDisabled();
+    expect(detailsBox()).not.toBeChecked();
+  });
+
+  it("keeps the lot option ticked when a product has something to print", async () => {
+    previewWith(1);
+    render(
+      <BarcodeLabelSheet target={{ itemIds: ["i-1"] }} onClose={vi.fn()} />,
+    );
+
+    await screen.findByAltText(/Preview/);
+
+    expect(detailsBox()).toBeEnabled();
+    expect(detailsBox()).toBeChecked();
+  });
+});

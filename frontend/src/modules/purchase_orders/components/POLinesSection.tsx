@@ -181,7 +181,15 @@ export function POLinesSection({
   };
 
   const handleSelectProduct = (key: string, product: LineItemProduct) => {
+    const current = lineItems.find((line) => line.key === key);
+    // A price already typed on the line stays; an empty one starts from what
+    // the product last cost.
+    const startingPrice =
+      !current?.unit_price && product.purchase_price != null
+        ? { unit_price: String(product.purchase_price) }
+        : {};
     onUpdateData(key, {
+      ...startingPrice,
       product_template_id: product.product_template_id,
       name: product.name,
       sku: product.sku,

@@ -1179,7 +1179,7 @@
       "storage": "Emplacement",
       "codes": {
         "title": "Codes d'emplacement",
-        "tree": "Les emplacements de cet entrepôt reçoivent leur code selon le modèle {{template}}, niveau par niveau : {{examples}}. L'entrepôt lui-même garde son propre code.",
+        "tree": "Les emplacements de cet entrepôt reçoivent leur code niveau par niveau : {{examples}}. L'entrepôt lui-même garde son propre code.",
         "random": "Codes au hasard après {{prefix}}, comme {{prefix}}-7KQ2.",
         "editTemplate": "Modèle de code",
         "renumber": "Renuméroter selon le modèle",

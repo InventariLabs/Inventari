@@ -62,6 +62,9 @@ class ProductSearchResult(BaseModel):
     brand: str | None = None
     uom_id: str | None = None
     uom_symbol: str | None = None
+    #: Catalogue search only: what the product last cost, from its newest
+    #: stock record that carries a price. A purchase line starts from it.
+    purchase_price: Decimal | None = None
     image_url: str | None = None
     is_stub: bool = False
 

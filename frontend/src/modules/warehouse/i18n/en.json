@@ -1179,7 +1179,7 @@
       "storage": "Location",
       "codes": {
         "title": "Location codes",
-        "tree": "Locations below the top level take their codes from the template {{template}}, one level after another: {{examples}}. The top-level location keeps its own code.",
+        "tree": "Locations below the top level are numbered one level after another: {{examples}}. The top-level location keeps its own code.",
         "random": "Random codes after {{prefix}}, such as {{prefix}}-7KQ2.",
         "editTemplate": "Code template",
         "renumber": "Renumber by template",

@@ -1,5 +1,6 @@
 """Product search service for warehouse module."""
 
+from datetime import datetime
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -31,10 +32,39 @@ async def search_products_async(
     for uom_id in {t.uom_id for t in templates if t.uom_id}:
         uom = await core_api.uoms.get_async(db, uom_id, org_id)
         symbols[uom_id] = uom.symbol if uom else None
+    prices = await _purchase_prices_async(db, org_id, [t.id for t in templates])
     return [
-        _template_dto_to_dict(t, symbols.get(t.uom_id) if t.uom_id else None)
+        _template_dto_to_dict(
+            t, symbols.get(t.uom_id) if t.uom_id else None, prices.get(t.id)
+        )
         for t in templates
     ]
+
+
+async def _purchase_prices_async(
+    db: AsyncSession, org_id: UUID, template_ids: list[UUID]
+) -> dict[UUID, Decimal]:
+    """The latest purchase price on record for each template that has one.
+
+    The price lives on the stock records, not on the template; a document
+    line that buys the product again starts from what it last cost.
+    """
+    from app.core.public_api import core_api
+
+    if not template_ids:
+        return {}
+    grouped = await core_api.items.list_with_template_async(db, org_id, template_ids)
+    prices: dict[UUID, Decimal] = {}
+    for tid, items in grouped.items():
+        newest: tuple[datetime, Decimal] | None = None
+        for item in items:
+            if item.purchase_price is None:
+                continue
+            if newest is None or item.created_at > newest[0]:
+                newest = (item.created_at, item.purchase_price)
+        if newest is not None:
+            prices[tid] = newest[1]
+    return prices
 
 
 async def search_stock_items_async(
@@ -210,7 +240,9 @@ async def _apply_shelf_claims_async(
 
 
 def _template_dto_to_dict(
-    tpl: ProductTemplateDTO, uom_symbol: str | None
+    tpl: ProductTemplateDTO,
+    uom_symbol: str | None,
+    purchase_price: Decimal | None = None,
 ) -> dict[str, Any]:
     return {
         'product_template_id': str(tpl.id),
@@ -222,6 +254,7 @@ def _template_dto_to_dict(
         'brand': tpl.brand,
         'uom_id': str(tpl.uom_id) if tpl.uom_id else None,
         'uom_symbol': uom_symbol,
+        'purchase_price': purchase_price,
         'image_url': tpl.image_url,
         'is_stub': bool(tpl.meta_data.get('is_stub', False))
         if tpl.meta_data

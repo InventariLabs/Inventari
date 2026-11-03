@@ -1179,7 +1179,7 @@
       "storage": "Ubicación",
       "codes": {
         "title": "Códigos de ubicación",
-        "tree": "Las ubicaciones de este almacén reciben su código según la plantilla {{template}}, nivel por nivel: {{examples}}. El almacén en sí conserva su propio código.",
+        "tree": "Las ubicaciones de este almacén reciben su código nivel por nivel: {{examples}}. El almacén en sí conserva su propio código.",
         "random": "Códigos al azar tras {{prefix}}, como {{prefix}}-7KQ2.",
         "editTemplate": "Plantilla de códigos",
         "renumber": "Renumerar según la plantilla",
