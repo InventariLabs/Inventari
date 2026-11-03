@@ -24,7 +24,7 @@
   "continue": "Continue",
   "back": "Back",
   "singleModuleName": "Just one module",
-  "singleModuleDescription": "One module is the whole app. Everything else steps back; leave it any time in Settings → My modules.",
+  "singleModuleDescription": "One module is the whole app — Production, if you make things. Everything else steps back; leave it any time in Settings → My modules.",
   "focusChoiceTitle": "Which module?",
   "focusChoiceSubtitle": "Only modules that can stand on their own are listed. Nothing here is permanent."
 }

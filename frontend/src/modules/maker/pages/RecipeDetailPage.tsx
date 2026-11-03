@@ -54,7 +54,13 @@ export default function RecipeDetailPage() {
     if (!recipe) return;
     setHeader({
       title: recipe.name,
-      subtitle: recipe.output_template_name ?? undefined,
+      // A recipe named after its product ("Soy candle" making "Soy candle")
+      // has nothing to add under its own title.
+      subtitle:
+        recipe.output_template_name &&
+        recipe.output_template_name !== recipe.name
+          ? recipe.output_template_name
+          : undefined,
       backTo: "/maker",
       actions: canManage ? (
         <>
@@ -147,23 +153,24 @@ export default function RecipeDetailPage() {
       {/* MakerRecipe summary */}
       <Card className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="flex-1 min-w-0">
+          {/* The name is the page title just above; the card keeps what the
+              title does not say. */}
           <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-lg font-semibold text-on">{recipe.name}</h2>
+            <p className="text-sm text-on-muted">
+              {t("composition.batchYield", {
+                qty: formatQuantityLocalized(
+                  t,
+                  recipe.batch_yield_qty,
+                  recipe.batch_yield_uom_symbol,
+                ),
+              })}
+            </p>
             {recipe.is_default && (
               <span className="text-[10px] font-medium uppercase text-accent bg-accent/10 px-2 py-0.5 rounded-full">
                 {t("catalog.default")}
               </span>
             )}
           </div>
-          <p className="text-sm text-on-muted mt-0.5">
-            {t("composition.batchYield", {
-              qty: formatQuantityLocalized(
-                t,
-                recipe.batch_yield_qty,
-                recipe.batch_yield_uom_symbol,
-              ),
-            })}
-          </p>
           <AvailabilityBadge recipeId={recipe.id} className="mt-1" />
           {recipe.source_recipe_id && (
             <p className="text-xs text-on-muted mt-1 flex items-center gap-1">

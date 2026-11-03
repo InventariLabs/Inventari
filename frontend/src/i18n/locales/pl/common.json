@@ -659,6 +659,8 @@
         "recipe_picking_undo": "Gotowanie — zwrot składnika",
         "recipe_picking_cancelled": "Gotowanie przerwane — zwrot stanu",
         "stock_take_adjustment": "Korekta z inwentaryzacji",
+        "production_run": "Zlecenie produkcyjne",
+        "production_run_reversed": "Zlecenie produkcyjne cofnięte",
         "circuit_breaker": "Odłączone przez bezpiecznik po powtarzających się niepowodzeniach dostawy"
       },
       "targetTypes": {

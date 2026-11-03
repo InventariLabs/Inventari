@@ -651,6 +651,8 @@
         "recipe_picking_undo": "Cozinhando — ingrediente devolvido",
         "recipe_picking_cancelled": "Preparo cancelado — estoque devolvido",
         "stock_take_adjustment": "Correção de contagem de estoque",
+        "production_run": "Produção",
+        "production_run_reversed": "Produção desfeita",
         "circuit_breaker": "Desativado pelo disjuntor após falhas repetidas de entrega"
       },
       "targetTypes": {

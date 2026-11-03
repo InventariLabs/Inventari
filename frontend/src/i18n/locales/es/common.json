@@ -657,6 +657,8 @@
         "recipe_picking_undo": "Cocina — ingrediente devuelto",
         "recipe_picking_cancelled": "Cocina cancelada — existencias devueltas",
         "stock_take_adjustment": "Corrección de inventario",
+        "production_run": "Orden de producción",
+        "production_run_reversed": "Orden de producción revertida",
         "circuit_breaker": "Desactivado por el fusible tras fallos de entrega repetidos"
       },
       "targetTypes": {

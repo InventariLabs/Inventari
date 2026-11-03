@@ -24,7 +24,7 @@
   "continue": "Weiter",
   "back": "Zurück",
   "singleModuleName": "Nur ein Modul",
-  "singleModuleDescription": "Ein Modul ist die ganze App. Alles andere tritt zurück; Sie können jederzeit unter Einstellungen → Meine Module zurückkehren.",
+  "singleModuleDescription": "Ein Modul ist die ganze App – zum Beispiel Fertigung, wenn Sie etwas herstellen. Alles andere tritt zurück; Sie können jederzeit unter Einstellungen → Meine Module zurückkehren.",
   "focusChoiceTitle": "Welches Modul?",
   "focusChoiceSubtitle": "Es werden nur Module angezeigt, die allein bestehen können. Nichts davon ist endgültig."
 }
