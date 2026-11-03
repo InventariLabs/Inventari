@@ -1,4 +1,4 @@
-import { categoryLabel } from "@/lib/i18nHelpers";
+import { categoryLabel, unitLabel } from "@/lib/i18nHelpers";
 import {
   formatDate,
   formatDateTime,
@@ -183,6 +183,12 @@ function referenceNameOf(
     const label = resolver(t, code, "");
     if (label) return label;
   }
+  // A unit is recorded by its symbol (`pcs`), which the app's own screens
+  // print as the interface language writes it (`szt.`); the journal does too.
+  // A symbol nobody translated (a unit the organization made) stays as it is.
+  if (t && recorded && (base === "uom" || base.endsWith("_uom"))) {
+    return unitLabel(t, recorded);
+  }
   return recorded;
 }
 
@@ -341,10 +347,6 @@ const VALUE_RESOLVERS: Record<
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",
     }),
-  // A unit is stored by its symbol (`pcs`); the product's own screens print
-  // it as the interface language writes it (`szt.`), and so does the journal.
-  uom: (t, code) => t(`common:units.${code}`, { defaultValue: "" }),
-  uom_symbol: (t, code) => t(`common:units.${code}`, { defaultValue: "" }),
   // A restore writes the reason the product was deleted for as a field of its
   // own; the archive and the delete entry word the same code from `reasons`.
   deletion_reason: (t, code) =>
