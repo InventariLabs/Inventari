@@ -14,6 +14,7 @@ import {
   useRequestPOApproval,
   useApprovePO,
   useRejectPO,
+  usePOApprovalRequirement,
 } from "./usePurchaseOrders";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
@@ -23,10 +24,15 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
+const modules = vi.hoisted(() => ({
+  enabled: ["purchase_orders"] as string[],
+}));
+
 vi.mock("@/contexts/ModulesContext", () => ({
+  useEnabledModulesOptional: () => modules.enabled,
   useModules: () => ({
-    enabledModules: ["purchase_orders"],
-    isModuleEnabled: (name: string) => name === "purchase_orders",
+    enabledModules: modules.enabled,
+    isModuleEnabled: (name: string) => modules.enabled.includes(name),
     isLoading: false,
     refreshModules: vi.fn(),
   }),
@@ -416,5 +422,53 @@ describe("useRejectPO", () => {
     });
     act(() => result.current.mutate({ poId: "po-1" }));
     await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+});
+
+describe("usePOApprovalRequirement", () => {
+  beforeEach(() => {
+    modules.enabled = ["purchase_orders", "approvals"];
+  });
+
+  const asked = (status: string) => {
+    const calls: string[] = [];
+    server.use(
+      http.get("/api/v1/purchase-orders/:po_id/approval-requirement", () => {
+        calls.push(status);
+        return HttpResponse.json({
+          approval_required: false,
+          approval_solvable: false,
+          undecidable_reason: "named_approvers_cannot_decide",
+          undecidable_stage: "Director",
+        });
+      }),
+    );
+    return calls;
+  };
+
+  it.each(["DRAFT", "PENDING_APPROVAL"])(
+    "asks the server about an order that is %s",
+    async (status) => {
+      const calls = asked(status);
+      const { result } = renderHook(
+        () => usePOApprovalRequirement({ id: "po-1", status }),
+        { wrapper: createWrapper() },
+      );
+      await waitFor(() =>
+        expect(result.current?.undecidable_stage).toBe("Director"),
+      );
+      expect(calls).toHaveLength(1);
+    },
+  );
+
+  it("does not ask about an order past approval", async () => {
+    const calls = asked("CONFIRMED");
+    const { result } = renderHook(
+      () => usePOApprovalRequirement({ id: "po-1", status: "CONFIRMED" }),
+      { wrapper: createWrapper() },
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current).toBeUndefined();
+    expect(calls).toHaveLength(0);
   });
 });
