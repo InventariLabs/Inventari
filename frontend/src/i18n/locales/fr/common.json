@@ -1138,6 +1138,7 @@
     "backendUnavailableBody": "Votre session est toujours ouverte — c'est le serveur qui n'a pas répondu. Réessayez dans un instant ; si l'erreur persiste, prévenez l'administrateur de cette installation.",
     "fileTooLarge": "Fichier trop volumineux. Taille maximale : {{maxMB}} Mo",
     "sessionEnded": "Votre session a pris fin, rien n'a donc été enregistré. Reconnectez-vous et recommencez.",
+    "sessionEndedRead": "Votre session a pris fin. Reconnectez-vous.",
     "imageFormatUnsupported": "Ce format d'image n'est pas pris en charge. Utilisez une image JPG, PNG, GIF ou WebP.",
     "modulesUnavailableTitle": "La liste des modules n'a pas pu être lue",
     "modulesUnavailableBody": "La liste des modules activés de votre organisation n'a pas pu être lue, les espaces de travail ne peuvent donc pas être nommés. Rien n'est perdu — réessayez dans un instant ; si l'erreur persiste, prévenez l'administrateur de cette installation."
