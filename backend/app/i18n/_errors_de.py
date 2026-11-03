@@ -947,6 +947,7 @@ ERRORS_DE: ErrorMessages = {
     'recipe_collection_own_parent': 'Eine Sammlung kann nicht ihre eigene übergeordnete Sammlung sein',
     'recipe_collection_under_descendant': 'Eine Sammlung kann nicht unter ihre eigene Untersammlung verschoben werden',
     'recipe_scrape_failed': 'Das Rezept konnte von der URL nicht abgerufen werden',
+    'register_date_from_after_date_to': 'Das Startdatum darf nicht nach dem Enddatum liegen',
     'meal_plan_end_before_start': 'Das Enddatum darf nicht vor dem Startdatum liegen',
     'meal_plan_too_long': 'Ein Plan darf höchstens {days} Tage umfassen',
     'meal_plan_no_slots': 'Aktivieren Sie mindestens eine Mahlzeit im Plan',

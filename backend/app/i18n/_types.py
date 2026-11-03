@@ -778,6 +778,7 @@ class ErrorMessages(TypedDict):
     recipe_collection_own_parent: str
     recipe_collection_under_descendant: str
     recipe_scrape_failed: str
+    register_date_from_after_date_to: str
     meal_plan_end_before_start: str
     meal_plan_too_long: str
     meal_plan_no_slots: str

@@ -10,6 +10,7 @@ from uuid import UUID
 from sqlalchemy import ColumnElement, Date, case, func, null, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import ServiceRejectionError
 from app.core.export_hygiene import defuse
 from app.core.module_sdk import PaginatedResponse
 from app.core.public_api import core_api
@@ -475,18 +476,37 @@ async def get_register_csv(
     It used to read the register's groups, so once the register started
     serving pages the export would have silently lost everything past page
     one. It queries its own rows, and no limit touches it.
+
+    It reads only the columns it prints: a whole ``Document`` brings every
+    line, product, partner and user through its relations, none of which the
+    file shows. A reversed range is refused here and not on the screen's own
+    reads, whose answers stay empty while somebody is typing the two dates.
     """
+    if date_from > date_to:
+        raise ServiceRejectionError('register_date_from_after_date_to')
     conditions = _window_conditions(
         org_id, date_from, date_to, doc_type, status_filter, partner_id, location_id
     )
     partner_names = await _partner_names_async(db, org_id, conditions)
     location_names = await _location_names_async(db, org_id, conditions)
     result = await db.execute(
-        select(Document)
+        select(
+            Document.number,
+            Document.type,
+            document_date_column().label('filed_on'),
+            Document.partner_snapshot['name'].as_string().label('frozen_partner'),
+            Document.partner_id,
+            Document.source_location_id,
+            Document.target_location_id,
+            Document.total_net,
+            Document.total_tax,
+            Document.total_gross,
+            Document.currency,
+            Document.status,
+        )
         .where(*conditions)
         .order_by(document_date_column().asc(), Document.created_at.asc())
     )
-    docs = list(result.scalars().all())
 
     buf = io.StringIO()
     writer = csv.writer(buf)
@@ -505,18 +525,17 @@ async def get_register_csv(
             'Status',
         ]
     )
-    for doc in docs:
-        row = _row(doc, partner_names, location_names)
+    for row in result:
         writer.writerow(
             [
                 defuse(value)
                 for value in (
                     row.number,
                     row.type,
-                    row.date.strftime('%Y-%m-%d'),
-                    row.partner_name or '',
-                    row.source_location_name or '',
-                    row.target_location_name or '',
+                    row.filed_on.strftime('%Y-%m-%d'),
+                    row.frozen_partner or partner_names.get(row.partner_id) or '',
+                    location_names.get(row.source_location_id) or '',
+                    location_names.get(row.target_location_id) or '',
                     str(row.total_net) if row.total_net is not None else '',
                     str(row.total_tax) if row.total_tax is not None else '',
                     str(row.total_gross) if row.total_gross is not None else '',
