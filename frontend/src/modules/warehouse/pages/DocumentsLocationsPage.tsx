@@ -940,7 +940,7 @@ function OccupancyCell({
     return (
       <span className="text-xs text-on-secondary">
         {t("putaway.locations.occupancy.noLimit", {
-          count: cell?.items_count ?? 0,
+          count: cell?.products ?? 0,
         })}
       </span>
     );

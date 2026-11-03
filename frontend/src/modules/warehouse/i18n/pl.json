@@ -1209,9 +1209,9 @@
         "setUp": "Ustaw miejsce"
       },
       "occupancy": {
-        "noLimit_one": "Bez limitu · {{count}} rekord",
-        "noLimit_few": "Bez limitu · {{count}} rekordy",
-        "noLimit_many": "Bez limitu · {{count}} rekordów",
+        "noLimit_one": "Bez limitu · {{count}} produkt",
+        "noLimit_few": "Bez limitu · {{count}} produkty",
+        "noLimit_many": "Bez limitu · {{count}} produktów",
         "sharesSum_one": "{{fill}}% — udział {{count}} produktu z limitem",
         "sharesSum_few": "{{fill}}% — suma udziałów {{count}} produktów z limitem",
         "sharesSum_many": "{{fill}}% — suma udziałów {{count}} produktów z limitem",
@@ -1220,7 +1220,7 @@
         "fullest_one": "{{name}} — najpełniejszy z {{count}} limitowanych produktów",
         "fullest_few": "{{name}} — najpełniejszy z {{count}} limitowanych produktów",
         "fullest_many": "{{name}} — najpełniejszy z {{count}} limitowanych produktów",
-        "noLimit_other": "Bez limitu · {{count}} rekordów",
+        "noLimit_other": "Bez limitu · {{count}} produktu",
         "fullest_other": "{{name}} — najpełniejszy z {{count}} limitowanych produktów"
       },
       "empty": {

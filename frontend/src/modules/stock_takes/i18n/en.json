@@ -100,6 +100,7 @@
     "increaseCount": "One more {{name}}",
     "saveCount": "Save the count for {{name}}",
     "countFor": "Counted quantity of {{name}}",
+    "countMalformed": "That is not a number. Type digits with one decimal point, for example 12 or 1.5.",
     "unsaved": "Not saved",
     "awaitingRecount": "To count again",
     "countAgain": "Count {{name}} again",
@@ -161,7 +162,9 @@
     "unitDecimals_one": "{{unit}} is counted to {{count}} decimal place — no finer.",
     "unitDecimals_other": "{{unit}} is counted to {{count}} decimal places — no finer.",
     "unexplainedDifferences_one": "One counted quantity differs by more than the tolerance and does not say why. Give it a reason, then finish the count.",
-    "unexplainedDifferences_other": "{{count}} counted quantities differ by more than the tolerance and do not say why. Give each one a reason, then finish the count."
+    "unexplainedDifferences_other": "{{count}} counted quantities differ by more than the tolerance and do not say why. Give each one a reason, then finish the count.",
+    "uncountedRemaining_one": "One item is still uncounted. Count it, then complete the stock take.",
+    "uncountedRemaining_other": "{{count}} items are still uncounted. Count them, then complete the stock take."
   },
   "blindModeActive": "Blind mode active — expected quantities are hidden.",
   "statuses": {

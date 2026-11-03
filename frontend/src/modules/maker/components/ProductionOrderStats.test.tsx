@@ -137,6 +137,22 @@ describe("ProductionOrderStats", () => {
     ).toBeInTheDocument();
   });
 
+  // The preview of the same run says "on each kg"; the finished run named
+  // no unit at all.
+  it("names the output unit in the per-unit result", () => {
+    render(
+      <ProductionOrderStats
+        order={order({
+          status: "COMPLETED",
+          actual_qty: "10",
+          result_per_unit: "10.05",
+          output_uom_symbol: "kg",
+        } as never)}
+      />,
+    );
+    expect(screen.getByText(/PLN 10\.05 per kg\)/)).toBeInTheDocument();
+  });
+
   it("writes actual and planned output with the translated unit, once", async () => {
     // The tile printed the raw symbol ("12 pcs") next to a dialog saying
     // "12 szt." on the same page — the unit must come from the same

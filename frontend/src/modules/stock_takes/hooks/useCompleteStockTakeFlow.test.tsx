@@ -75,6 +75,47 @@ describe("useCompleteStockTakeFlow", () => {
     );
   });
 
+  // "Require full count" refuses the close on every line without a number.
+  // The refusal used to come after the confirmation, so the dialog offered
+  // Complete and a toast then took it back.
+  it("refuses before asking when a full count is required and lines are open", async () => {
+    const open = [
+      ...lines,
+      { ...lines[0], id: "sti-2", item_id: "item-2", counted_quantity: null },
+      { ...lines[0], id: "sti-3", item_id: "item-3", counted_quantity: null },
+    ] as unknown as StockTakeItem[];
+    const { result } = renderHook(
+      () => useCompleteStockTakeFlow("1", open, confirm, 0, true),
+      { wrapper },
+    );
+
+    await act(async () => {
+      await result.current.handleComplete();
+    });
+
+    expect(confirm).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(
+      expect.stringContaining("2 items are still uncounted"),
+    );
+  });
+
+  it("still asks when a partial count is allowed", async () => {
+    const open = [
+      ...lines,
+      { ...lines[0], id: "sti-2", item_id: "item-2", counted_quantity: null },
+    ] as unknown as StockTakeItem[];
+    const { result } = renderHook(
+      () => useCompleteStockTakeFlow("1", open, confirm, 0, false),
+      { wrapper },
+    );
+
+    await act(async () => {
+      await result.current.handleComplete();
+    });
+
+    expect(confirm).toHaveBeenCalledTimes(1);
+  });
+
   it("says nothing about unsaved counts when there are none", async () => {
     const { result } = renderHook(
       () => useCompleteStockTakeFlow("1", lines, confirm, 0),

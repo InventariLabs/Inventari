@@ -219,4 +219,53 @@ describe("StockTakeItemCard — identical records of one product", () => {
       "true",
     );
   });
+
+  // A difference carries the reason field with its own note. A second box
+  // beside it asked the counter to write the same remark twice.
+  it("offers one note field on a line with a difference", () => {
+    const { rerender } = render(card(1));
+    expect(screen.getAllByPlaceholderText(/note/i)).toHaveLength(1);
+    rerender(card(1, { discrepancy: "missing" }));
+    expect(screen.queryByPlaceholderText("Add a note…")).toBeNull();
+    expect(screen.getByTestId("discrepancy-reason-note")).toBeInTheDocument();
+  });
+
+  // Typed digit by digit, "1.34.13" is no number: the save button stays
+  // disabled for it, and the box has to say why.
+  it("says so when the counted quantity is not a number", () => {
+    const withText = (counted: string) => (
+      <StockTakeItemCard
+        itemId="cable-1"
+        item={undefined}
+        stockTakeItem={undefined}
+        counted={counted}
+        savedCount={null}
+        discrepancy={null}
+        isSaved={false}
+        isUnsaved={false}
+        isUpdatePending={false}
+        isInProgress={true}
+        blindMode={true}
+        note=""
+        awaitingRecount={false}
+        counts={[]}
+        onRequestRecount={() => {}}
+        reasonCode=""
+        reasonNote=""
+        showReasonErrors={false}
+        onReasonChange={() => {}}
+        onNoteChange={() => {}}
+        onQuantityChange={() => {}}
+        onQuantityStep={() => {}}
+        onSave={() => {}}
+      />
+    );
+    const { rerender } = render(withText("1.5"));
+    expect(screen.queryByRole("alert")).toBeNull();
+    rerender(withText("1.34.13"));
+    expect(screen.getByRole("alert")).toHaveTextContent("not a number");
+    expect(
+      screen.getByRole("textbox", { name: /Counted quantity/ }),
+    ).toHaveAttribute("aria-invalid", "true");
+  });
 });

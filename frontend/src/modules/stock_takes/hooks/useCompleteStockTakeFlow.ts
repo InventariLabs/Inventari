@@ -32,6 +32,7 @@ export function useCompleteStockTakeFlow(
   lines: StockTakeItem[] | undefined,
   confirm: ReturnType<typeof useConfirm>["confirm"],
   unsavedCount = 0,
+  requireFullCount = false,
 ) {
   const { t } = useTranslation(["stock_takes"]);
   const navigate = useNavigate();
@@ -60,6 +61,17 @@ export function useCompleteStockTakeFlow(
         )
         .map((line) => `${line.item_name}\u0000${line.item_brand ?? ""}`),
     ).size;
+
+    // A stock take that requires a full count refuses to close over any line
+    // without a number. Said before the confirmation, because that dialog
+    // offers Complete and a refusal after it takes the offer back.
+    const uncounted = (lines ?? []).filter(
+      (line) => line.counted_quantity == null,
+    ).length;
+    if (requireFullCount && uncounted > 0) {
+      toast.error(t("errors.uncountedRemaining", { count: uncounted }));
+      return;
+    }
 
     const goToReport = () => navigate(`/inventory/stock-takes/${id}/report`);
     const reportFailure = (error: Error) =>
@@ -200,6 +212,7 @@ export function useCompleteStockTakeFlow(
     t,
     lines,
     unsavedCount,
+    requireFullCount,
     mayAcceptOverrides,
   ]);
 

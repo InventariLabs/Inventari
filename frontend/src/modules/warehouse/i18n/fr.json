@@ -1117,8 +1117,8 @@
         "setUp": "Régler l’emplacement"
       },
       "occupancy": {
-        "noLimit_one": "Aucune limite · {{count}} enregistrement",
-        "noLimit_other": "Aucune limite · {{count}} enregistrements",
+        "noLimit_one": "Aucune limite · {{count}} produit",
+        "noLimit_other": "Aucune limite · {{count}} produits",
         "sharesSum_one": "{{fill}}% — la part de {{count}} produit limité",
         "sharesSum_other": "{{fill}}% — les parts de {{count}} produits limités additionnées",
         "unmeasured": "Un produit ici n'a pas de limite et n'est pas compté",

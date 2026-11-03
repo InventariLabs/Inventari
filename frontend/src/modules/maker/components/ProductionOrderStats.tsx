@@ -204,7 +204,9 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
                 note={`${resultTerm.definition} ${t(
                   "detail.card.resultPerUnit",
                   {
-                    defaultValue: "({{amount}} per unit)",
+                    defaultValue: "({{amount}} per {{unit}})",
+                    unit:
+                      order.output_uom_symbol || t("create.needs.unitFallback"),
                     amount: formatMoney(
                       order.result_per_unit,
                       currency,

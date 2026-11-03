@@ -125,6 +125,7 @@ function CardResult({
           {" "}
           {t("productionList.card.resultPerUnit", {
             amount: formatMoney(order.result_per_unit, currency, language),
+            unit: order.output_uom_symbol || t("create.needs.unitFallback"),
           })}
         </span>
       </p>

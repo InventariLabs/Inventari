@@ -100,6 +100,7 @@
     "increaseCount": "Um {{name}} a mais",
     "saveCount": "Salvar a contagem de {{name}}",
     "countFor": "Quantidade contada de {{name}}",
+    "countMalformed": "Isso não é um número. Digite algarismos com um único separador decimal, por exemplo 12 ou 1,5.",
     "unsaved": "Não salvo",
     "awaitingRecount": "Contar novamente",
     "countAgain": "Contar {{name}} novamente",
@@ -161,7 +162,9 @@
     "unitDecimals_one": "{{unit}} é contado com {{count}} casa decimal — não mais que isso.",
     "unitDecimals_other": "{{unit}} é contado com {{count}} casas decimais — não mais que isso.",
     "unexplainedDifferences_one": "Uma quantidade contada difere além da tolerância e não informa o motivo. Informe um motivo e conclua a contagem.",
-    "unexplainedDifferences_other": "{{count}} quantidades contadas diferem além da tolerância e não informam o motivo. Informe um motivo para cada uma e conclua a contagem."
+    "unexplainedDifferences_other": "{{count}} quantidades contadas diferem além da tolerância e não informam o motivo. Informe um motivo para cada uma e conclua a contagem.",
+    "uncountedRemaining_one": "Falta contar um artigo. Conte-o e conclua a contagem.",
+    "uncountedRemaining_other": "Faltam contar {{count}} artigos. Conte-os e conclua a contagem."
   },
   "blindModeActive": "Modo cego ativo — as quantidades esperadas estão ocultas.",
   "statuses": {
