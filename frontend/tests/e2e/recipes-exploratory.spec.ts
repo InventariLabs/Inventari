@@ -874,13 +874,20 @@ test.describe("Recipes — follow-ups", () => {
     const recipeName = `E2E-Toast-${stamp}`;
     // Linked ingredient with no stock → status 'missing' (never 'unknown'),
     // so the Add-missing button is enabled.
+    // The line is named per run: the list a click adds to is the newest
+    // active one, which keeps what an earlier run put on it, and a name it
+    // already holds is answered with "already on the list" instead of
+    // "added" — so a fixed name only passed on a database nothing had used.
+    const ingredientName = `Zztoast Sesame ${stamp}`;
     const template = await api.createProductTemplate(token, {
-      name: `Zztoast Sesame ${stamp}`,
+      name: ingredientName,
     });
     const recipe = await api.createRecipe(token, {
       name: recipeName,
       servings: 2,
-      ingredients: [{ name: "Sesame", quantity: 2, template_id: template.id }],
+      ingredients: [
+        { name: ingredientName, quantity: 2, template_id: template.id },
+      ],
     });
     cleanupRecipeIds.push(recipe.id);
 
