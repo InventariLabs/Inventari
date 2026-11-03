@@ -523,8 +523,9 @@ export class ApiHelper {
 
   /**
    * Switches every optional module on, maker included. Only globalSetup and
-   * specs of the `chromium` project may call it: `mobile` and `pl-PL` can run
-   * while `module-gate` has maker switched off, and this would undo that.
+   * specs of the `chromium` project, or of a project that depends on
+   * `module-gate`, may call it: `mobile` and `pl-PL` can run while
+   * `module-gate` has maker switched off, and this would undo that.
    */
   async enableAllModules(token: string): Promise<void> {
     // stats, printing and announcements are always on: a toggle for them is

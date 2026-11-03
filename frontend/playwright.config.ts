@@ -137,7 +137,8 @@ export default defineConfig({
       // inside `chromium`, and two maker-result tests failed in every full run
       // while passing alone. After `chromium` and before `org-profile`, so the
       // two rewrites of the module list never overlap either. `mobile` and
-      // `pl-PL` may run alongside: none of their specs opens a maker screen.
+      // `pl-PL` may run alongside: none of their specs opens a maker screen or
+      // calls `enableAllModules`. `approvals` waits for this project.
       name: "module-gate",
       use: { ...devices["Desktop Chrome"] },
       testMatch: /maker-module-gate\.spec\.ts/,
@@ -150,12 +151,14 @@ export default defineConfig({
       // turns that confirm into PENDING_APPROVAL ("APPROVAL_REQUIRED"); and
       // one approvals describe's org-wide cleanup deleted the workflow another
       // describe had just created. So they run after `chromium`, in one
-      // worker. `module-gate` may run alongside: it touches only maker.
+      // worker. They run after `module-gate` too: their setup calls
+      // `enableAllModules`, which switches maker on, and running alongside it
+      // would undo the switch-off the gate tests assert on.
       name: "approvals",
       use: { ...devices["Desktop Chrome"] },
       testMatch: /approvals(-integration)?\.spec\.ts/,
       testIgnore: /(^|\/)phone-approvals\.spec\.ts$/,
-      dependencies: ["chromium"],
+      dependencies: ["chromium", "module-gate"],
       workers: 1,
     },
     {
