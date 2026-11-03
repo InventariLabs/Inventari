@@ -130,7 +130,7 @@ describe("WmsReceivingView on a phone", () => {
     render(<WmsReceivingView documentId={DOC} onClose={vi.fn()} />);
 
     const card = await screen.findByRole("region", { name: "Damson Plums" });
-    expect(within(card).getByText("Ordered 10 pcs.")).toBeInTheDocument();
+    expect(within(card).getByText("Still due 10 pcs.")).toBeInTheDocument();
     // The count starts at what was ordered: confirming says all of it came.
     expect(
       within(card).getByRole("spinbutton", {
@@ -282,10 +282,10 @@ describe("WmsReceivingView on a phone", () => {
     });
   });
 
-  it("does not call goods nobody ordered ordered", async () => {
+  it("does not call goods nobody ordered still due", async () => {
     // The phone's list of goods with no order hands its counts to the
     // session as the lines' expected quantities: three bolts written down
-    // read as "Ordered 3 pcs." on a card nobody had ordered anything for.
+    // read as "Still due 3 pcs." on a card nobody had ordered anything for.
     serveDocument();
     server.use(
       http.post(`${BASE}/start`, () =>
@@ -305,7 +305,7 @@ describe("WmsReceivingView on a phone", () => {
     const card = await screen.findByRole("region", { name: "Hex Bolt" });
 
     expect(within(card).getByText("Expected 3 pcs.")).toBeInTheDocument();
-    expect(within(card).queryByText(/Ordered/)).not.toBeInTheDocument();
+    expect(within(card).queryByText(/Still due/)).not.toBeInTheDocument();
     await user.click(within(card).getByRole("button", { name: "Decrease" }));
     expect(
       within(card).getByText("1 pcs. fewer than expected."),
@@ -1073,7 +1073,7 @@ describe("a burst of scans on a phone", () => {
     expect(
       await screen.findByRole("region", { name: "Gouda Cheese" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Ordered 10 pcs\./)).toBeInTheDocument();
+    expect(screen.getByText(/Still due 10 pcs\./)).toBeInTheDocument();
   });
 
   it("sends the scans still queued before it lets the worker leave", async () => {
