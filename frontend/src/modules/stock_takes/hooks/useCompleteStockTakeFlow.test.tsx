@@ -95,7 +95,7 @@ describe("useCompleteStockTakeFlow", () => {
 
     expect(confirm).not.toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith(
-      expect.stringContaining("2 items are still uncounted"),
+      expect.stringContaining("2 products are still uncounted"),
     );
   });
 

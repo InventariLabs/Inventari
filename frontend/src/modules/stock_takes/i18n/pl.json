@@ -181,10 +181,10 @@
     "unexplainedDifferences_few": "{{count}} policzone ilości różnią się bardziej niż tolerancja i nie mówią dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
     "unexplainedDifferences_many": "{{count}} policzonych ilości różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
     "unexplainedDifferences_other": "{{count}} policzonej ilości różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
-    "uncountedRemaining_one": "Jedna pozycja nie jest jeszcze policzona. Policz ją, a potem zakończ spis.",
-    "uncountedRemaining_few": "{{count}} pozycje nie są jeszcze policzone. Policz je, a potem zakończ spis.",
-    "uncountedRemaining_many": "{{count}} pozycji nie jest jeszcze policzonych. Policz je, a potem zakończ spis.",
-    "uncountedRemaining_other": "{{count}} pozycji nie jest jeszcze policzonej. Policz je, a potem zakończ spis."
+    "uncountedRemaining_one": "Jeden produkt nie jest jeszcze policzony. Policz go, a potem zakończ spis.",
+    "uncountedRemaining_few": "{{count}} produkty nie są jeszcze policzone. Policz je, a potem zakończ spis.",
+    "uncountedRemaining_many": "{{count}} produktów nie jest jeszcze policzonych. Policz je, a potem zakończ spis.",
+    "uncountedRemaining_other": "{{count}} produktu nie jest jeszcze policzonego. Policz je, a potem zakończ spis."
   },
   "blindModeActive": "Tryb ślepy aktywny — oczekiwane ilości są ukryte.",
   "statuses": {
