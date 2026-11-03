@@ -12,6 +12,9 @@ import {
 import { itemsApi } from "@/lib/api/items";
 import { labelsApi } from "@/lib/api/labels";
 import { equipmentApi } from "@/modules/equipment/api/equipment";
+import { SessionEndedError } from "@/lib/errors";
+import i18next from "i18next";
+import { toast } from "sonner";
 import type { Item, FieldDefinition } from "@/types";
 
 // Minimal but fully-typed Item for getById mocks, with per-test overrides.
@@ -473,6 +476,51 @@ describe("useEquipmentForm — invalidates cache after create + image upload", (
       expect(invalidatedKeys.some((k) => k.includes("dashboard"))).toBe(true);
     });
   });
+});
+
+describe("useEquipmentForm — a photo refused after the asset was saved", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it.each([
+    ["created", undefined as string | undefined],
+    ["edited", "edit-1"],
+  ])(
+    "does not say the %s asset was not saved when an ended session refused its photo",
+    async (_name, editItemId) => {
+      vi.mocked(itemsApi.getById).mockResolvedValue(
+        mockItem({ name: "Laptop" }),
+      );
+      vi.mocked(itemsApi.uploadImage).mockRejectedValueOnce(
+        new SessionEndedError(i18next.t("common:errors.sessionEnded")),
+      );
+      const { Wrapper } = makeWrapper();
+      const { result } = renderHook(() => useEquipmentForm(editItemId, {}), {
+        wrapper: Wrapper,
+      });
+      if (editItemId) {
+        await waitFor(() => expect(result.current.form.name).toBe("Laptop"));
+      }
+
+      act(() => {
+        result.current.set("name", "Laptop");
+        result.current.set("location_id", "loc-1");
+        result.current.setImageFile(
+          new File(["png"], "cover.png", { type: "image/png" }),
+        );
+      });
+      await act(async () => {
+        await result.current.handleSubmit({
+          preventDefault: vi.fn(),
+        } as unknown as React.FormEvent);
+      });
+
+      const shown = vi.mocked(toast.error).mock.calls.map(([m]) => String(m));
+      expect(shown).toEqual([i18next.t("items:messages.fileUploadFailed")]);
+      expect(toast.success).toHaveBeenCalled();
+    },
+  );
 });
 
 describe("useEquipmentForm — edit-mode label & barcode persistence", () => {

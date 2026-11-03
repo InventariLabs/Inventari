@@ -11,10 +11,17 @@ const API_BASE_URL = "/api/v1";
 // The refresh token is stored in an HttpOnly cookie by the backend.
 let _accessToken: string | null = null;
 
+// Set when a refresh round has ended the session and cleared by the next
+// token. A 401 that arrives after that round (a request sent before it, still
+// in flight) has nothing left to refresh: without this it opened a round of
+// its own, and every one of them announced the same sign-out again.
+let _sessionOver = false;
+
 export const tokenStore = {
   get: () => _accessToken,
   set: (token: string) => {
     _accessToken = token;
+    _sessionOver = false;
   },
   clear: () => {
     _accessToken = null;
@@ -120,17 +127,37 @@ const processQueue = (error: unknown, token: string | null = null) => {
 };
 
 /**
+ * POST routes that compute an answer and write nothing: a rendered label, a
+ * dry-run preview, a sheet read for its columns, a text read off a photo.
+ * They are POSTs because the input is a body, not because they save.
+ */
+const READ_ONLY_POST_ENDPOINTS = new Set([
+  "png",
+  "preview",
+  "scope-preview",
+  "analyze",
+  "extract",
+  "extract-nutrition",
+]);
+
+/**
  * What a request that was waiting on the session is told when the session is
  * over: the sign-in form follows, and the toast that would have said "Failed
  * to add" says instead that the session ended — and, for a request that was
- * going to save something, that the work was not saved. A read saved nothing,
- * so the sentence it gets does not claim otherwise.
+ * going to save something, that the work was not saved. A request that saves
+ * nothing (a read, or one of the POSTs above) gets the sentence that does not
+ * claim otherwise.
  */
 function sessionEndedError(
-  request: { method?: string } | undefined,
+  request: { method?: string; url?: string } | undefined,
 ): SessionEndedError {
   const method = (request?.method ?? "get").toLowerCase();
-  const reads = method === "get" || method === "head" || method === "options";
+  const lastSegment = (request?.url ?? "").split("?")[0].split("/").pop() ?? "";
+  const reads =
+    method === "get" ||
+    method === "head" ||
+    method === "options" ||
+    (method === "post" && READ_ONLY_POST_ENDPOINTS.has(lastSegment));
   return new SessionEndedError(
     i18next.t(
       reads ? "common:errors.sessionEndedRead" : "common:errors.sessionEnded",
@@ -161,6 +188,9 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (_sessionOver && !isRefreshing) {
+        return Promise.reject(sessionEndedError(originalRequest));
+      }
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -228,6 +258,7 @@ api.interceptors.response.use(
         // sign-in form, exactly when the outage screen had promised not to.
         if (isServerRefusal(caught)) {
           tokenStore.clear();
+          _sessionOver = true;
           window.dispatchEvent(new CustomEvent("auth:logout"));
         }
         return Promise.reject(refreshError);

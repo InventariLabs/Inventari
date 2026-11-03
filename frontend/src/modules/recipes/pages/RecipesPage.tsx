@@ -1,4 +1,4 @@
-import { extractApiError } from "@/lib/errors";
+import { extractApiError, followUpError } from "@/lib/errors";
 import { useDndA11y, useDndSensors } from "@/lib/dndA11y";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -274,6 +274,10 @@ function CollectionAddRecipesOverlay({
   );
 }
 
+/** A photo that failed after its recipe was saved: only the photo failed. */
+const photoFailed = (error: unknown, fallback: string) =>
+  toast.error(followUpError(error, fallback));
+
 export default function RecipesPage() {
   const { t } = useTranslation(["recipes", "common"]);
   const navigate = useNavigate();
@@ -472,11 +476,11 @@ export default function RecipesPage() {
       const created = await createMutation.mutateAsync(data);
       // the image endpoint needs an existing recipe id, so a photo
       // picked in the create form is uploaded right after creation.
+      // The recipe exists by now: a refused photo must not read as "not saved".
       if (imageFile) {
-        await uploadImageMutation.mutateAsync({
-          id: created.id,
-          file: imageFile,
-        });
+        await uploadImageMutation
+          .mutateAsync({ id: created.id, file: imageFile })
+          .catch((e: unknown) => photoFailed(e, t("errors.image_failed")));
       }
       toast.success(t("toasts.created"));
       setShowForm(false);
