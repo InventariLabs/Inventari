@@ -2796,6 +2796,8 @@ export class ApiHelper {
       output_location_id: string;
       production_date?: string | null;
       notes?: string | null;
+      /** Acknowledge a shortage warning (the draft is created short on stock). */
+      confirm_shortage?: boolean;
     },
   ): Promise<{
     id: string;
