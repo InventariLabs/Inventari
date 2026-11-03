@@ -208,7 +208,7 @@
     "executeScrap": "Bestand abschreiben",
     "approvalPendingHint": "Wartet auf Genehmigung — Ausführung ist bis zur Entscheidung gesperrt.",
     "approvalRequiredHint": "Eine Genehmigung ist erforderlich, aber keine Anfrage ist offen — zuerst Genehmigung anfordern.",
-    "approvalNoWorkflowHint": "Eine Genehmigung ist erforderlich, aber kein Genehmigungsworkflow ist aktiv — richten Sie ihn in den Genehmigungseinstellungen ein und beantragen Sie die Genehmigung.",
+    "approvalNoWorkflowHint": "Dieser Beleg braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.",
     "postNowReceive": "Wareneingang buchen",
     "postNowIssue": "Bestand ausbuchen",
     "postNowMove": "Bestand umlagern",
@@ -241,7 +241,7 @@
     "deleteMessage": "Dieses Entwurfsdokument löschen? Dies kann nicht rückgängig gemacht werden.",
     "confirmMessageApproval": "Beim Bestätigen geht dieses Dokument in die Genehmigungswarteschlange. Fortfahren?",
     "confirmMessageConditional": "Dies markiert das Dokument als bereit für die Lagerausführung — es sei denn, die Genehmigungsschwelle Ihrer Organisation schickt es zuerst in die Genehmigungswarteschlange. Fortfahren?",
-    "confirmMessageNoWorkflow": "Dieses Dokument erfordert eine Genehmigung, aber es gibt keine Genehmigungsworkflows für Dokumente, daher wird die Bestätigung abgelehnt. Erstellen Sie zuerst den Workflow.",
+    "confirmMessageNoWorkflow": "Dieser Beleg braucht eine Freigabe, aber noch ist niemand dafür eingerichtet, daher wird die Bestätigung abgelehnt. Bitten Sie Ihren Administrator, das einzurichten.",
     "requestApprovalMessage": "Die Anforderung setzt das Dokument zurück auf „wartet auf Genehmigung“, wo es bleibt, bis jemand genehmigt.",
     "confirmMessageDeadEndNamed": "Dieses Dokument erfordert eine Genehmigung, aber niemand könnte sie entscheiden: Die Stufe „{{stage}}“ nennt Personen ohne Zugriff auf Genehmigungen. Die Bestätigung schickt es trotzdem dorthin, und es wartet, bis die Anfrage zurückgezogen wird oder diese Personen Zugriff erhalten. Fortfahren?",
     "confirmMessageDeadEndNoApprover": "Dieses Dokument erfordert eine Genehmigung, aber niemand könnte sie entscheiden: Die Stufe „{{stage}}“ steht allen mit dem Genehmigungsrecht offen, und niemand in dieser Organisation hat es. Die Bestätigung schickt es trotzdem dorthin, und es wartet, bis die Anfrage zurückgezogen wird oder jemand das Recht erhält. Fortfahren?",
@@ -616,6 +616,8 @@
     "plannedReceiving": "→ {{location}} · Wareneingangszone, später einlagern"
   },
   "value": {
+    "unpricedLines_one": "{{count}} Position hat keinen Preis: Sie ist in dieser Summe nicht enthalten, und für diesen Bestand sind keine Kosten erfasst.",
+    "unpricedLines_other": "{{count}} Positionen haben keinen Preis: Sie sind in dieser Summe nicht enthalten, und für diesen Bestand sind keine Kosten erfasst.",
     "totalsTitle": "Dokumentsummen",
     "totalNet": "Nettogesamt",
     "totalTax": "Steuergesamt",

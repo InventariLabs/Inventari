@@ -14,6 +14,30 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A recipe's page and printout show a dash for a nutrient no ingredient
+  measured where the sum would have been 0, as the meal plan does. A rice dish
+  where only the chicken had values used to read "Carbs 0.0g".
+- "Max batches from stock" on a bill of materials shows ten as 10, not 1E+1.
+- The day's activity and History state the stock change of a correction: taking
+  one piece off an issue reads "by +1", where it used to read "by −1".
+- A generated community module asks for its own read and write permissions on
+  every route, and its manifest declares them with the usual default roles.
+- A product used up to zero reads "Used up" in the list and on its page rather
+  than "Consumed (Virtual)", and no longer offers "Add 1 unit", which was
+  refused after the click. Move brings it back to a shelf.
+- Add product shows pieces on its unit button when no unit was chosen, which is
+  what the save has always filed such a product as; it used to read "Choose".
+- Receive goods and Issue goods can add a supplier or customer that does not
+  exist yet without leaving the form.
+- A posted receipt says which of its lines have no price: they are left out of
+  the totals, and that stock has no recorded cost.
+- A dispute note in an attestation names the asset by its serial number when it
+  has one, and the public page says what was confirmed beside what was reported.
+- The message for a missing approval workflow tells a storekeeper to ask the
+  administrator instead of describing the administrator's settings.
+- Amounts in a unit that is a word take its plural ("6 bottles").
+- An issue dated today can be planned from its page, so that picking can start
+  on it without dating it tomorrow first.
 - A product whose nutrition came from Open Food Facts now counts its calories
   in recipe estimates and in the meal plan's daily totals. They used to go
   missing while its protein, fat and carbohydrates were counted, and the day

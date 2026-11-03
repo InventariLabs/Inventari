@@ -662,6 +662,8 @@
       "statusConfirmedDesc": "Your confirmation for this asset is saved, and you can close this tab now.",
       "statusDisputed": "Issue Reported",
       "statusDisputedDesc": "Your report is saved, and you can close this tab now.",
+      "statusDisputedConfirmedDesc_one": "Your report is saved, and so is your confirmation of {{count}} other asset. You can close this tab now.",
+      "statusDisputedConfirmedDesc_other": "Your report is saved, and so is your confirmation of {{count}} other assets. You can close this tab now.",
       "statusCampaignClosed": "Attestation Closed",
       "statusCampaignClosedDesc": "This request has been closed — your confirmation can no longer be saved. If you still hold this asset, please contact your organization.",
       "statusAssignmentReturned": "Already Returned",

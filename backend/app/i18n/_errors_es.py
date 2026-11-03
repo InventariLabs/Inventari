@@ -576,9 +576,7 @@ ERRORS_ES: ErrorMessages = {
     'approvals_read_forbidden': 'No tienes permiso para ver las solicitudes de aprobación',
     'approvals_write_forbidden': 'No tienes permiso para crear solicitudes de aprobación',
     'documents_approve_requires_grant': 'No tienes permiso para aprobar o rechazar documentos',
-    'po_approval_workflow_missing': (
-        'Las órdenes de compra requieren aprobación, pero no hay ningún flujo de aprobación configurado para ellas — cree uno en Aprobaciones → Flujos o desactive el requisito'
-    ),
+    'po_approval_workflow_missing': 'Este pedido necesita aprobación, pero todavía no hay nadie designado para darla. Pida a su administrador que lo configure.',
     'po_supplier_required': 'Una orden de compra no puede confirmarse sin proveedor',
     'document_type_requires_partner': 'Este tipo de documento requiere un socio.',
     'partner_has_no_email': 'El socio no tiene dirección de correo electrónico.',
@@ -847,9 +845,7 @@ ERRORS_ES: ErrorMessages = {
     'permanent_delete_disabled': (
         'La eliminación permanente está desactivada para esta organización.'
     ),
-    'documents_approval_workflow_missing': (
-        'Los documentos requieren aprobación, pero no hay ningún flujo de aprobación configurado para ellos — cree uno en Aprobaciones → Flujos o desactive el requisito'
-    ),
+    'documents_approval_workflow_missing': 'Este documento necesita aprobación, pero todavía no hay nadie designado para darla. Pida a su administrador que lo configure.',
     'category_delete_blocked_by_items': (
         'No se puede eliminar la categoría — está en uso ({count}). Mueva primero sus productos a otra categoría.'
     ),

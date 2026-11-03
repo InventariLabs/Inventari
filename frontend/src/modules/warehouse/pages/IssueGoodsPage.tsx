@@ -1,3 +1,7 @@
+import {
+  PartnerInlineCreate,
+  usePartnerCreateLayer,
+} from "@/modules/partners/moduleApi";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -78,24 +82,40 @@ function purposeOf(docType: DocumentType): Purpose {
 function CustomerField({ draft }: { draft: ActionDraft }) {
   const { t } = useTranslation("warehouse");
   const { workspace, picker, errors } = draft;
+  const createPartner = usePartnerCreateLayer({
+    roleTypes: picker.partnerTypes,
+    onAccepted: workspace.setPartnerId,
+  });
   return (
-    <SearchableCombobox
-      id="issue-customer"
-      label={t("issue.customer")}
-      required={workspace.requiresPartner}
-      // The field is the customer's on this screen; the shared check's
-      // "Partner is required for this document type" named neither.
-      error={errors.partner_id ? t("receive.errors.noCustomer") : undefined}
-      options={picker.fieldProps.partners}
-      onSearchChange={picker.fieldProps.onPartnerSearch}
-      loading={picker.fieldProps.partnersLoading}
-      value={workspace.partnerId}
-      onChange={workspace.setPartnerId}
-      placeholder={t("receive.customerPlaceholder")}
-      searchPlaceholder={t("form.searchPartner")}
-      emptyMessage={t("form.noCustomersFound")}
-      title={t("issue.customer")}
-    />
+    <>
+      <SearchableCombobox
+        id="issue-customer"
+        label={t("issue.customer")}
+        required={workspace.requiresPartner}
+        // The field is the customer's on this screen; the shared check's
+        // "Partner is required for this document type" named neither.
+        error={errors.partner_id ? t("receive.errors.noCustomer") : undefined}
+        options={picker.fieldProps.partners}
+        onSearchChange={picker.fieldProps.onPartnerSearch}
+        loading={picker.fieldProps.partnersLoading}
+        value={workspace.partnerId}
+        onChange={workspace.setPartnerId}
+        placeholder={t("receive.customerPlaceholder")}
+        searchPlaceholder={t("form.searchPartner")}
+        emptyMessage={t("form.noCustomersFound")}
+        createLabel={t("form.createNewPartner")}
+        onCreateNew={createPartner.handleCreate}
+        title={t("issue.customer")}
+      />
+      {createPartner.open && (
+        <PartnerInlineCreate
+          initialName={createPartner.query}
+          roleTypes={picker.partnerTypes}
+          onCreated={createPartner.handleCreated}
+          onCancel={createPartner.handleCancel}
+        />
+      )}
+    </>
   );
 }
 

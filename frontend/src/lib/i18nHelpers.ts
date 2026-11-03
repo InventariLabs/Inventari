@@ -44,10 +44,11 @@ export function makeTDynamic(
 export function unitLabel(
   t: TranslateFn,
   symbol: string | null | undefined,
+  count?: number,
 ): string {
   const unit = symbol?.trim();
   if (!unit) return "";
-  return t(`common:units.${unit}`, { defaultValue: unit });
+  return t(`common:units.${unit}`, { defaultValue: unit, count });
 }
 
 /** What the analytics API calls the bucket of products without a category. */
@@ -102,7 +103,10 @@ export function formatQuantityLocalized(
   rounding?: string | number | null,
 ): string {
   if (quantity === null || quantity === undefined || quantity === "") return "";
-  const unit = unitLabel(t, symbol);
+  // The count picks a word unit's plural ("6 bottles"); a unit with no plural
+  // forms in the catalogue ("kg") answers its one form for any count.
+  const count = Number(quantity);
+  const unit = unitLabel(t, symbol, Number.isFinite(count) ? count : undefined);
   const amount = formatQuantityValue(quantity, rounding);
   return unit ? `${amount} ${unit}` : amount;
 }

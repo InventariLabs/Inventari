@@ -238,3 +238,47 @@ describe("DocumentValueTotals", () => {
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 });
+
+describe("DocumentValueTotals — a received line with no price", () => {
+  beforeEach(() => {
+    valueTracking = true;
+    setOrganizationCurrency("PLN");
+  });
+
+  const posted = (lines: unknown[], overrides = {}) =>
+    makeDoc({
+      status: "COMPLETED",
+      lines,
+      ...overrides,
+    } as Partial<WarehouseDocument>);
+
+  it("says the line has no cost, beside the totals it is left out of", () => {
+    render(
+      <DocumentValueTotals
+        document={posted([{ unit_price: "10.00" }, { unit_price: null }])}
+      />,
+    );
+    expect(screen.getByText(/1 line has no price/)).toBeInTheDocument();
+  });
+
+  it("says so when no line has a price and there are no totals to show", () => {
+    render(
+      <DocumentValueTotals
+        document={posted([{ unit_price: null }, { unit_price: null }], {
+          total_net: null,
+          total_gross: null,
+        })}
+      />,
+    );
+    expect(screen.getByText(/2 lines have no price/)).toBeInTheDocument();
+  });
+
+  it("says nothing of a draft, whose prices may still come", () => {
+    render(
+      <DocumentValueTotals
+        document={posted([{ unit_price: null }], { status: "DRAFT" })}
+      />,
+    );
+    expect(screen.queryByText(/no price/)).not.toBeInTheDocument();
+  });
+});

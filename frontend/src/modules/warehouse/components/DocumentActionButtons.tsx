@@ -86,7 +86,7 @@ interface DraftActionsProps {
 /**
  * What a draft offers. The one-step verb is the primary action; the old
  * confirm step survives as "Plan" in the row's menu for a future-dated
- * document, where a plan is the point.
+ * document, where a plan is the point, and for goods to be picked first.
  */
 function DraftActions({
   isCorrection,
@@ -236,7 +236,7 @@ interface DocumentActionButtonsProps {
   canStartPicking: boolean;
   canStartReceiving: boolean;
   isDuplicatePending?: boolean;
-  /** A future-dated draft may still be planned instead of posted now. */
+  /** The draft may be planned instead of posted now: see `mayBePlanned`. */
   isPlanned?: boolean;
   /** The profile requires an approval for this document: the one-step
    * action sends it there instead of posting it. */
