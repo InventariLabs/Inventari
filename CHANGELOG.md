@@ -42,9 +42,8 @@ says what the release does rather than what changed since them.
   assistive technology.
 - Equipment categories: deleting one says what goes with it, and the Desktop
   Computer, Network Device and Peripheral presets have icons of their own. In
-  Polish the Batches status tabs read as plurals and the category list says
-  "Sprzęt" for its count. The AI connections page no longer shows its title
-  twice.
+  Polish the Batches status tabs read as plurals. The AI connections page no
+  longer shows its title twice.
 - A product whose nutrition came from Open Food Facts now counts its calories
   in recipe estimates and in the meal plan's daily totals. They used to go
   missing while its protein, fat and carbohydrates were counted, and the day

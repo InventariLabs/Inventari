@@ -644,7 +644,7 @@
     "table": {
       "name": "Kategoria",
       "code": "Kod",
-      "assets": "Sprzęt",
+      "assets": "Zasoby",
       "fields": "Pola"
     }
   },
