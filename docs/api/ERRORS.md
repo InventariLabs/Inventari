@@ -573,6 +573,7 @@ apart.
 | `RECIPE_SCRAPE_FAILED` | Failed to scrape recipe from URL |
 | `RECIPE_SCRAPE_FETCH_FAILED` | Jina Reader fetch failed for {url}: {error} |
 | `RECIPE_SCRAPE_NO_INGREDIENTS` | The AI found no ingredients — the page may not be a recipe |
+| `REGISTER_DATE_FROM_AFTER_DATE_TO` | The start date must not be after the end date |
 | `RELOCATION_BLOCKED_BY_RESERVATIONS` | Cannot move item: source stock has outstanding reservations. Release or fulfill them first. |
 | `RELOCATION_DESTINATION_FOREIGN` | Cannot move item: the destination is not this organization. |
 | `REMOVAL_STRATEGY_OF_SHARED_PRODUCT` | This product comes from the shared catalogue, so the order its stock leaves in is the catalogue's and cannot be changed for one organization. |

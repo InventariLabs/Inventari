@@ -28,27 +28,79 @@ const MAX_MODULE_LOAD_RELOADS = 2;
 const NETWORK_CHANGED = 'net::ERR_NETWORK_CHANGED';
 
 /**
+ * What one start of the app may take before a spec's clock starts. The dev
+ * server hands out about 500 modules per load: a second on a quiet host, 5.9 s
+ * (median) to 10.5 s (worst of 100) with twelve workers at load 80. A recovery
+ * reload starts all of it over, so the budget holds three starts.
+ */
+const APP_START_BUDGET = 35_000;
+
+/**
+ * The document has drawn past the app's full-screen loading state, to something
+ * other than its error screen: that one is what a failed start looks like, and
+ * the recovery reload comes after it, because the harness hears of the failure
+ * only once it is drawn. A screen no reload clears costs a failing spec the
+ * budget and is left to its assertion.
+ */
+const appHasStarted = () => {
+  const root = document.getElementById('root');
+  // Not one of the app's pages (a file, an API answer): nothing to wait for.
+  if (!root) return true;
+  return (
+    root.childElementCount > 0 &&
+    !document.querySelector('[data-testid="app-loading"], [data-testid="app-error"]')
+  );
+};
+
+/**
  * The test every spec imports, directly or through a fixture file that
  * extends it (`auth`, `polish`). A spec that imports `test` from
  * `@playwright/test` itself misses the recovery, and a transient abort during
  * a lazy route load fails it.
  */
 export const test = playwrightTest.extend({
-  page: async ({ page }, use) => {
+  page: async ({ page }, use, testInfo) => {
+    const goto = page.goto.bind(page);
+    const reloadPage = page.reload.bind(page);
     let reloads = 0;
     let reloading = false;
     const reload = () => {
       if (reloading || reloads >= MAX_MODULE_LOAD_RELOADS) return;
       reloads++;
       reloading = true;
+      // The start this reload repeats is not the test's to pay for.
+      testInfo.setTimeout(testInfo.timeout + APP_START_BUDGET / 3);
       // Fire-and-forget: the page may close under us when the test ends.
-      void page
-        .reload()
+      void reloadPage()
         .catch(() => {})
         .finally(() => {
           reloading = false;
         });
     };
+
+    /**
+     * Navigation returns at the `load` event, long before the app has drawn
+     * anything: a spec's next wait was timing the app's start, and a recovery
+     * reload inside it, instead of the thing it names. So a navigation ends
+     * when the app has started (the wait outlives a reload), and the test gets
+     * that time back. A page that never starts is left to the spec's own
+     * assertion to report.
+     */
+    const started =
+      <Args extends unknown[], Result>(navigate: (...args: Args) => Promise<Result>) =>
+      async (...args: Args): Promise<Result> => {
+        const begun = Date.now();
+        testInfo.setTimeout(testInfo.timeout + APP_START_BUDGET);
+        const result = await navigate(...args);
+        await page
+          .waitForFunction(appHasStarted, undefined, { timeout: APP_START_BUDGET })
+          .catch(() => {});
+        testInfo.setTimeout(testInfo.timeout - APP_START_BUDGET + (Date.now() - begun));
+        return result;
+      };
+    page.goto = started(goto);
+    page.reload = started(reloadPage);
+
     page.on('pageerror', (error) => {
       if (isTransientModuleLoadError(error.message)) reload();
     });

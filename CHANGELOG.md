@@ -38,6 +38,12 @@ says what the release does rather than what changed since them.
 - Amounts in a unit that is a word take its plural ("6 bottles").
 - An issue dated today can be planned from its page, so that picking can start
   on it without dating it tomorrow first.
+- Exporting the document register to CSV no longer loads every line, product
+  and user of the period into memory: a file of 20 000 documents of ten lines
+  takes half a second instead of seventeen and 40 MB instead of 1.2 GB. The
+  file itself is the same, still without a limit on rows. Asked through the API
+  for a period that ends before it starts, the export answers 400 with a sentence
+  saying so instead of an empty file.
 - A product whose nutrition came from Open Food Facts now counts its calories
   in recipe estimates and in the meal plan's daily totals. They used to go
   missing while its protein, fat and carbohydrates were counted, and the day

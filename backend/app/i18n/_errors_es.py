@@ -938,6 +938,7 @@ ERRORS_ES: ErrorMessages = {
     'recipe_collection_own_parent': 'Una colección no puede ser su propia colección superior',
     'recipe_collection_under_descendant': 'Una colección no se puede mover bajo una de sus subcolecciones',
     'recipe_scrape_failed': 'No se pudo obtener la receta de la URL',
+    'register_date_from_after_date_to': 'La fecha de inicio no puede ser posterior a la de fin',
     'meal_plan_end_before_start': 'La fecha de fin no puede ser anterior a la de inicio',
     'meal_plan_too_long': 'Un plan no puede superar los {days} días',
     'meal_plan_no_slots': 'Activa al menos una comida en el plan',
