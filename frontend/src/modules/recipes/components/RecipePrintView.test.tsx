@@ -171,6 +171,43 @@ describe("RecipePrintView — recipe card", () => {
     });
   });
 
+  /**
+   * Fat, protein and the rest of a recipe can be known while its calories are
+   * not. Paper said "0 kcal" then — a figure nobody measured, on the one sheet
+   * that leaves the app with no screen around it to contradict it.
+   */
+  it("says the calories are unknown rather than printing zero", () => {
+    render(
+      <RecipePrintView
+        recipe={baseRecipe}
+        servings={4}
+        nutrition={{
+          ...nutrition,
+          per_serving: { ...nutrition.per_serving, calories_kcal: null },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Calories unknown")).toBeInTheDocument();
+    expect(screen.queryByText(/\bkcal\b/)).toBeNull();
+  });
+
+  it("keeps a measured zero: a recipe of water has 0 kcal", () => {
+    render(
+      <RecipePrintView
+        recipe={baseRecipe}
+        servings={4}
+        nutrition={{
+          ...nutrition,
+          per_serving: { ...nutrition.per_serving, calories_kcal: 0 },
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/^0\s*kcal$/)).toBeInTheDocument();
+    expect(screen.queryByText("Calories unknown")).toBeNull();
+  });
+
   it("says on paper when the nutrition covers only part of the ingredients", () => {
     render(
       <RecipePrintView

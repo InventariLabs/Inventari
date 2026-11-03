@@ -10,6 +10,17 @@ heading carries the date it was cut. The history starts at 0.11.0, the first
 public release: the versions before it were never published, so its section
 says what the release does rather than what changed since them.
 
+## Unreleased
+
+### Fixed
+
+- A product whose nutrition came from Open Food Facts now counts its calories
+  in recipe estimates and in the meal plan's daily totals. They used to go
+  missing while its protein, fat and carbohydrates were counted, and the day
+  lost its totals altogether.
+- A printed recipe whose calories are not known says "Calories unknown" instead
+  of "0 kcal".
+
 ## v0.11.0 - 2026-11-02
 
 The first public release, and the one that makes the warehouse documents a

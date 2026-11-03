@@ -72,6 +72,22 @@ function PrintAllergens({ allergens }: { allergens: string[] }) {
   );
 }
 
+/**
+ * Unknown calories are said in words: a zero here is a figure nobody measured,
+ * on a sheet with no screen around it to contradict it. A measured 0 stays a 0.
+ */
+function PrintCalories({ value }: { value?: number | string | null }) {
+  const { t } = useTranslation("recipes");
+  const calories = toAmount(value);
+  return (
+    <span>
+      {calories == null
+        ? t("recipes:print.calories_unknown")
+        : `${Math.round(calories)} kcal`}
+    </span>
+  );
+}
+
 /** The estimate caveat under the nutrition line; it names generic values when used. */
 function PrintNutritionEstimate({ generic }: { generic?: boolean }) {
   const { t } = useTranslation("recipes");
@@ -174,10 +190,7 @@ export function RecipePrintView({
             <div className="text-sm mt-1 flex flex-wrap gap-x-4 gap-y-0.5">
               {nutritionSummary && (
                 <>
-                  <span>
-                    {Math.round(toAmount(nutritionSummary.calories_kcal) ?? 0)}{" "}
-                    kcal
-                  </span>
+                  <PrintCalories value={nutritionSummary.calories_kcal} />
                   {/* The macros are written exactly as the screen writes them
                       (one decimal, the reader's mark) — paper is read like a
                       screen, and `Math.round` gave the same number a second
