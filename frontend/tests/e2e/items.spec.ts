@@ -84,8 +84,36 @@ test.describe("Items — CRUD flow", () => {
   });
 
   test.beforeEach(async ({ page, authenticatedPage }) => {
+    // The filter chips belong to a list that loaded: while its request fails
+    // the page shows an error panel and no chips (an empty account has none
+    // either). A test that goes straight for a chip then reports a missing
+    // selector, and says nothing of the request that failed — so the screen
+    // is first held to showing a row, and a miss names the failed answers.
+    const failedLists: string[] = [];
+    page.on("response", (response) => {
+      const { pathname } = new URL(response.url());
+      if (
+        response.request().method() === "GET" &&
+        pathname === "/api/v1/items" &&
+        !response.ok()
+      ) {
+        failedLists.push(`${response.status()} ${response.url()}`);
+      }
+    });
     await page.goto("/inventory/items");
     await page.waitForLoadState("networkidle").catch(() => {});
+    try {
+      await expect(page.getByTestId("item-row").first()).toBeVisible({
+        timeout: 15000,
+      });
+    } catch (error) {
+      throw new Error(
+        `The item list showed no row. Failed list requests: ${
+          failedLists.join(", ") || "none"
+        }`,
+        { cause: error },
+      );
+    }
   });
 
   test("displays item list", async ({ page, authenticatedPage }) => {
