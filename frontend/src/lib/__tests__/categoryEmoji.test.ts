@@ -12,8 +12,8 @@ import {
 describe("resolveCategoryEmoji — the equipment presets", () => {
   it.each([
     ["Desktop Computer", "🖥️"],
-    ["Network Device", "🌐"],
-    ["Peripheral", "🕹️"],
+    ["Network Device", "🔌"],
+    ["Peripheral", "🖱️"],
   ])(
     "gives %s a glyph of its own instead of the last-resort box",
     (name, emoji) => {

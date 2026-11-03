@@ -120,8 +120,8 @@ KEYWORD_EMOJI_MAP: list[_EmojiEntry] = [
     _EmojiEntry(('battery', 'bateria', 'akumulator'), '🔋'),
     _EmojiEntry(('chip', 'cpu', 'procesor'), '🔩'),
     _EmojiEntry(('desktop', 'stacjonarn'), '🖥️'),
-    _EmojiEntry(('network', 'router', 'sieciow'), '🌐'),
-    _EmojiEntry(('peripheral', 'peryferi'), '🕹️'),
+    _EmojiEntry(('network', 'router', 'sieciow'), '🔌'),
+    _EmojiEntry(('peripheral', 'peryferi'), '🖱️'),
     # ── Tools ────────────────────────────────────────────────
     _EmojiEntry(('tool', 'narzędz'), '🧰'),
     _EmojiEntry(('hammer', 'młotek'), '🔨'),
