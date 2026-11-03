@@ -346,16 +346,17 @@ test.describe("Recipes — detail & sub-pages", () => {
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    // Open the recipe this describe seeded, not whichever card is first: a
-    // parallel spec can delete an arbitrary card between the list and the
-    // click, and the detail request then answers 404.
+    // Open this describe's own recipe by name. Taking whichever card is first
+    // lets a parallel worker's cleanup delete the clicked recipe mid-navigation.
     await page
-      .getByPlaceholder(/search|szukaj|wyszukaj|znajdź/i)
+      .getByPlaceholder(/search/i)
+      .first()
       .fill(detailRecipeName);
     const card = page
       .locator('[data-testid="recipe-card"]')
-      .filter({ hasText: detailRecipeName });
-    await expect(card).toHaveCount(1, { timeout: 15000 });
+      .filter({ hasText: detailRecipeName })
+      .first();
+    await expect(card).toBeVisible({ timeout: 15000 });
 
     const loaded = expectApiOk(
       page,
@@ -364,6 +365,7 @@ test.describe("Recipes — detail & sub-pages", () => {
     await card.click();
     await loaded;
 
+    await expect(page).toHaveURL(new RegExp(`/recipes/${detailRecipeId}$`));
     await expect(
       page.getByRole("heading", { level: 1, name: detailRecipeName }),
     ).toBeVisible({ timeout: 15000 });

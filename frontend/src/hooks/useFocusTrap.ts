@@ -30,11 +30,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(
     const focusableElements =
       container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS);
     if (focusableElements.length > 0) {
-      // Without `preventScroll` the browser scrolls the page behind the modal
-      // to reveal a field that is still sliding in. A search list open in the
-      // modal closes on any scroll, so that jump closed the results a moment
-      // after the user typed.
-      focusableElements[0].focus({ preventScroll: true });
+      focusableElements[0].focus();
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {

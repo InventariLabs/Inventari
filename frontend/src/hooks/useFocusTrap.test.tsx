@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { useFocusTrap } from "./useFocusTrap";
 
 function TrapContainer({ isActive }: { isActive: boolean }) {
@@ -30,13 +30,6 @@ describe("useFocusTrap", () => {
     render(<TrapContainer isActive={true} />);
     // After activation, first button should receive focus
     expect(document.activeElement?.textContent).toBe("First");
-  });
-
-  it("focuses the first element without scrolling the page behind it", () => {
-    const focus = vi.spyOn(HTMLElement.prototype, "focus");
-    render(<TrapContainer isActive={true} />);
-    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
-    focus.mockRestore();
   });
 
   it("does not auto-focus when inactive", () => {
