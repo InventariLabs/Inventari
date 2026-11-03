@@ -343,6 +343,11 @@ const VALUE_RESOLVERS: Record<
   focus_module: (t, code) => auditModuleName(t, code, ""),
   equipment_status: (t, code) =>
     t(`equipment:status.${code.toLowerCase()}`, { defaultValue: "" }),
+  // The condition an asset came back in: the words the return dialog offers.
+  condition: (t, code) =>
+    t(`equipment:assignments.condition_${code.toLowerCase()}`, {
+      defaultValue: "",
+    }),
   role: (t, code) =>
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",

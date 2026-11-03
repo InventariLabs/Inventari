@@ -1,3 +1,4 @@
+import { useHoldsAssignment } from "@/modules/equipment/hooks/useHoldsAssignment";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { User, RotateCcw, FileText, MapPin } from "lucide-react";
@@ -69,6 +70,7 @@ export function AssignmentsTab({
   );
 
   const active = history.find((a: EquipmentAssignment) => !a.checked_in_at);
+  const holdsIt = useHoldsAssignment(active ?? null);
 
   const openProtocol = async (assignmentId: string) => {
     const { equipmentApi } = await import("@/modules/equipment/api/equipment");
@@ -107,7 +109,9 @@ export function AssignmentsTab({
               leftIcon={<RotateCcw size={16} />}
               onClick={() => onCheckin(active)}
             >
-              {t("assignments.checkin")}
+              {holdsIt
+                ? t("assignments.checkin_modal.submit_holder")
+                : t("assignments.checkin")}
             </Button>
           ) : null)}
       </div>

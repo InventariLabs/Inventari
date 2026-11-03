@@ -1,3 +1,4 @@
+import { useHoldsAssignment } from "@/modules/equipment/hooks/useHoldsAssignment";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -58,6 +59,7 @@ export function AssetDetailHeaderActions({
   onArchive,
 }: AssetDetailHeaderActionsProps) {
   const { t } = useTranslation("equipment");
+  const holdsIt = useHoldsAssignment(activeAssignment);
   const [returnStatus, setReturnStatus] = useState<EquipmentStatus | null>(
     null,
   );
@@ -106,7 +108,9 @@ export function AssetDetailHeaderActions({
           leftIcon={<LogIn size={14} />}
           onClick={() => onCheckin(activeAssignment)}
         >
-          {t("actions.checkin")}
+          {holdsIt
+            ? t("assignments.checkin_modal.submit_holder")
+            : t("actions.checkin")}
         </Button>
       )}
       {approvalStatus?.has_workflow &&

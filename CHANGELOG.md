@@ -12,6 +12,11 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Added
+
+- Module authors can ask `@/module-sdk` whether the signed-in user is the person
+  a record names by e-mail address (`useIsSignedInAs`).
+
 ### Fixed
 
 - A recipe's page and printout show a dash for a nutrient no ingredient
@@ -38,6 +43,10 @@ says what the release does rather than what changed since them.
 - Amounts in a unit that is a word take its plural ("6 bottles").
 - An issue dated today can be planned from its page, so that picking can start
   on it without dating it tomorrow first.
+- Importing ingredient data from a file the import cannot read, a photo or a
+  JSON file that holds no list of rows for instance, now says what the import
+  expects: a .json or .csv file with one row per ingredient, in every
+  maintained language. It used to repeat the JSON parser's own words.
 - Exporting the document register to CSV no longer loads every line, product
   and user of the period into memory: a file of 20 000 documents of ten lines
   takes half a second instead of seventeen and 40 MB instead of 1.2 GB. The
@@ -54,6 +63,19 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- Handing an asset back, from "My assets" or from the asset's own page, opens a
+  dialog titled and worded for the person returning it (the page's button reads
+  "Return" too, not the manager's "Accept"), and the damaged and needs-repair choices each say
+  which repair entry they open. The holder's assignment history prints both
+  days and the condition in the interface language, and the organization log
+  does the same for the condition of a return.
+- The organization log marks the settings a workspace mode writes when it is
+  chosen as "Workspace mode default" instead of an update the person made.
+- On a phone, the buttons of the sheet that issues an asset stay in view at the
+  foot of the sheet instead of ending below its edge until the form was
+  scrolled, and the notice that an approval is needed sits beside them.
+- The equipment overview counts a new asset as soon as it is saved, also after
+  a batch add, without reloading the page.
 - The new production dialog writes the unit the way the rest of the app does
   ("szt." rather than "pcs"), and its hint about the recipe's batch no longer
   ends in two full stops. The audit log names the unit a product template was
