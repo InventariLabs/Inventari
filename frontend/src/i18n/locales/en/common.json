@@ -369,7 +369,7 @@
       },
       "revoked": "Revoked",
       "invitationAccepted": "Accepted",
-      "profileDefault": "Profile default",
+      "profileDefault": "Workspace mode default",
       "fields": {
         "address": "Address",
         "adjusted_items": "Adjusted rows",

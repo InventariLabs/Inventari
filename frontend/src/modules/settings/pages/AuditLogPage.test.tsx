@@ -716,7 +716,9 @@ describe("AuditLogPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("Profile default")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Workspace mode default"),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Update")).toHaveLength(1);
   });
 

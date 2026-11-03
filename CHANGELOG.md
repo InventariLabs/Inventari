@@ -26,7 +26,7 @@ says what the release does rather than what changed since them.
   days and the condition in the interface language, and the organization log
   does the same for the condition of a return.
 - The organization log marks the settings a workspace mode writes when it is
-  chosen as "Profile default" instead of an update the person made.
+  chosen as "Workspace mode default" instead of an update the person made.
 - The equipment overview counts a new asset as soon as it is saved, also after
   a batch add, without reloading the page.
 
