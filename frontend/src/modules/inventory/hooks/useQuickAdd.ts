@@ -2,7 +2,11 @@ import { useState, useMemo, useRef } from "react";
 import { logger } from "@/utils/logger";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { useAppMutation } from "@/lib/api/mutationFactory";
-import { apiErrorStatus, extractApiError } from "@/lib/errors";
+import {
+  SessionEndedError,
+  apiErrorStatus,
+  extractApiError,
+} from "@/lib/errors";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -159,7 +163,7 @@ export function useQuickAdd({
           });
         } catch (error) {
           toast.error(
-            extractApiError(
+            followUpError(
               error,
               t("items:messages.fileUploadFailedAttachment"),
             ),
@@ -177,11 +181,9 @@ export function useQuickAdd({
           );
           setImagePreview(image_url);
         } catch (error) {
-          const message = extractApiError(
-            error,
-            t("items:messages.fileUploadFailed"),
+          toast.error(
+            followUpError(error, t("items:messages.fileUploadFailed")),
           );
-          toast.error(message);
         }
         pendingImage.current = null;
       }
@@ -427,6 +429,17 @@ export function useQuickAdd({
     handleFileSelect,
     handleImageSelect,
   };
+}
+
+/**
+ * The toast for a step that runs after the product was already created.
+ * An ended session's own sentence says the work was not saved, which is not
+ * true here — the product is in — so the step's own failure sentence stands.
+ */
+function followUpError(error: unknown, fallback: string): string {
+  return error instanceof SessionEndedError
+    ? fallback
+    : extractApiError(error, fallback);
 }
 
 /**

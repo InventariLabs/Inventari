@@ -122,10 +122,20 @@ const processQueue = (error: unknown, token: string | null = null) => {
 /**
  * What a request that was waiting on the session is told when the session is
  * over: the sign-in form follows, and the toast that would have said "Failed
- * to add" says instead that the session ended and the work was not saved.
+ * to add" says instead that the session ended — and, for a request that was
+ * going to save something, that the work was not saved. A read saved nothing,
+ * so the sentence it gets does not claim otherwise.
  */
-function sessionEndedError(): SessionEndedError {
-  return new SessionEndedError(i18next.t("common:errors.sessionEnded"));
+function sessionEndedError(
+  request: { method?: string } | undefined,
+): SessionEndedError {
+  const method = (request?.method ?? "get").toLowerCase();
+  const reads = method === "get" || method === "head" || method === "options";
+  return new SessionEndedError(
+    i18next.t(
+      reads ? "common:errors.sessionEndedRead" : "common:errors.sessionEnded",
+    ),
+  );
 }
 
 // Handle 401 errors with Silent Refresh
@@ -160,7 +170,13 @@ api.interceptors.response.use(
             return api(originalRequest);
           })
           .catch((err) => {
-            return Promise.reject(err);
+            // The sentence is worded by what this request was doing, not by
+            // what the request that started the refresh was.
+            return Promise.reject(
+              err instanceof SessionEndedError
+                ? sessionEndedError(originalRequest)
+                : err,
+            );
           });
       }
 
@@ -185,10 +201,9 @@ api.interceptors.response.use(
         if (!access_token) {
           // 204: the server answered that there is no session to refresh.
           // The 401 that led here is final — end the session the same way a
-          // refusal does.
-          tokenStore.clear();
-          window.dispatchEvent(new CustomEvent("auth:logout"));
-          throw sessionEndedError();
+          // refusal does: the catch below reads this error as one and is the
+          // only place that clears the token and announces the sign-out.
+          throw sessionEndedError(originalRequest);
         }
         tokenStore.set(access_token);
         // Notify long-lived consumers (WebSocket bridge) that the access
@@ -203,7 +218,7 @@ api.interceptors.response.use(
         // started this reads it as that, not as the refusal's raw sentence or
         // as its own generic failure.
         const refreshError = isServerRefusal(caught)
-          ? sessionEndedError()
+          ? sessionEndedError(originalRequest)
           : caught;
         processQueue(refreshError, null);
         // A refresh that never got an answer is an outage, not a session's

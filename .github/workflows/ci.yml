@@ -287,14 +287,107 @@ jobs:
       - name: Suppressions have an owner and a live date
         run: npm run check:suppressions
 
-      # See the backend job: a failed gate must not hide the test results.
+      # See the backend job: a failed gate must not hide the build's result.
       - name: Type Check & Build
         if: ${{ !cancelled() }}
         run: npm run build:check
 
+  # The local gate's `vitest run --coverage`, in four parts. As one step it was
+  # nearly all of the frontend's time: 42 minutes of a 44-minute job on the
+  # two-CPU runner, 16 to 25 of 17 to 27 on the four-CPU one, while everything
+  # else in the job takes under two. Each test file already runs in a process
+  # of its own, so where a file runs changes nothing it can see.
+  frontend-unit:
+    name: Frontend unit tests (${{ matrix.shard }}/4)
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      # One red part must not cancel the others: the whole list of failures is
+      # the answer, and the merge below needs every part's report.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The floors are zero here and only here. They are measured over every
+      # source file, so a quarter of the suite is far below them by
+      # construction (and would fail every part). The floors themselves are
+      # checked on the merged report, by frontend-coverage below, from
+      # vite.config.ts unchanged.
       - name: Unit Tests (Vitest)
+        run: >-
+          npx vitest run --shard=${{ matrix.shard }}/4 --reporter=blob
+          --coverage --coverage.reporter=json
+          --coverage.thresholds.lines=0
+          --coverage.thresholds.functions=0
+          --coverage.thresholds.branches=0
+          --coverage.thresholds.statements=0
+
+      # `.vitest` is a dot directory, which upload-artifact skips unless told.
+      - name: Upload this part's report
         if: ${{ !cancelled() }}
-        run: npm run test:coverage
+        uses: actions/upload-artifact@v7
+        with:
+          name: vitest-report-${{ matrix.shard }}
+          path: frontend/.vitest/blob/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  # The whole suite's verdict: every part's tests and coverage replayed as one
+  # run, with the floors of vite.config.ts applied to the total. It runs after
+  # a red part too, so the log still lists every failure in one place. Measured
+  # on one tree, three runs of this against two of the single step: the same
+  # 1160 files and 11299 tests, and totals within 0.02 of a point. The single
+  # step and one of the three agree on every source file; the rest differ in a
+  # few whose tests race a timer, and differ from each other in those too.
+  frontend-coverage:
+    name: Frontend coverage floors
+    needs: [changes, frontend-unit]
+    if: ${{ !cancelled() && needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download the parts' reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: vitest-report-*
+          path: frontend/.vitest/blob
+          merge-multiple: true
+
+      - name: Merge the parts and apply the coverage floors
+        run: npx vitest run --merge-reports --coverage
 
   e2e:
     name: E2E (Playwright)

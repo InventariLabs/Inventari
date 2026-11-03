@@ -1127,7 +1127,8 @@
     "backendUnavailableTitle": "Não foi possível acessar o servidor",
     "backendUnavailableBody": "Sua sessão continua aberta — o servidor apenas não respondeu. Tente novamente em instantes; se continuar falhando, fale com quem administra esta instalação.",
     "fileTooLarge": "Arquivo grande demais. Tamanho máximo: {{maxMB}} MB",
-    "sessionEnded": "A sua sessão terminou, por isso nada foi guardado. Inicie sessão novamente e comece de novo.",
+    "sessionEnded": "Sua sessão terminou, então nada foi salvo. Entre novamente e comece de novo.",
+    "sessionEndedRead": "Sua sessão terminou. Entre novamente.",
     "imageFormatUnsupported": "Este formato de imagem não é compatível. Use uma imagem JPG, PNG, GIF ou WebP.",
     "modulesUnavailableTitle": "Não foi possível ler a lista de módulos",
     "modulesUnavailableBody": "A lista de módulos ativados da sua organização não pôde ser lida, então os espaços de trabalho não podem ser nomeados. Nada foi perdido — tente de novo em instantes; se continuar falhando, fale com quem administra esta instalação."

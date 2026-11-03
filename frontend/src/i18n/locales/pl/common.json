@@ -1170,6 +1170,7 @@
     "backendUnavailableBody": "Sesja jest nadal otwarta — to serwer nie odpowiedział. Spróbuj ponownie za chwilę, a jeśli błąd się powtarza, zgłoś to administratorowi instalacji.",
     "fileTooLarge": "Plik jest za duży. Maksymalny rozmiar: {{maxMB}} MB",
     "sessionEnded": "Twoja sesja się skończyła, więc nic nie zostało zapisane. Zaloguj się ponownie i zacznij od początku.",
+    "sessionEndedRead": "Twoja sesja się skończyła. Zaloguj się ponownie.",
     "imageFormatUnsupported": "Ten format zdjęcia nie jest obsługiwany. Użyj zdjęcia JPG, PNG, GIF lub WebP.",
     "modulesUnavailableTitle": "Nie udało się odczytać listy modułów",
     "modulesUnavailableBody": "Nie udało się odczytać listy modułów włączonych w tej organizacji, więc nie da się nazwać obszarów roboczych. Nic nie przepadło — spróbuj ponownie za chwilę, a jeśli błąd się powtarza, zgłoś to administratorowi instalacji."

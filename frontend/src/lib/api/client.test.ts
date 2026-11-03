@@ -235,20 +235,110 @@ describe("a session that ended under a request says so", () => {
     "reads as the session's end, not a generic failure, when the refresh %s",
     async (_name, refreshAnswer) => {
       server.use(
-        http.get("*/api/v1/things", () =>
+        http.post("*/api/v1/things", () =>
           HttpResponse.json({ detail: "stale token" }, { status: 401 }),
         ),
         http.post("*/api/v1/auth/refresh", refreshAnswer),
       );
       tokenStore.set("expired-token");
 
-      const message = await api.get("/things").then(
+      const message = await api.post("/things", {}).then(
         () => null,
         (e: unknown) => extractApiError(e, "Failed to add"),
       );
 
       expect(message).toBe(sentence());
       expect(message).not.toBe("Failed to add");
+    },
+  );
+
+  it("does not tell a read that it saved nothing", async () => {
+    server.use(
+      http.get("*/api/v1/things", () =>
+        HttpResponse.json({ detail: "stale token" }, { status: 401 }),
+      ),
+      http.post("*/api/v1/things", () =>
+        HttpResponse.json({ detail: "stale token" }, { status: 401 }),
+      ),
+      http.post(
+        "*/api/v1/auth/refresh",
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+    );
+    tokenStore.set("expired-token");
+
+    const read = await api.get("/things").then(
+      () => null,
+      (e: unknown) => extractApiError(e, "Failed to load"),
+    );
+    tokenStore.set("expired-token");
+    const write = await api.post("/things", {}).then(
+      () => null,
+      (e: unknown) => extractApiError(e, "Failed to add"),
+    );
+
+    expect(read).toBe(i18next.t("common:errors.sessionEndedRead"));
+    expect(write).toBe(sentence());
+    expect(read).not.toBe(write);
+  });
+
+  it("hands a request queued behind the refresh the session's end, not the refresh's raw refusal", async () => {
+    server.use(
+      http.get("*/api/v1/things", () =>
+        HttpResponse.json({ detail: "stale token" }, { status: 401 }),
+      ),
+      http.get("*/api/v1/others", () =>
+        HttpResponse.json({ detail: "stale token" }, { status: 401 }),
+      ),
+      http.post("*/api/v1/auth/refresh", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        return HttpResponse.json({ detail: "raw refusal" }, { status: 401 });
+      }),
+    );
+    tokenStore.set("expired-token");
+
+    const [first, queued] = await Promise.all(
+      ["/things", "/others"].map((url) =>
+        api.get(url).then(
+          () => null,
+          (e: unknown) => extractApiError(e, "Failed to load"),
+        ),
+      ),
+    );
+
+    expect(first).toBe(i18next.t("common:errors.sessionEndedRead"));
+    expect(queued).toBe(i18next.t("common:errors.sessionEndedRead"));
+  });
+
+  it.each([
+    ["answers 204", () => new HttpResponse(null, { status: 204 })],
+    [
+      "is refused with 401",
+      () => HttpResponse.json({ detail: "revoked" }, { status: 401 }),
+    ],
+  ])(
+    "announces the sign-out once when the refresh %s",
+    async (_name, refreshAnswer) => {
+      server.use(
+        http.get("*/api/v1/things", () =>
+          HttpResponse.json({ detail: "stale token" }, { status: 401 }),
+        ),
+        http.post("*/api/v1/auth/refresh", refreshAnswer),
+      );
+      tokenStore.set("expired-token");
+      let logouts = 0;
+      const count = () => {
+        logouts += 1;
+      };
+      window.addEventListener("auth:logout", count);
+      try {
+        await api.get("/things").catch(() => null);
+      } finally {
+        window.removeEventListener("auth:logout", count);
+      }
+
+      expect(logouts).toBe(1);
+      expect(tokenStore.get()).toBeNull();
     },
   );
 });

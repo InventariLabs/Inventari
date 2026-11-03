@@ -10,6 +10,7 @@ import { useScanStore } from "@/store/scanStore";
 import { useFormMemoryStore } from "@/store/formMemoryStore";
 import { useFormGuardStore } from "@/store/formGuardStore";
 import { toast } from "sonner";
+import i18next from "i18next";
 import type { VisionExtractResult } from "@/types";
 import { onePage } from "@/test/mocks/page";
 import { serveLocations } from "@/test/serveLocations";
@@ -177,6 +178,52 @@ describe("useQuickAdd", () => {
     });
 
     await waitFor(() => expect(uploads).toEqual(["new-item"]));
+  });
+
+  it("does not say the product was not saved when only its photo was refused by an ended session", async () => {
+    // The product is created first; the photo goes up after. A session that
+    // ends in between used to put "this was not saved" in a toast beside
+    // "Product added".
+    server.use(
+      http.post("/api/v1/items", () =>
+        HttpResponse.json(
+          { id: "new-item", name: "Jam", quantity: 1, metadata: null },
+          { status: 201 },
+        ),
+      ),
+      http.post("/api/v1/items/:id/image", () =>
+        HttpResponse.json({ detail: "expired" }, { status: 401 }),
+      ),
+      http.post(
+        "*/api/v1/auth/refresh",
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+    );
+    const error = vi.spyOn(toast, "error");
+
+    const { result } = renderHook(() => useQuickAdd({ onSuccess: vi.fn() }), {
+      wrapper: createWrapper(),
+    });
+    act(() => {
+      result.current.handleImageSelect(
+        new File(["photo"], "jam.jpg", { type: "image/jpeg" }),
+      );
+      result.current.setFormData((prev) => ({
+        ...prev,
+        name: "Jam",
+        quantity: "1",
+        location_id: "1",
+      }));
+    });
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    await waitFor(() => expect(error).toHaveBeenCalled());
+    const shown = error.mock.calls.map(([message]) => String(message));
+    expect(shown).toContain(i18next.t("items:messages.fileUploadFailed"));
+    expect(shown).not.toContain(i18next.t("common:errors.sessionEnded"));
+    error.mockRestore();
   });
 });
 

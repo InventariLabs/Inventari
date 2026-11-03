@@ -1136,6 +1136,7 @@
     "backendUnavailableBody": "Your session is still open — the server just did not answer. Try again in a moment; if it keeps failing, ask whoever runs this installation.",
     "fileTooLarge": "File too large. Maximum size: {{maxMB}} MB",
     "sessionEnded": "Your session has ended, so this was not saved. Sign in again and start over.",
+    "sessionEndedRead": "Your session has ended. Sign in again.",
     "imageFormatUnsupported": "This picture format is not supported. Use a JPG, PNG, GIF or WebP picture.",
     "modulesUnavailableTitle": "The module list could not be read",
     "modulesUnavailableBody": "Your organization's list of enabled modules could not be read, so the workspaces cannot be named. Nothing was lost — ask again in a moment; if it keeps failing, ask whoever runs this installation."
