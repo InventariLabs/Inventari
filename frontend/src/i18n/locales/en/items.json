@@ -260,6 +260,7 @@
     "purchase_price": "Purchase price per unit",
     "barcode": "Product code",
     "generateCode": "Generate code",
+    "generateCodeHint": "An internal code of this organization, from the range GS1 reserves for in-house codes, so it cannot be mistaken for a manufacturer's code. It is valid only inside the organization: goods sold on through other businesses' tills need a GTIN from GS1.",
     "sku": "SKU",
     "serial_number": "Serial Number",
     "purchasePriceUnitHint": "Per 1 {{unit}} — not the amount paid for the whole quantity.",
