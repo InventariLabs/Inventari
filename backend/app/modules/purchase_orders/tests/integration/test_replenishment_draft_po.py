@@ -263,7 +263,9 @@ class TestReplenishmentDraftPos:
             '/api/v1/purchase-orders/replenishment/alerts', headers=po_auth_headers
         )
         assert alerts.status_code == status.HTTP_200_OK
-        [alert] = [a for a in alerts.json() if a['reorder_rule_id'] == str(rule.id)]
+        [alert] = [
+            a for a in alerts.json()['items'] if a['reorder_rule_id'] == str(rule.id)
+        ]
         assert alert['preferred_partner_id'] == str(po_partner.id)
         assert alert['preferred_partner_name'] == po_partner.name
 
