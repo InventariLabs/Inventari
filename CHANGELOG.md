@@ -14,6 +14,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Importing ingredient data from a file the import cannot read, a photo or a
+  JSON file that holds no list of rows for instance, now says what the import
+  expects: a .json or .csv file with one row per ingredient, in every
+  maintained language. It used to repeat the JSON parser's own words.
 - Exporting the document register to CSV no longer loads every line, product
   and user of the period into memory: a file of 20 000 documents of ten lines
   takes half a second instead of seventeen and 40 MB instead of 1.2 GB. The

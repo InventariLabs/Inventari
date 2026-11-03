@@ -650,7 +650,7 @@ ERRORS_ES: ErrorMessages = {
     'document_update_status': 'Solo se pueden actualizar los documentos en estado borrador',
     'document_correction_locked': 'Los documentos de corrección están bloqueados: solo se pueden modificar las notas. Intento de cambio: {fields}. Cancele la corrección y cree una nueva si los datos son incorrectos.',
     'field_cannot_be_cleared': 'Estos campos no se pueden vaciar: {fields}.',
-    'ingredient_defaults_unreadable_file': 'No se pudo leer el archivo: {detail}',
+    'ingredient_defaults_unreadable_file': 'No se pudo leer el archivo. La importación espera un archivo .json o .csv con una fila por ingrediente.',
     'onboarding_modules_not_offered': 'El perfil «{profile}» no ofrece estos módulos: {modules}',
     'location_chain_step_incomplete': 'Cada paso de una cadena de ubicaciones necesita un id o un nombre.',
     'current_password_incorrect': 'La contraseña actual es incorrecta',

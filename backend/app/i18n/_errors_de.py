@@ -652,7 +652,7 @@ ERRORS_DE: ErrorMessages = {
     'document_update_status': 'Nur Dokumente im Entwurfsstatus können aktualisiert werden',
     'document_correction_locked': 'Korrekturdokumente sind gesperrt — nur Notizen können geändert werden. Änderungsversuch: {fields}. Brechen Sie die Korrektur ab und erstellen Sie eine neue, wenn die Daten falsch sind.',
     'field_cannot_be_cleared': 'Diese Felder können nicht geleert werden: {fields}.',
-    'ingredient_defaults_unreadable_file': 'Die Datei konnte nicht gelesen werden: {detail}',
+    'ingredient_defaults_unreadable_file': 'Die Datei konnte nicht gelesen werden. Der Import erwartet eine .json- oder .csv-Datei mit einer Zeile pro Zutat.',
     'onboarding_modules_not_offered': 'Das Profil „{profile}“ bietet diese Module nicht an: {modules}',
     'location_chain_step_incomplete': 'Jeder Schritt einer Standortkette braucht eine ID oder einen Namen.',
     'current_password_incorrect': 'Das aktuelle Passwort ist falsch',
