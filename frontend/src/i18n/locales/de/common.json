@@ -1261,6 +1261,7 @@
   },
   "combobox": {
     "searching": "Suche…",
+    "searchFailed": "Die Suche ist fehlgeschlagen. Bitte erneut versuchen.",
     "noResults": "Keine Ergebnisse für \"{{query}}\""
   },
   "productQuickCreate": {
