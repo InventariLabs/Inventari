@@ -179,10 +179,10 @@ async def import_ingredient_defaults(
             items = list(reader)
         else:
             items = json_module.loads(content)
+        if not isinstance(items, list):
+            raise ValueError('the file holds no list of rows')
     except Exception as exc:  # an uploaded file's every parse failure is a refusal
-        raise catalogue_refusal(
-            'ingredient_defaults_unreadable_file', detail=str(exc)
-        ) from exc
+        raise catalogue_refusal('ingredient_defaults_unreadable_file') from exc
 
     if len(items) > MAX_IMPORT_ROWS:
         raise catalogue_refusal(
