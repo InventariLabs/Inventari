@@ -126,7 +126,7 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
     // Offering "add as new" here would invite a duplicate of a product the
     // search never got to look for.
     return (
-      <div role="alert" className="p-3 text-sm text-danger">
+      <div role="alert" className="p-3 text-sm text-on-danger">
         {t("combobox.searchFailed")}
       </div>
     );
