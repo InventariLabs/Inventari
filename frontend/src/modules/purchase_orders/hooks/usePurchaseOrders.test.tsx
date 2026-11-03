@@ -19,6 +19,7 @@ import {
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
 import { queryKeys } from "@/hooks/queries/keys";
+import type { PurchaseOrder } from "../types/purchase-orders";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -425,12 +426,14 @@ describe("useRejectPO", () => {
   });
 });
 
+type POStatus = PurchaseOrder["status"];
+
 describe("usePOApprovalRequirement", () => {
   beforeEach(() => {
     modules.enabled = ["purchase_orders", "approvals"];
   });
 
-  const asked = (status: string) => {
+  const asked = (status: POStatus) => {
     const calls: string[] = [];
     server.use(
       http.get("/api/v1/purchase-orders/:po_id/approval-requirement", () => {
@@ -446,7 +449,7 @@ describe("usePOApprovalRequirement", () => {
     return calls;
   };
 
-  it.each(["DRAFT", "PENDING_APPROVAL"])(
+  it.each<POStatus>(["DRAFT", "PENDING_APPROVAL"])(
     "asks the server about an order that is %s",
     async (status) => {
       const calls = asked(status);
