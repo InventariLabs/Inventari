@@ -743,7 +743,8 @@
   "print": {
     "print": "Print",
     "printed_on": "Printed on {{date}}",
-    "per_serving": "Per serving"
+    "per_serving": "Per serving",
+    "calories_unknown": "Calories unknown"
   },
   "bulk": {
     "select_mode": "Select recipes",

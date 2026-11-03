@@ -268,7 +268,7 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
       await page.getByRole("button", { name: "Back" }).click();
       await expect(page).toHaveURL(/\/launcher$/);
     } finally {
-      await api.deletePurchaseOrder(token, seeded.id).catch(() => {});
+      await api.cancelPurchaseOrder(token, seeded.id).catch(() => {});
       await api.deletePartner(token, seeded.partnerId).catch(() => {});
     }
   });

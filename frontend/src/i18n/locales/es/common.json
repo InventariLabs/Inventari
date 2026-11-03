@@ -1138,6 +1138,7 @@
     "backendUnavailableBody": "Tu sesión sigue abierta: es el servidor el que no ha respondido. Inténtalo de nuevo en un momento y, si el error persiste, avisa a quien administra esta instalación.",
     "fileTooLarge": "Archivo demasiado grande. Tamaño máximo: {{maxMB}} MB",
     "sessionEnded": "Tu sesión ha terminado, así que no se guardó nada. Inicia sesión de nuevo y empieza otra vez.",
+    "sessionEndedRead": "Tu sesión ha terminado. Inicia sesión de nuevo.",
     "imageFormatUnsupported": "Este formato de imagen no es compatible. Usa una imagen JPG, PNG, GIF o WebP.",
     "modulesUnavailableTitle": "No se pudo leer la lista de módulos",
     "modulesUnavailableBody": "No se pudo leer la lista de módulos activos de tu organización, así que no se pueden nombrar los espacios de trabajo. No se ha perdido nada: inténtalo de nuevo en un momento y, si el error persiste, avisa a quien administra esta instalación."

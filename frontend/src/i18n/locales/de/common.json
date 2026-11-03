@@ -1136,6 +1136,7 @@
     "backendUnavailableBody": "Ihre Sitzung ist weiterhin aktiv — nur der Server hat nicht geantwortet. Versuchen Sie es gleich noch einmal; bleibt der Fehler, wenden Sie sich an die Administration dieser Installation.",
     "fileTooLarge": "Datei zu groß. Maximale Größe: {{maxMB}} MB",
     "sessionEnded": "Ihre Sitzung ist abgelaufen, daher wurde nichts gespeichert. Melden Sie sich erneut an und beginnen Sie von vorn.",
+    "sessionEndedRead": "Ihre Sitzung ist abgelaufen. Melden Sie sich erneut an.",
     "imageFormatUnsupported": "Dieses Bildformat wird nicht unterstützt. Verwenden Sie ein JPG-, PNG-, GIF- oder WebP-Bild.",
     "modulesUnavailableTitle": "Die Modulliste konnte nicht gelesen werden",
     "modulesUnavailableBody": "Die Liste der aktivierten Module Ihrer Organisation konnte nicht gelesen werden, daher lassen sich die Arbeitsbereiche nicht benennen. Nichts ist verloren — versuchen Sie es gleich noch einmal; bleibt der Fehler, wenden Sie sich an die Administration dieser Installation."
