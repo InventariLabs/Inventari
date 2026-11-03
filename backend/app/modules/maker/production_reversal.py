@@ -95,7 +95,7 @@ async def reverse_production(
         ),
     )
     history = {
-        'reason': f'Production run {order.number or order.id} taken back',
+        'reason': 'production_run_reversed',
         'production_order_id': str(order.id),
     }
     await _take_the_output_off(db, organization_id, order, user, history)

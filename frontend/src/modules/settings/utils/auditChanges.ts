@@ -341,6 +341,10 @@ const VALUE_RESOLVERS: Record<
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",
     }),
+  // A unit is stored by its symbol (`pcs`); the product's own screens print
+  // it as the interface language writes it (`szt.`), and so does the journal.
+  uom: (t, code) => t(`common:units.${code}`, { defaultValue: "" }),
+  uom_symbol: (t, code) => t(`common:units.${code}`, { defaultValue: "" }),
   // A restore writes the reason the product was deleted for as a field of its
   // own; the archive and the delete entry word the same code from `reasons`.
   deletion_reason: (t, code) =>

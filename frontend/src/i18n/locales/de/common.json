@@ -657,6 +657,8 @@
         "recipe_picking_undo": "Kochen — Zutat zurückgelegt",
         "recipe_picking_cancelled": "Kochen abgebrochen — Bestand zurückgebucht",
         "stock_take_adjustment": "Korrektur aus der Inventur",
+        "production_run": "Produktionsauftrag",
+        "production_run_reversed": "Produktionsauftrag zurückgenommen",
         "circuit_breaker": "Durch den Schutzschalter nach wiederholten Zustellfehlern deaktiviert"
       },
       "targetTypes": {

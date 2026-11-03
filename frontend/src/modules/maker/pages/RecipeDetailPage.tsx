@@ -54,7 +54,13 @@ export default function RecipeDetailPage() {
     if (!recipe) return;
     setHeader({
       title: recipe.name,
-      subtitle: recipe.output_template_name ?? undefined,
+      // A recipe named after its product ("Soy candle" making "Soy candle")
+      // has nothing to add under its own title.
+      subtitle:
+        recipe.output_template_name &&
+        recipe.output_template_name !== recipe.name
+          ? recipe.output_template_name
+          : undefined,
       backTo: "/maker",
       actions: canManage ? (
         <>

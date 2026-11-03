@@ -75,17 +75,21 @@ function renderPage() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   function HeaderHarness({ children }: { children: React.ReactNode }) {
     const [actions, setActions] = useState<React.ReactNode>(null);
+    const [subtitle, setSubtitle] = useState<string | undefined>(undefined);
     // Stable, as the real shell's is: a fresh identity per render would make
     // the page's header effect fire every render and loop this harness.
     const setHeader = useCallback(
-      (config: { actions?: React.ReactNode }) =>
-        setActions(config.actions ?? null),
+      (config: { actions?: React.ReactNode; subtitle?: string }) => {
+        setActions(config.actions ?? null);
+        setSubtitle(config.subtitle);
+      },
       [],
     );
     return (
       <PageHeaderContext.Provider value={{ data: {}, setHeader }}>
         {children}
         <div data-testid="header-actions">{actions}</div>
+        <div data-testid="header-subtitle">{subtitle}</div>
       </PageHeaderContext.Provider>
     );
   }
@@ -110,6 +114,21 @@ describe("RecipeDetailPage — the default formula is a choice, not a birthright
     currentRecipe = { ...baseRecipe };
     currentCanManage = true;
     vi.clearAllMocks();
+  });
+
+  it("names the product under the title only when it is a different name", () => {
+    currentRecipe = { ...baseRecipe, name: "Jar", output_template_name: "Jar" };
+    const { unmount } = renderPage();
+    expect(screen.getByTestId("header-subtitle")).toBeEmptyDOMElement();
+    unmount();
+
+    currentRecipe = {
+      ...baseRecipe,
+      name: "Jar, large batch",
+      output_template_name: "Jar",
+    };
+    renderPage();
+    expect(screen.getByTestId("header-subtitle")).toHaveTextContent("Jar");
   });
 
   it("offers Set as default on a formula that is not the default", () => {

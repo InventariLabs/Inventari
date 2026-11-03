@@ -147,6 +147,17 @@ describe("auditChanges value dictionaries", () => {
     ]);
   });
 
+  it("writes a unit symbol the way the interface language does", () => {
+    const changes = auditChanges(
+      { name: "Soy candle", uom: "pcs" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toContainEqual({ path: "uom", from: null, to: "szt." });
+  });
+
   it("words a restore's deletion reason the way the archive does", () => {
     const changes = auditChanges(
       {

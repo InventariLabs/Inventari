@@ -20,6 +20,15 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- The new production dialog writes the unit the way the rest of the app does
+  ("szt." rather than "pcs"), and its hint about the recipe's batch no longer
+  ends in two full stops. The audit log names a product's unit the same way.
+- The stock changes a production run writes, and the ones its reversal writes,
+  carry a reason in the interface language instead of an English sentence.
+- A recipe named after the product it makes no longer prints the name twice in
+  the page header.
+- The onboarding card for working with a single module now names Production,
+  so a person who came to make things can find it.
 
 ## v0.11.0 - 2026-11-02
 
