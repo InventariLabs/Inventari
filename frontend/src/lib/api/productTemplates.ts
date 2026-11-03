@@ -16,6 +16,17 @@ export interface ProductTemplateNutritionInfo {
  *  the endpoint already sends. */
 export type ProductTemplate = components["schemas"]["ProductTemplate"];
 
+/** Longest search text the endpoint takes; a product name may be longer. */
+const SEARCH_MAX_LENGTH = 100;
+
+/** A name longer than the endpoint's limit is searched by its opening —
+ *  sending all of it would be refused outright. Cut by code points, the unit
+ *  the endpoint counts in: a cut inside an emoji leaves a lone surrogate that
+ *  `encodeURIComponent` refuses to encode, so no request would leave at all. */
+export function clampProductSearch(query: string): string {
+  return Array.from(query).slice(0, SEARCH_MAX_LENGTH).join("");
+}
+
 export const productTemplatesApi = {
   get: async (templateId: string): Promise<ProductTemplate> => {
     const { data } = await api.get(`/items/product-templates/${templateId}`);
@@ -24,7 +35,7 @@ export const productTemplatesApi = {
 
   search: async (query: string, limit = 10): Promise<ProductTemplate[]> => {
     const { data } = await api.get(`/items/product-templates`, {
-      params: { search: query, limit },
+      params: { search: clampProductSearch(query), limit },
     });
     return data;
   },

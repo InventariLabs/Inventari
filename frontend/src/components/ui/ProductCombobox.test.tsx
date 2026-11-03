@@ -293,6 +293,19 @@ describe("ProductCombobox", () => {
     expect(await screen.findByText('No results for "zz"')).toBeInTheDocument();
   });
 
+  it("says the search failed, and offers no create, when the request is refused", async () => {
+    const user = userEvent.setup();
+    search.mockRejectedValue(new Error("422"));
+    const renderEmpty = vi.fn(() => <div>Nothing found</div>);
+    render(<ProductCombobox {...baseProps} renderNoResults={renderEmpty} />);
+
+    await user.type(screen.getByRole("combobox"), "zz");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Search failed");
+    expect(screen.queryByText('No results for "zz"')).not.toBeInTheDocument();
+    expect(screen.queryByText("Nothing found")).not.toBeInTheDocument();
+  });
+
   it("marks the empty panel as an open suggestion list", async () => {
     // With nothing found the panel carries no listbox role, so the marker is
     // the only thing that tells a surrounding sheet a list is open.

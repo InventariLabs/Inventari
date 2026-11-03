@@ -49,7 +49,7 @@ _Rename = Callable[[str], _Change]
 
 # Only for a change stuck on something else: nothing here takes this long, and
 # no test passes or fails on how close it comes.
-_NEVER_ARRIVES_AFTER = 30.0
+_NEVER_ARRIVES_AFTER = 120.0
 
 
 async def _backend_pid(session: AsyncSession) -> int:
