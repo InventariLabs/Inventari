@@ -138,6 +138,34 @@ class TestStatsByStorage:
         assert len(data) == 1
         assert data[0]['items_count'] == 5
 
+    def test_empty_virtual_places_stay_out_of_the_breakdown(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_type: StorageType,
+        test_storage_location: StorageLocation,
+    ) -> None:
+        """The system's own consumed/loss/production places hold no stock a
+        reader could act on; an empty one is noise between the real shelves."""
+        db_session.add(
+            StorageLocation(
+                organization_id=test_user.organization_id,
+                created_by=test_user.id,
+                storage_type_id=test_storage_type.id,
+                name='Consumed (Virtual)',
+                usage='customer',
+            )
+        )
+        db_session.commit()
+
+        response = client.get('/api/v1/stats/by-location', headers=auth_headers)
+
+        assert response.status_code == status.HTTP_200_OK
+        names = [row['location_name'] for row in response.json()['items']]
+        assert names == [test_storage_location.name]
+
 
 @pytest.mark.integration
 class TestStatsByCategory:

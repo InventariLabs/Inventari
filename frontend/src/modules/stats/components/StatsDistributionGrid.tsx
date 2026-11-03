@@ -37,31 +37,35 @@ export function StatsDistributionGrid({
         </h2>
         {storageStats && storageStats.length > 0 ? (
           <div className="space-y-6">
-            {storageStats.map((stat, idx) => (
-              <div
-                key={
-                  stat.location_id ||
-                  `${stat.location_name || "storage"}-${idx}`
-                }
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-on-secondary uppercase tracking-tight">
-                    {stat.location_name}
-                  </span>
-                  <Badge variant="secondary">
-                    {stat.items_count} {t("common:units.pcs")}
-                  </Badge>
+            {/* Fullest first, so the places that matter lead and the empty
+                ones close the list. */}
+            {[...storageStats]
+              .sort((a, b) => b.items_count - a.items_count)
+              .map((stat, idx) => (
+                <div
+                  key={
+                    stat.location_id ||
+                    `${stat.location_name || "storage"}-${idx}`
+                  }
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-on-secondary uppercase tracking-tight">
+                      {stat.location_name}
+                    </span>
+                    <Badge variant="secondary">
+                      {t("stats:recordCount", { count: stat.items_count })}
+                    </Badge>
+                  </div>
+                  <div className="w-full bg-surface-raised rounded-full h-2.5 overflow-hidden">
+                    <div
+                      className="bg-accent-500 h-full rounded-full transition-all duration-1000"
+                      style={{
+                        width: `${(stat.items_count / maxStorageCount) * 100}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-surface-raised rounded-full h-2.5 overflow-hidden">
-                  <div
-                    className="bg-accent-500 h-full rounded-full transition-all duration-1000"
-                    style={{
-                      width: `${(stat.items_count / maxStorageCount) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         ) : (
           <p className="text-on-muted text-center py-8 font-medium italic">
@@ -120,7 +124,7 @@ export function StatsDistributionGrid({
                         </span>
                       )}
                       <span className="text-[10px] text-on-muted font-medium uppercase">
-                        {stat.items_count} {t("common:units.pcs")}
+                        {t("stats:recordCount", { count: stat.items_count })}
                       </span>
                     </div>
                   </div>

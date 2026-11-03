@@ -23,6 +23,7 @@ from app.core.contracts import (
 from app.core.db_utils import in_ids
 from app.core.module_ownership import general_rows, hidden_module_tags_async
 from app.models import Category, Item, ItemHistory, StorageLocation
+from app.models.storage_location import LocationUsage
 from app.services.items.expiry import is_expired, is_expiring_soon
 from app.services.storage._queries import list_storage_ids_async
 
@@ -76,6 +77,9 @@ async def get_stats_by_storage_async(
     )
     stats_map = {row.storage_location_id: row for row in stats_query.all()}
 
+    # The system's consumed / loss / production places are move targets, not
+    # shelves. One that holds nothing says nothing, so it stays off the
+    # breakdown; one that does hold rows is still shown.
     return [
         StorageStatsDTO(
             location_id=storage.id,
@@ -89,6 +93,7 @@ async def get_stats_by_storage_async(
             else 0,
         )
         for storage in storages
+        if storage.usage == LocationUsage.INTERNAL or storage.id in stats_map
     ]
 
 

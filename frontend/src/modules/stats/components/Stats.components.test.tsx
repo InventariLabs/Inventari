@@ -683,6 +683,63 @@ describe("StatsDistributionGrid", () => {
     rerender(<StatsDistributionGrid {...props} showInventoryValue={false} />);
     expect(text().indexOf("Veggies")).toBeLessThan(text().indexOf("Dairy"));
   });
+
+  it("lists places fullest first, empty ones last", () => {
+    const places = [
+      {
+        ...storageStats[0],
+        location_id: "e",
+        location_name: "Spare",
+        items_count: 0,
+      },
+      storageStats[0],
+      storageStats[1],
+    ];
+    const { container } = render(
+      <StatsDistributionGrid {...props} storageStats={places} />,
+    );
+    const text = container.textContent ?? "";
+    expect(text.indexOf("Pantry")).toBeLessThan(text.indexOf("Fridge"));
+    expect(text.indexOf("Fridge")).toBeLessThan(text.indexOf("Spare"));
+  });
+
+  it("counts stock rows as records, never as pieces", () => {
+    // One product held as 2 pcs plus a half-used carton is two rows; the
+    // old label printed that as "2 pcs." and read as a total quantity.
+    const { container } = render(
+      <StatsDistributionGrid
+        {...props}
+        storageStats={[{ ...storageStats[0], items_count: 2 }]}
+        maxStorageCount={2}
+        categoryStats={[{ ...categoryStats[0], items_count: 1 }]}
+        maxCategoryCount={1}
+      />,
+    );
+    expect(container.textContent).toContain("2 records");
+    expect(container.textContent).toContain("1 record");
+    expect(container.textContent).not.toMatch(/pcs/i);
+  });
+
+  it("names the uncategorised bucket in the reader's language", async () => {
+    await withLanguage("pl", () => {
+      render(
+        <StatsDistributionGrid
+          {...props}
+          t={tFor("stats")}
+          categoryStats={[
+            {
+              ...categoryStats[0],
+              category_id: null,
+              category_code: null,
+              category_name: "Uncategorized",
+            },
+          ]}
+        />,
+      );
+      expect(screen.getByText("Brak kategorii")).toBeInTheDocument();
+      expect(screen.queryByText("Uncategorized")).not.toBeInTheDocument();
+    });
+  });
 });
 
 // ── StatsOverviewTab ──────────────────────────────────────────────────────────

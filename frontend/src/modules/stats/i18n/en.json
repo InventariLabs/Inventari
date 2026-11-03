@@ -2,6 +2,8 @@
   "title": "Statistics",
   "subtitle": "Overview of your supplies",
   "records": "Records",
+  "recordCount_one": "{{count}} record",
+  "recordCount_other": "{{count}} records",
   "places": "Locations, all levels",
   "expiringSoon": "Expiring soon",
   "expired": "Expired",
