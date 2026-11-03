@@ -554,6 +554,26 @@ class TestCoreProductTemplatesSearchFuzzyMany:
         assert [c.name for c in result['ryz']] == ['Ryż 1 kg']
         assert [c.name for c in result['smie']] == ['Śmietana 18%']
 
+    @pytest.mark.parametrize(
+        'name',
+        ['Weißbrot', 'Œufs', 'Молоко', 'Phở', 'Ryż', 'Maslo'],
+    )
+    async def test_a_name_finds_itself_whatever_its_script(
+        self, real_async_db_session: AsyncSession, async_test_storage_location, name
+    ):
+        """Folds beyond a single Latin letter (ß, œ, Cyrillic, Vietnamese)
+        are found by the raw spelling, as they always were. One fragment per
+        call: fragments of one call widen each other's SQL."""
+        db = real_async_db_session
+        org_id = async_test_storage_location.organization_id
+        await _make_template(db, org_id, name=name)
+        await db.commit()
+
+        result = await core_api.product_templates.search_fuzzy_many_async(
+            db, org_id, [name.lower()]
+        )
+        assert [c.name for c in result[name.lower()]] == [name]
+
     async def test_org_scoping(
         self, real_async_db_session: AsyncSession, async_test_storage_location
     ):

@@ -30,6 +30,17 @@ from app.services.storage._queries import list_storage_ids_async
 from ._common import get_org_currency_async, org_currency_filter, org_today_async
 
 
+async def _internal_storage_ids(db: AsyncSession, organization_id: UUID) -> list[UUID]:
+    """The ids of the organization's real shelves, virtual places left out."""
+    result = await db.scalars(
+        select(StorageLocation.id).where(
+            StorageLocation.organization_id == organization_id,
+            StorageLocation.usage == LocationUsage.INTERNAL,
+        )
+    )
+    return list(result.all())
+
+
 async def get_stats_by_storage_async(
     db: AsyncSession, organization_id: UUID
 ) -> list[StorageStatsDTO]:
@@ -40,8 +51,13 @@ async def get_stats_by_storage_async(
     the products list.
     """
     hidden = await hidden_module_tags_async(db, organization_id)
+    # Real shelves only: the system's consumed / loss / production places are
+    # move targets. A used-up product stays there as a row of quantity 0, so
+    # counting them put a phantom place at the head of the chart and made the
+    # breakdown add up to more than the overview's record count.
     storages_query = select(StorageLocation).where(
-        StorageLocation.organization_id == organization_id
+        StorageLocation.organization_id == organization_id,
+        StorageLocation.usage == LocationUsage.INTERNAL,
     )
     if hidden:
         storages_query = storages_query.where(
@@ -77,9 +93,6 @@ async def get_stats_by_storage_async(
     )
     stats_map = {row.storage_location_id: row for row in stats_query.all()}
 
-    # The system's consumed / loss / production places are move targets, not
-    # shelves. One that holds nothing says nothing, so it stays off the
-    # breakdown; one that does hold rows is still shown.
     return [
         StorageStatsDTO(
             location_id=storage.id,
@@ -93,7 +106,6 @@ async def get_stats_by_storage_async(
             else 0,
         )
         for storage in storages
-        if storage.usage == LocationUsage.INTERNAL or storage.id in stats_map
     ]
 
 
@@ -106,7 +118,7 @@ async def get_stats_by_category_async(
     shows module data, as its records stay out of the products list.
     """
     hidden = await hidden_module_tags_async(db, organization_id)
-    storage_ids = await list_storage_ids_async(db, organization_id)
+    storage_ids = await _internal_storage_ids(db, organization_id)
     if not storage_ids:
         return []
 

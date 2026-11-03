@@ -17,7 +17,7 @@ from typing import Any
 from uuid import UUID
 
 from anyascii import anyascii
-from sqlalchemy import case, func, or_, select
+from sqlalchemy import case, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -147,36 +147,55 @@ def _word_condition(word: str) -> Any:
     return or_(*[ProductTemplate.name.ilike(f'%{escape_ilike(s)}%') for s in spellings])
 
 
-def _build_fold_table() -> tuple[str, str]:
-    """Latin letters with a diacritic, and the plain letter each one folds to.
+def _build_accent_variants() -> dict[str, str]:
+    """Each plain Latin letter, with the accented letters that fold to it.
 
     The database cannot compare "ryz" with "Ryż" by itself (``ilike`` is
-    case-insensitive, not accent-insensitive), and the ``unaccent``
-    extension is not part of every deployment. ``translate`` with this
-    table does the same job for the single-letter folds, in no particular
-    language: it is built from the same ``anyascii`` the caller folds with.
+    case-insensitive, not accent-insensitive) and the ``unaccent`` extension
+    is not part of every deployment. The classes are built from the same
+    ``anyascii`` the caller folds with, so no language is hard-coded; only
+    the single-letter folds are listed, the rest is the raw spelling's job.
     """
-    pairs: dict[str, str] = {}
+    variants: dict[str, set[str]] = {}
     for code_point in range(0xC0, 0x250):
         letter = chr(code_point).lower()
         plain = anyascii(letter)
         if len(letter) == 1 and letter != plain and len(plain) == 1 and plain.isalpha():
-            pairs.setdefault(letter, plain)
-            # A database in the "C" locale lowercases ASCII only, so the
-            # capital is folded here as well rather than left to ``lower``.
-            capital = letter.upper()
-            if len(capital) == 1:
-                pairs.setdefault(capital, plain)
-    return ''.join(pairs), ''.join(pairs.values())
+            # Both cases are listed: a database in the "C" locale folds the
+            # case of ASCII letters only.
+            variants.setdefault(plain, set()).update({letter, letter.upper()})
+    return {plain: ''.join(sorted(letters)) for plain, letters in variants.items()}
 
 
-_FOLD_FROM, _FOLD_TO = _build_fold_table()
+_ACCENT_VARIANTS = _build_accent_variants()
 
 
-def _folded_name_like(fragment: str) -> Any:
-    """``name`` contains *fragment*, with accents and case set aside on both sides."""
-    folded_name = func.translate(func.lower(ProductTemplate.name), _FOLD_FROM, _FOLD_TO)
-    return folded_name.like(f'%{escape_ilike(anyascii(fragment).lower())}%')
+def _accent_tolerant_regex(folded: str) -> str:
+    """A regex matching *folded* in a name, whatever accents the name keeps."""
+    parts = []
+    for char in folded:
+        letters = _ACCENT_VARIANTS.get(char)
+        if letters:
+            parts.append(f'[{char}{letters}]')
+        else:
+            parts.append(char if char.isalnum() else f'\\{char}')
+    return ''.join(parts)
+
+
+def _name_contains(fragment: str) -> Any:
+    """``name`` contains *fragment* in its own spelling, or folded of accents.
+
+    Two cheap conditions rather than a fold of the column: the raw pattern
+    covers every script and the multi-letter folds ("ß" for "ss"), the regex
+    covers a fragment the caller already folded ("ryz") against a name that
+    kept its letters ("Ryż 1 kg"). Both read the name as stored, so the
+    trigram index on it stays usable.
+    """
+    folded = anyascii(fragment).lower()
+    return or_(
+        ProductTemplate.name.ilike(f'%{escape_ilike(fragment)}%'),
+        ProductTemplate.name.op('~*')(_accent_tolerant_regex(folded)),
+    )
 
 
 async def search_fuzzy_many_async(
@@ -212,12 +231,12 @@ async def search_fuzzy_many_async(
     if not cleaned:
         return {}
 
-    # Both sides are folded to ASCII for the comparison, so a fragment the
-    # caller already folded ("ryz") still finds a name that kept its letters
-    # ("Ryż 1 kg"). Python settles the exact verdict below with the same fold.
+    # A fragment and a name can disagree on diacritics in either direction,
+    # so narrow tolerantly and settle the exact verdict in Python below,
+    # where the same fold is available on both sides.
     result = await db.execute(
         select(ProductTemplate.id, ProductTemplate.name).where(
-            or_(*[_folded_name_like(fragment) for fragment in cleaned]),
+            or_(*[_name_contains(fragment) for fragment in cleaned]),
             or_(
                 ProductTemplate.organization_id == org_id,
                 ProductTemplate.organization_id.is_(None),
