@@ -274,6 +274,10 @@ function CollectionAddRecipesOverlay({
   );
 }
 
+/** A photo that failed after its recipe was saved: only the photo failed. */
+const photoFailed = (error: unknown, fallback: string) =>
+  toast.error(followUpError(error, fallback));
+
 export default function RecipesPage() {
   const { t } = useTranslation(["recipes", "common"]);
   const navigate = useNavigate();
@@ -472,17 +476,11 @@ export default function RecipesPage() {
       const created = await createMutation.mutateAsync(data);
       // the image endpoint needs an existing recipe id, so a photo
       // picked in the create form is uploaded right after creation.
+      // The recipe exists by now: a refused photo must not read as "not saved".
       if (imageFile) {
-        // The recipe exists by now: a photo that fails to go up must not
-        // read as "not saved" and invite a second, duplicate recipe.
-        try {
-          await uploadImageMutation.mutateAsync({
-            id: created.id,
-            file: imageFile,
-          });
-        } catch (error) {
-          toast.error(followUpError(error, t("errors.image_failed")));
-        }
+        await uploadImageMutation
+          .mutateAsync({ id: created.id, file: imageFile })
+          .catch((e: unknown) => photoFailed(e, t("errors.image_failed")));
       }
       toast.success(t("toasts.created"));
       setShowForm(false);
