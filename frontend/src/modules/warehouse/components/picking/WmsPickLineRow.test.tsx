@@ -330,16 +330,19 @@ describe("WmsPickLineRow's date", () => {
 });
 
 /**
- * On a phone the name and the batch code are what the picker compares with
- * the carton, so neither may be cut with an ellipsis. jsdom has no layout to
- * measure, so the test pins the classes that decide it: no `truncate`, the
- * name allowed two lines, the code allowed to break rather than be clipped.
+ * On a phone the name and the codes are what the picker compares with the
+ * carton, so none may be cut with an ellipsis or run under the quantity.
+ * jsdom has no layout to measure, so the test pins the classes that decide
+ * it (checked in the browser at 390 px): the name clamped to two lines, the
+ * location and the batch code allowed to break inside a long token, and the
+ * location text a shrinkable item of its flex line.
  */
 describe("WmsPickLineRow's text on a narrow screen", () => {
-  it("lets the name wrap and keeps the whole batch code", () => {
-    const productName =
-      "Espresso Blend Beans 1 kg Premium Roast Whole Arabica Bag";
+  it("lets the name wrap and the codes break instead of being cut", () => {
+    // Short enough for the two lines of a 163px column.
+    const productName = "Espresso Blend Beans 1 kg Whole Bean";
     const lotName = "LTC-2026-10-ESPRESSO-BLEND-000417";
+    const binLocation = "A-01-01 / LTC3003LONGCODENOHYPHENSATALL0417";
     render(
       <WmsPickLineRow
         line={{
@@ -348,7 +351,7 @@ describe("WmsPickLineRow's text on a narrow screen", () => {
           picked_quantity: 5,
           product_name: productName,
           lot_name: lotName,
-          bin_location: "A-01-01 · Shelf A-01-01",
+          bin_location: binLocation,
         }}
         onFullPick={vi.fn()}
         onUndo={vi.fn()}
@@ -358,7 +361,6 @@ describe("WmsPickLineRow's text on a narrow screen", () => {
     );
 
     const name = screen.getByText(productName);
-    expect(name).toHaveTextContent(productName);
     expect(name).toHaveClass("line-clamp-2", "break-words");
     expect(name).not.toHaveClass("truncate");
 
@@ -366,8 +368,11 @@ describe("WmsPickLineRow's text on a narrow screen", () => {
     expect(lot).toHaveClass("break-all");
     expect(lot).not.toHaveClass("truncate");
 
-    const location = screen.getByText(/A-01-01 · Shelf A-01-01/);
-    expect(location).toHaveClass("break-words");
-    expect(location).not.toHaveClass("truncate");
+    // The text node of a flex line has min-width:auto and overflow-wrap does
+    // not lower it, so only a min-w-0 item that may break anywhere keeps a
+    // long code inside its column.
+    const location = screen.getByText(binLocation);
+    expect(location).toHaveClass("min-w-0", "break-all");
+    expect(location.parentElement).not.toHaveClass("truncate");
   });
 });

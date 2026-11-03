@@ -82,9 +82,13 @@ const WmsPickLineRow = memo(function WmsPickLineRow({
             {line.product_name ?? t("picking.unknown_product")}
           </p>
           {line.bin_location && (
-            <p className="text-xs text-on-muted flex items-center gap-0.5 break-words">
-              <MapPin size={10} className="shrink-0" />
-              {line.bin_location}
+            // The text sits in its own span: a flex item has min-width:auto,
+            // so a long unbroken code (shelf and SKU joined by a slash) kept
+            // its full width and ran under the quantity column. min-w-0 lets
+            // the span shrink to the column and break-all splits the code.
+            <p className="text-xs text-on-muted flex items-start gap-0.5">
+              <MapPin size={10} className="mt-0.5 shrink-0" />
+              <span className="min-w-0 break-all">{line.bin_location}</span>
             </p>
           )}
           {shelfState && line.status === "pending" && (
