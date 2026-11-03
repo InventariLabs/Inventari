@@ -712,6 +712,7 @@ ERRORS_PT: dict[str, str] = {
     'recipe_collection_own_parent': 'Uma coleção não pode ser pai de si mesma',
     'recipe_collection_under_descendant': 'Uma coleção não pode ser movida para dentro de uma de suas descendentes',
     'recipe_scrape_failed': 'Falha ao extrair a receita da URL',
+    'register_date_from_after_date_to': 'A data inicial não pode ser posterior à data final',
     'meal_plan_end_before_start': 'A data final não pode ser anterior à data inicial',
     'meal_plan_too_long': 'O plano não pode ultrapassar {days} dias',
     'meal_plan_no_slots': 'Ative pelo menos uma refeição',

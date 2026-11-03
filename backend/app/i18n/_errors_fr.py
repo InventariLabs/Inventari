@@ -944,6 +944,7 @@ ERRORS_FR: ErrorMessages = {
     'recipe_collection_own_parent': 'Une collection ne peut pas être sa propre parente',
     'recipe_collection_under_descendant': 'Une collection ne peut pas être déplacée sous sa propre sous-collection',
     'recipe_scrape_failed': "Impossible de récupérer la recette depuis l'URL",
+    'register_date_from_after_date_to': 'La date de début ne peut pas être postérieure à la date de fin',
     'meal_plan_end_before_start': 'La date de fin ne peut pas précéder la date de début',
     'meal_plan_too_long': 'Un plan ne peut pas dépasser {days} jours',
     'meal_plan_no_slots': 'Activez au moins un repas dans le plan',
