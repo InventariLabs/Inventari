@@ -353,8 +353,10 @@ jobs:
   # The whole suite's verdict: every part's tests and coverage replayed as one
   # run, with the floors of vite.config.ts applied to the total. It runs after
   # a red part too, so the log still lists every failure in one place. Measured
-  # against a plain run of the same files: identical counts for every source
-  # file.
+  # on one tree, three runs of this against two of the single step: the same
+  # 1160 files and 11299 tests, and totals within 0.02 of a point. The single
+  # step and one of the three agree on every source file; the rest differ in a
+  # few whose tests race a timer, and differ from each other in those too.
   frontend-coverage:
     name: Frontend coverage floors
     needs: [changes, frontend-unit]
