@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.import_sheet import read_sheet, row_text
+from app.core.location_path import join_location_path
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -83,7 +84,7 @@ def _full_path(location: Any, by_id: dict[UUID, Any]) -> str:
         seen.add(current.id)
         names.append(current.name)
         current = by_id.get(current.parent_id) if current.parent_id else None
-    return ' \u203a '.join(reversed(names))
+    return join_location_path(reversed(names))
 
 
 def _path_ends_at(location: Any, segments: list[str], by_id: dict[UUID, Any]) -> bool:

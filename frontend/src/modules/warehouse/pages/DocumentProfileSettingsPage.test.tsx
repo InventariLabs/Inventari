@@ -481,12 +481,12 @@ describe("DocumentProfileSettingsPage — every setting reaches Save and comes b
       screen.getByRole("checkbox", { name: /enable value tracking/i }),
     );
     await userEvent.selectOptions(
-      screen.getByLabelText("Tax Handling"),
+      screen.getByLabelText("Tax handling"),
       "SIMPLE_RATE",
     );
-    await userEvent.type(screen.getByLabelText("Default Tax Rate (%)"), "23");
+    await userEvent.type(screen.getByLabelText("Default tax rate (%)"), "23");
     await userEvent.selectOptions(
-      screen.getByLabelText("Default Currency (ISO 4217)"),
+      screen.getByLabelText("Default currency (ISO 4217)"),
       "EUR",
     );
     await userEvent.click(
@@ -495,17 +495,17 @@ describe("DocumentProfileSettingsPage — every setting reaches Save and comes b
     await userEvent.click(
       screen.getByRole("checkbox", { name: /require unit price/i }),
     );
-    fireEvent.change(screen.getByLabelText("Document Number Format"), {
+    fireEvent.change(screen.getByLabelText("Document number format"), {
       target: { value: "{TYPE}/{YEAR}/{SEQ:05d}" },
     });
     await userEvent.clear(screen.getByLabelText("Label for Receipt"));
     await userEvent.type(screen.getByLabelText("Label for Receipt"), "PZ2");
     await userEvent.type(screen.getByLabelText("Label for Adjustment"), "ADJ");
     await userEvent.clear(
-      screen.getByLabelText("Approval Threshold (net value)"),
+      screen.getByLabelText("Approval threshold (net value)"),
     );
     await userEvent.type(
-      screen.getByLabelText("Approval Threshold (net value)"),
+      screen.getByLabelText("Approval threshold (net value)"),
       "100",
     );
     await openSection("Work on the floor");
@@ -536,9 +536,9 @@ describe("DocumentProfileSettingsPage — every setting reaches Save and comes b
     // ---- clear them all, the same way a reader would ----
     // The tax rate and the currency live inside value tracking, so they go
     // first — switching it off takes them off the screen.
-    await userEvent.clear(screen.getByLabelText("Default Tax Rate (%)"));
+    await userEvent.clear(screen.getByLabelText("Default tax rate (%)"));
     await userEvent.selectOptions(
-      screen.getByLabelText("Default Currency (ISO 4217)"),
+      screen.getByLabelText("Default currency (ISO 4217)"),
       "",
     );
     await openSection("Numbering and prices");
@@ -548,7 +548,7 @@ describe("DocumentProfileSettingsPage — every setting reaches Save and comes b
     await userEvent.click(
       screen.getByRole("checkbox", { name: /require partner tax id/i }),
     );
-    fireEvent.change(screen.getByLabelText("Document Number Format"), {
+    fireEvent.change(screen.getByLabelText("Document number format"), {
       target: { value: "{TYPE}/{YEAR}/{SEQ:03d}" },
     });
     await userEvent.clear(screen.getByLabelText("Label for Receipt"));
@@ -560,7 +560,7 @@ describe("DocumentProfileSettingsPage — every setting reaches Save and comes b
     );
     await openSection("Approvals");
     await userEvent.clear(
-      screen.getByLabelText("Approval Threshold (net value)"),
+      screen.getByLabelText("Approval threshold (net value)"),
     );
     await userEvent.click(screen.getByRole("checkbox", { name: "Receipt" }));
 
@@ -751,7 +751,7 @@ describe("DocumentProfileSettingsPage — a preset asks before it overwrites", (
     renderPage();
     await openSection("Ready-made setup");
     const select = await screen.findByRole("combobox", {
-      name: "Apply Preset",
+      name: "Apply preset",
     });
 
     await userEvent.selectOptions(select, "UK Warehouse");
@@ -775,7 +775,7 @@ describe("DocumentProfileSettingsPage — a preset asks before it overwrites", (
     renderPage();
     await openSection("Ready-made setup");
     const select = await screen.findByRole("combobox", {
-      name: "Apply Preset",
+      name: "Apply preset",
     });
 
     await userEvent.selectOptions(select, "Simple");

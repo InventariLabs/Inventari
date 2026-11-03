@@ -313,10 +313,10 @@ describe("PurchaseOrderDetailPage — header actions reach their mutation", () =
     arrange(po({ status: "CONFIRMED" }));
     renderPage();
     await userEvent.click(
-      within(header()).getByRole("button", { name: "Send to Vendor" }),
+      within(header()).getByRole("button", { name: "Send to supplier" }),
     );
     const dialog = await screen.findByRole("alertdialog", {
-      name: "Send to Vendor",
+      name: "Send to supplier",
     });
     expect(dialog).toHaveTextContent("acme@test.com");
     await userEvent.click(within(dialog).getByRole("button", { name: "Send" }));
@@ -325,7 +325,7 @@ describe("PurchaseOrderDetailPage — header actions reach their mutation", () =
       lang: "en",
     });
     await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith("Email sent to vendor"),
+      expect(toast.success).toHaveBeenCalledWith("Email sent to supplier"),
     );
   });
 

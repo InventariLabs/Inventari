@@ -360,7 +360,7 @@ test.describe("Warehouse — business location numbering", () => {
     for (const [id, code] of before) expect(await codeOf(s, id)).toBe(code);
 
     // Renumber from the first zone: its branch is numbered, the other is not.
-    await openCodes(page, `${wh.name} → ${one.zone.name}`);
+    await openCodes(page, `${wh.name} › ${one.zone.name}`);
     await page.getByRole("button", { name: "Renumber by template" }).click();
     await page
       .getByRole("alertdialog")

@@ -19,6 +19,7 @@
   "errorAdding": "Błąd podczas dodawania",
   "errorCamera": "Błąd kamery",
   "aimAtCode": "Wyceluj w kod kreskowy lub QR",
+  "closeCamera": "Zamknij podgląd z kamery",
   "dataFromHistory": "Dane automatycznie dopasowane z historii",
   "dataFromOFFShort": "Dane: OFF",
   "dataFromVisionShort": "Dane: Skan AI",

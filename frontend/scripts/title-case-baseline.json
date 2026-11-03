@@ -1,0 +1,5 @@
+{
+  "src/modules/purchase_orders/i18n/en.json::launcher.title": "Purchase Orders",
+  "src/modules/purchase_orders/i18n/en.json::navigation.purchaseOrders": "Purchase Orders",
+  "src/modules/purchase_orders/i18n/en.json::title": "Purchase Orders"
+}

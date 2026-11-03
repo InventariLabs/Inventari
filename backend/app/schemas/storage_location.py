@@ -92,7 +92,7 @@ class ArchivedStorageLocation(StorageLocation):
     a name ("Shelf 1" under two different parents), and the archive is where
     picking wrong is costliest — the row is gone from every other screen
     until restored. ``full_path`` carries the shape
-    ``StorageLocationSummary`` gives it ("Server Room → Shelf 1").
+    ``StorageLocationSummary`` gives it ("Server Room › Shelf 1").
 
     ``archived_at`` is the moment the location left the lists, read from the
     organization journal (``SOFT_DELETE`` / ``storage``): archiving writes no
@@ -180,7 +180,7 @@ class StorageLocationSummary(BaseModel):
     listed_children_count: int = 0
     expiring_soon_count: int  # items expiring within 7 days
     full_path: str | None = (
-        None  # precomputed full hierarchy path, e.g. "Warehouse → Zone A → Shelf 1"
+        None  # precomputed full hierarchy path, e.g. "Warehouse › Zone A › Shelf 1"
     )
     is_leaf: bool = (
         True  # True if no other storage has this as parent (i.e. can hold items)

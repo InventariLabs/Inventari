@@ -1,4 +1,5 @@
 import re
+from collections.abc import Sequence
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, Literal
@@ -324,6 +325,27 @@ def _line_loading(lines: Literal['all', 'rows', 'none']) -> Any:
     return loading
 
 
+def not_undone_conditions() -> list[ColumnElement[bool]]:
+    """What "Undo" reversed and the reversal it wrote are both left out.
+
+    The ``reverses`` relation says which; only a completed reversal has moved
+    the stock back, so a document whose reversal still waits is not undone.
+    """
+    reversal = aliased(Document)
+    undone = (
+        select(DocumentRelation.target_document_id)
+        .join(reversal, reversal.id == DocumentRelation.source_document_id)
+        .where(
+            DocumentRelation.relation_type == 'reverses',
+            reversal.status == DocumentStatus.COMPLETED.value,
+        )
+    )
+    reversals = select(DocumentRelation.source_document_id).where(
+        DocumentRelation.relation_type == 'reverses'
+    )
+    return [Document.id.not_in(undone), Document.id.not_in(reversals)]
+
+
 async def list_documents(
     db: AsyncSession,
     org_id: UUID,
@@ -341,6 +363,7 @@ async def list_documents(
     target_ids: list[UUID] | None = None,
     module_filters: list[tuple[str, DocumentFilterDTO]] | None = None,
     backorder_only: bool = False,
+    extra_conditions: Sequence[ColumnElement[bool]] = (),
     limit: int = 50,
     offset: int = 0,
     sort_by: str = 'document_date',
@@ -450,6 +473,7 @@ async def list_documents(
                 in_ids(Document.target_location_id, location_ids),
             )
         )
+    conditions += extra_conditions
     if backorder_only:
         # The drafts the application raises on a short completion, told
         # apart from the drafts a person typed. A backorder stores the

@@ -121,7 +121,7 @@ async function registerSummary(seed: ReceivingSeed) {
 async function openRegister(page: Page) {
   await page.goto("/warehouse/register");
   await expect(
-    page.getByRole("heading", { name: "Document Register" }),
+    page.getByRole("heading", { name: "Document register" }),
   ).toBeVisible();
 }
 

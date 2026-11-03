@@ -119,7 +119,7 @@ describe("PurchaseOrderFormModal", () => {
     const user = userEvent.setup();
     render(<PurchaseOrderFormModal onClose={onClose} onSuccess={vi.fn()} />);
 
-    const saveBtn = screen.getByRole("button", { name: "Create Order" });
+    const saveBtn = screen.getByRole("button", { name: "Create order" });
     await user.click(saveBtn);
 
     await waitFor(() => {
