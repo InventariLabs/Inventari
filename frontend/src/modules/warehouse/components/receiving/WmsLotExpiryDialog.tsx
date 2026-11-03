@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
-import { ScanToFill } from "@/module-sdk";
+import { LazyScanToFill } from "@/modules/shared/components/LazyScanToFill";
 import { Sheet, SheetActions, SheetBody } from "@/components/ui/Sheet";
 
 interface Props {
@@ -92,7 +92,7 @@ export default function WmsLotExpiryDialog({
             placeholder={t("receiving.lotExpiry.lotPlaceholder")}
             maxLength={100}
           />
-          <ScanToFill
+          <LazyScanToFill
             label={t("receiving.lotExpiry.scanLot")}
             onCode={(code) => setBatchNumber(code.slice(0, 100))}
           />

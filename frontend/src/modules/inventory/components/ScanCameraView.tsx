@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/Input";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { ScannerReadyHint } from "@/components/ui/ScannerReadyHint";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useTorchAvailable } from "@/module-sdk";
+import { useTorchAvailable } from "@/hooks/useScanCamera";
 import { useScannerInput } from "@/hooks/useScannerInput";
 import type { StorageContext } from "@/store/scanStore";
 interface ScanCameraViewProps {

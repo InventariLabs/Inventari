@@ -9,7 +9,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useTorchAvailable } from "@/module-sdk";
 import { Input } from "@/components/ui/Input";
 import { formatMoney } from "@/utils/formatters";
 import { LineItemRow } from "./LineItemRow";
@@ -150,7 +149,6 @@ export function LineItemsEditor({
   onConsolidate,
   renderLineExtra,
 }: LineItemsEditorProps) {
-  const hasTorch = useTorchAvailable();
   const [expandedOptional, setExpandedOptional] = useState<
     Record<string, boolean>
   >({});
@@ -275,7 +273,7 @@ export function LineItemsEditor({
                           {labels.scanProcessing ?? "Processing..."}
                         </div>
                       )}
-                      {hasTorch && (
+                      {scan.torchAvailable && (
                         <Button
                           type="button"
                           variant="ghost"

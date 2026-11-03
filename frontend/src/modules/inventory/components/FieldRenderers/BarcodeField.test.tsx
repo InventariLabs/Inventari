@@ -66,10 +66,12 @@ describe("BarcodeField", () => {
     expect(generateBarcode).toHaveBeenCalledTimes(1);
   });
 
-  it("reads the code printed on the product with the camera", () => {
+  it("reads the code printed on the product with the camera", async () => {
     const onChange = renderField("");
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan product code" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Scan product code" }),
+    );
 
     expect(onChange).toHaveBeenCalledWith("5901234123457");
   });

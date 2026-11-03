@@ -6,6 +6,11 @@ import QuickAddModal from "./QuickAddModal";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import * as modulesCtx from "@/contexts/ModulesContext";
 
+// The camera button loads the SDK after paint; this spec is not about it.
+vi.mock("@/modules/shared/components/LazyScanToFill", () => ({
+  LazyScanToFill: () => null,
+}));
+
 // Mock API
 vi.mock("../lib/api", () => ({
   labelsApi: {

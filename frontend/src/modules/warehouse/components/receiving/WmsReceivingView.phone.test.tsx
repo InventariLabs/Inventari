@@ -18,6 +18,7 @@ vi.mock("sonner", () => ({
 
 // The camera is a live device; the screen is what these tests read.
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: () => ({
     scannerError: null,
     isCameraActive: false,

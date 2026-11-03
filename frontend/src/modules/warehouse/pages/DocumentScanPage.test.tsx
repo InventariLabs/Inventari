@@ -9,6 +9,7 @@ import { http, HttpResponse } from "msw";
 import { scanWithHardwareScanner } from "@/test/scanner";
 
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: vi.fn(),
 }));
 

@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect, useSyncExternalStore } from "react";
 import { setTorchAvailable } from "@/hooks/useTorchAvailable";
+
+// Views that draw their own torch button ask the camera hook's module.
+export { useTorchAvailable } from "@/hooks/useTorchAvailable";
 import { logger } from "@/utils/logger";
 import { cameraErrorMessage } from "@/lib/cameraErrors";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";

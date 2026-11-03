@@ -5,6 +5,7 @@ import PurchaseOrderFormModal from "./PurchaseOrderFormModal";
 import { usePartners } from "@/hooks/usePartners";
 
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: vi.fn(() => ({
     isCameraActive: false,
     scannerError: null,

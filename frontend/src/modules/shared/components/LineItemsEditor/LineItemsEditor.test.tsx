@@ -10,11 +10,6 @@ import type {
   LineItemsScanState,
 } from "./types";
 
-const torch = vi.hoisted(() => ({ available: true }));
-vi.mock("@/hooks/useTorchAvailable", () => ({
-  useTorchAvailable: () => torch.available,
-}));
-
 const makeLabels = (): LineItemsEditorLabels => ({
   lines: "Lines",
   addLine: "Add Line",
@@ -56,6 +51,7 @@ const makeScan = (
   error: null,
   cameraActive: false,
   torchOn: false,
+  torchAvailable: true,
   onToggle: vi.fn(),
   onToggleTorch: vi.fn(),
   ...overrides,
@@ -204,10 +200,12 @@ describe("LineItemsEditor", () => {
   });
 
   it("draws no torch button on a camera that has no torch", () => {
-    torch.available = false;
-    const scan = makeScan({ open: true, cameraActive: true });
+    const scan = makeScan({
+      open: true,
+      cameraActive: true,
+      torchAvailable: false,
+    });
     render(<LineItemsEditor {...makeProps()} scan={scan} />);
-    torch.available = true;
     expect(
       screen.queryByRole("button", { name: "Torch on" }),
     ).not.toBeInTheDocument();

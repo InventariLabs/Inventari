@@ -1,7 +1,7 @@
 import { Barcode } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
-import { ScanToFill } from "@/module-sdk";
+import { LazyScanToFill } from "@/modules/shared/components/LazyScanToFill";
 import { useGenerateProductCode } from "@/modules/inventory/hooks/useItemMutations";
 import type { FieldDefinition } from "@/types";
 import { DefaultInputField } from "./DefaultInputField";
@@ -64,7 +64,7 @@ export function BarcodeField({
         )}
       </div>
       {/* The code printed on the product is read, not retyped. */}
-      <ScanToFill label={t("fields.scanCode")} onCode={onChange} />
+      <LazyScanToFill label={t("fields.scanCode")} onCode={onChange} />
     </div>
   );
 }

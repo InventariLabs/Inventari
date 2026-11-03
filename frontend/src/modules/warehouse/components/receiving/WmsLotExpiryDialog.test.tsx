@@ -42,7 +42,9 @@ describe("WmsLotExpiryDialog", () => {
     const user = userEvent.setup();
     renderDialog();
 
-    await user.click(screen.getByRole("button", { name: "Scan lot code" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Scan lot code" }),
+    );
 
     expect(screen.getByLabelText("Lot")).toHaveValue("LOT-2026-17");
   });

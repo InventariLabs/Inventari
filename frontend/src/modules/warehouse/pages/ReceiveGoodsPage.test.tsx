@@ -147,6 +147,7 @@ const camera = vi.hoisted(() => ({
 }));
 
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: ({
     onCodeScanned,
   }: {
