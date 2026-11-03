@@ -1,4 +1,5 @@
 import { api } from "@/lib/api/client";
+import { clampProductSearch } from "@/module-sdk";
 
 /**
  * A product the maker module can point at — as an output or an ingredient.
@@ -53,7 +54,7 @@ export const makerProductsApi = {
   search: async (query: string, limit = 10): Promise<ProductOption[]> => {
     const response = await api.get<ProductTemplateResponse[]>(
       "/items/product-templates",
-      { params: { search: query, limit } },
+      { params: { search: clampProductSearch(query), limit } },
     );
     return response.data.map(toOption);
   },

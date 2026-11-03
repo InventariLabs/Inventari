@@ -35,6 +35,24 @@ def test_weak_secret_key_rejected(monkeypatch):
         importlib.reload(mod)
 
 
+def test_weak_secret_key_warning_shows_no_part_of_the_key(monkeypatch, caplog):
+    """The dev-mode warning says the key is weak, not what any of it is."""
+    import importlib
+    import logging
+
+    import app.config as mod
+
+    monkeypatch.setenv('SECRET_KEY', 'changeme')
+    monkeypatch.setenv('TESTING', 'true')
+
+    with caplog.at_level(logging.WARNING, logger=mod.__name__):
+        importlib.reload(mod)
+
+    warning = next(r for r in caplog.records if 'known weak value' in r.getMessage())
+    assert '***' not in warning.getMessage()
+    assert warning.args in (None, ())
+
+
 def test_strong_secret_key_accepted(monkeypatch):
     monkeypatch.setenv('SECRET_KEY', 'a-valid-random-key-that-is-long-enough-abc123xyz')
     monkeypatch.setenv('DEBUG', 'false')

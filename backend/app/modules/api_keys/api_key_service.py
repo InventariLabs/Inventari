@@ -153,10 +153,9 @@ async def create_api_key_async(
     await db.refresh(api_key)
 
     logger.info(
-        'API key created: id=%s org=%s prefix=%s',
+        'API key created: id=%s org=%s',
         api_key.id,
         organization_id,
-        prefix,
     )
     return api_key, raw_key
 
