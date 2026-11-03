@@ -20,6 +20,9 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- Saving two partners with the same name, or the same code, at the same moment
+  now refuses the second one with the usual "already exists" message instead
+  of failing with a server error.
 
 ## v0.11.0 - 2026-11-02
 
