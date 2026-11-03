@@ -7,6 +7,10 @@ name: Dependency Licences
 on:
   workflow_dispatch:
 
+# The job only reads the repository and its lock files.
+permissions:
+  contents: read
+
 jobs:
   dependency-licenses:
     # Checks the licence of everything we install and that

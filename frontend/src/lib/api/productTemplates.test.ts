@@ -54,6 +54,24 @@ describe("productTemplatesApi", () => {
     expect(seen[0].query).toEqual({ search: "milk", limit: "10" });
   });
 
+  it("sends no more of a long name than the endpoint accepts", async () => {
+    const seen = stub("get", "/items/product-templates", []);
+    const name = "A".repeat(150) + "B".repeat(105);
+
+    await productTemplatesApi.search(name);
+
+    expect(seen[0].query.search).toBe("A".repeat(100));
+  });
+
+  it("does not cut a name inside a character made of two code units", async () => {
+    const seen = stub("get", "/items/product-templates", []);
+    const name = "x".repeat(99) + "😀" + "more text";
+
+    await productTemplatesApi.search(name);
+
+    expect(seen[0].query.search).toBe("x".repeat(99) + "😀");
+  });
+
   it("creates a product from a name and a unit and carries the scanned codes with it", async () => {
     const seen = stub("post", "/items/product-templates", { id: "t1" });
 

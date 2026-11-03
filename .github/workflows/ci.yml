@@ -14,6 +14,12 @@ on:
     branches: [ "dev", "main" ]
   workflow_dispatch:
 
+# Read-only token for every job: they check out code and run gates, and
+# upload-artifact uses the runner's own credentials. A job that ever needs
+# more asks for it in its own `permissions` block.
+permissions:
+  contents: read
+
 # A full run takes longer than the interval between merges to dev, so cancelling
 # it on every push can leave no completed verdict. Queue dev and main runs;
 # on a pull request a newer push makes the running verdict obsolete.

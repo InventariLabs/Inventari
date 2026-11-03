@@ -44,15 +44,25 @@ pytestmark = pytest.mark.integration
 _Change = Callable[[AsyncSession], Awaitable[Any]]
 
 
-async def _someone_is_waiting(db: AsyncSession) -> None:
+async def _someone_is_waiting(db: AsyncSession, second: asyncio.Task[Any]) -> None:
     """Until another backend of this database waits on a lock.
 
     ``pg_stat_activity`` is read once per transaction and then kept, and this
     session's transaction stays open between the polls: a poll that ran before
     the second change reached its lock saw "nobody waiting" for good. The
     snapshot is dropped before each read.
+
+    The wait ends on the signal, not on a count of polls: on a loaded machine
+    the second change can take seconds to get as far as its lock. It also ends
+    when the second change finishes without having waited, which is either its
+    own error (raised here, where it can be read) or a lock it never took.
     """
-    for _ in range(500):
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + 120
+    while loop.time() < deadline:
+        if second.done():
+            await second
+            raise AssertionError('the second change finished without waiting')
         await db.execute(text('SELECT pg_stat_clear_snapshot()'))
         waiting = await db.scalar(
             text(
@@ -80,7 +90,7 @@ async def _one_after_the_other(
     async with AsyncSession(bind=db.bind, expire_on_commit=False) as session:
         first_result = await first(session)
         waiting = asyncio.create_task(_second())
-        await _someone_is_waiting(db)
+        await _someone_is_waiting(db, waiting)
         await session.commit()
         second_result = await waiting
     return first_result, second_result
