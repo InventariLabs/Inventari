@@ -266,6 +266,7 @@ function ProductComboboxRow<T extends ProductComboboxOption>({
 /** The results as a listbox, with the caller's "add as new" panel under them
  *  when the text is a name no result carries in full. */
 function ProductComboboxList<T extends ProductComboboxOption>({
+  id,
   results,
   optionId,
   selectedIndex,
@@ -274,6 +275,8 @@ function ProductComboboxList<T extends ProductComboboxOption>({
   renderOptionMeta,
   footer,
 }: {
+  /** What the input's `aria-controls` names. */
+  id: string;
   results: T[];
   optionId: (index: number) => string;
   selectedIndex: number;
@@ -284,7 +287,7 @@ function ProductComboboxList<T extends ProductComboboxOption>({
 }) {
   return (
     <>
-      <div role="listbox">
+      <div id={id} role="listbox">
         {results.map((product, idx) => (
           <ProductComboboxRow
             key={product.product_template_id}
@@ -597,7 +600,6 @@ export function ProductCombobox<T extends ProductComboboxOption>({
               // every suggestion went dead to the mouse.
               pointerEvents: "auto",
             }}
-            id={listboxId}
             // Every open state of the panel — results, searching, empty —
             // carries the marker `Sheet` reads to leave Escape to the picker;
             // the listbox role alone covers only the one holding results.
@@ -605,17 +607,20 @@ export function ProductCombobox<T extends ProductComboboxOption>({
             className="bg-surface-card border border-border rounded-lg shadow-lg z-[var(--z-modal-nested)] overflow-y-auto overflow-x-hidden ring-1 ring-black/5"
           >
             {showLoading || showEmpty ? (
-              <ProductComboboxMessage
-                showLoading={showLoading}
-                failed={searchFailed}
-                onRetry={() => setRetryCount((n) => n + 1)}
-                query={query.trim()}
-                renderNoResults={renderNoResults}
-                onSelect={select}
-                t={t}
-              />
+              <div id={listboxId}>
+                <ProductComboboxMessage
+                  showLoading={showLoading}
+                  failed={searchFailed}
+                  onRetry={() => setRetryCount((n) => n + 1)}
+                  query={query.trim()}
+                  renderNoResults={renderNoResults}
+                  onSelect={select}
+                  t={t}
+                />
+              </div>
             ) : (
               <ProductComboboxList
+                id={listboxId}
                 results={results}
                 optionId={optionId}
                 selectedIndex={selectedIndex}

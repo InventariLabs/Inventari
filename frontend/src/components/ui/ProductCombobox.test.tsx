@@ -255,7 +255,7 @@ describe("ProductCombobox", () => {
     expect(input).toHaveAttribute("aria-expanded", "true");
     expect(input).toHaveAttribute(
       "aria-controls",
-      screen.getByRole("listbox").closest("[data-line-item-dropdown]")!.id,
+      screen.getByRole("listbox").id,
     );
   });
 
