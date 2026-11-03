@@ -444,7 +444,7 @@ function BrowseAppsTile() {
         <div className="w-14 h-14 rounded-[18px] flex items-center justify-center">
           <LayoutGrid size={26} strokeWidth={1.75} className="text-on-muted" />
         </div>
-        <span className="text-xs font-medium text-center leading-tight line-clamp-2 w-full px-0.5 text-on-muted">
+        <span className="text-xs font-medium text-center leading-tight line-clamp-2 w-full px-0.5 hyphens-auto break-words text-on-muted">
           {t("launcher:launcher.browseApps")}
         </span>
       </div>
