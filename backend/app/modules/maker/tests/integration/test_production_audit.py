@@ -149,6 +149,11 @@ class TestProductionRunAuditTrail:
         assert qty_changes, 'production wrote no quantity changes'
         for entry in qty_changes:
             assert entry['reason'] == 'production_run', entry
+            # The code carries no number; two runs on one day must still be
+            # told apart on the screens.
+            assert (entry.get('meta_data') or {}).get(
+                'production_order_number'
+            ) == number, entry
             assert (entry.get('meta_data') or {}).get('production_order_id') == run[
                 'order_id'
             ], entry
@@ -181,6 +186,7 @@ class TestProductionRunAuditTrail:
         assert rows, 'no history rows for the consumed item'
         blob = str(rows)
         assert 'production_run' in blob, blob[:400]
+        assert complete_resp.json()['number'] in blob, blob[:400]
 
     def test_taking_a_run_back_writes_a_code_the_screens_can_translate(
         self,

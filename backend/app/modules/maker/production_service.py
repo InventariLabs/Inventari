@@ -698,6 +698,7 @@ async def _consume_ingredients(
     history_changes = {
         'reason': 'production_run',
         'production_order_id': str(order.id),
+        'production_order_number': order.number or str(order.id),
     }
     await core_api.stock.lock_async(
         db,

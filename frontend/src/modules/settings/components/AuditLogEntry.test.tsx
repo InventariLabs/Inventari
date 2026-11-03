@@ -135,6 +135,15 @@ describe("AuditDetail — the document behind the row", () => {
     expect(screen.getByText("OUT/2026/003")).toBeInTheDocument();
   });
 
+  it("names the production run beside its reason code", () => {
+    renderDetail({
+      ...quantityRow({ production_order_number: "PR/2026/0001" }),
+      reason: "production_run",
+    });
+
+    expect(screen.getByText(/PR\/2026\/0001/)).toBeInTheDocument();
+  });
+
   it("links the number to the document when the reader may open it", () => {
     renderDetail(
       quantityRow({

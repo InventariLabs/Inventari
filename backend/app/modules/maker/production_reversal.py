@@ -97,6 +97,7 @@ async def reverse_production(
     history = {
         'reason': 'production_run_reversed',
         'production_order_id': str(order.id),
+        'production_order_number': order.number or str(order.id),
     }
     await _take_the_output_off(db, organization_id, order, user, history)
     rates = await _ingredient_rates(db, order.id)

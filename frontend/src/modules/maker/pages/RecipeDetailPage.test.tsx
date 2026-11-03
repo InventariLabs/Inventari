@@ -131,6 +131,16 @@ describe("RecipeDetailPage — the default formula is a choice, not a birthright
     expect(screen.getByTestId("header-subtitle")).toHaveTextContent("Jar");
   });
 
+  it("leaves the recipe's name to the page title and keeps the card's own facts", () => {
+    currentRecipe = { ...baseRecipe, is_default: true };
+    renderPage();
+    // The title is the shell's header; nothing in the page body repeats it.
+    expect(screen.queryByText("Jar of jam")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+    expect(screen.getByText(/default/i)).toBeInTheDocument();
+    expect(screen.getByText(/1/)).toBeInTheDocument();
+  });
+
   it("offers Set as default on a formula that is not the default", () => {
     currentRecipe = { ...baseRecipe, is_default: false };
     renderPage();

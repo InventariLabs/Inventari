@@ -25,9 +25,11 @@ says what the release does rather than what changed since them.
   ends in two full stops. The audit log names the unit a product template was
   created with the same way.
 - The stock changes a production run writes, and the ones its reversal writes,
-  carry a reason in the interface language instead of an English sentence.
-- A recipe named after the product it makes no longer prints the name twice in
-  the page header.
+  carry a reason in the interface language instead of an English sentence,
+  followed by the number of the run, in the audit log and in the item's history.
+- A recipe's page prints its name once, as the page title; the card under it
+  keeps the batch yield and the default badge, and the product made is named
+  under the title only when it is called something else.
 - The onboarding card for working with a single module now names Production,
   so a person who came to make things can find it.
 
