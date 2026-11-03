@@ -364,7 +364,7 @@
   },
   "stockManagement": "Zarządzanie zapasami",
   "minStockLevel": "Alert gdy ilość poniżej:",
-  "minStockHelp": "Ustaw próg, aby widzieć ten produkt na liście 'Mało zapasów'.",
+  "minStockHelp": "Ustaw próg, aby widzieć ten produkt na liście „Kończy się”.",
   "minQuantityPlaceholder": "np. 2",
   "configureStorage": "Konfiguruj",
   "configureStorageTitle": "Konfiguruj miejsce",

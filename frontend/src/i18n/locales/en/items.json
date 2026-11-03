@@ -323,7 +323,7 @@
   },
   "stockManagement": "Stock Management",
   "minStockLevel": "Alert if quantity below:",
-  "minStockHelp": "Set a threshold to see this product in the 'Running Low' list.",
+  "minStockHelp": "Set a threshold to see this product in the 'Running low' list.",
   "minQuantityPlaceholder": "e.g. 2",
   "configureStorage": "Configure",
   "configureStorageTitle": "Configure location",

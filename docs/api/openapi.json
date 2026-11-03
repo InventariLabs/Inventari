@@ -78304,6 +78304,18 @@
             ],
             "title": "Uom Symbol"
           },
+          "uom_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uom Id"
+          },
           "source": {
             "type": "string",
             "title": "Source"

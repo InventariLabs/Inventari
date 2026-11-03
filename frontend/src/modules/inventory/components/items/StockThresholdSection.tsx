@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import type { ItemFormData } from "@/modules/inventory/hooks/useItemForm";
+import { unitLabel } from "@/lib/i18nHelpers";
 import { RemovalStrategyChoice } from "../RemovalStrategyChoice";
 
 interface StockThresholdSectionProps {
@@ -51,7 +52,7 @@ export function StockThresholdSection({
           />
           {formData.uom_id && formData.uom && (
             <span className="text-sm font-medium text-on-secondary px-1">
-              {(formData.uom as { symbol: string }).symbol}
+              {unitLabel(t, (formData.uom as { symbol: string }).symbol)}
             </span>
           )}
         </div>
