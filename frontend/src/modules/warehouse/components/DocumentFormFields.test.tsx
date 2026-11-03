@@ -201,13 +201,13 @@ describe("DocumentFormFields", () => {
 
   it("renders scheduled date input", () => {
     render(<DocumentFormFields {...baseProps} />);
-    expect(screen.getByText("Scheduled Date")).toBeInTheDocument();
+    expect(screen.getByText("Scheduled date")).toBeInTheDocument();
   });
 
   it("renders external reference input", () => {
     render(<DocumentFormFields {...baseProps} />);
     expect(
-      screen.getByText("Reference / Related Document"),
+      screen.getByText("Reference / related document"),
     ).toBeInTheDocument();
   });
 
@@ -258,7 +258,7 @@ describe("DocumentFormFields", () => {
         onPartnerCreate={vi.fn()}
       />,
     );
-    expect(screen.getByText("Enable Partners")).toBeInTheDocument();
+    expect(screen.getByText("Enable partners")).toBeInTheDocument();
     // Notice body text rendered.
     expect(screen.getByText(/Enable the Partners module/i)).toBeInTheDocument();
     // No "+ Create new partner" dead action.

@@ -124,8 +124,8 @@ class TestTheExportKeepsWhatTheScreenShows:
         sheets = await _export(db, async_test_user)
 
         locations = sheets['Inventory'].set_index('Name')['Location']
-        assert locations['Switch 0'] == 'Building A → Server Room'
-        assert locations['Switch 1'] == 'Building B → Server Room'
+        assert locations['Switch 0'] == 'Building A › Server Room'
+        assert locations['Switch 1'] == 'Building B › Server Room'
 
     async def test_the_barcode_column_carries_the_code_on_the_product_card(
         self,

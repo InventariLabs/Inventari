@@ -222,7 +222,7 @@ class TestContextTagInheritance:
 
         rows = {row['name']: row for row in scoped}
         assert 'Server Room' not in rows
-        assert rows['QA Shelf B8']['full_path'] == 'Server Room → QA Shelf B8'
+        assert rows['QA Shelf B8']['full_path'] == 'Server Room › QA Shelf B8'
 
 
 @pytest.mark.integration

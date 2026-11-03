@@ -7,7 +7,7 @@ describe("locationChoiceOf", () => {
       locationChoiceOf({
         id: "shelf",
         name: "Top",
-        full_path: "Warehouse → Fridge A → Top",
+        full_path: "Warehouse › Fridge A › Top",
         short_code: "A-01",
         is_leaf: true,
       }),

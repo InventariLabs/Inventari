@@ -192,4 +192,4 @@ async def test_a_stock_take_finds_a_location_past_the_two_thousandth(
 
     assert set(snapshot_ids) == {last.id, child.id}
     assert set(family_ids) == {last.id, child.id}
-    assert paths[child.id] == 'Z_created after the seed / Z_child'
+    assert paths[child.id] == 'Z_created after the seed › Z_child'

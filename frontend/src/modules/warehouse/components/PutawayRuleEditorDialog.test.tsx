@@ -184,7 +184,7 @@ describe("PutawayRuleEditorDialog", () => {
     await user.click(await screen.findByText("Freezer"));
     await user.click(screen.getByRole("combobox", { name: /To location/i }));
     await user.click(await screen.findByText("Rack C-2"));
-    await user.click(screen.getByRole("button", { name: "Create Rule" }));
+    await user.click(screen.getByRole("button", { name: "Create rule" }));
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -226,7 +226,7 @@ describe("PutawayRuleEditorDialog", () => {
     const reordered = within(screen.getByRole("list")).getAllByRole("listitem");
     expect(reordered[0]).toHaveTextContent("Cold Store");
 
-    await user.click(screen.getByRole("button", { name: "Create Rule" }));
+    await user.click(screen.getByRole("button", { name: "Create rule" }));
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         location_type_code: "FREEZER",
@@ -277,7 +277,7 @@ describe("PutawayRuleEditorDialog", () => {
     const user = userEvent.setup();
     renderDialog();
 
-    const submit = screen.getByRole("button", { name: "Create Rule" });
+    const submit = screen.getByRole("button", { name: "Create rule" });
     expect(submit).toBeDisabled();
     expect(
       screen.getByText("At least one match key is required"),
@@ -472,7 +472,7 @@ describe("PutawayRuleEditorDialog on a short screen", () => {
 
     const exits = [
       ...screen.getAllByRole("button", { name: /close/i }),
-      screen.getByRole("button", { name: "Create Rule" }),
+      screen.getByRole("button", { name: "Create rule" }),
       screen.getByRole("button", { name: "Cancel" }),
     ];
     for (const exit of exits) {
@@ -490,7 +490,7 @@ describe("PutawayRuleEditorDialog on a short screen", () => {
 
     await user.click(screen.getByRole("combobox", { name: /Category$/i }));
     await user.click(await screen.findByText("Dairy"));
-    await user.click(screen.getByRole("button", { name: "Create Rule" }));
+    await user.click(screen.getByRole("button", { name: "Create rule" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "To location is required",

@@ -22,10 +22,10 @@ describe("useStorageLocationLabels", () => {
 
     await waitFor(() =>
       expect(result.current("shelf-599", "Shelf 599")).toBe(
-        "Warehouse → Shelf 599",
+        "Warehouse › Shelf 599",
       ),
     );
-    expect(result.current("shelf-3", null)).toBe("Warehouse → Shelf 3");
+    expect(result.current("shelf-3", null)).toBe("Warehouse › Shelf 3");
     // Two places named: one request for the two, not twelve pages of 600.
     expect(requests).toHaveLength(1);
     expect(requests[0].getAll("ids").sort()).toEqual(["shelf-3", "shelf-599"]);

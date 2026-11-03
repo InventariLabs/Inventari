@@ -36,7 +36,7 @@ vi.mock("@/contexts/ModulesContext", async (importOriginal) => ({
  * The backend refused this account all sixteen writes the pass tried, each
  * with a translated message. The screens went on offering "New document",
  * "Add Rule", "Create Order", "Add rule", "Add price", "New correction",
- * "Receive stock", "Request Approval", "Save Profile", "Send to Vendor" and
+ * "Receive stock", "Request Approval", "Save Profile", "Send to supplier" and
  * eight padlocks over the accounting periods — every one of them refused only
  * after the form had been filled in.
  */

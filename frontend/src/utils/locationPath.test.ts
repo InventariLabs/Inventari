@@ -2,9 +2,11 @@
  * One format for a location path, everywhere it is shown.
  *
  * A path is what tells two shelves called "Top" apart. Screens wrote it
- * three ways: the backend composes `full_path` with " → ", the document form
- * joined its own segments with " / ", and the archive dialog showed no path
- * at all — a list of bare names where the target could not be identified.
+ * four ways: the backend composes `full_path` with one separator, the
+ * document form joined its own segments with " / ", the occupancy view with
+ * another, and the arrow that says where a document's goods went was also a
+ * path's. The archive dialog showed no path at all — a list of bare names
+ * where the target could not be identified.
  */
 import { describe, expect, it } from "vitest";
 
@@ -18,22 +20,22 @@ import {
 const shelf = {
   id: "loc-1",
   name: "Top",
-  full_path: "Main Warehouse → Bay 3 → Top",
+  full_path: "Main Warehouse › Bay 3 › Top",
 };
 
 describe("the location path is written one way", () => {
   it("uses the separator the backend composes paths with", () => {
     // storage_query_service._compute_full_path joins with this exact string.
-    expect(LOCATION_PATH_SEPARATOR).toBe(" → ");
+    expect(LOCATION_PATH_SEPARATOR).toBe(" › ");
   });
 
   it("shows the whole path, not just the last segment", () => {
-    expect(getStorageLocationPath(shelf)).toBe("Main Warehouse → Bay 3 → Top");
+    expect(getStorageLocationPath(shelf)).toBe("Main Warehouse › Bay 3 › Top");
   });
 
   it("appends a shelf with the same separator", () => {
     expect(getStorageLocationPath(shelf, "second from the left")).toBe(
-      "Main Warehouse → Bay 3 → Top → second from the left",
+      "Main Warehouse › Bay 3 › Top › second from the left",
     );
   });
 
@@ -47,7 +49,7 @@ describe("the location path is written one way", () => {
   });
 
   it("says the path under a nested location", () => {
-    expect(locationPathBelowName(shelf)).toBe("Main Warehouse → Bay 3 → Top");
+    expect(locationPathBelowName(shelf)).toBe("Main Warehouse › Bay 3 › Top");
   });
 
   it("says nothing when the backend sent no path", () => {
@@ -73,7 +75,7 @@ describe("a path with no backend full_path is rebuilt from the list", () => {
 
   it("walks the ancestors up to the root", () => {
     expect(getStorageLocationPath(storages[2], null, undefined, storages)).toBe(
-      "Main Warehouse → Bay 3 → Top",
+      "Main Warehouse › Bay 3 › Top",
     );
   });
 
@@ -85,7 +87,7 @@ describe("a path with no backend full_path is rebuilt from the list", () => {
         undefined,
         storages,
       ),
-    ).toBe("Main Warehouse → Bay 3 → Top → second from the left");
+    ).toBe("Main Warehouse › Bay 3 › Top › second from the left");
   });
 
   it("leaves a root storage as its own name", () => {
@@ -97,12 +99,12 @@ describe("a path with no backend full_path is rebuilt from the list", () => {
   it("prefers the backend path over the walk when both are available", () => {
     expect(
       getStorageLocationPath(
-        { ...storages[2], full_path: "Elsewhere → Top" },
+        { ...storages[2], full_path: "Elsewhere › Top" },
         null,
         undefined,
         storages,
       ),
-    ).toBe("Elsewhere → Top");
+    ).toBe("Elsewhere › Top");
   });
 
   it("stops at the last known ancestor rather than inventing one", () => {
@@ -118,16 +120,16 @@ describe("a path with no backend full_path is rebuilt from the list", () => {
       { id: "b", name: "B", parent_id: "a" },
     ];
     expect(getStorageLocationPath(cycle[0], null, undefined, cycle)).toBe(
-      "B → A",
+      "B › A",
     );
   });
 });
 
 describe("a path is split into the leaf and the road to it", () => {
   it("puts the last segment first and the rest behind it", () => {
-    expect(splitLocationPath("Pantry Building → Dry Goods → Shelf A")).toEqual({
+    expect(splitLocationPath("Pantry Building › Dry Goods › Shelf A")).toEqual({
       leaf: "Shelf A",
-      parents: "Pantry Building → Dry Goods",
+      parents: "Pantry Building › Dry Goods",
     });
   });
 

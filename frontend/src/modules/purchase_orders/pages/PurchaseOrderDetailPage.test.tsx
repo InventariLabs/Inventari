@@ -478,7 +478,7 @@ describe("PurchaseOrderDetailPage", () => {
     );
   });
 
-  it("shows send to vendor button for confirmed PO", async () => {
+  it("shows send to supplier button for confirmed PO", async () => {
     server.use(
       http.get("/api/v1/purchase-orders/po-1", () =>
         HttpResponse.json(confirmedPO),
@@ -487,7 +487,7 @@ describe("PurchaseOrderDetailPage", () => {
     render(<PurchaseOrderDetailPage />, { wrapper: createWrapper() });
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /send to vendor/i }),
+        screen.getByRole("button", { name: /send to supplier/i }),
       ).toBeInTheDocument();
     });
   });

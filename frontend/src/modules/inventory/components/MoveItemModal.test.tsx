@@ -52,7 +52,7 @@ const foodFridge = {
   id: "loc-fridge",
   name: "Fridge A - Top Shelf",
   parent_id: "loc-internal",
-  full_path: "Cold Storage → Fridge A - Top Shelf",
+  full_path: "Cold Storage › Fridge A - Top Shelf",
   is_leaf: true,
   usage: "internal",
   context_tag: "food",

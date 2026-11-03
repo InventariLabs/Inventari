@@ -386,7 +386,7 @@ function ItemTableRowBase({
           The leaf comes first and is never cut: a product held in twelve
           records on twelve shelves of one warehouse differs only in its last
           segment, and a one-line path truncated at the end printed twelve
-          identical rows. Only the road to the leaf ("Pantry Building → Dry
+          identical rows. Only the road to the leaf ("Pantry Building › Dry
           Goods") is truncated, on a line of its own, and `title` carries
           what truncation took away.
 

@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import StorageDTO, WorkItemDTO, WorkItemQueryDTO
 from app.core.module_scope import get_claimed_context_tags
+from app.core.module_sdk import join_location_path
 from app.core.public_api import core_api
 
 from .cycle_count_service import (
@@ -244,13 +245,13 @@ async def _due_location_counts(
 
 
 def _path(by_id: dict[UUID, StorageDTO], storage: StorageDTO) -> str:
-    """The location as a person finds it: "Main Warehouse / Shelf A"."""
+    """The location as a person finds it: "Main Warehouse › Shelf A"."""
     chain: list[str] = []
     cursor: StorageDTO | None = storage
     while cursor is not None and len(chain) < len(by_id):
         chain.append(cursor.name)
         cursor = by_id.get(cursor.parent_id) if cursor.parent_id else None
-    return ' / '.join(reversed(chain))
+    return join_location_path(reversed(chain))
 
 
 stock_takes_api = StockTakesAPI()
