@@ -20,6 +20,7 @@ import {
 } from "@/modules/equipment/components/checkinConditions";
 import { ReturnLocationField } from "@/modules/equipment/components/ReturnLocationField";
 import { useCheckin } from "@/modules/equipment/hooks/useEquipment";
+import { useIsSignedInAs } from "@/module-sdk";
 
 /**
  * What checking in actually needs to know — narrower than
@@ -33,6 +34,7 @@ export interface CheckinTarget {
   id: string;
   item_name: string;
   assigned_to_name?: string | null;
+  assigned_to_email?: string | null;
   partner_name?: string | null;
   /** The holder, person or place, resolved by the backend. */
   holder_name?: string | null;
@@ -45,7 +47,8 @@ interface CheckinModalProps {
   homeLocationId?: string | null;
   /**
    * The holder is handing it back, not a manager receiving it: the dialog
-   * speaks the holder's verb.
+   * speaks the holder's verb. A viewer whose own address is the assignment's
+   * is the holder without being told, so the asset page words it right too.
    */
   byHolder?: boolean;
   onClose: () => void;
@@ -54,11 +57,14 @@ interface CheckinModalProps {
 export function CheckinModal({
   assignment,
   homeLocationId,
-  byHolder = false,
+  byHolder: handedBack = false,
   onClose,
 }: CheckinModalProps) {
   const { t } = useTranslation("equipment");
   const checkinMutation = useCheckin();
+  const holdsIt = useIsSignedInAs(assignment.assigned_to_email);
+  const byHolder =
+    handedBack || (assignment.holder_kind !== "location" && holdsIt);
 
   const title = byHolder
     ? t("assignments.checkin_modal.title_holder")
@@ -121,19 +127,20 @@ export function CheckinModal({
           {/* A line that names nobody is worse than no line: "Assigned to:"
               with an empty tail read as a missing answer, not as the holder's
               own check-in. The holder's screen passes its own "you". */}
-          {(assignment.holder_name ||
-            assignment.partner_name ||
-            assignment.assigned_to_name) && (
-            <p className="text-xs text-on-muted">
-              {assignment.holder_kind === "location"
-                ? `${t("assignments.standing_in")}: ${assignment.holder_name}`
-                : `${t("assignments.held_by")}: ${
-                    assignment.holder_name ??
-                    assignment.partner_name ??
-                    assignment.assigned_to_name
-                  }`}
-            </p>
-          )}
+          {!byHolder &&
+            (assignment.holder_name ||
+              assignment.partner_name ||
+              assignment.assigned_to_name) && (
+              <p className="text-xs text-on-muted">
+                {assignment.holder_kind === "location"
+                  ? `${t("assignments.standing_in")}: ${assignment.holder_name}`
+                  : `${t("assignments.held_by")}: ${
+                      assignment.holder_name ??
+                      assignment.partner_name ??
+                      assignment.assigned_to_name
+                    }`}
+              </p>
+            )}
         </div>
 
         <form

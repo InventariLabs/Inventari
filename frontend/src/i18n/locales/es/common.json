@@ -369,7 +369,7 @@
       },
       "revoked": "Revocada",
       "invitationAccepted": "Aceptada",
-      "profileDefault": "Valor del perfil",
+      "profileDefault": "Valor del modo de espacio de trabajo",
       "fields": {
         "address": "Dirección",
         "adjusted_items": "Líneas ajustadas",

@@ -1,5 +1,11 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import i18next from "i18next";
 import { toast } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -14,6 +20,7 @@ import { http, HttpResponse } from "msw";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import type { EquipmentAssignment } from "@/modules/equipment/api/equipment";
 import type { Item } from "@/types";
+import { useAuthStore } from "@/store/authStore";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -171,6 +178,35 @@ describe("CheckinModal", () => {
     }
   });
 
+  it("speaks the holder's verb on the asset page when the viewer holds it", async () => {
+    await i18next.changeLanguage("pl");
+    const before = useAuthStore.getState().user;
+    act(() => {
+      useAuthStore.setState({
+        user: { ...(before ?? {}), email: "JOHN@example.com" } as never,
+      });
+    });
+    let unmountView: (() => void) | undefined;
+    try {
+      ({ unmount: unmountView } = render(
+        <CheckinModal assignment={mockAssignment} onClose={onClose} />,
+        { wrapper: createWrapper() },
+      ));
+      expect(
+        screen.getByRole("dialog", { name: "Zwróć zasób" }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Zwróć" })).toBeInTheDocument();
+      // The holder is not told their own name in the third person.
+      expect(screen.queryByText(/John Doe/)).not.toBeInTheDocument();
+    } finally {
+      unmountView?.();
+      act(() => {
+        useAuthStore.setState({ user: before });
+      });
+      await i18next.changeLanguage("en");
+    }
+  });
+
   it("names the status a damaged return moved the asset to", async () => {
     render(<CheckinModal assignment={mockAssignment} onClose={onClose} />, {
       wrapper: createWrapper(),
@@ -280,6 +316,22 @@ describe("Equipment modal scrolling", () => {
     });
 
     expectScrollableModal("checkout-modal-card", "checkout-modal-body");
+  });
+
+  it("keeps the checkout buttons outside the scroll layer, submit still tied to the form", () => {
+    render(<CheckoutModal item={mockItem} onClose={onClose} />, {
+      wrapper: createWrapper(),
+    });
+
+    const body = screen.getByTestId("checkout-modal-body");
+    const submit = screen.getByRole("button", { name: "Check Out" });
+    const cancel = screen.getByRole("button", { name: "Cancel" });
+    // Inside the scrolling form they sat below the phone sheet's edge until
+    // the form was scrolled to its end.
+    expect(body).not.toContainElement(submit);
+    expect(body).not.toContainElement(cancel);
+    expect(submit).toHaveAttribute("form", body.id);
+    expect(body.id).not.toBe("");
   });
 
   it("constrains checkin content to a scrollable viewport", () => {
