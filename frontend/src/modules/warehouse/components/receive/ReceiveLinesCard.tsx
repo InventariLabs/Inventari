@@ -99,7 +99,10 @@ export function ReceiveLinesCard({
               <th scope="col" className="w-full px-4 py-2 font-medium">
                 {t("receive.product")}
               </th>
-              <th scope="col" className="px-2 py-2 font-medium">
+              <th
+                scope="col"
+                className="whitespace-nowrap px-2 py-2 font-medium"
+              >
                 {t("receive.ordered")}
               </th>
               <th scope="col" className="px-2 py-2 font-medium">
