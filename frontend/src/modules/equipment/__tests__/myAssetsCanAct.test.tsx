@@ -105,9 +105,10 @@ describe("My Assets, for a holder who can check in", () => {
     // The modal names what is being handed back — it takes the assignment,
     // and the holder's list describes it under a different shape.
     expect(screen.getAllByText("ThinkPad T14").length).toBeGreaterThan(1);
-    // The holder line comes from the payload, not from a field the modal
-    // finds empty: it used to read "Assigned to: undefined" here.
-    expect(screen.getByText(/Held by: Alicja Holder/)).toBeInTheDocument();
+    // The holder is the one handing it back: the dialog does not tell them
+    // who holds it (it used to read "Assigned to: undefined", then their own
+    // name in the third person).
+    expect(screen.queryByText(/Held by/)).not.toBeInTheDocument();
   });
 
   it("does not repeat the sentence about who else could do it", async () => {

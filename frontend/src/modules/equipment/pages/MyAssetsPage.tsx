@@ -22,7 +22,6 @@ import {
 } from "@/modules/equipment/hooks/useMyAssets";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
-import { format } from "date-fns";
 import { formatDateMedium } from "@/utils/formatters";
 import { useFormatOrgDay } from "@/hooks/useOrganizationTimezone";
 import { getCategoryLabel } from "@/modules/equipment/components/assetUtils";
@@ -235,7 +234,7 @@ export default function MyAssetsPage() {
                       {h.item_name}
                     </Link>
                     <p className="text-xs text-on-muted">
-                      {format(new Date(h.checked_out_at), "MMM d")} —{" "}
+                      {formatDateMedium(h.checked_out_at)} —{" "}
                       {h.checked_in_at
                         ? formatDateMedium(h.checked_in_at)
                         : "..."}
@@ -243,7 +242,10 @@ export default function MyAssetsPage() {
                   </div>
                   {h.checkin_condition && (
                     <span className="text-xs text-on-muted">
-                      {h.checkin_condition}
+                      {t(
+                        `assignments.condition_${h.checkin_condition.toLowerCase()}`,
+                        { defaultValue: h.checkin_condition },
+                      )}
                     </span>
                   )}
                 </div>
@@ -256,6 +258,7 @@ export default function MyAssetsPage() {
       {returning && (
         <CheckinModal
           assignment={returning}
+          byHolder
           onClose={() => setReturning(null)}
         />
       )}

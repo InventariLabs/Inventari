@@ -399,7 +399,7 @@ apart.
 | `IMPORT_ROW_FAILED` | The row could not be imported |
 | `IMPORT_TOO_MANY_ROWS` | The file has {count} rows; the limit is {limit}. Split it into smaller files. |
 | `IMPORT_UNKNOWN_UNIT` | Column "{column}": unknown unit "{value}". Known units: {units} |
-| `INGREDIENT_DEFAULTS_UNREADABLE_FILE` | Could not read the file: {detail} |
+| `INGREDIENT_DEFAULTS_UNREADABLE_FILE` | The file could not be read. The import expects a .json or .csv file with one row per ingredient. |
 | `INSUFFICIENT_QUANTITY` | Not enough stock to perform this action |
 | `INTERNAL_ERROR` | An internal error occurred |
 | `INVALID_COUNTRY_CODE` | Country must be a two-letter ISO 3166-1 alpha-2 code (e.g. PL). |
