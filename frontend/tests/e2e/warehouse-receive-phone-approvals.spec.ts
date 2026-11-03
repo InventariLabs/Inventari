@@ -127,7 +127,7 @@ test.describe("Receiving on a phone", () => {
     // First card: the rice, ordered ten. Only six came.
     const dialog = session(page);
     await expect(dialog.getByText("0 of 2", { exact: true })).toBeVisible();
-    await expect(dialog.getByText("Ordered 10 pcs.")).toBeVisible();
+    await expect(dialog.getByText("Still due 10 pcs.")).toBeVisible();
     await countField(page, d.rice.name).fill("6");
     await expect(
       dialog.getByText("4 pcs. missing. It stays expected on the order."),
@@ -142,7 +142,7 @@ test.describe("Receiving on a phone", () => {
 
     // Second card: the beans arrived in full, and the confirmed shelf holds.
     await expect(dialog.getByText("1 of 2", { exact: true })).toBeVisible();
-    await expect(dialog.getByText("Ordered 6 pcs.")).toBeVisible();
+    await expect(dialog.getByText("Still due 6 pcs.")).toBeVisible();
     await expect(countField(page, d.beans.name)).toHaveValue("6");
     await expect(
       dialog.getByText("Location confirmed", { exact: true }),
@@ -187,7 +187,7 @@ test.describe("Receiving on a phone", () => {
     await expect(
       session(page).getByText("0 of 1", { exact: true }),
     ).toBeVisible();
-    await expect(session(page).getByText("Ordered 4 pcs.")).toBeVisible();
+    await expect(session(page).getByText("Still due 4 pcs.")).toBeVisible();
     await scanShelf(page, d.shelf.code);
     await session(page)
       .getByRole("button", { name: "Correct, finish receiving" })
@@ -235,10 +235,10 @@ test.describe("Receiving on a phone", () => {
       .click();
     await expect(page).toHaveURL(/#receive/);
     const dialog = session(page);
-    await expect(dialog.getByText("Ordered 5 pcs.")).toBeVisible();
+    await expect(dialog.getByText("Still due 5 pcs.")).toBeVisible();
     await scanShelf(page, d.shelf.code);
     await dialog.getByRole("button", { name: "Correct, next" }).click();
-    await expect(dialog.getByText("Ordered 3 pcs.")).toBeVisible();
+    await expect(dialog.getByText("Still due 3 pcs.")).toBeVisible();
     await dialog
       .getByRole("button", { name: "Correct, finish receiving" })
       .click();
@@ -277,7 +277,7 @@ test.describe("Receiving on a phone", () => {
 
     await scanShelf(page, d.shelf.code);
     await dialog.getByRole("button", { name: "Correct, next" }).click();
-    await expect(dialog.getByText("Ordered 3 pcs.")).toBeVisible();
+    await expect(dialog.getByText("Still due 3 pcs.")).toBeVisible();
 
     await dialog
       .getByRole("button", { name: "The rest did not come — finish" })
@@ -292,7 +292,7 @@ test.describe("Receiving on a phone", () => {
     ).toBeVisible();
     // Keeping on returns to the card without booking anything.
     await page.getByRole("button", { name: "Keep receiving" }).click();
-    await expect(dialog.getByText("Ordered 3 pcs.")).toBeVisible();
+    await expect(dialog.getByText("Still due 3 pcs.")).toBeVisible();
     expect(await seed.onHand(d.rice, d.shelf)).toBe(0);
 
     await dialog
@@ -356,7 +356,7 @@ test.describe("Receiving on a phone", () => {
     const dialog = session(page);
     // No order to speak of: the count somebody wrote down is "expected".
     await expect(dialog.getByText("Expected 3 pcs.")).toBeVisible();
-    await expect(dialog.getByText(/^Ordered /)).toHaveCount(0);
+    await expect(dialog.getByText(/^Still due /)).toHaveCount(0);
     await scanShelf(page, shelf.code);
     await dialog.getByRole("button", { name: "Correct, next" }).click();
     await expect(dialog.getByText("Expected 1 pcs.")).toBeVisible();
@@ -562,6 +562,6 @@ test.describe("Receiving on a phone", () => {
     await expect(
       session(page).getByText("0 of 1", { exact: true }),
     ).toBeVisible();
-    await expect(session(page).getByText("Ordered 4 pcs.")).toBeVisible();
+    await expect(session(page).getByText("Still due 4 pcs.")).toBeVisible();
   });
 });

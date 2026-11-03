@@ -1262,7 +1262,7 @@
       "scanPrompt": "Scannez le produit suivant, dans n'importe quel ordre",
       "scanLocation": "Scannez l'étiquette de l'emplacement",
       "scanned": "Scanné",
-      "ordered": "Commandé {{quantity}}",
+      "ordered": "Reste {{quantity}}",
       "countedSoFar": "{{quantity}} comptés jusqu'ici",
       "howMany": "Quantité arrivée de {{name}}",
       "arrived": "{{unit}} arrivés",
@@ -1808,7 +1808,7 @@
     },
     "todo": {
       "count": "{{shown}} sur {{total}}",
-      "footnote": "Les tâches proviennent automatiquement des commandes d'achat et de vente, des ordres de fabrication, des validations et du planning de comptage."
+      "footnote": "Les tâches proviennent automatiquement des commandes d'achat, des documents d'expédition, des ordres de fabrication, des validations et du planning de comptage."
     },
     "feed": {
       "title": "Aujourd'hui dans l'entrepôt",
@@ -2045,7 +2045,7 @@
     "addPrices": "Ajouter les prix pour la comptabilité",
     "hidePrices": "Masquer les prix",
     "product": "Produit",
-    "ordered": "Commandé",
+    "ordered": "Reste à recevoir",
     "received": "Arrivé",
     "putOn": "Ranger sur",
     "unitPrice": "Prix unitaire",
