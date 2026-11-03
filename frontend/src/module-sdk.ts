@@ -60,6 +60,8 @@ export { useCanWrite } from "@/hooks/useCanWrite";
 // a screen offering an approval decision asks `approvals:approve` here.
 export { useHasPermission } from "@/hooks/useHasPermission";
 export { useHasRole } from "@/hooks/useHasRole";
+// Whether the signed-in user is the person a record names by e-mail address.
+export { useIsSignedInAs } from "@/hooks/useIsSignedInAs";
 export { useModulePageHeader } from "@/hooks/useModulePageHeader";
 // Whether the history holds an earlier screen of the app to go back to, for a
 // dialog that closes by going back to the link that opened it.

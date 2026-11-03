@@ -138,3 +138,20 @@ class TestADamagedReturnFilesAServiceEntry:
 
         (entry,) = _service_entries(client, eq_auth_headers, eq_item)
         assert entry['title'] == 'Zwrócony — wymaga naprawy'
+
+    def test_a_portuguese_return_is_filed_in_portuguese(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+    ) -> None:
+        """The dialog promises this wording, so the row cannot fall back to English."""
+        _check_out_and_in(
+            client,
+            {**eq_auth_headers, 'Accept-Language': 'pt'},
+            eq_item,
+            condition='DAMAGED',
+        )
+
+        (entry,) = _service_entries(client, eq_auth_headers, eq_item)
+        assert entry['title'] == 'Devolvido danificado'
