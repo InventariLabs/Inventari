@@ -147,6 +147,19 @@ describe("auditChanges value dictionaries", () => {
     ]);
   });
 
+  it("reads the condition an asset came back in as the return dialog words it", () => {
+    const changes = auditChanges(
+      { before: { condition: null }, after: { condition: "NEEDS_REPAIR" } },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([
+      { path: "condition", from: "—", to: "Wymaga naprawy" },
+    ]);
+  });
+
   it("words a restore's deletion reason the way the archive does", () => {
     const changes = auditChanges(
       {

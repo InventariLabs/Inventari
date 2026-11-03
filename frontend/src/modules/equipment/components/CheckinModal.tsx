@@ -43,17 +43,29 @@ interface CheckinModalProps {
   assignment: CheckinTarget;
   /** The asset's own location — where the return puts it unless told otherwise. */
   homeLocationId?: string | null;
+  /**
+   * The holder is handing it back, not a manager receiving it: the dialog
+   * speaks the holder's verb.
+   */
+  byHolder?: boolean;
   onClose: () => void;
 }
 
 export function CheckinModal({
   assignment,
   homeLocationId,
+  byHolder = false,
   onClose,
 }: CheckinModalProps) {
   const { t } = useTranslation("equipment");
   const checkinMutation = useCheckin();
 
+  const title = byHolder
+    ? t("assignments.checkin_modal.title_holder")
+    : t("assignments.checkin_modal.title");
+  const submitLabel = byHolder
+    ? t("assignments.checkin_modal.submit_holder")
+    : t("assignments.checkin_modal.submit");
   const [condition, setCondition] = useState<CheckinCondition>("GOOD");
   const [notes, setNotes] = useState("");
   const [returnTo, setReturnTo] = useState(homeLocationId ?? "");
@@ -100,12 +112,8 @@ export function CheckinModal({
       >
         <DialogHeader className="flex flex-row items-center gap-3 border-b border-border px-5 py-4">
           <RotateCcw size={18} className="text-primary-500" />
-          <DialogTitle className="font-semibold text-on">
-            {t("assignments.checkin_modal.title")}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {t("assignments.checkin_modal.title")}
-          </DialogDescription>
+          <DialogTitle className="font-semibold text-on">{title}</DialogTitle>
+          <DialogDescription className="sr-only">{title}</DialogDescription>
         </DialogHeader>
 
         <div className="px-5 pt-3 pb-1">
@@ -169,7 +177,7 @@ export function CheckinModal({
               {checkinMutation.isPending && (
                 <Loader2 size={14} className="animate-spin mr-2" />
               )}
-              {t("assignments.checkin_modal.submit")}
+              {submitLabel}
             </Button>
           </SheetActions>
         </form>

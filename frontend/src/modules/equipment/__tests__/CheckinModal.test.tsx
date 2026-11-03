@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import i18next from "i18next";
 import { toast } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
@@ -116,9 +117,13 @@ describe("CheckinModal", () => {
     render(<CheckinModal assignment={mockAssignment} onClose={onClose} />, {
       wrapper: createWrapper(),
     });
-    expect(screen.getByText(/good/i)).toBeInTheDocument();
-    expect(screen.getByText(/damaged/i)).toBeInTheDocument();
-    expect(screen.getByText(/needs repair/i)).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /^good/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /^damaged/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /^needs repair/i }),
+    ).toBeInTheDocument();
   });
 
   // A tap on the second radio took the asset out of circulation and filed a
@@ -128,9 +133,42 @@ describe("CheckinModal", () => {
       wrapper: createWrapper(),
     });
     expect(screen.getByText("Back to Available.")).toBeInTheDocument();
+    // The two service conditions open differently titled entries, and each
+    // radio names its own.
     expect(
-      screen.getAllByText("To Maintenance, with a repair entry."),
-    ).toHaveLength(2);
+      screen.getByText("To Maintenance, with an entry “Returned damaged”."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "To Maintenance, with an entry “Returned — needs repair”.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("speaks the verb of whoever is returning: the holder hands back, a manager receives", async () => {
+    await i18next.changeLanguage("pl");
+    try {
+      const { unmount } = render(
+        <CheckinModal assignment={mockAssignment} byHolder onClose={onClose} />,
+        { wrapper: createWrapper() },
+      );
+      expect(
+        screen.getByRole("dialog", { name: "Zwróć zasób" }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Zwróć" })).toBeInTheDocument();
+      unmount();
+
+      const second = render(
+        <CheckinModal assignment={mockAssignment} onClose={onClose} />,
+        { wrapper: createWrapper() },
+      );
+      expect(
+        screen.getByRole("dialog", { name: "Przyjmij zasób" }),
+      ).toBeInTheDocument();
+      second.unmount();
+    } finally {
+      await i18next.changeLanguage("en");
+    }
   });
 
   it("names the status a damaged return moved the asset to", async () => {

@@ -371,6 +371,7 @@
       },
       "revoked": "Cofnięte",
       "invitationAccepted": "Przyjęte",
+      "profileDefault": "Ustawienie profilu",
       "fields": {
         "address": "Adres",
         "adjusted_items": "Skorygowane pozycje",

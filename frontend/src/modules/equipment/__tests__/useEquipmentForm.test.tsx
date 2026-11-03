@@ -435,7 +435,42 @@ describe("useEquipmentForm — invalidates cache after create + image upload", (
       const invalidatedKeys = invalidateSpy.mock.calls.map(
         (c) => (c[0] as { queryKey: readonly unknown[] }).queryKey,
       );
-      expect(invalidatedKeys.some((k) => k.includes("assets"))).toBe(true);
+      // The equipment prefix covers the assets list and its detail entries.
+      expect(
+        invalidatedKeys.some(
+          (k) =>
+            k.includes("assets") || (k.length === 1 && k[0] === "equipment"),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  it("refreshes the overview counts too, not only the asset list", async () => {
+    // The category chart reads the asset list and the tiles read the
+    // dashboard; refreshing only the list left "0 assets" beside "Laptop 1".
+    const { qc, Wrapper } = makeWrapper();
+    const invalidateSpy = vi.spyOn(qc, "invalidateQueries");
+
+    const { result } = renderHook(() => useEquipmentForm(undefined, {}), {
+      wrapper: Wrapper,
+    });
+
+    act(() => {
+      result.current.set("name", "Laptop");
+      result.current.set("location_id", "loc-1");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: vi.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    await waitFor(() => {
+      const invalidatedKeys = invalidateSpy.mock.calls.map(
+        (c) => (c[0] as { queryKey: readonly unknown[] }).queryKey,
+      );
+      expect(invalidatedKeys.some((k) => k.includes("dashboard"))).toBe(true);
     });
   });
 });

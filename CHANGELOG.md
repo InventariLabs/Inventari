@@ -20,6 +20,15 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- Handing an asset back from "My assets" opens a dialog titled and worded for
+  the person returning it, and the damaged and needs-repair choices each say
+  which repair entry they open. The holder's assignment history prints both
+  days and the condition in the interface language, and the organization log
+  does the same for the condition of a return.
+- The organization log marks the settings a workspace mode writes when it is
+  chosen as "Profile default" instead of an update the person made.
+- The equipment overview counts a new asset as soon as it is saved, also after
+  a batch add, without reloading the page.
 
 ## v0.11.0 - 2026-11-02
 

@@ -369,6 +369,7 @@
       },
       "revoked": "Zurückgezogen",
       "invitationAccepted": "Angenommen",
+      "profileDefault": "Profilvorgabe",
       "fields": {
         "address": "Adresse",
         "adjusted_items": "Korrigierte Positionen",

@@ -369,6 +369,7 @@
       },
       "revoked": "Révoquée",
       "invitationAccepted": "Acceptée",
+      "profileDefault": "Valeur du profil",
       "fields": {
         "address": "Adresse",
         "adjusted_items": "Lignes ajustées",
