@@ -225,6 +225,54 @@ describe("useQuickAdd", () => {
     expect(shown).not.toContain(i18next.t("common:errors.sessionEnded"));
     error.mockRestore();
   });
+
+  it("does not say the product was not saved when only its attachment was refused by an ended session", async () => {
+    // A pending file field goes up as an attachment after the create, through
+    // a path of its own from the photo's.
+    server.use(
+      http.post("/api/v1/items", () =>
+        HttpResponse.json(
+          { id: "new-item", name: "Jam", quantity: 1, metadata: null },
+          { status: 201 },
+        ),
+      ),
+      http.post("/api/v1/items/:id/attachments", () =>
+        HttpResponse.json({ detail: "expired" }, { status: 401 }),
+      ),
+      http.post(
+        "*/api/v1/auth/refresh",
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+    );
+    const error = vi.spyOn(toast, "error");
+
+    const { result } = renderHook(() => useQuickAdd({ onSuccess: vi.fn() }), {
+      wrapper: createWrapper(),
+    });
+    act(() => {
+      result.current.handleFileSelect(
+        "manual",
+        new File(["pdf"], "manual.pdf", { type: "application/pdf" }),
+      );
+      result.current.setFormData((prev) => ({
+        ...prev,
+        name: "Jam",
+        quantity: "1",
+        location_id: "1",
+      }));
+    });
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    await waitFor(() => expect(error).toHaveBeenCalled());
+    const shown = error.mock.calls.map(([message]) => String(message));
+    expect(shown).toContain(
+      i18next.t("items:messages.fileUploadFailedAttachment"),
+    );
+    expect(shown).not.toContain(i18next.t("common:errors.sessionEnded"));
+    error.mockRestore();
+  });
 });
 
 /**
