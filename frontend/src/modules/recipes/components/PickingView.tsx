@@ -191,7 +191,9 @@ export default function PickingView({
         isLoading={isLoading}
         error={error}
         onStart={handleStart}
-        onClose={onClose}
+        // No arguments on purpose: the idle phase hands its button's click
+        // event to this, and a caller reads the first argument as "completed".
+        onClose={() => onClose()}
         t={t}
       />
     );

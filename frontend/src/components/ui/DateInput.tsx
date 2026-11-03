@@ -56,6 +56,7 @@ export type DatePresetId =
   | "today"
   | "yesterday"
   | "plus1Week"
+  | "plus2Weeks"
   | "plus1Month"
   | "plus3Months"
   | "plus6Months"
@@ -69,6 +70,7 @@ const PRESET_OFFSETS: Record<DatePresetId, (from: Date) => Date> = {
   today: (d) => d,
   yesterday: (d) => addDays(d, -1),
   plus1Week: (d) => addWeeks(d, 1),
+  plus2Weeks: (d) => addWeeks(d, 2),
   plus1Month: (d) => addMonths(d, 1),
   plus3Months: (d) => addMonths(d, 3),
   plus6Months: (d) => addMonths(d, 6),

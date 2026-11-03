@@ -51,6 +51,20 @@ describe("useItemFilters", () => {
     expect(result.current.expiringFilter).toBe(true);
   });
 
+  it("turning one date chip on turns the other off", () => {
+    const { result } = renderHook(() => useItemFilters(), {
+      wrapper: wrapper(),
+    });
+    act(() => result.current.setExpiredFilter(true));
+    act(() => result.current.setExpiringFilter(true));
+    expect(result.current.expiringFilter).toBe(true);
+    expect(result.current.expiredFilter).toBe(false);
+
+    act(() => result.current.setExpiredFilter(true));
+    expect(result.current.expiredFilter).toBe(true);
+    expect(result.current.expiringFilter).toBe(false);
+  });
+
   it("resetting filter resets skip to 0", () => {
     const { result } = renderHook(() => useItemFilters(), {
       wrapper: wrapper(),

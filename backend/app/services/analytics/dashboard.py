@@ -23,10 +23,16 @@ from app.core.contracts import (
 from app.core.db_utils import in_ids
 from app.core.module_ownership import general_rows, hidden_module_tags_async
 from app.models import Category, Item, ItemHistory, StorageLocation
+from app.models.storage_location import LocationUsage
 from app.services.items.expiry import is_expired, is_expiring_soon
 from app.services.storage._queries import list_storage_ids_async
 
-from ._common import get_org_currency_async, org_currency_filter, org_today_async
+from ._common import (
+    get_internal_storage_ids_async,
+    get_org_currency_async,
+    org_currency_filter,
+    org_today_async,
+)
 
 
 async def get_stats_by_storage_async(
@@ -39,8 +45,13 @@ async def get_stats_by_storage_async(
     the products list.
     """
     hidden = await hidden_module_tags_async(db, organization_id)
+    # Real shelves only: the system's consumed / loss / production places are
+    # move targets. A used-up product stays there as a row of quantity 0, so
+    # counting them put a phantom place at the head of the chart and made the
+    # breakdown add up to more than the overview's record count.
     storages_query = select(StorageLocation).where(
-        StorageLocation.organization_id == organization_id
+        StorageLocation.organization_id == organization_id,
+        StorageLocation.usage == LocationUsage.INTERNAL,
     )
     if hidden:
         storages_query = storages_query.where(
@@ -101,7 +112,7 @@ async def get_stats_by_category_async(
     shows module data, as its records stay out of the products list.
     """
     hidden = await hidden_module_tags_async(db, organization_id)
-    storage_ids = await list_storage_ids_async(db, organization_id)
+    storage_ids = await get_internal_storage_ids_async(db, organization_id, hidden)
     if not storage_ids:
         return []
 
