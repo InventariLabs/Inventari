@@ -97,12 +97,15 @@ interface ProductComboboxProps<T extends ProductComboboxOption> {
  */
 function ProductComboboxMessage<T extends ProductComboboxOption>({
   showLoading,
+  failed,
   query,
   renderNoResults,
   onSelect,
   t,
 }: {
   showLoading: boolean;
+  /** The search itself was refused or never ran — not an empty answer. */
+  failed: boolean;
   query: string;
   renderNoResults?: (
     query: string,
@@ -116,6 +119,15 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
       <div className="flex items-center gap-2 p-3 text-sm text-on-muted">
         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent-600" />
         {t("combobox.searching")}
+      </div>
+    );
+  }
+  if (failed) {
+    // Offering "add as new" here would invite a duplicate of a product the
+    // search never got to look for.
+    return (
+      <div role="alert" className="p-3 text-sm text-danger">
+        {t("combobox.searchFailed")}
       </div>
     );
   }
@@ -182,6 +194,8 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // branch would flash while the debounce is still pending.
   const [searchedQuery, setSearchedQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  // The search for `searchedQuery` threw: its empty `results` are no answer.
+  const [searchFailed, setSearchFailed] = useState(false);
 
   const trimmedQuery = query.trim();
   const settledQuery = useDebounce(trimmedQuery, debounceMs);
@@ -193,6 +207,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
     if (trimmedQuery.length < minQueryLength) {
       setResults([]);
       setSearchedQuery("");
+      setSearchFailed(false);
       setIsLoading(false);
     }
   }, [trimmedQuery, minQueryLength]);
@@ -207,10 +222,12 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         const data = await searchRef.current(settledQuery);
         if (cancelled || seq !== requestSeq.current) return;
         setResults(data);
+        setSearchFailed(false);
         setSearchedQuery(settledQuery);
       } catch {
         if (cancelled || seq !== requestSeq.current) return;
         setResults([]);
+        setSearchFailed(true);
         setSearchedQuery(settledQuery);
       } finally {
         if (!cancelled && seq === requestSeq.current) setIsLoading(false);
@@ -225,6 +242,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
     setQuery("");
     setResults([]);
     setSearchedQuery("");
+    setSearchFailed(false);
     setSelectedIndex(-1);
   }
 
@@ -413,6 +431,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
             {showLoading || showEmpty ? (
               <ProductComboboxMessage
                 showLoading={showLoading}
+                failed={searchFailed}
                 query={query.trim()}
                 renderNoResults={renderNoResults}
                 onSelect={select}

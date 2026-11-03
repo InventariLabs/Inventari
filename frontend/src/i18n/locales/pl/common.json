@@ -1304,6 +1304,7 @@
   },
   "combobox": {
     "searching": "Szukanie…",
+    "searchFailed": "Wyszukiwanie nie powiodło się. Spróbuj ponownie.",
     "noResults": "Brak wyników dla „{{query}}”"
   },
   "productQuickCreate": {

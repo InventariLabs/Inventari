@@ -16,15 +16,20 @@ export interface ProductTemplateNutritionInfo {
  *  the endpoint already sends. */
 export type ProductTemplate = components["schemas"]["ProductTemplate"];
 
+/** Longest search text the endpoint takes; a product name may be longer. */
+const SEARCH_MAX_LENGTH = 100;
+
 export const productTemplatesApi = {
   get: async (templateId: string): Promise<ProductTemplate> => {
     const { data } = await api.get(`/items/product-templates/${templateId}`);
     return data;
   },
 
+  /** A name longer than the endpoint's limit is searched by its opening —
+   *  sending all of it would be refused outright. */
   search: async (query: string, limit = 10): Promise<ProductTemplate[]> => {
     const { data } = await api.get(`/items/product-templates`, {
-      params: { search: query, limit },
+      params: { search: query.slice(0, SEARCH_MAX_LENGTH), limit },
     });
     return data;
   },
