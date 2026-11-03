@@ -51,6 +51,14 @@ interface UomSelectProps {
   unitWhenUnset?: string;
 }
 
+/** What the compact trigger names: the unit picked, else the one a save lands on. */
+function symbolToShow(
+  selected: Uom | null | undefined,
+  unitWhenUnset: string | undefined,
+): string | undefined {
+  return selected?.symbol ?? unitWhenUnset;
+}
+
 // ── What to show (symbols in preferred display order) ────────────────────────
 // Only units that actually exist in DB seeding are listed here.
 // Common = shown by default in the flat grid.
@@ -229,6 +237,7 @@ export const UomSelect: React.FC<UomSelectProps> = ({
       .filter((u) => restricted === null || restricted.has(u.category_id)) ??
     [];
   const selectedUom = allUoms.find((u) => u.id === value);
+  const shownSymbol = symbolToShow(selectedUom, unitWhenUnset);
 
   // Build ordered arrays from COMMON_ORDER / RARE_ORDER
   const commonUoms = COMMON_ORDER.map((sym) =>
@@ -283,11 +292,11 @@ export const UomSelect: React.FC<UomSelectProps> = ({
       <span
         className={cn(
           "text-xs font-medium",
-          value || unitWhenUnset ? "text-primary-700" : "text-on-muted",
+          shownSymbol ? "text-primary-700" : "text-on-muted",
         )}
       >
-        {selectedUom || unitWhenUnset
-          ? unitLabel(t, selectedUom?.symbol ?? unitWhenUnset)
+        {shownSymbol
+          ? unitLabel(t, shownSymbol)
           : // A dash beside a sibling picker reading "pcs" says nothing
             // about whether the unit is unset or does not apply. A verb, and
             // one that is not also the name of a unit: every other value this
@@ -296,9 +305,7 @@ export const UomSelect: React.FC<UomSelectProps> = ({
       </span>
       <ChevronDown
         size={14}
-        className={
-          value || unitWhenUnset ? "text-primary-500" : "text-on-muted"
-        }
+        className={shownSymbol ? "text-primary-500" : "text-on-muted"}
       />
     </Button>
   ) : (
