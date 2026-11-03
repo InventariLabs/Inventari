@@ -95,6 +95,10 @@ describe("MealPlanPickerModal", () => {
     mocks.useMealPlans.mockReturnValue({ data: [] });
     renderModal();
     expect(screen.getByText(/Create a meal plan first/)).toBeInTheDocument();
+    // "New Plan" places the recipe at once, so the hint must not promise
+    // that it can be added later.
+    expect(screen.getByText(/added to the first meal/)).toBeInTheDocument();
+    expect(screen.queryByText(/later/)).not.toBeInTheDocument();
   });
 
   it("gives the empty state an exit and a way to create a plan", () => {

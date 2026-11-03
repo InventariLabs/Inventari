@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useDebounce } from "@/module-sdk";
 import { todayIso } from "@/utils/formatters";
 import {
@@ -163,7 +163,11 @@ export function useProductionForm(
   const unit = preview.data?.planned_uom_symbol ?? selected?.uom_symbol ?? null;
   // The recipe is written per batch; the person writes what came out.
   const batchYield = preview.data?.batch_yield_qty;
-  const batch = batchYield ? formatQuantityLocalized(t, batchYield, unit) : "";
+  // The hint's sentence ends the batch with its own full stop, and a unit
+  // written "szt." brings one of its own: one is enough.
+  const batch = batchYield
+    ? formatQuantityLocalized(t, batchYield, unit).replace(/\.$/, "")
+    : "";
   let batchHint: string | undefined;
   if (batch && mode === "made")
     batchHint = t("create.batchHintMade", { batch });
@@ -187,7 +191,7 @@ export function useProductionForm(
     canPreview: requirements.length === 0,
     payload,
     preview,
-    unit,
+    unit: unit ? unitLabel(t, unit) : null,
     batchHint,
   };
 }

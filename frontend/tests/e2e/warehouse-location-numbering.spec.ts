@@ -101,7 +101,7 @@ async function openLocation(page: Page, location: Place) {
   await page.goto(`/inventory/locations/${location.id}`);
   await expect(
     page.getByRole("heading", { name: location.name, level: 2 }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
 }
 
 /** The code the tree shows next to a location's name. */

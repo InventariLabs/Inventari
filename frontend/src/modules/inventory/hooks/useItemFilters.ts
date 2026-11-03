@@ -129,9 +129,18 @@ export function useItemFilters() {
     categoryFilter: f.values.categoryFilter as string,
     setCategoryFilter: (v: string) => f.setFilter("categoryFilter", v),
     expiringFilter: f.values.expiringFilter as boolean,
-    setExpiringFilter: (v: boolean) => f.setFilter("expiringFilter", v),
+    // The two date chips are alternatives: they combine with AND, and no
+    // product is both "soon" and "past", so both on read as "No matching
+    // products" next to an expired yogurt. Turning one on turns the other off.
+    setExpiringFilter: (v: boolean) => {
+      if (v) f.setFilter("expiredFilter", false);
+      f.setFilter("expiringFilter", v);
+    },
     expiredFilter: f.values.expiredFilter as boolean,
-    setExpiredFilter: (v: boolean) => f.setFilter("expiredFilter", v),
+    setExpiredFilter: (v: boolean) => {
+      if (v) f.setFilter("expiringFilter", false);
+      f.setFilter("expiredFilter", v);
+    },
     lowStockFilter: f.values.lowStockFilter as boolean,
     setLowStockFilter: (v: boolean) => f.setFilter("lowStockFilter", v),
     usedUpFilter: f.values.usedUpFilter as boolean,

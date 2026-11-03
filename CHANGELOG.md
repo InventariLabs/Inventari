@@ -20,6 +20,34 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- The new production dialog writes the unit the way the rest of the app does
+  ("szt." rather than "pcs"), and its hint about the recipe's batch no longer
+  ends in two full stops. The audit log names the unit a product template was
+  created with the same way.
+- The stock changes a production run writes, and the ones its reversal writes,
+  carry a reason in the interface language instead of an English sentence,
+  followed by the number of the run, in the audit log and in the item's history.
+- A recipe's page prints its name once, as the page title; the card under it
+  keeps the batch yield and the default badge, and the product made is named
+  under the title only when it is called something else.
+- The onboarding card for working with a single module now names Production,
+  so a person who came to make things can find it.
+- Saving two partners with the same name, or the same code, at the same moment
+  now refuses the second one with the usual "already exists" message instead
+  of failing with a server error.
+- A recipe ingredient typed by hand whose name has accented letters ("Ryż") now
+  finds the product on the shelf ("Ryż 1 kg") instead of reading as missing.
+- The expiry date picker starts with a week, two weeks and a month, so fresh
+  food no longer needs the calendar.
+- The two date chips on the products list, "expiring soon" and "expired", no
+  longer stay on together and show an empty list: turning one on turns the
+  other off.
+- Statistics count stock rows as records instead of pieces, name the products
+  without a category in the reader's language, list the fullest places first
+  and leave out the system's consumed, loss and production places.
+- The meal plan dialog that has no plan yet now says the recipe is added to the
+  first meal of the new plan at once, and closing the "Take from stock" dialog
+  no longer marks the recipe as cooked.
 
 ## v0.11.0 - 2026-11-02
 

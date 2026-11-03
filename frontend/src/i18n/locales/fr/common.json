@@ -657,6 +657,8 @@
         "recipe_picking_undo": "Cuisine — ingrédient remis",
         "recipe_picking_cancelled": "Cuisine annulée — stock remis",
         "stock_take_adjustment": "Correction d'inventaire",
+        "production_run": "Ordre de fabrication",
+        "production_run_reversed": "Ordre de fabrication annulé",
         "circuit_breaker": "Désactivé par le disjoncteur après des échecs de livraison répétés"
       },
       "targetTypes": {
@@ -1244,6 +1246,7 @@
     "today": "Aujourd'hui",
     "yesterday": "Hier",
     "plus1Week": "Dans une semaine",
+    "plus2Weeks": "Dans 2 semaines",
     "plus1Month": "Dans un mois",
     "plus3Months": "Dans 3 mois",
     "plus6Months": "Dans 6 mois",

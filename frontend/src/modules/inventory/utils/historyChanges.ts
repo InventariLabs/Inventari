@@ -112,9 +112,13 @@ function readQuantityChanged(
   // code for what the count found. One event, one story, both screens.
   const reason = changes.reason as string | undefined;
   if (reason) {
-    parts.push(
-      t(`common:settings.audit.reasons.${reason}`, { defaultValue: reason }),
-    );
+    // A production run's reason is a code, and the code carries no number:
+    // two runs on one day would read the same without it.
+    const run = changes.production_order_number as string | undefined;
+    const label = t(`common:settings.audit.reasons.${reason}`, {
+      defaultValue: reason,
+    });
+    parts.push(run ? `${label} ${run}` : label);
   }
   const discrepancyCode = changes.discrepancy_reason_code as string | undefined;
   if (discrepancyCode) {

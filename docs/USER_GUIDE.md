@@ -479,6 +479,9 @@ has them, its batch and expiry date below.
   code** field. It fills in an internal EAN-13 starting with `20`, the GS1
   range a company may use for its own goods; no two products in the
   organization get the same one, and a code a product already has is skipped.
+  It is the organization's own internal code, which cannot be mistaken for a
+  manufacturer's, and it is valid only inside the organization: goods sold on
+  through other businesses' tills need a GTIN from GS1.
   **Save changes** keeps it. A product that already has a code does not offer
   the button: changing the code would orphan the labels already on the shelf.
 - **One product.** On a product's page, **Print label** (shown once the
