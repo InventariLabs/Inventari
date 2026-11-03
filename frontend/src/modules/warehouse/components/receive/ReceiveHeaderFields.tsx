@@ -49,6 +49,8 @@ interface Props {
 
   targetLocationId: string;
   onTargetChange: (id: string) => void;
+  /** Set while the post was refused for want of a location. */
+  targetError?: string;
   locationsEmptyReason: LocationPickerEmptyReason | null;
   locationsFailed: boolean;
 
@@ -81,6 +83,7 @@ export function ReceiveHeaderFields({
   onPartnerChange,
   targetLocationId,
   onTargetChange,
+  targetError,
   locationsEmptyReason,
   locationsFailed,
   externalReference,
@@ -168,6 +171,7 @@ export function ReceiveHeaderFields({
           scope={{ purpose: "stock" }}
           value={targetLocationId}
           onChange={onTargetChange}
+          error={targetError}
           placeholder={t("receive.warehousePlaceholder")}
           searchPlaceholder={t("receive.searchWarehouse")}
           emptyMessage={

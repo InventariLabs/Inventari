@@ -1262,7 +1262,7 @@
       "scanPrompt": "Nächstes Produkt scannen, in beliebiger Reihenfolge",
       "scanLocation": "Etikett des Lagerorts scannen",
       "scanned": "Gescannt",
-      "ordered": "Bestellt {{quantity}}",
+      "ordered": "Noch offen {{quantity}}",
       "countedSoFar": "bisher {{quantity}} gezählt",
       "howMany": "Wie viel von {{name}} angekommen ist",
       "arrived": "{{unit}} angekommen",
@@ -1808,7 +1808,7 @@
     },
     "todo": {
       "count": "{{shown}} von {{total}}",
-      "footnote": "Aufgaben entstehen von selbst aus Bestellungen, Fertigungsaufträgen, Genehmigungen und dem Zählplan."
+      "footnote": "Aufgaben entstehen von selbst aus Bestellungen, Versandbelegen, Fertigungsaufträgen, Genehmigungen und dem Zählplan."
     },
     "feed": {
       "title": "Heute im Lager",
@@ -2045,7 +2045,7 @@
     "addPrices": "Preise für die Buchhaltung hinzufügen",
     "hidePrices": "Preise ausblenden",
     "product": "Produkt",
-    "ordered": "Bestellt",
+    "ordered": "Noch offen",
     "received": "Angekommen",
     "putOn": "Einlagern auf",
     "unitPrice": "Nettopreis",
