@@ -51,6 +51,34 @@ describe("BarcodeField", () => {
     expect(generateBarcode).toHaveBeenCalledTimes(1);
   });
 
+  it("says what a generated code is beside the button and with the code", () => {
+    const { unmount } = render(
+      <QueryClientProvider client={new QueryClient()}>
+        <BarcodeField field={barcodeField} value="" onChange={vi.fn()} />
+      </QueryClientProvider>,
+    );
+    expect(
+      screen.getByRole("button", { name: "Generate code" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/valid only inside the organization/),
+    ).toBeVisible();
+    unmount();
+
+    renderField("2000000000015");
+    expect(
+      screen.getByText(/valid only inside the organization/),
+    ).toBeVisible();
+  });
+
+  it("keeps the hint off a manufacturer's code", () => {
+    renderField("5901234123457");
+
+    expect(
+      screen.queryByText(/valid only inside the organization/),
+    ).not.toBeInTheDocument();
+  });
+
   it("offers nothing to replace a code the product already has", () => {
     renderField("5901234123457");
 

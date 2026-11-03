@@ -5,6 +5,8 @@ import { useGenerateProductCode } from "@/modules/inventory/hooks/useItemMutatio
 import type { FieldDefinition } from "@/types";
 import { DefaultInputField } from "./DefaultInputField";
 
+const INTERNAL_CODE = /^20\d{11}$/;
+
 interface BarcodeFieldProps {
   id?: string;
   field: FieldDefinition;
@@ -31,31 +33,44 @@ export function BarcodeField({
 }: BarcodeFieldProps) {
   const { t } = useTranslation("items");
   const generate = useGenerateProductCode();
-  const empty = String(value ?? "").trim() === "";
+  const code = String(value ?? "").trim();
+  const empty = code === "";
+  // The range the generator draws from: an EAN-13 starting with 20, which
+  // GS1 keeps for a company's own goods.
+  const internal = INTERNAL_CODE.test(code);
 
   return (
-    <div className="flex items-start gap-2">
-      <div className="flex-1 min-w-0">
-        <DefaultInputField
-          id={id}
-          field={field}
-          value={value}
-          error={error}
-          onChange={onChange}
-        />
+    <div>
+      <div className="flex items-start gap-2">
+        <div className="flex-1 min-w-0">
+          <DefaultInputField
+            id={id}
+            field={field}
+            value={value}
+            error={error}
+            onChange={onChange}
+          />
+        </div>
+        {empty && (
+          <Button
+            type="button"
+            variant="outline"
+            leftIcon={<Barcode size={16} />}
+            isLoading={generate.isPending}
+            onClick={() =>
+              generate.mutate(undefined, {
+                onSuccess: (generated) => onChange(generated),
+              })
+            }
+          >
+            {t("fields.generateCode")}
+          </Button>
+        )}
       </div>
-      {empty && (
-        <Button
-          type="button"
-          variant="outline"
-          leftIcon={<Barcode size={16} />}
-          isLoading={generate.isPending}
-          onClick={() =>
-            generate.mutate(undefined, { onSuccess: (code) => onChange(code) })
-          }
-        >
-          {t("fields.generateCode")}
-        </Button>
+      {(empty || internal) && (
+        <p className="text-xs text-on-muted mt-1.5">
+          {t("fields.generateCodeHint")}
+        </p>
       )}
     </div>
   );
