@@ -696,8 +696,9 @@ async def _consume_ingredients(
     # the set on purpose: a run that eats A to make B and one that eats B to
     # make A are exactly the shape that deadlocks without it.
     history_changes = {
-        'reason': f'Production run {order.number or order.id}',
+        'reason': 'production_run',
         'production_order_id': str(order.id),
+        'production_order_number': order.number or str(order.id),
     }
     await core_api.stock.lock_async(
         db,

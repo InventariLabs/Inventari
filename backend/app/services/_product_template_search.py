@@ -147,6 +147,74 @@ def _word_condition(word: str) -> Any:
     return or_(*[ProductTemplate.name.ilike(f'%{escape_ilike(s)}%') for s in spellings])
 
 
+def _build_accent_variants() -> dict[str, str]:
+    """Each plain Latin letter, with the accented letters that fold to it.
+
+    The database cannot compare "ryz" with "Ryż" by itself (``ilike`` is
+    case-insensitive, not accent-insensitive) and the ``unaccent`` extension
+    is not part of every deployment. The classes are built from the same
+    ``anyascii`` the caller folds with, so no language is hard-coded; only
+    the single-letter folds are listed, the rest is the raw spelling's job.
+    """
+    variants: dict[str, set[str]] = {}
+    for code_point in range(0xC0, 0x250):
+        letter = chr(code_point).lower()
+        plain = anyascii(letter)
+        if len(letter) == 1 and letter != plain and len(plain) == 1 and plain.isalpha():
+            # Both cases are listed: a database in the "C" locale folds the
+            # case of ASCII letters only.
+            variants.setdefault(plain, set()).update({letter, letter.upper()})
+    return {plain: ''.join(sorted(letters)) for plain, letters in variants.items()}
+
+
+_ACCENT_VARIANTS = _build_accent_variants()
+
+
+def _accent_tolerant_regex(folded: str) -> str | None:
+    """A regex matching *folded* in a name that kept its accents.
+
+    ``None`` when no letter of *folded* has an accented spelling: the raw
+    pattern already finds it.
+    """
+    parts = []
+    tolerant = False
+    for char in folded:
+        letters = _ACCENT_VARIANTS.get(char)
+        if letters:
+            tolerant = True
+            parts.append(f'[{char}{letters}]')
+        else:
+            parts.append(char if char.isalnum() else f'\\{char}')
+    return ''.join(parts) if tolerant else None
+
+
+def _names_containing(fragments: list[str]) -> Any:
+    """``name`` contains one of *fragments* in its own spelling, or folded.
+
+    The raw pattern per fragment covers every script and the multi-letter
+    folds ("ß" for "ss"). The accent-tolerant regex covers a fragment the
+    caller already folded ("ryz") against a name that kept its letters
+    ("Ryż 1 kg"); all of them go into ONE regex, because PostgreSQL keeps 32
+    compiled regexes per session and a query naming more recompiles on every
+    row (a recipes page names about sixty fragments).
+
+    Both read the name as stored. The raw patterns alone stay on the trigram
+    index; the regex does not, so the query scans the catalogue whenever a
+    fragment has an accented spelling.
+    """
+    conditions = [
+        ProductTemplate.name.ilike(f'%{escape_ilike(fragment)}%')
+        for fragment in fragments
+    ]
+    folded = {anyascii(fragment).lower() for fragment in fragments}
+    regexes = sorted(
+        {regex for fragment in folded if (regex := _accent_tolerant_regex(fragment))}
+    )
+    if regexes:
+        conditions.append(ProductTemplate.name.op('~*')('|'.join(regexes)))
+    return or_(*conditions)
+
+
 async def search_fuzzy_many_async(
     db: AsyncSession,
     org_id: UUID,
@@ -164,8 +232,12 @@ async def search_fuzzy_many_async(
     names travel back alongside the ids to make that possible.
 
     Matching is diacritic-insensitive: both the fragment and the template
-    name are folded to ASCII before comparison, so a catalogue stored as
-    "Maslo" answers a query spelled "Masło" and the other way round.
+    name are folded to ASCII for the verdict, so a catalogue stored as
+    "Maslo" answers a query spelled "Masło" and the other way round. The
+    database narrows by the fragment as given (any script, "ß", "œ") and by
+    its ASCII fold against the accented Latin letters of a name ("ryz" finds
+    "Ryż"); a name whose letters fold to several ("Weißbrot" for "weissbrot")
+    is reached by the fragment spelled with them, not by the folded one.
 
     Args:
         org_id: Calling organization scope.
@@ -180,17 +252,12 @@ async def search_fuzzy_many_async(
     if not cleaned:
         return {}
 
-    # A fragment and a name can disagree on diacritics in either
-    # direction, so narrow on both spellings and settle it in Python
-    # where folding is available on both sides.
-    patterns = {
-        f'%{escape_ilike(spelling)}%'
-        for fragment in cleaned
-        for spelling in (fragment, anyascii(fragment).lower())
-    }
+    # A fragment and a name can disagree on diacritics in either direction,
+    # so narrow tolerantly and settle the exact verdict in Python below,
+    # where the same fold is available on both sides.
     result = await db.execute(
         select(ProductTemplate.id, ProductTemplate.name).where(
-            or_(*[ProductTemplate.name.ilike(p) for p in patterns]),
+            _names_containing(cleaned),
             or_(
                 ProductTemplate.organization_id == org_id,
                 ProductTemplate.organization_id.is_(None),

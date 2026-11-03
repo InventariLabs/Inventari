@@ -9,6 +9,7 @@ Tests verify correctness of endpoints:
 """
 
 from datetime import date, timedelta
+from decimal import Decimal
 
 import pytest
 from fastapi import status
@@ -137,6 +138,68 @@ class TestStatsByStorage:
         data = response.json()['items']
         assert len(data) == 1
         assert data[0]['items_count'] == 5
+
+    def test_empty_virtual_places_stay_out_of_the_breakdown(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_type: StorageType,
+        test_storage_location: StorageLocation,
+    ) -> None:
+        """The system's own consumed/loss/production places hold no stock a
+        reader could act on; an empty one is noise between the real shelves."""
+        db_session.add(
+            StorageLocation(
+                organization_id=test_user.organization_id,
+                created_by=test_user.id,
+                storage_type_id=test_storage_type.id,
+                name='Consumed (Virtual)',
+                usage='customer',
+            )
+        )
+        db_session.commit()
+
+        response = client.get('/api/v1/stats/by-location', headers=auth_headers)
+
+        assert response.status_code == status.HTTP_200_OK
+        names = [row['location_name'] for row in response.json()['items']]
+        assert names == [test_storage_location.name]
+
+    def test_a_used_up_product_does_not_bring_its_virtual_place_back(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_type: StorageType,
+        test_storage_location: StorageLocation,
+        test_items_batch: list[Item],
+    ) -> None:
+        """Using a product up moves its row, at quantity 0, into the consumed
+        place. That row is history, not stock: the place chart and the
+        category chart must still add up to the records on the shelves."""
+        consumed = StorageLocation(
+            organization_id=test_user.organization_id,
+            created_by=test_user.id,
+            storage_type_id=test_storage_type.id,
+            name='Consumed (Virtual)',
+            usage='customer',
+        )
+        db_session.add(consumed)
+        db_session.flush()
+        test_items_batch[0].storage_location_id = consumed.id
+        test_items_batch[0].quantity = Decimal(0)
+        db_session.commit()
+
+        by_place = client.get('/api/v1/stats/by-location', headers=auth_headers)
+        by_category = client.get('/api/v1/stats/by-category', headers=auth_headers)
+
+        places = by_place.json()['items']
+        assert [row['location_name'] for row in places] == [test_storage_location.name]
+        assert sum(row['items_count'] for row in places) == 4
+        assert sum(row['items_count'] for row in by_category.json()['items']) == 4
 
 
 @pytest.mark.integration

@@ -1117,8 +1117,8 @@
         "setUp": "Lagerort einrichten"
       },
       "occupancy": {
-        "noLimit_one": "Kein Limit · {{count}} Datensatz",
-        "noLimit_other": "Kein Limit · {{count}} Datensätze",
+        "noLimit_one": "Kein Limit · {{count}} Produkt",
+        "noLimit_other": "Kein Limit · {{count}} Produkte",
         "sharesSum_one": "{{fill}}% — der Anteil von {{count}} begrenzten Produkt",
         "sharesSum_other": "{{fill}}% — die Anteile von {{count}} begrenzten Produkten zusammen",
         "unmeasured": "Ein Produkt hier hat kein Limit und wird nicht mitgezählt",

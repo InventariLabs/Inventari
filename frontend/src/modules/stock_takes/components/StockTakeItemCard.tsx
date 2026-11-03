@@ -9,6 +9,7 @@ import type {
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { unitLabel } from "@/lib/i18nHelpers";
+import { countedAmount } from "@/modules/stock_takes/countingQuantity";
 import { cn } from "@/lib/utils";
 import { ReasonCodeField } from "@/modules/shared/components/ReasonCodeField";
 import {
@@ -18,6 +19,30 @@ import {
 import { recordMarks, type Twin } from "@/modules/stock_takes/recordMarks";
 import StockTakeItemCardHeader from "./StockTakeItemCardHeader";
 import StockTakeItemFigures from "./StockTakeItemFigures";
+
+/**
+ * Something typed that reads as no number ("1.34.13"): the save stays disabled
+ * for it, so the box has to say why instead of leaving it mute.
+ */
+function isMalformedCount(counted: string): boolean {
+  return counted.trim() !== "" && countedAmount(counted) === null;
+}
+
+function malformedCountProps(counted: string, id: string) {
+  return isMalformedCount(counted)
+    ? { "aria-invalid": true, "aria-describedby": id }
+    : {};
+}
+
+function MalformedCountNote({ counted, id }: { counted: string; id: string }) {
+  const { t } = useTranslation(["stock_takes"]);
+  if (!isMalformedCount(counted)) return null;
+  return (
+    <p id={id} role="alert" className="mt-2 text-xs font-medium text-red-600">
+      {t("item.countMalformed")}
+    </p>
+  );
+}
 
 interface Props {
   itemId: string;
@@ -94,6 +119,7 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
   // `unitLabel` is the one place that decides the word, as
   // `StockTakeItemFigures` beside it does for the figures.
   const unit = unitLabel(t, stockTakeItem?.uom_symbol);
+  const malformedId = `${itemId}-count-malformed`;
   return (
     <div
       data-testid="stock-take-item-card"
@@ -156,6 +182,7 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
               onChange={(e) => onQuantityChange(itemId, e.target.value)}
               className="h-11 text-center"
               aria-label={t("item.countFor", { name: productName })}
+              {...malformedCountProps(counted, malformedId)}
             />
             <Button
               size="icon"
@@ -202,6 +229,10 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
         )}
       </div>
 
+      {isInProgress && (
+        <MalformedCountNote counted={counted} id={malformedId} />
+      )}
+
       {counts.length > 1 && (
         // Both numbers, with the names behind them. Two people arriving at
         // the same figure is what makes the correction believable, and a
@@ -219,7 +250,11 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
         </p>
       )}
 
-      {isInProgress && (
+      {/* A line with a difference has the reason field below, with a note of
+          its own; a second empty box would ask for the same remark twice. A
+          note already on the line — typed before the difference showed — stays
+          here to be read and changed, or the counter believes it was lost. */}
+      {isInProgress && (!discrepancy || note.trim() !== "") && (
         <div className="mt-3">
           <Input
             type="text"

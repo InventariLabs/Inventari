@@ -652,6 +652,8 @@
         "recipe_picking_undo": "Cozinhando — ingrediente devolvido",
         "recipe_picking_cancelled": "Preparo cancelado — estoque devolvido",
         "stock_take_adjustment": "Correção de contagem de estoque",
+        "production_run": "Produção",
+        "production_run_reversed": "Produção desfeita",
         "circuit_breaker": "Desativado pelo disjuntor após falhas repetidas de entrega"
       },
       "targetTypes": {
@@ -1233,6 +1235,7 @@
     "today": "Hoje",
     "yesterday": "Ontem",
     "plus1Week": "Em uma semana",
+    "plus2Weeks": "Em 2 semanas",
     "plus1Month": "Em um mês",
     "plus3Months": "Em 3 meses",
     "plus6Months": "Em 6 meses",

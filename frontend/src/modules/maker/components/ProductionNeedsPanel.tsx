@@ -8,7 +8,7 @@ import { useMoney } from "@/hooks/useMoney";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useModules } from "@/contexts/ModulesContext";
 import { extractApiError } from "@/lib/errors";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { CostGapNote } from "@/modules/maker/components/CostFigure";
 import { EmptyBomNotice } from "@/modules/maker/components/EmptyBomNotice";
 import { MissingRecipeNotice } from "@/modules/maker/components/MissingRecipeNotice";
@@ -182,7 +182,9 @@ function CostLine({ preview }: { preview: ProductionPreviewResponse }) {
   const priced = preview.entries.length - unpriced;
   if (preview.unit_cost == null)
     return <CostGapNote priced={priced} unpriced={unpriced} />;
-  const unit = preview.planned_uom_symbol ?? t("create.needs.unitFallback");
+  const unit = preview.planned_uom_symbol
+    ? unitLabel(t, preview.planned_uom_symbol)
+    : t("create.needs.unitFallback");
   const result =
     preview.result_per_unit == null ? null : Number(preview.result_per_unit);
   return (

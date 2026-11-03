@@ -658,6 +658,8 @@
         "recipe_picking_undo": "Cooking — ingredient put back",
         "recipe_picking_cancelled": "Cooking called off — stock put back",
         "stock_take_adjustment": "Stock take correction",
+        "production_run": "Production run",
+        "production_run_reversed": "Production run taken back",
         "circuit_breaker": "Disabled by the circuit breaker after repeated delivery failures"
       },
       "targetTypes": {
@@ -1243,6 +1245,7 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "plus1Week": "In a week",
+    "plus2Weeks": "In 2 weeks",
     "plus1Month": "In a month",
     "plus3Months": "In 3 months",
     "plus6Months": "In 6 months",

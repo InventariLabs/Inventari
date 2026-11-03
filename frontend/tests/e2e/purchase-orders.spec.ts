@@ -90,33 +90,27 @@ test.describe("Purchase Orders — page & navigation", () => {
     page,
     authenticatedPage,
   }) => {
-    const poNumber = `E2E-PO-${Date.now()}`;
-    let po: { id: string } | null = null;
+    // The backend numbers the order itself and ignores the number sent, so
+    // the page is looked at for the number it answered with. A failed create
+    // fails the test: it has nothing to show without the order.
+    const po = await api.createPurchaseOrder(token, {
+      number: `E2E-PO-${crypto.randomUUID()}`,
+      partner_id: seedPartnerId,
+      status: "DRAFT",
+      lines: [
+        { name: "E2E PO Item", quantity_ordered: 5, unit_price: "10.00" },
+      ],
+    });
+    expect(po.number).toBeTruthy();
+
     try {
-      po = await api.createPurchaseOrder(token, {
-        number: poNumber,
-        partner_id: seedPartnerId,
-        status: "DRAFT",
-        lines: [
-          { name: "E2E PO Item", quantity_ordered: 5, unit_price: "10.00" },
-        ],
+      await page.goto("/purchase-orders");
+      await expect(page.getByText(po.number).first()).toBeVisible({
+        timeout: 15000,
       });
-    } catch {
-      return;
+    } finally {
+      await api.cancelPurchaseOrder(token, po.id);
     }
-    if (!po?.id) return;
-
-    await page.goto("/purchase-orders");
-    await page
-      .waitForLoadState("networkidle", { timeout: 15000 })
-      .catch(() => {});
-
-    const poText = page.getByText(poNumber).first();
-    if (await poText.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(poText).toBeVisible();
-    }
-
-    await api.cancelPurchaseOrder(token, po.id);
   });
 
   test("navigates to templates page", async ({ page, authenticatedPage }) => {

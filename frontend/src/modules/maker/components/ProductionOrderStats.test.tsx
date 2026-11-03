@@ -137,6 +137,40 @@ describe("ProductionOrderStats", () => {
     ).toBeInTheDocument();
   });
 
+  // The preview of the same run says "on each kg"; the finished run named
+  // no unit at all.
+  it("names the output unit in the per-unit result", () => {
+    render(
+      <ProductionOrderStats
+        order={order({
+          status: "COMPLETED",
+          actual_qty: "10",
+          result_per_unit: "10.05",
+          output_uom_symbol: "kg",
+        } as never)}
+      />,
+    );
+    expect(screen.getByText(/PLN 10\.05 per kg\)/)).toBeInTheDocument();
+  });
+
+  it("names a counted unit in the reader's word, not the record's symbol", async () => {
+    // "kg" reads the same everywhere; "pcs" inside a Polish sentence did not.
+    await withLanguage("pl", () => {
+      render(
+        <ProductionOrderStats
+          order={order({
+            status: "COMPLETED",
+            actual_qty: "2",
+            result_per_unit: "45.68",
+            output_uom_symbol: "pcs",
+          } as never)}
+        />,
+      );
+      expect(screen.getByText(/za szt\.\)/)).toBeInTheDocument();
+      expect(screen.queryByText(/za pcs/)).not.toBeInTheDocument();
+    });
+  });
+
   it("writes actual and planned output with the translated unit, once", async () => {
     // The tile printed the raw symbol ("12 pcs") next to a dialog saying
     // "12 szt." on the same page — the unit must come from the same

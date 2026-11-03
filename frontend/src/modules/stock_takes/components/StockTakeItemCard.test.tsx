@@ -151,7 +151,11 @@ describe("StockTakeItemCard — two records of one product", () => {
 describe("StockTakeItemCard — identical records of one product", () => {
   const card = (
     position: number,
-    props: { discrepancy?: "missing" | null; reasonRequired?: boolean } = {},
+    props: {
+      discrepancy?: "missing" | null;
+      reasonRequired?: boolean;
+      note?: string;
+    } = {},
   ) => (
     <StockTakeItemCard
       itemId={`cable-${position}`}
@@ -174,7 +178,7 @@ describe("StockTakeItemCard — identical records of one product", () => {
       isUpdatePending={false}
       isInProgress={true}
       blindMode={true}
-      note=""
+      note={props.note ?? ""}
       awaitingRecount={false}
       counts={[]}
       onRequestRecount={() => {}}
@@ -218,5 +222,62 @@ describe("StockTakeItemCard — identical records of one product", () => {
       "aria-required",
       "true",
     );
+  });
+
+  // A difference carries the reason field with its own note. A second box
+  // beside it asked the counter to write the same remark twice.
+  it("offers one note field on a line with a difference", () => {
+    const { rerender } = render(card(1));
+    expect(screen.getAllByPlaceholderText(/note/i)).toHaveLength(1);
+    rerender(card(1, { discrepancy: "missing" }));
+    expect(screen.queryByPlaceholderText("Add a note…")).toBeNull();
+    expect(screen.getByTestId("discrepancy-reason-note")).toBeInTheDocument();
+  });
+
+  // A note typed before the Save is on the line when the difference shows up:
+  // it stays where the counter can read and change it, not hidden with the box.
+  it("keeps a note already on a line with a difference readable and editable", () => {
+    render(card(1, { discrepancy: "missing", note: "Dented box" }));
+    expect(screen.getByDisplayValue("Dented box")).toBeInTheDocument();
+    expect(screen.getByTestId("discrepancy-reason-note")).toBeInTheDocument();
+  });
+
+  // Typed digit by digit, "1.34.13" is no number: the save button stays
+  // disabled for it, and the box has to say why.
+  it("says so when the counted quantity is not a number", () => {
+    const withText = (counted: string) => (
+      <StockTakeItemCard
+        itemId="cable-1"
+        item={undefined}
+        stockTakeItem={undefined}
+        counted={counted}
+        savedCount={null}
+        discrepancy={null}
+        isSaved={false}
+        isUnsaved={false}
+        isUpdatePending={false}
+        isInProgress={true}
+        blindMode={true}
+        note=""
+        awaitingRecount={false}
+        counts={[]}
+        onRequestRecount={() => {}}
+        reasonCode=""
+        reasonNote=""
+        showReasonErrors={false}
+        onReasonChange={() => {}}
+        onNoteChange={() => {}}
+        onQuantityChange={() => {}}
+        onQuantityStep={() => {}}
+        onSave={() => {}}
+      />
+    );
+    const { rerender } = render(withText("1.5"));
+    expect(screen.queryByRole("alert")).toBeNull();
+    rerender(withText("1.34.13"));
+    expect(screen.getByRole("alert")).toHaveTextContent("not a number");
+    expect(
+      screen.getByRole("textbox", { name: /Counted quantity/ }),
+    ).toHaveAttribute("aria-invalid", "true");
   });
 });

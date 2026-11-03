@@ -32,6 +32,7 @@ export function useCompleteStockTakeFlow(
   lines: StockTakeItem[] | undefined,
   confirm: ReturnType<typeof useConfirm>["confirm"],
   unsavedCount = 0,
+  requireFullCount = false,
 ) {
   const { t } = useTranslation(["stock_takes"]);
   const navigate = useNavigate();
@@ -47,19 +48,44 @@ export function useCompleteStockTakeFlow(
   const handleComplete = useCallback(async () => {
     // A unit counted away from where its record stands is moved there even
     // when the number agrees — the same rows the server's report counts.
-    // The sentence names products, and one product can stand as several
+    // The sentences name products, and one product can stand as several
     // records (two receipts into one place): those are one product to the
     // reader, told by the name and brand every row of the count shows.
-    const adjustments = new Set(
-      (lines ?? [])
-        .filter(
-          (line) =>
-            line.counted_quantity != null &&
-            (line.counted_quantity !== line.system_quantity ||
-              line.expected_location_id != null),
-        )
-        .map((line) => `${line.item_name}\u0000${line.item_brand ?? ""}`),
-    ).size;
+    const productsIn = (rows: StockTakeItem[]) =>
+      new Set(
+        rows.map((line) => `${line.item_name}\u0000${line.item_brand ?? ""}`),
+      ).size;
+    const adjustments = productsIn(
+      (lines ?? []).filter(
+        (line) =>
+          line.counted_quantity != null &&
+          (line.counted_quantity !== line.system_quantity ||
+            line.expected_location_id != null),
+      ),
+    );
+
+    // The numbers typed but not saved, in the words the confirmation uses.
+    const unsavedSentence =
+      unsavedCount > 0
+        ? t("confirm.complete.unsaved", { count: unsavedCount })
+        : "";
+
+    // A stock take that requires a full count refuses to close over any line
+    // without a number. Said before the confirmation, because that dialog
+    // offers Complete and a refusal after it takes the offer back. A number
+    // still in its box is not a count yet, so the refusal carries the unsaved
+    // sentence too: what is missing may be a Save, not a count.
+    const uncounted = productsIn(
+      (lines ?? []).filter((line) => line.counted_quantity == null),
+    );
+    if (requireFullCount && uncounted > 0) {
+      toast.error(
+        [t("errors.uncountedRemaining", { count: uncounted }), unsavedSentence]
+          .filter(Boolean)
+          .join(" "),
+      );
+      return;
+    }
 
     const goToReport = () => navigate(`/inventory/stock-takes/${id}/report`);
     const reportFailure = (error: Error) =>
@@ -72,9 +98,7 @@ export function useCompleteStockTakeFlow(
     // with nothing on the screen explaining which ones.
     const message = [
       t("confirm.complete.message", { count: adjustments }),
-      unsavedCount > 0
-        ? t("confirm.complete.unsaved", { count: unsavedCount })
-        : "",
+      unsavedSentence,
     ]
       .filter(Boolean)
       .join(" ");
@@ -200,6 +224,7 @@ export function useCompleteStockTakeFlow(
     t,
     lines,
     unsavedCount,
+    requireFullCount,
     mayAcceptOverrides,
   ]);
 

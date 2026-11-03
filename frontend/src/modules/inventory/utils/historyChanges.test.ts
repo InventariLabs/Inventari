@@ -358,3 +358,19 @@ describe("historyChanges quantities carry the record's unit", () => {
     );
   });
 });
+
+describe("historyChanges QUANTITY_CHANGED — a production run", () => {
+  it("names the run beside the reason code, not the code alone", () => {
+    const line = parseChanges(
+      "QUANTITY_CHANGED",
+      {
+        old: 5,
+        new: 1,
+        reason: "production_run",
+        production_order_number: "PR/2026/0001",
+      },
+      t,
+    );
+    expect(line).toContain("PR/2026/0001");
+  });
+});

@@ -12,7 +12,7 @@ import { formatMoney } from "@/utils/formatters";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatDate, formatDateTime } from "@/utils/helpers";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
 import { CostFigure } from "@/modules/maker/components/CostFigure";
 
@@ -204,7 +204,10 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
                 note={`${resultTerm.definition} ${t(
                   "detail.card.resultPerUnit",
                   {
-                    defaultValue: "({{amount}} per unit)",
+                    defaultValue: "({{amount}} per {{unit}})",
+                    unit:
+                      unitLabel(t, order.output_uom_symbol) ||
+                      t("create.needs.unitFallback"),
                     amount: formatMoney(
                       order.result_per_unit,
                       currency,
