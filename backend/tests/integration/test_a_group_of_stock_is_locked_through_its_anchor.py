@@ -19,6 +19,7 @@ import asyncio
 import time
 import uuid
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from sqlalchemy import func, select, text
@@ -44,6 +45,10 @@ pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 
 _DEADLOCK = '40P01'
 
+# Only for a change stuck on something else: nothing here takes this long, and
+# no test passes or fails on how close it comes.
+_NEVER_ARRIVES_AFTER = 120.0
+
 
 def _async_test_url() -> str:
     return settings.DATABASE_URL.replace('postgresql://', 'postgresql+asyncpg://', 1)
@@ -53,17 +58,20 @@ async def _pid(session: AsyncSession) -> int:
     return int(await session.scalar(text('SELECT pg_backend_pid()')))
 
 
-async def _waiting_on(engine: AsyncEngine, pid: int) -> str:
+async def _waiting_on(engine: AsyncEngine, pid: int, racer: asyncio.Task[Any]) -> str:
     """Which stock table *pid* has got to, once it is blocked on a lock.
 
     ``pg_stat_activity`` can still show the statement before the one that
     waits, so the answer is read off the locks the transaction holds: one
     stopped at an anchor holds a lock on ``stock_anchors``. (A quant it got
     past the anchors to lock was the other answer, while there were quants.)
+
+    However long *racer* takes to get there, the answer is still to come until
+    it has finished. If it raised, that exception is the answer.
     """
-    deadline = time.monotonic() + 5
+    deadline = time.monotonic() + _NEVER_ARRIVES_AFTER
     async with engine.connect() as conn:
-        while time.monotonic() < deadline:
+        while not racer.done() and time.monotonic() < deadline:
             blocked = await conn.scalar(
                 text('SELECT count(*) FROM pg_locks WHERE pid = :pid AND NOT granted'),
                 {'pid': pid},
@@ -84,6 +92,8 @@ async def _waiting_on(engine: AsyncEngine, pid: int) -> str:
                     return 'stock_anchors'
                 return f'neither table: {sorted(held)}'
             await asyncio.sleep(0.05)
+    if racer.done():
+        racer.result()
     return 'not waiting on any lock'
 
 
@@ -146,7 +156,9 @@ async def engine():
         _async_test_url(),
         echo=False,
         poolclass=NullPool,
-        connect_args={'server_settings': {'lock_timeout': '30s'}},
+        connect_args={
+            'server_settings': {'lock_timeout': f'{int(_NEVER_ARRIVES_AFTER)}s'}
+        },
     )
     yield engine
     await engine.dispose()
@@ -160,6 +172,18 @@ async def _card(db: AsyncSession, org_id: uuid.UUID):
     keeper = await shelf_keeper(db, org_id)
     await db.commit()
     return template, keeper
+
+
+async def test_a_second_change_that_fails_reports_its_own_failure(
+    real_async_db_session: AsyncSession,
+    engine: AsyncEngine,
+) -> None:
+    factory = async_sessionmaker(engine, class_=AsyncSession)
+    async with factory() as second:
+        second_pid = await _pid(second)
+        failing = asyncio.create_task(second.execute(text('SELECT 1 / 0')))
+        with pytest.raises(DBAPIError, match='division by zero'):
+            await _waiting_on(engine, second_pid, failing)
 
 
 async def test_two_first_arrivals_on_an_empty_shelf_queue_on_its_anchor(
@@ -196,9 +220,9 @@ async def test_two_first_arrivals_on_an_empty_shelf_queue_on_its_anchor(
                 second, org_id, from_second, empty, user_id=keeper.id
             )
         )
-        waiting_on = await _waiting_on(engine, second_pid)
+        waiting_on = await _waiting_on(engine, second_pid, second_arrival)
         await first.commit()
-        await asyncio.wait_for(second_arrival, timeout=10)
+        await asyncio.wait_for(second_arrival, timeout=_NEVER_ARRIVES_AFTER)
         await second.commit()
 
     assert waiting_on == 'stock_anchors', waiting_on
@@ -235,10 +259,10 @@ async def test_two_receipts_naming_two_new_shelves_in_opposite_orders_queue(
         )
         two_pid = await _pid(two)
         second = asyncio.create_task(receive(two, [right, left]))
-        waiting_on = await _waiting_on(engine, two_pid)
+        waiting_on = await _waiting_on(engine, two_pid, second)
         await receive(one, [left, right])
         await one.commit()
-        await asyncio.wait_for(second, timeout=10)
+        await asyncio.wait_for(second, timeout=_NEVER_ARRIVES_AFTER)
         await two.commit()
 
     assert waiting_on == 'stock_anchors', waiting_on
@@ -276,10 +300,11 @@ async def test_a_shelf_locked_late_is_a_detected_deadlock_not_wrong_stock(
         await put_on_shelf(two, keeper, template, right, 1)
         one_pid = await _pid(one)
         first = asyncio.create_task(put_on_shelf(one, keeper, template, right, 1))
-        await _waiting_on(engine, one_pid)
+        await _waiting_on(engine, one_pid, first)
         second = asyncio.create_task(put_on_shelf(two, keeper, template, left, 1))
         outcomes = await asyncio.wait_for(
-            asyncio.gather(first, second, return_exceptions=True), timeout=15
+            asyncio.gather(first, second, return_exceptions=True),
+            timeout=_NEVER_ARRIVES_AFTER,
         )
         aborted = [
             session
@@ -333,12 +358,12 @@ async def test_a_lock_on_every_shelf_and_a_move_off_one_of_them_queue(
                 mover, org_id, on_the_first, new_shelf, user_id=keeper.id
             )
         )
-        waiting_on = await _waiting_on(engine, mover_pid)
+        waiting_on = await _waiting_on(engine, mover_pid, move)
         await core_api.items.update_quantity_async(
             every_shelf, org_id, on_the_second, Decimal('7'), user_id=keeper.id
         )
         await every_shelf.commit()
-        await asyncio.wait_for(move, timeout=10)
+        await asyncio.wait_for(move, timeout=_NEVER_ARRIVES_AFTER)
         await mover.commit()
 
     assert waiting_on == 'stock_anchors', waiting_on
@@ -375,9 +400,9 @@ async def test_two_records_typed_onto_an_empty_shelf_queue_on_its_anchor(
         second_record = asyncio.create_task(
             put_on_shelf(second, keeper, template, empty, 4)
         )
-        waiting_on = await _waiting_on(engine, second_pid)
+        waiting_on = await _waiting_on(engine, second_pid, second_record)
         await first.commit()
-        await asyncio.wait_for(second_record, timeout=10)
+        await asyncio.wait_for(second_record, timeout=_NEVER_ARRIVES_AFTER)
         await second.commit()
 
     assert waiting_on == 'stock_anchors', waiting_on
@@ -417,9 +442,9 @@ async def test_two_records_of_one_group_taken_down_at_once_queue_on_its_anchor(
                 second, org_id, other, Decimal('4'), user_id=keeper.id
             )
         )
-        waiting_on = await _waiting_on(engine, second_pid)
+        waiting_on = await _waiting_on(engine, second_pid, second_change)
         await first.commit()
-        await asyncio.wait_for(second_change, timeout=10)
+        await asyncio.wait_for(second_change, timeout=_NEVER_ARRIVES_AFTER)
         await second.commit()
 
     assert waiting_on == 'stock_anchors', waiting_on
@@ -464,9 +489,9 @@ async def test_the_movement_pass_waits_on_the_anchor_before_it_writes(
                 created_by=keeper.id,
             )
         )
-        waiting_on = await _waiting_on(engine, second_pid)
+        waiting_on = await _waiting_on(engine, second_pid, arrival)
         await first.commit()
-        await asyncio.wait_for(arrival, timeout=10)
+        await asyncio.wait_for(arrival, timeout=_NEVER_ARRIVES_AFTER)
         await second.commit()
 
     assert waiting_on == 'stock_anchors', waiting_on
@@ -516,14 +541,14 @@ async def test_an_every_shelf_draw_keeps_the_anchors_it_locked_before_the_plan(
                 drawer, org_id, template_id, None, Decimal('2'), user_id=keeper.id
             )
         )
-        waiting_on = await _waiting_on(engine, drawer_pid)
+        waiting_on = await _waiting_on(engine, drawer_pid, draw)
         assert waiting_on == 'stock_anchors', waiting_on
         # The shelf the first lock cannot see: its anchor is created and its
         # stock committed while the every-shelf lock is still waiting.
         await put_on_shelf(arrival, keeper, template, second_shelf, 1)
         await arrival.commit()
         await holder.commit()
-        taken = await asyncio.wait_for(draw, timeout=10)
+        taken = await asyncio.wait_for(draw, timeout=_NEVER_ARRIVES_AFTER)
         await drawer.commit()
 
     assert sum((entry.consumed for entry in taken), Decimal('0')) == Decimal('2')

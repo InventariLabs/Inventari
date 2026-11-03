@@ -10,14 +10,16 @@ requests to code one location both wrote "— → LOC-…", the second over the
 code the first had just given. Each write now locks the row before it reads
 what it journals, so the second request reads what the first left.
 
-Every test holds the first change open until the second is seen waiting on
-a lock, so the second has read its row before the first commits — the
-interleaving the entries went wrong in — and cannot pass by starting late.
+Every test holds the first change open until it is seen holding up the
+second, or the second has finished, so the second has read its row before the
+first commits — the interleaving the entries went wrong in — and cannot pass
+by starting late.
 """
 
 from __future__ import annotations
 
 import asyncio
+import time
 import uuid
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -31,6 +33,7 @@ from app.models.audit_log import AuditLog, AuditTargetType
 from app.models.item import Item
 from app.models.label_pool import LabelPool
 from app.models.organization import Organization
+from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
 from app.models.stock_lot import LotStatus, StockLot
 from app.models.storage_location import StorageLocation
@@ -42,74 +45,83 @@ from app.services.storage._queries import ensure_short_code_async
 pytestmark = pytest.mark.integration
 
 _Change = Callable[[AsyncSession], Awaitable[Any]]
+_Rename = Callable[[str], _Change]
+
+# Only for a change stuck on something else: nothing here takes this long, and
+# no test passes or fails on how close it comes.
+_NEVER_ARRIVES_AFTER = 120.0
 
 
-async def _someone_is_waiting(db: AsyncSession, second: asyncio.Task[Any]) -> None:
-    """Until another backend of this database waits on a lock.
+async def _backend_pid(session: AsyncSession) -> int:
+    """The server process behind *session*, which keeps it until it ends."""
+    return int(await session.scalar(text('SELECT pg_backend_pid()')))
 
-    ``pg_stat_activity`` is read once per transaction and then kept, and this
-    session's transaction stays open between the polls: a poll that ran before
-    the second change reached its lock saw "nobody waiting" for good. The
-    snapshot is dropped before each read.
 
-    The wait ends on the signal, not on a count of polls: on a loaded machine
-    the second change can take seconds to get as far as its lock. It also ends
-    when the second change finishes without having waited, which is either its
-    own error (raised here, where it can be read) or a lock it never took.
+async def _held_up_or_finished(
+    db: AsyncSession, second: asyncio.Task[Any], second_pid: int, first_pid: int
+) -> None:
+    """Until the first change's backend holds up the second's, or it has finished.
+
+    The answer comes from the lock table, which is read as it stands, by the
+    two backends' numbers. Counting waiters in ``pg_stat_activity`` read a
+    snapshot the transaction kept, and took any backend waiting on any lock
+    for the second change.
+
+    A second change that finished without waiting read its rows before the
+    first committed, so the journal the test goes on to read says what that
+    did. One that raised is answered by its own exception.
     """
-    loop = asyncio.get_running_loop()
-    deadline = loop.time() + 120
-    while loop.time() < deadline:
-        if second.done():
-            await second
-            raise AssertionError('the second change finished without waiting')
-        await db.execute(text('SELECT pg_stat_clear_snapshot()'))
-        waiting = await db.scalar(
-            text(
-                'SELECT count(*) FROM pg_stat_activity '
-                "WHERE datname = current_database() AND wait_event_type = 'Lock'"
-            )
-        )
-        if waiting:
+    deadline = time.monotonic() + _NEVER_ARRIVES_AFTER
+    while not second.done():
+        if await db.scalar(
+            text('SELECT :first = ANY(pg_blocking_pids(:second))'),
+            {'first': first_pid, 'second': second_pid},
+        ):
             return
+        if time.monotonic() > deadline:
+            raise AssertionError('the second change never reached the first one')
         await asyncio.sleep(0.01)
-    raise AssertionError('the second change never waited for the first')
 
 
 async def _one_after_the_other(
     db: AsyncSession, first: _Change, second: _Change
 ) -> tuple[Any, Any]:
-    """*first* in a transaction held open until *second* waits on it."""
+    """*first* in a transaction held open until it holds up *second*.
+
+    Both connections are open before either change starts, so the backend to
+    watch is known however late the event loop gets round to the second.
+    """
 
     async def _second() -> Any:
-        async with AsyncSession(bind=db.bind, expire_on_commit=False) as session:
-            result = await second(session)
-            await session.commit()
-            return result
+        result = await second(second_session)
+        await second_session.commit()
+        return result
 
-    async with AsyncSession(bind=db.bind, expire_on_commit=False) as session:
-        first_result = await first(session)
-        waiting = asyncio.create_task(_second())
-        await _someone_is_waiting(db, waiting)
-        await session.commit()
-        second_result = await waiting
-    return first_result, second_result
+    async with (
+        AsyncSession(bind=db.bind, expire_on_commit=False) as first_session,
+        AsyncSession(bind=db.bind, expire_on_commit=False) as second_session,
+    ):
+        first_pid = await _backend_pid(first_session)
+        second_pid = await _backend_pid(second_session)
+        first_result = await first(first_session)
+        racing = asyncio.create_task(_second())
+        try:
+            await _held_up_or_finished(db, racing, second_pid, first_pid)
+            await first_session.commit()
+            return first_result, await racing
+        finally:
+            # Not left running on a session that is about to close.
+            racing.cancel()
+            await asyncio.wait({racing})
 
 
-async def _snapshots(db: AsyncSession, target_type: str, target_id: uuid.UUID):
-    rows = await db.scalars(
-        select(AuditLog.snapshot)
-        .where(AuditLog.target_type == target_type, AuditLog.target_id == target_id)
-        .order_by(AuditLog.created_at.asc(), AuditLog.id)
-    )
-    return list(rows.all())
-
-
-async def test_two_edits_of_one_partner_journal_the_sequence_they_made(
+@pytest.fixture
+async def _review_supplier(
     real_async_db_session: AsyncSession,
     async_test_household: Organization,
     async_test_user: User,
-) -> None:
+) -> _Rename:
+    """A committed partner, and the change that renames it."""
     db = real_async_db_session
     org_id, user_id = async_test_household.id, async_test_user.id
     partner = await partner_service.create_async(
@@ -126,9 +138,126 @@ async def test_two_edits_of_one_partner_journal_the_sequence_they_made(
             session, org_id, partner_id, PartnerUpdate(name=name), user_id=user_id
         )
 
-    await _one_after_the_other(db, _rename('Supplier A'), _rename('Supplier B'))
+    return _rename
 
-    _created, first, second = await _snapshots(db, AuditTargetType.PARTNER, partner_id)
+
+async def _late(session: AsyncSession, change: _Change) -> str:
+    """*change*, begun long after the first was started; the name it found."""
+    await asyncio.sleep(0.2)
+    found = await session.scalar(select(Partner.name).where(Partner.code == 'RVW'))
+    await change(session)
+    return found
+
+
+async def test_a_second_change_that_starts_late_is_still_waited_for(
+    real_async_db_session: AsyncSession, _review_supplier: _Rename
+) -> None:
+    rename = _review_supplier
+    _first, found = await _one_after_the_other(
+        real_async_db_session,
+        rename('Supplier A'),
+        lambda session: _late(session, rename('Supplier B')),
+    )
+
+    assert found == 'Review supplier'
+
+
+async def _queued_on_a_lock(db: AsyncSession, pid: int) -> None:
+    deadline = time.monotonic() + _NEVER_ARRIVES_AFTER
+    while not await db.scalar(
+        text('SELECT cardinality(pg_blocking_pids(:pid)) > 0'), {'pid': pid}
+    ):
+        assert time.monotonic() < deadline, 'the stranger never queued'
+        await asyncio.sleep(0.01)
+
+
+async def test_a_stranger_waiting_on_a_lock_is_not_the_second_change(
+    real_async_db_session: AsyncSession, _review_supplier: _Rename
+) -> None:
+    db = real_async_db_session
+    rename = _review_supplier
+    take = text('SELECT pg_advisory_xact_lock(7)')
+
+    async with (
+        AsyncSession(bind=db.bind) as holder,
+        AsyncSession(bind=db.bind) as stranger,
+    ):
+        stranger_pid = await _backend_pid(stranger)
+        await holder.execute(take)
+        queued = asyncio.create_task(stranger.execute(take))
+        try:
+            await _queued_on_a_lock(db, stranger_pid)
+            _first, found = await _one_after_the_other(
+                db,
+                rename('Supplier A'),
+                lambda session: _late(session, rename('Supplier B')),
+            )
+        finally:
+            await holder.rollback()
+            await queued
+
+    # The first change was held for the second, not let go by the stranger.
+    assert found == 'Review supplier'
+
+
+async def test_a_second_change_stuck_on_another_lock_is_reported_and_stopped(
+    real_async_db_session: AsyncSession,
+    _review_supplier: _Rename,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db = real_async_db_session
+    rename = _review_supplier
+    take = text('SELECT pg_advisory_xact_lock(7)')
+    monkeypatch.setitem(globals(), '_NEVER_ARRIVES_AFTER', 0.3)
+
+    async with AsyncSession(bind=db.bind) as holder:
+        await holder.execute(take)
+        with pytest.raises(AssertionError, match='never reached the first'):
+            await _one_after_the_other(
+                db, rename('Supplier A'), lambda session: session.execute(take)
+            )
+        # Stopped, not left queueing behind this holder for the next test.
+        await db.execute(text('SELECT pg_stat_clear_snapshot()'))
+        assert not await db.scalar(
+            text(
+                'SELECT count(*) FROM pg_stat_activity '
+                "WHERE datname = current_database() AND wait_event_type = 'Lock'"
+            )
+        )
+
+
+async def test_a_second_change_that_fails_reports_its_own_failure(
+    real_async_db_session: AsyncSession, _review_supplier: _Rename
+) -> None:
+    rename = _review_supplier
+
+    async def _breaks(_session: AsyncSession) -> None:
+        raise LookupError('the second change broke')
+
+    with pytest.raises(LookupError, match='the second change broke'):
+        await _one_after_the_other(real_async_db_session, rename('Supplier A'), _breaks)
+
+
+async def _snapshots(db: AsyncSession, target_type: str, target_id: uuid.UUID):
+    rows = await db.scalars(
+        select(AuditLog.snapshot)
+        .where(AuditLog.target_type == target_type, AuditLog.target_id == target_id)
+        .order_by(AuditLog.created_at.asc(), AuditLog.id)
+    )
+    return list(rows.all())
+
+
+async def test_two_edits_of_one_partner_journal_the_sequence_they_made(
+    real_async_db_session: AsyncSession, _review_supplier: _Rename
+) -> None:
+    db = real_async_db_session
+    rename = _review_supplier
+
+    partner, _second = await _one_after_the_other(
+        db, rename('Supplier A'), rename('Supplier B')
+    )
+
+    _created, first, second = await _snapshots(db, AuditTargetType.PARTNER, partner.id)
     assert (first['before'], first['after']) == (
         {'name': 'Review supplier'},
         {'name': 'Supplier A'},
