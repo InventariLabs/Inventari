@@ -218,24 +218,37 @@ function CheckoutLocationPicker({
  * The dialog's two buttons, outside the scroll layer so they hold their place
  * (UI_GUIDELINES §4.3): inside the form they sat wherever the form's end fell,
  * which on a phone was below the sheet's edge until the form was scrolled.
- * Submit reaches the form by its id.
+ * Submit reaches the form by its id. The refusal for want of an approval sits
+ * here too, above the buttons: it holds the only way forward, so it must
+ * appear where the finger was, not below the fold of the scrolling form.
  */
 function CheckoutFooter({
   formId,
   asking,
   pending,
+  approvalNeeded,
+  onRequestApproval,
   incomplete,
   onClose,
 }: {
   formId: string;
   asking: boolean;
   pending: boolean;
+  approvalNeeded: string | null;
+  onRequestApproval: () => void;
   incomplete: boolean;
   onClose: () => void;
 }) {
   const { t } = useTranslation("equipment");
   return (
-    <SheetFooter>
+    <SheetFooter className="space-y-3">
+      {approvalNeeded && (
+        <ApprovalNeededNotice
+          message={approvalNeeded}
+          pending={pending}
+          onRequest={onRequestApproval}
+        />
+      )}
       <SheetActions>
         <Button
           type="button"
@@ -555,20 +568,14 @@ export function CheckoutModal({
             aria-label={t("assignments.checkout_modal.notes")}
             className="w-full rounded-lg border border-border bg-surface-card text-on px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 resize-none placeholder:text-on-muted"
           />
-
-          {approvalNeeded && (
-            <ApprovalNeededNotice
-              message={approvalNeeded}
-              pending={pending}
-              onRequest={() => send("request")}
-            />
-          )}
         </form>
 
         <CheckoutFooter
           formId={formId}
           asking={asking}
           pending={pending}
+          approvalNeeded={approvalNeeded}
+          onRequestApproval={() => send("request")}
           incomplete={
             (mode === "person" && !form.assigned_to_name.trim()) ||
             (mode === "location" && !form.checkout_location_id)

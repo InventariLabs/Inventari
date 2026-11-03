@@ -12,6 +12,11 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Added
+
+- Module authors can ask `@/module-sdk` whether the signed-in user is the person
+  a record names by e-mail address (`useIsSignedInAs`).
+
 ### Fixed
 
 - A product whose nutrition came from Open Food Facts now counts its calories
@@ -20,13 +25,17 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
-- Handing an asset back from "My assets" opens a dialog titled and worded for
-  the person returning it, and the damaged and needs-repair choices each say
+- Handing an asset back, from "My assets" or from the asset's own page, opens a
+  dialog titled and worded for the person returning it (the page's button reads
+  "Return" too, not the manager's "Accept"), and the damaged and needs-repair choices each say
   which repair entry they open. The holder's assignment history prints both
   days and the condition in the interface language, and the organization log
   does the same for the condition of a return.
 - The organization log marks the settings a workspace mode writes when it is
   chosen as "Workspace mode default" instead of an update the person made.
+- On a phone, the buttons of the sheet that issues an asset stay in view at the
+  foot of the sheet instead of ending below its edge until the form was
+  scrolled, and the notice that an approval is needed sits beside them.
 - The equipment overview counts a new asset as soon as it is saved, also after
   a batch add, without reloading the page.
 

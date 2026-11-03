@@ -20,7 +20,7 @@ import {
 } from "@/modules/equipment/components/checkinConditions";
 import { ReturnLocationField } from "@/modules/equipment/components/ReturnLocationField";
 import { useCheckin } from "@/modules/equipment/hooks/useEquipment";
-import { useIsSignedInAs } from "@/module-sdk";
+import { useHoldsAssignment } from "@/modules/equipment/hooks/useHoldsAssignment";
 
 /**
  * What checking in actually needs to know — narrower than
@@ -62,9 +62,7 @@ export function CheckinModal({
 }: CheckinModalProps) {
   const { t } = useTranslation("equipment");
   const checkinMutation = useCheckin();
-  const holdsIt = useIsSignedInAs(assignment.assigned_to_email);
-  const byHolder =
-    handedBack || (assignment.holder_kind !== "location" && holdsIt);
+  const byHolder = useHoldsAssignment(assignment) || handedBack;
 
   const title = byHolder
     ? t("assignments.checkin_modal.title_holder")
@@ -126,7 +124,7 @@ export function CheckinModal({
           <p className="text-sm font-medium text-on">{assignment.item_name}</p>
           {/* A line that names nobody is worse than no line: "Assigned to:"
               with an empty tail read as a missing answer, not as the holder's
-              own check-in. The holder's screen passes its own "you". */}
+              own check-in. The holder is not told their own name. */}
           {!byHolder &&
             (assignment.holder_name ||
               assignment.partner_name ||
