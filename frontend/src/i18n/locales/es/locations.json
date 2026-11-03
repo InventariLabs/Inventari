@@ -267,7 +267,8 @@
   "reorg": {
     "noMoveTargets": "No hay dónde mover esta ubicación",
     "moveTo": "Mover a…",
-    "moveToTop": "Nivel superior"
+    "moveToTop": "Nivel superior",
+    "archiveOrDelete": "Archivar o eliminar…"
   },
   "card": {
     "unit_one": "producto",

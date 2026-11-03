@@ -258,6 +258,24 @@ describe("ModuleSettingsForm — a number outside its bounds", () => {
     await waitFor(() => expect(updateSettings).not.toHaveBeenCalled());
   });
 
+  it("refuses a fraction on a whole-number setting in the app's own words", async () => {
+    vi.clearAllMocks();
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="equipment"
+        schema={windowSchema}
+        initialValues={{}}
+      />,
+    );
+    fireEvent.change(screen.getByTestId("field-warning_window_days"), {
+      target: { value: "1.5" },
+    });
+
+    expect(screen.getByText("Enter a whole number.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(updateSettings).not.toHaveBeenCalled());
+  });
+
   it("saves once the number is back in range", async () => {
     vi.clearAllMocks();
     renderForm(

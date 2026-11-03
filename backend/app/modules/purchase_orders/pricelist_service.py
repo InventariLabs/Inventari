@@ -249,7 +249,9 @@ async def cheapest_offers_async(
 
     One query for the whole set, for callers that need a supplier per
     product (the replenishment alerts) and would otherwise ask once per
-    row. A product nobody quotes is simply absent from the result.
+    row. A product nobody quotes is simply absent from the result. An offer
+    of a deactivated supplier never counts: an order to it is refused when it
+    is confirmed, so the next cheapest offer wins.
     """
     if not product_template_ids:
         return {}
@@ -267,7 +269,8 @@ async def cheapest_offers_async(
     )
     cheapest: dict[UUID, PartnerPricelist] = {}
     for entry in (await db.scalars(stmt)).all():
-        cheapest.setdefault(entry.product_template_id, entry)
+        if entry.partner.is_active:
+            cheapest.setdefault(entry.product_template_id, entry)
     return cheapest
 
 

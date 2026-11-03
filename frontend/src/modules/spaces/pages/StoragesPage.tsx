@@ -252,6 +252,9 @@ export default function StoragesPage() {
               onSelect={select}
               canWrite={canWrite}
               onMoveTo={(nodeId) => setMoveIds([nodeId])}
+              onOpenSettings={(nodeId) =>
+                navigate(`/inventory/locations/${nodeId}?configure=true`)
+              }
               onDragMove={(nodeId, parentId) =>
                 void move([{ id: nodeId, parent_id: parentId }])
               }

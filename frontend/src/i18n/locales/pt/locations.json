@@ -290,7 +290,8 @@
   "reorg": {
     "noMoveTargets": "Não há para onde mover este local",
     "moveTo": "Mover para…",
-    "moveToTop": "Nível superior"
+    "moveToTop": "Nível superior",
+    "archiveOrDelete": "Arquivar ou excluir…"
   },
   "card": {
     "unit_one": "produto",

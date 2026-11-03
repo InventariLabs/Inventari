@@ -812,6 +812,7 @@
       "outOfRangeMin": "Introduzca un número igual o mayor que {{min}}.",
       "outOfRangeMax": "Introduzca un número igual o menor que {{max}}.",
       "outOfRangeSave": "Corrija el ajuste fuera de rango y guarde de nuevo.",
+      "notWholeNumber": "Introduzca un número entero.",
       "loadFailedHint": "Los ajustes no se han podido leer ahora mismo. Suele ser temporal.",
       "forbidden": "Solo la administración puede abrir los ajustes del módulo",
       "forbiddenHint": "Tu cuenta puede usar este módulo, pero no cambiar su comportamiento. Pídelo a la administración de tu organización.",

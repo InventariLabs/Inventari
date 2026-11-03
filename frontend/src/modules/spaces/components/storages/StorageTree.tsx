@@ -25,6 +25,8 @@ interface StorageTreeProps {
   canWrite: boolean;
   /** Opens the "Move to…" picker for one location. */
   onMoveTo: (id: string) => void;
+  /** Opens the Settings tab of one location, where Archive and Delete live. */
+  onOpenSettings: (id: string) => void;
   /** Desktop shortcut: drop *id* onto *parentId*. */
   onDragMove: (id: string, parentId: string) => void;
   label: string;
@@ -49,6 +51,7 @@ export function StorageTree({
   onSelect,
   canWrite,
   onMoveTo,
+  onOpenSettings,
   onDragMove,
   label,
 }: StorageTreeProps) {
@@ -198,6 +201,7 @@ export function StorageTree({
             onSelect(id);
           }}
           onMoveTo={onMoveTo}
+          onOpenSettings={onOpenSettings}
           onKeyDown={handleKeyDown}
           onDragStart={setDraggingId}
           onDragEnd={() => {
@@ -234,6 +238,7 @@ interface TreeLevelProps {
   onToggle: (id: string) => void;
   onSelect: (id: string) => void;
   onMoveTo: (id: string) => void;
+  onOpenSettings: (id: string) => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   onDragStart: (id: string) => void;
   onDragEnd: () => void;
@@ -265,6 +270,7 @@ function TreeRow({
   onToggle,
   onSelect,
   onMoveTo,
+  onOpenSettings,
   onKeyDown,
   onDragStart,
   onDragEnd,
@@ -387,6 +393,11 @@ function TreeRow({
                   label: t("reorg.moveTo"),
                   onSelect: () => onMoveTo(node.id),
                 },
+                {
+                  id: "settings",
+                  label: t("reorg.archiveOrDelete"),
+                  onSelect: () => onOpenSettings(node.id),
+                },
               ]}
               triggerClassName="h-6 w-6"
             />
@@ -407,6 +418,7 @@ function TreeRow({
             onToggle={onToggle}
             onSelect={onSelect}
             onMoveTo={onMoveTo}
+            onOpenSettings={onOpenSettings}
             onKeyDown={onKeyDown}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}

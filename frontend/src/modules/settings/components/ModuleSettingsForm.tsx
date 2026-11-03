@@ -85,7 +85,8 @@ function toSchemaShape(flat: Record<string, unknown>): Record<string, unknown> {
  * The sentence for a number outside the schema's bounds, or null.
  *
  * The browser's own bubble answers in the browser's language, not the app's,
- * so the form switches it off (`noValidate`) and says the same thing itself.
+ * so the form switches it off (`noValidate`) and says the same thing itself —
+ * for the bounds and for the whole-number check `noValidate` takes away too.
  */
 function rangeError(
   field: ModuleSettingsField,
@@ -95,6 +96,9 @@ function rangeError(
   const isNumber = field.type === "integer" || field.type === "number";
   if (!isNumber || typeof value !== "number" || Number.isNaN(value)) {
     return null;
+  }
+  if (field.type === "integer" && !Number.isInteger(value)) {
+    return t("settings.moduleSettings.notWholeNumber");
   }
   const { minimum: min, maximum: max } = field;
   const below = min !== undefined && value < min;

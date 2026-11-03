@@ -23586,8 +23586,7 @@ export interface components {
          *     at or above the minimum right now), ``covered_by_reserve`` (the
          *     proposed internal move covers the whole shortage, so there is nothing
          *     to buy), ``no_supplier`` (neither the rule nor the price list names
-         *     a supplier —
-         *     reported, never turned into an empty order).
+         *     a supplier; reported, never turned into an empty order).
          */
         ReplenishmentDraftSkipped: {
             /**

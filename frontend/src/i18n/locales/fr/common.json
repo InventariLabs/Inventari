@@ -812,6 +812,7 @@
       "outOfRangeMin": "Saisissez un nombre supérieur ou égal à {{min}}.",
       "outOfRangeMax": "Saisissez un nombre inférieur ou égal à {{max}}.",
       "outOfRangeSave": "Corrigez le réglage hors plage, puis enregistrez à nouveau.",
+      "notWholeNumber": "Saisissez un nombre entier.",
       "loadFailedHint": "Les réglages n'ont pas pu être lus pour le moment. C'est généralement temporaire.",
       "forbidden": "Seule l'administration peut ouvrir les réglages du module",
       "forbiddenHint": "Votre compte peut utiliser ce module, mais pas modifier son fonctionnement. Adressez-vous à l'administration de votre organisation.",

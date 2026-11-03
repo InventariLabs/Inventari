@@ -806,6 +806,7 @@
       "outOfRangeMin": "Digite um número igual ou maior que {{min}}.",
       "outOfRangeMax": "Digite um número igual ou menor que {{max}}.",
       "outOfRangeSave": "Corrija a configuração fora do intervalo e salve novamente.",
+      "notWholeNumber": "Digite um número inteiro.",
       "loadFailedHint": "As configurações não puderam ser lidas agora. Normalmente isso é temporário.",
       "forbidden": "Só um administrador pode abrir as configurações do módulo",
       "forbiddenHint": "Sua conta pode usar este módulo, mas não alterar o comportamento dele. Fale com um administrador da sua organização.",

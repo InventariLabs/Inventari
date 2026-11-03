@@ -812,6 +812,7 @@
       "outOfRangeMin": "Enter a number of {{min}} or more.",
       "outOfRangeMax": "Enter a number of {{max}} or less.",
       "outOfRangeSave": "Fix the setting that is out of range, then save again.",
+      "notWholeNumber": "Enter a whole number.",
       "loadFailedHint": "The settings could not be read just now. This is usually temporary.",
       "forbidden": "Only an administrator can open module settings",
       "forbiddenHint": "Your account can use this module, but not change how it behaves. Ask an administrator of your organization.",

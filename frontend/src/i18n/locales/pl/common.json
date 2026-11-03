@@ -814,6 +814,7 @@
       "outOfRangeMin": "Wpisz liczbę nie mniejszą niż {{min}}.",
       "outOfRangeMax": "Wpisz liczbę nie większą niż {{max}}.",
       "outOfRangeSave": "Popraw ustawienie spoza zakresu i zapisz ponownie.",
+      "notWholeNumber": "Wpisz liczbę całkowitą.",
       "loadFailedHint": "Nie udało się teraz odczytać ustawień. Zwykle jest to przejściowe.",
       "forbidden": "Ustawienia modułu otwiera tylko administrator",
       "forbiddenHint": "Twoje konto może korzystać z modułu, ale nie zmieniać jego działania. Poproś administratora organizacji.",

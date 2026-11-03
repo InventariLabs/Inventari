@@ -96,6 +96,7 @@ function Harness({ open = [] }: { open?: string[] }) {
       onSelect={setSelected}
       canWrite={false}
       onMoveTo={vi.fn()}
+      onOpenSettings={vi.fn()}
       onDragMove={vi.fn()}
       label="Storage locations"
     />
@@ -212,6 +213,7 @@ describe("StorageTree — branches that have not been read yet", () => {
         onSelect={vi.fn()}
         canWrite={false}
         onMoveTo={vi.fn()}
+        onOpenSettings={vi.fn()}
         onDragMove={vi.fn()}
         label="Storage locations"
       />,
@@ -231,6 +233,7 @@ describe("StorageTree — branches that have not been read yet", () => {
 describe("StorageTree — rows a writer can act on", () => {
   const renderWritable = () => {
     const onMoveTo = vi.fn();
+    const onOpenSettings = vi.fn();
     const onDragMove = vi.fn();
     render(
       <StorageTree
@@ -240,11 +243,12 @@ describe("StorageTree — rows a writer can act on", () => {
         onSelect={vi.fn()}
         canWrite
         onMoveTo={onMoveTo}
+        onOpenSettings={onOpenSettings}
         onDragMove={onDragMove}
         label="Storage locations"
       />,
     );
-    return { onMoveTo, onDragMove };
+    return { onMoveTo, onOpenSettings, onDragMove };
   };
   const dataTransfer = () => ({
     setData: vi.fn(),
@@ -265,6 +269,19 @@ describe("StorageTree — rows a writer can act on", () => {
 
     expect(onMoveTo).toHaveBeenCalledTimes(1);
     expect(onMoveTo).toHaveBeenCalledWith("freezer");
+  });
+
+  it("lets a row's menu reach Archive and Delete, which live on the Settings tab", async () => {
+    const { onOpenSettings } = renderWritable();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Actions for Freezer" }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Archive or delete…" }),
+    );
+
+    expect(onOpenSettings).toHaveBeenCalledWith("freezer");
   });
 
   it("drops the highlight when the pointer leaves a row it was dragged over", () => {
