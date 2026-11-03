@@ -692,7 +692,7 @@
     "select_plan": "Select plan",
     "select_day": "Select day",
     "select_slot": "Select slot",
-    "no_plans_add_to_plan": "Create a meal plan first — the recipe can then be added from the planner.",
+    "no_plans_add_to_plan": "Create a meal plan first — the recipe is then added to the first meal on its first day.",
     "more_actions": "More actions",
     "expiry_urgent": "Ingredients expiring soon",
     "delete_plan": "Delete plan",

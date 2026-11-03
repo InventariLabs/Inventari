@@ -536,6 +536,24 @@ class TestCoreProductTemplatesSearchFuzzyMany:
             'Masło Extra 82%',
         ]
 
+    async def test_ascii_fragment_finds_an_accented_name(
+        self, real_async_db_session: AsyncSession, async_test_storage_location
+    ):
+        """The caller folds its fragment to ASCII ("ryz"); the stored name
+        keeps its letters ("Ryż 1 kg"), and the database comparison alone
+        never joined the two."""
+        db = real_async_db_session
+        org_id = async_test_storage_location.organization_id
+        await _make_template(db, org_id, name='Ryż 1 kg')
+        await _make_template(db, org_id, name='Śmietana 18%')
+        await db.commit()
+
+        result = await core_api.product_templates.search_fuzzy_many_async(
+            db, org_id, ['ryz', 'smie']
+        )
+        assert [c.name for c in result['ryz']] == ['Ryż 1 kg']
+        assert [c.name for c in result['smie']] == ['Śmietana 18%']
+
     async def test_org_scoping(
         self, real_async_db_session: AsyncSession, async_test_storage_location
     ):

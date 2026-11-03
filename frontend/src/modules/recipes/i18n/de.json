@@ -692,7 +692,7 @@
     "select_plan": "Plan auswählen",
     "select_day": "Tag auswählen",
     "select_slot": "Mahlzeit auswählen",
-    "no_plans_add_to_plan": "Erstellen Sie zuerst einen Speiseplan — das Rezept lässt sich dann aus dem Planer hinzufügen.",
+    "no_plans_add_to_plan": "Erstellen Sie zuerst einen Speiseplan — das Rezept wird dann gleich zur ersten Mahlzeit des ersten Tages hinzugefügt.",
     "more_actions": "Weitere Aktionen",
     "expiry_urgent": "Zutaten laufen bald ab",
     "delete_plan": "Plan löschen",

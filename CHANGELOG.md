@@ -20,6 +20,19 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- A recipe ingredient typed by hand whose name has accented letters ("Ryż") now
+  finds the product on the shelf ("Ryż 1 kg") instead of reading as missing.
+- The expiry date picker starts with a week, two weeks and a month, so fresh
+  food no longer needs the calendar.
+- The two date chips on the products list, "expiring soon" and "expired", no
+  longer stay on together and show an empty list: turning one on turns the
+  other off.
+- Statistics count stock rows as records instead of pieces, name the products
+  without a category in the reader's language, list the fullest places first
+  and leave out the system's empty consumed, loss and production places.
+- The meal plan dialog that has no plan yet now says the recipe is added to the
+  first meal of the new plan at once, and closing the "Take from stock" dialog
+  no longer marks the recipe as cooked.
 
 ## v0.11.0 - 2026-11-02
 
