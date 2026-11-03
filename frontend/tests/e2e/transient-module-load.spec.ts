@@ -127,3 +127,45 @@ test.describe("Slow start of the app", () => {
     expect(aborted, "the fake abort never fired").toBeGreaterThan(1);
   });
 });
+
+/**
+ * The race the recovery reload runs against: an error screen is on the page
+ * and the reload that clears it has not begun. The harness only hears of the
+ * failure after the screen is drawn, so whether it wins is down to the host's
+ * load. The failed module schedules the reload itself, which leaves the screen
+ * up for a fixed while and keeps the harness out of it: `goto` is only done
+ * with the start if it was still waiting when the second request came.
+ */
+test.describe("An error screen during the start", () => {
+  const FAILED_MODULE = `
+    setTimeout(() => location.reload(), 2000);
+    throw new Error("this start failed");
+  `;
+
+  for (const { screen, module } of [
+    {
+      screen: "the boundary above the router",
+      module: /\/src\/App\.tsx|\/assets\/App-[\w-]+\.js/,
+    },
+    {
+      screen: "the route tree's error page",
+      module: /\/src\/pages\/LoginPage\.tsx|\/assets\/LoginPage-[\w-]+\.js/,
+    },
+  ]) {
+    test(`${screen} does not end the navigation`, async ({ page }) => {
+      let requests = 0;
+      await page.route(module, (route) =>
+        requests++ === 0
+          ? route.fulfill({
+              contentType: "text/javascript",
+              body: FAILED_MODULE,
+            })
+          : route.continue(),
+      );
+
+      await page.goto("/login");
+
+      expect(requests, "goto returned on the error screen").toBe(2);
+    });
+  }
+});

@@ -35,14 +35,20 @@ const NETWORK_CHANGED = 'net::ERR_NETWORK_CHANGED';
  */
 const APP_START_BUDGET = 35_000;
 
-/** The document has drawn past the app's full-screen loading state. */
+/**
+ * The document has drawn past the app's full-screen loading state, to something
+ * other than its error screen: that one is what a failed start looks like, and
+ * the recovery reload comes after it, because the harness hears of the failure
+ * only once it is drawn. A screen no reload clears costs a failing spec the
+ * budget and is left to its assertion.
+ */
 const appHasStarted = () => {
   const root = document.getElementById('root');
   // Not one of the app's pages (a file, an API answer): nothing to wait for.
   if (!root) return true;
   return (
     root.childElementCount > 0 &&
-    !document.querySelector('[data-testid="app-loading"]')
+    !document.querySelector('[data-testid="app-loading"], [data-testid="app-error"]')
   );
 };
 
