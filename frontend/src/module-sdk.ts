@@ -33,6 +33,8 @@ export { stockQuantsApi } from "@/lib/api/stockQuants";
 export type { StockQuantRow } from "@/lib/api/stockQuants";
 // The QR label pool: generating, assigning, freeing and exporting labels.
 export { labelsApi } from "@/lib/api/labels";
+// Cuts product-search text to what the product-template endpoint accepts.
+export { clampProductSearch } from "@/lib/api/productTemplates";
 
 // Helpers a module screen needs: class names, dynamic translation keys, and a
 // copy action that explains itself when the browser refuses.

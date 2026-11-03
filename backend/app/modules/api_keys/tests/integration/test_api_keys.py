@@ -588,6 +588,26 @@ class TestApiKeyServiceEdgeCases:
 
         await real_async_db_session.run_sync(_check_ak)
 
+    async def test_creation_log_carries_no_part_of_the_key(
+        self,
+        real_async_client: AsyncClient,
+        admin_headers: dict[str, str],
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        import logging
+
+        with caplog.at_level(logging.INFO):
+            create_resp = await _create_key(real_async_client, admin_headers)
+        raw_key = create_resp.json()['raw_key']
+        lines = [
+            r.getMessage()
+            for r in caplog.records
+            if 'API key created' in r.getMessage()
+        ]
+
+        assert lines
+        assert all(raw_key[:12] not in line and 'prefix' not in line for line in lines)
+
     async def test_key_prefix_is_first_20_chars(
         self,
         real_async_client: AsyncClient,
