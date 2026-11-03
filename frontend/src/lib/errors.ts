@@ -75,6 +75,20 @@ export class SessionEndedError extends ReadableError {
   readonly status = 401;
 }
 
+/**
+ * The sentence for a step that ran after the main write had already landed.
+ *
+ * An ended session's own sentence says the work was not saved, which is not
+ * true once the record exists — a photo or an attachment going up after the
+ * create must not tell the reader to start over (and make a duplicate). The
+ * step's own failure sentence stands in; any other failure reads as usual.
+ */
+export function followUpError(error: unknown, fallback: string): string {
+  return error instanceof SessionEndedError
+    ? fallback
+    : extractApiError(error, fallback);
+}
+
 /** The sentence a `ReadableError` carries, or null for anything else. */
 export function readableErrorMessage(error: unknown): string | null {
   // ui-pattern: error-message-as-copy — this class exists to mark a message

@@ -11,14 +11,23 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { signInWith, signOut } from "@/test/auth";
+import { tokenStore } from "@/lib/api/client";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
 import RecipesPage from "./RecipesPage";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { onePage } from "@/test/mocks/page";
+import { toast } from "sonner";
+import i18next from "i18next";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
+}));
+
+// jsdom has no canvas, so the real compressor never settles.
+vi.mock("@/lib/imageUtils", () => ({
+  compressImage: (file: File) => Promise.resolve(file),
+  prepareImageUpload: (file: File) => Promise.resolve(file),
 }));
 
 // jsdom's location is stubbed in the test setup, so pushState never reaches
@@ -236,6 +245,46 @@ describe("RecipesPage", () => {
     await waitFor(() => {
       expect(screen.getByText("New Recipe")).toBeInTheDocument();
     });
+  });
+
+  it("does not say a recipe was not saved when only its photo was refused by an ended session", async () => {
+    // The recipe is created first and its photo goes up after, so a session
+    // that ends in between must not invite a second, duplicate recipe.
+    server.use(
+      http.post("/api/v1/recipes", () =>
+        HttpResponse.json({ id: "new-1", name: "Soup" }, { status: 201 }),
+      ),
+      http.post("/api/v1/recipes/:id/image", () =>
+        HttpResponse.json({ detail: "expired" }, { status: 401 }),
+      ),
+      http.post(
+        "*/api/v1/auth/refresh",
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+    );
+    tokenStore.set("expired-token");
+
+    render(<RecipesPage />, { wrapper: createWrapper() });
+    await waitFor(() => {
+      expect(screen.getByText("Pasta Carbonara")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: /New recipe/i }));
+    await screen.findByText("New Recipe");
+    fireEvent.change(screen.getByLabelText(/^Recipe name/), {
+      target: { value: "Soup" },
+    });
+    fireEvent.change(document.getElementById("recipe-form-image")!, {
+      target: {
+        files: [new File(["photo"], "soup.jpg", { type: "image/jpeg" })],
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    const shown = vi.mocked(toast.error).mock.calls.map(([m]) => String(m));
+    expect(shown).not.toContain(i18next.t("common:errors.sessionEnded"));
+    expect(shown).not.toContain("Failed to save recipe");
+    expect(toast.success).toHaveBeenCalled();
   });
 
   it("opens the new recipe form when the URL asks for it", async () => {
