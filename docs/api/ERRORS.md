@@ -268,7 +268,7 @@ apart.
 | `DEMO_REGISTRATION_LOCKED` | This is the public demo, where visitors need no account. Request Access is not available here — use Try the demo to look around. |
 | `DEMO_SMTP_SETTINGS_LOCKED` | This is the public demo, so the mail server is fixed: every message the app would send is caught in the demo inbox. Email settings cannot be changed here. |
 | `DISCREPANCY_REASON_REQUIRED` | A discrepancy reason is required |
-| `DOCUMENTS_APPROVAL_WORKFLOW_MISSING` | Documents require approval, but no approval workflow is configured for them — create one under Approvals → Workflows, or turn the requirement off |
+| `DOCUMENTS_APPROVAL_WORKFLOW_MISSING` | This document needs an approval, but nobody has been set up to give it yet. Ask your administrator to set it up. |
 | `DOCUMENTS_PDF_REQUIRE_CONFIRMED` | A merged PDF is produced from confirmed or completed documents only. Not printable: {numbers}. |
 | `DOCUMENT_ADJUSTMENT_LINES_REFERENCE_ITEMS` | Adjustment document lines must reference existing items |
 | `DOCUMENT_ADJUSTMENT_WOULD_GO_NEGATIVE` | The adjustment would take {item} below zero: current {current}, change {delta}, result {result}. |
@@ -507,7 +507,7 @@ apart.
 | `PIECE_UNIT_MISSING_FROM_CATALOGUE` | This installation's unit catalogue has no piece unit, so 'a quantity of what' has no answer. Name a unit explicitly, or restore the standard unit catalogue. |
 | `PO_ALREADY_CANCELLED` | This purchase order is already cancelled |
 | `PO_APPROVAL_RACE_CONDITION` | The approval request could not be created — it may have been handled by another action. Try again. |
-| `PO_APPROVAL_WORKFLOW_MISSING` | Purchase orders require approval, but no approval workflow is configured for them — create one under Approvals → Workflows, or turn the requirement off |
+| `PO_APPROVAL_WORKFLOW_MISSING` | This purchase order needs an approval, but nobody has been set up to give it yet. Ask your administrator to set it up. |
 | `PO_CANCEL_COMPLETED` | Cannot cancel a completed purchase order |
 | `PO_CANCEL_RECEIVED_QUANTITIES` | Cannot cancel this purchase order because quantities have been received — cancel the linked receipts first |
 | `PO_CONFIRM_INVALID_STATUS` | This purchase order cannot be confirmed in its current state. |
