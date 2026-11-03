@@ -30,11 +30,19 @@ vi.mock("@/contexts/ModulesContext", () => ({
   }),
 }));
 
-/** A client whose invalidations are recorded rather than refetched. */
+/**
+ * A client whose invalidations are recorded rather than refetched.
+ *
+ * `src/test/mocks/reactQuery.ts` forces `gcTime: 0` on every QueryClient, so a
+ * query nobody observes is collected on the next timer tick — which the read
+ * below only beats by luck. `setQueryDefaults` is per key and outranks the
+ * global default, which keeps the document entries until the assertion.
+ */
 function setup() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
+  client.setQueryDefaults(queryKeys.documents.all, { gcTime: Infinity });
   const invalidated: unknown[] = [];
   vi.spyOn(client, "invalidateQueries").mockImplementation(async (filters) => {
     invalidated.push(filters?.queryKey);

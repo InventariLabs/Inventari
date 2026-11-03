@@ -338,14 +338,27 @@ test.describe.serial("Warehouse — from home to business", () => {
 
       await page.goto(`/inventory/stock-takes/${take.id}/counting`);
       const field = page.getByTestId("stock-take-counting-input");
+      // The bar is drawn from the scan's answer, and that answer is a lookup
+      // like the ones above: under load it can take longer than the default
+      // 5 s. Wait for it by name, so a refused or failed lookup says so
+      // instead of showing up as a bar that never appeared.
+      const answered = page.waitForResponse(
+        (response) =>
+          response.request().method() === "GET" &&
+          response.url().includes("/api/v1/labels/scan/"),
+        { timeout: 30000 },
+      );
       await field.fill(reading);
       await field.press("Enter");
-      await expect(page.getByText("Counting location:")).toContainText(
-        sticker.shelf.name,
+      const answer = await answered;
+      expect(answer.status(), `scan of ${how}: ${await answer.text()}`).toBe(
+        200,
       );
-      await expect(page.getByText("Counting location:")).not.toContainText(
-        other.shelf.name,
-      );
+      const counting = page.getByText("Counting location:");
+      await expect(counting).toContainText(sticker.shelf.name, {
+        timeout: 15000,
+      });
+      await expect(counting).not.toContainText(other.shelf.name);
     }
     await api.deleteStockTake(token, take.id);
   }
