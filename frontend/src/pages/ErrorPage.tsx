@@ -32,7 +32,10 @@ export default function ErrorPage() {
   if (!stale) logger.error(error);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-surface p-4 text-center">
+    <div
+      data-testid="app-error"
+      className="flex flex-col items-center justify-center min-h-screen bg-surface p-4 text-center"
+    >
       <div className="bg-surface-card p-8 rounded-3xl shadow-md max-w-md w-full flex flex-col items-center">
         <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6">
           <AlertTriangle size={32} />
