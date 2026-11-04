@@ -15,12 +15,14 @@ export const recipesLinkingApi = {
    * linked" only when they do.
    */
   listUnlinkedIngredients: async (): Promise<UnlinkedBacklog> => {
-    const url = "/recipes/ingredients/unlinked";
-    const items = await getEveryPage<UnlinkedIngredient>(url);
+    const items = await getEveryPage<UnlinkedIngredient>(
+      "/recipes/ingredients/unlinked",
+    );
     if (items.length > 0) return { items, hasIngredients: true };
-    const { data } = await api.get<UnlinkedIngredientsPage>(url, {
-      params: { limit: 1 },
-    });
+    const { data } = await api.get<UnlinkedIngredientsPage>(
+      "/recipes/ingredients/unlinked",
+      { params: { limit: 1 } },
+    );
     return { items, hasIngredients: data.ingredient_total > 0 };
   },
 
