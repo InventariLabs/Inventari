@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { ChoiceGroup } from "@/components/ui/ChoiceGroup";
 import { InlineQueryError } from "@/components/ui/QueryResult";
 import { Input } from "@/components/ui/Input";
@@ -170,6 +171,11 @@ export function ReceiveHeaderFields({
   // A phone does not list the order's lines under the fields: the receiving
   // session walks them, so the note does not point "below".
   const isPhone = useMediaQuery("(max-width: 639px)");
+  // Opened from an order (a task's "Receive delivery"): what the order expects
+  // leads the screen, because the reader came for that delivery. It used to sit
+  // below the question the order had already answered.
+  const [searchParams] = useSearchParams();
+  const openedFromOrder = Boolean(searchParams.get("order"));
 
   const orderNote = (() => {
     // Only a supplier's delivery can be waiting on a purchase order.
@@ -190,8 +196,45 @@ export function ReceiveHeaderFields({
     return t("receive.noOrderWaiting");
   })();
 
+  const orderNoteBlock = (
+    <>
+      {orderNote && (
+        <div className="flex flex-wrap items-end gap-3">
+          <p
+            className={
+              chosenOrderNumber
+                ? "text-sm text-success-700"
+                : "text-sm text-on-secondary"
+            }
+          >
+            {orderNote}
+          </p>
+          {orderCount > 1 && (
+            <NativeSelect
+              label={t("receive.orderSelect")}
+              labelClassName="sr-only"
+              wrapperClassName="w-full sm:w-64"
+              value={chosenOrderId ?? ""}
+              onChange={(event) => onOrderChange(event.target.value)}
+            >
+              {orderOptions.map((order) => (
+                <option key={order.id} value={order.id}>
+                  {t("receive.orderOption", {
+                    number: order.number,
+                    count: order.lineCount,
+                  })}
+                </option>
+              ))}
+            </NativeSelect>
+          )}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="space-y-4">
+      {openedFromOrder && orderNote && orderNoteBlock}
       <ChoiceGroup
         label={t("receive.source.label")}
         options={sourceOptions(t)}
@@ -255,37 +298,7 @@ export function ReceiveHeaderFields({
       {partnersError != null && (
         <InlineQueryError error={partnersError} onRetry={onRetryPartners} />
       )}
-      {orderNote && (
-        <div className="flex flex-wrap items-end gap-3">
-          <p
-            className={
-              chosenOrderNumber
-                ? "text-sm text-success-700"
-                : "text-sm text-on-secondary"
-            }
-          >
-            {orderNote}
-          </p>
-          {orderCount > 1 && (
-            <NativeSelect
-              label={t("receive.orderSelect")}
-              labelClassName="sr-only"
-              wrapperClassName="w-full sm:w-64"
-              value={chosenOrderId ?? ""}
-              onChange={(event) => onOrderChange(event.target.value)}
-            >
-              {orderOptions.map((order) => (
-                <option key={order.id} value={order.id}>
-                  {t("receive.orderOption", {
-                    number: order.number,
-                    count: order.lineCount,
-                  })}
-                </option>
-              ))}
-            </NativeSelect>
-          )}
-        </div>
-      )}
+      {!(openedFromOrder && orderNote) && orderNoteBlock}
       {ordersError != null && (
         <InlineQueryError error={ordersError} onRetry={onRetryOrders} />
       )}
