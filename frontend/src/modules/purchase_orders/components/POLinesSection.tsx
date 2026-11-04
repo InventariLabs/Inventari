@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useTorchAvailable } from "@/hooks/useScanCamera";
 import {
   LineItemsEditor,
   type LineItem,
@@ -91,6 +92,7 @@ export function POLinesSection({
 }: POLinesSectionProps) {
   const { results, isLoading, search, clearSearch } = useProductSearch();
   const { i18n } = useTranslation(["purchase_orders", "common", "scan"]);
+  const hasTorch = useTorchAvailable();
   const dateLang = i18n.language?.substring(0, 2) ?? "en";
   // The price each line was last given by a product pick, to tell it from one
   // the user typed.
@@ -249,6 +251,7 @@ export function POLinesSection({
         error: scannerError,
         cameraActive: isCameraActive,
         torchOn: isTorchOn,
+        torchAvailable: hasTorch,
         onToggle: onToggleScan,
         onToggleTorch,
         onManualCode,

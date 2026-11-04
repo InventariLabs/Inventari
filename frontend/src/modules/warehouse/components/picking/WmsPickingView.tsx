@@ -17,6 +17,7 @@ import WmsShortPickDialog from "./WmsShortPickDialog";
 import type { WmsPickLine } from "@/modules/warehouse/api/documents";
 import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import { unitLabel } from "@/lib/i18nHelpers";
+import type { ShipmentDraft } from "../shipping/shipmentDraft";
 import { buzzRefusal } from "../refusalBuzz";
 import { pickRefusal } from "./pickRefusal";
 
@@ -28,7 +29,7 @@ interface Props {
   /** Invoked when the session start was blocked by the approval engine. */
   onRequestApproval?: () => void | Promise<void>;
   /** Offered on the summary of a dispatch: close without completing, to pack. */
-  onPack?: () => void;
+  onPack?: (shipment: ShipmentDraft) => void;
 }
 
 // A line holding no batch has none to promise: say so instead of "it expects ".
@@ -436,7 +437,7 @@ function WmsPickingView({
         // Left without completing: the document keeps what was picked and
         // waits, as picked, for its Pack step or its own Complete.
         onLeave={() => leave(() => onClose(false))}
-        onPack={onPack && (() => leave(onPack))}
+        onPack={onPack && ((shipment) => leave(() => onPack(shipment)))}
       />
     );
   }

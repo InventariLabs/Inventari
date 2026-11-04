@@ -16,6 +16,7 @@ import {
 import { unitLabel } from "@/lib/i18nHelpers";
 import { useShowDocumentValue } from "@/modules/warehouse/hooks/useShowDocumentValue";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
+import { CorrectionDirection, CorrectionQuantity } from "./CorrectionQuantity";
 import { formatDecimalQty, formatMoney } from "@/utils/formatters";
 
 interface DocumentDetailLinesCardProps {
@@ -190,16 +191,17 @@ export function DocumentDetailLinesCard({
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-on">
                         {isCorrection(document) ? (
-                          <span
-                            className={
-                              expectedQuantity >= 0
-                                ? "text-accent-600"
-                                : "text-red-600"
-                            }
-                          >
-                            {expectedQuantity >= 0 ? "+" : ""}
-                            {formatQuantity(expectedQuantity)}
-                          </span>
+                          <div className="flex flex-col items-end">
+                            <CorrectionQuantity
+                              document={document}
+                              difference={expectedQuantity}
+                              formatQuantity={formatQuantity}
+                            />
+                            <CorrectionDirection
+                              document={document}
+                              difference={expectedQuantity}
+                            />
+                          </div>
                         ) : (
                           <div className="flex flex-col items-end">
                             <div className="font-semibold">

@@ -501,6 +501,8 @@
     "executionSummary": "Fait {{done}} / Prévu {{expected}}",
     "executionSummaryPerUnit": "Fait : {{progress}}",
     "correctionSummary": "Correction : +{{added}} / −{{removed}}",
+    "correctionAddsToStock": "entre en stock",
+    "correctionTakesFromStock": "sort du stock",
     "snapshotTitle": "Aperçu opérationnel",
     "snapshotLines": "Lignes d'article",
     "snapshotPlanned": "Qté prévue",
@@ -739,6 +741,8 @@
     "createSubtitle": "Ajuster les quantités pour le document {{number}}",
     "new": "Nouvelle correction",
     "warning": "Cela créera un nouveau document de correction. Les niveaux de stock seront ajustés une fois terminé.",
+    "directionReceipt": "Une variation positive ajoute des articles au stock, une variation négative les retire.",
+    "directionDispatch": "Une variation positive signifie que l’on a sorti davantage et retire les articles du stock ; une variation négative signifie que l’on a sorti moins et les remet en stock.",
     "executed": "Exécuté",
     "delta": "Écart",
     "minDelta": "Vous pouvez retirer au plus {{max}}",
@@ -1363,6 +1367,7 @@
       "hint": "Ce produit sort du rayon selon la péremption la plus proche. Relevez les deux sur l’emballage.",
       "lot": "Lot",
       "lotPlaceholder": "Numéro de lot (facultatif)",
+      "scanLot": "Scanner le numéro de lot",
       "expiry": "Date de péremption",
       "expiryRequired": "Saisissez la date de péremption indiquée sur l’emballage",
       "confirm": "Réceptionner"
@@ -2150,6 +2155,13 @@
       "body": "La marchandise a quitté le stock.",
       "another": "Sortir encore",
       "undoneTitle": "Sortie annulée"
+    },
+    "writeOff": {
+      "title_one": "{{count}} article mis au rebut",
+      "title_other": "{{count}} articles mis au rebut",
+      "body": "La marchandise a été retirée du stock.",
+      "another": "Mettre d’autres au rebut",
+      "undoneTitle": "Mise au rebut annulée"
     },
     "move": {
       "title_one": "{{count}} article déplacé",

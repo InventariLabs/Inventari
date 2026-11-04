@@ -11,6 +11,7 @@ vi.mock("sonner", () => {
 });
 
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: () => ({
     isCameraActive: false,
     scannerError: null,

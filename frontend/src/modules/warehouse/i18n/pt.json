@@ -501,6 +501,8 @@
     "executionSummary": "Feito {{done}} / Planejado {{expected}}",
     "executionSummaryPerUnit": "Feito: {{progress}}",
     "correctionSummary": "Correção: +{{added}} / −{{removed}}",
+    "correctionAddsToStock": "entra no estoque",
+    "correctionTakesFromStock": "sai do estoque",
     "snapshotTitle": "Resumo operacional",
     "snapshotLines": "Itens de linha",
     "snapshotPlanned": "Qtd. planejada",
@@ -732,6 +734,8 @@
     "createSubtitle": "Ajuste as quantidades do documento {{number}}",
     "new": "Nova correção",
     "warning": "Isto criará um novo documento de correção. Os níveis de estoque serão ajustados quando ele for concluído.",
+    "directionReceipt": "Uma alteração positiva acrescenta mercadoria ao estoque; uma negativa a retira.",
+    "directionDispatch": "Uma alteração positiva significa que saiu mais e retira a mercadoria do estoque; uma negativa, que saiu menos e a devolve ao estoque.",
     "executed": "Executado",
     "delta": "Alteração",
     "minDelta": "Você pode remover até {{max}}",
@@ -1337,6 +1341,7 @@
       "hint": "Este produto sai pela validade mais próxima. Leia os dois na embalagem.",
       "lot": "Lote",
       "lotPlaceholder": "Número do lote (opcional)",
+      "scanLot": "Escanear o número do lote",
       "expiry": "Data de validade",
       "expiryRequired": "Informe a data de validade que consta na embalagem",
       "confirm": "Receber"
@@ -2094,6 +2099,13 @@
       "body": "As mercadorias saíram do estoque.",
       "another": "Expedir mais",
       "undoneTitle": "Expedição desfeita"
+    },
+    "writeOff": {
+      "title_one": "1 linha com baixa",
+      "title_other": "{{count}} linhas com baixa",
+      "body": "As mercadorias foram baixadas do estoque.",
+      "another": "Dar baixa em mais",
+      "undoneTitle": "Baixa desfeita"
     },
     "move": {
       "title_one": "1 linha movida",
