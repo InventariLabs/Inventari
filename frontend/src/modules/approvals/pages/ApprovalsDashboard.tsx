@@ -450,7 +450,9 @@ function RequestCard({ request }: { request: ApprovalRequest }) {
               {summary.total_value != null && (
                 <span className="inline-flex items-center gap-1.5 text-base font-semibold text-on">
                   <Coins size={14} className="text-on-muted" />
-                  {formatMoney(summary.total_value, currency ?? null)}
+                  {t("dashboard.targetSummary.netAmount", {
+                    amount: formatMoney(summary.total_value, currency ?? null),
+                  })}
                 </span>
               )}
               {summary.lines_count > 0 && (

@@ -23,6 +23,16 @@ says what the release does rather than what changed since them.
   before this change prints the current details. A module that prints its own
   documents through the core print identity can freeze the same block with
   `issuer_snapshot` and `IssuerContext.from_snapshot`.
+- **Breaking:** the approve, reject and request-approval routes of documents
+  and purchase orders read the note from the JSON request body as
+  `{"notes": "..."}`. They no longer read a `notes` query parameter, which
+  put a free-text reason where proxies and access logs keep it; a client that
+  still sends one must move it to the body, or the note is not recorded.
+- The approval queues show a document's net amount and say that it is net, the
+  side the approval threshold is set on. They used to show the gross.
+- A refusal about a closed period names the month as the period screen does
+  ("September 2026"), not "2026-09".
+
 ### Added
 
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
@@ -60,6 +70,19 @@ says what the release does rather than what changed since them.
   the saved count is back on the screen.
 - Ticking two filter chips quickly on the product list no longer drops the
   first one from the address, which turned it off a moment later.
+- The notice to an approver names the document, who asked and the net amount,
+  in the app and by e-mail.
+- Completing a purchase order sends one notice per person; an administrator who
+  raised the order used to get two.
+- A write-off is weighed against the approval threshold at what the goods cost,
+  so one under the threshold raises no approval request and shows no approval
+  step or approver on its page. One whose goods have no recorded cost still
+  needs the approval.
+- A note written when approving or rejecting a purchase order is recorded. The
+  screen sent it in the request body and the server read only the query string,
+  so it was lost.
+- The journal names the custom role an invitation offers, not the built-in level
+  under it, and shows a print layout by the name the settings screen gives it.
 - Saving a supplier price or a reorder rule without a product now marks the
   product field as required and says so on the field, and a reorder rule whose
   maximum is below its minimum is refused on the Maximum field in plain words.

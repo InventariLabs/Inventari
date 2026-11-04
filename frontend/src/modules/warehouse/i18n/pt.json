@@ -1219,6 +1219,7 @@
     }
   },
   "targetSummary": {
+    "netAmount": "{{amount}} líquido",
     "linesCount": "{{count}} linha",
     "linesCount_one": "{{count}} linha",
     "linesCount_other": "{{count}} linhas"

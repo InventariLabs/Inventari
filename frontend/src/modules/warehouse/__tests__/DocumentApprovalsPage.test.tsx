@@ -480,6 +480,43 @@ describe("DocumentApprovalsPage", () => {
     expect(screen.getByText("Approve")).toBeInTheDocument();
   });
 
+  it("quotes a card's net amount and says it is net", async () => {
+    // The threshold that sent the document here is net; the card read the
+    // gross, 922.50 for a receipt of 750, with nothing saying which it was.
+    server.use(
+      http.get("/api/v1/modules/my", () =>
+        HttpResponse.json(["core", "warehouse", "approvals"]),
+      ),
+      http.get("/api/v1/warehouse/profile", () =>
+        HttpResponse.json({ value_tracking_enabled: true }),
+      ),
+      http.get("/api/v1/warehouse/awaiting-my-approval", () =>
+        HttpResponse.json({
+          items: [
+            {
+              ...pendingDocument("doc-1", "IN/2026/0001"),
+              total_net: "750.00",
+              total_gross: "922.50",
+              currency: "USD",
+            },
+          ],
+          total: 1,
+          limit: 50,
+          offset: 0,
+          has_more: false,
+        }),
+      ),
+      http.get("/api/v1/approvals/documents/doc-1/approval", () =>
+        HttpResponse.json(null),
+      ),
+    );
+
+    render(<DocumentApprovalsPage />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("$750.00 net")).toBeInTheDocument();
+    expect(screen.queryByText(/922/)).not.toBeInTheDocument();
+  });
+
   it("says the queue could not be loaded, rather than that it is empty", async () => {
     // this page used to answer a failed request with "nothing awaiting
     // your approval" — the one sentence guaranteed to make an approver stop

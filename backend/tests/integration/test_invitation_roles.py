@@ -398,6 +398,31 @@ class TestInvitationEmail:
         )
         assert sent[0]['role'] == 'Night Shift'
 
+    async def test_the_journal_names_the_custom_role_not_the_level_under_it(
+        self,
+        real_async_client,
+        real_async_db_session,
+        async_test_household,
+        admin,
+        sent,
+    ):
+        from sqlalchemy import select
+
+        from app.models.audit_log import AuditLog
+
+        role = await real_async_client.post(
+            '/api/v1/roles', headers=_auth(admin), json={'name': 'Night Shift'}
+        )
+        await real_async_client.post(
+            '/api/v1/organizations/my/invitation-code',
+            json={'role_id': role.json()['id'], 'email': 'anna@example.com'},
+            headers=_auth(admin),
+        )
+        entry = await real_async_db_session.scalar(
+            select(AuditLog).where(AuditLog.target_type == 'invitation')
+        )
+        assert entry.snapshot['role'] == 'Night Shift'
+
 
 @pytest.mark.asyncio
 class TestInvitationResend:
