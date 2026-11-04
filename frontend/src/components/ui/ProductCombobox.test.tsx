@@ -33,6 +33,13 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+/** Lets the frame already asked for run, inside `act` for what it sets. */
+async function nextFrame() {
+  await act(
+    () => new Promise<void>((done) => requestAnimationFrame(() => done())),
+  );
+}
+
 describe("ProductCombobox", () => {
   it("queries the search function once per 250 ms of typing", async () => {
     // Fake timers give the assertion a clock: the debounce must collapse a
@@ -114,6 +121,7 @@ describe("ProductCombobox", () => {
     );
     await user.type(input, "la");
     const list = await screen.findByRole("listbox");
+    await nextFrame();
 
     fireEvent.scroll(list);
     expect(screen.getByRole("listbox")).toBeInTheDocument();
@@ -140,6 +148,85 @@ describe("ProductCombobox", () => {
 
     expect(input).toHaveValue("la");
     expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("keeps the list through the scroll events of a sheet still moving, and after it rests", async () => {
+    // A sheet slides in with the focus already in it, so the browser scrolls
+    // the document to the input and takes that back frame by frame as the
+    // sheet stops overflowing it. Real scroll events and a real move, with
+    // nobody scrolling; a box filled at machine speed has its list open by
+    // then. This used to wipe the typed text, and so did the next scroll event
+    // on the form at rest, against the place the list had opened at.
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Latte cups")]);
+    render(<ProductCombobox {...baseProps} />);
+    const input = screen.getByRole("combobox");
+    let top = 303;
+    vi.spyOn(input, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({ top, bottom: top + 40, left: 0, right: 200, width: 200 }) as DOMRect,
+    );
+    await user.type(input, "la");
+    await screen.findByRole("listbox");
+
+    top = 302;
+    await nextFrame();
+    top = 301;
+    fireEvent.scroll(document);
+    expect(input).toHaveValue("la");
+
+    top = 300;
+    await nextFrame();
+    await nextFrame();
+    fireEvent.scroll(document);
+
+    expect(input).toHaveValue("la");
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("closes the list on the first real scroll after the sheet came to rest", async () => {
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Latte cups")]);
+    render(<ProductCombobox {...baseProps} />);
+    const input = screen.getByRole("combobox");
+    let top = 303;
+    vi.spyOn(input, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({ top, bottom: top + 40, left: 0, right: 200, width: 200 }) as DOMRect,
+    );
+    await user.type(input, "la");
+    await screen.findByRole("listbox");
+    top = 300;
+    await nextFrame();
+    await nextFrame();
+
+    top = 240;
+    fireEvent.scroll(document.body);
+
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("carries the list along when the input moves with no scroll", async () => {
+    // The list is fixed against the input's rect in the viewport. Read once
+    // on a moving sheet, that rect left it about 90 px off the input.
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Latte cups")]);
+    render(<ProductCombobox {...baseProps} />);
+    const input = screen.getByRole("combobox");
+    let top = 210;
+    vi.spyOn(input, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({ top, bottom: top + 40, left: 0, right: 200, width: 200 }) as DOMRect,
+    );
+    await user.type(input, "la");
+    const list = await screen.findByRole("listbox");
+    const panel = () => list.closest<HTMLElement>('[style*="position: fixed"]');
+    expect(panel()).toHaveStyle({ top: "254px" });
+
+    top = 300;
+    await nextFrame();
+
+    expect(panel()).toHaveStyle({ top: "344px" });
   });
 
   it("keeps the typed text when the box scrolls its own long text sideways", async () => {

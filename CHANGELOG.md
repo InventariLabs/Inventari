@@ -30,6 +30,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The product search no longer empties itself while you are using it. Its list
+  used to close and take your text along on a scroll event when nothing had
+  moved, or when the form was still sliding into place as the list opened. It
+  now closes only when a scroll moves a box that was standing still, and stays
+  under the box while the form settles.
 - Saving a supplier price or a reorder rule without a product now marks the
   product field as required and says so on the field, and a reorder rule whose
   maximum is below its minimum is refused on the Maximum field in plain words.
