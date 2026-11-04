@@ -25,7 +25,7 @@ import { AuthLayout } from "./AuthLayout";
 let landing = "/";
 
 export default function LoginPage() {
-  const { t } = useTranslation("auth");
+  const { t, i18n } = useTranslation("auth");
   const { data: initStatus } = useInitStatus();
   // The link must name what /register actually offers: on an empty
   // installation it is the first-account bootstrap form ("Create new
@@ -87,7 +87,9 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      toast.success(t("loginSuccess"));
+      // `t` is fixed to the language this render started in; signing in may
+      // have switched the interface to the account's own.
+      toast.success(i18n.t("loginSuccess", { ns: "auth" }));
       navigate(from ?? "/");
     } catch (error: unknown) {
       toast.error(t(loginFailureKey(error)));

@@ -3,6 +3,7 @@ import { useAppMutation } from "@/lib/api/mutationFactory";
 import { modulesApi } from "@/lib/api/modules";
 import { queryKeys } from "@/hooks/queries/keys";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export function useModuleSettings(moduleName: string | undefined) {
   return useQuery({
@@ -19,6 +20,7 @@ export function useUpdateModuleSettings(
   moduleName: string,
   options?: { quiet?: boolean },
 ) {
+  const { t } = useTranslation("common");
   return useAppMutation(
     (settings: Record<string, unknown>) =>
       modulesApi.updateSettings(moduleName, settings),
@@ -26,7 +28,7 @@ export function useUpdateModuleSettings(
       qc.invalidateQueries({
         queryKey: queryKeys.modules.settings(moduleName),
       });
-      if (!options?.quiet) toast.success(`Saved ${moduleName} settings`);
+      if (!options?.quiet) toast.success(t("settings.moduleSettings.saved"));
     },
   );
 }

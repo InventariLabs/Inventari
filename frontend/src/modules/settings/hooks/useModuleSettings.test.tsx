@@ -51,7 +51,7 @@ describe("module settings hooks", () => {
     });
     await act(() => result.current.mutateAsync({ currency: "PLN" }));
     expect(body).toEqual({ currency: "PLN" });
-    expect(toast.success).toHaveBeenCalledWith("Saved maker settings");
+    expect(toast.success).toHaveBeenCalledWith("Settings saved");
   });
 
   it("stays silent when the page confirms the save itself", async () => {

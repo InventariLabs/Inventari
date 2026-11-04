@@ -825,7 +825,8 @@
       "secretUnset": "Aucune clé enregistrée",
       "unknownModule": "Aucun module ne porte ce nom",
       "unknownModuleHint": "L'adresse pointe vers un module absent de cette installation. Vérifiez le lien ou choisissez le module dans le magasin.",
-      "open": "Paramètres du module"
+      "open": "Paramètres du module",
+      "saved": "Paramètres enregistrés"
     },
     "modules": {
       "openAppStore": "Ouvrir l'App Store"
