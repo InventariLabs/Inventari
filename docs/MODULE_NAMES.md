@@ -302,6 +302,10 @@ Rules:
   title, and the badge that marks a location row's origin. German and French keep two
   natural domain words (Ausrüstung/Geräte, équipement/matériel); both are listed, both are
   legal — the role is the rule, not a single word.
+- **Polish names the act of handing an asset over wydać, and the record of it wydanie.**
+  The button, the bulk action, the tab, the history and the empty states all say it;
+  *przypisany do* stays only as the label of the field that names the holder, a state
+  and not the act. The English "tag" is not used: the identifier is *numer inwentarzowy*.
 - **German names the thing Gerät.** It was Anlagegut, the accounting word for a fixed
   asset — and the module is explicitly not an asset register for accounting. The employee
   asked by e-mail to confirm they still have a laptop read a finance term, on a page that

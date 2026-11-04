@@ -466,10 +466,11 @@ describe("the equipment overview", () => {
   it("names what its link opens: the whole asset list, and how long it is", async () => {
     serve({
       assets: [asset("hp", printers, { status: "MAINTENANCE", serial: "S1" })],
-      totals: { total_assets: 1, retired: 0, active: 0 },
+      totals: { total_assets: 2, retired: 1, active: 0 },
     });
     renderPage();
-    const link = await screen.findByRole("link", { name: "All assets (1)" });
+    // The list behind the link shows the retired asset too: 2, not the fleet's 1.
+    const link = await screen.findByRole("link", { name: "All assets (2)" });
     expect(link).toHaveAttribute("href", "/equipment/assets");
     expect(
       screen.queryByRole("link", { name: "View all" }),

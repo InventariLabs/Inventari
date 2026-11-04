@@ -114,11 +114,12 @@ export default function EquipmentDashboardPage() {
             count: attention.length,
           })}
           summary={summary}
-          // The link opens the whole register, not the rows counted above it:
-          // the label carries the size of what it opens.
+          // The link opens the whole register, retired assets included (the
+          // list shows them), so the label carries total_assets, not the
+          // fleet size the sentence above it counts.
           linkLabel={
             d
-              ? t("dashboard.view_all", { n: fleetSize(d) })
+              ? t("dashboard.view_all", { n: d.total_assets })
               : t("dashboard.fleet.link")
           }
           linkHref="/equipment/assets"

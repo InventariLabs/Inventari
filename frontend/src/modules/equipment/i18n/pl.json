@@ -278,8 +278,8 @@
         "cta": "Importuj z pliku"
       },
       "step2": {
-        "title": "Przypisz go osobie lub miejscu",
-        "description": "Wydaj zasób (Check Out), aby śledzić, kto jest za niego odpowiedzialny."
+        "title": "Wydaj go osobie lub miejscu",
+        "description": "Wydaj zasób, aby śledzić, kto jest za niego odpowiedzialny."
       },
       "step3": {
         "title": "Skonfiguruj alerty konserwacji",
@@ -783,7 +783,7 @@
       "hintStorage": "Tylko wydane zasoby, których stałym miejscem jest to miejsce.",
       "hintCategory": "Tylko zasoby w tej kategorii.",
       "previewCount": "Zasoby w zakresie: {{assets}} · Osoby: {{people}}",
-      "previewEmpty": "W tym zakresie nie ma aktywnych przypisań — nie ma kogo zaatestować."
+      "previewEmpty": "W tym zakresie nie ma aktywnych wydań — nie ma kogo zaatestować."
     },
     "confirm": {
       "launchTitle": "Uruchomić atestację?",
@@ -803,8 +803,8 @@
       "deleteMessage": "Nie została uruchomiona, więc nic nie wyszło i nie ma czego zachowywać.",
       "launchMessageCounted": "E-mail atestacyjny zostanie wysłany do każdej osoby w zakresie — osoby: {{people}}, zasoby: {{assets}}. Tej operacji nie można cofnąć.",
       "nothingToAttestTitle": "Nie ma kogo zaatestować",
-      "nothingToAttestMessage": "W tym zakresie żaden zasób nie ma aktywnego przypisania, więc nie ma kogo zapytać. Najpierw przypisz zasób, potem uruchom atestację.",
-      "nothingToAttestAction": "Przejdź do przypisań",
+      "nothingToAttestMessage": "W tym zakresie żaden zasób nie jest wydany, więc nie ma kogo zapytać. Najpierw wydaj zasób, potem uruchom atestację.",
+      "nothingToAttestAction": "Przejdź do wydań",
       "withoutEmail_one": "{{count}} zasób jest wydany bez adresu e-mail; jego posiadacz nie zostanie zapytany.",
       "withoutEmail_few": "{{count}} zasoby są wydane bez adresu e-mail; ich posiadacze nie zostaną zapytani.",
       "withoutEmail_many": "{{count}} zasobów jest wydanych bez adresu e-mail; ich posiadacze nie zostaną zapytani.",
@@ -914,7 +914,7 @@
     "quantity": "Ilość",
     "prefix": "Prefiks",
     "prefixPlaceholder": "np. DELL-LAT5540",
-    "useSerialAsAssetTag": "Użyj numeru seryjnego jako tagu zasobu",
+    "useSerialAsAssetTag": "Użyj numeru seryjnego jako numeru inwentarzowego",
     "generate_one": "Wygeneruj {{count}} numer seryjny",
     "generate_few": "Wygeneruj {{count}} numery seryjne",
     "generate_many": "Wygeneruj {{count}} numerów seryjnych",
@@ -948,7 +948,7 @@
   "bulk_edit": {
     "change_status": "Status",
     "change_location": "Miejsce",
-    "assign_to": "Przypisz",
+    "assign_to": "Wydaj",
     "change_status_title_one": "Zmień status {{count}} zasobu",
     "change_status_title_few": "Zmień status {{count}} zasobów",
     "change_status_title_many": "Zmień status {{count}} zasobów",
@@ -957,10 +957,10 @@
     "change_location_title_few": "Przenieś {{count}} zasoby do miejsca",
     "change_location_title_many": "Przenieś {{count}} zasobów do miejsca",
     "change_location_title_other": "Przenieś {{count}} zasobów do miejsca",
-    "assign_to_title_one": "Przypisz {{count}} zasób osobie",
-    "assign_to_title_few": "Przypisz {{count}} zasoby osobie",
-    "assign_to_title_many": "Przypisz {{count}} zasobów osobie",
-    "assign_to_title_other": "Przypisz {{count}} zasobów osobie",
+    "assign_to_title_one": "Wydaj {{count}} zasób osobie",
+    "assign_to_title_few": "Wydaj {{count}} zasoby osobie",
+    "assign_to_title_many": "Wydaj {{count}} zasobów osobie",
+    "assign_to_title_other": "Wydaj {{count}} zasobów osobie",
     "new_status": "Nowy status",
     "target_location": "Do miejsca",
     "select_location": "Wybierz miejsce…",
@@ -968,17 +968,17 @@
   },
   "my_assets": {
     "title": "Mój sprzęt",
-    "subtitle": "Zasoby obecnie przypisane do Ciebie",
-    "empty": "Brak przypisanych zasobów",
+    "subtitle": "Zasoby obecnie wydane Tobie",
+    "empty": "Brak wydanych zasobów",
     "empty_hint": "Zasoby wydane na Ciebie pojawią się tutaj.",
     "checked_out": "Wydano",
     "overdue": "Zaległe",
     "due": "Termin",
     "warranty": "Gwarancja",
-    "history_title": "Historia przypisań",
+    "history_title": "Historia wydań",
     "hide_history": "Ukryj",
     "show_history": "Pokaż",
-    "no_history": "Brak przeszłych przypisań",
+    "no_history": "Brak wcześniejszych wydań",
     "return": "Zwróć",
     "who_returns": "Zwrot zapisuje osoba, która przyjmuje zasób z powrotem — poproś osobę odpowiedzialną za zasób o przyjęcie zwrotu albo o zgłoszenie usterki."
   },
@@ -1068,9 +1068,9 @@
   },
   "permissions": {
     "read": "Podgląd sprzętu",
-    "readDesc": "Może przeglądać zasoby, modele, przypisania i historię serwisową",
+    "readDesc": "Może przeglądać zasoby, modele, wydania i historię serwisową",
     "write": "Zarządzanie sprzętem",
-    "writeDesc": "Może dodawać i edytować zasoby, przypisywać je osobom i odnotowywać serwis"
+    "writeDesc": "Może dodawać i edytować zasoby, wydawać je osobom i odnotowywać serwis"
   },
   "labels": {
     "purpose": "Sprzęt"
