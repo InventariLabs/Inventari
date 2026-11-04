@@ -41,6 +41,11 @@ says what the release does rather than what changed since them.
   the screen, and the product suggestions open above the keyboard. A line added
   to a shopping list from the replenish suggestions keeps its unit, and the
   analytics tiles say what they count.
+- The product search no longer empties itself while you are using it. Its list
+  used to close and take your text along on a scroll event when nothing had
+  moved, or when the form was still sliding into place as the list opened. It
+  now closes only when a scroll moves a box that was standing still, and stays
+  under the box while the form settles.
 - Warehouse floor papercuts: the carrier typed on the picking summary is
   still there when packing opens; a camera without a torch no longer offers
   the light switch; the lot on the receiving expiry sheet and a product's own
