@@ -76,7 +76,7 @@ class ApprovalRequestDTO(BaseModel):
 
 
 class FirstStageVerdictDTO(BaseModel):
-    """Whether the stage a new request would wait at has anybody to decide it."""
+    """Whether every stage a new request would pass has anybody to decide it."""
 
     solvable: bool
     undecidable_reason: str | None = None

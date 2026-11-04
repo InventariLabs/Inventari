@@ -163,9 +163,12 @@ applies unchanged. Warehouse staff's receipts wait, the administrator's do not.
 - **Asked before the click.** A target that parks on confirmation says so first:
   `GET /purchase-orders/{id}/approval-requirement` answers a draft order for the person asking, as
   the document's endpoint answers a draft document, and both dialogs name a dead end instead of
-  promising the queue. Confirming still parks it. The order's verdict is there whether or not the
-  rules require the approval, because Request approval parks an order they would let through, and
-  its dialog names the same dead end. A module that parks a target of its own asks
+  promising the queue. Confirming still parks it. The verdict covers every stage the request would
+  have to pass and names the first one nobody can decide, so a decidable first stage no longer
+  hides a dead end behind it. The order's verdict is there whether or not the rules require the
+  approval, because Request approval parks an order they would let through, and its dialog names
+  the same dead end; an order parked with its request withdrawn is answered the same way, since
+  Request approval is offered on it again. A module that parks a target of its own asks
   `approvals_api.first_stage_verdict` the same way and owes its reader the same sentence.
 
 `GET /approvals/workflows` names the scope on every row by name (`requesters`: roles first, then
