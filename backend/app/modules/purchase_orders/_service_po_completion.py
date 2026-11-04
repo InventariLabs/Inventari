@@ -108,7 +108,11 @@ async def _emit_po_completed(
             link=f'/purchase-orders/{po.id}',
         )
         creator_notification = None
-        if po.created_by:
+        # An administrator who raised the order already has the notice for the
+        # administrators; a second one for the same completion reads as two
+        # events.
+        told_already = {n.user_id for n in admin_notifications}
+        if po.created_by and po.created_by not in told_already:
             creator_notification = await core_api.notifications.create_async(
                 session,
                 user_id=po.created_by,

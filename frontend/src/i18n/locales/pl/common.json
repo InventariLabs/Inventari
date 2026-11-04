@@ -827,7 +827,8 @@
       "secretUnset": "Brak zapisanego klucza",
       "unknownModule": "Nie ma modułu o tej nazwie",
       "unknownModuleHint": "Adres wskazuje moduł, którego ta instalacja nie ma. Sprawdź odnośnik albo wybierz moduł ze sklepu.",
-      "open": "Ustawienia modułu"
+      "open": "Ustawienia modułu",
+      "saved": "Zapisano ustawienia"
     },
     "modules": {
       "openAppStore": "Otwórz App Store"

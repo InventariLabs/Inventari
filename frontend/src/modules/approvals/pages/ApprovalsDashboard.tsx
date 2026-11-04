@@ -150,7 +150,7 @@ export default function ApprovalsDashboard() {
         <div className="flex justify-end">
           <Link
             to="/settings/modules/approvals"
-            className="inline-flex items-center gap-1 text-sm text-on-secondary underline hover:text-on"
+            className="inline-flex min-h-6 items-center gap-1 text-sm text-on-secondary underline hover:text-on md:min-h-0"
           >
             <ExternalLink size={14} />
             {t("common:settings.moduleSettings.open")}

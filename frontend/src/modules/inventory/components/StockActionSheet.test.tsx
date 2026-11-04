@@ -1,11 +1,12 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import StockActionSheet from "./StockActionSheet";
 import type { LabelScanView } from "@/types";
 import { formatDateTime } from "@/utils/formatters";
+import i18n from "i18next";
 
 vi.mock("@/components/Slot", () => ({ Slot: () => null }));
 
@@ -162,6 +163,26 @@ describe("StockActionSheet", () => {
       .getAllByRole("button")
       .filter((button) => button.className.includes("bg-primary-700"));
     expect(filled).toHaveLength(1);
+  });
+
+  it("writes the unit of the total the way the reader's language does", async () => {
+    await act(() => i18n.changeLanguage("pl"));
+    try {
+      render(
+        <StockActionSheet
+          data={mockData}
+          onClose={vi.fn()}
+          onConsume={vi.fn()}
+          onAddOne={vi.fn()}
+          onAdd={vi.fn()}
+        />,
+        { wrapper: createWrapper() },
+      );
+      expect(screen.getByText("szt.")).toBeInTheDocument();
+      expect(screen.queryByText("pcs")).not.toBeInTheDocument();
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 
   it("returns null when stock_summary is missing", () => {

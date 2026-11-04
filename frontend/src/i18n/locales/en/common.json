@@ -825,7 +825,8 @@
       "secretUnset": "No key stored",
       "unknownModule": "There is no module by that name",
       "unknownModuleHint": "The address points at a module this installation does not have. Check the link, or pick the module from the store.",
-      "open": "Module settings"
+      "open": "Module settings",
+      "saved": "Settings saved"
     },
     "modules": {
       "openAppStore": "Open App Store"

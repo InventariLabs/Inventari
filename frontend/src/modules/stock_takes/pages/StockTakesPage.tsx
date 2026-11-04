@@ -78,7 +78,7 @@ function ModuleSettingsLink() {
     <div className="flex justify-end">
       <Link
         to="/settings/modules/stock_takes"
-        className="inline-flex items-center gap-1 text-sm text-on-secondary underline hover:text-on"
+        className="inline-flex min-h-6 items-center gap-1 text-sm text-on-secondary underline hover:text-on md:min-h-0"
       >
         <Settings size={14} />
         {t("common:settings.moduleSettings.open")}

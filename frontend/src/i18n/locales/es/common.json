@@ -825,7 +825,8 @@
       "secretUnset": "No hay ninguna clave guardada",
       "unknownModule": "No existe ningún módulo con ese nombre",
       "unknownModuleHint": "La dirección apunta a un módulo que esta instalación no tiene. Revisa el enlace o elige el módulo en la tienda.",
-      "open": "Ajustes del módulo"
+      "open": "Ajustes del módulo",
+      "saved": "Ajustes guardados"
     },
     "modules": {
       "openAppStore": "Abrir App Store"

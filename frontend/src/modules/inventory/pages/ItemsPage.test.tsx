@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor, within } from "@/test/utils";
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { useState } from "react";
 import userEvent from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, delay } from "msw";
 import { server } from "@/test/mocks/server";
 import {
   PageHeaderContext,
@@ -437,6 +437,70 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
     await screen.findByText("Rack 42U Open Frame");
     await waitFor(() =>
       expect(screen.getByText(/Server Rack B/)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText(/^Unknown$/i)).toBeNull();
+  });
+
+  /**
+   * A row is not "Unknown" for as long as the places that name it are on
+   * their way: the page, which knows the answer is pending, hands the rows
+   * nothing to look the place up in.
+   */
+  it("prints no place on a row while the places are still loading", async () => {
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.get("*/organizations/my", () =>
+        HttpResponse.json({ ...org, settings: {} }),
+      ),
+      http.get("*/locations", async () => {
+        await gate;
+        await delay(0);
+        return HttpResponse.json(
+          onePage([
+            {
+              id: "loc-late",
+              name: "Late Shelf",
+              parent_id: null,
+              is_leaf: true,
+              organization_id: "org-1",
+              created_at: "2026-01-01T00:00:00Z",
+              updated_at: "2026-01-01T00:00:00Z",
+            },
+          ]),
+        );
+      }),
+      http.get("*/items", () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: "item-1",
+              name: "Plum Butter",
+              quantity: 1,
+              location_id: "loc-late",
+              organization_id: "org-1",
+              created_at: "2026-01-01T00:00:00Z",
+              updated_at: "2026-01-01T00:00:00Z",
+            },
+          ],
+          total: 1,
+        }),
+      ),
+    );
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+
+    await screen.findByText("Plum Butter");
+    expect(screen.queryByText(/^Unknown$/i)).toBeNull();
+    release();
+    await waitFor(() =>
+      expect(screen.getAllByText(/Late Shelf/).length).toBeGreaterThan(0),
     );
     expect(screen.queryByText(/^Unknown$/i)).toBeNull();
   });
