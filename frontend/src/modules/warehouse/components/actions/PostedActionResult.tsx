@@ -14,7 +14,7 @@ import {
 } from "@/modules/warehouse/types";
 
 /** The action the screen performed, which decides the words. */
-export type PostedAction = "receive" | "issue" | "move";
+export type PostedAction = "receive" | "issue" | "writeOff" | "move";
 
 interface PostedActionResultProps {
   /** The document the one-step post answered with. */
@@ -51,6 +51,10 @@ function headline(
       return undone
         ? t("posted.issue.undoneTitle")
         : t("posted.issue.title", { count });
+    case "writeOff":
+      return undone
+        ? t("posted.writeOff.undoneTitle")
+        : t("posted.writeOff.title", { count });
     default:
       return undone
         ? t("posted.move.undoneTitle")
@@ -75,6 +79,8 @@ function outcome(
         : t("posted.receive.body");
     case "issue":
       return t("posted.issue.body");
+    case "writeOff":
+      return t("posted.writeOff.body");
     default:
       return t("posted.move.body");
   }
@@ -103,6 +109,8 @@ function another(
       return t("posted.receive.another");
     case "issue":
       return t("posted.issue.another");
+    case "writeOff":
+      return t("posted.writeOff.another");
     default:
       return t("posted.move.another");
   }
@@ -117,7 +125,7 @@ function another(
  */
 export function PostedActionResult({
   document,
-  action,
+  action: requested,
   lineCount,
   details,
   extraActions,
@@ -130,6 +138,10 @@ export function PostedActionResult({
   const [reversal, setReversal] = useState<WarehouseDocument | null>(null);
   const [undoError, setUndoError] = useState<string | null>(null);
   const [printing, setPrinting] = useState(false);
+  // A write-off is booked on the issue screen, but it is not an issue: its
+  // answer names what was done instead of the goods having been "issued".
+  const action =
+    requested === "issue" && document.type === "SCRAP" ? "writeOff" : requested;
   const pending = document.status === "PENDING_APPROVAL";
   const count = lineCount ?? document.lines?.length ?? 0;
   const canUndo =

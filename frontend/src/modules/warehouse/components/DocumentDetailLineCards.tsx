@@ -13,6 +13,7 @@ import { PlannedPutawayLine } from "./PlannedPutawayLine";
 import { unitLabel } from "@/lib/i18nHelpers";
 import { useShowDocumentValue } from "@/modules/warehouse/hooks/useShowDocumentValue";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
+import { CorrectionDirection, CorrectionQuantity } from "./CorrectionQuantity";
 import { formatDecimalQty, formatMoney } from "@/utils/formatters";
 
 interface DocumentDetailLineCardsProps {
@@ -125,14 +126,11 @@ function LineCard({
 
       <div className="flex items-baseline gap-2 font-mono text-sm">
         {isCorrection ? (
-          <span
-            className={
-              expectedQuantity >= 0 ? "text-accent-600" : "text-red-600"
-            }
-          >
-            {expectedQuantity >= 0 ? "+" : ""}
-            {formatQuantity(expectedQuantity)}
-          </span>
+          <CorrectionQuantity
+            document={document}
+            difference={expectedQuantity}
+            formatQuantity={formatQuantity}
+          />
         ) : (
           <span className="font-semibold text-on">
             {formatQuantity(
@@ -141,6 +139,12 @@ function LineCard({
           </span>
         )}
         {unit && <span className="text-on-secondary">{unit}</span>}
+        {isCorrection && (
+          <CorrectionDirection
+            document={document}
+            difference={expectedQuantity}
+          />
+        )}
         {owesExecutionSummary && (
           <span className="font-sans text-xs text-on-secondary">
             {t("detail.executionSummary", {
