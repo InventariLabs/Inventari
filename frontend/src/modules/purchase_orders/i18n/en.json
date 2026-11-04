@@ -187,6 +187,8 @@
       "description": "No approval workflow exists for purchase orders, so confirming one is refused. Create the workflow, or turn the requirement off.",
       "action": "Create workflow",
       "moduleDescription": "The Approvals module is off, so there is nowhere for a purchase order to wait. Enable it, or turn the requirement off.",
+      "descriptionThreshold": "No approval workflow exists for purchase orders, so confirming one above the threshold is refused. Create the workflow, or clear the approval threshold.",
+      "moduleDescriptionThreshold": "The Approvals module is off, so there is nowhere for a purchase order above the threshold to wait. Enable it, or clear the approval threshold.",
       "moduleAction": "Open apps"
     }
   },
@@ -278,6 +280,7 @@
     "alertsTitle_other": "{{count}} products below minimum stock",
     "deleteConfirmTitle": "Delete rule?",
     "maxPositive": "Max must be greater than 0",
+    "maxBelowMin": "Max ({{max}}) cannot be below min ({{min}})",
     "minPositive": "Min must be greater than 0 — it is the threshold that makes the rule fire",
     "count_one": "rule",
     "count_other": "rules",

@@ -120,6 +120,7 @@ describe("PricelistFormModal — each field writes its own key", () => {
       <Harness
         initial={{
           ...emptyForm,
+          product: PRODUCT,
           unitPrice: "3",
           validFrom: "2026-02-10",
           validTo: "2026-02-01",
@@ -149,7 +150,7 @@ describe("PricelistFormModal — each field writes its own key", () => {
       .fn()
       .mockImplementation(async (q: string) => (q === "lat" ? [PRODUCT] : []));
     render(<Harness initial={emptyForm} search={search} />);
-    fireEvent.change(screen.getByLabelText("Product"), {
+    fireEvent.change(screen.getByLabelText(/^Product/), {
       target: { value: "lat" },
     });
     fireEvent.click(await screen.findByText("Latte cups"));
@@ -159,7 +160,7 @@ describe("PricelistFormModal — each field writes its own key", () => {
     await userEvent.click(screen.getByRole("button", { name: /clear/i }));
     expect(state().product).toBeNull();
 
-    fireEvent.change(screen.getByLabelText("Product"), {
+    fireEvent.change(screen.getByLabelText(/^Product/), {
       target: { value: "zzz" },
     });
     expect(await screen.findByText(/zzz/)).toBeInTheDocument();

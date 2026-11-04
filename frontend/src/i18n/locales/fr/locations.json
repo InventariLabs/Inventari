@@ -233,6 +233,8 @@
     "archiveTargetLabel": "Déplacer les produits vers",
     "archiveTargetNone": "Choisir un emplacement cible",
     "archiveReversible": "Vous pouvez revenir en arrière : les emplacements archivés se restaurent depuis Emplacements archivés.",
+    "archiveSubLocations_one": "L’{{count}} emplacement qu’il contient n’est pas archivé avec lui : il apparaît au premier niveau des listes jusqu’à la restauration de celui-ci.",
+    "archiveSubLocations_other": "Les {{count}} emplacements qu’il contient ne sont pas archivés avec lui : ils apparaissent au premier niveau des listes jusqu’à la restauration de celui-ci.",
     "archivePutawayRules_one": "{{count}} règle de rangement pointe vers cet emplacement. Elle le conservera comme cible jusqu’à modification.",
     "archivePutawayRules_other": "{{count}} règles de rangement pointent vers cet emplacement. Elles le conserveront comme cible jusqu’à modification."
   },
@@ -259,7 +261,8 @@
   "reorg": {
     "noMoveTargets": "Nulle part où déplacer cet emplacement",
     "moveTo": "Déplacer vers…",
-    "moveToTop": "Premier niveau"
+    "moveToTop": "Premier niveau",
+    "archiveOrDelete": "Archiver ou supprimer…"
   },
   "card": {
     "unit_one": "produit",
@@ -339,6 +342,7 @@
   },
   "contents": {
     "emptyTitle": "Rien à l’intérieur de cet emplacement",
+    "emptyDescriptionNone": "Il ne contient aucun produit ni emplacement.",
     "emptyDescription_one": "Son {{count}} produit est dans l’onglet Produits.",
     "emptyDescription_other": "Ses {{count}} produits sont dans l’onglet Produits.",
     "showProducts": "Afficher les produits",

@@ -193,6 +193,8 @@
       "description": "Nie ma przepływu akceptacji dla zamówień zakupu, więc potwierdzenie zamówienia zostanie odrzucone. Utwórz przepływ albo wyłącz ten wymóg.",
       "action": "Utwórz przepływ",
       "moduleDescription": "Moduł Akceptacje jest wyłączony, więc zamówienie nie ma gdzie czekać. Włącz moduł albo wyłącz ten wymóg.",
+      "descriptionThreshold": "Nie ma przepływu akceptacji dla zamówień zakupu, więc potwierdzenie zamówienia powyżej progu zostanie odrzucone. Utwórz przepływ albo wyczyść próg akceptacji.",
+      "moduleDescriptionThreshold": "Moduł Akceptacje jest wyłączony, więc zamówienie powyżej progu nie ma gdzie czekać. Włącz moduł albo wyczyść próg akceptacji.",
       "moduleAction": "Otwórz aplikacje"
     }
   },
@@ -290,6 +292,7 @@
     "alertsTitle_other": "{{count}} produktów poniżej stanu minimalnego",
     "deleteConfirmTitle": "Usunąć regułę?",
     "maxPositive": "Maksymalna ilość musi być większa niż 0",
+    "maxBelowMin": "Maksimum ({{max}}) nie może być niższe niż minimum ({{min}})",
     "minPositive": "Minimalna ilość musi być większa niż 0 — to próg, który uruchamia regułę",
     "count_one": "reguła",
     "count_few": "reguły",

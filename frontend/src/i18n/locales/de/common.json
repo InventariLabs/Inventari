@@ -2,6 +2,7 @@
   "access": {
     "readOnly": "Sie können das ansehen, aber nicht ändern",
     "readOnlyHint": "Ihr Konto darf dieses Modul lesen. Wenden Sie sich an die Administration Ihrer Organisation, wenn Sie etwas ändern müssen.",
+    "hiddenRecordsAdminOnly": "Nur ein Administrator kann das einschalten – bitten Sie einen darum.",
     "denied": "Sie haben darauf keinen Zugriff",
     "deniedHint": "Ihr Konto kann diese Daten nicht lesen. Bitten Sie eine Administratorin oder einen Administrator Ihrer Organisation um Zugriff."
   },
@@ -808,6 +809,11 @@
       "empty": "Keine Einstellungen verfügbar",
       "emptyHint": "Dieses Modul stellt keine Einstellungen bereit.",
       "loadFailed": "Modul-Einstellungen konnten nicht geladen werden",
+      "outOfRangeBetween": "Geben Sie eine Zahl von {{min}} bis {{max}} ein.",
+      "outOfRangeMin": "Geben Sie eine Zahl ab {{min}} ein.",
+      "outOfRangeMax": "Geben Sie eine Zahl bis {{max}} ein.",
+      "outOfRangeSave": "Korrigieren Sie die Einstellung außerhalb des Bereichs und speichern Sie erneut.",
+      "notWholeNumber": "Geben Sie eine ganze Zahl ein.",
       "loadFailedHint": "Die Einstellungen konnten gerade nicht gelesen werden. Das ist meist vorübergehend.",
       "forbidden": "Moduleinstellungen öffnet nur eine Administratorin oder ein Administrator",
       "forbiddenHint": "Ihr Konto darf das Modul nutzen, aber sein Verhalten nicht ändern. Wenden Sie sich an die Administration Ihrer Organisation.",

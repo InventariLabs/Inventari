@@ -219,7 +219,8 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
   it("keeps the counter above a list that still has rows", async () => {
     // The counter belonged to the empty state alone: the first visible row
     // silenced it, and two hidden products behind two visible ones said
-    // nothing at all.
+    // nothing at all. The switch it points at is an administrator's.
+    signInWith(["items:read", "items:write", "admin:access"]);
     server.use(
       http.get("*/organizations/my", () =>
         HttpResponse.json({ ...org, settings: {} }),

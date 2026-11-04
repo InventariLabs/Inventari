@@ -105,7 +105,7 @@ describe("PricelistPage", () => {
     );
 
     const dialog = await screen.findByRole("dialog");
-    const formSearch = within(dialog).getByLabelText("Product");
+    const formSearch = within(dialog).getByLabelText(/^Product/);
     const cardSearch = screen.getByLabelText("Search product…");
 
     fireEvent.change(formSearch, { target: { value: "la" } });

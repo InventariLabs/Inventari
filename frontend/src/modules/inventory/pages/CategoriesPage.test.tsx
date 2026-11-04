@@ -472,7 +472,7 @@ describe("CategoriesPage — module data kept out of the list", () => {
   beforeEach(() => {
     queryClient = createQueryClient();
     vi.clearAllMocks();
-    signInWith(["categories:read", "categories:write"]);
+    signInWith(["categories:read", "categories:write", "admin:access"]);
     server.use(
       http.get("/api/v1/categories", ({ request }) => {
         const url = new URL(request.url);
