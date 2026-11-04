@@ -136,7 +136,7 @@ describe("PricelistPage — saving and removing prices", () => {
     await pickSupplier();
     const dialog = await openCreateForm();
 
-    fireEvent.change(within(dialog).getByLabelText("Product"), {
+    fireEvent.change(within(dialog).getByLabelText(/^Product/), {
       target: { value: "la" },
     });
     fireEvent.click(
@@ -173,9 +173,13 @@ describe("PricelistPage — saving and removing prices", () => {
       target: { value: "3" },
     });
     fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Select a product first"),
-    );
+    // The refusal sits on the product field, which is marked required.
+    expect(
+      await within(dialog).findByText("Select a product first"),
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole("combobox", { name: /Product/ }),
+    ).toHaveAttribute("aria-required", "true");
     expect(created).toEqual([]);
   });
 
@@ -207,7 +211,7 @@ describe("PricelistPage — saving and removing prices", () => {
     fireEvent.click(screen.getByRole("button", { name: /edit latte cups/i }));
     const dialog = await screen.findByRole("dialog");
     // The product is fixed on an existing entry, so the picker is gone.
-    expect(within(dialog).queryByLabelText("Product")).not.toBeInTheDocument();
+    expect(within(dialog).queryByLabelText(/^Product/)).not.toBeInTheDocument();
     fireEvent.change(within(dialog).getByLabelText(/^Price/), {
       target: { value: "5" },
     });

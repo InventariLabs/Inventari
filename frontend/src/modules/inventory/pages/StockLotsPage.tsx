@@ -115,10 +115,26 @@ export default function StockLotsPage() {
           onChange: (value) => setStatusFilter(value as LotStatus | "all"),
           options: [
             { value: "all", label: t("inventory:moves.direction.all") },
-            ...STATUSES.map((value) => ({
-              value,
-              label: t(`inventory:lot.status.${value}`),
-            })),
+            // The tab names are plural-title friendly ("Active", not the
+            // singular-feminine "Aktywna" the status badge carries beside a
+            // batch number), and spelled out so each stays a literal key.
+            {
+              value: "active",
+              label: t("inventory:lots.statusFilter.active"),
+            },
+            {
+              value: "quarantined",
+              label: t("inventory:lots.statusFilter.quarantined"),
+            },
+            { value: "held", label: t("inventory:lots.statusFilter.held") },
+            {
+              value: "expired",
+              label: t("inventory:lots.statusFilter.expired"),
+            },
+            {
+              value: "recalled",
+              label: t("inventory:lots.statusFilter.recalled"),
+            },
           ],
         }}
         resultCount={isError ? undefined : total}

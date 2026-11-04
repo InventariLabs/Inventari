@@ -17,25 +17,23 @@ from app.core.contracts import UserContextDTO
 from app.core.deps import get_async_db, get_current_user_context, require_org
 from app.core.exceptions import map_service_errors
 from app.core.limiter import limiter
-from app.core.module_sdk import PaginatedResponse
 
 from ._schemas_linking import (
     BulkLinkIngredientsRequest,
     BulkLinkIngredientsResponse,
     IngredientMatchProposalsResponse,
-    UnlinkedIngredient,
+    UnlinkedIngredientsResponse,
 )
 from .ingredient_linking_service import (
     apply_links,
+    count_ingredients,
     list_unlinked_ingredients,
     suggest_matches,
 )
 
 
 def register_ingredient_matching_routes(router: APIRouter) -> None:
-    @router.get(
-        '/ingredients/unlinked', response_model=PaginatedResponse[UnlinkedIngredient]
-    )
+    @router.get('/ingredients/unlinked', response_model=UnlinkedIngredientsResponse)
     async def list_unlinked_ingredients_endpoint(
         # The screen works the backlog down in one sitting, so a page is wide.
         limit: int = Query(200, ge=1, le=1000),
@@ -45,8 +43,11 @@ def register_ingredient_matching_routes(router: APIRouter) -> None:
         org_id: UUID = Depends(require_org),
     ) -> Any:
         items = await list_unlinked_ingredients(db, org_id)
-        return PaginatedResponse[UnlinkedIngredient].from_full_list(
+        page = UnlinkedIngredientsResponse.from_full_list(
             items, offset=offset, limit=limit
+        )
+        return page.model_copy(
+            update={'ingredient_total': await count_ingredients(db, org_id)}
         )
 
     @router.post(

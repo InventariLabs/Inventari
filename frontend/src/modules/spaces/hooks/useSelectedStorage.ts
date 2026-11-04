@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { storagesApi } from "@/lib/api/storages";
 import { queryKeys } from "@/hooks/queries/keys";
+import { isIdentifierRejection } from "@/lib/errors";
 import { useLocationsById } from "@/module-sdk";
 import type {
   StorageLocationBreadcrumb,
@@ -40,6 +41,7 @@ export function useSelectedStorage(
     },
     enabled: !!selectedId,
   });
+  const malformed = isIdentifierRejection(scoped.error);
   const missed = scoped.data === null;
   const named = useLocationsById(missed ? [id] : []);
   const breadcrumb = useQuery<StorageLocationBreadcrumb[]>({
@@ -60,7 +62,10 @@ export function useSelectedStorage(
     isLoading: !!selectedId && (scoped.isLoading || lookupPending),
     // The way down is part of what the pane draws: without it the place
     // would read as standing at the top.
-    isError: scoped.isError || breadcrumb.isError || (missed && named.isError),
+    isError:
+      (scoped.isError && !malformed) ||
+      breadcrumb.isError ||
+      (missed && named.isError),
     refetch: () => {
       void scoped.refetch();
       void breadcrumb.refetch();

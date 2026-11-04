@@ -239,6 +239,8 @@
     "archiveTargetLabel": "Mover productos a",
     "archiveTargetNone": "Elegir ubicación de destino",
     "archiveReversible": "Puedes deshacerlo: las ubicaciones archivadas se restauran desde Ubicaciones archivadas.",
+    "archiveSubLocations_one": "La {{count}} ubicación que contiene no se archiva con ella: aparece en el nivel superior de las listas hasta que se restaure esta.",
+    "archiveSubLocations_other": "Las {{count}} ubicaciones que contiene no se archivan con ella: aparecen en el nivel superior de las listas hasta que se restaure esta.",
     "archivePutawayRules_one": "{{count}} regla de ubicación apunta aquí. Mantendrá esta ubicación como destino hasta que se edite.",
     "archivePutawayRules_other": "{{count}} reglas de ubicación apuntan aquí. Mantendrán esta ubicación como destino hasta que se editen."
   },
@@ -265,7 +267,8 @@
   "reorg": {
     "noMoveTargets": "No hay dónde mover esta ubicación",
     "moveTo": "Mover a…",
-    "moveToTop": "Nivel superior"
+    "moveToTop": "Nivel superior",
+    "archiveOrDelete": "Archivar o eliminar…"
   },
   "card": {
     "unit_one": "producto",
@@ -345,6 +348,7 @@
   },
   "contents": {
     "emptyTitle": "No hay nada dentro de esta ubicación",
+    "emptyDescriptionNone": "No contiene productos ni ubicaciones.",
     "emptyDescription_one": "Su {{count}} producto está en la pestaña Productos.",
     "emptyDescription_other": "Sus {{count}} productos están en la pestaña Productos.",
     "showProducts": "Mostrar productos",

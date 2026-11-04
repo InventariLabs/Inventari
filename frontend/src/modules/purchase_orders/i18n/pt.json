@@ -187,6 +187,8 @@
       "description": "Não existe um fluxo de aprovação para pedidos de compra, então confirmar um pedido é recusado. Crie o fluxo ou desative a exigência.",
       "action": "Criar fluxo",
       "moduleDescription": "O módulo Aprovações está desativado, então não há onde um pedido de compra aguardar. Ative-o ou desative a exigência.",
+      "descriptionThreshold": "Não existe um fluxo de aprovação para pedidos de compra, então confirmar um pedido acima do limite é recusado. Crie o fluxo ou esvazie o limite de aprovação.",
+      "moduleDescriptionThreshold": "O módulo Aprovações está desativado, então não há onde um pedido de compra acima do limite aguardar. Ative-o ou esvazie o limite de aprovação.",
       "moduleAction": "Abrir aplicativos"
     }
   },
@@ -278,6 +280,7 @@
     "alertsTitle_other": "{{count}} produtos abaixo do estoque mínimo",
     "deleteConfirmTitle": "Excluir regra?",
     "maxPositive": "O máximo deve ser maior que 0",
+    "maxBelowMin": "O máximo ({{max}}) não pode ser inferior ao mínimo ({{min}})",
     "minPositive": "O mínimo deve ser maior que 0 — é o limite que faz a regra disparar",
     "count_one": "regra",
     "count_other": "regras",

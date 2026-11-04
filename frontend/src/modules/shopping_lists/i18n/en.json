@@ -115,6 +115,7 @@
     "nameChanged": "Name changed",
     "nameChangeError": "Error changing name"
   },
+  "loadError": "Could not load your shopping lists",
   "permissions": {
     "read": "View shopping lists",
     "readDesc": "Can browse shopping lists and their suggestions",

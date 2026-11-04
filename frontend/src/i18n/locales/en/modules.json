@@ -81,7 +81,6 @@
     }
   },
   "config": {
-    "connectionsTitle": "AI Connections",
     "connectionsDescription": "Pool of LLM connections shared across modules. Bind one to each purpose below.",
     "addConnection": "Add connection",
     "editConnection": "Edit connection",

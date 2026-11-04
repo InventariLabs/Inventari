@@ -73,14 +73,21 @@ export function StorageContentsTab({
       <EmptyState
         icon={PackageOpen}
         title={t("locations:contents.emptyTitle")}
-        description={t("locations:contents.emptyDescription", {
-          count: parent.items_count,
-        })}
+        description={
+          parent.items_count > 0
+            ? t("locations:contents.emptyDescription", {
+                count: parent.items_count,
+              })
+            : t("locations:contents.emptyDescriptionNone")
+        }
+        // A button to a tab with nothing in it sends the reader nowhere.
         primaryAction={
-          <EmptyStateAction
-            label={t("locations:contents.showProducts")}
-            onClick={onShowProducts}
-          />
+          parent.items_count > 0 ? (
+            <EmptyStateAction
+              label={t("locations:contents.showProducts")}
+              onClick={onShowProducts}
+            />
+          ) : undefined
         }
       />
     );

@@ -21,6 +21,7 @@ interface StorageTreePanelProps {
   onSelect: (id: string) => void;
   canWrite: boolean;
   onMoveTo: (id: string) => void;
+  onOpenSettings: (id: string) => void;
   onDragMove: (id: string, parentId: string) => void;
 }
 
@@ -43,6 +44,7 @@ export function StorageTreePanel({
   onSelect,
   canWrite,
   onMoveTo,
+  onOpenSettings,
   onDragMove,
 }: StorageTreePanelProps) {
   const { t } = useTranslation(["locations", "common"]);
@@ -123,6 +125,7 @@ export function StorageTreePanel({
             onSelect={onSelect}
             canWrite={canWrite}
             onMoveTo={onMoveTo}
+            onOpenSettings={onOpenSettings}
             onDragMove={onDragMove}
             label={t("locations:tree.label")}
           />

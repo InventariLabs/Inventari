@@ -194,7 +194,8 @@ describe("AiConnectionsTab", () => {
     expect(
       screen.queryByRole("heading", { name: "AI Connections" }),
     ).toBeNull();
-    expect(screen.getByText("AI Connections")).toBeInTheDocument();
+    // Not as plain text either: that was the same name a second time.
+    expect(screen.queryByText("AI Connections")).toBeNull();
     expect(
       screen.getByRole("heading", { name: "Default per purpose", level: 2 }),
     ).toBeInTheDocument();

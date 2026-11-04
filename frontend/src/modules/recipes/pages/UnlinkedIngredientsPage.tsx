@@ -125,7 +125,7 @@ export default function UnlinkedIngredientsPage() {
     });
   }, [t, setHeader, canWrite, isSuggesting, listFailed, runSuggest]);
 
-  const items = unlinkedQuery.data ?? [];
+  const items = unlinkedQuery.data?.items ?? [];
   const proposedItems = items.filter((item) => proposals[item.id]);
   const selectedCount = proposedItems.filter((item) =>
     selected.has(item.id),
@@ -238,12 +238,22 @@ export default function UnlinkedIngredientsPage() {
       {!canWrite && <ReadOnlyNotice module="recipes" />}
       <QueryResult query={unlinkedQuery}>
         {(data) =>
-          data.length === 0 ? (
-            <EmptyState
-              icon={CircleCheck}
-              title={t("linking.empty_title")}
-              description={t("linking.empty_desc")}
-            />
+          data.items.length === 0 ? (
+            // Nothing to link is "all linked" only when there are
+            // ingredients; with none at all the claim would be false.
+            !data.hasIngredients ? (
+              <EmptyState
+                icon={Link2}
+                title={t("linking.empty_no_ingredients_title")}
+                description={t("linking.empty_no_ingredients_desc")}
+              />
+            ) : (
+              <EmptyState
+                icon={CircleCheck}
+                title={t("linking.empty_title")}
+                description={t("linking.empty_desc")}
+              />
+            )
           ) : (
             <>
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -312,7 +322,7 @@ export default function UnlinkedIngredientsPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>{data.map(renderRow)}</tbody>
+                  <tbody>{data.items.map(renderRow)}</tbody>
                 </table>
               </div>
             </>

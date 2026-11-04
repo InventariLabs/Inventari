@@ -67,9 +67,15 @@ describe("MakerSettingsPanel", () => {
     signInWith(["maker:read"]);
     renderPanel();
 
+    // Nothing is shown read-only, so the page must not claim it can be viewed.
     expect(
-      await screen.findByText(/you can view this, not change it/i),
+      await screen.findByText(
+        /only an administrator can open module settings/i,
+      ),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/you can view this, not change it/i),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /margin/i }),
     ).not.toBeInTheDocument();
@@ -152,5 +158,40 @@ describe("MakerSettingsPanel", () => {
       name: /allow overproduction/i,
     });
     expect(toggle).toHaveAttribute("aria-checked", "true");
+  });
+
+  /**
+   * The three choice groups draw the picked option by colour alone, so each
+   * button carries the state for assistive technology.
+   */
+  it("marks the picked option of every choice group as pressed", async () => {
+    signInWith(["maker:read", "maker:write", "maker:manage"]);
+    renderPanel();
+
+    const savings = await screen.findByTestId("maker-settings-savings-btn");
+    expect(savings).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("maker-settings-margin-btn")).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /advanced/i }));
+    for (const id of [
+      "maker-settings-scope-global",
+      "maker-settings-scope-per-location",
+      "maker-settings-strategy-allow",
+      "maker-settings-strategy-warn",
+      "maker-settings-strategy-block",
+    ]) {
+      expect(screen.getByTestId(id)).toHaveAttribute("aria-pressed");
+    }
+    expect(screen.getByTestId("maker-settings-strategy-allow")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByTestId("maker-settings-strategy-warn")).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
   });
 });

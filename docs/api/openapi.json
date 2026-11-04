@@ -22648,7 +22648,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_UnlinkedIngredient_"
+                  "$ref": "#/components/schemas/UnlinkedIngredientsResponse"
                 }
               }
             }
@@ -64300,47 +64300,6 @@
         ],
         "title": "PaginatedResponse[UnitConversionSchema]"
       },
-      "PaginatedResponse_UnlinkedIngredient_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/UnlinkedIngredient"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
-          },
-          "offset": {
-            "type": "integer",
-            "title": "Offset"
-          },
-          "has_more": {
-            "type": "boolean",
-            "title": "Has More"
-          },
-          "total_capped": {
-            "type": "boolean",
-            "title": "Total Capped",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset",
-          "has_more"
-        ],
-        "title": "PaginatedResponse[UnlinkedIngredient]"
-      },
       "PaginatedResponse_UomCategoryDTO_": {
         "properties": {
           "items": {
@@ -76443,7 +76402,7 @@
           "reason"
         ],
         "title": "ReplenishmentDraftSkipped",
-        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (the rule has no preferred supplier \u2014\nreported, never turned into an empty order)."
+        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (neither the rule nor the price list names\na supplier; reported, never turned into an empty order)."
       },
       "ReplenishmentMoveLineDTO": {
         "properties": {
@@ -83802,6 +83761,52 @@
         ],
         "title": "UnlinkedIngredient",
         "description": "One unlinked ingredient, with enough context to recognise it."
+      },
+      "UnlinkedIngredientsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UnlinkedIngredient"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          },
+          "ingredient_total": {
+            "type": "integer",
+            "title": "Ingredient Total",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "UnlinkedIngredientsResponse"
       },
       "UomCategoryDTO": {
         "properties": {

@@ -19434,24 +19434,6 @@ export interface components {
              */
             total_capped: boolean;
         };
-        /** PaginatedResponse[UnlinkedIngredient] */
-        PaginatedResponse_UnlinkedIngredient_: {
-            /** Items */
-            items: components["schemas"]["UnlinkedIngredient"][];
-            /** Total */
-            total: number;
-            /** Limit */
-            limit: number;
-            /** Offset */
-            offset: number;
-            /** Has More */
-            has_more: boolean;
-            /**
-             * Total Capped
-             * @default false
-             */
-            total_capped: boolean;
-        };
         /** PaginatedResponse[UomCategoryDTO] */
         PaginatedResponse_UomCategoryDTO_: {
             /** Items */
@@ -23587,8 +23569,8 @@ export interface components {
          *     ``not_found`` (no such rule in this org), ``not_alerting`` (stock is
          *     at or above the minimum right now), ``covered_by_reserve`` (the
          *     proposed internal move covers the whole shortage, so there is nothing
-         *     to buy), ``no_supplier`` (the rule has no preferred supplier —
-         *     reported, never turned into an empty order).
+         *     to buy), ``no_supplier`` (neither the rule nor the price list names
+         *     a supplier; reported, never turned into an empty order).
          */
         ReplenishmentDraftSkipped: {
             /**
@@ -26459,6 +26441,29 @@ export interface components {
             quantity: string;
             /** Uom Symbol */
             uom_symbol?: string | null;
+        };
+        /** UnlinkedIngredientsResponse */
+        UnlinkedIngredientsResponse: {
+            /** Items */
+            items: components["schemas"]["UnlinkedIngredient"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+            /**
+             * Ingredient Total
+             * @default 0
+             */
+            ingredient_total: number;
         };
         /** UomCategoryDTO */
         UomCategoryDTO: {
@@ -40189,7 +40194,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedResponse_UnlinkedIngredient_"];
+                    "application/json": components["schemas"]["UnlinkedIngredientsResponse"];
                 };
             };
             /** @description Validation Error */

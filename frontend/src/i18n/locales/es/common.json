@@ -2,6 +2,7 @@
   "access": {
     "readOnly": "Puede consultarlo, pero no modificarlo",
     "readOnlyHint": "Su cuenta puede leer este módulo. Consulte con la administración de su organización si necesita hacer cambios.",
+    "hiddenRecordsAdminOnly": "Solo un administrador puede activarlo; pídaselo a uno.",
     "denied": "No tienes acceso a esto",
     "deniedHint": "Tu cuenta no puede leer estos datos. Solicita acceso a un administrador de tu organización."
   },
@@ -808,6 +809,11 @@
       "empty": "No hay ajustes disponibles",
       "emptyHint": "Este módulo no expone ningún ajuste.",
       "loadFailed": "No se pudieron cargar los ajustes del módulo",
+      "outOfRangeBetween": "Introduzca un número de {{min}} a {{max}}.",
+      "outOfRangeMin": "Introduzca un número igual o mayor que {{min}}.",
+      "outOfRangeMax": "Introduzca un número igual o menor que {{max}}.",
+      "outOfRangeSave": "Corrija el ajuste fuera de rango y guarde de nuevo.",
+      "notWholeNumber": "Introduzca un número entero.",
       "loadFailedHint": "Los ajustes no se han podido leer ahora mismo. Suele ser temporal.",
       "forbidden": "Solo la administración puede abrir los ajustes del módulo",
       "forbiddenHint": "Tu cuenta puede usar este módulo, pero no cambiar su comportamiento. Pídelo a la administración de tu organización.",

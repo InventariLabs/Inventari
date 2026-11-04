@@ -2,6 +2,7 @@
   "access": {
     "readOnly": "Możesz to oglądać, ale nie zmieniać",
     "readOnlyHint": "Twoje konto ma podgląd tego modułu. Jeśli potrzebujesz wprowadzać zmiany, poproś administratora organizacji.",
+    "hiddenRecordsAdminOnly": "Tylko administrator może to włączyć — poproś go o to.",
     "denied": "Nie masz do tego dostępu",
     "deniedHint": "Twoje konto nie może odczytać tych danych. Poproś o dostęp administratora organizacji."
   },
@@ -810,6 +811,11 @@
       "empty": "Brak dostępnych ustawień",
       "emptyHint": "Ten moduł nie udostępnia żadnych ustawień.",
       "loadFailed": "Nie udało się wczytać ustawień modułu",
+      "outOfRangeBetween": "Wpisz liczbę od {{min}} do {{max}}.",
+      "outOfRangeMin": "Wpisz liczbę nie mniejszą niż {{min}}.",
+      "outOfRangeMax": "Wpisz liczbę nie większą niż {{max}}.",
+      "outOfRangeSave": "Popraw ustawienie spoza zakresu i zapisz ponownie.",
+      "notWholeNumber": "Wpisz liczbę całkowitą.",
       "loadFailedHint": "Nie udało się teraz odczytać ustawień. Zwykle jest to przejściowe.",
       "forbidden": "Ustawienia modułu otwiera tylko administrator",
       "forbiddenHint": "Twoje konto może korzystać z modułu, ale nie zmieniać jego działania. Poproś administratora organizacji.",

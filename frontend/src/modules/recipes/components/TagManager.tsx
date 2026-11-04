@@ -183,7 +183,7 @@ export default function TagManager({
         t("tags_manager.rename_success", { count: result.updated_recipes }),
       );
     } catch (err) {
-      toast.error(extractApiError(err, t("tags_manager.merge_failed")));
+      toast.error(extractApiError(err, t("tags_manager.rename_failed")));
     }
   };
 
