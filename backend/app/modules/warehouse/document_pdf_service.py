@@ -204,6 +204,29 @@ def _quantity_totals_by_unit(
     return list(groups.values())
 
 
+def _issuer_and_places(
+    document: Document, issuer: IssuerContext | None, lang: str
+) -> tuple[IssuerContext | None, str | None, str | None]:
+    """The issuer block and the two place names the printout states.
+
+    Frozen at confirmation like the partner (``print_snapshot``); a document
+    confirmed before that has none and prints them live. The logo is never
+    frozen, so it always comes from the ``issuer`` passed in.
+    """
+    frozen = document.print_snapshot
+    if not frozen:
+        return (
+            issuer,
+            document.source_location.name if document.source_location else None,
+            document.target_location.name if document.target_location else None,
+        )
+    if frozen.get('issuer'):
+        frozen_issuer = IssuerContext.from_snapshot(frozen['issuer'], lang)
+        frozen_issuer.logo = issuer.logo if issuer else None
+        issuer = frozen_issuer
+    return issuer, frozen.get('source_location'), frozen.get('target_location')
+
+
 def build_pdf_context(
     document: Document,
     profile: DocumentProfile | None,
@@ -252,11 +275,8 @@ def build_pdf_context(
         partner_ctx = _PartnerContext(document.partner, lang)
     else:
         partner_ctx = None
-    source_location = (
-        document.source_location.name if document.source_location else None
-    )
-    target_location = (
-        document.target_location.name if document.target_location else None
+    issuer, source_location, target_location = _issuer_and_places(
+        document, issuer, lang
     )
 
     # 4. Resolve labels and document title.

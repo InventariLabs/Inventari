@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
@@ -74,28 +74,47 @@ function purposeOf(docType: DocumentType): Purpose {
   return "customer";
 }
 
+const PartnerCreateLayer = lazy(
+  () => import("@/modules/warehouse/components/PartnerCreateLayer"),
+);
+
 /** Who gets the goods — asked only when they go to a customer. */
 function CustomerField({ draft }: { draft: ActionDraft }) {
   const { t } = useTranslation("warehouse");
   const { workspace, picker, errors } = draft;
+  const [newPartnerName, setNewPartnerName] = useState<string | null>(null);
   return (
-    <SearchableCombobox
-      id="issue-customer"
-      label={t("issue.customer")}
-      required={workspace.requiresPartner}
-      // The field is the customer's on this screen; the shared check's
-      // "Partner is required for this document type" named neither.
-      error={errors.partner_id ? t("receive.errors.noCustomer") : undefined}
-      options={picker.fieldProps.partners}
-      onSearchChange={picker.fieldProps.onPartnerSearch}
-      loading={picker.fieldProps.partnersLoading}
-      value={workspace.partnerId}
-      onChange={workspace.setPartnerId}
-      placeholder={t("receive.customerPlaceholder")}
-      searchPlaceholder={t("form.searchPartner")}
-      emptyMessage={t("form.noCustomersFound")}
-      title={t("issue.customer")}
-    />
+    <>
+      <SearchableCombobox
+        id="issue-customer"
+        label={t("issue.customer")}
+        required={workspace.requiresPartner}
+        // The field is the customer's on this screen; the shared check's
+        // "Partner is required for this document type" named neither.
+        error={errors.partner_id ? t("receive.errors.noCustomer") : undefined}
+        options={picker.fieldProps.partners}
+        onSearchChange={picker.fieldProps.onPartnerSearch}
+        loading={picker.fieldProps.partnersLoading}
+        value={workspace.partnerId}
+        onChange={workspace.setPartnerId}
+        placeholder={t("receive.customerPlaceholder")}
+        searchPlaceholder={t("form.searchPartner")}
+        emptyMessage={t("form.noCustomersFound")}
+        createLabel={t("form.createNewPartner")}
+        onCreateNew={setNewPartnerName}
+        title={t("issue.customer")}
+      />
+      {newPartnerName !== null && (
+        <Suspense fallback={null}>
+          <PartnerCreateLayer
+            initialName={newPartnerName}
+            roleTypes={picker.partnerTypes}
+            onAccepted={workspace.setPartnerId}
+            onClose={() => setNewPartnerName(null)}
+          />
+        </Suspense>
+      )}
+    </>
   );
 }
 

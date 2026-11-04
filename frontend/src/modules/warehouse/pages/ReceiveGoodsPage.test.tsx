@@ -177,6 +177,8 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
     onChange,
     placeholder,
     error,
+    createLabel,
+    onCreateNew,
     "aria-label": ariaLabel,
   }: {
     id?: string;
@@ -187,8 +189,22 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
     options: Array<{ id: string; name: string }>;
     onChange: (id: string) => void;
     placeholder?: string;
+    createLabel?: string;
+    onCreateNew?: (query: string) => void;
   }) => (
     <label>
+      {onCreateNew && (
+        <span
+          role="button"
+          tabIndex={0}
+          onClick={(event) => {
+            event.preventDefault();
+            onCreateNew("Palarnia Nowa");
+          }}
+        >
+          {createLabel}
+        </span>
+      )}
       {label}
       <select
         id={id}
@@ -372,6 +388,19 @@ describe("ReceiveGoodsPage", () => {
     for (const asked of state.locationRequests) {
       expect(asked.get("exclude_module_contexts")).toBe("true");
     }
+  });
+
+  it("adds a supplier that does not exist yet without leaving the form", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(
+      await screen.findByRole("button", { name: "+ Create new partner" }),
+    );
+
+    expect(
+      await screen.findByDisplayValue("Palarnia Nowa"),
+    ).toBeInTheDocument();
   });
 
   it("never reads the organization's locations whole", async () => {

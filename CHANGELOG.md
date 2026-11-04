@@ -12,6 +12,17 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Changed
+
+- A confirmed document now keeps your own company's name, tax number and
+  address and the names of the locations it refers to, as it already kept the
+  partner, so a reprint after the company moved or a shelf was renamed shows
+  what the original showed. The record a closed stock take leaves in the
+  register keeps them too. The layout, the document type's settings and the
+  logo are still read when the document is printed, and a document confirmed
+  before this change prints the current details. A module that prints its own
+  documents through the core print identity can freeze the same block with
+  `issuer_snapshot` and `IssuerContext.from_snapshot`.
 ### Added
 
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
@@ -49,6 +60,30 @@ says what the release does rather than what changed since them.
   Computer, Network Device and Peripheral presets have icons of their own. In
   Polish the Batches status tabs read as plurals. The AI connections page no
   longer shows its title twice.
+- A recipe's page and printout show a dash for a nutrient no ingredient
+  measured where the sum would have been 0, as the meal plan does. A rice dish
+  where only the chicken had values used to read "Carbs 0.0g".
+- "Max batches from stock" on a bill of materials shows ten as 10, not 1E+1.
+- The day's activity and History state the stock change of a correction: taking
+  one piece off an issue reads "by +1", where it used to read "by −1".
+- A generated community module asks for its own read and write permissions on
+  every route, and its manifest declares them with the usual default roles.
+- A product used up to zero reads "Consumed" in the list and on its page rather
+  than "Consumed (Virtual)", and no longer offers "Add 1 unit", which was
+  refused after the click. Move brings it back to a shelf.
+- Add product shows pieces on its unit button when no unit was chosen, which is
+  what the save has always filed such a product as; it used to read "Choose".
+- Receive goods and Issue goods can add a supplier or customer that does not
+  exist yet without leaving the form.
+- A posted receipt says which of its lines have no price: they are left out of
+  the totals, and that stock has no recorded cost.
+- A dispute note in an attestation names the asset by its serial number when it
+  has one, and the public page says what was confirmed beside what was reported.
+- The message for a missing approval workflow tells a storekeeper to ask the
+  administrator instead of describing the administrator's settings.
+- Amounts in a unit that is a word take its plural ("6 bottles").
+- An issue dated today can be planned from its page, so that picking can start
+  on it without dating it tomorrow first.
 - Importing ingredient data from a file the import cannot read, a photo or a
   JSON file that holds no list of rows for instance, now says what the import
   expects: a .json or .csv file with one row per ingredient, in every

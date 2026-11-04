@@ -1,3 +1,5 @@
+import { useLocationsById } from "@/module-sdk";
+import { isVirtualUsage } from "@/modules/shared/lib/storageUsage";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
@@ -40,7 +42,9 @@ export default function QuickActionSheet({
   // button was written beside it without one: a reader's shortcut offered
   // "Edit" and opened the full form, which the API then refused at Save.
   const canWrite = useCanWrite("items");
+  const { byId: places } = useLocationsById([item.location_id]);
   const { actions, deleteDialog } = useItemQuickActions(item, {
+    inVirtualPlace: isVirtualUsage(places.get(item.location_id)?.usage),
     onDone: onClose,
     onMove: () => {
       if (onMove) onMove();

@@ -676,6 +676,8 @@
       "statusConfirmedDesc": "Votre confirmation pour cet actif est prise en compte, vous pouvez maintenant fermer cet onglet.",
       "statusDisputed": "Problème signalé",
       "statusDisputedDesc": "Votre signalement est pris en compte, vous pouvez maintenant fermer cet onglet.",
+      "statusDisputedConfirmedDesc_one": "Votre signalement est enregistré, ainsi que votre confirmation pour {{count}} autre équipement. Vous pouvez fermer cet onglet.",
+      "statusDisputedConfirmedDesc_other": "Votre signalement est enregistré, ainsi que votre confirmation pour {{count}} autres équipements. Vous pouvez fermer cet onglet.",
       "statusCampaignClosed": "Attestation clôturée",
       "statusCampaignClosedDesc": "Cette demande est clôturée — votre confirmation ne peut plus être enregistrée. Si vous détenez encore cet actif, contactez votre organisation.",
       "statusAssignmentReturned": "Déjà retourné",

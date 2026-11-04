@@ -669,6 +669,8 @@
       "statusConfirmedDesc": "Sua confirmação deste equipamento foi salva e você já pode fechar esta aba.",
       "statusDisputed": "Problema informado",
       "statusDisputedDesc": "Seu relato foi salvo e você já pode fechar esta aba.",
+      "statusDisputedConfirmedDesc_one": "Seu relato foi salvo, assim como sua confirmação de mais {{count}} ativo. Você já pode fechar esta aba.",
+      "statusDisputedConfirmedDesc_other": "Seu relato foi salvo, assim como sua confirmação de mais {{count}} ativos. Você já pode fechar esta aba.",
       "statusCampaignClosed": "Atestação encerrada",
       "statusCampaignClosedDesc": "Esta solicitação foi encerrada — sua confirmação não pode mais ser salva. Se você ainda estiver com este equipamento, entre em contato com a sua organização.",
       "statusAssignmentReturned": "Já devolvido",

@@ -284,6 +284,10 @@ export default function AttestationPublicPage() {
           <StatusDisplay
             status={displayResponse.status}
             closedReason={closedReason}
+            confirmedCount={
+              displayResponse.items.filter((i) => i.status === "CONFIRMED")
+                .length
+            }
           />
         )}
 

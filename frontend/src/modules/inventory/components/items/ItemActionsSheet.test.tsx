@@ -173,3 +173,24 @@ describe("ItemActionsSheet", () => {
     expect(props.onAddOne).toHaveBeenCalledWith("item-1");
   });
 });
+
+describe("ItemActionsSheet — a used-up record", () => {
+  it("offers no unit the server would refuse, and keeps Move", () => {
+    render(
+      <ItemActionsSheet
+        {...baseProps()}
+        item={{ ...item, quantity: "0", location_id: "consumed" } as Item}
+        storages={
+          [
+            { id: "consumed", name: "Consumed (Virtual)", usage: "customer" },
+          ] as never
+        }
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Add 1 unit" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Move/ })).toBeInTheDocument();
+  });
+});

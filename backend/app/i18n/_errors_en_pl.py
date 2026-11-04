@@ -527,9 +527,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'approvals_read_forbidden': 'You do not have permission to view approval requests',
         'approvals_write_forbidden': 'You do not have permission to raise approval requests',
         'documents_approve_requires_grant': 'You do not have permission to approve or reject documents',
-        'po_approval_workflow_missing': (
-            'Purchase orders require approval, but no approval workflow is configured for them — create one under Approvals → Workflows, or turn the requirement off'
-        ),
+        'po_approval_workflow_missing': 'This purchase order needs an approval, but nobody has been set up to give it yet. Ask your administrator to set it up.',
         'po_supplier_required': 'A purchase order cannot be confirmed without a supplier',
         'document_type_requires_partner': 'This document type requires a partner.',
         'partner_has_no_email': 'The partner has no email address.',
@@ -860,9 +858,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'permanent_delete_disabled': (
             'Permanent deletion is disabled for this organization.'
         ),
-        'documents_approval_workflow_missing': (
-            'Documents require approval, but no approval workflow is configured for them — create one under Approvals → Workflows, or turn the requirement off'
-        ),
+        'documents_approval_workflow_missing': 'This document needs an approval, but nobody has been set up to give it yet. Ask your administrator to set it up.',
         'category_delete_blocked_by_items': (
             'Cannot delete category: it is in use ({count}). Move its products to another category first.'
         ),
@@ -1556,9 +1552,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'approvals_read_forbidden': 'Nie masz uprawnień do przeglądania wniosków o akceptację',
         'approvals_write_forbidden': 'Nie masz uprawnień do składania wniosków o akceptację',
         'documents_approve_requires_grant': 'Nie masz uprawnień do zatwierdzania ani odrzucania dokumentów',
-        'po_approval_workflow_missing': (
-            'Zamówienia zakupu wymagają akceptacji, ale nie ma dla nich żadnego przepływu akceptacji — utwórz go w Akceptacje → Przepływy albo wyłącz ten wymóg'
-        ),
+        'po_approval_workflow_missing': 'To zamówienie wymaga akceptacji, ale nikt nie został jeszcze wyznaczony do jej udzielania. Poproś administratora o ustawienie tego.',
         'po_supplier_required': 'Zamówienia zakupu nie można potwierdzić bez dostawcy',
         'document_type_requires_partner': 'Ten typ dokumentu wymaga kontrahenta.',
         'partner_has_no_email': 'Kontrahent nie ma adresu e-mail.',
@@ -1879,9 +1873,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'permanent_delete_disabled': (
             'Trwałe usuwanie jest wyłączone dla tej organizacji.'
         ),
-        'documents_approval_workflow_missing': (
-            'Dokumenty wymagają akceptacji, ale nie ma dla nich żadnego przepływu akceptacji — utwórz go w Akceptacje → Przepływy albo wyłącz ten wymóg'
-        ),
+        'documents_approval_workflow_missing': 'Ten dokument wymaga akceptacji, ale nikt nie został jeszcze wyznaczony do jej udzielania. Poproś administratora o ustawienie tego.',
         'category_delete_blocked_by_items': (
             'Nie można usunąć kategorii — jest w użyciu ({count}). Przenieś jej produkty do innej kategorii.'
         ),

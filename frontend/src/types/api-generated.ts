@@ -14187,6 +14187,8 @@ export interface components {
             target_location_name?: string | null;
             /** Backorder Id */
             backorder_id?: string | null;
+            /** Corrects Document Type */
+            corrects_document_type?: string | null;
             /** Scheduled Date */
             scheduled_date: string | null;
             /** Notes */

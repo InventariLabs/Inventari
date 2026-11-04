@@ -38,6 +38,16 @@ _FRONTEND_CATALOGS = {
     'pt': 'Módulo {title}.',
 }
 
+# What the role editor calls the two permissions the manifest declares.
+_PERMISSION_LABELS = {
+    'en': {'read': 'View', 'write': 'Change'},
+    'pl': {'read': 'Podgląd', 'write': 'Zmiany'},
+    'de': {'read': 'Ansehen', 'write': 'Ändern'},
+    'fr': {'read': 'Consulter', 'write': 'Modifier'},
+    'es': {'read': 'Ver', 'write': 'Modificar'},
+    'pt': {'read': 'Ver', 'write': 'Alterar'},
+}
+
 # Keys sit at the top level of the file: that is where get_module_error_message
 # reads them, and a message nested under "errors" falls through to Core.
 _BACKEND_CATALOGS = {
@@ -69,9 +79,18 @@ from app.core.module_sdk import (
     AppException,
     get_module_error_message,
     require_module,
+    require_read_write,
 )
 
-router = APIRouter(dependencies=[Depends(require_module("{name}"))])
+# Activation says the module is on; the pair says who may use it, and on the
+# router it covers the endpoints you add later too. Both keys are declared in
+# manifest.json.
+router = APIRouter(
+    dependencies=[
+        Depends(require_module("{name}")),
+        require_read_write("{name}:read", "{name}:write"),
+    ]
+)
 
 
 @router.get("/hello")
@@ -428,6 +447,18 @@ def scaffold_community_module(  # noqa: PLR0915 - existing complexity/size
                 'display_name': human,
                 'module_type': 'community',
                 'capabilities': ['database'],
+                # The roles that had the access keep it, as in example_widgets:
+                # a viewer reads, a member with no role row of its own writes.
+                'permissions': [
+                    {
+                        'key': f'{module_name}:read',
+                        'default_roles': ['manager', 'user', 'viewer'],
+                    },
+                    {
+                        'key': f'{module_name}:write',
+                        'default_roles': ['manager', 'user'],
+                    },
+                ],
             },
             indent=2,
         )
@@ -488,6 +519,7 @@ def scaffold_community_module(  # noqa: PLR0915 - existing complexity/size
                     'description': description.format(title=human),
                     'navigation': {'title': human},
                     'launcher': {'description': description.format(title=human)},
+                    'permissions': _PERMISSION_LABELS[lang].copy(),
                 },
                 indent=2,
                 ensure_ascii=False,

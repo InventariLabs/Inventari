@@ -75,3 +75,42 @@ describe("NutritionCard — where the values come from", () => {
     expect(screen.getByText(/Some use generic values/)).toBeVisible();
   });
 });
+
+describe("NutritionCard — a nutrient nobody measured", () => {
+  const partial: RecipeNutrition = {
+    ...nutrition(0.2),
+    per_serving: {
+      calories_kcal: 248,
+      carbs_g: null,
+      fat_g: 5.4,
+      protein_g: 46.5,
+      fiber_g: 1,
+      sugar_g: null,
+      salt_g: null,
+    },
+  };
+
+  it("prints a dash for it, never 0 g", () => {
+    render(<NutritionCard data={partial} servings={1} />);
+    const carbs = screen.getByText("Carbs").parentElement;
+    expect(carbs).toHaveTextContent("–");
+    expect(carbs).not.toHaveTextContent("0.0g");
+    expect(screen.getByText("Sugar").parentElement).toHaveTextContent("–");
+    expect(screen.getByText("Protein").parentElement).toHaveTextContent(
+      "46.5g",
+    );
+  });
+
+  it("keeps a zero the ingredients really measured", () => {
+    render(
+      <NutritionCard
+        data={{
+          ...nutrition(1),
+          per_serving: { ...nutrition(1).per_serving, carbs_g: 0 },
+        }}
+        servings={1}
+      />,
+    );
+    expect(screen.getByText("Carbs").parentElement).toHaveTextContent("0.0g");
+  });
+});

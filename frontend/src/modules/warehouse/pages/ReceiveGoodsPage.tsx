@@ -30,8 +30,6 @@ import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useReturnTarget } from "@/hooks/useReturnTarget";
 import { useModules } from "@/contexts/ModulesContext";
 import { usePartnerPicker } from "@/hooks/usePartnerPicker";
-import { CUSTOMER_ROLE_TYPES, SUPPLIER_ROLE_TYPES } from "@/hooks/partnerRoles";
-import type { PartnerType } from "@/types";
 import {
   useOpenPurchaseOrders,
   useOrderSupplier,
@@ -67,6 +65,7 @@ import {
   draftProblem,
   draftTotals,
   isHeld,
+  partnerTypesFor,
   RECEIVE_SOURCE_TYPE,
   shortDelivery,
   toDocumentCreate,
@@ -139,12 +138,6 @@ function emptyHint(t: TFunction, source: ReceiveSource): string {
   return source === "supplier"
     ? t("receive.emptyHint")
     : t("receive.emptyHintAny");
-}
-
-/** Who the partner field offers: a customer's goods come back from a
- *  customer. An internal receipt names nobody, and its field is hidden. */
-function partnerTypesFor(source: ReceiveSource): readonly PartnerType[] {
-  return source === "return" ? CUSTOMER_ROLE_TYPES : SUPPLIER_ROLE_TYPES;
 }
 
 /** What stops the sheet, in the words of the source that was chosen. */

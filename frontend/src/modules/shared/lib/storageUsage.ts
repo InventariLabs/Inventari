@@ -21,6 +21,18 @@ export function isVirtualUsage(usage: string | null | undefined): boolean {
 }
 
 /**
+ * Whether a record stands in a virtual location. Using up the last unit files
+ * it there: the place's name says nothing to a reader, and a unit added there
+ * is refused, because stock is not counted. The way back is Move.
+ */
+export function isInVirtualPlace(
+  locationId: string | null | undefined,
+  places: ReadonlyArray<{ id: string; usage?: string | null }> | undefined,
+): boolean {
+  return isVirtualUsage(places?.find((p) => p.id === locationId)?.usage);
+}
+
+/**
  * Label for the badge on a virtual location.
  *
  * Falls back to the raw value: rows written before the Odoo-style roles were

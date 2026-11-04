@@ -1,6 +1,9 @@
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { TranslateFn } from "@/types/i18n";
-import type { WarehouseDocumentRow } from "@/modules/warehouse/types";
+import {
+  correctionStockSign,
+  type WarehouseDocumentRow,
+} from "@/modules/warehouse/types";
 
 /**
  * Which document types each History chip stands for, as the comma-joined
@@ -62,10 +65,11 @@ function describeWhat(
   if (NAME_ONLY_TYPES.has(doc.type)) return only.name;
   const quantity = completed ? only.done_quantity : only.quantity;
   if (doc.type === "CORRECTION") {
-    // A correction's line is the difference it writes, signed as the
-    // document itself shows it: "Corrected X" alone left the −8 to the
-    // document, beside a receipt row that names its 20.
-    const delta = Number(quantity);
+    // A correction's line is a delta on the document it corrects, and the
+    // sentence states what happened to stock, as the document's own summary
+    // does: −1 on an issue put one back, so it reads "by +1".
+    const delta =
+      correctionStockSign(doc.corrects_document_type) * Number(quantity);
     const size = formatQuantityLocalized(
       t,
       Math.abs(delta),
