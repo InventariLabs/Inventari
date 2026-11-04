@@ -1640,6 +1640,19 @@ describe("ItemsPage — the ?import=1 deep link", () => {
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
+  it("hands the sheet the date a row of the overview linked to", async () => {
+    const scrollIntoView = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+    renderAt("?open=item-1&at=expiry");
+
+    await screen.findByRole("dialog");
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+    expect(scrollIntoView.mock.contexts[0]).toHaveAttribute(
+      "data-field-key",
+      "expiry_date",
+    );
+    scrollIntoView.mockRestore();
+  });
+
   it("closes a product dialog that a typed address opened in place", async () => {
     mockNavigate.mockClear();
     const user = userEvent.setup();

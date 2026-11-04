@@ -112,10 +112,21 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     await expect(menus.first()).toBeVisible();
 
     // …and the list is where it was left, not clamped to the short page the
-    // browser found while the list was still being fetched.
+    // browser found while the list was still being fetched. Measured against
+    // the page as it now stands: the left position was the very bottom, and
+    // in a full run that bottom can settle higher than it was when measured
+    // (36 px on the CI runner), which no restoring could reach.
     await expect
-      .poll(() => page.evaluate(() => window.scrollY), { timeout: 10000 })
-      .toBeGreaterThanOrEqual(leftAt - 2);
+      .poll(
+        () =>
+          page.evaluate((left) => {
+            const reachable =
+              document.documentElement.scrollHeight - window.innerHeight;
+            return window.scrollY - Math.min(left, reachable);
+          }, leftAt),
+        { timeout: 10000 },
+      )
+      .toBeGreaterThanOrEqual(-2);
   });
 
   test("a search typed into the list is still there after Back", async ({

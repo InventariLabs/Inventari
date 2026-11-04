@@ -10,6 +10,9 @@ import { hasHistoryToPop } from "@/module-sdk";
  * this list. Not when the address was typed or bookmarked (no earlier entry in the
  * history): there is nothing to go back to, so it closes
  * in place.
+ *
+ * `&at=expiry` opens the dialog at the expiry date. It belongs to the link that
+ * carried it: the next product opened from the list starts at the top.
  */
 export function useOpenProductParam(): [
   string | null,
@@ -35,6 +38,7 @@ export function useOpenProductParam(): [
       }
       setOpenId(id);
       const next = new URLSearchParams(searchParams);
+      next.delete("at");
       if (id) next.set("open", id);
       else next.delete("open");
       setSearchParams(next, { replace: true });

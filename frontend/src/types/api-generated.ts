@@ -24333,6 +24333,8 @@ export interface components {
             quantity: string;
             /** Uom Symbol */
             uom_symbol?: string | null;
+            /** Uom Id */
+            uom_id?: string | null;
             /** Source */
             source: string;
             /**

@@ -448,3 +448,64 @@ describe("LineItemSearchDropdown — a name nothing on the list matches", () => 
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 });
+
+describe("LineItemSearchDropdown — a phone keyboard takes the bottom of the screen", () => {
+  const original = Object.getOwnPropertyDescriptor(window, "visualViewport");
+
+  afterEach(() => {
+    if (original) Object.defineProperty(window, "visualViewport", original);
+    else Reflect.deleteProperty(window, "visualViewport");
+    document.getElementById("line-input")?.remove();
+  });
+
+  function renderAnchored(visibleHeight: number | null) {
+    // The input sits at y 250–300 of an 800 px window: plenty of room below
+    // by the window's own height, little once a keyboard covers the lower half.
+    const input = document.createElement("input");
+    input.id = "line-input";
+    input.getBoundingClientRect = () =>
+      ({ top: 250, bottom: 300, left: 10, right: 210, width: 200 }) as DOMRect;
+    document.body.appendChild(input);
+    Object.defineProperty(window, "innerHeight", {
+      value: 800,
+      configurable: true,
+    });
+    Object.defineProperty(window, "visualViewport", {
+      value:
+        visibleHeight === null
+          ? undefined
+          : {
+              height: visibleHeight,
+              addEventListener: vi.fn(),
+              removeEventListener: vi.fn(),
+            },
+      configurable: true,
+    });
+    render(
+      <LineItemSearchDropdown
+        results={[
+          stockHit({ item_id: "a", name: "Flour A" }),
+          stockHit({ item_id: "b", name: "Flour B" }),
+          stockHit({ item_id: "c", name: "Flour C" }),
+        ]}
+        isLoading={false}
+        selectedIndex={-1}
+        lineName="flo"
+        noResultsLabel="Nothing found"
+        anchorId="line-input"
+        onSelect={vi.fn()}
+      />,
+    );
+    return document.querySelector("[data-line-item-dropdown]") as HTMLElement;
+  }
+
+  it("opens below the input while the whole window is visible", () => {
+    const list = renderAnchored(null);
+    expect(Number.parseFloat(list.style.top)).toBeGreaterThanOrEqual(300);
+  });
+
+  it("opens above the input when the keyboard leaves no room below it", () => {
+    const list = renderAnchored(400);
+    expect(Number.parseFloat(list.style.top)).toBeLessThan(250);
+  });
+});

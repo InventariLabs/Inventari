@@ -325,7 +325,7 @@
   },
   "stockManagement": "Bestandsverwaltung",
   "minStockLevel": "Warnung bei Unterschreitung von:",
-  "minStockHelp": "Legen Sie einen Schwellenwert fest, um dieses Produkt in der Liste „Niedriger Bestand“ zu sehen.",
+  "minStockHelp": "Legen Sie einen Schwellenwert fest, um dieses Produkt in der Liste „Wird knapp“ zu sehen.",
   "minQuantityPlaceholder": "z. B. 2",
   "configureStorage": "Konfigurieren",
   "configureStorageTitle": "Lagerort konfigurieren",

@@ -90,6 +90,15 @@ describe("DashboardStorages", () => {
     expect(segments("Laundry shelf")).toEqual(["ok"]);
   });
 
+  it("opens the place a row names", () => {
+    renderCard(composition);
+    expect(
+      within(rowOf("Basement freezer")).getByRole("link", {
+        name: "Basement freezer",
+      }),
+    ).toHaveAttribute("href", "/inventory/locations/freezer");
+  });
+
   it("draws no bar for an empty zone, but still shows its zero", () => {
     renderCard(composition);
     const row = rowOf("Kitchen");

@@ -28,6 +28,14 @@ function isMalformedCount(counted: string): boolean {
   return counted.trim() !== "" && countedAmount(counted) === null;
 }
 
+/**
+ * Nothing is not zero: a box holding no number has nothing to record, so the
+ * Save waits for one (the note under the box says why when it is malformed).
+ */
+function saveIsDisabled(busyOrSaved: boolean, counted: string): boolean {
+  return busyOrSaved || countedAmount(counted) === null;
+}
+
 function malformedCountProps(counted: string, id: string) {
   return isMalformedCount(counted)
     ? { "aria-invalid": true, "aria-describedby": id }
@@ -220,7 +228,7 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
                   : "bg-primary-700 dark:bg-primary-800 hover:bg-primary-800 dark:hover:bg-primary-900 text-white",
               )}
               onClick={() => onSave(itemId)}
-              disabled={isSaved || isUpdatePending}
+              disabled={saveIsDisabled(isSaved || isUpdatePending, counted)}
               aria-label={t("item.saveCount", { name: productName })}
             >
               <Save size={18} />

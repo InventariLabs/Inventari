@@ -17,6 +17,7 @@ let ctx: APIRequestContext;
 let token: string;
 let stamp: string;
 let orderId: string;
+let orderNumber: string;
 
 test.beforeAll(async ({ playwright, baseURL }) => {
   ctx = await playwright.request.newContext({ baseURL });
@@ -66,6 +67,7 @@ test.beforeAll(async ({ playwright, baseURL }) => {
     output_location_id: sOut.id,
   });
   orderId = order.id;
+  orderNumber = order.number;
   await api.completeProductionOrder(token, order.id);
 });
 
@@ -98,9 +100,10 @@ test.describe("Maker — financial result (Phase C)", () => {
     // to serve the page's modules before the list query was even sent — past
     // the 5 s default, so the test failed while the server had answered nothing.
     await page.goto("/maker/production");
+    // By the run's own number: a spec in another worker may plan a draft of
+    // this product through the form, and the newest card comes first.
     const card = page
-      .getByText(`${stamp}-Jam`)
-      .first()
+      .getByText(orderNumber, { exact: true })
       .locator("xpath=ancestor::div[contains(@class, 'rounded-xl')][1]");
     // The result carries the organization's own name for it — savings on a
     // fresh stack, margin where someone switched it.
@@ -110,7 +113,8 @@ test.describe("Maker — financial result (Phase C)", () => {
     // Currency symbol depends on the org's setting (PLN on a fresh stack,
     // USD on a hand-configured one) — assert the numbers, not the symbol.
     await expect(card).toContainText(/25\.00/);
-    await expect(card).toContainText(/12\.50 per unit/);
+    // The result per piece, in the output's own unit.
+    await expect(card).toContainText(/12\.50 per pcs/);
   });
 
   test("production's start aggregates the monthly result", async ({

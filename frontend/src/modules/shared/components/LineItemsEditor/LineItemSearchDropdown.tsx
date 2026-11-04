@@ -113,7 +113,10 @@ export function LineItemSearchDropdown({
       const gap = 4;
       const itemCount = Math.max(results.length, 1);
       const estimatedHeight = Math.min(240, Math.max(48, itemCount * 44));
-      const spaceBelow = window.innerHeight - rect.bottom - gap;
+      // What the person can see, not what the window measures: an on-screen
+      // keyboard shrinks the visual viewport and leaves the window as it was.
+      const visibleBottom = window.visualViewport?.height ?? window.innerHeight;
+      const spaceBelow = visibleBottom - rect.bottom - gap;
       const up = spaceBelow < estimatedHeight && rect.top > spaceBelow;
       setPos({
         left: rect.left,
@@ -126,7 +129,11 @@ export function LineItemSearchDropdown({
     };
     update();
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.visualViewport?.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("resize", update);
+    };
   }, [showDropdown, results.length, anchor]);
 
   // Scrolls outside the dropdown (i.e. the modal form) should not leave a

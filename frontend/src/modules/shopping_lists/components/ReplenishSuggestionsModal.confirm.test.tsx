@@ -41,7 +41,8 @@ const suggestions = [
     priority: 0,
     estimated_price: null,
     notes: "below minimum",
-    uom_symbol: null,
+    uom_symbol: "kg",
+    uom_id: "uom-kg",
   },
   {
     source: "low_stock",
@@ -112,6 +113,9 @@ describe("ReplenishSuggestionsModal — the confirm sends what the reader chose"
           priority: 2,
           estimated_price: undefined,
           notes: "below minimum",
+          // The unit rides with the row: without it the list printed "—"
+          // where this sheet had said "kg".
+          uom_id: "uom-kg",
         },
       ],
     });

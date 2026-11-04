@@ -2812,6 +2812,7 @@ export class ApiHelper {
     },
   ): Promise<{
     id: string;
+    number: string;
     status: string;
     total_cost: string | null;
     output_template_id: string;
