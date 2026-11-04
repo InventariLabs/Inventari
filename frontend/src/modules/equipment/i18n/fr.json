@@ -161,6 +161,7 @@
   "maintenance": {
     "add_log": "Ajouter une entrée",
     "no_history": "Aucun enregistrement de maintenance",
+    "no_history_in_service": "Rien n’est encore noté pour cette maintenance",
     "in_service_title": "Cet équipement est en maintenance",
     "in_service_hint": "Terminer la maintenance le rendra de nouveau disponible.",
     "end_service": "Terminer la maintenance",

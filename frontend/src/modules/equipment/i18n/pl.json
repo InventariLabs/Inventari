@@ -172,6 +172,7 @@
   "maintenance": {
     "add_log": "Dodaj wpis",
     "no_history": "Brak wpisów serwisowych",
+    "no_history_in_service": "Nic jeszcze nie zapisano dla tego serwisu",
     "in_service_title": "Ten sprzęt jest w serwisie",
     "in_service_hint": "Zakończenie serwisu przywróci mu status „Dostępny”.",
     "end_service": "Zakończ serwis",
@@ -335,7 +336,7 @@
     "columns": {
       "title": "Kolumny",
       "name": "Nazwa",
-      "serial": "Nr seryjny / tag",
+      "serial": "Nr seryjny / inwentarzowy",
       "location": "Miejsce",
       "assignedTo": "Posiadacz",
       "warranty": "Gwarancja",

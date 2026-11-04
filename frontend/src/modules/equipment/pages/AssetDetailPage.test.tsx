@@ -182,6 +182,13 @@ describe("AssetDetailPage — archive, restore and purge", () => {
     // and the page the reader is on is the one that shows it retired.
     expect(screen.queryByText("the asset list")).not.toBeInTheDocument();
     expect(toast.success).toHaveBeenCalledWith("Asset retired");
+    // The dialog closes with the success: left open, its live Retire button
+    // sent a second request the API refuses.
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("alertdialog", { name: /retire this asset/i }),
+      ).not.toBeInTheDocument(),
+    );
   });
 
   it("cancelling the archive sends nothing and stays on the asset", async () => {

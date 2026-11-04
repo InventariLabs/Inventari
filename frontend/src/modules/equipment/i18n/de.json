@@ -154,6 +154,7 @@
   "maintenance": {
     "add_log": "Eintrag hinzufügen",
     "no_history": "Keine Wartungseinträge",
+    "no_history_in_service": "Für diese Wartung ist noch nichts eingetragen",
     "in_service_title": "Dieses Gerät ist in Wartung",
     "in_service_hint": "Mit dem Beenden der Wartung gilt es wieder als verfügbar.",
     "end_service": "Wartung beenden",

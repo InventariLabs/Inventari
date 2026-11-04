@@ -161,6 +161,7 @@
   "maintenance": {
     "add_log": "Agregar entrada",
     "no_history": "Sin registros de mantenimiento",
+    "no_history_in_service": "Aún no hay nada registrado para este mantenimiento",
     "in_service_title": "Este equipo está en mantenimiento",
     "in_service_hint": "Al terminar el mantenimiento volverá a estar disponible.",
     "end_service": "Terminar mantenimiento",

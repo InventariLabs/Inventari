@@ -371,7 +371,7 @@ export default function AddEquipmentPage() {
           isDownloading={isDownloadingLabels}
           onDone={() => {
             clearBulkLabelResult();
-            navigate("/equipment/assets");
+            navigate("/equipment/assets", { replace: true });
           }}
         />
       </div>

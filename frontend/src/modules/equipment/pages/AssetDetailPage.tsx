@@ -164,6 +164,7 @@ export default function AssetDetailPage() {
     // Retiring is a status change, not a removal: the asset is still here, and
     // the page the reader is on now shows it retired.
     toast.success(t("detail.retired"));
+    setShowRetireConfirm(false);
   };
 
   const handleArchive = async () => {

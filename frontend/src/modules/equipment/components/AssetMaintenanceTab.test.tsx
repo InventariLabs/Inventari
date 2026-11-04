@@ -75,3 +75,36 @@ describe("MaintenanceTab — the way out of service", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("MaintenanceTab — an empty log on an asset in service", () => {
+  it("says nothing is logged for the service, not that there are no records", async () => {
+    render(
+      <MaintenanceTab
+        item={makeItem("MAINTENANCE")}
+        onAdd={() => {}}
+        onEndService={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByText("Nothing logged for this service yet"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("No maintenance records"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the plain wording on an asset that is not in service", async () => {
+    render(
+      <MaintenanceTab
+        item={makeItem("AVAILABLE")}
+        onAdd={() => {}}
+        onEndService={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByText("No maintenance records"),
+    ).toBeInTheDocument();
+  });
+});

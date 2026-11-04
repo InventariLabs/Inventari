@@ -165,7 +165,14 @@ export function MaintenanceTab({
       ) : isLoading ? (
         <LoadingSpinner />
       ) : logs.length === 0 ? (
-        <EmptyState variant="compact" title={t("maintenance.no_history")} />
+        <EmptyState
+          variant="compact"
+          title={t(
+            inService && !archived
+              ? "maintenance.no_history_in_service"
+              : "maintenance.no_history",
+          )}
+        />
       ) : (
         <div className="space-y-2">
           {logs.map((log: MaintenanceLog) => (

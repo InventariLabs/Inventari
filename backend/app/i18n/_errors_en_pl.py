@@ -1515,7 +1515,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'attestation_scope_exceeds_limit': 'Zakres obejmuje ponad {limit} zasobów. Zawęź go albo podziel atestację na mniejsze.',
         'assignment_not_found': 'Przypisanie nie zostało znalezione',
         'maintenance_log_not_found': 'Dziennik konserwacji nie został znaleziony',
-        'equipment_cannot_checkout_retired': 'Nie można wypożyczyć wycofanego zasobu',
+        'equipment_cannot_checkout_retired': 'Nie można wydać wycofanego zasobu',
         'equipment_cannot_checkout_in_maintenance': 'Nie można wydać zasobu, który jest w serwisie; najpierw ustaw status Dostępny',
         'equipment_assignment_needs_person_or_location': 'Podaj osobę, która odbiera sprzęt, albo miejsce, w którym staje, ale nie oba',
         'equipment_bulk_scope_too_large': 'Filtrom odpowiada {matched} zasobów; jedna akcja obejmuje najwyżej {limit}. Zawęź filtry.',

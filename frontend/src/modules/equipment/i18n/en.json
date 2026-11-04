@@ -154,6 +154,7 @@
   "maintenance": {
     "add_log": "Add Entry",
     "no_history": "No maintenance records",
+    "no_history_in_service": "Nothing logged for this service yet",
     "in_service_title": "This asset is in service",
     "in_service_hint": "Ending the service marks it Available again.",
     "end_service": "End service",

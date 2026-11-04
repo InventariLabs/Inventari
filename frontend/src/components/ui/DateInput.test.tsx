@@ -1,6 +1,8 @@
-import { render, screen, fireEvent, within } from "@/test/utils";
+import i18next from "i18next";
+import { act, render, screen, fireEvent, within } from "@/test/utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { DateInput } from "./DateInput";
+import { formatDate } from "@/utils/formatters";
 
 /**
  * One date field for the whole app. The native `input[type=date]` it
@@ -43,6 +45,21 @@ describe("DateInput", () => {
 
     // en-US test locale → September, not 08.09
     expect(screen.getByRole("combobox")).toHaveTextContent(/9\/8\/2026|Sep/);
+  });
+
+  it("prints the day exactly as the rest of the app prints it", async () => {
+    // In Polish the two shapes part ways: "08.09.2026" against "8 wrz 2026".
+    await act(() => i18next.changeLanguage("pl"));
+    try {
+      render(<DateInput value="2026-09-08" onChange={vi.fn()} />);
+
+      expect(screen.getByRole("combobox")).toHaveTextContent(
+        formatDate("2026-09-08"),
+      );
+      expect(screen.getByRole("combobox")).toHaveTextContent("08.09.2026");
+    } finally {
+      await act(() => i18next.changeLanguage("en"));
+    }
   });
 
   it("paints the selected day on a fill white text clears 4.5:1 on", () => {

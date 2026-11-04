@@ -19,7 +19,7 @@
     "empty": "Brak przepływów pracy",
     "emptyHint": "Utwórz swój pierwszy przepływ pracy",
     "name": "Nazwa przepływu pracy",
-    "namePlaceholder": "np. Zatwierdzenie wypożyczenia sprzętu",
+    "namePlaceholder": "np. Zatwierdzenie wydania sprzętu",
     "nameRequired": "Nazwa przepływu pracy jest wymagana",
     "saveChanges": "Zapisz zmiany",
     "created": "Przepływ pracy utworzony pomyślnie",

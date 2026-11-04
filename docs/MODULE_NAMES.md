@@ -320,10 +320,10 @@ Rules:
   action, not an exception: it links into the module's **own** filtered list, so it speaks
   the module's individual word — the counts next to it speak "records".
 - **Frozen feature names are not vocabulary**: the My-Assets screen is My Assets / Mój
-  sprzęt / Mein Gerät / Mon matériel / Mi equipo, and stays so — four of five languages
-  chose the domain word for the screen a holder sees, and a feature name is a name, not a
-  set reference. Strings that *reference* the screen must use its real name in that
-  language (pl „Mój sprzęt”, de „Mein Gerät“, fr « Mon matériel », es «Mi equipo») — not a
+  sprzęt / Meine Geräte / Mon matériel / Mi equipo, and stays so — four of five languages
+  chose the domain word for the screen a holder sees (German a plural, as its other screens
+  are), and a feature name is a name, not a set reference. Strings that *reference* the screen must use its real name in that
+  language (pl „Mój sprzęt”, de „Meine Geräte“, fr « Mon matériel », es «Mi equipo») — not a
   back-translation of the English one.
 - **Kind names are exempt**: `categories.codes.*` ("Urządzenie sieciowe", "Inny sprzęt",
   "Other Equipment") name kinds of things, not sets, and keep their natural words. The

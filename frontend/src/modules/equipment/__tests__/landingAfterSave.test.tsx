@@ -1,7 +1,7 @@
 import React from "react";
 import { act, renderHook } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MemoryRouter, useLocation } from "react-router-dom";
+import { MemoryRouter, useLocation, useNavigationType } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 
 import { useEquipmentForm } from "../hooks/useEquipmentForm";
@@ -41,8 +41,10 @@ vi.mock("@/modules/equipment/api/equipment", () => ({
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 let where = "";
+let how = "";
 function Probe() {
   where = useLocation().pathname;
+  how = useNavigationType();
   return null;
 }
 
@@ -77,6 +79,8 @@ describe("where adding an asset lands", () => {
     });
 
     expect(where).toBe("/equipment/new-1");
+    // Back from the new asset must not reopen the form that was just saved.
+    expect(how).toBe("REPLACE");
   });
 
   it("opens the asset list after a batch", async () => {
@@ -95,5 +99,6 @@ describe("where adding an asset lands", () => {
     });
 
     expect(where).toBe("/equipment/assets");
+    expect(how).toBe("REPLACE");
   });
 });
