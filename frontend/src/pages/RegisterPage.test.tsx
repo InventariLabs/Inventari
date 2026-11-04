@@ -547,4 +547,48 @@ describe("RegisterPage", () => {
       await screen.findByText("signing in as first@example.com"),
     ).toBeInTheDocument();
   });
+
+  it("hands the approved address to the sign-in form, whose field is hidden on this path", async () => {
+    server.use(
+      http.get("/api/v1/auth/registration-link/tok1", () =>
+        HttpResponse.json({ email: "jan@example.com", full_name: "Jan Link" }),
+      ),
+    );
+    useAuthStore.setState({
+      completeRegistration: vi
+        .fn()
+        .mockResolvedValue(
+          undefined,
+        ) as unknown as AuthState["completeRegistration"],
+    });
+    function SignIn() {
+      const state = useLocation().state as { email?: string } | null;
+      return <p>signing in as {state?.email}</p>;
+    }
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register?token=tok1"]}>
+          <Routes>
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<SignIn />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText(/Full name/i)).toHaveValue("Jan Link"),
+    );
+    fireEvent.change(screen.getByLabelText(/^Password/i), {
+      target: { value: "Str0ng!passphrase" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm password/i), {
+      target: { value: "Str0ng!passphrase" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /complete/i }));
+
+    expect(
+      await screen.findByText("signing in as jan@example.com"),
+    ).toBeInTheDocument();
+  });
 });

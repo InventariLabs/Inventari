@@ -78,6 +78,8 @@ function SettingsSidebarItem({ item }: { item: SidebarItem }) {
     <NavLink
       to={destination(item)}
       end={item.exact}
+      // NavLink matches the path only; a section entry and its page share one.
+      aria-current={isCurrent(item, true, location) ? "page" : "false"}
       className={({ isActive }) =>
         cn(
           "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full",

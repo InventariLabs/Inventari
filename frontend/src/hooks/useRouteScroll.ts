@@ -57,6 +57,7 @@ export function useRouteScroll() {
   const current = useRef(entry);
   const restoring = useRef(false);
   const shownPath = useRef<string | null>(null);
+  const shownHash = useRef("");
 
   useEffect(() => {
     try {
@@ -83,9 +84,12 @@ export function useRouteScroll() {
     const first = shownPath.current === null;
     const pathChanged = !first && shownPath.current !== location.pathname;
     shownPath.current = location.pathname;
+    // Leaving a section of the page (`#people`) for the page itself.
+    const leftSection = shownHash.current !== "" && location.hash === "";
+    shownHash.current = location.hash;
 
     if (navigationType !== "POP") {
-      if (pathChanged && !location.hash) window.scrollTo(0, 0);
+      if ((pathChanged || leftSection) && !location.hash) window.scrollTo(0, 0);
       return;
     }
     if (location.hash) return;

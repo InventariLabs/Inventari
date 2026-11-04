@@ -116,6 +116,9 @@ describe("SettingsShell access", () => {
     const [desktop] = screen.getAllByRole("link", { name: "General" });
     expect(desktop.className).not.toContain("font-semibold");
     expect(people[0].className).toContain("font-semibold");
+    // A screen reader hears one current page, not two.
+    expect(desktop).not.toHaveAttribute("aria-current", "page");
+    expect(people[0]).toHaveAttribute("aria-current", "page");
   });
 
   it("lets an administrator through", () => {

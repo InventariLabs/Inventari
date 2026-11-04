@@ -14,6 +14,17 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- A new API key no longer starts with the permission to read the organization's
+  details and member list ticked. A script that creates a key through
+  `POST /api-keys` without naming any permission now gets a key that cannot read
+  `/organizations/my/members` (it answers 403); name `org:read` explicitly to
+  keep the old behaviour. The key dialog starts with that permission unticked as
+  well.
+- Settings has a "People" entry in its sidebar and phone menu that leads
+  straight to the members and invitations, which used to sit at the foot of
+  General. After registering, the sign-in form is prefilled with the new
+  address, and the webhook dialog lists every event in the interface language
+  and groups the events of modules the organization has not enabled apart.
 - A confirmed document now keeps your own company's name, tax number and
   address and the names of the locations it refers to, as it already kept the
   partner, so a reprint after the company moved or a shelf was renamed shows

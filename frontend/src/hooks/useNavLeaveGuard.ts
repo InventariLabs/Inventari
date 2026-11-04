@@ -57,8 +57,9 @@ export function useNavLeaveGuard() {
       const link = (e.target as HTMLElement).closest("a");
       if (!link) return;
       const href = link.getAttribute("href");
-      // A link to the page the reader is already on is not an exit.
-      if (!href || href === location.pathname) return;
+      // A link to the page the reader is already on is not an exit, nor is
+      // one to a section of it (`/settings#people`).
+      if (!href || href.split("#")[0] === location.pathname) return;
       e.preventDefault();
       e.stopPropagation();
       guardNavigate(() => navigate(href));

@@ -186,8 +186,6 @@ export default function WebhookForm({
     error: eventsError,
     refetch: refetchEvents,
   } = useWebhookAvailableEvents();
-  // The module a disabled event needs is named the way the rest of the app
-  // names it — `modules.<name>.name`, never the raw identifier.
 
   // A subscription the catalogue no longer lists still sits in `event_types`
   // (those rows are not migrated), but it has no checkbox of its own — the

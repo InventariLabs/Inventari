@@ -10,6 +10,8 @@ function Shell() {
   return (
     <>
       <Link to="/list/1">detail</Link>
+      <Link to="/list#part">part</Link>
+      <Link to="/list">whole</Link>
       <button onClick={() => navigate(-1)}>back</button>
     </>
   );
@@ -57,6 +59,21 @@ describe("useRouteScroll", () => {
     scrollTo.mockClear();
 
     await user.click(screen.getByRole("link", { name: "detail" }));
+
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 0));
+  });
+
+  it("scrolls to the top when a link leaves a section of the same page", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/list#part"]}>
+        <Shell />
+      </MemoryRouter>,
+    );
+    setScroll(900);
+    scrollTo.mockClear();
+
+    await user.click(screen.getByRole("link", { name: "whole" }));
 
     await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 0));
   });
