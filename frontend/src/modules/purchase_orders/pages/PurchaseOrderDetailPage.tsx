@@ -374,7 +374,7 @@ export default function PurchaseOrderDetailPage() {
       )}
       {approvalCardShown && (
         <POApprovalStatusCard
-          poId={po.id}
+          po={po}
           onApprove={async (_requestId, notes) => {
             await approvePOMutation.mutateAsync({ poId: po.id, notes });
           }}

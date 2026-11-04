@@ -174,15 +174,22 @@ async def confirm_approval_requirement(
     parked request would carry, so the dialog can neither promise a queue the
     request will never reach nor warn of one the order will not enter. The
     verdict does not wait for the rule: Request approval parks an order the
-    rule would let through, and its dialog reads the same answer. Only a draft
-    can be confirmed; any other order has nothing left to ask about.
+    rule would let through, and its dialog reads the same answer. So does an
+    order parked with nothing pending on it (its request was withdrawn): asking
+    again lands on the same stages, and that dialog owes the same warning. It
+    is not confirmed from there, so no rule is asked. Any other order has
+    nothing left to ask about.
     """
-    if po.status != 'DRAFT':
+    required = False
+    if po.status == 'DRAFT':
+        settings = await get_po_settings(db, org_id)
+        required = await _is_approval_required(
+            db, org_id, settings, po, requester_id=requester_id
+        )
+    elif po.status != 'PENDING_APPROVAL' or await approvals_api.find_active_request(
+        db, org_id, 'purchase_order', po.id
+    ):
         return PurchaseOrderApprovalRequirement(approval_required=False)
-    settings = await get_po_settings(db, org_id)
-    required = await _is_approval_required(
-        db, org_id, settings, po, requester_id=requester_id
-    )
     verdict = await approvals_api.first_stage_verdict(
         db, org_id, 'purchase_order', requester_id
     )

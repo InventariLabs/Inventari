@@ -249,6 +249,150 @@ class TestTheOrderKnowsBeforeTheClick:
         assert told.status_code == status.HTTP_404_NOT_FOUND
 
 
+def _two_stage_workflow(
+    client: TestClient, headers: dict[str, str], *, second: dict[str, Any]
+) -> None:
+    """Stage one is open; ``second`` is the stage the request reaches after it."""
+    made = client.post(
+        '/api/v1/approvals/workflows',
+        headers=headers,
+        json={
+            'target_type': 'purchase_order',
+            'requester_scope': {'everyone': True},
+            'name': 'Two stages',
+            'stages': [
+                {
+                    'order': 1,
+                    'role': 'manager',
+                    'label': 'Team lead',
+                    'approver_user_ids': [],
+                },
+                {'order': 2, **second},
+            ],
+            'is_active': True,
+            'expected_scope': {'holds': 'nothing'},
+            'allow_undecidable_stages': True,
+        },
+    )
+    assert made.status_code == status.HTTP_201_CREATED, made.text
+
+
+class TestALaterStageIsJudgedToo:
+    def test_a_decidable_first_stage_does_not_hide_an_undecidable_second(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        po_org: Organization,
+        po_auth_headers: dict[str, str],
+        po_partner: Partner,
+        po_template: ProductTemplate,
+    ) -> None:
+        """Fails without the fix: only the first waiting stage was judged.
+
+        A second holder of the grant makes the open first stage decidable; the
+        second stage names somebody who cannot see approvals at all, so the
+        request would park there one approval later, unannounced.
+        """
+        h.create_user(po_org, email='second@example.com')
+        blind = h.create_user(po_org, email='blind@example.com', role='user')
+        _two_stage_workflow(
+            client,
+            po_auth_headers,
+            second={
+                'role': 'director',
+                'label': 'Director',
+                'approver_user_ids': [str(blind.id)],
+            },
+        )
+        po = _order(
+            client, po_auth_headers, po_partner, po_template, unit_price='10.00'
+        )
+
+        told = _requirement(client, po_auth_headers, po['id'])
+
+        assert told['approval_solvable'] is False
+        assert told['undecidable_reason'] == 'named_approvers_cannot_decide'
+        assert told['undecidable_stage'] == 'Director'
+
+    def test_every_stage_decidable_is_a_clean_verdict(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        po_org: Organization,
+        po_auth_headers: dict[str, str],
+        po_partner: Partner,
+        po_template: ProductTemplate,
+    ) -> None:
+        h.create_user(po_org, email='second@example.com')
+        _two_stage_workflow(
+            client,
+            po_auth_headers,
+            second={'role': 'director', 'label': 'Director', 'approver_user_ids': []},
+        )
+        po = _order(
+            client, po_auth_headers, po_partner, po_template, unit_price='10.00'
+        )
+
+        told = _requirement(client, po_auth_headers, po['id'])
+
+        assert told['approval_solvable'] is True
+        assert told['undecidable_stage'] is None
+
+
+@pytest.mark.usefixtures('workflow')
+class TestAParkedOrderWithNothingPendingIsAskedToo:
+    def _parked(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        partner: Partner,
+        template: ProductTemplate,
+    ) -> dict[str, Any]:
+        po = _order(client, headers, partner, template, unit_price='10.00')
+        asked = client.post(f'{URL}/{po["id"]}/request-approval', headers=headers)
+        assert asked.status_code == status.HTTP_200_OK, asked.text
+        return po
+
+    def test_a_withdrawn_request_leaves_the_dead_end_named(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        po_partner: Partner,
+        po_template: ProductTemplate,
+    ) -> None:
+        """Fails without the fix: only a DRAFT was answered."""
+        po = self._parked(client, po_auth_headers, po_partner, po_template)
+        request = client.get(f'{URL}/{po["id"]}/approval', headers=po_auth_headers)
+        withdrawn = client.post(
+            f'/api/v1/approvals/requests/{request.json()["id"]}/cancel',
+            headers=po_auth_headers,
+        )
+        assert withdrawn.status_code == status.HTTP_200_OK, withdrawn.text
+
+        told = _requirement(client, po_auth_headers, po['id'])
+
+        assert told == {
+            'approval_required': False,
+            'approval_solvable': False,
+            'undecidable_reason': 'only_the_requester_can_decide',
+            'undecidable_stage': 'Team lead',
+        }
+
+    def test_an_order_whose_request_is_still_open_has_nothing_to_ask(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        po_partner: Partner,
+        po_template: ProductTemplate,
+    ) -> None:
+        po = self._parked(client, po_auth_headers, po_partner, po_template)
+
+        told = _requirement(client, po_auth_headers, po['id'])
+
+        assert told['approval_required'] is False
+        assert told['approval_solvable'] is True
+
+
 def test_with_no_workflow_there_is_no_stage_to_blame(
     client: TestClient,
     po_auth_headers: dict[str, str],
