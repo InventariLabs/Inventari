@@ -88,7 +88,7 @@ function CopyPlanButton({
 }: {
   hasMeals: boolean;
   onCopy: () => void;
-  t: TFunction;
+  t: (key: string) => string;
 }) {
   return (
     <div className="flex flex-col items-end gap-1">
