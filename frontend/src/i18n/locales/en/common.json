@@ -292,6 +292,7 @@
     },
     "tabs": {
       "general": "General",
+      "people": "People",
       "modules": "Modules",
       "myModules": "My modules",
       "auditLog": "Audit Log",

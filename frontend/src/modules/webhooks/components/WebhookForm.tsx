@@ -12,6 +12,7 @@ import { extractApiError, extractApiErrorField } from "@/lib/errors";
 import { useModuleLabels } from "@/hooks/useModuleLabels";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import type {
+  WebhookAvailableEvent,
   WebhookEndpoint,
   WebhookEndpointCreate,
   WebhookEndpointUpdate,
@@ -48,7 +49,7 @@ function WithdrawnEvents({
       {events.map((value) => (
         <label
           key={value}
-          className="flex items-center gap-2 cursor-pointer hover:bg-surface px-2 py-1 rounded"
+          className="flex min-h-11 items-center gap-2 cursor-pointer hover:bg-surface px-2 py-1 rounded md:min-h-0"
         >
           <Checkbox checked onChange={() => onToggle(value)} />
           <span className="text-xs font-mono text-on-warning">{value}</span>
@@ -59,6 +60,74 @@ function WithdrawnEvents({
       ))}
     </div>
   );
+}
+
+/** One subscribable event: its name, its translated sentence, and whether it needs a module. */
+function EventRow({
+  event,
+  checked,
+  onToggle,
+}: {
+  event: WebhookAvailableEvent;
+  checked: boolean;
+  onToggle: (value: string) => void;
+}) {
+  const { t } = useTranslation("webhooks");
+  const moduleLabels = useModuleLabels();
+  return (
+    <label className="flex min-h-11 items-center gap-2 cursor-pointer hover:bg-surface px-2 py-1 rounded md:min-h-0">
+      <Checkbox checked={checked} onChange={() => onToggle(event.event_type)} />
+      <span className="text-xs font-mono text-on-secondary dark:text-on-muted">
+        {event.event_type}
+      </span>
+      {/* The catalogue is translated here; the API's English sentence is the
+          fallback for an event added after this locale. */}
+      <span className="text-xs text-on-muted dark:text-on-secondary">
+        {`— ${t(`events.${event.event_type}`, {
+          defaultValue: event.description,
+        })}`}
+      </span>
+      {!event.available && event.source_module && (
+        <span className="text-[10px] text-on-muted border border-border rounded px-1.5 py-0.5 shrink-0">
+          {t("form.eventNeedsModule", {
+            module: moduleLabels({
+              name: event.source_module,
+              display_name: event.source_module,
+              description: "",
+            }).name,
+          })}
+        </span>
+      )}
+    </label>
+  );
+}
+
+/** The events of modules this organization has not enabled, apart from the ones that can fire. */
+function NeedModuleEvents({ children }: { children: React.ReactNode[] }) {
+  const { t } = useTranslation("webhooks");
+  if (children.length === 0) return null;
+  return (
+    <div
+      role="group"
+      aria-label={t("form.eventsNeedModulesGroup")}
+      className="mt-2 space-y-1 border-t border-border pt-2"
+    >
+      <p className="px-2 text-xs font-medium text-on-muted">
+        {t("form.eventsNeedModulesGroup")}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+/** Events that can fire now, apart from those of modules the organization has not enabled. */
+function splitByModule(events: WebhookAvailableEvent[]) {
+  const needsModule = (ev: WebhookAvailableEvent) =>
+    !ev.available && Boolean(ev.source_module);
+  return {
+    ready: events.filter((ev) => !needsModule(ev)),
+    needModule: events.filter(needsModule),
+  };
 }
 
 interface WebhookFormProps {
@@ -117,9 +186,6 @@ export default function WebhookForm({
     error: eventsError,
     refetch: refetchEvents,
   } = useWebhookAvailableEvents();
-  // The module a disabled event needs is named the way the rest of the app
-  // names it — `modules.<name>.name`, never the raw identifier.
-  const moduleLabels = useModuleLabels();
 
   // A subscription the catalogue no longer lists still sits in `event_types`
   // (those rows are not migrated), but it has no checkbox of its own — the
@@ -140,6 +206,18 @@ export default function WebhookForm({
       prev.includes(value) ? prev.filter((e) => e !== value) : [...prev, value],
     );
   };
+
+  const { ready: readyEvents, needModule: needModuleEvents } =
+    splitByModule(availableEvents);
+
+  const eventRow = (ev: WebhookAvailableEvent) => (
+    <EventRow
+      key={ev.event_type}
+      event={ev}
+      checked={selectedEvents.includes(ev.event_type)}
+      onToggle={toggleEvent}
+    />
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -274,38 +352,12 @@ export default function WebhookForm({
               )
             )}
             <WithdrawnEvents events={withdrawnEvents} onToggle={toggleEvent} />
-            {availableEvents.map((ev) => (
-              <label
-                key={ev.event_type}
-                className="flex items-center gap-2 cursor-pointer hover:bg-surface px-2 py-1 rounded"
-              >
-                <Checkbox
-                  checked={selectedEvents.includes(ev.event_type)}
-                  onChange={() => toggleEvent(ev.event_type)}
-                />
-                <span className="text-xs font-mono text-on-secondary dark:text-on-muted">
-                  {ev.event_type}
-                </span>
-                {/* The catalogue is translated here; the API's English sentence
-                    is the fallback for an event added after this locale. */}
-                <span className="text-xs text-on-muted dark:text-on-secondary">
-                  {`— ${t(`events.${ev.event_type}`, {
-                    defaultValue: ev.description,
-                  })}`}
-                </span>
-                {!ev.available && ev.source_module && (
-                  <span className="text-[10px] text-on-muted border border-border rounded px-1.5 py-0.5 shrink-0">
-                    {t("form.eventNeedsModule", {
-                      module: moduleLabels({
-                        name: ev.source_module,
-                        display_name: ev.source_module,
-                        description: "",
-                      }).name,
-                    })}
-                  </span>
-                )}
-              </label>
-            ))}
+            {readyEvents.map(eventRow)}
+            {/* Events of modules this organization has not enabled would fire
+                nothing; they stay subscribable, but apart from the ones that do. */}
+            <NeedModuleEvents>
+              {needModuleEvents.map(eventRow)}
+            </NeedModuleEvents>
           </div>
         </div>
 

@@ -16,17 +16,19 @@ import SettingsDataTab from "../components/SettingsDataTab";
 export default function SettingsGeneralSection() {
   const { t } = useTranslation("common");
   const { setHeader } = useModulePageHeader();
-  const { hash } = useLocation();
+  const { hash, key } = useLocation();
 
   // The screens that keep module-owned data out of their lists deep-link
   // here: "/settings#module-data" must land on the switch, not on the top of
-  // a page where it sits below the fold.
+  // a page where it sits below the fold. The sidebar's "People" entry is the
+  // same kind of link, to the members and invitations.
   useEffect(() => {
-    if (hash !== "#module-data") return;
+    if (hash !== "#module-data" && hash !== "#people") return;
     document
-      .getElementById("module-data")
+      .getElementById(hash.slice(1))
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [hash]);
+    // `key` is new on every click, so choosing the entry again scrolls again.
+  }, [hash, key]);
 
   useEffect(() => {
     setHeader({

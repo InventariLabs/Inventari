@@ -67,4 +67,14 @@ describe("Checkbox", () => {
     await userEvent.click(hit as HTMLElement);
     expect(onChange).toHaveBeenCalledTimes(1);
   });
+
+  it("with a label, the whole row is a 44px target on a phone", () => {
+    render(<Checkbox id="row" label="Read the team list" />);
+
+    const row = screen
+      .getByRole("checkbox", { name: "Read the team list" })
+      .closest("label");
+    expect(row?.className).toContain("min-h-11");
+    expect(row?.className).toContain("md:min-h-0");
+  });
 });

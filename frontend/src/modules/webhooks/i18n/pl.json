@@ -38,6 +38,7 @@
     "insecureUrlWarning": "Bez HTTPS dane jadą otwartym tekstem — przeczyta je wszystko po drodze.",
     "noSecretWarning": "Bez sekretu odbiorca nie odróżni Twoich danych od cudzych.",
     "eventNeedsModule": "wymaga modułu {{module}}",
+    "eventsNeedModulesGroup": "Zdarzenia modułów, których organizacja nie włączyła",
     "withdrawnEvents": "Nie ma ich już w katalogu",
     "withdrawnEventsHint": "Te nazwy zniknęły z katalogu zdarzeń, więc nigdy nie zadziałają. Odznacz je i zapisz, aby usunąć subskrypcję.",
     "eventsSelected": "(wybrano {{count}})",
@@ -109,7 +110,8 @@
     "document": {
       "cancelled": "Dokument został anulowany",
       "completed": "Dokument został zrealizowany",
-      "confirmed": "Dokument został potwierdzony"
+      "confirmed": "Dokument został potwierdzony",
+      "shipped": "Wysyłka została zrealizowana z przewoźnikiem i numerem przesyłki"
     },
     "equipment": {
       "checkin": "Sprzęt został zwrócony",
