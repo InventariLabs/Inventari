@@ -28,6 +28,7 @@ from app.services.items._query_get import (
     lock_records_async,
 )
 from app.services.items._query_listing import (
+    latest_purchase_prices_async,
     list_by_expiry_async,
     list_expiring_by_template_async,
     list_with_template_async,
@@ -326,6 +327,18 @@ class CoreItemsReadMixin:
             tid: [ItemDTO.model_validate(item) for item in items]
             for tid, items in grouped.items()
         }
+
+    async def latest_purchase_prices_async(
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        template_ids: builtins.list[UUID],
+    ) -> dict[UUID, Decimal]:
+        """The newest recorded purchase price of each product that has one.
+
+        Independent of the quantity on hand; deleted records do not answer.
+        """
+        return await latest_purchase_prices_async(db, organization_id, template_ids)
 
     async def inherited_category_async(
         self,

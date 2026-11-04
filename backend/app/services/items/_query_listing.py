@@ -9,6 +9,8 @@ specialized queries (expiring, low_stock, archived) in
 
 from collections.abc import Iterable
 from datetime import date
+from decimal import Decimal
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import select
@@ -219,6 +221,38 @@ async def list_with_template_async(
         if item.template_id is not None:
             grouped.setdefault(item.template_id, []).append(item)
     return grouped
+
+
+async def latest_purchase_prices_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    template_ids: Iterable[UUID],
+) -> dict[UUID, Decimal]:
+    """The price of each product's newest priced record, whatever it holds now.
+
+    What a product last cost does not depend on how much of it is left: the
+    price is wanted most when the shelf is empty and the product is bought
+    again. A deleted record does not answer; deleting says it should not count,
+    often because it was entered wrong. A template with no priced record has no
+    key in the result.
+    """
+    tids = list(template_ids)
+    if not tids:
+        return {}
+
+    result = await db.execute(
+        select(Item.template_id, Item.purchase_price)
+        .where(
+            Item.organization_id == organization_id,
+            Item.template_id.in_(tids),
+            Item.is_deleted.is_(False),
+            Item.purchase_price.is_not(None),
+        )
+        .distinct(Item.template_id)
+        .order_by(Item.template_id, Item.created_at.desc(), Item.id.desc())
+    )
+    # Both columns are nullable; the WHERE above has ruled the NULLs out.
+    return cast(dict[UUID, Decimal], dict(result.tuples().all()))
 
 
 async def distinct_uom_ids_for_template_async(
