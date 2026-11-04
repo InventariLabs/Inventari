@@ -104,7 +104,7 @@
     "empty_title": "Alle Zutaten sind verknüpft",
     "empty_desc": "Jede Rezeptzutat zeigt auf ein Produkt – Verfügbarkeit, Kosten und Kommissionierung decken das ganze Rezeptbuch ab.",
     "empty_no_ingredients_title": "Noch keine Rezeptzutaten",
-    "empty_no_ingredients_desc": "Füge einem Rezept Zutaten hinzu – sie erscheinen hier, bis sie mit einem Produkt verknüpft sind."
+    "empty_no_ingredients_desc": "Fügen Sie einem Rezept Zutaten hinzu – sie erscheinen hier, bis sie mit einem Produkt verknüpft sind."
   },
   "form": {
     "create_title": "Neues Rezept",
