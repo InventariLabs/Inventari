@@ -36,7 +36,7 @@ describe("a tap on a screen that has not been downloaded yet", () => {
       id: "1",
       full_name: "Test User",
       email: "test@example.com",
-      preferred_language: "en",
+      preferred_language: "en" as const,
       role: "admin",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
