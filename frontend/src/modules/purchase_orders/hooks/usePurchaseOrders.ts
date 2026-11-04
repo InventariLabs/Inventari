@@ -179,8 +179,11 @@ export function usePOApprovalWorkflowConfigured(): boolean | undefined {
 /**
  * What confirming this draft would do for the person asking, and whether
  * anybody could decide the approval it would start — the server's answer, from
- * the rule the confirmation itself obeys. ``undefined`` with the approvals
- * module off, and for an order past its draft: nothing to ask then.
+ * the rule the confirmation itself obeys. An order parked with its request
+ * withdrawn is asked too, because Request approval is offered on it again; the
+ * server answers a parked order that still has a request with nothing to say.
+ * ``undefined`` with the approvals module off, and for an order past that:
+ * nothing to ask then.
  */
 export function usePOApprovalRequirement(
   po: Pick<PurchaseOrder, "id" | "status"> | null,
@@ -189,7 +192,9 @@ export function usePOApprovalRequirement(
   const { data } = useQuery({
     queryKey: queryKeys.purchaseOrders.approvalRequirement(po?.id ?? ""),
     queryFn: () => purchaseOrdersApi.getApprovalRequirement(po?.id ?? ""),
-    enabled: approvalsEnabled && po?.status === "DRAFT",
+    enabled:
+      approvalsEnabled &&
+      (po?.status === "DRAFT" || po?.status === "PENDING_APPROVAL"),
     staleTime: 15_000,
   });
   return data;
