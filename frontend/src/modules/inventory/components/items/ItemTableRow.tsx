@@ -83,7 +83,10 @@ function getStoragePath(
     t("unknown", { ns: "common", defaultValue: "Unknown" }),
   );
   if (!storageId) return unknown;
-  const storage = storages?.find((s) => s.id === storageId);
+  // The places have not arrived yet: a record is not "Unknown" for as long as
+  // the list that names it is still on its way.
+  if (!storages) return "";
+  const storage = storages.find((s) => s.id === storageId);
   if (!storage) return unknown;
   return getStorageLocationPath(storage, shelfLocation, undefined, storages);
 }

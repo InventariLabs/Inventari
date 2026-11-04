@@ -521,8 +521,12 @@ describe("ItemMobileCard — quick actions carry their words", () => {
       const button = screen.getByRole("button", { name });
       const tip = within(button).getByRole("tooltip");
       expect(button.className).toContain("group/tooltip");
-      expect(tip.className).toContain("group-hover/tooltip:opacity-100");
-      expect(tip.className).toContain("group-focus-within/tooltip:opacity-100");
+      expect(tip.className).toContain(
+        "[@media(hover:hover)]:group-hover/tooltip:opacity-100",
+      );
+      expect(tip.className).toContain(
+        "group-focus-visible/tooltip:opacity-100",
+      );
       expect(tip.className).toContain("pointer-events-none");
       expect(tip.className).toContain("right-full");
     }
@@ -584,5 +588,31 @@ describe("ItemMobileCard — a used-up record", () => {
 
     expect(screen.getByText("Consumed")).toBeInTheDocument();
     expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
+  });
+});
+
+describe("ItemMobileCard — the places are still on their way", () => {
+  it("does not call the place Unknown before the list that names it arrived", () => {
+    render(
+      <ItemMobileCard
+        item={makeItem({ location_id: "place-1" } as Partial<Item>)}
+        {...baseProps()}
+        storages={undefined}
+      />,
+    );
+
+    expect(screen.queryByText("Unknown")).not.toBeInTheDocument();
+  });
+
+  it("still says Unknown for a place the arrived list does not hold", () => {
+    render(
+      <ItemMobileCard
+        item={makeItem({ location_id: "gone" } as Partial<Item>)}
+        {...baseProps()}
+        storages={[{ id: "place-1", name: "Pantry" }] as never}
+      />,
+    );
+
+    expect(screen.getByText("Unknown")).toBeInTheDocument();
   });
 });

@@ -114,6 +114,36 @@ describe("LoginPage", () => {
     });
   });
 
+  it("confirms the sign-in in the language the account switched the screen to", async () => {
+    const { default: i18n } = await import("i18next");
+    await i18n.changeLanguage("en");
+    useAuthStore.setState({
+      login: vi.fn(async () => {
+        await i18n.changeLanguage("pl");
+      }) as unknown as AuthState["login"],
+    });
+    const { toast } = await import("sonner");
+
+    renderLogin();
+    fireEvent.change(screen.getByLabelText(/Email/i), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/i), {
+      target: { value: "password" },
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /Sign in/i }));
+    });
+
+    try {
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith("Zalogowano pomyślnie!");
+      });
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
+  });
+
   const rejectWith = (status: number) => {
     const error = new AxiosError("failed", "ERR_BAD_REQUEST", undefined, null, {
       status,

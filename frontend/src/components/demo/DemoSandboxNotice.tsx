@@ -93,7 +93,7 @@ export function DemoSandboxNotice() {
           href={demoInboxUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="whitespace-nowrap font-medium underline decoration-2 underline-offset-4"
+          className="inline-flex min-h-6 items-center whitespace-nowrap font-medium underline decoration-2 underline-offset-4 md:min-h-0"
         >
           {isPhone ? t("demo.inboxLinkShort") : t("demo.inboxLink")}
         </a>
