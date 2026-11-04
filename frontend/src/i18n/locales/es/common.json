@@ -291,6 +291,7 @@
     },
     "tabs": {
       "general": "General",
+      "people": "Personas",
       "modules": "Módulos",
       "myModules": "Mis módulos",
       "auditLog": "Registro de auditoría",

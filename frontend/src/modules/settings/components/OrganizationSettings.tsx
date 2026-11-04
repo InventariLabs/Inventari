@@ -535,7 +535,10 @@ function PeopleCard() {
   const isSuperuser = useAuthStore((s) => s.user?.is_superuser === true);
 
   return (
-    <Card className="p-0 overflow-hidden sm:rounded-xl rounded-none">
+    <Card
+      id="people"
+      className="p-0 overflow-hidden sm:rounded-xl rounded-none scroll-mt-28"
+    >
       <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
         <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-500 shrink-0">
           <UsersRound size={17} />

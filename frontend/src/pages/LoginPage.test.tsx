@@ -62,6 +62,22 @@ describe("LoginPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("opens with the address registration just created", () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter
+          initialEntries={[
+            { pathname: "/login", state: { email: "new@example.com" } },
+          ]}
+        >
+          <LoginPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByLabelText(/Email/i)).toHaveValue("new@example.com");
+  });
+
   it("carries exactly one first-level heading tag", () => {
     // A DOM count, and only that: jsdom applies no CSS, so it cannot say
     // which heading a viewport actually shows — tests/e2e/auth-heading.spec.ts

@@ -36,6 +36,7 @@
     "insecureUrlWarning": "Sin HTTPS los datos viajan en texto plano y cualquiera en el camino puede leerlos.",
     "noSecretWarning": "Sin secreto, quien recibe no puede distinguir tus datos de los de otra persona.",
     "eventNeedsModule": "requiere el módulo {{module}}",
+    "eventsNeedModulesGroup": "Eventos de módulos que esta organización no ha activado",
     "withdrawnEvents": "Retirados del catálogo",
     "withdrawnEventsHint": "Estos nombres ya no están en el catálogo de eventos, así que nunca se activarán. Desmárcalos y guarda para eliminar la suscripción.",
     "eventsSelected": "({{count}} seleccionados)",
@@ -103,7 +104,8 @@
     "document": {
       "cancelled": "Se anuló un documento",
       "completed": "Se completó un documento",
-      "confirmed": "Se confirmó un documento"
+      "confirmed": "Se confirmó un documento",
+      "shipped": "Se completó un envío con su transportista y número de seguimiento"
     },
     "equipment": {
       "checkin": "Se devolvió un equipo",

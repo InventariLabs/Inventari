@@ -72,6 +72,15 @@ describe("SettingsGeneralSection", () => {
     await waitFor(() => expect(scrollSpy).toHaveBeenCalled());
   });
 
+  it("scrolls the people section into view for the sidebar's People entry", async () => {
+    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+
+    renderSection("/settings#people");
+
+    await waitFor(() => expect(scrollSpy).toHaveBeenCalled());
+    expect(scrollSpy.mock.contexts[0]).toHaveProperty("id", "people");
+  });
+
   it("stays put without the hash", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
 

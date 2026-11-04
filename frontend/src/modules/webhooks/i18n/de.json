@@ -36,6 +36,7 @@
     "insecureUrlWarning": "Ohne HTTPS werden die Daten im Klartext übertragen und sind unterwegs mitlesbar.",
     "noSecretWarning": "Ohne Secret kann die Gegenstelle Ihre Daten nicht von fremden unterscheiden.",
     "eventNeedsModule": "erfordert das Modul {{module}}",
+    "eventsNeedModulesGroup": "Ereignisse von Modulen, die diese Organisation nicht aktiviert hat",
     "withdrawnEvents": "Nicht mehr im Katalog",
     "withdrawnEventsHint": "Diese Namen stehen nicht mehr im Ereigniskatalog und können nie ausgelöst werden. Abwählen und speichern, um das Abonnement zu entfernen.",
     "eventsSelected": "({{count}} ausgewählt)",
@@ -103,7 +104,8 @@
     "document": {
       "cancelled": "Ein Beleg wurde storniert",
       "completed": "Ein Beleg wurde abgeschlossen",
-      "confirmed": "Ein Beleg wurde bestätigt"
+      "confirmed": "Ein Beleg wurde bestätigt",
+      "shipped": "Ein Versand wurde mit Spediteur und Sendungsnummer abgeschlossen"
     },
     "equipment": {
       "checkin": "Ein Gerät wurde zurückgegeben",

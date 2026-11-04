@@ -39,7 +39,12 @@ export default function LoginPage() {
   // is caught in Mailpit beside it. The notice is the demo's own statement
   // that this address is not private and nothing leaves the stack.
   const demoInboxUrl = initStatus?.demo_inbox_url;
-  const [email, setEmail] = useState("");
+  // Registration ends here with the address it just created, so the person
+  // types a password, not an address, to get in.
+  const carried = (useLocation().state as { email?: unknown } | null)?.email;
+  const [email, setEmail] = useState(
+    typeof carried === "string" ? carried : "",
+  );
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOpeningDemo, setIsOpeningDemo] = useState(false);

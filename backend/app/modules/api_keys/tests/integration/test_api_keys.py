@@ -666,6 +666,9 @@ class TestApiKeyPermissions:
 
         default = sorted(p.value for p in API_KEY_DEFAULT_PERMISSIONS)
         assert all(p.endswith(':read') for p in default)
+        # The team list carries every member's e-mail; a key that only reads
+        # products does not get it unless somebody ticks it.
+        assert 'org:read' not in default
         assert created.json()['permissions'] == default
         assert listed.json()['items'][0]['permissions'] == default
         assert listed.json()['items'][0]['scopes'] == []

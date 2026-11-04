@@ -103,6 +103,21 @@ describe("SettingsShell access", () => {
     }
   });
 
+  it("lists the people section in the sidebar and marks it current instead of General", () => {
+    // Inviting a colleague was reachable only by scrolling General past the
+    // currency and the time-zone list.
+    renderAt("/settings#people", "viewer");
+
+    const people = screen.getAllByRole("link", { name: "People" });
+    expect(people.length).toBeGreaterThan(0);
+    for (const link of people) {
+      expect(link).toHaveAttribute("href", "/settings#people");
+    }
+    const [desktop] = screen.getAllByRole("link", { name: "General" });
+    expect(desktop.className).not.toContain("font-semibold");
+    expect(people[0].className).toContain("font-semibold");
+  });
+
   it("lets an administrator through", () => {
     renderAt("/settings/audit-log", "admin");
 
