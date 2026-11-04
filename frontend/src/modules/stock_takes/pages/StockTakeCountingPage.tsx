@@ -21,6 +21,35 @@ import StockTakeShelfBar from "../components/StockTakeShelfBar";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 
+/** Held back while finishing runs and while a saved count is still on its way. */
+function CompleteButton({
+  onClick,
+  completing,
+  saving,
+}: {
+  onClick: () => void;
+  completing: boolean;
+  saving: boolean;
+}) {
+  const { t } = useTranslation(["stock_takes"]);
+  return (
+    <Button
+      size="content"
+      type="button"
+      variant="primary"
+      data-testid="stock-take-complete-btn"
+      onClick={onClick}
+      disabled={completing || saving}
+      className="px-4 py-2"
+    >
+      <CheckCircle size={18} />
+      {completing
+        ? t("stock_takes:actions.completing")
+        : t("stock_takes:actions.complete")}
+    </Button>
+  );
+}
+
 export default function StockTakeCountingPage() {
   const { t } = useTranslation(["stock_takes", "common"]);
   const { id } = useParams<{ id: string }>();
@@ -60,6 +89,7 @@ export default function StockTakeCountingPage() {
     triedToSave,
     countMutation,
     completeMutation,
+    isSavingCounts,
     handleQuantityChange,
     handleQuantityStep,
     handleAddItem,
@@ -184,21 +214,12 @@ export default function StockTakeCountingPage() {
           <XCircle size={18} />
           {t("stock_takes:actions.cancel")}
         </Button>,
-        <Button
-          size="content"
+        <CompleteButton
           key="complete"
-          type="button"
-          variant="primary"
-          data-testid="stock-take-complete-btn"
           onClick={handleComplete}
-          disabled={completeMutation.isPending}
-          className="px-4 py-2"
-        >
-          <CheckCircle size={18} />
-          {completeMutation.isPending
-            ? t("stock_takes:actions.completing")
-            : t("stock_takes:actions.complete")}
-        </Button>,
+          completing={completeMutation.isPending}
+          saving={isSavingCounts}
+        />,
       );
     }
 
@@ -214,6 +235,7 @@ export default function StockTakeCountingPage() {
     handleCancel,
     handleComplete,
     completeMutation.isPending,
+    isSavingCounts,
     t,
   ]);
 
