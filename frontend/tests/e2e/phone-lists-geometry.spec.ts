@@ -21,13 +21,19 @@ test.describe("Phone lists — nothing sits beyond the screen edge", () => {
   let archivedId: string;
   let longArchivedId: string;
   let storageId: string;
-  const runTag = `PhoneArchive${Math.random().toString(36).slice(2, 9)}`;
-  const archivedName = `${runTag} plain`;
+  let runTag: string;
+  let archivedName: string;
   // One unbroken name sets the table's minimum width, whatever the other rows
   // hold; it comes with a reason badge, which the plain row lacks.
-  const longArchivedName = `${runTag}IndustrialControllerReplacementModule`;
+  let longArchivedName: string;
 
   test.beforeAll(async ({ playwright, baseURL }) => {
+    // Named per seed, not per file: with parallel tests a worker runs this
+    // hook again for each test it is handed, and archived rows stay, so one
+    // tag across two seeds found the plain row twice.
+    runTag = `PhoneArchive${Math.random().toString(36).slice(2, 9)}`;
+    archivedName = `${runTag} plain`;
+    longArchivedName = `${runTag}IndustrialControllerReplacementModule`;
     const requestContext = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(requestContext);
     token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
