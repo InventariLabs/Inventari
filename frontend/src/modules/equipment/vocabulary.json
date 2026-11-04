@@ -66,7 +66,7 @@
     "myAssets": {
       "en": "My Assets",
       "pl": "Mój sprzęt",
-      "de": "Mein Gerät",
+      "de": "Meine Geräte",
       "fr": "Mon matériel",
       "es": "Mi equipo"
     }
@@ -141,9 +141,12 @@
     "import.description": true,
     "attestation.public.pageTitle": true,
     "attestation.public.assetSection": true,
-    "attestation.public.instructions": true,
-    "attestation.public.confirmButton": true,
-    "attestation.public.statusConfirmedDesc": true,
+    "attestation.public.instructions_one": true,
+    "attestation.public.instructions_other": true,
+    "attestation.public.confirmButton_one": true,
+    "attestation.public.confirmButton_other": true,
+    "attestation.public.statusConfirmedDesc_one": true,
+    "attestation.public.statusConfirmedDesc_other": true,
     "attestation.public.itemsSection": true,
     "attestation.public.selectItem": true,
     "attestation.response.asset": true,

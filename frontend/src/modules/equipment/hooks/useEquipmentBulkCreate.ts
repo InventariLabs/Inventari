@@ -128,7 +128,7 @@ export function useEquipmentBulkCreate(
         }
       }
 
-      navigate("/equipment");
+      navigate("/equipment/assets");
     } catch (error) {
       toast.error(
         extractApiError(

@@ -99,6 +99,7 @@ const EMOJI_TO_CLDR = {
   "🍓": "Strawberry",
   "💻": "Laptop",
   "🖥️": "Desktop computer",
+  "📺": "Television",
   "📱": "Mobile phone",
   "⌨️": "Keyboard",
   "🖱️": "Computer mouse",

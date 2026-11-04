@@ -393,7 +393,7 @@ export function useEquipmentForm(
         // the detail cache is primed fresh instead of a stale entry.
         invalidation.equipment(queryClient);
         toast.success(t("form.created", "Asset added successfully"));
-        navigate(`/equipment`);
+        navigate(`/equipment/${created.id}`);
       }
     } catch (err) {
       // The `{{msg}}` this used to interpolate is in none of the five

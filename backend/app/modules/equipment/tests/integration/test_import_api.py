@@ -178,6 +178,8 @@ class TestExecuteEndpoint:
         body = second.json()
         assert body['imported'] == 0
         assert body['skipped'] == 2
+        # The result names the serial numbers it skipped, not only how many.
+        assert body['skipped_serials'] == ['SN-A', 'SN-B']
 
         db_session.expire_all()
         count = (
@@ -381,6 +383,7 @@ class TestAnalyzeExecuteRoundtrip:
             'errors': [],
             'skipped': 0,
             'updated': 0,
+            'skipped_serials': [],
         }
 
         db_session.expire_all()

@@ -26,6 +26,7 @@ import { queryKeys } from "@/hooks/queries/keys";
 import { useAppMutation } from "@/lib/api/mutationFactory";
 import { apiErrorStatus, extractApiError } from "@/lib/errors";
 import type { AuditResponseRecord } from "@/modules/equipment/api/equipment";
+import { formatDate } from "@/utils/helpers";
 
 // ---------------------------------------------------------------------------
 // Unauthenticated API helpers (no /api/v1 prefix needed for public endpoint)
@@ -147,8 +148,39 @@ function Instructions({ items }: { items: AuditResponseRecord["items"] }) {
     <p className="text-sm text-on-secondary mb-6">
       {items.some((item) => item.status === "DISPUTED")
         ? t("attestation.public.reportedStillOpen")
-        : t("attestation.public.instructions")}
+        : t("attestation.public.instructions", {
+            count: Math.max(1, items.filter(isOpen).length),
+          })}
     </p>
+  );
+}
+
+/** The page's title, who is asking and — while it is still open — by which day. */
+function PageTitle({
+  organization,
+  deadlineDay,
+}: {
+  organization?: string | null;
+  deadlineDay?: string | null;
+}) {
+  const { t } = useTranslation("equipment");
+  return (
+    <div className="text-center mb-6">
+      {/* eslint-disable-next-line no-restricted-syntax -- standalone public page outside ModuleShell: <h1> is the document title of the attestation link, not a shell page heading */}
+      <h1 className="text-2xl font-semibold text-on">
+        {t("attestation.public.pageTitle")}
+      </h1>
+      <p className="text-on-muted text-sm mt-1">
+        {organization
+          ? t("attestation.public.requestedBy", { organization })
+          : t("attestation.public.brand")}
+      </p>
+      {deadlineDay && (
+        <p className="text-on-muted text-sm">
+          {t("attestation.public.answerBy", { date: formatDate(deadlineDay) })}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -264,23 +296,19 @@ export default function AttestationPublicPage() {
   // out. The page says it instead of offering buttons whose only outcome
   // is a refusal — an answer already given still wins (see StatusDisplay).
   const closedReason = displayResponse.closed_reason ?? null;
+  const answering = !isResolved && !closedReason;
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8">
         {/* Header */}
-        <div className="text-center mb-6">
-          {/* eslint-disable-next-line no-restricted-syntax -- standalone public page outside ModuleShell: <h1> is the document title of the attestation link, not a shell page heading */}
-          <h1 className="text-2xl font-semibold text-on">
-            {t("attestation.public.pageTitle")}
-          </h1>
-          <p className="text-on-muted text-sm mt-1">
-            {t("attestation.public.brand")}
-          </p>
-        </div>
+        <PageTitle
+          organization={displayResponse.organization_name}
+          deadlineDay={answering ? displayResponse.deadline_day : null}
+        />
 
         {/* Resolved or closed state */}
-        {(isResolved || closedReason) && (
+        {!answering && (
           <StatusDisplay
             status={displayResponse.status}
             closedReason={closedReason}
@@ -292,7 +320,7 @@ export default function AttestationPublicPage() {
         )}
 
         {/* Pending state */}
-        {!isResolved && !closedReason && (
+        {answering && (
           <>
             {/* Asset section so the attester knows what they are confirming. */}
             <div className="bg-surface-raised rounded-lg p-4 mb-3 space-y-2">
@@ -356,6 +384,7 @@ export default function AttestationPublicPage() {
                 }
                 onReport={() => setShowDispute(true)}
                 isPending={confirmMutation.isPending}
+                count={Math.max(1, displayResponse.items.filter(isOpen).length)}
               />
             )}
 

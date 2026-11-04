@@ -9,6 +9,25 @@ import {
 
 // ── Equipment presets each get a glyph of their own ─────────────────────
 
+describe("resolveCategoryEmoji — the default equipment categories", () => {
+  it("gives each of the eight its own glyph", () => {
+    const presets = [
+      ["Laptop", "LAPTOP"],
+      ["Desktop Computer", "DESKTOP"],
+      ["Monitor / Display", "MONITOR"],
+      ["Phone / Tablet", "PHONE"],
+      ["Network Device", "NETWORK_DEVICE"],
+      ["Peripheral", "PERIPHERAL"],
+      ["Server", "SERVER"],
+      ["Other Equipment", "OTHER_EQUIPMENT"],
+    ];
+    const glyphs = presets.map(([name, code]) =>
+      resolveCategoryEmoji({ name, code, contextTag: "equipment" }),
+    );
+    expect(new Set(glyphs).size).toBe(presets.length);
+  });
+});
+
 describe("resolveCategoryEmoji — the equipment presets", () => {
   it.each([
     ["Desktop Computer", "🖥️"],
@@ -127,8 +146,8 @@ describe("resolveCategoryEmoji — Layer 2: keyword match", () => {
     ["Cebula czerwona", "🧅"],
     // Equipment
     ["Laptop bag", "💻"],
-    ["Monitor stand", "🖥️"],
-    ["Ekran LCD", "🖥️"],
+    ["Monitor stand", "📺"],
+    ["Ekran LCD", "📺"],
     ["Phone case", "📱"],
     ["Smartphone Pro", "📱"],
     ["Telefon biurowy", "📱"],
@@ -138,8 +157,8 @@ describe("resolveCategoryEmoji — Layer 2: keyword match", () => {
     ["Mysz bezprzewodowa", "🖱️"],
     ["Printer ink", "🖨️"],
     ["Drukarka laserowa", "🖨️"],
-    ["Server rack", "🖥️"],
-    ["Serwer produkcyjny", "🖥️"],
+    ["Server rack", "🗄️"],
+    ["Serwer produkcyjny", "🗄️"],
     ["Cable HDMI", "🔌"],
     ["Kabel sieciowy", "🔌"],
     // Tools
@@ -261,7 +280,7 @@ describe("resolveCategoryEmoji — Layer 4: last resort", () => {
 
 describe("resolveCategoryEmoji — word-boundary safety", () => {
   it("PL 'ser' does not match 'serwer' (server)", () => {
-    expect(resolveCategoryEmoji({ name: "Serwer produkcyjny" })).toBe("🖥️");
+    expect(resolveCategoryEmoji({ name: "Serwer produkcyjny" })).toBe("🗄️");
   });
 
   it("'ser' matches as a whole word", () => {

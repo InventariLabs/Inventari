@@ -107,9 +107,9 @@ KEYWORD_EMOJI_MAP: list[_EmojiEntry] = [
     _EmojiEntry(('grain', 'kasza', 'cereal', 'płatk', 'platk'), '🌾'),
     _EmojiEntry(('produce', 'warzyw'), '🥬'),
     # ── Equipment / IT (server before 'ser' group handled above) ──
-    _EmojiEntry(('server', 'serwer'), '🖥️'),
+    _EmojiEntry(('server', 'serwer'), '🗄️'),
     _EmojiEntry(('laptop', 'notebook'), '💻'),
-    _EmojiEntry(('monitor', 'ekran', 'display'), '🖥️'),
+    _EmojiEntry(('monitor', 'ekran', 'display'), '📺'),
     _EmojiEntry(('phone', 'smartphone', 'telefon'), '📱'),
     _EmojiEntry(('tablet',), '📱'),
     _EmojiEntry(('keyboard', 'klawiatur'), '⌨️'),
@@ -122,6 +122,9 @@ KEYWORD_EMOJI_MAP: list[_EmojiEntry] = [
     _EmojiEntry(('desktop', 'stacjonarn'), '🖥️'),
     _EmojiEntry(('network', 'router', 'sieciow'), '🔌'),
     _EmojiEntry(('peripheral', 'peryferi'), '🖱️'),
+    # The catch-all preset: by its code, so it does not share the laptop the
+    # vertical default would give it.
+    _EmojiEntry(('other_equipment',), '🧰'),
     # ── Tools ────────────────────────────────────────────────
     _EmojiEntry(('tool', 'narzędz'), '🧰'),
     _EmojiEntry(('hammer', 'młotek'), '🔨'),

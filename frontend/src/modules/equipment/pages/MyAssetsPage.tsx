@@ -22,7 +22,7 @@ import {
 } from "@/modules/equipment/hooks/useMyAssets";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
-import { formatDateMedium } from "@/utils/formatters";
+import { formatDate } from "@/utils/helpers";
 import { useFormatOrgDay } from "@/hooks/useOrganizationTimezone";
 import { getCategoryLabel } from "@/modules/equipment/components/assetUtils";
 
@@ -132,7 +132,7 @@ export default function MyAssetsPage() {
                       <span className="flex items-center gap-1">
                         <Clock size={12} />
                         {t("my_assets.checked_out", "Checked out")}{" "}
-                        {formatDateMedium(asset.checked_out_at)}
+                        {formatDate(asset.checked_out_at)}
                       </span>
                       {asset.expected_return_at && (
                         <span className="flex items-center gap-1">
@@ -146,7 +146,7 @@ export default function MyAssetsPage() {
                         <span className="flex items-center gap-1">
                           <ShieldCheck size={12} />
                           {t("my_assets.warranty", "Warranty")}{" "}
-                          {formatDateMedium(asset.warranty_until)}
+                          {formatDate(asset.warranty_until)}
                         </span>
                       )}
                     </div>
@@ -234,10 +234,8 @@ export default function MyAssetsPage() {
                       {h.item_name}
                     </Link>
                     <p className="text-xs text-on-muted">
-                      {formatDateMedium(h.checked_out_at)} —{" "}
-                      {h.checked_in_at
-                        ? formatDateMedium(h.checked_in_at)
-                        : "..."}
+                      {formatDate(h.checked_out_at)} —{" "}
+                      {h.checked_in_at ? formatDate(h.checked_in_at) : "..."}
                     </p>
                   </div>
                   {h.checkin_condition && (

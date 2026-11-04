@@ -29,7 +29,9 @@ export function StatusDisplay({
           {t("attestation.public.statusConfirmed")}
         </h2>
         <p className="text-on-secondary">
-          {t("attestation.public.statusConfirmedDesc")}
+          {t("attestation.public.statusConfirmedDesc", {
+            count: Math.max(1, confirmedCount),
+          })}
         </p>
       </div>
     );

@@ -11989,6 +11989,10 @@ export interface components {
             created_at: string;
             /** Closed Reason */
             closed_reason?: string | null;
+            /** Organization Name */
+            organization_name?: string | null;
+            /** Deadline Day */
+            deadline_day?: string | null;
         };
         /**
          * AvailabilityResponse
@@ -12769,6 +12773,10 @@ export interface components {
             created_at: string;
             /** Closed Reason */
             closed_reason?: string | null;
+            /** Organization Name */
+            organization_name?: string | null;
+            /** Deadline Day */
+            deadline_day?: string | null;
             /**
              * Assets Returned
              * @default false
@@ -15492,6 +15500,11 @@ export interface components {
              * @default 0
              */
             updated: number;
+            /**
+             * Skipped Serials
+             * @default []
+             */
+            skipped_serials: string[];
         };
         /**
          * ImportPasteRequest

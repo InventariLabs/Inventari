@@ -3,6 +3,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { act } from "react";
+import i18n from "@/i18n/config";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
 import { signInWith, signOut } from "@/test/auth";
@@ -140,5 +142,21 @@ describe("My Assets — the assignment history reads in the interface language",
     expect(screen.getByText("Aug 1, 2026 — Aug 5, 2026")).toBeInTheDocument();
     expect(screen.getByText("Needs Repair")).toBeInTheDocument();
     expect(screen.queryByText("NEEDS_REPAIR")).not.toBeInTheDocument();
+  });
+});
+
+describe("My Assets — a day is written the way the rest of the module writes it", () => {
+  it("prints the check-out day numerically in German, as the lists do", async () => {
+    try {
+      await act(() => i18n.changeLanguage("de"));
+      renderPage();
+      await screen.findByText("ThinkPad T14");
+
+      // The card used to spell the month ("1. Aug. 2026") beside lists
+      // that print "01.08.2026".
+      expect(screen.getByText(/01\.08\.2026/)).toBeInTheDocument();
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 });

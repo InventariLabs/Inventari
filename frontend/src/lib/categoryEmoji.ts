@@ -97,9 +97,9 @@ export const KEYWORD_EMOJI_MAP: EmojiEntry[] = [
   { keywords: ["grain", "kasza", "cereal", "płatk", "platk"], emoji: "🌾" },
   { keywords: ["produce", "warzyw"], emoji: "🥬" },
   // ── Equipment / IT (server before 'ser' handled above) ──
-  { keywords: ["server", "serwer"], emoji: "🖥️" },
+  { keywords: ["server", "serwer"], emoji: "🗄️" },
   { keywords: ["laptop", "notebook"], emoji: "💻" },
-  { keywords: ["monitor", "ekran", "display"], emoji: "🖥️" },
+  { keywords: ["monitor", "ekran", "display"], emoji: "📺" },
   { keywords: ["phone", "smartphone", "telefon"], emoji: "📱" },
   { keywords: ["tablet"], emoji: "📱" },
   { keywords: ["keyboard", "klawiatur"], emoji: "⌨️" },
@@ -112,6 +112,9 @@ export const KEYWORD_EMOJI_MAP: EmojiEntry[] = [
   { keywords: ["desktop", "stacjonarn"], emoji: "🖥️" },
   { keywords: ["network", "router", "sieciow"], emoji: "🔌" },
   { keywords: ["peripheral", "peryferi"], emoji: "🖱️" },
+  // The catch-all preset: by its code, so it does not share the laptop the
+  // vertical default would give it.
+  { keywords: ["other_equipment"], emoji: "🧰" },
   // ── Tools ────────────────────────────────────────────────
   { keywords: ["tool", "narzędz"], emoji: "🧰" },
   { keywords: ["hammer", "młotek"], emoji: "🔨" },

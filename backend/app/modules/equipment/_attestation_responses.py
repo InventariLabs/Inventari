@@ -7,6 +7,7 @@ from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.public_api import core_api
 from app.modules.equipment.models import (
     AuditCampaign,
     AuditResponse,
@@ -78,7 +79,20 @@ async def get_public_response(
     if response is None:
         return None
     view = AuditResponseSchema.model_validate(response)
-    return view.model_copy(update={'closed_reason': closure_reason(response)})
+    org_id = response.organization_id
+    # The deadline is the end of a day on the organization's own clock; the
+    # day is what the page prints, so it is read through that clock here
+    # rather than through whatever zone the reader's browser happens to be in.
+    tz = await core_api.organizations.timezone_async(db, org_id)
+    return view.model_copy(
+        update={
+            'closed_reason': closure_reason(response),
+            'organization_name': await core_api.organizations.get_name_async(
+                db, org_id
+            ),
+            'deadline_day': response.campaign.deadline.astimezone(tz).date(),
+        }
+    )
 
 
 async def _guard_response(db: AsyncSession, response: AuditResponse) -> None:

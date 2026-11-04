@@ -6,7 +6,7 @@ import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useHasRole } from "@/module-sdk";
 import { AttentionCard } from "@/components/ui/AttentionCard";
-import { Button } from "@/components/ui/Button";
+import { buttonVariants } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { EquipmentDashboardWidget } from "@/modules/equipment/components/EquipmentDashboardWidget";
 import { FleetValuationWidget } from "@/modules/equipment/components/FleetValuationWidget";
@@ -101,43 +101,54 @@ export default function EquipmentDashboardPage() {
     : undefined;
 
   const failed = dashboard.isError || overdue.isError || fleet.isError;
+  // "Under control" is a claim about assets. Before the first one is added
+  // there is nothing to control, and the fleet card below says so itself.
+  const noAssetsYet = d != null && fleetSize(d) === 0 && !failed;
 
   return (
     <div className="space-y-6">
-      <AttentionCard
-        items={attention}
-        attentionLabel={t("dashboard.attention.heading", {
-          count: attention.length,
-        })}
-        summary={summary}
-        linkLabel={t("dashboard.view_all")}
-        linkHref="/equipment/assets"
-        // Its link opens every asset, not the ones counted here, so the rows
-        // past the first few have nowhere else to be read.
-        showAllLabel={t("common:dashboard.attention.showAll", {
-          count: attention.length,
-        })}
-        quiet={{
-          okText: t("dashboard.attention.quiet"),
-          linkLabel: t("dashboard.fleet.link"),
-          linkHref: "/equipment/assets",
-        }}
-        loading={dashboard.isLoading || overdue.isLoading || fleet.isLoading}
-        unavailable={
-          failed
-            ? {
-                message: t("dashboard.attention.unavailable"),
-                retryLabel: t("common:actions.retry"),
-                partialLabel: t("common:dashboard.attention.partial"),
-                onRetry: () => {
-                  if (dashboard.isError) void dashboard.refetch();
-                  if (overdue.isError) void overdue.refetch();
-                  if (fleet.isError) void fleet.refetch();
-                },
-              }
-            : undefined
-        }
-      />
+      {!noAssetsYet && (
+        <AttentionCard
+          items={attention}
+          attentionLabel={t("dashboard.attention.heading", {
+            count: attention.length,
+          })}
+          summary={summary}
+          // The link opens the whole register, not the rows counted above it:
+          // the label carries the size of what it opens.
+          linkLabel={
+            d
+              ? t("dashboard.view_all", { n: fleetSize(d) })
+              : t("dashboard.fleet.link")
+          }
+          linkHref="/equipment/assets"
+          // Its link opens every asset, not the ones counted here, so the rows
+          // past the first few have nowhere else to be read.
+          showAllLabel={t("common:dashboard.attention.showAll", {
+            count: attention.length,
+          })}
+          quiet={{
+            okText: t("dashboard.attention.quiet"),
+            linkLabel: t("dashboard.fleet.link"),
+            linkHref: "/equipment/assets",
+          }}
+          loading={dashboard.isLoading || overdue.isLoading || fleet.isLoading}
+          unavailable={
+            failed
+              ? {
+                  message: t("dashboard.attention.unavailable"),
+                  retryLabel: t("common:actions.retry"),
+                  partialLabel: t("common:dashboard.attention.partial"),
+                  onRetry: () => {
+                    if (dashboard.isError) void dashboard.refetch();
+                    if (overdue.isError) void overdue.refetch();
+                    if (fleet.isError) void fleet.refetch();
+                  },
+                }
+              : undefined
+          }
+        />
+      )}
 
       {/* The fleet's totals, one strip of four numbers: they used to sit on
           the inventory overview, where a stock reader met warranties. */}
@@ -176,13 +187,11 @@ function useAddAssetHeader() {
     setHeader({
       actions: canWrite ? (
         <div className="ml-auto">
-          {/* inline-flex on the anchor itself: an inline <a> around a 44px
-              button reports the line box — 21px — to anything that measures
-              it, while the button it wraps is already at the floor. */}
-          <Link to="/equipment/add" className="inline-flex">
-            <Button leftIcon={<Plus size={16} />}>
-              {t("dashboard.add_asset")}
-            </Button>
+          {/* The anchor itself wears the button's classes: a link around a
+              <button> is two tab stops and two names for one action. */}
+          <Link to="/equipment/add" className={buttonVariants()}>
+            <Plus size={16} />
+            {t("dashboard.add_asset")}
           </Link>
         </div>
       ) : undefined,

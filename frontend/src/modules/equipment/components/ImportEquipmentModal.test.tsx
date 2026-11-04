@@ -57,6 +57,7 @@ beforeEach(() => {
         imported: 11,
         failed: 1,
         skipped: 0,
+        skipped_serials: [],
         updated: 0,
         errors: [{ row: 7, error: "Serial number missing" }],
       });

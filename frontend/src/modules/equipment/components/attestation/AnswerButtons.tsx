@@ -7,6 +7,8 @@ interface AnswerButtonsProps {
   onConfirm: () => void;
   onReport: () => void;
   isPending: boolean;
+  /** How many assets the answer covers: the texts say "this" or "these". */
+  count: number;
 }
 
 /**
@@ -17,6 +19,7 @@ export function AnswerButtons({
   onConfirm,
   onReport,
   isPending,
+  count,
 }: AnswerButtonsProps) {
   const { t } = useTranslation("equipment");
   const [asking, setAsking] = useState(false);
@@ -25,7 +28,7 @@ export function AnswerButtons({
     return (
       <div className="space-y-3" role="group">
         <p className="font-semibold text-on">
-          {t("attestation.public.confirmAsk")}
+          {t("attestation.public.confirmAsk", { count })}
         </p>
         <div className="flex gap-3 flex-col sm:flex-row">
           <Button
@@ -36,7 +39,7 @@ export function AnswerButtons({
             <CheckCircle size={16} className="mr-2" />
             {isPending
               ? t("attestation.public.confirming")
-              : t("attestation.public.confirmYes")}
+              : t("attestation.public.confirmYes", { count })}
           </Button>
           <Button
             variant="outline"
@@ -55,7 +58,7 @@ export function AnswerButtons({
     <div className="flex gap-3 flex-col sm:flex-row">
       <Button className="w-full sm:w-auto" onClick={() => setAsking(true)}>
         <CheckCircle size={16} className="mr-2" />
-        {t("attestation.public.confirmButton")}
+        {t("attestation.public.confirmButton", { count })}
       </Button>
       <Button variant="outline" className="w-full sm:w-auto" onClick={onReport}>
         <AlertTriangle size={16} className="mr-2" />

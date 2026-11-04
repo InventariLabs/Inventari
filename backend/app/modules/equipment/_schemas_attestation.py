@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 
@@ -132,6 +132,12 @@ class AuditResponseSchema(BaseModel):
     # writes — the status it sits next to stays PENDING until a write
     # attempt moves it.
     closed_reason: str | None = None
+    # Who is asking and until which day, for the public page: a person who
+    # followed an emailed link has no other way to tell. Filled by the public
+    # GET only. ``deadline_day`` is a calendar day on the organization's own
+    # clock, never an instant.
+    organization_name: str | None = None
+    deadline_day: date | None = None
 
 
 class CampaignResponseSchema(AuditResponseSchema):
