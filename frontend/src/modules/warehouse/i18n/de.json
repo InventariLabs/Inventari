@@ -501,6 +501,8 @@
     "executionSummary": "Erledigt {{done}} / Geplant {{expected}}",
     "executionSummaryPerUnit": "Erledigt: {{progress}}",
     "correctionSummary": "Korrektur: +{{added}} / −{{removed}}",
+    "correctionAddsToStock": "kommt auf den Bestand",
+    "correctionTakesFromStock": "wird vom Bestand genommen",
     "snapshotTitle": "Betriebliche Übersicht",
     "snapshotLines": "Positionen",
     "snapshotPlanned": "Geplante Menge",
@@ -739,6 +741,8 @@
     "createSubtitle": "Mengen für Dokument {{number}} anpassen",
     "new": "Neue Korrektur",
     "warning": "Dadurch wird ein neues Korrekturdokument erstellt. Die Bestände werden bei Abschluss angepasst.",
+    "directionReceipt": "Eine positive Änderung bucht Ware auf den Bestand, eine negative nimmt sie vom Bestand.",
+    "directionDispatch": "Eine positive Änderung bedeutet, dass mehr ausgegeben wurde, und nimmt Ware vom Bestand; eine negative bedeutet, dass weniger ausgegeben wurde, und bucht die Ware zurück auf den Bestand.",
     "executed": "Ausgeführt",
     "delta": "Änderung",
     "minDelta": "Sie können höchstens {{max}} abziehen",
@@ -1363,6 +1367,7 @@
       "hint": "Dieses Produkt wird nach dem frühesten Verfall entnommen. Lesen Sie beides von der Verpackung ab.",
       "lot": "Charge",
       "lotPlaceholder": "Chargennummer (optional)",
+      "scanLot": "Chargennummer scannen",
       "expiry": "Verfallsdatum",
       "expiryRequired": "Geben Sie das Verfallsdatum von der Verpackung ein",
       "confirm": "Annehmen"
@@ -2150,6 +2155,13 @@
       "body": "Die Ware ist aus dem Bestand abgegangen.",
       "another": "Weitere ausgeben",
       "undoneTitle": "Warenausgang rückgängig gemacht"
+    },
+    "writeOff": {
+      "title_one": "{{count}} Position abgeschrieben",
+      "title_other": "{{count}} Positionen abgeschrieben",
+      "body": "Die Ware wurde vom Bestand abgeschrieben.",
+      "another": "Weitere abschreiben",
+      "undoneTitle": "Abschreibung rückgängig gemacht"
     },
     "move": {
       "title_one": "{{count}} Position umgelagert",

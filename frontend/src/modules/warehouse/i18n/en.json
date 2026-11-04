@@ -501,6 +501,8 @@
     "executionSummary": "Done {{done}} / planned {{expected}}",
     "executionSummaryPerUnit": "Done: {{progress}}",
     "correctionSummary": "Correction: +{{added}} / −{{removed}}",
+    "correctionAddsToStock": "added to stock",
+    "correctionTakesFromStock": "removed from stock",
     "snapshotTitle": "Operational snapshot",
     "snapshotLines": "Line items",
     "snapshotPlanned": "Planned qty",
@@ -739,6 +741,8 @@
     "createSubtitle": "Adjust quantities for document {{number}}",
     "new": "New correction",
     "warning": "This will create a new correction document. Stock levels will be adjusted when completed.",
+    "directionReceipt": "A positive change adds goods to stock; a negative one removes them.",
+    "directionDispatch": "A positive change means more was issued and removes goods from stock; a negative one means less was issued and puts them back.",
     "executed": "Executed",
     "delta": "Change",
     "minDelta": "You can remove up to {{max}}",
@@ -1363,6 +1367,7 @@
       "hint": "This product is taken by earliest expiry. Read both off the pack.",
       "lot": "Lot",
       "lotPlaceholder": "Lot number (optional)",
+      "scanLot": "Scan lot code",
       "expiry": "Expiry date",
       "expiryRequired": "Enter the expiry date from the pack",
       "confirm": "Receive"
@@ -2150,6 +2155,13 @@
       "body": "The goods have left stock.",
       "another": "Issue more",
       "undoneTitle": "Issue undone"
+    },
+    "writeOff": {
+      "title_one": "Wrote off 1 line",
+      "title_other": "Wrote off {{count}} lines",
+      "body": "The goods have been written off stock.",
+      "another": "Write off more",
+      "undoneTitle": "Write-off undone"
     },
     "move": {
       "title_one": "Moved 1 line",

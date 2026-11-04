@@ -563,6 +563,8 @@
     "executionSummary": "Wykonano {{done}} / Plan {{expected}}",
     "executionSummaryPerUnit": "Wykonano: {{progress}}",
     "correctionSummary": "Korekta: +{{added}} / −{{removed}}",
+    "correctionAddsToStock": "trafia na stan",
+    "correctionTakesFromStock": "schodzi ze stanu",
     "snapshotTitle": "Skrót operacyjny",
     "snapshotLines": "Pozycje",
     "snapshotPlanned": "Plan",
@@ -815,6 +817,8 @@
     "createSubtitle": "Koryguj ilości dokumentu {{number}}",
     "new": "Nowa korekta",
     "warning": "Zostanie utworzony nowy dokument korekty. Stany magazynowe zostaną zaktualizowane po zakończeniu.",
+    "directionReceipt": "Zmiana dodatnia dopisuje towar do stanu, ujemna zdejmuje go ze stanu.",
+    "directionDispatch": "Zmiana dodatnia oznacza, że wydano więcej i towar schodzi ze stanu; ujemna – że wydano mniej i towar wraca na stan.",
     "executed": "Wykonano",
     "delta": "Zmiana",
     "minDelta": "Możesz odjąć najwyżej {{max}}",
@@ -1477,6 +1481,7 @@
       "hint": "Ten produkt schodzi z półki według najwcześniejszego terminu. Odczytaj oba z opakowania.",
       "lot": "Partia",
       "lotPlaceholder": "Numer partii (opcjonalnie)",
+      "scanLot": "Zeskanuj numer partii",
       "expiry": "Termin ważności",
       "expiryRequired": "Wpisz termin ważności z opakowania",
       "confirm": "Przyjmij"
@@ -2318,6 +2323,15 @@
       "body": "Towar zszedł ze stanu.",
       "another": "Wydaj kolejne",
       "undoneTitle": "Wydanie cofnięte"
+    },
+    "writeOff": {
+      "title_one": "Spisano ze stanu {{count}} pozycję",
+      "title_few": "Spisano ze stanu {{count}} pozycje",
+      "title_many": "Spisano ze stanu {{count}} pozycji",
+      "title_other": "Spisano ze stanu {{count}} pozycji",
+      "body": "Towar został spisany ze stanu.",
+      "another": "Spisz kolejne",
+      "undoneTitle": "Spisanie cofnięte"
     },
     "move": {
       "title_one": "Przeniesiono {{count}} pozycję",

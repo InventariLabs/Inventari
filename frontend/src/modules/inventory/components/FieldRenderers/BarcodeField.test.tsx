@@ -10,6 +10,21 @@ vi.mock("@/lib/api/productTemplates", () => ({
   productTemplatesApi: { generateBarcode: () => generateBarcode() },
 }));
 
+// The camera is a live device; what the field does with a read is tested.
+vi.mock("./ScanCodeButton", () => ({
+  ScanCodeButton: ({
+    label,
+    onCode,
+  }: {
+    label: string;
+    onCode: (code: string) => void;
+  }) => (
+    <button type="button" onClick={() => onCode("5901234123457")}>
+      {label}
+    </button>
+  ),
+}));
+
 const barcodeField: FieldDefinition = {
   key: "barcode",
   type: "text",
@@ -49,6 +64,16 @@ describe("BarcodeField", () => {
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith("2000000000015"));
     expect(generateBarcode).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads the code printed on the product with the camera", async () => {
+    const onChange = renderField("");
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Scan product code" }),
+    );
+
+    expect(onChange).toHaveBeenCalledWith("5901234123457");
   });
 
   it("says what a generated code is beside the button and with the code", () => {

@@ -25,6 +25,7 @@ vi.mock("@/hooks/useDocumentCurrency", () => ({
   useDocumentCurrency: () => "USD",
 }));
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: () => ({
     isCameraActive: false,
     scannerError: null,

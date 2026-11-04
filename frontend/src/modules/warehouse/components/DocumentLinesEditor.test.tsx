@@ -10,6 +10,11 @@ const { searchResults, elsewhereResults, priceHint } = vi.hoisted(() => ({
   priceHint: vi.fn(),
 }));
 
+const torch = vi.hoisted(() => ({ available: true }));
+vi.mock("@/hooks/useTorchAvailable", () => ({
+  useTorchAvailable: () => torch.available,
+}));
+
 vi.mock("@/modules/warehouse/hooks/useProductSearch", () => ({
   useProductSearch: () => ({
     results: searchResults.current,

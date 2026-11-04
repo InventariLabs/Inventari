@@ -23,6 +23,7 @@ import { unitLabel } from "@/lib/i18nHelpers";
 import { ShipmentFields } from "../shipping/ShipmentFields";
 import {
   EMPTY_SHIPMENT,
+  type ShipmentDraft,
   shipmentError,
   shipmentPayload,
 } from "../shipping/shipmentDraft";
@@ -44,7 +45,7 @@ interface Props {
    * the document's Pack step instead of completing it. Offered only for a
    * dispatch, which is also what asks for the carrier here — and shown only
    * over that one document. */
-  onPack?: () => void;
+  onPack?: (shipment: ShipmentDraft) => void;
   /** Takes a skip back: the line returns to the list to be picked. */
   onUndoSkip?: (line: WmsPickLine) => void;
   /** Answers a skipped line as nothing picked, under the code the person
@@ -218,7 +219,7 @@ export default function WmsPickingSummary({
   };
 
   const pack = () => {
-    if (!skipsUnanswered()) onPack?.();
+    if (!skipsUnanswered()) onPack?.(shipment);
   };
 
   const picked = lines.filter((ln) => ln.status === "picked");

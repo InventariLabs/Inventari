@@ -14,6 +14,7 @@ import {
 } from "@/modules/warehouse/components/todo/WorkItemRow";
 import {
   actionLabel,
+  workItemNumber,
   workItemSentence,
   workItemTarget,
 } from "@/modules/warehouse/components/todo/workItemText";
@@ -143,7 +144,9 @@ function Whose({ item }: { item: WorkItem }) {
       )}
       <span className="flex-1" />
       {item.number && item.kind !== "custom" && (
-        <span className="break-all text-on-muted">{item.number}</span>
+        <span className="break-all text-on-muted">
+          {workItemNumber(t, item)}
+        </span>
       )}
     </div>
   );
