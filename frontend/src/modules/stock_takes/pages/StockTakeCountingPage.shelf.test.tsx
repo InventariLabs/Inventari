@@ -20,7 +20,10 @@ import { signInWith } from "@/test/auth";
 import StockTakeCountingPage from "./StockTakeCountingPage";
 import { onePage } from "@/test/mocks/page";
 
-vi.mock("@/hooks/useScanCamera", () => ({ useScanCamera: vi.fn() }));
+vi.mock("@/hooks/useScanCamera", () => ({
+  useScanCamera: vi.fn(),
+  useTorchAvailable: () => false,
+}));
 vi.mock("@/lib/api/labels", () => ({ labelsApi: { scan: vi.fn() } }));
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), {

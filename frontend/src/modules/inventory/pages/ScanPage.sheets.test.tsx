@@ -39,6 +39,7 @@ vi.mock("@/lib/api/labels", () => ({
 }));
 
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: ({
     onCodeScanned,
   }: {

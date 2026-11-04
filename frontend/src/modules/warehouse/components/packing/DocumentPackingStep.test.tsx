@@ -23,7 +23,10 @@ vi.mock("@/utils/helpers", async (importOriginal) => ({
   downloadBlob,
 }));
 
-const location = vi.hoisted(() => ({ hash: "" }));
+const location = vi.hoisted(() => ({
+  hash: "",
+  state: null as unknown,
+}));
 vi.mock("react-router-dom", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react-router-dom")>()),
   useLocation: () => ({ ...location, pathname: "/warehouse/documents/doc-1" }),
@@ -239,6 +242,7 @@ describe("DocumentPackingStep", () => {
   afterEach(() => {
     signOut();
     location.hash = "";
+    location.state = null;
   });
 
   beforeEach(() => {
@@ -567,6 +571,19 @@ describe("DocumentPackingStep", () => {
       carrier: "InPost",
       tracking_number: "6200 1234",
     });
+  });
+
+  it("starts with the carrier the picking summary already took", async () => {
+    const user = userEvent.setup();
+    const onComplete = vi.fn();
+    packingServer();
+    location.state = { shipment: { carrier: "InPost", trackingNumber: "" } };
+    renderStep(pickedDispatch(), { onComplete });
+
+    expect(await screen.findByLabelText("Carrier")).toHaveValue("InPost");
+    await user.click(screen.getByRole("button", { name: "Complete dispatch" }));
+
+    expect(onComplete).toHaveBeenCalledWith({ carrier: "InPost" });
   });
 
   it("asks for the carrier of a tracking number typed alone", async () => {

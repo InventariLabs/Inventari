@@ -206,6 +206,18 @@ describe("PostedActionResult", () => {
     ).toBeInTheDocument();
   });
 
+  it("ends a write-off on a write-off result, not on an issue", () => {
+    renderResult(posted({ type: "SCRAP", number: "SCR/2026/001" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Wrote off 2 lines" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Write off more" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Issued/)).not.toBeInTheDocument();
+  });
+
   it("says a document stopped for approval moves stock later, with nothing to undo", () => {
     renderResult(posted({ status: "PENDING_APPROVAL" }));
 

@@ -1,6 +1,7 @@
 import { Barcode } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
+import { ScanCodeButton } from "./ScanCodeButton";
 import { useGenerateProductCode } from "@/modules/inventory/hooks/useItemMutations";
 import type { FieldDefinition } from "@/types";
 import { DefaultInputField } from "./DefaultInputField";
@@ -16,7 +17,8 @@ interface BarcodeFieldProps {
 }
 
 /**
- * The product code, with a way to get one for a product that came without.
+ * The product code: read off the pack by the camera, or — for a product that
+ * came without — generated.
  *
  * A workshop's own goods carry no manufacturer's code, and the field was the
  * one place a scan door looks a product up by — so "Generate code" fills it
@@ -66,6 +68,10 @@ export function BarcodeField({
             {t("fields.generateCode")}
           </Button>
         )}
+      </div>
+      {/* The code printed on the product is read, not retyped. */}
+      <div className="mt-2">
+        <ScanCodeButton label={t("fields.scanCode")} onCode={onChange} />
       </div>
       {(empty || internal) && (
         <p className="text-xs text-on-muted mt-1.5">
