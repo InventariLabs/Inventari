@@ -186,6 +186,34 @@ describe("useStockTakeCounting", () => {
     );
   });
 
+  // Nothing is not zero: a Save on an empty (or unreadable) box must not turn
+  // "not counted" into "counted none".
+  it.each(["", "1.34.13"])(
+    "sends nothing when the box holds %j",
+    async (text) => {
+      const saved = vi.fn();
+      server.use(
+        http.patch("/api/v1/stock-takes/:id/items/:itemId/count", () => {
+          saved();
+          return HttpResponse.json({});
+        }),
+      );
+      const { result } = await renderLoaded();
+
+      act(() => {
+        result.current.handleQuantityChange("item-1", text);
+      });
+      act(() => {
+        result.current.handleSaveItem("item-1");
+      });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+
+      expect(saved).not.toHaveBeenCalled();
+    },
+  );
+
   it("handles API error gracefully", async () => {
     server.use(
       http.get("/api/v1/stock-takes/:id", () =>

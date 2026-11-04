@@ -242,7 +242,10 @@ export function useStockTakeCounting(id: string | undefined) {
     // PATCH …/items/{StockTakeItem.id}/count; only items found outside
     // the list go through the surplus endpoint (POST …/items).
     const line = getStockTakeItem(itemId);
-    const quantity = countedAmount(text) ?? 0;
+    // An empty or unreadable box is no count: saving it as 0 would turn
+    // "not counted" into "counted none" and zero the stock on completion.
+    const quantity = countedAmount(text);
+    if (quantity === null) return;
     const itemNotes = notes[itemId] || "";
     const reason = reasons[itemId] ?? { code: "" as const, note: "" };
 
