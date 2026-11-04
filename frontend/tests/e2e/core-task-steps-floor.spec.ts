@@ -434,6 +434,10 @@ defineStepTask({
     await page
       .getByRole("button", { name: `Save the count for ${seed.product}` })
       .click();
+    // Wait for the saved count to return before completing the stock take.
+    await expect(
+      page.getByRole("button", { name: "Discrepancies (1)" }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Complete stock take" }).click();
     await page
       .getByRole("alertdialog")

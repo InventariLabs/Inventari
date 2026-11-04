@@ -110,7 +110,7 @@ test.describe("Maker — financial result (Phase C)", () => {
     // Currency symbol depends on the org's setting (PLN on a fresh stack,
     // USD on a hand-configured one) — assert the numbers, not the symbol.
     await expect(card).toContainText(/25\.00/);
-    await expect(card).toContainText(/12\.50 per unit/);
+    await expect(card).toContainText(/12\.50 per pcs\./);
   });
 
   test("production's start aggregates the monthly result", async ({
