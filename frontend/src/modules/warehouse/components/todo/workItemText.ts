@@ -1,6 +1,7 @@
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { TranslateFn } from "@/types/i18n";
 import type { WorkItem } from "@/modules/warehouse/types";
+import { documentTitle } from "@/modules/warehouse/lib/documentTitle";
 
 const INBOUND_TYPES = new Set(["IN", "INTERNAL_IN"]);
 
@@ -77,13 +78,21 @@ export function workItemTarget(item: WorkItem): string {
   }
 }
 
+/** The document a task is about, in the words a document is called elsewhere:
+ * a draft has no number yet, and its raw identifier reads as an error. */
+export function workItemNumber(t: TranslateFn, item: WorkItem): string {
+  const number = item.number ?? "";
+  if (!number || !item.document_type) return number;
+  return documentTitle(t, { number, type: item.document_type });
+}
+
 /** What the task asks of the reader, as a sentence: who it is for and how
  * much of it. Each sentence is a literal key, so the unused-key check sees
  * them all and each language orders its own words. */
 export function workItemSentence(t: TranslateFn, item: WorkItem): string {
   if (item.sentence) return item.sentence;
   const subject = item.subject ?? "";
-  const number = item.number ?? "";
+  const number = workItemNumber(t, item);
   const lead = leadSentence(t, item, subject, number);
   const lines = Number(item.count ?? 0);
   const showsLines =

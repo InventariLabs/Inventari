@@ -108,7 +108,7 @@ export function ModuleTile({
         </div>
         <span
           className={cn(
-            "text-xs font-medium text-center leading-tight line-clamp-2 w-full px-0.5",
+            "text-xs font-medium text-center leading-tight line-clamp-2 w-full px-0.5 hyphens-auto break-words",
             hasColor ? "text-on" : "text-on-muted",
           )}
         >

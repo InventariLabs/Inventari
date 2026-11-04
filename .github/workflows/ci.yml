@@ -584,7 +584,9 @@ jobs:
         env:
           VITE_API_URL: http://localhost:5173
           CI: "true"
-        run: npx playwright test --reporter=github
+        # `html` as well: the report the upload below looks for is written by
+        # this reporter, and `github` alone left nothing to upload.
+        run: npx playwright test --reporter=github,html
 
       # The debug step above only fires when the readiness check fails, so a
       # spec failing against a 500 showed the browser's view and nothing of the

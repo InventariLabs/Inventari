@@ -323,7 +323,10 @@ function App({ initialEntries }: AppProps = {}) {
 
   return (
     <Suspense fallback={<LoadingSpinner fullScreen />}>
-      <RouterProvider key={routerKey} router={router} />
+      {/* No transitions: a tap on a screen not downloaded yet would keep the old
+          screen up, with the new address, until the chunk landed — no sign the
+          tap did anything. The nearest boundary answers at once instead. */}
+      <RouterProvider key={routerKey} router={router} useTransitions={false} />
     </Suspense>
   );
 }

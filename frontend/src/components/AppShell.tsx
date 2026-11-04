@@ -13,6 +13,7 @@ import { Settings, Search, ChevronLeft } from "lucide-react";
 import { useModules } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
 import { BrandLogo } from "@/components/ui/BrandLogo";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useProfileTheme } from "@/hooks/useProfileTheme";
 import { useActiveProfile } from "@/hooks/useActiveProfile";
 import { useRoleCheck } from "@/hooks/useHasRole";
@@ -398,7 +399,10 @@ export default function AppShell() {
               : "min-h-[calc(100dvh-3.5rem)]",
           )}
         >
-          <Outlet />
+          {/* A screen on its way keeps the shell around it. */}
+          <Suspense fallback={<LoadingSpinner />}>
+            <Outlet />
+          </Suspense>
         </div>
       </main>
 

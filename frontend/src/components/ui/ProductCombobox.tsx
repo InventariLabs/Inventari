@@ -26,6 +26,10 @@ function characterCount(text: string): number {
   return Array.from(text).length;
 }
 
+function samePlace(a: DOMRect, b: DOMRect): boolean {
+  return a.top === b.top && a.left === b.left;
+}
+
 /**
  * A name past the search limit is searched by its opening, so a product that
  * only shares that opening is listed and the "add as new" panel would
@@ -503,6 +507,8 @@ export function ProductCombobox<T extends ProductComboboxOption>({
     width: number;
     maxHeight: number;
   } | null>(null);
+  // Counts the input's moves that were no scroll, to place the panel again.
+  const [inputMoves, setInputMoves] = useState(0);
 
   useEffect(() => {
     if (!dropdownOpen) {
@@ -531,7 +537,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, [dropdownOpen, results.length, showEmpty, showLoading]);
+  }, [dropdownOpen, results.length, showEmpty, showLoading, inputMoves]);
 
   // Close when the form scrolls under the fixed panel — otherwise the
   // suggestions drift away from the input they belong to. Only a scroll of
@@ -545,23 +551,42 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // box, a focus scroll-into-view), so it can arrive for a list that opened
   // after the move, with the input exactly where it was. Closing then wiped a
   // correct query. The list closes only when the input really moved.
+  //
+  // Nor can a scroll be judged while the input is on its way somewhere. A sheet
+  // slides in from below the fold with the focus already in it, so the browser
+  // scrolls the document to the input and takes that back frame by frame as the
+  // sliding sheet stops overflowing it: real scroll events and a real move, with
+  // nobody scrolling, and a box filled at machine speed can have its list open
+  // by then. So a frame checks whether the input came to rest, and carries the
+  // panel along if not. A scroll closes the list only when it finds an input
+  // that stood still until now, which the first scroll of a reader's always does.
   useEffect(() => {
     if (!dropdownOpen) return;
-    const origin = inputRef.current?.getBoundingClientRect();
+    let lastSeen = inputRef.current?.getBoundingClientRect();
+    let atRest = false;
+    let frame = requestAnimationFrame(function follow() {
+      const now = inputRef.current?.getBoundingClientRect();
+      if (now && lastSeen) {
+        atRest = samePlace(now, lastSeen);
+        if (!atRest) setInputMoves((count) => count + 1);
+      }
+      lastSeen = now;
+      frame = requestAnimationFrame(follow);
+    });
     const onScroll = (e: Event) => {
       const scrolled = e.target as Node;
       const input = inputRef.current;
       const holdsInput =
         scrolled === document ||
         (scrolled !== input && scrolled.contains(input));
-      if (!holdsInput || !origin || !input) return;
-      const now = input.getBoundingClientRect();
-      if (Math.abs(now.top - origin.top) + Math.abs(now.left - origin.left) < 1)
-        return;
-      reset();
+      if (!holdsInput || !atRest || !lastSeen || !input) return;
+      if (!samePlace(lastSeen, input.getBoundingClientRect())) reset();
     };
     window.addEventListener("scroll", onScroll, true);
-    return () => window.removeEventListener("scroll", onScroll, true);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll, true);
+    };
   }, [dropdownOpen]);
 
   return (

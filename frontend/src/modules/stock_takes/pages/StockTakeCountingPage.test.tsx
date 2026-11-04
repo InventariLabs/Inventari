@@ -1,3 +1,4 @@
+import { useCallback, useState, type ReactNode } from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   fireEvent,
@@ -13,6 +14,7 @@ import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import StockTakeCountingPage from "./StockTakeCountingPage";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
+import { toast } from "sonner";
 
 import { signInWith } from "@/test/auth";
 import { onePage } from "@/test/mocks/page";
@@ -623,6 +625,105 @@ describe("StockTakeCountingPage", () => {
       expect(patches[0].discrepancy_reason).toBe("Two crates went to the fair");
     });
   });
+  describe("finishing right after a save", () => {
+    it("waits for the saved row before it lets the count be finished", async () => {
+      const counted = { value: null as number | null };
+      let answerReads = () => {};
+      const readsHeld = new Promise<void>((resolve) => {
+        answerReads = resolve;
+      });
+      let reads = 0;
+      vi.mocked(toast.error).mockClear();
+      server.use(
+        http.get("/api/v1/stock-takes/1", async () => {
+          reads += 1;
+          // The first read draws the page; those after the save wait here.
+          if (reads > 1) await readsHeld;
+          return HttpResponse.json({
+            id: "1",
+            name: "Stock Take 1",
+            location_id: "1",
+            location_name: "Fridge",
+            status: "in_progress",
+            require_full_count: true,
+            items_count: 1,
+            items: [
+              {
+                id: "sti-1",
+                item_id: "1",
+                item_name: "Milk",
+                name: "Milk",
+                system_quantity: 2,
+                counted_quantity: counted.value,
+              },
+            ],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }),
+        http.patch("/api/v1/stock-takes/1/items/sti-1/count", () => {
+          counted.value = 2;
+          return HttpResponse.json({ id: "sti-1" });
+        }),
+      );
+      // The page's buttons reach the screen through setHeader.
+      const Header = () => {
+        const [actions, setActions] = useState<ReactNode>(null);
+        const setHeader = useCallback(
+          (header: { actions?: ReactNode }) => setActions(header.actions),
+          [],
+        );
+        return (
+          <PageHeaderContext.Provider value={{ data: {}, setHeader }}>
+            <div>{actions}</div>
+            <StockTakeCountingPage />
+          </PageHeaderContext.Provider>
+        );
+      };
+      render(
+        <MemoryRouter initialEntries={["/stock-takes/1"]}>
+          <Routes>
+            <Route
+              path="/stock-takes/:id"
+              element={
+                <QueryClientProvider client={queryClient}>
+                  <Header />
+                </QueryClientProvider>
+              }
+            />
+          </Routes>
+        </MemoryRouter>,
+      );
+      const user = userEvent.setup();
+      const box = await screen.findByRole("textbox", {
+        name: "Counted quantity of Milk",
+      });
+      await user.type(box, "2");
+      const complete = screen.getByTestId("stock-take-complete-btn");
+      expect(complete).toBeEnabled();
+
+      await user.click(
+        screen.getByRole("button", { name: "Save the count for Milk" }),
+      );
+      // Pressed in this moment, the rows on screen would still read "not
+      // counted" and the count would be refused for a product just counted.
+      expect(complete).toBeDisabled();
+
+      await waitFor(() => expect(reads).toBeGreaterThan(1));
+      expect(complete).toBeDisabled();
+      answerReads();
+      await waitFor(() => expect(complete).toBeEnabled());
+
+      await user.click(complete);
+      expect(
+        await screen.findByRole("alertdialog", {
+          name: "Complete stock take",
+        }),
+      ).toBeInTheDocument();
+      expect(toast.error).not.toHaveBeenCalled();
+    });
+  });
+
   describe("counting a row again", () => {
     const row = (extra: Record<string, unknown>) => ({
       id: "1",

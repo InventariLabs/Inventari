@@ -273,10 +273,16 @@ export default function StatsPage() {
         {isAdmin && (
           <Link
             to="/settings/modules/stats"
-            className="ml-auto inline-flex shrink-0 items-center gap-1 whitespace-nowrap pb-2 pl-2 text-sm text-on-secondary hover:text-on"
+            // Icon only on a phone: the words took 130 of 360 px and left the
+            // tabs one and a half in view, the third one off the screen.
+            aria-label={t("common:settings.moduleSettings.open")}
+            title={t("common:settings.moduleSettings.open")}
+            className="ml-auto inline-flex h-11 min-w-11 shrink-0 items-center justify-center gap-1 whitespace-nowrap text-sm text-on-secondary hover:text-on sm:h-auto sm:min-w-0 sm:justify-start sm:pb-2 sm:pl-2"
           >
             <Settings size={14} />
-            {t("common:settings.moduleSettings.open")}
+            <span className="hidden sm:inline">
+              {t("common:settings.moduleSettings.open")}
+            </span>
           </Link>
         )}
       </nav>

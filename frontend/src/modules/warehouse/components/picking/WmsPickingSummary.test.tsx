@@ -85,6 +85,27 @@ describe("WmsPickingSummary", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it("takes the carrier already typed along to packing", async () => {
+    const user = userEvent.setup();
+    const onPack = vi.fn();
+    render(
+      <WmsPickingSummary
+        session={session}
+        lines={[picked]}
+        onClose={vi.fn()}
+        onPack={onPack}
+      />,
+    );
+
+    await user.type(screen.getByLabelText("Carrier"), "InPost");
+    await user.click(screen.getByRole("button", { name: "Pack" }));
+
+    expect(onPack).toHaveBeenCalledWith({
+      carrier: "InPost",
+      trackingNumber: "",
+    });
+  });
+
   it("opens without raising the keyboard on the optional carrier", () => {
     render(
       <WmsPickingSummary

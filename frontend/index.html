@@ -12,9 +12,22 @@
     <meta name="theme-color" content="#14b8a6" />
     <meta name="description" content="Inventari — you know what you have, and where. Self-hosted, modular inventory management." />
     <title>Inventari</title>
+    <!-- The first open waits for the bundle, seconds on a phone network, and
+         until it lands nothing but this file can speak. Inline style only: the
+         origin's policy allows it and refuses inline script, so this follows
+         the system's colour scheme, not a theme stored by the application.
+         Every rule is on `.boot`, which React removes: nothing here may outlive
+         it and compete with the application's own stylesheet. -->
+    <style>
+      .boot { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #fff; font: 600 16px system-ui, sans-serif; color: #059669; }
+      .boot i { width: 32px; height: 32px; box-sizing: border-box; border: 3px solid; border-right-color: transparent; border-radius: 50%; animation: boot-spin 1s linear infinite; }
+      @keyframes boot-spin { to { transform: rotate(360deg); } }
+      @media (prefers-color-scheme: dark) { .boot { background: #27272a; } }
+      @media (prefers-reduced-motion: reduce) { .boot i { animation: none; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="boot" role="status" aria-label="Loading"><i></i>Inventari</div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

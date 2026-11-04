@@ -33,6 +33,68 @@ describe("ItemEditModal", () => {
     });
   });
 
+  describe("opened from a row about a date", () => {
+    let scrollIntoView: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      scrollIntoView = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+      // A dated record: the expiry field belongs to a category that keeps dates.
+      server.use(
+        http.get("/api/v1/items/:id", () =>
+          HttpResponse.json({
+            id: "1",
+            name: "Test Item",
+            quantity: 10,
+            unit: "pcs",
+            category_id: "77",
+            expiry_date: "2026-10-29",
+            added_date: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }),
+        ),
+        http.get("/api/v1/categories", () =>
+          HttpResponse.json(
+            onePage([
+              {
+                id: "77",
+                name: "Dairy",
+                sort_order: 1,
+                field_definitions: [
+                  {
+                    key: "expiry_date",
+                    type: "date",
+                    label: "Expiry date",
+                    visible: true,
+                    required: false,
+                  },
+                ],
+              },
+            ]),
+          ),
+        ),
+      );
+    });
+    afterEach(() => scrollIntoView.mockRestore());
+
+    it("brings the expiry date into view, the reason the row was tapped", async () => {
+      render(<ItemEditModal itemId="1" onClose={() => {}} openAtExpiry />);
+      await screen.findByDisplayValue(/Test Item/i);
+
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
+      expect(scrollIntoView.mock.contexts[0]).toHaveAttribute(
+        "data-field-key",
+        "expiry_date",
+      );
+    });
+
+    it("opens at the top when nothing asked for the date", async () => {
+      render(<ItemEditModal itemId="1" onClose={() => {}} />);
+      await screen.findByDisplayValue(/Test Item/i);
+
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    });
+  });
+
   it("should render edit modal with item data", async () => {
     render(<ItemEditModal itemId="1" onClose={() => {}} />);
 

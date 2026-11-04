@@ -143,12 +143,16 @@ export default function InventoryDashboard() {
         actions={
           // The suggestions become a shopping list, so the door is the
           // shopping lists' to draw. `contents` keeps the slot's wrapper out
-          // of the row: an empty one would still take a gap.
-          <TypedSlot
-            name="dashboard_replenish_action"
-            data={{ onOpen: () => setIsReplenishOpen(true) }}
-            className="contents"
-          />
+          // of the row: an empty one would still take a gap. An organization
+          // with no products has nothing to replenish, and the slot's rule
+          // about stock in use elsewhere would explain an absence nobody sees.
+          productPage && productPage.total > 0 ? (
+            <TypedSlot
+              name="dashboard_replenish_action"
+              data={{ onOpen: () => setIsReplenishOpen(true) }}
+              className="contents"
+            />
+          ) : undefined
         }
       />
 

@@ -280,4 +280,41 @@ describe("StockTakeItemCard — identical records of one product", () => {
       screen.getByRole("textbox", { name: /Counted quantity/ }),
     ).toHaveAttribute("aria-invalid", "true");
   });
+  // Nothing is not zero: with an empty box the Save has nothing to record.
+  it("keeps Save disabled while the box holds no number", () => {
+    const withText = (counted: string) => (
+      <StockTakeItemCard
+        itemId="cable-1"
+        item={undefined}
+        stockTakeItem={undefined}
+        counted={counted}
+        savedCount={null}
+        discrepancy={null}
+        isSaved={false}
+        isUnsaved={true}
+        isUpdatePending={false}
+        isInProgress={true}
+        blindMode={true}
+        note=""
+        awaitingRecount={false}
+        counts={[]}
+        onRequestRecount={() => {}}
+        reasonCode=""
+        reasonNote=""
+        showReasonErrors={false}
+        onReasonChange={() => {}}
+        onNoteChange={() => {}}
+        onQuantityChange={() => {}}
+        onQuantityStep={() => {}}
+        onSave={() => {}}
+      />
+    );
+    const { rerender } = render(withText(""));
+    const save = () => screen.getByRole("button", { name: /Save the count/i });
+    expect(save()).toBeDisabled();
+    rerender(withText("1.34.13"));
+    expect(save()).toBeDisabled();
+    rerender(withText("0"));
+    expect(save()).toBeEnabled();
+  });
 });

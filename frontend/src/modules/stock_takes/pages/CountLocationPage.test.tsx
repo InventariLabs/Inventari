@@ -20,6 +20,7 @@ const camera = vi.hoisted(() => ({
 // The page draws its camera panel closed; what matters here is the code the
 // camera would hand over, which takes the same road as a typed one.
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: (options: { onCodeScanned: (code: string) => void }) => {
     camera.onCode = options.onCodeScanned;
     return {

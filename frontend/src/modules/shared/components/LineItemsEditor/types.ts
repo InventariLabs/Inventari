@@ -120,6 +120,8 @@ export interface LineItemsScanState {
   error: string | null;
   cameraActive: boolean;
   torchOn: boolean;
+  /** The camera that started has a torch; without one no button is drawn. */
+  torchAvailable: boolean;
   onToggle: () => void;
   onToggleTorch: () => void;
   /**

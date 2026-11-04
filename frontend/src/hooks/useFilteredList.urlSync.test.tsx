@@ -116,6 +116,38 @@ function useWritableSubject() {
 }
 
 describe("useFilteredList — explicit URL writes", () => {
+  // The router commits an address in a transition, so a second tap can arrive
+  // while the screen still renders the address from before the first one. On a
+  // busy phone the first chip dropped out of the address, and the sync back
+  // from the address then switched it off under the reader's thumb.
+  it("keeps a chip ticked before the address of the last one was rendered", async () => {
+    const { result } = renderHook(useWritableSubject, {
+      wrapper: wrapperFor("/items"),
+    });
+    await act(async () => {
+      result.current.list.setFilter("expiringFilter", true);
+      await Promise.resolve();
+      result.current.list.setFilter("expiredFilter", true);
+    });
+    expect(
+      new URLSearchParams(result.current.location.search).get("filter"),
+    ).toBe("expiring,expired");
+    expect(result.current.list.values.expiringFilter).toBe(true);
+    expect(result.current.list.values.expiredFilter).toBe(true);
+  });
+
+  it("builds on an address someone else navigated to, not on its own last write", () => {
+    const { result } = renderHook(useWritableSubject, {
+      wrapper: wrapperFor("/items"),
+    });
+    act(() => result.current.list.setFilter("expiringFilter", true));
+    act(() => result.current.navigate("/items?location_id=bay-3"));
+    act(() => result.current.list.setFilter("expiredFilter", true));
+    const params = new URLSearchParams(result.current.location.search);
+    expect(params.get("location_id")).toBe("bay-3");
+    expect(params.get("filter")).toBe("expired");
+  });
+
   it("clears a linked filter from the address and keeps it cleared on reload", () => {
     const { result, unmount } = renderHook(useWritableSubject, {
       wrapper: wrapperFor("/items?location_id=bay-3&unrelated=kept"),

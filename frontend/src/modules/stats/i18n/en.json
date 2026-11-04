@@ -49,8 +49,10 @@
     },
     "alerts": {
       "total": "Total alerts",
+      "totalHint": "Dates, forgotten products, missing staples; not low stock",
       "types": {
         "forgotten": "Forgotten items",
+        "forgottenHint": "Untouched for 60 days or more",
         "staple": "Missing staples",
         "expiring": "Expiring soon",
         "expired": "Expired",

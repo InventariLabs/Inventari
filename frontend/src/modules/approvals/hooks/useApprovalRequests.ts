@@ -102,6 +102,10 @@ export function useCancelRequest() {
       // the card kept the pending state until a reload.
       qc.invalidateQueries({ queryKey: queryKeys.documents.all });
       qc.invalidateQueries({ queryKey: queryKeys.documents.approvalAll });
+      // The same for a purchase order: a withdrawn request turns its
+      // approval-requirement answer from "an open request" into the verdict
+      // on a new one, which the card's Request approval asks with.
+      qc.invalidateQueries({ queryKey: queryKeys.purchaseOrders.all });
     },
   );
 }

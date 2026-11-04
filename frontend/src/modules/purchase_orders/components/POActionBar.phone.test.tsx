@@ -65,6 +65,15 @@ describe("POActionBar — the phone menu and a withdrawn request", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("keeps the main next step on the header row, outside the menu", async () => {
+    const props = renderBar(order());
+    // No menu opened: the receive button is already on the page.
+    await userEvent.click(
+      screen.getByRole("button", { name: "Receive delivery" }),
+    );
+    expect(props.onReceive).toHaveBeenCalledTimes(1);
+  });
+
   it("says under a disabled action why it cannot run", async () => {
     renderBar(order({ partner_id: null }));
     await userEvent.click(screen.getByRole("button", { name: "More actions" }));
