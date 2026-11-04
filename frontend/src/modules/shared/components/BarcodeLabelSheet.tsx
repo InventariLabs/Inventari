@@ -151,7 +151,7 @@ export function BarcodeLabelSheet({ target, onClose }: BarcodeLabelSheetProps) {
             <Checkbox
               id="product-label-details"
               label={t("labels:productLabel.details")}
-              checked={options.details}
+              checked={options.details && preview.withDetails !== 0}
               disabled={preview.withDetails === 0}
               onChange={(e) =>
                 setOptions((o) => ({ ...o, details: e.target.checked }))

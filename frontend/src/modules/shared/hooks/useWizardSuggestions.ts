@@ -66,3 +66,21 @@ export function useWizardSuggestions(
     filteredParentSuggestions,
   };
 }
+
+/**
+ * The name field after a chip is tapped. A chip fills an empty field, swaps
+ * one chip for another and completes a half-typed word, but it never throws
+ * away a name that was typed: "Rack A" stays when "Rack" is tapped.
+ */
+export function nameAfterChip(
+  typed: string,
+  chip: string,
+  suggestions: readonly string[],
+): string {
+  const current = typed.trim().toLowerCase();
+  const replaceable =
+    current === "" ||
+    chip.toLowerCase().startsWith(current) ||
+    suggestions.some((s) => s.toLowerCase() === current);
+  return replaceable ? chip : typed;
+}

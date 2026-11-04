@@ -1082,7 +1082,7 @@ describe("DocumentsLocationsPage — codes and shelf labels", () => {
 
     expect(
       await screen.findByText(
-        "Locations below the top level take their codes from the template {zone}-{rack:02}-{level:02}, one level after another: A, A-01, A-01-01. The top-level location keeps its own code.",
+        "Locations below the top level are numbered one level after another: A, A-01, A-01-01. The top-level location keeps its own code.",
       ),
     ).toBeInTheDocument();
   });
@@ -1392,7 +1392,7 @@ describe("DocumentsLocationsPage — codes and shelf labels", () => {
     serveOverview();
     render(<DocumentsLocationsPage />);
 
-    await screen.findByText(/take their codes from the template/);
+    await screen.findByText(/numbered one level after another/);
     expect(
       screen.queryByRole("button", { name: "Renumber by template" }),
     ).not.toBeInTheDocument();

@@ -1184,7 +1184,7 @@
       "storage": "Lagerort",
       "codes": {
         "title": "Lagerortcodes",
-        "tree": "Die Orte in diesem Lager erhalten ihre Codes nach der Vorlage {{template}}, Ebene für Ebene: {{examples}}. Das Lager selbst behält seinen eigenen Code.",
+        "tree": "Die Orte in diesem Lager erhalten ihre Codes Ebene für Ebene: {{examples}}. Das Lager selbst behält seinen eigenen Code.",
         "random": "Zufällige Codes nach {{prefix}}, etwa {{prefix}}-7KQ2.",
         "editTemplate": "Codevorlage",
         "renumber": "Nach Vorlage neu nummerieren",

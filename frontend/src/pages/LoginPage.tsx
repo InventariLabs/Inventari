@@ -39,7 +39,13 @@ export default function LoginPage() {
   // is caught in Mailpit beside it. The notice is the demo's own statement
   // that this address is not private and nothing leaves the stack.
   const demoInboxUrl = initStatus?.demo_inbox_url;
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  // Sign-up and joining by invitation send the address just used along, so
+  // the first sign-in does not ask for it again.
+  const justRegistered = (location.state as { email?: unknown } | null)?.email;
+  const [email, setEmail] = useState(
+    typeof justRegistered === "string" ? justRegistered : "",
+  );
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOpeningDemo, setIsOpeningDemo] = useState(false);
@@ -51,7 +57,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   // Set by PrivateRoute: the address the reader was sent away from. Only an
   // in-app path is followed, never a scheme or protocol-relative address.
-  const asked = (useLocation().state as { from?: unknown } | null)?.from;
+  const asked = (location.state as { from?: unknown } | null)?.from;
   const from =
     typeof asked === "string" && /^\/(?![/\\])/.test(asked) ? asked : null;
 
