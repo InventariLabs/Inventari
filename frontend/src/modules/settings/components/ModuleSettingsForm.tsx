@@ -81,6 +81,37 @@ function toSchemaShape(flat: Record<string, unknown>): Record<string, unknown> {
   return out;
 }
 
+/**
+ * The sentence for a number outside the schema's bounds, or null.
+ *
+ * The browser's own bubble answers in the browser's language, not the app's,
+ * so the form switches it off (`noValidate`) and says the same thing itself —
+ * for the bounds and for the whole-number check `noValidate` takes away too.
+ */
+function rangeError(
+  field: ModuleSettingsField,
+  value: unknown,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string | null {
+  const isNumber = field.type === "integer" || field.type === "number";
+  if (!isNumber || typeof value !== "number" || Number.isNaN(value)) {
+    return null;
+  }
+  if (field.type === "integer" && !Number.isInteger(value)) {
+    return t("settings.moduleSettings.notWholeNumber");
+  }
+  const { minimum: min, maximum: max } = field;
+  const below = min !== undefined && value < min;
+  const above = max !== undefined && value > max;
+  if (!below && !above) return null;
+  if (min !== undefined && max !== undefined) {
+    return t("settings.moduleSettings.outOfRangeBetween", { min, max });
+  }
+  return below
+    ? t("settings.moduleSettings.outOfRangeMin", { min })
+    : t("settings.moduleSettings.outOfRangeMax", { max });
+}
+
 function isMasked(value: unknown): boolean {
   return typeof value === "string" && value === MASKED_VALUE;
 }
@@ -167,8 +198,13 @@ export function ModuleSettingsForm({
     return toSchemaShape(payload);
   }
 
+  const hasOutOfRange = fields.some(
+    ({ path, field }) => rangeError(field, values[path], t) !== null,
+  );
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (hasOutOfRange) return;
     // `mutate`, not `mutateAsync`: only `mutate` carries the factory's error
     // toast, and nothing here waits for the result.
     mutation.mutate(buildPayload());
@@ -181,6 +217,9 @@ export function ModuleSettingsForm({
         JSON.stringify(values[path]) !== JSON.stringify(baseline[path]),
     );
   usePageSavePart(`moduleSettings:${moduleName}`, dirty, async () => {
+    if (hasOutOfRange) {
+      throw new Error(t("settings.moduleSettings.outOfRangeSave"));
+    }
     await mutation.mutateAsync(buildPayload());
   });
 
@@ -207,7 +246,7 @@ export function ModuleSettingsForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
       {fields.map(({ path, field }) => (
         <FieldRow
           key={path}
@@ -338,6 +377,7 @@ function FieldRow({ path, field, value, onChange }: FieldRowProps) {
         type={inputType}
         min={field.minimum}
         max={field.maximum}
+        error={rangeError(field, value, t) ?? undefined}
         value={value === undefined || value === null ? "" : String(value)}
         onChange={(e) =>
           onChange(

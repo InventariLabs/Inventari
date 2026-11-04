@@ -81,7 +81,6 @@
     }
   },
   "config": {
-    "connectionsTitle": "Connexions IA",
     "connectionsDescription": "Réservoir de connexions LLM partagé entre les modules. Associez-en une à chaque objectif ci-dessous.",
     "addConnection": "Ajouter une connexion",
     "editConnection": "Modifier la connexion",

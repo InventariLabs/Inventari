@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Coroutine
+from datetime import date
 from decimal import Decimal
 from types import SimpleNamespace
 from typing import Any
@@ -42,6 +43,16 @@ def _no_reserve_shelves() -> Any:
         ),
         patch(
             'app.modules.purchase_orders.replenishment_service._in_flight_inbound_async',
+            AsyncMock(return_value={}),
+        ),
+        # Nor a price list: a rule with no preferred supplier asks it for the
+        # cheapest offer, and here nobody quotes anything.
+        patch(
+            'app.core.public_api.core_api.organizations.today_async',
+            AsyncMock(return_value=date(2026, 1, 1)),
+        ),
+        patch(
+            'app.modules.purchase_orders.pricelist_service.cheapest_offers_async',
             AsyncMock(return_value={}),
         ),
     ):

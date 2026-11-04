@@ -413,7 +413,7 @@
     "unitCost": "Stückkosten",
     "unitCostIncomplete_one": "Für 1 Zutat des letzten Durchlaufs ist kein Einkaufspreis hinterlegt.",
     "unitCostIncomplete_other": "Für {{count}} Zutaten des letzten Durchlaufs ist kein Einkaufspreis hinterlegt.",
-    "stock": "Bestand",
+    "stock": "Bestand des Produkts",
     "lastProduced": "Zuletzt produziert",
     "ingredientCount": "{{count}} Zutaten",
     "ingredientCount_one": "{{count}} Zutat",

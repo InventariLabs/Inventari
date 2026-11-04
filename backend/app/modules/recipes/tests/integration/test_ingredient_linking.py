@@ -103,6 +103,9 @@ class TestUnlinkedIngredientsList:
         assert response.status_code == status.HTTP_200_OK, response.text
         data = response.json()
         assert data['total'] == 2
+        # The linked Tomato still counts: an empty backlog means "all linked"
+        # only when there are ingredients to be linked.
+        assert data['ingredient_total'] == 3
         rows = {(item['name'], item['recipe_name']) for item in data['items']}
         assert rows == {('Onion', 'Recipe A'), ('Carrot', 'Recipe B')}
         onion = next(item for item in data['items'] if item['name'] == 'Onion')
@@ -147,6 +150,7 @@ class TestUnlinkedIngredientsList:
             'offset': 0,
             'has_more': False,
             'total_capped': False,
+            'ingredient_total': 0,
         }
 
     def test_the_backlog_pages_by_limit_and_offset(

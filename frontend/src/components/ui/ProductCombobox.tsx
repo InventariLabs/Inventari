@@ -157,6 +157,10 @@ interface ProductComboboxProps<T extends ProductComboboxOption> {
   /** Longest text the box takes — a caller that creates from it passes the
    *  name column's limit, so the reader meets it while typing. */
   maxLength?: number;
+  /** Marks the field as required (star + announcement) without the browser's own submit blocking. */
+  required?: boolean;
+  /** The refusal, shown on the field itself. */
+  error?: string;
 }
 
 /**
@@ -367,6 +371,8 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   debounceMs = 250,
   initialQuery,
   maxLength,
+  required,
+  error,
 }: ProductComboboxProps<T>) {
   const { t } = useTranslation("common");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -573,6 +579,8 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         aria-label={label ? undefined : placeholder}
         label={label}
         labelClassName={labelClassName}
+        aria-required={required ? "true" : undefined}
+        error={error}
         value={value ? value.name : query}
         onChange={(e) => setQuery(e.target.value)}
         maxLength={maxLength}

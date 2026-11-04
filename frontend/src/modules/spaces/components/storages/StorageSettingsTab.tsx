@@ -155,6 +155,32 @@ export function StorageSettingsTab({
 
   return (
     <div className="space-y-6">
+      {/* At the top, not after six sections: archiving or deleting a location
+          is what a reader opens its settings for as often as editing, and the
+          button sat about fifteen hundred pixels down. */}
+      <div className="flex justify-end">
+        <ActionMenu
+          label={t("locations:settings.recordActions", {
+            name: storage.name,
+          })}
+          actions={[
+            {
+              id: "archive",
+              label: t("locations:edit.archive"),
+              icon: <ArchiveX size={16} />,
+              onSelect: () => setIsArchiveOpen(true),
+            },
+            {
+              id: "delete",
+              label: t("common:actions.delete"),
+              icon: <Trash2 size={16} />,
+              destructive: true,
+              disabled: deleteMutation.isPending,
+              onSelect: () => void handleDelete(),
+            },
+          ]}
+        />
+      </div>
       <Card className="space-y-6">
         <StorageEditFields
           formData={formData}
@@ -171,28 +197,7 @@ export function StorageSettingsTab({
           insideCount={insideCount}
           t={t}
         />
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
-          <ActionMenu
-            label={t("locations:settings.recordActions", {
-              name: storage.name,
-            })}
-            actions={[
-              {
-                id: "archive",
-                label: t("locations:edit.archive"),
-                icon: <ArchiveX size={16} />,
-                onSelect: () => setIsArchiveOpen(true),
-              },
-              {
-                id: "delete",
-                label: t("common:actions.delete"),
-                icon: <Trash2 size={16} />,
-                destructive: true,
-                disabled: deleteMutation.isPending,
-                onSelect: () => void handleDelete(),
-              },
-            ]}
-          />
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-4">
           <Button
             onClick={handleSave}
             disabled={!formData.name.trim() || updateMutation.isPending}
@@ -220,6 +225,7 @@ export function StorageSettingsTab({
       <StorageArchiveDialog
         open={isArchiveOpen}
         storageId={storage.id}
+        subLocations={summary.direct_children_count}
         onOpenChange={setIsArchiveOpen}
         onArchived={() => {
           setIsArchiveOpen(false);

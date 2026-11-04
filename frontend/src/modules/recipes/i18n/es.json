@@ -102,7 +102,9 @@
     "linked_success_other": "{{count}} ingredientes vinculados",
     "link_failed": "No se pudieron vincular los ingredientes",
     "empty_title": "Todos los ingredientes están vinculados",
-    "empty_desc": "Cada ingrediente de receta apunta a un producto: disponibilidad, coste y preparación cubren todo el recetario."
+    "empty_desc": "Cada ingrediente de receta apunta a un producto: disponibilidad, coste y preparación cubren todo el recetario.",
+    "empty_no_ingredients_title": "Aún no hay ingredientes de receta",
+    "empty_no_ingredients_desc": "Añade ingredientes a una receta: aparecerán aquí hasta que se vinculen a un producto."
   },
   "form": {
     "create_title": "Nueva receta",
@@ -323,6 +325,7 @@
   "errors": {
     "save_failed": "Error al guardar receta",
     "delete_failed": "Error al eliminar receta",
+    "load_failed": "No se pudo abrir la receta",
     "shopping_failed": "Error al añadir a la lista de compras",
     "history_failed": "Error al guardar nota",
     "image_failed": "Error al procesar imagen"
@@ -361,6 +364,7 @@
     "rename_label": "Nuevo nombre",
     "rename_success_one": "Renombrada: 1 receta actualizada",
     "rename_success_other": "Renombrada: {{count}} recetas actualizadas",
+    "rename_failed": "No se pudo renombrar la etiqueta",
     "delete": "Eliminar",
     "delete_confirm_title": "¿Eliminar la etiqueta?",
     "delete_confirm_message": "«{{name}}» se quitará de todas las recetas que la llevan. Las recetas se mantienen.",
@@ -381,7 +385,7 @@
     "import_json_placeholder": "Pegue el JSON de la receta aquí…",
     "import_submit": "Importar",
     "import_success": "Receta importada: {{name}}",
-    "import_error": "Error de importación: {{error}}",
+    "import_error": "Error de importación, no se guardó nada: {{error}}",
     "import_error_unknown": "el servidor no dio ningún motivo",
     "invalid_url": "URL no válida – debe comenzar con http:// o https://",
     "review_title": "Revisar ingredientes importados",
@@ -668,6 +672,7 @@
     "exclusions_count_one": "1 artículo excluido",
     "exclusions_count_other": "{{count}} artículos excluidos",
     "generate_list_disabled_tooltip": "Añade primero las comidas",
+    "needs_meals_hint": "Añade al menos una comida para generar una lista de compras o copiar este plan.",
     "not_cooked": "No cocinado",
     "entry_move_error": "No se pudo mover esta comida. Inténtalo de nuevo.",
     "drag_to_move": "Arrastra para mover",

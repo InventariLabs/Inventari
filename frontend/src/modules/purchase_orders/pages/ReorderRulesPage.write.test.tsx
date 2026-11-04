@@ -146,7 +146,7 @@ describe("ReorderRulesPage — creating and removing rules", () => {
     await user.click(await screen.findByRole("button", { name: "Add rule" }));
     const dialog = await screen.findByRole("dialog");
 
-    fireEvent.change(within(dialog).getByLabelText("Product"), {
+    fireEvent.change(within(dialog).getByLabelText(/^Product/), {
       target: { value: "oat" },
     });
     fireEvent.click(await screen.findByText("Oat milk"));
@@ -190,9 +190,11 @@ describe("ReorderRulesPage — creating and removing rules", () => {
       target: { value: "12" },
     });
     await user.click(within(dialog).getByRole("button", { name: "Save" }));
-    expect(toast.error).toHaveBeenCalledWith("Select a product first");
+    expect(
+      await within(dialog).findByText("Select a product first"),
+    ).toBeVisible();
 
-    fireEvent.change(within(dialog).getByLabelText("Product"), {
+    fireEvent.change(within(dialog).getByLabelText(/^Product/), {
       target: { value: "oat" },
     });
     fireEvent.click(await screen.findByText("Oat milk"));
@@ -271,5 +273,22 @@ describe("ReorderRulesPage — creating and removing rules", () => {
       await screen.findByRole("button", { name: /edit latte cups/i }),
     ).toBeInTheDocument();
     expect(alerts).toBeGreaterThan(1);
+  });
+  it("puts the refusal of a max below the min on the Max field", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Add rule" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.change(within(dialog).getByRole("spinbutton", { name: "Min" }), {
+      target: { value: "10" },
+    });
+    fireEvent.change(within(dialog).getByRole("spinbutton", { name: "Max" }), {
+      target: { value: "5" },
+    });
+    await user.click(within(dialog).getByRole("button", { name: "Save" }));
+    expect(
+      await within(dialog).findByText("Max (5) cannot be below min (10)"),
+    ).toBeVisible();
+    expect(created).toEqual([]);
   });
 });

@@ -367,6 +367,29 @@ async def _compute_alerts_for_rules(
     shortages, _, _ = await _shortages_async(db, org_id, rules)
     shares = _reserve_shares(shortages)
 
+    # A rule with no preferred supplier still has a supplier when the price
+    # list names one: the cheapest current offer is proposed, so the alert
+    # does not read "No supplier" beside a price the module itself holds.
+    # The rule's own choice always wins.
+    unassigned = sorted(
+        {
+            s.rule.product_template_id
+            for s in shortages
+            if not s.rule.preferred_partner_id
+        },
+        key=str,
+    )
+    offers = (
+        await pricelist_service.cheapest_offers_async(
+            db,
+            org_id,
+            unassigned,
+            active_on=await core_api.organizations.today_async(db, org_id),
+        )
+        if unassigned
+        else {}
+    )
+
     alerts: list[ReplenishmentAlertDTO] = []
     for shortage in shortages:
         rule = shortage.rule
@@ -382,6 +405,11 @@ async def _compute_alerts_for_rules(
         remaining = max(shortage.suggested - share, Decimal('0'))
         product = rule.product_template
         supplier = rule.preferred_partner
+        proposed_offer = (
+            None if rule.preferred_partner_id else offers.get(rule.product_template_id)
+        )
+        if proposed_offer is not None:
+            supplier = proposed_offer.partner
         alerts.append(
             ReplenishmentAlertDTO(
                 reorder_rule_id=rule.id,
@@ -400,7 +428,7 @@ async def _compute_alerts_for_rules(
                 ),
                 proposed_move_quantity=float(proposed),
                 remaining_to_buy=float(remaining),
-                preferred_partner_id=rule.preferred_partner_id,
+                preferred_partner_id=supplier.id if supplier else None,
                 preferred_partner_name=supplier.name if supplier else None,
             )
         )
@@ -684,7 +712,10 @@ async def create_draft_pos_from_alerts_async(
                 )
             )
             continue
-        if rule.preferred_partner_id is None:
+        # The alert's supplier is the rule's own choice or, failing that, the
+        # one the price list names — the same one the alerts view showed.
+        partner_id = alert.preferred_partner_id
+        if partner_id is None:
             skipped.append(
                 ReplenishmentDraftSkipped(
                     reorder_rule_id=rule.id,
@@ -693,7 +724,7 @@ async def create_draft_pos_from_alerts_async(
                 )
             )
             continue
-        groups.setdefault(rule.preferred_partner_id, []).append((rule, alert))
+        groups.setdefault(partner_id, []).append((rule, alert))
 
     today = await core_api.organizations.today_async(db, org_id)
     created: list[PurchaseOrder] = []

@@ -96,6 +96,7 @@ function Harness({ open = [] }: { open?: string[] }) {
       onSelect={setSelected}
       canWrite={false}
       onMoveTo={vi.fn()}
+      onOpenSettings={vi.fn()}
       onDragMove={vi.fn()}
       label="Storage locations"
     />
@@ -212,6 +213,7 @@ describe("StorageTree — branches that have not been read yet", () => {
         onSelect={vi.fn()}
         canWrite={false}
         onMoveTo={vi.fn()}
+        onOpenSettings={vi.fn()}
         onDragMove={vi.fn()}
         label="Storage locations"
       />,
@@ -231,20 +233,23 @@ describe("StorageTree — branches that have not been read yet", () => {
 describe("StorageTree — rows a writer can act on", () => {
   const renderWritable = () => {
     const onMoveTo = vi.fn();
+    const onOpenSettings = vi.fn();
     const onDragMove = vi.fn();
+    const onSelect = vi.fn();
     render(
       <StorageTree
         nodes={nodes}
         expanded={new Set()}
         onToggle={vi.fn()}
-        onSelect={vi.fn()}
+        onSelect={onSelect}
         canWrite
         onMoveTo={onMoveTo}
+        onOpenSettings={onOpenSettings}
         onDragMove={onDragMove}
         label="Storage locations"
       />,
     );
-    return { onMoveTo, onDragMove };
+    return { onMoveTo, onOpenSettings, onDragMove, onSelect };
   };
   const dataTransfer = () => ({
     setData: vi.fn(),
@@ -265,6 +270,23 @@ describe("StorageTree — rows a writer can act on", () => {
 
     expect(onMoveTo).toHaveBeenCalledTimes(1);
     expect(onMoveTo).toHaveBeenCalledWith("freezer");
+  });
+
+  it("lets a row's menu reach Archive and Delete, which live on the Settings tab", async () => {
+    const { onOpenSettings, onSelect } = renderWritable();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Actions for Freezer" }),
+    );
+    onSelect.mockClear();
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Archive or delete…" }),
+    );
+
+    expect(onOpenSettings).toHaveBeenCalledWith("freezer");
+    // The menu is a portal; its click must not bubble into the row's own
+    // select, which navigates after the item did and drops the Settings tab.
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
   it("drops the highlight when the pointer leaves a row it was dragged over", () => {

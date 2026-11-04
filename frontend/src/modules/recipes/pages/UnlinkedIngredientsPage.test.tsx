@@ -54,6 +54,7 @@ const unlinkedPayload = {
   limit: 200,
   offset: 0,
   has_more: false,
+  ingredient_total: 3,
 };
 
 function createWrapper() {
@@ -266,6 +267,7 @@ describe("UnlinkedIngredientsPage", () => {
           limit: 200,
           offset: 0,
           has_more: false,
+          ingredient_total: 4,
         }),
       ),
     );
@@ -274,5 +276,28 @@ describe("UnlinkedIngredientsPage", () => {
     expect(
       await screen.findByText("Every ingredient is linked"),
     ).toBeInTheDocument();
+  });
+
+  it("does not claim everything is linked when no recipe has an ingredient", async () => {
+    server.use(
+      http.get(UNLINKED_URL, () =>
+        HttpResponse.json({
+          items: [],
+          total: 0,
+          limit: 200,
+          offset: 0,
+          has_more: false,
+          ingredient_total: 0,
+        }),
+      ),
+    );
+    render(<UnlinkedIngredientsPage />, { wrapper: createWrapper() });
+
+    expect(
+      await screen.findByText("No recipe ingredients yet"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Every ingredient is linked"),
+    ).not.toBeInTheDocument();
   });
 });

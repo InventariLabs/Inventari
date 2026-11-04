@@ -172,6 +172,13 @@
   "lots": {
     "title": "Chargen",
     "subtitle": "Welche Chargen es gibt und welche nicht angefasst werden dürfen",
+    "statusFilter": {
+      "active": "Aktiv",
+      "quarantined": "In Quarantäne",
+      "held": "Gesperrt",
+      "expired": "Abgelaufen",
+      "recalled": "Zurückgerufen"
+    },
     "statusChanged": "Charge markiert als {{status}}",
     "reasonDialog": {
       "title": "Charge {{name}} als {{status}} kennzeichnen?",

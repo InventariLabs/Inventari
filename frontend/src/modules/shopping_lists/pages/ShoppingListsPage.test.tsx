@@ -204,7 +204,9 @@ describe("ShoppingListsPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+      expect(
+        screen.getByText("Could not load your shopping lists"),
+      ).toBeInTheDocument();
     });
     expect(screen.queryByText(/status code 500/)).not.toBeInTheDocument();
   });

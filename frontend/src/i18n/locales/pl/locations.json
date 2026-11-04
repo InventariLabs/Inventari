@@ -243,6 +243,10 @@
     "archiveTargetLabel": "Przenieś produkty do",
     "archiveTargetNone": "Wybierz miejsce docelowe",
     "archiveReversible": "Można to cofnąć: zarchiwizowane miejsca przywrócisz w widoku Zarchiwizowane miejsca.",
+    "archiveSubLocations_one": "{{count}} miejsce w środku nie jest archiwizowane razem z nim: widać je na najwyższym poziomie list, dopóki to miejsce nie zostanie przywrócone.",
+    "archiveSubLocations_few": "{{count}} miejsca w środku nie są archiwizowane razem z nim: widać je na najwyższym poziomie list, dopóki to miejsce nie zostanie przywrócone.",
+    "archiveSubLocations_many": "{{count}} miejsc w środku nie jest archiwizowanych razem z nim: widać je na najwyższym poziomie list, dopóki to miejsce nie zostanie przywrócone.",
+    "archiveSubLocations_other": "{{count}} miejsc w środku nie jest archiwizowanych razem z nim: widać je na najwyższym poziomie list, dopóki to miejsce nie zostanie przywrócone.",
     "archivePutawayRules_one": "{{count}} reguła rozkładania kieruje tutaj. Zachowa to miejsce jako cel, dopóki nie zostanie zmieniona.",
     "archivePutawayRules_few": "{{count}} reguły rozkładania kierują tutaj. Zachowają to miejsce jako cel, dopóki nie zostaną zmienione.",
     "archivePutawayRules_many": "{{count}} reguł rozkładania kieruje tutaj. Zachowa to miejsce jako cel, dopóki nie zostanie zmienione.",
@@ -271,7 +275,8 @@
   "reorg": {
     "noMoveTargets": "Nie ma dokąd przenieść tego miejsca",
     "moveTo": "Przenieś do…",
-    "moveToTop": "Najwyższy poziom"
+    "moveToTop": "Najwyższy poziom",
+    "archiveOrDelete": "Archiwizuj lub usuń…"
   },
   "card": {
     "unit_one": "produkt",
@@ -355,6 +360,7 @@
   },
   "contents": {
     "emptyTitle": "W tym miejscu nic nie ma",
+    "emptyDescriptionNone": "Nie ma tu żadnych produktów ani miejsc w środku.",
     "emptyDescription_one": "Jego {{count}} produkt jest na karcie Produkty.",
     "emptyDescription_other": "Jego {{count}} produktów jest na karcie Produkty.",
     "emptyDescription_few": "Jego {{count}} produkty są na karcie Produkty.",

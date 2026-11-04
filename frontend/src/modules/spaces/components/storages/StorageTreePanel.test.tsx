@@ -31,6 +31,7 @@ function renderPanel(
       onSelect={onSelect}
       canWrite={false}
       onMoveTo={vi.fn()}
+      onOpenSettings={vi.fn()}
       onDragMove={vi.fn()}
       {...extra}
     />,

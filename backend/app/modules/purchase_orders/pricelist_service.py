@@ -238,6 +238,42 @@ async def list_for_template_async(
     return list((await db.scalars(stmt)).all())
 
 
+async def cheapest_offers_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    product_template_ids: list[UUID],
+    *,
+    active_on: date,
+) -> dict[UUID, PartnerPricelist]:
+    """The cheapest offer valid on *active_on*, for each of the products.
+
+    One query for the whole set, for callers that need a supplier per
+    product (the replenishment alerts) and would otherwise ask once per
+    row. A product nobody quotes is simply absent from the result. An offer
+    of a deactivated supplier never counts: an order to it is refused when it
+    is confirmed, so the next cheapest offer wins.
+    """
+    if not product_template_ids:
+        return {}
+    stmt = (
+        select(PartnerPricelist)
+        .options(selectinload(PartnerPricelist.partner))
+        .where(
+            PartnerPricelist.organization_id == organization_id,
+            PartnerPricelist.product_template_id.in_(product_template_ids),
+            PartnerPricelist.valid_from <= active_on,
+            (PartnerPricelist.valid_to.is_(None))
+            | (PartnerPricelist.valid_to >= active_on),
+        )
+        .order_by(PartnerPricelist.unit_price, PartnerPricelist.id)
+    )
+    cheapest: dict[UUID, PartnerPricelist] = {}
+    for entry in (await db.scalars(stmt)).all():
+        if entry.partner.is_active:
+            cheapest.setdefault(entry.product_template_id, entry)
+    return cheapest
+
+
 async def get_best_price_async(
     db: AsyncSession,
     organization_id: UUID,

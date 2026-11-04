@@ -172,6 +172,13 @@
   "lots": {
     "title": "Lotes",
     "subtitle": "Qué lotes existen y cuáles no se pueden tocar",
+    "statusFilter": {
+      "active": "Activo",
+      "quarantined": "En cuarentena",
+      "held": "Retenido",
+      "expired": "Caducado",
+      "recalled": "Retirado"
+    },
     "statusChanged": "Lote marcado como {{status}}",
     "reasonDialog": {
       "title": "¿Marcar el lote {{name}} como {{status}}?",

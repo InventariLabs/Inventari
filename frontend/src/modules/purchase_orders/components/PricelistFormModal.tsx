@@ -76,6 +76,9 @@ export function PricelistFormModal({
     if (open) setSubmitted(false);
   }, [open]);
 
+  const productError =
+    !form.id && !form.product ? t("pricelist.productRequired") : undefined;
+
   const unitPrice = Number(form.unitPrice);
   const unitPriceError =
     form.unitPrice.trim() === "" ||
@@ -98,7 +101,12 @@ export function PricelistFormModal({
       ? t("pricelist.validToInvalid")
       : undefined;
 
-  const hasErrors = !!(unitPriceError || minQuantityError || validToError);
+  const hasErrors = !!(
+    productError ||
+    unitPriceError ||
+    minQuantityError ||
+    validToError
+  );
 
   const handleSubmit = () => {
     setSubmitted(true);
@@ -122,6 +130,8 @@ export function PricelistFormModal({
             onClear={() => onChange({ ...form, product: null })}
             search={searchProducts}
             placeholder={t("productPicker.search")}
+            required
+            error={submitted ? productError : undefined}
             renderNoResults={(query) => (
               <div className="space-y-1 p-3">
                 <p className="text-sm text-on-muted">

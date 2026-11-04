@@ -20,6 +20,21 @@ describe("StorageTrackingFields", () => {
     expect(screen.queryByText("fieldLabels.brand")).not.toBeInTheDocument();
   });
 
+  it("says which fields are tracked to assistive technology, not by tick alone", () => {
+    render(
+      <StorageTrackingFields value={["notes"]} onChange={vi.fn()} t={t} />,
+    );
+
+    expect(screen.getByRole("button", { name: "Notes" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Price" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
+
   it("adds a key to `value` when an unchecked field is clicked", () => {
     const onChange = vi.fn();
     render(

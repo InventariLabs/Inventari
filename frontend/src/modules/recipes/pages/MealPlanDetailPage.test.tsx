@@ -31,13 +31,13 @@ vi.mock("@/contexts/ModulesContext", () => ({
   }),
 }));
 
-const { updatePlanMock, pickingSessionMock, nutritionDays } = vi.hoisted(
-  () => ({
+const { updatePlanMock, pickingSessionMock, nutritionDays, planState } =
+  vi.hoisted(() => ({
     updatePlanMock: vi.fn(),
     pickingSessionMock: vi.fn(),
     nutritionDays: { current: [] as MealPlan["daily_nutrition_summary"] },
-  }),
-);
+    planState: { empty: false },
+  }));
 
 vi.mock("@/modules/recipes/hooks/useMealPlans", () => ({
   useMealPlan: () => ({ data: planFixture(), isLoading: false }),
@@ -89,6 +89,12 @@ vi.mock("@/modules/recipes/hooks/usePickingSession", () => ({
 }));
 
 function planFixture(): MealPlan {
+  const plan = basePlan();
+  if (planState.empty) plan.entries = [];
+  return plan;
+}
+
+function basePlan(): MealPlan {
   return {
     id: "mp1",
     name: "Test Week",
@@ -278,6 +284,26 @@ describe("MealPlanDetailPage slot conflict dialog", () => {
       expect(toast.error).toHaveBeenCalledWith("Could not update plan"),
     );
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  describe("a plan with no meals", () => {
+    beforeEach(() => {
+      planState.empty = true;
+    });
+    afterEach(() => {
+      planState.empty = false;
+    });
+
+    it("says why the plan cannot be copied or turned into a list", () => {
+      renderPage();
+
+      const copy = screen.getByRole("button", { name: "Copy to another week" });
+      expect(copy).toBeDisabled();
+      const hint = screen.getByText(
+        "Add at least one meal to generate a shopping list or copy this plan.",
+      );
+      expect(copy).toHaveAccessibleDescription(hint.textContent ?? "");
+    });
   });
 });
 

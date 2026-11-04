@@ -182,6 +182,13 @@
   "lots": {
     "title": "Partie",
     "subtitle": "Jakie partie istnieją i których nie wolno ruszać",
+    "statusFilter": {
+      "active": "Aktywne",
+      "quarantined": "Kwarantanna",
+      "held": "Wstrzymane",
+      "expired": "Przeterminowane",
+      "recalled": "Wycofane"
+    },
     "statusChanged": "Partia oznaczona jako: {{status}}",
     "reasonDialog": {
       "title": "Oznaczyć partię {{name}} jako {{status}}?",

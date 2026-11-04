@@ -67,7 +67,9 @@ describe("ReorderRuleFormModal — each field writes its own key", () => {
   it("writes thresholds, supplier, notes and location into the form", async () => {
     serveLocations([{ id: "loc-1", name: "Cold Storage" }]);
     const onSave = vi.fn();
-    render(<Harness initial={emptyForm} onSave={onSave} />);
+    render(
+      <Harness initial={{ ...emptyForm, product: PRODUCT }} onSave={onSave} />,
+    );
     const dialog = screen.getByRole("dialog");
 
     fireEvent.change(within(dialog).getByRole("spinbutton", { name: "Min" }), {
@@ -107,7 +109,7 @@ describe("ReorderRuleFormModal — each field writes its own key", () => {
 
   it("picks a product and clears it again", async () => {
     render(<Harness initial={emptyForm} />);
-    fireEvent.change(screen.getByLabelText("Product"), {
+    fireEvent.change(screen.getByLabelText(/^Product/), {
       target: { value: "lat" },
     });
     fireEvent.click(await screen.findByText("Latte cups"));
@@ -138,7 +140,7 @@ describe("ReorderRuleFormModal — each field writes its own key", () => {
       );
     }
     render(<Empty />);
-    fireEvent.change(screen.getByLabelText("Product"), {
+    fireEvent.change(screen.getByLabelText(/^Product/), {
       target: { value: "zzz" },
     });
     expect(await screen.findByText(/zzz/)).toBeInTheDocument();
@@ -155,7 +157,7 @@ describe("ReorderRuleFormModal — each field writes its own key", () => {
       />,
     );
     // An existing rule keeps its product: no picker to change it.
-    expect(screen.queryByLabelText("Product")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Product/)).not.toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("combobox", { name: "Preferred supplier" }),
     );
