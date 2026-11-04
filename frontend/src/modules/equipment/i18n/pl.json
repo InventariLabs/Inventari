@@ -914,7 +914,7 @@
     "quantity": "Ilość",
     "prefix": "Prefiks",
     "prefixPlaceholder": "np. DELL-LAT5540",
-    "useSerialAsAssetTag": "Użyj numeru seryjnego jako numeru inwentarzowego",
+    "useSerialAsAssetTag": "Użyj numeru seryjnego jako numeru inwentarzowego zasobu",
     "generate_one": "Wygeneruj {{count}} numer seryjny",
     "generate_few": "Wygeneruj {{count}} numery seryjne",
     "generate_many": "Wygeneruj {{count}} numerów seryjnych",

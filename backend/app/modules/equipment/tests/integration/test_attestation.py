@@ -450,9 +450,7 @@ class TestAuditCampaign:
         )
         assert launch_r.status_code == status.HTTP_400_BAD_REQUEST
         body = launch_r.json()['detail']
-        assert body['message'] == (
-            'W wybranym zakresie nie ma aktywnych przypisań sprzętu'
-        )
+        assert body['message'] == ('W wybranym zakresie nie ma aktywnych wydań sprzętu')
         # The language this response claims is the language it speaks.
         assert body.get('lang') == 'pl'
 
