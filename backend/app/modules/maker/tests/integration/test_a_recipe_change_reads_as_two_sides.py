@@ -128,8 +128,8 @@ class TestTheJournalReadsARecipeChange:
         assert edited.status_code == 200, edited.text
 
         entry = _entries(db_session, mk_org)[0]
-        assert _snapshot(entry)['before']['qty_per_batch'] == 2.0
-        assert _snapshot(entry)['after']['qty_per_batch'] == 5.0
+        assert _snapshot(entry)['before']['qty_per_batch'] == '2.0000'
+        assert _snapshot(entry)['after']['qty_per_batch'] == '5.0000'
         # The line the change is about, beside the change — a recipe has
         # more than one.
         assert _snapshot(entry)['ingredient'] == 'Śliwki węgierki'
@@ -182,6 +182,76 @@ class TestTheJournalReadsARecipeChange:
         assert edited.status_code == 200, edited.text
 
         entry = _entries(db_session, mk_org)[0]
-        assert _snapshot(entry)['before'] == {'amount': 3.5}
-        assert _snapshot(entry)['after'] == {'amount': 4.0}
+        assert _snapshot(entry)['before'] == {'amount': '3.50'}
+        assert _snapshot(entry)['after'] == {'amount': '4.00'}
         assert _snapshot(entry)['cost_line'] == 'Gaz'
+
+
+class TestTheJournalKeepsTheExactDigits:
+    def test_a_quantity_is_written_as_the_digits_the_column_holds(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        db_session: Session,
+    ) -> None:
+        """A float would print 1234.5678 rounded to six figures on the screen."""
+        recipe, line = _recipe_with_a_line(client, mk_auth_headers, db_session, mk_org)
+
+        edited = client.patch(
+            f'/api/v1/maker/recipes/{recipe["id"]}/bom-lines/{line["id"]}',
+            headers=mk_auth_headers,
+            json={'qty_per_batch': '1234.5678'},
+        )
+        assert edited.status_code == 200, edited.text
+
+        entry = _entries(db_session, mk_org)[0]
+        assert _snapshot(entry)['after']['qty_per_batch'] == '1234.5678'
+
+    def test_the_same_quantity_with_other_digits_writes_nothing(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        db_session: Session,
+    ) -> None:
+        recipe, line = _recipe_with_a_line(client, mk_auth_headers, db_session, mk_org)
+        written = len(_entries(db_session, mk_org))
+
+        edited = client.patch(
+            f'/api/v1/maker/recipes/{recipe["id"]}/bom-lines/{line["id"]}',
+            headers=mk_auth_headers,
+            json={'qty_per_batch': '2.0000'},
+        )
+        assert edited.status_code == 200, edited.text
+
+        assert len(_entries(db_session, mk_org)) == written
+
+    def test_an_added_and_a_removed_ingredient_carry_the_exact_quantity(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        db_session: Session,
+    ) -> None:
+        recipe, line = _recipe_with_a_line(client, mk_auth_headers, db_session, mk_org)
+        extra = _template(db_session, mk_org, name='Cukier')
+        added = client.post(
+            f'/api/v1/maker/recipes/{recipe["id"]}/bom-lines',
+            headers=mk_auth_headers,
+            json={
+                'child_template_id': str(extra.id),
+                'qty_per_batch': '0.1',
+                'unit': 'szt',
+            },
+        )
+        assert added.status_code == 201, added.text
+        removed = client.delete(
+            f'/api/v1/maker/recipes/{recipe["id"]}/bom-lines/{added.json()["id"]}',
+            headers=mk_auth_headers,
+        )
+        assert removed.status_code == 204, removed.text
+
+        removal, addition = _entries(db_session, mk_org)[:2]
+        assert _snapshot(addition)['qty_per_batch'] == '0.1000'
+        assert _snapshot(removal)['qty_per_batch'] == '0.1000'

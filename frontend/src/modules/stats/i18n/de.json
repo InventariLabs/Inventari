@@ -2,6 +2,8 @@
   "title": "Statistiken",
   "subtitle": "Übersicht Ihrer Bestände",
   "records": "Datensätze",
+  "recordCount_one": "{{count}} Datensatz",
+  "recordCount_other": "{{count}} Datensätze",
   "places": "Orte, alle Ebenen",
   "expiringSoon": "Läuft bald ab",
   "expired": "Abgelaufen",

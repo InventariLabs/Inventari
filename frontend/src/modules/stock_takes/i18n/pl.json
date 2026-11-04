@@ -106,6 +106,7 @@
     "increaseCount": "O jeden więcej: {{name}}",
     "saveCount": "Zapisz policzoną ilość: {{name}}",
     "countFor": "Policzona ilość: {{name}}",
+    "countMalformed": "To nie jest liczba. Wpisz cyfry z jednym separatorem dziesiętnym, na przykład 12 lub 1,5.",
     "unsaved": "Niezapisane",
     "awaitingRecount": "Do przeliczenia",
     "countAgain": "Policz {{name}} jeszcze raz",
@@ -179,7 +180,11 @@
     "unexplainedDifferences_one": "Jedna policzona ilość różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód, a potem zakończ spis.",
     "unexplainedDifferences_few": "{{count}} policzone ilości różnią się bardziej niż tolerancja i nie mówią dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
     "unexplainedDifferences_many": "{{count}} policzonych ilości różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
-    "unexplainedDifferences_other": "{{count}} policzonej ilości różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód przy każdej, a potem zakończ spis."
+    "unexplainedDifferences_other": "{{count}} policzonej ilości różni się bardziej niż tolerancja i nie mówi dlaczego. Podaj powód przy każdej, a potem zakończ spis.",
+    "uncountedRemaining_one": "Jeden produkt nie jest jeszcze policzony. Policz go, a potem zakończ spis.",
+    "uncountedRemaining_few": "{{count}} produkty nie są jeszcze policzone. Policz je, a potem zakończ spis.",
+    "uncountedRemaining_many": "{{count}} produktów nie jest jeszcze policzonych. Policz je, a potem zakończ spis.",
+    "uncountedRemaining_other": "{{count}} produktu nie jest jeszcze policzonego. Policz je, a potem zakończ spis."
   },
   "blindModeActive": "Tryb ślepy aktywny — oczekiwane ilości są ukryte.",
   "statuses": {

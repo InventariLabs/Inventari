@@ -38,6 +38,12 @@ interface Options {
    * sits at no longer resolves.
    */
   onDeleted?: () => void;
+  /**
+   * The record stands in a system place, where stock is not counted: the
+   * server refuses a unit added there, so it is not offered. Move brings it
+   * back to a shelf first.
+   */
+  inVirtualPlace?: boolean;
 }
 
 /**
@@ -61,7 +67,7 @@ interface Options {
  */
 export function useItemQuickActions(
   item: Item,
-  { onDone, onMove, onDeleted }: Options,
+  { onDone, onMove, onDeleted, inVirtualPlace = false }: Options,
 ) {
   const { t } = useTranslation(["labels", "common", "items", "equipment"]);
   const canWrite = useCanWrite("items");
@@ -169,7 +175,7 @@ export function useItemQuickActions(
             isLoading: consumeItemMutation.isPending,
             disabled: (toAmount(item.quantity) ?? 0) <= 0,
           },
-          {
+          !inVirtualPlace && {
             id: "add_one",
             label: isEquipmentItem
               ? t("equipment:actions.checkin")

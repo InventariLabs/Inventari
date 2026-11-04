@@ -12,6 +12,9 @@ import {
 import { itemsApi } from "@/lib/api/items";
 import { labelsApi } from "@/lib/api/labels";
 import { equipmentApi } from "@/modules/equipment/api/equipment";
+import { SessionEndedError } from "@/lib/errors";
+import i18next from "i18next";
+import { toast } from "sonner";
 import type { Item, FieldDefinition } from "@/types";
 
 // Minimal but fully-typed Item for getById mocks, with per-test overrides.
@@ -435,9 +438,89 @@ describe("useEquipmentForm — invalidates cache after create + image upload", (
       const invalidatedKeys = invalidateSpy.mock.calls.map(
         (c) => (c[0] as { queryKey: readonly unknown[] }).queryKey,
       );
-      expect(invalidatedKeys.some((k) => k.includes("assets"))).toBe(true);
+      // The equipment prefix covers the assets list and its detail entries.
+      expect(
+        invalidatedKeys.some(
+          (k) =>
+            k.includes("assets") || (k.length === 1 && k[0] === "equipment"),
+        ),
+      ).toBe(true);
     });
   });
+
+  it("refreshes the overview counts too, not only the asset list", async () => {
+    // The category chart reads the asset list and the tiles read the
+    // dashboard; refreshing only the list left "0 assets" beside "Laptop 1".
+    const { qc, Wrapper } = makeWrapper();
+    const invalidateSpy = vi.spyOn(qc, "invalidateQueries");
+
+    const { result } = renderHook(() => useEquipmentForm(undefined, {}), {
+      wrapper: Wrapper,
+    });
+
+    act(() => {
+      result.current.set("name", "Laptop");
+      result.current.set("location_id", "loc-1");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: vi.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    await waitFor(() => {
+      const invalidatedKeys = invalidateSpy.mock.calls.map(
+        (c) => (c[0] as { queryKey: readonly unknown[] }).queryKey,
+      );
+      expect(invalidatedKeys.some((k) => k.includes("dashboard"))).toBe(true);
+    });
+  });
+});
+
+describe("useEquipmentForm — a photo refused after the asset was saved", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it.each([
+    ["created", undefined as string | undefined],
+    ["edited", "edit-1"],
+  ])(
+    "does not say the %s asset was not saved when an ended session refused its photo",
+    async (_name, editItemId) => {
+      vi.mocked(itemsApi.getById).mockResolvedValue(
+        mockItem({ name: "Laptop" }),
+      );
+      vi.mocked(itemsApi.uploadImage).mockRejectedValueOnce(
+        new SessionEndedError(i18next.t("common:errors.sessionEnded")),
+      );
+      const { Wrapper } = makeWrapper();
+      const { result } = renderHook(() => useEquipmentForm(editItemId, {}), {
+        wrapper: Wrapper,
+      });
+      if (editItemId) {
+        await waitFor(() => expect(result.current.form.name).toBe("Laptop"));
+      }
+
+      act(() => {
+        result.current.set("name", "Laptop");
+        result.current.set("location_id", "loc-1");
+        result.current.setImageFile(
+          new File(["png"], "cover.png", { type: "image/png" }),
+        );
+      });
+      await act(async () => {
+        await result.current.handleSubmit({
+          preventDefault: vi.fn(),
+        } as unknown as React.FormEvent);
+      });
+
+      const shown = vi.mocked(toast.error).mock.calls.map(([m]) => String(m));
+      expect(shown).toEqual([i18next.t("items:messages.fileUploadFailed")]);
+      expect(toast.success).toHaveBeenCalled();
+    },
+  );
 });
 
 describe("useEquipmentForm — edit-mode label & barcode persistence", () => {

@@ -331,6 +331,72 @@ class TestAvailabilityFromTheShelf:
         assert ingredient['available_quantity'] == 1000.0
         assert ingredient['available_uom'] == 'g'
 
+    def test_a_name_with_accents_reaches_a_catalogue_name_with_accents(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_user: User,
+        test_storage_location: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """ "Ryż" against "Ryż 1 kg": both keep their letters, and the lookup
+        key is folded to "ryz" before it reaches the database — which then
+        found nothing and called the rice on the shelf missing."""
+        _stock_a_can(
+            db_session, test_user, test_storage_location, name='Ryż 1 kg', cans=2
+        )
+        recipe_id = _recipe_asking_for_grams(
+            client,
+            auth_headers,
+            db_session,
+            ingredient_name='Ryż',
+            grams='200',
+            name='Ryż z mlekiem',
+        )
+
+        ingredient = _availability(client, auth_headers, recipe_id)
+
+        assert ingredient['status'] == 'available_approx'
+        assert ingredient['match_type'] == 'fuzzy'
+
+    @pytest.mark.parametrize(
+        ('ingredient', 'product'),
+        [
+            ('Weißbrot', 'Weißbrot 500 g'),
+            ('Œufs', 'Œufs bio'),
+            ('Молоко', 'Молоко 1 л'),
+            ('Phở', 'Phở gạo'),
+        ],
+    )
+    def test_a_name_in_its_own_script_reaches_the_catalogue_name(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_user: User,
+        test_storage_location: StorageLocation,
+        db_session: Session,
+        ingredient: str,
+        product: str,
+    ) -> None:
+        """The lookup key is folded to ASCII for the verdict ("weis", "oeuf",
+        "molo", "pho"), but the database only holds the letters as stored:
+        "Weißbrot" never contains "weis". The fragment it is searched by keeps
+        the spelling the recipe was typed in."""
+        _stock_a_can(db_session, test_user, test_storage_location, name=product, cans=2)
+        recipe_id = _recipe_asking_for_grams(
+            client,
+            auth_headers,
+            db_session,
+            ingredient_name=ingredient,
+            grams='200',
+            name='Kolacja',
+        )
+
+        found = _availability(client, auth_headers, recipe_id)
+
+        assert found['status'] == 'available_approx'
+        assert found['match_type'] == 'fuzzy'
+
     def test_an_exact_link_still_wins_and_reports_available(
         self,
         client: TestClient,

@@ -26,8 +26,10 @@ from typing import Any, cast
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import Engine, event
 from sqlalchemy.orm import Session
 
+from app.core.export_hygiene import defuse
 from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
@@ -890,6 +892,148 @@ class TestDocumentRegisterCsv:
         reader = csv.DictReader(io.StringIO(resp.text))
         exported = [row['Document Number'] for row in reader]
         assert set(numbers) <= set(exported)
+
+    def test_the_export_reads_no_line_and_no_column_it_does_not_print(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+        doc_partner: Partner,
+    ) -> None:
+        """The file prints document headers, so a header is all it reads.
+
+        Asking for whole documents loaded every line, product, partner and
+        user of the window through the relations: 1.2 GB of memory for a
+        1.8 MB file of 20 000 documents of ten lines.
+        """
+        _create_and_complete_in(
+            client,
+            doc_auth_headers,
+            doc_target_location.id,
+            doc_template.id,
+            doc_partner.id,
+        )
+        statements: list[str] = []
+
+        def _record(_conn: Any, _cursor: Any, statement: str, *_args: Any) -> None:
+            statements.append(statement)
+
+        # The request runs on the app's engine; the listener sits on the class.
+        event.listen(Engine, 'before_cursor_execute', _record)
+        try:
+            today = date.today()
+            resp = client.get(_csv_url(today, today), headers=doc_auth_headers)
+        finally:
+            event.remove(Engine, 'before_cursor_execute', _record)
+
+        assert resp.status_code == 200, resp.text
+        assert not [s for s in statements if 'document_lines' in s]
+        (rows_read,) = [s for s in statements if 'documents.number' in s]
+        assert 'documents.meta_data' not in rows_read
+
+    def test_the_export_prints_what_the_rows_of_the_register_print(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+        doc_partner: Partner,
+    ) -> None:
+        """Each fallback of a row, read back from the file and from the page.
+
+        The frozen partner name wins over the live one, the live one stands in
+        when nothing was frozen, and a document with no planned date is filed
+        under the day it was written.
+        """
+        frozen, live, undated = (
+            _create_and_complete_in(
+                client,
+                doc_auth_headers,
+                doc_target_location.id,
+                doc_template.id,
+                doc_partner.id,
+            )
+            for _ in range(3)
+        )
+        today = date.today()
+        for doc, snapshot in (
+            (frozen, {'name': '=Frozen Ltd'}),
+            (live, None),
+            (undated, {'tax_id': '123'}),
+        ):
+            stored = db_session.get(Document, uuid.UUID(doc['id']))
+            assert stored is not None
+            stored.partner_snapshot = snapshot
+            stored.scheduled_date = None if doc is undated else today
+            if doc is undated:
+                stored.total_net = None
+                stored.total_tax = None
+                stored.total_gross = None
+                stored.currency = None
+            else:
+                stored.total_net = Decimal('10.00')
+                stored.total_tax = Decimal('2.30')
+                stored.total_gross = Decimal('12.30')
+                stored.currency = 'PLN'
+        db_session.commit()
+
+        resp = client.get(_csv_url(today, today), headers=doc_auth_headers)
+        assert resp.status_code == 200, resp.text
+        rows = {
+            row['Document Number']: row
+            for row in csv.DictReader(io.StringIO(resp.text))
+        }
+        page = client.get(
+            _rows_url(today, today, 'IN', group_by='type'), headers=doc_auth_headers
+        ).json()['items']
+
+        assert rows[frozen['number']]['Partner'] == defuse('=Frozen Ltd')
+        assert rows[live['number']]['Partner'] == doc_partner.name
+        assert rows[undated['number']]['Partner'] == doc_partner.name
+        for shown in page:
+            row = rows[shown['number']]
+            assert row['Type'] == shown['type']
+            assert row['Status'] == shown['status']
+            assert row['Date'] == shown['date'] == str(today)
+            assert row['Target Location'] == shown['target_location_name']
+            assert row['Source Location'] == ''
+        assert rows[frozen['number']]['Net'] == '10.00'
+        assert rows[frozen['number']]['Tax'] == '2.30'
+        assert rows[frozen['number']]['Gross'] == '12.30'
+        assert rows[frozen['number']]['Currency'] == 'PLN'
+        for column in ('Net', 'Tax', 'Gross', 'Currency'):
+            assert rows[undated['number']][column] == ''
+
+    @pytest.mark.parametrize(
+        ('language', 'sentence'),
+        [
+            ('en', 'The start date must not be after the end date'),
+            ('pl', 'Data początkowa nie może być późniejsza niż data końcowa'),
+        ],
+    )
+    def test_a_range_that_ends_before_it_starts_is_refused(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        language: str,
+        sentence: str,
+    ) -> None:
+        """An empty file says nothing about why it is empty; the refusal does."""
+        resp = client.get(
+            _csv_url(date(2026, 2, 1), date(2026, 1, 31)),
+            headers={**doc_auth_headers, 'Accept-Language': language},
+        )
+        assert resp.status_code == 400, resp.text
+        assert resp.json()['detail']['message'] == sentence
+
+    def test_a_range_of_one_day_is_not_refused(
+        self, client: TestClient, doc_auth_headers: dict[str, str]
+    ) -> None:
+        day = date(2026, 1, 31)
+        resp = client.get(_csv_url(day, day), headers=doc_auth_headers)
+        assert resp.status_code == 200, resp.text
 
 
 @pytest.mark.integration

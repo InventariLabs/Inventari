@@ -1,3 +1,5 @@
+import { CUSTOMER_ROLE_TYPES, SUPPLIER_ROLE_TYPES } from "@/hooks/partnerRoles";
+import type { PartnerType } from "@/types";
 import type { components } from "@/types/api-generated";
 import type { ProductSearchResult } from "@/modules/warehouse/api/documents";
 import type { OpenPurchaseOrderLine } from "@/hooks/useOpenPurchaseOrders";
@@ -557,4 +559,10 @@ export function draftProblem(
     }
   }
   return null;
+}
+
+/** Who the partner field offers: a customer's goods come back from a
+ *  customer. An internal receipt names nobody, and its field is hidden. */
+export function partnerTypesFor(source: ReceiveSource): readonly PartnerType[] {
+  return source === "return" ? CUSTOMER_ROLE_TYPES : SUPPLIER_ROLE_TYPES;
 }

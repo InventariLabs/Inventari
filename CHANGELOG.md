@@ -12,14 +12,117 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Changed
+
+- A confirmed document now keeps your own company's name, tax number and
+  address and the names of the locations it refers to, as it already kept the
+  partner, so a reprint after the company moved or a shelf was renamed shows
+  what the original showed. The record a closed stock take leaves in the
+  register keeps them too. The layout, the document type's settings and the
+  logo are still read when the document is printed, and a document confirmed
+  before this change prints the current details. A module that prints its own
+  documents through the core print identity can freeze the same block with
+  `issuer_snapshot` and `IssuerContext.from_snapshot`.
+### Added
+
+- Module authors can ask `@/module-sdk` whether the signed-in user is the person
+  a record names by e-mail address (`useIsSignedInAs`).
+
 ### Fixed
 
+- A recipe's page and printout show a dash for a nutrient no ingredient
+  measured where the sum would have been 0, as the meal plan does. A rice dish
+  where only the chicken had values used to read "Carbs 0.0g".
+- "Max batches from stock" on a bill of materials shows ten as 10, not 1E+1.
+- The day's activity and History state the stock change of a correction: taking
+  one piece off an issue reads "by +1", where it used to read "by −1".
+- A generated community module asks for its own read and write permissions on
+  every route, and its manifest declares them with the usual default roles.
+- A product used up to zero reads "Consumed" in the list and on its page rather
+  than "Consumed (Virtual)", and no longer offers "Add 1 unit", which was
+  refused after the click. Move brings it back to a shelf.
+- Add product shows pieces on its unit button when no unit was chosen, which is
+  what the save has always filed such a product as; it used to read "Choose".
+- Receive goods and Issue goods can add a supplier or customer that does not
+  exist yet without leaving the form.
+- A posted receipt says which of its lines have no price: they are left out of
+  the totals, and that stock has no recorded cost.
+- A dispute note in an attestation names the asset by its serial number when it
+  has one, and the public page says what was confirmed beside what was reported.
+- The message for a missing approval workflow tells a storekeeper to ask the
+  administrator instead of describing the administrator's settings.
+- Amounts in a unit that is a word take its plural ("6 bottles").
+- An issue dated today can be planned from its page, so that picking can start
+  on it without dating it tomorrow first.
+- The audit log now writes the quantities and amounts of a production order,
+  its completion, a recipe and its ingredient and cost lines, and of an item's
+  creation, use, disposal, deletion and restoration, and the low-stock
+  threshold of a product, as the exact digits the record holds. They used to
+  be saved as rounded decimal numbers, so a production order of 1,234.567 read
+  1,234.57 in the log. Saving a value again
+  with other trailing digits ("2.50" over "2.5") still writes no entry. Entries
+  written before this keep the numbers they were saved with.
+- Importing ingredient data from a file the import cannot read, a photo or a
+  JSON file that holds no list of rows for instance, now says what the import
+  expects: a .json or .csv file with one row per ingredient, in every
+  maintained language. It used to repeat the JSON parser's own words.
+- Exporting the document register to CSV no longer loads every line, product
+  and user of the period into memory: a file of 20 000 documents of ten lines
+  takes half a second instead of seventeen and 40 MB instead of 1.2 GB. The
+  file itself is the same, still without a limit on rows. Asked through the API
+  for a period that ends before it starts, the export answers 400 with a sentence
+  saying so instead of an empty file.
+- A product name longer than 100 characters can be searched: the search looks
+  for its opening, and a failed product search is reported as failed, with a
+  button to try again, rather than as "no results". A long name that only
+  shares its opening with an existing product can still be added as new.
 - A product whose nutrition came from Open Food Facts now counts its calories
   in recipe estimates and in the meal plan's daily totals. They used to go
   missing while its protein, fat and carbohydrates were counted, and the day
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- Handing an asset back, from "My assets" or from the asset's own page, opens a
+  dialog titled and worded for the person returning it (the page's button reads
+  "Return" too, not the manager's "Accept"), and the damaged and needs-repair choices each say
+  which repair entry they open. The holder's assignment history prints both
+  days and the condition in the interface language, and the organization log
+  does the same for the condition of a return.
+- The organization log marks the settings a workspace mode writes when it is
+  chosen as "Workspace mode default" instead of an update the person made.
+- On a phone, the buttons of the sheet that issues an asset stay in view at the
+  foot of the sheet instead of ending below its edge until the form was
+  scrolled, and the notice that an approval is needed sits beside them.
+- The equipment overview counts a new asset as soon as it is saved, also after
+  a batch add, without reloading the page.
+- The new production dialog writes the unit the way the rest of the app does
+  ("szt." rather than "pcs"), and its hint about the recipe's batch no longer
+  ends in two full stops. The audit log names the unit a product template was
+  created with the same way.
+- The stock changes a production run writes, and the ones its reversal writes,
+  carry a reason in the interface language instead of an English sentence,
+  followed by the number of the run, in the audit log and in the item's history.
+- A recipe's page prints its name once, as the page title; the card under it
+  keeps the batch yield and the default badge, and the product made is named
+  under the title only when it is called something else.
+- The onboarding card for working with a single module now names Production,
+  so a person who came to make things can find it.
+- Saving two partners with the same name, or the same code, at the same moment
+  now refuses the second one with the usual "already exists" message instead
+  of failing with a server error.
+- A recipe ingredient typed by hand whose name has accented letters ("Ryż") now
+  finds the product on the shelf ("Ryż 1 kg") instead of reading as missing.
+- The expiry date picker starts with a week, two weeks and a month, so fresh
+  food no longer needs the calendar.
+- The two date chips on the products list, "expiring soon" and "expired", no
+  longer stay on together and show an empty list: turning one on turns the
+  other off.
+- Statistics count stock rows as records instead of pieces, name the products
+  without a category in the reader's language, list the fullest places first
+  and leave out the system's consumed, loss and production places.
+- The meal plan dialog that has no plan yet now says the recipe is added to the
+  first meal of the new plan at once, and closing the "Take from stock" dialog
+  no longer marks the recipe as cooked.
 
 ## v0.11.0 - 2026-11-02
 

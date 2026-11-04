@@ -763,7 +763,7 @@
     "select_plan": "Wybierz plan",
     "select_day": "Wybierz dzień",
     "select_slot": "Wybierz posiłek",
-    "no_plans_add_to_plan": "Najpierw utwórz plan posiłków — przepis dodasz później z poziomu planera.",
+    "no_plans_add_to_plan": "Najpierw utwórz plan posiłków — przepis zostanie od razu dodany do pierwszego posiłku pierwszego dnia planu.",
     "more_actions": "Więcej akcji",
     "expiry_urgent": "Składniki z krótką datą",
     "delete_plan": "Usuń plan",

@@ -170,6 +170,31 @@ function LabelCodeField({ item }: { item: Item }) {
  * A field the record does not carry is absent rather than empty: a column of
  * blank rows buries the handful that have values.
  */
+/** The record's place; a used-up one has no shelf to name. */
+function RecordLocation({
+  storage,
+  shelfLocation,
+  usedUp,
+}: {
+  storage: StorageLocationSummary | undefined;
+  shelfLocation: string | null | undefined;
+  usedUp: boolean;
+}) {
+  const { t } = useTranslation(["items", "locations"]);
+  if (usedUp) return <>{t("items:usedUpPlace")}</>;
+  if (!storage) return null;
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1.5">
+      {getStorageLocationPath(storage, shelfLocation)}
+      {isVirtualUsage(storage.usage) && storage.usage && (
+        <span className="px-1.5 py-0.5 rounded-md bg-surface-inset text-on-secondary text-[10px] font-medium uppercase tracking-wide">
+          {virtualUsageLabel(t, storage.usage)}
+        </span>
+      )}
+    </span>
+  );
+}
+
 export default function ItemDetailOverview({
   item,
   storages,
@@ -225,16 +250,11 @@ export default function ItemDetailOverview({
           ) : null}
         </Field>
         <Field label={t("items:itemStorage")}>
-          {storage ? (
-            <span className="inline-flex flex-wrap items-center gap-1.5">
-              {getStorageLocationPath(storage, item.shelf_location)}
-              {isVirtualUsage(storage.usage) && storage.usage && (
-                <span className="px-1.5 py-0.5 rounded-md bg-surface-inset text-on-secondary text-[10px] font-medium uppercase tracking-wide">
-                  {virtualUsageLabel(t, storage.usage)}
-                </span>
-              )}
-            </span>
-          ) : null}
+          <RecordLocation
+            storage={storage}
+            shelfLocation={item.shelf_location}
+            usedUp={inVirtualStorage}
+          />
         </Field>
         <Field label={t("items:itemShelfLocation")}>
           {storage ? null : item.shelf_location}

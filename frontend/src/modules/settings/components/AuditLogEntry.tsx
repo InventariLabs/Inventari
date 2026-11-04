@@ -380,6 +380,9 @@ export function AuditDetail({
 }) {
   const code = discrepancyCodeOf(row);
   const document = stringMeta(row, "document_number");
+  // A production run's reason is a code without a number; the run is named
+  // beside it so two runs on one day do not read the same.
+  const runNumber = stringMeta(row, "production_order_number");
   // The person's half of the breaker: it switched the channel off by
   // itself, and this entry says someone switched it back on. Without the
   // sentence the row reads as a plain update over a channel that was never
@@ -395,7 +398,10 @@ export function AuditDetail({
         titles={titles}
       />
       {row.reason && (
-        <span className="text-on-muted">{reasonLabel(row.reason, t)}</span>
+        <span className="text-on-muted">
+          {reasonLabel(row.reason, t)}
+          {runNumber ? ` ${runNumber}` : ""}
+        </span>
       )}
       {document && <AuditDocumentReference row={row} t={t} />}
       {reactivated === true && (

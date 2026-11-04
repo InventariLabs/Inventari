@@ -239,6 +239,24 @@ describe("UnlinkedIngredientsPage", () => {
     ).toBeDisabled();
   });
 
+  it("offers no matching for a list that failed to load", async () => {
+    server.use(
+      http.get(UNLINKED_URL, () =>
+        HttpResponse.json({ detail: "down" }, { status: 500 }),
+      ),
+    );
+    render(<UnlinkedIngredientsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Find matches" }),
+      ).toBeDisabled(),
+    );
+    expect(
+      screen.queryByText("Every ingredient is linked"),
+    ).not.toBeInTheDocument();
+  });
+
   it("shows the all-linked empty state when the backlog is empty", async () => {
     server.use(
       http.get(UNLINKED_URL, () =>

@@ -578,9 +578,7 @@ ERRORS_DE: ErrorMessages = {
     'approvals_read_forbidden': 'Sie haben keine Berechtigung, Genehmigungsanträge einzusehen',
     'approvals_write_forbidden': 'Sie haben keine Berechtigung, Genehmigungsanträge zu stellen',
     'documents_approve_requires_grant': 'Sie haben keine Berechtigung, Dokumente zu genehmigen oder abzulehnen',
-    'po_approval_workflow_missing': (
-        'Bestellungen erfordern eine Genehmigung, aber es ist kein Genehmigungsworkflow dafür konfiguriert — legen Sie einen unter Genehmigungen → Workflows an oder deaktivieren Sie die Anforderung'
-    ),
+    'po_approval_workflow_missing': 'Diese Bestellung braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
     'po_supplier_required': 'Eine Bestellung kann ohne Lieferanten nicht bestätigt werden',
     'document_type_requires_partner': 'Dieser Dokumenttyp erfordert einen Partner.',
     'partner_has_no_email': 'Der Partner hat keine E-Mail-Adresse.',
@@ -652,7 +650,7 @@ ERRORS_DE: ErrorMessages = {
     'document_update_status': 'Nur Dokumente im Entwurfsstatus können aktualisiert werden',
     'document_correction_locked': 'Korrekturdokumente sind gesperrt — nur Notizen können geändert werden. Änderungsversuch: {fields}. Brechen Sie die Korrektur ab und erstellen Sie eine neue, wenn die Daten falsch sind.',
     'field_cannot_be_cleared': 'Diese Felder können nicht geleert werden: {fields}.',
-    'ingredient_defaults_unreadable_file': 'Die Datei konnte nicht gelesen werden: {detail}',
+    'ingredient_defaults_unreadable_file': 'Die Datei konnte nicht gelesen werden. Der Import erwartet eine .json- oder .csv-Datei mit einer Zeile pro Zutat.',
     'onboarding_modules_not_offered': 'Das Profil „{profile}“ bietet diese Module nicht an: {modules}',
     'location_chain_step_incomplete': 'Jeder Schritt einer Standortkette braucht eine ID oder einen Namen.',
     'current_password_incorrect': 'Das aktuelle Passwort ist falsch',
@@ -852,9 +850,7 @@ ERRORS_DE: ErrorMessages = {
     'permanent_delete_disabled': (
         'Das dauerhafte Löschen ist für diese Organisation deaktiviert.'
     ),
-    'documents_approval_workflow_missing': (
-        'Dokumente erfordern eine Freigabe, aber es ist kein Freigabeworkflow dafür konfiguriert — legen Sie einen unter Freigaben → Workflows an oder deaktivieren Sie die Anforderung'
-    ),
+    'documents_approval_workflow_missing': 'Dieses Dokument braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
     'category_delete_blocked_by_items': (
         'Kategorie kann nicht gelöscht werden — sie wird verwendet ({count}). Verschieben Sie ihre Produkte zuerst in eine andere Kategorie.'
     ),
@@ -947,6 +943,7 @@ ERRORS_DE: ErrorMessages = {
     'recipe_collection_own_parent': 'Eine Sammlung kann nicht ihre eigene übergeordnete Sammlung sein',
     'recipe_collection_under_descendant': 'Eine Sammlung kann nicht unter ihre eigene Untersammlung verschoben werden',
     'recipe_scrape_failed': 'Das Rezept konnte von der URL nicht abgerufen werden',
+    'register_date_from_after_date_to': 'Das Startdatum darf nicht nach dem Enddatum liegen',
     'meal_plan_end_before_start': 'Das Enddatum darf nicht vor dem Startdatum liegen',
     'meal_plan_too_long': 'Ein Plan darf höchstens {days} Tage umfassen',
     'meal_plan_no_slots': 'Aktivieren Sie mindestens eine Mahlzeit im Plan',

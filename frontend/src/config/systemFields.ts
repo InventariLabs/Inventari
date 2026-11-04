@@ -98,9 +98,18 @@ export const SYSTEM_FIELDS: Record<string, Partial<FieldDefinition>> = {
     // disappeared together with the value typed into it.
     contexts: FOOD_CONTEXTS,
     // Shelf life is thought of as an interval, not a date on a calendar.
-    // Only jumps that land outside the open month grid — a shortcut that saves
-    // no navigation is a button competing with the calendar under it.
-    date_presets: ["plus6Months", "plus1Year", "plus3Years"],
+    // The short jumps are there because fresh food (milk, meat, a salad)
+    // has days to live, not months — a list that started at half a year
+    // sent every such product to the calendar. The long ones land outside
+    // the open month grid, which is what earns a shortcut its place.
+    date_presets: [
+      "plus1Week",
+      "plus2Weeks",
+      "plus1Month",
+      "plus6Months",
+      "plus1Year",
+      "plus3Years",
+    ],
   },
   freeze_date: {
     key: "freeze_date",

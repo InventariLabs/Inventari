@@ -274,6 +274,7 @@ export default function ItemsContent({
         canWrite={canWrite}
         canDelete={canDelete}
         item={actionsItem ?? items[0]}
+        storages={storages}
         open={actionsItem !== null}
         onClose={() => setActionsItem(null)}
         onConsume={onConsume}

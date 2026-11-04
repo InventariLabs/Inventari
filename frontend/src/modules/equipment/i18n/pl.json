@@ -127,7 +127,8 @@
     "condition_damaged": "Uszkodzony",
     "condition_needs_repair": "Wymaga naprawy",
     "condition_effect_available": "Wraca jako Dostępny.",
-    "condition_effect_service": "Do serwisu, z wpisem naprawy.",
+    "condition_effect_damaged": "Do serwisu, z wpisem „Zwrócony uszkodzony”.",
+    "condition_effect_needs_repair": "Do serwisu, z wpisem „Zwrócony — wymaga naprawy”.",
     "checkin_done": "Zwrócono: {{asset}}",
     "checkin_done_status": "Zwrócono: {{asset}} — teraz {{status}}",
     "checkout_modal": {
@@ -159,7 +160,9 @@
       "title": "Przyjmij zasób",
       "condition": "Stan zwracanego zasobu",
       "notes": "Uwagi",
-      "submit": "Przyjmij"
+      "submit": "Przyjmij",
+      "title_holder": "Zwróć zasób",
+      "submit_holder": "Zwróć"
     },
     "returned": "Zwrócony",
     "active": "Aktywne",
@@ -718,6 +721,10 @@
       "statusConfirmedDesc": "Potwierdzenie tego zasobu zostało zapisane i możesz już zamknąć tę kartę.",
       "statusDisputed": "Problem zgłoszony",
       "statusDisputedDesc": "Twoje zgłoszenie zostało zapisane i możesz już zamknąć tę kartę.",
+      "statusDisputedConfirmedDesc_one": "Twoje zgłoszenie jest zapisane, a także potwierdzenie {{count}} innego zasobu. Możesz już zamknąć tę kartę.",
+      "statusDisputedConfirmedDesc_few": "Twoje zgłoszenie jest zapisane, a także potwierdzenie {{count}} innych zasobów. Możesz już zamknąć tę kartę.",
+      "statusDisputedConfirmedDesc_many": "Twoje zgłoszenie jest zapisane, a także potwierdzenie {{count}} innych zasobów. Możesz już zamknąć tę kartę.",
+      "statusDisputedConfirmedDesc_other": "Twoje zgłoszenie jest zapisane, a także potwierdzenie {{count}} innych zasobów. Możesz już zamknąć tę kartę.",
       "statusCampaignClosed": "Atestacja zamknięta",
       "statusCampaignClosedDesc": "To żądanie zostało zamknięte — Twoje potwierdzenie nie może być już zapisane. Jeśli nadal masz ten zasób, skontaktuj się ze swoją organizacją.",
       "statusAssignmentReturned": "Zasób został już zwrócony",

@@ -654,6 +654,35 @@ class TestIngredientDefaultsRouter:
         assert r.status_code == status.HTTP_400_BAD_REQUEST, r.text
         assert str(MAX_IMPORT_ROWS) in r.text
 
+    @pytest.mark.parametrize(
+        ('filename', 'payload'),
+        [
+            ('photo.jpg', b'\xff\xd8\xff\xe0\x00\x10JFIF'),
+            ('defaults.json', b'{"name": "Millet", "lang": "en"}'),
+        ],
+    )
+    def test_import_names_what_it_expects_when_the_file_is_unreadable(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        filename: str,
+        payload: bytes,
+    ) -> None:
+        """A wrong file is answered with what the import takes, not a parser trace."""
+        from io import BytesIO
+
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': (filename, BytesIO(payload), 'application/octet-stream')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_400_BAD_REQUEST, r.text
+        detail = r.json()['detail']
+        assert detail['code'] == 'INGREDIENT_DEFAULTS_UNREADABLE_FILE'
+        assert '.json or .csv' in detail['message']
+        assert 'Expecting value' not in detail['message']
+
     def test_import_accepts_a_file_within_the_cap(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:

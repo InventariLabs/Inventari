@@ -167,6 +167,24 @@ describe("DocumentProfileSettingsPage — a preset list that failed", () => {
   });
 });
 
+describe("DocumentProfileSettingsPage — a profile that failed", () => {
+  it("keeps the receiving options, which are not part of the profile, and offers another try", async () => {
+    server.use(
+      http.get(
+        "*/warehouse/profile",
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+    renderPage();
+
+    expect(
+      await screen.findByText("Failed to load document format settings"),
+    ).toBeVisible();
+    expect(await screen.findByText("Over-receipt tolerance (%)")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeVisible();
+  });
+});
+
 describe("DocumentProfileSettingsPage — one Settings screen", () => {
   // The module's own options used to be a second tab, "Module settings",
   // whose only other content was a link back to this screen.

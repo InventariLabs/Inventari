@@ -20,6 +20,7 @@ from ._document_workflow_helpers import (  # noqa: F401
     _apply_line_tax_rates,
     _build_partner_snapshot,
     _check_document_period_open,
+    _freeze_print_details,
 )
 from ._order_side import order_side_async
 from ._stock_executor_helpers import (

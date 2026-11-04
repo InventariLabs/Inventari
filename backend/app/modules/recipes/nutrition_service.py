@@ -284,6 +284,28 @@ def _round_totals(
     return per_serving, total_rounded
 
 
+def _unknown_unless_measured(
+    figures: dict[str, float | None],
+    total: dict[str, float | None],
+    ingredients: list[dict[str, Any]],
+) -> dict[str, float | None]:
+    """Blank a figure whose sum is 0 while some ingredient has no value for it.
+
+    Chicken with 0 g of carbs and rice with no data sum to 0 g, and the rice is
+    where the carbs are: that 0 is the absence of a measurement. A 0 every
+    ingredient vouches for stays. A sum above 0 stands, with the coverage line
+    saying it is partial. The meal plan's daily row applies the same rule.
+    """
+    counted = [row for row in ingredients if not row['negligible']]
+    return {
+        key: None
+        if total[key] == 0
+        and any((row['nutrition'] or {}).get(key) is None for row in counted)
+        else value
+        for key, value in figures.items()
+    }
+
+
 async def get_recipe_nutrition(
     db: 'AsyncSession',
     recipe: Recipe,
@@ -388,8 +410,15 @@ async def get_recipe_nutrition(
         'recipe_id': recipe.id,
         'servings': rounded_servings(exact_servings),
         'scale': float(multiplier),
-        'per_serving': per_serving,
-        'total': total_rounded,
+        'per_serving': _unknown_unless_measured(
+            per_serving, total_rounded, ingredients_out
+        ),
+        'total': _unknown_unless_measured(
+            total_rounded, total_rounded, ingredients_out
+        ),
+        # The sums as they stand, for the meal plan: it asks whether a recipe
+        # knows a nutrient at all, and decides a day's zeroes across its dishes.
+        'measured_sums': total_rounded,
         'ingredients': ingredients_out,
         'coverage': round(coverage, 2),
         'missing_nutrition': missing_nutrition,

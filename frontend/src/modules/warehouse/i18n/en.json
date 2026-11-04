@@ -208,7 +208,7 @@
     "executeScrap": "Write off stock",
     "approvalPendingHint": "Waiting for approval — execution is blocked until the request is resolved.",
     "approvalRequiredHint": "Approval is required and no request is open — request approval first.",
-    "approvalNoWorkflowHint": "Approval is required but no approval workflow is active — set one up in Approvals settings, then request approval.",
+    "approvalNoWorkflowHint": "This document needs an approval, but nobody has been set up to give it yet. Ask your administrator to set it up.",
     "postNowReceive": "Receive stock",
     "postNowIssue": "Issue stock",
     "postNowMove": "Move stock",
@@ -241,7 +241,7 @@
     "deleteMessage": "Delete this draft document? This cannot be undone.",
     "confirmMessageApproval": "Confirming will send this document to the approval queue. Continue?",
     "confirmMessageConditional": "This will mark the document ready for warehouse execution — unless your organization's approval threshold sends it to the approval queue first. Continue?",
-    "confirmMessageNoWorkflow": "This document needs approval, but no approval workflow exists for documents, so confirming it will be refused. Create the workflow first.",
+    "confirmMessageNoWorkflow": "This document needs approval, but nobody has been set up to give it yet, so confirming it will be refused. Ask your administrator to set it up.",
     "requestApprovalMessage": "Requesting approval moves this document back to awaiting approval, where it stays until someone signs off.",
     "confirmMessageDeadEndNamed": "This document needs approval, but nobody could decide it: the stage “{{stage}}” names approvers who cannot see approvals. Confirming still sends it there, and it waits until the request is withdrawn or those people are given access. Continue?",
     "confirmMessageDeadEndNoApprover": "This document needs approval, but nobody could decide it: the stage “{{stage}}” is open to anyone holding the approve permission, and nobody in this organization holds it. Confirming still sends it there, and it waits until the request is withdrawn or someone is given the permission. Continue?",
@@ -616,6 +616,7 @@
     "plannedReceiving": "→ {{location}} · receiving area, put away later"
   },
   "value": {
+    "unpricedLines": "Lines with no price are not in these totals, and that stock has no recorded cost.",
     "totalsTitle": "Document totals",
     "totalNet": "Net total",
     "totalTax": "Tax total",
@@ -1117,8 +1118,8 @@
         "setUp": "Set up location"
       },
       "occupancy": {
-        "noLimit_one": "No limit · {{count}} record",
-        "noLimit_other": "No limit · {{count}} records",
+        "noLimit_one": "No limit · {{count}} product",
+        "noLimit_other": "No limit · {{count}} products",
         "sharesSum_one": "{{fill}}% — the share of {{count}} limited product",
         "sharesSum_other": "{{fill}}% — the shares of {{count}} limited products added up",
         "unmeasured": "A product here has no limit and is not counted",

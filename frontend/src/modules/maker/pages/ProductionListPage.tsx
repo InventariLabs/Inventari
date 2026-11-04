@@ -27,7 +27,7 @@ import { formatDate } from "@/utils/helpers";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatMoney } from "@/utils/formatters";
 import { ProductionShortageSignal } from "@/modules/maker/components/ProductionShortageSignal";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
 
 const STATUS_FILTERS: (ProductionStatus | "ALL")[] = [
@@ -125,6 +125,9 @@ function CardResult({
           {" "}
           {t("productionList.card.resultPerUnit", {
             amount: formatMoney(order.result_per_unit, currency, language),
+            unit:
+              unitLabel(t, order.output_uom_symbol) ||
+              t("create.needs.unitFallback"),
           })}
         </span>
       </p>

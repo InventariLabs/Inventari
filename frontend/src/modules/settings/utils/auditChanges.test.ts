@@ -147,6 +147,44 @@ describe("auditChanges value dictionaries", () => {
     ]);
   });
 
+  it("reads the condition an asset came back in as the return dialog words it", () => {
+    const changes = auditChanges(
+      { before: { condition: null }, after: { condition: "NEEDS_REPAIR" } },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([
+      { path: "condition", from: "—", to: "Wymaga naprawy" },
+    ]);
+  });
+
+  it("writes the unit a product template recorded in the interface language", () => {
+    // The shape the template writer produces: the id, and the unit's symbol
+    // beside it as `uom_name`.
+    const changes = auditChanges(
+      { name: "Soy candle", uom_id: "16282d80-0000", uom_name: "pcs" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toContainEqual({ path: "uom_id", from: null, to: "szt." });
+    expect(JSON.stringify(changes)).not.toContain("pcs");
+  });
+
+  it("keeps the symbol of a unit nobody translated", () => {
+    const changes = auditChanges(
+      { name: "Soy candle", uom_id: "16282d80-0000", uom_name: "tul" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toContainEqual({ path: "uom_id", from: null, to: "tul" });
+  });
+
   it("words a restore's deletion reason the way the archive does", () => {
     const changes = auditChanges(
       {

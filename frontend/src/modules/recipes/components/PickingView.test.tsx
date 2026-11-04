@@ -120,6 +120,10 @@ describe("PickingView — idle phase rendering", () => {
     );
     await user.click(screen.getByText(/cancel|Anuluj/i));
     expect(onClose).toHaveBeenCalledOnce();
+    // Closing the opening dialog is not completing anything: the click
+    // event must not travel on as the "completed" argument, or the recipe
+    // page shows Completed for a session that never started.
+    expect(onClose).toHaveBeenCalledWith();
   });
 
   it("starts a recipe with no links at all, since names still pick", () => {

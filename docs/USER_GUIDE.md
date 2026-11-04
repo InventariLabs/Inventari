@@ -479,6 +479,9 @@ has them, its batch and expiry date below.
   code** field. It fills in an internal EAN-13 starting with `20`, the GS1
   range a company may use for its own goods; no two products in the
   organization get the same one, and a code a product already has is skipped.
+  It is the organization's own internal code, which cannot be mistaken for a
+  manufacturer's, and it is valid only inside the organization: goods sold on
+  through other businesses' tills need a GTIN from GS1.
   **Save changes** keeps it. A product that already has a code does not offer
   the button: changing the code would orphan the labels already on the shelf.
 - **One product.** On a product's page, **Print label** (shown once the
@@ -1421,10 +1424,16 @@ authority accepts, which is for the business and its adviser to settle.
   correction changes the outcome.
 - A **cancelled** document keeps its number and stays on record, and the
   document list shows it when filtered by status. Nothing deletes it.
-- The partner's name, tax number and address are copied onto the document when
-  it is confirmed, so editing the partner later does not change a document
-  already issued; each line keeps the product name and the price it was
-  written with.
+- The partner's name, tax number and address, your own company's name, tax
+  number and address, and the names of the locations the document refers to
+  are copied onto the document when it is confirmed (the record of a closed
+  stock take, which is written as done, takes them at that moment). Editing any of them later
+  does not change a document already issued, and a reprint shows the values
+  of the day it was confirmed; each line keeps the product name and the price
+  it was written with. What a reprint still reads as it is today: the print
+  template, the document type's settings (title, which columns show) and your
+  logo. A document confirmed before this was recorded prints your company
+  details and location names as they are now.
 - The **audit log** cannot be edited or deleted by anybody, administrators
   included: the database itself refuses to change or remove a row. No timer
   deletes documents, movements or audit entries. Two timers do delete: the
@@ -1495,13 +1504,14 @@ for an audit, by whom, and where copies are kept.
 
 **Printouts are not stored.** A PDF is produced from the document's data when
 you press **Download PDF**; Inventari does not keep a copy of what was
-printed. The partner and the lines are as they were at confirmation and do
-not change. But the PDF also reads what is current when it is made: the
-print template and the document type's settings (title, whether prices and
-tax are shown); the own-company details at the top (name, address, logo), from
-**Settings**; and the names of the shelves the document refers to, so a shelf
-renamed since appears under its new name. A reprint can therefore differ from
-the first print without the document having changed. A
+printed. The partner, your own company details (name, tax number, address),
+the names of the shelves the document refers to and the lines are as they
+were at confirmation and do not change. But the PDF also reads what is
+current when it is made: the print template, the document type's settings
+(title, whether prices and tax are shown) and your logo, from **Settings**.
+A reprint can therefore differ in layout from the first print without the
+document having changed; a document confirmed before the company details
+were recorded with it shows them as they are now. A
 business that must keep a delivery note or order *as sent* — because the law
 treats it as a business letter, or the customer was sent a file — should save
 the file at the moment it sends it (or keep the email it went out in) and

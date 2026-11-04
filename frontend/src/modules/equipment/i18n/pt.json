@@ -109,7 +109,8 @@
     "condition_damaged": "Danificado",
     "condition_needs_repair": "Precisa de reparo",
     "condition_effect_available": "Volta para Disponível.",
-    "condition_effect_service": "Vai para Manutenção, com um registro de reparo.",
+    "condition_effect_damaged": "Vai para Manutenção, com o registro “Devolvido danificado”.",
+    "condition_effect_needs_repair": "Vai para Manutenção, com o registro “Devolvido — precisa de reparo”.",
     "checkin_done": "Devolvido: {{asset}}",
     "checkin_done_status": "Devolvido: {{asset}} — agora {{status}}",
     "checkout_modal": {
@@ -141,7 +142,9 @@
       "title": "Receber devolução do equipamento",
       "condition": "Condição na devolução",
       "notes": "Observações",
-      "submit": "Receber devolução"
+      "submit": "Receber devolução",
+      "title_holder": "Devolver equipamento",
+      "submit_holder": "Devolver"
     },
     "returned": "Devolvido",
     "active": "Ativa",
@@ -662,6 +665,8 @@
       "statusConfirmedDesc": "Sua confirmação deste equipamento foi salva e você já pode fechar esta aba.",
       "statusDisputed": "Problema informado",
       "statusDisputedDesc": "Seu relato foi salvo e você já pode fechar esta aba.",
+      "statusDisputedConfirmedDesc_one": "Seu relato foi salvo, assim como sua confirmação de mais {{count}} ativo. Você já pode fechar esta aba.",
+      "statusDisputedConfirmedDesc_other": "Seu relato foi salvo, assim como sua confirmação de mais {{count}} ativos. Você já pode fechar esta aba.",
       "statusCampaignClosed": "Atestação encerrada",
       "statusCampaignClosedDesc": "Esta solicitação foi encerrada — sua confirmação não pode mais ser salva. Se você ainda estiver com este equipamento, entre em contato com a sua organização.",
       "statusAssignmentReturned": "Já devolvido",

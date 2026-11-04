@@ -9,6 +9,7 @@ from app.core.contracts import UserContextDTO
 from app.core.events import SystemEvent, TenantEventPayload, event_bus
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.money import quantise
 from app.i18n.service import get_current_lang
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.item import Item
@@ -139,8 +140,8 @@ async def _reduce_quantity(
         target_id=item.id,
         snapshot={
             'name': item.name,
-            'before': {'quantity': float(old_q)},
-            'after': {'quantity': float(item.quantity)},
+            'before': {'quantity': quantise(old_q, 3)},
+            'after': {'quantity': quantise(item.quantity, 3)},
         },
         reason=reason,
         meta_data={'notes': notes} if notes else None,

@@ -120,6 +120,31 @@ export function correctionStockSign(
   return originalType && DISPATCH_LIKE_ORIGINALS.has(originalType) ? -1 : 1;
 }
 
+const PICKED_BEFORE_POSTING: ReadonlySet<string> = new Set([
+  "OUT",
+  "INT",
+  "INTERNAL_OUT",
+]);
+
+/** The types whose goods can be picked from the shelves before they leave. */
+export function isPickedBeforePosting(type: string): boolean {
+  return PICKED_BEFORE_POSTING.has(type);
+}
+
+/**
+ * Whether a draft may be planned rather than posted now: a future date is a
+ * plan by itself, and an issue needs one today too, since a picking session
+ * starts on a planned document. Today's issue used to reach picking only after
+ * the office dated it tomorrow.
+ */
+export function mayBePlanned(
+  type: string,
+  scheduledDate: string | null | undefined,
+  today: string,
+): boolean {
+  return (!!scheduledDate && scheduledDate > today) || type === "OUT";
+}
+
 export type TaxHandling = "NONE" | "SIMPLE_RATE" | "PER_LINE_RATE";
 
 /**

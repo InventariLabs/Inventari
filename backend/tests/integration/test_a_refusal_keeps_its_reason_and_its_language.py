@@ -31,7 +31,7 @@ from app.modules.purchase_orders import _service_approval
 pytestmark = pytest.mark.integration
 
 NEW_KEYS = {
-    'ingredient_defaults_unreadable_file': {'detail': 'x'},
+    'ingredient_defaults_unreadable_file': {},
     'onboarding_modules_not_offered': {'profile': 'p', 'modules': 'm'},
     'location_chain_step_incomplete': {},
     'current_password_incorrect': {},
@@ -100,7 +100,8 @@ def test_an_unreadable_defaults_file_is_refused_in_polish_under_its_own_code(
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     detail = response.json()['detail']
     assert detail['code'] == 'INGREDIENT_DEFAULTS_UNREADABLE_FILE'
-    assert detail['message'].startswith('Nie udało się odczytać pliku: ')
+    assert detail['message'].startswith('Nie udało się odczytać pliku. ')
+    assert '.json lub .csv' in detail['message']
 
 
 @pytest.mark.parametrize('steps', [[{'name': ' '}, {'name': 'Shelf'}], [{'name': ''}]])

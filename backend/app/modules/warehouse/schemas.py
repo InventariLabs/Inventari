@@ -541,6 +541,9 @@ class DocumentListRowSchema(BaseModel):
     target_location_name: str | None = None
     #: The document this draft continues, when a short completion raised it.
     backorder_id: UUID | None = None
+    #: The type of the document a correction corrects: its lines are deltas on
+    #: that document, and only its type says which way a delta moved stock.
+    corrects_document_type: str | None = None
     scheduled_date: date | None
     notes: str | None
     external_reference: str | None

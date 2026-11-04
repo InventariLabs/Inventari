@@ -148,6 +148,30 @@ def document_list_row(document: Document) -> DocumentListRowSchema:
     )
 
 
+async def _attach_corrected_types(
+    db: AsyncSession, org_id: UUID, documents: Sequence[Document]
+) -> None:
+    """Name the original's type on each correction of a list page.
+
+    A column read and not the relation: ``Document`` eagerly loads its lines
+    and people, which is a page's worth of work for one word on each row.
+    """
+    original_ids = {
+        doc.corrects_document_id for doc in documents if doc.corrects_document_id
+    }
+    if not original_ids:
+        return
+    result = await db.execute(
+        select(Document.id, Document.type).where(
+            Document.id.in_(original_ids), Document.organization_id == org_id
+        )
+    )
+    types = {row.id: row.type for row in result}
+    for doc in documents:
+        if doc.corrects_document_id:
+            doc.corrects_document_type = types.get(doc.corrects_document_id)  # type: ignore[attr-defined]
+
+
 async def get_document(
     db: AsyncSession,
     org_id: UUID,
@@ -508,6 +532,7 @@ async def list_documents(
     )
     documents, total = await paginate_async(db, stmt, limit=limit, offset=offset)
     await attach_shipments_async(db, org_id, documents)
+    await _attach_corrected_types(db, org_id, documents)
     return documents, total
 
 

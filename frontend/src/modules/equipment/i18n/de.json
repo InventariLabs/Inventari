@@ -109,7 +109,8 @@
     "condition_damaged": "Beschädigt",
     "condition_needs_repair": "Reparaturbedürftig",
     "condition_effect_available": "Wieder Verfügbar.",
-    "condition_effect_service": "In die Wartung, mit Reparatureintrag.",
+    "condition_effect_damaged": "In die Wartung, mit dem Eintrag „Beschädigt zurückgegeben“.",
+    "condition_effect_needs_repair": "In die Wartung, mit dem Eintrag „Zurückgegeben — Reparatur nötig“.",
     "checkin_done": "Zurückgenommen: {{asset}}",
     "checkin_done_status": "Zurückgenommen: {{asset}} — jetzt {{status}}",
     "checkout_modal": {
@@ -141,7 +142,9 @@
       "title": "Gerät zurückgeben",
       "condition": "Rückgabezustand",
       "notes": "Notizen",
-      "submit": "Zurückgeben"
+      "submit": "Zurückgeben",
+      "title_holder": "Gerät zurückgeben",
+      "submit_holder": "Zurückgeben"
     },
     "returned": "Zurückgegeben",
     "active": "Aktiv",
@@ -662,6 +665,8 @@
       "statusConfirmedDesc": "Ihre Bestätigung für dieses Gerät wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
       "statusDisputed": "Problem gemeldet",
       "statusDisputedDesc": "Ihre Meldung wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
+      "statusDisputedConfirmedDesc_one": "Ihre Meldung ist gespeichert, ebenso Ihre Bestätigung für {{count}} weiteres Objekt. Sie können diesen Tab jetzt schließen.",
+      "statusDisputedConfirmedDesc_other": "Ihre Meldung ist gespeichert, ebenso Ihre Bestätigung für {{count}} weitere Objekte. Sie können diesen Tab jetzt schließen.",
       "statusCampaignClosed": "Attestierung geschlossen",
       "statusCampaignClosedDesc": "Diese Anfrage wurde geschlossen — Ihre Bestätigung kann nicht mehr erfasst werden. Wenn Sie das Gerät noch haben, wenden Sie sich an Ihre Organisation.",
       "statusAssignmentReturned": "Bereits zurückgegeben",

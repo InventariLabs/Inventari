@@ -343,6 +343,8 @@ export default function UnifiedFieldRenderer({
                   <UomSelect
                     compact
                     value={fdUomId || null}
+                    // The save files a product with no unit as pieces.
+                    unitWhenUnset="pcs"
                     onChange={(uomId, uom) => {
                       onChange("uom_id", uomId, false);
                       if (onUomChange) onUomChange(uomId, uom);

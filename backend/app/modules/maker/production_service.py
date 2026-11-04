@@ -384,7 +384,7 @@ async def _journal_opened(
         'name': order.number,
         'status': 'DRAFT',
         'output': output.name if output else None,
-        'planned_qty': float(order.planned_qty),
+        'planned_qty': str(_stored_qty(order.planned_qty)),
     }
     if copied_from is not None:
         snapshot['copied_from'] = copied_from
@@ -399,10 +399,18 @@ async def _journal_opened(
     )
 
 
+def _stored_qty(qty: Decimal) -> Decimal:
+    """A quantity as the column keeps it (``Numeric(12, 3)``), so the journal
+    records the digits the database holds, not the ones a form posted."""
+    return quantise(qty, 3)
+
+
 def _plan_shape(order: ProductionOrder) -> dict[str, object]:
-    """The fields a draft's edit can move, as its journal entry reads them."""
+    """The fields a draft's edit can move. A quantity stays a ``Decimal`` so
+    comparing it is numeric (``4`` and ``4.000`` are one quantity); the
+    journal writes it down as exact digits."""
     return {
-        'planned_qty': float(order.planned_qty),
+        'planned_qty': _stored_qty(order.planned_qty),
         'production_date': (
             order.production_date.isoformat() if order.production_date else None
         ),
@@ -696,8 +704,9 @@ async def _consume_ingredients(
     # the set on purpose: a run that eats A to make B and one that eats B to
     # make A are exactly the shape that deadlocks without it.
     history_changes = {
-        'reason': f'Production run {order.number or order.id}',
+        'reason': 'production_run',
         'production_order_id': str(order.id),
+        'production_order_number': order.number or str(order.id),
     }
     await core_api.stock.lock_async(
         db,
@@ -1021,8 +1030,8 @@ async def complete_production(
             'old_status': 'DRAFT',
             'new_status': 'COMPLETED',
             'output': output.name if output else None,
-            'quantity': float(actual_qty),
-            'total_cost': float(total_cost),
+            'quantity': _stored_qty(actual_qty),
+            'total_cost': quantise(total_cost, 2),
         },
     )
 

@@ -174,6 +174,24 @@ describe("DocumentHistoryPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("states a correction's stock change, not the delta on its original", () => {
+    // Taking one off an issue put it back on the shelf.
+    answer([
+      doc({
+        id: "fix-issue",
+        number: "KOR/2026/004",
+        type: "CORRECTION",
+        corrects_document_type: "OUT",
+        lines: [line("Coffee beans", "-1")],
+      }),
+    ]);
+    renderWithProviders(<DocumentHistoryPage />);
+
+    expect(
+      screen.getByText("Corrected Coffee beans by +1 pcs."),
+    ).toBeInTheDocument();
+  });
+
   it("shows the value only where value is tracked", () => {
     answer([
       doc({ total_gross: "1284.00", currency: "PLN", lines: [line("A", "1")] }),

@@ -575,9 +575,7 @@ ERRORS_FR: ErrorMessages = {
     'approvals_read_forbidden': "Vous n'avez pas l'autorisation de consulter les demandes d'approbation",
     'approvals_write_forbidden': "Vous n'avez pas l'autorisation de soumettre des demandes d'approbation",
     'documents_approve_requires_grant': "Vous n'avez pas l'autorisation d'approuver ou de rejeter des documents",
-    'po_approval_workflow_missing': (
-        "Les bons de commande exigent une approbation, mais aucun flux d'approbation n'est configuré pour eux — créez-en un dans Approbations → Flux, ou désactivez cette exigence"
-    ),
+    'po_approval_workflow_missing': 'Cette commande doit être approuvée, mais personne n’est encore désigné pour le faire. Demandez à votre administrateur de le configurer.',
     'po_supplier_required': 'Un bon de commande ne peut pas être confirmé sans fournisseur',
     'document_type_requires_partner': 'Ce type de document nécessite un partenaire.',
     'partner_has_no_email': "Le partenaire n'a pas d'adresse e-mail.",
@@ -649,7 +647,7 @@ ERRORS_FR: ErrorMessages = {
     'document_update_status': 'Seuls les documents au statut brouillon peuvent être mis à jour',
     'document_correction_locked': 'Les documents de correction sont verrouillés — seules les notes peuvent être modifiées. Tentative de modification : {fields}. Annulez la correction et créez-en une nouvelle si les données sont erronées.',
     'field_cannot_be_cleared': 'Ces champs ne peuvent pas être vidés : {fields}.',
-    'ingredient_defaults_unreadable_file': 'Impossible de lire le fichier : {detail}',
+    'ingredient_defaults_unreadable_file': "Impossible de lire le fichier. L'import attend un fichier .json ou .csv avec une ligne par ingrédient.",
     'onboarding_modules_not_offered': 'Le profil « {profile} » ne propose pas ces modules : {modules}',
     'location_chain_step_incomplete': "Chaque étape d'une chaîne d'emplacements doit avoir un identifiant ou un nom.",
     'current_password_incorrect': 'Le mot de passe actuel est incorrect',
@@ -849,9 +847,7 @@ ERRORS_FR: ErrorMessages = {
     'permanent_delete_disabled': (
         'La suppression définitive est désactivée pour cette organisation.'
     ),
-    'documents_approval_workflow_missing': (
-        "Les documents exigent une approbation, mais aucun flux d'approbation n'est configuré pour eux — créez-en un dans Approbations → Flux, ou désactivez cette exigence"
-    ),
+    'documents_approval_workflow_missing': 'Ce document doit être approuvé, mais personne n’est encore désigné pour le faire. Demandez à votre administrateur de le configurer.',
     'category_delete_blocked_by_items': (
         'Impossible de supprimer la catégorie — elle est utilisée ({count}). Déplacez d’abord ses produits vers une autre catégorie.'
     ),
@@ -944,6 +940,7 @@ ERRORS_FR: ErrorMessages = {
     'recipe_collection_own_parent': 'Une collection ne peut pas être sa propre parente',
     'recipe_collection_under_descendant': 'Une collection ne peut pas être déplacée sous sa propre sous-collection',
     'recipe_scrape_failed': "Impossible de récupérer la recette depuis l'URL",
+    'register_date_from_after_date_to': 'La date de début ne peut pas être postérieure à la date de fin',
     'meal_plan_end_before_start': 'La date de fin ne peut pas précéder la date de début',
     'meal_plan_too_long': 'Un plan ne peut pas dépasser {days} jours',
     'meal_plan_no_slots': 'Activez au moins un repas dans le plan',
