@@ -31,7 +31,10 @@ import { useStorageTypes } from "@/modules/shared/hooks/useStorages";
 import { useCreateStorageHierarchy } from "@/modules/shared/hooks/useStorageMutations";
 import { Step, StepContent } from "./StorageWizardStepContent";
 import { defaultTrackingFieldsForLocation } from "@/modules/spaces/utils/defaultTrackingFields";
-import { useWizardSuggestions } from "@/modules/shared/hooks/useWizardSuggestions";
+import {
+  nameAfterChip,
+  useWizardSuggestions,
+} from "@/modules/shared/hooks/useWizardSuggestions";
 
 interface StorageWizardProps {
   isOpen: boolean;
@@ -478,7 +481,7 @@ export default function StorageWizard({
         setSelectedFields(null);
       }}
       onLocationChip={(v) => {
-        setLocationName(v);
+        setLocationName(nameAfterChip(locationName, v, locationSuggestions));
         setSelectedFields(null);
       }}
       onFieldsChange={setSelectedFields}

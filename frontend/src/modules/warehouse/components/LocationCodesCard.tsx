@@ -139,7 +139,6 @@ export function LocationCodesCard({
         <CardDescription>
           {data.is_tree
             ? t("putaway.locations.codes.tree", {
-                template: data.template,
                 examples: templateExamples(data.template).join(", "),
               })
             : t("putaway.locations.codes.random", { prefix: data.template })}

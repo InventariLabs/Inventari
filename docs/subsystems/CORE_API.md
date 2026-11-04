@@ -126,6 +126,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `get_for_update_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID) -> ItemDTO \| None` | WRITE | Return a single item with row-level lock (SELECT ... FOR NO KEY UPDATE). |
 | `has_active_barcode_async` | `(db: AsyncSession, organization_id: UUID, barcode: str) -> bool` | READ | — |
 | `inherited_category_async` | `(db: AsyncSession, organization_id: UUID, *, source_category_id: UUID \| None=None, template_id: UUID \| None=None) -> UUID \| None` | READ | The category a new record of this product is filed under. |
+| `latest_purchase_prices_async` | `(db: AsyncSession, organization_id: UUID, template_ids: list[UUID]) -> dict[UUID, Decimal]` | READ | The newest recorded purchase price of each product that has one. |
 | `list_async` | `(db: AsyncSession, organization_id: UUID, *, storage_location_id: UUID \| None=None, template_id: UUID \| None=None, storage_usage: str \| None=None, category_id: UUID \| None=None, context_tag: str \| None=None, limit: int=100, offset: int=0) -> list[ItemDTO]` | READ | List items using an AsyncSession. |
 | `list_by_expiry_async` | `(db: AsyncSession, organization_id: UUID, *, template_ids: list[UUID] \| None=None, location_id: UUID \| None=None, storage_usage: str \| None=None, order: str='asc', limit: int=500) -> list[ItemDTO]` | READ | List active items sorted by ``expiry_date`` (FEFO picking order). |
 | `list_existing_serials_async` | `(db: AsyncSession, organization_id: UUID, serial_numbers: set[str]) -> set[str]` | READ | — |
@@ -590,9 +591,9 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 ## Statistics
 
-- **Total methods:** 309
+- **Total methods:** 310
 - **Namespaces:** 33
-- **Documented methods:** 309 (100%)
-- **READ methods:** 213 (69%)
+- **Documented methods:** 310 (100%)
+- **READ methods:** 214 (69%)
 - **WRITE methods:** 96 (31%)
 

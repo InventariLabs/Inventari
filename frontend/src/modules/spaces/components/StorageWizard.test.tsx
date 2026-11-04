@@ -503,6 +503,33 @@ describe("StorageWizard - step 2 suggestions follow the parent", () => {
     expect(screen.queryByRole("button", { name: "Freezer" })).toBeNull();
   });
 
+  it("keeps a name already typed when a chip is pressed", async () => {
+    serve([
+      makeStorageSummary({
+        id: "freezer-zone",
+        name: "Freezer Zone",
+        parent_id: null,
+        full_path: "Freezer Zone",
+        location_type: applianceType("FREEZER"),
+      }),
+    ]);
+    render(
+      <StorageWizard
+        isOpen={true}
+        onClose={vi.fn()}
+        preselectedParentId="freezer-zone"
+      />,
+      { wrapper: createWrapper() },
+    );
+    const chip = await screen.findByRole("button", { name: "Shelf" });
+    const field = screen.getByRole("textbox");
+    await userEvent.type(field, "Shelf A");
+
+    await userEvent.click(chip);
+
+    expect(field).toHaveValue("Shelf A");
+  });
+
   it("offers the places themselves under a root", async () => {
     serve([
       makeStorageSummary({
