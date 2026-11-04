@@ -19434,24 +19434,6 @@ export interface components {
              */
             total_capped: boolean;
         };
-        /** PaginatedResponse[UnlinkedIngredient] */
-        PaginatedResponse_UnlinkedIngredient_: {
-            /** Items */
-            items: components["schemas"]["UnlinkedIngredient"][];
-            /** Total */
-            total: number;
-            /** Limit */
-            limit: number;
-            /** Offset */
-            offset: number;
-            /** Has More */
-            has_more: boolean;
-            /**
-             * Total Capped
-             * @default false
-             */
-            total_capped: boolean;
-        };
         /** PaginatedResponse[UomCategoryDTO] */
         PaginatedResponse_UomCategoryDTO_: {
             /** Items */
@@ -26457,6 +26439,29 @@ export interface components {
             quantity: string;
             /** Uom Symbol */
             uom_symbol?: string | null;
+        };
+        /** UnlinkedIngredientsResponse */
+        UnlinkedIngredientsResponse: {
+            /** Items */
+            items: components["schemas"]["UnlinkedIngredient"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+            /**
+             * Ingredient Total
+             * @default 0
+             */
+            ingredient_total: number;
         };
         /** UomCategoryDTO */
         UomCategoryDTO: {
@@ -40187,7 +40192,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedResponse_UnlinkedIngredient_"];
+                    "application/json": components["schemas"]["UnlinkedIngredientsResponse"];
                 };
             };
             /** @description Validation Error */

@@ -10,6 +10,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.schemas.pagination import PaginatedResponse
+
 
 class UnlinkedIngredient(BaseModel):
     """One unlinked ingredient, with enough context to recognise it."""
@@ -23,6 +25,12 @@ class UnlinkedIngredient(BaseModel):
     match_name: str
     quantity: Decimal
     uom_symbol: str | None = None
+
+
+class UnlinkedIngredientsResponse(PaginatedResponse[UnlinkedIngredient]):
+    #: Every ingredient of the organization's recipes, linked or not — what
+    #: tells "everything is linked" apart from "there are no ingredients".
+    ingredient_total: int = 0
 
 
 class IngredientMatchProposal(BaseModel):

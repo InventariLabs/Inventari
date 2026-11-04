@@ -80,6 +80,37 @@ function readSlotConflicts(error: unknown): SlotConflict[] {
   );
 }
 
+/** Copying needs a meal to copy; the reason is text, not only a title. */
+function CopyPlanButton({
+  hasMeals,
+  onCopy,
+  t,
+}: {
+  hasMeals: boolean;
+  onCopy: () => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onCopy}
+        disabled={!hasMeals}
+        aria-describedby={hasMeals ? undefined : "meal-plan-needs-meals"}
+        leftIcon={<Copy size={16} />}
+      >
+        {t("meal_planner.copy_to_week")}
+      </Button>
+      {!hasMeals && (
+        <p id="meal-plan-needs-meals" className="text-xs text-on-muted">
+          {t("meal_planner.needs_meals_hint")}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function MealPlanDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -384,17 +415,11 @@ export default function MealPlanDetailPage() {
       />
 
       {canWrite && (
-        <div className="flex items-center justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={openCopyModal}
-            disabled={plan.entries.length === 0}
-            leftIcon={<Copy size={16} />}
-          >
-            {t("meal_planner.copy_to_week")}
-          </Button>
-        </div>
+        <CopyPlanButton
+          hasMeals={plan.entries.length > 0}
+          onCopy={openCopyModal}
+          t={t}
+        />
       )}
 
       <MealPlanCalendar

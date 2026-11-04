@@ -413,7 +413,7 @@
     "unitCost": "Coût unitaire",
     "unitCostIncomplete_one": "1 ingrédient de la dernière production n'a pas de prix d'achat enregistré.",
     "unitCostIncomplete_other": "{{count}} ingrédients de la dernière production n'ont pas de prix d'achat enregistré.",
-    "stock": "Stock",
+    "stock": "Stock du produit fini",
     "lastProduced": "Dernière production",
     "ingredientCount": "{{count}} ingrédients",
     "ingredientCount_one": "{{count}} ingrédient",
