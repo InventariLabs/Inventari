@@ -39,7 +39,7 @@ export function Tooltip({
     <span
       role="tooltip"
       className={cn(
-        "pointer-events-none absolute z-20 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-[10px] font-medium text-white opacity-0 shadow-md transition-opacity [@media(hover:hover)]:group-hover/tooltip:opacity-100 group-has-[:focus-visible]/tooltip:opacity-100",
+        "pointer-events-none absolute z-20 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-[10px] font-medium text-white opacity-0 shadow-md transition-opacity [@media(hover:hover)]:group-hover/tooltip:opacity-100 group-focus-visible/tooltip:opacity-100",
         side === "top"
           ? "bottom-full right-0 mb-1.5"
           : "right-full top-1/2 mr-1.5 -translate-y-1/2",

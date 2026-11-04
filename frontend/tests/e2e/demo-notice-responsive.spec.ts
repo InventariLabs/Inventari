@@ -145,11 +145,17 @@ for (const viewport of VIEWPORTS) {
         }
         // …and the way to the inbox, one unbroken link, on both.
         await expect(inboxLink).toHaveAttribute("href", DEMO_INBOX_URL);
-        const linkLines = await inboxLink.evaluate(
-          (element) =>
-            element.getBoundingClientRect().height /
-            parseFloat(getComputedStyle(element).lineHeight),
-        );
+        // Counted from the text's own line boxes: the link keeps a 24 px
+        // target on a phone, which is taller than its 16 px line.
+        const linkLines = await inboxLink.evaluate((element) => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          return new Set(
+            Array.from(range.getClientRects()).map((rect) =>
+              Math.round(rect.top),
+            ),
+          ).size;
+        });
         expect(
           Math.round(linkLines),
           `${language.code} inbox link is split across lines`,
