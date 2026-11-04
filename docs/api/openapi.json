@@ -67692,6 +67692,18 @@
             ],
             "title": "Uom Symbol"
           },
+          "purchase_price": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purchase Price"
+          },
           "image_url": {
             "anyOf": [
               {

@@ -42,6 +42,9 @@ test("a visitor confirms an order without prices and sees it through", async ({
     .getByRole("option", { name: /natural yoghurt/i })
     .first()
     .click();
+  // The demo's stock is priced, so the line starts from what the product last
+  // cost. The price is emptied here: an order with none is what this walks.
+  await form.getByRole("spinbutton", { name: /unit price/i }).clear();
   // A line with no price is nothing to total: no 0.00 before the order exists.
   await expect(form.getByText(/^0\.00/)).toHaveCount(0);
   await form.getByRole("button", { name: /create order/i }).click();

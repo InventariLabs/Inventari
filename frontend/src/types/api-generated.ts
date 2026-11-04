@@ -20632,6 +20632,8 @@ export interface components {
             uom_id?: string | null;
             /** Uom Symbol */
             uom_symbol?: string | null;
+            /** Purchase Price */
+            purchase_price?: string | null;
             /** Image Url */
             image_url?: string | null;
             /**

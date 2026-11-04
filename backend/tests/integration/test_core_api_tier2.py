@@ -17,7 +17,7 @@ Contract:
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from uuid import uuid4
 
@@ -264,6 +264,83 @@ class TestCoreItemsListWithTemplate:
             db, async_test_storage_location.organization_id, [uuid4()]
         )
         assert result == {result.popitem()[0]: []} or result == {}
+
+
+@pytest.mark.asyncio
+class TestCoreItemsLatestPurchasePrices:
+    """`core_api.items.latest_purchase_prices_async`."""
+
+    async def test_newest_priced_record_answers_whatever_its_quantity(
+        self, real_async_db_session: AsyncSession, async_test_storage_location
+    ):
+        db = real_async_db_session
+        org_id = async_test_storage_location.organization_id
+        loc_id = async_test_storage_location.id
+        tpl = await _make_template(db, org_id, name='Priced')
+        unpriced = await _make_template(db, org_id, name='Unpriced')
+        older = await _make_item(db, org_id, loc_id, name='Old', template_id=tpl.id)
+        older.purchase_price = Decimal('45.00')
+        older.created_at = datetime(2026, 1, 1, tzinfo=UTC)
+        empty = await _make_item(
+            db, org_id, loc_id, name='New', template_id=tpl.id, quantity=Decimal('0')
+        )
+        empty.purchase_price = Decimal('50.00')
+        empty.created_at = datetime(2026, 2, 1, tzinfo=UTC)
+        # The newest record has no price: it says nothing about the cost.
+        newest = await _make_item(db, org_id, loc_id, name='Nw', template_id=tpl.id)
+        newest.created_at = datetime(2026, 3, 1, tzinfo=UTC)
+        await _make_item(db, org_id, loc_id, name='U', template_id=unpriced.id)
+        await db.commit()
+
+        result = await core_api.items.latest_purchase_prices_async(
+            db, org_id, [tpl.id, unpriced.id]
+        )
+
+        assert result == {tpl.id: Decimal('50.00')}
+
+    async def test_deleted_records_do_not_answer(
+        self, real_async_db_session: AsyncSession, async_test_storage_location
+    ):
+        db = real_async_db_session
+        org_id = async_test_storage_location.organization_id
+        loc_id = async_test_storage_location.id
+        tpl = await _make_template(db, org_id, name='Deleted')
+        item = await _make_item(db, org_id, loc_id, template_id=tpl.id, is_deleted=True)
+        item.purchase_price = Decimal('45.00')
+        await db.commit()
+
+        assert (
+            await core_api.items.latest_purchase_prices_async(db, org_id, [tpl.id])
+            == {}
+        )
+
+    async def test_org_scoping(
+        self, real_async_db_session: AsyncSession, async_test_storage_location
+    ):
+        db = real_async_db_session
+        org_id = async_test_storage_location.organization_id
+        loc_id = async_test_storage_location.id
+        tpl = await _make_template(db, org_id, name='Ours')
+        item = await _make_item(db, org_id, loc_id, template_id=tpl.id)
+        item.purchase_price = Decimal('45.00')
+        await db.commit()
+
+        assert (
+            await core_api.items.latest_purchase_prices_async(db, uuid4(), [tpl.id])
+            == {}
+        )
+
+    async def test_no_templates_asks_nothing(
+        self, real_async_db_session: AsyncSession, async_test_storage_location
+    ):
+        assert (
+            await core_api.items.latest_purchase_prices_async(
+                real_async_db_session,
+                async_test_storage_location.organization_id,
+                [],
+            )
+            == {}
+        )
 
 
 @pytest.mark.asyncio
