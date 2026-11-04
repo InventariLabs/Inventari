@@ -21,7 +21,9 @@ export function toAttentionItems(
   const dated = groups.map((group) => {
     const first = group.items[0];
     const where = locations.get(first.location_id)?.name;
-    const href = `/inventory/items?open=${first.id}`;
+    // The date is why the row is here, and on a phone it sits far down the
+    // sheet, so the link asks for it.
+    const href = `/inventory/items?open=${first.id}&at=expiry`;
     const date = formatDate(first.expiry_date);
     // A product held as two records (half a carton left after cooking) is
     // two rows; the quantity is what tells them apart, read the way the

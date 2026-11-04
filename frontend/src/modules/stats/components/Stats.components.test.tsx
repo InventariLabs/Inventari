@@ -998,6 +998,15 @@ describe("SmartAlertsPanel", () => {
     ).toBeInTheDocument();
   });
 
+  it("says what the total counts, so it is not read against the overview's number", () => {
+    render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
+    expect(
+      screen.getByText(
+        "Dates, forgotten items, missing staples; not low stock",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("says when an expired record went off", () => {
     render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
     expect(screen.getByText(/^Expired on .*2026\.$/)).toBeInTheDocument();

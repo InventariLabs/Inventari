@@ -55,6 +55,7 @@
     },
     "alerts": {
       "total": "Suma alertów",
+      "totalHint": "Daty, zapomniane produkty, brakujące podstawy; bez niskiego stanu",
       "types": {
         "forgotten": "Zapomniane produkty",
         "forgottenHint": "Nietknięte od co najmniej 60 dni",

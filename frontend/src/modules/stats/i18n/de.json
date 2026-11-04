@@ -49,6 +49,7 @@
     },
     "alerts": {
       "total": "Benachrichtigungen gesamt",
+      "totalHint": "Daten, vergessene Artikel, fehlende Grundvorräte; ohne niedrigen Bestand",
       "types": {
         "forgotten": "Vergessene Artikel",
         "forgottenHint": "Seit mindestens 60 Tagen unberührt",

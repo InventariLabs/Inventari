@@ -24,6 +24,26 @@ function product(over: Partial<LowStockProduct>): LowStockProduct {
   };
 }
 
+describe("toAttentionItems — dated records", () => {
+  it("links to the record's date, which is why the row is on the card", () => {
+    const record = {
+      id: "i-7",
+      name: "Cottage Cheese",
+      location_id: "l-1",
+      expiry_date: "2026-10-29",
+      quantity: 10,
+    } as unknown as Item;
+    const [row] = toAttentionItems(
+      [{ key: "g-1", kind: "expired", items: [record] }] as AttentionGroup[],
+      new Map(),
+      [],
+      t,
+      none,
+    );
+    expect(row.href).toBe("/inventory/items?open=i-7&at=expiry");
+  });
+});
+
 describe("toAttentionItems — short products", () => {
   it("says a used-up product has none left, against its minimum", () => {
     const [row] = toAttentionItems([], new Map(), [product({})], t, none);

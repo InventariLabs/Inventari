@@ -165,7 +165,8 @@ export default function ItemsPage() {
   );
   const [searchParams] = useSearchParams();
 
-  const [editingItemId, setEditingItemId] = useOpenProductParam();
+  const [editingItemId, setEditingItemId, editingAtExpiry] =
+    useOpenProductParam();
 
   // A product's name opens the product dialog, the pencil's own — on the
   // desktop table and on a phone card alike. It used to open a quick-action
@@ -586,6 +587,7 @@ export default function ItemsPage() {
 
       <ItemsModalsContainer
         editingItemId={editingItemId}
+        editingAtExpiry={editingAtExpiry}
         setEditingItemId={setEditingItemId}
         thresholdItem={thresholdItem}
         setThresholdItem={setThresholdItem}

@@ -6,6 +6,7 @@ import ImportModal from "@/modules/inventory/components/items/ImportModal";
 
 interface ItemsModalsContainerProps {
   editingItemId: string | null;
+  editingAtExpiry: boolean;
   setEditingItemId: (id: string | null) => void;
   thresholdItem: Item | null;
   setThresholdItem: (item: Item | null) => void;
@@ -19,6 +20,7 @@ interface ItemsModalsContainerProps {
 
 export default function ItemsModalsContainer({
   editingItemId,
+  editingAtExpiry,
   setEditingItemId,
   thresholdItem,
   setThresholdItem,
@@ -34,6 +36,7 @@ export default function ItemsModalsContainer({
       {editingItemId && (
         <ItemEditModal
           itemId={editingItemId}
+          openAtExpiry={editingAtExpiry}
           onClose={() => setEditingItemId(null)}
         />
       )}
