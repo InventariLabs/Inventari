@@ -110,11 +110,12 @@ class ApprovalsAPI:
     async def first_stage_verdict(
         db: AsyncSession, org_id: UUID, target_type: str, requester_id: UUID
     ) -> FirstStageVerdictDTO | None:
-        """Whether a request raised now would park where somebody can decide it.
+        """Whether a request raised now could be decided at every stage.
 
         For the screen that raises the request (a document about to be
         confirmed): the answer is known before the click, so the dialog can
-        say it. ``None`` when no active workflow exists for the target type.
+        say it. The first stage nobody can decide is the one named. ``None`` when
+        no active workflow exists for the target type.
         """
         verdict = await first_stage_verdict_async(db, org_id, target_type, requester_id)
         if verdict is None:

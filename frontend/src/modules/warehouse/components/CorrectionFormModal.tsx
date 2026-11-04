@@ -18,7 +18,10 @@ import {
 import { useDiscardGuard } from "@/hooks/useDiscardGuard";
 import { DiscardDraftDialog } from "@/components/ui/DiscardDraftDialog";
 import { Sheet } from "@/components/ui/Sheet";
-import type { WarehouseDocument } from "@/modules/warehouse/types";
+import {
+  correctionStockSign,
+  type WarehouseDocument,
+} from "@/modules/warehouse/types";
 import { useCreateCorrection } from "@/modules/warehouse/hooks/useDocuments";
 import { useQuantityStepCheck } from "@/hooks/useUomPrecision";
 import { formatQuantityValue } from "@/utils/formatters";
@@ -147,7 +150,12 @@ export function CorrectionFormModal({
           className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
         />
         <p className="text-xs text-amber-700 dark:text-amber-300">
-          {t("corrections.warning")}
+          {t("corrections.warning")}{" "}
+          {/* Which way a difference moves stock depends on the document it
+              corrects: the banner says so before the reader types one. */}
+          {correctionStockSign(document.type) < 0
+            ? t("corrections.directionDispatch")
+            : t("corrections.directionReceipt")}
         </p>
       </div>
 

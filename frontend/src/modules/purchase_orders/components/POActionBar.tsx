@@ -76,6 +76,12 @@ interface POActionItem {
    * does not read as one more button beside the order's everyday actions.
    */
   destructive?: boolean;
+  /**
+   * The order's main next step: on a phone it stays on the header row beside
+   * the "⋯" instead of inside the menu, while it can run. A disabled one
+   * stays in the menu, where its reason is printed under the label.
+   */
+  promoted?: boolean;
   onClick: () => void;
 }
 
@@ -251,6 +257,7 @@ export function POActionBar({
       label: t("receiveDelivery"),
       icon: PackagePlus,
       variant: "secondary",
+      promoted: true,
       // The receive screen finds the order through its supplier.
       disabled: !po.partner_id,
       disabledReason: t("receiveDeliveryNoPartner"),
@@ -376,6 +383,40 @@ function Actions({
     );
   }
 
+  const promoted = items.find((item) => item.promoted && !item.disabled);
+  const inMenu = items.filter((item) => item !== promoted);
+
+  return (
+    <div className="flex items-center gap-1 shrink-0">
+      {promoted && (
+        <Button variant={promoted.variant} size="sm" onClick={promoted.onClick}>
+          <promoted.icon className="w-4 h-4 mr-1" />
+          {promoted.label}
+        </Button>
+      )}
+      {inMenu.length > 0 && (
+        <PhoneMenu
+          items={inMenu}
+          moreLabel={moreLabel}
+          open={open}
+          setOpen={setOpen}
+        />
+      )}
+    </div>
+  );
+}
+
+function PhoneMenu({
+  items,
+  moreLabel,
+  open,
+  setOpen,
+}: {
+  items: POActionItem[];
+  moreLabel: string;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>

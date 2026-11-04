@@ -37,6 +37,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Item, ProductTemplate
 from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
+from app.models.uom import Uom
 from app.models.user import User
 from app.modules.shopping_lists.models import ShoppingList
 from app.services.auth_service import get_password_hash
@@ -181,3 +182,36 @@ class TestThePreviewLeavesNoTrace:
         )
 
         assert response.status_code != 422, response.text
+
+
+@pytest.mark.integration
+class TestAProposalNamesItsUnitForTheListRow:
+    async def test_the_proposal_carries_the_unit_id_beside_its_symbol(
+        self,
+        real_async_client: Any,
+        real_async_db_session: AsyncSession,
+        buy_user: User,
+        a_product_that_is_short: ProductTemplate,
+    ) -> None:
+        # The review sheet printed "pcs" from the symbol, but a row added from
+        # it could only be built from what the proposal carried: no unit id,
+        # so the line landed on the list with "—" where the sheet said "pcs".
+        unit = await real_async_db_session.scalar(
+            select(Uom).where(Uom.symbol == 'pcs')
+        )
+        assert unit is not None
+        a_product_that_is_short.uom_id = unit.id
+        await real_async_db_session.commit()
+
+        response = await real_async_client.get(
+            '/api/v1/shopping-lists/suggestions', headers=_auth(buy_user)
+        )
+
+        assert response.status_code == status.HTTP_200_OK, response.text
+        proposal = next(
+            s
+            for s in response.json()['suggestions']
+            if s['name'] == a_product_that_is_short.name
+        )
+        assert proposal['uom_symbol'] == 'pcs'
+        assert proposal['uom_id'] == str(unit.id)

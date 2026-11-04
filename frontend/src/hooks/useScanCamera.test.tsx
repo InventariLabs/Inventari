@@ -11,6 +11,7 @@ import {
   whenDecodeCanvas,
   absorbReaderPlayAbort,
 } from "./useScanCamera";
+import { useTorchAvailable } from "./useTorchAvailable";
 
 vi.mock("html5-qrcode", () => {
   class MockHtml5Qrcode {
@@ -829,11 +830,20 @@ describe("useScanCamera — the flashlight", () => {
     });
   });
 
-  async function runCamera() {
+  async function runCamera(stream?: object) {
     const MockQr = Html5Qrcode as unknown as { rejectError: unknown };
     MockQr.rejectError = null;
     document.body.innerHTML = '<div id="qr-reader"><video></video></div>';
-    const hook = renderHook(() => useScanCamera({ onCodeScanned: vi.fn() }));
+    if (stream) {
+      Object.defineProperty(document.querySelector("video"), "srcObject", {
+        value: stream,
+        configurable: true,
+      });
+    }
+    const hook = renderHook(() => ({
+      ...useScanCamera({ onCodeScanned: vi.fn() }),
+      hasTorch: useTorchAvailable(),
+    }));
     act(() => {
       hook.result.current.setIsCameraActive(true);
     });
@@ -843,6 +853,22 @@ describe("useScanCamera — the flashlight", () => {
     expect(hook.result.current.isCameraRunning).toBe(true);
     return hook;
   }
+
+  it.each([
+    ["has a torch", true],
+    ["has none", false],
+  ])("knows before any tap whether the camera %s", async (_, torch) => {
+    const { result } = await runCamera({
+      getVideoTracks: () => [
+        {
+          addEventListener: () => {},
+          getCapabilities: () => (torch ? { torch: true } : {}),
+        },
+      ],
+    });
+
+    expect(result.current.hasTorch).toBe(torch);
+  });
 
   it("says the flashlight is not supported when the camera has no torch", async () => {
     const error = vi.spyOn(toast, "error").mockImplementation(() => "id");

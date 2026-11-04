@@ -30,6 +30,36 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Tapping a screen for the first time now shows a loading sign at once, inside
+  the application's frame, instead of leaving the old screen up for as long as
+  the download takes. The very first open of the application shows the product
+  name and a loading sign instead of a white page.
+- A row of the inventory overview about a date opens the product with its
+  expiry date in view; on a phone it was a long way down the sheet.
+- On a phone, a purchase order's main action sits on its bar rather than in the
+  "..." menu, the new partner sheet keeps Save in view, the statistics tabs fit
+  the screen, and the product suggestions open above the keyboard. A line added
+  to a shopping list from the replenish suggestions keeps its unit, and the
+  analytics tiles say what they count.
+- The product search no longer empties itself while you are using it. Its list
+  used to close and take your text along on a scroll event when nothing had
+  moved, or when the form was still sliding into place as the list opened. It
+  now closes only when a scroll moves a box that was standing still, and stays
+  under the box while the form settles.
+- Warehouse floor papercuts: the carrier typed on the picking summary is
+  still there when packing opens; a camera without a torch no longer offers
+  the light switch; the lot on the receiving expiry sheet and a product's own
+  code on the product form can be read with the camera instead of retyped,
+  and the lot sheet no longer opens with the keyboard over the expiry date; a
+  correction draft describes each line as added to or removed from stock in
+  words, the same way on its line, summary and confirmation; every row of
+  the history keeps its columns aligned; and a write-off ends on a write-off
+  result instead of "Issued".
+- Finishing a stock take right after saving the last count no longer refuses
+  with "one product is still uncounted": Complete stock take now waits until
+  the saved count is back on the screen.
+- Ticking two filter chips quickly on the product list no longer drops the
+  first one from the address, which turned it off a moment later.
 - Saving a supplier price or a reorder rule without a product now marks the
   product field as required and says so on the field, and a reorder rule whose
   maximum is below its minimum is refused on the Maximum field in plain words.

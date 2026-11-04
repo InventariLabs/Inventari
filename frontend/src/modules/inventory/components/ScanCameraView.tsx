@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/Input";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { ScannerReadyHint } from "@/components/ui/ScannerReadyHint";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useTorchAvailable } from "@/hooks/useScanCamera";
 import { useScannerInput } from "@/hooks/useScannerInput";
 import type { StorageContext } from "@/store/scanStore";
 interface ScanCameraViewProps {
@@ -116,6 +117,7 @@ export default function ScanCameraView({
   onDismissLookupFailure,
 }: ScanCameraViewProps) {
   const { t: tScan } = useTranslation(["scan", "common"]);
+  const hasTorch = useTorchAvailable();
   // A hardware scanner's code takes the camera's path, from any state.
   useScannerInput((code) => onManualCode?.(code), {
     enabled: Boolean(onManualCode),
@@ -186,25 +188,27 @@ export default function ScanCameraView({
           </div>
         )}
 
-        <div className="flex flex-col gap-3 pointer-events-auto">
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={onToggleTorch}
-            aria-label={tScan(isTorchOn ? "torchOff" : "torchOn")}
-            className={`rounded-full backdrop-blur-xl border-white/10 transition-all ${
-              isTorchOn
-                ? "bg-amber-400 text-black shadow-lg shadow-amber-400/20"
-                : "bg-black/40 text-white"
-            }`}
-          >
-            {isTorchOn ? (
-              <Zap size={24} fill="currentColor" />
-            ) : (
-              <ZapOff size={24} />
-            )}
-          </Button>
-        </div>
+        {hasTorch && (
+          <div className="flex flex-col gap-3 pointer-events-auto">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={onToggleTorch}
+              aria-label={tScan(isTorchOn ? "torchOff" : "torchOn")}
+              className={`rounded-full backdrop-blur-xl border-white/10 transition-all ${
+                isTorchOn
+                  ? "bg-amber-400 text-black shadow-lg shadow-amber-400/20"
+                  : "bg-black/40 text-white"
+              }`}
+            >
+              {isTorchOn ? (
+                <Zap size={24} fill="currentColor" />
+              ) : (
+                <ZapOff size={24} />
+              )}
+            </Button>
+          </div>
+        )}
       </div>
 
       {lookupFailure && (

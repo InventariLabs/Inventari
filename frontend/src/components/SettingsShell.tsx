@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import {
   Settings,
   Boxes,
@@ -407,7 +408,9 @@ export default function SettingsShell() {
                 description={denial.hint}
               />
             ) : (
-              <Outlet />
+              <Suspense fallback={<LoadingSpinner />}>
+                <Outlet />
+              </Suspense>
             )}
           </div>
         </PageHeaderContext.Provider>

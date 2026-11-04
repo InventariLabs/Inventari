@@ -289,6 +289,31 @@ describe("useCancelRequest", () => {
     });
     expect(spy).toHaveBeenCalledWith({ queryKey: ["document-approval"] });
   });
+
+  it("refreshes the purchase order's approval-requirement answer, which still says an open request exists", async () => {
+    server.use(
+      http.post("*/approvals/requests/req1/cancel", () =>
+        HttpResponse.json({ ...mockRequest, status: "CANCELLED" }),
+      ),
+    );
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const spy = vi.spyOn(queryClient, "invalidateQueries");
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>{children}</BrowserRouter>
+      </QueryClientProvider>
+    );
+    const { result } = renderHook(() => useCancelRequest(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync({ id: "req1" });
+    });
+    expect(spy).toHaveBeenCalledWith({ queryKey: ["purchase-orders"] });
+  });
 });
 
 describe("settling a request", () => {

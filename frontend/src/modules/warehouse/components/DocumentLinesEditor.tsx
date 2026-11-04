@@ -1,5 +1,6 @@
 import { useCallback, useMemo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { useTorchAvailable } from "@/hooks/useScanCamera";
 import {
   LineItemsEditor,
   type LineItem,
@@ -170,6 +171,7 @@ export function DocumentLinesEditor({
   onCreateProduct,
 }: DocumentLinesEditorProps) {
   const { t, i18n } = useTranslation(["warehouse", "scan"]);
+  const hasTorch = useTorchAvailable();
   const dateLang = i18n.language?.substring(0, 2) ?? "en";
   const { results, elsewhere, isLoading, search, clearSearch } =
     useProductSearch({
@@ -396,6 +398,7 @@ export function DocumentLinesEditor({
         error: scannerError,
         cameraActive: isCameraActive,
         torchOn: isTorchOn,
+        torchAvailable: hasTorch,
         onToggle: onScanToggle,
         onToggleTorch,
         onManualCode,

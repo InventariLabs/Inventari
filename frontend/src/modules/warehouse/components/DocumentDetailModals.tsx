@@ -126,10 +126,14 @@ export default function DocumentDetailModals({
           onRequestApproval={onPickingRequestApproval}
           onPack={
             isPackedType(doc.type)
-              ? () => {
-                  // Closed without completing: the Pack step comes first.
+              ? (shipment) => {
+                  // Closed without completing: the Pack step comes first,
+                  // and takes the carrier already typed along with it.
                   onPickingClose(false);
-                  navigate(PACKING_HASH, { replace: true });
+                  navigate(PACKING_HASH, {
+                    replace: true,
+                    state: { shipment },
+                  });
                 }
               : undefined
           }

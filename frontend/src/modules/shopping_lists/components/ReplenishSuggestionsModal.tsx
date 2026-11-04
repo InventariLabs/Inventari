@@ -72,6 +72,7 @@ function rowsToAdd(
         category_id: s.category_id ?? undefined,
         name: s.name,
         quantity: quantities[key] || toAmount(s.quantity) || 1,
+        uom_id: s.uom_id ?? undefined,
         priority: priorities[key] ?? s.priority ?? 0,
         estimated_price: s.estimated_price ?? undefined,
         notes: s.notes ?? undefined,

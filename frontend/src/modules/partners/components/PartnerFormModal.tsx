@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { NativeSelect } from "@/components/ui/NativeSelect";
-import { Sheet } from "@/components/ui/Sheet";
+import { Sheet, SheetActions, SheetFooter } from "@/components/ui/Sheet";
 import { extractApiError } from "@/lib/errors";
 import {
   useCreatePartner,
@@ -186,169 +186,174 @@ export default function PartnerFormModal({ partner, onClose }: Props) {
       <form
         noValidate
         onSubmit={handleSubmit}
-        className="p-5 space-y-4 overflow-y-auto flex-1"
+        className="flex min-h-0 flex-1 flex-col"
       >
-        {/* Name + Type */}
-        <div className="grid grid-cols-1 items-end sm:grid-cols-2 gap-3">
+        <div className="flex-1 min-h-0 space-y-4 overflow-y-auto p-5">
+          {/* Name + Type */}
+          <div className="grid grid-cols-1 items-end sm:grid-cols-2 gap-3">
+            <div>
+              <Input
+                id={NAME_FIELD_ID}
+                label={isEmployee ? t("fields.fullName") : t("fields.name")}
+                error={fieldErrors.name}
+                required
+                value={form.name}
+                onChange={(e) => set("name", e.target.value)}
+                placeholder={
+                  isEmployee
+                    ? t("form.fullNamePlaceholder")
+                    : t("form.namePlaceholder")
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <NativeSelect
+                // The star used to be baked into the label string, where a
+                // screen reader read it as the word "star"; the component draws
+                // it from `required` and announces the requirement instead.
+                label={t("fields.type")}
+                required
+                value={form.type}
+                onChange={(e) => set("type", e.target.value)}
+              >
+                {PARTNER_TYPES.map((pt) => (
+                  <option key={pt} value={pt}>
+                    {t(`types.${pt}`)}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+          </div>
+
+          {/* Tax ID and private person — hidden for employees */}
+          {!isEmployee && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3">
+                <div>
+                  <Input
+                    label={t("fields.taxId")}
+                    value={form.tax_id ?? ""}
+                    onChange={(e) => set("tax_id", e.target.value)}
+                    placeholder={t("form.taxIdPlaceholder")}
+                  />
+                </div>
+                <div>
+                  <Input
+                    label={t("fields.code")}
+                    value={form.code ?? ""}
+                    onChange={(e) => set("code", e.target.value)}
+                    placeholder={t("form.codePlaceholder")}
+                  />
+                </div>
+              </div>
+              <div>
+                <Checkbox
+                  id="partner-form-consumer"
+                  label={t("fields.isConsumer")}
+                  aria-describedby="partner-form-consumer-hint"
+                  checked={form.is_consumer}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      is_consumer: e.target.checked,
+                    }))
+                  }
+                />
+                <p
+                  id="partner-form-consumer-hint"
+                  className="text-xs text-on-muted mt-1 ml-6"
+                >
+                  {t("form.isConsumerHint")}
+                </p>
+              </div>
+            </>
+          )}
+
+          {/* Email + Phone */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3">
+            <div>
+              <Input
+                id={EMAIL_FIELD_ID}
+                type="email"
+                label={t("fields.email")}
+                error={fieldErrors.email}
+                value={form.email ?? ""}
+                onChange={(e) => set("email", e.target.value)}
+                placeholder={t("form.emailPlaceholder")}
+              />
+            </div>
+            <div>
+              <Input
+                label={t("fields.phone")}
+                value={form.phone ?? ""}
+                onChange={(e) => set("phone", e.target.value)}
+                placeholder={t("form.phonePlaceholder")}
+              />
+            </div>
+          </div>
+
+          {/* Website — hidden for employees */}
+          {!isEmployee && (
+            <div>
+              <Input
+                id={WEBSITE_FIELD_ID}
+                type="url"
+                label={t("fields.website")}
+                error={fieldErrors.website}
+                value={form.website ?? ""}
+                onChange={(e) => set("website", e.target.value)}
+                placeholder={t("form.websitePlaceholder")}
+              />
+            </div>
+          )}
           <div>
             <Input
-              id={NAME_FIELD_ID}
-              label={isEmployee ? t("fields.fullName") : t("fields.name")}
-              error={fieldErrors.name}
-              required
-              value={form.name}
-              onChange={(e) => set("name", e.target.value)}
+              label={
+                isEmployee ? t("fields.position") : t("fields.contactPerson")
+              }
+              value={form.contact_person ?? ""}
+              onChange={(e) => set("contact_person", e.target.value)}
               placeholder={
                 isEmployee
-                  ? t("form.fullNamePlaceholder")
-                  : t("form.namePlaceholder")
+                  ? t("form.positionPlaceholder")
+                  : t("form.contactPersonPlaceholder")
               }
             />
           </div>
-          <div className="space-y-1.5">
-            <NativeSelect
-              // The star used to be baked into the label string, where a
-              // screen reader read it as the word "star"; the component draws
-              // it from `required` and announces the requirement instead.
-              label={t("fields.type")}
-              required
-              value={form.type}
-              onChange={(e) => set("type", e.target.value)}
-            >
-              {PARTNER_TYPES.map((pt) => (
-                <option key={pt} value={pt}>
-                  {t(`types.${pt}`)}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-        </div>
 
-        {/* Tax ID and private person — hidden for employees */}
-        {!isEmployee && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3">
-              <div>
-                <Input
-                  label={t("fields.taxId")}
-                  value={form.tax_id ?? ""}
-                  onChange={(e) => set("tax_id", e.target.value)}
-                  placeholder={t("form.taxIdPlaceholder")}
-                />
-              </div>
-              <div>
-                <Input
-                  label={t("fields.code")}
-                  value={form.code ?? ""}
-                  onChange={(e) => set("code", e.target.value)}
-                  placeholder={t("form.codePlaceholder")}
-                />
-              </div>
-            </div>
-            <div>
-              <Checkbox
-                id="partner-form-consumer"
-                label={t("fields.isConsumer")}
-                aria-describedby="partner-form-consumer-hint"
-                checked={form.is_consumer}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    is_consumer: e.target.checked,
-                  }))
-                }
-              />
-              <p
-                id="partner-form-consumer-hint"
-                className="text-xs text-on-muted mt-1 ml-6"
-              >
-                {t("form.isConsumerHint")}
-              </p>
-            </div>
-          </>
-        )}
-
-        {/* Email + Phone */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3">
-          <div>
-            <Input
-              id={EMAIL_FIELD_ID}
-              type="email"
-              label={t("fields.email")}
-              error={fieldErrors.email}
-              value={form.email ?? ""}
-              onChange={(e) => set("email", e.target.value)}
-              placeholder={t("form.emailPlaceholder")}
-            />
-          </div>
-          <div>
-            <Input
-              label={t("fields.phone")}
-              value={form.phone ?? ""}
-              onChange={(e) => set("phone", e.target.value)}
-              placeholder={t("form.phonePlaceholder")}
-            />
-          </div>
-        </div>
-
-        {/* Website — hidden for employees */}
-        {!isEmployee && (
-          <div>
-            <Input
-              id={WEBSITE_FIELD_ID}
-              type="url"
-              label={t("fields.website")}
-              error={fieldErrors.website}
-              value={form.website ?? ""}
-              onChange={(e) => set("website", e.target.value)}
-              placeholder={t("form.websitePlaceholder")}
-            />
-          </div>
-        )}
-        <div>
-          <Input
-            label={
-              isEmployee ? t("fields.position") : t("fields.contactPerson")
-            }
-            value={form.contact_person ?? ""}
-            onChange={(e) => set("contact_person", e.target.value)}
-            placeholder={
-              isEmployee
-                ? t("form.positionPlaceholder")
-                : t("form.contactPersonPlaceholder")
-            }
+          {/* Notes */}
+          <Textarea
+            label={t("fields.notes")}
+            value={form.notes ?? ""}
+            onChange={(e) => set("notes", e.target.value)}
+            placeholder={t("form.notesPlaceholder")}
+            rows={3}
+            className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-surface-card text-on placeholder:text-on-muted resize-none transition-all duration-200"
           />
+
+          {/* Address — collapsible */}
+          {!isEmployee && (
+            <PartnerAddressSection
+              address={form.address}
+              open={showAddress}
+              onToggle={() => setShowAddress((v) => !v)}
+              onChange={setAddress}
+            />
+          )}
         </div>
 
-        {/* Notes */}
-        <Textarea
-          label={t("fields.notes")}
-          value={form.notes ?? ""}
-          onChange={(e) => set("notes", e.target.value)}
-          placeholder={t("form.notesPlaceholder")}
-          rows={3}
-          className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-surface-card text-on placeholder:text-on-muted resize-none transition-all duration-200"
-        />
-
-        {/* Address — collapsible */}
-        {!isEmployee && (
-          <PartnerAddressSection
-            address={form.address}
-            open={showAddress}
-            onToggle={() => setShowAddress((v) => !v)}
-            onChange={setAddress}
-          />
-        )}
-
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-2 pt-2">
-          <Button type="button" variant="outline" onClick={onClose}>
-            {t("common:form.cancel")}
-          </Button>
-          <Button type="submit" isLoading={isLoading}>
-            {isLoading ? t("form.saving") : t("common:form.save")}
-          </Button>
-        </div>
+        {/* Actions: outside the scrolling body, so a phone never has to
+            swipe past the last field to find Save. */}
+        <SheetFooter>
+          <SheetActions>
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t("common:form.cancel")}
+            </Button>
+            <Button type="submit" isLoading={isLoading}>
+              {isLoading ? t("form.saving") : t("common:form.save")}
+            </Button>
+          </SheetActions>
+        </SheetFooter>
       </form>
     </Sheet>
   );

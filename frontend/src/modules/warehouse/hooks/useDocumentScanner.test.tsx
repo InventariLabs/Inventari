@@ -8,6 +8,7 @@ let locationRequests: URLSearchParams[] = [];
 
 vi.mock("@/lib/api/labels", () => ({ labelsApi: { scan } }));
 vi.mock("@/hooks/useScanCamera", () => ({
+  useTorchAvailable: () => false,
   useScanCamera: () => ({
     isCameraActive: false,
     scannerError: null,

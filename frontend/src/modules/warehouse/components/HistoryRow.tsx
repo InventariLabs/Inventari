@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { DocumentStatusBadge } from "@/modules/warehouse/components/DocumentStatusBadge";
 import { describeHistoryEntry } from "@/modules/warehouse/historyEntry";
-import type { WarehouseDocumentRow } from "@/modules/warehouse/types";
+import {
+  showsDocumentValue,
+  type WarehouseDocumentRow,
+} from "@/modules/warehouse/types";
 import { cn } from "@/lib/utils";
 import { formatDateTime, formatMoney } from "@/utils/formatters";
 import type { DocumentColumnContributor } from "@/lib/moduleRegistry";
@@ -13,22 +16,23 @@ import {
 } from "@/modules/warehouse/hooks/useDocumentContributions";
 
 /** The row's columns at desktop width, a module's own among them. */
-function gridColumns(showValue: boolean, extra: number): string {
+function gridColumns(tracksValue: boolean, extra: number): string {
   return [
     "8rem minmax(0,1fr) 9rem 6rem",
     ...Array.from({ length: extra }, () => "minmax(0,9rem)"),
-    ...(showValue ? ["6rem"] : []),
+    ...(tracksValue ? ["6rem"] : []),
   ].join(" ");
 }
 
 interface HistoryRowProps {
   doc: WarehouseDocumentRow;
   /**
-   * Money shows only where the organization tracks the value of stock and
-   * the document is one whose lines carry a price — both asked of
-   * `showsDocumentValue` by the page before the row is rendered.
+   * The organization tracks the value of stock, so the list has an amount
+   * column. Every row keeps the column — a transfer holds a dash in it —
+   * because a row with one track fewer put its author and document 6rem
+   * further right than the rows around it.
    */
-  showValue: boolean;
+  tracksValue: boolean;
   /**
    * Columns enabled modules add, already narrowed by the page to the ones
    * some row on it fills.
@@ -40,10 +44,16 @@ interface HistoryRowProps {
  * One entry of the History list: what happened in a sentence, the document
  * that proves it, who did it and — where value is tracked — what it was worth.
  */
-export function HistoryRow({ doc, showValue, columns = [] }: HistoryRowProps) {
+export function HistoryRow({
+  doc,
+  tracksValue,
+  columns = [],
+}: HistoryRowProps) {
   const { t, i18n } = useTranslation("warehouse");
   const lang = i18n.language?.substring(0, 2) ?? "en";
   const { sentence, detail } = describeHistoryEntry(doc, t);
+  // Only a document whose lines carry a price has an amount to quote.
+  const quotesAmount = showsDocumentValue(doc.type, tracksValue);
   const completed = doc.status === "COMPLETED";
   // The moment it was done, or for work not done yet the moment it was typed.
   const when = formatDateTime(
@@ -58,7 +68,7 @@ export function HistoryRow({ doc, showValue, columns = [] }: HistoryRowProps) {
     <li
       className={cn(
         "flex flex-col gap-1 px-4 py-3 sm:grid sm:items-start sm:gap-x-3",
-        showValue
+        tracksValue
           ? "sm:grid-cols-[8rem_minmax(0,1fr)_9rem_6rem_6rem]"
           : "sm:grid-cols-[8rem_minmax(0,1fr)_9rem_6rem]",
       )}
@@ -66,7 +76,7 @@ export function HistoryRow({ doc, showValue, columns = [] }: HistoryRowProps) {
       // only read at desktop width, where the row is a grid at all.
       style={
         columns.length > 0
-          ? { gridTemplateColumns: gridColumns(showValue, columns.length) }
+          ? { gridTemplateColumns: gridColumns(tracksValue, columns.length) }
           : undefined
       }
     >
@@ -91,15 +101,17 @@ export function HistoryRow({ doc, showValue, columns = [] }: HistoryRowProps) {
       </span>
       <span className="text-sm text-on-secondary">{who}</span>
       {columns.length > 0 && <ModuleCells doc={doc} columns={columns} />}
-      {showValue && (
+      {tracksValue && (
         <span
           className={cn(
             "text-sm text-on tabular-nums sm:text-right",
             // A phone row has no column to keep empty.
-            !doc.total_gross && "max-sm:hidden",
+            !(quotesAmount && doc.total_gross) && "max-sm:hidden",
           )}
         >
-          {formatMoney(doc.total_gross, doc.currency, lang)}
+          {quotesAmount
+            ? formatMoney(doc.total_gross, doc.currency, lang)
+            : "—"}
         </span>
       )}
     </li>

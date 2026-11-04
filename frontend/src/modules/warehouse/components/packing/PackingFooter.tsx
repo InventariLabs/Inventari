@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { CheckCircle2, FileText } from "lucide-react";
@@ -11,6 +12,7 @@ import type { WarehouseDocument } from "@/modules/warehouse/types";
 import { ShipmentFields } from "../shipping/ShipmentFields";
 import {
   EMPTY_SHIPMENT,
+  type ShipmentDraft,
   shipmentError,
   shipmentPayload,
 } from "../shipping/shipmentDraft";
@@ -40,8 +42,15 @@ export function PackingFooter({
 }: Props) {
   const { t } = useTranslation("warehouse");
   const [slipPending, setSlipPending] = useState(false);
-  const [shipment, setShipment] = useState(EMPTY_SHIPMENT);
+  // The picking summary hands over the carrier it already asked for.
+  const carried = (useLocation().state as { shipment?: ShipmentDraft } | null)
+    ?.shipment;
+  const [shipment, setShipment] = useState(carried ?? EMPTY_SHIPMENT);
   const [shipmentFault, setShipmentFault] = useState<string>();
+  // The step can already be on the page when the summary hands the carrier over.
+  useEffect(() => {
+    if (carried) setShipment(carried);
+  }, [carried]);
 
   if (packageCount < 2 && !canComplete) return null;
 

@@ -94,6 +94,7 @@ export default function DashboardStorages({
                   "Package"
                 }
                 name={zone.name}
+                href={`/inventory/locations/${zone.id}`}
                 meta={zoneMeta(t, zone, segments)}
                 count={count}
                 maxCount={maxCount}

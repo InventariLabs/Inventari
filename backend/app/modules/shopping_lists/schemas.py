@@ -146,6 +146,8 @@ class ShoppingSuggestionSchema(BaseModel):
     name: str
     quantity: Decimal = Decimal(1)
     uom_symbol: str | None = None
+    #: The unit the symbol names, so a row added from the proposal keeps it.
+    uom_id: UUID | None = None
     source: str
     priority: int = 0
     estimated_price: Decimal | None = None
