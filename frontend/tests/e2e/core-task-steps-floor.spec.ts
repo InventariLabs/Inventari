@@ -434,9 +434,17 @@ defineStepTask({
     await page
       .getByRole("button", { name: `Save the count for ${seed.product}` })
       .click();
+    // Completing refuses, with a toast and no dialog, while the saved number
+    // has not come back from the server: the button greys out when it is
+    // pressed, long before the card agrees with the record. The difference
+    // is the server's verdict, so its filter button is what says the stock
+    // take has been read again.
+    await expect(
+      page.getByRole("button", { name: "Discrepancies (1)" }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Complete stock take" }).click();
-    await page
-      .getByRole("alertdialog")
+    const confirmation = page.getByRole("alertdialog");
+    await confirmation
       .getByRole("button", { name: "Complete", exact: true })
       .click();
     await expect(
