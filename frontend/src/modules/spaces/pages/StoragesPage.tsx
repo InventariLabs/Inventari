@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Archive, Boxes, Info, Plus, SearchX } from "lucide-react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
@@ -247,6 +252,9 @@ export default function StoragesPage() {
               onSelect={select}
               canWrite={canWrite}
               onMoveTo={(nodeId) => setMoveIds([nodeId])}
+              onOpenSettings={(nodeId) =>
+                navigate(`/inventory/locations/${nodeId}?configure=true`)
+              }
               onDragMove={(nodeId, parentId) =>
                 void move([{ id: nodeId, parent_id: parentId }])
               }
@@ -402,6 +410,16 @@ function MobileRoots({
           </li>
         ))}
       </ul>
+      {/* The tree's aside, where this link lives on a desktop, is not drawn on
+          a phone; a location archived from there could only be restored by
+          typing the address. */}
+      <Link
+        to="/inventory/locations/archived"
+        className="inline-flex min-h-11 items-center gap-1.5 px-1 text-sm text-on-muted hover:text-on"
+      >
+        <Archive size={14} aria-hidden="true" />
+        {t("tree.archivedLink")}
+      </Link>
     </section>
   );
 }

@@ -580,6 +580,27 @@ describe("ProductionCreateSheet — already made, in one step", () => {
     expect(mocks.navigate).toHaveBeenCalledWith("/maker/production/order-9");
   });
 
+  it("writes the unit as the interface language does, with one full stop after the batch", () => {
+    mocks.preview.data = { ...PLUM_PREVIEW, planned_uom_symbol: "pcs" };
+    renderSheet();
+    typeQuantity("20");
+    pickStorage("Warehouse");
+
+    // The unit's abbreviation ends in a full stop of its own; the hint's
+    // sentence must not add a second one after it.
+    expect(
+      screen.getByText(
+        "One batch of the BOM makes 1 pcs. Enter what came out, not the number of batches.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("pcs.")).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId("maker-create-needs")).getByText(
+        "Costs you 7.95 zł per pcs. · 159.00 zł in total",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("shows need, have and short before saving, and says the shortfall gets counted", () => {
     renderSheet();
     typeQuantity("20");

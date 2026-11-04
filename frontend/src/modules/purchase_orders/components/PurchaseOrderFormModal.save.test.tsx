@@ -121,7 +121,7 @@ describe("PurchaseOrderFormModal — what a save sends", () => {
     fireEvent.change(screen.getByLabelText("Currency"), {
       target: { value: "EUR" },
     });
-    await user.click(screen.getByRole("button", { name: "Create Order" }));
+    await user.click(screen.getByRole("button", { name: "Create order" }));
 
     await waitFor(() => expect(mutations.create).toHaveBeenCalledOnce());
     const payload = mutations.create.mock.calls[0][0];
@@ -144,7 +144,7 @@ describe("PurchaseOrderFormModal — what a save sends", () => {
     const user = userEvent.setup();
     render(<PurchaseOrderFormModal onClose={vi.fn()} onSuccess={onSuccess} />);
     await user.type(screen.getByPlaceholderText("Product"), "Widget");
-    await user.click(screen.getByRole("button", { name: "Create Order" }));
+    await user.click(screen.getByRole("button", { name: "Create order" }));
     await waitFor(() => expect(toast.error).toHaveBeenCalled());
     expect(onSuccess).not.toHaveBeenCalled();
     expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe("PurchaseOrderFormModal — what a save sends", () => {
     await user.click(
       screen.getAllByRole("button", { name: /remove line/i })[0],
     );
-    await user.click(screen.getByRole("button", { name: "Create Order" }));
+    await user.click(screen.getByRole("button", { name: "Create order" }));
     expect(toast.error).toHaveBeenCalled();
     expect(mutations.create).not.toHaveBeenCalled();
   });
@@ -173,7 +173,7 @@ describe("PurchaseOrderFormModal — what a save sends", () => {
         onSuccess={onSuccess}
       />,
     );
-    await user.click(screen.getByRole("button", { name: "Save Changes" }));
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
     await waitFor(() => expect(mutations.update).toHaveBeenCalledOnce());
     const { id, data } = mutations.update.mock.calls[0][0];
     expect(id).toBe("po-1");

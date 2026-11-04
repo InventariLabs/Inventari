@@ -114,7 +114,7 @@ function leadSentence(
     case "produce":
       return t("warehouse:todo.task.produce", {
         subject,
-        quantity: formatQuantityLocalized(t, item.count, undefined),
+        quantity: formatQuantityLocalized(t, item.count, item.unit),
       });
     case "approve":
       return subject

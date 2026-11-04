@@ -261,6 +261,7 @@
     "barcode": "Product code",
     "generateCode": "Generate code",
     "scanCode": "Scan product code",
+    "generateCodeHint": "An internal code of this organization, from the range GS1 reserves for in-house codes, so it cannot be mistaken for a manufacturer's code. It is valid only inside the organization: goods sold on through other businesses' tills need a GTIN from GS1.",
     "sku": "SKU",
     "serial_number": "Serial Number",
     "purchasePriceUnitHint": "Per 1 {{unit}} — not the amount paid for the whole quantity.",
@@ -504,6 +505,7 @@
     "keepTemplate": "Keep {{unit}}"
   },
   "showUsedUp": "Show used up",
+  "usedUpPlace": "Consumed",
   "removalStrategy": {
     "label": "Which stock leaves first",
     "fifoHelp": "FIFO: what came in first leaves first.",

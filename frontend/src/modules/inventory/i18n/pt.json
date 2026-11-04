@@ -172,6 +172,13 @@
   "lots": {
     "title": "Lotes",
     "subtitle": "Quais lotes existem e quais deles não podem ser mexidos",
+    "statusFilter": {
+      "active": "Ativo",
+      "quarantined": "Em quarentena",
+      "held": "Retido",
+      "expired": "Vencido",
+      "recalled": "Recolhido"
+    },
     "statusChanged": "Lote marcado como {{status}}",
     "reasonDialog": {
       "title": "Marcar {{name}} como {{status}}?",

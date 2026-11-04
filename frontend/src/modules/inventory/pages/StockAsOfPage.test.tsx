@@ -337,8 +337,8 @@ describe("endOfDay — the day ends when the reader's day ends", () => {
 
 it("distinguishes equally named shelves by the way to them", async () => {
   locations = [
-    { id: "l1", name: "Aisle 1", full_path: "Warehouse A → Aisle 1" },
-    { id: "l2", name: "Aisle 1", full_path: "Warehouse B → Aisle 1" },
+    { id: "l1", name: "Aisle 1", full_path: "Warehouse A › Aisle 1" },
+    { id: "l2", name: "Aisle 1", full_path: "Warehouse B › Aisle 1" },
   ];
   renderPage();
   fireEvent.click(screen.getByRole("combobox", { name: "Location" }));

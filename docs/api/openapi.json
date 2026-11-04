@@ -22648,7 +22648,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_UnlinkedIngredient_"
+                  "$ref": "#/components/schemas/UnlinkedIngredientsResponse"
                 }
               }
             }
@@ -42176,7 +42176,7 @@
           "created_at"
         ],
         "title": "ArchivedStorageLocation",
-        "description": "One row of ``GET /locations/archived`` \u2014 the identity a restore needs.\n\nA location's identity is its path, not its name: two locations may share\na name (\"Shelf 1\" under two different parents), and the archive is where\npicking wrong is costliest \u2014 the row is gone from every other screen\nuntil restored. ``full_path`` carries the shape\n``StorageLocationSummary`` gives it (\"Server Room \u2192 Shelf 1\").\n\n``archived_at`` is the moment the location left the lists, read from the\norganization journal (``SOFT_DELETE`` / ``storage``): archiving writes no\ndate column of its own (the flag lives in ``settings``), so the journal\nis where that date lives. A row archived outside the API has no entry\nand answers ``None`` rather than a wrong date."
+        "description": "One row of ``GET /locations/archived`` \u2014 the identity a restore needs.\n\nA location's identity is its path, not its name: two locations may share\na name (\"Shelf 1\" under two different parents), and the archive is where\npicking wrong is costliest \u2014 the row is gone from every other screen\nuntil restored. ``full_path`` carries the shape\n``StorageLocationSummary`` gives it (\"Server Room \u203a Shelf 1\").\n\n``archived_at`` is the moment the location left the lists, read from the\norganization journal (``SOFT_DELETE`` / ``storage``): archiving writes no\ndate column of its own (the flag lives in ``settings``), so the journal\nis where that date lives. A row archived outside the API has no entry\nand answers ``None`` rather than a wrong date."
       },
       "AssetFilter": {
         "properties": {
@@ -49757,6 +49757,17 @@
               }
             ],
             "title": "Backorder Id"
+          },
+          "corrects_document_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrects Document Type"
           },
           "scheduled_date": {
             "anyOf": [
@@ -64289,47 +64300,6 @@
         ],
         "title": "PaginatedResponse[UnitConversionSchema]"
       },
-      "PaginatedResponse_UnlinkedIngredient_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/UnlinkedIngredient"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
-          },
-          "offset": {
-            "type": "integer",
-            "title": "Offset"
-          },
-          "has_more": {
-            "type": "boolean",
-            "title": "Has More"
-          },
-          "total_capped": {
-            "type": "boolean",
-            "title": "Total Capped",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset",
-          "has_more"
-        ],
-        "title": "PaginatedResponse[UnlinkedIngredient]"
-      },
       "PaginatedResponse_UomCategoryDTO_": {
         "properties": {
           "items": {
@@ -76432,7 +76402,7 @@
           "reason"
         ],
         "title": "ReplenishmentDraftSkipped",
-        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (the rule has no preferred supplier \u2014\nreported, never turned into an empty order)."
+        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (neither the rule nor the price list names\na supplier; reported, never turned into an empty order)."
       },
       "ReplenishmentMoveLineDTO": {
         "properties": {
@@ -83779,6 +83749,52 @@
         ],
         "title": "UnlinkedIngredient",
         "description": "One unlinked ingredient, with enough context to recognise it."
+      },
+      "UnlinkedIngredientsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UnlinkedIngredient"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          },
+          "ingredient_total": {
+            "type": "integer",
+            "title": "Ingredient Total",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "UnlinkedIngredientsResponse"
       },
       "UomCategoryDTO": {
         "properties": {

@@ -261,6 +261,7 @@
     "barcode": "Código do produto",
     "generateCode": "Gerar código",
     "scanCode": "Escanear o código do produto",
+    "generateCodeHint": "Um código interno desta organização, da faixa que a GS1 reserva para códigos de uso próprio, por isso não se confunde com o código de um fabricante. Só vale dentro da organização: mercadoria revendida pelos caixas de outras empresas precisa de um GTIN da GS1.",
     "sku": "SKU",
     "serial_number": "Número de série",
     "purchasePriceUnitHint": "Por 1 {{unit}} — não o valor pago pela quantidade inteira.",
@@ -504,6 +505,7 @@
     "keepTemplate": "Manter {{unit}}"
   },
   "showUsedUp": "Mostrar esgotados",
+  "usedUpPlace": "Esgotado",
   "removalStrategy": {
     "label": "Qual estoque sai primeiro",
     "fifoHelp": "PEPS (FIFO): o que entrou primeiro sai primeiro.",

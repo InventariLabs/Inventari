@@ -68,7 +68,10 @@ const mockPutawayRules = (
     ),
   );
 
-const renderDialog = (rows?: Array<(typeof FLOOR)[number]>) => {
+const renderDialog = (
+  rows?: Array<(typeof FLOOR)[number]>,
+  subLocations?: number,
+) => {
   const requests = serveFloor(rows);
   const onOpenChange = vi.fn();
   const onArchived = vi.fn();
@@ -77,6 +80,7 @@ const renderDialog = (rows?: Array<(typeof FLOOR)[number]>) => {
       <StorageArchiveDialog
         open
         storageId="zone-1"
+        subLocations={subLocations}
         onOpenChange={onOpenChange}
         onArchived={onArchived}
       />
@@ -86,6 +90,27 @@ const renderDialog = (rows?: Array<(typeof FLOOR)[number]>) => {
 };
 
 const confirmButton = () => screen.getByRole("button", { name: "Archive" });
+
+describe("StorageArchiveDialog — sub-locations", () => {
+  it("says the locations inside stay in the lists, at the top level", async () => {
+    mockSummary(0, 0);
+    renderDialog(undefined, 2);
+
+    expect(
+      await screen.findByText(
+        /The 2 locations inside it are not archived with it/,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says nothing about sub-locations when there are none", async () => {
+    mockSummary(0, 0);
+    renderDialog(undefined, 0);
+
+    await screen.findByText(/This will hide the location/);
+    expect(screen.queryByText(/not archived with it/)).not.toBeInTheDocument();
+  });
+});
 
 describe("StorageArchiveDialog — putaway rules warning", () => {
   it("names the count of active rules pointing at the location", async () => {

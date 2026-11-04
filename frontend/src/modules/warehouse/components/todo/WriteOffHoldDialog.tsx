@@ -33,7 +33,7 @@ function suggestedReason(
  * Writes a batchless hold off in one step, the way Issue goods does for
  * "Damaged or expired": the reader says why, the write-off document is
  * created and posted together, and the goods leave the quarantine shelf.
- * The office's New Document form stays for the cases that need it.
+ * The office's New document form stays for the cases that need it.
  */
 export default function WriteOffHoldDialog({
   hold,

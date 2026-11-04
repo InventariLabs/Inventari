@@ -80,9 +80,23 @@ export default function EquipmentCategoriesPage() {
       // seeded in English and the interface translates them by code, so a
       // raw `cat.name` asks "delete Desktop Computer?" under a row that
       // reads "Komputer stacjonarny".
-      message: t("categories.confirmDelete", {
-        name: getCategoryLabel(t, { code: cat.code, name: cat.name }),
-      }),
+      // What goes with it: its field definitions are removed for good, and
+      // the assets filed under it are why the server may refuse.
+      message: [
+        t("categories.confirmDelete", {
+          name: getCategoryLabel(t, { code: cat.code, name: cat.name }),
+        }),
+        (cat.field_definitions ?? []).length > 0
+          ? t("categories.confirmDeleteFields", {
+              count: (cat.field_definitions ?? []).length,
+            })
+          : null,
+        (cat.items_count ?? 0) > 0
+          ? t("categories.confirmDeleteBlocked", { count: cat.items_count })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" "),
       variant: "danger",
       confirmLabel: t("common:actions.delete"),
     });

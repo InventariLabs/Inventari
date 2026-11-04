@@ -119,7 +119,7 @@ describe("WmsPickingSummary", () => {
     const carrier = screen.getByLabelText("Carrier");
     expect(carrier).not.toHaveFocus();
     expect(document.activeElement?.tagName).not.toBe("INPUT");
-    expect(screen.getByText("Picking Complete")).toHaveFocus();
+    expect(screen.getByText("Picking complete")).toHaveFocus();
   });
 
   it("offers no packing where nothing is packed", () => {

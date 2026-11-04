@@ -114,6 +114,7 @@ export function documentRow(
     source_location_name: doc.source_location_name,
     target_location_name: doc.target_location_name,
     backorder_id: doc.backorder_id,
+    corrects_document_type: doc.corrects_document_type,
     scheduled_date: doc.scheduled_date,
     notes: doc.notes,
     external_reference: doc.external_reference,

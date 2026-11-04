@@ -25,13 +25,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import in_ids
+from app.core.location_path import join_location_path
 from app.models.location_relocation import LocationRelocation
 from app.models.stock_move import StockMoveReferenceType
 from app.models.stock_quants_from_records import stock_quants_from_records
 from app.models.storage_location import StorageLocation
 from app.services import stock_moves_service
-
-_PATH_SEPARATOR = ' / '
 
 
 def path_to(
@@ -39,7 +38,7 @@ def path_to(
     parent_by_id: Mapping[UUID, UUID | None],
     node_id: UUID | None,
 ) -> str | None:
-    """The full path of *node_id* ("Main Warehouse / Zone A"), None for no node."""
+    """The full path of *node_id* ("Main Warehouse › Zone A"), None for no node."""
     names: list[str] = []
     seen: set[UUID] = set()
     current = node_id
@@ -47,7 +46,7 @@ def path_to(
         seen.add(current)
         names.append(name_by_id.get(current, ''))
         current = parent_by_id.get(current)
-    return _PATH_SEPARATOR.join(reversed(names)) if names else None
+    return join_location_path(reversed(names)) if names else None
 
 
 def top_of(parent_by_id: Mapping[UUID, UUID | None], node_id: UUID) -> UUID:

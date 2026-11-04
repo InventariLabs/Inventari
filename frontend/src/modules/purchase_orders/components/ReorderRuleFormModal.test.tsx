@@ -32,6 +32,18 @@ function renderModal(form: RuleFormState = emptyForm, onSave = vi.fn()) {
 
 const saveButton = () => screen.getByRole("button", { name: "Save" });
 
+const milk: CatalogueSearchResult = {
+  product_template_id: "tpl-1",
+  name: "Milk",
+  sku: null,
+  barcode: null,
+  brand: null,
+  uom_id: "uom-1",
+  uom_symbol: "pcs",
+  image_url: null,
+  is_stub: false,
+};
+
 describe("ReorderRuleFormModal validation", () => {
   it("blocks save and flags a missing max quantity", async () => {
     const onSave = renderModal();
@@ -95,12 +107,47 @@ describe("ReorderRuleFormModal validation", () => {
   it("calls onSave once both thresholds are above 0", async () => {
     const onSave = renderModal({
       ...emptyForm,
+      product: milk,
       minQuantity: "5",
       maxQuantity: "20",
     });
     await userEvent.click(saveButton());
 
     expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocks save without a product and says so on the product field", async () => {
+    const onSave = renderModal({
+      ...emptyForm,
+      minQuantity: "5",
+      maxQuantity: "20",
+    });
+    await userEvent.click(saveButton());
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByText("Select a product first")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: /Product/ })).toHaveAttribute(
+      "aria-required",
+      "true",
+    );
+  });
+
+  it("blocks a max below the min and puts the sentence on the Max field", async () => {
+    const onSave = renderModal({
+      ...emptyForm,
+      product: milk,
+      minQuantity: "10",
+      maxQuantity: "5",
+    });
+    await userEvent.click(saveButton());
+
+    expect(onSave).not.toHaveBeenCalled();
+    const message = screen.getByText("Max (5) cannot be below min (10)");
+    expect(screen.getByRole("spinbutton", { name: "Max" })).toHaveAttribute(
+      "aria-describedby",
+      expect.stringContaining(message.id),
+    );
+    expect(message.textContent).not.toMatch(/_/);
   });
 
   it("shows a description for each threshold field", () => {

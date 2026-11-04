@@ -24,8 +24,9 @@ export function ReorderAlertsCard({
   const navigate = useNavigate();
   const draftMutation = useCreateReplenishmentDraftPos();
 
-  // Only an alert whose rule names a supplier can become an order line —
-  // the rest are reported back by the API, never made into empty orders.
+  // Only an alert with a supplier — the rule's own, or the one its price list
+  // proposes — can become an order line; the rest are reported back by the
+  // API, never made into empty orders.
   const actionableIds = alerts
     .filter((alert) => alert.preferred_partner_id)
     .map((alert) => alert.reorder_rule_id);

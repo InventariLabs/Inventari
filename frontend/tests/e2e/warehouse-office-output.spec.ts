@@ -121,7 +121,7 @@ async function registerSummary(seed: ReceivingSeed) {
 async function openRegister(page: Page) {
   await page.goto("/warehouse/register");
   await expect(
-    page.getByRole("heading", { name: "Document Register" }),
+    page.getByRole("heading", { name: "Document register" }),
   ).toBeVisible();
 }
 
@@ -157,7 +157,7 @@ test("a write-off asks why, keeps the answer and is counted at its cost", async 
   await page.getByLabel("Reason for scrapping").selectOption("EXPIRED");
   await post.click();
   await expect(
-    page.getByRole("heading", { name: "Issued 1 line" }),
+    page.getByRole("heading", { name: "Wrote off 1 line" }),
   ).toBeVisible({ timeout: 15000 });
 
   const document = await seed.documentLinkedFrom(page);

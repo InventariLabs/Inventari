@@ -1,6 +1,8 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { useIsFetching } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
+import { toast } from "sonner";
 import { server } from "@/test/mocks/server";
 import { QueryWrapper } from "@/test/queryWrapper";
 import { useItemForm } from "./useItemForm";
@@ -193,6 +195,54 @@ describe("useItemForm — the unit the catalogue counts the product in", () => {
     const payload = onSubmit.mock.calls[0][0] as Record<string, unknown>;
     expect("uom_id" in payload).toBe(false);
     expect(payload.unit_confirmed_over_template).toBeUndefined();
+  });
+
+  it("holds the save while the catalogue cannot be asked, and saves once it answers", async () => {
+    const lookups = vi.fn();
+    server.use(
+      http.get("/api/v1/items/product-templates/lookup", () => {
+        lookups();
+        return HttpResponse.json({ detail: "down" }, { status: 500 });
+      }),
+    );
+    const onSubmit = vi.fn();
+    const { result } = renderHook(
+      () => ({ form: useItemForm({ onSubmit }), fetching: useIsFetching() }),
+      { wrapper: QueryWrapper },
+    );
+
+    act(() => {
+      result.current.form.handleInputChange("name", "Rye flour");
+      result.current.form.handleInputChange("location_id", "loc-1");
+    });
+    // The form does not publish the failure; the read having settled is what
+    // the press below depends on.
+    await waitFor(() => expect(lookups).toHaveBeenCalledOnce());
+    await waitFor(() => expect(result.current.fetching).toBe(0));
+
+    catalogueKnows(KILOGRAM, "kg");
+    act(() => {
+      result.current.form.submit();
+    });
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(
+      "Could not check which unit this product is kept in. Try saving again.",
+    );
+
+    // The refused save asked again, so the second press has the answer.
+    await waitFor(() =>
+      expect(result.current.form.formData.uom_id).toBe(KILOGRAM),
+    );
+    act(() => {
+      result.current.form.submit();
+    });
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    const payload = onSubmit.mock.calls[0][0] as Record<string, unknown>;
+    expect(payload.name).toBe("Rye flour");
+    // The template's own unit is the server's answer, not a choice to send.
+    expect("uom_id" in payload).toBe(false);
   });
 
   it("confirms a unit change on an existing record without a dialog", async () => {

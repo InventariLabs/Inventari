@@ -208,7 +208,7 @@
     "executeScrap": "Dar de baja",
     "approvalPendingHint": "Esperando aprobación — la ejecución está bloqueada hasta que se resuelva la solicitud.",
     "approvalRequiredHint": "Se requiere aprobación y no hay ninguna solicitud abierta — solicita primero la aprobación.",
-    "approvalNoWorkflowHint": "Se requiere aprobación pero no hay ningún flujo de aprobación activo: configúrelo en los ajustes de Aprobaciones y solicite la aprobación.",
+    "approvalNoWorkflowHint": "Este documento necesita aprobación, pero todavía no hay nadie designado para darla. Pida a su administrador que lo configure.",
     "postNowReceive": "Recibir existencias",
     "postNowIssue": "Emitir existencias",
     "postNowMove": "Mover existencias",
@@ -241,7 +241,7 @@
     "deleteMessage": "¿Eliminar este borrador? Esta acción no se puede deshacer.",
     "confirmMessageApproval": "Confirmar enviará este documento a la cola de aprobaciones. ¿Continuar?",
     "confirmMessageConditional": "Esto marcará el documento como listo para la ejecución de almacén, salvo que el umbral de aprobación de tu organización lo envíe primero a la cola de aprobaciones. ¿Continuar?",
-    "confirmMessageNoWorkflow": "Este documento requiere aprobación, pero no existe ningún circuito de aprobación para los documentos, por lo que su confirmación sería rechazada. Cree primero el circuito.",
+    "confirmMessageNoWorkflow": "Este documento necesita aprobación, pero todavía no hay nadie designado para darla, así que su confirmación será rechazada. Pida a su administrador que lo configure.",
     "requestApprovalMessage": "Solicitarla devuelve el documento a la espera de aprobación, donde permanece hasta que alguien la conceda.",
     "confirmMessageDeadEndNamed": "Este documento requiere aprobación, pero nadie podría resolverla: la etapa «{{stage}}» nombra aprobadores que no pueden ver las aprobaciones. Confirmar lo envía igualmente allí, y espera hasta que se retire la solicitud o esas personas reciban acceso. ¿Continuar?",
     "confirmMessageDeadEndNoApprover": "Este documento requiere aprobación, pero nadie podría resolverla: la etapa «{{stage}}» está abierta a quien tenga el permiso de aprobar, y nadie en esta organización lo tiene. Confirmar lo envía igualmente allí, y espera hasta que se retire la solicitud o alguien reciba el permiso. ¿Continuar?",
@@ -618,6 +618,7 @@
     "plannedReceiving": "→ {{location}} · zona de recepción, ubicar más tarde"
   },
   "value": {
+    "unpricedLines": "Las líneas sin precio no entran en estos totales y esas existencias no tienen coste registrado.",
     "totalsTitle": "Totales del documento",
     "totalNet": "Total neto",
     "totalTax": "Total impuestos",
@@ -1121,8 +1122,8 @@
         "setUp": "Ajustar la ubicación"
       },
       "occupancy": {
-        "noLimit_one": "Sin límite · {{count}} registro",
-        "noLimit_other": "Sin límite · {{count}} registros",
+        "noLimit_one": "Sin límite · {{count}} producto",
+        "noLimit_other": "Sin límite · {{count}} productos",
         "sharesSum_one": "{{fill}}% — la parte de {{count}} producto con límite",
         "sharesSum_other": "{{fill}}% — la suma de las partes de {{count}} productos con límite",
         "unmeasured": "Un producto aquí no tiene límite y no se cuenta",

@@ -2404,9 +2404,10 @@ export class ApiHelper {
 
   /**
    * Create an Item whose template is the given ProductTemplate id and seed
-   * stock (StockQuant) at the given location for the requested qty. The
-   * item-service resolves templates by name; we therefore create the item
-   * with the template's name so it joins the right template row.
+   * stock at the given location for the requested qty. The request names the
+   * card by id, so no name matching runs and a second card of the same name
+   * (another spec's, a shared one) cannot take the record; the answer is
+   * checked to prove it.
    *
    * This is the canonical way to seed enough stock for the maker
    * completion pipeline (which consumes via ``consume_across_locations``).
@@ -2424,6 +2425,7 @@ export class ApiHelper {
       headers: { Authorization: `Bearer ${token}` },
       data: {
         name: data.name,
+        template_id: data.template_id,
         quantity: data.quantity,
         location_id: data.location_id,
       },
@@ -2433,6 +2435,10 @@ export class ApiHelper {
         `Failed to create item for template: ${await response.text()}`,
       );
     const item = await response.json();
+    if (item.template_id !== data.template_id)
+      throw new Error(
+        `Item ${item.id} joined template ${item.template_id}, not ${data.template_id}`,
+      );
     return { id: item.id, template_id: item.template_id };
   }
 

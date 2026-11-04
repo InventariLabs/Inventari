@@ -1,3 +1,4 @@
+import { isVirtualUsage } from "@/modules/shared/lib/storageUsage";
 import { memo, useEffect, useState, useRef } from "react";
 import { categoryLabel } from "@/lib/i18nHelpers";
 import { useTranslation } from "react-i18next";
@@ -407,6 +408,8 @@ export default memo(function ItemMobileCard({
     const storage = storages?.find((s) => s.id === storageId);
     if (!storage)
       return String(t("unknown", { ns: "common", defaultValue: "Unknown" }));
+    // A used-up record is filed under a system place: its name says nothing.
+    if (isVirtualUsage(storage.usage)) return t("items:usedUpPlace");
 
     // Show leaf name only (+ shelf if present)
     return shelfLocation ? `${storage.name} · ${shelfLocation}` : storage.name;

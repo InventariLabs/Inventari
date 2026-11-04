@@ -103,13 +103,13 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan Mode" }));
-    fireEvent.change(screen.getByLabelText("Scan Barcode"), {
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
+    fireEvent.change(screen.getByLabelText("Scan barcode"), {
       target: { value: "123456" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Scan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply scan" }));
 
-    expect(screen.getByLabelText("Executed Quantity")).toHaveValue(1);
+    expect(screen.getByLabelText("Executed quantity")).toHaveValue(1);
   });
 
   it("names the unit a line does not have instead of printing a bare number", () => {
@@ -160,7 +160,7 @@ describe("DocumentExecutionPanel", () => {
     );
 
     const field = screen.getByLabelText(
-      "Executed Quantity",
+      "Executed quantity",
     ) as HTMLInputElement;
     expect(field.value).toBe("10");
   });
@@ -176,13 +176,13 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText("Executed Quantity"), {
+    fireEvent.change(screen.getByLabelText("Executed quantity"), {
       target: { value: "1" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & Complete" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
 
     expect(onSubmit).not.toHaveBeenCalled();
-    const select = screen.getByLabelText("Discrepancy Code");
+    const select = screen.getByLabelText("Discrepancy code");
     expect(select.className).toContain("border-red-500");
     const card = screen.getByTestId("document-line-card-line-1");
     expect(
@@ -200,11 +200,11 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText("Executed Quantity"), {
+    fireEvent.change(screen.getByLabelText("Executed quantity"), {
       target: { value: "1" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & Complete" }));
-    const select = screen.getByLabelText("Discrepancy Code");
+    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
+    const select = screen.getByLabelText("Discrepancy code");
     expect(select.className).toContain("border-red-500");
 
     fireEvent.change(select, { target: { value: "SHORTAGE" } });
@@ -221,8 +221,8 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan Mode" }));
-    fireEvent.click(screen.getByRole("button", { name: "Open Camera" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open camera" }));
 
     expect(scanCameraMock.restartCamera).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Aim at barcode or QR")).toBeInTheDocument();
@@ -231,10 +231,10 @@ describe("DocumentExecutionPanel", () => {
       scanCameraMock.triggerScan("123456");
     });
 
-    expect(screen.getByLabelText("Executed Quantity")).toHaveValue(1);
+    expect(screen.getByLabelText("Executed quantity")).toHaveValue(1);
   });
 
-  it("opens the camera when Apply Scan is pressed on an empty field", () => {
+  it("opens the camera when Apply scan is pressed on an empty field", () => {
     scanCameraMock.restartCamera.mockClear();
     render(
       <DocumentExecutionPanel
@@ -245,18 +245,18 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan Mode" }));
-    fireEvent.click(screen.getByRole("button", { name: "Apply Scan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply scan" }));
 
     // Not a silent press: the camera the code can come from is open.
     expect(scanCameraMock.restartCamera).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Aim at barcode or QR")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Close Camera" }),
+      screen.getByRole("button", { name: "Close camera" }),
     ).toBeInTheDocument();
 
     // Pressed again while it reads, it leaves the open camera alone.
-    fireEvent.click(screen.getByRole("button", { name: "Apply Scan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply scan" }));
     expect(scanCameraMock.restartCamera).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Aim at barcode or QR")).toBeInTheDocument();
   });
@@ -306,15 +306,15 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan Mode" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
 
     expect(screen.getByText("Done: 0")).toBeInTheDocument();
     expect(screen.getByText("Pending: 2")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Scan Barcode"), {
+    fireEvent.change(screen.getByLabelText("Scan barcode"), {
       target: { value: "123456" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Scan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply scan" }));
 
     expect(screen.getByText("Done: 1")).toBeInTheDocument();
     expect(screen.getByText("Pending: 1")).toBeInTheDocument();
@@ -365,9 +365,9 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan Mode" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
 
-    expect(screen.getByText("Up Next")).toBeInTheDocument();
+    expect(screen.getByText("Up next")).toBeInTheDocument();
     expect(screen.getByTestId("document-line-card-line-1")).toHaveAttribute(
       "data-active-scan-target",
       "true",
@@ -377,10 +377,10 @@ describe("DocumentExecutionPanel", () => {
       "false",
     );
 
-    fireEvent.change(screen.getByLabelText("Scan Barcode"), {
+    fireEvent.change(screen.getByLabelText("Scan barcode"), {
       target: { value: "123456" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Scan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply scan" }));
 
     expect(screen.getByTestId("document-line-card-line-1")).toHaveAttribute(
       "data-active-scan-target",
@@ -409,7 +409,7 @@ describe("DocumentExecutionPanel", () => {
     fireEvent.click(incrementButton);
     fireEvent.click(incrementButton);
 
-    expect(screen.getByLabelText("Executed Quantity")).toHaveValue(3);
+    expect(screen.getByLabelText("Executed quantity")).toHaveValue(3);
   });
 
   it("supports fill remaining and clear actions", () => {
@@ -423,10 +423,10 @@ describe("DocumentExecutionPanel", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
-    expect(screen.getByLabelText("Executed Quantity")).toHaveValue(0);
+    expect(screen.getByLabelText("Executed quantity")).toHaveValue(0);
 
-    fireEvent.click(screen.getByRole("button", { name: "Fill Remaining" }));
-    expect(screen.getByLabelText("Executed Quantity")).toHaveValue(3);
+    fireEvent.click(screen.getByRole("button", { name: "Fill remaining" }));
+    expect(screen.getByLabelText("Executed quantity")).toHaveValue(3);
   });
 
   it("opens a line nobody has executed yet without calling its own zero invalid", () => {
@@ -442,7 +442,7 @@ describe("DocumentExecutionPanel", () => {
     // Nothing received yet is the resting state of every confirmed document,
     // not a value someone typed wrong: the field is allowed to sit at zero
     // even though the unit refuses a quantity that small anywhere else.
-    const field = screen.getByLabelText("Executed Quantity");
+    const field = screen.getByLabelText("Executed quantity");
 
     expect(field).toHaveValue(0);
     expect(field).not.toHaveAttribute("aria-invalid", "true");
@@ -459,7 +459,7 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    const field = screen.getByLabelText("Executed Quantity");
+    const field = screen.getByLabelText("Executed quantity");
 
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
 
@@ -480,14 +480,14 @@ describe("DocumentExecutionPanel", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
 
-    expect(screen.getByLabelText("Discrepancy Code")).toBeInTheDocument();
+    expect(screen.getByLabelText("Discrepancy code")).toBeInTheDocument();
     expect(
-      screen.queryByLabelText("Discrepancy Reason"),
+      screen.queryByLabelText("Discrepancy reason"),
     ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Add Note" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add note" }));
 
-    expect(screen.getByLabelText("Discrepancy Reason")).toBeInTheDocument();
+    expect(screen.getByLabelText("Discrepancy reason")).toBeInTheDocument();
   });
 
   it("opens discrepancy note automatically when the line already has one", () => {
@@ -521,7 +521,7 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    expect(screen.getByLabelText("Discrepancy Reason")).toHaveValue(
+    expect(screen.getByLabelText("Discrepancy reason")).toHaveValue(
       "Outer box torn",
     );
   });
@@ -571,16 +571,16 @@ describe("DocumentExecutionPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan Mode" }));
-    fireEvent.change(screen.getByLabelText("Scan Barcode"), {
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
+    fireEvent.change(screen.getByLabelText("Scan barcode"), {
       target: { value: "123456" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Apply Scan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply scan" }));
 
     expect(screen.getByText("Next Line: Cable")).toBeInTheDocument();
-    expect(screen.getByText("Recently Scanned")).toBeInTheDocument();
+    expect(screen.getByText("Recently scanned")).toBeInTheDocument();
     expect(
-      screen.getByLabelText("Executed Quantity", {
+      screen.getByLabelText("Executed quantity", {
         selector: "input#done-quantity-line-2",
       }),
     ).toHaveFocus();
@@ -617,7 +617,7 @@ describe("DocumentExecutionPanel", () => {
     fireEvent.change(screen.getByLabelText("Tracking number"), {
       target: { value: "1Z999" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & Complete" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -639,7 +639,7 @@ describe("DocumentExecutionPanel", () => {
     );
 
     await screen.findByLabelText("Carrier");
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & Complete" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
 
     expect(onSubmit).toHaveBeenCalledOnce();
     expect(onSubmit.mock.calls[0][0]).not.toHaveProperty("shipment");
@@ -673,7 +673,7 @@ describe("DocumentExecutionPanel", () => {
       "bottom-20",
     );
     expect(
-      screen.getByRole("button", { name: "Confirm & Complete" }),
+      screen.getByRole("button", { name: "Confirm & complete" }),
     ).toBeInTheDocument();
   });
 
@@ -692,11 +692,11 @@ describe("DocumentExecutionPanel", () => {
     );
     const actions = screen.getByTestId("document-execution-actions");
 
-    fireEvent.click(screen.getByRole("button", { name: "Scan Mode" }));
-    fireEvent.click(screen.getByRole("button", { name: "Open Camera" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open camera" }));
     expect(actions).not.toHaveClass("sticky");
 
-    fireEvent.click(screen.getByRole("button", { name: "Close Camera" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close camera" }));
     expect(actions).toHaveClass("sticky", "bottom-20");
   });
 
@@ -746,11 +746,11 @@ describe("DocumentExecutionPanel", () => {
     );
 
     fireEvent.click(
-      screen.getAllByRole("button", { name: "Fill Remaining" })[0],
+      screen.getAllByRole("button", { name: "Fill remaining" })[0],
     );
 
     expect(
-      screen.getByLabelText("Executed Quantity", {
+      screen.getByLabelText("Executed quantity", {
         selector: "input#done-quantity-line-2",
       }),
     ).toHaveFocus();

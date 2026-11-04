@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { toast } from "sonner";
 import { render, screen } from "@/test/utils";
 import RecipeEditForm from "./RecipeEditForm";
 import type { RecipeList } from "@/modules/recipes/types/core";
@@ -8,6 +9,8 @@ vi.mock("@/modules/recipes/hooks/useRecipes", async (importOriginal) => ({
   ...(await importOriginal<object>()),
   useRecipe: mocks.useRecipe,
 }));
+
+vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
 
 const row = { id: "r-1", name: "Pancakes" } as RecipeList;
 const props = { recipe: row, onSubmit: vi.fn(), onCancel: vi.fn() };
@@ -63,5 +66,17 @@ describe("RecipeEditForm", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(container).toBeEmptyDOMElement();
     expect(props.onCancel).toHaveBeenCalled();
+  });
+
+  it("says the recipe could not be opened when its detail fails to load", () => {
+    mocks.useRecipe.mockReturnValue({
+      data: undefined,
+      isError: true,
+      error: new Error("Request failed with status code 500"),
+    });
+
+    render(<RecipeEditForm {...props} />);
+
+    expect(toast.error).toHaveBeenCalledWith("Could not open the recipe");
   });
 });

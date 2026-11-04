@@ -28,7 +28,7 @@ const baseProps = {
 
 describe("DocumentFormatSettings — number padding", () => {
   function getPaddingSelect(): HTMLSelectElement {
-    const labels = screen.getAllByText("Number Padding");
+    const labels = screen.getAllByText("Number padding");
     expect(labels.length).toBeGreaterThan(0);
     const wrapper = labels[0].closest("div");
     const select = wrapper?.parentElement?.querySelector("select");
@@ -55,8 +55,8 @@ describe("DocumentFormatSettings — number padding", () => {
     expect(screen.getByPlaceholderText("Receipt")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Delivery")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Transfer")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Internal Receipt")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Internal Issue")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Internal receipt")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Internal issue")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Correction")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Scrap")).toBeInTheDocument();
   });

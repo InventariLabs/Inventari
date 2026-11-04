@@ -172,6 +172,13 @@
   "lots": {
     "title": "Batches",
     "subtitle": "Which batches exist, and which of them may not be touched",
+    "statusFilter": {
+      "active": "Active",
+      "quarantined": "Quarantined",
+      "held": "Held",
+      "expired": "Expired",
+      "recalled": "Recalled"
+    },
     "statusChanged": "Batch marked as {{status}}",
     "reasonDialog": {
       "title": "Mark {{name}} as {{status}}?",

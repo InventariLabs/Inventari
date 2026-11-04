@@ -95,7 +95,7 @@ export default function ShoppingListsPage() {
     return (
       <QueryFailure
         error={error}
-        message={extractApiError(error, t("common:errors.generic"))}
+        message={extractApiError(error, t("loadError"))}
         onRetry={() => refetch()}
       />
     );

@@ -24,7 +24,7 @@
   "continue": "Continuar",
   "back": "Voltar",
   "singleModuleName": "Apenas um módulo",
-  "singleModuleDescription": "Um módulo é o aplicativo inteiro. Todo o resto fica em segundo plano; saia desse modo quando quiser em Configurações → Meus módulos.",
+  "singleModuleDescription": "Um módulo é o aplicativo inteiro — por exemplo Produção, se você fabrica algo. Todo o resto fica em segundo plano; saia desse modo quando quiser em Configurações → Meus módulos.",
   "focusChoiceTitle": "Qual módulo?",
   "focusChoiceSubtitle": "Só aparecem os módulos que funcionam sozinhos. Nada aqui é definitivo."
 }

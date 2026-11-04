@@ -479,6 +479,9 @@ has them, its batch and expiry date below.
   code** field. It fills in an internal EAN-13 starting with `20`, the GS1
   range a company may use for its own goods; no two products in the
   organization get the same one, and a code a product already has is skipped.
+  It is the organization's own internal code, which cannot be mistaken for a
+  manufacturer's, and it is valid only inside the organization: goods sold on
+  through other businesses' tills need a GTIN from GS1.
   **Save changes** keeps it. A product that already has a code does not offer
   the button: changing the code would orphan the labels already on the shelf.
 - **One product.** On a product's page, **Print label** (shown once the
@@ -868,8 +871,8 @@ filtered list survives a reload and can be bookmarked or sent to a colleague.
 | **Receipt** | Goods from a supplier | PZ | GRN | WE | BR | AE |
 | **Delivery** | Goods to a customer | WZ | DN | WA | BL | AS |
 | **Transfer** | Between your own locations | MM | ST | UML | BT | TR |
-| **Internal Receipt** | Goods made or found in-house | PW | IPR | IE | ERI | EI |
-| **Internal Issue** | Goods used in-house | RW | IC | IV | SCI | SI |
+| **Internal receipt** | Goods made or found in-house | PW | IPR | IE | ERI | EI |
+| **Internal issue** | Goods used in-house | RW | IC | IV | SCI | SI |
 | **Correction** | Changing the quantities of a completed document | KOR | CORR | KORR | COR | COR |
 | **Scrap** | Goods written off | ZL | — | — | — | — |
 
@@ -891,10 +894,10 @@ header does the same.
   module on, a receipt and a delivery need one; **Create new partner** adds one
   on the spot.
 - **From location** and **To location**, as the type needs them.
-- **Scheduled Date** — it also decides the month the document belongs to.
+- **Scheduled date** — it also decides the month the document belongs to.
 - **Reference / Related Document** — for example the supplier's delivery note —
   and **Notes**.
-- Lines: **Add Line** or **Scan**, with the product, quantity and unit, and —
+- Lines: **Add line** or **Scan**, with the product, quantity and unit, and —
   when value tracking is on — the unit price and VAT. **More fields** adds a
   batch number, serial number and expiry date. For a delivery, issue, transfer
   or scrap each line is picked from stock you actually hold.
@@ -916,7 +919,7 @@ header does the same.
 Saving creates a **Draft**. A draft carries a temporary identifier
 (`DRAFT-…`) of its own; it takes its number when you **Confirm** it.
 
-- **Import Lines** fills lines from a CSV or XLSX file or pasted text, with a
+- **Import lines** fills lines from a CSV or XLSX file or pasted text, with a
   column mapping — on a new document as you write it, or on a draft through
   **Edit**. Each row finds its product by barcode, SKU or name. On a delivery,
   issue, transfer or scrap, each line also takes its stock from the source
@@ -953,8 +956,8 @@ approver rejects goes back to a draft and lets its shelves go, so the next
 
 **Receive stock** (receipts), **Write off stock** (scrap) or **Pick items**
 (everything else) opens the execution panel. Enter what was actually received or picked per line: **+1**,
-**Fill Remaining** or type it. A line that ends short needs a **Discrepancy
-Code** — Shortage, Damage, Quality hold, Count variance or Other. A line that
+**Fill remaining** or type it. A line that ends short needs a **Discrepancy
+code** — Shortage, Damage, Quality hold, Count variance or Other. A line that
 came in above what was expected takes **Surplus from supplier**: in a
 receiving session the *Receive more than expected?* question is answered by
 **Receive the surplus**, and how far a receipt may go past the expected
@@ -1099,7 +1102,7 @@ on which nothing was picked has no destination to confirm.
   creates a new draft of the same type for what is missing. Other codes simply
   close the gap.
 - **Corrections.** A completed document has **New correction**: per line, the
-  change in quantity and a reason. **Apply Correction** confirms and completes
+  change in quantity and a reason. **Apply correction** confirms and completes
   it at once. Only quantities can be corrected.
 - **Returns.** A completed receipt, delivery or transfer offers **Create
   Return**. A receipt's return is a delivery back to the supplier, taken off
@@ -1190,7 +1193,7 @@ document's card.
 
 ### 10.6 Where received goods go
 
-**Putaway Rules** decide which shelf a receipt line lands on: match a product,
+**Putaway rules** decide which shelf a receipt line lands on: match a product,
 a category, a category group or a location type, and list target shelves in
 order — goods go to the first one with room (see *Capacity*, chapter 2). A
 line's own destination, when you set one, wins over the rules; a draft already
@@ -1208,9 +1211,9 @@ away from a receiving area on a location other than the suggested one — or on 
 product that has no suggestion yet — the put-away asks whether that location
 is now the product's home. *Yes* writes an ordinary putaway rule for the
 product (the next delivery is suggested there, and the rule can be edited
-under **Putaway Rules**); a product that already had a rule keeps its old
+under **Putaway rules**); a product that already had a rule keeps its old
 locations after the new one, as overflow. *No* changes nothing, and *Don't ask
-about this product again* stops the question for it — **Putaway Rules** lists
+about this product again* stops the question for it — **Putaway rules** lists
 those products at the bottom, each with *Ask again*. A receiving area, a
 quarantine location or a location that does not take stock is never offered as
 a home; the sheet says why instead. Nothing is asked when you were forced off
@@ -1226,7 +1229,7 @@ to the rules alone.
 ### 10.7 Approvals
 
 Approval of documents needs the **Approvals** module. The settings split the
-work in two: **Warehouse → Configuration → Approval Workflow** says *what* needs
+work in two: **Warehouse → Configuration → Approval workflow** says *what* needs
 approval — a type you list, or a net value over the threshold — and the
 workflow (chapter 13) says *who* approves.
 
@@ -1296,7 +1299,7 @@ change it.
 - **Printouts** — the **Print layout** every document without a template of
   its own type prints with, and a link to **Print templates** for your own
   layouts per type.
-- **Numbering and prices** — **Value Tracking**: prices and tax on document
+- **Numbering and prices** — **Value tracking**: prices and tax on document
   lines (no tax, one rate per document or a rate per line), a default rate,
   the currency, and whether every line must have a price. **Tax rates** keep
   the organization's rates (*Add the country's rates* starts the table from
@@ -1307,7 +1310,7 @@ change it.
   A new document or purchase-order line takes the product's rate, then its
   category's, then the default; a document with more than one rate shows the
   tax per rate under its totals and in print. Below it,
-  **Partner Requirements**: whether the partner must have a tax ID. Left
+  **Partner requirements**: whether the partner must have a tax ID. Left
   untouched, the organization's country decides (Poland, France and Spain
   require it; Germany does not); a partner marked as a private person is never asked
   ([chapter 13](#13-partners-and-approvals)). The closed *Advanced* group
@@ -1421,10 +1424,16 @@ authority accepts, which is for the business and its adviser to settle.
   correction changes the outcome.
 - A **cancelled** document keeps its number and stays on record, and the
   document list shows it when filtered by status. Nothing deletes it.
-- The partner's name, tax number and address are copied onto the document when
-  it is confirmed, so editing the partner later does not change a document
-  already issued; each line keeps the product name and the price it was
-  written with.
+- The partner's name, tax number and address, your own company's name, tax
+  number and address, and the names of the locations the document refers to
+  are copied onto the document when it is confirmed (the record of a closed
+  stock take, which is written as done, takes them at that moment). Editing any of them later
+  does not change a document already issued, and a reprint shows the values
+  of the day it was confirmed; each line keeps the product name and the price
+  it was written with. What a reprint still reads as it is today: the print
+  template, the document type's settings (title, which columns show) and your
+  logo. A document confirmed before this was recorded prints your company
+  details and location names as they are now.
 - The **audit log** cannot be edited or deleted by anybody, administrators
   included: the database itself refuses to change or remove a row. No timer
   deletes documents, movements or audit entries. Two timers do delete: the
@@ -1441,7 +1450,7 @@ more off a line than is still there. The original stays exactly as it was;
 the two are read together. A correction is subject to the same period check
 as any document.
 
-**Closing a period.** **Period Closure** closes a calendar month
+**Closing a period.** **Period closure** closes a calendar month
 (10.8). In a closed month no document can be created, edited, confirmed,
 completed or cancelled, and no stock take can be completed. Closing and
 reopening are each recorded with who did it, when, and the note typed at the
@@ -1481,7 +1490,7 @@ and a new prefix starts its own count.
 
 | The auditor wants | Where it comes from |
 |---|---|
-| The documents, with totals, partner, status and date | **Document Register** and **Export CSV** (10.8): the completed documents of the chosen period and type; the CSV has no row limit and carries no lines. Cancelled documents are not in it: they are on the document list, filtered by status, and in the audit log |
+| The documents, with totals, partner, status and date | **Document register** and **Export CSV** (10.8): the completed documents of the chosen period and type; the CSV has no row limit and carries no lines. Cancelled documents are not in it: they are on the document list, filtered by status, and in the audit log |
 | One document with its lines, as printed | **Download PDF** on the document (see below), or the document's page on screen; several at once through the bulk **Download PDF** of the document list |
 | Every movement of stock | **Movements → Export** (6): one spreadsheet of up to 50,000 rows (a larger result is refused, not cut short) with date, product, quantity, from and to, batch, source and person, for any filter the screen offers; its *Reference* column is the id of the document behind the movement, which joins to the page's link |
 | Stock on a given day | **Stock on a date → Export** or **Print** (6) |
@@ -1495,13 +1504,14 @@ for an audit, by whom, and where copies are kept.
 
 **Printouts are not stored.** A PDF is produced from the document's data when
 you press **Download PDF**; Inventari does not keep a copy of what was
-printed. The partner and the lines are as they were at confirmation and do
-not change. But the PDF also reads what is current when it is made: the
-print template and the document type's settings (title, whether prices and
-tax are shown); the own-company details at the top (name, address, logo), from
-**Settings**; and the names of the shelves the document refers to, so a shelf
-renamed since appears under its new name. A reprint can therefore differ from
-the first print without the document having changed. A
+printed. The partner, your own company details (name, tax number, address),
+the names of the shelves the document refers to and the lines are as they
+were at confirmation and do not change. But the PDF also reads what is
+current when it is made: the print template, the document type's settings
+(title, whether prices and tax are shown) and your logo, from **Settings**.
+A reprint can therefore differ in layout from the first print without the
+document having changed; a document confirmed before the company details
+were recorded with it shows them as they are now. A
 business that must keep a delivery note or order *as sent* — because the law
 treats it as a business letter, or the customer was sent a file — should save
 the file at the moment it sends it (or keep the email it went out in) and
@@ -1519,19 +1529,19 @@ and stored when an audit is announced.
 
 ## 11. Purchase orders
 
-**Purchase Orders → Create Order**: the supplier (a draft can do without one),
+**Purchase Orders → Create order**: the supplier (a draft can do without one),
 the scheduled date, currency, notes and lines with quantity, unit, unit price
 and VAT.
 
 - **Confirm** needs an active supplier. Depending on the settings, the order
   may first need approval — **Request approval** sends it.
-- **Send to Vendor** emails the order as PDF to the supplier; **Download PDF**
+- **Send to supplier** emails the order as PDF to the supplier; **Download PDF**
   saves it.
 - **Receiving.** On a confirmed order, **Receive delivery** opens **Receive
   goods** (chapter 10) with the order's lines already loaded: say what arrived
   and press **Receive into stock** — one press posts the receipt and moves the
   stock. A partial delivery is simply one receipt of several; the receipt is
-  listed under **Linked Receipts** on the order. The order is **Completed**
+  listed under **Linked receipts** on the order. The order is **Completed**
   when everything has been received.
 - **Cancel order** is possible until something has been received.
 

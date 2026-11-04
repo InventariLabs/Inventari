@@ -157,7 +157,7 @@ describe("CorrectionFormModal", () => {
     );
     await user.type(screen.getByTestId("correction-reason-note"), "   ");
     await user.click(
-      screen.getByRole("button", { name: "Create Correction (1 line)" }),
+      screen.getByRole("button", { name: "Create correction (1 line)" }),
     );
 
     expect(mutateMock).not.toHaveBeenCalled();
@@ -175,7 +175,7 @@ describe("CorrectionFormModal", () => {
 
     // The button counts lines, so a disabled one reads as "not enough lines".
     const submit = screen.getByRole("button", {
-      name: "Create Correction (1 line)",
+      name: "Create correction (1 line)",
     });
     expect(submit).toBeEnabled();
 
@@ -197,7 +197,7 @@ describe("CorrectionFormModal", () => {
       "WRONG_PRICE",
     );
     await user.click(
-      screen.getByRole("button", { name: "Create Correction (1 line)" }),
+      screen.getByRole("button", { name: "Create correction (1 line)" }),
     );
 
     expect(mutateMock).toHaveBeenCalledWith(
@@ -223,7 +223,7 @@ describe("CorrectionFormModal", () => {
     );
 
     await user.click(
-      screen.getByRole("button", { name: "Create Correction (1 line)" }),
+      screen.getByRole("button", { name: "Create correction (1 line)" }),
     );
 
     expect(mutateMock).toHaveBeenCalledWith(

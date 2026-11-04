@@ -172,6 +172,13 @@
   "lots": {
     "title": "Lots",
     "subtitle": "Quels lots existent et lesquels ne doivent pas être touchés",
+    "statusFilter": {
+      "active": "Actif",
+      "quarantined": "En quarantaine",
+      "held": "Bloqué",
+      "expired": "Périmé",
+      "recalled": "Rappelé"
+    },
     "statusChanged": "Lot marqué comme {{status}}",
     "reasonDialog": {
       "title": "Marquer le lot {{name}} comme {{status}} ?",

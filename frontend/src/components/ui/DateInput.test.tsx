@@ -217,6 +217,17 @@ describe("DateInput", () => {
     expect(onChange).toHaveBeenCalledWith("2029-08-15");
   });
 
+  it("jumps two weeks ahead in one click", () => {
+    const onChange = vi.fn();
+    render(<DateInput value="" onChange={onChange} presets={["plus2Weeks"]} />);
+
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.click(screen.getAllByTestId("date-preset")[0]);
+
+    // The suite pins today to 2026-08-15.
+    expect(onChange).toHaveBeenCalledWith("2026-08-29");
+  });
+
   it("moves a whole year per click in the panel header", () => {
     render(<DateInput value="2026-08-15" onChange={vi.fn()} />);
 

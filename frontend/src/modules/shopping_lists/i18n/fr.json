@@ -115,6 +115,7 @@
     "nameChanged": "Nom modifié",
     "nameChangeError": "Erreur lors du changement de nom"
   },
+  "loadError": "Impossible de charger les listes de courses",
   "permissions": {
     "read": "Consulter les listes d'achats",
     "readDesc": "Peut consulter les listes d'achats et leurs suggestions",

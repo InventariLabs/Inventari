@@ -10,7 +10,7 @@ import { QueryError } from "@/components/ui/QueryResult";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { extractApiError, extractFieldValidationError } from "@/lib/errors";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
-import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
+import { useCanManage } from "@/hooks/useCanWrite";
 import { usePOSettings, useUpdatePOSettings } from "../hooks/usePurchaseOrders";
 import { POApprovalWorkflowWarning } from "./POApprovalWorkflowWarning";
 
@@ -29,10 +29,10 @@ export function POApprovalSettings() {
   // The PUT behind this form answers to purchase_orders:manage: whether an
   // order needs approval is not a buyer's own call. The form says so up
   // front, in the words the other module settings screens use, instead of
-  // letting the save fail. A viewer is told the broader thing it lacks, as
-  // the Production settings tell theirs (MakerSettingsPanel).
+  // letting the save fail. The form is withheld from everyone without it, so
+  // a viewer gets the same sentence as the member: "you can view this" above
+  // an empty page would be untrue.
   const canManage = useCanManage("purchase_orders");
-  const canWrite = useCanWrite("purchase_orders");
 
   const [threshold, setThreshold] = useState<string>("");
   const [requireAll, setRequireAll] = useState(false);
@@ -51,12 +51,7 @@ export function POApprovalSettings() {
   }
 
   if (!canManage) {
-    return (
-      <ReadOnlyNotice
-        module="purchase_orders"
-        right={canWrite ? "manage" : "write"}
-      />
-    );
+    return <ReadOnlyNotice module="purchase_orders" right="manage" />;
   }
 
   const failOnThreshold = (message: string) => {
@@ -137,7 +132,8 @@ export function POApprovalSettings() {
 
         <div className="space-y-4">
           <POApprovalWorkflowWarning
-            approvalRequested={requireAll || threshold.trim() !== ""}
+            requireAll={requireAll}
+            thresholdSet={threshold.trim() !== ""}
           />
 
           <label className="flex items-center gap-2 text-sm">

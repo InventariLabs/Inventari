@@ -173,8 +173,8 @@ class TestEveryRowKnowsItsShelf:
         covered = {row['id']: row['path'] for row in count['counted_locations']}
         assert covered == {
             str(rack.id): 'Rack A',
-            str(shelf_one.id): 'Rack A / Shelf 1',
-            str(shelf_two.id): 'Rack A / Shelf 2',
+            str(shelf_one.id): 'Rack A › Shelf 1',
+            str(shelf_two.id): 'Rack A › Shelf 2',
         }
 
 
@@ -197,7 +197,7 @@ class TestGoodsFoundOnAnotherShelf:
         assert response.status_code == status.HTTP_201_CREATED, response.text
         row = response.json()
         assert row['location_id'] == str(shelf_two.id)
-        assert row['shelf_location'] == 'Rack A / Shelf 2'
+        assert row['shelf_location'] == 'Rack A › Shelf 2'
         assert Decimal(row['system_quantity']) == Decimal('0')
         assert Decimal(row['counted_quantity']) == Decimal('1')
         # Backed by a record of the same goods standing on the shelf they
@@ -388,7 +388,7 @@ class TestARecordThatIsItsOwnIdentity:
         assert found['item_id'] == str(record.id)
         assert found['location_id'] == str(shelf_two.id)
         assert found['expected_location_id'] == str(shelf_one.id)
-        assert found['shelf_location'] == 'Rack A / Shelf 2'
+        assert found['shelf_location'] == 'Rack A › Shelf 2'
         assert Decimal(found['counted_quantity']) == Decimal('1')
         assert found['is_discrepancy'] == 1
         again = client.get(f'/api/v1/stock-takes/{count["id"]}', headers=headers)
@@ -429,9 +429,9 @@ class TestARecordThatIsItsOwnIdentity:
         assert report['overstock'] == 1
         by_shelf = {row['location_id']: row for row in report['discrepancy_items']}
         assert Decimal(by_shelf[str(shelf_one.id)]['difference']) == Decimal('-1')
-        assert by_shelf[str(shelf_one.id)]['shelf_location'] == 'Rack A / Shelf 1'
+        assert by_shelf[str(shelf_one.id)]['shelf_location'] == 'Rack A › Shelf 1'
         assert Decimal(by_shelf[str(shelf_two.id)]['difference']) == Decimal('1')
-        assert by_shelf[str(shelf_two.id)]['shelf_location'] == 'Rack A / Shelf 2'
+        assert by_shelf[str(shelf_two.id)]['shelf_location'] == 'Rack A › Shelf 2'
         db_session.expire_all()
         moved = db_session.get(Item, record.id)
         assert moved is not None

@@ -57,6 +57,17 @@ class TestScaffoldBackend:
         assert manifest['capabilities'] == ['database']
         assert manifest['module_type'] == 'community'
 
+    def test_the_router_asks_for_the_permissions_the_manifest_declares(self, package):
+        # MODULES_GUIDE: every module route has a permission dependency.
+        manifest = json.loads((package / 'backend' / 'manifest.json').read_text())
+        router = (package / 'backend' / 'router.py').read_text()
+
+        assert [permission['key'] for permission in manifest['permissions']] == [
+            'demo_mod:read',
+            'demo_mod:write',
+        ]
+        assert 'require_read_write("demo_mod:read", "demo_mod:write")' in router
+
     def test_generates_only_the_english_catalog_by_default(self, package):
         catalogs = sorted(p.name for p in (package / 'backend' / 'i18n').iterdir())
 
@@ -157,6 +168,8 @@ class TestScaffoldFrontend:
 
             assert catalog['navigation']['title']
             assert catalog['launcher']['description']
+            assert catalog['permissions']['read']
+            assert catalog['permissions']['write']
 
     def test_module_ts_passes_registry_only_fields(self, package):
         """`translations` is not a field of FrontendModule, so `tsc --noEmit`

@@ -14,8 +14,11 @@ movement ledger must explain what the shelf holds afterwards.
 from __future__ import annotations
 
 import asyncio
+import time
 import uuid
+from collections.abc import Sequence
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from sqlalchemy import func, insert, select, text
@@ -27,6 +30,10 @@ from app.core.testing import ShelfRow
 from app.modules.warehouse.schemas import DocumentComplete
 
 from ._core_api_helpers import make_template
+
+# Only for a change stuck on something else: nothing here takes this long, and
+# no test passes or fails on how close it comes.
+_NEVER_ARRIVES_AFTER = 120.0
 
 
 def _async_test_url() -> str:
@@ -139,7 +146,7 @@ class TestTheSameRaceThroughTheDocumentPath:
                 racers = [
                     asyncio.create_task(run_the_register(doc_id)) for doc_id in doc_ids
                 ]
-                await _wait_for_lock_waiters(factory, expected=workers)
+                await _wait_for_lock_waiters(factory, racers)
                 await holder.rollback()
             outcomes = await asyncio.gather(*racers, return_exceptions=True)
         finally:
@@ -168,15 +175,23 @@ class TestTheSameRaceThroughTheDocumentPath:
         )
 
 
-async def _wait_for_lock_waiters(factory, expected: int, timeout: float = 15.0) -> None:
-    """Block until *expected* backends of this database are waiting on a lock.
+async def _wait_for_lock_waiters(factory, racers: Sequence[asyncio.Task[Any]]) -> None:
+    """Block until one backend of this database per racer is waiting on a lock.
 
     Scoped to the current database: each xdist worker has its own, so another
     worker's contention cannot satisfy the count.
+
+    A racer that has finished will never be counted, so the wait ends there,
+    and if it raised, on its own exception.
     """
-    deadline = asyncio.get_running_loop().time() + timeout
+    expected = len(racers)
+    deadline = time.monotonic() + _NEVER_ARRIVES_AFTER
     async with factory() as probe:
         while True:
+            for racer in racers:
+                if racer.done():
+                    racer.result()
+                    raise AssertionError('a racer finished without queueing')
             waiting = await probe.scalar(
                 text(
                     'SELECT count(*) FROM pg_stat_activity '
@@ -188,7 +203,7 @@ async def _wait_for_lock_waiters(factory, expected: int, timeout: float = 15.0) 
             await probe.rollback()
             if waiting >= expected:
                 return
-            if asyncio.get_running_loop().time() > deadline:
+            if time.monotonic() > deadline:
                 activity = (
                     await probe.execute(
                         text(
@@ -203,6 +218,36 @@ async def _wait_for_lock_waiters(factory, expected: int, timeout: float = 15.0) 
                     f'the interleaving this test forces never happened. {activity}'
                 )
             await asyncio.sleep(0.05)
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+class TestARacerThatEndsEndsTheWait:
+    """The count cannot be reached any more, so nothing is left to wait for."""
+
+    async def _racer_ending_with(self, ending) -> None:
+        engine = create_async_engine(_async_test_url(), echo=False, poolclass=NullPool)
+        try:
+            await _wait_for_lock_waiters(
+                async_sessionmaker(engine, class_=AsyncSession),
+                [asyncio.create_task(ending())],
+            )
+        finally:
+            await engine.dispose()
+
+    async def test_its_own_exception_is_the_failure(self, real_async_db_session):
+        async def breaks() -> None:
+            raise LookupError('the register broke')
+
+        with pytest.raises(LookupError, match='the register broke'):
+            await self._racer_ending_with(breaks)
+
+    async def test_finishing_without_queueing_is_said(self, real_async_db_session):
+        async def finishes() -> None:
+            return None
+
+        with pytest.raises(AssertionError, match='finished without queueing'):
+            await self._racer_ending_with(finishes)
 
 
 @pytest.mark.integration
@@ -312,7 +357,7 @@ class TestAReceiptThatWaitedForTheRecord:
                     select(Item.id).where(Item.id == record_id).with_for_update()
                 )
                 racers = [asyncio.create_task(register(d)) for d in racing]
-                await _wait_for_lock_waiters(factory, expected=len(racers))
+                await _wait_for_lock_waiters(factory, racers)
                 await holder.rollback()
             await asyncio.gather(*racers)
 

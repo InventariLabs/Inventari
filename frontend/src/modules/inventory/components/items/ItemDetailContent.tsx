@@ -1,3 +1,4 @@
+import { isVirtualUsage } from "@/modules/shared/lib/storageUsage";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -74,6 +75,7 @@ export default function ItemDetailContent({ item }: { item: Item }) {
     onMove: () => setMoving(true),
     // The address stops resolving the moment the record goes.
     onDeleted: () => navigate("/inventory/items"),
+    inVirtualPlace: isVirtualUsage(places.get(item.location_id)?.usage),
   });
 
   useEffect(() => {

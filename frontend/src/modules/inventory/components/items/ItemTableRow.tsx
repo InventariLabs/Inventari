@@ -1,3 +1,4 @@
+import { isInVirtualPlace } from "@/modules/shared/lib/storageUsage";
 import { memo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -96,6 +97,55 @@ function getCategoryName(
   const category = categories?.find((c) => c.id === categoryId);
   if (!category) return null;
   return categoryLabel(t, category.code, category.name);
+}
+
+/** Where the record stands; a used-up one has no shelf to name. */
+function ItemLocation({
+  item,
+  storages,
+}: {
+  item: Item;
+  storages: StorageLocationSummary[] | undefined;
+}) {
+  const { t } = useTranslation(["items", "common"]);
+  if (isInVirtualPlace(item.location_id, storages)) {
+    return (
+      <span className="text-sm text-on-muted">{t("items:usedUpPlace")}</span>
+    );
+  }
+  return (
+    <LocationLink
+      locationId={item.location_id}
+      path={getStoragePath(item.location_id, item.shelf_location, storages, t)}
+    />
+  );
+}
+
+/** "+1", where a unit can be added: not to a used-up record. */
+function AddOneButton({
+  item,
+  storages,
+  label,
+  onAddOne,
+}: {
+  item: Item;
+  storages: StorageLocationSummary[] | undefined;
+  label: string;
+  onAddOne: (itemId: string) => void;
+}) {
+  if (isInVirtualPlace(item.location_id, storages)) return null;
+  return (
+    <Button
+      size="iconSm"
+      variant="ghost"
+      onClick={() => onAddOne(item.id)}
+      className="relative group/tooltip text-on-muted hover:text-primary-600 hover:bg-primary-50"
+      aria-label={label}
+    >
+      <Plus size={16} />
+      <Tooltip label={label} />
+    </Button>
+  );
 }
 
 /** The location cell's link: the leaf of the path first, the road to it behind. */
@@ -203,12 +253,6 @@ function ItemTableRowBase({
   // stays in the card's unit.
   const partial = usePartialPackage()(item);
   const badge = badgeQuantity(t, item, partial);
-  const storagePath = getStoragePath(
-    item.location_id,
-    item.shelf_location,
-    storages,
-    t,
-  );
 
   // The row's icon actions say what they do in one place: these words are
   // the accessible name and the tooltip both, so the two cannot drift.
@@ -386,7 +430,7 @@ function ItemTableRowBase({
           The leaf comes first and is never cut: a product held in twelve
           records on twelve shelves of one warehouse differs only in its last
           segment, and a one-line path truncated at the end printed twelve
-          identical rows. Only the road to the leaf ("Pantry Building → Dry
+          identical rows. Only the road to the leaf ("Pantry Building › Dry
           Goods") is truncated, on a line of its own, and `title` carries
           what truncation took away.
 
@@ -395,7 +439,7 @@ function ItemTableRowBase({
           swallowed the click a reader aims at its centre. `aria-label` keeps
           the whole path as the link's name. */}
       <td className={cell}>
-        <LocationLink locationId={item.location_id} path={storagePath} />
+        <ItemLocation item={item} storages={storages} />
       </td>
 
       {/* Quantity — the low-stock state says so in a word, exactly like the
@@ -493,16 +537,12 @@ function ItemTableRowBase({
               </Button>
               {/* The opposite of the button beside it. "+1" existed only in the
               actions sheet, one click deeper than the action it undoes. */}
-              <Button
-                size="iconSm"
-                variant="ghost"
-                onClick={() => onAddOne(item.id)}
-                className="relative group/tooltip text-on-muted hover:text-primary-600 hover:bg-primary-50"
-                aria-label={addOneLabel}
-              >
-                <Plus size={16} />
-                <Tooltip label={addOneLabel} />
-              </Button>
+              <AddOneButton
+                item={item}
+                storages={storages}
+                label={addOneLabel}
+                onAddOne={onAddOne}
+              />
               <Button
                 size="iconSm"
                 variant="ghost"

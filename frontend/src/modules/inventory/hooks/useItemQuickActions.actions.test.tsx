@@ -52,7 +52,10 @@ function lastOptions(mock: ReturnType<typeof vi.fn>): MutateOptions {
   return mock.mock.calls.at(-1)?.[1] as MutateOptions;
 }
 
-function render(record: Item, opts: { onDeleted?: () => void } = {}) {
+function render(
+  record: Item,
+  opts: { onDeleted?: () => void; inVirtualPlace?: boolean } = {},
+) {
   const onDone = vi.fn();
   const onMove = vi.fn();
   const view = renderHook(() =>
@@ -204,5 +207,22 @@ describe("useItemQuickActions — offers, results and the delete dialog", () => 
     act(() => action("discard")!.onClick());
     act(() => result.current.deleteDialog.onCancel());
     expect(result.current.deleteDialog.open).toBe(false);
+  });
+
+  describe("a record in a system place", () => {
+    it("offers no unit the server would refuse, and keeps the way back", () => {
+      const { action } = render(item({ quantity: "0" }), {
+        inVirtualPlace: true,
+      });
+
+      expect(action("add_one")).toBeUndefined();
+      expect(action("move")).toBeDefined();
+    });
+
+    it("offers the unit on a real shelf, even at zero", () => {
+      const { action } = render(item({ quantity: "0" }));
+
+      expect(action("add_one")).toBeDefined();
+    });
   });
 });

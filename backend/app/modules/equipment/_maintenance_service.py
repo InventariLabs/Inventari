@@ -43,6 +43,7 @@ SERVICE_CASE_TITLE: dict[str, dict[str, str]] = {
         'de': 'Zurückgegeben — Reparatur nötig',
         'fr': 'Retourné — réparation nécessaire',
         'es': 'Devuelto — necesita reparación',
+        'pt': 'Devolvido — precisa de reparo',
     },
     'DAMAGED': {
         'en': 'Returned damaged',
@@ -50,6 +51,7 @@ SERVICE_CASE_TITLE: dict[str, dict[str, str]] = {
         'de': 'Beschädigt zurückgegeben',
         'fr': 'Retourné endommagé',
         'es': 'Devuelto dañado',
+        'pt': 'Devolvido danificado',
     },
 }
 

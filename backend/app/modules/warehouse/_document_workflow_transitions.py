@@ -24,6 +24,7 @@ from ._document_workflow_crud import (
     _apply_execution_quantities,
     _build_partner_snapshot,
     _check_document_period_open,
+    _freeze_print_details,
     _get_doc_for_update,
     _release_quants_for_doc,
     _reserve_quants_for_doc,
@@ -449,6 +450,9 @@ async def confirm_document(
         partner_dto = await core_api.partners.get_async(db, org_id, doc.partner_id)
         if partner_dto is not None:
             doc.partner_snapshot = _build_partner_snapshot(partner_dto)
+    doc.print_snapshot = _freeze_print_details(
+        doc, await core_api.organizations.get_async(db, org_id)
+    )
 
     await core_api.audit_log.log_action_async(
         db,

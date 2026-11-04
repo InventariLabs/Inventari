@@ -59,7 +59,7 @@ const EQUIPMENT = {
   name: "Server Rack A",
   context_tag: "equipment",
   parent_id: "eq-room",
-  full_path: "Office Building → Server Room → Server Rack A",
+  full_path: "Office Building › Server Room › Server Rack A",
   usage: "internal",
 };
 
@@ -79,7 +79,7 @@ const FOOD = {
   name: "Chest Freezer",
   context_tag: "food",
   parent_id: "food-zone",
-  full_path: "Freezer Zone → Chest Freezer",
+  full_path: "Freezer Zone › Chest Freezer",
   usage: "internal",
 };
 

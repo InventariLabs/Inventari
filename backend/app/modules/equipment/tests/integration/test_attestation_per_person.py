@@ -251,6 +251,8 @@ class TestAttestationPerPerson:
         assert response_row is not None
         token = response_row.token
         target = next(i for i in response_row.items if i.item_name == 'Laptop B')
+        target.serial_number = 'SN-B'
+        db_session.commit()
 
         dispute_r = client.post(
             f'/public/attestation/{token}/dispute',
@@ -284,7 +286,7 @@ class TestAttestationPerPerson:
             headers=eq_auth_headers,
         ).json()
         (row,) = detail['responses']
-        assert row['dispute_reason'] == 'Laptop B — Screen cracked in transit'
+        assert row['dispute_reason'] == 'Laptop B (SN-B) — Screen cracked in transit'
         assert row['dispute_type'] == 'DAMAGED'
         noted = {i['item_name']: i['dispute_reason'] for i in row['items']}
         assert noted['Laptop B'] == 'Screen cracked in transit'

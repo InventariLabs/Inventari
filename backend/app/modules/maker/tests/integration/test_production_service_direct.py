@@ -2110,8 +2110,8 @@ class TestUpdateOrder:
         assert updates[0].user_id == prod_user.id
         assert updates[0].snapshot == {
             'name': order.number,
-            'before': {'planned_qty': 4.0},
-            'after': {'planned_qty': 9.0},
+            'before': {'planned_qty': '4.000'},
+            'after': {'planned_qty': '9.000'},
         }
 
     @pytest.mark.asyncio
@@ -2350,9 +2350,90 @@ class TestDuplicateOrder:
             'name': duplicate.number,
             'status': 'DRAFT',
             'output': output.name,
-            'planned_qty': float(duplicate.planned_qty),
+            'planned_qty': '1.000',
             'copied_from': order.number,
         }
+
+    @pytest.mark.asyncio
+    async def test_the_opening_entry_keeps_the_exact_digits_of_the_quantity(
+        self,
+        real_async_db_session: AsyncSession,
+        prod_org: Organization,
+        prod_user: User,
+        prod_ctx: UserContextDTO,
+        prod_storage_type: StorageType,
+    ) -> None:
+        """A quantity is written down as the digits the column keeps — a text,
+        not the float that would print ``0.1`` for a value it only
+        approximates — for the order and for its copy alike."""
+        output = await _template(real_async_db_session, prod_org, name='Exact Out')
+        location = await _location(
+            real_async_db_session,
+            prod_org,
+            prod_user,
+            prod_storage_type,
+            name='Exact Loc',
+        )
+        await _recipe(real_async_db_session, prod_org, output_template_id=output.id)
+        order = await _draft_order(
+            real_async_db_session,
+            prod_org,
+            prod_ctx,
+            output_template=output,
+            output_location=location,
+            planned_qty=Decimal('2.5'),
+        )
+        duplicate = await production_service.duplicate_order(
+            real_async_db_session, prod_org.id, order.id, prod_ctx
+        )
+
+        for opened in (order, duplicate):
+            (entry,) = await _order_entries(
+                real_async_db_session, prod_org, opened.id, 'CREATE'
+            )
+            assert entry.snapshot is not None
+            assert entry.snapshot['planned_qty'] == '2.500'
+
+    @pytest.mark.asyncio
+    async def test_a_quantity_resaved_with_other_digits_writes_nothing(
+        self,
+        real_async_db_session: AsyncSession,
+        prod_org: Organization,
+        prod_user: User,
+        prod_ctx: UserContextDTO,
+        prod_storage_type: StorageType,
+    ) -> None:
+        """``4`` posted over a stored ``4.000`` is one quantity, not a change."""
+        output = await _template(real_async_db_session, prod_org, name='Digits Out')
+        location = await _location(
+            real_async_db_session,
+            prod_org,
+            prod_user,
+            prod_storage_type,
+            name='Digits Loc',
+        )
+        await _recipe(real_async_db_session, prod_org, output_template_id=output.id)
+        order = await _draft_order(
+            real_async_db_session,
+            prod_org,
+            prod_ctx,
+            output_template=output,
+            output_location=location,
+            planned_qty=Decimal('4.000'),
+        )
+
+        await production_service.update_order(
+            real_async_db_session,
+            prod_org.id,
+            order.id,
+            ProductionOrderUpdate(planned_qty=Decimal('4')),
+            prod_ctx,
+        )
+
+        assert (
+            await _order_entries(real_async_db_session, prod_org, order.id, 'UPDATE')
+            == []
+        )
 
     @pytest.mark.asyncio
     async def test_duplicate_not_found(

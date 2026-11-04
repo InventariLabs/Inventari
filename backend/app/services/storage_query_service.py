@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.core.db_utils import in_ids
+from app.core.location_path import join_location_path
 from app.models.audit_log import AuditAction, AuditLog, AuditTargetType
 from app.models.item import Item
 from app.models.storage_location import StorageLocation
@@ -48,7 +49,7 @@ def _compute_full_path(
     name = id_to_name.get(storage_id, '')
     if parent_id and parent_id in id_to_name:
         parent_path = _compute_full_path(parent_id, id_to_name, id_to_parent, visited)
-        return f'{parent_path} → {name}' if parent_path else name
+        return join_location_path([parent_path, name]) if parent_path else name
     return name
 
 

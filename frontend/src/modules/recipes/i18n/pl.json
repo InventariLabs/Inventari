@@ -119,7 +119,9 @@
     "linked_success_other": "Powiązano {{count}} składników",
     "link_failed": "Nie udało się powiązać składników",
     "empty_title": "Wszystkie składniki są powiązane",
-    "empty_desc": "Każdy składnik przepisu wskazuje produkt — dostępność, koszt i kompletacja obejmują całą książkę przepisów."
+    "empty_desc": "Każdy składnik przepisu wskazuje produkt — dostępność, koszt i kompletacja obejmują całą książkę przepisów.",
+    "empty_no_ingredients_title": "Brak składników w przepisach",
+    "empty_no_ingredients_desc": "Dodaj składniki do przepisu — pojawią się tutaj, dopóki nie zostaną powiązane z produktem."
   },
   "form": {
     "create_title": "Nowy przepis",
@@ -358,6 +360,7 @@
   "errors": {
     "save_failed": "Nie udało się zapisać przepisu",
     "delete_failed": "Nie udało się usunąć przepisu",
+    "load_failed": "Nie udało się otworzyć przepisu",
     "shopping_failed": "Nie udało się dodać do listy zakupów",
     "history_failed": "Nie udało się zapisać notatki",
     "image_failed": "Nie udało się przetworzyć zdjęcia"
@@ -402,6 +405,7 @@
     "rename_success_few": "Zmieniono nazwę: zaktualizowano {{count}} przepisy",
     "rename_success_many": "Zmieniono nazwę: zaktualizowano {{count}} przepisów",
     "rename_success_other": "Zmieniono nazwę: zaktualizowano {{count}} przepisów",
+    "rename_failed": "Nie udało się zmienić nazwy tagu",
     "delete": "Usuń",
     "delete_confirm_title": "Usunąć tag?",
     "delete_confirm_message": "„{{name}}” zniknie ze wszystkich przepisów, które go mają. Same przepisy zostają.",
@@ -424,7 +428,7 @@
     "import_json_placeholder": "Wklej JSON przepisu tutaj…",
     "import_submit": "Importuj",
     "import_success": "Zaimportowano: {{name}}",
-    "import_error": "Błąd importu: {{error}}",
+    "import_error": "Import nie powiódł się, nic nie zapisano: {{error}}",
     "import_error_unknown": "serwer nie podał powodu",
     "invalid_url": "Nieprawidłowy URL — musi zaczynać się od http:// lub https://",
     "review_title": "Sprawdź zaimportowane składniki",
@@ -739,6 +743,7 @@
     "exclusions_count_many": "Wykluczonych produktów: {{count}}",
     "exclusions_count_other": "Wykluczonych produktów: {{count}}",
     "generate_list_disabled_tooltip": "Najpierw dodaj posiłki",
+    "needs_meals_hint": "Dodaj co najmniej jeden posiłek, aby wygenerować listę zakupów lub skopiować plan.",
     "not_cooked": "Nie ugotowano",
     "entry_move_error": "Nie udało się przenieść posiłku. Spróbuj ponownie.",
     "drag_to_move": "Przeciągnij, aby przenieść",
@@ -763,7 +768,7 @@
     "select_plan": "Wybierz plan",
     "select_day": "Wybierz dzień",
     "select_slot": "Wybierz posiłek",
-    "no_plans_add_to_plan": "Najpierw utwórz plan posiłków — przepis dodasz później z poziomu planera.",
+    "no_plans_add_to_plan": "Najpierw utwórz plan posiłków — przepis zostanie od razu dodany do pierwszego posiłku pierwszego dnia planu.",
     "more_actions": "Więcej akcji",
     "expiry_urgent": "Składniki z krótką datą",
     "delete_plan": "Usuń plan",

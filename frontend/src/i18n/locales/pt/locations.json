@@ -262,6 +262,8 @@
     "archiveTargetLabel": "Mover produtos para",
     "archiveTargetNone": "Selecione um local de destino",
     "archiveReversible": "Você pode desfazer: os locais arquivados podem ser restaurados em Locais arquivados.",
+    "archiveSubLocations_one": "O {{count}} local dentro dele não é arquivado junto: aparece no nível superior das listas até este ser restaurado.",
+    "archiveSubLocations_other": "Os {{count}} locais dentro dele não são arquivados junto: aparecem no nível superior das listas até este ser restaurado.",
     "archivePutawayRules_one": "{{count}} regra de armazenagem aponta para cá. Ela manterá este local como destino até ser editada.",
     "archivePutawayRules_other": "{{count}} regras de armazenagem apontam para cá. Elas manterão este local como destino até serem editadas."
   },
@@ -288,7 +290,8 @@
   "reorg": {
     "noMoveTargets": "Não há para onde mover este local",
     "moveTo": "Mover para…",
-    "moveToTop": "Nível superior"
+    "moveToTop": "Nível superior",
+    "archiveOrDelete": "Arquivar ou excluir…"
   },
   "card": {
     "unit_one": "produto",
@@ -368,6 +371,7 @@
   },
   "contents": {
     "emptyTitle": "Não há nada dentro deste local",
+    "emptyDescriptionNone": "Não contém produtos nem locais dentro.",
     "emptyDescription_one": "O produto dele ({{count}}) está na aba Produtos.",
     "emptyDescription_other": "Os {{count}} produtos dele estão na aba Produtos.",
     "showProducts": "Mostrar produtos",

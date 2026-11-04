@@ -75,6 +75,20 @@ export class SessionEndedError extends ReadableError {
   readonly status = 401;
 }
 
+/**
+ * The sentence for a step that ran after the main write had already landed.
+ *
+ * An ended session's own sentence says the work was not saved, which is not
+ * true once the record exists — a photo or an attachment going up after the
+ * create must not tell the reader to start over (and make a duplicate). The
+ * step's own failure sentence stands in; any other failure reads as usual.
+ */
+export function followUpError(error: unknown, fallback: string): string {
+  return error instanceof SessionEndedError
+    ? fallback
+    : extractApiError(error, fallback);
+}
+
 /** The sentence a `ReadableError` carries, or null for anything else. */
 export function readableErrorMessage(error: unknown): string | null {
   // ui-pattern: error-message-as-copy — this class exists to mark a message
@@ -236,7 +250,10 @@ export function extractApiErrorCode(error: unknown): string | null {
  * `loc` starts at "path". A 422 about the body is a different event entirely
  * (the form that was sent is wrong), and stays one.
  */
-function isPathParameterRejection(error: unknown): boolean {
+function isPathParameterRejection(
+  error: unknown,
+  places: readonly string[] = ["path"],
+): boolean {
   if (!axios.isAxiosError(error) || error.response?.status !== 422)
     return false;
   const detail = (error.response?.data as { detail?: unknown } | undefined)
@@ -244,7 +261,7 @@ function isPathParameterRejection(error: unknown): boolean {
   if (!Array.isArray(detail)) return false;
   return detail.some((entry) => {
     const loc = (entry as { loc?: unknown } | null)?.loc;
-    return Array.isArray(loc) && loc[0] === "path";
+    return Array.isArray(loc) && places.includes(String(loc[0]));
   });
 }
 
@@ -266,6 +283,16 @@ function isPathParameterRejection(error: unknown): boolean {
 export function isNotFoundError(error: unknown): boolean {
   if (isPathParameterRejection(error)) return true;
   return axios.isAxiosError(error) && error.response?.status === 404;
+}
+
+/**
+ * A 422 on an identifier the address named, whether the server read it from
+ * the path or — for a screen that asks a list "which of these ids" — from the
+ * query. Either way the reader's event is that what the address names is not
+ * there, not that the request failed.
+ */
+export function isIdentifierRejection(error: unknown): boolean {
+  return isPathParameterRejection(error, ["path", "query"]);
 }
 
 /**

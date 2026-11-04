@@ -192,7 +192,7 @@ class TestClosingAShelf:
         closed = response.json()
         assert closed['counted_as_zero'] == 1
         assert closed['location_id'] == str(shelf_one.id)
-        assert closed['path'] == 'Rack C / Shelf 1'
+        assert closed['path'] == 'Rack C › Shelf 1'
         assert closed['empty'] is False
         assert closed['closed_by_name'] == 'Shelf-Closer'
         after = client.get(f'/api/v1/stock-takes/{count["id"]}', headers=headers)
@@ -205,7 +205,7 @@ class TestClosingAShelf:
         # The other shelf was not closed: its row still waits.
         assert rows[elsewhere['id']]['counted_quantity'] is None
         assert [shelf['path'] for shelf in after.json()['closed_locations']] == [
-            'Rack C / Shelf 1'
+            'Rack C › Shelf 1'
         ]
 
     def test_the_report_shows_them_as_shortages_and_the_stock_follows(
@@ -312,7 +312,7 @@ class TestAnEmptyShelf:
         )
         assert report.status_code == status.HTTP_200_OK, report.text
         [confirmed] = report.json()['closed_locations']
-        assert confirmed['path'] == 'Rack C / Shelf 2'
+        assert confirmed['path'] == 'Rack C › Shelf 2'
         assert confirmed['empty'] is True
         assert confirmed['closed_by_name'] == 'Shelf-Closer'
         assert confirmed['closed_at']

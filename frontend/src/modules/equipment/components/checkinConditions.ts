@@ -17,6 +17,12 @@ const LABEL_KEYS: Record<CheckinCondition, string> = {
   NEEDS_REPAIR: "equipment:assignments.condition_needs_repair",
 };
 
+const EFFECT_KEYS: Record<CheckinCondition, string> = {
+  GOOD: "equipment:assignments.condition_effect_available",
+  DAMAGED: "equipment:assignments.condition_effect_damaged",
+  NEEDS_REPAIR: "equipment:assignments.condition_effect_needs_repair",
+};
+
 const STYLES: Record<CheckinCondition, string> = {
   GOOD: "border-success-500 bg-success-50 dark:bg-success-900/20 text-success-700 dark:text-success-300",
   DAMAGED:
@@ -47,10 +53,7 @@ export function checkinConditionOptions(t: TFunction): ChoiceOption[] {
   return CHECKIN_CONDITIONS.map((c) => ({
     id: c,
     label: t(LABEL_KEYS[c]),
-    description:
-      statusAfterCheckin(c) === "AVAILABLE"
-        ? t("equipment:assignments.condition_effect_available")
-        : t("equipment:assignments.condition_effect_service"),
+    description: t(EFFECT_KEYS[c]),
     selectedClassName: STYLES[c],
   }));
 }

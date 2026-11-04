@@ -51,22 +51,49 @@ class IssuerContext:
 
     @classmethod
     def from_organization(cls, organization: Any, lang: str = 'en') -> IssuerContext:
-        from app.services.pdf_utils import format_partner_address
-
         if organization is None:
             return cls()
-        # The country lives in the organization's ISO column, not inside the
-        # address JSONB — fold it in so the printed address ends with the
-        # localised country name.
-        address_parts = dict(getattr(organization, 'address', None) or {})
-        country = getattr(organization, 'country', None)
-        if country:
-            address_parts['country'] = country
+        return cls.from_snapshot(issuer_snapshot(organization), lang)
+
+    @classmethod
+    def from_snapshot(
+        cls, snapshot: dict[str, Any] | None, lang: str = 'en'
+    ) -> IssuerContext:
+        """The block as ``issuer_snapshot`` froze it, worded in ``lang``.
+
+        The logo is not part of the snapshot: an image changed later is
+        presentation, not a statement of the transaction, so it stays the
+        one the organization has now.
+        """
+        from app.services.pdf_utils import format_partner_address
+
+        if not snapshot:
+            return cls()
         return cls(
-            name=getattr(organization, 'name', None),
-            tax_id=getattr(organization, 'tax_id', None),
-            address=format_partner_address(address_parts or None, lang),
+            name=snapshot.get('name'),
+            tax_id=snapshot.get('tax_id'),
+            address=format_partner_address(snapshot.get('address') or None, lang),
         )
+
+
+def issuer_snapshot(organization: Any) -> dict[str, Any]:
+    """The organization's own identity as a document states it on the day.
+
+    Stored raw (the address as its parts, the country as its ISO code) so the
+    block can still be worded in whichever language the document is printed
+    in later. The country lives in the organization's ISO column, not inside
+    the address JSONB — it is folded in so the printed address ends with the
+    localised country name.
+    """
+    address = dict(getattr(organization, 'address', None) or {})
+    country = getattr(organization, 'country', None)
+    if country:
+        address['country'] = country
+    return {
+        'name': getattr(organization, 'name', None),
+        'tax_id': getattr(organization, 'tax_id', None),
+        'address': address or None,
+    }
 
 
 async def build_issuer_context(organization: Any, lang: str = 'en') -> IssuerContext:

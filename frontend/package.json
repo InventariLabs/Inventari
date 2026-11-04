@@ -19,6 +19,8 @@
     "check:i18n": "node scripts/check-i18n-keys.mjs --baseline",
     "check:en-spelling": "node scripts/check-en-spelling.mjs",
     "check:vocabulary": "node scripts/check-vocabulary.mjs --baseline",
+    "check:title-case": "node scripts/check-title-case.mjs --baseline",
+    "check:title-case:baseline": "node scripts/check-title-case.mjs --write-baseline",
     "check:vocabulary:baseline": "node scripts/check-vocabulary.mjs --write-baseline",
     "check:i18n:unused": "node scripts/check-i18n-keys.mjs --unused --baseline",
     "check:audit-fields": "node scripts/check-audit-fields.mjs --baseline",

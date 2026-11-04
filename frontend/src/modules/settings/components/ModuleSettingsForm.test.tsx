@@ -219,3 +219,82 @@ describe("ModuleSettingsForm under a page with one Save", () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 });
+
+describe("ModuleSettingsForm — a number outside its bounds", () => {
+  const windowSchema: ModuleSettingsSchema = {
+    type: "object",
+    properties: {
+      warning_window_days: {
+        type: "integer",
+        minimum: 1,
+        maximum: 365,
+        default: 30,
+        title: "Warning window",
+      },
+    },
+  };
+
+  it("answers in the app's own words and does not save, instead of the browser's bubble", async () => {
+    vi.clearAllMocks();
+    const { container } = renderForm(
+      <ModuleSettingsForm
+        moduleName="equipment"
+        schema={windowSchema}
+        initialValues={{}}
+      />,
+    );
+    fireEvent.change(screen.getByTestId("field-warning_window_days"), {
+      target: { value: "-3" },
+    });
+
+    // The message is the app's, in the app's language, and rides on the field.
+    expect(
+      screen.getByText("Enter a number from 1 to 365."),
+    ).toBeInTheDocument();
+    // The browser's own validation is off, so its bubble cannot answer first.
+    expect(container.querySelector("form")).toHaveAttribute("novalidate");
+
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(updateSettings).not.toHaveBeenCalled());
+  });
+
+  it("refuses a fraction on a whole-number setting in the app's own words", async () => {
+    vi.clearAllMocks();
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="equipment"
+        schema={windowSchema}
+        initialValues={{}}
+      />,
+    );
+    fireEvent.change(screen.getByTestId("field-warning_window_days"), {
+      target: { value: "1.5" },
+    });
+
+    expect(screen.getByText("Enter a whole number.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(updateSettings).not.toHaveBeenCalled());
+  });
+
+  it("saves once the number is back in range", async () => {
+    vi.clearAllMocks();
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="equipment"
+        schema={windowSchema}
+        initialValues={{}}
+      />,
+    );
+    fireEvent.change(screen.getByTestId("field-warning_window_days"), {
+      target: { value: "14" },
+    });
+    expect(screen.queryByText(/Enter a number/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() =>
+      expect(updateSettings).toHaveBeenCalledWith("equipment", {
+        warning_window_days: 14,
+      }),
+    );
+  });
+});

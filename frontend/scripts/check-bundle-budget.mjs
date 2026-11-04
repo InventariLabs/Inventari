@@ -311,6 +311,25 @@ const dist = join(root, "dist");
  * module's own rather than three new ones. Those three phone budgets move a
  * step of five, to 395, 410 and 460; the other screens stand under theirs
  * (start 618.7, issue 567.7, history 592.3, products 498.2).
+ *
+ * Re-measured 2026-11-03 on the merge of the confirmation pass's small fixes
+ * with the development line: the branch stood at start 619.9 alone and the
+ * merge measures 620.1. What grew is copy in the Polish file: the wording for
+ * a receipt line with no price, the storekeeper's approval sentences, and the
+ * plural forms of the units that are words. The new-partner form the same
+ * branch brought to the goods screens loads on its first use, and the receipt
+ * line's sentence has one form where it had four. That one budget moves a step
+ * of five, to 625.
+ *
+ * Re-measured 2026-11-04 on the merge of the regression pass's small fixes with
+ * the development line: neither side is over alone, the dev tip stood at issue
+ * 569.8 and products 499.7 KiB gz, 0.2 and 0.3 under their ceilings, and the
+ * branch adds 0.5 KiB gz to every screen (issue 570.3, products 500.2, app first
+ * paint 387.1). It is copy, not an import: 156 lines of translated refusals,
+ * notices and menu labels in the five languages' module files, which the
+ * language chunk every first paint loads carries. Those two phone budgets move
+ * a step of five, to 575 and 505; the other screens stand under theirs (login
+ * 391.8, launcher 406.8, start 620.4, receive 457.5, history 594.0).
  */
 const BUDGETS = {
   initial: 245,

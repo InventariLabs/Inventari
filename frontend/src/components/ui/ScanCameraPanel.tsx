@@ -150,7 +150,7 @@ export function ScanCameraPanel({
         variant="ghost"
         size="iconSm"
         onClick={onClose}
-        aria-label={t("common:a11y.close")}
+        aria-label={t("scan:closeCamera")}
         className="absolute top-2 right-2 bg-black/60 text-white hover:bg-black/70"
       >
         <X size={16} />

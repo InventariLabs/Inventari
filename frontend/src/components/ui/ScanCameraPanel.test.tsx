@@ -46,6 +46,16 @@ describe("ScanCameraPanel", () => {
     expect(within(videoBox).queryByRole("button")).toBeNull();
   });
 
+  it("names its close button for the camera, not for whatever holds it", () => {
+    // Inside a sheet the sheet's own button is "Close"; two buttons of one
+    // name left a screen reader and a test unable to tell them apart.
+    render(<ScanCameraPanel {...base} />);
+    expect(
+      screen.getByRole("button", { name: "Close camera view" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Close" })).toBeNull();
+  });
+
   it("keeps the refusal text clear of the close button on both sides", () => {
     render(<ScanCameraPanel {...base} scannerError="Allow the camera" />);
     const text = screen.getByText("Allow the camera");

@@ -54,6 +54,7 @@ const unlinkedPayload = {
   limit: 200,
   offset: 0,
   has_more: false,
+  ingredient_total: 3,
 };
 
 function createWrapper() {
@@ -239,6 +240,24 @@ describe("UnlinkedIngredientsPage", () => {
     ).toBeDisabled();
   });
 
+  it("offers no matching for a list that failed to load", async () => {
+    server.use(
+      http.get(UNLINKED_URL, () =>
+        HttpResponse.json({ detail: "down" }, { status: 500 }),
+      ),
+    );
+    render(<UnlinkedIngredientsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Find matches" }),
+      ).toBeDisabled(),
+    );
+    expect(
+      screen.queryByText("Every ingredient is linked"),
+    ).not.toBeInTheDocument();
+  });
+
   it("shows the all-linked empty state when the backlog is empty", async () => {
     server.use(
       http.get(UNLINKED_URL, () =>
@@ -248,6 +267,7 @@ describe("UnlinkedIngredientsPage", () => {
           limit: 200,
           offset: 0,
           has_more: false,
+          ingredient_total: 4,
         }),
       ),
     );
@@ -256,5 +276,28 @@ describe("UnlinkedIngredientsPage", () => {
     expect(
       await screen.findByText("Every ingredient is linked"),
     ).toBeInTheDocument();
+  });
+
+  it("does not claim everything is linked when no recipe has an ingredient", async () => {
+    server.use(
+      http.get(UNLINKED_URL, () =>
+        HttpResponse.json({
+          items: [],
+          total: 0,
+          limit: 200,
+          offset: 0,
+          has_more: false,
+          ingredient_total: 0,
+        }),
+      ),
+    );
+    render(<UnlinkedIngredientsPage />, { wrapper: createWrapper() });
+
+    expect(
+      await screen.findByText("No recipe ingredients yet"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Every ingredient is linked"),
+    ).not.toBeInTheDocument();
   });
 });

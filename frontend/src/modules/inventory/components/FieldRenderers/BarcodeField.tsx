@@ -6,6 +6,8 @@ import { useGenerateProductCode } from "@/modules/inventory/hooks/useItemMutatio
 import type { FieldDefinition } from "@/types";
 import { DefaultInputField } from "./DefaultInputField";
 
+const INTERNAL_CODE = /^20\d{11}$/;
+
 interface BarcodeFieldProps {
   id?: string;
   field: FieldDefinition;
@@ -33,10 +35,14 @@ export function BarcodeField({
 }: BarcodeFieldProps) {
   const { t } = useTranslation("items");
   const generate = useGenerateProductCode();
-  const empty = String(value ?? "").trim() === "";
+  const code = String(value ?? "").trim();
+  const empty = code === "";
+  // The range the generator draws from: an EAN-13 starting with 20, which
+  // GS1 keeps for a company's own goods.
+  const internal = INTERNAL_CODE.test(code);
 
   return (
-    <div className="space-y-2">
+    <div>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <DefaultInputField
@@ -55,7 +61,7 @@ export function BarcodeField({
             isLoading={generate.isPending}
             onClick={() =>
               generate.mutate(undefined, {
-                onSuccess: (code) => onChange(code),
+                onSuccess: (generated) => onChange(generated),
               })
             }
           >
@@ -64,7 +70,14 @@ export function BarcodeField({
         )}
       </div>
       {/* The code printed on the product is read, not retyped. */}
-      <ScanCodeButton label={t("fields.scanCode")} onCode={onChange} />
+      <div className="mt-2">
+        <ScanCodeButton label={t("fields.scanCode")} onCode={onChange} />
+      </div>
+      {(empty || internal) && (
+        <p className="text-xs text-on-muted mt-1.5">
+          {t("fields.generateCodeHint")}
+        </p>
+      )}
     </div>
   );
 }

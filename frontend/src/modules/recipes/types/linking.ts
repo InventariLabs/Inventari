@@ -14,3 +14,10 @@ export type BulkLinkIngredientsRequest =
   components["schemas"]["BulkLinkIngredientsRequest"];
 export type BulkLinkIngredientsResponse =
   components["schemas"]["BulkLinkIngredientsResponse"];
+export type UnlinkedIngredientsPage =
+  components["schemas"]["UnlinkedIngredientsResponse"];
+/** What the screen reads: the whole backlog and whether any ingredient exists. */
+export interface UnlinkedBacklog {
+  items: UnlinkedIngredient[];
+  hasIngredients: boolean;
+}

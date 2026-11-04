@@ -100,3 +100,60 @@ class TestOneShapeForOneNumber:
         await db.flush()
 
         assert await _snapshots(db, async_test_item.id) == []
+
+
+class TestTheLowStockThresholdReadsLikeTheOtherNumbers:
+    """`min_quantity` is a DOUBLE column, but the journal is not its mirror.
+
+    The column keeps a float; what the journal writes is the digits that were
+    typed. A float in the snapshot is a number to the audit screen, which
+    prints it at six significant digits: 1234.567 read 1234.57.
+    """
+
+    async def test_an_item_edit_writes_the_threshold_as_digits(
+        self, real_async_db_session, async_test_item, async_test_user
+    ):
+        db = real_async_db_session
+        await update_item(
+            db,
+            async_test_item,
+            ItemUpdate(min_quantity=Decimal('1234.567')),
+            async_test_user,
+        )
+        await db.flush()
+
+        (snapshot,) = [
+            s
+            for s in await _snapshots(db, async_test_item.id)
+            if 'min_quantity' in (s.get('after') or {})
+        ]
+        assert snapshot['after']['min_quantity'] == '1234.567'
+        assert isinstance(snapshot['before']['min_quantity'], str)
+
+    async def test_the_same_threshold_with_other_digits_writes_nothing(
+        self, real_async_db_session, async_test_item, async_test_user
+    ):
+        db = real_async_db_session
+        await update_item(
+            db, async_test_item, ItemUpdate(min_quantity=Decimal('3')), async_test_user
+        )
+        await db.flush()
+        before = len(await _snapshots(db, async_test_item.id))
+
+        await update_item(
+            db,
+            async_test_item,
+            ItemUpdate(min_quantity=Decimal('3.000')),
+            async_test_user,
+        )
+        await db.flush()
+
+        assert len(await _snapshots(db, async_test_item.id)) == before
+
+    def test_the_record_and_the_comparison_read_a_float_two_ways(self):
+        from app.services.audit_service import audit_key, audit_value
+
+        assert audit_value(1234.567) == '1234.567'
+        assert audit_value({'min_quantity': 0.0}) == {'min_quantity': '0.0'}
+        # The comparison still sees a number, so a resave stays silent.
+        assert audit_key(1234.567) == audit_key(Decimal('1234.567000')) == 1234.567

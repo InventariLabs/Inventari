@@ -62,7 +62,7 @@ describe("DocumentDetailPage.confirmDialogMessage", () => {
     // next click answered with a 400.
     expect(message).not.toMatch(/approval queue/i);
     expect(message).not.toMatch(/ready for warehouse execution/i);
-    expect(message).toMatch(/no approval workflow/i);
+    expect(message).toMatch(/ask your administrator/i);
     expect(message).toMatch(/refused/i);
   });
 

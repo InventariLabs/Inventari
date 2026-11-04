@@ -81,7 +81,6 @@
     }
   },
   "config": {
-    "connectionsTitle": "Conexiones de IA",
     "connectionsDescription": "Conjunto de conexiones LLM compartidas por todos los módulos. Asigne una a cada propósito abajo.",
     "addConnection": "Añadir conexión",
     "editConnection": "Editar conexión",

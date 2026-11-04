@@ -22,7 +22,7 @@ describe("useLocationsById", () => {
 
     await waitFor(() => expect(result.current.byId.size).toBe(2));
     expect(result.current.byId.get("shelf-399")?.full_path).toBe(
-      "Warehouse → Shelf 399",
+      "Warehouse › Shelf 399",
     );
     expect(requests).toHaveLength(1);
     expect(requests[0].getAll("ids")).toEqual(["shelf-399", "shelf-7"]);

@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChoiceGroup } from "@/components/ui/ChoiceGroup";
 import { InlineQueryError } from "@/components/ui/QueryResult";
@@ -8,7 +9,10 @@ import { LocationCombobox } from "@/module-sdk";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { PartnerOption } from "@/hooks/usePartnerPicker";
 import type { LocationPickerEmptyReason } from "@/modules/shared/lib/locationPickerOffer";
-import type { ReceiveSource } from "@/modules/warehouse/components/receive/receiveDraft";
+import {
+  partnerTypesFor,
+  type ReceiveSource,
+} from "@/modules/warehouse/components/receive/receiveDraft";
 import type { DocumentType } from "@/modules/warehouse/types";
 
 /** The three answers to where the goods come from, each saying what it means. */
@@ -66,6 +70,70 @@ interface Props {
   chosenLineCount: number;
   orderOptions: Array<{ id: string; number: string; lineCount: number }>;
   onOrderChange: (id: string) => void;
+}
+
+const PartnerCreateLayer = lazy(
+  () => import("@/modules/warehouse/components/PartnerCreateLayer"),
+);
+
+/** Who the goods come from, with the way to add one that is not there yet. */
+function PartnerField({
+  source,
+  partnerId,
+  partnerOptions,
+  onPartnerSearch,
+  partnersLoading,
+  onPartnerChange,
+}: Pick<
+  Props,
+  | "source"
+  | "partnerId"
+  | "partnerOptions"
+  | "onPartnerSearch"
+  | "partnersLoading"
+  | "onPartnerChange"
+>) {
+  const { t } = useTranslation("warehouse");
+  const [newPartnerName, setNewPartnerName] = useState<string | null>(null);
+  return (
+    <>
+      <SearchableCombobox
+        label={t("receive.from")}
+        options={partnerOptions}
+        value={partnerId}
+        onChange={onPartnerChange}
+        onSearchChange={onPartnerSearch}
+        loading={partnersLoading}
+        placeholder={t(
+          source === "return"
+            ? "receive.customerPlaceholder"
+            : "receive.fromPlaceholder",
+        )}
+        searchPlaceholder={t(
+          source === "return"
+            ? "receive.searchCustomers"
+            : "receive.searchPartner",
+        )}
+        emptyMessage={t(
+          source === "return" ? "form.noCustomersFound" : "receive.noSuppliers",
+        )}
+        createLabel={t("form.createNewPartner")}
+        onCreateNew={setNewPartnerName}
+        title={t("receive.from")}
+        required
+      />
+      {newPartnerName !== null && (
+        <Suspense fallback={null}>
+          <PartnerCreateLayer
+            initialName={newPartnerName}
+            roleTypes={partnerTypesFor(source)}
+            onAccepted={onPartnerChange}
+            onClose={() => setNewPartnerName(null)}
+          />
+        </Suspense>
+      )}
+    </>
+  );
 }
 
 /** Where the goods come from and where they go, with the order note. */
@@ -139,30 +207,13 @@ export function ReceiveHeaderFields({
       </p>
       <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {partnersEnabled && source !== "internal" && (
-          <SearchableCombobox
-            label={t("receive.from")}
-            options={partnerOptions}
-            value={partnerId}
-            onChange={onPartnerChange}
-            onSearchChange={onPartnerSearch}
-            loading={partnersLoading}
-            placeholder={t(
-              source === "return"
-                ? "receive.customerPlaceholder"
-                : "receive.fromPlaceholder",
-            )}
-            searchPlaceholder={t(
-              source === "return"
-                ? "receive.searchCustomers"
-                : "receive.searchPartner",
-            )}
-            emptyMessage={t(
-              source === "return"
-                ? "form.noCustomersFound"
-                : "receive.noSuppliers",
-            )}
-            title={t("receive.from")}
-            required
+          <PartnerField
+            source={source}
+            partnerId={partnerId}
+            partnerOptions={partnerOptions}
+            onPartnerSearch={onPartnerSearch}
+            partnersLoading={partnersLoading}
+            onPartnerChange={onPartnerChange}
           />
         )}
         <LocationCombobox

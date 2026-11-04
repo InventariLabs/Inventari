@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { QueryFailure } from "@/components/ui/QueryResult";
-import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
+import { useCanManage } from "@/hooks/useCanWrite";
 import {
   useMakerSettings,
   useUpdateMakerSettings,
@@ -74,7 +74,6 @@ export function MakerSettingsPanel() {
   // strategy decides what production does to stock — so they sit behind
   // maker:manage, not the floor's maker:write.
   const canManage = useCanManage("maker");
-  const canWrite = useCanWrite("maker");
   const {
     data: settings,
     isLoading,
@@ -104,13 +103,12 @@ export function MakerSettingsPanel() {
   // switches. Here the panel drew all of them, promised that every choice
   // saves itself, and turned the 403 into "Failed to save settings" — a
   // sentence about a failure where the truth was a boundary. The notice names
-  // the right the account lacks: left at its default it asked about
-  // maker:write for everyone, which the floor holds, so it drew nothing at
-  // all for the very account it exists to speak to.
+  // the right that opens this page, :manage, for every account that lacks it:
+  // there are no values to show read-only, so "you can view this" above an
+  // empty page told a viewer something false. The Equipment settings say the
+  // same sentence.
   if (!canManage) {
-    return (
-      <ReadOnlyNotice module="maker" right={canWrite ? "manage" : "write"} />
-    );
+    return <ReadOnlyNotice module="maker" right="manage" />;
   }
 
   // `!settings` used to stand in for "still loading". After a failed read
@@ -172,6 +170,7 @@ export function MakerSettingsPanel() {
           <Button
             type="button"
             variant={direction === "SAVINGS" ? "success" : "outline"}
+            aria-pressed={direction === "SAVINGS"}
             onClick={() => {
               const old = direction;
               setDirection("SAVINGS");
@@ -187,6 +186,7 @@ export function MakerSettingsPanel() {
           <Button
             type="button"
             variant={direction === "MARGIN" ? "success" : "outline"}
+            aria-pressed={direction === "MARGIN"}
             onClick={() => {
               const old = direction;
               setDirection("MARGIN");
@@ -267,6 +267,7 @@ export function MakerSettingsPanel() {
             <Button
               type="button"
               variant={scope === "GLOBAL" ? "success" : "outline"}
+              aria-pressed={scope === "GLOBAL"}
               onClick={() => {
                 const old = scope;
                 setScope("GLOBAL");
@@ -282,6 +283,7 @@ export function MakerSettingsPanel() {
             <Button
               type="button"
               variant={scope === "PER_LOCATION" ? "success" : "outline"}
+              aria-pressed={scope === "PER_LOCATION"}
               onClick={() => {
                 const old = scope;
                 setScope("PER_LOCATION");
@@ -312,6 +314,7 @@ export function MakerSettingsPanel() {
                   key={s}
                   type="button"
                   variant={strategy === s ? "success" : "outline"}
+                  aria-pressed={strategy === s}
                   onClick={() => {
                     const old = strategy;
                     setStrategy(s);

@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import AuditAction, AuditTargetType, UserContextDTO
 from app.core.db_utils import acquire_advisory_lock, escape_ilike, paginate_async
 from app.core.exceptions import EntityNotFoundError, ServiceRejectionError
-from app.core.money import quantise
+from app.core.money import quantise, quantise_or_none
 from app.core.public_api import core_api
 
 from . import bom_service
@@ -60,12 +60,8 @@ def _recipe_shape(recipe: MakerRecipe) -> dict[str, Any]:
     """The fields a reader would want back if a change turned out wrong."""
     return {
         'name': recipe.name,
-        'batch_yield_qty': float(recipe.batch_yield_qty)
-        if recipe.batch_yield_qty is not None
-        else None,
-        'reference_price': float(recipe.reference_price)
-        if recipe.reference_price is not None
-        else None,
+        'batch_yield_qty': quantise_or_none(recipe.batch_yield_qty, 4),
+        'reference_price': quantise_or_none(recipe.reference_price, 2),
         'is_default': recipe.is_default,
         'process_steps': recipe.process_steps,
     }
@@ -82,13 +78,9 @@ def _line_shape(line: BoMLine, uom_symbol: str | None = None) -> dict[str, Any]:
     history.
     """
     return {
-        'qty_per_batch': float(line.qty_per_batch)
-        if line.qty_per_batch is not None
-        else None,
+        'qty_per_batch': quantise_or_none(line.qty_per_batch, 4),
         'uom': uom_symbol,
-        'yield_loss_pct': float(line.yield_loss_pct)
-        if line.yield_loss_pct is not None
-        else None,
+        'yield_loss_pct': quantise_or_none(line.yield_loss_pct, 2),
         'notes': line.notes,
     }
 
@@ -108,7 +100,7 @@ def _cost_line_shape(line: MakerRecipeCostLine) -> dict[str, Any]:
     return {
         'kind': line.kind,
         'label': line.label,
-        'amount': float(line.amount) if line.amount is not None else None,
+        'amount': quantise_or_none(line.amount, 2),
     }
 
 
@@ -246,9 +238,7 @@ async def create_recipe(
             'output': await ingredient_name(
                 db, organization_id, data.output_template_id
             ),
-            'batch_yield_qty': float(data.batch_yield_qty)
-            if data.batch_yield_qty is not None
-            else None,
+            'batch_yield_qty': quantise_or_none(data.batch_yield_qty, 4),
             'is_default': is_default,
         },
     )
@@ -708,7 +698,7 @@ async def add_bom_line(
             'ingredient_added': await ingredient_name(
                 db, organization_id, data.child_template_id
             ),
-            'qty_per_batch': float(data.qty_per_batch),
+            'qty_per_batch': quantise(data.qty_per_batch, 4),
         },
     )
     return line
@@ -725,7 +715,7 @@ async def delete_bom_line(
     line = await _get_line_of_recipe(db, organization_id, recipe_id, line_id)
     recipe = await get_recipe(db, organization_id, recipe_id)
     ingredient = await ingredient_name(db, organization_id, line.child_template_id)
-    removed_qty = float(line.qty_per_batch)
+    removed_qty = quantise(line.qty_per_batch, 4)
     await db.delete(line)
     await db.flush()
     if recipe is not None:
@@ -827,7 +817,7 @@ async def create_cost_line(
         user,
         recipe,
         AuditAction.UPDATE,
-        {'cost_line_added': data.label, 'amount': float(data.amount)},
+        {'cost_line_added': data.label, 'amount': quantise(data.amount, 2)},
     )
     return cost_line
 
@@ -892,7 +882,7 @@ async def delete_cost_line(
     if cost_line is None:
         raise EntityNotFoundError('cost_line', f'Cost line {line_id} not found')
     recipe = await get_recipe(db, organization_id, cost_line.recipe_id)
-    label, amount = cost_line.label, float(cost_line.amount)
+    label, amount = cost_line.label, quantise(cost_line.amount, 2)
     await db.delete(cost_line)
     await db.flush()
     if recipe is not None:

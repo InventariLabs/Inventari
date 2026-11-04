@@ -102,7 +102,9 @@
     "linked_success_other": "{{count}} ingredients linked",
     "link_failed": "Could not link ingredients",
     "empty_title": "Every ingredient is linked",
-    "empty_desc": "Each recipe ingredient points at a product — availability, cost and picking cover the whole recipe book."
+    "empty_desc": "Each recipe ingredient points at a product — availability, cost and picking cover the whole recipe book.",
+    "empty_no_ingredients_title": "No recipe ingredients yet",
+    "empty_no_ingredients_desc": "Add ingredients to a recipe — they will show up here until they are linked to a product."
   },
   "form": {
     "create_title": "New Recipe",
@@ -323,6 +325,7 @@
   "errors": {
     "save_failed": "Failed to save recipe",
     "delete_failed": "Failed to delete recipe",
+    "load_failed": "Could not open the recipe",
     "shopping_failed": "Failed to add to shopping list",
     "history_failed": "Failed to save note",
     "image_failed": "Failed to process image"
@@ -361,6 +364,7 @@
     "rename_label": "New name",
     "rename_success_one": "Renamed: 1 recipe updated",
     "rename_success_other": "Renamed: {{count}} recipes updated",
+    "rename_failed": "Failed to rename the tag",
     "delete": "Delete",
     "delete_confirm_title": "Delete tag?",
     "delete_confirm_message": "\"{{name}}\" will be removed from every recipe that carries it. The recipes stay.",
@@ -381,7 +385,7 @@
     "import_json_placeholder": "Paste recipe JSON here…",
     "import_submit": "Import",
     "import_success": "Recipe imported: {{name}}",
-    "import_error": "Import failed: {{error}}",
+    "import_error": "Import failed, nothing was saved: {{error}}",
     "import_error_unknown": "the server gave no reason",
     "invalid_url": "Invalid URL — must start with http:// or https://",
     "review_title": "Review imported ingredients",
@@ -668,6 +672,7 @@
     "exclusions_count_one": "1 item excluded",
     "exclusions_count_other": "{{count}} items excluded",
     "generate_list_disabled_tooltip": "Add meals first",
+    "needs_meals_hint": "Add at least one meal to generate a shopping list or copy this plan.",
     "not_cooked": "Not cooked",
     "entry_move_error": "Could not move this meal. Please try again.",
     "drag_to_move": "Drag to move",
@@ -692,7 +697,7 @@
     "select_plan": "Select plan",
     "select_day": "Select day",
     "select_slot": "Select slot",
-    "no_plans_add_to_plan": "Create a meal plan first — the recipe can then be added from the planner.",
+    "no_plans_add_to_plan": "Create a meal plan first — the recipe is then added to the first meal on its first day.",
     "more_actions": "More actions",
     "expiry_urgent": "Ingredients expiring soon",
     "delete_plan": "Delete plan",

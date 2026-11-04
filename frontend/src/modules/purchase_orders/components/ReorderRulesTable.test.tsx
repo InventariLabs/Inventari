@@ -1,8 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
 import { render, screen, within } from "@/test/utils";
 import { withLanguage } from "@/test/mocks/i18n";
 import type { ReorderRule } from "../api/reorder-rules";
 import { ReorderRulesTable } from "./ReorderRulesTable";
+
+const phone = vi.hoisted(() => ({ value: false }));
+vi.mock("@/hooks/useMediaQuery", () => ({
+  useMediaQuery: () => phone.value,
+}));
 
 // The API sends Numeric(12,3) as a string, whatever the TypeScript type says.
 const rule = {
@@ -22,7 +28,10 @@ const rule = {
   updated_at: null,
 } as unknown as ReorderRule;
 
-function renderTable(rules: ReorderRule[]) {
+function renderTable(
+  rules: ReorderRule[],
+  handlers: { onEdit?: () => void; onDelete?: () => void } = {},
+) {
   render(
     <ReorderRulesTable
       rules={rules}
@@ -30,8 +39,8 @@ function renderTable(rules: ReorderRule[]) {
       alertByRule={new Map()}
       locationName={() => "Cold Storage"}
       partnerName={() => "—"}
-      onEdit={vi.fn()}
-      onDelete={vi.fn()}
+      onEdit={handlers.onEdit ?? vi.fn()}
+      onDelete={handlers.onDelete ?? vi.fn()}
       isFiltered={false}
       onCreate={vi.fn()}
       catalogEmpty={false}
@@ -60,5 +69,37 @@ describe("ReorderRulesTable", () => {
       const row = screen.getByText("Latte cups").closest("tr") as HTMLElement;
       expect(within(row).getByText("12,5")).toBeInTheDocument();
     });
+  });
+});
+
+describe("ReorderRulesTable on a phone", () => {
+  it("lists a rule as a card with every figure and its actions in view", async () => {
+    phone.value = true;
+    try {
+      const onEdit = vi.fn();
+      renderTable(
+        [
+          {
+            ...rule,
+            preferred_partner_id: "p-1",
+          } as unknown as ReorderRule,
+        ],
+        { onEdit },
+      );
+
+      expect(screen.queryByRole("table")).not.toBeInTheDocument();
+      const card = screen.getByText("Latte cups").closest("li") as HTMLElement;
+      expect(within(card).getByText("Safety stock")).toBeInTheDocument();
+      expect(within(card).getByText(/Preferred supplier/)).toBeInTheDocument();
+      await userEvent.click(
+        within(card).getByRole("button", { name: "Edit Latte cups" }),
+      );
+      expect(onEdit).toHaveBeenCalledOnce();
+      expect(
+        within(card).getByRole("button", { name: "Delete Latte cups" }),
+      ).toBeInTheDocument();
+    } finally {
+      phone.value = false;
+    }
   });
 });

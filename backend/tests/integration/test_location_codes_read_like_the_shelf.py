@@ -258,7 +258,7 @@ class TestAHouseholdThatBecomesABusiness:
             name: old[name] for name in ('Zone North', 'Rack 1', 'Level 1', 'Rack 2')
         }
         assert next(r for r in reprint if r['name'] == 'Level 1')['path'] == (
-            'Main Warehouse → Zone North → Rack 1 → Level 1'
+            'Main Warehouse › Zone North › Rack 1 › Level 1'
         )
         aliases = db_session.scalars(
             select(LabelPool).where(LabelPool.short_code == old['Rack 1'])

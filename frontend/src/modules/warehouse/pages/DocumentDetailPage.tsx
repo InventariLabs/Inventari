@@ -45,6 +45,8 @@ import { useDocumentPartnerOptions } from "@/modules/warehouse/hooks/useDocument
 import { useDocumentPlaceNames } from "@/modules/warehouse/hooks/useDocumentPlaces";
 import {
   cancelReleasesStock,
+  isPickedBeforePosting,
+  mayBePlanned,
   UNDOABLE_DOCUMENT_TYPES,
 } from "@/modules/warehouse/types";
 import {
@@ -470,12 +472,11 @@ export default function DocumentDetailPage() {
           }
           isCompletePending={completeDocument.isPending}
           isPostNowPending={postDocumentNow.isPending}
-          isPlanned={!!doc.scheduled_date && doc.scheduled_date > todayIso()}
+          isPlanned={mayBePlanned(doc.type, doc.scheduled_date, todayIso())}
           approvalRequired={facts.required}
           isPdfDownloading={isPdfDownloading}
           canStartPicking={
-            doc.status === "CONFIRMED" &&
-            ["OUT", "INT", "INTERNAL_OUT"].includes(doc.type)
+            doc.status === "CONFIRMED" && isPickedBeforePosting(doc.type)
           }
           canStartReceiving={
             doc.status === "CONFIRMED" &&

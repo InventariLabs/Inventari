@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { itemsApi } from "@/lib/api/items";
 import { labelsApi } from "@/lib/api/labels";
-import { queryKeys } from "@/hooks/queries/keys";
-import { extractApiError } from "@/lib/errors";
+import { invalidation } from "@/lib/api/invalidation";
+import { extractApiError, followUpError } from "@/lib/errors";
 import type { EquipmentModel } from "@/modules/equipment/api/equipment";
 import type { FieldDefinition, ItemCreate, ItemUpdate } from "@/types";
 import type { EquipmentFormData } from "@/modules/equipment/pages/AddEquipmentPage";
@@ -208,6 +208,22 @@ export function useEquipmentForm(
     return equipmentMeta;
   };
 
+  // The asset is saved before its photo goes up. A photo that fails then is
+  // reported as that — never as the asset "not saved", which would invite a
+  // second, duplicate asset.
+  const applyImageAfterSave = async (itemId: string) => {
+    try {
+      await image.applyImageChanges(itemId);
+    } catch (err) {
+      toast.error(
+        followUpError(
+          err,
+          t("items:messages.fileUploadFailed", "Failed to upload file"),
+        ),
+      );
+    }
+  };
+
   // The required fields, marked inline (the page moves focus to the first one)
   // and named in a toast. Shared by the single and the batch submit; a batch
   // takes its name from "Asset" when blank, so only the single one needs it.
@@ -303,7 +319,7 @@ export function useEquipmentForm(
           unit_confirmed_over_template: false,
         };
         await itemsApi.update(editItemId, updatePayload);
-        await image.applyImageChanges(editItemId);
+        await applyImageAfterSave(editItemId);
         // Reconcile label_code through the label-pool API rather than the
         // generic item PATCH: the LabelPool binding (is_assigned / item_id)
         // must stay consistent with Item.label_code. assign also frees the
@@ -333,9 +349,7 @@ export function useEquipmentForm(
         // the freshly persisted item (including image_url). Without this,
         // React Query's 5-minute staleTime serves the pre-edit cached item
         // (image_url still null), so the uploaded image never renders.
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.equipment.assets.all,
-        });
+        invalidation.equipment(queryClient);
         toast.success(t("form.updated", "Asset updated successfully"));
         navigate(`/equipment/${editItemId}`);
       } else {
@@ -362,7 +376,7 @@ export function useEquipmentForm(
 
         const created = await itemsApi.create(payload);
 
-        await image.applyImageChanges(created.id);
+        await applyImageAfterSave(created.id);
 
         const labelToAssign = state.labelCode || form.label_code.trim();
         if (labelToAssign) {
@@ -377,9 +391,7 @@ export function useEquipmentForm(
 
         // Invalidate the list so the new item (with its image) appears, and
         // the detail cache is primed fresh instead of a stale entry.
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.equipment.assets.all,
-        });
+        invalidation.equipment(queryClient);
         toast.success(t("form.created", "Asset added successfully"));
         navigate(`/equipment`);
       }

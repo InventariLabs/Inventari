@@ -479,6 +479,7 @@ export function useStockTakeCounting(id: string | undefined) {
     stockTake?.items,
     confirm,
     unsavedCount,
+    stockTake?.require_full_count ?? false,
   );
 
   return {

@@ -13,10 +13,10 @@ import { locationOption } from "@/module-sdk";
 import { useDebounce } from "@/module-sdk";
 import { isVirtualUsage } from "@/modules/shared/lib/storageUsage";
 import type { StorageLocationSummary } from "@/types";
+import { LOCATION_PATH_SEPARATOR } from "@/utils/helpers";
 
 /** Rows one lookup returns; the exclusions are applied to them afterwards. */
 const TARGET_PAGE_SIZE = 100;
-const PATH_SEPARATOR = " → ";
 
 type LocationTargetPickerProps = Omit<
   SearchableComboboxProps,
@@ -34,7 +34,8 @@ type LocationTargetPickerProps = Omit<
  *  parent, so a full path names one place and the prefix is the subtree. */
 export function isInsidePath(path: string | null | undefined, inside: string) {
   return (
-    !!path && (path === inside || path.startsWith(`${inside}${PATH_SEPARATOR}`))
+    !!path &&
+    (path === inside || path.startsWith(`${inside}${LOCATION_PATH_SEPARATOR}`))
   );
 }
 
