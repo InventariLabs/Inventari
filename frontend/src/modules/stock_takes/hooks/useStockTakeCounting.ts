@@ -125,6 +125,28 @@ function useNewItemDraft() {
   };
 }
 
+/**
+ * Whether a saved count is still on its way back to the screen.
+ *
+ * Finishing is judged on the rows on screen, which still say "not counted"
+ * until the read after the save is here, so it waits for that read: pressed
+ * right after Save, it refused with "one product is still uncounted". The read
+ * stays outside the chain of saves, so a scan's next save need not wait for it.
+ */
+function useSavesInFlight(
+  refetch: (options: { cancelRefetch: boolean }) => Promise<unknown>,
+) {
+  const [inFlight, setInFlight] = useState(0);
+  const trackSave = (saved: Promise<void>) => {
+    setInFlight((count) => count + 1);
+    void saved
+      .then(() => refetch({ cancelRefetch: false }))
+      .finally(() => setInFlight((count) => count - 1));
+    return saved;
+  };
+  return { isSavingCounts: inFlight > 0, trackSave };
+}
+
 export function useStockTakeCounting(id: string | undefined) {
   const { t } = useTranslation(["stock_takes"]);
   const navigate = useNavigate();
@@ -160,6 +182,7 @@ export function useStockTakeCounting(id: string | undefined) {
     oneMoreThan,
   } = useCountingDrafts(stockTake);
 
+  const { isSavingCounts, trackSave } = useSavesInFlight(refetch);
   const countMutation = useCountStockTakeItem(id);
   const recountMutation = useRequestRecount(id);
   const recountMutate = recountMutation.mutate;
@@ -313,7 +336,7 @@ export function useStockTakeCounting(id: string | undefined) {
         createdLinesRef.current[itemId] = created.id;
       }
     };
-    savesRef.current = savesRef.current.then(write).catch(rollback);
+    savesRef.current = trackSave(savesRef.current.then(write).catch(rollback));
   };
 
   const shelfCounting = useShelfCounting({
@@ -509,6 +532,7 @@ export function useStockTakeCounting(id: string | undefined) {
     triedToSave,
     countMutation,
     completeMutation,
+    isSavingCounts,
     handleQuantityChange,
     handleQuantityStep,
     handleAddItem,
