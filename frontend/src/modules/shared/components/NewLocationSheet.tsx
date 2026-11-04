@@ -17,7 +17,10 @@ import { queryKeys } from "@/hooks/queries/keys";
 import { useCreateStorage } from "@/modules/shared/hooks/useStorageMutations";
 import { useExistingLocations } from "@/modules/shared/hooks/useExistingLocations";
 import { useLocationOffer, useLocationsById } from "@/module-sdk";
-import { useWizardSuggestions } from "@/modules/shared/hooks/useWizardSuggestions";
+import {
+  nameAfterChip,
+  useWizardSuggestions,
+} from "@/modules/shared/hooks/useWizardSuggestions";
 
 interface NewLocationSheetProps {
   open: boolean;
@@ -128,7 +131,7 @@ export function NewLocationSheet({
                 type="button"
                 variant={name === s ? "secondary" : "outline"}
                 size="sm"
-                onClick={() => setName(s)}
+                onClick={() => setName(nameAfterChip(name, s, suggestions))}
               >
                 {s}
               </Button>

@@ -1167,7 +1167,7 @@
       "storage": "Local",
       "codes": {
         "title": "Códigos dos locais",
-        "tree": "Os locais deste armazém recebem o código do modelo {{template}}, nível a nível: {{examples}}. O próprio armazém mantém o seu código.",
+        "tree": "Os locais deste armazém recebem o código nível a nível: {{examples}}. O próprio armazém mantém o seu código.",
         "random": "Códigos aleatórios após {{prefix}}, como {{prefix}}-7KQ2.",
         "editTemplate": "Modelo de código",
         "renumber": "Renumerar pelo modelo",

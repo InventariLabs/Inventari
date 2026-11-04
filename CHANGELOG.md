@@ -165,6 +165,19 @@ says what the release does rather than what changed since them.
   lost its totals altogether.
 - A printed recipe whose calories are not known says "Calories unknown" instead
   of "0 kcal".
+- Signing in right after creating the first account, joining an organization
+  by invitation or finishing an approved request has the address just used
+  filled in.
+- Pressing a name chip in the location wizard or the new-location sheet no
+  longer replaces a name already typed ("Rack A" stays when "Rack" is pressed).
+- A purchase order line picked from the catalogue starts from the price the
+  product last cost, when it has one, even if none of it is left in stock; a
+  price typed on the line is kept, and an order in another currency than the
+  organization's proposes none.
+- The product label dialog no longer shows "Lot and expiry date" ticked while
+  it is disabled for products that have neither, and the explanation of the
+  location codes describes the numbering in words rather than printing the
+  raw template.
 - Handing an asset back, from "My assets" or from the asset's own page, opens a
   dialog titled and worded for the person returning it (the page's button reads
   "Return" too, not the manager's "Accept"), and the damaged and needs-repair choices each say
