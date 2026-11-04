@@ -421,7 +421,7 @@
     "unitCostIncomplete_few": "{{count}} składniki z ostatniej produkcji nie mają zapisanej ceny zakupu.",
     "unitCostIncomplete_many": "{{count}} składników z ostatniej produkcji nie ma zapisanej ceny zakupu.",
     "unitCostIncomplete_other": "{{count}} składnika z ostatniej produkcji nie ma zapisanej ceny zakupu.",
-    "stock": "Stan magazynu",
+    "stock": "Wyrób na stanie",
     "lastProduced": "Ostatnia produkcja",
     "ingredientCount": "{{count}} składników",
     "ingredientCount_one": "{{count}} składnik",

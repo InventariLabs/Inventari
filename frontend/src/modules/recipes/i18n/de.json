@@ -102,7 +102,9 @@
     "linked_success_other": "{{count}} Zutaten verknüpft",
     "link_failed": "Zutaten konnten nicht verknüpft werden",
     "empty_title": "Alle Zutaten sind verknüpft",
-    "empty_desc": "Jede Rezeptzutat zeigt auf ein Produkt – Verfügbarkeit, Kosten und Kommissionierung decken das ganze Rezeptbuch ab."
+    "empty_desc": "Jede Rezeptzutat zeigt auf ein Produkt – Verfügbarkeit, Kosten und Kommissionierung decken das ganze Rezeptbuch ab.",
+    "empty_no_ingredients_title": "Noch keine Rezeptzutaten",
+    "empty_no_ingredients_desc": "Füge einem Rezept Zutaten hinzu – sie erscheinen hier, bis sie mit einem Produkt verknüpft sind."
   },
   "form": {
     "create_title": "Neues Rezept",
@@ -323,6 +325,7 @@
   "errors": {
     "save_failed": "Rezept konnte nicht gespeichert werden",
     "delete_failed": "Rezept konnte nicht gelöscht werden",
+    "load_failed": "Rezept konnte nicht geöffnet werden",
     "shopping_failed": "Konnte nicht zur Einkaufsliste hinzugefügt werden",
     "history_failed": "Notiz konnte nicht gespeichert werden",
     "image_failed": "Bild konnte nicht verarbeitet werden"
@@ -361,6 +364,7 @@
     "rename_label": "Neuer Name",
     "rename_success_one": "Umbenannt: 1 Rezept aktualisiert",
     "rename_success_other": "Umbenannt: {{count}} Rezepte aktualisiert",
+    "rename_failed": "Tag konnte nicht umbenannt werden",
     "delete": "Löschen",
     "delete_confirm_title": "Tag löschen?",
     "delete_confirm_message": "„{{name}}“ wird aus jedem Rezept entfernt, das ihn trägt. Die Rezepte bleiben.",
@@ -381,7 +385,7 @@
     "import_json_placeholder": "Rezept-JSON hier einfügen …",
     "import_submit": "Importieren",
     "import_success": "Rezept importiert: {{name}}",
-    "import_error": "Import fehlgeschlagen: {{error}}",
+    "import_error": "Import fehlgeschlagen, nichts wurde gespeichert: {{error}}",
     "import_error_unknown": "der Server nannte keinen Grund",
     "invalid_url": "Ungültige URL – muss mit http:// oder https:// beginnen",
     "review_title": "Importierte Zutaten überprüfen",
@@ -668,6 +672,7 @@
     "exclusions_count_one": "1 Artikel ausgeschlossen",
     "exclusions_count_other": "{{count}} Artikel ausgeschlossen",
     "generate_list_disabled_tooltip": "Zuerst Mahlzeiten hinzufügen",
+    "needs_meals_hint": "Mindestens eine Mahlzeit hinzufügen, um eine Einkaufsliste zu erstellen oder den Plan zu kopieren.",
     "not_cooked": "Nicht gekocht",
     "entry_move_error": "Mahlzeit konnte nicht verschoben werden. Bitte erneut versuchen.",
     "drag_to_move": "Zum Verschieben ziehen",

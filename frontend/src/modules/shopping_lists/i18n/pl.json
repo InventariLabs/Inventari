@@ -131,6 +131,7 @@
     "nameChanged": "Zmieniono nazwę",
     "nameChangeError": "Błąd podczas zmiany nazwy"
   },
+  "loadError": "Nie udało się wczytać list zakupów",
   "permissions": {
     "read": "Podgląd list zakupów",
     "readDesc": "Może przeglądać listy zakupów i ich podpowiedzi",

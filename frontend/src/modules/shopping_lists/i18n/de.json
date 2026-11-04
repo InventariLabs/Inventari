@@ -115,6 +115,7 @@
     "nameChanged": "Name geändert",
     "nameChangeError": "Fehler beim Ändern des Namens"
   },
+  "loadError": "Einkaufslisten konnten nicht geladen werden",
   "permissions": {
     "read": "Einkaufslisten ansehen",
     "readDesc": "Kann Einkaufslisten und deren Vorschläge einsehen",

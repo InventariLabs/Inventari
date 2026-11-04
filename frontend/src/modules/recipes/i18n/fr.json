@@ -102,7 +102,9 @@
     "linked_success_other": "{{count}} ingrédients liés",
     "link_failed": "Impossible de lier les ingrédients",
     "empty_title": "Tous les ingrédients sont liés",
-    "empty_desc": "Chaque ingrédient de recette pointe vers un produit — la disponibilité, le coût et la préparation couvrent tout le livre."
+    "empty_desc": "Chaque ingrédient de recette pointe vers un produit — la disponibilité, le coût et la préparation couvrent tout le livre.",
+    "empty_no_ingredients_title": "Aucun ingrédient de recette pour l'instant",
+    "empty_no_ingredients_desc": "Ajoutez des ingrédients à une recette : ils apparaîtront ici tant qu'ils ne sont pas liés à un produit."
   },
   "form": {
     "create_title": "Nouvelle recette",
@@ -323,6 +325,7 @@
   "errors": {
     "save_failed": "Échec de l'enregistrement de la recette",
     "delete_failed": "Échec de la suppression de la recette",
+    "load_failed": "Impossible d'ouvrir la recette",
     "shopping_failed": "Échec de l'ajout à la liste de courses",
     "history_failed": "Échec de l'enregistrement de la note",
     "image_failed": "Échec du traitement de l'image"
@@ -361,6 +364,7 @@
     "rename_label": "Nouveau nom",
     "rename_success_one": "Renommée : 1 recette mise à jour",
     "rename_success_other": "Renommée : {{count}} recettes mises à jour",
+    "rename_failed": "Impossible de renommer l'étiquette",
     "delete": "Supprimer",
     "delete_confirm_title": "Supprimer l'étiquette ?",
     "delete_confirm_message": "« {{name}} » sera retirée de toutes les recettes qui la portent. Les recettes restent.",
@@ -381,7 +385,7 @@
     "import_json_placeholder": "Collez le JSON de la recette ici…",
     "import_submit": "Importer",
     "import_success": "Recette importée : {{name}}",
-    "import_error": "Échec de l'importation : {{error}}",
+    "import_error": "Échec de l'importation, rien n'a été enregistré : {{error}}",
     "import_error_unknown": "le serveur n'a donné aucune raison",
     "invalid_url": "URL invalide – doit commencer par http:// ou https://",
     "review_title": "Vérifier les ingrédients importés",
@@ -668,6 +672,7 @@
     "exclusions_count_one": "1 article exclu",
     "exclusions_count_other": "{{count}} articles exclus",
     "generate_list_disabled_tooltip": "Ajoutez d'abord des repas",
+    "needs_meals_hint": "Ajoutez au moins un repas pour générer une liste de courses ou copier ce plan.",
     "not_cooked": "Non cuisiné",
     "entry_move_error": "Impossible de déplacer ce repas. Veuillez réessayer.",
     "drag_to_move": "Glisser pour déplacer",

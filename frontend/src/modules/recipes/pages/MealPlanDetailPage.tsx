@@ -384,16 +384,26 @@ export default function MealPlanDetailPage() {
       />
 
       {canWrite && (
-        <div className="flex items-center justify-end">
+        <div className="flex flex-col items-end gap-1">
           <Button
             variant="outline"
             size="sm"
             onClick={openCopyModal}
             disabled={plan.entries.length === 0}
+            aria-describedby={
+              plan.entries.length === 0 ? "meal-plan-needs-meals" : undefined
+            }
             leftIcon={<Copy size={16} />}
           >
             {t("meal_planner.copy_to_week")}
           </Button>
+          {/* A disabled button that only carries a title says nothing on
+              touch and to most readers; the reason is visible text. */}
+          {plan.entries.length === 0 && (
+            <p id="meal-plan-needs-meals" className="text-xs text-on-muted">
+              {t("meal_planner.needs_meals_hint")}
+            </p>
+          )}
         </div>
       )}
 

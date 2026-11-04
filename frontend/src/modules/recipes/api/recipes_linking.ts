@@ -3,13 +3,26 @@ import type {
   BulkLinkIngredientsRequest,
   BulkLinkIngredientsResponse,
   IngredientMatchProposalsResponse,
+  UnlinkedBacklog,
   UnlinkedIngredient,
+  UnlinkedIngredientsPage,
 } from "@/modules/recipes/types/linking";
 
 export const recipesLinkingApi = {
-  /** Every ingredient in the organization no recipe has linked yet. */
-  listUnlinkedIngredients: (): Promise<UnlinkedIngredient[]> =>
-    getEveryPage<UnlinkedIngredient>("/recipes/ingredients/unlinked"),
+  /**
+   * Every ingredient in the organization no recipe has linked yet, and whether
+   * the recipes hold any ingredient at all — an empty backlog means "all
+   * linked" only when they do.
+   */
+  listUnlinkedIngredients: async (): Promise<UnlinkedBacklog> => {
+    const url = "/recipes/ingredients/unlinked";
+    const items = await getEveryPage<UnlinkedIngredient>(url);
+    if (items.length > 0) return { items, hasIngredients: true };
+    const { data } = await api.get<UnlinkedIngredientsPage>(url, {
+      params: { limit: 1 },
+    });
+    return { items, hasIngredients: data.ingredient_total > 0 };
+  },
 
   /** Ask the matcher for proposals; none of them is written. */
   suggestIngredientMatches:
