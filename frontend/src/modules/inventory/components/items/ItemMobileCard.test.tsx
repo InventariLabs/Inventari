@@ -521,8 +521,12 @@ describe("ItemMobileCard — quick actions carry their words", () => {
       const button = screen.getByRole("button", { name });
       const tip = within(button).getByRole("tooltip");
       expect(button.className).toContain("group/tooltip");
-      expect(tip.className).toContain("group-hover/tooltip:opacity-100");
-      expect(tip.className).toContain("group-focus-within/tooltip:opacity-100");
+      expect(tip.className).toContain(
+        "[@media(hover:hover)]:group-hover/tooltip:opacity-100",
+      );
+      expect(tip.className).toContain(
+        "group-has-[:focus-visible]/tooltip:opacity-100",
+      );
       expect(tip.className).toContain("pointer-events-none");
       expect(tip.className).toContain("right-full");
     }

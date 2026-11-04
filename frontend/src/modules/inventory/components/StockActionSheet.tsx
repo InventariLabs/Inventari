@@ -17,6 +17,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { cn } from "@/lib/utils";
 import { formatDate, formatDateTime } from "@/utils/helpers";
 import { formatQuantityValue } from "@/utils/formatters";
+import { unitLabel } from "@/lib/i18nHelpers";
 import {
   usePartialPackage,
   usePartlyUsable,
@@ -332,7 +333,7 @@ export default function StockActionSheet({
               <span className="text-2xl font-semibold text-primary-600">
                 {realTotal}{" "}
                 <span className="text-sm font-medium text-on-muted">
-                  {unit}
+                  {unitLabel(t, unit, realTotal)}
                 </span>
               </span>
             </div>
