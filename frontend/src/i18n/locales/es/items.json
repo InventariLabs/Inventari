@@ -325,7 +325,7 @@
   },
   "stockManagement": "Gestión de stock",
   "minStockLevel": "Alertar si la cantidad es inferior a:",
-  "minStockHelp": "Establezca un umbral para ver este producto en la lista «Stock bajo».",
+  "minStockHelp": "Establezca un umbral para ver este producto en la lista «Queda poco».",
   "minQuantityPlaceholder": "ej. 2",
   "configureStorage": "Configurar",
   "configureStorageTitle": "Configurar ubicación",

@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Trash2, Package, AlertCircle } from "lucide-react";
 import { attachmentsApi } from "@/lib/api/attachments";
@@ -163,9 +163,15 @@ function ItemNotFound({ onClose }: { onClose: () => void }) {
 interface ItemEditModalProps {
   itemId: string;
   onClose: () => void;
+  /** Opened for the date: start with the expiry field in view, not the name. */
+  openAtExpiry?: boolean;
 }
 
-export default function ItemEditModal({ itemId, onClose }: ItemEditModalProps) {
+export default function ItemEditModal({
+  itemId,
+  onClose,
+  openAtExpiry = false,
+}: ItemEditModalProps) {
   const { t } = useTranslation(["items", "categories", "common", "labels"]);
 
   // A reader without `items:write` opens the same sheet to *read* the
@@ -252,6 +258,19 @@ export default function ItemEditModal({ itemId, onClose }: ItemEditModalProps) {
     onSubmit: (data) => updateMutation.mutate(data),
     form: "item_edit",
   });
+
+  // Once, when the field first exists: the fields arrive with the record and
+  // its category, and a reader who has scrolled since is not moved again.
+  const broughtExpiry = useRef(false);
+  useEffect(() => {
+    if (!openAtExpiry || broughtExpiry.current) return;
+    const field = modalRef.current?.querySelector(
+      '[data-field-key="expiry_date"]',
+    );
+    if (!field) return;
+    broughtExpiry.current = true;
+    field.scrollIntoView({ block: "center" });
+  }, [openAtExpiry, isLoadingItem, fieldDefinitions, modalRef]);
 
   /**
    * Every way out of this form goes through here, so an edit in progress is

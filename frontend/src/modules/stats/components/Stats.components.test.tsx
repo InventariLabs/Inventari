@@ -991,6 +991,22 @@ describe("SmartAlertsPanel", () => {
     expect(screen.getByText("4")).toBeInTheDocument();
   });
 
+  it("says what the forgotten-items tile counts, so a zero beside a stale row is not a contradiction", () => {
+    render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
+    expect(
+      screen.getByText("Untouched for 60 days or more"),
+    ).toBeInTheDocument();
+  });
+
+  it("says what the total counts, so it is not read against the overview's number", () => {
+    render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
+    expect(
+      screen.getByText(
+        "Dates, forgotten products, missing staples; not low stock",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("says when an expired record went off", () => {
     render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
     expect(screen.getByText(/^Expired on .*2026\.$/)).toBeInTheDocument();

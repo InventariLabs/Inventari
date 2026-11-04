@@ -30,6 +30,17 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Tapping a screen for the first time now shows a loading sign at once, inside
+  the application's frame, instead of leaving the old screen up for as long as
+  the download takes. The very first open of the application shows the product
+  name and a loading sign instead of a white page.
+- A row of the inventory overview about a date opens the product with its
+  expiry date in view; on a phone it was a long way down the sheet.
+- On a phone, a purchase order's main action sits on its bar rather than in the
+  "..." menu, the new partner sheet keeps Save in view, the statistics tabs fit
+  the screen, and the product suggestions open above the keyboard. A line added
+  to a shopping list from the replenish suggestions keeps its unit, and the
+  analytics tiles say what they count.
 - Warehouse floor papercuts: the carrier typed on the picking summary is
   still there when packing opens; a camera without a torch no longer offers
   the light switch; the lot on the receiving expiry sheet and a product's own
