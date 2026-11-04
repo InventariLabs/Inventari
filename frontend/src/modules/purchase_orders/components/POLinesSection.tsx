@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   LineItemsEditor,
@@ -91,6 +91,9 @@ export function POLinesSection({
   const { results, isLoading, search, clearSearch } = useProductSearch();
   const { i18n } = useTranslation(["purchase_orders", "common", "scan"]);
   const dateLang = i18n.language?.substring(0, 2) ?? "en";
+  // The price each line was last given by a product pick, to tell it from one
+  // the user typed.
+  const proposedPrices = useRef(new Map<string, string>());
 
   const lineItems = useMemo<LineItem[]>(
     () =>
@@ -182,12 +185,19 @@ export function POLinesSection({
 
   const handleSelectProduct = (key: string, product: LineItemProduct) => {
     const current = lineItems.find((line) => line.key === key);
-    // A price already typed on the line stays; an empty one starts from what
-    // the product last cost.
-    const startingPrice =
-      !current?.unit_price && product.purchase_price != null
-        ? { unit_price: String(product.purchase_price) }
-        : {};
+    // A price typed on the line stays. One the app proposed from the previous
+    // product (still untouched) or an empty one starts from what this product
+    // last cost, or from nothing when it has no price.
+    const proposed = proposedPrices.current.get(key);
+    const currentPrice = current?.unit_price ?? "";
+    const typedByUser = currentPrice !== "" && currentPrice !== proposed;
+    const price =
+      product.purchase_price != null ? String(product.purchase_price) : "";
+    let startingPrice: Partial<POLineInput> = {};
+    if (!typedByUser) {
+      proposedPrices.current.set(key, price);
+      if (price !== currentPrice) startingPrice = { unit_price: price };
+    }
     onUpdateData(key, {
       ...startingPrice,
       product_template_id: product.product_template_id,

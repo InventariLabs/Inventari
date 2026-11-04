@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -99,5 +100,73 @@ describe("POLinesSection product pick", () => {
 
     const [, update] = onUpdateData.mock.calls[0];
     expect(update).not.toHaveProperty("unit_price");
+  });
+
+  describe("with the line kept in state", () => {
+    function Harness() {
+      const [line, setLine] = useState<POLineInput>(emptyLine);
+      return (
+        <POLinesSection
+          lines={[line]}
+          scanOpen={false}
+          scanLoading={false}
+          isCameraActive={false}
+          scannerError={null}
+          isTorchOn={false}
+          onToggleScan={vi.fn()}
+          onAddLine={vi.fn()}
+          onToggleTorch={vi.fn()}
+          onManualCode={vi.fn()}
+          onUpdateData={(_id, data) =>
+            setLine((prev) => ({ ...prev, ...data }))
+          }
+          onRemove={vi.fn()}
+          t={(key) => key}
+        />
+      );
+    }
+
+    function renderHarness() {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <Harness />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+    }
+
+    async function clearProduct() {
+      await userEvent.click(
+        screen.getAllByRole("button", { name: "common:actions.clear" })[0],
+      );
+    }
+
+    it("drops the price proposed for a product when another one without a price is picked", async () => {
+      renderHarness();
+      await pick(/ground coffee/i);
+      expect(screen.getAllByDisplayValue("45.00").length).toBeGreaterThan(0);
+
+      await clearProduct();
+      await pick(/ground cocoa/i);
+
+      expect(screen.queryByDisplayValue("45.00")).not.toBeInTheDocument();
+    });
+
+    it("keeps a price typed over the proposed one when another product is picked", async () => {
+      renderHarness();
+      await pick(/ground coffee/i);
+      const [price] = screen.getAllByDisplayValue("45.00");
+      await userEvent.clear(price);
+      await userEvent.type(price, "40");
+
+      await clearProduct();
+      await pick(/ground cocoa/i);
+
+      expect(screen.getAllByDisplayValue("40").length).toBeGreaterThan(0);
+    });
   });
 });
