@@ -51,6 +51,7 @@
       "total": "Total alerts",
       "types": {
         "forgotten": "Forgotten items",
+        "forgottenHint": "Untouched for 60 days or more",
         "staple": "Missing staples",
         "expiring": "Expiring soon",
         "expired": "Expired",

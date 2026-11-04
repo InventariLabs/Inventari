@@ -51,6 +51,7 @@
       "total": "Total de alertas",
       "types": {
         "forgotten": "Itens esquecidos",
+        "forgottenHint": "Sem mexer há 60 dias ou mais",
         "staple": "Itens básicos em falta",
         "expiring": "Vencendo em breve",
         "expired": "Vencidos",

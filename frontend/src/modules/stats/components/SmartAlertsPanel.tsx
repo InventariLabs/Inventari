@@ -132,6 +132,9 @@ export default function SmartAlertsPanel({ alerts, t }: SmartAlertsPanelProps) {
               <p className="text-[10px] font-medium text-on-muted uppercase tracking-widest">
                 {t("stats:analytics.alerts.types.forgotten")}
               </p>
+              <p className="mt-1 text-xs text-on-muted">
+                {t("stats:analytics.alerts.types.forgottenHint")}
+              </p>
             </div>
           </div>
         </Card>

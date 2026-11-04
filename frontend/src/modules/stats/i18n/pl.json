@@ -57,6 +57,7 @@
       "total": "Suma alertów",
       "types": {
         "forgotten": "Zapomniane produkty",
+        "forgottenHint": "Nietknięte od co najmniej 60 dni",
         "staple": "Brakujące podstawy",
         "expiring": "Wygasające wkrótce",
         "expired": "Przeterminowane",

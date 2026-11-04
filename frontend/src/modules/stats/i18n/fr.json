@@ -51,6 +51,7 @@
       "total": "Total des alertes",
       "types": {
         "forgotten": "Articles oubliés",
+        "forgottenHint": "Intouchés depuis au moins 60 jours",
         "staple": "Articles de base manquants",
         "expiring": "Expire bientôt",
         "expired": "Expiré",

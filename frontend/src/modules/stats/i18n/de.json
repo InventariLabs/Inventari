@@ -51,6 +51,7 @@
       "total": "Benachrichtigungen gesamt",
       "types": {
         "forgotten": "Vergessene Artikel",
+        "forgottenHint": "Seit mindestens 60 Tagen unberührt",
         "staple": "Fehlende Grundartikel",
         "expiring": "Läuft bald ab",
         "expired": "Abgelaufen",
