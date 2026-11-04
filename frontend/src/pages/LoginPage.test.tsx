@@ -93,6 +93,22 @@ describe("LoginPage", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(2);
   });
 
+  it("fills in the address a new account was just made with", () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter
+          initialEntries={[
+            { pathname: "/login", state: { email: "owner@example.com" } },
+          ]}
+        >
+          <LoginPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByLabelText(/Email/i)).toHaveValue("owner@example.com");
+  });
+
   it("should call login and navigate on success", async () => {
     const loginMock = vi.fn().mockResolvedValue(undefined);
     useAuthStore.setState({

@@ -105,11 +105,6 @@ export default function RegisterPage() {
   useEffect(() => {
     if (approvedRequest?.full_name) setFullName(approvedRequest.full_name);
   }, [approvedRequest?.full_name]);
-  // The address field is hidden on this path, but the sign-in form that follows
-  // is prefilled from the same state.
-  useEffect(() => {
-    if (approvedRequest?.email) setEmail(approvedRequest.email);
-  }, [approvedRequest?.email]);
 
   const {
     requestRegistration,
@@ -169,7 +164,9 @@ export default function RegisterPage() {
       } else if (token) {
         await completeRegistration(token, password, fullName || undefined);
         toast.success(t("registrationCompleted"));
-        navigate("/login", { state: { email } });
+        navigate("/login", {
+          state: { email: approvedRequest?.email ?? email },
+        });
       } else {
         await requestRegistration(email, fullName || undefined);
         // No toast: the card that replaces this form is the confirmation,

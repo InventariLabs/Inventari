@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useTorchAvailable } from "@/hooks/useScanCamera";
 import {
@@ -8,6 +8,7 @@ import {
   type LineItemsEditorLabels,
   type RenderUomSelect,
 } from "@/modules/shared/components/LineItemsEditor";
+import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { UomSelect } from "@/modules/shared/components/UomSelect";
 import { useProductSearch } from "@/modules/warehouse/moduleApi";
 import { formatMoney } from "@/utils/formatters";
@@ -93,6 +94,15 @@ export function POLinesSection({
   const { i18n } = useTranslation(["purchase_orders", "common", "scan"]);
   const hasTorch = useTorchAvailable();
   const dateLang = i18n.language?.substring(0, 2) ?? "en";
+  // The price each line was last given by a product pick, to tell it from one
+  // the user typed.
+  const proposedPrices = useRef(new Map<string, string>());
+  // A recorded price is in the organization's currency; there is no conversion,
+  // so an order in another currency proposes nothing rather than the same
+  // figure under the wrong currency.
+  const organizationCurrency = useOrganizationCurrency();
+  const recordedPriceApplies =
+    (currency ?? null) === (organizationCurrency ?? null);
 
   const lineItems = useMemo<LineItem[]>(
     () =>
@@ -183,7 +193,24 @@ export function POLinesSection({
   };
 
   const handleSelectProduct = (key: string, product: LineItemProduct) => {
+    const current = lineItems.find((line) => line.key === key);
+    // A price typed on the line stays. One the app proposed from the previous
+    // product (still untouched) or an empty one starts from what this product
+    // last cost, or from nothing when it has no price.
+    const proposed = proposedPrices.current.get(key);
+    const currentPrice = current?.unit_price ?? "";
+    const typedByUser = currentPrice !== "" && currentPrice !== proposed;
+    const price =
+      recordedPriceApplies && product.purchase_price != null
+        ? String(product.purchase_price)
+        : "";
+    let startingPrice: Partial<POLineInput> = {};
+    if (!typedByUser) {
+      proposedPrices.current.set(key, price);
+      if (price !== currentPrice) startingPrice = { unit_price: price };
+    }
     onUpdateData(key, {
+      ...startingPrice,
       product_template_id: product.product_template_id,
       name: product.name,
       sku: product.sku,

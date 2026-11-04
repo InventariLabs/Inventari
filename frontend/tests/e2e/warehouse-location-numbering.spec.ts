@@ -353,10 +353,11 @@ test.describe("Warehouse — business location numbering", () => {
     await sheet.getByRole("button", { name: "Save" }).click();
     await expect(page.getByText("Code template saved")).toBeVisible();
     await expect(
-      page.getByText(`Codes from the template ${TREE_TEMPLATE}`, {
+      page.getByText("numbered one level after another: A, A-01, A-01-01", {
         exact: false,
       }),
     ).toBeVisible();
+    await expect(page.getByText(TREE_TEMPLATE)).toHaveCount(0);
     for (const [id, code] of before) expect(await codeOf(s, id)).toBe(code);
 
     // Renumber from the first zone: its branch is numbered, the other is not.
