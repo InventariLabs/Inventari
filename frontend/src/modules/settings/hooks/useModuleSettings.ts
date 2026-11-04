@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAppMutation } from "@/lib/api/mutationFactory";
 import { modulesApi } from "@/lib/api/modules";
 import { queryKeys } from "@/hooks/queries/keys";
+import { invalidation } from "@/lib/api/invalidation";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -28,6 +29,11 @@ export function useUpdateModuleSettings(
       qc.invalidateQueries({
         queryKey: queryKeys.modules.settings(moduleName),
       });
+      // The approvals settings decide who may decide a request ("administrators
+      // may approve their own"), so every request the app holds was judged under
+      // the old rule: a panel saying nobody can decide stayed on the order
+      // until a reload.
+      if (moduleName === "approvals") invalidation.approvals(qc);
       if (!options?.quiet) toast.success(t("settings.moduleSettings.saved"));
     },
   );

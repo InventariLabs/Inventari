@@ -3,6 +3,12 @@ import { renderHook, waitFor, act } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { toast } from "sonner";
 import { server } from "@/test/mocks/server";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+import { queryKeys } from "@/hooks/queries/keys";
 import { QueryWrapper } from "@/test/queryWrapper";
 import {
   useModuleSettings,
@@ -52,6 +58,35 @@ describe("module settings hooks", () => {
     await act(() => result.current.mutateAsync({ currency: "PLN" }));
     expect(body).toEqual({ currency: "PLN" });
     expect(toast.success).toHaveBeenCalledWith("Settings saved");
+  });
+
+  it("refreshes the approval requests when the approvals settings change", async () => {
+    server.use(
+      http.put("/api/v1/modules/approvals/settings", () =>
+        HttpResponse.json({ status: "ok" }),
+      ),
+    );
+    const qc = new QueryClient();
+    const readRequests = vi.fn(async () => []);
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+    );
+    const { result } = renderHook(
+      () => {
+        // A screen showing the requests, beside the settings being saved.
+        useQuery({
+          queryKey: [...queryKeys.approvals.requests, "list", {}],
+          queryFn: readRequests,
+        });
+        return useUpdateModuleSettings("approvals");
+      },
+      { wrapper },
+    );
+    await waitFor(() => expect(readRequests).toHaveBeenCalledTimes(1));
+    await act(() =>
+      result.current.mutateAsync({ allow_admin_self_approval: true }),
+    );
+    await waitFor(() => expect(readRequests).toHaveBeenCalledTimes(2));
   });
 
   it("stays silent when the page confirms the save itself", async () => {
