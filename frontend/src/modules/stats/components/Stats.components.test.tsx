@@ -1002,7 +1002,7 @@ describe("SmartAlertsPanel", () => {
     render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
     expect(
       screen.getByText(
-        "Dates, forgotten items, missing staples; not low stock",
+        "Dates, forgotten products, missing staples; not low stock",
       ),
     ).toBeInTheDocument();
   });

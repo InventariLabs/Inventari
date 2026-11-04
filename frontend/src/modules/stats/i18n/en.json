@@ -49,7 +49,7 @@
     },
     "alerts": {
       "total": "Total alerts",
-      "totalHint": "Dates, forgotten items, missing staples; not low stock",
+      "totalHint": "Dates, forgotten products, missing staples; not low stock",
       "types": {
         "forgotten": "Forgotten items",
         "forgottenHint": "Untouched for 60 days or more",
