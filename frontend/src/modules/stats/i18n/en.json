@@ -1,6 +1,6 @@
 {
   "title": "Statistics",
-  "subtitle": "Overview of your supplies",
+  "subtitle": "Overview of your stock",
   "records": "Records",
   "recordCount_one": "{{count}} record",
   "recordCount_other": "{{count}} records",

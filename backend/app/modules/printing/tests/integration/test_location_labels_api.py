@@ -95,6 +95,34 @@ class TestLocationLabelDownload:
         assert resp.headers['x-labels-without-code'] == '0'
         assert read_bars(resp.content) == barcode_modules('A-02-01')
 
+    def test_many_shelves_wrap_into_rows_of_full_size_labels(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        db_session: Session,
+        org: Organization,
+        user: User,
+        headers: dict[str, str],
+    ) -> None:
+        """The dialog shows this file. As one strip, 29 labels were 17419 px
+        wide, which the dialog's width turned into a grey line of bars; the
+        rows keep each label at its size and a preview a person can read."""
+        shelves = [
+            _shelf(h, db_session, org, user, f'S{n}', f'A-{n:02d}') for n in range(7)
+        ]
+
+        response = client.post(
+            f'{_BASE}/location-labels/png',
+            json={'location_ids': [str(shelf.id) for shelf in shelves]},
+            headers=headers,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        sheet = Image.open(io.BytesIO(response.content))
+        label_width, label_height = 591, 283
+        assert sheet.width == 3 * label_width + 2 * 10
+        assert sheet.height == 3 * label_height
+
     def test_a_qr_goes_beside_the_bars_when_asked(
         self,
         client: TestClient,

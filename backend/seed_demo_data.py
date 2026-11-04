@@ -48,6 +48,7 @@ from app.modules.purchase_orders.models import PurchaseOrder, PurchaseOrderLine
 from app.modules.stock_takes.models import (
     StockTakeItem,  # noqa: F401 — resolve Item.stock_take_items
 )
+from app.modules.warehouse.country_tax_rules import get_country_rule
 from app.modules.warehouse.document_value_service import recompute_document_values
 from app.modules.warehouse.models import (
     Document,
@@ -162,6 +163,26 @@ def _org_currency(db, org_id) -> str:
         db.query(Organization.currency).filter(Organization.id == org_id).scalar()
     )
     return currency or 'USD'
+
+
+def _org_tax_rates(db, org_id) -> tuple[Decimal | None, Decimal | None]:
+    """The standard and the reduced rate this organization's country charges.
+
+    A country with no row, or none named, charges nothing here, the way a real
+    document of that organization is left untaxed
+    (``resolve_document_tax_rate``): a dollar organization with no country was
+    otherwise shown 23% Polish VAT on every order. Food takes the reduced rate;
+    a country with none charges its standard rate there too.
+    """
+    from app.models.organization import Organization
+
+    country = db.query(Organization.country).filter(Organization.id == org_id).scalar()
+    rule = get_country_rule(country)
+    if rule is None:
+        return None, None
+    reduced = rule.reduced_tax_rates
+    standard = rule.default_tax_rate
+    return standard, reduced[0] if reduced else standard
 
 
 def _apply_expiry_story(
@@ -2683,7 +2704,7 @@ def _create_documents_demo(
                     done_quantity=Decimal(qty if finished else 0),
                     uom_id=template.uom_id,
                     unit_price=price,
-                    tax_rate=Decimal(tax),
+                    tax_rate=tax,
                     currency=currency,
                     line_number=n,
                     product_snapshot={
@@ -2697,8 +2718,7 @@ def _create_documents_demo(
         db.add(doc)
         return doc
 
-    food_tax = '8'
-    equip_tax = '23'
+    equip_tax, food_tax = _org_tax_rates(db, org_id)
     add_doc(
         DocumentType.IN,
         1,
@@ -3219,6 +3239,7 @@ def _create_purchase_orders_demo(db, org_id, created_by, equip_templates, locati
         return 0
 
     equip_price = {t[0]: t[5] for t in EQUIPMENT_TEMPLATES}
+    standard_tax = _org_tax_rates(db, org_id)[0]
     now = datetime.now(UTC)
     year = now.year
     offset = highest_po_seq(db, org_id, year)
@@ -3251,7 +3272,7 @@ def _create_purchase_orders_demo(db, org_id, created_by, equip_templates, locati
                     quantity_received=Decimal(received),
                     unit_price=equip_price.get(template.name, Decimal('9.99')),
                     uom_id=template.uom_id,
-                    tax_rate=Decimal('23'),
+                    tax_rate=standard_tax,
                     line_number=n,
                 )
             )

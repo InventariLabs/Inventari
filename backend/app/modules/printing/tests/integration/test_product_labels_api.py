@@ -5,11 +5,13 @@ internal EAN-13 here, read back off the PNG, not taken from the function
 that chose it.
 """
 
+import io
 from typing import Any, cast
 
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+from PIL import Image
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -97,6 +99,28 @@ class TestProductLabelPng:
         assert resp.content.startswith(_PNG_MAGIC)
         assert resp.headers['X-Labels-Without-Code'] == '0'
         assert read_bars(resp.content) == barcode_modules(code)
+
+    def test_many_labels_wrap_into_rows_of_full_size_labels(
+        self, client: TestClient, headers: dict[str, str], shelf: StorageLocation
+    ) -> None:
+        """The dialog shows this file, so a long strip is an unreadable preview."""
+        item_id = _product(
+            client,
+            headers,
+            shelf,
+            'Plum butter',
+            barcode=_generated_code(client, headers),
+        )
+
+        resp = client.post(
+            f'{_BASE}/product-labels/png',
+            headers=headers,
+            json={'item_ids': [item_id], 'copies': 4},
+        )
+
+        assert resp.status_code == status.HTTP_200_OK, resp.text
+        sheet = Image.open(io.BytesIO(resp.content))
+        assert sheet.size == (3 * 591 + 2 * 10, 2 * 283)
 
     def test_the_response_says_how_many_labels_carry_a_date(
         self, client: TestClient, headers: dict[str, str], shelf: StorageLocation

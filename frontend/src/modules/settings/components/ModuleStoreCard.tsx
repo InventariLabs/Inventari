@@ -415,7 +415,7 @@ export default function ModuleStoreCard({
           </p>
         ) : (
           <Button
-            variant={isEnabled ? "secondary" : "primary"}
+            variant={isEnabled ? "outline" : "primary"}
             size="sm"
             isLoading={isBusy}
             onClick={onToggle}

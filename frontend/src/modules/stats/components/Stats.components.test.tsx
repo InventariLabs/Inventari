@@ -627,6 +627,16 @@ describe("StatsDistributionGrid", () => {
     expect(screen.getByText("Pantry")).toBeInTheDocument();
   });
 
+  it("writes a name as its owner did, so its word space stays visible", () => {
+    // Capitals pulled tight closed the gap in "RACK A-01" to "RACKA-01".
+    render(<StatsDistributionGrid {...props} />);
+    for (const name of ["Fridge", "Dairy"]) {
+      const { className } = screen.getByText(name);
+      expect(className).not.toContain("uppercase");
+      expect(className).not.toContain("tracking-tight");
+    }
+  });
+
   it("renders category names", () => {
     render(<StatsDistributionGrid {...props} />);
     expect(screen.getByText("Dairy")).toBeInTheDocument();

@@ -25,7 +25,10 @@ from app.core.module_ownership import general_rows, hidden_module_tags_async
 from app.models import Category, Item, ItemHistory, StorageLocation
 from app.models.storage_location import LocationUsage
 from app.services.items.expiry import is_expired, is_expiring_soon
-from app.services.storage._queries import list_storage_ids_async
+from app.services.storage._queries import (
+    list_storage_ids_async,
+    not_archived_condition,
+)
 
 from ._common import (
     get_internal_storage_ids_async,
@@ -42,7 +45,9 @@ async def get_stats_by_storage_async(
 
     A vertical module's places and records stay out unless the organization
     shows module data (:func:`hidden_module_tags_async`), as they stay out of
-    the products list.
+    the products list. So does an archived place, as it does from every list
+    of places, and a container with no records of its own: an aisle at 0 says
+    nothing about its racks, and reads as a shelf with room on it.
     """
     hidden = await hidden_module_tags_async(db, organization_id)
     # Real shelves only: the system's consumed / loss / production places are
@@ -52,6 +57,7 @@ async def get_stats_by_storage_async(
     storages_query = select(StorageLocation).where(
         StorageLocation.organization_id == organization_id,
         StorageLocation.usage == LocationUsage.INTERNAL,
+        not_archived_condition(),
     )
     if hidden:
         storages_query = storages_query.where(
@@ -86,6 +92,7 @@ async def get_stats_by_storage_async(
         .group_by(Item.storage_location_id)
     )
     stats_map = {row.storage_location_id: row for row in stats_query.all()}
+    containers = {storage.parent_id for storage in storages}
 
     return [
         StorageStatsDTO(
@@ -100,6 +107,7 @@ async def get_stats_by_storage_async(
             else 0,
         )
         for storage in storages
+        if storage.id in stats_map or storage.id not in containers
     ]
 
 

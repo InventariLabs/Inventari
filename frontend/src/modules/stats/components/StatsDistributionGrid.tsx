@@ -49,7 +49,7 @@ export function StatsDistributionGrid({
                   }
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-on-secondary uppercase tracking-tight">
+                    <span className="text-sm font-semibold text-on-secondary">
                       {stat.location_name}
                     </span>
                     <Badge variant="secondary">
@@ -109,7 +109,7 @@ export function StatsDistributionGrid({
                         }}
                         size="sm"
                       />
-                      <span className="text-sm font-semibold text-on-secondary uppercase tracking-tight">
+                      <span className="text-sm font-semibold text-on-secondary">
                         {categoryLabel(
                           t,
                           stat.category_code,

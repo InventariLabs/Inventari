@@ -1870,7 +1870,7 @@
       "over": "Acima do limite",
       "empty": "Vazios"
     },
-    "searchPlaceholder": "Onde está… ex.: Gouda",
+    "searchPlaceholder": "Onde está… nome ou código do produto",
     "filterLabel": "Mostrar",
     "filters": {
       "all": "Tudo",
