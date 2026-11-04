@@ -9,7 +9,12 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import type { WorkItem } from "@/modules/warehouse/types";
 import { formatDate, todayIso } from "@/utils/formatters";
-import { actionLabel, workItemSentence, workItemTarget } from "./workItemText";
+import {
+  actionLabel,
+  workItemNumber,
+  workItemSentence,
+  workItemTarget,
+} from "./workItemText";
 
 export interface Member {
   id: string;
@@ -147,7 +152,9 @@ export function WorkItemRow({
               type="checkbox"
               checked={!!selected}
               onChange={() => onToggleSelect(item.source_id)}
-              aria-label={t("bulk.selectAriaLabel", { number: item.number })}
+              aria-label={t("bulk.selectAriaLabel", {
+                number: workItemNumber(t, item),
+              })}
               className="h-4 w-4 shrink-0 cursor-pointer rounded border-border text-primary-600 focus:ring-primary-500"
             />
           </label>
@@ -174,7 +181,7 @@ export function WorkItemRow({
           <div className="flex items-center gap-x-3 gap-y-0.5 text-xs text-on-secondary mt-0.5 flex-wrap">
             <DueText item={item} />
             {item.number && !isCustom && (
-              <span className="break-all">{item.number}</span>
+              <span className="break-all">{workItemNumber(t, item)}</span>
             )}
             {item.place && (
               <span className="inline-flex items-center gap-1 min-w-0">

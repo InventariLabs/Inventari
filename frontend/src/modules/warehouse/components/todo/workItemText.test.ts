@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import i18n from "@/i18n/config";
 import type { WorkItem } from "@/modules/warehouse/types";
-import { actionLabel, workItemSentence, workItemTarget } from "./workItemText";
+import {
+  actionLabel,
+  workItemNumber,
+  workItemSentence,
+  workItemTarget,
+} from "./workItemText";
 
 const t = i18n.getFixedT("en", "warehouse");
 
@@ -74,6 +79,21 @@ describe("a task's sentence", () => {
     expect(
       workItemSentence(t, task({ kind: "backorder", number: "DRAFT-1" })),
     ).toBe("Decide on the leftover DRAFT-1");
+  });
+
+  it("names a draft backorder by its kind, not by its raw identifier", () => {
+    const draft = task({
+      kind: "backorder",
+      document_type: "OUT",
+      number: "DRAFT-3CB4B1BD5F1C",
+    });
+    expect(workItemNumber(t, draft)).toBe("Delivery – draft 5F1C");
+    expect(workItemSentence(t, draft)).toBe(
+      "Decide on the leftover Delivery – draft 5F1C",
+    );
+    expect(
+      workItemNumber(t, task({ document_type: "OUT", number: "WZ/12" })),
+    ).toBe("WZ/12");
   });
 
   it("says how much reserve stock is on its way to a pick face", () => {

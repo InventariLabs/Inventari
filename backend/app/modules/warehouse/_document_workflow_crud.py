@@ -670,7 +670,8 @@ async def duplicate_document(
     """Create a new DRAFT document as a copy of ``source_doc_id``.
 
     Copies type, partner, locations, scheduled_date, notes,
-    external_reference, a scrap's reason, the fields modules keep in ``meta_data``
+    external_reference, the reason a scrap, a return or a correction was
+    written with, the fields modules keep in ``meta_data``
     and all lines (expected_quantity, template, name/brand/barcode, uom, batch,
     serial, expiry, unit_price, tax_rate, ``meta_data``).
     The new document always starts in DRAFT with an identifier of its own
@@ -726,10 +727,16 @@ async def duplicate_document(
         notes=source.notes,
         external_reference=source.external_reference,
         lines=line_copies,
-        reason_code=source.reason_code,
+        # Only a scrap takes its reason through the create schema; a return's
+        # or a correction's reason is a code of its own, copied below.
+        reason_code=source.reason_code if dt.is_scrap(source.type) else None,
         meta_data=source.meta_data,
     )
-    return await create_document(db, org_id, data, user_id)
+    copy = await create_document(db, org_id, data, user_id)
+    if source.reason_code and not dt.is_scrap(source.type):
+        copy.reason_code = source.reason_code
+        await db.flush()
+    return copy
 
 
 def _require_scrap_reason(reason_code: str | None, notes: str | None) -> None:
