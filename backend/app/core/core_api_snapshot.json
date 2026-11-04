@@ -1647,6 +1647,25 @@
             }
           ]
         },
+        "latest_purchase_prices_async": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "template_ids",
+              "required": true
+            }
+          ]
+        },
         "list_async": {
           "params": [
             {

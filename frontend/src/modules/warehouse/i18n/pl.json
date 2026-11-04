@@ -1286,7 +1286,7 @@
       "storage": "Miejsce",
       "codes": {
         "title": "Kody miejsc",
-        "tree": "Miejsca w tym magazynie dostają kody z szablonu {{template}}, poziom po poziomie: {{examples}}. Sam magazyn zachowuje własny kod.",
+        "tree": "Miejsca w tym magazynie dostają kody poziom po poziomie: {{examples}}. Sam magazyn zachowuje własny kod.",
         "random": "Losowe kody po {{prefix}}, np. {{prefix}}-7KQ2.",
         "editTemplate": "Szablon kodów",
         "renumber": "Przenumeruj według szablonu",
