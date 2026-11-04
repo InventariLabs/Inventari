@@ -7,6 +7,7 @@ import {
   type LineItemsEditorLabels,
   type RenderUomSelect,
 } from "@/modules/shared/components/LineItemsEditor";
+import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { UomSelect } from "@/modules/shared/components/UomSelect";
 import { useProductSearch } from "@/modules/warehouse/moduleApi";
 import { formatMoney } from "@/utils/formatters";
@@ -94,6 +95,12 @@ export function POLinesSection({
   // The price each line was last given by a product pick, to tell it from one
   // the user typed.
   const proposedPrices = useRef(new Map<string, string>());
+  // A recorded price is in the organization's currency; there is no conversion,
+  // so an order in another currency proposes nothing rather than the same
+  // figure under the wrong currency.
+  const organizationCurrency = useOrganizationCurrency();
+  const recordedPriceApplies =
+    (currency ?? null) === (organizationCurrency ?? null);
 
   const lineItems = useMemo<LineItem[]>(
     () =>
@@ -192,7 +199,9 @@ export function POLinesSection({
     const currentPrice = current?.unit_price ?? "";
     const typedByUser = currentPrice !== "" && currentPrice !== proposed;
     const price =
-      product.purchase_price != null ? String(product.purchase_price) : "";
+      recordedPriceApplies && product.purchase_price != null
+        ? String(product.purchase_price)
+        : "";
     let startingPrice: Partial<POLineInput> = {};
     if (!typedByUser) {
       proposedPrices.current.set(key, price);

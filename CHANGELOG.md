@@ -118,7 +118,9 @@ says what the release does rather than what changed since them.
 - Pressing a name chip in the location wizard or the new-location sheet no
   longer replaces a name already typed ("Rack A" stays when "Rack" is pressed).
 - A purchase order line picked from the catalogue starts from the price the
-  product last cost, when it has one; a price typed on the line is kept.
+  product last cost, when it has one, even if none of it is left in stock; a
+  price typed on the line is kept, and an order in another currency than the
+  organization's proposes none.
 - The product label dialog no longer shows "Lot and expiry date" ticked while
   it is disabled for products that have neither, and the explanation of the
   location codes describes the numbering in words rather than printing the

@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import { POLinesSection, type POLineInput } from "./POLinesSection";
 
 vi.mock("@/modules/warehouse/moduleApi", () => ({
@@ -22,6 +22,13 @@ vi.mock("@/modules/warehouse/moduleApi", () => ({
   }),
 }));
 
+const organization = vi.hoisted(() => ({
+  currency: undefined as string | undefined,
+}));
+vi.mock("@/hooks/useOrganizationCurrency", () => ({
+  useOrganizationCurrency: () => organization.currency,
+}));
+
 const emptyLine: POLineInput = {
   id: "line-1",
   product_template_id: null,
@@ -36,7 +43,11 @@ const emptyLine: POLineInput = {
   uom_id: null,
 };
 
-function renderSection(line: POLineInput, onUpdateData = vi.fn()) {
+function renderSection(
+  line: POLineInput,
+  onUpdateData = vi.fn(),
+  currency?: string,
+) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -45,6 +56,7 @@ function renderSection(line: POLineInput, onUpdateData = vi.fn()) {
       <MemoryRouter>
         <POLinesSection
           lines={[line]}
+          currency={currency}
           scanOpen={false}
           scanLoading={false}
           isCameraActive={false}
@@ -69,6 +81,14 @@ async function pick(name: RegExp) {
   await userEvent.click(await screen.findByText(name));
 }
 
+/** What the pick itself wrote: the calls before it are the typed search. */
+function pickUpdate(onUpdateData: ReturnType<typeof vi.fn>) {
+  const call = onUpdateData.mock.calls.find(
+    ([, data]) => data.product_template_id,
+  );
+  return call?.[1];
+}
+
 describe("POLinesSection product pick", () => {
   it("starts the line's price from what the product last cost", async () => {
     const onUpdateData = renderSection(emptyLine);
@@ -89,7 +109,8 @@ describe("POLinesSection product pick", () => {
 
     await pick(/ground cocoa/i);
 
-    const [, update] = onUpdateData.mock.calls[0];
+    const update = pickUpdate(onUpdateData);
+    expect(update).toMatchObject({ product_template_id: "tpl-2" });
     expect(update).not.toHaveProperty("unit_price");
   });
 
@@ -98,8 +119,35 @@ describe("POLinesSection product pick", () => {
 
     await pick(/ground coffee/i);
 
-    const [, update] = onUpdateData.mock.calls[0];
+    const update = pickUpdate(onUpdateData);
+    expect(update).toMatchObject({ product_template_id: "tpl-1" });
     expect(update).not.toHaveProperty("unit_price");
+  });
+
+  describe("on an order with a stated currency", () => {
+    afterEach(() => {
+      organization.currency = undefined;
+    });
+
+    it("proposes the price when the order is in the organization's currency", async () => {
+      organization.currency = "PLN";
+      const onUpdateData = renderSection(emptyLine, vi.fn(), "PLN");
+
+      await pick(/ground coffee/i);
+
+      expect(pickUpdate(onUpdateData)).toMatchObject({ unit_price: "45.00" });
+    });
+
+    it("proposes nothing on an order in another currency", async () => {
+      organization.currency = "PLN";
+      const onUpdateData = renderSection(emptyLine, vi.fn(), "EUR");
+
+      await pick(/ground coffee/i);
+
+      const update = pickUpdate(onUpdateData);
+      expect(update).toMatchObject({ product_template_id: "tpl-1" });
+      expect(update).not.toHaveProperty("unit_price");
+    });
   });
 
   describe("with the line kept in state", () => {
