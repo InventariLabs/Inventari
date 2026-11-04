@@ -135,6 +135,36 @@ describe("useItemFilters", () => {
     expect(result.current.skip).toBe(0);
   });
 
+  it("writes the sort into the address and reads it back", () => {
+    const { result } = renderHook(
+      () => ({ filters: useItemFilters(), location: useLocation() }),
+      { wrapper: wrapper("/inventory/items?filter=low-stock") },
+    );
+
+    act(() => result.current.filters.setSort("name", "asc"));
+
+    const params = new URLSearchParams(result.current.location.search);
+    expect(params.get("sort_by")).toBe("name");
+    expect(params.get("sort_order")).toBe("asc");
+    // The narrowing already in the address is left alone.
+    expect(params.get("filter")).toBe("low-stock");
+
+    // The default order is not worth an address of its own.
+    act(() => result.current.filters.setSort("created_at", "desc"));
+    const back = new URLSearchParams(result.current.location.search);
+    expect(back.has("sort_by")).toBe(false);
+    expect(back.has("sort_order")).toBe(false);
+    expect(back.get("filter")).toBe("low-stock");
+  });
+
+  it("opens in the order the address names", () => {
+    const { result } = renderHook(() => useItemFilters(), {
+      wrapper: wrapper("/inventory/items?sort_by=name&sort_order=asc"),
+    });
+    expect(result.current.sortBy).toBe("name");
+    expect(result.current.sortOrder).toBe("asc");
+  });
+
   it("returns to the first page when the page size changes", () => {
     // Page 4 of 50-row pages is past the end once a page holds 200, and
     // offset 150 into 200-row pages skips rows outright.
