@@ -134,7 +134,10 @@ describe("DocumentDetailModals picking summary", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Pack" }));
 
     expect(onPickingClose).toHaveBeenCalledWith(false);
-    expect(navigate).toHaveBeenCalledWith("#pack", { replace: true });
+    expect(navigate).toHaveBeenCalledWith("#pack", {
+      replace: true,
+      state: { shipment: expect.anything() },
+    });
   });
 
   it("offers no packing on a transfer", async () => {

@@ -2,6 +2,11 @@ import { act, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ScanCameraPanel } from "@/components/ui/ScanCameraPanel";
 
+const torch = vi.hoisted(() => ({ available: true }));
+vi.mock("@/hooks/useTorchAvailable", () => ({
+  useTorchAvailable: () => torch.available,
+}));
+
 const base = {
   open: true,
   scannerError: null,
@@ -29,7 +34,17 @@ describe("ScanCameraPanel", () => {
       removeEventListener: vi.fn(),
     })) as unknown as typeof window.matchMedia;
   });
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    torch.available = true;
+  });
+
+  it("draws no torch button on a camera that has no torch", () => {
+    torch.available = false;
+    render(<ScanCameraPanel {...base} />);
+    const videoBox = document.getElementById("qr-reader")!.parentElement!;
+    expect(within(videoBox).queryByRole("button")).toBeNull();
+  });
 
   it("names its close button for the camera, not for whatever holds it", () => {
     // Inside a sheet the sheet's own button is "Close"; two buttons of one

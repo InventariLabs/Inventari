@@ -51,6 +51,7 @@ const makeScan = (
   error: null,
   cameraActive: false,
   torchOn: false,
+  torchAvailable: true,
   onToggle: vi.fn(),
   onToggleTorch: vi.fn(),
   ...overrides,
@@ -196,6 +197,18 @@ describe("LineItemsEditor", () => {
       screen.getByRole("button", { name: "Torch on" }),
     );
     expect(box).toContainElement(document.getElementById("qr-reader"));
+  });
+
+  it("draws no torch button on a camera that has no torch", () => {
+    const scan = makeScan({
+      open: true,
+      cameraActive: true,
+      torchAvailable: false,
+    });
+    render(<LineItemsEditor {...makeProps()} scan={scan} />);
+    expect(
+      screen.queryByRole("button", { name: "Torch on" }),
+    ).not.toBeInTheDocument();
   });
 
   it("narrows the camera box so the square camera cannot fill a desktop dialog", () => {

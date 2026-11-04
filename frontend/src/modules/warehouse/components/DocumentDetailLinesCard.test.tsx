@@ -86,6 +86,27 @@ function renderCard(
   );
 }
 
+describe("DocumentDetailLinesCard — a correction's line", () => {
+  it("reads in stock terms, like the summary above it", () => {
+    // Less issued puts goods back: the line said "-1" under "+1 / −0".
+    renderCard([line({ quantity: "-1", expected_quantity: "-1" })], {
+      type: "CORRECTION",
+      corrects_document_type: "OUT",
+    });
+    expect(screen.getAllByText("+1").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("added to stock").length).toBeGreaterThan(0);
+  });
+
+  it("takes goods off stock when a receipt is corrected downwards", () => {
+    renderCard([line({ quantity: "-2", expected_quantity: "-2" })], {
+      type: "CORRECTION",
+      corrects_document_type: "IN",
+    });
+    expect(screen.getAllByText("-2").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("removed from stock").length).toBeGreaterThan(0);
+  });
+});
+
 describe("DocumentDetailLinesCard — quantity column", () => {
   it("shows no bar under the quantity when nothing is executed", () => {
     // A grey track under every number in a read-only table reads as an

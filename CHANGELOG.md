@@ -41,6 +41,15 @@ says what the release does rather than what changed since them.
   the screen, and the product suggestions open above the keyboard. A line added
   to a shopping list from the replenish suggestions keeps its unit, and the
   analytics tiles say what they count.
+- Warehouse floor papercuts: the carrier typed on the picking summary is
+  still there when packing opens; a camera without a torch no longer offers
+  the light switch; the lot on the receiving expiry sheet and a product's own
+  code on the product form can be read with the camera instead of retyped,
+  and the lot sheet no longer opens with the keyboard over the expiry date; a
+  correction draft describes each line as added to or removed from stock in
+  words, the same way on its line, summary and confirmation; every row of
+  the history keeps its columns aligned; and a write-off ends on a write-off
+  result instead of "Issued".
 - Saving a supplier price or a reorder rule without a product now marks the
   product field as required and says so on the field, and a reorder rule whose
   maximum is below its minimum is refused on the Maximum field in plain words.
