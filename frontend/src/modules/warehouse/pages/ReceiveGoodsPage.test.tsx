@@ -1869,6 +1869,17 @@ describe("ReceiveGoodsPage", () => {
         .mockResolvedValue({ id: "doc-9", status: "CONFIRMED" });
     });
 
+    it("puts what the order expects above the question the order has answered", async () => {
+      renderAt("/warehouse/receive?order=po-1");
+
+      const note = await screen.findByText("PO/2026/002 expects 1 line.");
+      const question = screen.getByText("Where do the goods come from?");
+      expect(
+        note.compareDocumentPosition(question) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
     it("hands a To do delivery to the receiving session, not the desk sheet", async () => {
       const user = userEvent.setup();
       renderAt("/warehouse/receive?order=po-1");

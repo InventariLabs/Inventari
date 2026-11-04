@@ -405,7 +405,10 @@ export default memo(function ItemMobileCard({
   ) => {
     if (!storageId)
       return String(t("unknown", { ns: "common", defaultValue: "Unknown" }));
-    const storage = storages?.find((s) => s.id === storageId);
+    // The places have not arrived yet: a record is not "Unknown" for as long
+    // as the list that names it is still on its way.
+    if (!storages) return "";
+    const storage = storages.find((s) => s.id === storageId);
     if (!storage)
       return String(t("unknown", { ns: "common", defaultValue: "Unknown" }));
     // A used-up record is filed under a system place: its name says nothing.

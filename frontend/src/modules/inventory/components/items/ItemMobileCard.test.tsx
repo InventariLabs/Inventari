@@ -590,3 +590,29 @@ describe("ItemMobileCard — a used-up record", () => {
     expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
   });
 });
+
+describe("ItemMobileCard — the places are still on their way", () => {
+  it("does not call the place Unknown before the list that names it arrived", () => {
+    render(
+      <ItemMobileCard
+        item={makeItem({ location_id: "place-1" } as Partial<Item>)}
+        {...baseProps()}
+        storages={undefined}
+      />,
+    );
+
+    expect(screen.queryByText("Unknown")).not.toBeInTheDocument();
+  });
+
+  it("still says Unknown for a place the arrived list does not hold", () => {
+    render(
+      <ItemMobileCard
+        item={makeItem({ location_id: "gone" } as Partial<Item>)}
+        {...baseProps()}
+        storages={[{ id: "place-1", name: "Pantry" }] as never}
+      />,
+    );
+
+    expect(screen.getByText("Unknown")).toBeInTheDocument();
+  });
+});
