@@ -2,11 +2,7 @@ import { useState, useMemo, useRef } from "react";
 import { logger } from "@/utils/logger";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { useAppMutation } from "@/lib/api/mutationFactory";
-import {
-  SessionEndedError,
-  apiErrorStatus,
-  extractApiError,
-} from "@/lib/errors";
+import { apiErrorStatus, extractApiError, followUpError } from "@/lib/errors";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -429,17 +425,6 @@ export function useQuickAdd({
     handleFileSelect,
     handleImageSelect,
   };
-}
-
-/**
- * The toast for a step that runs after the product was already created.
- * An ended session's own sentence says the work was not saved, which is not
- * true here — the product is in — so the step's own failure sentence stands.
- */
-function followUpError(error: unknown, fallback: string): string {
-  return error instanceof SessionEndedError
-    ? fallback
-    : extractApiError(error, fallback);
 }
 
 /**

@@ -210,6 +210,7 @@ export function StorageMovePicker({
               onSelect={(id) => onPick(id)}
               canWrite={false}
               onMoveTo={() => undefined}
+              onOpenSettings={() => undefined}
               onDragMove={() => undefined}
               label={t("locations:move.targetsLabel")}
             />

@@ -88,7 +88,7 @@ describe("DocumentValueTotals", () => {
 
     expect(screen.getByText("Cost of the write-off")).toBeInTheDocument();
     expect(screen.getByText("PLN 25.00")).toBeInTheDocument();
-    expect(screen.queryByText("Tax Total")).not.toBeInTheDocument();
+    expect(screen.queryByText("Tax total")).not.toBeInTheDocument();
   });
 
   it("says nothing about a write-off the cost layers could not value", () => {
@@ -117,20 +117,20 @@ describe("DocumentValueTotals", () => {
   it("renders net, tax and gross with the document currency", () => {
     render(<DocumentValueTotals document={makeDoc()} />);
 
-    expect(screen.getByText("Net Total")).toBeInTheDocument();
+    expect(screen.getByText("Net total")).toBeInTheDocument();
     expect(screen.getByText("PLN 100.00")).toBeInTheDocument();
-    expect(screen.getByText("Tax Total")).toBeInTheDocument();
+    expect(screen.getByText("Tax total")).toBeInTheDocument();
     expect(screen.getByText("PLN 23.00")).toBeInTheDocument();
-    expect(screen.getByText("Gross Total")).toBeInTheDocument();
+    expect(screen.getByText("Gross total")).toBeInTheDocument();
     expect(screen.getByText("PLN 123.00")).toBeInTheDocument();
   });
 
   it("hides tax row when total_tax is null", () => {
     render(<DocumentValueTotals document={makeDoc({ total_tax: null })} />);
 
-    expect(screen.getByText("Net Total")).toBeInTheDocument();
-    expect(screen.getByText("Gross Total")).toBeInTheDocument();
-    expect(screen.queryByText("Tax Total")).not.toBeInTheDocument();
+    expect(screen.getByText("Net total")).toBeInTheDocument();
+    expect(screen.getByText("Gross total")).toBeInTheDocument();
+    expect(screen.queryByText("Tax total")).not.toBeInTheDocument();
   });
 
   it("renders when only total_gross is set", () => {
@@ -198,7 +198,7 @@ describe("DocumentValueTotals", () => {
     const table = screen.getByRole("table", { name: "Tax by rate" });
     const rows = within(table).getAllByRole("row");
     expect(rows.map((row) => row.textContent)).toEqual([
-      "RateNet TotalTax Total",
+      "RateNet totalTax total",
       "19%€100.00€19.00",
       "7%€25.00€1.75",
     ]);
@@ -236,5 +236,49 @@ describe("DocumentValueTotals", () => {
     );
 
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
+  });
+});
+
+describe("DocumentValueTotals — a received line with no price", () => {
+  beforeEach(() => {
+    valueTracking = true;
+    setOrganizationCurrency("PLN");
+  });
+
+  const posted = (lines: unknown[], overrides = {}) =>
+    makeDoc({
+      status: "COMPLETED",
+      lines,
+      ...overrides,
+    } as Partial<WarehouseDocument>);
+
+  it("says the line has no cost, beside the totals it is left out of", () => {
+    render(
+      <DocumentValueTotals
+        document={posted([{ unit_price: "10.00" }, { unit_price: null }])}
+      />,
+    );
+    expect(screen.getByText(/Lines with no price/)).toBeInTheDocument();
+  });
+
+  it("says so when no line has a price and there are no totals to show", () => {
+    render(
+      <DocumentValueTotals
+        document={posted([{ unit_price: null }, { unit_price: null }], {
+          total_net: null,
+          total_gross: null,
+        })}
+      />,
+    );
+    expect(screen.getByText(/Lines with no price/)).toBeInTheDocument();
+  });
+
+  it("says nothing of a draft, whose prices may still come", () => {
+    render(
+      <DocumentValueTotals
+        document={posted([{ unit_price: null }], { status: "DRAFT" })}
+      />,
+    );
+    expect(screen.queryByText(/Lines with no price/)).not.toBeInTheDocument();
   });
 });

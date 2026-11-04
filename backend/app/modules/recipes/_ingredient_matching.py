@@ -185,11 +185,37 @@ def narrowing_fragment(name: str) -> str | None:
     shorter token means the same thing), so this prefix is the weakest
     necessary condition — narrowing the SQL query by it can never drop a
     candidate the rules below would have accepted.
+
+    The fragment is spelled the way *name* was typed ("weiß", "œuf", "молок"),
+    not folded to ASCII: the catalogue stores names with their own letters,
+    and a database that cannot fold has only that spelling to compare with.
+    The caller still folds both sides to give the verdict.
     """
     head = head_token(name)
     if head is None:
         return None
-    return head[:MIN_STEM_LENGTH]
+    return _as_typed(name, head[:MIN_STEM_LENGTH])
+
+
+def _as_typed(text: str, folded_prefix: str) -> str:
+    """The characters of *text* that fold to *folded_prefix*, lowercased.
+
+    *folded_prefix* opens a token of the folded *text*; the answer is the
+    stretch of the original that produced it, so "ß" (folding to "ss") and
+    letters of other scripts keep their own spelling.
+    """
+    folded = ''
+    owner: list[int] = []
+    for index, char in enumerate(text):
+        piece = anyascii(char).lower()
+        folded += piece
+        owner.extend([index] * len(piece))
+    for token in re.finditer('[a-z]+', folded):
+        if token.group().startswith(folded_prefix):
+            first = owner[token.start()]
+            last = owner[token.start() + len(folded_prefix) - 1]
+            return text[first : last + 1].lower()
+    return folded_prefix
 
 
 def _grade_candidate(

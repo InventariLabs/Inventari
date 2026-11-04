@@ -238,7 +238,7 @@
     "executeScrap": "Zezłomuj towar",
     "approvalPendingHint": "Oczekuje na aprobatę — realizacja zablokowana do rozstrzygnięcia zgłoszenia.",
     "approvalRequiredHint": "Wymagana jest akceptacja, a wniosek nie jest otwarty — najpierw poproś o akceptację.",
-    "approvalNoWorkflowHint": "Wymagana jest akceptacja, ale żaden przepływ akceptacji nie jest aktywny — skonfiguruj go w ustawieniach Akceptacji i wyślij wniosek.",
+    "approvalNoWorkflowHint": "Ten dokument wymaga akceptacji, ale nikt jeszcze nie może jej udzielić. Poproś o to administratora.",
     "postNowReceive": "Przyjmij na stan",
     "postNowIssue": "Wydaj",
     "postNowMove": "Przenieś",
@@ -271,7 +271,7 @@
     "deleteMessage": "Usunąć ten szkic dokumentu? Tej operacji nie można cofnąć.",
     "confirmMessageApproval": "Potwierdzenie wyśle dokument do kolejki akceptacji. Kontynuować?",
     "confirmMessageConditional": "To oznaczy dokument jako gotowy do realizacji magazynowej — chyba że próg akceptacji w Twojej organizacji wyśle go najpierw do kolejki akceptacji. Kontynuować?",
-    "confirmMessageNoWorkflow": "Ten dokument wymaga akceptacji, ale nie istnieje przepływ akceptacji dokumentów, więc jego potwierdzenie zostanie odrzucone. Najpierw utwórz przepływ.",
+    "confirmMessageNoWorkflow": "Ten dokument wymaga akceptacji, ale nikt jeszcze nie może jej udzielić, więc potwierdzenie zostanie odrzucone. Poproś o to administratora.",
     "requestApprovalMessage": "Prośba cofnie ten dokument do stanu oczekiwania na akceptację i zostanie w nim, dopóki ktoś jej nie udzieli.",
     "confirmMessageDeadEndNamed": "Ten dokument wymaga akceptacji, ale nikt nie mógłby jej rozstrzygnąć: etap „{{stage}}” wskazuje akceptantów, którzy nie mają dostępu do akceptacji. Potwierdzenie i tak go tam skieruje, a będzie czekał, dopóki wniosek nie zostanie wycofany albo te osoby nie dostaną dostępu. Kontynuować?",
     "confirmMessageDeadEndNoApprover": "Ten dokument wymaga akceptacji, ale nikt nie mógłby jej rozstrzygnąć: etap „{{stage}}” jest otwarty dla każdego z uprawnieniem akceptowania, a nikt w tej organizacji go nie ma. Potwierdzenie i tak go tam skieruje, a będzie czekał, dopóki wniosek nie zostanie wycofany albo ktoś nie dostanie tego uprawnienia. Kontynuować?",
@@ -690,6 +690,7 @@
     "plannedReceiving": "→ {{location}} · strefa przyjęć, rozłożenie później"
   },
   "value": {
+    "unpricedLines": "Pozycje bez ceny są poza tymi sumami i nie mają zapisanego kosztu.",
     "totalsTitle": "Podsumowanie wartości",
     "totalNet": "Razem netto",
     "totalTax": "Razem VAT",
@@ -1209,9 +1210,9 @@
         "setUp": "Ustaw miejsce"
       },
       "occupancy": {
-        "noLimit_one": "Bez limitu · {{count}} rekord",
-        "noLimit_few": "Bez limitu · {{count}} rekordy",
-        "noLimit_many": "Bez limitu · {{count}} rekordów",
+        "noLimit_one": "Bez limitu · {{count}} produkt",
+        "noLimit_few": "Bez limitu · {{count}} produkty",
+        "noLimit_many": "Bez limitu · {{count}} produktów",
         "sharesSum_one": "{{fill}}% — udział {{count}} produktu z limitem",
         "sharesSum_few": "{{fill}}% — suma udziałów {{count}} produktów z limitem",
         "sharesSum_many": "{{fill}}% — suma udziałów {{count}} produktów z limitem",
@@ -1220,7 +1221,7 @@
         "fullest_one": "{{name}} — najpełniejszy z {{count}} limitowanych produktów",
         "fullest_few": "{{name}} — najpełniejszy z {{count}} limitowanych produktów",
         "fullest_many": "{{name}} — najpełniejszy z {{count}} limitowanych produktów",
-        "noLimit_other": "Bez limitu · {{count}} rekordów",
+        "noLimit_other": "Bez limitu · {{count}} produktu",
         "fullest_other": "{{name}} — najpełniejszy z {{count}} limitowanych produktów"
       },
       "empty": {

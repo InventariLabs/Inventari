@@ -185,7 +185,7 @@ class TestTheJournalSeesTheLines:
         entry = _entries(db_session, mk_org.id, UUID(recipe['id']))[-1]
         assert _snapshot(entry)['name'] == 'Jam v1'
         assert _snapshot(entry)['ingredient_added'] == 'Sugar'
-        assert _snapshot(entry)['qty_per_batch'] == 0.5
+        assert _snapshot(entry)['qty_per_batch'] == '0.5000'
 
     def test_the_quantity_a_run_will_consume_is_recorded_both_ways(
         self,
@@ -218,8 +218,8 @@ class TestTheJournalSeesTheLines:
 
         entry = _entries(db_session, mk_org.id, UUID(recipe['id']))[-1]
         assert _snapshot(entry)['ingredient'] == 'Wax'
-        assert _snapshot(entry)['before']['qty_per_batch'] == 0.2
-        assert _snapshot(entry)['after']['qty_per_batch'] == 99.0
+        assert _snapshot(entry)['before']['qty_per_batch'] == '0.2000'
+        assert _snapshot(entry)['after']['qty_per_batch'] == '99.0000'
 
     def test_removing_an_ingredient_is_recorded_from_either_door(
         self,
@@ -249,4 +249,4 @@ class TestTheJournalSeesTheLines:
 
         entry = _entries(db_session, mk_org.id, UUID(recipe['id']))[-1]
         assert _snapshot(entry)['ingredient_removed'] == 'Wax'
-        assert _snapshot(entry)['qty_per_batch'] == 0.2
+        assert _snapshot(entry)['qty_per_batch'] == '0.2000'

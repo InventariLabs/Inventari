@@ -84,6 +84,8 @@ export function StorageTrackingFields({
                   : "outline"
             }
             disabled={fromAbove !== undefined}
+            // The tick and the fill say "tracked" to the eye only.
+            aria-pressed={checked}
             onClick={() =>
               onChange(
                 checked ? value.filter((f) => f !== key) : [...value, key],

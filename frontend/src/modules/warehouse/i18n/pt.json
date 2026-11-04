@@ -208,7 +208,7 @@
     "executeScrap": "Dar baixa no estoque",
     "approvalPendingHint": "Aguardando aprovação — a execução fica bloqueada até que a solicitação seja resolvida.",
     "approvalRequiredHint": "A aprovação é obrigatória e não há solicitação aberta — solicite a aprovação primeiro.",
-    "approvalNoWorkflowHint": "A aprovação é obrigatória, mas nenhum fluxo de aprovação está ativo — configure um nas configurações de Aprovações e depois solicite a aprovação.",
+    "approvalNoWorkflowHint": "Este documento precisa de aprovação, mas ainda não há ninguém designado para a dar. Peça ao seu administrador que o configure.",
     "postNowReceive": "Receber estoque",
     "postNowIssue": "Expedir estoque",
     "postNowMove": "Mover estoque",
@@ -241,7 +241,7 @@
     "deleteMessage": "Excluir este rascunho de documento? Esta ação não pode ser desfeita.",
     "confirmMessageApproval": "Ao confirmar, este documento será enviado para a fila de aprovação. Continuar?",
     "confirmMessageConditional": "Isto marcará o documento como pronto para execução no armazém — a menos que o limite de aprovação da sua organização o envie antes para a fila de aprovação. Continuar?",
-    "confirmMessageNoWorkflow": "Este documento precisa de aprovação, mas não existe fluxo de aprovação para documentos, então a confirmação será recusada. Crie o fluxo primeiro.",
+    "confirmMessageNoWorkflow": "Este documento precisa de aprovação, mas ainda não há ninguém designado para a dar, por isso a confirmação será recusada. Peça ao seu administrador que o configure.",
     "requestApprovalMessage": "Solicitar aprovação devolve este documento ao estado de aguardando aprovação, onde ele fica até alguém aprová-lo.",
     "confirmMessageDeadEndNamed": "Este documento precisa de aprovação, mas ninguém poderia decidir: a etapa “{{stage}}” indica aprovadores que não conseguem ver aprovações. Confirmar ainda assim o envia para lá, e ele espera até que a solicitação seja retirada ou essas pessoas recebam acesso. Continuar?",
     "confirmMessageDeadEndNoApprover": "Este documento precisa de aprovação, mas ninguém poderia decidir: a etapa “{{stage}}” está aberta a qualquer pessoa com a permissão de aprovar, e ninguém nesta organização a possui. Confirmar ainda assim o envia para lá, e ele espera até que a solicitação seja retirada ou alguém receba a permissão. Continuar?",
@@ -616,6 +616,7 @@
     "plannedReceiving": "→ {{location}} · área de recebimento, guardar depois"
   },
   "value": {
+    "unpricedLines": "As linhas sem preço não entram nestes totais e esse estoque não tem custo registrado.",
     "totalsTitle": "Totais do documento",
     "totalNet": "Total líquido",
     "totalTax": "Total de impostos",
@@ -1100,8 +1101,8 @@
         "setUp": "Configurar local"
       },
       "occupancy": {
-        "noLimit_one": "Sem limite · {{count}} registro",
-        "noLimit_other": "Sem limite · {{count}} registros",
+        "noLimit_one": "Sem limite · {{count}} produto",
+        "noLimit_other": "Sem limite · {{count}} produtos",
         "sharesSum_one": "{{fill}}% — a parcela de {{count}} produto com limite",
         "sharesSum_other": "{{fill}}% — as parcelas de {{count}} produtos com limite somadas",
         "unmeasured": "Um produto aqui não tem limite e não é contado",

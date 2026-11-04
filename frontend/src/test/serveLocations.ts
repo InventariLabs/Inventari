@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
 import { makeStorageSummary } from "@/test/factories/storage";
 import type { StorageLocationNode, StorageLocationSummary } from "@/types";
+import { LOCATION_PATH_SEPARATOR } from "@/utils/helpers";
 
 /**
  * Serve `GET /locations` and `GET /locations/tree` the way the backend does:
@@ -30,7 +31,7 @@ export function serveLocations(
       parts.unshift(current.name);
       current = current.parent_id ? byId.get(current.parent_id) : undefined;
     }
-    return parts.join(" → ");
+    return parts.join(LOCATION_PATH_SEPARATOR);
   };
   const archived = (row: StorageLocationSummary) =>
     (row.settings as { archived?: boolean } | null)?.archived === true;

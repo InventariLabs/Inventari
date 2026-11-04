@@ -162,6 +162,17 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     // A chip is the reader's own tap: the place and category pickers stay
     // folded away instead of pushing the list down.
     await expect(page.locator("#items-domain-filters")).toHaveCount(0);
+    // The pressed state is read from the screen's state at once; the address
+    // is written a beat later. Reloading in between brings back no chips, so
+    // wait for the address the reload will read.
+    await expect
+      .poll(() =>
+        (new URL(page.url()).searchParams.get("filter") ?? "")
+          .split(",")
+          .sort()
+          .join(","),
+      )
+      .toBe("low-stock,used-up");
     await page.reload();
     await expect(lowStock).toHaveAttribute("aria-pressed", "true");
     await expect(usedUp).toHaveAttribute("aria-pressed", "true");
@@ -221,9 +232,14 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
       // and the tile's name carries its "to do today" badge.
       await page.locator('a[href="/warehouse/todo"]').first().click();
       await expect(page).toHaveURL(/\/warehouse\/todo$/);
+      // The address changes before the screen does, and the launcher still on
+      // screen offers "Stock takes in progress" while any stock take is open.
+      await expect(
+        page.getByRole("navigation", { name: "Related screens" }),
+      ).toBeVisible({ timeout: 15000 });
 
       await page
-        .getByRole(entry.role, { name: entry.open, exact: false })
+        .getByRole(entry.role, { name: entry.open, exact: true })
         .first()
         .click();
       await expect(page).toHaveURL(entry.url);

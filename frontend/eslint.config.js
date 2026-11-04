@@ -120,12 +120,7 @@ export default tseslint.config(
       // scripts/ stays outside ESLint on purpose — these
       // are Node-run gates, and most carry their own vitest spec
       // (`*.test.mjs` beside them), so their correctness is enforced by
-      // those specs, not by the app-oriented lint. Not all do: the
-      // entry points check-bundle-budget, check-knip-baseline,
-      // check-module-catalog, check-module-settings, check-public-bundle,
-      // lint-test-assertions, lint-ui-conventions, scan-ui-patterns and
-      // sync-fluent-emoji have none — for those the exclusion rests on
-      // nothing under scripts/ being bundled or shipped, not on a spec.
+      // those specs, not by the app-oriented lint.
       "*.cjs",
       "*.mjs",
       "*.js",

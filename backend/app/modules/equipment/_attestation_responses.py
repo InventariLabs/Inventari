@@ -188,7 +188,7 @@ async def dispute_response(
     # one it is about, so a reader of the envelope alone is not left guessing.
     response.dispute_type = dispute_type
     response.dispute_reason = (
-        f'{target.item_name} — {reason}'
+        f'{_asset_label(target)} — {reason}'
         if target is not None and len(response.items) > 1
         else reason
     )
@@ -198,6 +198,13 @@ async def dispute_response(
     await _tell_the_admins(db, response, target, reason)
     await db.refresh(response)
     return response
+
+
+def _asset_label(target: AuditResponseItem) -> str:
+    """The asset as a note names it: three laptops can share one name."""
+    if target.serial_number:
+        return f'{target.item_name} ({target.serial_number})'
+    return target.item_name
 
 
 async def _tell_the_admins(

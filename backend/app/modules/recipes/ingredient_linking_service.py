@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import NotFoundException
@@ -73,6 +73,19 @@ async def list_unlinked_ingredients(
         )
         for ingredient, recipe_name in rows
     ]
+
+
+async def count_ingredients(db: AsyncSession, org_id: UUID) -> int:
+    """Every ingredient across the organization's recipes, linked or not."""
+    return (
+        await db.scalar(
+            select(func.count())
+            .select_from(RecipeIngredient)
+            .join(Recipe, Recipe.id == RecipeIngredient.recipe_id)
+            .where(Recipe.organization_id == org_id)
+        )
+        or 0
+    )
 
 
 async def suggest_matches(

@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { Sheet, SheetBody, SheetHeader } from "@/components/ui/Sheet";
-import type { Item } from "@/types";
+import { isInVirtualPlace } from "@/modules/shared/lib/storageUsage";
+import type { Item, StorageLocationSummary } from "@/types";
 
 interface ItemActionsSheetProps {
   item: Item;
@@ -25,6 +26,8 @@ interface ItemActionsSheetProps {
   onMove: (item: Item) => void;
   onSetThreshold: (item: Item) => void;
   onDelete?: (itemId: string) => void;
+  /** Where the record stands: in a system place no unit can be added. */
+  storages?: StorageLocationSummary[];
   /** Whether to offer any of them — edit, move and the alert all write. */
   canWrite?: boolean;
   /** Whether Delete may be offered — the API checks `items:delete` for it. */
@@ -60,10 +63,12 @@ export default function ItemActionsSheet({
   onMove,
   onSetThreshold,
   onDelete,
+  storages,
   canWrite = true,
   canDelete = canWrite,
 }: ItemActionsSheetProps) {
   const { t } = useTranslation(["items", "common", "labels"]);
+  const usedUp = isInVirtualPlace(item.location_id, storages);
   return (
     <Sheet open={open} onClose={onClose} aria-label={item.name}>
       {/* The name in aria-label is read to a screen reader; the reader
@@ -97,17 +102,19 @@ export default function ItemActionsSheet({
             >
               {t("items:actions.consume1unit")}
             </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              leftIcon={<Plus size={18} />}
-              onClick={() => {
-                onClose();
-                onAddOne(item.id);
-              }}
-            >
-              {t("items:actions.addOneUnit")}
-            </Button>
+            {!usedUp && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                leftIcon={<Plus size={18} />}
+                onClick={() => {
+                  onClose();
+                  onAddOne(item.id);
+                }}
+              >
+                {t("items:actions.addOneUnit")}
+              </Button>
+            )}
             <Button
               variant="ghost"
               className="w-full justify-start"

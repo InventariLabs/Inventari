@@ -7,8 +7,10 @@ import { useModules } from "@/contexts/ModulesContext";
 import { usePOApprovalWorkflowConfigured } from "../hooks/usePurchaseOrders";
 
 interface POApprovalWorkflowWarningProps {
-  /** Whether the settings on screen ask for approval at all. */
-  approvalRequested: boolean;
+  /** The "require approval for all orders" switch is on. */
+  requireAll: boolean;
+  /** An approval threshold is set: orders above it need approval. */
+  thresholdSet: boolean;
 }
 
 /**
@@ -28,7 +30,8 @@ interface POApprovalWorkflowWarningProps {
  * warning even where the workflow list itself would be filtered away.
  */
 export function POApprovalWorkflowWarning({
-  approvalRequested,
+  requireAll,
+  thresholdSet,
 }: POApprovalWorkflowWarningProps) {
   const { t } = useTranslation("purchase_orders");
   const navigate = useNavigate();
@@ -36,7 +39,7 @@ export function POApprovalWorkflowWarning({
   const approvalsEnabled = isModuleEnabled("approvals");
   const configured = usePOApprovalWorkflowConfigured();
 
-  if (!approvalRequested || configured === true) return null;
+  if ((!requireAll && !thresholdSet) || configured === true) return null;
   // While the module is on but the question is still unanswered — in flight
   // or failed — there is nothing honest to say; a warning that appears and
   // disappears reads as a glitch. With the module off the query never fires
@@ -45,14 +48,26 @@ export function POApprovalWorkflowWarning({
   // screen.
   if (approvalsEnabled && configured === undefined) return null;
 
+  // With the switch off the requirement left is the threshold, so that is the
+  // field the remedy names; "turn the requirement off" would point at a
+  // checkbox that already is.
+  const thresholdOnly = !requireAll;
   const body = approvalsEnabled
     ? {
-        text: t("settings.workflowMissing.description"),
+        text: t(
+          thresholdOnly
+            ? "settings.workflowMissing.descriptionThreshold"
+            : "settings.workflowMissing.description",
+        ),
         action: t("settings.workflowMissing.action"),
         to: "/approvals/workflows?new=1&target=purchase_order",
       }
     : {
-        text: t("settings.workflowMissing.moduleDescription"),
+        text: t(
+          thresholdOnly
+            ? "settings.workflowMissing.moduleDescriptionThreshold"
+            : "settings.workflowMissing.moduleDescription",
+        ),
         action: t("settings.workflowMissing.moduleAction"),
         to: "/apps",
       };

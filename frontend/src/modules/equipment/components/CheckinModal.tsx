@@ -20,6 +20,7 @@ import {
 } from "@/modules/equipment/components/checkinConditions";
 import { ReturnLocationField } from "@/modules/equipment/components/ReturnLocationField";
 import { useCheckin } from "@/modules/equipment/hooks/useEquipment";
+import { useHoldsAssignment } from "@/modules/equipment/hooks/useHoldsAssignment";
 
 /**
  * What checking in actually needs to know — narrower than
@@ -33,6 +34,7 @@ export interface CheckinTarget {
   id: string;
   item_name: string;
   assigned_to_name?: string | null;
+  assigned_to_email?: string | null;
   partner_name?: string | null;
   /** The holder, person or place, resolved by the backend. */
   holder_name?: string | null;
@@ -43,17 +45,31 @@ interface CheckinModalProps {
   assignment: CheckinTarget;
   /** The asset's own location — where the return puts it unless told otherwise. */
   homeLocationId?: string | null;
+  /**
+   * The holder is handing it back, not a manager receiving it: the dialog
+   * speaks the holder's verb. A viewer whose own address is the assignment's
+   * is the holder without being told, so the asset page words it right too.
+   */
+  byHolder?: boolean;
   onClose: () => void;
 }
 
 export function CheckinModal({
   assignment,
   homeLocationId,
+  byHolder: handedBack = false,
   onClose,
 }: CheckinModalProps) {
   const { t } = useTranslation("equipment");
   const checkinMutation = useCheckin();
+  const byHolder = useHoldsAssignment(assignment) || handedBack;
 
+  const title = byHolder
+    ? t("assignments.checkin_modal.title_holder")
+    : t("assignments.checkin_modal.title");
+  const submitLabel = byHolder
+    ? t("assignments.checkin_modal.submit_holder")
+    : t("assignments.checkin_modal.submit");
   const [condition, setCondition] = useState<CheckinCondition>("GOOD");
   const [notes, setNotes] = useState("");
   const [returnTo, setReturnTo] = useState(homeLocationId ?? "");
@@ -100,32 +116,29 @@ export function CheckinModal({
       >
         <DialogHeader className="flex flex-row items-center gap-3 border-b border-border px-5 py-4">
           <RotateCcw size={18} className="text-primary-500" />
-          <DialogTitle className="font-semibold text-on">
-            {t("assignments.checkin_modal.title")}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {t("assignments.checkin_modal.title")}
-          </DialogDescription>
+          <DialogTitle className="font-semibold text-on">{title}</DialogTitle>
+          <DialogDescription className="sr-only">{title}</DialogDescription>
         </DialogHeader>
 
         <div className="px-5 pt-3 pb-1">
           <p className="text-sm font-medium text-on">{assignment.item_name}</p>
           {/* A line that names nobody is worse than no line: "Assigned to:"
               with an empty tail read as a missing answer, not as the holder's
-              own check-in. The holder's screen passes its own "you". */}
-          {(assignment.holder_name ||
-            assignment.partner_name ||
-            assignment.assigned_to_name) && (
-            <p className="text-xs text-on-muted">
-              {assignment.holder_kind === "location"
-                ? `${t("assignments.standing_in")}: ${assignment.holder_name}`
-                : `${t("assignments.held_by")}: ${
-                    assignment.holder_name ??
-                    assignment.partner_name ??
-                    assignment.assigned_to_name
-                  }`}
-            </p>
-          )}
+              own check-in. The holder is not told their own name. */}
+          {!byHolder &&
+            (assignment.holder_name ||
+              assignment.partner_name ||
+              assignment.assigned_to_name) && (
+              <p className="text-xs text-on-muted">
+                {assignment.holder_kind === "location"
+                  ? `${t("assignments.standing_in")}: ${assignment.holder_name}`
+                  : `${t("assignments.held_by")}: ${
+                      assignment.holder_name ??
+                      assignment.partner_name ??
+                      assignment.assigned_to_name
+                    }`}
+              </p>
+            )}
         </div>
 
         <form
@@ -169,7 +182,7 @@ export function CheckinModal({
               {checkinMutation.isPending && (
                 <Loader2 size={14} className="animate-spin mr-2" />
               )}
-              {t("assignments.checkin_modal.submit")}
+              {submitLabel}
             </Button>
           </SheetActions>
         </form>

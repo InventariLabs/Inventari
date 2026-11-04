@@ -344,6 +344,36 @@ class TestAvailabilityEndpoint:
         body = resp.json()
         assert Decimal(body['max_batches']) == Decimal('3')
 
+    def test_max_batches_goes_out_as_a_plain_number(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        db_session: Session,
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+    ) -> None:
+        """Ten batches read "Max batches from stock: 1E+1" on the BOM header."""
+        output = _template(db_session, mk_org, name='Flavoured oil')
+        oil = _template(db_session, mk_org, name='Oil')
+        recipe = _recipe(db_session, mk_org, output.id, batch_yield_qty='1')
+        _bom_line(
+            db_session,
+            mk_org,
+            recipe_id=recipe.id,
+            parent_id=output.id,
+            child_id=oil.id,
+            qty='1',
+        )
+        _stock(client, mk_auth_headers, oil, mk_input_loc, '10')
+
+        resp = client.get(
+            f'/api/v1/maker/recipes/{recipe.id}/availability',
+            headers=mk_auth_headers,
+        )
+
+        assert resp.status_code == 200
+        assert resp.json()['max_batches'] == '10'
+
     def test_max_batches_is_whole_batches(
         self,
         client: TestClient,

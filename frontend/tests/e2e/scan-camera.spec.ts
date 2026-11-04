@@ -429,14 +429,14 @@ test.describe("Scan — one read per presence on the forms", () => {
   }) => {
     test.setTimeout(90000);
     await page.goto("/purchase-orders");
-    // Two "Create Order" buttons exist on an empty list — the header's and
+    // Two "Create order" buttons exist on an empty list — the header's and
     // the empty state's; either opens the same form.
     await page
-      .getByRole("button", { name: "Create Order", exact: true })
+      .getByRole("button", { name: "Create order", exact: true })
       .first()
       .click();
     await expect(
-      page.getByRole("heading", { name: "New Purchase Order" }),
+      page.getByRole("heading", { name: "New purchase order" }),
     ).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: "Scan", exact: true }).click();
     await expectReaderVideo(page);
@@ -452,7 +452,7 @@ test.describe("Scan — one read per presence on the forms", () => {
     // And the panel, not the wish to scan, owns the camera: closing it by
     // hand stops the reads until it is opened again.
     await page
-      .getByRole("button", { name: "Close Scanner", exact: true })
+      .getByRole("button", { name: "Close scanner", exact: true })
       .click();
     await expect(page.locator("#qr-reader")).toHaveCount(0);
     await expect.poll(() => camera.streams()).toMatchObject({ live: 0 });
@@ -482,7 +482,7 @@ test.describe("Scan — execution reads one presence", () => {
       storages.find((s) => s.name === "E2E-Kitchen") ?? storages[0];
     locationId = kitchen.id;
     const partner = await api.createPartner(token, {
-      name: `E2E-Camera-Customer-${Date.now().toString(36)}`,
+      name: `E2E-Camera-Customer-${crypto.randomUUID()}`,
       type: "CUSTOMER",
     });
     partnerId = partner.id;
@@ -522,11 +522,11 @@ test.describe("Scan — execution reads one presence", () => {
     await page.goto(`/warehouse/documents/${doc.id}`);
     await page.getByRole("button", { name: "Pick items" }).click();
     await expect(
-      page.getByRole("heading", { name: "Execute Document" }),
+      page.getByRole("heading", { name: "Execute document" }),
     ).toBeVisible({ timeout: 15000 });
-    await page.getByRole("button", { name: "Scan Mode", exact: true }).click();
+    await page.getByRole("button", { name: "Scan mode", exact: true }).click();
     await page
-      .getByRole("button", { name: "Open Camera", exact: true })
+      .getByRole("button", { name: "Open camera", exact: true })
       .click();
     await expect(page.locator("#qr-reader video")).toBeVisible({
       timeout: 15000,

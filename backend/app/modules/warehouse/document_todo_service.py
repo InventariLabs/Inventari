@@ -54,7 +54,7 @@ from app.core.logging import get_logger
 from app.core.public_api import core_api
 
 from . import document_types as dt
-from .document_query_service import list_documents
+from .document_query_service import list_documents, not_undone_conditions
 from .models import (
     Document,
     DocumentLine,
@@ -396,6 +396,9 @@ async def completed_documents_async(
         # A done task names its document and counts its lines
         # (``line_tallies_async``); no line is read for it.
         lines='none',
+        # An undone document and the reversal that undid it are one piece of
+        # work that came to nothing, not two things done.
+        extra_conditions=not_undone_conditions(),
     )
 
 

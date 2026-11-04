@@ -32,6 +32,10 @@ async def test_closed_period_refusal_follows_the_request_language(lang, fragment
     assert fragment in str(caught.value)
 
 
-def test_missing_workflow_refusal_has_a_polish_sentence():
-    text = get_error_message('documents_approval_workflow_missing', 'pl')
-    assert 'przepływu' in text
+def test_missing_workflow_refusal_speaks_to_the_floor():
+    # A storekeeper reads this, so it says whom to ask, not what to configure.
+    polish = get_error_message('documents_approval_workflow_missing', 'pl')
+    assert 'administratora' in polish
+    english = get_error_message('documents_approval_workflow_missing', 'en')
+    assert 'administrator' in english
+    assert 'Workflows' not in english

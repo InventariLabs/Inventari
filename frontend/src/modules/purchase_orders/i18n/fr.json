@@ -187,6 +187,8 @@
       "description": "Aucun flux d'approbation n'existe pour les bons de commande : la confirmation sera refusée. Créez le flux ou désactivez cette exigence.",
       "action": "Créer un flux",
       "moduleDescription": "Le module Approbations est désactivé, un bon de commande n'a donc nulle part où attendre. Activez le module ou désactivez cette exigence.",
+      "descriptionThreshold": "Aucun flux d'approbation n'existe pour les bons de commande : la confirmation au-dessus du seuil sera refusée. Créez le flux ou videz le seuil d'approbation.",
+      "moduleDescriptionThreshold": "Le module Approbations est désactivé, un bon de commande au-dessus du seuil n'a donc nulle part où attendre. Activez le module ou videz le seuil d'approbation.",
       "moduleAction": "Ouvrir les applications"
     }
   },
@@ -278,6 +280,7 @@
     "alertsTitle_other": "{{count}} produits sous le stock minimum",
     "deleteConfirmTitle": "Supprimer la règle ?",
     "maxPositive": "Le maximum doit être supérieur à 0",
+    "maxBelowMin": "Le maximum ({{max}}) ne peut pas être inférieur au minimum ({{min}})",
     "minPositive": "Le minimum doit être supérieur à 0 — c'est le seuil qui déclenche la règle",
     "count_one": "règle",
     "count_other": "règles",

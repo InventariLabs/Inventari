@@ -23,6 +23,7 @@ from app.core.import_sheet import cell_text as _cell_text
 from app.core.import_sheet import explain as _explain
 from app.core.import_sheet import read_rows
 from app.core.import_sheet import row_get as _row_get
+from app.core.location_path import join_location_path
 from app.core.logging import get_logger
 from app.i18n.service import get_unit_label
 from app.models.category import Category
@@ -39,10 +40,10 @@ from ._update import update_item
 
 logger = get_logger(__name__)
 
-#: The app writes a location as "Pantry → Dry Goods → Shelf A"; a keyboard
-#: writes the arrow as "->" or ">". All three read as the same path.
-_PATH_SEPARATORS = ('→', '->', '>')
-_PATH_ARROW = ' → '
+#: The app writes a location as "Pantry › Dry Goods › Shelf A"; a keyboard
+#: writes it as "->" or ">", and a file written before the arrow gave way to
+#: it still says "→". All of them read as the same path.
+_PATH_SEPARATORS = ('\u203a', '→', '->', '>')
 
 #: What a row does when its Label Code names a product the organization
 #: already has. 'add' is what the import always did — the code is ignored and
@@ -155,7 +156,7 @@ class _StorageIndex:
 
     A bare name matches any location carrying it (the first one seen), a
     path matches segment by segment from the root — so "Shelf A" and
-    "Pantry → Dry Goods → Shelf A" both find the shelf, and a path whose
+    "Pantry › Dry Goods › Shelf A" both find the shelf, and a path whose
     tail is missing knows which parent to grow it under.
     """
 
@@ -208,7 +209,7 @@ class _StorageIndex:
             seen.add(current)
             names.append(self._name.get(current, ''))
             current = self._parent.get(current)
-        return _PATH_ARROW.join(reversed(names))
+        return join_location_path(reversed(names))
 
     def fields_of(self, loc_id: UUID) -> dict[str, dict]:
         """The product fields a location asks for: its own and every level's above.

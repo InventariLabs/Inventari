@@ -57,11 +57,11 @@ describe("POActionBar — the phone menu and a withdrawn request", () => {
     const props = renderBar(order());
     await userEvent.click(screen.getByRole("button", { name: "More actions" }));
     await userEvent.click(
-      screen.getByRole("button", { name: "Send to Vendor" }),
+      screen.getByRole("button", { name: "Send to supplier" }),
     );
     expect(props.onAction).toHaveBeenCalledWith("send");
     expect(
-      screen.queryByRole("button", { name: "Send to Vendor" }),
+      screen.queryByRole("button", { name: "Send to supplier" }),
     ).not.toBeInTheDocument();
   });
 

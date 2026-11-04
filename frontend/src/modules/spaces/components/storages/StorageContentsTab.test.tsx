@@ -129,6 +129,22 @@ describe("StorageContentsTab", () => {
     expect(props.onShowProducts).toHaveBeenCalledTimes(1);
   });
 
+  it("offers no button to an empty products tab when the location holds nothing", async () => {
+    serveChildren(0, 0);
+    renderTab({ parent: { id: "rack-1", items_count: 0 } });
+
+    expect(
+      await screen.findByText("Nothing inside this location"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("It holds no products and has no locations inside."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/0 products/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Show products" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("pages through more than fifty children", async () => {
     serveChildren(120);
     renderTab();

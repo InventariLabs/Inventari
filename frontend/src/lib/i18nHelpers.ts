@@ -44,11 +44,15 @@ export function makeTDynamic(
 export function unitLabel(
   t: TranslateFn,
   symbol: string | null | undefined,
+  count?: number,
 ): string {
   const unit = symbol?.trim();
   if (!unit) return "";
-  return t(`common:units.${unit}`, { defaultValue: unit });
+  return t(`common:units.${unit}`, { defaultValue: unit, count });
 }
+
+/** What the analytics API calls the bucket of products without a category. */
+const UNCATEGORIZED_BUCKET = "Uncategorized";
 
 /**
  * A product category as the reader's language names it.
@@ -73,7 +77,12 @@ export function categoryLabel(
   code: string | null | undefined,
   name: string,
 ): string {
-  if (!code) return name;
+  // The statistics and rotation reports name the bucket of products with no
+  // category "Uncategorized" on the wire; it is a bucket, not a record, so
+  // there is no code to look up and the English word would reach every
+  // reader as it came.
+  if (!code)
+    return name === UNCATEGORIZED_BUCKET ? t("common:noCategory") : name;
   return t(`categories:codes.${code}`, { defaultValue: name });
 }
 
@@ -94,7 +103,10 @@ export function formatQuantityLocalized(
   rounding?: string | number | null,
 ): string {
   if (quantity === null || quantity === undefined || quantity === "") return "";
-  const unit = unitLabel(t, symbol);
+  // The count picks a word unit's plural ("6 bottles"); a unit with no plural
+  // forms in the catalogue ("kg") answers its one form for any count.
+  const count = Number(quantity);
+  const unit = unitLabel(t, symbol, Number.isFinite(count) ? count : undefined);
   const amount = formatQuantityValue(quantity, rounding);
   return unit ? `${amount} ${unit}` : amount;
 }

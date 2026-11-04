@@ -1086,7 +1086,7 @@ describe("WmsPickingView", () => {
     await userEvent.click(screen.getByRole("button", { name: "Short pick" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Short Pick" }),
+      await screen.findByRole("heading", { name: "Short pick" }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Final picked quantity")).toBeInTheDocument();
   });
@@ -1148,7 +1148,7 @@ describe("WmsPickingView", () => {
     // Tapping the line used to be the only way to record it, and it opened
     // the shortage window at 0.
     expect(
-      screen.queryByRole("heading", { name: "Short Pick" }),
+      screen.queryByRole("heading", { name: "Short pick" }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByLabelText("Final picked quantity"),
@@ -1157,7 +1157,7 @@ describe("WmsPickingView", () => {
     // The shortfall form is still there, behind its own button.
     await userEvent.click(screen.getByRole("button", { name: "Short pick" }));
     expect(
-      await screen.findByRole("heading", { name: "Short Pick" }),
+      await screen.findByRole("heading", { name: "Short pick" }),
     ).toBeInTheDocument();
   });
 
@@ -1369,7 +1369,7 @@ describe("WmsPickingView", () => {
 
     render(<WmsPickingView documentId={DOCUMENT_ID} onClose={onClose} />);
 
-    expect(await screen.findByText("Picking Complete")).toBeInTheDocument();
+    expect(await screen.findByText("Picking complete")).toBeInTheDocument();
     expect(
       screen.queryByPlaceholderText("Scan barcode or type…"),
     ).not.toBeInTheDocument();
@@ -1391,7 +1391,7 @@ describe("WmsPickingView", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Pick full amount" }),
     );
-    await screen.findByText("Picking Complete");
+    await screen.findByText("Picking complete");
     await userEvent.keyboard("{Escape}");
 
     expect(onClose).toHaveBeenCalledOnce();
@@ -1453,7 +1453,7 @@ describe("WmsPickingView", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Pick full amount" }),
     );
-    await screen.findByText("Picking Complete");
+    await screen.findByText("Picking complete");
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ["documents"] });
   });

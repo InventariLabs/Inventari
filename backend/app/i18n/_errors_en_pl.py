@@ -527,9 +527,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'approvals_read_forbidden': 'You do not have permission to view approval requests',
         'approvals_write_forbidden': 'You do not have permission to raise approval requests',
         'documents_approve_requires_grant': 'You do not have permission to approve or reject documents',
-        'po_approval_workflow_missing': (
-            'Purchase orders require approval, but no approval workflow is configured for them — create one under Approvals → Workflows, or turn the requirement off'
-        ),
+        'po_approval_workflow_missing': 'This purchase order needs an approval, but nobody has been set up to give it yet. Ask your administrator to set it up.',
         'po_supplier_required': 'A purchase order cannot be confirmed without a supplier',
         'document_type_requires_partner': 'This document type requires a partner.',
         'partner_has_no_email': 'The partner has no email address.',
@@ -601,7 +599,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'document_update_status': 'Only DRAFT documents can be updated',
         'document_correction_locked': 'Correction documents are locked — only notes can be changed. Attempted to change: {fields}. Cancel and create a new correction if the data is wrong.',
         'field_cannot_be_cleared': 'These fields cannot be cleared: {fields}.',
-        'ingredient_defaults_unreadable_file': 'Could not read the file: {detail}',
+        'ingredient_defaults_unreadable_file': 'The file could not be read. The import expects a .json or .csv file with one row per ingredient.',
         'onboarding_modules_not_offered': "The profile '{profile}' does not offer these modules: {modules}",
         'location_chain_step_incomplete': 'Each step of a location chain needs an id or a name.',
         'current_password_incorrect': 'Current password is incorrect',
@@ -860,9 +858,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'permanent_delete_disabled': (
             'Permanent deletion is disabled for this organization.'
         ),
-        'documents_approval_workflow_missing': (
-            'Documents require approval, but no approval workflow is configured for them — create one under Approvals → Workflows, or turn the requirement off'
-        ),
+        'documents_approval_workflow_missing': 'This document needs an approval, but nobody has been set up to give it yet. Ask your administrator to set it up.',
         'category_delete_blocked_by_items': (
             'Cannot delete category: it is in use ({count}). Move its products to another category first.'
         ),
@@ -960,6 +956,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'recipe_collection_own_parent': 'A collection cannot be its own parent',
         'recipe_collection_under_descendant': 'A collection cannot be moved under its descendant',
         'recipe_scrape_failed': 'Failed to scrape recipe from URL',
+        'register_date_from_after_date_to': 'The start date must not be after the end date',
         'meal_plan_end_before_start': 'The end date must not be before the start date',
         'meal_plan_too_long': 'Plan cannot exceed {days} days',
         'meal_plan_no_slots': 'Enable at least one meal slot',
@@ -1555,9 +1552,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'approvals_read_forbidden': 'Nie masz uprawnień do przeglądania wniosków o akceptację',
         'approvals_write_forbidden': 'Nie masz uprawnień do składania wniosków o akceptację',
         'documents_approve_requires_grant': 'Nie masz uprawnień do zatwierdzania ani odrzucania dokumentów',
-        'po_approval_workflow_missing': (
-            'Zamówienia zakupu wymagają akceptacji, ale nie ma dla nich żadnego przepływu akceptacji — utwórz go w Akceptacje → Przepływy albo wyłącz ten wymóg'
-        ),
+        'po_approval_workflow_missing': 'To zamówienie wymaga akceptacji, ale nikt nie został jeszcze wyznaczony do jej udzielania. Poproś administratora o ustawienie tego.',
         'po_supplier_required': 'Zamówienia zakupu nie można potwierdzić bez dostawcy',
         'document_type_requires_partner': 'Ten typ dokumentu wymaga kontrahenta.',
         'partner_has_no_email': 'Kontrahent nie ma adresu e-mail.',
@@ -1630,7 +1625,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'document_update_status': 'Można aktualizować tylko dokumenty w wersji roboczej',
         'document_correction_locked': 'Dokumenty korekty są zablokowane — można zmieniać tylko notatki. Próbowano zmienić: {fields}. Jeśli dane są błędne, anuluj korektę i utwórz nową.',
         'field_cannot_be_cleared': 'Tych pól nie można wyczyścić: {fields}.',
-        'ingredient_defaults_unreadable_file': 'Nie udało się odczytać pliku: {detail}',
+        'ingredient_defaults_unreadable_file': 'Nie udało się odczytać pliku. Import przyjmuje plik .json lub .csv z jednym wierszem na składnik.',
         'onboarding_modules_not_offered': 'Profil „{profile}” nie oferuje tych modułów: {modules}',
         'location_chain_step_incomplete': 'Każdy krok łańcucha miejsc wymaga identyfikatora lub nazwy.',
         'current_password_incorrect': 'Obecne hasło jest nieprawidłowe',
@@ -1878,9 +1873,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'permanent_delete_disabled': (
             'Trwałe usuwanie jest wyłączone dla tej organizacji.'
         ),
-        'documents_approval_workflow_missing': (
-            'Dokumenty wymagają akceptacji, ale nie ma dla nich żadnego przepływu akceptacji — utwórz go w Akceptacje → Przepływy albo wyłącz ten wymóg'
-        ),
+        'documents_approval_workflow_missing': 'Ten dokument wymaga akceptacji, ale nikt nie został jeszcze wyznaczony do jej udzielania. Poproś administratora o ustawienie tego.',
         'category_delete_blocked_by_items': (
             'Nie można usunąć kategorii — jest w użyciu ({count}). Przenieś jej produkty do innej kategorii.'
         ),
@@ -1977,6 +1970,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'recipe_collection_own_parent': 'Kolekcja nie może być własną kolekcją nadrzędną',
         'recipe_collection_under_descendant': 'Kolekcji nie można przenieść pod jej własną podkolekcję',
         'recipe_scrape_failed': 'Nie udało się pobrać przepisu z adresu URL',
+        'register_date_from_after_date_to': 'Data początkowa nie może być późniejsza niż data końcowa',
         'meal_plan_end_before_start': 'Data końca nie może być wcześniejsza niż data początku',
         'meal_plan_too_long': 'Plan nie może trwać dłużej niż {days} dni',
         'meal_plan_no_slots': 'Włącz co najmniej jeden posiłek w planie',

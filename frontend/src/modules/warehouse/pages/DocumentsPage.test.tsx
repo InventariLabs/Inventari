@@ -388,7 +388,7 @@ describe("DocumentsPage", () => {
     await act(async () => {
       await user.selectOptions(
         // desktop + mobile panels share one state — pick the first instance
-        screen.getAllByLabelText("Discrepancy Code")[0],
+        screen.getAllByLabelText("Discrepancy code")[0],
         "SHORTAGE",
       );
     });

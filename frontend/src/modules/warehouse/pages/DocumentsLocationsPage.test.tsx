@@ -103,6 +103,9 @@ const occupancy = {
       capacity_used: null,
       capacity_max: null,
       capped_products: 0,
+      // Four records of three products: the cell counts the products, the
+      // word the occupancy map uses for the same shelf.
+      products: 3,
       fill: null,
       status: "no_limit",
       unmeasured: true,
@@ -323,12 +326,12 @@ describe("DocumentsLocationsPage — the shelves of one warehouse", () => {
       "50",
     );
 
-    // A shelf nobody capped has no fill: the line counts records instead of
+    // A shelf nobody capped has no fill: the line counts products instead of
     // drawing a percentage that would mean zero units.
     const rowB = screen.getByText("Shelf B").closest("tr")!;
     expect(within(rowB).getByText("Different products")).toBeInTheDocument();
     expect(within(rowB).getByText("No limit")).toBeInTheDocument();
-    expect(within(rowB).getByText("No limit · 4 records")).toBeInTheDocument();
+    expect(within(rowB).getByText("No limit · 3 products")).toBeInTheDocument();
   });
 
   it("reads a page of the warehouse at a time, never the whole tree", async () => {

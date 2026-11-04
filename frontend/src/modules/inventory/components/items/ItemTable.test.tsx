@@ -599,17 +599,17 @@ describe("ItemTable — the storage cell is one click target", () => {
     );
 
     const link = screen.getByRole("link", {
-      name: "Pantry Building → Dry Goods → Shelf A - Bottom",
+      name: "Pantry Building › Dry Goods › Shelf A - Bottom",
     });
     const leaf = screen.getByText("Shelf A - Bottom");
     expect(link).toContainElement(leaf);
     expect(leaf.className).not.toContain("truncate");
     expect(
       leaf.compareDocumentPosition(
-        screen.getByText("Pantry Building → Dry Goods"),
+        screen.getByText("Pantry Building › Dry Goods"),
       ) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    expect(screen.getByText("Pantry Building → Dry Goods").className).toContain(
+    expect(screen.getByText("Pantry Building › Dry Goods").className).toContain(
       "truncate",
     );
   });
@@ -637,18 +637,17 @@ describe("ItemTable — the storage cell is one click target", () => {
     renderWithStorage();
 
     expect(
-      screen.getByRole("link", { name: "Main Warehouse → Bay 3" }),
+      screen.getByRole("link", { name: "Main Warehouse › Bay 3" }),
     ).toBeInTheDocument();
   });
 
   /**
-   * A used-up record is filed under the virtual Consumed place. The row's
-   * Location column must say that name — not "Unknown" — which the naming
-   * list reaching virtual locations made true; this pins it for the used-up
-   * view the row appears in.
+   * A used-up record is filed under the virtual Consumed place. That name says
+   * nothing to the reader, and a unit added there is refused by the server, so
+   * the row says what happened and offers no "+".
    */
-  describe("ItemTable — the used-up row names the virtual place", () => {
-    it("shows Consumed (Virtual), never Unknown, for a record filed there", () => {
+  describe("ItemTable — the used-up row", () => {
+    const renderUsedUp = () =>
       render(
         <ItemTable
           {...baseProps}
@@ -667,10 +666,20 @@ describe("ItemTable — the storage cell is one click target", () => {
         />,
       );
 
-      expect(
-        screen.getByRole("link", { name: "Consumed (Virtual)" }),
-      ).toBeInTheDocument();
+    it("says used up, not the system place's name, nor Unknown", () => {
+      renderUsedUp();
+
+      expect(screen.getByText("Consumed")).toBeInTheDocument();
+      expect(screen.queryByText("Consumed (Virtual)")).not.toBeInTheDocument();
       expect(screen.queryByText("Unknown")).not.toBeInTheDocument();
+    });
+
+    it("does not offer a unit the server would refuse", () => {
+      renderUsedUp();
+
+      expect(
+        screen.queryByRole("button", { name: "Add 1 unit" }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -678,7 +687,7 @@ describe("ItemTable — the storage cell is one click target", () => {
     renderWithStorage();
 
     const link = screen.getByRole("link", { name: /Main Warehouse/ });
-    expect(link).toHaveAttribute("title", "Main Warehouse → Bay 3");
+    expect(link).toHaveAttribute("title", "Main Warehouse › Bay 3");
   });
 });
 

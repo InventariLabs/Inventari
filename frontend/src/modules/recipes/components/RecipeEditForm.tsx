@@ -33,7 +33,7 @@ export default function RecipeEditForm({
 
   useEffect(() => {
     if (!detail.isError) return;
-    toast.error(extractApiError(detail.error, t("common:errors.generic")));
+    toast.error(extractApiError(detail.error, t("errors.load_failed")));
     onCancel();
   }, [detail.isError, detail.error, onCancel, t]);
 

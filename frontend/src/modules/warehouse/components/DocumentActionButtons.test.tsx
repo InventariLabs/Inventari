@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mayBePlanned } from "@/modules/warehouse/types";
 import { DocumentActionButtons } from "./DocumentActionButtons";
 import { tFor } from "@/test/mocks/i18n";
 
@@ -86,10 +87,10 @@ describe("DocumentActionButtons permission gating", () => {
     grant("warehouse:read", "warehouse:write");
     render(<DocumentActionButtons {...baseProps} docType="CORRECTION" />);
     expect(screen.queryByText("Delete")).not.toBeInTheDocument();
-    expect(screen.getByText("Apply Correction")).toBeInTheDocument();
+    expect(screen.getByText("Apply correction")).toBeInTheDocument();
   });
 
-  it("keeps Apply Correction on a CONFIRMED correction for retry", () => {
+  it("keeps Apply correction on a CONFIRMED correction for retry", () => {
     render(
       <DocumentActionButtons
         {...baseProps}
@@ -99,7 +100,7 @@ describe("DocumentActionButtons permission gating", () => {
         docType="CORRECTION"
       />,
     );
-    expect(screen.getByText("Apply Correction")).toBeInTheDocument();
+    expect(screen.getByText("Apply correction")).toBeInTheDocument();
   });
 
   it("offers Cancel on a stuck CONFIRMED correction to a manager of documents", async () => {
@@ -130,7 +131,7 @@ describe("DocumentActionButtons permission gating", () => {
         docType="CORRECTION"
       />,
     );
-    expect(screen.getByText("Apply Correction")).toBeInTheDocument();
+    expect(screen.getByText("Apply correction")).toBeInTheDocument();
     expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
   });
 });
@@ -417,7 +418,7 @@ describe("DocumentActionButtons naming", () => {
           docType={docType}
         />,
       );
-      expect(screen.getByText("Create Return")).toBeInTheDocument();
+      expect(screen.getByText("Create return")).toBeInTheDocument();
     },
   );
 
@@ -432,9 +433,23 @@ describe("DocumentActionButtons naming", () => {
           docType={docType}
         />,
       );
-      expect(screen.queryByText("Create Return")).not.toBeInTheDocument();
+      expect(screen.queryByText("Create return")).not.toBeInTheDocument();
     },
   );
+
+  it("offers no return on a document Undo has put back in full", () => {
+    // The server would refuse it: nothing is left of any line to send back.
+    render(
+      <DocumentActionButtons
+        {...baseProps}
+        isDraft={false}
+        docStatus="COMPLETED"
+        docType="OUT"
+        isReversed
+      />,
+    );
+    expect(screen.queryByText("Create return")).not.toBeInTheDocument();
+  });
 
   it("marks the scanner path as scanning, in outline", () => {
     // ...and the WMS session takes a Scan prefix, so the two names carry
@@ -551,7 +566,7 @@ describe("DocumentActionButtons without an approval workflow", () => {
     expect(button).toBeDisabled();
     expect(button.parentElement).toHaveAttribute(
       "title",
-      expect.stringContaining("no approval workflow is active"),
+      expect.stringContaining("Ask your administrator"),
     );
   });
 });
@@ -638,5 +653,23 @@ describe("DocumentActionButtons undo", () => {
     expect(
       screen.queryByRole("button", { name: "Undo receipt" }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("mayBePlanned", () => {
+  const today = "2026-11-03";
+
+  it("lets today's issue be planned, so that it can be picked", () => {
+    expect(mayBePlanned("OUT", today, today)).toBe(true);
+    expect(mayBePlanned("OUT", null, today)).toBe(true);
+  });
+
+  it("keeps a future date plannable on any type", () => {
+    expect(mayBePlanned("IN", "2026-11-04", today)).toBe(true);
+  });
+
+  it("does not offer a plan for a receipt or a move dated today", () => {
+    expect(mayBePlanned("IN", today, today)).toBe(false);
+    expect(mayBePlanned("INT", today, today)).toBe(false);
   });
 });

@@ -1,4 +1,4 @@
-import { categoryLabel } from "@/lib/i18nHelpers";
+import { categoryLabel, unitLabel } from "@/lib/i18nHelpers";
 import {
   formatDate,
   formatDateTime,
@@ -183,6 +183,12 @@ function referenceNameOf(
     const label = resolver(t, code, "");
     if (label) return label;
   }
+  // A unit is recorded by its symbol (`pcs`), which the app's own screens
+  // print as the interface language writes it (`szt.`); the journal does too.
+  // A symbol nobody translated (a unit the organization made) stays as it is.
+  if (t && recorded && (base === "uom" || base.endsWith("_uom"))) {
+    return unitLabel(t, recorded);
+  }
   return recorded;
 }
 
@@ -337,6 +343,11 @@ const VALUE_RESOLVERS: Record<
   focus_module: (t, code) => auditModuleName(t, code, ""),
   equipment_status: (t, code) =>
     t(`equipment:status.${code.toLowerCase()}`, { defaultValue: "" }),
+  // The condition an asset came back in: the words the return dialog offers.
+  condition: (t, code) =>
+    t(`equipment:assignments.condition_${code.toLowerCase()}`, {
+      defaultValue: "",
+    }),
   role: (t, code) =>
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",

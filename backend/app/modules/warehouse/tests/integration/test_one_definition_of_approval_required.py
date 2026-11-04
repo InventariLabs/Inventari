@@ -713,7 +713,7 @@ class TestAProfileThatSpeaksIsTheFilter:
             f'/api/v1/warehouse/documents/{doc_id}/confirm', headers=doc_auth_headers
         )
         assert confirm.status_code == status.HTTP_400_BAD_REQUEST, confirm.text
-        assert 'workflow' in confirm.json()['detail']['message'].lower()
+        assert 'administrator' in confirm.json()['detail']['message'].lower()
 
 
 @pytest.mark.integration

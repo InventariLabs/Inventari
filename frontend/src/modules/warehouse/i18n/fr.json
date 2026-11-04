@@ -208,7 +208,7 @@
     "executeScrap": "Mettre au rebut",
     "approvalPendingHint": "En attente d'approbation — l'exécution est bloquée jusqu'à la décision.",
     "approvalRequiredHint": "Une approbation est requise et aucune demande n'est ouverte — demandez d'abord l'approbation.",
-    "approvalNoWorkflowHint": "Une approbation est requise mais aucun workflow d'approbation n'est actif — configurez-en un dans les paramètres d'approbation, puis demandez l'approbation.",
+    "approvalNoWorkflowHint": "Ce document doit être approuvé, mais personne n’est encore désigné pour le faire. Demandez à votre administrateur de le configurer.",
     "postNowReceive": "Réceptionner le stock",
     "postNowIssue": "Sortir le stock",
     "postNowMove": "Déplacer le stock",
@@ -241,7 +241,7 @@
     "deleteMessage": "Supprimer ce brouillon ? Cette action est irréversible.",
     "confirmMessageApproval": "La confirmation enverra ce document dans la file d'approbation. Continuer ?",
     "confirmMessageConditional": "Ceci marquera le document comme prêt pour l'exécution entrepôt — sauf si le seuil d'approbation de votre organisation l'envoie d'abord dans la file d'approbation. Continuer ?",
-    "confirmMessageNoWorkflow": "Ce document nécessite une approbation, mais aucun circuit d'approbation n'existe pour les documents : sa confirmation serait refusée. Créez d'abord le circuit.",
+    "confirmMessageNoWorkflow": "Ce document doit être approuvé, mais personne n’est encore désigné pour le faire : sa confirmation sera donc refusée. Demandez à votre administrateur de le configurer.",
     "requestApprovalMessage": "La demande le renvoie en attente d'approbation, où il reste jusqu'à ce que quelqu'un l'approuve.",
     "confirmMessageDeadEndNamed": "Ce document nécessite une approbation, mais personne ne pourrait la trancher : l'étape « {{stage}} » nomme des approbateurs qui n'ont pas accès aux approbations. La confirmation l'y envoie quand même, et il attend que la demande soit retirée ou que ces personnes reçoivent l'accès. Continuer ?",
     "confirmMessageDeadEndNoApprover": "Ce document nécessite une approbation, mais personne ne pourrait la trancher : l'étape « {{stage}} » est ouverte à quiconque détient le droit d'approuver, et personne dans cette organisation ne l'a. La confirmation l'y envoie quand même, et il attend que la demande soit retirée ou que quelqu'un reçoive ce droit. Continuer ?",
@@ -616,6 +616,7 @@
     "plannedReceiving": "→ {{location}} · zone de réception, rangement plus tard"
   },
   "value": {
+    "unpricedLines": "Les lignes sans prix n’entrent pas dans ces totaux, et ce stock n’a pas de coût enregistré.",
     "totalsTitle": "Totaux du document",
     "totalNet": "Total net",
     "totalTax": "Total taxes",
@@ -1117,8 +1118,8 @@
         "setUp": "Régler l’emplacement"
       },
       "occupancy": {
-        "noLimit_one": "Aucune limite · {{count}} enregistrement",
-        "noLimit_other": "Aucune limite · {{count}} enregistrements",
+        "noLimit_one": "Aucune limite · {{count}} produit",
+        "noLimit_other": "Aucune limite · {{count}} produits",
         "sharesSum_one": "{{fill}}% — la part de {{count}} produit limité",
         "sharesSum_other": "{{fill}}% — les parts de {{count}} produits limités additionnées",
         "unmeasured": "Un produit ici n'a pas de limite et n'est pas compté",

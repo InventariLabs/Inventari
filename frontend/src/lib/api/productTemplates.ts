@@ -1,5 +1,6 @@
 import { api } from "./client";
 import type { components } from "@/types/api-generated";
+import { SEARCH_MAX_LENGTH } from "@/lib/productSearch";
 
 export interface ProductTemplateNutritionInfo {
   calories_kcal?: number | null;
@@ -15,9 +16,6 @@ export interface ProductTemplateNutritionInfo {
  *  hand-written copy dropped the weight-uom/volume fields and `min_quantity`
  *  the endpoint already sends. */
 export type ProductTemplate = components["schemas"]["ProductTemplate"];
-
-/** Longest search text the endpoint takes; a product name may be longer. */
-const SEARCH_MAX_LENGTH = 100;
 
 /** A name longer than the endpoint's limit is searched by its opening —
  *  sending all of it would be refused outright. Cut by code points, the unit

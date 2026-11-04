@@ -1,5 +1,6 @@
 import { afterEach, describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import TagManager from "./TagManager";
 import type { RecipeTagItem } from "@/modules/recipes/types/nutrition";
@@ -117,6 +118,33 @@ describe("TagManager colour", () => {
       expect(toast.error).toHaveBeenCalledWith(
         "The action could not be completed.",
       ),
+    );
+  });
+});
+
+describe("TagManager rename", () => {
+  beforeEach(() => {
+    vi.mocked(toast.error).mockClear();
+    tags = [tag("dinner")];
+  });
+
+  it("calls a failed rename a rename, not a merge", async () => {
+    // A rename travels as a merge into a new name, but the reader asked to
+    // rename — the failure must not talk about merging tags.
+    mergeMutate.mockRejectedValueOnce(new Error("Request failed"));
+    const user = userEvent.setup();
+    render(<TagManager />);
+
+    await user.click(screen.getByRole("button", { name: /more actions/i }));
+    await user.click(await screen.findByRole("button", { name: "Rename" }));
+    await user.clear(await screen.findByLabelText("New name"));
+    await user.type(screen.getByLabelText("New name"), "supper");
+    await user.click(
+      screen.getAllByRole("button", { name: "Rename" }).slice(-1)[0],
+    );
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Failed to rename the tag"),
     );
   });
 });

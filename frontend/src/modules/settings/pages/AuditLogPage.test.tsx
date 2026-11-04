@@ -666,6 +666,62 @@ describe("AuditLogPage", () => {
     },
   );
 
+  it("tells a profile's own settings from the person's edit of a setting", async () => {
+    server.use(
+      http.get("/api/v1/modules/equipment/settings", () =>
+        HttpResponse.json({
+          settings: {},
+          settings_schema: { properties: {} },
+        }),
+      ),
+    );
+    // Choosing a workspace mode writes the profile's warning windows under
+    // the person who chose it; the row used to read as their own "Update".
+    server.use(
+      http.get("/api/v1/audit-log", () =>
+        HttpResponse.json({
+          ...EMPTY_PAGE,
+          total: 2,
+          items: [
+            {
+              id: "m2",
+              organization_id: "o1",
+              user_id: "u1",
+              user_email: "admin@example.com",
+              action: "UPDATE",
+              target_type: "module",
+              target_id: "7d6f4bf7-1111-2222-3333-444455556666",
+              snapshot: { name: "equipment", subject: "profile:equipment_wms" },
+              reason: null,
+              meta_data: null,
+              created_at: "2026-08-20T10:05:00Z",
+            },
+            {
+              id: "m1",
+              organization_id: "o1",
+              user_id: "u1",
+              user_email: "admin@example.com",
+              action: "UPDATE",
+              target_type: "module",
+              target_id: "7d6f4bf7-1111-2222-3333-444455556666",
+              snapshot: { name: "equipment" },
+              reason: null,
+              meta_data: null,
+              created_at: "2026-08-20T10:00:00Z",
+            },
+          ],
+        }),
+      ),
+    );
+
+    renderPage();
+
+    expect(
+      await screen.findByText("Workspace mode default"),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Update")).toHaveLength(1);
+  });
+
   it("lists a key's permissions by the labels the key dialog shows", async () => {
     server.use(
       http.get("/api/v1/audit-log", () =>

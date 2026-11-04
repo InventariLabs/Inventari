@@ -72,7 +72,7 @@ const summaries = [
     direct_children_count: 1,
     total_subtree_items_count: 5,
     is_leaf: false,
-    full_path: "Pantry Building → Dry Goods",
+    full_path: "Pantry Building › Dry Goods",
   },
   {
     id: "leaf",
@@ -86,7 +86,7 @@ const summaries = [
     direct_children_count: 0,
     total_subtree_items_count: 4,
     is_leaf: true,
-    full_path: "Pantry Building → Dry Goods → Shelf A",
+    full_path: "Pantry Building › Dry Goods › Shelf A",
   },
   {
     id: "freezer",
@@ -566,7 +566,7 @@ describe("StoragesPage — one screen", () => {
       id: "leaf-b",
       name: "Shelf B",
       short_code: "SB",
-      full_path: "Pantry Building → Dry Goods → Shelf B",
+      full_path: "Pantry Building › Dry Goods › Shelf B",
     };
     const floor = (shelves: Array<{ id: string; parent_id: string }>) => [
       ...summaries.filter((entry) => entry.id !== "leaf"),
@@ -816,7 +816,7 @@ describe("StoragesPage — one screen", () => {
 
     const results = await screen.findByRole("list", { name: "Locations" });
     const hit = within(results).getByRole("button", { name: /Shelf A/ });
-    expect(hit).toHaveTextContent("Pantry Building → Dry Goods → Shelf A");
+    expect(hit).toHaveTextContent("Pantry Building › Dry Goods › Shelf A");
     expect(
       within(results).queryByRole("button", { name: /Freezer/ }),
     ).toBeNull();
@@ -1011,6 +1011,51 @@ describe("StoragesPage — one screen", () => {
 
     expect(await screen.findByText("Choose a location")).toBeInTheDocument();
     expect(screen.queryByText("Location not found")).not.toBeInTheDocument();
+  });
+
+  it("gives an address that is not an identifier the same page as an unknown location", async () => {
+    // The server refuses a cut link with a validation error, not a 404; a
+    // retry could only be refused again, so it is "not found", not a failure.
+    server.use(
+      http.get("/api/v1/locations", ({ request }) =>
+        new URL(request.url).searchParams.getAll("ids").includes("zone-12")
+          ? HttpResponse.json(
+              {
+                detail: [
+                  {
+                    type: "uuid_parsing",
+                    loc: ["query", "ids", 0],
+                    msg: "Input should be a valid UUID",
+                  },
+                ],
+              },
+              { status: 422 },
+            )
+          : undefined,
+      ),
+    );
+    renderPage("/inventory/locations/zone/zone-12");
+
+    expect(await screen.findByText("Location not found")).toBeInTheDocument();
+    expect(screen.queryByText(/try again/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Back to list" }),
+    ).toBeInTheDocument();
+  });
+
+  it("reaches the archived locations from the phone's first level too, not only from the tree beside it", async () => {
+    renderPage("/inventory/locations");
+
+    await screen.findByRole("button", { name: /^Freezer/ });
+    // One link in the tree's aside (desktop), one under the phone's list of
+    // roots; the aside is not drawn on a phone.
+    const links = screen.getAllByRole("link", { name: "Archived locations" });
+    expect(links).toHaveLength(2);
+    expect(
+      links.every(
+        (l) => l.getAttribute("href") === "/inventory/locations/archived",
+      ),
+    ).toBe(true);
   });
 
   it("opens a root from the phone's first level, which lists the roots themselves", async () => {

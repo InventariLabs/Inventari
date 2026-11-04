@@ -192,4 +192,24 @@ def test_narrowing_fragment_is_the_weakest_necessary_condition() -> None:
         fragment = narrowing_fragment(entry['name'])
         for name in entry['expected']:
             assert fragment is not None
-            assert fragment in anyascii(name).lower()
+            assert anyascii(fragment).lower() in anyascii(name).lower()
+
+
+@pytest.mark.parametrize(
+    ('name', 'fragment'),
+    [
+        ('Ryż', 'ryż'),
+        ('Weißbrot', 'weiß'),
+        ('Œufs', 'œuf'),
+        ('Молоко', 'моло'),
+        ('Phở gạo', 'phở'),
+        ('2 szt. Masło', 'masł'),
+        ('Maslo', 'masl'),
+    ],
+)
+def test_narrowing_fragment_keeps_the_spelling_it_was_typed_in(
+    name: str, fragment: str
+) -> None:
+    """A database that cannot fold compares the stored name with what was
+    typed; folded to ASCII ("weis", "molo") it never met "Weißbrot"."""
+    assert narrowing_fragment(name) == fragment

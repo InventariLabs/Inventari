@@ -148,7 +148,7 @@ describe("PurchaseOrdersPage", () => {
     });
     await user.click(screen.getByRole("button", { name: /create order/i }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText("New Purchase Order")).toBeInTheDocument();
+    expect(screen.getByText("New purchase order")).toBeInTheDocument();
   });
 
   it("filters the list with search and status tabs", async () => {
@@ -330,7 +330,7 @@ describe("PurchaseOrdersPage — a read-only account", () => {
     );
   });
 
-  it("offers no Create Order in the empty state", async () => {
+  it("offers no Create order in the empty state", async () => {
     server.use(
       http.get("/api/v1/purchase-orders", () =>
         HttpResponse.json({ items: [], total: 0 }),

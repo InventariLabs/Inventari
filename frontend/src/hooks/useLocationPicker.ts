@@ -10,12 +10,11 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
 import type { StorageLocationSummary } from "@/types";
+import { LOCATION_PATH_SEPARATOR } from "@/utils/helpers";
 
 /** Rows one lookup returns — enough to read, the search narrows the rest. */
 const PICKER_PAGE_SIZE = 30;
 const SEARCH_DEBOUNCE_MS = 300;
-const PATH_SEPARATOR = " → ";
-const PARENT_SEPARATOR = " › ";
 
 export interface LocationOption {
   id: string;
@@ -35,12 +34,12 @@ export function locationOption(
   location: Pick<StorageLocationSummary, "id" | "name" | "full_path"> &
     Partial<Pick<StorageLocationSummary, "location_type" | "context_tag">>,
 ): LocationOption {
-  const parts = (location.full_path ?? "").split(PATH_SEPARATOR);
+  const parts = (location.full_path ?? "").split(LOCATION_PATH_SEPARATOR);
   const above = parts.length > 1 ? parts.slice(0, -1) : [];
   return {
     id: location.id,
     name: location.name,
-    path: above.length > 0 ? above.join(PARENT_SEPARATOR) : undefined,
+    path: above.length > 0 ? above.join(LOCATION_PATH_SEPARATOR) : undefined,
     icon: location.location_type?.icon || undefined,
     contextTag: location.context_tag,
   };

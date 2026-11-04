@@ -31,7 +31,10 @@ describe("ingredient linking hooks", () => {
     const log = recordRequests(() => onePage([{ id: "g1", name: "flour" }]));
     const { result } = renderHook(() => useUnlinkedIngredients(), { wrapper });
     await waitFor(() =>
-      expect(result.current.data).toEqual([{ id: "g1", name: "flour" }]),
+      expect(result.current.data).toEqual({
+        items: [{ id: "g1", name: "flour" }],
+        hasIngredients: true,
+      }),
     );
     expect(log[0].path).toBe("/recipes/ingredients/unlinked");
   });

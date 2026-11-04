@@ -115,6 +115,7 @@
     "nameChanged": "Nombre cambiado",
     "nameChangeError": "Error al cambiar el nombre"
   },
+  "loadError": "No se pudieron cargar las listas de compras",
   "permissions": {
     "read": "Ver listas de compra",
     "readDesc": "Puede consultar las listas de compra y sus sugerencias",

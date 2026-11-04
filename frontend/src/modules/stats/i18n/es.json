@@ -2,6 +2,8 @@
   "title": "Estadísticas",
   "subtitle": "Resumen de sus suministros",
   "records": "Registros",
+  "recordCount_one": "{{count}} registro",
+  "recordCount_other": "{{count}} registros",
   "places": "Lugares, todos los niveles",
   "expiringSoon": "Por caducar",
   "expired": "Caducado",

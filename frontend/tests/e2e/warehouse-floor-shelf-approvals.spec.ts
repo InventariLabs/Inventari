@@ -439,7 +439,7 @@ test.describe("Floor shelf card — picking", () => {
     await expect(sheet.getByText("Scan the location label")).toHaveCount(0);
 
     await scan(page, product.barcode);
-    await expect(page.locator("body")).toContainText("Picking Complete");
+    await expect(page.locator("body")).toContainText("Picking complete");
     await expect(sheet.getByText("1 of 1 lines picked")).toBeVisible();
     await expect(sheet.getByText("1 picked", { exact: true })).toBeVisible();
     await expect(
@@ -515,7 +515,7 @@ test.describe("Floor shelf card — picking", () => {
     // Two different shelves, each asked for in its turn.
     expect(visited.sort()).toEqual([first.code, second.code].sort());
 
-    await expect(sheet.getByText("Picking Complete")).toBeVisible();
+    await expect(sheet.getByText("Picking complete")).toBeVisible();
     await expect(sheet.getByText("2 of 2 lines picked")).toBeVisible();
     await sheet.getByRole("button", { name: "Complete and book" }).click();
     await expect.poll(() => lineStates(docId)).toEqual(["DONE", "DONE"]);

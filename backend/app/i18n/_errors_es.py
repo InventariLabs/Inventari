@@ -576,9 +576,7 @@ ERRORS_ES: ErrorMessages = {
     'approvals_read_forbidden': 'No tienes permiso para ver las solicitudes de aprobación',
     'approvals_write_forbidden': 'No tienes permiso para crear solicitudes de aprobación',
     'documents_approve_requires_grant': 'No tienes permiso para aprobar o rechazar documentos',
-    'po_approval_workflow_missing': (
-        'Las órdenes de compra requieren aprobación, pero no hay ningún flujo de aprobación configurado para ellas — cree uno en Aprobaciones → Flujos o desactive el requisito'
-    ),
+    'po_approval_workflow_missing': 'Este pedido necesita aprobación, pero todavía no hay nadie designado para darla. Pida a su administrador que lo configure.',
     'po_supplier_required': 'Una orden de compra no puede confirmarse sin proveedor',
     'document_type_requires_partner': 'Este tipo de documento requiere un socio.',
     'partner_has_no_email': 'El socio no tiene dirección de correo electrónico.',
@@ -650,7 +648,7 @@ ERRORS_ES: ErrorMessages = {
     'document_update_status': 'Solo se pueden actualizar los documentos en estado borrador',
     'document_correction_locked': 'Los documentos de corrección están bloqueados: solo se pueden modificar las notas. Intento de cambio: {fields}. Cancele la corrección y cree una nueva si los datos son incorrectos.',
     'field_cannot_be_cleared': 'Estos campos no se pueden vaciar: {fields}.',
-    'ingredient_defaults_unreadable_file': 'No se pudo leer el archivo: {detail}',
+    'ingredient_defaults_unreadable_file': 'No se pudo leer el archivo. La importación espera un archivo .json o .csv con una fila por ingrediente.',
     'onboarding_modules_not_offered': 'El perfil «{profile}» no ofrece estos módulos: {modules}',
     'location_chain_step_incomplete': 'Cada paso de una cadena de ubicaciones necesita un id o un nombre.',
     'current_password_incorrect': 'La contraseña actual es incorrecta',
@@ -847,9 +845,7 @@ ERRORS_ES: ErrorMessages = {
     'permanent_delete_disabled': (
         'La eliminación permanente está desactivada para esta organización.'
     ),
-    'documents_approval_workflow_missing': (
-        'Los documentos requieren aprobación, pero no hay ningún flujo de aprobación configurado para ellos — cree uno en Aprobaciones → Flujos o desactive el requisito'
-    ),
+    'documents_approval_workflow_missing': 'Este documento necesita aprobación, pero todavía no hay nadie designado para darla. Pida a su administrador que lo configure.',
     'category_delete_blocked_by_items': (
         'No se puede eliminar la categoría — está en uso ({count}). Mueva primero sus productos a otra categoría.'
     ),
@@ -942,6 +938,7 @@ ERRORS_ES: ErrorMessages = {
     'recipe_collection_own_parent': 'Una colección no puede ser su propia colección superior',
     'recipe_collection_under_descendant': 'Una colección no se puede mover bajo una de sus subcolecciones',
     'recipe_scrape_failed': 'No se pudo obtener la receta de la URL',
+    'register_date_from_after_date_to': 'La fecha de inicio no puede ser posterior a la de fin',
     'meal_plan_end_before_start': 'La fecha de fin no puede ser anterior a la de inicio',
     'meal_plan_too_long': 'Un plan no puede superar los {days} días',
     'meal_plan_no_slots': 'Activa al menos una comida en el plan',

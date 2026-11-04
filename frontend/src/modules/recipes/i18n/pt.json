@@ -691,7 +691,7 @@
     "select_plan": "Selecione o planejamento",
     "select_day": "Selecione o dia",
     "select_slot": "Selecione a refeição",
-    "no_plans_add_to_plan": "Crie primeiro um planejamento de refeições — depois a receita poderá ser adicionada a partir dele.",
+    "no_plans_add_to_plan": "Crie primeiro um planejamento de refeições — a receita será adicionada logo à primeira refeição do primeiro dia.",
     "more_actions": "Mais ações",
     "expiry_urgent": "Ingredientes perto de vencer",
     "delete_plan": "Excluir planejamento",

@@ -21,6 +21,12 @@ import { LocationTargetPicker } from "./LocationTargetPicker";
 interface Props {
   open: boolean;
   storageId: string;
+  /**
+   * How many locations stand directly inside. They are not archived with
+   * their parent — they stay in the lists, at the top level — and the confirm
+   * says so before the reader finds them there.
+   */
+  subLocations?: number;
   onOpenChange: (open: boolean) => void;
   onArchived: () => void;
 }
@@ -28,6 +34,7 @@ interface Props {
 export function StorageArchiveDialog({
   open,
   storageId,
+  subLocations = 0,
   onOpenChange,
   onArchived,
 }: Props) {
@@ -167,6 +174,9 @@ export function StorageArchiveDialog({
               ? t("locations:edit.archiveConfirmItems")
               : t("locations:edit.archiveConfirmEmpty")
         } ${t("locations:edit.archiveReversible")}`,
+        subLocations > 0
+          ? t("locations:edit.archiveSubLocations", { count: subLocations })
+          : null,
         putawayRulesCount
           ? t("locations:edit.archivePutawayRules", {
               count: putawayRulesCount,

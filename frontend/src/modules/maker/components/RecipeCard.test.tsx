@@ -182,6 +182,16 @@ describe("RecipeCard stock figure", () => {
   });
 });
 
+describe("RecipeCard stock label", () => {
+  it("says the figure is the stock of the output product, not of the BOM", () => {
+    // A BOM with no ingredients can still sit next to a product that has
+    // units on the shelf; a bare "Stock: 1" read as a claim about the BOM.
+    renderCard({ ...baseRecipe, ingredient_count: 0, stock_qty: "1" });
+
+    expect(screen.getByText(/Output in stock:/)).toBeInTheDocument();
+  });
+});
+
 describe("RecipeCard thumbnail", () => {
   it("shows the output product's picture when the product has one", () => {
     renderCard({

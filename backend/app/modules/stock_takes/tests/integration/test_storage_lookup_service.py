@@ -169,7 +169,7 @@ class TestGetStorageTree:
 
         assert set(snapshot_ids) == {zone.id, rack.id, shelf.id, sibling.id}
         assert set(family_ids) == {site.id, zone.id, rack.id, shelf.id, sibling.id}
-        assert paths[zone.id] == 'Warehouse A / Zone A'
-        assert paths[rack.id] == 'Warehouse A / Zone A / Rack 1'
-        assert paths[shelf.id] == 'Warehouse A / Zone A / Rack 1 / Shelf 1'
-        assert paths[sibling.id] == 'Warehouse A / Zone A / Rack 1 / Shelf 2'
+        assert paths[zone.id] == 'Warehouse A › Zone A'
+        assert paths[rack.id] == 'Warehouse A › Zone A › Rack 1'
+        assert paths[shelf.id] == 'Warehouse A › Zone A › Rack 1 › Shelf 1'
+        assert paths[sibling.id] == 'Warehouse A › Zone A › Rack 1 › Shelf 2'

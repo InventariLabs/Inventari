@@ -86,7 +86,7 @@ interface DraftActionsProps {
 /**
  * What a draft offers. The one-step verb is the primary action; the old
  * confirm step survives as "Plan" in the row's menu for a future-dated
- * document, where a plan is the point.
+ * document, where a plan is the point, and for an issue to be picked first.
  */
 function DraftActions({
   isCorrection,
@@ -205,6 +205,15 @@ function offersUndo(
   );
 }
 
+/** Whether the row offers a return: a document the server takes one of, and
+ * not one Undo has already put back in full, which has nothing left to send. */
+function offersReturn(
+  docType: string,
+  isReversed: boolean | undefined,
+): boolean {
+  return RETURNABLE_TYPES.has(docType) && !isReversed;
+}
+
 /** Cancelling is what releases a confirmed document's hold, so it stays
  * offered on a confirmed or parked document to whoever manages documents. */
 function cancelOffersItself(
@@ -227,7 +236,7 @@ interface DocumentActionButtonsProps {
   canStartPicking: boolean;
   canStartReceiving: boolean;
   isDuplicatePending?: boolean;
-  /** A future-dated draft may still be planned instead of posted now. */
+  /** The draft may be planned instead of posted now: see `mayBePlanned`. */
   isPlanned?: boolean;
   /** The profile requires an approval for this document: the one-step
    * action sends it there instead of posting it. */
@@ -243,6 +252,9 @@ interface DocumentActionButtonsProps {
   /** A posted receipt, issue or move whose stock is still there to take
    * back: the page offers Undo beside Return. */
   canUndo?: boolean;
+  /** Undo has already put everything back: a return would have nothing left
+   * to send, so none is offered. */
+  isReversed?: boolean;
   isUndoPending?: boolean;
   onApplyCorrection: () => void;
   onEdit: () => void;
@@ -278,6 +290,7 @@ export function DocumentActionButtons({
   approvalRequiredNoRequest,
   approvalWorkflowMissing,
   canUndo,
+  isReversed,
   isUndoPending,
   onApplyCorrection,
   onEdit,
@@ -307,7 +320,7 @@ export function DocumentActionButtons({
   const hintKey = executionHintKey(gate);
   const executionHint = hintKey ? t(hintKey) : undefined;
   const executeLabelKey = executeLabelKeyFor(docType);
-  const canReturn = RETURNABLE_TYPES.has(docType);
+  const canReturn = offersReturn(docType, isReversed);
   // a correction whose first completion failed stays CONFIRMED —
   // keep the apply button available so the user can retry completion.
   const showCorrectionApply =

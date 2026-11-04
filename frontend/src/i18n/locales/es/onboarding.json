@@ -24,7 +24,7 @@
   "continue": "Continuar",
   "back": "Atrás",
   "singleModuleName": "Solo un módulo",
-  "singleModuleDescription": "Un módulo es toda la aplicación. Lo demás pasa a un segundo plano; puedes salir en cualquier momento en Ajustes → Mis módulos.",
+  "singleModuleDescription": "Un módulo es toda la aplicación, por ejemplo Fabricación si produces algo. Lo demás pasa a un segundo plano; puedes salir en cualquier momento en Ajustes → Mis módulos.",
   "focusChoiceTitle": "¿Qué módulo?",
   "focusChoiceSubtitle": "Solo se listan los módulos que pueden funcionar solos. Nada aquí es permanente."
 }

@@ -186,8 +186,8 @@ def test_a_move_within_one_warehouse_says_the_warehouse_stays(
     )
 
     (shelf,) = response.json()['moves']
-    assert shelf['from_path'] == 'Main Warehouse / Cold Storage'
-    assert shelf['to_path'] == 'Main Warehouse / Empty Bay'
+    assert shelf['from_path'] == 'Main Warehouse › Cold Storage'
+    assert shelf['to_path'] == 'Main Warehouse › Empty Bay'
     assert shelf['warehouse_changes'] is False
 
 
@@ -340,7 +340,7 @@ def test_the_single_edit_records_a_physical_move_too(
     assert response.status_code == status.HTTP_200_OK, response.text
     (document,) = db_session.scalars(select(LocationRelocation)).all()
     assert (document.from_path, document.to_path) == (
-        'Main Warehouse / Cold Storage',
+        'Main Warehouse › Cold Storage',
         'Pantry Building',
     )
     assert len(_relocation_moves(db_session)) == 2

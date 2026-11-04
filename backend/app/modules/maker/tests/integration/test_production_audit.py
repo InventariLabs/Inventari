@@ -9,6 +9,7 @@ item history never repeated it.
 
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any
 
 import pytest
@@ -138,7 +139,10 @@ class TestProductionRunAuditTrail:
         snapshot = completed[0]['snapshot']
         assert snapshot['name'] == number
         assert snapshot['output'] == 'Candle'
-        assert snapshot['quantity'] > 0
+        # Exact digits as text, never a float: the screen rounds a float to six figures.
+        assert isinstance(snapshot['quantity'], str)
+        assert Decimal(snapshot['quantity']) > 0
+        assert isinstance(snapshot['total_cost'], str)
 
         # The consequences: every mirrored quantity change says what took it.
         qty_changes = [
@@ -148,7 +152,12 @@ class TestProductionRunAuditTrail:
         ]
         assert qty_changes, 'production wrote no quantity changes'
         for entry in qty_changes:
-            assert 'Production run' in (entry['reason'] or ''), entry
+            assert entry['reason'] == 'production_run', entry
+            # The code carries no number; two runs on one day must still be
+            # told apart on the screens.
+            assert (entry.get('meta_data') or {}).get(
+                'production_order_number'
+            ) == number, entry
             assert (entry.get('meta_data') or {}).get('production_order_id') == run[
                 'order_id'
             ], entry
@@ -180,4 +189,36 @@ class TestProductionRunAuditTrail:
         rows = history.json()
         assert rows, 'no history rows for the consumed item'
         blob = str(rows)
-        assert 'Production run' in blob, blob[:400]
+        assert 'production_run' in blob, blob[:400]
+        assert complete_resp.json()['number'] in blob, blob[:400]
+
+    def test_taking_a_run_back_writes_a_code_the_screens_can_translate(
+        self,
+        client: TestClient,
+        mk_org: Organization,
+        mk_auth_headers: dict[str, str],
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """The reason is a code, not a sentence in one language.
+
+        An English "Production run … taken back" read in a Polish journal; the
+        screens resolve the code through the interface language instead.
+        """
+        run = _seed_run(
+            db_session, client, mk_org, mk_auth_headers, mk_input_loc, mk_output_loc
+        )
+        base = f'/api/v1/maker/production/orders/{run["order_id"]}'
+        assert (
+            client.post(f'{base}/complete', headers=mk_auth_headers).status_code == 200
+        )
+        reversed_resp = client.post(f'{base}/reverse', headers=mk_auth_headers)
+        assert reversed_resp.status_code == 200, reversed_resp.text
+
+        reasons = {
+            entry['reason']
+            for entry in _log_entries(client, mk_auth_headers)
+            if entry['action'] == 'QUANTITY_CHANGE'
+        }
+        assert reasons == {'production_run', 'production_run_reversed'}
