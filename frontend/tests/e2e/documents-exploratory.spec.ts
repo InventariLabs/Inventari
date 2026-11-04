@@ -25,8 +25,12 @@ test.describe("Documents Exploratory — Full User Workflow", () => {
     const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = auth.access_token;
     await api.enableAllModules(token);
-    const storages = await api.listStorages(token);
-    storageId = storages[0]?.id || "";
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    const storage = await api.createStorage(token, {
+      name: `E2E-Exploratory-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    });
+    storageId = storage.id;
   });
 
   test.afterAll(async () => {
@@ -34,13 +38,14 @@ test.describe("Documents Exploratory — Full User Workflow", () => {
       await api.cancelDocument(token, id).catch(() => {});
       await api.deleteDocument(token, id).catch(() => {});
     }
+    await api.deleteStorage(token, storageId).catch(() => {});
   });
 
   test("create INT document via UI dialog", async ({
     page,
     authenticatedPage,
   }) => {
-    expect(storageId, "the seeded org has a storage location").toBeTruthy();
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
     // /warehouse opens History; the document list keeps "New document" in
     // its header, where the growing History cannot push it away.
     await page.goto("/warehouse/all");
@@ -299,8 +304,12 @@ test.describe("Documents Exploratory — Form Edge Cases", () => {
     api = new ApiHelper(ctx);
     const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = auth.access_token;
-    const storages = await api.listStorages(token);
-    storageId = storages[0]?.id || "";
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    const storage = await api.createStorage(token, {
+      name: `E2E-Exploratory-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    });
+    storageId = storage.id;
   });
 
   test.afterAll(async () => {
@@ -308,6 +317,7 @@ test.describe("Documents Exploratory — Form Edge Cases", () => {
       await api.cancelDocument(token, id).catch(() => {});
       await api.deleteDocument(token, id).catch(() => {});
     }
+    await api.deleteStorage(token, storageId).catch(() => {});
   });
 
   test("creating document with many lines via API", async () => {
