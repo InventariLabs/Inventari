@@ -121,7 +121,7 @@ describe("POLinesSection product pick", () => {
             setLine((prev) => ({ ...prev, ...data }))
           }
           onRemove={vi.fn()}
-          t={(key) => key}
+          t={(key) => (key === "common:actions.clear" ? "Clear product" : key)}
         />
       );
     }
@@ -141,7 +141,7 @@ describe("POLinesSection product pick", () => {
 
     async function clearProduct() {
       await userEvent.click(
-        screen.getAllByRole("button", { name: "common:actions.clear" })[0],
+        screen.getAllByRole("button", { name: "Clear product" })[0],
       );
     }
 
