@@ -575,9 +575,7 @@ ERRORS_FR: ErrorMessages = {
     'approvals_read_forbidden': "Vous n'avez pas l'autorisation de consulter les demandes d'approbation",
     'approvals_write_forbidden': "Vous n'avez pas l'autorisation de soumettre des demandes d'approbation",
     'documents_approve_requires_grant': "Vous n'avez pas l'autorisation d'approuver ou de rejeter des documents",
-    'po_approval_workflow_missing': (
-        "Les bons de commande exigent une approbation, mais aucun flux d'approbation n'est configuré pour eux — créez-en un dans Approbations → Flux, ou désactivez cette exigence"
-    ),
+    'po_approval_workflow_missing': 'Cette commande doit être approuvée, mais personne n’est encore désigné pour le faire. Demandez à votre administrateur de le configurer.',
     'po_supplier_required': 'Un bon de commande ne peut pas être confirmé sans fournisseur',
     'document_type_requires_partner': 'Ce type de document nécessite un partenaire.',
     'partner_has_no_email': "Le partenaire n'a pas d'adresse e-mail.",
@@ -849,9 +847,7 @@ ERRORS_FR: ErrorMessages = {
     'permanent_delete_disabled': (
         'La suppression définitive est désactivée pour cette organisation.'
     ),
-    'documents_approval_workflow_missing': (
-        "Les documents exigent une approbation, mais aucun flux d'approbation n'est configuré pour eux — créez-en un dans Approbations → Flux, ou désactivez cette exigence"
-    ),
+    'documents_approval_workflow_missing': 'Ce document doit être approuvé, mais personne n’est encore désigné pour le faire. Demandez à votre administrateur de le configurer.',
     'category_delete_blocked_by_items': (
         'Impossible de supprimer la catégorie — elle est utilisée ({count}). Déplacez d’abord ses produits vers une autre catégorie.'
     ),

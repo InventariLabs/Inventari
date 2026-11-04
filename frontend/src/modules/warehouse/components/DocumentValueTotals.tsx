@@ -10,6 +10,19 @@ interface DocumentValueTotalsProps {
   document: WarehouseDocument;
 }
 
+/**
+ * Lines of a posted receipt that came in with no price, as a product added on
+ * a phone does: the document's totals leave them out and the stock has no
+ * recorded cost, which the totals alone do not say.
+ */
+function hasReceivedLineWithoutPrice(document: WarehouseDocument): boolean {
+  return (
+    document.status === "COMPLETED" &&
+    ["IN", "INTERNAL_IN"].includes(document.type) &&
+    (document.lines ?? []).some((line) => line.unit_price == null)
+  );
+}
+
 export function DocumentValueTotals({ document }: DocumentValueTotalsProps) {
   const { t, i18n } = useTranslation("warehouse");
   const currency = useDocumentCurrency(document.currency);
@@ -34,8 +47,14 @@ export function DocumentValueTotals({ document }: DocumentValueTotalsProps) {
       </Card>
     );
   }
-  if (!showValue || (!document.total_gross && !document.total_net)) {
-    return null;
+  const unpriced = hasReceivedLineWithoutPrice(document);
+  if (!showValue) return null;
+  if (!document.total_gross && !document.total_net) {
+    return unpriced ? (
+      <Card className="px-4 sm:px-6 py-4 text-sm text-on-secondary">
+        {t("value.unpricedLines")}
+      </Card>
+    ) : null;
   }
   // Goods at a reduced rate next to goods at the standard one: the tax per
   // rate, which the totals alone do not say. One rate would repeat them.
@@ -71,6 +90,11 @@ export function DocumentValueTotals({ document }: DocumentValueTotalsProps) {
             </dd>
           </div>
         </dl>
+        {unpriced && (
+          <p className="mt-3 text-sm text-on-secondary">
+            {t("value.unpricedLines")}
+          </p>
+        )}
         {byRate.length > 1 && (
           <table className="mt-4 w-full border-t border-border pt-3 text-sm">
             <caption className="text-left text-xs font-medium text-on-secondary pb-1">

@@ -28,7 +28,12 @@ from app.models.partner import Partner
 from app.models.storage_location import StorageLocation
 from app.models.uom import Uom
 from app.models.user import User
-from app.modules.warehouse.models import Document, DocumentLine, DocumentStatus
+from app.modules.warehouse.models import (
+    Document,
+    DocumentLine,
+    DocumentStatus,
+    DocumentType,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -123,6 +128,31 @@ class TestTheRow:
             'Hex bolt M6',
             'Flat washer',
         ]
+
+    def test_a_correction_names_the_type_of_the_document_it_corrects(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        db_session: Session,
+        receipt: Document,
+    ) -> None:
+        correction = Document(
+            organization_id=receipt.organization_id,
+            type=DocumentType.CORRECTION,
+            status=DocumentStatus.COMPLETED,
+            number='KOR/2026/LIST',
+            corrects_document_id=receipt.id,
+            created_by=receipt.created_by,
+        )
+        db_session.add(correction)
+        db_session.commit()
+
+        rows = {row['number']: row for row in _rows(client, doc_auth_headers)}
+
+        assert rows['KOR/2026/LIST']['corrects_document_type'] == 'IN'
+        assert rows[receipt.number]['corrects_document_type'] is None
+        # The original on the same page keeps its lines.
+        assert rows[receipt.number]['line_count'] == 4
 
     def test_a_module_reads_the_lines_that_carry_its_fields(
         self,

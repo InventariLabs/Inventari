@@ -385,8 +385,10 @@ apply to it as written: it is not a copy of `example_widgets`. What it holds:
 
 It has **no list endpoint**: until you add one, `GET /api/v1/warranty-tracker`
 answers 404. The rules of Path A step 2 hold here too — the router is guarded by
-`require_module('warranty_tracker')`, your own tables you query directly, Core
-data only through `core_api`.
+`require_module('warranty_tracker')` and by `require_read_write` with the
+`warranty_tracker:read` and `warranty_tracker:write` keys its manifest declares,
+so what you add to it needs a permission without asking; your own tables you query
+directly, Core data only through `core_api`.
 
 #### A list of your records
 
@@ -676,8 +678,10 @@ docker compose exec backend uv run python manage.py module validate \
 ```
 
 Then restart the backend and rebuild/restart the frontend as in the signed
-path above. The scaffold's `/hello` endpoint is guarded by module activation;
-activate **Warranty Tracker** in **Settings → Modules** before using it. Then
+path above. The scaffold's `/hello` endpoint is guarded by module activation and by
+`warranty_tracker:read`; activate **Warranty Tracker** in **Settings → Modules**
+before using it (the manifest gives the two keys to the usual roles, and the role
+editor changes that). Then
 `GET /api/v1/warranty-tracker` answers the empty page shown above, and
 http://localhost:5173/warranty-tracker says *Nothing here yet.* under the module's
 title.

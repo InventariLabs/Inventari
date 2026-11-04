@@ -504,6 +504,7 @@
     "keepTemplate": "Mantener {{unit}}"
   },
   "showUsedUp": "Mostrar consumidos",
+  "usedUpPlace": "Consumido",
   "removalStrategy": {
     "label": "Qué sale primero",
     "fifoHelp": "FIFO: sale primero lo que entró primero.",

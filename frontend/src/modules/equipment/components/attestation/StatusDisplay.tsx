@@ -4,6 +4,7 @@ import { CheckCircle, AlertTriangle, Clock, XCircle } from "lucide-react";
 export function StatusDisplay({
   status,
   closedReason,
+  confirmedCount = 0,
 }: {
   status: string;
   /**
@@ -14,6 +15,8 @@ export function StatusDisplay({
    * does not write — and still reads as expired.
    */
   closedReason?: string | null;
+  /** Assets confirmed under the same link: a report does not hide them. */
+  confirmedCount?: number;
 }) {
   const { t } = useTranslation("equipment");
 
@@ -40,7 +43,11 @@ export function StatusDisplay({
           {t("attestation.public.statusDisputed")}
         </h2>
         <p className="text-on-secondary">
-          {t("attestation.public.statusDisputedDesc")}
+          {confirmedCount > 0
+            ? t("attestation.public.statusDisputedConfirmedDesc", {
+                count: confirmedCount,
+              })
+            : t("attestation.public.statusDisputedDesc")}
         </p>
       </div>
     );

@@ -578,9 +578,7 @@ ERRORS_DE: ErrorMessages = {
     'approvals_read_forbidden': 'Sie haben keine Berechtigung, Genehmigungsanträge einzusehen',
     'approvals_write_forbidden': 'Sie haben keine Berechtigung, Genehmigungsanträge zu stellen',
     'documents_approve_requires_grant': 'Sie haben keine Berechtigung, Dokumente zu genehmigen oder abzulehnen',
-    'po_approval_workflow_missing': (
-        'Bestellungen erfordern eine Genehmigung, aber es ist kein Genehmigungsworkflow dafür konfiguriert — legen Sie einen unter Genehmigungen → Workflows an oder deaktivieren Sie die Anforderung'
-    ),
+    'po_approval_workflow_missing': 'Diese Bestellung braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
     'po_supplier_required': 'Eine Bestellung kann ohne Lieferanten nicht bestätigt werden',
     'document_type_requires_partner': 'Dieser Dokumenttyp erfordert einen Partner.',
     'partner_has_no_email': 'Der Partner hat keine E-Mail-Adresse.',
@@ -852,9 +850,7 @@ ERRORS_DE: ErrorMessages = {
     'permanent_delete_disabled': (
         'Das dauerhafte Löschen ist für diese Organisation deaktiviert.'
     ),
-    'documents_approval_workflow_missing': (
-        'Dokumente erfordern eine Freigabe, aber es ist kein Freigabeworkflow dafür konfiguriert — legen Sie einen unter Freigaben → Workflows an oder deaktivieren Sie die Anforderung'
-    ),
+    'documents_approval_workflow_missing': 'Dieses Dokument braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
     'category_delete_blocked_by_items': (
         'Kategorie kann nicht gelöscht werden — sie wird verwendet ({count}). Verschieben Sie ihre Produkte zuerst in eine andere Kategorie.'
     ),

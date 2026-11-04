@@ -88,6 +88,11 @@ function PrintCalories({ value }: { value?: number | string | null }) {
   );
 }
 
+/** A nutrient nobody measured prints a dash, as the screen does, not "—g". */
+function printGrams(value?: number | null): string {
+  return value != null ? `${formatNumberLocale(value, 1)}g` : "–";
+}
+
 /** The estimate caveat under the nutrition line; it names generic values when used. */
 function PrintNutritionEstimate({ generic }: { generic?: boolean }) {
   const { t } = useTranslation("recipes");
@@ -197,27 +202,27 @@ export function RecipePrintView({
                       shape on the same path. */}
                   <span>
                     {t("recipes:nutrition.protein")}:{" "}
-                    {formatNumberLocale(nutritionSummary.protein_g, 1)}g
+                    {printGrams(nutritionSummary.protein_g)}
                   </span>
                   <span>
                     {t("recipes:nutrition.carbs")}:{" "}
-                    {formatNumberLocale(nutritionSummary.carbs_g, 1)}g
+                    {printGrams(nutritionSummary.carbs_g)}
                   </span>
                   <span>
                     {t("recipes:nutrition.fat")}:{" "}
-                    {formatNumberLocale(nutritionSummary.fat_g, 1)}g
+                    {printGrams(nutritionSummary.fat_g)}
                   </span>
                   <span>
                     {t("recipes:nutrition.fiber")}:{" "}
-                    {formatNumberLocale(nutritionSummary.fiber_g, 1)}g
+                    {printGrams(nutritionSummary.fiber_g)}
                   </span>
                   <span>
                     {t("recipes:nutrition.sugar")}:{" "}
-                    {formatNumberLocale(nutritionSummary.sugar_g, 1)}g
+                    {printGrams(nutritionSummary.sugar_g)}
                   </span>
                   <span>
                     {t("recipes:nutrition.salt")}:{" "}
-                    {formatNumberLocale(nutritionSummary.salt_g, 1)}g
+                    {printGrams(nutritionSummary.salt_g)}
                   </span>
                 </>
               )}

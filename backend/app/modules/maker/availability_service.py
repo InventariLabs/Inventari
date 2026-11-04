@@ -204,10 +204,12 @@ async def _measure_stock_against_recipe(
         # A batch is a thing you either make or do not, so this is floored
         # rather than quantised: the screen used to offer "568.1818 batches"
         # of a tray bake. Never below zero — stock reserved past what is on
-        # hand is "none", not a negative number of batches.
+        # hand is "none", not a negative number of batches. Quantised, because
+        # a division keeps the exponent it landed on and ten batches went out
+        # on the wire as "1E+1".
         ingredient_max = max(
             Decimal('0'),
-            (converted / per_batch).to_integral_value(rounding=ROUND_FLOOR),
+            (converted / per_batch).quantize(Decimal('1'), rounding=ROUND_FLOOR),
         )
         if max_batches is None or ingredient_max < max_batches:
             max_batches = ingredient_max

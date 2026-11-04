@@ -49758,6 +49758,17 @@
             ],
             "title": "Backorder Id"
           },
+          "corrects_document_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrects Document Type"
+          },
           "scheduled_date": {
             "anyOf": [
               {

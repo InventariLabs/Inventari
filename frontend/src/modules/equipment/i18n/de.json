@@ -665,6 +665,8 @@
       "statusConfirmedDesc": "Ihre Bestätigung für dieses Gerät wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
       "statusDisputed": "Problem gemeldet",
       "statusDisputedDesc": "Ihre Meldung wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
+      "statusDisputedConfirmedDesc_one": "Ihre Meldung ist gespeichert, ebenso Ihre Bestätigung für {{count}} weiteres Objekt. Sie können diesen Tab jetzt schließen.",
+      "statusDisputedConfirmedDesc_other": "Ihre Meldung ist gespeichert, ebenso Ihre Bestätigung für {{count}} weitere Objekte. Sie können diesen Tab jetzt schließen.",
       "statusCampaignClosed": "Attestierung geschlossen",
       "statusCampaignClosedDesc": "Diese Anfrage wurde geschlossen — Ihre Bestätigung kann nicht mehr erfasst werden. Wenn Sie das Gerät noch haben, wenden Sie sich an Ihre Organisation.",
       "statusAssignmentReturned": "Bereits zurückgegeben",

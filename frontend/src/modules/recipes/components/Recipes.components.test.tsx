@@ -87,7 +87,7 @@ describe("NutritionCard", () => {
       },
     };
     render(<NutritionCard data={noCalData} servings={1} />);
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("–")).toBeInTheDocument();
   });
 });
 

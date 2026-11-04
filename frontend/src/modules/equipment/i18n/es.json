@@ -672,6 +672,8 @@
       "statusConfirmedDesc": "Tu confirmación de este activo ha quedado guardada y ya puedes cerrar esta pestaña.",
       "statusDisputed": "Problema notificado",
       "statusDisputedDesc": "Tu informe ha quedado guardado y ya puedes cerrar esta pestaña.",
+      "statusDisputedConfirmedDesc_one": "Su informe se ha guardado, al igual que su confirmación de {{count}} activo más. Ya puede cerrar esta pestaña.",
+      "statusDisputedConfirmedDesc_other": "Su informe se ha guardado, al igual que su confirmación de {{count}} activos más. Ya puede cerrar esta pestaña.",
       "statusCampaignClosed": "Atestación cerrada",
       "statusCampaignClosedDesc": "Esta solicitud se ha cerrado: su confirmación ya no puede registrarse. Si todavía conserva el activo, contacte con su organización.",
       "statusAssignmentReturned": "Ya devuelto",

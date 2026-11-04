@@ -1574,7 +1574,7 @@ class TestDocumentApprovalWorkflow:
             f'/api/v1/warehouse/documents/{doc_id}/confirm', headers=doc_auth_headers
         )
         assert resp.status_code == status.HTTP_400_BAD_REQUEST, resp.text
-        assert 'workflow' in resp.json()['detail']['message'].lower()
+        assert 'administrator' in resp.json()['detail']['message'].lower()
 
         # The document stays DRAFT — nothing was confirmed or released.
         after = client.get(

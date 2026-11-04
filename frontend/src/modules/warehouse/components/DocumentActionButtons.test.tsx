@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mayBePlanned } from "@/modules/warehouse/types";
 import { DocumentActionButtons } from "./DocumentActionButtons";
 import { tFor } from "@/test/mocks/i18n";
 
@@ -565,7 +566,7 @@ describe("DocumentActionButtons without an approval workflow", () => {
     expect(button).toBeDisabled();
     expect(button.parentElement).toHaveAttribute(
       "title",
-      expect.stringContaining("no approval workflow is active"),
+      expect.stringContaining("Ask your administrator"),
     );
   });
 });
@@ -652,5 +653,23 @@ describe("DocumentActionButtons undo", () => {
     expect(
       screen.queryByRole("button", { name: "Undo receipt" }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("mayBePlanned", () => {
+  const today = "2026-11-03";
+
+  it("lets today's issue be planned, so that it can be picked", () => {
+    expect(mayBePlanned("OUT", today, today)).toBe(true);
+    expect(mayBePlanned("OUT", null, today)).toBe(true);
+  });
+
+  it("keeps a future date plannable on any type", () => {
+    expect(mayBePlanned("IN", "2026-11-04", today)).toBe(true);
+  });
+
+  it("does not offer a plan for a receipt or a move dated today", () => {
+    expect(mayBePlanned("IN", today, today)).toBe(false);
+    expect(mayBePlanned("INT", today, today)).toBe(false);
   });
 });

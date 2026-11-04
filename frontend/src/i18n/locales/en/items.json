@@ -504,6 +504,7 @@
     "keepTemplate": "Keep {{unit}}"
   },
   "showUsedUp": "Show used up",
+  "usedUpPlace": "Consumed",
   "removalStrategy": {
     "label": "Which stock leaves first",
     "fifoHelp": "FIFO: what came in first leaves first.",

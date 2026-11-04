@@ -43,6 +43,20 @@ interface UomSelectProps {
   /** Said under the picker when `convertibleTo` narrows the choices, so a
    * missing unit reads as a rule rather than as a missing catalogue row. */
   convertibleHint?: string;
+  /**
+   * The unit a save lands on when nobody picks one, for a form whose server
+   * answers that itself. The compact trigger shows it as chosen: "Choose"
+   * beside a form that then saved pieces read as a question still open.
+   */
+  unitWhenUnset?: string;
+}
+
+/** What the compact trigger names: the unit picked, else the one a save lands on. */
+function symbolToShow(
+  selected: Uom | null | undefined,
+  unitWhenUnset: string | undefined,
+): string | undefined {
+  return selected?.symbol ?? unitWhenUnset;
 }
 
 // ── What to show (symbols in preferred display order) ────────────────────────
@@ -175,6 +189,7 @@ export const UomSelect: React.FC<UomSelectProps> = ({
   categoryFilter,
   convertibleTo,
   convertibleHint,
+  unitWhenUnset,
 }) => {
   const { t } = useTranslation(["items", "common"]);
   const uomsQuery = useUoms();
@@ -222,6 +237,7 @@ export const UomSelect: React.FC<UomSelectProps> = ({
       .filter((u) => restricted === null || restricted.has(u.category_id)) ??
     [];
   const selectedUom = allUoms.find((u) => u.id === value);
+  const shownSymbol = symbolToShow(selectedUom, unitWhenUnset);
 
   // Build ordered arrays from COMMON_ORDER / RARE_ORDER
   const commonUoms = COMMON_ORDER.map((sym) =>
@@ -276,11 +292,11 @@ export const UomSelect: React.FC<UomSelectProps> = ({
       <span
         className={cn(
           "text-xs font-medium",
-          value ? "text-primary-700" : "text-on-muted",
+          shownSymbol ? "text-primary-700" : "text-on-muted",
         )}
       >
-        {selectedUom
-          ? unitLabel(t, selectedUom.symbol)
+        {shownSymbol
+          ? unitLabel(t, shownSymbol)
           : // A dash beside a sibling picker reading "pcs" says nothing
             // about whether the unit is unset or does not apply. A verb, and
             // one that is not also the name of a unit: every other value this
@@ -289,7 +305,7 @@ export const UomSelect: React.FC<UomSelectProps> = ({
       </span>
       <ChevronDown
         size={14}
-        className={value ? "text-primary-500" : "text-on-muted"}
+        className={shownSymbol ? "text-primary-500" : "text-on-muted"}
       />
     </Button>
   ) : (

@@ -109,6 +109,8 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
     label,
     error,
     id,
+    createLabel,
+    onCreateNew,
   }: {
     options: { id: string; name: string }[];
     value: string;
@@ -116,6 +118,8 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
     label?: string;
     error?: string;
     id?: string;
+    createLabel?: string;
+    onCreateNew?: (query: string) => void;
   }) => (
     <div>
       <select
@@ -133,6 +137,11 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
         ))}
       </select>
       {error && <p role="alert">{error}</p>}
+      {onCreateNew && (
+        <button type="button" onClick={() => onCreateNew("Bistro Nowe")}>
+          {createLabel}
+        </button>
+      )}
     </div>
   ),
 }));
@@ -182,6 +191,18 @@ beforeEach(() => {
 });
 
 describe("IssueGoodsPage", () => {
+  it("adds a customer that does not exist yet without leaving the form", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(
+      await screen.findByRole("button", { name: "+ Create new partner" }),
+    );
+
+    expect(await screen.findByDisplayValue("Bistro Nowe")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Customer" })).toBeVisible();
+  });
+
   it("issues to a customer as a delivery from the only warehouse, in one post", async () => {
     const user = userEvent.setup();
     postMutate.mockImplementation((_payload, options) =>
