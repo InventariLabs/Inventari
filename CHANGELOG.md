@@ -54,6 +54,14 @@ says what the release does rather than what changed since them.
 - Amounts in a unit that is a word take its plural ("6 bottles").
 - An issue dated today can be planned from its page, so that picking can start
   on it without dating it tomorrow first.
+- The audit log now writes the quantities and amounts of a production order,
+  its completion, a recipe and its ingredient and cost lines, and of an item's
+  creation, use, disposal, deletion and restoration, and the low-stock
+  threshold of a product, as the exact digits the record holds. They used to
+  be saved as rounded decimal numbers, so a production order of 1,234.567 read
+  1,234.57 in the log. Saving a value again
+  with other trailing digits ("2.50" over "2.5") still writes no entry. Entries
+  written before this keep the numbers they were saved with.
 - Importing ingredient data from a file the import cannot read, a photo or a
   JSON file that holds no list of rows for instance, now says what the import
   expects: a .json or .csv file with one row per ingredient, in every

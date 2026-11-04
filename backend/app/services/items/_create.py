@@ -17,6 +17,7 @@ from app.core.exceptions import (
     catalogue_refusal,
 )
 from app.core.interceptors import interceptor_pipeline
+from app.core.money import quantise
 from app.i18n.service import get_current_lang
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.category import Category
@@ -571,7 +572,7 @@ async def create_item_async(
             'brand': item.brand,
             'barcode': item.barcode,
             'sku': template.sku,
-            'quantity': float(item.quantity) if item.quantity is not None else 0.0,
+            'quantity': quantise(item.quantity or Decimal('0'), 3),
             'storage_location_id': str(item.storage_location_id)
             if item.storage_location_id
             else None,

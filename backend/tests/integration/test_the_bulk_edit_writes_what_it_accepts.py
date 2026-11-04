@@ -141,8 +141,8 @@ class TestTheBatchWritesWhatItAccepts:
         # And the trace says so, from the card's side, as the single edit's
         # journal does: the threshold is the product's, and it moved.
         entry = _journal(db_session, first)[-1]
-        assert entry['before']['min_quantity'] == 0
-        assert entry['after']['min_quantity'] == 3
+        assert entry['before']['min_quantity'] == '0.0'
+        assert entry['after']['min_quantity'] == '3.0'
 
     def test_a_freeze_date_is_kept_where_the_single_edit_keeps_it(
         self,
