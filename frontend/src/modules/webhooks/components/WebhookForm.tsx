@@ -102,6 +102,34 @@ function EventRow({
   );
 }
 
+/** The events of modules this organization has not enabled, apart from the ones that can fire. */
+function NeedModuleEvents({ children }: { children: React.ReactNode[] }) {
+  const { t } = useTranslation("webhooks");
+  if (children.length === 0) return null;
+  return (
+    <div
+      role="group"
+      aria-label={t("form.eventsNeedModulesGroup")}
+      className="mt-2 space-y-1 border-t border-border pt-2"
+    >
+      <p className="px-2 text-xs font-medium text-on-muted">
+        {t("form.eventsNeedModulesGroup")}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+/** Events that can fire now, apart from those of modules the organization has not enabled. */
+function splitByModule(events: WebhookAvailableEvent[]) {
+  const needsModule = (ev: WebhookAvailableEvent) =>
+    !ev.available && Boolean(ev.source_module);
+  return {
+    ready: events.filter((ev) => !needsModule(ev)),
+    needModule: events.filter(needsModule),
+  };
+}
+
 interface WebhookFormProps {
   webhook?: WebhookEndpoint | null;
   onSave: (
@@ -181,12 +209,8 @@ export default function WebhookForm({
     );
   };
 
-  const readyEvents = availableEvents.filter(
-    (ev) => ev.available || !ev.source_module,
-  );
-  const needModuleEvents = availableEvents.filter(
-    (ev) => !ev.available && ev.source_module,
-  );
+  const { ready: readyEvents, needModule: needModuleEvents } =
+    splitByModule(availableEvents);
 
   const eventRow = (ev: WebhookAvailableEvent) => (
     <EventRow
@@ -333,18 +357,9 @@ export default function WebhookForm({
             {readyEvents.map(eventRow)}
             {/* Events of modules this organization has not enabled would fire
                 nothing; they stay subscribable, but apart from the ones that do. */}
-            {needModuleEvents.length > 0 && (
-              <div
-                role="group"
-                aria-label={t("form.eventsNeedModulesGroup")}
-                className="mt-2 space-y-1 border-t border-border pt-2"
-              >
-                <p className="px-2 text-xs font-medium text-on-muted">
-                  {t("form.eventsNeedModulesGroup")}
-                </p>
-                {needModuleEvents.map(eventRow)}
-              </div>
-            )}
+            <NeedModuleEvents>
+              {needModuleEvents.map(eventRow)}
+            </NeedModuleEvents>
           </div>
         </div>
 
