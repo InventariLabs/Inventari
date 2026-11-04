@@ -165,6 +165,19 @@ describe("useItemFilters", () => {
     expect(result.current.sortOrder).toBe("asc");
   });
 
+  it("names the address's order on the first render, not after an effect", () => {
+    const seen: string[] = [];
+    renderHook(
+      () => {
+        const f = useItemFilters();
+        seen.push(`${f.sortBy}:${f.sortOrder}`);
+        return f;
+      },
+      { wrapper: wrapper("/inventory/items?sort_by=name&sort_order=asc") },
+    );
+    expect(seen[0]).toBe("name:asc");
+  });
+
   it("returns to the first page when the page size changes", () => {
     // Page 4 of 50-row pages is past the end once a page holds 200, and
     // offset 150 into 200-row pages skips rows outright.

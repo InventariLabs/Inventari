@@ -5,6 +5,22 @@ import { useFilteredList } from "@/hooks/useFilteredList";
 type ItemSortBy = "created_at" | "name" | "quantity" | "expiry_date";
 type ItemSortOrder = "asc" | "desc";
 
+/** The sort an address names; a part it does not name or names wrongly is absent. */
+function sortFromAddress(params: URLSearchParams): {
+  by?: ItemSortBy;
+  order?: ItemSortOrder;
+} {
+  const by = params.get("sort_by");
+  const order = params.get("sort_order");
+  return {
+    by:
+      by && ["created_at", "name", "quantity", "expiry_date"].includes(by)
+        ? (by as ItemSortBy)
+        : undefined,
+    order: order === "asc" || order === "desc" ? order : undefined,
+  };
+}
+
 /**
  * Item list filters — thin wrapper over the generic `useFilteredList` factory.
  *
@@ -52,22 +68,20 @@ export function useItemFilters() {
     },
   );
 
-  const [sortBy, setSortByState] = useState<ItemSortBy>("created_at");
-  const [sortOrder, setSortOrderState] = useState<ItemSortOrder>("desc");
+  // The sort the address names, read at the first render so a list reopened
+  // with Back asks for its order once, not for the default order first.
+  const [sortBy, setSortByState] = useState<ItemSortBy>(
+    () => sortFromAddress(searchParams).by ?? "created_at",
+  );
+  const [sortOrder, setSortOrderState] = useState<ItemSortOrder>(
+    () => sortFromAddress(searchParams).order ?? "desc",
+  );
 
-  // Sync sort from URL on mount
+  // Follow the address when it changes under the screen (Back, a link).
   useEffect(() => {
-    const urlSortBy = searchParams.get("sort_by");
-    const urlSortOrder = searchParams.get("sort_order");
-    if (
-      urlSortBy &&
-      ["created_at", "name", "quantity", "expiry_date"].includes(urlSortBy)
-    ) {
-      setSortByState(urlSortBy as ItemSortBy);
-    }
-    if (urlSortOrder === "asc" || urlSortOrder === "desc") {
-      setSortOrderState(urlSortOrder);
-    }
+    const { by, order } = sortFromAddress(searchParams);
+    if (by) setSortByState(by);
+    if (order) setSortOrderState(order);
   }, [searchParams]);
 
   // Reset pagination when sort changes.

@@ -252,7 +252,7 @@ export default function ItemsPage() {
   );
   // Where the rows on screen stand, read by id: the page needs the places it
   // shows (and the one the filter names), not the organization's catalogue.
-  const { byId: placesById } = useLocationsById([
+  const { byId: placesById, isLoading: placesLoading } = useLocationsById([
     ...items.map((item) => item.location_id),
     filters.storageFilter,
   ]);
@@ -540,7 +540,9 @@ export default function ItemsPage() {
         onClearFilters={clearFilters}
         isPlaceholderData={isPlaceholderData}
         isLargeScreen={isLargeScreen}
-        storages={allStorages}
+        // No place is printed while the places that name the rows are on their
+        // way; "Unknown" is for a place the arrived answer does not hold.
+        storages={placesLoading ? undefined : allStorages}
         categories={allCategories}
         filters={{
           ...itemsFilters,
