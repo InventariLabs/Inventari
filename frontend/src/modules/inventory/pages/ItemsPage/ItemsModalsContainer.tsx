@@ -1,4 +1,5 @@
 import type { Item } from "@/types";
+import { useSearchParams } from "react-router-dom";
 import ItemEditModal from "@/modules/inventory/components/ItemEditModal";
 import ThresholdQuickSetSheet from "@/modules/inventory/components/ThresholdQuickSetSheet";
 import BulkEditModal from "@/modules/inventory/components/items/BulkEditModal";
@@ -6,7 +7,6 @@ import ImportModal from "@/modules/inventory/components/items/ImportModal";
 
 interface ItemsModalsContainerProps {
   editingItemId: string | null;
-  editingAtExpiry: boolean;
   setEditingItemId: (id: string | null) => void;
   thresholdItem: Item | null;
   setThresholdItem: (item: Item | null) => void;
@@ -20,7 +20,6 @@ interface ItemsModalsContainerProps {
 
 export default function ItemsModalsContainer({
   editingItemId,
-  editingAtExpiry,
   setEditingItemId,
   thresholdItem,
   setThresholdItem,
@@ -31,12 +30,13 @@ export default function ItemsModalsContainer({
   showImportModal,
   setShowImportModal,
 }: ItemsModalsContainerProps) {
+  const [searchParams] = useSearchParams();
   return (
     <>
       {editingItemId && (
         <ItemEditModal
           itemId={editingItemId}
-          openAtExpiry={editingAtExpiry}
+          openAtExpiry={searchParams.get("at") === "expiry"}
           onClose={() => setEditingItemId(null)}
         />
       )}

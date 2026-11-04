@@ -17,16 +17,12 @@ import { hasHistoryToPop } from "@/module-sdk";
 export function useOpenProductParam(): [
   string | null,
   (id: string | null) => void,
-  boolean,
 ] {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [openId, setOpenId] = useState<string | null>(() =>
     searchParams.get("open"),
-  );
-  const [atExpiry, setAtExpiry] = useState(
-    () => searchParams.get("at") === "expiry",
   );
   const openedByLink = useRef(
     searchParams.get("open") !== null && hasHistoryToPop(location),
@@ -41,7 +37,6 @@ export function useOpenProductParam(): [
         return;
       }
       setOpenId(id);
-      setAtExpiry(false);
       const next = new URLSearchParams(searchParams);
       next.delete("at");
       if (id) next.set("open", id);
@@ -51,5 +46,5 @@ export function useOpenProductParam(): [
     [navigate, searchParams, setSearchParams],
   );
 
-  return [openId, setOpen, atExpiry];
+  return [openId, setOpen];
 }
