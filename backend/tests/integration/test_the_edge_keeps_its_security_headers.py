@@ -74,3 +74,37 @@ class TestTheEdgeKeepsItsSecurityHeaders:
             'the check passed a location that kept only Cache-Control: '
             + repr(problems)
         )
+
+    def test_the_check_refuses_a_security_header_without_always(self) -> None:
+        """Without ``always`` nginx drops the header from 4xx/5xx responses."""
+        checker = _load_checker()
+        server_headers = '\n'.join(
+            f'    add_header {name} "value" always;'
+            for name in checker.SECURITY_HEADERS
+        )
+        location_headers = '\n'.join(
+            f'        add_header {name} "value"'
+            + ('' if name == 'Referrer-Policy' else ' always')
+            + ';'
+            for name in checker.SECURITY_HEADERS
+        )
+        drifting = f"""server {{
+{server_headers}
+    location ~* \\.js$ {{
+{location_headers}
+        add_header Cache-Control "public, immutable";
+    }}
+}}"""
+        problems = checker.check_nginx_security_headers(drifting)
+        assert len(problems) == 1 and 'Referrer-Policy' in problems[0], repr(problems)
+        assert 'always' in problems[0], repr(problems)
+
+    def test_the_server_block_must_use_always_too(self) -> None:
+        checker = _load_checker()
+        server_headers = '\n'.join(
+            f'    add_header {name} "value";' for name in checker.SECURITY_HEADERS
+        )
+        problems = checker.check_nginx_security_headers(
+            f'server {{\n{server_headers}\n}}'
+        )
+        assert any('always' in problem for problem in problems), repr(problems)
