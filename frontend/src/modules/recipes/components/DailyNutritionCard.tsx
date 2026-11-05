@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * Per-day macro totals of a plan; a day built from partly measured recipes says so.
+ * Per-day macro totals of a plan, one serving of each planned meal; a day built from partly measured recipes says so.
  * Unlike a recipe's own card there is no "complete enough" threshold: a day sums
  * several dishes, so 90% of its ingredients can still leave a whole dish out.
  */
@@ -28,19 +28,19 @@ export function DailyNutritionCard({ days }: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-on-muted border-b border-border">
-              <th className="text-left font-medium px-5 py-2">
+              <th className="text-left font-medium px-3 sm:px-5 py-2">
                 {t("meal_planner.date")}
               </th>
-              <th className="text-right font-medium px-3 py-2">
+              <th className="text-right font-medium px-2 sm:px-3 py-2 whitespace-nowrap">
                 {t("nutrition.carbs")}
               </th>
-              <th className="text-right font-medium px-3 py-2">
+              <th className="text-right font-medium px-2 sm:px-3 py-2 whitespace-nowrap">
                 {t("nutrition.protein")}
               </th>
-              <th className="text-right font-medium px-3 py-2">
+              <th className="text-right font-medium px-2 sm:px-3 py-2 whitespace-nowrap">
                 {t("nutrition.fat")}
               </th>
-              <th className="text-right font-medium px-5 py-2">
+              <th className="text-right font-medium px-3 sm:px-5 py-2 whitespace-nowrap">
                 {t("nutrition.calories")}
               </th>
             </tr>
@@ -51,21 +51,21 @@ export function DailyNutritionCard({ days }: Props) {
               className="border-b border-border/50 last:border-0"
             >
               <tr>
-                <td className="px-5 py-2 text-on-secondary whitespace-nowrap">
+                <td className="px-3 sm:px-5 py-2 text-on-secondary whitespace-nowrap">
                   {format(parseISO(day.date), "EEE d MMM", {
                     locale: dateFnsLocale(),
                   })}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums text-on-secondary">
+                <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
                   {day.carbs_g != null ? `${day.carbs_g} g` : "–"}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums text-on-secondary">
+                <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
                   {day.protein_g != null ? `${day.protein_g} g` : "–"}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums text-on-secondary">
+                <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
                   {day.fat_g != null ? `${day.fat_g} g` : "–"}
                 </td>
-                <td className="px-5 py-2 text-right tabular-nums font-medium text-on">
+                <td className="px-3 sm:px-5 py-2 text-right tabular-nums whitespace-nowrap font-medium text-on">
                   {day.calories_kcal != null
                     ? `${day.calories_kcal} kcal`
                     : "–"}
@@ -75,7 +75,7 @@ export function DailyNutritionCard({ days }: Props) {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-5 pb-2 -mt-1 text-xs text-on-muted"
+                    className="px-3 sm:px-5 pb-2 -mt-1 text-xs text-on-muted"
                   >
                     {t("nutrition.incomplete_warning", {
                       pct: Math.round(day.coverage * 100),

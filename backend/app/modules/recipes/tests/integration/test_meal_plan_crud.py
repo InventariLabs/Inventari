@@ -555,14 +555,83 @@ class TestMealPlanEntries:
         assert r.status_code == 200
         summary = r.json()['daily_nutrition_summary']
         assert len(summary) == 2
-        # 100 g × 350 kcal/100 g = 350 kcal per day (default servings 2 ×
-        # recipe servings... single entry, effective servings 2 → 700 kcal)
+        # 100 g × 350 kcal/100 g = 350 kcal for the one serving of the day,
+        # though the plan asks for two servings of it.
         day = next(s for s in summary if s['date'] == date.today().isoformat())
-        assert day['calories_kcal'] == pytest.approx(700.0, abs=2.0)
-        assert day['protein_g'] == pytest.approx(24.0, abs=1.0)
-        assert day['carbs_g'] == pytest.approx(130.0, abs=2.0)
+        assert day['calories_kcal'] == pytest.approx(350.0, abs=2.0)
+        assert day['protein_g'] == pytest.approx(12.0, abs=1.0)
+        assert day['carbs_g'] == pytest.approx(65.0, abs=2.0)
         # The product carries its own values, so nothing here is generic.
         assert day['generic_values'] is False
+
+    def test_a_dish_planned_for_many_servings_counts_one_serving(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_user: User,
+        db_session: Any,
+    ) -> None:
+        """An 8-serving dish adds one serving to the day, not the whole dish.
+
+        The table read 4210 kcal for a day of one banana bread baked for 8
+        — the whole loaf, which no one person eats.
+        """
+        template = ProductTemplate(
+            id=uuid.uuid4(),
+            organization_id=test_user.organization_id,
+            name='Loaf Flour',
+            meta_data={
+                'nutrition': {
+                    'calories_kcal': 400.0,
+                    'protein_g': 10.0,
+                    'fat_g': 2.0,
+                    'carbs_g': 80.0,
+                }
+            },
+        )
+        db_session.add(template)
+        db_session.flush()
+        uom = db_session.scalar(select(Uom).where(Uom.symbol == 'g'))
+        assert uom is not None
+        db_session.commit()
+
+        recipe_id = client.post(
+            '/api/v1/recipes',
+            json={
+                'name': 'Loaf',
+                'servings': 8,
+                'ingredients': [
+                    {
+                        'name': 'Loaf Flour',
+                        'template_id': str(template.id),
+                        'quantity': '800',
+                        'uom_id': str(uom.id),
+                        'is_optional': False,
+                    }
+                ],
+            },
+            headers=auth_headers,
+        ).json()['id']
+        plan_id = client.post(
+            PLAN_URL, json=_plan_payload(default_servings=8), headers=auth_headers
+        ).json()['id']
+        client.post(
+            f'{PLAN_URL}/{plan_id}/entries',
+            json={
+                'date': date.today().isoformat(),
+                'slot': 'LUNCH',
+                'recipe_id': recipe_id,
+                'order': 0,
+            },
+            headers=auth_headers,
+        )
+
+        day = client.get(f'{PLAN_URL}/{plan_id}', headers=auth_headers).json()[
+            'daily_nutrition_summary'
+        ][0]
+        # 800 g × 400 kcal/100 g = 3200 kcal for the loaf, 400 for one slice.
+        assert day['calories_kcal'] == pytest.approx(400.0, abs=2.0)
+        assert day['carbs_g'] == pytest.approx(80.0, abs=1.0)
 
     def test_plan_daily_nutrition_absent_is_null_not_zero(
         self, client: TestClient, auth_headers: dict[str, str]
@@ -736,7 +805,7 @@ class TestMealPlanEntries:
         assert day['coverage'] == 0.5
         assert day['carbs_g'] is None
         assert day['protein_g'] is None
-        assert day['fat_g'] == pytest.approx(200.0, abs=2.0)
+        assert day['fat_g'] == pytest.approx(100.0, abs=2.0)
 
     def test_a_nearly_complete_day_is_not_rounded_up_to_complete(
         self,
@@ -881,9 +950,9 @@ class TestMealPlanEntries:
         ][0]
         assert day['carbs_g'] is None
         assert day['protein_g'] is None
-        # The plan cooks two servings of the one-serving recipe.
-        assert day['calories_kcal'] == pytest.approx(2500.0, abs=2.0)
-        assert day['fat_g'] == pytest.approx(200.0, abs=2.0)
+        # The day counts one serving of the one-serving recipe.
+        assert day['calories_kcal'] == pytest.approx(1250.0, abs=2.0)
+        assert day['fat_g'] == pytest.approx(100.0, abs=2.0)
         assert day['coverage'] == 0.5
 
     def test_bulk_save_entries_replaces_all(
