@@ -10,7 +10,7 @@ vi.mock("sonner", () => ({
 }));
 
 vi.mock("@/lib/api/auth", () => ({
-  authApi: { confirmPasswordReset: vi.fn() },
+  authApi: { confirmPasswordReset: vi.fn(), checkPasswordReset: vi.fn() },
 }));
 
 let mounted: { unmount: () => void } | undefined;
@@ -45,9 +45,12 @@ function fill(password: string, confirm = password) {
 }
 
 describe("ResetPasswordPage", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    vi.mocked(authApi.checkPasswordReset).mockResolvedValue(undefined);
     renderPage();
+    // The form appears once the link has been checked.
+    await screen.findByLabelText(/^New password/);
   });
 
   it("does not offer to send a reset link — the link is what got us here", () => {
@@ -130,7 +133,7 @@ describe("ResetPasswordPage", () => {
       screen.getByText("Invalid or expired reset link."),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Request a fresh link from the sign-in screen\./),
+      screen.getByRole("link", { name: "Request a fresh reset link." }),
     ).toBeInTheDocument();
     expect(screen.queryByLabelText(/^New password/)).not.toBeInTheDocument();
     expect(toast.error).not.toHaveBeenCalled();
@@ -152,6 +155,7 @@ describe("ResetPasswordPage", () => {
 
   it("gives the same refusal when the URL carried no token at all", async () => {
     mounted?.unmount();
+    vi.mocked(authApi.checkPasswordReset).mockClear();
     render(
       <MemoryRouter initialEntries={["/reset-password"]}>
         <Routes>
@@ -160,16 +164,66 @@ describe("ResetPasswordPage", () => {
       </MemoryRouter>,
     );
 
-    fill("GoodPass1");
+    expect(await screen.findByTestId("reset-invalid-link")).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^New password/)).not.toBeInTheDocument();
+    expect(authApi.checkPasswordReset).not.toHaveBeenCalled();
+  });
+});
+
+describe("ResetPasswordPage — a link that is already dead", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("shows the refusal on arrival, without the password form, and links to a fresh request", async () => {
+    vi.mocked(authApi.checkPasswordReset).mockRejectedValue(refusal(400));
+    render(
+      <MemoryRouter initialEntries={["/reset-password/tok-1"]}>
+        <Routes>
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
+          <Route path="/forgot-password" element={<div>FORGOT_SCREEN</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByTestId("reset-invalid-link")).toBeInTheDocument();
-    expect(authApi.confirmPasswordReset).not.toHaveBeenCalled();
+    expect(authApi.checkPasswordReset).toHaveBeenCalledWith("tok-1");
+    expect(screen.queryByLabelText(/^New password/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Set new password" }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("link", { name: "Request a fresh reset link." }),
+    );
+    expect(await screen.findByText("FORGOT_SCREEN")).toBeInTheDocument();
+  });
+
+  it("keeps the form when the check itself could not be answered", async () => {
+    vi.mocked(authApi.checkPasswordReset).mockRejectedValue(refusal(503));
+    render(
+      <MemoryRouter initialEntries={["/reset-password/tok-1"]}>
+        <Routes>
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByLabelText(/^New password/)).toBeInTheDocument();
+    expect(screen.queryByTestId("reset-invalid-link")).not.toBeInTheDocument();
   });
 });
 
 describe("ResetPasswordPage — after the password is saved", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(authApi.checkPasswordReset).mockResolvedValue(undefined);
   });
 
   it("takes the reader to the login screen from the confirmation", async () => {
@@ -185,6 +239,7 @@ describe("ResetPasswordPage — after the password is saved", () => {
         </Routes>
       </MemoryRouter>,
     );
+    await screen.findByLabelText(/^New password/);
     fill("GoodPass1");
 
     fireEvent.click(await screen.findByRole("button", { name: "Go to login" }));

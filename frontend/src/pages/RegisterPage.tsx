@@ -110,8 +110,22 @@ export default function RegisterPage() {
     requestRegistration,
     completeRegistration,
     register: registerDirect,
+    login,
   } = useAuthStore();
   const navigate = useNavigate();
+
+  // Whoever has just chosen this password is the person at the keyboard, so
+  // the account is signed in rather than put in front of a form asking for
+  // the same address and password again. A refused sign-in (an account that
+  // is not yet usable) falls back to that form, with the address filled in.
+  const enter = async (address: string) => {
+    try {
+      await login(address, password);
+      navigate("/");
+    } catch {
+      navigate("/login", { state: { email: address } });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +161,7 @@ export default function RegisterPage() {
           queryKey: queryKeys.admin.initStatus,
         });
         toast.success(t("accountCreated"));
-        navigate("/login", { state: { email } });
+        await enter(email);
       } else if (inviteCode) {
         await registerDirect(
           email,
@@ -160,13 +174,11 @@ export default function RegisterPage() {
             defaultValue: "Account created & joined organization!",
           }),
         );
-        navigate("/login", { state: { email } });
+        await enter(email);
       } else if (token) {
         await completeRegistration(token, password, fullName || undefined);
         toast.success(t("registrationCompleted"));
-        navigate("/login", {
-          state: { email: approvedRequest?.email ?? email },
-        });
+        await enter(approvedRequest?.email ?? email);
       } else {
         await requestRegistration(email, fullName || undefined);
         // No toast: the card that replaces this form is the confirmation,
