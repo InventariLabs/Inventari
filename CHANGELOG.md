@@ -69,6 +69,18 @@ says what the release does rather than what changed since them.
   to get back into an installation without outgoing mail.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
+- When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
+  list's "From recipes" writes goods that another open shopping list still
+  asks for, the answer names them and the list that holds them
+  (`on_other_lists`), and the screen says so — in a toast, and on the meal plan
+  page in the panel that stays. The lists are still written as asked; nothing is
+  merged. Goods in another unit are not matched.
+- The name field of a form that creates a product offers the products already
+  in the catalogue whose name contains what is typed; picking one writes its
+  exact name, which is the match the save attaches the record to. Typing
+  "Wax" no longer leaves a second product beside "Soy wax".
+- An empty Products list says that products which exist only as a definition,
+  such as ones made inside a recipe or a BOM, appear there once they have stock.
 
 ### Fixed
 

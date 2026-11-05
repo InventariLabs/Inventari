@@ -1325,5 +1325,9 @@
   "settingsSave": {
     "region": "Enregistrer les modifications de cette page",
     "unsaved": "Vous avez des modifications non enregistrées"
+  },
+  "shoppingOverlap": {
+    "toast": "Déjà sur une autre liste ouverte : {{where}}",
+    "onList": "{{names}} sur « {{list}} »"
   }
 }

@@ -8,6 +8,7 @@ import { InlineQueryError } from "@/components/ui/QueryResult";
 import UnifiedFieldRenderer from "../UnifiedFieldRenderer";
 import type { TemplateUnitPrompt } from "@/modules/inventory/hooks/useItemForm";
 import { LocationCombobox } from "@/module-sdk";
+import ExistingProductSuggestions from "./ExistingProductSuggestions";
 
 export interface CategoriesFailure {
   error: unknown;
@@ -44,6 +45,11 @@ interface ProductFormContentProps {
   onAddStorage?: (query: string) => void;
   /** The unit the matched product template keeps — the hint by the picker. */
   templateUnit?: TemplateUnitPrompt | null;
+  /**
+   * Offer the existing products whose name contains the typed one. Only a
+   * form that creates a record asks: an open record is not a new product.
+   */
+  suggestExistingProducts?: boolean;
 }
 
 /**
@@ -71,6 +77,7 @@ export default function ProductFormContent({
   storageGate,
   onAddStorage,
   templateUnit = null,
+  suggestExistingProducts = false,
 }: ProductFormContentProps) {
   const { t } = useTranslation(["items", "categories", "common"]);
 
@@ -183,6 +190,12 @@ export default function ProductFormContent({
                 })}
                 error={errors.name}
               />
+              {suggestExistingProducts && (
+                <ExistingProductSuggestions
+                  name={(formData.name as string) ?? ""}
+                  onPick={(picked) => onChange("name", picked)}
+                />
+              )}
             </div>
           </div>
         </div>

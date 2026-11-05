@@ -91,6 +91,7 @@
     "title": "No products",
     "tryFilters": "Try changing filters",
     "addFirst": "Add your first product to a location. Export unlocks once there is a product.",
+    "definedWithoutStock": "Products that exist only as a definition — for example ones created inside a recipe or a BOM — are listed here once they have stock. Add one to a location to see it.",
     "noSearchResultsTitle": "No matching products",
     "noSearchResultsDescription": "No results for \"{{term}}\"",
     "clearSearch": "Clear search",
@@ -187,7 +188,8 @@
     "selectUnit": "Select unit…",
     "unitLabel": "Unit",
     "unitEmpty": "Choose",
-    "templateUnitHint": "{{product}} is counted in {{unit}} — this record takes that unit unless you choose another."
+    "templateUnitHint": "{{product}} is counted in {{unit}} — this record takes that unit unless you choose another.",
+    "existingProducts": "Already in your products:"
   },
   "identificationSection": "Product Identification",
   "itemWeightNet": "Weight per piece",

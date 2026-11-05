@@ -185,6 +185,7 @@ export function ManualTab({
         storageGate={storageGate}
         onAddStorage={onAddStorage}
         templateUnit={templateUnit}
+        suggestExistingProducts
       />
 
       {/* Product Info Display - Ingredients & Nutrition */}

@@ -31,6 +31,7 @@ from ._helpers import _round_shopping_qty
 from ._meal_plan_async_schema import _require_plan_async
 from ._meal_plan_helpers import _get_effective_servings, listed_meals_of
 from ._name_matching import match_key
+from ._shopping_overlap import lines_listed_elsewhere
 from ._shopping_rule import load_exclusions, quantity_to_buy
 from ._uom_helpers import convert_qty_for_template
 from .events import RecipeEvent
@@ -493,6 +494,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
         ]
         if new_items:
             await shopping_lists_api.add_items_async(db, sl.id, new_items, org_id)
+        written = new_items
     else:
         sl = await shopping_lists_api.create_shopping_list_async(
             db,
@@ -503,6 +505,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
         )
         if to_buy_items:
             await shopping_lists_api.add_items_async(db, sl.id, to_buy_items, org_id)
+        written = to_buy_items
 
     plan.shopping_list_id = sl.id
     # What the list was made from, for the plan screen to compare against.
@@ -526,4 +529,5 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
         available_count=available_count,
         to_buy_count=len(to_buy_items),
         items=to_buy_display,
+        on_other_lists=await lines_listed_elsewhere(db, org_id, written, list_id=sl.id),
     )

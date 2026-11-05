@@ -34,6 +34,7 @@ import { DateInput } from "@/components/ui/DateInput";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { todayIso } from "@/utils/formatters";
+import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
 
 const DEFAULT_SLOTS: MealSlot[] = ["BREAKFAST", "LUNCH", "DINNER"];
 const SLOT_ORDER: MealSlot[] = [...DEFAULT_SLOTS, "SNACK"];
@@ -208,8 +209,11 @@ export default function MealPlannerPage() {
 
   async function handleGenerateList(id: string) {
     try {
-      await generateList.mutateAsync(id);
+      const result = await generateList.mutateAsync(id);
       toast.success(t("meal_planner.list_generated"));
+      // The same goods may already stand on another open list.
+      const overlap = onOtherListsMessage(t, result.on_other_lists);
+      if (overlap) toast.warning(overlap);
     } catch (error) {
       toast.error(extractApiError(error, t("meal_planner.generate_error")));
     }

@@ -95,6 +95,7 @@
     "title": "Brak produktów",
     "tryFilters": "Spróbuj zmienić filtry",
     "addFirst": "Dodaj pierwszy produkt do jednego z miejsc. Eksport włączy się, gdy pojawi się pierwszy produkt.",
+    "definedWithoutStock": "Produkty, które istnieją tylko jako definicja — na przykład utworzone w przepisie lub recepturze — pojawią się tu, gdy będą mieć stan. Dodaj jeden do miejsca, żeby go zobaczyć.",
     "noSearchResultsTitle": "Brak pasujących produktów",
     "noSearchResultsDescription": "Brak wyników dla „{{term}}”",
     "clearSearch": "Wyczyść wyszukiwanie",
@@ -205,7 +206,8 @@
     "selectUnit": "Wybierz jednostkę…",
     "unitLabel": "Jednostka",
     "unitEmpty": "Ustaw",
-    "templateUnitHint": "{{product}} jest liczony w {{unit}} — ta pozycja przyjmie tę jednostkę, jeśli nie wybierzesz innej."
+    "templateUnitHint": "{{product}} jest liczony w {{unit}} — ta pozycja przyjmie tę jednostkę, jeśli nie wybierzesz innej.",
+    "existingProducts": "Już w Twoich produktach:"
   },
   "identificationSection": "Identyfikacja produktu",
   "locationSection": "Miejsce i stan",
