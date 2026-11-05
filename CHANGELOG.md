@@ -55,6 +55,34 @@ says what the release does rather than what changed since them.
   rather than grey. On a phone the expiry forecast tiles sit two across, so no
   label breaks inside a word in any of the six languages, and uppercase labels
   keep their word spaces.
+- Add Category opens empty, on the product and the equipment category screens
+  alike. It used to bring back the last name typed, after a cancel and after a
+  save, where saving it again was refused as a duplicate.
+- A product's thumbnail goes back to the picture the product has when the server
+  refuses a new one, and the same file can be picked again. It used to go on
+  showing the refused picture until the form was reopened.
+- A product form whose category list could not be loaded says so and offers a
+  retry, instead of quietly leaving out the fields the category declares.
+- The action sheet opened from a location's products or a scan explains why an
+  asset's actions are worded differently, as the product page does. An account
+  that may not act on the record no longer gets that sentence on either of them.
+- On a document form, a line the price books and past purchases have no price
+  for says so under that line. The sentence below the table now speaks only of
+  the document having no accounting value: as one sentence for every line, it
+  could not be true of two lines in different states.
+- Editing a draft return now offers the kind of partner the goods go back to:
+  suppliers on the return of a receipt, customers on the return of a delivery.
+  The form used to read the partner already on the draft as empty and refuse to
+  save, and a return to a manufacturer was refused by the API as well.
+- The scan confirmation on a document and the unit question on the item form
+  name the unit in the interface language ("szt.", not "pcs").
+- The short-pick dialog says "Cancel" like the short-receive one, and the picking
+  sheet's main button says "Complete picking", matching "Complete receiving".
+- The Polish refusal to finish a document with an open picking or receiving
+  session agrees with the number of sessions.
+- The answers of `PATCH /documents/{id}/confirm`, `.../complete` and
+  `POST /documents/{id}/post` carry `confirmed_by_name` and `completed_by_name`,
+  which were `null` until the document was read again.
 - Printing a list of labels gives a sheet of rows, three labels across, in the
   preview and in the download alike. It used to be one strip, however long,
   which the dialog shrank into a grey line of bars. The print queue still sends

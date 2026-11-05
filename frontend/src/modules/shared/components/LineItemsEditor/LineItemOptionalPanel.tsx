@@ -81,7 +81,7 @@ export function LineItemOptionalPanel({
                 variant="ghost"
                 size="contentSm"
                 onClick={onExpiryToggle}
-                className="px-1 py-0 text-xs font-medium"
+                className="px-1 py-2 min-h-11 md:min-h-10 text-xs font-medium"
               >
                 {labels.hideExpiryField}
               </Button>

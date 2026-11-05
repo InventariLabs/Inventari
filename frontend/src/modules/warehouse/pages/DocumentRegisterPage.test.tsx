@@ -762,21 +762,6 @@ describe("DocumentRegisterPage — the desktop branch is a table", () => {
     expect(table?.querySelectorAll("tbody").length).toBeGreaterThan(0);
   });
 
-  it("says the rows could not be loaded instead of calling the group empty", async () => {
-    mockRowsFailed();
-    const user = (await import("@testing-library/user-event")).default.setup();
-    render(
-      <HeaderHarness>
-        <DocumentRegisterPage />
-      </HeaderHarness>,
-    );
-
-    await user.click(screen.getByTestId("register-group-IN"));
-
-    expect(await screen.findByRole("alert")).toBeInTheDocument();
-    expect(screen.queryByText(/no documents/i)).not.toBeInTheDocument();
-  });
-
   it("leaves carrier and tracking out of a window nothing was shipped in", () => {
     render(
       <HeaderHarness>

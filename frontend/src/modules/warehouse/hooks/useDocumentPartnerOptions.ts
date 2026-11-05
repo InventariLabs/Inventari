@@ -5,20 +5,29 @@ import { CUSTOMER_ROLE_TYPES, SUPPLIER_ROLE_TYPES } from "@/hooks/partnerRoles";
  * The partner dropdown is filtered to the role set the document type
  * requires (supplier set for receipts, customer set for deliveries) and to
  * active partners only — the backend enforces the same rule on save. The OUT
- * dropdown is intentionally narrower than the backend: returns to suppliers
- * copy the partner from the source document.
+ * dropdown is intentionally narrower than the backend, which also takes the
+ * partner a return copies from its source document. A return swaps the two
+ * sets: the goods go back to whoever they came from.
  *
  * `selectedOffered` is whether the partner already chosen is one this picker
  * could offer; a form reads a chosen partner the picker cannot show as the
  * empty field the reader sees.
  */
 export function useDocumentPartnerOptions(
-  doc: { type?: string; partner_id?: string | null } | undefined,
+  doc:
+    | {
+        type?: string;
+        partner_id?: string | null;
+        return_of_id?: string | null;
+      }
+    | undefined,
   /** The partner held in a form, when it is not the document's saved one. */
   selectedId = doc?.partner_id ?? undefined,
 ) {
-  const partnerTypes =
-    doc?.type === "OUT" ? CUSTOMER_ROLE_TYPES : SUPPLIER_ROLE_TYPES;
+  const goesToCustomer = (doc?.type === "OUT") !== Boolean(doc?.return_of_id);
+  const partnerTypes = goesToCustomer
+    ? CUSTOMER_ROLE_TYPES
+    : SUPPLIER_ROLE_TYPES;
   const picker = usePartnerPicker(
     partnerTypes,
     selectedId,

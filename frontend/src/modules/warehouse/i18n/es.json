@@ -132,8 +132,8 @@
     "selectSource": "Seleccionar ubicación origen",
     "selectTarget": "Seleccionar ubicación destino",
     "notesPlaceholder": "Agregar notas u observaciones…",
-    "missingValueWarning": "Algunas líneas no tienen precio unitario — este documento no tiene valor contable. Al seleccionar un producto se puede sugerir un precio de sus listas de precios o compras anteriores.",
-    "missingValueWarningNoSource": "Algunas líneas no tienen precio unitario — este documento no tiene valor contable. Ni sus listas de precios ni las compras anteriores dieron un precio para estos productos — escríbalo a mano."
+    "missingValueWarning": "Algunas líneas no tienen precio unitario — este documento no tiene valor contable.",
+    "lineNoPriceSource": "Ni sus listas de precios ni las compras anteriores dan un precio — escríbalo a mano."
   },
   "bulk": {
     "selectAll": "Seleccionar todo",
@@ -852,7 +852,7 @@
     "undo_action": "Deshacer",
     "skip_confirm_title": "¿Omitir esta línea?",
     "skip_confirm_message": "{{product}} no se preparará en esta sesión. Puede deshacer la omisión desde la lista.",
-    "complete": "Completar",
+    "complete": "Completar preparación",
     "cancel": "Descartar los escaneos",
     "discard_confirm_title": "¿Descartar los escaneos?",
     "discard_confirm_message": "Todo lo recogido en esta sesión vuelve a quedar pendiente. No se puede deshacer.",

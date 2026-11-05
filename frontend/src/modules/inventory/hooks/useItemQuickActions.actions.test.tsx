@@ -118,6 +118,17 @@ describe("useItemQuickActions — offers, results and the delete dialog", () => 
     expect(result.current.vocabularyNote).toEqual(expect.any(String));
   });
 
+  it("keeps the note about the actions from an account offered none", () => {
+    signInWith(["items:read"]);
+    const { result } = render(
+      item({
+        category: { context_tag: "equipment" },
+      } as unknown as Partial<Item>),
+    );
+    expect(result.current.actions).toEqual([]);
+    expect(result.current.vocabularyNote).toBeNull();
+  });
+
   it("disables consume on an empty record", () => {
     const { action } = render(item({ quantity: "0" }));
     expect(action("consume")?.disabled).toBe(true);
