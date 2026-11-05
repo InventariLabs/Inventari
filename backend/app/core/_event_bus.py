@@ -29,7 +29,7 @@ from app.core._event_types import (
     TenantEventPayload,
     _sa_json_default,
 )
-from app.core._redis_streams import xautoclaim_messages
+from app.core._redis_streams import prune_consumers, xautoclaim_messages
 from app.core.contracts.events import (
     event_owner,
     get_payload_type,
@@ -794,6 +794,19 @@ class EventBus:
             logger.info('[EventBus] Reclaimed %d pending event(s)', reclaimed)
         return reclaimed
 
+    async def prune_dead_consumers(self, min_idle_ms: int) -> int:
+        """Remove the group's idle, empty-handed consumers other than this one."""
+        if not self._redis:
+            return 0
+        return await prune_consumers(
+            self._redis,
+            self._stream_name,
+            self._group_name,
+            min_idle_ms=min_idle_ms,
+            keep=self._node_id,
+            label='EventBus',
+        )
+
     async def disconnect(self) -> None:
         """Graceful shutdown: let the loop finish, then close Redis.
 
@@ -828,6 +841,17 @@ class EventBus:
             except asyncio.CancelledError:
                 pass
         if self._redis:
+            # Leave the group tidily: this process's name is never used again.
+            # A consumer still holding a cancelled message stays, so the
+            # reclaim can find it.
+            await prune_consumers(
+                self._redis,
+                self._stream_name,
+                self._group_name,
+                min_idle_ms=0,
+                only=self._node_id,
+                label='EventBus',
+            )
             await self._redis.aclose()
             self._redis = None
         self._stopping = False

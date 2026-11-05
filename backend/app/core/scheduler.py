@@ -23,7 +23,7 @@ from redis.asyncio import Redis
 from redis.exceptions import RedisError
 
 from app.config import settings
-from app.core._redis_streams import xautoclaim_messages
+from app.core._redis_streams import prune_consumers, xautoclaim_messages
 from app.core.logging import get_logger
 from app.core.module_identity import module_scope
 from app.core.schema_rebuild import schema_held_steady
@@ -310,6 +310,19 @@ class TaskScheduler:
         if reclaimed:
             logger.info('[Scheduler] Reclaimed %d pending task(s)', reclaimed)
         return reclaimed
+
+    async def prune_dead_consumers(self, min_idle_ms: int) -> int:
+        """Remove the group's idle, empty-handed consumers other than this one."""
+        if not self._redis:
+            return 0
+        return await prune_consumers(
+            self._redis,
+            self._stream_name,
+            self._group_name,
+            min_idle_ms=min_idle_ms,
+            keep=self._node_id,
+            label='Scheduler',
+        )
 
     async def _run_persistent_worker(self) -> None:
         """Background loop that pulls persistent tasks from Redis Stream."""
