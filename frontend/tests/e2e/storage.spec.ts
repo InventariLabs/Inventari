@@ -171,14 +171,16 @@ test.describe("Storage — extended actions (API)", () => {
   let token: string;
   let storageId: string;
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     const requestContext = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(requestContext);
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
 
+    // The worker index keeps two workers entering this hook in the same
+    // millisecond from building one location name.
     const storage = await api.createStorage(token, {
-      name: `Z-API-Storage-${Date.now()}`,
+      name: `Z-API-Storage-${Date.now()}-w${testInfo.workerIndex}`,
     });
     storageId = storage.id;
   });
