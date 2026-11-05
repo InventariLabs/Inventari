@@ -8,6 +8,7 @@ import {
   useCreateWorkflow,
   useUpdateWorkflow,
   useDeleteWorkflow,
+  useWorkflowWaiting,
 } from "../hooks/useApprovalWorkflows";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
@@ -214,5 +215,40 @@ describe("useDeleteWorkflow", () => {
     });
     act(() => result.current.mutate("wf1"));
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it("does not re-ask what waits on the workflow it just deleted", async () => {
+    let waitingCalls = 0;
+    server.use(
+      http.get("/api/v1/approvals/workflows/:id/waiting", ({ params }) => {
+        waitingCalls += 1;
+        // After the delete the workflow is gone: a second read is a 404.
+        return waitingCalls === 1
+          ? HttpResponse.json({
+              total: 0,
+              waiting: [],
+              settings_requiring_approval: [],
+            })
+          : HttpResponse.json(
+              { detail: `no workflow ${String(params.id)}` },
+              { status: 404 },
+            );
+      }),
+    );
+    // The switch-off dialog keeps this query mounted while the delete runs.
+    const { result } = renderHook(
+      () => ({
+        waiting: useWorkflowWaiting("wf1"),
+        remove: useDeleteWorkflow(),
+      }),
+      { wrapper: createWrapper() },
+    );
+    await waitFor(() => expect(result.current.waiting.isSuccess).toBe(true));
+    await act(() => result.current.remove.mutateAsync("wf1"));
+    await waitFor(() => expect(result.current.remove.isSuccess).toBe(true));
+    // Let any refetch the invalidation triggers settle.
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(waitingCalls).toBe(1);
+    expect(result.current.waiting.isError).toBe(false);
   });
 });
