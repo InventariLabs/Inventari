@@ -15,8 +15,6 @@ from sqlalchemy.orm import Session
 
 import seed_load_test_users as seed
 
-_PASSWORD = 'k6-seed-test-pw'  # noqa: S105 - throwaway value for a test database
-
 
 def test_stdout_mode_prints_the_csv_and_nothing_else(
     db_session: Session,
@@ -40,7 +38,7 @@ def test_stdout_mode_prints_the_csv_and_nothing_else(
             '--stdout',
         ],
     )
-    monkeypatch.setenv('K6_PASSWORD', _PASSWORD)
+    monkeypatch.setenv('K6_PASSWORD', 'k6-seed-test-pw')
 
     seed.main()
 

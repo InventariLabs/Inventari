@@ -159,11 +159,7 @@ def test_a_random_barcode_that_is_taken_is_drawn_again(
 ) -> None:
     # Every random code comes up twice in a row, as two equal draws would.
     # The second must not reach the database: uq_items_org_barcode_active.
-    codes = iter(
-        code
-        for n in range(10**4)
-        for code in (_ean13_for(n), _ean13_for(n))  # noqa: C416 - doubled on purpose
-    )
+    codes = iter(code for n in range(10**4) for code in (_ean13_for(n),) * 2)
     monkeypatch.setattr(seed, '_random_restricted_ean', lambda: next(codes))
 
     created = seed.seed_org_data(db_session, test_household.id, 300)
