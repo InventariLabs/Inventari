@@ -114,7 +114,7 @@ ERRORS_DE: ErrorMessages = {
     'shopping_list_not_writable': 'Diese Einkaufsliste ist {status} und kann nicht geändert werden. Aktivieren Sie sie zuerst wieder.',
     'shopping_list_delete_failed': 'Einkaufsliste konnte nicht gelöscht werden',
     'shopping_list_item_not_found': 'Einkaufslisten-Element nicht gefunden',
-    'shopping_list_item_quantity_rounds_to_zero': 'Die Menge {quantity} rundet auf der Speichergenauigkeit zu null — der kleinste speicherbare Wert ist 0,001',
+    'shopping_list_item_quantity_rounds_to_zero': 'Die Menge {quantity} rundet auf der Speichergenauigkeit zu null — der kleinste speicherbare Wert ist {smallest}',
     'shopping_list_item_quantity_above_ceiling': 'Die Menge {quantity} übersteigt die Kapazität der Spalte — der größte speicherbare Wert ist {ceiling}',
     'shopping_list_item_uom_unknown': 'Unbekannte Maßeinheit (uom_id: {uom_id}) — die Einheit existiert nicht',
     'shopping_list_item_item_unknown': 'Unbekanntes Produkt (item_id: {item_id}) — das Produkt existiert nicht',

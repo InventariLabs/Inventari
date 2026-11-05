@@ -132,8 +132,13 @@ class ShoppingListsAPI:
         ``db.refresh(item, ['category'])`` answered only the relationship.
         """
         from app.core.exceptions import ServiceRejectionError
+        from app.i18n.service import stated_quantity
         from app.modules.shopping_lists.models import ShoppingListItem
-        from app.schemas.validators import QUANTITY_MAX, quantize_quantity
+        from app.schemas.validators import (
+            QUANTITY_MAX,
+            QUANTITY_STEP,
+            quantize_quantity,
+        )
 
         await self._own_list_or_404_async(db, list_id, org_id)
         await _require_module_enabled(db, org_id)
@@ -198,6 +203,7 @@ class ShoppingListsAPI:
                 raise ServiceRejectionError(
                     'shopping_list_item_quantity_rounds_to_zero',
                     quantity=item_in.quantity,
+                    smallest=stated_quantity(QUANTITY_STEP),
                 )
             if stored > QUANTITY_MAX:
                 raise ServiceRejectionError(

@@ -112,7 +112,7 @@ ERRORS_ES: ErrorMessages = {
     'shopping_list_not_writable': 'Esta lista de la compra está {status} y no se puede modificar. Reactívala primero.',
     'shopping_list_delete_failed': 'Error al eliminar la lista de compras',
     'shopping_list_item_not_found': 'Artículo de la lista de compras no encontrado',
-    'shopping_list_item_quantity_rounds_to_zero': 'La cantidad {quantity} se redondea a cero con la precisión del almacenamiento — el valor más pequeño guardable es 0,001',
+    'shopping_list_item_quantity_rounds_to_zero': 'La cantidad {quantity} se redondea a cero con la precisión del almacenamiento — el valor más pequeño guardable es {smallest}',
     'shopping_list_item_quantity_above_ceiling': 'La cantidad {quantity} supera la capacidad de la columna — el valor más grande guardable es {ceiling}',
     'shopping_list_item_uom_unknown': 'Unidad de medida desconocida (uom_id: {uom_id}) — la unidad no existe',
     'shopping_list_item_item_unknown': 'Producto desconocido (item_id: {item_id}) — el producto no existe',
