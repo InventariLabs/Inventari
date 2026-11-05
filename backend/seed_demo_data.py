@@ -1722,7 +1722,7 @@ def _resolve_category_ids(db, org_id, *, catalogue='food'):
     """Map category codes (lowercased) to live IDs, for one organization.
 
     Reads the organization's own categories as well as the global ones —
-    module categories became per-organization rows in ``modcat01``, so a
+    module categories became per-organization rows in the archived ``modcat01``, so a
     lookup over global rows alone came back empty on an installation that
     has no global catalogue at all. Where a code exists in both, the
     organization's row wins: it is the one every other write path uses.

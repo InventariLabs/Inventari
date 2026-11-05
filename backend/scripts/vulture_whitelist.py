@@ -106,7 +106,7 @@ ALLERGEN_SET  # noqa: B018
 # these helpers — see api_keys, purchase_orders and webhooks 001_initial.
 create_table_if_absent  # noqa: B018
 create_index_if_absent  # noqa: B018
-# Core tzaware01 and one revision in each module chain convert their naive
+# The archived core tzaware01 and one revision in each module chain convert their naive
 # timestamp columns through it.
 convert_naive_timestamps_to_utc  # noqa: B018
 # Baseline builder for the tenancy lint, called from

@@ -49,7 +49,7 @@ Three findings decided the direction:
 - Item create/update accept `weight_value` and `weight_uom_id` and write them
   to the item's **org-owned** template. A global template
   (`organization_id IS NULL`) is shared and is never written to.
-- Migration `itemweight01` drops the column, with a working downgrade that
+- The archived migration `itemweight01` drops the column, with a working downgrade that
   restores its shape (not its contents — there were none).
 
 ## Rationale

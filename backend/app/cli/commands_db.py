@@ -705,7 +705,7 @@ def stamp_module(
 def upgrade_modules():
     """Apply per-module Alembic migrations (alembic_version_<module> tables).
 
-    Module tables were originally created by the core ``baseline_001``
+    Module tables were originally created by the archived core ``baseline_001``
     migration. After the module-migration isolation, each
     module owns its own migration chain. This command reconciles the two:
 

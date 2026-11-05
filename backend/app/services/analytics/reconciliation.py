@@ -13,7 +13,7 @@ Two pairs are compared, because two pairs can quietly disagree:
 "The shelf" is the records' view (``stock_quants_from_records``). The report
 compared two more pairs while there was a quant table — the records against
 it, and it against that view — and they ended with the table
-(``quantdrop01``): there is one number of stock, and nothing left for it to
+(archived ``quantdrop01``): there is one number of stock, and nothing left for it to
 disagree with (ADR-022).
 
 A scheduled job (``app.services.reconciliation_job``) runs this on a
