@@ -69,9 +69,10 @@ describe("extractApiError", () => {
     expect(extractApiError(err, "fallback")).toBe("fallback");
   });
 
-  it("names the field a 422 speaks about", () => {
-    // "Input should be a valid string" on its own sent the reader hunting
-    // through the form for a field the message never named.
+  it("never prints the API key of the field a 422 speaks about", () => {
+    // The key is an English snake_case word ("count: Muss kleiner oder
+    // gleich 500 sein"), the one untranslated part of an otherwise
+    // translated sentence. The server's message stands on its own.
     const error = {
       isAxiosError: true,
       response: {
@@ -88,7 +89,7 @@ describe("extractApiError", () => {
       },
     };
     expect(extractApiError(error, "fallback")).toBe(
-      "api_base_url: Input should be a valid string",
+      "Input should be a valid string",
     );
   });
 });

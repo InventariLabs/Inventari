@@ -28,20 +28,15 @@ export function extractApiError(error: unknown, fallback: string): string {
     const detail = error.response?.data?.detail;
     if (typeof detail === "string") return detail;
     if (Array.isArray(detail)) {
-      // A 422 array carries one entry per failing field. "Input should be
-      // a valid string" on its own names nothing; the entry's last `loc`
-      // segment does, so the reader knows which field to fix.
+      // A 422 array carries one entry per failing field. The message is the
+      // server's own sentence, already in the reader's language; the field's
+      // API key (`storage_location_id`) is not, and in front of a translated
+      // sentence it was the one English word on the line. A caller that can
+      // point at a field puts the message there (`parseApiValidationErrors`).
       const first = detail[0];
       if (first && typeof first === "object" && "msg" in first) {
         const msg = (first as { msg: unknown }).msg;
-        if (typeof msg === "string") {
-          const loc = (first as { loc?: unknown }).loc;
-          const field =
-            Array.isArray(loc) && loc.length > 0
-              ? String(loc[loc.length - 1])
-              : null;
-          return field && field !== "body" ? `${field}: ${msg}` : msg;
-        }
+        if (typeof msg === "string") return msg;
       }
       return fallback;
     }

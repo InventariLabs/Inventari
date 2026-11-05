@@ -849,7 +849,12 @@
       "none": "Nichts ist verloren gegangen",
       "noneHint": "Jede Nachricht dieser Organisation hat den Server verlassen.",
       "attempts": "{{n}} von {{max}} Versuchen",
-      "reason": "Grund: {{reason}}"
+      "reason": "Grund: {{reason}}",
+      "reasons": {
+        "notConfigured": "SMTP ist noch nicht eingerichtet",
+        "halfLogin": "SMTP-Benutzername und -Passwort müssen beide ausgefüllt oder beide leer sein",
+        "unreported": "Der Mailserver hat keinen Grund genannt"
+      }
     },
     "about": {
       "subtitle": "Version, Lizenz und Quellcode dieser Installation",

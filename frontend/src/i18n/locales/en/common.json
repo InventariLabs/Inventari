@@ -849,7 +849,12 @@
       "none": "Nothing was lost",
       "noneHint": "Every message this organization sent has left the building.",
       "attempts": "{{n}} of {{max}} attempts",
-      "reason": "Reason: {{reason}}"
+      "reason": "Reason: {{reason}}",
+      "reasons": {
+        "notConfigured": "SMTP is not set up yet",
+        "halfLogin": "The SMTP username and password must both be set, or both left empty",
+        "unreported": "The mail server gave no reason"
+      }
     },
     "about": {
       "subtitle": "Version, licence and source code of this installation",
