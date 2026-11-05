@@ -47,7 +47,7 @@ export default function ItemsEmptyState({
   // definition — one created inside a recipe — is not on it. An empty list
   // over such products says where they are, instead of "no products" and an
   // invitation to add the first one.
-  const { data: definedCount = 0 } = useQuery({
+  const { data: definedCount, isError: countFailed } = useQuery({
     queryKey: queryKeys.productTemplates.count,
     queryFn: productTemplatesApi.count,
     staleTime: 30_000,
@@ -91,7 +91,7 @@ export default function ItemsEmptyState({
             })
           : isFiltered
             ? t("empty.tryFilters")
-            : definedCount > 0
+            : !countFailed && (definedCount ?? 0) > 0
               ? t("empty.definedWithoutStock")
               : t("empty.addFirst")
       }
