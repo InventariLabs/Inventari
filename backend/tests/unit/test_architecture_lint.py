@@ -115,54 +115,34 @@ def test_escape_hatch_with_valid_reason_skips_violations(tmp_path):
     assert 'Complex GROUP BY' in escape_hatch_files[0][1]
 
 
-def test_escape_hatch_without_reason_exits(tmp_path):
+@pytest.mark.parametrize(
+    'source',
+    [
+        pytest.param(
+            '# architecture: allow_direct_db_access\nfrom app.models.item import Item\n',
+            id='no-reason',
+        ),
+        pytest.param(
+            '# architecture: allow_direct_db_access\n'
+            '# reason: because needed\n'
+            'from app.models.item import Item\n',
+            id='reason-too-short',
+        ),
+        pytest.param(
+            '# architecture: allow_direct_db_access\n'
+            '# reason: Complex multi-join aggregation for analytics reporting dashboard\n'
+            'from app.models.item import Item\n'
+            '\ndef save(db, item):\n'
+            '    db.add(item)\n'
+            '    db.commit()\n',
+            id='commit-under-the-marker',
+        ),
+    ],
+)
+def test_a_malformed_escape_hatch_exits(tmp_path, source):
     modules_root = tmp_path / 'modules'
     modules_root.mkdir()
-
-    service_file = modules_root / 'bad_service.py'
-    service_file.write_text(
-        '# architecture: allow_direct_db_access\nfrom app.models.item import Item\n',
-        encoding='utf-8',
-    )
-
-    with pytest.raises(SystemExit) as exc_info:
-        find_module_boundary_violations(modules_root, baseline_file=None)
-
-    assert exc_info.value.code == 1
-
-
-def test_escape_hatch_with_short_reason_exits(tmp_path):
-    modules_root = tmp_path / 'modules'
-    modules_root.mkdir()
-
-    service_file = modules_root / 'lazy_service.py'
-    service_file.write_text(
-        '# architecture: allow_direct_db_access\n'
-        '# reason: because needed\n'
-        'from app.models.item import Item\n',
-        encoding='utf-8',
-    )
-
-    with pytest.raises(SystemExit) as exc_info:
-        find_module_boundary_violations(modules_root, baseline_file=None)
-
-    assert exc_info.value.code == 1
-
-
-def test_escape_hatch_with_db_commit_exits(tmp_path):
-    modules_root = tmp_path / 'modules'
-    modules_root.mkdir()
-
-    service_file = modules_root / 'writing_service.py'
-    service_file.write_text(
-        '# architecture: allow_direct_db_access\n'
-        '# reason: Complex multi-join aggregation for analytics reporting dashboard\n'
-        'from app.models.item import Item\n'
-        '\ndef save(db, item):\n'
-        '    db.add(item)\n'
-        '    db.commit()\n',
-        encoding='utf-8',
-    )
+    (modules_root / 'bad_service.py').write_text(source, encoding='utf-8')
 
     with pytest.raises(SystemExit) as exc_info:
         find_module_boundary_violations(modules_root, baseline_file=None)
@@ -351,62 +331,44 @@ def test_api_layer_import_violations_skip_type_checking(tmp_path):
     assert baselined == []
 
 
-def test_is_cross_module_import_whitelisted_api_suffix():
-    """Approved public API pattern: <module>_api is whitelisted."""
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.approvals.approvals_api')
-        is True
-    )
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.warehouse.warehouse_api')
-        is True
-    )
-
-
-def test_is_cross_module_import_whitelisted_approved_modules():
-    """Approved sub-modules: exceptions and schemas are whitelisted."""
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.approvals.exceptions') is True
-    )
-    assert _is_cross_module_import_whitelisted('app.modules.approvals.schemas') is True
-
-
-def test_is_cross_module_import_whitelisted_rejects_unapproved():
-    """Non-public cross-module imports are not whitelisted."""
-    assert _is_cross_module_import_whitelisted('app.modules.approvals.models') is False
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.approvals.services') is False
-    )
-    assert _is_cross_module_import_whitelisted('app.modules.approvals.router') is False
-    assert _is_cross_module_import_whitelisted('app.core.public_api') is False
-
-
-def test_whitelist_wants_the_target_modules_own_api_file():
-    """The contract names one door per module, not an `_api` naming habit.
-
-    Both of these were True before: the suffix alone was the whole test, so
-    any file ending in `_api` opened the module — including one named after
-    somebody else's.
-    """
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.maker.secret_internal_api')
-        is False
-    )
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.maker.warehouse_api') is False
-    )
-
-
-def test_whitelist_wants_the_approved_names_one_level_deep():
-    """`exceptions` and `schemas` are the module's own, not any leaf so named."""
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.approvals.schemas.internal')
-        is False
-    )
-    assert (
-        _is_cross_module_import_whitelisted('app.modules.approvals.sub.exceptions')
-        is False
-    )
+@pytest.mark.parametrize(
+    ('target', 'allowed'),
+    [
+        # The public door: `<module>_api`, plus the module's own
+        # `exceptions` and `schemas`.
+        pytest.param('app.modules.approvals.approvals_api', True, id='own-api-file'),
+        pytest.param('app.modules.warehouse.warehouse_api', True, id='own-api-file-2'),
+        pytest.param('app.modules.approvals.exceptions', True, id='exceptions'),
+        pytest.param('app.modules.approvals.schemas', True, id='schemas'),
+        # Everything else inside a module is private.
+        pytest.param('app.modules.approvals.models', False, id='models'),
+        pytest.param('app.modules.approvals.services', False, id='services'),
+        pytest.param('app.modules.approvals.router', False, id='router'),
+        # The contract names one door per module, not an `_api` naming habit:
+        # the suffix alone used to be the whole test, so any file ending in
+        # `_api` opened the module — including one named after somebody
+        # else's.
+        pytest.param(
+            'app.modules.maker.secret_internal_api', False, id='api-suffix-only'
+        ),
+        pytest.param('app.modules.maker.warehouse_api', False, id='anothers-api-file'),
+        # `exceptions` and `schemas` are the module's own, not any leaf so named.
+        pytest.param(
+            'app.modules.approvals.schemas.internal', False, id='below-schemas'
+        ),
+        pytest.param(
+            'app.modules.approvals.sub.exceptions', False, id='nested-exceptions'
+        ),
+        # Only app.modules.* paths can be whitelisted.
+        pytest.param('app.core.public_api', False, id='core-api'),
+        pytest.param('app.core.contracts.dtos', False, id='core-contracts'),
+        pytest.param('app.services.items.query_service', False, id='legacy-services'),
+        pytest.param('app.models', False, id='too-short-models'),
+        pytest.param('app', False, id='too-short-app'),
+    ],
+)
+def test_the_cross_module_whitelist_judges_an_import_target(target, allowed):
+    assert _is_cross_module_import_whitelisted(target) is allowed
 
 
 def test_cross_module_check_reads_plain_import_too(tmp_path):
@@ -517,37 +479,54 @@ def test_the_prefix_is_derived_from_the_root_the_check_is_handed(tmp_path):
     assert 'app.plugins.other.services' in findings[0]
 
 
-def test_is_cross_module_import_whitelisted_too_short():
-    """Non-app paths are not whitelisted."""
-    assert _is_cross_module_import_whitelisted('app.models') is False
-    assert _is_cross_module_import_whitelisted('app') is False
-
-
-def test_a_relative_climb_to_the_modules_package_is_an_error(tmp_path, monkeypatch):
-    """`from ...modules import warehouse` names another module one line
-    below its absolute twin, which the gate already refused. Red before
-    the fix: the relative branch resolved the climb to bare `['app.modules']`,
-    dropped the bound names, and the judge saw an address too short to be
-    a reach — with a live crossing in the tree the gate exited 0.
-    """
+@pytest.mark.parametrize(
+    ('source', 'named'),
+    [
+        # Relative spellings resolve against the file's own package, so each
+        # names the same crossing as its absolute twin; the dots and the
+        # named module are one address. Red before the relative branch was
+        # resolved: a climb to bare `app.modules` dropped the bound names
+        # and the gate exited 0 with a live crossing in the tree.
+        pytest.param(
+            'from ...modules import warehouse\n',
+            'app.modules.warehouse',
+            id='relative-climb',
+        ),
+        pytest.param(
+            'from ...modules import warehouse as d\n',
+            'app.modules.warehouse',
+            id='climb-with-alias',
+        ),
+        pytest.param(
+            'from ..other.services import VALUE\n',
+            'app.modules.other.services',
+            id='relative-into-module',
+        ),
+        pytest.param(
+            'from ..other import services\n', 'app.modules.other', id='relative-package'
+        ),
+        pytest.param(
+            'from app.modules import other\n',
+            'app.modules.other',
+            id='package-root-grab',
+        ),
+        pytest.param(
+            'from ...modules.other.services import VALUE\n',
+            'app.modules.other.services',
+            id='climb-over-root',
+        ),
+    ],
+)
+def test_an_import_that_reaches_another_module_is_an_error(
+    tmp_path, monkeypatch, source, named
+):
     monkeypatch.chdir(tmp_path)
-    modules_root = _two_modules(tmp_path, 'from ...modules import warehouse\n')
+    modules_root = _two_modules(tmp_path, source)
 
     findings = _check_cross_module_imports(modules_root)
 
     assert len(findings) == 1
-    assert 'app.modules.warehouse' in findings[0]
-
-
-def test_a_relative_climb_with_an_alias_is_an_error(tmp_path, monkeypatch):
-    """The alias form binds the same package; the gate reads through it."""
-    monkeypatch.chdir(tmp_path)
-    modules_root = _two_modules(tmp_path, 'from ...modules import warehouse as d\n')
-
-    findings = _check_cross_module_imports(modules_root)
-
-    assert len(findings) == 1
-    assert 'app.modules.warehouse' in findings[0]
+    assert named in findings[0]
 
 
 def test_a_climb_from_a_nested_file_reaches_the_modules_package_too(
@@ -625,15 +604,6 @@ def test_a_two_part_import_of_an_inner_file_is_still_an_error(tmp_path):
     assert 'app.modules.other' in findings[0]
 
 
-def test_is_cross_module_import_whitelisted_rejects_non_modules():
-    """Only app.modules.* paths can be whitelisted — Core paths are rejected."""
-    assert _is_cross_module_import_whitelisted('app.core.public_api') is False
-    assert _is_cross_module_import_whitelisted('app.core.contracts.dtos') is False
-    assert (
-        _is_cross_module_import_whitelisted('app.services.items.query_service') is False
-    )
-
-
 def _two_modules(tmp_path, importing_source):
     """modules/me importing from modules/other, with a real target file."""
     modules_root = tmp_path / 'modules'
@@ -682,43 +652,6 @@ def test_imports_on_the_public_contract_are_not_findings(tmp_path, monkeypatch):
     assert _check_cross_module_imports(modules_root) == []
 
 
-def test_a_relative_import_into_another_module_is_an_error(tmp_path, monkeypatch):
-    """`from ..other.services import VALUE` written inside `me` is the same
-    crossing as its absolute twin — the dots resolve against the file's own
-    package, and the resolved path names another module."""
-    monkeypatch.chdir(tmp_path)
-    modules_root = _two_modules(tmp_path, 'from ..other.services import VALUE\n')
-
-    findings = _check_cross_module_imports(modules_root)
-
-    assert len(findings) == 1
-    assert 'app.modules.other.services' in findings[0]
-
-
-def test_a_relative_package_import_is_an_error(tmp_path, monkeypatch):
-    """`from ..other import services` — module given, names at the package
-    root. The dots resolve the same way; nothing vouches for the symbols."""
-    monkeypatch.chdir(tmp_path)
-    modules_root = _two_modules(tmp_path, 'from ..other import services\n')
-
-    findings = _check_cross_module_imports(modules_root)
-
-    assert len(findings) == 1
-    assert 'app.modules.other' in findings[0]
-
-
-def test_the_modules_package_root_grab_is_an_error(tmp_path, monkeypatch):
-    """`from app.modules import other` binds another module's package with
-    nothing naming what will be used — a grab the gate refuses."""
-    monkeypatch.chdir(tmp_path)
-    modules_root = _two_modules(tmp_path, 'from app.modules import other\n')
-
-    findings = _check_cross_module_imports(modules_root)
-
-    assert len(findings) == 1
-    assert 'app.modules.other' in findings[0]
-
-
 def test_a_relative_import_inside_the_owner_is_not_an_edge(tmp_path, monkeypatch):
     """`from .helpers import VALUE` stays inside the module that wrote it."""
     monkeypatch.chdir(tmp_path)
@@ -726,22 +659,6 @@ def test_a_relative_import_inside_the_owner_is_not_an_edge(tmp_path, monkeypatch
     (tmp_path / 'modules' / 'me' / 'helpers.py').write_text('VALUE = 1\n')
 
     assert _check_cross_module_imports(modules_root) == []
-
-
-def test_a_climb_over_the_root_that_comes_back_is_an_error(tmp_path, monkeypatch):
-    """`from ...modules.other.services import VALUE` from a module file
-    climbs over ``app`` and back down into ``app.modules`` — the dots and
-    the named module are one address, so the resolved target is the same
-    one its absolute spelling names, and it meets the same refusal."""
-    monkeypatch.chdir(tmp_path)
-    modules_root = _two_modules(
-        tmp_path, 'from ...modules.other.services import VALUE\n'
-    )
-
-    findings = _check_cross_module_imports(modules_root)
-
-    assert len(findings) == 1
-    assert 'app.modules.other.services' in findings[0]
 
 
 def test_sync_async_module_level_pair_is_flagged(tmp_path):
@@ -1520,7 +1437,7 @@ class TestCoreApiModelLeakGuardrail:
             ),
         ],
     )
-    def test_detects_model_return_as_error(self, tmp_path, definition):
+    def test_a_public_method_returning_a_model_is_an_error(self, tmp_path, definition):
         f = tmp_path / 'items.py'
         f.write_text(
             'from typing import TYPE_CHECKING\n'
@@ -1556,7 +1473,9 @@ class TestCoreApiModelLeakGuardrail:
             ),
         ],
     )
-    def test_private_helper_excluded(self, tmp_path, source):
+    def test_model_use_outside_a_public_return_type_is_not_flagged(
+        self, tmp_path, source
+    ):
         f = tmp_path / 'items.py'
         f.write_text(source, encoding='utf-8')
         result = _check_public_api_return_types(tmp_path)
@@ -1657,7 +1576,9 @@ class TestCoreApiAsyncNamingGuardrail:
             ),
         ],
     )
-    def test_a_suffixed_coroutine_passes(self, tmp_path, filename, source):
+    def test_async_naming_accepts_what_the_contract_allows(
+        self, tmp_path, filename, source
+    ):
         (tmp_path / filename).write_text(source, encoding='utf-8')
         assert _check_coreapi_async_naming(tmp_path) == []
 
@@ -1991,7 +1912,9 @@ class TestServicesEscapeHatchMarker:
             ),
         ],
     )
-    def test_ignores_marker_inside_prose_docstring(self, tmp_path, filename, source):
+    def test_a_marker_that_is_not_a_directive_is_ignored(
+        self, tmp_path, filename, source
+    ):
         services_root = tmp_path / 'services'
         services_root.mkdir()
         (services_root / filename).write_text(source, encoding='utf-8')
@@ -2096,7 +2019,9 @@ class TestCoreApiSignatureLegalityGuardrail:
             ),
         ],
     )
-    def test_schemas_type_in_return_flagged(self, tmp_path, filename, source, illegal):
+    def test_an_illegal_type_in_a_facade_signature_is_flagged(
+        self, tmp_path, filename, source, illegal
+    ):
         f = tmp_path / filename
         f.write_text(source, encoding='utf-8')
         result = _check_coreapi_signature_legality(tmp_path)
@@ -2160,7 +2085,7 @@ class TestCoreApiSignatureLegalityGuardrail:
             ),
         ],
     )
-    def test_contracts_dto_ok(self, tmp_path, filename, source):
+    def test_a_legal_facade_signature_is_not_flagged(self, tmp_path, filename, source):
         f = tmp_path / filename
         f.write_text(source, encoding='utf-8')
         result = _check_coreapi_signature_legality(tmp_path)
@@ -2253,7 +2178,7 @@ class TestMixedStatusAssertionCheck:
             ),
         ],
     )
-    def test_ignores_a_set_of_successes(self, tmp_path, body):
+    def test_a_membership_test_is_not_a_mixed_assertion(self, tmp_path, body):
         from app.core.architecture_lint._quality_checks_test_hygiene import (
             _check_mixed_status_assertions,
         )
