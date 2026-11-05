@@ -116,8 +116,8 @@ class TestKeywordMatch:
             ('Cebula czerwona', '🧅'),
             # Equipment
             ('Laptop bag', '💻'),
-            ('Monitor stand', '🖥️'),
-            ('Ekran LCD', '🖥️'),
+            ('Monitor stand', '📺'),
+            ('Ekran LCD', '📺'),
             ('Phone case', '📱'),
             ('Smartphone Pro', '📱'),
             ('Telefon biurowy', '📱'),
@@ -127,8 +127,8 @@ class TestKeywordMatch:
             ('Mysz bezprzewodowa', '🖱️'),
             ('Printer ink', '🖨️'),
             ('Drukarka laserowa', '🖨️'),
-            ('Server rack', '🖥️'),
-            ('Serwer produkcyjny', '🖥️'),
+            ('Server rack', '🗄️'),
+            ('Serwer produkcyjny', '🗄️'),
             ('Cable HDMI', '🔌'),
             ('Kabel sieciowy', '🔌'),
             # Tools
@@ -233,7 +233,7 @@ class TestWordBoundary:
     def test_ser_does_not_match_serwer(self):
         # 'serwer' starts with 'ser' but no word boundary on the right.
         result = resolve_category_emoji(name='Serwer produkcyjny')
-        assert result == '🖥️'  # server wins
+        assert result == '🗄️'  # server wins
 
     def test_ser_matches_as_whole_word(self):
         assert resolve_category_emoji(name='Ser żółty') == '🧀'

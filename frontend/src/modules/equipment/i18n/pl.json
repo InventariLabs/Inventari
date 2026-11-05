@@ -44,7 +44,7 @@
   "dashboard": {
     "title": "Przegląd sprzętu",
     "total_assets": "W flocie",
-    "active_assignments": "Wypożyczone",
+    "active_assignments": "Wydane",
     "in_maintenance": "W serwisie",
     "retired": "Wycofane",
     "warrantyAlertsCount_one": "{{count}} alert gwarancyjny",
@@ -77,10 +77,10 @@
       "assets_few": "{{count}} zasoby",
       "assets_many": "{{count}} zasobów",
       "assets_other": "{{count}} zasobu",
-      "issued_one": "{{count}} wypożyczony",
-      "issued_few": "{{count}} wypożyczone",
-      "issued_many": "{{count}} wypożyczonych",
-      "issued_other": "{{count}} wypożyczonego"
+      "issued_one": "{{count}} wydany",
+      "issued_few": "{{count}} wydane",
+      "issued_many": "{{count}} wydanych",
+      "issued_other": "{{count}} wydanego"
     },
     "fleet": {
       "title": "Flota wg kategorii",
@@ -99,24 +99,24 @@
     "legend": {
       "label": "Legenda",
       "ok": "na stanie",
-      "issued": "wypożyczone",
+      "issued": "wydane",
       "warn": "na stanie, gwarancja się kończy",
       "service": "w serwisie"
     },
     "journal": {
-      "title": "Ostatnie wypożyczenia",
-      "link": "Wszystkie wypożyczone",
-      "issued_to": "wypożyczenie → {{holder}}",
+      "title": "Ostatnie wydania",
+      "link": "Wszystkie wydane",
+      "issued_to": "wydanie → {{holder}}",
       "placed_in": "rozstawienie → {{holder}}"
     },
-    "view_all": "Wszystkie zasoby"
+    "view_all": "Wszystkie zasoby ({{n}})"
   },
   "assignments": {
     "checkout": "Wydaj",
     "checkout_done": "Wydano: {{asset}}",
     "checkout_placed": "Wydano do {{location}}: {{asset}}",
     "checkin": "Przyjmij",
-    "no_active": "Brak aktywnych wypożyczeń",
+    "no_active": "Brak aktywnych wydań",
     "you": "Ty",
     "held_by": "Posiadacz",
     "standing_in": "Stoi w",
@@ -172,6 +172,7 @@
   "maintenance": {
     "add_log": "Dodaj wpis",
     "no_history": "Brak wpisów serwisowych",
+    "no_history_in_service": "Nic jeszcze nie zapisano dla tego serwisu",
     "in_service_title": "Ten sprzęt jest w serwisie",
     "in_service_hint": "Zakończenie serwisu przywróci mu status „Dostępny”.",
     "end_service": "Zakończ serwis",
@@ -235,17 +236,17 @@
     "active_tab": "Aktywne",
     "archived_tab": "Archiwum",
     "no_archived": "Brak zarchiwizowanych zasobów",
-    "no_archived_hint": "Wycofane lub usunięte zasoby pojawią się tutaj.",
+    "no_archived_hint": "Zarchiwizowane zasoby pojawią się tutaj. Archiwizacja zdejmuje zasób z listy; możesz go przywrócić.",
     "all_locations": "Wszystkie miejsca",
     "all_categories": "Wszystkie kategorie",
     "filter_by_location": "Filtruj po miejscu",
     "filter_by_category": "Filtruj po kategorii",
     "clear_filters": "Wyczyść",
     "clear_filter": "Wyczyść filtr statusu",
-    "clear_checked_out": "Wyczyść filtr wypożyczeń",
+    "clear_checked_out": "Wyczyść filtr wydań",
     "empty_filtered": "Brak zasobów pasujących do aktywnych filtrów",
     "empty_filtered_status": "Brak zasobów o statusie {{status}}",
-    "empty_filtered_checked_out": "Brak wypożyczonych zasobów",
+    "empty_filtered_checked_out": "Brak wydanych zasobów",
     "showing_one": "{{count}} zasób",
     "showing_few": "{{count}} zasoby",
     "showing_many": "{{count}} zasobów",
@@ -277,8 +278,8 @@
         "cta": "Importuj z pliku"
       },
       "step2": {
-        "title": "Przypisz go osobie lub miejscu",
-        "description": "Wydaj zasób (Check Out), aby śledzić, kto jest za niego odpowiedzialny."
+        "title": "Wydaj go osobie lub miejscu",
+        "description": "Wydaj zasób, aby śledzić, kto jest za niego odpowiedzialny."
       },
       "step3": {
         "title": "Skonfiguruj alerty konserwacji",
@@ -335,7 +336,7 @@
     "columns": {
       "title": "Kolumny",
       "name": "Nazwa",
-      "serial": "Nr seryjny / tag",
+      "serial": "Nr seryjny / inwentarzowy",
       "location": "Miejsce",
       "assignedTo": "Posiadacz",
       "warranty": "Gwarancja",
@@ -353,7 +354,7 @@
     "tabs": {
       "timeline": "Historia",
       "info": "Informacje",
-      "assignments": "Wypożyczenia",
+      "assignments": "Wydania",
       "maintenance": "Serwis"
     },
     "confirm_retire": "Wycofać ten zasób?",
@@ -395,7 +396,7 @@
     "description": "Opis",
     "edit": "Edytuj model",
     "editSubtitle": "Zaktualizuj zapisany szablon sprzętu.",
-    "groupTag": "Tag grupy / zestawu",
+    "groupTag": "Oznaczenie grupy / zestawu",
     "manufacturer": "Producent",
     "metadataSection": "Metadane sprzętu",
     "model": "Numer modelu",
@@ -432,6 +433,8 @@
     "duplicateUpdate": "Aktualizuj istniejące",
     "duplicateAllow": "Utwórz duplikaty",
     "resultExtras": "Pominięto: {{skipped}}, Zaktualizowano: {{updated}}",
+    "completeWithErrors": "Import zakończony z błędami",
+    "skippedSerials": "Pominięte jako duplikaty: {{serials}}",
     "fields": {
       "name": "Nazwa",
       "brand": "Producent",
@@ -493,7 +496,7 @@
       "category": "Kategoria",
       "location": "Miejsce",
       "serialNumber": "Numer seryjny",
-      "assetTag": "Tag zasobu",
+      "assetTag": "Numer inwentarzowy",
       "barcode": "Kod kreskowy / EAN",
       "labelCode": "Etykieta / Kod QR",
       "manufacturer": "Producent",
@@ -505,7 +508,7 @@
       "ramGb": "RAM (GB)",
       "storageGb": "Dysk (GB)",
       "os": "System operacyjny",
-      "groupTag": "Tag grupy / zestawu",
+      "groupTag": "Oznaczenie grupy / zestawu",
       "usefulLifeYears": "Okres użytkowania (lata)"
     },
     "placeholders": {
@@ -704,13 +707,27 @@
     "public": {
       "pageTitle": "Atestacja zasobu",
       "brand": "Inventari",
+      "requestedBy": "Prośba od: {{organization}}",
+      "answerBy": "Prosimy o odpowiedź do {{date}}",
       "assignedTo": "Przypisane do",
       "assetSection": "Zasób",
       "serialNumber": "Numer seryjny",
-      "instructions": "Potwierdź, że ten zasób znajduje się w Twoim posiadaniu, lub zgłoś problem, jeśli coś jest nie tak.",
-      "confirmButton": "Mam ten zasób",
-      "confirmAsk": "Potwierdzasz, że masz ten zasób?",
-      "confirmYes": "Tak, mam go",
+      "instructions_one": "Potwierdź, że ten zasób znajduje się w Twoim posiadaniu, lub zgłoś problem, jeśli coś jest nie tak.",
+      "instructions_few": "Potwierdź, że te zasoby znajdują się w Twoim posiadaniu, lub zgłoś problem, jeśli coś jest nie tak.",
+      "instructions_many": "Potwierdź, że te zasoby znajdują się w Twoim posiadaniu, lub zgłoś problem, jeśli coś jest nie tak.",
+      "instructions_other": "Potwierdź, że te zasoby znajdują się w Twoim posiadaniu, lub zgłoś problem, jeśli coś jest nie tak.",
+      "confirmButton_one": "Mam ten zasób",
+      "confirmButton_few": "Mam te zasoby",
+      "confirmButton_many": "Mam te zasoby",
+      "confirmButton_other": "Mam te zasoby",
+      "confirmAsk_one": "Potwierdzasz, że masz ten zasób?",
+      "confirmAsk_few": "Potwierdzasz, że masz te zasoby?",
+      "confirmAsk_many": "Potwierdzasz, że masz te zasoby?",
+      "confirmAsk_other": "Potwierdzasz, że masz te zasoby?",
+      "confirmYes_one": "Tak, mam go",
+      "confirmYes_few": "Tak, mam je",
+      "confirmYes_many": "Tak, mam je",
+      "confirmYes_other": "Tak, mam je",
       "confirming": "Potwierdzanie…",
       "actionFailed": "Coś poszło nie tak. Spróbuj ponownie — jeśli błąd się powtarza, poproś o nowy link osobę, która Ci go wysłała.",
       "reportIssue": "Zgłoś problem",
@@ -726,7 +743,10 @@
       "detailsPlaceholder": "Opisz szczegółowo problem…",
       "cancel": "Anuluj",
       "statusConfirmed": "Potwierdzono",
-      "statusConfirmedDesc": "Potwierdzenie tego zasobu zostało zapisane i możesz już zamknąć tę kartę.",
+      "statusConfirmedDesc_one": "Potwierdzenie tego zasobu zostało zapisane i możesz już zamknąć tę kartę.",
+      "statusConfirmedDesc_few": "Potwierdzenie tych zasobów zostało zapisane i możesz już zamknąć tę kartę.",
+      "statusConfirmedDesc_many": "Potwierdzenie tych zasobów zostało zapisane i możesz już zamknąć tę kartę.",
+      "statusConfirmedDesc_other": "Potwierdzenie tych zasobów zostało zapisane i możesz już zamknąć tę kartę.",
       "statusDisputed": "Problem zgłoszony",
       "statusDisputedDesc": "Twoje zgłoszenie zostało zapisane i możesz już zamknąć tę kartę.",
       "statusDisputedConfirmedDesc_one": "Twoje zgłoszenie jest zapisane, a także potwierdzenie {{count}} innego zasobu. Możesz już zamknąć tę kartę.",
@@ -763,7 +783,7 @@
       "hintStorage": "Tylko wydane zasoby, których stałym miejscem jest to miejsce.",
       "hintCategory": "Tylko zasoby w tej kategorii.",
       "previewCount": "Zasoby w zakresie: {{assets}} · Osoby: {{people}}",
-      "previewEmpty": "W tym zakresie nie ma aktywnych przypisań — nie ma kogo zaatestować."
+      "previewEmpty": "W tym zakresie nie ma aktywnych wydań — nie ma kogo zaatestować."
     },
     "confirm": {
       "launchTitle": "Uruchomić atestację?",
@@ -783,8 +803,8 @@
       "deleteMessage": "Nie została uruchomiona, więc nic nie wyszło i nie ma czego zachowywać.",
       "launchMessageCounted": "E-mail atestacyjny zostanie wysłany do każdej osoby w zakresie — osoby: {{people}}, zasoby: {{assets}}. Tej operacji nie można cofnąć.",
       "nothingToAttestTitle": "Nie ma kogo zaatestować",
-      "nothingToAttestMessage": "W tym zakresie żaden zasób nie ma aktywnego przypisania, więc nie ma kogo zapytać. Najpierw przypisz zasób, potem uruchom atestację.",
-      "nothingToAttestAction": "Przejdź do przypisań",
+      "nothingToAttestMessage": "W tym zakresie żaden zasób nie jest wydany, więc nie ma kogo zapytać. Najpierw wydaj zasób, potem uruchom atestację.",
+      "nothingToAttestAction": "Przejdź do wydań",
       "withoutEmail_one": "{{count}} zasób jest wydany bez adresu e-mail; jego posiadacz nie zostanie zapytany.",
       "withoutEmail_few": "{{count}} zasoby są wydane bez adresu e-mail; ich posiadacze nie zostaną zapytani.",
       "withoutEmail_many": "{{count}} zasobów jest wydanych bez adresu e-mail; ich posiadacze nie zostaną zapytani.",
@@ -894,7 +914,7 @@
     "quantity": "Ilość",
     "prefix": "Prefiks",
     "prefixPlaceholder": "np. DELL-LAT5540",
-    "useSerialAsAssetTag": "Użyj numeru seryjnego jako tagu zasobu",
+    "useSerialAsAssetTag": "Użyj numeru seryjnego jako numeru inwentarzowego zasobu",
     "generate_one": "Wygeneruj {{count}} numer seryjny",
     "generate_few": "Wygeneruj {{count}} numery seryjne",
     "generate_many": "Wygeneruj {{count}} numerów seryjnych",
@@ -928,7 +948,7 @@
   "bulk_edit": {
     "change_status": "Status",
     "change_location": "Miejsce",
-    "assign_to": "Przypisz",
+    "assign_to": "Wydaj",
     "change_status_title_one": "Zmień status {{count}} zasobu",
     "change_status_title_few": "Zmień status {{count}} zasobów",
     "change_status_title_many": "Zmień status {{count}} zasobów",
@@ -937,10 +957,10 @@
     "change_location_title_few": "Przenieś {{count}} zasoby do miejsca",
     "change_location_title_many": "Przenieś {{count}} zasobów do miejsca",
     "change_location_title_other": "Przenieś {{count}} zasobów do miejsca",
-    "assign_to_title_one": "Przypisz {{count}} zasób osobie",
-    "assign_to_title_few": "Przypisz {{count}} zasoby osobie",
-    "assign_to_title_many": "Przypisz {{count}} zasobów osobie",
-    "assign_to_title_other": "Przypisz {{count}} zasobów osobie",
+    "assign_to_title_one": "Wydaj {{count}} zasób osobie",
+    "assign_to_title_few": "Wydaj {{count}} zasoby osobie",
+    "assign_to_title_many": "Wydaj {{count}} zasobów osobie",
+    "assign_to_title_other": "Wydaj {{count}} zasobów osobie",
     "new_status": "Nowy status",
     "target_location": "Do miejsca",
     "select_location": "Wybierz miejsce…",
@@ -948,17 +968,17 @@
   },
   "my_assets": {
     "title": "Mój sprzęt",
-    "subtitle": "Zasoby obecnie przypisane do Ciebie",
-    "empty": "Brak przypisanych zasobów",
+    "subtitle": "Zasoby obecnie wydane Tobie",
+    "empty": "Brak wydanych zasobów",
     "empty_hint": "Zasoby wydane na Ciebie pojawią się tutaj.",
     "checked_out": "Wydano",
     "overdue": "Zaległe",
     "due": "Termin",
     "warranty": "Gwarancja",
-    "history_title": "Historia przypisań",
+    "history_title": "Historia wydań",
     "hide_history": "Ukryj",
     "show_history": "Pokaż",
-    "no_history": "Brak przeszłych przypisań",
+    "no_history": "Brak wcześniejszych wydań",
     "return": "Zwróć",
     "who_returns": "Zwrot zapisuje osoba, która przyjmuje zasób z powrotem — poproś osobę odpowiedzialną za zasób o przyjęcie zwrotu albo o zgłoszenie usterki."
   },
@@ -1048,9 +1068,9 @@
   },
   "permissions": {
     "read": "Podgląd sprzętu",
-    "readDesc": "Może przeglądać zasoby, modele, przypisania i historię serwisową",
+    "readDesc": "Może przeglądać zasoby, modele, wydania i historię serwisową",
     "write": "Zarządzanie sprzętem",
-    "writeDesc": "Może dodawać i edytować zasoby, przypisywać je osobom i odnotowywać serwis"
+    "writeDesc": "Może dodawać i edytować zasoby, wydawać je osobom i odnotowywać serwis"
   },
   "labels": {
     "purpose": "Sprzęt"

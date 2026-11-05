@@ -28,7 +28,7 @@
     "searchPlaceholder": "Szukaj po nazwie, numerze lub typie…",
     "targetTypes": {
       "document": "Dokument",
-      "equipmentCheckout": "Wypożyczenie sprzętu",
+      "equipmentCheckout": "Wydanie sprzętu",
       "purchaseOrder": "Zamówienie zakupu"
     },
     "tabs": {

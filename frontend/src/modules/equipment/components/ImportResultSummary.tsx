@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { AlertCircle, Check, Info } from "lucide-react";
+import { AlertCircle, AlertTriangle, Check, Info } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import type { ImportExecuteResult } from "@/modules/equipment/api/equipment";
 
@@ -9,7 +9,9 @@ import type { ImportExecuteResult } from "@/modules/equipment/api/equipment";
  * It read "Import complete" under a green check whatever happened, so a sheet
  * whose every row was refused announced success above "Imported: 0, Failed: 3".
  * A run that wrote nothing now says so — as a failure when rows were refused,
- * plainly when every row was skipped as a duplicate.
+ * plainly when every row was skipped as a duplicate. A run that wrote some
+ * rows and refused others says "with errors" rather than "complete" above a
+ * red box, and a skipped duplicate is named by its serial number.
  */
 export function ImportResultSummary({
   result,
@@ -21,6 +23,8 @@ export function ImportResultSummary({
   const updated = result.updated ?? 0;
   const wroteNothing = result.imported === 0 && updated === 0;
   const refused = wroteNothing && result.failed > 0;
+  const partial = !wroteNothing && result.failed > 0;
+  const serials = result.skipped_serials;
 
   return (
     <>
@@ -30,6 +34,8 @@ export function ImportResultSummary({
             <AlertCircle size={20} className="text-red-500" aria-hidden />
           ) : wroteNothing ? (
             <Info size={20} className="text-on-muted" aria-hidden />
+          ) : partial ? (
+            <AlertTriangle size={20} className="text-amber-500" aria-hidden />
           ) : (
             <Check size={20} className="text-success-500" aria-hidden />
           )}
@@ -37,7 +43,9 @@ export function ImportResultSummary({
             <div className="text-sm font-medium text-on">
               {wroteNothing
                 ? t("import.nothingImported")
-                : t("import.complete")}
+                : partial
+                  ? t("import.completeWithErrors")
+                  : t("import.complete")}
             </div>
             <div className="text-xs text-on-muted">
               {t("import.result", {
@@ -48,6 +56,15 @@ export function ImportResultSummary({
             {skipped > 0 || updated > 0 ? (
               <div className="text-xs text-on-muted">
                 {t("import.resultExtras", { skipped, updated })}
+              </div>
+            ) : null}
+            {serials.length > 0 ? (
+              <div className="text-xs text-on-muted break-words">
+                {t("import.skippedSerials", {
+                  serials:
+                    serials.join(", ") +
+                    (skipped > serials.length ? ", …" : ""),
+                })}
               </div>
             ) : null}
           </div>

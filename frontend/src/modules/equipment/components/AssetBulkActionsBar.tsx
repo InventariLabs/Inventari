@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Archive,
@@ -40,6 +41,35 @@ interface AssetBulkActionsBarProps {
   onBulkChangeLocation: () => void;
   onBulkAssignTo: () => void;
   onClearSelection: () => void;
+}
+
+/**
+ * One action of the bar. On a phone the bar wrapped eight labelled buttons
+ * into rows that covered two fifths of the screen — and the rows being acted
+ * on with them — so below `sm` an action is its icon, and the label stays as
+ * its accessible name and tooltip.
+ */
+function BulkAction({
+  onClick,
+  icon,
+  label,
+}: {
+  onClick: () => void;
+  icon: ReactNode;
+  label: string;
+}) {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={onClick}
+      title={label}
+      className="px-3 sm:px-4"
+    >
+      {icon}
+      <span className="sr-only sm:not-sr-only">{label}</span>
+    </Button>
+  );
 }
 
 /**
@@ -124,65 +154,44 @@ export function AssetBulkActionsBar({
           server-side, so the bar shows only what will work. */}
       {!allMatching && (
         <>
-          <Button
-            variant="outline"
-            size="sm"
+          <BulkAction
             onClick={onBulkChangeStatus}
-            leftIcon={<RefreshCw size={14} />}
-          >
-            {t("bulk_edit.change_status", "Status")}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+            icon={<RefreshCw size={14} />}
+            label={t("bulk_edit.change_status", "Status")}
+          />
+          <BulkAction
             onClick={onBulkChangeLocation}
-            leftIcon={<MapPin size={14} />}
-          >
-            {t("bulk_edit.change_location", "Location")}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+            icon={<MapPin size={14} />}
+            label={t("bulk_edit.change_location", "Location")}
+          />
+          <BulkAction
             onClick={onBulkAssignTo}
-            leftIcon={<UserPlus size={14} />}
-          >
-            {t("bulk_edit.assign_to", "Assign")}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+            icon={<UserPlus size={14} />}
+            label={t("bulk_edit.assign_to", "Assign")}
+          />
+          <BulkAction
             onClick={onBulkReturn}
-            leftIcon={<PackageCheck size={14} />}
-          >
-            {t("actions.bulk_return", "Return Selected")}
-          </Button>
+            icon={<PackageCheck size={14} />}
+            label={t("actions.bulk_return", "Return Selected")}
+          />
         </>
       )}
-      <Button
-        variant="outline"
-        size="sm"
+      <BulkAction
         onClick={onBulkRetire}
-        leftIcon={<PowerOff size={14} />}
-      >
-        {t("actions.bulk_retire")}
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
+        icon={<PowerOff size={14} />}
+        label={t("actions.bulk_retire")}
+      />
+      <BulkAction
         onClick={onBulkArchive}
-        leftIcon={<Archive size={14} />}
-      >
-        {t("actions.bulk_archive", "Archive")}
-      </Button>
+        icon={<Archive size={14} />}
+        label={t("actions.bulk_archive", "Archive")}
+      />
       {!allMatching && (
-        <Button
-          variant="outline"
-          size="sm"
+        <BulkAction
           onClick={onBulkPrintLabels}
-          leftIcon={<QrCode size={14} />}
-        >
-          {t("actions.bulk_print_labels")}
-        </Button>
+          icon={<QrCode size={14} />}
+          label={t("actions.bulk_print_labels")}
+        />
       )}
       {!allMatching && (
         <SendToPrinterButton

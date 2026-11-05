@@ -161,8 +161,10 @@ export default function AssetDetailPage() {
   const handleRetire = async () => {
     if (!id) return;
     await retireMutation.mutateAsync(id);
+    // Retiring is a status change, not a removal: the asset is still here, and
+    // the page the reader is on now shows it retired.
     toast.success(t("detail.retired"));
-    navigate("/equipment");
+    setShowRetireConfirm(false);
   };
 
   const handleArchive = async () => {

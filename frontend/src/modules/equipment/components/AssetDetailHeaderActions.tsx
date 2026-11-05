@@ -12,7 +12,7 @@ import {
   LogOut,
   LogIn,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { AssetStatusMenu } from "@/modules/equipment/components/AssetStatusMenu";
@@ -162,15 +162,13 @@ export function AssetDetailHeaderActions({
         }}
         onCancel={() => setReturnStatus(null)}
       />
-      <Link to={`/equipment/${itemId}/edit`}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("actions.edit")}
-          title={t("actions.edit")}
-        >
-          <Edit2 size={16} />
-        </Button>
+      <Link
+        to={`/equipment/${itemId}/edit`}
+        className={buttonVariants({ variant: "ghost", size: "icon" })}
+        aria-label={t("actions.edit")}
+        title={t("actions.edit")}
+      >
+        <Edit2 size={16} />
       </Link>
       {/* ui-pattern: destructive-as-neutral — retiring is a status change,
           not a deletion: the asset stays in the register and the amber this

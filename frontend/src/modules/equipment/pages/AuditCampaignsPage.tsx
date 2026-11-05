@@ -15,7 +15,7 @@ import { equipmentApi } from "@/modules/equipment/api/equipment";
 import type { ScopeType } from "@/modules/equipment/api/equipment_campaigns";
 import { usePagination } from "@/hooks/usePagination";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
@@ -280,11 +280,15 @@ export default function AuditCampaignsPage() {
                 )}
                 {campaign.status === "ACTIVE" && (
                   <>
-                    <Link to={`/equipment/campaigns/${campaign.id}`}>
-                      <Button size="sm" variant="outline">
-                        <Eye size={14} className="mr-1" />
-                        {t("attestation.viewDetail", "Details")}
-                      </Button>
+                    <Link
+                      to={`/equipment/campaigns/${campaign.id}`}
+                      className={buttonVariants({
+                        size: "sm",
+                        variant: "outline",
+                      })}
+                    >
+                      <Eye size={14} className="mr-1" />
+                      {t("attestation.viewDetail", "Details")}
                     </Link>
                     {canWrite && (
                       <>
@@ -314,10 +318,11 @@ export default function AuditCampaignsPage() {
                     to be read, which is the reason cancelling exists. */}
                 {(campaign.status === "COMPLETED" ||
                   campaign.status === "CANCELLED") && (
-                  <Link to={`/equipment/campaigns/${campaign.id}`}>
-                    <Button size="sm" variant="ghost">
-                      {t("attestation.viewDetail", "Details")}
-                    </Button>
+                  <Link
+                    to={`/equipment/campaigns/${campaign.id}`}
+                    className={buttonVariants({ size: "sm", variant: "ghost" })}
+                  >
+                    {t("attestation.viewDetail", "Details")}
                   </Link>
                 )}
               </div>

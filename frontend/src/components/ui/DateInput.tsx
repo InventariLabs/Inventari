@@ -28,7 +28,7 @@ import {
   type SheetZTier,
 } from "@/components/ui/Sheet";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { formatLocale } from "@/utils/formatters";
+import { formatDate, formatLocale } from "@/utils/formatters";
 
 /**
  * The date field for the whole app.
@@ -170,12 +170,9 @@ export function DateInput({
 
   const locale = formatLocale();
 
-  const formatted = useMemo(() => {
-    if (!selected) return "";
-    return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-      selected,
-    );
-  }, [selected, locale]);
+  // The same numeric day every other screen prints — the picker used to
+  // spell it as "25 lis 2026" beside "30.11.2026" on the page behind it.
+  const formatted = selected ? formatDate(value) : "";
 
   const monthLabel = useMemo(
     () =>

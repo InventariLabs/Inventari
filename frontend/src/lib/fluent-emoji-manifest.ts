@@ -57,6 +57,7 @@ export const FluentEmojiManifest: Record<string, string> = {
   "🫒": "/emoji/olive_color.svg",
   "🌾": "/emoji/sheaf_of_rice_color.svg",
   "💻": "/emoji/laptop_color.svg",
+  "📺": "/emoji/television_color.svg",
   "📱": "/emoji/mobile_phone_color.svg",
   "📷": "/emoji/camera_color.svg",
   "🔌": "/emoji/electric_plug_color.svg",

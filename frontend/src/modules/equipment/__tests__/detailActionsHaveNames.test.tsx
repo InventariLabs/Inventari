@@ -43,7 +43,7 @@ describe("icon controls on the asset detail header", () => {
     renderActions();
 
     expect(
-      screen.getByRole("button", { name: "Edit asset" }),
+      screen.getByRole("link", { name: "Edit asset" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Retire" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Archive" })).toBeInTheDocument();

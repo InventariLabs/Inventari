@@ -161,6 +161,36 @@ describe("AssetDetailPage — archive, restore and purge", () => {
     expect(toast.success).toHaveBeenCalledWith("Asset archived");
   });
 
+  it("retires after the confirmation and stays on the asset", async () => {
+    const retired = vi.fn();
+    serveAsset();
+    server.use(
+      http.post(`/api/v1/equipment/items/${ITEM_ID}/retire`, () => {
+        retired();
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    renderDetail();
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Retire" }),
+    );
+    await confirmIn("Retire");
+
+    await waitFor(() => expect(retired).toHaveBeenCalledTimes(1));
+    // Retiring is a status change, not a removal: the asset is still here,
+    // and the page the reader is on is the one that shows it retired.
+    expect(screen.queryByText("the asset list")).not.toBeInTheDocument();
+    expect(toast.success).toHaveBeenCalledWith("Asset retired");
+    // The dialog closes with the success: left open, its live Retire button
+    // sent a second request the API refuses.
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("alertdialog", { name: /retire this asset/i }),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
   it("cancelling the archive sends nothing and stays on the asset", async () => {
     const archived = vi.fn();
     serveAsset();

@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Plus, FileDown, Upload } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
 interface AssetListHeaderActionsProps {
   canWrite: boolean;
@@ -61,10 +62,15 @@ export function AssetListHeaderActions({
         </Button>
       ))}
       {canWrite && (
-        <Link to="/equipment/add" className="min-w-0 flex-1 sm:flex-none">
-          <Button leftIcon={<Plus size={16} />} className="w-full sm:w-auto">
-            {t("dashboard.add_asset")}
-          </Button>
+        <Link
+          to="/equipment/add"
+          className={cn(
+            buttonVariants(),
+            "min-w-0 flex-1 gap-2 sm:flex-none sm:w-auto",
+          )}
+        >
+          <Plus size={16} />
+          {t("dashboard.add_asset")}
         </Link>
       )}
     </div>

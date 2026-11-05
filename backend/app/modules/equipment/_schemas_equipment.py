@@ -111,6 +111,10 @@ class ImportExecuteResult(BaseModel):
     # updated (update mode) rows.
     skipped: int = 0
     updated: int = 0
+    # The serial numbers of the rows skipped as duplicates (the first twenty,
+    # as with ``errors``): a bare count leaves the reader to find which rows
+    # of a long sheet it is.
+    skipped_serials: list[str] = []
 
 
 class AttachmentSchema(BaseModel):

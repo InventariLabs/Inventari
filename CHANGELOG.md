@@ -56,6 +56,15 @@ says what the release does rather than what changed since them.
 - Deactivate on a module's card reads as a button.
 - The demo data charges the tax of the organization's country, and none where
   no country is set, rather than Polish VAT on every order and document.
+- Equipment, small things a regression pass found: adding an asset opens the
+  new asset (a batch opens the asset list) and retiring one keeps you on it;
+  the public attestation page says which organization asks and by what day,
+  and its confirm texts follow the number of assets still open; an import
+  that lost rows says it finished with errors and names the serial numbers it
+  skipped as duplicates; an asset in service with an empty log says nothing
+  is logged for the service yet; the German screen is "Meine Geräte", and the
+  Polish module speaks of issuing (*wydanie*) throughout. The date picker now
+  prints a day the way the rest of the application does.
 - Tapping a screen for the first time now shows a loading sign at once, inside
   the application's frame, instead of leaving the old screen up for as long as
   the download takes. The very first open of the application shows the product

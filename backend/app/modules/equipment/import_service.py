@@ -274,6 +274,7 @@ async def execute_equipment_import(
     skipped = 0
     updated = 0
     errors: list[dict[str, Any]] = []
+    skipped_serials: list[str] = []
 
     duplicate_mode = str(mapping.get('duplicate_mode') or 'create_only')
 
@@ -334,6 +335,9 @@ async def execute_equipment_import(
             updated += 1
         elif outcome == 'skipped':
             skipped += 1
+            serial = row_text(row, mapping.get('serial_number'))
+            if serial:
+                skipped_serials.append(serial)
 
     return {
         'imported': imported,
@@ -341,6 +345,7 @@ async def execute_equipment_import(
         'skipped': skipped,
         'updated': updated,
         'errors': errors[:20],
+        'skipped_serials': skipped_serials[:20],
     }
 
 

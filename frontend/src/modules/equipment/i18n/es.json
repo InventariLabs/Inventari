@@ -98,7 +98,7 @@
       "issued_to": "préstamo → {{holder}}",
       "placed_in": "desplegado → {{holder}}"
     },
-    "view_all": "Todos los activos"
+    "view_all": "Todos los activos ({{n}})"
   },
   "assignments": {
     "checkout": "Prestar",
@@ -161,6 +161,7 @@
   "maintenance": {
     "add_log": "Agregar entrada",
     "no_history": "Sin registros de mantenimiento",
+    "no_history_in_service": "Aún no hay nada registrado para este mantenimiento",
     "in_service_title": "Este equipo está en mantenimiento",
     "in_service_hint": "Al terminar el mantenimiento volverá a estar disponible.",
     "end_service": "Terminar mantenimiento",
@@ -216,7 +217,7 @@
     "active_tab": "Activos",
     "archived_tab": "Archivados",
     "no_archived": "Sin activos archivados",
-    "no_archived_hint": "Los activos retirados o eliminados aparecerán aquí.",
+    "no_archived_hint": "Los activos que archive aparecerán aquí. Archivar quita un activo de la lista; puede restaurarlo.",
     "all_locations": "Todas las ubicaciones",
     "all_categories": "Todas las categorías",
     "filter_by_location": "Filtrar por ubicación",
@@ -389,6 +390,8 @@
     "duplicateUpdate": "Actualizar existentes",
     "duplicateAllow": "Crear duplicados",
     "resultExtras": "Omitidos: {{skipped}}, Actualizados: {{updated}}",
+    "completeWithErrors": "Importación terminada con errores",
+    "skippedSerials": "Omitidos por duplicados: {{serials}}",
     "fields": {
       "name": "Nombre",
       "brand": "Fabricante",
@@ -651,13 +654,19 @@
     "public": {
       "pageTitle": "Atestación de activo",
       "brand": "Inventari",
+      "requestedBy": "Solicitado por {{organization}}",
+      "answerBy": "Responda antes del {{date}}",
       "assignedTo": "Asignado a",
       "assetSection": "Activo",
       "serialNumber": "Número de serie",
-      "instructions": "Confirme que tiene este activo en su posesión, o informe de un problema si algo no está bien.",
-      "confirmButton": "Tengo este activo",
-      "confirmAsk": "¿Confirmas que tienes este activo?",
-      "confirmYes": "Sí, lo tengo",
+      "instructions_one": "Confirme que tiene este activo en su posesión, o informe de un problema si algo no está bien.",
+      "instructions_other": "Confirme que tiene estos activos en su posesión, o informe de un problema si algo no está bien.",
+      "confirmButton_one": "Tengo este activo",
+      "confirmButton_other": "Tengo estos activos",
+      "confirmAsk_one": "¿Confirmas que tienes este activo?",
+      "confirmAsk_other": "¿Confirmas que tienes estos activos?",
+      "confirmYes_one": "Sí, lo tengo",
+      "confirmYes_other": "Sí, los tengo",
       "confirming": "Confirmando…",
       "actionFailed": "Se ha producido un error. Inténtelo de nuevo; si el problema persiste, pida un nuevo enlace a la persona que se lo envió.",
       "reportIssue": "Informar de un problema",
@@ -673,7 +682,8 @@
       "detailsPlaceholder": "Describe el problema en detalle…",
       "cancel": "Cancelar",
       "statusConfirmed": "Confirmado",
-      "statusConfirmedDesc": "Tu confirmación de este activo ha quedado guardada y ya puedes cerrar esta pestaña.",
+      "statusConfirmedDesc_one": "Tu confirmación de este activo ha quedado guardada y ya puedes cerrar esta pestaña.",
+      "statusConfirmedDesc_other": "Tu confirmación de estos activos ha quedado guardada y ya puedes cerrar esta pestaña.",
       "statusDisputed": "Problema notificado",
       "statusDisputedDesc": "Tu informe ha quedado guardado y ya puedes cerrar esta pestaña.",
       "statusDisputedConfirmedDesc_one": "Su informe se ha guardado, al igual que su confirmación de {{count}} activo más. Ya puede cerrar esta pestaña.",

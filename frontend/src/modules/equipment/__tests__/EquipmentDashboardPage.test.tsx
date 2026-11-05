@@ -273,6 +273,7 @@ describe("the equipment overview", () => {
         warranty("dock", "Docking Station", 0),
         warranty("hub", "USB Hub", 1),
       ],
+      totals: { total_assets: 2, retired: 0, active: 0 },
     });
     renderPage();
 
@@ -313,7 +314,7 @@ describe("the equipment overview", () => {
   });
 
   it("does not call the day quiet before the answers are in", async () => {
-    serve();
+    serve({ assets: [asset("l1", laptops)] });
     let answer: () => void = () => {};
     const held = new Promise<void>((resolve) => (answer = resolve));
     server.use(
@@ -453,13 +454,23 @@ describe("the equipment overview", () => {
     await settle();
   });
 
-  it("names what its link opens: the whole asset list", async () => {
+  it("claims no control over a fleet that has no assets yet", async () => {
+    serve({ totals: { total_assets: 0, retired: 0, active: 0 } });
+    renderPage();
+    // "Fleet under control" over zero assets is a claim about nothing.
+    expect(await screen.findByText("In the fleet")).toBeInTheDocument();
+    expect(screen.queryByText("Fleet under control")).toBeNull();
+    await settle();
+  });
+
+  it("names what its link opens: the whole asset list, and how long it is", async () => {
     serve({
       assets: [asset("hp", printers, { status: "MAINTENANCE", serial: "S1" })],
-      totals: { total_assets: 1, retired: 0, active: 0 },
+      totals: { total_assets: 2, retired: 1, active: 0 },
     });
     renderPage();
-    const link = await screen.findByRole("link", { name: "All assets" });
+    // The list behind the link shows the retired asset too: 2, not the fleet's 1.
+    const link = await screen.findByRole("link", { name: "All assets (2)" });
     expect(link).toHaveAttribute("href", "/equipment/assets");
     expect(
       screen.queryByRole("link", { name: "View all" }),
@@ -479,7 +490,7 @@ describe("the equipment overview", () => {
 
   it("offers no 'Add Asset' to a reader", async () => {
     canWrite = false;
-    serve();
+    serve({ assets: [asset("l1", laptops)] });
     renderPage();
     await screen.findByRole("heading", { name: "Fleet under control" });
     expect(screen.queryByTestId("header-actions")).toBeNull();

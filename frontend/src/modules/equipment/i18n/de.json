@@ -10,7 +10,7 @@
   "nav": {
     "overview": "Übersicht",
     "assets": "Geräte",
-    "my_assets": "Mein Gerät",
+    "my_assets": "Meine Geräte",
     "locations": "Standorte",
     "categories": "Kategorien",
     "campaigns": "Attestierungen",
@@ -91,7 +91,7 @@
       "issued_to": "ausgeliehen an {{holder}}",
       "placed_in": "aufgestellt → {{holder}}"
     },
-    "view_all": "Alle Geräte"
+    "view_all": "Alle Geräte ({{n}})"
   },
   "assignments": {
     "checkout": "Ausleihen",
@@ -135,8 +135,8 @@
       "return_date_past_error": "Das Rückgabedatum darf nicht in der Vergangenheit liegen.",
       "accounts_group": "Konten in dieser Organisation",
       "return_date_consequence": "Ohne Rückgabedatum kann diese Ausgabe nie im Bericht über überfällige Rückgaben erscheinen.",
-      "email_consequence": "Ohne Adresse erscheint das Gerät nicht unter „Mein Gerät“ der Person, und eine Attestierung erreicht sie nicht.",
-      "email_unmatched": "Niemand in dieser Organisation nutzt diese Adresse — der Inhaber sieht dieses Gerät nicht unter „Mein Gerät“, und eine Attestierung kann ihn nicht erreichen. Nur beibehalten, wenn der Inhaber kein Konto hat."
+      "email_consequence": "Ohne Adresse erscheint das Gerät nicht unter „Meine Geräte“ der Person, und eine Attestierung erreicht sie nicht.",
+      "email_unmatched": "Niemand in dieser Organisation nutzt diese Adresse — der Inhaber sieht dieses Gerät nicht unter „Meine Geräte“, und eine Attestierung kann ihn nicht erreichen. Nur beibehalten, wenn der Inhaber kein Konto hat."
     },
     "checkin_modal": {
       "title": "Gerät zurückgeben",
@@ -154,6 +154,7 @@
   "maintenance": {
     "add_log": "Eintrag hinzufügen",
     "no_history": "Keine Wartungseinträge",
+    "no_history_in_service": "Für diese Wartung ist noch nichts eingetragen",
     "in_service_title": "Dieses Gerät ist in Wartung",
     "in_service_hint": "Mit dem Beenden der Wartung gilt es wieder als verfügbar.",
     "end_service": "Wartung beenden",
@@ -209,7 +210,7 @@
     "active_tab": "Aktiv",
     "archived_tab": "Archiviert",
     "no_archived": "Keine archivierten Geräte",
-    "no_archived_hint": "Archivierte oder gelöschte Geräte erscheinen hier.",
+    "no_archived_hint": "Archivierte Geräte erscheinen hier. Archivieren nimmt ein Gerät aus der Liste; Sie können es wiederherstellen.",
     "all_locations": "Alle Standorte",
     "all_categories": "Alle Kategorien",
     "filter_by_location": "Nach Standort filtern",
@@ -382,6 +383,8 @@
     "duplicateUpdate": "Vorhandene aktualisieren",
     "duplicateAllow": "Duplikate erstellen",
     "resultExtras": "Übersprungen: {{skipped}}, Aktualisiert: {{updated}}",
+    "completeWithErrors": "Import mit Fehlern abgeschlossen",
+    "skippedSerials": "Als Duplikate übersprungen: {{serials}}",
     "fields": {
       "name": "Bezeichnung",
       "brand": "Hersteller",
@@ -619,7 +622,7 @@
     "launched": "Gestartet",
     "launch": "Starten",
     "launching": "Wird gestartet…",
-    "complete": "Abgeschlossen",
+    "complete": "Abschließen",
     "viewDetail": "Details",
     "progressTitle": "Antwortfortschritt",
     "responsesTitle": "Einzelne Antworten",
@@ -644,13 +647,19 @@
     "public": {
       "pageTitle": "Geräte-Attestierung",
       "brand": "Inventari",
+      "requestedBy": "Angefragt von {{organization}}",
+      "answerBy": "Bitte antworten Sie bis {{date}}",
       "assignedTo": "Zugewiesen an",
       "assetSection": "Gerät",
       "serialNumber": "Seriennummer",
-      "instructions": "Bitte bestätigen Sie, dass sich dieses Gerät in Ihrem Besitz befindet, oder melden Sie ein Problem, wenn etwas nicht stimmt.",
-      "confirmButton": "Ich habe dieses Gerät",
-      "confirmAsk": "Bestätigen, dass Sie dieses Gerät haben?",
-      "confirmYes": "Ja, ich habe es",
+      "instructions_one": "Bitte bestätigen Sie, dass sich dieses Gerät in Ihrem Besitz befindet, oder melden Sie ein Problem, wenn etwas nicht stimmt.",
+      "instructions_other": "Bitte bestätigen Sie, dass sich diese Geräte in Ihrem Besitz befinden, oder melden Sie ein Problem, wenn etwas nicht stimmt.",
+      "confirmButton_one": "Ich habe dieses Gerät",
+      "confirmButton_other": "Ich habe diese Geräte",
+      "confirmAsk_one": "Bestätigen, dass Sie dieses Gerät haben?",
+      "confirmAsk_other": "Bestätigen, dass Sie diese Geräte haben?",
+      "confirmYes_one": "Ja, ich habe es",
+      "confirmYes_other": "Ja, ich habe sie",
       "confirming": "Wird bestätigt…",
       "actionFailed": "Etwas ist schiefgegangen. Bitte versuchen Sie es erneut — wenn der Fehler weiterhin auftritt, bitten Sie die Person, die Ihnen diesen Link gesendet hat, um einen neuen.",
       "reportIssue": "Problem melden",
@@ -666,7 +675,8 @@
       "detailsPlaceholder": "Bitte beschreiben Sie das Problem ausführlich…",
       "cancel": "Abbrechen",
       "statusConfirmed": "Bestätigt",
-      "statusConfirmedDesc": "Ihre Bestätigung für dieses Gerät wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
+      "statusConfirmedDesc_one": "Ihre Bestätigung für dieses Gerät wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
+      "statusConfirmedDesc_other": "Ihre Bestätigung für diese Geräte wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
       "statusDisputed": "Problem gemeldet",
       "statusDisputedDesc": "Ihre Meldung wurde gespeichert, und Sie können diesen Tab jetzt schließen.",
       "statusDisputedConfirmedDesc_one": "Ihre Meldung ist gespeichert, ebenso Ihre Bestätigung für {{count}} weiteres Objekt. Sie können diesen Tab jetzt schließen.",
@@ -854,10 +864,10 @@
     "new_status": "Neuer Status",
     "target_location": "Ziel-Lagerort",
     "select_location": "Standort auswählen…",
-    "no_email_warning": "Für diese Person ist keine E-Mail-Adresse hinterlegt — die herausgegebenen Geräte erscheinen nicht in ihrer Ansicht „Mein Gerät”."
+    "no_email_warning": "Für diese Person ist keine E-Mail-Adresse hinterlegt — die herausgegebenen Geräte erscheinen nicht in ihrer Ansicht „Meine Geräte”."
   },
   "my_assets": {
-    "title": "Mein Gerät",
+    "title": "Meine Geräte",
     "subtitle": "Ihnen aktuell zugewiesene Geräte",
     "empty": "Keine Geräte zugewiesen",
     "empty_hint": "Ihnen ausgeliehene Geräte erscheinen hier.",

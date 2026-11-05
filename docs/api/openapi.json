@@ -43392,6 +43392,29 @@
               }
             ],
             "title": "Closed Reason"
+          },
+          "organization_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization Name"
+          },
+          "deadline_day": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline Day"
           }
         },
         "type": "object",
@@ -45472,6 +45495,29 @@
               }
             ],
             "title": "Closed Reason"
+          },
+          "organization_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization Name"
+          },
+          "deadline_day": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline Day"
           },
           "assets_returned": {
             "type": "boolean",
@@ -53795,6 +53841,14 @@
             "type": "integer",
             "title": "Updated",
             "default": 0
+          },
+          "skipped_serials": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skipped Serials",
+            "default": []
           }
         },
         "type": "object",

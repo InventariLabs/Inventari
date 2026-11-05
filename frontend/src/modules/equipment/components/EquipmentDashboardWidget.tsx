@@ -74,7 +74,7 @@ export function EquipmentDashboardWidget() {
         <div className="mt-2 flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 text-xs text-on-info">
           <Wrench size={14} />
           <span>
-            {data.in_maintenance} {t("dashboard.in_maintenance").toLowerCase()}
+            {t("dashboard.fleet.in_service", { count: data.in_maintenance })}
           </span>
         </div>
       )}

@@ -302,6 +302,10 @@ Rules:
   title, and the badge that marks a location row's origin. German and French keep two
   natural domain words (Ausrüstung/Geräte, équipement/matériel); both are listed, both are
   legal — the role is the rule, not a single word.
+- **Polish names the act of handing an asset over wydać, and the record of it wydanie.**
+  The button, the bulk action, the tab, the history and the empty states all say it;
+  *przypisany do* stays only as the label of the field that names the holder, a state
+  and not the act. The English "tag" is not used: the identifier is *numer inwentarzowy*.
 - **German names the thing Gerät.** It was Anlagegut, the accounting word for a fixed
   asset — and the module is explicitly not an asset register for accounting. The employee
   asked by e-mail to confirm they still have a laptop read a finance term, on a page that
@@ -320,10 +324,10 @@ Rules:
   action, not an exception: it links into the module's **own** filtered list, so it speaks
   the module's individual word — the counts next to it speak "records".
 - **Frozen feature names are not vocabulary**: the My-Assets screen is My Assets / Mój
-  sprzęt / Mein Gerät / Mon matériel / Mi equipo, and stays so — four of five languages
-  chose the domain word for the screen a holder sees, and a feature name is a name, not a
-  set reference. Strings that *reference* the screen must use its real name in that
-  language (pl „Mój sprzęt”, de „Mein Gerät“, fr « Mon matériel », es «Mi equipo») — not a
+  sprzęt / Meine Geräte / Mon matériel / Mi equipo, and stays so — four of five languages
+  chose the domain word for the screen a holder sees (German a plural, as its other screens
+  are), and a feature name is a name, not a set reference. Strings that *reference* the screen must use its real name in that
+  language (pl „Mój sprzęt”, de „Meine Geräte“, fr « Mon matériel », es «Mi equipo») — not a
   back-translation of the English one.
 - **Kind names are exempt**: `categories.codes.*` ("Urządzenie sieciowe", "Inny sprzęt",
   "Other Equipment") name kinds of things, not sets, and keep their natural words. The
