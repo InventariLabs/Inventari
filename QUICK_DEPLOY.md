@@ -45,9 +45,10 @@ nano .env
 ```
 
 The copied file is the list of variables the stack reads. Seven have no
-working default: five are hex-string secrets to generate (they are
-interpolated into connection URLs verbatim, and base64's `+ / =` characters
-would corrupt them), plus the domain and the e-mail address for the
+working default: five are hex-string secrets to generate (two of them,
+`DB_APP_PASSWORD` and `REDIS_PASSWORD`, are interpolated into connection URLs
+verbatim, where base64's `+ / =` characters would corrupt them; hex is the safe
+choice for all five), plus the domain and the e-mail address for the
 certificate. `docker compose` itself refuses to start without three of them
 (`REDIS_PASSWORD`, `DB_APP_PASSWORD`, `FERNET_SALT`) and says which; left
 empty, the other four fail later and less clearly — the database will not
