@@ -61,9 +61,8 @@ describe("document approval decisions — the document and the queue both refres
         result.current.mutateAsync({ docId: "doc-1", notes: "ok" }),
       );
 
-      expect(seen).toEqual([
-        `POST /approvals/documents/doc-1/${route}?notes=ok`,
-      ]);
+      // The note travels in the body: nothing free-typed in the address.
+      expect(seen).toEqual([`POST /approvals/documents/doc-1/${route}`]);
       expect(invalidated).toContainEqual(queryKeys.documents.detail("doc-1"));
       expect(invalidated).toContainEqual(queryKeys.documents.approval("doc-1"));
       expect(invalidated).toContainEqual(["approvals"]);

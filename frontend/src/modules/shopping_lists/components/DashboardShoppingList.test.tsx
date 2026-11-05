@@ -52,19 +52,20 @@ describe("DashboardShoppingList", () => {
               { id: "i1", name: "Milk", is_purchased: false } as never,
               { id: "i2", name: "Bread", is_purchased: true } as never,
               { id: "i3", name: "Eggs", is_purchased: false } as never,
-              { id: "i4", name: "Salt", is_purchased: true } as never,
             ],
           }}
           t={t}
         />,
       ),
     );
-    expect(screen.getByText("2/4")).toBeInTheDocument();
+    // One of three, not two of four: half of a list reads the same whichever
+    // of bought and not bought gets counted.
+    expect(screen.getByText("1/3")).toBeInTheDocument();
     expect(
-      screen.getByRole("img", { name: "2 of 4 bought" }),
+      screen.getByRole("img", { name: "1 of 3 bought" }),
     ).toBeInTheDocument();
     const fill = container.querySelector("[data-fill]") as HTMLElement;
-    expect(parseFloat(fill.style.width)).toBe(50);
+    expect(parseFloat(fill.style.width)).toBeCloseTo(100 / 3, 3);
     expect(screen.getByRole("link", { name: "Groceries" })).toHaveAttribute(
       "href",
       "/shopping-lists/list-1",

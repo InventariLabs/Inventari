@@ -50,4 +50,22 @@ describe("content-size-unpadded", () => {
     expect(findings).toEqual([]);
     expect(considered).toBe(0);
   });
+
+  it("does not take a zero length for a stated height", () => {
+    for (const className of ["py-0", "p-0", "h-0", "min-h-0", "h-px", "h-[0px]", "py-[0rem]"]) {
+      expect(
+        run(`<Button size="content" className="${className}">Open</Button>`),
+        className,
+      ).toEqual(["modules/things/ThingPage.tsx:1"]);
+    }
+  });
+
+  it("still accepts a fractional or non-zero length that starts with a zero digit", () => {
+    for (const className of ["py-0.5", "h-[0.5rem]", "h-10"]) {
+      expect(
+        run(`<Button size="content" className="${className}">Open</Button>`),
+        className,
+      ).toEqual([]);
+    }
+  });
 });

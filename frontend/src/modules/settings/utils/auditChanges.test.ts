@@ -7,6 +7,7 @@ import frCommon from "@/i18n/locales/fr/common.json";
 import plCommon from "@/i18n/locales/pl/common.json";
 import plApprovals from "@/modules/approvals/i18n/pl.json";
 import plEquipment from "@/modules/equipment/i18n/pl.json";
+import plWarehouse from "@/modules/warehouse/i18n/pl.json";
 import plRecipes from "@/modules/recipes/i18n/pl.json";
 import {
   auditChanges,
@@ -116,6 +117,7 @@ describe("auditChanges value dictionaries", () => {
   const screenT = namespacedT({
     common: plCommon,
     equipment: plEquipment,
+    warehouse: plWarehouse,
   }) as never;
 
   it("reads a built-in level the way the roles screen reads it", () => {
@@ -129,6 +131,27 @@ describe("auditChanges value dictionaries", () => {
     expect(changes).toEqual([
       { path: "role", from: "Manager", to: "Użytkownik" },
     ]);
+  });
+
+  it("reads a print layout by the name the settings screen offers", () => {
+    const changes = auditChanges(
+      {
+        before: { print_template: "standard" },
+        after: { print_template: "pl_pz" },
+      },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([
+      {
+        path: "print_template",
+        from: plWarehouse.profile.layoutStandard,
+        to: plWarehouse.profile.layoutPlPz,
+      },
+    ]);
+    expect(changes[0]?.to).not.toContain("pl_pz");
   });
 
   it("reads an equipment status through the dictionary the asset screen owns", () => {

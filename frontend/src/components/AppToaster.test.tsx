@@ -12,7 +12,8 @@ import AppToaster from "./AppToaster";
  * is configuration that quietly stops existing: dropping `closeButton`, or
  * the `installToastDefaults()` call in the entry point, used to break nothing
  * at all. These are the two halves — what the surface renders, and that the
- * entry point still builds it.
+ * entry point still builds it. (That the entry point installs the reading-time
+ * rule is `main.test.tsx`: it runs the entry point rather than reading it.)
  */
 
 async function raiseWarning(message: string) {
@@ -58,10 +59,6 @@ describe("the entry point keeps building the notification surface", () => {
     expect(MAIN_SOURCE).toMatch(/<AppToaster\s*\/>/);
   });
 
-  it("installs the reading-time rule that gives long messages their time", () => {
-    expect(MAIN_SOURCE).toMatch(/^installToastDefaults\(\);$/m);
-  });
-
   it("keeps a second, hand-configured Toaster out of the entry point", () => {
     expect(MAIN_SOURCE).not.toContain("<Toaster");
   });
@@ -76,9 +73,16 @@ describe("the toast close button is a target a thumb can land on", () => {
     // anything that asked it — which is how a layout measurement reported
     // the close button at 20x20 with that fix already on screen. The
     // box is 44 now, and the painted circle stays 20 inside it.
-    const rule = INDEX_CSS.slice(INDEX_CSS.indexOf("[data-sonner-toaster]"));
-    expect(rule).toContain("[data-close-button][data-close-button]");
-    expect(rule).toMatch(/width:\s*44px/);
-    expect(rule).toMatch(/height:\s*44px/);
+    //
+    // This reads the stylesheet because jsdom computes no layout: a
+    // measurement in it would be 0x0 with the rule or without. The match is
+    // the rule's own block, so a `width: 44px` anywhere else in the file
+    // cannot stand in for it.
+    const block = INDEX_CSS.match(
+      /\[data-close-button\]\[data-close-button\]\s*\{([^}]*)\}/,
+    );
+    expect(block, "the close-button rule in index.css").not.toBeNull();
+    expect(block![1]).toMatch(/width:\s*44px/);
+    expect(block![1]).toMatch(/height:\s*44px/);
   });
 });

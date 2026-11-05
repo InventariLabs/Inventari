@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ShoppingListsPage from "./ShoppingListsPage";
 import { useAuthStore } from "@/store/authStore";
@@ -232,16 +232,22 @@ describe("ShoppingListsPage", () => {
     render(
       <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
         <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <ShoppingListsPage />
-          </BrowserRouter>
+          <MemoryRouter>
+            <Routes>
+              <Route path="/" element={<ShoppingListsPage />} />
+              <Route path="/shopping-lists/list-1" element={<p>The list</p>} />
+            </Routes>
+          </MemoryRouter>
         </QueryClientProvider>
       </PageHeaderContext.Provider>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Biedronka Shopping/i)).toBeInTheDocument();
-    });
+    const user = userEvent.setup();
+    await user.click(
+      await screen.findByRole("link", { name: /Biedronka Shopping/i }),
+    );
+
+    expect(await screen.findByText("The list")).toBeInTheDocument();
   });
 
   it("should open create list modal when clicking create button", async () => {

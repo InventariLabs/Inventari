@@ -65,7 +65,12 @@ class TestScanResolvesTemplate:
 
         The form defaults it, POST /items defaults it, the importer defaults
         it — the scan built its Item directly and was the one door a unitless
-        record could still walk through."""
+        record could still walk through.
+
+        This is the test that pins the backfill in ``create_item_async``: the
+        template is minted before the default unit is known, so only the
+        step that copies the record's unit onto a freshly minted template
+        gives it one. Without that step the assertion on the template fails."""
         db = real_async_db_session
         org_id = async_test_user.organization_id
         location = await _storage(db, org_id, async_test_user.id)
@@ -93,12 +98,18 @@ class TestScanResolvesTemplate:
         assert template is not None
         assert template.uom_id == item.uom_id
 
-    async def test_a_scan_that_names_a_unit_stamps_it_on_the_template(
+    async def test_a_scan_that_names_a_unit_leaves_it_on_the_template(
         self, real_async_db_session: AsyncSession, async_test_user
     ):
-        """The scan that carries a unit writes it on the catalogue row too,
+        """The scan that carries a unit leaves it on the catalogue row too,
         not only on its own record: the template reads one unit, the one
-        the first scan named."""
+        the first scan named.
+
+        An end-to-end check of the outcome, not a pin on one step: the unit
+        reaches the template twice — the template is minted wearing it, and
+        the backfill (pinned by the no-unit test above) would write it
+        anyway — so removing either step alone leaves this test green. It
+        fails only when neither puts the unit there."""
         db = real_async_db_session
         org_id = async_test_user.organization_id
         location = await _storage(db, org_id, async_test_user.id)

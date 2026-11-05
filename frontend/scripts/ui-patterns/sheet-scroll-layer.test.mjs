@@ -65,4 +65,25 @@ describe("sheet-scroll-layer", () => {
     expect(considered).toBe(2);
     expect(findings).toEqual(["a.tsx"]);
   });
+
+  it("is not satisfied by SheetBody or overflow-auto that only a comment mentions", () => {
+    for (const comment of [
+      "// wrap in <SheetBody> later",
+      "/* overflow-y-auto goes here */",
+    ]) {
+      const { findings } = sheetScrollLayer.run(
+        file(`${comment}\n<Sheet open>x</Sheet>`),
+      );
+      expect(findings, comment).toEqual(["modules/things/ThingSheet.tsx"]);
+    }
+  });
+
+  it("does not consider a file whose only <Sheet is commented out", () => {
+    const { considered, findings } = sheetScrollLayer.run(
+      file("// <Sheet open>old</Sheet>\n<div />"),
+    );
+
+    expect(considered).toBe(0);
+    expect(findings).toEqual([]);
+  });
 });

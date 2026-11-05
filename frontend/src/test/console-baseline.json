@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-24T22:40:28.266Z",
+  "generated": "2026-11-05T03:54:18.123Z",
   "entries": {
     "src/App.outageRetry.test.tsx": [
       "Warning: An update to %s inside a test was not wrapped in act(...)."
@@ -10,18 +10,8 @@
     "src/contexts/ModulesContext.test.tsx": [
       "Failed to fetch enabled modules:"
     ],
-    "src/hooks/useScanCamera.test.tsx": ["Camera start error:"],
-    "src/modules/warehouse/__tests__/tradeReadOnly.test.tsx": [
-      "[MSW Catch-All] Unmocked request intercepted: GET http://localhost:3000/api/v1/purchase-orders/settings"
-    ],
-    "src/modules/warehouse/components/DocumentImportModal.test.tsx": [
-      "Warning: An update to %s inside a test was not wrapped in act(...)."
-    ],
-    "src/modules/warehouse/components/InventoryPeriodPanel.test.tsx": [
-      "Warning: An update to %s inside a test was not wrapped in act(...)."
-    ],
-    "src/modules/warehouse/pages/DocumentsTemplatesPage.test.tsx": [
-      "[MSW Catch-All] Unmocked request intercepted: GET http://localhost:3000/api/v1/warehouse/templates/placeholders"
+    "src/hooks/useScanCamera.test.tsx": [
+      "Camera start error:"
     ],
     "src/modules/equipment/__tests__/attestationPublicRoute.test.tsx": [
       "Warning: Each child in a list should have a unique \"key\" prop.%s%s See https://reactjs.org/link/warning-keys for more information.%s"
@@ -30,22 +20,13 @@
       "Warning: An update to %s inside a test was not wrapped in act(...)."
     ],
     "src/modules/inventory/__tests__/dashboardAttentionUnavailable.test.tsx": [
-      "Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'length')]",
-      "The above error occurred in the <EquipmentDashboardWidget> component:",
-      "Uncaught error:",
       "useModulePageHeader: setHeader called outside a PageHeaderContext provider — the header (untitled) and its actions are dropped. Render this page under SettingsShell or ModuleShell."
     ],
     "src/modules/inventory/__tests__/dashboardProductsCount.test.tsx": [
       "useModulePageHeader: setHeader called outside a PageHeaderContext provider — the header (untitled) and its actions are dropped. Render this page under SettingsShell or ModuleShell."
     ],
     "src/modules/inventory/__tests__/dashboardStorageTiles.test.tsx": [
-      "Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'length')]",
-      "The above error occurred in the <EquipmentDashboardWidget> component:",
-      "Uncaught error:",
       "useModulePageHeader: setHeader called outside a PageHeaderContext provider — the header (untitled) and its actions are dropped. Render this page under SettingsShell or ModuleShell."
-    ],
-    "src/modules/inventory/__tests__/inventoryDashboardComposition.test.tsx": [
-      "Warning: An update to %s inside a test was not wrapped in act(...)."
     ],
     "src/modules/inventory/components/Inventory.fields.test.tsx": [
       "Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s"
@@ -78,10 +59,9 @@
     "src/modules/purchase_orders/pages/PurchaseOrdersPage.test.tsx": [
       "[MSW Catch-All] Unmocked request intercepted: GET http://localhost:3000/api/v1/purchase-orders/settings"
     ],
-    "src/modules/recipes/components/IngredientTemplateCombobox.test.tsx": [
-      "Warning: An update to %s inside a test was not wrapped in act(...)."
+    "src/modules/recipes/pages/NutritionLabelScan.test.tsx": [
+      "Error: nope"
     ],
-    "src/modules/recipes/pages/NutritionLabelScan.test.tsx": ["Error: nope"],
     "src/modules/recipes/pages/NutritionTableRow.test.tsx": [
       "Warning: validateDOMNesting(...): %s cannot appear as a child of <%s>.%s%s%s"
     ],
@@ -92,15 +72,20 @@
     "src/modules/shared/components/TemplatePreviewFrame.test.tsx": [
       "Warning: An update to %s inside a test was not wrapped in act(...)."
     ],
-    "src/modules/spaces/components/storages/StorageArchiveDialog.test.tsx": [
-      "[MSW Catch-All] Unmocked request intercepted: GET http://localhost:3000/api/v1/warehouse/putaway-rules"
+    "src/modules/warehouse/__tests__/tradeReadOnly.test.tsx": [
+      "[MSW Catch-All] Unmocked request intercepted: GET http://localhost:3000/api/v1/purchase-orders/settings"
     ],
-    "src/modules/stats/pages/StatsPage.errors.test.tsx": [
-      "[MSW Catch-All] Unmocked request intercepted: GET http://localhost:3000/api/v1/stats/config"
+    "src/modules/warehouse/components/DocumentImportModal.test.tsx": [
+      "Warning: An update to %s inside a test was not wrapped in act(...)."
     ],
-    "src/modules/stock_takes/pages/StockTakeReportPage.test.tsx": [
-      "Error: Not implemented: navigation (except hash changes)"
+    "src/modules/warehouse/components/InventoryPeriodPanel.test.tsx": [
+      "Warning: An update to %s inside a test was not wrapped in act(...)."
     ],
-    "src/pages/ErrorPage.test.tsx": ["Error: planted: the screen broke"]
+    "src/modules/warehouse/pages/DocumentsTemplatesPage.test.tsx": [
+      "[MSW Catch-All] Unmocked request intercepted: GET http://localhost:3000/api/v1/warehouse/templates/placeholders"
+    ],
+    "src/pages/ErrorPage.test.tsx": [
+      "Error: planted: the screen broke"
+    ]
   }
 }

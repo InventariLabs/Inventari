@@ -460,6 +460,9 @@ class AuthService:
                 # itself out of it.
                 from app.core.contracts import AuditAction, AuditTargetType
                 from app.core.public_api import core_api
+                from app.services._org_membership import (
+                    invitation_role_label_async,
+                )
 
                 await core_api.audit_log.log_action_async(
                     db,
@@ -470,7 +473,7 @@ class AuthService:
                     target_id=invitation.id,
                     snapshot={
                         'invited_email': invitation.invited_email,
-                        'role': invitation.role,
+                        'role': await invitation_role_label_async(db, invitation),
                     },
                 )
         else:

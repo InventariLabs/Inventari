@@ -934,27 +934,24 @@ describe("useItemForm — add and edit compute the same fields", () => {
   >[number];
   const record = { name: "Dell XPS", category_id: "77" };
 
-  const keys = (form: "item_create" | "item_edit", withCategories = true) => {
+  const keys = (form: "item_create" | "item_edit") => {
     const { result } = renderItemForm({
       ...defaultProps,
       form,
       initialData: record,
-      categories: withCategories ? [laptop] : [],
+      categories: [laptop],
     });
     return result.current.fieldDefinitions.map((d) => d.key);
   };
 
   // The same record must yield the same field set whichever door it comes
-  // through; a caller that stops passing `categories` to either door shows
-  // here as a missing category field.
+  // through. This hands the hook its categories itself, so it says nothing of
+  // a caller that stops passing them: useQuickAdd.test.tsx and
+  // ItemEditModal.test.tsx hold each door to that.
   it("gives one record the same fields on the add and the edit path", () => {
     const add = keys("item_create");
     expect(add).toContain("asset_tag");
     expect(keys("item_edit")).toEqual(add);
-  });
-
-  it("notices a door that drops the categories", () => {
-    expect(keys("item_edit", false)).not.toEqual(keys("item_create"));
   });
 });
 

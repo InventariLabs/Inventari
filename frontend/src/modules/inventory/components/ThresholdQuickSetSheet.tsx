@@ -174,7 +174,7 @@ export default function ThresholdQuickSetSheet({ item, onClose }: Props) {
             size="content"
             variant="link"
             onClick={() => setValue(String(measuredQuantity))}
-            className="w-full text-xs text-amber-600 font-medium p-0"
+            className="w-full text-xs text-amber-600 font-medium px-0 py-2 min-h-11 md:min-h-10"
           >
             ← {t("threshold.setToCurrent")} (
             {formatQuantityLocalized(

@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import {
   AttentionCard,
@@ -149,12 +149,17 @@ describe("AttentionCard with something to report", () => {
   });
 
   it("renders the location on every width — it wraps, it is not hidden", () => {
+    // jsdom has no stylesheet, so the classes are all there is to read — and
+    // on the whole way up: `hidden sm:flex` on a wrapper hides the place as
+    // surely as on its own span.
+    const hides = /^(?:.+:)?(?:hidden|invisible|sr-only)$/;
     renderCard();
     const where = screen.getAllByText("Fridge");
     expect(where).toHaveLength(2);
     for (const el of where) {
-      expect(el.className).not.toMatch(/(^|\s)hidden(\s|$)/);
-      expect(el.className).not.toMatch(/max-sm:hidden|sm:block|sm:inline/);
+      for (let at: Element | null = el; at; at = at.parentElement) {
+        expect([...at.classList].filter((c) => hides.test(c))).toEqual([]);
+      }
     }
   });
 
@@ -176,10 +181,22 @@ describe("AttentionCard with something to report", () => {
     expect(screen.queryByRole("button", { name: "Show all 4" })).toBeNull();
   });
 
-  it("uses no clickable div for a row", () => {
-    const { container } = renderCard();
-    expect(container.querySelector("div[onclick]")).toBeNull();
-    expect(container.querySelector("li[role='button']")).toBeNull();
+  it("opens a record from the name's link, and from nowhere else on the row", async () => {
+    // React delegates onClick, so a clickable div carries no attribute to find
+    // in the DOM. Only clicking it can tell.
+    const user = userEvent.setup();
+    const CurrentPath = () => <output>{useLocation().pathname}</output>;
+    renderCard({ actions: <CurrentPath /> });
+    const row = screen.getAllByRole("listitem")[0];
+
+    await user.click(within(row).getByText("expired yesterday"));
+    await user.click(row);
+    expect(screen.getByRole("status")).toHaveTextContent(/^\/$/);
+
+    await user.click(within(row).getByRole("link", { name: "UHT milk" }));
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "/inventory/items/expired",
+    );
   });
 });
 

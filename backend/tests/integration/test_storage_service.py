@@ -36,18 +36,6 @@ class TestStorageService:
     """StorageService integration tests."""
 
     @pytest.fixture
-    async def storage_type(self, real_async_db_session):
-        """Get PANTRY storage type from seeded data."""
-        st = (
-            await real_async_db_session.scalars(
-                select(StorageType).where(StorageType.type_code == 'PANTRY')
-            )
-        ).first()
-        if not st:
-            pytest.skip('PANTRY StorageType not seeded')
-        return st
-
-    @pytest.fixture
     async def system_storage_type(self, real_async_db_session):
         """Get SYSTEM storage type from seeded data."""
         st = (

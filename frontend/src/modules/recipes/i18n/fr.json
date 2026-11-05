@@ -434,7 +434,7 @@
     "import_error_ai_not_configured": "Échec de l'import : « {{purpose}} » nécessite une connexion IA, et aucune n'est encore configurée. Configurez-en une dans Paramètres → Connexions IA."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "Les suggestions des recettes fonctionnent toujours — elles reviennent à l’anglais. Ajoutez une entrée ou importez un fichier CSV/JSON pour remplir ce dictionnaire.",
+    "language_empty_hint": "Les suggestions des recettes fonctionnent toujours — elles utilisent les entrées correspondantes d’autres langues. Ajoutez une entrée ou importez un fichier CSV/JSON pour remplir ce dictionnaire.",
     "language_empty": "Le dictionnaire d’ingrédients n’a pas encore d’entrée pour {{lang}}.",
     "scan_label": "Lire sur l'étiquette",
     "scan_reading": "Lecture…",

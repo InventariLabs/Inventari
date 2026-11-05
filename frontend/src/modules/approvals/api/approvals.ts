@@ -118,17 +118,9 @@ export const targetDecisionApi: Record<
 > = {
   document: {
     approve: async (id, notes) =>
-      (
-        await api.post(`/approvals/documents/${id}/approve`, null, {
-          params: notes ? { notes } : undefined,
-        })
-      ).data,
+      (await api.post(`/approvals/documents/${id}/approve`, { notes })).data,
     reject: async (id, notes) =>
-      (
-        await api.post(`/approvals/documents/${id}/reject`, null, {
-          params: notes ? { notes } : undefined,
-        })
-      ).data,
+      (await api.post(`/approvals/documents/${id}/reject`, { notes })).data,
   },
   purchase_order: {
     approve: async (id, notes) =>

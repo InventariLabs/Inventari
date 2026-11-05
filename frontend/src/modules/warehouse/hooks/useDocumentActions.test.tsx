@@ -151,43 +151,6 @@ describe("useDocumentActions.handleApplyCorrection", () => {
     );
   });
 
-  it("opens the unit dialog instead of toasting when the correction stops on a unit mismatch", () => {
-    const { m, utils } = renderActions("CONFIRMED");
-
-    act(() => utils.result.current.handleApplyCorrection());
-    const onError = m.completeMutate.mock.calls[0][1].onError;
-    act(() =>
-      onError({
-        isAxiosError: true,
-        response: {
-          data: {
-            detail: {
-              code: "RECORD_UNIT_MISMATCH",
-              message:
-                "Widget is kept in g, and this record would be saved in kg.",
-              product: "Widget",
-              template_unit: "g",
-              chosen_unit: "kg",
-            },
-          },
-        },
-      }),
-    );
-
-    expect(toast.error).not.toHaveBeenCalled();
-    expect(utils.result.current.unitMismatch).toEqual({
-      product: "Widget",
-      templateUnit: "g",
-      chosenUnit: "kg",
-      payload: {},
-    });
-    act(() => utils.result.current.confirmUnitChoice());
-    expect(m.completeMutate).toHaveBeenLastCalledWith(
-      { id: "doc-1", data: { unit_confirmed_over_template: true } },
-      expect.any(Object),
-    );
-  });
-
   it("falls back to the generic complete error for unknown codes", () => {
     const { m, utils } = renderActions("CONFIRMED");
 

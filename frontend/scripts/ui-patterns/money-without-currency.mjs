@@ -33,7 +33,10 @@ function argumentsOf(text, open) {
     if (ch === ")" || ch === "]" || ch === "}") {
       depth--;
       if (depth === 0) {
-        args.push(text.slice(start, i).trim());
+        const last = text.slice(start, i).trim();
+        // A trailing comma (prettier's multi-line output) opens an argument
+        // that never comes; it is not a second one.
+        if (last !== "" || args.length === 0) args.push(last);
         return args;
       }
       continue;

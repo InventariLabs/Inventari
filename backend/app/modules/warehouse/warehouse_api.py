@@ -584,12 +584,17 @@ class WarehouseAPI:
         to be confirmed is asked about as ``CONFIRMED``.
         """
         from ._document_workflow_crud import get_or_raise
-        from .approval_service import document_sign_off
+        from .approval_service import document_sign_off, weighed_value_async
         from .document_profile_service import get_or_create_profile
 
         doc = await get_or_raise(db, org_id, document_id)
         profile = await get_or_create_profile(db, org_id)
-        return document_sign_off(doc, profile, status=as_status)
+        return document_sign_off(
+            doc,
+            profile,
+            value=await weighed_value_async(db, doc),
+            status=as_status,
+        )
 
     async def fill_line_tax_rates_async(
         self, db: AsyncSession, org_id: UUID, lines: Iterable[Any]
@@ -1005,7 +1010,7 @@ class WarehouseAPI:
                 Document.number,
                 Document.type,
                 Document.partner_snapshot['name'].astext.label('partner_name'),
-                Document.total_gross,
+                Document.total_net,
                 Document.currency,
                 Document.source_location_id,
                 Document.target_location_id,
@@ -1059,7 +1064,9 @@ class WarehouseAPI:
                 number=row.number,
                 type=row.type,
                 partner_name=row.partner_name,
-                total_value=row.total_gross,
+                # Net: the figure the approval threshold is set against, and
+                # the one a purchase order's summary reports.
+                total_value=row.total_net,
                 currency=row.currency,
                 lines_count=int(row.lines_count or 0),
                 source_location_name=src_name,

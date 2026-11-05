@@ -15,7 +15,7 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 from app.i18n.service import (
     get_current_lang,
-    get_error_message,
+    get_plural_error_message,
 )
 
 from . import document_types as dt
@@ -175,7 +175,9 @@ async def _check_no_active_wms_sessions(
         else 'document_wms_picking_active'
     )
     raise WmsSessionActiveError(
-        get_error_message(key, get_current_lang(), count=len(active))
+        get_plural_error_message(
+            key, len(active), get_current_lang(), sessions=len(active)
+        )
     )
 
 
@@ -469,7 +471,9 @@ async def confirm_document(
         },
     )
     await db.flush()
-    await db.refresh(doc, attribute_names=['lines'])
+    # ``confirmer`` with the row: it was loaded while the stamp was empty, and
+    # the answer names who confirmed.
+    await db.refresh(doc, attribute_names=['lines', 'confirmer'])
     return doc
 
 
@@ -651,7 +655,9 @@ async def complete_document(
         )
 
     await db.flush()
-    await db.refresh(doc, attribute_names=['lines'])
+    # Both hands with the row: the answer names them, and one-step posting
+    # reaches here on the copy that was read before either stamp was set.
+    await db.refresh(doc, attribute_names=['lines', 'completer', 'confirmer'])
 
     if backorder is not None:
         # expose the generated backorder on the complete response.

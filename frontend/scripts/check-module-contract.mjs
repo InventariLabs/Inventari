@@ -74,11 +74,10 @@ import {
 import { relative, resolve } from "node:path";
 import ts from "typescript";
 
-// `new URL(...).pathname`, not fileURLToPath: under vitest `import.meta.url`
-// carries a `/@fs/` prefix that fileURLToPath refuses outright.
-const ROOT = resolve(
-  new URL("..", import.meta.url).pathname.replace(/^\/@fs/, ""),
-); // frontend/
+// `import.meta.dirname`, not `new URL("..", import.meta.url)`: under vitest
+// vite rewrites that expression as an asset URL, and its path is not this
+// directory's parent.
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const INTERFACES_PATH = resolve(
   ROOT,
   "src/lib/moduleRegistry/moduleInterfaces.ts",

@@ -44,7 +44,7 @@ vi.mock(
         }
         editorStub.reportHint = props.onPriceHintResult as
           ((lineKey: string, suggested: boolean) => void) | undefined;
-        const lines: Array<{ _key: string }> = props.lines ?? [];
+        const lines = props.lines ?? [];
         editorStub.lineKeys = lines.map((line) => line._key);
         const indexOfKey = (key: string) =>
           lines.findIndex((line) => line._key === key);
@@ -55,6 +55,11 @@ vi.mock(
             createElement(
               "div",
               { key: line._key },
+              createElement(
+                "div",
+                { "data-testid": `extra ${line._key}` },
+                props.renderLineExtra?.(line),
+              ),
               createElement(
                 "button",
                 {
@@ -1858,53 +1863,41 @@ describe("DocumentFormModal — the empty-price warning speaks for its lines", (
     } as unknown as ReturnType<typeof profileHooks.useDocumentProfile>);
   });
 
-  it("keeps the no-source sentence while another line carries the price", async () => {
-    // The review's state C: line one asked and the price books answered
-    // nothing; line two found its price from the last purchase. The
-    // promise about suggestions must not come back just because a LATER
-    // line found its price — the sentence speaks for the lines that still
-    // carry none.
+  it("says what the price sources answered under the line they answered for", async () => {
+    // One sentence under the table could not be true of a line that asked and
+    // found nothing and of an empty line beside it, which has not asked yet.
     const user = userEvent.setup();
     editorStub.enabled = true;
     await act(async () => {
       render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
     });
-    // Line one: the pick happened, the price books answered nothing.
+    const [first] = editorStub.lineKeys;
     await user.click(
-      screen.getByRole("button", {
-        name: `simulate hint miss for ${editorStub.lineKeys[0]}`,
-      }),
+      screen.getByRole("button", { name: `simulate hint miss for ${first}` }),
     );
-
-    expect(
-      screen.getByText(
-        /no price came from your price books or past purchases/i,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText(/a price can be suggested from your price books/i),
-    ).not.toBeInTheDocument();
-
-    // Line two: priced from the last purchase. The first line's emptiness
-    // is still what the warning is about.
     await user.click(screen.getByRole("button", { name: "Add line" }));
-    await act(async () => {
-      editorStub.reportHint?.(editorStub.lineKeys[1], true);
-    });
-    await user.click(
-      screen.getByRole("button", {
-        name: `price line ${editorStub.lineKeys[1]}`,
-      }),
-    );
+    const second = editorStub.lineKeys[1];
 
+    const noPriceSource = /no price in your price books or past purchases/i;
     expect(
-      screen.getByText(
-        /no price came from your price books or past purchases/i,
-      ),
+      within(screen.getByTestId(`extra ${first}`)).getByText(noPriceSource),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText(/a price can be suggested from your price books/i),
+      within(screen.getByTestId(`extra ${second}`)).queryByText(noPriceSource),
     ).not.toBeInTheDocument();
+
+    // The sentence under the table speaks of the document alone.
+    expect(
+      screen.getByText(
+        "Some lines have no unit price — this document has no accounting value.",
+      ),
+    ).toBeInTheDocument();
+
+    // A price typed on the line ends what was said about it.
+    await user.click(
+      screen.getByRole("button", { name: `price line ${first}` }),
+    );
+    expect(screen.queryByText(noPriceSource)).not.toBeInTheDocument();
     editorStub.enabled = false;
   });
 });

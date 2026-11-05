@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   parseBackendBlock,
   punctuationAfterUnit,
   rivalCatalogues,
 } from "./check-units-labels.mjs";
+import { makeRepo, runGate } from "./gate-fixture.mjs";
 
 const reader = (files) => (path) => files[path];
 
@@ -87,6 +88,42 @@ describe("check-units-labels", () => {
       expect(punctuationAfterUnit(Object.keys(files), reader(files))).toEqual(
         [],
       );
+    });
+  });
+
+  describe("as the process `npm run check:units-labels` starts", () => {
+    let repo;
+    afterEach(() => repo?.cleanup());
+
+    const run = (screenLabel, args) => {
+      repo = makeRepo();
+      const languages = ["en", "pl", "de", "es", "fr"];
+      const mirror = languages
+        .map((l) => `    '${l}': {\n        'kg': 'kg',\n    },`)
+        .join("\n");
+      const files = {
+        "backend/app/i18n/_units.py": `UNIT_LABELS = {\n${mirror}\n}\n`,
+        "frontend/src/modules/.keep": "",
+      };
+      for (const l of languages) {
+        files[`frontend/src/i18n/locales/${l}/common.json`] = {
+          units: { kg: l === "pl" ? screenLabel : "kg" },
+        };
+      }
+      repo.write(files);
+      return runGate(repo, "check-units-labels.mjs", { args });
+    };
+
+    it("names the drift under --quiet, which silences only the success line", () => {
+      const drifted = run("kilo", ["--quiet"]);
+      expect(drifted.status).toBe(1);
+      expect(drifted.stderr).toContain(
+        "pl: 'kg' is 'kg' in the backend mirror but 'kilo' on the screen",
+      );
+
+      const clean = run("kg", ["--quiet"]);
+      expect(clean.status).toBe(0);
+      expect(clean.stdout).toBe("");
     });
   });
 });

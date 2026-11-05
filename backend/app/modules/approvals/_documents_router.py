@@ -38,7 +38,13 @@ from .document_gate import (
     warehouse_documents,
 )
 from .exceptions import ApprovalError
-from .schemas import ApprovalRequestSchema, DocumentApprovalRequirement
+from .schemas import (
+    ApprovalRequestSchema,
+    ApproveRequest,
+    AskForApproval,
+    DocumentApprovalRequirement,
+    RejectRequest,
+)
 
 #: The doors moved here from the warehouse router and keep its guard: reading a
 #: document's approval needs ``warehouse:read``, raising or deciding one holds
@@ -71,7 +77,7 @@ def _no_pending_request() -> ConflictException:
 @router.post('/{doc_id}/request-approval', response_model=ApprovalRequestSchema)
 async def request_document_approval(
     doc_id: UUID,
-    notes: str | None = None,
+    body: AskForApproval = AskForApproval(),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> Any:
@@ -99,7 +105,7 @@ async def request_document_approval(
             'document',
             doc_id,
             current_user.id,
-            meta_data={'notes': notes} if notes else None,
+            meta_data={'notes': body.notes} if body.notes else None,
         )
     except ApprovalError as exc:
         raise ConflictException(
@@ -117,7 +123,7 @@ async def request_document_approval(
 )
 async def approve_document(
     doc_id: UUID,
-    notes: str | None = None,
+    body: ApproveRequest = ApproveRequest(),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> Any:
@@ -129,7 +135,7 @@ async def approve_document(
         raise _no_pending_request()
     try:
         return await approvals_api.approve_stage(
-            db, org_id, active.id, current_user.id, notes=notes
+            db, org_id, active.id, current_user.id, notes=body.notes
         )
     except ApprovalError as exc:
         raise ConflictException(
@@ -144,13 +150,15 @@ async def approve_document(
 )
 async def reject_document(
     doc_id: UUID,
-    notes: str | None = None,
+    body: RejectRequest = RejectRequest(),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> Any:
     """Reject the document's request; the document goes back to a draft.
 
-    So the requester can correct it and submit it again, and is told why.
+    So the requester can correct it and submit it again, and is told why. The
+    reason travels in the body: a query string is what proxies and access logs
+    keep, and this one is free text about a colleague's document.
     """
     org_id = require_org(current_user)
     await _document(db, org_id, doc_id)
@@ -159,7 +167,7 @@ async def reject_document(
         raise _no_pending_request()
     try:
         return await approvals_api.reject_request(
-            db, org_id, active.id, current_user.id, notes=notes
+            db, org_id, active.id, current_user.id, notes=body.notes
         )
     except ApprovalError as exc:
         raise ConflictException(

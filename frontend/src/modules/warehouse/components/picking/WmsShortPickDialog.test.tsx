@@ -85,6 +85,19 @@ describe("WmsShortPickDialog", () => {
     ).toHaveValue(2);
   });
 
+  it("names its way out the way its receiving twin does", async () => {
+    const user = userEvent.setup();
+    const onCancel = vi.fn();
+    renderDialog({ onCancel });
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onCancel).toHaveBeenCalled();
+    expect(
+      screen.queryByRole("button", { name: "Back" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("closes on Escape, like every other sheet", async () => {
     const user = userEvent.setup();
     const onCancel = vi.fn();

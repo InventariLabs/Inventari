@@ -38,7 +38,7 @@
  *
  * Modes:
  *   node check-units-labels.mjs           # report and exit 1 on findings
- *   node check-units-labels.mjs --quiet   # exit code only
+ *   node check-units-labels.mjs --quiet   # findings only: no success line
  */
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
@@ -196,15 +196,16 @@ function main() {
   }
 
   if (findings.length > 0) {
-    if (!quiet) {
-      console.error(
-        `✗ the unit-label mirror drifted from the screen (${findings.length}):`,
-      );
-      for (const f of findings) console.error(`  - ${f}`);
-      console.error(
-        "  fix _units.py or the locale's units block — both, word for word.",
-      );
-    }
+    // `--quiet` (what `npm run check:units-labels` passes) silences only the
+    // success line: a red gate that names nothing is no use to whoever has to
+    // fix it.
+    console.error(
+      `✗ the unit-label mirror drifted from the screen (${findings.length}):`,
+    );
+    for (const f of findings) console.error(`  - ${f}`);
+    console.error(
+      "  fix _units.py or the locale's units block — both, word for word.",
+    );
     process.exit(1);
   }
   if (!quiet) {

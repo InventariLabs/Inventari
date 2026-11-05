@@ -477,7 +477,7 @@
     "import_error_ai_not_configured": "Import nieudany: „{{purpose}}” wymaga połączenia AI, a żadnego jeszcze nie ustawiono. Skonfiguruj je w Ustawieniach → Połączenia AI."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "Podpowiedzi w przepisach dalej działają — schodzą do angielskiego. Dodaj wpis albo zaimportuj plik CSV/JSON, aby wypełnić słownik.",
+    "language_empty_hint": "Podpowiedzi w przepisach dalej działają — korzystają z pasujących wpisów w innych językach. Dodaj wpis albo zaimportuj plik CSV/JSON, aby wypełnić słownik.",
     "language_empty": "Słownik składników nie ma jeszcze wpisów dla języka {{lang}}.",
     "scan_label": "Odczytaj z etykiety",
     "scan_reading": "Odczytuję…",
