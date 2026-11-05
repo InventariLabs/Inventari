@@ -267,6 +267,26 @@ def _register_background_jobs(task_scheduler, event_bus) -> None:
     task_scheduler.start_all()
 
 
+async def _reclaim_after_restart(logger: Logger, event_bus, task_scheduler) -> None:
+    """Run the stream reaper once now instead of waiting for its first tick.
+
+    What a previous process read and never acknowledged is redelivered here,
+    after the modules have subscribed their handlers, rather than up to a
+    reaper interval later. Entries not yet idle for ``STREAM_CLAIM_IDLE_MS``
+    stay for the tick.
+    """
+    if event_bus.redis is None and task_scheduler._redis is None:
+        return
+    from redis.exceptions import RedisError
+
+    from app.core.stream_reaper import reap_streams_once
+
+    try:
+        await reap_streams_once()
+    except (RedisError, OSError) as exc:
+        logger.warning('[Startup] Stream reclaim skipped: %s', exc)
+
+
 async def _start_services(
     logger: Logger, event_bus
 ) -> tuple[asyncio.Task | None, list[str]]:
@@ -295,6 +315,7 @@ async def _start_services(
 
     logger.info('[Startup] Starting task scheduler...')
     _register_background_jobs(task_scheduler, event_bus)
+    await _reclaim_after_restart(logger, event_bus, task_scheduler)
 
     from app.core.dev_guard import run_dev_guard
 

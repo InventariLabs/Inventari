@@ -59,6 +59,13 @@ says what the release does rather than what changed since them.
   side the approval threshold is set on. They used to show the gross.
 - A refusal about a closed period names the month as the period screen does
   ("September 2026"), not "2026-09".
+- A multi-node deployment no longer collects a dead member in the event and
+  task stream groups for every restart: the stream reaper removes consumers that
+  have held nothing for an hour, and a clean shutdown removes the event bus's own
+  at once. The reaper also runs once at startup, so a message a crashed node had
+  read but not finished is redelivered at once when the replacement starts more
+  than a minute later, instead of up to six minutes after the crash.
+  `docs/SCALING.md` says what the delay depends on.
 
 ### Added
 
