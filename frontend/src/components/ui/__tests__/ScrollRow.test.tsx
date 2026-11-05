@@ -1,12 +1,12 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, it, expect } from "vitest";
 import { ScrollRow } from "@/components/ui/ScrollRow";
 
 /**
- * jsdom reports zero for every layout measurement, so the fade itself is not
- * observable here — what is observable is that the row never falls back to the
- * browser scrollbar, and that it keeps whatever role and name the caller gave
- * it. The fade is exercised by the responsive E2E probes.
+ * jsdom reports zero for every layout measurement, so the tests below that
+ * look at the scrollbar and the caller's role and name need no layout. The
+ * edge fade does: its describe block further down gives the track a width and
+ * a scroll position by hand.
  */
 describe("ScrollRow", () => {
   it("hides the native scrollbar in every engine", () => {
@@ -68,5 +68,83 @@ describe("ScrollRow — paint room on all four sides", () => {
     // The vertical half, which was already there and must stay.
     expect(track.className).toContain("py-1");
     expect(track.className).toContain("-my-1");
+  });
+});
+
+/**
+ * The fade at an edge says "there is more this way". jsdom lays nothing out,
+ * so the three measurements the row reads are given here; the fade is then
+ * read back from the mask the row writes on its track.
+ */
+describe("ScrollRow — the fade at an edge that still has content behind it", () => {
+  const proto = HTMLElement.prototype as unknown as Record<string, unknown>;
+  const saved = new Map<string, PropertyDescriptor | undefined>();
+
+  function stubLayout(clientWidth: number, scrollWidth: number) {
+    for (const [name, value] of [
+      ["clientWidth", clientWidth],
+      ["scrollWidth", scrollWidth],
+    ] as const) {
+      saved.set(name, Object.getOwnPropertyDescriptor(proto, name));
+      Object.defineProperty(proto, name, { configurable: true, value });
+    }
+  }
+
+  function scrollTo(track: HTMLElement, scrollLeft: number) {
+    Object.defineProperty(track, "scrollLeft", {
+      configurable: true,
+      value: scrollLeft,
+    });
+    act(() => {
+      fireEvent.scroll(track);
+    });
+  }
+
+  const maskOf = (track: HTMLElement) => track.style.maskImage;
+
+  afterEach(() => {
+    for (const [name, descriptor] of saved) {
+      if (descriptor) Object.defineProperty(proto, name, descriptor);
+      else delete proto[name];
+    }
+    saved.clear();
+  });
+
+  it("fades the right edge when the content overflows, and the left only after scrolling", () => {
+    stubLayout(300, 900);
+    const { container } = render(<ScrollRow>chips</ScrollRow>);
+    const track = container.firstElementChild as HTMLElement;
+
+    // At the start: content behind the right edge only.
+    expect(maskOf(track)).toContain("#000 0,");
+    expect(maskOf(track)).toContain("transparent 100%");
+
+    // In the middle: both edges have content behind them.
+    scrollTo(track, 300);
+    expect(maskOf(track)).toContain("transparent 0, #000 1.5rem");
+    expect(maskOf(track)).toContain("transparent 100%");
+  });
+
+  it("drops the right fade and keeps the left one once the track is scrolled to its end", () => {
+    stubLayout(300, 900);
+    const { container } = render(<ScrollRow>chips</ScrollRow>);
+    const track = container.firstElementChild as HTMLElement;
+
+    scrollTo(track, 600);
+
+    expect(maskOf(track)).toContain("transparent 0, #000 1.5rem");
+    expect(maskOf(track)).not.toContain("transparent 100%");
+    expect(maskOf(track)).toContain("#000 100%");
+  });
+
+  it("puts no mask on a row whose content fits, at the start or after a scroll event", () => {
+    stubLayout(300, 300);
+    const { container } = render(<ScrollRow>chips</ScrollRow>);
+    const track = container.firstElementChild as HTMLElement;
+
+    expect(maskOf(track)).toBe("");
+
+    scrollTo(track, 0);
+    expect(maskOf(track)).toBe("");
   });
 });
