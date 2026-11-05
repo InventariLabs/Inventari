@@ -83,12 +83,12 @@ describe("NotFoundPage", () => {
   });
 
   it("does not send a member to the store that refuses them", () => {
-    // "Open App Store" led to /apps, which used to bounce a non-admin back to
+    // "Open Modules" led to /apps, which used to bounce a non-admin back to
     // the launcher without a word.
     renderAt("/shopping-lists");
 
     expect(
-      screen.queryByRole("link", { name: /App Store/i }),
+      screen.queryByRole("link", { name: /Open Modules/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("NotFoundPage", () => {
     renderAt("/shopping-lists");
 
     expect(
-      screen.getByRole("link", { name: /App Store/i }),
+      screen.getByRole("link", { name: /Open Modules/i }),
     ).toBeInTheDocument();
   });
 

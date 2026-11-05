@@ -162,8 +162,8 @@
       "members": "Miembros",
       "searchMembers": "Buscar miembros…",
       "inviteTitle": "Invitar usuario",
-      "removeMemberTitle": "¿Eliminar miembro?",
-      "removeMemberConfirm": "¿Está seguro de que desea eliminar a este miembro?",
+      "removeMemberTitle": "¿Eliminar a {{name}}?",
+      "removeMemberConfirm": "{{name}} ({{role}}) perderá de inmediato el acceso a esta organización. Los registros que creó se conservan. Para volver a admitir a esta persona, envíe una nueva invitación.",
       "invalidLink": "Este enlace de invitación no incluye el código de invitación. Pide una nueva invitación y abre el enlace completo.",
       "joinedSuccess": "Se unió a la organización con éxito",
       "alreadyMember": "Ya eres miembro de esta organización",
@@ -316,8 +316,8 @@
       "emptyHint": "Mostrar solo un módulo reduce el espacio de trabajo a esa aplicación. Activa una de las siguientes y vuelve aquí.",
       "stateEnabled": "Activada",
       "stateNotEnabled": "No activada",
-      "enableLink": "Activar en la App Store",
-      "enableAction": "Activar {{name}} en la App Store",
+      "enableLink": "Activar en Módulos",
+      "enableAction": "Activar {{name}} en Módulos",
       "previewLoading": "Calculando cambios…",
       "diffTitle": "Qué cambiará",
       "diffDisable": "Se desactivará",
@@ -803,7 +803,7 @@
       "systemGroup": "General",
       "systemRole": "Rol integrado: sus permisos no se pueden cambiar.",
       "systemRoleFooter": "Los roles integrados son de solo lectura.",
-      "title": "Acceso y roles"
+      "title": "Roles y accesos"
     },
     "data": {
       "exportDesc": "Descargar una copia de sus productos",
@@ -836,7 +836,7 @@
       "saved": "Ajustes guardados"
     },
     "modules": {
-      "openAppStore": "Abrir App Store"
+      "openAppStore": "Abrir Módulos"
     },
     "theme": "Tema",
     "theme_light": "Claro",
@@ -1087,7 +1087,7 @@
     "signedBy": "Firmado con la clave {{key}}",
     "signedByHint": "La firma cubre el autor y la licencia que se muestran aquí.",
     "subtitle": "{{active}} de los {{total}} módulos ofrecidos aquí están activados",
-    "title": "App Store",
+    "title": "Módulos",
     "trust_cloud": "Nube",
     "trust_community": "Comunidad",
     "trust_core": "Núcleo",
@@ -1214,7 +1214,7 @@
     "moduleNotEnabled": "Módulo no habilitado",
     "moduleNotEnabledDesc": "El módulo {{module}} no está habilitado para tu organización.",
     "goToSettings": "Ve a la configuración para habilitarlo.",
-    "openAppStore": "Abrir App Store",
+    "openAppStore": "Abrir Módulos",
     "dashboard": "Panel"
   },
   "analytics": {

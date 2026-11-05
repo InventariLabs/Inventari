@@ -1697,7 +1697,7 @@ a link to the source code; the rest is for administrators.
 - **Webhooks** (with its module on) — **Add webhook**: a URL, a signing secret
   and the events that call it, with delivery logs kept 30 days unless
 **Log retention (days)** says otherwise.
-- **Approvals** and **Analytics** — the settings of those modules.
+- **Approvals** and **Statistics** — the settings of those modules.
 
 ![The demo's module store: twelve of the fifteen modules switched on — partners, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with API keys, photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](images/app-store.webp)
 

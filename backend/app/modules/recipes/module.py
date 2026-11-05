@@ -175,6 +175,9 @@ class RecipesModule(BaseModule):
                 'register_production_as_document': {
                     'type': 'boolean',
                     'default': False,
+                    # The document register belongs to the warehouse; an
+                    # organization without it is not offered the option.
+                    'requires_modules': ['warehouse'],
                     'title': 'Register production as internal issue documents',
                     'title_key': 'recipes:settings.registerProductionAsDocument',
                     'description_key': 'recipes:settings.registerProductionAsDocumentDescription',

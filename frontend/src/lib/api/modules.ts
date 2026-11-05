@@ -41,6 +41,8 @@ export interface ModuleSettingsField {
   /** Full i18n keys (e.g. "recipes:settings.jinaApiKey") — preferred over literals. */
   title_key?: string;
   description_key?: string;
+  /** Modules the setting is about; it is offered only where all are enabled. */
+  requires_modules?: string[];
   properties?: Record<string, ModuleSettingsField>;
   required?: string[];
   additionalProperties?: boolean;

@@ -157,7 +157,7 @@
     "showInventoryValueDescription": "Pokazuj wartości zapasów w całej aplikacji: w podsumowaniu statystyk, na ekranach produktów oraz w eksportach i wydrukach. To metryka biznesowa — wyłącz dla domowych inwentarzy, które nie przechowują cen zakupu, z których można by ją zsumować."
   },
   "navigation": {
-    "settings": "Analityka"
+    "settings": "Statystyki"
   },
   "reconciliation": {
     "title": "Uzgodnienie stanu",

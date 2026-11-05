@@ -141,7 +141,7 @@
     "showInventoryValueDescription": "Show stock values across the app: on the stats overview, the product screens, and in exports and printouts. It is a business metric — disable for home inventories that keep no purchase prices for it to add up."
   },
   "navigation": {
-    "settings": "Analytics"
+    "settings": "Statistics"
   },
   "reconciliation": {
     "title": "Stock reconciliation",

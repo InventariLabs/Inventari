@@ -223,6 +223,7 @@ The root schema must be `{"type": "object"}`. Supported keywords:
 | `default` | any | filled in on write when the key is neither sent nor saved |
 | `version` | root | the settings shape version (see above) |
 | `title`, `description`, `title_key`, `description_key` | any | labels for the settings form; `*_key` values are i18n keys |
+| `requires_modules` | any | a list of module ids; the form offers the setting only where all of them are enabled |
 
 Two refusals leave the validator. A payload that breaks the schema is a
 reader's mistake: `SchemaValidationError`, carrying an i18n key the 400

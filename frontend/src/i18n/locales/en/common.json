@@ -162,8 +162,8 @@
       "members": "Members",
       "searchMembers": "Search members…",
       "inviteTitle": "Invite User",
-      "removeMemberTitle": "Remove Member?",
-      "removeMemberConfirm": "Are you sure you want to remove this member?",
+      "removeMemberTitle": "Remove {{name}}?",
+      "removeMemberConfirm": "{{name}} ({{role}}) loses access to this organization right away. The records they created stay. To let them back in, send a new invitation.",
       "invalidLink": "This invitation link is missing its invite code. Ask for a new invitation and open the full link.",
       "joinedSuccess": "Successfully joined organization",
       "alreadyMember": "You are already a member of this organization",
@@ -316,8 +316,8 @@
       "emptyHint": "Showing just one module narrows the workspace to that app. Switch one of these on, then come back here.",
       "stateEnabled": "Enabled",
       "stateNotEnabled": "Not enabled",
-      "enableLink": "Enable in the App Store",
-      "enableAction": "Enable {{name}} in the App Store",
+      "enableLink": "Enable in Modules",
+      "enableAction": "Enable {{name}} in Modules",
       "previewLoading": "Calculating changes…",
       "diffTitle": "What will change",
       "diffDisable": "Will switch off",
@@ -836,7 +836,7 @@
       "saved": "Settings saved"
     },
     "modules": {
-      "openAppStore": "Open App Store"
+      "openAppStore": "Open Modules"
     },
     "theme": "Theme",
     "theme_light": "Light",
@@ -1023,10 +1023,10 @@
   "unknown": "Unknown",
   "focusLock": {
     "title": "Only one module is showing",
-    "body": "This workspace shows one module, so the app launcher and the App Store are set aside. Open My modules to show all of them again.",
+    "body": "This workspace shows one module, so the app launcher and the Modules page are set aside. Open My modules to show all of them again.",
     "exit": "Open My modules",
     "unknownTitle": "Could not check which modules are showing",
-    "unknownBody": "Which modules this workspace shows could not be read, so the app launcher and the App Store are not shown. Try again, or open My modules.",
+    "unknownBody": "Which modules this workspace shows could not be read, so the app launcher and the Modules page are not shown. Try again, or open My modules.",
     "retry": "Try again"
   },
   "focusMarker": {
@@ -1085,7 +1085,7 @@
     "signedBy": "Signed by {{key}}",
     "signedByHint": "The signature covers the author and licence shown here.",
     "subtitle": "{{active}} of the {{total}} modules offered here are switched on",
-    "title": "App Store",
+    "title": "Modules",
     "trust_cloud": "Cloud",
     "trust_community": "Community",
     "trust_core": "Core",
@@ -1212,7 +1212,7 @@
     "moduleNotEnabled": "Module Not Enabled",
     "moduleNotEnabledDesc": "The {{module}} module is not enabled for your organization.",
     "goToSettings": "Go to Settings to enable it.",
-    "openAppStore": "Open App Store",
+    "openAppStore": "Open Modules",
     "dashboard": "Dashboard"
   },
   "analytics": {
