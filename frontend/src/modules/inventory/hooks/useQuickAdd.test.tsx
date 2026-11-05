@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import i18next from "i18next";
 import type { VisionExtractResult } from "@/types";
 import { onePage } from "@/test/mocks/page";
+import { queryKeys } from "@/hooks/queries/keys";
+import { useAllCategories } from "@/modules/shared/hooks/useCategories";
 import { serveLocations } from "@/test/serveLocations";
 
 // jsdom has no canvas, so the real compressor never settles and the vision
@@ -646,6 +648,85 @@ describe("useQuickAdd — which categories the form offers", () => {
       }),
     );
   }
+
+  it("reports a category list that failed, and clears the report on a retry", async () => {
+    server.use(
+      http.get("*/api/v1/categories", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    const { result } = renderHook(() => useQuickAdd({ onSuccess: vi.fn() }), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.categoriesFailure).toBeTruthy());
+
+    serveCategories(true);
+    act(() => result.current.categoriesFailure?.retry());
+
+    await waitFor(() => expect(result.current.categoriesFailure).toBeNull());
+    expect(result.current.categories?.length).toBeGreaterThan(0);
+  });
+
+  it("reports the offered list failing even when the full one arrived", async () => {
+    server.use(
+      http.get("*/organizations/my", () =>
+        HttpResponse.json({
+          id: "org-1",
+          name: "Test Org",
+          currency: "PLN",
+          settings: {},
+        }),
+      ),
+      http.get("*/api/v1/categories", ({ request }) =>
+        new URL(request.url).searchParams.get("exclude_module_contexts") ===
+        "true"
+          ? HttpResponse.json({ detail: "boom" }, { status: 500 })
+          : HttpResponse.json(onePage([dairy, laptop])),
+      ),
+    );
+    const { result } = renderHook(() => useQuickAdd({ onSuccess: vi.fn() }), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.categoriesFailure).toBeTruthy());
+  });
+
+  it("does not report a failed refresh while the last list still stands", async () => {
+    serveCategories(true);
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    // The list's own error is read beside the form, so the assertion below
+    // runs on a render that has already seen the refresh fail.
+    const { result } = renderHook(
+      () => ({
+        form: useQuickAdd({ onSuccess: vi.fn() }),
+        listError: useAllCategories().error,
+      }),
+      {
+        wrapper: ({ children }: { children: React.ReactNode }) => (
+          <QueryClientProvider client={client}>
+            <ModulesProvider>{children}</ModulesProvider>
+          </QueryClientProvider>
+        ),
+      },
+    );
+    await waitFor(() => expect(result.current.form.categories).toBeDefined());
+
+    server.use(
+      http.get("*/api/v1/categories", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    await act(async () => {
+      await client.invalidateQueries({ queryKey: queryKeys.categories.all });
+    });
+    await waitFor(() => expect(result.current.listError).toBeTruthy());
+
+    expect(result.current.form.categories?.length).toBeGreaterThan(0);
+    expect(result.current.form.categoriesFailure).toBeNull();
+  });
 
   it("leaves module categories out of the picker when the organization keeps them off the general lists", async () => {
     serveCategories(false);

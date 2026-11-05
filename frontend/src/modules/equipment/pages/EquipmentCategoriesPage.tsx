@@ -283,7 +283,6 @@ export default function EquipmentCategoriesPage() {
 
       {/* Modal — reuses the inventory CategoryFormModal */}
       <CategoryFormModal
-        key={editingCategory?.id ?? "new"}
         isOpen={showModal}
         editingCategory={editingCategory}
         contextTag="equipment"
