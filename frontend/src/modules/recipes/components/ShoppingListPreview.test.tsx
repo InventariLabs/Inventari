@@ -39,6 +39,7 @@ const result: ShoppingListGenerationResult = {
   total_ingredients: 7,
   available_count: 2,
   to_buy_count: 5,
+  on_other_lists: [],
   items: [
     {
       name: "Flour",
