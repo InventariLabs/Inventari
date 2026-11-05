@@ -647,6 +647,98 @@ describe("useScanCamera — one presence is one read", () => {
       window.matchMedia = originalMatchMedia;
     }
   });
+
+  describe("when the window is resized with the camera running", () => {
+    // A window that stays landscape raises no orientation event, yet the
+    // box the frame was sized for is a different one.
+    const sizeReader = (width: number, height: number) => {
+      const reader = document.getElementById("qr-reader")!;
+      Object.defineProperty(reader, "clientWidth", {
+        configurable: true,
+        value: width,
+      });
+      Object.defineProperty(reader, "clientHeight", {
+        configurable: true,
+        value: height,
+      });
+    };
+
+    const bootAt = async (width: number, height: number) => {
+      const MockQr = Html5Qrcode as unknown as { rejectError: unknown };
+      MockQr.rejectError = null;
+      const start = vi.spyOn(Html5Qrcode.prototype, "start");
+      document.body.innerHTML = '<div id="qr-reader"></div>';
+      sizeReader(width, height);
+      const { result, unmount } = renderHook(() =>
+        useScanCamera({ onCodeScanned: vi.fn() }),
+      );
+      act(() => {
+        result.current.setIsCameraActive(true);
+      });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+      });
+      // The library sizes its box once, at start, through this callback.
+      const qrbox = (
+        start.mock.calls[0][1] as {
+          qrbox: (w: number, h: number) => unknown;
+        }
+      ).qrbox;
+      act(() => {
+        qrbox(width, height);
+      });
+      return { start, unmount, result };
+    };
+
+    // The resize is debounced, the restart's cooldown ends in a render that
+    // act holds back until its scope closes, and the start follows on the
+    // reader's own delay: one scope for each, then wait for the start.
+    const settle = async (
+      start: { mock: { calls: unknown[] } },
+      wanted: number,
+    ) => {
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      });
+      await act(async () => {
+        const until = Date.now() + 3000;
+        while (start.mock.calls.length < wanted && Date.now() < until) {
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+      });
+    };
+
+    it("starts the camera again so the frame is sized for the new box", async () => {
+      const camera = await bootAt(1280, 720);
+      expect(camera.start).toHaveBeenCalledTimes(1);
+
+      sizeReader(863, 360);
+      act(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
+      await settle(camera.start, 2);
+
+      expect(camera.start).toHaveBeenCalledTimes(2);
+      camera.start.mockRestore();
+      camera.unmount();
+    });
+
+    it("leaves the camera alone when the box did not change", async () => {
+      const camera = await bootAt(1280, 720);
+
+      act(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
+      await settle(camera.start, 2);
+
+      expect(camera.start).toHaveBeenCalledTimes(1);
+      camera.start.mockRestore();
+      camera.unmount();
+    });
+  });
 });
 
 // html5-qrcode draws the frame from this box and decodes the same pixels, so

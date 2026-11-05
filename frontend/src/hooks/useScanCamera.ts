@@ -188,6 +188,56 @@ function subscribeToReader(notify: () => void) {
   return () => observer.disconnect();
 }
 
+/**
+ * The decoder's region, and the frame drawn from it, are sized once, when the
+ * camera starts. A phone turned on its side kept the old ones: the landscape
+ * frame, wider than the upright screen, hung off both edges and no longer
+ * matched what the decoder read. So a turn restarts the camera; so does any
+ * other change of the reader's box (a window dragged narrower, a split
+ * screen) — a turn is only the commonest of them, and one that leaves the
+ * screen landscape raises no orientation event at all.
+ */
+function useRestartWhenReaderBoxChanges(
+  isCameraRunning: boolean,
+  aimedFor: { current: { width: number; height: number } | null },
+  restart: () => void,
+) {
+  const restartRef = useRef(restart);
+  restartRef.current = restart;
+  useEffect(() => {
+    if (!isCameraRunning) return;
+    const restartForNewSize = () => {
+      aimedFor.current = null;
+      restartRef.current();
+    };
+    const orientation = window.matchMedia?.("(orientation: portrait)");
+    orientation?.addEventListener("change", restartForNewSize);
+
+    let settle: ReturnType<typeof setTimeout> | undefined;
+    const onResize = () => {
+      clearTimeout(settle);
+      // A drag fires a resize per frame; the box is read once it stops.
+      settle = setTimeout(() => {
+        const aimed = aimedFor.current;
+        const reader = document.getElementById("qr-reader");
+        if (!aimed || !reader) return;
+        if (
+          reader.clientWidth !== aimed.width ||
+          reader.clientHeight !== aimed.height
+        ) {
+          restartForNewSize();
+        }
+      }, 250);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      orientation?.removeEventListener("change", restartForNewSize);
+      window.removeEventListener("resize", onResize);
+      clearTimeout(settle);
+    };
+  }, [isCameraRunning, aimedFor]);
+}
+
 export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
   const { t: tScan } = useTranslation("scan");
 
@@ -211,6 +261,8 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
   // until the decoder stops seeing it — a held code was counted once more on
   // every turn.
   const reportedBeforeTurn = useRef<string | null>(null);
+  // The size of the reader's box the running camera's frame was computed for.
+  const aimedFor = useRef<{ width: number; height: number } | null>(null);
   // About a second of frames with nothing to read (the reader runs at 20 fps
   // and tries twice per frame). Long enough that a code merely hard to read
   // — a frame or three of blur — is still the same reading, short enough that
@@ -356,21 +408,12 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
   };
 
   // The decoder's region, and the frame drawn from it, are sized once, when
-  // the camera starts. A phone turned on its side kept the old ones: the
-  // landscape frame, wider than the upright screen, hung off both edges and
-  // no longer matched what the decoder read. A turn restarts the camera, and
-  // the new start sizes both for the screen as it now stands.
-  useEffect(() => {
-    if (!isCameraRunning) return;
-    const orientation = window.matchMedia?.("(orientation: portrait)");
-    if (!orientation) return;
-    const restartForTheTurn = () => {
-      reportedBeforeTurn.current = reportedCode.current;
-      restartCameraRef.current();
-    };
-    orientation.addEventListener("change", restartForTheTurn);
-    return () => orientation.removeEventListener("change", restartForTheTurn);
-  }, [isCameraRunning]);
+  // the camera starts. A change of the reader's box leaves them stale, so the
+  // camera starts again and the new start sizes both for the box as it stands.
+  useRestartWhenReaderBoxChanges(isCameraRunning, aimedFor, () => {
+    reportedBeforeTurn.current = reportedCode.current;
+    restartCameraRef.current();
+  });
 
   // Camera lifecycle
   useEffect(() => {
@@ -430,6 +473,12 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
                 viewfinderHeight,
                 reader?.clientHeight,
               );
+              if (reader) {
+                aimedFor.current = {
+                  width: reader.clientWidth,
+                  height: reader.clientHeight,
+                };
+              }
               // The scan screen draws its frame from these two numbers, so
               // the frame is the region the decoder reads, not a look-alike.
               reader?.parentElement?.style.setProperty(
