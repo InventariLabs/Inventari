@@ -41,6 +41,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On an organization seeded before the option words existed, the "Lactose free"
+  field of the Dairy and Cheese categories now offers its options in the
+  interface language instead of the stored English "No" and "Yes". Options an
+  organization wrote itself keep their words.
 - Printing a list of labels gives a sheet of rows, three labels across, in the
   preview and in the download alike. It used to be one strip, however long,
   which the dialog shrank into a grey line of bars. The print queue still sends
