@@ -1,6 +1,9 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from uuid import UUID
 
 from sqlalchemy import or_, select, true, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -117,6 +120,52 @@ async def _storage_type_name(db: AsyncSession, storage_type_id) -> str | None:
     return storage_type.name if storage_type is not None else None
 
 
+#: The two unique indexes behind the sibling-name rule (the model declares
+#: them): one for the places under a parent, one for the top level.
+_NAME_INDEXES = (
+    'uq_storage_locations_org_parent_name',
+    'uq_storage_locations_org_root_name',
+)
+
+
+def _name_taken(name: str) -> ConflictException:
+    return ConflictException(
+        code='STORAGE_CONFLICT',
+        message=get_error_message(
+            'storage_name_collision', get_current_lang(), name=name
+        ),
+    )
+
+
+@asynccontextmanager
+async def _name_rule_held_by_the_database(
+    db: AsyncSession, name: str
+) -> AsyncIterator[None]:
+    """Answer a sibling-name index violation the way the read answers it.
+
+    ``_check_name_unique`` reads before the write, so two requests that both
+    read before either wrote each saw a free name; the second insert then
+    meets the unique index. That is the same 409 the read gives, not a 500.
+    The savepoint keeps the failed statement from poisoning the caller's
+    transaction. Any other integrity error is re-raised untouched.
+    """
+    try:
+        async with db.begin_nested():
+            yield
+    except IntegrityError as exc:
+        constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
+        if constraint in _NAME_INDEXES or any(
+            index in str(exc.orig) for index in _NAME_INDEXES
+        ):
+            raise _name_taken(name) from exc
+        raise
+
+
+async def _flush_under_the_name_rule(db: AsyncSession, name: str) -> None:
+    async with _name_rule_held_by_the_database(db, name):
+        await db.flush()
+
+
 async def _check_name_unique(
     db: AsyncSession,
     organization_id,
@@ -142,12 +191,7 @@ async def _check_name_unique(
     result = await db.scalars(query)
     existing = result.first()
     if existing:
-        raise ConflictException(
-            code='STORAGE_CONFLICT',
-            message=get_error_message(
-                'storage_name_collision', get_current_lang(), name=name
-            ),
-        )
+        raise _name_taken(name)
 
 
 async def _check_short_code_unique(
@@ -275,8 +319,9 @@ async def create_storage(
             db, _org_id(user), storage.parent_id, storage_data.get('short_code_prefix')
         )
 
-    db.add(storage)
-    await db.flush()
+    async with _name_rule_held_by_the_database(db, storage.name):
+        db.add(storage)
+        await db.flush()
     await log_action_async(
         db,
         organization_id=_org_id(user),
@@ -398,6 +443,7 @@ async def update_storage(
             setattr(storage, field, value)
             if field in ('settings', 'context_schema', 'field_definitions'):
                 flag_modified(storage, field)
+    await _flush_under_the_name_rule(db, storage.name)
 
     # A re-filing that changed nothing is not an event — the same rule the
     # item update applies. A change of `usage` is the quiet, org-wide one
@@ -693,16 +739,15 @@ async def delete_storage(
     # tree — a rebuild nobody was told about. Reparenting first also leaves
     # the cascade nothing to fire on. Grandchildren are not touched: they keep
     # their own parent, which is the child that just moved.
-    await db.execute(
-        update(StorageLocation)
-        .where(
-            StorageLocation.organization_id == _org_id(user),
-            StorageLocation.parent_id == storage.id,
-        )
-        .values(parent_id=storage.parent_id)
-    )
-
     try:
+        await db.execute(
+            update(StorageLocation)
+            .where(
+                StorageLocation.organization_id == _org_id(user),
+                StorageLocation.parent_id == storage.id,
+            )
+            .values(parent_id=storage.parent_id)
+        )
         await db.delete(storage)
         await db.flush()
     except IntegrityError as exc:
