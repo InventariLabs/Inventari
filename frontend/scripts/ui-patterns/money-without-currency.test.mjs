@@ -85,4 +85,18 @@ const t = formatMoney(z, "PLN", "pl");`),
     expect(considered).toBe(0);
     expect(findings).toEqual([]);
   });
+
+  it("reads a trailing comma as no extra argument", () => {
+    const { findings } = moneyWithoutCurrency.run(
+      file(`formatMoney(
+  row.total,
+);
+formatMoney(
+  row.total,
+  currency,
+);`),
+    );
+
+    expect(findings).toEqual(["modules/things/ThingPage.tsx:1"]);
+  });
 });
