@@ -37,7 +37,12 @@ from app.core.deps import (
 from app.core.exceptions import NotFoundException
 from app.i18n.service import get_current_lang
 from app.modules.approvals.approvals_api import approvals_api
-from app.modules.approvals.schemas import ApprovalRequestSchema
+from app.modules.approvals.schemas import (
+    ApprovalRequestSchema,
+    ApproveRequest,
+    AskForApproval,
+    RejectRequest,
+)
 
 from ._service_approval import (
     approve_purchase_order,
@@ -60,14 +65,14 @@ def register_approval_routes(router: APIRouter) -> None:
     @router.post('/{po_id}/request-approval', response_model=ApprovalRequestSchema)
     async def request_approval_endpoint(
         po_id: UUID,
-        notes: str | None = None,
+        body: AskForApproval = AskForApproval(),
         current_user: UserContextDTO = Depends(get_current_user_context),
         db: AsyncSession = Depends(get_async_db, scope='function'),
         org_id: UUID = Depends(require_org),
     ) -> Any:
         po = await _get_po_or_404(db, org_id, po_id)
         return await request_purchase_order_approval(
-            db, org_id, po, current_user.id, notes
+            db, org_id, po, current_user.id, body.notes
         )
 
     @router.post(
@@ -77,14 +82,14 @@ def register_approval_routes(router: APIRouter) -> None:
     )
     async def approve_endpoint(
         po_id: UUID,
-        notes: str | None = None,
+        body: ApproveRequest = ApproveRequest(),
         current_user: UserContextDTO = Depends(get_current_user_context),
         db: AsyncSession = Depends(get_async_db, scope='function'),
         org_id: UUID = Depends(require_org),
     ) -> Any:
         po = await _get_po_or_404(db, org_id, po_id)
         request_obj = await approve_purchase_order(
-            db, org_id, po, current_user.id, notes
+            db, org_id, po, current_user.id, body.notes
         )
         return request_obj
 
@@ -95,13 +100,13 @@ def register_approval_routes(router: APIRouter) -> None:
     )
     async def reject_endpoint(
         po_id: UUID,
-        notes: str | None = None,
+        body: RejectRequest = RejectRequest(),
         current_user: UserContextDTO = Depends(get_current_user_context),
         db: AsyncSession = Depends(get_async_db, scope='function'),
         org_id: UUID = Depends(require_org),
     ) -> Any:
         po = await _get_po_or_404(db, org_id, po_id)
-        return await reject_purchase_order(db, org_id, po, current_user.id, notes)
+        return await reject_purchase_order(db, org_id, po, current_user.id, body.notes)
 
     @router.get(
         '/{po_id}/approval-requirement',

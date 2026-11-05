@@ -551,16 +551,14 @@ export const documentApprovalApi = {
     // Approval" status filter on the Documents list.
     const response = await api.post<DocumentApproval>(
       `/approvals/documents/${docId}/request-approval`,
-      null,
-      { params: notes ? { notes } : undefined },
+      { notes },
     );
     return response.data;
   },
   approve: async (docId: string, notes?: string): Promise<DocumentApproval> => {
     const response = await api.post<DocumentApproval>(
       `/approvals/documents/${docId}/approve`,
-      null,
-      { params: notes ? { notes } : undefined },
+      { notes },
     );
     return response.data;
   },
@@ -570,8 +568,7 @@ export const documentApprovalApi = {
     // loop) and notifies the requester whichever door decides it.
     const response = await api.post<DocumentApproval>(
       `/approvals/documents/${docId}/reject`,
-      null,
-      { params: notes ? { notes } : undefined },
+      { notes },
     );
     return response.data;
   },

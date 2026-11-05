@@ -123,7 +123,7 @@ class TestARunRefusesToCompleteInAClosedPeriod:
 
         assert completed.status_code == 409, completed.text
         assert completed.json()['detail']['code'] == 'PERIOD_CLOSED'
-        assert f'{datetime.now(tz=UTC).year}-' in str(completed.json()['detail'])
+        assert str(datetime.now(tz=UTC).year) in str(completed.json()['detail'])
 
     def test_a_run_in_a_reopened_month_completes_as_before(
         self,

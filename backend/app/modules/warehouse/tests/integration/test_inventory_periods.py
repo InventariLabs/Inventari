@@ -195,7 +195,7 @@ class TestInventoryPeriodClosure:
         resp = client.post('/api/v1/warehouse/periods/2026/9/close', headers=pl)
         assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
         detail = resp.json()['detail']
-        assert detail['message'] == 'Okres 2026-09 jest już zamknięty.'
+        assert detail['message'] == 'Okres wrzesień 2026 jest już zamknięty.'
         # The conflict envelope names the language it speaks, like the 400
         # path does — the stock-take refusal stamps `lang`, so the period
         # refusals do too.
@@ -206,7 +206,10 @@ class TestInventoryPeriodClosure:
 
         resp = client.post('/api/v1/warehouse/periods/2026/9/reopen', headers=pl)
         assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
-        assert resp.json()['detail']['message'] == 'Okres 2026-09 nie jest zamknięty.'
+        assert (
+            resp.json()['detail']['message']
+            == 'Okres wrzesień 2026 nie jest zamknięty.'
+        )
         assert resp.json()['detail']['lang'] == 'pl'
 
         # The English reader keeps the English sentence.
@@ -219,7 +222,9 @@ class TestInventoryPeriodClosure:
             headers={**doc_auth_headers, 'Accept-Language': 'en'},
         )
         assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
-        assert resp.json()['detail']['message'] == 'Period 2026-10 is already closed.'
+        assert (
+            resp.json()['detail']['message'] == 'Period October 2026 is already closed.'
+        )
         assert resp.json()['detail']['lang'] == 'en'
 
     def test_list_periods_returns_closed_and_open(
@@ -517,7 +522,7 @@ class TestInventoryPeriodClosure:
 
         assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
         # The refusal names the month, so "change the date" is actionable.
-        assert '2026-05' in resp.text
+        assert 'May 2026' in resp.text
 
     def test_create_undated_document_in_closed_current_period_blocked(
         self,

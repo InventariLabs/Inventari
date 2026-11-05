@@ -117,6 +117,23 @@ async def invitation_preview(
     )
 
 
+async def invitation_role_label_async(
+    db: AsyncSession, invitation: OrganizationInvitation
+) -> str:
+    """The role an invitation offers, by the name the organization gave it.
+
+    A custom role is held on top of a built-in level, and the level alone is
+    what the journal showed: "Member" for an invitation to "Night Shift".
+    """
+    if invitation.role_id is not None:
+        from app.models.role import Role
+
+        custom_role = await db.get(Role, invitation.role_id)
+        if custom_role is not None:
+            return custom_role.name
+    return invitation.role
+
+
 async def create_invitation_code(
     db: AsyncSession,
     organization_id: UUID,
@@ -333,13 +350,7 @@ async def resend_invitation(
     old_expires_at = invitation.expires_at
     invitation.expires_at = datetime.now(UTC) + INVITE_TTL
 
-    role_label = invitation.role
-    if invitation.role_id is not None:
-        from app.models.role import Role
-
-        custom_role = await db.get(Role, invitation.role_id)
-        if custom_role is not None:
-            role_label = custom_role.name
+    role_label = await invitation_role_label_async(db, invitation)
 
     # Extending a live way into the organization is an access act; the code
     # itself never goes in — an entry a reader can join with is not an entry.
@@ -352,7 +363,7 @@ async def resend_invitation(
         target_id=invitation.id,
         snapshot={
             'invited_email': invitation.invited_email,
-            'role': invitation.role,
+            'role': role_label,
             'before': {'expires_at': old_expires_at.isoformat()},
             'after': {'expires_at': invitation.expires_at.isoformat()},
         },
