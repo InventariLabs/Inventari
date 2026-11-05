@@ -797,7 +797,7 @@
       "systemGroup": "Général",
       "systemRole": "Rôle intégré — ses autorisations ne sont pas modifiables.",
       "systemRoleFooter": "Les rôles intégrés sont en lecture seule.",
-      "title": "Accès et rôles"
+      "title": "Rôles et accès"
     },
     "data": {
       "exportDesc": "Télécharger une copie de vos produits",
@@ -1081,7 +1081,7 @@
     "signedBy": "Signé avec la clé {{key}}",
     "signedByHint": "La signature couvre l'auteur et la licence affichés ici.",
     "subtitle": "{{active}} des {{total}} modules proposés ici sont activés",
-    "title": "App Store",
+    "title": "Modules",
     "trust_cloud": "Cloud",
     "trust_community": "Communauté",
     "trust_core": "Cœur",

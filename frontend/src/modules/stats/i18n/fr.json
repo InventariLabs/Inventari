@@ -140,7 +140,7 @@
     "showInventoryValueDescription": "Afficher la valeur totale du stock dans l'aperçu des statistiques. C'est une métrique d'entreprise — désactiver pour les inventaires domestiques qui ne conservent pas de prix d'achat à additionner."
   },
   "navigation": {
-    "settings": "Analytique"
+    "settings": "Statistiques"
   },
   "reconciliation": {
     "title": "Rapprochement des stocks",

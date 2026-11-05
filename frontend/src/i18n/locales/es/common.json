@@ -797,7 +797,7 @@
       "systemGroup": "General",
       "systemRole": "Rol integrado: sus permisos no se pueden cambiar.",
       "systemRoleFooter": "Los roles integrados son de solo lectura.",
-      "title": "Acceso y roles"
+      "title": "Roles y accesos"
     },
     "data": {
       "exportDesc": "Descargar una copia de sus productos",
@@ -1081,7 +1081,7 @@
     "signedBy": "Firmado con la clave {{key}}",
     "signedByHint": "La firma cubre el autor y la licencia que se muestran aquí.",
     "subtitle": "{{active}} de los {{total}} módulos ofrecidos aquí están activados",
-    "title": "App Store",
+    "title": "Módulos",
     "trust_cloud": "Nube",
     "trust_community": "Comunidad",
     "trust_core": "Núcleo",

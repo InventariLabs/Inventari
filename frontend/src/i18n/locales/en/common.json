@@ -1079,7 +1079,7 @@
     "signedBy": "Signed by {{key}}",
     "signedByHint": "The signature covers the author and licence shown here.",
     "subtitle": "{{active}} of the {{total}} modules offered here are switched on",
-    "title": "App Store",
+    "title": "Modules",
     "trust_cloud": "Cloud",
     "trust_community": "Community",
     "trust_core": "Core",

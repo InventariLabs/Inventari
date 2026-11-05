@@ -138,7 +138,7 @@
     "showInventoryValueDescription": "Den Gesamtwert des Bestands in der Statistikübersicht anzeigen. Eine betriebliche Kennzahl — für Haushaltsbestände deaktivieren, die keine Einkaufspreise speichern, aus denen er aufsummiert werden könnte."
   },
   "navigation": {
-    "settings": "Analytik"
+    "settings": "Statistiken"
   },
   "reconciliation": {
     "title": "Bestandsabgleich",
