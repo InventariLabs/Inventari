@@ -1240,53 +1240,54 @@ class TestSyncAsyncTwinGuardrail:
         assert 'get_timeline_sync() is a twin of get_timeline_async()' in named
         assert 'twin of get_timeline()' not in named
 
-    def test_the_offload_may_carry_the_sibling_in_a_lambda(self, tmp_path):
-        """`run_sync(lambda s: get_timeline_sync(s, days=days))` — the
-        name sits inside the lambda handed to the offload, which is the
-        real shape of the one cross-file pair in the corpus."""
-        service = tmp_path / 'metrics_service.py'
-        service.write_text(
-            'def get_timeline_sync(session, *, days):\n    return []\n',
-            encoding='utf-8',
-        )
-        door = tmp_path / 'admin_api.py'
-        door.write_text(
-            'from metrics_service import get_timeline_sync\n\n'
-            'async def get_timeline_async(db, days):\n'
-            '    return await db.run_sync(\n'
-            '        lambda sync_sess: get_timeline_sync(sync_sess, days=days)\n'
-            '    )\n',
-            encoding='utf-8',
-        )
+    @pytest.mark.parametrize(
+        ('files', 'half'),
+        [
+            # `run_sync(lambda s: get_timeline_sync(s, days=days))` — the name
+            # sits inside the lambda handed to the offload, which is the real
+            # shape of the one cross-file pair in the corpus.
+            pytest.param(
+                {
+                    'metrics_service.py': (
+                        'def get_timeline_sync(session, *, days):\n    return []\n'
+                    ),
+                    'admin_api.py': (
+                        'from metrics_service import get_timeline_sync\n\n'
+                        'async def get_timeline_async(db, days):\n'
+                        '    return await db.run_sync(\n'
+                        '        lambda sync_sess: get_timeline_sync(sync_sess, days=days)\n'
+                        '    )\n'
+                    ),
+                },
+                'get_timeline',
+                id='lambda-handed-to-the-offload',
+            ),
+            # Blocking work pushed to a thread pool —
+            # `run_sync_in_thread(lambda: render_pdf_sync(html))` — is the same
+            # drive relation under the other helper.
+            pytest.param(
+                {
+                    'pdf_service.py': 'def render_pdf_sync(html):\n    return html\n',
+                    'protocol_service.py': (
+                        'from pdf_service import render_pdf_sync\n\n'
+                        'async def render_pdf_async(html):\n'
+                        '    return await run_sync_in_thread(lambda: render_pdf_sync(html))\n'
+                    ),
+                },
+                'render_pdf',
+                id='thread-offload-of-a-lambda',
+            ),
+        ],
+    )
+    def test_the_offload_may_carry_the_sibling_in_a_lambda(self, tmp_path, files, half):
+        for name, source in files.items():
+            (tmp_path / name).write_text(source, encoding='utf-8')
         result = _check_sync_async_function_twins(tmp_path)
         errors = [r for r in result if r.startswith('::error')]
         assert len(errors) == 2
         named = '\n'.join(errors)
-        assert 'get_timeline_sync' in named
-        assert 'get_timeline_async' in named
-
-    def test_the_offload_may_be_a_thread_offload_of_a_lambda(self, tmp_path):
-        """Blocking work pushed to a thread pool —
-        `run_sync_in_thread(lambda: render_pdf_sync(html))` — is the same
-        drive relation under the other helper."""
-        service = tmp_path / 'pdf_service.py'
-        service.write_text(
-            'def render_pdf_sync(html):\n    return html\n',
-            encoding='utf-8',
-        )
-        door = tmp_path / 'protocol_service.py'
-        door.write_text(
-            'from pdf_service import render_pdf_sync\n\n'
-            'async def render_pdf_async(html):\n'
-            '    return await run_sync_in_thread(lambda: render_pdf_sync(html))\n',
-            encoding='utf-8',
-        )
-        result = _check_sync_async_function_twins(tmp_path)
-        errors = [r for r in result if r.startswith('::error')]
-        assert len(errors) == 2
-        named = '\n'.join(errors)
-        assert 'render_pdf_sync' in named
-        assert 'render_pdf_async' in named
+        assert f'{half}_sync' in named
+        assert f'{half}_async' in named
 
     def test_app_prefixed_and_relative_imports_name_the_same_module(self, tmp_path):
         """`from app.services.x import foo` and, inside `services`,
@@ -1319,56 +1320,134 @@ class TestSyncAsyncTwinGuardrail:
         assert 'get_y_async() is a twin of get_y_sync()' in named
         assert 'get_y_sync() is a twin of get_y_async()' in named
 
-    def test_a_call_that_is_not_an_offload_is_not_a_drive(self, tmp_path):
-        """`get_profile('food')` in the middle of an unrelated async
-        function names the same spelling and nothing else: importing a
-        module is not calling its function through the offload."""
-        profiles = tmp_path / 'product_profiles.py'
-        profiles.write_text(
-            'def get_profile(code):\n    return code\n',
-            encoding='utf-8',
-        )
-        service = tmp_path / 'auth_service.py'
-        service.write_text(
-            'from product_profiles import get_profile\n\n'
-            'class AuthService:\n'
-            '    async def get_profile_async(self, user):\n'
-            '        return get_profile(user.profile_code)\n',
-            encoding='utf-8',
-        )
-        result = _check_sync_async_function_twins(tmp_path)
-        assert [r for r in result if r.startswith('::error')] == []
-
-    def test_a_local_variable_sharing_the_name_is_not_a_drive(self, tmp_path):
-        """A local bound to the same spelling is not a call to another
-        module's function — the check reads calls, not vocabulary."""
-        profiles = tmp_path / 'product_profiles.py'
-        profiles.write_text(
-            'def get_profile(code):\n    return code\n',
-            encoding='utf-8',
-        )
-        service = tmp_path / 'auth_service.py'
-        service.write_text(
-            'class AuthService:\n'
-            '    async def get_profile_async(self, user):\n'
-            '        get_profile = self._cached(user)\n'
-            '        return get_profile\n',
-            encoding='utf-8',
-        )
-        result = _check_sync_async_function_twins(tmp_path)
-        assert [r for r in result if r.startswith('::error')] == []
-
-    def test_an_offload_naming_an_unimported_name_is_not_a_drive(self, tmp_path):
-        """`db.run_sync(get_x_sync)` offloads *some* name; the import is
-        what says it is the function in the other file rather than a
-        local — or another module's function spelled the same way."""
-        impl = tmp_path / 'implementation.py'
-        impl.write_text('def get_x_sync():\n    return []\n', encoding='utf-8')
-        door = tmp_path / 'door.py'
-        door.write_text(
-            'async def get_x_async():\n    return await db.run_sync(get_x_sync)\n',
-            encoding='utf-8',
-        )
+    @pytest.mark.parametrize(
+        'files',
+        [
+            # `get_profile('food')` in the middle of an unrelated async
+            # function names the same spelling and nothing else: importing a
+            # module is not calling its function through the offload.
+            pytest.param(
+                {
+                    'product_profiles.py': 'def get_profile(code):\n    return code\n',
+                    'auth_service.py': (
+                        'from product_profiles import get_profile\n\n'
+                        'class AuthService:\n'
+                        '    async def get_profile_async(self, user):\n'
+                        '        return get_profile(user.profile_code)\n'
+                    ),
+                },
+                id='a-call-that-is-not-an-offload',
+            ),
+            # A local bound to the same spelling is not a call to another
+            # module's function — the check reads calls, not vocabulary.
+            pytest.param(
+                {
+                    'product_profiles.py': 'def get_profile(code):\n    return code\n',
+                    'auth_service.py': (
+                        'class AuthService:\n'
+                        '    async def get_profile_async(self, user):\n'
+                        '        get_profile = self._cached(user)\n'
+                        '        return get_profile\n'
+                    ),
+                },
+                id='a-local-variable-sharing-the-name',
+            ),
+            # `db.run_sync(get_x_sync)` offloads *some* name; the import is what
+            # says it is the function in the other file rather than a local —
+            # or another module's function spelled the same way.
+            pytest.param(
+                {
+                    'implementation.py': 'def get_x_sync():\n    return []\n',
+                    'door.py': (
+                        'async def get_x_async():\n'
+                        '    return await db.run_sync(get_x_sync)\n'
+                    ),
+                },
+                id='an-offload-naming-an-unimported-name',
+            ),
+            # `from implementation import other_sync as gz` then `run_sync(gz)`
+            # drives `other_sync`, not every sibling the module defines: the
+            # alias is a spelling, not a licence to pair by module. Passes on
+            # both sides of the alias reading — it is a guard, not the fix —
+            # against the collapse into "the name came from a module that also
+            # defines the target".
+            pytest.param(
+                {
+                    'implementation.py': (
+                        'def get_z_sync():\n    return []\n\n'
+                        'def other_sync():\n    return []\n'
+                    ),
+                    'door.py': (
+                        'from implementation import other_sync as gz\n\n'
+                        'async def get_z_async(db):\n'
+                        '    return await db.run_sync(gz)\n'
+                    ),
+                },
+                id='an-alias-of-another-function',
+            ),
+            # Two imports of the same published name, each under its own alias,
+            # only one of them offloaded: the module behind the alias the
+            # offload never named is not a twin. Reading each alias as its
+            # published name alone merged both sources, so `implementation`'s
+            # half was paired with an offload that bound to `external_library`
+            # — outside the scanned tree. Fails on the merged reading (two
+            # errors), pins the source-preserving one.
+            pytest.param(
+                {
+                    'implementation.py': 'def get_z_sync():\n    return []\n',
+                    'door.py': (
+                        'from implementation import get_z_sync as gz\n'
+                        'from external_library import get_z_sync as other\n\n'
+                        'async def get_z_async(db):\n'
+                        '    return await db.run_sync(other)\n'
+                    ),
+                },
+                id='two-sources-bound-by-the-offloaded-alias',
+            ),
+            # The drive must sit in the body of the function being reported: a
+            # file that offloads the name somewhere else knows about the
+            # implementation, but not through this door.
+            pytest.param(
+                {
+                    'implementation.py': 'def get_x_sync():\n    return []\n',
+                    'door.py': (
+                        'from implementation import get_x_sync\n\n'
+                        'async def warm_cache_async():\n'
+                        '    return await db.run_sync(get_x_sync)\n\n'
+                        'async def get_x_async():\n'
+                        '    return None\n'
+                    ),
+                },
+                id='an-offload-in-a-sibling-function',
+            ),
+            # foo_sync in one file and foo_async in another, with no base and no
+            # relation between them: the spelling converges, the pair does not
+            # exist — a gate that blocked here would block on any two files that
+            # happen to share a name.
+            pytest.param(
+                {
+                    '_rev_j1.py': 'def rebuild_index_sync():\n    return []\n',
+                    '_rev_j2.py': 'async def rebuild_index_async():\n    return []\n',
+                },
+                id='halves-in-unrelated-files',
+            ),
+            # `create` in one file and `create_async` in another is a
+            # coincidence unless the second actually calls the first — generic
+            # names exist in many modules and most of them never meet.
+            pytest.param(
+                {
+                    'billing.py': 'def create():\n    pass\n',
+                    'shipping.py': 'async def create_async():\n    pass\n',
+                },
+                id='a-generic-name-in-two-files',
+            ),
+        ],
+    )
+    def test_a_name_that_is_not_driven_through_the_offload_is_not_a_twin(
+        self, tmp_path, files
+    ):
+        for name, source in files.items():
+            (tmp_path / name).write_text(source, encoding='utf-8')
         result = _check_sync_async_function_twins(tmp_path)
         assert [r for r in result if r.startswith('::error')] == []
 
@@ -1392,94 +1471,6 @@ class TestSyncAsyncTwinGuardrail:
         named = '\n'.join(errors)
         assert 'get_z_async() is a twin of get_z_sync()' in named
         assert 'get_z_sync() is a twin of get_z_async()' in named
-
-    def test_an_alias_of_another_function_is_not_a_drive(self, tmp_path):
-        """`from implementation import other_sync as gz` then
-        `run_sync(gz)` drives `other_sync`, not every sibling the module
-        defines: the alias is a spelling, not a licence to pair by
-        module. Passes on both sides of the alias reading — it is a
-        guard, not the fix — against the collapse into "the name came
-        from a module that also defines the target"."""
-        impl = tmp_path / 'implementation.py'
-        impl.write_text(
-            'def get_z_sync():\n    return []\n\ndef other_sync():\n    return []\n',
-            encoding='utf-8',
-        )
-        door = tmp_path / 'door.py'
-        door.write_text(
-            'from implementation import other_sync as gz\n\n'
-            'async def get_z_async(db):\n'
-            '    return await db.run_sync(gz)\n',
-            encoding='utf-8',
-        )
-        result = _check_sync_async_function_twins(tmp_path)
-        assert [r for r in result if r.startswith('::error')] == []
-
-    def test_two_sources_for_one_name_bind_by_the_alias_that_was_offloaded(
-        self, tmp_path
-    ):
-        """Two imports of the same published name, each under its own
-        alias, only one of them offloaded: the module behind the alias the
-        offload never named is not a twin. Reading each alias as its
-        published name alone merged both sources, so `implementation`'s
-        half was paired with an offload that bound to `external_library` —
-        outside the scanned tree. Fails on the merged reading (two errors),
-        pins the source-preserving one."""
-        impl = tmp_path / 'implementation.py'
-        impl.write_text('def get_z_sync():\n    return []\n', encoding='utf-8')
-        door = tmp_path / 'door.py'
-        door.write_text(
-            'from implementation import get_z_sync as gz\n'
-            'from external_library import get_z_sync as other\n\n'
-            'async def get_z_async(db):\n'
-            '    return await db.run_sync(other)\n',
-            encoding='utf-8',
-        )
-        result = _check_sync_async_function_twins(tmp_path)
-        assert [r for r in result if r.startswith('::error')] == []
-
-    def test_an_offload_in_a_sibling_function_is_not_this_twin(self, tmp_path):
-        """The drive must sit in the body of the function being reported:
-        a file that offloads the name somewhere else knows about the
-        implementation, but not through this door."""
-        impl = tmp_path / 'implementation.py'
-        impl.write_text('def get_x_sync():\n    return []\n', encoding='utf-8')
-        door = tmp_path / 'door.py'
-        door.write_text(
-            'from implementation import get_x_sync\n\n'
-            'async def warm_cache_async():\n'
-            '    return await db.run_sync(get_x_sync)\n\n'
-            'async def get_x_async():\n'
-            '    return None\n',
-            encoding='utf-8',
-        )
-        result = _check_sync_async_function_twins(tmp_path)
-        assert [r for r in result if r.startswith('::error')] == []
-
-    def test_sync_and_async_halves_in_unrelated_files_are_not_a_twin(self, tmp_path):
-        """foo_sync in one file and foo_async in another, with no base and
-        no relation between them: the spelling converges, the pair does
-        not exist — a gate that blocked here would block on any two files
-        that happen to share a name."""
-        a = tmp_path / '_rev_j1.py'
-        a.write_text('def rebuild_index_sync():\n    return []\n', encoding='utf-8')
-        b = tmp_path / '_rev_j2.py'
-        b.write_text(
-            'async def rebuild_index_async():\n    return []\n', encoding='utf-8'
-        )
-        result = _check_sync_async_function_twins(tmp_path)
-        assert [r for r in result if r.startswith('::error')] == []
-
-    def test_a_generic_name_in_two_files_is_not_a_twin(self, tmp_path):
-        """`create` in one file and `create_async` in another is a
-        coincidence unless the second actually calls the first — generic
-        names exist in many modules and most of them never meet."""
-        a = tmp_path / 'billing.py'
-        a.write_text('def create():\n    pass\n', encoding='utf-8')
-        b = tmp_path / 'shipping.py'
-        b.write_text('async def create_async():\n    pass\n', encoding='utf-8')
-        result = _check_sync_async_function_twins(tmp_path)
-        assert [r for r in result if r.startswith('::error')] == []
 
     def test_a_baseless_sync_variant_beside_an_async_one_is_flagged(self, tmp_path):
         """foo_sync + foo_async with no foo anywhere: both trim to a base
@@ -1516,14 +1507,25 @@ class TestSyncAsyncTwinGuardrail:
 class TestCoreApiModelLeakGuardrail:
     """Tests for _check_public_api_return_types."""
 
-    def test_detects_model_return_as_error(self, tmp_path):
-        """Returning an ORM model type is flagged as error."""
+    @pytest.mark.parametrize(
+        'definition',
+        [
+            pytest.param(
+                'async def get_async() -> "Item":\n    pass\n', id='model-return'
+            ),
+            # _model_-named public methods are no longer exempt.
+            pytest.param(
+                'async def get_model_async() -> "Item":\n    pass\n',
+                id='model-in-the-method-name',
+            ),
+        ],
+    )
+    def test_detects_model_return_as_error(self, tmp_path, definition):
         f = tmp_path / 'items.py'
         f.write_text(
             'from typing import TYPE_CHECKING\n'
             'if TYPE_CHECKING:\n'
-            '    from app.models.item import Item\n\n'
-            'async def get_async() -> "Item":\n    pass\n',
+            '    from app.models.item import Item\n\n' + definition,
             encoding='utf-8',
         )
         result = _check_public_api_return_types(tmp_path)
@@ -1531,31 +1533,32 @@ class TestCoreApiModelLeakGuardrail:
         assert len(errors) == 1
         assert 'Item' in errors[0]
 
-    def test_model_method_name_no_longer_excluded(self, tmp_path):
-        """_model_-named public methods are no longer exempt."""
+    @pytest.mark.parametrize(
+        'source',
+        [
+            # Private (_-prefixed) helpers may handle ORM models internally.
+            pytest.param(
+                'from typing import TYPE_CHECKING\n'
+                'if TYPE_CHECKING:\n'
+                '    from app.models.item import Item\n\n'
+                'def _to_dto(item: "Item") -> "Item":\n    pass\n',
+                id='private-helper',
+            ),
+            pytest.param(
+                'from app.core.contracts import ItemDTO\n\n'
+                'async def update_async(data: ItemDTO) -> ItemDTO:\n    pass\n',
+                id='dto-param',
+            ),
+            pytest.param(
+                'from app.core.contracts import ItemDTO\n\n'
+                'async def get_async() -> ItemDTO:\n    pass\n',
+                id='dto-return',
+            ),
+        ],
+    )
+    def test_private_helper_excluded(self, tmp_path, source):
         f = tmp_path / 'items.py'
-        f.write_text(
-            'from typing import TYPE_CHECKING\n'
-            'if TYPE_CHECKING:\n'
-            '    from app.models.item import Item\n\n'
-            'async def get_model_async() -> "Item":\n    pass\n',
-            encoding='utf-8',
-        )
-        result = _check_public_api_return_types(tmp_path)
-        errors = [r for r in result if r.startswith('::error')]
-        assert len(errors) == 1
-        assert 'Item' in errors[0]
-
-    def test_private_helper_excluded(self, tmp_path):
-        """Private (_-prefixed) helpers may handle ORM models internally."""
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'from typing import TYPE_CHECKING\n'
-            'if TYPE_CHECKING:\n'
-            '    from app.models.item import Item\n\n'
-            'def _to_dto(item: "Item") -> "Item":\n    pass\n',
-            encoding='utf-8',
-        )
+        f.write_text(source, encoding='utf-8')
         result = _check_public_api_return_types(tmp_path)
         assert result == []
 
@@ -1589,17 +1592,6 @@ class TestCoreApiModelLeakGuardrail:
         errors = [r for r in result if r.startswith('::error')]
         assert len(errors) == 1
 
-    def test_dto_param_not_flagged(self, tmp_path):
-        """DTO parameters are fine."""
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'from app.core.contracts import ItemDTO\n\n'
-            'async def update_async(data: ItemDTO) -> ItemDTO:\n    pass\n',
-            encoding='utf-8',
-        )
-        result = _check_public_api_return_types(tmp_path)
-        assert result == []
-
     def test_param_leak_baseline_downgrades_to_notice(self, tmp_path):
         """Baselined param leaks emit ::notice instead of ::error."""
         f = tmp_path / 'items.py'
@@ -1614,17 +1606,6 @@ class TestCoreApiModelLeakGuardrail:
         result = _check_public_api_return_types(tmp_path, baseline)
         assert len(result) == 1
         assert result[0].startswith('::notice')
-
-    def test_dto_return_not_flagged(self, tmp_path):
-        """Returning a DTO type is fine."""
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'from app.core.contracts import ItemDTO\n\n'
-            'async def get_async() -> ItemDTO:\n    pass\n',
-            encoding='utf-8',
-        )
-        result = _check_public_api_return_types(tmp_path)
-        assert result == []
 
 
 # ── Guardrail 2b: CoreAPI async naming ──────────────────────────────────────
@@ -1645,42 +1626,39 @@ class TestCoreApiAsyncNamingGuardrail:
         assert 'CoreItemsAPI.create()' in result[0]
         assert 'create_async' in result[0]
 
-    def test_a_suffixed_coroutine_passes(self, tmp_path):
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'class CoreItemsAPI:\n'
-            '    async def create_async(self) -> None:\n        pass\n',
-            encoding='utf-8',
-        )
-        assert _check_coreapi_async_naming(tmp_path) == []
-
-    def test_a_sync_method_passes(self, tmp_path):
-        f = tmp_path / 'events.py'
-        f.write_text(
-            'class CoreEventsAPI:\n'
-            '    def subscribe(self, handler) -> None:\n        pass\n',
-            encoding='utf-8',
-        )
-        assert _check_coreapi_async_naming(tmp_path) == []
-
-    def test_a_private_coroutine_passes(self, tmp_path):
-        f = tmp_path / 'organizations.py'
-        f.write_text(
-            'async def _load_org() -> None:\n    pass\n'
-            'class CoreOrganizationsAPI:\n'
-            '    async def _refresh(self) -> None:\n        pass\n',
-            encoding='utf-8',
-        )
-        assert _check_coreapi_async_naming(tmp_path) == []
-
-    def test_a_nested_coroutine_is_not_facade_surface(self, tmp_path):
-        f = tmp_path / 'llm.py'
-        f.write_text(
-            'class CoreLlmAPI:\n'
-            '    async def extract_async(self) -> None:\n'
-            '        async def log(response) -> None:\n            pass\n',
-            encoding='utf-8',
-        )
+    @pytest.mark.parametrize(
+        ('filename', 'source'),
+        [
+            pytest.param(
+                'items.py',
+                'class CoreItemsAPI:\n'
+                '    async def create_async(self) -> None:\n        pass\n',
+                id='suffixed-coroutine',
+            ),
+            pytest.param(
+                'events.py',
+                'class CoreEventsAPI:\n'
+                '    def subscribe(self, handler) -> None:\n        pass\n',
+                id='sync-method',
+            ),
+            pytest.param(
+                'organizations.py',
+                'async def _load_org() -> None:\n    pass\n'
+                'class CoreOrganizationsAPI:\n'
+                '    async def _refresh(self) -> None:\n        pass\n',
+                id='private-coroutine',
+            ),
+            pytest.param(
+                'llm.py',
+                'class CoreLlmAPI:\n'
+                '    async def extract_async(self) -> None:\n'
+                '        async def log(response) -> None:\n            pass\n',
+                id='nested-coroutine-is-not-facade-surface',
+            ),
+        ],
+    )
+    def test_a_suffixed_coroutine_passes(self, tmp_path, filename, source):
+        (tmp_path / filename).write_text(source, encoding='utf-8')
         assert _check_coreapi_async_naming(tmp_path) == []
 
 
@@ -1991,19 +1969,32 @@ class TestServicesEscapeHatchMarker:
         assert '::error' in errors[0]
         assert 'line=3' in errors[0]
 
-    def test_ignores_marker_inside_prose_docstring(self, tmp_path):
+    @pytest.mark.parametrize(
+        ('filename', 'source'),
+        [
+            # The marker appears only inside a docstring as prose, not as a
+            # directive.
+            pytest.param(
+                'valuation_service.py',
+                '"""\n'
+                'Service.\n\n'
+                'Note: this is NOT an escape-hatch — the\n'
+                '``# architecture: allow_direct_db_access`` marker does not apply here.\n'
+                '"""\n\n'
+                'def f():\n    pass\n',
+                id='marker-in-a-prose-docstring',
+            ),
+            pytest.param(
+                'test_valuation.py',
+                '# architecture: allow_direct_db_access\n',
+                id='test-file',
+            ),
+        ],
+    )
+    def test_ignores_marker_inside_prose_docstring(self, tmp_path, filename, source):
         services_root = tmp_path / 'services'
         services_root.mkdir()
-        # The marker appears only inside a docstring as prose, not as a directive.
-        (services_root / 'valuation_service.py').write_text(
-            '"""\n'
-            'Service.\n\n'
-            'Note: this is NOT an escape-hatch — the\n'
-            '``# architecture: allow_direct_db_access`` marker does not apply here.\n'
-            '"""\n\n'
-            'def f():\n    pass\n',
-            encoding='utf-8',
-        )
+        (services_root / filename).write_text(source, encoding='utf-8')
 
         errors = _check_services_escape_hatch_marker(services_root)
 
@@ -2022,18 +2013,6 @@ class TestServicesEscapeHatchMarker:
 
         assert len(errors) == 1
         assert 'analytics.py' in errors[0]
-
-    def test_skips_test_files(self, tmp_path):
-        services_root = tmp_path / 'services'
-        services_root.mkdir()
-        (services_root / 'test_valuation.py').write_text(
-            '# architecture: allow_direct_db_access\n',
-            encoding='utf-8',
-        )
-
-        errors = _check_services_escape_hatch_marker(services_root)
-
-        assert errors == []
 
     def test_missing_services_root_returns_empty(self, tmp_path):
         errors = _check_services_escape_hatch_marker(tmp_path / 'nonexistent')
@@ -2062,140 +2041,130 @@ class TestCoreApiSignatureLegalityGuardrail:
         assert 'app.schemas.item' in errors[0]
         assert 'CoreItemsAPI.create_async' in errors[0]
 
-    def test_schemas_type_in_return_flagged(self, tmp_path):
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'from app.core.contracts import ItemDTO\n'
-            'from app.schemas.pagination import CursorPaginatedResponse\n\n'
-            'class CoreItemsAPI:\n'
-            '    async def search(self) -> CursorPaginatedResponse[ItemDTO]:\n'
-            '        pass\n',
-            encoding='utf-8',
-        )
+    @pytest.mark.parametrize(
+        ('filename', 'source', 'illegal'),
+        [
+            # Only CursorPaginatedResponse is illegal — ItemDTO comes from
+            # contracts.
+            pytest.param(
+                'items.py',
+                'from app.core.contracts import ItemDTO\n'
+                'from app.schemas.pagination import CursorPaginatedResponse\n\n'
+                'class CoreItemsAPI:\n'
+                '    async def search(self) -> CursorPaginatedResponse[ItemDTO]:\n'
+                '        pass\n',
+                'CursorPaginatedResponse',
+                id='schemas-type-in-return',
+            ),
+            # TYPE_CHECKING imports are contract-visible too — still illegal.
+            pytest.param(
+                'categories.py',
+                'from typing import TYPE_CHECKING\n'
+                'if TYPE_CHECKING:\n'
+                '    from app.schemas.category import CategoryUpdate\n\n'
+                'class CoreCategoriesAPI:\n'
+                '    async def update_async(self, data: CategoryUpdate) -> None:\n'
+                '        pass\n',
+                'CategoryUpdate',
+                id='type-checking-import',
+            ),
+            pytest.param(
+                'storage_types.py',
+                'from app.i18n import Language\n\n'
+                'class CoreStorageTypesAPI:\n'
+                '    async def create_async(self, lang: Language | None = None) -> None:\n'
+                '        pass\n',
+                'Language',
+                id='i18n-type',
+            ),
+            pytest.param(
+                'queries.py',
+                'from app.schemas.label_pool import LabelPoolCreate\n\n'
+                'async def generate_pool_async(data: LabelPoolCreate) -> None:\n    pass\n',
+                'LabelPoolCreate',
+                id='module-level-function',
+            ),
+            # `from app.schemas import pagination` + `pagination.X` annotation.
+            pytest.param(
+                'items.py',
+                'from app.schemas import pagination\n\n'
+                'class CoreItemsAPI:\n'
+                '    async def search(self) -> pagination.CursorPaginatedResponse:\n'
+                '        pass\n',
+                'pagination',
+                id='module-attribute-root',
+            ),
+        ],
+    )
+    def test_schemas_type_in_return_flagged(self, tmp_path, filename, source, illegal):
+        f = tmp_path / filename
+        f.write_text(source, encoding='utf-8')
         result = _check_coreapi_signature_legality(tmp_path)
         errors = [r for r in result if r.startswith('::error')]
-        # Only CursorPaginatedResponse is illegal — ItemDTO comes from contracts.
         assert len(errors) == 1
-        assert 'CursorPaginatedResponse' in errors[0]
+        assert illegal in errors[0]
 
-    def test_type_checking_import_flagged(self, tmp_path):
-        """TYPE_CHECKING imports are contract-visible too — still illegal."""
-        f = tmp_path / 'categories.py'
-        f.write_text(
-            'from typing import TYPE_CHECKING\n'
-            'if TYPE_CHECKING:\n'
-            '    from app.schemas.category import CategoryUpdate\n\n'
-            'class CoreCategoriesAPI:\n'
-            '    async def update_async(self, data: CategoryUpdate) -> None:\n'
-            '        pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        errors = [r for r in result if r.startswith('::error')]
-        assert len(errors) == 1
-        assert 'CategoryUpdate' in errors[0]
-
-    def test_i18n_type_flagged(self, tmp_path):
-        f = tmp_path / 'storage_types.py'
-        f.write_text(
-            'from app.i18n import Language\n\n'
-            'class CoreStorageTypesAPI:\n'
-            '    async def create_async(self, lang: Language | None = None) -> None:\n'
-            '        pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        errors = [r for r in result if r.startswith('::error')]
-        assert len(errors) == 1
-        assert 'Language' in errors[0]
-
-    def test_contracts_dto_ok(self, tmp_path):
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'from app.core.contracts import ItemDTO, UserContextDTO\n\n'
-            'class CoreItemsAPI:\n'
-            '    async def get_async(self, user: UserContextDTO) -> ItemDTO:\n'
-            '        pass\n',
-            encoding='utf-8',
-        )
+    @pytest.mark.parametrize(
+        ('filename', 'source'),
+        [
+            pytest.param(
+                'items.py',
+                'from app.core.contracts import ItemDTO, UserContextDTO\n\n'
+                'class CoreItemsAPI:\n'
+                '    async def get_async(self, user: UserContextDTO) -> ItemDTO:\n'
+                '        pass\n',
+                id='contracts-dto',
+            ),
+            pytest.param(
+                'storages.py',
+                'from datetime import datetime\n'
+                'from decimal import Decimal\n'
+                'from pathlib import Path\n'
+                'from typing import Any, Literal\n'
+                'from uuid import UUID\n\n'
+                'from sqlalchemy.ext.asyncio import AsyncSession\n\n'
+                'class CoreStoragesAPI:\n'
+                '    async def get_async(\n'
+                '        self,\n'
+                '        db: AsyncSession,\n'
+                '        org_id: UUID,\n'
+                '        *,\n'
+                '        kind: Literal["a", "b"] = "a",\n'
+                '    ) -> dict[str, Any] | None:\n'
+                '        pass\n\n'
+                '    async def stats(self, db: AsyncSession) -> tuple[datetime, Decimal, Path]:\n'
+                '        pass\n',
+                id='whitelisted-stdlib-and-session',
+            ),
+            pytest.param(
+                'ai_connections.py',
+                'class ConnectionStillBoundError(Exception):\n'
+                '    pass\n\n'
+                'class CoreAIConnectionsAPI:\n'
+                '    async def delete(self) -> ConnectionStillBoundError | None:\n'
+                '        pass\n',
+                id='local-class',
+            ),
+            pytest.param(
+                'items.py',
+                'from app.schemas.item import ItemCreate\n\n'
+                'class CoreItemsAPI:\n'
+                '    def _to_model(self, data: ItemCreate) -> ItemCreate:\n        pass\n',
+                id='private-method-exempt',
+            ),
+            pytest.param(
+                '__init__.py',
+                'from app.schemas.item import ItemCreate\n\n'
+                'def create(data: ItemCreate) -> None:\n    pass\n',
+                id='init-py-skipped',
+            ),
+        ],
+    )
+    def test_contracts_dto_ok(self, tmp_path, filename, source):
+        f = tmp_path / filename
+        f.write_text(source, encoding='utf-8')
         result = _check_coreapi_signature_legality(tmp_path)
         assert result == []
-
-    def test_whitelisted_stdlib_and_session_ok(self, tmp_path):
-        f = tmp_path / 'storages.py'
-        f.write_text(
-            'from datetime import datetime\n'
-            'from decimal import Decimal\n'
-            'from pathlib import Path\n'
-            'from typing import Any, Literal\n'
-            'from uuid import UUID\n\n'
-            'from sqlalchemy.ext.asyncio import AsyncSession\n\n'
-            'class CoreStoragesAPI:\n'
-            '    async def get_async(\n'
-            '        self,\n'
-            '        db: AsyncSession,\n'
-            '        org_id: UUID,\n'
-            '        *,\n'
-            '        kind: Literal["a", "b"] = "a",\n'
-            '    ) -> dict[str, Any] | None:\n'
-            '        pass\n\n'
-            '    async def stats(self, db: AsyncSession) -> tuple[datetime, Decimal, Path]:\n'
-            '        pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        assert result == []
-
-    def test_local_class_ok(self, tmp_path):
-        f = tmp_path / 'ai_connections.py'
-        f.write_text(
-            'class ConnectionStillBoundError(Exception):\n'
-            '    pass\n\n'
-            'class CoreAIConnectionsAPI:\n'
-            '    async def delete(self) -> ConnectionStillBoundError | None:\n'
-            '        pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        assert result == []
-
-    def test_private_method_exempt(self, tmp_path):
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'from app.schemas.item import ItemCreate\n\n'
-            'class CoreItemsAPI:\n'
-            '    def _to_model(self, data: ItemCreate) -> ItemCreate:\n        pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        assert result == []
-
-    def test_module_level_function_checked(self, tmp_path):
-        f = tmp_path / 'queries.py'
-        f.write_text(
-            'from app.schemas.label_pool import LabelPoolCreate\n\n'
-            'async def generate_pool_async(data: LabelPoolCreate) -> None:\n    pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        errors = [r for r in result if r.startswith('::error')]
-        assert len(errors) == 1
-        assert 'LabelPoolCreate' in errors[0]
-
-    def test_module_attr_root_flagged(self, tmp_path):
-        """`from app.schemas import pagination` + `pagination.X` annotation."""
-        f = tmp_path / 'items.py'
-        f.write_text(
-            'from app.schemas import pagination\n\n'
-            'class CoreItemsAPI:\n'
-            '    async def search(self) -> pagination.CursorPaginatedResponse:\n'
-            '        pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        errors = [r for r in result if r.startswith('::error')]
-        assert len(errors) == 1
-        assert 'pagination' in errors[0]
 
     def test_baseline_downgrades_to_notice(self, tmp_path):
         f = tmp_path / 'items.py'
@@ -2209,16 +2178,6 @@ class TestCoreApiSignatureLegalityGuardrail:
         result = _check_coreapi_signature_legality(tmp_path, baseline)
         assert len(result) == 1
         assert result[0].startswith('::notice')
-
-    def test_init_py_skipped(self, tmp_path):
-        f = tmp_path / '__init__.py'
-        f.write_text(
-            'from app.schemas.item import ItemCreate\n\n'
-            'def create(data: ItemCreate) -> None:\n    pass\n',
-            encoding='utf-8',
-        )
-        result = _check_coreapi_signature_legality(tmp_path)
-        assert result == []
 
 
 # ── Mixed-status assertion check (test hygiene) ─────────────────────────────
@@ -2279,28 +2238,28 @@ class TestMixedStatusAssertionCheck:
         assert len(errors) == 1
         assert '[200, 404]' in errors[0]
 
-    def test_ignores_a_set_of_successes(self, tmp_path):
-        """`in (200, 201)` narrows a shape; it does not hedge a verdict."""
+    @pytest.mark.parametrize(
+        'body',
+        [
+            # `in (200, 201)` narrows a shape; it does not hedge a verdict.
+            pytest.param(
+                'def test_thing():\n    assert r.status_code in (200, 201)\n',
+                id='a-set-of-successes',
+            ),
+            # Branching on the code is a decision, not a claim about it.
+            pytest.param(
+                'def test_thing():\n    if r.status_code in (200, 404):\n        pass\n',
+                id='an-in-comparison-that-is-not-an-assertion',
+            ),
+        ],
+    )
+    def test_ignores_a_set_of_successes(self, tmp_path, body):
         from app.core.architecture_lint._quality_checks_test_hygiene import (
             _check_mixed_status_assertions,
         )
 
         root = tmp_path / 'tests'
-        self._write(root, 'def test_thing():\n    assert r.status_code in (200, 201)\n')
-
-        assert _check_mixed_status_assertions((root,)) == []
-
-    def test_ignores_an_in_comparison_that_is_not_an_assertion(self, tmp_path):
-        """Branching on the code is a decision, not a claim about it."""
-        from app.core.architecture_lint._quality_checks_test_hygiene import (
-            _check_mixed_status_assertions,
-        )
-
-        root = tmp_path / 'tests'
-        self._write(
-            root,
-            'def test_thing():\n    if r.status_code in (200, 404):\n        pass\n',
-        )
+        self._write(root, body)
 
         assert _check_mixed_status_assertions((root,)) == []
 

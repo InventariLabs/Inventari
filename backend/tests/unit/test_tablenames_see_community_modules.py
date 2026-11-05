@@ -357,3 +357,37 @@ class TestExternalModuleRoots:
 
         assert _main.EXTERNAL_MODULES_ROOTS
         assert Path('/modules-workspace') in _main.EXTERNAL_MODULES_ROOTS
+
+    def test_every_existing_root_is_scanned(self, tmp_path: Path, monkeypatch):
+        """The scan reads the roots it is configured with, not just names them."""
+        from app.core.architecture_lint import _main
+
+        first, second = tmp_path / 'first', tmp_path / 'second'
+        _write_community_module(first)
+        _write_community_module(second)
+        monkeypatch.setattr(
+            _main, 'EXTERNAL_MODULES_ROOTS', (first, second, tmp_path / 'missing')
+        )
+
+        errors = _main._external_module_migration_errors()
+
+        assert len(errors) == 2
+        assert sum(str(first) in error for error in errors) == 1
+        assert sum(str(second) in error for error in errors) == 1
+
+    def test_two_roots_on_one_directory_report_each_module_once(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """In the container ``/modules-workspace`` and the repo-root twin are
+        one directory; a module there used to be reported twice."""
+        from app.core.architecture_lint import _main
+
+        real = tmp_path / 'workspace'
+        _write_community_module(real)
+        link = tmp_path / 'twin'
+        link.symlink_to(real, target_is_directory=True)
+        monkeypatch.setattr(_main, 'EXTERNAL_MODULES_ROOTS', (real, link))
+
+        errors = _main._external_module_migration_errors()
+
+        assert len(errors) == 1
