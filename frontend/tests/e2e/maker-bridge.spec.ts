@@ -24,7 +24,7 @@ let outputTemplateId: string;
 let outputStorageId: string;
 let outputStorageName: string;
 
-test.beforeAll(async ({ playwright, baseURL }) => {
+test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
   ctx = await playwright.request.newContext({ baseURL });
   api = new ApiHelper(ctx);
 
@@ -36,7 +36,9 @@ test.beforeAll(async ({ playwright, baseURL }) => {
     create_on_shortage_strategy: "ALLOW",
   });
 
-  stamp = `E2E-Bridge-${Date.now()}`;
+  // The worker index keeps two workers entering this hook in the same
+  // millisecond from building one location name.
+  stamp = `E2E-Bridge-${Date.now()}-w${testInfo.workerIndex}`;
   const output = await api.createProductTemplate(token, {
     name: `${stamp}-Jam`,
   });

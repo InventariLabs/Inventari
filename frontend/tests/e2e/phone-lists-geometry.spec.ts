@@ -27,7 +27,7 @@ test.describe("Phone lists — nothing sits beyond the screen edge", () => {
   // hold; it comes with a reason badge, which the plain row lacks.
   let longArchivedName: string;
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     // Named per seed, not per file: with parallel tests a worker runs this
     // hook again for each test it is handed, and archived rows stay, so one
     // tag across two seeds found the plain row twice.
@@ -43,7 +43,7 @@ test.describe("Phone lists — nothing sits beyond the screen edge", () => {
     labelCodes = labels.map((l) => l.short_code);
 
     storageId = (
-      await api.createStorage(token, { name: `Z_Test Phone ${Date.now()}` })
+      await api.createStorage(token, { name: `Z_Test Phone ${Date.now()}-w${testInfo.workerIndex}` })
     ).id;
     archivedId = (
       await api.createItem(token, {
