@@ -198,8 +198,8 @@ export default function WmsShortPickDialog({
             line it skips — the receiving twin retired this dialog's Skip for
             the same reason: two answers to one question. */}
         <SheetActions className="mt-5">
-          <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-            {t("picking.back")}
+          <Button variant="ghost" onClick={onCancel} disabled={isLoading}>
+            {t("common:form.cancel")}
           </Button>
           <Button onClick={confirm} disabled={isLoading}>
             {isLoading && <Loader2 size={14} className="animate-spin" />}

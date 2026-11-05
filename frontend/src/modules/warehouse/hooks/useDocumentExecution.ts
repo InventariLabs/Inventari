@@ -8,6 +8,7 @@ import type {
 import { DOCUMENT_HELD_CODES } from "@/modules/warehouse/discrepancyCodes";
 import { getDocumentLineStatus } from "@/modules/warehouse/lineStatus";
 import { formatDecimalQty } from "@/utils/formatters";
+import { unitLabel } from "@/lib/i18nHelpers";
 
 export type ExecutionLine = WarehouseDocument["lines"][number];
 
@@ -313,7 +314,7 @@ export function useDocumentExecution({
               name,
               done: nextDoneQuantity,
               expected: expectedQuantity,
-              unit: matchedLine.uom?.symbol ?? "",
+              unit: unitLabel(t, matchedLine.uom?.symbol, expectedQuantity),
             })
           : t("warehouse:detail.scanAlreadyDone", { name }),
       );
