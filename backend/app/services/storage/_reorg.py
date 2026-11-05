@@ -280,6 +280,25 @@ def _validate_final_state(plan: _Plan, data: StorageReorgRequest) -> None:
                 'exists under the same parent.',
             )
         sibling_names.add(key)
+    # A move lands among the siblings of its new parent: a place of the same
+    # name already there is the same refusal a create gets, said before the
+    # write instead of as the index's violation after it.
+    names_on_level: dict[tuple[UUID | None, str], UUID] = {}
+    for node, name in plan.name_by_id.items():
+        if node not in created_ids and node not in deleted_set:
+            names_on_level.setdefault((plan.parent_map.get(node), name), node)
+    for move_id, new_parent in plan.moves:
+        name = plan.name_by_id.get(move_id, '')
+        holder = names_on_level.get((new_parent, name))
+        if holder is not None and holder != move_id:
+            move_index = _index_of(data, 'move', id=move_id)
+            _reject(
+                plan,
+                move_index,
+                data.operations[move_index],
+                f'A storage location named "{name}" already '
+                'exists under the same parent.',
+            )
 
 
 def _index_of(

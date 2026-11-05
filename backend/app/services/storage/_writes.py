@@ -739,7 +739,20 @@ async def delete_storage(
     # tree — a rebuild nobody was told about. Reparenting first also leaves
     # the cascade nothing to fire on. Grandchildren are not touched: they keep
     # their own parent, which is the child that just moved.
+    #
+    # The lifted children land on the level the doomed row still stands on, so
+    # a child bearing the deleted row's own name would meet it in the sibling-
+    # name index — for a state the delete does not leave behind (one place of
+    # that name on the level). The doomed row therefore gives up its name
+    # first; the audit entry above already holds it. A child that meets a
+    # different, surviving sibling still collides, and that refusal is right.
     try:
+        await db.execute(
+            update(StorageLocation)
+            .where(StorageLocation.id == storage.id)
+            .values(name=str(storage.id))
+            .execution_options(synchronize_session=False)
+        )
         await db.execute(
             update(StorageLocation)
             .where(
