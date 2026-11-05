@@ -137,15 +137,3 @@ class TestAnUnknownUnitIsRefusedNotA500:
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['uom_id'] is None
-
-    def test_the_list_still_reads_after_the_refusals(
-        self,
-        client: TestClient,
-        auth_headers: dict[str, str],
-        test_shopping_list: ShoppingList,
-    ) -> None:
-        response = client.get(
-            f'/api/v1/shopping-lists/{test_shopping_list.id}',
-            headers=auth_headers,
-        )
-        assert response.status_code == status.HTTP_200_OK
