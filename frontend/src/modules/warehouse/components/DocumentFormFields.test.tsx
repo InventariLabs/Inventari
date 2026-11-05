@@ -259,6 +259,11 @@ describe("DocumentFormFields", () => {
       />,
     );
     expect(screen.getByText("Enable partners")).toBeInTheDocument();
+    // On the inset surface the ramp's 600 step is 2.96:1 in light and 3.28:1
+    // in dark; 800 (5.98:1) and the brand-text token (6.66:1) clear 4.5:1.
+    const link = screen.getByRole("link", { name: "Enable partners" });
+    expect(link).toHaveClass("text-primary-800", "dark:text-on-primary");
+    expect(link).not.toHaveClass("text-primary-600");
     // Notice body text rendered.
     expect(screen.getByText(/Enable the Partners module/i)).toBeInTheDocument();
     // No "+ Create new partner" dead action.
