@@ -170,6 +170,13 @@ def generate_product_label_png(
     return _png(_draw(label, width_mm, height_mm, dpi, max_height_px), dpi)
 
 
+#: Labels across the sheet a person downloads and previews. Three of the wide
+#: presets (50 and 62 mm) fit the width of an A4 page and stay readable in the
+#: preview at any number of labels. The print queue keeps its one strip: a roll
+#: printer takes them side by side.
+DOWNLOAD_SHEET_COLUMNS = 3
+
+
 def generate_product_label_batch_png(
     labels: Sequence[ProductLabel],
     width_mm: float = 50.0,

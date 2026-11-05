@@ -216,6 +216,25 @@ describe("AppStore trust badges", () => {
     });
   });
 
+  it("draws Deactivate as a button on the tinted card of a module that is on", async () => {
+    // The raised fill all but vanished on that tint: the word sat on the card
+    // like plain text beside a solid Activate on the cards that are off.
+    vi.spyOn(modulesCtx, "useModules").mockReturnValue({
+      enabledModules: ["api_keys"],
+      isModuleEnabled: (name: string) => name === "api_keys",
+      isLoading: false,
+      refreshModules: vi.fn(),
+      focusModule: null,
+      hiddenModules: [],
+    });
+    render(<AppStore />, { wrapper: Wrapper });
+
+    const deactivate = await screen.findByRole("button", {
+      name: tFor("common")("appStore.deactivate"),
+    });
+    expect(deactivate).toHaveClass("border", "border-border");
+  });
+
   it("does not badge a module Core while it can be switched off", async () => {
     await withLanguage("en", async () => {
       render(<AppStore />, { wrapper: Wrapper });

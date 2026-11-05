@@ -218,6 +218,28 @@ describe("StatsPage", () => {
     expect(await screen.findByText("PLN 30.00")).toBeInTheDocument();
   });
 
+  it("heads the page in words a warehouse can use as well as a household", async () => {
+    const setHeader = vi.fn();
+    const queryClient = createQueryClient();
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader }}>
+        <QueryClientProvider client={queryClient}>
+          <ModulesProvider>
+            <BrowserRouter>
+              <StatsPage />
+            </BrowserRouter>
+          </ModulesProvider>
+        </QueryClientProvider>
+      </PageHeaderContext.Provider>,
+    );
+
+    await waitFor(() =>
+      expect(setHeader).toHaveBeenCalledWith(
+        expect.objectContaining({ subtitle: "Overview of your stock" }),
+      ),
+    );
+  });
+
   it("should render distribution sections", async () => {
     render(<StatsPage />, { wrapper: Wrapper });
 

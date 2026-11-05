@@ -1,6 +1,6 @@
 {
   "title": "Estadísticas",
-  "subtitle": "Resumen de sus suministros",
+  "subtitle": "Resumen de su stock",
   "records": "Registros",
   "recordCount_one": "{{count}} registro",
   "recordCount_other": "{{count}} registros",

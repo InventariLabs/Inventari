@@ -248,13 +248,23 @@ describe("StockTakeReportPage", () => {
     expect(value?.className).not.toContain("amber-600");
   });
 
-  it("writes the overstock count with the brand text token, which has a dark value", async () => {
+  it("writes the overstock count in the tone of a surplus line, which has a dark value", async () => {
     // text-primary-700 has no dark variant: 2.97:1 on the dark card.
     renderPage();
     const label = await screen.findByText("Overstock");
     const value = label.parentElement?.querySelector("p:nth-of-type(2)");
-    expect(value).toHaveClass("text-on-primary");
+    expect(value).toHaveClass("text-on-info");
     expect(value?.className).not.toContain("primary-700");
+  });
+
+  it("does not colour a surplus as an error beside an amber shortfall", async () => {
+    renderPage();
+    await screen.findByText("Milk");
+    const surplus = screen.getByText(/^\+3\b/);
+    const shortfall = screen.getByText(/^-2\b/);
+    expect(surplus).toHaveClass("text-on-info");
+    expect(surplus.className).not.toContain("danger");
+    expect(shortfall).toHaveClass("text-on-warning");
   });
 
   it("shows discrepancies by default, sorted by absolute difference desc", async () => {

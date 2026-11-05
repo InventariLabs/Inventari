@@ -201,6 +201,112 @@ class TestStatsByStorage:
         assert sum(row['items_count'] for row in places) == 4
         assert sum(row['items_count'] for row in by_category.json()['items']) == 4
 
+    def _place(
+        self,
+        db_session: Session,
+        test_user: User,
+        test_storage_type: StorageType,
+        name: str,
+        parent: StorageLocation | None = None,
+        settings: dict[str, bool] | None = None,
+    ) -> StorageLocation:
+        place = StorageLocation(
+            organization_id=test_user.organization_id,
+            created_by=test_user.id,
+            storage_type_id=test_storage_type.id,
+            name=name,
+            parent_id=parent.id if parent else None,
+            settings=settings,
+        )
+        db_session.add(place)
+        db_session.flush()
+        return place
+
+    def test_an_archived_place_stays_out_of_the_breakdown(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_type: StorageType,
+        test_storage_location: StorageLocation,
+    ) -> None:
+        """Archived is gone from every list of places; it is not an empty shelf."""
+        self._place(
+            db_session,
+            test_user,
+            test_storage_type,
+            'Server Room',
+            settings={'archived': True},
+        )
+        db_session.commit()
+
+        response = client.get('/api/v1/stats/by-location', headers=auth_headers)
+
+        names = [row['location_name'] for row in response.json()['items']]
+        assert names == [test_storage_location.name]
+
+    def test_a_container_is_not_listed_as_an_empty_shelf(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_type: StorageType,
+        test_storage_location: StorageLocation,
+        test_items_batch: list[Item],
+    ) -> None:
+        """An aisle holds its racks, not goods: at 0 records it is not a place
+        with room on it. A shelf with nothing on it still is, and so is a
+        parent holding records of its own."""
+        aisle = self._place(db_session, test_user, test_storage_type, 'Aisle A')
+        self._place(db_session, test_user, test_storage_type, 'Rack A-01', parent=aisle)
+        self._place(
+            db_session,
+            test_user,
+            test_storage_type,
+            'Rack B-01',
+            parent=test_storage_location,
+        )
+        db_session.commit()
+
+        response = client.get('/api/v1/stats/by-location', headers=auth_headers)
+
+        counts = {
+            row['location_name']: row['items_count'] for row in response.json()['items']
+        }
+        assert counts == {
+            test_storage_location.name: 5,
+            'Rack A-01': 0,
+            'Rack B-01': 0,
+        }
+
+    def test_a_parent_of_archived_places_only_is_an_empty_shelf_again(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_type: StorageType,
+        test_storage_location: StorageLocation,
+    ) -> None:
+        """Archiving a rack's only shelves leaves a rack with room on it."""
+        rack = self._place(db_session, test_user, test_storage_type, 'Rack C-01')
+        self._place(
+            db_session,
+            test_user,
+            test_storage_type,
+            'Shelf C-01-01',
+            parent=rack,
+            settings={'archived': True},
+        )
+        db_session.commit()
+
+        response = client.get('/api/v1/stats/by-location', headers=auth_headers)
+
+        names = {row['location_name'] for row in response.json()['items']}
+        assert names == {test_storage_location.name, 'Rack C-01'}
+
 
 @pytest.mark.integration
 class TestStatsByCategory:

@@ -183,7 +183,7 @@ export default function StockTakeReportPage() {
       value: report.tolerated_differences,
       tone: "text-on",
     },
-    { key: "overstock", value: report.overstock, tone: "text-on-primary" },
+    { key: "overstock", value: report.overstock, tone: "text-on-info" },
     { key: "understock", value: report.understock, tone: "text-on-warning" },
     { key: "notCounted", value: report.not_counted, tone: "text-on-muted" },
   ] as const;
@@ -333,11 +333,11 @@ export default function StockTakeReportPage() {
                         // discrepancy — it asked for no explanation and got
                         // none. Naming it here is what keeps the report
                         // honest about what "perfect" would have hidden.
-                        item.is_discrepancy === 0
+                        // A surplus is not an error either: it reads as the
+                        // Overstock tile above does, a shortfall as Understock.
+                        item.is_discrepancy === 0 || difference > 0
                           ? "info"
-                          : difference > 0
-                            ? "danger"
-                            : "warning"
+                          : "warning"
                       }
                       className="text-[10px]"
                     >

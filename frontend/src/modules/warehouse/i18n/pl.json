@@ -2055,7 +2055,7 @@
       "over": "Ponad limit",
       "empty": "Puste"
     },
-    "searchPlaceholder": "Gdzie leży… np. Gouda",
+    "searchPlaceholder": "Gdzie leży… nazwa lub kod produktu",
     "filterLabel": "Pokaż",
     "filters": {
       "all": "Wszystko",

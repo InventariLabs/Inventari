@@ -191,6 +191,7 @@ async def product_labels_png(
     says how many were, so the screen can say so.
     """
     from app.modules.printing.services.product_label_service import (
+        DOWNLOAD_SHEET_COLUMNS,
         generate_product_label_batch_png,
     )
 
@@ -203,7 +204,9 @@ async def product_labels_png(
     if not labels:
         raise catalogue_refusal('product_label_no_code')
     labels = [label for label in labels for _ in range(payload.copies)]
-    png = generate_product_label_batch_png(labels, payload.width_mm, payload.height_mm)
+    png = generate_product_label_batch_png(
+        labels, payload.width_mm, payload.height_mm, columns=DOWNLOAD_SHEET_COLUMNS
+    )
     return StreamingResponse(
         io.BytesIO(png),
         media_type='image/png',
@@ -231,6 +234,7 @@ async def location_labels_png(
     says how many were.
     """
     from app.modules.printing.services.product_label_service import (
+        DOWNLOAD_SHEET_COLUMNS,
         generate_product_label_batch_png,
     )
 
@@ -240,7 +244,9 @@ async def location_labels_png(
     if not labels:
         raise catalogue_refusal('print_job_nothing_to_print')
     labels = [label for label in labels for _ in range(payload.copies)]
-    png = generate_product_label_batch_png(labels, payload.width_mm, payload.height_mm)
+    png = generate_product_label_batch_png(
+        labels, payload.width_mm, payload.height_mm, columns=DOWNLOAD_SHEET_COLUMNS
+    )
     return StreamingResponse(
         io.BytesIO(png),
         media_type='image/png',

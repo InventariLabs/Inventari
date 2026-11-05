@@ -6,6 +6,14 @@ import { TranslateFn } from "@/types/i18n";
 import { categoryLabel } from "@/lib/i18nHelpers";
 import { useMoney } from "@/hooks/useMoney";
 
+/**
+ * A location's or a category's name, as its owner typed it. This font's narrow
+ * space, which `:root` already widens for running text, still vanishes between
+ * capitals: a name typed "RACK A-01" read as "RACKA-01" here.
+ */
+const NAME_TEXT =
+  "text-sm font-semibold text-on-secondary [word-spacing:0.15em]";
+
 type Props = {
   t: TranslateFn;
   storageStats: StorageStats[];
@@ -49,9 +57,7 @@ export function StatsDistributionGrid({
                   }
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-on-secondary uppercase tracking-tight">
-                      {stat.location_name}
-                    </span>
+                    <span className={NAME_TEXT}>{stat.location_name}</span>
                     <Badge variant="secondary">
                       {t("stats:recordCount", { count: stat.items_count })}
                     </Badge>
@@ -109,7 +115,7 @@ export function StatsDistributionGrid({
                         }}
                         size="sm"
                       />
-                      <span className="text-sm font-semibold text-on-secondary uppercase tracking-tight">
+                      <span className={NAME_TEXT}>
                         {categoryLabel(
                           t,
                           stat.category_code,

@@ -38,6 +38,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models.item import Item
+from app.models.organization import Organization
 from app.models.stock_move import StockMove, StockMoveReferenceType
 from app.models.stock_valuation_layer import StockValuationLayer
 from app.models.storage_location import StorageLocation
@@ -48,16 +49,18 @@ from app.modules.maker.models import (
     ProductionOrder,
     ProductionOrderLine,
 )
+from app.modules.purchase_orders.models import PurchaseOrder, PurchaseOrderLine
 from app.modules.recipes.models.meal_plan import MealPlan, MealPlanEntry
 from app.modules.recipes.models.recipe import Recipe, RecipeIngredient
 from app.modules.shopping_lists.models import ShoppingListItem
-from app.modules.warehouse.models import Document
+from app.modules.warehouse.models import Document, DocumentLine
 from seed_demo_data import (
     DEMO_STORY_EXPIRED,
     FOOD_TEMPLATES,
     FOOD_ZONE_BY_CATEGORY,
     SEED_PREFIX,
     TODAY,
+    _org_tax_rates,
     clean_seed_data,
 )
 from tests.integration._demo_world import ids, seeded_organization
@@ -81,6 +84,38 @@ def _zone_of(db: Session, location_id: uuid.UUID) -> str:
             return node.name
         node = parent
     return node.name
+
+
+class TestTheSeedChargesTheTaxOfTheOrganizationsCountry:
+    """A dollar organization with no country was charged Polish VAT on every
+    order and document, because the seed wrote the rates by hand."""
+
+    def test_no_country_means_no_tax_on_orders_or_documents(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        assert db_session.get(Organization, seeded).country is None
+        order_rates = {
+            rate
+            for (rate,) in db_session.query(PurchaseOrderLine.tax_rate)
+            .join(PurchaseOrder)
+            .filter(PurchaseOrder.organization_id == seeded)
+        }
+        document_rates = {
+            rate
+            for (rate,) in db_session.query(DocumentLine.tax_rate)
+            .join(Document)
+            .filter(Document.organization_id == seeded)
+        }
+        assert order_rates == {None}
+        assert document_rates == {None}
+
+    def test_a_country_with_a_row_keeps_its_own_rates(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        db_session.get(Organization, seeded).country = 'PL'
+        db_session.flush()
+
+        assert _org_tax_rates(db_session, seeded) == (Decimal('23'), Decimal('8'))
 
 
 class TestDocumentsCarryNoSeedMarkerOnScreen:

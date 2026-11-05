@@ -206,7 +206,7 @@ describe("OccupancyPage — the tree", () => {
 
     await screen.findByText("Fridge A");
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "gouda",
     );
     await waitFor(() =>
@@ -225,13 +225,15 @@ describe("OccupancyPage — the tree", () => {
     await user.click(screen.getByRole("button", { name: "Collapse Cold" }));
     expect(screen.queryByText("Fridge B")).not.toBeInTheDocument();
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "gouda",
     );
     expect(await screen.findByText("Fridge B")).toBeInTheDocument();
     expect(within(rowOf("Fridge B")).getByText("12 pcs")).toBeInTheDocument();
     // The search over, the fold is back as the reader left it.
-    await user.clear(screen.getByPlaceholderText("Where is… e.g. Gouda"));
+    await user.clear(
+      screen.getByPlaceholderText("Where is… product name or code"),
+    );
     await waitFor(() =>
       expect(screen.queryByText("Fridge B")).not.toBeInTheDocument(),
     );
@@ -244,7 +246,7 @@ describe("OccupancyPage — the tree", () => {
 
     await screen.findByText("Fridge A");
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "gouda",
     );
     await waitFor(() => expect(reads.searches).toHaveBeenCalledWith("gouda"));
@@ -269,7 +271,7 @@ describe("OccupancyPage — the tree", () => {
 
     await screen.findByText("Fridge A");
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "gouda",
     );
     expect(
@@ -294,7 +296,7 @@ describe("OccupancyPage — the tree", () => {
 
     await screen.findByText("Fridge A");
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "gouda",
     );
     const alert = await screen.findByRole("alert");
@@ -341,7 +343,10 @@ describe("OccupancyPage — the tree", () => {
     render(<OccupancyPage />);
 
     await screen.findByText("Fridge A");
-    await user.type(screen.getByPlaceholderText("Where is… e.g. Gouda"), "zzz");
+    await user.type(
+      screen.getByPlaceholderText("Where is… product name or code"),
+      "zzz",
+    );
     expect(await screen.findByText("No location matches.")).toBeInTheDocument();
   });
 
@@ -483,7 +488,7 @@ describe("OccupancyPage — the map", () => {
     ).toHaveTextContent("7 pcs");
 
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "rice",
     );
     const hit = await screen.findByRole("button", {
@@ -532,7 +537,7 @@ describe("OccupancyPage — the map", () => {
     const user = await openMap();
 
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "gouda",
     );
     const b = await screen.findByRole("button", {
@@ -607,7 +612,7 @@ describe("OccupancyPage — the map", () => {
     await screen.findByText("S1");
 
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "rice",
     );
     await waitFor(() =>
@@ -621,7 +626,7 @@ describe("OccupancyPage — the map", () => {
     const user = await openMap();
 
     await user.type(
-      screen.getByPlaceholderText("Where is… e.g. Gouda"),
+      screen.getByPlaceholderText("Where is… product name or code"),
       "gouda",
     );
     await waitFor(() =>

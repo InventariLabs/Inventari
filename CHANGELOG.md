@@ -41,6 +41,21 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Printing a list of labels gives a sheet of rows, three labels across, in the
+  preview and in the download alike. It used to be one strip, however long,
+  which the dialog shrank into a grey line of bars. The print queue still sends
+  a printer its strip.
+- Product distribution by location no longer lists archived locations, or a
+  container with no records of its own as if it were an empty shelf, and writes
+  location and category names as they were typed, so the space in "Rack A-01"
+  stays visible.
+- A stock take report shows a surplus in blue, like its Overstock tile, not in
+  the red of an error beside an amber shortfall.
+- Warehouse occupancy no longer suggests a cheese in its search box on every
+  profile, and the statistics page no longer calls a warehouse's stock supplies.
+- Deactivate on a module's card reads as a button.
+- The demo data charges the tax of the organization's country, and none where
+  no country is set, rather than Polish VAT on every order and document.
 - Tapping a screen for the first time now shows a loading sign at once, inside
   the application's frame, instead of leaving the old screen up for as long as
   the download takes. The very first open of the application shows the product

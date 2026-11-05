@@ -627,6 +627,19 @@ describe("StatsDistributionGrid", () => {
     expect(screen.getByText("Pantry")).toBeInTheDocument();
   });
 
+  it("writes a name as its owner did, so its word space stays visible", () => {
+    // Between capitals the font's narrow space closed "RACK A-01" to
+    // "RACKA-01", typed that way or set in capitals here. jsdom lays nothing
+    // out, so this pins the rule; the gap itself was measured in a browser.
+    render(<StatsDistributionGrid {...props} />);
+    for (const name of ["Fridge", "Dairy"]) {
+      const { className } = screen.getByText(name);
+      expect(className).not.toContain("uppercase");
+      expect(className).not.toContain("tracking-tight");
+      expect(className).toContain("[word-spacing:0.15em]");
+    }
+  });
+
   it("renders category names", () => {
     render(<StatsDistributionGrid {...props} />);
     expect(screen.getByText("Dairy")).toBeInTheDocument();
