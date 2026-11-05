@@ -196,43 +196,40 @@ function submitLabelFor(
   return labels[docType];
 }
 
+/** Whether a line still waits for a price. */
+function isUnpriced(line: { unit_price?: string | null }): boolean {
+  return line.unit_price == null || line.unit_price === "";
+}
+
 /**
  * The value-completeness signal — a document whose lines carry no price has
- * no accounting value. Says nothing while every line is priced.
+ * no accounting value. Says nothing while every line is priced. It speaks of
+ * the document only: what the price sources answered differs from line to
+ * line, so that answer stands under the line it is about.
  */
 function MissingValueWarning({
   lines,
-  everyUnpricedLineAsked,
 }: {
   lines: Array<{ unit_price?: string }>;
-  everyUnpricedLineAsked: boolean;
 }) {
   const { t } = useTranslation("warehouse");
-  if (!lines.some((line) => line.unit_price == null || line.unit_price === ""))
-    return null;
+  if (!lines.some(isUnpriced)) return null;
   return (
     <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300">
       <TriangleAlert size={14} className="mt-0.5 shrink-0" />
-      <span>
-        {t(
-          everyUnpricedLineAsked
-            ? "form.missingValueWarningNoSource"
-            : "form.missingValueWarning",
-        )}
-      </span>
+      <span>{t("form.missingValueWarning")}</span>
     </div>
   );
 }
 
-/** Whether every line that still carries no price has already looked for a
- * suggestion and come back empty — the warning's promise gives way then. */
-function allUnpricedLinesAsked(
-  lines: Array<{ _key: string; unit_price?: string | null }>,
-  answers: Record<string, boolean>,
-): boolean {
-  return lines
-    .filter((line) => line.unit_price == null || line.unit_price === "")
-    .every((line) => answers[line._key] === false);
+/** Under a line that went looking for a price and came back without one. */
+function LineNoPriceSource() {
+  const { t } = useTranslation("warehouse");
+  return (
+    <p className="text-xs text-amber-800 dark:text-amber-300">
+      {t("form.lineNoPriceSource")}
+    </p>
+  );
 }
 
 /** What the prefill reads besides the form it fills. */
@@ -406,7 +403,10 @@ export default function DocumentFormModal({
     showValueFields && (profile?.tax_handling ?? "NONE") !== "NONE";
   // After the workspace: the picker reads the partner it holds, to name it
   // and to say whether the role set still allows it.
-  const picker = useDocumentPartnerOptions({ type: docType }, partnerId);
+  const picker = useDocumentPartnerOptions(
+    { type: docType, return_of_id: document?.return_of_id },
+    partnerId,
+  );
   // The picker folds shelf-total rows only where the executor can spend
   // them — one executor truth, mirrored from document_types.py.
   const lineImport = useDocumentLineImport({
@@ -420,10 +420,8 @@ export default function DocumentFormModal({
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   // Server (422) errors, set by handleApiError; cleared on input change.
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
-  // Per line: did the price sources answer the pick? The empty-price
-  // warning talks about lines, so the answer is kept per line — a miss on
-  // the first line must not speak for the second, and one priced line must
-  // not resurrect the promise over its unpriced neighbour.
+  // Per line: did the price sources answer the pick? A miss on the first line
+  // says nothing about the second, so the answer stands under its own line.
   const [priceHintByLine, setPriceHintByLine] = useState<
     Record<string, boolean>
   >({});
@@ -529,12 +527,11 @@ export default function DocumentFormModal({
     stock: { locationId: stockLocationId },
   });
 
-  // The warning names what happened to the lines it covers. Among the
-  // lines that still carry no price: if every one of them already went
-  // looking for a suggestion and came back empty, the promise gives way;
-  // while any unpriced line has not been asked yet, the promise stands —
-  // its suggestion may still arrive.
-  const everyUnpricedLineAsked = allUnpricedLinesAsked(lines, priceHintByLine);
+  const renderModuleLineExtra = lineExtraFor(
+    "document",
+    workspace,
+    extensions.registerBeforeSubmit,
+  );
 
   const save = () => {
     if (isEdit && document) {
@@ -759,21 +756,21 @@ export default function DocumentFormModal({
                   onManualCode={handleCodeScanned}
                   onRemoveLine={removeLine}
                   onUpdateLine={updateLine}
-                  renderLineExtra={lineExtraFor(
-                    "document",
-                    workspace,
-                    extensions.registerBeforeSubmit,
+                  renderLineExtra={(line) => (
+                    <>
+                      {showValueFields &&
+                        isUnpriced(line) &&
+                        priceHintByLine[line._key] === false && (
+                          <LineNoPriceSource />
+                        )}
+                      {renderModuleLineExtra(line)}
+                    </>
                   )}
                   onPriceHintResult={(lineKey, suggested) =>
                     setPriceHintByLine(withPriceHint(lineKey, suggested))
                   }
                 />
-                {showValueFields && (
-                  <MissingValueWarning
-                    lines={lines}
-                    everyUnpricedLineAsked={everyUnpricedLineAsked}
-                  />
-                )}
+                {showValueFields && <MissingValueWarning lines={lines} />}
               </div>
             </section>
           </form>

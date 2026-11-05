@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { unitLabel } from "@/lib/i18nHelpers";
 import type { PendingUnitChoice } from "@/modules/inventory/hooks/useItemForm";
 
 interface Props {
@@ -22,6 +23,8 @@ interface Props {
  */
 export function UnitChoiceDialog({ choice, onResolve }: Props) {
   const { t } = useTranslation(["items", "common"]);
+  const templateUnit = unitLabel(t, choice.template.uomSymbol);
+  const chosenUnit = unitLabel(t, choice.chosenSymbol);
 
   return (
     <ConfirmDialog
@@ -31,15 +34,11 @@ export function UnitChoiceDialog({ choice, onResolve }: Props) {
       })}
       message={t("items:unitChoice.message", {
         product: choice.template.productName,
-        template_unit: choice.template.uomSymbol,
-        chosen_unit: choice.chosenSymbol,
+        template_unit: templateUnit,
+        chosen_unit: chosenUnit,
       })}
-      confirmLabel={t("items:unitChoice.keepChosen", {
-        unit: choice.chosenSymbol,
-      })}
-      cancelLabel={t("items:unitChoice.keepTemplate", {
-        unit: choice.template.uomSymbol,
-      })}
+      confirmLabel={t("items:unitChoice.keepChosen", { unit: chosenUnit })}
+      cancelLabel={t("items:unitChoice.keepTemplate", { unit: templateUnit })}
       variant="warning"
       onConfirm={() => onResolve(true)}
       onCancel={() => onResolve(false)}

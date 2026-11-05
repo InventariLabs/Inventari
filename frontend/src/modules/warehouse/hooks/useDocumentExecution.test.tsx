@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import type { TFunction } from "i18next";
+import i18n from "@/i18n/config";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
 import type { LabelScanView } from "@/types";
 import { useDocumentExecution } from "./useDocumentExecution";
@@ -243,5 +244,29 @@ describe("useDocumentExecution — goods held back from a receipt", () => {
     // Reaching the expected quantity clears a gap reason — but not the
     // reason goods are held back.
     expect(result.current.codes["line-1"]).toBe("DAMAGE");
+  });
+});
+
+describe("useDocumentExecution — the scan sentence", () => {
+  it("names the unit the way the reader's language writes it", () => {
+    const pieces = {
+      ...doc,
+      lines: [
+        { ...doc.lines[0], uom: { id: "u", symbol: "pcs", name: "Piece" } },
+      ],
+    } as unknown as WarehouseDocument;
+    const { result } = renderHook(() =>
+      useDocumentExecution({
+        document: pieces,
+        onSubmit: vi.fn(),
+        t: i18n.getFixedT("pl") as unknown as TFunction,
+      }),
+    );
+
+    act(() => result.current.applyScanCode("5901234123457"));
+
+    expect(result.current.scanFeedback).toBe(
+      "Zastosowano do Sugar: 1 / 12 szt.",
+    );
   });
 });

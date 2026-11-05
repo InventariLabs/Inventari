@@ -521,7 +521,11 @@ class ErrorMessages(TypedDict):
     module_needs_newer_platform: str
     document_delete_status: str
     document_wms_picking_active: str
+    document_wms_picking_active_one: NotRequired[str]
+    document_wms_picking_active_few: NotRequired[str]
     document_wms_receiving_active: str
+    document_wms_receiving_active_one: NotRequired[str]
+    document_wms_receiving_active_few: NotRequired[str]
     document_confirm_invalid_status: str
     document_lines_need_stock_row: str
     #: Counted-noun forms (see `service.get_plural_error_message`): the base
