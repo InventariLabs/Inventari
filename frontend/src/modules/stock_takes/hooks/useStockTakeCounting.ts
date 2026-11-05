@@ -147,6 +147,18 @@ function useSavesInFlight(
   return { isSavingCounts: inFlight > 0, trackSave };
 }
 
+/** The distinct first segments of the rows' shelf codes, sorted — the
+ * choices of the location-level filter. */
+function shelfLevels(items: StockTakeItem[] | undefined): string[] {
+  return [
+    ...new Set(
+      (items ?? [])
+        .map((item) => item.shelf_location?.split("-")[0])
+        .filter((level): level is string => Boolean(level)),
+    ),
+  ].sort();
+}
+
 export function useStockTakeCounting(id: string | undefined) {
   const { t } = useTranslation(["stock_takes"]);
   const navigate = useNavigate();
@@ -478,13 +490,7 @@ export function useStockTakeCounting(id: string | undefined) {
   const surplusCount = surplusItemIds.filter(
     (itemId) => countedAmount(countedQuantities[itemId]) !== null,
   ).length;
-  const locationLevels = [
-    ...new Set(
-      (stockTake?.items ?? [])
-        .map((item) => item.shelf_location?.split("-")[0])
-        .filter((level): level is string => Boolean(level)),
-    ),
-  ].sort();
+  const locationLevels = shelfLevels(stockTake?.items);
   const totalCount = stockTake?.items_count || 0;
   const progress = totalCount > 0 ? (countedCount / totalCount) * 100 : 0;
   // The same number the server publishes as `discrepancies_count`.
