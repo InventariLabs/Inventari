@@ -28,7 +28,7 @@ interface Props {
 export default function ExistingProductSuggestions({ name, onPick }: Props) {
   const { t } = useTranslation("items");
   const typed = useDebounce(name.trim(), SUGGESTION_DELAY_MS);
-  const { data } = useQuery({
+  const { data, isError } = useQuery({
     queryKey: queryKeys.inventory.productNameSuggestions(typed),
     enabled: typed.length >= 2,
     staleTime: 60_000,
@@ -40,7 +40,9 @@ export default function ExistingProductSuggestions({ name, onPick }: Props) {
   const others = (data ?? []).filter(
     (product) => product.name.trim().toLowerCase() !== lowered,
   );
-  if (typed.length < 2 || others.length === 0) return null;
+  // A hint that could not be fetched is no hint: the save still attaches to
+  // an exact name, so the form goes on without it rather than showing an error.
+  if (isError || typed.length < 2 || others.length === 0) return null;
 
   return (
     <div
