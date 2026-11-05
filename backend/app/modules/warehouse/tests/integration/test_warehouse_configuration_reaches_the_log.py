@@ -318,10 +318,12 @@ class TestPutawayRulesReachTheLog:
             doc_org, doc_storage_type, doc_user, name='Other building'
         )
         twin = h.create_storage_location(
-            doc_org, doc_storage_type, doc_user, name=doc_target_location.name
+            doc_org,
+            doc_storage_type,
+            doc_user,
+            name=doc_target_location.name,
+            parent_id=building.id,
         )
-        twin.parent_id = building.id
-        db_session.commit()
         category = _make_category(db_session, doc_org, 'Chilled')
         created = client.post(
             '/api/v1/warehouse/putaway-rules',
