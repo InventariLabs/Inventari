@@ -21,6 +21,7 @@ import { useNotificationsWebSocket } from "@/modules/announcements/hooks/useNoti
 class FakeWebSocket {
   static readonly CONNECTING = 0;
   static readonly OPEN = 1;
+  static readonly CLOSING = 2;
   static readonly CLOSED = 3;
 
   static instances: FakeWebSocket[] = [];
@@ -30,6 +31,13 @@ class FakeWebSocket {
   sent: unknown[] = [];
   listeners: Record<string, Array<(event: unknown) => void>> = {};
   closedByClient = false;
+  /**
+   * A real browser dispatches `close` some time after `close()` is called,
+   * not inside the call. Set this to see the hook through that gap; the test
+   * then delivers the event itself with `finishClose`.
+   */
+  deferClose = false;
+  private pendingClose: { code: number } | null = null;
 
   constructor(url: string) {
     this.url = url;
@@ -45,8 +53,21 @@ class FakeWebSocket {
   }
 
   close(code = 1000) {
-    this.readyState = FakeWebSocket.CLOSED;
     this.closedByClient = true;
+    if (this.deferClose) {
+      this.readyState = FakeWebSocket.CLOSING;
+      this.pendingClose = { code };
+      return;
+    }
+    this.readyState = FakeWebSocket.CLOSED;
+    this.dispatch("close", { code, reason: "", wasClean: true });
+  }
+
+  finishClose() {
+    if (!this.pendingClose) return;
+    const { code } = this.pendingClose;
+    this.pendingClose = null;
+    this.readyState = FakeWebSocket.CLOSED;
     this.dispatch("close", { code, reason: "", wasClean: true });
   }
 
@@ -249,6 +270,40 @@ describe("useNotificationsWebSocket", () => {
     expect(first.readyState).toBe(FakeWebSocket.CLOSED);
     await new Promise((resolve) => setTimeout(resolve, 1_500));
     expect(FakeWebSocket.instances).toHaveLength(2);
+  });
+
+  it("does not reconnect when a replaced socket's close arrives after the new socket exists", async () => {
+    // A browser delivers `close` after `close()` has returned, so by then the
+    // replacement is already live. A flag shared by both sockets ("this close
+    // was ours") has been cleared by the new connect() at that point, and the
+    // late close read as a dropped connection: a third socket, opened behind
+    // the live one. Each socket has to be judged by its own generation.
+    vi.useFakeTimers();
+    try {
+      renderHook(() => useNotificationsWebSocket(), { wrapper: makeWrapper() });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      const first = FakeWebSocket.instances[0];
+      first.deferClose = true;
+
+      tokenStore.set("rotated-token");
+      act(() => window.dispatchEvent(new CustomEvent("auth:token-refreshed")));
+      expect(FakeWebSocket.instances).toHaveLength(2);
+      expect(first.readyState).toBe(FakeWebSocket.CLOSING);
+
+      // The close lands now, after the replacement was built, with a code
+      // that would normally earn a retry.
+      act(() => first.finishClose());
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+
+      expect(FakeWebSocket.instances).toHaveLength(2);
+      expect(FakeWebSocket.instances[1].url).toContain("token=rotated-token");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("rebuilds the socket with the new token after a silent refresh", async () => {

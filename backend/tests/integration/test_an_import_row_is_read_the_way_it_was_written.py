@@ -69,7 +69,7 @@ class TestABlankQuantityIsNotAOne:
         assert result['failed'] == 1
         assert result['errors'] == [
             {
-                'row': 2,
+                'row': 1,
                 'error': 'Column "Quantity": the quantity is empty. Fill it in, '
                 'or clear the quantity mapping to import every row as 1',
             }

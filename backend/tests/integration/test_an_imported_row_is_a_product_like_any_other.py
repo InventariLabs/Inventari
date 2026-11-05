@@ -110,7 +110,7 @@ class TestAnImportedRowIsAProductLikeAnyOther:
         )
 
         assert result['imported'] == 0
-        assert result['errors'][0]['row'] == 2
+        assert result['errors'][0]['row'] == 1
         assert result['errors'][0]['error'].startswith(
             'Column "Unit": unknown unit "bushel". Known units: '
         )
@@ -161,8 +161,31 @@ class TestAnImportedRowIsAProductLikeAnyOther:
 
         assert result['imported'] == 1
         assert result['errors'] == [
-            {'row': 2, 'error': 'Column "Quantity": "plenty" is not a number'}
+            {'row': 1, 'error': 'Column "Quantity": "plenty" is not a number'}
         ]
+
+    async def test_a_refused_row_is_numbered_as_the_preview_numbers_it(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        """The preview counts data rows from 1, the header not counted. The
+        second row of the sheet is "2" there, so the result must not call it
+        "3" (the spreadsheet row, which nothing on the screen explains)."""
+        result = await import_items(
+            real_async_db_session,
+            _csv(
+                [
+                    {'Name': 'Imported salt', 'Quantity': 1},
+                    {'Name': 'Imported sugar', 'Quantity': 'abc'},
+                ]
+            ),
+            'stock.csv',
+            {'name': 'Name', 'quantity': 'Quantity'},
+            _ctx(async_test_user),
+            create_missing_locations=False,
+            create_missing_categories=False,
+        )
+
+        assert [e['row'] for e in result['errors']] == [2]
 
     async def test_an_unexpected_failure_stays_out_of_the_reply(
         self,
