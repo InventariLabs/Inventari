@@ -139,7 +139,7 @@
     "showInventoryValueDescription": "Mostra o valor total do estoque na visão geral das estatísticas. É uma métrica de negócio — desative em inventários domésticos que não guardam preços de compra para somar."
   },
   "navigation": {
-    "settings": "Análises"
+    "settings": "Estatísticas"
   },
   "reconciliation": {
     "title": "Conciliação de estoque",

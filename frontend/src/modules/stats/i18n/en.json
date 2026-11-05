@@ -138,7 +138,7 @@
     "showInventoryValueDescription": "Show the total stock value on the stats overview. It is a business metric — disable for home inventories that keep no purchase prices for it to add up."
   },
   "navigation": {
-    "settings": "Analytics"
+    "settings": "Statistics"
   },
   "reconciliation": {
     "title": "Stock reconciliation",

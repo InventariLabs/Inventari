@@ -164,8 +164,8 @@
       "members": "Użytkownicy",
       "searchMembers": "Szukaj członków…",
       "inviteTitle": "Zaproś użytkownika",
-      "removeMemberTitle": "Usunąć użytkownika?",
-      "removeMemberConfirm": "Czy na pewno chcesz usunąć tego użytkownika?",
+      "removeMemberTitle": "Usunąć {{name}}?",
+      "removeMemberConfirm": "{{name}} ({{role}}) od razu straci dostęp do tej organizacji. Rekordy utworzone przez tę osobę zostaną. Aby ją przywrócić, wyślij nowe zaproszenie.",
       "invalidLink": "Ten link zaproszenia nie zawiera kodu zaproszenia. Poproś o nowe zaproszenie i otwórz pełny link.",
       "joinedSuccess": "Pomyślnie dołączono do organizacji",
       "alreadyMember": "Już należysz do tej organizacji",
@@ -799,7 +799,7 @@
       "systemGroup": "Ogólne",
       "systemRole": "Rola wbudowana — jej uprawnień nie da się zmienić.",
       "systemRoleFooter": "Role wbudowane są tylko do odczytu.",
-      "title": "Dostęp i role"
+      "title": "Role i uprawnienia"
     },
     "data": {
       "exportDesc": "Pobierz kopię swoich produktów",
@@ -832,7 +832,7 @@
       "saved": "Zapisano ustawienia"
     },
     "modules": {
-      "openAppStore": "Otwórz App Store"
+      "openAppStore": "Otwórz Moduły"
     },
     "theme": "Motyw",
     "theme_light": "Jasny",
@@ -1117,7 +1117,7 @@
     "signedBy": "Podpisano kluczem {{key}}",
     "signedByHint": "Podpis obejmuje pokazanego tu autora i licencję.",
     "subtitle": "Włączone: {{active}} z {{total}} modułów oferowanych tutaj",
-    "title": "App Store",
+    "title": "Moduły",
     "trust_cloud": "Chmura",
     "trust_community": "Społeczność",
     "trust_core": "Rdzeń",
@@ -1252,7 +1252,7 @@
     "moduleNotEnabled": "Moduł nie jest włączony",
     "moduleNotEnabledDesc": "Moduł {{module}} nie jest włączony dla Twojej organizacji.",
     "goToSettings": "Przejdź do ustawień, aby go włączyć.",
-    "openAppStore": "Otwórz App Store",
+    "openAppStore": "Otwórz Moduły",
     "dashboard": "Pulpit"
   },
   "analytics": {
