@@ -1323,5 +1323,9 @@
   "settingsSave": {
     "region": "Save the changes on this page",
     "unsaved": "You have unsaved changes"
+  },
+  "shoppingOverlap": {
+    "toast": "Already on another open list: {{where}}",
+    "onList": "{{names}} on “{{list}}”"
   }
 }

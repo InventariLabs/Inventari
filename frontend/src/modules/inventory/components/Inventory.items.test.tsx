@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { signInWith, signOut } from "@/test/auth";
 import ItemsEmptyState from "./items/ItemsEmptyState";
 import ItemsPagination from "./items/ItemsPagination";
@@ -19,14 +21,27 @@ vi.mock("@/lib/moduleRegistry", () => ({
 
 const noop = vi.fn();
 
+// The empty list asks the catalogue whether products wait without stock, so
+// it needs a query client beside the router.
+function Shell({ children }: { children: ReactNode }) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return (
+    <QueryClientProvider client={client}>
+      <MemoryRouter>{children}</MemoryRouter>
+    </QueryClientProvider>
+  );
+}
+
 // ─── ItemsEmptyState ─────────────────────────────────────────────────────────
 
 describe("ItemsEmptyState", () => {
   it("renders add-first text when no filters active", () => {
     render(
-      <MemoryRouter>
+      <Shell>
         <ItemsEmptyState hasFilters={false} />
-      </MemoryRouter>,
+      </Shell>,
     );
     expect(screen.getByText("No products")).toBeInTheDocument();
     expect(
@@ -42,9 +57,9 @@ describe("ItemsEmptyState", () => {
     // nothing, and the way back to the rows the account plainly has.
     const onClearFilters = vi.fn();
     render(
-      <MemoryRouter>
+      <Shell>
         <ItemsEmptyState hasFilters={true} onClearFilters={onClearFilters} />
-      </MemoryRouter>,
+      </Shell>,
     );
     expect(screen.getByText("No matching products")).toBeInTheDocument();
     expect(screen.getByText("Try changing filters")).toBeInTheDocument();
@@ -61,9 +76,9 @@ describe("ItemsEmptyState", () => {
     // The clearing callback is the only thing the action changes; the claim
     // that the account should add a product is wrong either way.
     render(
-      <MemoryRouter>
+      <Shell>
         <ItemsEmptyState hasFilters={true} />
-      </MemoryRouter>,
+      </Shell>,
     );
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(
@@ -73,9 +88,9 @@ describe("ItemsEmptyState", () => {
 
   it("renders link to /inventory/items/add", () => {
     render(
-      <MemoryRouter>
+      <Shell>
         <ItemsEmptyState hasFilters={false} />
-      </MemoryRouter>,
+      </Shell>,
     );
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "/inventory/items/add");
@@ -84,13 +99,13 @@ describe("ItemsEmptyState", () => {
   it("renders search-specific message and a clear button when search term is set", () => {
     const onClear = vi.fn();
     render(
-      <MemoryRouter>
+      <Shell>
         <ItemsEmptyState
           hasFilters={true}
           searchTerm="milk"
           onClearSearch={onClear}
         />
-      </MemoryRouter>,
+      </Shell>,
     );
     expect(screen.getByText(/milk/)).toBeInTheDocument();
     const clearBtn = screen.getByRole("button", { name: /clear search/i });
@@ -104,9 +119,9 @@ describe("ItemsEmptyState", () => {
     // concludes the app lost its data — the answer it owes the reader is
     // where the rows went and which switch brings them back.
     render(
-      <MemoryRouter>
+      <Shell>
         <ItemsEmptyState hasFilters={false} hiddenCount={2} />
-      </MemoryRouter>,
+      </Shell>,
     );
     expect(screen.getByText("Some products are hidden")).toBeInTheDocument();
     expect(screen.queryByText("No products")).not.toBeInTheDocument();
@@ -122,9 +137,9 @@ describe("ItemsEmptyState", () => {
     // "No results" for a search the reader typed is a different answer than
     // the module filter's — the hint must not overwrite it.
     render(
-      <MemoryRouter>
+      <Shell>
         <ItemsEmptyState hasFilters={true} hiddenCount={2} />
-      </MemoryRouter>,
+      </Shell>,
     );
     expect(screen.getByText("Try changing filters")).toBeInTheDocument();
     expect(

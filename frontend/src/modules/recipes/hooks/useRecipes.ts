@@ -249,8 +249,10 @@ export function useUploadRecipeImage() {
   return useAppMutation(
     ({ id, file }: { id: string; file: File }) =>
       recipesApi.uploadImage(id, file),
-    (qc, _result, { id }) => {
-      qc.invalidateQueries({ queryKey: queryKeys.recipes.detail(id) });
+    (qc) => {
+      // The cover is on the cards of the list and the meal plan too: the
+      // detail alone left them showing the old address until a reload.
+      qc.invalidateQueries({ queryKey: queryKeys.recipes.all() });
     },
   );
 }
@@ -258,8 +260,8 @@ export function useUploadRecipeImage() {
 export function useDeleteRecipeImage() {
   return useAppMutation(
     (id: string) => recipesApi.deleteImage(id),
-    (qc, _result, id) => {
-      qc.invalidateQueries({ queryKey: queryKeys.recipes.detail(id) });
+    (qc) => {
+      qc.invalidateQueries({ queryKey: queryKeys.recipes.all() });
     },
   );
 }

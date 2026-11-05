@@ -16,6 +16,7 @@ import type {
 import { dateFnsLocale } from "@/utils/formatters";
 import { formatQuantityValue } from "@/utils/formatters";
 import { unitLabel } from "@/lib/i18nHelpers";
+import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
 
 interface ShoppingListPreviewProps {
   planId: string;
@@ -84,6 +85,9 @@ export function ShoppingListPreview({
   // the update.
   if (generationResult && !mealsAddedSinceList) {
     const { buyNow, buyLater } = groupByBuyTiming(generationResult.items || []);
+    // A toast would be gone in seconds; this panel stays, so the overlap
+    // stays with it until the reader has seen which list holds what.
+    const overlap = onOtherListsMessage(t, generationResult.on_other_lists);
 
     return (
       <div className="flex flex-col gap-2 p-3 rounded-lg bg-surface-inset/50 text-sm">
@@ -97,6 +101,16 @@ export function ShoppingListPreview({
             to_buy: generationResult.to_buy_count,
           })}
         </p>
+
+        {overlap && (
+          <p
+            role="status"
+            className="text-xs text-on-warning bg-amber-50 rounded px-2 py-1"
+            data-testid="shopping-overlap"
+          >
+            {overlap}
+          </p>
+        )}
 
         {(buyNow.length > 0 || buyLater.length > 0) && (
           <div className="mt-1 flex flex-col gap-2">

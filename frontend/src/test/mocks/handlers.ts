@@ -482,6 +482,13 @@ export const handlers = [
     });
   }),
 
+  // Ahead of `/items/:id`, which would take "product-templates" for an id.
+  // The name field of a create form asks which products contain what is
+  // typed; the catalogue holds none unless a test says otherwise.
+  http.get("/api/v1/items/product-templates", () => {
+    return HttpResponse.json([]);
+  }),
+
   http.get("/api/v1/items/:id", () => {
     return HttpResponse.json({
       id: "1",
@@ -1086,6 +1093,12 @@ export const handlers = [
   // A product the catalogue does not know is answered `null`, not a 404.
   http.get("/api/v1/items/product-templates/lookup", () => {
     return HttpResponse.json(null);
+  }),
+
+  // An empty list asks whether the catalogue holds products with no stock;
+  // by default it holds none, so the list invites the first product.
+  http.get("/api/v1/items/product-templates/count", () => {
+    return HttpResponse.json({ count: 0 });
   }),
 
   // ── Notifications ─────────────────────────────────────────────

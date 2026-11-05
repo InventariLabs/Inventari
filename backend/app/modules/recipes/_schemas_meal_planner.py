@@ -8,6 +8,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.modules.recipes.models import MealSlot
 
+from ._schemas_io import ListedElsewhere
+
 # === MealPlanner ===
 
 
@@ -196,6 +198,8 @@ class ShoppingListGenerationResult(BaseModel):
     available_count: int
     to_buy_count: int
     items: list[_GeneratedItem] = []
+    #: Lines written to this list that an other open list still asks for too.
+    on_other_lists: list[ListedElsewhere] = []
 
 
 # === Shopping Exclusions ===

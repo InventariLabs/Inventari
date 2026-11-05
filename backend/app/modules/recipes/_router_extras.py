@@ -14,7 +14,7 @@ from app.core.exceptions import (
     map_service_errors,
 )
 from app.core.file_signature import validate_signature
-from app.core.module_sdk import cover_extension, served_url
+from app.core.module_sdk import cover_leaf_of, served_url
 from app.core.public_api import core_api
 from app.core.upload_validation import format_size_limit, read_capped_upload
 from app.i18n.service import get_current_lang, get_error_message
@@ -260,14 +260,14 @@ def register_extras_routes(router: APIRouter) -> None:  # noqa: C901, PLR0915 - 
         if recipe.image_url:
             # The row is writable through the recipe form, so it never names
             # the object this deletes: another recipe's cover in the same
-            # organization would otherwise be picked. Only its extension is
-            # read, and the key is rebuilt from this organization and this
-            # recipe — the facade owns the ``<org>/recipes/`` prefix.
-            extension = cover_extension(recipe.image_url)
-            if extension:
+            # organization would otherwise be picked. Only the cover's file
+            # name is read, and the key is rebuilt from this organization and
+            # this recipe — the facade owns the ``<org>/recipes/`` prefix.
+            leaf = cover_leaf_of(recipe.image_url)
+            if leaf:
                 try:
                     await core_api.file_storage.delete_for_org_async(
-                        org_id, 'recipes', f'{recipe_id}/cover.{extension}'
+                        org_id, 'recipes', f'{recipe_id}/{leaf}'
                     )
                 except FileNotFoundError:
                     pass

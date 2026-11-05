@@ -56,6 +56,9 @@ export const queryKeys = {
      * part of the question. */
     templateUnitHint: (barcode: string, name: string) =>
       ["template-unit-hint", barcode, name] as const,
+    /** Existing products whose name contains the one being typed. */
+    productNameSuggestions: (name: string) =>
+      ["product-name-suggestions", name] as const,
   },
 
   storages: {

@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import type { IngredientAvailability } from "@/modules/recipes/types/core";
 
 vi.mock("sonner", () => ({
-  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }));
 
 vi.mock("../hooks/useMealPlans", () => ({
@@ -455,6 +455,33 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     expect(message).toContain("Shopping list");
     expect(message).not.toMatch(/Added 0/);
     expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  // The same goods on two open lists is two trips for one purchase; the
+  // list is still written, and a second toast names where else they stand.
+  it("names the other open list that already asks for the same goods", async () => {
+    mockAddToShoppingList.mockResolvedValue({
+      shopping_list_id: "sl2",
+      added_count: 2,
+      list_name: "Shopping list",
+      on_other_lists: [
+        { name: "Flour", list_id: "sl1", list_name: "Week 30" },
+        { name: "Eggs", list_id: "sl1", list_name: "Week 30" },
+      ],
+    });
+    render(
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /add missing/i }));
+    await vi.waitFor(() => expect(toast.warning).toHaveBeenCalled());
+    const message = (toast.warning as Mock).mock.calls[0][0];
+    expect(message).toContain("Flour, Eggs");
+    expect(message).toContain("Week 30");
+    expect(message).not.toContain("{{");
   });
 
   it("renders toast without raw placeholder when list_name is absent", async () => {

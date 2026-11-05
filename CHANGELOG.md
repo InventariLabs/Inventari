@@ -69,9 +69,31 @@ says what the release does rather than what changed since them.
   to get back into an installation without outgoing mail.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
+- When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
+  list's "From recipes" writes goods that another open shopping list still
+  asks for, the answer names them and the list that holds them
+  (`on_other_lists`), and the screen says so — in a toast, and on the meal plan
+  page in the panel that stays. The lists are still written as asked; nothing is
+  merged. Goods in another unit are not matched.
+- The name field of a form that creates a product offers the products already
+  in the catalogue whose name contains what is typed; picking one writes its
+  exact name, which is the match the save attaches the record to. Typing
+  "Wax" no longer leaves a second product beside "Soy wax".
+- An empty Products list says that products which exist only as a definition,
+  such as ones made inside a recipe or a BOM, appear there once they have stock.
 
 ### Fixed
 
+- Replacing the photo of a product, an asset or a recipe shows the new picture
+  at once. It used to go on showing the old one until the page was reloaded,
+  because every cover was kept under the same address. Module authors get
+  `cover_leaf` and `cover_leaf_of` in the module SDK to name and read a cover
+  file the same way. A photo picked in the product edit sheet is now saved with
+  Save changes, and Close drops it like any other edit; it used to be stored the
+  moment it was picked and then overwritten by the save.
+- The production Content-Security-Policy admits the web worker that shrinks a
+  photo before it is sent, so choosing a photo no longer logs a policy
+  violation or shrinks it on the page's own thread.
 - On an organization seeded before the option words existed, the "Lactose free"
   field of the Dairy and Cheese categories now offers its options in the
   interface language instead of the stored English "No" and "Yes". Options an

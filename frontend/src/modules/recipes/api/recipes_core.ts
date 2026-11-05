@@ -215,6 +215,8 @@ export const recipesCoreApi = {
     /** Missing goods left off because the list already carries them. */
     already_listed_count?: number;
     list_name?: string | null;
+    /** Lines written that another open list still asks for too. */
+    on_other_lists?: { name: string; list_id: string; list_name: string }[];
   }> => {
     const response = await api.post(
       `/recipes/${id}/add-to-shopping-list`,

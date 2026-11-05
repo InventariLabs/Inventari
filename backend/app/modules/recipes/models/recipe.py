@@ -49,7 +49,7 @@ class Recipe(Base):
     servings: Mapped[int] = mapped_column(Integer, default=1)
     prep_time_minutes: Mapped[int | None] = mapped_column(Integer)
     #: The cover picture's reference, never its address: the org-scoped storage
-    #: key the upload wrote (``<org>/recipes/<recipe_id>/cover.<ext>``) or a
+    #: key the upload wrote (``<org>/recipes/<recipe_id>/cover.<digest>.<ext>``) or a
     #: foreign ``http(s)`` address for a picture kept from an import.
     #: ``image_url`` below builds the address a reader is given; the column
     #: keeps its historical name.

@@ -8,6 +8,7 @@ import {
 } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import {
   PageHeaderContext,
@@ -18,7 +19,7 @@ import { signInWith, signOut } from "@/test/auth";
 import MealPlannerPage from "./MealPlannerPage";
 
 vi.mock("sonner", () => ({
-  toast: { success: vi.fn(), error: vi.fn() },
+  toast: { success: vi.fn(), error: vi.fn(), warning: vi.fn() },
 }));
 
 const planItem: MealPlanListItem = {
@@ -39,6 +40,7 @@ const deleteMock = vi.hoisted(() => ({
   mutateAsync: vi.fn().mockResolvedValue(undefined),
 }));
 const plansMock = vi.hoisted(() => ({ data: [] as MealPlanListItem[] }));
+const generateMock = vi.hoisted(() => ({ mutateAsync: vi.fn() }));
 const createMock = vi.hoisted(() => ({ mutateAsync: vi.fn() }));
 const addEntryMock = vi.hoisted(() => ({
   mutateAsync: vi.fn(),
@@ -70,7 +72,7 @@ vi.mock("@/modules/recipes/hooks/useMealPlans", () => ({
     isPending: false,
   }),
   useGenerateMealPlanShoppingList: () => ({
-    mutateAsync: vi.fn(),
+    mutateAsync: generateMock.mutateAsync,
     isPending: false,
   }),
 }));
@@ -120,6 +122,26 @@ describe("MealPlannerPage grid", () => {
     expect(screen.getByText("Week 33")).toBeInTheDocument();
     const grid = container.querySelector('[class*="auto-fit"]');
     expect(grid).not.toBeNull();
+  });
+
+  it("names the other open list when the generated one repeats its goods", async () => {
+    generateMock.mutateAsync.mockResolvedValue({
+      shopping_list_id: "sl2",
+      on_other_lists: [{ name: "Flour", list_id: "sl1", list_name: "Week 30" }],
+    });
+    signInWith(["recipes:write"]);
+    try {
+      renderPage();
+      fireEvent.click(
+        screen.getByRole("button", { name: /generate shopping list/i }),
+      );
+      await waitFor(() => expect(toast.warning).toHaveBeenCalled());
+      const message = vi.mocked(toast.warning).mock.calls[0][0] as string;
+      expect(message).toContain("Flour");
+      expect(message).toContain("Week 30");
+    } finally {
+      signOut();
+    }
   });
 
   it("hides the shopping-list action when the shopping_lists module is disabled", () => {

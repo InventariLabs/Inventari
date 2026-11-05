@@ -1,5 +1,6 @@
 import { api, getEveryPage } from "@/lib/api/client";
 import type { components } from "@/types/api-generated";
+import type { ListedElsewhere } from "@/modules/shared/lib/shoppingOverlap";
 import type {
   ShoppingList,
   ShoppingListWithItems,
@@ -35,11 +36,15 @@ export const shoppingListsApi = {
   addFromRecipes: async (data: {
     recipe_ids: string[];
     shopping_list_id: string;
-  }): Promise<{ added_count: number }> => {
-    const response = await api.post<{ added_count: number }>(
-      "/recipes/shopping-list/add-from-recipes",
-      data,
-    );
+  }): Promise<{
+    added_count: number;
+    /** Lines written that another open list still asks for too. */
+    on_other_lists?: ListedElsewhere[];
+  }> => {
+    const response = await api.post<{
+      added_count: number;
+      on_other_lists?: ListedElsewhere[];
+    }>("/recipes/shopping-list/add-from-recipes", data);
     return response.data;
   },
 

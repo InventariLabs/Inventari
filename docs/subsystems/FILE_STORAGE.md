@@ -43,11 +43,16 @@ every read, so a relative path can never be read outside its
 
 | Family | Key | Written by |
 |---|---|---|
-| Item cover | `<org>/items/<item_id>/cover.<ext>` | `POST /items/{id}/image` (`backend/app/api/_items_images.py`) |
-| Recipe cover | `<org>/recipes/<recipe_id>/cover.<ext>` | recipe cover upload and import (`backend/app/modules/recipes/_recipe_cover.py`) |
+| Item cover | `<org>/items/<item_id>/cover.<digest>.<ext>` | `POST /items/{id}/image` (`backend/app/api/_items_images.py`) |
+| Recipe cover | `<org>/recipes/<recipe_id>/cover.<digest>.<ext>` | recipe cover upload and import (`backend/app/modules/recipes/_recipe_cover.py`) |
 | Item attachment | `<org>/attachments/<item_id>/<uuid>.<ext>` | `backend/app/services/attachment_service.py` |
 | Equipment attachment | `<org>/equipment/<item_id>/<uuid>.<ext>` | `backend/app/modules/equipment/attachment_service.py` |
 | Organization logo | `<org>/organizations/logo.<ext>` | `POST /organizations/logo` (`backend/app/api/organizations.py`) |
+
+A cover's `<digest>` is the first twelve hex digits of the SHA-256 of its bytes,
+so a replaced picture is a new address. Replacing does not delete the previous
+file — an opened package, a copied recipe or a form open since before the
+replacement may still name it — only removing the cover does.
 
 `<ext>` is derived from the validated content type, never from the client's
 filename: `jpg`, `png`, `gif` or `webp` for the image families, the accepted
@@ -109,10 +114,13 @@ runs with the Recipes module chain. Neither needs an operator step.
 
 ## Security
 - Path traversal protection.
-- No versions kept: saving to an existing path overwrites the file.
+- No versions kept: saving to an existing path overwrites the file. A cover
+  therefore never reuses a name for a different picture: it is saved as
+  `cover.<digest of the bytes>.<ext>` (`cover_leaf`), so a replaced picture is a
+  new address and the old file is deleted once the row names the new one.
 - Every `/uploads/` read is organization-scoped by an `UploadPathResolver`.
-- A delete never follows the stored reference: it reads only the extension and
+- A delete never follows the stored reference: it reads only the cover's file name and
   rebuilds the key from the organization and the entity it is serving
-  (`cover_extension` in `backend/app/core/file_reference.py`). Those columns
+  (`cover_leaf_of` in `backend/app/core/file_reference.py`). Those columns
   are writable through the forms, so a reference naming another row's picture
   must not be able to select the object that gets removed.
