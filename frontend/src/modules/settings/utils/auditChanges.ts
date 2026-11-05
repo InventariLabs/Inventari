@@ -513,10 +513,15 @@ function fieldDefinitionChange(
   const keyOf = (d: Definition) => String(d.key ?? d.label);
   const wasBy = new Map<string, Definition>(was.map((d) => [keyOf(d), d]));
   const isBy = new Map<string, Definition>(is.map((d) => [keyOf(d), d]));
-  const say = (verb: "added" | "removed" | "changed", d: Definition): string =>
-    t(`common:settings.audit.fieldDefinitions.${verb}`, {
-      field: fieldDefinitionText(d, t),
-    });
+  const say = (verb: "added" | "removed" | "changed", d: Definition) => {
+    const field = fieldDefinitionText(d, t);
+    if (verb === "added") {
+      return t("common:settings.audit.fieldDefinitions.added", { field });
+    }
+    return verb === "removed"
+      ? t("common:settings.audit.fieldDefinitions.removed", { field })
+      : t("common:settings.audit.fieldDefinitions.changed", { field });
+  };
   const lines = [
     ...is.flatMap((d) => {
       const old = wasBy.get(keyOf(d));
