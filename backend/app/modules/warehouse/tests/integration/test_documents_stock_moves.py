@@ -17,6 +17,7 @@ Tests:
 
 from __future__ import annotations
 
+import json
 import re
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -1005,6 +1006,24 @@ class TestOutboundOfACardlessRecord:
             ),
             body,
         ), 'the refusal names the record and both units'
+
+        # The execution screen opens its confirmation dialog on this shape
+        # and on nothing else: the code and the three fields, beside the
+        # sentence API-only consumers have always read.
+        detail = json.loads(body)['detail']
+        assert detail['code'] == 'RECORD_UNIT_MISMATCH'
+        assert detail['product'] == name
+        assert detail['template_unit'] == 'g'
+        assert detail['chosen_unit'] == 'kg'
+        assert re.search(
+            error_message_pattern(
+                'item_unit_differs_from_template_confirmation_required',
+                product=name,
+                template_unit='g',
+                chosen_unit='kg',
+            ),
+            detail['message'],
+        ), "the structured envelope keeps the bind's own sentence"
 
         db_session.expire_all()
         item = db_session.get(Item, legacy.id)
