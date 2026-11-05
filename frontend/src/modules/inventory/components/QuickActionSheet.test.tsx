@@ -84,32 +84,6 @@ describe("QuickActionSheet", () => {
   });
 
   /**
-   * The list's sheet offers an asset the same switched actions as the product
-   * page, so it owes the same sentence about why they sound different.
-   */
-  it("explains an asset's vocabulary above its actions", () => {
-    render(
-      <QuickActionSheet
-        item={
-          {
-            ...mockItem,
-            category: { context_tag: "equipment" },
-          } as unknown as Item
-        }
-        onClose={() => {}}
-      />,
-    );
-
-    expect(screen.getByText(/checked in and disposed of/i)).toBeInTheDocument();
-  });
-
-  it("adds no such sentence to a product", () => {
-    render(<QuickActionSheet item={mockItem} onClose={() => {}} />);
-
-    expect(screen.queryByText(/checked in and disposed of/i)).toBeNull();
-  });
-
-  /**
    * A product without a brand fell back to the hard-coded English "No brand"
    * on the sheet of every language. The fallback is a catalogue entry now,
    * so the sheet says it in the reader's words.
@@ -259,5 +233,31 @@ describe("QuickActionSheet", () => {
 
     expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
     expect(screen.getByText("Product details")).toBeInTheDocument();
+  });
+
+  /**
+   * The sheet offers an asset the same switched actions as the product
+   * page, so it owes the same sentence about why they sound different.
+   */
+  it("explains an asset's vocabulary above its actions", () => {
+    render(
+      <QuickActionSheet
+        item={
+          {
+            ...mockItem,
+            category: { context_tag: "equipment" },
+          } as unknown as Item
+        }
+        onClose={() => {}}
+      />,
+    );
+
+    expect(screen.getByText(/checked in and disposed of/i)).toBeInTheDocument();
+  });
+
+  it("adds no such sentence to a product", () => {
+    render(<QuickActionSheet item={mockItem} onClose={() => {}} />);
+
+    expect(screen.queryByText(/checked in and disposed of/i)).toBeNull();
   });
 });
