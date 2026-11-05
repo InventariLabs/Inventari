@@ -468,7 +468,9 @@ export interface paths {
          * Reject Document
          * @description Reject the document's request; the document goes back to a draft.
          *
-         *     So the requester can correct it and submit it again, and is told why.
+         *     So the requester can correct it and submit it again, and is told why. The
+         *     reason travels in the body: a query string is what proxies and access logs
+         *     keep, and this one is free text about a colleague's document.
          */
         post: operations["reject_document_api_v1_approvals_documents__doc_id__reject_post"];
         delete?: never;
@@ -11584,6 +11586,11 @@ export interface components {
             full_path?: string | null;
             /** Archived At */
             archived_at?: string | null;
+        };
+        /** AskForApproval */
+        AskForApproval: {
+            /** Notes */
+            notes?: string | null;
         };
         /**
          * AssetFilter
@@ -28941,16 +28948,18 @@ export interface operations {
     };
     approve_document_api_v1_approvals_documents__doc_id__approve_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 doc_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ApproveRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -28974,16 +28983,18 @@ export interface operations {
     };
     reject_document_api_v1_approvals_documents__doc_id__reject_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 doc_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RejectRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -29007,16 +29018,18 @@ export interface operations {
     };
     request_document_approval_api_v1_approvals_documents__doc_id__request_approval_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 doc_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AskForApproval"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -39109,16 +39122,18 @@ export interface operations {
     };
     approve_endpoint_api_v1_purchase_orders__po_id__approve_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 po_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ApproveRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -39408,16 +39423,18 @@ export interface operations {
     };
     reject_endpoint_api_v1_purchase_orders__po_id__reject_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 po_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RejectRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -39441,16 +39458,18 @@ export interface operations {
     };
     request_approval_endpoint_api_v1_purchase_orders__po_id__request_approval_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 po_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AskForApproval"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

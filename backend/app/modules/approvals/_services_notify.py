@@ -14,10 +14,13 @@ which requires an AsyncSession — all approvals callers are async now.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
+from decimal import Decimal
 from html import escape
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
+from babel.numbers import format_currency, format_decimal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserDTO
@@ -25,6 +28,7 @@ from app.core.logging import get_logger
 from app.core.public_api import core_api
 from app.core.public_api.users import UserProfileDTO
 
+from ._audit import people_names_async
 from ._services_solvability import (
     APPROVE_GRANT,
     NAMED_APPROVERS_CANNOT_DECIDE,
@@ -35,6 +39,7 @@ from ._services_solvability import (
 )
 from .models import OPEN_STATUSES
 from .target_scopes import describe_scope_async
+from .target_summaries import get_target_summary_provider
 from .target_types import REQUESTING_TARGET_TYPES
 
 if TYPE_CHECKING:
@@ -61,6 +66,30 @@ _NOTIFY_CONTENT: dict[str, str] = {
     'fr': "Une demande d'approbation attend votre décision.",
     'es': 'Una solicitud de aprobación espera su decisión.',
 }
+# Who asks and about what. Two requests from one person read alike without it,
+# and the recipient had to open the queue to tell them apart.
+_NOTIFY_TITLE_NAMED: dict[str, str] = {
+    'en': 'New approval request: {number}',
+    'pl': 'Nowy wniosek o akceptację: {number}',
+    'de': 'Neue Genehmigungsanfrage: {number}',
+    'fr': "Nouvelle demande d'approbation : {number}",
+    'es': 'Nueva solicitud de aprobación: {number}',
+}
+_NOTIFY_CONTENT_NAMED: dict[str, str] = {
+    'en': 'Request from {requester}: {target}. It is waiting for your decision.',
+    'pl': 'Wniosek od {requester}: {target}. Czeka na Twoją decyzję.',
+    'de': 'Anfrage von {requester}: {target}. Sie wartet auf Ihre Entscheidung.',
+    'fr': 'Demande de {requester} : {target}. Elle attend votre décision.',
+    'es': 'Solicitud de {requester}: {target}. Espera su decisión.',
+}
+# The amount a summary reports is net, the side the approval threshold is on.
+_NET_AMOUNT: dict[str, str] = {
+    'en': '{amount} net',
+    'pl': '{amount} netto',
+    'de': '{amount} netto',
+    'fr': '{amount} HT',
+    'es': '{amount} neto',
+}
 _OPEN_QUEUE: dict[str, str] = {
     'en': 'Open the approval queue',
     'pl': 'Otwórz kolejkę akceptacji',
@@ -72,6 +101,58 @@ _OPEN_QUEUE: dict[str, str] = {
 
 def _loc(table: dict[str, str], lang: str) -> str:
     return table.get(lang, table['en'])
+
+
+def _money(value: Decimal, currency: str | None, lang: str) -> str:
+    """The amount as the queue card writes it, in the recipient's language."""
+    locale = lang.replace('-', '_')
+    if currency:
+        return format_currency(value, currency, locale=locale)
+    return format_decimal(value, format='#,##0.00', locale=locale)
+
+
+@dataclass(frozen=True)
+class _RequestFacts:
+    """What the notice names: who asked, and what the request stands before."""
+
+    requester: str | None
+    number: str | None
+    amount: Decimal | None
+    currency: str | None
+
+    def title(self, lang: str) -> str:
+        if not self.number:
+            return _loc(_NOTIFY_TITLE, lang)
+        return _loc(_NOTIFY_TITLE_NAMED, lang).format(number=self.number)
+
+    def content(self, lang: str) -> str:
+        if not self.requester or not self.number:
+            return _loc(_NOTIFY_CONTENT, lang)
+        target = self.number
+        if self.amount is not None:
+            amount = _money(self.amount, self.currency, lang)
+            target += f', {_loc(_NET_AMOUNT, lang).format(amount=amount)}'
+        return _loc(_NOTIFY_CONTENT_NAMED, lang).format(
+            requester=self.requester, target=target
+        )
+
+
+async def _request_facts_async(
+    db: AsyncSession, request: ApprovalRequest, org_id: UUID
+) -> _RequestFacts:
+    """Read them from whoever describes the target; missing facts are left out."""
+    names = await people_names_async(db, org_id, [request.created_by])
+    provider = get_target_summary_provider(request.target_type)
+    summaries = (
+        await provider(db, org_id, [request.target_id]) if provider is not None else {}
+    )
+    summary = summaries.get(request.target_id)
+    return _RequestFacts(
+        requester=names.get(str(request.created_by)),
+        number=getattr(summary, 'number', None),
+        amount=getattr(summary, 'total_value', None),
+        currency=getattr(summary, 'currency', None),
+    )
 
 
 _DEAD_END_TITLE: dict[str, str] = {
@@ -307,11 +388,13 @@ async def _notify_pending_stage_approvers_async(
     if not users:
         return
 
+    facts = await _request_facts_async(db, request, org_id)
+
     notification_dtos = []
     for user in users:
         lang = user.preferred_language or 'en'
-        title = _loc(_NOTIFY_TITLE, lang)
-        content = _loc(_NOTIFY_CONTENT, lang)
+        title = facts.title(lang)
+        content = facts.content(lang)
         try:
             dto = await core_api.notifications.create_async(
                 db,
@@ -341,8 +424,10 @@ async def _notify_pending_stage_approvers_async(
             continue
         try:
             lang = user.preferred_language or 'en'
-            subject = _loc(_NOTIFY_TITLE, lang)
-            body = _loc(_NOTIFY_CONTENT, lang)
+            subject = facts.title(lang)
+            # A person's name and a document number are somebody's typing, and
+            # this is the channel that renders them as markup.
+            body = escape(facts.content(lang))
             html = (
                 '<html><body style="font-family:sans-serif;line-height:1.6;'
                 'color:#333;"><p>'

@@ -248,6 +248,10 @@ class RejectRequest(BaseModel):
     notes: str | None = None
 
 
+class AskForApproval(BaseModel):
+    notes: str | None = None
+
+
 class RequestApproval(BaseModel):
     target_type: str
     target_id: UUID

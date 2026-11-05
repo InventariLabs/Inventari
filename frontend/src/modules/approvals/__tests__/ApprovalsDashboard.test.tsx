@@ -480,7 +480,8 @@ describe("ApprovalsDashboard", () => {
 
     await screen.findByText("IN/2026/9001");
     expect(screen.getByText("ACME Supplier")).toBeInTheDocument();
-    expect(screen.getByText("$250.00")).toBeInTheDocument();
+    // The threshold is net, so the card says which side its figure is on.
+    expect(screen.getByText("$250.00 net")).toBeInTheDocument();
     expect(screen.getByText("3 lines")).toBeInTheDocument();
     // link to the document detail page
     const link = screen.getByRole("link", { name: "Open document" });
@@ -519,7 +520,7 @@ describe("ApprovalsDashboard", () => {
 
     await screen.findByText("PO/2026/004");
     expect(screen.getByText("ACME Supplies")).toBeInTheDocument();
-    expect(screen.getByText("$300.00")).toBeInTheDocument();
+    expect(screen.getByText("$300.00 net")).toBeInTheDocument();
     const link = screen.getByRole("link", { name: "Open purchase order" });
     expect(link).toHaveAttribute("href", "/purchase-orders/po-42");
   });

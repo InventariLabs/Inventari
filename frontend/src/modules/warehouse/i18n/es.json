@@ -1244,6 +1244,7 @@
     }
   },
   "targetSummary": {
+    "netAmount": "{{amount}} neto",
     "linesCount": "{{count}} línea",
     "linesCount_one": "{{count}} línea",
     "linesCount_other": "{{count}} líneas"

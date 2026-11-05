@@ -435,7 +435,7 @@
     "import_error_ai_not_configured": "Import failed: \"{{purpose}}\" needs an AI connection, and none is set up yet. Configure one in Settings → AI Connections."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "Recipe suggestions still work — they fall back to English. Add an entry or import a CSV/JSON to fill this dictionary.",
+    "language_empty_hint": "Recipe suggestions still work — they use matching entries in other languages. Add an entry or import a CSV/JSON to fill this dictionary.",
     "language_empty": "The ingredient dictionary has no entries for {{lang}} yet.",
     "scan_label": "Read from a label",
     "scan_reading": "Reading…",

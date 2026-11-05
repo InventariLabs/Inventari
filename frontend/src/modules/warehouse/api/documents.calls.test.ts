@@ -295,7 +295,9 @@ describe("documentApprovalApi — decisions go through the document's own routes
     expect(seen[0].path).toBe("/approvals/documents/doc-1/approve");
     expect(seen[0].search.has("notes")).toBe(false);
     expect(seen[1].path).toBe("/approvals/documents/doc-1/reject");
-    expect(seen[1].search.get("notes")).toBe("wrong supplier");
+    // A query string is what proxies and access logs keep.
+    expect(seen[1].search.has("notes")).toBe(false);
+    expect(seen[1].body).toEqual({ notes: "wrong supplier" });
   });
 
   it("reads the approval requirement of a document", async () => {

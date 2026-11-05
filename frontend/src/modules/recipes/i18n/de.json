@@ -435,7 +435,7 @@
     "import_error_ai_not_configured": "Import fehlgeschlagen: „{{purpose}}“ erfordert eine KI-Verbindung, und es ist noch keine eingerichtet. Richten Sie eine unter Einstellungen → KI-Verbindungen ein."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "Vorschläge in Rezepten funktionieren weiter — sie greifen auf Englisch zurück. Fügen Sie einen Eintrag hinzu oder importieren Sie eine CSV-/JSON-Datei, um das Wörterbuch zu füllen.",
+    "language_empty_hint": "Vorschläge in Rezepten funktionieren weiter — sie nutzen passende Einträge in anderen Sprachen. Fügen Sie einen Eintrag hinzu oder importieren Sie eine CSV-/JSON-Datei, um das Wörterbuch zu füllen.",
     "language_empty": "Das Zutatenwörterbuch hat noch keine Einträge für {{lang}}.",
     "scan_label": "Vom Etikett lesen",
     "scan_reading": "Wird gelesen …",

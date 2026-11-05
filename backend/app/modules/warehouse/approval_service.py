@@ -14,8 +14,15 @@ from __future__ import annotations
 
 from decimal import Decimal
 from typing import Any, Literal
+from uuid import UUID
 
-from .models import Document
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.money import quantise
+from app.core.public_api import core_api
+
+from . import document_types as dt
+from .models import Document, DocumentLine
 
 
 class ApprovalError(ValueError):
@@ -31,6 +38,54 @@ def document_value(doc: Document) -> Decimal | None:
     same reason — and the threshold is entitled to know which it has.
     """
     return doc.total_net
+
+
+async def _line_template_id_async(
+    db: AsyncSession, doc: Document, line: DocumentLine
+) -> UUID | None:
+    """The product whose cost layers the line would draw, the executor's way."""
+    if line.product_template_id is not None or line.item_id is None:
+        return line.product_template_id
+    item = await core_api.items.get_async(db, doc.organization_id, line.item_id)
+    return item.template_id if item is not None else None
+
+
+async def weighed_value_async(db: AsyncSession, doc: Document) -> Decimal | None:
+    """What the threshold weighs: the stated value, or what a write-off will cost.
+
+    A write-off asks for no price, and is worth what the cost layers it draws
+    were worth, which is only written when it is posted. Until then it had no
+    value, and no value is over every limit: two rolls of tape worth 25 under
+    a threshold of 500 raised an approval request. The goods already carry a
+    cost, so the threshold reads the layers' rate, the same indicative figure
+    a forecast does. A line nothing can value still leaves the whole document
+    unknown, which keeps the rule ``document_value`` states.
+    """
+    value = document_value(doc)
+    if value is not None or not dt.is_scrap(doc.type):
+        return value
+    templates = [await _line_template_id_async(db, doc, line) for line in doc.lines]
+    known = [template_id for template_id in templates if template_id is not None]
+    rates = await core_api.valuation.get_rates_batch_async(
+        db, doc.organization_id, known
+    )
+    total = Decimal('0')
+    for line, template_id in zip(doc.lines, templates, strict=True):
+        rate = rates.get(template_id) if template_id is not None else None
+        if rate is None:
+            return None
+        try:
+            quantity = await core_api.uoms.to_stock_uom_async(
+                db,
+                doc.organization_id,
+                template_id,
+                line.expected_quantity,
+                line.uom_id,
+            )
+        except ValueError:
+            return None
+        total += quantity * rate
+    return quantise(total)
 
 
 def required_types(profile: Any) -> list[str]:
@@ -60,10 +115,15 @@ def profile_names_what_needs_approval(profile: Any) -> bool:
 
 
 def is_approval_required(
-    doc: Document, profile: Any, *, status: str | None = None
+    doc: Document,
+    profile: Any,
+    *,
+    value: Decimal | None,
+    status: str | None = None,
 ) -> bool:
     """Whether the profile asks for an approval of this document.
 
+    ``value`` is what the threshold weighs (``weighed_value_async``).
     ``status`` weighs the document at a status other than the one it holds
     now. Its only caller, ``document_sign_off``, is asked about both halves of
     the rule at the same status, so the profile half has to be askable about
@@ -78,7 +138,6 @@ def is_approval_required(
 
     threshold = profile.approval_threshold
     if threshold is not None:
-        value = document_value(doc)
         # An unpriced document cannot be shown to be under the limit, and a
         # limit that lets through whatever it cannot measure is not a limit.
         # The way out is either way round: price the document, or have it
@@ -95,7 +154,11 @@ SignOff = Literal['required', 'not_required', 'unspecified']
 
 
 def document_sign_off(
-    doc: Document, profile: Any, *, status: str | None = None
+    doc: Document,
+    profile: Any,
+    *,
+    value: Decimal | None,
+    status: str | None = None,
 ) -> SignOff:
     """The profile's half of the approval rule, about one document.
 
@@ -104,7 +167,7 @@ def document_sign_off(
     executed is weighed at all: a draft needs nothing yet.
     """
     weighed_status = doc.status if status is None else status
-    if is_approval_required(doc, profile, status=weighed_status):
+    if is_approval_required(doc, profile, value=value, status=weighed_status):
         return 'required'
     if weighed_status not in {'CONFIRMED', 'PENDING_APPROVAL'}:
         return 'not_required'

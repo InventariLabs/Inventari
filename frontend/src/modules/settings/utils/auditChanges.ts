@@ -325,6 +325,13 @@ export function formatAuditValue(
  */
 const ROTATED_VALUE = "ROTATED_VALUE";
 
+/** The stored print layouts and their keys on the document settings screen. */
+const PRINT_LAYOUT_NAMES: Record<string, string> = {
+  auto: "layoutAuto",
+  standard: "layoutStandard",
+  pl_pz: "layoutPlPz",
+};
+
 /**
  * The value dictionaries the reader shares with the screens that own them.
  *
@@ -352,6 +359,11 @@ const VALUE_RESOLVERS: Record<
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",
     }),
+  // The layout a document prints in: the names the settings screen offers.
+  print_template: (t, code) =>
+    PRINT_LAYOUT_NAMES[code]
+      ? t(`warehouse:profile.${PRINT_LAYOUT_NAMES[code]}`, { defaultValue: "" })
+      : "",
   // A restore writes the reason the product was deleted for as a field of its
   // own; the archive and the delete entry word the same code from `reasons`.
   deletion_reason: (t, code) =>
