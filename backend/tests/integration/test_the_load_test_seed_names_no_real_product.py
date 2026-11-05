@@ -19,6 +19,7 @@ import os
 import re
 from pathlib import Path
 
+import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -148,3 +149,31 @@ def test_every_scenario_search_finds_a_seeded_name() -> None:
         if not any(query.lower() in name for name in names)
     ]
     assert unmatched == []
+
+
+def test_a_random_barcode_that_is_taken_is_drawn_again(
+    db_session: Session,
+    test_household: Organization,
+    test_user: User,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Every random code comes up twice in a row, as two equal draws would.
+    # The second must not reach the database: uq_items_org_barcode_active.
+    codes = iter(code for n in range(10**4) for code in (_ean13_for(n),) * 2)
+    monkeypatch.setattr(seed, '_random_restricted_ean', lambda: next(codes))
+
+    created = seed.seed_org_data(db_session, test_household.id, 300)
+    db_session.flush()
+
+    barcodes = db_session.scalars(
+        select(Item.barcode).where(
+            Item.organization_id == test_household.id, Item.barcode.isnot(None)
+        )
+    ).all()
+    assert created == 300
+    assert len(barcodes) == len(set(barcodes))
+
+
+def _ean13_for(n: int) -> str:
+    body = f'29{n:010d}'
+    return body + _check_digit(body)

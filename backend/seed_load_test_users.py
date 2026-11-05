@@ -51,14 +51,14 @@ DEFAULT_PREFIX = 'k6user'
 CSV_OUTPUT = os.path.join(os.path.dirname(__file__), '..', 'load_tests', 'users.csv')
 
 
-def clean_k6_users(db, prefix: str):
+def clean_k6_users(db, prefix: str, info=print):
     users = (
         db.query(User)
         .filter(User.email.like(f'{prefix}%@loadtest.inventari.app'))
         .all()
     )
     if not users:
-        print(f'No users with prefix {prefix} found to delete.')
+        info(f'No users with prefix {prefix} found to delete.')
         return 0
 
     for user in users:
@@ -74,11 +74,13 @@ def clean_k6_users(db, prefix: str):
         db.delete(user)
 
     db.commit()
-    print(f'Deleted {len(users)} k6 users.')
+    info(f'Deleted {len(users)} k6 users.')
     return len(users)
 
 
-def create_k6_users(db, count: int, prefix: str, password: str, dry_run: bool):
+def create_k6_users(
+    db, count: int, prefix: str, password: str, dry_run: bool, info=print
+):
     created = []
     skipped = 0
     hashed = get_password_hash(password)
@@ -93,7 +95,7 @@ def create_k6_users(db, count: int, prefix: str, password: str, dry_run: bool):
             continue
 
         if dry_run:
-            print(f'  [dry-run] Would create: {email}')
+            info(f'  [dry-run] Would create: {email}')
             created.append({'email': email, 'password': password})
             continue
 
@@ -120,7 +122,7 @@ def create_k6_users(db, count: int, prefix: str, password: str, dry_run: bool):
 
         if i % 10 == 0:
             db.commit()
-            print(f'  Created {i}/{count}...', end='\r')
+            info(f'  Created {i}/{count}...', end='\r')
 
     if not dry_run:
         db.commit()
@@ -206,10 +208,10 @@ def main():
     db = SessionLocal()
     try:
         if args.clean and not args.dry_run:
-            clean_k6_users(db, args.prefix)
+            clean_k6_users(db, args.prefix, info)
 
         users, skipped = create_k6_users(
-            db, args.count, args.prefix, password, args.dry_run
+            db, args.count, args.prefix, password, args.dry_run, info
         )
 
         info(f'\n✅ Done: {len(users) - skipped} new, {skipped} already existed')
