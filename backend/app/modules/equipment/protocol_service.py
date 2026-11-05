@@ -12,7 +12,7 @@ from app.core.public_api import core_api
 from app.core.template_schemas import PlaceholderInfo
 from app.i18n import Language
 
-from ._protocol_templates import (  # noqa: F401
+from ._protocol_templates import (
     AVAILABLE_PLACEHOLDERS,
 )
 from ._protocol_templates import (

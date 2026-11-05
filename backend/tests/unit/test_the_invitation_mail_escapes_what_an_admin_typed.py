@@ -24,7 +24,7 @@ def _rendered(organization_name: str, role: str) -> str:
 
     captured: dict[str, str] = {}
 
-    def _capture(to_email, subject, html, smtp_config=None):  # noqa: ANN001
+    def _capture(to_email, subject, html, smtp_config=None):
         captured['html'] = html
         return True
 

@@ -46,7 +46,7 @@ from app.models.user import User
 from app.modules.maker.models import BoMLine, MakerRecipe, ProductionOrder
 from app.modules.purchase_orders.models import PurchaseOrder, PurchaseOrderLine
 from app.modules.stock_takes.models import (
-    StockTakeItem,  # noqa: F401 — resolve Item.stock_take_items
+    StockTakeItem,  # resolve Item.stock_take_items
 )
 from app.modules.warehouse.country_tax_rules import get_country_rule
 from app.modules.warehouse.document_value_service import recompute_document_values

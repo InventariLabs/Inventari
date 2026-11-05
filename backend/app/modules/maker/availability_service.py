@@ -226,7 +226,7 @@ async def _measure_stock_against_recipe(
     )
 
 
-async def compute_availability(  # noqa: C901 - existing complexity/size
+async def compute_availability(
     db: AsyncSession,
     organization_id: UUID,
     recipe_id: UUID,

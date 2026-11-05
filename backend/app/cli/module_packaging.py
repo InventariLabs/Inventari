@@ -27,7 +27,7 @@ from ._module_meta import (
     BACKEND_MODULES_DIR,
     FRONTEND_MODULES_DIR,
     ModuleYaml,
-    TrackingEntry,  # noqa: F401  — re-exported for backward compatibility
+    TrackingEntry,  # re-exported for backward compatibility
     _get_reserved_module_names,
     _load_tracking,
     _parse_module_yaml,

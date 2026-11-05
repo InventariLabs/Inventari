@@ -82,7 +82,7 @@ def _create_core_tables(db_url: str, module_name: str, module_tables: set[str]) 
 
     Also drops the module's alembic version table so each test starts fresh.
     """
-    import app.core.template_models  # noqa: F401
+    import app.core.template_models
     import app.models  # noqa: F401
     from app.database import Base
 
@@ -377,7 +377,7 @@ def _create_everything(db_url: str, module_name: str) -> None:
     """
     import importlib
 
-    import app.core.template_models  # noqa: F401
+    import app.core.template_models
     import app.models  # noqa: F401
 
     try:

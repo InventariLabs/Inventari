@@ -124,7 +124,7 @@ def create_admin(
     ),
 ):
     """Create an admin user or reset existing admin password."""
-    import app.modules.stock_takes.models  # noqa: F401 - resolve StockTakeItem/StockTake mapper
+    import app.modules.stock_takes.models  # resolve StockTakeItem/StockTake mapper
     import app.modules.warehouse.models  # noqa: F401 - resolve Document mapper
     from app.database import SessionLocal
     from app.models.organization import Organization

@@ -131,7 +131,7 @@ async def create_api_key_async(
     result = await db.execute(
         select(func.count(ApiKey.id)).where(
             ApiKey.organization_id == organization_id,
-            ApiKey.is_active.is_(True),  # noqa: E712
+            ApiKey.is_active.is_(True),
         )
     )
     active_count = result.scalar() or 0
@@ -247,7 +247,7 @@ async def validate_api_key(db: AsyncSession, raw_key: str) -> 'ApiKey | None':
         select(ApiKey)
         .where(
             ApiKey.hashed_key == hashed,
-            ApiKey.is_active.is_(True),  # noqa: E712
+            ApiKey.is_active.is_(True),
         )
         .with_for_update()
     )
@@ -310,7 +310,7 @@ async def list_api_keys(
         select(ApiKey)
         .where(
             ApiKey.organization_id == organization_id,
-            ApiKey.is_active.is_(True),  # noqa: E712
+            ApiKey.is_active.is_(True),
         )
         .order_by(ApiKey.created_at.desc(), ApiKey.id),
         limit=limit,

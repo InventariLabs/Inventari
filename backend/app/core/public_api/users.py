@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 # Re-export UserProfileDTO from contracts for backward compatibility.
-from app.core.contracts import UserProfileDTO  # noqa: E402, F401
+from app.core.contracts import UserProfileDTO  # noqa: E402
 
 
 def _to_dto(user: User) -> UserProfileDTO:

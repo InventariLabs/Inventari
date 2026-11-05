@@ -268,7 +268,7 @@ async def count_needing_attention_async(
     return await db.scalar(query) or 0
 
 
-def get_items(  # noqa: C901 - existing complexity/size
+def get_items(
     db: Session,
     user=None,
     storage_id: UUID | None = None,

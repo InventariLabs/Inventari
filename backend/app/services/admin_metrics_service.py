@@ -99,7 +99,7 @@ async def list_org_metrics_async(db: AsyncSession) -> list[AdminOrgMetricsDTO]:
     item_counts = await _counts_by_org(
         Item.organization_id,
         Item.id,
-        Item.is_deleted == False,  # noqa: E712
+        Item.is_deleted == False,
     )
     storage_counts = await _counts_by_org(
         StorageLocation.organization_id, StorageLocation.id
@@ -107,7 +107,7 @@ async def list_org_metrics_async(db: AsyncSession) -> list[AdminOrgMetricsDTO]:
     waste_counts = await _counts_by_org(
         Item.organization_id,
         Item.id,
-        Item.is_deleted == True,  # noqa: E712
+        Item.is_deleted == True,
         # The two reasons that mean the goods were thrown away rather than
         # used up. Both are written by the delete dialog today.
         Item.deletion_reason.in_(['EXPIRED', 'DISPOSED']),
@@ -127,7 +127,7 @@ async def list_org_metrics_async(db: AsyncSession) -> list[AdminOrgMetricsDTO]:
             )
             .join(Organization, Organization.id == Item.organization_id)
             .where(
-                Item.is_deleted == False,  # noqa: E712
+                Item.is_deleted == False,
                 Item.currency == Organization.currency,
             )
             .group_by(Item.organization_id)
@@ -209,7 +209,7 @@ async def get_global_admin_stats_async(db: AsyncSession) -> GlobalAdminStatsDTO:
         total_organizations=(await db.scalar(select(func.count(Organization.id)))) or 0,
         total_users=(await db.scalar(select(func.count(User.id)))) or 0,
         active_items=(
-            await db.scalar(select(func.count(Item.id)).where(Item.is_deleted == False))  # noqa: E712
+            await db.scalar(select(func.count(Item.id)).where(Item.is_deleted == False))
         )
         or 0,
         dau=dau,
