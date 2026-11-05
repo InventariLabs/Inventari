@@ -15,7 +15,7 @@ import ServingsSelector from "./ServingsSelector";
 import { Card } from "@/components/ui/Card";
 import { useModules } from "@/contexts/ModulesContext";
 import type { IngredientAvailability } from "@/modules/recipes/types/core";
-import { isSpiceQuantity } from "../utils";
+import { isSpiceQuantity, onOtherListsMessage } from "../utils";
 
 /**
  * The backend's `needs_buying` predicate, mirrored.
@@ -98,6 +98,9 @@ export default function RecipeAvailabilityChecker({
               count: result.added_count,
             }),
       );
+      // The same goods may already stand on another open list.
+      const overlap = onOtherListsMessage(t, result.on_other_lists);
+      if (overlap) toast.warning(overlap);
     } catch (error) {
       toast.error(extractApiError(error, t("errors.shopping_failed")));
     }

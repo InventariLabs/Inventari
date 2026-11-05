@@ -1088,6 +1088,12 @@ export const handlers = [
     return HttpResponse.json(null);
   }),
 
+  // An empty list asks whether the catalogue holds products with no stock;
+  // by default it holds none, so the list invites the first product.
+  http.get("/api/v1/items/product-templates/count", () => {
+    return HttpResponse.json({ count: 0 });
+  }),
+
   // ── Notifications ─────────────────────────────────────────────
   http.get("/api/v1/notifications", () => {
     return HttpResponse.json(

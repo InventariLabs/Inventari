@@ -36,6 +36,7 @@ from ._schemas_io import (  # noqa: F401
     IngredientCost,
     IngredientNutrition,
     LinkIngredientTemplateRequest,
+    ListedElsewhere,
     NutritionSummary,
     PatchCookingHistoryRequest,
     PreviewIngredient,

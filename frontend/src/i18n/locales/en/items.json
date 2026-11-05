@@ -90,6 +90,7 @@
     "title": "No products",
     "tryFilters": "Try changing filters",
     "addFirst": "Add your first product to a location. Export unlocks once there is a product.",
+    "definedWithoutStock": "Products that exist only as a definition — for example ones created inside a recipe — are listed here once they have stock. Add one to a location to see it.",
     "noSearchResultsTitle": "No matching products",
     "noSearchResultsDescription": "No results for \"{{term}}\"",
     "clearSearch": "Clear search",

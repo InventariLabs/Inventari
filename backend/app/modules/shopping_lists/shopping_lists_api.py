@@ -264,6 +264,50 @@ class ShoppingListsAPI:
         )
         return [ShoppingListItemDTO.model_validate(i) for i in result.all()]
 
+    async def open_lines_async(
+        self,
+        db: AsyncSession,
+        org_id: UUID,
+        *,
+        exclude_list_id: UUID | None = None,
+    ) -> list[tuple[ShoppingListDTO, ShoppingListItemDTO]]:
+        """Async: the lines still to buy on the organization's active lists.
+
+        A line already ticked off is bought and no longer asks for anything,
+        and a completed or archived list is not one anyone shops from. The
+        list being written to is left out by *exclude_list_id*, so a caller
+        comparing its own lines against "the other lists" does not meet
+        itself.
+        """
+        from app.modules.shopping_lists.models import (
+            ShoppingList,
+            ShoppingListItem,
+            ShoppingListStatus,
+        )
+
+        query = (
+            select(ShoppingList, ShoppingListItem)
+            .join(
+                ShoppingListItem, ShoppingListItem.shopping_list_id == ShoppingList.id
+            )
+            .where(
+                ShoppingList.organization_id == org_id,
+                ShoppingList.status == ShoppingListStatus.ACTIVE.value,
+                ShoppingListItem.is_purchased.is_(False),
+            )
+            .order_by(ShoppingList.created_at, ShoppingListItem.name)
+        )
+        if exclude_list_id is not None:
+            query = query.where(ShoppingList.id != exclude_list_id)
+        rows = (await db.execute(query)).all()
+        return [
+            (
+                ShoppingListDTO.model_validate(shopping_list),
+                ShoppingListItemDTO.model_validate(item),
+            )
+            for shopping_list, item in rows
+        ]
+
     async def get_shopping_list_async(
         self,
         db: AsyncSession,

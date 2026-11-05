@@ -90,6 +90,7 @@
     "title": "Sin productos",
     "tryFilters": "Intente cambiar los filtros",
     "addFirst": "Agregue su primer producto a una ubicación. La exportación se habilitará cuando haya un producto.",
+    "definedWithoutStock": "Los productos que solo existen como definición — por ejemplo, los creados en una receta — aparecen aquí cuando tienen existencias. Agregue uno a una ubicación para verlo.",
     "noSearchResultsTitle": "Sin productos que coincidan",
     "noSearchResultsDescription": "Sin resultados para «{{term}}»",
     "clearSearch": "Borrar búsqueda",

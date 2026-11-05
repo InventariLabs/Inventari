@@ -72,6 +72,14 @@ class AddFromRecipesRequest(BaseModel):
     Wins over ``servings`` when both arrive."""
 
 
+class ListedElsewhere(BaseModel):
+    """A line just written that another open shopping list already carries."""
+
+    name: str
+    list_id: UUID
+    list_name: str
+
+
 class AddToShoppingListResponse(BaseModel):
     shopping_list_id: UUID
     added_count: int
@@ -81,6 +89,9 @@ class AddToShoppingListResponse(BaseModel):
     #: Missing goods left off because the list already carries them — so a
     #: second press can say "already on the list" instead of "added 0".
     already_listed_count: int = 0
+    #: Lines written to this list that an other open list still asks for too,
+    #: so the reader can see the overlap instead of shopping the goods twice.
+    on_other_lists: list[ListedElsewhere] = []
 
 
 # === Cooking History ===

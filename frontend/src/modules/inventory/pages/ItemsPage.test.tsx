@@ -182,6 +182,53 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
     );
   });
 
+  // A product created inside a recipe is a definition with no stock, and the
+  // list is of what is held: "No products — add your first" over a catalog
+  // that has some was the finding.
+  it("says where products without stock are when the list is empty", async () => {
+    server.use(
+      http.get("*/items", () => HttpResponse.json({ items: [], total: 0 })),
+      http.get("*/items/product-templates/count", () =>
+        HttpResponse.json({ count: 4 }),
+      ),
+    );
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+
+    expect(
+      await screen.findByText(/exist only as a definition/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Add your first product/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("invites the first product when the catalog is empty too", async () => {
+    server.use(
+      http.get("*/items", () => HttpResponse.json({ items: [], total: 0 })),
+      http.get("*/items/product-templates/count", () =>
+        HttpResponse.json({ count: 0 }),
+      ),
+    );
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+
+    expect(
+      await screen.findByText(/Add your first product/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/exist only as a definition/i),
+    ).not.toBeInTheDocument();
+  });
+
   it("names hidden module data instead of an empty list", async () => {
     // The filtered answer is empty, the unfiltered one is not: the list owes
     // the reader where the rows went, not "No products" over rows that

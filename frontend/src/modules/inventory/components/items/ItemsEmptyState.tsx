@@ -1,8 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { EyeOff, Package, Plus, SearchX, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { EmptyState, EmptyStateAction } from "@/components/ui/EmptyState";
+import { queryKeys } from "@/hooks/queries/keys";
+import { productTemplatesApi } from "@/lib/api/productTemplates";
 
 interface ItemsEmptyStateProps {
   hasFilters: boolean;
@@ -40,6 +43,16 @@ export default function ItemsEmptyState({
   // Only an un-narrowed empty list may speak for the module filter: "no
   // results" for a search the reader typed is a different answer.
   const isHidden = !hasFilters && hiddenCount > 0;
+  // The list is of what is held, so a product that so far exists only as a
+  // definition — one created inside a recipe — is not on it. An empty list
+  // over such products says where they are, instead of "no products" and an
+  // invitation to add the first one.
+  const { data: definedCount = 0 } = useQuery({
+    queryKey: queryKeys.productTemplates.count,
+    queryFn: productTemplatesApi.count,
+    staleTime: 30_000,
+    enabled: !hasFilters && !isHidden,
+  });
 
   if (isHidden) {
     return (
@@ -78,7 +91,9 @@ export default function ItemsEmptyState({
             })
           : isFiltered
             ? t("empty.tryFilters")
-            : t("empty.addFirst")
+            : definedCount > 0
+              ? t("empty.definedWithoutStock")
+              : t("empty.addFirst")
       }
       primaryAction={
         isPureSearch ? (

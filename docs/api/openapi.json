@@ -40466,6 +40466,14 @@
             "type": "integer",
             "title": "Already Listed Count",
             "default": 0
+          },
+          "on_other_lists": {
+            "items": {
+              "$ref": "#/components/schemas/ListedElsewhere"
+            },
+            "type": "array",
+            "title": "On Other Lists",
+            "default": []
           }
         },
         "type": "object",
@@ -57741,6 +57749,31 @@
         ],
         "title": "LinkedReceiptSchema",
         "description": "Minimal document summary for linked receipts."
+      },
+      "ListedElsewhere": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "list_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "List Id"
+          },
+          "list_name": {
+            "type": "string",
+            "title": "List Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "list_id",
+          "list_name"
+        ],
+        "title": "ListedElsewhere",
+        "description": "A line just written that another open shopping list already carries."
       },
       "LlmCapability": {
         "type": "string",
@@ -77711,6 +77744,14 @@
             },
             "type": "array",
             "title": "Items",
+            "default": []
+          },
+          "on_other_lists": {
+            "items": {
+              "$ref": "#/components/schemas/ListedElsewhere"
+            },
+            "type": "array",
+            "title": "On Other Lists",
             "default": []
           }
         },

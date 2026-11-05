@@ -336,7 +336,8 @@
     "already_listed_toast_one": "Już na liście „{{list}}”: {{count}} pozycja",
     "already_listed_toast_few": "Już na liście „{{list}}”: {{count}} pozycje",
     "already_listed_toast_many": "Już na liście „{{list}}”: {{count}} pozycji",
-    "already_listed_toast_other": "Już na liście „{{list}}”: {{count}} pozycji"
+    "already_listed_toast_other": "Już na liście „{{list}}”: {{count}} pozycji",
+    "on_other_lists_toast": "Już na innej otwartej liście: {{names}} (na {{lists}})"
   },
   "history": {
     "title": "Historia gotowania",

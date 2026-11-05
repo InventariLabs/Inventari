@@ -19,6 +19,7 @@ from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
 
 from ._constants import localized
 from ._helpers import _round_shopping_qty
+from ._shopping_overlap import lines_listed_elsewhere
 from ._shopping_rule import (
     load_exclusions,
     needs_buying,
@@ -209,5 +210,6 @@ async def add_recipes_to_shopping_list(
         shopping_list_id=list_id,
         added_count=len(added_items),
         already_listed_count=already_listed,
+        on_other_lists=await lines_listed_elsewhere(db, org_id, items, list_id=list_id),
         list_name=shopping_list.name,
     )

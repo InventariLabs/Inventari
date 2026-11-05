@@ -10935,6 +10935,11 @@ export interface components {
              * @default 0
              */
             already_listed_count: number;
+            /**
+             * On Other Lists
+             * @default []
+             */
+            on_other_lists: components["schemas"]["ListedElsewhere"][];
         };
         /**
          * AiConnectionCreateDTO
@@ -16802,6 +16807,21 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * ListedElsewhere
+         * @description A line just written that another open shopping list already carries.
+         */
+        ListedElsewhere: {
+            /** Name */
+            name: string;
+            /**
+             * List Id
+             * Format: uuid
+             */
+            list_id: string;
+            /** List Name */
+            list_name: string;
         };
         /**
          * LlmCapability
@@ -24145,6 +24165,11 @@ export interface components {
              * @default []
              */
             items: components["schemas"]["_GeneratedItem"][];
+            /**
+             * On Other Lists
+             * @default []
+             */
+            on_other_lists: components["schemas"]["ListedElsewhere"][];
         };
         /** ShoppingListItem */
         ShoppingListItem: {
