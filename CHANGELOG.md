@@ -41,6 +41,17 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Add Category opens empty, on the product and the equipment category screens
+  alike. It used to bring back the last name typed, after a cancel and after a
+  save, where saving it again was refused as a duplicate.
+- A product's thumbnail goes back to the picture the product has when the server
+  refuses a new one, and the same file can be picked again. It used to go on
+  showing the refused picture until the form was reopened.
+- A product form whose category list could not be loaded says so and offers a
+  retry, instead of quietly leaving out the fields the category declares.
+- The action sheet opened from a location's products or a scan explains why an
+  asset's actions are worded differently, as the product page does. An account
+  that may not act on the record no longer gets that sentence on either of them.
 - Printing a list of labels gives a sheet of rows, three labels across, in the
   preview and in the download alike. It used to be one strip, however long,
   which the dialog shrank into a grey line of bars. The print queue still sends

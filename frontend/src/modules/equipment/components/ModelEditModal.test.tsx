@@ -111,3 +111,33 @@ describe("ModelEditModal — what a save carries", () => {
     expect(onSave).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * The page mounts this dialog under one key for every new model, like the
+ * category pages did; it stays clean because it seeds its fields each time it
+ * opens.
+ */
+describe("ModelEditModal — a second opening", () => {
+  it("drops what the last opening of a new model left in the fields", async () => {
+    const user = userEvent.setup();
+    const dialog = (isOpen: boolean) => (
+      <QueryWrapper>
+        <ModelEditModal
+          isOpen={isOpen}
+          model={null}
+          isSubmitting={false}
+          onSave={vi.fn()}
+          onClose={vi.fn()}
+        />
+      </QueryWrapper>
+    );
+    const { rerender } = render(dialog(true));
+
+    const nameField = () => screen.getByRole("textbox", { name: /name/i });
+    await user.type(nameField(), "Draft model");
+    rerender(dialog(false));
+    rerender(dialog(true));
+
+    await waitFor(() => expect(nameField()).toHaveValue(""));
+  });
+});

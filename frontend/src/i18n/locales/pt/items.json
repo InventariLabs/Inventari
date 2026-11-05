@@ -63,6 +63,7 @@
     "DISPOSED": "Descartado",
     "ARCHIVED": "Arquivado"
   },
+  "categoriesUnavailable": "Não foi possível carregar as categorias, então podem faltar alguns campos neste formulário.",
   "itemName": "Nome do produto",
   "itemNamePlaceholder": "ex.: Leite integral 1 l",
   "itemBrand": "Marca",

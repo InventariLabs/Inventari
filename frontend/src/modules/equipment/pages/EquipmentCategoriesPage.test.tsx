@@ -177,4 +177,36 @@ describe("EquipmentCategoriesPage", () => {
     expect(await screen.findByText("Add New Category")).toBeInTheDocument();
     expect(screen.queryByDisplayValue("Monitors")).not.toBeInTheDocument();
   });
+
+  it("opens Add Category empty after a cancel and after a save", async () => {
+    server.use(
+      http.post("/api/v1/categories", () =>
+        HttpResponse.json({ id: "cat-new", name: "Docks" }, { status: 201 }),
+      ),
+    );
+    const user = renderPage();
+    const openForm = async () => {
+      await user.click(
+        await screen.findByRole("button", { name: "Add Category" }),
+      );
+      return screen.findByRole("textbox", { name: /category name/i });
+    };
+    const formClosed = () =>
+      waitFor(() =>
+        expect(screen.queryByText("Add New Category")).not.toBeInTheDocument(),
+      );
+
+    await user.type(await openForm(), "Draft cat");
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await formClosed();
+
+    const afterCancel = await openForm();
+    expect(afterCancel).toHaveValue("");
+
+    await user.type(afterCancel, "Docks");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    await formClosed();
+
+    expect(await openForm()).toHaveValue("");
+  });
 });

@@ -63,6 +63,7 @@
     "DISPOSED": "Wyrzucony",
     "ARCHIVED": "Zarchiwizowany"
   },
+  "categoriesUnavailable": "Nie udało się wczytać kategorii, więc w tym formularzu może brakować niektórych pól.",
   "itemName": "Nazwa produktu",
   "itemNamePlaceholder": "np. Mleko 3,2% 1 l",
   "itemBrand": "Marka",
