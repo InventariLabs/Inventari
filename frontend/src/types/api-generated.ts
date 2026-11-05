@@ -13886,6 +13886,8 @@ export interface components {
             row: number;
             /** Error */
             error: string;
+            /** Code */
+            code?: string | null;
         };
         /** DocumentImportLineResponse */
         DocumentImportLineResponse: {
