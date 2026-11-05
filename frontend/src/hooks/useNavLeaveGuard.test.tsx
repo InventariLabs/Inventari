@@ -24,6 +24,7 @@ function NavProbe() {
     <div onClickCapture={guardClick}>
       <Link to="/other">Other page</Link>
       <Link to="/here">Current page</Link>
+      <Link to="/here#people">Section of this page</Link>
       <span data-testid="path">{location.pathname}</span>
       <ConfirmDialog {...confirmDialogProps} />
     </div>
@@ -97,5 +98,15 @@ describe("useNavLeaveGuard", () => {
 
     expect(screen.queryByText("Unsaved changes")).not.toBeInTheDocument();
     expect(screen.getByTestId("path")).toHaveTextContent("/here");
+  });
+
+  it("does not ask for a link to a section of the page the reader is on", async () => {
+    const user = userEvent.setup();
+    useFormGuardStore.getState().setDirtyForm("The asset form");
+    renderProbe();
+
+    await user.click(screen.getByText("Section of this page"));
+
+    expect(screen.queryByText("Unsaved changes")).not.toBeInTheDocument();
   });
 });

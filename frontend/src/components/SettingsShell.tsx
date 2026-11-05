@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Info,
   UserRound,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 import { holdsPermission } from "@/hooks/useHasPermission";
@@ -39,8 +40,31 @@ type SidebarItem = {
   label: string;
   to: string;
   exact?: boolean;
+  /** A section of the page `to` names, e.g. `#people`; it stands on its own in the list. */
+  hash?: string;
   icon: LucideIcon;
 };
+
+/** The section of /settings that holds the members and the invitations. */
+const PEOPLE_HASH = "#people";
+
+/** Where an entry leads: its page, and the section of it when it names one. */
+const destination = (item: SidebarItem) => item.to + (item.hash ?? "");
+
+/**
+ * Whether `item` is the current entry. A section entry and the page that
+ * contains it share a path, so the hash tells them apart.
+ */
+function isCurrent(
+  item: SidebarItem,
+  pathActive: boolean,
+  location: { pathname: string; hash: string },
+): boolean {
+  if (item.hash) return pathActive && location.hash === item.hash;
+  const onPeople =
+    location.pathname === "/settings" && location.hash === PEOPLE_HASH;
+  return pathActive && !(item.to === "/settings" && onPeople);
+}
 
 type SidebarGroup = {
   label: string | null;
@@ -49,16 +73,19 @@ type SidebarGroup = {
 
 function SettingsSidebarItem({ item }: { item: SidebarItem }) {
   const Icon = item.icon;
+  const location = useLocation();
   return (
     <NavLink
-      to={item.to}
+      to={destination(item)}
       end={item.exact}
+      // NavLink matches the path only; a section entry and its page share one.
+      aria-current={isCurrent(item, true, location) ? "page" : "false"}
       className={({ isActive }) =>
         cn(
           "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full",
           // Brand tint carries the active state; the label stays neutral so it
           // survives both themes and every product profile's palette.
-          isActive
+          isCurrent(item, isActive, location)
             ? "bg-primary-50 text-on font-semibold"
             : "text-on-secondary hover:bg-surface-raised hover:text-on",
         )
@@ -135,6 +162,16 @@ export default function SettingsShell() {
           to: "/settings",
           exact: true,
           icon: Settings,
+        },
+        // Inviting a colleague is the first thing a new administrator looks
+        // for, and it sat at the foot of General, below the currency and the
+        // time-zone list, with no way in from here.
+        {
+          label: t("settings.tabs.people"),
+          to: "/settings",
+          hash: PEOPLE_HASH,
+          exact: true,
+          icon: UsersRound,
         },
         {
           label: t("settings.tabs.profile"),
@@ -228,7 +265,7 @@ export default function SettingsShell() {
                 </p>
               )}
               {group.items.map((item) => (
-                <SettingsSidebarItem key={item.to} item={item} />
+                <SettingsSidebarItem key={destination(item)} item={item} />
               ))}
             </div>
           ))}
@@ -240,15 +277,15 @@ export default function SettingsShell() {
         const allItems = groups.flatMap((g) => g.items);
         const active =
           allItems.find((item) =>
-            item.exact
-              ? location.pathname === item.to
-              : location.pathname.startsWith(item.to) &&
-                item.to !== "/settings",
-          ) ??
-          allItems.find(
-            (item) => item.exact && location.pathname === item.to,
-          ) ??
-          allItems[0];
+            isCurrent(
+              item,
+              item.exact
+                ? location.pathname === item.to
+                : location.pathname.startsWith(item.to) &&
+                    item.to !== "/settings",
+              location,
+            ),
+          ) ?? allItems[0];
         const ActiveIcon = active?.icon ?? Settings;
 
         return (
@@ -308,13 +345,17 @@ export default function SettingsShell() {
                     )}
                     {group.items.map((item) => {
                       const Icon = item.icon;
-                      const isActive = item.exact
-                        ? location.pathname === item.to
-                        : location.pathname.startsWith(item.to);
+                      const isActive = isCurrent(
+                        item,
+                        item.exact
+                          ? location.pathname === item.to
+                          : location.pathname.startsWith(item.to),
+                        location,
+                      );
                       return (
                         <NavLink
-                          key={item.to}
-                          to={item.to}
+                          key={destination(item)}
+                          to={destination(item)}
                           end={item.exact}
                           onClick={(e) => {
                             e.preventDefault();
@@ -322,7 +363,7 @@ export default function SettingsShell() {
                             // question lands — leaving for the new tab,
                             // or staying to keep typing.
                             setMobileNavOpen(false);
-                            guardNavigate(() => navigate(item.to));
+                            guardNavigate(() => navigate(destination(item)));
                           }}
                           className={cn(
                             "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors",

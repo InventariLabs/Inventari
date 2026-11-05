@@ -36,6 +36,7 @@
     "insecureUrlWarning": "Without HTTPS the payload travels in clear text, readable by anything on the way.",
     "noSecretWarning": "Without a secret the receiver cannot tell your payloads from anyone else's.",
     "eventNeedsModule": "needs the {{module}} module",
+    "eventsNeedModulesGroup": "Events of modules this organization has not enabled",
     "withdrawnEvents": "No longer in the catalogue",
     "withdrawnEventsHint": "These names left the event catalogue, so they can never fire. Uncheck them and save to remove the subscription.",
     "eventsSelected": "({{count}} selected)",
@@ -103,7 +104,8 @@
     "document": {
       "cancelled": "A document was cancelled",
       "completed": "A document was completed",
-      "confirmed": "A document was confirmed"
+      "confirmed": "A document was confirmed",
+      "shipped": "A dispatch was completed with its carrier and tracking number"
     },
     "equipment": {
       "checkin": "A piece of equipment was returned",

@@ -292,6 +292,7 @@
     },
     "tabs": {
       "general": "Général",
+      "people": "Personnes",
       "modules": "Modules",
       "myModules": "Mes modules",
       "auditLog": "Journal d'audit",

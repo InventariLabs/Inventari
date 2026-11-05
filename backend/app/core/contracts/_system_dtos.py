@@ -460,13 +460,14 @@ API_KEY_PERMISSIONS: frozenset[SystemPermission] = frozenset(
 
 #: The list a new key gets when its creator names none, and the ticks the
 #: issuing dialog opens with: read only. The common uses — a dashboard, a home
-#: automation — only look, so a write is a tick somebody puts there.
+#: automation — only look, so a write is a tick somebody puts there. Reading
+#: the team list (`org:read` returns every member's name, e-mail and role) is
+#: not in it: a script that only reads products has no business with people.
 API_KEY_DEFAULT_PERMISSIONS: frozenset[SystemPermission] = frozenset(
     {
         SystemPermission.ITEMS_READ,
         SystemPermission.CATEGORIES_READ,
         SystemPermission.STORAGES_READ,
-        SystemPermission.ORG_READ,
     }
 )
 

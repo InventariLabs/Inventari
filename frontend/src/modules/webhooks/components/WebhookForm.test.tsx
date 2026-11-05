@@ -115,6 +115,37 @@ describe("WebhookForm — every control says what it is", () => {
     expect(await screen.findByText("(1 selected)")).toBeInTheDocument();
   });
 
+  it("sets apart the events of modules the organization has not enabled", async () => {
+    server.use(
+      http.get("*/webhooks/events", () =>
+        HttpResponse.json([
+          {
+            event_type: "document.shipped",
+            description: "API sentence that must not be shown",
+            available: false,
+            source_module: "warehouse",
+          },
+          {
+            event_type: "item.created",
+            description: "An item was created",
+            available: true,
+            source_module: null,
+          },
+        ]),
+      ),
+    );
+    renderForm();
+
+    const group = await screen.findByRole("group", {
+      name: /modules this organization has not enabled/i,
+    });
+    // The event that fires sits outside the group; the silent one inside it,
+    // described from the catalogue and not by the API's English fallback.
+    expect(group).toHaveTextContent("document.shipped");
+    expect(group).toHaveTextContent(/dispatch was completed/i);
+    expect(group).not.toHaveTextContent("item.created");
+  });
+
   it("keeps a withdrawn subscription visible and removable", async () => {
     // The row held item.consumed, the catalogue no longer lists it, and the
     // form rendered the catalogue alone — so the field showed "1 selected"

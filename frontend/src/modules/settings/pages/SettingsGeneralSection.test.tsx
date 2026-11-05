@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { Link, MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
@@ -70,6 +71,38 @@ describe("SettingsGeneralSection", () => {
 
     expect(await screen.findByTestId("module-data-toggle")).toBeInTheDocument();
     await waitFor(() => expect(scrollSpy).toHaveBeenCalled());
+  });
+
+  it("scrolls the people section into view for the sidebar's People entry", async () => {
+    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+
+    renderSection("/settings#people");
+
+    await waitFor(() => expect(scrollSpy).toHaveBeenCalled());
+    expect(scrollSpy.mock.contexts[0]).toHaveProperty("id", "people");
+  });
+
+  it("scrolls again when the same entry is chosen a second time", async () => {
+    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+    const user = userEvent.setup();
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={["/settings#people"]}>
+            <Link to="/settings#people">People entry</Link>
+            <SettingsGeneralSection />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </PageHeaderContext.Provider>,
+    );
+    await waitFor(() => expect(scrollSpy).toHaveBeenCalledTimes(1));
+
+    await user.click(screen.getByText("People entry"));
+
+    await waitFor(() => expect(scrollSpy).toHaveBeenCalledTimes(2));
   });
 
   it("stays put without the hash", async () => {
