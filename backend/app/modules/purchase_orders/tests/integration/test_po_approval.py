@@ -998,7 +998,7 @@ class TestApprovalActsAreJournalledOnTheOrder:
         requested = client.post(
             f'{PO_URL}/{po["id"]}/request-approval',
             headers=approval_headers,
-            params={'notes': 'please check'},
+            json={'notes': 'please check'},
         )
         assert requested.status_code == 200, requested.text
         approved = client.post(f'{PO_URL}/{po["id"]}/approve', headers=approval_headers)
@@ -1028,7 +1028,7 @@ class TestApprovalActsAreJournalledOnTheOrder:
         rejected = client.post(
             f'{PO_URL}/{po["id"]}/reject',
             headers=approval_headers,
-            params={'notes': 'too dear'},
+            json={'notes': 'too dear'},
         )
         assert rejected.status_code == 200, rejected.text
 
