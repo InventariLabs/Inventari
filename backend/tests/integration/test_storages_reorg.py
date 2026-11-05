@@ -372,6 +372,62 @@ class TestStorageReorg:
         assert self._get(client, auth_headers, a_id).status_code == 404
         assert self._get(client, auth_headers, b_id).status_code == 404
 
+    def test_deleting_a_place_lifts_a_child_that_bears_its_name(
+        self, client, auth_headers, db_session, test_user
+    ):
+        """The level the delete leaves holds one 'Box', so the lift is fine.
+
+        While the doomed row still stands on its level, the lifted child with
+        the same name meets it in the sibling-name index; the delete must not
+        be refused for a state it does not leave behind.
+        """
+        parent = self._make_storage(db_session, test_user, 'Box')
+        child = self._make_storage(db_session, test_user, 'Box', parent_id=parent.id)
+        parent_id, child_id = parent.id, child.id
+
+        response = client.delete(f'/api/v1/locations/{parent_id}', headers=auth_headers)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
+        assert self._get(client, auth_headers, parent_id).status_code == 404
+        assert self._get(client, auth_headers, child_id).json()['parent_id'] is None
+
+    def test_deleting_a_place_still_refuses_a_lift_onto_another_sibling(
+        self, client, auth_headers, db_session, test_user
+    ):
+        """A child that meets a different, surviving 'Box' is still refused."""
+        parent = self._make_storage(db_session, test_user, 'Shelf')
+        self._make_storage(db_session, test_user, 'Box')
+        self._make_storage(db_session, test_user, 'Box', parent_id=parent.id)
+
+        response = client.delete(f'/api/v1/locations/{parent.id}', headers=auth_headers)
+
+        assert response.status_code == status.HTTP_409_CONFLICT, response.text
+        assert self._get(client, auth_headers, parent.id).status_code == 200
+
+    def test_moving_onto_a_parent_holding_the_name_is_refused_in_the_dry_run(
+        self, client, auth_headers, db_session, test_user
+    ):
+        """The name rule is told to the person before the move, not as raw SQL."""
+        site = self._make_storage(db_session, test_user, 'Site')
+        self._make_storage(db_session, test_user, 'Box', parent_id=site.id)
+        loose = self._make_storage(db_session, test_user, 'Box')
+        operations = [{'op': 'move', 'id': str(loose.id), 'parent_id': str(site.id)}]
+
+        for dry_run in (True, False):
+            response = client.post(
+                '/api/v1/locations/reorg',
+                headers=auth_headers,
+                json={'operations': operations, 'dry_run': dry_run},
+            )
+            body = response.json()
+            assert body['applied'] is False
+            assert len(body['rejections']) == 1, body
+            rejection = body['rejections'][0]
+            assert rejection['index'] == 0
+            assert 'already exists' in rejection['reason'].lower()
+            assert 'constraint' not in rejection['reason'].lower()
+        assert self._get(client, auth_headers, loose.id).json()['parent_id'] is None
+
 
 @pytest.mark.integration
 class TestStorageReorgDepth:

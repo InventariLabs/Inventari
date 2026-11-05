@@ -470,6 +470,24 @@ _DROPPED_AFTER_BASELINE_TABLES = {'item_type_definitions'}
 _DROPPED_AFTER_BASELINE_COLUMNS = {('items', 'item_type')}
 
 
+#: The unique indexes the core revisions after the baseline build on tables the
+#: previous chain already had. The models declare them, so a database stamped
+#: from the previous chain lacks them until the upgrade that follows the stamp.
+_ADDED_AFTER_BASELINE_INDEXES = {
+    'uq_storage_locations_org_parent_name',
+    'uq_storage_locations_org_root_name',
+}
+
+
+def _added_after_baseline(gap) -> bool:
+    """Whether one ``compare_metadata`` entry is an index a later revision builds."""
+    entries = gap if isinstance(gap, list) else [gap]
+    return all(
+        entry[0] == 'add_index' and entry[1].name in _ADDED_AFTER_BASELINE_INDEXES
+        for entry in entries
+    )
+
+
 def _dropped_after_baseline(gap) -> bool:
     """Whether one ``compare_metadata`` entry is a removal a later revision makes."""
     entries = gap if isinstance(gap, list) else [gap]
@@ -507,7 +525,9 @@ def _unexplained_gaps(gaps: list, pending) -> list:
     return [
         gap
         for gap in gaps
-        if not _dropped_after_baseline(gap) and not _module_chain_changes(gap, pending)
+        if not _dropped_after_baseline(gap)
+        and not _added_after_baseline(gap)
+        and not _module_chain_changes(gap, pending)
     ]
 
 
