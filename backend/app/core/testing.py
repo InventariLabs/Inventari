@@ -177,9 +177,11 @@ class ModuleTestHelper:
         *,
         name: str,
         description: str | None = None,
+        parent_id: uuid.UUID | None = None,
     ) -> StorageLocation:
         location = StorageLocation(
             name=name,
+            parent_id=parent_id,
             organization_id=org.id,
             storage_type_id=storage_type.id,
             created_by=user.id,

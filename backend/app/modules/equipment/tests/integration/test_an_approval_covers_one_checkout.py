@@ -42,7 +42,7 @@ def _make_item(h: ModuleTestHelper, org: Any, admin: User, db_session: Session) 
     from app.models.category import Category
 
     st_type = h.create_storage_type(f'IT {uuid4().hex[:4]}', f'IT_{uuid4().hex[:6]}')
-    loc = h.create_storage_location(org, st_type, admin, name='Loc')
+    loc = h.create_storage_location(org, st_type, admin, name=f'Loc {uuid4().hex[:4]}')
     cat = Category(
         name='Laptop',
         code=f'LAPTOP_{uuid4().hex[:6]}',
