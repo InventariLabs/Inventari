@@ -83,8 +83,16 @@ export function useUpdateWorkflow() {
 export function useDeleteWorkflow() {
   return useAppMutation(
     (id: string) => approvalsApi.deleteWorkflow(id),
-    (qc) => {
-      qc.invalidateQueries({ queryKey: workflowKeys.all });
+    (qc, _data, id) => {
+      // The switch-off dialog still holds this workflow's "what waits on it"
+      // count while it closes; asking again for a workflow that is gone would
+      // log a 404, so that one entry is left out of the refresh.
+      const waitingKey = queryKeys.approvals.workflowWaiting(id);
+      qc.invalidateQueries({
+        queryKey: workflowKeys.all,
+        predicate: (query) =>
+          JSON.stringify(query.queryKey) !== JSON.stringify(waitingKey),
+      });
       // Switching a workflow off releases its open requests, which clears
       // their notices on the server — refresh the bell.
       invalidation.notifications(qc);
