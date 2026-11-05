@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import { usePageSavePart, useUnderPageSave } from "@/module-sdk";
+import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { useUpdateModuleSettings } from "@/modules/settings/hooks/useModuleSettings";
 import type {
   ModuleSettingsField,
@@ -127,6 +128,7 @@ export function ModuleSettingsForm({
   // under the admin-gated shell; this is the same rule where the form can
   // state it, so the form cannot be mounted without it.
   const canManageSettings = useHasPermission("admin:access");
+  const enabledModules = useEnabledModulesOptional();
   // Under a page that has one Save the form hands its edit to it, and keeps
   // neither its own button nor its own confirmation.
   const underPageSave = useUnderPageSave();
@@ -140,14 +142,17 @@ export function ModuleSettingsForm({
         const path = prefix ? `${prefix}.${key}` : key;
         if (field.type === "object" && field.properties) {
           walk(field.properties, path);
-        } else {
+        } else if (field.requires_modules?.every((m) => enabledModules.includes(m)) ?? true) {
+          // A setting about another module's concept is not offered where
+          // that module is off: switching it on would promise records in a
+          // register the organization cannot open.
           list.push({ path, field });
         }
       }
     }
     walk(schema.properties ?? {}, "");
     return list;
-  }, [schema]);
+  }, [schema, enabledModules]);
 
   const flattenInitial = useMemo(() => {
     const flat: FormState = applyDefaults(schema.properties ?? {});

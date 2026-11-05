@@ -322,6 +322,22 @@ describe("OrganizationMembers", () => {
     expect(await screen.findByText("Magazynier · read and write")).toBeTruthy();
   });
 
+  it("names the person and the role in the removal confirmation", async () => {
+    // The row behind the dialog was the only thing that said who "this
+    // member" was; one row too low removed the wrong colleague's access.
+    signInWith(["admin:access"]);
+    renderSettings();
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^Remove member / }),
+    );
+
+    const dialog = await screen.findByRole("alertdialog");
+    expect(dialog).toHaveTextContent("Remove Warehouse Clerk?");
+    expect(dialog).toHaveTextContent(/Warehouse Clerk \(Member\) loses access/);
+    expect(dialog).toHaveTextContent("The records they created stay");
+  });
+
   it("says why the member was not removed, in the server's words", async () => {
     // The row's own guard hides the administrator's row, but the server is the
     // one that decides: it refuses to remove the person asking, a member of
