@@ -214,6 +214,6 @@ class TestTheImportFindsTheShelfTheReaderNamed:
 
         assert result['imported'] == 0
         assert result['errors'] == [
-            {'row': 2, 'error': 'Column "Storage": location "Attic → Box 3" not found'}
+            {'row': 1, 'error': 'Column "Storage": location "Attic → Box 3" not found'}
         ]
         assert await _location_count(db, org_id) == before

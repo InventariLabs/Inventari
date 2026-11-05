@@ -83,7 +83,7 @@ class TestASheetOverTheItemLimitSaysWhy:
             0,
             5,
         )
-        assert [e['row'] for e in body['errors']] == [2, 3, 4, 5, 6]
+        assert [e['row'] for e in body['errors']] == [1, 2, 3, 4, 5]
         assert [e['error'] for e in body['errors']] == [LIMIT_MESSAGE] * 5
         assert [
             r.message for r in caplog.records if 'Import row failed' in r.message

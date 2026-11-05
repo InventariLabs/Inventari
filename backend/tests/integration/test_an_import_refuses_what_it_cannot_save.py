@@ -80,7 +80,7 @@ class TestAnUnknownCategoryRefusesTheRow:
         assert result['imported'] == 0
         assert result['failed'] == 1
         assert result['errors'] == [
-            {'row': 2, 'error': 'Column "Category": category "Spices" not found'}
+            {'row': 1, 'error': 'Column "Category": category "Spices" not found'}
         ]
         # Nothing was written: the refusal must not leave behind the product
         # it was refusing to give a category.
@@ -157,7 +157,7 @@ class TestAnUnreadableDateRefusesTheRow:
         assert result['imported'] == 0
         assert result['failed'] == 1
         assert result['errors'] == [
-            {'row': 2, 'error': 'Column "Expiry": "31.02.2027" is not a date'}
+            {'row': 1, 'error': 'Column "Expiry": "31.02.2027" is not a date'}
         ]
         await _assert_not_saved(real_async_db_session, 'Oliwa')
 
@@ -210,6 +210,6 @@ class TestTheFreezeDateTravelsWithTheSheet:
         )
 
         assert result['errors'] == [
-            {'row': 2, 'error': 'Column "Freeze": "31.02.2026" is not a date'}
+            {'row': 1, 'error': 'Column "Freeze": "31.02.2026" is not a date'}
         ]
         await _assert_not_saved(real_async_db_session, 'Soup')
