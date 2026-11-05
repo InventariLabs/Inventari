@@ -72,6 +72,16 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Replacing the photo of a product, an asset or a recipe shows the new picture
+  at once. It used to go on showing the old one until the page was reloaded,
+  because every cover was kept under the same address. Module authors get
+  `cover_leaf` and `cover_leaf_of` in the module SDK to name and read a cover
+  file the same way. A photo picked in the product edit sheet is now saved with
+  Save changes, and Close drops it like any other edit; it used to be stored the
+  moment it was picked and then overwritten by the save.
+- The production Content-Security-Policy admits the web worker that shrinks a
+  photo before it is sent, so choosing a photo no longer logs a policy
+  violation or shrinks it on the page's own thread.
 - On an organization seeded before the option words existed, the "Lactose free"
   field of the Dairy and Cheese categories now offers its options in the
   interface language instead of the stored English "No" and "Yes". Options an

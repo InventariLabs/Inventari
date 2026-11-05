@@ -95,3 +95,27 @@ describe("prepareImageUpload", () => {
     expect(await prepareImageUpload(pdf, { imageOnly: false })).toBe(pdf);
   });
 });
+
+describe("the photo-shrinking worker", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // The worker is a blob: and fetches the library with importScripts; its
+  // default address is a CDN, which the production script-src refuses.
+  // The policy string alone cannot tell, so the call is what is pinned.
+  it("loads the library from this origin when a photo is shrunk", async () => {
+    const photo = createFakeFile("p.jpg", 4096);
+    mockCompress.mockResolvedValue(createFakeFile("p.jpg", 100));
+
+    await prepareImageUpload(photo);
+    await compressImage(photo);
+
+    expect(mockCompress).toHaveBeenCalledTimes(2);
+    for (const [, options] of mockCompress.mock.calls) {
+      const libURL = new URL(String(options?.libURL));
+      expect(libURL.origin).toBe(window.location.origin);
+      expect(libURL.pathname).toMatch(/browser-image-compression.*\.js$/);
+    }
+  });
+});

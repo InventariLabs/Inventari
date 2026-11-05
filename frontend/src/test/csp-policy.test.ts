@@ -49,6 +49,15 @@ describe("the SPA origin's Content-Security-Policy", () => {
     expect(directive("object-src")).toBe("object-src 'none'");
   });
 
+  it("lets the photo-shrinking worker start from a blob", () => {
+    // browser-image-compression builds its worker from a blob: URL. Without a
+    // worker-src the browser falls back to script-src, which refuses it: every
+    // photo logged a violation and was shrunk on the main thread instead.
+    // The worker then fetches the library with importScripts under
+    // script-src 'self': imageUtils passes it an address on this origin.
+    expect(directive("worker-src")).toBe("worker-src 'self' blob:");
+  });
+
   it("never allows eval", () => {
     expect(policy).not.toContain("unsafe-eval");
   });

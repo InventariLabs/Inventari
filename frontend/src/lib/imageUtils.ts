@@ -1,6 +1,16 @@
 import { logger } from "@/utils/logger";
 import { ReadableError } from "@/lib/errors";
 import i18n from "@/i18n/config";
+// The library's own script, served from this origin. Its web worker is a blob:
+// that fetches the library with importScripts, and the library's default
+// address is a CDN, which the page's script-src refuses: the worker started,
+// the load failed, and the shrink ran on the page's own thread after logging
+// a violation. A blob worker is given an absolute address, so the build's
+// relative one is resolved against the page.
+import shrinkLibraryPath from "browser-image-compression/dist/browser-image-compression.js?url";
+
+const shrinkLibraryUrl = () =>
+  new URL(shrinkLibraryPath, window.location.href).href;
 
 export async function compressImage(
   file: File,
@@ -15,6 +25,8 @@ export async function compressImage(
     maxWidthOrHeight: maxWidth,
 
     useWebWorker: true,
+
+    libURL: shrinkLibraryUrl(),
 
     initialQuality: quality,
 
@@ -73,6 +85,7 @@ export async function prepareImageUpload(
       maxSizeMB: 1,
       maxWidthOrHeight: UPLOAD_IMAGE_MAX_SIDE,
       useWebWorker: true,
+      libURL: shrinkLibraryUrl(),
     });
     // The library hands back a Blob in some paths; multipart upload names a
     // Blob "blob", which the server's extension check and the stored

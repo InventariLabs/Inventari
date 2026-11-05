@@ -2,7 +2,6 @@ import { useCallback, useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Trash2, Package, AlertCircle } from "lucide-react";
 import { attachmentsApi } from "@/lib/api/attachments";
-import { itemsApi } from "@/lib/api/items";
 import { productTemplatesApi } from "@/lib/api/productTemplates";
 import type { ProductTemplate } from "@/lib/api/productTemplates";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -29,6 +28,7 @@ import {
   type ItemFormData,
 } from "@/modules/inventory/hooks/useItemForm";
 import { useItem } from "@/modules/inventory/hooks/useItems";
+import { usePickedItemImage } from "@/modules/inventory/hooks/usePickedItemImage";
 import { useFreeLabel } from "@/modules/inventory/hooks/useFreeLabel";
 import { useScopedCategories } from "@/modules/shared/hooks/useCategories";
 import {
@@ -37,6 +37,14 @@ import {
 } from "@/modules/inventory/hooks/useItemMutations";
 
 /** The product a record is a card of, read for the valuation section. */
+/** The sheet opened with the picture the record had then; one changed since,
+ * here or elsewhere, belongs to the photo's own endpoint and is not written
+ * back by a rename. */
+function withoutOpenedPicture(submission: Record<string, unknown>) {
+  const { image_url: _opened, ...data } = submission;
+  return data;
+}
+
 function useProductTemplate(templateId: string | null | undefined) {
   const [template, setTemplate] = useState<ProductTemplate | null>(null);
   const [isLoadingTemplate, setIsLoadingTemplate] = useState(false);
@@ -185,7 +193,6 @@ export default function ItemEditModal({
     isFreeing,
     confirmDialogProps: freeDialog,
   } = useFreeLabel();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showDeleteReason, setShowDeleteReason] = useState(false);
   /** Where the reader asked to go, held while we ask about unsaved edits. */
   const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null);
@@ -202,16 +209,14 @@ export default function ItemEditModal({
     isError: isItemError,
   } = useItem(itemId);
 
-  // The picture the server holds, as far as this sheet knows: the preview can
-  // be ahead of it while an upload is on its way.
-  const acceptedImage = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (item?.image_url) {
-      acceptedImage.current = item.image_url;
-      setImagePreview(item.image_url);
-    }
-  }, [item]);
+  const {
+    preview: imagePreview,
+    setPreview: setImagePreview,
+    hasPicked,
+    isBusy,
+    pick: pickImage,
+    store: storePickedImage,
+  } = usePickedItemImage(itemId, item);
 
   const { template, isLoadingTemplate } = useProductTemplate(item?.template_id);
 
@@ -234,13 +239,19 @@ export default function ItemEditModal({
   const updateItemMutation = useUpdateItem();
 
   const updateMutation = {
-    mutate: (data: Record<string, unknown>) =>
+    mutate: (submission: Record<string, unknown>) =>
       updateItemMutation.mutate(
-        { id: itemId, data },
+        { id: itemId, data: withoutOpenedPicture(submission) },
         {
-          onSuccess: () => {
-            toast.success(t("messages.updateSuccess"));
-            onClose();
+          onSuccess: async () => {
+            await storePickedImage(
+              t("items:messages.fileUploadFailed"),
+              (message) => setErrors({ submit: message }),
+              () => {
+                toast.success(t("messages.updateSuccess"));
+                onClose();
+              },
+            );
           },
           onError: (error: unknown) => {
             setErrors({
@@ -249,12 +260,12 @@ export default function ItemEditModal({
           },
         },
       ),
-    isPending: updateItemMutation.isPending,
+    isPending: isBusy(updateItemMutation.isPending),
   };
 
   const {
     formData,
-    isDirty,
+    isDirty: formIsDirty,
     errors,
     setErrors,
     fieldDefinitions,
@@ -267,6 +278,8 @@ export default function ItemEditModal({
     onSubmit: (data) => updateMutation.mutate(data),
     form: "item_edit",
   });
+
+  const isDirty = formIsDirty || hasPicked;
 
   // Once, when the field first exists: the fields arrive with the record and
   // its category, and a reader who has scrolled since is not moved again.
@@ -321,16 +334,7 @@ export default function ItemEditModal({
     }
   };
 
-  const handleImageSelect = async (file: File) => {
-    try {
-      const { image_url } = await itemsApi.uploadImage(itemId, file);
-      acceptedImage.current = image_url;
-      setImagePreview(image_url);
-    } catch (error) {
-      setImagePreview(acceptedImage.current);
-      toast.error(extractApiError(error, t("items:messages.fileUploadFailed")));
-    }
-  };
+  const handleImageSelect = async (file: File) => pickImage(file);
 
   const deleteItemMutation = useDeleteItem();
   const deleteMutation = {

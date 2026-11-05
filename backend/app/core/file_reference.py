@@ -21,6 +21,9 @@ was shown.
 
 from __future__ import annotations
 
+import hashlib
+import re
+
 #: The route that serves every stored file, owned and verified by the app
 #: rather than by the storage backend (``app/api/uploads.py``).
 UPLOAD_ROUTE_PREFIX = '/uploads/'
@@ -81,3 +84,38 @@ def cover_extension(reference: str | None) -> str | None:
         return None
     extension = reference.rsplit('.', 1)[-1].lower() if '.' in reference else ''
     return extension if extension in _COVER_EXTENSIONS else None
+
+
+#: ``cover.<ext>`` as older uploads wrote it, or ``cover.<digest>.<ext>``.
+_COVER_LEAF = re.compile(
+    r'cover(?:\.[0-9a-f]{12})?\.(?:' + '|'.join(sorted(_COVER_EXTENSIONS)) + r')'
+)
+
+
+def cover_leaf(content: bytes, extension: str) -> str:
+    """The file name a cover with these bytes is saved under.
+
+    A fixed ``cover.<ext>`` made the address of a replaced picture the address
+    of the old one, so a page that had shown the old picture kept showing it:
+    the browser reuses an image it already holds for the same address. The
+    name carries a digest of the bytes instead, so a different picture is a
+    different address on every screen that shows it, and the same bytes saved
+    twice stay one file. The name still starts ``cover.`` and ends in the
+    extension, which is all the upload resolvers read.
+    """
+    return f'cover.{hashlib.sha256(content).hexdigest()[:12]}.{extension}'
+
+
+def cover_leaf_of(reference: str | None) -> str | None:
+    """The cover file name *reference* ends in, if it ends in one of ours.
+
+    Like :func:`cover_extension`, this keeps only the tail of a column the
+    forms can write: a delete rebuilds the key from the organization and the
+    entity it is serving and adds this leaf, so a reference cannot pick
+    another row's file. A foreign address, and a tail that is not a cover
+    name, answer ``None``.
+    """
+    if not reference or reference.startswith(('http://', 'https://')):
+        return None
+    leaf = reference.rsplit('/', 1)[-1]
+    return leaf if _COVER_LEAF.fullmatch(leaf) else None

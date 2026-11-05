@@ -23,7 +23,7 @@ _EXT_TO_MIME: dict[str, str] = {
 
 
 class RecipeCoverResolver(UploadPathResolver):
-    """Resolve ``<org_id>/recipes/<recipe_id>/cover.<ext>`` — the recipe cover
+    """Resolve ``<org_id>/recipes/<recipe_id>/cover.<digest>.<ext>`` — the recipe cover
     image.
 
     Ownership is verified by loading the recipe org-scoped via ``get_recipe``.
@@ -31,7 +31,7 @@ class RecipeCoverResolver(UploadPathResolver):
     the asking organization's id is never resolved here.
 
     A cover URL stored before the org-scoped move lacks that segment
-    (``recipes/<recipe_id>/cover.<ext>``) and is deliberately unresolved: the
+    (``recipes/<recipe_id>/cover.<digest>.<ext>``) and is deliberately unresolved: the
     record is not migrated — development and demo stores are reset — so the
     screen shows no cover rather than this route reaching for a path outside
     the caller's namespace.
@@ -44,7 +44,7 @@ class RecipeCoverResolver(UploadPathResolver):
         organization_id: UUID,
     ) -> OwnedFileMeta | None:
         parts = file_path.split('/')
-        # Expected shape: <org_id>/recipes/<recipe_id>/cover.<ext>
+        # Expected shape: <org_id>/recipes/<recipe_id>/cover.<digest>.<ext>
         if len(parts) != 4 or parts[0] != str(organization_id) or parts[1] != 'recipes':
             return None
         try:
