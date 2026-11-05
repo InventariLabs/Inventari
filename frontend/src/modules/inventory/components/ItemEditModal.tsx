@@ -37,6 +37,14 @@ import {
 } from "@/modules/inventory/hooks/useItemMutations";
 
 /** The product a record is a card of, read for the valuation section. */
+/** The sheet opened with the picture the record had then; one changed since,
+ * here or elsewhere, belongs to the photo's own endpoint and is not written
+ * back by a rename. */
+function withoutOpenedPicture(submission: Record<string, unknown>) {
+  const { image_url: _opened, ...data } = submission;
+  return data;
+}
+
 function useProductTemplate(templateId: string | null | undefined) {
   const [template, setTemplate] = useState<ProductTemplate | null>(null);
   const [isLoadingTemplate, setIsLoadingTemplate] = useState(false);
@@ -205,6 +213,7 @@ export default function ItemEditModal({
     preview: imagePreview,
     setPreview: setImagePreview,
     hasPicked,
+    isBusy,
     pick: pickImage,
     store: storePickedImage,
   } = usePickedItemImage(itemId, item);
@@ -230,9 +239,9 @@ export default function ItemEditModal({
   const updateItemMutation = useUpdateItem();
 
   const updateMutation = {
-    mutate: (data: Record<string, unknown>) =>
+    mutate: (submission: Record<string, unknown>) =>
       updateItemMutation.mutate(
-        { id: itemId, data },
+        { id: itemId, data: withoutOpenedPicture(submission) },
         {
           onSuccess: async () => {
             await storePickedImage(
@@ -251,7 +260,7 @@ export default function ItemEditModal({
           },
         },
       ),
-    isPending: updateItemMutation.isPending,
+    isPending: isBusy(updateItemMutation.isPending),
   };
 
   const {

@@ -49,8 +49,24 @@ class TestAReplacedCoverIsANewAddress:
         served = client.get(second, headers=headers)
         assert served.status_code == status.HTTP_200_OK
         assert served.content == _png((0, 0, 255))
-        # Nothing names the old file any more, so it does not stay behind.
-        assert client.get(first, headers=headers).status_code == 404
+
+    def test_a_copy_of_the_old_reference_keeps_its_picture(
+        self, client, test_item, test_items_batch, test_user
+    ):
+        # An opened package copies the reference to its own row; a stale
+        # form writes the old one back. Neither is left naming a deleted file
+        # when the original's photo is replaced.
+        headers = _auth(test_user)
+        first = self._upload(client, test_item, headers, (255, 0, 0))
+        copy = test_items_batch[0]
+        put = client.put(
+            f'/api/v1/items/{copy.id}', json={'image_url': first}, headers=headers
+        )
+        assert put.status_code == status.HTTP_200_OK, put.text
+
+        self._upload(client, test_item, headers, (0, 0, 255))
+
+        assert client.get(first, headers=headers).status_code == status.HTTP_200_OK
 
     def test_the_same_picture_twice_keeps_one_address_and_its_file(
         self, client, test_item, test_user

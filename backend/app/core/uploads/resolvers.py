@@ -27,7 +27,7 @@ _EXT_TO_MIME: dict[str, str] = {
 
 
 class ItemCoverResolver(UploadPathResolver):
-    """Resolve ``<org_id>/items/<item_id>/cover.<ext>`` — the item cover image.
+    """Resolve ``<org_id>/items/<item_id>/cover.<digest>.<ext>`` — the item cover image.
 
     Cover uploads (_items_images.py) write the file and set ``item.image_url``
     but never create an attachment row, so ownership is verified by loading the
@@ -40,7 +40,7 @@ class ItemCoverResolver(UploadPathResolver):
     rest of it looks like.
 
     A cover URL stored before the org-scoped move lacks that segment
-    (``items/<item_id>/cover.<ext>``) and is deliberately unresolved: the
+    (``items/<item_id>/cover.<digest>.<ext>``) and is deliberately unresolved: the
     record is not migrated — dev/demo stores reset with their stacks — so
     the screen shows no cover rather than this route reaching for a path
     outside the caller's namespace.
@@ -53,7 +53,7 @@ class ItemCoverResolver(UploadPathResolver):
         organization_id: UUID,
     ) -> OwnedFileMeta | None:
         parts = file_path.split('/')
-        # Expected shape: <org_id>/items/<item_id>/cover.<ext>
+        # Expected shape: <org_id>/items/<item_id>/cover.<digest>.<ext>
         if len(parts) != 4 or parts[0] != str(organization_id) or parts[1] != 'items':
             return None
         try:

@@ -19,12 +19,25 @@ export function usePickedItemImage(
   const queryClient = useQueryClient();
   const [picked, setPicked] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  /** The photo is on its way after the update has been answered: Save stays
+   * busy until the sheet closes, so a second click cannot send a second
+   * update whose stale write would land after the photo's. */
+  const [isStoring, setIsStoring] = useState(false);
 
   // A record reloaded while a picked photo waits for Save keeps showing the
   // photo that was picked.
   useEffect(() => {
     if (savedUrl && !picked) setPreview(savedUrl);
   }, [savedUrl, picked]);
+
+  // A picked photo's preview is an object URL; it is let go when the preview
+  // moves on or the sheet closes.
+  useEffect(
+    () => () => {
+      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
 
   const pick = (file: File) => {
     setPicked(file);
@@ -41,11 +54,13 @@ export function usePickedItemImage(
     done: () => void,
   ) => {
     if (picked) {
+      setIsStoring(true);
       try {
         await itemsApi.uploadImage(itemId, picked);
       } catch (error) {
         setPicked(null);
         setPreview(savedUrl ?? null);
+        setIsStoring(false);
         refused(extractApiError(error, fallback));
         return;
       }
@@ -57,5 +72,13 @@ export function usePickedItemImage(
     done();
   };
 
-  return { preview, setPreview, hasPicked: picked !== null, pick, store };
+  return {
+    preview,
+    setPreview,
+    hasPicked: picked !== null,
+    /** Busy while the update, or the photo that follows it, is on its way. */
+    isBusy: (updating: boolean) => updating || isStoring,
+    pick,
+    store,
+  };
 }

@@ -132,6 +132,70 @@ describe("ItemEditModal — leaving, refusals and the photo", () => {
     beforeEach(() => {
       // jsdom has no object URLs.
       URL.createObjectURL = vi.fn(() => "blob:picked");
+      URL.revokeObjectURL = vi.fn();
+    });
+
+    it("is not written back by the update: the update never carries the picture the sheet opened with", async () => {
+      let sent: Record<string, unknown> = {};
+      server.use(
+        http.get("/api/v1/items/1", () =>
+          HttpResponse.json({ ...record, image_url: "/uploads/old.jpg" }),
+        ),
+        http.put("/api/v1/items/1", async ({ request }) => {
+          sent = (await request.json()) as Record<string, unknown>;
+          return HttpResponse.json(record);
+        }),
+      );
+      const onClose = vi.fn();
+      render(<ItemEditModal itemId="1" onClose={onClose} />);
+      const name = await screen.findByDisplayValue("Test Item");
+      fireEvent.change(name, { target: { value: "Renamed" } });
+
+      fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(sent.name).toBe("Renamed");
+      expect(sent).not.toHaveProperty("image_url");
+    });
+
+    it("keeps Save busy until the photo is stored, so a second click sends nothing", async () => {
+      let release: () => void = () => {};
+      const puts = vi.fn();
+      const posts = vi.fn();
+      server.use(
+        http.put("/api/v1/items/1", () => {
+          puts();
+          return HttpResponse.json(record);
+        }),
+        http.post("/api/v1/items/1/image", async () => {
+          posts();
+          await new Promise<void>((resolve) => {
+            release = resolve;
+          });
+          return HttpResponse.json({ image_url: "/uploads/stored.jpg" });
+        }),
+      );
+      const onClose = vi.fn();
+      const { container } = render(
+        <ItemEditModal itemId="1" onClose={onClose} />,
+      );
+      await screen.findByDisplayValue("Test Item");
+      pickPhoto(container);
+      const save = screen.getByRole("button", { name: /save changes/i });
+
+      fireEvent.click(save);
+      await waitFor(() => expect(puts).toHaveBeenCalledTimes(1));
+      // The update is answered; the photo is still on its way.
+      await waitFor(() => expect(posts).toHaveBeenCalledTimes(1));
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      expect(save).toBeDisabled();
+      fireEvent.click(save);
+      expect(puts).toHaveBeenCalledTimes(1);
+
+      release();
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
     });
 
     it("waits for Save: nothing is uploaded and the sheet asks before it is closed", async () => {

@@ -66,7 +66,8 @@ class TestAReplacedRecipeCoverIsANewAddress:
 
         assert first != second
         assert client.get(second, headers=auth_headers).status_code == 200
-        assert client.get(first, headers=auth_headers).status_code == 404
+        # The old file stays: a copy of the recipe may still name it.
+        assert client.get(first, headers=auth_headers).status_code == 200
         shown = client.get(f'{RECIPE_URL}/{recipe_id}', headers=auth_headers)
         assert shown.json()['image_url'] == second
 

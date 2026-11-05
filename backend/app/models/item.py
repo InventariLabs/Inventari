@@ -219,7 +219,7 @@ class Item(Base):
         String(255)
     )  # e.g. "Top Drawer", "Shelf 2"
     #: The cover picture's reference, never its address: the org-scoped storage
-    #: key the upload wrote (``<org>/items/<item_id>/cover.<ext>``) or a foreign
+    #: key the upload wrote (``<org>/items/<item_id>/cover.<digest>.<ext>``) or a foreign
     #: ``http(s)`` address for a picture that lives on somebody else's server.
     #: ``image_url`` below builds the address a reader is given, so moving the
     #: files or switching storage backends changes no row. The column keeps its

@@ -716,6 +716,7 @@ describe("ItemEditModal — a picture the server refused", () => {
   beforeEach(() => {
     // jsdom has no object URLs.
     URL.createObjectURL = vi.fn(() => "blob:picked");
+    URL.revokeObjectURL = vi.fn();
     server.use(
       http.get("/api/v1/items/:id", () =>
         HttpResponse.json({
