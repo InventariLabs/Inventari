@@ -450,7 +450,7 @@ export class ApiHelper {
 
   async listWebhooks(
     token: string,
-  ): Promise<Array<{ id: string; name: string }>> {
+  ): Promise<Array<{ id: string; name: string; is_active: boolean }>> {
     const response = await this.request.get("/api/v1/webhooks/endpoints", {
       headers: { Authorization: `Bearer ${token}` },
     });

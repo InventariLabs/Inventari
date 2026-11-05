@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { WebhookCard } from "./WebhookCard";
@@ -157,15 +157,49 @@ describe("WebhookCard status", () => {
       const onReactivate = vi.fn();
       renderCard(TRIPPED, vi.fn(), { onReactivate });
 
-      fireEvent.click(screen.getByRole("button", { name: "Reactivate" }));
+      fireEvent.click(screen.getByRole("button", { name: /^Reactivate / }));
 
       expect(onReactivate).toHaveBeenCalledTimes(1);
+    });
+
+    it("offers exactly one Reactivate, named after the webhook", () => {
+      // The action row used to repeat it, so a phone (where the row spells
+      // its labels out) showed the word twice and a screen reader heard two
+      // identical buttons.
+      renderCard(TRIPPED);
+
+      const buttons = screen.getAllByRole("button", { name: /Reactivate/ });
+      expect(buttons).toHaveLength(1);
+      expect(buttons[0]).toHaveAccessibleName(`Reactivate ${BASE.name}`);
+    });
+
+    it("keeps the icon beside the label instead of stacking it above", () => {
+      renderCard(TRIPPED);
+
+      const banner = screen
+        .getByText(/auto-disabled after 10/i)
+        .closest<HTMLElement>("[class*='bg-yellow-50']")!;
+      const button = within(banner).getByRole("button", {
+        name: /Reactivate/,
+      });
+      // `block` replaces the button's `inline-flex`, which is what puts the
+      // icon and the word on one line.
+      expect(button).toHaveClass("inline-flex");
+      expect(button).not.toHaveClass("block");
+    });
+
+    it("keeps the row's Reactivate for an endpoint somebody paused", () => {
+      renderCard({ is_active: false, auto_disabled_at: null });
+
+      expect(
+        screen.getAllByRole("button", { name: /Reactivate/ }),
+      ).toHaveLength(1);
     });
 
     it("keeps the banner's way back from people who cannot use it", () => {
       renderCard(TRIPPED, vi.fn(), { isAdmin: false });
 
-      expect(screen.queryByRole("button", { name: "Reactivate" })).toBeNull();
+      expect(screen.queryByRole("button", { name: /Reactivate/ })).toBeNull();
     });
 
     it("keeps the error count in the sentence once a passing test has not reset it", () => {
