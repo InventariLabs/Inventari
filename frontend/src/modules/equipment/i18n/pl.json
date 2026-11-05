@@ -147,7 +147,7 @@
       "select_location": "Miejsce",
       "placeholders": {
         "name": "np. Anna Nowak",
-        "email": "anna@firma.pl"
+        "email": "anna@example.com"
       },
       "error_person_required": "Wpisz lub wybierz przypisaną osobę",
       "return_date_past_error": "Data zwrotu nie może być w przeszłości.",
