@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
                   })
                 : t("reset.noEmailBody", {
                     defaultValue:
-                      "No reset link was sent, because email is not configured here. Ask an administrator to set your password or to configure email in Settings.",
+                      "No reset link was sent, because email is not configured here. Ask an administrator to set your password or to configure email in Settings. The only administrator can reset it on the server with the create-admin command (see “Locked out” in DEPLOYMENT.md).",
                   })}
             </p>
           </div>
