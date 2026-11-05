@@ -26,7 +26,10 @@ def _report() -> StockAsOfReportDTO:
 
 
 async def _sheet_html(
-    monkeypatch: pytest.MonkeyPatch, lang: str, country: str | None = None
+    monkeypatch: pytest.MonkeyPatch,
+    lang: str,
+    country: str | None = None,
+    search: str | None = None,
 ) -> str:
     async def no_issuer(organization: Any, lang: str = 'en') -> Any:
         return SimpleNamespace(name='Acme', logo_data_uri=None)
@@ -35,7 +38,7 @@ async def _sheet_html(
     monkeypatch.setattr(svc, 'page_size_of', lambda organization: 'A4')
     monkeypatch.setattr(svc._svc, 'render_to_pdf', lambda html: html.encode())
     pdf = await svc.generate_stock_as_of_pdf(
-        _report(), SimpleNamespace(country=country), lang
+        _report(), SimpleNamespace(country=country), lang, search=search
     )
     return pdf.decode()
 
@@ -78,3 +81,22 @@ async def test_english_sheet_of_an_organization_outside_the_us_is_day_first(
     assert 'Sep 30, 2026' not in uk
     us = await _sheet_html(monkeypatch, 'en', 'US')
     assert 'Sep 30, 2026' in us
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ('lang', 'label'),
+    [
+        ('en', 'Narrowed to'),
+        ('pl', 'Zawężone do'),
+        ('de', 'Eingegrenzt auf'),
+        ('fr', 'Limité à'),
+        ('es', 'Limitado a'),
+    ],
+)
+async def test_a_narrowed_sheet_names_its_search_in_the_reader_language(
+    monkeypatch: pytest.MonkeyPatch, lang: str, label: str
+) -> None:
+    html = await _sheet_html(monkeypatch, lang, search='tomat')
+    assert label in html and 'tomat' in html
+    assert label not in await _sheet_html(monkeypatch, lang)

@@ -71,7 +71,7 @@ def _holds() -> ColumnElement[bool]:
     return and_(Item.quantity > _ZERO, Item.quantity != _NAN)
 
 
-def product_matches(pattern: str) -> ColumnElement[bool]:
+def _product_matches(pattern: str) -> ColumnElement[bool]:
     """What a typed string is matched against on the product's side.
 
     Its name, brand, the code a scan wrote and its catalogue number — the
@@ -89,7 +89,7 @@ def product_matches(pattern: str) -> ColumnElement[bool]:
     )
 
 
-def _searched_products(organization_id: UUID, pattern: str) -> CompoundSelect:
+def searched_products(organization_id: UUID, pattern: str) -> CompoundSelect:
     """The products a typed string can reach: by their own fields or by a batch.
 
     Narrowing to these first is what keeps a search cheap: the groups of
@@ -100,7 +100,7 @@ def _searched_products(organization_id: UUID, pattern: str) -> CompoundSelect:
         select(ProductTemplate.id)
         .where(
             ProductTemplate.organization_id == organization_id,
-            product_matches(pattern),
+            _product_matches(pattern),
         )
         .union(
             select(StockLot.product_template_id).where(
@@ -195,11 +195,11 @@ async def _count_groups_async(
     if pattern is not None:
         groups = (
             groups.where(
-                Item.template_id.in_(_searched_products(organization_id, pattern))
+                Item.template_id.in_(searched_products(organization_id, pattern))
             )
             .join(ProductTemplate, ProductTemplate.id == Item.template_id)
             .outerjoin(StockLot, StockLot.id == Item.lot_id)
-            .where(or_(product_matches(pattern), StockLot.name.ilike(pattern)))
+            .where(or_(_product_matches(pattern), StockLot.name.ilike(pattern)))
         )
     if count_up_to is not None:
         groups = groups.limit(count_up_to + 1)
@@ -352,9 +352,9 @@ async def list_rows_for_org_async(
     if pattern is not None:
         stmt = stmt.where(
             StockAnchor.product_template_id.in_(
-                _searched_products(organization_id, pattern)
+                searched_products(organization_id, pattern)
             ),
-            or_(product_matches(pattern), StockLot.name.ilike(pattern)),
+            or_(_product_matches(pattern), StockLot.name.ilike(pattern)),
         )
 
     rows: list[StockQuantRowDTO] = []

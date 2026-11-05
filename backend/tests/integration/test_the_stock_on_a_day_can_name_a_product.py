@@ -19,6 +19,7 @@ from openpyxl import load_workbook
 from sqlalchemy import update
 
 from app.models.product_template import ProductTemplate
+from app.models.stock_lot import StockLot
 from app.models.stock_move import StockMove
 from app.models.storage_location import StorageLocation
 
@@ -114,3 +115,48 @@ def test_the_spreadsheet_carries_the_narrowed_report(
     cells = [str(cell.value) for row in sheet.iter_rows() for cell in row]
     assert 'Sugar' in cells
     assert 'Rye flour' not in cells
+
+
+def test_a_search_reaches_a_product_by_the_name_of_its_batch(
+    client, auth_headers, db_session, test_user, shelf_of_three
+):
+    """The stock list finds a recalled batch by its name; the report must too."""
+    db_session.add(
+        StockLot(
+            organization_id=test_user.organization_id,
+            product_template_id=shelf_of_three['Salt'].id,
+            name='RECALL-77',
+        )
+    )
+    db_session.commit()
+
+    assert _names(client, auth_headers, search='recall-77')[0] == ['Salt']
+
+
+def test_a_long_search_is_not_refused(client, auth_headers, shelf_of_three):
+    assert _names(client, auth_headers, search='x' * 150) == ([], 0)
+
+
+def test_the_printout_states_what_it_was_narrowed_to(
+    client, auth_headers, shelf_of_three, monkeypatch
+):
+    """A filed sheet whose total covers part of the shelf must say which part."""
+    from app.services import stock_report_pdf_service as pdf_service
+
+    monkeypatch.setattr(pdf_service._svc, 'render_to_pdf', lambda html: html.encode())
+    as_of = datetime.now(UTC).isoformat()
+
+    narrowed = client.get(
+        '/api/v1/stock-as-of/export/pdf',
+        headers=auth_headers,
+        params={'as_of': as_of, 'search': 'sugar'},
+    )
+    assert narrowed.status_code == status.HTTP_200_OK, narrowed.text
+    html = narrowed.content.decode()
+    assert 'Narrowed to' in html and 'sugar' in html
+    assert 'Rye flour' not in html
+
+    whole = client.get(
+        '/api/v1/stock-as-of/export/pdf', headers=auth_headers, params={'as_of': as_of}
+    )
+    assert 'Narrowed to' not in whole.content.decode()

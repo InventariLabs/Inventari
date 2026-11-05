@@ -422,6 +422,16 @@ describe("StockAsOfPage — the address carries the report", () => {
     await waitFor(() => expect(asked.query).toMatchObject({ search: "rye" }));
   });
 
+  it("sends the text the way it words the empty answer: without the spaces around it", () => {
+    renderAt("/inventory/stock/as-of?search=%20%20tomat%20");
+    expect(asked.query).toMatchObject({ search: "tomat" });
+  });
+
+  it("sends no search for a field that holds only spaces", () => {
+    renderAt("/inventory/stock/as-of?search=%20%20%20");
+    expect(asked.query.search).toBeUndefined();
+  });
+
   it("says the search found nothing, not that the shelf was empty", () => {
     state = { data: { ...REPORT, items: [], total: 0 }, isError: false };
     renderAt("/inventory/stock/as-of?search=zzz");

@@ -163,10 +163,9 @@ async def stock_as_of(
     ),
     search: str | None = Query(
         None,
-        max_length=100,
         description=(
-            'Narrows the report to the products whose name, brand, barcode '
-            'or catalogue number contains this text. The total and the '
+            'Narrows the report to the products whose name, brand, barcode, '
+            'catalogue number or batch contains this text. The total and the '
             'unpriced count then speak about those products only.'
         ),
     ),
@@ -194,10 +193,9 @@ async def stock_as_of_xlsx(
     location_id: UUID | None = Query(None),
     search: str | None = Query(
         None,
-        max_length=100,
         description=(
-            'Narrows the report to the products whose name, brand, barcode '
-            'or catalogue number contains this text. The total and the '
+            'Narrows the report to the products whose name, brand, barcode, '
+            'catalogue number or batch contains this text. The total and the '
             'unpriced count then speak about those products only.'
         ),
     ),
@@ -226,10 +224,9 @@ async def stock_as_of_pdf(
     location_id: UUID | None = Query(None),
     search: str | None = Query(
         None,
-        max_length=100,
         description=(
-            'Narrows the report to the products whose name, brand, barcode '
-            'or catalogue number contains this text. The total and the '
+            'Narrows the report to the products whose name, brand, barcode, '
+            'catalogue number or batch contains this text. The total and the '
             'unpriced count then speak about those products only.'
         ),
     ),
@@ -259,7 +256,11 @@ async def stock_as_of_pdf(
         )
     show_value = await _shows_inventory_value_async(db, org_id)
     pdf = await generate_stock_as_of_pdf(
-        report, organization, get_current_lang(), show_value=show_value
+        report,
+        organization,
+        get_current_lang(),
+        show_value=show_value,
+        search=search,
     )
     filename = f'inventari_stock_{report.as_of.date().isoformat()}.pdf'
     return Response(

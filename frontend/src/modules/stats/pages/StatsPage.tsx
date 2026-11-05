@@ -28,6 +28,7 @@ import {
   useStatsConfig,
   useReconciliation,
 } from "@/modules/stats/hooks/useStats";
+import { useShowInventoryValue } from "@/modules/shared/hooks/useShowInventoryValue";
 import { useTracksExpiry } from "@/modules/shared/hooks/useTracksExpiry";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
 import { cn } from "@/lib/utils";
@@ -86,9 +87,10 @@ export default function StatsPage() {
   const { data: statsConfig, isLoading: isLoadingConfig } = useStatsConfig();
   const analyticsEnabled = statsConfig?.enable_analytics ?? true;
   // Same gate, other surface: the value signal on the overview is a business
-  // metric, and the home profile presets it off. Fail-open matches the
-  // backend default, as above.
-  const showInventoryValue = statsConfig?.show_inventory_value ?? true;
+  // metric, and the home profile presets it off. Read through the one hook
+  // every other screen uses, so the figure stays hidden until the setting
+  // has answered instead of showing for a moment and being taken back.
+  const showInventoryValue = useShowInventoryValue();
   const showAnalytics = activeTab === "analytics" && analyticsEnabled;
 
   // The overview and the attention count the dashboard's heading reads too —

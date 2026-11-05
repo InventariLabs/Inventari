@@ -27796,17 +27796,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string",
-                  "maxLength": 100
+                  "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only.",
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
               "title": "Search"
             },
-            "description": "Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only."
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           },
           {
             "name": "limit",
@@ -27915,17 +27914,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string",
-                  "maxLength": 100
+                  "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only.",
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
               "title": "Search"
             },
-            "description": "Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only."
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {
@@ -28009,17 +28007,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string",
-                  "maxLength": 100
+                  "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only.",
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
               "title": "Search"
             },
-            "description": "Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only."
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {

@@ -46,7 +46,7 @@ says what the release does rather than what changed since them.
   place you had narrowed to, and the spreadsheet, the printout and the
   `search` parameter of `GET /stock-as-of` follow the same text. Its total and
   counts then speak about the matching products only.
-- The "Show inventory value" setting says that it also governs the item
+- The "Show inventory value" setting says that it also governs the product
   screens, exports and printouts, not only the statistics overview, and a
   profile that hides stock value no longer shows it for a moment while the
   setting is still on its way.

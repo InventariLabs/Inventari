@@ -234,7 +234,7 @@ export default function StockAsOfPage() {
   const query = {
     as_of: endOfDay(day),
     location_id: locationId || undefined,
-    search: filters.search || undefined,
+    search: filters.search.trim() || undefined,
   };
   const {
     data: report,

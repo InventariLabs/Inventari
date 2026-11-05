@@ -63,7 +63,7 @@ from app.models.product_template import ProductTemplate
 from app.models.stock_move import StockMove, StockMoveState
 from app.models.stock_valuation_layer import StockValuationLayer, layer_dated_at
 from app.models.uom import Uom
-from app.services.stock_quants_service import product_matches
+from app.services.stock_quants_service import searched_products
 from app.services.storage._queries import descendant_ids_async
 from app.services.storage._relocation import parents_as_of_async, subtree_of
 
@@ -222,14 +222,12 @@ def _quantities_as_of(
     )
     if product_pattern is not None:
         # The products a typed string reaches, read as the stock list reads
-        # it — narrowing the report to them keeps the figures beside the
-        # rows (the total, the unpriced count) about the same products.
+        # it (their own fields and their batches) — narrowing the report to
+        # them keeps the figures beside the rows (the total, the unpriced
+        # count) about the same products.
         quantities = quantities.where(
             sides.c.product_template_id.in_(
-                select(ProductTemplate.id).where(
-                    ProductTemplate.organization_id == organization_id,
-                    product_matches(product_pattern),
-                )
+                searched_products(organization_id, product_pattern)
             )
         )
     return quantities
