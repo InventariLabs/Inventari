@@ -64,6 +64,7 @@ export default function QuickAddModal({
     carriedOver,
     clearCarriedOver,
     categories,
+    categoriesFailure,
     templateUnit,
     pendingUnitChoice,
     resolveUnitChoice,
@@ -241,6 +242,7 @@ export default function QuickAddModal({
                 handleSubmit={submit}
                 isFromHistory={isFromHistory}
                 categories={categories}
+                categoriesFailure={categoriesFailure}
                 onAddCategory={() => setShowNewCategoryForm(true)}
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}

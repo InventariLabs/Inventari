@@ -22,7 +22,8 @@ const UNSIZED = new Set(["content", "contentSm"]);
  * so stating it says nothing the size had not said, and the button stays as
  * tall as its text.
  */
-const VALUE = "(?:full|screen|fit|min|max|\\d+(?:\\.5)?|\\[[^\\]]+\\])";
+const ZERO = "(?:0(?:\\.0+)?|\\[0(?:\\.0+)?[a-z%]*\\])(?=$|[\\s\"'`}])";
+const VALUE = `(?!${ZERO})(?:full|screen|fit|min|max|\\d+(?:\\.5)?|\\[[^\\]]+\\])`;
 const HEIGHT = new RegExp(`(?:^|[\\s"'\`{])(?:min-h|h|py|p)-${VALUE}`);
 
 export default {

@@ -64,6 +64,7 @@ export default function AddItemPage() {
     carriedOver,
     clearCarriedOver,
     categories,
+    categoriesFailure,
     assignMutation,
     handleFileSelect,
     handleImageSelect,
@@ -173,6 +174,7 @@ export default function AddItemPage() {
                 fieldDefinitions={fieldDefinitions}
                 handleSubmit={handleSubmit}
                 categories={categories}
+                categoriesFailure={categoriesFailure}
                 onAddCategory={() => setShowNewCategoryForm(true)}
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}

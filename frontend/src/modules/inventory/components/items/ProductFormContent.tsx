@@ -4,9 +4,15 @@ import type { ReactNode } from "react";
 import type { FieldDefinition, CategoryDTO } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { InlineQueryError } from "@/components/ui/QueryResult";
 import UnifiedFieldRenderer from "../UnifiedFieldRenderer";
 import type { TemplateUnitPrompt } from "@/modules/inventory/hooks/useItemForm";
 import { LocationCombobox } from "@/module-sdk";
+
+export interface CategoriesFailure {
+  error: unknown;
+  retry: () => void;
+}
 
 interface ProductFormContentProps {
   formData: Record<string, unknown>;
@@ -16,6 +22,11 @@ interface ProductFormContentProps {
   errors: Record<string, string>;
   fieldDefinitions: FieldDefinition[];
   categories?: CategoryDTO[];
+  /**
+   * The category list never arrived. Which fields the form draws is read from
+   * it, so the reader is told the form may be short of some.
+   */
+  categoriesFailure?: CategoriesFailure | null;
   onAddCategory?: () => void;
   imagePreview?: string | null;
   setImagePreview?: (url: string | null) => void;
@@ -53,6 +64,7 @@ export default function ProductFormContent({
   errors,
   fieldDefinitions,
   categories,
+  categoriesFailure,
   onAddCategory,
   imagePreview,
   setImagePreview,
@@ -137,6 +149,9 @@ export default function ProductFormContent({
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
+                    // Emptied so that picking this file again, after a refusal
+                    // say, is a change the browser reports.
+                    e.target.value = "";
                     if (file) {
                       // The local preview bridges the wait for an upload;
                       // once the handler's promise settles it must not land
@@ -249,6 +264,14 @@ export default function ProductFormContent({
           </div>
         </div>
       </div>
+
+      {categoriesFailure && (
+        <InlineQueryError
+          error={categoriesFailure.error}
+          onRetry={categoriesFailure.retry}
+          message={t("categoriesUnavailable")}
+        />
+      )}
 
       {/* SECTION 1: IDENTITY */}
       {hasVisibleIdentity && (

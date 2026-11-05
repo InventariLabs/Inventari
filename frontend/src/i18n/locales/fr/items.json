@@ -63,6 +63,7 @@
     "DISPOSED": "Éliminé",
     "ARCHIVED": "Archivé"
   },
+  "categoriesUnavailable": "Les catégories n'ont pas pu être chargées : certains champs peuvent manquer dans ce formulaire.",
   "itemName": "Nom du produit",
   "itemNamePlaceholder": "ex. Lait entier 1 l",
   "itemBrand": "Marque",

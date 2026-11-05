@@ -103,8 +103,10 @@ const MAKER_RECIPE_ENTRY = {
   snapshot: {
     name: "Powidła śliwkowe",
     ingredient: "Cukier biały",
-    before: { qty_per_batch: 2, uom: "kg" },
-    after: { qty_per_batch: 5, uom: "kg" },
+    // The writer keeps only the keys whose value changed, so a change of the
+    // quantity alone carries no unit on either side.
+    before: { qty_per_batch: 2 },
+    after: { qty_per_batch: 5 },
   },
   reason: null,
   meta_data: null,

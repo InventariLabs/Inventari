@@ -247,6 +247,17 @@ class TestTheLineKeepsTheUnitOfWhatItNames:
                 ],
             },
         )
+        # Creating the line copies the template's unit onto it, which would
+        # answer the session row without ever reading the template. Clear it
+        # to get the shape this test is named for: a line that carries no
+        # unit of its own and has only the template to ask.
+        stored = db_session.scalars(
+            select(DocumentLine).where(DocumentLine.document_id == uuid.UUID(doc_id))
+        ).one()
+        assert stored.uom_id == doc_uom_pcs.id
+        stored.uom_id = None
+        db_session.commit()
+
         _confirm(client, doc_auth_headers, doc_id)
 
         resp = client.post(

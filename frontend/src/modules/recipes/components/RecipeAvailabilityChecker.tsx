@@ -200,7 +200,7 @@ export default function RecipeAvailabilityChecker({
               variant="ghost"
               onClick={() => setSpicesExpanded((v) => !v)}
               aria-expanded={spicesExpanded}
-              className="w-full justify-start p-0 text-xs text-on-muted"
+              className="w-full justify-start px-0 py-2 min-h-11 md:min-h-10 text-xs text-on-muted"
             >
               <ChevronDown
                 size={16}

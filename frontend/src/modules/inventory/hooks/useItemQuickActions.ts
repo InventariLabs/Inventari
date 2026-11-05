@@ -224,10 +224,12 @@ export function useItemQuickActions(
   // The vocabulary above switches with the record's category: an asset is
   // checked in and disposed, a product is topped up and deleted. The switch
   // reads as arbitrary on the one screen where both kinds of record live, so
-  // the note travels with the actions and says why they sound different.
-  const vocabularyNote = isEquipmentItem
-    ? t("items:quickActions.equipmentNote")
-    : null;
+  // the note travels with the actions and says why they sound different —
+  // and stays away from an account offered none of them.
+  const vocabularyNote =
+    isEquipmentItem && actions.length > 0
+      ? t("items:quickActions.equipmentNote")
+      : null;
 
   return {
     actions,

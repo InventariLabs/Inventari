@@ -63,6 +63,7 @@
     "DISPOSED": "Desechado",
     "ARCHIVED": "Archivado"
   },
+  "categoriesUnavailable": "No se pudieron cargar las categorías, por lo que pueden faltar algunos campos en este formulario.",
   "itemName": "Nombre del producto",
   "itemNamePlaceholder": "ej. Leche entera 1 l",
   "itemBrand": "Marca",

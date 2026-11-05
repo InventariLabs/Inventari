@@ -63,6 +63,7 @@
     "DISPOSED": "Disposed",
     "ARCHIVED": "Archived"
   },
+  "categoriesUnavailable": "The categories could not be loaded, so this form may be missing some of its fields.",
   "itemName": "Product name",
   "itemNamePlaceholder": "e.g. Whole milk 1 l",
   "itemBrand": "Brand",
