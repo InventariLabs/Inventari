@@ -303,8 +303,7 @@
     "added_toast_no_list_one": "1 Artikel hinzugefügt",
     "added_toast_no_list_other": "{{count}} Artikel hinzugefügt",
     "already_listed_toast_one": "Schon auf der Liste „{{list}}“: {{count}} Artikel",
-    "already_listed_toast_other": "Schon auf der Liste „{{list}}“: {{count}} Artikel",
-    "on_other_lists_toast": "Schon auf einer anderen offenen Liste: {{names}} (auf {{lists}})"
+    "already_listed_toast_other": "Schon auf der Liste „{{list}}“: {{count}} Artikel"
   },
   "history": {
     "title": "Kochverlauf",

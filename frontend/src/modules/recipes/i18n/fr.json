@@ -303,8 +303,7 @@
     "added_toast_no_list_one": "1 article ajouté",
     "added_toast_no_list_other": "{{count}} articles ajoutés",
     "already_listed_toast_one": "Déjà sur la liste « {{list}} » : {{count}} article",
-    "already_listed_toast_other": "Déjà sur la liste « {{list}} » : {{count}} articles",
-    "on_other_lists_toast": "Déjà sur une autre liste ouverte : {{names}} (sur {{lists}})"
+    "already_listed_toast_other": "Déjà sur la liste « {{list}} » : {{count}} articles"
   },
   "history": {
     "title": "Historique de cuisson",

@@ -15,7 +15,8 @@ import ServingsSelector from "./ServingsSelector";
 import { Card } from "@/components/ui/Card";
 import { useModules } from "@/contexts/ModulesContext";
 import type { IngredientAvailability } from "@/modules/recipes/types/core";
-import { isSpiceQuantity, onOtherListsMessage } from "../utils";
+import { isSpiceQuantity } from "../utils";
+import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
 
 /**
  * The backend's `needs_buying` predicate, mirrored.

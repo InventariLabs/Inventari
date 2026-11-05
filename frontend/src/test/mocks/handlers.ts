@@ -482,6 +482,13 @@ export const handlers = [
     });
   }),
 
+  // Ahead of `/items/:id`, which would take "product-templates" for an id.
+  // The name field of a create form asks which products contain what is
+  // typed; the catalogue holds none unless a test says otherwise.
+  http.get("/api/v1/items/product-templates", () => {
+    return HttpResponse.json([]);
+  }),
+
   http.get("/api/v1/items/:id", () => {
     return HttpResponse.json({
       id: "1",

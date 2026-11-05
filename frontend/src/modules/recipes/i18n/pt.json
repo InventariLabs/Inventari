@@ -300,8 +300,7 @@
     "added_toast_no_list_one": "1 item adicionado",
     "added_toast_no_list_other": "{{count}} itens adicionados",
     "already_listed_toast_one": "Já na lista \"{{list}}\": {{count}} item",
-    "already_listed_toast_other": "Já na lista \"{{list}}\": {{count}} itens",
-    "on_other_lists_toast": "Já em outra lista aberta: {{names}} (em {{lists}})"
+    "already_listed_toast_other": "Já na lista \"{{list}}\": {{count}} itens"
   },
   "history": {
     "title": "Histórico de preparo",

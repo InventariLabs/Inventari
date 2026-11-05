@@ -269,7 +269,7 @@ class ShoppingListsAPI:
         db: AsyncSession,
         org_id: UUID,
         *,
-        exclude_list_id: UUID | None = None,
+        exclude_list_id: UUID,
     ) -> list[tuple[ShoppingListDTO, ShoppingListItemDTO]]:
         """Async: the lines still to buy on the organization's active lists.
 
@@ -292,13 +292,12 @@ class ShoppingListsAPI:
             )
             .where(
                 ShoppingList.organization_id == org_id,
+                ShoppingList.id != exclude_list_id,
                 ShoppingList.status == ShoppingListStatus.ACTIVE.value,
                 ShoppingListItem.is_purchased.is_(False),
             )
             .order_by(ShoppingList.created_at, ShoppingListItem.name)
         )
-        if exclude_list_id is not None:
-            query = query.where(ShoppingList.id != exclude_list_id)
         rows = (await db.execute(query)).all()
         return [
             (

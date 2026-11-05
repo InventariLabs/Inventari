@@ -1,4 +1,3 @@
-import type { TFunction } from "i18next";
 import type { RecipeIngredient } from "@/modules/recipes/types/core";
 import { formatQuantityLocale, toAmount } from "@/utils/formatters";
 
@@ -139,20 +138,3 @@ export const needsProductLink = (item: {
   is_linked: boolean;
   recommended_item_id: string | null;
 }): boolean => item.is_linked === false && item.recommended_item_id == null;
-
-/**
- * The sentence for goods a freshly written shopping list shares with another
- * open one, or null when nothing overlaps — each distinct name and list once,
- * in the order the server named them.
- */
-export function onOtherListsMessage(
-  t: TFunction,
-  lines: readonly { name: string; list_name: string }[] | undefined,
-): string | null {
-  if (!lines || lines.length === 0) return null;
-  const distinct = (values: string[]) => [...new Set(values)].join(", ");
-  return t("recipes:shopping.on_other_lists_toast", {
-    names: distinct(lines.map((line) => line.name)),
-    lists: distinct(lines.map((line) => `“${line.list_name}”`)),
-  });
-}

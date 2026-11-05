@@ -1323,5 +1323,9 @@
   "settingsSave": {
     "region": "Änderungen auf dieser Seite speichern",
     "unsaved": "Sie haben ungespeicherte Änderungen"
+  },
+  "shoppingOverlap": {
+    "toast": "Steht schon auf einer anderen offenen Liste: {{where}}",
+    "onList": "{{names}} auf „{{list}}“"
   }
 }

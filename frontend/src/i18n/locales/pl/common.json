@@ -1377,5 +1377,9 @@
   "settingsSave": {
     "region": "Zapis zmian na tej stronie",
     "unsaved": "Masz niezapisane zmiany"
+  },
+  "shoppingOverlap": {
+    "toast": "To już jest na innej otwartej liście: {{where}}",
+    "onList": "{{names}} na liście „{{list}}”"
   }
 }

@@ -6,6 +6,7 @@ import { useRecipeOptions } from "../hooks/useShoppingLists";
 import { useModules } from "@/contexts/ModulesContext";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
+import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { QueryError } from "@/components/ui/QueryResult";
@@ -66,6 +67,9 @@ export default function AddFromRecipesModal({
           defaultValue: `Added ${result.added_count} ingredients`,
         }),
       );
+      // The same goods may already stand on another open list.
+      const overlap = onOtherListsMessage(t, result.on_other_lists);
+      if (overlap) toast.warning(overlap);
       onSuccess();
     } catch (err) {
       setAddError(extractApiError(err, t("addFromRecipes.failed")));

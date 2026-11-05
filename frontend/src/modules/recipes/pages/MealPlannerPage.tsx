@@ -34,7 +34,7 @@ import { DateInput } from "@/components/ui/DateInput";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { todayIso } from "@/utils/formatters";
-import { onOtherListsMessage } from "@/modules/recipes/utils";
+import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
 
 const DEFAULT_SLOTS: MealSlot[] = ["BREAKFAST", "LUNCH", "DINNER"];
 const SLOT_ORDER: MealSlot[] = [...DEFAULT_SLOTS, "SNACK"];

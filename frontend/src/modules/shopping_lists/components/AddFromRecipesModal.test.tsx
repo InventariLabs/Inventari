@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddFromRecipesModal from "./AddFromRecipesModal";
+import { toast } from "sonner";
 import { shoppingListsApi } from "../api/shopping-lists";
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn(), warning: vi.fn() },
+}));
 
 vi.mock("../api/shopping-lists", () => ({
   shoppingListsApi: { addFromRecipes: vi.fn() },
@@ -93,5 +98,33 @@ describe("AddFromRecipesModal", () => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
     });
     expect(screen.getByRole("alert")).not.toHaveTextContent(/status code/);
+  });
+
+  it("names the other open list that already asks for the same goods", async () => {
+    vi.mocked(shoppingListsApi.addFromRecipes).mockResolvedValue({
+      added_count: 1,
+      on_other_lists: [
+        { name: "Eggs", list_id: "list-2", list_name: "Week 30" },
+      ],
+    });
+
+    await selectAndSubmit();
+
+    await waitFor(() => expect(toast.warning).toHaveBeenCalledTimes(1));
+    const message = vi.mocked(toast.warning).mock.calls[0][0] as string;
+    expect(message).toContain("Eggs");
+    expect(message).toContain("Week 30");
+  });
+
+  it("stays quiet about overlap when nothing else holds the goods", async () => {
+    vi.mocked(shoppingListsApi.addFromRecipes).mockResolvedValue({
+      added_count: 1,
+      on_other_lists: [],
+    });
+
+    await selectAndSubmit();
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    expect(toast.warning).not.toHaveBeenCalled();
   });
 });

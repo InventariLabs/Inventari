@@ -303,8 +303,7 @@
     "added_toast_no_list_one": "Added 1 item",
     "added_toast_no_list_other": "Added {{count}} items",
     "already_listed_toast_one": "Already on list \"{{list}}\": {{count}} product",
-    "already_listed_toast_other": "Already on list \"{{list}}\": {{count}} products",
-    "on_other_lists_toast": "Already on another open list: {{names}} (on {{lists}})"
+    "already_listed_toast_other": "Already on list \"{{list}}\": {{count}} products"
   },
   "history": {
     "title": "Cooking history",

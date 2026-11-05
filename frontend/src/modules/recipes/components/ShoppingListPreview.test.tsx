@@ -24,6 +24,14 @@ const t = (key: string, opts?: Record<string, unknown>) => {
     const words = commonEn.units as unknown as Record<string, string>;
     return String(words[symbol] ?? symbol);
   }
+  if (key.startsWith("common:shoppingOverlap.")) {
+    const text = (
+      commonEn.shoppingOverlap as unknown as Record<string, string>
+    )[key.slice("common:shoppingOverlap.".length)];
+    return text.replace(/\{\{\w+\}\}/g, (m) =>
+      String(opts?.[m.slice(2, -2)] ?? m),
+    );
+  }
   const path = key.replace("recipes:", "").split(".");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let value: any = en;
@@ -84,6 +92,30 @@ describe("ShoppingListPreview", () => {
     expect(
       screen.getByText("7 ingredients · 2 in pantry · 5 to buy"),
     ).toBeInTheDocument();
+  });
+
+  it("keeps the goods another open list holds in the panel, with the list that holds them", () => {
+    // A toast on this page was gone in seconds, and the panel is what stays.
+    renderPreview({
+      generationResult: {
+        ...result,
+        on_other_lists: [
+          { name: "Flour", list_id: "l-a", list_name: "Week 30" },
+          { name: "Eggs", list_id: "l-a", list_name: "Week 30" },
+          { name: "Eggs", list_id: "l-b", list_name: "Party" },
+        ],
+      },
+    });
+
+    expect(screen.getByTestId("shopping-overlap")).toHaveTextContent(
+      "Already on another open list: Flour, Eggs on “Week 30”; Eggs on “Party”",
+    );
+  });
+
+  it("says nothing about overlap when no other list holds the goods", () => {
+    renderPreview({ generationResult: result });
+
+    expect(screen.queryByTestId("shopping-overlap")).not.toBeInTheDocument();
   });
 
   it("carries the unit symbol into the summary chips, like the list itself", () => {

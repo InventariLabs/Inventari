@@ -91,7 +91,7 @@
     "title": "Aucun produit",
     "tryFilters": "Essayez de modifier les filtres",
     "addFirst": "Ajoutez votre premier produit à un emplacement. L'export sera disponible dès qu'il y aura un produit.",
-    "definedWithoutStock": "Les produits qui n'existent que comme définition — par exemple ceux créés dans une recette — apparaissent ici dès qu'ils ont du stock. Ajoutez-en un à un emplacement pour le voir.",
+    "definedWithoutStock": "Les produits qui n'existent que comme définition — par exemple ceux créés dans une recette ou une nomenclature — apparaissent ici dès qu'ils ont du stock. Ajoutez-en un à un emplacement pour le voir.",
     "noSearchResultsTitle": "Aucun produit correspondant",
     "noSearchResultsDescription": "Aucun résultat pour « {{term}} »",
     "clearSearch": "Effacer la recherche",
@@ -188,7 +188,8 @@
     "selectUnit": "Sélectionner l'unité…",
     "unitLabel": "Unité",
     "unitEmpty": "Choisir",
-    "templateUnitHint": "{{product}} est compté en {{unit}} — cette fiche prend cette unité, sauf si vous en choisissez une autre."
+    "templateUnitHint": "{{product}} est compté en {{unit}} — cette fiche prend cette unité, sauf si vous en choisissez une autre.",
+    "existingProducts": "Déjà dans vos produits :"
   },
   "identificationSection": "Identification du produit",
   "itemWeightNet": "Poids par pièce",
