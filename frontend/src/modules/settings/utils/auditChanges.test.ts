@@ -1369,3 +1369,72 @@ describe("formatAuditValue statuses", () => {
     },
   );
 });
+
+describe("auditChanges category field definitions", () => {
+  const words: Record<string, string> = {
+    "modules:fieldBuilder.types.select": "Dropdown",
+    "modules:fieldBuilder.types.text": "Text",
+    "common:settings.audit.fieldDefinitions.required": "required",
+    "common:settings.audit.fieldDefinitions.added": "Added field {{field}}",
+    "common:settings.audit.fieldDefinitions.removed": "Removed field {{field}}",
+    "common:settings.audit.fieldDefinitions.changed": "Changed field {{field}}",
+  };
+  const say = ((key: string, opts?: Record<string, unknown>) =>
+    (words[key] ?? String(opts?.defaultValue ?? key)).replace(
+      "{{field}}",
+      String(opts?.field),
+    )) as unknown as Parameters<typeof auditFieldLabel>[1];
+  const threadSize = {
+    key: "thread_size",
+    type: "select",
+    label: "Thread size",
+    options: ["M4", "M6"],
+    required: true,
+  };
+  const colour = { key: "colour", type: "text", label: "Colour" };
+
+  it("names an added field by label and type, not as JSON", () => {
+    const [change] = auditChanges(
+      {
+        before: { field_definitions: [colour] },
+        after: { field_definitions: [colour, threadSize] },
+      },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(change.path).toBe("field_definitions");
+    expect(change.to).toBe("Added field Thread size (Dropdown, required)");
+    expect(change.to).not.toContain("{");
+  });
+
+  it("names removed and changed fields as well", () => {
+    const [change] = auditChanges(
+      {
+        before: { field_definitions: [colour, threadSize] },
+        after: {
+          field_definitions: [{ ...threadSize, required: false }],
+        },
+      },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(change.to).toBe(
+      "Changed field Thread size (Dropdown); Removed field Colour (Text)",
+    );
+  });
+
+  it("reads a created category's fields the same way", () => {
+    const [change] = auditChanges(
+      { name: "Fasteners", field_definitions: [threadSize] },
+      "CREATE",
+      undefined,
+      say,
+    );
+
+    expect(change.to).toBe("Added field Thread size (Dropdown, required)");
+  });
+});

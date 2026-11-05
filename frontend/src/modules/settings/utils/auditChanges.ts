@@ -480,6 +480,82 @@ function leafText(
   return text;
 }
 
+/** The key under which a category records the fields its products carry. */
+const FIELD_DEFINITIONS_KEY = "field_definitions";
+
+/** One field definition as a person would name it: "Thread size (Dropdown, required)". */
+function fieldDefinitionText(
+  definition: Record<string, unknown>,
+  t: TranslateFn,
+): string {
+  const key = typeof definition.key === "string" ? definition.key : "";
+  const label =
+    typeof definition.label === "string" && definition.label.trim() !== ""
+      ? definition.label
+      : key || "—";
+  const type = typeof definition.type === "string" ? definition.type : "";
+  const typeName = type
+    ? t(`modules:fieldBuilder.types.${type}`, { defaultValue: type })
+    : "";
+  const details = [
+    typeName,
+    definition.required === true
+      ? t("common:settings.audit.fieldDefinitions.required")
+      : "",
+  ].filter(Boolean);
+  return details.length ? `${label} (${details.join(", ")})` : label;
+}
+
+/**
+ * A category's field definitions as the fields that were added, removed or
+ * changed, matched by key. The list used to print each definition as JSON on
+ * both sides of the arrow; the reader needs the sentence, not the schema.
+ * Null when the two sides are not lists of definitions, so the generic walk
+ * still handles a snapshot written in another shape.
+ */
+function fieldDefinitionChange(
+  before: unknown,
+  after: unknown,
+  t?: TranslateFn,
+): AuditChange | null {
+  const asList = (value: unknown): Record<string, unknown>[] | null => {
+    if (value === null || value === undefined) return [];
+    return Array.isArray(value) && value.every(isPlainObject) ? value : null;
+  };
+  const was = asList(before);
+  const is = asList(after);
+  if (!t || !was || !is) return null;
+  const keyOf = (definition: Record<string, unknown>) =>
+    String(definition.key ?? definition.label ?? "");
+  const wasByKey = new Map(was.map((d) => [keyOf(d), d]));
+  const isByKey = new Map(is.map((d) => [keyOf(d), d]));
+  const lines: string[] = [];
+  for (const [key, definition] of isByKey) {
+    const text = fieldDefinitionText(definition, t);
+    const previous = wasByKey.get(key);
+    if (!previous) {
+      lines.push(
+        t("common:settings.audit.fieldDefinitions.added", { field: text }),
+      );
+    } else if (JSON.stringify(previous) !== JSON.stringify(definition)) {
+      lines.push(
+        t("common:settings.audit.fieldDefinitions.changed", { field: text }),
+      );
+    }
+  }
+  for (const [key, definition] of wasByKey) {
+    if (!isByKey.has(key)) {
+      lines.push(
+        t("common:settings.audit.fieldDefinitions.removed", {
+          field: fieldDefinitionText(definition, t),
+        }),
+      );
+    }
+  }
+  if (lines.length === 0) return null;
+  return { path: FIELD_DEFINITIONS_KEY, from: "—", to: lines.join("; ") };
+}
+
 function walk(
   before: unknown,
   after: unknown,
@@ -496,6 +572,13 @@ function walk(
   // and needing *both* sides to be objects meant the whole value was printed
   // as JSON — `Jina: — → {"api_key":"**********"}` — where the field names
   // were the answer. The same holds in reverse, when a value is cleared.
+  if (prefix.split(".").pop() === FIELD_DEFINITIONS_KEY) {
+    const change = fieldDefinitionChange(before, after, t);
+    if (change) {
+      out.push({ ...change, path: prefix });
+      return;
+    }
+  }
   const beforeFields = absentAsEmpty(before);
   const afterFields = absentAsEmpty(after);
   if (depth < MAX_DEPTH && beforeFields && afterFields) {
@@ -649,6 +732,9 @@ function flatFields(
       from: null,
       to:
         referenceNameOf(snapshot, key, t) ??
+        (key === FIELD_DEFINITIONS_KEY
+          ? fieldDefinitionChange(null, value, t)?.to
+          : undefined) ??
         (key === FIELDS_KEY && Array.isArray(value) && t
           ? value
               .map((field) => auditFieldLabel(String(field), t))

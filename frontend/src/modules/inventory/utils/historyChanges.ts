@@ -32,12 +32,12 @@ export interface HistoryUnit {
  *
  * A row's numbers are in the unit of the record they belong to, but the
  * payload does not carry it — "290.667 → 499" left the reader to guess
- * between grams and pieces. Without a unit in hand the number stays bare.
+ * between grams and pieces. Without a unit in hand the number stays bare,
+ * though still in the reader's number format ("1,5" where the language
+ * writes a comma).
  */
 function amountText(amount: number, { t, unit }: ReadContext): string {
-  return unit?.symbol
-    ? formatQuantityLocalized(t, amount, unit.symbol, unit.rounding)
-    : String(amount);
+  return formatQuantityLocalized(t, amount, unit?.symbol, unit?.rounding);
 }
 
 type ChangeReader = (
@@ -57,14 +57,22 @@ type ChangeReader = (
  * which document the figure came out of.
  */
 function fieldDisplayName(key: string, t: Translate): string {
-  return key
-    .split(".")
-    .map((segment) => {
+  const segments = key.split(".");
+  return segments
+    .map((segment, index) => {
       const sys = SYSTEM_FIELDS[segment] as
         Partial<FieldDefinition> | undefined;
       if (sys?.label) {
         const translated = t(sys.label, { defaultValue: "" });
         if (translated) return translated;
+      }
+      // A custom field of the product form (`meta_data.lactose_free`) is
+      // named by the form's own catalogue entry, so the history says what the
+      // form says. Only below `meta_data`: the same catalogue also holds
+      // form captions ("Unit (pcs, kg, …)") that are not field names.
+      if (segments[index - 1] === "meta_data") {
+        const custom = t(`items:fields.${segment}`, { defaultValue: "" });
+        if (custom) return custom;
       }
       const shared = t(`common:settings.audit.fields.${segment}`, {
         defaultValue: "",
@@ -217,16 +225,23 @@ function readOpened(
   if (left === 0) return t("items:history.openedNothingLeft");
   const unit = changes.left_unit as string | undefined;
   return t("items:history.openedLeft", {
-    amount: unit ? `${left} ${unit}` : String(left),
+    amount: formatQuantityLocalized(t, left, unit),
   });
 }
 
 function readCreated(
   changes: Record<string, unknown>,
-  { t }: ReadContext,
+  ctx: ReadContext,
 ): string {
   const qty = changes.quantity as number | undefined;
-  return qty ? t("items:history.createdWith", { count: qty }) : "";
+  // `count` still picks the plural form; the number itself is printed with
+  // the record's unit, in the reader's format.
+  return qty
+    ? ctx.t("items:history.createdWith", {
+        count: qty,
+        amount: amountText(qty, ctx),
+      })
+    : "";
 }
 
 /**

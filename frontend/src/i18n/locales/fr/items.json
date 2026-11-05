@@ -391,8 +391,8 @@
     },
     "linkedDocument": "Document lié",
     "corrects": "corrige {{number}}",
-    "createdWith_one": "Créé avec la quantité {{count}}",
-    "createdWith_other": "Créé avec la quantité {{count}}",
+    "createdWith_one": "Créé avec la quantité {{amount}}",
+    "createdWith_other": "Créé avec la quantité {{amount}}",
     "createdViaScan": {
       "label": "Créé en scannant l'étiquette {{code}}",
       "barcode": "Créé en scannant le code-barres {{code}}",

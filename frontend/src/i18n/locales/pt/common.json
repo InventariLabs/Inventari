@@ -704,6 +704,12 @@
       "document": "Documento",
       "corrects": "corrige {{number}}",
       "secretChanged": "um novo valor (oculto)",
+      "fieldDefinitions": {
+        "added": "Campo {{field}} adicionado",
+        "removed": "Campo {{field}} removido",
+        "changed": "Campo {{field}} alterado",
+        "required": "obrigatório"
+      },
       "builtInModules": {
         "core": "Básico",
         "locations": "Locais",
