@@ -683,16 +683,15 @@ class AuthService:
         )
 
     @staticmethod
-    async def confirm_password_reset_async(
-        db: AsyncSession, token: str, new_password: str
-    ) -> User:
-        """Verify a reset token and replace the user's password.
+    async def _live_reset_token_async(
+        db: AsyncSession, token: str
+    ) -> tuple[User, str, datetime]:
+        """The user, ``jti`` and expiry of a reset token that can still be used.
 
-        Raises ``ValueError`` for any failure mode (invalid token, unknown
-        user) so the router can map it to a 400. On success the new hash is
-        flushed for the caller to commit; the returned instance reflects it.
+        Raises ``ServiceRejectionError`` for every way a token can be dead —
+        forged, expired, of another type, already spent, or for a user that is
+        gone — so the check and the confirm cannot disagree about which is which.
         """
-        refuse_credential_change_in_demo()
         claims = read_password_reset_claims(token)
         if not claims:
             raise ServiceRejectionError('invalid_reset_token')
@@ -704,6 +703,29 @@ class AuthService:
         user = await db.get(User, user_id)
         if not user:
             raise ServiceRejectionError('invalid_reset_token')
+        return user, jti, expires_at
+
+    @staticmethod
+    async def check_password_reset_token_async(db: AsyncSession, token: str) -> None:
+        """Raise ``ServiceRejectionError`` unless the token could still reset a password.
+
+        Spends nothing: the reset screen asks this on arrival, so a link that
+        is spent or expired is refused before anyone types a password for it.
+        """
+        await AuthService._live_reset_token_async(db, token)
+
+    @staticmethod
+    async def confirm_password_reset_async(
+        db: AsyncSession, token: str, new_password: str
+    ) -> User:
+        """Verify a reset token and replace the user's password.
+
+        Raises ``ValueError`` for any failure mode (invalid token, unknown
+        user) so the router can map it to a 400. On success the new hash is
+        flushed for the caller to commit; the returned instance reflects it.
+        """
+        refuse_credential_change_in_demo()
+        user, jti, expires_at = await AuthService._live_reset_token_async(db, token)
         user.hashed_password = await run_sync_in_thread(
             partial(get_password_hash, new_password)
         )

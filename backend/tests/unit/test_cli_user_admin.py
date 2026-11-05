@@ -466,3 +466,71 @@ class TestCreateAdminRefusesKnownWeakPasswordsInProduction:
 
         assert result.exit_code == 0
         db.add.assert_called()
+
+
+class TestCreateAdminTakesTheAccountsLanguage:
+    """The language of an account made from the host is chosen, not guessed."""
+
+    def _create(self, db: MagicMock, *extra: str):
+        with (
+            patch('app.database.SessionLocal', return_value=db),
+            patch('app.cli.commands_user._mark_credentials_changed', AsyncMock()),
+        ):
+            return runner.invoke(
+                app,
+                [
+                    'user',
+                    'create-admin',
+                    '--email',
+                    'first@b.c',
+                    '--password',
+                    'Passw0rd',
+                    *extra,
+                ],
+            )
+
+    def _new_db(self) -> MagicMock:
+        db = MagicMock()
+        db.scalars.return_value.first.return_value = None
+        db.scalar.return_value = 0
+        return db
+
+    def test_lang_becomes_the_preferred_language(self):
+        from app.models.user import User
+
+        db = self._new_db()
+        result = self._create(db, '--lang', 'pl')
+
+        assert result.exit_code == 0, result.output
+        user = next(
+            c.args[0] for c in db.add.call_args_list if isinstance(c.args[0], User)
+        )
+        assert user.preferred_language == 'pl'
+
+    def test_lang_is_applied_when_the_account_exists(self):
+        db, user = _db_with_existing_user(uuid4())
+
+        result = self._create(db, '--lang', 'de')
+
+        assert result.exit_code == 0, result.output
+        assert user.preferred_language == 'de'
+
+    def test_an_existing_account_keeps_its_language_without_lang(self):
+        db, user = _db_with_existing_user(uuid4())
+        user.preferred_language = 'fr'
+
+        result = self._create(db)
+
+        assert result.exit_code == 0, result.output
+        assert user.preferred_language == 'fr'
+
+    def test_an_unknown_language_is_refused_with_the_valid_ones(self):
+        db = self._new_db()
+
+        result = self._create(db, '--lang', 'xx')
+
+        assert result.exit_code == 1
+        assert 'xx' in result.output
+        assert 'pl' in result.output
+        assert 'Traceback' not in result.output
+        db.add.assert_not_called()

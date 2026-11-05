@@ -348,9 +348,23 @@ later.
 > `create-admin` run after Caddy is already up narrows the window but does
 > not close it.
 
-The same command is also the way back into an installation whose administrator
-lost the password: run against an existing e-mail address, it sets the new
-password, restores the administrator role and signs out every earlier session.
+### Locked out: the administrator forgot the password
+
+The sign-in screen's reset link needs outgoing mail (below). On an installation
+with none, the only administrator has no link to wait for — the reset happens
+on the server, with the command that created the account:
+
+```bash
+docker compose -f docker-compose.prod.yml exec backend \
+  python manage.py user create-admin \
+    --email you@example.com --password '<a new password>'
+```
+
+Run against an existing e-mail address it sets the new password, restores the
+administrator role and signs out every earlier session; the name and the
+organization stay as they were. `--lang pl` (or `en`, `de`, `fr`, `es`, `pt`)
+also sets the language the account opens in; without it the account keeps the
+one it has. The sign-in screen says the same when it finds no mail to send.
 
 ### Outgoing mail
 
