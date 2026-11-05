@@ -15,6 +15,7 @@ import { Boxes, FileDown, Info, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ListControlBar } from "@/components/ui/ListControlBar";
 import { DateInput } from "@/components/ui/DateInput";
 import { LocationCombobox } from "@/module-sdk";
 import { useLocationsById } from "@/module-sdk";
@@ -205,7 +206,13 @@ export default function StockAsOfPage() {
       day: { default: today, urlKey: "date" },
       location: { default: "", urlKey: "location" },
     },
-    { limit: PAGE_SIZE, syncToUrl: true },
+    {
+      limit: PAGE_SIZE,
+      syncToUrl: true,
+      // The stock list links here with what it was narrowed to, so the
+      // reader keeps the product they were looking at.
+      urlSearchKey: "search",
+    },
   );
   // A day typed into the address, or a cleared field, must not take the
   // page down with it: the report cannot end a day that does not exist.
@@ -227,6 +234,7 @@ export default function StockAsOfPage() {
   const query = {
     as_of: endOfDay(day),
     location_id: locationId || undefined,
+    search: filters.search || undefined,
   };
   const {
     data: report,
@@ -260,6 +268,13 @@ export default function StockAsOfPage() {
 
   return (
     <div className="space-y-6">
+      <ListControlBar
+        search={{
+          value: filters.searchInput,
+          onChange: filters.setSearchInput,
+          placeholder: t("inventory:asOf.searchPlaceholder"),
+        }}
+      />
       <Card className="p-4">
         <div className="flex flex-wrap items-end gap-3">
           <DateInput
@@ -324,11 +339,15 @@ export default function StockAsOfPage() {
           icon={Boxes}
           title={t("inventory:asOf.empty.title")}
           description={
-            selectedLocation
-              ? t("inventory:asOf.empty.descriptionAt", {
-                  location: selectedLocation.name,
+            filters.search.trim()
+              ? t("inventory:asOf.empty.descriptionSearch", {
+                  search: filters.search.trim(),
                 })
-              : t("inventory:asOf.empty.description")
+              : selectedLocation
+                ? t("inventory:asOf.empty.descriptionAt", {
+                    location: selectedLocation.name,
+                  })
+                : t("inventory:asOf.empty.description")
           }
         />
       ) : (

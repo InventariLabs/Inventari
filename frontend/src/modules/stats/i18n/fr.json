@@ -66,8 +66,11 @@
         "staple_one": "Dernier achat il y a {{count}} jour, plus de deux fois l’intervalle habituel.",
         "staple_many": "Dernier achat il y a {{count}} jours, plus de deux fois l’intervalle habituel.",
         "staple_other": "Dernier achat il y a {{count}} jours, plus de deux fois l’intervalle habituel.",
-        "expiring": "Expire le {{date}}.",
-        "expired": "Périmé depuis le {{date}}."
+        "expiringToday": "Expire aujourd'hui, le {{date}}.",
+        "expiring_one": "Expire le {{date}}, dans {{count}} jour.",
+        "expiring_other": "Expire le {{date}}, dans {{count}} jours.",
+        "expired_one": "Périmé depuis le {{date}}, il y a {{count}} jour.",
+        "expired_other": "Périmé depuis le {{date}}, il y a {{count}} jours."
       },
       "noAlerts": "Aucune alerte - votre inventaire a l'air bon !",
       "noData": "Rien à vérifier pour l’instant — ajoutez des articles et les alertes suivront"
@@ -137,7 +140,7 @@
     "enableAnalytics": "Activer l'analytique",
     "enableAnalyticsDescription": "Afficher l'onglet analytique (rotation, prévisions de dépenses, habitudes d'achat). Désactiver pour les petits inventaires domestiques dont l'historique est insuffisant pour des analyses pertinentes.",
     "showInventoryValue": "Afficher la valeur du stock",
-    "showInventoryValueDescription": "Afficher la valeur totale du stock dans l'aperçu des statistiques. C'est une métrique d'entreprise — désactiver pour les inventaires domestiques qui ne conservent pas de prix d'achat à additionner."
+    "showInventoryValueDescription": "Afficher les valeurs du stock dans toute l'application : dans l'aperçu des statistiques, sur les écrans des articles, ainsi que dans les exports et les impressions. C'est une métrique d'entreprise — désactiver pour les inventaires domestiques qui ne conservent pas de prix d'achat à additionner."
   },
   "navigation": {
     "settings": "Analytique"

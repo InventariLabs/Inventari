@@ -42995,6 +42995,8 @@ export interface operations {
                 as_of: string;
                 /** @description This place and everything below it. Quantities only — the cost history is kept per product, not per shelf. */
                 location_id?: string | null;
+                /** @description Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only. */
+                search?: string | null;
                 limit?: number;
                 offset?: number;
             };
@@ -43029,6 +43031,8 @@ export interface operations {
             query: {
                 as_of: string;
                 location_id?: string | null;
+                /** @description Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only. */
+                search?: string | null;
             };
             header?: never;
             path?: never;
@@ -43061,6 +43065,8 @@ export interface operations {
             query: {
                 as_of: string;
                 location_id?: string | null;
+                /** @description Narrows the report to the products whose name, brand, barcode or catalogue number contains this text. The total and the unpriced count then speak about those products only. */
+                search?: string | null;
             };
             header?: never;
             path?: never;

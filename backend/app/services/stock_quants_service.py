@@ -71,7 +71,7 @@ def _holds() -> ColumnElement[bool]:
     return and_(Item.quantity > _ZERO, Item.quantity != _NAN)
 
 
-def _product_matches(pattern: str) -> ColumnElement[bool]:
+def product_matches(pattern: str) -> ColumnElement[bool]:
     """What a typed string is matched against on the product's side.
 
     Its name, brand, the code a scan wrote and its catalogue number — the
@@ -100,7 +100,7 @@ def _searched_products(organization_id: UUID, pattern: str) -> CompoundSelect:
         select(ProductTemplate.id)
         .where(
             ProductTemplate.organization_id == organization_id,
-            _product_matches(pattern),
+            product_matches(pattern),
         )
         .union(
             select(StockLot.product_template_id).where(
@@ -199,7 +199,7 @@ async def _count_groups_async(
             )
             .join(ProductTemplate, ProductTemplate.id == Item.template_id)
             .outerjoin(StockLot, StockLot.id == Item.lot_id)
-            .where(or_(_product_matches(pattern), StockLot.name.ilike(pattern)))
+            .where(or_(product_matches(pattern), StockLot.name.ilike(pattern)))
         )
     if count_up_to is not None:
         groups = groups.limit(count_up_to + 1)
@@ -354,7 +354,7 @@ async def list_rows_for_org_async(
             StockAnchor.product_template_id.in_(
                 _searched_products(organization_id, pattern)
             ),
-            or_(_product_matches(pattern), StockLot.name.ilike(pattern)),
+            or_(product_matches(pattern), StockLot.name.ilike(pattern)),
         )
 
     rows: list[StockQuantRowDTO] = []

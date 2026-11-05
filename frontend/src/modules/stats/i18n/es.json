@@ -66,8 +66,11 @@
         "staple_one": "Última compra hace {{count}} día, más del doble de lo habitual.",
         "staple_many": "Última compra hace {{count}} días, más del doble de lo habitual.",
         "staple_other": "Última compra hace {{count}} días, más del doble de lo habitual.",
-        "expiring": "Caduca el {{date}}.",
-        "expired": "Caducó el {{date}}."
+        "expiringToday": "Caduca hoy, {{date}}.",
+        "expiring_one": "Caduca el {{date}}, en {{count}} día.",
+        "expiring_other": "Caduca el {{date}}, en {{count}} días.",
+        "expired_one": "Caducó el {{date}}, hace {{count}} día.",
+        "expired_other": "Caducó el {{date}}, hace {{count}} días."
       },
       "noAlerts": "Sin alertas - ¡su inventario se ve bien!",
       "noData": "Aún no hay nada que revisar — añade artículos y llegarán los avisos"
@@ -137,7 +140,7 @@
     "enableAnalytics": "Activar analítica",
     "enableAnalyticsDescription": "Mostrar la pestaña de analítica (rotación, previsiones de gasto, patrones de compra). Desactivar para inventarios domésticos pequeños sin historial suficiente para que estos análisis sean útiles.",
     "showInventoryValue": "Mostrar valor del inventario",
-    "showInventoryValueDescription": "Mostrar el valor total del stock en el resumen de estadísticas. Es una métrica de negocio — desactivar para inventarios domésticos que no guardan precios de compra con los que sumarlo."
+    "showInventoryValueDescription": "Mostrar los valores del stock en toda la aplicación: en el resumen de estadísticas, en las pantallas de artículos y en las exportaciones e impresiones. Es una métrica de negocio — desactivar para inventarios domésticos que no guardan precios de compra con los que sumarlo."
   },
   "navigation": {
     "settings": "Analíticas"

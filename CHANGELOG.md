@@ -41,6 +41,20 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The stock-on-a-date report can be narrowed to a product: it has a search
+  field, the stock list's "Stock on a date" button carries the search and the
+  place you had narrowed to, and the spreadsheet, the printout and the
+  `search` parameter of `GET /stock-as-of` follow the same text. Its total and
+  counts then speak about the matching products only.
+- The "Show inventory value" setting says that it also governs the item
+  screens, exports and printouts, not only the statistics overview, and a
+  profile that hides stock value no longer shows it for a moment while the
+  setting is still on its way.
+- Smart alerts state in words how far off an expiry date is ("Expires on
+  12.11.2026, in 3 days"), and an alert about a date within the week is amber
+  rather than grey. On a phone the expiry forecast tiles sit two across, so no
+  label breaks inside a word in any of the six languages, and uppercase labels
+  keep their word spaces.
 - Printing a list of labels gives a sheet of rows, three labels across, in the
   preview and in the download alike. It used to be one strip, however long,
   which the dialog shrank into a grey line of bars. The print queue still sends

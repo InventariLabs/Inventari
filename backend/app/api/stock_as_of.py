@@ -67,6 +67,7 @@ async def _build_report(
     *,
     limit: int | None = None,
     offset: int = 0,
+    search: str | None = None,
 ) -> tuple[StockAsOfReportDTO, Any]:
     """The report, or the refusal — shared by the screen, the sheet and the PDF.
 
@@ -104,6 +105,7 @@ async def _build_report(
         has_layers=has_layers,
         limit=limit,
         offset=offset,
+        search=search,
     )
     organization = await core_api.organizations.get_async(db, org_id)
 
@@ -159,6 +161,15 @@ async def stock_as_of(
             'history is kept per product, not per shelf.'
         ),
     ),
+    search: str | None = Query(
+        None,
+        max_length=100,
+        description=(
+            'Narrows the report to the products whose name, brand, barcode '
+            'or catalogue number contains this text. The total and the '
+            'unpriced count then speak about those products only.'
+        ),
+    ),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     _: object = require_permission(SystemPermission.ITEMS_READ),
@@ -172,7 +183,7 @@ async def stock_as_of(
     """
     org_id = require_org(current_user)
     report, _organization = await _build_report(
-        db, org_id, as_of, location_id, limit=limit, offset=offset
+        db, org_id, as_of, location_id, limit=limit, offset=offset, search=search
     )
     return report
 
@@ -181,6 +192,15 @@ async def stock_as_of(
 async def stock_as_of_xlsx(
     as_of: date | datetime = Query(...),
     location_id: UUID | None = Query(None),
+    search: str | None = Query(
+        None,
+        max_length=100,
+        description=(
+            'Narrows the report to the products whose name, brand, barcode '
+            'or catalogue number contains this text. The total and the '
+            'unpriced count then speak about those products only.'
+        ),
+    ),
     _: object = require_permission(SystemPermission.ITEMS_READ),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
@@ -189,7 +209,9 @@ async def stock_as_of_xlsx(
     from app.services.stock_report_pdf_service import rows_to_export_frame
 
     org_id = require_org(current_user)
-    report, _organization = await _build_report(db, org_id, as_of, location_id)
+    report, _organization = await _build_report(
+        db, org_id, as_of, location_id, search=search
+    )
     show_value = await _shows_inventory_value_async(db, org_id)
     return to_xlsx_response(
         rows_to_export_frame(report, show_value=show_value),
@@ -202,6 +224,15 @@ async def stock_as_of_xlsx(
 async def stock_as_of_pdf(
     as_of: date | datetime = Query(...),
     location_id: UUID | None = Query(None),
+    search: str | None = Query(
+        None,
+        max_length=100,
+        description=(
+            'Narrows the report to the products whose name, brand, barcode '
+            'or catalogue number contains this text. The total and the '
+            'unpriced count then speak about those products only.'
+        ),
+    ),
     _: object = require_permission(SystemPermission.ITEMS_READ),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
@@ -218,7 +249,7 @@ async def stock_as_of_pdf(
 
     org_id = require_org(current_user)
     report, organization = await _build_report(
-        db, org_id, as_of, location_id, limit=PDF_ROW_LIMIT
+        db, org_id, as_of, location_id, limit=PDF_ROW_LIMIT, search=search
     )
     if report.has_more:
         # A printout that silently stops at row five thousand would be read

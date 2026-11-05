@@ -219,6 +219,7 @@
     "date": "A fecha de",
     "location": "Ubicación",
     "everywhere": "En todas partes",
+    "searchPlaceholder": "Buscar un producto…",
     "print": "Imprimir",
     "total": "Total",
     "caption": "Existencias de {{organization}} a {{date}}",
@@ -230,7 +231,8 @@
     "empty": {
       "title": "No había nada en las estanterías",
       "description": "En esa fecha ninguno de los productos registrados estaba en existencia.",
-      "descriptionAt": "{{location}} — en esa fecha no contenía ninguno de los productos que registra."
+      "descriptionAt": "{{location}} — en esa fecha no contenía ninguno de los productos que registra.",
+      "descriptionSearch": "Ningún producto registrado coincide con «{{search}}» en esta fecha."
     },
     "columns": {
       "product": "Producto",
