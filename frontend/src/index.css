@@ -349,6 +349,17 @@ textarea {
   word-spacing: inherit;
 }
 
+/* Capitals have no ascenders or descenders to carry the eye across a gap, so
+   the -0.025em / -0.05em tracking of `tracking-tight` / `tracking-tighter`
+   closes a word space on uppercase text: "AISLE A" read "AISLEA" and
+   "MAIN WAREHOUSE" read "MAINWAREHOUSE". Uppercase text keeps normal
+   tracking whatever the tracking utility says; two classes outrank either
+   utility, so the order of the class list does not matter. */
+.uppercase.tracking-tight,
+.uppercase.tracking-tighter {
+  letter-spacing: normal;
+}
+
 /* Dark mode overrides */
 .dark {
   color-scheme: dark;
