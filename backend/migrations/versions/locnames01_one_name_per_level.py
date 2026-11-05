@@ -11,7 +11,7 @@ Nothing is deleted and no stock moves: the later place of each pair takes a
 number after its name ("Cellar (2)"), the oldest keeps its name.
 
 Revision ID: locnames01
-Revises: ledgertotals02
+Revises: fieldwords01
 Create Date: 2026-11-05
 """
 
@@ -21,7 +21,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = 'locnames01'
-down_revision: str | None = 'ledgertotals02'
+down_revision: str | None = 'fieldwords01'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
