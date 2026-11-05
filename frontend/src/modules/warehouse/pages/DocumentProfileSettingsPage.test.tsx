@@ -23,6 +23,7 @@ vi.mock("@/hooks/useModulePageHeader", () => ({
 }));
 
 vi.mock("@/contexts/ModulesContext", () => ({
+  useEnabledModulesOptional: () => ["warehouse"],
   useModules: () => ({
     enabledModules: ["warehouse"],
     hiddenModules: [],
