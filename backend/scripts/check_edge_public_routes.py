@@ -52,7 +52,9 @@ SECURITY_HEADERS = (
     'Permissions-Policy',
 )
 
-NGINX_ADD_HEADER = re.compile(r'^\s*add_header\s+(\S+)\s*(?:"([^"]*)")?')
+NGINX_ADD_HEADER = re.compile(
+    r'^\s*add_header\s+(\S+)\s*(?:"([^"]*)")?[^;]*?(\balways\s*)?;'
+)
 
 NGINX_SERVER_TOKENS = re.compile(r'^\s*server_tokens off;', re.MULTILINE)
 NGINX_DOTFILES = re.compile(
@@ -113,23 +115,26 @@ def check_nginx_document_cache(text: str) -> list[str]:
     return problems
 
 
-def _header_blocks(text: str) -> list[tuple[str, int, dict[str, str | None]]]:
+_HeaderBlock = tuple[str, int, dict[str, tuple[str | None, bool]]]
+
+
+def _header_blocks(text: str) -> list[_HeaderBlock]:
     """Every nginx block that declares ``add_header``, with its header values.
 
-    Returns ``(label, line number, {name: quoted value or None})`` — outer
+    Returns ``(label, line number, {name: (quoted value or None, has always)})`` — outer
     ``server`` first, locations as encountered. The file is hand-formatted one
     directive per line, so a brace-counting scan is enough: comments are
     dropped, ``{`` pushes the line's block and ``}`` pops it. Labels are the
     block's first line (``server``, ``location = /sw.js``), which is what a
     failure message should name.
     """
-    stack: list[tuple[str, int, dict[str, str | None]]] = []
-    blocks: list[tuple[str, int, dict[str, str | None]]] = []
+    stack: list[_HeaderBlock] = []
+    blocks: list[_HeaderBlock] = []
     for line_no, raw in enumerate(text.splitlines(), 1):
         line = raw.split('#', 1)[0]
         header = NGINX_ADD_HEADER.match(line)
         if header and stack:
-            stack[-1][2][header.group(1)] = header.group(2)
+            stack[-1][2][header.group(1)] = (header.group(2), bool(header.group(3)))
         for _ in range(line.count('{')):
             stack.append((line.split('{', 1)[0].strip(), line_no, {}))
         for _ in range(line.count('}')):
@@ -137,6 +142,10 @@ def _header_blocks(text: str) -> list[tuple[str, int, dict[str, str | None]]]:
                 blocks.append(stack.pop())
     blocks.extend(reversed(stack))
     return blocks
+
+
+def _without_always(headers: dict[str, tuple[str | None, bool]]) -> list[str]:
+    return [h for h in SECURITY_HEADERS if h in headers and not headers[h][1]]
 
 
 def check_nginx_security_headers(text: str) -> list[str]:
@@ -147,7 +156,9 @@ def check_nginx_security_headers(text: str) -> list[str]:
     the inherited set wholesale. The rule: a block may add Cache-Control, but
     then it carries CSP, X-Frame-Options, X-Content-Type-Options,
     Referrer-Policy and Permissions-Policy itself — with the same values, so a
-    copied policy cannot go stale in one place.
+    copied policy cannot go stale in one place. Every one of them also ends in
+    ``always``: without it nginx adds the header to 2xx and 3xx responses only,
+    so a 404 or a 502 would leave without the policy.
     """
     blocks = _header_blocks(text)
     server = next(
@@ -162,6 +173,13 @@ def check_nginx_security_headers(text: str) -> list[str]:
         problems.append(
             'nginx.conf: the `server` block does not declare ' + ', '.join(absent)
         )
+    unsealed = _without_always(server[2])
+    if unsealed:
+        problems.append(
+            'nginx.conf: the `server` block declares '
+            + ', '.join(unsealed)
+            + ' without `always`, so error responses leave without them'
+        )
     for label, line, headers in blocks:
         if not headers or label == 'server':
             continue
@@ -173,10 +191,17 @@ def check_nginx_security_headers(text: str) -> list[str]:
                 + ', '.join(missing)
             )
             continue
+        unsealed = _without_always(headers)
+        if unsealed:
+            problems.append(
+                f'nginx.conf:{line}: `{label}` declares '
+                + ', '.join(unsealed)
+                + ' without `always`, so its 4xx and 5xx responses leave without them'
+            )
         stale = [
             header
             for header in SECURITY_HEADERS
-            if header in expected and headers[header] != expected[header]
+            if header in expected and headers[header][0] != expected[header][0]
         ]
         if stale:
             problems.append(
