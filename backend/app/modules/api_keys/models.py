@@ -33,8 +33,9 @@ class ApiKey(Base):
     # SHA-256 hash of the raw key — the raw key is NEVER stored
     hashed_key = Column(String(64), nullable=False, unique=True, index=True)
 
-    # First ~20 chars of the raw key for visual identification (e.g. "inv_live_a1b2c3d4")
-    key_prefix = Column(String(20), nullable=False)
+    # The start of the raw key, to tell keys apart by eye ("inv_live_a1b2c3"):
+    # api_key_service.SHOWN_KEY_CHARACTERS of its random characters, no more.
+    key_prefix = Column(String(15), nullable=False)
 
     #: The permission keys the key may use, chosen from its creator's when it
     #: was issued. The whole of what it may do: its owner's grants are not

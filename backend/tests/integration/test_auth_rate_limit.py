@@ -216,7 +216,7 @@ class TestAuthRateLimitEnforced:
                     user_id=test_user.id,
                     name='CI',
                     hashed_key=hashlib.sha256(raw.encode()).hexdigest(),
-                    key_prefix=raw[:20],
+                    key_prefix=raw[:15],
                 )
             )
             raws.append(raw)
@@ -286,7 +286,7 @@ class TestAuthRateLimitEnforced:
                 user_id=test_user.id,
                 name='CI',
                 hashed_key=hashlib.sha256(raw.encode()).hexdigest(),
-                key_prefix=raw[:20],
+                key_prefix=raw[:15],
             )
         )
         db_session.commit()

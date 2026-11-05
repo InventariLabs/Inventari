@@ -22,13 +22,15 @@ from .models.profile import DocumentTypeConfig
 from .schemas import (
     DocumentTypeConfigCreate,
     DocumentTypeConfigOut,
+    DocumentTypeConfigUpdate,
 )
 
 # The upsert journals the payload's own field names (`keys=set(payload)`),
 # so the snapshot-key exporter reads this pair the way it reads a dict
 # literal (`AGENTS.md §3`: the declaration sits beside the writer it
-# speaks for). The delete endpoint journals the record's columns as they
-# stood — a universe the model side of this pair already names.
+# speaks for). The delete endpoint journals the settings the dropped record
+# held — the fields the update schema can set, not the row's identity and
+# stamps — a universe the model side of this pair names.
 AUDIT_PAYLOAD_SCHEMA = ('DocumentTypeConfigCreate', 'DocumentTypeConfig')
 
 router = APIRouter(dependencies=[Depends(require_module('warehouse'))])
@@ -110,7 +112,7 @@ async def delete_type_config(
         current_user.id,
         module='warehouse',
         subject=f'type-config:{normalized}',
-        keys=set(before),
+        keys=set(before) & set(DocumentTypeConfigUpdate.model_fields),
         before=before,
         after=None,
     )
