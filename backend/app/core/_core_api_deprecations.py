@@ -9,7 +9,7 @@ the same machinery for the hundred-times-larger core_api surface.
 
 **Removed surface that no builder outside the repository used leaves without
 a window.** The quant table's picking reads, replaced by group-and-lot reads
-while the table was still in place, left with the table (``quantdrop01``),
+while the table was still in place, left with the table (archived ``quantdrop01``),
 and so did every other method that wrote it, read it or answered with its
 row. ``CoreStockAPI.reserve_async`` went the same way: a reservation always
 belongs to a document and its call without one was refused, and no published

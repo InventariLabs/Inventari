@@ -82,7 +82,7 @@ def shelf_with_a_promise(
     The record goes the way an archive goes (``is_deleted``); the promise the
     document holds on that shelf is not released with it, so the group the
     view sees is a promise and nothing behind it. The database refuses that
-    shape at commit now (``holdguard01``), so it is the one an instance older
+    shape at commit now (archived ``holdguard01``), so it is the one an instance older
     than the guard holds, written past it.
     """
     shelf, template = _shelf_and_template(db_session, test_user)

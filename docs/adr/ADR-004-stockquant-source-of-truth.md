@@ -62,7 +62,7 @@ every read would be too slow.
 The decision holds for every organization, whatever modules it has enabled.
 The stock a shelf held before the register knew it — an organization that
 kept none so far, a shelf whose records predate it — was posted once by the
-`openbal01` migration: a batch-less quant, a movement marked
+archived `openbal01` migration: a batch-less quant, a movement marked
 `opening_balance` and the cost layer, valued like any unpriced receipt.
 `StockMove` is the journal
 next to the state — every change to a quant has a movement explaining it —
@@ -84,7 +84,7 @@ unit_cost=None)`. Behavior:
    adopts one here — resolved, or minted, from the record's own words and bound
    through the unit gate every other door takes — and the stock it already held
    is posted as an opening: a quant on its own shelf, a movement marked
-   `opening_balance` and an unpriced layer — the three writes `openbal01` made
+   `opening_balance` and an unpriced layer — the three writes the archived `openbal01` made
    for every shelf the register did not know, so all three reconciliation pairs
    agree from the adoption on. An edit that writes a card field (the low-stock
    threshold, the unit weight) to such a record through `PUT /items/{id}` adopts

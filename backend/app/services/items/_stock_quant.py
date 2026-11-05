@@ -70,7 +70,7 @@ async def post_opening_balance_async(
 
     A record that predates its card keeps its stock outside the register —
     no movement, no cost layer — and joining the register means saying what
-    it holds, the way the ``openbal01`` migration said it for every shelf the
+    it holds, the way the archived ``openbal01`` migration said it for every shelf the
     register did not know: a movement marked ``opening_balance`` the shelf
     can be traced back to, and the layer the reconciliation report measures
     the shelf against, posted the way a quantity raised by hand is: at the

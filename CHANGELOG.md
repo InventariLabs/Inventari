@@ -51,6 +51,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On an organization seeded before the option words existed, the "Lactose free"
+  field of the Dairy and Cheese categories now offers its options in the
+  interface language instead of the stored English "No" and "Yes". Options an
+  organization wrote itself keep their words.
 - Add Category opens empty, on the product and the equipment category screens
   alike. It used to bring back the last name typed, after a cancel and after a
   save, where saving it again was refused as a duplicate.

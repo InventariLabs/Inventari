@@ -1,4 +1,4 @@
-"""Regression guard: module-owned tables must NOT be in core baseline_001.
+"""Regression guard: module-owned tables must NOT be in core baseline_002.
 
 Since the module migration extraction,
 every module's tables are created by that module's own

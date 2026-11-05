@@ -29,7 +29,7 @@ pytestmark = pytest.mark.integration
 #: Every CHECK that stands between the stock tables and an impossible state.
 #: The quant table's three went with the table; the promise it kept per row —
 #: never more held than stocked — is kept per grain at commit by a trigger
-#: (``holdguard01``), tested in ``test_the_database_refuses_a_hold_past_its_grain.py``.
+#: (archived ``holdguard01``), tested in ``test_the_database_refuses_a_hold_past_its_grain.py``.
 GUARDS = (
     'ck_items_quantity_nonneg',
     'ck_svl_remaining_not_negative',

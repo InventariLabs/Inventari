@@ -1,6 +1,6 @@
 """A ledger holding only unknown layers is a quantity, not a valuation.
 
-The ``openbal01`` migration opened every shelf the register did not know with
+The archived ``openbal01`` migration opened every shelf the register did not know with
 a cost layer valued at the organization's own rate — and at 0.00 marked
 ``unknown`` where there was none (:class:`CostBasis`). Stock that a person
 typed onto a record with its own price landed on the books as an unknown

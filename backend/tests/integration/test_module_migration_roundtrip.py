@@ -879,7 +879,7 @@ SHOPPING_LISTS_TABLES = dict(MODULES)['shopping_lists']
 class TestShoppingListsFreshInstall:
     """Fresh install: the full core chain runs before module migrations.
 
-    Core migration ``e4f5a6b7c8d9`` pre-creates ``shopping_list_history``
+    The archived core migration ``e4f5a6b7c8d9`` pre-creates ``shopping_list_history``
     (with the same ``ix_*`` index names the module migration uses). The
     all-or-nothing stamp check in ``_upgrade_all_modules`` then fails
     (``shopping_lists``/``shopping_list_items`` are missing), so the module's

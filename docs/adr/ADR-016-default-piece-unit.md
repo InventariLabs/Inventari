@@ -48,7 +48,7 @@ by rejecting the request.**
   the quantity, it does not change what is accepted. A caller who never
   picked a unit keeps recording fractional quantities; a caller who picked
   pieces is bound by whole numbers (rounding 1.0), as before.
-- Migration `uompcs01` backfills `items.uom_id IS NULL` with the system
+- The archived migration `uompcs01` backfills `items.uom_id IS NULL` with the system
   piece unit. One direction only — a defaulted row and a deliberately-pieces
   row are indistinguishable afterwards, so the downgrade is a documented
   no-op.

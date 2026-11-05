@@ -13,7 +13,7 @@ pairs, a batch's numbers (its own screen and the batch list), the shelf
 occupancy behind a location delete, the reservation guard inside deleting a
 record and the CLI's reservation check; ``docs/subsystems/STOCK.md`` names
 where each lives. The quant table it was once read beside is gone
-(``quantdrop01``): what the view says is the stock.
+(archived ``quantdrop01``): what the view says is the stock.
 
 It is a ``Table`` on its own ``MetaData``, not a model on ``Base``:
 ``Base.metadata.create_all`` builds tables, and it would build this one as a

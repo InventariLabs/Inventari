@@ -4,7 +4,7 @@ This began as the first-receipt race on the quant table: ``increment_quant_async
 locked nothing when the row did not exist yet, the unique constraint meant to
 make the loser retry could not fire for a lotless quant, and two double-clicked
 scans left two rows the reconciliation reported forever. The table is gone
-(``quantdrop01``), and a first receipt now queues on its group's anchor.
+(archived ``quantdrop01``), and a first receipt now queues on its group's anchor.
 
 What is left to hold is the records' side of the same race: receipts racing
 through the document register must land every delivery on the shelf, and the

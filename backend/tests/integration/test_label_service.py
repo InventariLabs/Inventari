@@ -829,7 +829,7 @@ class TestListByShortCodes:
 
 @pytest.mark.integration
 class TestPerOrgShortCodeUniqueness:
-    """short_code is unique per organization, not globally (orglabel01).
+    """short_code is unique per organization, not globally (archived orglabel01).
 
     Sync (not async) so the session depends on setup_test_db, which rebuilds
     the schema from current models — async sessions reuse stale schema from a
