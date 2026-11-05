@@ -11,6 +11,7 @@ Tests cover:
 - Raw key is returned only once at creation
 """
 
+import re
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
@@ -28,6 +29,8 @@ from app.models.user import User
 from app.services.token_service import create_access_token, get_password_hash
 
 API_KEYS_URL = '/api/v1/api-keys'
+#: ``inv_live_`` and six of the key's random characters.
+SHOWN_PREFIX_LENGTH = 15
 
 
 # ---------------------------------------------------------------------------
@@ -142,7 +145,7 @@ class TestCreateApiKey:
         data = resp.json()
         assert data['name'] == 'Test Key'
         assert data['raw_key'].startswith('inv_live_')
-        assert data['key_prefix'] == data['raw_key'][:20]
+        assert data['key_prefix'] == data['raw_key'][:SHOWN_PREFIX_LENGTH]
         assert 'id' in data
         assert data['expires_at'] is None
 
@@ -156,7 +159,7 @@ class TestCreateApiKey:
         keys = list_resp.json()['items']
         assert len(keys) == 1
         assert 'raw_key' not in keys[0]
-        assert keys[0]['key_prefix'] == raw_key[:20]
+        assert keys[0]['key_prefix'] == raw_key[:SHOWN_PREFIX_LENGTH]
 
     async def test_create_with_expiry(
         self, real_async_client: AsyncClient, admin_headers: dict[str, str]
@@ -608,7 +611,7 @@ class TestApiKeyServiceEdgeCases:
         assert lines
         assert all(raw_key[:12] not in line and 'prefix' not in line for line in lines)
 
-    async def test_key_prefix_is_first_20_chars(
+    async def test_key_prefix_is_the_marker_and_six_characters(
         self,
         real_async_client: AsyncClient,
         admin_headers: dict[str, str],
@@ -623,7 +626,8 @@ class TestApiKeyServiceEdgeCases:
         def _check_ak(sync_sess: Session) -> None:
             ak = sync_sess.get(ApiKey, key_id)
             assert ak is not None
-            assert ak.key_prefix == raw_key[:20]
+            assert ak.key_prefix == raw_key[:SHOWN_PREFIX_LENGTH]
+            assert re.fullmatch(r'inv_live_[0-9a-f]{6}', str(ak.key_prefix))
 
         await real_async_db_session.run_sync(_check_ak)
 
@@ -828,6 +832,10 @@ class TestApiKeyAuditTrail:
         (entry,) = [e for e in log.json()['items'] if e['target_type'] == 'api_key']
         assert entry['action'] == 'CREATE'
         assert entry['snapshot']['name'] == 'CI runner'
+        assert (
+            entry['snapshot']['key_prefix']
+            == created.json()['raw_key'][:SHOWN_PREFIX_LENGTH]
+        )
         assert entry['user_email'] == 'ak_admin@example.com'
 
     async def test_revoking_a_key_is_recorded_with_its_author(
@@ -853,6 +861,10 @@ class TestApiKeyAuditTrail:
         assert entries[0]['target_id'] == key_id
         # The row is gone from the list, so the name survives only here.
         assert entries[0]['snapshot']['name'] == 'Old script'
+        assert (
+            entries[0]['snapshot']['key_prefix']
+            == created.json()['raw_key'][:SHOWN_PREFIX_LENGTH]
+        )
         assert entries[0]['user_email'] == 'ak_admin@example.com'
 
     async def test_the_raw_key_never_reaches_the_log(

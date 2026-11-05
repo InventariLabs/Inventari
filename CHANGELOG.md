@@ -14,6 +14,14 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- An API key's shown prefix is now `inv_live_` and six characters instead of
+  eleven, on the API keys page and in the audit log, where it gave away a third
+  of the key's random part to anyone allowed to read the log. Existing keys are
+  shortened on upgrade and keep working, because a key is never looked up by its
+  prefix. Entries already in the audit log keep the longer prefix they were
+  written with, since the log cannot be rewritten; they still begin with the
+  short one, so a script comparing prefixes should compare the start. To take a
+  key's longer prefix out of circulation, issue a new key and revoke the old one.
 - A new API key no longer starts with the permission to read the organization's
   details and member list ticked. A script that creates a key through
   `POST /api-keys` without naming any permission now gets a key that cannot read

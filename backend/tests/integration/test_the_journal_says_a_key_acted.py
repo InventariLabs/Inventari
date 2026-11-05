@@ -112,6 +112,19 @@ class TestATraceOfTheKey:
         actor = await _note_actor(real_async_client, admin, UUID(item['id']))
         assert actor == {'type': 'api_key', 'key_prefix': prefix}
 
+    async def test_the_key_is_named_by_six_of_its_characters_and_no_more(
+        self, real_async_client, admin, shelf, api_key
+    ):
+        """The journal is read more widely than the key settings, so what it
+        holds has to identify a key, not give away part of it."""
+        raw_key, _ = api_key
+        item = await _create_item(
+            real_async_client, {'Authorization': f'Bearer {raw_key}'}, shelf, 'Beeswax'
+        )
+
+        actor = await _note_actor(real_async_client, admin, UUID(item['id']))
+        assert actor['key_prefix'] == raw_key[: len('inv_live_') + 6]
+
     async def test_the_owner_is_still_named_beside_the_key(
         self, real_async_client, admin, shelf, api_key
     ):
