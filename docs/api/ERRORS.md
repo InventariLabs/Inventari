@@ -350,6 +350,9 @@ apart.
 | `EQUIPMENT_CANNOT_CHECKOUT_IN_MAINTENANCE` | Cannot check out an asset that is in maintenance; set it to Available first |
 | `EQUIPMENT_CANNOT_CHECKOUT_RETIRED` | Cannot check out a retired asset |
 | `EQUIPMENT_DEPLOY_REQUIRES_CHECKOUT` | An asset becomes deployed by checking it out to someone. Check it out instead of setting the status. |
+| `EQUIPMENT_STATUS_INVALID` | Invalid status: {status} |
+| `EQUIPMENT_STATUS_TRANSITION_DENIED` | Cannot change status from {old} to {new} |
+| `EQUIPMENT_STATUS_TRANSITION_FROM_RETIRED` | Cannot change status from {old} to {new}. Retired assets must be explicitly unretired first. |
 | `EQUIPMENT_STILL_ASSIGNED` | The asset is still checked out to someone. Check it in first. |
 | `EXTRA_COST_CURRENCY_MISMATCH` | The extra cost is in a different currency than the document. Enter it in the document's currency — converting at a rate nobody recorded would put a number in the stock value with no history behind it. |
 | `EXTRA_COST_DOCUMENT_POSTED` | This receipt is already posted, so an extra cost cannot be added to it: the goods may have left the shelf and there is nothing left to charge. Issue a correction to the receipt while its period is open instead. |
