@@ -1,15 +1,15 @@
-"""Period-guard registry — inversion of the Core → documents dependency.
+"""Period-guard registry — inversion of the Core → warehouse dependency.
 
 Inventory period locks are owned by the ``warehouse`` module (model, table,
 close/reopen workflow). Core stock-mutating paths still need the guard, but
 Core must never import a feature module. Instead of Core importing
-``documents.inventory_period_service``, the warehouse module *registers* its
+``warehouse.inventory_period_service``, the warehouse module *registers* its
 guard implementation here at startup, and Core calls it through this
 registry.
 
 Graceful degradation: when no guard is registered (warehouse module absent
 or rejected), :func:`check_period_not_closed` is a no-op — period locking is
-a documents feature, so without the module there is nothing to enforce.
+a warehouse feature, so without the module there is nothing to enforce.
 """
 
 from __future__ import annotations

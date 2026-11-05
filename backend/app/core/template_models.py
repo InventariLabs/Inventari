@@ -1,4 +1,4 @@
-"""Core DocumentTemplate model — shared across equipment, documents, purchase_orders modules."""
+"""Core DocumentTemplate model — shared across equipment, warehouse, purchase_orders modules."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from app.database import Base
 class DocumentTemplate(Base):
     """User-configurable document templates stored in the database.
 
-    Each template belongs to a module (``equipment``, ``documents``, ``purchase_orders``)
+    Each template belongs to a module (``equipment``, ``warehouse``, ``purchase_orders``)
     and has a ``document_type`` discriminator that is module-specific (plain string, no enum).
     The ``is_default`` field is constrained to one default per ``(organization_id, module, document_type)``.
     """

@@ -1,6 +1,6 @@
 """What cooking leaves behind when there is no document module to ask.
 
-In a household profile ``documents`` is not enabled, so no RW document is
+In a household profile ``warehouse`` is not enabled, so no RW document is
 written and the organization journal knows nothing about picking. The item's
 own history is the only account of the ubytek there will ever be, and it used
 to read ``{'old': 500.0, 'new': 499.0}`` — a number that changed, with nothing
