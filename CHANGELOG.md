@@ -14,6 +14,12 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- A refused invitation now answers with one sentence that says what to try — use
+  the e-mail address the invitation was sent to, or ask for a new one — and the
+  sentence is the same for a wrong address, an expired, a used, a withdrawn and an
+  unknown code, so it still tells nobody which of them it was. The separate
+  "issued for a different address" answer is gone, since it confirmed that a code
+  was live.
 - An API key's shown prefix is now `inv_live_` and six characters instead of
   eleven, on the API keys page and in the audit log, where it gave away a third
   of the key's random part to anyone allowed to read the log. Existing keys are

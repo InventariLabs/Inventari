@@ -31,7 +31,6 @@ from app.schemas.user import (
 from app.schemas.user import (
     User as UserSchema,
 )
-from app.services._org_membership import open_invitation
 from app.services.auth_service import AuthService
 
 logger = get_logger(__name__)
@@ -82,17 +81,13 @@ async def register(
             db, user_in.invite_code, user_in.email
         )
     ):
-        # A link that is alive but was minted for another address says so:
-        # the visitor holds a valid code, and "invalid invitation" sent them
-        # off to ask for a fresh one when a corrected address was all it took.
-        # Only someone holding an open code reaches this answer, so it is no
-        # oracle for which addresses are invited.
-        reason = (
-            'organization_invite_wrong_email'
-            if user_in.invite_code and await open_invitation(db, user_in.invite_code)
-            else 'organization_invite_invalid'
+        # One sentence for every dead end — wrong address, expired, used,
+        # withdrawn, unknown — and one lookup behind it: anything that told
+        # them apart, in words or in time, would confirm that a code is live.
+        # The sentence itself names the likely fix.
+        raise catalogue_refusal(
+            'organization_invite_invalid', lang=user_in.preferred_language
         )
-        raise catalogue_refusal(reason, lang=user_in.preferred_language)
 
     if await AuthService.email_exists_async(db, user_in.email):
         raise ConflictException(

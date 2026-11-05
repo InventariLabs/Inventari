@@ -79,10 +79,25 @@ class TestPublicInvitationCheck:
 
         assert response.json()['invited_email'] == 'nowa@example.com'
 
-    def test_a_mistyped_address_is_told_it_is_the_address(self, client, db_session):
-        invitation = _seed_invitation(
-            db_session, 'BOUNDCO2', invited_email='nowa@example.com'
-        )
+    @pytest.mark.parametrize(
+        'seed',
+        [
+            pytest.param({'invited_email': 'nowa@example.com'}, id='wrong-address'),
+            pytest.param(
+                {'expires_in': timedelta(days=-1)},
+                id='expired',
+            ),
+            pytest.param({'is_used': True}, id='used'),
+            pytest.param({'revoked': True}, id='withdrawn'),
+        ],
+    )
+    def test_every_refusal_is_one_sentence_that_names_the_likely_fix(
+        self, client, db_session, seed
+    ):
+        # A prober must not tell the four dead ends apart, so the answer is the
+        # same status and the same words for all of them; and the words name
+        # what the reader can do about it — the address or a fresh invitation.
+        invitation = _seed_invitation(db_session, 'REFUSED01', **seed)
 
         response = client.post(
             '/api/v1/auth/register',
@@ -92,14 +107,7 @@ class TestPublicInvitationCheck:
                 'invite_code': invitation.code,
             },
         )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
-        assert 'e-mail address' in response.text
-
-    def test_a_dead_code_still_reads_as_an_invalid_invitation(self, client, db_session):
-        # Seeding an inviter first: on an empty install registration is open.
-        _seed_invitation(db_session, 'ANYCODE1')
-        response = client.post(
+        unknown = client.post(
             '/api/v1/auth/register',
             json={
                 'email': 'zla@example.com',
@@ -108,7 +116,11 @@ class TestPublicInvitationCheck:
             },
         )
 
-        assert 'Invalid organization invitation' in response.text
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+        assert response.json() == unknown.json()
+        message = response.json()['detail']['message']
+        assert 'address' in message
+        assert 'new one' in message
 
     def test_unknown_code_refuses_with_404(self, client):
         response = client.get('/public/invitation/NOBODY999')
