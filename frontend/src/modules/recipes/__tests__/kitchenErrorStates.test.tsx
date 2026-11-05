@@ -244,6 +244,13 @@ describe("Kitchen — an empty ingredient dictionary names its language", () => 
       screen.getAllByRole("button", { name: /add override/i }).length,
     ).toBeGreaterThanOrEqual(2);
     expect(screen.queryByText(/no ingredients found/i)).toBeNull();
+    // The hint says what really happens — names are matched across the other
+    // languages' entries — and never claims a fallback to the language it
+    // is written in.
+    expect(
+      screen.getByText(/matching entries in other languages/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/fall back to english/i)).toBeNull();
   });
 
   it("keeps the search answer for a search that finds nothing", async () => {
