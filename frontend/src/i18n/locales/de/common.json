@@ -797,7 +797,7 @@
       "systemGroup": "Allgemein",
       "systemRole": "Integrierte Rolle — ihre Berechtigungen sind unveränderlich.",
       "systemRoleFooter": "Integrierte Rollen sind schreibgeschützt.",
-      "title": "Zugriff und Rollen"
+      "title": "Rollen & Rechte"
     },
     "data": {
       "exportDesc": "Eine Kopie Ihrer Produkte herunterladen",
@@ -1079,7 +1079,7 @@
     "signedBy": "Signiert mit Schlüssel {{key}}",
     "signedByHint": "Die Signatur deckt den hier gezeigten Autor und die Lizenz ab.",
     "subtitle": "{{active}} der {{total}} hier angebotenen Module sind aktiv",
-    "title": "App Store",
+    "title": "Module",
     "trust_cloud": "Cloud",
     "trust_community": "Community",
     "trust_core": "Kern",

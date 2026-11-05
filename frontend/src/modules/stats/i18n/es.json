@@ -140,7 +140,7 @@
     "showInventoryValueDescription": "Mostrar el valor total del stock en el resumen de estadísticas. Es una métrica de negocio — desactivar para inventarios domésticos que no guardan precios de compra con los que sumarlo."
   },
   "navigation": {
-    "settings": "Analíticas"
+    "settings": "Estadísticas"
   },
   "reconciliation": {
     "title": "Conciliación de existencias",

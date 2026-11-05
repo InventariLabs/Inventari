@@ -150,7 +150,7 @@
     "showInventoryValueDescription": "Pokazuj łączną wartość zapasów w podsumowaniu statystyk. To metryka biznesowa — wyłącz dla domowych inwentarzy, które nie przechowują cen zakupu, z których można by ją zsumować."
   },
   "navigation": {
-    "settings": "Analityka"
+    "settings": "Statystyki"
   },
   "reconciliation": {
     "title": "Uzgodnienie stanu",

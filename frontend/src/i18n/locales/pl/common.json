@@ -799,7 +799,7 @@
       "systemGroup": "Ogólne",
       "systemRole": "Rola wbudowana — jej uprawnień nie da się zmienić.",
       "systemRoleFooter": "Role wbudowane są tylko do odczytu.",
-      "title": "Dostęp i role"
+      "title": "Role i uprawnienia"
     },
     "data": {
       "exportDesc": "Pobierz kopię swoich produktów",
@@ -1117,7 +1117,7 @@
     "signedBy": "Podpisano kluczem {{key}}",
     "signedByHint": "Podpis obejmuje pokazanego tu autora i licencję.",
     "subtitle": "Włączone: {{active}} z {{total}} modułów oferowanych tutaj",
-    "title": "App Store",
+    "title": "Moduły",
     "trust_cloud": "Chmura",
     "trust_community": "Społeczność",
     "trust_core": "Rdzeń",
