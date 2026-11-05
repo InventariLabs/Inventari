@@ -15,12 +15,18 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
  *  - Cannot cancel a non-DRAFT order
  */
 
-async function seedLifecycleContext(api: ApiHelper, ctx: APIRequestContext) {
+async function seedLifecycleContext(
+  api: ApiHelper,
+  ctx: APIRequestContext,
+  workerIndex: number,
+) {
   const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
   const token = auth.access_token;
   await api.enableAllModules(token);
 
-  const stamp = Date.now();
+  // The worker index keeps two workers entering this hook in the same
+  // millisecond from building one location name.
+  const stamp = `${Date.now()}-w${workerIndex}`;
   const output = await api.createProductTemplate(token, {
     name: `E2E-Comp-Out-${stamp}`,
   });
@@ -65,10 +71,10 @@ test.describe("Maker — completion lifecycle", () => {
   const createdItemIds: string[] = [];
   const orderIds: string[] = [];
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     ctx = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(ctx);
-    const seeded = await seedLifecycleContext(api, ctx);
+    const seeded = await seedLifecycleContext(api, ctx, testInfo.workerIndex);
     token = seeded.token;
     output = seeded.output;
     ingredient = seeded.ingredient;

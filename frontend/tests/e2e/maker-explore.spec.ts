@@ -21,7 +21,7 @@ test.describe.serial("Maker exploratory", () => {
     let token: string;
     let seededTemplate: { id: string; name: string };
 
-    test.beforeAll(async ({ playwright, baseURL }) => {
+    test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
       const ctx = await playwright.request.newContext({ baseURL });
       api = new ApiHelper(ctx);
       const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
@@ -31,7 +31,9 @@ test.describe.serial("Maker exploratory", () => {
       // list offers nothing to narrow), so pin one order down. Without it
       // the search test flapped depending on what parallel specs had left
       // behind in the shared org.
-      const stamp = Date.now();
+      // The worker index keeps two workers entering this hook in the same
+      // millisecond from building one location name.
+      const stamp = `${Date.now()}-w${testInfo.workerIndex}`;
       seededTemplate = await api.createProductTemplate(token, {
         name: `E2E-Explore-Output-${stamp}`,
       });

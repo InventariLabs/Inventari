@@ -18,11 +18,11 @@ test.beforeEach(async ({ page, authenticatedPage }) => {
 test("location selection fills the row without opening it", async ({
   page,
   request,
-}) => {
+}, testInfo) => {
   const api = new ApiHelper(request);
   const token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
   const parent = await api.createStorage(token, {
-    name: `Touch parent ${Date.now()}`,
+    name: `Touch parent ${Date.now()}-w${testInfo.workerIndex}`,
   });
   let childId = "";
   try {
@@ -52,11 +52,11 @@ test("location selection fills the row without opening it", async ({
 test("product form and location breadcrumb links have a phone target", async ({
   page,
   request,
-}) => {
+}, testInfo) => {
   const api = new ApiHelper(request);
   const token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
   const location = await api.createStorage(token, {
-    name: `Touch breadcrumb ${Date.now()}`,
+    name: `Touch breadcrumb ${Date.now()}-w${testInfo.workerIndex}`,
   });
   try {
     await page.goto("/inventory/items/add");

@@ -17,15 +17,18 @@ test.describe("Warehouse — shelf labels on the surface", () => {
   let shelfName: string;
   let shelfCode: string;
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     const ctx = await playwright.request.newContext({ baseURL });
     const api = new ApiHelper(ctx);
     const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     const token = auth.access_token;
     await api.enableAllModules(token);
 
-    warehouseName = `E2E-Labels-WH-${UID}`;
-    shelfName = `E2E-Labels-Shelf-${UID}`;
+    // Two workers can read one millisecond for UID, and two concurrent
+    // creates of one location name both succeed, so the worker index keeps
+    // each worker on its own warehouse.
+    warehouseName = `E2E-Labels-WH-${UID}-w${testInfo.workerIndex}`;
+    shelfName = `E2E-Labels-Shelf-${UID}-w${testInfo.workerIndex}`;
     const warehouse = await api.createStorageIdempotent(token, {
       name: warehouseName,
     });

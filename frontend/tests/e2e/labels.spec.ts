@@ -150,7 +150,7 @@ test.describe("Labels — extended actions (API)", () => {
   let shortCode: string;
   let itemId: string;
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     const requestContext = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(requestContext);
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
@@ -161,7 +161,9 @@ test.describe("Labels — extended actions (API)", () => {
     shortCode = labels[0].short_code;
 
     const storage = await api.createStorage(token, {
-      name: `Z_Label_Test_${Date.now()}`,
+      // The worker index keeps two workers entering this hook in the same
+      // millisecond from building one location name.
+      name: `Z_Label_Test_${Date.now()}-w${testInfo.workerIndex}`,
     });
     const item = await api.createItem(token, {
       name: `E2E-Label-Item-${Date.now()}`,
