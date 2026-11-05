@@ -824,6 +824,9 @@ ERRORS_FR: ErrorMessages = {
         "Un actif devient sorti lorsqu'il est remis à une personne. "
         'Sortez-le au lieu de modifier le statut.'
     ),
+    'equipment_status_invalid': 'Statut invalide : {status}',
+    'equipment_status_transition_denied': 'Impossible de changer le statut de {old} à {new}',
+    'equipment_status_transition_from_retired': "Impossible de changer le statut de {old} à {new}. Les équipements retirés doivent d'abord être explicitement réactivés.",
     'attestation_assignment_required': 'Sélectionnez l’équipement concerné par le problème',
     'meta_data_spelled_twice': (
         "'meta_data' et 'metadata' nomment deux fois le même champ. "

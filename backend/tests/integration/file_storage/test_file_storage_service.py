@@ -87,6 +87,22 @@ class TestLocalStorageProvider:
             await provider.delete(evil_relative)
 
     @pytest.mark.asyncio
+    async def test_a_path_outside_the_base_does_not_exist_for_a_probe(self, tmp_path):
+        """``exists`` and ``get_url`` answer a traversal as "not there".
+
+        The write and read paths refuse a traversal loudly (a programmer's
+        mistake); an existence probe has no file to refuse, so it says no,
+        and ``get_url`` — which only hands out URLs of files that exist —
+        reports the same missing file rather than leaking the guard's error.
+        """
+        provider = LocalStorageProvider(tmp_path / 'base')
+        (tmp_path / 'outside.txt').write_bytes(b'secret')
+
+        assert await provider.exists('../outside.txt') is False
+        with pytest.raises(FileNotFoundError):
+            await provider.get_url('../outside.txt')
+
+    @pytest.mark.asyncio
     async def test_get_url(self, temp_storage):
         """Test URL generation."""
         file_obj = io.BytesIO(b'test')

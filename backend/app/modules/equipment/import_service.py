@@ -24,7 +24,6 @@ from app.core.file_import import (
 )
 from app.core.import_sheet import read_rows, row_text
 from app.core.logging import get_logger
-from app.i18n.service import get_current_lang
 
 from ._import_dedup_service import find_item_by_serial_async
 from ._serial import serial_of, without_serial
@@ -411,7 +410,7 @@ async def _process_row(
         # whose status is not one of the four reaches the list and the detail
         # card as a state badge spelling the raw cell, which is exactly what
         # UNKNOWN_STATUS was written to keep off a screen.
-        validate_transition(None, status, get_current_lang())
+        validate_transition(None, status)
         equipment_meta['equipment_status'] = status
 
     purchase_price = _sheet_price(row, mapping.get('purchase_price'))

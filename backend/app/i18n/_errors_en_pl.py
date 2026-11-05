@@ -837,6 +837,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'An asset becomes deployed by checking it out to someone. '
             'Check it out instead of setting the status.'
         ),
+        'equipment_status_invalid': 'Invalid status: {status}',
+        'equipment_status_transition_denied': 'Cannot change status from {old} to {new}',
+        'equipment_status_transition_from_retired': 'Cannot change status from {old} to {new}. Retired assets must be explicitly unretired first.',
         'attestation_assignment_required': 'Select the asset you are reporting a problem with',
         'meta_data_spelled_twice': (
             "'meta_data' and 'metadata' name one field spelled twice. Send one of them."
@@ -1853,6 +1856,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'Zasób staje się wydany przez wydanie go osobie. '
             'Zamiast ustawiać status, wydaj zasób.'
         ),
+        'equipment_status_invalid': 'Nieprawidłowy status: {status}',
+        'equipment_status_transition_denied': 'Nie można zmienić statusu z {old} na {new}',
+        'equipment_status_transition_from_retired': 'Nie można zmienić statusu z {old} na {new}. Wycofane zasoby muszą być najpierw jawnie przywrócone.',
         'attestation_assignment_required': 'Wybierz zasób, którego dotyczy zgłoszenie problemu',
         'meta_data_spelled_twice': (
             "'meta_data' i 'metadata' to jedno pole zapisane dwoma nazwami. "

@@ -607,6 +607,9 @@ class ErrorMessages(TypedDict):
     attestation_assignment_required: str
     equipment_still_assigned: str
     equipment_deploy_requires_checkout: str
+    equipment_status_invalid: str
+    equipment_status_transition_denied: str
+    equipment_status_transition_from_retired: str
     equipment_bulk_item_failed: str
     unknown_bulk_action: str
     bom_line_unit_not_convertible: str
