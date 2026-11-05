@@ -105,17 +105,31 @@ async def _read_with_uom(
     order: ProductionOrder,
     lines: list[ProductionOrderLine] | None = None,
     produced_item_name: str | None = None,
-    shortage_count: int | None = None,
-    shortage_items: list[ShortageItemRead] | None = None,
 ) -> ProductionOrderRead:
+    """The one constructor of a single order's answer, whichever door it came through.
+
+    A draft carries the shortage completion would refuse on — the count and
+    the refusal's own list — here, not at the call sites, so create, update,
+    duplicate and the read can never tell a client different things about
+    the same order. An order past the draft has no signal (null), and the
+    lookup returns before touching the database for it.
+    """
     symbols = await _output_uom_symbols(db, org_id, [order])
+    shortage_signals = await availability_service.shortage_signals_for_orders(
+        db, org_id, [order]
+    )
+    items = shortage_signals.get(order.id)
     return _to_read(
         order,
         lines=lines,
         produced_item_name=produced_item_name,
         output_uom_symbol=symbols.get(order.output_template_id),
-        shortage_count=shortage_count,
-        shortage_items=shortage_items,
+        shortage_count=len(items) if items is not None else None,
+        shortage_items=(
+            [ShortageItemRead.model_validate(item) for item in items]
+            if items is not None
+            else None
+        ),
     )
 
 
@@ -501,26 +515,8 @@ async def get_production_order(
     if order.produced_item_id is not None:
         produced = await core_api.items.get_async(db, org_id, order.produced_item_id)
         produced_item_name = produced.name if produced is not None else None
-    # The same signal the listing shows, at full width: the count and the
-    # refusal's own list, so the page that names the blocker names every
-    # ingredient it comes from — one source, it cannot disagree with the
-    # refusal or the card.
-    shortage_signals = await availability_service.shortage_signals_for_orders(
-        db, org_id, [order]
-    )
-    items = shortage_signals.get(order.id)
     return await _read_with_uom(
-        db,
-        org_id,
-        order,
-        lines=lines,
-        produced_item_name=produced_item_name,
-        shortage_count=len(items) if items is not None else None,
-        shortage_items=(
-            [ShortageItemRead.model_validate(item) for item in items]
-            if items is not None
-            else None
-        ),
+        db, org_id, order, lines=lines, produced_item_name=produced_item_name
     )
 
 
