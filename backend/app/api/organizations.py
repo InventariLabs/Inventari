@@ -62,6 +62,7 @@ from app.schemas.pagination import PaginatedResponse
 from app.services._org_membership import (
     VALID_MEMBER_ROLES,
     change_member_role_audited,
+    invitation_role_label_async,
 )
 from app.services._org_membership import (
     create_invitation_code as create_invitation_code_service,
@@ -338,7 +339,7 @@ async def create_invitation_code(
         target_id=invitation['id'],
         snapshot={
             'expires_at': invitation.get('expires_at'),
-            'role': invitation.get('role'),
+            'role': invitation.get('role_label') or invitation.get('role'),
             'invited_email': invitation.get('invited_email'),
         },
     )
@@ -471,7 +472,7 @@ async def revoke_invitation(
         target_id=invitation.id,
         snapshot={
             'invited_email': invitation.invited_email,
-            'role': invitation.role,
+            'role': await invitation_role_label_async(db, invitation),
         },
     )
 

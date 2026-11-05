@@ -34,6 +34,16 @@ says what the release does rather than what changed since them.
   before this change prints the current details. A module that prints its own
   documents through the core print identity can freeze the same block with
   `issuer_snapshot` and `IssuerContext.from_snapshot`.
+- **Breaking:** the approve, reject and request-approval routes of documents
+  and purchase orders read the note from the JSON request body as
+  `{"notes": "..."}`. They no longer read a `notes` query parameter, which
+  put a free-text reason where proxies and access logs keep it; a client that
+  still sends one must move it to the body, or the note is not recorded.
+- The approval queues show a document's net amount and say that it is net, the
+  side the approval threshold is set on. They used to show the gross.
+- A refusal about a closed period names the month as the period screen does
+  ("September 2026"), not "2026-09".
+
 ### Added
 
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
@@ -41,6 +51,34 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Add Category opens empty, on the product and the equipment category screens
+  alike. It used to bring back the last name typed, after a cancel and after a
+  save, where saving it again was refused as a duplicate.
+- A product's thumbnail goes back to the picture the product has when the server
+  refuses a new one, and the same file can be picked again. It used to go on
+  showing the refused picture until the form was reopened.
+- A product form whose category list could not be loaded says so and offers a
+  retry, instead of quietly leaving out the fields the category declares.
+- The action sheet opened from a location's products or a scan explains why an
+  asset's actions are worded differently, as the product page does. An account
+  that may not act on the record no longer gets that sentence on either of them.
+- On a document form, a line the price books and past purchases have no price
+  for says so under that line. The sentence below the table now speaks only of
+  the document having no accounting value: as one sentence for every line, it
+  could not be true of two lines in different states.
+- Editing a draft return now offers the kind of partner the goods go back to:
+  suppliers on the return of a receipt, customers on the return of a delivery.
+  The form used to read the partner already on the draft as empty and refuse to
+  save, and a return to a manufacturer was refused by the API as well.
+- The scan confirmation on a document and the unit question on the item form
+  name the unit in the interface language ("szt.", not "pcs").
+- The short-pick dialog says "Cancel" like the short-receive one, and the picking
+  sheet's main button says "Complete picking", matching "Complete receiving".
+- The Polish refusal to finish a document with an open picking or receiving
+  session agrees with the number of sessions.
+- The answers of `PATCH /documents/{id}/confirm`, `.../complete` and
+  `POST /documents/{id}/post` carry `confirmed_by_name` and `completed_by_name`,
+  which were `null` until the document was read again.
 - Printing a list of labels gives a sheet of rows, three labels across, in the
   preview and in the download alike. It used to be one strip, however long,
   which the dialog shrank into a grey line of bars. The print queue still sends
@@ -95,6 +133,19 @@ says what the release does rather than what changed since them.
   the saved count is back on the screen.
 - Ticking two filter chips quickly on the product list no longer drops the
   first one from the address, which turned it off a moment later.
+- The notice to an approver names the document, who asked and the net amount,
+  in the app and by e-mail.
+- Completing a purchase order sends one notice per person; an administrator who
+  raised the order used to get two.
+- A write-off is weighed against the approval threshold at what the goods cost,
+  so one under the threshold raises no approval request and shows no approval
+  step or approver on its page. One whose goods have no recorded cost still
+  needs the approval.
+- A note written when approving or rejecting a purchase order is recorded. The
+  screen sent it in the request body and the server read only the query string,
+  so it was lost.
+- The journal names the custom role an invitation offers, not the built-in level
+  under it, and shows a print layout by the name the settings screen gives it.
 - Saving a supplier price or a reorder rule without a product now marks the
   product field as required and says so on the field, and a reorder rule whose
   maximum is below its minimum is refused on the Maximum field in plain words.

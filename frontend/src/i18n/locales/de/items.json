@@ -63,6 +63,7 @@
     "DISPOSED": "Entsorgt",
     "ARCHIVED": "Archiviert"
   },
+  "categoriesUnavailable": "Die Kategorien konnten nicht geladen werden, daher fehlen in diesem Formular möglicherweise einige Felder.",
   "itemName": "Produktname",
   "itemNamePlaceholder": "z. B. Vollmilch 1 l",
   "itemBrand": "Marke",

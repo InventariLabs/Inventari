@@ -40,6 +40,7 @@
     "cancelledOn": "Cancelled on {{date}}",
     "requestedBy": "by {{name}}",
     "targetSummary": {
+      "netAmount": "{{amount}} net",
       "linesCount": "{{count}} line",
       "linesCount_one": "{{count}} line",
       "linesCount_other": "{{count}} lines",

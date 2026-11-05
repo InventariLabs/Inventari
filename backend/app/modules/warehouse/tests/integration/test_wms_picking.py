@@ -1402,6 +1402,40 @@ class TestWmsGuards:
         )
         assert session_id not in msg
 
+    def test_the_refusal_agrees_with_its_one_session_in_polish(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_source_location: StorageLocation,
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_item: Item,
+        doc_template: ProductTemplate,
+        doc_org: Organization,
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+    ) -> None:
+        doc_id, _, _ = self._setup_out_with_stock(
+            client,
+            doc_auth_headers,
+            doc_source_location,
+            doc_target_location,
+            doc_partner,
+            doc_item,
+            doc_template,
+            doc_org,
+            db_session,
+            async_engine_fixture,
+        )
+        resp = client.patch(
+            f'/api/v1/warehouse/documents/{doc_id}/complete',
+            headers={**doc_auth_headers, 'Accept-Language': 'pl'},
+        )
+        assert resp.status_code == status.HTTP_409_CONFLICT
+        msg = resp.json()['detail']['message']
+        assert 'trwa 1 aktywna sesja kompletacji' in msg
+        assert 'Najpierw ją zakończ' in msg
+
     def test_cancel_blocked_by_active_wms_session(
         self,
         client: TestClient,

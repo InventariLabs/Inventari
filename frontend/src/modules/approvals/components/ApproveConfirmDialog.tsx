@@ -74,7 +74,9 @@ export function ApproveConfirmDialog({
           })
         : null,
       summary?.total_value
-        ? formatMoney(summary.total_value, summary.currency ?? null)
+        ? t("dashboard.targetSummary.netAmount", {
+            amount: formatMoney(summary.total_value, summary.currency ?? null),
+          })
         : null,
     ]
       .filter(Boolean)

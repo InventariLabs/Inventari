@@ -132,8 +132,8 @@
     "selectSource": "Sélectionner l'emplacement source",
     "selectTarget": "Sélectionner l'emplacement cible",
     "notesPlaceholder": "Ajouter des notes ou remarques…",
-    "missingValueWarning": "Certaines lignes n'ont pas de prix unitaire — ce document n'a aucune valeur comptable. Un prix peut être suggéré à partir de vos grilles tarifaires ou de vos achats passés lors de la sélection d'un produit.",
-    "missingValueWarningNoSource": "Certaines lignes n'ont pas de prix unitaire — ce document n'a aucune valeur comptable. Ni vos grilles tarifaires ni vos achats passés n'ont donné de prix pour ces produits — saisissez-le manuellement."
+    "missingValueWarning": "Certaines lignes n'ont pas de prix unitaire — ce document n'a aucune valeur comptable.",
+    "lineNoPriceSource": "Ni vos grilles tarifaires ni vos achats passés ne donnent de prix — saisissez-le manuellement."
   },
   "bulk": {
     "selectAll": "Tout sélectionner",
@@ -852,7 +852,7 @@
     "undo_action": "Annuler",
     "skip_confirm_title": "Ignorer cette ligne ?",
     "skip_confirm_message": "{{product}} ne sera pas préparé dans cette session. Vous pouvez annuler l'omission depuis la liste.",
-    "complete": "Terminer",
+    "complete": "Terminer la préparation",
     "cancel": "Abandonner les scans",
     "discard_confirm_title": "Abandonner les scans ?",
     "discard_confirm_message": "Tout ce qui a été préparé dans cette session redevient en attente. Impossible d'annuler.",
@@ -1244,6 +1244,7 @@
     }
   },
   "targetSummary": {
+    "netAmount": "{{amount}} HT",
     "linesCount": "{{count}} ligne",
     "linesCount_one": "{{count}} ligne",
     "linesCount_other": "{{count}} lignes"

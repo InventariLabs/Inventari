@@ -132,8 +132,8 @@
     "selectSource": "Choose where the goods come from",
     "selectTarget": "Choose where the goods go",
     "notesPlaceholder": "Add notes or remarks…",
-    "missingValueWarning": "Some lines have no unit price — this document has no accounting value. A price can be suggested from your price books or past purchase documents when you pick a product.",
-    "missingValueWarningNoSource": "Some lines have no unit price — this document has no accounting value. No price came from your price books or past purchases for these products, so enter it manually."
+    "missingValueWarning": "Some lines have no unit price — this document has no accounting value.",
+    "lineNoPriceSource": "No price in your price books or past purchases — enter it manually."
   },
   "bulk": {
     "selectAll": "Select all",
@@ -852,7 +852,7 @@
     "undo_action": "Undo",
     "skip_confirm_title": "Skip this line?",
     "skip_confirm_message": "{{product}} will not be picked in this session. You can undo the skip from the list.",
-    "complete": "Complete",
+    "complete": "Complete picking",
     "cancel": "Discard scans",
     "discard_confirm_title": "Discard the scans?",
     "discard_confirm_message": "Everything picked in this session goes back to waiting. This cannot be undone.",
@@ -1244,6 +1244,7 @@
     }
   },
   "targetSummary": {
+    "netAmount": "{{amount}} net",
     "linesCount": "{{count}} line",
     "linesCount_one": "{{count}} line",
     "linesCount_other": "{{count}} lines"

@@ -8,6 +8,7 @@ from datetime import UTC, date, datetime
 from typing import Any
 from uuid import UUID
 
+from babel.dates import format_date
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -51,6 +52,19 @@ def period_is_closed(period: InventoryPeriod) -> bool:
     if period.closed_at is None:
         return False
     return period.reopened_at is None or period.closed_at > period.reopened_at
+
+
+def period_label(year: int, month: int) -> str:
+    """A month as the period screen names it, in the reader's language.
+
+    A refusal in a Polish sentence said "Okres 2026-09" about the month the
+    screen calls "wrzesień 2026": the same period under a name the reader has
+    to translate before finding it on the list.
+    """
+    # Babel spells a locale with an underscore; ``pt-BR`` is how a language is
+    # stored here.
+    locale = get_current_lang().replace('-', '_')
+    return format_date(date(year, month, 1), 'LLLL y', locale=locale)
 
 
 async def is_period_closed(db: AsyncSession, org_id: UUID, doc_date: date) -> bool:
@@ -150,7 +164,7 @@ async def close_period(
     period = await get_period(db, org_id, year, month)
     if period_is_closed(period):
         raise ServiceRejectionError(
-            'period_already_closed', period=f'{year}-{month:02d}'
+            'period_already_closed', period=period_label(year, month)
         )
     period.closed_at = datetime.now(UTC)
     period.closed_by = user_id
@@ -170,7 +184,9 @@ async def reopen_period(
 ) -> dict[str, Any]:
     period = await get_period(db, org_id, year, month)
     if not period_is_closed(period):
-        raise ServiceRejectionError('period_not_closed', period=f'{year}-{month:02d}')
+        raise ServiceRejectionError(
+            'period_not_closed', period=period_label(year, month)
+        )
     period.reopened_at = datetime.now(UTC)
     period.reopened_by = user_id
     period.notes = notes
@@ -206,7 +222,7 @@ async def _refuse_a_closed_period_async(
     if await is_period_closed(db, org_id, on):
         raise PeriodClosedError(
             get_error_message(
-                sentence, get_current_lang(), period=f'{on.year}-{on.month:02d}'
+                sentence, get_current_lang(), period=period_label(on.year, on.month)
             )
         )
 

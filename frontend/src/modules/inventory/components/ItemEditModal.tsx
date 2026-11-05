@@ -202,8 +202,13 @@ export default function ItemEditModal({
     isError: isItemError,
   } = useItem(itemId);
 
+  // The picture the server holds, as far as this sheet knows: the preview can
+  // be ahead of it while an upload is on its way.
+  const acceptedImage = useRef<string | null>(null);
+
   useEffect(() => {
     if (item?.image_url) {
+      acceptedImage.current = item.image_url;
       setImagePreview(item.image_url);
     }
   }, [item]);
@@ -214,7 +219,11 @@ export default function ItemEditModal({
   // own category kept in — an asset opened for editing must still see the
   // category it is filed under, or the field would show a placeholder over
   // a value the save would then carry anyway.
-  const { scoped: categories } = useScopedCategories(item?.category_id ?? null);
+  const {
+    scoped: categories,
+    error: categoriesError,
+    refetch: refetchCategories,
+  } = useScopedCategories(item?.category_id ?? null);
   // The item's own location is kept whatever owns it — the location field
   // names the place by id, so a record opened for editing still shows the
   // place it stands — and the rest of the offer is a stock flow's: what may
@@ -315,8 +324,10 @@ export default function ItemEditModal({
   const handleImageSelect = async (file: File) => {
     try {
       const { image_url } = await itemsApi.uploadImage(itemId, file);
+      acceptedImage.current = image_url;
       setImagePreview(image_url);
     } catch (error) {
+      setImagePreview(acceptedImage.current);
       toast.error(extractApiError(error, t("items:messages.fileUploadFailed")));
     }
   };
@@ -427,6 +438,11 @@ export default function ItemEditModal({
                 errors={errors}
                 fieldDefinitions={fieldDefinitions}
                 categories={categories}
+                categoriesFailure={
+                  !categories && categoriesError
+                    ? { error: categoriesError, retry: refetchCategories }
+                    : null
+                }
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
               />

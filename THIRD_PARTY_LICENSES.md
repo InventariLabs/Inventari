@@ -278,7 +278,7 @@ and the static assets the frontend serves.
 | `fastq` | 1.20.3 | ISC |  |
 | `fdir` | 6.5.0 | MIT |  |
 | `fill-range` | 7.1.1 | MIT |  |
-| `follow-redirects` | 1.16.0 | MIT |  |
+| `follow-redirects` | 1.16.2 | MIT |  |
 | `form-data` | 4.0.6 | MIT |  |
 | `function-bind` | 1.1.2 | MIT |  |
 | `get-intrinsic` | 1.3.0 | MIT |  |
@@ -357,7 +357,7 @@ and the static assets the frontend serves.
 | `mime-types` | 2.1.35 | MIT |  |
 | `ms` | 2.1.3 | MIT |  |
 | `mz` | 2.7.0 | MIT |  |
-| `nanoid` | 3.3.19 | MIT |  |
+| `nanoid` | 3.3.20 | MIT |  |
 | `normalize-path` | 3.0.0 | MIT |  |
 | `object-assign` | 4.1.1 | MIT |  |
 | `object-hash` | 3.0.0 | MIT |  |
@@ -367,12 +367,12 @@ and the static assets the frontend serves.
 | `picomatch` | 2.3.2 | MIT |  |
 | `picomatch` | 4.0.7 | MIT |  |
 | `pirates` | 4.0.7 | MIT |  |
-| `postcss` | 8.5.28 | MIT |  |
+| `postcss` | 8.5.32 | MIT |  |
 | `postcss-import` | 15.1.0 | MIT |  |
 | `postcss-js` | 4.1.0 | MIT |  |
 | `postcss-load-config` | 6.0.1 | MIT |  |
 | `postcss-nested` | 6.2.0 | MIT |  |
-| `postcss-selector-parser` | 6.1.4 | MIT |  |
+| `postcss-selector-parser` | 6.1.5 | MIT |  |
 | `postcss-value-parser` | 4.2.0 | MIT |  |
 | `property-information` | 7.2.0 | MIT |  |
 | `proxy-from-env` | 2.1.0 | MIT |  |
@@ -403,7 +403,7 @@ and the static assets the frontend serves.
 | `scheduler` | 0.23.2 | MIT |  |
 | `set-cookie-parser` | 2.7.2 | MIT |  |
 | `sonner` | 2.0.8 | MIT |  |
-| `source-map-js` | 1.2.1 | BSD-3-Clause |  |
+| `source-map-js` | 1.2.2 | BSD-3-Clause |  |
 | `space-separated-tokens` | 2.0.2 | MIT |  |
 | `stringify-entities` | 4.0.4 | MIT |  |
 | `style-to-js` | 1.1.21 | MIT |  |

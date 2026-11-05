@@ -244,7 +244,7 @@ export function StepContent({
                 size="content"
                 variant="link"
                 onClick={onCustomize}
-                className="text-primary-400 hover:text-primary-600 p-0 text-xs"
+                className="text-primary-400 hover:text-primary-600 px-0 py-2 min-h-11 md:min-h-10 text-xs"
               >
                 {t("locations:onboarding.customize")}
               </Button>
@@ -351,7 +351,7 @@ export function StepContent({
           size="content"
           variant="ghost"
           onClick={onToggleAdvanced}
-          className="text-on-muted hover:text-on-secondary p-0"
+          className="text-on-muted hover:text-on-secondary px-0 py-2 min-h-11 md:min-h-10"
         >
           <ChevronDown
             size={13}

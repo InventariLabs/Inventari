@@ -13,7 +13,11 @@ import CategoriesPage from "./CategoriesPage";
 import { server } from "@/test/mocks/server";
 import { withLanguage } from "@/test/mocks/i18n";
 import { http, HttpResponse } from "msw";
-import { PageHeaderContext } from "@/hooks/useModulePageHeader";
+import { useCallback, useState, type ReactNode } from "react";
+import {
+  PageHeaderContext,
+  type PageHeaderData,
+} from "@/hooks/useModulePageHeader";
 import { signInWith, signOut } from "@/test/auth";
 import { onePage } from "@/test/mocks/page";
 
@@ -695,5 +699,80 @@ describe("CategoriesPage — an account that may not change a category", () => {
     expect(
       screen.queryByRole("button", { name: /^edit$/i }),
     ).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * The new-category form used to keep its state while closed, so the next
+ * opening showed the last name typed: after a save, one that the server then
+ * refused as already taken.
+ */
+describe("CategoriesPage — Add Category opens empty", () => {
+  function HeaderHost({ children }: { children: ReactNode }) {
+    const [data, setData] = useState<PageHeaderData>({});
+    const setHeader = useCallback((next: PageHeaderData) => {
+      setData(next);
+    }, []);
+    return (
+      <PageHeaderContext.Provider value={{ data, setHeader }}>
+        {data.actions ? <div>{data.actions}</div> : null}
+        {children}
+      </PageHeaderContext.Provider>
+    );
+  }
+
+  const openForm = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(
+      await screen.findByRole("button", { name: "Add Category" }),
+    );
+    return screen.findByRole("textbox", { name: /category name/i });
+  };
+
+  beforeEach(() => {
+    signInWith(["categories:read", "categories:write"]);
+    server.use(
+      http.get("/api/v1/categories", () =>
+        HttpResponse.json(onePage(mockCategories)),
+      ),
+      http.post("/api/v1/categories", () =>
+        HttpResponse.json(
+          { id: "cat-new", name: "Adhesives" },
+          { status: 201 },
+        ),
+      ),
+    );
+    render(
+      <HeaderHost>
+        <QueryClientProvider client={createQueryClient()}>
+          <BrowserRouter>
+            <CategoriesPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </HeaderHost>,
+    );
+  });
+
+  afterEach(() => signOut());
+
+  it("after a cancel", async () => {
+    const user = userEvent.setup();
+    await user.type(await openForm(user), "Draft cat");
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() =>
+      expect(screen.queryByText("Add New Category")).not.toBeInTheDocument(),
+    );
+
+    expect(await openForm(user)).toHaveValue("");
+  });
+
+  it("after a save", async () => {
+    const user = userEvent.setup();
+    await user.type(await openForm(user), "Adhesives");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(screen.queryByText("Add New Category")).not.toBeInTheDocument(),
+    );
+
+    expect(await openForm(user)).toHaveValue("");
   });
 });

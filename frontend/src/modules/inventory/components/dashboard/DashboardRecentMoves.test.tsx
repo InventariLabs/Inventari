@@ -152,6 +152,50 @@ describe("DashboardRecentMoves", () => {
     expect(rows[2]).toHaveTextContent(/issued/i);
   });
 
+  it("tells them apart in colour too", async () => {
+    render(<DashboardRecentMoves />, { wrapper });
+    await screen.findByText("Flour");
+    const dots = screen
+      .getAllByRole("listitem")
+      .map((row) => row.querySelector("[aria-hidden='true']"));
+    expect(dots[0]).toHaveClass("bg-blue-600");
+    expect(dots[1]).toHaveClass("bg-success-500");
+    expect(dots[2]).toHaveClass("bg-amber-500");
+  });
+
+  it("dates a move by its completion, or its creation until it has one", async () => {
+    server.use(
+      http.get("*/stock-moves", () =>
+        HttpResponse.json({
+          items: [
+            move({
+              id: "done",
+              product_name: "Flour",
+              created_at: "2026-09-18T08:00:00Z",
+              completed_at: "2026-09-20T09:00:00Z",
+            }),
+            move({
+              id: "open",
+              product_name: "Sugar",
+              created_at: "2026-09-19T08:00:00Z",
+              completed_at: null,
+            }),
+          ],
+          total: 2,
+          offset: 0,
+          limit: RECENT_MOVES_LIMIT,
+          has_more: false,
+        }),
+      ),
+    );
+    render(<DashboardRecentMoves />, { wrapper });
+    await screen.findByText("Flour");
+    const moments = screen
+      .getAllByRole("listitem")
+      .map((row) => row.querySelector("time")?.getAttribute("datetime"));
+    expect(moments).toEqual(["2026-09-20T09:00:00Z", "2026-09-19T08:00:00Z"]);
+  });
+
   it("declines the outside by the end of the sentence it fills", async () => {
     // The journal names where a receipt landed; a row with no named landing
     // gets the destination's word for outside, never the source's.

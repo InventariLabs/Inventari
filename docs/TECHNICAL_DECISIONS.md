@@ -59,6 +59,8 @@ This document outlines the key technical decisions made during the development o
 
 **Decision:** The core engine provides domain-neutral primitives (Items, Locations, Categories, stock and its movements) and extension points (Interceptors, EventBus, ContributionRegistry). All vertical-specific logic lives in optional modules.
 
+**Why the core is this neutral:** Inventari began as a private application for managing a fridge and grew into a framework for managing things. The core had to survive each change of purpose (home, IT desk, warehouse), so what is specific to one of them was moved out of it and into modules.
+
 **Current modules (15 backend, 21 frontend):**
 
 Backend: `api_keys`, `approvals`, `equipment`, `example_widgets`, `maker`, `nutrition`, `printing`, `purchase_orders`, `recipes`, `shopping_lists`, `stats`, `stock_takes`, `vision`, `warehouse`, `webhooks` + core.
