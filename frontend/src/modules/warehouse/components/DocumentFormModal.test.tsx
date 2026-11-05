@@ -44,7 +44,7 @@ vi.mock(
         }
         editorStub.reportHint = props.onPriceHintResult as
           ((lineKey: string, suggested: boolean) => void) | undefined;
-        const lines: Array<{ _key: string }> = props.lines ?? [];
+        const lines = props.lines ?? [];
         editorStub.lineKeys = lines.map((line) => line._key);
         const indexOfKey = (key: string) =>
           lines.findIndex((line) => line._key === key);

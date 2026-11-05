@@ -54,7 +54,10 @@ import { useDocumentPartnerOptions } from "@/modules/warehouse/hooks/useDocument
 import { useModules } from "@/contexts/ModulesContext";
 import { useShowDocumentValue } from "@/modules/warehouse/hooks/useShowDocumentValue";
 import { useQuickAddLine } from "@/modules/warehouse/hooks/useQuickAddLine";
-import { lineFieldErrors } from "@/modules/warehouse/components/documentFormShared";
+import {
+  lineFieldErrors,
+  type ReceiptDraftLine,
+} from "@/modules/warehouse/components/documentFormShared";
 import type {
   DocumentType,
   WarehouseDocument,
@@ -232,6 +235,32 @@ function LineNoPriceSource() {
   );
 }
 
+/** What sits under a line: the price sources' answer, then other modules' fields. */
+function withPriceSourceAnswer(
+  showsPrices: boolean,
+  answers: Record<string, boolean>,
+  ...moduleExtra: Parameters<typeof lineExtraFor>
+) {
+  const renderModuleExtra = lineExtraFor(...moduleExtra);
+  return function renderLineExtra(line: ReceiptDraftLine) {
+    const foundNoPrice = isUnpriced(line) && answers[line._key] === false;
+    return (
+      <>
+        {showsPrices && foundNoPrice && <LineNoPriceSource />}
+        {renderModuleExtra(line)}
+      </>
+    );
+  };
+}
+
+/** What the partner field reads of the document being edited. */
+function partnerFieldDoc(
+  type: DocumentType,
+  document?: { return_of_id?: string | null },
+) {
+  return { type, return_of_id: document?.return_of_id };
+}
+
 /** What the prefill reads besides the form it fills. */
 interface DocumentLocationPrefillInput {
   locationsLoaded: boolean;
@@ -404,7 +433,7 @@ export default function DocumentFormModal({
   // After the workspace: the picker reads the partner it holds, to name it
   // and to say whether the role set still allows it.
   const picker = useDocumentPartnerOptions(
-    { type: docType, return_of_id: document?.return_of_id },
+    partnerFieldDoc(docType, document),
     partnerId,
   );
   // The picker folds shelf-total rows only where the executor can spend
@@ -526,12 +555,6 @@ export default function DocumentFormModal({
     onOpenQuickAdd: quickAdd.openQuickAdd,
     stock: { locationId: stockLocationId },
   });
-
-  const renderModuleLineExtra = lineExtraFor(
-    "document",
-    workspace,
-    extensions.registerBeforeSubmit,
-  );
 
   const save = () => {
     if (isEdit && document) {
@@ -756,15 +779,12 @@ export default function DocumentFormModal({
                   onManualCode={handleCodeScanned}
                   onRemoveLine={removeLine}
                   onUpdateLine={updateLine}
-                  renderLineExtra={(line) => (
-                    <>
-                      {showValueFields &&
-                        isUnpriced(line) &&
-                        priceHintByLine[line._key] === false && (
-                          <LineNoPriceSource />
-                        )}
-                      {renderModuleLineExtra(line)}
-                    </>
+                  renderLineExtra={withPriceSourceAnswer(
+                    showValueFields,
+                    priceHintByLine,
+                    "document",
+                    workspace,
+                    extensions.registerBeforeSubmit,
                   )}
                   onPriceHintResult={(lineKey, suggested) =>
                     setPriceHintByLine(withPriceHint(lineKey, suggested))
