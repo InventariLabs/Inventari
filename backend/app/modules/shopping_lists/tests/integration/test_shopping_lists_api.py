@@ -25,8 +25,10 @@ from fastapi import status
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+from app.i18n.service import stated_quantity
 from app.models.user import User
 from app.modules.shopping_lists.models import ShoppingList, ShoppingListItem
+from app.schemas.validators import QUANTITY_STEP
 
 
 @pytest.mark.integration
@@ -832,6 +834,7 @@ class TestTheDoorQuantisesAndRefusesTheZero:
         code = response.json()['detail']['code']
         assert code == 'SHOPPING_LIST_ITEM_QUANTITY_ROUNDS_TO_ZERO'
         assert 'najmniejsza zapisywalna ilość' in detail
+        assert detail.endswith(stated_quantity(QUANTITY_STEP, 'pl'))
         assert 'countable' not in detail
 
     def test_an_update_to_a_rounding_zero_is_refused(

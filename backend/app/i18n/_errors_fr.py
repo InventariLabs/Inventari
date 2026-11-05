@@ -111,7 +111,7 @@ ERRORS_FR: ErrorMessages = {
     'shopping_list_not_writable': 'Cette liste de courses est {status} et ne peut pas être modifiée. Réactivez-la d’abord.',
     'shopping_list_delete_failed': 'Échec de la suppression de la liste de courses',
     'shopping_list_item_not_found': 'Article de la liste de courses introuvable',
-    'shopping_list_item_quantity_rounds_to_zero': "La quantité {quantity} s'arrondit à zéro à la précision du stockage — la plus petite valeur enregistrable est 0,001",
+    'shopping_list_item_quantity_rounds_to_zero': "La quantité {quantity} s'arrondit à zéro à la précision du stockage — la plus petite valeur enregistrable est {smallest}",
     'shopping_list_item_quantity_above_ceiling': 'La quantité {quantity} dépasse la capacité de la colonne — la plus grande valeur enregistrable est {ceiling}',
     'shopping_list_item_uom_unknown': "Unité de mesure inconnue (uom_id : {uom_id}) — l'unité n'existe pas",
     'shopping_list_item_item_unknown': "Produit inconnu (item_id : {item_id}) — le produit n'existe pas",
