@@ -138,7 +138,7 @@
     "enableAnalytics": "Enable analytics",
     "enableAnalyticsDescription": "Show the analytics tab (rotation, spend forecasts, purchase patterns). Disable for small home inventories where there is not enough history for these to be meaningful.",
     "showInventoryValue": "Show inventory value",
-    "showInventoryValueDescription": "Show stock values across the app: on the stats overview, the item screens, and in exports and printouts. It is a business metric — disable for home inventories that keep no purchase prices for it to add up."
+    "showInventoryValueDescription": "Show stock values across the app: on the stats overview, the product screens, and in exports and printouts. It is a business metric — disable for home inventories that keep no purchase prices for it to add up."
   },
   "navigation": {
     "settings": "Analytics"

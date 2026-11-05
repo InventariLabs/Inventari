@@ -140,7 +140,7 @@
     "enableAnalytics": "Activer l'analytique",
     "enableAnalyticsDescription": "Afficher l'onglet analytique (rotation, prévisions de dépenses, habitudes d'achat). Désactiver pour les petits inventaires domestiques dont l'historique est insuffisant pour des analyses pertinentes.",
     "showInventoryValue": "Afficher la valeur du stock",
-    "showInventoryValueDescription": "Afficher les valeurs du stock dans toute l'application : dans l'aperçu des statistiques, sur les écrans des articles, ainsi que dans les exports et les impressions. C'est une métrique d'entreprise — désactiver pour les inventaires domestiques qui ne conservent pas de prix d'achat à additionner."
+    "showInventoryValueDescription": "Afficher les valeurs du stock dans toute l'application : dans l'aperçu des statistiques, sur les écrans des produits, ainsi que dans les exports et les impressions. C'est une métrique d'entreprise — désactiver pour les inventaires domestiques qui ne conservent pas de prix d'achat à additionner."
   },
   "navigation": {
     "settings": "Analytique"

@@ -140,7 +140,7 @@
     "enableAnalytics": "Activar analítica",
     "enableAnalyticsDescription": "Mostrar la pestaña de analítica (rotación, previsiones de gasto, patrones de compra). Desactivar para inventarios domésticos pequeños sin historial suficiente para que estos análisis sean útiles.",
     "showInventoryValue": "Mostrar valor del inventario",
-    "showInventoryValueDescription": "Mostrar los valores del stock en toda la aplicación: en el resumen de estadísticas, en las pantallas de artículos y en las exportaciones e impresiones. Es una métrica de negocio — desactivar para inventarios domésticos que no guardan precios de compra con los que sumarlo."
+    "showInventoryValueDescription": "Mostrar los valores del stock en toda la aplicación: en el resumen de estadísticas, en las pantallas de productos y en las exportaciones e impresiones. Es una métrica de negocio — desactivar para inventarios domésticos que no guardan precios de compra con los que sumarlo."
   },
   "navigation": {
     "settings": "Analíticas"

@@ -138,7 +138,7 @@
     "enableAnalytics": "Analytik aktivieren",
     "enableAnalyticsDescription": "Analytik-Tab anzeigen (Rotation, Ausgabenprognosen, Einkaufsmuster). Für kleine Haushaltsbestände deaktivieren, bei denen nicht genügend Verlaufsdaten für aussagekräftige Analysen vorliegen.",
     "showInventoryValue": "Inventarwert anzeigen",
-    "showInventoryValueDescription": "Bestandswerte in der gesamten App anzeigen: in der Statistikübersicht, auf den Artikelseiten sowie in Exporten und Ausdrucken. Eine betriebliche Kennzahl — für Haushaltsbestände deaktivieren, die keine Einkaufspreise speichern, aus denen er aufsummiert werden könnte."
+    "showInventoryValueDescription": "Bestandswerte in der gesamten App anzeigen: in der Statistikübersicht, auf den Produktseiten sowie in Exporten und Ausdrucken. Eine betriebliche Kennzahl — für Haushaltsbestände deaktivieren, die keine Einkaufspreise speichern, aus denen er aufsummiert werden könnte."
   },
   "navigation": {
     "settings": "Analytik"
