@@ -71,16 +71,17 @@ async def validate_locations_async(
 # the role filters the UI applies to the partner dropdown.:
 # the canonical role sets live in Core (app/schemas/partner.py).
 #
-# The OUT asymmetry is intentional and must stay: the dropdown offers
-# CUSTOMER_ROLE_TYPES ({CUSTOMER, BOTH}), while the backend additionally
-# accepts SUPPLIER because returns to suppliers copy the partner from the
-# source document (document_return_service).
+# The OUT asymmetry is intentional and must stay: the dropdown of an ordinary
+# issue offers CUSTOMER_ROLE_TYPES ({CUSTOMER, BOTH}), while the backend also
+# accepts everyone goods are received from, because a return to them copies the
+# partner from the source document (document_return_service) and its draft can
+# still be saved. A manufacturer delivers goods too, so it takes them back too.
 PARTNER_TYPES_BY_DOC_TYPE = {
     # A receipt comes from a supplier or a manufacturer — and back from a
     # customer: goods a customer returns are received on a receipt of their
     # own, and that receipt names the customer, not their supplier.
     'IN': SUPPLIER_ROLE_TYPES | CUSTOMER_ROLE_TYPES,
-    'OUT': CUSTOMER_ROLE_TYPES | frozenset({'SUPPLIER'}),
+    'OUT': CUSTOMER_ROLE_TYPES | SUPPLIER_ROLE_TYPES,
 }
 
 #: What the refusal says for each restricted type — the roles in words.

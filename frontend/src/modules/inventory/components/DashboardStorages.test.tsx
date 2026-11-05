@@ -1,8 +1,17 @@
 import React from "react";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
+import { http, HttpResponse } from "msw";
+import { server } from "@/test/mocks/server";
+import { onePage } from "@/test/mocks/page";
 import { withLanguage } from "@/test/mocks/i18n";
 import type { StorageLocationNode } from "@/types";
 import type { StorageComposition } from "@/modules/inventory/hooks/useDashboardAttention";
@@ -177,6 +186,42 @@ describe("DashboardStorages", () => {
         "5 rekordów: 2 wygasają",
       );
     });
+  });
+
+  it("draws a zone's own type icon, and a box for a zone without one", async () => {
+    server.use(
+      http.get("*/location-types", () =>
+        HttpResponse.json(onePage([{ id: "cold", icon: "Refrigerator" }])),
+      ),
+    );
+    renderCard(
+      [comp("freezer", 52), comp("shelf", 6)],
+      [
+        {
+          ...zone("freezer", "Basement freezer", 52),
+          location_type_id: "cold",
+        },
+        zone("shelf", "Laundry shelf", 6),
+      ],
+    );
+
+    await waitFor(() =>
+      expect(
+        rowOf("Basement freezer").querySelector(".lucide-refrigerator"),
+      ).not.toBeNull(),
+    );
+    expect(
+      rowOf("Laundry shelf").querySelector(".lucide-package"),
+    ).not.toBeNull();
+  });
+
+  it("offers to add the first storage in place when there is none", () => {
+    renderCard([], []);
+
+    expect(screen.queryByRole("list")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Create location" }),
+    ).toBeInTheDocument();
   });
 
   it("keeps every link inside the module shell", () => {

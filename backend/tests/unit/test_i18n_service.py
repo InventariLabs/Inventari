@@ -2,6 +2,8 @@
 
 import logging
 
+import pytest
+
 from app.i18n import SUPPORTED_LANGUAGES, Language
 from app.i18n.service import (
     get_default_language,
@@ -136,6 +138,21 @@ class TestGetPluralErrorMessage:
             )
             == 'Should have at least 1 character'
         )
+
+    @pytest.mark.parametrize(
+        ('count', 'clause', 'pronoun'),
+        [
+            (1, 'trwa 1 aktywna sesja kompletacji', 'ją'),
+            (2, 'trwają 2 aktywne sesje kompletacji', 'je'),
+            (5, 'trwa 5 aktywnych sesji kompletacji', 'je'),
+        ],
+    )
+    def test_the_session_refusal_agrees_with_its_count(self, count, clause, pronoun):
+        message = get_plural_error_message(
+            'document_wms_picking_active', count, 'pl', sessions=count
+        )
+        assert clause in message
+        assert f'Najpierw {pronoun} zakończ' in message
 
     def test_a_language_without_plural_forms_keeps_the_single_sentence(self):
         assert (

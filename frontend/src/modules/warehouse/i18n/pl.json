@@ -134,8 +134,8 @@
     "selectSource": "Wybierz miejsce źródłowe",
     "selectTarget": "Wybierz miejsce docelowe",
     "notesPlaceholder": "Dodaj uwagi lub notatki…",
-    "missingValueWarning": "Niektóre pozycje nie mają ceny jednostkowej — dokument nie ma wartości księgowej. Po wyborze produktu cena może zostać podpowiedziana z cenników lub ostatnich dokumentów zakupowych.",
-    "missingValueWarningNoSource": "Niektóre pozycje nie mają ceny jednostkowej — dokument nie ma wartości księgowej. Cenniki i dotychczasowe zakupy nie dają ceny dla tych produktów — wpisz ją ręcznie."
+    "missingValueWarning": "Niektóre pozycje nie mają ceny jednostkowej — dokument nie ma wartości księgowej.",
+    "lineNoPriceSource": "Cenniki i dotychczasowe zakupy nie dają ceny — wpisz ją ręcznie."
   },
   "bulk": {
     "selectAll": "Zaznacz wszystkie",
@@ -932,7 +932,7 @@
     "undo_action": "Cofnij",
     "skip_confirm_title": "Pominąć tę linię?",
     "skip_confirm_message": "Produkt {{product}} nie zostanie skompletowany w tej sesji. Pominięcie można cofnąć z listy.",
-    "complete": "Zakończ",
+    "complete": "Zakończ kompletację",
     "cancel": "Odrzuć skany",
     "discard_confirm_title": "Odrzucić skany?",
     "discard_confirm_message": "Wszystko, co zebrano w tej sesji, wraca do oczekujących. Tego nie można cofnąć.",

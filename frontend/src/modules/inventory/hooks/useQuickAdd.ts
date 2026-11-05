@@ -40,6 +40,56 @@ interface UseQuickAddProps {
   onSuccess: (newItem?: Item) => void;
 }
 
+/**
+ * The two category lists the form reads, and whether either never arrived.
+ *
+ * Categories answer two different questions here, and one list cannot
+ * answer both. The full catalogue is what the record's own category and
+ * the label's purpose are looked up in; the picker offers the scoped set —
+ * the same one the product list shows — so a category that would move the
+ * record into a module is not handed out by a form that says "product".
+ * A category the record deliberately carries — from the caller's
+ * initialData, or the one the label's own purpose names — stays offered
+ * even when it belongs to a module: it is an ask, not a leftover.
+ *
+ * The form's fields read the full list and its picker the offered one. A list
+ * refreshed in vain still answers both, so only a missing one counts as failed.
+ */
+function useQuickAddCategories(
+  initialCategoryId: string | null | undefined,
+  contextTag: string | undefined,
+) {
+  const {
+    data: allCategories,
+    error: allCategoriesError,
+    refetch: refetchAllCategories,
+  } = useAllCategories();
+  const deliberateCategoryId =
+    initialCategoryId ??
+    (contextTag && allCategories
+      ? allCategories.find((c) => c.context_tag === contextTag)?.id
+      : undefined) ??
+    null;
+  const {
+    scoped: scopedCategories,
+    error: scopedCategoriesError,
+    refetch: refetchScopedCategories,
+  } = useScopedCategories(deliberateCategoryId);
+  const missingListError =
+    (!allCategories && allCategoriesError) ||
+    (!scopedCategories && scopedCategoriesError);
+  const categoriesFailure = missingListError
+    ? {
+        error: missingListError,
+        retry: () => {
+          void refetchAllCategories();
+          refetchScopedCategories();
+        },
+      }
+    : null;
+  return { allCategories, scopedCategories, categoriesFailure };
+}
+
 export function useQuickAdd({
   labelCode,
   initialStorageId,
@@ -88,23 +138,8 @@ export function useQuickAdd({
     isError: isStoragesError,
     refetch: refetchStorages,
   } = useQuickAddStorages();
-  // Categories answer two different questions here, and one list cannot
-  // answer both. The full catalogue is what the record's own category and
-  // the label's purpose are looked up in; the picker offers the scoped set —
-  // the same one the product list shows — so a category that would move the
-  // record into a module is not handed out by a form that says "product".
-  // A category the record deliberately carries — from the caller's
-  // initialData, or the one the label's own purpose names — stays offered
-  // even when it belongs to a module: it is an ask, not a leftover.
-  const { data: allCategories } = useAllCategories();
-  const deliberateCategoryId =
-    initialData?.category_id ??
-    (contextTag && allCategories
-      ? allCategories.find((c) => c.context_tag === contextTag)?.id
-      : undefined) ??
-    null;
-  const { scoped: scopedCategories } =
-    useScopedCategories(deliberateCategoryId);
+  const { allCategories, scopedCategories, categoriesFailure } =
+    useQuickAddCategories(initialData?.category_id, contextTag);
 
   const { rememberedStorageId, rememberedCategoryId, heldFromMemory } =
     rememberedPicks(initialData, initialStorageId, {
@@ -421,6 +456,7 @@ export function useQuickAdd({
     isStoragesError,
     refetchStorages,
     categories: scopedCategories,
+    categoriesFailure,
     assignMutation,
     handleFileSelect,
     handleImageSelect,

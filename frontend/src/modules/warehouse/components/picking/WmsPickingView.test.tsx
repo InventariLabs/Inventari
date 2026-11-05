@@ -429,7 +429,9 @@ describe("WmsPickingView", () => {
     expect(
       screen.getByText("Take the goods to C-03 · Rack C and scan its label"),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Complete" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Complete picking" }),
+    ).toBeDisabled();
 
     await userEvent.type(field, "SHF-B2{enter}");
     await waitFor(() =>
