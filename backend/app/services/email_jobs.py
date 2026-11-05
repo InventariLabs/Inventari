@@ -200,7 +200,7 @@ async def _send_job(db: AsyncSession, job_id: uuid.UUID, now: datetime) -> None:
     smtp_config = _decode_smtp_config(job)
     if job.attachment_bytes is not None and job.attachment_filename:
         result = await run_sync_in_thread(
-            lambda: EmailService._send_email_with_attachment(  # noqa: SLF001
+            lambda: EmailService._send_email_with_attachment(
                 job.to_email,
                 job.subject,
                 job.html_content,

@@ -648,7 +648,7 @@ class TestSmtpTransport:
         monkeypatch.setattr('smtplib.SMTP', plain)
         monkeypatch.setattr('smtplib.SMTP_SSL', ssl)
 
-        result = EmailService._send_email_with_attachment(  # noqa: SLF001
+        result = EmailService._send_email_with_attachment(
             to_email='recipient@test.com',
             subject='Test',
             html_content='<p>Test</p>',

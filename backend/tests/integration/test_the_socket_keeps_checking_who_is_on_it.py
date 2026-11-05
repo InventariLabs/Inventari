@@ -28,11 +28,11 @@ WS_URL = '/api/v1/ws/notifications'
 
 @pytest.fixture
 def blacklist_on() -> Any:
-    previous = token_blacklist._redis  # noqa: SLF001
+    previous = token_blacklist._redis
     fake = FakeTokenStore()
     token_blacklist.set_redis(fake)
     yield fake
-    token_blacklist._redis = previous  # noqa: SLF001
+    token_blacklist._redis = previous
 
 
 def _token(user, **claims: Any) -> str:

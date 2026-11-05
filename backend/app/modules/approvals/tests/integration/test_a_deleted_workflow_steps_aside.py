@@ -408,8 +408,8 @@ _APPROVALS_TABLES = {'approval_workflows', 'approval_requests', 'approval_decisi
 @pytest.fixture
 def before_the_archive() -> Iterator[str]:
     """An empty database with the approvals tables as revision 004 left them."""
-    import app.core.template_models  # noqa: F401
-    import app.models  # noqa: F401
+    import app.core.template_models
+    import app.models
     import app.modules.approvals.models  # noqa: F401
     from app.database import Base
 

@@ -491,7 +491,7 @@ async def _name_products_of_typed_lines(
         )
 
 
-async def create_receipt_from_po(  # noqa: C901 - existing complexity/size
+async def create_receipt_from_po(
     db: AsyncSession,
     org_id: UUID,
     po_id: UUID,

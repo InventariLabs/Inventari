@@ -25,14 +25,14 @@ _DATA_URI = f'data:image/png;base64,{_PNG}'
 class _CountingHandler(BaseHTTPRequestHandler):
     hits: list[str] = []
 
-    def do_GET(self):  # noqa: N802 - BaseHTTPRequestHandler API
+    def do_GET(self):  # BaseHTTPRequestHandler API
         type(self).hits.append(self.path)
         self.send_response(200)
         self.send_header('Content-Type', 'image/png')
         self.end_headers()
         self.wfile.write(base64.b64decode(_PNG))
 
-    def log_message(self, *args):  # noqa: A002 - silence test server logging
+    def log_message(self, *args):  # silence test server logging
         pass
 
 

@@ -180,7 +180,7 @@ from ._maintenance_service import (  # noqa: E402
     retire_item,
     update_log,
 )
-from ._overdue_service import list_overdue_assignments  # noqa: E402,F401
+from ._overdue_service import list_overdue_assignments  # noqa: E402
 from .bulk_service import bulk_edit_items  # noqa: E402
 
 __all__ = [

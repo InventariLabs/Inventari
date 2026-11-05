@@ -31,7 +31,7 @@ import app.database
 # registry — a service-level query through an incomplete registry fails with
 # "failed to locate a name" and the stream would dress that up as its error
 # event instead of answering.
-import app.main  # noqa: F401
+import app.main
 from app.core.contracts import OverviewDTO, UserContextDTO
 from app.models.user import User
 from app.modules.stats import router as stats_router

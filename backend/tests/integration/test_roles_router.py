@@ -36,7 +36,7 @@ def _auth(user) -> dict:
 
 async def _make_admin(db, user_id, org_id):
     """Promote a user to admin so the router guard lets the request through."""
-    from app.models.user import User  # noqa: PLC0415
+    from app.models.user import User
 
     user = await db.get(User, user_id)
     user.role = 'admin'
@@ -265,10 +265,10 @@ class TestRolesRouter:
 
         # Create a target user via the SYNC db_session so the row commits
         # before the HTTP request's separate session tries to read it.
-        from uuid import uuid4  # noqa: PLC0415
+        from uuid import uuid4
 
-        from app.models.user import User  # noqa: PLC0415
-        from app.services.auth_service import get_password_hash  # noqa: PLC0415
+        from app.models.user import User
+        from app.services.auth_service import get_password_hash
 
         target_user_id = uuid4()
         target_user = User(
@@ -515,7 +515,7 @@ class TestRoleLifecycle:
         permission check honoured in every tenant. There is no such row any
         more; what is left to refuse is somebody else's.
         """
-        from app.models.organization import Organization  # noqa: PLC0415
+        from app.models.organization import Organization
 
         await self._admin(real_async_db_session, async_test_user, async_test_household)
         elsewhere = Organization(name='Somebody Else', currency='PLN')

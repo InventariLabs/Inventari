@@ -131,7 +131,7 @@ async def run_job_async(
                 'processed': result['total'],
                 'result': result,
             }
-        except Exception as exc:  # noqa: BLE001 — the job is how the failure reaches the screen
+        except Exception as exc:  # the job is how the failure reaches the screen
             logger.exception('[import] job %s failed', job_id)
             await db.rollback()
             outcome = {'status': 'failed', 'error': str(exc)[:2000]}

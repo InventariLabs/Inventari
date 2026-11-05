@@ -296,7 +296,7 @@ def _seed_many(org_id: Any, created_by: Any, items: int) -> dict[str, int]:
     organization gets its equipment, documents and orders, a food one gets
     neither the rows nor a crash over the categories it never declared.
     """
-    import seed_demo_data as demo  # noqa: PLC0415 — backend root, not a package
+    import seed_demo_data as demo  # backend root, not a package
     from app.database import SessionLocal
     from app.models.organization import Organization
 

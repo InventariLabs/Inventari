@@ -42,7 +42,7 @@ def _make_service(
     if 'app.services.crypto_service' in sys.modules:
         del sys.modules['app.services.crypto_service']
 
-    import app.services.crypto_service as cs  # noqa: PLC0415
+    import app.services.crypto_service as cs
 
     # Restore originals immediately so other tests are not affected
     if orig_config is not None:

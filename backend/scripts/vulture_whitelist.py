@@ -253,7 +253,8 @@ shell_command  # noqa: B018
 # silenced name with no caller and no deadline is how a dead API goes on
 # being reported as alive.
 #
-# Format: <name>  # noqa: B018  # owner=<who> expires=<YYYY-MM-DD> <reason>
+# Format: <name>, then the B018 suppression comment, then
+# "# owner=<who> expires=<YYYY-MM-DD> <reason>" as the lines below show.
 maker_api  # noqa: B018  # owner=core expires=2027-02-28 Module extension surface (AGENTS.md, Cross-Module API Contracts); no in-repo caller outside the maker module itself.
 maker_api.list_bom_lines_async  # noqa: B018  # owner=core expires=2027-02-28 As maker_api above.
 maker_api.explode_bom_async  # noqa: B018  # owner=core expires=2027-02-28 As maker_api above.

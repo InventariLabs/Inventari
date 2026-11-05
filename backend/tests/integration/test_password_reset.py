@@ -214,7 +214,7 @@ class TestPasswordReset:
         """The reset screen asks before it shows a form; asking costs nothing."""
         from app.core.token_blacklist import token_blacklist
 
-        original_redis = token_blacklist._redis  # noqa: SLF001
+        original_redis = token_blacklist._redis
         token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
         try:
             token = create_password_reset_token(test_user.id)
@@ -229,12 +229,12 @@ class TestPasswordReset:
             )
             assert confirm.status_code == 200, confirm.text
         finally:
-            token_blacklist._redis = original_redis  # noqa: SLF001
+            token_blacklist._redis = original_redis
 
     def test_check_refuses_a_spent_token(self, client: TestClient, test_user) -> None:
         from app.core.token_blacklist import token_blacklist
 
-        original_redis = token_blacklist._redis  # noqa: SLF001
+        original_redis = token_blacklist._redis
         token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
         try:
             token = create_password_reset_token(test_user.id)
@@ -248,7 +248,7 @@ class TestPasswordReset:
             assert check.status_code == 400, check.text
             assert check.json()['detail']['code'] == 'INVALID_RESET_TOKEN'
         finally:
-            token_blacklist._redis = original_redis  # noqa: SLF001
+            token_blacklist._redis = original_redis
 
     def test_check_refuses_a_garbage_token(self, client: TestClient) -> None:
         check = client.post(
@@ -269,7 +269,7 @@ class TestPasswordReset:
 
         from app.core.token_blacklist import token_blacklist
 
-        original_redis = token_blacklist._redis  # noqa: SLF001
+        original_redis = token_blacklist._redis
         token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
         try:
             login = client.post(
@@ -324,7 +324,7 @@ class TestPasswordReset:
             # The login already set the cookie; refresh rides on it.
             assert client.post('/api/v1/auth/refresh').status_code == 200
         finally:
-            token_blacklist._redis = original_redis  # noqa: SLF001
+            token_blacklist._redis = original_redis
 
     def test_profile_password_change_revokes_but_name_change_does_not(
         self, client: TestClient, test_user, db_session
@@ -332,7 +332,7 @@ class TestPasswordReset:
         """PATCH /me kills other sessions only when the password moves."""
         from app.core.token_blacklist import token_blacklist
 
-        original_redis = token_blacklist._redis  # noqa: SLF001
+        original_redis = token_blacklist._redis
         token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
         try:
             login = client.post(
@@ -366,7 +366,7 @@ class TestPasswordReset:
             )
             assert client.get('/api/v1/auth/me', headers=headers).status_code == 401
         finally:
-            token_blacklist._redis = original_redis  # noqa: SLF001
+            token_blacklist._redis = original_redis
 
     def test_short_password_is_rejected_by_pydantic(
         self, client: TestClient, test_user
@@ -604,7 +604,7 @@ class TestPasswordChangeHardening:
     def test_reset_token_works_only_once(self, client: TestClient, test_user) -> None:
         from app.core.token_blacklist import token_blacklist
 
-        original_redis = token_blacklist._redis  # noqa: SLF001
+        original_redis = token_blacklist._redis
         token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
         try:
             token = create_password_reset_token(test_user.id)
@@ -628,4 +628,4 @@ class TestPasswordChangeHardening:
                 == 200
             ), 'the replay must not have changed the password again'
         finally:
-            token_blacklist._redis = original_redis  # noqa: SLF001
+            token_blacklist._redis = original_redis

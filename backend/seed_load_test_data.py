@@ -267,7 +267,7 @@ def seed_org_data(db, org_id, items_per_org: int) -> int:
         db.query(Item)
         .filter(
             Item.organization_id == org_id,
-            Item.is_deleted == False,  # noqa: E712
+            Item.is_deleted == False,
         )
         .count()
     )

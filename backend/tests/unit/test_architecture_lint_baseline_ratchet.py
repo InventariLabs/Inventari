@@ -177,7 +177,7 @@ class TestWhitelistRatchet:
         assert current_sizes(tmp_path, wl) == {'vulture_whitelist.py': 1}
 
     def test_extending_an_existing_entry_is_growth(self, tmp_path):
-        # `a  # noqa` becoming `a.sneaky  # noqa` adds no line and no statement,
+        # A whitelist entry `a` becoming `a.sneaky` adds no line and no statement,
         # but it silences one more name.
         wl = _whitelist(tmp_path, ['a'])
         before = current_sizes(tmp_path, wl)['vulture_whitelist.py']

@@ -418,7 +418,7 @@ def build_pdf_context(
     }
 
 
-def render_document_html(  # noqa: PLR0915 - existing complexity/size
+def render_document_html(
     document: Document,
     profile: DocumentProfile | None,
     lang: str = 'en',
