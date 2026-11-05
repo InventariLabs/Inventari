@@ -51,6 +51,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Two locations can no longer be saved with one name at the same level when two
+  people, or a retried request, name them at the same moment: the second is
+  refused with the same "already exists at this level" answer a later attempt
+  gets. The database now holds the rule too. On upgrade, places that already
+  shared a name under one parent keep both: the newer one is renamed with a
+  number after its name, for example "Cellar (2)".
 - Add Category opens empty, on the product and the equipment category screens
   alike. It used to bring back the last name typed, after a cancel and after a
   save, where saving it again was refused as a duplicate.

@@ -12,6 +12,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
@@ -74,6 +75,27 @@ class StorageLocation(Base):
         # them in this order lets it stop once the page is full instead of
         # sorting every group of the organization (``stockpage01``).
         Index('ix_storage_locations_org_name', 'organization_id', 'name'),
+        # A name is taken once per level. The service checks it first so the
+        # caller can be told which name, but two requests that both read
+        # before either wrote each found it free; the index is what settles
+        # them. Two partial indexes rather than one over ``parent_id``: a
+        # unique index treats NULLs as distinct, and every top-level place
+        # has no parent.
+        Index(
+            'uq_storage_locations_org_parent_name',
+            'organization_id',
+            'parent_id',
+            'name',
+            unique=True,
+            postgresql_where=text('parent_id IS NOT NULL'),
+        ),
+        Index(
+            'uq_storage_locations_org_root_name',
+            'organization_id',
+            'name',
+            unique=True,
+            postgresql_where=text('parent_id IS NULL'),
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
