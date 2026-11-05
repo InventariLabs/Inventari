@@ -817,6 +817,15 @@ describe("StatsOverviewTab", () => {
 // ── StatsExpiryForecast ───────────────────────────────────────────────────────
 
 describe("StatsExpiryForecast", () => {
+  it("sits two tiles across on a phone, so the longest label (PRZETERMINOWANE, 95 px) is never broken inside the word", () => {
+    // Three across leaves a 320 px screen tiles of 56 px. jsdom lays nothing
+    // out, so the guard is the grid the tiles sit in.
+    render(<StatsExpiryForecast t={t} expiryForecast={expiryForecast} />);
+    const grid = screen.getByText("Expired").closest(".grid");
+    expect(grid?.className).toMatch(/(^|\s)grid-cols-2(\s|$)/);
+    expect(grid?.className).not.toMatch(/(^|\s)grid-cols-3(\s|$)/);
+  });
+
   it("renders all forecast periods", () => {
     render(<StatsExpiryForecast t={t} expiryForecast={expiryForecast} />);
     // Count values
@@ -1022,7 +1031,39 @@ describe("SmartAlertsPanel", () => {
 
   it("says when an expired record went off", () => {
     render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
-    expect(screen.getByText(/^Expired on .*2026\.$/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/^Expired on .*2026, 2 days ago\.$/),
+    ).toBeInTheDocument();
+  });
+
+  it("says how far off a date is, so two records of one product differ in words and not in colour alone", () => {
+    const sameProductTwice: SmartAlerts = {
+      total_alerts: 2,
+      alerts: [
+        {
+          ...smartAlerts.alerts[1],
+          days_until_expiry: 0,
+          expiry_date: "2026-10-31",
+        },
+        {
+          ...smartAlerts.alerts[1],
+          severity: "warning",
+          days_until_expiry: 6,
+          expiry_date: "2026-11-06",
+        },
+      ],
+    };
+    render(wrap(<SmartAlertsPanel alerts={sameProductTwice} t={t} />));
+    expect(screen.getByText(/^Expires today, .*2026\.$/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/^Expires on .*2026, in 6 days\.$/),
+    ).toBeInTheDocument();
+  });
+
+  it("paints a warning alert amber, not the neutral grey of an unknown severity", () => {
+    render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
+    const card = screen.getByRole("link", { name: "Milk" }).closest("div.p-4");
+    expect(card?.className).toContain("bg-amber-50");
   });
 
   it("leads from an item's alert to that item", () => {
@@ -1043,7 +1084,9 @@ describe("SmartAlertsPanel", () => {
 
   it("writes each alert's sentence in English", () => {
     render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
-    expect(screen.getByText(/^Expires on .*2026\.$/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/^Expires on .*2026, in 2 days\.$/),
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Untouched for 75 days — use it before buying more."),
     ).toBeInTheDocument();

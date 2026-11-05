@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { renderWithProviders } from "@/test/utils";
@@ -391,6 +397,46 @@ describe("StockAsOfPage — the address carries the report", () => {
       as_of: endOfDay("2026-06-30"),
       location_id: "l1",
     });
+  });
+
+  it("opens on the product the stock list was narrowed to", () => {
+    renderAt("/inventory/stock/as-of?search=flour");
+
+    expect(asked.query).toMatchObject({ search: "flour" });
+    expect(
+      screen.getByRole("textbox", { name: "Search a product…" }),
+    ).toHaveValue("flour");
+  });
+
+  it("asks the server for the product the reader types", async () => {
+    renderAt("/inventory/stock/as-of");
+    expect(asked.query.search).toBeUndefined();
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Search a product…" }),
+      {
+        target: { value: "rye" },
+      },
+    );
+
+    await waitFor(() => expect(asked.query).toMatchObject({ search: "rye" }));
+  });
+
+  it("sends the text the way it words the empty answer: without the spaces around it", () => {
+    renderAt("/inventory/stock/as-of?search=%20%20tomat%20");
+    expect(asked.query).toMatchObject({ search: "tomat" });
+  });
+
+  it("sends no search for a field that holds only spaces", () => {
+    renderAt("/inventory/stock/as-of?search=%20%20%20");
+    expect(asked.query.search).toBeUndefined();
+  });
+
+  it("says the search found nothing, not that the shelf was empty", () => {
+    state = { data: { ...REPORT, items: [], total: 0 }, isError: false };
+    renderAt("/inventory/stock/as-of?search=zzz");
+
+    expect(screen.getByText(/match “zzz” on this date/)).toBeInTheDocument();
   });
 
   it("writes the storage the reader picks to the address", async () => {

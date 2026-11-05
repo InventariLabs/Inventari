@@ -26,12 +26,12 @@ export function StatsExpiryForecast({ t, expiryForecast }: Props) {
         {t("stats:expiryForecast")}
       </h2>
       {expiryForecast && expiryForecast.length > 0 ? (
-        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
           {expiryForecast.map((forecast) => (
             <div
               key={forecast.period}
               className={cn(
-                "p-3 sm:p-5 rounded-2xl text-center transition-all border",
+                "p-2.5 sm:p-5 rounded-2xl text-center transition-all border",
                 forecast.period === "Expired"
                   ? "bg-red-50 border-red-200 text-on-danger dark:bg-red-500/10 dark:border-red-500/20"
                   : forecast.period === "Today" ||
@@ -46,7 +46,7 @@ export function StatsExpiryForecast({ t, expiryForecast }: Props) {
               {/* No opacity dial on the label: at 10px the tinted tiles'
                   colour half only clears AA at full strength (a 70% wash of
                   `on-warning` on amber-50 measured ~4.3:1). */}
-              <p className="text-[10px] sm:text-[10px] font-medium uppercase tracking-tight leading-tight break-words">
+              <p className="text-[10px] font-medium uppercase tracking-tight leading-tight break-words">
                 {PERIOD_TRANSLATIONS_KEYS[forecast.period]
                   ? t(PERIOD_TRANSLATIONS_KEYS[forecast.period], {
                       ns: "common",

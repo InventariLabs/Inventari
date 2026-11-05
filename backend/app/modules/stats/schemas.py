@@ -102,6 +102,10 @@ class CategoryConsumption(BaseModel):
 class ConsumptionStats(BaseModel):
     most_consumed: list[MostConsumedItem]
     most_wasted: list[MostConsumedItem]
+    #: Share of outflow events that were waste. Served for API consumers
+    #: only: the cost analysis screen shows the share of *value* wasted
+    #: (``CostAnalysis.waste_value_percentage``), which is the figure a
+    #: reader can act on; an event count says nothing about money lost.
     waste_event_rate: float
     #: ``None`` where the ledger has no outgoing value for the window — see
     #: ``CostAnalysis.total_wasted``.

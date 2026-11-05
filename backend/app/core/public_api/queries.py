@@ -19,9 +19,10 @@ be fresh.
 Invalidation: every state-changing act funnels through the audit
 journal, whose writer calls ``cache_invalidate_org_queries`` — one
 ``INCR`` on the organization's version key, after which the names
-these functions build resolve elsewhere; bulk item updates, which do
-not journal, invalidate explicitly. A cache entry therefore never
-survives a write to the records it aggregates.
+these functions build resolve elsewhere; a bulk item update journals
+each row like a single edit and invalidates explicitly on top of it. A
+cache entry therefore never survives a write to the records it
+aggregates.
 
 Not every journal entry is such a write. The models here are all
 defined over stock, catalogue and custody facts, so the journal writer

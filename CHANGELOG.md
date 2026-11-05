@@ -55,6 +55,20 @@ says what the release does rather than what changed since them.
   field of the Dairy and Cheese categories now offers its options in the
   interface language instead of the stored English "No" and "Yes". Options an
   organization wrote itself keep their words.
+- The stock-on-a-date report can be narrowed to a product: it has a search
+  field, the stock list's "Stock on a date" button carries the search and the
+  place you had narrowed to, and the spreadsheet, the printout and the
+  `search` parameter of `GET /stock-as-of` follow the same text. Its total and
+  counts then speak about the matching products only.
+- The "Show inventory value" setting says that it also governs the product
+  screens, exports and printouts, not only the statistics overview, and a
+  profile that hides stock value no longer shows it for a moment while the
+  setting is still on its way.
+- Smart alerts state in words how far off an expiry date is ("Expires on
+  12.11.2026, in 3 days"), and an alert about a date within the week is amber
+  rather than grey. On a phone the expiry forecast tiles sit two across, so no
+  label breaks inside a word in any of the six languages, and uppercase labels
+  keep their word spaces.
 - Add Category opens empty, on the product and the equipment category screens
   alike. It used to bring back the last name typed, after a cancel and after a
   save, where saving it again was refused as a duplicate.

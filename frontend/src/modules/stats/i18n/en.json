@@ -64,8 +64,11 @@
         "forgotten_other": "Untouched for {{count}} days — use it before buying more.",
         "staple_one": "Last bought {{count}} day ago, more than twice as long as usual.",
         "staple_other": "Last bought {{count}} days ago, more than twice as long as usual.",
-        "expiring": "Expires on {{date}}.",
-        "expired": "Expired on {{date}}."
+        "expiringToday": "Expires today, {{date}}.",
+        "expiring_one": "Expires on {{date}}, in {{count}} day.",
+        "expiring_other": "Expires on {{date}}, in {{count}} days.",
+        "expired_one": "Expired on {{date}}, {{count}} day ago.",
+        "expired_other": "Expired on {{date}}, {{count}} days ago."
       },
       "noAlerts": "No alerts - your inventory looks good!",
       "noData": "Nothing to check yet — add items and alerts will follow"
@@ -135,7 +138,7 @@
     "enableAnalytics": "Enable analytics",
     "enableAnalyticsDescription": "Show the analytics tab (rotation, spend forecasts, purchase patterns). Disable for small home inventories where there is not enough history for these to be meaningful.",
     "showInventoryValue": "Show inventory value",
-    "showInventoryValueDescription": "Show the total stock value on the stats overview. It is a business metric — disable for home inventories that keep no purchase prices for it to add up."
+    "showInventoryValueDescription": "Show stock values across the app: on the stats overview, the product screens, and in exports and printouts. It is a business metric — disable for home inventories that keep no purchase prices for it to add up."
   },
   "navigation": {
     "settings": "Analytics"

@@ -27754,6 +27754,24 @@
             "description": "This place and everything below it. Quantities only \u2014 the cost history is kept per product, not per shelf."
           },
           {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -27852,6 +27870,24 @@
               ],
               "title": "Location Id"
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {
@@ -27927,6 +27963,24 @@
               ],
               "title": "Location Id"
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {

@@ -74,6 +74,14 @@ function appliedStockFilters(
   ].filter((name): name is string => Boolean(name));
 }
 
+/** What the report of a day is narrowed to: what this list is narrowed to. */
+function asOfQuery(search: string, locationId: string): string {
+  const params = new URLSearchParams();
+  if (search.trim()) params.set("search", search.trim());
+  if (locationId) params.set("location", locationId);
+  return params.toString();
+}
+
 export default function StockLevelsPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const { setHeader } = useModulePageHeader();
@@ -187,7 +195,11 @@ export default function StockLevelsPage() {
             <Button
               variant="outline"
               leftIcon={<CalendarClock size={16} />}
-              onClick={() => navigate("/inventory/stock/as-of")}
+              onClick={() =>
+                navigate(
+                  `/inventory/stock/as-of?${asOfQuery(filters.searchInput, locationId)}`,
+                )
+              }
             >
               {t("inventory:asOf.title")}
             </Button>
