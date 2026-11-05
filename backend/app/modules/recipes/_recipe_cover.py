@@ -31,6 +31,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import AppException
 from app.core.file_signature import validate_signature
 from app.core.logging import get_logger
+from app.core.module_sdk import cover_leaf
 from app.core.public_api import core_api
 from app.core.ssrf_guard import validate_webhook_url
 
@@ -103,13 +104,13 @@ async def store_cover(
     """Put *content* in the app's own storage and return its storage key.
 
     The org travels with the call: the storage keeps the file under
-    ``<org>/recipes/<recipe_id>/cover.<ext>`` and the facade rebuilds that
+    ``<org>/recipes/<recipe_id>/cover.<digest>.<ext>`` and the facade rebuilds that
     prefix on every call, so the recipe keeps only the key. The address a
     reader loads is built from it when the row is read
     (``Recipe.image_url``) — never stored.
     """
     data, stored_type = _reencode(content, content_type)
-    path = f'{recipe_id}/cover.{RECIPE_IMAGE_MIME_TO_EXT[stored_type]}'
+    path = f'{recipe_id}/{cover_leaf(data, RECIPE_IMAGE_MIME_TO_EXT[stored_type])}'
     return await core_api.file_storage.save_for_org_async(
         organization_id, 'recipes', path, data, stored_type
     )

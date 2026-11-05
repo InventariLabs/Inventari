@@ -703,44 +703,41 @@ describe("ItemEditModal — a reader without items:write", () => {
 });
 
 /**
- * The thumbnail shows the picked file while the upload is on its way. A refused
- * upload left it there, where it read as the product's picture until the sheet
- * was reopened.
+ * The thumbnail shows the picked file until Save stores it. A refused photo
+ * left it there, where it read as the product's picture until the sheet was
+ * reopened.
  */
 describe("ItemEditModal — a picture the server refused", () => {
   const SAVED = "/uploads/saved.png";
-  const ACCEPTED = "/uploads/accepted.png";
 
   const picture = (name: string) =>
     new File(["pixels"], name, { type: "image/gif" });
 
-  /** Each upload waits for its answer until the test gives it. */
-  function serveUploads() {
-    const answers: Array<(response: Response) => void> = [];
+  beforeEach(() => {
+    // jsdom has no object URLs.
+    URL.createObjectURL = vi.fn(() => "blob:picked");
     server.use(
       http.get("/api/v1/items/:id", () =>
         HttpResponse.json({
           id: "1",
           name: "Test Item",
           quantity: 1,
+          category_id: "1",
+          location_id: "1",
           image_url: SAVED,
           added_date: new Date().toISOString(),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }),
       ),
-      http.post(
-        "/api/v1/items/:id/image",
-        () => new Promise<Response>((resolve) => answers.push(resolve)),
+      http.put("/api/v1/items/:id", () => HttpResponse.json({ id: "1" })),
+      http.post("/api/v1/items/:id/image", () =>
+        HttpResponse.json({ detail: "The file is too large" }, { status: 413 }),
       ),
     );
-    return answers;
-  }
+  });
 
-  const refusal = () =>
-    HttpResponse.json({ detail: "The file is too large" }, { status: 413 });
-
-  async function openPicker() {
+  async function pickAndSave() {
     render(<ItemEditModal itemId="1" onClose={() => {}} />);
     await screen.findByDisplayValue(/Test Item/i);
     const thumbnail = () => screen.getByAltText(/image preview/i);
@@ -748,54 +745,29 @@ describe("ItemEditModal — a picture the server refused", () => {
     const input = document.querySelector<HTMLInputElement>(
       'input[type="file"][accept="image/*"]',
     )!;
-    return { thumbnail, input, user: userEvent.setup() };
+    const user = userEvent.setup();
+    await user.upload(input, picture("too-big.png"));
+    await waitFor(() =>
+      expect(thumbnail()).toHaveAttribute("src", "blob:picked"),
+    );
+    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    return { thumbnail, input, user };
   }
 
   it("goes back to the product's picture once the upload is refused", async () => {
-    const answers = serveUploads();
-    const { thumbnail, input, user } = await openPicker();
+    const { thumbnail } = await pickAndSave();
 
-    await user.upload(input, picture("too-big.png"));
-    // The bridge is on show first; this is the state the refusal must undo.
-    await waitFor(() =>
-      expect(thumbnail().getAttribute("src")).toMatch(/^data:image\/gif/),
-    );
-    await waitFor(() => expect(answers).toHaveLength(1));
-    answers[0](refusal());
-
+    expect(await screen.findByText("The file is too large")).toBeVisible();
     await waitFor(() => expect(thumbnail()).toHaveAttribute("src", SAVED));
   });
 
-  it("goes back to the picture accepted a moment ago, not the one the sheet opened on", async () => {
-    const answers = serveUploads();
-    const { thumbnail, input, user } = await openPicker();
-
-    await user.upload(input, picture("fine.png"));
-    await waitFor(() => expect(answers).toHaveLength(1));
-    answers[0](HttpResponse.json({ image_url: ACCEPTED }));
-    await waitFor(() => expect(thumbnail()).toHaveAttribute("src", ACCEPTED));
-
-    await user.upload(input, picture("too-big.png"));
-    await waitFor(() =>
-      expect(thumbnail().getAttribute("src")).toMatch(/^data:image\/gif/),
-    );
-    await waitFor(() => expect(answers).toHaveLength(2));
-    answers[1](refusal());
-
-    await waitFor(() => expect(thumbnail()).toHaveAttribute("src", ACCEPTED));
-  });
-
   it("lets the same file be picked again after a refusal", async () => {
-    const answers = serveUploads();
-    const { input, user } = await openPicker();
+    const { input } = await pickAndSave();
 
-    await user.upload(input, picture("too-big.png"));
-    await waitFor(() => expect(answers).toHaveLength(1));
-    answers[0](refusal());
-
+    await screen.findByText("The file is too large");
     // A browser fires no change for the file the input already holds, so a
     // retry of the same file would do nothing and say nothing.
-    await waitFor(() => expect(input.value).toBe(""));
+    expect(input.value).toBe("");
   });
 });
 

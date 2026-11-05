@@ -14,7 +14,7 @@ from app.core.exceptions import (
     map_service_errors,
 )
 from app.core.file_signature import validate_signature
-from app.core.module_sdk import cover_extension, served_url
+from app.core.module_sdk import cover_leaf_of, served_url
 from app.core.public_api import core_api
 from app.core.upload_validation import format_size_limit, read_capped_upload
 from app.i18n.service import get_current_lang, get_error_message
@@ -230,6 +230,7 @@ def register_extras_routes(router: APIRouter) -> None:  # noqa: C901, PLR0915 - 
         # Re-encoded on the way in, like an imported one: the same
         # normalising, and EXIF — which on a phone photograph carries where it
         # was taken — does not survive the trip.
+        previous_leaf = cover_leaf_of(recipe.image_url)
         try:
             stored_key = await store_cover(
                 org_id, recipe_id, content, image.content_type
@@ -243,6 +244,15 @@ def register_extras_routes(router: APIRouter) -> None:  # noqa: C901, PLR0915 - 
         # The row keeps the storage key; the address the client is handed is
         # built from it, so switching backends changes no row.
         await set_recipe_image_url(db, recipe, stored_key)
+        # The new picture has its own address; the old file is no longer named
+        # by anything.
+        if previous_leaf and not stored_key.endswith(f'/{previous_leaf}'):
+            try:
+                await core_api.file_storage.delete_for_org_async(
+                    org_id, 'recipes', f'{recipe_id}/{previous_leaf}'
+                )
+            except FileNotFoundError:
+                pass
         return RecipeImageResponse(image_url=served_url(stored_key))
 
     @router.delete('/{recipe_id}/image', status_code=status.HTTP_204_NO_CONTENT)
@@ -260,14 +270,14 @@ def register_extras_routes(router: APIRouter) -> None:  # noqa: C901, PLR0915 - 
         if recipe.image_url:
             # The row is writable through the recipe form, so it never names
             # the object this deletes: another recipe's cover in the same
-            # organization would otherwise be picked. Only its extension is
-            # read, and the key is rebuilt from this organization and this
-            # recipe — the facade owns the ``<org>/recipes/`` prefix.
-            extension = cover_extension(recipe.image_url)
-            if extension:
+            # organization would otherwise be picked. Only the cover's file
+            # name is read, and the key is rebuilt from this organization and
+            # this recipe — the facade owns the ``<org>/recipes/`` prefix.
+            leaf = cover_leaf_of(recipe.image_url)
+            if leaf:
                 try:
                     await core_api.file_storage.delete_for_org_async(
-                        org_id, 'recipes', f'{recipe_id}/cover.{extension}'
+                        org_id, 'recipes', f'{recipe_id}/{leaf}'
                     )
                 except FileNotFoundError:
                     pass

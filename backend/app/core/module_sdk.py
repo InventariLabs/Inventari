@@ -84,7 +84,13 @@ from app.core.exceptions import (
     ValidationException,
     map_service_errors,
 )
-from app.core.file_reference import cover_extension, served_url, stored_reference
+from app.core.file_reference import (
+    cover_extension,
+    cover_leaf,
+    cover_leaf_of,
+    served_url,
+    stored_reference,
+)
 from app.core.interceptors import InterceptorPipeline, interceptor_pipeline
 from app.core.location_path import join_location_path
 from app.core.logging import get_logger
@@ -160,6 +166,8 @@ __all__ = [
     'contribution_registry',
     'convert_naive_timestamps_to_utc',
     'cover_extension',
+    'cover_leaf',
+    'cover_leaf_of',
     'create_index_if_absent',
     'create_table_if_absent',
     'define_module',

@@ -18,7 +18,7 @@ from app.core.deps import (
     require_permission,
 )
 from app.core.exceptions import AppException, catalogue_refusal
-from app.core.file_reference import cover_extension, served_url
+from app.core.file_reference import cover_leaf, cover_leaf_of, served_url
 from app.core.file_signature import validate_signature
 from app.core.public_api import core_api
 from app.core.upload_validation import read_capped_upload
@@ -91,17 +91,28 @@ async def upload_item_image(
     ext = _MIME_TO_EXT[image.content_type]
 
     # The row keeps the org-scoped storage key — what the storage layer
-    # returns, never the address it would build: ``<org>/items/<id>/cover.<ext>``.
+    # returns, never the address it would build:
+    # ``<org>/items/<id>/cover.<digest>.<ext>``. The digest makes a replaced
+    # picture a new address; the old file goes once the row names the new one.
     # The address is built when the row is read (``Item.image_url``), so
     # moving the files or switching backends rewrites nothing.
+    previous_leaf = cover_leaf_of(item.image_url)
+    leaf = cover_leaf(content, ext)
     stored_key = await core_api.file_storage.save_for_org_async(
-        org_id, 'items', f'{item_id}/cover.{ext}', content, image.content_type
+        org_id, 'items', f'{item_id}/{leaf}', content, image.content_type
     )
     url = served_url(stored_key)
 
     await update_item(
         db=db, item=item, item_in=ItemUpdate(image_url=url), user=current_user
     )
+    if previous_leaf and previous_leaf != leaf:
+        try:
+            await core_api.file_storage.delete_for_org_async(
+                org_id, 'items', f'{item_id}/{previous_leaf}'
+            )
+        except FileNotFoundError:
+            pass
     return {'image_url': url}
 
 
@@ -119,15 +130,15 @@ async def delete_item_image(
 
     # The row is writable through the item form, so it never names the object
     # this deletes: a reference naming another item's cover would otherwise
-    # pick that object. Only its extension is read, and the key is rebuilt
-    # from this organization and this item — the facade owns the
+    # pick that object. Only the cover's file name is read, and the key is
+    # rebuilt from this organization and this item — the facade owns the
     # ``<org>/items/`` prefix. A picture on somebody else's server answers no
-    # extension, so removing the reference is all this endpoint does about it.
-    extension = cover_extension(item.image_url)
-    if extension:
+    # file name, so removing the reference is all this endpoint does about it.
+    leaf = cover_leaf_of(item.image_url)
+    if leaf:
         try:
             await core_api.file_storage.delete_for_org_async(
-                org_id, 'items', f'{item_id}/cover.{extension}'
+                org_id, 'items', f'{item_id}/{leaf}'
             )
         except FileNotFoundError:
             pass

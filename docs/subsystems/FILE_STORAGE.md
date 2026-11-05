@@ -109,10 +109,13 @@ runs with the Recipes module chain. Neither needs an operator step.
 
 ## Security
 - Path traversal protection.
-- No versions kept: saving to an existing path overwrites the file.
+- No versions kept: saving to an existing path overwrites the file. A cover
+  therefore never reuses a name for a different picture: it is saved as
+  `cover.<digest of the bytes>.<ext>` (`cover_leaf`), so a replaced picture is a
+  new address and the old file is deleted once the row names the new one.
 - Every `/uploads/` read is organization-scoped by an `UploadPathResolver`.
-- A delete never follows the stored reference: it reads only the extension and
+- A delete never follows the stored reference: it reads only the cover's file name and
   rebuilds the key from the organization and the entity it is serving
-  (`cover_extension` in `backend/app/core/file_reference.py`). Those columns
+  (`cover_leaf_of` in `backend/app/core/file_reference.py`). Those columns
   are writable through the forms, so a reference naming another row's picture
   must not be able to select the object that gets removed.
