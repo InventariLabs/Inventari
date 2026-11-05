@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 class ApiKeyIdentity:
     """What Core authentication needs from a resolved key.
 
-    ``key_prefix`` is the first ~20 characters of the raw key (``inv_live_…``,
+    ``key_prefix`` is the start of the raw key (``inv_live_`` and six characters,
     the same string the API Keys screen shows), never the key itself — the raw
     value is not stored anywhere and must not travel.
     """

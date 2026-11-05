@@ -110,7 +110,7 @@ class TestApiKeyResolverRegistry:
     async def test_delegates_to_the_registered_resolver(self):
         user_id = uuid.uuid4()
         identity = api_key_auth.ApiKeyIdentity(
-            user_id=user_id, key_prefix='inv_live_b3be8b5830a'
+            user_id=user_id, key_prefix='inv_live_b3be8b'
         )
 
         async def resolver(db, raw_key):
@@ -122,6 +122,6 @@ class TestApiKeyResolverRegistry:
         # The prefix is part of what a key hands back: the journal names the
         # key, not only the account it belongs to.
         assert (await api_key_auth.resolve_api_key(None, 'inv_good')).key_prefix == (
-            'inv_live_b3be8b5830a'
+            'inv_live_b3be8b'
         )
         assert await api_key_auth.resolve_api_key(None, 'inv_bad') is None
