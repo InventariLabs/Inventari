@@ -523,6 +523,73 @@ class TestWiring:
         assert '[ -z "$$AGE_RECIPIENT" ]' in command
         assert '--include "*.age"' in command
 
+    def test_the_offsite_command_refuses_without_a_key_and_copies_only_ciphertext(
+        self, tmp_path: Path
+    ) -> None:
+        """Runs the service's own command, as compose composes it, with a stand-in rclone.
+
+        The stand-in honours ``--include`` the way rclone does (only matching
+        names are copied), so what lands in the remote is what the real filter
+        would let through.
+        """
+        bin_dir = tmp_path / 'bin'
+        bin_dir.mkdir()
+        # rclone sync <src> <dst> --include <glob> ...: copies the files whose name matches.
+        (bin_dir / 'rclone').write_text(
+            """#!/bin/sh
+src="$2"; dst="$3"; glob="*"
+shift 3
+while [ "$#" -gt 0 ]; do
+  [ "$1" = "--include" ] && { glob="$2"; shift; }
+  shift
+done
+mkdir -p "$dst"
+for f in "$src"/*; do
+  case "$(basename "$f")" in $glob) cp "$f" "$dst"/ ;; esac
+done
+"""
+        )
+        # One pass is enough: the loop's sleep ends the shell running it.
+        (bin_dir / 'sleep').write_text('#!/bin/sh\nkill $PPID\n')
+        for stub in bin_dir.iterdir():
+            stub.chmod(0o755)
+        backups = tmp_path / 'backups'
+        backups.mkdir()
+        (backups / 'shop-1.sql.gz').write_text('plain dump left from before the key')
+        (backups / 'shop-1.sql.gz.age').write_text('ciphertext')
+        (backups / 'uploads-1.tar.gz.age').write_text('ciphertext')
+        remote = tmp_path / 'remote'
+        # compose passes `$$` through as a literal `$`.
+        command = ' '.join(_compose()['db-backup-offsite']['command']).replace(
+            '$$', '$'
+        )
+
+        def run(**env: str) -> subprocess.CompletedProcess[str]:
+            return subprocess.run(
+                ['/bin/sh', '-c', command.replace('/backups', str(backups))],
+                env={'PATH': f'{bin_dir}:{os.environ.get("PATH", "")}', **env},
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+
+        no_remote = run(BACKUP_RCLONE_REMOTE='', AGE_RECIPIENT=_KEY)
+        assert no_remote.returncode == 1
+        assert 'BACKUP_RCLONE_REMOTE is empty' in no_remote.stderr
+
+        plain = run(BACKUP_RCLONE_REMOTE=str(remote), AGE_RECIPIENT='')
+        assert plain.returncode == 1
+        assert 'AGE_RECIPIENT is empty' in plain.stderr
+        assert not remote.exists()
+
+        encrypted = run(BACKUP_RCLONE_REMOTE=str(remote), AGE_RECIPIENT=_KEY)
+        assert encrypted.returncode != 1, encrypted.stderr
+        assert sorted(p.name for p in remote.iterdir()) == [
+            'shop-1.sql.gz.age',
+            'uploads-1.tar.gz.age',
+        ]
+
     def test_the_healthcheck_counts_a_plain_backup_as_fresh(self) -> None:
         test = _compose()['db-backup']['healthcheck']['test'][1]
 
