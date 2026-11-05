@@ -146,12 +146,12 @@ export const needsProductLink = (item: {
  * in the order the server named them.
  */
 export function onOtherListsMessage(
-  t: TFunction<"recipes">,
+  t: TFunction,
   lines: readonly { name: string; list_name: string }[] | undefined,
 ): string | null {
   if (!lines || lines.length === 0) return null;
   const distinct = (values: string[]) => [...new Set(values)].join(", ");
-  return t("shopping.on_other_lists_toast", {
+  return t("recipes:shopping.on_other_lists_toast", {
     names: distinct(lines.map((line) => line.name)),
     lists: distinct(lines.map((line) => `“${line.list_name}”`)),
   });
