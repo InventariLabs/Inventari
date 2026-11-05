@@ -19,7 +19,7 @@ let stamp: string;
 let orderId: string;
 let orderNumber: string;
 
-test.beforeAll(async ({ playwright, baseURL }) => {
+test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
   ctx = await playwright.request.newContext({ baseURL });
   api = new ApiHelper(ctx);
 
@@ -27,7 +27,9 @@ test.beforeAll(async ({ playwright, baseURL }) => {
   token = auth.access_token;
   await api.enableAllModules(token);
 
-  stamp = `E2E-Result-${Date.now()}`;
+  // The worker index keeps two workers entering this hook in the same
+  // millisecond from building one location name.
+  stamp = `E2E-Result-${Date.now()}-w${testInfo.workerIndex}`;
   const output = await api.createProductTemplate(token, {
     name: `${stamp}-Jam`,
   });
