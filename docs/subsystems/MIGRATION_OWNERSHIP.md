@@ -63,7 +63,7 @@ incremental revisions, not the baseline alone.
 `ai_connections`, `ai_usage_logs`, `announcements`, `audit_log`, `categories`, `document_templates`, `email_jobs`, `event_deliveries`, `event_outbox`, `item_attachments`, `item_history`, `item_import_jobs`, `items`, `label_pool`, `location_relocations`, `module_installations`, `notifications`, `organization_invitations`, `organizations`, `partners`, `product_templates`, `registration_requests`, `roles`, `stock_anchors`, `stock_ledger_totals`, `stock_lots`, `stock_moves`, `stock_reservations`, `stock_valuation_layers`, `storage_locations`, `storage_types`, `system_settings`, `uom_categories`, `uoms`, `user_roles`, `users`.
 
 The retired `stock_quants` table is not part of the current schema
-(`quantdrop01` drops it); the `stock_quants_from_records` read view is
+(the archived `quantdrop01` dropped it); the `stock_quants_from_records` read view is
 core-owned. Alembic's bookkeeping tables (`alembic_version` and
 `alembic_version_<module>`) are excluded from the counts above. The nutrition
 cache is listed separately because it lives in another database.

@@ -98,7 +98,7 @@ table, and so did their fields on the contract and on the screen.
 
 ### How it got there
 
-| step | what changed | migrations |
+| step | what changed | migrations (the core ones are archived, their result is `baseline_002`) |
 |------|--------------|------------|
 | 1 | records carry their batch and owner; every stock write keeps them | `lotrec01`, `lotrec02` |
 | 2 | the records' view stands beside the table and is compared with it | `quantview01` |
@@ -106,7 +106,7 @@ table, and so did their fields on the contract and on the screen.
 | 4 | anchors, reservation rows with their own grain, the hold guard; the table goes | `anchors01`–`03`, `resgrain01`, `holdguard01`, `quantdrop01`, documents `doc_pick_quant_gone01` |
 | 5 | the bridge is the record's own posting, the table's reconciliation pairs go, this ADR | — |
 
-`quantdrop01` is the only step that is not undone by reverting code. Its
+The archived `quantdrop01` is the only step that is not undone by reverting code. Its
 downgrade rebuilds the table from the view — every constraint it had, each
 reservation pointed back at the quant of its grain — which is a rebuild, not
 a restore.
@@ -158,7 +158,7 @@ a restore.
 - Records: `backend/app/models/item.py` (`quantity`, `lot_id`, `owner_id`).
 - The sum: `backend/app/models/stock_quants_from_records.py`.
 - The lock: `backend/app/models/stock_anchor.py`, `core_api.stock.lock_async`.
-- Reservations: `backend/app/models/stock_reservation.py`, `holdguard01`.
+- Reservations: `backend/app/models/stock_reservation.py`, `baseline_002` (from the archived `holdguard01`).
 - A record's own posting: `backend/app/services/items/_stock_quant.py`
   (`apply_quantity_change_async`, `_post_the_change_async`,
   `lock_record_stock_async`).

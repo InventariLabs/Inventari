@@ -165,7 +165,7 @@ async def org_uses_valuation_layers_async(db: AsyncSession, org_id: UUID) -> boo
 
     And an organization that has the modules can still hold no cost: stock
     imported straight into the records, or standing there since before the
-    ledger existed — the ``openbal01`` migration opened those shelves with
+    ledger existed — the archived ``openbal01`` migration opened those shelves with
     layers at 0.00 marked ``unknown``, whose quantity is real and whose
     figure is not a cost (:attr:`StockValuationLayer.carries_a_cost`).
     Reading them reported 0.00 over records that carried their own price,

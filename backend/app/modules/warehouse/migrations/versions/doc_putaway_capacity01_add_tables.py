@@ -6,9 +6,9 @@ Create Date: 2026-09-16
 
 A putaway rule about to fill a shelf could not know how much the shelf
 holds, and the company overview had nothing to show occupancy from. The
-capacity lives beside the rule it sharpens, in the documents module — the
+capacity lives beside the rule it sharpens, in the warehouse module — the
 same precedent as ReorderRule living in purchase_orders — so the Core
-stays neutral and a home without the documents module loses nothing.
+stays neutral and a home without the warehouse module loses nothing.
 
 Two tables: one row per (location, product) naming the most the shelf
 holds of that product in its stock unit, and one per location saying

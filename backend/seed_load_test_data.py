@@ -308,7 +308,11 @@ def seed_org_data(db, org_id, items_per_org: int) -> int:
             product = random.choice(pool)
             name, brand, barcode = product
             if barcode is None:
+                # Ten random digits collide now and then, and more often as
+                # an organization fills up: draw again until the code is free.
                 barcode = _random_restricted_ean()
+                while barcode in taken_barcodes:
+                    barcode = _random_restricted_ean()
             elif barcode in taken_barcodes:
                 barcode = None
             if barcode is not None:

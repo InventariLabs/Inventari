@@ -1,6 +1,6 @@
-"""documents module baseline — create 9 document-related tables.
+"""warehouse module baseline — create 9 document-related tables.
 
-Initial migration for the documents module, extracted from core baseline_001
+Initial migration for the warehouse module, extracted from core baseline_001
 as part of the module migration isolation effort.
 
 Tables (creation order respects FK dependencies):

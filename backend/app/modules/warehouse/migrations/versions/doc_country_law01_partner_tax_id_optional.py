@@ -7,7 +7,7 @@ Create Date: 2026-09-26
 Whether a partner must carry a tax id is law, and law is where the
 organization sits. ``require_partner_tax_id`` becomes tri-state: NULL is
 "the profile states no opinion" and the organization's country answers
-(``app/modules/documents/country_tax_rules.py``) — the same shape
+(``app/modules/warehouse/country_tax_rules.py``) — the same shape
 ``default_currency`` already has against the organization currency, and
 ``default_tax_rate`` against the country's rate.
 

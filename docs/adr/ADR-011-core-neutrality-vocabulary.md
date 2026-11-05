@@ -79,7 +79,7 @@ DISPOSAL_ACTIONS   = (ItemAction.DISCARDED.value, ItemAction.DISPOSED.value)
 
 *Update 2026-10-23:* before the first public release the legacy values left
   the stored data as well. No published database exists yet; the owner's
-  instance and the demo are reached by migration `legacyvals01`, which
+  instance and the demo are reached by archived migration `legacyvals01`, which
   rewrites `CONSUMED` → `USED` and `DISCARDED` → `DISPOSED` in
   `items.deletion_reason`, `item_history.action` and
   `stock_valuation_layers.reason` (the migration now sits in

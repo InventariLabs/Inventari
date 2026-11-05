@@ -6,7 +6,7 @@ Cross-cutting capabilities owned by a module are exposed to Core through a
 registry (e.g. :mod:`app.core.period_guard`) or a cross-module public API
 (``*_api.py``), never by direct import from Core.
 
-Zero baseline: the single historical violation (Core → documents periods)
+Zero baseline: the single historical violation (Core → warehouse periods)
 has since been removed. New violations are ``::error``.
 """
 

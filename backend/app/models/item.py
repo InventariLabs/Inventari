@@ -126,7 +126,7 @@ class Item(Base):
         # The quant's key, read from the records' side: what one batch of one
         # owner holds on one shelf is a sum over this index. The quantity and
         # the deletion flag ride along, so the stock page's count and each
-        # anchor's groups are read off the index alone (``stockpage01``).
+        # anchor's groups are read off the index alone (archived ``stockpage01``).
         Index(
             'ix_items_stock_group',
             'organization_id',
@@ -309,7 +309,7 @@ class Item(Base):
     # members of a quant's key the record did not carry. The stock model
     # keeps one record per batch per owner, so the records' quantities are
     # the only stock number and a quant is their sum.
-    # Existing records were assigned by migration (``lotrec02``). A record's
+    # Existing records were assigned by migration (archived ``lotrec02``). A record's
     # posting and its move change the record's own batch and owner, and so do
     # production, stock takes and the document executor (backend/AGENTS.md
     # §4).

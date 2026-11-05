@@ -72,7 +72,7 @@ class StorageLocation(Base):
         ),
         # The stock page lists a place as a block, places by name; walking
         # them in this order lets it stop once the page is full instead of
-        # sorting every group of the organization (``stockpage01``).
+        # sorting every group of the organization (archived ``stockpage01``).
         Index('ix_storage_locations_org_name', 'organization_id', 'name'),
     )
 

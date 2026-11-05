@@ -4,7 +4,7 @@
 batch and owner, and the reservation rows of each, into the columns the quant
 table had. It stood beside the table to be compared with it, and the
 reconciliation's fourth pair was the comparison; the table is gone
-(``quantdrop01``) and the view is what every reader of stock reads. These pin
+(archived ``quantdrop01``) and the view is what every reader of stock reads. These pin
 what it says on its own:
 
 - it has the columns its model declares, so a reader of the model reads it;

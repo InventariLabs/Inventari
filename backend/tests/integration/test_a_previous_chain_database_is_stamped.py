@@ -43,6 +43,7 @@ BACKEND = Path(__file__).resolve().parents[2]
 PREVIOUS_CHAIN = (
     BACKEND / 'tests' / 'fixtures' / 'previous_head' / 'previous_chain_docvis01.sql.gz'
 )
+RELEASED = BACKEND / 'tests' / 'fixtures' / 'release_databases' / 'v0.11.0.sql.gz'
 PREVIOUS_HEAD = LEGACY_CHAIN_PREVIOUS_HEAD
 BASELINE = LEGACY_CHAIN_BASELINE
 #: A revision of the previous chain that already widened ``label_pool``, so a
@@ -54,14 +55,14 @@ _SAME_SCHEMA_SIBLING = 'poolcode01'
 _COUNTED = ('items', 'stock_moves', 'stock_lots', 'audit_log', 'users', 'organizations')
 
 
-def _restore(url: str) -> None:
-    """Run the previous head's dump into the empty database at ``url``.
+def _restore(url: str, dump: Path = PREVIOUS_CHAIN) -> None:
+    """Run a dump, the previous head's by default, into the empty database at ``url``.
 
     The dump sets ``search_path`` to empty for its session, so it gets a
     connection of its own. A raw cursor and no parameters: the rows carry
     ``%``.
     """
-    sql = gzip.decompress(PREVIOUS_CHAIN.read_bytes())
+    sql = gzip.decompress(dump.read_bytes())
     engine = create_engine(url)
     try:
         connection = engine.raw_connection()
@@ -94,6 +95,38 @@ def _revision(url: str) -> str:
         ).scalar()
     engine.dispose()
     return revision
+
+
+def _schema(url: str) -> dict[str, set[tuple]]:
+    """What the database holds, as PostgreSQL prints it, names included."""
+    queries = {
+        'constraints': (
+            'SELECT t.relname, c.conname, pg_get_constraintdef(c.oid) '
+            'FROM pg_constraint c '
+            'JOIN pg_class t ON t.oid = c.conrelid '
+            'JOIN pg_namespace n ON n.oid = t.relnamespace '
+            "WHERE n.nspname = 'public'"
+        ),
+        'indexes': (
+            "SELECT indexname, indexdef FROM pg_indexes WHERE schemaname = 'public'"
+        ),
+        'columns': (
+            'SELECT table_name, column_name, data_type, is_nullable, column_default '
+            "FROM information_schema.columns WHERE table_schema = 'public'"
+        ),
+        'triggers': (
+            'SELECT event_object_table, trigger_name, action_statement '
+            "FROM information_schema.triggers WHERE trigger_schema = 'public'"
+        ),
+    }
+    engine = create_engine(url)
+    with engine.connect() as connection:
+        schema = {
+            kind: {tuple(row) for row in connection.execute(text(query))}
+            for kind, query in queries.items()
+        }
+    engine.dispose()
+    return schema
 
 
 def _stamp(url: str, monkeypatch) -> None:
@@ -132,6 +165,26 @@ def test_the_previous_head_stamps_onto_the_baseline(monkeypatch):
             'a stamped and upgraded database is not the schema the models '
             'declare:\n' + '\n'.join(f'  - {op}' for op in gaps)
         )
+        stamped = _schema(url)
+
+    # The models name no foreign key and do not print a default the way the
+    # database does, so the comparison above cannot see those. The release's
+    # database can: restored from a dump like this one, it prints alike.
+    with isolated_db_url('stampreleased') as url:
+        _restore(url, RELEASED)
+        monkeypatch.setenv('DATABASE_URL', url)
+        command.upgrade(Config('alembic.ini'), 'head')
+        upgrade_modules()
+        released = _schema(url)
+
+    differing = {
+        kind: sorted(map(str, stamped[kind] ^ released[kind]))
+        for kind in stamped
+        if stamped[kind] != released[kind]
+    }
+    assert not differing, (
+        f'a stamped database and a released one are two databases: {differing}'
+    )
 
 
 @pytest.mark.parametrize(

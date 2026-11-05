@@ -12,7 +12,7 @@ Lives in the ``purchase_orders`` module because replenishment is a
 procurement decision — and its last mile lives here too:
 ``create_draft_pos_from_alerts_async`` turns the current alerts into
 draft purchase orders, grouped by supplier.  Previously this
-service lived in ``documents`` and used ``ProductTemplate.min_quantity``
+service lived in ``warehouse`` and used ``ProductTemplate.min_quantity``
 (org-global).  The per-location rules replace that flat field.
 
 The move itself is a warehouse document, so it is created on the other side

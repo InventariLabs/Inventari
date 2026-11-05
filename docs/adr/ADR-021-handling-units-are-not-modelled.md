@@ -54,7 +54,7 @@ this decision removes.
 If a vertical needs pallets later, they arrive as a designed feature: the
 model, a write path in receiving, a screen, and the "what happens to every
 other path when goods stand on a unit" semantics decided before the first row
-exists. The `pkgremove01` downgrade, which restores the table and the column,
+exists. The archived `pkgremove01` downgrade, which restores the table and the column,
 and this record are a starting point, not a promise.
 
 ### Alternatives considered
@@ -87,7 +87,7 @@ Negative:
 ## Risks
 
 - A vertical that needs pallets finds the model gone from the tree. Mitigated:
-  the `pkgremove01` downgrade, this record, and the design questions written
+  the archived `pkgremove01` downgrade, this record, and the design questions written
   down here.
 - The quant-key change is silent for databases where every `package_id` is
   NULL — the normal case — so the migration only rewrites the constraint.

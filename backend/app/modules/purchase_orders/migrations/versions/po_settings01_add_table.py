@@ -9,7 +9,7 @@ above which a PO must be approved) and ``approval_required`` (all POs
 require approval) feed the confirm flow in
 ``app/modules/purchase_orders/_service_workflow.py``.
 
-Analogy to ``DocumentProfile`` in the documents module — one row per
+Analogy to ``DocumentProfile`` in the warehouse module — one row per
 organization, created lazily on first settings access.
 """
 

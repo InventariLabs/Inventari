@@ -574,7 +574,7 @@ def unvalidated_constraints(engine: Engine) -> list[tuple[str, str]]:
 
     Not drift, and never a reason to refuse a boot: such a constraint checks
     every new write, it only says nothing about the rows that were there
-    before it. ``schemafk01`` leaves a foreign key in this state on purpose
+    before it. The archived ``schemafk01`` leaves a foreign key in this state on purpose
     when the rows under it point at parents that no longer exist, and the
     doctor keeps naming it on every start, so the promise to finish it does
     not live only in one migration's output.
