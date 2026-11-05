@@ -329,6 +329,12 @@ check-frontend: ## Run frontend typecheck + production build
 #                                      63/49/73/63 floor went missing locally.
 #   format:check                     — the pre-commit hook checks formatting on commit;
 #                                      this is the whole-tree re-check.
+#   build                            — `vite build` alone; `build:check` (tsc, the
+#                                      build and the bundle budget) is the one
+#                                      wired in above.
+#   check:dead                       — plain `knip`, which exits 1 on the
+#                                      grandfathered findings; the verdict that
+#                                      gates is `check:dead:baseline`, above.
 #   sync:emoji                       — NETWORK writer (downloads SVGs); its
 #                                      offline guard is check:emoji, above.
 #   check:i18n:sync-backend /

@@ -241,7 +241,7 @@ export function AssetTable({
                       onClick={() =>
                         onSortChange(col.sortable as EquipmentSortKey)
                       }
-                      className="p-0 uppercase text-xs tracking-wide text-on-secondary hover:text-on"
+                      className="px-0 py-2 min-h-11 md:min-h-10 uppercase text-xs tracking-wide text-on-secondary hover:text-on"
                       aria-label={t("table.sortBy", { column: col.label })}
                     >
                       {col.label}
