@@ -59,7 +59,7 @@ ERRORS_PT: dict[str, str] = {
     'shopping_list_not_writable': 'Esta lista de compras está {status} e não pode ser modificada. Reative-a primeiro.',
     'shopping_list_delete_failed': 'Falha ao excluir a lista de compras',
     'shopping_list_item_not_found': 'Item da lista de compras não encontrado',
-    'shopping_list_item_quantity_rounds_to_zero': 'A quantidade {quantity} é arredondada para zero na precisão da loja — a menor quantidade contável é 0.001',
+    'shopping_list_item_quantity_rounds_to_zero': 'A quantidade {quantity} é arredondada para zero na precisão da loja — a menor quantidade contável é {smallest}',
     'shopping_list_item_quantity_above_ceiling': 'A quantidade {quantity} excede o que a coluna comporta — o maior valor que pode ser armazenado é {ceiling}',
     'shopping_list_item_uom_unknown': 'Unidade de medida desconhecida (uom_id: {uom_id}) — a unidade não existe',
     'shopping_list_item_item_unknown': 'Produto desconhecido (item_id: {item_id}) — o item não existe',

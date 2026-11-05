@@ -208,6 +208,55 @@ class TestPasswordReset:
         )
         assert response.status_code == 400
 
+    def test_check_accepts_a_live_token_without_spending_it(
+        self, client: TestClient, test_user
+    ) -> None:
+        """The reset screen asks before it shows a form; asking costs nothing."""
+        from app.core.token_blacklist import token_blacklist
+
+        original_redis = token_blacklist._redis  # noqa: SLF001
+        token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
+        try:
+            token = create_password_reset_token(test_user.id)
+            check = client.post(
+                '/api/v1/auth/password-reset/check', json={'token': token}
+            )
+            assert check.status_code == 204, check.text
+            # Still good for the real thing afterwards.
+            confirm = client.post(
+                '/api/v1/auth/password-reset/confirm',
+                json={'token': token, 'new_password': 'NewStrong123'},
+            )
+            assert confirm.status_code == 200, confirm.text
+        finally:
+            token_blacklist._redis = original_redis  # noqa: SLF001
+
+    def test_check_refuses_a_spent_token(self, client: TestClient, test_user) -> None:
+        from app.core.token_blacklist import token_blacklist
+
+        original_redis = token_blacklist._redis  # noqa: SLF001
+        token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
+        try:
+            token = create_password_reset_token(test_user.id)
+            client.post(
+                '/api/v1/auth/password-reset/confirm',
+                json={'token': token, 'new_password': 'NewStrong123'},
+            )
+            check = client.post(
+                '/api/v1/auth/password-reset/check', json={'token': token}
+            )
+            assert check.status_code == 400, check.text
+            assert check.json()['detail']['code'] == 'INVALID_RESET_TOKEN'
+        finally:
+            token_blacklist._redis = original_redis  # noqa: SLF001
+
+    def test_check_refuses_a_garbage_token(self, client: TestClient) -> None:
+        check = client.post(
+            '/api/v1/auth/password-reset/check', json={'token': 'not.a.valid.jwt'}
+        )
+        assert check.status_code == 400
+        assert check.json()['detail']['code'] == 'INVALID_RESET_TOKEN'
+
     def test_reset_invalidates_sessions_issued_before_it(
         self, client: TestClient, test_user, db_session
     ) -> None:

@@ -65,7 +65,11 @@ test.describe("Recipes — CRUD flow", () => {
     authenticatedPage,
   }) => {
     await page.getByText(seedName).first().click();
-    await expect(page.getByText(seedName)).toBeVisible({ timeout: 10000 });
+    // The print-only card repeats the name in its own <h1>; a role query sees
+    // only the heading that is actually shown on screen.
+    await expect(
+      page.getByRole("heading", { level: 1, name: seedName }),
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test("creates a new recipe via UI", async ({ page, authenticatedPage }) => {

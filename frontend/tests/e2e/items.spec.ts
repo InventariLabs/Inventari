@@ -314,14 +314,16 @@ test.describe("Items — modal backdrop guard", () => {
   let itemId: string;
   const itemName = `MQA8 Backdrop Item ${Math.random().toString(36).substring(2, 9)}`;
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     const requestContext = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(requestContext);
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     const token = authData.access_token;
 
+    // The worker index keeps two workers entering this hook in the same
+    // millisecond from building one location name.
     const storage = await api.createStorage(token, {
-      name: `Z_Test MQA8 Storage ${Date.now()}`,
+      name: `Z_Test MQA8 Storage ${Date.now()}-w${testInfo.workerIndex}`,
     });
     testStorageId = storage.id;
 
@@ -424,14 +426,16 @@ test.describe("Items — extended actions (API)", () => {
   let testCategoryId: string;
   const itemIds: string[] = [];
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     const requestContext = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(requestContext);
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
 
+    // The worker index keeps two workers entering this hook in the same
+    // millisecond from building one location name.
     const storage = await api.createStorage(token, {
-      name: `Z_Test Ext ${Date.now()}`,
+      name: `Z_Test Ext ${Date.now()}-w${testInfo.workerIndex}`,
     });
     testStorageId = storage.id;
     const category = await api.createCategory(token, {

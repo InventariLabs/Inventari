@@ -5,6 +5,7 @@ import {
   expectedBounds,
   parseBackendQuantity,
   parseTsConstant,
+  zeroRefusalFindings,
 } from "./check-quantity-bounds.mjs";
 
 describe("check-quantity-bounds", () => {
@@ -98,6 +99,49 @@ describe("check-quantity-bounds", () => {
 
       expect(findings).toHaveLength(1);
       expect(findings[0]).toContain("pasted number");
+    });
+  });
+
+  describe("the zero refusal", () => {
+    const key = "shopping_list_item_quantity_rounds_to_zero";
+    const catalog = (...sentences) => [
+      {
+        path: "_errors_xx.py",
+        text: sentences
+          .map((sentence) => `    '${key}': ${sentence},`)
+          .join("\n"),
+      },
+    ];
+
+    it("accepts a sentence that interpolates the step", () => {
+      expect(zeroRefusalFindings(catalog("'Smallest is {smallest}'"))).toEqual(
+        [],
+      );
+    });
+
+    it("refuses a sentence that repeats the step", () => {
+      const findings = zeroRefusalFindings(catalog("'Smallest is 0.001'"));
+
+      expect(findings).toHaveLength(1);
+      expect(findings[0]).toContain("does not interpolate {smallest}");
+    });
+
+    it("checks every line a file holds the key on", () => {
+      const findings = zeroRefusalFindings(
+        catalog("'Smallest is {smallest}'", "'Najmniejsza to 0,001'"),
+      );
+
+      expect(findings).toHaveLength(1);
+    });
+
+    it("refuses a catalogue that lost the key", () => {
+      const findings = zeroRefusalFindings([
+        { path: "_errors_xx.py", text: "ERRORS = {}" },
+      ]);
+
+      expect(findings[0]).toContain(
+        "no shopping_list_item_quantity_rounds_to_zero",
+      );
     });
   });
 });

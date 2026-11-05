@@ -31,7 +31,8 @@ _SETTINGS_SCHEMA = {
             'title_key': 'stats:settings.showInventoryValue',
             'description_key': 'stats:settings.showInventoryValueDescription',
             'description': (
-                'Show the total stock value on the stats overview. It is a '
+                'Show stock values across the app: on the stats overview, the '
+                'product screens, and in exports and printouts. It is a '
                 'business metric — disable for home inventories that keep no '
                 'purchase prices for it to add up.'
             ),

@@ -11,7 +11,7 @@ def _register_export_enricher() -> None:
 
     Core must not import a feature module (architecture lint), so
     the equipment module registers itself here at import time — the same
-    pattern as ``documents`` and ``app.core.period_guard``.
+    pattern as ``warehouse`` and ``app.core.period_guard``.
     """
     from app.core.export_enrichers import register_export_enricher
 
@@ -43,7 +43,7 @@ def _register_approval_target_summaries() -> None:
     The queue rendered a checkout as eight characters of a UUID — no asset
     name, no serial, no way through to the equipment page — on the screen
     whose only job is deciding whether to allow the checkout. Registered at
-    import, like the documents and purchase_orders modules do, so enrichment
+    import, like the warehouse and purchase_orders modules do, so enrichment
     does not depend on which organisation happened to start first.
     """
     from app.modules.approvals.approvals_api import approvals_api

@@ -4,7 +4,7 @@
   `StockMove`, `StockLot` (`app/models/`), and the view
   `stock_quants_from_records`
 - **Model**: [ADR-022 — one number of stock](../adr/ADR-022-one-number-of-stock.md)
-  (supersedes ADR-004, whose quant table is gone, `quantdrop01`)
+  (supersedes ADR-004, whose quant table is gone, archived `quantdrop01`)
 - **Rules**: `backend/AGENTS.md` §"Stock Posting Rules"
 - **Reconciliation**: `app.services.analytics.reconciliation` + `app.services.reconciliation_job`
 
@@ -17,7 +17,7 @@ The records (`Item`, one per batch per owner) hold the stock, and
 (`quantity − reserved_quantity`) is worked out by the readers. "Quant" is
 the word for such a group, read from the view; the `stock_quants` table that
 used to hold the same numbers beside the records is gone (migration
-`quantdrop01`). Every change to `Item.quantity` is posted in the same
+archived `quantdrop01`). Every change to `Item.quantity` is posted in the same
 transaction: a single record's change through `apply_quantity_change_async`,
 which writes the change's movement and its cost layer
 (`_post_the_change_async`); a door that moves several records as one
@@ -226,7 +226,7 @@ table. Over the records the same promise is a comparison of two sums — the
 reservation rows of a `(product, shelf, batch, owner)` grain against its live
 records — so it is
 kept by a constraint trigger instead, `ck_stock_holds_within_stock`
-(migration `holdguard01`), `DEFERRABLE INITIALLY DEFERRED`. It fires on a
+(`baseline_002`, from the archived `holdguard01`), `DEFERRABLE INITIALLY DEFERRED`. It fires on a
 reservation row inserted, or updated in its quantity or grain, and on a record that could have
 taken stock out of its grain: less quantity, another batch, owner, shelf or
 product, marked deleted, or purged. The record triggers' `WHEN` lets an
@@ -288,7 +288,7 @@ exactly the ones production writes (`StockMoveReferenceType` in
 `app/core/contracts/_stock_dtos.py`): `document`, `item`, `adjustment`,
 `maker_production`, `recipe_picking`, `item_history` (the one-time backfill),
 `opening_balance` (what a shelf held before the register knew it, posted
-once by the `openbal01` migration, and since by every door that adopts a card
+once by the archived `openbal01` migration, and since by every door that adopts a card
 for a record that predates one) and `location_relocation`. The ledger's
 sort order is `coalesce(completed_at, created_at) DESC, id` — the
 **business date** of the movement, served by a dedicated index.
@@ -365,7 +365,7 @@ shelf-versus-ledger pair is the measure of what it carried instead.
 
 "The shelf" is the records' view below. The report compared two more pairs
 while there was a quant table — `Item.quantity` against it, and it against
-the records' view — and they ended with it (`quantdrop01`): there is one
+the records' view — and they ended with it (archived `quantdrop01`): there is one
 number of stock now. Their fields left the answer, the stored pass and the
 screen with them.
 
@@ -414,12 +414,12 @@ run verbatim.
 
 ## The records' view of the quants
 
-`stock_quants_from_records` (migration `quantview01`) is the stock as the
+`stock_quants_from_records` (`baseline_002`, from the archived `quantview01`) is the stock as the
 records tell it: the live records of each `(organization, product, shelf,
 batch, owner)` summed into `quantity`, and the `stock_reservations` rows of the
 same group into `reserved_quantity`, with the columns the quant table had. A
 reservation row carries its own group — the anchor of its product on its
-shelf, its batch and its owner (migration `resgrain01`); the quant it used
+shelf, its batch and its owner (`baseline_002`, from the archived `resgrain01`); the quant it used
 to name went with the table.
 `removal_strategy` is the constant the table's column always held; `id` is
 derived from the group's key.
@@ -438,7 +438,7 @@ the reservation guard inside deleting a record
 (`app/services/items/_lifecycle.py`); the CLI's reservation check
 (`app/cli/commands_db.py`); and the reservation check of a record carried
 to another shelf (`app/services/items/_stock_relocation.py`). The table the
-view was once compared with is gone (migration `quantdrop01`, step 4 of the
+view was once compared with is gone (archived migration `quantdrop01`, step 4 of the
 stock-model decision that makes the record's quantity the only stock
 number): what the view says is the stock.
 
@@ -446,7 +446,7 @@ Two consequences for whoever changes the schema:
 
 - The test databases are built by `create_all`, which builds tables only, so
   `backend/conftest.py` runs the `VIEW_SQL` of the baseline migration
-  (`baseline_002`, which carries the view as `resgrain01` left it) on every
+  (`baseline_002`, which carries the view as the archived `resgrain01` left it) on every
   worker database. The suite
   reads the view that ships, not a copy; a migration that redefines the view
   points `conftest.py` at itself.

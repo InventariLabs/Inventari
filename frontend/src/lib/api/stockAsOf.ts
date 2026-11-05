@@ -14,6 +14,8 @@ export type StockAsOfReport = components["schemas"]["StockAsOfReportDTO"];
 export interface StockAsOfQuery {
   as_of: string;
   location_id?: string;
+  /** Narrows the report to the products this text reaches. */
+  search?: string;
   /** The screen's page; the files leave both out and carry every row. */
   limit?: number;
   offset?: number;
@@ -22,6 +24,7 @@ export interface StockAsOfQuery {
 function toParams(query: StockAsOfQuery): Record<string, unknown> {
   const params: Record<string, unknown> = { as_of: query.as_of };
   if (query.location_id) params.location_id = query.location_id;
+  if (query.search) params.search = query.search;
   if (query.limit !== undefined) params.limit = query.limit;
   if (query.offset !== undefined) params.offset = query.offset;
   return params;

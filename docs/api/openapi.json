@@ -2624,6 +2624,41 @@
         ]
       }
     },
+    "/api/v1/auth/password-reset/check": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Check Password Reset Token",
+        "description": "Say whether a reset link can still be used, without using it.\n\nThe reset page asks this on arrival; a link from an old e-mail is the\nusual way to land there with a token that is spent or expired.",
+        "operationId": "check_password_reset_token_api_v1_auth_password_reset_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetCheckIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/password-reset/confirm": {
       "post": {
         "tags": [
@@ -27754,6 +27789,24 @@
             "description": "This place and everything below it. Quantities only \u2014 the cost history is kept per product, not per shelf."
           },
           {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -27852,6 +27905,24 @@
               ],
               "title": "Location Id"
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {
@@ -27927,6 +27998,24 @@
               ],
               "title": "Location Id"
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {
@@ -66049,6 +66138,20 @@
         "type": "object",
         "title": "PartnerUpdate",
         "description": "All fields optional \u2014 supports partial (PATCH-style) updates via PUT."
+      },
+      "PasswordResetCheckIn": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "PasswordResetCheckIn",
+        "description": "Body for ``POST /auth/password-reset/check``."
       },
       "PasswordResetConfirmIn": {
         "properties": {

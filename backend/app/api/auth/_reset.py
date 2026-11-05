@@ -21,6 +21,12 @@ class PasswordResetRequestIn(BaseModel):
     email: EmailStr
 
 
+class PasswordResetCheckIn(BaseModel):
+    """Body for ``POST /auth/password-reset/check``."""
+
+    token: str
+
+
 class PasswordResetConfirmIn(BaseModel):
     """Body for ``POST /auth/password-reset/confirm``."""
 
@@ -68,6 +74,24 @@ async def request_password_reset(
         status='accepted',
         email_delivery_configured=await AuthService.mail_delivery_available_async(db),
     )
+
+
+@router.post('/password-reset/check', status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit('30/minute')
+async def check_password_reset_token(
+    request: Request,
+    data: PasswordResetCheckIn,
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> None:
+    """Say whether a reset link can still be used, without using it.
+
+    The reset page asks this on arrival; a link from an old e-mail is the
+    usual way to land there with a token that is spent or expired.
+    """
+    try:
+        await AuthService.check_password_reset_token_async(db, data.token)
+    except ValueError as exc:
+        raise catalogue_refusal('invalid_reset_token') from exc
 
 
 @router.post('/password-reset/confirm')

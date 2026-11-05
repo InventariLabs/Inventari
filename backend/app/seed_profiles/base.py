@@ -139,7 +139,7 @@ def upsert_storage_types(
     that is, is decided per path, and the two answers are deliberate: a
     seeding with an actor — onboarding, a profile switch — speaks the
     request's language, the reader who is choosing; a seeding without one —
-    the ``stypei18n01`` migration — keeps the creator's language, because a
+    the archived ``stypei18n01`` migration — keeps the creator's language, because a
     batch has no reader to ask, and says so itself. The reader's language
     and not the organization's because the organization has no language to
     speak of: ``Organization`` carries no such column — a session's language

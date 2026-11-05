@@ -250,7 +250,7 @@ test.describe("Phone lists — the first record is above the fold", () => {
     await api.enableAllModules(token);
 
     // Other specs share the organization; the stamp keeps these rows apart.
-    tag = `Phone1st-${workerInfo.project.name}-${Date.now()}`;
+    tag = `Phone1st-${workerInfo.project.name}-${Date.now()}-w${workerInfo.workerIndex}`;
     const storage = await api.createStorage(token, { name: `${tag} place` });
     cleanup.push(() => api.deleteStorage(token, storage.id));
 

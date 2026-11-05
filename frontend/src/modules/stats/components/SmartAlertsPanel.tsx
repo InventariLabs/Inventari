@@ -34,13 +34,20 @@ const alertMessage = (alert: SmartAlert, t: Translate): string => {
       return t("stats:analytics.alerts.messages.staple", {
         count: params.days_since,
       });
-    case "stats.alerts.expiring_soon":
-      return t("stats:analytics.alerts.messages.expiring", {
-        date: formatDate(alert.expiry_date),
-      });
+    // The date and how far off it is, in words: two records of one product
+    // differ by their dates, and the colour alone never said which was the
+    // urgent one.
+    case "stats.alerts.expiring_soon": {
+      const days = alert.days_until_expiry ?? 0;
+      const date = formatDate(alert.expiry_date);
+      return days > 0
+        ? t("stats:analytics.alerts.messages.expiring", { date, count: days })
+        : t("stats:analytics.alerts.messages.expiringToday", { date });
+    }
     case "stats.alerts.expired":
       return t("stats:analytics.alerts.messages.expired", {
         date: formatDate(alert.expiry_date),
+        count: Math.abs(alert.days_until_expiry ?? 0),
       });
     default:
       return "";
@@ -77,6 +84,7 @@ const getSeverityColor = (severity: string) => {
       return "bg-red-50 border-red-200 text-on-danger dark:bg-red-500/10 dark:border-red-500/20";
     case "high":
     case "medium":
+    case "warning":
       return "bg-amber-50 border-amber-200 text-on-warning dark:bg-amber-500/10 dark:border-amber-500/20";
     case "low":
       return "bg-primary-50 border-primary-200 text-primary-700 dark:text-primary-500 dark:bg-primary-500/10 dark:border-primary-500/20";
@@ -165,7 +173,9 @@ export default function SmartAlertsPanel({ alerts, t }: SmartAlertsPanelProps) {
                 variant={
                   alert.severity === "critical"
                     ? "danger"
-                    : alert.severity === "high" || alert.severity === "medium"
+                    : alert.severity === "high" ||
+                        alert.severity === "medium" ||
+                        alert.severity === "warning"
                       ? "warning"
                       : "info"
                 }

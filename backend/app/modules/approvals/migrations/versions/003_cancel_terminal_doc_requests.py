@@ -11,7 +11,7 @@ module's status guard lives only in its own proxy router. Active requests
 on terminal documents are unactionable (the document can no longer
 transition) and pollute the awaiting-my-approval queue; cancel them.
 
-Guarded with ``to_regclass`` — ``documents`` is owned by the documents
+Guarded with ``to_regclass`` — ``documents`` is owned by the warehouse
 module and may not exist on installs where it is disabled.
 """
 

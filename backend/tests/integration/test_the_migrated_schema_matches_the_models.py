@@ -70,21 +70,6 @@ def test_what_migrations_build_is_what_the_models_declare(monkeypatch):
     )
 
 
-#: Indexes whose migrated definition differs from the model's in a way that
-#: changes no behaviour: the baseline built ``uq_partner_org_code`` without the
-#: ``WHERE code IS NOT NULL`` predicate, and NULLs never collide in a unique
-#: index anyway. Only this exact pair of definitions is waived: any other
-#: predicate under the same name still fails.
-_EQUIVALENT_DEFINITION_DRIFT = {
-    'uq_partner_org_code': (
-        'CREATE UNIQUE INDEX uq_partner_org_code ON public.partners'
-        ' USING btree (organization_id, code)',
-        'CREATE UNIQUE INDEX uq_partner_org_code ON public.partners'
-        ' USING btree (organization_id, code) WHERE (code IS NOT NULL)',
-    ),
-}
-
-
 def _index_definitions(url: str) -> dict[str, str]:
     """Every index in the database, by name, as Postgres itself prints it.
 
@@ -128,7 +113,6 @@ def test_the_migrated_indexes_are_the_ones_the_models_declare(monkeypatch):
         f'  - {name}\n      migrated: {migrated[name]}\n      declared: {declared[name]}'
         for name in sorted(migrated.keys() & declared.keys())
         if migrated[name] != declared[name]
-        and _EQUIVALENT_DEFINITION_DRIFT.get(name) != (migrated[name], declared[name])
     ]
     assert not differing, (
         'an index the migrations build is not the index the models declare:\n'
@@ -269,11 +253,6 @@ def test_the_migrated_database_carries_the_trigram_indexes(monkeypatch):
     baseline writes them by hand, and this asks the database a fresh install
     leaves behind.
     """
-    from migrations.versions.baseline_002_full_schema import TRIGRAM_INDEXES
-    from migrations.versions.listreads01_index_the_list_searches import (
-        TRIGRAM_INDEXES as LIST_TRIGRAM_INDEXES,
-    )
-
     with isolated_db_url('trgm') as url:
         monkeypatch.setenv('DATABASE_URL', url)
         command.upgrade(Config('alembic.ini'), 'head')
@@ -293,8 +272,18 @@ def test_the_migrated_database_carries_the_trigram_indexes(monkeypatch):
             ).scalar()
         engine.dispose()
 
+    # Spelled out: taken from the tuples the migrations loop over, an entry
+    # dropped from a tuple would leave the two sides agreeing.
     assert set(found) == {
-        name for name, _table, _column in (*TRIGRAM_INDEXES, *LIST_TRIGRAM_INDEXES)
+        'ix_items_barcode_trgm',
+        'ix_items_brand_trgm',
+        'ix_items_label_code_trgm',
+        'ix_items_name_trgm',
+        'ix_items_serial_number_trgm',
+        'ix_partners_name_trgm',
+        'ix_product_templates_barcode_trgm',
+        'ix_product_templates_name_trgm',
+        'ix_product_templates_sku_trgm',
     }
     assert all('USING gin' in definition for definition in found.values())
     assert extension == 1, 'the pg_trgm extension the indexes need is missing'

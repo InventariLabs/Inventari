@@ -8,7 +8,7 @@ object carrying a group's key will do, a :class:`~app.core.testing.ShelfRow`
 most often — or the view files the hold elsewhere.
 
 A hold that outgrows its grain is refused at commit by the database itself
-(``holdguard01``). An instance older than that guard can still hold one, and
+(archived ``holdguard01``). An instance older than that guard can still hold one, and
 the checks that report such a grain are tested on it: ``past_the_hold_guard``
 writes it in the caller's transaction with the triggers on the two tables
 switched off and back on before the commit — the guard's, and any other a
@@ -102,7 +102,7 @@ def hold(
     return row
 
 
-#: The triggers of ``holdguard01``, by table.
+#: The triggers of the archived ``holdguard01``, by table.
 _HOLD_GUARD = (
     ('items', 'ck_stock_holds_within_stock'),
     ('items', 'ck_stock_holds_within_stock_on_delete'),

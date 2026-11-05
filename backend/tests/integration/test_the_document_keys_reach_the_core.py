@@ -213,7 +213,7 @@ def _seed_the_shape_the_keys_never_guarded(engine) -> dict[str, uuid.UUID]:
                 id=kept_item,
                 organization_id=org,
                 # The piece the reservation below holds: a hold with no
-                # record under it is refused at commit (``holdguard01``).
+                # record under it is refused at commit (archived ``holdguard01``).
                 template_id=template,
                 storage_location_id=location,
                 name='Kept',

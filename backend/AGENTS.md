@@ -49,9 +49,9 @@ The Core MUST remain neutral — it serves food tracking, IT equipment, warehous
 ### Rules
 - **No domain columns in Core models** (`warranty_until`, `assigned_to`, `equipment_status`, …). Use `meta_data` (JSONB) or module tables.
   Permitted exceptions on `Item`, **not a precedent**: `serial_number` and `expiry_date` (a denormalised cache for non-lot items — authoritative expiry lives on `StockLot`). Do not add further domain date columns; `freeze_date`/`production_date` already moved to `meta_data` (`food` / `manufacturing`).
-- **Lot/batch tracking: `StockLot` names the batch, the record holds it.** The stock model keeps one record per batch per owner, so the records' quantities are the only stock number and a quant — read from `stock_quants_from_records` — is their sum: `Item.lot_id` and `Item.owner_id` name the batch and owner a record's stock is in (existing records were assigned, and split where they straddled two batches, by migration `lotrec02`). The bridge and a record's move change the record's own batch and owner (consuming a held batch is refused there, disposing of it is not); production takes a draw off the records of the batch and owner it came from, a stock take corrects each batch and owner by its own difference, and the document executor opens a record per batch received and takes records off by the batches the draw plan named. Lots flow from document lines into `Item.lot_id`, recall uses `StockLot.status`, and outflows honour lots through the draw planned from the records (`take_from_the_records_async`, cross-lot FIFO/FEFO). A new path that writes stock sets them.
+- **Lot/batch tracking: `StockLot` names the batch, the record holds it.** The stock model keeps one record per batch per owner, so the records' quantities are the only stock number and a quant — read from `stock_quants_from_records` — is their sum: `Item.lot_id` and `Item.owner_id` name the batch and owner a record's stock is in (existing records were assigned, and split where they straddled two batches, by archived migration `lotrec02`). The bridge and a record's move change the record's own batch and owner (consuming a held batch is refused there, disposing of it is not); production takes a draw off the records of the batch and owner it came from, a stock take corrects each batch and owner by its own difference, and the document executor opens a record per batch received and takes records off by the batches the draw plan named. Lots flow from document lines into `Item.lot_id`, recall uses `StockLot.status`, and outflows honour lots through the draw planned from the records (`take_from_the_records_async`, cross-lot FIFO/FEFO). A new path that writes stock sets them.
 - **`meta_data` namespace convention.** Write under your module's key — `item.meta_data['equipment'] = {...}`. Flat keys are forbidden.
-- **Neutral defaults and vocabulary.** No food-specific defaults in Core — e.g. defaulting `behavior_mode` to `'EXPIRY'`, `allowed_system_fields` that assume `expiry_date`, a `'PANTRY'` fallback. The action and reason vocabulary is `USED` / `DISPOSED`; the food-era `CONSUMED` / `DISCARDED` left the database and the enum before the first release (migration `legacyvals01`), so new code reads and writes the neutral pair only.
+- **Neutral defaults and vocabulary.** No food-specific defaults in Core — e.g. defaulting `behavior_mode` to `'EXPIRY'`, `allowed_system_fields` that assume `expiry_date`, a `'PANTRY'` fallback. The action and reason vocabulary is `USED` / `DISPOSED`; the food-era `CONSUMED` / `DISCARDED` left the database and the enum before the first release (archived migration `legacyvals01`), so new code reads and writes the neutral pair only.
 - **Comments and docstrings** use neutral examples (`Cold Storage`, `Shelf A`, `Receiving`), never `Fridge`/`Pantry`/`Kitchen`.
 
 ### Module Extensibility Patterns (use these instead of modifying Core)
@@ -316,14 +316,14 @@ call the async variant directly. Do NOT create parallel sync/async file variants
 - **Item.quantity / StockMove — one model, in every organization** ([ADR-022](../docs/adr/ADR-022-one-number-of-stock.md)).
   **The records** (`Item.quantity`, one record per batch per owner) are the stock — the only number of
   it; `stock_quants_from_records` sums them per (product_template, location, lot, owner) — physical,
-  reserved, available — and a "quant" is such a sum (the `stock_quants` table is gone, `quantdrop01`).
+  reserved, available — and a "quant" is such a sum (the `stock_quants` table is gone, archived `quantdrop01`).
   **StockMove** is the journal — every change to a record's stock has a movement explaining it,
   posted in the same transaction (see *Stock Posting Rules*).
   - It holds whatever modules are enabled. An organization without a module that reads the register
     (`consumes_stock_quant` — today warehouse, maker, purchase_orders, stock_takes) keeps the same
     movements; only the screens that show them stay behind that list, so a household sees no change.
   - The stock a shelf held before the register knew it was posted once as an opening balance
-    (`openbal01`, movement `reference_type='opening_balance'`). A record that predates its card adopts
+    (archived `openbal01`, movement `reference_type='opening_balance'`). A record that predates its card adopts
     it on its first change — or on an edit that writes a field to its card — and posts what it held as
     an opening (`opening_balance` movement, layer), then the change as a movement of its own.
   - A record that changes shelves takes its stock with it through one call,

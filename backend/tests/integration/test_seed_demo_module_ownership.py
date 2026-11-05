@@ -5,7 +5,7 @@ so nothing else fills in the two marks the rest of the application reads: the
 ``meta_data['equipment']`` namespace and the ``module_name`` derived from it.
 Without them a seeded server is a record no list owns — the core inventory
 shows it with "remove one unit" beside it, and the module that made it cannot
-find it. The categories moved per organization in ``modcat01``, which is how
+find it. The categories moved per organization in the archived ``modcat01``, which is how
 the seed started producing them: a lookup over global categories alone came
 back empty and every ``cat_ids.get(...)`` quietly returned ``None``.
 """
@@ -121,7 +121,7 @@ class TestResolveCategoryIds:
         test_household: Organization,
         equipment_categories: dict[str, uuid.UUID],
     ) -> None:
-        """Module categories are per-organization rows since ``modcat01``."""
+        """Module categories are per-organization rows since the archived ``modcat01``."""
         resolved = _resolve_category_ids(
             db_session, test_household.id, catalogue='equipment'
         )

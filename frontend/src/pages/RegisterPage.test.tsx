@@ -504,11 +504,58 @@ describe("RegisterPage", () => {
       ).toBe(true),
     );
   });
-  it("hands the address just used to the sign-in page", async () => {
+  it("signs the first account in and continues to the app, not the sign-in form", async () => {
+    const login = vi.fn().mockResolvedValue(undefined);
     useAuthStore.setState({
       register: vi
         .fn()
         .mockResolvedValue(undefined) as unknown as AuthState["register"],
+      login: login as unknown as AuthState["login"],
+    });
+    server.use(
+      http.get("/api/v1/auth/init-status", () =>
+        HttpResponse.json({ is_initialized: false }),
+      ),
+    );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register"]}>
+          <Routes>
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/" element={<p>the app</p>} />
+            <Route path="/login" element={<p>sign-in form</p>} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    const password = await screen.findByLabelText(/^Password/i);
+    fireEvent.change(screen.getByLabelText(/Email/i), {
+      target: { value: "owner@example.com" },
+    });
+    fireEvent.change(password, { target: { value: "Str0ng!passphrase" } });
+    fireEvent.change(screen.getByLabelText(/Confirm password/i), {
+      target: { value: "Str0ng!passphrase" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /create/i }));
+
+    expect(await screen.findByText("the app")).toBeInTheDocument();
+    expect(login).toHaveBeenCalledWith(
+      "owner@example.com",
+      "Str0ng!passphrase",
+    );
+    expect(screen.queryByText("sign-in form")).not.toBeInTheDocument();
+  });
+  it("falls back to the sign-in page, address filled in, when the new account cannot sign in yet", async () => {
+    useAuthStore.setState({
+      register: vi
+        .fn()
+        .mockResolvedValue(undefined) as unknown as AuthState["register"],
+      login: vi
+        .fn()
+        .mockRejectedValue(
+          new Error("refused"),
+        ) as unknown as AuthState["login"],
     });
     server.use(
       http.get("/api/v1/auth/init-status", () =>

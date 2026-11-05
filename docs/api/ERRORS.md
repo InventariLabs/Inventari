@@ -608,7 +608,7 @@ apart.
 | `SHOPPING_LIST_ITEM_CATEGORY_UNKNOWN` | Unknown category (category_id: {category_id}) — the category does not exist |
 | `SHOPPING_LIST_ITEM_ITEM_UNKNOWN` | Unknown product (item_id: {item_id}) — the item does not exist |
 | `SHOPPING_LIST_ITEM_QUANTITY_ABOVE_CEILING` | The quantity {quantity} is past what the column holds — the largest storable value is {ceiling} |
-| `SHOPPING_LIST_ITEM_QUANTITY_ROUNDS_TO_ZERO` | Quantity {quantity} rounds to zero at the store's precision — the smallest countable amount is 0.001 |
+| `SHOPPING_LIST_ITEM_QUANTITY_ROUNDS_TO_ZERO` | Quantity {quantity} rounds to zero at the store's precision — the smallest countable amount is {smallest} |
 | `SHOPPING_LIST_ITEM_TEMPLATE_UNKNOWN` | Unknown product template (template_id: {template_id}) — the template does not exist |
 | `SHOPPING_LIST_ITEM_UOM_UNKNOWN` | Unknown unit of measure (uom_id: {uom_id}) — the unit does not exist |
 | `SHOPPING_LIST_NOTHING_TO_CONVERT` | No convertible items (all lack a product template) |

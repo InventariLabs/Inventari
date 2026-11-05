@@ -219,6 +219,7 @@
     "date": "As of",
     "location": "Location",
     "everywhere": "Everywhere",
+    "searchPlaceholder": "Search a product…",
     "print": "Print",
     "total": "Total",
     "caption": "Stock held by {{organization}} on {{date}}",
@@ -230,7 +231,8 @@
     "empty": {
       "title": "Nothing was on the shelf",
       "description": "On this date none of the products it records were in stock.",
-      "descriptionAt": "{{location}} — on this date it held none of the products it records."
+      "descriptionAt": "{{location}} — on this date it held none of the products it records.",
+      "descriptionSearch": "None of the products it records match “{{search}}” on this date."
     },
     "columns": {
       "product": "Product",

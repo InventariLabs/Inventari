@@ -26,6 +26,7 @@ class StockReportPdfService(PdfServiceBase):
     module_name = 'core'
 
     labels_en = {
+        'search': 'Narrowed to',
         'title': 'Stock on hand',
         'product': 'Product',
         'quantity': 'Quantity',
@@ -40,6 +41,7 @@ class StockReportPdfService(PdfServiceBase):
         'nothing': 'Nothing was on the shelf on this date.',
     }
     labels_pl = {
+        'search': 'Zawężone do',
         'title': 'Stan magazynowy',
         'product': 'Produkt',
         'quantity': 'Ilość',
@@ -54,6 +56,7 @@ class StockReportPdfService(PdfServiceBase):
         'nothing': 'Na ten dzień nic nie stało na półce.',
     }
     labels_de = {
+        'search': 'Eingegrenzt auf',
         'title': 'Lagerbestand',
         'product': 'Produkt',
         'quantity': 'Menge',
@@ -68,6 +71,7 @@ class StockReportPdfService(PdfServiceBase):
         'nothing': 'An diesem Tag lag nichts im Lager.',
     }
     labels_fr = {
+        'search': 'Limité à',
         'title': 'État du stock',
         'product': 'Produit',
         'quantity': 'Quantité',
@@ -82,6 +86,7 @@ class StockReportPdfService(PdfServiceBase):
         'nothing': "Rien n'était en stock à cette date.",
     }
     labels_es = {
+        'search': 'Limitado a',
         'title': 'Existencias',
         'product': 'Producto',
         'quantity': 'Cantidad',
@@ -106,8 +111,13 @@ async def generate_stock_as_of_pdf(
     lang: str = 'en',
     *,
     show_value: bool = True,
+    search: str | None = None,
 ) -> bytes:
-    """Render one report. No barcode: the sheet identifies a date."""
+    """Render one report. No barcode: the sheet identifies a date.
+
+    A sheet narrowed by a search says so beside its dates: it is filed and
+    read months later, and its total must not read as the whole shelf.
+    """
     labels = _svc.get_labels(lang)
     issuer = await build_issuer_context(organization, lang)
     country = getattr(organization, 'country', None)
@@ -129,6 +139,7 @@ async def generate_stock_as_of_pdf(
                 'label': labels['generated'],
                 'value': format_date_for(lang, report.generated_at, country=country),
             },
+            *([{'label': labels['search'], 'value': search}] if search else []),
         ],
         'rows': report.items,
         # A file is the screen in the reader's hands: what the organization's

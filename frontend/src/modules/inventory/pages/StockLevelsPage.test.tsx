@@ -13,10 +13,12 @@ const writeSearchParams = vi.fn(
     searchParams = update(searchParams);
   },
 );
+const navigateSpy = vi.fn();
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
+    useNavigate: () => navigateSpy,
     useSearchParams: () => [searchParams, writeSearchParams],
   };
 });
@@ -107,8 +109,26 @@ describe("StockLevelsPage", () => {
     searchParams = new URLSearchParams();
     listState = { items: ROWS, total: 1 };
     listSpy.mockClear();
+    navigateSpy.mockClear();
     writeSearchParams.mockClear();
     placeAsks.length = 0;
+  });
+
+  it("carries what the list is narrowed to into the stock on a date", async () => {
+    searchParams = new URLSearchParams("location=l1");
+    renderPage();
+
+    await userEvent.type(
+      screen.getByPlaceholderText("Search a product or a batch…"),
+      "rye",
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Stock on a date" }),
+    );
+
+    expect(navigateSpy).toHaveBeenCalledWith(
+      "/inventory/stock/as-of?search=rye&location=l1",
+    );
   });
 
   it("never subtracts the promise from the stock", () => {

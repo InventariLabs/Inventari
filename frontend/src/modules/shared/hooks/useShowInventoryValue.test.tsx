@@ -49,6 +49,39 @@ describe("useShowInventoryValue", () => {
     await waitFor(() => expect(result.current).toBe(false));
   });
 
+  it("keeps the value hidden until the config has answered", async () => {
+    // A profile that withholds the figure must not flash it on the first
+    // paint and take it back when the answer arrives.
+    let answer: (() => void) | undefined;
+    server.use(
+      http.get("/api/v1/stats/config", async () => {
+        await new Promise<void>((resolve) => {
+          answer = resolve;
+        });
+        return HttpResponse.json({
+          enable_analytics: true,
+          show_inventory_value: true,
+        });
+      }),
+    );
+
+    const seen: boolean[] = [];
+    const { result } = renderHook(
+      () => {
+        const show = useShowInventoryValue();
+        seen.push(show);
+        return show;
+      },
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() => expect(answer).toBeDefined());
+    expect(result.current).toBe(false);
+    answer?.();
+    await waitFor(() => expect(result.current).toBe(true));
+    expect(seen[0]).toBe(false);
+  });
+
   it("fails open while the config cannot be read", async () => {
     server.use(
       http.get("/api/v1/stats/config", () =>

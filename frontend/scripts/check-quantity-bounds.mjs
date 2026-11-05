@@ -15,7 +15,9 @@
  *   1. does ``QUANTITY_MAX`` in quantityBounds.ts equal the backend's max;
  *   2. does ``QUANTITY_STEP`` in useUomPrecision.ts equal the backend's step;
  *   3. does every shopping-list catalogue's ``addItem.validation.quantityMax``
- *      interpolate ``{{max}}`` rather than paste the number into the sentence.
+ *      interpolate ``{{max}}`` rather than paste the number into the sentence;
+ *   4. does every backend catalogue's "rounds to zero" refusal interpolate
+ *      ``{smallest}`` rather than paste the step ("0.001") into the sentence.
  *
  * Modes:
  *   node check-quantity-bounds.mjs           # report and exit 1 on findings
@@ -38,6 +40,11 @@ const FRONTEND_STEP = resolve(ROOT, "src/hooks/useUomPrecision.ts");
 const CATALOGS = ["en", "pl", "de", "es", "fr"].map((lang) =>
   resolve(ROOT, `src/modules/shopping_lists/i18n/${lang}.json`),
 );
+// The backend's refusals live in Python catalogues (en and pl share a file).
+const ERROR_CATALOGS = ["en_pl", "de", "es", "fr", "pt"].map((lang) =>
+  resolve(ROOT, `../backend/app/i18n/_errors_${lang}.py`),
+);
+const ZERO_REFUSAL_KEY = "shopping_list_item_quantity_rounds_to_zero";
 
 /** The digits and scale the backend declares, or null when it lost them. */
 export function parseBackendQuantity(text) {
@@ -125,6 +132,32 @@ export function ceilingSentenceFindings(catalogs) {
 }
 
 /**
+ * The refusal for a quantity that rounds to zero names the smallest amount
+ * the column keeps. The route fills ``{smallest}`` from the backend's step; a
+ * sentence that pastes the number keeps stating it after the scale moves.
+ * Every catalogue has to carry the key, and every line holding it has to
+ * interpolate.
+ */
+export function zeroRefusalFindings(catalogs) {
+  const findings = [];
+  const line = new RegExp(`'${ZERO_REFUSAL_KEY}':\\s*(.+)$`, "gm");
+  for (const { path, text } of catalogs) {
+    const sentences = [...text.matchAll(line)].map((match) => match[1]);
+    if (sentences.length === 0) {
+      findings.push(`${path}: no ${ZERO_REFUSAL_KEY} sentence`);
+    }
+    for (const sentence of sentences) {
+      if (!sentence.includes("{smallest}")) {
+        findings.push(
+          `${path}: ${ZERO_REFUSAL_KEY} does not interpolate {smallest} — it repeats the step: ${sentence}`,
+        );
+      }
+    }
+  }
+  return findings;
+}
+
+/**
  * The gate itself. Guarded, because the file also exports its readers: a
  * test that imports them used to run the whole gate on import.
  */
@@ -157,6 +190,15 @@ function main() {
   findings.push(
     ...ceilingSentenceFindings(
       CATALOGS.map((path) => ({ path, text: readFileSync(path, "utf8") })),
+    ),
+  );
+
+  findings.push(
+    ...zeroRefusalFindings(
+      ERROR_CATALOGS.map((path) => ({
+        path,
+        text: readFileSync(path, "utf8"),
+      })),
     ),
   );
 
