@@ -74,8 +74,15 @@
         "staple_few": "Ostatni zakup {{count}} dni temu, ponad dwa razy dłużej niż zwykle.",
         "staple_many": "Ostatni zakup {{count}} dni temu, ponad dwa razy dłużej niż zwykle.",
         "staple_other": "Ostatni zakup {{count}} dnia temu, ponad dwa razy dłużej niż zwykle.",
-        "expiring": "Termin ważności: {{date}}.",
-        "expired": "Termin ważności minął {{date}}."
+        "expiringToday": "Termin ważności mija dziś, {{date}}.",
+        "expiring_one": "Termin ważności: {{date}}, za {{count}} dzień.",
+        "expiring_few": "Termin ważności: {{date}}, za {{count}} dni.",
+        "expiring_many": "Termin ważności: {{date}}, za {{count}} dni.",
+        "expiring_other": "Termin ważności: {{date}}, za {{count}} dnia.",
+        "expired_one": "Termin ważności minął {{date}}, {{count}} dzień temu.",
+        "expired_few": "Termin ważności minął {{date}}, {{count}} dni temu.",
+        "expired_many": "Termin ważności minął {{date}}, {{count}} dni temu.",
+        "expired_other": "Termin ważności minął {{date}}, {{count}} dnia temu."
       },
       "noAlerts": "Brak alertów - Twoje zapasy wyglądają świetnie!",
       "noData": "Nie ma jeszcze czego sprawdzać — dodaj produkty, a alerty się pojawią"
@@ -147,7 +154,7 @@
     "enableAnalytics": "Włącz analitykę",
     "enableAnalyticsDescription": "Pokazuj zakładkę analityki (rotacja, prognozy wydatków, wzorce zakupowe). Wyłącz dla małych domowych inwentarzy, gdzie historii jest za mało, by te analizy były sensowne.",
     "showInventoryValue": "Pokaż wartość zapasów",
-    "showInventoryValueDescription": "Pokazuj łączną wartość zapasów w podsumowaniu statystyk. To metryka biznesowa — wyłącz dla domowych inwentarzy, które nie przechowują cen zakupu, z których można by ją zsumować."
+    "showInventoryValueDescription": "Pokazuj wartości zapasów w całej aplikacji: w podsumowaniu statystyk, na ekranach produktów oraz w eksportach i wydrukach. To metryka biznesowa — wyłącz dla domowych inwentarzy, które nie przechowują cen zakupu, z których można by ją zsumować."
   },
   "navigation": {
     "settings": "Analityka"

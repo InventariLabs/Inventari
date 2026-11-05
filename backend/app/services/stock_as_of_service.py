@@ -52,7 +52,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import ColumnElement, Select
 
 from app.core.contracts import StockAsOfRowDTO
-from app.core.db_utils import in_ids
+from app.core.db_utils import escape_ilike, in_ids
 from app.core.module_ownership import (
     hidden_module_tags_async,
     outside_module_products,
@@ -63,6 +63,7 @@ from app.models.product_template import ProductTemplate
 from app.models.stock_move import StockMove, StockMoveState
 from app.models.stock_valuation_layer import StockValuationLayer, layer_dated_at
 from app.models.uom import Uom
+from app.services.stock_quants_service import searched_products
 from app.services.storage._queries import descendant_ids_async
 from app.services.storage._relocation import parents_as_of_async, subtree_of
 
@@ -145,6 +146,7 @@ def _quantities_as_of(
     as_of: datetime,
     location_ids: list[UUID] | None,
     hidden_tags: set[str] | None = None,
+    product_pattern: str | None = None,
 ) -> Select:
     """Quantity per product on the date, summed over the places asked about.
 
@@ -213,11 +215,22 @@ def _quantities_as_of(
         .group_by(sides.c.product_template_id)
         .having(func.sum(sides.c.quantity) != 0)
     )
-    return quantities.where(
+    quantities = quantities.where(
         outside_module_products(
             sides.c.product_template_id, organization_id, hidden_tags
         )
     )
+    if product_pattern is not None:
+        # The products a typed string reaches, read as the stock list reads
+        # it (their own fields and their batches) — narrowing the report to
+        # them keeps the figures beside the rows (the total, the unpriced
+        # count) about the same products.
+        quantities = quantities.where(
+            sides.c.product_template_id.in_(
+                searched_products(organization_id, product_pattern)
+            )
+        )
+    return quantities
 
 
 def _values_as_of(organization_id: UUID, as_of: datetime, org_currency: str) -> Select:
@@ -356,6 +369,7 @@ async def report_async(
     has_layers: bool,
     limit: int | None = None,
     offset: int = 0,
+    search: str | None = None,
 ) -> StockAsOfPage:
     """The rows of one organization on one date, ``limit`` of them from
     ``offset`` in name order — all of them when ``limit`` is None, as the
@@ -389,7 +403,11 @@ async def report_async(
 
     hidden_tags = await hidden_module_tags_async(db, organization_id)
     quantities = _quantities_as_of(
-        organization_id, as_of, location_ids, hidden_tags
+        organization_id,
+        as_of,
+        location_ids,
+        hidden_tags,
+        f'%{escape_ilike(search)}%' if search else None,
     ).cte('quantities')
     if priced:
         values = _values_as_of(organization_id, as_of, org_currency).cte('stock_values')

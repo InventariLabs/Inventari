@@ -2,7 +2,7 @@
 Integration tests for stats module AnalyticsServiceAsync.
 
 Tests verify business logic for:
-- Inventory rotation analysis (FIFO compliance)
+- Inventory rotation analysis
 - Smart alerts and recommendations
 - Expense forecasting
 - Purchase pattern analysis

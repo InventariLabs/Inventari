@@ -22,9 +22,17 @@ says what the release does rather than what changed since them.
   well.
 - Settings has a "People" entry in its sidebar and phone menu that leads
   straight to the members and invitations, which used to sit at the foot of
-  General. After registering, the sign-in form is prefilled with the new
-  address, and the webhook dialog lists every event in the interface language
-  and groups the events of modules the organization has not enabled apart.
+  General. The webhook dialog lists every event in the interface language and
+  groups the events of modules the organization has not enabled apart.
+- Creating an account — the first one, by invitation or from an approved
+  request — signs it in and continues to the app, instead of sending the new
+  owner to a sign-in form that asks for the address and password just chosen.
+  If the sign-in is refused, the form opens with the address filled in.
+- A password-reset link that is spent or expired is refused when the page opens,
+  with a link to request a new one, instead of after a new password has been
+  typed. The page asks the new open endpoint `POST /auth/password-reset/check`.
+  The "this installation does not send email" notice also says that the only
+  administrator can reset the password on the server.
 - A confirmed document now keeps your own company's name, tax number and
   address and the names of the locations it refers to, as it already kept the
   partner, so a reprint after the company moved or a shelf was renamed shows
@@ -46,6 +54,11 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- `manage.py user create-admin` takes `--lang` (`en`, `pl`, `de`, `fr`, `es` or
+  `pt`) to set the language the account opens in; an unknown code is refused,
+  and without it a new account takes the instance default and an existing one
+  keeps its own. DEPLOYMENT.md and QUICK_DEPLOY.md say how to use the command
+  to get back into an installation without outgoing mail.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
 
@@ -65,6 +78,20 @@ says what the release does rather than what changed since them.
   field of the Dairy and Cheese categories now offers its options in the
   interface language instead of the stored English "No" and "Yes". Options an
   organization wrote itself keep their words.
+- The stock-on-a-date report can be narrowed to a product: it has a search
+  field, the stock list's "Stock on a date" button carries the search and the
+  place you had narrowed to, and the spreadsheet, the printout and the
+  `search` parameter of `GET /stock-as-of` follow the same text. Its total and
+  counts then speak about the matching products only.
+- The "Show inventory value" setting says that it also governs the product
+  screens, exports and printouts, not only the statistics overview, and a
+  profile that hides stock value no longer shows it for a moment while the
+  setting is still on its way.
+- Smart alerts state in words how far off an expiry date is ("Expires on
+  12.11.2026, in 3 days"), and an alert about a date within the week is amber
+  rather than grey. On a phone the expiry forecast tiles sit two across, so no
+  label breaks inside a word in any of the six languages, and uppercase labels
+  keep their word spaces.
 - Add Category opens empty, on the product and the equipment category screens
   alike. It used to bring back the last name typed, after a cancel and after a
   save, where saving it again was refused as a duplicate.

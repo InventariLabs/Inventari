@@ -199,6 +199,16 @@ sudo ufw allow 80/tcp && sudo ufw allow 443/tcp
 docker compose -f docker-compose.prod.yml logs caddy
 ```
 
+**Locked out — the administrator forgot the password?** Without outgoing mail
+there is no reset link; reset it from the server with the command that created
+the account. It sets the new password, keeps the administrator role and signs
+out every earlier session:
+```bash
+docker compose -f docker-compose.prod.yml exec backend \
+  python manage.py user create-admin \
+    --email you@example.com --password '<a new password>'
+```
+
 **Backend not starting?**
 ```bash
 docker compose -f docker-compose.prod.yml logs backend

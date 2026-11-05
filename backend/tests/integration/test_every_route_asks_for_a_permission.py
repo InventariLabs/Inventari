@@ -82,6 +82,7 @@ _OPEN = {
     'POST /api/v1/auth/refresh': 'the session renewing itself',
     'POST /api/v1/auth/logout': "ending the caller's own session",
     'POST /api/v1/auth/password-reset/request': 'before sign-in',
+    'POST /api/v1/auth/password-reset/check': 'before sign-in',
     'POST /api/v1/auth/password-reset/confirm': 'before sign-in',
     'GET /public/invitation/{code}': 'asked before sign-in',
     'POST /api/v1/auth/password-reset/_dev_token': 'only under TESTING, for E2E',
