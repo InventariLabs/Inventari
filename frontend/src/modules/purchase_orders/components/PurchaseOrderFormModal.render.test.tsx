@@ -94,12 +94,14 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
 describe("PurchaseOrderFormModal", () => {
   it("renders create mode header", () => {
     render(<PurchaseOrderFormModal onClose={vi.fn()} onSuccess={vi.fn()} />);
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: "New purchase order" }),
+    ).toBeInTheDocument();
   });
 
   it("renders with an empty line by default", () => {
     render(<PurchaseOrderFormModal onClose={vi.fn()} onSuccess={vi.fn()} />);
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByText("1 item")).toBeInTheDocument();
   });
 
   it("uses the shared wide sheet container", () => {
