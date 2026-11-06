@@ -3,7 +3,8 @@
 For each module with ``migrations/versions/``, verifies:
 1. ``upgrade head`` creates the module's tables
 2. ``downgrade base`` removes them
-3. The version table is separate from core ``alembic_version``
+3. The version table is separate from core ``alembic_version`` (checked in
+   the same item as 1: both need the same freshly migrated schema)
 4. Running ``upgrade head`` twice is idempotent (no error)
 5. Migrated table columns match the SQLAlchemy model definitions — their
    names, and for a numeric column its width too: a name check saw
@@ -110,7 +111,7 @@ class TestModuleMigrationRoundTrip:
     def test_upgrade_creates_tables(
         self, module_name, expected_tables, isolated_db_url
     ):
-        """Module upgrade@head creates all expected tables."""
+        """Module upgrade@head creates its tables and a version table of its own."""
         _create_core_tables(isolated_db_url, module_name, expected_tables)
         run_module_migrations(module_name, 'upgrade', db_url=isolated_db_url)
 
@@ -123,22 +124,9 @@ class TestModuleMigrationRoundTrip:
             assert table in actual_tables, (
                 f'Module {module_name}: table "{table}" missing after upgrade'
             )
-
-    def test_version_table_separate(
-        self, module_name, expected_tables, isolated_db_url
-    ):
-        """Module version table is separate from core alembic_version."""
-        _create_core_tables(isolated_db_url, module_name, expected_tables)
-        run_module_migrations(module_name, 'upgrade', db_url=isolated_db_url)
-
-        engine = create_engine(isolated_db_url)
-        insp = inspect(engine)
-        tables = set(insp.get_table_names())
-        engine.dispose()
-
-        version_table = get_version_table_name(module_name)
-        assert version_table in tables
-        assert 'alembic_version' not in tables
+        # The version table is the module's own, never core ``alembic_version``.
+        assert get_version_table_name(module_name) in actual_tables
+        assert 'alembic_version' not in actual_tables
 
     def test_downgrade_removes_tables(
         self, module_name, expected_tables, isolated_db_url
