@@ -42,3 +42,10 @@ describe("approval workflow hint", () => {
     });
   }
 });
+
+describe("approval workflow heading", () => {
+  it("calls the section a flow, as the hint and consequence sentences below do (pl)", () => {
+    expect(pl.profile.approvalWorkflow).toBe("Przepływ akceptacji");
+    expect(pl.profile.approvalHowItWorks).toContain("przepływ");
+  });
+});
