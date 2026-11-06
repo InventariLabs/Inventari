@@ -116,12 +116,16 @@ function ItemLocation({
       <span className="text-sm text-on-muted">{t("items:usedUpPlace")}</span>
     );
   }
-  return (
-    <LocationLink
-      locationId={item.location_id}
-      path={getStoragePath(item.location_id, item.shelf_location, storages, t)}
-    />
+  const path = getStoragePath(
+    item.location_id,
+    item.shelf_location,
+    storages,
+    t,
   );
+  // While the places are on their way there is no name to link with, and a
+  // link without one reads to a screen reader as "link" and nothing more.
+  if (!path) return null;
+  return <LocationLink locationId={item.location_id} path={path} />;
 }
 
 /** "+1", where a unit can be added: not to a used-up record. */

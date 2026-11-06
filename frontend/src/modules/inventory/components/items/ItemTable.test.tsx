@@ -683,6 +683,23 @@ describe("ItemTable — the storage cell is one click target", () => {
     });
   });
 
+  it("offers no nameless link while the places are on their way", () => {
+    render(
+      <ItemTable
+        {...baseProps}
+        storages={undefined}
+        items={[makeItem("1", { location_id: "bay-3" })]}
+      />,
+    );
+
+    // There is no name to link with yet: a link with an empty name reads to
+    // a screen reader as "link" and nothing more.
+    expect(
+      document.querySelector('a[href="/inventory/locations/bay-3"]'),
+    ).toBeNull();
+    expect(screen.queryByText("Unknown")).not.toBeInTheDocument();
+  });
+
   it("puts the full path in `title`, which truncation may take from the label", () => {
     renderWithStorage();
 

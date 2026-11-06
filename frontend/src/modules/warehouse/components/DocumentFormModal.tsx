@@ -584,15 +584,13 @@ export default function DocumentFormModal({
       return;
     }
 
-    createMutation.mutate(toCreatePayload(), {
+    const create = { data: toCreatePayload() };
+    createMutation.mutate(create, {
       onSuccess: (created) => {
         rememberLastUsedLocations(docType, sourceLocationId, targetLocationId);
         toast.success(t("toast.created"));
-        if (onCreated && created) {
-          onCreated(created);
-          return;
-        }
-        onClose();
+        if (onCreated && created) onCreated(created);
+        else onClose();
       },
       onError: handleApiError,
     });

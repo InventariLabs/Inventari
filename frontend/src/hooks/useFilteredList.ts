@@ -315,5 +315,12 @@ export function useFilteredList<T extends FilterDefinitions>(
     },
     /** Update a single filter value. */
     setFilter,
+    /**
+     * Edit the address through the same queue the filters write through, for
+     * a control of the screen's own that keeps its state in the address too
+     * — the sort, say. A write past it starts from the address on screen and
+     * drops a filter written in the same moment.
+     */
+    writeParams,
   };
 }

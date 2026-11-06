@@ -8266,7 +8266,14 @@ export interface paths {
          */
         get: operations["list_documents_api_v1_warehouse_documents_get"];
         put?: never;
-        /** Create Document */
+        /**
+         * Create Document
+         * @description Create a DRAFT document.
+         *
+         *     ``Idempotency-Key`` names the save: the same key sent again (a retry
+         *     after the answer was lost) is answered with the draft the first save
+         *     wrote instead of a second draft.
+         */
         post: operations["create_document_api_v1_warehouse_documents_post"];
         delete?: never;
         options?: never;
@@ -44509,7 +44516,9 @@ export interface operations {
     create_document_api_v1_warehouse_documents_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };

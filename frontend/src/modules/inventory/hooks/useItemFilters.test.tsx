@@ -157,6 +157,36 @@ describe("useItemFilters", () => {
     expect(back.get("filter")).toBe("low-stock");
   });
 
+  // A chip and a sort pressed before the first address has rendered each
+  // start from the address on screen; the sort used to write past the list's
+  // own queue of writes, so the chip stayed on while Back lost it.
+  it.each([
+    ["chip first", ["chip", "sort"]],
+    ["sort first", ["sort", "chip"]],
+  ])(
+    "keeps a chip and a sort pressed in one moment both in the address (%s)",
+    async (_name, order) => {
+      const { result } = renderHook(
+        () => ({ filters: useItemFilters(), location: useLocation() }),
+        { wrapper: wrapper("/inventory/items") },
+      );
+
+      await act(async () => {
+        for (const press of order) {
+          if (press === "chip") result.current.filters.setExpiredFilter(true);
+          else result.current.filters.setSort("name", "asc");
+          await Promise.resolve();
+        }
+      });
+
+      const params = new URLSearchParams(result.current.location.search);
+      expect(params.get("filter")).toBe("expired");
+      expect(params.get("sort_by")).toBe("name");
+      expect(params.get("sort_order")).toBe("asc");
+      expect(result.current.filters.expiredFilter).toBe(true);
+    },
+  );
+
   it("opens in the order the address names", () => {
     const { result } = renderHook(() => useItemFilters(), {
       wrapper: wrapper("/inventory/items?sort_by=name&sort_order=asc"),

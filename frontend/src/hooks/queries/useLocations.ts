@@ -108,6 +108,12 @@ export function useLocationsById(
   return {
     byId,
     isLoading: query.isLoading,
+    /**
+     * The ids changed and `byId` is still the answer for the previous ones,
+     * kept on screen until the new answer comes: a place missing from it may
+     * be on its way rather than unknown.
+     */
+    isPlaceholderData: query.isPlaceholderData,
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
