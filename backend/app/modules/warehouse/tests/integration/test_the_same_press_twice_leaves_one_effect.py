@@ -34,6 +34,7 @@ from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
 from app.modules.warehouse import _document_workflow_transitions as transitions
+from app.modules.warehouse._document_workflow_crud import create_document
 from app.modules.warehouse.document_correction_service import undo_document
 from app.modules.warehouse.document_profile_service import get_or_create_profile
 from app.modules.warehouse.models import Document, DocumentLine, DocumentStatus
@@ -403,4 +404,103 @@ class TestAPressRepeatedAfterTheFirstLanded:
             json=payload,
         )
 
+        assert second.json()['id'] != first.json()['id']
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+async def test_two_draft_saves_with_one_key_at_once_write_one_draft(
+    real_async_db_session: AsyncSession,
+) -> None:
+    db = real_async_db_session
+    shelf = await _shelf_with_one_product(db)
+    key = uuid.uuid4().hex
+
+    async def save(session: AsyncSession) -> Document:
+        return await create_document(
+            session,
+            shelf.org_id,
+            DocumentCreate.model_validate(
+                {
+                    'type': 'IN',
+                    'target_location_id': str(shelf.shelf_id),
+                    'lines': [
+                        {
+                            'product_template_id': str(shelf.template_id),
+                            'expected_quantity': '1',
+                        }
+                    ],
+                }
+            ),
+            shelf.user_id,
+            post_key=key,
+        )
+
+    outcomes = await _run_two(save, save)
+
+    assert not any(isinstance(o, BaseException) for o in outcomes), outcomes
+    assert outcomes[0].id == outcomes[1].id
+    made = await db.scalar(
+        select(func.count())
+        .select_from(Document)
+        .where(Document.organization_id == shelf.org_id)
+    )
+    assert made == 1
+
+
+@pytest.mark.integration
+class TestADraftSavedAgainAfterTheAnswerWasLost:
+    """A draft save is a press too: the retry after a lost answer must not
+    leave the first draft behind in Drafts beside a second one."""
+
+    def test_the_same_key_is_answered_with_the_first_draft(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+    ) -> None:
+        payload = _a_receipt(doc_partner, doc_target_location, doc_template)
+        headers = {**doc_auth_headers, 'Idempotency-Key': uuid.uuid4().hex}
+
+        first = client.post(
+            '/api/v1/warehouse/documents', headers=headers, json=payload
+        )
+        again = client.post(
+            '/api/v1/warehouse/documents', headers=headers, json=payload
+        )
+
+        assert first.status_code == status.HTTP_201_CREATED, first.text
+        assert again.status_code == status.HTTP_201_CREATED, again.text
+        assert again.json()['id'] == first.json()['id']
+        assert again.json()['status'] == DocumentStatus.DRAFT.value
+        db_session.expire_all()
+        drafts = db_session.scalar(
+            select(func.count())
+            .select_from(Document)
+            .where(Document.partner_id == doc_partner.id)
+        )
+        assert drafts == 1
+
+    def test_without_a_key_each_save_is_a_draft_of_its_own(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+    ) -> None:
+        payload = _a_receipt(doc_partner, doc_target_location, doc_template)
+
+        first = client.post(
+            '/api/v1/warehouse/documents', headers=doc_auth_headers, json=payload
+        )
+        second = client.post(
+            '/api/v1/warehouse/documents', headers=doc_auth_headers, json=payload
+        )
+
+        assert first.status_code == status.HTTP_201_CREATED, first.text
+        assert second.status_code == status.HTTP_201_CREATED, second.text
         assert second.json()['id'] != first.json()['id']

@@ -53,6 +53,26 @@ describe("RecipeEditForm", () => {
     expect(screen.getByDisplayValue("Pancakes")).toBeInTheDocument();
   });
 
+  it("keeps one sheet mounted when the recipe lands, and the focus inside it", () => {
+    // A second sheet mounted for the form replayed the entrance: the backdrop
+    // blinked out and the panel slid in again. Same node = no replay.
+    mocks.useRecipe.mockReturnValue({ data: undefined, isError: false });
+    const { rerender } = render(<RecipeEditForm {...props} />);
+    const dialog = screen.getByRole("dialog");
+    const backdrop = dialog.parentElement;
+
+    mocks.useRecipe.mockReturnValue({
+      data: { id: "r-1", name: "Pancakes", ingredients: [] },
+      isError: false,
+    });
+    rerender(<RecipeEditForm {...props} />);
+
+    expect(screen.getByRole("dialog")).toBe(dialog);
+    expect(dialog.parentElement).toBe(backdrop);
+    expect(screen.getByDisplayValue("Pancakes")).toBeInTheDocument();
+    expect(dialog.contains(document.activeElement)).toBe(true);
+  });
+
   it("renders nothing for a recipe that failed to load", () => {
     // The effect has already toasted and asked to close.
     mocks.useRecipe.mockReturnValue({

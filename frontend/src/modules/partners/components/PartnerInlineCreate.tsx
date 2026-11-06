@@ -22,6 +22,12 @@ interface PartnerInlineCreateProps {
   roleTypes?: readonly PartnerType[];
   onCreated: (partner: Partner) => void;
   onCancel: () => void;
+  /**
+   * Id of the field that opened the layer. The layer unmounts while its
+   * Cancel or Add button holds the focus, which then falls to the page body —
+   * behind a dialog the next Tab would leave. The field gets it back.
+   */
+  returnFocusId?: string;
 }
 
 export function PartnerInlineCreate({
@@ -29,6 +35,7 @@ export function PartnerInlineCreate({
   roleTypes,
   onCreated,
   onCancel,
+  returnFocusId,
 }: PartnerInlineCreateProps) {
   const { t } = useTranslation(["partners", "common"]);
   const createMutation = useCreatePartner();
@@ -51,6 +58,22 @@ export function PartnerInlineCreate({
     nameRef.current?.focus({ preventScroll: true });
     nameRef.current?.select();
   }, []);
+
+  // Two frames on, once the layer is gone: if nobody took the focus it is on
+  // the body, and the field that asked for the layer is where it belongs.
+  useEffect(() => {
+    if (!returnFocusId) return;
+    return () => {
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          const active = document.activeElement;
+          if (!active || active === document.body) {
+            document.getElementById(returnFocusId)?.focus();
+          }
+        }),
+      );
+    };
+  }, [returnFocusId]);
 
   const handleCreate = () => {
     const trimmed = name.trim();

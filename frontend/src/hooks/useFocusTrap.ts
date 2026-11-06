@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { getTopmostOverlaySheetPanel } from "@/components/ui/overlayStack";
+
 const FOCUSABLE_SELECTORS = [
   "a[href]",
   "button:not([disabled])",
@@ -61,9 +63,22 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      if (previousFocusRef.current instanceof HTMLElement) {
-        previousFocusRef.current.focus();
+      const previous = previousFocusRef.current;
+      if (
+        previous instanceof HTMLElement &&
+        previous !== document.body &&
+        previous.isConnected
+      ) {
+        previous.focus();
+        return;
       }
+      // Whatever had the focus when this layer opened is gone (a list the
+      // reader picked in, a step that re-rendered) or was never a control.
+      // Focus left on a removed element falls to <body>, outside a sheet that
+      // is still open, and the next Tab leaves it. The sheet that stays open
+      // takes it instead.
+      const panel = getTopmostOverlaySheetPanel();
+      if (panel && panel !== container) panel.focus();
     };
   }, [isActive]);
 

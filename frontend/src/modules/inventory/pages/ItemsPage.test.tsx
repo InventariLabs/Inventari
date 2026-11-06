@@ -621,6 +621,140 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
   });
 
   /**
+   * The same holds when the rows change on the page: the places of the rows
+   * on screen before are still held while the new rows' places are asked for,
+   * and a row they do not name is still on its way, not "Unknown".
+   */
+  it("prints no place on rows a change of rows brought, until their places arrive", async () => {
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const place = (id: string, name: string) => ({
+      id,
+      name,
+      parent_id: null,
+      is_leaf: true,
+      organization_id: "org-1",
+      created_at: "2026-01-01T00:00:00Z",
+      updated_at: "2026-01-01T00:00:00Z",
+    });
+    const row = (id: string, name: string, locationId: string) => ({
+      id,
+      name,
+      quantity: 1,
+      location_id: locationId,
+      organization_id: "org-1",
+      created_at: "2026-01-01T00:00:00Z",
+      updated_at: "2026-01-01T00:00:00Z",
+    });
+    server.use(
+      http.get("*/organizations/my", () =>
+        HttpResponse.json({ ...org, settings: {} }),
+      ),
+      http.get("*/locations", async ({ request }) => {
+        const ids = new URL(request.url).searchParams.getAll("ids");
+        if (ids.includes("loc-late")) await gate;
+        return HttpResponse.json(
+          onePage(
+            [
+              place("loc-first", "First Shelf"),
+              place("loc-late", "Late Shelf"),
+            ].filter((p) => ids.includes(p.id)),
+          ),
+        );
+      }),
+      http.get("*/items", ({ request }) => {
+        const search = new URL(request.url).searchParams.get("search");
+        const items =
+          search === "Plum"
+            ? [row("item-2", "Plum Butter", "loc-late")]
+            : [row("item-1", "Apple Jam", "loc-first")];
+        return HttpResponse.json({ items, total: items.length });
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+    await waitFor(() =>
+      expect(screen.getAllByText(/First Shelf/).length).toBeGreaterThan(0),
+    );
+
+    await user.type(screen.getByPlaceholderText(/Search products/i), "Plum");
+    await screen.findByText("Plum Butter", {}, { timeout: 2000 });
+    expect(screen.queryByText(/^Unknown$/i)).toBeNull();
+
+    release();
+    await waitFor(() =>
+      expect(screen.getAllByText(/Late Shelf/).length).toBeGreaterThan(0),
+    );
+    expect(screen.queryByText(/^Unknown$/i)).toBeNull();
+  });
+
+  it("says Unknown when the places of the changed rows never come", async () => {
+    server.use(
+      http.get("*/organizations/my", () =>
+        HttpResponse.json({ ...org, settings: {} }),
+      ),
+      http.get("*/locations", ({ request }) => {
+        const ids = new URL(request.url).searchParams.getAll("ids");
+        if (ids.includes("loc-late"))
+          return HttpResponse.json({ detail: "down" }, { status: 503 });
+        return HttpResponse.json(
+          onePage([
+            {
+              id: "loc-first",
+              name: "First Shelf",
+              parent_id: null,
+              is_leaf: true,
+              organization_id: "org-1",
+              created_at: "2026-01-01T00:00:00Z",
+              updated_at: "2026-01-01T00:00:00Z",
+            },
+          ]),
+        );
+      }),
+      http.get("*/items", ({ request }) => {
+        const plum = new URL(request.url).searchParams.get("search") === "Plum";
+        const items = [
+          {
+            id: plum ? "item-2" : "item-1",
+            name: plum ? "Plum Butter" : "Apple Jam",
+            quantity: 1,
+            location_id: plum ? "loc-late" : "loc-first",
+            organization_id: "org-1",
+            created_at: "2026-01-01T00:00:00Z",
+            updated_at: "2026-01-01T00:00:00Z",
+          },
+        ];
+        return HttpResponse.json({ items, total: 1 });
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+    await waitFor(() =>
+      expect(screen.getAllByText(/First Shelf/).length).toBeGreaterThan(0),
+    );
+
+    await user.type(screen.getByPlaceholderText(/Search products/i), "Plum");
+    await screen.findByText("Plum Butter", {}, { timeout: 2000 });
+
+    // A failed answer is not left blank for good.
+    expect(
+      (await screen.findAllByText(/^Unknown$/i, {}, { timeout: 5000 })).length,
+    ).toBeGreaterThan(0);
+  });
+
+  /**
    * A warehouse of two thousand shelves: the screen used to download all of
    * them, page after page and twice over, to name the dozen on screen and to
    * fill a filter. It names the places its rows stand in and searches for the

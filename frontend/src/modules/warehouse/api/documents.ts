@@ -277,10 +277,18 @@ export const documentsApi = {
     return response.data;
   },
 
-  create: async (data: DocumentCreate): Promise<WarehouseDocument> => {
+  /**
+   * Write a DRAFT. A key names the save: sent again after a lost answer, it
+   * is answered with the draft the first send wrote instead of a second.
+   */
+  create: async (
+    data: DocumentCreate,
+    key?: string,
+  ): Promise<WarehouseDocument> => {
     const response = await api.post<WarehouseDocument>(
       "/warehouse/documents",
       data,
+      key ? { headers: { "Idempotency-Key": key } } : undefined,
     );
     return response.data;
   },

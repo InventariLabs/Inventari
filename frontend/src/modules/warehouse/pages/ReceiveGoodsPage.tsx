@@ -444,21 +444,14 @@ type Press = { key: string; body: string };
  */
 async function sendOnePress(
   press: { current: Press | null },
-  send: (input: {
-    data: DocumentCreate;
-    key: string;
-    confirmSurplus: boolean;
-  }) => Promise<WarehouseDocument>,
   data: DocumentCreate,
-  confirmSurplus: boolean,
+  send: (key: string) => Promise<WarehouseDocument>,
 ): Promise<WarehouseDocument> {
   const body = JSON.stringify(data);
   if (press.current?.body !== body) {
     press.current = { key: crypto.randomUUID(), body };
   }
-  // A surplus the server asked about wrote nothing, so the answer goes
-  // under the same key: it is the same press, now confirmed.
-  const answer = await send({ data, key: press.current.key, confirmSurplus });
+  const answer = await send(press.current.key);
   press.current = null;
   return answer;
 }
@@ -730,7 +723,10 @@ function useSheetPresses(args: {
   clearRefusals: () => void;
   runBeforeSubmit: () => Promise<void>;
   payload: () => DocumentCreate;
-  save: (data: DocumentCreate) => Promise<WarehouseDocument>;
+  save: (input: {
+    data: DocumentCreate;
+    key: string;
+  }) => Promise<WarehouseDocument>;
   send: (input: {
     data: DocumentCreate;
     key: string;
@@ -770,6 +766,9 @@ function useSheetPresses(args: {
     onPosted,
     onPostError,
   } = args;
+  // The draft's own key, apart from the post's: the server answers a key it
+  // has seen with the document it made under it.
+  const draftPress = useRef<Press | null>(null);
 
   const post = useCallback(
     async (confirmSurplus = false) => {
@@ -783,11 +782,11 @@ function useSheetPresses(args: {
       submitting.current = true;
       try {
         await runBeforeSubmit();
-        const document = await sendOnePress(
-          press,
-          send,
-          payload(),
-          confirmSurplus,
+        const data = payload();
+        // A surplus the server asked about wrote nothing, so the answer goes
+        // under the same key: it is the same press, now confirmed.
+        const document = await sendOnePress(press, data, (key) =>
+          send({ data, key, confirmSurplus }),
         );
         onPosted(postedReceipt(document, totals, order, shortCount));
       } catch (error) {
@@ -843,7 +842,12 @@ function useSheetPresses(args: {
       submitting.current = true;
       try {
         await runBeforeSubmit();
-        const draft = await save(payload());
+        const data = payload();
+        // A draft save is a press of its own: a key that named the post
+        // would be answered with the posted receipt, and the other way round.
+        const draft = await sendOnePress(draftPress, data, (key) =>
+          save({ data, key }),
+        );
         if (then) {
           await then(draft.id);
           return;

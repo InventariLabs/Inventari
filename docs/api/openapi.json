@@ -30804,6 +30804,7 @@
           "Warehouse"
         ],
         "summary": "Create Document",
+        "description": "Create a DRAFT document.\n\n``Idempotency-Key`` names the save: the same key sent again (a retry\nafter the answer was lost) is answered with the draft the first save\nwrote instead of a second draft.",
         "operationId": "create_document_api_v1_warehouse_documents_post",
         "security": [
           {
@@ -30811,6 +30812,26 @@
           },
           {
             "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
           }
         ],
         "requestBody": {

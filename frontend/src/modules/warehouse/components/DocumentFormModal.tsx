@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type ComponentProps,
   type MutableRefObject,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -345,6 +346,18 @@ function useDocumentLocationPrefill(
   ]);
 }
 
+/** The new-partner layer under the document's partner field; it hands the
+ * focus back to that field when it closes. */
+function DocumentPartnerCreate(
+  props: Omit<ComponentProps<typeof PartnerInlineCreate>, "returnFocusId">,
+) {
+  return (
+    <div className="mt-3">
+      <PartnerInlineCreate {...props} returnFocusId={FIELD_IDS.partner} />
+    </div>
+  );
+}
+
 export default function DocumentFormModal({
   document,
   initialType,
@@ -571,15 +584,13 @@ export default function DocumentFormModal({
       return;
     }
 
-    createMutation.mutate(toCreatePayload(), {
+    const create = { data: toCreatePayload() };
+    createMutation.mutate(create, {
       onSuccess: (created) => {
         rememberLastUsedLocations(docType, sourceLocationId, targetLocationId);
         toast.success(t("toast.created"));
-        if (onCreated && created) {
-          onCreated(created);
-          return;
-        }
-        onClose();
+        if (onCreated && created) onCreated(created);
+        else onClose();
       },
       onError: handleApiError,
     });
@@ -707,14 +718,12 @@ export default function DocumentFormModal({
               />
 
               {partnerCreateOpen && partnersEnabled && (
-                <div className="mt-3">
-                  <PartnerInlineCreate
-                    initialName={partnerCreateQuery}
-                    roleTypes={picker.partnerTypes}
-                    onCreated={handlePartnerCreated}
-                    onCancel={handlePartnerCreateCancel}
-                  />
-                </div>
+                <DocumentPartnerCreate
+                  initialName={partnerCreateQuery}
+                  roleTypes={picker.partnerTypes}
+                  onCreated={handlePartnerCreated}
+                  onCancel={handlePartnerCreateCancel}
+                />
               )}
 
               <WorkspaceFormExtra

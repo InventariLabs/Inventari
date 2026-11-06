@@ -33,8 +33,8 @@
       ]
     },
     "src/modules/recipes/components/RecipeForm.tsx": {
-      "RecipeForm": [
-        34
+      "RecipeFormContent": [
+        33
       ]
     },
     "src/modules/shared/components/LineItemsEditor/LineItemRow.tsx": {
@@ -116,7 +116,7 @@
     },
     "src/modules/inventory/pages/ItemsPage.tsx": {
       "ItemsPage": [
-        382
+        378
       ]
     },
     "src/modules/inventory/pages/LabelPoolPage.tsx": {
@@ -135,7 +135,7 @@
       ]
     },
     "src/modules/recipes/components/RecipeForm.tsx": {
-      "RecipeForm": [
+      "RecipeFormContent": [
         367
       ]
     },
@@ -156,7 +156,7 @@
     },
     "src/modules/warehouse/components/DocumentFormModal.tsx": {
       "DocumentFormModal": [
-        392
+        388
       ]
     },
     "src/modules/warehouse/pages/DocumentDetailPage.tsx": {

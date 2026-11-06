@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import {
@@ -10,7 +10,40 @@ import {
   SheetTitle,
 } from "./Sheet";
 
+function NestedSheets() {
+  const [outer, setOuter] = useState(true);
+  const [inner, setInner] = useState(false);
+  // Stable callbacks: a sheet re-registers in the stack whenever its
+  // `onClose` changes, which would put the outer one on top again.
+  const closeOuter = useCallback(() => setOuter(false), []);
+  const closeInner = useCallback(() => setInner(false), []);
+  return (
+    <>
+      <Sheet open={outer} onClose={closeOuter} aria-label="Outer">
+        {/* The control that opened the inner sheet is replaced by it, as a
+            wizard step is — nothing is left to hand the focus back to. */}
+        {inner ? null : <button onClick={() => setInner(true)}>choose</button>}
+      </Sheet>
+      <Sheet open={inner} onClose={closeInner} aria-label="Inner">
+        <button>pick</button>
+      </Sheet>
+    </>
+  );
+}
+
 describe("Sheet", () => {
+  it("hands the focus to the sheet underneath when the one above closes", () => {
+    render(<NestedSheets />);
+    fireEvent.click(screen.getByText("choose"));
+    expect(screen.getAllByRole("dialog")).toHaveLength(2);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    const remaining = screen.getByRole("dialog", { name: "Outer" });
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(remaining.contains(document.activeElement)).toBe(true);
+  });
+
   it("renders nothing when closed", () => {
     render(
       <Sheet open={false} onClose={() => {}}>

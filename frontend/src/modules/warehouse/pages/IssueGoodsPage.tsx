@@ -111,6 +111,7 @@ function CustomerField({ draft }: { draft: ActionDraft }) {
             roleTypes={picker.partnerTypes}
             onAccepted={workspace.setPartnerId}
             onClose={() => setNewPartnerName(null)}
+            returnFocusId="issue-customer"
           />
         </Suspense>
       )}
