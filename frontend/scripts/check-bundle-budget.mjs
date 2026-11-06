@@ -330,6 +330,14 @@ const dist = join(root, "dist");
  * language chunk every first paint loads carries. Those two phone budgets move
  * a step of five, to 575 and 505; the other screens stand under theirs (login
  * 391.8, launcher 406.8, start 620.4, receive 457.5, history 594.0).
+ *
+ * Re-measured 2026-11-06 with the import dialog's progress line and the
+ * failed-import sentence: the dev tip alone measures the history screen at
+ * 594.9 KiB gz against its 595, and the branch's copy (a label with two
+ * counts and the failure's two sentences, in six languages) sits in the
+ * language chunk every first paint loads and takes it to 595.0 — copy, not
+ * an import. That one phone budget moves a step of five, to 600; the other
+ * screens stand under theirs.
  */
 const BUDGETS = {
   initial: 245,
