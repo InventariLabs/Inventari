@@ -10,6 +10,7 @@ import { ImportMappingStep } from "./ImportMappingStep";
 import { ImportProgressStep } from "./ImportProgressStep";
 import type {
   ImportMapping,
+  ImportProgress,
   ImportOutcome,
   ImportPreviewRow,
   MappingField,
@@ -42,7 +43,13 @@ export interface ImportWizardSheetProps<R extends ImportOutcome> {
   /** Headers and the first rows — the mapping step shows both. */
   analyze: (file: File) => Promise<SheetAnalysis>;
   suggest: (headers: string[]) => ImportMapping;
-  run: (file: File, mapping: ImportMapping) => Promise<R>;
+  /** `onProgress` is told how many of the sheet's rows a long import has got
+   *  through; an entity whose import is never moved to the background ignores it. */
+  run: (
+    file: File,
+    mapping: ImportMapping,
+    onProgress: (progress: ImportProgress) => void,
+  ) => Promise<R>;
   texts: {
     analyzeFailed: string;
     importFailed: string;
@@ -93,6 +100,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
   >({});
   const [mapping, setMapping] = useState<ImportMapping>({});
   const [importResult, setImportResult] = useState<R | null>(null);
+  const [progress, setProgress] = useState<ImportProgress | null>(null);
 
   const handleFileUpload = async (selectedFile: File) => {
     setFile(selectedFile);
@@ -110,9 +118,10 @@ export function ImportWizardSheet<R extends ImportOutcome>({
 
   const handleImport = async () => {
     if (!file || !mapping[requiredField] || !canRun) return;
+    setProgress(null);
     setStep("processing");
     try {
-      setImportResult(await run(file, mapping));
+      setImportResult(await run(file, mapping, setProgress));
       setStep("result");
     } catch (error) {
       // A gate refusal carries its reason and its remedy, written to be
@@ -194,6 +203,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
             waitText={texts.wait}
             addedText={texts.added}
             summaryText={summaryText}
+            progress={progress}
           >
             {importResult && resultExtras?.(importResult)}
           </ImportProgressStep>

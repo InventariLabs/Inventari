@@ -857,7 +857,12 @@
       "none": "Nic nie przepadło",
       "noneHint": "Każda wiadomość tej organizacji opuściła serwer.",
       "attempts": "{{n}} z {{max}} prób",
-      "reason": "Powód: {{reason}}"
+      "reason": "Powód: {{reason}}",
+      "reasons": {
+        "notConfigured": "SMTP nie jest jeszcze skonfigurowany",
+        "halfLogin": "Nazwa użytkownika i hasło SMTP muszą być podane oba albo oba puste",
+        "unreported": "Serwer poczty nie podał powodu"
+      }
     },
     "about": {
       "subtitle": "Wersja, licencja i kod źródłowy tej instalacji",
@@ -1283,6 +1288,9 @@
     "skipColumn": "— Pomiń / domyślne —",
     "importing": "Importowanie danych…",
     "processImport": "Importuj",
+    "progress": "Wiersze: {{done}} / {{total}}",
+    "jobFailedPartly": "{{error}} Przetworzone wiersze: {{done}} / {{total}}.",
+    "jobFailedNothing": "{{error}} Nic nie zostało zaimportowane.",
     "complete": "Import zakończony",
     "statsTotal": "Razem",
     "statsImported": "Zaimportowane",

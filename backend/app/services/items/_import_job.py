@@ -26,9 +26,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import worker_recycle
 from app.core.contracts import UserContextDTO
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.logging import get_logger
-from app.i18n.service import get_current_lang
+from app.i18n._types import Language
+from app.i18n.service import get_current_lang, get_error_message
 from app.models.item_import_job import ItemImportJob
 
 from ._import import LabelMatch, import_items
@@ -45,6 +46,11 @@ STALE_AFTER = timedelta(minutes=5)
 
 #: Tasks the event loop only holds weakly; kept here until they finish.
 _running: set[asyncio.Task[None]] = set()
+
+#: The catalogued reasons a job keeps in ``error`` when it holds no sentence of
+#: its own; :func:`reader_reason` turns them into the reader's language.
+_JOB_FAILED = 'import_job_failed'
+_JOB_INTERRUPTED = 'import_job_interrupted'
 
 SessionFactory = Callable[[], AbstractAsyncContextManager[AsyncSession]]
 
@@ -134,7 +140,15 @@ async def run_job_async(
         except Exception as exc:  # the job is how the failure reaches the screen
             logger.exception('[import] job %s failed', job_id)
             await db.rollback()
-            outcome = {'status': 'failed', 'error': str(exc)[:2000]}
+            # Only a refusal is written for the reader; any other exception
+            # carries driver or parser text, which the log has and the screen
+            # must not (the traceback is logged above).
+            reason = (
+                str(exc)[:2000]
+                if isinstance(exc, ServiceRejectionError)
+                else _JOB_FAILED
+            )
+            outcome = {'status': 'failed', 'error': reason}
         await _record_progress_async(db, job_id, **outcome)
 
 
@@ -156,6 +170,18 @@ async def read_job_async(
         raise NotFoundException('import_job', get_current_lang())
     if job.status == 'running' and datetime.now(UTC) - job.updated_at > STALE_AFTER:
         job.status = 'failed'
-        job.error = 'The import was interrupted before it finished.'
+        job.error = _JOB_INTERRUPTED
         await db.flush()
     return job
+
+
+def reader_reason(error: str | None, lang: Language | None = None) -> str | None:
+    """The job's failure as a sentence in *lang* (the request's by default).
+
+    The job holds either a refusal's sentence, written in the language of the
+    request that started it, or the key of a catalogued reason, which only
+    the read knows the language for.
+    """
+    if error in (_JOB_FAILED, _JOB_INTERRUPTED):
+        return get_error_message(error, lang or get_current_lang())
+    return error

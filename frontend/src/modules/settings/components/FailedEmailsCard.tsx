@@ -60,6 +60,21 @@ export default function FailedEmailsCard() {
 }
 
 /**
+ * The reasons the mail queue and the SMTP configuration write themselves
+ * (`SmtpConfig.problem` in `email_service.py` and `_UNREPORTED_FAILURE` in
+ * `email_jobs.py`), in English whatever the reader's language. Anything else
+ * in `last_error` is the relay's or the socket's own text, which nobody here
+ * can translate and an administrator can search for as it stands.
+ */
+const OWN_REASONS: Record<string, string> = {
+  "SMTP is not configured": "settings.failedEmails.reasons.notConfigured",
+  "SMTP username and password must both be set, or both left empty for a relay that does not ask for a login":
+    "settings.failedEmails.reasons.halfLogin",
+  "SMTP send failed without a reported reason":
+    "settings.failedEmails.reasons.unreported",
+};
+
+/**
  * One lost message: who it was for, what it was, and what the relay said.
  *
  * The reason comes last and in full. "It failed" leaves an administrator
@@ -89,7 +104,11 @@ function FailedEmailRow({ failure }: { failure: FailedEmail }) {
       <p className="text-xs text-on-secondary truncate">{failure.subject}</p>
       {failure.last_error && (
         <p className="text-xs text-on-danger break-words">
-          {t("settings.failedEmails.reason", { reason: failure.last_error })}
+          {t("settings.failedEmails.reason", {
+            reason: OWN_REASONS[failure.last_error]
+              ? t(OWN_REASONS[failure.last_error])
+              : failure.last_error,
+          })}
         </p>
       )}
     </li>

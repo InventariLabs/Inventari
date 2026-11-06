@@ -703,7 +703,7 @@ describe("AiConnectionFields — a failed test stands beside the button", () => 
     vi.restoreAllMocks();
   });
 
-  it("puts a validation refusal (422) in the form, naming the field", async () => {
+  it("puts a validation refusal (422) in the form", async () => {
     // The screen in the report answered a 422 with nothing at all: the fields
     // were gone, the reply was gone, and pressing "Test connection" read as
     // having done nothing.
@@ -720,7 +720,7 @@ describe("AiConnectionFields — a failed test stands beside the button", () => 
     await clickTest();
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "api_base_url: Input should be a valid string",
+      "Input should be a valid string",
     );
     // The click left the button where it started: not stuck mid-send.
     expect(

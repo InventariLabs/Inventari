@@ -267,6 +267,7 @@ describe("ImportModal (products)", () => {
       createLocations: false,
       createCategories: true,
       onLabelMatch: "add",
+      onProgress: expect.any(Function),
     });
   });
 

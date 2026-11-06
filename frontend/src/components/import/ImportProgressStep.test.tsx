@@ -19,6 +19,32 @@ describe("ImportProgressStep", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows how many rows a long import has got through", () => {
+    render(
+      <ImportProgressStep
+        isProcessing={true}
+        importResult={null}
+        progress={{ processed: 300, total: 1200 }}
+        {...texts}
+      />,
+    );
+    const bar = screen.getByRole("progressbar");
+    expect(bar).toHaveAttribute("aria-valuenow", "25");
+    expect(screen.getByText("Rows: 300 / 1200")).toBeInTheDocument();
+  });
+
+  it("shows no bar until the server has reported a count", () => {
+    render(
+      <ImportProgressStep
+        isProcessing={true}
+        importResult={null}
+        progress={null}
+        {...texts}
+      />,
+    );
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
   it("renders completed result with the server's numbers", () => {
     const mockResult: ImportOutcome = {
       total: 5,

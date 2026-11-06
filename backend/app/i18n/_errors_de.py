@@ -374,6 +374,8 @@ ERRORS_DE: ErrorMessages = {
     'import_location_not_found': 'Kein Ort heißt „{value}“',
     'import_price_invalid': 'Spalte „{column}“: „{value}“ ist kein Preis',
     'import_date_invalid': 'Spalte „{column}“: „{value}“ ist kein Datum',
+    'import_job_failed': 'Der Import wurde wegen eines unerwarteten Fehlers abgebrochen.',
+    'import_job_interrupted': 'Der Import wurde unterbrochen, bevor er fertig war.',
     'import_column_not_a_number': 'Spalte „{column}“: „{value}“ ist keine Zahl',
     'import_quantity_not_positive': 'Spalte „{column}“: Die Menge muss größer als null sein, „{value}“ ist es nicht',
     'import_column_location_not_found': 'Spalte „{column}“: Lagerort „{value}“ nicht gefunden',

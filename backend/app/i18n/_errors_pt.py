@@ -288,6 +288,8 @@ ERRORS_PT: dict[str, str] = {
     'import_location_not_found': 'Nenhum local se chama “{value}”',
     'import_price_invalid': 'Coluna "{column}": "{value}" não é um preço',
     'import_date_invalid': 'Coluna "{column}": "{value}" não é uma data',
+    'import_job_failed': 'A importação parou por causa de um erro inesperado.',
+    'import_job_interrupted': 'A importação foi interrompida antes de terminar.',
     'import_column_not_a_number': 'Coluna "{column}": "{value}" não é um número',
     'import_quantity_not_positive': 'Coluna "{column}": a quantidade precisa ser maior que zero, "{value}" não é',
     'import_column_location_not_found': 'Coluna "{column}": local "{value}" não encontrado',

@@ -12,6 +12,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { http, HttpResponse, type JsonBodyType } from "msw";
 import { server } from "@/test/mocks/server";
 import { api } from "./client";
+import { ReadableError } from "@/lib/errors";
 import { itemsApi } from "./items";
 
 vi.mock("@/lib/imageUtils", () => ({
@@ -522,5 +523,82 @@ describe("importing a sheet", () => {
     await expect(itemsApi.importItems(sheet, {})).rejects.toThrow(
       "bad header row",
     );
+  });
+
+  it("tells the reader how many rows a failed background import had already saved", async () => {
+    vi.spyOn(api, "post").mockResolvedValue({
+      status: 202,
+      data: { id: "job-3" },
+    });
+    vi.spyOn(api, "get").mockResolvedValue({
+      data: {
+        status: "failed",
+        error: "The import was interrupted before it finished.",
+        processed: 400,
+        total: 1000,
+      },
+    });
+
+    const failure: unknown = await itemsApi
+      .importItems(sheet, {})
+      .catch((e: unknown) => e);
+
+    expect(failure).toBeInstanceOf(ReadableError);
+    expect((failure as Error).message).toContain(
+      "The import was interrupted before it finished.",
+    );
+    // rows the job got through, not rows it imported: failed rows are in it
+    expect((failure as Error).message).toMatch(/rows processed/i);
+    expect((failure as Error).message).toContain("400");
+    expect((failure as Error).message).toContain("1000");
+  });
+
+  it("says nothing was imported when a failed background import saved no row", async () => {
+    vi.spyOn(api, "post").mockResolvedValue({
+      status: 202,
+      data: { id: "job-4" },
+    });
+    vi.spyOn(api, "get").mockResolvedValue({
+      data: {
+        status: "failed",
+        error: "bad header row",
+        processed: 0,
+        total: 9,
+      },
+    });
+
+    const failure: unknown = await itemsApi
+      .importItems(sheet, {})
+      .catch((e: unknown) => e);
+
+    expect((failure as Error).message).toContain("bad header row");
+    expect((failure as Error).message).toMatch(/nothing was imported/i);
+  });
+
+  it("reports each look at a running background import to the caller", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(api, "post").mockResolvedValue({
+      status: 202,
+      data: { id: "job-5" },
+    });
+    vi.spyOn(api, "get")
+      .mockResolvedValueOnce({
+        data: { status: "running", processed: 200, total: 900 },
+      })
+      .mockResolvedValueOnce({ data: { status: "done", result: outcome } });
+    const onProgress = vi.fn();
+
+    const pending = itemsApi.importItems(
+      sheet,
+      {},
+      true,
+      true,
+      "add",
+      onProgress,
+    );
+    await vi.advanceTimersByTimeAsync(1500);
+    await pending;
+
+    expect(onProgress).toHaveBeenCalledWith({ processed: 200, total: 900 });
   });
 });
