@@ -225,13 +225,15 @@ async def update_category(
                     # drift.
                     #
                     # The decision on one name for one field: the field
-                    # builder shows a system field under the catalogue's
-                    # translated word and offers no control to rename it, so
-                    # this refusal is reached only by an API client, which
-                    # reads the definition it sent — and that carries the
-                    # stored label. Every seeded definition names itself
-                    # (a test pins it); the key is only the backstop for a
-                    # definition stored by an older seeding without a label.
+                    # builder shows a typed system field under the
+                    # catalogue's translated word, lists an untyped
+                    # visibility flag (category_id) not at all, and offers no
+                    # control to rename either, so this refusal is reached
+                    # only by an API client, which reads the definition it
+                    # sent — and that carries the stored label. Every seeded
+                    # definition names itself (a test pins it); the key is
+                    # only the backstop for a definition stored by an older
+                    # seeding without a label.
                     raise ServiceRejectionError(
                         'category_system_field_label_locked',
                         field=prior.get('label') or prior.get('key'),

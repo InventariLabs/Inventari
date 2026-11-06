@@ -89,7 +89,9 @@ export default function FieldBuilder({
   };
 
   const visibleFields = useMemo(
-    () => fields.filter((f) => f.label && f.label.trim() !== ""),
+    // A definition with no type is a module's visibility flag for a built-in
+    // column, not a field: it has nothing to edit, and no catalogue names it.
+    () => fields.filter((f) => f.type && f.label && f.label.trim() !== ""),
     [fields],
   );
 
