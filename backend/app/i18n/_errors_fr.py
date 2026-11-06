@@ -371,6 +371,8 @@ ERRORS_FR: ErrorMessages = {
     'import_location_not_found': 'Aucun emplacement ne s’appelle « {value} »',
     'import_price_invalid': 'Colonne « {column} » : « {value} » n’est pas un prix',
     'import_date_invalid': 'Colonne « {column} » : « {value} » n’est pas une date',
+    'import_job_failed': 'L’importation s’est arrêtée à cause d’une erreur inattendue.',
+    'import_job_interrupted': 'L’importation a été interrompue avant la fin.',
     'import_column_not_a_number': 'Colonne « {column} » : « {value} » n’est pas un nombre',
     'import_quantity_not_positive': 'Colonne « {column} » : la quantité doit être supérieure à zéro, « {value} » ne l’est pas',
     'import_column_location_not_found': 'Colonne « {column} » : emplacement « {value} » introuvable',

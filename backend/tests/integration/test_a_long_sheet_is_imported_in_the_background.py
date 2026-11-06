@@ -169,7 +169,41 @@ class TestTheTaskImportsAndReportsHowItEnded:
 
         await db.refresh(job)
         assert job.status == 'failed'
-        assert job.error
+        assert 'could not be read as a spreadsheet' in (job.error or '')
+
+    async def test_an_unexpected_failure_keeps_no_driver_text_for_the_screen(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        db = real_async_db_session
+        user = UserContextDTO(
+            id=async_test_user.id, organization_id=async_test_user.organization_id
+        )
+        job = await import_jobs.start_job_async(db, user, 'odd.csv', 1)
+        await db.commit()
+
+        async def _break(**_: object) -> None:
+            raise RuntimeError('INSERT INTO items (...) VALUES (:secret)')
+
+        monkeypatch.setattr(import_jobs, 'import_items', _break)
+        await import_jobs.run_job_async(
+            job.id,
+            _factory(db),
+            file_content=b'',
+            filename='odd.csv',
+            mapping=MAPPING,
+            user=user,
+            create_missing_locations=False,
+            create_missing_categories=False,
+            on_label_match='add',
+        )
+
+        await db.refresh(job)
+        assert job.status == 'failed'
+        # the job holds a catalogued reason, translated when it is read
+        assert job.error == 'import_job_failed'
 
 
 class TestAJobIsReadByWhoStartedIt:
@@ -215,7 +249,17 @@ class TestAJobIsReadByWhoStartedIt:
         read = await import_jobs.read_job_async(db, owner, job.id)
 
         assert read.status == 'failed'
-        assert 'interrupted' in (read.error or '')
+        assert read.error == 'import_job_interrupted'
+        assert import_jobs.reader_reason(read.error, 'pl') == (
+            'Import został przerwany, zanim się zakończył.'
+        )
+        assert import_jobs.reader_reason(read.error, 'en') == (
+            'The import was interrupted before it finished.'
+        )
+        # a sentence the job already holds is not a key: it passes untouched
+        assert import_jobs.reader_reason('Could not resolve', 'pl') == (
+            'Could not resolve'
+        )
 
     async def test_a_job_that_moved_lately_is_still_running(
         self,

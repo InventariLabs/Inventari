@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2, Check, FileSpreadsheet, AlertCircle } from "lucide-react";
-import type { ImportOutcome } from "./types";
+import type { ImportOutcome, ImportProgress } from "./types";
 
 interface ImportProgressStepProps {
   isProcessing: boolean;
@@ -14,6 +14,10 @@ interface ImportProgressStepProps {
    *  additions — an import that also overwrote rows must not open with
    *  "Added 1 product." alone. Falls back to `addedText`. */
   summaryText?: string;
+  /** How far a long import has got, once the server reports it. A sheet
+   *  that runs in the background takes minutes; without a number the reader
+   *  cannot tell a slow import from a stuck one. */
+  progress?: ImportProgress | null;
   /** What the import founded beside the records, when the entity has any. */
   children?: ReactNode;
 }
@@ -24,10 +28,15 @@ export function ImportProgressStep({
   waitText,
   addedText,
   summaryText,
+  progress,
   children,
 }: ImportProgressStepProps) {
   const { t } = useTranslation(["common"]);
   if (isProcessing) {
+    const percent =
+      progress && progress.total > 0
+        ? Math.min(100, Math.round((progress.processed / progress.total) * 100))
+        : null;
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-6">
         <div className="relative">
@@ -42,6 +51,32 @@ export function ImportProgressStep({
           </h3>
           <p className="text-on-secondary text-sm mt-1">{waitText}</p>
         </div>
+        {progress && percent !== null && (
+          <div className="flex w-full max-w-sm items-center gap-3">
+            <div
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={percent}
+              aria-label={t("common:import.progress", {
+                done: progress.processed,
+                total: progress.total,
+              })}
+              className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-raised"
+            >
+              <div
+                className="h-full rounded-full bg-primary-600"
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+            <span className="text-sm text-on-secondary tabular-nums">
+              {t("common:import.progress", {
+                done: progress.processed,
+                total: progress.total,
+              })}
+            </span>
+          </div>
+        )}
       </div>
     );
   }

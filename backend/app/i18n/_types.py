@@ -274,6 +274,8 @@ class ErrorMessages(TypedDict):
     import_location_not_found: str
     import_price_invalid: str
     import_date_invalid: str
+    import_job_failed: str
+    import_job_interrupted: str
     import_column_not_a_number: str
     import_quantity_not_positive: str
     import_column_location_not_found: str
