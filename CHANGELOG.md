@@ -23,8 +23,9 @@ says what the release does rather than what changed since them.
   listed in `docs/api/ERRORS.md` for 0.11.0, is no longer sent; a client that
   branched on it now receives `ORGANIZATION_INVITE_INVALID`, the code every other
   refusal of an invitation already carried, and should treat the two alike. The
-  public link check (`GET /public/invitation/{code}`) keeps answering a 404 with
-  that same code, but its sentence no longer advises about the registration address.
+  public link check (`GET /public/invitation/{code}`) keeps answering a dead code
+  with a 404 and that same code, but with a sentence of its own that asks for a
+  new link, since the check never sees an address.
 - An API key's shown prefix is now `inv_live_` and six characters instead of
   eleven, on the API keys page and in the audit log, where it gave away a third
   of the key's random part to anyone allowed to read the log. Existing keys are
