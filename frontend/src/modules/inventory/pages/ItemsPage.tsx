@@ -252,10 +252,14 @@ export default function ItemsPage() {
   );
   // Where the rows on screen stand, read by id: the page needs the places it
   // shows (and the one the filter names), not the organization's catalogue.
-  const { byId: placesById, isLoading: placesLoading } = useLocationsById([
+  const places = useLocationsById([
     ...items.map((item) => item.location_id),
     filters.storageFilter,
   ]);
+  const placesById = places.byId;
+  // Pending too while the answer for the previous rows is held in its place:
+  // after a search, a page or a chip the new rows' places are still to come.
+  const placesLoading = places.isLoading || places.isPlaceholderData;
   const allStorages = useMemo(() => [...placesById.values()], [placesById]);
   // Footer sums over the whole filtered set — the same params as the list
   // above minus the paging, so the two can never disagree.
