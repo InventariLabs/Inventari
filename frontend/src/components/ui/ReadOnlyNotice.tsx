@@ -63,13 +63,9 @@ export function ReadOnlyNotice({
   if (granted) return null;
 
   const title =
-    right === "manage"
-      ? t("settings.moduleSettings.forbidden")
-      : t("access.readOnly");
+    right === "manage" ? t("access.manageOnly") : t("access.readOnly");
   const hint =
-    right === "manage"
-      ? t("settings.moduleSettings.forbiddenHint")
-      : t("access.readOnlyHint");
+    right === "manage" ? t("access.manageOnlyHint") : t("access.readOnlyHint");
 
   return (
     <div

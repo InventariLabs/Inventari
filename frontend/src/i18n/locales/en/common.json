@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "You can view this, not change it",
     "readOnlyHint": "Your account can read this module. Ask an administrator of your organization if you need to make changes.",
+    "manageOnly": "You can use this, not reconfigure it",
+    "manageOnlyHint": "Your account can use this module, but not change how it behaves. Ask someone who can manage it in your organization.",
     "hiddenRecordsAdminOnly": "Only an administrator can turn this on — ask one.",
     "denied": "You do not have access to this",
     "deniedHint": "Your account cannot read this data. Ask an administrator of your organization for access."

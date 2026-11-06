@@ -154,6 +154,52 @@ class TestGetPluralErrorMessage:
         assert clause in message
         assert f'Najpierw {pronoun} zakończ' in message
 
+    @pytest.mark.parametrize(
+        ('lang', 'short', 'long'),
+        [
+            (
+                'fr',
+                'Doit contenir au minimum 1 caractère',
+                'Doit contenir au maximum 1 caractère',
+            ),
+            (
+                'es',
+                'Debe tener al menos 1 carácter',
+                'Debe tener como máximo 1 carácter',
+            ),
+        ],
+    )
+    def test_french_and_spanish_count_one_character_in_the_singular(
+        self, lang, short, long
+    ):
+        assert (
+            get_plural_error_message(
+                'validation_string_too_short', 1, lang, min_length=1
+            )
+            == short
+        )
+        assert (
+            get_plural_error_message(
+                'validation_string_too_long', 1, lang, max_length=1
+            )
+            == long
+        )
+
+    @pytest.mark.parametrize(
+        ('lang', 'expected'),
+        [
+            ('fr', 'Doit contenir au minimum 2 caractères'),
+            ('es', 'Debe tener al menos 2 caracteres'),
+        ],
+    )
+    def test_french_and_spanish_keep_the_plural_for_other_counts(self, lang, expected):
+        assert (
+            get_plural_error_message(
+                'validation_string_too_short', 2, lang, min_length=2
+            )
+            == expected
+        )
+
     def test_a_language_without_plural_forms_keeps_the_single_sentence(self):
         assert (
             get_plural_error_message(

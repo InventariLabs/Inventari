@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "Możesz to oglądać, ale nie zmieniać",
     "readOnlyHint": "Twoje konto ma podgląd tego modułu. Jeśli potrzebujesz wprowadzać zmiany, poproś administratora organizacji.",
+    "manageOnly": "Możesz z tego korzystać, ale nie zmieniać jego działania",
+    "manageOnlyHint": "Twoje konto może korzystać z modułu, ale nie zmieniać jego działania. Poproś osobę w organizacji, która może nim zarządzać.",
     "hiddenRecordsAdminOnly": "Tylko administrator może to włączyć — poproś go o to.",
     "denied": "Nie masz do tego dostępu",
     "deniedHint": "Twoje konto nie może odczytać tych danych. Poproś o dostęp administratora organizacji."

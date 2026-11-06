@@ -872,6 +872,8 @@ ERRORS_ES: ErrorMessages = {
     'validation_missing': 'Este campo es obligatorio',
     'validation_string_too_long': 'Debe tener como máximo {max_length} caracteres',
     'validation_string_too_short': 'Debe tener al menos {min_length} caracteres',
+    'validation_string_too_long_one': 'Debe tener como máximo {max_length} carácter',
+    'validation_string_too_short_one': 'Debe tener al menos {min_length} carácter',
     'validation_pattern': 'No coincide con el formato esperado',
     'validation_greater_than_equal': 'Debe ser mayor o igual que {ge}',
     'validation_greater_than': 'Debe ser mayor que {gt}',

@@ -762,8 +762,8 @@
     "backToList": "Zurück zu den Attestierungen",
     "cancel": "Absagen",
     "noEmailWarning": "Diese Organisation versendet keine E-Mails, daher erhält niemand die Anfrage. Kopieren Sie nach dem Start den Link jeder Person von der Attestierungsseite und geben Sie ihn weiter.",
-    "emptyDescription": "Eine Attestierung bittet die Halterung eines Geräts, auf einer gemeinsamen Seite zu bestätigen, dass sie es noch halten — mit Frist und Erinnerung auf dem Weg. Beginnen Sie oben mit „Neue Attestierung“: Sie erzeugt einen Entwurf, und ihr Start sendet der Halterung einen Link zum Bestätigen oder Melden eines Problems — wo es keine E-Mail gibt, wird der Link persönlich übergeben.",
-    "emptyDescriptionViewer": "Eine Attestierung bittet die Halterung eines Geräts, auf einer gemeinsamen Seite zu bestätigen, dass sie es noch halten — mit Frist und Erinnerung auf dem Weg. Starten darf sie auf dieser Seite, wer Schreibrechte hat; die Halterung erhält dann einen Link zum Bestätigen oder Melden eines Problems.",
+    "emptyDescription": "Eine Attestierung bittet den Inhaber eines Geräts, auf einer gemeinsamen Seite zu bestätigen, dass es sich noch in seinem Besitz befindet — mit Frist und Erinnerung vor deren Ablauf. Beginnen Sie oben mit „Neue Attestierung“: Sie erzeugt einen Entwurf, und ihr Start sendet dem Inhaber einen Link zum Bestätigen oder Melden eines Problems — wo es keine E-Mail gibt, wird der Link persönlich übergeben.",
+    "emptyDescriptionViewer": "Eine Attestierung bittet den Inhaber eines Geräts, auf einer gemeinsamen Seite zu bestätigen, dass es sich noch in seinem Besitz befindet — mit Frist und Erinnerung vor deren Ablauf. Starten darf sie auf dieser Seite, wer Schreibrechte hat; der Inhaber erhält dann einen Link zum Bestätigen oder Melden eines Problems.",
     "reminders": {
       "sent_one": "{{count}} Erinnerung gesendet",
       "sent_other": "{{count}} Erinnerungen gesendet",
@@ -887,12 +887,12 @@
     "requested": "Genehmigung angefragt",
     "request_error": "Anfrage fehlgeschlagen",
     "approved_next_checkout": "Für die nächste Ausleihe genehmigt",
-    "status_pending": "Freigabe ausstehend",
-    "status_in_progress": "Freigabe ausstehend",
+    "status_pending": "Genehmigung ausstehend",
+    "status_in_progress": "Genehmigung ausstehend",
     "status_approved": "Genehmigt",
     "status_rejected": "Abgelehnt",
     "request_title": "Genehmigung für eine Ausgabe anfragen",
-    "send_request": "Zur Freigabe senden",
+    "send_request": "Zur Genehmigung senden",
     "request_this_checkout": "Genehmigung für diese Ausgabe anfragen"
   },
   "valuation": {

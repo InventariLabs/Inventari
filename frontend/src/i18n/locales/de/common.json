@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "Sie können das ansehen, aber nicht ändern",
     "readOnlyHint": "Ihr Konto darf dieses Modul lesen. Wenden Sie sich an die Administration Ihrer Organisation, wenn Sie etwas ändern müssen.",
+    "manageOnly": "Sie dürfen das nutzen, aber nicht umstellen",
+    "manageOnlyHint": "Ihr Konto darf das Modul nutzen, aber sein Verhalten nicht ändern. Bitten Sie jemanden in Ihrer Organisation, der es verwalten darf.",
     "hiddenRecordsAdminOnly": "Nur ein Administrator kann das einschalten – bitten Sie einen darum.",
     "denied": "Sie haben darauf keinen Zugriff",
     "deniedHint": "Ihr Konto kann diese Daten nicht lesen. Bitten Sie eine Administratorin oder einen Administrator Ihrer Organisation um Zugriff."
@@ -636,7 +638,7 @@
         "stages": "Stufen",
         "target_type": "Gilt für",
         "decided_by": "Entschieden von",
-        "approvers": "Freigebende"
+        "approvers": "Genehmigende"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",
