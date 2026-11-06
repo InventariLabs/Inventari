@@ -283,7 +283,11 @@ class BaseModule(ABC):
                 if existing.context_schema != st_decl.context_schema:
                     existing.context_schema = st_decl.context_schema
                     db.add(existing)
-                if existing.is_system and existing.name == st_decl.name != name:
+                # The same test the profile seeder applies: a name still equal
+                # to the literal is one nobody has renamed. The row's
+                # ``is_system`` flag is not part of it — a type forked from a
+                # global one is not flagged, and its name is as untouched.
+                if existing.name == st_decl.name != name:
                     existing.name = name
                     db.add(existing)
                 continue

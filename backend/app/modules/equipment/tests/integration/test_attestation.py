@@ -1130,6 +1130,39 @@ class TestTheLocationScopeMeansTheAssetsOwnLocation:
 
 
 @pytest.mark.integration
+class TestTheScopeLimitCountsItems:
+    """The limit is checked against the items a location or category lists,
+    whether or not anyone holds them — so the refusal speaks of items, not of
+    assets (which are only the ones handed out)."""
+
+    def test_the_refusal_names_what_it_counted(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        eq_storage_location: StorageLocation,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(
+            'app.modules.equipment._attestation_campaigns._SCOPE_FETCH_LIMIT', 1
+        )
+
+        refused = client.get(
+            '/api/v1/equipment/campaigns/scope-preview',
+            headers=eq_auth_headers,
+            params={
+                'scope_type': 'STORAGE',
+                'scope_filter_id': str(eq_storage_location.id),
+            },
+        )
+
+        assert refused.status_code == status.HTTP_400_BAD_REQUEST, refused.text
+        message = refused.json()['detail']['message']
+        assert 'more than 1 items' in message
+        assert 'assets' not in message
+
+
+@pytest.mark.integration
 class TestThePreviewNamesWhoWillBeAsked:
     """A draft showed "people: 2" and nobody to go with it; the preview now
     carries the holders' names — once each, sorted, the person without an

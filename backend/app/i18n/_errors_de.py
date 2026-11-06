@@ -540,7 +540,7 @@ ERRORS_DE: ErrorMessages = {
     'attestation_reminders_not_active': 'Erinnerungen lassen sich nur für eine laufende Kampagne senden',
     'campaign_deadline_past': 'Der Kampagnen-Endtermin muss heute oder später liegen',
     'attestation_complete_not_allowed': 'Eine Kampagne im Status {status} lässt sich nicht abschließen',
-    'attestation_scope_exceeds_limit': 'Der Umfang umfasst mehr als {limit} Ressourcen. Grenzen Sie ihn ein oder teilen Sie die Bestätigung auf.',
+    'attestation_scope_exceeds_limit': 'Der Umfang umfasst mehr als {limit} Artikel. Grenzen Sie ihn ein oder teilen Sie die Bestätigung auf.',
     'assignment_not_found': 'Zuweisung nicht gefunden',
     'maintenance_log_not_found': 'Wartungsprotokoll nicht gefunden',
     'equipment_cannot_checkout_retired': 'Ausgemusterte Ressource kann nicht ausgeliehen werden',

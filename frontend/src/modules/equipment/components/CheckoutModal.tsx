@@ -227,6 +227,7 @@ function CheckoutFooter({
   asking,
   pending,
   approvalNeeded,
+  refusal,
   onRequestApproval,
   incomplete,
   onClose,
@@ -235,6 +236,7 @@ function CheckoutFooter({
   asking: boolean;
   pending: boolean;
   approvalNeeded: string | null;
+  refusal: string | null;
   onRequestApproval: () => void;
   incomplete: boolean;
   onClose: () => void;
@@ -248,6 +250,14 @@ function CheckoutFooter({
           pending={pending}
           onRequest={onRequestApproval}
         />
+      )}
+      {refusal && (
+        <p
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+        >
+          {refusal}
+        </p>
       )}
       <SheetActions>
         <Button
@@ -280,6 +290,9 @@ export function CheckoutModal({
   const requestMutation = useRequestApproval(item.id);
   // The refusal's own sentence, while the checkout waits for an approval.
   const [approvalNeeded, setApprovalNeeded] = useState<string | null>(null);
+  // Any other refusal, read where the click was: a toast rises outside the
+  // dialog and is gone in seconds, leaving filled fields and an active button.
+  const [refusal, setRefusal] = useState<string | null>(null);
   const asking = purpose === "request";
   const pending = checkoutMutation.isPending || requestMutation.isPending;
   const { isModuleEnabled } = useModules();
@@ -341,6 +354,7 @@ export function CheckoutModal({
   };
 
   const send = (as: CheckoutPurpose) => {
+    setRefusal(null);
     if (mode === "person" && !form.assigned_to_name.trim()) {
       toast.error(t("assignments.checkout_modal.error_person_required"));
       return;
@@ -369,7 +383,7 @@ export function CheckoutModal({
             onClose();
           },
           onError: (err) =>
-            toast.error(extractApiError(err, t("approvals.request_error"))),
+            setRefusal(extractApiError(err, t("approvals.request_error"))),
         },
       );
       return;
@@ -386,7 +400,7 @@ export function CheckoutModal({
         if (extractApiErrorCode(err) === "APPROVAL_REQUIRED") {
           setApprovalNeeded(message);
         } else {
-          toast.error(message);
+          setRefusal(message);
         }
       },
     });
@@ -575,6 +589,7 @@ export function CheckoutModal({
           asking={asking}
           pending={pending}
           approvalNeeded={approvalNeeded}
+          refusal={refusal}
           onRequestApproval={() => send("request")}
           incomplete={
             (mode === "person" && !form.assigned_to_name.trim()) ||
