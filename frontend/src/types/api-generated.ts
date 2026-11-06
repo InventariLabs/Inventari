@@ -23515,6 +23515,8 @@ export interface components {
             safety_stock: string;
             /** Preferred Partner Id */
             preferred_partner_id?: string | null;
+            /** Preferred Partner Name */
+            preferred_partner_name?: string | null;
             /** Notes */
             notes?: string | null;
             /** Created At */

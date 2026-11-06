@@ -12,7 +12,6 @@ import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { InlineQueryError, QueryFailure } from "@/components/ui/QueryResult";
-import { usePartnerNames } from "@/hooks/usePartners";
 import { usePartnerPicker } from "@/hooks/usePartnerPicker";
 import { SUPPLIER_ROLE_TYPES } from "@/module-sdk";
 import { LocationCombobox } from "@/module-sdk";
@@ -122,8 +121,17 @@ export default function ReorderRulesPage() {
     formOpen ? form.preferredPartnerId || undefined : undefined,
   );
   const partnersFailed = partnersError != null;
-  const partnerNames = usePartnerNames(
-    rules.map((r) => r.preferred_partner_id),
+  // The API names each rule's supplier, so the list needs no read per partner.
+  const partnerNames = useMemo(
+    () =>
+      new Map(
+        rules.flatMap((r) =>
+          r.preferred_partner_id && r.preferred_partner_name
+            ? [[r.preferred_partner_id, r.preferred_partner_name] as const]
+            : [],
+        ),
+      ),
+    [rules],
   );
   const createMutation = useCreateReorderRule();
   const updateMutation = useUpdateReorderRule();
