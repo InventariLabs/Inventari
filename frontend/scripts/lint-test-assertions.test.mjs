@@ -70,6 +70,24 @@ describe("lint-test-assertions", () => {
     expect(status).toBe(0);
   });
 
+  it("takes the escape hatch on the query's own line as well", () => {
+    const { status } = run({
+      "a.test.tsx": `it("x", () => {\n  expect(screen.getByText("order.created")).toBeTruthy(); // not-an-i18n-key\n});\n`,
+    });
+
+    expect(status).toBe(0);
+  });
+
+  it("catches a raw key in a findBy query as it does in a getBy one", () => {
+    const { status, stdout } = run({
+      "a.test.tsx": `it("x", async () => {\n  expect(await screen.findByText("common:form.cancel")).toBeTruthy();\n});\n`,
+    });
+
+    expect(status).toBe(1);
+    expect(stdout).toContain("Raw i18n keys queried as text (1)");
+    expect(stdout).toContain('src/a.test.tsx:2  "common:form.cancel"');
+  });
+
   it("fails on a test body with no expectation, naming the test", () => {
     const { status, stdout } = run({
       "a.test.tsx": `it("renders without throwing", () => {\n  render(<A />);\n});\n`,

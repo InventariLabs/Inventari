@@ -36,7 +36,8 @@ function runKnip() {
       result.stdout || result.stderr || "knip produced no JSON output",
     );
     console.error(`knip exited with status ${result.status}`);
-    process.exit(result.status ?? 1);
+    // A knip that printed garbage and exited 0 has not said "nothing found".
+    process.exit(result.status || 1);
   }
   return data;
 }

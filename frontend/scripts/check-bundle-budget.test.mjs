@@ -6,11 +6,28 @@
  * compress, so a chunk's gzip size is about its byte size.
  */
 import { randomBytes } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { makeRepo, runGate } from "./gate-fixture.mjs";
 
 const KIB = 1024;
+/**
+ * The budgets the gate itself holds, read from its source: they move a step at
+ * a time as the app grows, and what these specs pin is how a verdict is reached,
+ * not where the line currently sits.
+ */
+const BUDGETS = Object.fromEntries(
+  [
+    ...readFileSync(
+      join(import.meta.dirname, "check-bundle-budget.mjs"),
+      "utf8",
+    )
+      .match(/const BUDGETS = \{([^}]*)\}/)[1]
+      .matchAll(/(\w+):\s*(\d+)/g),
+  ].map(([, name, kib]) => [name, Number(kib)]),
+);
 /** A chunk of about `kib` KiB gzip, optionally importing sibling chunks. */
 const chunk = (kib, imports = []) =>
   `${imports.map((f) => `import "./${f}";`).join("")}/*${randomBytes(kib * KIB).toString("base64")}*/\n`;
@@ -49,9 +66,15 @@ describe("check-bundle-budget", () => {
     const { status, stdout } = run(dist());
 
     expect(status).toBe(0);
-    expect(stdout).toMatch(/ok\s+initial\s+\d+\.\d KiB gz\s+\(budget 245\)/);
     expect(stdout).toMatch(
-      /ok\s+appFirstPaint\s+\d+\.\d KiB gz\s+\(budget 390\)/,
+      new RegExp(
+        `ok\\s+initial\\s+\\d+\\.\\d KiB gz\\s+\\(budget ${BUDGETS.initial}\\)`,
+      ),
+    );
+    expect(stdout).toMatch(
+      new RegExp(
+        `ok\\s+appFirstPaint\\s+\\d+\\.\\d KiB gz\\s+\\(budget ${BUDGETS.appFirstPaint}\\)`,
+      ),
     );
     expect(stdout).toContain("heaviest language: i18n-pl-ddd.js");
     expect(stdout).toMatch(/ok\s+receive/);
@@ -93,23 +116,44 @@ describe("check-bundle-budget", () => {
     expect(kib("receive") - kib("appFirstPaint")).toBeGreaterThan(8);
   });
 
+  it("counts a chunk the entry and the App tree both import once in first paint", () => {
+    const firstPaint = (files) =>
+      Number(/appFirstPaint\s+(\d+\.\d)/.exec(run(files).stdout)[1]);
+
+    const apart = firstPaint(dist());
+    repo.cleanup();
+    const shared = firstPaint(
+      dist({
+        "frontend/dist/assets/App-ccc.js": chunk(20, ["shared-bbb.js"]),
+      }),
+    );
+
+    // shared-bbb.js is 10 KiB and already in `initial`; counted again it
+    // would put first paint 10 KiB above the build that does not share it.
+    expect(Math.abs(shared - apart)).toBeLessThan(3);
+  });
+
   it("fails when the startup path outgrows its budget, and says to find the import", () => {
     const { status, stderr } = run(
-      dist({ "frontend/dist/assets/shared-bbb.js": chunk(250) }),
+      dist({ "frontend/dist/assets/shared-bbb.js": chunk(BUDGETS.initial) }),
     );
 
     expect(status).toBe(1);
-    expect(stderr).toMatch(/initial \d+\.\d > 245 KiB gz/);
+    expect(stderr).toMatch(
+      new RegExp(`initial \\d+\\.\\d > ${BUDGETS.initial} KiB gz`),
+    );
     expect(stderr).toContain("find the import that walked in");
   });
 
   it("fails when the signed-in first paint outgrows its budget", () => {
     const { status, stderr } = run(
-      dist({ "frontend/dist/assets/App-ccc.js": chunk(400) }),
+      dist({ "frontend/dist/assets/App-ccc.js": chunk(BUDGETS.appFirstPaint) }),
     );
 
     expect(status).toBe(1);
-    expect(stderr).toMatch(/appFirstPaint \d+\.\d > 390 KiB gz/);
+    expect(stderr).toMatch(
+      new RegExp(`appFirstPaint \\d+\\.\\d > ${BUDGETS.appFirstPaint} KiB gz`),
+    );
   });
 
   it("fails when a phone screen's own chunks push it over its budget", () => {

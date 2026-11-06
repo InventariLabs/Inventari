@@ -4,6 +4,8 @@
  * both trees are visible.
  */
 import { afterEach, describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { makeRepo, runGate } from "./gate-fixture.mjs";
 
@@ -150,6 +152,9 @@ describe("check-module-catalog", () => {
 
     expect(sync.status).toBe(0);
     expect(sync.stdout).toContain("snapshot refreshed (3 modules)");
+    expect(JSON.parse(readFileSync(join(repo.root, SNAPSHOT), "utf8"))).toEqual(
+      ["alpha", "core_tools", "zeta"],
+    );
     expect(run().status).toBe(0);
   });
 

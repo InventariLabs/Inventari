@@ -4,6 +4,8 @@
  * and must say so quietly where only the frontend is.
  */
 import { afterEach, describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { makeRepo, runGate } from "./gate-fixture.mjs";
 
@@ -62,6 +64,8 @@ describe("check-module-settings", () => {
       "backend/app/modules/nomanifest/readme.md": "x",
       "backend/app/modules/loose.txt": "x",
       ...manifest("labels", false),
+      ...manifest("stringly", "true"),
+      ...manifest("numeric", 1),
       [SNAPSHOT]: [],
     });
 
@@ -90,6 +94,9 @@ describe("check-module-settings", () => {
 
     expect(sync.status).toBe(0);
     expect(sync.stdout).toContain("snapshot refreshed (2 modules)");
+    expect(JSON.parse(readFileSync(join(repo.root, SNAPSHOT), "utf8"))).toEqual(
+      ["alpha", "zeta"],
+    );
     expect(run().status).toBe(0);
     expect(run().stdout).toContain("2 module(s) declare settings");
   });

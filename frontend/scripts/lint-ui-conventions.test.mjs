@@ -6,13 +6,19 @@
  */
 import { afterEach, describe, expect, it } from "vitest";
 
-import { BLOCKING, DETECTORS } from "./ui-patterns/index.mjs";
+import { BLOCKING } from "./ui-patterns/index.mjs";
 import { makeRepo, runGate } from "./gate-fixture.mjs";
 
 let repo;
 afterEach(() => repo?.cleanup());
 
-const run = (files) => {
+/** `border-weight` demoted from the blocking set, as a detector that only reports. */
+const DEMOTE_BORDER_WEIGHT = {
+  "ui-patterns/index.mjs": (text) =>
+    `${text}\nBLOCKING.delete("border-weight");\n`,
+};
+
+const run = (files, options = {}) => {
   repo = makeRepo();
   repo.write(
     Object.fromEntries(
@@ -24,6 +30,7 @@ const run = (files) => {
   );
   return runGate(repo, "lint-ui-conventions.mjs", {
     siblings: ["ui-patterns"],
+    ...options,
   });
 };
 
@@ -62,9 +69,19 @@ describe("lint-ui-conventions", () => {
   });
 
   it("enforces only the blocking detectors, never the report-only ones", () => {
-    const reportOnly = DETECTORS.filter((d) => !BLOCKING.has(d.name));
-    const { stdout } = run({ "Clean.tsx": "export const A = () => null;\n" });
+    const { status, stdout, stderr } = run(
+      {
+        "Bad.tsx":
+          'export const A = () => <div className="border-2 border-primary-500" />;\n',
+      },
+      { patch: DEMOTE_BORDER_WEIGHT },
+    );
 
-    for (const d of reportOnly) expect(stdout).not.toContain(`${d.name} `);
+    // The violation is real, but its detector no longer blocks: not run, not printed.
+    expect(status).toBe(0);
+    expect(stderr).toBe("");
+    expect(stdout).toContain("0 violations");
+    expect(stdout).not.toContain("border-weight ");
+    expect(stdout).toContain("button-size-override ");
   });
 });

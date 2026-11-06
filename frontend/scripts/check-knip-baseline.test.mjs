@@ -125,4 +125,16 @@ describe("check-knip-baseline", () => {
     expect(stderr).toContain("cannot load knip.json");
     expect(stderr).toContain("knip exited with status 2");
   });
+
+  it("fails, rather than passing, when knip printed no JSON yet exited 0", () => {
+    const { status, stderr } = run({
+      baseline: KEYS,
+      knipOutput: "Deprecation notice: reporter flag has moved",
+      knipExit: 0,
+    });
+
+    expect(status).toBe(1);
+    expect(stderr).toContain("Deprecation notice");
+    expect(stderr).toContain("knip exited with status 0");
+  });
 });
