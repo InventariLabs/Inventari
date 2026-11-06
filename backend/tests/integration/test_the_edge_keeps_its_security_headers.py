@@ -99,6 +99,47 @@ class TestTheEdgeKeepsItsSecurityHeaders:
         assert len(problems) == 1 and 'Referrer-Policy' in problems[0], repr(problems)
         assert 'always' in problems[0], repr(problems)
 
+    @pytest.mark.parametrize(
+        'directive',
+        [
+            'add_header Cache-Control\n            "no-store";',
+            'add_header\n            Cache-Control "no-store";',
+            'add_header Cache-Control "no-store,\n            no-cache";',
+            'add_header Cache-Control "no-store"; add_header Pragma "no-cache";',
+        ],
+        ids=[
+            'value-on-next-line',
+            'name-on-next-line',
+            'value-spans-lines',
+            'two-on-one-line',
+        ],
+    )
+    def test_the_check_refuses_an_add_header_it_cannot_read_whole(
+        self, directive: str
+    ) -> None:
+        """The scan reads one line at a time, so a directive must fit on one.
+
+        An ``add_header`` that ended on the next line was not recorded at all:
+        a location whose only header was split looked like a location that sets
+        none and passed, while nginx still dropped the server-level set from it.
+        """
+        checker = _load_checker()
+        server_headers = '\n'.join(
+            f'    add_header {name} "value" always;'
+            for name in checker.SECURITY_HEADERS
+        )
+        drifting = f"""server {{
+{server_headers}
+    location /x {{
+        {directive}
+    }}
+}}"""
+        problems = checker.check_nginx_security_headers(drifting)
+        directive_line = len(checker.SECURITY_HEADERS) + 3
+        assert len(problems) == 1, repr(problems)
+        assert problems[0].startswith(f'nginx.conf:{directive_line}: '), repr(problems)
+        assert 'one line' in problems[0], repr(problems)
+
     def test_the_server_block_must_use_always_too(self) -> None:
         checker = _load_checker()
         server_headers = '\n'.join(
