@@ -28,9 +28,10 @@ export interface PricelistFormState {
  *
  * `validFrom` is saved, not just shown, so it is the reader's own day —
  * `toISOString()` answers in UTC, which around midnight is yesterday or
- * tomorrow.
+ * tomorrow. It is also read each time the form opens, never once at module
+ * load: a tab left open past midnight would otherwise save yesterday.
  */
-export const emptyForm: PricelistFormState = {
+export const emptyForm = (): PricelistFormState => ({
   id: null,
   product: null,
   unitPrice: "",
@@ -39,7 +40,7 @@ export const emptyForm: PricelistFormState = {
   validFrom: todayIso(),
   validTo: "",
   notes: "",
-};
+});
 
 interface PricelistFormModalProps {
   open: boolean;
