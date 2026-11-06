@@ -288,8 +288,8 @@
     "description": "“{{name}}” is archived and stays off the active list. Open it here, or restore it from the archive."
   },
   "usage": {
-    "customer": "Customer",
-    "inventory": "Inventory adjustment",
+    "customer": "Consumed",
+    "inventory": "Inventory loss",
     "production": "Production",
     "virtualNotice": "System location — its contents do not count toward stock levels."
   },

@@ -7,6 +7,8 @@ import { formatDecimalQty, formatRecentMoment } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { StockMoveRow } from "@/lib/api/stockMoves";
 import { useStockMoves } from "@/modules/inventory/hooks/useStockMoves";
+import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
+import { recordsMovements } from "@/modules/inventory/constants/movementModules";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
 import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
 
@@ -94,6 +96,9 @@ export function DashboardRecentMoves() {
   // The overview counts what the products list shows, and so does its
   // journal: a laptop received into the equipment module is not a move here.
   const excludeModuleContexts = !useShowModuleData();
+  // The journal screen is listed only where a module reads the ledger; the
+  // overview must not link to a tab the navigation hides.
+  const hasJournal = recordsMovements(useEnabledModulesOptional());
   const { data, isLoading, isError, error, refetch } = useStockMoves({
     limit: RECENT_MOVES_LIMIT,
     exclude_module_contexts: excludeModuleContexts,
@@ -121,8 +126,8 @@ export function DashboardRecentMoves() {
       entries={(data?.items ?? []).map((move) =>
         moveJournalEntry(move, t, placeName),
       )}
-      linkLabel={t("common:dashboard.journal.link")}
-      linkHref="/inventory/moves"
+      linkLabel={hasJournal ? t("common:dashboard.journal.link") : undefined}
+      linkHref={hasJournal ? "/inventory/moves" : undefined}
       loading={isLoading}
       empty={{
         text: t("common:dashboard.journal.empty"),

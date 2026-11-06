@@ -427,6 +427,7 @@ def test_a_new_backend_file_does_not_change_the_saved_artefact() -> None:
         'declarations-read': 4,
         'uncovered-writer-files': [],
         'keys': ['barcode', 'name'],
+        'target-types': ['item'],
     }
 
     before = script.artefact_payload({**declared, 'files-read': 993})
@@ -434,3 +435,34 @@ def test_a_new_backend_file_does_not_change_the_saved_artefact() -> None:
 
     assert before == after
     assert before['keys'] == ['barcode', 'name']
+
+
+def test_the_audit_target_types_are_read_from_the_enum(
+    collect_keys, tmp_path: Path
+) -> None:
+    """Every value the journal can be filtered by is a member of one enum.
+
+    The exporter reads the members, comments and docstring aside, so the
+    frontend half can ask whether every one has a name in the catalogue.
+    """
+    root = _write_app(
+        tmp_path,
+        {
+            'core/contracts/dtos.py': (
+                'class AuditTargetType(StrEnum):\n'
+                '    """What an entry is about."""\n'
+                '\n'
+                '    ITEM = "item"\n'
+                '    #: A comment between members.\n'
+                '    STOCK_LOT = "stock_lot"\n'
+                '\n'
+                '\n'
+                'class Other(StrEnum):\n'
+                '    NOT_A_TARGET = "not_a_target"\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['target-types'] == ['item', 'stock_lot']

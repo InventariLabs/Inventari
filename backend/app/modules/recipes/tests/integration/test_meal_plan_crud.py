@@ -61,11 +61,43 @@ class TestMealPlanCRUD:
             PLAN_URL,
             json=_plan_payload(
                 start_date=today.isoformat(),
-                end_date=(today + timedelta(days=15)).isoformat(),
+                end_date=(today + timedelta(days=14)).isoformat(),
             ),
             headers=auth_headers,
         )
         assert r.status_code == 400
+
+    def test_create_plan_of_exactly_14_days_is_accepted(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """The refusal says a plan cannot exceed 14 days, so fourteen is fine."""
+        today = date.today()
+        r = client.post(
+            PLAN_URL,
+            json=_plan_payload(end_date=(today + timedelta(days=13)).isoformat()),
+            headers=auth_headers,
+        )
+        assert r.status_code == 201, r.text
+
+    def test_update_plan_dates_past_14_days_returns_400(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        today = date.today()
+        plan_id = client.post(
+            PLAN_URL, json=_plan_payload(), headers=auth_headers
+        ).json()['id']
+        fourteen = client.put(
+            f'{PLAN_URL}/{plan_id}',
+            json={'end_date': (today + timedelta(days=13)).isoformat()},
+            headers=auth_headers,
+        )
+        fifteen = client.put(
+            f'{PLAN_URL}/{plan_id}',
+            json={'end_date': (today + timedelta(days=14)).isoformat()},
+            headers=auth_headers,
+        )
+        assert fourteen.status_code == 200, fourteen.text
+        assert fifteen.status_code == 400
 
     def test_create_plan_end_before_start_returns_400(
         self, client: TestClient, auth_headers: dict[str, str]
@@ -476,11 +508,26 @@ class TestMealPlanEntries:
             f'{PLAN_URL}/{plan_id}/copy-to',
             json={
                 'start_date': start.isoformat(),
-                'end_date': (start + timedelta(days=15)).isoformat(),
+                'end_date': (start + timedelta(days=14)).isoformat(),
             },
             headers=auth_headers,
         )
         assert r.status_code == 400
+
+    def test_copy_plan_of_exactly_14_days_is_accepted(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        plan_id, _ = self._create_plan_and_recipe(client, auth_headers)
+        start = date.today() + timedelta(days=1)
+        r = client.post(
+            f'{PLAN_URL}/{plan_id}/copy-to',
+            json={
+                'start_date': start.isoformat(),
+                'end_date': (start + timedelta(days=13)).isoformat(),
+            },
+            headers=auth_headers,
+        )
+        assert r.status_code == 200, r.text
 
     def test_plan_daily_nutrition_summary(
         self,

@@ -606,18 +606,27 @@ async def _fixed_cost_and_recipe(
 
 
 def _snapshot_financial_result(
-    order: ProductionOrder, recipe: MakerRecipe | None, unit_cost: Decimal
+    order: ProductionOrder,
+    recipe: MakerRecipe | None,
+    unit_cost: Decimal,
+    *,
+    uncosted: bool = False,
 ) -> None:
     """financial result snapshot (reference_price − unit_cost).
 
     Stored per order so the catalog, order list, dashboard widget and cost
     history stay consistent even when the recipe changes later.
+
+    A run that consumed an ingredient the ledger could not price states no
+    result: its cost left that ingredient out, so the margin against it would
+    be overstated by exactly what was left out - the recipe card withholds the
+    same figure for the same reason. The cost itself is still kept.
     """
     if recipe is None:
         return
     order.unit_cost_snapshot = quantise(unit_cost, 4)
     order.reference_price_snapshot = recipe.reference_price
-    if recipe.reference_price is not None:
+    if recipe.reference_price is not None and not uncosted:
         result_per_unit = quantise(recipe.reference_price - unit_cost)
         order.result_per_unit = result_per_unit
         order.result_per_batch = quantise(result_per_unit * recipe.batch_yield_qty)
@@ -992,7 +1001,11 @@ async def complete_production(
     unit_cost = (
         total_cost / actual_qty if actual_qty > 0 and total_cost > 0 else Decimal('0')
     )
-    _snapshot_financial_result(order, recipe, unit_cost)
+    uncosted = any(
+        child_template_id not in consumption.unit_costs
+        for child_template_id, _qty, _unit in flat
+    )
+    _snapshot_financial_result(order, recipe, unit_cost, uncosted=uncosted)
 
     await _receive_output(db, organization_id, order, actual_qty, unit_cost, user)
     _write_order_lines(db, order, flat, consumption)

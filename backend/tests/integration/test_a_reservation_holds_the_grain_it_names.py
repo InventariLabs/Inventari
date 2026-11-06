@@ -263,14 +263,21 @@ async def test_a_reservation_holds_only_the_shelf_it_names(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ('strategy', 'held'), [(None, 'SOON'), ('FEFO', 'SOON'), ('FIFO', 'FAR')]
+)
 async def test_a_reservation_follows_the_strategy_it_is_given(
-    real_async_db_session: AsyncSession, scene: ReserveScene
+    strategy: str | None,
+    held: str,
+    real_async_db_session: AsyncSession,
+    scene: ReserveScene,
 ) -> None:
-    """The default FIFO holds the record filled first, not the FEFO batch.
+    """A call that names no strategy follows the product's; one that names it wins.
 
-    The template says FEFO; the call does not say otherwise, so the
-    signature's FIFO is what the hold follows. Mutating the strategy handed
-    to the plan would quietly reserve the batch that expires sooner.
+    The template says FEFO, and so does the draw at completion, so a hold that
+    names nothing holds the batch that expires sooner. An explicit FIFO holds
+    the record filled first instead - mutating the strategy handed to the plan
+    would quietly reserve the other batch.
     """
     db = real_async_db_session
     scene.template.removal_strategy = 'FEFO'
@@ -315,9 +322,12 @@ async def test_a_reservation_follows_the_strategy_it_is_given(
     )
     await db.commit()
 
-    result = await _reserve(db, scene, None, '1')
+    kwargs = {} if strategy is None else {'removal_strategy': strategy}
+    result = await _reserve(db, scene, None, '1', **kwargs)
 
-    assert [slice_.lot_id for slice_ in result.reserved] == [far.id]
+    assert [slice_.lot_id for slice_ in result.reserved] == [
+        {'SOON': soon.id, 'FAR': far.id}[held]
+    ]
 
 
 @pytest.mark.asyncio

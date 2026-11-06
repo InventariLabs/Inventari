@@ -32,9 +32,31 @@ class TestNormalizeLicence:
         raw = 'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)'
         assert normalize_licence(raw) == 'MPL-1.1'
 
+    def test_mit_zero_is_not_read_as_plain_mit(self) -> None:
+        # cffi ships under MIT-0; the report labelled it MIT because the
+        # alias table matches by substring and MIT came first.
+        assert normalize_licence('MIT-0') == 'MIT-0'
+        assert classify(['MIT-0']) == 'allowed'
+
     def test_unrecognised_text_is_unknown_not_permissive(self) -> None:
         assert normalize_licence('see LICENSE file') == 'UNKNOWN'
         assert normalize_licence('') == 'UNKNOWN'
+
+
+class TestTheReportDoesNotOverclaim:
+    def test_the_header_names_what_it_leaves_out(self) -> None:
+        from app.cli._deps_licenses import ScanResult
+        from app.cli._deps_licenses_report import render_markdown
+
+        body = render_markdown(ScanResult())
+        assert 'Every component' not in body
+        for left_out in (
+            'base images',
+            'psycopg2-binary',
+            'seed_assets',
+            'print-agent',
+        ):
+            assert left_out in body
 
 
 class TestClassify:

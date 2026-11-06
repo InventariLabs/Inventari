@@ -17,9 +17,11 @@ import ItemDetailContent from "@/modules/inventory/components/items/ItemDetailCo
  * about. The same physical rack had a page when the Equipment module looked
  * at it and a menu when Inventory did.
  *
- * Two tabs, not three: stock movements have no source of their own — every
- * move, count and quantity change is already an entry in the history below,
- * and a "Movements" tab would be the same list under a second name.
+ * Overview and History for everyone, and a Movements tab where a module
+ * reads the stock ledger: the history lists what happened to the record
+ * itself, the ledger lists the stock moves of its product, so the third tab
+ * is not the history under a second name and an organization without a
+ * module that reads the ledger is not offered it.
  */
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>();

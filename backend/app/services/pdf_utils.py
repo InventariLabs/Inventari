@@ -23,7 +23,7 @@ from jinja2.runtime import Context
 from app.core.datetimes import format_date_for
 from app.core.utils import pick_by_lang
 from app.i18n._types import SUPPORTED_LANGUAGES, Language
-from app.i18n.service import get_unit_label
+from app.i18n.service import get_unit_label, writes_decimal_comma
 
 
 def filter_format_date(value: datetime | str | None, lang: str = 'en') -> str:
@@ -37,13 +37,9 @@ def filter_format_date(value: datetime | str | None, lang: str = 'en') -> str:
         return str(value)
 
 
-# Languages that write the decimal separator as a comma.
-_COMMA_DECIMAL_LANGS = ('pl', 'de', 'fr', 'es', 'pt')
-
-
 def _localize_decimal(text: str, lang: str) -> str:
     """Swap the dot of an already formatted number for the language's separator."""
-    return text.replace('.', ',') if lang.startswith(_COMMA_DECIMAL_LANGS) else text
+    return text.replace('.', ',') if writes_decimal_comma(lang) else text
 
 
 def filter_format_qty(value: Decimal | float | str | None, lang: str = 'en') -> str:
