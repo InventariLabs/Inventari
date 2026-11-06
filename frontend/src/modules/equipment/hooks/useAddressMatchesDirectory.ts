@@ -1,6 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import { useEmployeeAutocomplete } from "@/modules/equipment/hooks/useEmployeeAutocomplete";
-import { useOrganizationMembers } from "@/modules/settings/hooks/useOrganization";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  employeeSearchQuery,
+  useEmployeeAutocomplete,
+} from "@/modules/equipment/hooks/useEmployeeAutocomplete";
+import {
+  organizationMembersQuery,
+  useOrganizationMembers,
+} from "@/modules/settings/hooks/useOrganization";
 
 interface UseAddressMatchesDirectoryParams {
   /** The hand-typed address, trimmed. */
@@ -10,6 +17,24 @@ interface UseAddressMatchesDirectoryParams {
   /** The Partners register only exists when its module is on. */
   partnersEnabled: boolean;
 }
+
+export interface AddressCheck {
+  /** The settled address belongs to nobody either register knows. */
+  unmatched: boolean;
+  /**
+   * Whether the save of the address in the field must stop to show the
+   * warning first: true when it matches nobody and the warning was not yet
+   * on screen for it. The registers are asked now, not after the settle
+   * window, and the warning rises by the same call — so an address pasted
+   * and submitted inside the window is named before it is stored.
+   */
+  holdForWarning: () => Promise<boolean>;
+}
+
+type Register = { items?: Array<{ email?: string | null }> } | undefined;
+
+const knows = (register: Register, lower: string) =>
+  (register?.items ?? []).some((entry) => entry.email?.toLowerCase() === lower);
 
 /**
  * Whether a hand-typed address belongs to nobody either register knows —
@@ -22,10 +47,12 @@ export function useAddressMatchesDirectory({
   email,
   enabled,
   partnersEnabled,
-}: UseAddressMatchesDirectoryParams): boolean {
-  // The check waits for the typing to settle: a keystroke-by-keystroke
+}: UseAddressMatchesDirectoryParams): AddressCheck {
+  const queryClient = useQueryClient();
+  // The highlighting waits for the typing to settle: a keystroke-by-keystroke
   // lookup fired a request per character, and mid-address a correct
-  // account reads as a typo until its last letter lands.
+  // account reads as a typo until its last letter lands. The save does not
+  // wait for it — see `holdForWarning`.
   const [settledEmail, setSettledEmail] = useState("");
   useEffect(() => {
     const timer = setTimeout(() => setSettledEmail(email), 400);
@@ -45,7 +72,7 @@ export function useAddressMatchesDirectory({
       enabled: partnersEnabled && checking,
     });
 
-  return useMemo(() => {
+  const unmatched = useMemo(() => {
     // A register that failed to answer cannot testify that the address is in
     // nobody's book: the warning stays quiet rather than call a correct
     // address a typo.
@@ -54,13 +81,7 @@ export function useAddressMatchesDirectory({
     }
     if (partnersEnabled && !partnerData) return false;
     const lower = settledEmail.toLowerCase();
-    const memberHas = (memberData.items ?? []).some(
-      (m) => m.email.toLowerCase() === lower,
-    );
-    const partnerHas = (partnerData?.items ?? []).some(
-      (p) => p.email?.toLowerCase() === lower,
-    );
-    return !memberHas && !partnerHas;
+    return !knows(memberData, lower) && !knows(partnerData, lower);
   }, [
     checking,
     membersFailed,
@@ -70,4 +91,31 @@ export function useAddressMatchesDirectory({
     partnersEnabled,
     settledEmail,
   ]);
+
+  const holdForWarning = useCallback(async () => {
+    if (!enabled || !email.includes("@")) return false;
+    // The warning already stands for this very address: the reader has
+    // seen it and saves anyway, which the check allows.
+    if (unmatched && settledEmail === email) return false;
+    let nobodys: boolean;
+    try {
+      const [members, partners] = await Promise.all([
+        queryClient.fetchQuery(organizationMembersQuery(0, 20, email)),
+        partnersEnabled
+          ? queryClient.fetchQuery(employeeSearchQuery(email))
+          : undefined,
+      ]);
+      const lower = email.toLowerCase();
+      nobodys = !knows(members, lower) && !knows(partners, lower);
+    } catch {
+      // Same rule as the highlighting: no answer, no accusation.
+      return false;
+    }
+    // The answers are in the cache under the keys the highlighting reads,
+    // so settling on this address shows the warning on the next render.
+    setSettledEmail(email);
+    return nobodys;
+  }, [enabled, email, unmatched, settledEmail, queryClient, partnersEnabled]);
+
+  return { unmatched, holdForWarning };
 }
