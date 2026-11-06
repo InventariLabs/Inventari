@@ -52,9 +52,12 @@ SECURITY_HEADERS = (
     'Permissions-Policy',
 )
 
+# One whole directive, alone on its line. A line that opens add_header and
+# fails this is refused rather than skipped: skipping it would hide the block.
 NGINX_ADD_HEADER = re.compile(
-    r'^\s*add_header\s+(\S+)\s*(?:"([^"]*)")?[^;]*?(\balways\s*)?;'
+    r'^\s*add_header\s+(\S+)\s*(?:"([^"]*)")?[^;"]*?(\balways\s*)?;\s*$'
 )
+NGINX_ADD_HEADER_LINE = re.compile(r'^\s*add_header\b')
 
 NGINX_SERVER_TOKENS = re.compile(r'^\s*server_tokens off;', re.MULTILINE)
 NGINX_DOTFILES = re.compile(
@@ -123,7 +126,8 @@ def _header_blocks(text: str) -> list[_HeaderBlock]:
 
     Returns ``(label, line number, {name: (quoted value or None, has always)})`` — outer
     ``server`` first, locations as encountered. The file is hand-formatted one
-    directive per line, so a brace-counting scan is enough: comments are
+    directive per line — ``check_nginx_security_headers`` refuses an
+    ``add_header`` that is not — so a brace-counting scan is enough: comments are
     dropped, ``{`` pushes the line's block and ``}`` pops it. Labels are the
     block's first line (``server``, ``location = /sw.js``), which is what a
     failure message should name.
@@ -160,15 +164,24 @@ def check_nginx_security_headers(text: str) -> list[str]:
     ``always``: without it nginx adds the header to 2xx and 3xx responses only,
     so a 404 or a 502 would leave without the policy.
     """
+    problems = [
+        f'nginx.conf:{line_no}: an add_header that is not one whole directive on '
+        'one line; this check reads the file line by line and would not see the '
+        'header it sets'
+        for line_no, raw in enumerate(text.splitlines(), 1)
+        if NGINX_ADD_HEADER_LINE.match(code := raw.split('#', 1)[0])
+        and not NGINX_ADD_HEADER.match(code)
+    ]
     blocks = _header_blocks(text)
     server = next(
         (block for block in blocks if block[0] == 'server' and block[2]), None
     )
     if server is None:
-        return ['nginx.conf: no `server` block declares the security headers']
+        return problems + [
+            'nginx.conf: no `server` block declares the security headers'
+        ]
     expected = server[2]
     absent = [header for header in SECURITY_HEADERS if header not in expected]
-    problems: list[str] = []
     if absent:
         problems.append(
             'nginx.conf: the `server` block does not declare ' + ', '.join(absent)
