@@ -130,6 +130,7 @@ ERRORS_FR: ErrorMessages = {
     'role_name_taken': 'Un rôle nommé "{name}" existe déjà dans cette organisation.',
     'invitation_not_found': 'Invitation introuvable',
     'organization_invite_invalid': "Cette invitation ne peut pas être utilisée. Vérifiez que vous utilisez l'adresse e-mail à laquelle elle a été envoyée, ou demandez-en une nouvelle.",
+    'organization_invite_link_dead': "Ce lien d'invitation ne fonctionne plus. Demandez-en un nouveau à la personne qui vous l'a envoyé.",
     'organization_invite_expired': "L'invitation d'organisation a expiré",
     'email_test_failed': "Impossible d'envoyer l'e-mail de test",
     'module_org_required': 'Pour gérer les modules, vous devez appartenir à une organisation. Reconnectez-vous ou contactez le support.',

@@ -77,6 +77,7 @@ ERRORS_PT: dict[str, str] = {
     'role_name_taken': 'Já existe uma função chamada "{name}" nesta organização.',
     'invitation_not_found': 'Convite não encontrado',
     'organization_invite_invalid': 'Este convite não pode ser usado. Verifique se o cadastro usa o endereço de e-mail para o qual ele foi enviado ou peça um novo.',
+    'organization_invite_link_dead': 'Este link de convite não funciona mais. Peça um novo a quem o enviou.',
     'organization_invite_expired': 'O convite da organização expirou',
     'email_test_failed': 'Não foi possível enviar o e-mail de teste',
     'module_org_required': 'Você precisa pertencer a uma organização para gerenciar módulos. Entre novamente ou entre em contato com o suporte.',
