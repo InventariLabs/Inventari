@@ -1,4 +1,6 @@
 import { prepareImageUpload } from "@/lib/imageUtils";
+import i18next from "i18next";
+import { ReadableError } from "@/lib/errors";
 import { api, type Page } from "./client";
 import {
   IMAGE_UPLOAD_MAX_BYTES,
@@ -7,6 +9,7 @@ import {
 } from "@/utils/fileValidation";
 import type { components } from "@/types/api-generated";
 import type {
+  ImportProgress,
   ImportRowError,
   ItemImportOutcome,
 } from "@/components/import/types";
@@ -35,14 +38,34 @@ const IMPORT_POLL_MS = 1500;
  * A long sheet is answered with a job instead of a result: its rows take
  * minutes, longer than a request is allowed to last. The job's answer, once
  * done, is the one the synchronous import would have given, so the caller
- * cannot tell the two apart. */
-async function followImportJob(jobId: string): Promise<ItemImportResponse> {
+ * cannot tell the two apart. `onProgress` hears each look at the running job,
+ * so the screen can show a number rather than a spinner for those minutes.
+ *
+ * A job that fails keeps what its batches had already committed, so the
+ * refusal says how many rows that was: a half-imported sheet and one that
+ * imported nothing ask for different things from the reader. */
+async function followImportJob(
+  jobId: string,
+  onProgress?: (progress: ImportProgress) => void,
+): Promise<ItemImportResponse> {
   for (;;) {
     const { data: job } = await api.get<ItemImportJob>(
       `/items/import/jobs/${jobId}`,
     );
     if (job.status === "done" && job.result) return job.result;
-    if (job.status === "failed") throw new Error(job.error ?? "Import failed");
+    if (job.status === "failed") {
+      const error = job.error ?? i18next.t("common:import.jobFailedUnknown");
+      throw new ReadableError(
+        job.processed > 0
+          ? i18next.t("common:import.jobFailedPartly", {
+              error,
+              done: job.processed,
+              total: job.total,
+            })
+          : i18next.t("common:import.jobFailedNothing", { error }),
+      );
+    }
+    onProgress?.({ processed: job.processed, total: job.total });
     await new Promise((resolve) => setTimeout(resolve, IMPORT_POLL_MS));
   }
 }
@@ -281,13 +304,15 @@ export const itemsApi = {
    * only one of the keys no setting under which its permission worked.
    * `onLabelMatch` decides what a row whose Label Code names a product
    * already here does: add it anyway ("add", the default), leave the
-   * product alone ("skip") or write the row onto it ("overwrite"). */
+   * product alone ("skip") or write the row onto it ("overwrite").
+   * `onProgress` is told how far a background import has got. */
   importItems: async (
     file: File,
     mapping: unknown,
     createLocations: boolean = true,
     createCategories: boolean = true,
     onLabelMatch: LabelMatchMode = "add",
+    onProgress?: (progress: ImportProgress) => void,
   ): Promise<ItemImportOutcome> => {
     assertFileSize(file);
     const formData = new FormData();
@@ -302,7 +327,7 @@ export const itemsApi = {
     );
     const outcome =
       response.status === 202
-        ? await followImportJob((response.data as ItemImportJob).id)
+        ? await followImportJob((response.data as ItemImportJob).id, onProgress)
         : (response.data as ItemImportResponse);
     // The contract types `errors` as open dicts; the server builds
     // { row, error } objects and the progress step renders exactly those

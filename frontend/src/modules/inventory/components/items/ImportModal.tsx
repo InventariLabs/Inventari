@@ -202,7 +202,7 @@ export default function ImportModal({ onClose }: Props) {
           Object.fromEntries(offered.map((f) => [f.key, t(f.labelKey)])),
         )
       }
-      run={(file, mapping) =>
+      run={(file, mapping, onProgress) =>
         importMutation.mutateAsync({
           file,
           mapping: showInventoryValue
@@ -211,6 +211,7 @@ export default function ImportModal({ onClose }: Props) {
           createLocations: canWriteStorages && createLocations,
           createCategories: canWriteCategories && createCategories,
           onLabelMatch,
+          onProgress,
         })
       }
       texts={{

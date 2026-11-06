@@ -17,6 +17,12 @@ export interface ImportOutcome {
   errors: ImportRowError[];
 }
 
+/** How far a background import has got: rows read of rows in the sheet. */
+export interface ImportProgress {
+  processed: number;
+  total: number;
+}
+
 /** Which sheet column feeds which field; the empty string means skip. */
 export type ImportMapping = Record<string, string>;
 
