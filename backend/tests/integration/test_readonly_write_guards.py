@@ -266,7 +266,7 @@ class TestImportSideDoorGuard:
                 )
             },
             data={
-                'mapping_json': '{"name": "nazwa", "storage_location": "miejsce"}',
+                'mapping_json': '{"name": "nazwa", "location": "miejsce"}',
                 'create_missing_categories': 'false',
             },
             headers=_auth(user),
@@ -274,6 +274,68 @@ class TestImportSideDoorGuard:
         assert resp.status_code == 403
         assert 'locations:write' in resp.text
         assert 'categories:write' not in resp.text
+
+    def test_a_sheet_that_names_neither_column_is_not_refused_for_founding(
+        self, client: TestClient, db_session: Session, org: Organization
+    ) -> None:
+        """The refusal is about what the sheet would found. A mapping with
+        no category and no location column cannot found anything, whatever
+        the toggles say, so it is imported."""
+        user = _member_with_role(db_session, org, ['items:write'])
+        resp = client.post(
+            '/api/v1/items/import',
+            files={'file': ('sheet.csv', b'nazwa\nBolt\n', 'text/csv')},
+            data={'mapping_json': '{"name": "nazwa"}'},
+            headers=_auth(user),
+        )
+        assert resp.status_code != 403, resp.text
+
+    def test_a_mapping_that_is_not_json_is_refused_before_the_permission_check(
+        self, client: TestClient, db_session: Session, org: Organization
+    ) -> None:
+        """The mapping is read first, since the permissions asked depend on
+        it: an unreadable one is the sheet's fault, whoever sends it."""
+        user = _member_with_role(db_session, org, ['items:write'])
+        resp = client.post(
+            '/api/v1/items/import',
+            files={'file': ('sheet.csv', b'nazwa\nBolt\n', 'text/csv')},
+            data={'mapping_json': '{not json'},
+            headers=_auth(user),
+        )
+        assert resp.status_code == 400, resp.text
+        assert 'categories:write' not in resp.text
+
+    def test_the_refusal_counts_the_permissions_it_names(
+        self, client: TestClient, db_session: Session, org: Organization
+    ) -> None:
+        user = _member_with_role(db_session, org, ['items:write'])
+        both = client.post(
+            '/api/v1/items/import',
+            files={
+                'file': (
+                    'sheet.csv',
+                    b'nazwa,kategoria,miejsce\nBolt,Washers,Bay 12\n',
+                    'text/csv',
+                )
+            },
+            data={
+                'mapping_json': '{"name": "nazwa", "category": "kategoria", "location": "miejsce"}'
+            },
+            headers=_auth(user),
+        )
+        one = client.post(
+            '/api/v1/items/import',
+            files={
+                'file': ('sheet.csv', b'nazwa,kategoria\nBolt,Washers\n', 'text/csv')
+            },
+            data={'mapping_json': '{"name": "nazwa", "category": "kategoria"}'},
+            headers=_auth(user),
+        )
+        assert both.status_code == one.status_code == 403
+        assert 'categories:write, locations:write' in both.text
+        assert 'the permissions categories:write' in both.text
+        assert 'the permission categories:write' in one.text
+        assert 'permissions' not in one.text
 
     def test_import_still_creates_for_a_role_that_holds_both(
         self,

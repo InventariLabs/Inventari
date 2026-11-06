@@ -39,6 +39,7 @@ class ErrorMessages(TypedDict):
     token_invalid: str
     insufficient_permissions: str
     import_create_forbidden: str
+    import_create_forbidden_one: NotRequired[str]
     import_stubs_forbidden: str
     user_blocked: str
     user_blocked_no_reason: str

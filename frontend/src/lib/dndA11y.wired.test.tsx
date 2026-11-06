@@ -859,6 +859,14 @@ describe("every drag context in the tree takes its words and its keyboard from t
    * tests above pin what the reader hears then. The gate reads literals: a
    * `data` it cannot read is a finding, never a shrug.
    */
+  const LABELLED_SURFACES = [
+    "src/modules/launcher/components/Launcher.tsx",
+    "src/modules/recipes/components/CollectionsPanel.tsx",
+    "src/modules/recipes/components/MealPlanCell.tsx",
+    "src/modules/recipes/components/MealPlanEntryCard.tsx",
+    "src/modules/recipes/components/RecipeCard.tsx",
+  ] as const;
+
   interface DragLabelRead {
     findings: string[];
     carrying: number;
@@ -944,7 +952,7 @@ describe("every drag context in the tree takes its words and its keyboard from t
                 `${fileName}: ${node.expression.text} hands the announcement ` +
                   "a data object without [DND_LABEL] — the reader hears the " +
                   "machine id instead of the name on screen. Put the visible " +
-                  "name in data under DND_LABEL, or drop the data",
+                  "name in data under DND_LABEL",
               );
             }
           }
@@ -960,6 +968,7 @@ describe("every drag context in the tree takes its words and its keyboard from t
     const src = resolve(__dirname, "..");
     const findings: string[] = [];
     let carrying = 0;
+    const carryingByFile = new Map<string, number>();
     for (const file of sourceFiles(src)) {
       const text = withoutLineComments(readFileSync(file, "utf8"));
       // A file that never names the drag hooks holds no surface to name.
@@ -968,6 +977,7 @@ describe("every drag context in the tree takes its words and its keyboard from t
       const read = readDragLabels(text, relative);
       findings.push(...read.findings);
       carrying += read.carrying;
+      carryingByFile.set(relative, read.carrying);
     }
     expect(
       findings,
@@ -979,6 +989,17 @@ describe("every drag context in the tree takes its words and its keyboard from t
       carrying,
       "drag surfaces carrying data were expected in the tree",
     ).toBeGreaterThan(0);
+    // A surface whose data holds nothing but the label is the one case the
+    // rule cannot see go: deleting the whole `data` property leaves a call
+    // with no data, which is legal, and the announcement quietly goes back
+    // to the machine id. These surfaces were written to carry the label, so
+    // each one has to keep carrying data.
+    for (const surface of LABELLED_SURFACES) {
+      expect(
+        carryingByFile.get(surface) ?? 0,
+        `${surface} must keep handing its drag data, with the label, to dnd-kit`,
+      ).toBeGreaterThan(0);
+    }
   });
 
   it("reads label wiring as it is written, and refuses a nameless data object", () => {
