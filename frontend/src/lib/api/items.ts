@@ -54,15 +54,16 @@ async function followImportJob(
     );
     if (job.status === "done" && job.result) return job.result;
     if (job.status === "failed") {
-      const error = job.error ?? i18next.t("common:import.jobFailedUnknown");
+      const error = job.error ?? "";
       throw new ReadableError(
-        job.processed > 0
+        (job.processed > 0
           ? i18next.t("common:import.jobFailedPartly", {
               error,
               done: job.processed,
               total: job.total,
             })
-          : i18next.t("common:import.jobFailedNothing", { error }),
+          : i18next.t("common:import.jobFailedNothing", { error })
+        ).trim(),
       );
     }
     onProgress?.({ processed: job.processed, total: job.total });
