@@ -17,6 +17,7 @@ Two things were wrong with how a code was given:
 from __future__ import annotations
 
 import asyncio
+import sys
 import time
 from uuid import UUID
 
@@ -108,8 +109,15 @@ async def test_a_location_that_has_a_code_keeps_it_and_writes_nothing(
     assert entries.all() == []
 
 
-async def _someone_is_waiting(db: AsyncSession, renumber: asyncio.Task[None]) -> None:
-    """Until another backend of this database waits on a lock.
+async def _backend_pid(session: AsyncSession) -> int:
+    """The server process behind *session*, which keeps it until it ends."""
+    return int(await session.scalar(text('SELECT pg_backend_pid()')))
+
+
+async def _renumber_waits_for_the_create(
+    db: AsyncSession, renumber: asyncio.Task[None], renumber_pid: int, create_pid: int
+) -> None:
+    """Until the create's backend holds up the renumber's.
 
     The create holds its transaction open until then, so the renumber is
     known to have reached the point where it would collide — on the advisory
@@ -117,22 +125,21 @@ async def _someone_is_waiting(db: AsyncSession, renumber: asyncio.Task[None]) ->
     commits. Without the wait the renumber might simply start after the
     commit and pass for the wrong reason.
 
+    The answer comes from the lock table, by the two backends' numbers, which
+    the caller reads before the renumber starts. Counting waiters in
+    ``pg_stat_activity`` took any backend waiting on any lock for the
+    renumber.
+
     A renumber that raised is answered by its own exception. One that finished
     without waiting read the codes before the create committed, so the codes
     the test goes on to read say what that did.
     """
     deadline = time.monotonic() + _NEVER_ARRIVES_AFTER
     while not renumber.done():
-        # pg_stat_activity is a snapshot per transaction and this session's
-        # stays open: drop it, or the loop rereads its first poll forever.
-        await db.execute(text('SELECT pg_stat_clear_snapshot()'))
-        waiting = await db.scalar(
-            text(
-                'SELECT count(*) FROM pg_stat_activity '
-                "WHERE datname = current_database() AND wait_event_type = 'Lock'"
-            )
-        )
-        if waiting:
+        if await db.scalar(
+            text('SELECT :create = ANY(pg_blocking_pids(:renumber))'),
+            {'create': create_pid, 'renumber': renumber_pid},
+        ):
             return
         if time.monotonic() > deadline:
             raise AssertionError('the renumber never reached the lock')
@@ -147,13 +154,46 @@ async def test_a_renumber_that_fails_reports_its_own_failure(
         raise LookupError('the renumber broke')
 
     with pytest.raises(LookupError, match='the renumber broke'):
-        await _someone_is_waiting(real_async_db_session, asyncio.create_task(_breaks()))
+        await _renumber_waits_for_the_create(
+            real_async_db_session, asyncio.create_task(_breaks()), 0, 0
+        )
 
 
-async def _renumber(engine, org_id: UUID, user_id: UUID, warehouse_id: UUID) -> None:
-    async with AsyncSession(bind=engine, expire_on_commit=False) as session:
-        await number_branch_async(session, org_id, user_id, warehouse_id, renumber=True)
-        await session.commit()
+async def test_a_stranger_waiting_on_a_lock_is_not_the_renumber(
+    real_async_db_session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    db = real_async_db_session
+    take = text('SELECT pg_advisory_xact_lock(7)')
+    monkeypatch.setattr(sys.modules[__name__], '_NEVER_ARRIVES_AFTER', 0.3)
+
+    async with (
+        AsyncSession(bind=db.bind) as holder,
+        AsyncSession(bind=db.bind) as stranger,
+        AsyncSession(bind=db.bind) as renumbering,
+    ):
+        holder_pid = await _backend_pid(holder)
+        renumber_pid = await _backend_pid(renumbering)
+        await holder.execute(take)
+        queued = asyncio.create_task(stranger.execute(take))
+        # The renumber, still idle, is not held up by the create just because
+        # the stranger is.
+        renumber = asyncio.create_task(asyncio.sleep(30))
+        try:
+            with pytest.raises(AssertionError, match='never reached the lock'):
+                await _renumber_waits_for_the_create(
+                    db, renumber, renumber_pid, holder_pid
+                )
+        finally:
+            renumber.cancel()
+            await holder.rollback()
+            await queued
+
+
+async def _renumber(
+    session: AsyncSession, org_id: UUID, user_id: UUID, warehouse_id: UUID
+) -> None:
+    await number_branch_async(session, org_id, user_id, warehouse_id, renumber=True)
+    await session.commit()
 
 
 async def test_a_renumber_and_a_create_at_once_both_succeed(
@@ -178,7 +218,13 @@ async def test_a_renumber_and_a_create_at_once_both_succeed(
     await db.commit()
 
     engine = db.bind
-    async with AsyncSession(bind=engine, expire_on_commit=False) as create:
+    async with (
+        AsyncSession(bind=engine, expire_on_commit=False) as create,
+        AsyncSession(bind=engine, expire_on_commit=False) as renumbering,
+    ):
+        # Both backends are known before either statement of the race runs.
+        create_pid = await _backend_pid(create)
+        renumber_pid = await _backend_pid(renumbering)
         # The create draws the first letter too — the old zone carries no
         # template code — and holds it until it commits.
         code = await code_for_new_location_async(create, org_id, warehouse_id)
@@ -194,8 +240,16 @@ async def test_a_renumber_and_a_create_at_once_both_succeed(
         )
         await create.flush()
 
-        renumber = asyncio.create_task(_renumber(engine, org_id, user_id, warehouse_id))
-        await _someone_is_waiting(db, renumber)
+        renumber = asyncio.create_task(
+            _renumber(renumbering, org_id, user_id, warehouse_id)
+        )
+        try:
+            await _renumber_waits_for_the_create(db, renumber, renumber_pid, create_pid)
+        except BaseException:
+            # Not left queueing behind a create that is about to roll back.
+            await create.rollback()
+            await asyncio.gather(renumber, return_exceptions=True)
+            raise
         await create.commit()
         await renumber
 

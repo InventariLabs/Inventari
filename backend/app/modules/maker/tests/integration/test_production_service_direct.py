@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import asyncio
 import uuid
-from collections.abc import Coroutine
+from collections.abc import Callable, Coroutine
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from typing import Any, cast
@@ -2192,13 +2192,17 @@ class TestUpdateOrder:
             await production_service.update_order(
                 first, prod_org.id, order.id, edit, prod_ctx
             )
+            first_pid = int(await first.scalar(text('SELECT pg_backend_pid()')))
+            second_pid = int(await second.scalar(text('SELECT pg_backend_pid()')))
             racer = asyncio.create_task(
                 production_service.update_order(
                     second, prod_org.id, order.id, edit, prod_ctx
                 )
             )
             try:
-                await _wait_until_parked(maker)
+                await _wait_until_parked(
+                    racer, racer_pid=second_pid, holder_pid=first_pid, maker=maker
+                )
             except BaseException:
                 await first.rollback()
                 await asyncio.gather(racer, return_exceptions=True)
@@ -2219,25 +2223,82 @@ class TestUpdateOrder:
         ]
 
 
-async def _wait_until_parked(maker: async_sessionmaker[AsyncSession]) -> None:
-    """Return once a backend of this database waits on a lock."""
+async def _wait_until_parked(
+    racer: asyncio.Task[Any],
+    *,
+    racer_pid: int,
+    holder_pid: int,
+    maker: async_sessionmaker[AsyncSession],
+) -> None:
+    """Return once the *racer*'s backend waits on a lock the *holder*'s holds.
+
+    Both backends are named by the caller before the racer starts, and the
+    lock table is asked about them: any other backend queued on any other
+    lock, in this database or a neighbour's, does not stand in for the racer.
+    A racer that raised is answered by its own exception as soon as it has.
+    """
     deadline = asyncio.get_running_loop().time() + 15
     async with maker() as probe:
-        while True:
+        while not racer.done():
             waiting = await probe.scalar(
-                text(
-                    'SELECT count(*) FROM pg_stat_activity '
-                    "WHERE datname = current_database() AND wait_event_type = 'Lock'"
-                )
+                text('SELECT :holder = ANY(pg_blocking_pids(:racer))'),
+                {'holder': holder_pid, 'racer': racer_pid},
             )
-            # pg_stat_activity is a snapshot per transaction: end it, or
-            # the loop rereads the moment of its first query forever.
-            await probe.rollback()
             if waiting:
                 return
             if asyncio.get_running_loop().time() > deadline:
-                raise AssertionError('the second save never parked on a lock')
+                raise AssertionError('the second save never parked on the first')
             await asyncio.sleep(0.02)
+    racer.result()
+    raise AssertionError('the second save finished without parking on the first')
+
+
+class TestTheParkedProbeWatchesItsOwnRacer:
+    """A racer that ends ends the wait; a stranger's queueing is not a racer's."""
+
+    @staticmethod
+    async def _watch(
+        db: AsyncSession,
+        racer_work: Callable[[AsyncSession], Coroutine[Any, Any, None]],
+    ) -> None:
+        maker = async_sessionmaker(bind=db.bind, expire_on_commit=False)
+        take = text('SELECT pg_advisory_xact_lock(7)')
+        async with maker() as holder, maker() as stranger, maker() as racing:
+            pids = [
+                int(await s.scalar(text('SELECT pg_backend_pid()')))
+                for s in (holder, stranger, racing)
+            ]
+            await holder.execute(take)
+            queued = asyncio.create_task(stranger.execute(take))
+            racer = asyncio.create_task(racer_work(racing))
+            try:
+                await _wait_until_parked(
+                    racer, racer_pid=pids[2], holder_pid=pids[0], maker=maker
+                )
+            finally:
+                racer.cancel()
+                await holder.rollback()
+                await asyncio.gather(racer, queued, return_exceptions=True)
+
+    @pytest.mark.asyncio
+    async def test_a_racer_that_fails_reports_its_own_failure(
+        self, real_async_db_session: AsyncSession
+    ) -> None:
+        async def _breaks(_session: AsyncSession) -> None:
+            raise LookupError('the save broke')
+
+        with pytest.raises(LookupError, match='the save broke'):
+            await self._watch(real_async_db_session, _breaks)
+
+    @pytest.mark.asyncio
+    async def test_a_racer_that_never_waits_is_said_to_have_finished(
+        self, real_async_db_session: AsyncSession
+    ) -> None:
+        async def _free(_session: AsyncSession) -> None:
+            return None
+
+        with pytest.raises(AssertionError, match='finished without parking'):
+            await self._watch(real_async_db_session, _free)
 
 
 async def _order_entries(
