@@ -11,7 +11,7 @@ import { makeRepo, runGate } from "./gate-fixture.mjs";
 let repo;
 afterEach(() => repo?.cleanup());
 
-const run = (files, args = []) => {
+const run = (files, args = [], options = {}) => {
   repo = makeRepo();
   repo.write(
     Object.fromEntries(
@@ -24,13 +24,14 @@ const run = (files, args = []) => {
   return runGate(repo, "scan-ui-patterns.mjs", {
     args,
     siblings: ["ui-patterns"],
+    ...options,
   });
 };
 
 const BAD = {
   "Bad.tsx":
     'export const A = () => (\n  <div className="border-2 border-primary-500" />\n);\n',
-  "hook.ts": "export const x = 1;\n",
+  "hook.ts": "export const x = (error: Error) => error.message;\n",
   "Bad.test.tsx": "// ignored\n",
 };
 
@@ -44,6 +45,29 @@ describe("scan-ui-patterns", () => {
       expect(line, d.name).toBeDefined();
       expect(line).toContain(BLOCKING.has(d.name) ? "[blocking]" : "[report]");
     }
+  });
+
+  it("tags a detector [report] once it is not in the blocking set, and still counts it", () => {
+    const { status, stdout } = run(BAD, [], {
+      patch: {
+        "ui-patterns/index.mjs": (text) =>
+          `${text}\nBLOCKING.delete("border-weight");\n`,
+      },
+    });
+    const line = (name) =>
+      stdout.split("\n").find((l) => l.startsWith(`${name} `));
+
+    expect(status).toBe(0);
+    expect(line("border-weight")).toContain("[report]");
+    expect(line("border-weight")).toMatch(/1 finding\(s\)/);
+    expect(line("button-size-override")).toContain("[blocking]");
+  });
+
+  it("reads a .ts file for the rules that read hooks, and finds in it", () => {
+    const { stdout } = run(BAD, ["--list"]);
+
+    expect(stdout).toContain("error-message-as-copy — 1 finding(s)");
+    expect(stdout).toContain("  src/hook.ts:1");
   });
 
   it("counts the files it read: tsx for markup, tsx plus ts for the hook rules, no tests", () => {
