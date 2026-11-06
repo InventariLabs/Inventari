@@ -87,7 +87,7 @@ export function useProfileSwitchApply() {
       invalidation.stats(qc);
     },
     {
-      errorFallback: "Failed to switch profile",
+      errorFallback: "Failed to switch workspace mode",
     },
   );
 }

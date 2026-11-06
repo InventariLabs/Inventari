@@ -132,7 +132,7 @@ export function WorkspaceModeSettings() {
     );
   }
 
-  // "No profiles available." describes the installation. It is the wrong
+  // "No workspace modes available." describes the installation. It is the wrong
   // thing to tell an administrator who came here to change how the workspace
   // works and whose list simply did not arrive.
   if (profilesFailed) {

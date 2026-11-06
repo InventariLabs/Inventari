@@ -237,6 +237,13 @@ export default function Launcher() {
   // the fallback branch and nothing else.
   const orgId = "default";
   const recentItems = userId ? getRecentItems(userId, orgId) : [];
+  // A visit is stored under the technical module name; the list names it the
+  // way the tile above does, as the command palette does.
+  const tDyn = makeTDynamic(t);
+  const recentModuleName = (technicalName: string): string => {
+    const tile = allModules.find((mod) => mod.name === technicalName)?.launcher;
+    return tile ? tDyn(tile.displayName) : technicalName;
+  };
 
   const isAdmin = useHasPermission("admin:access");
   const greeting = useLauncherGreeting();
@@ -329,24 +336,27 @@ export default function Launcher() {
                 {t("launcher:launcher.recentItems", "Recently visited")}
               </h2>
               <ul className="space-y-1">
-                {recentItems.slice(0, 5).map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      to={item.path}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-raised transition-colors text-sm text-on"
-                    >
-                      <span className="w-6 h-6 rounded-lg bg-surface-raised flex items-center justify-center shrink-0">
-                        <span className="text-[10px] font-medium text-on-muted uppercase">
-                          {item.module[0]}
+                {recentItems.slice(0, 5).map((item) => {
+                  const moduleName = recentModuleName(item.module);
+                  return (
+                    <li key={item.id}>
+                      <Link
+                        to={item.path}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-raised transition-colors text-sm text-on"
+                      >
+                        <span className="w-6 h-6 rounded-lg bg-surface-raised flex items-center justify-center shrink-0">
+                          <span className="text-[10px] font-medium text-on-muted uppercase">
+                            {moduleName[0]}
+                          </span>
                         </span>
-                      </span>
-                      <span className="flex-1 truncate">{item.title}</span>
-                      <span className="text-[10px] text-on-muted capitalize shrink-0">
-                        {item.module}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+                        <span className="flex-1 truncate">{item.title}</span>
+                        <span className="text-[10px] text-on-muted capitalize shrink-0">
+                          {moduleName}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}

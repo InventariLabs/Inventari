@@ -65,7 +65,7 @@ async function switchProfile(page: Page, targetName: string) {
 
   const dialog = page.getByRole("alertdialog");
   await expect(dialog).toBeVisible({ timeout: 10000 });
-  await dialog.getByRole("button", { name: /switch profile/i }).click();
+  await dialog.getByRole("button", { name: /switch workspace mode/i }).click();
 
   // The CURRENT badge moves to the target profile once the org refreshes.
   const badge = page.getByText(/^current$/i).first();

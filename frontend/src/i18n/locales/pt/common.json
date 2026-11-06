@@ -756,7 +756,7 @@
     },
     "shell": {
       "groupAdmin": "Administração",
-      "groupIntegrations": "Integrações"
+      "groupModuleSettings": "Configurações dos módulos"
     },
     "rbac": {
       "builtInBadge": "Integrada",

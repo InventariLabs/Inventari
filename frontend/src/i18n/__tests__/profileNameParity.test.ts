@@ -174,6 +174,34 @@ describe("workspace mode name parity", () => {
     expect(problems).toEqual([]);
   });
 
+  it("the launcher's workspace panel in Settings never calls the mode a profile", () => {
+    // Settings → My modules shows this panel under the title "Workspace
+    // mode"; its loading, empty, hint and confirmation texts once said
+    // "profile" in every language.
+    const KEYS = [
+      "reapplyHint",
+      "loading",
+      "empty",
+      "diffConfigHint",
+      "confirmApply",
+      "confirmReapplyMessage",
+    ];
+    const OLD_WORD = /profil|perfi[ls]/i;
+    const problems: string[] = [];
+    for (const lang of MAINTAINED_LANGUAGES) {
+      const launcher = readJson(
+        path.join(SRC, "modules", "launcher", "i18n", `${lang}.json`),
+      );
+      for (const key of KEYS) {
+        const text = dig(launcher, `workspace.${key}`);
+        if (typeof text !== "string" || OLD_WORD.test(text)) {
+          problems.push(`${lang}: workspace.${key} = ${JSON.stringify(text)}`);
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
   it("the English label is neither the identifier nor an architecture word", () => {
     const problems: string[] = [];
     for (const id of PROFILE_IDS) {

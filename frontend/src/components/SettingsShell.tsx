@@ -221,7 +221,7 @@ export default function SettingsShell() {
       ],
     },
     {
-      label: t("settings.shell.groupIntegrations"),
+      label: t("settings.shell.groupModuleSettings"),
       items: moduleSections.map((s) => ({
         label: tDyn(s.title),
         to: `/settings/${s.path}`,

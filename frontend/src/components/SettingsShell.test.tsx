@@ -207,6 +207,10 @@ describe("SettingsShell access", () => {
       expect(approvals).toHaveAttribute("href", "/settings/modules/approvals");
       const stats = screen.getByRole("link", { name: "Statistics" });
       expect(stats).toHaveAttribute("href", "/settings/modules/stats");
+      // Approvals and Statistics are not integrations: the group that
+      // holds module settings says what it holds.
+      expect(screen.queryByText(/integrations/i)).toBeNull();
+      expect(screen.getByText("Module settings")).toBeInTheDocument();
     } finally {
       modulesState.enabledModules = ["core", "items"];
     }
