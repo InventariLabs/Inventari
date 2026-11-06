@@ -241,8 +241,9 @@ describe("CheckoutModal — the person behind the address", () => {
    * pasted and submitted inside the window was stored with no warning ever
    * on screen. Here the address lands and the form is submitted in the same
    * tick, so no timer can settle in between. Measured with the save not
-   * waiting for the check: the first submit posts the checkout
-   * (`expected { … assigned_to_email: 'ghost@example.com' } to be null`).
+   * waiting for the check: only this test goes red, the first submit
+   * having posted the checkout (`expected { item_id: 'item-1', …(2) } to
+   * be null`).
    */
   it("names an address submitted inside the settle window before saving it", async () => {
     mockDirectories({ members: [anna] });
