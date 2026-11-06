@@ -1539,18 +1539,25 @@ type and spacing:
 
 - A CTA only when the reader can act on it: a read-only account gets the title and the
   description, no button it cannot use.
-- **A page's empty state carries all three parts — title, description and CTA.**
+- **A page's empty state carries a title and a description; the CTA belongs
+  to the page, not always to the empty state.**
   The title names the absence ("No locations yet"); the description is a
   separate sentence, never the second half of the title. A heading reading
   "No locations yet. Add your first." renders both sentences in heading
-  weight and size, so the invitation reads as an error message.
+  weight and size, so the invitation reads as an error message. The action
+  goes in the empty state's `primaryAction` unless the page already shows it
+  where the reader looks first — its header, its tab toolbar or the form
+  above the list — in which case a second button beside it is a competing
+  first move and is left out.
 - **A compact empty state inside a card, panel, tab or modal may keep a single
   line** — the description is optional there, and `EmptyState`'s `description`
-  prop stays optional for them. The three-part rule is what a _page_ owes its
+  prop stays optional for them. The description rule is what a _page_ owes its
   reader.
 - `check:empty-state` (part of `make check-frontend`) fails when a file under
-  `modules/<module>/pages/**/*Page.tsx` renders `<EmptyState>` without a
-  `description`.
+  `modules/<module>/pages/**/*Page.tsx`, or a `*EmptyState.tsx` helper a page
+  hands its empty state to (anywhere under `modules/<module>/`), renders
+  `<EmptyState>` without a `description`. It checks the description only; the
+  title and the CTA are for the author and the reviewer.
 
 ### 11.8 Detail Page Header (with back navigation)
 
