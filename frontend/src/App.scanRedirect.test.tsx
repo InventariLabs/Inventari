@@ -50,6 +50,11 @@ vi.mock("@/lib/api/labels", () => ({
   },
 }));
 
+// Shorter than the test's own limit (`testTimeout` in vite.config.ts), so a
+// redirect that really fails reports the spy's "called 0 times" and not
+// "Test timed out": equal windows let the test-level timer win the race.
+const ROUTE_LOADED_WITHIN = 12000;
+
 // A printed QR label carries {base_url}/scan?code=<short_code> (the backend
 // builds this URL in label_print_service). The legacy alias used to drop the
 // query string in the redirect, so a scanned sticker opened an empty scanner
@@ -124,7 +129,7 @@ describe("legacy /scan alias", () => {
       () => {
         expect(labelsApi.scan).toHaveBeenCalledWith("STM-0001");
       },
-      { timeout: 15000 },
+      { timeout: ROUTE_LOADED_WITHIN },
     );
   });
 });
@@ -190,7 +195,7 @@ describe("short /s/ scan address", () => {
       () => {
         expect(labelsApi.scan).toHaveBeenCalledWith(code);
       },
-      { timeout: 15000 },
+      { timeout: ROUTE_LOADED_WITHIN },
     );
   });
 });
