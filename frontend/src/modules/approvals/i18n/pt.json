@@ -271,7 +271,7 @@
     "deadEndCauseNamedUnknown": "Esta etapa indica aprovadores que não conseguem ver as aprovações.",
     "deadEndCauseNoApprover": "A etapa está aberta a qualquer pessoa com a permissão de aprovar, e ninguém nesta organização a tem.",
     "deadEndCauseOnlyRequester": "A etapa está aberta a qualquer pessoa com a permissão de aprovar, mas a única que a tem é quem fez a solicitação — e o solicitante não pode decidir a própria solicitação.",
-    "deadEndStepWithdraw": "Retire a solicitação. O documento volta para Confirmado; pedir aprovação de novo cai na mesma etapa, porque o fluxo continua como está.",
+    "deadEndStepWithdraw": "Retire a solicitação. Pedir aprovação de novo cai na mesma etapa, porque o fluxo continua como está.",
     "deadEndStepGrantNamed": "Dê a {{names}} acesso às aprovações — um perfil com a permissão de leitura de aprovações basta.",
     "deadEndStepGrantNamedUnknown": "Dê aos aprovadores indicados acesso às aprovações — um perfil com a permissão de leitura de aprovações basta.",
     "deadEndStepGrantApprove": "Dê a alguém a permissão de aprovar por meio de um perfil.",

@@ -92,16 +92,19 @@ describe("ApprovalDeadEndNotice — when the members cannot be read", () => {
 });
 
 describe("ApprovalDeadEndNotice — what each reader can do", () => {
-  it("tells the requester to withdraw, and what happens to the document", async () => {
+  it("tells the requester to withdraw, and what asking again does", async () => {
     signInWith([], { id: REQUESTER });
     renderNotice({});
 
     const note = await screen.findByRole("note");
     expect(within(note).getByText(/Withdraw the request/)).toBeInTheDocument();
-    // What follows the withdrawal is said before the click, not discovered.
+    // What follows the withdrawal is said before the click, not discovered —
+    // and promises no status: a purchase order stays parked after it, a
+    // warehouse document goes back, and one sentence serves both.
     expect(
-      within(note).getByText(/goes back to Confirmed/),
+      within(note).getByText(/lands on the same stage/),
     ).toBeInTheDocument();
+    expect(within(note).queryByText(/goes back to/)).not.toBeInTheDocument();
     // Nothing for the requester to chase through a screen they cannot use.
     expect(within(note).queryByRole("link")).not.toBeInTheDocument();
     expect(within(note).getByText(/Ask an administrator/)).toBeInTheDocument();

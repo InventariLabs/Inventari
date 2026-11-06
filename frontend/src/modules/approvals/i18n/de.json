@@ -271,7 +271,7 @@
     "deadEndCauseNamedUnknown": "Diese Stufe nennt genehmigende Personen ohne Zugriff auf Genehmigungen.",
     "deadEndCauseNoApprover": "Die Stufe ist für alle mit dem Genehmigungsrecht offen, und niemand in dieser Organisation hat es.",
     "deadEndCauseOnlyRequester": "Die Stufe ist für alle mit dem Genehmigungsrecht offen, aber die einzige Person mit diesem Recht ist die antragstellende — und ein Antragsteller kann seinen eigenen Antrag nicht entscheiden.",
-    "deadEndStepWithdraw": "Ziehen Sie die Anfrage zurück. Das Dokument kehrt zu „Bestätigt“ zurück; eine neue Genehmigungsanfrage landet auf derselben Stufe, weil der Workflow unverändert bleibt.",
+    "deadEndStepWithdraw": "Ziehen Sie die Anfrage zurück. Eine neue Genehmigungsanfrage landet auf derselben Stufe, weil der Workflow unverändert bleibt.",
     "deadEndStepGrantNamed": "Geben Sie {{names}} Zugriff auf Genehmigungen — eine Rolle mit dem Leserecht für Genehmigungen genügt.",
     "deadEndStepGrantNamedUnknown": "Geben Sie den genannten Personen Zugriff auf Genehmigungen — eine Rolle mit dem Leserecht für Genehmigungen genügt.",
     "deadEndStepGrantApprove": "Geben Sie jemandem das Genehmigungsrecht über eine Rolle.",
