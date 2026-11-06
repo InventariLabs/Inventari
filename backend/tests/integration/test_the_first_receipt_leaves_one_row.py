@@ -14,6 +14,7 @@ movement ledger must explain what the shelf holds afterwards.
 from __future__ import annotations
 
 import asyncio
+import sys
 import time
 import uuid
 from collections.abc import Sequence
@@ -118,10 +119,15 @@ class TestTheSameRaceThroughTheDocumentPath:
             engine, class_=AsyncSession, expire_on_commit=False
         )
 
+        pids: dict[Any, int] = {}
+
         async def run_the_register(doc_id) -> None:
             async with factory() as session:
                 await confirm_document(session, org_id, doc_id, async_test_user.id)
                 await session.commit()
+                # The commit let the connection go: the transaction that
+                # queues is the one begun here.
+                pids[doc_id] = await _backend_pid(session)
                 await complete_document(
                     session,
                     org_id,
@@ -143,10 +149,13 @@ class TestTheSameRaceThroughTheDocumentPath:
                         storage_location_id=location_id,
                     )
                 )
+                holder_pid = await _backend_pid(holder)
                 racers = [
                     asyncio.create_task(run_the_register(doc_id)) for doc_id in doc_ids
                 ]
-                await _wait_for_lock_waiters(factory, racers)
+                await _wait_for_lock_waiters(
+                    factory, racers, [(doc_id, pids) for doc_id in doc_ids], holder_pid
+                )
                 await holder.rollback()
             outcomes = await asyncio.gather(*racers, return_exceptions=True)
         finally:
@@ -175,16 +184,31 @@ class TestTheSameRaceThroughTheDocumentPath:
         )
 
 
-async def _wait_for_lock_waiters(factory, racers: Sequence[asyncio.Task[Any]]) -> None:
-    """Block until one backend of this database per racer is waiting on a lock.
+async def _backend_pid(session: AsyncSession) -> int:
+    """The server process behind *session*, which keeps it until it ends."""
+    return int(await session.scalar(text('SELECT pg_backend_pid()')))
 
-    Scoped to the current database: each xdist worker has its own, so another
-    worker's contention cannot satisfy the count.
 
-    A racer that has finished will never be counted, so the wait ends there,
-    and if it raised, on its own exception.
+async def _wait_for_lock_waiters(
+    factory,
+    racers: Sequence[asyncio.Task[Any]],
+    backends: Sequence[tuple[Any, dict[Any, int]]],
+    holder_pid: int,
+) -> None:
+    """Block until every racer's backend waits on a lock of this race.
+
+    Waiting on the holder's lock, or on a racer queued ahead for the same
+    row, counts; waiting on anyone else's does not.
+
+    ``backends`` names each racer's key in the dict its coroutine writes its
+    backend number to, once its transaction has begun. The lock table is read
+    as it stands, by those numbers: counting waiters in ``pg_stat_activity``
+    took any backend queued on any lock for a racer, so a stranger could let
+    the race go on before a racer had reached the lock.
+
+    A racer that has finished will never queue, so the wait ends there, and
+    if it raised, on its own exception.
     """
-    expected = len(racers)
     deadline = time.monotonic() + _NEVER_ARRIVES_AFTER
     async with factory() as probe:
         while True:
@@ -192,62 +216,88 @@ async def _wait_for_lock_waiters(factory, racers: Sequence[asyncio.Task[Any]]) -
                 if racer.done():
                     racer.result()
                     raise AssertionError('a racer finished without queueing')
-            waiting = await probe.scalar(
-                text(
-                    'SELECT count(*) FROM pg_stat_activity '
-                    "WHERE datname = current_database() AND wait_event_type = 'Lock'"
+            known = [pids[key] for key, pids in backends if key in pids]
+            queued = 0
+            if known:
+                queued = await probe.scalar(
+                    text(
+                        'SELECT count(*) FROM unnest(CAST(:pids AS int[])) AS p(pid) '
+                        'WHERE pg_blocking_pids(p.pid) && CAST(:ours AS int[])'
+                    ),
+                    {'pids': known, 'ours': [holder_pid, *known]},
                 )
-            )
-            # pg_stat_activity is a snapshot per transaction: without ending
-            # it, the loop would reread the moment of its first query forever.
-            await probe.rollback()
-            if waiting >= expected:
+            if queued == len(backends):
                 return
             if time.monotonic() > deadline:
-                activity = (
-                    await probe.execute(
-                        text(
-                            'SELECT current_database(), datname, state, '
-                            'wait_event_type, wait_event, left(query, 60) '
-                            'FROM pg_stat_activity WHERE datname = current_database()'
-                        )
-                    )
-                ).all()
                 raise AssertionError(
-                    f'{waiting} backend(s) waiting on a lock, expected {expected}: '
-                    f'the interleaving this test forces never happened. {activity}'
+                    f'{queued} of {len(backends)} racer(s) waiting on the holder: '
+                    'the interleaving this test forces never happened.'
                 )
             await asyncio.sleep(0.05)
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-class TestARacerThatEndsEndsTheWait:
-    """The count cannot be reached any more, so nothing is left to wait for."""
+class TestTheWaitWatchesItsOwnRacers:
+    """A racer that ends ends the wait; a stranger's queueing is not a racer's."""
 
-    async def _racer_ending_with(self, ending) -> None:
+    async def _waiting_for(self, racer_work, *, strangers: bool = False) -> None:
         engine = create_async_engine(_async_test_url(), echo=False, poolclass=NullPool)
+        factory = async_sessionmaker(engine, class_=AsyncSession)
+        take = text('SELECT pg_advisory_xact_lock(7)')
+        pids: dict[str, int] = {}
         try:
-            await _wait_for_lock_waiters(
-                async_sessionmaker(engine, class_=AsyncSession),
-                [asyncio.create_task(ending())],
-            )
+            async with factory() as holder, factory() as stranger, factory() as idle:
+                holder_pid = await _backend_pid(holder)
+                stranger_pid = await _backend_pid(stranger)
+                pids['idle'] = await _backend_pid(idle)
+                await holder.execute(take)
+                queued = []
+                if strangers:
+                    queued.append(asyncio.create_task(stranger.execute(take)))
+                    await _wait_for_lock_waiters(
+                        factory,
+                        queued,
+                        [('stranger', {'stranger': stranger_pid})],
+                        holder_pid,
+                    )
+                racer = asyncio.create_task(racer_work(pids))
+                try:
+                    await _wait_for_lock_waiters(
+                        factory, [racer], [('racer', pids)], holder_pid
+                    )
+                finally:
+                    racer.cancel()
+                    await holder.rollback()
+                    await asyncio.gather(racer, *queued, return_exceptions=True)
         finally:
             await engine.dispose()
 
     async def test_its_own_exception_is_the_failure(self, real_async_db_session):
-        async def breaks() -> None:
+        async def breaks(_pids) -> None:
             raise LookupError('the register broke')
 
         with pytest.raises(LookupError, match='the register broke'):
-            await self._racer_ending_with(breaks)
+            await self._waiting_for(breaks)
 
     async def test_finishing_without_queueing_is_said(self, real_async_db_session):
-        async def finishes() -> None:
+        async def finishes(_pids) -> None:
             return None
 
         with pytest.raises(AssertionError, match='finished without queueing'):
-            await self._racer_ending_with(finishes)
+            await self._waiting_for(finishes)
+
+    async def test_a_stranger_queueing_on_the_lock_is_not_the_racer(
+        self, real_async_db_session, monkeypatch
+    ):
+        async def idles(pids) -> None:
+            # Its backend is known, and it waits on nothing.
+            pids['racer'] = pids['idle']
+            await asyncio.sleep(30)
+
+        monkeypatch.setattr(sys.modules[__name__], '_NEVER_ARRIVES_AFTER', 0.5)
+        with pytest.raises(AssertionError, match='the interleaving this test forces'):
+            await self._waiting_for(idles, strangers=True)
 
 
 @pytest.mark.integration
@@ -326,10 +376,13 @@ class TestAReceiptThatWaitedForTheRecord:
             engine, class_=AsyncSession, expire_on_commit=False
         )
 
+        pids: dict[Any, int] = {}
+
         async def register(doc_id) -> None:
             async with factory() as session:
                 await confirm_document(session, org_id, doc_id, async_test_user.id)
                 await session.commit()
+                pids[doc_id] = await _backend_pid(session)
                 await complete_document(
                     session,
                     org_id,
@@ -356,8 +409,11 @@ class TestAReceiptThatWaitedForTheRecord:
                 await holder.execute(
                     select(Item.id).where(Item.id == record_id).with_for_update()
                 )
+                holder_pid = await _backend_pid(holder)
                 racers = [asyncio.create_task(register(d)) for d in racing]
-                await _wait_for_lock_waiters(factory, racers)
+                await _wait_for_lock_waiters(
+                    factory, racers, [(d, pids) for d in racing], holder_pid
+                )
                 await holder.rollback()
             await asyncio.gather(*racers)
 

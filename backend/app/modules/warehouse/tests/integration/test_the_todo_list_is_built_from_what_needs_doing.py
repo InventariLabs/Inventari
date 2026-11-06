@@ -20,8 +20,8 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Session
 
 from app.core.contracts import WorkItemDTO, WorkItemQueryDTO
@@ -50,34 +50,14 @@ from app.modules.warehouse.models import (
 from app.modules.warehouse.warehouse_api import warehouse_api
 from app.modules.warehouse.work_item_service import assign_work_item_async
 
+from .test_two_scans_of_one_line import (
+    _backend_pid,
+    _let_racers_finish,
+    _wait_until_parked,
+)
+
 _TODAY = date.today()
 _YESTERDAY = _TODAY - timedelta(days=1)
-_PARK_TIMEOUT = 15.0
-
-
-async def _wait_until_claimants_park(engine: AsyncEngine, racers: int) -> None:
-    """Return once ``racers`` claims wait on the work-item overlay table.
-
-    Only statements against ``work_item_overlays`` are counted: the suite
-    runs other tests in parallel, and an unrelated lock waiter must not pass
-    for one of ours.
-    """
-    probe_engine = engine.execution_options(isolation_level='AUTOCOMMIT')
-    async with probe_engine.connect() as probe:
-        deadline = asyncio.get_running_loop().time() + _PARK_TIMEOUT
-        while True:
-            waiting = await probe.scalar(
-                text(
-                    'SELECT count(*) FROM pg_stat_activity '
-                    "WHERE datname = current_database() AND wait_event_type = 'Lock' "
-                    "AND query LIKE '%work_item_overlays%'"
-                )
-            )
-            if waiting is not None and waiting >= racers:
-                return
-            if asyncio.get_running_loop().time() > deadline:
-                raise AssertionError(f'{racers} claim(s) never parked on the row')
-            await asyncio.sleep(0.02)
 
 
 @pytest.fixture
@@ -634,39 +614,54 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
                 bind=async_engine_fixture, expire_on_commit=False
             )
 
-            async def _claim(assignee: UUID) -> str:
-                async with maker() as db:
-                    try:
-                        await assign_work_item_async(
-                            db,
-                            doc_org.id,
-                            doc_user.id,
-                            source_kind=CUSTOM_SOURCE_KIND,
-                            source_id=item_id,
-                            assignee_id=assignee,
-                            only_if_unassigned=True,
-                        )
-                    except ConflictException as refusal:
-                        assert (
-                            cast(dict[str, Any], refusal.detail)['code']
-                            == 'WORK_ITEM_TAKEN'
-                        )
-                        return 'taken'
-                    await db.commit()
-                    return 'claimed'
+            async def _claim(db: AsyncSession, assignee: UUID) -> str:
+                try:
+                    await assign_work_item_async(
+                        db,
+                        doc_org.id,
+                        doc_user.id,
+                        source_kind=CUSTOM_SOURCE_KIND,
+                        source_id=item_id,
+                        assignee_id=assignee,
+                        only_if_unassigned=True,
+                    )
+                except ConflictException as refusal:
+                    assert (
+                        cast(dict[str, Any], refusal.detail)['code']
+                        == 'WORK_ITEM_TAKEN'
+                    )
+                    return 'taken'
+                await db.commit()
+                return 'claimed'
 
-            async with maker() as blocker:
+            async with maker() as blocker, maker() as mine, maker() as theirs:
                 await blocker.execute(
                     select(WorkItemOverlay.id)
                     .where(WorkItemOverlay.id == item_id)
                     .with_for_update()
                 )
-                first = asyncio.create_task(_claim(doc_user.id))
-                second = asyncio.create_task(_claim(colleague.id))
+                blocker_pid = await _backend_pid(blocker)
+                my_pid, their_pid = await _backend_pid(mine), await _backend_pid(theirs)
+                first = asyncio.create_task(_claim(mine, doc_user.id))
+                second = asyncio.create_task(_claim(theirs, colleague.id))
                 try:
-                    await _wait_until_claimants_park(async_engine_fixture, 2)
-                finally:
+                    # Each claim waits on the row the blocker holds, or behind
+                    # the other claim that is already queued for it.
+                    for racer, pid, other in (
+                        (first, my_pid, their_pid),
+                        (second, their_pid, my_pid),
+                    ):
+                        await _wait_until_parked(
+                            async_engine_fixture,
+                            racer,
+                            racer_pid=pid,
+                            holder_pid=[blocker_pid, other],
+                        )
+                except BaseException:
                     await blocker.rollback()
+                    await _let_racers_finish(first, second)
+                    raise
+                await blocker.rollback()
                 answers = await asyncio.gather(first, second)
             return {doc_user.id: answers[0], colleague.id: answers[1]}
 
