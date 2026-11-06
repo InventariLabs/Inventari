@@ -2,6 +2,8 @@ import { render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
+import { act } from "react";
+import i18n from "i18next";
 import FailedEmailsCard from "./FailedEmailsCard";
 import { server } from "@/test/mocks/server";
 import { onePage } from "@/test/mocks/page";
@@ -75,5 +77,27 @@ describe("FailedEmailsCard", () => {
       await screen.findByRole("button", { name: /try again/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText("Nothing was lost")).not.toBeInTheDocument();
+  });
+
+  it("translates the reasons the mail queue writes itself", async () => {
+    // These sentences come from the backend in English whatever the reader's
+    // language is; they are the part an administrator acts on.
+    server.use(
+      http.get("*/organizations/my/failed-emails", () =>
+        HttpResponse.json(
+          onePage([{ ...FAILURE, last_error: "SMTP is not configured" }]),
+        ),
+      ),
+    );
+    await act(() => i18n.changeLanguage("de"));
+    try {
+      renderCard();
+
+      const row = await screen.findByTestId("failed-email-row");
+      expect(within(row).queryByText(/SMTP is not configured/)).toBeNull();
+      expect(within(row).getByText(/^Grund: .*SMTP/)).toBeInTheDocument();
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 });

@@ -129,6 +129,21 @@ describe("LabelGenerateModal — label purpose", () => {
     });
   });
 
+  it("holds the number of labels at the 500 the server accepts", async () => {
+    // The input's max attribute is only a hint to the spinner arrows; typing
+    // 600 used to leave as a request and come back a 422.
+    renderModal();
+
+    const count = screen.getByLabelText("Number of labels (1–500)");
+    fireEvent.change(count, { target: { value: "600" } });
+
+    expect(count).toHaveValue(500);
+    fireEvent.click(screen.getByTestId("export-labels-btn"));
+    await waitFor(() => {
+      expect(generatePayload).toMatchObject({ count: 500 });
+    });
+  });
+
   it("sends the number of labels and the internal description as typed", async () => {
     renderModal();
 

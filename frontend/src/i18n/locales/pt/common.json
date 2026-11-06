@@ -849,7 +849,12 @@
       "none": "Nada se perdeu",
       "noneHint": "Todas as mensagens enviadas por esta organização saíram.",
       "attempts": "{{n}} de {{max}} tentativas",
-      "reason": "Motivo: {{reason}}"
+      "reason": "Motivo: {{reason}}",
+      "reasons": {
+        "notConfigured": "O SMTP ainda não está configurado",
+        "halfLogin": "O utilizador e a palavra-passe do SMTP têm de ser preenchidos os dois ou deixados os dois vazios",
+        "unreported": "O servidor de correio não indicou nenhum motivo"
+      }
     },
     "about": {
       "subtitle": "Versão, licença e código-fonte desta instalação",

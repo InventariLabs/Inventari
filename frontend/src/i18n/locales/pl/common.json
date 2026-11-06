@@ -857,7 +857,12 @@
       "none": "Nic nie przepadło",
       "noneHint": "Każda wiadomość tej organizacji opuściła serwer.",
       "attempts": "{{n}} z {{max}} prób",
-      "reason": "Powód: {{reason}}"
+      "reason": "Powód: {{reason}}",
+      "reasons": {
+        "notConfigured": "SMTP nie jest jeszcze skonfigurowany",
+        "halfLogin": "Nazwa użytkownika i hasło SMTP muszą być podane oba albo oba puste",
+        "unreported": "Serwer poczty nie podał powodu"
+      }
     },
     "about": {
       "subtitle": "Wersja, licencja i kod źródłowy tej instalacji",

@@ -855,7 +855,12 @@
       "none": "Rien n'a été perdu",
       "noneHint": "Tous les messages de cette organisation ont quitté le serveur.",
       "attempts": "{{n}} tentatives sur {{max}}",
-      "reason": "Raison : {{reason}}"
+      "reason": "Raison : {{reason}}",
+      "reasons": {
+        "notConfigured": "SMTP n’est pas encore configuré",
+        "halfLogin": "L’identifiant et le mot de passe SMTP doivent être renseignés tous les deux, ou laissés vides tous les deux",
+        "unreported": "Le serveur de messagerie n’a donné aucune raison"
+      }
     },
     "about": {
       "subtitle": "Version, licence et code source de cette installation",

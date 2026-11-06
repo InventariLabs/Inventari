@@ -839,10 +839,9 @@ describe("DocumentFormModal", () => {
     // per-field mapping is covered by parseApiValidationErrors unit tests
     // and the aggregate validation tests.
     expect(createMutate).toHaveBeenCalled();
-    // The 422 field is named now — the message no longer arrives alone.
-    expect(toastError).toHaveBeenCalledWith(
-      "partner_id: Partner id is required",
-    );
+    // The toast carries the server's sentence alone; the API key of the
+    // field (`partner_id`) is not the reader's word for it.
+    expect(toastError).toHaveBeenCalledWith("Partner id is required");
     expect(toastSuccess).not.toHaveBeenCalled();
   });
 

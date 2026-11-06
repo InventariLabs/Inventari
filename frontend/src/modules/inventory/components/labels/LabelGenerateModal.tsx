@@ -14,6 +14,9 @@ import { Sheet, SheetActions, SheetFooter } from "@/components/ui/Sheet";
 /** The purpose id used for plain product labels — the pool's own default. */
 const PRODUCT_PURPOSE = "";
 
+/** The most labels one batch may hold; the server refuses a larger count. */
+const MAX_LABELS_PER_BATCH = 500;
+
 interface GenData {
   count: number;
   prefix: string;
@@ -104,13 +107,16 @@ export function LabelGenerateModal({
               id="label-generate-count"
               type="number"
               min="1"
-              max="500"
+              max={MAX_LABELS_PER_BATCH}
               autoFocus
               value={genData.count}
               onChange={(e) =>
                 setGenData({
                   ...genData,
-                  count: parseInt(e.target.value) || 1,
+                  count: Math.min(
+                    parseInt(e.target.value) || 1,
+                    MAX_LABELS_PER_BATCH,
+                  ),
                 })
               }
               className="text-center text-xl"
