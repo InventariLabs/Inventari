@@ -420,10 +420,9 @@ describe("AssetDetailPage — asking for approval", () => {
     renderDetail();
 
     await askForTheCheckoutOf("Kasia Kowalska");
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
-        "An approval is already pending",
-      ),
+    // Read in the dialog the request was sent from, not in a toast outside it.
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "An approval is already pending",
     );
   });
 });
