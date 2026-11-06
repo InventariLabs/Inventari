@@ -63,7 +63,7 @@ describe("PricelistFormModal — each field writes its own key", () => {
     render(
       <Harness
         initial={{
-          ...emptyForm,
+          ...emptyForm(),
           product: PRODUCT,
           validFrom: "2026-01-10",
           validTo: "2026-01-20",
@@ -119,7 +119,7 @@ describe("PricelistFormModal — each field writes its own key", () => {
     render(
       <Harness
         initial={{
-          ...emptyForm,
+          ...emptyForm(),
           product: PRODUCT,
           unitPrice: "3",
           validFrom: "2026-02-10",
@@ -137,7 +137,7 @@ describe("PricelistFormModal — each field writes its own key", () => {
     const onSave = vi.fn();
     render(
       <Harness
-        initial={{ ...emptyForm, unitPrice: "3", minQuantity: "0" }}
+        initial={{ ...emptyForm(), unitPrice: "3", minQuantity: "0" }}
         onSave={onSave}
       />,
     );
@@ -149,7 +149,7 @@ describe("PricelistFormModal — each field writes its own key", () => {
     const search = vi
       .fn()
       .mockImplementation(async (q: string) => (q === "lat" ? [PRODUCT] : []));
-    render(<Harness initial={emptyForm} search={search} />);
+    render(<Harness initial={emptyForm()} search={search} />);
     fireEvent.change(screen.getByLabelText(/^Product/), {
       target: { value: "lat" },
     });

@@ -76278,6 +76278,17 @@
             ],
             "title": "Preferred Partner Id"
           },
+          "preferred_partner_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Partner Name"
+          },
           "notes": {
             "anyOf": [
               {

@@ -271,6 +271,7 @@
     "emptyFilteredTitle": "Żadna reguła nie pasuje do filtrów",
     "emptyFilteredDescription": "Wyczyść wyszukiwanie albo wybierz inne miejsce.",
     "alertStock": "dostępne {{available}} / min {{min}}",
+    "alertStockSafety": "dostępne {{available}} / zapas bezpieczeństwa {{threshold}}",
     "alertLocation": "w {{location}}",
     "alertSupplier": "dostawca {{supplier}}",
     "noSupplier": "Brak dostawcy",

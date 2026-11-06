@@ -227,6 +227,15 @@ class ReorderRule(Base):
         return self.product_template.name if self.product_template else ''
 
     @property
+    def preferred_partner_name(self) -> str | None:
+        """The preferred supplier's name, ``None`` when the rule names none.
+
+        The relationship is selectin-loaded, so the list of rules carries the
+        names without a read per supplier.
+        """
+        return self.preferred_partner.name if self.preferred_partner else None
+
+    @property
     def uom_id(self) -> uuid.UUID | None:
         """Unit of the product this rule replenishes.
 

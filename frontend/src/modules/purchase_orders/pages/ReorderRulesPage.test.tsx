@@ -92,6 +92,7 @@ const RULE = {
   max_quantity: 10,
   safety_stock: 1,
   preferred_partner_id: "p-1",
+  preferred_partner_name: "ACME",
   notes: null,
 };
 
@@ -229,26 +230,37 @@ describe("ReorderRulesPage edit form state", () => {
     ).toBeInTheDocument();
   });
 
-  it("names a preferred supplier that no page of the register lists", async () => {
+  it("names the preferred suppliers from the rules, without reading each partner", async () => {
     modules.enabled = ["purchase_orders", "partners"];
+    const readById: string[] = [];
     server.use(
       http.get("/api/v1/purchase-orders/reorder-rules", () =>
         HttpResponse.json(
-          onePage([{ ...RULE, preferred_partner_id: "p-900" }]),
+          onePage([
+            {
+              ...RULE,
+              preferred_partner_id: "p-900",
+              preferred_partner_name: "Supplier 900",
+            },
+            {
+              ...RULE,
+              id: "rule-2",
+              preferred_partner_id: "p-901",
+              preferred_partner_name: "Supplier 901",
+            },
+          ]),
         ),
       ),
-      http.get("/api/v1/partners/p-900", () =>
-        HttpResponse.json({
-          id: "p-900",
-          name: "Supplier 900",
-          type: "SUPPLIER",
-          is_active: true,
-        }),
-      ),
+      http.get("/api/v1/partners/:id", ({ params }) => {
+        readById.push(String(params.id));
+        return HttpResponse.json({ id: params.id, name: "wrong" });
+      }),
     );
     render(<PageHost />, { wrapper: createWrapper() });
 
     expect(await screen.findByText("Supplier 900")).toBeInTheDocument();
+    expect(screen.getByText("Supplier 901")).toBeInTheDocument();
+    expect(readById).toEqual([]);
   });
 
   it("looks the typed supplier up on the server instead of in a capped list", async () => {
