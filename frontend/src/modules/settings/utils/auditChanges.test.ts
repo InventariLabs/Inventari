@@ -12,6 +12,7 @@ import plRecipes from "@/modules/recipes/i18n/pl.json";
 import {
   auditChanges,
   auditFieldLabel,
+  auditFieldTitles,
   formatAuditValue,
   snapshotIdentity,
 } from "./auditChanges";
@@ -36,6 +37,33 @@ describe("auditFieldLabel", () => {
       key) as unknown as Parameters<typeof auditFieldLabel>[1];
 
     expect(auditFieldLabel("shelf_location", named)).toBe("Shelf Location");
+  });
+});
+
+describe("auditFieldTitles", () => {
+  const real = ((key: string, opts?: { defaultValue?: string }) => {
+    let node: unknown = enCommon;
+    for (const part of key.split(".")) {
+      node = (node as Record<string, unknown> | undefined)?.[part];
+    }
+    return typeof node === "string" ? node : (opts?.defaultValue ?? key);
+  }) as unknown as Parameters<typeof auditFieldLabel>[1];
+
+  it("counts a recipe's lines as ingredients and a document's as plain lines", () => {
+    const recipe = auditFieldTitles("maker_recipe");
+    const document = auditFieldTitles("document");
+
+    expect(auditFieldLabel("lines", real, recipe)).toBe("Ingredient lines");
+    expect(auditFieldLabel("lines", real, document)).toBe("Lines");
+    expect(
+      auditFieldLabel("lines", real, auditFieldTitles("purchase_order")),
+    ).toBe("Lines");
+  });
+
+  it("keeps the titles a module gave its own settings", () => {
+    const titles = auditFieldTitles("module", { limit: "mod:limit" });
+
+    expect(titles).toMatchObject({ limit: "mod:limit" });
   });
 });
 

@@ -88,6 +88,15 @@ describe("check-audit-fields", () => {
     expect(gaps(declared)).toEqual([]);
   });
 
+  it("names every target type the backend declares in every catalogue, today", () => {
+    const declared = JSON.parse(
+      readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
+    )["target-types"];
+
+    expect(declared.length).toBeGreaterThan(20);
+    expect(gaps(declared, catalogKeys(undefined, "targetTypes"))).toEqual([]);
+  });
+
   it("writes and reloads a baseline without losing a gap", () => {
     // The baseline is the escape hatch for a key that was already untranslated
     // when the gate arrived. If it silently loses entries, "no gap beyond the
@@ -123,7 +132,10 @@ describe("check-audit-fields label gaps", () => {
     for (const language of ["en", "pl", "de", "fr", "es"]) {
       mkdirSync(join(dir, language), { recursive: true });
       const json = JSON.parse(
-        readFileSync(join(ROOT, `src/i18n/locales/${language}/common.json`), "utf8"),
+        readFileSync(
+          join(ROOT, `src/i18n/locales/${language}/common.json`),
+          "utf8",
+        ),
       );
       delete json.settings.audit.fields.barcode;
       writeFileSync(join(dir, language, "common.json"), JSON.stringify(json));
@@ -144,6 +156,44 @@ describe("check-audit-fields label gaps", () => {
     expect(output).toContain("en: barcode");
     expect(output).toContain("pl: barcode");
     expect(output).toContain("settings.audit.fields.barcode");
+  });
+});
+
+describe("check-audit-fields target-type gaps", () => {
+  // Same teeth as the field labels: a type removed from the catalogues has to
+  // fail the gate and be named, in the section it belongs to.
+  const dir = mkdtempSync(join(tmpdir(), "audit-target-types-"));
+  afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("falls and names the type when one catalogue entry is removed", () => {
+    for (const language of ["en", "pl", "de", "fr", "es"]) {
+      mkdirSync(join(dir, language), { recursive: true });
+      const json = JSON.parse(
+        readFileSync(
+          join(ROOT, `src/i18n/locales/${language}/common.json`),
+          "utf8",
+        ),
+      );
+      if (language !== "fr") delete json.settings.audit.targetTypes.stock_lot;
+      writeFileSync(join(dir, language, "common.json"), JSON.stringify(json));
+    }
+
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, AUDIT_LOCALES_DIR: dir },
+      },
+    );
+    const output = `${stdout}${stderr}`;
+
+    expect(status).toBe(1);
+    expect(output).toContain("en: stock_lot (targetTypes)");
+    expect(output).toContain("de: stock_lot (targetTypes)");
+    expect(output).not.toContain("fr: stock_lot");
+    expect(output).toContain("settings.audit.targetTypes.stock_lot");
   });
 });
 
@@ -219,21 +269,36 @@ describe("check-audit-fields --freshness", () => {
     expect(output).toContain("no longer declared: a_field_the_writers_dropped");
   });
 
+  it("fails when the artefact has not kept up with the target types", () => {
+    const withTypes = (path, types) => {
+      writeFileSync(
+        path,
+        JSON.stringify({
+          "declarations-read": 4,
+          "uncovered-writer-files": [],
+          keys: ["barcode"],
+          "target-types": types,
+        }),
+      );
+      return path;
+    };
+    const saved = withTypes(join(dir, "saved-types.json"), ["item"]);
+    const fresh = withTypes(join(dir, "fresh-types.json"), ["item", "label"]);
+
+    const { status, output } = runGate(saved, fresh);
+
+    expect(status).toBe(1);
+    expect(output).toContain("missing: label");
+    expect(output).toContain("make sync-audit-fields");
+  });
+
   it("fails when a writer lost its declaration at the same keys", () => {
     // The declarations-read counter exists so a writer without its
     // declaration shows as a fall, not as no writer: keys can stay identical
     // (a duplicate pair elsewhere) while a writer went unread. Comparing
     // keys alone is how a renamed declaration once passed the gate.
-    const saved = artifact(
-      join(dir, "saved-declared.json"),
-      ["barcode"],
-      4,
-    );
-    const fresh = artifact(
-      join(dir, "fresh-undeclared.json"),
-      ["barcode"],
-      3,
-    );
+    const saved = artifact(join(dir, "saved-declared.json"), ["barcode"], 4);
+    const fresh = artifact(join(dir, "fresh-undeclared.json"), ["barcode"], 3);
 
     const { status, output } = runGate(saved, fresh);
 
@@ -247,18 +312,10 @@ describe("check-audit-fields --freshness", () => {
     // uncovered-writer-files is the artefact naming the writers it could not
     // read. Saved and exported have to agree on it, or a new undeclared
     // writer ships behind a regenerated-looking artefact.
-    const saved = artifact(
-      join(dir, "saved-covered.json"),
-      ["barcode"],
-      4,
-      [],
-    );
-    const fresh = artifact(
-      join(dir, "fresh-uncovered.json"),
-      ["barcode"],
-      4,
-      ["app.services.thing_config"],
-    );
+    const saved = artifact(join(dir, "saved-covered.json"), ["barcode"], 4, []);
+    const fresh = artifact(join(dir, "fresh-uncovered.json"), ["barcode"], 4, [
+      "app.services.thing_config",
+    ]);
 
     const { status, output } = runGate(saved, fresh);
 
