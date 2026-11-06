@@ -9,7 +9,14 @@
  * gate does in CI — its exit code and what it prints.
  */
 import { spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -45,11 +52,14 @@ export function makeRepo() {
  * Copy `script` (and the sibling files it imports) next to the fixture and run it.
  *
  * `siblings` are files or directories under `scripts/`; test files are left out.
+ * `patch` maps a path under `scripts/` to a function from its copied text to the
+ * text the gate should run with — for a spec that needs a gate's input to differ
+ * from what the repo ships (a detector that is report-only, say).
  */
 export function runGate(
   repo,
   script,
-  { args = [], siblings = [], env = {}, nodeArgs = [] } = {},
+  { args = [], siblings = [], nodeArgs = [], patch = {} } = {},
 ) {
   for (const name of [script, ...siblings]) {
     cpSync(join(SCRIPTS, name), join(repo.frontend, "scripts", name), {
@@ -57,13 +67,16 @@ export function runGate(
       filter: (source) => !source.endsWith(".test.mjs"),
     });
   }
+  for (const [name, edit] of Object.entries(patch)) {
+    const target = join(repo.frontend, "scripts", name);
+    writeFileSync(target, edit(readFileSync(target, "utf8")));
+  }
   const result = spawnSync(
     process.execPath,
     [...nodeArgs, join(repo.frontend, "scripts", script), ...args],
     {
       cwd: repo.frontend,
       encoding: "utf8",
-      env: { ...process.env, ...env },
     },
   );
   return {
