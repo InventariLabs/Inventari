@@ -406,7 +406,7 @@ class TestTheRebuildRunsItsStepsInOrder:
             seed_data, 'seed_all', lambda **k: order.append('seed:system')
         )
         monkeypatch.setattr(
-            commands_user, 'create_admin', lambda **k: order.append('admin')
+            commands_user, 'provision_admin', lambda **k: order.append('admin')
         )
 
         async def _onboard(_email: str) -> None:
@@ -468,7 +468,7 @@ class TestTheRebuildRunsItsStepsInOrder:
         monkeypatch.setattr(seed_data, 'seed_all', lambda **k: None)
         created: dict = {}
         monkeypatch.setattr(
-            commands_user, 'create_admin', lambda **k: created.update(k)
+            commands_user, 'provision_admin', lambda **k: created.update(k)
         )
 
         async def _onboard(_email: str) -> None:
