@@ -1342,6 +1342,36 @@ describe("ReceiveGoodsPage", () => {
     expect(state.postNew.mock.calls[2][0].key).not.toBe(firstKey);
   });
 
+  it("names a draft save as a press too, apart from the post of the same sheet", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.selectOptions(screen.getByLabelText("From"), "partner-1");
+    await screen.findByText("Jasmine Rice");
+    const later = () => screen.getByRole("button", { name: "Finish later" });
+
+    // The answer is lost on the way back: the server wrote the draft, the
+    // screen says it could not, and the reader saves again.
+    state.createDraft.mockRejectedValueOnce(new Error("network"));
+    await user.click(later());
+    await waitFor(() => expect(state.createDraft).toHaveBeenCalledTimes(1));
+    const draftKey = state.createDraft.mock.calls[0][0].key;
+    expect(draftKey).toEqual(expect.any(String));
+
+    // The same sheet is the same save: the server answers with the first draft.
+    state.createDraft.mockRejectedValueOnce(new Error("network"));
+    await user.click(later());
+    await waitFor(() => expect(state.createDraft).toHaveBeenCalledTimes(2));
+    expect(state.createDraft.mock.calls[1][0].key).toBe(draftKey);
+
+    // Posting the sheet is another press: under the draft's key the server
+    // would answer the post with the draft.
+    await user.click(
+      screen.getByRole("button", { name: "Receive into stock" }),
+    );
+    await waitFor(() => expect(state.postNew).toHaveBeenCalledTimes(1));
+    expect(state.postNew.mock.calls[0][0].key).not.toBe(draftKey);
+  });
+
   it("names the next identical delivery afresh once the receipt is answered", async () => {
     const user = userEvent.setup();
     renderPage();
@@ -1909,7 +1939,7 @@ describe("ReceiveGoodsPage", () => {
         await screen.findByText("Document doc-9#receive"),
       ).toBeInTheDocument();
       expect(state.createDraft).toHaveBeenCalledTimes(1);
-      expect(state.createDraft.mock.calls[0][0]).toEqual(
+      expect(state.createDraft.mock.calls[0][0].data).toEqual(
         expect.objectContaining({
           type: "IN",
           partner_id: "partner-1",
@@ -1966,7 +1996,7 @@ describe("ReceiveGoodsPage", () => {
       expect(
         await screen.findByText("Document doc-9#receive"),
       ).toBeInTheDocument();
-      expect(state.createDraft.mock.calls[0][0]).toEqual(
+      expect(state.createDraft.mock.calls[0][0].data).toEqual(
         expect.objectContaining({
           partner_id: "partner-1",
           lines: [
@@ -2046,7 +2076,7 @@ describe("ReceiveGoodsPage", () => {
       expect(
         await screen.findByText("Document doc-9#receive"),
       ).toBeInTheDocument();
-      expect(state.createDraft.mock.calls[0][0]).toEqual(
+      expect(state.createDraft.mock.calls[0][0].data).toEqual(
         expect.objectContaining({
           type: "IN",
           partner_id: "partner-1",

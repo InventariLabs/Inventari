@@ -74,6 +74,13 @@ describe("POActionBar — the phone menu and a withdrawn request", () => {
     expect(props.onReceive).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps Confirm of a draft on the header row, outside the menu", async () => {
+    const props = renderBar(order({ status: "DRAFT" }));
+    // A draft's next step is confirming it: no menu opened.
+    await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    expect(props.onAction).toHaveBeenCalledWith("confirm");
+  });
+
   it("says under a disabled action why it cannot run", async () => {
     renderBar(order({ partner_id: null }));
     await userEvent.click(screen.getByRole("button", { name: "More actions" }));

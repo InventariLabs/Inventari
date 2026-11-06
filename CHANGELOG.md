@@ -109,6 +109,10 @@ says what the release does rather than what changed since them.
   is shown only while those modules are enabled. The recipes option "Register
   production as internal issue documents" uses it, so an organization without
   the warehouse is no longer offered an option that would do nothing.
+- `POST /warehouse/documents`, which writes a draft, takes an `Idempotency-Key`
+  header as `POST /warehouse/documents/post` does: the same key sent again is
+  answered with the draft the first request wrote instead of a second one. A
+  request without the header writes a draft each time, as before.
 
 ### Fixed
 
@@ -236,6 +240,23 @@ says what the release does rather than what changed since them.
   the saved count is back on the screen.
 - Ticking two filter chips quickly on the product list no longer drops the
   first one from the address, which turned it off a moment later.
+- The product list keeps its order when you come back to it: the sort is part
+  of the address, so Back from a product finds the rows where you left them,
+  and a chip ticked in the same moment as a change of sort stays on after Back
+  too.
+- A product's place on the product list is left blank while its name is still
+  on its way, also after a search, another page or a chip changes the rows; it
+  used to read "Unknown" until the names arrived. A place whose name cannot be
+  loaded still says "Unknown".
+- Saving a receipt as a draft again after the answer was lost on the way back
+  (a phone changing networks) no longer leaves a second draft behind: the
+  answer is the draft the first save wrote.
+- A purchase order's approval panel follows the approvals settings: after
+  "Admins may approve their own requests" is saved, going back to the order
+  offers Approve without a reload.
+- The confirmation after saving a module's settings is worded in the interface
+  language, and the one after signing in in the language of the screen the
+  account opens in, not the device's.
 - The notice to an approver names the document, who asked and the net amount,
   in the app and by e-mail.
 - Completing a purchase order sends one notice per person; an administrator who

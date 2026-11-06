@@ -7,8 +7,10 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.contracts import AuditAction, AuditTargetType
+from app.core.db_utils import acquire_advisory_lock
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.logging import get_logger
 from app.core.public_api import core_api
@@ -519,6 +521,28 @@ async def _currency_from_named_order_lines_async(
     return distinct.pop() if len(distinct) == 1 else None
 
 
+async def document_of_press(
+    db: AsyncSession, org_id: UUID, post_key: str
+) -> Document | None:
+    """The document a press already made, or ``None`` for a press not seen yet.
+
+    ``post_key`` names one press of a screen. The same press sent again — a
+    double click, a retry after the answer was lost on the way back — must be
+    answered with what the first one wrote, not write a second document. The
+    lock makes the second wait for the first to commit instead of racing it,
+    and holds until this transaction ends, so the caller writes the key on the
+    document it makes before anyone else can look.
+    """
+    await acquire_advisory_lock(db, f'document_post_key:{org_id}:{post_key}')
+    return (
+        await db.execute(
+            select(Document)
+            .where(Document.organization_id == org_id, Document.post_key == post_key)
+            .options(selectinload(Document.lines))
+        )
+    ).scalar_one_or_none()
+
+
 async def create_document(
     db: AsyncSession,
     org_id: UUID,
@@ -527,8 +551,13 @@ async def create_document(
     *,
     currency: str | None = None,
     stock_already_applied: bool = False,
+    post_key: str | None = None,
 ) -> Document:
     """Create a DRAFT document.
+
+    ``post_key`` names the press, as on ``post_new_document``: a draft saved
+    again under the key of a save whose answer was lost is answered with the
+    draft the first save wrote, so the reader does not find two in Drafts.
 
     ``currency`` is for callers that build a document out of one already
     priced elsewhere — a receipt made from a purchase order, say. Passing it
@@ -543,6 +572,11 @@ async def create_document(
     """
     from . import document_types as dt
     from .document_type_config_service import get_type_config
+
+    if post_key:
+        made = await document_of_press(db, org_id, post_key)
+        if made is not None:
+            return made
 
     # The closure dialog says documents dated in the month "can no longer be
     # created or edited", and until now only the second half was true: the
@@ -623,6 +657,7 @@ async def create_document(
         created_by=user_id,
         currency=currency,
         stock_already_applied=stock_already_applied,
+        post_key=post_key,
     )
     for i, line_data in enumerate(data.lines, 1):
         doc.lines.append(

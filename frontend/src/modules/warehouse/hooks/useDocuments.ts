@@ -58,7 +58,8 @@ export function useFetchDocument() {
 
 export function useCreateDocument() {
   return useAppMutation(
-    (data: DocumentCreate) => documentsApi.create(data),
+    ({ data, key }: { data: DocumentCreate; key?: string }) =>
+      documentsApi.create(data, key),
     (qc) => {
       invalidation.documents(qc);
     },

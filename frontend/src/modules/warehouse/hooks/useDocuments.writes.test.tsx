@@ -121,7 +121,7 @@ describe("useDocuments writes — the right call, then the right caches dropped"
     );
 
     await act(() =>
-      result.current.create.mutateAsync({ type: "OUT" } as never),
+      result.current.create.mutateAsync({ data: { type: "OUT" } as never }),
     );
     await act(() => result.current.confirm.mutateAsync("doc-4"));
     await act(() => result.current.duplicate.mutateAsync("doc-4"));

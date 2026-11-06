@@ -6,10 +6,8 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.core.contracts import AuditAction, AuditTargetType
-from app.core.db_utils import acquire_advisory_lock
 from app.core.events import emit_transactional_safe
 from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
@@ -1018,19 +1016,10 @@ async def post_new_document(
     first one made and is answered with it, so the stock moves once. The
     lock makes the second wait for the first to commit instead of racing it.
     """
-    from ._document_workflow_crud import create_document
+    from ._document_workflow_crud import create_document, document_of_press
 
     if post_key:
-        await acquire_advisory_lock(db, f'document_post_key:{org_id}:{post_key}')
-        made = (
-            await db.execute(
-                select(Document)
-                .where(
-                    Document.organization_id == org_id, Document.post_key == post_key
-                )
-                .options(selectinload(Document.lines))
-            )
-        ).scalar_one_or_none()
+        made = await document_of_press(db, org_id, post_key)
         if made is not None:
             return made
 

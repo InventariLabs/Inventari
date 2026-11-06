@@ -28,7 +28,7 @@ function sortFromAddress(params: URLSearchParams): {
  * zero changes.
  */
 export function useItemFilters() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const f = useFilteredList(
     {
@@ -168,23 +168,20 @@ export function useItemFilters() {
     // from the list and left with Back finds the rows where the reader had
     // put them, not in the default order under the same scroll offset. The
     // default order stays out of the address.
+    // It goes through the list's own writes, so a chip tapped in the same
+    // moment stays in the address beside it.
     setSort: (by: ItemSortBy, order: ItemSortOrder) => {
       setSortByState(by);
       setSortOrderState(order);
-      setSearchParams(
-        (current) => {
-          const next = new URLSearchParams(current);
-          if (by === "created_at" && order === "desc") {
-            next.delete("sort_by");
-            next.delete("sort_order");
-          } else {
-            next.set("sort_by", by);
-            next.set("sort_order", order);
-          }
-          return next;
-        },
-        { replace: true },
-      );
+      f.writeParams((next) => {
+        if (by === "created_at" && order === "desc") {
+          next.delete("sort_by");
+          next.delete("sort_order");
+        } else {
+          next.set("sort_by", by);
+          next.set("sort_order", order);
+        }
+      });
     },
     // UI state
     showFilters,
