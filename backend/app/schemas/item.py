@@ -642,6 +642,8 @@ class ArchivedItemSchema(BaseModel):
     deleted_at: datetime | None = None
     deleted_by: UUID | None = None
     deletion_reason: str | None = None
+    #: What the person typed under "Notes" in the delete dialog, if anything.
+    deletion_notes: str | None = None
     category: ArchivedCategoryBrief | None = None
 
 

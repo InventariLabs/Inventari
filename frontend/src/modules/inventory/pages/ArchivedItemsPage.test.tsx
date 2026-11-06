@@ -39,6 +39,7 @@ const archivedRows = [
     id: "1",
     name: "Old Bread",
     deletion_reason: "other", // backend stores lowercase
+    deletion_notes: "wrong product, entered by mistake",
     deleted_at: "2026-07-01T00:00:00Z",
     category: { name: "Bakery" },
   },
@@ -141,6 +142,16 @@ describe("ArchivedItemsPage", () => {
     expect(screen.getByText("Expired")).toBeInTheDocument();
     // no raw keys leak to the UI
     expect(screen.queryByText(/deletionReasons/i)).toBeNull();
+  });
+
+  it("shows the note given in the delete dialog next to the product, and none where there was none", () => {
+    renderPage();
+
+    expect(
+      screen.getByText("wrong product, entered by mistake"),
+    ).toBeInTheDocument();
+    // Only the one row that carries a note gets the label.
+    expect(screen.getAllByText("Note:")).toHaveLength(1);
   });
 
   it("translates the ARCHIVED reason the module flows write", () => {

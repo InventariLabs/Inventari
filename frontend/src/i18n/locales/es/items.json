@@ -488,6 +488,7 @@
   "archivedNoMatchesDesc": "Compruebe la ortografía o borre la búsqueda para ver todo el archivo.",
   "archivedReasonLabel": "Motivo",
   "archivedDeletedAtLabel": "Eliminado",
+  "archivedNoteLabel": "Nota",
   "groupByCategory": "Agrupar por categoría",
   "totals": {
     "label": "Total",

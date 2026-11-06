@@ -42,6 +42,7 @@ from app.services.items import (
 from app.services.items._query_get import count_needing_attention_async
 from app.services.items._query_special import (
     get_archived_items_async,
+    get_deletion_notes_async,
     get_expiring_items_async,
 )
 from app.services.items.low_stock import claimed_tags_for
@@ -275,6 +276,7 @@ async def get_archived_items(
         module_scope=module_scope,
         search=search,
     )
+    notes = await get_deletion_notes_async(db, [item.id for item in items])
     result = []
     for item in items:
         result.append(
@@ -292,6 +294,7 @@ async def get_archived_items(
                 deleted_at=item.deleted_at,
                 deleted_by=item.deleted_by,
                 deletion_reason=item.deletion_reason,
+                deletion_notes=notes.get(item.id),
                 category=ArchivedCategoryBrief(
                     id=item.category.id,
                     name=item.category.name,

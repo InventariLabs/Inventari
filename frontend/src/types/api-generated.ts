@@ -11530,6 +11530,8 @@ export interface components {
             deleted_by?: string | null;
             /** Deletion Reason */
             deletion_reason?: string | null;
+            /** Deletion Notes */
+            deletion_notes?: string | null;
             category?: components["schemas"]["ArchivedCategoryBrief"] | null;
         };
         /**
