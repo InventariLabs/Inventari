@@ -10,6 +10,7 @@ import { useStockMoves } from "@/modules/inventory/hooks/useStockMoves";
 import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { recordsMovements } from "@/modules/inventory/constants/movementModules";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
+import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
 
 /** How many moves the overview shows; the journal holds the rest. */
 export const RECENT_MOVES_LIMIT = 5;
@@ -52,6 +53,7 @@ function outboundPhrase(
 function moveJournalEntry(
   move: StockMoveRow,
   t: TFunction,
+  placeName: ReturnType<typeof useStorageLocationLabels>,
   now?: Date,
 ): JournalEntry {
   const quantity = formatQuantityLocalized(
@@ -61,8 +63,12 @@ function moveJournalEntry(
   );
   // The outside is declined by the slot it fills: what came in "from
   // outside" did not also leave "from outside".
-  const from = move.from_location_name ?? t("inventory:moves.outsideFrom");
-  const to = move.to_location_name ?? t("inventory:moves.outsideTo");
+  const from =
+    placeName(move.from_location_id, move.from_location_name) ??
+    t("inventory:moves.outsideFrom");
+  const to =
+    placeName(move.to_location_id, move.to_location_name) ??
+    t("inventory:moves.outsideTo");
   const at = move.completed_at ?? move.created_at ?? null;
 
   const [tone, phrase]: [JournalEntry["tone"], string] = !move.from_location_id
@@ -98,6 +104,14 @@ export function DashboardRecentMoves() {
     exclude_module_contexts: excludeModuleContexts,
   });
 
+  // Named by path: "Shelf 1 → Shelf 1" is two warehouses' shelves read as one.
+  const placeName = useStorageLocationLabels(
+    (data?.items ?? []).flatMap((move) => [
+      move.from_location_id,
+      move.to_location_id,
+    ]),
+  );
+
   if (isError) {
     return (
       <Card className="p-4 sm:p-5">
@@ -109,7 +123,9 @@ export function DashboardRecentMoves() {
   return (
     <JournalCard
       title={t("common:dashboard.journal.title")}
-      entries={(data?.items ?? []).map((move) => moveJournalEntry(move, t))}
+      entries={(data?.items ?? []).map((move) =>
+        moveJournalEntry(move, t, placeName),
+      )}
       linkLabel={hasJournal ? t("common:dashboard.journal.link") : undefined}
       linkHref={hasJournal ? "/inventory/moves" : undefined}
       loading={isLoading}

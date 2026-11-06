@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
+import { serveLocations } from "@/test/serveLocations";
 import i18n from "@/i18n/config";
 import type { StockMoveRow } from "@/lib/api/stockMoves";
 import {
@@ -147,6 +148,44 @@ describe("DashboardRecentMoves", () => {
     expect(rows[2]).toHaveTextContent("UHT milk");
     expect(rows[2]).toHaveTextContent("Fridge");
     expect(within(rows[0]).getByText("Flour").tagName).toBe("STRONG");
+  });
+
+  it("names a place by its path, so two shelves of one name stay two", async () => {
+    serveLocations([
+      { id: "wa", name: "Warehouse A", parent_id: null },
+      { id: "wb", name: "Warehouse B", parent_id: null },
+      { id: "shelf-a", name: "Shelf 1", parent_id: "wa" },
+      { id: "shelf-b", name: "Shelf 1", parent_id: "wb" },
+    ]);
+    server.use(
+      http.get("*/stock-moves", () =>
+        HttpResponse.json({
+          items: [
+            move({
+              id: "between",
+              product_name: "Hex Bolt M8",
+              quantity: "30.000",
+              uom_symbol: "pcs",
+              from_location_id: "shelf-a",
+              from_location_name: "Shelf 1",
+              to_location_id: "shelf-b",
+              to_location_name: "Shelf 1",
+            }),
+          ],
+          total: 1,
+          offset: 0,
+          limit: RECENT_MOVES_LIMIT,
+          has_more: false,
+        }),
+      ),
+    );
+    render(<DashboardRecentMoves />, { wrapper });
+    await screen.findByText("Hex Bolt M8");
+    await waitFor(() =>
+      expect(screen.getAllByRole("listitem")[0]).toHaveTextContent(
+        "Warehouse A › Shelf 1 → Warehouse B › Shelf 1",
+      ),
+    );
   });
 
   it("tells a receipt, an issue and a transfer apart in words", async () => {

@@ -3,6 +3,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { StockMove } from "@/modules/maker/types/maker";
+import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
 
 interface ProductionStockMovesTableProps {
   stockMoves: StockMove[];
@@ -13,6 +14,9 @@ export function ProductionStockMovesTable({
   stockMoves,
 }: ProductionStockMovesTableProps) {
   const { t } = useTranslation("maker");
+  const placeName = useStorageLocationLabels(
+    stockMoves.flatMap((move) => [move.from_location_id, move.to_location_id]),
+  );
 
   if (stockMoves.length === 0) return null;
 
@@ -35,10 +39,12 @@ export function ProductionStockMovesTable({
             // arrives out of it. A side with an id whose name is gone
             // still answers — as the label, not the identifier.
             const fromName = move.from_location_id
-              ? (move.from_location_name ?? t("detail.line.unknownLocation"))
+              ? (placeName(move.from_location_id, move.from_location_name) ??
+                t("detail.line.unknownLocation"))
               : null;
             const toName = move.to_location_id
-              ? (move.to_location_name ?? t("detail.line.unknownLocation"))
+              ? (placeName(move.to_location_id, move.to_location_name) ??
+                t("detail.line.unknownLocation"))
               : null;
             const trace =
               fromName && toName

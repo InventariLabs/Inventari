@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { ProductionIngredientsTable } from "./ProductionIngredientsTable";
 import { ProductionStockMovesTable } from "./ProductionStockMovesTable";
 import { withLanguage } from "@/test/mocks/i18n";
+import { QueryWrapper } from "@/test/queryWrapper";
+import { serveLocations } from "@/test/serveLocations";
 import type {
   CostBreakdownEntry,
   ShortageEntry,
@@ -157,7 +159,9 @@ describe("ProductionIngredientsTable", () => {
 
 describe("ProductionStockMovesTable", () => {
   it("shows product and lot names instead of truncated identifiers", () => {
-    render(<ProductionStockMovesTable stockMoves={[move]} />);
+    render(<ProductionStockMovesTable stockMoves={[move]} />, {
+      wrapper: QueryWrapper,
+    });
 
     expect(screen.getByTitle(move.product_template_id)).toHaveTextContent(
       "Strawberries",
@@ -174,7 +178,9 @@ describe("ProductionStockMovesTable", () => {
       uom_symbol: "pcs",
     };
     await withLanguage("pl", () => {
-      render(<ProductionStockMovesTable stockMoves={[pcsMove]} />);
+      render(<ProductionStockMovesTable stockMoves={[pcsMove]} />, {
+        wrapper: QueryWrapper,
+      });
 
       expect(screen.getByText("12 szt.")).toBeInTheDocument();
       expect(screen.queryByText(/12 pcs/)).not.toBeInTheDocument();
@@ -197,7 +203,9 @@ describe("ProductionStockMovesTable", () => {
       lot_code: null,
     };
 
-    render(<ProductionStockMovesTable stockMoves={[move, receipt]} />);
+    render(<ProductionStockMovesTable stockMoves={[move, receipt]} />, {
+      wrapper: QueryWrapper,
+    });
 
     expect(screen.getByText("← Cold Storage")).toBeInTheDocument();
     expect(screen.getByText("→ Output Store")).toBeInTheDocument();
@@ -206,18 +214,46 @@ describe("ProductionStockMovesTable", () => {
     expect(screen.queryByText(/bb22cc33/)).not.toBeInTheDocument();
   });
 
+  it("names a shelf by its path, so two shelves of one name stay two", async () => {
+    serveLocations([
+      { id: "wa", name: "Warehouse A", parent_id: null },
+      { id: "wb", name: "Warehouse B", parent_id: null },
+      { id: "shelf-a", name: "Shelf 1", parent_id: "wa" },
+      { id: "shelf-b", name: "Shelf 1", parent_id: "wb" },
+    ]);
+    const transfer: StockMove = {
+      ...move,
+      from_location_id: "shelf-a",
+      from_location_name: "Shelf 1",
+      to_location_id: "shelf-b",
+      to_location_name: "Shelf 1",
+    };
+
+    render(<ProductionStockMovesTable stockMoves={[transfer]} />, {
+      wrapper: QueryWrapper,
+    });
+
+    expect(
+      await screen.findByText("Warehouse A › Shelf 1 → Warehouse B › Shelf 1"),
+    ).toBeInTheDocument();
+  });
+
   it("falls back to a label when a named location's row is gone", () => {
     render(
       <ProductionStockMovesTable
         stockMoves={[{ ...move, from_location_name: null }]}
       />,
+      { wrapper: QueryWrapper },
     );
 
     expect(screen.getByText(/← Unknown location/)).toBeInTheDocument();
   });
 
   it("renders nothing when there are no moves", () => {
-    const { container } = render(<ProductionStockMovesTable stockMoves={[]} />);
+    const { container } = render(
+      <ProductionStockMovesTable stockMoves={[]} />,
+      { wrapper: QueryWrapper },
+    );
     expect(container).toBeEmptyDOMElement();
   });
 });

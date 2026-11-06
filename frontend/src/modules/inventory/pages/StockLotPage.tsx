@@ -27,6 +27,7 @@ import { formatDecimalQty } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
+import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
 import { useStockLot } from "../hooks/useStockLot";
 import { useSetLotStatus } from "../hooks/useStockLots";
 import {
@@ -82,6 +83,9 @@ export default function StockLotPage() {
     error,
     refetch,
   } = useStockLot(id ?? "");
+  const placeName = useStorageLocationLabels(
+    lot?.locations.map((place) => place.location_id) ?? [],
+  );
 
   useEffect(() => {
     if (!lot) return;
@@ -216,7 +220,7 @@ export default function StockLotPage() {
                   className="flex items-center justify-between gap-4 px-4 py-3"
                 >
                   <span className="text-sm text-on">
-                    {place.location_name ?? "—"}
+                    {placeName(place.location_id, place.location_name) ?? "—"}
                   </span>
                   <span className="text-sm tabular-nums text-on whitespace-nowrap">
                     {quantity(place.quantity)}
