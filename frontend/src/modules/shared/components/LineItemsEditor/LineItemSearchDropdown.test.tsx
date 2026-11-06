@@ -10,7 +10,7 @@
  * those prints through a label passed down from the editor, so the tests
  * below render the dropdown the way the row does, labels included.
  */
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, afterEach } from "vitest";
 
@@ -543,5 +543,79 @@ describe("LineItemSearchDropdown — a phone keyboard takes the bottom of the sc
   it("opens above the input when the keyboard leaves no room below it", () => {
     const list = renderAnchored(400);
     expect(Number.parseFloat(list.style.top)).toBeLessThan(250);
+  });
+});
+
+describe("LineItemSearchDropdown — a scroll closes the list only when it moves the input", () => {
+  let top = 250;
+
+  afterEach(() => {
+    document.getElementById("line-input")?.remove();
+  });
+
+  function renderAnchored(onRequestClose: () => void) {
+    top = 250;
+    const input = document.createElement("input");
+    input.id = "line-input";
+    input.getBoundingClientRect = () =>
+      ({ top, bottom: top + 50, left: 10, right: 210, width: 200 }) as DOMRect;
+    document.body.appendChild(input);
+    render(
+      <LineItemSearchDropdown
+        results={[stockHit({ item_id: "a", name: "Flour A" })]}
+        isLoading={false}
+        selectedIndex={-1}
+        lineName="flo"
+        noResultsLabel="Nothing found"
+        anchorId="line-input"
+        onSelect={vi.fn()}
+        onRequestClose={onRequestClose}
+      />,
+    );
+    return input;
+  }
+
+  it("keeps the list when a scroll leaves the input where it was", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+
+    fireEvent.scroll(document);
+
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it("keeps the list when something that does not hold the input scrolls", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+    const elsewhere = document.createElement("div");
+    document.body.appendChild(elsewhere);
+    top = 200;
+
+    fireEvent.scroll(elsewhere);
+
+    expect(close).not.toHaveBeenCalled();
+    elsewhere.remove();
+  });
+
+  it("keeps the list when the list itself scrolls", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+    top = 200;
+
+    fireEvent.scroll(
+      document.querySelector("[data-line-item-dropdown]") as HTMLElement,
+    );
+
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it("closes the list when the page scrolls the input away", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+    top = 200;
+
+    fireEvent.scroll(document);
+
+    expect(close).toHaveBeenCalledTimes(1);
   });
 });
