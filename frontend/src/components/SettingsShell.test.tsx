@@ -291,6 +291,56 @@ describe("SettingsShell — the mobile nav sheet", () => {
   });
 });
 
+describe("SettingsShell — the mobile nav sheet marks one entry current and keeps the reader on the page", () => {
+  const openSheet = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(screen.getByRole("button", { name: /General|People/ }));
+    return within(screen.getByRole("dialog"));
+  };
+
+  it.each([
+    ["/settings", "General"],
+    ["/settings#people", "People"],
+  ])("marks only %s's own entry as the current page", async (path, current) => {
+    const user = userEvent.setup();
+    renderAt(path, "admin", ["admin:access"]);
+
+    const sheet = await openSheet(user);
+
+    const marked = sheet
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("aria-current") === "page");
+    expect(marked.map((link) => link.textContent)).toEqual([current]);
+  });
+
+  it("goes to the people section without asking while General holds unsaved changes", async () => {
+    const user = userEvent.setup();
+    useFormGuardStore.setState({ dirtyForm: "Ustawienia organizacji" });
+    renderAt("/settings", "admin", ["admin:access"]);
+
+    const sheet = await openSheet(user);
+    await user.click(sheet.getByRole("link", { name: "People" }));
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /People/ })).toBeInTheDocument();
+
+    useFormGuardStore.setState({ dirtyForm: null });
+  });
+
+  it("still asks before leaving the settings page for another one", async () => {
+    const user = userEvent.setup();
+    useFormGuardStore.setState({ dirtyForm: "Ustawienia organizacji" });
+    renderAt("/settings", "admin", ["admin:access"]);
+
+    const sheet = await openSheet(user);
+    await user.click(sheet.getByRole("link", { name: /poczta|email/i }));
+
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+
+    useFormGuardStore.setState({ dirtyForm: null });
+  });
+});
+
 describe("SettingsShell — the sidebar asks before throwing unsaved work away", () => {
   it("asks when a dirty form is registered and cancelling keeps the reader here", async () => {
     const user = userEvent.setup();

@@ -357,12 +357,22 @@ export default function SettingsShell() {
                           key={destination(item)}
                           to={destination(item)}
                           end={item.exact}
+                          // NavLink matches the path only; General and
+                          // People share one.
+                          aria-current={isActive ? "page" : "false"}
                           onClick={(e) => {
                             e.preventDefault();
                             // The sheet must close whichever way the
                             // question lands — leaving for the new tab,
                             // or staying to keep typing.
                             setMobileNavOpen(false);
+                            // A section of the page the reader is on is not
+                            // an exit (the sidebar's guardClick says the
+                            // same), so it asks nothing.
+                            if (item.to === location.pathname) {
+                              navigate(destination(item));
+                              return;
+                            }
                             guardNavigate(() => navigate(destination(item)));
                           }}
                           className={cn(
