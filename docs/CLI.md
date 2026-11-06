@@ -37,6 +37,7 @@ as `DEPLOYMENT.md` writes it. Every command below is given without that prefix.
 | Command | Description |
 |---------|-------------|
 | `manage.py user create-admin --email E --password P [--name N] [--lang L] [--allow-weak-password] [--no-instance-superuser]` | Create an admin account with its own organization, or reset the password of an existing one (which also invalidates its earlier sessions and exits 1 if Redis cannot be reached to do so). The first account on an instance becomes its superuser unless `--no-instance-superuser` is given. `--name` defaults to `Administrator`. `--lang` (`en`, `pl`, `de`, `fr`, `es` or `pt`) sets the language the account opens in; an unknown code is refused, and without it a new account takes the instance default and an existing one keeps its own |
+| `manage.py user erase USER_ID [--yes]` | Erase one person's account on a GDPR erasure request: shows whose account it is and asks first (`--yes` skips the question, for a run without a terminal), then replaces the address, name and password, closes the account and revokes its sessions in one transaction. When a step fails — Redis unreachable included — it prints `Nothing was erased` and exits 1, and the account is as it was. What erasure does not reach, and what to do about it, is in [GDPR_MANUAL_PROCEDURE.md](GDPR_MANUAL_PROCEDURE.md) |
 
 ```bash
 docker compose exec backend uv run python manage.py user create-admin \

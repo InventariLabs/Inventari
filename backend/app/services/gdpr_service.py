@@ -9,13 +9,16 @@ RegistrationRequest rows (pre-signup email/name) and the invitations
 issued for that address are anonymized too.
 
 Rows with audit value (ItemHistory, AuditLog, StockMove.created_by, ...)
-keep pointing at the anonymized user — the identifier is a UUID, not
-personal data. Audit entries go further: they are immutable in the
+keep pointing at the anonymized user. That UUID is pseudonymised, not
+anonymous: it stays personal data for as long as anything can tie it back
+to the person, and the journal can. Audit entries are immutable in the
 database (``audit_log_immutable`` refuses UPDATE and DELETE), and a
 member or invitation entry carries the address as its name. Erasure
 therefore rewrites what is mutable and states what it leaves — never a
-write behind the trigger. See docs/GDPR_MANUAL_PROCEDURE.md for the
-manual flow and for the records that keep the address afterwards.
+write behind the trigger. Whether what it leaves may stay is the
+controller's decision on a legal ground, not this function's; see
+docs/GDPR_MANUAL_PROCEDURE.md for the procedure and for the records that
+keep the address afterwards.
 """
 
 import secrets
@@ -26,7 +29,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
-from app.core.token_blacklist import token_blacklist
+from app.core.token_blacklist import TokenBlacklist, token_blacklist
 from app.models.organization import OrganizationInvitation
 from app.models.user import RegistrationRequest, User
 
@@ -35,11 +38,21 @@ logger = get_logger(__name__)
 ANONYMIZED_EMAIL_DOMAIN = 'anonymized.invalid'
 
 
-async def anonymize_user_async(db: AsyncSession, user_id: UUID) -> User:
+async def anonymize_user_async(
+    db: AsyncSession, user_id: UUID, *, blacklist: TokenBlacklist | None = None
+) -> User:
     """Destroy the personal data of *user_id*.
 
     Raises ValueError when the user does not exist. The caller owns the
-    transaction (commit/rollback).
+    transaction (commit/rollback). The token family is revoked after the
+    rewrite is flushed and before the caller commits: a revocation that
+    cannot be written raises in production, and the caller's rollback then
+    takes the rewrite back with it.
+
+    *blacklist* receives the revocation. By default it is the process's
+    shared one, which the app lifespan connects to Redis; a process without
+    that lifespan (``manage.py user erase``) brings one on a connection of
+    its own, so the connection it closes is not left on the shared object.
     """
     user = await db.get(User, user_id)
     if user is None:
@@ -78,6 +91,6 @@ async def anonymize_user_async(db: AsyncSession, user_id: UUID) -> User:
 
     await db.flush()
 
-    await token_blacklist.revoke_user_family(str(user_id))
+    await (blacklist or token_blacklist).revoke_user_family(str(user_id))
     logger.info('[GDPR] Anonymized user %s', user_id)
     return user

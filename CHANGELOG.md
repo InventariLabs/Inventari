@@ -86,6 +86,16 @@ says what the release does rather than what changed since them.
   and without it a new account takes the instance default and an existing one
   keeps its own. DEPLOYMENT.md and QUICK_DEPLOY.md say how to use the command
   to get back into an installation without outgoing mail.
+- `manage.py user erase <user id>` erases one person's account on a GDPR
+  erasure request: it shows whose account it is and asks first (`--yes` skips
+  the question), then replaces the address, name and password, closes the
+  account and revokes its sessions in one transaction, and reports
+  "Nothing was erased" with exit code 1 when a step fails, Redis included.
+  It replaces the Python script `docs/GDPR_MANUAL_PROCEDURE.md` asked
+  operators to paste. The procedure also says now that the user id the
+  journal keeps is pseudonymised personal data, not anonymous, and that
+  journal entries naming the person stay only on a legal ground — with the
+  SQL to redact them when there is none.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
 - When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a

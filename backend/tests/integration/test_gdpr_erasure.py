@@ -18,11 +18,15 @@ from __future__ import annotations
 import json
 import uuid
 from datetime import UTC, datetime, timedelta
+from unittest.mock import patch
 
 import pytest
+from redis.exceptions import ConnectionError as RedisConnectionError
 from sqlalchemy import func, select
+from typer.testing import CliRunner
 
 from app.core.public_api import core_api
+from app.core.token_blacklist import TokenBlacklist, token_blacklist
 from app.models.audit_log import AuditAction, AuditLog
 from app.models.item_history import ItemAction, ItemHistory
 from app.models.organization import OrganizationInvitation
@@ -31,8 +35,11 @@ from app.schemas.user import UserCreate
 from app.services._org_membership import join_organization, resend_invitation
 from app.services.auth_service import AuthService
 from app.services.gdpr_service import anonymize_user_async
+from manage import app as cli
 
 pytestmark = pytest.mark.integration
+
+cli_runner = CliRunner()
 
 
 @pytest.mark.asyncio
@@ -294,3 +301,164 @@ class TestErasureOfTheRecordsThatKeepAnAddress:
             'invited_email': old_email,
             'role': invitation.role,
         }
+
+
+class _Redis:
+    """Just enough Redis for the revocation, and a way to lose it."""
+
+    def __init__(self, *, ping_error=None, write_error=None) -> None:
+        self.store: dict[str, str] = {}
+        self.closed = False
+        self._ping_error = ping_error
+        self._write_error = write_error
+
+    async def ping(self) -> bool:
+        if self._ping_error is not None:
+            raise self._ping_error
+        return True
+
+    async def setex(self, key: str, ttl: int, value: str) -> None:
+        if self._write_error is not None:
+            raise self._write_error
+        self.store[key] = value
+
+    async def aclose(self) -> None:
+        self.closed = True
+
+
+class TestTheEraseCommand:
+    """``manage.py user erase`` is the procedure's erasure, run as an operator runs it.
+
+    The procedure used to paste a script that failed as written: it asked for
+    a session before any async engine existed, and in production the token
+    revocation refused to run with no Redis behind it. So every test here
+    meets the command the way a fresh process on a deployed install does — no
+    async engine, a shared blacklist with no connection, DEBUG and TESTING
+    off — against the worker database, and reads the outcome back through a
+    connection of its own, which only sees what was committed.
+    """
+
+    @pytest.fixture(autouse=True)
+    def fresh_production_process(self, monkeypatch):
+        from app import database
+        from app.config import settings
+
+        monkeypatch.setattr(settings, 'DEBUG', False)
+        monkeypatch.setattr(settings, 'TESTING', False)
+        monkeypatch.delenv('TESTING', raising=False)
+        monkeypatch.setattr(database, 'async_engine', None)
+        monkeypatch.setattr(database, 'AsyncSessionLocal', None)
+        monkeypatch.setattr(token_blacklist, '_redis', None)
+        # The test process loaded every module's models long ago; discovering
+        # them again would register the modules a second time in the shared
+        # registry.
+        monkeypatch.setattr('app.cli.bootstrap_db', lambda: None)
+
+    @pytest.fixture
+    def account(self, setup_test_db):
+        """An account committed where the command's own connection can see it."""
+        from app.database import SessionLocal
+
+        with SessionLocal() as db:
+            user = User(
+                email=f'erasable_{uuid.uuid4().hex[:8]}@example.com',
+                hashed_password='never-checked-here',
+                full_name='Erasable Person',
+                organization_id=None,
+                role='user',
+                is_active=True,
+            )
+            db.add(user)
+            db.commit()
+            user_id, email = user.id, user.email
+        yield user_id, email
+        with SessionLocal() as db:
+            db.query(User).filter(User.id == user_id).delete()
+            db.commit()
+
+    @staticmethod
+    def _read_back(user_id):
+        from app.database import SessionLocal
+
+        with SessionLocal() as db:
+            user = db.get(User, user_id)
+            assert user is not None
+            return user.email, user.full_name, user.is_active
+
+    def test_the_account_is_erased_and_its_sessions_revoked(self, account):
+        user_id, _email = account
+        redis = _Redis()
+
+        with patch('redis.asyncio.from_url', return_value=redis):
+            result = cli_runner.invoke(cli, ['user', 'erase', str(user_id), '--yes'])
+
+        assert result.exit_code == 0, result.output
+        assert self._read_back(user_id) == (
+            f'deleted-{user_id.hex}@anonymized.invalid',
+            'Deleted User',
+            False,
+        )
+        assert f'{TokenBlacklist.PREFIX}user:{user_id}' in redis.store
+        assert redis.closed is True
+        # The revocation went through a connection of the command's own: the
+        # blacklist the rest of the process shares is left as it was found.
+        assert token_blacklist._redis is None
+
+    @pytest.mark.parametrize(
+        'redis',
+        [
+            _Redis(ping_error=RedisConnectionError('connection refused')),
+            _Redis(write_error=RedisConnectionError('connection lost')),
+        ],
+        ids=['redis-unreachable', 'revocation-lost'],
+    )
+    def test_a_revocation_that_cannot_be_written_erases_nothing(self, account, redis):
+        """One transaction: the account is rewritten before the revocation is
+        written, so a lost revocation must take the rewrite back with it."""
+        user_id, email = account
+
+        with patch('redis.asyncio.from_url', return_value=redis):
+            result = cli_runner.invoke(cli, ['user', 'erase', str(user_id), '--yes'])
+
+        assert result.exit_code == 1
+        assert 'Nothing was erased' in result.output
+        assert self._read_back(user_id) == (email, 'Erasable Person', True)
+        assert redis.closed is True
+
+    def test_an_unknown_id_is_reported(self, setup_test_db):
+        unknown = uuid.uuid4()
+
+        with patch('redis.asyncio.from_url', return_value=_Redis()):
+            result = cli_runner.invoke(cli, ['user', 'erase', str(unknown), '--yes'])
+
+        assert result.exit_code == 1
+        assert 'Nothing was erased' in result.output
+        assert str(unknown) in result.output
+
+    def test_the_operator_sees_whose_account_it_is_and_can_decline(self, account):
+        user_id, email = account
+        redis = _Redis()
+
+        with patch('redis.asyncio.from_url', return_value=redis):
+            result = cli_runner.invoke(
+                cli, ['user', 'erase', str(user_id)], input='n\n'
+            )
+
+        assert result.exit_code == 1
+        assert email in result.output
+        assert 'Erasable Person' in result.output
+        assert self._read_back(user_id) == (email, 'Erasable Person', True)
+        assert redis.store == {}
+
+    def test_a_question_nobody_can_answer_names_the_way_out(self, account):
+        """``exec -T`` gives the command no terminal: the question meets the end
+        of its input, and the operator is told to pass ``--yes``."""
+        user_id, email = account
+
+        with patch('redis.asyncio.from_url', return_value=_Redis()):
+            result = cli_runner.invoke(cli, ['user', 'erase', str(user_id)], input='')
+
+        assert result.exit_code == 1
+        assert 'Nothing was erased' in result.output
+        assert '--yes' in result.output
+        assert self._read_back(user_id) == (email, 'Erasable Person', True)
