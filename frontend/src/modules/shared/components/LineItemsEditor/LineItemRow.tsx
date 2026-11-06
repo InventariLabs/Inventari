@@ -423,6 +423,7 @@ export const LineItemRow = memo(function LineItemRow({
                   <LineItemSearchDropdown
                     {...picker.dropdown}
                     noResultsLabel={labels.noResults}
+                    adHocLabel={labels.noResultsAdHoc}
                     inStockLabel={labels.inStock}
                     expiryLabel={labels.expiryLabel}
                     storageLabel={labels.storageLabel}

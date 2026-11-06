@@ -95,6 +95,7 @@
     "lineSubtotal": "Subtotal",
     "removeLine": "Eliminar línea",
     "noResults": "No se encontraron productos",
+    "noResultsAdHoc": "No está en su lista — la línea se conservará tal como la escribió.",
     "adHocBadge": "Manual",
     "adHocBadgeTooltip": "Escrita a mano: no es un producto de tu lista.",
     "subtotal": "Neto",

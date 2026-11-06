@@ -95,6 +95,7 @@
     "lineSubtotal": "Sous-total",
     "removeLine": "Supprimer la ligne",
     "noResults": "Aucun produit trouvé",
+    "noResultsAdHoc": "Absent de votre liste — la ligne sera conservée telle que saisie.",
     "adHocBadge": "Libre",
     "adHocBadgeTooltip": "Ligne saisie librement : ce n'est pas un produit de votre liste.",
     "subtotal": "Net",

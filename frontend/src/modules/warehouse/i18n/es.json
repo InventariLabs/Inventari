@@ -428,6 +428,7 @@
     "manualEntry": "Entrada manual",
     "searchItems": "Buscar artículos por nombre, código de barras…",
     "noResults": "No se encontraron artículos",
+    "noResultsAdHoc": "No está en su lista — la línea se conservará tal como la escribió.",
     "inLocation": "Productos en {{location}}",
     "inOtherLocation": "en {{location}}",
     "changeSource": "Cambiar la ubicación de origen",

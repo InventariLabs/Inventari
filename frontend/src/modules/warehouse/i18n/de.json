@@ -428,6 +428,7 @@
     "manualEntry": "Manuelle Eingabe",
     "searchItems": "Artikel nach Name, Barcode suchen…",
     "noResults": "Keine Artikel gefunden",
+    "noResultsAdHoc": "Nicht in Ihrer Liste — die Zeile bleibt so stehen, wie Sie sie eingegeben haben.",
     "inLocation": "Produkte in {{location}}",
     "inOtherLocation": "in {{location}}",
     "changeSource": "Quellort ändern",

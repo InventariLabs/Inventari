@@ -95,6 +95,7 @@
     "lineSubtotal": "Wartość brutto",
     "removeLine": "Usuń pozycję",
     "noResults": "Nie znaleziono produktów",
+    "noResultsAdHoc": "Brak na Twojej liście — pozycja zostanie zachowana tak, jak ją wpisano.",
     "adHocBadge": "Wpisana ręcznie",
     "adHocBadgeTooltip": "Wpisana ręcznie — to nie jest produkt z Twojej listy.",
     "subtotal": "Netto",
