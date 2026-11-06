@@ -11,6 +11,7 @@ import {
 import { getDocumentLineStatusVariant } from "@/modules/warehouse/lineStatus";
 import { unitLabel } from "@/lib/i18nHelpers";
 import { formatQuantityValue } from "@/utils/formatters";
+import { typedDoneQuantity } from "@/modules/warehouse/hooks/useDocumentExecution";
 import type {
   DocumentDiscrepancyCode,
   WarehouseDocument,
@@ -290,7 +291,7 @@ const ExecutionLineCard = memo(function ExecutionLineCard({
         min={0}
         max={String(expectedQuantity)}
         label={t("warehouse:detail.doneQuantityLabel")}
-        value={values[line.id] ?? "0"}
+        value={typedDoneQuantity(values, line.id)}
         onQuantityChange={(quantity) => {
           if (quantity !== null) onUpdateDoneQuantity(line.id, quantity);
         }}
