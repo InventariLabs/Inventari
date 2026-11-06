@@ -270,14 +270,14 @@ describe("POApprovalSettings", () => {
       [
         "a member who may write orders",
         ["purchase_orders:read", "purchase_orders:write"],
-        /only an administrator can open module settings/i,
+        /you can use this, not reconfigure it/i,
       ],
       // A viewer sees no values either, so it gets the same sentence rather
       // than "you can view this" above an empty page.
       [
         "a viewer",
         ["purchase_orders:read"],
-        /only an administrator can open module settings/i,
+        /you can use this, not reconfigure it/i,
       ],
     ])("offers no save surface to %s", async (_who, grants, notice) => {
       signInWith(grants);
@@ -286,7 +286,9 @@ describe("POApprovalSettings", () => {
       render(<POApprovalSettings />);
 
       expect(await screen.findByText(notice)).toBeInTheDocument();
-      expect(screen.getByText(/ask an administrator/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/ask someone who can manage it/i),
+      ).toBeInTheDocument();
       expect(
         screen.queryByRole("button", { name: /save/i }),
       ).not.toBeInTheDocument();
@@ -305,7 +307,7 @@ describe("POApprovalSettings", () => {
 
       expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
       expect(
-        screen.queryByText(/only an administrator can open module settings/i),
+        screen.queryByText(/you can use this, not reconfigure it/i),
       ).not.toBeInTheDocument();
     });
   });
