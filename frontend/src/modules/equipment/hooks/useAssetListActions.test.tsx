@@ -175,15 +175,19 @@ describe("useAssetListActions — the archive pages by its cursor", () => {
     serveList([asset(1)]);
     const { result } = renderList();
     act(() => result.current.setListTab("archived"));
-    await waitFor(() => expect(result.current.archivedHasNext).toBe(true));
+    await waitFor(() =>
+      expect(result.current.archivedPagination.keyset.hasNext).toBe(true),
+    );
 
-    act(() => result.current.onArchivedNext());
+    act(() => result.current.archivedPagination.onNext());
 
     await waitFor(() =>
       expect(archived[archived.length - 1].get("cursor")).toBe("after-first"),
     );
-    await waitFor(() => expect(result.current.archivedSkip).toBe(50));
-    expect(result.current.archivedHasNext).toBe(false);
+    await waitFor(() =>
+      expect(result.current.archivedPagination.skip).toBe(50),
+    );
+    expect(result.current.archivedPagination.keyset.hasNext).toBe(false);
     expect(archived.every((params) => !params.has("offset"))).toBe(true);
 
     // A new phrase is a new answer: a position in the old one means nothing.
@@ -192,7 +196,7 @@ describe("useAssetListActions — the archive pages by its cursor", () => {
       expect(archived[archived.length - 1].get("search")).toBe("Laptop"),
     );
     expect(archived[archived.length - 1].has("cursor")).toBe(false);
-    expect(result.current.archivedSkip).toBe(0);
+    expect(result.current.archivedPagination.skip).toBe(0);
   });
 });
 
