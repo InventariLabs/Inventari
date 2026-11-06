@@ -120,11 +120,20 @@ router.include_router(occupancy_router)
 @map_service_errors
 async def create_document(
     data: DocumentCreate,
+    idempotency_key: str | None = Header(None, min_length=8, max_length=64),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> Any:
-    return await services.create_document(db, org_id, data, current_user.id)
+    """Create a DRAFT document.
+
+    ``Idempotency-Key`` names the save: the same key sent again (a retry
+    after the answer was lost) is answered with the draft the first save
+    wrote instead of a second draft.
+    """
+    return await services.create_document(
+        db, org_id, data, current_user.id, post_key=idempotency_key
+    )
 
 
 @router.post(

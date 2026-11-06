@@ -116,12 +116,16 @@ function ItemLocation({
       <span className="text-sm text-on-muted">{t("items:usedUpPlace")}</span>
     );
   }
-  return (
-    <LocationLink
-      locationId={item.location_id}
-      path={getStoragePath(item.location_id, item.shelf_location, storages, t)}
-    />
+  const path = getStoragePath(
+    item.location_id,
+    item.shelf_location,
+    storages,
+    t,
   );
+  // While the places are on their way there is no name to link with, and a
+  // link without one reads to a screen reader as "link" and nothing more.
+  if (!path) return null;
+  return <LocationLink locationId={item.location_id} path={path} />;
 }
 
 /** "+1", where a unit can be added: not to a used-up record. */
@@ -151,7 +155,12 @@ function AddOneButton({
   );
 }
 
-/** The location cell's link: the leaf of the path first, the road to it behind. */
+/**
+ * The location cell's link: the leaf of the path first, the road to it behind.
+ * It carries no `aria-label`: the name a screen reader speaks is the text on
+ * screen, leaf first, so the visible words are always part of it (WCAG 2.5.3).
+ * The `title` keeps the whole root-to-leaf path for a pointer that hovers.
+ */
 function LocationLink({
   locationId,
   path,
@@ -165,7 +174,6 @@ function LocationLink({
       to={`/inventory/locations/${locationId}`}
       className="block min-w-0 text-sm text-on-secondary underline decoration-border underline-offset-2 hover:text-accent-700 hover:decoration-accent-600 transition-colors"
       title={path}
-      aria-label={path}
     >
       <span className="block break-words font-medium">{leaf}</span>
       {parents && (

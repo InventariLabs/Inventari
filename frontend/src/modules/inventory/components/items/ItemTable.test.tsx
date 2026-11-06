@@ -599,7 +599,7 @@ describe("ItemTable — the storage cell is one click target", () => {
     );
 
     const link = screen.getByRole("link", {
-      name: "Pantry Building › Dry Goods › Shelf A - Bottom",
+      name: /Shelf A - Bottom.*Pantry Building › Dry Goods/,
     });
     const leaf = screen.getByText("Shelf A - Bottom");
     expect(link).toContainElement(leaf);
@@ -633,12 +633,14 @@ describe("ItemTable — the storage cell is one click target", () => {
     expect(link).toHaveAttribute("href", "/inventory/locations/bay-3");
   });
 
-  it("names the whole path, not just the leaf", () => {
+  it("names the link with the words on screen, leaf first, and hints the whole path", () => {
     renderWithStorage();
 
-    expect(
-      screen.getByRole("link", { name: "Main Warehouse › Bay 3" }),
-    ).toBeInTheDocument();
+    // An `aria-label` spelling the path root-first left the visible "Bay 3"
+    // out of the name's start order (axe: label-content-name-mismatch).
+    const link = screen.getByRole("link", { name: /^Bay 3\s*Main Warehouse$/ });
+    expect(link).not.toHaveAttribute("aria-label");
+    expect(link).toHaveAttribute("title", "Main Warehouse › Bay 3");
   });
 
   /**
@@ -681,6 +683,23 @@ describe("ItemTable — the storage cell is one click target", () => {
         screen.queryByRole("button", { name: "Add 1 unit" }),
       ).not.toBeInTheDocument();
     });
+  });
+
+  it("offers no nameless link while the places are on their way", () => {
+    render(
+      <ItemTable
+        {...baseProps}
+        storages={undefined}
+        items={[makeItem("1", { location_id: "bay-3" })]}
+      />,
+    );
+
+    // There is no name to link with yet: a link with an empty name reads to
+    // a screen reader as "link" and nothing more.
+    expect(
+      document.querySelector('a[href="/inventory/locations/bay-3"]'),
+    ).toBeNull();
+    expect(screen.queryByText("Unknown")).not.toBeInTheDocument();
   });
 
   it("puts the full path in `title`, which truncation may take from the label", () => {

@@ -116,7 +116,7 @@
     },
     "src/modules/inventory/pages/ItemsPage.tsx": {
       "ItemsPage": [
-        382
+        378
       ]
     },
     "src/modules/inventory/pages/LabelPoolPage.tsx": {
@@ -156,7 +156,7 @@
     },
     "src/modules/warehouse/components/DocumentFormModal.tsx": {
       "DocumentFormModal": [
-        390
+        388
       ]
     },
     "src/modules/warehouse/pages/DocumentDetailPage.tsx": {

@@ -535,18 +535,20 @@ describe("DocumentFormModal", () => {
 
     await waitFor(() => {
       expect(createMutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: "IN",
-          partner_id: "partner-1",
-          target_location_id: "loc-2",
-          lines: [
-            expect.objectContaining({
-              product_template_id: "pt-widget",
-              name: "Widget",
-              expected_quantity: 1,
-            }),
-          ],
-        }),
+        {
+          data: expect.objectContaining({
+            type: "IN",
+            partner_id: "partner-1",
+            target_location_id: "loc-2",
+            lines: [
+              expect.objectContaining({
+                product_template_id: "pt-widget",
+                name: "Widget",
+                expected_quantity: 1,
+              }),
+            ],
+          }),
+        },
         expect.any(Object),
       );
     });
@@ -975,11 +977,13 @@ describe("DocumentFormModal", () => {
 
     await waitFor(() => {
       expect(createMutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: "OUT",
-          source_location_id: "loc-1",
-          lines: [expect.objectContaining({ item_id: "item-9" })],
-        }),
+        {
+          data: expect.objectContaining({
+            type: "OUT",
+            source_location_id: "loc-1",
+            lines: [expect.objectContaining({ item_id: "item-9" })],
+          }),
+        },
         expect.any(Object),
       );
     });
@@ -1031,15 +1035,17 @@ describe("DocumentFormModal", () => {
     // The blank line the form opened with gave way to the imported one.
     await waitFor(() => {
       expect(createMutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          lines: [
-            expect.objectContaining({
-              item_id: "record-1",
-              product_template_id: "tpl-1",
-              expected_quantity: 8,
-            }),
-          ],
-        }),
+        {
+          data: expect.objectContaining({
+            lines: [
+              expect.objectContaining({
+                item_id: "record-1",
+                product_template_id: "tpl-1",
+                expected_quantity: 8,
+              }),
+            ],
+          }),
+        },
         expect.any(Object),
       );
     });
@@ -1129,14 +1135,16 @@ describe("DocumentFormModal", () => {
 
     await waitFor(() => {
       expect(createMutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          lines: [
-            expect.objectContaining({
-              name: "Widget",
-              notes: "Handle with care",
-            }),
-          ],
-        }),
+        {
+          data: expect.objectContaining({
+            lines: [
+              expect.objectContaining({
+                name: "Widget",
+                notes: "Handle with care",
+              }),
+            ],
+          }),
+        },
         expect.any(Object),
       );
     });

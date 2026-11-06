@@ -147,6 +147,23 @@ function expiryChips(
   ];
 }
 
+/**
+ * Where the rows on screen stand, read by id: the page needs the places it
+ * shows (and the one the filter names), not the organization's catalogue.
+ *
+ * Pending while the first answer is on its way, and while the answer for the
+ * previous rows is held in its place: after a search, a page or a chip the
+ * new rows' places are still to come.
+ */
+function useRowPlaces(items: Item[], storageFilter: string) {
+  const places = useLocationsById([
+    ...items.map((item) => item.location_id),
+    storageFilter,
+  ]);
+  const storages = useMemo(() => [...places.byId.values()], [places.byId]);
+  return { storages, pending: places.isLoading || places.isPlaceholderData };
+}
+
 export default function ItemsPage() {
   const { t } = useTranslation(["items", "categories", "common", "labels"]);
   const { setHeader } = useModulePageHeader();
@@ -250,13 +267,7 @@ export default function ItemsPage() {
     () => itemsResponse?.items ?? [],
     [itemsResponse?.items],
   );
-  // Where the rows on screen stand, read by id: the page needs the places it
-  // shows (and the one the filter names), not the organization's catalogue.
-  const { byId: placesById, isLoading: placesLoading } = useLocationsById([
-    ...items.map((item) => item.location_id),
-    filters.storageFilter,
-  ]);
-  const allStorages = useMemo(() => [...placesById.values()], [placesById]);
+  const rowPlaces = useRowPlaces(items, filters.storageFilter);
   // Footer sums over the whole filtered set — the same params as the list
   // above minus the paging, so the two can never disagree.
   const aggregates = matchesNothing ? undefined : aggregatesQuery.data;
@@ -332,7 +343,7 @@ export default function ItemsPage() {
     items,
     storageFilter: filters.storageFilter,
     exportParams: aggregateParams,
-    storages: allStorages,
+    storages: rowPlaces.storages,
     setConsumeDialogItem,
     setDeleteReasonItem,
   });
@@ -542,7 +553,7 @@ export default function ItemsPage() {
         isLargeScreen={isLargeScreen}
         // No place is printed while the places that name the rows are on their
         // way; "Unknown" is for a place the arrived answer does not hold.
-        storages={placesLoading ? undefined : allStorages}
+        storages={rowPlaces.pending ? undefined : rowPlaces.storages}
         categories={allCategories}
         filters={{
           ...itemsFilters,
