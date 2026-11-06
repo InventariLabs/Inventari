@@ -164,7 +164,7 @@
       "members": "Użytkownicy",
       "searchMembers": "Szukaj członków…",
       "inviteTitle": "Zaproś użytkownika",
-      "removeMemberTitle": "Usunąć {{name}}?",
+      "removeMemberTitle": "Usunąć z organizacji: {{name}}?",
       "removeMemberConfirm": "{{name}} ({{role}}) od razu straci dostęp do tej organizacji. Rekordy utworzone przez tę osobę zostaną. Aby ją przywrócić, wyślij nowe zaproszenie.",
       "invalidLink": "Ten link zaproszenia nie zawiera kodu zaproszenia. Poproś o nowe zaproszenie i otwórz pełny link.",
       "joinedSuccess": "Pomyślnie dołączono do organizacji",

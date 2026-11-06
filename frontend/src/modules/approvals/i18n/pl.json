@@ -14,7 +14,7 @@
   "navigation": {
     "dashboard": "Pulpit",
     "workflows": "Przepływy",
-    "settings": "Akceptacje"
+    "settings": "Zatwierdzenia"
   },
   "dashboard": {
     "title": "Wnioski o akceptację",

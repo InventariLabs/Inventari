@@ -338,7 +338,7 @@
       "previewFailed": "The preview of this change could not be loaded, so it cannot be applied yet."
     },
     "audit": {
-      "title": "Audit log",
+      "title": "Audit Log",
       "subtitle": "Immutable record of this organization's actions: {{actions}}.",
       "targetType": "Target type",
       "anyTarget": "Any",

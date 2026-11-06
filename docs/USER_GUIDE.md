@@ -120,7 +120,7 @@ My modules** (chapter 14).
 
 On a phone, the top bar keeps search, the bell and the avatar; settings, the
 theme and the language move into the avatar menu (**Settings**,
-**Appearance**, **Language**). Inside Inventory a bar at the bottom offers
+**Appearance**, **Language**). Inside Inventory, a bar at the bottom offers
 **Overview**, **Scan** and **More** — the last one holds the rest of the tabs
 and links to the other modules.
 
