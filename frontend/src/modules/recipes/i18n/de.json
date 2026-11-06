@@ -291,8 +291,8 @@
     "incomplete_warning": "Nährwertdaten nur für {{pct}} % der Zutaten verfügbar",
     "estimate_note": "Eine aus den Produktwerten der Zutaten summierte Schätzung (Etiketten oder Open Food Facts, eine Community-Datenbank). Mit dem Etikett abgleichen.",
     "estimate_generic_note": "Eine aus den Zutaten summierte Schätzung. Manche nutzen allgemeine Werte statt der des Produkts; der Rest stammt von Produktetiketten oder aus Open Food Facts (einer Community-Datenbank). Mit dem Etikett abgleichen.",
-    "daily_estimate_note": "Die Tagessummen addieren die Schätzungen der einzelnen Rezepte, aus Produktetiketten oder Open Food Facts. Sie dienen nur zur Orientierung.",
-    "daily_estimate_generic_note": "Die Tagessummen addieren die Schätzungen der einzelnen Rezepte. Manche nutzen allgemeine Werte statt der des Produkts. Sie dienen nur zur Orientierung."
+    "daily_estimate_note": "Die Tagessummen addieren eine Portion jeder geplanten Mahlzeit, aus Produktetiketten oder Open Food Facts. Sie dienen nur zur Orientierung.",
+    "daily_estimate_generic_note": "Die Tagessummen addieren eine Portion jeder geplanten Mahlzeit. Manche nutzen allgemeine Werte statt der des Produkts. Sie dienen nur zur Orientierung."
   },
   "shopping": {
     "add_missing_button": "Fehlende zur Einkaufsliste hinzufügen",

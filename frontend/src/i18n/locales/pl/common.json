@@ -241,7 +241,7 @@
       "loadFailedHint": "Nie udało się teraz odczytać ustawień organizacji, więc nie pokazujemy niczego zamiast wartości domyślnych, które nigdy nie zostały zapisane. Spróbuj ponownie.",
       "peopleTitle": "Osoby",
       "inviteEmail": "Adres e-mail",
-      "inviteEmailPlaceholder": "osoba@firma.pl",
+      "inviteEmailPlaceholder": "osoba@example.com",
       "inviteEmailRequired": "Podaj adres e-mail osoby, którą zapraszasz",
       "inviteEmailInvalid": "To nie wygląda na adres e-mail",
       "sendInvite": "Wyślij zaproszenie",
@@ -712,6 +712,12 @@
       "document": "Dokument",
       "corrects": "koryguje {{number}}",
       "secretChanged": "nowa wartość (ukryta)",
+      "fieldDefinitions": {
+        "added": "Dodano pole {{field}}",
+        "removed": "Usunięto pole {{field}}",
+        "changed": "Zmieniono pole {{field}}",
+        "required": "wymagane"
+      },
       "builtInModules": {
         "core": "Podstawy",
         "locations": "Miejsca",

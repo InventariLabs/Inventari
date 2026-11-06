@@ -76,9 +76,9 @@
     "codePlaceholder": "np. DOO-001",
     "taxIdPlaceholder": "np. PL1234567890",
     "isConsumerHint": "Nie ma NIP-u: dokumenty potwierdzają się bez niego, także tam, gdzie prawo wymaga go od firm.",
-    "emailPlaceholder": "kontakt@firma.pl",
+    "emailPlaceholder": "kontakt@example.com",
     "phonePlaceholder": "+48 123 456 789",
-    "websitePlaceholder": "https://firma.pl",
+    "websitePlaceholder": "https://example.com",
     "contactPersonPlaceholder": "np. Jan Kowalski (dział zakupów)",
     "positionPlaceholder": "np. Informatyk, Dział IT",
     "notesPlaceholder": "Notatki wewnętrzne…",
@@ -103,8 +103,8 @@
     "deactivateFailed": "Nie udało się dezaktywować partnera",
     "saveFailed": "Nie udało się zapisać partnera",
     "createFailed": "Nie udało się utworzyć partnera",
-    "invalidEmail": "Podaj adres e-mail, na przykład imie@firma.pl.",
-    "invalidWebsite": "Podaj adres strony, na przykład https://firma.pl."
+    "invalidEmail": "Podaj adres e-mail, na przykład imie@example.com.",
+    "invalidWebsite": "Podaj adres strony, na przykład https://example.com."
   },
   "inlineCreateHint": "Szybkie tworzenie partnera",
   "inlineCreateSuccess": "Partner „{{name}}” został utworzony. Przed wystawieniem dokumentu z adresem uzupełnij NIP i adres.",

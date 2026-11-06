@@ -165,6 +165,12 @@ function useLineItemPicker({
   };
 
   const handleFocus = () => {
+    // A blur whose grace window is still open must not fire after the focus
+    // came back, or it closes the panel under an input that holds the focus.
+    if (blurTimerRef.current !== null) {
+      clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
     setIsFocused(true);
     setPickerDismissed(false);
     // A line that opens with a name already in it — a saved draft, a pasted

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test/utils";
+import { act, fireEvent, render, screen } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
 import { LineItemRow } from "./LineItemRow";
 import type { LineItem, LineItemProduct, LineItemsEditorLabels } from "./types";
@@ -521,6 +521,40 @@ describe("LineItemRow — the blur grace timer", () => {
     const cleared = clearTimeoutSpy.mock.calls.flat();
     for (const id of scheduled) {
       expect(cleared, "a timer outlived the row").toContain(id);
+    }
+  });
+});
+
+describe("LineItemRow — focus returning inside the blur grace window", () => {
+  // Picking an option blurs the input; the row is then cleared and typed into
+  // again. On a slow machine the first blur's timer is still pending when the
+  // focus comes back, and used to fire after it: the panel closed under the
+  // user's hands, with the input still focused.
+  it("keeps the panel open when an earlier blur's timer fires after the focus came back", () => {
+    vi.useFakeTimers();
+    try {
+      const props = makeProps();
+      props.search.results = [
+        { product_template_id: "tpl-1", name: "Ground cocoa" },
+      ] as LineItemProduct[];
+      render(
+        <LineItemRow
+          {...props}
+          line={makeLine({ name: "Gr", sku: undefined, barcode: undefined })}
+        />,
+      );
+      const name = screen.getByRole("combobox");
+
+      fireEvent.focus(name);
+      fireEvent.blur(name);
+      fireEvent.focus(name);
+      act(() => {
+        vi.advanceTimersByTime(250);
+      });
+
+      expect(screen.getByText("Ground cocoa")).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
     }
   });
 });

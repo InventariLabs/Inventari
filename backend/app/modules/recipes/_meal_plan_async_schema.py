@@ -144,8 +144,10 @@ async def _build_daily_nutrition_async(
 ) -> list[DailyNutritionSummary]:
     """Aggregate per-date nutrition totals across all plan entries.
 
-    Uses the recipe nutrition pipeline per entry (scaled by the effective
-    servings), summed by date.
+    Uses the recipe nutrition pipeline per entry, summed by date. Each entry
+    counts one serving, not the servings planned for it: the table reads as
+    what one person eats that day. One banana bread planned for 8 servings
+    adds one slice, not 4210 kcal, to the day it is baked on.
 
     A nutrient nothing contributed to stays ``None``, not 0.0. The two say
     opposite things and the table renders them differently — "0 g" is a
@@ -176,8 +178,7 @@ async def _build_daily_nutrition_async(
     for entry in plan.entries:
         if entry.recipe is None:
             continue
-        servings = _get_effective_servings(entry, plan)
-        nutrition = await get_recipe_nutrition(db, entry.recipe, org_id, servings)
+        nutrition = await get_recipe_nutrition(db, entry.recipe, org_id, 1)
         total = nutrition['measured_sums']
         if nutrition['generic_values']:
             generic_days.add(entry.date)

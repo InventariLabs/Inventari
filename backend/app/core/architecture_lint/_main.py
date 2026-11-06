@@ -970,6 +970,23 @@ def _emit_surface_checks(
     )
 
 
+def _external_module_migration_errors() -> list[str]:
+    """Migration gaps of modules that live outside the repo tree.
+
+    Two configured roots may be one directory (in the container
+    ``/modules-workspace`` and the repo-root twin are), so a root is read once
+    per resolved path: otherwise every module there is reported twice.
+    """
+    errors: list[str] = []
+    seen: set[Path] = set()
+    for root in EXTERNAL_MODULES_ROOTS:
+        if not root.is_dir() or root.resolve() in seen:
+            continue
+        seen.add(root.resolve())
+        errors.extend(_check_module_migrations_exist(root))
+    return errors
+
+
 def main() -> int:
     """Run every architecture check in order; 0 when nothing blocks.
 
@@ -1034,12 +1051,7 @@ def _run_checks() -> int:
         _check_module_migrations_exist(
             MODULES_ROOT, baseline_modules=_load_module_migrations_baseline()
         )
-        + [
-            error
-            for root in EXTERNAL_MODULES_ROOTS
-            if root.is_dir()
-            for error in _check_module_migrations_exist(root)
-        ],
+        + _external_module_migration_errors(),
         category='module migration gap',
         quiet=args.quiet,
         baseline_file='app/core/module_migrations_baseline.txt',
