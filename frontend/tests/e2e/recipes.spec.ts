@@ -128,63 +128,37 @@ test.describe("Recipes — CRUD flow", () => {
       ingredients: [],
     });
 
+    // beforeEach loaded the list before this recipe existed; load it again.
+    // A list or search that does not show the recipe must fail this case, not
+    // end it early.
     await page.goto("/recipes");
-    await page
-      .waitForLoadState("networkidle", { timeout: 15000 })
-      .catch(() => {});
-    await page
-      .locator('input[placeholder*="Search"], input[placeholder*="search"]')
-      .first()
-      .waitFor({ state: "visible", timeout: 10000 })
-      .catch(() => {});
-
-    const searchInput = page
-      .locator('input[placeholder*="Search"], input[placeholder*="search"]')
-      .first();
-    if (await searchInput.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await searchInput.fill(deleteName);
-      await page
-        .getByText(deleteName)
-        .first()
-        .waitFor({ state: "visible", timeout: 5000 })
-        .catch(() => {});
-    }
-
-    const rowVisible = await page
-      .getByText(deleteName)
-      .first()
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (!rowVisible) {
-      // API-created recipe may not appear in the frontend list yet
-      await api.deleteRecipe(token, toDelete.id).catch(() => {});
-      return;
-    }
+    const searchInput = page.getByPlaceholder(/search|szukaj|wyszukaj|znajdź/i);
+    await expect(searchInput).toBeVisible({ timeout: 10000 });
+    await searchInput.fill(deleteName);
 
     const recipeRow = page
       .locator('[data-testid="recipe-card"]')
       .filter({ hasText: deleteName })
       .first();
+    await expect(recipeRow).toBeVisible({ timeout: 10000 });
     await recipeRow.scrollIntoViewIfNeeded();
     await recipeRow.hover();
 
-    const deleteBtn = recipeRow
-      .locator('[data-testid="recipe-delete-btn"]')
-      .first();
-    const btnVisible = await deleteBtn
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
-    if (btnVisible) {
-      await deleteBtn.click();
-      const confirmBtn = page
-        .getByRole("button", { name: /confirm|delete|usuń|tak/i })
-        .last();
-      if (await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await confirmBtn.click();
-      }
-    }
+    const deleteBtn = recipeRow.locator('[data-testid="recipe-delete-btn"]');
+    await expect(deleteBtn).toBeVisible({ timeout: 5000 });
+    await deleteBtn.click();
 
+    const dialog = page.getByRole("alertdialog");
+    await expect(dialog).toBeVisible({ timeout: 5000 });
+    await dialog.getByRole("button", { name: /^(delete|usuń)$/i }).click();
+
+    await expect(dialog).toBeHidden({ timeout: 10000 });
     await expect(page.getByText(deleteName)).toHaveCount(0, { timeout: 10000 });
+
+    // Gone on the server too, not only hidden by the list.
+    await expect(api.getRecipe(token, toDelete.id)).rejects.toThrow(
+      /Failed to get recipe/,
+    );
   });
 
   test("recipe card action buttons stay compact at 1280px", async ({
