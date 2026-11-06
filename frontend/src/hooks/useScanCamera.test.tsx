@@ -12,6 +12,7 @@ import {
   absorbReaderPlayAbort,
 } from "./useScanCamera";
 import { useTorchAvailable } from "./useTorchAvailable";
+import { logger } from "@/utils/logger";
 
 vi.mock("html5-qrcode", () => {
   class MockHtml5Qrcode {
@@ -230,6 +231,110 @@ describe("useScanCamera", () => {
 
     await act(async () => {
       document.body.innerHTML = "";
+    });
+  });
+
+  // A start that is still pending when its run is torn down (a restart, the
+  // wish switched off, the component gone) fails later, into a run nobody is
+  // waiting on. What that late failure writes — the device state and the
+  // error sentence — belongs to the run that owns the screen now.
+  describe("a camera start that fails after its run was torn down", () => {
+    const pendingStart = () => {
+      let fail: (error: unknown) => void = () => {};
+      const start = vi
+        .spyOn(Html5Qrcode.prototype, "start")
+        .mockImplementationOnce(
+          () => new Promise<null>((_, reject) => (fail = reject)),
+        );
+      const logged = vi.spyOn(logger, "error").mockImplementation(() => {});
+      return {
+        fail: (error: unknown) => fail(error),
+        logged,
+        restore: () => {
+          start.mockRestore();
+          logged.mockRestore();
+        },
+      };
+    };
+
+    it("leaves the state of the run that replaced it alone", async () => {
+      vi.useFakeTimers();
+      const pending = pendingStart();
+      try {
+        const MockQr = Html5Qrcode as unknown as { rejectError: unknown };
+        MockQr.rejectError = null;
+        document.body.innerHTML = '<div id="qr-reader"></div>';
+        const { result } = renderHook(() =>
+          useScanCamera({ onCodeScanned: vi.fn() }),
+        );
+        act(() => result.current.setIsCameraActive(true));
+        // The first run's start is now in flight and never answers by itself.
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(600);
+        });
+        expect(result.current.isCameraRunning).toBe(false);
+
+        // A restart tears that run down; the second run starts and delivers.
+        act(() => result.current.restartCamera());
+        // Inside one act React renders once at the end, so the cooldown and
+        // the start delay that follows it are waited out in separate steps.
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(150);
+        });
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(600);
+        });
+        expect(result.current.isCameraRunning).toBe(true);
+
+        // The first run's start now fails. It must not blank the second
+        // run's "running" nor print its error over a camera that works.
+        await act(async () => {
+          pending.fail("NotAllowedError: Permission denied");
+          await vi.advanceTimersByTimeAsync(0);
+        });
+        expect(pending.logged).toHaveBeenCalled();
+        expect(result.current.scannerError).toBeNull();
+        expect(result.current.isCameraRunning).toBe(true);
+
+        await act(async () => {
+          document.body.innerHTML = "";
+        });
+      } finally {
+        pending.restore();
+        vi.useRealTimers();
+      }
+    });
+
+    it("is only logged when the hook was unmounted meanwhile", async () => {
+      vi.useFakeTimers();
+      const pending = pendingStart();
+      try {
+        document.body.innerHTML = '<div id="qr-reader"></div>';
+        const { result, unmount } = renderHook(() =>
+          useScanCamera({ onCodeScanned: vi.fn() }),
+        );
+        act(() => result.current.setIsCameraActive(true));
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(600);
+        });
+
+        unmount();
+        // Rejecting into an unmounted hook must end in the log and nowhere
+        // else: no throw out of the catch, no unhandled rejection (vitest
+        // fails the run on one).
+        await act(async () => {
+          pending.fail(new Error("camera gone"));
+          await vi.advanceTimersByTimeAsync(0);
+        });
+        expect(pending.logged).toHaveBeenCalledWith(
+          "Camera start error:",
+          expect.any(Error),
+        );
+        document.body.innerHTML = "";
+      } finally {
+        pending.restore();
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -802,6 +907,55 @@ describe("decodeAtCameraResolution", () => {
       1,
     );
     expect([canvas.width, canvas.height]).toEqual([1280, 500]);
+  });
+
+  // `binarizeLocally` is tested on its own; nothing else sees that the
+  // wrapper hands the wide-run pass to the right frame. Each frame the
+  // camera draws goes by in a cycle of three: as seen, thresholded, and
+  // thresholded with the wide ink of a dark package edge dropped.
+  it("drops the wide ink of a dark surround on the third frame only", () => {
+    const draw = vi.fn();
+    const canvas = document.createElement("canvas");
+    const width = 123;
+    const height = 8;
+    // black package edge | white label with a black bar | black package edge
+    const row = [
+      ...Array(40).fill(0),
+      ...Array(20).fill(255),
+      ...Array(3).fill(0),
+      ...Array(20).fill(255),
+      ...Array(40).fill(0),
+    ];
+    const put: ImageData[] = [];
+    vi.spyOn(canvas, "getContext").mockReturnValue({
+      drawImage: draw,
+      getImageData: () => {
+        const data = new Uint8ClampedArray(width * height * 4);
+        for (let y = 0; y < height; y++)
+          row.forEach((v, x) =>
+            data.fill(v, (y * width + x) * 4, (y * width + x) * 4 + 3),
+          );
+        return { width, height, data } as unknown as ImageData;
+      },
+      putImageData: (picture: ImageData) => put.push(picture),
+    } as unknown as CanvasRenderingContext2D);
+    decodeAtCameraResolution(canvas);
+    const video = document.createElement("video");
+    const context = canvas.getContext("2d")!;
+    for (let frame = 0; frame < 3; frame++) {
+      context.drawImage(video, 0, 0, width, height, 0, 0, 1, 1);
+    }
+
+    // The first frame is left as the camera saw it: nothing is put back.
+    expect(put).toHaveLength(2);
+    // The pixel beside the label, in the black edge's wide run of ink.
+    const beside = (3 * width + 39) * 4;
+    expect(put[0].data[beside]).toBe(0);
+    expect(put[1].data[beside]).toBe(255);
+    // The bar itself is ink in both passes.
+    const bar = (3 * width + 61) * 4;
+    expect(put[0].data[bar]).toBe(0);
+    expect(put[1].data[bar]).toBe(0);
   });
 });
 
