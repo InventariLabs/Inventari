@@ -80,10 +80,17 @@ export function ReorderAlertsCard({
                 <span className="text-xs text-on-muted">{alert.sku}</span>
               )}
               <span>
-                {t("reorderRules.alertStock", {
-                  available: alert.available_quantity,
-                  min: alert.min_quantity,
-                })}
+                {/* The alert fires under the higher of the two, so the card
+                    names the one that stands higher. */}
+                {alert.safety_stock > alert.min_quantity
+                  ? t("reorderRules.alertStockSafety", {
+                      available: alert.available_quantity,
+                      threshold: alert.safety_stock,
+                    })
+                  : t("reorderRules.alertStock", {
+                      available: alert.available_quantity,
+                      min: alert.min_quantity,
+                    })}
               </span>
               <span className="text-xs text-on-muted">
                 {t("reorderRules.alertLocation", {
