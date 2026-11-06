@@ -26,6 +26,11 @@
  *                                                # the saved artefact has to be
  *                                                # the one the backend exports now
  *
+ * The same artefact carries the values of the backend's `AuditTargetType`, and
+ * the same catalogues have to name each of them under
+ * `settings.audit.targetTypes`: the journal's filter and its Target column
+ * print a type the catalogue does not know as the raw identifier.
+ *
  * Freshness is the caller's half of the gate: this script cannot regenerate the
  * artefact (the writers are Python, and this runs where the frontend does), so
  * `make check-audit-fields-fresh` exports the keys to a file and hands the path
@@ -64,12 +69,19 @@ const LOCALES_DIR = process.env.AUDIT_LOCALES_DIR
 /** Where `auditFieldLabel` looks a segment up — see utils/auditChanges.ts. */
 const CATALOG_POINTER = "/settings/audit/fields/";
 
-export function catalogKeys(languages = LANGUAGES) {
+/** The two vocabularies the artefact is read against, and where they live. */
+const FIELDS = "fields";
+const TARGET_TYPES = "targetTypes";
+
+export function catalogKeys(languages = LANGUAGES, section = FIELDS) {
   const perLanguage = new Map();
   for (const language of languages) {
     const file = resolve(LOCALES_DIR, `${language}/common.json`);
     const json = JSON.parse(readFileSync(file, "utf8"));
-    perLanguage.set(language, new Set(Object.keys(json.settings.audit.fields)));
+    perLanguage.set(
+      language,
+      new Set(Object.keys(json.settings.audit[section])),
+    );
   }
   return perLanguage;
 }
@@ -102,6 +114,7 @@ function loadKeys() {
   const json = JSON.parse(readFileSync(KEYS_PATH, "utf8"));
   return {
     keys: json.keys ?? [],
+    targetTypes: json["target-types"] ?? [],
     declarationsRead: json["declarations-read"] ?? 0,
     uncovered: json["uncovered-writer-files"] ?? [],
   };
@@ -133,8 +146,20 @@ function loadBaseline() {
   return json.gaps ?? [];
 }
 
+/** A gap in the fields catalogue has no `section`; it is the original kind. */
 function baseKey(entry) {
-  return `${entry.language}:${entry.key}`;
+  return `${entry.section ?? FIELDS}:${entry.language}:${entry.key}`;
+}
+
+/** Every gap of both kinds, the target-type ones tagged with their section. */
+function allGaps(keys, targetTypes) {
+  return [
+    ...gaps(keys),
+    ...gaps(targetTypes, catalogKeys(LANGUAGES, TARGET_TYPES)).map((gap) => ({
+      ...gap,
+      section: TARGET_TYPES,
+    })),
+  ];
 }
 
 /**
@@ -146,7 +171,13 @@ function baseKey(entry) {
  * the path. Same shape as the API-type freshness check, for the same reason —
  * the generator lives on the other side of the tree from the gate.
  */
-function checkFreshness(savedKeys, savedDeclarations, savedUncovered, quiet) {
+function checkFreshness(
+  savedKeys,
+  savedTargetTypes,
+  savedDeclarations,
+  savedUncovered,
+  quiet,
+) {
   const freshPath = process.env.AUDIT_KEYS_FRESH;
   if (!freshPath) {
     console.error(
@@ -173,6 +204,22 @@ function checkFreshness(savedKeys, savedDeclarations, savedUncovered, quiet) {
     console.error(
       "Run `make sync-audit-fields`. The gate reads this file, so a stale one makes it green over a journal it cannot see.",
     );
+    process.exit(1);
+  }
+
+  // The target types are the other half of what the artefact stands for: a
+  // new enum member the saved file does not hold is a type the label check
+  // below never asks the catalogues about.
+  const freshTargetTypes = fresh["target-types"] ?? [];
+  const staleTypes = staleKeys(savedTargetTypes, freshTargetTypes);
+  if (staleTypes.missing.length > 0 || staleTypes.extra.length > 0) {
+    console.error(
+      `check-audit-fields: the target types in ${KEYS_PATH} are not what the backend declares today:`,
+    );
+    for (const type of staleTypes.missing) console.error(`  missing: ${type}`);
+    for (const type of staleTypes.extra)
+      console.error(`  no longer declared: ${type}`);
+    console.error("Run `make sync-audit-fields`.");
     process.exit(1);
   }
 
@@ -225,10 +272,10 @@ function runCli() {
   const onlyNew = process.argv.includes("--baseline");
   const freshness = process.argv.includes("--freshness");
 
-  const { keys, declarationsRead, uncovered } = loadKeys();
+  const { keys, targetTypes, declarationsRead, uncovered } = loadKeys();
 
   if (freshness) {
-    checkFreshness(keys, declarationsRead, uncovered, quiet);
+    checkFreshness(keys, targetTypes, declarationsRead, uncovered, quiet);
   }
 
   // Structural, never grand fathered: the baseline exists for translation
@@ -247,7 +294,7 @@ function runCli() {
     process.exit(1);
   }
 
-  const found = gaps(keys);
+  const found = allGaps(keys, targetTypes);
   const baseline = loadBaseline();
   const baselineSet = new Set(baseline.map(baseKey));
   const reported = onlyNew
@@ -260,7 +307,7 @@ function runCli() {
       JSON.stringify(
         {
           generatedBy: "node scripts/check-audit-fields.mjs --write-baseline",
-          note: "Snapshot field names with no translation yet. The goal is an empty file.",
+          note: "Snapshot field names and target types with no translation yet. The goal is an empty file.",
           gaps: found,
         },
         null,
@@ -268,12 +315,12 @@ function runCli() {
       ) + "\n",
     );
     console.log(
-      `check-audit-fields: baseline written with ${found.length} gap(s) of ${keys.length} key(s) × ${LANGUAGES.length} language(s)`,
+      `check-audit-fields: baseline written with ${found.length} gap(s) of ${keys.length} key(s) and ${targetTypes.length} target type(s) × ${LANGUAGES.length} language(s)`,
     );
     process.exit(0);
   }
 
-  const summary = `check-audit-fields: ${keys.length} declared key(s) from ${declarationsRead} declaration(s), read against ${LANGUAGES.length} catalogues`;
+  const summary = `check-audit-fields: ${keys.length} declared key(s) from ${declarationsRead} declaration(s) and ${targetTypes.length} target type(s), read against ${LANGUAGES.length} catalogues`;
 
   if (reported.length > 0) {
     if (!quiet) {
@@ -281,9 +328,12 @@ function runCli() {
         `${summary} — ${reported.length} name(s) no catalogue knows:`,
       );
       for (const gap of reported)
-        console.error(`  ${gap.language}: ${gap.key}`);
+        console.error(
+          `  ${gap.language}: ${gap.key}${gap.section ? ` (${gap.section})` : ""}`,
+        );
+      const first = reported[0];
       console.error(
-        `Add \`settings.audit.fields.${reported[0].key}\` to src/i18n/locales/<lang>/common.json — the journal prints the raw key until you do.`,
+        `Add \`settings.audit.${first.section ?? FIELDS}.${first.key}\` to src/i18n/locales/<lang>/common.json — the journal prints the raw key until you do.`,
       );
     }
     process.exit(1);

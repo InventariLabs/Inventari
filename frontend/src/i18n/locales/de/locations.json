@@ -282,8 +282,8 @@
     "description": "„{{name}}“ ist archiviert und bleibt aus der aktiven Liste heraus. Hier öffnen oder aus dem Archiv wiederherstellen."
   },
   "usage": {
-    "customer": "Kunde",
-    "inventory": "Bestandskorrektur",
+    "customer": "Verbraucht",
+    "inventory": "Inventarverlust",
     "production": "Produktion",
     "virtualNotice": "Systemstandort — sein Inhalt zählt nicht zu den Lagerbeständen."
   },

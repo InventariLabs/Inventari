@@ -135,9 +135,10 @@ def _seed_everything(items: int, admin_email: str, admin_password: str) -> dict:
     console.print(f'  Creating {admin_email}...')
     from app.cli.commands_user import provision_admin
 
-    # Everyone signs in to a public demo with this one account, so it is an
-    # organization admin only: the instance-wide powers of a superuser (block
-    # accounts, announce to all users, decide registrations) stay out of reach.
+    # This is the operator's own account; visitors get organizations of
+    # their own and never sign in with it. It is an organization admin only:
+    # the instance-wide powers of a superuser (block accounts, announce to all
+    # users, decide registrations) stay out of reach.
     provision_admin(
         email=admin_email,
         password=admin_password,

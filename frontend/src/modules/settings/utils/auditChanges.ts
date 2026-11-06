@@ -792,3 +792,21 @@ export function auditFieldLabel(
     )
     .join(" › ");
 }
+
+/**
+ * The names a row gives its own fields, keyed by path.
+ *
+ * Two writers share the snapshot key `lines` and mean different things by it:
+ * a production recipe counts its ingredients, a document or a purchase order
+ * counts its lines. The catalogue holds one word per key, and the journal is
+ * immutable, so the key cannot be split in the rows already written; the row's
+ * target type is what tells the two apart. *moduleTitles* are the names a
+ * module's settings give their fields, when the row is about one.
+ */
+export function auditFieldTitles(
+  targetType: string,
+  moduleTitles?: Record<string, string>,
+): Record<string, string> | undefined {
+  if (targetType === "maker_recipe") return moduleTitles;
+  return { lines: "settings.audit.fields.line_count", ...moduleTitles };
+}

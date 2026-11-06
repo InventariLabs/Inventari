@@ -250,6 +250,66 @@ class TestResultSnapshot:
         assert body['result_per_unit'] == '9.83'
         assert body['result_per_batch'] == '9.83'
 
+    def test_a_run_with_an_uncosted_ingredient_states_no_result(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A margin measured against a cost that left an ingredient out is
+        overstated by what was left out, so the run keeps its cost and states
+        no result - the same withholding the recipe card applies."""
+        cocoa = _template(db_session, mk_org, name='Cocoa')
+        hazelnuts = _template(db_session, mk_org, name='Hazelnuts')
+        output = _template(db_session, mk_org, name='Chocolate')
+        recipe = _recipe(db_session, mk_org, output.id, reference_price='12.50')
+        for ingredient in (cocoa, hazelnuts):
+            _bom_line(
+                db_session,
+                recipe_id=recipe.id,
+                parent_id=output.id,
+                child_id=ingredient.id,
+            )
+        post_on_shelf(
+            client,
+            mk_auth_headers,
+            cocoa,
+            mk_input_loc.id,
+            '100.000',
+            purchase_price='2.00',
+        )
+        post_on_shelf(client, mk_auth_headers, hazelnuts, mk_input_loc.id, '100.000')
+
+        order_id = client.post(
+            '/api/v1/maker/production/orders',
+            headers=mk_auth_headers,
+            json={
+                'output_template_id': str(output.id),
+                'planned_qty': '4.000',
+                'output_location_id': str(mk_output_loc.id),
+            },
+        ).json()['id']
+        completed = client.post(
+            f'/api/v1/maker/production/orders/{order_id}/complete',
+            headers=mk_auth_headers,
+            json={},
+        )
+        assert completed.status_code == 200, completed.text
+        body = completed.json()
+
+        assert body['unit_cost_snapshot'] is not None
+        assert body['result_per_unit'] is None
+        assert body['result_per_batch'] is None
+
+        months = client.get(
+            '/api/v1/maker/production/monthly-result', headers=mk_auth_headers
+        ).json()
+        assert months[-1]['orders'] == 0
+        assert months[-1]['result'] == '0.00'
+
     def test_snapshot_result_null_without_reference_price(
         self,
         client: TestClient,

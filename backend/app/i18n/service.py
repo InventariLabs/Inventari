@@ -248,6 +248,11 @@ _COMMA_DECIMAL_LANGUAGES = frozenset(
 )
 
 
+def writes_decimal_comma(lang: str) -> bool:
+    """Whether *lang* (``pl`` or a regional ``pl-PL``) writes ``2,5`` rather than ``2.5``."""
+    return lang.split('-')[0].split('_')[0] in _COMMA_DECIMAL_LANGUAGES
+
+
 def stated_quantity(quantity: Decimal, lang: Language | None = None) -> str:
     """The quantity as a refusal states it, whatever scale it arrived on.
 

@@ -147,8 +147,13 @@ describe("a location's products with the locations inside", () => {
         name: "Delete",
       }),
     );
+    const reasonDialog = await screen.findByRole("alertdialog");
+    await userEvent.selectOptions(
+      within(reasonDialog).getByTestId("deletion-reason"),
+      "EXPIRED",
+    );
     await userEvent.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
+      within(reasonDialog).getByRole("button", {
         name: "Delete",
       }),
     );

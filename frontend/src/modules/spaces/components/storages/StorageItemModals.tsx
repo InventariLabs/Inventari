@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { TypedSlot } from "@/components/Slot";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { MoveItemModal, QuickActionSheet } from "@/modules/inventory/moduleApi";
 import type { Item } from "@/types";
 
@@ -9,7 +8,6 @@ interface StorageItemModalsProps {
   setEditingItemId: (id: string | null) => void;
   actionItem: Item | null;
   setActionItem: (item: Item | null) => void;
-  confirmDialogProps: Parameters<typeof ConfirmDialog>[0];
 }
 
 /**
@@ -26,7 +24,6 @@ export default function StorageItemModals({
   setEditingItemId,
   actionItem,
   setActionItem,
-  confirmDialogProps,
 }: StorageItemModalsProps) {
   const [movingItem, setMovingItem] = useState<Item | null>(null);
 
@@ -64,8 +61,6 @@ export default function StorageItemModals({
           onSuccess={() => setMovingItem(null)}
         />
       )}
-
-      <ConfirmDialog {...confirmDialogProps} />
     </>
   );
 }
