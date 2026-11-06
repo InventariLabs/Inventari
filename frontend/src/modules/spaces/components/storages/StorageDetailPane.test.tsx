@@ -48,10 +48,10 @@ afterEach(() => {
   signOut();
 });
 
-function renderPane() {
+function renderPane(shown: StorageLocation = storage) {
   const props = {
     node,
-    storage,
+    storage: shown,
     path,
     excludeModuleContexts: false,
     canWriteStorage: true,
@@ -170,6 +170,20 @@ describe("StorageDetailPane — renaming in place", () => {
   });
 });
 
+describe("StorageDetailPane — a virtual location", () => {
+  it("names its role the way its own name does", () => {
+    renderPane({
+      ...storage,
+      name: "Consumed (Virtual)",
+      usage: "customer",
+    } as StorageLocation);
+
+    // The badge beside "Consumed (Virtual)" used to read "Customer".
+    expect(screen.queryByText("Customer")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Consumed").length).toBeGreaterThan(0);
+  });
+});
+
 describe("StorageDetailPane — the header's actions", () => {
   it("downloads the location's label under its code", async () => {
     server.use(
@@ -185,7 +199,7 @@ describe("StorageDetailPane — the header's actions", () => {
     const user = userEvent.setup();
     renderPane();
 
-    await user.click(screen.getByRole("button", { name: "Print Preview" }));
+    await user.click(screen.getByRole("button", { name: "Download label" }));
     await waitFor(() =>
       expect(downloadBlob).toHaveBeenCalledWith(
         expect.anything(),
@@ -203,7 +217,7 @@ describe("StorageDetailPane — the header's actions", () => {
     const user = userEvent.setup();
     renderPane();
 
-    await user.click(screen.getByRole("button", { name: "Print Preview" }));
+    await user.click(screen.getByRole("button", { name: "Download label" }));
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith("Error downloading labels"),
     );

@@ -7,6 +7,7 @@
   "actions": {
     "generate": "Générer des étiquettes",
     "preview": "Aperçu avant impression",
+    "downloadOne": "Télécharger l'étiquette",
     "generateNow": "Générer maintenant",
     "deleteSelected": "Supprimer la sélection",
     "reuseLabel": "Réutiliser l'étiquette",

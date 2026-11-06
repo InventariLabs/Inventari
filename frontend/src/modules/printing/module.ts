@@ -13,8 +13,10 @@ const ProductLabelSheetHost = lazy(
   () => import("./components/ProductLabelSheetHost"),
 );
 
-// /labels/scan/:code is kept here as printed QR codes reference this path directly
-// and changing it would break existing physical labels.
+// A printed QR now opens `/s/<code>` (see the backend's scan_links). The flat
+// /labels/scan/:code route stays registered here because the first stickers
+// opened exactly that address, and changing it would break labels already
+// stuck on shelves.
 moduleRegistry.register({
   name: "printing",
   launcher: {

@@ -386,7 +386,7 @@ describe("StoragesPage — one screen", () => {
       screen.getByRole("link", { name: /add product here/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Print Preview" }),
+      screen.getByRole("button", { name: "Download label" }),
     ).toBeInTheDocument();
     expect(
       screen.getAllByRole("button", { name: "Move to…" }).length,
@@ -1212,7 +1212,7 @@ describe("StoragesPage — one screen", () => {
     renderPage("/inventory/locations/zone");
 
     await userEvent.click(
-      await screen.findByRole("button", { name: "Print Preview" }),
+      await screen.findByRole("button", { name: "Download label" }),
     );
 
     await waitFor(() =>
