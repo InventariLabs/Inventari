@@ -534,3 +534,74 @@ class TestCreateAdminTakesTheAccountsLanguage:
         assert 'pl' in result.output
         assert 'Traceback' not in result.output
         db.add.assert_not_called()
+
+
+class TestAnAdminCanBeProvisionedFromPythonCode:
+    """``demo reset`` creates its account by calling Python, not the command line.
+
+    A typer command called as a function receives ``typer.Option`` objects
+    for every parameter it was not given, so ``lang`` reached the language
+    check as an ``OptionInfo`` and the rebuild stopped at the admin account.
+    """
+
+    def test_the_arguments_demo_reset_passes_create_the_account(self):
+        from app.cli.commands_user import provision_admin
+
+        db = MagicMock()
+        db.scalars.return_value.first.return_value = None
+        db.scalar.return_value = 0
+
+        with patch('app.database.SessionLocal', return_value=db):
+            provision_admin(
+                email='admin@example.com',
+                password='DemoPass123',
+                name='Demo Administrator',
+                instance_superuser=False,
+            )
+
+        user = next(
+            c.args[0]
+            for c in db.add.call_args_list
+            if type(c.args[0]).__name__ == 'User'
+        )
+        assert user.is_superuser is False
+        assert user.preferred_language is None or isinstance(
+            user.preferred_language, str
+        )
+
+    def test_no_cli_code_calls_a_typer_command_as_a_function(self):
+        import ast
+        from pathlib import Path
+
+        import app.cli
+
+        sources = sorted(Path(app.cli.__file__).parent.glob('*.py'))
+        trees = {p: ast.parse(p.read_text()) for p in sources}
+
+        def is_command(fn: ast.FunctionDef) -> bool:
+            return any(
+                isinstance(d, ast.Call)
+                and isinstance(d.func, ast.Attribute)
+                and d.func.attr in {'command', 'callback'}
+                for d in fn.decorator_list
+            )
+
+        commands = {
+            n.name
+            for tree in trees.values()
+            for n in ast.walk(tree)
+            if isinstance(n, ast.FunctionDef) and is_command(n)
+        }
+        offenders = [
+            f'{path.name}:{n.lineno} calls {n.func.id}()'
+            for path, tree in trees.items()
+            for n in ast.walk(tree)
+            if isinstance(n, ast.Call)
+            and isinstance(n.func, ast.Name)
+            and n.func.id in commands
+        ]
+        assert not offenders, (
+            'a typer command called as a function gets typer.Option objects '
+            'for its defaults; call a plain function the command delegates to: '
+            + ', '.join(offenders)
+        )

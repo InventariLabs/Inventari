@@ -124,6 +124,30 @@ def create_admin(
     ),
 ):
     """Create an admin user or reset existing admin password."""
+    provision_admin(
+        email=email,
+        password=password,
+        name=name,
+        lang=lang,
+        allow_weak_password=allow_weak_password,
+        instance_superuser=instance_superuser,
+    )
+
+
+def provision_admin(
+    email: str,
+    password: str,
+    name: str = 'Administrator',
+    lang: str | None = None,
+    allow_weak_password: bool = False,
+    instance_superuser: bool = True,
+) -> None:
+    """Create an admin user or reset an existing admin's password.
+
+    The body of ``create-admin`` with plain Python defaults. A typer command
+    called as a function receives ``typer.Option`` objects for the parameters
+    it was not given, so code that creates an admin calls this instead.
+    """
     import app.modules.stock_takes.models  # resolve StockTakeItem/StockTake mapper
     import app.modules.warehouse.models  # noqa: F401 - resolve Document mapper
     from app.database import SessionLocal
