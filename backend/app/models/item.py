@@ -115,6 +115,22 @@ class Item(Base):
             'is_deleted',
             text('created_at DESC'),
         ),
+        # The archive's own order, which it pages by the last row seen
+        # (``get_archived_items_async``): newest archive date first, the id
+        # breaking ties between records archived at one instant. A record
+        # with no archive date sorts by the day it was made. The id ascends
+        # inside the descending date, so a page is read off it in order, not
+        # sorted. Live records are in it too: the planner learns how many
+        # records share a date from this index's statistics, PostgreSQL does
+        # not read them from a partial index, and without them a page starting
+        # inside a large group of one instant sorted the whole group.
+        Index(
+            'ix_items_org_archived_at',
+            'organization_id',
+            'is_deleted',
+            text('coalesce(deleted_at, created_at) DESC'),
+            'id',
+        ),
         Index('ix_items_meta_data_gin', 'meta_data', postgresql_using='gin'),
         Index(
             'uq_items_org_serial',

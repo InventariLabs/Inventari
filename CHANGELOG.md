@@ -38,6 +38,14 @@ says what the release does rather than what changed since them.
   straight to the members and invitations, which used to sit at the foot of
   General. The webhook dialog lists every event in the interface language and
   groups the events of modules the organization has not enabled apart.
+- `GET /items/archived` pages by the last record seen, as the stock movement
+  ledger and the audit log do: it answers with `next_cursor`, takes `cursor`
+  for the page after, counts on the first page and carries that count, so a
+  page deep in a long archive costs what the first one does. Records archived
+  at the same instant are ordered by their id, so turning a page no longer
+  shows one of them twice and leaves out another. `offset` still answers and
+  is deprecated. The archive screens of the product list and of Equipment page
+  this way.
 - Creating an account — the first one, by invitation or from an approved
   request — signs it in and continues to the app, instead of sending the new
   owner to a sign-in form that asks for the address and password just chosen.
