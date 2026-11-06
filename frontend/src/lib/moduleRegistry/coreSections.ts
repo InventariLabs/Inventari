@@ -150,7 +150,8 @@ function hasPathPrefix(pathname: string, prefix: string): boolean {
 /**
  * The kept core nav section `pathname` belongs to, or null. Callers resolve
  * adoptable sections first (`getCoreSectionForPath`): the archive paths hang
- * under the items and storages prefixes and belong to the archive.
+ * under the items and storages prefixes and belong to the archive, unless the
+ * module renounced it — then they belong to the kept section.
  */
 export function getCoreNavSectionForPath(
   pathname: string,

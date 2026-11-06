@@ -199,6 +199,32 @@ describe("ScanPage", () => {
     expect(navigateMock).toHaveBeenCalledWith("/", { replace: true });
   });
 
+  it("goes home from the scanner a redirect replaced into place, where the key is no longer the initial one", async () => {
+    // A printed code's address (/s/<code>) and the sign-in return replace the
+    // first entry: the location gets a fresh key but nothing was added to the
+    // history, and the router's own counter says there is nothing to pop.
+    window.history.replaceState({ idx: 0 }, "");
+    try {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter
+            initialEntries={[{ pathname: "/inventory/scan", key: "replaced" }]}
+          >
+            <ScanPage />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+
+      await userEvent.click(
+        await screen.findByRole("button", { name: /back/i }),
+      );
+
+      expect(navigateMock).toHaveBeenCalledWith("/", { replace: true });
+    } finally {
+      window.history.replaceState(null, "");
+    }
+  });
+
   it("still goes back to where the reader came from inside the app", async () => {
     render(
       <QueryClientProvider client={queryClient}>

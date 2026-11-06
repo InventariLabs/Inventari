@@ -97,6 +97,9 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The scanner's Back button now leads to the launcher when the scanner was the
+  first screen of the tab — opened by address, through a printed code's link or
+  after signing in — instead of doing nothing.
 - Refusing an asset's status change from the bulk edit now reads in the language
   of the session (it was always English) and the row carries a machine code, and
   the Polish sentence no longer says "zmienić status z". A refused row of a

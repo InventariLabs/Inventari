@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StorageRequired } from "@/modules/shared/components/StorageRequired";
 import { labelsApi } from "@/lib/api/labels";
-import { useLocationOffer } from "@/module-sdk";
+import { hasHistoryToPop, useLocationOffer } from "@/module-sdk";
 import type { LabelScanView } from "@/types";
 import type { ItemFormData } from "@/modules/inventory/hooks/useItemForm";
 import {
@@ -335,9 +335,10 @@ export default function ScanPage() {
         isTorchOn={isTorchOn}
         storageContext={storageContext}
         onBack={() =>
-          // Opened by address or from a fresh tab, the scanner is the first
-          // entry of its history and popping it does nothing.
-          location.key !== "default"
+          // Opened by address, by a printed code's redirect or from a fresh
+          // tab, the scanner is the first entry of its history and popping it
+          // does nothing.
+          hasHistoryToPop(location)
             ? navigate(-1)
             : navigate("/", { replace: true })
         }
