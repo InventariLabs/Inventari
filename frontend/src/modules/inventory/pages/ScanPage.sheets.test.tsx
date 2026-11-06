@@ -171,9 +171,11 @@ function scanAnswers(view: Partial<LabelScanView>) {
   } as unknown as LabelScanView);
 }
 
-function renderPage() {
+// `entries` with a second entry puts the scanner mid-history, as a reader who
+// arrived from another screen has it.
+function renderPage(entries = ["/"], index = 0) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={entries} initialIndex={index}>
       <ScanPage />
     </MemoryRouter>,
   );
@@ -384,7 +386,7 @@ describe("ScanPage — the sheets a scan opens, and the ways out of them", () =>
       icon: "📦",
     } as never);
     const user = userEvent.setup();
-    renderPage();
+    renderPage(["/inventory", "/inventory/scan"], 1);
 
     await user.click(screen.getByRole("button", { name: "back" }));
     expect(mocks.navigate).toHaveBeenCalledWith(-1);

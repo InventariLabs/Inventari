@@ -183,6 +183,65 @@ describe("ScanPage", () => {
     expect(instruction).toBeInTheDocument();
   });
 
+  it("goes home from the scanner opened by address, where there is no back", async () => {
+    // A bare address or a fresh tab makes the scanner the first entry of its
+    // history, and navigate(-1) from there does nothing.
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/inventory/scan"]}>
+          <ScanPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await userEvent.click(await screen.findByRole("button", { name: /back/i }));
+
+    expect(navigateMock).toHaveBeenCalledWith("/", { replace: true });
+  });
+
+  it("goes home from the scanner a redirect replaced into place, where the key is no longer the initial one", async () => {
+    // A printed code's address (/s/<code>) and the sign-in return replace the
+    // first entry: the location gets a fresh key but nothing was added to the
+    // history, and the router's own counter says there is nothing to pop.
+    window.history.replaceState({ idx: 0 }, "");
+    try {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter
+            initialEntries={[{ pathname: "/inventory/scan", key: "replaced" }]}
+          >
+            <ScanPage />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+
+      await userEvent.click(
+        await screen.findByRole("button", { name: /back/i }),
+      );
+
+      expect(navigateMock).toHaveBeenCalledWith("/", { replace: true });
+    } finally {
+      window.history.replaceState(null, "");
+    }
+  });
+
+  it("still goes back to where the reader came from inside the app", async () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter
+          initialEntries={["/inventory", "/inventory/scan"]}
+          initialIndex={1}
+        >
+          <ScanPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await userEvent.click(await screen.findByRole("button", { name: /back/i }));
+
+    expect(navigateMock).toHaveBeenCalledWith(-1);
+  });
+
   it("pins the scanner between the app bar and the bottom nav instead of subtracting a fixed offset", async () => {
     // The shell above the scanner changes height with orientation; a
     // calc(100dvh - Nrem) height pushed the camera area and aim frame
