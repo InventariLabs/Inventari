@@ -270,15 +270,20 @@ function useArchivedListing(listTab: ListTab, search: string) {
   }, [isPlaceholderData, goNext, nextCursor]);
 
   return {
-    skip: paging.page * PAGE_SIZE,
-    hasNext: Boolean(nextCursor),
     archivedSearch,
     data,
     isLoading,
     isError,
     refetch,
-    onPrev: paging.goPrev,
-    onNext,
+    // The page bar, ready to spread onto Pagination.
+    pagination: {
+      skip: paging.page * PAGE_SIZE,
+      limit: PAGE_SIZE,
+      total: data?.total ?? 0,
+      keyset: { rows: data?.items?.length ?? 0, hasNext: Boolean(nextCursor) },
+      onPrev: paging.goPrev,
+      onNext,
+    },
   };
 }
 
@@ -397,15 +402,12 @@ export function useAssetListActions() {
   const resetPagination = useCallback(() => setSkip(0), []);
 
   const {
-    skip: archivedSkip,
-    hasNext: archivedHasNext,
     archivedSearch,
     data: archivedItems,
     isLoading: archivedLoading,
     isError: archivedError,
     refetch: refetchArchived,
-    onPrev: onArchivedPrev,
-    onNext: onArchivedNext,
+    pagination: archivedPagination,
   } = useArchivedListing(listTab, search);
 
   const bulkRetireMutation = useBulkRetireEquipment();
@@ -427,7 +429,6 @@ export function useAssetListActions() {
     () => archivedItems?.items ?? [],
     [archivedItems],
   );
-  const archivedTotal = archivedItems?.total ?? 0;
 
   // Batch endpoints report failures by item id; the reader knows assets by
   // name. Both lists feed the map because purge and restore act on archived
@@ -507,7 +508,7 @@ export function useAssetListActions() {
   useEffect(() => {
     setSelectedIds(new Set());
     setAllMatching(false);
-  }, [skip, archivedSkip, listTab, archivedSearch]);
+  }, [skip, archivedPagination.skip, listTab, archivedSearch]);
 
   const handleExport = useCallback(async () => {
     try {
@@ -798,15 +799,7 @@ export function useAssetListActions() {
     onPrev,
     onNext,
     resetPagination,
-    // The archive's page bar, ready to spread: the archive pages by cursor.
-    archivedPagination: {
-      skip: archivedSkip,
-      limit: PAGE_SIZE,
-      total: archivedTotal,
-      keyset: { rows: equipmentArchived.length, hasNext: archivedHasNext },
-      onPrev: onArchivedPrev,
-      onNext: onArchivedNext,
-    },
+    archivedPagination,
     bulkRetireMutation,
     bulkArchiveMutation,
     bulkReturnMutation,

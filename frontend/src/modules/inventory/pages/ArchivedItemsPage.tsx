@@ -145,7 +145,7 @@ function useArchivePage(search: string, excludeModuleContexts: boolean) {
       limit: PAGE_SIZE,
       total: page?.total ?? 0,
       keyset: {
-        rows: page?.items.length ?? 0,
+        rows: page?.items?.length ?? 0,
         hasNext: Boolean(page?.next_cursor),
       },
       onPrev: paging.goPrev,

@@ -106,12 +106,12 @@
     },
     "src/modules/equipment/hooks/useAssetListActions.ts": {
       "useAssetListActions": [
-        451
+        443
       ]
     },
     "src/modules/equipment/pages/AssetListPage.tsx": {
       "AssetListPage": [
-        485
+        476
       ]
     },
     "src/modules/inventory/pages/ItemsPage.tsx": {
