@@ -133,6 +133,7 @@ export default function AssetListPage() {
     resetPagination,
     archivedSkip,
     archivedTotal,
+    archivedHasNext,
     onArchivedPrev,
     onArchivedNext,
     bulkReturnMutation,
@@ -546,6 +547,10 @@ export default function AssetListPage() {
             skip={archivedSkip}
             limit={limit}
             total={archivedTotal}
+            keyset={{
+              rows: equipmentArchived.length,
+              hasNext: archivedHasNext,
+            }}
             onPrev={onArchivedPrev}
             onNext={onArchivedNext}
           />

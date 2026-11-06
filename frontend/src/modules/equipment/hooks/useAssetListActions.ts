@@ -20,6 +20,7 @@ import { downloadBlob } from "@/utils/helpers";
 import { getTodayFilename } from "@/utils/formatters";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { queryKeys } from "@/hooks/queries/keys";
+import { useKeysetPaging } from "@/module-sdk";
 import { getEquipmentMeta } from "@/modules/equipment/components/assetUtils";
 import {
   bulkReturnPayload,
@@ -233,56 +234,50 @@ function useSearchPhrase() {
  * while the archived tab is on screen: typed over the active list it belongs
  * to that list, and re-asking the archive on every keystroke would be work
  * for a tab nobody is reading. Coming back with a phrase still in the box
- * narrows the archive then, and a new phrase starts it at page one — offset
- * 50 over a narrowed set would show an empty page while page one holds the
- * matches.
+ * narrows the archive then. The archive pages by the last row seen, so a new
+ * phrase — or coming back to the tab — starts it from its first page: a
+ * position in one answer means nothing in another.
  */
 function useArchivedListing(listTab: ListTab, search: string) {
-  const [skip, setSkip] = useState(0);
   const archivedSearch = listTab === "archived" ? search : "";
+  const paging = useKeysetPaging({ listTab, archivedSearch });
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, isPlaceholderData, refetch } = useQuery({
     queryKey: [
       ...queryKeys.equipment.assets.list({}),
       "archived",
       archivedSearch,
-      skip,
+      paging.cursor ?? null,
     ],
     queryFn: async () => {
       return itemsApi.getArchived({
         module_scope: "equipment",
         search: archivedSearch || undefined,
-        offset: skip,
+        cursor: paging.cursor,
         limit: PAGE_SIZE,
       });
     },
     placeholderData: keepPreviousData,
   });
 
-  useEffect(() => {
-    setSkip(0);
-  }, [archivedSearch]);
-
-  const onPrev = useCallback(
-    () => setSkip((s) => Math.max(0, s - PAGE_SIZE)),
-    [],
-  );
+  const { goNext } = paging;
+  const nextCursor = data?.next_cursor;
+  // The cursor on screen belongs to the page it came with; while the next
+  // page loads the old rows are still shown, and their cursor must not be
+  // taken for the new page's.
   const onNext = useCallback(() => {
-    const total = data?.total ?? 0;
-    if (total > 0 && skip + PAGE_SIZE < total) {
-      setSkip(skip + PAGE_SIZE);
-    }
-  }, [skip, data?.total]);
+    if (!isPlaceholderData) goNext(nextCursor);
+  }, [isPlaceholderData, goNext, nextCursor]);
 
   return {
-    skip,
-    setSkip,
+    skip: paging.page * PAGE_SIZE,
+    hasNext: Boolean(nextCursor),
     archivedSearch,
     data,
     isLoading,
     isError,
     refetch,
-    onPrev,
+    onPrev: paging.goPrev,
     onNext,
   };
 }
@@ -403,7 +398,7 @@ export function useAssetListActions() {
 
   const {
     skip: archivedSkip,
-    setSkip: setArchivedSkip,
+    hasNext: archivedHasNext,
     archivedSearch,
     data: archivedItems,
     isLoading: archivedLoading,
@@ -745,7 +740,6 @@ export function useAssetListActions() {
       writeListTab(tab);
       if (tab === "archived") {
         clearSelection();
-        setArchivedSkip(0);
       }
     },
     selectedIds,
@@ -806,6 +800,7 @@ export function useAssetListActions() {
     resetPagination,
     archivedSkip,
     archivedTotal,
+    archivedHasNext,
     onArchivedPrev,
     onArchivedNext,
     bulkRetireMutation,

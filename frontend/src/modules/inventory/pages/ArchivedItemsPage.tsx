@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { categoryLabel } from "@/lib/i18nHelpers";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +23,7 @@ import { useArchiveTabs } from "@/hooks/useArchiveTabs";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useFilteredList } from "@/hooks/useFilteredList";
 import { useHasPermission } from "@/hooks/useHasPermission";
+import { useKeysetPaging } from "@/hooks/useKeysetPaging";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import {
   useOrganization,
@@ -118,27 +119,63 @@ function ArchivedNameCell({
   );
 }
 
+/** One page of the archive and the bar that turns it. The archive only grows,
+ *  so the server pages it by the last row seen: the next page is asked for
+ *  with the cursor the page on screen carried, and a new question (the
+ *  phrase, the module-data policy) starts again from its first page. */
+function useArchivePage(search: string, excludeModuleContexts: boolean) {
+  const question = useMemo(
+    () => ({
+      search: search || undefined,
+      exclude_module_contexts: excludeModuleContexts,
+    }),
+    [search, excludeModuleContexts],
+  );
+  const paging = useKeysetPaging(question);
+  const archivedQuery = useArchivedItems({
+    ...question,
+    limit: PAGE_SIZE,
+    cursor: paging.cursor,
+  });
+  const page = archivedQuery.data;
+  return {
+    archivedQuery,
+    pagination: {
+      skip: paging.page * PAGE_SIZE,
+      limit: PAGE_SIZE,
+      total: page?.total ?? 0,
+      keyset: {
+        rows: page?.items.length ?? 0,
+        hasNext: Boolean(page?.next_cursor),
+      },
+      onPrev: paging.goPrev,
+      // The cursor on screen belongs to the page it came with; while the next
+      // page loads the old rows are still shown, and their cursor must not be
+      // taken for the new page's.
+      onNext: () => {
+        if (!archivedQuery.isPlaceholderData) paging.goNext(page?.next_cursor);
+      },
+    },
+  };
+}
+
 export default function ArchivedItemsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation(["items", "common"]);
   const { setHeader } = useModulePageHeader();
-  // The same debounced search / paginated state machine the active list runs
-  // on — the phrase goes to the server, so a match on page 2 answers, and the
-  // page number resets when the phrase changes.
-  const f = useFilteredList({}, { searchDebounceMs: 400, limit: PAGE_SIZE });
+  // The same debounced search the active list runs on — the phrase goes to
+  // the server, so a match on a later page answers.
+  const f = useFilteredList({}, { searchDebounceMs: 400 });
   // The archive is the active list in another state, so it follows the same
   // module-data policy — a restore is confirmed on the tab the row reappears
   // on, and two tabs of one screen must describe one population.
   const excludeModuleContexts = !useShowModuleData();
-  const archivedQuery = useArchivedItems({
-    offset: f.skip,
-    limit: f.limit,
-    search: f.search || undefined,
-    exclude_module_contexts: excludeModuleContexts,
-  });
-  const response = archivedQuery.data;
-  const items = response?.items ?? [];
-  const total = response?.total ?? 0;
+  const { archivedQuery, pagination } = useArchivePage(
+    f.search,
+    excludeModuleContexts,
+  );
+  const items = archivedQuery.data?.items ?? [];
+  const total = pagination.total;
   const restoreMutation = useRestoreItem();
   const purgeMutation = usePurgeItem();
   const { data: org } = useOrganization();
@@ -400,13 +437,7 @@ export default function ArchivedItemsPage() {
         }}
       </QueryResult>
 
-      <Pagination
-        skip={f.skip}
-        limit={f.limit}
-        total={total}
-        onPrev={f.onPrev}
-        onNext={f.onNext}
-      />
+      <Pagination {...pagination} />
 
       <ConfirmDialog
         open={restoreTarget !== null}

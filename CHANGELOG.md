@@ -96,6 +96,9 @@ says what the release does rather than what changed since them.
   to get back into an installation without outgoing mail.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
+- Module authors can page a list the server pages by cursor with
+  `useKeysetPaging` from `@/module-sdk`: it keeps the cursors of the pages
+  already visited and starts from the first page when the question changes.
 - When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
   list's "From recipes" writes goods that another open shopping list still
   asks for, the answer names them and the list that holds them
