@@ -22,7 +22,12 @@ vi.mock("@/hooks/useModulePageHeader", () => ({
   useModulePageHeader: () => ({ setHeader: vi.fn() }),
 }));
 
+// One array for every render, as the real context gives: a new one each time
+// would re-run whatever the form derives from it.
+const enabledModules = ["warehouse"];
+
 vi.mock("@/contexts/ModulesContext", () => ({
+  useEnabledModulesOptional: () => enabledModules,
   useModules: () => ({
     enabledModules: ["warehouse"],
     hiddenModules: [],

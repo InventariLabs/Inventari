@@ -490,7 +490,7 @@ describe("FocusModeSettings", () => {
     }
     expect(
       within(rows[0]).getByRole("link", {
-        name: "Enable Equipment Tracking in the App Store",
+        name: "Enable Equipment Tracking in Modules",
       }),
     ).toHaveAttribute("href", "/apps?module=equipment");
     expect(within(empty).queryByText(/standalone/i)).not.toBeInTheDocument();

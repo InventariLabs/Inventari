@@ -162,8 +162,8 @@
       "members": "Mitglieder",
       "searchMembers": "Mitglieder suchen…",
       "inviteTitle": "Benutzer einladen",
-      "removeMemberTitle": "Mitglied entfernen?",
-      "removeMemberConfirm": "Sind Sie sicher, dass Sie dieses Mitglied entfernen möchten?",
+      "removeMemberTitle": "{{name}} entfernen?",
+      "removeMemberConfirm": "{{name}} ({{role}}) verliert sofort den Zugriff auf diese Organisation. Die von dieser Person angelegten Datensätze bleiben erhalten. Um die Person wieder aufzunehmen, senden Sie eine neue Einladung.",
       "invalidLink": "In diesem Einladungslink fehlt der Einladungscode. Bitten Sie um eine neue Einladung und öffnen Sie den vollständigen Link.",
       "joinedSuccess": "Organisation erfolgreich beigetreten",
       "alreadyMember": "Sie gehören dieser Organisation bereits an",
@@ -316,8 +316,8 @@
       "emptyHint": "Nur ein Modul zu zeigen grenzt den Arbeitsbereich auf diese App ein. Schalten Sie eines davon ein und kommen Sie dann hierher zurück.",
       "stateEnabled": "Aktiviert",
       "stateNotEnabled": "Nicht aktiviert",
-      "enableLink": "Im App Store aktivieren",
-      "enableAction": "{{name}} im App Store aktivieren",
+      "enableLink": "In „Module“ aktivieren",
+      "enableAction": "{{name}} in „Module“ aktivieren",
       "previewLoading": "Änderungen werden berechnet…",
       "diffTitle": "Was sich ändert",
       "diffDisable": "Wird ausgeschaltet",
@@ -803,7 +803,7 @@
       "systemGroup": "Allgemein",
       "systemRole": "Integrierte Rolle — ihre Berechtigungen sind unveränderlich.",
       "systemRoleFooter": "Integrierte Rollen sind schreibgeschützt.",
-      "title": "Zugriff und Rollen"
+      "title": "Rollen & Rechte"
     },
     "data": {
       "exportDesc": "Eine Kopie Ihrer Produkte herunterladen",
@@ -836,7 +836,7 @@
       "saved": "Einstellungen gespeichert"
     },
     "modules": {
-      "openAppStore": "App Store öffnen"
+      "openAppStore": "Module öffnen"
     },
     "theme": "Design",
     "theme_light": "Hell",
@@ -1028,7 +1028,7 @@
   "unknown": "Unbekannt",
   "focusLock": {
     "title": "Es wird nur ein Modul angezeigt",
-    "body": "Dieser Arbeitsbereich zeigt ein Modul, daher sind der App-Start und der App-Store beiseitegelegt. Öffnen Sie „Meine Module“, um alle wieder zu zeigen.",
+    "body": "Dieser Arbeitsbereich zeigt ein Modul, daher sind der App-Start und die Seite „Module“ beiseitegelegt. Öffnen Sie „Meine Module“, um alle wieder zu zeigen.",
     "exit": "„Meine Module“ öffnen",
     "unknownTitle": "Angezeigte Module konnten nicht geprüft werden",
     "unknownBody": "Welche Module dieser Arbeitsbereich zeigt, konnte nicht gelesen werden, daher wird der App-Start nicht angezeigt. Versuchen Sie es erneut oder öffnen Sie „Meine Module“.",
@@ -1090,7 +1090,7 @@
     "signedBy": "Signiert mit Schlüssel {{key}}",
     "signedByHint": "Die Signatur deckt den hier gezeigten Autor und die Lizenz ab.",
     "subtitle": "{{active}} der {{total}} hier angebotenen Module sind aktiv",
-    "title": "App Store",
+    "title": "Module",
     "trust_cloud": "Cloud",
     "trust_community": "Community",
     "trust_core": "Kern",
@@ -1217,7 +1217,7 @@
     "moduleNotEnabled": "Modul nicht aktiviert",
     "moduleNotEnabledDesc": "Das Modul {{module}} ist für Ihre Organisation nicht aktiviert.",
     "goToSettings": "Gehen Sie zu den Einstellungen, um es zu aktivieren.",
-    "openAppStore": "App-Store öffnen",
+    "openAppStore": "Module öffnen",
     "dashboard": "Dashboard"
   },
   "analytics": {

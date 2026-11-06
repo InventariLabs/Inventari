@@ -205,7 +205,7 @@ describe("SettingsShell access", () => {
 
       const approvals = screen.getByRole("link", { name: "Approvals" });
       expect(approvals).toHaveAttribute("href", "/settings/modules/approvals");
-      const stats = screen.getByRole("link", { name: "Analytics" });
+      const stats = screen.getByRole("link", { name: "Statistics" });
       expect(stats).toHaveAttribute("href", "/settings/modules/stats");
     } finally {
       modulesState.enabledModules = ["core", "items"];

@@ -37,7 +37,7 @@ export default function OrganizationMembers() {
   const { user } = useAuthStore();
   const isAdmin = useHasPermission("admin:access");
 
-  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+  const [memberToRemoveId, setMemberToRemoveId] = useState<string | null>(null);
   const pageSize = 20;
   const [memberPage, setMemberPage] = useState(1);
   const [memberSearch, setMemberSearch] = useState("");
@@ -64,6 +64,16 @@ export default function OrganizationMembers() {
   const memberTotalPages = Math.max(Math.ceil(totalMembers / pageSize), 1);
 
   const removeMemberMutation = useRemoveMember();
+  const memberToRemove = members?.find((m) => m.id === memberToRemoveId);
+  const memberDisplayName = memberToRemove
+    ? memberToRemove.full_name || memberToRemove.email
+    : "";
+  const roleLabel = (member: NonNullable<typeof members>[number]) =>
+    member.custom_role
+      ? member.custom_role.name
+      : t(`settings.organization.memberRoles.${member.role}`, {
+          defaultValue: member.role,
+        });
   const changeMemberRoleMutation = useChangeMemberRole();
   // Custom roles are admin-only data (the endpoint requires
   // SYSTEM_CONFIG_WRITE), so the query stays disabled for everyone else.
@@ -156,14 +166,7 @@ export default function OrganizationMembers() {
                         custom role names itself; its summary comes from the
                         permission set, not the built-in map. */}
                     <p className="text-xs text-on-muted truncate">
-                      {member.custom_role
-                        ? member.custom_role.name
-                        : t(
-                            `settings.organization.memberRoles.${member.role}`,
-                            {
-                              defaultValue: member.role,
-                            },
-                          )}
+                      {roleLabel(member)}
                       {" · "}
                       {t(
                         `settings.organization.memberRoleAccess.${
@@ -251,7 +254,7 @@ export default function OrganizationMembers() {
                     <Button
                       variant="ghost"
                       size="iconSm"
-                      onClick={() => setMemberToRemove(member.id)}
+                      onClick={() => setMemberToRemoveId(member.id)}
                       className="text-on-muted transition-all hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
                       aria-label={t("a11y.removeMember", {
                         name: member.full_name || member.email,
@@ -281,26 +284,27 @@ export default function OrganizationMembers() {
       <ConfirmDialog
         open={!!memberToRemove}
         title={t("settings.organization.removeMemberTitle", {
-          defaultValue: "Remove Member?",
+          name: memberDisplayName,
         })}
         message={t("settings.organization.removeMemberConfirm", {
-          defaultValue: "Are you sure you want to remove this member?",
+          name: memberDisplayName,
+          role: memberToRemove ? roleLabel(memberToRemove) : "",
         })}
         confirmLabel={t("actions.remove", { defaultValue: "Remove" })}
         variant="danger"
         onConfirm={() => {
           if (memberToRemove)
-            removeMemberMutation.mutate(memberToRemove, {
+            removeMemberMutation.mutate(memberToRemove.id, {
               onSuccess: () => {
                 toast.success(t("settings.organization.memberRemoved"));
-                setMemberToRemove(null);
+                setMemberToRemoveId(null);
               },
               onError: (error) =>
                 toast.error(extractApiError(error, t("messages.error"))),
             });
-          setMemberToRemove(null);
+          setMemberToRemoveId(null);
         }}
-        onCancel={() => setMemberToRemove(null)}
+        onCancel={() => setMemberToRemoveId(null)}
       />
     </>
   );

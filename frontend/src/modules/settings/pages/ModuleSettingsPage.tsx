@@ -82,7 +82,7 @@ export default function ModuleSettingsPage({
         to="/apps"
         className="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-primary-700 dark:bg-primary-800 text-white text-sm font-medium hover:bg-primary-800 dark:hover:bg-primary-900"
       >
-        {t("settings.modules.openAppStore", "Open App Store")}
+        {t("settings.modules.openAppStore", "Open Modules")}
       </Link>
     );
 

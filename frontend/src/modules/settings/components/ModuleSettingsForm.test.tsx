@@ -27,6 +27,11 @@ vi.mock("@/lib/api/modules", () => ({
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
+const enabledModules = vi.hoisted(() => ({ list: [] as string[] }));
+vi.mock("@/contexts/ModulesContext", () => ({
+  useEnabledModulesOptional: () => enabledModules.list,
+}));
+
 // A nested schema, like the recipes module's — the shape the flat form state
 // has to survive a round trip through.
 const schema: ModuleSettingsSchema = {
@@ -296,5 +301,56 @@ describe("ModuleSettingsForm — a number outside its bounds", () => {
         warning_window_days: 14,
       }),
     );
+  });
+});
+
+describe("ModuleSettingsForm — a setting about another module", () => {
+  const gated: ModuleSettingsSchema = {
+    type: "object",
+    properties: {
+      enable_cost_calculation: {
+        type: "boolean",
+        default: true,
+        title: "Enable cost calculation",
+      },
+      register_production_as_document: {
+        type: "boolean",
+        default: false,
+        title: "Register production as internal issue documents",
+        requires_modules: ["warehouse"],
+      },
+    },
+  };
+  const gatedTitle = "Register production as internal issue documents";
+
+  afterEach(() => {
+    enabledModules.list = [];
+  });
+
+  it("is not offered where the module it names is off", () => {
+    enabledModules.list = ["recipes"];
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="recipes"
+        schema={gated}
+        initialValues={{}}
+      />,
+    );
+
+    expect(screen.getByText("Enable cost calculation")).toBeInTheDocument();
+    expect(screen.queryByText(gatedTitle)).toBeNull();
+  });
+
+  it("is offered once the module it names is on", () => {
+    enabledModules.list = ["recipes", "warehouse"];
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="recipes"
+        schema={gated}
+        initialValues={{}}
+      />,
+    );
+
+    expect(screen.getByText(gatedTitle)).toBeInTheDocument();
   });
 });

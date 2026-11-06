@@ -162,8 +162,8 @@
       "members": "Membros",
       "searchMembers": "Buscar membros…",
       "inviteTitle": "Convidar usuário",
-      "removeMemberTitle": "Remover membro?",
-      "removeMemberConfirm": "Tem certeza de que deseja remover este membro?",
+      "removeMemberTitle": "Remover {{name}}?",
+      "removeMemberConfirm": "{{name}} ({{role}}) perde o acesso a esta organização imediatamente. Os registros criados pela pessoa permanecem. Para readmiti-la, envie um novo convite.",
       "invalidLink": "Este link de convite não tem o código do convite. Peça um novo convite e abra o link completo.",
       "joinedSuccess": "Você entrou na organização com sucesso",
       "alreadyMember": "Você já faz parte desta organização",
@@ -316,8 +316,8 @@
       "emptyHint": "Mostrar só um módulo reduz o espaço de trabalho a esse aplicativo. Ative um destes e volte aqui.",
       "stateEnabled": "Ativado",
       "stateNotEnabled": "Não ativado",
-      "enableLink": "Ativar na App Store",
-      "enableAction": "Ativar {{name}} na App Store",
+      "enableLink": "Ativar em Módulos",
+      "enableAction": "Ativar {{name}} em Módulos",
       "previewLoading": "Calculando alterações…",
       "diffTitle": "O que vai mudar",
       "diffDisable": "Será desativado",
@@ -830,7 +830,7 @@
       "saved": "Configurações guardadas"
     },
     "modules": {
-      "openAppStore": "Abrir a App Store"
+      "openAppStore": "Abrir Módulos"
     },
     "theme": "Tema",
     "theme_light": "Claro",
@@ -1020,10 +1020,10 @@
   "unknown": "Desconhecido",
   "focusLock": {
     "title": "Só um módulo está sendo exibido",
-    "body": "Este espaço de trabalho mostra um módulo, então o menu de aplicativos e a App Store ficam de lado. Abra Meus módulos para mostrar todos novamente.",
+    "body": "Este espaço de trabalho mostra um módulo, então o menu de aplicativos e a página Módulos ficam de lado. Abra Meus módulos para mostrar todos novamente.",
     "exit": "Abrir Meus módulos",
     "unknownTitle": "Não foi possível verificar quais módulos estão sendo exibidos",
-    "unknownBody": "Não foi possível ler quais módulos este espaço de trabalho mostra, então o menu de aplicativos e a App Store não são exibidos. Tente novamente ou abra Meus módulos.",
+    "unknownBody": "Não foi possível ler quais módulos este espaço de trabalho mostra, então o menu de aplicativos e a página Módulos não são exibidos. Tente novamente ou abra Meus módulos.",
     "retry": "Tentar novamente"
   },
   "focusMarker": {
@@ -1082,7 +1082,7 @@
     "signedBy": "Assinado por {{key}}",
     "signedByHint": "A assinatura cobre o autor e a licença exibidos aqui.",
     "subtitle": "{{active}} dos {{total}} módulos oferecidos aqui estão ativados",
-    "title": "App Store",
+    "title": "Módulos",
     "trust_cloud": "Nuvem",
     "trust_community": "Comunidade",
     "trust_core": "Núcleo",
@@ -1207,7 +1207,7 @@
     "moduleNotEnabled": "Módulo não ativado",
     "moduleNotEnabledDesc": "O módulo {{module}} não está ativado para sua organização.",
     "goToSettings": "Vá às Configurações para ativá-lo.",
-    "openAppStore": "Abrir a App Store",
+    "openAppStore": "Abrir Módulos",
     "dashboard": "Painel"
   },
   "analytics": {

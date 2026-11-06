@@ -162,8 +162,8 @@
       "members": "Membres",
       "searchMembers": "Rechercher des membres…",
       "inviteTitle": "Inviter un utilisateur",
-      "removeMemberTitle": "Retirer le membre ?",
-      "removeMemberConfirm": "Êtes-vous sûr de vouloir retirer ce membre ?",
+      "removeMemberTitle": "Retirer {{name}} ?",
+      "removeMemberConfirm": "{{name}} ({{role}}) perdra immédiatement l'accès à cette organisation. Les enregistrements créés par cette personne sont conservés. Pour la réintégrer, envoyez une nouvelle invitation.",
       "invalidLink": "Ce lien d'invitation ne contient pas de code d'invitation. Demandez une nouvelle invitation et ouvrez le lien complet.",
       "joinedSuccess": "Organisation rejointe avec succès",
       "alreadyMember": "Vous faites déjà partie de cette organisation",
@@ -316,8 +316,8 @@
       "emptyHint": "N'afficher qu'un module réduit l'espace de travail à cette application. Activez-en une ci-dessous, puis revenez ici.",
       "stateEnabled": "Activée",
       "stateNotEnabled": "Non activée",
-      "enableLink": "Activer dans l'App Store",
-      "enableAction": "Activer {{name}} dans l'App Store",
+      "enableLink": "Activer dans Modules",
+      "enableAction": "Activer {{name}} dans Modules",
       "previewLoading": "Calcul des changements…",
       "diffTitle": "Ce qui va changer",
       "diffDisable": "Sera désactivé",
@@ -803,7 +803,7 @@
       "systemGroup": "Général",
       "systemRole": "Rôle intégré — ses autorisations ne sont pas modifiables.",
       "systemRoleFooter": "Les rôles intégrés sont en lecture seule.",
-      "title": "Accès et rôles"
+      "title": "Rôles et accès"
     },
     "data": {
       "exportDesc": "Télécharger une copie de vos produits",
@@ -836,7 +836,7 @@
       "saved": "Paramètres enregistrés"
     },
     "modules": {
-      "openAppStore": "Ouvrir l'App Store"
+      "openAppStore": "Ouvrir Modules"
     },
     "theme": "Thème",
     "theme_light": "Clair",
@@ -1092,7 +1092,7 @@
     "signedBy": "Signé avec la clé {{key}}",
     "signedByHint": "La signature couvre l'auteur et la licence affichés ici.",
     "subtitle": "{{active}} des {{total}} modules proposés ici sont activés",
-    "title": "App Store",
+    "title": "Modules",
     "trust_cloud": "Cloud",
     "trust_community": "Communauté",
     "trust_core": "Cœur",
@@ -1219,7 +1219,7 @@
     "moduleNotEnabled": "Module non activé",
     "moduleNotEnabledDesc": "Le module {{module}} n'est pas activé pour votre organisation.",
     "goToSettings": "Allez dans les paramètres pour l'activer.",
-    "openAppStore": "Ouvrir l'App Store",
+    "openAppStore": "Ouvrir Modules",
     "dashboard": "Tableau de bord"
   },
   "analytics": {

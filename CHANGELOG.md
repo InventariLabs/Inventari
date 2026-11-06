@@ -72,6 +72,12 @@ says what the release does rather than what changed since them.
   read but not finished is redelivered at once when the replacement starts more
   than a minute later, instead of up to six minutes after the crash.
   `docs/SCALING.md` says what the delay depends on.
+- The module store in Settings is now headed "Modules", the name of its
+  sidebar entry, and the Statistics settings link carries the module's own
+  name instead of "Analytics". Every settings destination reads the same in the
+  sidebar and in the heading of the page it opens in all languages. Removing a
+  member now asks "Remove <name>?" and says that person loses access at once
+  while the records they created stay.
 
 ### Added
 
@@ -94,6 +100,10 @@ says what the release does rather than what changed since them.
   "Wax" no longer leaves a second product beside "Soy wax".
 - An empty Products list says that products which exist only as a definition,
   such as ones made inside a recipe or a BOM, appear there once they have stock.
+- A module's settings schema may mark an option `requires_modules`: the option
+  is shown only while those modules are enabled. The recipes option "Register
+  production as internal issue documents" uses it, so an organization without
+  the warehouse is no longer offered an option that would do nothing.
 
 ### Fixed
 
