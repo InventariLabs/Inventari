@@ -265,6 +265,7 @@
     "emptyFilteredTitle": "Ninguna regla coincide con los filtros",
     "emptyFilteredDescription": "Borra la búsqueda o elige otra ubicación.",
     "alertStock": "disponible {{available}} / min {{min}}",
+    "alertStockSafety": "disponible {{available}} / stock de seguridad {{threshold}}",
     "alertLocation": "en {{location}}",
     "alertSupplier": "proveedor {{supplier}}",
     "noSupplier": "Sin proveedor",

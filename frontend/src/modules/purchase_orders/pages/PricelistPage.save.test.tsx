@@ -165,6 +165,33 @@ describe("PricelistPage — saving and removing prices", () => {
     );
   });
 
+  it("proposes the day the form is opened on, not the day the app loaded", async () => {
+    render(<PageHost />);
+    await pickSupplier();
+    // The page has been open for a while; the clock moves on to another day
+    // before the form is opened.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2031, 2, 4, 0, 10));
+    try {
+      const dialog = await openCreateForm();
+      fireEvent.change(within(dialog).getByLabelText(/^Product/), {
+        target: { value: "la" },
+      });
+      fireEvent.click(
+        await screen.findByText("Latte cups", { selector: "*:not(td)" }),
+      );
+      fireEvent.change(within(dialog).getByLabelText(/^Price/), {
+        target: { value: "3" },
+      });
+      fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+      await waitFor(() => expect(created).toHaveLength(1));
+      expect(created[0]).toMatchObject({ valid_from: "2031-03-04" });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("refuses to save a new price before a product is picked", async () => {
     render(<PageHost />);
     await pickSupplier();

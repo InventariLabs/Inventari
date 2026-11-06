@@ -560,6 +560,8 @@ class ReorderRuleSchema(BaseModel):
     max_quantity: Decimal
     safety_stock: Decimal
     preferred_partner_id: UUID | None = None
+    # The supplier's name, so the list prints it without reading each partner.
+    preferred_partner_name: str | None = None
     notes: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None

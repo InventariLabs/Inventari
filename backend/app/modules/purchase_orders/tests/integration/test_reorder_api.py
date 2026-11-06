@@ -265,6 +265,43 @@ class TestReorderRuleAPI:
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_rules_list_names_the_preferred_supplier(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        po_location: Any,
+        po_template: Any,
+        po_partner: Any,
+    ) -> None:
+        """The list carries the supplier's name, so a page never reads each
+        partner by id to print it."""
+        created = client.post(
+            URL,
+            headers=po_auth_headers,
+            json=_rule_payload(
+                po_template, po_location, preferred_partner_id=str(po_partner.id)
+            ),
+        )
+        assert created.status_code == status.HTTP_201_CREATED
+        assert created.json()['preferred_partner_name'] == po_partner.name
+
+        listed = client.get(URL, headers=po_auth_headers).json()['items']
+        assert [r['preferred_partner_name'] for r in listed] == [po_partner.name]
+
+    def test_rule_without_supplier_has_no_supplier_name(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        po_location: Any,
+        po_template: Any,
+    ) -> None:
+        response = client.post(
+            URL,
+            headers=po_auth_headers,
+            json=_rule_payload(po_template, po_location),
+        )
+        assert response.json()['preferred_partner_name'] is None
+
     def test_rule_response_exposes_product_unit(
         self,
         client: TestClient,

@@ -265,6 +265,7 @@
     "emptyFilteredTitle": "No rule matches the filters",
     "emptyFilteredDescription": "Clear the search or pick another location.",
     "alertStock": "available {{available}} / min {{min}}",
+    "alertStockSafety": "available {{available}} / safety stock {{threshold}}",
     "alertLocation": "at {{location}}",
     "alertSupplier": "supplier {{supplier}}",
     "noSupplier": "No supplier",
