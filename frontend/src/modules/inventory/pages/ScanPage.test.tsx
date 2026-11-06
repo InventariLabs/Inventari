@@ -183,6 +183,39 @@ describe("ScanPage", () => {
     expect(instruction).toBeInTheDocument();
   });
 
+  it("goes home from the scanner opened by address, where there is no back", async () => {
+    // A bare address or a fresh tab makes the scanner the first entry of its
+    // history, and navigate(-1) from there does nothing.
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/inventory/scan"]}>
+          <ScanPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await userEvent.click(await screen.findByRole("button", { name: /back/i }));
+
+    expect(navigateMock).toHaveBeenCalledWith("/", { replace: true });
+  });
+
+  it("still goes back to where the reader came from inside the app", async () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter
+          initialEntries={["/inventory", "/inventory/scan"]}
+          initialIndex={1}
+        >
+          <ScanPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await userEvent.click(await screen.findByRole("button", { name: /back/i }));
+
+    expect(navigateMock).toHaveBeenCalledWith(-1);
+  });
+
   it("pins the scanner between the app bar and the bottom nav instead of subtracting a fixed offset", async () => {
     // The shell above the scanner changes height with orientation; a
     // calc(100dvh - Nrem) height pushed the camera area and aim frame

@@ -236,7 +236,8 @@ export class RegistryQueries {
    * that adopts a core section, that section's pages render under the focus
    * module's banner, because the owning module's navigation is hidden and the
    * section (the label pool, the scanner) must keep a home. A section the
-   * focus module renounces falls through to the owner untouched.
+   * focus module renounces falls through to the owner untouched — unless the
+   * module keeps the list the section hangs under (the archive of kept items).
    */
   getShellModule(
     pathname: string,
@@ -247,13 +248,15 @@ export class RegistryQueries {
       const focus = this.modules.get(focusModule);
       if (focus?.standalone) {
         const section = getCoreSectionForPath(pathname);
-        if (section) {
-          if (focus.standalone.coreSections[section] === "adopt") return focus;
-        } else {
-          const kept = getCoreNavSectionForPath(pathname);
-          if (kept && focus.standalone.keepCoreNav?.includes(kept)) {
-            return focus;
-          }
+        if (section && focus.standalone.coreSections[section] === "adopt") {
+          return focus;
+        }
+        // A renounced section still falls through to the kept check: the
+        // archive hangs under the items and storages prefixes, and the
+        // Active/Archived switch on a kept list must not leave the banner.
+        const kept = getCoreNavSectionForPath(pathname);
+        if (kept && focus.standalone.keepCoreNav?.includes(kept)) {
+          return focus;
         }
       }
     }

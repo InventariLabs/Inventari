@@ -298,12 +298,25 @@ describe("keepCoreNav", () => {
       "/inventory/moves",
       "/inventory/categories",
       "/inventory/stock-takes",
-      "/inventory/items/archived",
+      "/inventory/locations/archived",
     ]) {
       expect(
         moduleRegistry.getShellModule(path, enabled, "test-keeper")?.name,
       ).toBe("inventory");
     }
+  });
+
+  it("keeps the archive of a kept section under the focus module's banner", () => {
+    // The Active/Archived switch on the kept items list leads here; sending
+    // it to the inventory shell would drop the reader out of the focus module
+    // on one click, whatever the module decided about the archive section.
+    expect(
+      moduleRegistry.getShellModule(
+        "/inventory/items/archived",
+        enabled,
+        "test-keeper",
+      )?.name,
+    ).toBe("test-keeper");
   });
 
   it("does not hand kept sections to a module that is not in focus", () => {

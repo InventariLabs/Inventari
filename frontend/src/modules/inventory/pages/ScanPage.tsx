@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StorageRequired } from "@/modules/shared/components/StorageRequired";
 import { labelsApi } from "@/lib/api/labels";
@@ -66,6 +66,7 @@ export default function ScanPage() {
   const { t: tScan } = useTranslation("scan");
   const { t: tCommon } = useTranslation("common");
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { storageContext, setStorageContext } = useScanStore();
 
@@ -333,7 +334,13 @@ export default function ScanPage() {
         scannerError={scannerError}
         isTorchOn={isTorchOn}
         storageContext={storageContext}
-        onBack={() => navigate(-1)}
+        onBack={() =>
+          // Opened by address or from a fresh tab, the scanner is the first
+          // entry of its history and popping it does nothing.
+          location.key !== "default"
+            ? navigate(-1)
+            : navigate("/", { replace: true })
+        }
         onStartCamera={() => setIsCameraActive(true)}
         onRestartCamera={restartCamera}
         onToggleTorch={toggleTorch}
