@@ -3,6 +3,9 @@ import { Textarea } from "@/components/ui/Textarea";
 import { SearchableCombobox } from "@/components/ui/SearchableCombobox";
 import type { PartnerOption } from "@/hooks/usePartnerPicker";
 
+/** The supplier field's id — the create-supplier layer returns focus to it. */
+export const PO_PARTNER_FIELD_ID = "po-form-partner";
+
 interface PODocumentInfoSectionProps {
   partnerId: string;
   partners: PartnerOption[];
@@ -66,6 +69,7 @@ export function PODocumentInfoSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-4">
         <div className="space-y-1">
           <SearchableCombobox
+            id={PO_PARTNER_FIELD_ID}
             label={partnerLabel}
             options={partners}
             onSearchChange={onPartnerSearch}

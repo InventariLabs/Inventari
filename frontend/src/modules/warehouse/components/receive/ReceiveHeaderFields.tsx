@@ -99,6 +99,7 @@ function PartnerField({
   return (
     <>
       <SearchableCombobox
+        id="receive-partner"
         label={t("receive.from")}
         options={partnerOptions}
         value={partnerId}
@@ -130,6 +131,7 @@ function PartnerField({
             roleTypes={partnerTypesFor(source)}
             onAccepted={onPartnerChange}
             onClose={() => setNewPartnerName(null)}
+            returnFocusId="receive-partner"
           />
         </Suspense>
       )}

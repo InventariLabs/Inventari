@@ -21,7 +21,10 @@ import {
 } from "../hooks/usePurchaseOrders";
 import { usePoLineScanner } from "../hooks/usePoLineScanner";
 import { POHeader } from "./POHeader";
-import { PODocumentInfoSection } from "./PODocumentInfoSection";
+import {
+  PODocumentInfoSection,
+  PO_PARTNER_FIELD_ID,
+} from "./PODocumentInfoSection";
 import { POLinesSection, type POLineInput } from "./POLinesSection";
 import { totalAmounts } from "@/utils/money";
 import type {
@@ -349,6 +352,7 @@ export default function PurchaseOrderFormModal({
               roleTypes={SUPPLIER_ROLE_TYPES}
               onCreated={handlePartnerCreated}
               onCancel={handlePartnerCreateCancel}
+              returnFocusId={PO_PARTNER_FIELD_ID}
             />
           </div>
         )}
