@@ -15,7 +15,8 @@ from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import event, select
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from app.models.item import Item
@@ -551,3 +552,102 @@ class TestTheListNamesTheBlocker:
         assert items[0]['convertible'] is False
         assert items[0]['shortage'] is None
         assert items[0]['available_uom_symbol'] == 'pcs'
+
+    def test_every_door_that_returns_a_draft_names_the_same_shortage(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """Create, update and duplicate answered with the order and no
+        forecast at all, while a read of the same draft counted two short
+        ingredients: the client got a different truth depending on which door
+        it came through. All of them go through one constructor now."""
+        created, _ = _draft(
+            client,
+            mk_auth_headers,
+            mk_org,
+            mk_input_loc,
+            mk_output_loc,
+            'Output every door',
+            '50',
+            stock='10',
+            db_session=db_session,
+        )
+        base = '/api/v1/maker/production/orders'
+
+        def read(order_id: str) -> dict[str, Any]:
+            got = client.get(f'{base}/{order_id}', headers=mk_auth_headers)
+            assert got.status_code == 200, got.text
+            body: dict[str, Any] = got.json()
+            return body
+
+        updated = client.patch(
+            f'{base}/{created["id"]}', headers=mk_auth_headers, json={'notes': 'x'}
+        )
+        assert updated.status_code == 200, updated.text
+        duplicated = client.post(
+            f'{base}/{created["id"]}/duplicate', headers=mk_auth_headers
+        )
+        assert duplicated.status_code == 201, duplicated.text
+
+        for answer in (created, updated.json(), duplicated.json()):
+            read_back = read(answer['id'])
+            assert read_back['shortage_count'] == 1
+            assert answer['shortage_count'] == read_back['shortage_count']
+            assert answer['shortage_items'] == read_back['shortage_items']
+
+    def test_a_page_costs_the_same_statements_at_any_number_of_recipes(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """Counted in statements, not milliseconds: the forecast for a page
+        of drafts on three different recipes and on twelve asks the database
+        the same number of questions, so its cost cannot grow with the
+        recipes on the page."""
+
+        def page_statements() -> int:
+            seen: list[str] = []
+
+            def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
+                seen.append(statement)
+
+            event.listen(Engine, 'before_cursor_execute', count)
+            try:
+                listed = client.get(
+                    '/api/v1/maker/production/orders', headers=mk_auth_headers
+                )
+            finally:
+                event.remove(Engine, 'before_cursor_execute', count)
+            assert listed.status_code == 200, listed.text
+            return len(seen)
+
+        def add_drafts(first: int, last: int) -> None:
+            for n in range(first, last):
+                _draft(
+                    client,
+                    mk_auth_headers,
+                    mk_org,
+                    mk_input_loc,
+                    mk_output_loc,
+                    f'Output many {n}',
+                    '1',
+                    stock='5',
+                    db_session=db_session,
+                )
+
+        add_drafts(0, 3)
+        few = page_statements()
+        add_drafts(3, 12)
+        many = page_statements()
+
+        assert few > 0, 'the counter saw no statements'
+        assert many == few, (few, many)
