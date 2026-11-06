@@ -291,8 +291,8 @@
     "incomplete_warning": "Données nutritionnelles disponibles pour {{pct}} % des ingrédients seulement",
     "estimate_note": "Estimation additionnant les valeurs des produits des ingrédients (étiquettes ou Open Food Facts, une base communautaire). À comparer avec l'étiquette.",
     "estimate_generic_note": "Estimation additionnant les ingrédients. Certains utilisent des valeurs génériques plutôt que celles d'un produit ; les autres viennent des étiquettes ou d'Open Food Facts (une base communautaire). À comparer avec l'étiquette.",
-    "daily_estimate_note": "Les totaux journaliers additionnent les estimations de chaque recette, d'après les étiquettes ou Open Food Facts. À prendre comme indication.",
-    "daily_estimate_generic_note": "Les totaux journaliers additionnent les estimations de chaque recette. Certaines utilisent des valeurs génériques plutôt que celles d'un produit. À prendre comme indication."
+    "daily_estimate_note": "Les totaux journaliers additionnent une portion de chaque repas prévu, d'après les étiquettes ou Open Food Facts. À prendre comme indication.",
+    "daily_estimate_generic_note": "Les totaux journaliers additionnent une portion de chaque repas prévu. Certaines utilisent des valeurs génériques plutôt que celles d'un produit. À prendre comme indication."
   },
   "shopping": {
     "add_missing_button": "Ajouter les manquants à la liste de courses",
