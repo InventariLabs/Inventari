@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
 import {
@@ -9,7 +9,7 @@ import {
 
 const noop = vi.fn();
 
-function renderModal(form: PricelistFormState = emptyForm, onSave = vi.fn()) {
+function renderModal(form: PricelistFormState = emptyForm(), onSave = vi.fn()) {
   render(
     <PricelistFormModal
       open
@@ -33,20 +33,29 @@ const saveButton = () => screen.getByRole("button", { name: "Save" });
  * between midnight and the zone offset is yesterday or tomorrow.
  */
 describe("PricelistFormModal — the default valid_from day", () => {
-  it("prefills the reader's own day, not the UTC one", async () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("prefills the reader's own day, not the UTC one", () => {
     const original = process.env.TZ;
     process.env.TZ = "Europe/Warsaw";
     vi.useFakeTimers();
     // 00:30 on 11 September 2026 local is still 22:30 on the 10th in UTC.
     vi.setSystemTime(new Date(2026, 8, 11, 0, 30));
     try {
-      vi.resetModules();
-      const fresh = await import("./PricelistFormModal");
-      expect(fresh.emptyForm.validFrom).toBe("2026-09-11");
+      expect(emptyForm().validFrom).toBe("2026-09-11");
     } finally {
-      vi.useRealTimers();
       process.env.TZ = original;
     }
+  });
+
+  it("proposes the new day when the form is built after midnight", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 8, 11, 23, 50));
+    expect(emptyForm().validFrom).toBe("2026-09-11");
+    vi.setSystemTime(new Date(2026, 8, 12, 0, 10));
+    expect(emptyForm().validFrom).toBe("2026-09-12");
   });
 });
 
@@ -69,7 +78,7 @@ describe("PricelistFormModal validation", () => {
   });
 
   it("blocks save and flags a zero unit price", async () => {
-    const onSave = renderModal({ ...emptyForm, unitPrice: "0" });
+    const onSave = renderModal({ ...emptyForm(), unitPrice: "0" });
     await userEvent.click(saveButton());
 
     expect(onSave).not.toHaveBeenCalled();
@@ -80,7 +89,7 @@ describe("PricelistFormModal validation", () => {
 
   it("blocks save and flags a non-positive min quantity", async () => {
     const onSave = renderModal({
-      ...emptyForm,
+      ...emptyForm(),
       unitPrice: "10",
       minQuantity: "0",
     });
@@ -94,7 +103,7 @@ describe("PricelistFormModal validation", () => {
 
   it("blocks save when valid_to is before valid_from", async () => {
     const onSave = renderModal({
-      ...emptyForm,
+      ...emptyForm(),
       unitPrice: "10",
       validFrom: "2026-08-25",
       validTo: "2026-08-20",
@@ -109,7 +118,7 @@ describe("PricelistFormModal validation", () => {
 
   it("calls onSave when every API rule is satisfied", async () => {
     const onSave = renderModal({
-      ...emptyForm,
+      ...emptyForm(),
       product: {
         product_template_id: "tpl-1",
         name: "Latte cups",
@@ -129,7 +138,7 @@ describe("PricelistFormModal validation", () => {
   });
 
   it("blocks save without a product and marks the product field required", async () => {
-    const onSave = renderModal({ ...emptyForm, unitPrice: "10" });
+    const onSave = renderModal({ ...emptyForm(), unitPrice: "10" });
     await userEvent.click(saveButton());
 
     expect(onSave).not.toHaveBeenCalled();
@@ -141,7 +150,7 @@ describe("PricelistFormModal validation", () => {
   });
 
   it("offers currency from a dictionary instead of free text", () => {
-    renderModal({ ...emptyForm, unitPrice: "10" });
+    renderModal({ ...emptyForm(), unitPrice: "10" });
 
     const currencyField = screen.getByLabelText("Currency");
     expect(currencyField.tagName).toBe("SELECT");

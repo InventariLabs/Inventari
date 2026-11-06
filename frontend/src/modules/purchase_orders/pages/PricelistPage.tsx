@@ -50,7 +50,7 @@ export default function PricelistPage() {
   const [formOpen, setFormOpen] = useState(false);
   const orgCurrency = useDocumentCurrency(null);
   const blankForm = useCallback(
-    () => ({ ...emptyForm, currency: orgCurrency ?? "" }),
+    () => ({ ...emptyForm(), currency: orgCurrency ?? "" }),
     [orgCurrency],
   );
   const [form, setForm] = useState<PricelistFormState>(blankForm);
