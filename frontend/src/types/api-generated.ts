@@ -8223,7 +8223,7 @@ export interface paths {
          *     same read fills To do's *Needs a decision* block, so one rule answers
          *     both: the approvals module must be on, the reader must hold
          *     ``approvals:approve`` and the open stage must name them. A disabled
-         *     module or a failed lookup reads as an empty queue.
+         *     module reads as an empty queue; a failed lookup is a 500.
          */
         get: operations["list_documents_awaiting_my_approval_api_v1_warehouse_awaiting_my_approval_get"];
         put?: never;
@@ -15542,7 +15542,7 @@ export interface components {
         ImportPasteRequest: {
             /**
              * Text
-             * @description Raw pasted clipboard text.
+             * @description Raw pasted clipboard text, no longer than an imported file may be.
              */
             text?: string;
             /**
@@ -19716,7 +19716,7 @@ export interface components {
         ParsePasteRequest: {
             /**
              * Text
-             * @description Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected.
+             * @description Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected. No longer than an imported file may be.
              */
             text?: string;
         };
@@ -22268,7 +22268,7 @@ export interface components {
         ReadPastedLinesRequest: {
             /**
              * Text
-             * @description Raw pasted clipboard text.
+             * @description Raw pasted clipboard text, no longer than an imported file may be.
              */
             text?: string;
             /** Mapping Json */

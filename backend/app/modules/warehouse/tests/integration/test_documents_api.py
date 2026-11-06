@@ -4127,6 +4127,48 @@ class TestDoc12ValueTracking:
         assert Decimal(data['unit_price']) == Decimal('7.5')
         assert data['source'] == 'last_purchase'
 
+    def test_price_hint_reports_a_failed_pricelist_lookup_as_a_500(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A defect in the pricelist lookup is a 500, not the next price.
+
+        The lookup is asked only when the orders module is on for the
+        organization (``order_side_async`` answers ``None`` otherwise), and a
+        blanket ``except Exception`` around it fell through to the last
+        purchase: a broken pricelist suggested a different price than the
+        supplier's, with nothing to say the pricelist was never read.
+        """
+        from app.modules.warehouse import _documents_query_router
+
+        class _BrokenOrders:
+            async def list_pricelist_for_partner_async(
+                self, *_args: object, **_kwargs: object
+            ) -> list[object]:
+                raise RuntimeError('simulated defect in the pricelist lookup')
+
+        async def _orders_on(*_args: object) -> _BrokenOrders:
+            return _BrokenOrders()
+
+        monkeypatch.setattr(_documents_query_router, 'order_side_async', _orders_on)
+        quiet_client = TestClient(client.app, raise_server_exceptions=False)
+
+        hint = quiet_client.get(
+            '/api/v1/warehouse/price-hint',
+            headers=doc_auth_headers,
+            params={
+                'template_id': str(doc_template.id),
+                'partner_id': str(doc_partner.id),
+            },
+        )
+
+        assert hint.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR, hint.text
+        assert hint.json()['detail']['code'] == 'INTERNAL_ERROR'
+
     def test_price_hint_empty_when_no_history(
         self,
         client: TestClient,
