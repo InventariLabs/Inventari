@@ -486,6 +486,7 @@
     "manualEntry": "Ręczne dodanie",
     "searchItems": "Szukaj po nazwie, kodzie kreskowym…",
     "noResults": "Nie znaleziono pozycji",
+    "noResultsAdHoc": "Brak na Twojej liście — pozycja zostanie zachowana tak, jak ją wpisano.",
     "inLocation": "Produkty w miejscu: {{location}}",
     "inOtherLocation": "w miejscu: {{location}}",
     "changeSource": "Zmień miejsce źródłowe",

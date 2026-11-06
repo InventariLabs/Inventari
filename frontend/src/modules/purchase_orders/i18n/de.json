@@ -95,6 +95,7 @@
     "lineSubtotal": "Zwischensumme",
     "removeLine": "Position entfernen",
     "noResults": "Keine Produkte gefunden",
+    "noResultsAdHoc": "Nicht in Ihrer Liste — die Zeile bleibt so stehen, wie Sie sie eingegeben haben.",
     "adHocBadge": "Manuell",
     "adHocBadgeTooltip": "Von Hand eingegeben — kein Produkt aus Ihrer Liste.",
     "subtotal": "Netto",

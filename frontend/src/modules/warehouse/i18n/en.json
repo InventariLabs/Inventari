@@ -428,6 +428,7 @@
     "manualEntry": "Manual entry",
     "searchItems": "Search items by name, barcode…",
     "noResults": "No items found",
+    "noResultsAdHoc": "Not in your list — the line will be kept as typed in.",
     "inLocation": "Products in {{location}}",
     "inOtherLocation": "in {{location}}",
     "changeSource": "Change source location",

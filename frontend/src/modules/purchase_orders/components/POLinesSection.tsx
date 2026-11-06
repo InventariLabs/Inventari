@@ -158,6 +158,7 @@ export function POLinesSection({
     removeLine: t("form.removeLine"),
     clearProduct: t("common:actions.clear"),
     noResults: t("form.noResults"),
+    noResultsAdHoc: t("form.noResultsAdHoc"),
     adHocBadge: t("form.adHocBadge"),
     adHocBadgeTooltip: t("form.adHocBadgeTooltip"),
     scanManualLabel: t("scan:manualInputLabel"),

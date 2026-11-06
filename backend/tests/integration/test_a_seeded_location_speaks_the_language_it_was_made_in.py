@@ -15,7 +15,7 @@ reader agrees from then on.
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.i18n.service import set_current_lang
@@ -68,6 +68,16 @@ async def _names(db: AsyncSession, organization_id) -> dict[str, StorageLocation
     return {
         (row.settings or {}).get('seed', {}).get('code', row.name): row for row in rows
     }
+
+
+async def _row_count(db: AsyncSession, organization_id) -> int:
+    return (
+        await db.execute(
+            select(func.count())
+            .select_from(StorageLocation)
+            .where(StorageLocation.organization_id == organization_id)
+        )
+    ).scalar_one()
 
 
 class TestTheSeedIsWrittenInTheReadersLanguage:
@@ -165,6 +175,10 @@ class TestARowStillCarryingTheInstallDayEnglish:
         # test_a_fresh_package_takes_delivery.py).
         assert sum(1 for row in rows.values() if row.context_tag == 'equipment') == 1
         assert sum(1 for row in rows.values() if row.context_tag is None) == 1
+        # The two sums above are per tag, so a third row under yet another tag
+        # would pass both; the total is what closes that. It counts rows, not
+        # the dict above, which folds rows sharing a handle into one.
+        assert await _row_count(real_async_db_session, seed_org.id) == 2
 
     async def test_a_renamed_row_keeps_the_name_its_owner_gave_it(
         self,

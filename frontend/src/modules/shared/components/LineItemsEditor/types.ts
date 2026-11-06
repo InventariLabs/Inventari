@@ -169,6 +169,8 @@ export interface LineItemsEditorLabels {
   removeLine: string;
   clearProduct: string;
   noResults: string;
+  /** Said under `noResults` where a line nobody found is kept as typed in. */
+  noResultsAdHoc?: string;
   /** Prefixes the quantity on a stock hit, e.g. "In stock: 7 pcs". */
   inStock?: string;
   expiryLabel?: string;

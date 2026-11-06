@@ -428,6 +428,7 @@
     "manualEntry": "Saisie manuelle",
     "searchItems": "Rechercher par nom, code-barres…",
     "noResults": "Aucun article trouvé",
+    "noResultsAdHoc": "Absent de votre liste — la ligne sera conservée telle que saisie.",
     "inLocation": "Produits dans {{location}}",
     "inOtherLocation": "dans {{location}}",
     "changeSource": "Changer l'emplacement source",

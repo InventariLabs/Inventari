@@ -225,6 +225,42 @@ describe("LineItemSearchDropdown — the overlay stack can see the panel", () =>
     expect(screen.getByText("Nothing found")).toBeInTheDocument();
   });
 
+  it("says in the panel that a name nobody found is kept as typed in", () => {
+    // The line is accepted as ad hoc either way; the badge above the field
+    // was the only sign of it. The words belong where the decision is made.
+    render(
+      <LineItemSearchDropdown
+        results={[]}
+        isLoading={false}
+        selectedIndex={-1}
+        lineName="Wire stripper"
+        noResultsLabel="Nothing found"
+        adHocLabel="The line will be kept as typed in."
+        onSelect={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Nothing found")).toBeInTheDocument();
+    expect(screen.getByTestId("line-item-adhoc-hint")).toHaveTextContent(
+      "The line will be kept as typed in.",
+    );
+  });
+
+  it("adds no ad-hoc sentence where the editor does not accept typed-in lines", () => {
+    render(
+      <LineItemSearchDropdown
+        results={[]}
+        isLoading={false}
+        selectedIndex={-1}
+        lineName="Wire stripper"
+        noResultsLabel="Nothing found"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId("line-item-adhoc-hint")).toBeNull();
+  });
+
   it("stays closed until there is a result or a search worth reporting", () => {
     // Focusing an empty product field used to open the panel with "no
     // results" printed before anything had been searched.

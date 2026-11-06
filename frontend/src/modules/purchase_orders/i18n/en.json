@@ -95,6 +95,7 @@
     "lineSubtotal": "Subtotal",
     "removeLine": "Remove line",
     "noResults": "No products found",
+    "noResultsAdHoc": "Not in your list — the line will be kept as typed in.",
     "adHocBadge": "Typed in",
     "adHocBadgeTooltip": "Typed in by hand — not a product from your list.",
     "subtotal": "Net",

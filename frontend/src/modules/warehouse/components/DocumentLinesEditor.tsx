@@ -215,6 +215,7 @@ export function DocumentLinesEditor({
     removeLine: t("lines.removeLine"),
     clearProduct: t("common:actions.clear"),
     noResults: t("picker.noResults"),
+    noResultsAdHoc: t("picker.noResultsAdHoc"),
     inStock: t("picker.inStock"),
     addedLabel: t("picker.added"),
     expiryLabel: t("lines.expiryDate"),

@@ -16,6 +16,8 @@ interface LineItemSearchDropdownProps {
   selectedIndex: number;
   lineName: string;
   noResultsLabel: string;
+  /** Under the no-results line: what happens to the typed name anyway. */
+  adHocLabel?: string;
   /** Label prefixing a stock hit's quantity; omitted for catalogue searches. */
   inStockLabel?: string;
   expiryLabel?: string;
@@ -74,6 +76,7 @@ export function LineItemSearchDropdown({
   selectedIndex,
   lineName,
   noResultsLabel,
+  adHocLabel,
   inStockLabel,
   expiryLabel,
   storageLabel,
@@ -265,7 +268,14 @@ export function LineItemSearchDropdown({
     ))
   ) : (
     <>
-      <p className="text-xs text-on-muted text-center py-2">{noResultsLabel}</p>
+      <p className="text-xs text-on-muted text-center py-2">
+        {noResultsLabel}
+        {adHocLabel && (
+          <span className="block pt-0.5" data-testid="line-item-adhoc-hint">
+            {adHocLabel}
+          </span>
+        )}
+      </p>
       {onCreate && createLabel && (
         <div className="border-t border-border p-2">
           <Button
