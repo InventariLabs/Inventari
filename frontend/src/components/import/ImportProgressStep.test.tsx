@@ -30,7 +30,7 @@ describe("ImportProgressStep", () => {
     );
     const bar = screen.getByRole("progressbar");
     expect(bar).toHaveAttribute("aria-valuenow", "25");
-    expect(screen.getByText("300 of 1200 rows")).toBeInTheDocument();
+    expect(screen.getByText("Rows read: 300 / 1200")).toBeInTheDocument();
   });
 
   it("shows no bar until the server has reported a count", () => {
