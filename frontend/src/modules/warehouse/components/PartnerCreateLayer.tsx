@@ -14,11 +14,14 @@ export default function PartnerCreateLayer({
   roleTypes,
   onAccepted,
   onClose,
+  returnFocusId,
 }: {
   initialName: string;
   roleTypes: readonly PartnerType[];
   onAccepted: (partnerId: string) => void;
   onClose: () => void;
+  /** The partner field that opened the layer — it gets the focus back. */
+  returnFocusId?: string;
 }) {
   const { handleCreated } = usePartnerCreateLayer({
     roleTypes,
@@ -34,6 +37,7 @@ export default function PartnerCreateLayer({
         roleTypes={roleTypes}
         onCreated={handleCreated}
         onCancel={onClose}
+        returnFocusId={returnFocusId}
       />
     </div>
   );

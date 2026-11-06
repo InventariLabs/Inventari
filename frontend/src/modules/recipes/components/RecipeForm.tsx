@@ -9,9 +9,11 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { FIELD_LABEL_CLASS } from "@/components/ui/fieldLabel";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import {
   Sheet,
   SheetActions,
+  SheetBody,
   SheetFooter,
   SheetHeader,
 } from "@/components/ui/Sheet";
@@ -39,6 +41,13 @@ interface Props {
   onSubmit: (data: RecipeCreate, imageFile?: File | null) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  /**
+   * The record to edit is still on its way. The sheet stands at once with a
+   * spinner in it, and the form takes its place inside the very same sheet
+   * when `initial` lands — a second sheet mounted for the form replayed the
+   * entrance (the backdrop blinked out, the panel slid in again).
+   */
+  loading?: boolean;
 }
 
 /** A draft row as the wire carries it: no editor key. The picking override
@@ -176,12 +185,85 @@ function useIngredientDefaultsAutofill(
   }, [loaded, lang, recipeId, setIngredients]);
 }
 
-export default function RecipeForm({
+/**
+ * The sheet around the recipe form. It owns the `Sheet` so that one stays
+ * mounted from the first frame of a slow edit until the form closes: what
+ * changes when the recipe arrives is only what is inside it.
+ */
+export default function RecipeForm({ loading, ...props }: Props) {
+  const { t } = useTranslation(["recipes", "common"]);
+  const { initial, onCancel } = props;
+  // The form inside knows whether it holds work worth asking about; until it
+  // is mounted there is nothing to lose and the sheet just closes.
+  const leaveRef = useRef<(() => void) | null>(null);
+  const editing = loading || !!initial;
+  const title = editing ? t("form.edit_title") : t("form.create_title");
+  return (
+    <Sheet
+      open
+      onClose={() => (leaveRef.current ?? onCancel)()}
+      maxWidth="3xl"
+      className="overflow-hidden"
+      aria-label={title}
+    >
+      {loading ? (
+        <>
+          <SheetHeader
+            title={title}
+            onClose={onCancel}
+            closeLabel={t("common:actions.close")}
+            className="px-5 py-4 shrink-0"
+          />
+          <SheetBody>
+            <LoadingSpinner />
+          </SheetBody>
+        </>
+      ) : (
+        <RecipeFormContent {...props} leaveRef={leaveRef} />
+      )}
+    </Sheet>
+  );
+}
+
+/**
+ * What the form owes the sheet that holds it, returning the form's ref.
+ *
+ * The loading header's close button held the focus and went with it when the
+ * form took its place; with it gone the sheet's Tab trap has no end to wrap
+ * at, so the first field takes it. And the sheet asks the form before it
+ * closes (`leaveRef`), so a filled-in form is not thrown away unasked.
+ */
+function useSheetHandover(
+  leaveRef: React.MutableRefObject<(() => void) | null>,
+  requestLeave: () => void,
+) {
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    const active = document.activeElement;
+    if (!active || active === document.body) {
+      formRef.current?.querySelector<HTMLElement>("input")?.focus();
+    }
+  }, []);
+  useEffect(() => {
+    leaveRef.current = requestLeave;
+    return () => {
+      leaveRef.current = null;
+    };
+  });
+  return formRef;
+}
+
+type ContentProps = Omit<Props, "loading"> & {
+  leaveRef: React.MutableRefObject<(() => void) | null>;
+};
+
+function RecipeFormContent({
   initial,
   onSubmit,
   onCancel,
   isLoading,
-}: Props) {
+  leaveRef,
+}: ContentProps) {
   const { t, i18n } = useTranslation(["recipes", "common"]);
   const lang = resolveLang(i18n.language);
   const lookupDefault = useDebouncedIngredientLookup(lang);
@@ -321,6 +403,8 @@ export default function RecipeForm({
     onCancel();
   };
 
+  const formRef = useSheetHandover(leaveRef, requestLeave);
+
   const addIngredient = () => {
     setIngredients((prev) => [...prev, emptyIngredient(nextKey)]);
     setNextKey((k) => k + 1);
@@ -414,14 +498,12 @@ export default function RecipeForm({
   };
 
   return (
-    <Sheet
-      open
-      onClose={requestLeave}
-      maxWidth="3xl"
-      className="overflow-hidden"
-      aria-label={initial ? t("form.edit_title") : t("form.create_title")}
-    >
-      <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+    <>
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        className="flex flex-col flex-1 min-h-0"
+      >
         <SheetHeader
           title={initial ? t("form.edit_title") : t("form.create_title")}
           onClose={requestLeave}
@@ -594,6 +676,6 @@ export default function RecipeForm({
         }}
         onCancel={() => setDiscardConfirmOpen(false)}
       />
-    </Sheet>
+    </>
   );
 }

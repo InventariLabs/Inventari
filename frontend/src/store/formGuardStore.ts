@@ -17,9 +17,10 @@ import { create } from "zustand";
  * form, the product add form, the approval path form, and a stock take
  * mid-count, rows of numbers no single save button commits. Forms the app
  * rebuilds cheaply (an import dialog, a filter panel) deliberately stay out
- * — asking there would teach the reader to click through the question, and
- * a form inside its own dialog could never be asked at all, because no
- * navigation is reachable while the dialog traps interaction.
+ * — asking there would teach the reader to click through the question.
+ * A dialog is no reason to stay out: its tabs and links are out of reach,
+ * but the command palette opens over it and navigates through the gate, so
+ * a long form in a dialog is asked like any other.
  *
  * A new long-lived form registers with one line, `useFormGuard(isDirty,
  * label)`. The survey in `src/test/form-guard-coverage.test.ts` is what
