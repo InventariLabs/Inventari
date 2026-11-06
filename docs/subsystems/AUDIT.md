@@ -102,7 +102,10 @@ journal never named it, nothing left in the installation says what it did.
 
 Every entry written by a request authenticated with a key therefore carries
 `meta_data.actor = {'type': 'api_key', 'key_prefix': 'inv_live_…'}` — the
-prefix the API Keys screen shows, never the key itself. The actor is
+prefix the API Keys screen shows, never the key itself. An entry written
+before that prefix was cut to six characters keeps the eleven it was written
+with (the journal is immutable), and still begins with what the screen shows
+now. The actor is
 request-scoped (`app/core/audit_actor.py`): set where authentication resolves
 the key, read once in `log_action_async`, and cleared around every request by
 the app-level `audit_actor_scope` dependency. Everything a caller wrote into

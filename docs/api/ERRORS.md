@@ -350,6 +350,9 @@ apart.
 | `EQUIPMENT_CANNOT_CHECKOUT_IN_MAINTENANCE` | Cannot check out an asset that is in maintenance; set it to Available first |
 | `EQUIPMENT_CANNOT_CHECKOUT_RETIRED` | Cannot check out a retired asset |
 | `EQUIPMENT_DEPLOY_REQUIRES_CHECKOUT` | An asset becomes deployed by checking it out to someone. Check it out instead of setting the status. |
+| `EQUIPMENT_STATUS_INVALID` | Invalid status: {status} |
+| `EQUIPMENT_STATUS_TRANSITION_DENIED` | Cannot change status from {old} to {new} |
+| `EQUIPMENT_STATUS_TRANSITION_FROM_RETIRED` | Cannot change status from {old} to {new}. Retired assets must be explicitly unretired first. |
 | `EQUIPMENT_STILL_ASSIGNED` | The asset is still checked out to someone. Check it in first. |
 | `EXTRA_COST_CURRENCY_MISMATCH` | The extra cost is in a different currency than the document. Enter it in the document's currency — converting at a rate nobody recorded would put a number in the stock value with no history behind it. |
 | `EXTRA_COST_DOCUMENT_POSTED` | This receipt is already posted, so an extra cost cannot be added to it: the goods may have left the shelf and there is nothing left to charge. Issue a correction to the receipt while its period is open instead. |
@@ -473,8 +476,7 @@ apart.
 | `ONBOARDING_PROFILE_UNKNOWN` | Unknown profile: '{profile}' |
 | `ONLY_IMAGE_FILES_ALLOWED` | Only image files are allowed (jpg, png, gif, webp) |
 | `ORGANIZATION_CURRENCY_MISSING` | Organization currency not configured |
-| `ORGANIZATION_INVITE_INVALID` | Invalid organization invitation |
-| `ORGANIZATION_INVITE_WRONG_EMAIL` | This invitation was issued for a different e-mail address. Use the address the invitation was sent to. |
+| `ORGANIZATION_INVITE_INVALID` | This invitation can't be used. Check that you are registering with the e-mail address it was sent to, or ask for a new one. |
 | `ORGANIZATION_NOT_FOUND` | Organization not found |
 | `ORGANIZATION_REQUIRED` | Organization required |
 | `OVER_RECEIPT_PAST_CEILING` | Receiving {quantity} against {basis} goes past the {ceiling}% over-receipt ceiling — nobody may receive that much |
@@ -608,7 +610,7 @@ apart.
 | `SHOPPING_LIST_ITEM_CATEGORY_UNKNOWN` | Unknown category (category_id: {category_id}) — the category does not exist |
 | `SHOPPING_LIST_ITEM_ITEM_UNKNOWN` | Unknown product (item_id: {item_id}) — the item does not exist |
 | `SHOPPING_LIST_ITEM_QUANTITY_ABOVE_CEILING` | The quantity {quantity} is past what the column holds — the largest storable value is {ceiling} |
-| `SHOPPING_LIST_ITEM_QUANTITY_ROUNDS_TO_ZERO` | Quantity {quantity} rounds to zero at the store's precision — the smallest countable amount is 0.001 |
+| `SHOPPING_LIST_ITEM_QUANTITY_ROUNDS_TO_ZERO` | Quantity {quantity} rounds to zero at the store's precision — the smallest countable amount is {smallest} |
 | `SHOPPING_LIST_ITEM_TEMPLATE_UNKNOWN` | Unknown product template (template_id: {template_id}) — the template does not exist |
 | `SHOPPING_LIST_ITEM_UOM_UNKNOWN` | Unknown unit of measure (uom_id: {uom_id}) — the unit does not exist |
 | `SHOPPING_LIST_NOTHING_TO_CONVERT` | No convertible items (all lack a product template) |

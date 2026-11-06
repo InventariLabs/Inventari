@@ -89,7 +89,7 @@ def _product_matches(pattern: str) -> ColumnElement[bool]:
     )
 
 
-def _searched_products(organization_id: UUID, pattern: str) -> CompoundSelect:
+def searched_products(organization_id: UUID, pattern: str) -> CompoundSelect:
     """The products a typed string can reach: by their own fields or by a batch.
 
     Narrowing to these first is what keeps a search cheap: the groups of
@@ -195,7 +195,7 @@ async def _count_groups_async(
     if pattern is not None:
         groups = (
             groups.where(
-                Item.template_id.in_(_searched_products(organization_id, pattern))
+                Item.template_id.in_(searched_products(organization_id, pattern))
             )
             .join(ProductTemplate, ProductTemplate.id == Item.template_id)
             .outerjoin(StockLot, StockLot.id == Item.lot_id)
@@ -352,7 +352,7 @@ async def list_rows_for_org_async(
     if pattern is not None:
         stmt = stmt.where(
             StockAnchor.product_template_id.in_(
-                _searched_products(organization_id, pattern)
+                searched_products(organization_id, pattern)
             ),
             or_(_product_matches(pattern), StockLot.name.ilike(pattern)),
         )

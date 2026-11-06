@@ -7,6 +7,7 @@ import frCommon from "@/i18n/locales/fr/common.json";
 import plCommon from "@/i18n/locales/pl/common.json";
 import plApprovals from "@/modules/approvals/i18n/pl.json";
 import plEquipment from "@/modules/equipment/i18n/pl.json";
+import plWarehouse from "@/modules/warehouse/i18n/pl.json";
 import plRecipes from "@/modules/recipes/i18n/pl.json";
 import {
   auditChanges,
@@ -116,6 +117,7 @@ describe("auditChanges value dictionaries", () => {
   const screenT = namespacedT({
     common: plCommon,
     equipment: plEquipment,
+    warehouse: plWarehouse,
   }) as never;
 
   it("reads a built-in level the way the roles screen reads it", () => {
@@ -129,6 +131,27 @@ describe("auditChanges value dictionaries", () => {
     expect(changes).toEqual([
       { path: "role", from: "Manager", to: "Użytkownik" },
     ]);
+  });
+
+  it("reads a print layout by the name the settings screen offers", () => {
+    const changes = auditChanges(
+      {
+        before: { print_template: "standard" },
+        after: { print_template: "pl_pz" },
+      },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([
+      {
+        path: "print_template",
+        from: plWarehouse.profile.layoutStandard,
+        to: plWarehouse.profile.layoutPlPz,
+      },
+    ]);
+    expect(changes[0]?.to).not.toContain("pl_pz");
   });
 
   it("reads an equipment status through the dictionary the asset screen owns", () => {
@@ -1345,4 +1368,90 @@ describe("formatAuditValue statuses", () => {
       }
     },
   );
+});
+
+describe("auditChanges category field definitions", () => {
+  const words: Record<string, string> = {
+    "modules:fieldBuilder.types.select": "Dropdown",
+    "modules:fieldBuilder.types.text": "Text",
+    "common:settings.audit.fieldDefinitions.required": "required",
+    "common:settings.audit.fieldDefinitions.added": "Added field {{field}}",
+    "common:settings.audit.fieldDefinitions.removed": "Removed field {{field}}",
+    "common:settings.audit.fieldDefinitions.changed": "Changed field {{field}}",
+  };
+  const say = ((key: string, opts?: Record<string, unknown>) =>
+    (words[key] ?? String(opts?.defaultValue ?? key)).replace(
+      "{{field}}",
+      String(opts?.field),
+    )) as unknown as Parameters<typeof auditFieldLabel>[1];
+  const threadSize = {
+    key: "thread_size",
+    type: "select",
+    label: "Thread size",
+    options: ["M4", "M6"],
+    required: true,
+  };
+  const colour = { key: "colour", type: "text", label: "Colour" };
+
+  it("names an added field by label and type, not as JSON", () => {
+    const [change] = auditChanges(
+      {
+        before: { field_definitions: [colour] },
+        after: { field_definitions: [colour, threadSize] },
+      },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(change.path).toBe("field_definitions");
+    expect(change.to).toBe("Added field Thread size (Dropdown, required)");
+    expect(change.to).not.toContain("{");
+  });
+
+  it("names removed and changed fields as well", () => {
+    const [change] = auditChanges(
+      {
+        before: { field_definitions: [colour, threadSize] },
+        after: {
+          field_definitions: [{ ...threadSize, required: false }],
+        },
+      },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(change.to).toBe(
+      "Changed field Thread size (Dropdown); Removed field Colour (Text)",
+    );
+  });
+
+  it("names the fields a deleted category carried, without a verb", () => {
+    // HARD_DELETE keeps the definitions flat, as they stood: nothing was added.
+    const [change] = auditChanges(
+      { name: "Fasteners", field_definitions: [threadSize, colour] },
+      "HARD_DELETE",
+      undefined,
+      say,
+    );
+
+    expect(change.from).toBeNull();
+    expect(change.to).toBe("Thread size (Dropdown, required), Colour (Text)");
+  });
+
+  it("leaves an update's change without a left side to draw an arrow from", () => {
+    const [change] = auditChanges(
+      {
+        before: { field_definitions: null },
+        after: { field_definitions: [colour] },
+      },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(change.from).toBeNull();
+    expect(change.to).toBe("Added field Colour (Text)");
+  });
 });

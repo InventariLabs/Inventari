@@ -291,8 +291,8 @@
     "incomplete_warning": "Datos nutricionales disponibles solo para el {{pct}} % de los ingredientes",
     "estimate_note": "Una estimación sumada a partir de los valores de los productos de los ingredientes (etiquetas u Open Food Facts, una base de datos comunitaria). Compárala con la etiqueta.",
     "estimate_generic_note": "Una estimación sumada a partir de los ingredientes. Algunos usan valores genéricos en lugar de los de un producto; el resto procede de etiquetas de productos u Open Food Facts (una base de datos comunitaria). Compárala con la etiqueta.",
-    "daily_estimate_note": "Los totales diarios suman las estimaciones de cada receta, con etiquetas u Open Food Facts. Tómalos como orientación.",
-    "daily_estimate_generic_note": "Los totales diarios suman las estimaciones de cada receta. Algunas usan valores genéricos en lugar de los de un producto. Tómalos como orientación."
+    "daily_estimate_note": "Los totales diarios suman una ración de cada comida planificada, con etiquetas u Open Food Facts. Tómalos como orientación.",
+    "daily_estimate_generic_note": "Los totales diarios suman una ración de cada comida planificada. Algunas usan valores genéricos en lugar de los de un producto. Tómalos como orientación."
   },
   "shopping": {
     "add_missing_button": "Añadir faltantes a la lista de compras",
@@ -434,7 +434,7 @@
     "import_error_ai_not_configured": "Error de importación: «{{purpose}}» necesita una conexión de IA y aún no hay ninguna configurada. Configura una en Ajustes → Conexiones de IA."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "Las sugerencias de las recetas siguen funcionando — recurren al inglés. Añade una entrada o importa un archivo CSV/JSON para llenar este diccionario.",
+    "language_empty_hint": "Las sugerencias de las recetas siguen funcionando — usan las entradas coincidentes de otros idiomas. Añade una entrada o importa un archivo CSV/JSON para llenar este diccionario.",
     "language_empty": "El diccionario de ingredientes aún no tiene entradas para {{lang}}.",
     "scan_label": "Leer de la etiqueta",
     "scan_reading": "Leyendo…",

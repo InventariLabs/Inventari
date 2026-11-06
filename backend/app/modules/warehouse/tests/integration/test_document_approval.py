@@ -95,7 +95,7 @@ class TestDocumentApprovalWorkflow:
         resp = client.post(
             f'/api/v1/approvals/documents/{doc_id}/request-approval',
             headers=auth_headers,
-            params={'notes': notes} if notes else None,
+            json={'notes': notes} if notes else None,
         )
         assert resp.status_code == status.HTTP_200_OK, resp.text
         return resp  # type: ignore[no-any-return]
@@ -2191,7 +2191,7 @@ class TestDocumentApprovalWorkflow:
         reject_resp = client.post(
             f'/api/v1/approvals/documents/{doc_id}/reject',
             headers=doc_auth_headers,
-            params={'notes': 'Wrong price'},
+            json={'notes': 'Wrong price'},
         )
         assert reject_resp.status_code == status.HTTP_200_OK, reject_resp.text
         assert reject_resp.json()['status'] == 'REJECTED'
@@ -2247,7 +2247,7 @@ class TestDocumentApprovalWorkflow:
         client.post(
             f'/api/v1/approvals/documents/{doc_id}/reject',
             headers=doc_auth_headers,
-            params={'notes': 'Wrong price'},
+            json={'notes': 'Wrong price'},
         )
         # Doc is DRAFT now; re-confirm auto-creates a new request (threshold
         # is still 100.00 and the line value is 250.00).
@@ -2310,7 +2310,7 @@ class TestDocumentApprovalWorkflow:
         client.post(
             f'/api/v1/approvals/documents/{doc_id}/reject',
             headers=doc_auth_headers,
-            params={'notes': 'Cancel this'},
+            json={'notes': 'Cancel this'},
         )
 
         # Doc is DRAFT; the reservation must be released so it does not
@@ -2379,7 +2379,7 @@ class TestDocumentApprovalWorkflow:
         client.post(
             f'/api/v1/approvals/documents/{doc_id}/reject',
             headers=doc_auth_headers,
-            params={'notes': 'Numbers off'},
+            json={'notes': 'Numbers off'},
         )
 
         assert called_with, 'notify_rejection_async was not called'

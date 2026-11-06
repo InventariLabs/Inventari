@@ -7,34 +7,38 @@ test.describe("Stock Takes — inventory counting flow", () => {
   let token: string;
   let seedStockTakeId: string;
   let ownedSeedStockTake = false;
+  let seedStorageId: string | undefined;
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     const requestContext = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(requestContext);
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
     await api.enableAllModules(token);
 
-    const storages = await api.listStorages(token);
-    for (const storage of storages) {
-      try {
-        const stockTake = await api.createStockTake(token, {
-          name: `E2E-StockTake-${Date.now()}`,
-          location_id: storage.id,
-        });
-        seedStockTakeId = stockTake.id;
-        ownedSeedStockTake = true;
-        break;
-      } catch {
-        const existing = await api.listStockTakes(token);
-        const active = existing.find(
-          (st) => st.status === "in_progress" || st.status === "draft",
-        );
-        if (active) {
-          seedStockTakeId = active.id;
-          ownedSeedStockTake = false;
-          break;
-        }
+    // The seed count opens on a place of its own: a count on a place that
+    // another spec created and is about to click would turn that click into
+    // "resume the open count".
+    try {
+      seedStorageId = (
+        await api.createStorage(token, {
+          name: `E2E-StockTake-Loc-${Date.now()}-w${testInfo.workerIndex}`,
+        })
+      ).id;
+      const stockTake = await api.createStockTake(token, {
+        name: `E2E-StockTake-${Date.now()}`,
+        location_id: seedStorageId,
+      });
+      seedStockTakeId = stockTake.id;
+      ownedSeedStockTake = true;
+    } catch {
+      const existing = await api.listStockTakes(token);
+      const active = existing.find(
+        (st) => st.status === "in_progress" || st.status === "draft",
+      );
+      if (active) {
+        seedStockTakeId = active.id;
+        ownedSeedStockTake = false;
       }
     }
   });
@@ -42,6 +46,9 @@ test.describe("Stock Takes — inventory counting flow", () => {
   test.afterAll(async () => {
     if (token && seedStockTakeId && ownedSeedStockTake) {
       await api.deleteStockTake(token, seedStockTakeId).catch(() => {});
+    }
+    if (token && seedStorageId) {
+      await api.deleteStorage(token, seedStorageId).catch(() => {});
     }
   });
 

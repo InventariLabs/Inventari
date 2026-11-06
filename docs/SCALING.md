@@ -171,6 +171,22 @@ The consumer now awaits the handlers and acknowledges after them, so:
   holding, up to `SHUTDOWN_DRAIN_S` (10 s), then cancels — and what was
   cancelled stays unacknowledged, which is the point.
 
+**After a node dies — how long until the message runs again.** A message
+a dead worker had read is redelivered by `XAUTOCLAIM` once it has been
+unacknowledged for `STREAM_CLAIM_IDLE_MS` (60 s), and only when some node
+runs the stream reaper. The reaper runs on every node at startup (after the
+modules have subscribed their handlers) and then on a 5-minute tick, one
+node per tick. So the worst case is **about 6 minutes** (the 5-minute tick
+plus the 60 s idle window — measured: 5 min 43 s), and it is much shorter
+when a node starts later than 60 s after the crash, because that startup run
+finds the message already idle. It depends on three numbers: the idle window,
+the tick interval and how long the replacement takes to start. A handler
+that failed (rather than a worker that died) does not wait for any of this:
+the retry worker runs it with its own backoff. Consumers are named after the
+process: a clean shutdown of the event bus removes its own from the group, and the reaper
+removes any that has held nothing for an hour, so `XINFO CONSUMERS` does
+not grow with every restart.
+
 Emission itself is still the caller's problem to get right: `emit` is an
 XADD after the commit, so it can be lost in a crash and can announce a
 transaction that then rolls back. `emit_transactional` writes to the

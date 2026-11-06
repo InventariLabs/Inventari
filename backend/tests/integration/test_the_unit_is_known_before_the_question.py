@@ -90,7 +90,7 @@ def _record_that_predates_its_card(db, storage, *, unit: str | None) -> str:
     """A record as it stands before any card: no template, no stock posted.
 
     ``unit`` is the record's own unit symbol, the case the review measured;
-    ``None`` is what a row written before ``uompcs01`` looks like. Inserted
+    ``None`` is what a row written before the archived ``uompcs01`` looks like. Inserted
     rather than created and then unhooked from its card: the create path
     mints a card of the same name and puts the stock under it, and an update
     that adopts a card finds that one by name instead of minting its own.

@@ -225,7 +225,7 @@ def _own_tables_group(db, module_tables: set[str]) -> OrphanGroup | None:
     total = 0
     populated: list[str] = []
     for table in tables:
-        # noqa S608: no bind parameter exists for an identifier; the name
+        # S608: no bind parameter exists for an identifier; the name
         # matched _IDENTIFIER before it got here.
         rows = _scalar_count(db, f'SELECT count(*) FROM "{table}"', {})  # noqa: S608
         total += rows

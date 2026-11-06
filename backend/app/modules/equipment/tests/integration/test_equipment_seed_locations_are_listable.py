@@ -159,8 +159,8 @@ def isolated_db_with_seed(isolated_db_url: str) -> str:
       - 'Pre-existing Spot'  usage='internal' context_tag='equipment'
       - 'Random non-eq'      usage='active'   context_tag=NULL
     """
-    import app.core.template_models  # noqa: F401
-    import app.models  # noqa: F401
+    import app.core.template_models
+    import app.models
     import app.modules.equipment.models  # noqa: F401
 
     engine = create_engine(isolated_db_url)

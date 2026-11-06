@@ -1,7 +1,7 @@
 """Idempotent DDL for module baseline migrations.
 
 A module's ``001_initial`` does not only run on empty databases. On instances
-that predate the module-migration split, the core ``baseline_001`` already
+that predate the module-migration split, the archived core ``baseline_001`` already
 created those tables, and ``db upgrade-modules`` reconciles the two by stamping
 ``001_initial`` — but only when it can see that every table is there. Anything
 that confuses that check (a table renamed, a stamp that never happened, DDL
@@ -23,7 +23,7 @@ revision from the first, so a public name that is renamed, removed or changed
 in behaviour breaks installs that have nothing to do with the change. Add new
 helpers freely; never alter an existing one. Anything else a revision needs —
 a model's columns, a seed list, an inference map — it freezes inside its own
-file, the way ``tzaware01`` freezes its column list. A test
+file, the way the archived ``tzaware01`` freezes its column list. A test
 (``test_migrations_import_no_application_code``) keeps the public names and
 refuses any other ``app`` import in a revision.
 
@@ -48,7 +48,7 @@ from cryptography.fernet import Fernet
 
 logger = logging.getLogger(__name__)
 
-#: The scheme settings secrets were written with when ``aiconn02`` was cut,
+#: The scheme settings secrets were written with when the archived ``aiconn02`` was cut,
 #: frozen here: ``enc:`` + Fernet, keyed by PBKDF2-HMAC-SHA256 over
 #: ``ENCRYPTION_KEY`` (``SECRET_KEY`` when unset) and ``FERNET_SALT``.
 _CIPHERTEXT_PREFIX = 'enc:'

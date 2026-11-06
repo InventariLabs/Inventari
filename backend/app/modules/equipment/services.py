@@ -12,7 +12,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import get_org_owned_or_404_async
 from app.core.logging import get_logger
-from app.i18n.service import get_current_lang
 
 from ._holder import holder_of_parts
 from ._unit_identity import unit_identifiers
@@ -143,7 +142,6 @@ async def _update_equipment_status(
 
     from .status_machine import validate_transition
 
-    lang = get_current_lang()
     item = await core_api.items.get_async(db, org_id, item_id)
     if not item:
         return
@@ -151,7 +149,7 @@ async def _update_equipment_status(
     equipment_ns = (item.meta_data or {}).get('equipment', {})
     old_status = equipment_ns.get('equipment_status', 'UNKNOWN')
 
-    validate_transition(old_status, status_value, lang)
+    validate_transition(old_status, status_value)
 
     await core_api.items.update_meta_data_async(
         db,
@@ -180,7 +178,7 @@ from ._maintenance_service import (  # noqa: E402
     retire_item,
     update_log,
 )
-from ._overdue_service import list_overdue_assignments  # noqa: E402,F401
+from ._overdue_service import list_overdue_assignments  # noqa: E402
 from .bulk_service import bulk_edit_items  # noqa: E402
 
 __all__ = [

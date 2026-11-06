@@ -21,7 +21,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import (
-    PeriodClosedError,  # noqa: F401 (re-exported for convenience)
+    PeriodClosedError,  # re-exported for convenience
 )
 from app.core.period_guard import check_period_not_closed
 

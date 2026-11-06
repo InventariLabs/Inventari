@@ -27,11 +27,11 @@ PASSWORD = 'testpassword123'
 
 @pytest.fixture
 def blacklist_on() -> Any:
-    previous = token_blacklist._redis  # noqa: SLF001
+    previous = token_blacklist._redis
     fake = FakeTokenStore()
     token_blacklist.set_redis(fake)
     yield fake
-    token_blacklist._redis = previous  # noqa: SLF001
+    token_blacklist._redis = previous
 
 
 def _login(client, user) -> tuple[str, str]:

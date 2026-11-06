@@ -219,6 +219,7 @@
     "date": "Em",
     "location": "Local",
     "everywhere": "Todos os locais",
+    "searchPlaceholder": "Buscar um produto…",
     "print": "Imprimir",
     "total": "Total",
     "caption": "Estoque de {{organization}} em {{date}}",
@@ -230,7 +231,8 @@
     "empty": {
       "title": "Não havia nada na prateleira",
       "description": "Nesta data, nenhum dos produtos cadastrados estava em estoque.",
-      "descriptionAt": "{{location}} — nesta data não guardava nenhum dos produtos cadastrados."
+      "descriptionAt": "{{location}} — nesta data não guardava nenhum dos produtos cadastrados.",
+      "descriptionSearch": "Nenhum dos produtos registrados corresponde a “{{search}}” nesta data."
     },
     "columns": {
       "product": "Produto",

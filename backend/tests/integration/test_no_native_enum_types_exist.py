@@ -27,7 +27,7 @@ pytestmark = pytest.mark.integration
 
 
 def test_no_model_column_is_a_native_enum():
-    import app.core.template_models  # noqa: F401
+    import app.core.template_models
     import app.models  # noqa: F401
     from app.database import Base
 

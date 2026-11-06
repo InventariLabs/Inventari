@@ -4,7 +4,7 @@ The approvals queue renders a card per request. A checkout request used to
 render as eight characters of a UUID because the engine only knew how to
 describe documents and purchase orders — the module that raises the request
 is the one that knows what it points at, so this module claims the
-``equipment_checkout`` target type the same way ``documents`` and
+``equipment_checkout`` target type the same way ``warehouse`` and
 ``purchase_orders`` claim theirs.
 """
 

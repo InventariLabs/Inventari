@@ -115,6 +115,49 @@ class TestAClearedFieldClearsAndAnAbsentOneStays:
         assert body['notes'] == 'kept for now'
         assert body['external_reference'] == 'REF-1'
 
+    def test_a_named_null_clears_the_partner_where_none_is_required(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+    ) -> None:
+        """The success half of clearing a partner: an internal receipt takes
+        a partner but does not need one, so the named null lands as NULL.
+
+        Passing only the refusal test would let a writer that ignores a
+        partner key sent as null stay green; this one fails then, because the
+        partner would still be on the document.
+        """
+        created = client.post(
+            '/api/v1/warehouse/documents',
+            headers=doc_auth_headers,
+            json={
+                'type': 'INTERNAL_IN',
+                'partner_id': str(doc_partner.id),
+                'target_location_id': str(doc_target_location.id),
+                'lines': [
+                    {
+                        'product_template_id': str(doc_template.id),
+                        'expected_quantity': '2',
+                    }
+                ],
+            },
+        )
+        assert created.status_code == status.HTTP_201_CREATED, created.text
+        draft = cast(dict[str, Any], created.json())
+        assert draft['partner_id'] == str(doc_partner.id)
+
+        cleared = _put(client, doc_auth_headers, draft['id'], {'partner_id': None})
+
+        assert cleared.status_code == status.HTTP_200_OK, cleared.text
+        assert cast(dict[str, Any], cleared.json())['partner_id'] is None
+        kept = client.get(
+            f'/api/v1/warehouse/documents/{draft["id"]}', headers=doc_auth_headers
+        )
+        assert cast(dict[str, Any], kept.json())['partner_id'] is None
+
     def test_a_named_null_on_a_partner_a_receipt_may_not_lose_is_refused_by_name(
         self,
         client: TestClient,

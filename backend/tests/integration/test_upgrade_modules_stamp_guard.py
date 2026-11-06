@@ -38,7 +38,7 @@ def isolated_db_url():
     with _isolated_db_url('stamp_guard') as test_url:
         # Create all Base.metadata tables, then drop every module table +
         # version table so only core tables remain.
-        import app.core.template_models  # noqa: F401
+        import app.core.template_models
         import app.models  # noqa: F401
         from app.database import Base
 
@@ -104,7 +104,7 @@ class TestUpgradeModulesStampGuard:
         expected_tables = _collect_module_tablenames(MODULES_ROOT / module_name)
 
         engine = create_engine(isolated_db_url)
-        import app.core.template_models  # noqa: F401
+        import app.core.template_models
         import app.models  # noqa: F401
         from app.database import Base
 

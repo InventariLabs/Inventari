@@ -45,9 +45,10 @@ nano .env
 ```
 
 The copied file is the list of variables the stack reads. Seven have no
-working default: five are hex-string secrets to generate (they are
-interpolated into connection URLs verbatim, and base64's `+ / =` characters
-would corrupt them), plus the domain and the e-mail address for the
+working default: five are hex-string secrets to generate (two of them,
+`DB_APP_PASSWORD` and `REDIS_PASSWORD`, are interpolated into connection URLs
+verbatim, where base64's `+ / =` characters would corrupt them; hex is the safe
+choice for all five), plus the domain and the e-mail address for the
 certificate. `docker compose` itself refuses to start without three of them
 (`REDIS_PASSWORD`, `DB_APP_PASSWORD`, `FERNET_SALT`) and says which; left
 empty, the other four fail later and less clearly — the database will not
@@ -196,6 +197,16 @@ because an update is what it is for.
 ping inventari.example.com           # check DNS
 sudo ufw allow 80/tcp && sudo ufw allow 443/tcp
 docker compose -f docker-compose.prod.yml logs caddy
+```
+
+**Locked out — the administrator forgot the password?** Without outgoing mail
+there is no reset link; reset it from the server with the command that created
+the account. It sets the new password, keeps the administrator role and signs
+out every earlier session:
+```bash
+docker compose -f docker-compose.prod.yml exec backend \
+  python manage.py user create-admin \
+    --email you@example.com --password '<a new password>'
 ```
 
 **Backend not starting?**

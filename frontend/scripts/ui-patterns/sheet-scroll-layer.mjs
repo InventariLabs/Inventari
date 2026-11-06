@@ -1,3 +1,5 @@
+import { withoutComments } from "./lib.mjs";
+
 export default {
   name: "sheet-scroll-layer",
   says:
@@ -9,7 +11,11 @@ export default {
     "overflow-y-auto of its own.",
 
   run(files) {
-    const considered = files.filter((f) => /<Sheet([\s>]|$)/.test(f.text));
+    // Comments are blanked first: a commented-out `<Sheet` is not a sheet,
+    // and a `SheetBody` or `overflow-auto` mentioned in a comment is not a
+    // scroll layer.
+    const stripped = files.map((f) => ({ ...f, text: withoutComments(f.text) }));
+    const considered = stripped.filter((f) => /<Sheet([\s>]|$)/.test(f.text));
     const findings = [];
 
     for (const file of considered) {

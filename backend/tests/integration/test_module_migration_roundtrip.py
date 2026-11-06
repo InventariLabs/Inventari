@@ -82,7 +82,7 @@ def _create_core_tables(db_url: str, module_name: str, module_tables: set[str]) 
 
     Also drops the module's alembic version table so each test starts fresh.
     """
-    import app.core.template_models  # noqa: F401
+    import app.core.template_models
     import app.models  # noqa: F401
     from app.database import Base
 
@@ -377,7 +377,7 @@ def _create_everything(db_url: str, module_name: str) -> None:
     """
     import importlib
 
-    import app.core.template_models  # noqa: F401
+    import app.core.template_models
     import app.models  # noqa: F401
 
     try:
@@ -879,7 +879,7 @@ SHOPPING_LISTS_TABLES = dict(MODULES)['shopping_lists']
 class TestShoppingListsFreshInstall:
     """Fresh install: the full core chain runs before module migrations.
 
-    Core migration ``e4f5a6b7c8d9`` pre-creates ``shopping_list_history``
+    The archived core migration ``e4f5a6b7c8d9`` pre-creates ``shopping_list_history``
     (with the same ``ix_*`` index names the module migration uses). The
     all-or-nothing stamp check in ``_upgrade_all_modules`` then fails
     (``shopping_lists``/``shopping_list_items`` are missing), so the module's

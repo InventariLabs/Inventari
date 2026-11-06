@@ -231,7 +231,7 @@ class StockMoveReferenceType(StrEnum):
         picking session)
       - ``item_history``    — one-time backfill from ItemHistory rows
       - ``opening_balance`` — the stock a shelf held before the register knew
-        it, posted once by the ``openbal01`` migration and since by every door
+        it, posted once by the archived ``openbal01`` migration and since by every door
         that adopts a card for a record that predates one
         (``reference_id`` is then that record)
       - ``location_relocation`` — a location that physically moved with the

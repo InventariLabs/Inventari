@@ -10,7 +10,13 @@ from __future__ import annotations
 
 import pytest
 
-from app.core.file_reference import cover_extension, served_url, stored_reference
+from app.core.file_reference import (
+    cover_extension,
+    cover_leaf,
+    cover_leaf_of,
+    served_url,
+    stored_reference,
+)
 
 pytestmark = pytest.mark.unit
 
@@ -90,3 +96,37 @@ class TestCoverExtension:
         # The caller rebuilds the key from the entity it is serving, so a
         # path smuggled in front of the tail is discarded with the rest.
         assert cover_extension('a/b/../../cover.jpg') == 'jpg'
+
+
+class TestCoverLeaf:
+    """A replaced picture is a new address; the leaf carries the bytes' digest."""
+
+    def test_different_bytes_are_different_names(self) -> None:
+        assert cover_leaf(b'one', 'png') != cover_leaf(b'two', 'png')
+
+    def test_the_same_bytes_are_the_same_name(self) -> None:
+        assert cover_leaf(b'one', 'png') == cover_leaf(b'one', 'png')
+
+    def test_a_leaf_is_read_back_from_a_key_or_an_address(self) -> None:
+        leaf = cover_leaf(b'one', 'webp')
+        assert cover_leaf_of(f'org/items/x/{leaf}') == leaf
+        assert cover_leaf_of(f'/uploads/org/items/x/{leaf}') == leaf
+
+    def test_a_cover_written_before_the_digest_is_still_a_cover(self) -> None:
+        assert cover_leaf_of(_KEY) == 'cover.png'
+
+    @pytest.mark.parametrize(
+        'value',
+        [
+            None,
+            '',
+            _FOREIGN,
+            'org/items/x/secret.png',
+            'org/items/x/cover.exe',
+            'org/items/x/cover.zzzzzzzzzzzz.png',
+            'org/items/x/cover..png',
+            'org/items/x/cover.png/../../secret.png',
+        ],
+    )
+    def test_anything_else_answers_nothing(self, value) -> None:
+        assert cover_leaf_of(value) is None

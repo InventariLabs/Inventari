@@ -71,7 +71,7 @@ def issued_keys(monkeypatch) -> set[str]:
     async def resolver(db, raw_key):
         if raw_key not in issued:
             return None
-        return ApiKeyIdentity(user_id=uuid.uuid4(), key_prefix=raw_key[:20])
+        return ApiKeyIdentity(user_id=uuid.uuid4(), key_prefix=raw_key[:15])
 
     monkeypatch.setattr(api_key_auth, '_resolver', resolver)
     return issued

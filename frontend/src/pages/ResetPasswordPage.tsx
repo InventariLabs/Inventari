@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Lock, ArrowLeft, CheckCircle2 } from "lucide-react";
@@ -29,6 +29,35 @@ export default function ResetPasswordPage() {
   // The request itself failed (server error, no network): the link may be
   // perfectly good, so the form stays and the reader is told to try again.
   const [requestFailed, setRequestFailed] = useState(false);
+  // A link from an old e-mail is the usual way to land here with a token that
+  // is spent or expired: ask before showing a form for a password it can
+  // never save. Until the answer comes the card holds no form, so a dead link
+  // never flashes one.
+  const [checking, setChecking] = useState(Boolean(token));
+
+  useEffect(() => {
+    if (!token) {
+      setLinkInvalid(true);
+      return;
+    }
+    let current = true;
+    authApi
+      .checkPasswordReset(token)
+      .catch((error: unknown) => {
+        // Only a refusal condemns the link; a server or network failure
+        // leaves the form, and submitting it reports what happened.
+        const status = apiErrorStatus(error);
+        if (current && status !== null && status >= 400 && status < 500) {
+          setLinkInvalid(true);
+        }
+      })
+      .finally(() => {
+        if (current) setChecking(false);
+      });
+    return () => {
+      current = false;
+    };
+  }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,6 +133,8 @@ export default function ResetPasswordPage() {
               {t("reset.goToLogin", { defaultValue: "Go to login" })}
             </Button>
           </div>
+        ) : checking && !linkInvalid ? (
+          <div aria-busy="true" data-testid="reset-checking" />
         ) : linkInvalid ? (
           <div className="py-4" data-testid="reset-invalid-link">
             <h2 className="text-lg font-semibold text-on mb-2">
@@ -119,10 +150,15 @@ export default function ResetPasswordPage() {
             </p>
             {/* The way out, not just the verdict — the attestation screen's
                 refusal card is the pattern: say who can reissue the link. */}
-            <p className="mt-3 text-sm text-on-muted leading-relaxed">
-              {t("reset.invalidTokenNext", {
-                defaultValue: "Request a fresh link from the sign-in screen.",
-              })}
+            <p className="mt-3 text-sm leading-relaxed">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-primary-600 hover:underline"
+              >
+                {t("reset.invalidTokenNext", {
+                  defaultValue: "Request a fresh reset link.",
+                })}
+              </Link>
             </p>
           </div>
         ) : (

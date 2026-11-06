@@ -546,7 +546,7 @@ async def _stock_unit_from_items_async(
 ) -> UUID | None:
     """The unit this product's shelves actually hold, when the catalogue is silent.
 
-    The piece backfill (``uompcs01``) gave every item row a unit, so a
+    The piece backfill (archived ``uompcs01``) gave every item row a unit, so a
     unitless template whose items exist is not a product predating units —
     its shelves answer "pieces" whether the catalogue row does or not. The
     items have to agree; a product held in several units has no single stock

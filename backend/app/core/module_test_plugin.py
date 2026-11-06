@@ -68,7 +68,7 @@ def _get_module_name(request: pytest.FixtureRequest) -> str:
 @pytest.fixture
 def module_org(
     request: pytest.FixtureRequest, db_session: Session
-) -> Generator[Organization]:  # noqa: F821
+) -> Generator[Organization]:
     """Organization with the test's ``@pytest.mark.module`` module enabled.
 
     Always includes the core modules (``core``, ``items``, ``locations``,
@@ -88,7 +88,7 @@ def module_org(
 
 
 @pytest.fixture
-def module_user(module_org: Organization, db_session: Session) -> Generator[User]:  # noqa: F821
+def module_user(module_org: Organization, db_session: Session) -> Generator[User]:
     """Admin user in the ``module_org`` organization."""
     from app.models.user import User
     from app.services.auth_service import get_password_hash
@@ -108,7 +108,7 @@ def module_user(module_org: Organization, db_session: Session) -> Generator[User
 
 
 @pytest.fixture
-def module_auth_headers(module_user: User) -> dict[str, str]:  # noqa: F821
+def module_auth_headers(module_user: User) -> dict[str, str]:
     """JWT ``Authorization`` headers for ``module_user``."""
     from app.services.token_service import create_access_token
 

@@ -32,6 +32,10 @@ logger = get_logger(__name__)
 
 # Maximum number of active API keys per organisation (prevents abuse)
 MAX_KEYS_PER_ORG = 10
+#: How many of a key's random characters its shown prefix carries: enough to
+#: tell an organization's keys apart, on a screen and in a journal read more
+#: widely than the key settings, and no more of the key than that.
+SHOWN_KEY_CHARACTERS = 6
 
 # Debounce interval for last_used_at updates (seconds)
 LAST_USED_DEBOUNCE_SECONDS = 300
@@ -127,7 +131,7 @@ async def create_api_key_async(
     result = await db.execute(
         select(func.count(ApiKey.id)).where(
             ApiKey.organization_id == organization_id,
-            ApiKey.is_active.is_(True),  # noqa: E712
+            ApiKey.is_active.is_(True),
         )
     )
     active_count = result.scalar() or 0
@@ -136,7 +140,7 @@ async def create_api_key_async(
 
     raw_key = f'{API_KEY_PREFIX}{secrets.token_hex(16)}'
     hashed = _hash_key(raw_key)
-    prefix = raw_key[:20]  # e.g. "inv_live_a1b2c3d4e5f"
+    prefix = raw_key[: len(API_KEY_PREFIX) + SHOWN_KEY_CHARACTERS]  # "inv_live_a1b2c3"
 
     api_key = ApiKey(
         organization_id=organization_id,
@@ -243,7 +247,7 @@ async def validate_api_key(db: AsyncSession, raw_key: str) -> 'ApiKey | None':
         select(ApiKey)
         .where(
             ApiKey.hashed_key == hashed,
-            ApiKey.is_active.is_(True),  # noqa: E712
+            ApiKey.is_active.is_(True),
         )
         .with_for_update()
     )
@@ -306,7 +310,7 @@ async def list_api_keys(
         select(ApiKey)
         .where(
             ApiKey.organization_id == organization_id,
-            ApiKey.is_active.is_(True),  # noqa: E712
+            ApiKey.is_active.is_(True),
         )
         .order_by(ApiKey.created_at.desc(), ApiKey.id),
         limit=limit,

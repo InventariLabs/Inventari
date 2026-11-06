@@ -27,7 +27,7 @@ _HANG_SECONDS = 1.5
 class _ReaderAndProbeHandler(BaseHTTPRequestHandler):
     """``/reader`` hangs; ``/probe`` answers at once, on its own thread."""
 
-    def do_GET(self) -> None:  # noqa: N802 - BaseHTTPRequestHandler API
+    def do_GET(self) -> None:  # BaseHTTPRequestHandler API
         if self.path.startswith('/reader'):
             time.sleep(_HANG_SECONDS)
             self.send_response(500)

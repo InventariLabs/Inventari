@@ -24,9 +24,7 @@ import importlib
 
 import pytest
 from alembic import command
-from alembic.autogenerate import compare_metadata
 from alembic.config import Config
-from alembic.runtime.migration import MigrationContext
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
 
@@ -70,27 +68,13 @@ def test_what_migrations_build_is_what_the_models_declare(monkeypatch):
     )
 
 
-#: Indexes whose migrated definition differs from the model's in a way that
-#: changes no behaviour: the baseline built ``uq_partner_org_code`` without the
-#: ``WHERE code IS NOT NULL`` predicate, and NULLs never collide in a unique
-#: index anyway. Only this exact pair of definitions is waived: any other
-#: predicate under the same name still fails.
-_EQUIVALENT_DEFINITION_DRIFT = {
-    'uq_partner_org_code': (
-        'CREATE UNIQUE INDEX uq_partner_org_code ON public.partners'
-        ' USING btree (organization_id, code)',
-        'CREATE UNIQUE INDEX uq_partner_org_code ON public.partners'
-        ' USING btree (organization_id, code) WHERE (code IS NOT NULL)',
-    ),
-}
-
-
 def _index_definitions(url: str) -> dict[str, str]:
     """Every index in the database, by name, as Postgres itself prints it.
 
-    ``compare_metadata`` matches an index by name and column list, so a
-    migration that writes the columns in the other order or leaves out a
-    ``DESC`` can still diff clean. The printed definition carries both.
+    ``compare_metadata`` already catches an index whose columns are in
+    another order or that lost a ``DESC``. What it does not see is the rest
+    of the definition — a partial index's ``WHERE`` predicate, an operator
+    class, the ``USING`` method — and the printed definition carries all of it.
     """
     engine = create_engine(url)
     with engine.connect() as conn:
@@ -105,11 +89,12 @@ def _index_definitions(url: str) -> dict[str, str]:
 def test_the_migrated_indexes_are_the_ones_the_models_declare(monkeypatch):
     """Column order and sort direction of an index survive the migration chain.
 
-    The test databases are built by ``create_all``, so the order and the
-    ``DESC`` a model declares are there whatever the migration wrote. This
-    builds both databases and prints every index of each: a migration that
-    swaps two columns of a composite index, or drops its ``DESC``, leaves the
-    two definitions different and fails here, on every core index at once.
+    The test databases are built by ``create_all``, so the whole definition a
+    model declares is there whatever the migration wrote. This builds both
+    databases and prints every index of each: a migration that drops a partial
+    index's predicate, changes an operator class or an access method (or swaps
+    two columns, or drops a ``DESC``) leaves the two definitions different and
+    fails here, on every core index at once.
     """
     metadata = _registered_base().metadata
 
@@ -128,7 +113,6 @@ def test_the_migrated_indexes_are_the_ones_the_models_declare(monkeypatch):
         f'  - {name}\n      migrated: {migrated[name]}\n      declared: {declared[name]}'
         for name in sorted(migrated.keys() & declared.keys())
         if migrated[name] != declared[name]
-        and _EQUIVALENT_DEFINITION_DRIFT.get(name) != (migrated[name], declared[name])
     ]
     assert not differing, (
         'an index the migrations build is not the index the models declare:\n'
@@ -140,8 +124,8 @@ def test_the_migrated_indexes_are_the_ones_the_models_declare(monkeypatch):
 def test_a_column_type_that_drifted_is_a_diff(monkeypatch):
     """The type comparison has teeth: a JSONB column turned back to JSON shows.
 
-    Type comparison is spelled out in the gate rather than left to the
-    library default, and this pins that it is really on.
+    The diff is the gate's own (``schema_gaps``), so turning the type
+    comparison off there turns this test red.
     """
     metadata = _registered_base().metadata
 
@@ -157,10 +141,7 @@ def test_a_column_type_that_drifted_is_a_diff(monkeypatch):
                 )
             )
         with engine.connect() as conn:
-            diff = compare_metadata(
-                MigrationContext.configure(conn, opts={'compare_type': True}),
-                metadata,
-            )
+            diff = schema_gaps(conn, metadata)
         engine.dispose()
 
     def _type_changes(ops):
@@ -269,11 +250,6 @@ def test_the_migrated_database_carries_the_trigram_indexes(monkeypatch):
     baseline writes them by hand, and this asks the database a fresh install
     leaves behind.
     """
-    from migrations.versions.baseline_002_full_schema import TRIGRAM_INDEXES
-    from migrations.versions.listreads01_index_the_list_searches import (
-        TRIGRAM_INDEXES as LIST_TRIGRAM_INDEXES,
-    )
-
     with isolated_db_url('trgm') as url:
         monkeypatch.setenv('DATABASE_URL', url)
         command.upgrade(Config('alembic.ini'), 'head')
@@ -293,8 +269,18 @@ def test_the_migrated_database_carries_the_trigram_indexes(monkeypatch):
             ).scalar()
         engine.dispose()
 
+    # Spelled out: taken from the tuples the migrations loop over, an entry
+    # dropped from a tuple would leave the two sides agreeing.
     assert set(found) == {
-        name for name, _table, _column in (*TRIGRAM_INDEXES, *LIST_TRIGRAM_INDEXES)
+        'ix_items_barcode_trgm',
+        'ix_items_brand_trgm',
+        'ix_items_label_code_trgm',
+        'ix_items_name_trgm',
+        'ix_items_serial_number_trgm',
+        'ix_partners_name_trgm',
+        'ix_product_templates_barcode_trgm',
+        'ix_product_templates_name_trgm',
+        'ix_product_templates_sku_trgm',
     }
     assert all('USING gin' in definition for definition in found.values())
     assert extension == 1, 'the pg_trgm extension the indexes need is missing'

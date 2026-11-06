@@ -38,10 +38,10 @@ from tests.integration._fake_token_store import FakeTokenStore
 
 @pytest.fixture
 def blacklist_on() -> Iterator[None]:
-    previous = token_blacklist._redis  # noqa: SLF001
+    previous = token_blacklist._redis
     token_blacklist.set_redis(FakeTokenStore())  # type: ignore[arg-type]
     yield
-    token_blacklist._redis = previous  # noqa: SLF001
+    token_blacklist._redis = previous
 
 
 @pytest.fixture

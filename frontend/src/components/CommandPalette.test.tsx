@@ -323,7 +323,8 @@ describe("CommandPalette — jumping away asks a dirty form first", () => {
 
     await user.click(screen.getByRole("button", { name: "Leave anyway" }));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/settings");
+    // The jump happens in the confirm promise's continuation, not in the click.
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/settings"));
   });
 
   it("keeps the palette open when the reader declines", async () => {

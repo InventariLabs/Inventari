@@ -63,6 +63,7 @@
     "DISPOSED": "Desechado",
     "ARCHIVED": "Archivado"
   },
+  "categoriesUnavailable": "No se pudieron cargar las categorías, por lo que pueden faltar algunos campos en este formulario.",
   "itemName": "Nombre del producto",
   "itemNamePlaceholder": "ej. Leche entera 1 l",
   "itemBrand": "Marca",
@@ -90,6 +91,7 @@
     "title": "Sin productos",
     "tryFilters": "Intente cambiar los filtros",
     "addFirst": "Agregue su primer producto a una ubicación. La exportación se habilitará cuando haya un producto.",
+    "definedWithoutStock": "Los productos que solo existen como definición — por ejemplo, los creados en una receta o una lista de materiales — aparecen aquí cuando tienen existencias. Agregue uno a una ubicación para verlo.",
     "noSearchResultsTitle": "Sin productos que coincidan",
     "noSearchResultsDescription": "Sin resultados para «{{term}}»",
     "clearSearch": "Borrar búsqueda",
@@ -186,7 +188,8 @@
     "selectUnit": "Seleccionar unidad…",
     "unitLabel": "Unidad",
     "unitEmpty": "Elegir",
-    "templateUnitHint": "{{product}} se cuenta en {{unit}} — este registro toma esa unidad salvo que elijas otra."
+    "templateUnitHint": "{{product}} se cuenta en {{unit}} — este registro toma esa unidad salvo que elijas otra.",
+    "existingProducts": "Ya en tus productos:"
   },
   "identificationSection": "Identificación del producto",
   "itemWeightNet": "Peso por pieza",
@@ -388,8 +391,8 @@
     },
     "linkedDocument": "Documento vinculado",
     "corrects": "corrige {{number}}",
-    "createdWith_one": "Creado con la cantidad {{count}}",
-    "createdWith_other": "Creado con la cantidad {{count}}",
+    "createdWith_one": "Creado con la cantidad {{amount}}",
+    "createdWith_other": "Creado con la cantidad {{amount}}",
     "createdViaScan": {
       "label": "Creado al escanear la etiqueta {{code}}",
       "barcode": "Creado al escanear el código de barras {{code}}",

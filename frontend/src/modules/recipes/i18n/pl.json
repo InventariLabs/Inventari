@@ -318,8 +318,8 @@
     "incomplete_warning": "Dane odżywcze dostępne tylko dla {{pct}}% składników",
     "estimate_note": "Szacunek zsumowany z wartości produktów użytych jako składniki (etykiety lub Open Food Facts, baza społecznościowa). Porównaj go z etykietą.",
     "estimate_generic_note": "Szacunek zsumowany ze składników. Część używa wartości ogólnych zamiast wartości produktu; reszta pochodzi z etykiet produktów lub Open Food Facts (bazy społecznościowej). Porównaj go z etykietą.",
-    "daily_estimate_note": "Sumy dzienne dodają szacunki poszczególnych przepisów, z etykiet produktów lub Open Food Facts. Traktuj je orientacyjnie.",
-    "daily_estimate_generic_note": "Sumy dzienne dodają szacunki poszczególnych przepisów. Część używa wartości ogólnych zamiast wartości produktu. Traktuj je orientacyjnie."
+    "daily_estimate_note": "Sumy dzienne dodają jedną porcję każdego zaplanowanego posiłku, z etykiet produktów lub Open Food Facts. Traktuj je orientacyjnie.",
+    "daily_estimate_generic_note": "Sumy dzienne dodają jedną porcję każdego zaplanowanego posiłku. Część używa wartości ogólnych zamiast wartości produktu. Traktuj je orientacyjnie."
   },
   "shopping": {
     "add_missing_button": "Dodaj brakujące do listy zakupów",
@@ -477,7 +477,7 @@
     "import_error_ai_not_configured": "Import nieudany: „{{purpose}}” wymaga połączenia AI, a żadnego jeszcze nie ustawiono. Skonfiguruj je w Ustawieniach → Połączenia AI."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "Podpowiedzi w przepisach dalej działają — schodzą do angielskiego. Dodaj wpis albo zaimportuj plik CSV/JSON, aby wypełnić słownik.",
+    "language_empty_hint": "Podpowiedzi w przepisach dalej działają — korzystają z pasujących wpisów w innych językach. Dodaj wpis albo zaimportuj plik CSV/JSON, aby wypełnić słownik.",
     "language_empty": "Słownik składników nie ma jeszcze wpisów dla języka {{lang}}.",
     "scan_label": "Odczytaj z etykiety",
     "scan_reading": "Odczytuję…",

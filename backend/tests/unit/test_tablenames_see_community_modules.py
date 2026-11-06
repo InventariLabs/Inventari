@@ -357,3 +357,58 @@ class TestExternalModuleRoots:
 
         assert _main.EXTERNAL_MODULES_ROOTS
         assert Path('/modules-workspace') in _main.EXTERNAL_MODULES_ROOTS
+
+    def test_every_existing_root_is_scanned(self, tmp_path: Path, monkeypatch):
+        """The scan reads the roots it is configured with, not just names them."""
+        from app.core.architecture_lint import _main
+
+        first, second = tmp_path / 'first', tmp_path / 'second'
+        _write_community_module(first)
+        _write_community_module(second)
+        monkeypatch.setattr(
+            _main, 'EXTERNAL_MODULES_ROOTS', (first, second, tmp_path / 'missing')
+        )
+
+        errors = _main._external_module_migration_errors()
+
+        assert len(errors) == 2
+        assert sum(str(first) in error for error in errors) == 1
+        assert sum(str(second) in error for error in errors) == 1
+
+    def test_two_roots_on_one_directory_report_each_module_once(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """In the container ``/modules-workspace`` and the repo-root twin are
+        one directory; a module there used to be reported twice."""
+        from app.core.architecture_lint import _main
+
+        real = tmp_path / 'workspace'
+        _write_community_module(real)
+        link = tmp_path / 'twin'
+        link.symlink_to(real, target_is_directory=True)
+        monkeypatch.setattr(_main, 'EXTERNAL_MODULES_ROOTS', (real, link))
+
+        errors = _main._external_module_migration_errors()
+
+        assert len(errors) == 1
+
+    def test_the_lint_run_reports_a_gap_in_an_external_root(
+        self, tmp_path: Path, monkeypatch, capsys
+    ):
+        """The gate, not just the helper: ``main()`` must carry the scan.
+
+        Without the call in ``_run_checks`` the helper stays green on its own
+        and a community module with no migration passes the lint.
+        """
+        from app.core.architecture_lint import _main
+
+        root = tmp_path / 'workspace'
+        _write_community_module(root)
+        monkeypatch.setattr(_main, 'EXTERNAL_MODULES_ROOTS', (root,))
+        monkeypatch.setattr('sys.argv', ['architecture_lint'])
+
+        exit_code = _main.main()
+
+        out = capsys.readouterr().out
+        assert exit_code != 0
+        assert sum(str(root) in line for line in out.splitlines()) == 1

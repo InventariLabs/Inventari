@@ -120,49 +120,57 @@ export const WebhookCard = memo(function WebhookCard({
           {autoDisabled && (
             <div className="flex items-start gap-1.5 mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-xs text-yellow-700 dark:text-yellow-300">
               <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-              <span>
-                {t("circuitBreakerWarning", {
-                  count: webhook.consecutive_failures,
-                })}{" "}
-                {/* Events that fire while it is off are never stored, so
-                    Reactivate cannot bring them back — say so here. */}
-                {t("eventsWhileOff")}{" "}
-                {/* The breaker knows that deliveries stopped, not why they
-                    did — a refused signing secret, a timeout and a 500 all
-                    land here. The cause of the last attempt is written on its
-                    own log row; prescribing the URL pointed administrators
-                    away from every cause but one. */}{" "}
-                <Button
-                  variant="link"
-                  size="contentSm"
-                  onClick={onLogs}
-                  className="underline font-medium px-0.5 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
-                >
-                  {t("logs")}
-                </Button>{" "}
-                {/* The threshold that cut this endpoint off lives two screens
-                    away, and the card never said where. */}
-                <Link
-                  to="/settings/modules/webhooks"
-                  className="underline font-medium"
-                >
-                  {t("thresholdLink")}
-                </Link>
+              <div className="min-w-0">
+                <span>
+                  {t("circuitBreakerWarning", {
+                    count: webhook.consecutive_failures,
+                  })}{" "}
+                  {/* Events that fire while it is off are never stored, so
+                      Reactivate cannot bring them back — say so here. */}
+                  {t("eventsWhileOff")}{" "}
+                  {/* The breaker knows that deliveries stopped, not why they
+                      did — a refused signing secret, a timeout and a 500 all
+                      land here. The cause of the last attempt is written on
+                      its own log row; prescribing the URL pointed
+                      administrators away from every cause but one. */}{" "}
+                  <Button
+                    variant="link"
+                    size="contentSm"
+                    onClick={onLogs}
+                    className="underline font-medium px-0.5 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
+                  >
+                    {t("logs")}
+                  </Button>{" "}
+                  {/* The threshold that cut this endpoint off lives two
+                      screens away, and the card never said where. */}
+                  <Link
+                    to="/settings/modules/webhooks"
+                    className="underline font-medium"
+                  >
+                    {t("thresholdLink")}
+                  </Link>
+                </span>
                 {/* The way back belongs where the cut-off is announced: the
                     only other door is the edit form's last switch, under
-                    forty event checkboxes. */}
+                    forty event checkboxes. It is the card's only Reactivate
+                    for a tripped endpoint (the action row below leaves its
+                    own out), so a phone does not show the word twice. Its own
+                    line, not `block` on the button: that overrode the
+                    button's flex display and stacked the icon over the label. */}
                 {isAdmin && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={onReactivate}
-                    leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-                    className="mt-2 block"
-                  >
-                    {t("reactivate")}
-                  </Button>
+                  <div className="mt-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={onReactivate}
+                      leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+                      aria-label={`${t("reactivate")} ${webhook.name}`}
+                    >
+                      {t("reactivate")}
+                    </Button>
+                  </div>
                 )}
-              </span>
+              </div>
             </div>
           )}
 
@@ -238,7 +246,7 @@ export const WebhookCard = memo(function WebhookCard({
           </Button>
           {isAdmin && (
             <>
-              {!webhook.is_active && (
+              {!webhook.is_active && !autoDisabled && (
                 <Button
                   size="sm"
                   variant="ghost"

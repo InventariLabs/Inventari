@@ -44,6 +44,30 @@ def _refuse_known_weak_password(password: str, allow_weak: bool) -> None:
     sys.exit(1)
 
 
+def _refuse_unusable_input(password: str, lang: str | None, allow_weak: bool) -> None:
+    """Exit 1 with a readable message when the password or language cannot be used."""
+    from app.i18n import SUPPORTED_LANGUAGES
+    from app.schemas.user import validate_password_policy
+
+    _refuse_known_weak_password(password, allow_weak)
+
+    if lang is not None and lang not in SUPPORTED_LANGUAGES:
+        console.print(
+            f'[red]✘ Unknown language {lang!r}. '
+            f'Choose one of: {", ".join(SUPPORTED_LANGUAGES)}[/]'
+        )
+        sys.exit(1)
+
+    # The CLI hashed whatever it was given, so it could create an account with
+    # a password the API itself would refuse — and `make dev-up` then printed
+    # that password as the login. Same policy in both places.
+    try:
+        validate_password_policy(password)
+    except ValueError as exc:
+        console.print(f'[red]✘ Password rejected: {exc}[/]')
+        sys.exit(1)
+
+
 async def _mark_credentials_changed(user_id: str) -> None:
     """Invalidate every session issued before this password reset.
 
@@ -80,6 +104,14 @@ def create_admin(
     email: str = typer.Option(..., help='Admin email address'),
     password: str = typer.Option(..., help='Admin password'),
     name: str = typer.Option('Administrator', help='Full name'),
+    lang: str | None = typer.Option(
+        None,
+        '--lang',
+        help=(
+            'Interface language of the account (en, pl, de, fr, es, pt); '
+            'omitted: the instance default for a new account, unchanged for an existing one'
+        ),
+    ),
     allow_weak_password: bool = typer.Option(
         False,
         '--allow-weak-password',
@@ -92,24 +124,14 @@ def create_admin(
     ),
 ):
     """Create an admin user or reset existing admin password."""
-    import app.modules.stock_takes.models  # noqa: F401 - resolve StockTakeItem/StockTake mapper
+    import app.modules.stock_takes.models  # resolve StockTakeItem/StockTake mapper
     import app.modules.warehouse.models  # noqa: F401 - resolve Document mapper
     from app.database import SessionLocal
     from app.models.organization import Organization
     from app.models.user import User
-    from app.schemas.user import validate_password_policy
     from app.services.auth_service import get_password_hash
 
-    _refuse_known_weak_password(password, allow_weak_password)
-
-    # The CLI hashed whatever it was given, so it could create an account with
-    # a password the API itself would refuse — and `make dev-up` then printed
-    # that password as the login. Same policy in both places.
-    try:
-        validate_password_policy(password)
-    except ValueError as exc:
-        console.print(f'[red]✘ Password rejected: {exc}[/]')
-        sys.exit(1)
+    _refuse_unusable_input(password, lang, allow_weak_password)
 
     db = SessionLocal()
     try:
@@ -121,6 +143,8 @@ def create_admin(
             user.hashed_password = get_password_hash(password)
             user.role = 'admin'
             user.is_active = True
+            if lang is not None:
+                user.preferred_language = lang
             db.commit()
             user_id = str(user.id)
             console.print('[green]✔ Updated successfully.[/]')
@@ -154,6 +178,8 @@ def create_admin(
             is_superuser=first_account,
             is_active=True,
         )
+        if lang is not None:
+            user.preferred_language = lang
         db.add(user)
         db.flush()
 

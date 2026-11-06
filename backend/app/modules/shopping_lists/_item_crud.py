@@ -18,6 +18,8 @@ from app.core.exceptions import (
     catalogue_status_refusal,
 )
 from app.i18n import Language
+from app.i18n.service import stated_quantity
+from app.schemas.validators import QUANTITY_STEP
 
 from ._helpers import get_shopping_list_item_or_404
 from .models import ShoppingList, ShoppingListItem
@@ -50,7 +52,12 @@ _TEMPLATE_REFUSAL_KEY = 'shopping_list_item_template_unknown'
 
 def _refuse_if_zero(quantity: Decimal | None, lang: Language | None) -> None:
     if quantity is not None and quantity <= 0:
-        raise catalogue_refusal(_ZERO_REFUSAL_KEY, lang=lang, quantity=quantity)
+        raise catalogue_refusal(
+            _ZERO_REFUSAL_KEY,
+            lang=lang,
+            quantity=quantity,
+            smallest=stated_quantity(QUANTITY_STEP, lang),
+        )
 
 
 async def _refuse_if_unknown_uom(

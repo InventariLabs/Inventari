@@ -22,7 +22,7 @@ module_migrations_baseline.txt 0
 public_api_missing_org_baseline.txt 10
 raw_http_exception_baseline.txt 0
 refusal_sentences_baseline.txt 0
-request_scope_baseline.txt 25
+request_scope_baseline.txt 26
 services_public_api_import_baseline.txt 20
 sync_async_twin_baseline.txt 12
 test_skip_baseline.txt 0

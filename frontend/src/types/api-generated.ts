@@ -468,7 +468,9 @@ export interface paths {
          * Reject Document
          * @description Reject the document's request; the document goes back to a draft.
          *
-         *     So the requester can correct it and submit it again, and is told why.
+         *     So the requester can correct it and submit it again, and is told why. The
+         *     reason travels in the body: a query string is what proxies and access logs
+         *     keep, and this one is free text about a colleague's document.
          */
         post: operations["reject_document_api_v1_approvals_documents__doc_id__reject_post"];
         delete?: never;
@@ -871,6 +873,29 @@ export interface paths {
          * @description Update current user's preferred language.
          */
         post: operations["update_my_language_api_v1_auth_me_language_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password-reset/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Password Reset Token
+         * @description Say whether a reset link can still be used, without using it.
+         *
+         *     The reset page asks this on arrival; a link from an old e-mail is the
+         *     usual way to land there with a token that is spent or expired.
+         */
+        post: operations["check_password_reset_token_api_v1_auth_password_reset_check_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10935,6 +10960,11 @@ export interface components {
              * @default 0
              */
             already_listed_count: number;
+            /**
+             * On Other Lists
+             * @default []
+             */
+            on_other_lists: components["schemas"]["ListedElsewhere"][];
         };
         /**
          * AiConnectionCreateDTO
@@ -11579,6 +11609,11 @@ export interface components {
             full_path?: string | null;
             /** Archived At */
             archived_at?: string | null;
+        };
+        /** AskForApproval */
+        AskForApproval: {
+            /** Notes */
+            notes?: string | null;
         };
         /**
          * AssetFilter
@@ -13851,6 +13886,8 @@ export interface components {
             row: number;
             /** Error */
             error: string;
+            /** Code */
+            code?: string | null;
         };
         /** DocumentImportLineResponse */
         DocumentImportLineResponse: {
@@ -16802,6 +16839,21 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * ListedElsewhere
+         * @description A line just written that another open shopping list already carries.
+         */
+        ListedElsewhere: {
+            /** Name */
+            name: string;
+            /**
+             * List Id
+             * Format: uuid
+             */
+            list_id: string;
+            /** List Name */
+            list_name: string;
         };
         /**
          * LlmCapability
@@ -20033,6 +20085,14 @@ export interface components {
             address?: components["schemas"]["PartnerAddress"] | null;
             /** Notes */
             notes?: string | null;
+        };
+        /**
+         * PasswordResetCheckIn
+         * @description Body for ``POST /auth/password-reset/check``.
+         */
+        PasswordResetCheckIn: {
+            /** Token */
+            token: string;
         };
         /**
          * PasswordResetConfirmIn
@@ -24145,6 +24205,11 @@ export interface components {
              * @default []
              */
             items: components["schemas"]["_GeneratedItem"][];
+            /**
+             * On Other Lists
+             * @default []
+             */
+            on_other_lists: components["schemas"]["ListedElsewhere"][];
         };
         /** ShoppingListItem */
         ShoppingListItem: {
@@ -28916,16 +28981,18 @@ export interface operations {
     };
     approve_document_api_v1_approvals_documents__doc_id__approve_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 doc_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ApproveRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -28949,16 +29016,18 @@ export interface operations {
     };
     reject_document_api_v1_approvals_documents__doc_id__reject_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 doc_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RejectRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -28982,16 +29051,18 @@ export interface operations {
     };
     request_document_approval_api_v1_approvals_documents__doc_id__request_approval_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 doc_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AskForApproval"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -29680,6 +29751,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["User"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_password_reset_token_api_v1_auth_password_reset_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordResetCheckIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -39084,16 +39186,18 @@ export interface operations {
     };
     approve_endpoint_api_v1_purchase_orders__po_id__approve_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 po_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ApproveRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -39383,16 +39487,18 @@ export interface operations {
     };
     reject_endpoint_api_v1_purchase_orders__po_id__reject_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 po_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RejectRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -39416,16 +39522,18 @@ export interface operations {
     };
     request_approval_endpoint_api_v1_purchase_orders__po_id__request_approval_post: {
         parameters: {
-            query?: {
-                notes?: string | null;
-            };
+            query?: never;
             header?: never;
             path: {
                 po_id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AskForApproval"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -42995,6 +43103,8 @@ export interface operations {
                 as_of: string;
                 /** @description This place and everything below it. Quantities only — the cost history is kept per product, not per shelf. */
                 location_id?: string | null;
+                /** @description Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only. */
+                search?: string | null;
                 limit?: number;
                 offset?: number;
             };
@@ -43029,6 +43139,8 @@ export interface operations {
             query: {
                 as_of: string;
                 location_id?: string | null;
+                /** @description Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only. */
+                search?: string | null;
             };
             header?: never;
             path?: never;
@@ -43061,6 +43173,8 @@ export interface operations {
             query: {
                 as_of: string;
                 location_id?: string | null;
+                /** @description Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only. */
+                search?: string | null;
             };
             header?: never;
             path?: never;

@@ -1192,24 +1192,18 @@
               "format": "uuid",
               "title": "Doc Id"
             }
-          },
-          {
-            "name": "notes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Notes"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveRequest",
+                "default": {}
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1240,7 +1234,7 @@
           "Approvals"
         ],
         "summary": "Reject Document",
-        "description": "Reject the document's request; the document goes back to a draft.\n\nSo the requester can correct it and submit it again, and is told why.",
+        "description": "Reject the document's request; the document goes back to a draft.\n\nSo the requester can correct it and submit it again, and is told why. The\nreason travels in the body: a query string is what proxies and access logs\nkeep, and this one is free text about a colleague's document.",
         "operationId": "reject_document_api_v1_approvals_documents__doc_id__reject_post",
         "security": [
           {
@@ -1260,24 +1254,18 @@
               "format": "uuid",
               "title": "Doc Id"
             }
-          },
-          {
-            "name": "notes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Notes"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRequest",
+                "default": {}
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1328,24 +1316,18 @@
               "format": "uuid",
               "title": "Doc Id"
             }
-          },
-          {
-            "name": "notes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Notes"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskForApproval",
+                "default": {}
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2640,6 +2622,41 @@
             "ApiKey": []
           }
         ]
+      }
+    },
+    "/api/v1/auth/password-reset/check": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Check Password Reset Token",
+        "description": "Say whether a reset link can still be used, without using it.\n\nThe reset page asks this on arrival; a link from an old e-mail is the\nusual way to land there with a token that is spent or expired.",
+        "operationId": "check_password_reset_token_api_v1_auth_password_reset_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetCheckIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/auth/password-reset/confirm": {
@@ -20556,24 +20573,18 @@
               "format": "uuid",
               "title": "Po Id"
             }
-          },
-          {
-            "name": "notes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Notes"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveRequest",
+                "default": {}
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -21111,24 +21122,18 @@
               "format": "uuid",
               "title": "Po Id"
             }
-          },
-          {
-            "name": "notes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Notes"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRequest",
+                "default": {}
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -21178,24 +21183,18 @@
               "format": "uuid",
               "title": "Po Id"
             }
-          },
-          {
-            "name": "notes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Notes"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskForApproval",
+                "default": {}
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -27790,6 +27789,24 @@
             "description": "This place and everything below it. Quantities only \u2014 the cost history is kept per product, not per shelf."
           },
           {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -27888,6 +27905,24 @@
               ],
               "title": "Location Id"
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {
@@ -27963,6 +27998,24 @@
               ],
               "title": "Location Id"
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only.",
+              "title": "Search"
+            },
+            "description": "Narrows the report to the products whose name, brand, barcode, catalogue number or batch contains this text. The total and the unpriced count then speak about those products only."
           }
         ],
         "responses": {
@@ -40466,6 +40519,14 @@
             "type": "integer",
             "title": "Already Listed Count",
             "default": 0
+          },
+          "on_other_lists": {
+            "items": {
+              "$ref": "#/components/schemas/ListedElsewhere"
+            },
+            "type": "array",
+            "title": "On Other Lists",
+            "default": []
           }
         },
         "type": "object",
@@ -42177,6 +42238,23 @@
         ],
         "title": "ArchivedStorageLocation",
         "description": "One row of ``GET /locations/archived`` \u2014 the identity a restore needs.\n\nA location's identity is its path, not its name: two locations may share\na name (\"Shelf 1\" under two different parents), and the archive is where\npicking wrong is costliest \u2014 the row is gone from every other screen\nuntil restored. ``full_path`` carries the shape\n``StorageLocationSummary`` gives it (\"Server Room \u203a Shelf 1\").\n\n``archived_at`` is the moment the location left the lists, read from the\norganization journal (``SOFT_DELETE`` / ``storage``): archiving writes no\ndate column of its own (the flag lives in ``settings``), so the journal\nis where that date lives. A row archived outside the API has no entry\nand answers ``None`` rather than a wrong date."
+      },
+      "AskForApproval": {
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "title": "AskForApproval"
       },
       "AssetFilter": {
         "properties": {
@@ -48458,6 +48536,17 @@
           "error": {
             "type": "string",
             "title": "Error"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
           }
         },
         "type": "object",
@@ -57742,6 +57831,31 @@
         "title": "LinkedReceiptSchema",
         "description": "Minimal document summary for linked receipts."
       },
+      "ListedElsewhere": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "list_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "List Id"
+          },
+          "list_name": {
+            "type": "string",
+            "title": "List Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "list_id",
+          "list_name"
+        ],
+        "title": "ListedElsewhere",
+        "description": "A line just written that another open shopping list already carries."
+      },
       "LlmCapability": {
         "type": "string",
         "enum": [
@@ -66035,6 +66149,20 @@
         "type": "object",
         "title": "PartnerUpdate",
         "description": "All fields optional \u2014 supports partial (PATCH-style) updates via PUT."
+      },
+      "PasswordResetCheckIn": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "PasswordResetCheckIn",
+        "description": "Body for ``POST /auth/password-reset/check``."
       },
       "PasswordResetConfirmIn": {
         "properties": {
@@ -77711,6 +77839,14 @@
             },
             "type": "array",
             "title": "Items",
+            "default": []
+          },
+          "on_other_lists": {
+            "items": {
+              "$ref": "#/components/schemas/ListedElsewhere"
+            },
+            "type": "array",
+            "title": "On Other Lists",
             "default": []
           }
         },

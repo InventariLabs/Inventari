@@ -105,7 +105,7 @@ export function DocumentFormFields({
         {t("form.noLocationsAllClaimed")}{" "}
         <Link
           to="/settings#module-data"
-          className="font-semibold text-primary-600 hover:underline"
+          className="font-semibold text-on-primary hover:underline"
         >
           {t("form.openModuleDataSettings")}
         </Link>
@@ -131,7 +131,7 @@ export function DocumentFormFields({
                   {t("form.enablePartnersNotice")}{" "}
                   <Link
                     to="/apps?module=partners"
-                    className="font-semibold text-primary-600 hover:underline"
+                    className="font-semibold text-primary-800 hover:underline dark:text-on-primary"
                   >
                     {t("form.enablePartnersLink")}
                   </Link>

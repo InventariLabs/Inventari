@@ -2,7 +2,9 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import type { FieldDefinition, CategoryDTO } from "@/types";
 import { useLocationsById } from "@/module-sdk";
-import ProductFormContent from "../items/ProductFormContent";
+import ProductFormContent, {
+  type CategoriesFailure,
+} from "../items/ProductFormContent";
 import type { TemplateUnitPrompt } from "@/modules/inventory/hooks/useItemForm";
 import { Slot } from "@/components/Slot";
 import { Button } from "@/components/ui/Button";
@@ -18,6 +20,7 @@ interface ManualTabProps {
   isFromHistory?: boolean;
   categories?: CategoryDTO[];
   onAddCategory?: () => void;
+  categoriesFailure?: CategoriesFailure | null;
   imagePreview?: string | null;
   setImagePreview?: (url: string | null) => void;
   /** Which fields are filled in from the previous product rather than from
@@ -42,6 +45,7 @@ export function ManualTab({
   handleSubmit,
   isFromHistory,
   categories,
+  categoriesFailure,
   onAddCategory,
   imagePreview,
   setImagePreview,
@@ -174,12 +178,14 @@ export function ManualTab({
         errors={errors}
         fieldDefinitions={fieldDefinitions}
         categories={categories}
+        categoriesFailure={categoriesFailure}
         onAddCategory={onAddCategory}
         imagePreview={imagePreview}
         setImagePreview={setImagePreview}
         storageGate={storageGate}
         onAddStorage={onAddStorage}
         templateUnit={templateUnit}
+        suggestExistingProducts
       />
 
       {/* Product Info Display - Ingredients & Nutrition */}

@@ -14,10 +14,16 @@ from app.modules.warehouse.inventory_period_service import (
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    ('lang', 'fragment'),
-    [('pl', 'zamknięty'), ('en', 'is closed'), ('de', 'geschlossen')],
+    ('lang', 'fragment', 'month'),
+    [
+        ('pl', 'zamknięty', 'wrzesień 2025'),
+        ('en', 'is closed', 'September 2025'),
+        ('de', 'geschlossen', 'September 2025'),
+    ],
 )
-async def test_closed_period_refusal_follows_the_request_language(lang, fragment):
+async def test_closed_period_refusal_follows_the_request_language(
+    lang, fragment, month
+):
     set_current_lang(lang)
     try:
         with patch(
@@ -28,7 +34,9 @@ async def test_closed_period_refusal_follows_the_request_language(lang, fragment
                 await check_period_not_closed_async(None, None, date(2025, 9, 15))
     finally:
         set_current_lang('en')
-    assert '2025-09' in str(caught.value)
+    # The month is named the way the period screen names it, not as 2025-09.
+    assert month in str(caught.value)
+    assert '2025-09' not in str(caught.value)
     assert fragment in str(caught.value)
 
 

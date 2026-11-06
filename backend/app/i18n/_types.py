@@ -39,6 +39,7 @@ class ErrorMessages(TypedDict):
     token_invalid: str
     insufficient_permissions: str
     import_create_forbidden: str
+    import_create_forbidden_one: NotRequired[str]
     import_stubs_forbidden: str
     user_blocked: str
     user_blocked_no_reason: str
@@ -103,7 +104,6 @@ class ErrorMessages(TypedDict):
     role_in_use: str
     role_name_taken: str
     organization_invite_invalid: str
-    organization_invite_wrong_email: str
     organization_invite_expired: str
     email_test_failed: str
     module_org_required: str
@@ -521,7 +521,11 @@ class ErrorMessages(TypedDict):
     module_needs_newer_platform: str
     document_delete_status: str
     document_wms_picking_active: str
+    document_wms_picking_active_one: NotRequired[str]
+    document_wms_picking_active_few: NotRequired[str]
     document_wms_receiving_active: str
+    document_wms_receiving_active_one: NotRequired[str]
+    document_wms_receiving_active_few: NotRequired[str]
     document_confirm_invalid_status: str
     document_lines_need_stock_row: str
     #: Counted-noun forms (see `service.get_plural_error_message`): the base
@@ -604,6 +608,9 @@ class ErrorMessages(TypedDict):
     attestation_assignment_required: str
     equipment_still_assigned: str
     equipment_deploy_requires_checkout: str
+    equipment_status_invalid: str
+    equipment_status_transition_denied: str
+    equipment_status_transition_from_retired: str
     equipment_bulk_item_failed: str
     unknown_bulk_action: str
     bom_line_unit_not_convertible: str

@@ -66,8 +66,11 @@
         "staple_one": "Última compra há {{count}} dia, mais do dobro do intervalo habitual.",
         "staple_many": "Última compra há {{count}} dias, mais do dobro do intervalo habitual.",
         "staple_other": "Última compra há {{count}} dias, mais do dobro do intervalo habitual.",
-        "expiring": "Vence em {{date}}.",
-        "expired": "Expirou em {{date}}."
+        "expiringToday": "Vence hoje, {{date}}.",
+        "expiring_one": "Vence em {{date}}, daqui a {{count}} dia.",
+        "expiring_other": "Vence em {{date}}, daqui a {{count}} dias.",
+        "expired_one": "Expirou em {{date}}, há {{count}} dia.",
+        "expired_other": "Expirou em {{date}}, há {{count}} dias."
       },
       "noAlerts": "Sem alertas - seu inventário está em ordem!",
       "noData": "Ainda não há nada para verificar — adicione itens e os alertas aparecerão"
@@ -136,7 +139,7 @@
     "enableAnalytics": "Ativar análises",
     "enableAnalyticsDescription": "Mostra a aba de análises (giro, previsão de gastos, padrões de compra). Desative em inventários domésticos pequenos, em que não há histórico suficiente para que sejam relevantes.",
     "showInventoryValue": "Mostrar valor do inventário",
-    "showInventoryValueDescription": "Mostra o valor total do estoque na visão geral das estatísticas. É uma métrica de negócio — desative em inventários domésticos que não guardam preços de compra para somar."
+    "showInventoryValueDescription": "Mostra os valores do estoque em todo o aplicativo: na visão geral das estatísticas, nas telas dos produtos e nas exportações e impressões. É uma métrica de negócio — desative em inventários domésticos que não guardam preços de compra para somar."
   },
   "navigation": {
     "settings": "Análises"

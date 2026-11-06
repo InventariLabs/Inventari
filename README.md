@@ -71,6 +71,10 @@ Inventari keeps those facts in a shared core. Modules supply the vocabulary,
 rules and screens for each job, and an organization enables the modules it
 uses.
 
+It began as a private application for keeping track of a fridge and grew, job
+by job, into a framework for managing things. That is why the core stays
+neutral: it has already had to serve more than one purpose.
+
 **For Home** — stop throwing away expired food, cook from what you already
 have, and scan a label instead of typing it.
 

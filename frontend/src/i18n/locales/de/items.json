@@ -63,6 +63,7 @@
     "DISPOSED": "Entsorgt",
     "ARCHIVED": "Archiviert"
   },
+  "categoriesUnavailable": "Die Kategorien konnten nicht geladen werden, daher fehlen in diesem Formular möglicherweise einige Felder.",
   "itemName": "Produktname",
   "itemNamePlaceholder": "z. B. Vollmilch 1 l",
   "itemBrand": "Marke",
@@ -90,6 +91,7 @@
     "title": "Keine Produkte",
     "tryFilters": "Filter ändern",
     "addFirst": "Fügen Sie Ihr erstes Produkt an einem Lagerort hinzu. Der Export wird verfügbar, sobald es ein Produkt gibt.",
+    "definedWithoutStock": "Produkte, die nur als Definition existieren — zum Beispiel in einem Rezept oder einer Stückliste angelegte —, erscheinen hier, sobald sie einen Bestand haben. Fügen Sie eines an einem Lagerort hinzu, um es zu sehen.",
     "noSearchResultsTitle": "Keine passenden Produkte",
     "noSearchResultsDescription": "Keine Ergebnisse für „{{term}}\"",
     "clearSearch": "Suche zurücksetzen",
@@ -186,7 +188,8 @@
     "selectUnit": "Einheit auswählen …",
     "unitLabel": "Einheit",
     "unitEmpty": "Wählen",
-    "templateUnitHint": "{{product}} wird in {{unit}} gezählt — dieser Datensatz übernimmt diese Einheit, sofern Sie keine andere wählen."
+    "templateUnitHint": "{{product}} wird in {{unit}} gezählt — dieser Datensatz übernimmt diese Einheit, sofern Sie keine andere wählen.",
+    "existingProducts": "Schon in Ihren Produkten:"
   },
   "identificationSection": "Produktidentifikation",
   "itemWeightNet": "Gewicht pro Stück",
@@ -388,8 +391,8 @@
     },
     "linkedDocument": "Verknüpftes Dokument",
     "corrects": "korrigiert {{number}}",
-    "createdWith_one": "Erstellt mit der Menge {{count}}",
-    "createdWith_other": "Erstellt mit der Menge {{count}}",
+    "createdWith_one": "Erstellt mit der Menge {{amount}}",
+    "createdWith_other": "Erstellt mit der Menge {{amount}}",
     "createdViaScan": {
       "label": "Durch Scannen des Etiketts {{code}} erstellt",
       "barcode": "Durch Scannen des Strichcodes {{code}} erstellt",

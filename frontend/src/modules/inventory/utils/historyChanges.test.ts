@@ -256,7 +256,7 @@ describe("historyChanges OPENED", () => {
   const tOpened = ((key: string, opts?: Record<string, unknown>) =>
     key === "items:history.openedLeft"
       ? `${String(opts?.amount)} left`
-      : key) as unknown as (
+      : String(opts?.defaultValue ?? key)) as unknown as (
     key: string,
     opts?: Record<string, unknown>,
   ) => string;
@@ -372,5 +372,56 @@ describe("historyChanges QUANTITY_CHANGED — a production run", () => {
       t,
     );
     expect(line).toContain("PR/2026/0001");
+  });
+});
+
+describe("historyChanges read in the reader's language", () => {
+  const catalogue: Record<string, string> = {
+    "items:fields.lactose_free": "Bez laktozy",
+    "items:history.openedLeft": "Zostało {{amount}}",
+    "items:history.createdWith": "Created with quantity {{amount}}",
+  };
+  const tl = ((key: string, opts?: Record<string, unknown>) => {
+    const text = catalogue[key];
+    if (text) return text.replace("{{amount}}", String(opts?.amount));
+    return String(opts?.defaultValue ?? key);
+  }) as unknown as (key: string, opts?: Record<string, unknown>) => string;
+
+  it("names a seeded custom field by the form's own label", () => {
+    const line = parseChanges(
+      "UPDATED",
+      {
+        old: { meta_data: { lactose_free: false } },
+        new: { meta_data: { lactose_free: true } },
+      },
+      tl,
+    );
+
+    expect(line).toContain("Bez laktozy:");
+    expect(line).not.toContain("Lactose free");
+  });
+
+  it("writes a decimal quantity with its unit in the reader's format", async () => {
+    await i18n.changeLanguage("de");
+    try {
+      const kg = { symbol: "kg", rounding: null };
+      expect(parseChanges("USED", { qty: 1.5 }, tl, undefined, kg)).toBe(
+        "1,5 kg",
+      );
+      expect(parseChanges("OPENED", { left: 1.5, left_unit: "kg" }, tl)).toBe(
+        "Zostało 1,5 kg",
+      );
+      expect(parseChanges("QUANTITY_CHANGED", { old: 1.5, new: 2.5 }, tl)).toBe(
+        "1,5 → 2,5",
+      );
+      expect(
+        parseChanges("CREATED", { quantity: 1.5 }, tl, undefined, {
+          symbol: "kg",
+          rounding: null,
+        }),
+      ).toBe("Created with quantity 1,5 kg");
+    } finally {
+      await i18n.changeLanguage("en");
+    }
   });
 });

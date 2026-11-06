@@ -104,12 +104,12 @@ class LocalStorageProvider(StorageProvider):
         logger.info('Deleted file: %s', file_path)
 
     async def exists(self, file_path: str) -> bool:
-        """Check if file exists."""
+        """Check if file exists; a path outside the base is a file that is not there."""
         try:
             full_path = self._get_full_path(file_path)
-            return full_path.exists()
-        except ValueError:
+        except RuntimeError:
             return False
+        return full_path.exists()
 
     async def get_url(
         self,

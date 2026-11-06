@@ -219,6 +219,7 @@
     "date": "Stand",
     "location": "Lagerort",
     "everywhere": "Überall",
+    "searchPlaceholder": "Produkt suchen…",
     "print": "Drucken",
     "total": "Summe",
     "caption": "Bestand von {{organization}} am {{date}}",
@@ -230,7 +231,8 @@
     "empty": {
       "title": "Nichts lag im Lager",
       "description": "An diesem Tag war keines der geführten Produkte auf Lager.",
-      "descriptionAt": "{{location}} — an diesem Tag hielt es keines der geführten Produkte."
+      "descriptionAt": "{{location}} — an diesem Tag hielt es keines der geführten Produkte.",
+      "descriptionSearch": "Kein erfasstes Produkt passt an diesem Tag zu „{{search}}“."
     },
     "columns": {
       "product": "Produkt",

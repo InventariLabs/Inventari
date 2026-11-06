@@ -219,6 +219,7 @@
     "date": "Au",
     "location": "Emplacement",
     "everywhere": "Partout",
+    "searchPlaceholder": "Rechercher un produit…",
     "print": "Imprimer",
     "total": "Total",
     "caption": "Stock de {{organization}} au {{date}}",
@@ -230,7 +231,8 @@
     "empty": {
       "title": "Rien n'était en stock",
       "description": "À cette date, aucun des produits suivis n'était en stock.",
-      "descriptionAt": "{{location}} — ce jour-là, il ne détenait aucun des produits qu'il suit."
+      "descriptionAt": "{{location}} — ce jour-là, il ne détenait aucun des produits qu'il suit.",
+      "descriptionSearch": "Aucun des produits enregistrés ne correspond à « {{search}} » à cette date."
     },
     "columns": {
       "product": "Produit",

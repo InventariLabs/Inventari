@@ -114,6 +114,8 @@ class DocumentImportNoStockRow(BaseModel):
 class DocumentImportErrorResponse(BaseModel):
     row: int
     error: str
+    # The refusal's catalogue code, so a client can branch without the sentence.
+    code: str | None = None
 
 
 class DocumentImportLinesResponse(BaseModel):

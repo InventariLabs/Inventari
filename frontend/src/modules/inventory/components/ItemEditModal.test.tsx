@@ -6,6 +6,10 @@ import ItemEditModal from "./ItemEditModal";
 import { signInWith, signOut } from "@/test/auth";
 import { useAuthStore } from "@/store/authStore";
 import { onePage } from "@/test/mocks/page";
+import userEvent from "@testing-library/user-event";
+import { useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/hooks/queries/keys";
+import { useScopedCategories } from "@/modules/shared/hooks/useCategories";
 
 // The sheet edits for an account holding `items:write` and only shows the
 // product to one that does not; the describes below that do not sign in
@@ -695,5 +699,175 @@ describe("ItemEditModal — a reader without items:write", () => {
     expect(screen.getByRole("note")).toHaveTextContent(
       /view this, not change it/i,
     );
+  });
+});
+
+/**
+ * The thumbnail shows the picked file until Save stores it. A refused photo
+ * left it there, where it read as the product's picture until the sheet was
+ * reopened.
+ */
+describe("ItemEditModal — a picture the server refused", () => {
+  const SAVED = "/uploads/saved.png";
+
+  const picture = (name: string) =>
+    new File(["pixels"], name, { type: "image/gif" });
+
+  beforeEach(() => {
+    // jsdom has no object URLs.
+    URL.createObjectURL = vi.fn(() => "blob:picked");
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get("/api/v1/items/:id", () =>
+        HttpResponse.json({
+          id: "1",
+          name: "Test Item",
+          quantity: 1,
+          category_id: "1",
+          location_id: "1",
+          image_url: SAVED,
+          added_date: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }),
+      ),
+      http.put("/api/v1/items/:id", () => HttpResponse.json({ id: "1" })),
+      http.post("/api/v1/items/:id/image", () =>
+        HttpResponse.json({ detail: "The file is too large" }, { status: 413 }),
+      ),
+    );
+  });
+
+  async function pickAndSave() {
+    render(<ItemEditModal itemId="1" onClose={() => {}} />);
+    await screen.findByDisplayValue(/Test Item/i);
+    const thumbnail = () => screen.getByAltText(/image preview/i);
+    await waitFor(() => expect(thumbnail()).toHaveAttribute("src", SAVED));
+    const input = document.querySelector<HTMLInputElement>(
+      'input[type="file"][accept="image/*"]',
+    )!;
+    const user = userEvent.setup();
+    await user.upload(input, picture("too-big.png"));
+    await waitFor(() =>
+      expect(thumbnail()).toHaveAttribute("src", "blob:picked"),
+    );
+    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    return { thumbnail, input, user };
+  }
+
+  it("goes back to the product's picture once the upload is refused", async () => {
+    const { thumbnail } = await pickAndSave();
+
+    expect(await screen.findByText("The file is too large")).toBeVisible();
+    await waitFor(() => expect(thumbnail()).toHaveAttribute("src", SAVED));
+  });
+
+  it("lets the same file be picked again after a refusal", async () => {
+    const { input } = await pickAndSave();
+
+    await screen.findByText("The file is too large");
+    // A browser fires no change for the file the input already holds, so a
+    // retry of the same file would do nothing and say nothing.
+    expect(input.value).toBe("");
+  });
+});
+
+/**
+ * Which fields the form draws comes from the category list. A list that never
+ * arrived left the form on the base fields with nothing saying so: a laptop's
+ * asset tag simply was not there.
+ */
+describe("ItemEditModal — a category list that failed", () => {
+  const LAPTOP = {
+    id: "cat-lap",
+    name: "Laptop",
+    sort_order: 1,
+    field_definitions: [
+      {
+        key: "asset_tag",
+        type: "text",
+        label: "Asset Tag",
+        visible: true,
+        required: false,
+      },
+    ],
+  };
+
+  beforeEach(() => {
+    server.use(
+      http.get("/api/v1/items/:id", () =>
+        HttpResponse.json({
+          id: "1",
+          name: "Test Item",
+          quantity: 1,
+          category_id: LAPTOP.id,
+          added_date: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }),
+      ),
+    );
+  });
+
+  it("says the fields may be missing, and a retry brings them back", async () => {
+    server.use(
+      http.get("/api/v1/categories", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    render(<ItemEditModal itemId="1" onClose={() => {}} />);
+
+    expect(
+      await screen.findByText(/categories could not be loaded/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("Asset Tag")).not.toBeInTheDocument();
+
+    server.use(
+      http.get("/api/v1/categories", () =>
+        HttpResponse.json(onePage([LAPTOP])),
+      ),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /try again/i }));
+
+    expect(await screen.findByLabelText("Asset Tag")).toBeInTheDocument();
+    expect(
+      screen.queryByText(/categories could not be loaded/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("says nothing when a refresh fails while the last list still stands", async () => {
+    server.use(
+      http.get("/api/v1/categories", () =>
+        HttpResponse.json(onePage([LAPTOP])),
+      ),
+    );
+    let client: QueryClient | undefined;
+    // Reads the query the form reads, so the assertion below runs on a render
+    // that has already seen the refresh fail.
+    function ListError() {
+      client = useQueryClient();
+      const { error } = useScopedCategories(LAPTOP.id);
+      return error ? <span>refresh failed</span> : null;
+    }
+    render(
+      <>
+        <ItemEditModal itemId="1" onClose={() => {}} />
+        <ListError />
+      </>,
+    );
+    expect(await screen.findByLabelText("Asset Tag")).toBeInTheDocument();
+
+    server.use(
+      http.get("/api/v1/categories", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    await client?.invalidateQueries({ queryKey: queryKeys.categories.all });
+
+    expect(await screen.findByText("refresh failed")).toBeInTheDocument();
+    expect(screen.getByLabelText("Asset Tag")).toBeInTheDocument();
+    expect(
+      screen.queryByText(/categories could not be loaded/i),
+    ).not.toBeInTheDocument();
   });
 });

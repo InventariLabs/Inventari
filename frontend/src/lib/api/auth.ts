@@ -169,6 +169,11 @@ export const authApi = {
     return response.data;
   },
 
+  /** Resolves when the link could still reset a password; rejects (400) when it is spent, expired or forged. */
+  checkPasswordReset: async (token: string): Promise<void> => {
+    await api.post("/auth/password-reset/check", { token });
+  },
+
   confirmPasswordReset: async (
     token: string,
     newPassword: string,

@@ -874,7 +874,9 @@ async def _process_import_row(
     ctx: _ImportContext, row: pd.Series, index: int
 ) -> _RowResult:
     """Process one import row. Captures per-row errors so the batch can continue."""
-    row_num = index + 2  # +2 accounts for header row + 1-based numbering
+    # Data rows from 1, the header not counted — the way the preview above
+    # the result numbers them, so "row 3" names the same row on both screens.
+    row_num = index + 1
     ctx.begin_row()
     try:
         # Wrap the whole row in a savepoint (pattern: _bulk_update.py).

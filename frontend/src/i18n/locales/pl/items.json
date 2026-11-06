@@ -63,6 +63,7 @@
     "DISPOSED": "Wyrzucony",
     "ARCHIVED": "Zarchiwizowany"
   },
+  "categoriesUnavailable": "Nie udało się wczytać kategorii, więc w tym formularzu może brakować niektórych pól.",
   "itemName": "Nazwa produktu",
   "itemNamePlaceholder": "np. Mleko 3,2% 1 l",
   "itemBrand": "Marka",
@@ -94,6 +95,7 @@
     "title": "Brak produktów",
     "tryFilters": "Spróbuj zmienić filtry",
     "addFirst": "Dodaj pierwszy produkt do jednego z miejsc. Eksport włączy się, gdy pojawi się pierwszy produkt.",
+    "definedWithoutStock": "Produkty, które istnieją tylko jako definicja — na przykład utworzone w przepisie lub recepturze — pojawią się tu, gdy będą mieć stan. Dodaj jeden do miejsca, żeby go zobaczyć.",
     "noSearchResultsTitle": "Brak pasujących produktów",
     "noSearchResultsDescription": "Brak wyników dla „{{term}}”",
     "clearSearch": "Wyczyść wyszukiwanie",
@@ -204,7 +206,8 @@
     "selectUnit": "Wybierz jednostkę…",
     "unitLabel": "Jednostka",
     "unitEmpty": "Ustaw",
-    "templateUnitHint": "{{product}} jest liczony w {{unit}} — ta pozycja przyjmie tę jednostkę, jeśli nie wybierzesz innej."
+    "templateUnitHint": "{{product}} jest liczony w {{unit}} — ta pozycja przyjmie tę jednostkę, jeśli nie wybierzesz innej.",
+    "existingProducts": "Już w Twoich produktach:"
   },
   "identificationSection": "Identyfikacja produktu",
   "locationSection": "Miejsce i stan",
@@ -415,10 +418,10 @@
     },
     "linkedDocument": "Połączony dokument",
     "corrects": "koryguje {{number}}",
-    "createdWith_one": "Utworzono z ilością {{count}}",
-    "createdWith_few": "Utworzono z ilością {{count}}",
-    "createdWith_many": "Utworzono z ilością {{count}}",
-    "createdWith_other": "Utworzono z ilością {{count}}",
+    "createdWith_one": "Utworzono z ilością {{amount}}",
+    "createdWith_few": "Utworzono z ilością {{amount}}",
+    "createdWith_many": "Utworzono z ilością {{amount}}",
+    "createdWith_other": "Utworzono z ilością {{amount}}",
     "createdViaScan": {
       "label": "Utworzono przez zeskanowanie etykiety {{code}}",
       "barcode": "Utworzono przez zeskanowanie kodu kreskowego {{code}}",

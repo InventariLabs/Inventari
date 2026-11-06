@@ -64,8 +64,11 @@
         "forgotten_other": "Seit {{count}} Tagen unberührt — vor dem nächsten Kauf aufbrauchen.",
         "staple_one": "Zuletzt vor {{count}} Tag gekauft, mehr als doppelt so lange wie üblich.",
         "staple_other": "Zuletzt vor {{count}} Tagen gekauft, mehr als doppelt so lange wie üblich.",
-        "expiring": "Läuft am {{date}} ab.",
-        "expired": "Abgelaufen am {{date}}."
+        "expiringToday": "Läuft heute ab, {{date}}.",
+        "expiring_one": "Läuft am {{date}} ab, in {{count}} Tag.",
+        "expiring_other": "Läuft am {{date}} ab, in {{count}} Tagen.",
+        "expired_one": "Abgelaufen am {{date}}, vor {{count}} Tag.",
+        "expired_other": "Abgelaufen am {{date}}, vor {{count}} Tagen."
       },
       "noAlerts": "Keine Benachrichtigungen - Ihr Bestand sieht gut aus!",
       "noData": "Noch nichts zu prüfen — fügen Sie Artikel hinzu, dann folgen die Hinweise"
@@ -135,7 +138,7 @@
     "enableAnalytics": "Analytik aktivieren",
     "enableAnalyticsDescription": "Analytik-Tab anzeigen (Rotation, Ausgabenprognosen, Einkaufsmuster). Für kleine Haushaltsbestände deaktivieren, bei denen nicht genügend Verlaufsdaten für aussagekräftige Analysen vorliegen.",
     "showInventoryValue": "Inventarwert anzeigen",
-    "showInventoryValueDescription": "Den Gesamtwert des Bestands in der Statistikübersicht anzeigen. Eine betriebliche Kennzahl — für Haushaltsbestände deaktivieren, die keine Einkaufspreise speichern, aus denen er aufsummiert werden könnte."
+    "showInventoryValueDescription": "Bestandswerte in der gesamten App anzeigen: in der Statistikübersicht, auf den Produktseiten sowie in Exporten und Ausdrucken. Eine betriebliche Kennzahl — für Haushaltsbestände deaktivieren, die keine Einkaufspreise speichern, aus denen er aufsummiert werden könnte."
   },
   "navigation": {
     "settings": "Analytik"

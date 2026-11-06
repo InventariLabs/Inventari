@@ -126,7 +126,7 @@ class Item(Base):
         # The quant's key, read from the records' side: what one batch of one
         # owner holds on one shelf is a sum over this index. The quantity and
         # the deletion flag ride along, so the stock page's count and each
-        # anchor's groups are read off the index alone (``stockpage01``).
+        # anchor's groups are read off the index alone (archived ``stockpage01``).
         Index(
             'ix_items_stock_group',
             'organization_id',
@@ -219,7 +219,7 @@ class Item(Base):
         String(255)
     )  # e.g. "Top Drawer", "Shelf 2"
     #: The cover picture's reference, never its address: the org-scoped storage
-    #: key the upload wrote (``<org>/items/<item_id>/cover.<ext>``) or a foreign
+    #: key the upload wrote (``<org>/items/<item_id>/cover.<digest>.<ext>``) or a foreign
     #: ``http(s)`` address for a picture that lives on somebody else's server.
     #: ``image_url`` below builds the address a reader is given, so moving the
     #: files or switching storage backends changes no row. The column keeps its
@@ -309,7 +309,7 @@ class Item(Base):
     # members of a quant's key the record did not carry. The stock model
     # keeps one record per batch per owner, so the records' quantities are
     # the only stock number and a quant is their sum.
-    # Existing records were assigned by migration (``lotrec02``). A record's
+    # Existing records were assigned by migration (archived ``lotrec02``). A record's
     # posting and its move change the record's own batch and owner, and so do
     # production, stock takes and the document executor (backend/AGENTS.md
     # §4).

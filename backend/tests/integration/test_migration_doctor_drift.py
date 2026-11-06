@@ -80,7 +80,7 @@ def frozen_modules_root(tmp_path, monkeypatch):
 
 def _create_core_tables(db_url: str) -> None:
     """Core schema only — the module's own migrations create its tables."""
-    import app.core.template_models  # noqa: F401
+    import app.core.template_models
     import app.models  # noqa: F401
     from app.database import Base
 
@@ -107,7 +107,7 @@ def _rewind_version_table(db_url: str, revision: str) -> None:
     with engine.connect() as conn:
         conn.execute(
             text(
-                f'UPDATE "{get_version_table_name(DRIFT_MODULE)}" '  # noqa: S608 — module name, not user input
+                f'UPDATE "{get_version_table_name(DRIFT_MODULE)}" '  # module name, not user input
                 'SET version_num = :revision'
             ),
             {'revision': revision},

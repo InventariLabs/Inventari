@@ -704,6 +704,12 @@
       "document": "Documento",
       "corrects": "corrige {{number}}",
       "secretChanged": "um novo valor (oculto)",
+      "fieldDefinitions": {
+        "added": "Campo {{field}} adicionado",
+        "removed": "Campo {{field}} removido",
+        "changed": "Campo {{field}} alterado",
+        "required": "obrigatório"
+      },
       "builtInModules": {
         "core": "Básico",
         "locations": "Locais",
@@ -1318,5 +1324,9 @@
   "settingsSave": {
     "region": "Salvar as alterações desta página",
     "unsaved": "Você tem alterações não salvas"
+  },
+  "shoppingOverlap": {
+    "toast": "Já está noutra lista aberta: {{where}}",
+    "onList": "{{names}} em «{{list}}»"
   }
 }

@@ -288,8 +288,8 @@
     "incomplete_warning": "Dados nutricionais disponíveis para apenas {{pct}}% dos ingredientes",
     "estimate_note": "Uma estimativa somada a partir dos valores dos produtos dos ingredientes (rótulos ou Open Food Facts, uma base de dados comunitária). Compare com o rótulo.",
     "estimate_generic_note": "Uma estimativa somada a partir dos ingredientes. Alguns usam valores genéricos em vez dos de um produto; o resto vem de rótulos de produtos ou do Open Food Facts (uma base de dados comunitária). Compare com o rótulo.",
-    "daily_estimate_note": "Os totais diários somam as estimativas de cada receita, com rótulos ou Open Food Facts. Use-os como orientação.",
-    "daily_estimate_generic_note": "Os totais diários somam as estimativas de cada receita. Algumas usam valores genéricos em vez dos de um produto. Use-os como orientação."
+    "daily_estimate_note": "Os totais diários somam uma porção de cada refeição planejada, com rótulos ou Open Food Facts. Use-os como orientação.",
+    "daily_estimate_generic_note": "Os totais diários somam uma porção de cada refeição planejada. Algumas usam valores genéricos em vez dos de um produto. Use-os como orientação."
   },
   "shopping": {
     "add_missing_button": "Adicionar o que falta à lista de compras",
@@ -429,7 +429,7 @@
     "import_error_ai_not_configured": "Falha na importação: \"{{purpose}}\" precisa de uma conexão de IA, e nenhuma foi configurada ainda. Configure uma em Configurações → Conexões de IA."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "As sugestões de receitas continuam funcionando — recorrem ao inglês. Adicione uma entrada ou importe um CSV/JSON para preencher este dicionário.",
+    "language_empty_hint": "As sugestões de receitas continuam funcionando — usam as entradas correspondentes de outros idiomas. Adicione uma entrada ou importe um CSV/JSON para preencher este dicionário.",
     "language_empty": "O dicionário de ingredientes ainda não tem entradas em {{lang}}.",
     "scan_label": "Ler de um rótulo",
     "scan_reading": "Lendo…",

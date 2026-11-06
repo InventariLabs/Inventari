@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor, within, act } from "@/test/utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { http, HttpResponse } from "msw";
-import { toast } from "sonner";
 import { server } from "@/test/mocks/server";
 import { signInWith, signOut } from "@/test/auth";
 import ItemEditModal from "./ItemEditModal";
@@ -35,7 +34,7 @@ const record = {
  * The edit form's other ways out and side doors: Escape closes an untouched
  * form and asks about a touched one, "keep editing" really keeps the edit, a
  * refused save says why and stays open, the delete-reason dialog can be
- * backed out of, a chosen photo is uploaded at once (and a refused upload
+ * backed out of, a chosen photo waits for Save (and a refused upload
  * says so), and a product that cannot be read settles the valuation section
  * instead of leaving it loading.
  */
@@ -120,49 +119,86 @@ describe("ItemEditModal — leaving, refusals and the photo", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("uploads a chosen photo at once and shows the stored one", async () => {
-    const uploads = vi.fn();
-    server.use(
-      http.post("/api/v1/items/1/image", () => {
-        uploads();
-        return HttpResponse.json({ image_url: "/uploads/stored.jpg" });
-      }),
-    );
-    const { container } = render(
-      <ItemEditModal itemId="1" onClose={vi.fn()} />,
-    );
-    await screen.findByDisplayValue("Test Item");
-
+  const pickPhoto = (container: HTMLElement) => {
     const input = container.querySelector(
       'input[type="file"][accept="image/*"]',
     ) as HTMLInputElement;
     fireEvent.change(input, {
       target: { files: [new File(["x"], "p.jpg", { type: "image/jpeg" })] },
     });
+  };
 
-    await waitFor(() => expect(uploads).toHaveBeenCalledTimes(1));
-    await waitFor(() =>
-      expect(screen.getByRole("img", { name: /preview/i })).toHaveAttribute(
-        "src",
-        "/uploads/stored.jpg",
-      ),
-    );
-  });
+  describe("a picked photo", () => {
+    beforeEach(() => {
+      // jsdom has no object URLs.
+      URL.createObjectURL = vi.fn(() => "blob:picked");
+      URL.revokeObjectURL = vi.fn();
+    });
 
-  it("keeps the stored photo when the local preview finishes reading after the upload", async () => {
-    const readers: Array<() => void> = [];
-    class SlowReader {
-      result: string | null = null;
-      onloadend: (() => void) | null = null;
-      readAsDataURL() {
-        readers.push(() => {
-          this.result = "data:image/jpeg;base64,eA==";
-          this.onloadend?.();
-        });
-      }
-    }
-    vi.stubGlobal("FileReader", SlowReader);
-    try {
+    it("is not written back by the update: the update never carries the picture the sheet opened with", async () => {
+      let sent: Record<string, unknown> = {};
+      server.use(
+        http.get("/api/v1/items/1", () =>
+          HttpResponse.json({ ...record, image_url: "/uploads/old.jpg" }),
+        ),
+        http.put("/api/v1/items/1", async ({ request }) => {
+          sent = (await request.json()) as Record<string, unknown>;
+          return HttpResponse.json(record);
+        }),
+      );
+      const onClose = vi.fn();
+      render(<ItemEditModal itemId="1" onClose={onClose} />);
+      const name = await screen.findByDisplayValue("Test Item");
+      fireEvent.change(name, { target: { value: "Renamed" } });
+
+      fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(sent.name).toBe("Renamed");
+      expect(sent).not.toHaveProperty("image_url");
+    });
+
+    it("keeps Save busy until the photo is stored, so a second click sends nothing", async () => {
+      let release: () => void = () => {};
+      const puts = vi.fn();
+      const posts = vi.fn();
+      server.use(
+        http.put("/api/v1/items/1", () => {
+          puts();
+          return HttpResponse.json(record);
+        }),
+        http.post("/api/v1/items/1/image", async () => {
+          posts();
+          await new Promise<void>((resolve) => {
+            release = resolve;
+          });
+          return HttpResponse.json({ image_url: "/uploads/stored.jpg" });
+        }),
+      );
+      const onClose = vi.fn();
+      const { container } = render(
+        <ItemEditModal itemId="1" onClose={onClose} />,
+      );
+      await screen.findByDisplayValue("Test Item");
+      pickPhoto(container);
+      const save = screen.getByRole("button", { name: /save changes/i });
+
+      fireEvent.click(save);
+      await waitFor(() => expect(puts).toHaveBeenCalledTimes(1));
+      // The update is answered; the photo is still on its way.
+      await waitFor(() => expect(posts).toHaveBeenCalledTimes(1));
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      expect(save).toBeDisabled();
+      fireEvent.click(save);
+      expect(puts).toHaveBeenCalledTimes(1);
+
+      release();
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+    });
+
+    it("waits for Save: nothing is uploaded and the sheet asks before it is closed", async () => {
       const uploads = vi.fn();
       server.use(
         http.post("/api/v1/items/1/image", () => {
@@ -170,56 +206,108 @@ describe("ItemEditModal — leaving, refusals and the photo", () => {
           return HttpResponse.json({ image_url: "/uploads/stored.jpg" });
         }),
       );
+      const onClose = vi.fn();
       const { container } = render(
-        <ItemEditModal itemId="1" onClose={vi.fn()} />,
+        <ItemEditModal itemId="1" onClose={onClose} />,
       );
       await screen.findByDisplayValue("Test Item");
 
-      const input = container.querySelector(
-        'input[type="file"][accept="image/*"]',
-      ) as HTMLInputElement;
-      fireEvent.change(input, {
-        target: { files: [new File(["x"], "p.jpg", { type: "image/jpeg" })] },
-      });
+      pickPhoto(container);
+
       await waitFor(() =>
         expect(screen.getByRole("img", { name: /preview/i })).toHaveAttribute(
           "src",
-          "/uploads/stored.jpg",
+          "blob:picked",
         ),
       );
-
-      // The reader reports in only now, after the stored photo is shown.
-      readers.forEach((finish) => act(finish));
-      expect(screen.getByRole("img", { name: /preview/i })).toHaveAttribute(
-        "src",
-        "/uploads/stored.jpg",
+      expect(uploads).not.toHaveBeenCalled();
+      fireEvent.keyDown(window, { key: "Escape" });
+      expect(await screen.findByRole("alertdialog")).toHaveTextContent(
+        "Leave without saving?",
       );
-    } finally {
-      vi.unstubAllGlobals();
-    }
-  });
-
-  it("says so when the photo upload is refused", async () => {
-    server.use(
-      http.post("/api/v1/items/1/image", () =>
-        HttpResponse.json({ detail: "Not an image" }, { status: 400 }),
-      ),
-    );
-    const { container } = render(
-      <ItemEditModal itemId="1" onClose={vi.fn()} />,
-    );
-    await screen.findByDisplayValue("Test Item");
-
-    const input = container.querySelector(
-      'input[type="file"][accept="image/*"]',
-    ) as HTMLInputElement;
-    fireEvent.change(input, {
-      target: { files: [new File(["x"], "p.jpg", { type: "image/jpeg" })] },
+      expect(onClose).not.toHaveBeenCalled();
     });
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Not an image"),
-    );
+    it("is uploaded after the item is saved, so the save cannot write the old picture over it", async () => {
+      const calls: string[] = [];
+      server.use(
+        http.put("/api/v1/items/1", () => {
+          calls.push("save");
+          return HttpResponse.json(record);
+        }),
+        http.post("/api/v1/items/1/image", () => {
+          calls.push("photo");
+          return HttpResponse.json({ image_url: "/uploads/stored.jpg" });
+        }),
+      );
+      const onClose = vi.fn();
+      const { container } = render(
+        <ItemEditModal itemId="1" onClose={onClose} />,
+      );
+      await screen.findByDisplayValue("Test Item");
+      pickPhoto(container);
+
+      fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(calls).toEqual(["save", "photo"]);
+    });
+
+    it("says so when the photo is refused on Save, and the sheet stays open", async () => {
+      server.use(
+        http.post("/api/v1/items/1/image", () =>
+          HttpResponse.json({ detail: "Not an image" }, { status: 400 }),
+        ),
+      );
+      const onClose = vi.fn();
+      const { container } = render(
+        <ItemEditModal itemId="1" onClose={onClose} />,
+      );
+      await screen.findByDisplayValue("Test Item");
+      pickPhoto(container);
+
+      fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+      expect(await screen.findByText("Not an image")).toBeInTheDocument();
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("keeps showing the picked photo when the local preview finishes reading later", async () => {
+      const readers: Array<() => void> = [];
+      class SlowReader {
+        result: string | null = null;
+        onloadend: (() => void) | null = null;
+        readAsDataURL() {
+          readers.push(() => {
+            this.result = "data:image/jpeg;base64,eA==";
+            this.onloadend?.();
+          });
+        }
+      }
+      vi.stubGlobal("FileReader", SlowReader);
+      try {
+        const { container } = render(
+          <ItemEditModal itemId="1" onClose={vi.fn()} />,
+        );
+        await screen.findByDisplayValue("Test Item");
+        pickPhoto(container);
+        await waitFor(() =>
+          expect(screen.getByRole("img", { name: /preview/i })).toHaveAttribute(
+            "src",
+            "blob:picked",
+          ),
+        );
+
+        readers.forEach((finish) => act(finish));
+
+        expect(screen.getByRole("img", { name: /preview/i })).toHaveAttribute(
+          "src",
+          "blob:picked",
+        );
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
   });
 
   it("stops loading the valuation when the product behind the record cannot be read", async () => {

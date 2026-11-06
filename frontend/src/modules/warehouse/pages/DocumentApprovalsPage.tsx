@@ -407,10 +407,13 @@ function ApprovalRequestCard({
                   <span>{doc.target_location_name}</span>
                 </span>
               )}
-              {showValue && doc.total_gross != null && (
+              {/* Net, and saying so: the threshold that sent it here is net. */}
+              {showValue && doc.total_net != null && (
                 <span className="inline-flex items-center gap-1.5 text-base font-semibold text-on">
                   <Coins size={14} className="text-on-muted" />
-                  {money(doc.total_gross, currency ?? null)}
+                  {t("targetSummary.netAmount", {
+                    amount: money(doc.total_net, currency ?? null),
+                  })}
                 </span>
               )}
               <span className="inline-flex items-center gap-1.5">

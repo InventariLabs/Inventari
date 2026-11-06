@@ -38,7 +38,7 @@ from ._crud import (
     update_recipe,
 )
 from ._helpers import set_recipe_image_url
-from ._uom_helpers import _convert_qty_to_uom  # noqa: F401 — re-exported for tests
+from ._uom_helpers import _convert_qty_to_uom  # re-exported for tests
 
 __all__ = [
     'create_recipe',

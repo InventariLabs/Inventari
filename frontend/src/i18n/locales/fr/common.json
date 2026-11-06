@@ -710,6 +710,12 @@
       "document": "Document",
       "corrects": "corrige {{number}}",
       "secretChanged": "une nouvelle valeur (masquée)",
+      "fieldDefinitions": {
+        "added": "Champ {{field}} ajouté",
+        "removed": "Champ {{field}} supprimé",
+        "changed": "Champ {{field}} modifié",
+        "required": "obligatoire"
+      },
       "builtInModules": {
         "core": "Essentiels",
         "locations": "Emplacements",
@@ -1330,5 +1336,9 @@
   "settingsSave": {
     "region": "Enregistrer les modifications de cette page",
     "unsaved": "Vous avez des modifications non enregistrées"
+  },
+  "shoppingOverlap": {
+    "toast": "Déjà sur une autre liste ouverte : {{where}}",
+    "onList": "{{names}} sur « {{list}} »"
   }
 }

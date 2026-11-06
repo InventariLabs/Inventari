@@ -14,6 +14,20 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- A refused invitation now answers with one sentence that says what to try — use
+  the e-mail address the invitation was sent to, or ask for a new one — and the
+  sentence is the same for a wrong address, an expired, a used, a withdrawn and an
+  unknown code, so it still tells nobody which of them it was. The separate
+  "issued for a different address" answer is gone, since it confirmed that a code
+  was live.
+- An API key's shown prefix is now `inv_live_` and six characters instead of
+  eleven, on the API keys page and in the audit log, where it gave away a third
+  of the key's random part to anyone allowed to read the log. Existing keys are
+  shortened on upgrade and keep working, because a key is never looked up by its
+  prefix. Entries already in the audit log keep the longer prefix they were
+  written with, since the log cannot be rewritten; they still begin with the
+  short one, so a script comparing prefixes should compare the start. To take a
+  key's longer prefix out of circulation, issue a new key and revoke the old one.
 - A new API key no longer starts with the permission to read the organization's
   details and member list ticked. A script that creates a key through
   `POST /api-keys` without naming any permission now gets a key that cannot read
@@ -22,9 +36,17 @@ says what the release does rather than what changed since them.
   well.
 - Settings has a "People" entry in its sidebar and phone menu that leads
   straight to the members and invitations, which used to sit at the foot of
-  General. After registering, the sign-in form is prefilled with the new
-  address, and the webhook dialog lists every event in the interface language
-  and groups the events of modules the organization has not enabled apart.
+  General. The webhook dialog lists every event in the interface language and
+  groups the events of modules the organization has not enabled apart.
+- Creating an account — the first one, by invitation or from an approved
+  request — signs it in and continues to the app, instead of sending the new
+  owner to a sign-in form that asks for the address and password just chosen.
+  If the sign-in is refused, the form opens with the address filled in.
+- A password-reset link that is spent or expired is refused when the page opens,
+  with a link to request a new one, instead of after a new password has been
+  typed. The page asks the new open endpoint `POST /auth/password-reset/check`.
+  The "this installation does not send email" notice also says that the only
+  administrator can reset the password on the server.
 - A confirmed document now keeps your own company's name, tax number and
   address and the names of the locations it refers to, as it already kept the
   partner, so a reprint after the company moved or a shelf was renamed shows
@@ -34,13 +56,114 @@ says what the release does rather than what changed since them.
   before this change prints the current details. A module that prints its own
   documents through the core print identity can freeze the same block with
   `issuer_snapshot` and `IssuerContext.from_snapshot`.
+- **Breaking:** the approve, reject and request-approval routes of documents
+  and purchase orders read the note from the JSON request body as
+  `{"notes": "..."}`. They no longer read a `notes` query parameter, which
+  put a free-text reason where proxies and access logs keep it; a client that
+  still sends one must move it to the body, or the note is not recorded.
+- The approval queues show a document's net amount and say that it is net, the
+  side the approval threshold is set on. They used to show the gross.
+- A refusal about a closed period names the month as the period screen does
+  ("September 2026"), not "2026-09".
+- A multi-node deployment no longer collects a dead member in the event and
+  task stream groups for every restart: the stream reaper removes consumers that
+  have held nothing for an hour, and a clean shutdown removes the event bus's own
+  at once. The reaper also runs once at startup, so a message a crashed node had
+  read but not finished is redelivered at once when the replacement starts more
+  than a minute later, instead of up to six minutes after the crash.
+  `docs/SCALING.md` says what the delay depends on.
+
 ### Added
 
+- `manage.py user create-admin` takes `--lang` (`en`, `pl`, `de`, `fr`, `es` or
+  `pt`) to set the language the account opens in; an unknown code is refused,
+  and without it a new account takes the instance default and an existing one
+  keeps its own. DEPLOYMENT.md and QUICK_DEPLOY.md say how to use the command
+  to get back into an installation without outgoing mail.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
+- When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
+  list's "From recipes" writes goods that another open shopping list still
+  asks for, the answer names them and the list that holds them
+  (`on_other_lists`), and the screen says so — in a toast, and on the meal plan
+  page in the panel that stays. The lists are still written as asked; nothing is
+  merged. Goods in another unit are not matched.
+- The name field of a form that creates a product offers the products already
+  in the catalogue whose name contains what is typed; picking one writes its
+  exact name, which is the match the save attaches the record to. Typing
+  "Wax" no longer leaves a second product beside "Soy wax".
+- An empty Products list says that products which exist only as a definition,
+  such as ones made inside a recipe or a BOM, appear there once they have stock.
 
 ### Fixed
 
+- Refusing an asset's status change from the bulk edit now reads in the language
+  of the session (it was always English) and the row carries a machine code, and
+  the Polish sentence no longer says "zmienić status z". A refused row of a
+  warehouse document import carries its code too, and a database error in a row
+  now shows the generic sentence instead of the statement that failed.
+- Replacing the photo of a product, an asset or a recipe shows the new picture
+  at once. It used to go on showing the old one until the page was reloaded,
+  because every cover was kept under the same address. Module authors get
+  `cover_leaf` and `cover_leaf_of` in the module SDK to name and read a cover
+  file the same way. A photo picked in the product edit sheet is now saved with
+  Save changes, and Close drops it like any other edit; it used to be stored the
+  moment it was picked and then overwritten by the save.
+- The production Content-Security-Policy admits the web worker that shrinks a
+  photo before it is sent, so choosing a photo no longer logs a policy
+  violation or shrinks it on the page's own thread.
+- On an organization seeded before the option words existed, the "Lactose free"
+  field of the Dairy and Cheese categories now offers its options in the
+  interface language instead of the stored English "No" and "Yes". Options an
+  organization wrote itself keep their words.
+- The stock-on-a-date report can be narrowed to a product: it has a search
+  field, the stock list's "Stock on a date" button carries the search and the
+  place you had narrowed to, and the spreadsheet, the printout and the
+  `search` parameter of `GET /stock-as-of` follow the same text. Its total and
+  counts then speak about the matching products only.
+- The "Show inventory value" setting says that it also governs the product
+  screens, exports and printouts, not only the statistics overview, and a
+  profile that hides stock value no longer shows it for a moment while the
+  setting is still on its way.
+- Smart alerts state in words how far off an expiry date is ("Expires on
+  12.11.2026, in 3 days"), and an alert about a date within the week is amber
+  rather than grey. On a phone the expiry forecast tiles sit two across, so no
+  label breaks inside a word in any of the six languages, and uppercase labels
+  keep their word spaces.
+- Two locations can no longer be saved with one name at the same level when two
+  people, or a retried request, name them at the same moment: the second is
+  refused with the same "already exists at this level" answer a later attempt
+  gets. The database now holds the rule too. On upgrade, places that already
+  shared a name under one parent keep both: the newer one is renamed with a
+  number after its name, for example "Cellar (2)".
+- Add Category opens empty, on the product and the equipment category screens
+  alike. It used to bring back the last name typed, after a cancel and after a
+  save, where saving it again was refused as a duplicate.
+- A product's thumbnail goes back to the picture the product has when the server
+  refuses a new one, and the same file can be picked again. It used to go on
+  showing the refused picture until the form was reopened.
+- A product form whose category list could not be loaded says so and offers a
+  retry, instead of quietly leaving out the fields the category declares.
+- The action sheet opened from a location's products or a scan explains why an
+  asset's actions are worded differently, as the product page does. An account
+  that may not act on the record no longer gets that sentence on either of them.
+- On a document form, a line the price books and past purchases have no price
+  for says so under that line. The sentence below the table now speaks only of
+  the document having no accounting value: as one sentence for every line, it
+  could not be true of two lines in different states.
+- Editing a draft return now offers the kind of partner the goods go back to:
+  suppliers on the return of a receipt, customers on the return of a delivery.
+  The form used to read the partner already on the draft as empty and refuse to
+  save, and a return to a manufacturer was refused by the API as well.
+- The scan confirmation on a document and the unit question on the item form
+  name the unit in the interface language ("szt.", not "pcs").
+- The short-pick dialog says "Cancel" like the short-receive one, and the picking
+  sheet's main button says "Complete picking", matching "Complete receiving".
+- The Polish refusal to finish a document with an open picking or receiving
+  session agrees with the number of sessions.
+- The answers of `PATCH /documents/{id}/confirm`, `.../complete` and
+  `POST /documents/{id}/post` carry `confirmed_by_name` and `completed_by_name`,
+  which were `null` until the document was read again.
 - Printing a list of labels gives a sheet of rows, three labels across, in the
   preview and in the download alike. It used to be one strip, however long,
   which the dialog shrank into a grey line of bars. The print queue still sends
@@ -95,6 +218,19 @@ says what the release does rather than what changed since them.
   the saved count is back on the screen.
 - Ticking two filter chips quickly on the product list no longer drops the
   first one from the address, which turned it off a moment later.
+- The notice to an approver names the document, who asked and the net amount,
+  in the app and by e-mail.
+- Completing a purchase order sends one notice per person; an administrator who
+  raised the order used to get two.
+- A write-off is weighed against the approval threshold at what the goods cost,
+  so one under the threshold raises no approval request and shows no approval
+  step or approver on its page. One whose goods have no recorded cost still
+  needs the approval.
+- A note written when approving or rejecting a purchase order is recorded. The
+  screen sent it in the request body and the server read only the query string,
+  so it was lost.
+- The journal names the custom role an invitation offers, not the built-in level
+  under it, and shows a print layout by the name the settings screen gives it.
 - Saving a supplier price or a reorder rule without a product now marks the
   product field as required and says so on the field, and a reorder rule whose
   maximum is below its minimum is refused on the Maximum field in plain words.

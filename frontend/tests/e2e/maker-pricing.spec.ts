@@ -18,13 +18,15 @@ test.describe("Maker — pricing calculator (UI)", () => {
   let parent: { id: string; name: string };
   let outputStorage: { id: string };
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     ctx = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(ctx);
     const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = auth.access_token;
     await api.enableAllModules(token);
-    const stamp = Date.now();
+    // The worker index keeps two workers entering this hook in the same
+    // millisecond from building one location name.
+    const stamp = `${Date.now()}-w${testInfo.workerIndex}`;
     parent = await api.createProductTemplate(token, {
       name: `E2E-Pricing-Parent-${stamp}`,
     });

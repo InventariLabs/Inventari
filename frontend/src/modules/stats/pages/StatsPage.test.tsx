@@ -310,6 +310,35 @@ describe("StatsPage", () => {
     expect(screen.getByText(/2 signals/i)).toBeInTheDocument();
   });
 
+  // The first paint is the screen the switch exists for: a profile that
+  // withholds the figure must not show it while the setting is on its way.
+  it("keeps the inventory value off the first paint while the config is on its way", async () => {
+    let answer: (() => void) | undefined;
+    server.use(
+      http.get("/api/v1/stats/config", async () => {
+        await new Promise<void>((resolve) => {
+          answer = resolve;
+        });
+        return HttpResponse.json({
+          enable_analytics: true,
+          show_inventory_value: false,
+        });
+      }),
+    );
+    render(<StatsPage />, { wrapper: Wrapper });
+
+    // The headline has arrived and the page is up; the config has not.
+    expect(await screen.findByText("7")).toBeInTheDocument();
+    await waitFor(() => expect(answer).toBeDefined());
+    expect(screen.queryByText("PLN 30.00")).not.toBeInTheDocument();
+
+    answer?.();
+    await waitFor(() =>
+      expect(screen.getByText(/2 signals/i)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText("PLN 30.00")).not.toBeInTheDocument();
+  });
+
   it("redirects /inventory/stats/analytics to the overview when disabled", async () => {
     server.use(
       http.get("/api/v1/stats/config", () =>

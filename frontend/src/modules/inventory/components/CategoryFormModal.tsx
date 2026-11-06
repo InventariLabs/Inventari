@@ -112,13 +112,22 @@ function categoryPayload(
   return payload;
 }
 
-export function CategoryFormModal({
-  isOpen,
+/**
+ * The form exists only while it is open, under the identity of what it edits:
+ * a new category typed, cancelled or saved leaves nothing for the next opening
+ * to show, and the name just saved cannot come back to be refused as taken.
+ */
+export function CategoryFormModal({ isOpen, ...form }: CategoryFormModalProps) {
+  if (!isOpen) return null;
+  return <CategoryForm key={form.editingCategory?.id ?? "new"} {...form} />;
+}
+
+function CategoryForm({
   editingCategory,
   onClose,
   contextTag,
   groupSuggestions = [],
-}: CategoryFormModalProps) {
+}: Omit<CategoryFormModalProps, "isOpen">) {
   const { t } = useTranslation(["categories", "common"]);
   const titleId = useId();
   const namePlaceholder = useCategoryNamePlaceholder(contextTag);
@@ -169,11 +178,9 @@ export function CategoryFormModal({
     }
   };
 
-  if (!isOpen && !editingCategory) return null;
-
   return (
     <Sheet
-      open={isOpen}
+      open
       onClose={onClose}
       backdropOpacity={60}
       aria-labelledby={titleId}

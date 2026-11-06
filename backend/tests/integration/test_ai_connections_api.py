@@ -759,7 +759,7 @@ class TestAiConnectionsBindings:
 
         Deployments that bound a purpose before per-purpose slots keep
         their choice in ``settings.modules.<owner>.ai_default_connection_id``
-        — the old write path and migration aiconn02 both wrote there. The
+        — the old write path and archived migration aiconn02 both wrote there. The
         clear popped only ``ai.defaults[<key>]``, the read fallback
         answered with the slot, and \"not configured\" came back as the
         same connection: a 200 that changed nothing, on every deployment
@@ -784,7 +784,7 @@ class TestAiConnectionsBindings:
         db_session.refresh(parser)
 
         # The slot predates per-purpose bindings — seed it the way the old
-        # write path (and migration aiconn02) left it behind.
+        # write path (and archived migration aiconn02) left it behind.
         test_household.settings = {
             'modules': {'recipes': {'ai_default_connection_id': str(parser.id)}}
         }

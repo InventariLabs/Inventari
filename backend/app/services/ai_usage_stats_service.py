@@ -74,7 +74,7 @@ async def get_global_ai_stats_async(
         await db.scalar(
             select(func.sum(AIUsageLog.estimated_cost_usd)).where(
                 AIUsageLog.created_at >= since,
-                AIUsageLog.cost_is_estimated == True,  # noqa: E712
+                AIUsageLog.cost_is_estimated == True,
             )
         )
         or 0.0

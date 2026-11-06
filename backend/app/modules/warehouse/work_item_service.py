@@ -196,7 +196,7 @@ async def _provided_items_async(
         try:
             async with db.begin_nested():
                 rows, count = await provider(db, org_id, query)
-        except Exception:  # noqa: BLE001 — a module's bug must not empty To do
+        except Exception:  # a module's bug must not empty To do
             logger.warning('[work-items] provider of %s failed', module, exc_info=True)
             continue
         items += [_provided_item(row, date_to) for row in rows]

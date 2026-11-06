@@ -125,7 +125,7 @@ async def list_schedules(
         CycleCountSchedule.organization_id == org_id,
     )
     if active_only:
-        query = query.filter(CycleCountSchedule.is_active.is_(True))  # noqa: E712
+        query = query.filter(CycleCountSchedule.is_active.is_(True))
     result = await db.scalars(
         query.order_by(CycleCountSchedule.created_at.desc(), CycleCountSchedule.id)
     )

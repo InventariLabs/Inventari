@@ -83,16 +83,96 @@ describe("ItemsPage", () => {
     });
   });
 
-  it("should call delete API when delete button is clicked", async () => {
-    render(
-      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
-        <ItemsPage />
-      </PageHeaderContext.Provider>,
-    );
+  describe("a row's own actions", () => {
+    const row = (id: string, name: string) => ({
+      id,
+      name,
+      quantity: 1,
+      unit: "pcs",
+      category_id: "1",
+      location_id: "1",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+    const rows = [row("a", "Alpha"), row("b", "Beta")];
 
-    // Verify the page renders with items
-    await screen.findAllByText(/Test Item/i);
-    expect(screen.getByText("Test Item")).toBeInTheDocument();
+    // Two rows, so an action that reached the wrong record cannot pass.
+    beforeEach(() => {
+      server.use(
+        http.get("/api/v1/items", () =>
+          HttpResponse.json({ items: rows, total: rows.length }),
+        ),
+        http.get("/api/v1/items/:id", ({ params }) =>
+          HttpResponse.json(rows.find((r) => r.id === params.id)),
+        ),
+      );
+    });
+
+    const openRow = async (name: string) => {
+      render(
+        <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+          <ItemsPage />
+        </PageHeaderContext.Provider>,
+      );
+      return (await screen.findByText(name)).closest("tr") as HTMLElement;
+    };
+
+    it("deletes the record of the row, once the reader says why", async () => {
+      const user = userEvent.setup();
+      const deleted: unknown[] = [];
+      server.use(
+        http.delete("/api/v1/items/:id", async ({ params, request }) => {
+          deleted.push({
+            id: params.id,
+            ...((await request.json()) as object),
+          });
+          return new HttpResponse(null, { status: 204 });
+        }),
+      );
+
+      const beta = await openRow("Beta");
+      await user.click(within(beta).getByRole("button", { name: "Delete" }));
+
+      const dialog = await screen.findByRole("alertdialog");
+      expect(deleted).toEqual([]);
+
+      await user.selectOptions(
+        within(dialog).getByTestId("deletion-reason"),
+        "EXPIRED",
+      );
+      await user.click(within(dialog).getByRole("button", { name: "Delete" }));
+
+      await waitFor(() =>
+        expect(deleted).toEqual([
+          expect.objectContaining({ id: "b", reason: "EXPIRED" }),
+        ]),
+      );
+    });
+
+    it("edits the record of the row and saves it there", async () => {
+      const user = userEvent.setup();
+      const saved: unknown[] = [];
+      server.use(
+        http.put("/api/v1/items/:id", async ({ params, request }) => {
+          const body = (await request.json()) as { name?: string };
+          saved.push({ id: params.id, name: body.name });
+          return HttpResponse.json({ ...rows[1], ...body });
+        }),
+      );
+
+      const beta = await openRow("Beta");
+      await user.click(within(beta).getByRole("button", { name: "Edit" }));
+
+      expect(await screen.findByText(/Edit product/i)).toBeInTheDocument();
+      const name = await screen.findByDisplayValue("Beta");
+      await user.clear(name);
+      await user.type(name, "Beta renamed");
+      await user.click(screen.getByRole("button", { name: /Save changes/i }));
+
+      await waitFor(() =>
+        expect(saved).toEqual([{ id: "b", name: "Beta renamed" }]),
+      );
+    });
   });
 
   it("opens the product dialog when the product's name is clicked", async () => {
@@ -108,18 +188,6 @@ describe("ItemsPage", () => {
     // The pencil's own dialog, not a sheet of quick actions in front of it.
     expect(await screen.findByText(/Edit product/i)).toBeInTheDocument();
     expect(await screen.findByDisplayValue("Test Item")).toBeInTheDocument();
-  });
-
-  it("should open edit modal when edit button is clicked", async () => {
-    render(
-      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
-        <ItemsPage />
-      </PageHeaderContext.Provider>,
-    );
-
-    // Verify the page renders with items
-    await screen.findAllByText(/Test Item/i);
-    expect(screen.getByText("Test Item")).toBeInTheDocument();
   });
 });
 
@@ -180,6 +248,53 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
         ),
       ).toBe(true),
     );
+  });
+
+  // A product created inside a recipe is a definition with no stock, and the
+  // list is of what is held: "No products — add your first" over a catalog
+  // that has some was the finding.
+  it("says where products without stock are when the list is empty", async () => {
+    server.use(
+      http.get("*/items", () => HttpResponse.json({ items: [], total: 0 })),
+      http.get("*/items/product-templates/count", () =>
+        HttpResponse.json({ count: 4 }),
+      ),
+    );
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+
+    expect(
+      await screen.findByText(/exist only as a definition/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Add your first product/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("invites the first product when the catalog is empty too", async () => {
+    server.use(
+      http.get("*/items", () => HttpResponse.json({ items: [], total: 0 })),
+      http.get("*/items/product-templates/count", () =>
+        HttpResponse.json({ count: 0 }),
+      ),
+    );
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+
+    expect(
+      await screen.findByText(/Add your first product/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/exist only as a definition/i),
+    ).not.toBeInTheDocument();
   });
 
   it("names hidden module data instead of an empty list", async () => {

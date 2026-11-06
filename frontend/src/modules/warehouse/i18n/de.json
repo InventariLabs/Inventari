@@ -132,8 +132,8 @@
     "selectSource": "Quell-Lagerort auswählen",
     "selectTarget": "Ziel-Lagerort auswählen",
     "notesPlaceholder": "Notizen oder Bemerkungen hinzufügen…",
-    "missingValueWarning": "Einige Positionen haben keinen Einzelpreis — dieses Dokument hat keinen Buchungswert. Beim Auswählen eines Produkts kann ein Preis aus Preislisten oder früheren Einkäufen vorgeschlagen werden.",
-    "missingValueWarningNoSource": "Einige Positionen haben keinen Einzelpreis — dieses Dokument hat keinen Buchungswert. Preislisten und frühere Einkäufe liefern keinen Preis für diese Produkte — bitte von Hand eintragen."
+    "missingValueWarning": "Einige Positionen haben keinen Einzelpreis — dieses Dokument hat keinen Buchungswert.",
+    "lineNoPriceSource": "Preislisten und frühere Einkäufe liefern keinen Preis — bitte von Hand eintragen."
   },
   "bulk": {
     "selectAll": "Alle auswählen",
@@ -852,7 +852,7 @@
     "undo_action": "Rückgängig",
     "skip_confirm_title": "Diese Zeile überspringen?",
     "skip_confirm_message": "{{product}} wird in dieser Sitzung nicht kommissioniert. Das Überspringen lässt sich in der Liste rückgängig machen.",
-    "complete": "Abschließen",
+    "complete": "Kommissionierung abschließen",
     "cancel": "Scans verwerfen",
     "discard_confirm_title": "Scans verwerfen?",
     "discard_confirm_message": "Alles, was in dieser Sitzung kommissioniert wurde, steht wieder aus. Das lässt sich nicht rückgängig machen.",
@@ -1244,6 +1244,7 @@
     }
   },
   "targetSummary": {
+    "netAmount": "{{amount}} netto",
     "linesCount": "{{count}} Zeile",
     "linesCount_one": "{{count}} Zeile",
     "linesCount_other": "{{count}} Zeilen"

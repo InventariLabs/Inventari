@@ -35,7 +35,7 @@ def _numeric_shape(column_type: object) -> tuple[int | None, int | None] | None:
 
 
 def test_every_numeric_column_is_as_wide_as_the_model_declares(monkeypatch):
-    import app.core.template_models  # noqa: F401
+    import app.core.template_models
     import app.models  # noqa: F401
     from app.database import Base
 

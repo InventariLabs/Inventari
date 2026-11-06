@@ -106,7 +106,7 @@ ALLERGEN_SET  # noqa: B018
 # these helpers — see api_keys, purchase_orders and webhooks 001_initial.
 create_table_if_absent  # noqa: B018
 create_index_if_absent  # noqa: B018
-# Core tzaware01 and one revision in each module chain convert their naive
+# The archived core tzaware01 and one revision in each module chain convert their naive
 # timestamp columns through it.
 convert_naive_timestamps_to_utc  # noqa: B018
 # Baseline builder for the tenancy lint, called from
@@ -253,7 +253,8 @@ shell_command  # noqa: B018
 # silenced name with no caller and no deadline is how a dead API goes on
 # being reported as alive.
 #
-# Format: <name>  # noqa: B018  # owner=<who> expires=<YYYY-MM-DD> <reason>
+# Format: <name>, then the B018 suppression comment, then
+# "# owner=<who> expires=<YYYY-MM-DD> <reason>" as the lines below show.
 maker_api  # noqa: B018  # owner=core expires=2027-02-28 Module extension surface (AGENTS.md, Cross-Module API Contracts); no in-repo caller outside the maker module itself.
 maker_api.list_bom_lines_async  # noqa: B018  # owner=core expires=2027-02-28 As maker_api above.
 maker_api.explode_bom_async  # noqa: B018  # owner=core expires=2027-02-28 As maker_api above.

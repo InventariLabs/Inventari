@@ -137,7 +137,7 @@ async def _lock_what_the_lines_change(
         )
 
 
-async def execute_correction(  # noqa: C901 - existing complexity/size
+async def execute_correction(
     db: AsyncSession,
     doc: Document,
     user_id: UUID,

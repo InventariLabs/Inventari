@@ -110,6 +110,20 @@ describe("AuditTarget — the record the row is about", () => {
     expect(screen.getByText("IN/2026/003")).toBeInTheDocument();
   });
 
+  it("names an invitation by its address and the role's own name", () => {
+    // Filed under the invitation, not the organization: "Night Shift" is the
+    // name the organization gave a custom role, which no catalogue carries.
+    renderTarget({
+      ...quantityRow(null),
+      target_type: "invitation",
+      snapshot: { invited_email: "anna@example.com", role: "Night Shift" },
+    });
+
+    expect(
+      screen.getByText("anna@example.com · Night Shift"),
+    ).toBeInTheDocument();
+  });
+
   it("falls back to the identifier for an approval entry with no number", () => {
     renderTarget({
       ...quantityRow(null),

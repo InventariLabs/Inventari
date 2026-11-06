@@ -139,15 +139,11 @@ test.describe("Registration & Org Joining — flow", () => {
       })
       .click();
 
-    try {
-      await page.waitForURL("**/login", { timeout: 10000 });
-    } catch {
-      await expect(
-        page.getByText(
-          /success|congratulations|account created|konto|zostało|joined/i,
-        ),
-      ).toBeVisible({ timeout: 5000 });
-    }
+    // The new account is signed in; it is not sent to a form asking for the
+    // address and password it has just chosen.
+    await page.waitForURL((url) => !/^\/(register|login)/.test(url.pathname), {
+      timeout: 15000,
+    });
   });
 
   test("joining organization via invite token works", async ({ page }) => {

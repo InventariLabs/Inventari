@@ -194,3 +194,102 @@ class TestStreamMaxlen:
             assert scheduler._redis is not None
             await scheduler._redis.delete(stream)
             await scheduler._redis.aclose()
+
+
+async def _consumer_names(bus: EventBus) -> set[str]:
+    assert bus._redis is not None
+    infos = await bus._redis.xinfo_consumers(bus._stream_name, bus._group_name)
+    return {info['name'] for info in infos}
+
+
+@pytest.mark.integration
+class TestConsumerGroupCleanup:
+    async def test_disconnect_removes_the_nodes_own_consumer(self):
+        stream, group = _names('evt_leave')
+        bus = await _make_bus(stream, group)
+        node = bus._node_id
+        # A second client to look at the group after the bus has closed.
+        probe = await _make_bus(stream, group)
+        try:
+            assert bus._redis is not None
+            await bus._redis.xadd(stream, {'event': 'x', 'payload': '{}'})
+            streams = await bus._redis.xreadgroup(group, node, {stream: '>'}, count=1)
+            await bus._redis.xack(stream, group, streams[0][1][0][0])
+            assert node in await _consumer_names(probe)
+
+            await bus.disconnect()
+
+            assert node not in await _consumer_names(probe)
+        finally:
+            assert probe._redis is not None
+            await probe._redis.delete(stream)
+            await probe.disconnect()
+
+    async def test_disconnect_keeps_a_consumer_that_still_holds_a_message(self):
+        stream, group = _names('evt_leave_pending')
+        bus = await _make_bus(stream, group)
+        node = bus._node_id
+        probe = await _make_bus(stream, group)
+        try:
+            assert bus._redis is not None
+            await bus._redis.xadd(stream, {'event': 'x', 'payload': '{}'})
+            await bus._redis.xreadgroup(group, node, {stream: '>'}, count=1)
+
+            await bus.disconnect()
+
+            assert node in await _consumer_names(probe)
+            assert await probe.reclaim_pending_events(min_idle_ms=0) == 1
+        finally:
+            assert probe._redis is not None
+            await probe._redis.delete(stream)
+            await probe.disconnect()
+
+    async def test_reaper_removes_dead_consumers_but_never_one_with_pending(self):
+        stream, group = _names('evt_prune')
+        bus = await _make_bus(stream, group)
+        try:
+            assert bus._redis is not None
+            await bus._redis.xadd(stream, {'event': 'x', 'payload': '{}'})
+            await bus._redis.xadd(stream, {'event': 'x', 'payload': '{}'})
+            # One consumer read and acknowledged (empty-handed), one holds a
+            # message, one only ever asked.
+            first = await bus._redis.xreadgroup(group, 'gone', {stream: '>'}, count=1)
+            await bus._redis.xack(stream, group, first[0][1][0][0])
+            await bus._redis.xreadgroup(group, 'holding', {stream: '>'}, count=1)
+            await bus._redis.xgroup_createconsumer(stream, group, 'never-read')
+
+            removed = await bus.prune_dead_consumers(0)
+
+            assert removed == 2
+            assert await _consumer_names(bus) == {'holding'}
+        finally:
+            assert bus._redis is not None
+            await bus._redis.delete(stream)
+            await bus.disconnect()
+
+    async def test_a_recently_active_consumer_is_left_alone(self):
+        stream, group = _names('evt_prune_fresh')
+        bus = await _make_bus(stream, group)
+        try:
+            assert bus._redis is not None
+            await bus._redis.xgroup_createconsumer(stream, group, 'just-now')
+
+            assert await bus.prune_dead_consumers(60_000) == 0
+            assert await _consumer_names(bus) == {'just-now'}
+        finally:
+            assert bus._redis is not None
+            await bus._redis.delete(stream)
+            await bus.disconnect()
+
+    async def test_scheduler_prunes_its_dead_consumers_too(self):
+        stream, group = _names('task_prune')
+        scheduler = await _make_scheduler(stream, group)
+        try:
+            assert scheduler._redis is not None
+            await scheduler._redis.xgroup_createconsumer(stream, group, 'gone')
+
+            assert await scheduler.prune_dead_consumers(0) == 1
+        finally:
+            assert scheduler._redis is not None
+            await scheduler._redis.delete(stream)
+            await scheduler._redis.aclose()

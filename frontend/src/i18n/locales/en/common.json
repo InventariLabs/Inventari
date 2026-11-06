@@ -710,6 +710,12 @@
       "document": "Document",
       "corrects": "corrects {{number}}",
       "secretChanged": "a new value (hidden)",
+      "fieldDefinitions": {
+        "added": "Added field {{field}}",
+        "removed": "Removed field {{field}}",
+        "changed": "Changed field {{field}}",
+        "required": "required"
+      },
       "builtInModules": {
         "core": "Basics",
         "locations": "Locations",
@@ -1328,5 +1334,9 @@
   "settingsSave": {
     "region": "Save the changes on this page",
     "unsaved": "You have unsaved changes"
+  },
+  "shoppingOverlap": {
+    "toast": "Already on another open list: {{where}}",
+    "onList": "{{names}} on “{{list}}”"
   }
 }

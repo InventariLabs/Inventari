@@ -509,7 +509,7 @@ class EmailService:
         mark_external_effect('email:queued-with-attachment')
         if settings.TESTING:
             result = await run_sync_in_thread(
-                lambda: EmailService._send_email_with_attachment(  # noqa: SLF001
+                lambda: EmailService._send_email_with_attachment(
                     to_email,
                     subject,
                     html_content,

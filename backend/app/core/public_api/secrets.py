@@ -20,7 +20,7 @@ gone, the ciphertext it produced is still in the database.
 """
 
 from app.core.module_identity import refuse_foreign_module
-from app.services.crypto_service import MASKED_VALUE  # noqa: F401
+from app.services.crypto_service import MASKED_VALUE
 from app.services.crypto_service import decrypt_module_secret as _decrypt_bound
 from app.services.crypto_service import encrypt_module_secret as _encrypt_bound
 

@@ -325,6 +325,13 @@ export function formatAuditValue(
  */
 const ROTATED_VALUE = "ROTATED_VALUE";
 
+/** The stored print layouts and their keys on the document settings screen. */
+const PRINT_LAYOUT_NAMES: Record<string, string> = {
+  auto: "layoutAuto",
+  standard: "layoutStandard",
+  pl_pz: "layoutPlPz",
+};
+
 /**
  * The value dictionaries the reader shares with the screens that own them.
  *
@@ -352,6 +359,11 @@ const VALUE_RESOLVERS: Record<
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",
     }),
+  // The layout a document prints in: the names the settings screen offers.
+  print_template: (t, code) =>
+    PRINT_LAYOUT_NAMES[code]
+      ? t(`warehouse:profile.${PRINT_LAYOUT_NAMES[code]}`, { defaultValue: "" })
+      : "",
   // A restore writes the reason the product was deleted for as a field of its
   // own; the archive and the delete entry word the same code from `reasons`.
   deletion_reason: (t, code) =>
@@ -468,6 +480,73 @@ function leafText(
   return text;
 }
 
+/** The key under which a category records the fields its products carry. */
+const FIELD_DEFINITIONS_KEY = "field_definitions";
+
+type Definition = Record<string, unknown>;
+
+/** A definition as a person names it: "Thread size (Dropdown, required)". */
+function fieldDefinitionText(d: Definition, t: TranslateFn): string {
+  const label = String(d.label || d.key || "—");
+  const details = [
+    d.type && t(`modules:fieldBuilder.types.${d.type}`, { defaultValue: "" }),
+    d.required === true && t("common:settings.audit.fieldDefinitions.required"),
+  ].filter(Boolean);
+  return details.length ? `${label} (${details.join(", ")})` : label;
+}
+
+/**
+ * A category's field definitions as the fields added, removed or changed,
+ * matched by key — the list used to print each definition as JSON. Null when
+ * a side is not a list of definitions, so the generic walk still applies.
+ */
+function fieldDefinitionChange(
+  before: unknown,
+  after: unknown,
+  t?: TranslateFn,
+): AuditChange | null {
+  const list = (v: unknown) =>
+    v == null ? [] : Array.isArray(v) && v.every(isPlainObject) ? v : null;
+  const was = list(before);
+  const is = list(after);
+  if (!t || !was || !is) return null;
+  const keyOf = (d: Definition) => String(d.key ?? d.label);
+  const wasBy = new Map<string, Definition>(was.map((d) => [keyOf(d), d]));
+  const isBy = new Map<string, Definition>(is.map((d) => [keyOf(d), d]));
+  const say = (verb: "added" | "removed" | "changed", d: Definition) => {
+    const field = fieldDefinitionText(d, t);
+    if (verb === "added") {
+      return t("common:settings.audit.fieldDefinitions.added", { field });
+    }
+    return verb === "removed"
+      ? t("common:settings.audit.fieldDefinitions.removed", { field })
+      : t("common:settings.audit.fieldDefinitions.changed", { field });
+  };
+  const lines = [
+    ...is.flatMap((d) => {
+      const old = wasBy.get(keyOf(d));
+      if (!old) return [say("added", d)];
+      return JSON.stringify(old) === JSON.stringify(d)
+        ? []
+        : [say("changed", d)];
+    }),
+    ...was.filter((d) => !isBy.has(keyOf(d))).map((d) => say("removed", d)),
+  ];
+  return lines.length
+    ? { path: FIELD_DEFINITIONS_KEY, from: null, to: lines.join("; ") }
+    : null;
+}
+
+/**
+ * The fields a category carried, named without a verb — what a flat snapshot
+ * (a deletion keeps the list as it stood) can honestly say: nothing was added
+ * by it. Null when the value is not a list of definitions.
+ */
+function fieldDefinitionNames(value: unknown, t?: TranslateFn): string | null {
+  if (!t || !Array.isArray(value) || !value.every(isPlainObject)) return null;
+  return value.map((d) => fieldDefinitionText(d, t)).join(", ") || null;
+}
+
 function walk(
   before: unknown,
   after: unknown,
@@ -484,6 +563,13 @@ function walk(
   // and needing *both* sides to be objects meant the whole value was printed
   // as JSON — `Jina: — → {"api_key":"**********"}` — where the field names
   // were the answer. The same holds in reverse, when a value is cleared.
+  if (prefix.split(".").pop() === FIELD_DEFINITIONS_KEY) {
+    const change = fieldDefinitionChange(before, after, t);
+    if (change) {
+      out.push({ ...change, path: prefix });
+      return;
+    }
+  }
   const beforeFields = absentAsEmpty(before);
   const afterFields = absentAsEmpty(after);
   if (depth < MAX_DEPTH && beforeFields && afterFields) {
@@ -637,6 +723,9 @@ function flatFields(
       from: null,
       to:
         referenceNameOf(snapshot, key, t) ??
+        (key === FIELD_DEFINITIONS_KEY
+          ? fieldDefinitionNames(value, t)
+          : undefined) ??
         (key === FIELDS_KEY && Array.isArray(value) && t
           ? value
               .map((field) => auditFieldLabel(String(field), t))

@@ -291,8 +291,8 @@
     "incomplete_warning": "Nutrition data available for {{pct}}% of ingredients only",
     "estimate_note": "An estimate summed from the ingredients' product values (labels or Open Food Facts, a community database). Check it against the label.",
     "estimate_generic_note": "An estimate summed from the ingredients. Some use generic values rather than a product's own; the rest come from product labels or Open Food Facts (a community database). Check it against the label.",
-    "daily_estimate_note": "Daily totals add up the estimates of each recipe, from product labels or Open Food Facts. Treat them as a guide.",
-    "daily_estimate_generic_note": "Daily totals add up the estimates of each recipe. Some use generic values rather than a product's own. Treat them as a guide."
+    "daily_estimate_note": "Daily totals add up one serving of each planned meal, from product labels or Open Food Facts. Treat them as a guide.",
+    "daily_estimate_generic_note": "Daily totals add up one serving of each planned meal. Some use generic values rather than a product's own. Treat them as a guide."
   },
   "shopping": {
     "add_missing_button": "Add missing to shopping list",
@@ -434,7 +434,7 @@
     "import_error_ai_not_configured": "Import failed: \"{{purpose}}\" needs an AI connection, and none is set up yet. Configure one in Settings → AI Connections."
   },
   "ingredient_defaults": {
-    "language_empty_hint": "Recipe suggestions still work — they fall back to English. Add an entry or import a CSV/JSON to fill this dictionary.",
+    "language_empty_hint": "Recipe suggestions still work — they use matching entries in other languages. Add an entry or import a CSV/JSON to fill this dictionary.",
     "language_empty": "The ingredient dictionary has no entries for {{lang}} yet.",
     "scan_label": "Read from a label",
     "scan_reading": "Reading…",

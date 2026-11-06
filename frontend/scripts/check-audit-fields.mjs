@@ -39,11 +39,10 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-// Under vitest the module URL is a vite `/@fs/...` path; strip it so the same
-// file works run from a shell and imported from a test.
-const ROOT = resolve(
-  new URL("..", import.meta.url).pathname.replace(/^\/@fs/, ""),
-); // frontend/
+// `import.meta.dirname`, not `new URL("..", import.meta.url)`: under vitest
+// vite rewrites that expression as an asset URL, and its path is not this
+// directory's parent.
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const KEYS_PATH = resolve(
   ROOT,
   process.env.AUDIT_KEYS ?? "scripts/audit-snapshot-keys.json",

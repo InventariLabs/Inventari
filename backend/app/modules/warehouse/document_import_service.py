@@ -9,7 +9,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import acquire_advisory_lock, get_org_owned_or_404_async
-from app.core.exceptions import ServiceRejectionError
+from app.core.exceptions import (
+    ServiceRejectionError,
+    is_reader_facing_value_error,
+    refusal_row,
+)
 from app.core.file_import import PREVIEW_ROWS
 from app.core.import_sheet import (
     PASTE_DELIMITERS,
@@ -318,7 +322,20 @@ async def _lines_from_rows(
             # rows of *data* from 1; this used to count the header as row 1,
             # so a refusal pointed at the row below the one it meant and the
             # reader looked at a row where nothing was wrong.
-            errors.append({'row': _row_number(index), 'error': str(e)})
+            if isinstance(e, ValueError) and is_reader_facing_value_error(e):
+                # A refusal this codebase wrote, in the request's language.
+                errors.append(refusal_row(e, row=_row_number(index)))
+            else:
+                # A library's text (SQL, a decimal's class name) is not the
+                # reader's to see: the traceback goes to the log, the row gets
+                # the generic sentence.
+                logger.exception('Document import row %d failed', _row_number(index))
+                errors.append(
+                    refusal_row(
+                        ServiceRejectionError('internal_error'),
+                        row=_row_number(index),
+                    )
+                )
 
     if doc_id is not None:
         # Flush so the response carries the created lines' ids; the commit

@@ -503,7 +503,6 @@ export default function CategoriesPage() {
 
       {/* Add/Edit Modal */}
       <CategoryFormModal
-        key={editingCategory?.id ?? "new"}
         isOpen={isModalOpen}
         editingCategory={editingCategory}
         groupSuggestions={Array.from(

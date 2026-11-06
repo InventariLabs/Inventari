@@ -4,9 +4,16 @@ import type { ReactNode } from "react";
 import type { FieldDefinition, CategoryDTO } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { InlineQueryError } from "@/components/ui/QueryResult";
 import UnifiedFieldRenderer from "../UnifiedFieldRenderer";
 import type { TemplateUnitPrompt } from "@/modules/inventory/hooks/useItemForm";
 import { LocationCombobox } from "@/module-sdk";
+import ExistingProductSuggestions from "./ExistingProductSuggestions";
+
+export interface CategoriesFailure {
+  error: unknown;
+  retry: () => void;
+}
 
 interface ProductFormContentProps {
   formData: Record<string, unknown>;
@@ -16,6 +23,11 @@ interface ProductFormContentProps {
   errors: Record<string, string>;
   fieldDefinitions: FieldDefinition[];
   categories?: CategoryDTO[];
+  /**
+   * The category list never arrived. Which fields the form draws is read from
+   * it, so the reader is told the form may be short of some.
+   */
+  categoriesFailure?: CategoriesFailure | null;
   onAddCategory?: () => void;
   imagePreview?: string | null;
   setImagePreview?: (url: string | null) => void;
@@ -33,6 +45,11 @@ interface ProductFormContentProps {
   onAddStorage?: (query: string) => void;
   /** The unit the matched product template keeps — the hint by the picker. */
   templateUnit?: TemplateUnitPrompt | null;
+  /**
+   * Offer the existing products whose name contains the typed one. Only a
+   * form that creates a record asks: an open record is not a new product.
+   */
+  suggestExistingProducts?: boolean;
 }
 
 /**
@@ -53,12 +70,14 @@ export default function ProductFormContent({
   errors,
   fieldDefinitions,
   categories,
+  categoriesFailure,
   onAddCategory,
   imagePreview,
   setImagePreview,
   storageGate,
   onAddStorage,
   templateUnit = null,
+  suggestExistingProducts = false,
 }: ProductFormContentProps) {
   const { t } = useTranslation(["items", "categories", "common"]);
 
@@ -137,6 +156,9 @@ export default function ProductFormContent({
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
+                    // Emptied so that picking this file again, after a refusal
+                    // say, is a change the browser reports.
+                    e.target.value = "";
                     if (file) {
                       // The local preview bridges the wait for an upload;
                       // once the handler's promise settles it must not land
@@ -168,6 +190,12 @@ export default function ProductFormContent({
                 })}
                 error={errors.name}
               />
+              {suggestExistingProducts && (
+                <ExistingProductSuggestions
+                  name={(formData.name as string) ?? ""}
+                  onPick={(picked) => onChange("name", picked)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -249,6 +277,14 @@ export default function ProductFormContent({
           </div>
         </div>
       </div>
+
+      {categoriesFailure && (
+        <InlineQueryError
+          error={categoriesFailure.error}
+          onRetry={categoriesFailure.retry}
+          message={t("categoriesUnavailable")}
+        />
+      )}
 
       {/* SECTION 1: IDENTITY */}
       {hasVisibleIdentity && (
