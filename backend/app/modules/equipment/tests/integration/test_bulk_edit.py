@@ -133,6 +133,39 @@ class TestBulkEditStatus:
         data = response.json()
         assert data['updated'] == 0
 
+    def test_a_refused_transition_reads_in_the_session_language_with_its_code(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        db_session: Session,
+    ) -> None:
+        """The bulk row speaks Polish to a Polish session and names its cause by code.
+
+        The status machine answered in English for every reader here, because
+        the bulk edit never passed it a language, and the row carried no code.
+        """
+        _set_equipment_status(eq_item, db_session, 'RETIRED')
+
+        response = client.patch(
+            '/api/v1/equipment/assets/bulk',
+            headers={**eq_auth_headers, 'Accept-Language': 'pl'},
+            json={
+                'item_ids': [str(eq_item.id)],
+                'action': 'change_status',
+                'data': {'status': 'DEPLOYED'},
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        [error] = response.json()['errors']
+        assert error['item_id'] == str(eq_item.id)
+        assert error['code'] == 'EQUIPMENT_STATUS_TRANSITION_FROM_RETIRED'
+        assert error['error'] == (
+            'Nie można zmienić statusu z RETIRED na DEPLOYED. '
+            'Wycofane zasoby muszą być najpierw jawnie przywrócone.'
+        )
+
     # --- Retiring an asset must close its active assignment --------------
 
     def _checkout(

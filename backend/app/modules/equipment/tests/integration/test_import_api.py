@@ -8,9 +8,13 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+from app.core.testing import ModuleTestHelper
 from app.models.category import Category
 from app.models.item import Item
+from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
+from app.models.storage_type import StorageType
+from app.models.user import User
 
 """Equipment import analyze / execute endpoints.
 
@@ -463,3 +467,44 @@ class TestTheImportReadsTheSheetTheAppExports:
                 'code': 'IMPORT_LOCATION_NOT_FOUND',
             }
         ]
+
+    def test_an_ambiguous_location_is_refused_in_the_readers_language(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        h: ModuleTestHelper,
+        eq_org: Organization,
+        eq_user: User,
+        eq_storage_type: StorageType,
+    ) -> None:
+        """A word that names two shelves reaches the row as a keyed Polish refusal.
+
+        The resolver is unit-tested in isolation; this drives the same
+        refusal through the real request, where the row carries the sentence
+        in the session language and the code a client branches on.
+        """
+        for rack in ('Rack A', 'Rack B'):
+            parent = h.create_storage_location(
+                eq_org, eq_storage_type, eq_user, name=rack
+            )
+            h.create_storage_location(
+                eq_org, eq_storage_type, eq_user, name='Shelf 1', parent_id=parent.id
+            )
+
+        resp = client.post(
+            '/api/v1/equipment/import/execute',
+            headers={**eq_auth_headers, 'Accept-Language': 'pl'},
+            files={
+                'file': ('assets.csv', b'name,storage\nLaptop-1,Shelf 1\n', 'text/csv')
+            },
+            data={'mapping_json': json.dumps({'name': 'name', 'location': 'storage'})},
+        )
+
+        assert resp.status_code == status.HTTP_200_OK, resp.text
+        body = resp.json()
+        assert body['imported'] == 0
+        [row] = body['errors']
+        assert row['row'] == 1
+        assert row['error'].startswith('„Shelf 1” pasuje do 2 miejsc')
+        assert 'Rack A › Shelf 1' in row['error']
+        assert row['code'] == 'STORAGE_LOCATION_AMBIGUOUS'

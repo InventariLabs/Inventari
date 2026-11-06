@@ -828,6 +828,9 @@ ERRORS_DE: ErrorMessages = {
         'Ein Gerät gilt als ausgegeben, sobald es an eine Person ausgegeben wurde. '
         'Geben Sie es aus, statt den Status zu setzen.'
     ),
+    'equipment_status_invalid': 'Ungültiger Status: {status}',
+    'equipment_status_transition_denied': 'Status kann nicht von {old} nach {new} geändert werden',
+    'equipment_status_transition_from_retired': 'Status kann nicht von {old} nach {new} geändert werden. Ausgemusterte Geräte müssen zuerst explizit reaktiviert werden.',
     'attestation_assignment_required': 'Wählen Sie das Gerät aus, für das Sie ein Problem melden',
     'meta_data_spelled_twice': (
         "'meta_data' und 'metadata' benennen dasselbe Feld zweimal. "

@@ -173,6 +173,72 @@ class TestImportRefusesWhatTheFormRefuses:
         assert 'nie jest liczbą' in message, message
         assert 'cannot read' not in message
 
+    def test_the_refused_row_carries_the_code_of_its_refusal(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+    ) -> None:
+        doc = _create_doc(
+            client,
+            doc_auth_headers,
+            str(doc_partner.id),
+            str(doc_target_location.id),
+        )
+        resp = client.post(
+            f'/api/v1/warehouse/documents/{doc["id"]}/import-paste',
+            json={
+                'text': 'nazwa,ilosc\nDrugi,BANANA',
+                'mapping_json': {'name': 'nazwa', 'quantity': 'ilosc'},
+            },
+            headers=doc_auth_headers,
+        )
+        assert resp.status_code == 200, resp.text
+        [row] = resp.json()['errors']
+        assert row['code'] == 'IMPORT_COLUMN_NOT_A_NUMBER'
+
+    def test_a_database_error_never_reaches_the_result_screen(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+    ) -> None:
+        """A row that fails inside the database answers with the generic sentence.
+
+        The loop caught ``SQLAlchemyError`` beside the refusals and printed
+        ``str(e)``, which for a database error is the statement and its
+        parameters.
+        """
+        from unittest.mock import patch
+
+        from sqlalchemy.exc import SQLAlchemyError
+
+        doc = _create_doc(
+            client,
+            doc_auth_headers,
+            str(doc_partner.id),
+            str(doc_target_location.id),
+        )
+        with patch(
+            'app.modules.warehouse.document_import_service._build_document_line',
+            side_effect=SQLAlchemyError('SELECT secret_column FROM items'),
+        ):
+            resp = client.post(
+                f'/api/v1/warehouse/documents/{doc["id"]}/import-paste',
+                json={
+                    'text': 'nazwa,ilosc\nDrugi,2',
+                    'mapping_json': {'name': 'nazwa', 'quantity': 'ilosc'},
+                },
+                headers={**doc_auth_headers, 'Accept-Language': 'pl'},
+            )
+        assert resp.status_code == 200, resp.text
+        assert 'secret_column' not in resp.text
+        [row] = resp.json()['errors']
+        assert row['error'] == 'Wystąpił błąd wewnętrzny'
+        assert row['code'] == 'INTERNAL_ERROR'
+
 
 @pytest.mark.integration
 class TestConfirmationLooksAtTheLines:

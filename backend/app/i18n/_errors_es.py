@@ -823,6 +823,9 @@ ERRORS_ES: ErrorMessages = {
         'Un activo pasa a estar prestado cuando se entrega a una persona. '
         'Préstalo en lugar de cambiar el estado.'
     ),
+    'equipment_status_invalid': 'Estado no válido: {status}',
+    'equipment_status_transition_denied': 'No se puede cambiar el estado de {old} a {new}',
+    'equipment_status_transition_from_retired': 'No se puede cambiar el estado de {old} a {new}. Los equipos retirados deben ser reactivados explícitamente primero.',
     'attestation_assignment_required': 'Selecciona el activo sobre el que informas del problema',
     'meta_data_spelled_twice': (
         "'meta_data' y 'metadata' nombran un mismo campo dos veces. "

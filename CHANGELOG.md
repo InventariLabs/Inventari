@@ -97,6 +97,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Refusing an asset's status change from the bulk edit now reads in the language
+  of the session (it was always English) and the row carries a machine code, and
+  the Polish sentence no longer says "zmienić status z". A refused row of a
+  warehouse document import carries its code too, and a database error in a row
+  now shows the generic sentence instead of the statement that failed.
 - Replacing the photo of a product, an asset or a recipe shows the new picture
   at once. It used to go on showing the old one until the page was reloaded,
   because every cover was kept under the same address. Module authors get
