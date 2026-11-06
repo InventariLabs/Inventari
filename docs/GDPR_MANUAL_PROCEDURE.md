@@ -56,7 +56,7 @@ touches none of them: see *Records the organization owns*.
 | `users` | `email`, `full_name`, `hashed_password`; `blocking_reason` — free text an operator may have written when blocking the account | yes (`blocking_reason` is not in the query below; add it if set) | email, name and password anonymized in place by `anonymize_user_async`; `blocking_reason` is **not** touched — clear it by hand if it names the person |
 | `registration_requests` | `email`, `full_name` | yes | anonymized by `anonymize_user_async` |
 | `organization_invitations` | `invited_email` — the address the code was issued for; `created_by`, `used_by_user_id` are UUIDs | yes | `invited_email` anonymized by `anonymize_user_async`; UUIDs kept |
-| `audit_log` | `user_id` (UUID); on member and invitation entries the address itself: `snapshot.name` when a member is created, changed or leaves, `snapshot.invited_email` when an invitation is issued, resent, revoked or accepted; on equipment hand-over entries the holder's name (`snapshot.before.assigned_to` / `snapshot.after.assigned_to`); on partner entries the partner's name and, when a field changed, its old and new value (`snapshot.before` / `snapshot.after`, e.g. `email`, `phone`, `contact_person`) | yes for entries by the person and entries naming the address (member and invitation entries); entries that name a holder or a partner only by name are found with the queries under *Records the organization owns* | **kept as written**: rows are immutable in the database (`audit_log_immutable` trigger) — see *Records that keep the address* |
+| `audit_log` | `user_id` (UUID); on member and invitation entries the address itself: `snapshot.name` when a member is created, changed or leaves, `snapshot.invited_email` when an invitation is issued, resent, revoked or accepted; on equipment hand-over entries the holder's name (`snapshot.before.assigned_to` / `snapshot.after.assigned_to`); on partner entries the partner's name and, when a field changed, its old and new value (`snapshot.before` / `snapshot.after`, e.g. `email`, `phone`, `contact_person`) | yes for entries by the person and entries naming the address (member and invitation entries); entries that name a holder or a partner only by name are found with the queries under *Records the organization owns* | **not rewritten by erasure**: the database refuses `UPDATE` and `DELETE` on it (`audit_log_immutable` trigger). Kept only on a legal ground, otherwise redacted by hand — see *Records that keep the address* |
 | `email_jobs` | `to_email`, `subject`; `html_content` quotes the address in the delivered body | yes (`to_email`, `subject`, timestamps) | kept — a copy of mail already delivered; rows deleted on request, see *Records that keep the address* |
 | `item_history` | `user_id` (FK); on equipment `CHECKOUT` entries `changes.assigned_to`, the holder's name as typed at checkout | metadata (by `user_id`) | FK kept (audit value); the holder's name stays — see *Records the organization owns* |
 | `stock_moves` | `created_by` (FK only) | no | FK kept |
@@ -67,7 +67,7 @@ touches none of them: see *Records the organization owns*.
 | `equipment_assignments` | `assigned_to_name`, `assigned_to_email` — free text, so a person without an account can hold an asset; `checkout_notes`, `checkin_notes` | yes, by query | **not touched** — organization record, matched to a person by address |
 | `audit_responses` (equipment attestation campaigns) | `assignee_name`, `assignee_email`, and from the person's answer on the public link `response_ip`, `response_user_agent`, `dispute_reason` | yes, by query | **not touched** — organization record |
 | `organizations` | `name`, `address`, `tax_id` — the organization's own business details; a sole trader's identify a person | no | **not touched** — edited by the organization |
-| Refresh/access tokens | JWT in HttpOnly cookie / memory | n/a | revoked via `token_blacklist.revoke_user_family` |
+| Refresh/access tokens | JWT in HttpOnly cookie / memory | n/a | revoked by erasure (the token blacklist) |
 | Technical logs — `LOG_DIR/app.log` (10 MB × 5 backups) and the container stdout | addresses and client IPs: failed-login and lockout lines write the account's address and the IP that tried it (`app.services.auth_service`), the mail lines write the recipient (`app.services.email_service`) | no | **kept** — erasure never writes a log file; see *Records that keep the address* |
 
 ## Export (right of access, Art. 15)
@@ -120,51 +120,26 @@ queries under *Records the organization owns*.
 
 ## Erasure (right to be forgotten, Art. 17)
 
-Use the service function (keeps audit FKs intact, destroys PII,
-deactivates the account, revokes tokens). Put the user's id in place of
-`<USER_ID>`; on a development stack the same script runs with
-`docker compose exec -T backend uv run python -`.
+Erase the account with the management command, putting the user's id in
+place of `<USER_ID>`:
 
 ```bash
-docker compose -f docker-compose.prod.yml exec -T backend python - <<'EOF'
-import asyncio
-from uuid import UUID
-
-import redis.asyncio as aioredis
-
-from app import database
-from app.cli import bootstrap_db
-from app.config import settings
-from app.core.token_blacklist import token_blacklist
-from app.services.gdpr_service import anonymize_user_async
-
-USER_ID = UUID('<USER_ID>')
-
-
-async def main():
-    # A script runs outside the web app, so it does what the app's startup
-    # would: load every module's models, open the database engine, and
-    # connect the Redis that token revocation writes to (production refuses
-    # to revoke without it).
-    bootstrap_db()
-    database.init_async_engine()
-    redis = aioredis.from_url(
-        settings.REDIS_CRITICAL_URL or settings.REDIS_URL, decode_responses=True
-    )
-    token_blacklist.set_redis(redis)
-    try:
-        async with database.AsyncSessionLocal() as db:
-            await anonymize_user_async(db, USER_ID)
-            await db.commit()
-        print(f'Erased user {USER_ID}')
-    finally:
-        await redis.aclose()
-        await database.async_engine.dispose()
-
-
-asyncio.run(main())
-EOF
+docker compose -f docker-compose.prod.yml exec backend python manage.py user erase <USER_ID>
 ```
+
+It shows the address and name of the account and asks before it changes
+anything; `--yes` skips the question, for a run without a terminal
+(`exec -T`). On a development stack the same command runs with
+`docker compose exec backend uv run python manage.py user erase <USER_ID>`.
+
+The command connects to the database and to the Redis the token blacklist
+lives on — the dedicated `REDIS_CRITICAL_URL` instance when one is set,
+`REDIS_URL` otherwise — then rewrites the account and revokes its sessions
+in one transaction. When a step fails, for example because Redis cannot be
+reached and production refuses to drop a revocation, it prints
+`Nothing was erased` with the cause and exits 1, and the account is as it
+was; fix the cause and run it again. An unknown id is reported the same
+way.
 
 Effects (verified by `backend/tests/integration/test_gdpr_erasure.py`):
 
@@ -178,12 +153,14 @@ Effects (verified by `backend/tests/integration/test_gdpr_erasure.py`):
   for nobody — rather than being cleared into a bearer link.
   `created_by` / `used_by_user_id` are UUIDs and stay.
 - `item_history` / `audit_log` / `stock_moves`: rows preserved with the
-  FK to the anonymized user (audit requirement); the UUID is not PII.
-  Journal entries keep what they recorded, address included — see the next
-  section.
+  FK to the anonymized user, so the organization's history keeps its
+  references. The user's UUID is **pseudonymised, not anonymous**: it is
+  still personal data for as long as anything can tie it back to the
+  person (GDPR Art. 4(5), Recital 26), and the journal entries that keep
+  the address do exactly that — see the next section.
 - Outstanding tokens revoked via the token blacklist.
 
-What the function does **not** touch: `users.blocking_reason`, the organization's
+What the command does **not** touch: `users.blocking_reason`, the organization's
 records about the person (`equipment_assignments`, `audit_responses`, `partners`,
 the holder's name in `item_history` and `notifications`), the journal and the
 logs. The next section covers what an operator does about each.
@@ -194,26 +171,71 @@ Erasure rewrites what can be rewritten. Three kinds of record still hold
 the address afterwards, and each has an explicit handling. None of them is
 handled by pretending the address is no longer there.
 
-### Journal entries (`audit_log`) — kept, because they cannot be edited
+### Journal entries (`audit_log`) — kept only on a legal ground
 
 A journal entry about a member or an invitation carries the address as its
 name: `snapshot.name` when a member was created, changed or left, and
 `snapshot.invited_email` when an invitation was issued, resent, revoked or
-accepted. The
-journal is the organization's record of who did what, and the database
-refuses `UPDATE` and `DELETE` on it (`audit_log_immutable` trigger). An
-erasure that rewrote those rows would have to switch that trigger off
-first; a journal an operator can edit on request is not a journal.
+accepted. The journal is the organization's record of who did what, and the
+database refuses `UPDATE` and `DELETE` on it (`audit_log_immutable`
+trigger), so neither the application nor anyone using it can change that
+record after the fact. That is why erasure leaves the entries as they were
+written: `backend/tests/integration/test_audit_log_is_immutable.py` holds
+the refusal, and `backend/tests/integration/test_gdpr_erasure.py` pins that
+erasure leaves the entries alone while scrubbing the invitation row beside
+them.
 
-**Handling:** the entries stay exactly as written. Answer the requester
-plainly: the address remains in the organization's history of its members
-and of who was invited, and it is not editable — it leaves the database
-only with the entry itself, which is the journal's own retention question
-(`docs/SCALING.md`), not this procedure's. Two tests carry that:
-`backend/tests/integration/test_audit_log_is_immutable.py` is what makes
-"not editable" a fact rather than a promise, and
-`backend/tests/integration/test_gdpr_erasure.py` pins that erasure leaves
-the entries alone while scrubbing the invitation row beside them.
+The trigger explains what erasure does; it is not a reason the address may
+stay. A technical safeguard is not a ground the GDPR recognises for keeping
+data a person has asked to have erased, so whether these entries stay is the
+controller's decision, made for each request:
+
+- **Kept**, where the controller has a ground the GDPR recognises against
+  erasure, and can show it:
+  - a purpose Art. 17(3) exempts from erasure — for a journal, usually a
+    legal obligation to keep the record (point (b)) or the establishment,
+    exercise or defence of legal claims (point (e));
+  - or, for a journal kept on the organization's legitimate interest
+    (Art. 6(1)(f)), that the entries are still needed for it
+    (Art. 17(1)(a)) and, when the person objects, compelling legitimate
+    grounds that override their interests (Art. 17(1)(c), Art. 21(1)).
+
+  Write the ground down with the request (*Record keeping*), and tell the
+  requester which entries stay and why, and that they may lodge a complaint
+  with a supervisory authority or seek a judicial remedy (Art. 12(4)).
+- **Redacted**, where no such ground holds. The trigger guards the journal
+  against the application, not against the owner of the database, who can
+  lift it for one transaction. Run this as the database superuser — `psql`
+  in the database container,
+  `docker compose -f docker-compose.prod.yml exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'`
+  — with `<EMAIL>` the person's address and `<ERASED_EMAIL>` the account's
+  address after erasure (`SELECT email FROM users WHERE id = '<USER_ID>'`,
+  of the form `deleted-<id>@anonymized.invalid`), so the entries go on
+  naming the same closed account:
+
+  ```sql
+  BEGIN;
+  ALTER TABLE audit_log DISABLE TRIGGER audit_log_immutable;
+
+  UPDATE audit_log
+  SET snapshot = jsonb_set(snapshot::jsonb, '{name}', to_jsonb('<ERASED_EMAIL>'::text))::json
+  WHERE lower(snapshot->>'name') = lower('<EMAIL>');
+
+  UPDATE audit_log
+  SET snapshot = jsonb_set(snapshot::jsonb, '{invited_email}', to_jsonb('<ERASED_EMAIL>'::text))::json
+  WHERE lower(snapshot->>'invited_email') = lower('<EMAIL>');
+
+  ALTER TABLE audit_log ENABLE TRIGGER audit_log_immutable;
+  COMMIT;
+  ```
+
+  The trigger is off only inside that transaction: `ALTER TABLE` holds a
+  lock that keeps every other writer out of the journal until `COMMIT`, and
+  a statement that fails rolls the whole transaction back, the trigger's
+  state included. On an instance with several organizations the decision is
+  each organization's; add `AND organization_id = '<ORG_ID>'` to both
+  updates to redact one organization's entries only. Record the redaction
+  with the request: the journal itself no longer shows that it was changed.
 
 ### Delivered mail (`email_jobs`) — kept, deletable
 
@@ -314,14 +336,18 @@ WHERE lower(assignee_email) = lower('<EMAIL>');
 `token_expires_at = now()` closes the link the person was mailed. A `partners`
 row is edited or deleted in the application itself, not by SQL. The holder's
 name in `item_history` and `notifications` is history of what happened and
-stays unless you decide otherwise; the journal entries found above cannot be
-changed at all (next section). Say which of these stay in the answer to the
-requester. Records that name the person only by name, never by address, are
-found only by the name queries above; confirm each hit is the same person
-before changing it.
+stays unless you decide otherwise. The journal entries found above follow the
+journal's rule (*Journal entries*, above): kept on a legal ground, otherwise
+redacted the same way, setting the key the query matched
+(`'{before,assigned_to}'`, `'{after,assigned_to}'` or `'{name}'`) to the
+placeholder the scrub above uses, `'Deleted holder'`. Say which of these stay
+in the answer to the requester. Records that name the person only by name,
+never by address, are found only by the name queries above; confirm each hit
+is the same person before changing it.
 
 ## Record keeping
 
 Log every handled request (date, type, user UUID, handler, completion
-date) in the internal admin log. Do NOT store the requester's email in
-that log after erasure is complete.
+date, and for each record kept, the ground it was kept on) in the internal
+admin log. Do NOT store the requester's email in that log after erasure is
+complete.
