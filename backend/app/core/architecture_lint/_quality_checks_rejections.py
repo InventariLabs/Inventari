@@ -67,6 +67,12 @@ REFUSAL_EXCLUDED: dict[str, str] = {
         ' for the log and the secrets CLI; the class is not reader-facing at'
         ' runtime (``reader_facing = False``)'
     ),
+    'OperatorError': (
+        'its message is written for whoever runs a command or starts the'
+        ' process (boot, ``manage.py``, manifest and seed-profile validation);'
+        ' no request reaches it and the class is not reader-facing at runtime'
+        ' (``reader_facing = False``)'
+    ),
     'LlmContractError': (
         'its message quotes what a model sent and is written for the log; the'
         ' class is not reader-facing at runtime (``reader_facing = False``),'
@@ -159,25 +165,6 @@ REJECTION_GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
             'app/core/token_blacklist.py',
             'app/core/llm/',
             'app/core/public_api/',
-        ),
-    ),
-    (
-        'boot-cli',
-        (
-            'raised while the process boots, a manage.py command runs or a'
-            ' manifest/seed profile is validated — no client reads the toast.'
-            ' The leaning is per path, not proven per site: re-check an entry'
-            ' against the client groups whenever its file changes for a'
-            ' client-facing reason'
-        ),
-        (
-            'app/config.py',
-            'app/cli/',
-            'app/seed_data.py',
-            'app/core/version.py',
-            'app/core/define_module.py',
-            'app/core/module_migrations.py',
-            'app/core/module_manifest_schema.py',
         ),
     ),
     (
@@ -426,24 +413,9 @@ def rejection_group(rel_path: str) -> str:
 REJECTION_GROUP_OVERRIDES: dict[str, str] = {
     'app/api/organizations.py::Provide exactly one of role or role_id': 'client-422',
     'app/api/stock_lots.py::reason must not be blank': 'client-422',
-    # Not validators, whatever the directory leans: the event registry refuses
-    # a module's registration from its ``on_startup`` (a developer reads it at
-    # boot), and the Numeric type's bind guard fires on ORM writes that skip
-    # the schemas, like the bulk import — the 400 handler answers that one.
-    **{
-        f'app/core/contracts/events/_registry.py::{literal}': 'boot-cli'
-        for literal in (
-            ' is a core event; its payload is owned by the core contract and'
-            ' cannot be redefined by a module.',
-            ' is already registered by ',
-            ' must be an EventPayload subclass.',
-            ' must be namespaced as <module>.<event>, lowercase, e.g.'
-            ' "warranty.expired".',
-            '; refusing to replace it with ',
-            'Event name ',
-            'Payload for ',
-        )
-    },
+    # Not a validator, whatever the directory leans: the Numeric type's bind
+    # guard fires on ORM writes that skip the schemas, like the bulk import —
+    # the 400 handler answers that one.
     'app/models/item.py::expected a finite number, got ': 'client-guards',
     # Pydantic validators in module schemas: they refuse through the 422
     # envelope, whatever the module directory leans. Raw English that stays

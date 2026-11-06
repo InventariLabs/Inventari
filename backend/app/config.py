@@ -6,6 +6,7 @@ from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.core.logging import get_logger
+from app.core.operator_error import OperatorError
 
 # The upstream repository — the source link of an unmodified installation.
 UPSTREAM_SOURCE_CODE_URL = 'https://github.com/InventariLabs/Inventari'
@@ -294,7 +295,7 @@ settings = Settings()
 
 # Post-initialization validation
 if not settings.DEBUG and 'user:password' in settings.DATABASE_URL:
-    raise ValueError(
+    raise OperatorError(
         'DATABASE_URL contains default credentials. Set a proper DATABASE_URL for production.'
     )
 
@@ -318,7 +319,7 @@ if not settings.SECRET_KEY:
             'SECRET_KEY not set. Generated a random key for this session. Set SECRET_KEY env variable for production.'
         )
     else:
-        raise ValueError(
+        raise OperatorError(
             'SECRET_KEY must be set in environment variables for production!'
         )
 elif settings.SECRET_KEY in _WEAK_SECRET_KEYS:
@@ -328,7 +329,7 @@ elif settings.SECRET_KEY in _WEAK_SECRET_KEYS:
         settings.DEBUG or settings.TESTING or os.getenv('TESTING', '').lower() == 'true'
     )
     if not _is_dev:
-        raise ValueError(
+        raise OperatorError(
             'SECRET_KEY is a known weak value. '
             'Generate a proper one: python -c "import secrets; print(secrets.token_urlsafe(32))"'
         )
@@ -350,7 +351,7 @@ if _key_bytes < 32:
         'Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"'
     )
     if not _is_dev:
-        raise ValueError(_msg)
+        raise OperatorError(_msg)
     _logger.warning(_msg)
 
 
@@ -374,7 +375,7 @@ def check_testing_mode_is_deliberate(
     """
     if not testing or debug or ack_unsafe:
         return
-    raise ValueError(
+    raise OperatorError(
         'TESTING=true with DEBUG=false. TESTING enables the password-reset '
         'dev-token response, makes the token blacklist fail open and accepts a '
         'known-weak SECRET_KEY — none of which belong on a deployment that '
@@ -409,7 +410,7 @@ def llm_env_capabilities(provider: str, capabilities: str) -> frozenset[str]:
         )
     unknown = declared.difference(_LLM_ENV_CAPABILITIES)
     if unknown:
-        raise ValueError(
+        raise OperatorError(
             f'LLM_CAPABILITIES names {", ".join(sorted(unknown))}, which no '
             f'model is asked for. Allowed: {", ".join(_LLM_ENV_CAPABILITIES)}.'
         )
@@ -429,7 +430,7 @@ def check_llm_environment(
 
     allowed = sorted(p.value for p in LlmProvider if protocol_for(p.value))
     if provider not in allowed:
-        raise ValueError(
+        raise OperatorError(
             f'LLM_PROVIDER={provider!r} is not a provider this server can call '
             f'a model through. Allowed: {", ".join(allowed)}.'
         )
@@ -438,12 +439,12 @@ def check_llm_environment(
         return
     base = base_url.strip().rstrip('/')
     if not base:
-        raise ValueError(
+        raise OperatorError(
             'LLM_API_KEY is set but LLM_API_BASE_URL is empty: set it '
             f'to the endpoint of the {provider} API.'
         )
     if provider != 'openrouter' and base == _OPENROUTER_BASE_URL:
-        raise ValueError(
+        raise OperatorError(
             f'LLM_PROVIDER={provider} but LLM_API_BASE_URL is still the '
             'OpenRouter address, so the key would be sent to OpenRouter. Set '
             f'LLM_API_BASE_URL to the {provider} endpoint (.env.example has '
@@ -467,7 +468,7 @@ _is_prod = not settings.DEBUG and not settings.TESTING
 # The one legitimate prod-like use is the load-test stack
 # (docker-compose.loadtest-backend.yml), which opts in explicitly.
 if settings.LOAD_TESTING and _is_prod and not settings.LOAD_TESTING_ACK_UNSAFE:
-    raise ValueError(
+    raise OperatorError(
         'LOAD_TESTING=true disables the global rate limiter, and DEBUG/TESTING are off. '
         'Refusing to start: this would run production traffic with no brute-force protection. '
         'Set LOAD_TESTING=false for a normal deployment, or — if this really is a load-test '
@@ -530,7 +531,7 @@ if _is_prod:
         if not v or v.startswith('postgresql://localhost')
     ]
     if _missing:
-        raise ValueError(
+        raise OperatorError(
             f'Missing or default production values for: {", ".join(_missing)}. '
             'Set them in environment variables before starting in production mode.'
         )
@@ -553,7 +554,7 @@ def placeholder_settings(values: dict[str, object]) -> list[str]:
 
 _placeholders = placeholder_settings(settings.model_dump())
 if _is_prod and _placeholders:
-    raise ValueError(
+    raise OperatorError(
         f'{", ".join(_placeholders)} still carry the placeholder from the '
         'example configuration file. Replace each with a value of your own '
         '(secrets: openssl rand -hex 32) before starting with DEBUG off.'
@@ -577,13 +578,13 @@ _WEAK_FERNET_SALTS = frozenset(
 
 _fernet_salt_bytes = len(settings.FERNET_SALT.encode('utf-8'))
 if _is_prod and _fernet_salt_bytes < 16:
-    raise ValueError(
+    raise OperatorError(
         'FERNET_SALT must be set to a per-deployment random value (>=16 bytes) '
         'in production. Generate with: '
         'python -c "import secrets; print(secrets.token_urlsafe(32))"'
     )
 if _is_prod and settings.FERNET_SALT in _WEAK_FERNET_SALTS:
-    raise ValueError(
+    raise OperatorError(
         'FERNET_SALT is a known example value shipped with the project. '
         'Generate a per-deployment one: '
         'python -c "import secrets; print(secrets.token_urlsafe(32))"'

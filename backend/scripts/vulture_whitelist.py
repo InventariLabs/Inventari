@@ -307,16 +307,14 @@ ManifestCapability.NETWORK  # noqa: B018
 ManifestCapability.FILESYSTEM  # noqa: B018
 ManifestCapability.PROCESS  # noqa: B018
 ManifestCapability.DATABASE  # noqa: B018
-# Schema/tracking keys consumed via dict access or extra='forbid' manifests.
-ModuleManifest.license  # noqa: B018
-ModuleManifest.homepage  # noqa: B018
-# previous_version / upgraded_at / installed_at / inventari_min_version are
+# previous_version / upgraded_at / installed_at are
 # written by `module upgrade` (app/cli/_module_upgrade.py) and read back by
 # `module list` and its --json export (app/cli/commands_module.py) — all
 # through string keys, which is what vulture cannot follow. ModuleTrackingEntry
 # is a TypedDict (total=False), so its keys are pinned in ignore_names, not
 # here: a TypedDict key is not an attribute, and mypy rightly refuses to read
-# it as one.
+# it as one. `inventari_min_version` needs no pin of either kind: the manifest
+# validator reads it as an attribute (app/core/module_validator.py).
 
 # --- ProductProfile fields: serialized via GET /api/v1/profiles, consumed by -
 # frontend (useProfileTheme, AppShell, useProfileCategories);
