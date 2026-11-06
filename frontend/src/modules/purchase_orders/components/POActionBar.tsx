@@ -212,6 +212,8 @@ export function POActionBar({
       label: t("confirm"),
       icon: CheckCircle,
       variant: "primary",
+      // A draft's next step: on a phone it stays beside the "⋯".
+      promoted: true,
       onClick: () => onAction("confirm"),
     });
     if (canRequestApproval) {
