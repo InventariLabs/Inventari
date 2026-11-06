@@ -130,3 +130,18 @@ def test_an_added_line_that_looks_like_a_file_header_is_still_an_added_line() ->
     diff = _diff('@@ -0,0 +1 @@\n', '+++ value\n')
 
     assert gate.added_lines(diff) == {'app/thing.py': {1}}
+
+
+def test_a_file_that_only_lost_lines_needs_no_place_in_the_report() -> None:
+    """Dropping a marker comment from a file the suite never imports adds
+    nothing to judge; it must not read as a report older than the change."""
+    gate = _gate()
+
+    uncovered, covered, missed = gate.judge(
+        {'app/modules/x/migrations/env.py': set()}, {}, ('app/',)
+    )
+
+    assert (uncovered, covered, missed) == ([], 0, 0)
+
+    with pytest.raises(gate.GateError):
+        gate.judge({'app/modules/x/migrations/env.py': {3}}, {}, ('app/',))
