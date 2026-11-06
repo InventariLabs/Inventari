@@ -10,6 +10,7 @@ import {
   coverageOf,
   enKeySet,
   listLanguages,
+  listNamespaces,
   readCoverageDeclaration,
 } from "../../test/localeCatalog";
 
@@ -38,9 +39,10 @@ import {
  * TRANSLATION_COVERAGE_WRITE=1 (mirrors CONSOLE_BASELINE_WRITE), never by
  * hand.
  *
- * The gate watches the four core namespaces it has always watched
- * (common, items, labels, storages); module catalogs carry their own parity
- * tests next to the module.
+ * The gate watches every core namespace English carries (the `.json` files
+ * of `locales/en`), read from the directory like the languages are, so a
+ * namespace added later is held to parity from its first key. Module catalogs
+ * carry their own parity tests next to the module.
  */
 
 const LOCALES = resolve(__dirname, "../locales");
@@ -48,7 +50,7 @@ const COVERAGE_FILE = resolve(
   __dirname,
   "../../../scripts/translation-coverage.json",
 );
-const CORE_NAMESPACES = ["common", "items", "labels", "locations"];
+const CORE_NAMESPACES = listNamespaces(LOCALES, "en");
 
 /** A key ending in a plural suffix is a form of an existing key, not a
  *  sentence of its own — languages with more plural categories than English
@@ -79,6 +81,27 @@ const declaration = readCoverageDeclaration(COVERAGE_FILE);
 describe("the locale directory and the shipped language list agree", () => {
   it("every language directory is shipped, and every shipped language has a directory", () => {
     expect(languages).toEqual([...SUPPORTED_LANGUAGES].sort());
+  });
+});
+
+describe("the gate watches every core namespace", () => {
+  it("reads the namespaces from the English directory, and finds them", () => {
+    // A path typo would leave the list empty and every language "complete".
+    expect(CORE_NAMESPACES).toEqual(
+      expect.arrayContaining([
+        "auth",
+        "categories",
+        "common",
+        "items",
+        "labels",
+        "locations",
+        "modules",
+        "onboarding",
+        "permissions",
+        "scan",
+      ]),
+    );
+    expect(enKeys.length).toBeGreaterThan(0);
   });
 });
 

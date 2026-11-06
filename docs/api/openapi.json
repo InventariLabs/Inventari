@@ -23515,67 +23515,6 @@
         }
       }
     },
-    "/api/v1/recipes/meal-plans/{plan_id}/entries/{entry_id}/cook": {
-      "post": {
-        "tags": [
-          "Recipes"
-        ],
-        "summary": "Cook Plan Entry",
-        "operationId": "cook_plan_entry_api_v1_recipes_meal_plans__plan_id__entries__entry_id__cook_post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "plan_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Plan Id"
-            }
-          },
-          {
-            "name": "entry_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Entry Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PickingStartResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/recipes/meal-plans/{plan_id}/generate-shopping-list": {
       "post": {
         "tags": [

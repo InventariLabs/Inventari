@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 from starlette.testclient import TestClient
 
+from app.core.testing import ModuleTestHelper
 from app.models.category import Category
 from app.models.item import Item
 from app.models.organization import Organization
@@ -433,6 +434,31 @@ class TestFleetValuationEndpoint:
         data = response.json()
         assert float(data['total_purchase_value']) == 1000
         assert data['asset_count'] == 1
+
+    @pytest.mark.parametrize('role', ['user', 'viewer'])
+    def test_fleet_valuation_is_refused_to_an_ordinary_member(
+        self, client: TestClient, h: ModuleTestHelper, eq_org: Organization, role: str
+    ) -> None:
+        """The totals are the organization's finances; the overview shows
+        them to administrators and managers only, and the API says the same."""
+        member = h.create_user(eq_org, email=f'{role}_val@test.com', role=role)
+
+        response = client.get(
+            '/api/v1/equipment/valuation', headers=h.get_auth_headers(member)
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_fleet_valuation_is_open_to_a_manager(
+        self, client: TestClient, h: ModuleTestHelper, eq_org: Organization
+    ) -> None:
+        manager = h.create_user(eq_org, email='manager_val@test.com', role='manager')
+
+        response = client.get(
+            '/api/v1/equipment/valuation', headers=h.get_auth_headers(manager)
+        )
+
+        assert response.status_code == status.HTTP_200_OK
 
     def test_fleet_valuation_requires_auth(self, client: TestClient) -> None:
         response = client.get('/api/v1/equipment/valuation')

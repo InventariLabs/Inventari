@@ -60,6 +60,7 @@ class CoreValuationAPI:
         currency: str | None = None,
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
+        extra_unit_cost: Decimal = Decimal('0'),
     ) -> None:
         """Record a receipt into the cost history.
 
@@ -83,6 +84,11 @@ class CoreValuationAPI:
         cost, and ``unit_cost`` is ignored: the price on a return line is
         what the customer paid, not what the goods are worth on the shelf.
         The mirror of the same argument on ``record_delivery_async``.
+
+        Pass ``extra_unit_cost`` for the line's per-unit share of freight, duty
+        and insurance. It is added to the cost the line has - the stated price,
+        or the organization's rate where nobody stated one - and never turns
+        an unpriced line into a stated one.
         """
         from app.services.valuation_service import ValuationService
 
@@ -96,6 +102,7 @@ class CoreValuationAPI:
             currency=currency,
             document_date=document_date,
             reverses_line_id=reverses_line_id,
+            extra_unit_cost=extra_unit_cost,
         )
 
     async def record_unpriced_receipt_async(

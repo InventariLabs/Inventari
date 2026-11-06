@@ -19,7 +19,7 @@ async def reserve_for_document_async(
     product_template_id: UUID,
     location_id: UUID | None,
     needed_qty: Decimal,
-    removal_strategy: str = 'FIFO',
+    removal_strategy: str | None = None,
     *,
     document_id: UUID,
     document_line_id: UUID | None = None,

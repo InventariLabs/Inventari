@@ -30,8 +30,8 @@ from ._meal_plan_async_schema import (
 )
 from ._meal_plan_helpers import (
     _MAX_PLAN_DAYS,
-    _get_effective_servings,
     _next_order_in_cell_async,
+    _plan_is_too_long,
     _validate_entry,
 )
 from ._meal_plan_shopping import generate_shopping_list_async  # noqa: F401
@@ -51,7 +51,6 @@ from .schemas import (
     MealPlanEntryUpdate,
     MealPlanSchema,
     MealPlanUpdate,
-    PickingStartResponse,
 )
 
 # ── CRUD ───────────────────────────────────────────────────────────────────────
@@ -66,7 +65,7 @@ async def create_meal_plan_async(
 ) -> MealPlanSchema:
     if data.end_date < data.start_date:
         raise ServiceRejectionError('meal_plan_end_before_start')
-    if (data.end_date - data.start_date).days > _MAX_PLAN_DAYS:
+    if _plan_is_too_long(data.start_date, data.end_date):
         raise ServiceRejectionError('meal_plan_too_long', days=_MAX_PLAN_DAYS)
     if not data.enabled_slots:
         raise ServiceRejectionError('meal_plan_no_slots')
@@ -234,7 +233,7 @@ async def update_meal_plan_async(
         new_end = data.end_date or plan.end_date
         if new_end < new_start:
             raise ServiceRejectionError('meal_plan_end_before_start')
-        if (new_end - new_start).days > _MAX_PLAN_DAYS:
+        if _plan_is_too_long(new_start, new_end):
             raise ServiceRejectionError('meal_plan_too_long', days=_MAX_PLAN_DAYS)
         conflict = await db.scalar(
             select(MealPlanEntry).where(
@@ -529,7 +528,7 @@ async def copy_plan_to_week_async(
 
     if data.end_date < data.start_date:
         raise ServiceRejectionError('meal_plan_end_before_start')
-    if (data.end_date - data.start_date).days > _MAX_PLAN_DAYS:
+    if _plan_is_too_long(data.start_date, data.end_date):
         raise ServiceRejectionError('meal_plan_too_long', days=_MAX_PLAN_DAYS)
     if data.start_date < datetime.now(UTC).date():
         raise ServiceRejectionError('meal_plan_start_in_past')
@@ -599,32 +598,3 @@ async def require_entry_of_recipe_async(
     )
     if found is None:
         raise NotFoundException('meal_plan_entry', get_current_lang())
-
-
-async def cook_entry_async(
-    db: AsyncSession,
-    plan_id: UUID,
-    entry_id: UUID,
-    org_id: UUID,
-    user_id: UUID,
-) -> PickingStartResponse:
-    from .picking_service import start_picking_session
-
-    plan = await _require_plan_async(db, plan_id, org_id)
-    entry = await db.scalar(
-        select(MealPlanEntry)
-        .where(MealPlanEntry.id == entry_id, MealPlanEntry.meal_plan_id == plan_id)
-        .options(joinedload(MealPlanEntry.recipe))
-    )
-    if entry is None:
-        raise NotFoundException('meal_plan_entry', get_current_lang())
-
-    effective_servings = _get_effective_servings(entry, plan)
-    return await start_picking_session(
-        db=db,
-        recipe_id=entry.recipe_id,
-        org_id=org_id,
-        user_id=user_id,
-        servings=effective_servings,
-        meal_plan_entry_id=entry.id,
-    )

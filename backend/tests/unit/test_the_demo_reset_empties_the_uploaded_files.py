@@ -20,8 +20,10 @@ Properties, tested apart because they fail apart:
   versions is emptied through the listing it does have — and a store that
   refuses does not stop the rebuild either.
 
-Everything runs against a temporary directory and an in-memory bucket; no step
-but the one under test reaches the database or the network.
+Everything runs against a temporary directory and an in-memory bucket; every
+other step of the reset, the one that caps the AI requests included, is
+replaced, so nothing here reaches the database or the network and the file
+passes on its own.
 """
 
 from __future__ import annotations
@@ -59,6 +61,12 @@ def _the_storage_service_keeps_no_state_between_tests():
     FileStorageService._instance, FileStorageService._provider = instance, provider
 
 
+def _the_ai_cap_needs_no_database(monkeypatch) -> None:
+    """Capping the AI requests opens the async engine on the worker database,
+    which this file never creates: run on its own, the reset would fail on it."""
+    monkeypatch.setattr(commands_demo, '_cap_the_ai_requests', lambda: 0)
+
+
 def _arrange_reset(monkeypatch, uploads: Path, order: list[str]) -> None:
     """Every step but the uploads one replaced by a note; the seed writes a file."""
     monkeypatch.setattr(commands_demo, 'guard_demo_instance', lambda: None)
@@ -74,6 +82,7 @@ def _arrange_reset(monkeypatch, uploads: Path, order: list[str]) -> None:
     monkeypatch.setattr(
         commands_demo, '_record_reset_time', lambda: order.append('record')
     )
+    _the_ai_cap_needs_no_database(monkeypatch)
     monkeypatch.setattr(settings, 'FILE_STORAGE_BACKEND', 'local')
     monkeypatch.setattr(settings, 'FILE_STORAGE_LOCAL_PATH', str(uploads))
 
@@ -263,6 +272,7 @@ def _arrange_reset_with_bucket(
     monkeypatch.setattr(
         commands_demo, '_record_reset_time', lambda: order.append('record')
     )
+    _the_ai_cap_needs_no_database(monkeypatch)
     _storage_goes_to_object_storage(monkeypatch)
     _point_storage_at(monkeypatch, bucket)
 

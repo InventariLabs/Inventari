@@ -1,6 +1,8 @@
 # Third-party licences
 
-Every component redistributed with Inventari, with the licence it ships under.
+The libraries, system packages, images and static assets listed below, with the
+licence each ships under. It does not claim to list everything a deployment
+receives (see *What this report does not cover*).
 Generated — do not edit by hand. Run it from a checkout that has both
 `backend/.venv` and `frontend/node_modules` installed:
 
@@ -19,10 +21,24 @@ is switched off to save runner minutes, so no CI run stands behind this file.
 The backend container has no `npm`, so inside it the command only works with
 `--skip-frontend` and the frontend section would come out empty.
 
-Scope is what a deployment actually receives: backend runtime packages
+Scope: backend runtime packages
 (dev-dependencies excluded), the frontend production bundle, the system
 packages inside the backend and backup images, the images the stack pulls,
 and the static assets the frontend serves.
+
+## What this report does not cover
+
+* The operating system layer of the `python` and `nginx` base images, and the
+  system packages the backend image installs beyond the ones listed in the
+  system-layer table. Their licences are the distribution's own; the image
+  carries them under `/usr/share/doc`.
+* The libraries compiled into the `psycopg2-binary` wheel (libpq, OpenSSL and
+  their dependencies), which have licences of their own beside the wheel's.
+* The eight recipe photographs under `backend/seed_assets`, used by the demo
+  only. They are CC0; `sources.json` beside them names the page, author and
+  licence of each.
+* The print agent in `print-agent/`, which is part of this repository and
+  carries its own `LICENSE`.
 
 ## Backend runtime (104 packages)
 
@@ -49,7 +65,7 @@ and the static assets the frontend serves.
 | `botocore` | 1.40.61 | Apache-2.0 |  |
 | `brotli` | 1.2.1 | MIT |  |
 | `certifi` | 2026.10.19 | MPL-2.0 |  |
-| `cffi` | 2.1.0 | MIT |  |
+| `cffi` | 2.1.0 | MIT-0 |  |
 | `charset-normalizer` | 3.4.9 | MIT |  |
 | `click` | 8.4.2 | BSD-3-Clause |  |
 | `cryptography` | 50.0.0 | Apache-2.0 OR BSD-3-Clause |  |

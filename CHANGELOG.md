@@ -595,8 +595,8 @@ lists every public surface and the promise its class makes.
   each day's carbohydrates, protein, fat and calories, meals dragged between
   days and cooked from stock with **Cook Now**, suggestions ranked by how much
   of the recipe is in stock, what expires within three days, what has not been
-  cooked lately and how quick it is, a copy of a plan to another stretch whose
-  last day falls at most 14 days after its first, and one shopping list for the
+  cooked lately and how quick it is, a copy of a plan to another stretch (a plan
+  covers at most 14 days, first and last included), and one shopping list for the
   whole plan that adds what the shelves do not cover (an ingredient with no
   product to check against is added in full) and leaves out what is always at
   home.

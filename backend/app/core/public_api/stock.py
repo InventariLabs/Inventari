@@ -559,7 +559,7 @@ class CoreStockAPI:
         product_template_id: UUID,
         location_id: UUID | None,
         needed_qty: Decimal,
-        removal_strategy: str = 'FIFO',
+        removal_strategy: str | None = None,
         *,
         document_id: UUID,
         document_line_id: UUID | None = None,
@@ -572,8 +572,9 @@ class CoreStockAPI:
         quantity and the reservation row that records them. Each grain drawn
         on gets that row for the document, naming the group, batch and owner
         it holds, so ``release_for_document_async`` releases this document's
-        holds and nobody else's. *lot_id* holds the batch the line names
-        alone; *require_active_lot* False lets that batch be held whatever
+        holds and nobody else's. *removal_strategy* left out follows the
+        product's own, the order the draw will take the stock in. *lot_id*
+        holds the batch the line names alone; *require_active_lot* False lets that batch be held whatever
         its status, for the door that takes a held batch out by name.
         """
         from app.services._stock_reservation import (

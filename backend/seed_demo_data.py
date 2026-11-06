@@ -1173,7 +1173,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Dell Latitude 5540',
         'Dell',
-        '5397184123456',
+        '2000000010014',
         'laptop',
         UOM_PIECE,
         Decimal('4200.00'),
@@ -1182,7 +1182,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'ThinkPad T14s Gen 4',
         'Lenovo',
-        '0196881123456',
+        '2000000010021',
         'laptop',
         UOM_PIECE,
         Decimal('5800.00'),
@@ -1191,7 +1191,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'MacBook Pro 14 M3',
         'Apple',
-        '0194252123456',
+        '2000000010038',
         'laptop',
         UOM_PIECE,
         Decimal('9500.00'),
@@ -1200,7 +1200,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'HP EliteBook 840 G10',
         'HP',
-        '0196882123456',
+        '2000000010045',
         'laptop',
         UOM_PIECE,
         Decimal('4600.00'),
@@ -1209,7 +1209,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Dell OptiPlex 7010',
         'Dell',
-        '5397184234567',
+        '2000000010052',
         'desktop',
         UOM_PIECE,
         Decimal('3200.00'),
@@ -1218,7 +1218,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'HP ProDesk 400 G9',
         'HP',
-        '0196883234567',
+        '2000000010069',
         'desktop',
         UOM_PIECE,
         Decimal('2800.00'),
@@ -1227,7 +1227,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Lenovo ThinkCentre M90q',
         'Lenovo',
-        '0196884234567',
+        '2000000010076',
         'desktop',
         UOM_PIECE,
         Decimal('3600.00'),
@@ -1236,7 +1236,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Dell UltraSharp U2723QE',
         'Dell',
-        '5397184345678',
+        '2000000010083',
         'monitor',
         UOM_PIECE,
         Decimal('2100.00'),
@@ -1245,7 +1245,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'LG 27UK850-W',
         'LG',
-        '8806097345678',
+        '2000000010090',
         'monitor',
         UOM_PIECE,
         Decimal('1600.00'),
@@ -1254,7 +1254,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Samsung Odyssey G5',
         'Samsung',
-        '8806098345678',
+        '2000000010106',
         'monitor',
         UOM_PIECE,
         Decimal('1400.00'),
@@ -1263,7 +1263,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'iPhone 15 Pro',
         'Apple',
-        '0194253456789',
+        '2000000010113',
         'phone',
         UOM_PIECE,
         Decimal('5200.00'),
@@ -1272,7 +1272,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Samsung Galaxy S24',
         'Samsung',
-        '8806099456789',
+        '2000000010120',
         'phone',
         UOM_PIECE,
         Decimal('3800.00'),
@@ -1281,7 +1281,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'iPad Air M2',
         'Apple',
-        '0194254456789',
+        '2000000010137',
         'phone',
         UOM_PIECE,
         Decimal('3400.00'),
@@ -1290,7 +1290,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Cisco Catalyst 9200L',
         'Cisco',
-        '0882658567890',
+        '2000000010144',
         'network_device',
         UOM_PIECE,
         Decimal('8500.00'),
@@ -1299,7 +1299,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Ubiquiti UniFi USW-Pro-48',
         'Ubiquiti',
-        '8100014567890',
+        '2000000010151',
         'network_device',
         UOM_PIECE,
         Decimal('3200.00'),
@@ -1308,7 +1308,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'TP-Link TL-SG3428',
         'TP-Link',
-        '6935364567890',
+        '2000000010168',
         'network_device',
         UOM_PIECE,
         Decimal('950.00'),
@@ -1317,7 +1317,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Cisco Meraki MR46',
         'Cisco',
-        '0882659567890',
+        '2000000010175',
         'network_device',
         UOM_PIECE,
         Decimal('2800.00'),
@@ -1326,7 +1326,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Logitech MX Keys S',
         'Logitech',
-        '0978551678901',
+        '2000000010182',
         'peripheral',
         UOM_PIECE,
         Decimal('450.00'),
@@ -1335,7 +1335,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Logitech MX Master 3S',
         'Logitech',
-        '0978552678901',
+        '2000000010199',
         'peripheral',
         UOM_PIECE,
         Decimal('400.00'),
@@ -1344,7 +1344,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Logitech C920 HD Pro',
         'Logitech',
-        '0978553678901',
+        '2000000010205',
         'peripheral',
         UOM_PIECE,
         Decimal('350.00'),
@@ -1353,7 +1353,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Jabra Evolve2 65',
         'Jabra',
-        '5707054678901',
+        '2000000010212',
         'peripheral',
         UOM_PIECE,
         Decimal('650.00'),
@@ -1362,7 +1362,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Dell PowerEdge R750',
         'Dell',
-        '5397185678901',
+        '2000000010229',
         'server',
         UOM_PIECE,
         Decimal('28000.00'),
@@ -1371,7 +1371,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'HPE ProLiant DL380 Gen10',
         'HPE',
-        '8881825678901',
+        '2000000010236',
         'server',
         UOM_PIECE,
         Decimal('32000.00'),
@@ -1380,7 +1380,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Supermicro SYS-1029U',
         'Supermicro',
-        '1234565678901',
+        '2000000010243',
         'server',
         UOM_PIECE,
         Decimal('18000.00'),
@@ -1389,7 +1389,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'APC Smart-UPS 3000VA',
         'APC',
-        '0731303678901',
+        '2000000010250',
         'other_equipment',
         UOM_PIECE,
         Decimal('4200.00'),
@@ -1398,7 +1398,7 @@ EQUIPMENT_TEMPLATES = [
     (
         'Rack 42U Open Frame',
         'Rittal',
-        '4017304678901',
+        '2000000010267',
         'other_equipment',
         UOM_PIECE,
         Decimal('2800.00'),

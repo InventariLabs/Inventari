@@ -6444,23 +6444,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/recipes/meal-plans/{plan_id}/entries/{entry_id}/cook": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Cook Plan Entry */
-        post: operations["cook_plan_entry_api_v1_recipes_meal_plans__plan_id__entries__entry_id__cook_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/recipes/meal-plans/{plan_id}/generate-shopping-list": {
         parameters: {
             query?: never;
@@ -40782,38 +40765,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    cook_plan_entry_api_v1_recipes_meal_plans__plan_id__entries__entry_id__cook_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                plan_id: string;
-                entry_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PickingStartResponse"];
-                };
             };
             /** @description Validation Error */
             422: {
