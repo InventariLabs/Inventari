@@ -24,6 +24,26 @@ const LOCATION_WORD: Record<string, RegExp> = {
 const WAREHOUSE_WORD =
   /\b(Lager|entrepôts?|almacenes|warehouses?|magazyn\w*|armazéns?)\b/i;
 
+// Statistics and label printing are on in every organisation too
+// (`ALWAYS_ON_MODULES` in the backend); a footer that listed only three
+// modules promised the reader could switch the other two off.
+const STATS_WORD: Record<string, RegExp> = {
+  en: /statistics/i,
+  de: /Statistiken/,
+  fr: /statistiques/i,
+  es: /estadísticas/i,
+  pl: /statystyki/i,
+  pt: /estatísticas/i,
+};
+const PRINTING_WORD: Record<string, RegExp> = {
+  en: /label printing/i,
+  de: /Etikettendruck/,
+  fr: /impression d'étiquettes/i,
+  es: /impresión de etiquetas/i,
+  pl: /druk etykiet/i,
+  pt: /impressão de etiquetas/i,
+};
+
 const FOOTERS = { en, de, fr, es, pl, pt };
 
 describe("onboarding module step footer", () => {
@@ -32,6 +52,12 @@ describe("onboarding module step footer", () => {
       const footer = catalogue.moduleChoiceFooter;
       expect(footer).toMatch(LOCATION_WORD[language]);
       expect(footer).not.toMatch(WAREHOUSE_WORD);
+    });
+
+    it(`${language}: also names statistics and label printing`, () => {
+      const footer = catalogue.moduleChoiceFooter;
+      expect(footer).toMatch(STATS_WORD[language]);
+      expect(footer).toMatch(PRINTING_WORD[language]);
     });
   }
 });

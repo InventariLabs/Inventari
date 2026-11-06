@@ -43,7 +43,7 @@
     "diffConfig": "Reset settings for",
     "confirmTitle": "Switch to {{name}}?",
     "confirmMessage": "Modules will be enabled and disabled for your organization. You can switch back at any time.",
-    "confirmApply": "Switch profile",
+    "confirmApply": "Switch workspace mode",
     "confirmReapplyTitle": "Run {{name}} setup again?",
     "confirmReapplyMessage": "No modules are added or removed. The workspace mode's setup runs again: its default settings are reset to the mode's values, and the names it seeded — location types included — are rewritten in the language of this session.",
     "confirmReapply": "Run setup again",

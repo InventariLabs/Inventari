@@ -43,7 +43,7 @@
     "diffConfig": "Einstellungen zurücksetzen für",
     "confirmTitle": "Zu {{name}} wechseln?",
     "confirmMessage": "Module werden für Ihre Organisation aktiviert und deaktiviert. Sie können jederzeit zurückwechseln.",
-    "confirmApply": "Profil wechseln",
+    "confirmApply": "Arbeitsbereich wechseln",
     "confirmReapplyTitle": "Einrichtung von {{name}} erneut ausführen?",
     "confirmReapplyMessage": "Es werden keine Module hinzugefügt oder entfernt. Die Einrichtung des Profils läuft erneut: Seine Standardeinstellungen kehren zu den Profilwerten zurück, und die vom Profil gesäten Namen — einschließlich der Lagerorttypen — werden in der Sprache dieser Sitzung geschrieben.",
     "confirmReapply": "Einrichtung erneut ausführen",

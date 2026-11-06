@@ -43,7 +43,7 @@
     "diffConfig": "Redefinir configurações de",
     "confirmTitle": "Mudar para {{name}}?",
     "confirmMessage": "Módulos serão ativados e desativados para a sua organização. Você pode voltar atrás a qualquer momento.",
-    "confirmApply": "Mudar de perfil",
+    "confirmApply": "Mudar de modo de trabalho",
     "confirmReapplyTitle": "Executar a configuração de {{name}} de novo?",
     "confirmReapplyMessage": "Nenhum módulo é adicionado ou removido. A configuração do modo de trabalho é executada novamente: as configurações padrão voltam aos valores do modo, e os nomes que ela criou — inclusive os tipos de local — são reescritos no idioma desta sessão.",
     "confirmReapply": "Executar configuração de novo",

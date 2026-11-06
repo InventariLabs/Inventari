@@ -43,7 +43,7 @@
     "diffConfig": "Restablecer ajustes para",
     "confirmTitle": "¿Cambiar a {{name}}?",
     "confirmMessage": "Se activarán y desactivarán módulos para su organización. Puede volver atrás en cualquier momento.",
-    "confirmApply": "Cambiar perfil",
+    "confirmApply": "Cambiar modo de espacio de trabajo",
     "confirmReapplyTitle": "¿Volver a ejecutar la configuración de {{name}}?",
     "confirmReapplyMessage": "No se añade ni se quita ningún módulo. La configuración del perfil se ejecuta de nuevo: sus ajustes predeterminados vuelven a los valores del perfil, y los nombres que sembró — incluidos los tipos de ubicación — se reescriben en el idioma de esta sesión.",
     "confirmReapply": "Volver a ejecutar la configuración",

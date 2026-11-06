@@ -45,7 +45,7 @@
     "diffConfig": "Resetuj ustawienia dla",
     "confirmTitle": "Przełączyć na {{name}}?",
     "confirmMessage": "Moduły zostaną włączone i wyłączone dla Twojej organizacji. Możesz wrócić w każdej chwili.",
-    "confirmApply": "Przełącz profil",
+    "confirmApply": "Przełącz tryb pracy",
     "confirmReapplyTitle": "Ponowić konfigurację {{name}}?",
     "confirmReapplyMessage": "Żaden moduł nie zostanie dodany ani usunięty. Konfiguracja profilu wykona się ponownie: jego ustawienia domyślne wrócą do wartości profilu, a zasiane przez niego nazwy — typy miejsc włącznie — zostaną zapisane w języku tej sesji.",
     "confirmReapply": "Wykonaj ponownie",

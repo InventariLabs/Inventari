@@ -263,7 +263,7 @@ describe("WorkspaceModeSettings", () => {
     expect(dialog).toHaveTextContent("Storage Locations");
 
     await userEvent.click(
-      screen.getByRole("button", { name: /switch profile/i }),
+      screen.getByRole("button", { name: /switch workspace mode/i }),
     );
     await waitFor(() => {
       expect(calls).toContainEqual({
@@ -299,7 +299,7 @@ describe("WorkspaceModeSettings", () => {
     await userEvent.click(applyBtn);
 
     await userEvent.click(
-      await screen.findByRole("button", { name: /switch profile/i }),
+      await screen.findByRole("button", { name: /switch workspace mode/i }),
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
