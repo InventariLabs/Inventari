@@ -571,25 +571,16 @@ export default function DocumentFormModal({
       return;
     }
 
-    createMutation.mutate(
-      { data: toCreatePayload() },
-      {
-        onSuccess: (created) => {
-          rememberLastUsedLocations(
-            docType,
-            sourceLocationId,
-            targetLocationId,
-          );
-          toast.success(t("toast.created"));
-          if (onCreated && created) {
-            onCreated(created);
-            return;
-          }
-          onClose();
-        },
-        onError: handleApiError,
+    const create = { data: toCreatePayload() };
+    createMutation.mutate(create, {
+      onSuccess: (created) => {
+        rememberLastUsedLocations(docType, sourceLocationId, targetLocationId);
+        toast.success(t("toast.created"));
+        if (onCreated && created) onCreated(created);
+        else onClose();
       },
-    );
+      onError: handleApiError,
+    });
   };
 
   const handleSubmit = (event: React.FormEvent) => {
