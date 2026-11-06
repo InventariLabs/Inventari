@@ -22,10 +22,10 @@ export function StorageLabelActions({
       <Button
         variant="secondary"
         onClick={onDownload}
-        aria-label={t("actions.preview")}
+        aria-label={t("actions.downloadOne")}
         leftIcon={<QrCode size={18} />}
       >
-        <span className="hidden sm:inline">{t("actions.preview")}</span>
+        <span className="hidden sm:inline">{t("actions.downloadOne")}</span>
       </Button>
       {storage.short_code && (
         <SendToPrinterButton

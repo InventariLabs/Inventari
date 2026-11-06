@@ -306,8 +306,8 @@
     "description": "„{{name}}” jest zarchiwizowane i nie trafia na aktywną listę. Otwórz je tutaj albo przywróć z archiwum."
   },
   "usage": {
-    "customer": "Klient",
-    "inventory": "Korekta inwentaryzacji",
+    "customer": "Zużyte",
+    "inventory": "Straty",
     "production": "Produkcja",
     "virtualNotice": "Miejsce systemowe — jego zawartość nie liczy się do stanów magazynowych."
   },

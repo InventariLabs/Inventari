@@ -317,8 +317,8 @@
     "description": "“{{name}}” está arquivado e fica fora da lista ativa. Abra-o aqui ou restaure-o a partir do arquivo."
   },
   "usage": {
-    "customer": "Cliente",
-    "inventory": "Ajuste de estoque",
+    "customer": "Consumido",
+    "inventory": "Perda",
     "production": "Produção",
     "virtualNotice": "Local do sistema — seu conteúdo não conta nos níveis de estoque."
   },

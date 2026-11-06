@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
 import i18n from "@/i18n/config";
@@ -11,6 +11,12 @@ import {
   DashboardRecentMoves,
   RECENT_MOVES_LIMIT,
 } from "./DashboardRecentMoves";
+
+let enabledModules: string[] = ["warehouse"];
+vi.mock("@/contexts/ModulesContext", async () => {
+  const actual = await vi.importActual("@/contexts/ModulesContext");
+  return { ...actual, useEnabledModulesOptional: () => enabledModules };
+});
 
 function move(overrides: Partial<StockMoveRow>): StockMoveRow {
   return {
@@ -51,6 +57,7 @@ describe("DashboardRecentMoves", () => {
   let requestedExclusion: string | null = null;
 
   beforeEach(() => {
+    enabledModules = ["warehouse"];
     requestedLimit = null;
     requestedExclusion = null;
     server.use(
@@ -286,6 +293,18 @@ describe("DashboardRecentMoves", () => {
     expect(
       links.some((l) => l.getAttribute("href") === "/inventory/moves"),
     ).toBe(true);
+  });
+
+  it("offers no link to a journal the organization does not have", async () => {
+    // The moves screen is hidden where no module reads the ledger; the link
+    // would lead to a page the navigation does not list.
+    enabledModules = ["core", "items"];
+    render(<DashboardRecentMoves />, { wrapper });
+    await screen.findByText("Flour");
+    const links = screen.queryAllByRole("link");
+    expect(
+      links.some((l) => l.getAttribute("href") === "/inventory/moves"),
+    ).toBe(false);
   });
 
   it("points an empty ledger at the stock screen", async () => {
