@@ -710,6 +710,12 @@
       "document": "Document",
       "corrects": "corrects {{number}}",
       "secretChanged": "a new value (hidden)",
+      "fieldDefinitions": {
+        "added": "Added field {{field}}",
+        "removed": "Removed field {{field}}",
+        "changed": "Changed field {{field}}",
+        "required": "required"
+      },
       "builtInModules": {
         "core": "Basics",
         "locations": "Locations",

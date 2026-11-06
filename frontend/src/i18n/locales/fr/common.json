@@ -710,6 +710,12 @@
       "document": "Document",
       "corrects": "corrige {{number}}",
       "secretChanged": "une nouvelle valeur (masquée)",
+      "fieldDefinitions": {
+        "added": "Champ {{field}} ajouté",
+        "removed": "Champ {{field}} supprimé",
+        "changed": "Champ {{field}} modifié",
+        "required": "obligatoire"
+      },
       "builtInModules": {
         "core": "Essentiels",
         "locations": "Emplacements",

@@ -710,6 +710,12 @@
       "document": "Dokument",
       "corrects": "korrigiert {{number}}",
       "secretChanged": "ein neuer Wert (verborgen)",
+      "fieldDefinitions": {
+        "added": "Feld {{field}} hinzugefügt",
+        "removed": "Feld {{field}} entfernt",
+        "changed": "Feld {{field}} geändert",
+        "required": "Pflichtfeld"
+      },
       "builtInModules": {
         "core": "Grundlagen",
         "locations": "Lagerorte",

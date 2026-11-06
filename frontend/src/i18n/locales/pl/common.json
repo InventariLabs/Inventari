@@ -712,6 +712,12 @@
       "document": "Dokument",
       "corrects": "koryguje {{number}}",
       "secretChanged": "nowa wartość (ukryta)",
+      "fieldDefinitions": {
+        "added": "Dodano pole {{field}}",
+        "removed": "Usunięto pole {{field}}",
+        "changed": "Zmieniono pole {{field}}",
+        "required": "wymagane"
+      },
       "builtInModules": {
         "core": "Podstawy",
         "locations": "Miejsca",
