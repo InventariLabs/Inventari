@@ -759,7 +759,6 @@ ignore_names = [
     # through the tracking JSON (app/cli/commands_module.py) — dict keys,
     # invisible to both vulture's attribute scan and a whitelist pin.
     "installed_at",
-    "inventari_min_version",
     "previous_version",
     "upgraded_at",
     "on_enable",

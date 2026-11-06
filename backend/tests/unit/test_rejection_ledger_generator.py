@@ -12,6 +12,7 @@ rewrite is idempotent, the prose survives it, and the command can say which
 debt it took on and which it retired.
 """
 
+import ast
 from pathlib import Path
 
 from app.core.architecture_lint._quality_checks_rejections import (
@@ -19,6 +20,8 @@ from app.core.architecture_lint._quality_checks_rejections import (
     counts_by_group,
     keyed_dynamic_value_error_entries,
     ledger_entries,
+    raw_value_error_sentence_entries,
+    refusal_class_names,
     rejection_group_for_entry,
     write_rejection_ledger,
 )
@@ -72,9 +75,9 @@ class TestTheLedgerRewriteIsIdempotent:
     ) -> None:
         """A total can stay put while one site is paid off and another written.
 
-        The fixture lives under ``app/cli/`` — boot-cli sentences are the one
-        class a regeneration may still take on; a client-facing one is
-        refused outright (see the refusal tests below).
+        The fixture lives under ``app/cli/``, a path no client group claims:
+        a regeneration may still take on a sentence there; a client-facing
+        one is refused outright (see the refusal tests below).
         """
         app_root = _app_tree(
             tmp_path, "raise ValueError('the old sentence')\n", subdir='cli'
@@ -124,15 +127,7 @@ class TestThePathRuleYieldsToThePerEntryOverride:
             == 'client-422'
         )
 
-    def test_the_registry_and_the_bind_guard_are_not_filed_as_validators(
-        self,
-    ) -> None:
-        assert (
-            rejection_group_for_entry(
-                'app/core/contracts/events/_registry.py::Payload for '
-            )
-            == 'boot-cli'
-        )
+    def test_the_bind_guard_is_not_filed_as_a_validator(self) -> None:
         assert (
             rejection_group_for_entry(
                 'app/models/item.py::expected a finite number, got '
@@ -233,26 +228,35 @@ class TestTheGeneratorRefusesNewClientFacingDebt:
         rewrite = write_rejection_ledger(app_root, ledger)
 
         # The cli copy was already ledgered; the modules copy of the SAME
-        # sentence is new and client-facing — refused, boot-cli or not.
+        # sentence is new and client-facing — refused, wherever the old one sat.
         assert rewrite.refused == [
             'app/modules/thing_service.py::a brand new client sentence'
         ]
 
-    def test_boot_cli_additions_are_still_admitted(self, tmp_path: Path) -> None:
-        """No client reads a boot refusal; the ledger may take that debt."""
+    def test_a_boot_or_cli_sentence_is_not_ledger_debt_when_it_is_an_operator_error(
+        self, tmp_path: Path
+    ) -> None:
+        """No client reads a boot refusal: ``OperatorError`` keeps it out of
+        the ledger, while a plain ``ValueError`` at the same place is still
+        seen by the scan the gate runs."""
         app_root = _app_tree(
             tmp_path,
-            "raise ValueError('manifest lacks a name')\n",
+            "raise OperatorError('manifest lacks a name')\n",
             subdir='cli',
         )
-        ledger = tmp_path / 'ledger.txt'
-        rewrite = write_rejection_ledger(app_root, ledger)
+        assert raw_value_error_sentence_entries(app_root) == set()
 
-        assert rewrite.refused == []
-        assert rewrite.added == ['app/cli/thing_service.py::manifest lacks a name']
-        assert ledger_entries(ledger) == {
+        (app_root / 'cli' / 'thing_service.py').write_text(
+            "raise ValueError('manifest lacks a name')\n", encoding='utf-8'
+        )
+        assert raw_value_error_sentence_entries(app_root) == {
             'app/cli/thing_service.py::manifest lacks a name'
         }
+
+    def test_operator_error_is_outside_the_refusal_family(self) -> None:
+        trees = [('x.py', ast.parse('class OperatorError(ValueError): pass'))]
+
+        assert 'OperatorError' not in refusal_class_names(trees)
 
 
 class TestKeyedDynamicRaisesAreVisibleToTheClassification:

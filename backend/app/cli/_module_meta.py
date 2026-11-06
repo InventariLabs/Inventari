@@ -18,6 +18,7 @@ from app.core.module_tracking import (
     TRACKING_FILE,
     ModuleTrackingEntry,
 )
+from app.core.operator_error import OperatorError
 
 logger = get_logger(__name__)
 
@@ -174,30 +175,30 @@ def _parse_module_yaml(source_dir: Path) -> ModuleYaml:
     """Parse and validate module.yaml from *source_dir*. Raises ValueError on invalid content."""
     yaml_path = source_dir / 'module.yaml'
     if not yaml_path.exists():
-        raise ValueError(f'module.yaml not found in {source_dir}')
+        raise OperatorError(f'module.yaml not found in {source_dir}')
 
     try:
         raw = yaml.safe_load(yaml_path.read_text(encoding='utf-8'))
     except yaml.YAMLError as exc:
-        raise ValueError(f'module.yaml is not valid YAML: {exc}') from exc
+        raise OperatorError(f'module.yaml is not valid YAML: {exc}') from exc
 
     if not isinstance(raw, dict):
-        raise ValueError('module.yaml must be a YAML mapping.')
+        raise OperatorError('module.yaml must be a YAML mapping.')
 
     name = raw.get('name', '')
     version = raw.get('version', '')
 
     if not isinstance(name, str) or not _VALID_NAME_RE.match(name):
-        raise ValueError(
+        raise OperatorError(
             f"module.yaml 'name' must match ^[a-z][a-z0-9_]*$, got: {name!r}"
         )
 
     if not isinstance(version, str) or not version:
-        raise ValueError("module.yaml 'version' must be a non-empty string.")
+        raise OperatorError("module.yaml 'version' must be a non-empty string.")
 
     components = raw.get('components', {})
     if not isinstance(components, dict):
-        raise ValueError("module.yaml 'components' must be a mapping.")
+        raise OperatorError("module.yaml 'components' must be a mapping.")
 
     return ModuleYaml(
         name=name,

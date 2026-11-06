@@ -18,6 +18,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.logging import get_logger
+from app.core.operator_error import OperatorError
 from app.core.product_profiles import DEFAULT_PROFILE_ID
 
 logger = get_logger(__name__)
@@ -42,7 +43,7 @@ def _get_seeder(profile: str):
     """Resolve profile name to seed function."""
     dotted = _PROFILE_MAP.get(profile)
     if dotted is None:
-        raise ValueError(
+        raise OperatorError(
             f"Unknown seed profile '{profile}'. Available: {', '.join(_PROFILE_MAP)}"
         )
     module_path, func_name = dotted.rsplit('.', 1)

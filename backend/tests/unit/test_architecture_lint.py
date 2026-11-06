@@ -1,3 +1,6 @@
+import ast
+from pathlib import Path
+
 import pytest
 
 from app.core.architecture_lint import (
@@ -7,8 +10,13 @@ from app.core.architecture_lint import (
     find_api_layer_import_violations,
     find_module_boundary_violations,
 )
+from app.core.architecture_lint import _main as lint_main
 from app.core.architecture_lint._constants import _rel
-from app.core.architecture_lint._main import summarize_baselined_notices
+from app.core.architecture_lint._main import (
+    _BASELINED_SUMMARY,
+    _emit_baselined,
+    _print_baselined_counts,
+)
 from app.core.architecture_lint._quality_checks import (
     _check_coreapi_async_naming,
     _check_coreapi_signature_legality,
@@ -44,6 +52,36 @@ def test_architecture_lint_reports_forbidden_imports(tmp_path):
     assert 'app.models.item' in import_paths
     assert 'app.database' in import_paths
     assert escape_hatch_files == []
+
+
+def test_a_migration_env_is_neither_a_violation_nor_an_l2_bypass(tmp_path):
+    """``migrations/env.py`` imports the metadata for Alembic and nothing
+    else: it needs no marker, and must not be counted as a read bypass."""
+    modules_root = tmp_path / 'modules'
+    (modules_root / 'widgets' / 'migrations').mkdir(parents=True)
+    (modules_root / 'widgets' / 'migrations' / 'env.py').write_text(
+        'from app.database import Base\n', encoding='utf-8'
+    )
+
+    violations, escape_hatch_files = find_module_boundary_violations(
+        modules_root, baseline_file=None
+    )
+
+    assert violations == []
+    assert escape_hatch_files == []
+
+
+def test_a_migration_version_file_is_still_scanned(tmp_path):
+    modules_root = tmp_path / 'modules'
+    versions = modules_root / 'widgets' / 'migrations' / 'versions'
+    versions.mkdir(parents=True)
+    (versions / '0001_init.py').write_text(
+        'from app.models.item import Item\n', encoding='utf-8'
+    )
+
+    violations, _ = find_module_boundary_violations(modules_root, baseline_file=None)
+
+    assert [v.import_path for v in violations] == ['app.models.item']
 
 
 def test_architecture_lint_ignores_allowed_imports(tmp_path):
@@ -1812,61 +1850,78 @@ class TestTestSkipRegistry:
 
 
 # ---------------------------------------------------------------------------
-# --quiet baseline-notice summarization (summarize_baselined_notices)
+# --quiet baseline summary (_print_baselined_counts)
 # ---------------------------------------------------------------------------
 
 
-class TestQuietBaselineSummarization:
-    """In --quiet mode, baselined per-file ::notice lines collapse to one
-    summary line per category, so accepted debt stops drowning real signal.
+class TestQuietBaselineSummary:
+    """Under ``--quiet`` accepted debt is counted once, in the closing summary.
 
-    Baselined notices are *accepted* debt (documented in a baseline file with
-    a reason). Printing 8 of them line-by-line every run trains reviewers to
-    ignore all notices. The summary preserves discoverability (count + reason
-    pointer to the baseline file) without the noise.
+    Baselined notices are *accepted* debt, documented in a baseline file.
+    Printing them line by line, and again in the closing summary under another
+    label, trained reviewers to skim both; and a category missing from the
+    closing summary was reported nowhere in the run's last lines.
     """
 
-    def test_quiet_collapses_per_file_notices_to_summary(self):
-        """Multiple per-file ::notice collapse to a single summary line."""
-        notices = [
-            '::notice file=app/a.py,title=Architecture: sync/async twin::foo() twin of bar()',
-            '::notice file=app/b.py,title=Architecture: sync/async twin::baz() twin of qux()',
+    NOTICE = '::notice file=app/a.py,title=Architecture: sync/async twin::foo()'
+
+    def test_quiet_holds_back_the_per_file_notices(self, capsys):
+        errors, notices = _emit_baselined([self.NOTICE], quiet=True)
+
+        assert capsys.readouterr().out == ''
+        assert errors == []
+        assert notices == [self.NOTICE]
+
+    def test_verbose_prints_per_file_notices_for_annotations(self, capsys):
+        _emit_baselined([self.NOTICE, '::error title=X::boom'], quiet=False)
+
+        assert capsys.readouterr().out.splitlines() == [
+            '::error title=X::boom',
+            self.NOTICE,
         ]
-        out = summarize_baselined_notices(
-            notices, category='sync/async twin', quiet=True
-        )
-        # Exactly one summary line — no per-file ::notice file= leakage.
-        assert len(out) == 1
-        assert '2 baselined' in out[0]
-        assert 'sync/async twin' in out[0]
-        # Reason pointer tells reviewers WHERE to look (baseline file).
-        assert 'baseline' in out[0].lower()
 
-    def test_verbose_mode_emits_per_file_notices_unchanged(self):
-        """Without --quiet (GitHub PR mode) per-file notices stay intact."""
-        notices = [
-            '::notice file=app/a.py,title=Architecture: sync/async twin::foo() twin of bar()',
+    def test_each_count_is_printed_once_with_its_baseline_file(self, capsys):
+        _print_baselined_counts({'twin': [self.NOTICE] * 3, 'toctou': []})
+
+        lines = capsys.readouterr().out.splitlines()
+        assert lines == [
+            '  (3 baselined sync/async twin(s) — app/core/sync_async_twin_baseline.txt)'
         ]
-        out = summarize_baselined_notices(
-            notices, category='sync/async twin', quiet=False
-        )
-        assert out == notices
 
-    def test_empty_notices_produce_nothing(self):
-        """No baselined notices -> no output (no empty summary line)."""
-        assert summarize_baselined_notices([], category='x', quiet=True) == []
-        assert summarize_baselined_notices([], category='x', quiet=False) == []
+    def test_no_summary_line_is_a_workflow_command(self, capsys):
+        _print_baselined_counts({key: [self.NOTICE] for key in _BASELINED_SUMMARY})
 
-    def test_summary_includes_baseline_filename_pointer(self):
-        """Summary points reviewers at the baseline file for the 'why'."""
-        notices = ['::notice file=app/a.py,title=X::msg']
-        out = summarize_baselined_notices(
-            notices,
-            category='sync/async twin',
-            quiet=True,
-            baseline_file='app/core/sync_async_twin_baseline.txt',
-        )
-        assert 'sync_async_twin_baseline.txt' in out[0]
+        out = capsys.readouterr().out.splitlines()
+        assert len(out) == len(_BASELINED_SUMMARY)
+        assert not any(line.lstrip().startswith('::') for line in out)
+
+    def test_every_category_main_records_has_a_summary_entry(self):
+        """A new ``baselined['x']`` assignment without a label is a gate that
+        reports its debt nowhere."""
+        tree = ast.parse(Path(lint_main.__file__).read_text(encoding='utf-8'))
+        recorded = {
+            node.slice.value
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Subscript)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == 'baselined'
+            and isinstance(node.ctx, ast.Store)
+            and isinstance(node.slice, ast.Constant)
+        }
+
+        assert recorded - set(_BASELINED_SUMMARY) == set()
+        assert set(_BASELINED_SUMMARY) - recorded == set()
+
+    def test_every_pointer_names_a_file_that_exists(self):
+        backend = Path(__file__).resolve().parents[2]
+
+        missing = [
+            baseline_file
+            for _, baseline_file in _BASELINED_SUMMARY.values()
+            if baseline_file and not (backend / baseline_file).is_file()
+        ]
+
+        assert missing == []
 
 
 class TestServicesEscapeHatchMarker:

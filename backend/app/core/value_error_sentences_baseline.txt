@@ -18,8 +18,14 @@
 # Group 1 is empty: every refusal a request can reach through the 400 handler
 # is keyed, and a client reads its machine code (the upper-cased key) in
 # `detail.code`. What is left below is filed with the reason it is not a 400
-# refusal: a Pydantic validator (422), a boot or CLI error, or an internal
-# invariant.
+# refusal: a Pydantic validator (422), a core guard, or an internal invariant.
+#
+# A sentence raised while the process boots, a manage.py command runs or a
+# manifest or seed profile is validated is not debt of this ledger at all:
+# nothing in a request reaches it, so it raises OperatorError
+# (app/core/operator_error.py), a ValueError for the callers that catch one and
+# not reader-facing at runtime. A new plain ValueError sentence in app/cli/,
+# app/config.py or the manifest code is flagged by the gate like any other.
 #
 # Groups are assigned per REACHABLE MECHANISM, not per directory — a
 # sentence in app/core/contracts reaches a client through the 422 validator
@@ -35,15 +41,13 @@
 # 3. client-guards — core guards that fire during requests (imports,
 #    uploads, SSRF checks, settings saves) and can reach the 400 envelope
 #    the same way group 1 does; they head for the same keyed migration.
-# 4. boot-cli — raised while the process boots, a manage.py command runs or
-#    a manifest/seed profile is validated; no client reads the toast.
-# 5. internal-invariant — a guard on a caller's mistake or on a model's
+# 4. internal-invariant — a guard on a caller's mistake or on a model's
 #    malformed answer; no request supplies the value. Plain on purpose: the
 #    400 handler logs a plain ValueError with its traceback. Assigned per
 #    entry in REJECTION_GROUP_OVERRIDES, never by path.
 #
-# The leaning is per path, not proven per site — in every group, not only
-# boot-cli: re-check an entry against the client groups whenever its file
+# The leaning is per path, not proven per site — in every group:
+# re-check an entry against the client groups whenever its file
 # changes for a client-facing reason. The known per-place exceptions are
 # recorded as entry overrides in REJECTION_GROUP_OVERRIDES (the generator,
 # app/core/architecture_lint/_quality_checks_rejections.py), which are
@@ -60,63 +64,8 @@
 #
 # The counts line below the marker is generated from the entries.
 # BEGIN COUNTS (generated — do not edit by hand)
-# Counts by reachability group: client-400 0, client-422 25, client-guards 1, boot-cli 57, internal-invariant 0, unclassified 0, keyed-dynamic 0.
+# Counts by reachability group: client-400 0, client-422 25, client-guards 1, internal-invariant 0, unclassified 0, keyed-dynamic 0.
 # END COUNTS (generated)
-app/cli/_module_meta.py::module.yaml 'components' must be a mapping.
-app/cli/_module_meta.py::module.yaml 'name' must match ^[a-z][a-z0-9_]*$, got: 
-app/cli/_module_meta.py::module.yaml 'version' must be a non-empty string.
-app/cli/_module_meta.py::module.yaml is not valid YAML: 
-app/cli/_module_meta.py::module.yaml must be a YAML mapping.
-app/cli/_module_meta.py::module.yaml not found in 
-app/cli/_module_signing.py::) — bytecode and native binaries cannot be signed or shipped
-app/cli/_module_signing.py::) — symlinks cannot be signed or shipped
-app/cli/_module_signing.py::package contains a symlink (
-app/cli/_module_signing.py::package contains executable code the safety scanner cannot read (
-app/cli/module_packaging.py:: may not start with "-": 
-app/cli/module_packaging.py:: not found in 
-app/cli/module_packaging.py::. Check what the remote offers: git ls-remote --tags 
-app/cli/module_packaging.py::Installing from git requires a pinned revision: pass --rev <tag|commit>. Without it the installed code depends on when you ran the command.
-app/cli/module_packaging.py::Revision 
-app/cli/module_packaging.py::Source path does not exist or is not a directory: 
-app/cli/module_packaging.py::git clone failed:\n
-app/config.py:: API.
-app/config.py:: but LLM_API_BASE_URL is still the OpenRouter address, so the key would be sent to OpenRouter. Set LLM_API_BASE_URL to the 
-app/config.py:: endpoint (.env.example has examples).
-app/config.py:: is not a provider this server can call a model through. Allowed: 
-app/config.py:: still carry the placeholder from the example configuration file. Replace each with a value of your own (secrets: openssl rand -hex 32) before starting with DEBUG off.
-app/config.py::, which no model is asked for. Allowed: 
-app/config.py::. Set them in environment variables before starting in production mode.
-app/config.py::DATABASE_URL contains default credentials. Set a proper DATABASE_URL for production.
-app/config.py::FERNET_SALT is a known example value shipped with the project. Generate a per-deployment one: python -c "import secrets; print(secrets.token_urlsafe(32))"
-app/config.py::FERNET_SALT must be set to a per-deployment random value (>=16 bytes) in production. Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
-app/config.py::LLM_API_KEY is set but LLM_API_BASE_URL is empty: set it to the endpoint of the 
-app/config.py::LLM_CAPABILITIES names 
-app/config.py::LLM_PROVIDER=
-app/config.py::LOAD_TESTING=true disables the global rate limiter, and DEBUG/TESTING are off. Refusing to start: this would run production traffic with no brute-force protection. Set LOAD_TESTING=false for a normal deployment, or — if this really is a load-test run — set LOAD_TESTING_ACK_UNSAFE=true to acknowledge the limiter stays off.
-app/config.py::Missing or default production values for: 
-app/config.py::SECRET_KEY is a known weak value. Generate a proper one: python -c "import secrets; print(secrets.token_urlsafe(32))"
-app/config.py::SECRET_KEY must be set in environment variables for production!
-app/config.py::TESTING=true with DEBUG=false. TESTING enables the password-reset dev-token response, makes the token blacklist fail open and accepts a known-weak SECRET_KEY — none of which belong on a deployment that looks like production from every other angle. Refusing to start: set TESTING=false for a normal deployment, or TESTING_ACK_UNSAFE=true if this really is a test stack.
-app/core/contracts/events/_registry.py:: is a core event; its payload is owned by the core contract and cannot be redefined by a module.
-app/core/contracts/events/_registry.py:: is already registered by 
-app/core/contracts/events/_registry.py:: must be an EventPayload subclass.
-app/core/contracts/events/_registry.py:: must be namespaced as <module>.<event>, lowercase, e.g. "warranty.expired".
-app/core/contracts/events/_registry.py::; refusing to replace it with 
-app/core/contracts/events/_registry.py::Event name 
-app/core/contracts/events/_registry.py::Payload for 
-app/core/define_module.py::Either router or router_factory must be provided
-app/core/module_manifest_schema.py:: is outside the "
-app/core/module_manifest_schema.py:::" namespace and is not a core permission
-app/core/module_manifest_schema.py::optional_requires must be a list
-app/core/module_manifest_schema.py::optional_requires must be non-empty strings, got 
-app/core/module_manifest_schema.py::permission 
-app/core/module_manifest_schema.py::permission key must be "<module>:<action>", got 
-app/core/module_manifest_schema.py::permissions must be a list
-app/core/module_manifest_schema.py::requires must be a list
-app/core/module_manifest_schema.py::requires must be non-empty strings, got 
-app/core/module_migrations.py::Unknown action: 
-app/core/version.py:: (expected X.Y.Z)
-app/core/version.py::Invalid version string: 
 app/models/item.py::expected a finite number, got 
 app/modules/equipment/_schemas_equipment.py::name must not contain null bytes
 app/modules/purchase_orders/schemas.py::Provide product_template_id or name
@@ -143,5 +92,3 @@ app/modules/warehouse/schemas.py::must not contain null bytes
 app/modules/warehouse/schemas.py::notes must not contain null bytes
 app/modules/webhooks/schemas.py::. Valid values: 
 app/modules/webhooks/schemas.py::Unknown event type(s): 
-app/seed_data.py::'. Available: 
-app/seed_data.py::Unknown seed profile '

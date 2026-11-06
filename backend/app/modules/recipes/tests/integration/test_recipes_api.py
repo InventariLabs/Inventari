@@ -26,7 +26,7 @@ from typing import Any, cast
 
 import pytest
 from fastapi import status
-from sqlalchemy import Engine, event, select
+from sqlalchemy import event, select
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
@@ -2093,6 +2093,7 @@ class TestRecipeShoppingList:
         auth_headers: dict[str, str],
         test_user: User,
         db_session: Session,
+        async_engine_fixture: Any,
     ) -> None:
         """The add's statement count stays put while the recipe grows lines.
 
@@ -2101,8 +2102,12 @@ class TestRecipeShoppingList:
         grew with the ingredient count (a recipe may name a hundred). A
         count of one reader's calls is the narrower pin: it stays green
         when the same query moves anywhere else on the line. The bound
-        below is on the request's own statements, so a read added at any
-        step of the path fails it, not only this exact function.
+        below is on the request's own statements, counted on the engine the
+        request runs on and nothing else. It sits at the count the path spends
+        today (35, measured), so a read added at any step of the path fails
+        it, not only this exact function; when the path gets cheaper the
+        bound must come down with it, or the room left spends the next
+        addition unseen.
         """
         g_id = _get_uom_id(db_session, 'g')
         assert g_id is not None
@@ -2130,11 +2135,12 @@ class TestRecipeShoppingList:
         def _count_statement(*_args: Any) -> None:
             statements['count'] += 1
 
-        # The request runs on the app's engine, so the counter sits on the
-        # engine class — the same instrument the request log's query count
-        # reads through app.core.performance. Only the POST runs inside the
-        # window; the fixture writes are done.
-        event.listen(Engine, 'before_cursor_execute', _count_statement)
+        # The request runs on the fixture's async engine, so the counter sits
+        # on that engine alone — not on the Engine class, where any other
+        # engine's activity inside the window would count against the bound.
+        # Only the POST runs inside the window; the fixture writes are done.
+        request_engine = async_engine_fixture.sync_engine
+        event.listen(request_engine, 'before_cursor_execute', _count_statement)
         try:
             r = client.post(
                 f'{RECIPE_URL}/{recipe_id}/add-to-shopping-list',
@@ -2142,7 +2148,7 @@ class TestRecipeShoppingList:
                 headers=auth_headers,
             )
         finally:
-            event.remove(Engine, 'before_cursor_execute', _count_statement)
+            event.remove(request_engine, 'before_cursor_execute', _count_statement)
         assert r.status_code == 200, r.text
         assert r.json()['added_count'] == 10
 

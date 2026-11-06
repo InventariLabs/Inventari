@@ -45,6 +45,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 
 from app.config import settings
 from app.core.logging import get_logger
+from app.core.operator_error import OperatorError
 
 if TYPE_CHECKING:
     from ._module_meta import ModuleYaml
@@ -146,7 +147,7 @@ def package_walk(source_dir: Path, meta: ModuleYaml) -> tuple[list[Path], list[P
         for path in sorted(root.rglob('*')):
             rel = path.relative_to(source_dir)
             if path.is_symlink():
-                raise ValueError(
+                raise OperatorError(
                     f'package contains a symlink ({rel.as_posix()}) — '
                     'symlinks cannot be signed or shipped'
                 )
@@ -156,7 +157,7 @@ def package_walk(source_dir: Path, meta: ModuleYaml) -> tuple[list[Path], list[P
                 dropped.append(path)
                 continue
             if path.suffix.lower() in UNREADABLE_EXECUTABLE_SUFFIXES:
-                raise ValueError(
+                raise OperatorError(
                     'package contains executable code the safety scanner '
                     f'cannot read ({rel.as_posix()}) — bytecode and native '
                     'binaries cannot be signed or shipped'
