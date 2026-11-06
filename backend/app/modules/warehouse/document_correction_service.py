@@ -141,7 +141,8 @@ async def create_correction(
     # what the line executed, less what earlier corrections and returns have
     # already taken off it. Bounding it by the original figure meant a
     # delivery of ten accepted a correction of minus ten twice over.
-    # Positive deltas stay unbounded on purpose (over-receipt corrections).
+    # Positive deltas have no floor to hit; the over-receipt gate below is
+    # what bounds them.
     left_on_line = await reversible_quantities_async(
         db,
         org_id,
