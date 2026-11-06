@@ -1547,8 +1547,9 @@ type and spacing:
   weight and size, so the invitation reads as an error message. The action
   goes in the empty state's `primaryAction` unless the page already shows it
   where the reader looks first — its header, its tab toolbar or the form
-  above the list — in which case a second button beside it is a competing
-  first move and is left out.
+  above the list — in which case the empty state either leaves it out or
+  repeats it as `EmptyStateAction` with `variant="outline"`, never as a
+  second filled button (two filled buttons are competing first moves).
 - **A compact empty state inside a card, panel, tab or modal may keep a single
   line** — the description is optional there, and `EmptyState`'s `description`
   prop stays optional for them. The description rule is what a _page_ owes its
