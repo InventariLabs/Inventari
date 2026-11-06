@@ -29,8 +29,9 @@ export interface JournalEntry {
 interface JournalCardProps {
   title: string;
   entries: readonly JournalEntry[];
-  linkLabel: string;
-  linkHref: string;
+  /** Both or neither: where the full journal is not offered, no link. */
+  linkLabel?: string;
+  linkHref?: string;
   /** What an empty journal says, and where things that fill it happen. */
   empty: { text: string; linkLabel?: string; linkHref?: string };
   /**
@@ -56,9 +57,11 @@ export function JournalCard({
     <Card className="p-4 sm:p-5">
       <CardHeader className="flex-row items-baseline justify-between space-y-0 pb-2">
         <CardTitle>{title}</CardTitle>
-        <CardLink to={linkHref} arrow className="text-xs">
-          {linkLabel}
-        </CardLink>
+        {linkHref && linkLabel && (
+          <CardLink to={linkHref} arrow className="text-xs">
+            {linkLabel}
+          </CardLink>
+        )}
       </CardHeader>
       {loading ? (
         <ul aria-busy="true" className="divide-y divide-border">

@@ -9,6 +9,7 @@
   "actions": {
     "generate": "Generuj etykiety",
     "preview": "Podgląd wydruku",
+    "downloadOne": "Pobierz etykietę",
     "generateNow": "Generuj teraz",
     "deleteSelected": "Usuń wybrane",
     "reuseLabel": "Użyj ponownie etykiety",

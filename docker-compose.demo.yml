@@ -4,9 +4,10 @@
 # whether it fills up with their experiments — it does — but how long the mess
 # outlives the visit. Here, until the next reset.
 #
-# Layer this on top of the production compose file and nothing else changes:
+# Layer this on top of the production compose file (and only that one) and
+# nothing else changes:
 #
-#     COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml:docker-compose.demo.yml \
+#     COMPOSE_FILE=docker-compose.prod.yml:docker-compose.demo.yml \
 #       docker compose --profile demo up -d
 #
 # The reset runs only where INVENTARI_DEMO says it may, so adding this file to

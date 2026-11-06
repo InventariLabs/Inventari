@@ -196,6 +196,7 @@ class ValuationService:
         currency: str | None = None,
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
+        extra_unit_cost: Decimal = Decimal('0'),
     ) -> StockValuationLayer | None:
         """Async: record receipt by template_id (Public API helper).
 
@@ -219,6 +220,7 @@ class ValuationService:
             currency,
             document_date,
             reverses_line_id=reverses_line_id,
+            extra_unit_cost=extra_unit_cost,
         )
 
     @staticmethod
@@ -265,6 +267,7 @@ class ValuationService:
         currency: str | None = None,
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
+        extra_unit_cost: Decimal = Decimal('0'),
     ) -> StockValuationLayer | None:
         """Post a receipt layer. ``unit_cost=None`` means nobody named a price.
 
@@ -277,6 +280,13 @@ class ValuationService:
         still posted, marked ``unknown``: the quantity is real even where the
         value is not known, and "unknown" is an answer a report can act on
         where "0.00" is not.
+
+        *extra_unit_cost* is the line's share of the freight, duty and
+        insurance the delivery arrived with, per unit. It rides on whatever
+        cost the line has and decides nothing about where that cost came
+        from: a priced line stays ``stated``, a priceless one stays
+        ``average`` or ``unknown`` and carries the share on top. A return
+        (*reverses_line_id*) takes no share; it comes back at what it cost.
 
         *reverses_line_id* names the outflow line whose goods are coming back
         -- a customer's return, a dispatch corrected downwards. Those goods
@@ -321,6 +331,9 @@ class ValuationService:
                 cost_basis = CostBasis.UNKNOWN
             else:
                 cost_basis = CostBasis.AVERAGE
+
+        if extra_unit_cost and reversed_cost is None:
+            unit_cost += extra_unit_cost
 
         # Resolved here rather than left NULL. A layer that does not say what
         # its cost is in leaves the next reader with the same guess this whole

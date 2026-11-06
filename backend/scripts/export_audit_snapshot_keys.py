@@ -78,6 +78,9 @@ APP_ROOT = BACKEND_ROOT / 'app'
 # update; the funnel's `context=` names the record an entry is about.
 SNAPSHOT_KEYWORDS = {'snapshot', 'before', 'after', 'context'}
 
+# The enum whose values are the journal's target types.
+TARGET_TYPE_ENUM = 'AuditTargetType'
+
 # A function that *builds* one of those values.
 BUILDER_NAME_PARTS = ('snapshot', '_shape')
 
@@ -284,6 +287,25 @@ def collect(
     return keys, resolved, dynamic_funnel_keys, imports
 
 
+def audit_target_types(tree: ast.AST) -> set[str]:
+    """The values of ``AuditTargetType`` when this file defines it.
+
+    Every ``target_type`` the journal can be filtered by is a member of that
+    enum, so its string members are the set the frontend catalogue
+    (``settings.audit.targetTypes``) has to name.
+    """
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == TARGET_TYPE_ENUM:
+            for member in node.body:
+                if isinstance(member, ast.Assign) and isinstance(
+                    member.value, ast.Constant
+                ):
+                    if isinstance(member.value.value, str):
+                        found.add(member.value.value)
+    return found
+
+
 def annotated_class_fields(tree: ast.AST, module: str) -> dict[str, set[str]]:
     """The annotated class-body fields of every class in one file.
 
@@ -350,6 +372,7 @@ def column_for_field(root: Path) -> dict[str, str]:
 def collect_keys(root: Path) -> CollectedKeys:
     """The artefact payload for one application tree."""
     keys: set[str] = set()
+    target_types: set[str] = set()
     class_fields: dict[str, set[str]] = {}
     declarations: list[tuple[str, str]] = []
     funnel_files: list[str] = []
@@ -380,6 +403,7 @@ def collect_keys(root: Path) -> CollectedKeys:
             tree, module, package
         )
         keys.update(tree_keys)
+        target_types.update(audit_target_types(tree))
         for name, fields in annotated_class_fields(tree, module).items():
             class_fields.setdefault(name, set()).update(fields)
         declarations.extend(file_declarations)
@@ -442,6 +466,7 @@ def collect_keys(root: Path) -> CollectedKeys:
         'declarations-read': len(declarations),
         'uncovered-writer-files': uncovered,
         'keys': sorted(keys),
+        'target-types': sorted(target_types),
     }
 
 
@@ -454,7 +479,8 @@ def artefact_payload(collected: dict) -> dict:
             'Field names the backend declares for audit snapshots — literal '
             'snapshot keys, the schema/model intersections its payload-driven '
             'writers declare via AUDIT_PAYLOAD_SCHEMA, and the literal key '
-            'sets of the journal_config_change funnel. Refresh with make '
+            'sets of the journal_config_change funnel; "target-types" is the '
+            'value set of AuditTargetType. Refresh with make '
             'sync-audit-fields; do not edit by hand.'
         ),
         # How many files were read is left out: it grows with every new file
@@ -471,6 +497,10 @@ def artefact_payload(collected: dict) -> dict:
         'uncovered-writer-files': collected['uncovered-writer-files'],
         'key-count': len(keys),
         'keys': keys,
+        # The values of AuditTargetType: the frontend half checks each one has
+        # a name in settings.audit.targetTypes, so a new target type cannot
+        # reach the filter as a raw identifier.
+        'target-types': collected['target-types'],
     }
 
 

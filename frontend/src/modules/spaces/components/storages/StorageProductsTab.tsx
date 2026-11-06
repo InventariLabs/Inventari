@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { extractApiError } from "@/lib/errors";
 import { toast } from "sonner";
-import { useConfirm } from "@/hooks/useConfirm";
+import { DeleteReasonDialog } from "@/modules/inventory/moduleApi";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { InlineQueryError } from "@/components/ui/QueryResult";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -64,7 +64,7 @@ export function StorageProductsTab({
     "common",
     "labels",
   ]);
-  const { confirm, confirmDialogProps } = useConfirm();
+  const [deletingItem, setDeletingItem] = useState<Item | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [actionItem, setActionItem] = useState<Item | null>(null);
   const [includeInside, setIncludeInside] = useState(false);
@@ -130,11 +130,6 @@ export function StorageProductsTab({
   }, [allItems, selectedCategoryId]);
 
   const deleteItemMutation = useDeleteItemFromStorage(storage.id);
-  const deleteMutation = {
-    mutate: (itemId: string) => deleteItemMutation.mutate({ itemId }),
-    isPending: deleteItemMutation.isPending,
-    variables: deleteItemMutation.variables,
-  };
 
   const consumeItemMutation = useConsumeItemFromStorage(storage.id);
   const consumeMutation = {
@@ -213,21 +208,10 @@ export function StorageProductsTab({
           onItemClick={setActionItem}
           onConsumeItem={(itemId) => consumeMutation.mutate(itemId)}
           onEditItem={setEditingItemId}
-          onDeleteItem={async (item) => {
-            if (
-              await confirm({
-                title: t("items:actions.delete"),
-                message: t("items:actions.confirmDelete"),
-                variant: "danger",
-                confirmLabel: t("items:actions.delete"),
-              })
-            ) {
-              deleteMutation.mutate(item.id);
-            }
-          }}
+          onDeleteItem={setDeletingItem}
           isConsumePending={consumeMutation.isPending}
           consumePendingId={consumeMutation.variables?.itemId}
-          isDeletePending={deleteMutation.isPending}
+          isDeletePending={deleteItemMutation.isPending}
         />
       )}
 
@@ -236,7 +220,24 @@ export function StorageProductsTab({
         setEditingItemId={setEditingItemId}
         actionItem={actionItem}
         setActionItem={setActionItem}
-        confirmDialogProps={confirmDialogProps}
+      />
+
+      <DeleteReasonDialog
+        key={deletingItem?.id ?? "no-delete"}
+        open={deletingItem !== null}
+        itemName={deletingItem?.name ?? ""}
+        onConfirm={async (reason, notes) => {
+          // Awaited, so a refused delete leaves the dialog standing with the
+          // reason and note as typed.
+          if (deletingItem)
+            await deleteItemMutation.mutateAsync({
+              itemId: deletingItem.id,
+              reason,
+              notes,
+            });
+          setDeletingItem(null);
+        }}
+        onCancel={() => setDeletingItem(null)}
       />
     </div>
   );

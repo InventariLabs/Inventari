@@ -7,6 +7,7 @@
   "actions": {
     "generate": "Generar etiquetas",
     "preview": "Vista previa de impresión",
+    "downloadOne": "Descargar etiqueta",
     "generateNow": "Generar ahora",
     "deleteSelected": "Eliminar seleccionados",
     "reuseLabel": "Reutilizar etiqueta",

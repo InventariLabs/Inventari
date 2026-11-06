@@ -312,7 +312,6 @@ export const API_ROUTES = [
   "/api/v1/recipes/meal-plans/{plan_id}/entries",
   "/api/v1/recipes/meal-plans/{plan_id}/entries/bulk",
   "/api/v1/recipes/meal-plans/{plan_id}/entries/{entry_id}",
-  "/api/v1/recipes/meal-plans/{plan_id}/entries/{entry_id}/cook",
   "/api/v1/recipes/meal-plans/{plan_id}/generate-shopping-list",
   "/api/v1/recipes/shopping-list/add-from-recipes",
   "/api/v1/recipes/tags",

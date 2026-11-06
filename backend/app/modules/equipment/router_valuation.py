@@ -7,8 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import UserContextDTO
 from app.core.deps import get_async_db, get_current_user_context, require_org
 from app.core.exceptions import (
+    ForbiddenException,
     NotFoundException,
 )
+from app.i18n.service import get_current_lang, get_error_message
 
 from .schemas import (
     AssetValuation,
@@ -17,8 +19,27 @@ from .schemas import (
 
 router = APIRouter()
 
+#: Who may read the fleet's purchase and book totals: the overview shows them
+#: to administrators and managers only, because they are the organization's
+#: finances, and the API holds the same line.
+_FINANCE_ROLES = frozenset({'admin', 'manager'})
 
-@router.get('/valuation', response_model=FleetValuation)
+
+def _require_finance_reader(
+    current_user: UserContextDTO = Depends(get_current_user_context),
+) -> None:
+    if current_user.is_superuser or current_user.role in _FINANCE_ROLES:
+        return
+    raise ForbiddenException(
+        get_error_message('insufficient_permissions', get_current_lang())
+    )
+
+
+@router.get(
+    '/valuation',
+    response_model=FleetValuation,
+    dependencies=[Depends(_require_finance_reader)],
+)
 async def fleet_valuation(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),

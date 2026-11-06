@@ -288,8 +288,8 @@
     "description": "« {{name}} » est archivé et reste hors de la liste active. Ouvrez-le ici ou restaurez-le depuis l'archive."
   },
   "usage": {
-    "customer": "Client",
-    "inventory": "Ajustement d'inventaire",
+    "customer": "Consommé",
+    "inventory": "Perte",
     "production": "Production",
     "virtualNotice": "Emplacement système — son contenu ne compte pas dans les niveaux de stock."
   },

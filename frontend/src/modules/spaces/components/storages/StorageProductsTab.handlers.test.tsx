@@ -226,8 +226,13 @@ describe("StorageProductsTab — removing and deleting a product", () => {
     expect(deleted).toEqual([]);
 
     await userEvent.click(trash);
+    const reasonDialog = await screen.findByRole("alertdialog");
+    await userEvent.selectOptions(
+      within(reasonDialog).getByTestId("deletion-reason"),
+      "EXPIRED",
+    );
     await userEvent.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
+      within(reasonDialog).getByRole("button", {
         name: "Delete",
       }),
     );

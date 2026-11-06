@@ -29,6 +29,7 @@ from app.services._stock_quant_ops import (
     anchor_ids_async,
     lock_stock_async,
 )
+from app.services.stock_strategy import resolve_removal_strategy
 
 logger = get_logger(__name__)
 
@@ -39,7 +40,7 @@ async def reserve_for_document_async(
     product_template_id: UUID,
     location_id: UUID | None,
     needed_qty: Decimal,
-    removal_strategy: str = 'FIFO',
+    removal_strategy: str | None = None,
     *,
     document_id: UUID,
     document_line_id: UUID | None = None,
@@ -79,11 +80,22 @@ async def reserve_for_document_async(
 
     There is no reservation without a document: a hold is a row, and a row
     names the document it is for.
+
+    *removal_strategy* None follows the product's own, as ``plan_draw_async``
+    does when the stock leaves: the hold has to cover the batches the draw
+    will take, and a first-expired-first-out product held in FIFO order
+    promises the wrong stock.
     """
     if document_id is None:
         raise TypeError('A reservation belongs to a document; none was named.')
     if needed_qty <= 0:
         return ReservationResult(success=True, message='No quantity to reserve')
+
+    if removal_strategy is None:
+        template = await db.scalar(
+            select(ProductTemplate).where(ProductTemplate.id == product_template_id)
+        )
+        removal_strategy = resolve_removal_strategy(template)
 
     plan = await _plan_under_the_anchors_async(
         db,

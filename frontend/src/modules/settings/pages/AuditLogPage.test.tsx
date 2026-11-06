@@ -1910,3 +1910,35 @@ describe("AuditLogPage — the breaker's rows name their actor", () => {
     expect(fact.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("AuditLogPage — what a line count is a count of", () => {
+  const entry = (id: string, target_type: string) => ({
+    ...BREAKER_ENTRY,
+    id,
+    user_id: "u1",
+    user_email: "admin@example.com",
+    action: "UPDATE",
+    target_type,
+    target_id: `${id}-target`,
+    snapshot: { number: "OUT/2026/002", lines: 3 },
+    reason: null,
+    created_at: "2026-10-01T12:00:00Z",
+  });
+
+  it("does not call the lines of a cancelled document ingredients", async () => {
+    stubAudit(entry("d1", "document"));
+    renderPage();
+
+    expect(await screen.findAllByText(/^Lines:/)).not.toHaveLength(0);
+    expect(screen.queryByText(/Ingredient lines/)).not.toBeInTheDocument();
+  });
+
+  it("still calls the lines of a production recipe ingredients", async () => {
+    stubAudit(entry("r1", "maker_recipe"));
+    renderPage();
+
+    expect(await screen.findAllByText(/^Ingredient lines:/)).not.toHaveLength(
+      0,
+    );
+  });
+});

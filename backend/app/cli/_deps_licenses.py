@@ -33,6 +33,7 @@ ALLOWED = {
     'CC0-1.0',
     'ISC',
     'MIT',
+    'MIT-0',
     'MIT-CMU',
     'MPL-2.0',
     'PSF-2.0',
@@ -130,6 +131,9 @@ _ALIASES: tuple[tuple[str, str], ...] = (
     ('CDDL', 'CDDL-1.0'),
     ('MIT-CMU', 'MIT-CMU'),
     ('CMU', 'MIT-CMU'),
+    # MIT-0 (cffi) drops the attribution clause; reading it as plain MIT would
+    # state a stricter licence than the one the package ships under.
+    ('MIT-0', 'MIT-0'),
     ('MIT', 'MIT'),
     ('APACHE', 'Apache-2.0'),
     ('ISC', 'ISC'),

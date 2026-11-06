@@ -669,10 +669,12 @@ async def _record_receipt_valuation(
     # arrived with. Without it the shelf is worth what the supplier invoiced
     # and nothing else, and every margin taken off that number is short by
     # the cost of getting the goods there. A line nobody priced still gets
-    # its share: the freight bill is a real number even where the purchase
-    # price is missing.
-    if surcharge and stock_quantity > 0:
-        unit_cost = (unit_cost or Decimal('0')) + surcharge / stock_quantity
+    # its share, but on top of the cost an unpriced line has - the
+    # organization's rate, or none - so the share never makes the layer look
+    # like a price the supplier stated.
+    extra_unit_cost = (
+        surcharge / stock_quantity if surcharge and stock_quantity > 0 else Decimal('0')
+    )
     await core_api.valuation.record_receipt_async(
         db,
         doc.organization_id,
@@ -690,4 +692,5 @@ async def _record_receipt_valuation(
         # left, not at the price the customer paid for them. An ordinary
         # delivery names no such line and is worth what the supplier asked.
         reverses_line_id=line.corrects_line_id,
+        extra_unit_cost=extra_unit_cost,
     )
