@@ -84,7 +84,6 @@ from app.schemas.organization import Organization
 from app.schemas.partner import PartnerListItem
 from app.services._stock_reservation import list_reservations_async
 from app.services.category_emoji import resolve_category_emoji
-from app.services.gdpr_service import anonymize_user_async
 from app.services.profile_switch_planner import ProfileSwitchPlan
 
 # --- Used as types/keys in files excluded from the scan (*schemas*.py) ------
@@ -267,7 +266,6 @@ purchase_orders_api.create_reorder_rule_async  # noqa: B018  # owner=core expire
 purchase_orders_api.list_pricelist_for_partner_async  # noqa: B018  # owner=core expires=2027-02-28 Module extension surface; no in-repo caller.
 purchase_orders_api.list_supplier_prices_for_template_async  # noqa: B018  # owner=core expires=2027-02-28 Module extension surface; no in-repo caller.
 get_module_error_message  # noqa: B018  # owner=core expires=2027-02-28 Module-facing i18n API documented in MODULES_GUIDE.md; no in-repo caller.
-anonymize_user_async  # noqa: B018  # owner=core expires=2027-02-28 Entry point of the manual GDPR erasure procedure (docs/GDPR_MANUAL_PROCEDURE.md); called by hand, never by code.
 core_api.events.registered_events  # noqa: B018  # owner=core expires=2027-02-28 CoreAPI contract method; no in-repo caller and none in the cloud module either.
 core_api.partners.deactivate_async  # noqa: B018  # owner=core expires=2027-02-28 CoreAPI contract method; no in-repo caller and none in the cloud module either.
 core_api.partners.activate_async  # noqa: B018  # owner=core expires=2027-02-28 CoreAPI contract method; no in-repo caller and none in the cloud module either.
