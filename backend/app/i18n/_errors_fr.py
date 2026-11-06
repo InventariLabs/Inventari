@@ -874,6 +874,8 @@ ERRORS_FR: ErrorMessages = {
     'validation_missing': 'Ce champ est obligatoire',
     'validation_string_too_long': 'Doit contenir au maximum {max_length} caractères',
     'validation_string_too_short': 'Doit contenir au minimum {min_length} caractères',
+    'validation_string_too_long_one': 'Doit contenir au maximum {max_length} caractère',
+    'validation_string_too_short_one': 'Doit contenir au minimum {min_length} caractère',
     'validation_pattern': 'Ne correspond pas au format attendu',
     'validation_greater_than_equal': 'Doit être supérieur ou égal à {ge}',
     'validation_greater_than': 'Doit être supérieur à {gt}',

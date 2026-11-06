@@ -105,7 +105,7 @@
   "quickAdd": {
     "title": "Nowy produkt",
     "guardName": "Formularz produktu",
-    "tabVision": "Skanuj etykietę",
+    "tabVision": "Rozpoznaj ze zdjęcia",
     "tabManual": "Dodaj ręcznie",
     "visionTitle": "Rozpoznawanie AI",
     "visionHelp": "AI może uzupełnić nazwę, markę i datę ważności na podstawie zdjęcia.",

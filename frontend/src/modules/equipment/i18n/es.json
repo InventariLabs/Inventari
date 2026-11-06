@@ -769,8 +769,8 @@
     "backToList": "Volver a las atestaciones",
     "cancel": "Anular",
     "noEmailWarning": "Esta organización no envía correos, así que nadie recibirá la solicitud. Tras lanzarla, copia el enlace de cada persona desde la página de la atestación y entrégaselo.",
-    "emptyDescription": "Una certificación pide a quien posee un activo que confirme en una página compartida que todavía lo tiene — con un plazo y un recordatorio de camino. Empiece con «Nueva certificación» arriba: crea un borrador y, al lanzarla, la persona poseedora recibe un enlace para confirmar o informar de un problema; donde no hay correo electrónico, el enlace se entrega en mano.",
-    "emptyDescriptionViewer": "Una certificación pide a quien posee un activo que confirme en una página compartida que todavía lo tiene — con un plazo y un recordatorio de camino. Iniciarla queda reservado a cuentas con permiso de escritura en esta página; la persona poseedora recibirá después un enlace para confirmar o informar de un problema.",
+    "emptyDescription": "Una certificación pide al titular de un activo que confirme en una página compartida que todavía lo tiene — con un plazo y un recordatorio antes de que venza. Empiece con «Nueva certificación» arriba: crea un borrador y, al lanzarla, el titular recibe un enlace para confirmar o informar de un problema; donde no hay correo electrónico, el enlace se entrega en mano.",
+    "emptyDescriptionViewer": "Una certificación pide al titular de un activo que confirme en una página compartida que todavía lo tiene — con un plazo y un recordatorio antes de que venza. Iniciarla queda reservado a cuentas con permiso de escritura en esta página; el titular recibirá después un enlace para confirmar o informar de un problema.",
     "reminders": {
       "sent_one": "{{count}} recordatorio enviado",
       "sent_other": "{{count}} recordatorios enviados",
