@@ -175,7 +175,10 @@ class ConsumptionStatsDTO(BaseModel):
     to ``core_api.queries`` is transparent to the frontend.
     """
 
+    #: The ten largest by quantity, then by name: a tie at the tenth place
+    #: names the same product on every reading.
     most_consumed: list[ConsumptionItemDTO]
+    #: The ten largest by value, then by name.
     most_wasted: list[ConsumptionItemDTO]
     #: Share of outflow events that were disposals — counted per event,
     #: not per money (that one is ``CostSummaryDTO.waste_value_percentage``).

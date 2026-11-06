@@ -154,6 +154,52 @@ describe("useAssetListActions — paging", () => {
   });
 });
 
+describe("useAssetListActions — the archive pages by its cursor", () => {
+  it("asks for the next page with the cursor the server handed back, and starts again on a new phrase", async () => {
+    const archived: URLSearchParams[] = [];
+    server.use(
+      http.get("/api/v1/items/archived", ({ request }) => {
+        const params = new URL(request.url).searchParams;
+        archived.push(params);
+        const second = params.get("cursor") === "after-first";
+        return HttpResponse.json({
+          items: [asset(second ? 51 : 1)],
+          total: 51,
+          offset: second ? 50 : 0,
+          limit: 50,
+          has_more: !second,
+          next_cursor: second ? null : "after-first",
+        });
+      }),
+    );
+    serveList([asset(1)]);
+    const { result } = renderList();
+    act(() => result.current.setListTab("archived"));
+    await waitFor(() =>
+      expect(result.current.archivedPagination.keyset.hasNext).toBe(true),
+    );
+
+    act(() => result.current.archivedPagination.onNext());
+
+    await waitFor(() =>
+      expect(archived[archived.length - 1].get("cursor")).toBe("after-first"),
+    );
+    await waitFor(() =>
+      expect(result.current.archivedPagination.skip).toBe(50),
+    );
+    expect(result.current.archivedPagination.keyset.hasNext).toBe(false);
+    expect(archived.every((params) => !params.has("offset"))).toBe(true);
+
+    // A new phrase is a new answer: a position in the old one means nothing.
+    act(() => result.current.setSearch("Laptop"));
+    await waitFor(() =>
+      expect(archived[archived.length - 1].get("search")).toBe("Laptop"),
+    );
+    expect(archived[archived.length - 1].has("cursor")).toBe(false);
+    expect(result.current.archivedPagination.skip).toBe(0);
+  });
+});
+
 describe("useAssetListActions — selection", () => {
   it("select-all takes the page, a second press clears it, and the whole-set widening counts the total", async () => {
     serveList([asset(1), asset(2)], 61);

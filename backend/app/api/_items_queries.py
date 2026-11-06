@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api._items_params import parse_template_ids
 from app.api.dependencies import get_user_storage_ids
 from app.core.contracts import SystemPermission, UserContextDTO
+from app.core.cursor import decode_keyset_cursor, encode_keyset_cursor
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
@@ -234,8 +235,23 @@ async def get_expiring_items(
 
 @router.get('/archived', response_model=ArchivedItemListResponse)
 async def get_archived_items(
-    offset: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
+    cursor: str | None = Query(
+        None,
+        description=(
+            "The previous page's next_cursor: the page that follows it. The cost "
+            'of a page stays its size however long the archive grows, and the '
+            'count is taken on the first page and carried, so it does not move.'
+        ),
+    ),
+    offset: int = Query(
+        0,
+        ge=0,
+        description=(
+            'Deprecated: counts rows from the top on every call, so a deep page '
+            'costs every row above it. Page with `cursor`.'
+        ),
+    ),
     context_tag: str | None = Query(
         None, description='Filter by category context_tag (e.g. equipment)'
     ),
@@ -259,23 +275,41 @@ async def get_archived_items(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
 ):
-    """List of archived (soft-deleted) products, scoped by module context."""
+    """Archived (soft-deleted) products, newest archived first, scoped by module context."""
+    org_id = require_org(current_user)
     claimed_tags: set[str] = set()
     if exclude_module_contexts:
         from app.core.module_scope import get_claimed_context_tags
 
         claimed_tags = get_claimed_context_tags()
 
-    items, total = await get_archived_items_async(
+    position = decode_keyset_cursor(cursor) if cursor else None
+    served_before = position.offset if position else offset
+    # One row more than asked: whether it exists is the whole of "is there a
+    # next page", and no count has to be right for that to be so.
+    rows, total = await get_archived_items_async(
         db,
         user_storage_ids,
-        offset=offset,
-        limit=limit,
+        organization_id=org_id,
+        offset=0 if position else offset,
+        limit=limit + 1,
+        after=(position.sort_value, position.row_id) if position else None,
+        known_total=position.total if position else None,
         context_tag=context_tag,
         claimed_tags=claimed_tags or None,
         module_scope=module_scope,
         search=search,
     )
+    items = rows[:limit]
+    next_cursor = None
+    if len(rows) > limit:
+        last = items[-1]
+        next_cursor = encode_keyset_cursor(
+            last.deleted_at or last.created_at,
+            last.id,
+            total=total,
+            offset=served_before + len(items),
+        )
     notes = await get_deletion_notes_async(db, [item.id for item in items])
     result = []
     for item in items:
@@ -306,6 +340,10 @@ async def get_archived_items(
             )
         )
 
-    return ArchivedItemListResponse.from_slice(
-        items=result, offset=offset, limit=limit, total=total
+    return ArchivedItemListResponse.from_keyset(
+        items=result,
+        offset=served_before,
+        limit=limit,
+        total=total,
+        next_cursor=next_cursor,
     )

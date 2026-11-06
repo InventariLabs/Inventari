@@ -7873,7 +7873,7 @@
           "Items"
         ],
         "summary": "Get Archived Items",
-        "description": "List of archived (soft-deleted) products, scoped by module context.",
+        "description": "Archived (soft-deleted) products, newest archived first, scoped by module context.",
         "operationId": "get_archived_items_api_v1_items_archived_get",
         "security": [
           {
@@ -7885,17 +7885,6 @@
         ],
         "parameters": [
           {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "title": "Offset"
-            }
-          },
-          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -7906,6 +7895,37 @@
               "default": 50,
               "title": "Limit"
             }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's next_cursor: the page that follows it. The cost of a page stays its size however long the archive grows, and the count is taken on the first page and carried, so it does not move.",
+              "title": "Cursor"
+            },
+            "description": "The previous page's next_cursor: the page that follows it. The cost of a page stays its size however long the archive grows, and the count is taken on the first page and carried, so it does not move."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Deprecated: counts rows from the top on every call, so a deep page costs every row above it. Page with `cursor`.",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Deprecated: counts rows from the top on every call, so a deep page costs every row above it. Page with `cursor`."
           },
           {
             "name": "context_tag",
@@ -41897,6 +41917,17 @@
             "type": "boolean",
             "title": "Total Capped",
             "default": false
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
           }
         },
         "type": "object",
@@ -41905,7 +41936,7 @@
           "total"
         ],
         "title": "ArchivedItemListResponse",
-        "description": "Paginated response for the archived items list endpoint."
+        "description": "A page of the archived items list, paged by the last row seen."
       },
       "ArchivedItemSchema": {
         "properties": {

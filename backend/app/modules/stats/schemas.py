@@ -100,7 +100,12 @@ class CategoryConsumption(BaseModel):
 
 
 class ConsumptionStats(BaseModel):
+    #: The ten products used most, by quantity; equal quantities in the order
+    #: of their names, so a tie at the tenth place names the same product on
+    #: every reading.
     most_consumed: list[MostConsumedItem]
+    #: The ten products whose disposals cost most, by value; equal values in
+    #: the order of their names.
     most_wasted: list[MostConsumedItem]
     #: Share of outflow events that were waste. Served for API consumers
     #: only: the cost analysis screen shows the share of *value* wasted

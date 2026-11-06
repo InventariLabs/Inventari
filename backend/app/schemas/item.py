@@ -15,7 +15,7 @@ from pydantic import (
 from app.core.exceptions import ServiceRejectionError
 from app.core.open_package import effective_expiry, use_by_of
 from app.schemas.category import Category
-from app.schemas.pagination import PaginatedResponse
+from app.schemas.pagination import KeysetPaginatedResponse, PaginatedResponse
 from app.schemas.product_template import ProductTemplate
 from app.schemas.uom import UomInfoWithCategory
 from app.schemas.validators import (
@@ -647,8 +647,8 @@ class ArchivedItemSchema(BaseModel):
     category: ArchivedCategoryBrief | None = None
 
 
-class ArchivedItemListResponse(PaginatedResponse[ArchivedItemSchema]):  # type: ignore[type-arg]
-    """Paginated response for the archived items list endpoint."""
+class ArchivedItemListResponse(KeysetPaginatedResponse[ArchivedItemSchema]):
+    """A page of the archived items list, paged by the last row seen."""
 
     limit: int = 50
     offset: int = 0

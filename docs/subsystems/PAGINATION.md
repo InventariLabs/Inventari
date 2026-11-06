@@ -7,7 +7,7 @@ question about how it grows, not about taste.
 |---|---|---|
 | **Offset** — `limit` + `offset`, a `COUNT(*)` per request | `PaginatedResponse.from_slice` | Lists that stay small: a settings table, a picker, anything an organization will not grow past a few thousand rows. `db_utils.paginate_async` is this. |
 | **Cursor** — `limit` + opaque `cursor`, no count | `CursorPaginatedResponse` | Feeds read front to back that never show a total: item history, webhook deliveries, the infinite-scroll item list. |
-| **Keyset with a carried count** — `limit` + `cursor`, the total counted once | `KeysetPaginatedResponse` | Lists that grow without bound **and** whose screen says "101–200 of 5,000": the stock movement ledger (`GET /stock-moves`) and the audit journal (`GET /audit-log`). |
+| **Keyset with a carried count** — `limit` + `cursor`, the total counted once | `KeysetPaginatedResponse` | Lists that grow without bound **and** whose screen says "101–200 of 5,000": the stock movement ledger (`GET /stock-moves`), the audit journal (`GET /audit-log`) and the archived products (`GET /items/archived`). |
 
 ## Every list answers with an envelope
 
@@ -90,7 +90,14 @@ A list moves to keyset in four parts. The ledger is the reference
    walk: `(organization_id, <sort key> DESC, id)`. The ledger's key is an
    expression (`coalesce(completed_at, created_at)`), and the index is written
    on that exact expression. If no index carries the order, keyset has nothing
-   to seek into — add the index first.
+   to seek into — add the index first. An index on an expression must not be
+   partial: the planner learns how many rows share one value of the expression
+   from that index's statistics, and PostgreSQL does not read them from a
+   partial index. The archive's index first left out the live records; a page
+   starting inside ten thousand records archived at one instant was estimated
+   at a hundred rows and sorted the whole group. A leading equality column
+   (`is_deleted` in `ix_items_org_archived_at`) keeps the other rows out of
+   the range instead.
 2. **A total order.** The sort key plus `id` as tiebreak. Entries written by one
    batch share an instant, so ties are the ordinary case. `ORDER BY key DESC`
    alone makes a page boundary lose or repeat rows.
@@ -175,8 +182,8 @@ the screens ignore "next" while `isPlaceholderData`.
 
 ## Migrating the next list
 
-For each list still on offset (the archived items in `api/_items_queries.py`,
-the `paginate_async` callers whose tables grow):
+For each list still on offset (the `paginate_async` callers whose tables
+grow):
 
 1. Write down the sort order and check an index serves it — `EXPLAIN` the page
    on a table a hundred thousand rows long, not on the dev stack.

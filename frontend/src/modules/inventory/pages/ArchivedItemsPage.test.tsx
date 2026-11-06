@@ -65,7 +65,7 @@ const archivedRows = [
  *  and the render assertions below fail on the extra rows. */
 function stubServerSearch(params?: {
   search?: string;
-  offset?: number;
+  cursor?: string;
   limit?: number;
 }): ReturnType<typeof useArchivedItems> {
   const needle = params?.search?.trim().toLowerCase();
@@ -77,10 +77,32 @@ function stubServerSearch(params?: {
       items: rows,
       total: rows.length,
       limit: params?.limit ?? 50,
-      offset: params?.offset ?? 0,
+      offset: 0,
       has_more: false,
+      next_cursor: null,
     },
     isLoading: false,
+  } as unknown as ReturnType<typeof useArchivedItems>;
+}
+
+/** A long archive, paged by the server's cursor: the first page hands back
+ *  `after-first`, and the page asked for with it is the second one. */
+function stubCursorPages(params?: {
+  cursor?: string;
+  limit?: number;
+}): ReturnType<typeof useArchivedItems> {
+  const second = params?.cursor === "after-first";
+  return {
+    data: {
+      items: second ? [archivedRows[2]] : [archivedRows[0], archivedRows[1]],
+      total: 51,
+      limit: params?.limit ?? 50,
+      offset: second ? 50 : 0,
+      has_more: !second,
+      next_cursor: second ? null : "after-first",
+    },
+    isLoading: false,
+    isPlaceholderData: false,
   } as unknown as ReturnType<typeof useArchivedItems>;
 }
 
@@ -228,6 +250,34 @@ describe("ArchivedItemsPage", () => {
     });
     expect(screen.getByText("Milk")).toBeInTheDocument();
     expect(screen.queryByText("Old Bread")).toBeNull();
+  });
+
+  it("turns the page with the cursor the server handed back, and back without one", async () => {
+    // The archive only grows, and a page asked for by position made the
+    // server read every row above it. The next page is the one below the
+    // last row seen, named by the cursor the previous page carried.
+    mockUseArchivedItems.mockImplementation(stubCursorPages);
+    const user = userEvent.setup();
+    renderPage();
+    expect(mockUseArchivedItems).toHaveBeenLastCalledWith(
+      expect.objectContaining({ cursor: undefined, limit: 50 }),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+
+    expect(mockUseArchivedItems).toHaveBeenLastCalledWith(
+      expect.objectContaining({ cursor: "after-first" }),
+    );
+    expect(await screen.findByText("Desk Lamp")).toBeInTheDocument();
+    expect(screen.queryByText("Milk")).toBeNull();
+    expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+
+    await user.click(screen.getByRole("button", { name: "Previous page" }));
+
+    expect(mockUseArchivedItems).toHaveBeenLastCalledWith(
+      expect.objectContaining({ cursor: undefined }),
+    );
+    expect(await screen.findByText("Milk")).toBeInTheDocument();
   });
 
   it("says no matches only after the server answered empty", async () => {
