@@ -1228,7 +1228,7 @@
     "importing": "Importando dados…",
     "processImport": "Processar importação",
     "progress": "Linhas: {{done}} / {{total}}",
-    "jobFailedPartly": "{{error}} Linhas importadas: {{done}} / {{total}}.",
+    "jobFailedPartly": "{{error}} Linhas processadas: {{done}} / {{total}}.",
     "jobFailedNothing": "{{error}} Nada foi importado.",
     "complete": "Importação concluída",
     "statsTotal": "Total",

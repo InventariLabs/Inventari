@@ -182,7 +182,10 @@ async def read_import_job(
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ):
     """How far an import that went to the background has got, and how it ended."""
-    return await import_jobs.read_job_async(db, current_user, job_id)
+    job = await import_jobs.read_job_async(db, current_user, job_id)
+    answer = ItemImportJobResponse.model_validate(job, from_attributes=True)
+    answer.error = import_jobs.reader_reason(answer.error)
+    return answer
 
 
 @router.get('/export/xlsx', response_model=None)

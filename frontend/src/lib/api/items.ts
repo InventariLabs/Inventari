@@ -42,8 +42,9 @@ const IMPORT_POLL_MS = 1500;
  * so the screen can show a number rather than a spinner for those minutes.
  *
  * A job that fails keeps what its batches had already committed, so the
- * refusal says how many rows that was: a half-imported sheet and one that
- * imported nothing ask for different things from the reader. */
+ * refusal says how many rows the job had got through (rows read, which
+ * includes any that failed or were skipped, not rows imported): a half-done
+ * sheet and one that did nothing ask for different things from the reader. */
 async function followImportJob(
   jobId: string,
   onProgress?: (progress: ImportProgress) => void,

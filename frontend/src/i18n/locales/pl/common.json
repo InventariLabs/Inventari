@@ -1284,7 +1284,7 @@
     "importing": "Importowanie danych…",
     "processImport": "Importuj",
     "progress": "Wiersze: {{done}} / {{total}}",
-    "jobFailedPartly": "{{error}} Zaimportowane wiersze: {{done}} / {{total}}.",
+    "jobFailedPartly": "{{error}} Przetworzone wiersze: {{done}} / {{total}}.",
     "jobFailedNothing": "{{error}} Nic nie zostało zaimportowane.",
     "complete": "Import zakończony",
     "statsTotal": "Razem",

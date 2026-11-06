@@ -547,6 +547,8 @@ describe("importing a sheet", () => {
     expect((failure as Error).message).toContain(
       "The import was interrupted before it finished.",
     );
+    // rows the job got through, not rows it imported: failed rows are in it
+    expect((failure as Error).message).toMatch(/rows processed/i);
     expect((failure as Error).message).toContain("400");
     expect((failure as Error).message).toContain("1000");
   });

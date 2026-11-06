@@ -1240,7 +1240,7 @@
     "importing": "Importation des données…",
     "processImport": "Traiter l'importation",
     "progress": "Lignes : {{done}} / {{total}}",
-    "jobFailedPartly": "{{error}} Lignes importées : {{done}} / {{total}}.",
+    "jobFailedPartly": "{{error}} Lignes traitées : {{done}} / {{total}}.",
     "jobFailedNothing": "{{error}} Rien n'a été importé.",
     "complete": "Import terminé",
     "statsTotal": "Total",

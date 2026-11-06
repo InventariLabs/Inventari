@@ -1238,7 +1238,7 @@
     "importing": "Importing Data…",
     "processImport": "Process Import",
     "progress": "Rows: {{done}} / {{total}}",
-    "jobFailedPartly": "{{error}} Rows imported before it stopped: {{done}} / {{total}}.",
+    "jobFailedPartly": "{{error}} Rows processed before it stopped: {{done}} / {{total}}.",
     "jobFailedNothing": "{{error}} Nothing was imported.",
     "complete": "Import complete",
     "statsTotal": "Total",
