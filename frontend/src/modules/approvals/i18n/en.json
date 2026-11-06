@@ -271,7 +271,7 @@
     "deadEndCauseNamedUnknown": "This stage names approvers who cannot see approvals.",
     "deadEndCauseNoApprover": "The stage is open to anyone holding the approve permission, and nobody in this organization holds it.",
     "deadEndCauseOnlyRequester": "The stage is open to anyone holding the approve permission, but the only holder is the person who asked — and a requester cannot decide their own request.",
-    "deadEndStepWithdraw": "Withdraw the request. The document goes back to Confirmed; asking for approval again lands on the same stage, because the workflow stays as it is.",
+    "deadEndStepWithdraw": "Withdraw the request. Asking for approval again lands on the same stage, because the workflow stays as it is.",
     "deadEndStepGrantNamed": "Give {{names}} access to approvals — a role with the approvals read permission is enough.",
     "deadEndStepGrantNamedUnknown": "Give the named approvers access to approvals — a role with the approvals read permission is enough.",
     "deadEndStepGrantApprove": "Give someone the approve permission through a role.",

@@ -271,7 +271,7 @@
     "deadEndCauseNamedUnknown": "Cette étape nomme des approbateurs qui n'ont pas accès aux approbations.",
     "deadEndCauseNoApprover": "L'étape est ouverte à quiconque détient le droit d'approuver, et personne dans cette organisation ne l'a.",
     "deadEndCauseOnlyRequester": "L'étape est ouverte à quiconque détient le droit d'approuver, mais le seul détenteur est la personne qui a demandé — et un demandeur ne peut pas trancher sa propre demande.",
-    "deadEndStepWithdraw": "Retirez la demande. Le document revient à « Confirmé » ; une nouvelle demande d'approbation arrive sur la même étape, car le flux reste inchangé.",
+    "deadEndStepWithdraw": "Retirez la demande. Une nouvelle demande d'approbation arrive sur la même étape, car le flux reste inchangé.",
     "deadEndStepGrantNamed": "Donnez à {{names}} l'accès aux approbations — un rôle avec le droit de lecture des approbations suffit.",
     "deadEndStepGrantNamedUnknown": "Donnez aux approbateurs nommés l'accès aux approbations — un rôle avec le droit de lecture des approbations suffit.",
     "deadEndStepGrantApprove": "Accordez à quelqu'un le droit d'approuver par un rôle.",

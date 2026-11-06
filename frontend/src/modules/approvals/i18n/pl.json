@@ -281,7 +281,7 @@
     "deadEndCauseNamedUnknown": "Ten etap wskazuje akceptantów, którzy nie mają dostępu do akceptacji.",
     "deadEndCauseNoApprover": "Etap jest otwarty dla każdego z uprawnieniem akceptowania, a nikt w tej organizacji go nie ma.",
     "deadEndCauseOnlyRequester": "Etap jest otwarty dla każdego z uprawnieniem akceptowania, ale jedynym jego posiadaczem jest osoba zgłaszająca — a wnioskodawca nie może rozstrzygać własnego wniosku.",
-    "deadEndStepWithdraw": "Wycofaj wniosek. Dokument wraca do statusu Potwierdzony; kolejna prośba o akceptację trafi na ten sam etap, bo przepływ zostaje bez zmian.",
+    "deadEndStepWithdraw": "Wycofaj wniosek. Kolejna prośba o akceptację trafi na ten sam etap, bo przepływ zostaje bez zmian.",
     "deadEndStepGrantNamed": "Daj osobom: {{names}} dostęp do akceptacji — wystarczy rola z uprawnieniem do przeglądania akceptacji.",
     "deadEndStepGrantNamedUnknown": "Daj wskazanym akceptantom dostęp do akceptacji — wystarczy rola z uprawnieniem do przeglądania akceptacji.",
     "deadEndStepGrantApprove": "Przyznaj komuś uprawnienie akceptowania przez rolę.",
