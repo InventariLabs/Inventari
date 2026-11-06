@@ -488,6 +488,7 @@
   "archivedNoMatchesDesc": "Prüfen Sie die Schreibweise oder leeren Sie die Suche, um das ganze Archiv zu sehen.",
   "archivedReasonLabel": "Grund",
   "archivedDeletedAtLabel": "Gelöscht",
+  "archivedNoteLabel": "Notiz",
   "groupByCategory": "Nach Kategorie gruppieren",
   "totals": {
     "label": "Summe",

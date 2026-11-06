@@ -85,6 +85,39 @@ function reasonKey(reason: string): string {
   return reason.toUpperCase();
 }
 
+/** The product's name and, under it, what was written when it was deleted.
+ *  The archive is where restoring or purging is decided, so the note from the
+ *  delete dialog is read here. Below `sm` the date also lives under the name,
+ *  since its own column is hidden there. */
+function ArchivedNameCell({
+  name,
+  note,
+  deletedAt,
+}: {
+  name: string;
+  note?: string | null;
+  deletedAt?: string | null;
+}) {
+  const { t } = useTranslation("items");
+  return (
+    <>
+      <span className="text-sm font-semibold text-on [overflow-wrap:anywhere] block sm:truncate">
+        {name}
+      </span>
+      {note && (
+        <span className="mt-0.5 block text-xs text-on-secondary [overflow-wrap:anywhere]">
+          <span className="font-medium">{t("archivedNoteLabel")}:</span> {note}
+        </span>
+      )}
+      {deletedAt && (
+        <span className="mt-0.5 block text-xs text-on-secondary tabular-nums sm:hidden">
+          {formatDate(deletedAt)}
+        </span>
+      )}
+    </>
+  );
+}
+
 export default function ArchivedItemsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation(["items", "common"]);
@@ -270,16 +303,11 @@ export default function ArchivedItemsPage() {
                   {archivedItems.map((item) => (
                     <tr key={item.id} className="group">
                       <td className={bodyCell}>
-                        <span className="text-sm font-semibold text-on [overflow-wrap:anywhere] block sm:truncate">
-                          {item.name}
-                        </span>
-                        {/* Below `sm` the date lives under the name; its
-                            column is hidden there. */}
-                        {item.deleted_at && (
-                          <span className="mt-0.5 block text-xs text-on-secondary tabular-nums sm:hidden">
-                            {formatDate(item.deleted_at)}
-                          </span>
-                        )}
+                        <ArchivedNameCell
+                          name={item.name}
+                          note={item.deletion_notes}
+                          deletedAt={item.deleted_at}
+                        />
                       </td>
                       <td
                         className={cn(bodyCell, "text-on-secondary", wideOnly)}

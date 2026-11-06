@@ -19,6 +19,7 @@ from app.core.db_utils import in_ids, paginate_async
 from app.core.exceptions import AppException, NotFoundException
 from app.i18n.service import get_current_lang, get_error_message
 from app.models.item import Item
+from app.models.item_history import ItemAction, ItemHistory
 from app.models.product_template import ProductTemplate
 
 
@@ -176,6 +177,36 @@ async def get_archived_items_async(
         .order_by(Item.deleted_at.desc())
     )
     return await paginate_async(db, query, limit=limit, offset=offset)
+
+
+async def get_deletion_notes_async(
+    db: AsyncSession, item_ids: list[UUID]
+) -> dict[UUID, str]:
+    """The note typed into the delete dialog, per archived product.
+
+    The note is written once, into the ``DELETED`` history entry; a product
+    deleted, restored and deleted again has several, and the latest one is
+    the deletion the archive is showing. A product deleted without a note
+    has no key in the result.
+    """
+    if not item_ids:
+        return {}
+    rows = await db.execute(
+        select(ItemHistory.item_id, ItemHistory.changes)
+        .where(
+            ItemHistory.item_id.in_(item_ids),
+            ItemHistory.action == ItemAction.DELETED.value,
+        )
+        .order_by(ItemHistory.created_at.asc())
+    )
+    notes: dict[UUID, str] = {}
+    for item_id, changes in rows:
+        note = (changes or {}).get('notes')
+        if note:
+            notes[item_id] = note
+        else:
+            notes.pop(item_id, None)
+    return notes
 
 
 def get_product_template_or_404(

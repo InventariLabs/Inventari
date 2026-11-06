@@ -488,6 +488,7 @@
   "archivedNoMatchesDesc": "Check the spelling or clear the search to see the whole archive.",
   "archivedReasonLabel": "Reason",
   "archivedDeletedAtLabel": "Deleted",
+  "archivedNoteLabel": "Note",
   "groupByCategory": "Group by category",
   "totals": {
     "label": "Totals",

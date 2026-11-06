@@ -488,6 +488,7 @@
   "archivedNoMatchesDesc": "Verifique a grafia ou limpe a busca para ver todo o arquivo.",
   "archivedReasonLabel": "Motivo",
   "archivedDeletedAtLabel": "Excluído",
+  "archivedNoteLabel": "Nota",
   "groupByCategory": "Agrupar por categoria",
   "totals": {
     "label": "Totais",
