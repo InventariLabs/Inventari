@@ -119,6 +119,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The consumption report's two top-ten lists, the products used most and the
+  ones whose disposals cost most, put equal products in the order of their
+  names. A tie at the tenth place used to be settled by the order the database
+  returned the rows in, so the same window could name a different tenth product
+  from one reading to the next.
 - The scanner's Back button now leads to the launcher when the scanner was the
   first screen of the tab — opened by address, through a printed code's link or
   after signing in — instead of doing nothing.

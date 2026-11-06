@@ -47,6 +47,21 @@ _KIND_OF_ACTION: dict[str, str] = {
 _QUERIED_ACTIONS: tuple[str, ...] = tuple(_KIND_OF_ACTION)
 
 
+def _top_ten(by_product: dict[str, dict], measure: str) -> list[dict]:
+    """The ten products largest by *measure*; equal ones in the order of their names.
+
+    The lines come out of a ``GROUP BY`` in no order of their own, so a
+    ranking by the figure alone left a tie at the tenth place to whatever
+    order the database returned them in, and the same window could name a
+    different tenth product on the next reading. The name is what the report
+    rolls records up by, so the figure and then the name is a total order.
+    """
+    return sorted(
+        by_product.values(),
+        key=lambda line: (-line[measure], line['name'].casefold(), line['name']),
+    )[:10]
+
+
 async def get_consumption_stats_async(
     db: AsyncSession, organization_id: UUID, days: int = 30
 ) -> ConsumptionStatsDTO:
@@ -170,12 +185,8 @@ async def get_consumption_stats_async(
         by_kind['wasted'], wasted_value
     )
 
-    most_consumed = sorted(
-        consumed_by_product.values(), key=lambda x: x['quantity'], reverse=True
-    )[:10]
-    most_wasted = sorted(
-        wasted_by_product.values(), key=lambda x: x['value'], reverse=True
-    )[:10]
+    most_consumed = _top_ten(consumed_by_product, 'quantity')
+    most_wasted = _top_ten(wasted_by_product, 'value')
 
     total_events = consumed_events + wasted_events
     waste_event_rate = wasted_events / total_events if total_events > 0 else 0.0
