@@ -35,10 +35,13 @@ import { toast } from "sonner";
  *
  * Reviewed against the nav-leave guard (`useFormGuard`) and deliberately left
  * out of it: nothing on this page is typed into the page. A rule is written
- * in `PutawayRuleEditorDialog`, which traps interaction while it is open —
- * no module tab is clickable, the route cannot change underneath it, and the
- * dialog's own close control is the exit. The guard's question could never
- * fire here, and arming it would only teach the reader to click through one.
+ * in `PutawayRuleEditorDialog`, whose tabs and links are out of reach while
+ * it is open — but the command palette opens over it and can still navigate,
+ * so the question could be asked. It is not armed because a rule is a handful
+ * of picks (a product or category, the target shelves in order) and one
+ * number, which the pickers give back in seconds, and the guard is kept for
+ * forms where a stray click costs real work. Revisit if the rule grows free
+ * text.
  */
 export default function PutawayRulesPage() {
   const { t } = useTranslation("warehouse");

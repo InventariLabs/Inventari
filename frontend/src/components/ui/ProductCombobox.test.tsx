@@ -516,6 +516,71 @@ describe("ProductCombobox", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("closes its panel when focus leaves, so Escape reaches the sheet", async () => {
+    // The panel used to outlive the focus: Escape from another field was
+    // yielded to a list nobody was typing in, and nothing happened.
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    search.mockResolvedValue([stub("Widget")]);
+    render(
+      <Sheet open={true} onClose={onClose}>
+        <ProductCombobox {...baseProps} />
+        <input aria-label="Notes" />
+      </Sheet>,
+    );
+
+    await user.type(screen.getByRole("combobox"), "wi");
+    await screen.findByRole("listbox");
+
+    await user.click(screen.getByLabelText("Notes"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the text and brings the panel back when the box is typed in again", async () => {
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Widget")]);
+    render(
+      <div>
+        <ProductCombobox {...baseProps} />
+        <input aria-label="Notes" />
+      </div>,
+    );
+    const box = screen.getByRole("combobox");
+
+    await user.type(box, "wi");
+    await screen.findByRole("listbox");
+    await user.click(screen.getByLabelText("Notes"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(box).toHaveValue("wi");
+
+    await user.click(box);
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("closes its panel on a press outside, and not on a pick inside it", async () => {
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Widget")]);
+    render(
+      <div>
+        <ProductCombobox {...baseProps} />
+        <p>elsewhere</p>
+      </div>,
+    );
+
+    await user.type(screen.getByRole("combobox"), "wi");
+    await screen.findByRole("listbox");
+    await user.click(screen.getByText("elsewhere"));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+    await user.clear(screen.getByRole("combobox"));
+    await user.type(screen.getByRole("combobox"), "wid");
+    await user.click(await screen.findByRole("option", { name: /Widget/ }));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps the searching state distinct from an empty result", async () => {
     vi.useFakeTimers();
     let resolveSearch!: (value: ProductComboboxOption[]) => void;

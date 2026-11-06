@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { Sheet, SheetBody, SheetHeader } from "@/components/ui/Sheet";
 import { extractApiError } from "@/lib/errors";
 import { useRecipe } from "@/modules/recipes/hooks/useRecipes";
 import type { RecipeCreate, RecipeList } from "@/modules/recipes/types/core";
@@ -40,30 +38,11 @@ export default function RecipeEditForm({
   // A failed read has already toasted and closed the form; it renders nothing.
   // A pending one shows the sheet at once, so the click is answered while the
   // detail travels — on a cold cache the form used to appear only when it
-  // landed, and the click looked dead.
+  // landed, and the click looked dead. The same sheet then holds the form.
   if (detail.isError) return null;
-  if (!detail.data) {
-    return (
-      <Sheet
-        open
-        onClose={onCancel}
-        maxWidth="3xl"
-        aria-label={t("form.edit_title")}
-      >
-        <SheetHeader
-          title={t("form.edit_title")}
-          onClose={onCancel}
-          closeLabel={t("common:actions.close")}
-          className="px-5 py-4 shrink-0"
-        />
-        <SheetBody>
-          <LoadingSpinner />
-        </SheetBody>
-      </Sheet>
-    );
-  }
   return (
     <RecipeForm
+      loading={!detail.data}
       initial={detail.data}
       onSubmit={onSubmit}
       onCancel={onCancel}

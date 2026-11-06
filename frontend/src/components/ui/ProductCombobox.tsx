@@ -346,6 +346,43 @@ function ProductComboboxList<T extends ProductComboboxOption>({
 }
 
 /**
+ * A panel that outlives the focus holds Escape for a box nobody is typing in
+ * (`hasListboxOpen`), so a sheet around it could not be closed from anywhere
+ * else on the form. `setDismissed(true)` runs when focus or a press goes outside both
+ * the box and the panel; a press inside the panel is a pick.
+ */
+function useDismissOnOutside(
+  open: boolean,
+  inputRef: React.RefObject<HTMLElement | null>,
+  panelRef: React.RefObject<HTMLElement | null>,
+  setDismissed: (dismissed: boolean) => void,
+) {
+  useEffect(() => {
+    if (!open) return;
+    const outside = (target: EventTarget | null) => {
+      const node = target as Node | null;
+      return (
+        !!node &&
+        !inputRef.current?.contains(node) &&
+        !panelRef.current?.contains(node)
+      );
+    };
+    const onPointerDown = (e: Event) => {
+      if (outside(e.target)) setDismissed(true);
+    };
+    const onFocusIn = (e: FocusEvent) => {
+      if (outside(e.target)) setDismissed(true);
+    };
+    document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("focusin", onFocusIn);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("focusin", onFocusIn);
+    };
+  }, [open, inputRef, panelRef, setDismissed]);
+}
+
+/**
  * A single product is the smallest unit every inventory module manipulates,
  * so the search for it was implemented three times — the pricelist and
  * reorder-rule forms, the maker's BoM editor and the putaway rule editor each
@@ -480,7 +517,14 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // The panel now opens for the in-between state too: a search that is still
   // running says "searching" instead of silently leaving the field looking
   // broken, and a search that finished empty always says so (/).
-  const dropdownOpen = showResults || showLoading || showEmpty;
+  // The reader moved on — focus went elsewhere or a press landed outside —
+  // while the text stays where they left it. Typing or returning to the box
+  // brings the list back.
+  const [dismissed, setDismissed] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const dropdownOpen = (showResults || showLoading || showEmpty) && !dismissed;
+
+  useDismissOnOutside(dropdownOpen, inputRef, panelRef, setDismissed);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown" && showResults) {
@@ -607,7 +651,11 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         aria-required={required ? "true" : undefined}
         error={error}
         value={value ? value.name : query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setDismissed(false);
+        }}
+        onFocus={() => setDismissed(false)}
         maxLength={maxLength}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
@@ -657,6 +705,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         panelPos &&
         createPortal(
           <div
+            ref={panelRef}
             style={{
               position: "fixed",
               top: panelPos.top,

@@ -713,6 +713,7 @@ export default function DocumentFormModal({
                     roleTypes={picker.partnerTypes}
                     onCreated={handlePartnerCreated}
                     onCancel={handlePartnerCreateCancel}
+                    returnFocusId={FIELD_IDS.partner}
                   />
                 </div>
               )}

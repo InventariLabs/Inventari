@@ -1,4 +1,4 @@
-import { act } from "react";
+import React, { act } from "react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/utils";
@@ -45,6 +45,40 @@ describe("PartnerInlineCreate", () => {
       screen.getByPlaceholderText("e.g. ABC Wholesaler"),
     ).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toBeInTheDocument();
+  });
+
+  it("hands the focus back to the field that opened it when Cancel closes it", async () => {
+    // The layer unmounts while Cancel holds the focus; the page body then has
+    // it, outside the dialog the layer sits in.
+    const user = userEvent.setup();
+    function Host() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <div>
+          <button id="partner-field">Partner</button>
+          {open && (
+            <PartnerInlineCreate
+              initialName=""
+              onCreated={vi.fn()}
+              onCancel={() => setOpen(false)}
+              returnFocusId="partner-field"
+            />
+          )}
+        </div>
+      );
+    }
+    render(<Host />);
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByTestId("partner-inline-create-submit")).toBeNull();
+    await act(
+      () =>
+        new Promise<void>((done) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => done())),
+        ),
+    );
+
+    expect(document.activeElement).toBe(screen.getByText("Partner"));
   });
 
   it("takes focus into the name and brings the layer into view", () => {
