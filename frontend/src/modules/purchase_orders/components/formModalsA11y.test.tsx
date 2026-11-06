@@ -21,7 +21,7 @@ function renderPricelist(onClose = vi.fn()) {
   render(
     <PricelistFormModal
       open
-      form={emptyPricelistForm}
+      form={emptyPricelistForm()}
       onChange={vi.fn()}
       searchProducts={vi.fn().mockResolvedValue([])}
       onProductSelected={vi.fn()}

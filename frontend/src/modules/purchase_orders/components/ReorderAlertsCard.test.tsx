@@ -93,6 +93,40 @@ describe("ReorderAlertsCard draft-PO action", () => {
     ).toBeInTheDocument();
   });
 
+  it("names the minimum as the threshold when it is the higher one", () => {
+    render(
+      <ReorderAlertsCard
+        alerts={[{ ...ALERT_WITH_SUPPLIER, available_quantity: 2 }]}
+        locationName={locationName}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(screen.getByText("available 2 / min 10")).toBeInTheDocument();
+  });
+
+  it("names the safety stock as the threshold when it stands above the minimum", () => {
+    render(
+      <ReorderAlertsCard
+        alerts={[
+          {
+            ...ALERT_WITH_SUPPLIER,
+            available_quantity: 19,
+            min_quantity: 19,
+            safety_stock: 21,
+          },
+        ]}
+        locationName={locationName}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(
+      screen.getByText("available 19 / safety stock 21"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/min 19/)).not.toBeInTheDocument();
+  });
+
   it("hides the create action when no alert has a supplier", () => {
     render(
       <ReorderAlertsCard
