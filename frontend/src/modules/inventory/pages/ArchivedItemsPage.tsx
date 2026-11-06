@@ -18,7 +18,7 @@ import {
   usePurgeItem,
 } from "@/modules/inventory/hooks/useItemMutations";
 import { useArchivedItems } from "@/modules/inventory/hooks/useItems";
-import { archivedReasonBadgeKey } from "@/modules/shared/lib/archiveReasons";
+import { archivedReasonLabel } from "@/modules/shared/lib/archiveReasons";
 import { useArchiveTabs } from "@/hooks/useArchiveTabs";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useFilteredList } from "@/hooks/useFilteredList";
@@ -328,10 +328,12 @@ export default function ArchivedItemsPage() {
                               REASON_COLORS.OTHER
                             }
                           >
-                            {t(archivedReasonBadgeKey(item.deletion_reason))}
+                            {archivedReasonLabel(t, item.deletion_reason)}
                           </Badge>
                         ) : (
-                          <span className="text-on-muted">—</span>
+                          <span className="text-on-muted">
+                            {archivedReasonLabel(t, null)}
+                          </span>
                         )}
                       </td>
                       <td
