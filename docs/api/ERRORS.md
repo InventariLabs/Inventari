@@ -233,7 +233,7 @@ apart.
 | `ATTESTATION_NO_ACTIVE_ASSIGNMENTS` | No active assignments found for the configured scope |
 | `ATTESTATION_REFUSED` | This attestation link cannot accept this action. Ask the organisation that sent it for a new link. |
 | `ATTESTATION_REMINDERS_NOT_ACTIVE` | Reminders can only be sent for a campaign that is running |
-| `ATTESTATION_SCOPE_EXCEEDS_LIMIT` | The scope covers more than {limit} assets. Narrow it, or split the attestation into smaller ones. |
+| `ATTESTATION_SCOPE_EXCEEDS_LIMIT` | The scope covers more than {limit} items. Narrow it, or split the attestation into smaller ones. |
 | `BARCODE_ALREADY_EXISTS` | Barcode {barcode} already exists |
 | `BARCODE_IN_USE` | Barcode already in use: {barcode} |
 | `BARCODE_NAMES_ONE_RECORD` | One barcode cannot name {count} records: {barcode} |
