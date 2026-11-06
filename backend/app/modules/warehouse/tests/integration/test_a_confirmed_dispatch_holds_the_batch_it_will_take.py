@@ -113,5 +113,5 @@ def test_the_hold_follows_the_products_removal_strategy(
     rows = db_session.scalars(
         select(StockReservation).where(StockReservation.document_id == doc_id)
     ).all()
-    names = {db_session.get(StockLot, row.lot_id).name for row in rows}  # type: ignore[union-attr]
-    assert names == {held}
+    by_name = {'RECEIVED-FIRST': first.id, 'EXPIRES-SOON': second.id}
+    assert {row.lot_id for row in rows} == {by_name[held]}
