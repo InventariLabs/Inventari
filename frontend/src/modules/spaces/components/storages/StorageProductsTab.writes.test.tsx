@@ -162,8 +162,10 @@ describe("StorageProductsTab — taking stock off the shelf", () => {
 
   it("deletes a product only after the confirmation", async () => {
     const deleted = vi.fn();
+    let deletedWith: unknown;
     server.use(
-      http.delete("/api/v1/items/item-2", () => {
+      http.delete("/api/v1/items/item-2", async ({ request }) => {
+        deletedWith = await request.json();
         deleted();
         return new HttpResponse(null, { status: 204 });
       }),
@@ -176,12 +178,18 @@ describe("StorageProductsTab — taking stock off the shelf", () => {
       within(rowOf("Loose screws")).getByRole("button", { name: "Delete" }),
     );
     const dialog = await screen.findByRole("alertdialog");
+    // Same question as the products list: no reason, no delete.
     expect(
-      within(dialog).getByText("Are you sure you want to delete this product?"),
-    ).toBeInTheDocument();
+      within(dialog).getByRole("button", { name: "Delete" }),
+    ).toBeDisabled();
     expect(deleted).not.toHaveBeenCalled();
+    await user.selectOptions(
+      within(dialog).getByTestId("deletion-reason"),
+      "EXPIRED",
+    );
     await user.click(within(dialog).getByRole("button", { name: "Delete" }));
     await waitFor(() => expect(deleted).toHaveBeenCalledTimes(1));
+    expect(deletedWith).toMatchObject({ reason: "EXPIRED" });
   });
 });
 
@@ -210,6 +218,10 @@ describe("StorageProductsTab — the category filter", () => {
       within(rowOf("Apple Juice")).getByRole("button", { name: "Delete" }),
     );
     const dialog = await screen.findByRole("alertdialog");
+    await user.selectOptions(
+      within(dialog).getByTestId("deletion-reason"),
+      "EXPIRED",
+    );
     await user.click(within(dialog).getByRole("button", { name: "Delete" }));
 
     await waitFor(() =>
