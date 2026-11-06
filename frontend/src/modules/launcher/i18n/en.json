@@ -30,10 +30,10 @@
     "current": "Current",
     "apply": "Apply",
     "reapply": "Apply again",
-    "reapplyHint": "Runs this profile's setup again — no modules are added or removed",
+    "reapplyHint": "Runs this workspace mode's setup again — no modules are added or removed",
     "target": "Target: {{name}}",
-    "loading": "Loading profiles…",
-    "empty": "No profiles available.",
+    "loading": "Loading workspace modes…",
+    "empty": "No workspace modes available.",
     "diffTitle": "What will change",
     "diffSubtitle": "From {{from}} to {{to}}",
     "diffEnable": "Enable",
@@ -50,7 +50,7 @@
     "previewLoading": "Calculating changes…",
     "diffManualKept": "Kept (added manually)",
     "diffCascadeHint": "Disabled because they require a removed module",
-    "diffConfigHint": "Profile defaults will overwrite current settings",
+    "diffConfigHint": "The workspace mode's defaults will overwrite current settings",
     "renumberOffer": "Your locations keep their codes and stickers. For codes that read like A-02-01, choose Renumber by template under Configuration → Location codes, labels and walk order; old stickers keep scanning."
   },
   "activeProfile": {
