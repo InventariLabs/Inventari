@@ -13,7 +13,6 @@ from app.core.deps import (
     get_async_db,
     get_current_user_context,
     require_org,
-    require_permission,
 )
 from app.core.exceptions import (
     ConflictException,
@@ -26,7 +25,6 @@ from app.i18n.service import get_current_lang, get_error_message
 from app.modules.recipes._meal_plan import (
     add_entry_async,
     bulk_save_entries_async,
-    cook_entry_async,
     copy_plan_to_week_async,
     count_meal_plans_async,
     create_meal_plan_async,
@@ -52,7 +50,6 @@ from app.modules.recipes.schemas import (
     MealPlanListItem,
     MealPlanSchema,
     MealPlanUpdate,
-    PickingStartResponse,
     ShoppingExclusionCreate,
     ShoppingExclusionSchema,
     ShoppingListGenerationResult,
@@ -347,22 +344,3 @@ async def generate_plan_shopping_list(
     return await generate_shopping_list_async(
         db, plan_id, org_id, current_user.id, lang
     )
-
-
-# ── Cook Now ───────────────────────────────────────────────────────────────────
-
-
-@router.post(
-    '/{plan_id}/entries/{entry_id}/cook',
-    response_model=PickingStartResponse,
-    dependencies=[require_permission('recipes:consume')],
-)
-@map_service_errors
-async def cook_plan_entry(
-    plan_id: UUID,
-    entry_id: UUID,
-    current_user: UserContextDTO = Depends(get_current_user_context),
-    db: AsyncSession = Depends(get_async_db, scope='function'),
-) -> Any:
-    org_id = require_org(current_user)
-    return await cook_entry_async(db, plan_id, entry_id, org_id, current_user.id)

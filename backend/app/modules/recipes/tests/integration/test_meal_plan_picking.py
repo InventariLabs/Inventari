@@ -55,37 +55,6 @@ class TestMealPlanPickingIntegration:
         ).json()['id']
         return plan_id, entry_id, recipe_id
 
-    def test_cook_entry_creates_picking_session(
-        self, client: TestClient, auth_headers: dict[str, str]
-    ) -> None:
-        plan_id, entry_id, _ = self._setup_plan_with_entry(client, auth_headers)
-        r = client.post(
-            f'{PLAN_URL}/{plan_id}/entries/{entry_id}/cook', headers=auth_headers
-        )
-        assert r.status_code == 200
-        data = r.json()
-        assert 'picking_session_id' in data
-
-    def test_cook_entry_not_found_returns_404(
-        self, client: TestClient, auth_headers: dict[str, str]
-    ) -> None:
-        plan_id = client.post(
-            PLAN_URL, json=_plan_payload(), headers=auth_headers
-        ).json()['id']
-        r = client.post(
-            f'{PLAN_URL}/{plan_id}/entries/{uuid.uuid4()}/cook', headers=auth_headers
-        )
-        assert r.status_code == 404
-
-    def test_cook_unknown_plan_returns_404(
-        self, client: TestClient, auth_headers: dict[str, str]
-    ) -> None:
-        r = client.post(
-            f'{PLAN_URL}/{uuid.uuid4()}/entries/{uuid.uuid4()}/cook',
-            headers=auth_headers,
-        )
-        assert r.status_code == 404
-
     def test_entry_is_completed_false_before_cooking(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:
@@ -273,12 +242,15 @@ class TestARepeatedRecipeIsCookedOnItsOwnDay:
         auth_headers: dict[str, str],
         db_session: Session,
     ) -> None:
-        plan_id, _, entries = self._plan_with_lunch_and_dinner(client, auth_headers)
+        plan_id, recipe_id, entries = self._plan_with_lunch_and_dinner(
+            client, auth_headers
+        )
         started = client.post(
-            f'{PLAN_URL}/{plan_id}/entries/{entries[cooked]}/cook',
+            f'{RECIPE_URL}/{recipe_id}/picking/start',
+            json={'servings': 2, 'meal_plan_entry_id': entries[cooked]},
             headers=auth_headers,
         )
-        assert started.status_code == 200, started.text
+        assert started.status_code == 201, started.text
         session = db_session.get(
             PickingSession, uuid.UUID(started.json()['picking_session_id'])
         )
@@ -350,13 +322,17 @@ class TestARepeatedRecipeIsCookedOnItsOwnDay:
     def test_cook_now_on_the_sibling_card_moves_an_unfinished_cook_to_it(
         self, client: TestClient, auth_headers: dict[str, str], db_session: Session
     ) -> None:
-        plan_id, _, entries = self._plan_with_lunch_and_dinner(client, auth_headers)
+        plan_id, recipe_id, entries = self._plan_with_lunch_and_dinner(
+            client, auth_headers
+        )
         first = client.post(
-            f'{PLAN_URL}/{plan_id}/entries/{entries["LUNCH"]}/cook',
+            f'{RECIPE_URL}/{recipe_id}/picking/start',
+            json={'servings': 2, 'meal_plan_entry_id': entries['LUNCH']},
             headers=auth_headers,
         ).json()
         again = client.post(
-            f'{PLAN_URL}/{plan_id}/entries/{entries["DINNER"]}/cook',
+            f'{RECIPE_URL}/{recipe_id}/picking/start',
+            json={'servings': 2, 'meal_plan_entry_id': entries['DINNER']},
             headers=auth_headers,
         ).json()
         assert again['picking_session_id'] == first['picking_session_id']

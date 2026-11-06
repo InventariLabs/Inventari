@@ -15,7 +15,16 @@ from app.i18n.service import get_current_lang, get_error_message
 
 from .models import MealPlan, MealPlanEntry, MealSlot, Recipe
 
+#: A plan covers at most this many calendar days, first and last included.
 _MAX_PLAN_DAYS = 14
+
+
+def _plan_is_too_long(start: date, end: date) -> bool:
+    """Whether a plan from *start* to *end* spans more than ``_MAX_PLAN_DAYS`` days.
+
+    Both ends count: ``end - start`` is 13 days for a plan of fourteen.
+    """
+    return (end - start).days >= _MAX_PLAN_DAYS
 
 
 def _get_effective_servings(

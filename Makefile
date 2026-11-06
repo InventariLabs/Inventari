@@ -680,7 +680,7 @@ measure-scale: ## Time every daily screen and report on a scale-seeded stack (us
 	@api="$${SCALE_API:-http://$$($(DOCKER_COMPOSE) port backend 8000)}"; \
 		python3 load_tests/scale/measure.py --api "$$api" --tier "$(TIER)" --out "load_tests/scale/results/$(TIER).json"
 
-db-seed-demo: ## Seed demo data (~600 items, suppliers, warehouse hierarchy)
+db-seed-demo: ## Seed demo data (500 items by default, suppliers, warehouse hierarchy)
 	@echo "$(BLUE)[INFO]$(NC) Seeding demo data..."
 	$(BACKEND_EXEC) uv run python seed_demo_data.py
 	@echo "$(GREEN)[OK]$(NC) Demo data seeded. Login: admin@example.com"

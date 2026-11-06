@@ -7,7 +7,7 @@
 # covers less than it did.
 architecture_lint_api_imports_baseline.txt 0
 architecture_lint_baseline.txt 0
-audit_coverage_baseline.txt 130
+audit_coverage_baseline.txt 129
 bare_emit_baseline.txt 0
 core_api_model_leak_baseline.txt 0
 coreapi_signature_legality_baseline.txt 0
