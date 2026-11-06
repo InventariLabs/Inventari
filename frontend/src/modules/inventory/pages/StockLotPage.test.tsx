@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { fireEvent, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "@/test/utils";
+import { serveLocations } from "@/test/serveLocations";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { signInWith, signOut } from "@/test/auth";
 import StockLotPage from "./StockLotPage";
@@ -115,6 +116,19 @@ describe("StockLotPage", () => {
     expect(screen.getByText("6 kg")).toBeInTheDocument();
     expect(screen.getByText("Aisle 2")).toBeInTheDocument();
     expect(screen.getByText("4 kg")).toBeInTheDocument();
+  });
+
+  it("names each shelf by its path, so two aisles of one name stay two", async () => {
+    serveLocations([
+      { id: "wh", name: "Warehouse A", parent_id: null },
+      { id: "l1", name: "Aisle 1", parent_id: "wh" },
+      { id: "l2", name: "Aisle 2", parent_id: "wh" },
+    ]);
+
+    renderPage();
+
+    expect(await screen.findByText("Warehouse A › Aisle 1")).toBeVisible();
+    expect(screen.getByText("Warehouse A › Aisle 2")).toBeVisible();
   });
 
   it("asks the ledger for this batch and nothing else", () => {
