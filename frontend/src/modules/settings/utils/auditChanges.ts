@@ -533,8 +533,18 @@ function fieldDefinitionChange(
     ...was.filter((d) => !isBy.has(keyOf(d))).map((d) => say("removed", d)),
   ];
   return lines.length
-    ? { path: FIELD_DEFINITIONS_KEY, from: "—", to: lines.join("; ") }
+    ? { path: FIELD_DEFINITIONS_KEY, from: null, to: lines.join("; ") }
     : null;
+}
+
+/**
+ * The fields a category carried, named without a verb — what a flat snapshot
+ * (a deletion keeps the list as it stood) can honestly say: nothing was added
+ * by it. Null when the value is not a list of definitions.
+ */
+function fieldDefinitionNames(value: unknown, t?: TranslateFn): string | null {
+  if (!t || !Array.isArray(value) || !value.every(isPlainObject)) return null;
+  return value.map((d) => fieldDefinitionText(d, t)).join(", ") || null;
 }
 
 function walk(
@@ -714,7 +724,7 @@ function flatFields(
       to:
         referenceNameOf(snapshot, key, t) ??
         (key === FIELD_DEFINITIONS_KEY
-          ? fieldDefinitionChange(null, value, t)?.to
+          ? fieldDefinitionNames(value, t)
           : undefined) ??
         (key === FIELDS_KEY && Array.isArray(value) && t
           ? value

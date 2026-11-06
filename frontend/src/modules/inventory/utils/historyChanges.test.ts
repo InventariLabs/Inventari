@@ -379,6 +379,7 @@ describe("historyChanges read in the reader's language", () => {
   const catalogue: Record<string, string> = {
     "items:fields.lactose_free": "Bez laktozy",
     "items:history.openedLeft": "Zostało {{amount}}",
+    "items:history.createdWith": "Created with quantity {{amount}}",
   };
   const tl = ((key: string, opts?: Record<string, unknown>) => {
     const text = catalogue[key];
@@ -413,6 +414,12 @@ describe("historyChanges read in the reader's language", () => {
       expect(parseChanges("QUANTITY_CHANGED", { old: 1.5, new: 2.5 }, tl)).toBe(
         "1,5 → 2,5",
       );
+      expect(
+        parseChanges("CREATED", { quantity: 1.5 }, tl, undefined, {
+          symbol: "kg",
+          rounding: null,
+        }),
+      ).toBe("Created with quantity 1,5 kg");
     } finally {
       await i18n.changeLanguage("en");
     }

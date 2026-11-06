@@ -1427,14 +1427,31 @@ describe("auditChanges category field definitions", () => {
     );
   });
 
-  it("reads a created category's fields the same way", () => {
+  it("names the fields a deleted category carried, without a verb", () => {
+    // HARD_DELETE keeps the definitions flat, as they stood: nothing was added.
     const [change] = auditChanges(
-      { name: "Fasteners", field_definitions: [threadSize] },
-      "CREATE",
+      { name: "Fasteners", field_definitions: [threadSize, colour] },
+      "HARD_DELETE",
       undefined,
       say,
     );
 
-    expect(change.to).toBe("Added field Thread size (Dropdown, required)");
+    expect(change.from).toBeNull();
+    expect(change.to).toBe("Thread size (Dropdown, required), Colour (Text)");
+  });
+
+  it("leaves an update's change without a left side to draw an arrow from", () => {
+    const [change] = auditChanges(
+      {
+        before: { field_definitions: null },
+        after: { field_definitions: [colour] },
+      },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(change.from).toBeNull();
+    expect(change.to).toBe("Added field Colour (Text)");
   });
 });
