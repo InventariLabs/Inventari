@@ -107,6 +107,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Importing ingredient data from a file with no usable row — an empty sheet, a
+  renamed photo, a bank statement with no name column, a list of numbers — now
+  answers with what the import expects instead of a green "0 added" message.
+  A file with some good rows still imports them, and the message turns into a
+  warning when any row had to be skipped.
 - The scanner's Back button now leads to the launcher when the scanner was the
   first screen of the tab — opened by address, through a printed code's link or
   after signing in — instead of doing nothing.
