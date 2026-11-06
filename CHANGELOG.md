@@ -111,6 +111,24 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A fault while reading the documents awaiting your approval, or a supplier's
+  pricelist for a price suggestion, is now answered as a server error and
+  logged with its traceback. The approval list used to come back empty and the
+  suggestion fell back to the last purchase price, so a fault looked like
+  having nothing to approve, or like the supplier's price.
+- A request whose `X-Request-ID` or `Accept-Language` header carries a byte
+  outside UTF-8 is no longer answered with a 500. A client's `X-Request-ID` is
+  kept only when it is 8 to 64 letters, digits and hyphens, as a UUID or a
+  trace id is; any other value is replaced by one the server makes, which the
+  response returns as before, because the id is written into every log line
+  of the request.
+- A "not found" answer is in the reader's language on every endpoint; many
+  still answered in English. A module's `NotFoundException` raised without a
+  language now speaks the request's language too.
+- Closing or reopening an inventory period refuses a month outside 1–12 or a
+  year outside 2000–2100 with a 422, instead of closing a thirteenth month.
+  Pasted import text is refused with a 422 past the size an imported file may
+  have (50 MB).
 - The scanner's Back button now leads to the launcher when the scanner was the
   first screen of the tab — opened by address, through a printed code's link or
   after signing in — instead of doing nothing.

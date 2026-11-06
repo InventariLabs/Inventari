@@ -712,6 +712,35 @@ class TestDocumentApprovalWorkflow:
                     synced.enabled_modules = original
                     sync_s.commit()
 
+    def test_awaiting_my_approval_reports_a_failed_lookup_as_a_500(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A defect in the approvals lookup is a 500, not an empty queue.
+
+        The lookup was wrapped in a blanket ``except Exception`` that answered
+        200 with no documents: a broken approvals module looked to the
+        approver exactly like a day with nothing to approve. A disabled
+        module is decided before the lookup (the test above), so nothing the
+        lookup can raise is an expected refusal.
+        """
+        from app.modules.approvals.approvals_api import approvals_api
+
+        async def _boom(*_args: object, **_kwargs: object) -> None:
+            raise RuntimeError('simulated defect in the approvals lookup')
+
+        monkeypatch.setattr(approvals_api, 'list_requests', _boom)
+        quiet_client = TestClient(client.app, raise_server_exceptions=False)
+
+        resp = quiet_client.get(
+            '/api/v1/warehouse/awaiting-my-approval', headers=doc_auth_headers
+        )
+
+        assert resp.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+        assert resp.json()['detail']['code'] == 'INTERNAL_ERROR'
+
     def _disable_approvals_module(self, doc_org: Organization) -> list[str]:
         """Switch the approvals module off and propagate to the request
         session, the way the queue test below does."""

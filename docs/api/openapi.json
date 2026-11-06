@@ -30690,7 +30690,7 @@
           "Warehouse"
         ],
         "summary": "List Documents Awaiting My Approval",
-        "description": "List documents the current user can act on (PENDING/IN_PROGRESS).\n\nPowers the \"Do akceptacji\" submenu in the Documents module \u2014 approvers\nsee only what they can act on without leaving the document context. The\nsame read fills To do's *Needs a decision* block, so one rule answers\nboth: the approvals module must be on, the reader must hold\n``approvals:approve`` and the open stage must name them. A disabled\nmodule or a failed lookup reads as an empty queue.",
+        "description": "List documents the current user can act on (PENDING/IN_PROGRESS).\n\nPowers the \"Do akceptacji\" submenu in the Documents module \u2014 approvers\nsee only what they can act on without leaving the document context. The\nsame read fills To do's *Needs a decision* block, so one rule answers\nboth: the approvals module must be on, the reader must hold\n``approvals:approve`` and the open stage must name them. A disabled\nmodule reads as an empty queue; a failed lookup is a 500.",
         "operationId": "list_documents_awaiting_my_approval_api_v1_warehouse_awaiting_my_approval_get",
         "security": [
           {
@@ -35318,6 +35318,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 2100,
+              "minimum": 2000,
               "title": "Year"
             }
           },
@@ -35327,6 +35329,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 12,
+              "minimum": 1,
               "title": "Month"
             }
           }
@@ -35394,6 +35398,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 2100,
+              "minimum": 2000,
               "title": "Year"
             }
           },
@@ -35403,6 +35409,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 12,
+              "minimum": 1,
               "title": "Month"
             }
           }
@@ -53922,8 +53930,9 @@
         "properties": {
           "text": {
             "type": "string",
+            "maxLength": 52428800,
             "title": "Text",
-            "description": "Raw pasted clipboard text.",
+            "description": "Raw pasted clipboard text, no longer than an imported file may be.",
             "default": ""
           },
           "mapping_json": {
@@ -64936,8 +64945,9 @@
         "properties": {
           "text": {
             "type": "string",
+            "maxLength": 52428800,
             "title": "Text",
-            "description": "Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected.",
+            "description": "Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected. No longer than an imported file may be.",
             "default": ""
           }
         },
@@ -72693,8 +72703,9 @@
         "properties": {
           "text": {
             "type": "string",
+            "maxLength": 52428800,
             "title": "Text",
-            "description": "Raw pasted clipboard text.",
+            "description": "Raw pasted clipboard text, no longer than an imported file may be.",
             "default": ""
           },
           "mapping_json": {
