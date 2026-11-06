@@ -219,23 +219,51 @@ export default function RecipeForm({ loading, ...props }: Props) {
           </SheetBody>
         </>
       ) : (
-        <RecipeFormContent {...props} title={title} leaveRef={leaveRef} />
+        <RecipeFormContent {...props} leaveRef={leaveRef} />
       )}
     </Sheet>
   );
 }
+
+/**
+ * What the form owes the sheet that holds it, returning the form's ref.
+ *
+ * The loading header's close button held the focus and went with it when the
+ * form took its place; with it gone the sheet's Tab trap has no end to wrap
+ * at, so the first field takes it. And the sheet asks the form before it
+ * closes (`leaveRef`), so a filled-in form is not thrown away unasked.
+ */
+function useSheetHandover(
+  leaveRef: React.MutableRefObject<(() => void) | null>,
+  requestLeave: () => void,
+) {
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    const active = document.activeElement;
+    if (!active || active === document.body) {
+      formRef.current?.querySelector<HTMLElement>("input")?.focus();
+    }
+  }, []);
+  useEffect(() => {
+    leaveRef.current = requestLeave;
+    return () => {
+      leaveRef.current = null;
+    };
+  });
+  return formRef;
+}
+
+type ContentProps = Omit<Props, "loading"> & {
+  leaveRef: React.MutableRefObject<(() => void) | null>;
+};
 
 function RecipeFormContent({
   initial,
   onSubmit,
   onCancel,
   isLoading,
-  title,
   leaveRef,
-}: Omit<Props, "loading"> & {
-  title: string;
-  leaveRef: React.MutableRefObject<(() => void) | null>;
-}) {
+}: ContentProps) {
   const { t, i18n } = useTranslation(["recipes", "common"]);
   const lang = resolveLang(i18n.language);
   const lookupDefault = useDebouncedIngredientLookup(lang);
@@ -375,23 +403,7 @@ function RecipeFormContent({
     onCancel();
   };
 
-  // The loading header's close button held the focus and went with it when the
-  // form took its place; with it gone the sheet's Tab trap has no end to wrap
-  // at. The first field is where an edit starts.
-  const formRef = useRef<HTMLFormElement>(null);
-  useEffect(() => {
-    const active = document.activeElement;
-    if (!active || active === document.body) {
-      formRef.current?.querySelector<HTMLElement>("input")?.focus();
-    }
-  }, []);
-
-  useEffect(() => {
-    leaveRef.current = requestLeave;
-    return () => {
-      leaveRef.current = null;
-    };
-  });
+  const formRef = useSheetHandover(leaveRef, requestLeave);
 
   const addIngredient = () => {
     setIngredients((prev) => [...prev, emptyIngredient(nextKey)]);
@@ -493,7 +505,7 @@ function RecipeFormContent({
         className="flex flex-col flex-1 min-h-0"
       >
         <SheetHeader
-          title={title}
+          title={initial ? t("form.edit_title") : t("form.create_title")}
           onClose={requestLeave}
           closeLabel={t("common:actions.close")}
           className="px-5 py-4 shrink-0"
