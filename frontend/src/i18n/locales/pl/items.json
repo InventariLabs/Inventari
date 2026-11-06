@@ -526,6 +526,7 @@
   "archivedNoMatchesDesc": "Sprawdź pisownię albo wyczyść wyszukiwanie, żeby zobaczyć całe archiwum.",
   "archivedReasonLabel": "Powód",
   "archivedDeletedAtLabel": "Usunięto",
+  "archivedNoteLabel": "Notatka",
   "groupByCategory": "Grupuj po kategorii",
   "totals": {
     "label": "Suma",

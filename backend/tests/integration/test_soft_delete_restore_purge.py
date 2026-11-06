@@ -140,6 +140,61 @@ class TestSoftDelete:
         assert archived['is_deleted'] is True
         assert archived['deletion_reason'] == 'DAMAGED'
 
+    def test_archive_list_carries_the_note_given_when_deleting(
+        self,
+        client,
+        auth_headers,
+        db_session,
+        test_storage_location,
+        test_category,
+        test_user,
+    ):
+        """The delete dialog asks for a note; the archive, where the next
+        decision (restore or purge) is made, has to show it. A product
+        deleted twice shows the note of its latest deletion, and one deleted
+        without a note shows none."""
+        from app.models.item import Item as ItemModel
+
+        def make(name):
+            item = ItemModel(
+                organization_id=test_user.organization_id,
+                storage_location_id=test_storage_location.id,
+                category_id=test_category.id,
+                name=name,
+                quantity=1,
+            )
+            db_session.add(item)
+            db_session.commit()
+            db_session.refresh(item)
+            return item
+
+        noted = make('Deleted with a note')
+        plain = make('Deleted without a note')
+        twice = make('Deleted twice')
+
+        def delete(item, body):
+            r = client.request(
+                'DELETE', f'/api/v1/items/{item.id}', headers=auth_headers, json=body
+            )
+            assert r.status_code == status.HTTP_204_NO_CONTENT
+
+        delete(noted, {'reason': 'TEST_DATA', 'notes': 'wrong product'})
+        delete(plain, {'reason': 'TEST_DATA'})
+        delete(twice, {'reason': 'LOST', 'notes': 'first time'})
+        r = client.post(f'/api/v1/items/{twice.id}/restore', headers=auth_headers)
+        assert r.status_code == status.HTTP_200_OK, r.text
+        delete(twice, {'reason': 'LOST', 'notes': 'second time'})
+
+        rows = {
+            i['id']: i
+            for i in client.get('/api/v1/items/archived', headers=auth_headers).json()[
+                'items'
+            ]
+        }
+        assert rows[str(noted.id)]['deletion_notes'] == 'wrong product'
+        assert rows[str(plain.id)]['deletion_notes'] is None
+        assert rows[str(twice.id)]['deletion_notes'] == 'second time'
+
     def test_soft_delete_double_delete_returns_error(
         self,
         client,

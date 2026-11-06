@@ -42036,6 +42036,17 @@
             ],
             "title": "Deletion Reason"
           },
+          "deletion_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deletion Notes"
+          },
           "category": {
             "anyOf": [
               {
