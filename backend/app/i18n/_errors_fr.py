@@ -537,7 +537,7 @@ ERRORS_FR: ErrorMessages = {
     'attestation_reminders_not_active': 'Les rappels ne partent que pour une campagne en cours',
     'campaign_deadline_past': "L'échéance de la campagne doit être aujourd'hui ou plus tard",
     'attestation_complete_not_allowed': 'Une campagne au statut {status} ne peut pas être terminée',
-    'attestation_scope_exceeds_limit': 'Le périmètre couvre plus de {limit} ressources. Réduisez-le ou scindez la campagne.',
+    'attestation_scope_exceeds_limit': 'Le périmètre couvre plus de {limit} articles. Réduisez-le ou scindez la campagne.',
     'assignment_not_found': 'Attribution introuvable',
     'maintenance_log_not_found': 'Journal de maintenance introuvable',
     'equipment_cannot_checkout_retired': "Impossible d'emprunter une ressource retirée",

@@ -413,7 +413,7 @@ ERRORS_PT: dict[str, str] = {
     'attestation_reminders_not_active': 'Lembretes só podem ser enviados para uma campanha em andamento',
     'campaign_deadline_past': 'O prazo da campanha deve ser hoje ou depois',
     'attestation_complete_not_allowed': 'Uma campanha {status} não pode ser concluída',
-    'attestation_scope_exceeds_limit': 'O escopo abrange mais de {limit} ativos. Restrinja-o ou divida a atestação em partes menores.',
+    'attestation_scope_exceeds_limit': 'O escopo abrange mais de {limit} itens. Restrinja-o ou divida a atestação em partes menores.',
     'assignment_not_found': 'Atribuição não encontrada',
     'maintenance_log_not_found': 'Registro de manutenção não encontrado',
     'equipment_cannot_checkout_retired': 'Não é possível retirar um ativo baixado',

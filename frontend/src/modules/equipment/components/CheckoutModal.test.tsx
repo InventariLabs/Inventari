@@ -456,3 +456,80 @@ describe("CheckoutModal — asking for the approval of this checkout", () => {
     expect(postedCheckout).toBeNull();
   });
 });
+
+/**
+ * A checkout the server refuses for a reason of its own (an address on a
+ * reserved domain, say) used to be answered by a toast alone: it rises at the
+ * edge of the screen, outside the dialog the reader is looking at, and is gone
+ * in seconds — the fields stay filled, the button stays active, and the dialog
+ * itself says nothing. The refusal belongs where the click was.
+ */
+describe("CheckoutModal — a refusal is read in the dialog", () => {
+  const refuse = () =>
+    server.use(
+      http.post("/api/v1/equipment/assignments", () =>
+        HttpResponse.json(
+          {
+            detail: [
+              {
+                type: "value_error",
+                loc: ["body", "assigned_to_email"],
+                msg: "That address is on a reserved domain.",
+              },
+            ],
+          },
+          { status: 422 },
+        ),
+      ),
+    );
+
+  beforeEach(() => {
+    postedCheckout = null;
+    mockDirectories({ members: [] });
+  });
+
+  it("shows the reason in the dialog, outside the scrolling form, and keeps the fields", async () => {
+    refuse();
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+    render(<CheckoutModal item={makeItem()} onClose={onClose} />);
+
+    await fillPersonFields(user, "Jan Test", "jan@foo.invalid");
+    await user.click(screen.getByRole("button", { name: "Check Out" }));
+
+    const reason = await screen.findByText(
+      "That address is on a reserved domain.",
+    );
+    expect(reason).toHaveAttribute("role", "alert");
+    expect(screen.getByTestId("checkout-modal-body")).not.toContainElement(
+      reason,
+    );
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/assigned to \(email\)/i)).toHaveValue(
+      "jan@foo.invalid",
+    );
+  });
+
+  it("clears the reason when the reader tries again", async () => {
+    refuse();
+    const user = userEvent.setup();
+    render(<CheckoutModal item={makeItem()} onClose={vi.fn()} />);
+
+    await fillPersonFields(user, "Jan Test", "jan@foo.invalid");
+    await user.click(screen.getByRole("button", { name: "Check Out" }));
+    await screen.findByText("That address is on a reserved domain.");
+
+    server.use(
+      http.post("/api/v1/equipment/assignments", () =>
+        HttpResponse.json({ id: "asg-1" }, { status: 201 }),
+      ),
+    );
+    await user.click(screen.getByRole("button", { name: "Check Out" }));
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText("That address is on a reserved domain."),
+      ).not.toBeInTheDocument(),
+    );
+  });
+});

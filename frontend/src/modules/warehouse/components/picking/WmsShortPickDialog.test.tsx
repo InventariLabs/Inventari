@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import { act } from "react";
+import i18n from "i18next";
 import { render, screen, within } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
 import WmsShortPickDialog from "./WmsShortPickDialog";
@@ -209,5 +211,25 @@ describe("WmsShortPickDialog", () => {
     renderDialog();
 
     expect(screen.queryByRole("button", { name: "Skip" })).toBeNull();
+  });
+});
+
+/**
+ * The unit beside the quantities names the same unit the pick row above the
+ * sheet does, in the reader's language: "szt." in both places, never "pcs"
+ * in one and "szt." in the other.
+ */
+describe("WmsShortPickDialog — the unit in the reader's language", () => {
+  it("writes the line's unit in Polish in the shortfall sentence", async () => {
+    await act(() => i18n.changeLanguage("pl"));
+    try {
+      renderDialog();
+      expect(
+        screen.getByText(/Oczekiwano 3 szt\. · zeskanowano 0 szt\./),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/pcs/)).not.toBeInTheDocument();
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 });

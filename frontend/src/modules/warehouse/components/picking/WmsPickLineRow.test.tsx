@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
 import userEvent from "@testing-library/user-event";
+import { act } from "react";
+import i18n from "i18next";
 import { render, screen } from "@/test/utils";
 import WmsPickLineRow from "./WmsPickLineRow";
 import type { WmsPickLine } from "@/modules/warehouse/api/documents";
@@ -374,5 +376,26 @@ describe("WmsPickLineRow's text on a narrow screen", () => {
     const location = screen.getByText(binLocation);
     expect(location).toHaveClass("min-w-0", "break-all");
     expect(location.parentElement).not.toHaveClass("truncate");
+  });
+});
+
+describe("WmsPickLineRow — the unit in the reader's language", () => {
+  it("writes the line's unit in Polish", async () => {
+    await act(() => i18n.changeLanguage("pl"));
+    try {
+      render(
+        <WmsPickLineRow
+          line={pendingLine}
+          onFullPick={vi.fn()}
+          onUndo={vi.fn()}
+          onShortPick={vi.fn()}
+          onSkip={vi.fn()}
+        />,
+      );
+      expect(screen.getByText("5 szt.")).toBeInTheDocument();
+      expect(screen.queryByText(/pcs/)).not.toBeInTheDocument();
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 });

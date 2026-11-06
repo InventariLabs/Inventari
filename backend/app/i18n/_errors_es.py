@@ -538,7 +538,7 @@ ERRORS_ES: ErrorMessages = {
     'attestation_reminders_not_active': 'Solo se pueden enviar recordatorios de una campaña en curso',
     'campaign_deadline_past': 'La fecha límite de la campaña debe ser hoy o más tarde',
     'attestation_complete_not_allowed': 'Una campaña en estado {status} no se puede completar',
-    'attestation_scope_exceeds_limit': 'El ámbito abarca más de {limit} recursos. Redúzcalo o divida la confirmación.',
+    'attestation_scope_exceeds_limit': 'El ámbito abarca más de {limit} artículos. Redúzcalo o divida la confirmación.',
     'assignment_not_found': 'Asignación no encontrada',
     'maintenance_log_not_found': 'Registro de mantenimiento no encontrado',
     'equipment_cannot_checkout_retired': 'No se puede prestar un recurso dado de baja',
