@@ -98,25 +98,40 @@ _REJECTION_TTL_SECONDS = 3600.0
 #: (``WEB_CONCURRENCY``, 4 by default — ``backend/Dockerfile``). A refusal
 #: learned in one worker is unknown to the others, so a route pays the
 #: wasted call once per worker that serves it in the hour rather than once:
-#: at most 4, not 1. Measured with the real client against a refusing
-#: provider, 4 processes taking requests in turn (the most even spread, so
-#: the worst case): 4 requests an hour save nothing, 8 save 4 of the 7 a
-#: shared memory would, 20 save 16 of 19, 100 save 96 of 99. The calls a
+#: at most 4, not 1 — in the stable case, where the entry survives the whole
+#: hour. Measured with the real client against a refusing provider, 4
+#: processes taking requests in turn (the most even spread, so the worst
+#: case), with no eviction and no restart in between: 4 requests an hour
+#: save nothing, 8 save 4 of the 7 a
+#: shared memory would, 20 save 16 of 19, 100 save 96 of 99. Eviction past
+#: the ceiling below and a worker restart both empty the memory early, and
+#: the route then relearns before the hour is out, so these are the best
+#: case, not a guarantee. The calls a
 #: shared store could still save are those first few per worker, and Redis
 #: would put a network round trip, and a way to fail, in front of every
 #: LLM call to save them — so the memory stays per process.
 #:
-#: Hard ceiling on remembered refusals. Entries are keyed by owner (a row,
-#: or a draft's organization) × provider × address × model × key, and the
-#: address and model are free text in both branches, so the keyspace is
-#: not finite by construction. In practice it is small: an entry is
-#: written only after a provider answered a billed call with 400, and a
-#: draft probe takes the organization-settings permission and the
-#: organization's AI budget. An instance with a few connections and a few
-#: models each stays in the tens; 256 is reached only by refusals from
-#: that many distinct routes inside one hour in one worker. Past it the
+#: Hard ceiling on remembered refusals. An entry is one route/key pair: the
+#: route is owner (a row, or a draft's organization) × provider × address ×
+#: model, and the key is the refused payload key. The address and model are
+#: free text in both branches, so the keyspace is not finite by
+#: construction. In practice it is small: an entry is written only after a
+#: provider answered a billed call with 400, and a draft probe takes the
+#: organization-settings permission and the organization's AI budget. An
+#: instance with a few connections and a few models each stays in the tens
+#: of entries. A route that refuses several keys takes one entry per key,
+#: and there are three keys, so 256 entries are reached by as few as 86
+#: routes refusing all three, or 128 refusing two (``reasoning`` and
+#: ``response_format``, say) inside one hour in one worker. Past it the
 #: oldest entry goes first, whatever organization it belongs to — losing
 #: it costs exactly what its expiry would, one question asked again.
+#:
+#: Core decision: the identity this memory is keyed on, and the URL
+#: normalisation behind it (:func:`route_base_url`), are Core invariants. A
+#: module reaches the LLM clients through the purpose and client APIs and
+#: gets this memory with them; it has no hook to change what counts as the
+#: same route or to keep its own refusals apart, on purpose, because two
+#: spellings of one route must stay one memory for every caller.
 _MAX_MEMORY_ENTRIES = 256
 
 #: (connection identity, payload key) → monotonic time of the last refusal.

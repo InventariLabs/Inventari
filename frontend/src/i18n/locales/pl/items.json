@@ -96,6 +96,8 @@
     "tryFilters": "Spróbuj zmienić filtry",
     "addFirst": "Dodaj pierwszy produkt do jednego z miejsc. Eksport włączy się, gdy pojawi się pierwszy produkt.",
     "definedWithoutStock": "Produkty, które istnieją tylko jako definicja — na przykład utworzone w przepisie lub recepturze — pojawią się tu, gdy będą mieć stan. Dodaj jeden do miejsca, żeby go zobaczyć.",
+    "definedMatchTitle": "„{{name}}” nie jest jeszcze w żadnym miejscu",
+    "definedMatchDescription": "Produkt o tej nazwie istnieje, ale tylko jako definicja — na przykład utworzony w przepisie lub recepturze. Ta lista pokazuje produkty, gdy mają stan. Dodaj go do miejsca, żeby zobaczyć go tutaj.",
     "noSearchResultsTitle": "Brak pasujących produktów",
     "noSearchResultsDescription": "Brak wyników dla „{{term}}”",
     "clearSearch": "Wyczyść wyszukiwanie",
