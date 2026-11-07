@@ -58,8 +58,11 @@ export default function AssetDetailPage() {
   const restoreMutation = useRestoreEquipment();
   const { changeStatus: handleChangeStatus, isPending: isBulkEditing } =
     useChangeAssetStatus(id);
-  const { data: approvalStatus } = useApprovalStatus(id ?? "");
-  const { data: assignments } = useItemAssignmentHistory(id ?? "");
+  // Both reads are keyed by an asset id: an id the item read did not accept
+  // would only draw a validation error behind the not-found card.
+  const knownId = item ? (id ?? "") : "";
+  const { data: approvalStatus } = useApprovalStatus(knownId);
+  const { data: assignments } = useItemAssignmentHistory(knownId);
   const activeAssignment = assignments?.find((a) => !a.checked_in_at) ?? null;
 
   const [showCheckout, setShowCheckout] = useState(false);
