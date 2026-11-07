@@ -10,7 +10,11 @@ from app.core.db_utils import get_org_owned_or_404_async
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.logging import get_logger
 from app.core.public_api import core_api
-from app.core.upload_validation import UploadMessages, UploadPolicy
+from app.core.upload_validation import (
+    ATTACHMENT_CONTENT_TYPES,
+    UploadMessages,
+    UploadPolicy,
+)
 from app.i18n.service import get_current_lang
 
 from ._unit_identity import audit_identity
@@ -19,28 +23,15 @@ from .schemas import AttachmentSchema
 
 logger = get_logger(__name__)
 
-ALLOWED_CONTENT_TYPES = {
-    'application/pdf',
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'text/plain',
-}
-
 MAX_FILE_SIZE = 20 * 1024 * 1024
 
-#: Twenty megabytes rather than the ten an item attachment gets, and
-#: ``.doc`` among the accepted types: a warranty scan arrives as whatever
-#: the supplier sent. The filename is not gated at all here — the name goes
-#: into the record, the extension on disk comes from the validated type.
+#: The types every attachment takes, at twenty megabytes rather than the ten
+#: an item attachment gets: a warranty scan is not a product photo. The
+#: filename is not gated at all here — the name goes into the record, the
+#: extension on disk comes from the validated type.
 ATTACHMENT_POLICY = UploadPolicy(
     max_bytes=MAX_FILE_SIZE,
-    content_types=frozenset(ALLOWED_CONTENT_TYPES),
+    content_types=ATTACHMENT_CONTENT_TYPES,
 )
 
 VALID_FILE_TYPES = {'INVOICE', 'WARRANTY', 'PHOTO', 'MANUAL', 'OTHER'}

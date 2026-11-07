@@ -8,10 +8,9 @@ Two attachment services used to answer the same question apart: item
 attachments (10 MB, their own MIME list, the extension read off the
 uploaded filename) and equipment's (20 MB, a list of its own, the
 extension read off the validated type). The limits differ on purpose — a
-warranty scan is not a product photo — and so do the allowlists:
-equipment accepts ``.doc``, item attachments refuse it because no
-signature tells a ``.doc`` from an ``.xls``. Those are product calls. The
-mechanism around them was not.
+warranty scan is not a product photo — and whether the filename is gated
+is each screen's own promise. The type list is not a per-screen call: both
+read ``ATTACHMENT_CONTENT_TYPES``.
 """
 
 from __future__ import annotations
@@ -188,6 +187,30 @@ class FileSignatureMismatchError(FileTypeNotAllowedError):
 class FileTooLargeError(UploadRejectedError):
     """Upload exceeds the policy's size limit."""
 
+
+#: What an attachment may be, wherever one is filed — an item's papers or
+#: an equipment record's. Two copies of this list drifted apart once, so a
+#: caller narrows or widens it in its own code, where the difference shows.
+#:
+#: No ``.doc`` (``application/msword``), and by decision rather than for
+#: want of a check: ``file_signature`` knows the OLE2 header an ``.xls``
+#: passes with, and a ``.doc`` carries the same one. ``.docx`` is the Word
+#: format to use.
+ATTACHMENT_CONTENT_TYPES: frozenset[str] = frozenset(
+    {
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'application/pdf',
+        'text/plain',
+        'application/zip',
+        'application/x-zip-compressed',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }
+)
 
 #: Extension per validated content type — never from the filename, which is
 #: whatever the uploader typed. Only the storage provider's path check stood

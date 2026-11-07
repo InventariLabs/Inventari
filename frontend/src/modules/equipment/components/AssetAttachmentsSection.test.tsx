@@ -58,6 +58,23 @@ describe("AssetAttachmentsSection link gate", () => {
     },
   );
 
+  // The browser drops tabs and newlines from an address and reads `\` as
+  // `/` before it resolves one, so each of these opens evil.example even
+  // though the string itself starts with one slash; the last names a host
+  // the parser cannot read at all.
+  it.each([
+    "/\t/evil.example/x",
+    "/\n\\evil.example/x",
+    "/\r//evil.example/x",
+    "/\t/[x",
+  ])(
+    "renders %j, another site once the browser reads it, as no link",
+    async (url) => {
+      await renderWith([url]);
+      expect(screen.queryAllByRole("link")).toHaveLength(0);
+    },
+  );
+
   it("keeps relative uploads and https links clickable", async () => {
     await renderWith(["/uploads/a.pdf", "https://cdn.example/b.pdf"]);
     const hrefs = screen
@@ -118,6 +135,17 @@ describe("AssetAttachmentsSection — upload and delete", () => {
       },
     });
   }
+
+  it("offers the old Word format nowhere, since no attachment takes it", async () => {
+    renderSection();
+    await screen.findByText("file-a1.pdf");
+
+    const input = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    expect(input.accept.split(",")).toContain(".docx");
+    expect(input.accept.split(",")).not.toContain(".doc");
+  });
 
   it("uploads the file as the chosen type and refreshes the list", async () => {
     let body = "";

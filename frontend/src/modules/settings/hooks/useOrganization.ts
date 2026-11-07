@@ -43,6 +43,22 @@ export function useShowModuleData(): boolean {
   return org?.settings?.show_module_data === true;
 }
 
+/**
+ * One page of the organization's members, as a query: the hook below mounts
+ * it, and a caller that needs the answer at once (a save that must not
+ * outrun a check) fetches the same entry from the cache.
+ */
+export function organizationMembersQuery(
+  offset = 0,
+  limit = 20,
+  search?: string,
+) {
+  return {
+    queryKey: [...queryKeys.organization.members, offset, limit, search ?? ""],
+    queryFn: () => organizationsApi.getMembers(offset, limit, search),
+  };
+}
+
 export function useOrganizationMembers(
   offset = 0,
   limit = 20,
@@ -50,8 +66,7 @@ export function useOrganizationMembers(
   options?: { enabled?: boolean },
 ) {
   return useQuery({
-    queryKey: [...queryKeys.organization.members, offset, limit, search ?? ""],
-    queryFn: () => organizationsApi.getMembers(offset, limit, search),
+    ...organizationMembersQuery(offset, limit, search),
     enabled: options?.enabled ?? true,
   });
 }

@@ -122,6 +122,10 @@ async function fillPersonFields(
 }
 
 describe("CheckoutModal — the person behind the address", () => {
+  beforeEach(() => {
+    postedCheckout = null;
+  });
+
   it("warns before the save when the address matches nobody", async () => {
     mockDirectories({ members: [anna] });
     const user = userEvent.setup();
@@ -220,6 +224,8 @@ describe("CheckoutModal — the person behind the address", () => {
     render(<CheckoutModal item={makeItem()} onClose={vi.fn()} />);
 
     await fillPersonFields(user, "Tomasz Praktykant", "tomasz@szkola.edu");
+    // The warning stands; the reader has seen it, and one click saves.
+    await screen.findByText(/no one in this organization uses this address/i);
     await user.click(screen.getByRole("button", { name: /check out/i }));
 
     await waitFor(() => {
@@ -227,6 +233,66 @@ describe("CheckoutModal — the person behind the address", () => {
     });
     expect(postedCheckout?.assigned_to_email).toBe("tomasz@szkola.edu");
     expect(postedCheckout?.assigned_to_name).toBe("Tomasz Praktykant");
+  });
+
+  /**
+   * The warning has no blind window. It is highlighted once the typing has
+   * settled for 400 ms, and the save used not to wait for it: an address
+   * pasted and submitted inside the window was stored with no warning ever
+   * on screen. Here the address lands and the form is submitted in the same
+   * tick, so no timer can settle in between. Measured with the save not
+   * waiting for the check: only this test goes red, the first submit
+   * having posted the checkout (`expected { item_id: 'item-1', …(2) } to
+   * be null`).
+   */
+  it("names an address submitted inside the settle window before saving it", async () => {
+    mockDirectories({ members: [anna] });
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    render(<CheckoutModal item={makeItem()} onClose={onClose} />);
+    await user.type(
+      await screen.findByLabelText(/assigned to \(name\)/i),
+      "Caspar Ghost",
+    );
+    const submit = screen.getByRole("button", { name: /check out/i });
+
+    fireEvent.change(screen.getByLabelText(/assigned to \(email\)/i), {
+      target: { value: "ghost@example.com" },
+    });
+    fireEvent.click(submit);
+
+    expect(
+      await screen.findByText(/no one in this organization uses this address/i),
+    ).toBeInTheDocument();
+    expect(postedCheckout).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+
+    // The warning seen, the next submit saves the address as typed.
+    await user.click(submit);
+    await waitFor(() => expect(postedCheckout).not.toBeNull());
+    expect(postedCheckout?.assigned_to_email).toBe("ghost@example.com");
+  });
+
+  /** Pin, passes either way: a known address costs no second submit. */
+  it("saves a known address submitted at once, in one step", async () => {
+    mockDirectories({ members: [anna] });
+    const user = userEvent.setup();
+    render(<CheckoutModal item={makeItem()} onClose={vi.fn()} />);
+    await user.type(
+      await screen.findByLabelText(/assigned to \(name\)/i),
+      "Anna Nowak",
+    );
+
+    fireEvent.change(screen.getByLabelText(/assigned to \(email\)/i), {
+      target: { value: "anna@example.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /check out/i }));
+
+    await waitFor(() => expect(postedCheckout).not.toBeNull());
+    expect(postedCheckout?.assigned_to_email).toBe("anna@example.com");
+    expect(
+      screen.queryByText(/no one in this organization uses this address/i),
+    ).not.toBeInTheDocument();
   });
 
   it("fills the fields when a member is picked from the directory", async () => {
@@ -384,7 +450,18 @@ describe("CheckoutModal — asking for the approval of this checkout", () => {
   beforeEach(() => {
     posted = null;
     postedCheckout = null;
-    mockDirectories({ members: [] });
+    // A colleague the directory knows: the address warning is not what
+    // these tests are about.
+    mockDirectories({
+      members: [
+        {
+          id: "u2",
+          email: "kasia@example.com",
+          full_name: "Kasia Kowalska",
+          role: "member",
+        },
+      ],
+    });
     server.use(
       http.post("/api/v1/equipment/item-1/request-approval", async (req) => {
         posted = (await req.request.json()) as Record<string, unknown>;
@@ -495,6 +572,8 @@ describe("CheckoutModal — a refusal is read in the dialog", () => {
     render(<CheckoutModal item={makeItem()} onClose={onClose} />);
 
     await fillPersonFields(user, "Jan Test", "jan@foo.invalid");
+    // Nobody's address: the reader sees the warning, then saves anyway.
+    await screen.findByText(/no one in this organization uses this address/i);
     await user.click(screen.getByRole("button", { name: "Check Out" }));
 
     const reason = await screen.findByText(
@@ -516,6 +595,8 @@ describe("CheckoutModal — a refusal is read in the dialog", () => {
     render(<CheckoutModal item={makeItem()} onClose={vi.fn()} />);
 
     await fillPersonFields(user, "Jan Test", "jan@foo.invalid");
+    // Nobody's address: the reader sees the warning, then saves anyway.
+    await screen.findByText(/no one in this organization uses this address/i);
     await user.click(screen.getByRole("button", { name: "Check Out" }));
     await screen.findByText("That address is on a reserved domain.");
 

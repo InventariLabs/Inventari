@@ -49,6 +49,9 @@ export { readJson, writeJson } from "@/lib/localStorage";
 export { extractApiError } from "@/lib/errors";
 // The error a callback throws to put its own sentence on the screen that asked.
 export { ReadableError } from "@/lib/errors";
+// What a file picker for an attachment offers: the types the server's
+// attachment uploads accept, and no others.
+export { ATTACHMENT_FILE_ACCEPT } from "@/utils/fileValidation";
 // A location on one line, its own name before the path, as every location
 // picker names it.
 export { storageLeafLabel } from "@/utils/storageLeafOption";

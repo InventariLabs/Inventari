@@ -1580,7 +1580,8 @@ describe("WmsReceivingView", () => {
         screen.queryByRole("spinbutton", { name: "Final received quantity" }),
       ).not.toBeInTheDocument();
 
-      // Cancelling the question gives the quantity sheet back.
+      // Cancelling the question gives the quantity sheet back, with the
+      // count the worker had typed still in it.
       await userEvent.click(
         within(dialog).getByRole("button", { name: "Cancel" }),
       );
@@ -1588,14 +1589,10 @@ describe("WmsReceivingView", () => {
         await screen.findByRole("spinbutton", {
           name: "Final received quantity",
         }),
-      ).toBeInTheDocument();
+      ).toHaveValue(3);
       expect(toast.success).not.toHaveBeenCalled();
 
       // Asked again, the date resends the quantity typed the first time.
-      await userEvent.type(
-        screen.getByRole("spinbutton", { name: "Final received quantity" }),
-        "3",
-      );
       await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
       const again = await screen.findByRole("dialog", {
         name: "Lot and expiry",

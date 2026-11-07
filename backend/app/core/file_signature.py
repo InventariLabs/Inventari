@@ -36,9 +36,8 @@ _SIGNATURES: dict[str, tuple[bytes, ...]] = {
 # the container, not which Office format sits inside it — only an OLE2 parser
 # tells .doc from .xls. Listing them keeps a declared .doc from being stored
 # as the first OLE2 entry the sniffer happens to match.
-# (``services/attachment_service.py`` answers the same question differently: it
-# drops .doc from its allowlist entirely. That divergence predates this and is
-# a product call, not a validator one.)
+# (No attachment accepts .doc — ``upload_validation.ATTACHMENT_CONTENT_TYPES``
+# leaves it out. That is a product call, not a validator one.)
 _OLE2_FAMILY_MIMES = frozenset(
     {
         'application/msword',

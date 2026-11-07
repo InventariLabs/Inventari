@@ -33,6 +33,8 @@ interface Props {
   focusLineKey: string | null;
   /** The order line behind this row arrived short, counted over its rows. */
   shortLine: boolean;
+  /** The server refused the receipt until this row carries an expiry date. */
+  needsExpiry: boolean;
   onFocusHandled: () => void;
   onUpdate: (key: string, patch: RowPatch) => void;
   onRemove: (key: string) => void;
@@ -51,6 +53,7 @@ export function ReceiveLineRow({
   canWrite,
   focusLineKey,
   shortLine,
+  needsExpiry,
   onFocusHandled,
   onUpdate,
   onRemove,
@@ -71,6 +74,11 @@ export function ReceiveLineRow({
     if (hasDetails) setDetailsOpen(true);
   }, [hasDetails]);
 
+  // The refusal names this row: its date field is where the answer goes.
+  useEffect(() => {
+    if (needsExpiry) setDetailsOpen(true);
+  }, [needsExpiry]);
+
   useEffect(() => {
     if (focusLineKey !== line.key) return;
     quantityRef.current?.focus();
@@ -80,6 +88,7 @@ export function ReceiveLineRow({
 
   const quantity = Number(line.quantity);
   const quantityInvalid = !Number.isFinite(quantity) || quantity <= 0;
+  const expiryMissing = needsExpiry && !line.expiryDate;
 
   return (
     <>
@@ -247,8 +256,14 @@ export function ReceiveLineRow({
                 label={t("receive.expiry")}
                 value={line.expiryDate}
                 disabled={!canWrite}
+                error={expiryMissing ? t("receive.expiryNeeded") : undefined}
                 onChange={(value) => onUpdate(line.key, { expiryDate: value })}
               />
+              {expiryMissing && (
+                <p className="pb-2 text-xs text-on-danger">
+                  {t("receive.expiryNeeded")}
+                </p>
+              )}
             </div>
           </td>
         </tr>

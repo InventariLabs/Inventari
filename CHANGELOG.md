@@ -86,6 +86,12 @@ says what the release does rather than what changed since them.
   sidebar and in the heading of the page it opens in all languages. Removing a
   member now asks "Remove <name>?" and says that person loses access at once
   while the records they created stay.
+- Equipment attachments and the files attached to a product accept one list
+  of file types. The old binary Word format (`.doc`) is refused by both — save
+  it as `.docx` — and Equipment now takes `.zip`, as products always have. The
+  file pickers on both screens no longer offer `.doc`, which the server refused
+  only after the upload. The size limits stay as they were: 20 MB for an
+  equipment attachment, 10 MB for a product's.
 
 ### Added
 
@@ -129,9 +135,17 @@ says what the release does rather than what changed since them.
   header as `POST /warehouse/documents/post` does: the same key sent again is
   answered with the draft the first request wrote instead of a second one. A
   request without the header writes a draft each time, as before.
+- Module authors can hand an attachment's file picker the types the server
+  accepts, `ATTACHMENT_FILE_ACCEPT` from `@/module-sdk`, instead of keeping a
+  list of their own.
 
 ### Fixed
 
+- The Check Out Asset dialog names an address nobody in the organization uses
+  before it saves it, also when the address is pasted and submitted at once.
+  The check waited for the typing to pause, and a quicker Enter stored the
+  address with no warning ever on screen; such a submit now shows the warning
+  and saves nothing, and the next one saves the asset to that address.
 - A fault while reading the documents awaiting your approval, or a supplier's
   pricelist for a price suggestion, is now answered as a server error and
   logged with its traceback. The approval list used to come back empty and the

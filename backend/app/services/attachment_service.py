@@ -11,7 +11,11 @@ from sqlalchemy.orm import joinedload
 from app.core.db_utils import after_commit
 from app.core.file_storage.service import FileStorageService
 from app.core.logging import get_logger
-from app.core.upload_validation import UploadMessages, UploadPolicy
+from app.core.upload_validation import (
+    ATTACHMENT_CONTENT_TYPES,
+    UploadMessages,
+    UploadPolicy,
+)
 from app.i18n import Language
 from app.i18n.service import get_error_message
 from app.models.audit_log import AuditAction, AuditTargetType
@@ -28,25 +32,8 @@ MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
 _ATTACHMENTS = 'attachments'
 
 
-ALLOWED_CONTENT_TYPES = {
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'application/pdf',
-    'text/plain',
-    'application/zip',
-    'application/x-zip-compressed',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-}
-
-# No .doc: application/msword has no entry in file_signature._SIGNATURES, so a
-# genuine .doc was rejected as "unsupported" anyway — the whitelist promised
-# what the validator refused. Adding the OLE2 signature would not fix it either,
-# since .doc, .xls and .ppt share it and only an OLE2 parser tells them apart.
-# .docx (OOXML, a ZIP) is supported and is the format to use.
+#: The filename gate in front of ``ATTACHMENT_CONTENT_TYPES``, one extension
+#: per type on that list (no ``.doc``, for the reason given there).
 ALLOWED_EXTENSIONS = {
     '.jpg',
     '.jpeg',
@@ -66,7 +53,7 @@ ALLOWED_EXTENSIONS = {
 #: on the item screen makes.
 ITEM_ATTACHMENT_POLICY = UploadPolicy(
     max_bytes=MAX_UPLOAD_SIZE,
-    content_types=frozenset(ALLOWED_CONTENT_TYPES),
+    content_types=ATTACHMENT_CONTENT_TYPES,
     extensions=frozenset(ALLOWED_EXTENSIONS),
 )
 
