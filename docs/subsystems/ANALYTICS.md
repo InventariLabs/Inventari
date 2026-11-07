@@ -54,7 +54,7 @@ All endpoints are mounted under `/api/v1/stats`:
 | GET | `/api/v1/stats/shopping-suggestions` | Reorder suggestions for low stock |
 | GET | `/api/v1/stats/cost-analysis` | Spend and waste breakdown (`?period=day\|week\|month\|year`) |
 | GET | `/api/v1/stats/rotation-analysis` | Stock age, slow movers, dead stock |
-| GET | `/api/v1/stats/smart-alerts` | Forgotten items, overdue staples and items expiring soon |
+| GET | `/api/v1/stats/smart-alerts` | Forgotten products, overdue staples and products expiring soon |
 | GET | `/api/v1/stats/expense-forecast` | Predicted future spending (`?period=month`) |
 | GET | `/api/v1/stats/purchase-patterns` | Recurring products and bulk-buying patterns |
 | GET | `/api/v1/stats/reconciliation` | The shelf vs the movement ledger and vs the cost layers |

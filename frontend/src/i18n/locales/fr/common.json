@@ -185,7 +185,7 @@
       "orgName": "Nom de l'organisation",
       "permanentDelete": {
         "title": "Suppression définitive",
-        "description": "Permet de supprimer définitivement les produits archivés. Action irréversible — désactivé par défaut pour les profils d'entreprise avec inventaire audité.",
+        "description": "Permet de supprimer définitivement les produits archivés. Action irréversible — désactivé par défaut dans les modes d’espace de travail d'entreprise avec inventaire audité.",
         "label": "Autoriser la suppression définitive",
         "instantSave": "Enregistré dès que vous basculez l'option.",
         "confirmTitle": "Autoriser la suppression définitive ?",
@@ -314,8 +314,8 @@
     },
     "focus": {
       "loading": "Chargement des modules…",
-      "empty": "Aucune des applications qui peuvent être affichées seules n'est encore activée.",
-      "emptyHint": "N'afficher qu'un module réduit l'espace de travail à cette application. Activez-en une ci-dessous, puis revenez ici.",
+      "empty": "Aucun des modules qui peuvent être affichés seuls n'est encore activé.",
+      "emptyHint": "N'afficher qu'un module réduit l'espace de travail à ce module. Activez-en un ci-dessous, puis revenez ici.",
       "stateEnabled": "Activée",
       "stateNotEnabled": "Non activée",
       "enableLink": "Activer dans Modules",

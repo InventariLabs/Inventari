@@ -51,7 +51,7 @@
       "total": "Total de alertas",
       "totalHint": "Fechas, artículos olvidados, básicos que faltan; sin stock bajo",
       "types": {
-        "forgotten": "Artículos olvidados",
+        "forgotten": "Productos olvidados",
         "forgottenHint": "Sin tocar desde hace 60 días o más",
         "staple": "Artículos básicos faltantes",
         "expiring": "Por caducar",
