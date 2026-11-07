@@ -464,6 +464,14 @@ says what the release does rather than what changed since them.
 - The meal plan dialog that has no plan yet now says the recipe is added to the
   first meal of the new plan at once, and closing the "Take from stock" dialog
   no longer marks the recipe as cooked.
+- The built-in layouts in the document templates' preview are named in the
+  reader's language ("Standard layout", "Pick list"), as the print-layout
+  picker names them, instead of "Standard Template" in every language.
+- An organization template keeps an `alt`, `title` or `class` whose text
+  begins with "Data:" — the Polish label for a date — on the printout and in
+  the editor's preview; the sanitizer used to drop it as if it were a `data:`
+  link. A logo uploaded as WebP now prints through `{{ issuer.logo }}` instead
+  of leaving an empty image.
 
 ## v0.11.0 - 2026-11-02
 
