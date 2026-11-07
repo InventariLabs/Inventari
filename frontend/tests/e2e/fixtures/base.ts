@@ -37,7 +37,10 @@ const APP_START_BUDGET = 35_000;
 
 /**
  * The document has drawn past the app's full-screen loading state, to something
- * other than its error screen: that one is what a failed start looks like, and
+ * other than its error screen. The loading state starts in `index.html`, whose
+ * own sign fills `#root` before any script has run, so a child in the root is
+ * not a start: the sign carries the loader's test id for that reason. The error
+ * screen is what a failed start looks like, and
  * the recovery reload comes after it, because the harness hears of the failure
  * only once it is drawn. A screen no reload clears costs a failing spec the
  * budget and is left to its assertion.
