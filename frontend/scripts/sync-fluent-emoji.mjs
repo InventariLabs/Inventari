@@ -6,7 +6,8 @@
  *
  * Usage:
  *   node scripts/sync-fluent-emoji.mjs --sync   # download missing SVGs + regen manifest
- *   node scripts/sync-fluent-emoji.mjs --check  # CI guard: fail if any SVG missing
+ *   node scripts/sync-fluent-emoji.mjs --check  # CI guard: fail if any SVG is missing or the manifest differs
+ *                                              from what --sync would write
  *
  * Source: microsoft/fluentui-emoji (MIT).
  *   https://github.com/microsoft/fluentui-emoji/tree/main/assets

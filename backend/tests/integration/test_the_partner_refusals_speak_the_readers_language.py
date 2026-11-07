@@ -81,7 +81,7 @@ class TestPartnerServiceRefusalsSpeakPolish:
 
         assert resp.status_code == 409, resp.text
         assert _message(resp) == (
-            'Kontrahent o nazwie "Hurtownia Duplikat" i typie "SUPPLIER" już istnieje.'
+            'Kontrahent o nazwie "Hurtownia Duplikat" i typie "Dostawca" już istnieje.'
         )
         assert resp.json()['detail']['code'] == 'PARTNER_NAME_EXISTS'
 

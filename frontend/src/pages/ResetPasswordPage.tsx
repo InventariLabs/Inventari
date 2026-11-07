@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Lock, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Lock, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { authApi } from "@/lib/api/auth";
@@ -12,7 +12,17 @@ import { AuthLayout } from "./AuthLayout";
 import { SignedInNotice } from "./SignedInNotice";
 import { PasswordRules } from "./PasswordRules";
 import { firstBrokenRule } from "@/lib/passwordPolicy";
-import { apiErrorStatus } from "@/lib/errors";
+import { apiErrorStatus, isServerRefusal } from "@/lib/errors";
+
+/**
+ * Whether a failed check or save condemns the link. A 4xx is the server
+ * refusing this token — except a 429, which refuses the pace of the requests
+ * from this address and says nothing about the link: read as a dead link, it
+ * sent a reader holding a perfectly good one off to ask for another.
+ */
+function refusesTheLink(error: unknown): boolean {
+  return isServerRefusal(error) && apiErrorStatus(error) !== 429;
+}
 
 export default function ResetPasswordPage() {
   const { t } = useTranslation("auth");
@@ -27,9 +37,12 @@ export default function ResetPasswordPage() {
   // gone before anyone had read it, and the form below went on asking for
   // a password a dead link can never save.
   const [linkInvalid, setLinkInvalid] = useState(false);
-  // The request itself failed (server error, no network): the link may be
-  // perfectly good, so the form stays and the reader is told to try again.
-  const [requestFailed, setRequestFailed] = useState(false);
+  // The save did not happen for a reason that is not the link — the server
+  // broke, the network dropped, or too many attempts came from this address:
+  // the link may be perfectly good, so the form stays and says which.
+  const [failure, setFailure] = useState<
+    "requestFailed" | "tooManyAttempts" | null
+  >(null);
   // A link from an old e-mail is the usual way to land here with a token that
   // is spent or expired: ask before showing a form for a password it can
   // never save. Until the answer comes the card holds no form, so a dead link
@@ -45,12 +58,10 @@ export default function ResetPasswordPage() {
     authApi
       .checkPasswordReset(token)
       .catch((error: unknown) => {
-        // Only a refusal condemns the link; a server or network failure
-        // leaves the form, and submitting it reports what happened.
-        const status = apiErrorStatus(error);
-        if (current && status !== null && status >= 400 && status < 500) {
-          setLinkInvalid(true);
-        }
+        // Only a refusal of the token condemns the link; a server or network
+        // failure, or a rate limit, leaves the form, and submitting it
+        // reports what happened.
+        if (current && refusesTheLink(error)) setLinkInvalid(true);
       })
       .finally(() => {
         if (current) setChecking(false);
@@ -83,16 +94,17 @@ export default function ResetPasswordPage() {
       return;
     }
     setIsLoading(true);
-    setRequestFailed(false);
+    setFailure(null);
     try {
       await authApi.confirmPasswordReset(token, newPassword);
       setDone(true);
     } catch (error) {
-      const status = apiErrorStatus(error);
-      if (status !== null && status >= 400 && status < 500) {
+      if (refusesTheLink(error)) {
         setLinkInvalid(true);
       } else {
-        setRequestFailed(true);
+        setFailure(
+          apiErrorStatus(error) === 429 ? "tooManyAttempts" : "requestFailed",
+        );
       }
     } finally {
       setIsLoading(false);
@@ -137,7 +149,20 @@ export default function ResetPasswordPage() {
             </Button>
           </div>
         ) : checking && !linkInvalid ? (
-          <div aria-busy="true" data-testid="reset-checking" />
+          // Said, not just held: a blank card on a slow connection read as
+          // a page that had failed to load.
+          <p
+            role="status"
+            data-testid="reset-checking"
+            className="flex items-center gap-2 py-4 text-sm text-on-muted"
+          >
+            <Loader2
+              size={16}
+              className="shrink-0 animate-spin"
+              aria-hidden="true"
+            />
+            {t("reset.checking")}
+          </p>
         ) : linkInvalid ? (
           <div className="py-4" data-testid="reset-invalid-link">
             <h2 className="text-lg font-semibold text-on mb-2">
@@ -154,9 +179,12 @@ export default function ResetPasswordPage() {
             {/* The way out, not just the verdict — the attestation screen's
                 refusal card is the pattern: say who can reissue the link. */}
             <p className="mt-3 text-sm leading-relaxed">
+              {/* A reset link is usually opened from an e-mail on a phone:
+                  the same 44 px target and contrast as the login page's
+                  "Forgot password?" link. */}
               <Link
                 to="/forgot-password"
-                className="font-medium text-primary-600 hover:underline"
+                className="inline-flex min-h-11 items-center md:min-h-0 font-medium text-primary-700 hover:text-primary-800 dark:text-primary-500 dark:hover:text-primary-500 underline decoration-2 underline-offset-4 transition-colors"
               >
                 {t("reset.invalidTokenNext", {
                   defaultValue: "Request a fresh reset link.",
@@ -177,16 +205,18 @@ export default function ResetPasswordPage() {
               </p>
             </div>
 
-            {requestFailed && (
+            {failure && (
               <p
                 role="alert"
                 className="mb-4 text-sm text-red-600 dark:text-red-400"
                 data-testid="reset-request-failed"
               >
-                {t("reset.requestFailed", {
-                  defaultValue:
-                    "The password could not be saved because of a problem on our side. Your link may still be valid — try again.",
-                })}
+                {failure === "tooManyAttempts"
+                  ? t("reset.tooManyAttempts")
+                  : t("reset.requestFailed", {
+                      defaultValue:
+                        "The password could not be saved because of a problem on our side. Your link may still be valid — try again.",
+                    })}
               </p>
             )}
             <form onSubmit={handleSubmit} className="space-y-5">
