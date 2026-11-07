@@ -194,3 +194,80 @@ class TestAnApprovalCoversOneCheckout:
         assert used.status_code == status.HTTP_200_OK, used.text
         assert used.json()['status'] == 'APPROVED'
         assert used.json()['consumed'] is True
+
+
+def _issue_in_bulk(
+    client: TestClient, headers: dict[str, str], item: Item, name: str
+) -> Any:
+    return client.patch(
+        '/api/v1/equipment/assets/bulk',
+        headers=headers,
+        json={
+            'item_ids': [str(item.id)],
+            'action': 'assign_to',
+            'data': {'assigned_to_name': name},
+        },
+    )
+
+
+@pytest.mark.integration
+class TestTheBatchSpendsTheApprovalToo:
+    """The batch issue is a checkout, and it spends the approval like one.
+
+    The batch route spends the asset's approval after the gate lets it past,
+    but nothing held it there: with the spend removed from the batch, every
+    test of the batch and of the single checkout stayed green, and one old
+    approval would again have opened the batch door for every later
+    checkout. Measured with the spend replaced by ``pass``: this test goes
+    red at the second batch issue (``assert 1 == 0`` — the asset went out
+    again on the spent approval).
+    """
+
+    def test_a_second_batch_issue_needs_its_own_approval(
+        self,
+        client: TestClient,
+        checkout_approval_org: dict[str, Any],
+        db_session: Session,
+    ) -> None:
+        from app.modules.equipment.models import EquipmentAssignment
+
+        org = checkout_approval_org['org']
+        admin: User = checkout_approval_org['admin']
+        h: ModuleTestHelper = checkout_approval_org['h']
+        item = _make_item(h, org, admin, db_session)
+        _open_workflow(client, h, admin)
+        _approve_a_checkout(client, h, org, admin, item)
+
+        issuer = h.create_user(org, email=f'issuer_{uuid4().hex[:6]}@test.com')
+        auth = h.get_auth_headers(issuer)
+
+        first = _issue_in_bulk(client, auth, item, 'Carol')
+        assert first.status_code == status.HTTP_200_OK, first.text
+        assert first.json()['updated'] == 1, first.text
+        assignment = (
+            db_session.query(EquipmentAssignment)
+            .filter(EquipmentAssignment.item_id == item.id)
+            .one()
+        )
+
+        returned = client.post(
+            f'/api/v1/equipment/assignments/{assignment.id}/checkin',
+            headers=auth,
+            json={},
+        )
+        assert returned.status_code == status.HTTP_200_OK, returned.text
+
+        second = _issue_in_bulk(client, auth, item, 'Dave')
+        assert second.status_code == status.HTTP_200_OK, second.text
+        assert second.json()['updated'] == 0, (
+            'the approval was spent by the first batch issue; the asset must '
+            'not go out again on it'
+        )
+        assert len(second.json()['errors']) == 1
+        assert 'approval' in second.json()['errors'][0]['error'].lower()
+
+        # A fresh approval opens the batch door for exactly one more issue.
+        _approve_a_checkout(client, h, org, admin, item)
+        third = _issue_in_bulk(client, auth, item, 'Erin')
+        assert third.status_code == status.HTTP_200_OK, third.text
+        assert third.json()['updated'] == 1, third.text

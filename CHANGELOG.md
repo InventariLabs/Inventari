@@ -132,6 +132,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The Check Out Asset dialog names an address nobody in the organization uses
+  before it saves it, also when the address is pasted and submitted at once.
+  The check waited for the typing to pause, and a quicker Enter stored the
+  address with no warning ever on screen; such a submit now shows the warning
+  and saves nothing, and the next one saves the asset to that address.
 - A fault while reading the documents awaiting your approval, or a supplier's
   pricelist for a price suggestion, is now answered as a server error and
   logged with its traceback. The approval list used to come back empty and the
