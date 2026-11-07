@@ -157,6 +157,15 @@ says what the release does rather than what changed since them.
   longer repeated in the footer or on the phone's start panel, so a screen
   reader announces it once. An error under one field no longer pushes the
   other fields of its row out of line on any of the three forms.
+- A request refused for exceeding the general rate limit is answered in the
+  request's language: a Polish, German, French or Spanish reader used to get the
+  refusal in English, while one refused by an endpoint's own limit already got
+  it in their language. Both kinds of refusal now carry `lang` beside `message`.
+- `DEFAULT_LANGUAGE` reaches the backend container on both the development and
+  the production stack, and is in `.env.production.example`. It used to be read
+  only by a backend started outside Docker, so an account created without a
+  language — the administrator `manage.py user create-admin` makes without
+  `--lang` — started in English whatever `.env` said.
 - The symbol list in the document and equipment template editors reads as
   something a template author can use. Examples of record-valued symbols
   (`totals_by_unit`, `packages`, `pick_lines`) show their fields instead of

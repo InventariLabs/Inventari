@@ -66,6 +66,7 @@ function line(
     expected_quantity: 10,
     uom_symbol: "pcs",
     from_order: true,
+    expected_is_count: false,
     ...overrides,
   };
 }
@@ -312,6 +313,41 @@ describe("WmsReceivingView on a phone", () => {
       within(card).getByText("1 pcs. fewer than expected."),
     ).toBeInTheDocument();
   });
+
+  it.each([
+    { typedCount: true, warns: false },
+    { typedCount: false, warns: true },
+  ])(
+    "warns about more than expected only for a promised figure (typed count: $typedCount)",
+    async ({ typedCount, warns }) => {
+      // The figure on the start card is a count somebody typed, not a
+      // promise: raising it to what really arrived is the true count. A
+      // delivery note's figure is a promise, and going past it says so.
+      serveDocument();
+      server.use(
+        http.post(`${BASE}/start`, () =>
+          HttpResponse.json(
+            session([
+              line("sugar", "Sugar", {
+                expected_quantity: 1,
+                from_order: false,
+                expected_is_count: typedCount,
+              }),
+            ]),
+          ),
+        ),
+      );
+      const user = userEvent.setup();
+
+      render(<WmsReceivingView documentId={DOC} onClose={vi.fn()} />);
+      const card = await screen.findByRole("region", { name: "Sugar" });
+      await user.click(within(card).getByRole("button", { name: "Increase" }));
+
+      const note = within(card).queryByText("1 pcs. more than expected.");
+      if (warns) expect(note).toBeInTheDocument();
+      else expect(note).not.toBeInTheDocument();
+    },
+  );
 
   it("brings back a count typed and not confirmed after Back and resume", async () => {
     serveDocument();

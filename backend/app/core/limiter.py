@@ -203,16 +203,23 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> Res
     to slowapi's own handler for a coroutine handler. An ``async def`` here
     would cover the decorator paths only and leave the middleware answering
     the old shape.
-    """
-    from app.i18n.service import get_current_lang, get_error_message
 
+    The language is read from the request, not from ``get_current_lang()``:
+    the middleware is the outermost one, so a default limit refuses before
+    ``LanguageMiddleware`` has set the request language, and a Polish reader
+    past the default ceiling was answered in English.
+    """
+    from app.i18n.service import get_error_message, get_language_from_accept_header
+
+    lang = get_language_from_accept_header(request.headers.get('accept-language'))
     response = JSONResponse(
         status_code=429,
         content={
             'detail': {
                 'code': 'RATE_LIMIT_EXCEEDED',
-                'message': get_error_message('rate_limit_exceeded', get_current_lang()),
+                'message': get_error_message('rate_limit_exceeded', lang),
                 'limit': str(exc.detail),
+                'lang': lang,
             }
         },
     )
