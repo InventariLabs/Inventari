@@ -450,6 +450,36 @@ describe("useStockTakeCounting", () => {
     expect(posts[0].body.item_id).toBe("item-2");
     expect(posts[0].body.counted_quantity).toBe(4);
   });
+  // Finishing is judged on the rows on screen. A find on a shelf is a save
+  // like any other: while its request is out, Complete stays disabled.
+  it("reports a save in flight while a found-on-shelf scan is writing", async () => {
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.post("/api/v1/stock-takes/:id/items", async ({ request }) => {
+        const body = (await request.json()) as Record<string, unknown>;
+        await gate;
+        return HttpResponse.json({ id: "sti-new", ...body }, { status: 201 });
+      }),
+    );
+
+    const { result } = await renderLoaded();
+    expect(result.current.isSavingCounts).toBe(false);
+
+    act(() => {
+      result.current.shelfCounting.countFoundOnShelf("item-2", {
+        id: "shelf-1",
+        path: "Kitchen / A",
+      } as never);
+    });
+    await waitFor(() => expect(result.current.isSavingCounts).toBe(true));
+
+    release();
+    await waitFor(() => expect(result.current.isSavingCounts).toBe(false));
+  });
+
   // A number typed into the box is one button press away from being a count,
   // and walking off the screen throws it away. Everything that summarises the
   // stock take therefore reads what the server holds.
