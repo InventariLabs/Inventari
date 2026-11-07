@@ -257,7 +257,9 @@ export default function IngredientDefaultsPage() {
       // One counted sentence per tally: one string cannot inflect the
       // words after several different numbers. A new ingredient and an
       // override founded over a system entry are told apart on purpose.
-      toast.success(
+      // A tally with errors in it is not a plain success: some rows were lost.
+      const tell = result.errors > 0 ? toast.warning : toast.success;
+      tell(
         [
           t("ingredient_defaults.import_added", { count: result.created }),
           t("ingredient_defaults.import_overridden", {
