@@ -13,37 +13,65 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AuditAction, AuditTargetType
 from app.core.public_api import core_api
 from app.core.settings_diff import changed_settings_snapshot, journal_config_change
 
-from .models import PurchaseOrder
+from .models import PurchaseOrder, ReorderRule
 
 
-def _line_text(line: Any) -> str:
-    """One line with everything an edit can set on it.
+def _line_state(line: Any, rule_shelves: dict[UUID, str | None]) -> dict[str, Any]:
+    """One line with everything an edit can set on it, as data.
 
-    Name, quantity and price come first, as they always read; the rest is
-    appended only when the line has it, so a line changed in any one of its
-    fields prints differently and the edit is not mistaken for no edit.
+    The reader words it in their own language, so the entry holds the parts
+    and no sentence: name and quantity always, the rest only when the line
+    has it, so a line changed in any one of its fields prints differently and
+    the edit is not mistaken for no edit. A reference is written by what it
+    reads as — the product's name, the unit's symbol, the shelf the reorder
+    rule watches — never by the id behind it.
     """
-    text = f'{line.name} × {line.quantity_ordered.normalize():f}'
+    state: dict[str, Any] = {
+        'name': line.name,
+        'quantity': line.quantity_ordered.normalize(),
+    }
     if line.unit_price is not None:
-        text += f' @ {line.unit_price.normalize():f}'
+        state['unit_price'] = line.unit_price.normalize()
     if line.tax_rate is not None:
-        text += f' · tax {line.tax_rate.normalize():f}%'
-    for label, value in (
-        ('product', line.product_template_id),
-        ('unit', line.uom_id),
-        ('reorder rule', line.source_reorder_rule_id),
-    ):
-        if value is not None:
-            text += f' · {label} {value}'
+        state['tax_rate'] = line.tax_rate.normalize()
+    if line.product_template is not None:
+        state['product'] = line.product_template.name
+    if line.uom is not None:
+        state['unit'] = line.uom.symbol
+    if line.source_reorder_rule_id is not None:
+        state['reorder_rule'] = rule_shelves.get(line.source_reorder_rule_id) or ''
     if line.notes:
-        text += f' · note: {line.notes}'
-    return text
+        state['notes'] = line.notes
+    return state
+
+
+async def _rule_shelves(
+    db: AsyncSession, org_id: UUID, po: PurchaseOrder
+) -> dict[UUID, str | None]:
+    """The shelf each reorder rule on the order's lines watches, by rule id."""
+    rule_ids = {
+        line.source_reorder_rule_id
+        for line in po.lines
+        if line.source_reorder_rule_id is not None
+    }
+    if not rule_ids:
+        return {}
+    rules = await db.scalars(
+        select(ReorderRule).where(
+            ReorderRule.organization_id == org_id, ReorderRule.id.in_(rule_ids)
+        )
+    )
+    return {
+        rule.id: rule.storage_location.name if rule.storage_location else None
+        for rule in rules
+    }
 
 
 async def edit_state(
@@ -59,6 +87,7 @@ async def edit_state(
         if po.partner_id
         else None
     )
+    shelves = await _rule_shelves(db, org_id, po)
     return {
         'number': po.number,
         'partner_id': po.partner_id,
@@ -66,7 +95,7 @@ async def edit_state(
         'scheduled_date': po.scheduled_date,
         'currency': po.currency,
         'notes': po.notes,
-        'lines': [_line_text(line) for line in po.lines],
+        'lines': [_line_state(line, shelves) for line in po.lines],
     }
 
 

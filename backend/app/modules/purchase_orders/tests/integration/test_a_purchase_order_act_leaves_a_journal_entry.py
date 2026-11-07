@@ -88,15 +88,17 @@ class TestOrderActsAreJournalled:
         assert snapshot['number'] == po['number']
         assert snapshot['before']['notes'] == 'first note'
         assert snapshot['after']['notes'] == 'second note'
-        assert snapshot['before']['lines'] == ['Widget × 2 @ 3.5']
-        assert snapshot['after']['lines'] == ['Widget × 5']
+        assert snapshot['before']['lines'] == [
+            {'name': 'Widget', 'quantity': '2', 'unit_price': '3.5'}
+        ]
+        assert snapshot['after']['lines'] == [{'name': 'Widget', 'quantity': '5'}]
         assert 'partner_id' not in snapshot['after']
 
     @pytest.mark.parametrize(
-        ('field', 'old', 'new', 'old_text', 'new_text'),
+        ('field', 'key', 'old', 'new', 'old_value', 'new_value'),
         [
-            ('tax_rate', '0.10', '0.20', ' · tax 0.1%', ' · tax 0.2%'),
-            ('notes', 'line old', 'line new', ': line old', ': line new'),
+            ('tax_rate', 'tax_rate', '0.10', '0.20', '0.1', '0.2'),
+            ('notes', 'notes', 'line old', 'line new', 'line old', 'line new'),
         ],
     )
     def test_a_change_to_one_line_field_alone_is_journalled(
@@ -107,10 +109,11 @@ class TestOrderActsAreJournalled:
         po_org: Any,
         db_session: Session,
         field: str,
+        key: str,
         old: str,
         new: str,
-        old_text: str,
-        new_text: str,
+        old_value: str,
+        new_value: str,
     ) -> None:
         line = {'name': 'Widget', 'quantity_ordered': 2, 'unit_price': '3.50'}
         created = client.post(
@@ -131,8 +134,43 @@ class TestOrderActsAreJournalled:
         assert resp.status_code == 200, resp.text
 
         (entry,) = _entries(db_session, po_org, 'purchase_order', po['id'])
-        assert entry['before']['lines'][0].endswith(old_text)
-        assert entry['after']['lines'][0].endswith(new_text)
+        assert entry['before']['lines'][0][key] == old_value
+        assert entry['after']['lines'][0][key] == new_value
+
+    def test_a_line_names_its_product_and_unit_not_their_ids(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        po_partner: Any,
+        po_org: Any,
+        po_template: Any,
+        po_uom_kg: Any,
+        db_session: Session,
+    ) -> None:
+        po = _order(client, po_auth_headers, po_partner)
+        resp = client.patch(
+            f'{PO_URL}/{po["id"]}',
+            headers=po_auth_headers,
+            json={
+                'lines': [
+                    {
+                        'name': 'Widget',
+                        'quantity_ordered': 2,
+                        'unit_price': '3.50',
+                        'product_template_id': str(po_template.id),
+                        'uom_id': str(po_uom_kg.id),
+                    }
+                ]
+            },
+        )
+        assert resp.status_code == 200, resp.text
+
+        (entry,) = _entries(db_session, po_org, 'purchase_order', po['id'])
+        (line,) = entry['after']['lines']
+        assert line['product'] == po_template.name
+        assert line['unit'] == po_uom_kg.symbol
+        assert str(po_template.id) not in str(entry)
+        assert str(po_uom_kg.id) not in str(entry)
 
     def test_an_edit_that_changes_nothing_writes_nothing(
         self,

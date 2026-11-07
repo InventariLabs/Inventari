@@ -641,7 +641,11 @@
         "stages": "Stages",
         "target_type": "Applies to",
         "decided_by": "Decided by",
-        "approvers": "Approvers"
+        "approvers": "Approvers",
+        "emailed_to": "Emailed to",
+        "imported_from": "Imported from",
+        "skipped": "Rows skipped",
+        "approval": "Approval"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",
@@ -755,9 +759,19 @@
         "wms_session_short_pick": "Closed with a shortage",
         "wms_session_short_receive": "Closed with a shortage",
         "DAMAGE": "Damage",
-        "QUALITY_HOLD": "Quality hold"
+        "QUALITY_HOLD": "Quality hold",
+        "approval_requested": "Requested",
+        "approval_approved": "Approved",
+        "approval_rejected": "Rejected"
       },
-      "reactivatedAfterBreaker": "Reactivated after the circuit breaker cut it off"
+      "reactivatedAfterBreaker": "Reactivated after the circuit breaker cut it off",
+      "poLine": {
+        "tax": "{{rate}}% tax",
+        "product": "product: {{name}}",
+        "reorderRule": "reorder rule: {{shelf}}",
+        "reorderRuleUnnamed": "from a reorder rule",
+        "note": "note: {{text}}"
+      }
     },
     "shell": {
       "groupAdmin": "Admin",

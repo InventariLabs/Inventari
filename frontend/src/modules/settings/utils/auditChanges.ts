@@ -368,7 +368,70 @@ const VALUE_RESOLVERS: Record<
   // own; the archive and the delete entry word the same code from `reasons`.
   deletion_reason: (t, code) =>
     t(`common:settings.audit.reasons.${code}`, { defaultValue: "" }),
+  // What was decided on a purchase order: the journal writes the word of the
+  // act (`requested`, `approved`, `rejected`), not a capitalised code.
+  approval: (t, code) =>
+    t(`common:settings.audit.values.approval_${code}`, { defaultValue: "" }),
 };
+
+/**
+ * An order line as the journal writes it: the parts, not a sentence.
+ *
+ * The name and quantity always come, the rest only when the line has it — see
+ * `_line_state` in the purchase-orders journal. The words between the parts
+ * are the reader's, which is why the entry holds data: a sentence written
+ * once in English stays English for every reader after. A line written before
+ * that as a plain string is printed as it was.
+ */
+function purchaseOrderLineText(
+  line: Record<string, unknown>,
+  resolveId: IdResolver | undefined,
+  t: TranslateFn,
+): string {
+  const show = (value: unknown) => formatAuditValue(value, resolveId, t);
+  const text = (value: unknown) => String(value ?? "").trim();
+  let head = `${text(line.name)} × ${show(line.quantity)}`;
+  if (text(line.unit)) head += ` ${text(line.unit)}`;
+  if (line.unit_price != null) head += ` @ ${show(line.unit_price)}`;
+  const parts = [head];
+  if (line.tax_rate != null) {
+    parts.push(
+      t("common:settings.audit.poLine.tax", {
+        rate: show(line.tax_rate),
+        defaultValue: "",
+      }),
+    );
+  }
+  if (text(line.product)) {
+    parts.push(
+      t("common:settings.audit.poLine.product", {
+        name: text(line.product),
+        defaultValue: "",
+      }),
+    );
+  }
+  if (typeof line.reorder_rule === "string") {
+    parts.push(
+      line.reorder_rule
+        ? t("common:settings.audit.poLine.reorderRule", {
+            shelf: line.reorder_rule,
+            defaultValue: "",
+          })
+        : t("common:settings.audit.poLine.reorderRuleUnnamed", {
+            defaultValue: "",
+          }),
+    );
+  }
+  if (text(line.notes)) {
+    parts.push(
+      t("common:settings.audit.poLine.note", {
+        text: text(line.notes),
+        defaultValue: "",
+      }),
+    );
+  }
+  return parts.join(" · ");
+}
 
 /**
  * The fields that hold module names, one or many. A profile switch writes the
@@ -453,6 +516,8 @@ function leafText(
         .join(", ") || "—"
     );
   }
+  const orderLines = purchaseOrderLinesText(leaf, value, resolveId, t);
+  if (orderLines) return orderLines;
   const text = formatAuditValue(value, resolveId, t, referenceKindOf(path));
   if (text === "UNKNOWN" && leaf === "equipment_status") {
     return "—";
@@ -479,6 +544,23 @@ function leafText(
     if (word) return word;
   }
   return text;
+}
+
+/** The `lines` of an order entry worded for the reader, or null when the
+ * value is not that shape (a recipe counts its lines; an old entry holds text). */
+function purchaseOrderLinesText(
+  leaf: string,
+  value: unknown,
+  resolveId: IdResolver | undefined,
+  t: TranslateFn | undefined,
+): string | null {
+  if (!t || leaf !== "lines" || !Array.isArray(value) || value.length === 0) {
+    return null;
+  }
+  if (!value.every(isPlainObject)) return null;
+  return value
+    .map((line) => purchaseOrderLineText(line, resolveId, t))
+    .join("; ");
 }
 
 /** The key under which a category records the fields its products carry. */

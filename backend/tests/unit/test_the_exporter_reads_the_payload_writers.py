@@ -466,3 +466,32 @@ def test_the_audit_target_types_are_read_from_the_enum(
     payload = collect_keys(root)
 
     assert payload['target-types'] == ['item', 'stock_lot']
+
+
+def test_an_act_named_beside_the_changed_fields_is_read(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A journal helper that takes the act as `act=` writes those keys too.
+
+    A purchase order's e-mail, line import and approval decision arrive in
+    the entry through `act={...}`, beside the fields that moved; a key read
+    from `snapshot=` alone left them out of the catalogue requirement and
+    they reached the reader as the raw Python key.
+    """
+    root = _write_app(
+        tmp_path,
+        {
+            'services/order_acts.py': (
+                'async def route():\n'
+                '    await journal_order_act(\n'
+                '        db, org, user, po,\n'
+                '        act={"emailed_to": addr, "approval": "approved"},\n'
+                '    )\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert 'emailed_to' in payload['keys']
+    assert 'approval' in payload['keys']

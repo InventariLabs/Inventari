@@ -641,7 +641,11 @@
         "stages": "Étapes",
         "target_type": "S'applique à",
         "decided_by": "Décidé par",
-        "approvers": "Approbateurs"
+        "approvers": "Approbateurs",
+        "emailed_to": "Envoyé par e-mail à",
+        "imported_from": "Importé depuis",
+        "skipped": "Lignes ignorées",
+        "approval": "Approbation"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",
@@ -755,9 +759,19 @@
         "wms_session_short_pick": "Clôturée avec un manque",
         "wms_session_short_receive": "Clôturée avec un manque",
         "DAMAGE": "Dommage",
-        "QUALITY_HOLD": "Blocage qualité"
+        "QUALITY_HOLD": "Blocage qualité",
+        "approval_requested": "Demandée",
+        "approval_approved": "Approuvée",
+        "approval_rejected": "Rejetée"
       },
-      "reactivatedAfterBreaker": "Réactivé après la coupure du disjoncteur"
+      "reactivatedAfterBreaker": "Réactivé après la coupure du disjoncteur",
+      "poLine": {
+        "tax": "TVA {{rate}} %",
+        "product": "produit : {{name}}",
+        "reorderRule": "règle de réapprovisionnement : {{shelf}}",
+        "reorderRuleUnnamed": "d’une règle de réapprovisionnement",
+        "note": "note : {{text}}"
+      }
     },
     "shell": {
       "groupAdmin": "Admin",
