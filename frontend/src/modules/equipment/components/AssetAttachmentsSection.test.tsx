@@ -58,6 +58,23 @@ describe("AssetAttachmentsSection link gate", () => {
     },
   );
 
+  // The browser drops tabs and newlines from an address and reads `\` as
+  // `/` before it resolves one, so each of these opens evil.example even
+  // though the string itself starts with one slash; the last names a host
+  // the parser cannot read at all.
+  it.each([
+    "/\t/evil.example/x",
+    "/\n\\evil.example/x",
+    "/\r//evil.example/x",
+    "/\t/[x",
+  ])(
+    "renders %j, another site once the browser reads it, as no link",
+    async (url) => {
+      await renderWith([url]);
+      expect(screen.queryAllByRole("link")).toHaveLength(0);
+    },
+  );
+
   it("keeps relative uploads and https links clickable", async () => {
     await renderWith(["/uploads/a.pdf", "https://cdn.example/b.pdf"]);
     const hrefs = screen
