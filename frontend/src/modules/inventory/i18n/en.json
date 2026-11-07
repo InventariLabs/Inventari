@@ -167,8 +167,8 @@
     "whereItLies": "Where it lies",
     "seeForProduct": "In every location",
     "seeForLocation": "Stock levels for this location",
-    "rows_one": "stock entry",
-    "rows_other": "stock entries"
+    "rows_one": "record",
+    "rows_other": "records"
   },
   "lots": {
     "title": "Batches",

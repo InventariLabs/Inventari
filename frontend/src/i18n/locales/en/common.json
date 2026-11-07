@@ -188,7 +188,7 @@
       "orgName": "Organization name",
       "permanentDelete": {
         "title": "Permanent deletion",
-        "description": "Allows permanently deleting archived products. This cannot be undone — off by default for business profiles with audited inventory.",
+        "description": "Allows permanently deleting archived products. This cannot be undone — off by default in business workspace modes with audited inventory.",
         "label": "Allow permanent deletion",
         "instantSave": "Saved as soon as you switch it.",
         "confirmTitle": "Allow permanent deletion?",
@@ -317,8 +317,8 @@
     },
     "focus": {
       "loading": "Loading modules…",
-      "empty": "None of the apps that can be shown on their own is switched on yet.",
-      "emptyHint": "Showing just one module narrows the workspace to that app. Switch one of these on, then come back here.",
+      "empty": "None of the modules that can be shown on their own is switched on yet.",
+      "emptyHint": "Showing just one module narrows the workspace to that module. Switch one of these on, then come back here.",
       "stateEnabled": "Enabled",
       "stateNotEnabled": "Not enabled",
       "enableLink": "Enable in Modules",

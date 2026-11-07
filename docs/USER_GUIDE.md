@@ -1710,7 +1710,7 @@ a link to the source code; the rest is for administrators.
 - **Overview** — *Inventory Health Check*: what needs attention, what is running
   low and the estimated value; **Show detailed stats** for distribution by
   location and category, the expiry forecast and costs.
-- **Analytics** — stock age and rotation, alerts (forgotten items, missing
+- **Analytics** — stock age and rotation, alerts (forgotten products, missing
   staples, things expiring or expired, low stock, price spikes), a spending
   forecast and purchase patterns.
 - **Reconciliation** — a check that your stock agrees with its history: the

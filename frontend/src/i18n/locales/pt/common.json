@@ -186,7 +186,7 @@
       "orgName": "Nome da organização",
       "permanentDelete": {
         "title": "Exclusão permanente",
-        "description": "Permite excluir permanentemente produtos arquivados. Isso não pode ser desfeito — desativado por padrão em perfis empresariais com estoque auditado.",
+        "description": "Permite excluir permanentemente produtos arquivados. Isso não pode ser desfeito — desativado por padrão em modos de trabalho empresariais com estoque auditado.",
         "label": "Permitir exclusão permanente",
         "instantSave": "Salvo assim que você alterna.",
         "confirmTitle": "Permitir exclusão permanente?",
@@ -315,8 +315,8 @@
     },
     "focus": {
       "loading": "Carregando módulos…",
-      "empty": "Nenhum dos aplicativos que podem ser exibidos sozinhos está ativado ainda.",
-      "emptyHint": "Mostrar só um módulo reduz o espaço de trabalho a esse aplicativo. Ative um destes e volte aqui.",
+      "empty": "Nenhum dos módulos que podem ser exibidos sozinhos está ativado ainda.",
+      "emptyHint": "Mostrar só um módulo reduz o espaço de trabalho a esse módulo. Ative um destes e volte aqui.",
       "stateEnabled": "Ativado",
       "stateNotEnabled": "Não ativado",
       "enableLink": "Ativar em Módulos",

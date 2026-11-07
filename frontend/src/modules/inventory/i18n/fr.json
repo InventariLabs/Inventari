@@ -148,7 +148,7 @@
       "location": "Emplacement",
       "anyLocation": "Partout",
       "includeEmpty": "Inclure les emplacements à zéro",
-      "includeEmptyHint": "Affiche les lignes de stock dont la quantité est nulle — la trace de ce qui était ici. Un emplacement qui n'a jamais porté le produit n'a aucune ligne.",
+      "includeEmptyHint": "Affiche les enregistrements dont la quantité est nulle — la trace de ce qui était ici. Un emplacement qui n'a jamais porté le produit n'a aucun enregistrement.",
       "oneStorage": "un emplacement",
       "oneProduct": "un produit"
     },
@@ -167,8 +167,8 @@
     "whereItLies": "Où il se trouve",
     "seeForProduct": "Dans tous les emplacements",
     "seeForLocation": "Niveaux de stock de cet emplacement",
-    "rows_one": "ligne de stock",
-    "rows_other": "lignes de stock"
+    "rows_one": "enregistrement",
+    "rows_other": "enregistrements"
   },
   "lots": {
     "title": "Lots",

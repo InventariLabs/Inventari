@@ -49,9 +49,9 @@
     },
     "alerts": {
       "total": "Benachrichtigungen gesamt",
-      "totalHint": "Daten, vergessene Artikel, fehlende Grundvorräte; ohne niedrigen Bestand",
+      "totalHint": "Daten, vergessene Produkte, fehlende Grundvorräte; ohne niedrigen Bestand",
       "types": {
-        "forgotten": "Vergessene Artikel",
+        "forgotten": "Vergessene Produkte",
         "forgottenHint": "Seit mindestens 60 Tagen unberührt",
         "staple": "Fehlende Grundartikel",
         "expiring": "Läuft bald ab",
@@ -105,7 +105,7 @@
   "errors": {
     "failedToLoadRotationAnalysis": "Rotationsanalyse konnte nicht geladen werden",
     "failedToLoadAlerts": "Benachrichtigungen konnten nicht geladen werden",
-    "failedToLoadStorageDistribution": "Verteilung nach Standort konnte nicht geladen werden",
+    "failedToLoadStorageDistribution": "Verteilung nach Lagerort konnte nicht geladen werden",
     "failedToLoadCategoryDistribution": "Verteilung nach Kategorie konnte nicht geladen werden",
     "failedToLoadExpiryForecast": "Ablaufprognose konnte nicht geladen werden",
     "failedToLoadCostAnalysis": "Kostenanalyse konnte nicht geladen werden",
