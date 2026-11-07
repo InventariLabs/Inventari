@@ -866,6 +866,7 @@ class TestRecipeAvailability:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='Mąka pszenna dostępna',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -877,6 +878,7 @@ class TestRecipeAvailability:
             name='Mąka pszenna dostępna',
             template_id=template.id,
             quantity=Decimal('1000'),
+            uom_id=_grams(db_session),
         )
         db_session.add(item)
         anchor_pending_records(db_session)
@@ -921,6 +923,7 @@ class TestRecipeAvailability:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='Jajka testowe',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -932,6 +935,7 @@ class TestRecipeAvailability:
             name='Jajka testowe',
             template_id=template.id,
             quantity=Decimal('12'),
+            uom_id=_grams(db_session),
         )
         db_session.add(item)
         anchor_pending_records(db_session)
@@ -981,6 +985,7 @@ class TestRecipeAvailability:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='Mąka niewystarczająca',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -992,6 +997,7 @@ class TestRecipeAvailability:
             name='Mąka niewystarczająca',
             template_id=template.id,
             quantity=Decimal('200'),
+            uom_id=_grams(db_session),
         )
         db_session.add(item)
         anchor_pending_records(db_session)
@@ -1038,6 +1044,7 @@ class TestRecipeAvailability:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='Makaron skalowanie',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -1049,6 +1056,7 @@ class TestRecipeAvailability:
             name='Makaron skalowanie',
             template_id=template.id,
             quantity=Decimal('500'),
+            uom_id=_grams(db_session),
         )
         db_session.add(item)
         anchor_pending_records(db_session)
@@ -1097,6 +1105,7 @@ class TestRecipeAvailability:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='Ryż podzielony',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -1110,6 +1119,7 @@ class TestRecipeAvailability:
                     name='Ryż podzielony',
                     template_id=template.id,
                     quantity=qty,
+                    uom_id=_grams(db_session),
                 )
             )
         anchor_pending_records(db_session)
@@ -1300,6 +1310,7 @@ class TestRecipePickingSession:
             organization_id=test_user.organization_id,
             name='Produkt z kodem',
             barcode=barcode,
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -1312,6 +1323,7 @@ class TestRecipePickingSession:
             template_id=template.id,
             barcode=None,  # no direct barcode on item
             quantity=Decimal('1000'),
+            uom_id=_grams(db_session),
         )
         db_session.add(item)
         anchor_pending_records(db_session)
@@ -1474,6 +1486,7 @@ class TestRecipePickingSession:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='Insufficient Item',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -1485,6 +1498,7 @@ class TestRecipePickingSession:
             name='Insufficient Item',
             template_id=template.id,
             quantity=Decimal('50'),
+            uom_id=_grams(db_session),
         )
         db_session.add(item)
         anchor_pending_records(db_session)
@@ -1844,6 +1858,13 @@ def _get_uom_id(db_session: Session, symbol: str = 'g') -> str | None:
     return str(row[0]) if row else None
 
 
+def _grams(db_session: Session) -> uuid.UUID:
+    """The system unit ``g``, for a product whose stock a recipe line is measured against."""
+    grams = _get_uom_id(db_session, 'g')
+    assert grams is not None, "'g' is not seeded"
+    return uuid.UUID(grams)
+
+
 @pytest.mark.integration
 class TestRecipeNutrition:
     def test_nutrition_returns_structure(
@@ -2019,7 +2040,7 @@ class TestRecipeNutrition:
         test_user: User,
         db_session: Session,
     ) -> None:
-        """If ingredient has no UOM, but template has weight_value → fallback to weight."""
+        """A counted unit on a product with weight_value → fallback to its weight."""
         # Template: 1 unit = 500g
         template = _create_template_with_nutrition(
             db_session, test_user.organization_id, 'Heavy Bread'
@@ -2030,7 +2051,7 @@ class TestRecipeNutrition:
         template.weight_uom_id = uuid.UUID(uom_id)
         db_session.commit()
 
-        # Recipe: 1 unit (no UOM specified)
+        # Recipe: 1 piece
         recipe_id = _create_recipe_with_template(
             client,
             auth_headers,
@@ -2038,6 +2059,7 @@ class TestRecipeNutrition:
             name='Bread Nutrition Fallback',
             servings=1,
             qty='1',
+            uom_id=_get_uom_id(db_session, 'pcs'),
         )
 
         r = client.get(f'{RECIPE_URL}/{recipe_id}/nutrition', headers=auth_headers)
@@ -2262,6 +2284,7 @@ class TestRecipeShoppingList:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='In Stock Ingredient',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -2274,6 +2297,7 @@ class TestRecipeShoppingList:
                 name='In Stock Ingredient',
                 template_id=template.id,
                 quantity=Decimal('500'),
+                uom_id=_grams(db_session),
             )
         )
         anchor_pending_records(db_session)
@@ -2431,6 +2455,7 @@ class TestCookingHistory:
             id=uuid.uuid4(),
             organization_id=test_user.organization_id,
             name='History Ingredient',
+            uom_id=_grams(db_session),
         )
         db_session.add(template)
         db_session.flush()
@@ -2442,6 +2467,7 @@ class TestCookingHistory:
             name='History Ingredient',
             template_id=template.id,
             quantity=Decimal('500'),
+            uom_id=_grams(db_session),
         )
         db_session.add(item)
         anchor_pending_records(db_session)

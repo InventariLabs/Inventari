@@ -1244,7 +1244,7 @@ class TestImportRefusesALineWithNoUnit:
 
         assert resp.status_code == status.HTTP_400_BAD_REQUEST, resp.text
         detail = resp.json()['detail']
-        assert detail['code'] == 'RECIPE_IMPORT_UNIT_MISSING', detail
+        assert detail['code'] == 'RECIPE_INGREDIENT_UNIT_MISSING', detail
         assert 'Salt' in detail['message']
 
 
