@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { signInWith, signOut } from "@/test/auth";
+import { productTemplatesApi } from "@/lib/api/productTemplates";
+import { itemsApi } from "@/lib/api/items";
 import ItemsEmptyState from "./items/ItemsEmptyState";
 import ItemsPagination from "./items/ItemsPagination";
 import ItemsBulkActionBar from "./items/ItemsBulkActionBar";
@@ -96,7 +98,8 @@ describe("ItemsEmptyState", () => {
     expect(link).toHaveAttribute("href", "/inventory/items/add");
   });
 
-  it("renders search-specific message and a clear button when search term is set", () => {
+  it("renders search-specific message and a clear button when search term is set", async () => {
+    vi.spyOn(productTemplatesApi, "search").mockResolvedValue([]);
     const onClear = vi.fn();
     render(
       <Shell>
@@ -107,11 +110,126 @@ describe("ItemsEmptyState", () => {
         />
       </Shell>,
     );
-    expect(screen.getByText(/milk/)).toBeInTheDocument();
+    expect(await screen.findByText(/milk/)).toBeInTheDocument();
     const clearBtn = screen.getByRole("button", { name: /clear search/i });
     expect(clearBtn).toBeInTheDocument();
     fireEvent.click(clearBtn);
     expect(onClear).toHaveBeenCalled();
+  });
+
+  const renderSearch = (term: string) =>
+    render(
+      <Shell>
+        <ItemsEmptyState
+          hasFilters={true}
+          searchTerm={term}
+          onClearSearch={vi.fn()}
+        />
+      </Shell>,
+    );
+
+  const noRecords = () => {
+    vi.spyOn(itemsApi, "getAll").mockResolvedValue({
+      items: [],
+      total: 0,
+    } as never);
+    vi.spyOn(itemsApi, "getArchived").mockResolvedValue({
+      items: [],
+      total: 0,
+    } as never);
+  };
+
+  it("a search that matches only a definition says the product exists", async () => {
+    // Created inside a BOM, the product has no record at all, so the list
+    // cannot hold it — and "No results" over a name the reader just made is
+    // a false answer.
+    vi.spyOn(productTemplatesApi, "search").mockResolvedValue([
+      { id: "t1", name: "Wosk sojowy" },
+    ] as never);
+    noRecords();
+    renderSearch("sojowy");
+    expect(
+      await screen.findByText(/“Wosk sojowy” is not in a location yet/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/^No results for/)).not.toBeInTheDocument();
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      "/inventory/items/add?name=Wosk%20sojowy",
+    );
+  });
+
+  it("a match with a record, stocked or used up, is not called a definition", async () => {
+    // The row is off the list only because a location or chip narrowed it, or
+    // because its last unit was used up (a record at zero) — the product
+    // has been in a location, so "not in a location yet" would be false.
+    vi.spyOn(productTemplatesApi, "search").mockResolvedValue([
+      { id: "t1", name: "Wosk kokosowy" },
+    ] as never);
+    const getAll = vi.spyOn(itemsApi, "getAll").mockResolvedValue({
+      items: [{ id: "i1" }],
+      total: 1,
+    } as never);
+    renderSearch("kokos");
+    expect(await screen.findByText(/^No results for/)).toBeInTheDocument();
+    expect(getAll).toHaveBeenCalledWith(
+      expect.objectContaining({ template_ids: "t1", include_empty: true }),
+    );
+    expect(screen.queryByText(/not in a location yet/)).not.toBeInTheDocument();
+  });
+
+  it("a match whose only record is archived is not called a definition", async () => {
+    vi.spyOn(productTemplatesApi, "search").mockResolvedValue([
+      { id: "t1", name: "Wosk rozany" },
+    ] as never);
+    vi.spyOn(itemsApi, "getAll").mockResolvedValue({
+      items: [],
+      total: 0,
+    } as never);
+    vi.spyOn(itemsApi, "getArchived").mockResolvedValue({
+      items: [{ id: "i1", name: "Wosk rozany" }],
+      total: 1,
+    } as never);
+    renderSearch("rozany");
+    expect(await screen.findByText(/^No results for/)).toBeInTheDocument();
+    expect(screen.queryByText(/not in a location yet/)).not.toBeInTheDocument();
+  });
+
+  it("says nothing while the lookup is in flight", async () => {
+    vi.spyOn(productTemplatesApi, "search").mockReturnValue(
+      new Promise(() => {}),
+    );
+    renderSearch("sojowy");
+    expect(screen.queryByText(/^No results for/)).not.toBeInTheDocument();
+  });
+
+  it("looks the term up once typing settles, not on every key", async () => {
+    const search = vi
+      .spyOn(productTemplatesApi, "search")
+      .mockResolvedValue([]);
+    const { rerender } = renderSearch("s");
+    for (const term of ["so", "soj", "sojo"]) {
+      rerender(
+        <Shell>
+          <ItemsEmptyState
+            hasFilters={true}
+            searchTerm={term}
+            onClearSearch={vi.fn()}
+          />
+        </Shell>,
+      );
+    }
+    expect(await screen.findByText(/^No results for/)).toBeInTheDocument();
+    expect(search).toHaveBeenCalledTimes(1);
+    expect(search).toHaveBeenCalledWith("sojo", 5);
+  });
+
+  it("does not look a one-letter search up", async () => {
+    // A guard on the endpoint's two-letter minimum (it answers 422 below it);
+    // dev never searched, so this passes there too.
+    const search = vi.spyOn(productTemplatesApi, "search");
+    renderSearch("x");
+    expect(await screen.findByText(/^No results for/)).toBeInTheDocument();
+    expect(search).not.toHaveBeenCalled();
   });
 
   it("names the hidden module data instead of an empty warehouse", () => {

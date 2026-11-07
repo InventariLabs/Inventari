@@ -440,6 +440,7 @@ export const queryKeys = {
 
   productTemplates: {
     count: ["product-templates", "count"] as const,
+    search: (term: string) => ["product-templates", "search", term] as const,
     stock: (templateId: string) =>
       ["product-templates", templateId, "stock"] as const,
   },

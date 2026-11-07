@@ -92,6 +92,8 @@
     "tryFilters": "Essayez de modifier les filtres",
     "addFirst": "Ajoutez votre premier produit à un emplacement. L'export sera disponible dès qu'il y aura un produit.",
     "definedWithoutStock": "Les produits qui n'existent que comme définition — par exemple ceux créés dans une recette ou une nomenclature — apparaissent ici dès qu'ils ont du stock. Ajoutez-en un à un emplacement pour le voir.",
+    "definedMatchTitle": "« {{name}} » n'est encore dans aucun emplacement",
+    "definedMatchDescription": "Un produit portant ce nom existe, mais seulement comme définition — par exemple créé dans une recette ou une nomenclature. Cette liste montre les produits dès qu'ils ont du stock. Ajoutez-le à un emplacement pour le voir ici.",
     "noSearchResultsTitle": "Aucun produit correspondant",
     "noSearchResultsDescription": "Aucun résultat pour « {{term}} »",
     "clearSearch": "Effacer la recherche",

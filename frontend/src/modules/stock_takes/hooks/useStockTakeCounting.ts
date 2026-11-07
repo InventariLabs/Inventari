@@ -361,6 +361,7 @@ export function useStockTakeCounting(id: string | undefined) {
     surplusMutation,
     countMutation,
     savesRef,
+    trackSave,
     createdLinesRef,
     handleQuantityChange,
     oneMoreThan,
@@ -541,7 +542,8 @@ export function useStockTakeCounting(id: string | undefined) {
     triedToSave,
     countMutation,
     completeMutation,
-    isSavingCounts,
+    // A shelf close is a write the completion must not overtake either.
+    isSavingCounts: isSavingCounts || shelfCounting.isClosing,
     handleQuantityChange,
     handleQuantityStep,
     handleAddItem,

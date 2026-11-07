@@ -14,6 +14,7 @@ from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.async_utils import await_if_awaitable
@@ -200,14 +201,24 @@ async def get_profile(db: Any, org_id: UUID) -> DocumentProfile | None:
 
 
 async def create_default_profile(db: Any, org_id: UUID) -> DocumentProfile:
-    profile = DocumentProfile(
-        organization_id=org_id,
-        name='Simple',
-        **PRESETS['Simple'],
+    """Give the organization the Simple profile, unless somebody just did.
+
+    Two first postings of one organization can both find no profile and both
+    arrive here. A plain insert made the second one fail on
+    ``uq_document_profile_org`` — a 500 for a user who did nothing wrong.
+    ``ON CONFLICT DO NOTHING`` waits for the other transaction's row and
+    leaves it alone, and the read after it returns whichever row stands.
+    """
+    await await_if_awaitable(
+        db.execute(
+            pg_insert(DocumentProfile)
+            .values(organization_id=org_id, name='Simple', **PRESETS['Simple'])
+            .on_conflict_do_nothing(constraint='uq_document_profile_org')
+        )
     )
-    db.add(profile)
-    await await_if_awaitable(db.flush())
-    await await_if_awaitable(db.refresh(profile))
+    profile = await get_profile(db, org_id)
+    if profile is None:
+        raise RuntimeError(f'document profile of {org_id} vanished after its insert')
     return profile
 
 
