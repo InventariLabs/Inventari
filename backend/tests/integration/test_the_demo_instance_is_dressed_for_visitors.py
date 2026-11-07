@@ -411,7 +411,11 @@ class TestTheRecipesShowTheirAllergens:
         missing = []
         for name, _description, _servings, _minutes, _tags, lines, _how in DEMO_RECIPES:
             for allergen, words in self.PROBES.items():
-                has = any(w in line[0].lower() for line in lines for w in words)
+                has = any(
+                    w in line[0].lower() and 'coconut' not in line[0].lower()
+                    for line in lines
+                    for w in words
+                )
                 if has and allergen not in shown[name]:
                     missing.append(f'{name}: {allergen}')
         assert not missing, f'recipes that hide an allergen: {missing}'

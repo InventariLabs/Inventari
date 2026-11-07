@@ -198,12 +198,32 @@ _SORTED_KEYWORDS: list[str] = sorted(_ALLERGEN_NAME_MAP, key=len, reverse=True)
 
 _WS_RE = re.compile(r'\s+')
 
+# "Coconut milk" is no dairy: the plant word stays (so almond milk still reads
+# as nuts, soy milk as soy), the milk or cream word it qualifies goes.
+_PLANT_MILK_EN_RE = re.compile(
+    r'\b(coconut|almond|soy|soya|oats?|rice|cashew|hazelnut|hemp|pea|plant)[ -](?:milk|cream)\b'
+)
+_PL_PLANT = (
+    r'(kokosow\w*|sojow\w*|migdalow\w*|owsian\w*|ryzow\w*|orzechow\w*|roslinn\w*)'
+)
+_PLANT_MILK_PL_RE = re.compile(
+    rf'\b(?:mleko|smietan[ak]a?)\s+{_PL_PLANT}|{_PL_PLANT}\s+(?:mleko|smietan[ak]a?)\b'
+)
+
 
 def normalize_name(name: str) -> str:
     """Lowercase, strip diacritics and collapse whitespace."""
     decomposed = unicodedata.normalize('NFD', name.lower())
     no_diacritics = ''.join(c for c in decomposed if not unicodedata.combining(c))
     return _WS_RE.sub(' ', no_diacritics).strip()
+
+
+def _without_plant_milk(normalized: str) -> str:
+    """Drop the dairy word from a plant milk, keeping its plant."""
+    en = _PLANT_MILK_EN_RE.sub(
+        lambda m: 'oats' if m[1].startswith('oat') else m[1], normalized
+    )
+    return _PLANT_MILK_PL_RE.sub(lambda m: m[1] or m[2], en)
 
 
 def infer_allergens(name: str) -> list[str]:
@@ -215,6 +235,7 @@ def infer_allergens(name: str) -> list[str]:
     normalized = normalize_name(name)
     if not normalized:
         return []
+    normalized = _without_plant_milk(normalized)
     found: set[str] = set()
     for keyword in _SORTED_KEYWORDS:
         if keyword in normalized:
