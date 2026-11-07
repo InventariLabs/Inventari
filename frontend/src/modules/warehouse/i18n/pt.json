@@ -293,6 +293,7 @@
     "error": "Falha ao importar as linhas",
     "createStubsLabel": "Criar produtos provisórios para códigos de barras sem correspondência",
     "createStubsHint": "Linhas cujo código de barras não corresponde a um modelo de produto existente terão um produto provisório criado automaticamente, para serem importadas como correspondentes.",
+    "createStubsDenied": "Esta conta não pode criar produtos novos, por isso as linhas com código de barras desconhecido ficam sem correspondência nesta importação. Peça a um administrador a permissão «items:write», se precisar dela.",
     "stubsCreated": "+{{count}} produtos provisórios criados",
     "success_one": "1 linha importada",
     "success_other": "{{count}} linhas importadas",

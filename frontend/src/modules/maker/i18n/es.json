@@ -17,7 +17,8 @@
     "error": "No se pudieron cargar las órdenes de producción",
     "empty": {
       "title": "Aún no hay órdenes de producción",
-      "subtitle": "Planifica una orden para consumir ingredientes y crear la salida."
+      "subtitle": "Planifica una orden para consumir ingredientes y crear la salida.",
+      "subtitleReadOnly": "Las órdenes de producción aparecerán aquí cuando alguien las programe."
     },
     "noMatches": {
       "title": "Ninguna orden coincide",

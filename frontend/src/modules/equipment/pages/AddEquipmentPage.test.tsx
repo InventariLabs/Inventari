@@ -186,3 +186,43 @@ describe("AddEquipmentPage — the form around the record", () => {
     );
   });
 });
+
+describe("AddEquipmentPage — a read-only account", () => {
+  function renderAt(path: string) {
+    signInWith(["equipment:read"]);
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[path]}>
+          <PageHeaderHost>
+            <Routes>
+              <Route path="/equipment/add" element={<AddEquipmentPage />} />
+              <Route
+                path="/equipment/:id/edit"
+                element={<AddEquipmentPage />}
+              />
+              <Route path="/equipment/:id" element={<p>the asset card</p>} />
+              <Route path="/equipment" element={<p>the register</p>} />
+            </Routes>
+          </PageHeaderHost>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    return userEvent.setup();
+  }
+
+  it("is taken from the edit form to the asset it may look at", async () => {
+    const user = renderAt("/equipment/eq-1/edit");
+    expect(screen.getByText(/you can view this/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Open the asset" }));
+    expect(await screen.findByText("the asset card")).toBeInTheDocument();
+  });
+
+  it("is taken from the add form back to the register", async () => {
+    const user = renderAt("/equipment/add");
+    await user.click(screen.getByRole("button", { name: "Back to list" }));
+    expect(await screen.findByText("the register")).toBeInTheDocument();
+  });
+});

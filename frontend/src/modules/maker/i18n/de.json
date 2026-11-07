@@ -17,7 +17,8 @@
     "error": "Produktionsaufträge konnten nicht geladen werden",
     "empty": {
       "title": "Noch keine Produktionsaufträge",
-      "subtitle": "Plane einen Produktionsauftrag, um Zutaten zu verbrauchen und Output zu erzeugen."
+      "subtitle": "Plane einen Produktionsauftrag, um Zutaten zu verbrauchen und Output zu erzeugen.",
+      "subtitleReadOnly": "Produktionsläufe erscheinen hier, sobald sie jemand einplant."
     },
     "noMatches": {
       "title": "Keine passenden Produktionsaufträge",

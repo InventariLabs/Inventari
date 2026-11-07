@@ -27,6 +27,7 @@
   "emptyFilteredDescription": "Löschen Sie die Suche oder den Statusfilter.",
   "noOrders": "Noch keine Bestellungen",
   "noOrdersDescription": "Erstellen Sie Ihre erste Bestellung, um zu beginnen.",
+  "noOrdersDescriptionReadOnly": "Bestellungen erscheinen hier, sobald sie jemand aufgibt.",
   "notFound": "Bestellung nicht gefunden",
   "scheduled": "Geplant",
   "downloadPdf": "PDF herunterladen",

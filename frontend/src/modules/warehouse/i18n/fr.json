@@ -293,6 +293,7 @@
     "error": "Échec de l'importation des lignes",
     "createStubsLabel": "Créer des produits de remplacement pour les codes-barres non appariés",
     "createStubsHint": "Les lignes dont le code-barres ne correspond à aucun modèle de produit existant recevront automatiquement un remplaçant pour être importées comme appariées.",
+    "createStubsDenied": "Ce compte ne peut pas créer de nouveaux produits : les lignes dont le code-barres est inconnu resteront non appariées dans cet import. Demandez à un administrateur la permission « items:write » si vous en avez besoin.",
     "stubsCreated": "+{{count}} produits de remplacement créés",
     "success_one": "1 ligne importée",
     "success_other": "{{count}} lignes importées",

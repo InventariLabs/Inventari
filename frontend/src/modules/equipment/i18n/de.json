@@ -429,6 +429,7 @@
     "type_disputed": "Problem gemeldet"
   },
   "form": {
+    "readOnlyOpenAsset": "Anlage öffnen",
     "pickersFailed": "Kategorien oder Lagerorte konnten nicht geladen werden, daher sind die Listen unvollständig. Versuchen Sie es vor dem Speichern erneut.",
     "addTitle": "Gerät hinzufügen",
     "save": "Gerät speichern",

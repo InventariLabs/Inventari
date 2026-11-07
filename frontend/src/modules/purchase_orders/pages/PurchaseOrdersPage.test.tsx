@@ -342,6 +342,11 @@ describe("PurchaseOrdersPage — a read-only account", () => {
     expect(
       screen.queryByRole("button", { name: /create order/i }),
     ).not.toBeInTheDocument();
+    // The line under the heading must not tell a reader to create one.
+    expect(screen.queryByText(/create your first/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/will appear here once someone places them/i),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/you can view this, not change it/i),
     ).toBeInTheDocument();

@@ -6,6 +6,7 @@
   "subtitle": "Zakupy do sklepu: planuj, co kupić, i kupuj według listy",
   "newList": "Nowa lista",
   "addFirst": "Utwórz swoją pierwszą listę zakupów, aby zacząć planowanie",
+  "addFirstReadOnly": "Listy zakupów pojawią się tutaj, gdy ktoś je utworzy.",
   "modal": {
     "title": "Nowa lista zakupów",
     "nameLabel": "Nazwa listy",

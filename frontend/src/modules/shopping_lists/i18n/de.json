@@ -6,6 +6,7 @@
   "subtitle": "Tägliche Einkäufe: planen Sie, was zu kaufen ist, und haken Sie ab",
   "newList": "Neue Liste",
   "addFirst": "Erstellen Sie Ihre erste Einkaufsliste, um mit der Planung zu beginnen",
+  "addFirstReadOnly": "Einkaufslisten erscheinen hier, sobald sie jemand anlegt.",
   "modal": {
     "title": "Neue Einkaufsliste",
     "nameLabel": "Listenname",

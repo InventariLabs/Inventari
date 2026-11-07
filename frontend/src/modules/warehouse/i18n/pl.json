@@ -329,6 +329,7 @@
     "error": "Nie udało się zaimportować linii",
     "createStubsLabel": "Utwórz produkty tymczasowe dla niedopasowanych kodów kreskowych",
     "createStubsHint": "Wiersze, których kod kreskowy nie pasuje do istniejącego szablonu produktu, automatycznie otrzymają produkt tymczasowy, aby zaimportować je jako dopasowane.",
+    "createStubsDenied": "To konto nie może tworzyć nowych produktów, więc wiersze z nieznanym kodem kreskowym pozostaną niedopasowane. Poproś administratora o uprawnienie „items:write”, jeśli tego potrzebujesz.",
     "stubsCreated": "+utworzono {{count}} produktów tymczasowych",
     "success_one": "Zaimportowano 1 linię",
     "success_few": "Zaimportowano {{count}} linie",

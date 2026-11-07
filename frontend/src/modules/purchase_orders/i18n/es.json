@@ -27,6 +27,7 @@
   "emptyFilteredDescription": "Borre la búsqueda o el filtro de estado.",
   "noOrders": "Aún no hay órdenes de compra",
   "noOrdersDescription": "Cree su primera orden de compra para comenzar.",
+  "noOrdersDescriptionReadOnly": "Los pedidos de compra aparecerán aquí cuando alguien los haga.",
   "notFound": "Orden de compra no encontrada",
   "scheduled": "Programado",
   "downloadPdf": "Descargar PDF",

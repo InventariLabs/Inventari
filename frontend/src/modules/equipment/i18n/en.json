@@ -429,6 +429,7 @@
     "type_disputed": "Problem reported"
   },
   "form": {
+    "readOnlyOpenAsset": "Open the asset",
     "pickersFailed": "Categories or locations could not be loaded, so the lists below are incomplete. Try again before saving.",
     "addTitle": "Add Asset",
     "save": "Save Asset",

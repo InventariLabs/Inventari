@@ -298,7 +298,11 @@ function PurchaseOrdersEmptyState({
       icon={FileText}
       title={hasFilters ? t("emptyFilteredTitle") : t("noOrders")}
       description={
-        hasFilters ? t("emptyFilteredDescription") : t("noOrdersDescription")
+        hasFilters
+          ? t("emptyFilteredDescription")
+          : canWrite
+            ? t("noOrdersDescription")
+            : t("noOrdersDescriptionReadOnly")
       }
       primaryAction={
         !hasFilters && canWrite ? (
