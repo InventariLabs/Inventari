@@ -86336,6 +86336,11 @@
             "title": "From Order",
             "default": false
           },
+          "expected_is_count": {
+            "type": "boolean",
+            "title": "Expected Is Count",
+            "default": false
+          },
           "planned_location_id": {
             "anyOf": [
               {

@@ -30,7 +30,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import StockLotDTO
 from app.core.public_api import core_api
 
-from ._over_receipt import SURPLUS_CODE
+from ._over_receipt import SURPLUS_CODE, is_surplus
 from ._po_receipt_guard import assert_line_over_receipt_allowed_async
 from ._wms_direction import WmsDirection
 from ._wms_session_close import (
@@ -217,7 +217,7 @@ async def execute_scan_async(
             )
 
     new_qty = line.picked_quantity + quantity
-    over_expected = new_qty > line.expected_quantity
+    over_expected = is_surplus(doc_line, new_qty, line.expected_quantity)
     if over_expected:
         if may_exceed_over_receipt is None:
             return scan_response(
