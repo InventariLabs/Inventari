@@ -5,7 +5,7 @@ endpoints and product-search helpers.
 """
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from typing import Any
 
@@ -49,10 +49,15 @@ class ProductSearchResult(BaseModel):
     #: differ by their best-before or their serial, and the reader sees it.
     expiry_date: date | None = None
     serial_number: str | None = None
-    #: When this record landed, per-record rows only — a merged row is a
-    #: shelf total and names no single date.
-    created_at: datetime | None = None
-    #: The shelf a hit stands on. The search walks a location's subtree and a
+    #: The day this record was added — the date the product card calls
+    #: "Added on", per-record rows only: a merged row is a shelf total and
+    #: names no single day.
+    added_date: date | None = None
+    #: True when the row is the total of several interchangeable records. It
+    #: still names one of them in ``item_id`` — a dispatch line needs a
+    #: record — so the flag is what tells a reader the row is not that record.
+    merged: bool = False
+    #: The shelf a hit stands on. A zone searches the shelves below it and a
     #: scrap searches the whole org, so the shelf is often the only thing
     #: telling same-named rows apart.
     location_name: str | None = None

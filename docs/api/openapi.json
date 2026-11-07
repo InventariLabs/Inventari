@@ -35681,10 +35681,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Narrow a stock search to this location and the ones under it. On its own it also selects the stock search, for callers written before the explicit flag.",
+              "description": "Narrow a stock search to this location. A shelf is exact: only its own records. A zone also offers the shelves below it. On its own it also selects the stock search, for callers written before the explicit flag.",
               "title": "Location Id"
             },
-            "description": "Narrow a stock search to this location and the ones under it. On its own it also selects the stock search, for callers written before the explicit flag."
+            "description": "Narrow a stock search to this location. A shelf is exact: only its own records. A zone also offers the shelves below it. On its own it also selects the stock search, for callers written before the explicit flag."
           },
           {
             "name": "stock",
@@ -67719,17 +67719,22 @@
             ],
             "title": "Serial Number"
           },
-          "created_at": {
+          "added_date": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Created At"
+            "title": "Added Date"
+          },
+          "merged": {
+            "type": "boolean",
+            "title": "Merged",
+            "default": false
           },
           "location_name": {
             "anyOf": [

@@ -12,11 +12,15 @@ export interface LineItemProduct {
   /** What makes two rows of one product on one shelf two rows. */
   expiry_date?: string | null;
   serial_number?: string | null;
-  /** When this record landed — per-record stock rows only; a merged row is
-   *  a shelf total and has no single date. The third thing that tells two
-   *  unmarked twins apart besides their quantity. */
-  created_at?: string | null;
-  /** The shelf a hit stands on — the search walks a location's subtree. */
+  /** The day this record was added (what the product card calls "Added
+   *  on") — per-record stock rows only; a merged row is a shelf total and
+   *  has no single day. The third thing that tells two unmarked twins apart
+   *  besides their quantity. */
+  added_date?: string | null;
+  /** True for the total of several interchangeable records: `item_id` then
+   *  names one of them, but the row is not that record. */
+  merged?: boolean;
+  /** The shelf a hit stands on — a zone's search covers the shelves below it. */
   location_name?: string | null;
   uom_symbol?: string | null;
   name: string;
