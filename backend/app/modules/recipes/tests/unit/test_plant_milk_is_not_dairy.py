@@ -23,6 +23,9 @@ from app.modules.recipes._allergens import infer_allergens
         'Mleko kokosowe',
         'Mleko sojowe',
         'Kokosowe mleko',
+        'Mleko migdałowe',
+        'Coconut milk, canned',
+        'Coconut milk 400 ml',
     ],
 )
 def test_a_plant_milk_does_not_carry_dairy(name: str) -> None:
@@ -44,7 +47,19 @@ def test_a_plant_milk_keeps_the_allergen_of_its_plant(name: str, allergen: str) 
 
 @pytest.mark.parametrize(
     'name',
-    ['Milk', 'Whole milk 1L', 'Mleko 3.2%', 'Cream', 'Coconut milk and butter'],
+    [
+        'Milk',
+        'Whole milk 1L',
+        'Mleko 3.2%',
+        'Cream',
+        'Coconut milk and butter',
+        'Hazelnut cream',
+        'Almond cream',
+        'Rice cream',
+        'Almond milk chocolate',
+        'Pea cream soup',
+        'Smietana migdalowa',
+    ],
 )
 def test_a_dairy_milk_still_carries_milk(name: str) -> None:
     assert 'milk' in infer_allergens(name)
