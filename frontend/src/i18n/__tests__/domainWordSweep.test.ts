@@ -8,6 +8,14 @@ import { describe, expect, it } from "vitest";
 
 import commonEn from "../locales/en/common.json";
 import commonPl from "../locales/pl/common.json";
+import commonFr from "../locales/fr/common.json";
+import commonEs from "../locales/es/common.json";
+import commonDe from "../locales/de/common.json";
+import commonPt from "../locales/pt/common.json";
+import statsDe from "../../modules/stats/i18n/de.json";
+import statsEs from "../../modules/stats/i18n/es.json";
+import statsFr from "../../modules/stats/i18n/fr.json";
+import statsPt from "../../modules/stats/i18n/pt.json";
 import inventoryEn from "../../modules/inventory/i18n/en.json";
 import inventoryPl from "../../modules/inventory/i18n/pl.json";
 
@@ -48,5 +56,23 @@ describe("domain word sweep", () => {
         /\bapps?\b|aplikacj/i,
       );
     }
+  });
+
+  it("keeps the per-module state labels masculine, like the module they describe", () => {
+    expect(commonPl.settings.focus.stateEnabled).toBe("Włączony");
+    expect(commonPl.settings.focus.stateNotEnabled).toBe("Niewłączony");
+    expect(commonFr.settings.focus.stateEnabled).toBe("Activé");
+    expect(commonFr.settings.focus.stateNotEnabled).toBe("Non activé");
+    expect(commonEs.settings.focus.stateEnabled).toBe("Activado");
+    expect(commonEs.settings.focus.stateNotEnabled).toBe("No activado");
+    expect(commonDe.settings.focus.stateEnabled).toBe("Aktiviert");
+    expect(commonPt.settings.focus.stateEnabled).toBe("Ativado");
+  });
+
+  it("names forgotten products the same way in the alerts label and its hint", () => {
+    expect(statsDe.analytics.alerts.totalHint).toContain("vergessene Produkte");
+    expect(statsEs.analytics.alerts.totalHint).toContain("productos olvidados");
+    expect(statsFr.analytics.alerts.totalHint).toContain("produits oubliés");
+    expect(statsPt.analytics.alerts.totalHint).toContain("produtos esquecidos");
   });
 });

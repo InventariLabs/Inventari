@@ -244,14 +244,6 @@ const AGREES_WITH_OWN_NOUN = new Map([
     "'Własna' is the grupa",
   ],
   [
-    "i18n/locales/pl/common.json settings.focus.stateEnabled",
-    "'Włączona' is the funkcja",
-  ],
-  [
-    "i18n/locales/pl/common.json settings.focus.stateNotEnabled",
-    "'Niewłączona' is the funkcja",
-  ],
-  [
     "i18n/locales/pl/common.json settings.audit.fields.is_active",
     "'Aktywna' is the flaga",
   ],

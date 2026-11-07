@@ -49,7 +49,7 @@
     },
     "alerts": {
       "total": "Total de alertas",
-      "totalHint": "Datas, itens esquecidos, básicos em falta; sem stock baixo",
+      "totalHint": "Datas, produtos esquecidos, básicos em falta; sem stock baixo",
       "types": {
         "forgotten": "Produtos esquecidos",
         "forgottenHint": "Sem mexer há 60 dias ou mais",
