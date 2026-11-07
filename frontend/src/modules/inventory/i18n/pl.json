@@ -154,7 +154,7 @@
       "location": "Miejsce",
       "anyLocation": "Wszędzie",
       "includeEmpty": "Pokaż też miejsca ze stanem zerowym",
-      "includeEmptyHint": "Pokazuje wpisy ze stanem zrównanym do zera — ślad po tym, że coś tu było. Miejsce, w którym produkt nigdy nie leżał, nie ma wpisu do pokazania.",
+      "includeEmptyHint": "Pokazuje rekordy ze stanem zrównanym do zera — ślad po tym, że coś tu było. Miejsce, w którym produkt nigdy nie leżał, nie ma rekordu do pokazania.",
       "oneStorage": "jedno miejsce",
       "oneProduct": "jeden produkt"
     },
@@ -175,10 +175,10 @@
     "whereItLies": "Gdzie leży",
     "seeForProduct": "We wszystkich miejscach",
     "seeForLocation": "Stany magazynowe tego miejsca",
-    "rows_one": "pozycja magazynowa",
-    "rows_few": "pozycje magazynowe",
-    "rows_many": "pozycji magazynowych",
-    "rows_other": "pozycji magazynowej"
+    "rows_one": "rekord",
+    "rows_few": "rekordy",
+    "rows_many": "rekordów",
+    "rows_other": "rekordu"
   },
   "lots": {
     "title": "Partie",

@@ -188,7 +188,7 @@
       "orgName": "Nombre de la organización",
       "permanentDelete": {
         "title": "Eliminación permanente",
-        "description": "Permite eliminar permanentemente productos archivados. No se puede deshacer — desactivado por defecto en perfiles de empresa con inventario auditado.",
+        "description": "Permite eliminar permanentemente productos archivados. No se puede deshacer — desactivado por defecto en modos de espacio de trabajo de empresa con inventario auditado.",
         "label": "Permitir eliminación permanente",
         "instantSave": "Se guarda en cuanto lo cambias.",
         "confirmTitle": "¿Permitir el borrado definitivo?",
@@ -317,10 +317,10 @@
     },
     "focus": {
       "loading": "Cargando módulos…",
-      "empty": "Ninguna de las aplicaciones que pueden mostrarse por separado está activada todavía.",
-      "emptyHint": "Mostrar solo un módulo reduce el espacio de trabajo a esa aplicación. Activa una de las siguientes y vuelve aquí.",
-      "stateEnabled": "Activada",
-      "stateNotEnabled": "No activada",
+      "empty": "Ninguno de los módulos que pueden mostrarse por separado está activado todavía.",
+      "emptyHint": "Mostrar solo un módulo reduce el espacio de trabajo a ese módulo. Activa uno de los siguientes y vuelve aquí.",
+      "stateEnabled": "Activado",
+      "stateNotEnabled": "No activado",
       "enableLink": "Activar en Módulos",
       "enableAction": "Activar {{name}} en Módulos",
       "previewLoading": "Calculando cambios…",
