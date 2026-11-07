@@ -1,10 +1,11 @@
-"""One mechanism, two policies that stay different on purpose.
+"""One mechanism and one type list, two policies that differ on purpose.
 
 Item attachments and equipment attachments answer "may this file be
-uploaded" with the same steps — extension, declared type, size, signature —
-and different answers. The limits and the allowlists are product calls; the
-steps were copied. This checks that consolidating the steps did not
-quietly consolidate the calls.
+uploaded" with the same steps — extension, declared type, size, signature.
+They accept the same types: one list, kept in the core, so a type is
+admitted or refused for both in one place. What stays different is a
+product call — the size limit, and whether the filename is gated. This
+checks that sharing the steps and the list did not quietly share those.
 """
 
 from __future__ import annotations
@@ -12,6 +13,7 @@ from __future__ import annotations
 import pytest
 
 from app.core.upload_validation import (
+    ATTACHMENT_CONTENT_TYPES,
     FileTooLargeError,
     FileTypeNotAllowedError,
     UploadMessages,
@@ -52,16 +54,17 @@ class TestUploadPolicyKeepsEachCallersLimits:
                 messages=MESSAGES,
             )
 
-    def test_a_doc_is_accepted_by_one_and_refused_by_the_other(self) -> None:
-        """No signature tells a .doc from an .xls, so item attachments
-        refuse the type rather than promise what the validator would
-        reject; a supplier's warranty arrives as whatever they sent."""
-        assert (
-            EQUIPMENT.check(
-                OLE2, declared_type='application/msword', messages=MESSAGES
-            ).extension
-            == 'doc'
-        )
+    def test_both_accept_the_one_list_of_types(self) -> None:
+        """Two copies of the list drifted apart once: equipment took .doc
+        while item attachments refused it, each with a reason of its own."""
+        assert ITEM.content_types == ATTACHMENT_CONTENT_TYPES
+        assert EQUIPMENT.content_types == ATTACHMENT_CONTENT_TYPES
+
+    def test_a_doc_is_refused_by_both(self) -> None:
+        """The old binary Word format stays out by decision, not for want of
+        a signature: .docx is the Word format to use."""
+        with pytest.raises(FileTypeNotAllowedError):
+            EQUIPMENT.check(OLE2, declared_type='application/msword', messages=MESSAGES)
         with pytest.raises(FileTypeNotAllowedError):
             ITEM.check(
                 OLE2,
