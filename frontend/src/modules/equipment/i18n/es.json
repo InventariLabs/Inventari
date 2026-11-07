@@ -206,7 +206,7 @@
     "all_statuses": "Todos",
     "confirm_bulk_retire_one": "¿Retirar {{count}} activo seleccionado?",
     "confirm_bulk_retire_other": "¿Retirar {{count}} activos seleccionados?",
-    "confirm_bulk_retire_msg": "Los activos se marcarán como retirados y permanecerán registrados. Su estado cambiará a «Retirado».",
+    "confirm_bulk_retire_msg": "Los activos se marcarán como retirados y permanecerán registrados. Su estado cambiará a «Retirado». Un activo prestado no se retira — devuélvalo primero.",
     "confirm_bulk_purge_one": "¿Eliminar permanentemente {{count}} activo seleccionado?",
     "confirm_bulk_purge_other": "¿Eliminar permanentemente {{count}} activos seleccionados?",
     "confirm_bulk_purge_msg": "Esta acción no se puede deshacer.",

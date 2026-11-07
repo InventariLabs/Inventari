@@ -6,6 +6,30 @@ import { Button } from "@/components/ui/Button";
 import { useAutoResetFlag } from "@/hooks/useAutoResetFlag";
 import { copyText } from "@/lib/clipboard";
 
+/**
+ * Pages whose address ends in a credential: the password reset, old-style
+ * invitation and equipment attestation links that an e-mail hands out.
+ */
+const SECRET_PATH_TAIL =
+  /^(\/(?:reset-password|join|public\/attestation)\/)[^/]+/;
+/** Query parameters that carry one: registration and invitation links. */
+const SECRET_PARAMS = ["token", "invite", "code"];
+const REDACTED = "redacted";
+
+/**
+ * The page address with the credentials an e-mailed link put there masked.
+ * A crash on such a page would otherwise hand a live token to wherever the
+ * report is pasted — for a self-hosted install, often a public issue tracker.
+ */
+function reportableAddress(href: string): string {
+  const url = new URL(href);
+  url.pathname = url.pathname.replace(SECRET_PATH_TAIL, `$1${REDACTED}`);
+  for (const name of SECRET_PARAMS) {
+    if (url.searchParams.has(name)) url.searchParams.set(name, REDACTED);
+  }
+  return url.href;
+}
+
 /** What the reader pastes into a bug report: the failure, the page and the time. */
 function describeError(error: unknown): string {
   if (isRouteErrorResponse(error)) {
@@ -36,7 +60,11 @@ export default function ErrorDetails({ error }: { error: unknown }) {
 
   const report = useMemo(
     () =>
-      [new Date().toISOString(), window.location.href, describeError(error)]
+      [
+        new Date().toISOString(),
+        reportableAddress(window.location.href),
+        describeError(error),
+      ]
         .join("\n")
         .trim(),
     [error],

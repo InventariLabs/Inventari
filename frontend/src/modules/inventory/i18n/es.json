@@ -186,7 +186,8 @@
       "message": "El motivo queda con el lote y se muestra junto a su estado.",
       "label": "Por qué",
       "placeholder": "Aviso del proveedor 41/26 — vidrio en el tarro 12",
-      "confirm": "Cambiar estado"
+      "confirm": "Cambiar estado",
+      "failed": "No se pudo cambiar el estado del lote"
     },
     "actionsFor": "Acciones para el lote {{name}}",
     "columns": {

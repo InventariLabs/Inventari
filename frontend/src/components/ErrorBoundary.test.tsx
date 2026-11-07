@@ -61,7 +61,11 @@ describe("ErrorBoundary", () => {
   });
 
   it("sends the reader to the start page from the full-screen fallback", () => {
-    const location = { ...window.location, href: "/orders/42" };
+    // A browser's `href` is always absolute; the fallback's report parses it.
+    const location = {
+      ...window.location,
+      href: `${window.location.origin}/orders/42`,
+    };
     vi.stubGlobal("location", location);
     render(
       <ErrorBoundary>

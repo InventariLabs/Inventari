@@ -210,6 +210,8 @@ export default function BulkEditModal({ itemIds, onClose, onSuccess }: Props) {
     );
   };
 
+  const anyFieldTicked = Object.values(enabledFields).some(Boolean);
+
   const toggleField = (field: string) => {
     setEnabledFields((prev) => ({ ...prev, [field]: !prev[field] }));
   };
@@ -387,7 +389,13 @@ export default function BulkEditModal({ itemIds, onClose, onSuccess }: Props) {
           <Button variant="outline" onClick={onClose}>
             {t("bulkEdit.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={bulkMutation.isPending}>
+          {/* Waits for a ticked field: the subtitle above says to pick one,
+              and a press with none was only answered by a toast saying it
+              again. A field ticked and left empty still answers on press. */}
+          <Button
+            onClick={handleSubmit}
+            disabled={bulkMutation.isPending || !anyFieldTicked}
+          >
             {bulkMutation.isPending ? (
               <Loader2 size={20} className="animate-spin" />
             ) : (

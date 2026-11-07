@@ -358,7 +358,7 @@ export default function StorageWizard({
         handleClose();
       },
       onError: (error: unknown) => {
-        toast.error(extractApiError(error, t("unknownError")));
+        toast.error(extractApiError(error, t("errors.createFailed")));
       },
     });
   };

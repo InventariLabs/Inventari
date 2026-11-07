@@ -60,7 +60,8 @@
   "errors": {
     "cannotDelete": "Löschen nicht möglich: Zuerst die Produkte entfernen oder verschieben.",
     "cannotArchive": "Dieser Lagerort kann nicht archiviert werden",
-    "cannotRestore": "Lagerort konnte nicht wiederhergestellt werden"
+    "cannotRestore": "Lagerort konnte nicht wiederhergestellt werden",
+    "createFailed": "Lagerort konnte nicht angelegt werden. Bitte erneut versuchen."
   },
   "wizard": {
     "discardTitle": "Diesen neuen Lagerort verwerfen?",
@@ -196,7 +197,6 @@
     "step1DescMore": "Benennen Sie den Lagerort, den Sie hinzufügen – z. B. Kühllager, Wareneingang.",
     "parentPlaceholder": "Lagerort wählen"
   },
-  "unknownError": "Unbekannter Fehler",
   "edit": {
     "nameLabel": "Name",
     "qrCodeLabel": "QR-Code",

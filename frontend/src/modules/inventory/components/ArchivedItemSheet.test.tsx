@@ -4,6 +4,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ArchivedItemSheet from "./ArchivedItemSheet";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
+import { toast } from "sonner";
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,13 +71,39 @@ describe("ArchivedItemSheet", () => {
     expect(screen.getByText(/Old Milk/i)).toBeInTheDocument();
     // The stored reason is a vocabulary code; the sheet shows its word.
     expect(
-      screen.getByText((_, el) => el?.textContent?.trim() === "Status: Used"),
+      screen.getByText(
+        (_, el) => el?.textContent?.trim() === "Reason for deletion: Used",
+      ),
     ).toBeInTheDocument();
+  });
+
+  it("calls the stored value what it is: the reason the product was deleted", () => {
+    // Read as "Status: Test / erroneous data", the line put the deletion
+    // reason under a word the sheet uses for nothing else.
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ArchivedItemSheet
+          item={{ ...mockItem, deletion_reason: "TEST_DATA" }}
+          labelCode="STM-0001"
+          onClose={() => {}}
+          onReuse={() => {}}
+        />
+      </QueryClientProvider>,
+    );
+
+    expect(
+      screen.getByText(
+        (_, el) =>
+          el?.textContent?.trim() ===
+          "Reason for deletion: Test / erroneous data",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/^Status/)).not.toBeInTheDocument();
   });
 
   it("shows a missing reason as a lack, not as the reason Other", () => {
     // The defect this sheet carried for a year: a record archived without a
-    // reason read "Status: Other", because the missing value was defaulted
+    // reason read "Reason for deletion: Other", because the missing value was defaulted
     // into a key that exists — the one answer that cannot be counted, said
     // with confidence. The absence has its own word now.
     render(
@@ -88,12 +119,12 @@ describe("ArchivedItemSheet", () => {
 
     expect(
       screen.getByText(
-        (_, el) => el?.textContent?.trim() === "Status: Unknown",
+        (_, el) => el?.textContent?.trim() === "Reason for deletion: Unknown",
       ),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(
-        (_, el) => el?.textContent?.trim() === "Status: Other",
+        (_, el) => el?.textContent?.trim() === "Reason for deletion: Other",
       ),
     ).not.toBeInTheDocument();
   });
@@ -131,7 +162,8 @@ describe("ArchivedItemSheet", () => {
 
     expect(
       screen.getByText(
-        (_, el) => el?.textContent?.trim() === "Status: SOMETHING_NEW",
+        (_, el) =>
+          el?.textContent?.trim() === "Reason for deletion: SOMETHING_NEW",
       ),
     ).toBeInTheDocument();
   });
@@ -155,5 +187,32 @@ describe("ArchivedItemSheet", () => {
     await waitFor(() => {
       expect(onReuse).toHaveBeenCalled();
     });
+  });
+
+  it("names the label when freeing it fails without a reason", async () => {
+    server.use(
+      http.post("/api/v1/labels/pool/STM-0001/unassign", () =>
+        HttpResponse.json({ detail: "Internal Server Error" }, { status: 500 }),
+      ),
+    );
+    const onReuse = vi.fn();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ArchivedItemSheet
+          item={mockItem}
+          labelCode="STM-0001"
+          onClose={() => {}}
+          onReuse={onReuse}
+        />
+      </QueryClientProvider>,
+    );
+
+    fireEvent.click(screen.getByText(/Reuse label/i));
+
+    // "The action could not be completed." said nothing about which write.
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Could not free the label"),
+    );
+    expect(onReuse).not.toHaveBeenCalled();
   });
 });

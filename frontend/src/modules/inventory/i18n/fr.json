@@ -186,7 +186,8 @@
       "message": "La raison reste attachée au lot et apparaît à côté de son statut.",
       "label": "Pourquoi",
       "placeholder": "Avis fournisseur 41/26 — verre trouvé dans le pot 12",
-      "confirm": "Changer le statut"
+      "confirm": "Changer le statut",
+      "failed": "Impossible de changer le statut du lot"
     },
     "actionsFor": "Actions pour le lot {{name}}",
     "columns": {

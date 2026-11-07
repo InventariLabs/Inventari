@@ -102,6 +102,14 @@ says what the release does rather than what changed since them.
   file pickers on both screens no longer offer `.doc`, which the server refused
   only after the upload. The size limits stay as they were: 20 MB for an
   equipment attachment, 10 MB for a product's.
+- **Breaking:** the `/api/v1/ws/notifications` WebSocket takes the access token
+  as a subprotocol instead of a `token` query parameter: the client offers
+  `bearer` and then the token (`Sec-WebSocket-Protocol: bearer, <token>`), and
+  the socket answers with `bearer`. In the address, the token was written into
+  the backend's log and every proxy's access log on each connect, and those
+  logs outlive it; in a header it travels as it does on every other request. A
+  client that still sends the token in the address is refused with close code
+  4001 and has to offer the two subprotocols instead.
 
 ### Added
 
@@ -502,6 +510,22 @@ says what the release does rather than what changed since them.
   the editor's preview; the sanitizer used to drop it as if it were a `data:`
   link. A logo uploaded as WebP now prints through `{{ issuer.logo }}` instead
   of leaving an empty image.
+- The error details a broken screen offers to copy into a bug report no longer
+  carry the token of the link that opened the page: on a password reset,
+  invitation, registration or equipment attestation page the token reads
+  `redacted`, so a report pasted into a public issue tracker hands nobody a
+  live link.
+- Inventory, location and equipment dialogs say what failed and what they
+  need: creating a location, saving a stock alert, a bulk edit, changing a
+  batch's status and freeing a label name the write that could not be done
+  when the server gives no reason, instead of "Unknown error" or "Something
+  went wrong". The location wizard no longer suggests a name already taken at
+  that level by a location a module owns or one in the archive. Bulk edit's
+  Apply waits until a field is ticked, the bulk Retire question says before
+  you answer that a checked-out asset is not retired, and the archived label's
+  sheet calls the deletion reason by its name rather than "Status". Saving an
+  empty service entry marks every missing answer in the app's language,
+  instead of stopping at the title with the browser's own message.
 
 ## v0.11.0 - 2026-11-02
 

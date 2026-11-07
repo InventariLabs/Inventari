@@ -257,7 +257,7 @@
     "successUpdated": "Updated {{count}} products",
     "successUpdated_one": "Updated {{count}} product",
     "successUpdated_other": "Updated {{count}} products",
-    "errorUpdate": "Error during update"
+    "errorUpdate": "Could not change the selected products"
   },
   "fields": {
     "purchase_price": "Purchase price per unit",
@@ -459,7 +459,8 @@
     "runningLow": "Running low",
     "setToCurrent": "Set to current quantity",
     "save": "Set alert",
-    "scopeNote": "The alert belongs to the product: it is measured against everything you have of it, not against this one record."
+    "scopeNote": "The alert belongs to the product: it is measured against everything you have of it, not against this one record.",
+    "saveFailed": "Could not save the minimum stock alert"
   },
   "deletionReasonPlaceholder": "— pick a reason —",
   "quickActions": {

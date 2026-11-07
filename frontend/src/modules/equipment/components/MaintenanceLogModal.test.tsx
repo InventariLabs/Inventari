@@ -85,9 +85,10 @@ describe("MaintenanceLogModal", () => {
   it("names each missing answer on Save and sends nothing", async () => {
     const { onClose, user } = renderModal();
 
-    // Submitted directly: jsdom's own constraint check would stop the
-    // empty form before the component's answer could be heard.
-    fireEvent.submit(screen.getByTestId("maintenance-modal-body"));
+    // Pressed, not submitted directly: the browser's own constraint check
+    // used to stop the empty form at the title — in the browser's language,
+    // about the title alone — before the form's answer could be heard.
+    await user.click(screen.getByRole("button", { name: "Save" }));
     expect(
       screen.getByText("Choose what kind of work this was"),
     ).toBeInTheDocument();

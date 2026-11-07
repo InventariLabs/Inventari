@@ -206,7 +206,7 @@
     "all_statuses": "Tous",
     "confirm_bulk_retire_one": "Retirer {{count}} actif sélectionné ?",
     "confirm_bulk_retire_other": "Retirer {{count}} actifs sélectionnés ?",
-    "confirm_bulk_retire_msg": "Les actifs seront marqués comme retirés et resteront dans le registre. Leur statut passera à « Retiré ».",
+    "confirm_bulk_retire_msg": "Les actifs seront marqués comme retirés et resteront dans le registre. Leur statut passera à « Retiré ». Un actif emprunté n'est pas retiré — retournez-le d'abord.",
     "confirm_bulk_purge_one": "Supprimer définitivement {{count}} actif sélectionné ?",
     "confirm_bulk_purge_other": "Supprimer définitivement {{count}} actifs sélectionnés ?",
     "confirm_bulk_purge_msg": "Cette action est irréversible.",
