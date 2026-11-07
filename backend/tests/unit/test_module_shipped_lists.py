@@ -116,7 +116,11 @@ class TestTheShippedListIsTheTree:
     def test_a_virtual_feature_keeps_always_on(self):
         # No module directory answers to the name, so the feature grant
         # stands — the banner and the bell are furniture, not a drop.
-        assert is_always_on('announcements') is True
+        assert is_always_on('announcements') is True, (
+            'a directory app/modules/announcements/ now exists: the name is '
+            'reserved for the virtual feature, so a registering module there '
+            'turns the always-on grant off — rename or remove that directory'
+        )
 
     def test_a_dropped_directory_cannot_wear_always_on(self, monkeypatch):
         """The registry knows a manifest for the name — a discovered

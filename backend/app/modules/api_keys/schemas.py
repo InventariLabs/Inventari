@@ -104,10 +104,10 @@ class ApiKeyCapabilities(BaseModel):
     default_permissions: list[str]
     #: Never on a key, whoever issues it.
     withheld_permissions: list[str]
-    #: Administrative areas are closed to keys by a role check, not by a
-    #: missing permission. ``withheld_permissions`` names the permissions
-    #: that open most of them, but the role check is the door, so this flag
-    #: says the areas stay shut even to a key that somehow carried one.
+    #: Administrative areas stay closed to keys. The doors are permissions:
+    #: ``withheld_permissions`` names the ones that open them and no key
+    #: list can hold them; a key's role is never ``admin``, so the admin
+    #: bypass does not apply to it either.
     admin_areas_blocked: bool
     #: The header a key travels in.
     header: str
