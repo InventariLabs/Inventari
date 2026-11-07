@@ -78,6 +78,29 @@ describe("JoinOrganizationPage", () => {
     });
   });
 
+  it("does not ask a signed-out visitor's organization on the way to registration", async () => {
+    // The organization is read only to tell "already a member" from "joined",
+    // which needs a session. Asked without one, it is refused with a 401 — an
+    // error in the console and a token refresh for a visitor who has none.
+    const organizationAsked = vi.fn();
+    server.use(
+      http.get("/api/v1/organizations/my", () => {
+        organizationAsked();
+        return HttpResponse.json({}, { status: 401 });
+      }),
+      http.get("/public/invitation/SIGNEDOUT1", () =>
+        HttpResponse.json({ valid: true }),
+      ),
+    );
+
+    renderJoin("/join/SIGNEDOUT1");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("register-landing")).toBeInTheDocument();
+    });
+    expect(organizationAsked).not.toHaveBeenCalled();
+  });
+
   it("tells the reader a dead path-form link is dead instead of redirecting", async () => {
     // A dead link such as /join/QACFAKETOKEN123 used to fall through the
     // catch-all to "/" and, signed out, silently on to /login — where
