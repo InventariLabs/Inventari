@@ -1,10 +1,13 @@
 import uuid
 
 import pytest
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
+from app.i18n.service import set_current_lang
 from app.models.organization import Organization
+from app.models.partner import Partner
 from app.models.user import User
 from app.schemas.partner import PartnerCreate, PartnerUpdate
 from app.services import partner_service
@@ -199,6 +202,109 @@ class TestPartnerCreateLostRace:
                 user_id=async_test_user.id,
             )
         assert refused.value.key == 'partner_name_exists'
+
+    @pytest.mark.asyncio
+    async def test_the_transaction_stays_usable_after_a_refused_rename(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+    ):
+        """The UPDATE belongs inside the savepoint, not before it.
+
+        ``begin_nested`` flushes what is pending before it opens the savepoint,
+        so a rename set on the row beforehand ran outside it and the unique
+        violation took the whole transaction down.
+        """
+        org_id = async_test_household.id
+        await partner_service.create_async(
+            real_async_db_session,
+            org_id,
+            _make_create(name='Taken'),
+            async_test_user.id,
+        )
+        other = await partner_service.create_async(
+            real_async_db_session, org_id, _make_create(name='Free'), async_test_user.id
+        )
+        other_id = other.id
+        with pytest.raises(ServiceRejectionError):
+            await partner_service.update_async(
+                real_async_db_session,
+                org_id,
+                other_id,
+                PartnerUpdate(name='Taken'),
+                user_id=async_test_user.id,
+            )
+        await real_async_db_session.execute(text('SELECT 1'))
+        assert (
+            await real_async_db_session.scalar(
+                select(Partner.name).where(Partner.id == other_id)
+            )
+            == 'Free'
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_code_that_spells_the_constraint_is_not_a_name_clash(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+    ):
+        """The refusal follows the constraint hit, not text that holds the row.
+
+        The violation's message quotes the row's values; a code that happens to
+        spell the name constraint must still be answered as a code clash.
+        """
+        org_id = async_test_household.id
+        code = 'uq_partner_org_name_type'
+        await partner_service.create_async(
+            real_async_db_session,
+            org_id,
+            _make_create(name='First', code=code),
+            async_test_user.id,
+        )
+        with pytest.raises(ServiceRejectionError) as refused:
+            await partner_service.create_async(
+                real_async_db_session,
+                org_id,
+                _make_create(name='Second', code=code),
+                async_test_user.id,
+            )
+        assert refused.value.key == 'partner_code_exists'
+
+
+@pytest.mark.integration
+class TestPartnerDuplicateNamesTheType:
+    """The refusal says "Supplier", the word on the screen, not ``SUPPLIER``."""
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ('lang', 'word'),
+        [('en', 'Supplier'), ('pl', 'Dostawca'), ('de', 'Lieferant')],
+    )
+    async def test_the_look_names_the_type_in_the_readers_language(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+        lang: str,
+        word: str,
+    ):
+        org_id = async_test_household.id
+        data = _make_create(name='Twice')
+        await partner_service.create_async(
+            real_async_db_session, org_id, data, async_test_user.id
+        )
+        set_current_lang(lang)  # type: ignore[arg-type]
+        try:
+            with pytest.raises(ServiceRejectionError) as refused:
+                await partner_service.create_async(
+                    real_async_db_session, org_id, data, async_test_user.id
+                )
+        finally:
+            set_current_lang(None)
+        assert f'"{word}"' in str(refused.value) or f'« {word} »' in str(refused.value)
+        assert 'SUPPLIER' not in str(refused.value)
 
 
 @pytest.mark.integration

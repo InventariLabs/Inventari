@@ -170,6 +170,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Refusing a partner that already exists now names its type in the reader's
+  words ("Supplier", "Dostawca") rather than the stored value `SUPPLIER`, in
+  every language, and so does the refusal to confirm an order to a partner that
+  is not a supplier. A rename that loses a race for the name no longer ends the
+  transaction around it, and a duplicate is told apart by the constraint the
+  database reports instead of by text that also quotes the row's values.
+
 - The Receive goods, Issue goods and Move goods forms refuse a missing value
   where it is. Receiving without a supplier or customer marks that field and
   says why under it, as the location field already did, and the sentence is no
