@@ -8,7 +8,7 @@ import {
   useAddToShoppingList,
   useOpenShoppingLists,
 } from "../hooks/useRecipes";
-import IngredientRow from "./IngredientRow";
+import IngredientRow, { statusDot } from "./IngredientRow";
 import { Button } from "@/components/ui/Button";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { useCanWrite } from "@/hooks/useCanWrite";
@@ -266,17 +266,7 @@ export default function RecipeAvailabilityChecker({
                   >
                     <span
                       className={`w-1.5 h-1.5 rounded-full inline-block ${
-                        status === "available"
-                          ? "bg-accent-400"
-                          : status === "available_approx"
-                            ? "bg-amber-400"
-                            : status === "insufficient"
-                              ? "bg-red-300"
-                              : status === "incomparable"
-                                ? "bg-blue-400"
-                                : status === "missing"
-                                  ? "bg-red-400"
-                                  : "bg-gray-300"
+                        statusDot[status] ?? statusDot.unknown
                       }`}
                     ></span>
                     {/* "Unknown 3" alone does not say what it means —
