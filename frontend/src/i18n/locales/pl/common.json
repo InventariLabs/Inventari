@@ -770,7 +770,7 @@
       "poLine": {
         "tax": "VAT {{rate}}%",
         "product": "produkt: {{name}}",
-        "reorderRule": "reguła uzupełnień: {{shelf}}",
+        "reorderRule": "reguła uzupełnień: {{location}}",
         "reorderRuleUnnamed": "z reguły uzupełnień",
         "note": "notatka: {{text}}"
       }

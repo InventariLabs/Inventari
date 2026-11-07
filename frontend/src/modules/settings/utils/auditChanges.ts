@@ -414,7 +414,7 @@ function purchaseOrderLineText(
     parts.push(
       line.reorder_rule
         ? t("common:settings.audit.poLine.reorderRule", {
-            shelf: line.reorder_rule,
+            location: line.reorder_rule,
             defaultValue: "",
           })
         : t("common:settings.audit.poLine.reorderRuleUnnamed", {

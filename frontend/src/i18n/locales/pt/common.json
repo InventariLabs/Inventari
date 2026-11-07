@@ -760,7 +760,7 @@
       "poLine": {
         "tax": "IVA {{rate}}%",
         "product": "produto: {{name}}",
-        "reorderRule": "regra de reposição: {{shelf}}",
+        "reorderRule": "regra de reposição: {{location}}",
         "reorderRuleUnnamed": "de uma regra de reposição",
         "note": "nota: {{text}}"
       }

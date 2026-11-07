@@ -768,7 +768,7 @@
       "poLine": {
         "tax": "TVA {{rate}} %",
         "product": "produit : {{name}}",
-        "reorderRule": "règle de réapprovisionnement : {{shelf}}",
+        "reorderRule": "règle de réapprovisionnement : {{location}}",
         "reorderRuleUnnamed": "d’une règle de réapprovisionnement",
         "note": "note : {{text}}"
       }

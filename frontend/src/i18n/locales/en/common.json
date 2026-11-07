@@ -768,7 +768,7 @@
       "poLine": {
         "tax": "{{rate}}% tax",
         "product": "product: {{name}}",
-        "reorderRule": "reorder rule: {{shelf}}",
+        "reorderRule": "reorder rule: {{location}}",
         "reorderRuleUnnamed": "from a reorder rule",
         "note": "note: {{text}}"
       }
