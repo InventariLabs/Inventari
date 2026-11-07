@@ -2037,6 +2037,7 @@
       "tracking": "Linki do śledzenia",
       "presets": "Gotowe ustawienia"
     },
+    "sectionRefused": "niezapisane – serwer to odrzucił",
     "nav": "Sekcje konfiguracji",
     "related": "Powiązane ekrany",
     "advanced": {
