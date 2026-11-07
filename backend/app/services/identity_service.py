@@ -104,14 +104,23 @@ async def get_current_user(
 
     # --- API Key flow ---
     if api_key or credential.startswith(API_KEY_PREFIX):
-        from app.core.api_key_auth import api_key_scopes_admit, resolve_api_key
+        from app.core.api_key_auth import (
+            api_key_scopes_admit,
+            explain_api_key_refusal,
+            resolve_api_key,
+        )
 
         identity = await resolve_api_key(db, credential)
         if identity is None:
+            # A typo, a lapsed key and a revoked one each get their own
+            # sentence; any other refusal keeps the general one.
+            reason = await explain_api_key_refusal(db, credential)
             raise AppException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 code='INVALID_API_KEY',
-                message=get_error_message('invalid_api_key', lang),
+                message=get_error_message(
+                    f'api_key_{reason}' if reason else 'invalid_api_key', lang
+                ),
                 headers={'WWW-Authenticate': 'Bearer'},
             )
         # A key issued for one job (a print agent, say) reaches only the

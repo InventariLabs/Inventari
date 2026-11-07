@@ -140,7 +140,35 @@ async def _attempt_delivery(
     except httpx.TimeoutException:
         return False, None, None, f'Timeout after {webhook.timeout_seconds}s'
     except httpx.RequestError as exc:
-        return False, None, None, str(exc)[:500]
+        logger.info('Webhook %s: the request failed: %r', webhook.id, exc)
+        return False, None, None, _request_failure_sentence(exc, webhook)
+
+
+def _request_failure_sentence(exc: httpx.RequestError, webhook: WebhookEndpoint) -> str:
+    """Say what went wrong in words for the administrator, not the library's.
+
+    httpx reports a refused or unreachable connection as "All connection
+    attempts failed", which names neither the address nor what to check. The
+    three causes it stands for are the ones the administrator can act on.
+    """
+    from urllib.parse import urlparse
+
+    parsed = urlparse(str(webhook.url))
+    target = parsed.netloc or str(webhook.url)
+    if isinstance(exc, httpx.ConnectError):
+        if 'certificate' in str(exc).lower() or 'ssl' in str(exc).lower():
+            return (
+                f'The connection to {target} was refused over TLS: the '
+                "receiver's certificate could not be verified."
+            )
+        return (
+            f'Could not connect to {target}. The address may be wrong, a '
+            'firewall may be blocking it, or the receiver may be down.'
+        )
+    return (
+        f'The connection to {target} broke before the receiver answered '
+        f'({type(exc).__name__}).'
+    )
 
 
 def _calc_next_retry(attempt: int, webhook: WebhookEndpoint) -> datetime:
@@ -279,6 +307,9 @@ async def _notify_circuit_breaker(db: AsyncSession, webhook: WebhookEndpoint) ->
                 failures=webhook.consecutive_failures,
             ),
             notification_type='warning',
+            # The notice says to fix the address and switch the channel back
+            # on — both happen on this screen.
+            link='/settings/webhooks',
         )
         await core_api.notifications.publish_async(db, notifications)
     except AttributeError:

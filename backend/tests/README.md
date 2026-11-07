@@ -184,6 +184,31 @@ Tests require the full Docker stack (`docker compose up -d`). The `db_session` f
 1. Check that `db_session` (not a raw `Session`) is injected in the test
 2. Check that `@pytest.mark.integration` is present on DB-touching tests
 
+### Test databases left behind
+
+Every run builds its databases under its own id: `inventari_test_r<id>_gw<N>`
+for the workers and `test_scratch_r<id>_gw<N>` for the migration tests, and
+drops them when it ends (the `[test-db] dropped …` line). A run that was
+killed outright (SIGKILL, a dead container) never reaches that point and
+leaves its databases under a name no later run reuses.
+
+Clear such a run by **naming it** — the id is in the leftover database names:
+
+```bash
+docker compose exec backend uv run python -c "from app.config import settings; from app.core.db_isolation import drop_run_databases; print(drop_run_databases(settings.DATABASE_URL, 'inventari_test', '<id>'))"
+```
+
+Never drop "all the test databases" with a pattern: a suite that is still
+running on the same server loses its databases under it and reports dozens of
+`ERROR at setup — database does not exist` while the passed count stays green.
+An `INVENTARI_TEST_RUN_ID` exported in your shell is ignored — every run mints
+its own.
+
+Databases from before the run ids (`inventari_test`, `inventari_test_gw<N>`,
+`test_scratch_gw<N>`) belong to no run, so no run removes them. Drop them by
+hand, one `DROP DATABASE "<name>" WITH (FORCE)` each, and only when no suite
+of an older checkout is running against the server.
+
 ### Auth errors (401)
 
 1. Use the `auth_headers` fixture, not a hardcoded token

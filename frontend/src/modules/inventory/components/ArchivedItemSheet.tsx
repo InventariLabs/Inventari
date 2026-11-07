@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/Sheet";
 import { formatDate } from "@/utils/helpers";
-import { archivedReasonBadgeKey } from "@/modules/shared/lib/archiveReasons";
+import { archivedReasonLabel } from "@/modules/shared/lib/archiveReasons";
 
 interface Props {
   item: Item;
@@ -40,7 +40,7 @@ export default function ArchivedItemSheet({
       open
       onClose={onClose}
       backdropOpacity={60}
-      aria-label={t("history.title")}
+      aria-label={t("history.title", { defaultValue: "Product history" })}
     >
       <div className="w-12 h-1.5 bg-surface-inset rounded-full mx-auto mt-3 mb-1 sm:hidden"></div>
 
@@ -52,7 +52,7 @@ export default function ArchivedItemSheet({
             </div>
             <div>
               <h3 className="font-semibold text-lg text-on leading-tight">
-                {t("history.title")}
+                {t("history.title", { defaultValue: "Product history" })}
               </h3>
               <p className="text-on-secondary text-sm mt-0.5">
                 {t("history.label", { defaultValue: "Label" })}:{" "}
@@ -87,15 +87,7 @@ export default function ArchivedItemSheet({
               <CheckCircle2 size={14} />
               {/* The word the delete dialog asked this value under. */}
               {t("items:deletionReason")}:{" "}
-              {item.deletion_reason
-                ? t(archivedReasonBadgeKey(item.deletion_reason), {
-                    // A stored value the catalogue does not know still beats
-                    // a blank line: the word is what was written, and it is
-                    // the truth even when it is not a word the reader has a
-                    // translation for.
-                    defaultValue: item.deletion_reason,
-                  })
-                : t("common:unknown")}
+              {archivedReasonLabel(t, item.deletion_reason)}
             </div>
             {item.deleted_at && (
               <div className="flex items-center gap-1">

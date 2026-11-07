@@ -55,7 +55,7 @@ function PickProductLine({
   // naming only what was planned would put "4" above a field whose job is
   // now to take the remaining 2.
   return (
-    <p className="text-sm text-on-secondary">
+    <p className="text-sm text-on-secondary [overflow-wrap:anywhere]">
       {showDocument && line.document_number && (
         <span className="font-medium text-on">{line.document_number} · </span>
       )}

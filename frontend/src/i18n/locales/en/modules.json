@@ -78,6 +78,15 @@
     },
     "items": {
       "name": "Inventory"
+    },
+    "locations": {
+      "name": "Locations"
+    },
+    "categories": {
+      "name": "Categories"
+    },
+    "announcements": {
+      "name": "Announcements"
     }
   },
   "config": {

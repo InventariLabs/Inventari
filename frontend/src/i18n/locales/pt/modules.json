@@ -78,6 +78,15 @@
     },
     "items": {
       "name": "Estoque"
+    },
+    "locations": {
+      "name": "Locais"
+    },
+    "categories": {
+      "name": "Categorias"
+    },
+    "announcements": {
+      "name": "Avisos"
     }
   },
   "config": {

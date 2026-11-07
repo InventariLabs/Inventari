@@ -12,6 +12,7 @@
   "failuresSinceSuccess_other": "{{count}} entregas fallidas desde la última correcta.",
   "consecutiveFailures": "Fallos consecutivos",
   "test": "Probar",
+  "testHint": "Envía ahora un evento de ejemplo. Una prueba fallida cuenta para el límite del disyuntor, igual que una entrega real.",
   "reactivate": "Reactivar",
   "thresholdLink": "Ajustar el umbral de fallos",
   "delete": "Eliminar",

@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { formatDate } from "@/utils/helpers";
 import type { ArchivedItem } from "@/types";
 import { getCategoryLabel } from "@/modules/equipment/components/assetUtils";
-import { archivedReasonBadgeKey } from "@/modules/shared/lib/archiveReasons";
+import { archivedReasonLabel } from "@/modules/shared/lib/archiveReasons";
 
 interface ArchivedAssetRowProps {
   item: ArchivedItem;
@@ -55,7 +55,7 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
           </span>
           {item.deletion_reason && (
             <Badge variant="outline">
-              {t(archivedReasonBadgeKey(item.deletion_reason))}
+              {archivedReasonLabel(t, item.deletion_reason)}
             </Badge>
           )}
         </div>

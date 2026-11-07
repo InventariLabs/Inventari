@@ -310,3 +310,18 @@ Stability classes are the ones above; a vector is listed with the file that owns
 | Pick order strategies | orders the lines a picker walks through; the organization chooses the strategy in warehouse settings | `backend/app/modules/warehouse/pick_order_strategies.py` (`warehouse_api.register_pick_order_strategy`) |
 
 A new vector is added to this table in the same change that creates it.
+
+### Decisions: shared administration behaviour has no entry vector, on purpose
+
+The answers below were asked of changes to account identity, mail routing, the
+language preference and the refusal catalogue. Each is "nowhere, on purpose"
+unless it names a seam that already exists; none of them calls for a new hook.
+
+| Behaviour | Decision | Invariant, or the existing seam |
+|---|---|---|
+| Account identity (sign-in, password reset, who a session belongs to) | Nowhere, on purpose | Only Core's auth services establish who a person is and which organization they belong to. A module receives the result as `UserContextDTO`; it never mints or checks a credential. |
+| Mail routing and SMTP authentication | Nowhere, on purpose | One resolver (`_resolve_smtp_config` in `backend/app/services/email_service.py`) picks the server: the organization's own settings, else the installation's. A server the organization names brings its own login or none, so the installation's credentials are never offered to a host an administrator typed; the stored password is encrypted at rest; a demo ignores the organization's server. A module that needs to reach a person addresses the person (`core_api.notifications`), not a mail server. |
+| The language preference and the language selector | Nowhere, on purpose | The set of languages is the build's (`frontend/src/i18n/languages.ts`, the list `LanguageSelector` shows), and the preference is the user's. A module adds words in the languages that exist (its own `i18n/<lang>.json`, see below), never a language. |
+| The organization's name at onboarding | An existing seam | `core_api.organizations.apply_onboarding_profile_async` takes an optional `organization_name`. The addition is backward compatible: the parameter is optional and appears in `backend/app/core/core_api_snapshot.json` as not required. Covered by the service test (`test_onboarding_profile.py`, a founder's name replaces the default) and the endpoint test (`test_onboarding_setup_access.py`, the name is trimmed); a caller that omits the argument keeps the default name. |
+| Translated refusals: `CodedRejectionError` and the catalogue | Nowhere, on purpose, for rendering | Two Core invariants. A refusal is rendered in the request's language by Core's exception handlers (`backend/app/main.py`) from a catalogue key; a module does not render its own. A diagnostic about cryptography — an `UndecryptableSecretError`, a key that no longer opens a secret — is for the operator's log and the `secrets` CLI and never becomes a sentence for a reader: such an error is not reader-facing, and the callers that tell a reader to re-enter a secret say so with a catalogue key of their own. A machine `code` on a `CodedRejectionError` is a client contract, so a module cannot rename or reuse one of Core's. |
+| Module-owned refusal messages | An existing seam | The module's `backend/i18n/<lang>.json` (keys at the top level) answers through `get_module_error_message`, which `app.core.module_sdk` exports; English is the catalogue a module must ship and answers for any language or key the module lacks. A module's own refusals use it; nothing new is added for them. |

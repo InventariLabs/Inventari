@@ -9,7 +9,7 @@ from app.core.modules import (
 )
 
 _CATEGORY_VISIBLE = [
-    {'key': 'category_id', 'visible': True},
+    {'key': 'category_id', 'label': 'Category', 'visible': True},
 ]
 
 _COMMON_EQUIPMENT_FIELDS = [

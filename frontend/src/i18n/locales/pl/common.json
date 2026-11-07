@@ -723,12 +723,6 @@
         "changed": "Zmieniono pole {{field}}",
         "required": "wymagane"
       },
-      "builtInModules": {
-        "core": "Podstawy",
-        "locations": "Miejsca",
-        "categories": "Kategorie",
-        "announcements": "Ogłoszenia"
-      },
       "values": {
         "ALL": "Wszystkie",
         "STORAGE": "Miejsce",

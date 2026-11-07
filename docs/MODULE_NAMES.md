@@ -35,13 +35,18 @@ They never change as part of naming work.
 ## Name table
 
 Every key of the `modules` catalog has a row: the fifteen shipped module directories,
-`partners`, `core` and `items`. The always-on core features `locations`, `categories` and
-`announcements` have no catalog entry and no store card, so they have no row.
+`partners`, `core`, `items` and the three always-on features `locations`, `categories` and
+`announcements`. Those three have a catalog `name` and nothing else — no store card, no
+description — because the audit journal prints the module list an organization starts with
+and must name each key from this catalog, not from a vocabulary of its own.
 
 | Technical name | en | pl | de | fr | es | One-sentence description |
 |---|---|---|---|---|---|---|
 | `core` (virtual) | Home & Kitchen | Dom i Kuchnia | Haus & Küche | Maison & Cuisine | Hogar y cocina | Fridge, Pantry, and basic products. Always on; not a marketplace module. |
 | `items` (always-on) | Inventory | Inwentarz | Inventar | Inventaire | Inventario | The products domain behind the inventory screens; always on, named by the inventory launcher card. |
+| `locations` (always-on) | Locations | Miejsca | Lagerorte | Emplacements | Ubicaciones | Where stock lives; named by the journal only, no store card. |
+| `categories` (always-on) | Categories | Kategorie | Kategorien | Catégories | Categorías | How products are grouped; named by the journal only, no store card. |
+| `announcements` (always-on) | Announcements | Ogłoszenia | Ankündigungen | Annonces | Anuncios | Notices to members; named by the journal only, no store card. |
 | `api_keys` | API Keys | Klucze API | API-Schlüssel | Clés API | Claves API | Programmatic access via REST API keys. |
 | `approvals` | Approvals | Zatwierdzenia | Genehmigungen | Approbations | Aprobaciones | Multi-stage approval workflows for critical operations. |
 | `warehouse` | Warehouse | Magazyn | Lager | Entrepôt | Almacén | Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules. |

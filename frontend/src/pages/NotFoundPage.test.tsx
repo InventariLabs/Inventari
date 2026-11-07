@@ -76,6 +76,19 @@ describe("NotFoundPage", () => {
     expect(screen.queryByText("Page Not Found")).not.toBeInTheDocument();
   });
 
+  it.each(["/settings/webhooks", "/settings/api-keys"])(
+    "says a module is off at %s, the address its settings section lives at",
+    (path) => {
+      // A module whose only screen is a settings section owned no path in the
+      // table, so its address read as one that never existed — to whoever
+      // followed it from a guide or a bookmark.
+      renderAt(path);
+
+      expect(screen.getByText("Module Not Enabled")).toBeInTheDocument();
+      expect(screen.queryByText("Page Not Found")).not.toBeInTheDocument();
+    },
+  );
+
   it("still recognises one that does", () => {
     renderAt("/shopping-lists/anything");
 

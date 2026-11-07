@@ -201,21 +201,26 @@ DB_PORT = os.getenv('DB_PORT', '5432')
 DB_NAME_BASE = os.getenv('DB_TEST_NAME', 'inventari_test')
 
 # Support for parallel testing via pytest-xdist
-# Each worker gets its own database and redis prefix to avoid race conditions.
+# Each worker gets its own database and redis streams to avoid race conditions;
+# the streams wear the run id as the databases do, so two suites on one Redis
+# never read each other's events.
 # The name also wears this run's id: two suites sharing one database server
 # never share worker-database names, so a sweep dropping another (finished)
 # run's databases cannot delete a live run's databases under it — which is
 # how a suite loses a worker database mid-flight and reports "ERROR at
 # setup — database does not exist" while the passed count stays green.
-TEST_RUN_ID = controller_run_id()
 worker_id = os.environ.get('PYTEST_XDIST_WORKER')
+# The controller mints the id; a worker reads the one it inherited.
+TEST_RUN_ID = controller_run_id(mint=not worker_id)
 if worker_id:
     DB_NAME = run_scoped_db_name(DB_NAME_BASE, worker_id)
     # Isolate Redis for parallel tests
-    settings.REDIS_STREAM_NAME = f'inventari_stream_{worker_id}'
-    settings.REDIS_TASKS_STREAM_NAME = f'inventari_tasks_{worker_id}'
+    settings.REDIS_STREAM_NAME = f'inventari_stream_{TEST_RUN_ID}_{worker_id}'
+    settings.REDIS_TASKS_STREAM_NAME = f'inventari_tasks_{TEST_RUN_ID}_{worker_id}'
 else:
     DB_NAME = run_scoped_db_name(DB_NAME_BASE, None)
+    settings.REDIS_STREAM_NAME = f'inventari_stream_{TEST_RUN_ID}'
+    settings.REDIS_TASKS_STREAM_NAME = f'inventari_tasks_{TEST_RUN_ID}'
 
 # Force settings.DATABASE_URL to use the direct worker database (bypass PgBouncer for tests)
 TEST_DATABASE_URL = (

@@ -721,12 +721,6 @@
         "changed": "Feld {{field}} geändert",
         "required": "Pflichtfeld"
       },
-      "builtInModules": {
-        "core": "Grundlagen",
-        "locations": "Lagerorte",
-        "categories": "Kategorien",
-        "announcements": "Ankündigungen"
-      },
       "values": {
         "ALL": "Alle",
         "STORAGE": "Lagerort",

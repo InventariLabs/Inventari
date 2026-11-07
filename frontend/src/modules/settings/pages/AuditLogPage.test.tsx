@@ -566,7 +566,7 @@ describe("AuditLogPage", () => {
       /\b(announcements|categories|core|items|locations)\b/,
     );
     expect(text).toMatch(
-      /Announcements, Categories, Basics, Inventory, Locations/,
+      /Announcements, Categories, Home & Kitchen, Inventory, Locations/,
     );
     expect(text).toMatch(/Workspace mode:\s*—\s*→\s*Equipment/);
   });
@@ -722,6 +722,37 @@ describe("AuditLogPage", () => {
       await screen.findByText("Workspace mode default"),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Update")).toHaveLength(1);
+  });
+
+  it("shows the prefix of a revoked key, the name a script knows itself by", async () => {
+    server.use(
+      http.get("/api/v1/audit-log", () =>
+        HttpResponse.json({
+          ...EMPTY_PAGE,
+          total: 1,
+          items: [
+            {
+              id: "k2",
+              organization_id: "o1",
+              user_id: "u1",
+              user_email: "admin@example.com",
+              action: "SOFT_DELETE",
+              target_type: "api_key",
+              target_id: "7d6f4bf7-1111-2222-3333-444455556666",
+              snapshot: { name: "CI", key_prefix: "inv_live_b3be8b5830a" },
+              reason: null,
+              meta_data: null,
+              created_at: "2026-08-20T10:05:00Z",
+            },
+          ],
+        }),
+      ),
+    );
+
+    renderPage();
+
+    expect(await screen.findByText(/inv_live_b3be8b5830a/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Key prefix/).length).toBeGreaterThan(0);
   });
 
   it("lists a key's permissions by the labels the key dialog shows", async () => {

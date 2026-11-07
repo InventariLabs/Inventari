@@ -80,6 +80,32 @@ async def resolve_api_key(db: AsyncSession, raw_key: str) -> ApiKeyIdentity | No
     return identity
 
 
+#: Says why a refused key was refused — ``'unknown'``, ``'expired'`` or
+#: ``'revoked'`` — or ``None`` when the refusal has no reason worth a sentence
+#: of its own (the organization lost the module, the owner moved on). The
+#: module answers from its own table; Core only turns the answer into a message.
+ApiKeyRefusalFn = Callable[['AsyncSession', str], Awaitable['str | None']]
+
+_refusal_explainer: ApiKeyRefusalFn | None = None
+
+
+def register_api_key_refusal_explainer(fn: ApiKeyRefusalFn) -> None:
+    """Register the refusal explainer (called by the owning module)."""
+    global _refusal_explainer
+    _refusal_explainer = fn
+
+
+async def explain_api_key_refusal(db: AsyncSession, raw_key: str) -> str | None:
+    """Why ``raw_key`` was refused, for the script on the other side of the 401.
+
+    A typo, a key past its date and a key taken away call for three different
+    next steps, and one sentence for all of them left the caller guessing.
+    """
+    if _refusal_explainer is None:
+        return None
+    return await _refusal_explainer(db, raw_key)
+
+
 #: Loads, in one query, a check telling an issued, active key from any other
 #: value. The rate limiter asks it in place of a lookup per key once a sender
 #: has spent its lookups (``app.core.limiter``); the check closes over the

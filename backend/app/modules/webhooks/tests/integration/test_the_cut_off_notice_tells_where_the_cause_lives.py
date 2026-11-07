@@ -123,6 +123,10 @@ class TestTheCutOffNoticeTellsWhereTheCauseLives:
                 'the notice must tell the card story: the cause of the last '
                 'attempt is named in the delivery log'
             )
+            assert rows[0].link == '/settings/webhooks', (
+                'the notice sends the administrator to the log, so it must '
+                'carry the way there'
+            )
 
     async def test_no_language_tells_the_administrator_to_fix_the_address(
         self,

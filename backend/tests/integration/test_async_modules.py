@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.item import Item
@@ -91,13 +92,23 @@ async def mod_location(
 
 
 @pytest.fixture
+async def mod_grams(real_async_db_session: AsyncSession) -> str:
+    """The system unit ``g``: a recipe line is written in some unit."""
+    result = await real_async_db_session.execute(
+        text("SELECT id FROM uoms WHERE symbol = 'g'")
+    )
+    return str(result.scalar_one())
+
+
+@pytest.fixture
 async def mod_template(
-    real_async_db_session: AsyncSession, mod_org: Organization
+    real_async_db_session: AsyncSession, mod_org: Organization, mod_grams: str
 ) -> ProductTemplate:
     t = ProductTemplate(
         name='Async Test Product',
         organization_id=mod_org.id,
         barcode='MODASYNC001',
+        uom_id=mod_grams,
     )
     real_async_db_session.add(t)
     await real_async_db_session.commit()
@@ -293,7 +304,9 @@ class TestAsyncStockTakes:
 @pytest.mark.integration
 @pytest.mark.async_db
 class TestAsyncRecipes:
-    async def test_create_recipe(self, real_async_client, mod_headers, mod_org):
+    async def test_create_recipe(
+        self, real_async_client, mod_headers, mod_org, mod_grams
+    ):
         resp = await real_async_client.post(
             '/api/v1/recipes',
             headers=mod_headers,
@@ -301,8 +314,8 @@ class TestAsyncRecipes:
                 'name': 'Async Test Recipe',
                 'servings': 4,
                 'ingredients': [
-                    {'name': 'Tomatoes', 'quantity': 500},
-                    {'name': 'Onion', 'quantity': 200},
+                    {'name': 'Tomatoes', 'quantity': 500, 'uom_id': mod_grams},
+                    {'name': 'Onion', 'quantity': 200, 'uom_id': mod_grams},
                 ],
             },
         )
@@ -337,6 +350,7 @@ class TestAsyncRecipes:
         mod_org,
         mod_location,
         mod_template,
+        mod_grams,
         real_async_db_session,
     ):
         await _create_item_with_stock(
@@ -354,6 +368,7 @@ class TestAsyncRecipes:
                         'name': 'Async Stock Item',
                         'template_id': str(mod_template.id),
                         'quantity': 10,
+                        'uom_id': mod_grams,
                     },
                 ],
             },
