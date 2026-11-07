@@ -14,6 +14,16 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- **Breaking:** the document product search no longer returns `created_at` on a
+  stock hit; it returns `added_date`, the day the record was added — the same
+  date the product card shows as "Added on", so the picker and the card no longer
+  disagree by a day around midnight. A client that read `created_at` reads
+  `added_date` instead (a date, not a timestamp). A hit that is the total of
+  several interchangeable records now says so with `merged: true`, and the picker
+  tells such rows apart by their product's code rather than by the code of one
+  record in the group. The `location_id` description now says what the search
+  does: a shelf answers with its own records only, a zone also with the shelves
+  below it.
 - A refused invitation now answers with one sentence that says what to try — use
   the e-mail address the invitation was sent to, or ask for a new one — and the
   sentence is the same for a wrong address, an expired, a used, a withdrawn and an

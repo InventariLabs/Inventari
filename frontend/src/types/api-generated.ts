@@ -20670,8 +20670,10 @@ export interface components {
             expiry_date?: string | null;
             /** Serial Number */
             serial_number?: string | null;
-            /** Created At */
-            created_at?: string | null;
+            /** Added Date */
+            added_date?: string | null;
+            /** Merged */
+            merged?: boolean | null;
             /** Location Name */
             location_name?: string | null;
             /** Name */
@@ -46917,7 +46919,7 @@ export interface operations {
             query?: {
                 q?: string;
                 limit?: number;
-                /** @description Narrow a stock search to this location and the ones under it. On its own it also selects the stock search, for callers written before the explicit flag. */
+                /** @description Narrow a stock search to this location. A shelf is exact: only its own records. A zone also offers the shelves below it. On its own it also selects the stock search, for callers written before the explicit flag. */
                 location_id?: string | null;
                 /** @description Answer with the stock on hand rather than the product catalogue. Results then carry item_id, which the lines of a document taking goods off a shelf require. Combine with location_id to narrow it. */
                 stock?: boolean;
