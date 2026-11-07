@@ -19,7 +19,7 @@ export interface LineItemProduct {
   added_date?: string | null;
   /** True for the total of several interchangeable records: `item_id` then
    *  names one of them, but the row is not that record. */
-  merged?: boolean;
+  merged?: boolean | null;
   /** The shelf a hit stands on — a zone's search covers the shelves below it. */
   location_name?: string | null;
   uom_symbol?: string | null;

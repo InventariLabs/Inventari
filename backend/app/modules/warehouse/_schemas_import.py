@@ -56,7 +56,8 @@ class ProductSearchResult(BaseModel):
     #: True when the row is the total of several interchangeable records. It
     #: still names one of them in ``item_id`` — a dispatch line needs a
     #: record — so the flag is what tells a reader the row is not that record.
-    merged: bool = False
+    #: Optional in the contract so a client building its own hit need not name it.
+    merged: bool | None = None
     #: The shelf a hit stands on. A zone searches the shelves below it and a
     #: scrap searches the whole org, so the shelf is often the only thing
     #: telling same-named rows apart.

@@ -20672,11 +20672,8 @@ export interface components {
             serial_number?: string | null;
             /** Added Date */
             added_date?: string | null;
-            /**
-             * Merged
-             * @default false
-             */
-            merged: boolean;
+            /** Merged */
+            merged?: boolean | null;
             /** Location Name */
             location_name?: string | null;
             /** Name */

@@ -67763,9 +67763,15 @@
             "title": "Added Date"
           },
           "merged": {
-            "type": "boolean",
-            "title": "Merged",
-            "default": false
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merged"
           },
           "location_name": {
             "anyOf": [
