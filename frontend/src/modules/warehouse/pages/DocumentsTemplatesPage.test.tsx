@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@/test/utils";
+import { render, screen, waitFor, within } from "@/test/utils";
 import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import i18next from "i18next";
 import { http, HttpResponse } from "msw";
 import { onePage } from "@/test/mocks/page";
 import { toast } from "sonner";
@@ -154,6 +155,89 @@ describe("DocumentsTemplatesPage — nothing written yet", () => {
       name: /your first template/i,
     });
     expect(create).not.toHaveClass("bg-primary-700");
+  });
+});
+
+describe("DocumentsTemplatesPage — the built-in layouts' names", () => {
+  // The API names its layouts once, in English ("Standard Template"), and
+  // the preview's picker printed that name as it came, so a Polish reader
+  // chose between "Standard Template" and "Pick List". The names are the
+  // ones the print-layout picker and the empty screen already use.
+  const builtIns = [
+    ["Standard Template", "STANDARD"],
+    ["PL PZ Template", "PL_PZ"],
+    ["Packing Slip", "PACKING_SLIP"],
+    ["Pick List", "PICK_LIST"],
+  ].map(([name, document_type]) => ({
+    name,
+    document_type,
+    body_html: "<p>x</p>",
+  }));
+
+  it.each([
+    ["en", ["Standard layout", "PL PZ layout", "Packing slip", "Pick list"]],
+    [
+      "pl",
+      [
+        "Układ standardowy",
+        "Układ PZ (PL)",
+        "List pakowy",
+        "Lista kompletacji",
+      ],
+    ],
+    ["de", ["Standardlayout", "PL-PZ-Layout", "Packliste", "Pickliste"]],
+    [
+      "fr",
+      [
+        "Mise en page standard",
+        "Mise en page PL PZ",
+        "Bordereau de colisage",
+        "Bon de préparation",
+      ],
+    ],
+    [
+      "es",
+      [
+        "Diseño estándar",
+        "Diseño PL PZ",
+        "Lista de embalaje",
+        "Lista de picking",
+      ],
+    ],
+    [
+      "pt",
+      [
+        "Layout padrão",
+        "Layout PL PZ",
+        "Romaneio de embalagem",
+        "Lista de separação",
+      ],
+    ],
+  ] as const)("read in the reader's language (%s)", async (language, names) => {
+    noTemplates();
+    server.use(
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json(builtIns),
+      ),
+    );
+
+    await withLanguage(language, async () => {
+      render(<DocumentsTemplatesPage />);
+      await userEvent.click(
+        await screen.findByRole("button", {
+          name: i18next.t("warehouse:templates.builtInPreviewAction"),
+        }),
+      );
+
+      const picker = await screen.findByRole("combobox", {
+        name: i18next.t("warehouse:templates.builtInPreviewTitle"),
+      });
+      expect(
+        within(picker)
+          .getAllByRole("option")
+          .map((option) => option.textContent),
+      ).toEqual(names);
+    });
   });
 });
 

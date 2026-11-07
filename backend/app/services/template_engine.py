@@ -147,14 +147,22 @@ _ATTRIBUTE_RE = re.compile(
 
 #: The one place a ``data:`` URI is allowed: an image embedded in
 #: ``<img src>``. The printed Code128 (SVG) and QR (PNG) reach every print
-#: template this way, and nh3's default URL schemes have no ``data:``, so the
-#: whole ``src`` used to vanish and the printout came out without either
-#: code. ``<img>`` never executes what it holds; the same URI in a link
-#: (``data:text/html``) is a document of its own, so everywhere else it is
-#: still dropped.
+#: template this way, and so does the organization's logo in any format the
+#: logo upload takes (WebP included); nh3's default URL schemes have no
+#: ``data:``, so the whole ``src`` used to vanish and the printout came out
+#: without either code. ``<img>`` never executes what it holds; the same URI
+#: in a link (``data:text/html``) is a document of its own, so everywhere
+#: else it is still dropped.
 _DATA_IMAGE_RE = re.compile(
-    r'data:image/(?:png|jpeg|gif|svg\+xml);base64,[A-Za-z0-9+/=]*'
+    r'data:image/(?:png|jpeg|gif|webp|svg\+xml);base64,[A-Za-z0-9+/=]*'
 )
+
+#: The allowlisted attributes that hold a URL — the only ones a ``data:``
+#: document can hide in. Every other attribute is text: "Data:" is the
+#: Polish label for a date, and ``alt="Data: 14.10"`` is a caption, not a
+#: link. nh3 checks the scheme of ``href`` and ``src`` itself but not of
+#: ``cite``, so the filter below covers all three.
+_URL_ATTRIBUTES = {'href', 'src', 'cite'}
 
 #: Control characters and spaces a URL parser drops from inside a scheme
 #: (``da\nta:`` is ``data:``), so the filter has to look past them too.
@@ -165,6 +173,8 @@ _URL_SCHEMES = set(nh3.ALLOWED_URL_SCHEMES) | {'data'}
 
 def _only_data_images_in_img_src(tag: str, attribute: str, value: str) -> str | None:
     """Attribute filter: keep ``data:`` only on an image's ``src``."""
+    if attribute not in _URL_ATTRIBUTES:
+        return value
     if _URL_NOISE_RE.sub('', value).lower().startswith('data:') and not (
         tag == 'img' and attribute == 'src' and _DATA_IMAGE_RE.fullmatch(value)
     ):
