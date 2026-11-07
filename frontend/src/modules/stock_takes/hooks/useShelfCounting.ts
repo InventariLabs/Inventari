@@ -28,6 +28,8 @@ interface Options {
   countMutation: ReturnType<typeof useCountStockTakeItem>;
   /** The counting screen's save queue: a find waits for the saves before it. */
   savesRef: MutableRefObject<Promise<void>>;
+  /** Marks a save as in flight, so finishing waits for it like for any save. */
+  trackSave: (saved: Promise<void>) => Promise<void>;
   /** Rows the surplus endpoint created, by record, before the list shows them. */
   createdLinesRef: MutableRefObject<Record<string, string>>;
   handleQuantityChange: (itemId: string, text: string) => void;
@@ -55,6 +57,7 @@ export function useShelfCounting({
   surplusMutation,
   countMutation,
   savesRef,
+  trackSave,
   createdLinesRef,
   handleQuantityChange,
   oneMoreThan,
@@ -147,9 +150,11 @@ export function useShelfCounting({
         });
       }
     };
-    savesRef.current = savesRef.current.then(write).catch((error: Error) => {
-      toast.error(extractApiError(error, t("errors.saveFailed")));
-    });
+    savesRef.current = trackSave(
+      savesRef.current.then(write).catch((error: Error) => {
+        toast.error(extractApiError(error, t("errors.saveFailed")));
+      }),
+    );
   };
 
   return {
