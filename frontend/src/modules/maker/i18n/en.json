@@ -252,7 +252,6 @@
     "cost": {
       "fixedCosts": "Fixed costs / batch",
       "referencePrice": "Reference price",
-      "perBatch": "per batch",
       "perYieldUnit": "per unit — a batch makes {{qty}}",
       "noFixed": "No fixed costs set",
       "ingredients": "Ingredients",

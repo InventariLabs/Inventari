@@ -256,7 +256,6 @@
     "cost": {
       "fixedCosts": "Koszty stałe / partia",
       "referencePrice": "Cena referencyjna",
-      "perBatch": "na partię",
       "perYieldUnit": "za jednostkę — partia to {{qty}}",
       "noFixed": "Brak ustawionych kosztów stałych",
       "ingredients": "Składniki",

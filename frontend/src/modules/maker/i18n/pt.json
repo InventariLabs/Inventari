@@ -252,7 +252,6 @@
     "cost": {
       "fixedCosts": "Custos fixos / lote",
       "referencePrice": "Preço de referência",
-      "perBatch": "por lote",
       "perYieldUnit": "por unidade — um lote produz {{qty}}",
       "noFixed": "Nenhum custo fixo definido",
       "ingredients": "Ingredientes",

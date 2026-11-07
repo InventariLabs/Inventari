@@ -1,9 +1,10 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import DashboardShoppingList from "./DashboardShoppingList";
 import { tFor } from "@/test/mocks/i18n";
+import { signInWith, signOut } from "@/test/auth";
 
 // The real translator, bound to the namespace the page uses. An identity
 // stub would make every label assertion below pass on a missing translation.
@@ -16,13 +17,26 @@ const withRouter = (component: React.ReactElement) => (
 // ── DashboardShoppingList ─────────────────────────────────────────────────────
 
 describe("DashboardShoppingList", () => {
-  it("renders empty state when no active shopping list", () => {
+  afterEach(() => {
+    signOut();
+  });
+
+  it("offers a writer the door to a new list, under the page's own name for it", () => {
+    signInWith(["shopping_lists:read", "shopping_lists:write"]);
     render(
       withRouter(<DashboardShoppingList activeShoppingList={null} t={t} />),
     );
-    expect(
-      screen.getByRole("link", { name: "Create list" }),
-    ).toBeInTheDocument();
+    const door = screen.getByRole("link", { name: "New list" });
+    expect(door).toHaveAttribute("href", "/shopping-lists");
+  });
+
+  it("offers a read-only account no door to a page where it cannot create a list", () => {
+    signInWith(["shopping_lists:read"]);
+    render(
+      withRouter(<DashboardShoppingList activeShoppingList={null} t={t} />),
+    );
+    expect(screen.getByText("No active shopping lists")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "New list" })).toBeNull();
   });
 
   it("renders active shopping list name", () => {

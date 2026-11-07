@@ -150,11 +150,16 @@ describe("CostLinesEditor", () => {
     renderEditor();
 
     expect(screen.getAllByText("Fixed costs / batch")).toHaveLength(1);
+    // The heading already carries the unit; the sum does not say it again.
     const total = screen.getByText("PLN 16.50");
     expect(total).toBeInTheDocument();
-    // The space is text, not just the margin: "16.50per batch" is one word
-    // to a screen reader.
-    expect(total).toHaveTextContent(/PLN 16\.50 per batch/);
+    expect(total).not.toHaveTextContent(/batch/i);
+  });
+
+  it("does not print the amount twice when a single line is the whole sum", () => {
+    render(<CostLinesEditor recipeId="r-1" lines={lines.slice(0, 1)} />);
+
+    expect(screen.getAllByText("PLN 12.50")).toHaveLength(1);
   });
 
   it("offers no total while no line exists — the caption says that instead", () => {

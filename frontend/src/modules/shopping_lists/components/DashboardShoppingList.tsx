@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import type { ShoppingListItem } from "@/modules/shopping_lists/types/shopping";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import { CardLink, CompositionBar } from "@/module-sdk";
 
 interface DashboardShoppingListProps {
@@ -22,6 +23,9 @@ export default function DashboardShoppingList({
   activeShoppingList,
   t,
 }: DashboardShoppingListProps) {
+  // The door leads to the page where a list is made; to an account that may
+  // not write one it would lead to a page whose every answer is a refusal.
+  const canWrite = useCanWrite("shopping_lists");
   return (
     <Card className="p-4 sm:p-5">
       <CardHeader className="flex-row items-baseline justify-between space-y-0 pb-2">
@@ -38,10 +42,12 @@ export default function DashboardShoppingList({
           <p className="text-sm text-on-secondary">
             {t("common:dashboard.noActiveLists")}
           </p>
-          <CardLink to="/shopping-lists" className="text-sm">
-            <Plus size={16} aria-hidden="true" />
-            {t("common:dashboard.createList")}
-          </CardLink>
+          {canWrite && (
+            <CardLink to="/shopping-lists" className="text-sm">
+              <Plus size={16} aria-hidden="true" />
+              {t("common:dashboard.createList")}
+            </CardLink>
+          )}
         </div>
       )}
     </Card>

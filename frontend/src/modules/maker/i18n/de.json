@@ -252,7 +252,6 @@
     "cost": {
       "fixedCosts": "Fixe Kosten / Charge",
       "referencePrice": "Referenzpreis",
-      "perBatch": "pro Charge",
       "perYieldUnit": "pro Einheit — eine Charge ergibt {{qty}}",
       "noFixed": "Keine fixen Kosten festgelegt",
       "ingredients": "Zutaten",

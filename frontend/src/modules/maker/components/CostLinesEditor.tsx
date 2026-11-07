@@ -64,7 +64,9 @@ export function CostLinesEditor({ recipeId, lines }: CostLinesEditorProps) {
 
   // The sum lives beside the lines it sums: the tab above used to repeat
   // this section's heading on a summary card of its own, so the reader met
-  // the same label and the same figure twice on one screen.
+  // the same label and the same figure twice on one screen. The heading
+  // already says "/ batch", so the sum does not repeat the unit; and one
+  // line is its own sum, so the figure is not printed a second time.
   const totalFixed = lines.reduce((sum, line) => sum + Number(line.amount), 0);
 
   const draftValid =
@@ -131,14 +133,9 @@ export function CostLinesEditor({ recipeId, lines }: CostLinesEditorProps) {
           {t("detail.cost.fixedCosts")}
         </h3>
         <div className="flex items-center gap-2 sm:gap-3">
-          {lines.length > 0 && (
+          {lines.length > 1 && (
             <p className="text-sm font-medium text-on tabular-nums">
-              {/* The space is text, not the margin: without it the
-                  paragraph reads "PLN 12.50per batch" to a screen reader. */}
-              {formatMoney(totalFixed, currency, i18n.language)}{" "}
-              <span className="ml-1 text-xs font-normal text-on-muted">
-                {t("detail.cost.perBatch")}
-              </span>
+              {formatMoney(totalFixed, currency, i18n.language)}
             </p>
           )}
           {draft === null && (
