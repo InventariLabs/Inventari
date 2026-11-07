@@ -58,7 +58,7 @@ class TestTheSocketRefusesADeadCredential:
         _mark_credentials_changed(blacklist_on, str(test_user.id))
 
         with pytest.raises(WebSocketDisconnect) as exc:
-            with client.websocket_connect(f'{WS_URL}?token={token}'):
+            with client.websocket_connect(WS_URL, subprotocols=['bearer', token]):
                 pass
 
         assert exc.value.code == 4001
@@ -70,7 +70,7 @@ class TestTheSocketRefusesADeadCredential:
         _revoke_family(blacklist_on, str(test_user.id), 'session-a')
 
         with pytest.raises(WebSocketDisconnect) as exc:
-            with client.websocket_connect(f'{WS_URL}?token={token}'):
+            with client.websocket_connect(WS_URL, subprotocols=['bearer', token]):
                 pass
 
         assert exc.value.code == 4001
@@ -82,7 +82,7 @@ class TestTheSocketRefusesADeadCredential:
         user_id = str(test_user.id)
         baseline = len(ws_module.hub._connections.get(user_id, set()))
 
-        with client.websocket_connect(f'{WS_URL}?token={token}'):
+        with client.websocket_connect(WS_URL, subprotocols=['bearer', token]):
             assert len(ws_module.hub._connections.get(user_id, set())) > baseline
 
 
@@ -95,7 +95,9 @@ class TestTheSocketRechecksWhileItIsOpen:
         token = _token(test_user, sid='session-b')
 
         with pytest.raises(WebSocketDisconnect) as exc:
-            with client.websocket_connect(f'{WS_URL}?token={token}') as socket:
+            with client.websocket_connect(
+                WS_URL, subprotocols=['bearer', token]
+            ) as socket:
                 _revoke_family(blacklist_on, str(test_user.id), 'session-b')
                 socket.receive_text()
 
@@ -108,6 +110,6 @@ class TestTheSocketRechecksWhileItIsOpen:
         token = _token(test_user, sid='session-c')
         user_id = str(test_user.id)
 
-        with client.websocket_connect(f'{WS_URL}?token={token}'):
+        with client.websocket_connect(WS_URL, subprotocols=['bearer', token]):
             time.sleep(0.3)
             assert ws_module.hub._connections.get(user_id)
