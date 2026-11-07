@@ -59,3 +59,14 @@ class TestDefuseWorksheet:
         assert reloaded['A1'].data_type == 's'
         assert reloaded['A1'].value == "=cmd|'/c calc'!A1"
         assert reloaded['A2'].value == 'Milk'
+
+
+def test_rows_to_csv_defuses_data_cells_and_leaves_the_header_alone():
+    from app.core.csv_export import rows_to_csv
+
+    text = rows_to_csv(['Name', 'Qty'], [["=cmd|'/c calc'!A1", 3], ['Milk', None]])
+
+    lines = text.splitlines()
+    assert lines[0] == 'Name,Qty'
+    assert lines[1].startswith("\t=cmd|'/c calc'!A1,")
+    assert lines[2] == 'Milk,'

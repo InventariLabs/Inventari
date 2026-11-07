@@ -1,7 +1,7 @@
 """Purchase Order database models."""
 
 import uuid
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from sqlalchemy import (
@@ -17,6 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
+from app.core.module_sdk import utc_now
 from app.database import Base
 
 
@@ -60,12 +61,12 @@ class PurchaseOrder(Base):
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+        DateTime(timezone=True), default=utc_now
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=utc_now,
+        onupdate=utc_now,
     )
 
     lines: Mapped[list['PurchaseOrderLine']] = relationship(
@@ -209,12 +210,12 @@ class ReorderRule(Base):
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+        DateTime(timezone=True), default=utc_now
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=utc_now,
+        onupdate=utc_now,
     )
 
     product_template: Mapped['ProductTemplate'] = relationship(lazy='selectin')  # type: ignore[name-defined]
@@ -335,12 +336,12 @@ class PartnerPricelist(Base):
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+        DateTime(timezone=True), default=utc_now
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=utc_now,
+        onupdate=utc_now,
     )
 
     partner: Mapped['Partner'] = relationship(lazy='selectin')  # type: ignore[name-defined]
@@ -381,12 +382,12 @@ class POSettings(Base):
     )
     approval_required: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+        DateTime(timezone=True), default=utc_now
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=utc_now,
+        onupdate=utc_now,
     )
 
     def __repr__(self) -> str:

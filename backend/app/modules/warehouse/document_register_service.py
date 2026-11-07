@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import csv
-import io
 from datetime import date
 from decimal import Decimal
 from typing import Any
@@ -11,8 +9,7 @@ from sqlalchemy import ColumnElement, Date, case, func, null, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
-from app.core.export_hygiene import defuse
-from app.core.module_sdk import PaginatedResponse
+from app.core.module_sdk import PaginatedResponse, rows_to_csv
 from app.core.public_api import core_api
 
 from . import document_types as dt
@@ -508,9 +505,7 @@ async def get_register_csv(
         .order_by(document_date_column().asc(), Document.created_at.asc())
     )
 
-    buf = io.StringIO()
-    writer = csv.writer(buf)
-    writer.writerow(
+    return rows_to_csv(
         [
             'Document Number',
             'Type',
@@ -523,25 +518,21 @@ async def get_register_csv(
             'Gross',
             'Currency',
             'Status',
-        ]
+        ],
+        (
+            (
+                row.number,
+                row.type,
+                row.filed_on.strftime('%Y-%m-%d'),
+                row.frozen_partner or partner_names.get(row.partner_id) or '',
+                location_names.get(row.source_location_id) or '',
+                location_names.get(row.target_location_id) or '',
+                str(row.total_net) if row.total_net is not None else '',
+                str(row.total_tax) if row.total_tax is not None else '',
+                str(row.total_gross) if row.total_gross is not None else '',
+                row.currency or '',
+                row.status,
+            )
+            for row in result
+        ),
     )
-    for row in result:
-        writer.writerow(
-            [
-                defuse(value)
-                for value in (
-                    row.number,
-                    row.type,
-                    row.filed_on.strftime('%Y-%m-%d'),
-                    row.frozen_partner or partner_names.get(row.partner_id) or '',
-                    location_names.get(row.source_location_id) or '',
-                    location_names.get(row.target_location_id) or '',
-                    str(row.total_net) if row.total_net is not None else '',
-                    str(row.total_tax) if row.total_tax is not None else '',
-                    str(row.total_gross) if row.total_gross is not None else '',
-                    row.currency or '',
-                    row.status,
-                )
-            ]
-        )
-    return buf.getvalue()

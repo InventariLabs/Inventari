@@ -21,10 +21,11 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AuditAction
+from app.core.module_sdk import paginate_async
 from app.core.public_api import core_api
 from app.modules.example_widgets.models import Widget
 from app.modules.example_widgets.schemas import WidgetCreate, WidgetUpdate
@@ -65,17 +66,12 @@ async def list_widgets(
     list a module owns can grow, and reading it whole to count it is the cost
     the pagination envelope exists to avoid.
     """
-    active = (Widget.organization_id == organization_id, Widget.is_active.is_(True))
-    total = await db.scalar(select(func.count()).select_from(Widget).where(*active))
     stmt = (
         select(Widget)
-        .where(*active)
+        .where(Widget.organization_id == organization_id, Widget.is_active.is_(True))
         .order_by(Widget.created_at.desc())
-        .limit(limit)
-        .offset(offset)
     )
-    result = await db.execute(stmt)
-    return list(result.scalars().all()), total or 0
+    return await paginate_async(db, stmt, limit=limit, offset=offset)
 
 
 async def get_widget(

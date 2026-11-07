@@ -12,6 +12,7 @@ from uuid import UUID
 from sqlalchemy import ColumnElement, Select, any_, func, literal, select, text
 from sqlalchemy import event as sa_event
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, SessionTransaction
 
@@ -58,6 +59,28 @@ def typed_fragment_pattern(text: str) -> str:
     """
     escaped = escape_ilike(text)
     return f'{escaped}%' if len(text) < SUBSTRING_MIN_LENGTH else f'%{escaped}%'
+
+
+def constraint_name_of(exc: IntegrityError) -> str | None:
+    """The constraint an ``IntegrityError`` names, as the driver reports it.
+
+    asyncpg puts it in ``diag.constraint_name``; a driver that does not leaves
+    ``None`` here and ``hit_constraint`` falls back to the message.
+    """
+    return getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
+
+
+def hit_constraint(exc: IntegrityError, *names: str) -> bool:
+    """Whether an ``IntegrityError`` is one of the named constraints.
+
+    ``constraint_name`` is what asyncpg reports; the string fallback covers
+    drivers that only put it in the message. Anything else stays unmapped:
+    a refusal must name the rule it refused, not claim a name clash for a
+    foreign key that went missing.
+    """
+    constraint = constraint_name_of(exc)
+    message = str(exc.orig)
+    return any(constraint == name or name in message for name in names)
 
 
 def in_ids(column: Any, ids: Iterable[Any]) -> ColumnElement[bool]:
