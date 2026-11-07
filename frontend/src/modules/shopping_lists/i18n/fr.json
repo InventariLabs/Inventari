@@ -6,6 +6,7 @@
   "subtitle": "Courses du quotidien : planifiez vos achats et cochez pendant les courses",
   "newList": "Nouvelle liste",
   "addFirst": "Créez votre première liste de courses pour commencer à planifier",
+  "addFirstReadOnly": "Les listes de courses apparaîtront ici dès que quelqu'un en créera.",
   "modal": {
     "title": "Nouvelle liste de courses",
     "nameLabel": "Nom de la liste",

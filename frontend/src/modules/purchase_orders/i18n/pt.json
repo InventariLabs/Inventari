@@ -27,6 +27,7 @@
   "emptyFilteredDescription": "Tente limpar a busca ou o filtro de status.",
   "noOrders": "Nenhum pedido de compra ainda",
   "noOrdersDescription": "Crie seu primeiro pedido de compra para começar.",
+  "noOrdersDescriptionReadOnly": "As encomendas de compra aparecerão aqui quando alguém as fizer.",
   "notFound": "Pedido de compra não encontrado",
   "scheduled": "Agendado",
   "downloadPdf": "Baixar PDF",

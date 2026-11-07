@@ -17,7 +17,8 @@
     "error": "Não foi possível carregar as ordens de produção",
     "empty": {
       "title": "Nenhuma produção ainda",
-      "subtitle": "Agende uma produção para consumir ingredientes e gerar o produto final."
+      "subtitle": "Agende uma produção para consumir ingredientes e gerar o produto final.",
+      "subtitleReadOnly": "As ordens de produção aparecerão aqui quando alguém as agendar."
     },
     "noMatches": {
       "title": "Nenhuma produção encontrada",

@@ -136,7 +136,7 @@ export default function ShoppingListsPage() {
               {t("empty.title")}
             </h3>
             <p className="text-sm text-on-muted mb-6 max-w-md">
-              {t("addFirst")}
+              {canWrite ? t("addFirst") : t("addFirstReadOnly")}
             </p>
             {canWrite && (
               <Button

@@ -436,6 +436,7 @@
     "type_disputed": "Problema notificado"
   },
   "form": {
+    "readOnlyOpenAsset": "Abrir la ficha del equipo",
     "pickersFailed": "No se pudieron cargar las categorías o ubicaciones, así que las listas de abajo están incompletas. Inténtalo de nuevo antes de guardar.",
     "addTitle": "Agregar activo",
     "save": "Guardar activo",

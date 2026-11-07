@@ -27,6 +27,7 @@
   "emptyFilteredDescription": "Wyczyść wyszukiwanie lub filtr statusu.",
   "noOrders": "Brak zamówień zakupowych",
   "noOrdersDescription": "Utwórz pierwsze zamówienie zakupowe.",
+  "noOrdersDescriptionReadOnly": "Zamówienia zakupu pojawią się tutaj, gdy ktoś je złoży.",
   "notFound": "Nie znaleziono zamówienia",
   "scheduled": "Planowana data",
   "downloadPdf": "Pobierz PDF",

@@ -436,6 +436,7 @@
     "type_disputed": "Problème signalé"
   },
   "form": {
+    "readOnlyOpenAsset": "Ouvrir la fiche de l'équipement",
     "pickersFailed": "Les catégories ou les emplacements n'ont pas pu être chargés, les listes ci-dessous sont donc incomplètes. Réessayez avant d'enregistrer.",
     "addTitle": "Ajouter un actif",
     "save": "Enregistrer l'actif",

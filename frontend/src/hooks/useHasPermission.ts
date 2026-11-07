@@ -16,6 +16,17 @@
  * from endpoints that do not compute it. Undefined means "not loaded", so the
  * hook falls back to the admin check rather than reporting a denial it cannot
  * actually support.
+ *
+ * Decision (kept deliberately): the hook does NOT tell "does not hold the
+ * permission" apart from "permissions have not arrived yet". For a non-admin
+ * the answer is `false` in both cases, i.e. it fails closed. A write
+ * affordance that appears for a moment and is then withdrawn is the worse
+ * flicker, and everything that needs the answer outside a page's first
+ * paint — a dialog, a menu, a row action — opens long after /auth/me has
+ * resolved, so the window is not met in practice. A caller that must say
+ * "you lack X" in words (rather than merely hide a control) is such a
+ * dialog; one that would render at first paint should gate on
+ * `user.permissions !== undefined` itself.
  */
 import { useAuthStore } from "@/store/authStore";
 import type { User } from "@/types";

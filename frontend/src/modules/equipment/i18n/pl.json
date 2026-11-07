@@ -479,6 +479,7 @@
     "type_disputed": "Zgłoszony problem"
   },
   "form": {
+    "readOnlyOpenAsset": "Otwórz kartę sprzętu",
     "pickersFailed": "Nie udało się wczytać kategorii lub miejsc, więc poniższe listy są niepełne. Spróbuj ponownie przed zapisem.",
     "addTitle": "Dodaj zasób",
     "save": "Zapisz",

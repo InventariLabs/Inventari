@@ -27,6 +27,7 @@
   "emptyFilteredDescription": "Effacez la recherche ou le filtre de statut.",
   "noOrders": "Aucun bon de commande",
   "noOrdersDescription": "Créez votre premier bon de commande pour commencer.",
+  "noOrdersDescriptionReadOnly": "Les bons de commande apparaîtront ici dès que quelqu'un en passera.",
   "notFound": "Bon de commande introuvable",
   "scheduled": "Planifié",
   "downloadPdf": "Télécharger le PDF",
