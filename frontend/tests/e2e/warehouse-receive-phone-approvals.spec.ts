@@ -409,6 +409,63 @@ test.describe("Receiving on a phone", () => {
     expect(await seed.onHand(sugar, shelf)).toBe(5);
   });
 
+  test("an ordered and an extra product from one supplier are both booked", async ({
+    page,
+    playwright,
+    baseURL,
+    authenticatedPage: _auth,
+  }, testInfo) => {
+    const seed = await startSeed({ playwright }, baseURL, testInfo);
+    const shelf = await seed.shelf("Shelf");
+    const supplier = await seed.partner("Supplier", "SUPPLIER");
+    const rice = await seed.product("Rice");
+    const sugar = await seed.product("Sugar");
+    const order = await seed.order(supplier, [{ product: rice, quantity: 4 }]);
+
+    await openFromStart(page);
+    await choosePartner(page, supplier.name);
+    await expect(
+      page.getByText(`${order.number} expects 1 line.`),
+    ).toBeVisible();
+    await chooseLocation(page, shelf.name);
+    // The sugar is not on the order: it joins the delivery as a line of its own.
+    await scanProduct(page, sugar.barcode, sugar.name);
+
+    await page
+      .getByRole("button", { name: "Receive one product at a time" })
+      .click();
+    await expect(page).toHaveURL(/#receive/);
+    const dialog = session(page);
+    await expect(dialog.getByText("0 of 2", { exact: true })).toBeVisible();
+
+    // The ordered line comes first, with what is still due on it.
+    await expect(dialog.getByRole("region", { name: rice.name })).toBeVisible();
+    await expect(dialog.getByText("Still due 4 pcs.")).toBeVisible();
+    await scanShelf(page, shelf.code);
+    await dialog.getByRole("button", { name: "Correct, next" }).click();
+
+    // Then the extra one, which nothing is due on.
+    await expect(
+      dialog.getByRole("region", { name: sugar.name }),
+    ).toBeVisible();
+    await expect(dialog.getByText(/^Still due /)).toHaveCount(0);
+    await countField(page, sugar.name).fill("2");
+    await dialog
+      .getByRole("button", { name: "Correct, finish receiving" })
+      .click();
+    await expect(
+      dialog.getByRole("heading", { name: "Received 2 lines" }),
+    ).toBeVisible({ timeout: 15000 });
+
+    // Both reached the shelf; the order shows only its own line as received.
+    expect(await seed.onHand(rice, shelf)).toBe(4);
+    expect(await seed.onHand(sugar, shelf)).toBe(2);
+    const lines = await seed.orderLines(order);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ ordered: 4, received: 4 });
+    expect(await seed.orderStatus(order)).not.toBe("CONFIRMED");
+  });
+
   test("the camera in the session reads the next product", async ({
     page,
     camera,
