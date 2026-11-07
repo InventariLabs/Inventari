@@ -173,6 +173,19 @@ describe("ResetPasswordPage", () => {
     expect(screen.getByLabelText(/^New password/)).toBeInTheDocument();
   });
 
+  it("keeps the form when saving is refused for too many attempts, and says so", async () => {
+    // A 429 refuses the pace of the requests, not the token: the link was
+    // never used, and calling it dead sent the reader to ask for another.
+    vi.mocked(authApi.confirmPasswordReset).mockRejectedValue(refusal(429));
+    fill("GoodPass1");
+
+    expect(await screen.findByTestId("reset-request-failed")).toHaveTextContent(
+      /Too many attempts.*Your link has not been used/,
+    );
+    expect(screen.queryByTestId("reset-invalid-link")).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^New password/)).toBeInTheDocument();
+  });
+
   it("gives the same refusal when the URL carried no token at all", async () => {
     mounted?.unmount();
     vi.mocked(authApi.checkPasswordReset).mockClear();
@@ -220,6 +233,45 @@ describe("ResetPasswordPage — a link that is already dead", () => {
       screen.getByRole("link", { name: "Request a fresh reset link." }),
     );
     expect(await screen.findByText("FORGOT_SCREEN")).toBeInTheDocument();
+  });
+
+  it("keeps the form when the check is refused for too many attempts", async () => {
+    vi.mocked(authApi.checkPasswordReset).mockRejectedValue(refusal(429));
+    render(
+      <MemoryRouter initialEntries={["/reset-password/tok-1"]}>
+        <Routes>
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByLabelText(/^New password/)).toBeInTheDocument();
+    expect(screen.queryByTestId("reset-invalid-link")).not.toBeInTheDocument();
+  });
+
+  it("says the link is being checked while the answer is on its way", () => {
+    vi.mocked(authApi.checkPasswordReset).mockReturnValue(
+      new Promise<void>(() => {}),
+    );
+    render(
+      <MemoryRouter initialEntries={["/reset-password/tok-1"]}>
+        <Routes>
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    // On screen, and in a live region a screen reader announces.
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Checking your reset link…",
+    );
+    expect(screen.queryByLabelText(/^New password/)).not.toBeInTheDocument();
   });
 
   it("keeps the form when the check itself could not be answered", async () => {

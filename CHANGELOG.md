@@ -68,7 +68,10 @@ says what the release does rather than what changed since them.
   If the sign-in is refused, the form opens with the address filled in.
 - A password-reset link that is spent or expired is refused when the page opens,
   with a link to request a new one, instead of after a new password has been
-  typed. The page asks the new open endpoint `POST /auth/password-reset/check`.
+  typed. The page asks the new open endpoint `POST /auth/password-reset/check`,
+  and says it is checking while the answer is on its way. A request refused
+  for coming too often from one address no longer calls a good link spent:
+  the form stays, and a refused save says to try again later.
   The "this installation does not send email" notice also says that the only
   administrator can reset the password on the server.
 - A confirmed document now keeps your own company's name, tax number and
