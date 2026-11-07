@@ -721,12 +721,6 @@
         "changed": "Champ {{field}} modifié",
         "required": "obligatoire"
       },
-      "builtInModules": {
-        "core": "Essentiels",
-        "locations": "Emplacements",
-        "categories": "Catégories",
-        "announcements": "Annonces"
-      },
       "values": {
         "ALL": "Toutes",
         "STORAGE": "Emplacement",

@@ -258,9 +258,11 @@ describe("WorkspaceModeSettings", () => {
     await waitFor(() => expect(applyBtn).not.toBeDisabled());
     await userEvent.click(applyBtn);
 
-    // The confirm dialog lists the modules being disabled (display names).
+    // The confirm dialog lists the modules being disabled by the catalogue
+    // name, not by the manifest's `display_name` ("Storage Locations").
     const dialog = await screen.findByRole("alertdialog");
-    expect(dialog).toHaveTextContent("Storage Locations");
+    expect(dialog).toHaveTextContent("Locations");
+    expect(dialog).not.toHaveTextContent("Storage Locations");
 
     await userEvent.click(
       screen.getByRole("button", { name: /switch workspace mode/i }),

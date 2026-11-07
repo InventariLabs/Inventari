@@ -84,6 +84,14 @@ const CORE_KEY = "core";
  *  still has to name them — by the card of the frontend module that renders
  *  the feature, never by the technical slug. */
 const ALWAYS_ON_FEATURES = ["items"] as const;
+/** Built-in features with a catalogue name but no store card and no launcher
+ *  tile of their own: the audit journal prints them from
+ *  `modules.<key>.name` like every other module (docs/MODULE_NAMES.md). */
+const NAME_ONLY_FEATURES = [
+  "locations",
+  "categories",
+  "announcements",
+] as const;
 /** The frontend module whose launcher tile carries the feature's card name. */
 const FEATURE_CARD_MODULE: Record<(typeof ALWAYS_ON_FEATURES)[number], string> =
   { items: "inventory" };
@@ -160,11 +168,25 @@ describe("module name parity", () => {
     expect(problems).toEqual([]);
   });
 
+  it("a name-only built-in feature has a name in all five locales", () => {
+    const problems: string[] = [];
+    for (const feature of NAME_ONLY_FEATURES) {
+      for (const lang of MAINTAINED_LANGUAGES) {
+        const name = dig(modulesCatalogs[lang], `${feature}.name`);
+        if (typeof name !== "string" || name.trim() === "") {
+          problems.push(`${lang}: modules.${feature}.name missing or empty`);
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
   it("no modules.json entry is orphaned (key must map to a known module)", () => {
     const known = new Set([
       ...marketplaceModules,
       CORE_KEY,
       ...ALWAYS_ON_FEATURES,
+      ...NAME_ONLY_FEATURES,
     ]);
     const problems: string[] = [];
     for (const lang of MAINTAINED_LANGUAGES) {

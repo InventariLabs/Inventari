@@ -713,12 +713,6 @@
         "changed": "Campo {{field}} alterado",
         "required": "obrigatório"
       },
-      "builtInModules": {
-        "core": "Básico",
-        "locations": "Locais",
-        "categories": "Categorias",
-        "announcements": "Avisos"
-      },
       "values": {
         "ALL": "Todos",
         "STORAGE": "Local",
