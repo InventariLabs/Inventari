@@ -606,7 +606,7 @@ export default function DocumentDetailPage() {
             />
             {doc.status === "PENDING_APPROVAL" && (
               <Link
-                to="/approvals?status=pending"
+                to="/approvals"
                 className="inline-flex min-h-6 items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline md:min-h-0"
               >
                 <ListChecks size={14} />

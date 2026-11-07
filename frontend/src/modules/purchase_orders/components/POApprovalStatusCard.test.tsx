@@ -67,4 +67,15 @@ describe("POApprovalStatusCard", () => {
     renderCard();
     expect(slot.data?.requestConsequence).toContain("PO/2026/017");
   });
+
+  it("links to the approval queue by an address that names its open tab", () => {
+    requirement.answer = undefined;
+    renderCard();
+    // `?status=pending` names no tab: the queue opened on Open while the
+    // address read as if it were a tab of its own. The bare address is the
+    // one the Open tab itself shows.
+    expect(
+      screen.getByRole("link", { name: "Open approval queue" }),
+    ).toHaveAttribute("href", "/approvals");
+  });
 });

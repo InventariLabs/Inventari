@@ -333,7 +333,9 @@ async def cancel_request(
 
        ``reason`` says why it was closed when the cancelling was not the
        requester's own act (the workflow was switched off); it is kept on the
-       request and in the journal entry.
+       request and in the journal entry's reason column. Such a release passes
+       ``cascade`` only to skip the requester-only guard: the journal does not
+       mark it as following a cancellation of the target.
 
        ``cascade`` marks the call as following the target's own cancellation —
        a document or purchase order being cancelled or deleted takes its approval
@@ -396,11 +398,11 @@ async def cancel_request(
             'old_status': old_status,
             'new_status': 'CANCELLED',
         },
-        meta_data={
-            **({'cascade': True} if cascade else {}),
-            **({'reason': reason} if reason else {}),
-        }
-        or None,
+        # A release is the administrator's own act and carries its reason in
+        # the column; ``cascade`` only means the target's cancellation came
+        # first, which a release never is -- its target goes on as Confirmed.
+        reason=as_reason(reason),
+        meta_data={'cascade': True} if cascade and reason is None else None,
     )
     # no inner commit — the router's ``get_async_db`` commits the
     # whole transaction at request end. On any exception (e.g. the     # cascade that calls this service from within cancel_document) the
