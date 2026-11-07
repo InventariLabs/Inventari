@@ -728,7 +728,7 @@ ERRORS_PT: dict[str, str] = {
     'recipe_import_name_required': 'name é obrigatório nos dados de importação',
     'recipe_import_data_required': 'data é obrigatório para importação json',
     'recipe_import_unit_unknown': "O ingrediente '{ingredient}' usa a unidade '{unit}', que esta instância não conhece",
-    'recipe_import_unit_missing': "O ingrediente '{ingredient}' tem quantidade mas não tem unidade",
+    'recipe_ingredient_unit_missing': "O ingrediente '{ingredient}' tem quantidade mas não tem unidade",
     'recipe_import_url_required': 'url é obrigatório para importação por url',
     'recipe_scrape_fetch_failed': 'Falha ao buscar no Jina Reader para {url}: {error}',
     'recipe_scrape_encoding_unsupported': 'O Jina Reader retornou conteúdo comprimido que não pode ser lido com segurança. Tente outro método de importação.',

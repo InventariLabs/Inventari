@@ -957,7 +957,7 @@ ERRORS_ES: ErrorMessages = {
     'recipe_import_name_required': 'Los datos de importación deben incluir el nombre de la receta',
     'recipe_import_data_required': 'La importación JSON requiere datos',
     'recipe_import_unit_unknown': "El ingrediente '{ingredient}' usa la unidad '{unit}', que esta instancia no conoce",
-    'recipe_import_unit_missing': "El ingrediente '{ingredient}' tiene cantidad pero no unidad",
+    'recipe_ingredient_unit_missing': "El ingrediente '{ingredient}' tiene cantidad pero no unidad",
     'recipe_import_url_required': 'La importación por URL requiere una URL',
     'recipe_scrape_fetch_failed': 'Jina Reader no pudo obtener {url}: {error}',
     'recipe_scrape_encoding_unsupported': 'Jina Reader devolvió contenido comprimido que no se puede leer de forma segura. Prueba otro método de importación.',

@@ -799,7 +799,7 @@ class ErrorMessages(TypedDict):
     recipe_import_name_required: str
     recipe_import_data_required: str
     recipe_import_unit_unknown: str
-    recipe_import_unit_missing: str
+    recipe_ingredient_unit_missing: str
     recipe_import_url_required: str
     recipe_scrape_fetch_failed: str
     recipe_scrape_encoding_unsupported: str

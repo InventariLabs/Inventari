@@ -917,7 +917,7 @@ class TestPickingUnknownStatus:
             ingredients=[
                 {
                     'name': ingredient_name,
-                    'quantity': '10',
+                    'quantity': '500',
                     'is_optional': False,
                     # no template_id on purpose
                 }
