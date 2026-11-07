@@ -58,6 +58,9 @@ interface Props {
     heldQty?: number,
   ) => void;
   onCancel: () => void;
+  /** Out of sight while another question sits on the same layer. The sheet
+   *  stays mounted, so what was typed in it is still there when it returns. */
+  hidden?: boolean;
 }
 
 export default function WmsShortReceiveDialog({
@@ -67,6 +70,7 @@ export default function WmsShortReceiveDialog({
   serverError,
   onConfirm,
   onCancel,
+  hidden,
 }: Props) {
   const { t } = useTranslation("warehouse");
   // The line's final total, prefilled with what the scans already recorded:
@@ -164,7 +168,7 @@ export default function WmsShortReceiveDialog({
 
   return (
     <Sheet
-      open
+      open={!hidden}
       onClose={onCancel}
       zIndex="modal-nested"
       maxWidth="md"

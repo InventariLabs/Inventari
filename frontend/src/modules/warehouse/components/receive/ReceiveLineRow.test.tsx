@@ -45,6 +45,7 @@ function renderRow(props: {
   planChecking?: boolean;
   line?: ReceiveDraftLine;
   onUpdate?: () => void;
+  needsExpiry?: boolean;
 }) {
   return render(
     <table>
@@ -60,6 +61,7 @@ function renderRow(props: {
           canWrite
           focusLineKey={null}
           shortLine={false}
+          needsExpiry={props.needsExpiry ?? false}
           onFocusHandled={vi.fn()}
           onUpdate={props.onUpdate ?? vi.fn()}
           onRemove={vi.fn()}
@@ -148,5 +150,31 @@ describe("ReceiveLineRow layout", () => {
     const vat = screen.getByLabelText(/VAT/i);
     expect(vat).toHaveValue("23.00");
     expect(vat.closest("div.w-20")).not.toBeNull();
+  });
+});
+
+describe("ReceiveLineRow expiry refused by the server", () => {
+  it("opens the lot and expiry fields and says the date is needed", () => {
+    renderRow({ needsExpiry: true });
+
+    expect(screen.getByLabelText("Expiry")).toBeVisible();
+    expect(screen.getByText("Needed for this product")).toBeInTheDocument();
+  });
+
+  it("stops asking once the row carries a date", () => {
+    renderRow({
+      needsExpiry: true,
+      line: { ...line, expiryDate: "2027-01-31" },
+    });
+
+    expect(
+      screen.queryByText("Needed for this product"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the fields folded for a row nobody refused", () => {
+    renderRow({});
+
+    expect(screen.queryByLabelText("Expiry")).not.toBeInTheDocument();
   });
 });

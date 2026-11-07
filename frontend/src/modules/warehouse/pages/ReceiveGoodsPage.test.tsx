@@ -1587,6 +1587,48 @@ describe("ReceiveGoodsPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("opens the lot and expiry of the row an undated FEFO refusal names, in its own words", async () => {
+    // The server's sentence is written for an API client ("send the lot and
+    // expiry with the completion"). The page reads the rows the refusal
+    // names, opens their lot-and-expiry fields and says which row needs the
+    // date, in words a person on this screen can act on.
+    state.postNew.mockRejectedValueOnce(
+      new AxiosError("Bad Request", "ERR_BAD_REQUEST", undefined, undefined, {
+        status: 400,
+        statusText: "Bad Request",
+        headers: {},
+        config: { headers: {} } as never,
+        data: {
+          detail: {
+            code: "RECEIPT_EXPIRY_REQUIRED",
+            message:
+              "Send the lot and expiry with the completion, or put the date on the line",
+            lines: [{ line_id: "x", line_number: 1, product: "Jasmine Rice" }],
+          },
+        },
+      }),
+    );
+    const user = userEvent.setup();
+    renderPage();
+    await user.selectOptions(screen.getByLabelText("From"), "partner-1");
+    await screen.findByText("Jasmine Rice");
+    expect(screen.queryByLabelText("Expiry")).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Receive into stock" }),
+    );
+
+    const expiry = await screen.findByLabelText("Expiry");
+    expect(expiry).toBeVisible();
+    expect(
+      screen.getByText(/Expiry date needed for: Jasmine Rice/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/with the completion/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Could not receive the delivery."),
+    ).not.toBeInTheDocument();
+  });
+
   it("names the order's open receipt and offers to receive the rest through it", async () => {
     // A short delivery's draft, or a receipt saved for later, speaks for part
     // of what the order owes: received beside it here, the post meets a

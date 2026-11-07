@@ -561,6 +561,23 @@ export function draftProblem(
   return null;
 }
 
+/**
+ * The rows a `RECEIPT_EXPIRY_REQUIRED` refusal names. The server numbers the
+ * lines of a receipt it has just created in the order the sheet sent them, so
+ * a row's place on the sheet is its line number less one.
+ */
+export function undatedRows(
+  named: Record<string, unknown>[] | null,
+  lines: ReceiveDraftLine[],
+): ReceiveDraftLine[] {
+  const rows: ReceiveDraftLine[] = [];
+  for (const row of named ?? []) {
+    const line = lines[Number(row.line_number) - 1];
+    if (line && !rows.includes(line)) rows.push(line);
+  }
+  return rows;
+}
+
 /** Who the partner field offers: a customer's goods come back from a
  *  customer. An internal receipt names nobody, and its field is hidden. */
 export function partnerTypesFor(source: ReceiveSource): readonly PartnerType[] {
