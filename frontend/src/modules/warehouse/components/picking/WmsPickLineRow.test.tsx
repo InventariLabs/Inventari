@@ -362,19 +362,23 @@ describe("WmsPickLineRow's text on a narrow screen", () => {
       />,
     );
 
+    // The whole name, never an ellipsis: a picked row leaves the name a
+    // 163px column, and a long name is read against the carton.
     const name = screen.getByText(productName);
-    expect(name).toHaveClass("line-clamp-2", "break-words");
-    expect(name).not.toHaveClass("truncate");
+    expect(name).toHaveClass("[overflow-wrap:anywhere]");
+    expect(name).not.toHaveClass("truncate", "line-clamp-2");
 
+    // Codes break at a hyphen or a space where they can, and inside a token
+    // only when the token does not fit the column.
     const lot = screen.getByText(new RegExp(lotName));
-    expect(lot).toHaveClass("break-all");
-    expect(lot).not.toHaveClass("truncate");
+    expect(lot).toHaveClass("[overflow-wrap:anywhere]");
+    expect(lot).not.toHaveClass("break-all", "truncate");
 
     // The text node of a flex line has min-width:auto and overflow-wrap does
-    // not lower it, so only a min-w-0 item that may break anywhere keeps a
-    // long code inside its column.
+    // not lower it, so only a min-w-0 item keeps a long code in its column.
     const location = screen.getByText(binLocation);
-    expect(location).toHaveClass("min-w-0", "break-all");
+    expect(location).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(location).not.toHaveClass("break-all");
     expect(location.parentElement).not.toHaveClass("truncate");
   });
 });

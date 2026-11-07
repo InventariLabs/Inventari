@@ -217,11 +217,16 @@ export default function WmsReceiveLineRow({
       )}
     >
       <div className="min-w-0 flex-1 basis-40">
-        <p className="truncate text-sm font-medium text-on">
+        {/* The whole name and the whole batch code, breaking at a space or
+            a hyphen and inside a token only when it does not fit: both are
+            read against the carton, so an ellipsis is no help. */}
+        <p className="text-sm font-medium text-on [overflow-wrap:anywhere]">
           {line.product_name ?? line.document_line_id}
         </p>
         {line.lot_name && (
-          <p className="text-xs text-on-muted truncate">{line.lot_name}</p>
+          <p className="text-xs text-on-muted [overflow-wrap:anywhere]">
+            {line.lot_name}
+          </p>
         )}
         <HeldBackNote line={line} />
         <PlannedShelf line={line} />
