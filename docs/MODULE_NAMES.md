@@ -345,7 +345,8 @@ as the only defensible premise — `frontend/src/modules/equipment/vocabulary.js
 word stems, curated key lists, exemptions) — enforced by
 `frontend/src/modules/equipment/__tests__/vocabulary.test.ts`: curated individual keys
 carry the individual word and no other, feature-name references use the real screen name,
-and location counters keep the cross-module word. Widening the measure means curating
+location counters keep the cross-module word, and Polish says *przypis…* only on the
+curated holder-field labels and on a label (etykieta) assigned to an asset. Widening the measure means curating
 more keys into the map, not loosening a heuristic.
 
 ### The `maker` orders tab

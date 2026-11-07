@@ -32,7 +32,7 @@ _EMAIL_LABELS: dict[str, dict[str, str]] = {
             'Potwierdzenie jest wymagane do <b>{deadline}</b>.'
         ),
         'multiple_items_body': (
-            'Prosimy o potwierdzenie, że nadal posiadasz następujące przedmioty:'
+            'Prosimy o potwierdzenie, że nadal posiadasz następujące zasoby:'
         ),
         'button': 'Potwierdź / Zgłoś problem',
         'fallback': 'Jeśli przycisk nie działa, skopiuj i wklej ten link:',

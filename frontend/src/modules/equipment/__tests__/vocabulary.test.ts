@@ -104,6 +104,21 @@ describe("equipment vocabulary (the naming decision, as a measure)", () => {
     }
   });
 
+  it("Polish says przypisany only on the holder field — the handover is wydanie", () => {
+    const rule = map.handoverWord.pl;
+    const allowed = new Set([...rule.holderLabelKeys, ...rule.labelKeys]);
+    for (const key of allowed) value("pl", key);
+    const stray = Object.entries(flatten(catalogs.pl))
+      .filter(
+        ([key, text]) => has(text, [rule.retiredStem]) && !allowed.has(key),
+      )
+      .map(([key]) => key);
+    expect(
+      stray,
+      `pl.json names the handover with "${rule.retiredStem}…" — the act is wydać / wydanie`,
+    ).toEqual([]);
+  });
+
   it("keys that point at the My-Assets screen use that screen's real name in this language", () => {
     for (const [key, feature] of Object.entries(map.featureNameKeys)) {
       for (const lang of languages) {
