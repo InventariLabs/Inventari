@@ -104,22 +104,37 @@ def isolated_db_url(prefix: str = 'test') -> Iterator[str]:
     yield url
 
 
-def controller_run_id() -> str:
+# Set once this process has minted its own run id (see ``controller_run_id``).
+_run_started = False
+
+
+def controller_run_id(*, mint: bool = False) -> str:
     """This run's identity: minted by the controller, worn by every database
     it creates.
 
-    The controller imports the test configuration before xdist spawns the
-    workers, and the workers inherit its environment, so one ``setdefault``
-    here gives every process of one run the same id and every process of
-    another run a different one. A worker database built on this id can
-    therefore never share its name with a database another run created on
-    the same server — which is the collision the recovery sweeps feed on:
-    the documented remedy for a poisoned run is dropping the run's test
-    databases, and such a sweep landing on a server while a suite is still
-    running deletes that suite's databases under it, read live as dozens of
-    "ERROR at setup — database does not exist" under a summary that still
-    counts its passed tests as green.
+    The controller asks with ``mint=True`` before xdist spawns the workers,
+    and the workers inherit its environment, so every process of one run
+    reads the same id and every process of another run a different one. A
+    worker database built on this id can therefore never share its name with
+    a database another run created on the same server — which is the
+    collision the recovery sweeps feed on: the documented remedy for a
+    poisoned run is dropping the run's test databases, and such a sweep
+    landing on a server while a suite is still running deletes that suite's
+    databases under it, read live as dozens of "ERROR at setup — database
+    does not exist" under a summary that still counts its passed tests as
+    green.
+
+    Minting overwrites whatever the environment already holds: an
+    ``INVENTARI_TEST_RUN_ID`` exported in the shell — natural while looking
+    at orphaned databases — used to be inherited through ``setdefault``, and
+    every run started from that shell then shared one id. A second mint in
+    the same process (a test that imports the configuration again) keeps the
+    id it made.
     """
+    global _run_started
+    if mint and not _run_started:
+        os.environ['INVENTARI_TEST_RUN_ID'] = uuid4().hex[:10]
+        _run_started = True
     return os.environ.setdefault('INVENTARI_TEST_RUN_ID', uuid4().hex[:10])
 
 
