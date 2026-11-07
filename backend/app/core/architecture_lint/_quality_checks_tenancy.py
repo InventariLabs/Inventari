@@ -37,7 +37,13 @@ import ast
 from collections.abc import Iterator
 from pathlib import Path
 
-from ._constants import ESCAPE_HATCH_MARKER, _is_test_file, _rel, _rel_parts
+from ._constants import (
+    ESCAPE_HATCH_MARKER,
+    _is_alembic_env,
+    _is_test_file,
+    _rel,
+    _rel_parts,
+)
 
 _ORG_PARAM_NAMES = frozenset({'organization_id', 'org_id'})
 _OPT_OUT_PARAM_NAMES = frozenset({'include_global'})
@@ -243,19 +249,6 @@ def _collect_public_api_missing_org_keys(
         name = entry.split('::', 2)[2].split('(', 1)[0]
         keys.add(f'{file_part}::{name}')
     return keys
-
-
-def _is_alembic_env(py_file: Path, root: Path) -> bool:
-    """True for Alembic ``migrations/env.py`` files.
-
-    Migration tooling imports models for metadata/autogenerate but never
-    queries tenant data, so the org-filter requirement does not apply
-    (carve-out S-2026-08-01).
-
-    Read below ``root``: a checkout under a directory named ``migrations``
-    would otherwise hand this carve-out to every ``env.py`` in the tree.
-    """
-    return py_file.name == 'env.py' and 'migrations' in _rel_parts(py_file, root)
 
 
 def _check_escape_hatch_org_filter(app_root: Path, baseline: set[str]) -> list[str]:

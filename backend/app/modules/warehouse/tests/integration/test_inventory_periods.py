@@ -7,6 +7,7 @@ from typing import Any
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError as SyncIntegrityError
 from sqlalchemy.orm import Session
 
@@ -182,6 +183,38 @@ class TestInventoryPeriodClosure:
         assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
         # Not PERIOD_CLOSED, which said the opposite of the sentence beside it.
         assert resp.json()['detail']['code'] == 'PERIOD_NOT_CLOSED'
+
+    @pytest.mark.parametrize('action', ['close', 'reopen'])
+    @pytest.mark.parametrize(
+        ('year', 'month'),
+        [(2026, 13), (2026, 0), (1999, 6), (2101, 6)],
+    )
+    def test_a_month_that_does_not_exist_is_refused_and_leaves_no_row(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_org: Any,
+        action: str,
+        year: int,
+        month: int,
+    ) -> None:
+        """The period row is made on its first touch, and nothing between the
+        path and that insert asked whether the month exists: ``month=13``
+        closed a thirteenth month. The year keeps the range the list's own
+        filter takes."""
+        from app.modules.warehouse.models import InventoryPeriod
+
+        resp = client.post(
+            f'/api/v1/warehouse/periods/{year}/{month}/{action}',
+            headers=doc_auth_headers,
+        )
+
+        assert resp.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, resp.text
+        rows = db_session.scalars(
+            select(InventoryPeriod).where(InventoryPeriod.organization_id == doc_org.id)
+        ).all()
+        assert rows == []
 
     def test_the_refusals_reach_a_polish_reader_in_polish(
         self, client: TestClient, doc_auth_headers: dict[str, str]

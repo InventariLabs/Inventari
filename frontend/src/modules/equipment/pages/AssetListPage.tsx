@@ -131,10 +131,7 @@ export default function AssetListPage() {
     onPrev,
     onNext,
     resetPagination,
-    archivedSkip,
-    archivedTotal,
-    onArchivedPrev,
-    onArchivedNext,
+    archivedPagination,
     bulkReturnMutation,
     bulkPurgeMutation,
     restoreMutation,
@@ -542,13 +539,7 @@ export default function AssetListPage() {
               ))}
             </div>
           )}
-          <Pagination
-            skip={archivedSkip}
-            limit={limit}
-            total={archivedTotal}
-            onPrev={onArchivedPrev}
-            onNext={onArchivedNext}
-          />
+          <Pagination {...archivedPagination} />
         </>
       )}
 

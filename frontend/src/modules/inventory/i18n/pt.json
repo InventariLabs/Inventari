@@ -8,7 +8,8 @@
     "needsAttention_other": "precisam de atenção"
   },
   "actions": {
-    "stockTakesInProgress": "Inventários em andamento"
+    "stockTakesInProgress": "Inventários em andamento",
+    "stockTakesUnavailable": "Não foi possível verificar os inventários em andamento"
   },
   "nav": {
     "overview": "Visão geral",
@@ -185,7 +186,8 @@
       "message": "O motivo é guardado junto com o lote e exibido ao lado do status.",
       "label": "Por quê",
       "placeholder": "Aviso do fornecedor 41/26 — vidro encontrado no pote 12",
-      "confirm": "Alterar status"
+      "confirm": "Alterar status",
+      "failed": "Não foi possível alterar o status do lote"
     },
     "actionsFor": "Ações do lote {{name}}",
     "columns": {

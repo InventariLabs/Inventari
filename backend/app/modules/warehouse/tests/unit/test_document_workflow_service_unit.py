@@ -71,6 +71,7 @@ def _make_line(
     line.discrepancy_code = discrepancy_code
     line.discrepancy_reason = discrepancy_reason
     line.held_quantity = Decimal('0')
+    line.expected_is_count = False
     return line
 
 

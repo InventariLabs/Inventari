@@ -595,6 +595,7 @@ ERRORS_FR: ErrorMessages = {
     'approval_not_stage_approver': "Vous n'êtes pas approbateur pour cette étape.",
     'approval_only_requester_can_cancel': "Seule la personne à l'origine de la demande peut la retirer.",
     'approval_workflow_inactive': "Le flux d'approbation de cette demande n'est plus actif.",
+    'approval_target_not_found': "Cet enregistrement n'existe pas : aucune approbation ne peut être demandée.",
     'approval_request_already_open': "Une demande d'approbation est déjà ouverte pour cet enregistrement.",
     'approval_workflow_no_stages': "Ce flux d'approbation n'a aucune étape configurée.",
     'approval_workflow_needs_stage': "Un flux d'approbation doit comporter au moins une étape.",

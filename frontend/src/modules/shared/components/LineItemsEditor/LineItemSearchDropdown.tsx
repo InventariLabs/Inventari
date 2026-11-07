@@ -36,7 +36,7 @@ interface LineItemSearchDropdownProps {
    * modal the old inline `absolute` list was clipped by the scrolling form
    * container. Without an anchor the legacy inline behaviour is kept. */
   anchorId?: string;
-  /** Called when a scroll happens outside the dropdown while it is open in
+  /** Called when a scroll moves the input while the dropdown is open in
    * portal mode — the parent should close the dropdown (the fixed list must
    * not detach from its input). */
   onRequestClose?: () => void;
@@ -53,7 +53,7 @@ function visibleSignature(product: LineItemProduct): string {
     readableSku(product.sku),
     product.barcode,
     product.serial_number,
-    product.created_at ? formatDate(product.created_at) : null,
+    product.added_date ? formatDate(product.added_date) : null,
     product.expiry_date,
     product.location_name,
     product.available_quantity,
@@ -62,9 +62,13 @@ function visibleSignature(product: LineItemProduct): string {
 }
 
 /** Brand and id tail for a row that reads like a sibling. A stock hit
- *  carries its record id; a catalogue hit only its template's. */
+ *  carries its record id; a catalogue hit only its template's. A merged row
+ *  is a shelf total, not the record its `item_id` happens to name, so it
+ *  goes by its template's id like a catalogue hit. */
 function twinHint(product: LineItemProduct): string | null {
-  const id = product.item_id ?? product.product_template_id;
+  const id = product.merged
+    ? product.product_template_id
+    : (product.item_id ?? product.product_template_id);
   if (!id) return null;
   const tail = `#${id.slice(-6)}`;
   return product.brand ? `${product.brand} · ${tail}` : tail;
@@ -92,6 +96,8 @@ export function LineItemSearchDropdown({
 }: LineItemSearchDropdownProps) {
   const { t } = useTranslation("common");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  // Where the input stood when the panel was last placed against it.
+  const placedAt = useRef<{ top: number; left: number } | null>(null);
   const [pos, setPos] = useState<{
     top: number;
     left: number;
@@ -113,6 +119,7 @@ export function LineItemSearchDropdown({
     }
     const update = () => {
       const rect = anchor.getBoundingClientRect();
+      placedAt.current = { top: rect.top, left: rect.left };
       const gap = 4;
       const itemCount = Math.max(results.length, 1);
       const estimatedHeight = Math.min(240, Math.max(48, itemCount * 44));
@@ -139,12 +146,23 @@ export function LineItemSearchDropdown({
     };
   }, [showDropdown, results.length, anchor]);
 
-  // Scrolls outside the dropdown (i.e. the modal form) should not leave a
-  // detached fixed list — but the list's own scroll must not close itself.
+  // A fixed list must not stay behind when a scroll carries its input away.
+  // Only a scroll of something holding the input can do that, and even then
+  // the list goes only if the input really moved from where the panel was
+  // placed: a scroll event can reach us for a layout move that happened
+  // before the list opened, or for a container that scrolled without
+  // shifting the input. The list's own scroll and the input scrolling its own
+  // text move nothing either.
   useEffect(() => {
     if (!showDropdown || !anchor) return;
     const onScroll = (e: Event) => {
-      if (dropdownRef.current?.contains(e.target as Node)) return;
+      const scrolled = e.target as Node;
+      if (scrolled === anchor || !scrolled.contains(anchor)) return;
+      const placed = placedAt.current;
+      const rect = anchor.getBoundingClientRect();
+      if (placed && placed.top === rect.top && placed.left === rect.left) {
+        return;
+      }
       onRequestClose?.();
     };
     window.addEventListener("scroll", onScroll, true);
@@ -232,10 +250,10 @@ export function LineItemSearchDropdown({
               twinHint(product) && (
                 <span className="font-mono">{twinHint(product)}</span>
               )}
-            {product.created_at && (
+            {product.added_date && (
               <span>
                 {addedLabel ? `${addedLabel}: ` : ""}
-                {formatDate(product.created_at)}
+                {formatDate(product.added_date)}
               </span>
             )}
             {product.expiry_date && (
@@ -244,8 +262,8 @@ export function LineItemSearchDropdown({
                 {product.expiry_date}
               </span>
             )}
-            {/* The search walks a location's subtree, so same-named rows can
-                stand on different shelves — the shelf is what tells them
+            {/* A zone's search covers the shelves below it, so same-named
+                rows can stand on different shelves — the shelf is what tells them
                 apart, and where the picker walks. */}
             {product.location_name && (
               <span>

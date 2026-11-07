@@ -77,8 +77,9 @@ interface LotExpiryAsk {
  */
 function useHeldFromCard(
   requestShortReceive: (lineId: string) => void,
-  sheetLine: WmsReceiveLine | null,
+  state: { phase: string; shortReceiveLine: WmsReceiveLine | null },
 ) {
+  const sheetLine = shortSheetLineFor(state);
   const [counted, setCounted] = useState<{
     lineId: string;
     quantity: number;
@@ -89,22 +90,21 @@ function useHeldFromCard(
       requestShortReceive(line.id);
     },
     quantity: counted?.lineId === sheetLine?.id ? counted?.quantity : undefined,
+    sheetLine,
   };
 }
 
 /**
- * The line the short-receive sheet is open for. Both sheets share one layer
- * and this one is rendered later, so while the expiry question it raised is
- * open the sheet is not mounted: its resend holds the typed quantity, and
- * Cancel on the question brings the sheet back for a fresh try.
+ * The line the short-receive sheet is open for. Both sheets share one layer,
+ * so while the expiry question it raised is open the sheet is hidden, not
+ * unmounted: its resend holds the typed quantity, and Cancel on the question
+ * brings the sheet back with that draft still in it.
  */
-function shortSheetLineFor(
-  state: { phase: string; shortReceiveLine: WmsReceiveLine | null },
-  ask: LotExpiryAsk | null,
-): WmsReceiveLine | null {
-  return state.phase === "short_receive" && !ask
-    ? state.shortReceiveLine
-    : null;
+function shortSheetLineFor(state: {
+  phase: string;
+  shortReceiveLine: WmsReceiveLine | null;
+}): WmsReceiveLine | null {
+  return state.phase === "short_receive" ? state.shortReceiveLine : null;
 }
 
 function LotExpiryAskDialog({
@@ -382,18 +382,15 @@ export default function WmsReceivingView({
   }, [state.phase, startSession]);
 
   // A scan the server answered with "needs_lot_expiry", waiting for the lot
-  // and date the worker reads off the pack. It is sent again with them.
-  // A tap on "Receive full amount" or the short-receive sheet is asked the
-  // same way, and sends its own call again, which is why the ask holds the
-  // resend rather than a barcode.
+  // and date the worker reads off the pack. A tap on "Receive full amount" or
+  // the short-receive sheet is asked the same way and sends its own call again
+  // with them, which is why the ask holds the resend rather than a barcode.
   const [lotExpiryAsk, setLotExpiryAsk] = useState<LotExpiryAsk | null>(null);
-
   // A count past the over-receipt tolerance, asked of a worker who may
   // receive over it. The same call goes again with the answer.
   const surplus = useSurplusQuestion();
 
-  const shortSheetLine = shortSheetLineFor(state, lotExpiryAsk);
-  const heldFromCard = useHeldFromCard(requestShortReceive, shortSheetLine);
+  const heldFromCard = useHeldFromCard(requestShortReceive, state);
   const handleScan = async (
     barcode: string,
     quantity: number,
@@ -672,14 +669,15 @@ export default function WmsReceivingView({
         onCancel={() => setSkipAsk(null)}
       />
 
-      {shortSheetLine && (
+      {heldFromCard.sheetLine && (
         <WmsShortReceiveDialog
-          line={shortSheetLine}
+          line={heldFromCard.sheetLine}
           initialQuantity={heldFromCard.quantity}
           isLoading={isLoading}
           serverError={sessionError}
           onConfirm={handleShortReceiveConfirm}
           onCancel={cancelShortReceive}
+          hidden={lotExpiryAsk !== null}
         />
       )}
     </div>

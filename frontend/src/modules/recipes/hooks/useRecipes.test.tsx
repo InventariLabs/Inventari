@@ -9,7 +9,7 @@ import {
   useCreateRecipe,
   useDeleteRecipe,
   useAddToShoppingList,
-  useActiveShoppingListId,
+  useOpenShoppingLists,
   useAddRecipeToCollection,
   useToggleRecipeFavorite,
 } from "./useRecipes";
@@ -160,31 +160,36 @@ describe("useDeleteRecipe", () => {
   });
 });
 
-describe("useActiveShoppingListId", () => {
-  it("asks for the newest active list and answers its id", async () => {
+describe("useOpenShoppingLists", () => {
+  it("asks for the open lists, newest first, and answers their ids and names", async () => {
     let asked: URLSearchParams | undefined;
     server.use(
       http.get("/api/v1/shopping-lists", ({ request }) => {
         asked = new URL(request.url).searchParams;
         return HttpResponse.json({
-          items: [{ id: "active-1" }],
+          items: [
+            { id: "active-1", name: "Week 30" },
+            { id: "active-0", name: "Party" },
+          ],
           total: 2,
-          limit: 1,
+          limit: 50,
           offset: 0,
-          has_more: true,
+          has_more: false,
         });
       }),
     );
-    const { result } = renderHook(() => useActiveShoppingListId(), {
+    const { result } = renderHook(() => useOpenShoppingLists(), {
       wrapper: createWrapper(),
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBe("active-1");
+    expect(result.current.data).toEqual([
+      { id: "active-1", name: "Week 30" },
+      { id: "active-0", name: "Party" },
+    ]);
     expect(asked?.get("active_only")).toBe("true");
-    expect(asked?.get("limit")).toBe("1");
   });
 
-  it("answers null when there is no active list, so the server makes one", async () => {
+  it("answers an empty list when none is open, so the server makes one", async () => {
     server.use(
       http.get("/api/v1/shopping-lists", () =>
         HttpResponse.json({
@@ -196,11 +201,11 @@ describe("useActiveShoppingListId", () => {
         }),
       ),
     );
-    const { result } = renderHook(() => useActiveShoppingListId(), {
+    const { result } = renderHook(() => useOpenShoppingLists(), {
       wrapper: createWrapper(),
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBeNull();
+    expect(result.current.data).toEqual([]);
   });
 });
 

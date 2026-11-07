@@ -271,46 +271,99 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def summarize_baselined_notices(
-    notices: list[str],
-    *,
-    category: str,
-    quiet: bool,
-    baseline_file: str | Path | None = None,
-) -> list[str]:
-    """Collapse baselined per-file ``::notice`` lines into one summary line.
+#: One entry per category a check can baseline: ``key -> (label, baseline
+#: file)``. ``--quiet`` prints the count of each exactly once, in the closing
+#: summary, under this label; ``baselined`` in ``_run_checks`` is keyed the
+#: same way. A test reads both and fails when a key is recorded there that
+#: has no entry here, so a new baselined check cannot go uncounted.
+_BASELINED_SUMMARY: dict[str, tuple[str, str | None]] = {
+    'get_db': ('baselined get_db in async def', None),
+    'migration': (
+        'module(s) with baselined migration gaps',
+        'app/core/module_migrations_baseline.txt',
+    ),
+    'twin': (
+        'baselined sync/async twin(s)',
+        'app/core/sync_async_twin_baseline.txt',
+    ),
+    'model_leak': (
+        'baselined CoreAPI model leak(s)',
+        'app/core/core_api_model_leak_baseline.txt',
+    ),
+    'toctou': (
+        'baselined TOCTOU risk function(s)',
+        'app/core/toctou_risk_baseline.txt',
+    ),
+    'bare_emit': (
+        'baselined non-transactional emit(s)',
+        'app/core/bare_emit_baseline.txt',
+    ),
+    'request_scope': (
+        'baselined global endpoint(s)',
+        'app/core/request_scope_baseline.txt',
+    ),
+    'raw_http_exception': (
+        'baselined raw HTTPException raise(s)',
+        'app/core/raw_http_exception_baseline.txt',
+    ),
+    'org_filter': (
+        'baselined escape hatch(es) without org filter',
+        'app/core/escape_hatch_org_filter_baseline.txt',
+    ),
+    'query_scope': (
+        'baselined escape-hatch quer(ies) without org filter',
+        'app/core/escape_hatch_query_scope_baseline.txt',
+    ),
+    'missing_org': (
+        'baselined public_api method(s) without organization',
+        'app/core/public_api_missing_org_baseline.txt',
+    ),
+    'unread_org': (
+        'baselined function(s) taking an organization unread',
+        'app/core/unread_org_parameter_baseline.txt',
+    ),
+    'legality': (
+        'baselined CoreAPI signature legality finding(s)',
+        'app/core/coreapi_signature_legality_baseline.txt',
+    ),
+    'test_skip': (
+        'registered environmental test skip(s)',
+        'app/core/test_skip_baseline.txt',
+    ),
+    'mixed_status': (
+        'baselined assertion(s) that cannot fail',
+        'app/core/mixed_status_assert_baseline.txt',
+    ),
+    'tx_ownership': (
+        'baselined mid-stack commit(s)',
+        'app/core/transaction_ownership_baseline.txt',
+    ),
+    'tx_rollback': (
+        'baselined mid-stack rollback(s)',
+        'app/core/transaction_rollback_baseline.txt',
+    ),
+    'services_facade': (
+        'listed service place(s) importing the facade',
+        'app/core/services_public_api_import_baseline.txt',
+    ),
+    'audit_coverage': (
+        'baselined write path(s) without a journal entry',
+        'app/core/audit_coverage_baseline.txt',
+    ),
+}
 
-    Baselined notices represent *accepted* debt documented (with a reason) in a
-    baseline file. In ``--quiet`` mode they are collapsed into a single summary
-    line per category so they stop drowning real signal on every run; in verbose
-    mode (GitHub PR annotations) per-file notices stay intact so each file stays
-    navigable in the PR review UI.
 
-    Args:
-        notices: per-file ``::notice`` strings for one category.
-        category: human label for the summary (e.g. ``'sync/async twin'``).
-        quiet: when True, collapse to a single summary line; when False,
-            return the per-file notices unchanged.
-        baseline_file: optional pointer to the baseline file holding the
-            documented reason — shown in the summary so reviewers know
-            where to look.
+def _print_baselined_counts(baselined: dict[str, list[str]]) -> None:
+    """Print the count of every baselined category, once, with its list.
 
-    Returns:
-        A single-element list with the summary line in quiet mode (or the
-        original per-file notices in verbose mode); an empty list when there
-        are no notices.
+    The single place ``--quiet`` reports accepted debt; the per-file notices
+    of the verbose mode (CI annotations) are not repeated here.
     """
-    if not notices:
-        return []
-    if not quiet:
-        return list(notices)
-    pointer = (
-        f' (see {baseline_file} for the documented reason)' if baseline_file else ''
-    )
-    return [
-        f'::notice title=Architecture: {len(notices)} baselined {category}'
-        f' notice(s) (non-blocking){pointer}'
-    ]
+    for key, (label, baseline_file) in _BASELINED_SUMMARY.items():
+        notices = baselined.get(key)
+        if notices:
+            pointer = f' — {baseline_file}' if baseline_file else ''
+            print(f'  ({len(notices)} {label}{pointer})')
 
 
 def _print_failure_summary(
@@ -321,8 +374,7 @@ def _print_failure_summary(
     get_db_errors: list[str],
     i18n_errors: list[str],
     i18n_warnings: list[str],
-    get_db_notices: list[str],
-    migration_notices: list[str],
+    baselined: dict[str, list[str]],
     api_import_baseline: list[Violation],
     violations: list[Violation],
 ) -> None:
@@ -357,23 +409,13 @@ def _print_failure_summary(
             f'(::warning, non-blocking).'
         )
 
-    if get_db_notices:
-        print(
-            f'Architecture lint: {len(get_db_notices)} baselined get_db in async def (::notice, non-blocking).'
-        )
-
-    if migration_notices:
-        print(
-            f'Architecture lint: {len(migration_notices)} module(s) with baselined '
-            f'migration gaps (::notice, non-blocking). Remove from '
-            f'core/module_migrations_baseline.txt once migrated.'
-        )
-
     if api_import_baseline:
         print(
             f'Architecture lint: {len(api_import_baseline)} baselined app/api/** import violation(s) '
             f'(::notice, non-blocking).'
         )
+
+    _print_baselined_counts(baselined)
 
     if violations:
         print('Architecture lint failed. New forbidden imports found in app.modules:')
@@ -469,16 +511,15 @@ def _stale_baseline_errors() -> list[str]:
 def _emit_baselined(
     entries: Iterable[str],
     *,
-    category: str,
     quiet: bool,
-    baseline_file: str | None = None,
 ) -> tuple[list[str], list[str]]:
     """Print a check that separates blocking errors from baselined notices.
 
     Eight checks share this shape: the errors go out one per line, the notices
-    collapse into a single summary line under ``--quiet``. Returns both lists
-    because ``main`` still needs the errors for the exit code and the notices
-    for the closing counts.
+    go out per file for GitHub annotations and are held back under ``--quiet``,
+    where the closing summary (:func:`_print_baselined_counts`) reports their
+    count once. Returns both lists because ``main`` still needs the errors for
+    the exit code and the notices for that summary.
     """
     errors: list[str] = []
     notices: list[str] = []
@@ -486,10 +527,9 @@ def _emit_baselined(
         (notices if entry.startswith('::notice') else errors).append(entry)
     for err in errors:
         print(err)
-    for notice in summarize_baselined_notices(
-        notices, category=category, quiet=quiet, baseline_file=baseline_file
-    ):
-        print(notice)
+    if not quiet:
+        for notice in notices:
+            print(notice)
     return errors, notices
 
 
@@ -503,9 +543,7 @@ def _emit_test_skips(*, quiet: bool) -> tuple[list[str], list[str]]:
     errors = _emit(registry_errors)
     hits, notices = _emit_baselined(
         _check_test_skips((MODULES_ROOT, TESTS_ROOT), registry),
-        category='registered test skip',
         quiet=quiet,
-        baseline_file='app/core/test_skip_baseline.txt',
     )
     return errors + hits, notices
 
@@ -551,15 +589,11 @@ def _emit_contract_checks(
     """
     request_scope_errors, baselined['request_scope'] = _emit_baselined(
         _check_request_scope(APP_ROOT, _load_request_scope_baseline()),
-        category='endpoint without a tenant',
         quiet=args.quiet,
-        baseline_file='app/core/request_scope_baseline.txt',
     )
     raw_http_errors, baselined['raw_http_exception'] = _emit_baselined(
         _check_raw_http_exceptions([APP_ROOT], _load_raw_http_exception_baseline()),
-        category='raw HTTPException',
         quiet=args.quiet,
-        baseline_file='app/core/raw_http_exception_baseline.txt',
     )
     return request_scope_errors, raw_http_errors
 
@@ -782,16 +816,11 @@ def _print_api_import_findings(
 def _print_escape_hatch_notices(
     escape_hatch_files: list[tuple[Path, str]], *, quiet: bool
 ) -> None:
-    """Announce the approved L2 read bypasses (one line each, or one summary)."""
-    if quiet and escape_hatch_files:
-        files_list = ', '.join(
-            str(f.relative_to(Path.cwd())) for f, _ in escape_hatch_files
-        )
-        print(
-            f'::notice title=Architecture: {len(escape_hatch_files)} L2 CoreAPI '
-            f'read-bypass files approved (read-only auto-verified)::'
-            f'Auto-verified read-only bypasses: {files_list}'
-        )
+    """Announce the approved L2 read bypasses, one annotation per file.
+
+    ``--quiet`` prints nothing here: the closing summary carries the count.
+    """
+    if quiet:
         return
     for file_path, reason in escape_hatch_files:
         rel = file_path.relative_to(Path.cwd())
@@ -856,24 +885,7 @@ def _print_pass_summary(
         print(
             f'  ({len(api_import_baseline)} baselined app/api/** import violation(s) — D1 in progress)'
         )
-    counts = (
-        ('twin', 'baselined sync/async twin(s)'),
-        ('model_leak', 'baselined CoreAPI model leak(s)'),
-        ('toctou', 'baselined TOCTOU risk function(s)'),
-        ('bare_emit', 'baselined non-transactional emit(s)'),
-        ('request_scope', 'baselined global endpoint(s)'),
-        ('org_filter', 'baselined escape hatch(es) without org filter'),
-        ('unread_org', 'baselined function(s) taking an organization unread'),
-        ('legality', 'baselined CoreAPI signature legality finding(s)'),
-        ('test_skip', 'registered environmental test skip(s)'),
-        ('tx_ownership', 'baselined mid-stack commit(s)'),
-        ('services_facade', 'listed service place(s) importing the facade'),
-        ('tx_rollback', 'baselined mid-stack rollback(s)'),
-        ('audit_coverage', 'baselined write path(s) without a journal entry'),
-    )
-    for key, label in counts:
-        if baselined[key]:
-            print(f'  ({len(baselined[key])} {label})')
+    _print_baselined_counts(baselined)
 
 
 def _emit_tenancy_checks(*, quiet: bool, baselined: dict[str, list[str]]) -> list[str]:
@@ -890,9 +902,7 @@ def _emit_tenancy_checks(*, quiet: bool, baselined: dict[str, list[str]]) -> lis
         _check_escape_hatch_org_filter(
             APP_ROOT, _load_escape_hatch_org_filter_baseline()
         ),
-        category='escape hatch without org filter',
         quiet=quiet,
-        baseline_file='app/core/escape_hatch_org_filter_baseline.txt',
     )
 
     # 18a. Tenancy: each escape-hatch query must filter on an organization.
@@ -902,9 +912,7 @@ def _emit_tenancy_checks(*, quiet: bool, baselined: dict[str, list[str]]) -> lis
     query_scope_errors = _emit(query_scope_baseline_errors)
     query_scope_hits, baselined['query_scope'] = _emit_baselined(
         _check_escape_hatch_query_scoping(APP_ROOT, query_scope_baseline),
-        category='escape-hatch query without org filter',
         quiet=quiet,
-        baseline_file='app/core/escape_hatch_query_scope_baseline.txt',
     )
     query_scope_errors += query_scope_hits
 
@@ -913,17 +921,13 @@ def _emit_tenancy_checks(*, quiet: bool, baselined: dict[str, list[str]]) -> lis
         _check_public_api_missing_org(
             PUBLIC_API_ROOT, _load_public_api_missing_org_baseline(), MODULES_ROOT
         ),
-        category='public_api method without organization',
         quiet=quiet,
-        baseline_file='app/core/public_api_missing_org_baseline.txt',
     )
 
     # 18c. Tenancy: a function taking the organization must read it.
     unread_org_errors, baselined['unread_org'] = _emit_baselined(
         _check_unread_org_parameter(APP_ROOT, _load_unread_org_parameter_baseline()),
-        category='organization taken and not read',
         quiet=quiet,
-        baseline_file='app/core/unread_org_parameter_baseline.txt',
     )
 
     return [
@@ -1029,7 +1033,6 @@ def _run_checks() -> int:
     # 4. async def with Depends(get_db) — must use get_async_db
     get_db_errors, baselined['get_db'] = _emit_baselined(
         _check_get_db_in_async_def(API_ROOT),
-        category='get_db in async def',
         quiet=args.quiet,
     )
 
@@ -1052,9 +1055,7 @@ def _run_checks() -> int:
             MODULES_ROOT, baseline_modules=_load_module_migrations_baseline()
         )
         + _external_module_migration_errors(),
-        category='module migration gap',
         quiet=args.quiet,
-        baseline_file='app/core/module_migrations_baseline.txt',
     )
 
     # 8. i18n translations for all modules
@@ -1077,9 +1078,7 @@ def _run_checks() -> int:
     # 12. Guardrail: sync/async function twins (foo + foo_async)
     twin_errors, baselined['twin'] = _emit_baselined(
         _check_sync_async_function_twins(APP_ROOT, _load_sync_async_twin_baseline()),
-        category='sync/async twin',
         quiet=args.quiet,
-        baseline_file='app/core/sync_async_twin_baseline.txt',
     )
 
     # 13. Guardrail: CoreAPI model return type leak
@@ -1087,9 +1086,7 @@ def _run_checks() -> int:
         _check_public_api_return_types(
             PUBLIC_API_ROOT, _load_core_api_model_leak_baseline()
         ),
-        category='CoreAPI model leak',
         quiet=args.quiet,
-        baseline_file='app/core/core_api_model_leak_baseline.txt',
     )
 
     # 13a. Guardrail: a public CoreAPI coroutine says so in its name.
@@ -1099,18 +1096,14 @@ def _run_checks() -> int:
     toctou_baseline, toctou_baseline_errors = _load_toctou_risk_baseline()
     toctou_errors, baselined['toctou'] = _emit_baselined(
         _check_toctou_risk(MODULES_ROOT, toctou_baseline),
-        category='TOCTOU risk function',
         quiet=args.quiet,
-        baseline_file='app/core/toctou_risk_baseline.txt',
     )
     toctou_errors += _emit(toctou_baseline_errors + _stale_baseline_errors())
 
     # 14a. Guardrail: emits that are not tied to the transaction they describe.
     bare_emit_errors, baselined['bare_emit'] = _emit_baselined(
         _check_bare_emit(APP_ROOT, _load_bare_emit_baseline()),
-        category='emit outside the transaction',
         quiet=args.quiet,
-        baseline_file='app/core/bare_emit_baseline.txt',
     )
 
     # 14b/14d. Guardrails: an endpoint that touches the DB must hold the
@@ -1171,9 +1164,7 @@ def _run_checks() -> int:
         _check_coreapi_signature_legality(
             PUBLIC_API_ROOT, _load_coreapi_signature_legality_baseline()
         ),
-        category='CoreAPI signature legality',
         quiet=args.quiet,
-        baseline_file='app/core/coreapi_signature_legality_baseline.txt',
     )
 
     # 21. Test hygiene: an assertion may not accept a success and a refusal
@@ -1183,9 +1174,7 @@ def _run_checks() -> int:
         _check_mixed_status_assertions(
             (MODULES_ROOT, TESTS_ROOT), _load_mixed_status_assert_baseline()
         ),
-        category='assertion that cannot fail',
         quiet=args.quiet,
-        baseline_file='app/core/mixed_status_assert_baseline.txt',
     )
 
     # 22. Guardrail: a service, a core module or a vertical module never
@@ -1200,15 +1189,11 @@ def _run_checks() -> int:
     )
     tx_errors, baselined['tx_ownership'] = _emit_baselined(
         commit_findings,
-        category='commit inside the stack',
         quiet=args.quiet,
-        baseline_file='app/core/transaction_ownership_baseline.txt',
     )
     tx_rollback_errors, baselined['tx_rollback'] = _emit_baselined(
         rollback_findings,
-        category='rollback inside the stack',
         quiet=args.quiet,
-        baseline_file='app/core/transaction_rollback_baseline.txt',
     )
 
     # 23. Guardrail: a core service never imports the core_api facade — the
@@ -1220,9 +1205,7 @@ def _run_checks() -> int:
         _check_services_facade_imports(
             SERVICES_ROOT, _load_services_public_api_import_baseline()
         ),
-        category='service importing the facade',
         quiet=args.quiet,
-        baseline_file='app/core/services_public_api_import_baseline.txt',
     )
 
     # 24. Guardrail: every write path reaches the organization journal — a
@@ -1233,9 +1216,7 @@ def _run_checks() -> int:
     audit_baseline, audit_baseline_errors = _load_audit_coverage_baseline()
     audit_errors, baselined['audit_coverage'] = _emit_baselined(
         _check_audit_coverage(APP_ROOT, audit_baseline),
-        category='write path without a journal entry',
         quiet=args.quiet,
-        baseline_file='app/core/audit_coverage_baseline.txt',
     )
     audit_errors += _emit(audit_baseline_errors)
 
@@ -1291,8 +1272,7 @@ def _run_checks() -> int:
         get_db_errors=get_db_errors,
         i18n_errors=i18n_errors,
         i18n_warnings=i18n_warnings,
-        get_db_notices=baselined['get_db'],
-        migration_notices=baselined['migration'],
+        baselined=baselined,
         api_import_baseline=api_import_baseline,
         violations=violations,
     )

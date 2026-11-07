@@ -9,16 +9,17 @@ carried a ``checkout_location_id``, so the path had never produced a record.
 
 These tests pin the requirement itself — one of the two, not both, not the
 name unconditionally. Measured against the reverted fix (``min_length=1``
-back on the schema field, the service check removed): two of the four fail
-— ``location_only`` with a 422 where it wants a 201, and
-``whitespace_is_not_a_name`` with a 422 whose body is Pydantic's, because a
-length cap counts a space as a character.
+back on the schema field, the service check removed): five of the six
+fail. ``location_only`` gets a 422 where it wants a 201;
+``whitespace_is_not_a_name`` gets a 201 and stores a blank holder, because
+``min_length=1`` counts a space as a character and lets the body through,
+and nothing else checks the name; ``neither_person_nor_location``
+and ``the_refusal_is_translated`` get Pydantic's 422, naming a field the
+location mode never shows, where they want this rule's own 400 in the
+reader's language; ``both_person_and_location`` is not refused at all.
 
-The other two pass either way and say so deliberately: ``person_only``
-guards the mode that already worked, and ``neither_person_nor_location``
-describes a refusal both shapes produce — the old one incidentally, by
-demanding a name always and answering 422, this one on purpose and in the
-reader's language.
+Only ``person_only`` passes either way, deliberately: it guards the mode
+that already worked.
 """
 
 from __future__ import annotations

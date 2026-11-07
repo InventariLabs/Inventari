@@ -296,6 +296,8 @@
   },
   "shopping": {
     "add_missing_button": "Fehlende zur Einkaufsliste hinzufügen",
+    "target_list_label": "Auf Liste",
+    "lists_unavailable": "Die Listen konnten nicht geladen werden; die Artikel kommen auf eine neue Liste.",
     "added_toast": "{{count}} Artikel zur Liste „{{list}}“ hinzugefügt",
     "added_toast_one": "1 Artikel zur Liste „{{list}}“ hinzugefügt",
     "added_toast_other": "{{count}} Artikel zur Liste „{{list}}“ hinzugefügt",

@@ -207,6 +207,10 @@ describe("SettingsShell access", () => {
       expect(approvals).toHaveAttribute("href", "/settings/modules/approvals");
       const stats = screen.getByRole("link", { name: "Statistics" });
       expect(stats).toHaveAttribute("href", "/settings/modules/stats");
+      // Approvals and Statistics are not integrations: the group that
+      // holds module settings says what it holds.
+      expect(screen.queryByText(/integrations/i)).toBeNull();
+      expect(screen.getByText("Module settings")).toBeInTheDocument();
     } finally {
       modulesState.enabledModules = ["core", "items"];
     }
@@ -288,6 +292,66 @@ describe("SettingsShell — the mobile nav sheet", () => {
     const close = within(screen.getByRole("dialog")).getByLabelText("Close");
     expect(close.className).toContain("h-11");
     expect(close.className).toContain("w-11");
+  });
+});
+
+describe("SettingsShell — the mobile nav sheet marks and guards its entries", () => {
+  it.each(["/settings", "/settings#people"])(
+    "marks exactly one entry as the current page on %s",
+    async (path) => {
+      const user = userEvent.setup();
+      renderAt(path, "admin", ["admin:access"]);
+
+      await user.click(
+        screen.getByRole("button", {
+          name: path.endsWith("#people") ? "People" : "General",
+        }),
+      );
+
+      const sheet = within(screen.getByRole("dialog"));
+      const current = sheet
+        .getAllByRole("link")
+        .filter((link) => link.getAttribute("aria-current") === "page");
+      expect(current).toHaveLength(1);
+      expect(current[0]).toHaveAccessibleName(
+        path.endsWith("#people") ? "People" : "General",
+      );
+    },
+  );
+
+  it("goes to the people section without asking while General holds unsaved work", async () => {
+    // The section is on the page the reader is already on; nothing is left.
+    const user = userEvent.setup();
+    useFormGuardStore.setState({ dirtyForm: "Ustawienia organizacji" });
+    renderAt("/settings", "admin", ["admin:access"]);
+
+    await user.click(screen.getByRole("button", { name: "General" }));
+    await user.click(
+      within(screen.getByRole("dialog")).getByRole("link", { name: "People" }),
+    );
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByText("general body")).toBeInTheDocument();
+
+    useFormGuardStore.setState({ dirtyForm: null });
+  });
+
+  it("still asks before the sheet leaves the page for another", async () => {
+    const user = userEvent.setup();
+    useFormGuardStore.setState({ dirtyForm: "Ustawienia organizacji" });
+    renderAt("/settings", "admin", ["admin:access"]);
+
+    await user.click(screen.getByRole("button", { name: "General" }));
+    await user.click(
+      within(screen.getByRole("dialog")).getByRole("link", {
+        name: /poczta|email/i,
+      }),
+    );
+
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+
+    useFormGuardStore.setState({ dirtyForm: null });
   });
 });
 

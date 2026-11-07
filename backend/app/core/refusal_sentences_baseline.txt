@@ -25,7 +25,7 @@
 # this ledger's entries raised at 4xx (the 'Internal server error' ones are
 # 500s, never shown) plus value_error_sentences_baseline.txt's client-422
 # group; its client-400 group is empty since those refusals were given
-# catalogue keys, and boot-cli never fires during a request. Both files
+# catalogue keys. Both files
 # count themselves between their BEGIN/END COUNTS lines, so the sizes live
 # there rather than in prose that drifts. Reachability stays what both
 # headers call it: per path, not proven per site.

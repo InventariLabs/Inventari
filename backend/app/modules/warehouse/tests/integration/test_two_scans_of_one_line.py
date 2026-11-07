@@ -19,7 +19,9 @@ assertion and the guard test accepts a scan it should have refused.
 from __future__ import annotations
 
 import asyncio
+import sys
 import uuid
+from collections.abc import Callable, Coroutine, Sequence
 from decimal import Decimal
 from typing import Any, cast
 
@@ -44,31 +46,50 @@ from app.modules.warehouse.tests.integration._records import sow as _sow
 _PARK_TIMEOUT = 15.0  # seconds a racer gets to reach the lock it parks on
 
 
-async def _wait_until_parked(engine: AsyncEngine, racers: int) -> None:
-    """Return once ``racers`` backends of this database wait on a lock.
+async def _backend_pid(session: AsyncSession) -> int:
+    """The server process behind *session*, which keeps it until it ends."""
+    return int(await session.scalar(text('SELECT pg_backend_pid()')))
 
-    A fixed sleep only guesses that each racer has reached its lock; on a
+
+async def _wait_until_parked(
+    engine: AsyncEngine,
+    racer: asyncio.Task[Any],
+    *,
+    racer_pid: int,
+    holder_pid: int | Sequence[int],
+) -> None:
+    """Return once the *racer*'s backend waits on a lock the *holder*'s holds.
+
+    The holder may be several backends when the racer can queue behind
+    another racer for the same row rather than behind the holder itself.
+
+    A fixed sleep only guesses that the racer has reached its lock; on a
     loaded host it had not, and the interleaving the test is built around
-    never happened. The database knows who is waiting, so ask it. Each poll
-    is its own autocommit statement: ``pg_stat_activity`` is a snapshot cached
-    for the length of a transaction, so a probe that kept one open would never
-    see a racer that arrives after its first read.
+    never happened. Counting waiters in ``pg_stat_activity`` took any backend
+    queued on any lock for the racer, and the test then passed without
+    racing. The lock table is asked about the two backends by their numbers,
+    which the caller reads before the racer starts, so it does not matter how
+    late the event loop gets round to the racer.
+
+    A racer that raised is answered by its own exception as soon as it has
+    raised. One that finished without parking never met the holder, so the
+    interleaving the test needs did not happen.
     """
+    holders = [holder_pid] if isinstance(holder_pid, int) else list(holder_pid)
     probe_engine = engine.execution_options(isolation_level='AUTOCOMMIT')
     async with probe_engine.connect() as probe:
         deadline = asyncio.get_running_loop().time() + _PARK_TIMEOUT
-        while True:
-            waiting = await probe.scalar(
-                text(
-                    'SELECT count(*) FROM pg_stat_activity '
-                    "WHERE datname = current_database() AND wait_event_type = 'Lock'"
-                )
-            )
-            if waiting is not None and waiting >= racers:
+        while not racer.done():
+            if await probe.scalar(
+                text('SELECT pg_blocking_pids(:racer) && CAST(:holders AS int[])'),
+                {'holders': holders, 'racer': racer_pid},
+            ):
                 return
             if asyncio.get_running_loop().time() > deadline:
-                raise AssertionError(f'{racers} racer(s) never parked on a lock')
+                raise AssertionError('the racer never parked on the holder')
             await asyncio.sleep(0.02)
+    racer.result()
+    raise AssertionError('the racer finished without parking on the holder')
 
 
 async def _let_racers_finish(*tasks: asyncio.Task[Any]) -> None:
@@ -194,18 +215,26 @@ async def _two_parked_scans(
             select(WmsPickLine).where(WmsPickLine.id == line_id).with_for_update()
         )
 
+        blocker_pid = await _backend_pid(blocker)
+        first_pid = await _backend_pid(first)
+        second_pid = await _backend_pid(second)
+
         tasks: list[asyncio.Task[Any]] = []
         try:
             first_task = asyncio.create_task(
                 scan(first, session_id, org_id, barcode, first_quantity)
             )
             tasks.append(first_task)
-            await _wait_until_parked(engine, 1)
+            await _wait_until_parked(
+                engine, first_task, racer_pid=first_pid, holder_pid=blocker_pid
+            )
             second_task = asyncio.create_task(
                 scan(second, session_id, org_id, barcode, second_quantity)
             )
             tasks.append(second_task)
-            await _wait_until_parked(engine, 2)
+            await _wait_until_parked(
+                engine, second_task, racer_pid=second_pid, holder_pid=first_pid
+            )
         except BaseException:
             await blocker.rollback()
             await _let_racers_finish(*tasks)
@@ -537,6 +566,8 @@ class TestAScanParallelWithAnUndo:
                 await undo_pick_async(
                     undoing, uuid.UUID(session_id), doc_org.id, line_id
                 )
+                undoing_pid = await _backend_pid(undoing)
+                scanning_pid = await _backend_pid(scanning)
                 scan_task = asyncio.create_task(
                     scan_pick_async(
                         scanning,
@@ -547,7 +578,12 @@ class TestAScanParallelWithAnUndo:
                     )
                 )
                 try:
-                    await _wait_until_parked(async_engine_fixture, 1)
+                    await _wait_until_parked(
+                        async_engine_fixture,
+                        scan_task,
+                        racer_pid=scanning_pid,
+                        holder_pid=undoing_pid,
+                    )
                 except BaseException:
                     await undoing.rollback()
                     await _let_racers_finish(scan_task)
@@ -566,33 +602,114 @@ class TestAScanParallelWithAnUndo:
 
 
 @pytest.mark.integration
-class TestTheParkedProbeSeesLateArrivals:
-    def test_a_racer_arriving_after_the_first_poll_is_noticed(
-        self, async_engine_fixture: AsyncEngine, setup_test_db: None
-    ) -> None:
-        """The first poll finds nobody parked; the racer arrives afterwards.
+class TestTheParkedProbeWatchesItsOwnRacer:
+    """The probe answers for the one racer it is given, by backend number."""
 
-        A probe that held one transaction open kept reading its first
-        ``pg_stat_activity`` snapshot and timed out on a waiter that was
-        really there.
+    @staticmethod
+    def _watch(
+        engine: AsyncEngine,
+        racer_work: Callable[[AsyncSession], Coroutine[Any, Any, None]],
+        *,
+        stranger_queues: bool = False,
+    ) -> None:
+        """*racer_work* in a session, while a holder keeps an advisory lock.
+
+        With ``stranger_queues`` another session waits on that lock too, so
+        the database has a backend waiting that is not the racer.
         """
 
         async def _exercise() -> None:
-            key = uuid.uuid4().int % (2**62)
-            lock = text('SELECT pg_advisory_xact_lock(:key)')
-            async with async_engine_fixture.connect() as holder:
-                await holder.execute(lock, {'key': key})
-
-                async def _late_waiter() -> None:
-                    await asyncio.sleep(0.3)
-                    async with async_engine_fixture.connect() as waiter:
-                        await waiter.execute(lock, {'key': key})
-
-                task = asyncio.create_task(_late_waiter())
+            take = text('SELECT pg_advisory_xact_lock(:key)')
+            key = {'key': uuid.uuid4().int % (2**62)}
+            async with (
+                AsyncSession(bind=engine) as holder,
+                AsyncSession(bind=engine) as stranger,
+                AsyncSession(bind=engine) as racing,
+            ):
+                holder_pid = await _backend_pid(holder)
+                stranger_pid = await _backend_pid(stranger)
+                racer_pid = await _backend_pid(racing)
+                await holder.execute(take, key)
+                queued = []
+                if stranger_queues:
+                    queued.append(asyncio.create_task(stranger.execute(take, key)))
+                    await _wait_until_parked(
+                        engine, queued[0], racer_pid=stranger_pid, holder_pid=holder_pid
+                    )
+                racer = asyncio.create_task(racer_work(racing))
                 try:
-                    await _wait_until_parked(async_engine_fixture, 1)
+                    await _wait_until_parked(
+                        engine, racer, racer_pid=racer_pid, holder_pid=holder_pid
+                    )
                 finally:
+                    racer.cancel()
                     await holder.rollback()
-                    await task
+                    await asyncio.gather(racer, *queued, return_exceptions=True)
 
         asyncio.run(_exercise())
+
+    def test_a_racer_arriving_after_the_first_poll_is_noticed(
+        self, async_engine_fixture: AsyncEngine, setup_test_db: None
+    ) -> None:
+        """The first poll finds nobody parked; the racer arrives afterwards."""
+
+        self._watch_late(async_engine_fixture)
+
+    @staticmethod
+    def _watch_late(engine: AsyncEngine) -> None:
+        async def _exercise() -> None:
+            take = text('SELECT pg_advisory_xact_lock(:key)')
+            key = {'key': uuid.uuid4().int % (2**62)}
+            async with (
+                AsyncSession(bind=engine) as holder,
+                AsyncSession(bind=engine) as racing,
+            ):
+                holder_pid = await _backend_pid(holder)
+                racer_pid = await _backend_pid(racing)
+                await holder.execute(take, key)
+
+                async def _late() -> None:
+                    await asyncio.sleep(0.3)
+                    await racing.execute(take, key)
+
+                racer = asyncio.create_task(_late())
+                try:
+                    await _wait_until_parked(
+                        engine, racer, racer_pid=racer_pid, holder_pid=holder_pid
+                    )
+                finally:
+                    await holder.rollback()
+                    await racer
+
+        asyncio.run(_exercise())
+
+    def test_a_racer_that_fails_reports_its_own_failure(
+        self, async_engine_fixture: AsyncEngine, setup_test_db: None
+    ) -> None:
+        async def _breaks(_session: AsyncSession) -> None:
+            raise LookupError('the racer broke')
+
+        with pytest.raises(LookupError, match='the racer broke'):
+            self._watch(async_engine_fixture, _breaks)
+
+    def test_a_racer_that_never_waits_is_said_to_have_finished(
+        self, async_engine_fixture: AsyncEngine, setup_test_db: None
+    ) -> None:
+        async def _free(_session: AsyncSession) -> None:
+            return None
+
+        with pytest.raises(AssertionError, match='finished without parking'):
+            self._watch(async_engine_fixture, _free)
+
+    def test_a_stranger_queueing_on_the_lock_is_not_the_racer(
+        self,
+        async_engine_fixture: AsyncEngine,
+        setup_test_db: None,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        async def _idles(_session: AsyncSession) -> None:
+            await asyncio.sleep(30)
+
+        monkeypatch.setattr(sys.modules[__name__], '_PARK_TIMEOUT', 0.5)
+        with pytest.raises(AssertionError, match='never parked on the holder'):
+            self._watch(async_engine_fixture, _idles, stranger_queues=True)

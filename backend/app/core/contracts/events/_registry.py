@@ -18,6 +18,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from app.core.module_identity import current_module, event_registration_refusal
+from app.core.operator_error import OperatorError
 
 from ._base import EventPayload, EventValidationError, TenantEventPayload
 from ._payloads import (
@@ -143,12 +144,12 @@ def register_payload(event_name: str, model: type[EventPayload]) -> None:
     """
     name = str(event_name)
     if not _EVENT_NAME_RE.match(name):
-        raise ValueError(
+        raise OperatorError(
             f'Event name {name!r} must be namespaced as <module>.<event>, '
             'lowercase, e.g. "warranty.expired".'
         )
     if not isinstance(model, type) or not issubclass(model, EventPayload):
-        raise ValueError(f'Payload for {name!r} must be an EventPayload subclass.')
+        raise OperatorError(f'Payload for {name!r} must be an EventPayload subclass.')
     if name in EVENT_PAYLOAD_TYPES:
         if EVENT_PAYLOAD_TYPES[name] is model:
             # The module re-declares its own event with the very class that
@@ -156,7 +157,7 @@ def register_payload(event_name: str, model: type[EventPayload]) -> None:
             # planned). An ownership claim, not a shadowing attempt — tolerate
             # it as a no-op and keep the core table as the single source.
             return
-        raise ValueError(
+        raise OperatorError(
             f'{name!r} is a core event; its payload is owned by the core contract '
             'and cannot be redefined by a module.'
         )
@@ -173,11 +174,11 @@ def register_payload(event_name: str, model: type[EventPayload]) -> None:
     known_modules = {module.metadata.name for module in module_registry.get_all()}
     refusal = event_registration_refusal(name, known_modules=known_modules)
     if refusal is not None:
-        raise ValueError(refusal)
+        raise OperatorError(refusal)
 
     existing = _RUNTIME_PAYLOAD_TYPES.get(name)
     if existing is not None and existing is not model:
-        raise ValueError(
+        raise OperatorError(
             f'{name!r} is already registered by {existing.__name__}; '
             f'refusing to replace it with {model.__name__}.'
         )

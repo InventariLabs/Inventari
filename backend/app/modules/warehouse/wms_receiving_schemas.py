@@ -40,6 +40,10 @@ class WmsReceiveLineOut(BaseModel):
     #: it is the count somebody wrote down, and the card must not call it
     #: ordered.
     from_order: bool = False
+    #: Whether ``expected_quantity`` is only a count somebody typed on the
+    #: first screen. Receiving more than it is the true count, so the card
+    #: must not warn "more than expected".
+    expected_is_count: bool = False
 
     #: Where this line's goods are going, and who decided — the same fields a
     #: document line carries, filled by the same planner. The office screen

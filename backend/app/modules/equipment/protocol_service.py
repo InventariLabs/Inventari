@@ -165,15 +165,20 @@ async def protocol_placeholders_async(
             sources.append(category.name)
 
     entries = [
-        {
-            'key': f'{{{{custom.{key}}}}}',
-            'description': f'{label} — custom field of {", ".join(sources)}',
-        }
+        PlaceholderInfo(
+            key=f'{{{{custom.{key}}}}}',
+            description=f'{label} — custom field of {", ".join(sources)}',
+            custom_field_label=label,
+            custom_field_categories=sources,
+        )
         for key, (label, sources) in fields.items()
     ]
     return [
-        PlaceholderInfo(key=p['key'], description=p['description'])
-        for p in [*AVAILABLE_PLACEHOLDERS, *entries]
+        *(
+            PlaceholderInfo(key=p['key'], description=p['description'])
+            for p in AVAILABLE_PLACEHOLDERS
+        ),
+        *entries,
     ]
 
 

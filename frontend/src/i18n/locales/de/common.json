@@ -93,6 +93,9 @@
     "seeded_none": "Nichts zu kopieren — jedes integrierte Layout liegt bereits als eigenes vor.",
     "deleteTitle": "Vorlage löschen",
     "example": "Beispiel",
+    "namePlaceholder": "z. B. Übergabeprotokoll des Unternehmens",
+    "htmlInvalid": "Das HTML sieht unausgeglichen aus — prüfen Sie auf nicht geschlossene Tags.",
+    "customFieldOf": "{{label}} — benutzerdefiniertes Feld der Kategorie: {{categories}}",
     "possiblyEmpty": "Kann leer sein",
     "preview_failed": "Dieses Layout lässt sich nicht rendern.",
     "outdatedCopy": "Aus einer älteren Fassung der eingebauten Vorlage erstellt.",
@@ -185,7 +188,7 @@
       "orgName": "Organisationsname",
       "permanentDelete": {
         "title": "Dauerhaftes Löschen",
-        "description": "Erlaubt das dauerhafte Löschen archivierter Produkte. Dies kann nicht rückgängig gemacht werden — für Geschäftsprofile mit geprüftem Bestand standardmäßig deaktiviert.",
+        "description": "Erlaubt das dauerhafte Löschen archivierter Produkte. Dies kann nicht rückgängig gemacht werden — in geschäftlichen Arbeitsbereichen mit geprüftem Bestand standardmäßig deaktiviert.",
         "label": "Dauerhaftes Löschen erlauben",
         "instantSave": "Wird sofort beim Umschalten gespeichert.",
         "confirmTitle": "Endgültiges Löschen erlauben?",
@@ -314,8 +317,8 @@
     },
     "focus": {
       "loading": "Module werden geladen…",
-      "empty": "Keine der Apps, die allein gezeigt werden können, ist eingeschaltet.",
-      "emptyHint": "Nur ein Modul zu zeigen grenzt den Arbeitsbereich auf diese App ein. Schalten Sie eines davon ein und kommen Sie dann hierher zurück.",
+      "empty": "Keines der Module, die allein gezeigt werden können, ist eingeschaltet.",
+      "emptyHint": "Nur ein Modul zu zeigen grenzt den Arbeitsbereich auf dieses Modul ein. Schalten Sie eines davon ein und kommen Sie dann hierher zurück.",
       "stateEnabled": "Aktiviert",
       "stateNotEnabled": "Nicht aktiviert",
       "enableLink": "In „Module“ aktivieren",
@@ -468,8 +471,8 @@
         "line_count": "Zeilen",
         "lines": "Zutatenpositionen",
         "lines_removed": "Zutatenpositionen entfernt",
-        "location": "Standort",
-        "location_details": "Standortdetails",
+        "location": "Lagerort",
+        "location_details": "Lagerortdetails",
         "logo": "Logo",
         "lot_name": "Charge",
         "maintenance_type": "Wartungsart",
@@ -764,7 +767,7 @@
     },
     "shell": {
       "groupAdmin": "Admin",
-      "groupIntegrations": "Integrationen"
+      "groupModuleSettings": "Moduleinstellungen"
     },
     "rbac": {
       "builtInBadge": "Integriert",
@@ -835,7 +838,9 @@
       "unknownModule": "Ein Modul dieses Namens gibt es nicht",
       "unknownModuleHint": "Die Adresse verweist auf ein Modul, das diese Installation nicht hat. Prüfen Sie den Link oder wählen Sie das Modul im Store.",
       "open": "Moduleinstellungen",
-      "saved": "Einstellungen gespeichert"
+      "saved": "Einstellungen gespeichert",
+      "guardName": "Die Moduleinstellungen",
+      "saveFailed": "Die Einstellungen konnten nicht gespeichert werden."
     },
     "modules": {
       "openAppStore": "Module öffnen"
@@ -856,6 +861,8 @@
       "subtitle": "Zustellfehler",
       "none": "Nichts ist verloren gegangen",
       "noneHint": "Jede Nachricht dieser Organisation hat den Server verlassen.",
+      "noneUnsent": "Es wurde nichts versendet",
+      "noneUnsentHint": "Es ist kein Mailserver eingerichtet, daher verlässt keine Nachricht diese Installation – und keine kann scheitern. Richten Sie oben einen ein.",
       "attempts": "{{n}} von {{max}} Versuchen",
       "reason": "Grund: {{reason}}",
       "reasons": {
@@ -969,8 +976,8 @@
     "thisWeek": "Diese Woche",
     "next2Weeks": "Nächste 2 Wochen",
     "thisMonth": "Diesen Monat",
-    "locationCount_one": "{{count}} Standort",
-    "locationCount_other": "{{count}} Standorte",
+    "locationCount_one": "{{count}} Lagerort",
+    "locationCount_other": "{{count}} Lagerorte",
     "recordCount_one": "{{count}} Datensatz",
     "recordCount_other": "{{count}} Datensätze",
     "recordCountMore_one": "mehr als {{count}} Datensatz",
@@ -1085,6 +1092,7 @@
     "onResumesWebhooks_one": "Das Senden wird an 1 gespeicherte Adresse fortgesetzt, sobald das Modul an ist — dieselbe wie vor dem Ausschalten.",
     "onResumesWebhooks_other": "Das Senden wird an {{count}} gespeicherte Adressen fortgesetzt, sobald das Modul an ist — dieselben wie vor dem Ausschalten.",
     "optionalCompanionsHint": "Funktioniert eigenständig — {{names}} zu aktivieren ergänzt die Integration.",
+    "optionalCompanionsOffHint": "Die Integration ist hier nicht verfügbar, solange Sie {{names}} nicht aktivieren.",
     "requiresHint": "Aktivieren Sie zuerst {{names}}.",
     "screensMissing": "Oberfläche fehlt",
     "screensMissingHint": "Seine Seiten wurden hier nicht installiert; das Einschalten fügt nichts hinzu, was sich öffnen ließe. Eine erneute Installation vervollständigt das Modul.",

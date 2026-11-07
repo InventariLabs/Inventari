@@ -172,9 +172,8 @@ that is what the label and the description have to say.
   promised a cleaning that never happens.
 - The workspace mode is labelled "Workspace mode" (Polish *tryb pracy*) wherever a label
   names it. "Profile" in this product means a user profile and a document profile, and the
-  word survives in code and API paths. A few UI strings still say "profile" for a mode (the
-  onboarding status messages, the launcher's workspace switch, one Polish description); the
-  vocabulary baseline holds them until they are swept.
+  word survives in code and API paths. The onboarding status messages, the launcher's
+  workspace switch and the permanent-delete setting all say "workspace mode" now.
 
 ## Domain vocabulary
 
@@ -204,7 +203,7 @@ Rules:
 
 | Concept | en | pl | de | fr | es | Retires | Why |
 |---|---|---|---|---|---|---|---|
-| A place stock is kept — the top level a user opens (`Cold Storage`, `Receiving`) and every node inside it (`Shelf A - Top`, `Bay 3`) | **Location** | Miejsce | Lagerort | Emplacement | Ubicación | storage (as a name for it), place, room, zone, spot, warehouse, shelf (outside shelf life and named shelves); fr stockage; pl magazyn, lokalizacja, miejsce przechowywania | The app had five words for one thing — Storages, storage location, target location, Locations (equipment) and Warehouse. The tree already treats the levels alike; the word does too. "Warehouse" became the name of the module that moves stock. |
+| A place stock is kept — the top level a user opens (`Cold Storage`, `Receiving`) and every node inside it (`Shelf A - Top`, `Bay 3`) | **Location** | Miejsce | Lagerort | Emplacement | Ubicación | storage (as a name for it), place, room, zone, spot, warehouse, shelf (outside shelf life and named shelves); fr stockage; pl magazyn, lokalizacja, miejsce przechowywania; de Standort | The app had five words for one thing — Storages, storage location, target location, Locations (equipment) and Warehouse. The tree already treats the levels alike; the word does too. "Warehouse" became the name of the module that moves stock. |
 | The thing that is stocked | **Product** | Produkt | Produkt | Produit | Producto | item, article, przedmiot | The sidebar said Items over a subtitle that said products (§14.3). |
 | A product's stock row in a location, counted across modules | **Record** | Rekord | Datensatz | Enregistrement | Registro | entry, row (in prose) | Boundary with *asset* written down in "asset vs equipment vs record". |
 | The physical quantity | **On hand** | Na stanie | Bestand | En stock | En existencia | in hand, current stock (as a column) | It is the figure the ledger posts against (ADR-022). |
@@ -248,7 +247,8 @@ What the table does not claim:
   data, not vocabulary.
 - **French is Emplacement.** The container used to be Entrepôt, which is now the module's
   name; the register's filters and the permission labels no longer say "Stockage".
-  German is Lagerort (the module is Lager), Spanish Ubicación (the module is Almacén), Polish
+  German is Lagerort (the module is Lager) in every catalog and in the server's messages and PDF labels —
+  Standort is retired, including inside the equipment module; Spanish Ubicación (the module is Almacén), Polish
   Miejsce (the module is Magazyn).
 
 ## Glossary of contested terms

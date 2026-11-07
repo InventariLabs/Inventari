@@ -19,7 +19,7 @@ app = typer.Typer(
 
 # Sub-Typers (command groups)
 app.add_typer(db_app, name='db', help='Database management (reset, seed, migrate)')
-app.add_typer(user_app, name='user', help='User management (create-admin)')
+app.add_typer(user_app, name='user', help='User management (create-admin, erase)')
 app.add_typer(
     demo_app, name='demo', help='Demo instance (reset — destructive, demo only)'
 )

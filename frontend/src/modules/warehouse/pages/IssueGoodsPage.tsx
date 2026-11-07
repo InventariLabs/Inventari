@@ -147,7 +147,7 @@ function IssueForm({
             type: t(`types.${workspace.docType}`),
           })}
         </p>
-        <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
           {purpose === "customer" && draft.partnersEnabled && (
             <CustomerField draft={draft} />
           )}

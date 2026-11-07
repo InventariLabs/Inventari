@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts.dtos import UserContextDTO
 from app.core.deps import get_async_db, get_current_user_context, require_org
-from app.core.logging import get_logger
 from app.core.module_sdk import PaginatedResponse
 from app.core.public_api import core_api
 
@@ -39,8 +38,6 @@ from .schemas import (
 )
 from .tax_rate_assignment_service import product_tax_rates_async
 from .work_item_service import UNASSIGNED, assemble_work_items_async
-
-logger = get_logger(__name__)
 
 # Read-only query endpoints split out of ``router.py`` to keep that file
 # under the 400-LOC lint limit. The ``require_module('warehouse')``
@@ -157,9 +154,8 @@ async def get_documents_todo(
     # A filter has to look through the sources, not only their first page.
     narrowed = view != 'all' or state is not None or assignee is not None
     reach = _EVERY_ROW if narrowed else page
-    org = current_user.organization
-    approvals_enabled = bool(
-        org is not None and 'approvals' in (org.enabled_modules or [])
+    approvals_enabled = await core_api.organizations.is_module_enabled_async(
+        db, org_id, 'approvals'
     )
     (
         inbound,
@@ -258,7 +254,7 @@ async def list_documents_awaiting_my_approval(
     same read fills To do's *Needs a decision* block, so one rule answers
     both: the approvals module must be on, the reader must hold
     ``approvals:approve`` and the open stage must name them. A disabled
-    module or a failed lookup reads as an empty queue.
+    module reads as an empty queue; a failed lookup is a 500.
     """
     documents, total = await awaiting_approval_documents_async(
         db, org_id, current_user, limit=limit, offset=offset
@@ -301,18 +297,15 @@ async def get_price_hint(
 
     orders = await order_side_async(db, org_id) if partner_id is not None else None
     if partner_id is not None and orders is not None:
-        try:
-            offers = await orders.list_pricelist_for_partner_async(
-                db,
-                org_id,
-                partner_id,
-                product_template_id=template_id,
-            )
-        except Exception as exc:  # noqa: BLE001 — the pricelist module may be off
-            # Graceful degradation: a disabled/empty pricelist module must
-            # not break the hint chain — fall through to last-purchase.
-            logger.info('[doc-queue] price-hint: pricelist lookup failed: %s', exc)
-            offers = []
+        # A switched-off orders module is ``None`` above, and an empty
+        # pricelist is an empty list: what the lookup raises is a defect, and
+        # falling through to the last purchase would suggest another price.
+        offers = await orders.list_pricelist_for_partner_async(
+            db,
+            org_id,
+            partner_id,
+            product_template_id=template_id,
+        )
         if offers:
             best = min(offers, key=lambda o: o.unit_price)
             return PriceHintResponse(

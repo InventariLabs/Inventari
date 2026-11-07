@@ -27,6 +27,8 @@ export interface PermissionGroup {
   id: string;
   /** Technical module name; absent for the system group. */
   module?: string;
+  /** The manifest's name for the module, the label's last resort. */
+  displayName?: string | null;
   permissions: PermissionDefinition[];
 }
 
@@ -48,6 +50,7 @@ export function permissionGroups(
     ...catalog.modules.map((m) => ({
       id: m.module,
       module: m.module,
+      displayName: m.display_name,
       permissions: m.permissions,
     })),
   ].filter((g) => g.permissions.length > 0);

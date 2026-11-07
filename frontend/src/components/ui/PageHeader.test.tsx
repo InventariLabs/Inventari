@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, it, expect } from "vitest";
 import { MemoryRouter, useLocation } from "react-router-dom";
@@ -101,6 +101,10 @@ describe("PageHeader back arrow", () => {
       await screen.findByRole("button", { name: "Leave anyway" }),
     );
 
-    expect(screen.getByTestId("where")).toHaveTextContent(/^\/orders$/);
+    // The navigation lands a tick after the click resolves, in the confirm
+    // promise's continuation; reading the path immediately races the router.
+    await waitFor(() =>
+      expect(screen.getByTestId("where")).toHaveTextContent(/^\/orders$/),
+    );
   });
 });

@@ -731,7 +731,7 @@
     "numberPaddingDigits": "{{count}} cyfry",
     "typeLabels": "Etykiety typów dokumentów",
     "defaultCurrency": "Domyślna waluta (ISO 4217)",
-    "approvalWorkflow": "Ścieżka akceptacji",
+    "approvalWorkflow": "Przepływ akceptacji",
     "approvalWorkflowHint": "Wymagaj akceptacji przed realizacją dokumentów o wysokiej wartości lub wrażliwych. Decyduje uprawnienie „Akceptacja zgłoszeń”, a nie nazwa roli — akceptować może każda rola, która je niesie, także własna.",
     "approvalHowItWorks": "Te ustawienia mówią, co wymaga akceptacji: typ z listy poniżej albo wartość netto powyżej progu. Kto akceptuje, mówi przepływ dokumentów — a aktywny przepływ przy pustych ustawieniach tutaj oznacza, że czeka każdy potwierdzony dokument. Zamówienia zakupu dzielą to tak samo, wybierając „zawsze” albo kwotę netto zamiast listy typów. Zanim dokument czekający na akceptację będzie można zrealizować i wykonać operacje magazynowe, musi go zaakceptować ktoś z uprawnieniem „Akceptacja zgłoszeń”.",
     "approvalConsequenceModuleOff": "Przy wyłączonym module Akceptacji żaden dokument nie czeka — potwierdzenie wykonuje się od razu.",
@@ -2037,6 +2037,7 @@
       "tracking": "Linki do śledzenia",
       "presets": "Gotowe ustawienia"
     },
+    "sectionRefused": "niezapisane – serwer to odrzucił",
     "nav": "Sekcje konfiguracji",
     "related": "Powiązane ekrany",
     "advanced": {
@@ -2239,6 +2240,7 @@
     "heldWhy": "Powód",
     "lot": "Partia",
     "expiry": "Data ważności",
+    "expiryNeeded": "Wymagana dla tego produktu",
     "emptyTitle": "Nic jeszcze nie zeskanowano",
     "emptyHint": "Zeskanuj produkt albo wybierz dostawcę z oczekującym zamówieniem.",
     "emptyHintAny": "Zeskanuj produkt, potem wpisz, ile przyszło.",
@@ -2276,6 +2278,7 @@
       "noPartner": "Wybierz dostawcę.",
       "noCustomer": "Wybierz klienta.",
       "postFailed": "Nie udało się przyjąć dostawy.",
+      "needsExpiry": "Brakuje daty ważności: {{products}}. Wpisz ją w „Partia i data ważności” przy pozycji.",
       "openPartner": "Otwórz kontrahenta",
       "saveFailed": "Nie udało się zapisać szkicu.",
       "previewFailed": "Nie udało się ustalić, gdzie trafią pozycje. Plan powstanie z reguł przy przyjęciu.",

@@ -1,10 +1,18 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import ForgotPasswordPage from "./ForgotPasswordPage";
 import { authApi } from "@/lib/api/auth";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/authStore";
+import type { AuthState } from "@/store/authStore";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -72,5 +80,17 @@ describe("ForgotPasswordPage", () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("This is the public demo.");
     });
+  });
+
+  it("says a session is live when the reader is already signed in", () => {
+    expect(screen.queryByTestId("signed-in-notice")).toBeNull();
+    act(() =>
+      useAuthStore.setState({
+        user: { email: "tomas@example.com" } as AuthState["user"],
+        isAuthenticated: true,
+      }),
+    );
+    expect(screen.getByTestId("signed-in-notice")).toBeInTheDocument();
+    act(() => useAuthStore.setState({ user: null, isAuthenticated: false }));
   });
 });

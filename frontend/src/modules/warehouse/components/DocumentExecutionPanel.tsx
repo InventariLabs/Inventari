@@ -14,7 +14,10 @@ import {
   shipmentError,
   shipmentPayload,
 } from "./shipping/shipmentDraft";
-import { useDocumentExecution } from "@/modules/warehouse/hooks/useDocumentExecution";
+import {
+  typedDoneQuantity,
+  useDocumentExecution,
+} from "@/modules/warehouse/hooks/useDocumentExecution";
 import { getDocumentLineStatus } from "@/modules/warehouse/lineStatus";
 import type {
   DocumentCompletePayload,
@@ -164,7 +167,7 @@ export function DocumentExecutionPanel({
       <div className="space-y-3">
         {document.lines.map((line) => {
           const currentDoneQty = Number(
-            exec.values[line.id] ?? line.expected_quantity ?? line.quantity,
+            typedDoneQuantity(exec.values, line.id),
           );
           const expectedQty = Number(line.expected_quantity ?? line.quantity);
 

@@ -14,6 +14,16 @@ const DEFAULT_MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 export const IMAGE_UPLOAD_MAX_BYTES = 10 * 1024 * 1024;
 
 /**
+ * What a file picker for an attachment offers — the item's file field and
+ * the equipment record's papers. Hand-synced with the one type list the
+ * backend accepts (`ATTACHMENT_CONTENT_TYPES` in
+ * `backend/app/core/upload_validation.py`): no `.doc`, which the server
+ * refuses. `image/*` rather than four extensions keeps the phone's camera
+ * on offer; the server still decides which images pass.
+ */
+export const ATTACHMENT_FILE_ACCEPT = "image/*,.pdf,.txt,.zip,.docx,.xls,.xlsx";
+
+/**
  * Whether the file is small enough, and a toast saying so when it is not.
  *
  * The message goes through i18n rather than a template literal: this runs

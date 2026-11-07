@@ -1907,6 +1907,7 @@
       "tracking": "Tracking links",
       "presets": "Ready-made setup"
     },
+    "sectionRefused": "not saved — the server refused it",
     "nav": "Configuration sections",
     "related": "Related screens",
     "advanced": {
@@ -2081,6 +2082,7 @@
     "heldWhy": "Why",
     "lot": "Lot",
     "expiry": "Expiry",
+    "expiryNeeded": "Needed for this product",
     "emptyTitle": "Nothing scanned yet",
     "emptyHint": "Scan a product, or choose a supplier with a waiting order.",
     "emptyHintAny": "Scan a product, then say how many came.",
@@ -2114,6 +2116,7 @@
       "noPartner": "Choose the supplier.",
       "noCustomer": "Choose the customer.",
       "postFailed": "Could not receive the delivery.",
+      "needsExpiry": "Expiry date needed for: {{products}}. Enter it under Lot and expiry on the row.",
       "openPartner": "Open the partner",
       "saveFailed": "Could not save the draft.",
       "previewFailed": "Could not work out where the lines go. The plan will follow the rules when you post.",

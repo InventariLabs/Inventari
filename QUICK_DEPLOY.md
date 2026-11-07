@@ -115,6 +115,9 @@ installations meet are:
   before the instance goes public.
 - `SOURCE_CODE_URL` — leave empty unless you run a modified version; then
   AGPL-3.0 §13 requires it to point at your own source.
+- `DEFAULT_LANGUAGE` — `pl`, `de`, `fr` or `es` in place of English for an
+  account created without a language of its own (the administrator of Step 5
+  included) and for a request that names no language the server speaks.
 
 The comment above each variable in the file says what it does.
 

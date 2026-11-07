@@ -92,7 +92,7 @@ export default function RolesPage() {
     return group.module
       ? moduleLabels({
           name: group.module,
-          display_name: group.module,
+          display_name: group.displayName ?? group.module,
           description: "",
         }).name
       : t("settings.rbac.systemGroup");

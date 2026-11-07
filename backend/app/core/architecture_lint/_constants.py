@@ -165,3 +165,17 @@ def _is_model_file(file_path: Path) -> bool:
     if file_path.name == 'models.py':
         return True
     return file_path.parent.name == 'models'
+
+
+def _is_alembic_env(py_file: Path, root: Path) -> bool:
+    """True for Alembic ``migrations/env.py`` files.
+
+    Migration tooling imports ``Base.metadata`` for schema operations but
+    never queries tenant data, so the org-filter requirement does not apply
+    (carve-out S-2026-08-01), and the file is neither a boundary violation
+    nor an L2 read bypass: it needs no escape-hatch marker.
+
+    Read below ``root``: a checkout under a directory named ``migrations``
+    would otherwise hand this carve-out to every ``env.py`` in the tree.
+    """
+    return py_file.name == 'env.py' and 'migrations' in _rel_parts(py_file, root)

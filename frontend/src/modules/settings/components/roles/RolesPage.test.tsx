@@ -96,6 +96,36 @@ describe("RolesPage", () => {
     expect(within(row).getByText("4")).toBeInTheDocument();
   });
 
+  it("names a module that has no translation by its manifest, not its identifier", async () => {
+    // A scaffolded or community module has no entry in the modules catalog;
+    // the technical name used to stand in for it.
+    server.use(
+      http.get("*/roles/permission-catalog", () =>
+        HttpResponse.json({
+          system: [],
+          modules: [
+            {
+              module: "review_probe",
+              display_name: "Review Probe",
+              permissions: [perm("review_probe:read")],
+            },
+          ],
+        }),
+      ),
+      http.get("*/roles", () =>
+        HttpResponse.json(
+          onePage([{ ...ROLE, permissions: ["review_probe:read"] }]),
+        ),
+      ),
+    );
+    renderPage();
+
+    const table = await screen.findByTestId("roles-table");
+    const row = within(table).getByText("Warehouse operator").closest("tr")!;
+    expect(within(row).getByText(/Review Probe/)).toBeInTheDocument();
+    expect(within(row).queryByText(/review_probe/)).toBeNull();
+  });
+
   it("renders the same records as cards for a phone", async () => {
     withRoles([ROLE]);
     renderPage();

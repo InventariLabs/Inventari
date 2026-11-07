@@ -95,7 +95,7 @@ function MoveForm({
   return (
     <>
       <Card className="space-y-4 p-4 md:p-6">
-        <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
           <LocationField
             id="move-source"
             label={t("fields.sourceLocation")}

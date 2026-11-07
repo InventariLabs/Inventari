@@ -8,7 +8,8 @@
     "needsAttention_other": "demandent votre attention"
   },
   "actions": {
-    "stockTakesInProgress": "Inventaires en cours"
+    "stockTakesInProgress": "Inventaires en cours",
+    "stockTakesUnavailable": "Les inventaires en cours n'ont pas pu être vérifiés"
   },
   "nav": {
     "overview": "Aperçu",
@@ -147,7 +148,7 @@
       "location": "Emplacement",
       "anyLocation": "Partout",
       "includeEmpty": "Inclure les emplacements à zéro",
-      "includeEmptyHint": "Affiche les lignes de stock dont la quantité est nulle — la trace de ce qui était ici. Un emplacement qui n'a jamais porté le produit n'a aucune ligne.",
+      "includeEmptyHint": "Affiche les enregistrements dont la quantité est nulle — la trace de ce qui était ici. Un emplacement qui n'a jamais porté le produit n'a aucun enregistrement.",
       "oneStorage": "un emplacement",
       "oneProduct": "un produit"
     },
@@ -166,8 +167,8 @@
     "whereItLies": "Où il se trouve",
     "seeForProduct": "Dans tous les emplacements",
     "seeForLocation": "Niveaux de stock de cet emplacement",
-    "rows_one": "ligne de stock",
-    "rows_other": "lignes de stock"
+    "rows_one": "enregistrement",
+    "rows_other": "enregistrements"
   },
   "lots": {
     "title": "Lots",
@@ -185,7 +186,8 @@
       "message": "La raison reste attachée au lot et apparaît à côté de son statut.",
       "label": "Pourquoi",
       "placeholder": "Avis fournisseur 41/26 — verre trouvé dans le pot 12",
-      "confirm": "Changer le statut"
+      "confirm": "Changer le statut",
+      "failed": "Impossible de changer le statut du lot"
     },
     "actionsFor": "Actions pour le lot {{name}}",
     "columns": {

@@ -102,13 +102,13 @@ function GuardHarness({ onNavigate }: { onNavigate: () => void }) {
   );
 }
 
-function renderPage(onNavigate: () => void = vi.fn()) {
+function renderPage(onNavigate: () => void = vi.fn(), entry = "/") {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[entry]}>
         <DocumentProfileSettingsPage />
         <GuardHarness onNavigate={onNavigate} />
       </MemoryRouter>
@@ -862,5 +862,95 @@ describe("DocumentProfileSettingsPage — a preset asks before it overwrites", (
       default_unit: "pcs",
     });
     expect(toastError).not.toHaveBeenCalled();
+  });
+});
+
+describe("DocumentProfileSettingsPage — after the one-Save rework", () => {
+  it("drops an unsaved print-layout pick when a preset rewrites the row", async () => {
+    const puts: unknown[] = [];
+    const applied = { ...profile, name: "Simple", print_template: "pl_pz" };
+    server.use(
+      http.get("*/warehouse/profile/presets", () =>
+        HttpResponse.json(["Simple"]),
+      ),
+      http.post("*/warehouse/profile/apply-preset/:name", () =>
+        HttpResponse.json(applied),
+      ),
+      http.put("*/warehouse/profile", async ({ request }) => {
+        puts.push(await request.json());
+        return HttpResponse.json(applied);
+      }),
+    );
+    renderPage();
+    await openSection("Printouts");
+    await userEvent.selectOptions(
+      await screen.findByRole("combobox", { name: "Print layout" }),
+      "auto",
+    );
+    expect(await saveButton()).toBeInTheDocument();
+
+    await openSection("Ready-made setup");
+    await userEvent.selectOptions(
+      await screen.findByRole("combobox", { name: "Apply preset" }),
+      "Simple",
+    );
+
+    // The preset's layout stands; the old pick is not waiting to overwrite it.
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: "Save" })).toBeNull(),
+    );
+    await openSection("Printouts");
+    expect(screen.getByRole("combobox", { name: "Print layout" })).toHaveValue(
+      "pl_pz",
+    );
+    expect(puts).toHaveLength(0);
+  });
+
+  it("marks the section whose edit the server refused", async () => {
+    vi.spyOn(toast, "error").mockImplementation(() => "");
+    server.use(
+      http.put("*/warehouse/profile", () =>
+        HttpResponse.json(
+          { detail: "The tracking link for Acme is not a web address." },
+          { status: 400 },
+        ),
+      ),
+    );
+    renderPage();
+    await openSection("Tracking links");
+    await userEvent.click(
+      screen.getByRole("button", { name: "Add a carrier" }),
+    );
+    await userEvent.type(screen.getByLabelText("Carrier"), "Acme");
+    fireEvent.change(screen.getByLabelText("Tracking link"), {
+      target: { value: "acme" },
+    });
+    await openSection("Receiving and scanning");
+    expect(
+      screen.getByRole("tab", { name: "Tracking links" }),
+    ).not.toHaveTextContent(/not saved/i);
+
+    await userEvent.click(await saveButton());
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("tab", { name: /Tracking links/ }),
+      ).toHaveTextContent(/not saved/i),
+    );
+    // The section that was saved is not accused.
+    expect(
+      screen.getByRole("tab", { name: "Receiving and scanning" }),
+    ).not.toHaveTextContent(/not saved/i);
+  });
+
+  it("brings the tab a ?section= link opens on into view", async () => {
+    const scrollIntoView = vi.fn();
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    renderPage(vi.fn(), "/?section=numbering");
+    await screen.findByDisplayValue(profile.numbering_format);
+
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+    const target = scrollIntoView.mock.instances.at(-1) as HTMLElement;
+    expect(target).toHaveTextContent("Numbering and prices");
   });
 });

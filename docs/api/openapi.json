@@ -7873,7 +7873,7 @@
           "Items"
         ],
         "summary": "Get Archived Items",
-        "description": "List of archived (soft-deleted) products, scoped by module context.",
+        "description": "Archived (soft-deleted) products, newest archived first, scoped by module context.",
         "operationId": "get_archived_items_api_v1_items_archived_get",
         "security": [
           {
@@ -7885,17 +7885,6 @@
         ],
         "parameters": [
           {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "title": "Offset"
-            }
-          },
-          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -7906,6 +7895,37 @@
               "default": 50,
               "title": "Limit"
             }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's next_cursor: the page that follows it. The cost of a page stays its size however long the archive grows, and the count is taken on the first page and carried, so it does not move.",
+              "title": "Cursor"
+            },
+            "description": "The previous page's next_cursor: the page that follows it. The cost of a page stays its size however long the archive grows, and the count is taken on the first page and carried, so it does not move."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Deprecated: counts rows from the top on every call, so a deep page costs every row above it. Page with `cursor`.",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Deprecated: counts rows from the top on every call, so a deep page costs every row above it. Page with `cursor`."
           },
           {
             "name": "context_tag",
@@ -30690,7 +30710,7 @@
           "Warehouse"
         ],
         "summary": "List Documents Awaiting My Approval",
-        "description": "List documents the current user can act on (PENDING/IN_PROGRESS).\n\nPowers the \"Do akceptacji\" submenu in the Documents module \u2014 approvers\nsee only what they can act on without leaving the document context. The\nsame read fills To do's *Needs a decision* block, so one rule answers\nboth: the approvals module must be on, the reader must hold\n``approvals:approve`` and the open stage must name them. A disabled\nmodule or a failed lookup reads as an empty queue.",
+        "description": "List documents the current user can act on (PENDING/IN_PROGRESS).\n\nPowers the \"Do akceptacji\" submenu in the Documents module \u2014 approvers\nsee only what they can act on without leaving the document context. The\nsame read fills To do's *Needs a decision* block, so one rule answers\nboth: the approvals module must be on, the reader must hold\n``approvals:approve`` and the open stage must name them. A disabled\nmodule reads as an empty queue; a failed lookup is a 500.",
         "operationId": "list_documents_awaiting_my_approval_api_v1_warehouse_awaiting_my_approval_get",
         "security": [
           {
@@ -35318,6 +35338,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 2100,
+              "minimum": 2000,
               "title": "Year"
             }
           },
@@ -35327,6 +35349,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 12,
+              "minimum": 1,
               "title": "Month"
             }
           }
@@ -35394,6 +35418,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 2100,
+              "minimum": 2000,
               "title": "Year"
             }
           },
@@ -35403,6 +35429,8 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "maximum": 12,
+              "minimum": 1,
               "title": "Month"
             }
           }
@@ -35673,10 +35701,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Narrow a stock search to this location and the ones under it. On its own it also selects the stock search, for callers written before the explicit flag.",
+              "description": "Narrow a stock search to this location. A shelf is exact: only its own records. A zone also offers the shelves below it. On its own it also selects the stock search, for callers written before the explicit flag.",
               "title": "Location Id"
             },
-            "description": "Narrow a stock search to this location and the ones under it. On its own it also selects the stock search, for callers written before the explicit flag."
+            "description": "Narrow a stock search to this location. A shelf is exact: only its own records. A zone also offers the shelves below it. On its own it also selects the stock search, for callers written before the explicit flag."
           },
           {
             "name": "stock",
@@ -41889,6 +41917,17 @@
             "type": "boolean",
             "title": "Total Capped",
             "default": false
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
           }
         },
         "type": "object",
@@ -41897,7 +41936,7 @@
           "total"
         ],
         "title": "ArchivedItemListResponse",
-        "description": "Paginated response for the archived items list endpoint."
+        "description": "A page of the archived items list, paged by the last row seen."
       },
       "ArchivedItemSchema": {
         "properties": {
@@ -53922,8 +53961,9 @@
         "properties": {
           "text": {
             "type": "string",
+            "maxLength": 52428800,
             "title": "Text",
-            "description": "Raw pasted clipboard text.",
+            "description": "Raw pasted clipboard text, no longer than an imported file may be.",
             "default": ""
           },
           "mapping_json": {
@@ -64936,8 +64976,9 @@
         "properties": {
           "text": {
             "type": "string",
+            "maxLength": 52428800,
             "title": "Text",
-            "description": "Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected.",
+            "description": "Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected. No longer than an imported file may be.",
             "default": ""
           }
         },
@@ -66693,6 +66734,31 @@
               }
             ],
             "title": "Document Types"
+          },
+          "custom_field_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Field Label"
+          },
+          "custom_field_categories": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Field Categories"
           }
         },
         "type": "object",
@@ -66701,7 +66767,7 @@
           "description"
         ],
         "title": "PlaceholderInfo",
-        "description": "A field a template author can print in a user template.\n\n``key`` is the literal Jinja2 expression (e.g. ``{{partner.name}}``),\n``example`` a representative rendered value, ``possibly_empty`` marks\nfields that are absent for some documents, and ``document_types`` names\nthe document types the field belongs to (``None`` = any type)."
+        "description": "A field a template author can print in a user template.\n\n``key`` is the literal Jinja2 expression (e.g. ``{{partner.name}}``),\n``example`` a representative rendered value, ``possibly_empty`` marks\nfields that are absent for some documents, and ``document_types`` names\nthe document types the field belongs to (``None`` = any type). A category\ncustom field also carries its ``custom_field_label`` and the\n``custom_field_categories`` that define it, apart from the English\n``description``, so a client can phrase the sentence in its own language."
       },
       "PreviewIngredient": {
         "properties": {
@@ -67709,17 +67775,28 @@
             ],
             "title": "Serial Number"
           },
-          "created_at": {
+          "added_date": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "date"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Created At"
+            "title": "Added Date"
+          },
+          "merged": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merged"
           },
           "location_name": {
             "anyOf": [
@@ -72693,8 +72770,9 @@
         "properties": {
           "text": {
             "type": "string",
+            "maxLength": 52428800,
             "title": "Text",
-            "description": "Raw pasted clipboard text.",
+            "description": "Raw pasted clipboard text, no longer than an imported file may be.",
             "default": ""
           },
           "mapping_json": {
@@ -76246,6 +76324,17 @@
               }
             ],
             "title": "Preferred Partner Id"
+          },
+          "preferred_partner_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Partner Name"
           },
           "notes": {
             "anyOf": [
@@ -86247,6 +86336,11 @@
             "title": "From Order",
             "default": false
           },
+          "expected_is_count": {
+            "type": "boolean",
+            "title": "Expected Is Count",
+            "default": false
+          },
           "planned_location_id": {
             "anyOf": [
               {
@@ -87823,6 +87917,10 @@
       },
       "_GeneratedItem": {
         "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
           "name": {
             "type": "string",
             "title": "Name"
@@ -87879,6 +87977,7 @@
         },
         "type": "object",
         "required": [
+          "key",
           "name",
           "quantity"
         ],

@@ -4,7 +4,10 @@ import type { TFunction } from "i18next";
 import i18n from "@/i18n/config";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
 import type { LabelScanView } from "@/types";
-import { useDocumentExecution } from "./useDocumentExecution";
+import {
+  typedDoneQuantity,
+  useDocumentExecution,
+} from "./useDocumentExecution";
 import { useDocumentScanResult } from "./useDocumentScanResult";
 
 const t = ((key: string) => key) as unknown as TFunction;
@@ -38,6 +41,36 @@ function renderExecution() {
     useDocumentExecution({ document: doc, onSubmit: vi.fn(), t }),
   );
 }
+
+describe("useDocumentExecution — how much is done", () => {
+  const withDone = (done: string) =>
+    ({
+      ...doc,
+      lines: [{ ...doc.lines[0], done_quantity: done }],
+    }) as unknown as WarehouseDocument;
+
+  it("starts a line nobody has received on zero, not on the full quantity", () => {
+    const untouched = withDone("0.000");
+    const { result } = renderHook(() =>
+      useDocumentExecution({ document: untouched, onSubmit: vi.fn(), t }),
+    );
+
+    expect(typedDoneQuantity(result.current.values, "line-1")).toBe("0");
+  });
+
+  it("starts a line on what the server reports as done, padding stripped", () => {
+    const partial = withDone("4.000");
+    const { result } = renderHook(() =>
+      useDocumentExecution({ document: partial, onSubmit: vi.fn(), t }),
+    );
+
+    expect(typedDoneQuantity(result.current.values, "line-1")).toBe("4");
+  });
+
+  it("answers zero for a line with no entry yet, the one answer every reader shares", () => {
+    expect(typedDoneQuantity({}, "line-1")).toBe("0");
+  });
+});
 
 describe("useDocumentExecution — the recently-scanned mark", () => {
   it("does not mark a line whose quantity was typed", () => {

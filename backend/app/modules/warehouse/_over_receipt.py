@@ -30,6 +30,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from contextlib import contextmanager
 from decimal import Decimal, InvalidOperation
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,6 +40,9 @@ from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message, stated_quantity
 
 from ._order_side import order_side_async
+
+if TYPE_CHECKING:
+    from .models import DocumentLine
 
 #: The organization setting this module reads. Stored under
 #: ``module:warehouse`` through the module settings schema.
@@ -53,6 +57,20 @@ CEILING_SETTING_KEY = 'over_receipt_ceiling_percent'
 #: label in the reader's language — a sentence stored beside it would reach
 #: every reader in English.
 SURPLUS_CODE = 'SURPLUS'
+
+
+def is_surplus(
+    doc_line: DocumentLine | None, quantity: Decimal, expected: Decimal
+) -> bool:
+    """Whether *quantity* is goods beyond what somebody promised.
+
+    A line whose expected quantity is only a count somebody typed
+    (``expected_is_count``) promised nothing, so receiving more than it is the
+    true count, not a surplus from the supplier.
+    """
+    if doc_line is not None and doc_line.expected_is_count:
+        return False
+    return quantity > expected
 
 
 async def over_receipt_tolerance_percent_async(

@@ -119,6 +119,6 @@ describe("useAddressMatchesDirectory — a register that did not answer", () => 
     });
 
     await waitFor(() => expect(mockedGetMembers).toHaveBeenCalledTimes(1));
-    expect(view.result.current).toBe(false);
+    expect(view.result.current.unmatched).toBe(false);
   });
 });

@@ -454,6 +454,9 @@ services:
       # published a contact.
       OPERATOR_NAME: ${OPERATOR_NAME:-}
       OPERATOR_CONTACT: ${OPERATOR_CONTACT:-}
+      # The language an account created without one starts in, and the one
+      # a request naming no language is answered in (.env.example).
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en}
     volumes:
       - uploads_data:/app/uploads
       # Community modules are deployment state, not image content. Mounting

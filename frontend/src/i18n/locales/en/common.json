@@ -93,6 +93,9 @@
     "seeded_none": "Nothing to copy — every built-in layout is already here as your own.",
     "deleteTitle": "Delete template",
     "example": "Example",
+    "namePlaceholder": "e.g. Company Handover Protocol",
+    "htmlInvalid": "The HTML looks unbalanced — check for unclosed tags.",
+    "customFieldOf": "{{label}} — custom field of {{categories}}",
     "possiblyEmpty": "May be empty",
     "preview_failed": "This layout does not render.",
     "outdatedCopy": "Made from an older version of the built-in layout.",
@@ -185,7 +188,7 @@
       "orgName": "Organization name",
       "permanentDelete": {
         "title": "Permanent deletion",
-        "description": "Allows permanently deleting archived products. This cannot be undone — off by default for business profiles with audited inventory.",
+        "description": "Allows permanently deleting archived products. This cannot be undone — off by default in business workspace modes with audited inventory.",
         "label": "Allow permanent deletion",
         "instantSave": "Saved as soon as you switch it.",
         "confirmTitle": "Allow permanent deletion?",
@@ -314,8 +317,8 @@
     },
     "focus": {
       "loading": "Loading modules…",
-      "empty": "None of the apps that can be shown on their own is switched on yet.",
-      "emptyHint": "Showing just one module narrows the workspace to that app. Switch one of these on, then come back here.",
+      "empty": "None of the modules that can be shown on their own is switched on yet.",
+      "emptyHint": "Showing just one module narrows the workspace to that module. Switch one of these on, then come back here.",
       "stateEnabled": "Enabled",
       "stateNotEnabled": "Not enabled",
       "enableLink": "Enable in Modules",
@@ -764,7 +767,7 @@
     },
     "shell": {
       "groupAdmin": "Admin",
-      "groupIntegrations": "Integrations"
+      "groupModuleSettings": "Module settings"
     },
     "rbac": {
       "builtInBadge": "Built-in",
@@ -835,7 +838,9 @@
       "unknownModule": "There is no module by that name",
       "unknownModuleHint": "The address points at a module this installation does not have. Check the link, or pick the module from the store.",
       "open": "Module settings",
-      "saved": "Settings saved"
+      "saved": "Settings saved",
+      "guardName": "The module settings",
+      "saveFailed": "The settings could not be saved."
     },
     "modules": {
       "openAppStore": "Open Modules"
@@ -856,6 +861,8 @@
       "subtitle": "Delivery failures",
       "none": "Nothing was lost",
       "noneHint": "Every message this organization sent has left the building.",
+      "noneUnsent": "Nothing has been sent",
+      "noneUnsentHint": "No mail server is configured, so no message leaves this installation — and none can fail. Set one up above.",
       "attempts": "{{n}} of {{max}} attempts",
       "reason": "Reason: {{reason}}",
       "reasons": {
@@ -1085,6 +1092,7 @@
     "onResumesWebhooks_one": "Sending resumes to 1 saved address as soon as this is on — the same one it was sending to before it was switched off.",
     "onResumesWebhooks_other": "Sending resumes to {{count}} saved addresses as soon as this is on — the same ones it was sending to before it was switched off.",
     "optionalCompanionsHint": "Works on its own — switching on {{names}} adds the integration.",
+    "optionalCompanionsOffHint": "The integration is unavailable here until you switch on {{names}}.",
     "requiresHint": "Switch on {{names}} first.",
     "screensMissing": "Screens missing",
     "screensMissingHint": "Its pages did not install here, so switching it on adds nothing you can open. Reinstalling the module completes it.",

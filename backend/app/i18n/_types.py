@@ -461,6 +461,7 @@ class ErrorMessages(TypedDict):
     approval_only_requester_can_cancel: str
     approval_workflow_inactive: str
     approval_request_already_open: str
+    approval_target_not_found: str
     approval_workflow_no_stages: str
     approval_workflow_needs_stage: str
     approval_workflow_modify_blocked: str

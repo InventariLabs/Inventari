@@ -399,7 +399,9 @@ export const itemsApi = {
     // the records saved without one. A module's Archive asks this, not
     // context_tag, which alone loses exactly those records.
     module_scope?: string;
-    offset?: number;
+    // The previous page's `next_cursor`: the archive pages by the last row
+    // seen, so a deep page costs what the first one does.
+    cursor?: string;
     limit?: number;
     search?: string;
   }): Promise<ArchivedItemListResponse> => {

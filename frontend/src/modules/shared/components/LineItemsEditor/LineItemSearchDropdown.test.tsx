@@ -10,7 +10,7 @@
  * those prints through a label passed down from the editor, so the tests
  * below render the dropdown the way the row does, labels included.
  */
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, afterEach } from "vitest";
 
@@ -280,7 +280,7 @@ describe("LineItemSearchDropdown — the overlay stack can see the panel", () =>
   });
 });
 
-describe("LineItemSearchDropdown — twins created the same day", () => {
+describe("LineItemSearchDropdown — twins added the same day", () => {
   const base = {
     product_template_id: "t-1",
     name: "RV2172 Twin",
@@ -290,7 +290,7 @@ describe("LineItemSearchDropdown — twins created the same day", () => {
     image_url: null,
     uom_id: null,
     available_quantity: null as number | null,
-    created_at: "2026-09-15T21:56:42.973Z",
+    added_date: "2026-09-15",
   };
 
   it("still tells same-day records apart by their record code", () => {
@@ -333,6 +333,42 @@ describe("LineItemSearchDropdown — twins created the same day", () => {
     renderList(rows);
 
     expect(screen.getAllByRole("option")).toHaveLength(2);
+    expect(screen.queryByText("#00aa01")).not.toBeInTheDocument();
+    expect(screen.queryByText("#00bb02")).not.toBeInTheDocument();
+  });
+});
+
+describe("LineItemSearchDropdown — merged rows", () => {
+  it("goes by the product's code, not the code of one record of the group", () => {
+    // A merged row is the total of several records; its item_id names one
+    // of them only because a dispatch line needs a record. Printing that
+    // record's tail would dress the total up as a single record.
+    const twin = {
+      name: "Merged twin",
+      sku: null,
+      barcode: null,
+      brand: null,
+      image_url: null,
+      uom_id: null,
+      location_name: "Shelf A",
+      available_quantity: 6,
+      merged: true,
+    };
+    renderList([
+      {
+        ...twin,
+        product_template_id: "0198aaaa-0000-7000-8000-00000000cc03",
+        item_id: "0198aaaa-0000-7000-8000-00000000aa01",
+      },
+      {
+        ...twin,
+        product_template_id: "0198aaaa-0000-7000-8000-00000000dd04",
+        item_id: "0198aaaa-0000-7000-8000-00000000bb02",
+      },
+    ]);
+
+    expect(screen.getByText("#00cc03")).toBeInTheDocument();
+    expect(screen.getByText("#00dd04")).toBeInTheDocument();
     expect(screen.queryByText("#00aa01")).not.toBeInTheDocument();
     expect(screen.queryByText("#00bb02")).not.toBeInTheDocument();
   });
@@ -543,5 +579,79 @@ describe("LineItemSearchDropdown — a phone keyboard takes the bottom of the sc
   it("opens above the input when the keyboard leaves no room below it", () => {
     const list = renderAnchored(400);
     expect(Number.parseFloat(list.style.top)).toBeLessThan(250);
+  });
+});
+
+describe("LineItemSearchDropdown — a scroll closes the list only when it moves the input", () => {
+  let top = 250;
+
+  afterEach(() => {
+    document.getElementById("line-input")?.remove();
+  });
+
+  function renderAnchored(onRequestClose: () => void) {
+    top = 250;
+    const input = document.createElement("input");
+    input.id = "line-input";
+    input.getBoundingClientRect = () =>
+      ({ top, bottom: top + 50, left: 10, right: 210, width: 200 }) as DOMRect;
+    document.body.appendChild(input);
+    render(
+      <LineItemSearchDropdown
+        results={[stockHit({ item_id: "a", name: "Flour A" })]}
+        isLoading={false}
+        selectedIndex={-1}
+        lineName="flo"
+        noResultsLabel="Nothing found"
+        anchorId="line-input"
+        onSelect={vi.fn()}
+        onRequestClose={onRequestClose}
+      />,
+    );
+    return input;
+  }
+
+  it("keeps the list when a scroll leaves the input where it was", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+
+    fireEvent.scroll(document);
+
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it("keeps the list when something that does not hold the input scrolls", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+    const elsewhere = document.createElement("div");
+    document.body.appendChild(elsewhere);
+    top = 200;
+
+    fireEvent.scroll(elsewhere);
+
+    expect(close).not.toHaveBeenCalled();
+    elsewhere.remove();
+  });
+
+  it("keeps the list when the list itself scrolls", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+    top = 200;
+
+    fireEvent.scroll(
+      document.querySelector("[data-line-item-dropdown]") as HTMLElement,
+    );
+
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it("closes the list when the page scrolls the input away", () => {
+    const close = vi.fn();
+    renderAnchored(close);
+    top = 200;
+
+    fireEvent.scroll(document);
+
+    expect(close).toHaveBeenCalledTimes(1);
   });
 });

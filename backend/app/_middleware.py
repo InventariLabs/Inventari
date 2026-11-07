@@ -6,6 +6,7 @@ event-loop binding issues that BaseHTTPMiddleware exhibits with async SQLAlchemy
 and asyncpg connections.
 """
 
+import re
 import time
 from collections.abc import MutableMapping
 from typing import Any
@@ -163,7 +164,9 @@ class LanguageMiddleware:
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> Any:
         if scope['type'] == 'http':
             headers = dict(scope.get('headers', []))
-            accept_language = headers.get(b'accept-language', b'').decode()
+            # Latin-1 maps every byte, so a value outside UTF-8 is read as a
+            # language tag nobody speaks, never a ``UnicodeDecodeError``.
+            accept_language = headers.get(b'accept-language', b'').decode('latin-1')
             lang = get_language_from_accept_header(accept_language)
             set_current_lang(lang)
             # Known once the user is: see ``get_current_user``.
@@ -225,13 +228,18 @@ class PerformanceMiddleware:
 class RequestIDMiddleware:
     """Generate or propagate an ``X-Request-ID`` for every request.
 
-    If the client sends ``X-Request-ID``, it is reused; otherwise a new
-    UUID4 is generated. The ID is:
+    A client's ``X-Request-ID`` is reused when it has the shape of an id —
+    8 to 64 letters, digits and hyphens, which a UUID or a trace id has;
+    otherwise, or when there is none, a new UUID4 is generated. The id is
+    written verbatim into every log line of the request, so a space, a quote
+    or a byte outside ASCII would let a client shape those lines, and a byte
+    outside UTF-8 used to stop the request with a 500. The ID is:
     - stored in a contextvar (``request_id_var``) for log correlation
     - returned in the ``X-Request-ID`` response header
     """
 
     HEADER_NAME = b'x-request-id'
+    _ACCEPTED_ID = re.compile(r'[0-9A-Za-z-]{8,64}')
 
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
@@ -242,8 +250,9 @@ class RequestIDMiddleware:
 
         # Check for inbound X-Request-ID
         headers = dict(scope.get('headers', []))
-        incoming = headers.get(self.HEADER_NAME, b'').decode().strip()
-        rid = incoming if incoming else generate_request_id()
+        incoming = headers.get(self.HEADER_NAME, b'').decode('latin-1').strip()
+        accepted = self._ACCEPTED_ID.fullmatch(incoming) is not None
+        rid = incoming if accepted else generate_request_id()
 
         # Set contextvar for downstream log correlation
         token = request_id_var.set(rid)

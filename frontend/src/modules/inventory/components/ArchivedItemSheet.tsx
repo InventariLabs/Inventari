@@ -24,7 +24,7 @@ export default function ArchivedItemSheet({
   onReuse,
   canWrite = true,
 }: Props) {
-  const { t } = useTranslation(["labels", "common", "inventory"]);
+  const { t } = useTranslation(["labels", "common", "inventory", "items"]);
   const unassignMutation = useUnassignLabel();
   const handleUnassign = () => {
     unassignMutation.mutate(labelCode, {
@@ -85,7 +85,8 @@ export default function ArchivedItemSheet({
           <div className="flex flex-wrap items-center gap-y-2 gap-x-4 mt-4 text-xs text-amber-700 font-medium">
             <div className="flex items-center gap-1">
               <CheckCircle2 size={14} />
-              {t("history.status", { defaultValue: "Status" })}:{" "}
+              {/* The word the delete dialog asked this value under. */}
+              {t("items:deletionReason")}:{" "}
               {archivedReasonLabel(t, item.deletion_reason)}
             </div>
             {item.deleted_at && (

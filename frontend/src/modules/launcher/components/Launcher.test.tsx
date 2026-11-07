@@ -14,6 +14,7 @@ import { moduleRegistry, type FrontendModule } from "@/lib/moduleRegistry";
 import { useAuthStore } from "@/store/authStore";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import Launcher from "./Launcher";
+import { addRecentItem } from "@/lib/recentItems";
 import { forgetFirstVisits } from "../hooks/useLauncherGreeting";
 import type { ProductProfile, Organization, LauncherCategory } from "@/types";
 import { Home } from "lucide-react";
@@ -331,6 +332,32 @@ describe("Launcher (profile-aware)", () => {
     // assertion is on the DOM, not on the class alone.
     expect(sidebar.childElementCount).toBe(0);
     expect(sidebar.className).toContain("empty:hidden");
+  });
+});
+
+describe("Launcher recently visited", () => {
+  it("names the module the way its tile does, not by its technical name", async () => {
+    // "Recently visited" printed the stored module identifier ("shopping_lists")
+    // beside a tile and a palette that both said "Shopping lists".
+    moduleRegistry.getVisibleModules = vi.fn(() => [
+      mod("inventory", "core", "inventory:launcher.title"),
+    ]);
+    addRecentItem(
+      {
+        id: "r1",
+        title: "Oat milk",
+        module: "inventory",
+        path: "/inventory/items/1",
+        timestamp: 0,
+      },
+      "user-1",
+      "default",
+    );
+    renderLauncher();
+
+    const link = await screen.findByRole("link", { name: /Oat milk/ });
+    expect(link).toHaveTextContent("Inventory");
+    expect(link).not.toHaveTextContent("inventory");
   });
 });
 

@@ -50,7 +50,6 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import LotStatus, UserContextDTO
-from app.core.logging import get_logger
 from app.core.public_api import core_api
 
 from . import document_types as dt
@@ -65,8 +64,6 @@ from .models import (
     WmsPickSessionDocument,
 )
 from .schemas import QuarantineHoldSchema
-
-logger = get_logger(__name__)
 
 #: Every action the queue puts on a row; the response declares the same set.
 NextAction = Literal[
@@ -483,13 +480,14 @@ async def awaiting_approval_documents_async(
     Same rule as the approvals queue: the approvals module must be on, the
     reader must hold ``approvals:approve`` and the request's open stage must
     name them. A request parked where nobody can decide it is not a decision
-    this person can take, so it stays out of the block. Any failure inside
-    the approvals module degrades to an empty list rather than breaking the
-    floor's queue.
+    this person can take, so it stays out of the block. A switched-off module
+    is answered here, before the lookup; anything the lookup raises is a
+    defect and travels as one, because an empty list would tell the approver
+    there is nothing to decide.
     """
-    org = user.organization
-    enabled_modules = set(org.enabled_modules or []) if org else set()
-    if 'approvals' not in enabled_modules:
+    if not await core_api.organizations.is_module_enabled_async(
+        db, org_id, 'approvals'
+    ):
         return [], 0
     if not user.has_permission('approvals:approve'):
         return [], 0
@@ -497,18 +495,12 @@ async def awaiting_approval_documents_async(
     # without the approvals package.
     from app.modules.approvals.approvals_api import approvals_api
 
-    try:
-        requests = await approvals_api.list_requests(
-            db,
-            org_id,
-            target_type='document',
-            pending_for_user_id=user.id,
-        )
-    except Exception as exc:  # noqa: BLE001 — the approvals module may be off
-        logger.warning(
-            '[doc-queue] awaiting_approval: approvals lookup failed: %s', exc
-        )
-        return [], 0
+    requests = await approvals_api.list_requests(
+        db,
+        org_id,
+        target_type='document',
+        pending_for_user_id=user.id,
+    )
 
     target_ids = [request.target_id for request in requests]
     if not target_ids:

@@ -140,7 +140,8 @@ export function useItemSearch(query: string, storageId?: string) {
 }
 
 export function useArchivedItems(params?: {
-  offset?: number;
+  /** The previous page's `next_cursor`; none for the first page. */
+  cursor?: string;
   limit?: number;
   search?: string;
   /** The organization policy, applied to the archive as to the active list. */

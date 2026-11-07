@@ -20,6 +20,7 @@ from pathlib import Path
 
 from rich.console import Console
 
+from app.core.operator_error import OperatorError
 from app.core.version import check_min_version
 
 from ._module_meta import (
@@ -64,7 +65,7 @@ def _reject_option_like(value: str, label: str) -> None:
     this can be closed.
     """
     if value.startswith('-'):
-        raise ValueError(f'{label} may not start with "-": {value!r}')
+        raise OperatorError(f'{label} may not start with "-": {value!r}')
 
 
 def _clone_at_rev(source: str, rev: str, tmp: Path) -> None:
@@ -92,7 +93,7 @@ def _clone_at_rev(source: str, rev: str, tmp: Path) -> None:
         ['git', 'clone', '--', source, str(tmp)], capture_output=True, text=True
     )
     if full.returncode != 0:
-        raise ValueError(f'git clone failed:\n{full.stderr}')
+        raise OperatorError(f'git clone failed:\n{full.stderr}')
 
     checkout = subprocess.run(
         ['git', '-C', str(tmp), 'checkout', '--detach', rev],
@@ -103,7 +104,7 @@ def _clone_at_rev(source: str, rev: str, tmp: Path) -> None:
         # Not the checkout's stderr: an unknown rev makes git argue about a
         # path argument to --detach, which reads as a problem the user never
         # caused. Say what is missing and how to look, and stop there.
-        raise ValueError(
+        raise OperatorError(
             f'Revision {rev!r} not found in {source}. '
             f'Check what the remote offers: git ls-remote --tags {source}'
         )
@@ -124,7 +125,7 @@ def resolve_source(
     """
     if _is_git_source(source):
         if not rev:
-            raise ValueError(
+            raise OperatorError(
                 'Installing from git requires a pinned revision: pass --rev <tag|commit>. '
                 'Without it the installed code depends on when you ran the command.'
             )
@@ -144,7 +145,9 @@ def resolve_source(
 
     local = Path(source).expanduser().resolve()
     if not local.exists() or not local.is_dir():
-        raise ValueError(f'Source path does not exist or is not a directory: {source}')
+        raise OperatorError(
+            f'Source path does not exist or is not a directory: {source}'
+        )
     return local, False, None
 
 

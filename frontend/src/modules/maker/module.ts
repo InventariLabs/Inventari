@@ -140,7 +140,7 @@ moduleRegistry.register({
     },
   ],
   // No settingsSections: the module's own settings page owns these options.
-  // The global settings shell groups module sections under "Integrations",
-  // which is neither what these are nor where their screens live.
+  // The global settings shell lists module sections under "Module settings",
+  // which is not where the screens these options change live.
   settingsSections: [],
 });

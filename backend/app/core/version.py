@@ -13,6 +13,8 @@ import tomllib
 from functools import cache
 from pathlib import Path
 
+from app.core.operator_error import OperatorError
+
 _PYPROJECT_PATH = Path(__file__).resolve().parents[2] / 'pyproject.toml'
 
 _VERSION_RE = re.compile(r'^\d+(?:\.\d+){0,2}$')
@@ -41,7 +43,7 @@ def parse_version(text: str) -> tuple[int, int, int]:
     """Parse 'X.Y.Z' (or shorter) into a comparable tuple. Raises ValueError."""
     stripped = text.strip()
     if not _VERSION_RE.match(stripped):
-        raise ValueError(f'Invalid version string: {text!r} (expected X.Y.Z)')
+        raise OperatorError(f'Invalid version string: {text!r} (expected X.Y.Z)')
     parts = [int(p) for p in stripped.split('.')]
     while len(parts) < 3:
         parts.append(0)

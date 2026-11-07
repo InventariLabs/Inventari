@@ -41,6 +41,7 @@ from app.core._module_declarations import ModuleMetadata
 from app.core.context import ModuleContext
 from app.core.logging import get_logger
 from app.core.module_manifest_schema import ModuleManifest
+from app.core.operator_error import OperatorError
 
 if TYPE_CHECKING:
     from fastapi import APIRouter
@@ -290,7 +291,7 @@ def define_module(
         overridden them.
     """
     if router is None and router_factory is None:
-        raise ValueError('Either router or router_factory must be provided')
+        raise OperatorError('Either router or router_factory must be provided')
     import inspect
 
     caller_frame = inspect.stack()[1]

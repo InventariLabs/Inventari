@@ -395,6 +395,19 @@ export default function DocumentsTemplatesPage() {
     [PICK_LIST]: t("templates.type_pick_list"),
   };
 
+  // The API names its built-in layouts once, in English; the preview's
+  // picker calls them what the print-layout picker and the empty screen do.
+  const BUILT_IN_NAMES: Record<string, string> = {
+    STANDARD: t("profile.layoutStandard"),
+    PL_PZ: t("profile.layoutPlPz"),
+    [PACKING_SLIP]: t("templates.type_packing_slip"),
+    [PICK_LIST]: t("templates.type_pick_list"),
+  };
+  const namedBuiltIns = builtIns.map((tpl) => ({
+    ...tpl,
+    name: BUILT_IN_NAMES[tpl.document_type] ?? tpl.name,
+  }));
+
   return (
     <div className="space-y-6">
       {/* A screen that used to carry three buttons and now carries none reads
@@ -500,7 +513,7 @@ export default function DocumentsTemplatesPage() {
       <BuiltInTemplatePreview
         open={previewOpen}
         onClose={() => setPreviewOpen(false)}
-        templates={builtIns}
+        templates={namedBuiltIns}
         module="warehouse"
       />
       {/* The import picker: never painted, opened by the header button. */}

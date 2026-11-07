@@ -25,7 +25,7 @@ from app.core.exceptions import (
     map_service_errors,
 )
 from app.core.modules import require_module
-from app.core.upload_validation import read_import_file
+from app.core.upload_validation import MAX_IMPORT_SIZE, read_import_file
 from app.i18n.service import get_current_lang, get_error_message
 
 from .schemas import (
@@ -66,8 +66,10 @@ class ParsePasteRequest(BaseModel):
 
     text: str = Field(
         default='',
+        max_length=MAX_IMPORT_SIZE,
         description='Raw text pasted from clipboard (Excel/Sheets). '
-        'Delimiter (tab, comma, semicolon) is auto-detected.',
+        'Delimiter (tab, comma, semicolon) is auto-detected. '
+        'No longer than an imported file may be.',
     )
 
 
@@ -181,7 +183,11 @@ async def read_lines_from_file(
 class ReadPastedLinesRequest(BaseModel):
     """Request body for POST /import/lines/paste."""
 
-    text: str = Field(default='', description='Raw pasted clipboard text.')
+    text: str = Field(
+        default='',
+        max_length=MAX_IMPORT_SIZE,
+        description='Raw pasted clipboard text, no longer than an imported file may be.',
+    )
     mapping_json: dict[str, Any] = Field(default_factory=dict)
     type: str = Field(max_length=20, description='The document type being written.')
     source_location_id: UUID | None = None
@@ -252,7 +258,11 @@ async def import_document_lines(
 class ImportPasteRequest(BaseModel):
     """Request body for POST /{doc_id}/import-paste."""
 
-    text: str = Field(default='', description='Raw pasted clipboard text.')
+    text: str = Field(
+        default='',
+        max_length=MAX_IMPORT_SIZE,
+        description='Raw pasted clipboard text, no longer than an imported file may be.',
+    )
     mapping_json: dict[str, Any] = Field(
         default_factory=dict,
         description='Column mapping (same shape as import-lines mapping_json).',

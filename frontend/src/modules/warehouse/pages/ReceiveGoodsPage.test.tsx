@@ -226,6 +226,7 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
       <button type="button" onClick={() => onChange(value)}>
         {`Choose ${label ?? "option"} again`}
       </button>
+      {error && <span role="alert">{error}</span>}
     </label>
   ),
 }));
@@ -1150,9 +1151,10 @@ describe("ReceiveGoodsPage", () => {
       screen.getByRole("button", { name: "Receive into stock" }),
     );
 
+    // Announced once: under the field, not again in the footer.
     expect(
-      await screen.findByText("Choose the location the goods go to."),
-    ).toBeInTheDocument();
+      await screen.findAllByText("Choose the location the goods go to."),
+    ).toHaveLength(1);
     expect(screen.getByLabelText("To location")).toHaveFocus();
     // The field itself is marked, as Issue and Move mark theirs, and the
     // mark goes once a location is chosen.
@@ -1483,7 +1485,11 @@ describe("ReceiveGoodsPage", () => {
     await user.click(
       screen.getByRole("button", { name: "Receive into stock" }),
     );
-    expect(await screen.findByText("Choose the supplier.")).toBeInTheDocument();
+    // The field wears the refusal and it is announced once.
+    expect(await screen.findAllByText("Choose the supplier.")).toHaveLength(1);
+    expect(screen.getByLabelText("From")).toBeInvalid();
+    // The press is not dead: the reader lands on the refused field.
+    expect(screen.getByLabelText("From")).toHaveFocus();
     expect(state.postNew).not.toHaveBeenCalled();
   });
   it("opens on the order a link names, with its lines, and posts it in one press", async () => {
@@ -1585,6 +1591,48 @@ describe("ReceiveGoodsPage", () => {
     expect(
       await screen.findByText(/PO\/2026\/002 is now received in full/),
     ).toBeInTheDocument();
+  });
+
+  it("opens the lot and expiry of the row an undated FEFO refusal names, in its own words", async () => {
+    // The server's sentence is written for an API client ("send the lot and
+    // expiry with the completion"). The page reads the rows the refusal
+    // names, opens their lot-and-expiry fields and says which row needs the
+    // date, in words a person on this screen can act on.
+    state.postNew.mockRejectedValueOnce(
+      new AxiosError("Bad Request", "ERR_BAD_REQUEST", undefined, undefined, {
+        status: 400,
+        statusText: "Bad Request",
+        headers: {},
+        config: { headers: {} } as never,
+        data: {
+          detail: {
+            code: "RECEIPT_EXPIRY_REQUIRED",
+            message:
+              "Send the lot and expiry with the completion, or put the date on the line",
+            lines: [{ line_id: "x", line_number: 1, product: "Jasmine Rice" }],
+          },
+        },
+      }),
+    );
+    const user = userEvent.setup();
+    renderPage();
+    await user.selectOptions(screen.getByLabelText("From"), "partner-1");
+    await screen.findByText("Jasmine Rice");
+    expect(screen.queryByLabelText("Expiry")).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Receive into stock" }),
+    );
+
+    const expiry = await screen.findByLabelText("Expiry");
+    expect(expiry).toBeVisible();
+    expect(
+      screen.getByText(/Expiry date needed for: Jasmine Rice/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/with the completion/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Could not receive the delivery."),
+    ).not.toBeInTheDocument();
   });
 
   it("names the order's open receipt and offers to receive the rest through it", async () => {

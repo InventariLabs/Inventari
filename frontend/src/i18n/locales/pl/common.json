@@ -95,6 +95,9 @@
     "seeded_none": "Nie ma czego kopiować — każdy wbudowany układ jest już tu jako własny.",
     "deleteTitle": "Usuń szablon",
     "example": "Przykład",
+    "namePlaceholder": "np. Protokół przekazania sprzętu",
+    "htmlInvalid": "Kod HTML wygląda na niezbalansowany — sprawdź, czy wszystkie znaczniki są domknięte.",
+    "customFieldOf": "{{label}} — pole własne kategorii: {{categories}}",
     "possiblyEmpty": "Może być puste",
     "preview_failed": "Ten układ się nie renderuje.",
     "outdatedCopy": "Powstał ze starszej wersji szablonu wbudowanego.",
@@ -187,7 +190,7 @@
       "orgName": "Nazwa organizacji",
       "permanentDelete": {
         "title": "Trwałe usuwanie",
-        "description": "Pozwala trwale usuwać zarchiwizowane produkty. Tej operacji nie można cofnąć — domyślnie wyłączone dla profili firmowych z audytowanym stanem magazynowym.",
+        "description": "Pozwala trwale usuwać zarchiwizowane produkty. Tej operacji nie można cofnąć — domyślnie wyłączone w trybach pracy dla firm z audytowanym stanem magazynowym.",
         "label": "Zezwól na trwałe usuwanie",
         "instantSave": "Zapisuje się od razu po przełączeniu.",
         "confirmTitle": "Zezwolić na trwałe usuwanie?",
@@ -316,12 +319,12 @@
     },
     "focus": {
       "loading": "Ładowanie modułów…",
-      "empty": "Żadna z aplikacji, które mogą być pokazane osobno, nie jest jeszcze włączona.",
-      "emptyHint": "Pokazanie jednego modułu zawęża przestrzeń do tej aplikacji. Włącz jedną z poniższych, a potem wróć tutaj.",
-      "stateEnabled": "Włączona",
-      "stateNotEnabled": "Niewłączona",
-      "enableLink": "Włącz w sklepie z aplikacjami",
-      "enableAction": "Włącz {{name}} w sklepie z aplikacjami",
+      "empty": "Żaden z modułów, które mogą być pokazane osobno, nie jest jeszcze włączony.",
+      "emptyHint": "Pokazanie jednego modułu zawęża przestrzeń do tego modułu. Włącz jeden z poniższych, a potem wróć tutaj.",
+      "stateEnabled": "Włączony",
+      "stateNotEnabled": "Niewłączony",
+      "enableLink": "Włącz w Modułach",
+      "enableAction": "Włącz {{name}} w Modułach",
       "previewLoading": "Obliczanie zmian…",
       "diffTitle": "Co się zmieni",
       "diffDisable": "Zostanie wyłączone",
@@ -766,7 +769,7 @@
     },
     "shell": {
       "groupAdmin": "Administracja",
-      "groupIntegrations": "Integracje"
+      "groupModuleSettings": "Ustawienia modułów"
     },
     "rbac": {
       "builtInBadge": "Wbudowana",
@@ -837,7 +840,9 @@
       "unknownModule": "Nie ma modułu o tej nazwie",
       "unknownModuleHint": "Adres wskazuje moduł, którego ta instalacja nie ma. Sprawdź odnośnik albo wybierz moduł ze sklepu.",
       "open": "Ustawienia modułu",
-      "saved": "Zapisano ustawienia"
+      "saved": "Zapisano ustawienia",
+      "guardName": "Ustawienia modułu",
+      "saveFailed": "Nie udało się zapisać ustawień."
     },
     "modules": {
       "openAppStore": "Otwórz Moduły"
@@ -858,6 +863,8 @@
       "subtitle": "Nieudane wysyłki",
       "none": "Nic nie przepadło",
       "noneHint": "Każda wiadomość tej organizacji opuściła serwer.",
+      "noneUnsent": "Nic nie zostało wysłane",
+      "noneUnsentHint": "Serwer poczty nie jest skonfigurowany, więc żadna wiadomość nie opuszcza tej instalacji — i żadna nie może zawieść. Skonfiguruj go powyżej.",
       "attempts": "{{n}} z {{max}} prób",
       "reason": "Powód: {{reason}}",
       "reasons": {
@@ -1123,6 +1130,7 @@
     "onResumesWebhooks_one": "Wysyłka wznowi się pod 1 zapisany adres, gdy tylko moduł zostanie włączony — ten sam, pod który szła przed wyłączeniem.",
     "onResumesWebhooks_other": "Wysyłka wznowi się pod {{count}} zapisanego adresu, gdy tylko moduł zostanie włączony — te same, pod które szła przed wyłączeniem.",
     "optionalCompanionsHint": "Działa samodzielnie — włączenie modułu {{names}} dodaje integrację.",
+    "optionalCompanionsOffHint": "Integracja jest tu niedostępna, dopóki nie włączysz: {{names}}.",
     "requiresHint": "Wymaga włączenia: {{names}}.",
     "screensMissing": "Brak ekranów",
     "screensMissingHint": "Jego strony nie zainstalowały się tutaj, więc włączenie nie doda niczego, co da się otworzyć. Ponowna instalacja modułu domyka sprawę.",

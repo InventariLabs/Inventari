@@ -14,6 +14,16 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- **Breaking:** the document product search no longer returns `created_at` on a
+  stock hit; it returns `added_date`, the day the record was added — the same
+  date the product card shows as "Added on", so the picker and the card no longer
+  disagree by a day around midnight. A client that read `created_at` reads
+  `added_date` instead (a date, not a timestamp). A hit that is the total of
+  several interchangeable records now says so with `merged: true`, and the picker
+  tells such rows apart by their product's code rather than by the code of one
+  record in the group. The `location_id` description now says what the search
+  does: a shelf answers with its own records only, a zone also with the shelves
+  below it.
 - A refused invitation now answers with one sentence that says what to try — use
   the e-mail address the invitation was sent to, or ask for a new one — and the
   sentence is the same for a wrong address, an expired, a used, a withdrawn and an
@@ -38,6 +48,14 @@ says what the release does rather than what changed since them.
   straight to the members and invitations, which used to sit at the foot of
   General. The webhook dialog lists every event in the interface language and
   groups the events of modules the organization has not enabled apart.
+- `GET /items/archived` pages by the last record seen, as the stock movement
+  ledger and the audit log do: it answers with `next_cursor`, takes `cursor`
+  for the page after, counts on the first page and carries that count, so a
+  page deep in a long archive costs what the first one does. Records archived
+  at the same instant are ordered by their id, so turning a page no longer
+  shows one of them twice and leaves out another. `offset` still answers and
+  is deprecated. The archive screens of the product list and of Equipment page
+  this way.
 - Creating an account — the first one, by invitation or from an approved
   request — signs it in and continues to the app, instead of sending the new
   owner to a sign-in form that asks for the address and password just chosen.
@@ -78,6 +96,20 @@ says what the release does rather than what changed since them.
   sidebar and in the heading of the page it opens in all languages. Removing a
   member now asks "Remove <name>?" and says that person loses access at once
   while the records they created stay.
+- Equipment attachments and the files attached to a product accept one list
+  of file types. The old binary Word format (`.doc`) is refused by both — save
+  it as `.docx` — and Equipment now takes `.zip`, as products always have. The
+  file pickers on both screens no longer offer `.doc`, which the server refused
+  only after the upload. The size limits stay as they were: 20 MB for an
+  equipment attachment, 10 MB for a product's.
+- **Breaking:** the `/api/v1/ws/notifications` WebSocket takes the access token
+  as a subprotocol instead of a `token` query parameter: the client offers
+  `bearer` and then the token (`Sec-WebSocket-Protocol: bearer, <token>`), and
+  the socket answers with `bearer`. In the address, the token was written into
+  the backend's log and every proxy's access log on each connect, and those
+  logs outlive it; in a header it travels as it does on every other request. A
+  client that still sends the token in the address is refused with close code
+  4001 and has to offer the two subprotocols instead.
 
 ### Added
 
@@ -86,8 +118,21 @@ says what the release does rather than what changed since them.
   and without it a new account takes the instance default and an existing one
   keeps its own. DEPLOYMENT.md and QUICK_DEPLOY.md say how to use the command
   to get back into an installation without outgoing mail.
+- `manage.py user erase <user id>` erases one person's account on a GDPR
+  erasure request: it shows whose account it is and asks first (`--yes` skips
+  the question), then replaces the address, name and password, closes the
+  account and revokes its sessions in one transaction, and reports
+  "Nothing was erased" with exit code 1 when a step fails, Redis included.
+  It replaces the Python script `docs/GDPR_MANUAL_PROCEDURE.md` asked
+  operators to paste. The procedure also says now that the user id the
+  journal keeps is pseudonymised personal data, not anonymous, and that
+  journal entries naming the person stay only on a legal ground — with the
+  SQL to redact them when there is none.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
+- Module authors can page a list the server pages by cursor with
+  `useKeysetPaging` from `@/module-sdk`: it keeps the cursors of the pages
+  already visited and starts from the first page when the question changes.
 - When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
   list's "From recipes" writes goods that another open shopping list still
   asks for, the answer names them and the list that holds them
@@ -108,9 +153,71 @@ says what the release does rather than what changed since them.
   header as `POST /warehouse/documents/post` does: the same key sent again is
   answered with the draft the first request wrote instead of a second one. A
   request without the header writes a draft each time, as before.
+- Module authors can hand an attachment's file picker the types the server
+  accepts, `ATTACHMENT_FILE_ACCEPT` from `@/module-sdk`, instead of keeping a
+  list of their own.
 
 ### Fixed
 
+- The Receive goods, Issue goods and Move goods forms refuse a missing value
+  where it is. Receiving without a supplier or customer marks that field and
+  says why under it, as the location field already did, and the sentence is no
+  longer repeated in the footer or on the phone's start panel, so a screen
+  reader announces it once. An error under one field no longer pushes the
+  other fields of its row out of line on any of the three forms.
+- A request refused for exceeding the general rate limit is answered in the
+  request's language: a Polish, German, French or Spanish reader used to get the
+  refusal in English, while one refused by an endpoint's own limit already got
+  it in their language. Both kinds of refusal now carry `lang` beside `message`.
+- `DEFAULT_LANGUAGE` reaches the backend container on both the development and
+  the production stack, and is in `.env.production.example`. It used to be read
+  only by a backend started outside Docker, so an account created without a
+  language — the administrator `manage.py user create-admin` makes without
+  `--lang` — started in English whatever `.env` said.
+- The symbol list in the document and equipment template editors reads as
+  something a template author can use. Examples of record-valued symbols
+  (`totals_by_unit`, `packages`, `pick_lines`) show their fields instead of
+  Python dictionaries with `Decimal(...)` wrappers, the document examples
+  (title, status) are in the editor's language, and the Name hint, the
+  unbalanced-HTML message and the description of a category custom field are
+  translated instead of falling back to English. `GET
+  /warehouse/templates/placeholders` answers in the request language, and a
+  custom-field entry of the equipment placeholder lists carries
+  `custom_field_label` and `custom_field_categories` beside its English
+  description.
+- A module that is switched on now says on its store card when a module it
+  works better with is switched off, as the card already did before the module
+  was switched on. The roles screen names a module with no translation of its
+  own, such as one just made with `make new-module`, by the name in its
+  manifest instead of its technical identifier.
+- The Check Out Asset dialog names an address nobody in the organization uses
+  before it saves it, also when the address is pasted and submitted at once.
+  The check waited for the typing to pause, and a quicker Enter stored the
+  address with no warning ever on screen; such a submit now shows the warning
+  and saves nothing, and the next one saves the asset to that address.
+- A fault while reading the documents awaiting your approval, or a supplier's
+  pricelist for a price suggestion, is now answered as a server error and
+  logged with its traceback. The approval list used to come back empty and the
+  suggestion fell back to the last purchase price, so a fault looked like
+  having nothing to approve, or like the supplier's price.
+- A request whose `X-Request-ID` or `Accept-Language` header carries a byte
+  outside UTF-8 is no longer answered with a 500. A client's `X-Request-ID` is
+  kept only when it is 8 to 64 letters, digits and hyphens, as a UUID or a
+  trace id is; any other value is replaced by one the server makes, which the
+  response returns as before, because the id is written into every log line
+  of the request.
+- A "not found" answer is in the reader's language on every endpoint; many
+  still answered in English. A module's `NotFoundException` raised without a
+  language now speaks the request's language too.
+- Closing or reopening an inventory period refuses a month outside 1–12 or a
+  year outside 2000–2100 with a 422, instead of closing a thirteenth month.
+  Pasted import text is refused with a 422 past the size an imported file may
+  have (50 MB).
+- The consumption report's two top-ten lists, the products used most and the
+  ones whose disposals cost most, put equal products in the order of their
+  names. A tie at the tenth place used to be settled by the order the database
+  returned the rows in, so the same window could name a different tenth product
+  from one reading to the next.
 - The scanner's Back button now leads to the launcher when the scanner was the
   first screen of the tab — opened by address, through a printed code's link or
   after signing in — instead of doing nothing.
@@ -401,6 +508,30 @@ says what the release does rather than what changed since them.
 - The meal plan dialog that has no plan yet now says the recipe is added to the
   first meal of the new plan at once, and closing the "Take from stock" dialog
   no longer marks the recipe as cooked.
+- The built-in layouts in the document templates' preview are named in the
+  reader's language ("Standard layout", "Pick list"), as the print-layout
+  picker names them, instead of "Standard Template" in every language.
+- An organization template keeps an `alt`, `title` or `class` whose text
+  begins with "Data:" — the Polish label for a date — on the printout and in
+  the editor's preview; the sanitizer used to drop it as if it were a `data:`
+  link. A logo uploaded as WebP now prints through `{{ issuer.logo }}` instead
+  of leaving an empty image.
+- The error details a broken screen offers to copy into a bug report no longer
+  carry the token of the link that opened the page: on a password reset,
+  invitation, registration or equipment attestation page the token reads
+  `redacted`, so a report pasted into a public issue tracker hands nobody a
+  live link.
+- Inventory, location and equipment dialogs say what failed and what they
+  need: creating a location, saving a stock alert, a bulk edit, changing a
+  batch's status and freeing a label name the write that could not be done
+  when the server gives no reason, instead of "Unknown error" or "Something
+  went wrong". The location wizard no longer suggests a name already taken at
+  that level by a location a module owns or one in the archive. Bulk edit's
+  Apply waits until a field is ticked, the bulk Retire question says before
+  you answer that a checked-out asset is not retired, and the archived label's
+  sheet calls the deletion reason by its name rather than "Status". Saving an
+  empty service entry marks every missing answer in the app's language,
+  instead of stopping at the title with the browser's own message.
 
 ## v0.11.0 - 2026-11-02
 

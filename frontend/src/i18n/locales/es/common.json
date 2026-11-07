@@ -93,6 +93,9 @@
     "seeded_none": "Nada que copiar — cada diseño integrado ya está aquí como propio.",
     "deleteTitle": "Eliminar plantilla",
     "example": "Ejemplo",
+    "namePlaceholder": "p. ej. Acta de entrega de la empresa",
+    "htmlInvalid": "El HTML parece desequilibrado — revisa las etiquetas sin cerrar.",
+    "customFieldOf": "{{label}} — campo personalizado de la categoría: {{categories}}",
     "possiblyEmpty": "Puede estar vacío",
     "preview_failed": "Este diseño no se puede renderizar.",
     "outdatedCopy": "Creado a partir de una versión anterior de la plantilla integrada.",
@@ -185,7 +188,7 @@
       "orgName": "Nombre de la organización",
       "permanentDelete": {
         "title": "Eliminación permanente",
-        "description": "Permite eliminar permanentemente productos archivados. No se puede deshacer — desactivado por defecto en perfiles de empresa con inventario auditado.",
+        "description": "Permite eliminar permanentemente productos archivados. No se puede deshacer — desactivado por defecto en modos de espacio de trabajo de empresa con inventario auditado.",
         "label": "Permitir eliminación permanente",
         "instantSave": "Se guarda en cuanto lo cambias.",
         "confirmTitle": "¿Permitir el borrado definitivo?",
@@ -314,10 +317,10 @@
     },
     "focus": {
       "loading": "Cargando módulos…",
-      "empty": "Ninguna de las aplicaciones que pueden mostrarse por separado está activada todavía.",
-      "emptyHint": "Mostrar solo un módulo reduce el espacio de trabajo a esa aplicación. Activa una de las siguientes y vuelve aquí.",
-      "stateEnabled": "Activada",
-      "stateNotEnabled": "No activada",
+      "empty": "Ninguno de los módulos que pueden mostrarse por separado está activado todavía.",
+      "emptyHint": "Mostrar solo un módulo reduce el espacio de trabajo a ese módulo. Activa uno de los siguientes y vuelve aquí.",
+      "stateEnabled": "Activado",
+      "stateNotEnabled": "No activado",
       "enableLink": "Activar en Módulos",
       "enableAction": "Activar {{name}} en Módulos",
       "previewLoading": "Calculando cambios…",
@@ -764,7 +767,7 @@
     },
     "shell": {
       "groupAdmin": "Admin",
-      "groupIntegrations": "Integraciones"
+      "groupModuleSettings": "Ajustes de módulos"
     },
     "rbac": {
       "builtInBadge": "Integrado",
@@ -835,7 +838,9 @@
       "unknownModule": "No existe ningún módulo con ese nombre",
       "unknownModuleHint": "La dirección apunta a un módulo que esta instalación no tiene. Revisa el enlace o elige el módulo en la tienda.",
       "open": "Ajustes del módulo",
-      "saved": "Ajustes guardados"
+      "saved": "Ajustes guardados",
+      "guardName": "Los ajustes del módulo",
+      "saveFailed": "No se pudieron guardar los ajustes."
     },
     "modules": {
       "openAppStore": "Abrir Módulos"
@@ -856,6 +861,8 @@
       "subtitle": "Errores de envío",
       "none": "No se perdió nada",
       "noneHint": "Todos los mensajes de esta organización salieron del servidor.",
+      "noneUnsent": "No se ha enviado nada",
+      "noneUnsentHint": "No hay ningún servidor de correo configurado, así que ningún mensaje sale de esta instalación, y ninguno puede fallar. Configura uno arriba.",
       "attempts": "{{n}} de {{max}} intentos",
       "reason": "Motivo: {{reason}}",
       "reasons": {
@@ -1087,6 +1094,7 @@
     "onResumesWebhooks_one": "El envío se reanuda hacia 1 dirección guardada en cuanto se active — la misma de antes de desactivarlo.",
     "onResumesWebhooks_other": "El envío se reanuda hacia {{count}} direcciones guardadas en cuanto se active — las mismas de antes de desactivarlo.",
     "optionalCompanionsHint": "Funciona por sí solo — activar {{names}} añade la integración.",
+    "optionalCompanionsOffHint": "La integración no está disponible aquí mientras no actives {{names}}.",
     "requiresHint": "Active primero {{names}}.",
     "screensMissing": "Faltan las pantallas",
     "screensMissingHint": "Sus páginas no se instalaron aquí, así que activarlo no añade nada que se pueda abrir. Reinstalar el módulo lo completa.",

@@ -10,7 +10,8 @@
     "needsAttention_other": "wymaga uwagi"
   },
   "actions": {
-    "stockTakesInProgress": "Spisy z natury w toku"
+    "stockTakesInProgress": "Spisy z natury w toku",
+    "stockTakesUnavailable": "Nie udało się sprawdzić spisów z natury w toku"
   },
   "nav": {
     "overview": "Przegląd",
@@ -153,7 +154,7 @@
       "location": "Miejsce",
       "anyLocation": "Wszędzie",
       "includeEmpty": "Pokaż też miejsca ze stanem zerowym",
-      "includeEmptyHint": "Pokazuje wpisy ze stanem zrównanym do zera — ślad po tym, że coś tu było. Miejsce, w którym produkt nigdy nie leżał, nie ma wpisu do pokazania.",
+      "includeEmptyHint": "Pokazuje rekordy ze stanem zrównanym do zera — ślad po tym, że coś tu było. Miejsce, w którym produkt nigdy nie leżał, nie ma rekordu do pokazania.",
       "oneStorage": "jedno miejsce",
       "oneProduct": "jeden produkt"
     },
@@ -174,10 +175,10 @@
     "whereItLies": "Gdzie leży",
     "seeForProduct": "We wszystkich miejscach",
     "seeForLocation": "Stany magazynowe tego miejsca",
-    "rows_one": "pozycja magazynowa",
-    "rows_few": "pozycje magazynowe",
-    "rows_many": "pozycji magazynowych",
-    "rows_other": "pozycji magazynowej"
+    "rows_one": "rekord",
+    "rows_few": "rekordy",
+    "rows_many": "rekordów",
+    "rows_other": "rekordu"
   },
   "lots": {
     "title": "Partie",
@@ -195,7 +196,8 @@
       "message": "Powód zostaje przy partii i jest widoczny obok jej statusu.",
       "label": "Dlaczego",
       "placeholder": "Zawiadomienie dostawcy 41/26 — szkło w słoiku 12",
-      "confirm": "Zmień status"
+      "confirm": "Zmień status",
+      "failed": "Nie udało się zmienić statusu partii"
     },
     "actionsFor": "Akcje dla partii {{name}}",
     "columns": {

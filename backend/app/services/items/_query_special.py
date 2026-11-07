@@ -8,15 +8,19 @@ listings in ``_query_listing.py``, and lookups/counts in
 ``_query_lookup.py``.
 """
 
+from collections.abc import Sequence
+from datetime import datetime
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, joinedload, noload, selectinload
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.db_utils import in_ids, paginate_async
 from app.core.exceptions import AppException, NotFoundException
+from app.core.keyset import read_page_after
 from app.i18n.service import get_current_lang, get_error_message
 from app.models.item import Item
 from app.models.item_history import ItemAction, ItemHistory
@@ -108,18 +112,39 @@ async def get_expiring_items_async(
     return await paginate_async(db, query, limit=limit, offset=offset)
 
 
+def _archived_at() -> ColumnElement[Any]:
+    """The date the archive sorts by: when a record was archived.
+
+    A record archived without one sorts by the day it was made.
+    ``ix_items_org_archived_at`` is on this exact expression.
+    """
+    return func.coalesce(Item.deleted_at, Item.created_at)
+
+
 async def get_archived_items_async(
     db: AsyncSession,
     user_storage_ids: list[UUID],
     *,
+    organization_id: UUID,
     offset: int = 0,
     limit: int = 50,
+    after: tuple[datetime, UUID] | None = None,
+    known_total: int | None = None,
     context_tag: str | None = None,
     claimed_tags: set[str] | None = None,
     module_scope: str | None = None,
     search: str | None = None,
 ) -> tuple[list[Item], int]:
-    """List soft-deleted items, optionally scoped by module context.
+    """List soft-deleted items, newest archived first, optionally scoped by module context.
+
+    The order is total — the archive date (:func:`_archived_at`), then the id —
+    because records archived in one go share an instant, and a page boundary
+    between them would otherwise show one twice and hide another. The next
+    page is asked for with the last row of this one (``after``: its date and
+    id) rather than with a larger ``offset``, so a page deep in an archive
+    that only grows costs what the first one costs. The count is the whole
+    answer to the filters; a caller holding it from the first page passes it
+    back as ``known_total`` and it is not taken again.
 
     context_tag: positive filter — only items whose category has this tag.
     claimed_tags: negative filter — exclude items whose category tag is in
@@ -135,8 +160,11 @@ async def get_archived_items_async(
     Returns (items, total) so callers can build a paginated envelope.
     """
     conditions: list[ColumnElement[bool]] = [
-        in_ids(Item.storage_location_id, user_storage_ids),
+        # The organization and the archived state are what the index is on;
+        # the shelves keep the list to records that stand on one.
+        Item.organization_id == organization_id,
         Item.is_deleted.is_(True),
+        in_ids(Item.storage_location_id, user_storage_ids),
     ]
 
     if search:
@@ -165,18 +193,37 @@ async def get_archived_items_async(
 
         conditions.append(unclaimed_by_a_module(claimed_tags))
 
-    query = (
-        select(Item)
-        .options(joinedload(Item.category))
-        .options(
-            noload(Item.storage_location),
-            noload(Item.uom),
-            noload(Item.template),
-        )
-        .where(*conditions)
-        .order_by(Item.deleted_at.desc())
+    total = (
+        known_total
+        if known_total is not None
+        else await db.scalar(select(func.count()).select_from(Item).where(*conditions))
     )
-    return await paginate_async(db, query, limit=limit, offset=offset)
+
+    async def read(
+        extra: Sequence[ColumnElement[bool]], order: Sequence[Any], size: int
+    ) -> list[Item]:
+        rows = await db.scalars(
+            select(Item)
+            .options(joinedload(Item.category))
+            .options(
+                noload(Item.storage_location),
+                noload(Item.uom),
+                noload(Item.template),
+            )
+            .where(*conditions, *extra)
+            .order_by(*order)
+            .offset(0 if after else offset)
+            .limit(size)
+        )
+        return list(rows.all())
+
+    if after is None:
+        page = await read([], [_archived_at().desc(), Item.id], limit)
+    else:
+        page = await read_page_after(
+            read, moment=_archived_at(), row_id=Item.id, after=after, limit=limit
+        )
+    return page, int(total or 0)
 
 
 async def get_deletion_notes_async(

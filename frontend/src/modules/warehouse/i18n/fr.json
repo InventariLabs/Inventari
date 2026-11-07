@@ -1907,6 +1907,7 @@
       "tracking": "Liens de suivi",
       "presets": "Réglages prêts à l’emploi"
     },
+    "sectionRefused": "non enregistré : le serveur l'a refusé",
     "nav": "Sections de la configuration",
     "related": "Écrans associés",
     "advanced": {
@@ -2081,6 +2082,7 @@
     "heldWhy": "Motif",
     "lot": "Lot",
     "expiry": "Péremption",
+    "expiryNeeded": "Requise pour ce produit",
     "emptyTitle": "Rien n’est encore scanné",
     "emptyHint": "Scannez un produit ou choisissez un fournisseur avec une commande en attente.",
     "emptyHintAny": "Scannez un produit, puis indiquez la quantité reçue.",
@@ -2114,6 +2116,7 @@
       "noPartner": "Choisissez le fournisseur.",
       "noCustomer": "Choisissez le client.",
       "postFailed": "La réception n’a pas pu être enregistrée.",
+      "needsExpiry": "Péremption manquante pour : {{products}}. Saisissez-la sous « Lot et péremption » sur la ligne.",
       "openPartner": "Ouvrir le partenaire",
       "saveFailed": "Le brouillon n’a pas pu être enregistré.",
       "previewFailed": "Impossible de déterminer où vont les lignes. Le plan suivra les règles lors de la réception.",

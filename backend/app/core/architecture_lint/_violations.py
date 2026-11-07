@@ -18,6 +18,7 @@ from ._constants import (
     REASON_MIN_WORDS,
     REASON_PATTERN,
     Violation,
+    _is_alembic_env,
     _is_model_file,
     _is_test_file,
     _rel,
@@ -267,7 +268,11 @@ def collect_module_import_violations(modules_root: Path) -> list[Violation]:
     """
     violations: list[Violation] = []
     for py_file in modules_root.rglob('*.py'):
-        if _is_test_file(py_file, modules_root) or _is_model_file(py_file):
+        if (
+            _is_test_file(py_file, modules_root)
+            or _is_model_file(py_file)
+            or _is_alembic_env(py_file, modules_root)
+        ):
             continue
         try:
             source = py_file.read_text(encoding='utf-8')
@@ -296,7 +301,7 @@ def find_module_boundary_violations(
         if _is_test_file(py_file, root):
             continue
 
-        if _is_model_file(py_file):
+        if _is_model_file(py_file) or _is_alembic_env(py_file, root):
             continue
 
         # A file that is not valid Python used to take the whole gate down

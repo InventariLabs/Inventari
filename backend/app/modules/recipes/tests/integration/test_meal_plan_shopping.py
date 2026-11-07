@@ -531,6 +531,30 @@ class TestShoppingListDeductsWhatIsOnTheShelf:
         # The summary chip reads like the list does: a number and its measure.
         assert result['items'][0]['uom_symbol'] == 'g'
 
+    def test_each_generated_line_carries_its_own_key(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """The preview tells its rows apart by this, not by name or position."""
+        plan_id = _plan_with(
+            client,
+            auth_headers,
+            db_session,
+            ingredient_names=['Maka', 'Cukier'],
+        )
+
+        first = _generate(client, auth_headers, plan_id)
+        again = _generate(client, auth_headers, plan_id)
+
+        keys = [item['key'] for item in first['items']]
+        assert len(keys) == 2
+        assert all(keys)
+        assert len(set(keys)) == 2
+        # The same plan asks for the same lines, so the keys are the same ones.
+        assert [item['key'] for item in again['items']] == keys
+
 
 @pytest.mark.integration
 class TestStockSpokenForIsNotStockYouHave:

@@ -23,6 +23,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.core.operator_error import OperatorError
 from app.core.version import check_min_version
 
 # Core keys such as 'org:settings:write' carry three segments, so a permission
@@ -145,7 +146,9 @@ class PermissionDef(BaseModel):
     @classmethod
     def validate_key(cls, v: str) -> str:
         if not _PERMISSION_RE.match(v):
-            raise ValueError(f'permission key must be "<module>:<action>", got {v!r}')
+            raise OperatorError(
+                f'permission key must be "<module>:<action>", got {v!r}'
+            )
         return v
 
     @model_validator(mode='after')
@@ -348,7 +351,7 @@ class ModuleManifest(BaseModel):
     @model_validator(mode='after')
     def manifest_version_is_one_we_read(self) -> ModuleManifest:
         if self.manifest_version not in SUPPORTED_MANIFEST_VERSIONS:
-            raise ValueError(_unsupported_manifest_version(self.manifest_version))
+            raise OperatorError(_unsupported_manifest_version(self.manifest_version))
         return self
 
     @field_validator('permissions', mode='before')
@@ -356,7 +359,7 @@ class ModuleManifest(BaseModel):
     def widen_permission_strings(cls, v: object) -> object:
         """Accept the shorthand ``"maker:write"`` alongside full objects."""
         if not isinstance(v, list):
-            raise ValueError('permissions must be a list')
+            raise OperatorError('permissions must be a list')
         return [{'key': p} if isinstance(p, str) else p for p in v]
 
     @model_validator(mode='after')
@@ -375,7 +378,7 @@ class ModuleManifest(BaseModel):
         for perm in self.permissions:
             namespace = perm.key.split(':', 1)[0]
             if namespace != self.name and perm.key not in CORE_PERMISSION_KEYS:
-                raise ValueError(
+                raise OperatorError(
                     f'permission {perm.key!r} is outside the "{self.name}:" '
                     f'namespace and is not a core permission'
                 )
@@ -414,20 +417,20 @@ class ModuleManifest(BaseModel):
     @classmethod
     def validate_requires(cls, v: list[str]) -> list[str]:
         if not isinstance(v, list):
-            raise ValueError('requires must be a list')
+            raise OperatorError('requires must be a list')
         for dep in v:
             if not isinstance(dep, str) or not dep.strip():
-                raise ValueError(f'requires must be non-empty strings, got {dep!r}')
+                raise OperatorError(f'requires must be non-empty strings, got {dep!r}')
         return v
 
     @field_validator('optional_requires', mode='before')
     @classmethod
     def validate_optional_requires(cls, v: list[str]) -> list[str]:
         if not isinstance(v, list):
-            raise ValueError('optional_requires must be a list')
+            raise OperatorError('optional_requires must be a list')
         for dep in v:
             if not isinstance(dep, str) or not dep.strip():
-                raise ValueError(
+                raise OperatorError(
                     f'optional_requires must be non-empty strings, got {dep!r}'
                 )
         return v

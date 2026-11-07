@@ -1851,6 +1851,7 @@
       "tracking": "Links de rastreamento",
       "presets": "Configuração pronta"
     },
+    "sectionRefused": "não guardado — o servidor recusou",
     "nav": "Seções de configuração",
     "related": "Telas relacionadas",
     "advanced": {
@@ -2025,6 +2026,7 @@
     "heldWhy": "Por quê",
     "lot": "Lote",
     "expiry": "Validade",
+    "expiryNeeded": "Obrigatória para este produto",
     "emptyTitle": "Nada escaneado ainda",
     "emptyHint": "Escaneie um produto ou escolha um fornecedor com um pedido em espera.",
     "emptyHintAny": "Escaneie um produto e diga quantos vieram.",
@@ -2058,6 +2060,7 @@
       "noPartner": "Escolha o fornecedor.",
       "noCustomer": "Escolha o cliente.",
       "postFailed": "Não foi possível receber a entrega.",
+      "needsExpiry": "Falta a validade de: {{products}}. Preencha em «Lote e validade» na linha.",
       "openPartner": "Abrir o parceiro",
       "saveFailed": "Não foi possível salvar o rascunho.",
       "previewFailed": "Não foi possível calcular para onde as linhas vão. O plano seguirá as regras quando você lançar.",

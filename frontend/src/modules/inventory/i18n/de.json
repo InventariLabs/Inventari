@@ -8,7 +8,8 @@
     "needsAttention_other": "brauchen Aufmerksamkeit"
   },
   "actions": {
-    "stockTakesInProgress": "Laufende Inventuren"
+    "stockTakesInProgress": "Laufende Inventuren",
+    "stockTakesUnavailable": "Laufende Inventuren konnten nicht geprüft werden"
   },
   "nav": {
     "overview": "Übersicht",
@@ -147,7 +148,7 @@
       "location": "Lagerort",
       "anyLocation": "Überall",
       "includeEmpty": "Lagerorte mit Nullbestand einbeziehen",
-      "includeEmptyHint": "Zeigt Bestandszeilen mit der Menge null — die Spur davon, dass hier etwas war. Ein Lagerort, an dem das Produkt nie war, hat keine Zeile.",
+      "includeEmptyHint": "Zeigt Datensätze mit der Menge null — die Spur davon, dass hier etwas war. Ein Lagerort, an dem das Produkt nie war, hat keinen Datensatz.",
       "oneStorage": "ein Lagerort",
       "oneProduct": "ein Produkt"
     },
@@ -166,8 +167,8 @@
     "whereItLies": "Wo es liegt",
     "seeForProduct": "An allen Lagerorten",
     "seeForLocation": "Bestände dieses Lagerorts",
-    "rows_one": "Bestandsposition",
-    "rows_other": "Bestandspositionen"
+    "rows_one": "Datensatz",
+    "rows_other": "Datensätze"
   },
   "lots": {
     "title": "Chargen",
@@ -185,7 +186,8 @@
       "message": "Der Grund bleibt bei der Charge und steht neben ihrem Status.",
       "label": "Warum",
       "placeholder": "Lieferantenmeldung 41/26 — Glas in Glas 12 gefunden",
-      "confirm": "Status ändern"
+      "confirm": "Status ändern",
+      "failed": "Der Status der Charge konnte nicht geändert werden"
     },
     "actionsFor": "Aktionen für Charge {{name}}",
     "columns": {

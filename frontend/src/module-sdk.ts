@@ -49,6 +49,9 @@ export { readJson, writeJson } from "@/lib/localStorage";
 export { extractApiError } from "@/lib/errors";
 // The error a callback throws to put its own sentence on the screen that asked.
 export { ReadableError } from "@/lib/errors";
+// What a file picker for an attachment offers: the types the server's
+// attachment uploads accept, and no others.
+export { ATTACHMENT_FILE_ACCEPT } from "@/utils/fileValidation";
 // A location on one line, its own name before the path, as every location
 // picker names it.
 export { storageLeafLabel } from "@/utils/storageLeafOption";
@@ -142,6 +145,9 @@ export { useStoragesTree } from "@/hooks/queries/useStoragesTree";
 export type { LocationOption } from "@/hooks/useLocationPicker";
 export { useDebounce, useDebouncedCallback } from "@/hooks/useDebounce";
 export { default as Pagination } from "@/components/ui/Pagination";
+// The page state of a list the server pages by the last row seen: the cursors
+// of the pages visited, and the first page again when the question changes.
+export { useKeysetPaging } from "@/hooks/useKeysetPaging";
 
 // Generated wire types and the helper a create payload uses when a field may be
 // left to the server's default.

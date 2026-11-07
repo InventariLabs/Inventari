@@ -1907,6 +1907,7 @@
       "tracking": "Enlaces de seguimiento",
       "presets": "Ajustes predefinidos"
     },
+    "sectionRefused": "sin guardar: el servidor lo rechazó",
     "nav": "Secciones de la configuración",
     "related": "Pantallas relacionadas",
     "advanced": {
@@ -2081,6 +2082,7 @@
     "heldWhy": "Motivo",
     "lot": "Lote",
     "expiry": "Caducidad",
+    "expiryNeeded": "Obligatoria para este producto",
     "emptyTitle": "Todavía no hay nada escaneado",
     "emptyHint": "Escanea un producto o elige un proveedor con un pedido pendiente.",
     "emptyHintAny": "Escanea un producto y luego indica cuántos han llegado.",
@@ -2114,6 +2116,7 @@
       "noPartner": "Elige el proveedor.",
       "noCustomer": "Elige el cliente.",
       "postFailed": "No se ha podido recibir la entrega.",
+      "needsExpiry": "Falta la caducidad de: {{products}}. Introdúcela en «Lote y caducidad» de la línea.",
       "openPartner": "Abrir el socio",
       "saveFailed": "No se ha podido guardar el borrador.",
       "previewFailed": "No se ha podido determinar dónde van las líneas. El plan seguirá las reglas al recibir.",

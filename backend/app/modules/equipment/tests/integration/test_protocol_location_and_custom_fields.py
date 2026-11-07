@@ -285,6 +285,27 @@ class TestCategoryCustomFields:
             assert 'Operating hours' in keys['{{custom.operating_hours}}'], path
             assert '{{custom.udt_review_due}}' in keys, path
 
+    def test_a_custom_field_entry_carries_its_label_and_categories_apart(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        machine_category: Category,
+    ) -> None:
+        """The description is one English sentence; a Polish editor cannot
+        translate the connective inside it, so the parts travel separately."""
+        for path in (
+            '/api/v1/equipment/protocol/placeholders',
+            '/api/v1/equipment/templates/placeholders',
+        ):
+            resp = client.get(path, headers=eq_auth_headers)
+            entry = next(
+                e for e in resp.json() if e['key'] == '{{custom.operating_hours}}'
+            )
+            assert entry['custom_field_label'] == 'Operating hours', path
+            assert entry['custom_field_categories'] == [machine_category.name], path
+            builtin = next(e for e in resp.json() if e['key'] == '{{item_name}}')
+            assert builtin['custom_field_label'] is None, path
+
     def test_food_category_fields_are_not_offered(
         self,
         client: TestClient,

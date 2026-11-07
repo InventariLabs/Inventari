@@ -26,6 +26,8 @@ from typing import Literal
 from alembic import command
 from alembic.config import Config
 
+from app.core.operator_error import OperatorError
+
 logger = logging.getLogger(__name__)
 
 MODULES_ROOT = Path(__file__).resolve().parents[2] / 'app' / 'modules'
@@ -127,4 +129,4 @@ def run_module_migrations(
     elif action == 'current':
         command.current(cfg)
     else:
-        raise ValueError(f'Unknown action: {action}')
+        raise OperatorError(f'Unknown action: {action}')

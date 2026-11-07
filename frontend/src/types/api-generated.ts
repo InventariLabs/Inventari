@@ -2251,7 +2251,7 @@ export interface paths {
         };
         /**
          * Get Archived Items
-         * @description List of archived (soft-deleted) products, scoped by module context.
+         * @description Archived (soft-deleted) products, newest archived first, scoped by module context.
          */
         get: operations["get_archived_items_api_v1_items_archived_get"];
         put?: never;
@@ -8223,7 +8223,7 @@ export interface paths {
          *     same read fills To do's *Needs a decision* block, so one rule answers
          *     both: the approvals module must be on, the reader must hold
          *     ``approvals:approve`` and the open stage must name them. A disabled
-         *     module or a failed lookup reads as an empty queue.
+         *     module reads as an empty queue; a failed lookup is a 500.
          */
         get: operations["list_documents_awaiting_my_approval_api_v1_warehouse_awaiting_my_approval_get"];
         put?: never;
@@ -11456,7 +11456,7 @@ export interface components {
         };
         /**
          * ArchivedItemListResponse
-         * @description Paginated response for the archived items list endpoint.
+         * @description A page of the archived items list, paged by the last row seen.
          */
         ArchivedItemListResponse: {
             /** Items */
@@ -11483,6 +11483,8 @@ export interface components {
              * @default false
              */
             total_capped: boolean;
+            /** Next Cursor */
+            next_cursor?: string | null;
         };
         /** ArchivedItemSchema */
         ArchivedItemSchema: {
@@ -15542,7 +15544,7 @@ export interface components {
         ImportPasteRequest: {
             /**
              * Text
-             * @description Raw pasted clipboard text.
+             * @description Raw pasted clipboard text, no longer than an imported file may be.
              */
             text?: string;
             /**
@@ -19716,7 +19718,7 @@ export interface components {
         ParsePasteRequest: {
             /**
              * Text
-             * @description Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected.
+             * @description Raw text pasted from clipboard (Excel/Sheets). Delimiter (tab, comma, semicolon) is auto-detected. No longer than an imported file may be.
              */
             text?: string;
         };
@@ -20264,7 +20266,10 @@ export interface components {
          *     ``key`` is the literal Jinja2 expression (e.g. ``{{partner.name}}``),
          *     ``example`` a representative rendered value, ``possibly_empty`` marks
          *     fields that are absent for some documents, and ``document_types`` names
-         *     the document types the field belongs to (``None`` = any type).
+         *     the document types the field belongs to (``None`` = any type). A category
+         *     custom field also carries its ``custom_field_label`` and the
+         *     ``custom_field_categories`` that define it, apart from the English
+         *     ``description``, so a client can phrase the sentence in its own language.
          */
         PlaceholderInfo: {
             /** Key */
@@ -20280,6 +20285,10 @@ export interface components {
             possibly_empty: boolean;
             /** Document Types */
             document_types?: string[] | null;
+            /** Custom Field Label */
+            custom_field_label?: string | null;
+            /** Custom Field Categories */
+            custom_field_categories?: string[] | null;
         };
         /**
          * PreviewIngredient
@@ -20668,8 +20677,10 @@ export interface components {
             expiry_date?: string | null;
             /** Serial Number */
             serial_number?: string | null;
-            /** Created At */
-            created_at?: string | null;
+            /** Added Date */
+            added_date?: string | null;
+            /** Merged */
+            merged?: boolean | null;
             /** Location Name */
             location_name?: string | null;
             /** Name */
@@ -22268,7 +22279,7 @@ export interface components {
         ReadPastedLinesRequest: {
             /**
              * Text
-             * @description Raw pasted clipboard text.
+             * @description Raw pasted clipboard text, no longer than an imported file may be.
              */
             text?: string;
             /** Mapping Json */
@@ -23515,6 +23526,8 @@ export interface components {
             safety_stock: string;
             /** Preferred Partner Id */
             preferred_partner_id?: string | null;
+            /** Preferred Partner Name */
+            preferred_partner_name?: string | null;
             /** Notes */
             notes?: string | null;
             /** Created At */
@@ -27425,6 +27438,11 @@ export interface components {
              * @default false
              */
             from_order: boolean;
+            /**
+             * Expected Is Count
+             * @default false
+             */
+            expected_is_count: boolean;
             /** Planned Location Id */
             planned_location_id?: string | null;
             /** Planned Location Name */
@@ -28005,6 +28023,8 @@ export interface components {
         };
         /** _GeneratedItem */
         _GeneratedItem: {
+            /** Key */
+            key: string;
             /** Name */
             name: string;
             /** Quantity */
@@ -32585,8 +32605,11 @@ export interface operations {
     get_archived_items_api_v1_items_archived_get: {
         parameters: {
             query?: {
-                offset?: number;
                 limit?: number;
+                /** @description The previous page's next_cursor: the page that follows it. The cost of a page stays its size however long the archive grows, and the count is taken on the first page and carried, so it does not move. */
+                cursor?: string | null;
+                /** @description Deprecated: counts rows from the top on every call, so a deep page costs every row above it. Page with `cursor`. */
+                offset?: number;
                 /** @description Filter by category context_tag (e.g. equipment) */
                 context_tag?: string | null;
                 /** @description Hide items whose category belongs to a vertical module */
@@ -46910,7 +46933,7 @@ export interface operations {
             query?: {
                 q?: string;
                 limit?: number;
-                /** @description Narrow a stock search to this location and the ones under it. On its own it also selects the stock search, for callers written before the explicit flag. */
+                /** @description Narrow a stock search to this location. A shelf is exact: only its own records. A zone also offers the shelves below it. On its own it also selects the stock search, for callers written before the explicit flag. */
                 location_id?: string | null;
                 /** @description Answer with the stock on hand rather than the product catalogue. Results then carry item_id, which the lines of a document taking goods off a shelf require. Combine with location_id to narrow it. */
                 stock?: boolean;

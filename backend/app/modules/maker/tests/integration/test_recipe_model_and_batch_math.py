@@ -856,12 +856,18 @@ class TestOneLockedDefaultImplementation:
     /recipes uses), and get_or_create_default_recipe holds the same lock
     around its own guaranteed-default insert.
 
-    Measured with the lock removed at both call sites: the two tests that
-    run the decision in parallel go red (IntegrityError off
-    ``uq_recipe_org_template_name`` and ``uq_recipe_default_per_template``
-    respectively); the four sequential tests pass with and without the
-    lock — they measure the sequence, not the race, and stay as the
-    behaviour the race must land in.
+    Four places hold the lock: ``recipe_service.create_recipe``,
+    ``recipe_service.create_recipe_from_culinary``, the default flip in
+    ``recipe_service.update_recipe`` and
+    ``bom_service.get_or_create_default_recipe``. The two parallel tests
+    drive two of them — ``create_recipe`` and ``get_or_create_default_recipe``
+    — so "the lock removed" means those two addresses: with both removed the
+    two parallel tests go red (IntegrityError off ``uq_recipe_org_template_name``
+    and ``uq_recipe_default_per_template`` respectively); with only the
+    ``recipe_service`` ones removed, one of the six goes red, because the
+    get-or-create door is still serialised. The four sequential tests pass
+    with and without the lock — they measure the sequence, not the race, and
+    stay as the behaviour the race must land in.
     """
 
     def test_first_recipe_is_default(

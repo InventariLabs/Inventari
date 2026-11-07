@@ -4,9 +4,6 @@ Uses a separate version_table (alembic_version_maker) so that
 core migrations and module migrations are completely independent.
 """
 
-# architecture: allow_direct_db_access
-# reason: Alembic migration env.py needs Base.metadata for schema operations
-
 from logging.config import fileConfig
 
 from alembic import context

@@ -112,6 +112,7 @@ async def _receipt_plans(
     for line in doc.lines:
         plan = plans[line.id]
         plan['from_order'] = line.source_po_line_id is not None
+        plan['expected_is_count'] = line.expected_is_count
         if plan['planned_source'] != SOURCE_DOCUMENT or doc.target_location_id is None:
             continue
         offer = await floor_shelf_offer_async(

@@ -23,6 +23,7 @@ from app.schemas.pagination import PaginatedResponse
 
 from ._documents_router import router as documents_router
 from ._error_mapping import map_approval_errors
+from ._services_request import require_target_exists
 from .approvals_api import approvals_api
 from .approvals_dtos import ApprovalRequestDTO, ApprovalWorkflowDTO
 from .models import ApprovalWorkflow
@@ -419,6 +420,9 @@ async def create_request_endpoint(
     org_id: UUID = Depends(require_org),
 ) -> ApprovalRequestDTO:
     """Create an approval request for a target entity."""
+    # Here, not in the service: the modules that raise a request of their own
+    # have just read their target; this route takes the id from the client.
+    await require_target_exists(db, org_id, data.target_type, data.target_id)
     return await approvals_api.request_approval(
         db,
         org_id,

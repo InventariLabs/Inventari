@@ -51,11 +51,16 @@ class AppException(HTTPException):
 
 
 class NotFoundException(AppException):
-    """404 — resource not found."""
+    """404 — resource not found.
 
-    def __init__(self, resource: str, lang: Language | None = 'en') -> None:
+    Without *lang* the sentence is in the request's language: the default
+    used to be English, and every call site that did not pass the language
+    answered a Polish reader in English.
+    """
+
+    def __init__(self, resource: str, lang: Language | None = None) -> None:
         i18n_key = f'{resource}_not_found'
-        message = get_error_message(i18n_key, lang)
+        message = get_error_message(i18n_key, lang or get_current_lang())
         super().__init__(
             status_code=404,
             code=f'{resource.upper()}_NOT_FOUND',
@@ -532,7 +537,7 @@ def refusal_code_of(exc: BaseException) -> str | None:
     return None
 
 
-def refusal_row(exc: ValueError, **where: Any) -> dict[str, Any]:
+def refusal_row(exc: Exception, **where: Any) -> dict[str, Any]:
     """One refused row of a batch result: *where* it is, its sentence and its code.
 
     For a refusal the caller has already judged the reader's to see (see

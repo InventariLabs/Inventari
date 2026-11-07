@@ -264,6 +264,7 @@
     "emptyFilteredTitle": "Nenhuma regra corresponde aos filtros",
     "emptyFilteredDescription": "Limpe a busca ou escolha outro local.",
     "alertStock": "disponível {{available}} / mín. {{min}}",
+    "alertStockSafety": "disponível {{available}} / estoque de segurança {{threshold}}",
     "alertLocation": "em {{location}}",
     "alertSupplier": "fornecedor {{supplier}}",
     "noSupplier": "Sem fornecedor",

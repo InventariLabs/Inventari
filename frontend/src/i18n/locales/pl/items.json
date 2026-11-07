@@ -298,7 +298,7 @@
     "successUpdated_few": "Zaktualizowano {{count}} produkty",
     "successUpdated_many": "Zaktualizowano {{count}} produktów",
     "successUpdated_other": "Zaktualizowano {{count}} produktów",
-    "errorUpdate": "Błąd podczas aktualizacji"
+    "errorUpdate": "Nie udało się zmienić zaznaczonych produktów"
   },
   "fields": {
     "purchase_price": "Cena zakupu za jednostkę",
@@ -497,7 +497,8 @@
     "runningLow": "Niski stan",
     "setToCurrent": "Ustaw na bieżącą ilość",
     "save": "Ustaw alert",
-    "scopeNote": "Alert należy do produktu: mierzy się go całym zapasem tego produktu, nie tym jednym rekordem."
+    "scopeNote": "Alert należy do produktu: mierzy się go całym zapasem tego produktu, nie tym jednym rekordem.",
+    "saveFailed": "Nie udało się zapisać alertu o niskim stanie"
   },
   "deletionReasonPlaceholder": "— wybierz powód —",
   "quickActions": {

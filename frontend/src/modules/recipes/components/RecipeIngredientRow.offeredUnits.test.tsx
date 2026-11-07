@@ -111,6 +111,17 @@ describe("RecipeIngredientRow — the units a linked ingredient offers", () => {
     ).toBeNull();
   });
 
+  it("offers ml and l beside the pack once the card states a volume per pack", async () => {
+    // The hint already said "enter volume per piece to use ml"; once the card
+    // carried it, the picker still left ml out.
+    await offeredUnits({ uomId: "u-pack", measureUomIds: ["u-l"] });
+
+    expect(screen.getByText("pack")).toBeInTheDocument();
+    expect(screen.getByText("ml")).toBeInTheDocument();
+    expect(screen.getByText("l")).toBeInTheDocument();
+    expect(screen.queryByText("g")).not.toBeInTheDocument();
+  });
+
   it("offers only the pack while the card states no measure, and points at the card", async () => {
     await offeredUnits({ uomId: "u-pack", measureUomIds: [] });
 

@@ -471,6 +471,7 @@ ERRORS_PT: dict[str, str] = {
     'approval_not_stage_approver': 'Você não é aprovador desta etapa.',
     'approval_only_requester_can_cancel': 'Somente a pessoa que abriu a solicitação pode retirá-la.',
     'approval_workflow_inactive': 'O fluxo de aprovação desta solicitação não está mais ativo.',
+    'approval_target_not_found': 'Este registro não existe, portanto não é possível solicitar a sua aprovação.',
     'approval_request_already_open': 'Já existe uma solicitação de aprovação aberta para este registro.',
     'approval_workflow_no_stages': 'Este fluxo de aprovação não tem etapas configuradas.',
     'approval_workflow_needs_stage': 'Um fluxo de aprovação precisa de pelo menos uma etapa.',

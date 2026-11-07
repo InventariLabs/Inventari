@@ -69,6 +69,7 @@ import {
   RECEIVE_SOURCE_TYPE,
   shortDelivery,
   toDocumentCreate,
+  undatedRows,
   withImportedLines,
   withOrderLines,
   withScannedProduct,
@@ -86,7 +87,11 @@ import type {
 } from "@/modules/warehouse/types";
 import { formatQuantityLocale } from "@/utils/formatters";
 import { unitLabel } from "@/lib/i18nHelpers";
-import { extractApiError, extractApiErrorCode } from "@/lib/errors";
+import {
+  extractApiError,
+  extractApiErrorCode,
+  extractApiErrorRows,
+} from "@/lib/errors";
 
 // Pasting rows is a desk task, opened on request: its own chunk keeps the
 // import dialog (file upload, column mapping, preview) off the screen a
@@ -98,6 +103,7 @@ const DocumentImportModal = lazy(() =>
 );
 
 const TARGET_FIELD_ID = "receive-target-warehouse";
+const PARTNER_FIELD_ID = "receive-partner";
 
 /** Below `sm` the delivery is received one item at a time, as a phone holds it. */
 const PHONE_QUERY = "(max-width: 639px)";
@@ -154,15 +160,31 @@ function problemMessage(
   return t(PROBLEM_KEYS[problem]);
 }
 
-/** The refusal that belongs to the location field, for the field to wear. */
-function targetProblem(
+/** The refusals that belong to a field: it wears them, so nothing repeats them. */
+const FIELD_PROBLEMS: ReadonlySet<ProblemKey> = new Set([
+  "noWarehouse",
+  "noPartner",
+]);
+
+/** The refusal that belongs to `field`, for the field to wear. */
+function fieldProblem(
   t: TFunction,
   problem: ProblemKey | null,
   source: ReceiveSource,
+  field: "noWarehouse" | "noPartner",
 ): string | undefined {
-  return problem === "noWarehouse"
+  return problem === field ? problemMessage(t, problem, source) : undefined;
+}
+
+/** The refusal that no field wears, for the footer or the phone panel. */
+function looseProblem(
+  t: TFunction,
+  problem: ProblemKey | null,
+  source: ReceiveSource,
+): string | null {
+  return problem && !FIELD_PROBLEMS.has(problem)
     ? problemMessage(t, problem, source)
-    : undefined;
+    : null;
 }
 
 /** The sentence under the result: the count, and what the order still expects. */
@@ -480,6 +502,8 @@ function receiveHeading(
 function focusProblem(issue: ProblemKey | null, scan: HTMLInputElement | null) {
   if (issue === "noWarehouse") {
     document.getElementById(TARGET_FIELD_ID)?.focus();
+  } else if (issue === "noPartner") {
+    document.getElementById(PARTNER_FIELD_ID)?.focus();
   } else if (issue === "noLines" || issue === "noProduct") {
     scan?.focus();
   }
@@ -743,6 +767,8 @@ function useSheetPresses(args: {
   holdsGoods: boolean;
   onPosted: (receipt: PostedReceipt) => void;
   onPostError: (message: string, code?: string | null) => void;
+  /** Take the refusal if it is the question about undated rows; false if not. */
+  onUndated: (error: unknown) => boolean;
 }) {
   const {
     canWrite,
@@ -765,6 +791,7 @@ function useSheetPresses(args: {
     holdsGoods,
     onPosted,
     onPostError,
+    onUndated,
   } = args;
   // The draft's own key, apart from the post's: the server answers a key it
   // has seen with the document it made under it.
@@ -794,6 +821,7 @@ function useSheetPresses(args: {
           askSurplus(extractApiError(error, ""), () => post(true));
           return;
         }
+        if (onUndated(error)) return;
         onPostError(
           extractApiError(error, t("receive.errors.postFailed")),
           extractApiErrorCode(error),
@@ -809,6 +837,7 @@ function useSheetPresses(args: {
       clearRefusals,
       onPostError,
       onPosted,
+      onUndated,
       order,
       payload,
       press,
@@ -981,6 +1010,40 @@ function usePostError(partnerId: string, t: TFunction) {
   return { postError, setPostError, postErrorFix };
 }
 
+/**
+ * The rows the server refused for want of an expiry date. A receipt of a
+ * product taken by earliest expiry may not arrive undated: the refusal names
+ * the rows, and the sheet opens their date fields and says which need one.
+ */
+function useUndatedRows(
+  lines: ReceiveDraftLine[],
+  setPostError: (message: string | null) => void,
+  t: TFunction,
+) {
+  const [undatedKeys, setUndatedKeys] = useState<Set<string>>(new Set());
+  const clearUndated = useCallback(() => setUndatedKeys(new Set()), []);
+  const onUndated = useCallback(
+    (error: unknown) => {
+      if (extractApiErrorCode(error) !== "RECEIPT_EXPIRY_REQUIRED")
+        return false;
+      const rows = undatedRows(extractApiErrorRows(error, "lines"), lines);
+      if (rows.length === 0) return false;
+      setUndatedKeys(new Set(rows.map((row) => row.key)));
+      setPostError(
+        t("receive.errors.needsExpiry", {
+          products: rows.map((row) => row.name).join(", "),
+        }),
+      );
+      return true;
+    },
+    [lines, setPostError, t],
+  );
+  return useMemo(
+    () => ({ keys: undatedKeys, clear: clearUndated, onUndated }),
+    [undatedKeys, clearUndated, onUndated],
+  );
+}
+
 /** The order the reader chose, or the first one the supplier has open. */
 function chosenOf<T extends { id: string }>(orders: T[], id: string | null) {
   return orders.find((order) => order.id === id) ?? orders[0] ?? null;
@@ -1021,6 +1084,7 @@ export default function ReceiveGoodsPage() {
   const [focusLineKey, setFocusLineKey] = useState<string | null>(null);
   const [problem, setProblem] = useState<ProblemKey | null>(null);
   const { postError, setPostError, postErrorFix } = usePostError(partnerId, t);
+  const undated = useUndatedRows(lines, setPostError, t);
   const [importOpen, setImportOpen] = useState(false);
   const [result, setResult] = useState<PostedReceipt | null>(null);
   // What the last paste could not put on the sheet. Kept until the next
@@ -1124,7 +1188,8 @@ export default function ReceiveGoodsPage() {
   const clearRefusals = useCallback(() => {
     setPostError(null);
     setProblem(null);
-  }, [setPostError]);
+    undated.clear();
+  }, [setPostError, undated]);
 
   const showProblem = useCallback((refusal: Refusal) => {
     setProblem(refusal.problem);
@@ -1179,6 +1244,7 @@ export default function ReceiveGoodsPage() {
     holdsGoods: lines.some(isHeld),
     onPosted: setResult,
     onPostError: setPostError,
+    onUndated: undated.onUndated,
   });
 
   const { quantityEnter, addProduct, goods } = useLineEntry({
@@ -1236,7 +1302,8 @@ export default function ReceiveGoodsPage() {
           onPartnerChange={changePartner}
           targetLocationId={targetLocationId}
           onTargetChange={changeTarget}
-          targetError={targetProblem(t, problem, source)}
+          targetError={fieldProblem(t, problem, source, "noWarehouse")}
+          partnerError={fieldProblem(t, problem, source, "noPartner")}
           locationsEmptyReason={emptyReason}
           locationsFailed={locationsFailed}
           externalReference={externalReference}
@@ -1270,7 +1337,7 @@ export default function ReceiveGoodsPage() {
           hasOrder={chosenOrder !== null}
           ordersLoading={orders.isLoading}
           goods={goods}
-          error={problem ? problemMessage(t, problem, source) : postError}
+          error={looseProblem(t, problem, source) ?? postError}
         />
       ) : (
         <>
@@ -1285,6 +1352,7 @@ export default function ReceiveGoodsPage() {
             canWrite={canWrite}
             focusLineKey={focusLineKey}
             shortKeys={short.rowKeys}
+            undatedKeys={undated.keys}
             scanRef={scanRef}
             onSelectProduct={addProduct}
             onFocusHandled={() => setFocusLineKey(null)}
@@ -1314,7 +1382,7 @@ export default function ReceiveGoodsPage() {
             quantity={totalQuantity(totals)}
             shortCount={short.count}
             fromOrder={chosenOrder !== null}
-            problemText={problem ? problemMessage(t, problem, source) : null}
+            problemText={looseProblem(t, problem, source)}
             postLabel={postLabel(t, source)}
             postError={postError}
             postErrorFix={postErrorFix}

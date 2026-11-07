@@ -221,7 +221,7 @@ export default function SettingsShell() {
       ],
     },
     {
-      label: t("settings.shell.groupIntegrations"),
+      label: t("settings.shell.groupModuleSettings"),
       items: moduleSections.map((s) => ({
         label: tDyn(s.title),
         to: `/settings/${s.path}`,
@@ -357,12 +357,20 @@ export default function SettingsShell() {
                           key={destination(item)}
                           to={destination(item)}
                           end={item.exact}
+                          // NavLink matches the path only; see the sidebar.
+                          aria-current={isActive ? "page" : "false"}
                           onClick={(e) => {
                             e.preventDefault();
                             // The sheet must close whichever way the
                             // question lands — leaving for the new tab,
                             // or staying to keep typing.
                             setMobileNavOpen(false);
+                            // A section of the page the reader is on is not
+                            // an exit, as for the sidebar's links.
+                            if (item.to === location.pathname) {
+                              navigate(destination(item));
+                              return;
+                            }
                             guardNavigate(() => navigate(destination(item)));
                           }}
                           className={cn(

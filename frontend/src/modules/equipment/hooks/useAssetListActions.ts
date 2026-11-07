@@ -20,6 +20,7 @@ import { downloadBlob } from "@/utils/helpers";
 import { getTodayFilename } from "@/utils/formatters";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { queryKeys } from "@/hooks/queries/keys";
+import { useKeysetPaging } from "@/module-sdk";
 import { getEquipmentMeta } from "@/modules/equipment/components/assetUtils";
 import {
   bulkReturnPayload,
@@ -233,57 +234,56 @@ function useSearchPhrase() {
  * while the archived tab is on screen: typed over the active list it belongs
  * to that list, and re-asking the archive on every keystroke would be work
  * for a tab nobody is reading. Coming back with a phrase still in the box
- * narrows the archive then, and a new phrase starts it at page one — offset
- * 50 over a narrowed set would show an empty page while page one holds the
- * matches.
+ * narrows the archive then. The archive pages by the last row seen, so a new
+ * phrase — or coming back to the tab — starts it from its first page: a
+ * position in one answer means nothing in another.
  */
 function useArchivedListing(listTab: ListTab, search: string) {
-  const [skip, setSkip] = useState(0);
   const archivedSearch = listTab === "archived" ? search : "";
+  const paging = useKeysetPaging({ listTab, archivedSearch });
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, isPlaceholderData, refetch } = useQuery({
     queryKey: [
       ...queryKeys.equipment.assets.list({}),
       "archived",
       archivedSearch,
-      skip,
+      paging.cursor ?? null,
     ],
     queryFn: async () => {
       return itemsApi.getArchived({
         module_scope: "equipment",
         search: archivedSearch || undefined,
-        offset: skip,
+        cursor: paging.cursor,
         limit: PAGE_SIZE,
       });
     },
     placeholderData: keepPreviousData,
   });
 
-  useEffect(() => {
-    setSkip(0);
-  }, [archivedSearch]);
-
-  const onPrev = useCallback(
-    () => setSkip((s) => Math.max(0, s - PAGE_SIZE)),
-    [],
-  );
+  const { goNext } = paging;
+  const nextCursor = data?.next_cursor;
+  // The cursor on screen belongs to the page it came with; while the next
+  // page loads the old rows are still shown, and their cursor must not be
+  // taken for the new page's.
   const onNext = useCallback(() => {
-    const total = data?.total ?? 0;
-    if (total > 0 && skip + PAGE_SIZE < total) {
-      setSkip(skip + PAGE_SIZE);
-    }
-  }, [skip, data?.total]);
+    if (!isPlaceholderData) goNext(nextCursor);
+  }, [isPlaceholderData, goNext, nextCursor]);
 
   return {
-    skip,
-    setSkip,
     archivedSearch,
     data,
     isLoading,
     isError,
     refetch,
-    onPrev,
-    onNext,
+    // The page bar, ready to spread onto Pagination.
+    pagination: {
+      skip: paging.page * PAGE_SIZE,
+      limit: PAGE_SIZE,
+      total: data?.total ?? 0,
+      keyset: { rows: data?.items?.length ?? 0, hasNext: Boolean(nextCursor) },
+      onPrev: paging.goPrev,
+      onNext,
+    },
   };
 }
 
@@ -402,15 +402,12 @@ export function useAssetListActions() {
   const resetPagination = useCallback(() => setSkip(0), []);
 
   const {
-    skip: archivedSkip,
-    setSkip: setArchivedSkip,
     archivedSearch,
     data: archivedItems,
     isLoading: archivedLoading,
     isError: archivedError,
     refetch: refetchArchived,
-    onPrev: onArchivedPrev,
-    onNext: onArchivedNext,
+    pagination: archivedPagination,
   } = useArchivedListing(listTab, search);
 
   const bulkRetireMutation = useBulkRetireEquipment();
@@ -432,7 +429,6 @@ export function useAssetListActions() {
     () => archivedItems?.items ?? [],
     [archivedItems],
   );
-  const archivedTotal = archivedItems?.total ?? 0;
 
   // Batch endpoints report failures by item id; the reader knows assets by
   // name. Both lists feed the map because purge and restore act on archived
@@ -512,7 +508,7 @@ export function useAssetListActions() {
   useEffect(() => {
     setSelectedIds(new Set());
     setAllMatching(false);
-  }, [skip, archivedSkip, listTab, archivedSearch]);
+  }, [skip, archivedPagination.skip, listTab, archivedSearch]);
 
   const handleExport = useCallback(async () => {
     try {
@@ -745,7 +741,6 @@ export function useAssetListActions() {
       writeListTab(tab);
       if (tab === "archived") {
         clearSelection();
-        setArchivedSkip(0);
       }
     },
     selectedIds,
@@ -804,10 +799,7 @@ export function useAssetListActions() {
     onPrev,
     onNext,
     resetPagination,
-    archivedSkip,
-    archivedTotal,
-    onArchivedPrev,
-    onArchivedNext,
+    archivedPagination,
     bulkRetireMutation,
     bulkArchiveMutation,
     bulkReturnMutation,

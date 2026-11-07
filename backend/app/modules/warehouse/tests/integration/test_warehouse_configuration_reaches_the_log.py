@@ -49,7 +49,11 @@ from app.modules.warehouse.tax_rate_service import (
 )
 
 from .test_receipt_line_target import _make_category
-from .test_two_scans_of_one_line import _let_racers_finish, _wait_until_parked
+from .test_two_scans_of_one_line import (
+    _backend_pid,
+    _let_racers_finish,
+    _wait_until_parked,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -90,9 +94,15 @@ def _overlap(engine: AsyncEngine, write: _Write, then: _Write | None = None) -> 
     async def _run() -> None:
         async with maker() as first, maker() as second:
             await write(first)
+            first_pid, second_pid = (
+                await _backend_pid(first),
+                await _backend_pid(second),
+            )
             racer = asyncio.create_task((then or write)(second))
             try:
-                await _wait_until_parked(engine, 1)
+                await _wait_until_parked(
+                    engine, racer, racer_pid=second_pid, holder_pid=first_pid
+                )
             except BaseException:
                 await first.rollback()
                 await _let_racers_finish(racer)
@@ -677,6 +687,8 @@ class TestTaxRatesReachTheLog:
                     user_id=user_id,
                     is_default=True,
                 )
+                first_pid = await _backend_pid(first)
+                second_pid = await _backend_pid(second)
                 racer = asyncio.create_task(
                     create_tax_rate(
                         second,
@@ -688,7 +700,12 @@ class TestTaxRatesReachTheLog:
                     )
                 )
                 try:
-                    await _wait_until_parked(async_engine_fixture, 1)
+                    await _wait_until_parked(
+                        async_engine_fixture,
+                        racer,
+                        racer_pid=second_pid,
+                        holder_pid=first_pid,
+                    )
                 except BaseException:
                     await first.rollback()
                     await _let_racers_finish(racer)
@@ -733,9 +750,16 @@ class TestTaxRatesReachTheLog:
         async def _two_new_defaults() -> None:
             async with maker() as first, maker() as second:
                 await _create(first, 'Rate X')
+                first_pid = await _backend_pid(first)
+                second_pid = await _backend_pid(second)
                 racer = asyncio.create_task(_create(second, 'Rate Y'))
                 try:
-                    await _wait_until_parked(async_engine_fixture, 1)
+                    await _wait_until_parked(
+                        async_engine_fixture,
+                        racer,
+                        racer_pid=second_pid,
+                        holder_pid=first_pid,
+                    )
                 except BaseException:
                     await first.rollback()
                     await _let_racers_finish(racer)
@@ -794,9 +818,16 @@ class TestTaxRatesReachTheLog:
         async def _two_promotions() -> None:
             async with maker() as first, maker() as second:
                 await _promote(first, 'Rate Q')
+                first_pid = await _backend_pid(first)
+                second_pid = await _backend_pid(second)
                 racer = asyncio.create_task(_promote(second, 'Rate R'))
                 try:
-                    await _wait_until_parked(async_engine_fixture, 1)
+                    await _wait_until_parked(
+                        async_engine_fixture,
+                        racer,
+                        racer_pid=second_pid,
+                        holder_pid=first_pid,
+                    )
                 except BaseException:
                     await first.rollback()
                     await _let_racers_finish(racer)

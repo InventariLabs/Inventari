@@ -157,7 +157,7 @@ const SURFACES: Surface[] = [
     element: <WorkspaceModeSettings />,
     endpoint: "/api/v1/profiles",
     emptyBody: onePage([]),
-    emptyText: /no profiles available/i,
+    emptyText: /no workspace modes available/i,
   },
   {
     name: "the mail server",

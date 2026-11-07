@@ -30,5 +30,5 @@ toctou_risk_baseline.txt 0
 transaction_ownership_baseline.txt 0
 transaction_rollback_baseline.txt 0
 unread_org_parameter_baseline.txt 1
-value_error_sentences_baseline.txt 83
-vulture_whitelist.py 176
+value_error_sentences_baseline.txt 26
+vulture_whitelist.py 174

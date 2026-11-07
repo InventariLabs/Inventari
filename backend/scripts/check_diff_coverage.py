@@ -264,6 +264,11 @@ def judge(
     covered = missed = 0
 
     for path in sorted(changed):
+        if not changed[path]:
+            # Only lines were removed: nothing was added to judge, so the
+            # report not describing the file (a migration env.py the suite
+            # never imports) is not a stale report.
+            continue
         file_lines = measured.get(path)
         if (
             file_lines is None

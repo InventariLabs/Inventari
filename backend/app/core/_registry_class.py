@@ -420,6 +420,14 @@ class ModuleRegistry:
         modules: list[dict[str, object]] = [
             {
                 'module': name,
+                # The manifest's name, for a screen that has no translation of
+                # its own for this module (a scaffold, a community module):
+                # better than the technical identifier.
+                'display_name': (
+                    self._modules[name].metadata.display_name
+                    if name in self._modules
+                    else None
+                ),
                 'permissions': [p.model_dump() for p in perms],
             }
             for name, perms in sorted(self._custom_permissions.items())

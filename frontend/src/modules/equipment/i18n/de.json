@@ -11,7 +11,7 @@
     "overview": "Übersicht",
     "assets": "Geräte",
     "my_assets": "Meine Geräte",
-    "locations": "Standorte",
+    "locations": "Lagerorte",
     "categories": "Kategorien",
     "campaigns": "Attestierungen",
     "settings": "Einstellungen"
@@ -125,8 +125,8 @@
       "notes": "Notizen",
       "submit": "Ausleihen",
       "to_person": "An Person",
-      "to_location": "An Standort",
-      "select_location": "Standort",
+      "to_location": "An Lagerort",
+      "select_location": "Lagerort",
       "placeholders": {
         "name": "z. B. Max Mustermann",
         "email": "name@beispiel.de"
@@ -199,7 +199,7 @@
     "all_statuses": "Alle",
     "confirm_bulk_retire_one": "{{count}} ausgewähltes Gerät ausmustern?",
     "confirm_bulk_retire_other": "{{count}} ausgewählte Geräte ausmustern?",
-    "confirm_bulk_retire_msg": "Die Geräte werden als ausgemustert markiert und bleiben im Register. Ihr Status wechselt zu „Ausgemustert”.",
+    "confirm_bulk_retire_msg": "Die Geräte werden als ausgemustert markiert und bleiben im Register. Ihr Status wechselt zu „Ausgemustert”. Ein ausgeliehenes Gerät wird nicht ausgemustert — geben Sie es zuerst zurück.",
     "confirm_bulk_purge_one": "{{count}} ausgewähltes Gerät endgültig löschen?",
     "confirm_bulk_purge_other": "{{count}} ausgewählte Geräte endgültig löschen?",
     "confirm_bulk_purge_msg": "Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -211,9 +211,9 @@
     "archived_tab": "Archiviert",
     "no_archived": "Keine archivierten Geräte",
     "no_archived_hint": "Archivierte Geräte erscheinen hier. Archivieren nimmt ein Gerät aus der Liste; Sie können es wiederherstellen.",
-    "all_locations": "Alle Standorte",
+    "all_locations": "Alle Lagerorte",
     "all_categories": "Alle Kategorien",
-    "filter_by_location": "Nach Standort filtern",
+    "filter_by_location": "Nach Lagerort filtern",
     "filter_by_category": "Nach Kategorie filtern",
     "clear_filters": "Zurücksetzen",
     "clear_filter": "Statusfilter zurücksetzen",
@@ -232,14 +232,14 @@
       "oldest": "Älteste zuerst",
       "name": "Name A–Z",
       "warranty": "Garantie (früheste zuerst)",
-      "location": "Standort A–Z",
+      "location": "Lagerort A–Z",
       "price": "Preis (höchster zuerst)"
     },
     "gettingStarted": {
       "description": "Verfolgen Sie IT-Assets, Ausrüstung und andere physische Gegenstände in Ihrer gesamten Organisation.",
       "step1": {
         "title": "Fügen Sie Ihr erstes Gerät hinzu",
-        "description": "Verwenden Sie das Formular, um ein Gerät mit Kategorie und Standort zu registrieren.",
+        "description": "Verwenden Sie das Formular, um ein Gerät mit Kategorie und Lagerort zu registrieren.",
         "cta": "Erstes Gerät hinzufügen"
       },
       "stepImport": {
@@ -281,15 +281,15 @@
     "bulk_edit_failed": "Änderung der ausgewählten Geräte fehlgeschlagen",
     "selection_all_matching_one": "Alles, was den Filtern entspricht, ist ausgewählt ({{count}} Gerät) — Ausmustern und Archivieren wirken auf das Ganze.",
     "selection_all_matching_other": "Alles, was den Filtern entspricht, ist ausgewählt ({{count}} Geräte) — Ausmustern und Archivieren wirken auf das Ganze.",
-    "narrowed_to_location": "Nach Standort gefiltert: {{name}}",
-    "clear_narrowed": "Standortfilter aufheben"
+    "narrowed_to_location": "Nach Lagerort gefiltert: {{name}}",
+    "clear_narrowed": "Lagerortfilter aufheben"
   },
   "table": {
     "columns": {
       "title": "Spalten",
       "name": "Name",
       "serial": "Seriennummer / Tag",
-      "location": "Standort",
+      "location": "Lagerort",
       "assignedTo": "Im Besitz von",
       "warranty": "Garantie",
       "status": "Status"
@@ -368,7 +368,7 @@
     "rows_found_one": "{{count}} Zeile gefunden — Spalten zuordnen",
     "rows_found_other": "{{count}} Zeilen gefunden — Spalten zuordnen",
     "skip": "-- Überspringen --",
-    "default_location": "Standardstandort",
+    "default_location": "Standardlagerort",
     "default_category": "Standardkategorie",
     "none": "-- Keine --",
     "execute": "Importieren",
@@ -391,7 +391,7 @@
       "serial_number": "Seriennummer",
       "asset_tag": "Inventarnummer",
       "model": "Modell",
-      "location": "Standort",
+      "location": "Lagerort",
       "category": "Kategorie",
       "purchase_price": "Kaufpreis",
       "purchase_date": "Kaufdatum",
@@ -400,7 +400,7 @@
       "equipment_status": "Status"
     },
     "supported_title": "Spalten, die dieser Import versteht",
-    "supported_hint": "Spaltenüberschriften werden in allen unterstützten Sprachen erkannt, unabhängig von Groß- und Kleinschreibung, Leerzeichen und Akzenten. Bezeichnung und Standort sind Pflicht.",
+    "supported_hint": "Spaltenüberschriften werden in allen unterstützten Sprachen erkannt, unabhängig von Groß- und Kleinschreibung, Leerzeichen und Akzenten. Bezeichnung und Lagerort sind Pflicht.",
     "location_path_hint": "Ein Lagerort kann als Pfad geschrieben werden — \"Garage › Regal A › Fach 1\" — so viel davon, wie nötig ist, um einen Ort zu benennen. Ein Name, der auf mehrere passt, wird abgelehnt statt geraten.",
     "template": "Beispieldatei herunterladen",
     "analyze_failed": "Die Datei konnte nicht gelesen werden. Prüfen Sie das Format und versuchen Sie es erneut.",
@@ -429,7 +429,7 @@
     "type_disputed": "Problem gemeldet"
   },
   "form": {
-    "pickersFailed": "Kategorien oder Standorte konnten nicht geladen werden, daher sind die Listen unvollständig. Versuchen Sie es vor dem Speichern erneut.",
+    "pickersFailed": "Kategorien oder Lagerorte konnten nicht geladen werden, daher sind die Listen unvollständig. Versuchen Sie es vor dem Speichern erneut.",
     "addTitle": "Gerät hinzufügen",
     "save": "Gerät speichern",
     "created": "Gerät erfolgreich hinzugefügt",
@@ -444,7 +444,7 @@
     "fields": {
       "name": "Name",
       "category": "Kategorie",
-      "location": "Standort",
+      "location": "Lagerort",
       "serialNumber": "Seriennummer",
       "assetTag": "Inventarnummer",
       "barcode": "Barcode / EAN",
@@ -464,7 +464,7 @@
     "placeholders": {
       "name": "z. B. Dell Latitude 5540",
       "category": "Kategorie auswählen…",
-      "location": "Standort auswählen…",
+      "location": "Lagerort auswählen…",
       "barcode": "Scannen oder eingeben…",
       "select": "Auswählen…",
       "notes": "Zusätzliche Notizen, Zuweisungsinformationen…"
@@ -481,7 +481,7 @@
     },
     "errors": {
       "nameRequired": "Name ist erforderlich",
-      "locationRequired": "Standort ist erforderlich",
+      "locationRequired": "Lagerort ist erforderlich",
       "categoryRequired": "Kategorie ist erforderlich",
       "saveFailed": "Fehler beim Speichern des Geräts",
       "loadFailed": "Gerät konnte nicht geladen werden"
@@ -539,23 +539,23 @@
     }
   },
   "locations": {
-    "addTitle": "Standort hinzufügen",
-    "name": "Standortname",
+    "addTitle": "Lagerort hinzufügen",
+    "name": "Lagerortname",
     "namePlaceholder": "z. B. Serverraum, IT-Lager",
     "description": "Beschreibung",
     "descriptionPlaceholder": "Etage, Gebäude, Details…",
     "add": "Hinzufügen",
     "save": "Speichern",
-    "created": "Standort erfolgreich erstellt",
-    "createFailed": "Fehler beim Erstellen des Standorts",
-    "updated": "Standort aktualisiert",
-    "updateFailed": "Fehler beim Aktualisieren des Standorts",
-    "deleted": "Standort gelöscht",
-    "deleteFailed": "Fehler beim Löschen des Standorts",
-    "deleteTitle": "Standort löschen",
-    "confirmDelete": "Standort \"{{name}}\" löschen?",
-    "parent": "Übergeordneter Standort",
-    "parentNone": "Kein übergeordneter Standort",
+    "created": "Lagerort erfolgreich erstellt",
+    "createFailed": "Fehler beim Erstellen des Lagerorts",
+    "updated": "Lagerort aktualisiert",
+    "updateFailed": "Fehler beim Aktualisieren des Lagerorts",
+    "deleted": "Lagerort gelöscht",
+    "deleteFailed": "Fehler beim Löschen des Lagerorts",
+    "deleteTitle": "Lagerort löschen",
+    "confirmDelete": "Lagerort \"{{name}}\" löschen?",
+    "parent": "Übergeordneter Lagerort",
+    "parentNone": "Kein übergeordneter Lagerort",
     "holding_one": "1 Datensatz hier",
     "holding_other": "{{count}} Datensätze hier",
     "cannotDeleteHolding_one": "Löschen nicht möglich: hier steht 1 Datensatz. Zuerst verschieben.",
@@ -563,7 +563,7 @@
     "holdingHereAndBelow": "{{here}} hier · {{below}} darunter",
     "holdingTotal_one": "1 Datensatz hier insgesamt",
     "holdingTotal_other": "{{count}} Datensätze hier insgesamt",
-    "view_assets": "Geräte an diesem Standort anzeigen"
+    "view_assets": "Geräte an diesem Lagerort anzeigen"
   },
   "categories": {
     "title": "Ausrüstungskategorien",
@@ -595,13 +595,13 @@
     }
   },
   "locationsPage": {
-    "title": "Ausrüstungsstandorte",
+    "title": "Ausrüstungslagerorte",
     "subtitle": "Verwalten Sie Lagerorte für physische Geräte.",
-    "empty": "Noch keine Standorte",
+    "empty": "Noch keine Lagerorte",
     "emptyDescription": "Fügen Sie den ersten hinzu, damit die Ausrüstung einen Platz hat.",
     "equipmentTag": "Ausrüstung",
-    "search": "Standorte suchen…",
-    "noResults": "Keine Standorte entsprechen der Suche",
+    "search": "Lagerorte suchen…",
+    "noResults": "Keine Lagerorte entsprechen der Suche",
     "showMore": "Mehr anzeigen"
   },
   "attestation": {
@@ -703,12 +703,12 @@
     "scope": {
       "label": "Umfang",
       "all": "Alle ausgegebenen Geräte",
-      "storage": "Nach Standort",
+      "storage": "Nach Lagerort",
       "category": "Nach Kategorie",
-      "storagePlaceholder": "Standort auswählen",
+      "storagePlaceholder": "Lagerort auswählen",
       "categoryPlaceholder": "Kategorie auswählen",
       "hintAll": "Jedes ausgegebene Gerät wird attestiert.",
-      "hintStorage": "Nur ausgegebene Geräte, deren eigener Standort dieser ist.",
+      "hintStorage": "Nur ausgegebene Geräte, deren eigener Lagerort dieser ist.",
       "hintCategory": "Nur Geräte in dieser Kategorie.",
       "previewCount": "Geräte im Umfang: {{assets}} · Personen: {{people}}",
       "previewEmpty": "In diesem Umfang gibt es keine aktiven Zuweisungen — niemand zu bestätigen."
@@ -853,17 +853,17 @@
   },
   "bulk_edit": {
     "change_status": "Status",
-    "change_location": "Standort",
+    "change_location": "Lagerort",
     "assign_to": "Zuweisen",
     "change_status_title_one": "Status für {{count}} Gerät ändern",
     "change_status_title_other": "Status für {{count}} Geräte ändern",
-    "change_location_title_one": "{{count}} Gerät an einen Standort verschieben",
-    "change_location_title_other": "{{count}} Geräte an einen Standort verschieben",
+    "change_location_title_one": "{{count}} Gerät an einen Lagerort verschieben",
+    "change_location_title_other": "{{count}} Geräte an einen Lagerort verschieben",
     "assign_to_title_one": "{{count}} Gerät einer Person zuweisen",
     "assign_to_title_other": "{{count}} Geräte einer Person zuweisen",
     "new_status": "Neuer Status",
     "target_location": "Ziel-Lagerort",
-    "select_location": "Standort auswählen…",
+    "select_location": "Lagerort auswählen…",
     "no_email_warning": "Für diese Person ist keine E-Mail-Adresse hinterlegt — die herausgegebenen Geräte erscheinen nicht in ihrer Ansicht „Meine Geräte”."
   },
   "my_assets": {
@@ -954,7 +954,7 @@
     "only_out_one": "Eines der {{selected}} ausgewählten Geräte liegt im Lager; die Rücknahme betrifft die übrigen.",
     "only_out_other": "{{count}} der {{selected}} ausgewählten Geräte liegen im Lager; die Rücknahme betrifft die übrigen.",
     "condition_hint": "Der Zustand gilt für jedes hier zurückgenommene Gerät. Weicht eines ab, nehmen Sie es einzeln zurück.",
-    "own_place": "Jedes an seinen eigenen Standort"
+    "own_place": "Jedes an seinen eigenen Lagerort"
   },
   "permissions": {
     "read": "Ausrüstung ansehen",
