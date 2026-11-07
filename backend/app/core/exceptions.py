@@ -537,7 +537,7 @@ def refusal_code_of(exc: BaseException) -> str | None:
     return None
 
 
-def refusal_row(exc: ValueError, **where: Any) -> dict[str, Any]:
+def refusal_row(exc: Exception, **where: Any) -> dict[str, Any]:
     """One refused row of a batch result: *where* it is, its sentence and its code.
 
     For a refusal the caller has already judged the reader's to see (see

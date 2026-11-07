@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
 import pytest
 from fastapi import status
@@ -8,6 +9,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+from app.core.interceptors import interceptor_pipeline
 from app.core.testing import ModuleTestHelper
 from app.models.category import Category
 from app.models.item import Item
@@ -15,6 +17,7 @@ from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
 from app.models.storage_type import StorageType
 from app.models.user import User
+from app.modules.equipment.interceptors import EquipmentItemInterceptor
 
 """Equipment import analyze / execute endpoints.
 
@@ -237,6 +240,74 @@ class TestExecuteEndpoint:
         assert item.name == 'Laptop-1 renamed'
         assert item.meta_data is not None
         assert item.meta_data['equipment']['equipment_status'] == 'MAINTENANCE'
+
+    def test_a_status_the_interceptor_refuses_fails_only_its_row(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_storage_location: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """Deploying an unassigned asset is one refused row, not a 500.
+
+        The test application starts without module interceptors, so the
+        equipment one is registered here, as a running server has it. An
+        update-mode row asking for DEPLOYED on an asset nobody holds is
+        vetoed by it; the import caught only ``ValueError`` and database
+        errors, so the veto took the whole request down with a 500 and the
+        rows after it were never read. Measured with the fix reverted:
+        ``assert 500 == 200``.
+        """
+
+        def run(sheet: bytes, mapping: dict[str, str]) -> Any:
+            return client.post(
+                '/api/v1/equipment/import/execute',
+                headers=eq_auth_headers,
+                files={'file': ('assets.csv', sheet, 'text/csv')},
+                data={
+                    'mapping_json': json.dumps(mapping),
+                    'default_location_id': str(eq_storage_location.id),
+                },
+            )
+
+        mapping = {
+            'name': 'name',
+            'serial_number': 'serial',
+            'equipment_status': 'status',
+            'duplicate_mode': 'update',
+        }
+        seeded = run(b'name,serial,status\nLaptop-1,SN-M,Maintenance\n', mapping)
+        assert seeded.status_code == status.HTTP_200_OK, seeded.text
+
+        interceptor = EquipmentItemInterceptor()
+        interceptor_pipeline.register_item_interceptor(interceptor)
+        try:
+            resp = run(
+                b'name,serial,status\n'
+                b'Laptop-1,SN-M,Deployed\n'
+                b'Laptop-2,SN-N,Available\n',
+                mapping,
+            )
+        finally:
+            interceptor_pipeline.unregister_item_interceptor(interceptor)
+
+        assert resp.status_code == status.HTTP_200_OK, resp.text
+        body = resp.json()
+        assert body['failed'] == 1
+        assert body['imported'] == 1
+        (refused,) = body['errors']
+        assert refused['row'] == 1
+        assert refused['code'] == 'EQUIPMENT_NOT_ASSIGNED'
+        assert refused['error']
+
+        db_session.expire_all()
+        kept = {
+            i.name: (i.meta_data or {})['equipment']['equipment_status']
+            for i in db_session.query(Item).filter(
+                Item.organization_id == eq_storage_location.organization_id
+            )
+        }
+        assert kept == {'Laptop-1': 'MAINTENANCE', 'Laptop-2': 'AVAILABLE'}
 
     def test_a_new_asset_without_a_status_arrives_available(
         self,
