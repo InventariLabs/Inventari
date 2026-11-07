@@ -1192,6 +1192,37 @@ describe("absorbReaderPlayAbort", () => {
     expect(unhandled).toEqual([]);
   });
 
+  it("is in place by the time the camera starts, so a cancelled start leaves no unhandled rejection", async () => {
+    HTMLVideoElement.prototype.play = () =>
+      Promise.reject(removedWhileStarting());
+    // The library plays the video it puts in the reader while start() runs.
+    const start = vi
+      .spyOn(Html5Qrcode.prototype, "start")
+      .mockImplementation(async () => {
+        document.querySelector("video")!.play();
+        return null;
+      });
+    process.on("unhandledRejection", onUnhandled);
+    document.body.innerHTML = '<div id="qr-reader"><video></video></div>';
+
+    const { result, unmount } = renderHook(() =>
+      useScanCamera({ onCodeScanned: vi.fn() }),
+    );
+    act(() => {
+      result.current.setIsCameraActive(true);
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+    });
+    expect(start).toHaveBeenCalled();
+    // Node reports an unhandled rejection after the microtask queue drains.
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    unmount();
+    vi.restoreAllMocks();
+
+    expect(unhandled).toEqual([]);
+  });
+
   it("leaves a failure other than the interruption, and any other video, alone", async () => {
     HTMLVideoElement.prototype.play = () =>
       Promise.reject(new DOMException("denied", "NotAllowedError"));
