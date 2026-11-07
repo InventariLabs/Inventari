@@ -94,7 +94,14 @@ export function computeFieldDefinitions({
     const categoryOverride = categoryFields.find((f) => f.key === key);
 
     if (categoryOverride) {
-      fieldDef = { ...fieldDef, ...categoryOverride };
+      // A definition with no type is a module's visibility flag for a
+      // built-in column (its label names the column for API clients only),
+      // so the system field keeps its own, translated label.
+      fieldDef = {
+        ...fieldDef,
+        ...categoryOverride,
+        ...(categoryOverride.type ? {} : { label: fieldDef.label }),
+      };
     }
 
     if (categoryContext && sysConfig.contexts) {

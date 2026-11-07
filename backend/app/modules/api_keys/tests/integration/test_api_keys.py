@@ -368,6 +368,7 @@ class TestRevokeApiKey:
             API_KEYS_URL, headers={'X-API-Key': raw_key}
         )
         assert auth_resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert 'revoked' in auth_resp.json()['detail']['message']
 
 
 # ---------------------------------------------------------------------------
@@ -481,6 +482,8 @@ class TestApiKeyAuthentication:
             headers={'X-API-Key': 'inv_live_invalidtoken12345'},
         )
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        # A typo says so, apart from the two ends a real key can meet.
+        assert 'typos' in resp.json()['detail']['message']
 
     async def test_expired_key_rejected(
         self,
@@ -499,6 +502,7 @@ class TestApiKeyAuthentication:
             headers={'X-API-Key': raw_key},
         )
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert 'has expired' in resp.json()['detail']['message']
 
     async def test_api_key_cannot_create_other_api_keys(
         self,

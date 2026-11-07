@@ -217,6 +217,9 @@ class TestRetrySemantics:
 
         log = await _fetch_log(session_factory, log_id)
         assert log.delivery_status == _DELIVERY_STATUS_FAILED
+        # A delivery given up on promises no next attempt: the last scheduled
+        # time used to stay standing, in the past, for the raw API to read.
+        assert log.next_retry_at is None
 
     async def test_disabled_webhook_marks_failed(
         self, session_factory: SessionFactory, webhook: WebhookEndpoint

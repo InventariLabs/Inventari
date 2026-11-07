@@ -410,6 +410,32 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     expect(screen.getByText(/not enough 1/i)).toBeInTheDocument();
   });
 
+  it.each([
+    ["available", /available 1/i, "bg-success-400"],
+    ["incomparable", /uncountable 1/i, "bg-amber-400"],
+  ] as const)(
+    "paints the %s legend dot the colour the rows use",
+    (status, label, colour) => {
+      availabilityData.ingredients = [
+        {
+          ...availabilityData.ingredients[0],
+          status,
+          quantities_comparable: status === "available",
+          available_quantity: 1,
+        } as IngredientAvailability,
+      ];
+      render(
+        <RecipeAvailabilityChecker
+          recipeId="r1"
+          activeServings={4}
+          onServingsChange={vi.fn()}
+        />,
+      );
+      const legend = screen.getByText(label);
+      expect(legend.querySelector("span")).toHaveClass(colour);
+    },
+  );
+
   it("renders toast with list name when backend provides it", async () => {
     mockAddToShoppingList.mockResolvedValue({
       shopping_list_id: "sl1",

@@ -332,6 +332,9 @@ class ErrorMessages(TypedDict):
     attachment_not_found: str
     api_key_not_found: str
     invalid_api_key: str
+    api_key_unknown: str
+    api_key_expired: str
+    api_key_revoked: str
     api_key_owner_inactive: str
     unit_conversion_already_exists: str
     conversion_not_found: str
@@ -799,7 +802,7 @@ class ErrorMessages(TypedDict):
     recipe_import_name_required: str
     recipe_import_data_required: str
     recipe_import_unit_unknown: str
-    recipe_import_unit_missing: str
+    recipe_ingredient_unit_missing: str
     recipe_import_url_required: str
     recipe_scrape_fetch_failed: str
     recipe_scrape_encoding_unsupported: str

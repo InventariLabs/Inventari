@@ -222,6 +222,7 @@ async def retry_failed_deliveries(db: AsyncSession) -> None:
         else:
             if log.attempt_number > webhook.max_retries:
                 log.delivery_status = _DELIVERY_STATUS_FAILED
+                log.next_retry_at = None
             else:
                 log.delivery_status = _DELIVERY_STATUS_PENDING_RETRY
                 log.next_retry_at = _calc_next_retry(log.attempt_number, webhook)

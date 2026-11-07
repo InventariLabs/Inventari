@@ -5,12 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.core.api_key_auth import (
     ApiKeyIdentity,
+    register_api_key_refusal_explainer,
     register_api_key_resolver,
     register_issued_api_keys,
 )
 from app.core.define_module import define_module
 
-from .api_key_service import issued_key_check_async
+from .api_key_service import explain_refusal_async, issued_key_check_async
 from .router import router
 
 
@@ -57,5 +58,6 @@ async def _resolve_api_key(db: AsyncSession, raw_key: str) -> ApiKeyIdentity | N
 # very first request, which can precede per-module startup hooks.
 register_api_key_resolver(_resolve_api_key)
 register_issued_api_keys(issued_key_check_async)
+register_api_key_refusal_explainer(explain_refusal_async)
 
 module = define_module(router=router)

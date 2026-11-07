@@ -299,13 +299,34 @@ export class ApiHelper {
     return (await response.json()).items;
   }
 
+  /**
+   * Creates a recipe. The endpoint refuses an ingredient line without a unit,
+   * as the form does, so a line that names none gets grams — the unit a
+   * spec that does not care about it would have picked in the form.
+   */
   async createRecipe(
     token: string,
     data: Record<string, unknown>,
   ): Promise<{ id: string }> {
+    const lines = (data.ingredients ?? []) as Array<Record<string, unknown>>;
+    let body = data;
+    if (lines.some((line) => line.uom_id === undefined)) {
+      const uoms = await this.request.get("/api/v1/uoms?limit=200", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const grams = ((await uoms.json()).items as Array<{
+        id: string;
+        symbol: string;
+      }>).find((uom) => uom.symbol === "g");
+      if (!grams) throw new Error("The unit g is not seeded");
+      body = {
+        ...data,
+        ingredients: lines.map((line) => ({ uom_id: grams.id, ...line })),
+      };
+    }
     const response = await this.request.post("/api/v1/recipes", {
       headers: { Authorization: `Bearer ${token}` },
-      data,
+      data: body,
     });
     if (!response.ok())
       throw new Error(`Failed to create recipe: ${await response.text()}`);

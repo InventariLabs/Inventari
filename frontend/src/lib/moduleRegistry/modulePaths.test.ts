@@ -22,7 +22,12 @@ describe("MODULE_PATHS", () => {
       expect(mod, name).toBeDefined();
       const real = {
         basePath: mod?.moduleNav?.basePath ?? null,
-        paths: (mod?.routes ?? []).map((route) => route.path),
+        paths: [
+          ...(mod?.routes ?? []).map((route) => route.path),
+          ...(mod?.settingsSections ?? []).map(
+            (section) => `/settings/${section.path}`,
+          ),
+        ],
       };
       // A module that owns no path is absent from the table; the comparison
       // reads that absence as "no paths", so a module that gains its first

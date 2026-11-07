@@ -177,6 +177,18 @@ describe("WmsPickingView", () => {
     });
   });
 
+  it("lets a product name without spaces wrap in the text under the scan field", async () => {
+    const name =
+      "Supercalifragilisticexpialidociousproductnamewithoutspaces123456";
+    const session = buildSession();
+    session.lines[0] = { ...session.lines[0], product_name: name };
+    server.use(http.post(START_PATH, () => HttpResponse.json(session)));
+    render(<WmsPickingView documentId={DOCUMENT_ID} onClose={vi.fn()} />);
+
+    const next = await screen.findByText(`${name} — 5 pcs.`);
+    expect(next).toHaveClass("[overflow-wrap:anywhere]");
+  });
+
   it("starts the session on mount and shows the line to pick", async () => {
     server.use(http.post(START_PATH, () => HttpResponse.json(buildSession())));
 

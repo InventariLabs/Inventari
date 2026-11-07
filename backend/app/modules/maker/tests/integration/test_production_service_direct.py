@@ -1842,6 +1842,7 @@ class TestCancelOrder:
         assert len(cancels) == 1
         assert cancels[0].reason == 'Customer pulled the order'
         assert cancels[0].snapshot == {
+            'name': order.number,
             'old_status': 'DRAFT',
             'new_status': 'CANCELLED',
         }

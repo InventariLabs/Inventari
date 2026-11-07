@@ -111,7 +111,7 @@ class TestUnlinkedIngredientsList:
         onion = next(item for item in data['items'] if item['name'] == 'Onion')
         assert onion['match_name'] == 'onion'
         assert onion['recipe_id']
-        assert onion['uom_symbol'] is None
+        assert onion['uom_symbol'] == 'g'
 
     def test_excludes_recipes_of_other_organizations(
         self,

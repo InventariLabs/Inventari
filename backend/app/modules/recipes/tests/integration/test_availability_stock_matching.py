@@ -107,6 +107,7 @@ def _recipe_asking_for_grams(
 def _recipe_asking_without_unit(
     client: TestClient,
     auth_headers: dict[str, str],
+    db_session: Session,
     *,
     ingredient_name: str,
     quantity: str = '1',
@@ -114,9 +115,8 @@ def _recipe_asking_without_unit(
 ) -> str:
     """Create a recipe whose ingredient carries no unit at all.
 
-    The ingredient row shows a name and an amount; the unit lives under
-    "More options". Whoever fills in only what they see creates exactly
-    this shape.
+    The API refuses to write such a line now, so the unit is cleared on the
+    stored row: recipes saved before the refusal still read this way.
     """
     payload = {
         'name': name,
@@ -132,7 +132,13 @@ def _recipe_asking_without_unit(
     }
     response = client.post(RECIPE_URL, json=payload, headers=auth_headers)
     assert response.status_code == 201, response.text
-    return str(response.json()['id'])
+    recipe_id = str(response.json()['id'])
+    db_session.execute(
+        text('UPDATE recipe_ingredients SET uom_id = NULL WHERE recipe_id = :id'),
+        {'id': recipe_id},
+    )
+    db_session.commit()
+    return recipe_id
 
 
 def _availability(
@@ -212,7 +218,7 @@ class TestAvailabilityFromTheShelf:
         """
         _stock_a_can(db_session, test_user, test_storage_location)
         recipe_id = _recipe_asking_without_unit(
-            client, auth_headers, ingredient_name='Ciecierzyca z puszki'
+            client, auth_headers, db_session, ingredient_name='Ciecierzyca z puszki'
         )
 
         response = client.get(

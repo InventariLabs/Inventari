@@ -76,26 +76,30 @@ const WmsPickLineRow = memo(function WmsPickLineRow({
               {line.document_number}
             </p>
           )}
-          {/* Two lines for the name, and the batch code whole: on a phone
-              both are read against the carton, so an ellipsis is no help. */}
-          <p className="text-sm font-medium text-on line-clamp-2 break-words">
+          {/* The whole name and the whole batch code: on a phone both are
+              read against the carton, so neither is cut. They break at a
+              space or a hyphen where they can and inside a token only when
+              it does not fit the column. */}
+          <p className="text-sm font-medium text-on [overflow-wrap:anywhere]">
             {line.product_name ?? t("picking.unknown_product")}
           </p>
           {line.bin_location && (
             // The text sits in its own span: a flex item has min-width:auto,
             // so a long unbroken code (shelf and SKU joined by a slash) kept
             // its full width and ran under the quantity column. min-w-0 lets
-            // the span shrink to the column and break-all splits the code.
+            // the span shrink to the column and overflow-wrap splits the code.
             <p className="text-xs text-on-muted flex items-start gap-0.5">
               <MapPin size={10} className="mt-0.5 shrink-0" />
-              <span className="min-w-0 break-all">{line.bin_location}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">
+                {line.bin_location}
+              </span>
             </p>
           )}
           {shelfState && line.status === "pending" && (
             <ShelfConfirmation state={shelfState} kind="picking" />
           )}
           {line.lot_name && (
-            <p className="text-xs text-on-muted break-all">
+            <p className="text-xs text-on-muted [overflow-wrap:anywhere]">
               {t("picking.lot", { name: line.lot_name })}
             </p>
           )}

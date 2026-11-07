@@ -263,7 +263,7 @@ export const WebhookCard = memo(function WebhookCard({
                 size="sm"
                 variant="ghost"
                 onClick={onTest}
-                title={t("test")}
+                title={t("testHint")}
                 aria-label={`${t("test")} ${webhook.name}`}
               >
                 <Send className="w-4 h-4" />
