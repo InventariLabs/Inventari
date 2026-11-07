@@ -643,7 +643,11 @@
         "stages": "Etapy",
         "target_type": "Dotyczy",
         "decided_by": "Kto zdecydował",
-        "approvers": "Akceptujący"
+        "approvers": "Akceptujący",
+        "emailed_to": "Wysłano e-mailem do",
+        "imported_from": "Zaimportowano z",
+        "skipped": "Pominięte wiersze",
+        "approval": "Akceptacja"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",
@@ -757,9 +761,19 @@
         "wms_session_short_pick": "Zamknięta z brakami",
         "wms_session_short_receive": "Zamknięta z brakami",
         "DAMAGE": "Uszkodzenie",
-        "QUALITY_HOLD": "Blokada jakościowa"
+        "QUALITY_HOLD": "Blokada jakościowa",
+        "approval_requested": "Wysłano do akceptacji",
+        "approval_approved": "Zaakceptowano",
+        "approval_rejected": "Odrzucono"
       },
-      "reactivatedAfterBreaker": "Wznowione po odcięciu przez bezpiecznik"
+      "reactivatedAfterBreaker": "Wznowione po odcięciu przez bezpiecznik",
+      "poLine": {
+        "tax": "VAT {{rate}}%",
+        "product": "produkt: {{name}}",
+        "reorderRule": "reguła uzupełnień: {{location}}",
+        "reorderRuleUnnamed": "z reguły uzupełnień",
+        "note": "notatka: {{text}}"
+      }
     },
     "shell": {
       "groupAdmin": "Administracja",

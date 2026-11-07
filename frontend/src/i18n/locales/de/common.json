@@ -641,7 +641,11 @@
         "stages": "Stufen",
         "target_type": "Gilt für",
         "decided_by": "Entschieden von",
-        "approvers": "Genehmigende"
+        "approvers": "Genehmigende",
+        "emailed_to": "Per E-Mail gesendet an",
+        "imported_from": "Importiert aus",
+        "skipped": "Übersprungene Zeilen",
+        "approval": "Genehmigung"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",
@@ -755,9 +759,19 @@
         "wms_session_short_pick": "Mit Fehlmenge geschlossen",
         "wms_session_short_receive": "Mit Fehlmenge geschlossen",
         "DAMAGE": "Beschädigung",
-        "QUALITY_HOLD": "Qualitätssperre"
+        "QUALITY_HOLD": "Qualitätssperre",
+        "approval_requested": "Angefordert",
+        "approval_approved": "Genehmigt",
+        "approval_rejected": "Abgelehnt"
       },
-      "reactivatedAfterBreaker": "Nach der Abschaltung durch den Schutzschalter wieder aktiviert"
+      "reactivatedAfterBreaker": "Nach der Abschaltung durch den Schutzschalter wieder aktiviert",
+      "poLine": {
+        "tax": "{{rate}} % Steuer",
+        "product": "Produkt: {{name}}",
+        "reorderRule": "Nachbestellregel: {{location}}",
+        "reorderRuleUnnamed": "aus einer Nachbestellregel",
+        "note": "Notiz: {{text}}"
+      }
     },
     "shell": {
       "groupAdmin": "Admin",

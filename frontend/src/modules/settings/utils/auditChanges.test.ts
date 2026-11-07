@@ -1483,3 +1483,74 @@ describe("auditChanges category field definitions", () => {
     expect(change.to).toBe("Added field Colour (Text)");
   });
 });
+
+describe("auditChanges on a purchase order", () => {
+  // The catalogue helper does not interpolate; the real translator does.
+  const lookup = namespacedT({ common: plCommon }) as unknown as (
+    key: string,
+    opts?: Record<string, unknown>,
+  ) => string;
+  const say = ((key: string, opts: Record<string, unknown> = {}) =>
+    lookup(key, opts).replace(/{{(\w+)}}/g, (_, name: string) =>
+      String(opts[name] ?? ""),
+    )) as never;
+
+  it("reads the decision on an order in the reader's word", () => {
+    const changes = auditChanges(
+      { number: "PO-1", approval: "rejected", notes: "too dear" },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(changes).toContainEqual({
+      path: "approval",
+      from: null,
+      to: plCommon.settings.audit.values.approval_rejected,
+    });
+    expect(JSON.stringify(changes)).not.toContain("rejected");
+  });
+
+  it("words an order line from its parts, with no id and no English", () => {
+    const [change] = auditChanges(
+      {
+        before: { lines: [{ name: "Śruba", quantity: "2" }] },
+        after: {
+          lines: [
+            {
+              name: "Śruba",
+              quantity: "2.000",
+              unit: "szt.",
+              unit_price: "3.50",
+              tax_rate: "23",
+              product: "Śruba M6",
+              reorder_rule: "Regał A",
+              notes: "pilne",
+            },
+          ],
+        },
+      },
+      "UPDATE",
+      undefined,
+      say,
+    );
+
+    expect(change.path).toBe("lines");
+    expect(change.to).toBe(
+      "Śruba × 2 szt. @ 3.5 · VAT 23% · produkt: Śruba M6 · reguła uzupełnień: Regał A · notatka: pilne",
+    );
+  });
+
+  it("names the new snapshot keys in every language the journal ships", () => {
+    for (const catalog of [enCommon, plCommon, deCommon, frCommon, esCommon]) {
+      for (const key of [
+        "emailed_to",
+        "imported_from",
+        "skipped",
+        "approval",
+      ] as const) {
+        expect(catalog.settings.audit.fields[key]).toBeTruthy();
+      }
+    }
+  });
+});

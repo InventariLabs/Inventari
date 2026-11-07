@@ -76,7 +76,7 @@ APP_ROOT = BACKEND_ROOT / 'app'
 # A keyword whose value is written into the journal. `snapshot=` carries a
 # create's or a delete's fields; `before=`/`after=` carry the two sides of an
 # update; the funnel's `context=` names the record an entry is about.
-SNAPSHOT_KEYWORDS = {'snapshot', 'before', 'after', 'context'}
+SNAPSHOT_KEYWORDS = {'snapshot', 'before', 'after', 'context', 'act'}
 
 # The enum whose values are the journal's target types.
 TARGET_TYPE_ENUM = 'AuditTargetType'
