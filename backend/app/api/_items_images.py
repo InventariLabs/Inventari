@@ -1,3 +1,5 @@
+import asyncio
+import io
 from uuid import UUID
 
 from fastapi import (
@@ -7,6 +9,7 @@ from fastapi import (
     UploadFile,
     status,
 )
+from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_user_storage_ids
@@ -34,6 +37,16 @@ from app.services.items._query_special import get_item_or_404_async
 _MAX_IMAGE_BYTES = 10 * 1024 * 1024
 
 router = APIRouter()
+
+
+def _decodes(content: bytes) -> bool:
+    """Whether the bytes are a picture, not only a file that starts like one."""
+    try:
+        with Image.open(io.BytesIO(content)) as picture:
+            picture.load()
+    except (OSError, SyntaxError, ValueError, Image.DecompressionBombError):
+        return False
+    return True
 
 
 #: The extension comes from the validated MIME, never from the
@@ -83,6 +96,10 @@ async def upload_item_image(
     # other upload paths already do — this was the inconsistency, not a
     # missing idea.
     validate_signature(content, image.content_type)
+    # The signature says what the file claims to be, not that it is one: a
+    # header followed by text passed it and then showed a broken thumbnail.
+    if not await asyncio.to_thread(_decodes, content):
+        raise catalogue_refusal('image_unreadable')
 
     # Derive the extension from the validated MIME type rather than
     # from the client-supplied filename — the name is attacker data and only
