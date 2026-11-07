@@ -154,9 +154,8 @@ async def get_documents_todo(
     # A filter has to look through the sources, not only their first page.
     narrowed = view != 'all' or state is not None or assignee is not None
     reach = _EVERY_ROW if narrowed else page
-    org = current_user.organization
-    approvals_enabled = bool(
-        org is not None and 'approvals' in (org.enabled_modules or [])
+    approvals_enabled = await core_api.organizations.is_module_enabled_async(
+        db, org_id, 'approvals'
     )
     (
         inbound,

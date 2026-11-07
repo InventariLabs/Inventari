@@ -5,7 +5,7 @@ Follows the approvals_api pattern: module owns its API, other modules import dir
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, cast
@@ -595,6 +595,50 @@ class WarehouseAPI:
             value=await weighed_value_async(db, doc),
             status=as_status,
         )
+
+    async def documents_sign_off_async(
+        self,
+        db: AsyncSession,
+        org_id: UUID,
+        document_ids: Sequence[UUID],
+        *,
+        as_status: str | None = None,
+    ) -> dict[UUID, Literal['required', 'not_required', 'unspecified']]:
+        """``document_sign_off_async`` for many documents, in a fixed number of queries.
+
+        One read for the documents with their lines and one for the profile,
+        whatever the page holds. An id that names no document of the
+        organization is left out of the answer — a list screen asks about the
+        rows it has just read, and a row that vanished needs nothing signed.
+        """
+        from sqlalchemy.orm import selectinload
+
+        from .approval_service import document_sign_off, weighed_value_async
+        from .document_profile_service import get_or_create_profile
+        from .models import Document
+
+        if not document_ids:
+            return {}
+        documents = (
+            await db.scalars(
+                select(Document)
+                .options(selectinload(Document.lines))
+                .where(
+                    Document.organization_id == org_id,
+                    Document.id.in_(document_ids),
+                )
+            )
+        ).all()
+        profile = await get_or_create_profile(db, org_id)
+        return {
+            doc.id: document_sign_off(
+                doc,
+                profile,
+                value=await weighed_value_async(db, doc),
+                status=as_status,
+            )
+            for doc in documents
+        }
 
     async def fill_line_tax_rates_async(
         self, db: AsyncSession, org_id: UUID, lines: Iterable[Any]

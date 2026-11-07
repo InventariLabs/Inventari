@@ -212,6 +212,7 @@ apart.
 | `APPROVAL_SCOPE_REQUIRED` | Switching a workflow on needs the scope it will hold, as shown to you — send "expected_scope", or the workflow stays off. |
 | `APPROVAL_STAGE_OPEN_UNSOLVABLE` | Stage "{label}" waits for anyone holding the approvals approve permission, and nobody in this organization holds it — no request would ever be decided. Grant it to somebody, or name an approver. |
 | `APPROVAL_STAGE_UNSOLVABLE` | Stage "{label}" could never be decided: none of its named approvers can see approvals. Add at least one approver who has approvals access. |
+| `APPROVAL_TARGET_NOT_FOUND` | This record does not exist, so no approval can be requested for it. |
 | `APPROVAL_UNKNOWN_APPROVERS` | Some of the selected approvers do not belong to this organization. |
 | `APPROVAL_UNKNOWN_REQUESTERS` | Some of the selected people or roles do not belong to this organization. |
 | `APPROVAL_WORKFLOW_ARCHIVED` | This workflow was deleted and is archived: its requests still show the stages they went through, so it cannot be changed or switched on again. Create a new workflow in its place. |

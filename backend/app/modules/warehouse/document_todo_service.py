@@ -485,9 +485,9 @@ async def awaiting_approval_documents_async(
     defect and travels as one, because an empty list would tell the approver
     there is nothing to decide.
     """
-    org = user.organization
-    enabled_modules = set(org.enabled_modules or []) if org else set()
-    if 'approvals' not in enabled_modules:
+    if not await core_api.organizations.is_module_enabled_async(
+        db, org_id, 'approvals'
+    ):
         return [], 0
     if not user.has_permission('approvals:approve'):
         return [], 0

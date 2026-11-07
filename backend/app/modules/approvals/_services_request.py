@@ -13,6 +13,26 @@ from ._services_skip import _auto_advance_self_only_stages
 from ._services_workflow import get_active_workflow
 from .exceptions import ApprovalError
 from .models import OPEN_STATUSES, ApprovalDecision, ApprovalRequest
+from .target_summaries import get_target_summary_provider
+
+
+async def require_target_exists(
+    db: AsyncSession, org_id: UUID, target_type: str, target_id: UUID
+) -> None:
+    """Refuse a request about something its own module cannot describe.
+
+    A request for an id that names no record is stored and then listed by no
+    queue, because every queue reaches a request through its target: nobody
+    sees it, nobody can decide it. The module that owns the target type
+    already describes its targets for the queue (``target_summaries``), so the
+    same provider answers whether the target is there. A type nobody claimed
+    cannot be checked and is let through, as the queue lets it through.
+    """
+    provider = get_target_summary_provider(target_type)
+    if provider is None:
+        return
+    if target_id not in await provider(db, org_id, [target_id]):
+        raise ApprovalError.translated('approval_target_not_found')
 
 
 async def request_approval(
