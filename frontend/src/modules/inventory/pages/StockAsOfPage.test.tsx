@@ -436,7 +436,19 @@ describe("StockAsOfPage — the address carries the report", () => {
     state = { data: { ...REPORT, items: [], total: 0 }, isError: false };
     renderAt("/inventory/stock/as-of?search=zzz");
 
+    expect(
+      screen.getByRole("heading", { name: "Nothing matches the search" }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/match “zzz” on this date/)).toBeInTheDocument();
+    expect(screen.queryByText("Nothing was on the shelf")).toBeNull();
+  });
+
+  it("says nothing about an empty shelf on a day the search finds products", () => {
+    renderAt("/inventory/stock/as-of?search=rye");
+
+    expect(screen.getByText("Rye flour")).toBeInTheDocument();
+    expect(screen.queryByText("Nothing was on the shelf")).toBeNull();
+    expect(screen.queryByText("Nothing matches the search")).toBeNull();
   });
 
   it("writes the storage the reader picks to the address", async () => {

@@ -160,3 +160,30 @@ def test_the_printout_states_what_it_was_narrowed_to(
         '/api/v1/stock-as-of/export/pdf', headers=auth_headers, params={'as_of': as_of}
     )
     assert 'Narrowed to' not in whole.content.decode()
+
+
+def test_a_printout_whose_search_finds_nothing_says_the_search_found_nothing(
+    client, auth_headers, shelf_of_three, monkeypatch
+):
+    """Not that nothing was on the shelf: the shelf held three products that day."""
+    from app.services import stock_report_pdf_service as pdf_service
+
+    monkeypatch.setattr(pdf_service._svc, 'render_to_pdf', lambda html: html.encode())
+    as_of = datetime.now(UTC).isoformat()
+
+    def _sheet(search: str) -> str:
+        response = client.get(
+            '/api/v1/stock-as-of/export/pdf',
+            headers=auth_headers,
+            params={'as_of': as_of, 'search': search},
+        )
+        assert response.status_code == status.HTTP_200_OK, response.text
+        return response.content.decode()
+
+    nothing = _sheet('zzzzqq')
+    assert 'No product matches the search on this date.' in nothing
+    assert 'Nothing was on the shelf' not in nothing
+
+    stocked = _sheet('sugar')
+    assert 'No product matches the search' not in stocked
+    assert 'Nothing was on the shelf' not in stocked

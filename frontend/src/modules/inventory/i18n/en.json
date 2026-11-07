@@ -232,6 +232,7 @@
     "cannotAnswer": "This date cannot be answered for.",
     "empty": {
       "title": "Nothing was on the shelf",
+      "titleSearch": "Nothing matches the search",
       "description": "On this date none of the products it records were in stock.",
       "descriptionAt": "{{location}} — on this date it held none of the products it records.",
       "descriptionSearch": "None of the products it records match “{{search}}” on this date."

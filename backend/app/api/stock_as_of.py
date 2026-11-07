@@ -145,6 +145,25 @@ async def _shows_inventory_value_async(db: AsyncSession, org_id: UUID) -> bool:
     )
 
 
+async def _place_named_async(
+    db: AsyncSession, org_id: UUID, location_id: UUID | None
+) -> str | None:
+    """The place a report is narrowed to, as the way to it — None for the whole.
+
+    The way, not the bare name: two shelves called "Top" in two aisles are
+    two places, and a filed sheet has only its words to say which it was.
+    """
+    if location_id is None:
+        return None
+    from app.services.storage._queries import get_storage_async
+    from app.services.storage_query_service import location_paths_async
+
+    location = await get_storage_async(db, org_id, location_id)
+    if location is None:
+        return None
+    return (await location_paths_async(db, org_id, [location]))[location.id]
+
+
 @router.get('/stock-as-of', response_model=StockAsOfReportDTO)
 async def stock_as_of(
     as_of: date | datetime = Query(
@@ -238,7 +257,8 @@ async def stock_as_of_pdf(
 
     It carries the date it is about and the date it was made, because the
     confusion between those two is the whole reason an audit rejects a
-    printout.
+    printout — and the place it was asked about, or a sheet for one shelf
+    reads as the whole warehouse.
     """
     from fastapi.responses import Response
 
@@ -261,6 +281,7 @@ async def stock_as_of_pdf(
         get_current_lang(),
         show_value=show_value,
         search=search,
+        location=await _place_named_async(db, org_id, location_id),
     )
     filename = f'inventari_stock_{report.as_of.date().isoformat()}.pdf'
     return Response(

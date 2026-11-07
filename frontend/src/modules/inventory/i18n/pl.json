@@ -246,6 +246,7 @@
     "cannotAnswer": "Na ten dzień nie da się odpowiedzieć.",
     "empty": {
       "title": "Nic nie stało na półce",
+      "titleSearch": "Nic nie pasuje do wyszukiwania",
       "description": "Tego dnia żaden z prowadzonych produktów nie był na stanie.",
       "descriptionAt": "{{location}} — tego dnia nie było tu żadnego z prowadzonych produktów.",
       "descriptionSearch": "Żaden z zapisanych produktów nie pasuje do „{{search}}” w tym dniu."

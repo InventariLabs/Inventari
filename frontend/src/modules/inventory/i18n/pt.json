@@ -232,6 +232,7 @@
     "cannotAnswer": "Não é possível responder para esta data.",
     "empty": {
       "title": "Não havia nada na prateleira",
+      "titleSearch": "Nada corresponde à busca",
       "description": "Nesta data, nenhum dos produtos cadastrados estava em estoque.",
       "descriptionAt": "{{location}} — nesta data não guardava nenhum dos produtos cadastrados.",
       "descriptionSearch": "Nenhum dos produtos registrados corresponde a “{{search}}” nesta data."

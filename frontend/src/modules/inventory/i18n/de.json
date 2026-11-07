@@ -232,6 +232,7 @@
     "cannotAnswer": "Für dieses Datum gibt es keine Antwort.",
     "empty": {
       "title": "Nichts lag im Lager",
+      "titleSearch": "Nichts passt zur Suche",
       "description": "An diesem Tag war keines der geführten Produkte auf Lager.",
       "descriptionAt": "{{location}} — an diesem Tag hielt es keines der geführten Produkte.",
       "descriptionSearch": "Kein erfasstes Produkt passt an diesem Tag zu „{{search}}“."
