@@ -10,7 +10,8 @@
     "needsAttention_other": "wymaga uwagi"
   },
   "actions": {
-    "stockTakesInProgress": "Spisy z natury w toku"
+    "stockTakesInProgress": "Spisy z natury w toku",
+    "stockTakesUnavailable": "Nie udało się sprawdzić spisów z natury w toku"
   },
   "nav": {
     "overview": "Przegląd",

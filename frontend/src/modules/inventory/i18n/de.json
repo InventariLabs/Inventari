@@ -8,7 +8,8 @@
     "needsAttention_other": "brauchen Aufmerksamkeit"
   },
   "actions": {
-    "stockTakesInProgress": "Laufende Inventuren"
+    "stockTakesInProgress": "Laufende Inventuren",
+    "stockTakesUnavailable": "Laufende Inventuren konnten nicht geprüft werden"
   },
   "nav": {
     "overview": "Übersicht",
