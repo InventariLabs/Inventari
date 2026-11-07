@@ -96,6 +96,38 @@ describe("ShoppingListsPage", () => {
     expect(createBtn).toBeInTheDocument();
   });
 
+  it("does not tell a reader to create a list they cannot create", async () => {
+    useAuthStore.setState({
+      user: {
+        ...useAuthStore.getState().user!,
+        permissions: ["shopping_lists:read"],
+      },
+    });
+    vi.mocked(useShoppingLists).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as unknown as ReturnType<typeof useShoppingLists>);
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <ShoppingListsPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </PageHeaderContext.Provider>,
+    );
+
+    expect(
+      await screen.findByText(/will appear here once someone creates them/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/create your first/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /New list/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it("should render shopping lists when data exists", async () => {
     const mockLists = [
       {

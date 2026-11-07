@@ -178,7 +178,9 @@ def _refuse_lines_without_a_unit(
             raise ServiceRejectionError(
                 'recipe_import_unit_unknown', ingredient=ing.name, unit=unit
             )
-        raise ServiceRejectionError('recipe_import_unit_missing', ingredient=ing.name)
+        raise ServiceRejectionError(
+            'recipe_ingredient_unit_missing', ingredient=ing.name
+        )
 
 
 # ---------------------------------------------------------------------------

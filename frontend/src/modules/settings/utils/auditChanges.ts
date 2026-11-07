@@ -383,11 +383,12 @@ const MODULE_LIST_FIELDS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * A module's name as the App Store prints it, or *fallback* when the
- * catalogue has none (a community module the build does not know). The
- * built-in modules the store does not list (the base, locations, categories,
- * announcements) read from the journal's own short dictionary: onboarding
- * writes all of them into the set the organization starts with.
+ * A module's name as the module catalogue prints it (`modules.<key>.name`,
+ * docs/MODULE_NAMES.md), or *fallback* when the catalogue has none (a
+ * community module the build does not know). The base is the one entry that
+ * carries `title` instead of `name`. The journal keeps no vocabulary of its
+ * own: onboarding writes every built-in key into the set an organization
+ * starts with, and each of them is a catalogue entry.
  */
 export function auditModuleName(
   t: TranslateFn,
@@ -395,9 +396,9 @@ export function auditModuleName(
   fallback: string = name,
 ): string {
   return (
-    t(`modules:modules.${name}.name`, { defaultValue: "" }) ||
-    t(`common:settings.audit.builtInModules.${name}`, { defaultValue: "" }) ||
-    fallback
+    t(`modules:modules.${name}.${name === "core" ? "title" : "name"}`, {
+      defaultValue: "",
+    }) || fallback
   );
 }
 

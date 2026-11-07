@@ -109,6 +109,23 @@ describe("FieldBuilder", () => {
     });
   });
 
+  it("lists no row for a visibility flag that declares no type", async () => {
+    // A module's flag ({key, label, visible}) switches a built-in column on;
+    // it is not a field the reader can edit, and its stored label is English
+    // platform copy that no catalogue translates.
+    const fields = [
+      { key: "category_id", label: "Category", visible: true, is_system: true },
+      ...sampleFields,
+    ] as FieldDefinition[];
+    await withLanguage("pl", () => {
+      render(<FieldBuilder fields={fields} onChange={vi.fn()} />);
+      fireEvent.click(screen.getAllByRole("button")[0]);
+
+      expect(screen.getByText("Serial Number")).toBeInTheDocument();
+      expect(screen.queryByText("Category")).not.toBeInTheDocument();
+    });
+  });
+
   it("leaves a user's own field named by the user's words, even when a catalog key matches", async () => {
     const fields: FieldDefinition[] = [
       {

@@ -330,6 +330,17 @@ export default function AddEquipmentPage() {
     return (
       <div className="space-y-6">
         <ReadOnlyNotice module="equipment" />
+        {/* The notice says the reader may look; the form is not the place to
+            look. Point at the one that is: the asset's card when there is
+            one, the register otherwise. */}
+        <Button
+          variant="outline"
+          onClick={() =>
+            navigate(editItemId ? `/equipment/${editItemId}` : "/equipment")
+          }
+        >
+          {editItemId ? t("form.readOnlyOpenAsset") : t("list.back")}
+        </Button>
       </div>
     );
   }

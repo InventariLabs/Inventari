@@ -493,14 +493,7 @@ test: test-backend test-frontend lint-architecture ## Run all tests (backend, fr
 
 test-backend: ## Run only backend tests
 	@echo "$(BLUE)[INFO]$(NC) Running backend tests..."
-	@$(BACKEND_EXEC) uv run pytest -n $(PYTEST_WORKERS) -v > $(PYTEST_LOG) 2>&1; \
-	rc=$$?; \
-	tail -20 $(PYTEST_LOG); \
-	python3 backend/scripts/check_pytest_summary_errors.py $(PYTEST_LOG); \
-	summary=$$?; \
-	rm -f $(PYTEST_LOG); \
-	if [ $$summary -ne 0 ]; then exit 1; fi; \
-	exit $$rc
+	@$(call GATED_PYTEST,-n $(PYTEST_WORKERS) -v,tail -20)
 
 test-frontend: ## Run only frontend tests
 	@echo "$(BLUE)[INFO]$(NC) Running frontend tests..."
@@ -572,15 +565,15 @@ test-e2e-isolated: ## Run Playwright E2E on the secondary dev2 stack (dev DB sta
 
 test-unit: ## Run only unit tests
 	@echo "$(BLUE)[INFO]$(NC) Running unit tests..."
-	$(BACKEND_EXEC) uv run pytest -n $(PYTEST_WORKERS) tests/unit -v
+	@$(call GATED_PYTEST,-n $(PYTEST_WORKERS) tests/unit -v,cat)
 
 test-integration: ## Run only integration tests
 	@echo "$(BLUE)[INFO]$(NC) Running integration tests..."
-	$(BACKEND_EXEC) uv run pytest -n $(PYTEST_WORKERS) tests/integration -v
+	@$(call GATED_PYTEST,-n $(PYTEST_WORKERS) tests/integration -v,cat)
 
 test-coverage: ## Run tests with coverage, then gate the changed lines (>= 80%) — CI's two backend test steps
 	@echo "$(BLUE)[INFO]$(NC) Running tests with code coverage..."
-	$(BACKEND_EXEC) uv run pytest -n $(PYTEST_WORKERS) --cov=app --cov-report=term-missing:skip-covered --cov-report=json --cov-fail-under=70
+	@$(call GATED_PYTEST,-n $(PYTEST_WORKERS) --cov=app --cov-report=term-missing:skip-covered --cov-report=json --cov-fail-under=70,cat)
 	@$(MAKE) --no-print-directory check-diff-coverage
 
 # Mutation testing is not a gate: a full run over the stock posting functions
@@ -629,7 +622,7 @@ check-diff-coverage: ## Gate the lines changed vs origin/dev (>= 80% covered); n
 
 test-fast: ## Run tests excluding slow-marked tests
 	@echo "$(BLUE)[INFO]$(NC) Running fast tests (excluding slow)..."
-	$(BACKEND_EXEC) uv run pytest -n $(PYTEST_WORKERS) -m "not slow" -q
+	@$(call GATED_PYTEST,-n $(PYTEST_WORKERS) -m "not slow" -q,cat)
 
 test-profile: ## Profile the suite: per-phase time, costliest files, and the load it ran under
 	@echo "$(BLUE)[INFO]$(NC) Profiling the backend suite (runs the whole suite once)..."
@@ -781,6 +774,23 @@ AUDIT_KEYS_JSON := /tmp/inventari-audit-keys.$(if $(COMPOSE_PROJECT_NAME),$(COMP
 # the summary line after the fact — a pipe hands the caller tee's exit code,
 # which is how a run carrying errors was ever pushed as green.
 PYTEST_LOG := /tmp/inventari-pytest.$(if $(COMPOSE_PROJECT_NAME),$(COMPOSE_PROJECT_NAME),core).$(shell echo $$$$).log
+
+# One backend pytest run, gated: $(1) are pytest's arguments, $(2) shows the
+# log. The run goes to a file so the recipe can read the exit code and the
+# summary line after the fact — a pipe hands the caller tee's exit code, which
+# is how a run carrying errors was ever pushed as green. The log is removed
+# whatever the verdict; the checker is addressed from $(CURDIR) so the recipe
+# survives `make -C`.
+define GATED_PYTEST
+$(BACKEND_EXEC) uv run pytest $(1) > $(PYTEST_LOG) 2>&1; \
+rc=$$?; \
+$(2) $(PYTEST_LOG); \
+python3 $(CURDIR)/backend/scripts/check_pytest_summary_errors.py $(PYTEST_LOG); \
+summary=$$?; \
+rm -f $(PYTEST_LOG); \
+if [ $$summary -ne 0 ]; then exit 1; fi; \
+exit $$rc
+endef
 # The three targets below write a TRACKED artefact, and that is the shape they
 # all follow: the command writes a scratch file and the tree is touched only
 # by a move that happens after it succeeded. A plain redirection truncates its

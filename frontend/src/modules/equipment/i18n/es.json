@@ -436,6 +436,7 @@
     "type_disputed": "Problema notificado"
   },
   "form": {
+    "readOnlyOpenAsset": "Abrir la ficha del equipo",
     "pickersFailed": "No se pudieron cargar las categorías o ubicaciones, así que las listas de abajo están incompletas. Inténtalo de nuevo antes de guardar.",
     "addTitle": "Agregar activo",
     "save": "Guardar activo",
@@ -828,8 +829,8 @@
     "pasteLabel": "Números de serie",
     "serial_label": "Número de serie",
     "pastePlaceholder": "Un número de serie por línea",
-    "detected_one": "✓ {{count}} número de serie detectado",
-    "detected_other": "✓ {{count}} números de serie detectados",
+    "detected_one": "{{count}} número de serie detectado",
+    "detected_other": "{{count}} números de serie detectados",
     "duplicatesFound": "Se detectaron números de serie duplicados.",
     "duplicate": "Duplicado",
     "quantity": "Cantidad",

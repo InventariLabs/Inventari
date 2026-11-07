@@ -713,12 +713,6 @@
         "changed": "Campo {{field}} alterado",
         "required": "obrigatório"
       },
-      "builtInModules": {
-        "core": "Básico",
-        "locations": "Locais",
-        "categories": "Categorias",
-        "announcements": "Avisos"
-      },
       "values": {
         "ALL": "Todos",
         "STORAGE": "Local",
@@ -959,7 +953,7 @@
     "shoppingList": "Lista de compras",
     "manage": "Gerenciar",
     "noActiveLists": "Nenhuma lista de compras ativa",
-    "createList": "Criar lista",
+    "createList": "Nova lista",
     "myStorages": "Meus locais",
     "viewAll": "Ver tudo",
     "expired": "Vencidos",

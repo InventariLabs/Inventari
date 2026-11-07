@@ -6,6 +6,7 @@
   "subtitle": "Everyday shopping: plan what to buy, then shop from the list",
   "newList": "New list",
   "addFirst": "Create your first shopping list to start planning",
+  "addFirstReadOnly": "Shopping lists will appear here once someone creates them.",
   "modal": {
     "title": "New shopping list",
     "nameLabel": "List name",

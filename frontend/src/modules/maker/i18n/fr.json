@@ -17,7 +17,8 @@
     "error": "Impossible de charger les ordres de production",
     "empty": {
       "title": "Aucun ordre de production",
-      "subtitle": "Planifiez un ordre pour consommer des ingrédients et créer la sortie."
+      "subtitle": "Planifiez un ordre pour consommer des ingrédients et créer la sortie.",
+      "subtitleReadOnly": "Les ordres de production apparaîtront ici dès que quelqu'un en planifiera."
     },
     "noMatches": {
       "title": "Aucun ordre correspondant",
@@ -252,7 +253,6 @@
     "cost": {
       "fixedCosts": "Coûts fixes / lot",
       "referencePrice": "Prix de référence",
-      "perBatch": "par lot",
       "perYieldUnit": "par unité — un lot donne {{qty}}",
       "noFixed": "Aucun coût fixe défini",
       "ingredients": "Ingrédients",

@@ -723,12 +723,6 @@
         "changed": "Zmieniono pole {{field}}",
         "required": "wymagane"
       },
-      "builtInModules": {
-        "core": "Podstawy",
-        "locations": "Miejsca",
-        "categories": "Kategorie",
-        "announcements": "Ogłoszenia"
-      },
       "values": {
         "ALL": "Wszystkie",
         "STORAGE": "Miejsce",
@@ -979,7 +973,7 @@
     "shoppingList": "Lista zakupów",
     "manage": "Zarządzaj",
     "noActiveLists": "Brak aktywnych list zakupów",
-    "createList": "Utwórz listę",
+    "createList": "Nowa lista",
     "myStorages": "Moje miejsca",
     "viewAll": "Zobacz wszystkie",
     "expired": "Przeterminowane",

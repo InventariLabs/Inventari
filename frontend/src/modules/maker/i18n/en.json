@@ -17,7 +17,8 @@
     "error": "Failed to load production orders",
     "empty": {
       "title": "No production runs yet",
-      "subtitle": "Schedule a production run to consume ingredients and create output."
+      "subtitle": "Schedule a production run to consume ingredients and create output.",
+      "subtitleReadOnly": "Production runs will appear here once someone schedules them."
     },
     "noMatches": {
       "title": "No run matches",
@@ -252,7 +253,6 @@
     "cost": {
       "fixedCosts": "Fixed costs / batch",
       "referencePrice": "Reference price",
-      "perBatch": "per batch",
       "perYieldUnit": "per unit — a batch makes {{qty}}",
       "noFixed": "No fixed costs set",
       "ingredients": "Ingredients",

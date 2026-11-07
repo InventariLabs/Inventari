@@ -85,6 +85,14 @@ function stubServerSearch(params?: {
   } as unknown as ReturnType<typeof useArchivedItems>;
 }
 
+/** An archive that holds exactly this one row. */
+function archiveOf(row: object): ReturnType<typeof useArchivedItems> {
+  return {
+    data: { items: [row], total: 1, limit: 50, offset: 0, has_more: false },
+    isLoading: false,
+  } as unknown as ReturnType<typeof useArchivedItems>;
+}
+
 /** A long archive, paged by the server's cursor: the first page hands back
  *  `after-first`, and the page asked for with it is the second one. */
 function stubCursorPages(params?: {
@@ -187,6 +195,28 @@ describe("ArchivedItemsPage", () => {
     expect(row).not.toBeNull();
     expect(row).toHaveTextContent("Archived");
     expect(screen.queryByText("ARCHIVED")).not.toBeInTheDocument();
+  });
+
+  it("reads a reason the catalogue does not know as the value that was written", () => {
+    // A stored value without a word of its own used to print the composed
+    // key ("items:deletionReasons.SOMETHING_NEW") in the badge.
+    mockUseArchivedItems.mockReturnValue(
+      archiveOf({ ...archivedRows[1], deletion_reason: "SOMETHING_NEW" }),
+    );
+    renderPage();
+
+    const row = screen.getByText("Milk").closest("tr");
+    expect(row).toHaveTextContent("SOMETHING_NEW");
+    expect(row).not.toHaveTextContent("deletionReasons");
+  });
+
+  it("says Unknown for a row with no reason, as the label sheet does", () => {
+    mockUseArchivedItems.mockReturnValue(
+      archiveOf({ ...archivedRows[1], deletion_reason: null }),
+    );
+    renderPage();
+
+    expect(screen.getByText("Milk").closest("tr")).toHaveTextContent("Unknown");
   });
 
   it("names a reason with the word the delete dialog chose it by", () => {

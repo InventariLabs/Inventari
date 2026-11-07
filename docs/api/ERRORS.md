@@ -567,9 +567,9 @@ apart.
 | `RECIPE_EXTRACTION_FAILED` | The recipe could not be extracted from this page. Try again, or enter the recipe by hand. |
 | `RECIPE_IMPORT_DATA_REQUIRED` | data required for json import |
 | `RECIPE_IMPORT_NAME_REQUIRED` | name is required in import data |
-| `RECIPE_IMPORT_UNIT_MISSING` | Ingredient '{ingredient}' has an amount but no unit |
 | `RECIPE_IMPORT_UNIT_UNKNOWN` | Ingredient '{ingredient}' uses the unit '{unit}', which this instance does not know |
 | `RECIPE_IMPORT_URL_REQUIRED` | url required for url import |
+| `RECIPE_INGREDIENT_UNIT_MISSING` | Ingredient '{ingredient}' has an amount but no unit |
 | `RECIPE_NOT_FOUND` | Recipe not found |
 | `RECIPE_SCRAPE_EMPTY` | Jina Reader returned empty content for {url} |
 | `RECIPE_SCRAPE_ENCODING_UNSUPPORTED` | Jina Reader returned compressed content that cannot be read safely. Try another import method. |

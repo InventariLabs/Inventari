@@ -29,7 +29,13 @@ says what the release does rather than what changed since them.
   sentence is the same for a wrong address, an expired, a used, a withdrawn and an
   unknown code, so it still tells nobody which of them it was. The separate
   "issued for a different address" answer is gone, since it confirmed that a code
-  was live.
+  was live. **Breaking:** the refusal code `ORGANIZATION_INVITE_WRONG_EMAIL`,
+  listed in `docs/api/ERRORS.md` for 0.11.0, is no longer sent; a client that
+  branched on it now receives `ORGANIZATION_INVITE_INVALID`, the code every other
+  refusal of an invitation already carried, and should treat the two alike. The
+  public link check (`GET /public/invitation/{code}`) keeps answering a dead code
+  with a 404 and that same code, but with a sentence of its own that asks for a
+  new link, since the check never sees an address.
 - An API key's shown prefix is now `inv_live_` and six characters instead of
   eleven, on the API keys page and in the audit log, where it gave away a third
   of the key's random part to anyone allowed to read the log. Existing keys are
@@ -231,6 +237,11 @@ says what the release does rather than what changed since them.
   names. A tie at the tenth place used to be settled by the order the database
   returned the rows in, so the same window could name a different tenth product
   from one reading to the next.
+- Importing ingredient data from a file with no usable row — an empty sheet, a
+  renamed photo, a bank statement with no name column, a list of numbers — now
+  answers with what the import expects instead of a green "0 added" message.
+  A file with some good rows still imports them, and the message turns into a
+  warning when any row had to be skipped.
 - The scanner's Back button now leads to the launcher when the scanner was the
   first screen of the tab — opened by address, through a printed code's link or
   after signing in — instead of doing nothing.

@@ -104,6 +104,7 @@ class ErrorMessages(TypedDict):
     role_in_use: str
     role_name_taken: str
     organization_invite_invalid: str
+    organization_invite_link_dead: str
     organization_invite_expired: str
     email_test_failed: str
     module_org_required: str
@@ -798,7 +799,7 @@ class ErrorMessages(TypedDict):
     recipe_import_name_required: str
     recipe_import_data_required: str
     recipe_import_unit_unknown: str
-    recipe_import_unit_missing: str
+    recipe_ingredient_unit_missing: str
     recipe_import_url_required: str
     recipe_scrape_fetch_failed: str
     recipe_scrape_encoding_unsupported: str

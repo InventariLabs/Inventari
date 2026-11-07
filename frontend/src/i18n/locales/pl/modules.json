@@ -78,6 +78,15 @@
     },
     "items": {
       "name": "Inwentarz"
+    },
+    "locations": {
+      "name": "Miejsca"
+    },
+    "categories": {
+      "name": "Kategorie"
+    },
+    "announcements": {
+      "name": "Ogłoszenia"
     }
   },
   "config": {

@@ -721,12 +721,6 @@
         "changed": "Champ {{field}} modifié",
         "required": "obligatoire"
       },
-      "builtInModules": {
-        "core": "Essentiels",
-        "locations": "Emplacements",
-        "categories": "Catégories",
-        "announcements": "Annonces"
-      },
       "values": {
         "ALL": "Toutes",
         "STORAGE": "Emplacement",
@@ -967,7 +961,7 @@
     "shoppingList": "Liste de courses",
     "manage": "Gérer",
     "noActiveLists": "Aucune liste de courses active",
-    "createList": "Créer une liste",
+    "createList": "Nouvelle liste",
     "myStorages": "Mes emplacements",
     "viewAll": "Voir tout",
     "expired": "Expiré",

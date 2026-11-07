@@ -285,6 +285,10 @@ describe("DocumentImportModal", () => {
     await reachMapping();
 
     expect(screen.queryByRole("checkbox")).toBeNull();
+    // Silence reads as a bug: the screen says why the offer is missing.
+    expect(
+      screen.getByText(/your account can't create new products/i),
+    ).toBeInTheDocument();
   });
 
   it("offers the stubs to an account holding items:write", async () => {

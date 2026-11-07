@@ -217,7 +217,7 @@
     "clean_servings_hint": "Versuchen Sie {{counts}} Portionen für ganze Mengen",
     "complete_confirm": "Alle verbleibenden als übersprungen markieren und abschließen?",
     "session_complete": "Zutaten gesammelt!",
-    "just_completed": "Abgeschlossen ✓",
+    "just_completed": "Abgeschlossen",
     "resumed_badge": "Fortgesetzt",
     "resumed_one": "Weiter, wo Sie aufgehört haben — eine unfertige Entnahme für 1 Portion.",
     "resumed_other": "Weiter, wo Sie aufgehört haben — eine unfertige Entnahme für {{count}} Portionen.",

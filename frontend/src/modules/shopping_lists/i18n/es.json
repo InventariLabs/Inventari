@@ -6,6 +6,7 @@
   "subtitle": "Compras del día a día: planifique qué comprar y compre con la lista",
   "newList": "Nueva lista",
   "addFirst": "Cree su primera lista de compras para empezar a planificar",
+  "addFirstReadOnly": "Las listas de la compra aparecerán aquí cuando alguien las cree.",
   "modal": {
     "title": "Nueva lista de compras",
     "nameLabel": "Nombre de la lista",

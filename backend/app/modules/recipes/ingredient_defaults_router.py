@@ -42,6 +42,9 @@ from .schemas import (
 
 router = APIRouter(prefix='/ingredient-defaults')
 
+# Every tally of import_defaults except `errors`: a row that was understood.
+_USABLE_ROW_TALLIES = ('created', 'overridden', 'updated', 'unchanged')
+
 
 @router.get('', response_model=PaginatedResponse[IngredientDefaultSchema])
 async def list_ingredient_defaults(
@@ -190,6 +193,11 @@ async def import_ingredient_defaults(
         )
 
     result = await import_defaults(db, org_id, lang, items)
+    if not any(result[tally] for tally in _USABLE_ROW_TALLIES):
+        # An empty sheet, a renamed photo, a bank statement: nothing in the
+        # file was an ingredient row. Say what the import takes rather than
+        # tick a green box over a row of zeros.
+        raise catalogue_refusal('ingredient_defaults_unreadable_file')
     return ImportDefaultsResult(**result)
 
 

@@ -201,14 +201,29 @@ def get_available_modules_list():
     return modules
 
 
-@router.get('/available', response_model=PaginatedResponse[ModuleInfo])
+@router.get(
+    '/available',
+    response_model=PaginatedResponse[ModuleInfo],
+    # The docstring carries a note for maintainers; the API reference keeps
+    # the one sentence a client needs.
+    description='List modules available for the current organization based on entitlements.',
+)
 async def get_available_modules(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db=Depends(get_async_db, scope='function'),
 ):
-    """List modules available for the current organization based on entitlements."""
+    """List modules available for the current organization based on entitlements.
+
+    Transaction note: this is the one API function that rolls back by hand.
+    The ``allowed_modules`` read is best-effort — a failure is logged and
+    swallowed so the list still renders — but the failed statement may have
+    poisoned the transaction, and the request goes on to use the same session.
+    Unlike every other rollback, it is not followed by a raise, so the
+    request-scoped session cannot undo it for us; the rollback is the recovery
+    that keeps the rest of the request usable.
+    """
     allowed_list: list[str] = []
     if current_user.organization_id:
         try:

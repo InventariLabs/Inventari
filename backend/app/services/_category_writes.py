@@ -216,18 +216,24 @@ async def update_category(
                     # gives the 400 its code and the reader's language.
                     #
                     # The {field} the keyed message interpolates carries the
-                    # stored label, not the key: the form this payload came
-                    # from renders the stored label verbatim
-                    # (FieldBuilderFieldRow), so that is the name the reader
-                    # was looking at, while a key like `asset_tag` is a word
-                    # no screen shows. The label is passed in rather than
-                    # resolved here on purpose — the backend keeps no
-                    # per-locale field-label catalogue, and the two frontend
-                    # namespaces (items, equipment) name one key two
-                    # different ways, so a backend-side lookup would be a
-                    # third naming authority guaranteed to drift. The key is
-                    # kept only as a backstop for a definition stored
-                    # without a label.
+                    # stored label, not the key: a key like `asset_tag` is a
+                    # word no screen shows. The label is passed in rather
+                    # than resolved here on purpose — the backend keeps no
+                    # per-locale field-label catalogue, and the frontend
+                    # namespaces name one key differently, so a backend-side
+                    # lookup would be a third naming authority guaranteed to
+                    # drift.
+                    #
+                    # The decision on one name for one field: the field
+                    # builder shows a typed system field under the
+                    # catalogue's translated word, lists an untyped
+                    # visibility flag (category_id) not at all, and offers no
+                    # control to rename either, so this refusal is reached
+                    # only by an API client, which reads the definition it
+                    # sent — and that carries the stored label. Every seeded
+                    # definition names itself (a test pins it); the key is
+                    # only the backstop for a definition stored by an older
+                    # seeding without a label.
                     raise ServiceRejectionError(
                         'category_system_field_label_locked',
                         field=prior.get('label') or prior.get('key'),

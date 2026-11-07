@@ -79,36 +79,47 @@ export function StartActions({
   onCount: () => void;
 }) {
   const { t } = useTranslation("warehouse");
-  // The four tiles start work that posts stock. A read-only account is told
-  // so by the notice on the screen and is offered none of them.
-  if (!useCanWrite("warehouse")) return null;
+  // The tiles start work that posts stock. A read-only account is told so by
+  // the notice on the screen and is offered none of them. Counting is
+  // `stock_takes` work, so its tile asks that key — the same one the
+  // stock-takes screen and the API check — and the other three ask the
+  // warehouse's own.
+  const canMove = useCanWrite("warehouse");
+  const canCount = useCanWrite("stock_takes");
+  if (!canMove && !canCount) return null;
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-      <ActionTile
-        icon={ArrowDownToLine}
-        title={t("start.actions.receive.title")}
-        subtitle={t("start.actions.receive.subtitle")}
-        primary
-        onClick={onReceive}
-      />
-      <ActionTile
-        icon={ArrowUpFromLine}
-        title={t("start.actions.issue.title")}
-        subtitle={t("start.actions.issue.subtitle")}
-        onClick={onIssue}
-      />
-      <ActionTile
-        icon={ArrowLeftRight}
-        title={t("start.actions.move.title")}
-        subtitle={t("start.actions.move.subtitle")}
-        onClick={onMove}
-      />
-      <ActionTile
-        icon={ClipboardCheck}
-        title={t("start.actions.count.title")}
-        subtitle={t("start.actions.count.subtitle")}
-        onClick={onCount}
-      />
+      {canMove && (
+        <>
+          <ActionTile
+            icon={ArrowDownToLine}
+            title={t("start.actions.receive.title")}
+            subtitle={t("start.actions.receive.subtitle")}
+            primary
+            onClick={onReceive}
+          />
+          <ActionTile
+            icon={ArrowUpFromLine}
+            title={t("start.actions.issue.title")}
+            subtitle={t("start.actions.issue.subtitle")}
+            onClick={onIssue}
+          />
+          <ActionTile
+            icon={ArrowLeftRight}
+            title={t("start.actions.move.title")}
+            subtitle={t("start.actions.move.subtitle")}
+            onClick={onMove}
+          />
+        </>
+      )}
+      {canCount && (
+        <ActionTile
+          icon={ClipboardCheck}
+          title={t("start.actions.count.title")}
+          subtitle={t("start.actions.count.subtitle")}
+          onClick={onCount}
+        />
+      )}
     </div>
   );
 }

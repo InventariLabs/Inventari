@@ -17,3 +17,17 @@
  */
 export const archivedReasonBadgeKey = (reason: string): string =>
   `items:deletionReasons.${reason.toUpperCase()}`;
+
+/**
+ * The word an archived record's reason is read as, on every screen that shows
+ * it: the catalogue's word when it has one, else the value that was written
+ * (the truth, even when no translation exists — never the composed key), and
+ * "Unknown" when no reason was stored at all.
+ */
+export const archivedReasonLabel = (
+  t: (key: string, options?: { defaultValue?: string }) => string,
+  reason: string | null | undefined,
+): string =>
+  reason
+    ? t(archivedReasonBadgeKey(reason), { defaultValue: reason })
+    : t("common:unknown");

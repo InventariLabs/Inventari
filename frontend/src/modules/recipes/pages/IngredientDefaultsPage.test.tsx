@@ -1,10 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import { toast } from "sonner";
 import userEvent from "@testing-library/user-event";
 import { signInWith } from "@/test/auth";
 import IngredientDefaultsPage from "./IngredientDefaultsPage";
 
-vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+const importMutate = vi.hoisted(() => vi.fn());
+
+vi.mock("sonner", () => ({
+  toast: { error: vi.fn(), success: vi.fn(), warning: vi.fn() },
+}));
 
 vi.mock("@/contexts/ModulesContext", () => ({
   useModules: () => ({
@@ -48,7 +53,7 @@ vi.mock("@/modules/recipes/hooks/useIngredientDefaults", () => ({
     isPending: false,
   }),
   useDeleteIngredientDefault: () => ({ mutateAsync: vi.fn() }),
-  useImportIngredientDefaults: () => ({ mutateAsync: vi.fn() }),
+  useImportIngredientDefaults: () => ({ mutateAsync: importMutate }),
 }));
 
 vi.mock("@/modules/recipes/api/recipes", () => ({
@@ -127,5 +132,49 @@ describe("IngredientDefaultsPage — reading a nutrition table off a label", () 
     expect(
       screen.queryByRole("button", { name: /read from a label/i }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("IngredientDefaultsPage — the tally of an import", () => {
+  beforeEach(() => {
+    signInWith(["recipes:read", "recipes:write"]);
+    vi.mocked(toast.success).mockClear();
+    vi.mocked(toast.warning).mockClear();
+  });
+
+  async function importWith(tally: Record<string, number>) {
+    importMutate.mockResolvedValue(tally);
+    const { container } = render(<IngredientDefaultsPage />);
+    const input = container.querySelector('input[type="file"]');
+    await userEvent.upload(
+      input as HTMLInputElement,
+      new File(["name\nMillet"], "defaults.csv", { type: "text/csv" }),
+    );
+  }
+
+  it("is a plain success while no row was lost", async () => {
+    await importWith({
+      created: 1,
+      overridden: 0,
+      updated: 0,
+      unchanged: 0,
+      errors: 0,
+    });
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    expect(toast.warning).not.toHaveBeenCalled();
+  });
+
+  it("is a warning once any row could not be imported", async () => {
+    await importWith({
+      created: 1,
+      overridden: 0,
+      updated: 0,
+      unchanged: 0,
+      errors: 2,
+    });
+
+    await waitFor(() => expect(toast.warning).toHaveBeenCalled());
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });

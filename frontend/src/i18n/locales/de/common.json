@@ -721,12 +721,6 @@
         "changed": "Feld {{field}} geändert",
         "required": "Pflichtfeld"
       },
-      "builtInModules": {
-        "core": "Grundlagen",
-        "locations": "Lagerorte",
-        "categories": "Kategorien",
-        "announcements": "Ankündigungen"
-      },
       "values": {
         "ALL": "Alle",
         "STORAGE": "Lagerort",
@@ -967,7 +961,7 @@
     "shoppingList": "Einkaufsliste",
     "manage": "Verwalten",
     "noActiveLists": "Keine aktiven Einkaufslisten",
-    "createList": "Liste erstellen",
+    "createList": "Neue Liste",
     "myStorages": "Meine Lagerorte",
     "viewAll": "Alle anzeigen",
     "expired": "Abgelaufen",
