@@ -37,6 +37,7 @@ from app.config import settings
 from app.core.contracts import API_KEY_PREFIX
 from app.core.limiter import limiter
 from app.database import get_async_db, get_db
+from app.i18n.service import get_error_message
 from app.main import app
 from app.modules.api_keys.models import ApiKey
 
@@ -496,3 +497,61 @@ class TestLimitsOnRoutesWithAPathParameter:
         ]
 
         assert statuses[:3] == [401, 401, 401] and statuses[3] == 429, statuses
+
+
+#: The five maintained languages: each has a catalogue row of its own for the
+#: refusal, so a sentence answered in the wrong one cannot match by accident.
+_MAINTAINED_LANGUAGES = ('en', 'pl', 'de', 'fr', 'es')
+
+
+@pytest.mark.integration
+class TestTheRefusalSpeaksTheRequestLanguage:
+    """A 429 is written in the language the request asked for, on both paths.
+
+    The default limits are enforced from ``RouterAwareSlowAPIMiddleware``, the
+    outermost middleware of the application, which runs before
+    ``LanguageMiddleware`` has read ``Accept-Language``: a Polish reader past
+    the default ceiling was refused in English, while a route with a limit of
+    its own, refused inside the route, answered in Polish. The contract
+    (docs/api/ERRORS.md, "Request language" and the ``lang`` field) is the
+    catalogue's sentence in the request language and a ``lang`` naming it;
+    both are read here through the real application's middleware order.
+    """
+
+    @staticmethod
+    def _assert_refused_in(response, lang: str) -> None:
+        assert response.status_code == 429, response.text
+        detail = response.json()['detail']
+        assert detail['code'] == 'RATE_LIMIT_EXCEEDED'
+        assert detail['message'] == get_error_message('rate_limit_exceeded', lang)
+        assert detail['lang'] == lang
+
+    @pytest.mark.parametrize('lang', _MAINTAINED_LANGUAGES)
+    def test_past_the_default_limit(self, rate_limited_client, monkeypatch, lang):
+        monkeypatch.setattr(settings, 'RATE_LIMIT_PER_IP', '1/minute')
+        headers = {'Accept-Language': lang}
+
+        first = rate_limited_client.get('/api/v1/auth/init-status', headers=headers)
+        assert first.status_code == 200, first.text
+
+        self._assert_refused_in(
+            rate_limited_client.get('/api/v1/auth/init-status', headers=headers), lang
+        )
+
+    @pytest.mark.parametrize('lang', _MAINTAINED_LANGUAGES)
+    def test_past_a_route_limit_of_its_own(
+        self, rate_limited_client, monkeypatch, lang
+    ):
+        monkeypatch.setattr(settings, 'RATE_LIMIT_LOGIN', '1 per minute')
+        login = {'username': 'nosuch@example.com', 'password': 'wrong'}
+        headers = {'Accept-Language': lang}
+
+        first = rate_limited_client.post(
+            '/api/v1/auth/login', data=login, headers=headers
+        )
+        assert first.status_code == 401, first.text
+
+        self._assert_refused_in(
+            rate_limited_client.post('/api/v1/auth/login', data=login, headers=headers),
+            lang,
+        )

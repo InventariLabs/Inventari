@@ -198,6 +198,9 @@ services:
       # same reason: set in .env alone, it never reaches the container, and
       # every signed install is refused as "no trusted signing keys".
       MODULE_SIGNING_PUBLIC_KEYS: ${MODULE_SIGNING_PUBLIC_KEYS:-}
+      # The language an account created without one starts in, and the one
+      # a request naming no language is answered in (.env.example).
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en}
       # `manage.py module install` writes both halves of a community module.
       # The backend half lands under /app; the frontend half has nowhere to go
       # unless the frontend module tree is mounted, and an install that silently
