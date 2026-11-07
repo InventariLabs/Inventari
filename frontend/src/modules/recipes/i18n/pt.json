@@ -214,7 +214,7 @@
     "clean_servings_hint": "Experimente {{counts}} porções para quantidades inteiras",
     "complete_confirm": "Marcar todos os restantes como ignorados e concluir?",
     "session_complete": "Ingredientes separados!",
-    "just_completed": "Concluído ✓",
+    "just_completed": "Concluído",
     "resumed_badge": "Retomado",
     "resumed_one": "Você continuou de onde parou — separação inacabada para 1 porção.",
     "resumed_other": "Você continuou de onde parou — separação inacabada para {{count}} porções.",

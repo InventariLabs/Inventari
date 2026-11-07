@@ -217,7 +217,7 @@
     "clean_servings_hint": "Essayez {{counts}} portions pour des quantités entières",
     "complete_confirm": "Marquer tout le reste comme ignoré et terminer ?",
     "session_complete": "Ingrédients rassemblés !",
-    "just_completed": "Terminé ✓",
+    "just_completed": "Terminé",
     "resumed_badge": "Reprise",
     "resumed_one": "Reprise là où vous en étiez — un prélèvement inachevé pour 1 portion.",
     "resumed_other": "Reprise là où vous en étiez — un prélèvement inachevé pour {{count}} portions.",

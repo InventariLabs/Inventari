@@ -217,7 +217,7 @@
     "clean_servings_hint": "Try {{counts}} servings for whole quantities",
     "complete_confirm": "Mark all remaining as skipped and complete?",
     "session_complete": "Ingredients collected!",
-    "just_completed": "Completed ✓",
+    "just_completed": "Completed",
     "resumed_badge": "Resumed",
     "resumed_one": "Picked up where you left off — unfinished picking for 1 serving.",
     "resumed_other": "Picked up where you left off — unfinished picking for {{count}} servings.",

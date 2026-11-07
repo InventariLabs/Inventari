@@ -217,7 +217,7 @@
     "clean_servings_hint": "Pruebe {{counts}} porciones para cantidades enteras",
     "complete_confirm": "¿Marcar todo lo restante como omitido y completar?",
     "session_complete": "¡Ingredientes recogidos!",
-    "just_completed": "Completado ✓",
+    "just_completed": "Completado",
     "resumed_badge": "Reanudada",
     "resumed_one": "Retomamos donde lo dejaste: una recogida sin terminar para 1 ración.",
     "resumed_other": "Retomamos donde lo dejaste: una recogida sin terminar para {{count}} raciones.",
