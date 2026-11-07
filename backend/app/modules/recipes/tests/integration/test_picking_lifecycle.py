@@ -1130,7 +1130,7 @@ class TestPickingDocumentRegistration:
         test_household: Organization,
         test_storage_location: StorageLocation,
     ) -> None:
-        """Documents module disabled → silent no-op (graceful degradation).
+        """Warehouse module disabled → silent no-op (graceful degradation).
 
         Real integration variant (replaces the earlier mock-based unit test):
         the toggle is on but 'warehouse' is not in the org's enabled modules,

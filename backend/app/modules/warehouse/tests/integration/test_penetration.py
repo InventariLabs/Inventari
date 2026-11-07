@@ -1,4 +1,4 @@
-"""Documents module — penetration / security tests.
+"""Warehouse module — penetration / security tests.
 
 Covers: authentication, authorization, multi-tenancy, input validation,
         state machine violations, SQL injection, XSS, correction/return edge

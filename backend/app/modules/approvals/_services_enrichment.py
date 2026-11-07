@@ -39,8 +39,8 @@ async def list_requests(
        ``pending_for_user_id`` returns only
        active (PENDING/IN_PROGRESS) requests where the current stage has
        an open approver list (anyone may approve) OR the user is in the
-       assigned approver list. This powers the "Do akceptacji" queue
-       in the Documents module so approvers see only what they can act on.
+       assigned approver list. This powers the "To approve" queue
+       in the warehouse module so approvers see only what they can act on.
 
        When ``pending_for_user_id`` is provided, an extra join with the
        workflow is issued to look up the current stage. The Python-side

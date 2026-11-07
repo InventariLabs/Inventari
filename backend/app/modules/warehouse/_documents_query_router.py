@@ -249,7 +249,7 @@ async def list_documents_awaiting_my_approval(
 ) -> DocumentListResponse:
     """List documents the current user can act on (PENDING/IN_PROGRESS).
 
-    Powers the "Do akceptacji" submenu in the Documents module — approvers
+    Powers the "To approve" submenu in the warehouse module — approvers
     see only what they can act on without leaving the document context. The
     same read fills To do's *Needs a decision* block, so one rule answers
     both: the approvals module must be on, the reader must hold
