@@ -186,6 +186,9 @@ ERRORS_PT: dict[str, str] = {
     'not_found': 'Recurso não encontrado',
     'conflict': 'Conflito de recurso',
     'internal_error': 'Ocorreu um erro interno',
+    'text_has_a_null_character': (
+        'O texto enviado contém um caractere nulo (U+0000), que não pode ser salvo nem pesquisado. Remova-o e tente novamente.'
+    ),
     'rate_limit_exceeded': 'Muitas solicitações. Tente novamente mais tarde.',
     'service_unavailable': 'Serviço temporariamente indisponível',
     'stock_take_edit_completed': 'Não é possível editar uma contagem de estoque concluída ou cancelada',

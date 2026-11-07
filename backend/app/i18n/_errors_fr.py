@@ -265,6 +265,9 @@ ERRORS_FR: ErrorMessages = {
     'not_found': 'Ressource introuvable',
     'conflict': 'Conflit de ressources',
     'internal_error': "Une erreur interne s'est produite",
+    'text_has_a_null_character': (
+        'Le texte envoyé contient un caractère nul (U+0000), qui ne peut être ni enregistré ni recherché. Supprimez-le et réessayez.'
+    ),
     'rate_limit_exceeded': 'Trop de requêtes. Réessayez plus tard.',
     'service_unavailable': 'Service temporairement indisponible',
     'stock_take_edit_completed': 'Impossible de modifier un inventaire terminé ou annulé',

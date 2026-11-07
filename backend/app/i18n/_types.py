@@ -223,6 +223,7 @@ class ErrorMessages(TypedDict):
     not_found: str
     conflict: str
     internal_error: str
+    text_has_a_null_character: str
     rate_limit_exceeded: str
     service_unavailable: str
     stock_take_edit_completed: str

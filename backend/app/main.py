@@ -12,7 +12,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from app._lifespan import lifespan
 from app._middleware import (
@@ -56,7 +56,7 @@ from app.api.users import router as users_router
 from app.api.websocket import router as websocket_router
 from app.config import settings
 from app.core.audit_actor import audit_actor_scope
-from app.core.db_retry import TransactionRetryMiddleware
+from app.core.db_retry import TransactionRetryMiddleware, sqlstate_of
 from app.core.file_storage.service import FileStorageService
 from app.core.label_rendering import LabelRendererUnavailableError
 from app.core.limiter import limiter, rate_limit_exceeded_handler
@@ -324,6 +324,46 @@ async def integrity_error_handler(request: Request, exc: IntegrityError):
             'detail': {
                 'code': 'STOCK_STATE_IMPOSSIBLE',
                 'message': get_error_message(key, lang),
+                'lang': lang,
+            }
+        },
+    )
+
+
+#: PostgreSQL's ``character_not_in_repertoire``: text with U+0000 in it, which
+#: no text column and no text parameter can hold.
+_NULL_CHARACTER_IN_TEXT = '22021'
+
+
+@app.exception_handler(DBAPIError)
+async def unstorable_text_handler(request: Request, exc: DBAPIError):
+    """Refuse text with a NUL character in words, instead of a 500.
+
+    The database refuses a statement whose text carries U+0000, and any
+    request field can carry one — a list's ``?search=%00`` is a hand-edited
+    address away, since the screens keep their search there. The stock on a
+    date, the stock list, the products and the partners all answered it with
+    a 500. Here rather than at each endpoint, as with the stock guards above:
+    the database is where every path that sends text meets.
+
+    Every other database error is raised on unchanged, so it ends where it
+    ended before: the retry around the request still sees a deadlock, and
+    the outermost handler still answers a defect with the generic 500.
+    """
+    if sqlstate_of(exc) != _NULL_CHARACTER_IN_TEXT:
+        raise exc
+    from app.i18n.service import get_current_lang, get_error_message
+
+    lang = get_current_lang()
+    logger.warning(
+        'Text with a null character refused on %s %s', request.method, request.url.path
+    )
+    return JSONResponse(
+        status_code=400,
+        content={
+            'detail': {
+                'code': 'TEXT_HAS_A_NULL_CHARACTER',
+                'message': get_error_message('text_has_a_null_character', lang),
                 'lang': lang,
             }
         },

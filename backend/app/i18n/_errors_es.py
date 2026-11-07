@@ -266,6 +266,9 @@ ERRORS_ES: ErrorMessages = {
     'not_found': 'Recurso no encontrado',
     'conflict': 'Conflicto de recursos',
     'internal_error': 'Ocurrió un error interno',
+    'text_has_a_null_character': (
+        'El texto enviado contiene un carácter nulo (U+0000), que no se puede guardar ni buscar. Elimínelo e inténtelo de nuevo.'
+    ),
     'rate_limit_exceeded': 'Demasiadas solicitudes. Inténtalo de nuevo más tarde.',
     'service_unavailable': 'Servicio temporalmente no disponible',
     'stock_take_edit_completed': 'No se puede editar un inventario completado o cancelado',
