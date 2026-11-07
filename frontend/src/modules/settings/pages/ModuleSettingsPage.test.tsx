@@ -149,8 +149,13 @@ describe("ModuleSettingsPage — auto-UI for module settings", () => {
     await waitFor(() => {
       expect(screen.getByTestId("field-threshold")).toBeInTheDocument();
     });
+    // Another field is edited so there is a Save to press; the secret is not.
+    const input = screen.getByTestId("field-threshold") as HTMLInputElement;
+    await user.clear(input);
+    await user.type(input, "7");
     await user.click(screen.getByRole("button", { name: /Save/i }));
     await waitFor(() => {
+      expect(captured).toEqual(expect.objectContaining({ threshold: 7 }));
       expect(captured).not.toHaveProperty("jina.api_key");
     });
   });
