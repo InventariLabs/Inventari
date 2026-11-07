@@ -835,7 +835,9 @@
       "unknownModule": "Aucun module ne porte ce nom",
       "unknownModuleHint": "L'adresse pointe vers un module absent de cette installation. Vérifiez le lien ou choisissez le module dans le magasin.",
       "open": "Paramètres du module",
-      "saved": "Paramètres enregistrés"
+      "saved": "Paramètres enregistrés",
+      "guardName": "Les réglages du module",
+      "saveFailed": "Les paramètres n'ont pas pu être enregistrés."
     },
     "modules": {
       "openAppStore": "Ouvrir Modules"
@@ -856,6 +858,8 @@
       "subtitle": "Échecs d'envoi",
       "none": "Rien n'a été perdu",
       "noneHint": "Tous les messages de cette organisation ont quitté le serveur.",
+      "noneUnsent": "Rien n'a été envoyé",
+      "noneUnsentHint": "Aucun serveur de messagerie n'est configuré : aucun message ne quitte cette installation, et aucun ne peut échouer. Configurez-en un ci-dessus.",
       "attempts": "{{n}} tentatives sur {{max}}",
       "reason": "Raison : {{reason}}",
       "reasons": {

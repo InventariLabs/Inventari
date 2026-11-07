@@ -1851,6 +1851,7 @@
       "tracking": "Links de rastreamento",
       "presets": "Configuração pronta"
     },
+    "sectionRefused": "não guardado — o servidor recusou",
     "nav": "Seções de configuração",
     "related": "Telas relacionadas",
     "advanced": {

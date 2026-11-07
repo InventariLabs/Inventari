@@ -8,7 +8,8 @@
     "needsAttention_other": "demandent votre attention"
   },
   "actions": {
-    "stockTakesInProgress": "Inventaires en cours"
+    "stockTakesInProgress": "Inventaires en cours",
+    "stockTakesUnavailable": "Les inventaires en cours n'ont pas pu être vérifiés"
   },
   "nav": {
     "overview": "Aperçu",

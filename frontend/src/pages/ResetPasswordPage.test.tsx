@@ -1,9 +1,17 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { toast } from "sonner";
 import ResetPasswordPage from "./ResetPasswordPage";
 import { authApi } from "@/lib/api/auth";
+import { useAuthStore } from "@/store/authStore";
+import type { AuthState } from "@/store/authStore";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -51,6 +59,18 @@ describe("ResetPasswordPage", () => {
     renderPage();
     // The form appears once the link has been checked.
     await screen.findByLabelText(/^New password/);
+  });
+
+  it("says a session is live when the reader is already signed in", () => {
+    expect(screen.queryByTestId("signed-in-notice")).toBeNull();
+    act(() =>
+      useAuthStore.setState({
+        user: { email: "tomas@example.com" } as AuthState["user"],
+        isAuthenticated: true,
+      }),
+    );
+    expect(screen.getByTestId("signed-in-notice")).toBeInTheDocument();
+    act(() => useAuthStore.setState({ user: null, isAuthenticated: false }));
   });
 
   it("does not offer to send a reset link — the link is what got us here", () => {

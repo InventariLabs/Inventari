@@ -827,7 +827,9 @@
       "unknownModule": "Não existe um módulo com esse nome",
       "unknownModuleHint": "O endereço aponta para um módulo que esta instalação não tem. Verifique o link ou escolha o módulo na loja.",
       "open": "Configurações do módulo",
-      "saved": "Configurações guardadas"
+      "saved": "Configurações guardadas",
+      "guardName": "As configurações do módulo",
+      "saveFailed": "Não foi possível guardar as configurações."
     },
     "modules": {
       "openAppStore": "Abrir Módulos"
@@ -848,6 +850,8 @@
       "subtitle": "Falhas de entrega",
       "none": "Nada se perdeu",
       "noneHint": "Todas as mensagens enviadas por esta organização saíram.",
+      "noneUnsent": "Nada foi enviado",
+      "noneUnsentHint": "Nenhum servidor de e-mail está configurado, por isso nenhuma mensagem sai desta instalação — e nenhuma pode falhar. Configure um acima.",
       "attempts": "{{n}} de {{max}} tentativas",
       "reason": "Motivo: {{reason}}",
       "reasons": {

@@ -1907,6 +1907,7 @@
       "tracking": "Enlaces de seguimiento",
       "presets": "Ajustes predefinidos"
     },
+    "sectionRefused": "sin guardar: el servidor lo rechazó",
     "nav": "Secciones de la configuración",
     "related": "Pantallas relacionadas",
     "advanced": {

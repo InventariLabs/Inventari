@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "./AuthLayout";
+import { SignedInNotice } from "./SignedInNotice";
 import { PasswordRules } from "./PasswordRules";
 import { firstBrokenRule } from "@/lib/passwordPolicy";
 import { apiErrorStatus } from "@/lib/errors";
@@ -108,6 +109,8 @@ export default function ResetPasswordPage() {
           <ArrowLeft size={14} />
           {t("reset.backToLogin", { defaultValue: "Back to login" })}
         </Link>
+
+        <SignedInNotice />
 
         {done ? (
           <div className="text-center py-4" data-testid="reset-success">

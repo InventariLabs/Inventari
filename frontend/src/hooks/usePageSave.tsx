@@ -19,6 +19,8 @@ interface PageSavePart {
 interface PageSaveContextValue {
   dirty: boolean;
   saving: boolean;
+  /** Parts whose last write was refused and whose edit is still waiting. */
+  failedKeys: ReadonlySet<string>;
   /** Saves every dirty part, one after another; resolves with the failures. */
   saveAll: () => Promise<unknown[]>;
   register: (key: string, part: PageSavePart) => void;
@@ -40,21 +42,10 @@ export function PageSaveProvider({ children }: { children: ReactNode }) {
   const parts = useRef(new Map<string, PageSavePart>());
   const [dirtyKeys, setDirtyKeys] = useState<ReadonlySet<string>>(new Set());
   const [saving, setSaving] = useState(false);
+  const [failedKeys, setFailedKeys] = useState<ReadonlySet<string>>(new Set());
 
-  const register = useCallback((key: string, part: PageSavePart) => {
-    parts.current.set(key, part);
-    setDirtyKeys((current) => {
-      if (current.has(key) === part.dirty) return current;
-      const next = new Set(current);
-      if (part.dirty) next.add(key);
-      else next.delete(key);
-      return next;
-    });
-  }, []);
-
-  const unregister = useCallback((key: string) => {
-    parts.current.delete(key);
-    setDirtyKeys((current) => {
+  const forget = useCallback((key: string) => {
+    setFailedKeys((current) => {
       if (!current.has(key)) return current;
       const next = new Set(current);
       next.delete(key);
@@ -62,20 +53,53 @@ export function PageSaveProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const register = useCallback(
+    (key: string, part: PageSavePart) => {
+      parts.current.set(key, part);
+      setDirtyKeys((current) => {
+        if (current.has(key) === part.dirty) return current;
+        const next = new Set(current);
+        if (part.dirty) next.add(key);
+        else next.delete(key);
+        return next;
+      });
+      // An edit taken back is no longer a refused one.
+      if (!part.dirty) forget(key);
+    },
+    [forget],
+  );
+
+  const unregister = useCallback(
+    (key: string) => {
+      parts.current.delete(key);
+      forget(key);
+      setDirtyKeys((current) => {
+        if (!current.has(key)) return current;
+        const next = new Set(current);
+        next.delete(key);
+        return next;
+      });
+    },
+    [forget],
+  );
+
   const saveAll = useCallback(async () => {
     setSaving(true);
     const failures: unknown[] = [];
+    const refused = new Set<string>();
     try {
-      for (const part of [...parts.current.values()]) {
+      for (const [key, part] of [...parts.current.entries()]) {
         if (!part.dirty) continue;
         try {
           await part.save();
         } catch (error) {
           failures.push(error);
+          refused.add(key);
         }
       }
     } finally {
       setSaving(false);
+      setFailedKeys(refused);
     }
     return failures;
   }, []);
@@ -84,11 +108,12 @@ export function PageSaveProvider({ children }: { children: ReactNode }) {
     () => ({
       dirty: dirtyKeys.size > 0,
       saving,
+      failedKeys,
       saveAll,
       register,
       unregister,
     }),
-    [dirtyKeys, saving, saveAll, register, unregister],
+    [dirtyKeys, saving, failedKeys, saveAll, register, unregister],
   );
 
   return (

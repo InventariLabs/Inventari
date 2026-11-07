@@ -1,6 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { ActionItemsFeed } from "./ActionItemsFeed";
@@ -155,6 +159,48 @@ describe("ActionItemsFeed", () => {
     const { container } = renderFeed();
 
     await waitFor(() => expect(container).toBeEmptyDOMElement());
+  });
+
+  /**
+   * A provider whose read failed returns an error row. The card must show it
+   * and stay: when the card's own appearance remounted the collectors, each
+   * remount refetched the failed query, cleared its error, and the card
+   * vanished again in a loop of requests.
+   */
+  it("shows a failed read's error row without refetching in a loop", async () => {
+    const queryFn = vi.fn().mockRejectedValue(new Error("500"));
+    const useFailing = (): ActionItem[] => {
+      const { isError } = useQuery({
+        queryKey: ["feed-failing"],
+        queryFn,
+        retry: false,
+      });
+      return isError
+        ? [
+            {
+              id: "unavailable",
+              labelKey: "inventory:actions.stockTakesUnavailable",
+              icon: Bell,
+              severity: "error",
+              linkTo: "/inventory/stock-takes",
+            },
+          ]
+        : [];
+    };
+    moduleRegistry.getActionItemProviders = vi.fn(() => [
+      { moduleName: "stock_takes", hook: useFailing },
+    ]);
+
+    renderFeed();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("action-items-feed")).toBeInTheDocument();
+    });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(screen.getByTestId("action-items-feed")).toBeInTheDocument();
+    expect(queryFn).toHaveBeenCalledTimes(1);
+    // An error row is not a pending thing.
+    expect(screen.queryByText(/pending across/)).not.toBeInTheDocument();
   });
 
   /**

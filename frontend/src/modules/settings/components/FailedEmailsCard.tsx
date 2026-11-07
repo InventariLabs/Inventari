@@ -4,7 +4,10 @@ import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { formatDateMedium } from "@/utils/formatters";
-import { useFailedEmails } from "@/modules/settings/hooks/useOrganization";
+import {
+  useFailedEmails,
+  useOrganization,
+} from "@/modules/settings/hooks/useOrganization";
 import type { FailedEmail } from "@/lib/api/organizations";
 
 /**
@@ -22,6 +25,12 @@ import type { FailedEmail } from "@/lib/api/organizations";
 export default function FailedEmailsCard() {
   const { t } = useTranslation("common");
   const { data: failures = [], isError, error, refetch } = useFailedEmails();
+  // "Nothing was lost" is only a finding when mail can leave at all. Without
+  // a mail server the queue is empty because nothing is ever queued, and the
+  // badge above it says "Not configured". Unknown is not "cannot send": the
+  // organization still loading keeps the usual wording.
+  const { data: organization } = useOrganization();
+  const cannotSend = organization?.can_send_email === false;
 
   return (
     <Card className="p-6 space-y-4">
@@ -45,8 +54,16 @@ export default function FailedEmailsCard() {
         <EmptyState
           variant="compact"
           icon={MailWarning}
-          title={t("settings.failedEmails.none")}
-          description={t("settings.failedEmails.noneHint")}
+          title={
+            cannotSend
+              ? t("settings.failedEmails.noneUnsent")
+              : t("settings.failedEmails.none")
+          }
+          description={
+            cannotSend
+              ? t("settings.failedEmails.noneUnsentHint")
+              : t("settings.failedEmails.noneHint")
+          }
         />
       ) : (
         <ul data-testid="failed-emails" className="flex flex-col gap-2">

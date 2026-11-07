@@ -85,8 +85,13 @@ export function ActionItemsFeed() {
   );
   // The subtitle and the row badges must agree: both count things to do, not
   // rows. A provider can pack several pending requests into one row, so
-  // `allItems.length` understated the real total.
-  const totalCount = allItems.reduce((sum, item) => sum + (item.count ?? 1), 0);
+  // `allItems.length` understated the real total. A row that says a count
+  // could not be taken (severity "error") is not a pending thing: counting it
+  // made the subtitle claim one pending item beside "could not be checked".
+  const totalCount = allItems.reduce(
+    (sum, item) => sum + (item.severity === "error" ? 0 : (item.count ?? 1)),
+    0,
+  );
 
   if (providers.length === 0) {
     return null;
@@ -106,71 +111,78 @@ export function ActionItemsFeed() {
 
   // Nothing to do is not news. The card used to hold its place with "All
   // caught up" inside it, which on first paint was a claim made before a
-  // single provider had answered — `totalCount === 0` is the loading state as
-  // much as the empty one, and the two are indistinguishable from here.
-  if (totalCount === 0) {
-    return <>{collectors}</>;
-  }
-
+  // single provider had answered — no rows is the loading state as much as the
+  // empty one, and the two are indistinguishable from here.
+  //
+  // The collectors sit beside the card, never inside the branch that decides
+  // whether it shows: a parent that changed with the card remounted them, and
+  // every remount refetched a failed read, which cleared its error and
+  // dropped the card again.
   return (
-    <Card className="p-5">
+    <>
       {collectors}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-500 flex items-center justify-center">
-          <Bell size={18} />
-        </div>
-        <div>
-          <h2 className="text-sm font-semibold text-on leading-tight">
-            {t("launcher.actionItems.title")}
-          </h2>
-          <p className="text-xs text-on-muted">
-            {t("launcher.actionItems.subtitle", { count: totalCount })}
-          </p>
-        </div>
-      </div>
+      {allItems.length > 0 && (
+        <Card className="p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-500 flex items-center justify-center">
+              <Bell size={18} />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-on leading-tight">
+                {t("launcher.actionItems.title")}
+              </h2>
+              {totalCount > 0 && (
+                <p className="text-xs text-on-muted">
+                  {t("launcher.actionItems.subtitle", { count: totalCount })}
+                </p>
+              )}
+            </div>
+          </div>
 
-      <ul className="space-y-2" data-testid="action-items-feed">
-        {allItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <li key={`${item.moduleName}-${item.id}`}>
-              <Link
-                to={item.linkTo}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl border border-border bg-surface-card p-3",
-                  "hover:bg-surface-raised hover:border-primary-300 active:scale-[0.99] transition-all",
-                )}
-              >
-                <div
-                  className={cn(
-                    "shrink-0 w-9 h-9 rounded-lg flex items-center justify-center",
-                    severityClasses(item.severity),
-                  )}
-                  aria-hidden="true"
-                >
-                  <Icon size={18} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-on truncate">
-                    {t(item.labelKey, item.labelValues)}
-                  </p>
-                  <p className="text-xs text-on-muted truncate uppercase tracking-wide">
-                    {moduleName(item.moduleName)}
-                  </p>
-                </div>
-                {typeof item.count === "number" && item.count > 0 && (
-                  <span
-                    className="shrink-0 text-xs font-medium text-on-secondary bg-surface-inset px-2 py-1 rounded-md"
-                    data-testid="action-item-count"
+          <ul className="space-y-2" data-testid="action-items-feed">
+            {allItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={`${item.moduleName}-${item.id}`}>
+                  <Link
+                    to={item.linkTo}
+                    className={cn(
+                      "flex items-center gap-3 rounded-xl border border-border bg-surface-card p-3",
+                      "hover:bg-surface-raised hover:border-primary-300 active:scale-[0.99] transition-all",
+                    )}
                   >
-                    {item.count}
-                  </span>
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </Card>
+                    <div
+                      className={cn(
+                        "shrink-0 w-9 h-9 rounded-lg flex items-center justify-center",
+                        severityClasses(item.severity),
+                      )}
+                      aria-hidden="true"
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-on truncate">
+                        {t(item.labelKey, item.labelValues)}
+                      </p>
+                      <p className="text-xs text-on-muted truncate uppercase tracking-wide">
+                        {moduleName(item.moduleName)}
+                      </p>
+                    </div>
+                    {typeof item.count === "number" && item.count > 0 && (
+                      <span
+                        className="shrink-0 text-xs font-medium text-on-secondary bg-surface-inset px-2 py-1 rounded-md"
+                        data-testid="action-item-count"
+                      >
+                        {item.count}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
+    </>
   );
 }

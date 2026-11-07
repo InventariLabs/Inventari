@@ -837,7 +837,9 @@
       "unknownModule": "Nie ma modułu o tej nazwie",
       "unknownModuleHint": "Adres wskazuje moduł, którego ta instalacja nie ma. Sprawdź odnośnik albo wybierz moduł ze sklepu.",
       "open": "Ustawienia modułu",
-      "saved": "Zapisano ustawienia"
+      "saved": "Zapisano ustawienia",
+      "guardName": "Ustawienia modułu",
+      "saveFailed": "Nie udało się zapisać ustawień."
     },
     "modules": {
       "openAppStore": "Otwórz Moduły"
@@ -858,6 +860,8 @@
       "subtitle": "Nieudane wysyłki",
       "none": "Nic nie przepadło",
       "noneHint": "Każda wiadomość tej organizacji opuściła serwer.",
+      "noneUnsent": "Nic nie zostało wysłane",
+      "noneUnsentHint": "Serwer poczty nie jest skonfigurowany, więc żadna wiadomość nie opuszcza tej instalacji — i żadna nie może zawieść. Skonfiguruj go powyżej.",
       "attempts": "{{n}} z {{max}} prób",
       "reason": "Powód: {{reason}}",
       "reasons": {

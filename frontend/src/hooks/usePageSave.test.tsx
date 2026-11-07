@@ -17,9 +17,10 @@ function Part({
 }
 
 function Probe({ onFailures }: { onFailures?: (failures: unknown[]) => void }) {
-  const { dirty, saving, saveAll } = usePageSave();
+  const { dirty, saving, saveAll, failedKeys } = usePageSave();
   return (
     <>
+      <span data-testid="failed">{[...failedKeys].join(",")}</span>
       <span data-testid="state">
         {dirty ? "dirty" : "clean"}
         {saving ? " saving" : ""}
@@ -91,6 +92,31 @@ describe("PageSaveProvider", () => {
 
     expect(later).toHaveBeenCalledOnce();
     expect(onFailures).toHaveBeenCalledWith([refusal]);
+  });
+
+  it("names the parts that were refused until their edit is taken back", async () => {
+    const save = vi.fn().mockResolvedValue(undefined);
+    const bad = () => Promise.reject(new Error("refused"));
+    const { rerender } = render(
+      <PageSaveProvider>
+        <Part name="bad" dirty save={bad} />
+        <Part name="good" dirty save={save} />
+        <Probe />
+      </PageSaveProvider>,
+    );
+    expect(screen.getByTestId("failed")).toHaveTextContent("");
+
+    await userEvent.click(screen.getByRole("button", { name: "save" }));
+    expect(screen.getByTestId("failed")).toHaveTextContent(/^bad$/);
+
+    rerender(
+      <PageSaveProvider>
+        <Part name="bad" dirty={false} save={bad} />
+        <Part name="good" dirty save={save} />
+        <Probe />
+      </PageSaveProvider>,
+    );
+    expect(screen.getByTestId("failed")).toHaveTextContent("");
   });
 
   it("forgets a part that unmounts", () => {

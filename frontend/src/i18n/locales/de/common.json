@@ -835,7 +835,9 @@
       "unknownModule": "Ein Modul dieses Namens gibt es nicht",
       "unknownModuleHint": "Die Adresse verweist auf ein Modul, das diese Installation nicht hat. Prüfen Sie den Link oder wählen Sie das Modul im Store.",
       "open": "Moduleinstellungen",
-      "saved": "Einstellungen gespeichert"
+      "saved": "Einstellungen gespeichert",
+      "guardName": "Die Moduleinstellungen",
+      "saveFailed": "Die Einstellungen konnten nicht gespeichert werden."
     },
     "modules": {
       "openAppStore": "Module öffnen"
@@ -856,6 +858,8 @@
       "subtitle": "Zustellfehler",
       "none": "Nichts ist verloren gegangen",
       "noneHint": "Jede Nachricht dieser Organisation hat den Server verlassen.",
+      "noneUnsent": "Es wurde nichts versendet",
+      "noneUnsentHint": "Es ist kein Mailserver eingerichtet, daher verlässt keine Nachricht diese Installation – und keine kann scheitern. Richten Sie oben einen ein.",
       "attempts": "{{n}} von {{max}} Versuchen",
       "reason": "Grund: {{reason}}",
       "reasons": {
