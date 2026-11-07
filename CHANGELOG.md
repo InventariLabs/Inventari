@@ -561,6 +561,12 @@ says what the release does rather than what changed since them.
   sheet calls the deletion reason by its name rather than "Status". Saving an
   empty service entry marks every missing answer in the app's language,
   instead of stopping at the title with the browser's own message.
+- Stored photos load on an instance that serves the app straight from the
+  frontend container, without the bundled Caddy in front. That container's
+  nginx answered every `/uploads/…` file ending in `.jpg` or `.png` with its own
+  404 instead of asking the backend; a PDF attachment came through. An
+  instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
+  backend itself.
 
 ## v0.11.0 - 2026-11-02
 
