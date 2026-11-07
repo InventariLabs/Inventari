@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def _merge_field_definitions(
+def _merge_declared_field_definitions(
     current: list[dict[str, Any]] | None, declared: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
     """Merge a module's declared field definitions into the stored ones.
@@ -27,6 +27,10 @@ def _merge_field_definitions(
     Declared fields are marked ``is_system=True`` and overwrite their stored
     counterparts by ``key``; fields the organization added itself (no matching
     declaration) are kept as they are.
+
+    Not the merge of a category *update* — that one, with the label rule,
+    is ``_merge_field_definitions`` in ``app/services/_category_reads.py``.
+    Here the label comes from the manifest and is taken as declared.
     """
     merged = list(current or [])
     for decl_field in declared:
@@ -337,7 +341,7 @@ class BaseModule(ABC):
                 existing.icon = cat_decl.icon or existing.icon
                 if cat_decl.context_tag:
                     existing.context_tag = cat_decl.context_tag
-                existing.field_definitions = _merge_field_definitions(
+                existing.field_definitions = _merge_declared_field_definitions(
                     existing.field_definitions, cat_decl.field_definitions
                 )
                 db.add(existing)
@@ -347,7 +351,7 @@ class BaseModule(ABC):
                     code=cat_decl.code,
                     context_tag=cat_decl.context_tag,
                     icon=cat_decl.icon,
-                    field_definitions=_merge_field_definitions(
+                    field_definitions=_merge_declared_field_definitions(
                         [], cat_decl.field_definitions
                     ),
                     organization_id=hh_id,

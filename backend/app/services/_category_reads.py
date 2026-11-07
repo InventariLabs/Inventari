@@ -13,6 +13,10 @@ def _merge_field_definitions(
 ) -> list[dict]:
     """Merge field_definitions while preserving is_system flags.
 
+    This is the merge of a category *update* and the home of the label rule.
+    The merge of a module's declared fields (label taken from the manifest)
+    is ``_merge_declared_field_definitions`` in ``app/core/_base_module.py``.
+
     - System fields (is_system=True) from the existing list are retained even if
       absent from the update list — they cannot be removed by users.
     - User-supplied fields are added or merged on top by key.
