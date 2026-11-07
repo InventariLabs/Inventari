@@ -87,7 +87,8 @@ def utc_now() -> datetime:
     """The current moment, timezone-aware in UTC.
 
     The one spelling for a column default (``default=utc_now``) and for code
-    that stamps a record, so no model carries its own lambda.
+    that stamps a record. A model can take it instead of spelling its own
+    ``lambda: datetime.now(UTC)``; the existing lambdas are left as they are.
     """
     return datetime.now(UTC)
 

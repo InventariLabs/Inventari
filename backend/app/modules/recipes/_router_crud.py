@@ -96,7 +96,7 @@ def register_crud_routes(router: APIRouter) -> None:  # noqa: C901 - route regis
             tags=tags_list,
             is_favorite=is_favorite,
             collection_id=collection_id,
-            skip=offset,
+            offset=offset,
             limit=limit,
             sort=sort,
         )

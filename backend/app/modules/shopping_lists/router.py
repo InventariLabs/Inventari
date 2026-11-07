@@ -87,7 +87,7 @@ async def get_shopping_lists(
 ) -> Any:
     org_id = require_org(current_user)
     lists, total = await list_shopping_lists(
-        db, org_id, active_only, skip=offset, limit=limit
+        db, org_id, active_only, offset=offset, limit=limit
     )
     return PaginatedResponse.from_slice(lists, offset=offset, limit=limit, total=total)
 

@@ -161,7 +161,7 @@ async def get_items(
             only_low_stock=only_low_stock,
             needs_attention=needs_attention,
             low_stock_threshold=low_stock_threshold,
-            skip=offset,
+            offset=offset,
             limit=limit,
             # The scope is the reader's organization, named rather than
             # listed location by location: the page is then walked in the

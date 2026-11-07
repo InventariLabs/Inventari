@@ -248,6 +248,11 @@ async def paginate_async(  # noqa: UP047
     With ``count_cap`` the count stops past ``count_window``: a total above
     the window means the list holds more, and ``PaginatedResponse.from_slice``
     given the same cap reports it that way.
+
+    A hand-written ``.offset()`` beside this is one of four things: a keyset
+    page (``after``), a literal ``offset`` the planner must see as a constant,
+    a list that returns rows only (its caller counts elsewhere or not at all),
+    or a multi-column select this single-entity wrapper does not fit.
     """
     window = count_window(offset, limit, count_cap) if count_cap else None
     total = (await db.scalar(_count_stmt(stmt, window))) or 0

@@ -9,7 +9,7 @@ from sqlalchemy import ColumnElement, Date, case, func, null, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
-from app.core.module_sdk import PaginatedResponse, rows_to_csv
+from app.core.module_sdk import PaginatedResponse, paginate_async, rows_to_csv
 from app.core.public_api import core_api
 
 from . import document_types as dt
@@ -392,27 +392,21 @@ async def get_register_rows_async(
     else:
         conditions.append(group_col == group_key)
 
-    count_stmt = select(func.count()).select_from(Document).where(*conditions)
-    total = await db.scalar(count_stmt)
-
     rows_stmt = (
         select(Document)
         .where(*conditions)
         # Oldest first by the date the register is about; the write time
         # breaks ties so a page boundary lands in the same place twice.
         .order_by(document_date_column().asc(), Document.created_at.asc())
-        .offset(offset)
-        .limit(limit)
     )
-    result = await db.execute(rows_stmt)
-    docs = list(result.scalars().all())
+    docs, total = await paginate_async(db, rows_stmt, limit=limit, offset=offset)
     await attach_shipments_async(db, org_id, docs)
 
     return PaginatedResponse[RegisterDocumentRow].from_slice(
         [_row(doc, partner_names, location_names) for doc in docs],
         offset=offset,
         limit=limit,
-        total=total or 0,
+        total=total,
     )
 
 

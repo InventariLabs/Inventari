@@ -76,7 +76,7 @@ async def list_shopping_lists(
     db: AsyncSession,
     org_id: UUID,
     active_only: bool = True,
-    skip: int = 0,
+    offset: int = 0,
     limit: int = 50,
 ) -> tuple[list[ShoppingList], int]:
     stmt = select(ShoppingList).where(ShoppingList.organization_id == org_id)
@@ -88,7 +88,7 @@ async def list_shopping_lists(
         db,
         stmt.order_by(ShoppingList.created_at.desc(), ShoppingList.id),
         limit=limit,
-        offset=skip,
+        offset=offset,
     )
 
 
