@@ -100,7 +100,7 @@ async def list_orders(
     sort: str = 'newest',
     date_from: date | None = None,
     date_to: date | None = None,
-    skip: int = 0,
+    offset: int = 0,
     limit: int = 50,
 ) -> tuple[list[ProductionOrder], int]:
     """List production orders with optional filters, sorting, and pagination.
@@ -127,7 +127,7 @@ async def list_orders(
     else:
         stmt = stmt.order_by(ProductionOrder.created_at.desc())
 
-    return await paginate_async(db, stmt, limit=limit, offset=skip)
+    return await paginate_async(db, stmt, limit=limit, offset=offset)
 
 
 class _MonthBucket(TypedDict):

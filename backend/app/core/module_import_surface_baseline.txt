@@ -175,7 +175,6 @@ recipes | owner=core | expires=2027-06-30 | recipe valuation and unit conversion
   app.core.db_utils
   app.core.deps
   app.core.exceptions
-  app.core.export_hygiene
   app.core.file_signature
   app.core.limiter
   app.core.llm.errors
@@ -280,7 +279,6 @@ warehouse | owner=core | expires=2027-06-30 | warehouse documents use core scan,
   app.core.deps
   app.core.events
   app.core.exceptions
-  app.core.export_hygiene
   app.core.file_import
   app.core.import_sheet
   app.core.interceptors

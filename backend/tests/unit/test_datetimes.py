@@ -106,3 +106,11 @@ class TestARegionalLanguageTag:
         assert format_datetime_for('de_DE', datetime(2026, 10, 25, 9, 5)) == (
             '25.10.2026 09:05'
         )
+
+
+def test_utc_now_is_timezone_aware_utc():
+    from datetime import UTC
+
+    from app.core.datetimes import utc_now
+
+    assert utc_now().utcoffset() == UTC.utcoffset(None)

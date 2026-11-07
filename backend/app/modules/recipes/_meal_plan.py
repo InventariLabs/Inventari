@@ -128,14 +128,14 @@ async def list_meal_plans_async(
     org_id: UUID,
     start_date: date | None = None,
     end_date: date | None = None,
-    skip: int = 0,
+    offset: int = 0,
     limit: int = 20,
 ) -> list[dict[str, Any]]:
     stmt = _plans_in_window(org_id, start_date, end_date)
     plans = (
         await db.scalars(
             stmt.order_by(MealPlan.start_date.desc(), MealPlan.id)
-            .offset(skip)
+            .offset(offset)
             .limit(limit)
         )
     ).all()

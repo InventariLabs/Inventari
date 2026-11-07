@@ -9,7 +9,11 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app.core.context import build_module_context
 from app.core.contracts import UserContextDTO
-from app.core.db_utils import acquire_advisory_lock
+from app.core.db_utils import (
+    acquire_advisory_lock,
+    constraint_name_of,
+    hit_constraint,
+)
 from app.core.events import SystemEvent, TenantEventPayload, event_bus
 from app.core.exceptions import (
     ConflictException,
@@ -153,10 +157,7 @@ async def _name_rule_held_by_the_database(
         async with db.begin_nested():
             yield
     except IntegrityError as exc:
-        constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
-        if constraint in _NAME_INDEXES or any(
-            index in str(exc.orig) for index in _NAME_INDEXES
-        ):
+        if hit_constraint(exc, *_NAME_INDEXES):
             raise _name_taken(name) from exc
         raise
 
@@ -769,7 +770,7 @@ async def delete_storage(
         # asking for this delete — journal entries included. The failed
         # flush has poisoned this transaction for further SQL, so the
         # caller ends it; the request-scoped session rolls back on teardown.
-        constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
+        constraint = constraint_name_of(exc)
         if constraint == 'ck_stock_moves_at_least_one_location':
             raise ServiceRejectionError(
                 'storage_delete_concurrent_movements', error=exc.orig

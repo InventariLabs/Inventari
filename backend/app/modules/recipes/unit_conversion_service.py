@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictException
 from app.core.logging import get_logger
+from app.core.module_sdk import hit_constraint
 from app.i18n.service import get_current_lang, get_error_message
 
 from .models import UnitConversion
@@ -34,17 +35,6 @@ def _conversion_exists(ingredient_name: str, source_unit: str) -> ConflictExcept
             unit=source_unit,
         ),
     )
-
-
-def _hit_constraint(exc: IntegrityError, name: str) -> bool:
-    """Whether an ``IntegrityError`` is the named unique constraint.
-
-    ``constraint_name`` is what asyncpg reports; the string fallback covers
-    drivers that only put it in the message. Anything else stays unmapped —
-    a refusal must name the rule it refused.
-    """
-    constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
-    return constraint == name or name in str(exc.orig)
 
 
 # ---------------------------------------------------------------------------
@@ -339,7 +329,7 @@ async def create_conversion(
             db.add(conv)
             await db.flush()
     except IntegrityError as exc:
-        if _hit_constraint(exc, _CONVERSION_UNIQUE):
+        if hit_constraint(exc, _CONVERSION_UNIQUE):
             raise _conversion_exists(ingredient_name, source_unit) from exc
         raise
     await db.flush()
@@ -384,7 +374,7 @@ async def update_conversion(
         async with db.begin_nested():
             await db.flush()
     except IntegrityError as exc:
-        if _hit_constraint(exc, _CONVERSION_UNIQUE):
+        if hit_constraint(exc, _CONVERSION_UNIQUE):
             raise _conversion_exists(ingredient_name, source_unit) from exc
         raise
     await db.flush()

@@ -908,7 +908,7 @@ async def list_catalog(
     search: str | None = None,
     output_template_id: UUID | None = None,
     sort: str = 'newest',
-    skip: int = 0,
+    offset: int = 0,
     limit: int = 50,
 ) -> tuple[list[MakerRecipe], int]:
     """List recipes enriched with catalog data (last_unit_cost, stock, etc.).
@@ -929,7 +929,7 @@ async def list_catalog(
     else:
         stmt = stmt.order_by(MakerRecipe.created_at.desc())
 
-    return await paginate_async(db, stmt, limit=limit, offset=skip)
+    return await paginate_async(db, stmt, limit=limit, offset=offset)
 
 
 @dataclass(frozen=True)

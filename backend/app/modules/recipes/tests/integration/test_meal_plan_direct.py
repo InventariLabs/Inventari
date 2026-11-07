@@ -471,7 +471,7 @@ class TestListMealPlans:
         assert [row['id'] for row in all_rows] == [third.id, second.id, first.id]
 
         page = await list_meal_plans_async(
-            real_async_db_session, meal_org.id, skip=1, limit=1
+            real_async_db_session, meal_org.id, offset=1, limit=1
         )
         assert [row['id'] for row in page] == [second.id]
 

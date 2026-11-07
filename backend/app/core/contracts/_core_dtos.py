@@ -17,7 +17,11 @@ from app.core.exceptions import ServiceRejectionError
 from app.schemas.pagination import (  # noqa: F401
     CursorPaginatedResponse as CursorPaginatedDTO,
 )
-from app.schemas.validators import QUANTITY_MAX, RemovalStrategy
+from app.schemas.validators import (
+    QUANTITY_MAX,
+    RemovalStrategy,
+    decimal_from_int_float,
+)
 
 if TYPE_CHECKING:
     from ._system_dtos import StorageTypeDTO
@@ -196,18 +200,6 @@ class ItemDTO(BaseModel):
     updated_at: datetime
 
 
-def _decimal_from_int_float(v: Any) -> Any:
-    """Convert int/float to Decimal via str — no binary float artifacts.
-
-    Inline copy of ``app.schemas.validators.decimal_from_int_float``;
-    contracts must not import from ``app.schemas`` (layering), and this
-    guard must run *before* pydantic coerces float → Decimal.
-    """
-    if isinstance(v, (int, float)):
-        return Decimal(str(v))
-    return v
-
-
 class ItemCreateDTO(BaseModel):
     """Input DTO for CoreItemsAPI.create_async — mirrors ItemCreate fields.
 
@@ -263,7 +255,7 @@ class ItemCreateDTO(BaseModel):
     @field_validator('quantity', mode='before')
     @classmethod
     def quantity_to_decimal(cls, v: Any) -> Any:
-        return _decimal_from_int_float(v)
+        return decimal_from_int_float(v)
 
 
 class ItemUpdateDTO(BaseModel):
@@ -294,7 +286,7 @@ class ItemUpdateDTO(BaseModel):
     @field_validator('quantity', mode='before')
     @classmethod
     def quantity_to_decimal(cls, v: Any) -> Any:
-        return _decimal_from_int_float(v)
+        return decimal_from_int_float(v)
 
 
 class ProductTemplateDTO(BaseModel):

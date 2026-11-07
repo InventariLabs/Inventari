@@ -38,7 +38,7 @@ What deliberately stays out:
 from __future__ import annotations
 
 from contextvars import ContextVar
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 #: What an empty date looks like on a printed document.
 MISSING = '—'
@@ -81,6 +81,16 @@ _ENGLISH_MONTHS = (
 #: A printed date that is given no *country* of its own reads it from here, so
 #: a caller that only knows ``lang`` still writes the order the screen shows.
 _request_country: ContextVar[str | None] = ContextVar('request_country', default=None)
+
+
+def utc_now() -> datetime:
+    """The current moment, timezone-aware in UTC.
+
+    The one spelling for a column default (``default=utc_now``) and for code
+    that stamps a record. A model can take it instead of spelling its own
+    ``lambda: datetime.now(UTC)``; the existing lambdas are left as they are.
+    """
+    return datetime.now(UTC)
 
 
 def set_request_country(country: str | None) -> None:

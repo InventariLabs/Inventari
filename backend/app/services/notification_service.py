@@ -27,12 +27,12 @@ class NotificationService:
         db: AsyncSession,
         user_id: UUID,
         unread_only: bool = False,
-        skip: int = 0,
+        offset: int = 0,
         limit: int = 50,
     ) -> list[Notification]:
         """Return notifications for *user_id* ordered newest first."""
         query = NotificationService._for_user(user_id, unread_only)
-        result = await db.scalars(query.offset(skip).limit(limit))
+        result = await db.scalars(query.offset(offset).limit(limit))
         return list(result.all())
 
     @staticmethod

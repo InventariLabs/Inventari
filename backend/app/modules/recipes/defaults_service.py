@@ -10,8 +10,6 @@ Lookup hierarchy:
 
 from __future__ import annotations
 
-import csv
-import io
 import json
 import uuid
 from decimal import Decimal
@@ -22,8 +20,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import acquire_advisory_lock, escape_ilike, paginate_async
 from app.core.exceptions import AppException
-from app.core.export_hygiene import defuse
 from app.core.logging import get_logger
+from app.core.module_sdk import rows_to_csv
 from app.i18n.service import get_current_lang, get_error_message
 
 from ._name_matching import normalize_name
@@ -318,14 +316,10 @@ async def export_defaults(
     ]
 
     if fmt == 'csv':
-        buf = io.StringIO()
-        writer = csv.DictWriter(buf, fieldnames=fields)
-        writer.writeheader()
-        for row in items:
-            # Names and sources are user text; a leading '=' would execute on
-            # open.
-            writer.writerow({f: defuse(getattr(row, f, None)) for f in fields})
-        return buf.getvalue()
+        # Names and sources are user text; rows_to_csv defuses a leading '='.
+        return rows_to_csv(
+            fields, ([getattr(row, f, None) for f in fields] for row in items)
+        )
 
     return json.dumps(
         [{f: _serialise(getattr(row, f, None)) for f in fields} for row in items],

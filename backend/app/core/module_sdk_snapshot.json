@@ -2672,6 +2672,21 @@
         }
       ]
     },
+    "hit_constraint": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "exc",
+          "required": true
+        },
+        {
+          "kind": "VAR_POSITIONAL",
+          "name": "names",
+          "required": false
+        }
+      ]
+    },
     "interceptor_pipeline": {
       "kind": "value",
       "members": {
@@ -3345,6 +3360,21 @@
         }
       ]
     },
+    "rows_to_csv": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "header",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "rows",
+          "required": true
+        }
+      ]
+    },
     "scan_registry": {
       "kind": "value",
       "members": {
@@ -3407,6 +3437,10 @@
           "required": true
         }
       ]
+    },
+    "utc_now": {
+      "kind": "function",
+      "params": []
     }
   },
   "version": 1

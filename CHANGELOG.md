@@ -113,6 +113,11 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- Module authors get three more helpers in the module SDK: `hit_constraint`
+  (did this integrity error trip one of the named constraints, by the name the
+  driver reports with the message text as fallback), `rows_to_csv` (header and
+  rows to CSV text, with every data cell defused against spreadsheet formulas,
+  as the built-in exports do) and `utc_now` (the timezone-aware current moment).
 - `manage.py user create-admin` takes `--lang` (`en`, `pl`, `de`, `fr`, `es` or
   `pt`) to set the language the account opens in; an unknown code is refused,
   and without it a new account takes the instance default and an existing one

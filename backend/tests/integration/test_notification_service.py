@@ -466,7 +466,7 @@ class TestListForUserAsync:
         page = await NotificationService.list_for_user_async(
             db=async_db,
             user_id=async_user.id,
-            skip=2,
+            offset=2,
             limit=2,
         )
 

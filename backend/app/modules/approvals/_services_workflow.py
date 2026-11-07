@@ -21,9 +21,7 @@ from .target_scopes import describe_scope_async
 
 logger = get_logger(__name__)
 
-VALID_STATUSES = frozenset(
-    {'PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED', 'CANCELLED'}
-)
+VALID_STATUSES = frozenset({*OPEN_STATUSES, 'APPROVED', 'REJECTED', 'CANCELLED'})
 DECISION_VALUES = frozenset({'PENDING', 'APPROVED', 'REJECTED'})
 
 

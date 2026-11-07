@@ -112,14 +112,14 @@ async def list_recipes(
     tags: list[str] | None = None,
     is_favorite: bool | None = None,
     collection_id: UUID | None = None,
-    skip: int = 0,
+    offset: int = 0,
     limit: int = 50,
     sort: str = 'newest',
 ) -> tuple[list[Recipe], int]:
     """List recipes with pagination.
 
        Returns ``(items, total)`` — the total is computed independently of
-       ``skip``/``limit`` so the client can render the result count and the
+       ``offset``/``limit`` so the client can render the result count and the
     real last page instead of guessing from the page size.
     """
     stmt = (
@@ -142,7 +142,7 @@ async def list_recipes(
         stmt = stmt.order_by(Recipe.name.asc())
     else:
         stmt = stmt.order_by(Recipe.is_favorite.desc(), Recipe.updated_at.desc())
-    return await paginate_async(db, stmt, limit=limit, offset=skip)
+    return await paginate_async(db, stmt, limit=limit, offset=offset)
 
 
 def _ingredient_values(ing_data: RecipeIngredientCreate, idx: int) -> dict[str, Any]:
