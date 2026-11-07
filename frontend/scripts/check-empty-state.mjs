@@ -12,7 +12,8 @@
  *
  * The rule is about pages, not about panels: a compact empty state inside a
  * card, a tab or a modal may stand as a single line. So this gate scans the
- * page files — `modules/<module>/pages/**\/*Page.tsx` — and flags every
+ * page files — `modules/<module>/pages/**\/*Page.tsx`, and the
+ * `*EmptyState.tsx` helpers a page hands its empty state to — and flags every
  * `<EmptyState>` whose opening tag carries no `description` attribute.
  *
  * The AST, not a regex: a description can be a multi-line conditional
@@ -35,8 +36,18 @@ const QUIET = process.argv.includes("--quiet");
 /** A module's page file, relative to `src/`. Panels and tabs are not pages. */
 const PAGE = /^modules\/[^/]+\/pages\/.*Page\.tsx$/;
 
+/**
+ * A page's empty state pulled out into its own component (function-length
+ * extractions do this) keeps the page's duty, so a module file named
+ * `*EmptyState.tsx` is scanned wherever it sits.
+ */
+const EMPTY_STATE_HELPER = /^modules\/[^/]+\/(?:.*\/)?[A-Za-z]*EmptyState\.tsx$/;
+
 export function isScanned(rel) {
-  return PAGE.test(rel) && !/\.test\.tsx$/.test(rel);
+  return (
+    (PAGE.test(rel) || EMPTY_STATE_HELPER.test(rel)) &&
+    !/\.test\.tsx$/.test(rel)
+  );
 }
 
 export function findViolations(files) {
