@@ -36,12 +36,29 @@ function SearchEmptyState({
   canWrite: boolean;
 }) {
   const { t } = useTranslation("items");
-  const { data: definitions } = useQuery({
+  // The catalogue knowing a name does not mean the product has no stock: a
+  // stocked row can be missing from the list only because a location or chip
+  // narrowed it. So a match counts as "definition only" when the stock the
+  // backend sums for it is nothing. The endpoint refuses a one-letter search.
+  const lookupEnabled = searchTerm.length >= 2;
+  const { data: definedMatch, isPending } = useQuery({
     queryKey: queryKeys.productTemplates.search(searchTerm),
-    queryFn: () => productTemplatesApi.search(searchTerm, 1),
+    queryFn: async () => {
+      const matches = await productTemplatesApi.search(searchTerm, 5);
+      const stocks = await Promise.all(
+        matches.map((m) => productTemplatesApi.getStock(m.id)),
+      );
+      return (
+        matches.find((_, i) => Number(stocks[i].total_quantity) === 0) ?? null
+      );
+    },
     staleTime: 30_000,
+    enabled: lookupEnabled,
   });
-  const definedMatch = definitions?.[0];
+
+  // Until the lookup answers, "no results" would be the wrong answer shown
+  // first.
+  if (lookupEnabled && isPending) return null;
 
   if (definedMatch) {
     return (
@@ -51,7 +68,9 @@ function SearchEmptyState({
         description={t("empty.definedMatchDescription")}
         primaryAction={
           canWrite ? (
-            <Link to="/inventory/items/add">
+            <Link
+              to={`/inventory/items/add?name=${encodeURIComponent(definedMatch.name)}`}
+            >
               <Button size="lg" leftIcon={<Plus size={20} />}>
                 {t("addProduct")}
               </Button>

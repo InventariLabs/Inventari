@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -97,7 +97,8 @@ describe("ItemsEmptyState", () => {
     expect(link).toHaveAttribute("href", "/inventory/items/add");
   });
 
-  it("renders search-specific message and a clear button when search term is set", () => {
+  it("renders search-specific message and a clear button when search term is set", async () => {
+    vi.spyOn(productTemplatesApi, "search").mockResolvedValue([]);
     const onClear = vi.fn();
     render(
       <Shell>
@@ -108,12 +109,23 @@ describe("ItemsEmptyState", () => {
         />
       </Shell>,
     );
-    expect(screen.getByText(/milk/)).toBeInTheDocument();
+    expect(await screen.findByText(/milk/)).toBeInTheDocument();
     const clearBtn = screen.getByRole("button", { name: /clear search/i });
     expect(clearBtn).toBeInTheDocument();
     fireEvent.click(clearBtn);
     expect(onClear).toHaveBeenCalled();
   });
+
+  const renderSearch = (term: string) =>
+    render(
+      <Shell>
+        <ItemsEmptyState
+          hasFilters={true}
+          searchTerm={term}
+          onClearSearch={vi.fn()}
+        />
+      </Shell>,
+    );
 
   it("a search that matches only a definition says the product exists", async () => {
     // Created inside a BOM, the product has no stock, so the list cannot hold
@@ -121,23 +133,54 @@ describe("ItemsEmptyState", () => {
     vi.spyOn(productTemplatesApi, "search").mockResolvedValue([
       { id: "t1", name: "Wosk sojowy" },
     ] as never);
-    render(
-      <Shell>
-        <ItemsEmptyState
-          hasFilters={true}
-          searchTerm="sojowy"
-          onClearSearch={vi.fn()}
-        />
-      </Shell>,
-    );
+    vi.spyOn(productTemplatesApi, "getStock").mockResolvedValue({
+      product_template_id: "t1",
+      total_quantity: "0.000",
+      uom_symbol: "g",
+    });
+    renderSearch("sojowy");
     expect(
       await screen.findByText(/“Wosk sojowy” is not in a location yet/),
     ).toBeInTheDocument();
     expect(screen.queryByText(/^No results for/)).not.toBeInTheDocument();
     expect(screen.getByRole("link")).toHaveAttribute(
       "href",
-      "/inventory/items/add",
+      "/inventory/items/add?name=Wosk%20sojowy",
     );
+  });
+
+  it("a match that holds stock is not called a definition", async () => {
+    // The row is off the list only because a location or chip narrowed it.
+    vi.spyOn(productTemplatesApi, "search").mockResolvedValue([
+      { id: "t1", name: "Wosk sojowy" },
+    ] as never);
+    const getStock = vi
+      .spyOn(productTemplatesApi, "getStock")
+      .mockResolvedValue({
+        product_template_id: "t1",
+        total_quantity: "5.000",
+        uom_symbol: "g",
+      });
+    renderSearch("sojowy");
+    // The stock is asked for before the answer is given.
+    await waitFor(() => expect(getStock).toHaveBeenCalledWith("t1"));
+    expect(await screen.findByText(/^No results for/)).toBeInTheDocument();
+    expect(screen.queryByText(/not in a location yet/)).not.toBeInTheDocument();
+  });
+
+  it("says nothing while the lookup is in flight", async () => {
+    vi.spyOn(productTemplatesApi, "search").mockReturnValue(
+      new Promise(() => {}),
+    );
+    renderSearch("sojowy");
+    expect(screen.queryByText(/^No results for/)).not.toBeInTheDocument();
+  });
+
+  it("does not look a one-letter search up", async () => {
+    const search = vi.spyOn(productTemplatesApi, "search");
+    renderSearch("x");
+    expect(await screen.findByText(/^No results for/)).toBeInTheDocument();
+    expect(search).not.toHaveBeenCalled();
   });
 
   it("names the hidden module data instead of an empty warehouse", () => {
