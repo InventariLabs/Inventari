@@ -148,7 +148,7 @@
       "location": "Ubicación",
       "anyLocation": "En cualquier sitio",
       "includeEmpty": "Incluir ubicaciones a cero",
-      "includeEmptyHint": "Muestra las entradas de stock con cantidad cero — el rastro de que algo estuvo aquí. Una ubicación que nunca tuvo el producto no tiene ninguna entrada.",
+      "includeEmptyHint": "Muestra los registros con cantidad cero — el rastro de que algo estuvo aquí. Una ubicación que nunca tuvo el producto no tiene ningún registro.",
       "oneStorage": "una ubicación",
       "oneProduct": "un producto"
     },
@@ -167,8 +167,8 @@
     "whereItLies": "Dónde está",
     "seeForProduct": "En todas las ubicaciones",
     "seeForLocation": "Niveles de stock de esta ubicación",
-    "rows_one": "línea de stock",
-    "rows_other": "líneas de stock"
+    "rows_one": "registro",
+    "rows_other": "registros"
   },
   "lots": {
     "title": "Lotes",

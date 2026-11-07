@@ -499,8 +499,15 @@ describe("CheckoutModal — asking for the approval of this checkout", () => {
     // Structure only (jsdom has no layout): the refusal is outside the
     // scrolling form, so on a phone it cannot land below the fold while the
     // footer's button stays in view.
+    // The refusal is picked out by its text: until the member lookup settles
+    // the unmatched-address hint is a second alert, and this test is about
+    // where the refusal sits, not about which alerts are mounted.
+    const refusal = screen
+      .getByText(/needs an approval first/i)
+      .closest<HTMLElement>('[role="alert"]');
+    expect(refusal).not.toBeNull();
     expect(screen.getByTestId("checkout-modal-body")).not.toContainElement(
-      screen.getByRole("alert"),
+      refusal,
     );
     await user.click(ask);
 
