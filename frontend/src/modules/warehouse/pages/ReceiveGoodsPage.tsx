@@ -103,6 +103,7 @@ const DocumentImportModal = lazy(() =>
 );
 
 const TARGET_FIELD_ID = "receive-target-warehouse";
+const PARTNER_FIELD_ID = "receive-partner";
 
 /** Below `sm` the delivery is received one item at a time, as a phone holds it. */
 const PHONE_QUERY = "(max-width: 639px)";
@@ -159,15 +160,31 @@ function problemMessage(
   return t(PROBLEM_KEYS[problem]);
 }
 
-/** The refusal that belongs to the location field, for the field to wear. */
-function targetProblem(
+/** The refusals that belong to a field: it wears them, so nothing repeats them. */
+const FIELD_PROBLEMS: ReadonlySet<ProblemKey> = new Set([
+  "noWarehouse",
+  "noPartner",
+]);
+
+/** The refusal that belongs to `field`, for the field to wear. */
+function fieldProblem(
   t: TFunction,
   problem: ProblemKey | null,
   source: ReceiveSource,
+  field: "noWarehouse" | "noPartner",
 ): string | undefined {
-  return problem === "noWarehouse"
+  return problem === field ? problemMessage(t, problem, source) : undefined;
+}
+
+/** The refusal that no field wears, for the footer or the phone panel. */
+function looseProblem(
+  t: TFunction,
+  problem: ProblemKey | null,
+  source: ReceiveSource,
+): string | null {
+  return problem && !FIELD_PROBLEMS.has(problem)
     ? problemMessage(t, problem, source)
-    : undefined;
+    : null;
 }
 
 /** The sentence under the result: the count, and what the order still expects. */
@@ -485,6 +502,8 @@ function receiveHeading(
 function focusProblem(issue: ProblemKey | null, scan: HTMLInputElement | null) {
   if (issue === "noWarehouse") {
     document.getElementById(TARGET_FIELD_ID)?.focus();
+  } else if (issue === "noPartner") {
+    document.getElementById(PARTNER_FIELD_ID)?.focus();
   } else if (issue === "noLines" || issue === "noProduct") {
     scan?.focus();
   }
@@ -1283,7 +1302,8 @@ export default function ReceiveGoodsPage() {
           onPartnerChange={changePartner}
           targetLocationId={targetLocationId}
           onTargetChange={changeTarget}
-          targetError={targetProblem(t, problem, source)}
+          targetError={fieldProblem(t, problem, source, "noWarehouse")}
+          partnerError={fieldProblem(t, problem, source, "noPartner")}
           locationsEmptyReason={emptyReason}
           locationsFailed={locationsFailed}
           externalReference={externalReference}
@@ -1317,7 +1337,7 @@ export default function ReceiveGoodsPage() {
           hasOrder={chosenOrder !== null}
           ordersLoading={orders.isLoading}
           goods={goods}
-          error={problem ? problemMessage(t, problem, source) : postError}
+          error={looseProblem(t, problem, source) ?? postError}
         />
       ) : (
         <>
@@ -1362,7 +1382,7 @@ export default function ReceiveGoodsPage() {
             quantity={totalQuantity(totals)}
             shortCount={short.count}
             fromOrder={chosenOrder !== null}
-            problemText={problem ? problemMessage(t, problem, source) : null}
+            problemText={looseProblem(t, problem, source)}
             postLabel={postLabel(t, source)}
             postError={postError}
             postErrorFix={postErrorFix}

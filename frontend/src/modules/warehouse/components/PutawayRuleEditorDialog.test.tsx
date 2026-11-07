@@ -235,6 +235,15 @@ describe("PutawayRuleEditorDialog", () => {
     );
   });
 
+  it("asks for the target location in a sentence, not a field name", async () => {
+    servePutawayState({ capacity: [], cells: [] });
+    renderDialog({});
+
+    const picker = screen.getByRole("combobox", { name: /To location/i });
+    expect(picker).toHaveTextContent("Select a location");
+    expect(picker).not.toHaveTextContent("Select the To location");
+  });
+
   it("says the conditions are an alternative, not a conjunction", async () => {
     // four fields stacked in a column read as filters joined by
     // AND. The resolver fires on ANY filled key, so a user filling two

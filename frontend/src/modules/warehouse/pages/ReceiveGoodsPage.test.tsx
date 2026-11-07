@@ -226,6 +226,7 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
       <button type="button" onClick={() => onChange(value)}>
         {`Choose ${label ?? "option"} again`}
       </button>
+      {error && <span role="alert">{error}</span>}
     </label>
   ),
 }));
@@ -1150,9 +1151,10 @@ describe("ReceiveGoodsPage", () => {
       screen.getByRole("button", { name: "Receive into stock" }),
     );
 
+    // Announced once: under the field, not again in the footer.
     expect(
-      await screen.findByText("Choose the location the goods go to."),
-    ).toBeInTheDocument();
+      await screen.findAllByText("Choose the location the goods go to."),
+    ).toHaveLength(1);
     expect(screen.getByLabelText("To location")).toHaveFocus();
     // The field itself is marked, as Issue and Move mark theirs, and the
     // mark goes once a location is chosen.
@@ -1483,7 +1485,11 @@ describe("ReceiveGoodsPage", () => {
     await user.click(
       screen.getByRole("button", { name: "Receive into stock" }),
     );
-    expect(await screen.findByText("Choose the supplier.")).toBeInTheDocument();
+    // The field wears the refusal and it is announced once.
+    expect(await screen.findAllByText("Choose the supplier.")).toHaveLength(1);
+    expect(screen.getByLabelText("From")).toBeInvalid();
+    // The press is not dead: the reader lands on the refused field.
+    expect(screen.getByLabelText("From")).toHaveFocus();
     expect(state.postNew).not.toHaveBeenCalled();
   });
   it("opens on the order a link names, with its lines, and posts it in one press", async () => {

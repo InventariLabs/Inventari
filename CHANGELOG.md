@@ -159,6 +159,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The Receive goods, Issue goods and Move goods forms refuse a missing value
+  where it is. Receiving without a supplier or customer marks that field and
+  says why under it, as the location field already did, and the sentence is no
+  longer repeated in the footer or on the phone's start panel, so a screen
+  reader announces it once. An error under one field no longer pushes the
+  other fields of its row out of line on any of the three forms.
 - A request refused for exceeding the general rate limit is answered in the
   request's language: a Polish, German, French or Spanish reader used to get the
   refusal in English, while one refused by an endpoint's own limit already got
