@@ -12,6 +12,7 @@
   "failuresSinceSuccess_other": "{{count}} entregas com falha desde a última bem-sucedida.",
   "consecutiveFailures": "Falhas consecutivas",
   "test": "Testar",
+  "testHint": "Envia agora um evento de exemplo. Um teste que falha conta para o limite do disjuntor, tal como uma entrega real.",
   "reactivate": "Reativar",
   "thresholdLink": "Definir o limite de falhas",
   "delete": "Excluir",
