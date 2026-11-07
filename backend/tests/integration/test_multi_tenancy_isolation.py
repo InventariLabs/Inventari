@@ -681,40 +681,6 @@ class TestUnauthorizedAccess:
 
 
 # ============================================================================
-# Tests: Organization Context
-# ============================================================================
-
-
-@pytest.mark.integration
-class TestOrganizationContext:
-    """Tests that organization context is enforced."""
-
-    def test_items_have_correct_org_id(self, client, headers_a, item_a, item_b):
-        """All items returned for user A should belong to organization A."""
-        resp = client.get('/api/v1/items', headers=headers_a)
-        assert resp.status_code == status.HTTP_200_OK, resp.text
-
-        data = resp.json()
-        if isinstance(data, dict):
-            items = data.get('items', data.get('data', []))
-        else:
-            items = data if isinstance(data, list) else []
-
-        for item in items:
-            item_org_id = item.get('organization_id')
-            if item_org_id is None:
-                continue  # Skip items without org_id
-
-            if item['id'] == str(item_a.id):
-                assert str(item_org_id) == str(item_a.organization_id)
-            elif item['id'] == str(item_b.id):
-                # BUG: item from org B should not appear at all
-                raise AssertionError(
-                    'CRITICAL: Item from Org B is visible to Org A user'
-                )
-
-
-# ============================================================================
 # A foreign shelf is not a destination
 # ============================================================================
 

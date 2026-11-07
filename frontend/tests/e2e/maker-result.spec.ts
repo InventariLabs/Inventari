@@ -39,12 +39,15 @@ test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
   const sIn = await api.createStorage(token, { name: `${stamp}-In` });
   const sOut = await api.createStorage(token, { name: `${stamp}-Out` });
 
-  // Stock: 10 kg fruit at the input location.
+  // Stock: 10 kg fruit at the input location, bought at 2.50 a kilo. Without a
+  // price the run would state no result at all: its cost would leave the fruit
+  // out, and a margin against that cost would be overstated by exactly it.
   await api.seedStock(token, {
     product_template_id: ingredient.id,
     product_template_name: `${stamp}-Fruit`,
     location_id: sIn.id,
     quantity: 10,
+    purchase_price: "2.50",
   });
 
   // Formula with a reference (store) price of 12.50; 1 kg fruit per batch.
@@ -61,8 +64,8 @@ test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     unit: "kg",
   });
 
-  // Plan 2 jars → complete them (no AVCO rate seeded → unit cost 0,
-  // result per unit = reference price 12.50).
+  // Plan 2 jars → complete them: 2 kg fruit at 2.50 → unit cost 2.50,
+  // result per unit 12.50 − 2.50 = 10.00.
   const order = await api.createProductionOrder(token, {
     output_template_id: output.id,
     planned_qty: "2",
@@ -87,10 +90,10 @@ test.describe("Maker — financial result (Phase C)", () => {
 
     expect(body.status).toBe("COMPLETED");
     expect(body.reference_price_snapshot).toBe("12.50");
-    // No AVCO rate seeded → material cost 0 → unit cost 0.
-    expect(body.unit_cost_snapshot).toBe("0.0000");
-    expect(body.result_per_unit).toBe("12.50");
-    expect(body.result_per_batch).toBe("12.50");
+    expect(body.unit_cost_snapshot).toBe("2.5000");
+    expect(body.result_per_unit).toBe("10.00");
+    // One jar per batch.
+    expect(body.result_per_batch).toBe("10.00");
   });
 
   test("production list shows the result column for completed orders", async ({
@@ -114,9 +117,9 @@ test.describe("Maker — financial result (Phase C)", () => {
     });
     // Currency symbol depends on the org's setting (PLN on a fresh stack,
     // USD on a hand-configured one) — assert the numbers, not the symbol.
-    await expect(card).toContainText(/25\.00/);
+    await expect(card).toContainText(/20\.00/);
     // The result per piece, in the output's own unit.
-    await expect(card).toContainText(/12\.50 per pcs/);
+    await expect(card).toContainText(/10\.00 per pcs/);
   });
 
   test("production's start aggregates the monthly result", async ({

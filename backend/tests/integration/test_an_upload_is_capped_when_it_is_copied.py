@@ -18,11 +18,20 @@ for neither.
 
 from __future__ import annotations
 
+import io
+
 import pytest
 from fastapi import status
+from PIL import Image
 from starlette.testclient import TestClient
 
 JPEG_MAGIC = b'\xff\xd8\xff'
+
+
+def _jpeg() -> bytes:
+    buffer = io.BytesIO()
+    Image.new('RGB', (4, 4), (10, 20, 30)).save(buffer, 'JPEG')
+    return buffer.getvalue()
 
 
 @pytest.mark.integration
@@ -55,7 +64,32 @@ class TestTheItemImageEndpoint:
         response = client.post(
             f'/api/v1/items/{test_item.id}/image',
             headers=auth_headers,
-            files={'image': ('ok.jpg', JPEG_MAGIC + b'x' * 64, 'image/jpeg')},
+            files={'image': ('ok.jpg', _jpeg(), 'image/jpeg')},
         )
 
         assert response.status_code == status.HTTP_200_OK, response.text
+
+    @pytest.mark.parametrize(
+        ('name', 'mime', 'body'),
+        [
+            ('a.gif', 'image/gif', b'GIF89a followed by plain text'),
+            ('a.png', 'image/png', b'\x89PNG\r\n\x1a\n and then nothing a picture has'),
+            ('a.jpg', 'image/jpeg', JPEG_MAGIC + b'x' * 64),
+        ],
+    )
+    def test_a_signature_with_no_picture_behind_it_is_refused(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_item,
+        name: str,
+        mime: str,
+        body: bytes,
+    ) -> None:
+        response = client.post(
+            f'/api/v1/items/{test_item.id}/image',
+            headers=auth_headers,
+            files={'image': (name, body, mime)},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text

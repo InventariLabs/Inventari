@@ -520,7 +520,7 @@
     "discardFailed": "Nie udało się zdjąć ze stanu",
     "recordLeftList": "Rekord zniknął z listy produktów.",
     "openRecord": "Otwórz rekord",
-    "equipmentNote": "Kategoria sprzętowa: tę pozycję się przyjmuje i wycofuje, a nie zużywa i usuwa."
+    "equipmentNote": "Kategoria sprzętowa: tę pozycję się przyjmuje i likwiduje, a nie zużywa i usuwa."
   },
   "noArchivedItemsDescRestoreOnly": "Usunięte produkty trafiają tutaj i można je przywrócić. Trwałe usuwanie jest w tej organizacji wyłączone.",
   "noArchivedItemsDescViewOnly": "Produkty, które usuniesz, trafią tutaj. Przywrócenie wymaga uprawnienia, którego to konto nie ma.",

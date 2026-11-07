@@ -1,5 +1,14 @@
+import { act } from "react";
 import { render, screen, waitFor } from "@/test/utils";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeAll,
+  beforeEach,
+  afterEach,
+} from "vitest";
 import { signInWith, signOut } from "@/test/auth";
 import userEvent from "@testing-library/user-event";
 import { withLanguage } from "@/test/mocks/i18n";
@@ -7,6 +16,31 @@ import { itemsApi } from "@/lib/api/items";
 import QuickActionSheet from "./QuickActionSheet";
 import type { Item } from "@/types";
 import { formatDate } from "@/utils/formatters";
+
+// The sheet's module slots load lazily. Left to finish on their own they land
+// inside whichever test happens to be running, and the console gate fails that
+// one with "a suspended resource finished loading inside a test" — so which
+// test failed depended on how many synchronous tests ran ahead of it. The
+// import only starts when a sheet first renders, so render one here and wait
+// for it. The render must stay OUTSIDE act: render() already runs inside an
+// outer act scope, and React defers a nested act's work until that outermost
+// scope exits, so a sheet rendered inside this act is still empty when
+// dynamicImportSettled() runs, nothing is pending, and unmount() cancels the
+// queued render. Rendered outside, the import has started before the wait.
+beforeAll(async () => {
+  signInWith(["items:read", "items:write"]);
+  const { unmount } = render(
+    <QuickActionSheet
+      item={{ id: "warm-up", name: "Warm-up", quantity: "1" } as Item}
+      onClose={() => {}}
+    />,
+  );
+  await act(async () => {
+    await vi.dynamicImportSettled();
+  });
+  unmount();
+  signOut();
+});
 
 // Every action in the sheet changes the record, so the sheet is empty for an
 // account that may not — which is a different screen than these tests mean.
@@ -252,12 +286,12 @@ describe("QuickActionSheet", () => {
       />,
     );
 
-    expect(screen.getByText(/checked in and disposed of/i)).toBeInTheDocument();
+    expect(screen.getByText(/returned and disposed of/i)).toBeInTheDocument();
   });
 
   it("adds no such sentence to a product", () => {
     render(<QuickActionSheet item={mockItem} onClose={() => {}} />);
 
-    expect(screen.queryByText(/checked in and disposed of/i)).toBeNull();
+    expect(screen.queryByText(/returned and disposed of/i)).toBeNull();
   });
 });

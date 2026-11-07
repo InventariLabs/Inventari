@@ -94,8 +94,8 @@ def build_profile_switch_plan(
         current_modules: Modules currently enabled for the organization.
         profile: Target ``ProductProfile``.
         modules: All registered ``BaseModule`` instances.
-        always_on: Modules that cannot be disabled (canonical
-            ``ALWAYS_ON_MODULES`` set).
+        always_on: Modules that cannot be disabled — the effective set,
+            ``ALWAYS_ON_MODULES`` filtered through ``is_always_on``.
         allowed_modules: Optional allow-list for premium/entitled modules.
             When ``None``, the entitlement check is skipped.
         source_profile: The organization's current ``ProductProfile``, if

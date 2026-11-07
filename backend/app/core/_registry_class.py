@@ -290,6 +290,11 @@ class ModuleRegistry:
         """
         from app.core.module_safety import ALWAYS_ON_MODULES
 
+        # The raw policy set, not ``is_always_on``: this runs while modules are
+        # still being discovered, and a requirement only skips the "must be
+        # registered" check here. It grants nothing — an always-on name a
+        # dropped directory wears still has to register as a module to load,
+        # and ``is_always_on`` decides at request time whether it is switched on.
         while True:
             changed = False
             registered = set(self._modules.keys())

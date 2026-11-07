@@ -173,6 +173,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Uploading a product picture that only starts like one — a GIF, PNG or JPEG
+  header followed by something else — is now refused as unreadable instead of
+  being stored and shown as a broken thumbnail. The equipment note beside the
+  item actions now calls the action "Return", as the button does.
+
 - `manage.py db stamp-module` now works on a database that a newer version has
   already migrated. `db doctor` refuses to start in that state and prints this
   command as the way out, but the command itself stopped with "Can't locate
