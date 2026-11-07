@@ -501,6 +501,11 @@ says what the release does rather than what changed since them.
   the editor's preview; the sanitizer used to drop it as if it were a `data:`
   link. A logo uploaded as WebP now prints through `{{ issuer.logo }}` instead
   of leaving an empty image.
+- The error details a broken screen offers to copy into a bug report no longer
+  carry the token of the link that opened the page: on a password reset,
+  invitation, registration or equipment attestation page the token reads
+  `redacted`, so a report pasted into a public issue tracker hands nobody a
+  live link.
 
 ## v0.11.0 - 2026-11-02
 
