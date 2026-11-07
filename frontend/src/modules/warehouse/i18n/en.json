@@ -293,7 +293,7 @@
     "error": "Failed to import lines",
     "createStubsLabel": "Create product stubs for unmatched barcodes",
     "createStubsHint": "Rows whose barcode doesn't match an existing product template will get a stub created automatically so they import as matched.",
-    "createStubsDenied": "Your account can't create new products, so unmatched barcodes stay unmatched in this import. Ask an administrator for the \"items:write\" permission if you need that.",
+    "createStubsDenied": "Your account can't create new products, so unmatched barcodes stay unmatched in this import. Ask an administrator for permission to add products if you need that.",
     "stubsCreated": "+{{count}} stub products created",
     "success_one": "Imported 1 line",
     "success_other": "Imported {{count}} lines",

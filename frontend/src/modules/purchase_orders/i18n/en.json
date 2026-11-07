@@ -27,7 +27,7 @@
   "emptyFilteredDescription": "Try clearing the search or status filter.",
   "noOrders": "No purchase orders yet",
   "noOrdersDescription": "Create your first purchase order to get started.",
-  "noOrdersDescriptionReadOnly": "Purchase orders will appear here once someone places them.",
+  "noOrdersDescriptionReadOnly": "Purchase orders will appear here once they are created.",
   "notFound": "Purchase order not found",
   "scheduled": "Scheduled",
   "downloadPdf": "Download PDF",

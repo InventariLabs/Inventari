@@ -293,7 +293,7 @@
     "error": "Error al importar las líneas",
     "createStubsLabel": "Crear productos sustitutos para códigos de barras no coincidentes",
     "createStubsHint": "Las filas cuyo código de barras no coincida con ninguna plantilla de producto existente obtendrán automáticamente un sustituto para importarse como coincidentes.",
-    "createStubsDenied": "Esta cuenta no puede crear productos nuevos, así que las filas con un código de barras desconocido quedarán sin emparejar en esta importación. Pide a un administrador el permiso «items:write» si lo necesitas.",
+    "createStubsDenied": "Esta cuenta no puede crear productos nuevos, así que las filas con un código de barras desconocido quedarán sin emparejar en esta importación. Pide a un administrador el permiso para añadir productos si lo necesitas.",
     "stubsCreated": "+{{count}} productos sustitutos creados",
     "success_one": "1 línea importada",
     "success_other": "{{count}} líneas importadas",

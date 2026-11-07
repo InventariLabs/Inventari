@@ -293,7 +293,7 @@
     "error": "Zeilen konnten nicht importiert werden",
     "createStubsLabel": "Stub-Produkte für nicht zugeordnete Barcodes erstellen",
     "createStubsHint": "Zeilen, deren Barcode keinem vorhandenen Produkt-Template entspricht, erhalten automatisch einen Stub, damit sie als zugeordnet importiert werden.",
-    "createStubsDenied": "Dieses Konto kann keine neuen Produkte anlegen, daher bleiben Zeilen mit unbekanntem Barcode in diesem Import nicht zugeordnet. Bitten Sie bei Bedarf einen Administrator um die Berechtigung „items:write“.",
+    "createStubsDenied": "Dieses Konto kann keine neuen Produkte anlegen, daher bleiben Zeilen mit unbekanntem Barcode in diesem Import nicht zugeordnet. Bitten Sie bei Bedarf einen Administrator um die Berechtigung, Produkte anzulegen.",
     "stubsCreated": "+{{count}} Stub-Produkte erstellt",
     "success_one": "1 Zeile importiert",
     "success_other": "{{count}} Zeilen importiert",
