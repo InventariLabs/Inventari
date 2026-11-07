@@ -280,7 +280,7 @@ describe("LineItemSearchDropdown — the overlay stack can see the panel", () =>
   });
 });
 
-describe("LineItemSearchDropdown — twins created the same day", () => {
+describe("LineItemSearchDropdown — twins added the same day", () => {
   const base = {
     product_template_id: "t-1",
     name: "RV2172 Twin",
@@ -290,7 +290,7 @@ describe("LineItemSearchDropdown — twins created the same day", () => {
     image_url: null,
     uom_id: null,
     available_quantity: null as number | null,
-    created_at: "2026-09-15T21:56:42.973Z",
+    added_date: "2026-09-15",
   };
 
   it("still tells same-day records apart by their record code", () => {
@@ -333,6 +333,42 @@ describe("LineItemSearchDropdown — twins created the same day", () => {
     renderList(rows);
 
     expect(screen.getAllByRole("option")).toHaveLength(2);
+    expect(screen.queryByText("#00aa01")).not.toBeInTheDocument();
+    expect(screen.queryByText("#00bb02")).not.toBeInTheDocument();
+  });
+});
+
+describe("LineItemSearchDropdown — merged rows", () => {
+  it("goes by the product's code, not the code of one record of the group", () => {
+    // A merged row is the total of several records; its item_id names one
+    // of them only because a dispatch line needs a record. Printing that
+    // record's tail would dress the total up as a single record.
+    const twin = {
+      name: "Merged twin",
+      sku: null,
+      barcode: null,
+      brand: null,
+      image_url: null,
+      uom_id: null,
+      location_name: "Shelf A",
+      available_quantity: 6,
+      merged: true,
+    };
+    renderList([
+      {
+        ...twin,
+        product_template_id: "0198aaaa-0000-7000-8000-00000000cc03",
+        item_id: "0198aaaa-0000-7000-8000-00000000aa01",
+      },
+      {
+        ...twin,
+        product_template_id: "0198aaaa-0000-7000-8000-00000000dd04",
+        item_id: "0198aaaa-0000-7000-8000-00000000bb02",
+      },
+    ]);
+
+    expect(screen.getByText("#00cc03")).toBeInTheDocument();
+    expect(screen.getByText("#00dd04")).toBeInTheDocument();
     expect(screen.queryByText("#00aa01")).not.toBeInTheDocument();
     expect(screen.queryByText("#00bb02")).not.toBeInTheDocument();
   });

@@ -53,7 +53,7 @@ function visibleSignature(product: LineItemProduct): string {
     readableSku(product.sku),
     product.barcode,
     product.serial_number,
-    product.created_at ? formatDate(product.created_at) : null,
+    product.added_date ? formatDate(product.added_date) : null,
     product.expiry_date,
     product.location_name,
     product.available_quantity,
@@ -62,9 +62,13 @@ function visibleSignature(product: LineItemProduct): string {
 }
 
 /** Brand and id tail for a row that reads like a sibling. A stock hit
- *  carries its record id; a catalogue hit only its template's. */
+ *  carries its record id; a catalogue hit only its template's. A merged row
+ *  is a shelf total, not the record its `item_id` happens to name, so it
+ *  goes by its template's id like a catalogue hit. */
 function twinHint(product: LineItemProduct): string | null {
-  const id = product.item_id ?? product.product_template_id;
+  const id = product.merged
+    ? product.product_template_id
+    : (product.item_id ?? product.product_template_id);
   if (!id) return null;
   const tail = `#${id.slice(-6)}`;
   return product.brand ? `${product.brand} · ${tail}` : tail;
@@ -246,10 +250,10 @@ export function LineItemSearchDropdown({
               twinHint(product) && (
                 <span className="font-mono">{twinHint(product)}</span>
               )}
-            {product.created_at && (
+            {product.added_date && (
               <span>
                 {addedLabel ? `${addedLabel}: ` : ""}
-                {formatDate(product.created_at)}
+                {formatDate(product.added_date)}
               </span>
             )}
             {product.expiry_date && (
@@ -258,8 +262,8 @@ export function LineItemSearchDropdown({
                 {product.expiry_date}
               </span>
             )}
-            {/* The search walks a location's subtree, so same-named rows can
-                stand on different shelves — the shelf is what tells them
+            {/* A zone's search covers the shelves below it, so same-named
+                rows can stand on different shelves — the shelf is what tells them
                 apart, and where the picker walks. */}
             {product.location_name && (
               <span>
