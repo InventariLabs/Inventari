@@ -29,7 +29,7 @@ interface Props {
 // labelled for assistive technology instead of relying on `title`. Settled as
 // the module's answer, not an oversight; `gray-300` is the neutral
 // ramp step, remapped per theme like every other one here.
-const statusDot: Record<string, string> = {
+export const statusDot: Record<string, string> = {
   available: "bg-success-400",
   available_approx: "bg-amber-400",
   // Lighter than "missing": the goods are on the shelf, there is just
@@ -40,6 +40,8 @@ const statusDot: Record<string, string> = {
   // Stock whose measure cannot meet the recipe's is not a green dot: the two
   // numbers beside it are not on one scale, and nothing on the row said so.
   not_comparable: "bg-amber-400",
+  // The availability status of the same condition, which the legend counts.
+  incomparable: "bg-amber-400",
 };
 
 const statusLabel: Record<string, string> = {

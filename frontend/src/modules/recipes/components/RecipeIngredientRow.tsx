@@ -84,8 +84,10 @@ function unitPickerHint(
   // Without the catalogue the sentence would name the unit by its id, and
   // the picker under it already says the units did not load.
   if (!stockUnit || unitsFailed) return undefined;
-  const symbol =
-    uoms.find((u) => u.id === stockUnit.uomId)?.symbol ?? stockUnit.uomId;
+  const symbol = unitLabel(
+    t,
+    uoms.find((u) => u.id === stockUnit.uomId)?.symbol ?? stockUnit.uomId,
+  );
   if (!isCountedUom(categories, stockUnit.uomId))
     return t("form.unit_must_be_convertible", { unit: symbol });
   return stockUnit.measureUomIds.length
