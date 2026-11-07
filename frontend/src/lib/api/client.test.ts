@@ -377,6 +377,25 @@ describe("the sentence follows what the request was doing", () => {
     expect(await message(api.post(url, {}))).toBe(readSentence());
   });
 
+  it("lets a module declare its own POST read-only, whatever its path ends in", async () => {
+    server.use(
+      http.post("*/api/v1/some-module/work-out-price", refuse),
+      http.post("*/api/v1/some-module/work-out-price-and-save", refuse),
+      http.post("*/api/v1/auth/refresh", ended),
+    );
+    tokenStore.set("expired-token");
+
+    expect(
+      await message(
+        api.post("/some-module/work-out-price", {}, { readOnly: true }),
+      ),
+    ).toBe(readSentence());
+    // The declaration is the module's to make: without it the route is a write.
+    expect(
+      await message(api.post("/some-module/work-out-price-and-save", {})),
+    ).toBe(writeSentence());
+  });
+
   it("still tells a POST that saves, with a query string, that it did not", async () => {
     server.use(
       http.post("*/api/v1/items", refuse),

@@ -209,6 +209,7 @@
     "deleteSuccess": "Excluído com sucesso",
     "fileAttached": "Arquivo anexado",
     "fileUploadFailed": "Não foi possível enviar o arquivo",
+    "imageRemoveFailed": "Não foi possível remover a foto",
     "fileUploadFailedAttachment": "Não foi possível enviar o arquivo anexo",
     "unitLookupFailed": "Não foi possível verificar em qual unidade este produto é mantido. Tente salvar novamente.",
     "quantityClearedOnUnitChange": "Quantidade apagada — a nova unidade mede outra coisa.",

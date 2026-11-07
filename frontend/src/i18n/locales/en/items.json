@@ -209,6 +209,7 @@
     "deleteSuccess": "Deleted successfully",
     "fileAttached": "File attached",
     "fileUploadFailed": "Failed to upload file",
+    "imageRemoveFailed": "Failed to remove the photo",
     "fileUploadFailedAttachment": "Failed to upload attachment file",
     "unitLookupFailed": "Could not check which unit this product is kept in. Try saving again.",
     "quantityClearedOnUnitChange": "Quantity cleared — the new unit measures something else.",

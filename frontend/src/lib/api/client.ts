@@ -4,6 +4,19 @@ import i18next from "i18next";
 
 import { SessionEndedError, isServerRefusal } from "@/lib/errors";
 
+declare module "axios" {
+  interface AxiosRequestConfig {
+    /**
+     * Set on a POST that computes an answer and saves nothing. When the
+     * session has ended behind it, the user is told so without the claim that
+     * their work was not saved. A module marks its own routes with this; the
+     * core client keeps no list of them (the few last path segments below
+     * predate it).
+     */
+    readOnly?: boolean;
+  }
+}
+
 const API_BASE_URL = "/api/v1";
 
 // Access token stored in module memory only — never in localStorage.
@@ -130,6 +143,8 @@ const processQueue = (error: unknown, token: string | null = null) => {
  * POST routes that compute an answer and write nothing: a rendered label, a
  * dry-run preview, a sheet read for its columns, a text read off a photo.
  * They are POSTs because the input is a body, not because they save.
+ * A route that is not in this set declares itself with `readOnly: true` in the
+ * request config.
  */
 const READ_ONLY_POST_ENDPOINTS = new Set([
   "png",
@@ -149,7 +164,7 @@ const READ_ONLY_POST_ENDPOINTS = new Set([
  * claim otherwise.
  */
 function sessionEndedError(
-  request: { method?: string; url?: string } | undefined,
+  request: { method?: string; url?: string; readOnly?: boolean } | undefined,
 ): SessionEndedError {
   const method = (request?.method ?? "get").toLowerCase();
   const lastSegment = (request?.url ?? "").split("?")[0].split("/").pop() ?? "";
@@ -157,7 +172,9 @@ function sessionEndedError(
     method === "get" ||
     method === "head" ||
     method === "options" ||
-    (method === "post" && READ_ONLY_POST_ENDPOINTS.has(lastSegment));
+    (method === "post" &&
+      (request?.readOnly === true ||
+        READ_ONLY_POST_ENDPOINTS.has(lastSegment)));
   return new SessionEndedError(
     i18next.t(
       reads ? "common:errors.sessionEndedRead" : "common:errors.sessionEnded",
