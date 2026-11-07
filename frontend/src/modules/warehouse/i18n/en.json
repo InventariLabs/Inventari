@@ -1907,6 +1907,7 @@
       "tracking": "Tracking links",
       "presets": "Ready-made setup"
     },
+    "sectionRefused": "not saved — the server refused it",
     "nav": "Configuration sections",
     "related": "Related screens",
     "advanced": {

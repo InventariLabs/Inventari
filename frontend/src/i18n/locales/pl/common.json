@@ -837,7 +837,9 @@
       "unknownModule": "Nie ma modułu o tej nazwie",
       "unknownModuleHint": "Adres wskazuje moduł, którego ta instalacja nie ma. Sprawdź odnośnik albo wybierz moduł ze sklepu.",
       "open": "Ustawienia modułu",
-      "saved": "Zapisano ustawienia"
+      "saved": "Zapisano ustawienia",
+      "guardName": "Ustawienia modułu",
+      "saveFailed": "Nie udało się zapisać ustawień."
     },
     "modules": {
       "openAppStore": "Otwórz Moduły"

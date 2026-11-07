@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Save } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { useHasPermission } from "@/hooks/useHasPermission";
-import { usePageSavePart, useUnderPageSave } from "@/module-sdk";
+import {
+  PageSaveProvider,
+  SettingsSaveBar,
+  usePageSavePart,
+  useUnderPageSave,
+} from "@/module-sdk";
 import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { useUpdateModuleSettings } from "@/modules/settings/hooks/useModuleSettings";
 import type {
@@ -117,7 +120,30 @@ function isMasked(value: unknown): boolean {
   return typeof value === "string" && value === MASKED_VALUE;
 }
 
-export function ModuleSettingsForm({
+/**
+ * A module's schema-driven settings form. On a page that already has one Save
+ * it hands its edit to that page; on its own it brings the page's one Save
+ * with it — the sticky bar that appears once something changed, and the
+ * question before the page is left with that edit unsaved (UI_GUIDELINES
+ * §11.9).
+ */
+export function ModuleSettingsForm(props: ModuleSettingsFormProps) {
+  const { t } = useTranslation("common");
+  const underPageSave = useUnderPageSave();
+  if (underPageSave) return <ModuleSettingsFields {...props} />;
+  return (
+    <PageSaveProvider>
+      <ModuleSettingsFields {...props} />
+      <SettingsSaveBar
+        guardLabel={t("settings.moduleSettings.guardName")}
+        successMessage={t("settings.moduleSettings.saved")}
+        failureMessage={t("settings.moduleSettings.saveFailed")}
+      />
+    </PageSaveProvider>
+  );
+}
+
+function ModuleSettingsFields({
   moduleName,
   schema,
   initialValues,
@@ -129,12 +155,9 @@ export function ModuleSettingsForm({
   // state it, so the form cannot be mounted without it.
   const canManageSettings = useHasPermission("admin:access");
   const enabledModules = useEnabledModulesOptional();
-  // Under a page that has one Save the form hands its edit to it, and keeps
-  // neither its own button nor its own confirmation.
-  const underPageSave = useUnderPageSave();
-  const mutation = useUpdateModuleSettings(moduleName, {
-    quiet: underPageSave,
-  });
+  // The form always sits under a page Save (its own or the page's): the
+  // confirmation and the error report belong to that Save, not to the request.
+  const mutation = useUpdateModuleSettings(moduleName, { quiet: true });
   const fields = useMemo(() => {
     const list: Array<{ path: string; field: ModuleSettingsField }> = [];
     function walk(props: Record<string, ModuleSettingsField>, prefix: string) {
@@ -210,12 +233,9 @@ export function ModuleSettingsForm({
     ({ path, field }) => rangeError(field, values[path], t) !== null,
   );
 
+  // Enter in a field must not reload the page; saving is the page Save's job.
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (hasOutOfRange) return;
-    // `mutate`, not `mutateAsync`: only `mutate` carries the factory's error
-    // toast, and nothing here waits for the result.
-    mutation.mutate(buildPayload());
   }
 
   const dirty =
@@ -264,17 +284,6 @@ export function ModuleSettingsForm({
           onChange={(v) => updateField(path, v, field.format === "secret")}
         />
       ))}
-      {!underPageSave && (
-        <div className="flex justify-end pt-2">
-          <Button
-            type="submit"
-            isLoading={mutation.isPending}
-            leftIcon={<Save size={16} />}
-          >
-            {t("common:actions.save", "Save")}
-          </Button>
-        </div>
-      )}
     </form>
   );
 }

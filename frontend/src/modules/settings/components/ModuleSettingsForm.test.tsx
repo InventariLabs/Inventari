@@ -7,6 +7,7 @@ import { QueryWrapper } from "@/test/queryWrapper";
 import { signInWith, signOut } from "@/test/auth";
 import { ModuleSettingsForm } from "./ModuleSettingsForm";
 import { PageSaveProvider, usePageSave } from "@/module-sdk";
+import { useFormGuardStore } from "@/store/formGuardStore";
 import type { ModuleSettingsSchema } from "@/lib/api/modules";
 
 // Saving module settings is `admin:access` on the API — the form asks for it.
@@ -105,11 +106,14 @@ describe("ModuleSettingsForm with a nested schema", () => {
         initialValues={{ jina: { api_key: "**********" } }}
       />,
     );
+    // Something else is changed so there is a Save to press; the secret stays
+    // as it was.
+    fireEvent.click(screen.getByTestId("field-enable_cost_calculation"));
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => expect(updateSettings).toHaveBeenCalled());
     expect(updateSettings.mock.calls[0][1]).toEqual({
-      enable_cost_calculation: true,
+      enable_cost_calculation: false,
     });
   });
 });
@@ -140,6 +144,7 @@ describe("ModuleSettingsForm — a refused save", () => {
         initialValues={{}}
       />,
     );
+    fireEvent.click(screen.getByTestId("field-enable_cost_calculation"));
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith(sentence));
@@ -176,6 +181,57 @@ describe("ModuleSettingsForm — the boolean field is a 44px target", () => {
     // Without this the row squeezes the box: `min-w-0` beside it, no shrink
     // guard of its own, and 20px of content in a 13px slot.
     expect(label?.className).toContain("shrink-0");
+  });
+});
+
+describe("ModuleSettingsForm on its own", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useFormGuardStore.getState().setDirtyForm(null);
+  });
+
+  it("shows no Save until a field changes, then a sticky one, and confirms once", async () => {
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="recipes"
+        schema={schema}
+        initialValues={{}}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /save/i })).toBeNull();
+
+    fireEvent.click(screen.getByTestId("field-enable_cost_calculation"));
+    const bar = await screen.findByRole("region", {
+      name: /save the changes/i,
+    });
+    expect(bar.className).toContain("sticky");
+
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(toast.success).toHaveBeenCalledTimes(1));
+    expect(toast.success).toHaveBeenCalledWith("Settings saved");
+  });
+
+  it("asks before the page is left with an unsaved edit, and stops asking once it is reverted", async () => {
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="recipes"
+        schema={schema}
+        initialValues={{}}
+      />,
+    );
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    fireEvent.click(screen.getByTestId("field-enable_cost_calculation"));
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe(
+        "The module settings",
+      ),
+    );
+
+    fireEvent.click(screen.getByTestId("field-enable_cost_calculation"));
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBeNull(),
+    );
   });
 });
 

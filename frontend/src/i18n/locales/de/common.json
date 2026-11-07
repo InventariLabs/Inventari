@@ -835,7 +835,9 @@
       "unknownModule": "Ein Modul dieses Namens gibt es nicht",
       "unknownModuleHint": "Die Adresse verweist auf ein Modul, das diese Installation nicht hat. Prüfen Sie den Link oder wählen Sie das Modul im Store.",
       "open": "Moduleinstellungen",
-      "saved": "Einstellungen gespeichert"
+      "saved": "Einstellungen gespeichert",
+      "guardName": "Die Moduleinstellungen",
+      "saveFailed": "Die Einstellungen konnten nicht gespeichert werden."
     },
     "modules": {
       "openAppStore": "Module öffnen"
