@@ -108,6 +108,20 @@ function AlertName({ alert }: { alert: SmartAlert }) {
   );
 }
 
+// Where a dated record lies, and its batch. Two records of one product going
+// off on one day read the same sentence twice; the shelf is what tells the
+// reader which one to go to.
+function AlertWhere({ alert, t }: { alert: SmartAlert; t: Translate }) {
+  const where = [
+    alert.location_name,
+    alert.lot_name &&
+      t("stats:analytics.alerts.batch", { lot: alert.lot_name }),
+  ].filter(Boolean);
+  return where.length > 0 ? (
+    <p className="mt-0.5 text-xs">{where.join(" · ")}</p>
+  ) : null;
+}
+
 export default function SmartAlertsPanel({ alerts, t }: SmartAlertsPanelProps) {
   return (
     <div className="space-y-6">
@@ -168,6 +182,7 @@ export default function SmartAlertsPanel({ alerts, t }: SmartAlertsPanelProps) {
               <div className="flex-1 min-w-0">
                 <AlertName alert={alert} />
                 <p className="text-sm opacity-90">{alertMessage(alert, t)}</p>
+                <AlertWhere alert={alert} t={t} />
               </div>
               <Badge
                 variant={

@@ -84,6 +84,7 @@
         "expired_many": "Termin ważności minął {{date}}, {{count}} dni temu.",
         "expired_other": "Termin ważności minął {{date}}, {{count}} dnia temu."
       },
+      "batch": "Partia {{lot}}",
       "noAlerts": "Brak alertów - Twoje zapasy wyglądają świetnie!",
       "noData": "Nie ma jeszcze czego sprawdzać — dodaj produkty, a alerty się pojawią"
     },
