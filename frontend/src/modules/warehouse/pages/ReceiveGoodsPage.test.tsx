@@ -1488,6 +1488,8 @@ describe("ReceiveGoodsPage", () => {
     // The field wears the refusal and it is announced once.
     expect(await screen.findAllByText("Choose the supplier.")).toHaveLength(1);
     expect(screen.getByLabelText("From")).toBeInvalid();
+    // The press is not dead: the reader lands on the refused field.
+    expect(screen.getByLabelText("From")).toHaveFocus();
     expect(state.postNew).not.toHaveBeenCalled();
   });
   it("opens on the order a link names, with its lines, and posts it in one press", async () => {

@@ -103,6 +103,7 @@ const DocumentImportModal = lazy(() =>
 );
 
 const TARGET_FIELD_ID = "receive-target-warehouse";
+const PARTNER_FIELD_ID = "receive-partner";
 
 /** Below `sm` the delivery is received one item at a time, as a phone holds it. */
 const PHONE_QUERY = "(max-width: 639px)";
@@ -501,6 +502,8 @@ function receiveHeading(
 function focusProblem(issue: ProblemKey | null, scan: HTMLInputElement | null) {
   if (issue === "noWarehouse") {
     document.getElementById(TARGET_FIELD_ID)?.focus();
+  } else if (issue === "noPartner") {
+    document.getElementById(PARTNER_FIELD_ID)?.focus();
   } else if (issue === "noLines" || issue === "noProduct") {
     scan?.focus();
   }
