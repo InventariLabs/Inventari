@@ -20,7 +20,6 @@ Create Date: 2026-11-06
 
 from collections.abc import Sequence
 
-import sqlalchemy as sa
 from alembic import op
 
 revision: str = 'archivedat01'
@@ -29,18 +28,33 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
+_INDEX = 'ix_items_org_archived_at'
+
+
+def _drop_if_invalid(conn) -> None:
+    """Remove a leftover INVALID index from an interrupted concurrent build."""
+    invalid = conn.exec_driver_sql(
+        'SELECT 1 FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid '
+        'WHERE c.relname = %s AND i.indisvalid = false',
+        (_INDEX,),
+    ).fetchone()
+    if invalid:
+        conn.exec_driver_sql(f'DROP INDEX CONCURRENTLY IF EXISTS {_INDEX}')
+
+
 def upgrade() -> None:
-    op.create_index(
-        'ix_items_org_archived_at',
-        'items',
-        [
-            'organization_id',
-            'is_deleted',
-            sa.text('coalesce(deleted_at, created_at) DESC'),
-            'id',
-        ],
-    )
+    # CONCURRENTLY, in an autocommit block: ``items`` is the largest table an
+    # established instance has, and a plain build would stop every write to it
+    # for as long as the build takes.
+    with op.get_context().autocommit_block():
+        conn = op.get_bind()
+        _drop_if_invalid(conn)
+        conn.exec_driver_sql(
+            f'CREATE INDEX CONCURRENTLY IF NOT EXISTS {_INDEX} ON items '
+            '(organization_id, is_deleted, coalesce(deleted_at, created_at) DESC, id)'
+        )
 
 
 def downgrade() -> None:
-    op.drop_index('ix_items_org_archived_at', table_name='items')
+    with op.get_context().autocommit_block():
+        op.get_bind().exec_driver_sql(f'DROP INDEX CONCURRENTLY IF EXISTS {_INDEX}')

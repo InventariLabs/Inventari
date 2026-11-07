@@ -125,7 +125,12 @@ def run_module_migrations(
         command.downgrade(cfg, target)
     elif action == 'stamp':
         logger.info("Stamping module '%s' at %s", module_name, revision)
-        command.stamp(cfg, revision)
+        # ``purge`` empties the version table before it writes. Without it
+        # Alembic first resolves the revision the table holds, and a database
+        # that a newer checkout migrated holds one this checkout has no file
+        # for ("Can't locate revision") — the one situation in which the
+        # doctor sends the operator here.
+        command.stamp(cfg, revision, purge=True)
     elif action == 'current':
         command.current(cfg)
     else:

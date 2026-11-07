@@ -29,6 +29,7 @@ from app.core.public_api import core_api
 from app.i18n.service import (
     get_current_lang,
     get_error_message,
+    get_partner_type_label,
 )
 from app.modules.approvals.approvals_api import approvals_api
 from app.modules.approvals.exceptions import ApprovalError
@@ -228,7 +229,9 @@ async def _refuse_unusable_supplier(
             raise ServiceRejectionError('po_partner_inactive', name=partner.name)
         if partner.type not in _SUPPLIER_PARTNER_TYPES:
             raise ServiceRejectionError(
-                'po_partner_not_supplier', name=partner.name, partner_type=partner.type
+                'po_partner_not_supplier',
+                name=partner.name,
+                partner_type=get_partner_type_label(partner.type),
             )
     return partner
 

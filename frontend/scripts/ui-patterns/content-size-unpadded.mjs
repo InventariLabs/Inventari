@@ -20,9 +20,11 @@ const UNSIZED = new Set(["content", "contentSm"]);
 /**
  * `auto` is deliberately not a value: `h-auto` is what `content` already is,
  * so stating it says nothing the size had not said, and the button stays as
- * tall as its text.
+ * tall as its text. A zero is a zero however it is spelled: `0`, `0.0`,
+ * `[.0px]`, and with Tailwind's trailing important marker (`py-0!`).
  */
-const ZERO = "(?:0(?:\\.0+)?|\\[0(?:\\.0+)?[a-z%]*\\])(?=$|[\\s\"'`}])";
+const ZERO =
+  "(?:0(?:\\.0+)?|\\[(?:0|0?\\.0+)[a-z%]*\\])(?=!?(?:$|[\\s\"'`}]))";
 const VALUE = `(?!${ZERO})(?:full|screen|fit|min|max|\\d+(?:\\.5)?|\\[[^\\]]+\\])`;
 const HEIGHT = new RegExp(`(?:^|[\\s"'\`{])(?:min-h|h|py|p)-${VALUE}`);
 

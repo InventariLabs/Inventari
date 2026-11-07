@@ -193,8 +193,10 @@ class TestConfirmPurchaseOrderPartnerValidation:
             ) as mock_core,
         ):
             mock_core.partners.get_async = AsyncMock(return_value=partner)
-            with pytest.raises(ValueError, match='not a supplier'):
+            with pytest.raises(ValueError, match='not a supplier') as refused:
                 await confirm_purchase_order(db, uuid4(), po.id, uuid4())
+        # The reader's word for the type, not the stored value.
+        assert 'type "Customer"' in str(refused.value)
 
     @pytest.mark.asyncio
     async def test_allows_both_type(self) -> None:
