@@ -480,7 +480,7 @@
     "discardFailed": "Failed to remove from stock",
     "recordLeftList": "The record left the products list.",
     "openRecord": "Open record",
-    "equipmentNote": "Equipment category: this record is checked in and disposed of rather than consumed and deleted."
+    "equipmentNote": "Equipment category: this record is returned and disposed of rather than consumed and deleted."
   },
   "noArchivedItemsDescRestoreOnly": "Products you delete will appear here, and you can put them back. Removing one for good is switched off for this organization.",
   "noArchivedItemsDescViewOnly": "Products you delete will appear here. Putting one back needs a permission this account does not have.",

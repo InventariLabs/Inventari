@@ -480,7 +480,7 @@
     "discardFailed": "No se pudo retirar del stock",
     "recordLeftList": "El registro salió de la lista de productos.",
     "openRecord": "Abrir registro",
-    "equipmentNote": "Categoría de equipo: este registro se recibe y se retira, no se consume ni se elimina."
+    "equipmentNote": "Categoría de equipo: este registro se devuelve y se desecha, no se consume ni se elimina."
   },
   "noArchivedItemsDescRestoreOnly": "Los productos eliminados aparecen aquí y se pueden restaurar. La eliminación definitiva está desactivada en esta organización.",
   "noArchivedItemsDescViewOnly": "Los productos que elimines aparecerán aquí. Restaurarlos requiere un permiso que esta cuenta no tiene.",

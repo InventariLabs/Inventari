@@ -480,7 +480,7 @@
     "discardFailed": "Échec du retrait du stock",
     "recordLeftList": "L'enregistrement a quitté la liste des produits.",
     "openRecord": "Ouvrir l'enregistrement",
-    "equipmentNote": "Catégorie équipement : cet enregistrement est réceptionné et retiré plutôt que consommé et supprimé."
+    "equipmentNote": "Catégorie équipement : cet enregistrement est retourné et éliminé plutôt que consommé et supprimé."
   },
   "noArchivedItemsDescRestoreOnly": "Les produits supprimés arrivent ici et peuvent être restaurés. La suppression définitive est désactivée pour cette organisation.",
   "noArchivedItemsDescViewOnly": "Les produits supprimés apparaissent ici. Les restaurer demande une permission que ce compte n'a pas.",

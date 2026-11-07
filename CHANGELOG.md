@@ -170,6 +170,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Uploading a product picture that only starts like one — a GIF, PNG or JPEG
+  header followed by something else — is now refused as unreadable instead of
+  being stored and shown as a broken thumbnail. The equipment note beside the
+  item actions now calls the action "Return", as the button does.
+
 - On a phone, the picking and receiving lists show the whole product name and
   the whole batch and location code instead of cutting them: they break at a
   space or a hyphen and inside a code only where it does not fit the column. A

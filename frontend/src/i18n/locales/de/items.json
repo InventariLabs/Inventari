@@ -480,7 +480,7 @@
     "discardFailed": "Aus dem Bestand entfernen fehlgeschlagen",
     "recordLeftList": "Der Datensatz ist aus der Produktliste verschwunden.",
     "openRecord": "Datensatz öffnen",
-    "equipmentNote": "Equipment-Kategorie: dieser Datensatz wird eingecheckt und entsorgt statt verbraucht und gelöscht."
+    "equipmentNote": "Equipment-Kategorie: dieser Datensatz wird zurückgegeben und entsorgt statt verbraucht und gelöscht."
   },
   "noArchivedItemsDescRestoreOnly": "Gelöschte Produkte landen hier und lassen sich zurückholen. Das endgültige Entfernen ist für diese Organisation abgeschaltet.",
   "noArchivedItemsDescViewOnly": "Gelöschte Produkte erscheinen hier. Zum Zurückholen fehlt diesem Konto die Berechtigung.",

@@ -222,7 +222,7 @@ export function useItemQuickActions(
   ).filter(Boolean) as ItemQuickAction[];
 
   // The vocabulary above switches with the record's category: an asset is
-  // checked in and disposed, a product is topped up and deleted. The switch
+  // returned and disposed, a product is topped up and deleted. The switch
   // reads as arbitrary on the one screen where both kinds of record live, so
   // the note travels with the actions and says why they sound different —
   // and stays away from an account offered none of them.
