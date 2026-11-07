@@ -375,6 +375,8 @@ async def list_lot_rows_async(
         .scalar_subquery()
     )
 
+    # Not ``paginate_async``: that wraps a single-entity select, and this page
+    # is four columns whose count runs over the batches alone, not the joins.
     stmt = (
         select(StockLot, ProductTemplate.name, Uom.symbol, on_hand)
         .outerjoin(ProductTemplate, ProductTemplate.id == StockLot.product_template_id)

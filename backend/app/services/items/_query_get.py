@@ -283,7 +283,7 @@ def get_items(
     only_low_stock: bool = False,
     needs_attention: bool = False,
     low_stock_threshold: float = 1.0,
-    skip: int = 0,
+    offset: int = 0,
     limit: int = 100,
     user_storage_ids: list[UUID] | None = None,
     user_organization_id: UUID | None = None,
@@ -424,7 +424,7 @@ def get_items(
         ordering = ordering.nullslast()
     query = query.order_by(ordering)
 
-    return paginate(db, query, limit=limit, offset=skip, count_cap=count_cap)
+    return paginate(db, query, limit=limit, offset=offset, count_cap=count_cap)
 
 
 @dataclass(frozen=True)

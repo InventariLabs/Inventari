@@ -58,10 +58,10 @@ class TestItemServiceLayer:
     ):
         """Test pagination with skip and limit."""
         items_page1, total1 = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, skip=0, limit=2)
+            lambda s: get_items(s, async_test_user, offset=0, limit=2)
         )
         items_page2, total2 = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, skip=2, limit=2)
+            lambda s: get_items(s, async_test_user, offset=2, limit=2)
         )
 
         assert len(items_page1) <= 2

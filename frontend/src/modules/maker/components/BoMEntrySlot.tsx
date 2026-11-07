@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useCanManage } from "@/hooks/useCanWrite";
 import { useBomSummary } from "@/modules/maker/hooks/useBom";
 import type { ProductOption } from "@/modules/maker/api/products";
 import type { RecipeCatalogLocationState } from "@/modules/maker/types/maker";
@@ -47,11 +48,16 @@ export function BoMEntrySlot({ data }: BoMEntrySlotProps) {
   const navigate = useNavigate();
   const item = data?.item;
   const templateId = item?.template_id;
+  const canManage = useCanManage("maker");
   const { data: summary } = useBomSummary(templateId ?? undefined);
   if (!templateId || !item) return null;
 
   const entry = summary?.items.find((i) => i.template_id === templateId);
   const recipeId = entry?.default_recipe_id;
+  // Opening an existing formula is reading; creating one is `maker:manage`
+  // work, so an account without it is not offered a button that lands on a
+  // catalogue with no way to create anything.
+  if (!recipeId && !canManage) return null;
   const state: RecipeCatalogLocationState = {
     createRecipeFor: toProductOption(item, templateId),
   };

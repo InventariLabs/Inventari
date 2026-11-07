@@ -138,6 +138,23 @@ function CardResult({
   );
 }
 
+/**
+ * The sentence under the empty heading. A reader is not told to schedule a
+ * run: that is the one thing this account cannot do about the empty list.
+ */
+function EmptyListSubtitle({
+  isNarrowed,
+  canWrite,
+}: {
+  isNarrowed: boolean;
+  canWrite: boolean;
+}) {
+  const { t } = useTranslation("maker");
+  if (isNarrowed) return <>{t("productionList.noMatches.subtitle")}</>;
+  if (canWrite) return <>{t("productionList.empty.subtitle")}</>;
+  return <>{t("productionList.empty.subtitleReadOnly")}</>;
+}
+
 export default function ProductionListPage() {
   const currency = useOrganizationCurrency();
   const { t, i18n } = useTranslation("maker");
@@ -298,9 +315,7 @@ export default function ProductionListPage() {
               : t("productionList.empty.title")}
           </h3>
           <p className="text-on-secondary mb-8">
-            {isNarrowed
-              ? t("productionList.noMatches.subtitle")
-              : t("productionList.empty.subtitle")}
+            <EmptyListSubtitle isNarrowed={isNarrowed} canWrite={canWrite} />
           </p>
           {/* Nothing to create from a search that found nothing — the CTA
               belongs to the genuinely empty list, and to an account that

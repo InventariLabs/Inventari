@@ -451,3 +451,37 @@ class TestAfterCommit:
         await db.commit()
         await dispatch_committed_events(db)
         assert ran == ['inner']
+
+
+class _Diag:
+    def __init__(self, constraint_name):
+        self.constraint_name = constraint_name
+
+
+class _OrigError(Exception):
+    def __init__(self, message, constraint_name=None):
+        super().__init__(message)
+        self.diag = _Diag(constraint_name)
+
+
+def _integrity_error(message, constraint_name=None):
+    from sqlalchemy.exc import IntegrityError
+
+    return IntegrityError('INSERT', {}, _OrigError(message, constraint_name))
+
+
+def test_hit_constraint_matches_the_driver_reported_name():
+    from app.core.db_utils import hit_constraint
+
+    exc = _integrity_error('duplicate key', 'uq_a')
+    assert hit_constraint(exc, 'uq_a')
+    assert hit_constraint(exc, 'uq_b', 'uq_a')
+    assert not hit_constraint(exc, 'uq_b')
+
+
+def test_hit_constraint_falls_back_to_the_message():
+    from app.core.db_utils import hit_constraint
+
+    exc = _integrity_error('violates unique constraint "uq_a"')
+    assert hit_constraint(exc, 'uq_a')
+    assert not hit_constraint(exc, 'fk_other')

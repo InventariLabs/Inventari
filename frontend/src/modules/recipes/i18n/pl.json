@@ -236,7 +236,7 @@
     "clean_servings_hint": "Spróbuj {{counts}} porcji dla pełnych ilości",
     "complete_confirm": "Oznaczyć pozostałe jako pominięte i zakończyć?",
     "session_complete": "Składniki zebrane!",
-    "just_completed": "Ukończono ✓",
+    "just_completed": "Ukończono",
     "resumed_badge": "Wznowiona",
     "resumed_one": "Wracamy do niedokończonego pobierania na 1 porcję.",
     "resumed_few": "Wracamy do niedokończonego pobierania na {{count}} porcje.",

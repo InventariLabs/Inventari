@@ -479,6 +479,7 @@
     "type_disputed": "Zgłoszony problem"
   },
   "form": {
+    "readOnlyOpenAsset": "Otwórz kartę sprzętu",
     "pickersFailed": "Nie udało się wczytać kategorii lub miejsc, więc poniższe listy są niepełne. Spróbuj ponownie przed zapisem.",
     "addTitle": "Dodaj zasób",
     "save": "Zapisz",
@@ -905,10 +906,10 @@
     "pasteLabel": "Numery seryjne",
     "serial_label": "Numer seryjny",
     "pastePlaceholder": "Jeden numer seryjny w wierszu",
-    "detected_one": "✓ Wykryto {{count}} numer seryjny",
-    "detected_few": "✓ Wykryto {{count}} numery seryjne",
-    "detected_many": "✓ Wykryto {{count}} numerów seryjnych",
-    "detected_other": "✓ Wykryto {{count}} numerów seryjnych",
+    "detected_one": "Wykryto {{count}} numer seryjny",
+    "detected_few": "Wykryto {{count}} numery seryjne",
+    "detected_many": "Wykryto {{count}} numerów seryjnych",
+    "detected_other": "Wykryto {{count}} numerów seryjnych",
     "duplicatesFound": "Wykryto zduplikowane numery seryjne.",
     "duplicate": "Duplikat",
     "quantity": "Ilość",

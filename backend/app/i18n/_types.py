@@ -104,6 +104,7 @@ class ErrorMessages(TypedDict):
     role_in_use: str
     role_name_taken: str
     organization_invite_invalid: str
+    organization_invite_link_dead: str
     organization_invite_expired: str
     email_test_failed: str
     module_org_required: str

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -23,13 +23,10 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.db_facade import Base
+from app.core.module_sdk import utc_now
 
 if TYPE_CHECKING:
     from app.models.product_template import ProductTemplate
-
-
-def _utc_now() -> datetime:
-    return datetime.now(tz=UTC)
 
 
 class MakerRecipe(Base):
@@ -99,13 +96,13 @@ class MakerRecipe(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=_utc_now,
+        default=utc_now,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=_utc_now,
-        onupdate=_utc_now,
+        default=utc_now,
+        onupdate=utc_now,
     )
 
     # Relationships
@@ -213,13 +210,13 @@ class BoMLine(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=_utc_now,
+        default=utc_now,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=_utc_now,
-        onupdate=_utc_now,
+        default=utc_now,
+        onupdate=utc_now,
     )
 
     recipe: Mapped[MakerRecipe] = relationship(back_populates='lines')
@@ -309,7 +306,7 @@ class ProductionOrder(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=_utc_now,
+        default=utc_now,
     )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancel_reason: Mapped[str | None] = mapped_column(String(500))
@@ -414,11 +411,11 @@ class MakerModuleSettings(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=_utc_now,
+        default=utc_now,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=_utc_now,
-        onupdate=_utc_now,
+        default=utc_now,
+        onupdate=utc_now,
     )

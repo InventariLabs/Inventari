@@ -1,8 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { BoMEntrySlot } from "./BoMEntrySlot";
+import { signInWith, signOut } from "@/test/auth";
 import type { Item } from "@/types";
 
 let summaryData: {
@@ -75,6 +76,11 @@ function renderSlot(
 }
 
 describe("BoMEntrySlot", () => {
+  beforeEach(() => {
+    signInWith(["maker:read", "maker:write", "maker:manage"]);
+  });
+  afterEach(signOut);
+
   it("opens the default BOM card when the product has one", async () => {
     summaryData = {
       items: [
@@ -127,5 +133,23 @@ describe("BoMEntrySlot", () => {
     summaryData = { items: [] };
     const { container } = renderSlot(makeItem({ template_id: null }));
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("offers no way to create a formula to an account without maker:manage", () => {
+    signInWith(["maker:read", "maker:write"]);
+    summaryData = { items: [] };
+    const { container } = renderSlot(makeItem());
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("still lets that account open a formula that exists", () => {
+    signInWith(["maker:read", "maker:write"]);
+    summaryData = {
+      items: [
+        { template_id: "tpl-1", line_count: 2, default_recipe_id: "recipe-1" },
+      ],
+    };
+    renderSlot(makeItem());
+    expect(screen.getByTestId("maker-bom-entry-link")).toBeInTheDocument();
   });
 });

@@ -240,7 +240,7 @@ class CoreNotificationsAPI:
     ) -> list[NotificationDTO]:
         """Return notifications for *user_id* ordered newest first."""
         notifications = await NotificationService.list_for_user_async(
-            db, user_id, unread_only=unread_only, skip=skip, limit=limit
+            db, user_id, unread_only=unread_only, offset=skip, limit=limit
         )
         return [NotificationDTO.model_validate(n) for n in notifications]
 

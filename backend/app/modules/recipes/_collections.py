@@ -10,24 +10,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictException, ServiceRejectionError
+from app.core.module_sdk import hit_constraint
 from app.i18n.service import get_current_lang, get_error_message
 
 from .models import RecipeCollection, RecipeCollectionMember
 from .schemas import RecipeCollectionCreate, RecipeCollectionUpdate
 
 _COLLECTION_NAME_UNIQUE = 'uq_recipe_collections_org_name'
-
-
-def _hit_constraint(exc: IntegrityError, name: str) -> bool:
-    """Whether an ``IntegrityError`` is the named unique constraint.
-
-    ``constraint_name`` is what asyncpg reports; the string fallback covers
-    drivers that only put it in the message. Anything else stays unmapped —
-    a refusal must name the rule it refused, not claim a name clash for a
-    foreign key that went missing.
-    """
-    constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
-    return constraint == name or name in str(exc.orig)
 
 
 def _name_taken(name: str) -> ConflictException:
@@ -140,7 +129,7 @@ async def create_collection_async(
             db.add(collection)
             await db.flush()
     except IntegrityError as exc:
-        if _hit_constraint(exc, _COLLECTION_NAME_UNIQUE):
+        if hit_constraint(exc, _COLLECTION_NAME_UNIQUE):
             raise _name_taken(name) from exc
         raise
     await db.flush()
@@ -205,7 +194,7 @@ async def update_collection_async(
         async with db.begin_nested():
             await db.flush()
     except IntegrityError as exc:
-        if new_name is not None and _hit_constraint(exc, _COLLECTION_NAME_UNIQUE):
+        if new_name is not None and hit_constraint(exc, _COLLECTION_NAME_UNIQUE):
             raise _name_taken(new_name) from exc
         raise
     await db.flush()

@@ -164,6 +164,8 @@ async def list_recipes(
         None, description='Only formulas producing this product'
     ),
     sort: str = Query('newest', pattern='^(newest|oldest|name)$'),
+    # ``skip`` stays the wire name: the maker screens send it and the REST
+    # query shipped with 0.11. Everything below the router says ``offset``.
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     current_user: UserContextDTO = Depends(get_current_user_context),
@@ -182,7 +184,7 @@ async def list_recipes(
         search=search,
         output_template_id=output_template_id,
         sort=sort,
-        skip=skip,
+        offset=skip,
         limit=limit,
     )
 

@@ -84,6 +84,11 @@ export function ImportPreviewView({
           </span>
         </label>
       )}
+      {!canCreateStubs && (
+        <p className="text-xs text-on-secondary">
+          {t("warehouse:import.createStubsDenied")}
+        </p>
+      )}
 
       {previewRows.length > 0 && (
         <div className="space-y-2">

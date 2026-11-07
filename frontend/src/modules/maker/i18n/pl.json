@@ -17,7 +17,8 @@
     "error": "Nie udało się wczytać zleceń produkcyjnych",
     "empty": {
       "title": "Brak zleceń produkcyjnych",
-      "subtitle": "Zaplanuj zlecenie, aby zużyć składniki i wytworzyć produkt."
+      "subtitle": "Zaplanuj zlecenie, aby zużyć składniki i wytworzyć produkt.",
+      "subtitleReadOnly": "Zlecenia produkcyjne pojawią się tutaj, gdy ktoś je zaplanuje."
     },
     "noMatches": {
       "title": "Brak pasujących zleceń",
@@ -256,7 +257,6 @@
     "cost": {
       "fixedCosts": "Koszty stałe / partia",
       "referencePrice": "Cena referencyjna",
-      "perBatch": "na partię",
       "perYieldUnit": "za jednostkę — partia to {{qty}}",
       "noFixed": "Brak ustawionych kosztów stałych",
       "ingredients": "Składniki",

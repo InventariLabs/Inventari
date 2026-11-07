@@ -147,6 +147,19 @@ describe("ProductionListPage tools over an empty list", () => {
     ).toBeInTheDocument();
   });
 
+  it("does not tell a reader to schedule a run they cannot schedule", () => {
+    signInWith(["maker:read"]);
+    renderPage();
+
+    expect(screen.getByText("No production runs yet")).toBeInTheDocument();
+    expect(
+      screen.queryByText(/schedule a production run/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/will appear here once someone schedules them/i),
+    ).toBeInTheDocument();
+  });
+
   it("keeps the tools and says 'no match' once the reader has narrowed it", () => {
     listData = {
       items: [order],

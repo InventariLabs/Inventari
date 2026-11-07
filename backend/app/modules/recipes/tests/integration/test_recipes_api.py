@@ -683,6 +683,55 @@ class TestIngredientDefaultsRouter:
         assert '.json or .csv' in detail['message']
         assert 'Expecting value' not in detail['message']
 
+    @pytest.mark.parametrize(
+        ('filename', 'payload'),
+        [
+            ('bank.csv', b'date,amount,payee\n2026-01-02,10,Shop\n2026-01-03,5,Cafe\n'),
+            ('photo.csv', b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\n\xff\xd8\n'),
+            ('empty.csv', b''),
+            ('numbers.json', b'[1, 2, 3]'),
+            ('nothing.json', b'[]'),
+        ],
+    )
+    def test_import_refuses_a_file_none_of_whose_rows_can_be_used(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        filename: str,
+        payload: bytes,
+    ) -> None:
+        """A sheet that yields nothing is answered with what the import takes."""
+        from io import BytesIO
+
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': (filename, BytesIO(payload), 'application/octet-stream')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_400_BAD_REQUEST, r.text
+        detail = r.json()['detail']
+        assert detail['code'] == 'INGREDIENT_DEFAULTS_UNREADABLE_FILE'
+        assert '.json or .csv' in detail['message']
+
+    def test_import_keeps_the_good_rows_of_a_partly_good_file(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """One unusable row is counted, the others still land."""
+        from io import BytesIO
+
+        payload = b'name,calories_kcal\nMillet flakes,350\n,\n'
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': ('defaults.csv', BytesIO(payload), 'text/csv')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_200_OK, r.text
+        body = r.json()
+        assert body['created'] == 1
+        assert body['errors'] == 1
+
     def test_import_accepts_a_file_within_the_cap(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:

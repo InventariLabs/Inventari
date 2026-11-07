@@ -342,3 +342,36 @@ class TestTheQuestionIsWrittenDownToo:
         _asked, withdrawn = await _entries(db, org.id)
         assert withdrawn.user_id == async_approver.id
         assert (withdrawn.meta_data or {})['cascade'] is True
+
+    async def test_a_release_keeps_its_reason_in_the_reason_column(
+        self,
+        real_async_db_session: AsyncSession,
+        async_approval_org: Organization,
+        async_requester: User,
+        async_approver: User,
+        guarded_document: uuid.UUID,
+    ) -> None:
+        """Switching a workflow off is an administrator's act, not a cleanup.
+
+        The target is not being cancelled -- it goes back to Confirmed -- so
+        the entry must not read as following one, and the reason belongs in
+        the column an auditor filters on, not only in the request's meta.
+        """
+        db, org = real_async_db_session, async_approval_org
+        request = await request_approval(
+            db, org.id, 'document', guarded_document, async_requester.id
+        )
+
+        await cancel_request(
+            db,
+            org.id,
+            request.id,
+            async_approver.id,
+            cascade=True,
+            reason='workflow deactivated',
+        )
+
+        _asked, released = await _entries(db, org.id)
+        assert released.user_id == async_approver.id
+        assert released.reason == 'workflow deactivated'
+        assert 'cascade' not in (released.meta_data or {})

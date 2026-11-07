@@ -89,6 +89,28 @@ describe("check-empty-state", () => {
     expect(findings.length).toBe(0);
   });
 
+  it("follows a page empty state extracted into an *EmptyState helper", () => {
+    const helper = `<EmptyState icon={Scale} title={t("empty")} />`;
+    for (const path of [
+      "modules/recipes/pages/UnitConversionsEmptyState.tsx",
+      "modules/inventory/components/items/ItemsEmptyState.tsx",
+    ]) {
+      const findings = findViolations([{ path, text: helper }]);
+      expect(findings.length).toBe(1);
+      expect(findings[0]).toContain(path);
+    }
+  });
+
+  it("passes an *EmptyState helper that carries a description", () => {
+    const findings = findViolations([
+      {
+        path: "modules/inventory/components/items/ItemsEmptyState.tsx",
+        text: `<EmptyState title={t("a")} description={t("b")} />`,
+      },
+    ]);
+    expect(findings.length).toBe(0);
+  });
+
   it("ignores a page test file even when it renders the page's empty state", () => {
     const findings = findViolations([
       {

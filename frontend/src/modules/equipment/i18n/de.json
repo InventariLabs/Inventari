@@ -429,6 +429,7 @@
     "type_disputed": "Problem gemeldet"
   },
   "form": {
+    "readOnlyOpenAsset": "Gerät öffnen",
     "pickersFailed": "Kategorien oder Lagerorte konnten nicht geladen werden, daher sind die Listen unvollständig. Versuchen Sie es vor dem Speichern erneut.",
     "addTitle": "Gerät hinzufügen",
     "save": "Gerät speichern",
@@ -821,8 +822,8 @@
     "pasteLabel": "Seriennummern",
     "serial_label": "Seriennummer",
     "pastePlaceholder": "Eine Seriennummer pro Zeile",
-    "detected_one": "✓ {{count}} Seriennummer erkannt",
-    "detected_other": "✓ {{count}} Seriennummern erkannt",
+    "detected_one": "{{count}} Seriennummer erkannt",
+    "detected_other": "{{count}} Seriennummern erkannt",
     "duplicatesFound": "Doppelte Seriennummern erkannt.",
     "duplicate": "Duplikat",
     "quantity": "Anzahl",

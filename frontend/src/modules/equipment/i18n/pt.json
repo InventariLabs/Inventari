@@ -429,6 +429,7 @@
     "type_disputed": "Problema informado"
   },
   "form": {
+    "readOnlyOpenAsset": "Abrir a ficha do equipamento",
     "pickersFailed": "Não foi possível carregar as categorias ou os locais, então as listas abaixo estão incompletas. Tente novamente antes de salvar.",
     "addTitle": "Adicionar equipamento",
     "save": "Salvar equipamento",
@@ -821,8 +822,8 @@
     "pasteLabel": "Números de série",
     "serial_label": "Número de série",
     "pastePlaceholder": "Um número de série por linha",
-    "detected_one": "✓ {{count}} número de série detectado",
-    "detected_other": "✓ {{count}} números de série detectados",
+    "detected_one": "{{count}} número de série detectado",
+    "detected_other": "{{count}} números de série detectados",
     "duplicatesFound": "Números de série duplicados detectados.",
     "duplicate": "Duplicado",
     "quantity": "Quantidade",
