@@ -27,6 +27,7 @@ class FakeWebSocket {
   static instances: FakeWebSocket[] = [];
 
   url: string;
+  protocols: string[];
   readyState: number = FakeWebSocket.OPEN;
   sent: unknown[] = [];
   listeners: Record<string, Array<(event: unknown) => void>> = {};
@@ -39,8 +40,9 @@ class FakeWebSocket {
   deferClose = false;
   private pendingClose: { code: number } | null = null;
 
-  constructor(url: string) {
+  constructor(url: string, protocols: string | string[] = []) {
     this.url = url;
+    this.protocols = typeof protocols === "string" ? [protocols] : protocols;
     FakeWebSocket.instances.push(this);
   }
 
@@ -99,13 +101,16 @@ afterEach(() => {
 });
 
 describe("useNotificationsWebSocket", () => {
-  it("opens a WS to /api/v1/ws/notifications with the current token", async () => {
+  it("offers the current token as a subprotocol, never in the address", async () => {
+    // An address is written down by every access log it passes through; the
+    // subprotocols travel in a header, as the token does on every other call.
     renderHook(() => useNotificationsWebSocket(), { wrapper: makeWrapper() });
     await flush();
     expect(FakeWebSocket.instances).toHaveLength(1);
-    expect(FakeWebSocket.instances[0].url).toContain(
-      "/api/v1/ws/notifications?token=initial-token",
-    );
+    const socket = FakeWebSocket.instances[0];
+    expect(new URL(socket.url).pathname).toBe("/api/v1/ws/notifications");
+    expect(socket.url).not.toContain("initial-token");
+    expect(socket.protocols).toEqual(["bearer", "initial-token"]);
   });
 
   it("invalidates the notifications query on a received message", async () => {
@@ -193,7 +198,10 @@ describe("useNotificationsWebSocket", () => {
     await new Promise((resolve) => setTimeout(resolve, 1_500));
 
     expect(FakeWebSocket.instances.length).toBeGreaterThanOrEqual(2);
-    expect(FakeWebSocket.instances[1].url).toContain("token=initial-token");
+    expect(FakeWebSocket.instances[1].protocols).toEqual([
+      "bearer",
+      "initial-token",
+    ]);
   });
 
   it("leaves reconnecting to the close that follows an error, not the error itself", async () => {
@@ -262,7 +270,10 @@ describe("useNotificationsWebSocket", () => {
     await flush();
 
     expect(FakeWebSocket.instances).toHaveLength(2);
-    expect(FakeWebSocket.instances[1].url).toContain("token=rotated-token");
+    expect(FakeWebSocket.instances[1].protocols).toEqual([
+      "bearer",
+      "rotated-token",
+    ]);
 
     // The replaced socket opens late and closes silently; its close event
     // belongs to nobody and must not schedule a reconnect.
@@ -300,7 +311,10 @@ describe("useNotificationsWebSocket", () => {
       });
 
       expect(FakeWebSocket.instances).toHaveLength(2);
-      expect(FakeWebSocket.instances[1].url).toContain("token=rotated-token");
+      expect(FakeWebSocket.instances[1].protocols).toEqual([
+        "bearer",
+        "rotated-token",
+      ]);
     } finally {
       vi.useRealTimers();
     }
@@ -312,6 +326,9 @@ describe("useNotificationsWebSocket", () => {
     await flush();
 
     expect(FakeWebSocket.instances).toHaveLength(1);
-    expect(FakeWebSocket.instances[0].url).toContain("token=rotated-token");
+    expect(FakeWebSocket.instances[0].protocols).toEqual([
+      "bearer",
+      "rotated-token",
+    ]);
   });
 });

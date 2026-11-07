@@ -1,8 +1,8 @@
 /**
  * useNotificationsWebSocket — opens a WebSocket to
- * ``/api/v1/ws/notifications?token=<access_token>`` and invalidates the
- * TanStack Query notifications cache whenever the BE broadcasts a new
- * notification for the authenticated user.
+ * ``/api/v1/ws/notifications``, offering the access token as a subprotocol,
+ * and invalidates the TanStack Query notifications cache whenever the BE
+ * broadcasts a new notification for the authenticated user.
  *
  * Lifecycle
  * ----------
@@ -35,6 +35,13 @@ import { tokenStore } from "@/lib/api/client";
 import { queryKeys } from "@/hooks/queries/keys";
 
 const WS_PATH = "/api/v1/ws/notifications";
+/**
+ * Offered just ahead of the token. A browser socket cannot set an
+ * `Authorization` header, but its subprotocols travel in one
+ * (`Sec-WebSocket-Protocol`); a token in the address would be written into
+ * every access log between here and the backend instead.
+ */
+const BEARER_SUBPROTOCOL = "bearer";
 const RECONNECT_BASE_MS = 1_000;
 const RECONNECT_MAX_MS = 30_000;
 
@@ -42,13 +49,13 @@ const RECONNECT_MAX_MS = 30_000;
  * Resolve the absolute WebSocket URL for the current origin.
  * Falls back to ws:// on http:// and wss:// on https:// for dev.
  */
-function resolveWsUrl(token: string): string {
+function resolveWsUrl(): string {
   if (typeof window === "undefined") return "";
   const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
   // Replace only the leading scheme; keep path empty because the path
   // is rooted at /api/v1 which is what nginx proxies to FastAPI.
   const host = window.location.host;
-  return `${proto}//${host}${WS_PATH}?token=${encodeURIComponent(token)}`;
+  return `${proto}//${host}${WS_PATH}`;
 }
 
 /** Stable predicate: was this close intentional or recoverable? */
@@ -145,8 +152,10 @@ export function useNotificationsWebSocket(
       const currentToken = tokenStore.get();
       if (!currentToken) return;
 
-      const url = resolveWsUrl(currentToken);
-      const socket = new WebSocket(url);
+      const socket = new WebSocket(resolveWsUrl(), [
+        BEARER_SUBPROTOCOL,
+        currentToken,
+      ]);
       const generation = ++generationRef.current;
       socketRef.current = socket;
 
@@ -192,8 +201,8 @@ export function useNotificationsWebSocket(
 
     const handleLogout = () => closeSocket();
     const handleTokenRefreshed = () => {
-      // The current socket still has the old (now-invalidated) token in its
-      // URL; rebuild it with the new token.
+      // The current socket was opened with the old (now-invalidated) token;
+      // rebuild it with the new one.
       closeSocket();
       if (enabledRef.current) connect();
     };

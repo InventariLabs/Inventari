@@ -1,8 +1,9 @@
 """Integration tests for the WS-driven notification pipeline.
 
-The existing NotificationHub at app/api/websocket.py already accepts
-``/ws/notifications?token=<jwt>`` and forwards Redis Pub/Sub messages to
-the authenticated user's connected clients. The producer side lives in
+The NotificationHub at app/api/websocket.py accepts ``/ws/notifications``
+with the access token offered as a subprotocol (``bearer, <jwt>``) and
+forwards Redis Pub/Sub messages to the authenticated user's connected
+clients. The producer side lives in
 ``core_api.notifications.publish_async``, which modules call AFTER their
 own ``db.commit()`` so subscribers see the row before being notified.
 
@@ -36,8 +37,16 @@ from tests.integration._fake_token_store import FakeTokenStore
 uuid = _uuid_mod.uuid4
 
 
+WS_URL = '/api/v1/ws/notifications'
+
+
 def _ws_token(test_user) -> str:
     return create_access_token(data={'sub': str(test_user.id)})
+
+
+def _bearer(token: str) -> list[str]:
+    """What the browser offers: the marker, then the token, as subprotocols."""
+    return ['bearer', token]
 
 
 @pytest.mark.integration
@@ -49,14 +58,33 @@ class TestWebSocketEndpoint:
         token = _ws_token(test_user)
         user_id = str(test_user.id)
         baseline = len(hub._connections.get(user_id, set()))
-        with client.websocket_connect(f'/api/v1/ws/notifications?token={token}'):
+        with client.websocket_connect(WS_URL, subprotocols=_bearer(token)) as socket:
             assert len(hub._connections.get(user_id, set())) > baseline
+            # A browser that offered subprotocols drops a socket whose server
+            # picks none, so the server has to answer with the marker.
+            assert socket.accepted_subprotocol == 'bearer'
+
+    def test_ws_does_not_read_a_token_from_the_address(
+        self, client: TestClient, test_user
+    ) -> None:
+        """A token in the query string lands in every access log on the way.
+
+        The socket used to take it there; a client that still does is refused,
+        so the address never becomes a way in again.
+        """
+        from starlette.websockets import WebSocketDisconnect
+
+        token = _ws_token(test_user)
+        with pytest.raises(WebSocketDisconnect) as exc_info:
+            with client.websocket_connect(f'{WS_URL}?token={token}'):
+                pass
+        assert exc_info.value.code == 4001
 
     def test_ws_rejects_missing_token(self, client: TestClient) -> None:
         from starlette.websockets import WebSocketDisconnect
 
         with pytest.raises(WebSocketDisconnect) as exc_info:
-            with client.websocket_connect('/api/v1/ws/notifications'):
+            with client.websocket_connect(WS_URL):
                 pass
         assert exc_info.value.code == 4001
 
@@ -78,9 +106,7 @@ class TestWebSocketEndpoint:
         try:
             asyncio.run(_revoke())
             with pytest.raises(WebSocketDisconnect) as exc_info:
-                with client.websocket_connect(
-                    f'/api/v1/ws/notifications?token={token}'
-                ):
+                with client.websocket_connect(WS_URL, subprotocols=_bearer(token)):
                     pass
             assert exc_info.value.code == 4001
             assert 'revoked' in str(exc_info.value.reason or '').lower()
@@ -106,7 +132,7 @@ class TestWebSocketEndpoint:
 
         token = _ws_token(async_test_user)
         with pytest.raises(WebSocketDisconnect) as exc_info:
-            with client.websocket_connect(f'/api/v1/ws/notifications?token={token}'):
+            with client.websocket_connect(WS_URL, subprotocols=_bearer(token)):
                 pass
         assert exc_info.value.code == 4003
         assert 'blocked' in str(exc_info.value.reason or '').lower()
@@ -126,7 +152,7 @@ class TestWebSocketEndpoint:
 
         token = _ws_token(async_test_user)
         with pytest.raises(WebSocketDisconnect) as exc_info:
-            with client.websocket_connect(f'/api/v1/ws/notifications?token={token}'):
+            with client.websocket_connect(WS_URL, subprotocols=_bearer(token)):
                 pass
         assert exc_info.value.code == 4001
 
@@ -157,7 +183,7 @@ class TestNotificationHubBroadcastUnit:
                 self.received: list[dict] = []
                 self.closed = False
 
-            async def accept(self) -> None:
+            async def accept(self, subprotocol: str | None = None) -> None:
                 pass
 
             async def send_json(self, payload: dict) -> None:
@@ -182,7 +208,7 @@ class TestNotificationHubBroadcastUnit:
         local_hub = NotificationHub()
 
         class _DeadWS:
-            async def accept(self) -> None:
+            async def accept(self, subprotocol: str | None = None) -> None:
                 pass
 
             async def send_json(self, payload: dict) -> None:
@@ -195,7 +221,7 @@ class TestNotificationHubBroadcastUnit:
             def __init__(self) -> None:
                 self.received: list[dict] = []
 
-            async def accept(self) -> None:
+            async def accept(self, subprotocol: str | None = None) -> None:
                 pass
 
             async def send_json(self, payload: dict) -> None:

@@ -158,7 +158,12 @@ export default function JoinOrganizationPage() {
   // organization the reader belonged to before the attempt, against the one
   // that came back. The attempt waits until that is known (or known to be
   // unavailable), because the answer is gone once the join has been judged.
-  const currentOrganization = useOrganization();
+  // Only a signed-in reader has an organization to ask for: a signed-out
+  // visitor's request would be refused (a 401 and a token refresh for
+  // nothing), and the effect below never waits on it for them.
+  const currentOrganization = useOrganization({
+    enabled: !isAuthLoading && isAuthenticated,
+  });
   const currentOrganizationSettled =
     currentOrganization.isSuccess || currentOrganization.isError;
 
