@@ -36,9 +36,9 @@ interface TemplateEditorModalProps {
    * out answered a Polish reader in English — two of the three did.
    */
   placeholderDescriptions: readonly { key: string; descriptionKey: string }[];
-  /** Localized, module-relevant example for the Name field. */
+  /** Module-relevant example for the Name field; a generic localized one when absent. */
   namePlaceholder?: string;
-  /** Localized HTML-validation message shown under the body field. */
+  /** HTML-validation message shown under the body field; a generic localized one when absent. */
   htmlInvalidMessage?: string;
   /**
    * Whether the module can actually serve a server-side render of the draft.
@@ -192,10 +192,7 @@ export function TemplateEditorModal({
     // the body was saved without any check. Surface a basic tag-balance
     // problem at the field instead of silently persisting half-written HTML.
     if (!hasBalancedHtml(bodyHtml)) {
-      setBodyError(
-        htmlInvalidMessage ??
-          "The HTML looks unbalanced — check for unclosed tags.",
-      );
+      setBodyError(htmlInvalidMessage ?? t("common:templates.htmlInvalid"));
       return;
     }
     setBodyError(undefined);
@@ -267,7 +264,7 @@ export function TemplateEditorModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={
-                  namePlaceholder ?? "e.g. Company Handover Protocol"
+                  namePlaceholder ?? t("common:templates.namePlaceholder")
                 }
               />
             </div>
@@ -339,9 +336,19 @@ export function TemplateEditorModal({
                   const descriptionKey = placeholderDescriptions.find(
                     (d) => d.key === p.key,
                   )?.descriptionKey;
+                  // A category custom field is described by the API as one
+                  // English sentence; its label and categories arrive apart
+                  // so the connective is the reader's language.
                   const description = descriptionKey
                     ? t(descriptionKey)
-                    : p.description;
+                    : p.custom_field_label
+                      ? t("common:templates.customFieldOf", {
+                          label: p.custom_field_label,
+                          categories: (p.custom_field_categories ?? []).join(
+                            ", ",
+                          ),
+                        })
+                      : p.description;
                   return (
                     <Button
                       size="content"

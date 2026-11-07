@@ -151,6 +151,17 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The symbol list in the document and equipment template editors reads as
+  something a template author can use. Examples of record-valued symbols
+  (`totals_by_unit`, `packages`, `pick_lines`) show their fields instead of
+  Python dictionaries with `Decimal(...)` wrappers, the document examples
+  (title, status) are in the editor's language, and the Name hint, the
+  unbalanced-HTML message and the description of a category custom field are
+  translated instead of falling back to English. `GET
+  /warehouse/templates/placeholders` answers in the request language, and a
+  custom-field entry of the equipment placeholder lists carries
+  `custom_field_label` and `custom_field_categories` beside its English
+  description.
 - The Check Out Asset dialog names an address nobody in the organization uses
   before it saves it, also when the address is pasted and submitted at once.
   The check waited for the typing to pause, and a quicker Enter stored the

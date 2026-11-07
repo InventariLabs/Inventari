@@ -145,6 +145,37 @@ class TestPlaceholdersEndpoint:
         assert 'object at 0x' not in ''.join(value or '' for value in catalog.values())
         assert catalog['{{document.lines}}'] == 'Example Item × 2'
 
+    def test_a_list_of_records_reads_as_values_not_as_python_literals(self) -> None:
+        """``{{totals_by_unit}}`` showed ``{'symbol': None, 'expected':
+        Decimal('2'), 'done': Decimal('0')}`` — dict braces, ``None`` and a
+        ``Decimal(...)`` wrapper in a help meant for a template author."""
+        catalog = {entry.key: entry.example for entry in _build_placeholders_catalog()}
+        text = ''.join(value or '' for value in catalog.values())
+
+        assert 'Decimal(' not in text
+        assert "{'" not in text
+        assert 'None' not in text
+        assert catalog['{{totals_by_unit}}'] == 'expected: 2, done: 0'
+
+    def test_the_examples_follow_the_readers_language(self) -> None:
+        """``doc_title`` and ``print_status`` were English demo values in a
+        Polish editor, next to a Polish description."""
+        pl = {entry.key: entry.example for entry in _build_placeholders_catalog('pl')}
+
+        assert 'Przyjęcie' in (pl['{{doc_title}}'] or '')
+        assert pl['{{print_status}}'] != 'Draft'
+
+    def test_the_endpoint_answers_in_the_callers_language(
+        self, client: TestClient, doc_auth_headers: dict[str, str]
+    ) -> None:
+        resp = client.get(
+            '/api/v1/warehouse/templates/placeholders',
+            headers={**doc_auth_headers, 'Accept-Language': 'pl'},
+        )
+
+        examples = {entry['key']: entry['example'] for entry in resp.json()}
+        assert 'Przyjęcie' in examples['{{doc_title}}']
+
 
 class TestTemplatePreviewEndpoint:
     """POST /preview answers "what will this print", not "what does it say"."""

@@ -20266,7 +20266,10 @@ export interface components {
          *     ``key`` is the literal Jinja2 expression (e.g. ``{{partner.name}}``),
          *     ``example`` a representative rendered value, ``possibly_empty`` marks
          *     fields that are absent for some documents, and ``document_types`` names
-         *     the document types the field belongs to (``None`` = any type).
+         *     the document types the field belongs to (``None`` = any type). A category
+         *     custom field also carries its ``custom_field_label`` and the
+         *     ``custom_field_categories`` that define it, apart from the English
+         *     ``description``, so a client can phrase the sentence in its own language.
          */
         PlaceholderInfo: {
             /** Key */
@@ -20282,6 +20285,10 @@ export interface components {
             possibly_empty: boolean;
             /** Document Types */
             document_types?: string[] | null;
+            /** Custom Field Label */
+            custom_field_label?: string | null;
+            /** Custom Field Categories */
+            custom_field_categories?: string[] | null;
         };
         /**
          * PreviewIngredient

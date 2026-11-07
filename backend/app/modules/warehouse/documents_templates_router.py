@@ -484,25 +484,45 @@ def _example_context(lang: str = 'en') -> dict[str, Any]:
     }
 
 
-def _format_example(value: Any) -> str:
-    """A short printable example value from a context value."""
+def _format_scalar(value: Any) -> str:
+    """One value as a reader writes it: no ``Decimal(...)``, no ``None``."""
     if value is None:
         return ''
     if isinstance(value, bool):
         return 'true' if value else 'false'
+    if isinstance(value, Decimal):
+        return format(value.normalize(), 'f')
     if isinstance(value, str) and value.startswith('data:'):
         return '[embedded image data URI]'
+    return str(value)
+
+
+def _format_example(value: Any) -> str:
+    """A short printable example value from a context value."""
     if isinstance(value, list):
         # A list of rows is shown as what each row carries, never as the
         # list's repr (a module path and a memory address).
-        text = ', '.join(_format_row_example(row) for row in value)
+        text = '; '.join(_format_row_example(row) for row in value)
     else:
-        text = str(value)
+        text = _format_scalar(value)
     return text if len(text) <= 80 else f'{text[:77]}…'
 
 
 def _format_row_example(row: Any) -> str:
-    """One row of a list-valued placeholder: ``name × quantity`` for a line."""
+    """One row of a list-valued placeholder.
+
+    A line reads ``name × quantity``; a record (``totals_by_unit``,
+    ``packages``) reads ``field: value`` for each field it carries, leaving
+    out what is empty, embedded or itself a list.
+    """
+    if isinstance(row, dict):
+        return ', '.join(
+            f'{key}: {text}'
+            for key, item in row.items()
+            if not isinstance(item, list | dict)
+            and (text := _format_scalar(item))
+            and not text.startswith('[embedded')
+        )
     name = getattr(row, 'name', None)
     quantity = getattr(row, 'quantity', None)
     if name is not None and quantity is not None:
@@ -524,9 +544,13 @@ def _catalog_entry(key: str, value: Any) -> PlaceholderInfo:
     )
 
 
-def _build_placeholders_catalog() -> list[PlaceholderInfo]:
-    """The catalog, derived from the real render context."""
-    context = _example_context()
+def _build_placeholders_catalog(lang: str = 'en') -> list[PlaceholderInfo]:
+    """The catalog, derived from the real render context.
+
+    The example values are the ones the document prints in ``lang``, so a
+    Polish editor does not show an English title beside a Polish description.
+    """
+    context = _example_context(lang)
     items: list[PlaceholderInfo] = []
 
     for key, value in sorted(context.items()):
@@ -597,7 +621,7 @@ async def preview_template(
 async def list_placeholders(
     current_user: UserContextDTO = Depends(get_current_user_context),
 ) -> list[PlaceholderInfo]:
-    return _build_placeholders_catalog()
+    return _build_placeholders_catalog(get_current_lang())
 
 
 @router.get('', response_model=PaginatedResponse[DocumentTemplateSchema])
