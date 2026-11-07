@@ -1123,6 +1123,7 @@
     "onResumesWebhooks_one": "Wysyłka wznowi się pod 1 zapisany adres, gdy tylko moduł zostanie włączony — ten sam, pod który szła przed wyłączeniem.",
     "onResumesWebhooks_other": "Wysyłka wznowi się pod {{count}} zapisanego adresu, gdy tylko moduł zostanie włączony — te same, pod które szła przed wyłączeniem.",
     "optionalCompanionsHint": "Działa samodzielnie — włączenie modułu {{names}} dodaje integrację.",
+    "optionalCompanionsOffHint": "{{names}} nie jest włączony, więc integracja z nim jest tu niedostępna.",
     "requiresHint": "Wymaga włączenia: {{names}}.",
     "screensMissing": "Brak ekranów",
     "screensMissingHint": "Jego strony nie zainstalowały się tutaj, więc włączenie nie doda niczego, co da się otworzyć. Ponowna instalacja modułu domyka sprawę.",

@@ -88,6 +88,26 @@ class TestGroupedCatalog:
             }
         ]
 
+    def test_a_section_names_its_module_from_the_manifest(self, monkeypatch):
+        """A module with no translation is still named, not shown by identifier."""
+        from unittest.mock import MagicMock
+
+        module = MagicMock()
+        module.metadata.display_name = 'Warranty Tracker'
+        monkeypatch.setitem(module_registry._modules, 'warranty', module)
+        module_registry.register_permission_defs(
+            'warranty', [PermissionDef(key='warranty:write')]
+        )
+        module_registry.register_permission_defs(
+            'unregistered', [PermissionDef(key='unregistered:write')]
+        )
+
+        catalog = module_registry.get_permissions_catalog()
+
+        names = {m['module']: m['display_name'] for m in catalog['modules']}
+        assert names['warranty'] == 'Warranty Tracker'
+        assert names['unregistered'] is None
+
     def test_a_disabled_module_contributes_no_columns(self):
         """A grant for a module the org does not run could never take effect."""
         module_registry.register_permission_defs(

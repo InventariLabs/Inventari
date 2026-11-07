@@ -512,14 +512,32 @@ describe("AppStore optional companions", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("says nothing when the module itself is already on", async () => {
-    // The hint is a fact before enabling; afterwards there is no decision.
+  it("names the switched-off companion on a module that is already on", async () => {
+    // A module running without its companion is where the gap matters most:
+    // the card says why part of it is missing, in the present tense.
     withEnabled(["recipes"]);
+    render(<AppStore />, { wrapper: Wrapper });
+
+    const names = mt("modules.shopping_lists.name");
+    expect(
+      await screen.findByText(
+        t("appStore.optionalCompanionsOffHint", { names }),
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(hintWith(names))).not.toBeInTheDocument();
+  });
+
+  it("says nothing on a module that is on when its companion is on too", async () => {
+    withEnabled(["recipes", "shopping_lists"]);
     render(<AppStore />, { wrapper: Wrapper });
 
     await screen.findByText(mt("modules.recipes.name"));
     expect(
-      screen.queryByText(hintWith(mt("modules.shopping_lists.name"))),
+      screen.queryByText(
+        t("appStore.optionalCompanionsOffHint", {
+          names: mt("modules.shopping_lists.name"),
+        }),
+      ),
     ).not.toBeInTheDocument();
   });
 

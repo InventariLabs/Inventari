@@ -132,6 +132,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A module that is switched on now says on its store card when a module it
+  works better with is switched off, as the card already did before the module
+  was switched on. The roles screen names a module with no translation of its
+  own, such as one just made with `make new-module`, by the name in its
+  manifest instead of its technical identifier.
 - The Check Out Asset dialog names an address nobody in the organization uses
   before it saves it, also when the address is pasted and submitted at once.
   The check waited for the typing to pause, and a quicker Enter stored the
