@@ -153,6 +153,18 @@ export default function IngredientTemplateCombobox({
     }
   };
 
+  // The list is for the field in front of the reader. Once focus goes to any
+  // other control — the unit picker under the name, most often — it closes,
+  // so two popovers are never open over each other. Focus walking into the
+  // list (ArrowDown) or back to the field keeps it open.
+  const closeUnlessFocusStaysInList = (next: EventTarget | null) => {
+    if (next instanceof Node) {
+      if (listRef.current?.contains(next)) return;
+      if (inputRef.current?.contains(next)) return;
+    }
+    setOpen(false);
+  };
+
   const clearTemplate = () => {
     onChange(null, query);
   };
@@ -177,8 +189,10 @@ export default function IngredientTemplateCombobox({
                 onQueryChange(e.target.value);
                 setOpen(true);
               }}
-              onFocus={() => setOpen(true)}
-              onBlur={() => onBlur?.()}
+              onBlur={(e) => {
+                onBlur?.();
+                closeUnlessFocusStaysInList(e.relatedTarget);
+              }}
               onKeyDown={handleInputKeyDown}
               disabled={disabled}
               placeholder={t("form.ingredient_name")}
@@ -234,6 +248,7 @@ export default function IngredientTemplateCombobox({
                   selectTemplate(option);
                 }}
                 onKeyDown={(e) => handleOptionKeyDown(e, option, index)}
+                onBlur={(e) => closeUnlessFocusStaysInList(e.relatedTarget)}
                 variant="ghost"
                 size="contentSm"
                 className="w-full px-2.5 py-2 justify-start text-left gap-2"

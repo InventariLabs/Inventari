@@ -38,7 +38,8 @@ async def product_search(
     location_id: UUID | None = Query(
         None,
         description=(
-            'Narrow a stock search to this location and the ones under it. '
+            'Narrow a stock search to this location. A shelf is exact: only '
+            'its own records. A zone also offers the shelves below it. '
             'On its own it also selects the stock search, for callers written '
             'before the explicit flag.'
         ),

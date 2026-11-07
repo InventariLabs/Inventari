@@ -8,7 +8,7 @@ import { extractApiError } from "@/lib/errors";
 
 interface UseProductSearchOptions {
   onSelect?: (product: ProductSearchResult) => void;
-  /** Narrows a stock search to this location and the ones under it. */
+  /** Narrows a stock search to this location: a shelf is exact, a zone also offers the shelves below it. */
   locationId?: string | null;
   /**
    * Answer with the stock on hand rather than the product catalogue.

@@ -447,12 +447,12 @@ describe("LineItemsEditor (a chosen product still shows its line's error)", () =
         labels={{ ...makeLabels(), inStock: "In stock", addedLabel: "Added" }}
         search={{
           results: [
-            { ...stockHit, created_at: "2026-09-01T08:00:00Z" },
+            { ...stockHit, added_date: "2026-09-01" },
             {
               ...stockHit,
               item_id: "item-2",
               available_quantity: 3,
-              created_at: null,
+              added_date: null,
             },
           ],
           isLoading: false,
@@ -464,11 +464,9 @@ describe("LineItemsEditor (a chosen product still shows its line's error)", () =
     await user.click(screen.getByPlaceholderText("Item"));
 
     const row = await screen.findByText(/^Added: /);
-    // The label rides the reader's calendar day — the same formatter every
-    // other date on screen uses, never a raw timestamp.
-    expect(row.textContent).toBe(
-      `Added: ${formatDate("2026-09-01T08:00:00Z")}`,
-    );
+    // The record's own day through the formatter every other date on screen
+    // uses — the same day the product card prints, never a shifted instant.
+    expect(row.textContent).toBe(`Added: ${formatDate("2026-09-01")}`);
     // The twin with no date on its record gets no fake one.
     expect(screen.queryByText(/^Added: $/)).not.toBeInTheDocument();
   });

@@ -197,6 +197,50 @@ describe("IngredientTemplateCombobox", () => {
       expect(document.activeElement).toBe(input);
     });
 
+    it("closes the list once focus moves on to another control", async () => {
+      // The unit picker sits right under the name. A list left open over it
+      // hid its options, and a click aimed at a unit landed on a suggestion.
+      const { user } = await openList();
+      const next = document.createElement("button");
+      next.textContent = "Unit";
+      document.body.appendChild(next);
+
+      await user.click(next);
+
+      await waitFor(() =>
+        expect(screen.queryByText("Organic Spaghetti")).not.toBeInTheDocument(),
+      );
+      next.remove();
+    });
+
+    it("keeps the list open while focus walks into it", async () => {
+      const { user } = await openList();
+
+      await user.keyboard("{ArrowDown}");
+
+      expect(screen.getByText("Organic Spaghetti")).toBeInTheDocument();
+    });
+
+    it("does not open the list by focusing the field alone", async () => {
+      // A pointer click focuses and then clicks: opening on focus and
+      // toggling on click left the list shut after a click and open after
+      // a Tab, over whatever the reader was heading for.
+      const user = userEvent.setup();
+      render(
+        <IngredientTemplateCombobox
+          query="spa"
+          value={null}
+          onChange={vi.fn()}
+          onQueryChange={vi.fn()}
+        />,
+      );
+      await waitFor(() => expect(mockSearch).toHaveBeenCalled());
+
+      await user.tab();
+
+      expect(screen.queryByText("Organic Spaghetti")).not.toBeInTheDocument();
+    });
+
     it("renders the list on a Radix popper layer, so Escape stops there", async () => {
       // The sheet around this field reads exactly this marker before deciding
       // whether an Escape was aimed at it or at the list.
