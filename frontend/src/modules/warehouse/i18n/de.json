@@ -2115,7 +2115,7 @@
       "noPartner": "Wählen Sie den Lieferanten.",
       "noCustomer": "Wählen Sie den Kunden.",
       "postFailed": "Der Wareneingang konnte nicht gebucht werden.",
-      "needsExpiry": "Haltbarkeit fehlt für: {{products}}. Trage sie unter „Charge und Haltbarkeit“ in der Zeile ein.",
+      "needsExpiry": "Haltbarkeit fehlt für: {{products}}. Tragen Sie es unter „Charge und Haltbarkeit“ in der Zeile ein.",
       "openPartner": "Partner öffnen",
       "saveFailed": "Der Entwurf konnte nicht gespeichert werden.",
       "previewFailed": "Es konnte nicht ermittelt werden, wohin die Positionen gehen. Der Plan folgt beim Buchen den Regeln.",
