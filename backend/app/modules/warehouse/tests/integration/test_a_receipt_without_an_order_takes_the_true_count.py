@@ -141,3 +141,89 @@ def test_a_line_with_a_real_expectation_still_meets_the_tolerance(
     # The test user may receive over tolerance, so the surplus is a question.
     assert resp.status_code == 409, resp.text
     assert resp.json()['detail']['code'] == 'SURPLUS_NEEDS_CONFIRMATION'
+
+
+def _settled_line(
+    client: TestClient, headers: dict[str, str], doc_id: str
+) -> dict[str, Any]:
+    done = client.patch(
+        f'/api/v1/warehouse/documents/{doc_id}/complete', headers=headers
+    )
+    assert done.status_code == 200, done.text
+    line: dict[str, Any] = done.json()['lines'][0]
+    return line
+
+
+def test_a_count_raised_in_the_dialog_is_not_marked_a_surplus(
+    client: TestClient,
+    doc_auth_headers: dict[str, str],
+    doc_partner: Partner,
+    doc_target_location: StorageLocation,
+    doc_template: ProductTemplate,
+) -> None:
+    doc_id, session = _session(
+        client,
+        doc_auth_headers,
+        doc_partner,
+        doc_target_location,
+        doc_template,
+        expected_is_count=True,
+    )
+
+    resp = _confirm_count(client, doc_auth_headers, doc_id, session, 2)
+    assert resp.status_code == 200, resp.text
+
+    line = _settled_line(client, doc_auth_headers, doc_id)
+    assert line['discrepancy_code'] is None
+    assert line['line_status'] == 'DONE'
+
+
+def test_a_count_raised_by_scanning_is_not_marked_a_surplus(
+    client: TestClient,
+    doc_auth_headers: dict[str, str],
+    doc_partner: Partner,
+    doc_target_location: StorageLocation,
+    doc_template: ProductTemplate,
+) -> None:
+    doc_id, session = _session(
+        client,
+        doc_auth_headers,
+        doc_partner,
+        doc_target_location,
+        doc_template,
+        expected_is_count=True,
+    )
+
+    scanned = client.post(
+        f'/api/v1/warehouse/documents/{doc_id}/receiving/{session["id"]}/scan',
+        headers=doc_auth_headers,
+        json={'barcode': doc_template.barcode, 'quantity': '2'},
+    )
+    assert scanned.status_code == 200, scanned.text
+
+    line = _settled_line(client, doc_auth_headers, doc_id)
+    assert line['discrepancy_code'] is None
+    assert line['line_status'] == 'DONE'
+
+
+def test_a_line_with_a_real_expectation_raised_is_still_a_surplus(
+    client: TestClient,
+    doc_auth_headers: dict[str, str],
+    doc_partner: Partner,
+    doc_target_location: StorageLocation,
+    doc_template: ProductTemplate,
+) -> None:
+    doc_id, session = _session(
+        client, doc_auth_headers, doc_partner, doc_target_location, doc_template
+    )
+
+    resp = client.post(
+        f'/api/v1/warehouse/documents/{doc_id}/receiving/{session["id"]}/short-receive',
+        headers=doc_auth_headers,
+        json={'line_id': session['lines'][0]['id'], 'received_quantity': 2},
+        params={'confirm_surplus': 'true'},
+    )
+    assert resp.status_code == 200, resp.text
+
+    line = _settled_line(client, doc_auth_headers, doc_id)
+    assert line['discrepancy_code'] == 'SURPLUS'

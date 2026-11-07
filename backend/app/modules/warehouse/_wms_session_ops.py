@@ -29,7 +29,7 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 
 from . import document_types as dt
-from ._over_receipt import SURPLUS_CODE
+from ._over_receipt import SURPLUS_CODE, is_surplus
 from ._po_receipt_guard import assert_line_over_receipt_allowed_async
 from ._wms_direction import PICKING, RECEIVING, WmsDirection
 from ._wms_line_utils import (
@@ -292,7 +292,7 @@ async def confirm_short_async(
 
     _refuse_a_shortfall_nobody_chose(direction, line, quantity, discrepancy_code)
 
-    over_expected = quantity > line.expected_quantity
+    over_expected = is_surplus(doc_line, quantity, line.expected_quantity)
     if over_expected:
         if may_exceed_over_receipt is None:
             raise ServiceRejectionError('wms_quantity_above_expected')

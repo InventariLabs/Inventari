@@ -70,6 +70,7 @@ const receiveLine: WmsReceiveLine = {
   id: "line-1",
   document_line_id: "doc-line-1",
   from_order: false,
+  expected_is_count: false,
   pick_order: 1,
   status: "pending",
   received_quantity: 3,

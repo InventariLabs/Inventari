@@ -35,6 +35,7 @@ function line(
     id,
     document_line_id: `doc-${id}`,
     from_order: false,
+    expected_is_count: false,
     pick_order: 1,
     status,
     received_quantity: received,
