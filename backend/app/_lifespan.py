@@ -277,14 +277,14 @@ async def _reclaim_after_restart(logger: Logger, event_bus, task_scheduler) -> N
     """
     if event_bus.redis is None and task_scheduler._redis is None:
         return
-    from redis.exceptions import RedisError
-
     from app.core.stream_reaper import reap_streams_once
 
     try:
         await reap_streams_once()
-    except (RedisError, OSError) as exc:
-        logger.warning('[Startup] Stream reclaim skipped: %s', exc)
+    except (
+        Exception
+    ) as exc:  # same net as the reaper tick: this step must not end startup
+        logger.warning('[Startup] Stream reclaim skipped: %s', exc, exc_info=True)
 
 
 async def _start_services(
