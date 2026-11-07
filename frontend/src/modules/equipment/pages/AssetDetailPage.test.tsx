@@ -464,11 +464,12 @@ describe("AssetDetailPage — handing the asset over", () => {
     );
 
     await waitFor(() => expect(toast.success).toHaveBeenCalled());
-    const [, options] = vi.mocked(toast.success).mock.calls[0] as [
-      string,
-      { action: { label: string } },
-    ];
-    expect(options.action.label).toBe("Download PDF");
+    expect(toast.success).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        action: expect.objectContaining({ label: "Download PDF" }),
+      }),
+    );
   });
 });
 
