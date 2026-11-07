@@ -305,7 +305,7 @@ check-frontend: ## Run frontend typecheck + production build
 	docker compose exec frontend npm run lint:i18n
 	@echo "$(BLUE)[INFO]$(NC) Checking tests assert what the product renders, not raw keys..."
 	docker compose exec frontend npm run lint:tests
-	@echo "$(BLUE)[INFO]$(NC) Checking every category emoji has a self-hosted SVG..."
+	@echo "$(BLUE)[INFO]$(NC) Checking every category emoji has a self-hosted SVG and a manifest entry..."
 	docker compose exec frontend npm run check:emoji
 	@echo "$(BLUE)[INFO]$(NC) Checking UI conventions..."
 	docker compose exec frontend npm run lint:ui
@@ -332,7 +332,9 @@ check-frontend: ## Run frontend typecheck + production build
 #   build                            — `vite build` alone; `build:check` (tsc, the
 #                                      build and the bundle budget) is the one
 #                                      wired in above.
-#   check:dead                       — plain `knip`, which exits 1 on the
+#   check:dead                       — plain `knip`: it exits 0 on this tree and
+#                                      prints only a configuration hint, so its
+#                                      exit code says nothing about the
 #                                      grandfathered findings; the verdict that
 #                                      gates is `check:dead:baseline`, above.
 #   sync:emoji                       — NETWORK writer (downloads SVGs); its

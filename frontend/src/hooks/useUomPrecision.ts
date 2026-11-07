@@ -18,10 +18,11 @@ export interface UomPrecision {
 /**
  * The quantity columns' scale (`numeric(12,3)`): a step finer than this is
  * rounded away by the database anyway, so the screen floors a unit's step at
- * this value before it counts places. The server does not: it counts places
- * from the unit's raw `rounding`. The two agree for every seeded unit
- * (0.001, 0.01, 1.0) and differ only for a unit finer than 0.001, which the
- * product cannot create today.
+ * this value before it counts places. `quantity_step()` on the server floors
+ * at the same scale; only the refusal in `validate_quantity_precision_async`
+ * counts places from the unit's raw `rounding`. The two agree for every
+ * seeded unit (0.001, 0.01, 1.0) and differ only for a unit finer than
+ * 0.001, which the product cannot create today.
  *
  * The same mirror as `QUANTITY_MAX` in `modules/shopping_lists/quantityBounds.ts`,
  * and `npm run check:quantity-bounds` compares both against
@@ -59,8 +60,9 @@ function keptDecimalPlaces(step: number): number {
 /** The constraints a unit names, or the permissive fallback when none does. */
 function precisionOf(rounding: unknown): UomPrecision {
   // The wire sends rounding as text ('0.010000'); the step is the number
-  // it names, floored at the quantity columns' scale (the server does not
-  // floor; see QUANTITY_STEP).
+  // it names, floored at the quantity columns' scale as quantity_step() does
+  // on the server (see QUANTITY_STEP for where the server counts from the
+  // raw rounding instead).
   const stepValue = Math.max(Number(rounding), QUANTITY_STEP);
   if (!Number.isFinite(stepValue)) return FALLBACK;
 

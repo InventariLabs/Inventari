@@ -248,7 +248,9 @@ export function AssetTable({
                       <SortArrow active={sort === col.sortable} dir={sortDir} />
                     </Button>
                   ) : (
-                    <span className="uppercase text-xs tracking-wide">
+                    // The same 40px box the sort buttons beside it occupy, so
+                    // a plain label and a sortable one share one text top.
+                    <span className="inline-flex min-h-10 items-center uppercase text-xs tracking-wide">
                       {col.label}
                     </span>
                   )}
