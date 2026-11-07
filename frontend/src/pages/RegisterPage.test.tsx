@@ -565,6 +565,53 @@ describe("RegisterPage", () => {
     );
     expect(screen.queryByText("sign-in form")).not.toBeInTheDocument();
   });
+  it("signs an approved request in with the approved address and continues to the app", async () => {
+    // The approval link carries no address field: the account is the one
+    // the request named, and that is the address the sign-in must use.
+    server.use(
+      http.get("/api/v1/auth/registration-link/tok1", () =>
+        HttpResponse.json({ email: "jan@example.com", full_name: "Jan Link" }),
+      ),
+    );
+    const completeRegistration = vi.fn().mockResolvedValue(undefined);
+    const login = vi.fn().mockResolvedValue(undefined);
+    useAuthStore.setState({
+      completeRegistration:
+        completeRegistration as unknown as AuthState["completeRegistration"],
+      login: login as unknown as AuthState["login"],
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register?token=tok1"]}>
+          <Routes>
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/" element={<p>the app</p>} />
+            <Route path="/login" element={<p>sign-in form</p>} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await screen.findByText(/jan@example.com/);
+    fireEvent.change(screen.getByLabelText(/^Password/i), {
+      target: { value: "Str0ng!passphrase" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm password/i), {
+      target: { value: "Str0ng!passphrase" },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: "Complete Registration" }),
+    );
+
+    expect(await screen.findByText("the app")).toBeInTheDocument();
+    expect(completeRegistration).toHaveBeenCalledWith(
+      "tok1",
+      "Str0ng!passphrase",
+      "Jan Link",
+    );
+    expect(login).toHaveBeenCalledWith("jan@example.com", "Str0ng!passphrase");
+    expect(screen.queryByText("sign-in form")).not.toBeInTheDocument();
+  });
   it("falls back to the sign-in page, address filled in, when the new account cannot sign in yet", async () => {
     useAuthStore.setState({
       register: vi
