@@ -105,7 +105,9 @@ class ApiKeyCapabilities(BaseModel):
     #: Never on a key, whoever issues it.
     withheld_permissions: list[str]
     #: Administrative areas are closed to keys by a role check, not by a
-    #: missing permission — so it cannot be read off the lists above.
+    #: missing permission. ``withheld_permissions`` names the permissions
+    #: that open most of them, but the role check is the door, so this flag
+    #: says the areas stay shut even to a key that somehow carried one.
     admin_areas_blocked: bool
     #: The header a key travels in.
     header: str

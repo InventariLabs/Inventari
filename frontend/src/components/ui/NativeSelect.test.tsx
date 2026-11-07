@@ -55,4 +55,24 @@ describe("NativeSelect", () => {
     expect(chevron).not.toBeNull();
     expect(chevron?.getAttribute("aria-hidden")).toBe("true");
   });
+
+  /**
+   * A field's explanation used to be dropped on the floor by every caller that
+   * passed `description` to a select — the prop did not exist. It must reach
+   * the DOM and name the select's description, the contract `Input` has.
+   */
+  it("shows its description and points the select's aria-describedby at it", () => {
+    render(
+      <NativeSelect label="Sort by" description="Applies to every list">
+        <option value="name">Name</option>
+      </NativeSelect>,
+    );
+    const select = screen.getByLabelText("Sort by");
+    const hint = screen.getByText("Applies to every list");
+
+    expect(hint.id).not.toBe("");
+    expect(select.getAttribute("aria-describedby")?.split(" ")).toContain(
+      hint.id,
+    );
+  });
 });

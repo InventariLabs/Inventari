@@ -1,10 +1,11 @@
 """
 Lock-before-change tests for stats API module guard.
 
-stats is currently in TRUSTED_CORE_MODULES, which means require_module('stats')
+stats is currently always-on (``ALWAYS_ON_MODULES`` and shipped as a directory,
+so ``is_always_on('stats')`` holds), which means require_module('stats')
 always returns True regardless of organization enabled_modules. These tests
-document that current behavior. If stats is removed from TRUSTED_CORE_MODULES,
-these tests should be updated to assert 403 when disabled.
+document that current behavior. If stats stops being always-on, these tests
+should be updated to assert 403 when disabled.
 """
 
 import pytest
@@ -30,7 +31,7 @@ class TestStatsModuleGuard:
     def test_stats_overview_returns_200_even_when_not_in_enabled_modules(
         self, client: TestClient, db_session: Session
     ) -> None:
-        """stats is in TRUSTED_CORE_MODULES, so it bypasses enabled_modules check."""
+        """stats is always-on, so it bypasses enabled_modules check."""
         org = Organization(
             name='No Stats Org',
             enabled_modules=['core', 'items', 'locations', 'categories'],
@@ -64,7 +65,7 @@ class TestStatsModuleGuard:
     def test_stats_by_storage_returns_200_even_when_not_in_enabled_modules(
         self, client: TestClient, db_session: Session
     ) -> None:
-        """stats is in TRUSTED_CORE_MODULES, so it bypasses enabled_modules check."""
+        """stats is always-on, so it bypasses enabled_modules check."""
         org = Organization(
             name='No Stats Org 2',
             enabled_modules=['core', 'items', 'locations', 'categories'],

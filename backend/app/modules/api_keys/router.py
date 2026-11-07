@@ -41,6 +41,11 @@ from app.modules.api_keys.api_key_service import (
 # has — so any member could enumerate the organization's keys by name, prefix,
 # issuer and last use. Declared on the router so the pair cannot drift apart
 # again, and so an endpoint added later arrives closed.
+#
+# The same dependency closes `GET /api-keys/capabilities` to a key: a key can
+# never hold `org:settings:write` (it is withheld), so it cannot read what a
+# key may carry. Deliberate, and nothing consumes the endpoint as a key — it
+# feeds the issuing form a signed-in administrator sees.
 router = APIRouter(
     tags=['api-keys'],
     dependencies=[

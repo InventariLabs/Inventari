@@ -365,7 +365,8 @@ def _check_module_dependencies(
 ) -> None:
     """Raise if required modules are not enabled or the requirements loop.
 
-    Skips modules in ALWAYS_ON_MODULES (implicitly enabled). ``_visited`` holds
+    Skips prerequisites that are effectively always-on (``is_always_on``:
+    implicitly enabled). ``_visited`` holds
     the modules on the path being walked — the ancestors — so a prerequisite
     shared by two branches is not mistaken for a loop; only a module that
     requires itself, through any chain, is.

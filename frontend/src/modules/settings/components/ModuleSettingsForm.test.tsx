@@ -52,6 +52,44 @@ const schema: ModuleSettingsSchema = {
   },
 };
 
+describe("ModuleSettingsForm field descriptions", () => {
+  it("shows a choice field's description beside its select", () => {
+    const withDescriptions: ModuleSettingsSchema = {
+      type: "object",
+      properties: {
+        mode: {
+          type: "string",
+          enum: ["fast", "exact"],
+          title: "Mode",
+          description: "How the module weighs speed against precision",
+        },
+        label_text: {
+          type: "string",
+          title: "Label text",
+          description: "Printed under the barcode",
+        },
+      },
+    };
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="recipes"
+        schema={withDescriptions}
+        initialValues={{}}
+      />,
+    );
+
+    expect(
+      screen.getByText("How the module weighs speed against precision"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("field-mode")).toHaveAccessibleDescription(
+      "How the module weighs speed against precision",
+    );
+    expect(screen.getByTestId("field-label_text")).toHaveAccessibleDescription(
+      "Printed under the barcode",
+    );
+  });
+});
+
 describe("ModuleSettingsForm with a nested schema", () => {
   beforeEach(() => {
     vi.clearAllMocks();
