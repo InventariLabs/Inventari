@@ -527,6 +527,50 @@ describe("AppStore optional companions", () => {
     expect(screen.queryByText(hintWith(names))).not.toBeInTheDocument();
   });
 
+  it("lists several switched-off companions without agreeing with them", async () => {
+    // The hint holds a list of names; a verb or pronoun agreeing with it is
+    // wrong as soon as there are two ("Approvals, Purchase Orders is …").
+    const stub = (name: string, extra = {}) => ({
+      name,
+      display_name: name,
+      description: "x",
+      icon: "box",
+      category: "business",
+      requires: [],
+      version: "1.0.0",
+      requires_api_key: false,
+      ...extra,
+    });
+    vi.spyOn(modulesCtx, "useModules").mockReturnValue({
+      enabledModules: ["warehouse"],
+      isModuleEnabled: (name: string) => name === "warehouse",
+      isLoading: false,
+      refreshModules: vi.fn(),
+      focusModule: null,
+      hiddenModules: [],
+    });
+    server.use(
+      http.get("/api/v1/modules/available", () =>
+        HttpResponse.json(
+          onePage([
+            stub("warehouse", {
+              optional_requires: ["approvals", "purchase_orders"],
+            }),
+            stub("approvals"),
+            stub("purchase_orders"),
+          ]),
+        ),
+      ),
+    );
+    render(<AppStore />, { wrapper: Wrapper });
+
+    const names = `${mt("modules.approvals.name")}, ${mt("modules.purchase_orders.name")}`;
+    const hint = t("appStore.optionalCompanionsOffHint", { names });
+    expect(await screen.findByText(hint)).toBeInTheDocument();
+    // In English the old wording read "Approvals, Purchase Orders is not …".
+    expect(hint).not.toMatch(/\{\{|\bis not\b|\bwith it\b/);
+  });
+
   it("says nothing on a module that is on when its companion is on too", async () => {
     withEnabled(["recipes", "shopping_lists"]);
     render(<AppStore />, { wrapper: Wrapper });

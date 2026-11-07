@@ -1079,7 +1079,7 @@
     "onResumesWebhooks_one": "O envio é retomado para 1 endereço salvo assim que isto for ativado — o mesmo para o qual enviava antes de ser desativado.",
     "onResumesWebhooks_other": "O envio é retomado para {{count}} endereços salvos assim que isto for ativado — os mesmos para os quais enviava antes de ser desativado.",
     "optionalCompanionsHint": "Funciona sozinho — ativar {{names}} adiciona a integração.",
-    "optionalCompanionsOffHint": "{{names}} não está ativado, por isso a integração com ele não está disponível aqui.",
+    "optionalCompanionsOffHint": "A integração não está disponível aqui enquanto você não ativar {{names}}.",
     "requiresHint": "Ative primeiro {{names}}.",
     "screensMissing": "Telas ausentes",
     "screensMissingHint": "As páginas dele não foram instaladas aqui, então ativá-lo não adiciona nada que você possa abrir. Reinstalar o módulo o completa.",
