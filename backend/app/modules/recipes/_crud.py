@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
@@ -49,13 +50,16 @@ def _attach_uom_symbols(recipe: Recipe) -> None:
         ingredient.uom_symbol = ingredient.uom.symbol if ingredient.uom else None  # type: ignore[attr-defined]
 
 
-def refuse_lines_without_a_unit(ingredients: list[RecipeIngredientCreate]) -> None:
+def refuse_lines_without_a_unit(
+    ingredients: Iterable[RecipeIngredientCreate | RecipeIngredient],
+) -> None:
     """Refuse a named ingredient line that names no unit.
 
     "Salt 2" could not be weighed against the shelf and reached the shopping
     list as "Salt 2 —". The recipe form refuses it; this is the same refusal
     for every other client of the create and update doors. Rows stored before
-    the check stay readable — only a write carrying such a line is refused.
+    the check stay readable — only a write carrying such a line is refused,
+    and a copy of a recipe holding one is a write.
     """
     for ing in ingredients:
         if ing.uom_id is None:
@@ -332,6 +336,7 @@ async def duplicate_recipe(
     source = result.scalars().first()
     if not source:
         return None
+    refuse_lines_without_a_unit(source.ingredients)
 
     copy = Recipe(
         organization_id=organization_id,

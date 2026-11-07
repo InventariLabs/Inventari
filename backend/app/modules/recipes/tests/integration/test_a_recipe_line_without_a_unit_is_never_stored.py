@@ -104,3 +104,34 @@ def test_a_line_with_a_unit_is_still_stored(
     )
 
     assert response.status_code == 201, response.text
+
+
+def test_duplicate_refuses_a_recipe_that_holds_a_line_without_a_unit(
+    client: TestClient, auth_headers: dict[str, str], db_session: Session
+) -> None:
+    created = client.post(
+        RECIPE_URL,
+        json=_recipe(
+            [{'name': 'Water', 'quantity': 1, 'uom_id': _uom_id(db_session, 'g')}]
+        ),
+        headers=auth_headers,
+    )
+    assert created.status_code == 201, created.text
+    recipe_id = created.json()['id']
+    # A line stored before the refusal existed.
+    db_session.execute(
+        text('UPDATE recipe_ingredients SET uom_id = NULL WHERE recipe_id = :r'),
+        {'r': recipe_id},
+    )
+    db_session.commit()
+
+    response = client.post(f'{RECIPE_URL}/{recipe_id}/duplicate', headers=auth_headers)
+
+    assert response.status_code == 400, response.text
+    assert response.json()['detail']['code'] == 'RECIPE_INGREDIENT_UNIT_MISSING'
+    assert 'Water' in response.json()['detail']['message']
+    assert _stored_count(db_session, 'Brine (copy)') == 0
+    # The original stays readable.
+    assert (
+        client.get(f'{RECIPE_URL}/{recipe_id}', headers=auth_headers).status_code == 200
+    )
