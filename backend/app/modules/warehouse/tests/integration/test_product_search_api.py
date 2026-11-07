@@ -380,7 +380,7 @@ class TestStockSearchTellsRowsApart:
     reader has to tell apart - and a row with nothing on it cannot back a
     dispatch line, so offering it builds a document that breaks later."""
 
-    def test_a_transfer_row_carries_the_date_it_landed(
+    def test_a_transfer_row_carries_the_day_it_was_added(
         self,
         client: TestClient,
         doc_auth_headers: dict[str, str],
@@ -389,21 +389,28 @@ class TestStockSearchTellsRowsApart:
         doc_source_location: StorageLocation,
     ) -> None:
         """Two unmarked records of one product on one shelf differ by
-        nothing but their quantity — the record's own landing date is the
-        third thing the row says, so the picker is not a guessing game."""
+        nothing but their quantity — the record's own day is the third
+        thing the row says, so the picker is not a guessing game. It is the
+        day the product card prints as "Added on" (the record's date, not
+        an instant a browser would shift into its own zone), so the two
+        screens cannot disagree about one record."""
         older = Item(
             name='Shelf twin',
             organization_id=doc_org.id,
             storage_location_id=doc_source_location.id,
             quantity=Decimal('3'),
-            created_at=datetime(2026, 9, 1, 8, 0, 0),
+            # A moment past midnight UTC: the instant falls on the 16th, the
+            # record's own day is the 15th.
+            created_at=datetime(2026, 9, 16, 0, 30, 0),
+            added_date=date(2026, 9, 15),
         )
         newer = Item(
             name='Shelf twin',
             organization_id=doc_org.id,
             storage_location_id=doc_source_location.id,
             quantity=Decimal('4'),
-            created_at=datetime(2026, 9, 2, 8, 0, 0),
+            created_at=datetime(2026, 9, 17, 8, 0, 0),
+            added_date=date(2026, 9, 17),
         )
         db_session.add_all([older, newer])
         db_session.commit()
@@ -416,14 +423,12 @@ class TestStockSearchTellsRowsApart:
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert len(data) == 2
-        landed = {Decimal(str(r['available_quantity'])): r['created_at'] for r in data}
-        assert landed[Decimal('3')] is not None
-        assert landed[Decimal('4')] is not None
-        # Each row names its OWN record's date — the dates differ, which is
-        # the point: quantity is no longer the only discriminator.
-        assert landed[Decimal('3')] != landed[Decimal('4')]
+        added = {Decimal(str(r['available_quantity'])): r['added_date'] for r in data}
+        assert added[Decimal('3')] == '2026-09-15'
+        assert added[Decimal('4')] == '2026-09-17'
+        assert [r['merged'] for r in data] == [False, False]
 
-    def test_a_merged_row_names_no_record_date(
+    def test_a_merged_row_names_no_record_day_and_says_it_is_merged(
         self,
         client: TestClient,
         doc_auth_headers: dict[str, str],
@@ -462,7 +467,10 @@ class TestStockSearchTellsRowsApart:
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert len(data) == 1
-        assert data[0]['created_at'] is None
+        assert data[0]['added_date'] is None
+        # The row names one record (a dispatch line needs it) but is the
+        # total of two — the flag lets a reader not mistake it for a record.
+        assert data[0]['merged'] is True
 
     def test_a_drained_row_is_not_offered_for_dispatch(
         self,
@@ -1078,7 +1086,7 @@ class TestStockSearchTellsRowsApart:
             )
         return template
 
-    def test_the_pool_is_split_between_rows_in_offering_order(
+    def test_the_pool_is_split_between_rows_earliest_best_before_first(
         self,
         client: TestClient,
         doc_auth_headers: dict[str, str],
@@ -1090,7 +1098,7 @@ class TestStockSearchTellsRowsApart:
         """The claimable pool belongs to the shelf, not to each row: four
         dated records of three under a pool of two were each offered two —
         eight in all, neither the shelf's stock nor its pool. The rows are
-        served in offering order until the pool runs dry."""
+        served earliest best-before first until the pool runs dry."""
         self._seed_partly_reserved_shelf(
             db_session,
             async_engine_fixture,
@@ -1161,6 +1169,65 @@ class TestStockSearchTellsRowsApart:
             Decimal('1'),
             Decimal('3'),
         ]
+
+    def test_a_record_without_a_best_before_is_served_last(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+        doc_org: Organization,
+        doc_source_location: StorageLocation,
+    ) -> None:
+        """Nothing on an undated record can spoil, so under a shortage the
+        dated record is served first: a pool of four over an undated three
+        and a dated three leaves the dated row whole and the undated one
+        with the remainder, however the query happened to order them."""
+        template = ProductTemplate(
+            organization_id=doc_org.id, name='Undated last', sku='UDL-1'
+        )
+        db_session.add(template)
+        db_session.flush()
+        _sow(
+            db_session,
+            async_engine_fixture,
+            doc_org,
+            template,
+            doc_source_location.id,
+            Decimal('3'),
+        )
+        _sow(
+            db_session,
+            async_engine_fixture,
+            doc_org,
+            template,
+            doc_source_location.id,
+            Decimal('3'),
+            expiry_date=date(2027, 1, 1),
+        )
+        _hold(
+            db_session,
+            async_engine_fixture,
+            template,
+            doc_source_location.id,
+            Decimal('2'),
+        )
+
+        response = client.get(
+            '/api/v1/warehouse/product-search',
+            headers=doc_auth_headers,
+            params={
+                'q': 'undated last',
+                'location_id': str(doc_source_location.id),
+                'merge': 'true',
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        offered = {
+            row['expiry_date']: Decimal(str(row['available_quantity']))
+            for row in response.json()
+        }
+        assert offered == {'2027-01-01': Decimal('3'), None: Decimal('1')}
 
     def test_a_document_built_from_the_whole_offer_confirms(
         self,

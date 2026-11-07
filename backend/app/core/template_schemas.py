@@ -55,7 +55,10 @@ class PlaceholderInfo(BaseModel):
     ``key`` is the literal Jinja2 expression (e.g. ``{{partner.name}}``),
     ``example`` a representative rendered value, ``possibly_empty`` marks
     fields that are absent for some documents, and ``document_types`` names
-    the document types the field belongs to (``None`` = any type).
+    the document types the field belongs to (``None`` = any type). A category
+    custom field also carries its ``custom_field_label`` and the
+    ``custom_field_categories`` that define it, apart from the English
+    ``description``, so a client can phrase the sentence in its own language.
     """
 
     key: str
@@ -63,3 +66,5 @@ class PlaceholderInfo(BaseModel):
     example: str | None = None
     possibly_empty: bool = False
     document_types: list[str] | None = None
+    custom_field_label: str | None = None
+    custom_field_categories: list[str] | None = None

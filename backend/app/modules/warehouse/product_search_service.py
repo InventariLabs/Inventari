@@ -127,8 +127,6 @@ async def search_stock_items_async(
         )
         rows = [_item_dto_to_dict(i) for i in page.items]
     rows = await _apply_shelf_claims_async(db, org_id, rows, merge=merge)
-    for row in rows:
-        row.pop('merged', None)  # routing fact, not part of the answer
     return rows
 
 
@@ -152,7 +150,7 @@ async def _apply_shelf_claims_async(
     (the undated records only — the dated ones travel as rows of their own)
     and the shelf's claimable pool, which covers every record standing
     here. The pool belongs to the shelf, so it is handed out to the rows
-    in offering order — the sum of the offered rows never exceeds it, and
+    earliest best-before first — the sum of the offered rows never exceeds it, and
     a document built from the whole offer reserves what it names. Ten
     gross with three spoken for builds a document for seven, not one that
     dies at confirmation. A transfer dialog (no merge) keeps the gross
@@ -249,11 +247,12 @@ def _item_dto_to_dict(
         'item_id': str(item.id),
         'available_quantity': offered if offered is not None else item.quantity,
         'merged': merged,
-        # A per-record row says when its record landed — on a shelf of
-        # unmarked twins the quantity was the only thing telling them
-        # apart. A merged row is a shelf total, not a record, so it names
-        # no date at all.
-        'created_at': None if merged else item.created_at,
+        # A per-record row says the day its record was added — the date the
+        # product card prints, not an instant a browser would shift into its
+        # own zone — since on a shelf of unmarked twins the quantity was the
+        # only thing telling them apart. A merged row is a shelf total, not
+        # a record, so it names no day at all.
+        'added_date': None if merged else item.added_date,
         'name': item.name,
         'sku': None,
         'barcode': item.barcode,

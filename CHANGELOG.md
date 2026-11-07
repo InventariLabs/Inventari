@@ -14,6 +14,16 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- **Breaking:** the document product search no longer returns `created_at` on a
+  stock hit; it returns `added_date`, the day the record was added — the same
+  date the product card shows as "Added on", so the picker and the card no longer
+  disagree by a day around midnight. A client that read `created_at` reads
+  `added_date` instead (a date, not a timestamp). A hit that is the total of
+  several interchangeable records now says so with `merged: true`, and the picker
+  tells such rows apart by their product's code rather than by the code of one
+  record in the group. The `location_id` description now says what the search
+  does: a shelf answers with its own records only, a zone also with the shelves
+  below it.
 - A refused invitation now answers with one sentence that says what to try — use
   the e-mail address the invitation was sent to, or ask for a new one — and the
   sentence is the same for a wrong address, an expired, a used, a withdrawn and an
@@ -141,6 +151,22 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The symbol list in the document and equipment template editors reads as
+  something a template author can use. Examples of record-valued symbols
+  (`totals_by_unit`, `packages`, `pick_lines`) show their fields instead of
+  Python dictionaries with `Decimal(...)` wrappers, the document examples
+  (title, status) are in the editor's language, and the Name hint, the
+  unbalanced-HTML message and the description of a category custom field are
+  translated instead of falling back to English. `GET
+  /warehouse/templates/placeholders` answers in the request language, and a
+  custom-field entry of the equipment placeholder lists carries
+  `custom_field_label` and `custom_field_categories` beside its English
+  description.
+- A module that is switched on now says on its store card when a module it
+  works better with is switched off, as the card already did before the module
+  was switched on. The roles screen names a module with no translation of its
+  own, such as one just made with `make new-module`, by the name in its
+  manifest instead of its technical identifier.
 - The Check Out Asset dialog names an address nobody in the organization uses
   before it saves it, also when the address is pasted and submitted at once.
   The check waited for the typing to pause, and a quicker Enter stored the
