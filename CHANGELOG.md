@@ -38,6 +38,14 @@ says what the release does rather than what changed since them.
   straight to the members and invitations, which used to sit at the foot of
   General. The webhook dialog lists every event in the interface language and
   groups the events of modules the organization has not enabled apart.
+- `GET /items/archived` pages by the last record seen, as the stock movement
+  ledger and the audit log do: it answers with `next_cursor`, takes `cursor`
+  for the page after, counts on the first page and carries that count, so a
+  page deep in a long archive costs what the first one does. Records archived
+  at the same instant are ordered by their id, so turning a page no longer
+  shows one of them twice and leaves out another. `offset` still answers and
+  is deprecated. The archive screens of the product list and of Equipment page
+  this way.
 - Creating an account — the first one, by invitation or from an approved
   request — signs it in and continues to the app, instead of sending the new
   owner to a sign-in form that asks for the address and password just chosen.
@@ -98,6 +106,9 @@ says what the release does rather than what changed since them.
   SQL to redact them when there is none.
 - Module authors can ask `@/module-sdk` whether the signed-in user is the person
   a record names by e-mail address (`useIsSignedInAs`).
+- Module authors can page a list the server pages by cursor with
+  `useKeysetPaging` from `@/module-sdk`: it keeps the cursors of the pages
+  already visited and starts from the first page when the question changes.
 - When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
   list's "From recipes" writes goods that another open shopping list still
   asks for, the answer names them and the list that holds them
@@ -144,6 +155,11 @@ says what the release does rather than what changed since them.
   year outside 2000–2100 with a 422, instead of closing a thirteenth month.
   Pasted import text is refused with a 422 past the size an imported file may
   have (50 MB).
+- The consumption report's two top-ten lists, the products used most and the
+  ones whose disposals cost most, put equal products in the order of their
+  names. A tie at the tenth place used to be settled by the order the database
+  returned the rows in, so the same window could name a different tenth product
+  from one reading to the next.
 - The scanner's Back button now leads to the launcher when the scanner was the
   first screen of the tab — opened by address, through a printed code's link or
   after signing in — instead of doing nothing.

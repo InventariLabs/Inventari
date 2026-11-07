@@ -470,10 +470,11 @@ _DROPPED_AFTER_BASELINE_TABLES = {'item_type_definitions'}
 _DROPPED_AFTER_BASELINE_COLUMNS = {('items', 'item_type')}
 
 
-#: The unique indexes the core revisions after the baseline build on tables the
+#: The indexes the core revisions after the baseline build on tables the
 #: previous chain already had. The models declare them, so a database stamped
 #: from the previous chain lacks them until the upgrade that follows the stamp.
 _ADDED_AFTER_BASELINE_INDEXES = {
+    'ix_items_org_archived_at',
     'uq_storage_locations_org_parent_name',
     'uq_storage_locations_org_root_name',
 }

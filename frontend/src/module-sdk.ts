@@ -142,6 +142,9 @@ export { useStoragesTree } from "@/hooks/queries/useStoragesTree";
 export type { LocationOption } from "@/hooks/useLocationPicker";
 export { useDebounce, useDebouncedCallback } from "@/hooks/useDebounce";
 export { default as Pagination } from "@/components/ui/Pagination";
+// The page state of a list the server pages by the last row seen: the cursors
+// of the pages visited, and the first page again when the question changes.
+export { useKeysetPaging } from "@/hooks/useKeysetPaging";
 
 // Generated wire types and the helper a create payload uses when a field may be
 // left to the server's default.

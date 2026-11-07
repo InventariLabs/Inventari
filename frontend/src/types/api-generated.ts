@@ -2251,7 +2251,7 @@ export interface paths {
         };
         /**
          * Get Archived Items
-         * @description List of archived (soft-deleted) products, scoped by module context.
+         * @description Archived (soft-deleted) products, newest archived first, scoped by module context.
          */
         get: operations["get_archived_items_api_v1_items_archived_get"];
         put?: never;
@@ -11456,7 +11456,7 @@ export interface components {
         };
         /**
          * ArchivedItemListResponse
-         * @description Paginated response for the archived items list endpoint.
+         * @description A page of the archived items list, paged by the last row seen.
          */
         ArchivedItemListResponse: {
             /** Items */
@@ -11483,6 +11483,8 @@ export interface components {
              * @default false
              */
             total_capped: boolean;
+            /** Next Cursor */
+            next_cursor?: string | null;
         };
         /** ArchivedItemSchema */
         ArchivedItemSchema: {
@@ -32587,8 +32589,11 @@ export interface operations {
     get_archived_items_api_v1_items_archived_get: {
         parameters: {
             query?: {
-                offset?: number;
                 limit?: number;
+                /** @description The previous page's next_cursor: the page that follows it. The cost of a page stays its size however long the archive grows, and the count is taken on the first page and carried, so it does not move. */
+                cursor?: string | null;
+                /** @description Deprecated: counts rows from the top on every call, so a deep page costs every row above it. Page with `cursor`. */
+                offset?: number;
                 /** @description Filter by category context_tag (e.g. equipment) */
                 context_tag?: string | null;
                 /** @description Hide items whose category belongs to a vertical module */

@@ -74,11 +74,14 @@ async def _record(
     location: StorageLocation,
     name: str,
     category: Category | None = None,
+    *,
+    item_id: uuid.UUID | None = None,
 ) -> Item:
     template = ProductTemplate(name=name, organization_id=org.id)
     db.add(template)
     await db.flush()
     item = Item(
+        id=item_id or uuid.uuid4(),
         organization_id=org.id,
         storage_location_id=location.id,
         template_id=template.id,
@@ -195,3 +198,55 @@ async def test_a_row_the_mapping_cannot_name_is_left_out_and_logged(
     skips = [r for r in caplog.records if 'cannot name' in r.getMessage()]
     assert len(skips) == 1
     assert "{'UPDATED': 1}" in skips[0].getMessage()
+
+
+#: Twelve products, made in the reverse of their names' order and with ids
+#: that sort the same way, so neither the order the rows were written in nor
+#: the order of their ids is the order of their names.
+_TIED = [f'Product {letter}' for letter in 'LKJIHGFEDCBA']
+
+
+@pytest.fixture
+async def tied_window(real_async_db_session: AsyncSession) -> Organization:
+    """One clear leader and eleven products tied behind it, in both rankings."""
+    db = real_async_db_session
+    org, location = await _organization(db)
+    leader = await _record(db, org, location, 'Leader')
+    rows: list[object] = [
+        _row(leader, 'USED', {'qty': 5.0}),
+        _row(leader, 'DISPOSED', {'qty': 5.0}),
+        _layer(leader, 'DISPOSED', '9.00'),
+    ]
+    first_id = uuid.uuid4().int & ~0xFF
+    for position, name in enumerate(_TIED):
+        item = await _record(
+            db, org, location, name, item_id=uuid.UUID(int=first_id + position)
+        )
+        rows += [
+            _row(item, 'USED', {'qty': 2.0}),
+            _row(item, 'DISPOSED', {'qty': 1.0}),
+            _layer(item, 'DISPOSED', '3.50'),
+        ]
+    db.add_all(rows)
+    await db.commit()
+    return org
+
+
+async def test_a_tie_at_the_tenth_place_is_settled_by_the_name(
+    real_async_db_session: AsyncSession, tied_window: Organization
+) -> None:
+    """Equal products are listed in the order of their names, both rankings.
+
+    The rows come out of a ``GROUP BY`` in no order of their own, and both
+    rankings sorted by the figure alone: which of eleven equal products made
+    the top ten was settled by the order the database happened to return
+    them in, and the same window could name a different tenth product on the
+    next reading.
+    """
+    stats = await get_consumption_stats_async(real_async_db_session, tied_window.id)
+
+    expected = ['Leader', *sorted(_TIED)[:9]]
+    assert [c.name for c in stats.most_consumed] == expected
+    assert [c.quantity for c in stats.most_consumed] == [5.0] + [2.0] * 9
+    assert [c.name for c in stats.most_wasted] == expected
+    assert [c.value for c in stats.most_wasted] == [9.0] + [3.5] * 9

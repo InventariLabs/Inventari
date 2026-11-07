@@ -338,6 +338,14 @@ const dist = join(root, "dist");
  * wording for the category field-definition change in the common language file
  * the first paint loads, and the reader that uses them, which sits in the
  * shared audit module. That one phone budget moves a step of five, to 600.
+ *
+ * Re-measured 2026-11-06 on the branch that pages the archived products by
+ * cursor: the same tree without the module SDK's new export measures the
+ * products screen at 609.9 KiB gz against its 610, and the export adds 0.3 KiB
+ * gz (products 610.2). It is the cursor paging hook the stock movement ledger
+ * and the audit log already use, which the Equipment archive now reaches
+ * through `@/module-sdk`; the SDK is one chunk, and the products screen loads
+ * it. That one phone budget moves a step of five, to 615.
  */
 const BUDGETS = {
   initial: 245,
