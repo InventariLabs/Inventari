@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/authStore";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
 import { toast } from "sonner";
+import { queryKeys } from "@/hooks/queries/keys";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -109,6 +110,35 @@ describe("useCompleteStockTakeFlow", () => {
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringContaining("2 products are still uncounted"),
     );
+  });
+
+  // A read that has just returned reaches the query cache before it reaches
+  // the screen. A press in between must judge the saved count, not the rows
+  // of the render before it.
+  it("judges the rows the cache holds, not the ones last drawn", async () => {
+    vi.mocked(toast.error).mockClear();
+    const drawn = [{ ...lines[0], counted_quantity: null }] as StockTakeItem[];
+    const client = new QueryClient({
+      defaultOptions: { mutations: { retry: false } },
+    });
+    client.setQueryData(queryKeys.stockTakes.detail("1"), { items: lines });
+    const { result } = renderHook(
+      () => useCompleteStockTakeFlow("1", drawn, confirm, 0, true),
+      {
+        wrapper: ({ children }: { children: React.ReactNode }) => (
+          <QueryClientProvider client={client}>
+            <BrowserRouter>{children}</BrowserRouter>
+          </QueryClientProvider>
+        ),
+      },
+    );
+
+    await act(async () => {
+      await result.current.handleComplete();
+    });
+
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(confirm).toHaveBeenCalledTimes(1);
   });
 
   it("counts products, not records, and says when numbers are only unsaved", async () => {

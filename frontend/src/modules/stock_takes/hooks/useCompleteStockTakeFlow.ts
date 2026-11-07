@@ -1,11 +1,16 @@
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import { useCompleteStockTake } from "@/modules/stock_takes/hooks/useStockTakes";
-import type { StockTakeItem } from "@/modules/stock_takes/types/stock-takes";
+import type {
+  StockTake,
+  StockTakeItem,
+} from "@/modules/stock_takes/types/stock-takes";
+import { queryKeys } from "@/hooks/queries/keys";
 import { extractApiError, extractApiErrorRows } from "@/lib/errors";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 
@@ -38,6 +43,7 @@ export function useCompleteStockTakeFlow(
   const navigate = useNavigate();
   const completeMutation = useCompleteStockTake(id);
   const completeMutate = completeMutation.mutate;
+  const queryClient = useQueryClient();
   // Accepting a difference the organization's own tolerance calls too large
   // — or a count far above the system stock — is not the counter's decision.
   // One key, `stock_takes:approve`, guards both refusals on the server. Asked
@@ -46,6 +52,17 @@ export function useCompleteStockTakeFlow(
   const mayAcceptOverrides = useHasPermission("stock_takes:approve");
 
   const handleComplete = useCallback(async () => {
+    // The rows as the cache holds them now, not as the last render drew them:
+    // a read that has just returned reaches the cache before it reaches the
+    // screen, and a press in between judged the count from before the save —
+    // "still uncounted" for a number that was saved a moment ago.
+    const rows =
+      (id
+        ? queryClient.getQueryData<StockTake>(queryKeys.stockTakes.detail(id))
+            ?.items
+        : undefined) ??
+      lines ??
+      [];
     // A unit counted away from where its record stands is moved there even
     // when the number agrees — the same rows the server's report counts.
     // The sentences name products, and one product can stand as several
@@ -56,7 +73,7 @@ export function useCompleteStockTakeFlow(
         rows.map((line) => `${line.item_name}\u0000${line.item_brand ?? ""}`),
       ).size;
     const adjustments = productsIn(
-      (lines ?? []).filter(
+      rows.filter(
         (line) =>
           line.counted_quantity != null &&
           (line.counted_quantity !== line.system_quantity ||
@@ -76,7 +93,7 @@ export function useCompleteStockTakeFlow(
     // still in its box is not a count yet, so the refusal carries the unsaved
     // sentence too: what is missing may be a Save, not a count.
     const uncounted = productsIn(
-      (lines ?? []).filter((line) => line.counted_quantity == null),
+      rows.filter((line) => line.counted_quantity == null),
     );
     if (requireFullCount && uncounted > 0) {
       toast.error(
@@ -117,7 +134,7 @@ export function useCompleteStockTakeFlow(
     // boxes. The rows come off the wire with the item id, so the symbol is
     // read from the lines already on screen rather than asked of the server.
     const lineOf = (itemId: unknown) =>
-      (lines ?? []).find((line) => line.item_id === itemId);
+      rows.find((line) => line.item_id === itemId);
     // The same formatter the card behind this dialog uses, with the unit's
     // own rounding: "2,15 kg" here and there. A decimal trimmer wrote the
     // database's point, so the card said 2,15 and this said 2.15.
@@ -219,6 +236,7 @@ export function useCompleteStockTakeFlow(
   }, [
     confirm,
     completeMutate,
+    queryClient,
     navigate,
     id,
     t,
