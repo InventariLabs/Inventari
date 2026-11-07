@@ -5,6 +5,8 @@ import { EyeOff, Package, Plus, SearchX, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { EmptyState, EmptyStateAction } from "@/components/ui/EmptyState";
 import { queryKeys } from "@/hooks/queries/keys";
+import { useDebounce } from "@/module-sdk";
+import { itemsApi } from "@/lib/api/items";
 import { productTemplatesApi } from "@/lib/api/productTemplates";
 
 interface ItemsEmptyStateProps {
@@ -17,6 +19,25 @@ interface ItemsEmptyStateProps {
   hiddenCount?: number;
   /** Whether to offer the first product — the form asks for `items:write`. */
   canWrite?: boolean;
+}
+
+/** How long typing must rest before the lookup runs — the list's own wait. */
+const SEARCH_SETTLE_MS = 400;
+
+/** Whether the template has any record: held, used up (at zero), or archived.
+ *  Archived rows carry no template id, so the archive is matched by name. */
+async function templateHasRecord(
+  templateId: string,
+  name: string,
+): Promise<boolean> {
+  const live = await itemsApi.getAll({
+    template_ids: templateId,
+    include_empty: true,
+    limit: 1,
+  });
+  if (live.items.length > 0) return true;
+  const archived = await itemsApi.getArchived({ search: name, limit: 50 });
+  return archived.items.some((i) => i.name === name);
 }
 
 /**
@@ -36,21 +57,22 @@ function SearchEmptyState({
   canWrite: boolean;
 }) {
   const { t } = useTranslation("items");
-  // The catalogue knowing a name does not mean the product has no stock: a
-  // stocked row can be missing from the list only because a location or chip
-  // narrowed it. So a match counts as "definition only" when the stock the
-  // backend sums for it is nothing. The endpoint refuses a one-letter search.
-  const lookupEnabled = searchTerm.length >= 2;
+  // The catalogue knowing a name does not mean the product has never been in
+  // a location: a stocked row can be missing from the list only because a
+  // location or chip narrowed it, and a used-up or archived record sits on
+  // its own tab. So a match counts as "definition only" when it has no record
+  // at all. The endpoint refuses a one-letter search, and the lookup follows
+  // the settled term — the one the list waits for — not every key.
+  const lookupTerm = useDebounce(searchTerm, SEARCH_SETTLE_MS);
+  const lookupEnabled = lookupTerm.length >= 2;
   const { data: definedMatch, isPending } = useQuery({
-    queryKey: queryKeys.productTemplates.search(searchTerm),
+    queryKey: queryKeys.productTemplates.search(lookupTerm),
     queryFn: async () => {
-      const matches = await productTemplatesApi.search(searchTerm, 5);
-      const stocks = await Promise.all(
-        matches.map((m) => productTemplatesApi.getStock(m.id)),
+      const matches = await productTemplatesApi.search(lookupTerm, 5);
+      const hasRecord = await Promise.all(
+        matches.map((m) => templateHasRecord(m.id, m.name)),
       );
-      return (
-        matches.find((_, i) => Number(stocks[i].total_quantity) === 0) ?? null
-      );
+      return matches.find((_, i) => !hasRecord[i]) ?? null;
     },
     staleTime: 30_000,
     enabled: lookupEnabled,
@@ -58,7 +80,7 @@ function SearchEmptyState({
 
   // Until the lookup answers, "no results" would be the wrong answer shown
   // first.
-  if (lookupEnabled && isPending) return null;
+  if (lookupTerm !== searchTerm || (lookupEnabled && isPending)) return null;
 
   if (definedMatch) {
     return (
