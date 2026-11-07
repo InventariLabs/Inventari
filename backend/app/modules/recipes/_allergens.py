@@ -57,6 +57,7 @@ _ALLERGEN_NAME_MAP: dict[str, set[str]] = {
     'zyto': {'gluten'},
     'rye': {'gluten'},
     'owies': {'gluten'},
+    'owsian': {'gluten'},
     'oats': {'gluten'},
     'kuskus': {'gluten'},
     'couscous': {'gluten'},
@@ -205,8 +206,18 @@ _WS_RE = re.compile(r'\s+')
 # nothing when a further noun follows ("almond milk chocolate", "pea cream
 # soup") - a missed milk is the unsafe error, a false one the safe error.
 _PLANT_MILK_EN_RE = re.compile(
-    r'\b(?:(coconut|almond|soy|soya|oats?|rice|cashew|hazelnut|hemp|pea|plant)[ -]milk'
-    r'|(coconut|soy|soya|oats?|cashew|plant)[ -]cream)\b(?!\s+[a-z])'
+    r'\b(?:(coconut|almond|soy|soya|oats?|rice|cashew|hazelnut|hemp|pea|plant'
+    r'|walnut|pistachio|macadamia|peanut)[ -]milk'
+    r'|(coconut|soy|soya|oats?|cashew|plant)[ -]cream'
+    r'|cream of (coconut))\b(?!\s+[a-z])'
+)
+# Butter that is no dairy: the nut or fat it is made of stays, the dairy word
+# goes. "Masło orzechowe" is peanut butter, so it becomes the peanut keyword.
+_NON_DAIRY_BUTTER_EN_RE = re.compile(
+    r'\b(peanut|almond|cashew|hazelnut|cocoa|cacao|shea|nut) butter\b(?!\s+[a-z])'
+)
+_NON_DAIRY_BUTTER_PL_RE = re.compile(
+    r'\bmaslo (orzechowe|kakaowe|shea|migdalowe|z orzechow ziemnych)\b(?!\s+[a-z])'
 )
 _PL_MILK_PLANT = (
     r'(kokosow\w*|sojow\w*|migdalow\w*|owsian\w*|ryzow\w*|orzechow\w*|roslinn\w*)'
@@ -226,12 +237,17 @@ def normalize_name(name: str) -> str:
 
 
 def _without_plant_milk(normalized: str) -> str:
-    """Drop the dairy word from a plant milk, keeping its plant."""
+    """Drop the dairy word from a plant milk or a nut butter, keeping its plant."""
 
     def plant(m: re.Match[str]) -> str:
         word = next(g for g in m.groups() if g)
         return 'oats' if word.startswith('oat') else word
 
+    def butter_pl(m: re.Match[str]) -> str:
+        return 'orzeszki ziemne' if m.group(1).startswith('orzech') else m.group(1)
+
+    normalized = _NON_DAIRY_BUTTER_EN_RE.sub(lambda m: m.group(1), normalized)
+    normalized = _NON_DAIRY_BUTTER_PL_RE.sub(butter_pl, normalized)
     return _PLANT_MILK_PL_RE.sub(plant, _PLANT_MILK_EN_RE.sub(plant, normalized))
 
 
