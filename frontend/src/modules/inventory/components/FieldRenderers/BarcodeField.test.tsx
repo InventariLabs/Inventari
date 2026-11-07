@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -76,32 +77,64 @@ describe("BarcodeField", () => {
     expect(onChange).toHaveBeenCalledWith("5901234123457");
   });
 
-  it("says what a generated code is beside the button and with the code", () => {
-    const { unmount } = render(
-      <QueryClientProvider client={new QueryClient()}>
-        <BarcodeField field={barcodeField} value="" onChange={vi.fn()} />
-      </QueryClientProvider>,
-    );
-    expect(
-      screen.getByRole("button", { name: "Generate code" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/valid only inside the organization/),
-    ).toBeVisible();
-    unmount();
+  // The hint stood as a plain paragraph: a screen reader on the field never
+  // heard it, so it is now the input's description.
+  it("describes, under an empty field, the code the button gives", () => {
+    renderField("");
 
-    renderField("2000000000015");
     expect(
-      screen.getByText(/valid only inside the organization/),
-    ).toBeVisible();
+      screen.getByRole("textbox", { name: "Product code" }),
+    ).toHaveAccessibleDescription(
+      /^“Generate code” gives an in-house code starting with 20/,
+    );
+  });
+
+  // A 13-digit code starting with 20 may be another company's in-store code
+  // typed by hand; the form cannot tell, so the sentence holds for both.
+  it("describes a code in the in-house range without claiming who made it", () => {
+    renderField("2000000000015");
+
+    const input = screen.getByRole("textbox", { name: "Product code" });
+    expect(input).toHaveAccessibleDescription(
+      /valid only inside the business that assigned it/,
+    );
+    expect(input).not.toHaveAccessibleDescription(/organization/);
   });
 
   it("keeps the hint off a manufacturer's code", () => {
     renderField("5901234123457");
 
+    expect(screen.queryByText(/GS1/)).not.toBeInTheDocument();
     expect(
-      screen.queryByText(/valid only inside the organization/),
-    ).not.toBeInTheDocument();
+      screen.getByRole("textbox", { name: "Product code" }),
+    ).not.toHaveAccessibleDescription();
+  });
+
+  // The hint went on the first keystroke of a typed code, and everything
+  // below the field moved up by its height. Its place stays, empty and out
+  // of the accessibility tree, for as long as the form is open.
+  it("keeps the hint's place when the first character of a code is typed", () => {
+    function Controlled() {
+      const [code, setCode] = useState("");
+      return (
+        <BarcodeField
+          field={barcodeField}
+          value={code}
+          onChange={(v) => setCode(String(v ?? ""))}
+        />
+      );
+    }
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <Controlled />
+      </QueryClientProvider>,
+    );
+    const input = screen.getByRole("textbox", { name: "Product code" });
+
+    fireEvent.change(input, { target: { value: "5" } });
+
+    expect(screen.getByText(/gives an in-house code/)).toHaveClass("invisible");
+    expect(input).not.toHaveAccessibleDescription();
   });
 
   it("offers nothing to replace a code the product already has", () => {

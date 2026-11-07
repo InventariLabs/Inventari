@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/Input";
@@ -79,6 +80,9 @@ export function WeightField({
   // symbol the reader has to guess which, and half the time guesses wrong.
   const weightUom = findUom(uomCategories, weightUomId);
   const weightUomSymbol = unitLabel(t, weightUom?.symbol);
+  // What to enter and what it adds up to describe the input itself.
+  const hintId = useId();
+  const totalId = useId();
 
   return (
     <div>
@@ -93,6 +97,7 @@ export function WeightField({
             // Named from the same source as the visible label the parent
             // renders (`getLabel`), not left to the id/htmlFor pairing alone.
             aria-label={getLabel(field, tDyn)}
+            aria-describedby={showTotal ? `${hintId} ${totalId}` : hintId}
             onChange={(e) => {
               const raw = e.target.value;
               onChange(raw === "" ? null : raw.replace(",", "."));
@@ -111,13 +116,16 @@ export function WeightField({
         </div>
       </div>
 
-      <p className="text-xs text-on-muted mt-1.5 flex items-center gap-1.5 font-medium">
+      <p
+        id={hintId}
+        className="text-xs text-on-muted mt-1.5 flex items-center gap-1.5 font-medium"
+      >
         <Info size={12} className="text-primary-400" />
         {t("items:weightPerPieceHint")}
       </p>
 
       {showTotal && (
-        <p className="text-xs text-on-muted mt-0.5 font-medium">
+        <p id={totalId} className="text-xs text-on-muted mt-0.5 font-medium">
           {/* The product is a number the formatter reads directly; the unit's
               own step decides how many decimals it keeps — and with no unit
               picked, the quantity columns' scale does, rather than the
