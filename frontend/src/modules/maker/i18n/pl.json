@@ -73,7 +73,7 @@
   },
   "create": {
     "title": "Zapisz produkcję",
-    "subtitle": "Zapisz to, co już zrobiłeś, albo zaplanuj produkcję. Co zejdzie ze stanu, czego brakuje i ile to kosztuje, widać obok formularza przed zapisem.",
+    "subtitle": "Zapisz to, co już zrobione, albo zaplanuj produkcję. Co zejdzie ze stanu, czego brakuje i ile to kosztuje, widać obok formularza przed zapisem.",
     "productLabel": "Produkt wyjściowy",
     "searchPlaceholder": "Szukaj po nazwie, SKU lub kodzie kreskowym…",
     "change": "Zmień",
@@ -100,7 +100,7 @@
     "hasBom": "Ma recepturę",
     "mode": {
       "label": "Co zapisujesz?",
-      "made": "Już zrobiłem",
+      "made": "Już zrobione",
       "planned": "Planuję zrobić"
     },
     "qtyLabelMade": "Ile wyszło?",

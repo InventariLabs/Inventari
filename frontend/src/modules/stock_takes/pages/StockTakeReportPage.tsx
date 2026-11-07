@@ -2,7 +2,7 @@ import { csvCell, downloadCsv } from "@/lib/csv";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { toAmount } from "@/utils/formatters";
+import { formatDateTime, toAmount } from "@/utils/formatters";
 import { Download } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
@@ -110,7 +110,7 @@ export default function StockTakeReportPage() {
     // its unit and the table carries the count's day, storage and starter —
     // the same facts the movements export attaches to each of its rows.
     const localMoment = (iso: string | null | undefined) =>
-      iso ? new Date(iso).toLocaleString() : "";
+      iso ? formatDateTime(iso) : "";
     const headers = [
       t("report.name"),
       t("item.expected"),

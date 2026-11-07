@@ -266,7 +266,7 @@
     "withdrawRequest": "Wycofaj wniosek",
     "approvers": "Osoby zatwierdzające",
     "anyApprover": "Każda uprawniona osoba może zatwierdzić ten etap",
-    "ownRequestCannotApprove": "Złożyłeś ten wniosek, więc musi go zatwierdzić ktoś inny.",
+    "ownRequestCannotApprove": "Ten wniosek pochodzi od Ciebie, więc musi go zatwierdzić ktoś inny.",
     "awaitingApprover": "Czeka na decyzję osoby zatwierdzającej.",
     "deadEndTitle": "Tego wniosku nikt nie może rozstrzygnąć",
     "unknownApprover": "Nieznany użytkownik",
