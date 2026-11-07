@@ -18,15 +18,25 @@ interface UseDocumentExecutionOptions {
   t: TFunction;
 }
 
+/**
+ * How much of a line is done, as the field shows it. Every reader of the
+ * screen asks here: a line nobody has typed into yet has done nothing, which
+ * is also what the server reports for an untouched line (`done_quantity` is
+ * required in the contract), so "no entry" and "zero" are one answer.
+ */
+export function typedDoneQuantity(
+  values: Record<string, string>,
+  lineId: string,
+): string {
+  return values[lineId] ?? "0";
+}
+
 function buildInitialDoneValues(
   document: WarehouseDocument,
-  scanMode = false,
 ): Record<string, string> {
   return Object.fromEntries(
     document.lines.map((line) => {
-      const expectedQuantity = line.expected_quantity ?? line.quantity;
-      const initialValue =
-        line.done_quantity ?? (scanMode ? 0 : expectedQuantity);
+      const initialValue = line.done_quantity;
       // The wire carries a column's own scale, not a number anybody typed:
       // ten pieces arrive as "10.000". Handed to the field as it came, the
       // digits read as ten thousand to one reader and as a piece count with
@@ -159,7 +169,7 @@ function countLineStatuses(
   codes: Record<string, DocumentDiscrepancyCode | "">,
 ) {
   const doneOf = (lineId: string) => {
-    const parsed = Number(values[lineId] ?? "0");
+    const parsed = Number(typedDoneQuantity(values, lineId));
     return Number.isFinite(parsed) ? parsed : 0;
   };
   return document.lines.reduce(
@@ -389,7 +399,7 @@ export function useDocumentExecution({
     setScanMode((prev) => {
       const next = !prev;
       setCameraOpen(false);
-      setValues(buildInitialDoneValues(document, next));
+      setValues(buildInitialDoneValues(document));
       setScanValue("");
       setLastScannedLineId(null);
       setScannedLineId(null);
