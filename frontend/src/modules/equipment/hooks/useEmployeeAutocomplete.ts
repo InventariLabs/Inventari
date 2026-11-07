@@ -7,11 +7,13 @@ interface UseEmployeeAutocompleteParams {
   enabled: boolean;
 }
 
-export function useEmployeeAutocomplete({
-  search,
-  enabled,
-}: UseEmployeeAutocompleteParams) {
-  return useQuery({
+/**
+ * The employee book searched for `search`, as a query: the hook below mounts
+ * it, and the checkout's address check fetches the same entry when the save
+ * cannot wait for the typing to settle.
+ */
+export function employeeSearchQuery(search: string) {
+  return {
     queryKey: queryKeys.partners.employees(search),
     queryFn: () =>
       partnersApi.list({
@@ -20,7 +22,13 @@ export function useEmployeeAutocomplete({
         limit: 20,
         is_active: true,
       }),
-    enabled,
     staleTime: 30_000,
-  });
+  };
+}
+
+export function useEmployeeAutocomplete({
+  search,
+  enabled,
+}: UseEmployeeAutocompleteParams) {
+  return useQuery({ ...employeeSearchQuery(search), enabled });
 }

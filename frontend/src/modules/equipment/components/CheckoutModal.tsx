@@ -294,7 +294,10 @@ export function CheckoutModal({
   // dialog and is gone in seconds, leaving filled fields and an active button.
   const [refusal, setRefusal] = useState<string | null>(null);
   const asking = purpose === "request";
-  const pending = checkoutMutation.isPending || requestMutation.isPending;
+  // The address check a save waits for, so a second Enter cannot save twice.
+  const [verifying, setVerifying] = useState(false);
+  const pending =
+    checkoutMutation.isPending || requestMutation.isPending || verifying;
   const { isModuleEnabled } = useModules();
   const partnersEnabled = isModuleEnabled("partners");
   // The day travels as an instant inside the organization's day, because
@@ -330,7 +333,7 @@ export function CheckoutModal({
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const addressUnmatched = useAddressMatchesDirectory({
+  const address = useAddressMatchesDirectory({
     email: form.assigned_to_email.trim(),
     enabled: mode === "person" && !selectedPerson,
     partnersEnabled,
@@ -353,7 +356,7 @@ export function CheckoutModal({
     set("expected_return_at", value);
   };
 
-  const send = (as: CheckoutPurpose) => {
+  const send = async (as: CheckoutPurpose) => {
     setRefusal(null);
     if (mode === "person" && !form.assigned_to_name.trim()) {
       toast.error(t("assignments.checkout_modal.error_person_required"));
@@ -388,6 +391,14 @@ export function CheckoutModal({
       );
       return;
     }
+    // The warning is named before the save, not after it: an address pasted
+    // and submitted inside the highlighting's settle window used to be stored
+    // with no warning ever shown. This submit then only raises it; the next
+    // one saves.
+    setVerifying(true);
+    const hold = await address.holdForWarning();
+    setVerifying(false);
+    if (hold) return;
     checkoutMutation.mutate(body, {
       onSuccess: (assignment) => {
         onDone?.(assignment);
@@ -408,7 +419,7 @@ export function CheckoutModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    send(purpose);
+    void send(purpose);
   };
 
   // Radix Dialog handles ESC, focus trap, scroll lock, and the
@@ -535,11 +546,11 @@ export function CheckoutModal({
                     "name@example.com",
                   )}
                   aria-describedby={emailMessageId}
-                  aria-invalid={addressUnmatched || undefined}
+                  aria-invalid={address.unmatched || undefined}
                 />
                 <EmailNotice
                   id={emailMessageId}
-                  unmatched={addressUnmatched}
+                  unmatched={address.unmatched}
                   empty={!form.assigned_to_email.trim()}
                 />
               </div>
@@ -590,7 +601,7 @@ export function CheckoutModal({
           pending={pending}
           approvalNeeded={approvalNeeded}
           refusal={refusal}
-          onRequestApproval={() => send("request")}
+          onRequestApproval={() => void send("request")}
           incomplete={
             (mode === "person" && !form.assigned_to_name.trim()) ||
             (mode === "location" && !form.checkout_location_id)
