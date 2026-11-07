@@ -20,12 +20,23 @@ import { formatDate } from "@/utils/formatters";
 // The sheet's module slots load lazily. Left to finish on their own they land
 // inside whichever test happens to be running, and the console gate fails that
 // one with "a suspended resource finished loading inside a test" — so which
-// test failed depended on how many synchronous tests ran ahead of it. Settling
-// the imports here, inside act, makes the order irrelevant.
+// test failed depended on how many synchronous tests ran ahead of it. The
+// import only starts when a sheet first renders, so render one here, inside
+// act, and wait for it: the slots are resolved before the first test runs and
+// the order stops mattering.
 beforeAll(async () => {
+  signInWith(["items:read", "items:write"]);
   await act(async () => {
+    const { unmount } = render(
+      <QuickActionSheet
+        item={{ id: "warm-up", name: "Warm-up", quantity: "1" } as Item}
+        onClose={() => {}}
+      />,
+    );
     await vi.dynamicImportSettled();
+    unmount();
   });
+  signOut();
 });
 
 // Every action in the sheet changes the record, so the sheet is empty for an
