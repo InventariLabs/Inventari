@@ -50,6 +50,7 @@ const result: ShoppingListGenerationResult = {
   on_other_lists: [],
   items: [
     {
+      key: "flour:g",
       name: "Flour",
       quantity: "500",
       uom_symbol: "g",
@@ -58,6 +59,7 @@ const result: ShoppingListGenerationResult = {
       matched_approximately: false,
     },
     {
+      key: "coconut:ml",
       name: "Coconut milk",
       quantity: "200",
       uom_symbol: "ml",
@@ -134,6 +136,7 @@ describe("ShoppingListPreview", () => {
         ...result,
         items: [
           {
+            key: "flour:g",
             name: "Flour",
             quantity: "500",
             uom_symbol: "g",
@@ -142,6 +145,7 @@ describe("ShoppingListPreview", () => {
             matched_approximately: false,
           },
           {
+            key: "flour:pcs",
             name: "Flour",
             quantity: "2",
             uom_symbol: "pcs",
@@ -157,6 +161,31 @@ describe("ShoppingListPreview", () => {
     expect(screen.getByText(/Flour \(2 pcs\.\)/)).toBeInTheDocument();
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
+  });
+
+  it("keeps each chip on its own line when the lines come back in another order", () => {
+    // A chip is a node React reuses by key. Keyed by position, the node that
+    // stood for "Flour" would be handed to whatever line now sits first.
+    const { rerender } = renderPreview({ generationResult: result });
+    const flour = screen.getByText(/Flour \(500 g\)/);
+
+    rerender(
+      <MemoryRouter>
+        <ShoppingListPreview
+          planId="p1"
+          hasMeals
+          isGenerating={false}
+          onGenerate={vi.fn()}
+          t={t}
+          generationResult={{
+            ...result,
+            items: [...result.items].reverse(),
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(/Flour \(500 g\)/)).toBe(flour);
   });
 
   it("takes a returning visitor to the existing list in one click", () => {
