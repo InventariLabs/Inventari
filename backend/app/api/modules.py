@@ -201,7 +201,13 @@ def get_available_modules_list():
     return modules
 
 
-@router.get('/available', response_model=PaginatedResponse[ModuleInfo])
+@router.get(
+    '/available',
+    response_model=PaginatedResponse[ModuleInfo],
+    # The docstring carries a note for maintainers; the API reference keeps
+    # the one sentence a client needs.
+    description='List modules available for the current organization based on entitlements.',
+)
 async def get_available_modules(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
