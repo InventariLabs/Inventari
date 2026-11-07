@@ -543,10 +543,11 @@ export class ApiHelper {
   }
 
   /**
-   * Switches every optional module on, maker included. Only globalSetup and
-   * specs of the `chromium` project, or of a project that depends on
-   * `module-gate`, may call it: `mobile` and `pl-PL` can run while
-   * `module-gate` has maker switched off, and this would undo that.
+   * Switches every optional module on, maker included. A project that can
+   * share a phase with `module-gate` must not call it: this would undo the
+   * switch-off its assertions rely on. Today none does: `chromium`, `mobile`
+   * and `pl-PL` finish in an earlier phase, and every other project that
+   * touches the module list depends on `module-gate` or on `chromium`.
    */
   async enableAllModules(token: string): Promise<void> {
     // stats, printing and announcements are always on: a toggle for them is
