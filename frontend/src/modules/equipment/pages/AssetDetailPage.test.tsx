@@ -105,14 +105,14 @@ function PageHeaderHost({ children }: { children: React.ReactNode }) {
   );
 }
 
-function renderDetail() {
+function renderDetail(id: string = ITEM_ID) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   return render(
     <QueryClientProvider client={queryClient}>
       <ModulesProvider>
-        <MemoryRouter initialEntries={[`/equipment/${ITEM_ID}`]}>
+        <MemoryRouter initialEntries={[`/equipment/${id}`]}>
           <PageHeaderHost>
             <Routes>
               <Route path="/equipment" element={<p>the asset list</p>} />
@@ -544,5 +544,28 @@ describe("AssetDetailPage — an archived card", () => {
     expect(
       screen.queryByRole("button", { name: "Upload" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("asks for approval status and assignments only of an asset it found", async () => {
+    // `/equipment/models` is no asset: the item read refuses the id, and the
+    // two reads that take the same id would only add validation errors.
+    const asked: string[] = [];
+    server.use(
+      http.get("/api/v1/items/models", () =>
+        HttpResponse.json({ detail: "not found" }, { status: 404 }),
+      ),
+      http.get("/api/v1/equipment/models/approval-status", () => {
+        asked.push("approval-status");
+        return HttpResponse.json({ detail: "bad id" }, { status: 422 });
+      }),
+      http.get("/api/v1/equipment/assignments/item/models", () => {
+        asked.push("assignments");
+        return HttpResponse.json({ detail: "bad id" }, { status: 422 });
+      }),
+    );
+    renderDetail("models");
+
+    expect(await screen.findByText("Asset not found")).toBeInTheDocument();
+    expect(asked).toEqual([]);
   });
 });
