@@ -417,6 +417,25 @@ describe("RegisterPage", () => {
     act(() => useAuthStore.setState({ user: null, isAuthenticated: false }));
   });
 
+  it("says a session is live on the plain request-access page too", async () => {
+    useAuthStore.setState({
+      user: { email: "tomas@example.com" } as AuthState["user"],
+      isAuthenticated: true,
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register"]}>
+          <RegisterPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    expect(await screen.findByTestId("signed-in-notice")).toHaveTextContent(
+      /signed in as tomas@example\.com/,
+    );
+    act(() => useAuthStore.setState({ user: null, isAuthenticated: false }));
+  });
+
   it("shows no session notice when nobody is signed in", async () => {
     server.use(
       http.get("/api/v1/auth/registration-link/tok1", () =>

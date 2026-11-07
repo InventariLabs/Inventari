@@ -856,6 +856,8 @@
       "subtitle": "Delivery failures",
       "none": "Nothing was lost",
       "noneHint": "Every message this organization sent has left the building.",
+      "noneUnsent": "Nothing has been sent",
+      "noneUnsentHint": "No mail server is configured, so no message leaves this installation — and none can fail. Set one up above.",
       "attempts": "{{n}} of {{max}} attempts",
       "reason": "Reason: {{reason}}",
       "reasons": {

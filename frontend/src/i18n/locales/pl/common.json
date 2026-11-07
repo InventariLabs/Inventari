@@ -858,6 +858,8 @@
       "subtitle": "Nieudane wysyłki",
       "none": "Nic nie przepadło",
       "noneHint": "Każda wiadomość tej organizacji opuściła serwer.",
+      "noneUnsent": "Nic nie zostało wysłane",
+      "noneUnsentHint": "Serwer poczty nie jest skonfigurowany, więc żadna wiadomość nie opuszcza tej instalacji — i żadna nie może zawieść. Skonfiguruj go powyżej.",
       "attempts": "{{n}} z {{max}} prób",
       "reason": "Powód: {{reason}}",
       "reasons": {

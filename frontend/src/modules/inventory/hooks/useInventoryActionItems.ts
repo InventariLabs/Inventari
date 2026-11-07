@@ -1,4 +1,4 @@
-import { ClipboardList } from "lucide-react";
+import { AlertTriangle, ClipboardList } from "lucide-react";
 import { api } from "@/module-sdk";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useModuleQuery } from "@/hooks/queries/useModuleQuery";
@@ -29,9 +29,21 @@ export function useInventoryActionItems(): ActionItem[] {
     retry: 1,
   });
 
-  // A launcher tile is a nudge, not a statement: when the stock-takes request
-  // fails there is no tile, and no tile claims nothing is in progress.
-  const count = isError ? 0 : (data?.total ?? 0);
+  // A failed read is not "nothing in progress": with no card at all the
+  // launcher would say exactly that. Say the count could not be taken,
+  // pointing at the list that shows the failure in full.
+  if (isError) {
+    return [
+      {
+        id: "inventory-stock-takes-unavailable",
+        labelKey: "inventory:actions.stockTakesUnavailable",
+        icon: AlertTriangle,
+        severity: "error",
+        linkTo: "/inventory/stock-takes",
+      },
+    ];
+  }
+  const count = data?.total ?? 0;
   if (count === 0) return [];
 
   return [

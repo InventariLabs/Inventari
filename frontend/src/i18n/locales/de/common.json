@@ -856,6 +856,8 @@
       "subtitle": "Zustellfehler",
       "none": "Nichts ist verloren gegangen",
       "noneHint": "Jede Nachricht dieser Organisation hat den Server verlassen.",
+      "noneUnsent": "Es wurde nichts versendet",
+      "noneUnsentHint": "Es ist kein Mailserver eingerichtet, daher verlässt keine Nachricht diese Installation – und keine kann scheitern. Richten Sie oben einen ein.",
       "attempts": "{{n}} von {{max}} Versuchen",
       "reason": "Grund: {{reason}}",
       "reasons": {

@@ -848,6 +848,8 @@
       "subtitle": "Falhas de entrega",
       "none": "Nada se perdeu",
       "noneHint": "Todas as mensagens enviadas por esta organização saíram.",
+      "noneUnsent": "Nada foi enviado",
+      "noneUnsentHint": "Nenhum servidor de e-mail está configurado, por isso nenhuma mensagem sai desta instalação — e nenhuma pode falhar. Configure um acima.",
       "attempts": "{{n}} de {{max}} tentativas",
       "reason": "Motivo: {{reason}}",
       "reasons": {

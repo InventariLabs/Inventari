@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "./AuthLayout";
+import { SignedInNotice } from "./SignedInNotice";
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation("auth");
@@ -51,6 +52,8 @@ export default function ForgotPasswordPage() {
           <ArrowLeft size={14} />
           {t("reset.backToLogin", { defaultValue: "Back to login" })}
         </Link>
+
+        <SignedInNotice />
 
         {submitted ? (
           // An installation with no SMTP sends nothing, and telling the reader
