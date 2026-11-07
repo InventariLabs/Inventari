@@ -26,6 +26,8 @@ interface Props {
   focusLineKey: string | null;
   /** Rows of an order line whose delivered rows together fall short. */
   shortKeys: Set<string>;
+  /** Rows the server refused for want of an expiry date. */
+  undatedKeys: Set<string>;
   scanRef: RefObject<HTMLInputElement>;
   onSelectProduct: (product: ProductSearchResult) => void;
   onFocusHandled: () => void;
@@ -48,6 +50,7 @@ export function ReceiveLinesCard({
   canWrite,
   focusLineKey,
   shortKeys,
+  undatedKeys,
   scanRef,
   onSelectProduct,
   onFocusHandled,
@@ -148,6 +151,7 @@ export function ReceiveLinesCard({
                   canWrite={canWrite}
                   focusLineKey={focusLineKey}
                   shortLine={shortKeys.has(line.key)}
+                  needsExpiry={undatedKeys.has(line.key)}
                   onFocusHandled={onFocusHandled}
                   onUpdate={onUpdate}
                   onRemove={onRemove}

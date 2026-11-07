@@ -69,6 +69,7 @@ import {
   RECEIVE_SOURCE_TYPE,
   shortDelivery,
   toDocumentCreate,
+  undatedRows,
   withImportedLines,
   withOrderLines,
   withScannedProduct,
@@ -86,7 +87,11 @@ import type {
 } from "@/modules/warehouse/types";
 import { formatQuantityLocale } from "@/utils/formatters";
 import { unitLabel } from "@/lib/i18nHelpers";
-import { extractApiError, extractApiErrorCode } from "@/lib/errors";
+import {
+  extractApiError,
+  extractApiErrorCode,
+  extractApiErrorRows,
+} from "@/lib/errors";
 
 // Pasting rows is a desk task, opened on request: its own chunk keeps the
 // import dialog (file upload, column mapping, preview) off the screen a
@@ -743,6 +748,8 @@ function useSheetPresses(args: {
   holdsGoods: boolean;
   onPosted: (receipt: PostedReceipt) => void;
   onPostError: (message: string, code?: string | null) => void;
+  /** Take the refusal if it is the question about undated rows; false if not. */
+  onUndated: (error: unknown) => boolean;
 }) {
   const {
     canWrite,
@@ -765,6 +772,7 @@ function useSheetPresses(args: {
     holdsGoods,
     onPosted,
     onPostError,
+    onUndated,
   } = args;
   // The draft's own key, apart from the post's: the server answers a key it
   // has seen with the document it made under it.
@@ -794,6 +802,7 @@ function useSheetPresses(args: {
           askSurplus(extractApiError(error, ""), () => post(true));
           return;
         }
+        if (onUndated(error)) return;
         onPostError(
           extractApiError(error, t("receive.errors.postFailed")),
           extractApiErrorCode(error),
@@ -809,6 +818,7 @@ function useSheetPresses(args: {
       clearRefusals,
       onPostError,
       onPosted,
+      onUndated,
       order,
       payload,
       press,
@@ -981,6 +991,40 @@ function usePostError(partnerId: string, t: TFunction) {
   return { postError, setPostError, postErrorFix };
 }
 
+/**
+ * The rows the server refused for want of an expiry date. A receipt of a
+ * product taken by earliest expiry may not arrive undated: the refusal names
+ * the rows, and the sheet opens their date fields and says which need one.
+ */
+function useUndatedRows(
+  lines: ReceiveDraftLine[],
+  setPostError: (message: string | null) => void,
+  t: TFunction,
+) {
+  const [undatedKeys, setUndatedKeys] = useState<Set<string>>(new Set());
+  const clearUndated = useCallback(() => setUndatedKeys(new Set()), []);
+  const onUndated = useCallback(
+    (error: unknown) => {
+      if (extractApiErrorCode(error) !== "RECEIPT_EXPIRY_REQUIRED")
+        return false;
+      const rows = undatedRows(extractApiErrorRows(error, "lines"), lines);
+      if (rows.length === 0) return false;
+      setUndatedKeys(new Set(rows.map((row) => row.key)));
+      setPostError(
+        t("receive.errors.needsExpiry", {
+          products: rows.map((row) => row.name).join(", "),
+        }),
+      );
+      return true;
+    },
+    [lines, setPostError, t],
+  );
+  return useMemo(
+    () => ({ keys: undatedKeys, clear: clearUndated, onUndated }),
+    [undatedKeys, clearUndated, onUndated],
+  );
+}
+
 /** The order the reader chose, or the first one the supplier has open. */
 function chosenOf<T extends { id: string }>(orders: T[], id: string | null) {
   return orders.find((order) => order.id === id) ?? orders[0] ?? null;
@@ -1021,6 +1065,7 @@ export default function ReceiveGoodsPage() {
   const [focusLineKey, setFocusLineKey] = useState<string | null>(null);
   const [problem, setProblem] = useState<ProblemKey | null>(null);
   const { postError, setPostError, postErrorFix } = usePostError(partnerId, t);
+  const undated = useUndatedRows(lines, setPostError, t);
   const [importOpen, setImportOpen] = useState(false);
   const [result, setResult] = useState<PostedReceipt | null>(null);
   // What the last paste could not put on the sheet. Kept until the next
@@ -1124,7 +1169,8 @@ export default function ReceiveGoodsPage() {
   const clearRefusals = useCallback(() => {
     setPostError(null);
     setProblem(null);
-  }, [setPostError]);
+    undated.clear();
+  }, [setPostError, undated]);
 
   const showProblem = useCallback((refusal: Refusal) => {
     setProblem(refusal.problem);
@@ -1179,6 +1225,7 @@ export default function ReceiveGoodsPage() {
     holdsGoods: lines.some(isHeld),
     onPosted: setResult,
     onPostError: setPostError,
+    onUndated: undated.onUndated,
   });
 
   const { quantityEnter, addProduct, goods } = useLineEntry({
@@ -1285,6 +1332,7 @@ export default function ReceiveGoodsPage() {
             canWrite={canWrite}
             focusLineKey={focusLineKey}
             shortKeys={short.rowKeys}
+            undatedKeys={undated.keys}
             scanRef={scanRef}
             onSelectProduct={addProduct}
             onFocusHandled={() => setFocusLineKey(null)}
