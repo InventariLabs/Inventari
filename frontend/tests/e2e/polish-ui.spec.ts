@@ -35,9 +35,8 @@ test.describe("Polish UI on a phone", () => {
     token = authData.access_token;
 
     // The shopping-lists module is enabled by globalSetup. This spec runs in
-    // the `pl-PL` project, which may overlap `module-gate`, so it must not
-    // call `enableAllModules` itself: that would switch maker back on in the
-    // middle of that project's assertions.
+    // the `pl-PL` project, which finishes before `module-gate` starts, so
+    // nothing here races that project's assertions.
 
     const list = await api.createShoppingList(token, { name: listName });
     listId = list.id;

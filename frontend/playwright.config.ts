@@ -143,8 +143,11 @@ export default defineConfig({
       // inside `chromium`, and two maker-result tests failed in every full run
       // while passing alone. After `chromium` and before `org-profile`, so the
       // two rewrites of the module list never overlap either. `mobile` and
-      // `pl-PL` may run alongside: none of their specs opens a maker screen or
-      // calls `enableAllModules`. `approvals` waits for this project.
+      // `pl-PL` have no dependencies, so they run in the first phase, and
+      // Playwright finishes a phase before it starts the next: they are done
+      // before this project starts and can call `enableAllModules` freely (the
+      // phone's `phone-first-record-responsive` does). `approvals` waits for
+      // this project.
       name: "module-gate",
       use: { ...devices["Desktop Chrome"] },
       testMatch: /maker-module-gate\.spec\.ts/,
