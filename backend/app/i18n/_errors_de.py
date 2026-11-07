@@ -133,6 +133,7 @@ ERRORS_DE: ErrorMessages = {
     'role_name_taken': 'Eine Rolle mit dem Namen "{name}" existiert in dieser Organisation bereits.',
     'invitation_not_found': 'Einladung nicht gefunden',
     'organization_invite_invalid': 'Diese Einladung kann nicht verwendet werden. Prüfen Sie, ob Sie sich mit der E-Mail-Adresse registrieren, an die sie gesendet wurde, oder fordern Sie eine neue an.',
+    'organization_invite_link_dead': 'Dieser Einladungslink funktioniert nicht mehr. Bitten Sie die Person, die ihn gesendet hat, um einen neuen.',
     'organization_invite_expired': 'Organisationseinladung ist abgelaufen',
     'email_test_failed': 'Test-E-Mail konnte nicht gesendet werden',
     'module_org_required': 'Um Module zu verwalten, müssen Sie zu einer Organisation gehören. Melden Sie sich erneut an oder wenden Sie sich an den Support.',

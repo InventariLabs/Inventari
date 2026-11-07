@@ -131,6 +131,7 @@ ERRORS_ES: ErrorMessages = {
     'role_name_taken': 'Ya existe un rol llamado "{name}" en esta organización.',
     'invitation_not_found': 'Invitación no encontrada',
     'organization_invite_invalid': 'Esta invitación no se puede usar. Comprueba que usas la dirección de correo a la que se envió, o pide una nueva.',
+    'organization_invite_link_dead': 'Este enlace de invitación ya no funciona. Pide uno nuevo a quien te lo envió.',
     'organization_invite_expired': 'La invitación de organización ha expirado',
     'email_test_failed': 'No se pudo enviar el correo de prueba',
     'module_org_required': 'Para gestionar módulos debes pertenecer a una organización. Inicia sesión de nuevo o contacta con soporte.',

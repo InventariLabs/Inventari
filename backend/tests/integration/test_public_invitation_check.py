@@ -149,3 +149,11 @@ class TestPublicInvitationCheck:
         response = client.get(f'/public/invitation/{invitation.code}')
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_refusal_keeps_its_code_and_gives_no_registration_advice(self, client):
+        response = client.get('/public/invitation/NOBODY999')
+
+        detail = response.json()['detail']
+        assert detail['code'] == 'ORGANIZATION_INVITE_INVALID'
+        assert 'address' not in detail['message']
+        assert 'register' not in detail['message']

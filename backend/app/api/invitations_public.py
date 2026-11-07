@@ -14,8 +14,9 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_async_db
-from app.core.exceptions import catalogue_status_refusal
+from app.core.exceptions import AppException, rejection_code
 from app.core.limiter import limiter
+from app.i18n.service import get_current_lang, get_error_message
 from app.services._org_membership import invitation_preview, open_invitation
 
 
@@ -49,7 +50,16 @@ async def check_invitation(
     """
     invitation = await open_invitation(db, code)
     if invitation is None:
-        raise catalogue_status_refusal('organization_invite_invalid', 404)
+        # The code is the one registering with a dead code answers (a stable
+        # contract); the sentence is not: this check never sees an address, so
+        # the registration advice of that key would be wrong here.
+        lang = get_current_lang()
+        raise AppException(
+            status_code=404,
+            code=rejection_code('organization_invite_invalid'),
+            message=get_error_message('organization_invite_link_dead', lang),
+            extra={'lang': lang},
+        )
     preview = await invitation_preview(db, invitation)
     return InvitationCheckResponse(
         valid=True,
