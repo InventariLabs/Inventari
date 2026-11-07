@@ -332,6 +332,9 @@ class ErrorMessages(TypedDict):
     attachment_not_found: str
     api_key_not_found: str
     invalid_api_key: str
+    api_key_unknown: str
+    api_key_expired: str
+    api_key_revoked: str
     api_key_owner_inactive: str
     unit_conversion_already_exists: str
     conversion_not_found: str

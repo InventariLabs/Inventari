@@ -173,6 +173,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On a phone, the picking and receiving lists show the whole product name and
+  the whole batch and location code instead of cutting them: they break at a
+  space or a hyphen and inside a code only where it does not fit the column. A
+  product name without spaces no longer runs off the edge in the line under the
+  scan field or gives the picking summary a horizontal scrollbar.
 - The Receive goods, Issue goods and Move goods forms refuse a missing value
   where it is. Receiving without a supplier or customer marks that field and
   says why under it, as the location field already did, and the sentence is no

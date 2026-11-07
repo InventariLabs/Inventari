@@ -108,6 +108,7 @@ function DeliveryRow({ delivery }: { delivery: WebhookDelivery }) {
         size="content"
         variant="ghost"
         onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
         className="w-full justify-start py-3 px-4"
       >
         <span className="font-mono text-xs text-on-secondary dark:text-on-muted min-w-32">

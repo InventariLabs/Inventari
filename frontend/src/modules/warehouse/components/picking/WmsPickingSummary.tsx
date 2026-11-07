@@ -77,7 +77,7 @@ function SkippedLine({
   const { onUndo, onAnswer, isLoading } = answers;
   return (
     <div className="ml-6 space-y-1">
-      <p className="text-xs text-on-muted">
+      <p className="text-xs text-on-muted [overflow-wrap:anywhere]">
         {line.product_name} — {formatQuantityValue(line.expected_quantity)}{" "}
         {unitLabel(t, line.uom_symbol)}
       </p>
@@ -126,7 +126,10 @@ function LineBuckets({
             </span>
           </div>
           {picked.map((ln) => (
-            <p key={ln.id} className="text-xs text-accent-600 ml-6">
+            <p
+              key={ln.id}
+              className="text-xs text-accent-600 ml-6 [overflow-wrap:anywhere]"
+            >
               {ln.product_name} — {formatQuantityValue(ln.picked_quantity)}{" "}
               {unitLabel(t, ln.uom_symbol)}
             </p>
@@ -143,7 +146,10 @@ function LineBuckets({
             </span>
           </div>
           {shortPicked.map((ln) => (
-            <p key={ln.id} className="text-xs text-amber-600 ml-6">
+            <p
+              key={ln.id}
+              className="text-xs text-amber-600 ml-6 [overflow-wrap:anywhere]"
+            >
               {ln.product_name} — {formatQuantityValue(ln.picked_quantity)}/
               {formatQuantityValue(ln.expected_quantity)}{" "}
               {unitLabel(t, ln.uom_symbol)}

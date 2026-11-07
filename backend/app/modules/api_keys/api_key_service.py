@@ -227,6 +227,31 @@ async def issued_key_check_async(db: AsyncSession) -> Callable[[str], bool]:
     return lambda raw_key: _hash_key(raw_key) in hashes
 
 
+async def explain_refusal_async(db: AsyncSession, raw_key: str) -> str | None:
+    """Why :func:`validate_api_key` turned ``raw_key`` away, when it can say.
+
+    ``'unknown'`` — no key by that value (a typo, or a key that never existed);
+    ``'revoked'`` — it existed and was taken away, which includes a key revoked
+    because its owner left the organization; ``'expired'`` — it is past its
+    date. ``None`` for the rest (the module is off for the organization, the
+    owner's credentials changed): those keep the general sentence.
+    """
+    api_key = (
+        await db.execute(select(ApiKey).where(ApiKey.hashed_key == _hash_key(raw_key)))
+    ).scalar_one_or_none()
+    if api_key is None:
+        return 'unknown'
+    if not api_key.is_active:
+        return 'revoked'
+    expires = api_key.expires_at
+    if expires is not None:
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=UTC)
+        if datetime.now(UTC) > expires:
+            return 'expired'
+    return None
+
+
 async def validate_api_key(db: AsyncSession, raw_key: str) -> 'ApiKey | None':
     """Look up an API key by its raw value. Updates last_used_at with debounce.
 

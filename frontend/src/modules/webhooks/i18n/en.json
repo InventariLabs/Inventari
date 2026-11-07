@@ -12,6 +12,7 @@
   "failuresSinceSuccess_other": "{{count}} failed deliveries since the last successful one.",
   "consecutiveFailures": "Consecutive failures",
   "test": "Test",
+  "testHint": "Sends a sample event now. A failed test counts toward the circuit breaker, like a real delivery.",
   "reactivate": "Reactivate",
   "thresholdLink": "Set the failure threshold",
   "delete": "Delete",

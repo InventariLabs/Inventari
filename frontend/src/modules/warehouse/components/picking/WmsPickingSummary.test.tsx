@@ -42,6 +42,41 @@ describe("WmsPickingSummary", () => {
     rerender(<WmsPickingSummary {...props} completesDocument />);
     expect(screen.getByText(/books the stock/i)).toBeInTheDocument();
   });
+  it("lets a product name without spaces wrap in every list of the summary", () => {
+    const name =
+      "Supercalifragilisticexpialidociousproductnamewithoutspaces123456";
+    const lines: WmsPickLine[] = [
+      { ...picked, id: "a", product_name: `${name}-picked` },
+      {
+        ...picked,
+        id: "b",
+        status: "short",
+        picked_quantity: 2,
+        product_name: `${name}-short`,
+      },
+      {
+        ...picked,
+        id: "c",
+        status: "skipped",
+        picked_quantity: 0,
+        product_name: `${name}-skipped`,
+      },
+    ];
+    render(
+      <WmsPickingSummary
+        session={{ ...session, lines }}
+        lines={lines}
+        onClose={vi.fn()}
+      />,
+    );
+
+    for (const kind of ["picked", "short", "skipped"]) {
+      expect(screen.getByText(new RegExp(`${name}-${kind}`))).toHaveClass(
+        "[overflow-wrap:anywhere]",
+      );
+    }
+  });
+
   it("books only from the button that says so: Escape leaves the document as picked", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();

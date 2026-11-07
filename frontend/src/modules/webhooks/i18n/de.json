@@ -12,6 +12,7 @@
   "failuresSinceSuccess_other": "{{count}} fehlgeschlagene Zustellungen seit der letzten erfolgreichen.",
   "consecutiveFailures": "Aufeinanderfolgende Fehler",
   "test": "Test",
+  "testHint": "Sendet jetzt ein Beispielereignis. Ein fehlgeschlagener Test zählt wie eine echte Zustellung zum Schwellenwert des Sicherungsschalters.",
   "reactivate": "Reaktivieren",
   "thresholdLink": "Fehlerschwelle einstellen",
   "delete": "Löschen",
