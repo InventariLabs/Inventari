@@ -92,6 +92,8 @@
     "tryFilters": "Tente alterar os filtros",
     "addFirst": "Adicione seu primeiro produto a um local. A exportação fica disponível assim que houver um produto.",
     "definedWithoutStock": "Produtos que existem apenas como definição — por exemplo, criados em uma receita ou em uma lista de materiais — aparecem aqui quando tiverem estoque. Adicione um a um local para vê-lo.",
+    "definedMatchTitle": "“{{name}}” ainda não está em nenhum local",
+    "definedMatchDescription": "Existe um produto com este nome, mas apenas como definição — por exemplo, criado em uma receita ou em uma lista de materiais. Esta lista mostra os produtos quando têm estoque. Adicione-o a um local para vê-lo aqui.",
     "noSearchResultsTitle": "Nenhum produto encontrado",
     "noSearchResultsDescription": "Nenhum resultado para \"{{term}}\"",
     "clearSearch": "Limpar busca",

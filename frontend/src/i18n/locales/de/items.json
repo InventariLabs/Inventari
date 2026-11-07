@@ -92,6 +92,8 @@
     "tryFilters": "Filter ändern",
     "addFirst": "Fügen Sie Ihr erstes Produkt an einem Lagerort hinzu. Der Export wird verfügbar, sobald es ein Produkt gibt.",
     "definedWithoutStock": "Produkte, die nur als Definition existieren — zum Beispiel in einem Rezept oder einer Stückliste angelegte —, erscheinen hier, sobald sie einen Bestand haben. Fügen Sie eines an einem Lagerort hinzu, um es zu sehen.",
+    "definedMatchTitle": "„{{name}}“ ist noch an keinem Lagerort",
+    "definedMatchDescription": "Ein Produkt mit diesem Namen existiert, aber nur als Definition — zum Beispiel in einem Rezept oder einer Stückliste angelegt. Diese Liste zeigt Produkte, sobald sie einen Bestand haben. Fügen Sie es an einem Lagerort hinzu, um es hier zu sehen.",
     "noSearchResultsTitle": "Keine passenden Produkte",
     "noSearchResultsDescription": "Keine Ergebnisse für „{{term}}\"",
     "clearSearch": "Suche zurücksetzen",
