@@ -16,6 +16,7 @@ from app.i18n._errors_en_pl import ERRORS_EN_PL
 from app.i18n._errors_es import ERRORS_ES
 from app.i18n._errors_fr import ERRORS_FR
 from app.i18n._errors_pt import ERRORS_PT
+from app.i18n._partner_types import PARTNER_TYPE_LABELS
 from app.i18n._shopping import SHOPPING_LABELS
 from app.i18n._types import (
     MAINTAINED_LANGUAGES,
@@ -62,6 +63,7 @@ __all__ = [
     'PasswordResetEmailContent',
     'REGISTRATION_EMAIL_CONTENT',
     'RegistrationEmailContent',
+    'PARTNER_TYPE_LABELS',
     'SHOPPING_LABELS',
     'SUPPORTED_LANGUAGES',
     'UNIT_LABELS',

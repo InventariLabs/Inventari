@@ -19,6 +19,7 @@ from app.core.logging import get_logger
 from app.i18n import (
     COMMUNITY_ERRORS,
     ERRORS,
+    PARTNER_TYPE_LABELS,
     SHOPPING_LABELS,
     SUPPORTED_LANGUAGES,
     UNIT_LABELS,
@@ -288,6 +289,18 @@ def get_unit_label(symbol: str, lang: Language | None = None) -> str:
         k: str(v) for k, v in UNIT_LABELS.get(lang, UNIT_LABELS['en']).items()
     }
     return labels.get(symbol, symbol)
+
+
+def get_partner_type_label(partner_type: str, lang: Language | None = None) -> str:
+    """The partner type in *lang* — ``SUPPLIER`` is "Dostawca" in a Polish session.
+
+    A refusal that says "type SUPPLIER" names the stored value, not the word the
+    reader picked. A value the catalogue does not carry is returned unchanged.
+    """
+    if lang is None:
+        lang = get_current_lang()
+    labels = PARTNER_TYPE_LABELS.get(lang, PARTNER_TYPE_LABELS['en'])
+    return labels.get(partner_type, partner_type)
 
 
 def get_shopping_label(key: str, lang: Language | None = None) -> str:
