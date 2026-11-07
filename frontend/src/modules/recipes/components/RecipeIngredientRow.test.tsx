@@ -1,5 +1,6 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
+import i18n from "@/i18n/config";
 import userEvent from "@testing-library/user-event";
 import RecipeIngredientRow, {
   type IngredientDraft,
@@ -214,6 +215,22 @@ describe("RecipeIngredientRow — a counted unit with nothing saying what it mea
     );
   });
 
+  it("names the stock unit the way the reader's language writes it", async () => {
+    // The hint printed the raw symbol ("przeliczalne na pcs") where every
+    // other Polish screen says "szt.".
+    pieceCatalogue();
+    await act(() => i18n.changeLanguage("pl"));
+    try {
+      await renderExpanded({}, { uomId: "u-pcs", measureUomIds: [] });
+
+      const hint = screen.getByTestId("uom-convertible-hint").textContent;
+      expect(hint).toContain("szt.");
+      expect(hint).not.toContain("pcs");
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
+  });
+
   it("does not name the stock unit by its id when the units failed to load", async () => {
     // The hint falls back to the unit's id when the catalogue has no symbol
     // for it, which is what a failed request looked like: "Only units
@@ -235,7 +252,7 @@ describe("RecipeIngredientRow — a counted unit with nothing saying what it mea
 
     const hint = screen.getByTestId("uom-convertible-hint").textContent;
     expect(hint).toBe(
-      "Offered: pcs and the units of the weight or volume per piece stated on the product card.",
+      "Offered: pcs. and the units of the weight or volume per piece stated on the product card.",
     );
   });
 
