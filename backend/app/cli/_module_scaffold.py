@@ -286,6 +286,12 @@ The table and index are created through ``create_table_if_absent`` /
 or a core revision that created them earlier) replays this revision without
 failing. Both come from ``app.core.module_sdk``, the only door this module's
 code may import Core through.
+
+A later revision that indexes or backfills a table which may already hold rows
+does not copy the plain form above: it builds the index CONCURRENTLY and updates
+in batches. The template is in the platform's
+``docs/subsystems/MIGRATION_OWNERSHIP.md``, *Revisions on a Table That Already
+Holds Rows*.
 """
 
 from collections.abc import Sequence

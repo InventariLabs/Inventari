@@ -164,6 +164,14 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- `manage.py db stamp-module` now works on a database that a newer version has
+  already migrated. `db doctor` refuses to start in that state and prints this
+  command as the way out, but the command itself stopped with "Can't locate
+  revision" because it first looked up the revision the database recorded, which
+  the older checkout has no file for. It now replaces the recorded revision
+  without looking it up. The index on `audit_log (organization_id)` is dropped
+  by a migration too: the two composite indexes on the journal serve every read
+  it did.
 - The Receive goods, Issue goods and Move goods forms refuse a missing value
   where it is. Receiving without a supplier or customer marks that field and
   says why under it, as the location field already did, and the sentence is no

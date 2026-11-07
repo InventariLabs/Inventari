@@ -55,9 +55,9 @@ class AuditLog(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    # No index of its own: it leads both composites in ``__table_args__``.
     organization_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey('organizations.id', ondelete='CASCADE'),
-        index=True,
     )
     user_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey('users.id', ondelete='SET NULL'),

@@ -161,6 +161,42 @@ class TestDriftDetectionAndRepair:
         finally:
             engine.dispose()
 
+    def test_stamp_module_rewinds_a_database_ahead_of_the_code(self, scratch_db_url):
+        """The doctor's fix has to work when the database is newer than the checkout.
+
+        The version table then names a revision this checkout has never heard
+        of, and a stamp that first resolves the recorded revision refuses with
+        "Can't locate revision" — in exactly the situation the doctor sends the
+        operator to it for.
+        """
+        revisions = ordered_revisions(DRIFT_MODULE)
+        _create_core_tables(scratch_db_url)
+        run_module_migrations(DRIFT_MODULE, 'upgrade', db_url=scratch_db_url)
+        _rewind_version_table(scratch_db_url, '999_from_a_newer_release')
+
+        run_module_migrations(
+            DRIFT_MODULE,
+            'stamp',
+            db_url=scratch_db_url,
+            revision=revisions[0].revision,
+        )
+
+        engine = create_engine(scratch_db_url)
+        try:
+            with engine.connect() as conn:
+                recorded = (
+                    conn.execute(
+                        text(
+                            f'SELECT version_num FROM "{get_version_table_name(DRIFT_MODULE)}"'
+                        )
+                    )
+                    .scalars()
+                    .all()
+                )
+            assert recorded == [revisions[0].revision]
+        finally:
+            engine.dispose()
+
     def test_an_empty_database_is_not_drift(self, scratch_db_url):
         """B3's blocking edge case: the doctor runs before the first migration."""
         engine = create_engine(scratch_db_url)
