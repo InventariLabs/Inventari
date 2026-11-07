@@ -105,8 +105,8 @@ const MAKER_RECIPE_ENTRY = {
     ingredient: "Cukier biały",
     // The writer keeps only the keys whose value changed, so a change of the
     // quantity alone carries no unit on either side.
-    before: { qty_per_batch: 2 },
-    after: { qty_per_batch: 5 },
+    before: { qty_per_batch: "2.0000" },
+    after: { qty_per_batch: "5.0000" },
   },
   reason: null,
   meta_data: null,
