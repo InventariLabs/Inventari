@@ -62,6 +62,26 @@ describe("FailedEmailsCard", () => {
     expect(screen.queryByTestId("failed-email-row")).not.toBeInTheDocument();
   });
 
+  it("does not call an empty queue lossless when no mail server is configured", async () => {
+    // The badge above says "Not configured": the queue is empty because
+    // nothing is ever queued, not because everything arrived.
+    server.use(
+      http.get("*/organizations/my/failed-emails", () =>
+        HttpResponse.json(onePage([])),
+      ),
+      http.get("*/organizations/my", () =>
+        HttpResponse.json({ id: "org-1", name: "Acme", can_send_email: false }),
+      ),
+    );
+
+    renderCard();
+
+    expect(
+      await screen.findByText("Nothing has been sent"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Nothing was lost")).not.toBeInTheDocument();
+  });
+
   it("offers a retry when the read itself fails", async () => {
     // A card that renders "nothing was lost" over a 500 is worse than one
     // that says it could not look.

@@ -93,7 +93,7 @@ export default function AssetDetailPage() {
         : t("assignments.checkout_done", { asset: item?.name ?? "" });
     toast.success(done, {
       action: {
-        label: t("protocol.open"),
+        label: t("protocol.download_pdf"),
         onClick: () => downloadProtocol.mutate({ assignmentId: assignment.id }),
       },
     });

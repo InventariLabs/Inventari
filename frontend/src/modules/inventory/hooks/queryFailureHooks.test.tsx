@@ -15,14 +15,9 @@ import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocat
 /**
  * Three hooks that derive a number, a tile or a name from a request. When the
  * request fails they have nothing to say, and say exactly that: no hidden
- * count, no launcher tile, the name the row came with.
- *
- * Each is a behaviour document, not teeth. A failed request leaves `data`
- * empty exactly as no answer would, so the assertions here hold with the
- * `isError` read dropped as well — quiet on failure is the design, not a
- * guard these tests can see. What they pin is the silence itself: no count
- * invented from an empty list, no launcher tile claiming a number, and no
- * name substituted for the one the row arrived with.
+ * count, the name the row came with — and, for the launcher, a tile that says
+ * the stock takes could not be read, since no tile at all would look like
+ * "nothing in progress".
  */
 function wrapper({ children }: { children: React.ReactNode }) {
   const client = new QueryClient({
@@ -118,14 +113,20 @@ describe("useHiddenItemCount — the probe failed", () => {
 });
 
 describe("useInventoryActionItems — the stock takes request failed", () => {
-  it("shows no tile, which claims nothing", async () => {
+  it("says the stock takes could not be read instead of claiming none are in progress", async () => {
     server.use(fail("/api/v1/stock-takes"));
     const { result } = renderHook(() => useInventoryActionItems(), { wrapper });
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 50));
+    // The hook retries once before it gives up, one second apart.
+    await waitFor(() => expect(result.current).toHaveLength(1), {
+      timeout: 5000,
     });
-    expect(result.current).toEqual([]);
+    expect(result.current[0]).toMatchObject({
+      id: "inventory-stock-takes-unavailable",
+      severity: "error",
+      linkTo: "/inventory/stock-takes",
+    });
+    expect(result.current[0].count).toBeUndefined();
   });
 });
 

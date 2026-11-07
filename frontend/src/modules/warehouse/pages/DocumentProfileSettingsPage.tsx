@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +10,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   PageSaveProvider,
   SettingsSaveBar,
+  usePageSave,
   usePageSavePart,
 } from "@/module-sdk";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
@@ -48,6 +49,19 @@ const SECTIONS = [
   "presets",
 ] as const;
 type Section = (typeof SECTIONS)[number];
+
+/**
+ * The section a page-Save part lives in, for the parts that live in exactly
+ * one. The profile form spreads over several sections, so a refusal of it
+ * names none: the toast carries the server's sentence.
+ */
+const SECTION_OF_PART: Record<string, Section> = {
+  "moduleSettings:warehouse": "receiving",
+  receivingModes: "putaway",
+  printLayout: "printouts",
+  pickOrder: "floor",
+  trackingLinks: "tracking",
+};
 
 /** The screen when the profile did not load. The receiving tolerance is its
  * own query: the profile failing says nothing about it, so it stays where it
@@ -130,6 +144,31 @@ function ConfigurationPage() {
   const draft = useDocumentProfileDraft(profile);
   const { selectedPreset, setSelectedPreset, isDirty, syncLocalState } = draft;
 
+  // Sections that keep their own state (the print layout pick) are not reached
+  // by `syncLocalState`; a counter in their `key` makes them start over when
+  // the row is rewritten under them, as the apply question promises.
+  const [rowRewrites, setRowRewrites] = useState(0);
+  const syncAfterRewrite = (saved: Parameters<typeof syncLocalState>[0]) => {
+    syncLocalState(saved);
+    setRowRewrites((n) => n + 1);
+  };
+
+  // A section whose edit the server refused is marked in the navigation: the
+  // reader may be looking at another one when the answer comes.
+  const { failedKeys } = usePageSave();
+  const refusedSections = new Set(
+    [...failedKeys].map((key) => SECTION_OF_PART[key]).filter(Boolean),
+  );
+
+  // On a phone the section list scrolls sideways, and a `?section=` link
+  // opens on a tab past its right edge.
+  const tabsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    tabsRef.current
+      ?.querySelector<HTMLElement>('[role="tab"][data-state="active"]')
+      ?.scrollIntoView?.({ block: "nearest", inline: "center" });
+  }, [section, isLoading]);
+
   useEffect(() => {
     setHeader({
       title: t("settings.moduleTitle"),
@@ -139,7 +178,7 @@ function ConfigurationPage() {
 
   const { applyPreset, confirmDialogProps } = usePresetApply({
     profile,
-    syncLocalState,
+    syncLocalState: syncAfterRewrite,
     applyPresetMutation,
     updateMutation,
   });
@@ -185,7 +224,7 @@ function ConfigurationPage() {
   const panels: Record<Section, React.ReactNode> = {
     receiving: <ReceivingPanel d={draft} />,
     putaway: <PutawayPanel canWrite={canWrite} />,
-    printouts: <PrintoutsPanel />,
+    printouts: <PrintoutsPanel key={rowRewrites} />,
     numbering: <NumberingPanel d={draft} />,
     approvals: <ApprovalsPanel d={draft} />,
     floor: <FloorPanel d={draft} />,
@@ -221,6 +260,7 @@ function ConfigurationPage() {
         className="md:flex md:items-start md:gap-6"
       >
         <TabsList
+          ref={tabsRef}
           aria-label={t("configuration.nav")}
           className="w-full md:sticky md:top-2 md:w-64 md:shrink-0 md:flex-col md:items-stretch md:[justify-content:flex-start]"
         >
@@ -231,6 +271,17 @@ function ConfigurationPage() {
               className="md:w-full md:justify-start"
             >
               {labels[key]}
+              {refusedSections.has(key) && (
+                <>
+                  <span
+                    aria-hidden
+                    className="h-2 w-2 shrink-0 rounded-full bg-red-600"
+                  />
+                  <span className="sr-only">
+                    {t("configuration.sectionRefused")}
+                  </span>
+                </>
+              )}
             </TabsTrigger>
           ))}
         </TabsList>

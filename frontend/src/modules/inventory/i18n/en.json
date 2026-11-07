@@ -8,7 +8,8 @@
     "needsAttention_other": "need attention"
   },
   "actions": {
-    "stockTakesInProgress": "Stock takes in progress"
+    "stockTakesInProgress": "Stock takes in progress",
+    "stockTakesUnavailable": "Stock takes in progress could not be checked"
   },
   "nav": {
     "overview": "Overview",

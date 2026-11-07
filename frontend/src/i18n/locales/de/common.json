@@ -93,6 +93,9 @@
     "seeded_none": "Nichts zu kopieren — jedes integrierte Layout liegt bereits als eigenes vor.",
     "deleteTitle": "Vorlage löschen",
     "example": "Beispiel",
+    "namePlaceholder": "z. B. Übergabeprotokoll des Unternehmens",
+    "htmlInvalid": "Das HTML sieht unausgeglichen aus — prüfen Sie auf nicht geschlossene Tags.",
+    "customFieldOf": "{{label}} — benutzerdefiniertes Feld der Kategorie: {{categories}}",
     "possiblyEmpty": "Kann leer sein",
     "preview_failed": "Dieses Layout lässt sich nicht rendern.",
     "outdatedCopy": "Aus einer älteren Fassung der eingebauten Vorlage erstellt.",
@@ -835,7 +838,9 @@
       "unknownModule": "Ein Modul dieses Namens gibt es nicht",
       "unknownModuleHint": "Die Adresse verweist auf ein Modul, das diese Installation nicht hat. Prüfen Sie den Link oder wählen Sie das Modul im Store.",
       "open": "Moduleinstellungen",
-      "saved": "Einstellungen gespeichert"
+      "saved": "Einstellungen gespeichert",
+      "guardName": "Die Moduleinstellungen",
+      "saveFailed": "Die Einstellungen konnten nicht gespeichert werden."
     },
     "modules": {
       "openAppStore": "Module öffnen"
@@ -856,6 +861,8 @@
       "subtitle": "Zustellfehler",
       "none": "Nichts ist verloren gegangen",
       "noneHint": "Jede Nachricht dieser Organisation hat den Server verlassen.",
+      "noneUnsent": "Es wurde nichts versendet",
+      "noneUnsentHint": "Es ist kein Mailserver eingerichtet, daher verlässt keine Nachricht diese Installation – und keine kann scheitern. Richten Sie oben einen ein.",
       "attempts": "{{n}} von {{max}} Versuchen",
       "reason": "Grund: {{reason}}",
       "reasons": {
@@ -1085,6 +1092,7 @@
     "onResumesWebhooks_one": "Das Senden wird an 1 gespeicherte Adresse fortgesetzt, sobald das Modul an ist — dieselbe wie vor dem Ausschalten.",
     "onResumesWebhooks_other": "Das Senden wird an {{count}} gespeicherte Adressen fortgesetzt, sobald das Modul an ist — dieselben wie vor dem Ausschalten.",
     "optionalCompanionsHint": "Funktioniert eigenständig — {{names}} zu aktivieren ergänzt die Integration.",
+    "optionalCompanionsOffHint": "Die Integration ist hier nicht verfügbar, solange Sie {{names}} nicht aktivieren.",
     "requiresHint": "Aktivieren Sie zuerst {{names}}.",
     "screensMissing": "Oberfläche fehlt",
     "screensMissingHint": "Seine Seiten wurden hier nicht installiert; das Einschalten fügt nichts hinzu, was sich öffnen ließe. Eine erneute Installation vervollständigt das Modul.",

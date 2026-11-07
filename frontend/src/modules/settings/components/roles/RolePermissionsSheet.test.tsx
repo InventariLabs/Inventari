@@ -285,6 +285,42 @@ describe("RolePermissionsSheet", () => {
     ).toBeInTheDocument();
   });
 
+  it("heads a module the translations do not know with its manifest name", async () => {
+    // A scaffolded module has no entry in the i18n catalog; its manifest name
+    // is the only readable heading, and the technical name must not show.
+    const catalog: PermissionCatalog = {
+      ...CATALOG,
+      modules: [
+        ...CATALOG.modules,
+        {
+          module: "review_probe",
+          display_name: "Review Probe",
+          permissions: [
+            {
+              key: "review_probe:read",
+              label_key: "review_probe:permissions.read",
+              description_key: null,
+              default_roles: [],
+            },
+          ],
+        },
+      ],
+    };
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RolePermissionsSheet
+          role={role(["review_probe:read"])}
+          groups={permissionGroups(catalog)}
+          onClose={vi.fn()}
+        />
+      </QueryClientProvider>,
+    );
+
+    expect(await screen.findByText("Review Probe")).toBeInTheDocument();
+    expect(screen.queryByText("review_probe")).toBeNull();
+  });
+
   it("opens the areas the role uses and leaves the rest shut", async () => {
     renderSheet(role(["items:read"]));
 

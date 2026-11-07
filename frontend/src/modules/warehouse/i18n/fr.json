@@ -1907,6 +1907,7 @@
       "tracking": "Liens de suivi",
       "presets": "Réglages prêts à l’emploi"
     },
+    "sectionRefused": "non enregistré : le serveur l'a refusé",
     "nav": "Sections de la configuration",
     "related": "Écrans associés",
     "advanced": {

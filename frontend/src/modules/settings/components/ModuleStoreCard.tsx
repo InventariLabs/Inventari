@@ -386,14 +386,18 @@ export default function ModuleStoreCard({
               {t("appStore.requiresHint", { names: missingRequirementNames })}
             </p>
           )}
-          {/* A soft companion never blocks enabling — it is a fact before the
-              decision, like the other hints. Only a module that is off has a
-              decision pending, so an enabled or always-on card says nothing. */}
-          {!isEnabled && !isAlwaysOn && missingCompanionNames && (
+          {/* A soft companion never blocks enabling. Before the press it is a
+              fact for the decision; once the module is on, the same gap is
+              why part of it is missing, said in the tense that is true. */}
+          {!isAlwaysOn && missingCompanionNames && (
             <p className="text-xs text-on-warning mt-1 leading-snug">
-              {t("appStore.optionalCompanionsHint", {
-                names: missingCompanionNames,
-              })}
+              {isEnabled
+                ? t("appStore.optionalCompanionsOffHint", {
+                    names: missingCompanionNames,
+                  })
+                : t("appStore.optionalCompanionsHint", {
+                    names: missingCompanionNames,
+                  })}
             </p>
           )}
           <ModuleMetaLine

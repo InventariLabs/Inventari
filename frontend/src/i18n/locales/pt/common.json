@@ -91,6 +91,9 @@
     "seeded_none": "Nada para copiar — todos os layouts integrados já estão aqui como seus.",
     "deleteTitle": "Excluir modelo",
     "example": "Exemplo",
+    "namePlaceholder": "ex.: Termo de entrega da empresa",
+    "htmlInvalid": "O HTML parece desbalanceado — verifique se há tags sem fechar.",
+    "customFieldOf": "{{label}} — campo personalizado da categoria: {{categories}}",
     "possiblyEmpty": "Pode ficar vazio",
     "preview_failed": "Este layout não é exibido.",
     "outdatedCopy": "Feito a partir de uma versão antiga do layout integrado.",
@@ -827,7 +830,9 @@
       "unknownModule": "Não existe um módulo com esse nome",
       "unknownModuleHint": "O endereço aponta para um módulo que esta instalação não tem. Verifique o link ou escolha o módulo na loja.",
       "open": "Configurações do módulo",
-      "saved": "Configurações guardadas"
+      "saved": "Configurações guardadas",
+      "guardName": "As configurações do módulo",
+      "saveFailed": "Não foi possível guardar as configurações."
     },
     "modules": {
       "openAppStore": "Abrir Módulos"
@@ -848,6 +853,8 @@
       "subtitle": "Falhas de entrega",
       "none": "Nada se perdeu",
       "noneHint": "Todas as mensagens enviadas por esta organização saíram.",
+      "noneUnsent": "Nada foi enviado",
+      "noneUnsentHint": "Nenhum servidor de e-mail está configurado, por isso nenhuma mensagem sai desta instalação — e nenhuma pode falhar. Configure um acima.",
       "attempts": "{{n}} de {{max}} tentativas",
       "reason": "Motivo: {{reason}}",
       "reasons": {
@@ -1075,6 +1082,7 @@
     "onResumesWebhooks_one": "O envio é retomado para 1 endereço salvo assim que isto for ativado — o mesmo para o qual enviava antes de ser desativado.",
     "onResumesWebhooks_other": "O envio é retomado para {{count}} endereços salvos assim que isto for ativado — os mesmos para os quais enviava antes de ser desativado.",
     "optionalCompanionsHint": "Funciona sozinho — ativar {{names}} adiciona a integração.",
+    "optionalCompanionsOffHint": "A integração não está disponível aqui enquanto você não ativar {{names}}.",
     "requiresHint": "Ative primeiro {{names}}.",
     "screensMissing": "Telas ausentes",
     "screensMissingHint": "As páginas dele não foram instaladas aqui, então ativá-lo não adiciona nada que você possa abrir. Reinstalar o módulo o completa.",

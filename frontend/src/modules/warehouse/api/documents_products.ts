@@ -30,7 +30,8 @@ export const documentsProductsApi = {
   },
 
   /**
-   * The stock on hand, narrowed to one location and its subtree when given.
+   * The stock on hand, narrowed to one location when given: a shelf is
+   * exact, a zone also offers the shelves below it.
    *
    * Every result names an item, which is what a line taking goods off a shelf
    * has to reference — the stock executors move stock by record and refuse a

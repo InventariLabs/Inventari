@@ -1907,6 +1907,7 @@
       "tracking": "Sendungsverfolgung",
       "presets": "Fertige Einrichtung"
     },
+    "sectionRefused": "nicht gespeichert – der Server hat es abgelehnt",
     "nav": "Bereiche der Konfiguration",
     "related": "Verwandte Seiten",
     "advanced": {

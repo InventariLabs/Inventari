@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useInitStatus } from "@/hooks/useInitStatus";
 import { AuthLayout } from "./AuthLayout";
+import { SignedInNotice } from "./SignedInNotice";
 import { PasswordRules } from "./PasswordRules";
 import { firstBrokenRule } from "@/lib/passwordPolicy";
 import { extractApiError } from "@/lib/errors";
@@ -29,7 +30,8 @@ function OtherSessionNotice() {
   const signedIn = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const arrivedByLink = searchParams.has("token") || searchParams.has("invite");
-  if (!signedIn || !arrivedByLink) return null;
+  if (!signedIn) return null;
+  if (!arrivedByLink) return <SignedInNotice />;
   return (
     <div
       role="status"

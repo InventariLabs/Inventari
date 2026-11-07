@@ -335,6 +335,74 @@ describe("TemplateEditorModal", () => {
     });
   });
 
+  it("speaks the reader's language where a screen passes no hint or message of its own", async () => {
+    // The documents and equipment screens pass neither prop; the dialog
+    // answered a Polish reader with its English literals.
+    await withLanguage("pl", async () => {
+      const user = userEvent.setup();
+      render(
+        <TemplateEditorModal
+          module="warehouse"
+          documentTypes={documentTypes}
+          placeholderDescriptions={[]}
+          onClose={onClose}
+        />,
+        { wrapper: createWrapper() },
+      );
+
+      const name = await screen.findByPlaceholderText(/^np\. /);
+      expect(name).toBeInTheDocument();
+
+      await user.type(name, "Protokół");
+      const body = screen.getByRole("textbox", { name: /HTML/i });
+      await user.click(body);
+      await user.paste("<div><p>niedomknięte</div>");
+      await user.click(screen.getByRole("button", { name: /utwórz|zapisz/i }));
+
+      expect(await screen.findByText(/niezbalansowany/)).toBeInTheDocument();
+    });
+  });
+
+  it("phrases a category custom field in the reader's language", async () => {
+    // The API describes it as '<label> — custom field of <categories>', one
+    // English sentence the frontend cannot translate; label and categories
+    // arrive as fields of their own.
+    server.use(
+      http.get("*/api/v1/equipment/templates/placeholders", () =>
+        HttpResponse.json([
+          {
+            key: "{{custom.operating_hours}}",
+            description: "Operating hours — custom field of Machines, Vehicles",
+            custom_field_label: "Operating hours",
+            custom_field_categories: ["Machines", "Vehicles"],
+          },
+        ]),
+      ),
+    );
+
+    await withLanguage("pl", async () => {
+      render(
+        <TemplateEditorModal
+          module="equipment"
+          documentTypes={documentTypes}
+          i18nNamespace="equipment"
+          placeholderDescriptions={[]}
+          onClose={onClose}
+        />,
+        { wrapper: createWrapper() },
+      );
+
+      const button = (
+        await screen.findByText("{{custom.operating_hours}}")
+      ).closest("button");
+
+      expect(button).toHaveTextContent(
+        "Operating hours — pole własne kategorii: Machines, Vehicles",
+      );
+      expect(button).not.toHaveTextContent("custom field of");
+    });
+  });
+
   it("documents can preview its draft render", async () => {
     render(
       <TemplateEditorModal
