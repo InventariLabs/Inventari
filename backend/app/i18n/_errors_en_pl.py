@@ -218,6 +218,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'not_found': 'Resource not found',
         'conflict': 'Resource conflict',
         'internal_error': 'An internal error occurred',
+        'text_has_a_null_character': (
+            'The text sent contains a null character (U+0000), which can be neither stored nor searched for. Remove it and try again.'
+        ),
         'rate_limit_exceeded': 'Too many requests. Try again later.',
         'service_unavailable': 'Service temporarily unavailable',
         'stock_take_edit_completed': 'Cannot edit a completed or cancelled stock take',
@@ -1252,6 +1255,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'not_found': 'Zasób nie został znaleziony',
         'conflict': 'Konflikt zasobów',
         'internal_error': 'Wystąpił błąd wewnętrzny',
+        'text_has_a_null_character': (
+            'Wysłany tekst zawiera znak pusty (U+0000), którego nie da się ani zapisać, ani wyszukać. Usuń go i spróbuj ponownie.'
+        ),
         'rate_limit_exceeded': 'Zbyt wiele żądań. Spróbuj ponownie później.',
         'service_unavailable': 'Usługa tymczasowo niedostępna',
         'stock_take_edit_completed': 'Nie można edytować zakończonej lub anulowanej inwentaryzacji',

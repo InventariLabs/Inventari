@@ -9,6 +9,7 @@ and items nearing expiry.
 # reason: Complex multi-join alerts with history analysis cannot be expressed through CoreAPI
 
 import statistics
+from collections.abc import Sequence
 from datetime import date, datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -16,6 +17,7 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import ColumnElement
 
 from app.core.module_sdk import general_rows, hidden_module_tags_async
 from app.core.public_api import core_api
@@ -28,6 +30,28 @@ from .constants import MAX_ANALYTICS_ROWS
 def _to_naive(dt: datetime) -> datetime:
     """Drop timezone info so naive/aware datetimes are comparable."""
     return dt.replace(tzinfo=None) if dt.tzinfo is not None else dt
+
+
+async def _lot_names_async(
+    db: AsyncSession, organization_id: UUID, items: Sequence[Item]
+) -> dict[UUID, str]:
+    """The batch name of every record among *items* that has one.
+
+    Read per product, through the batches the core lists for it: the records
+    an alert names are a week's worth of dates, so the products are few.
+    """
+    names: dict[UUID, str] = {}
+    products = {
+        item.template_id
+        for item in items
+        if item.lot_id is not None and item.template_id is not None
+    }
+    for product_id in products:
+        for lot in await core_api.stock.list_lots_async(
+            db, organization_id, product_id
+        ):
+            names[lot.id] = lot.name
+    return names
 
 
 async def get_smart_alerts_async(  # noqa: C901 - existing complexity/size
@@ -203,6 +227,19 @@ async def get_smart_alerts_async(  # noqa: C901 - existing complexity/size
                         }
                     )
 
+    alerts.extend(await _expiry_alerts_async(db, organization_id, today, shown))
+
+    return {'alerts': alerts, 'total_alerts': len(alerts)}
+
+
+async def _expiry_alerts_async(
+    db: AsyncSession, organization_id: UUID, today: date, shown: ColumnElement[bool]
+) -> list[dict[str, Any]]:
+    """One alert per record on the shelves going off within a week, or gone off.
+
+    *shown* is the condition that keeps a vertical module's records out,
+    as for the other alerts.
+    """
     # Expired and expiring together, worst first: the overview beside these
     # alerts counts both among what needs attention, and stopping the query
     # at today left the one record already spoiled as the one never named.
@@ -211,7 +248,7 @@ async def get_smart_alerts_async(  # noqa: C901 - existing complexity/size
     dated_items = (
         await db.scalars(
             select(Item)
-            .options(joinedload(Item.category))
+            .options(joinedload(Item.category), joinedload(Item.storage_location))
             .where(
                 Item.organization_id == organization_id,
                 Item.is_deleted.is_(False),
@@ -225,13 +262,17 @@ async def get_smart_alerts_async(  # noqa: C901 - existing complexity/size
         )
     ).all()
 
+    dated: list[dict[str, Any]] = []
+    # Two records of one product going off on one day read the same sentence
+    # twice; where each one lies, and its batch, is what tells them apart.
+    lot_names = await _lot_names_async(db, organization_id, dated_items)
     for item in dated_items:
         if item.effective_expiry_date is None:
             continue
         days_until_expiry = (item.effective_expiry_date - today).days
         # Today's date has not expired yet (see app.services.items.expiry).
         expired = days_until_expiry < 0
-        alerts.append(
+        dated.append(
             {
                 'type': 'EXPIRED' if expired else 'EXPIRING_SOON',
                 'severity': 'critical' if days_until_expiry <= 2 else 'warning',
@@ -239,6 +280,8 @@ async def get_smart_alerts_async(  # noqa: C901 - existing complexity/size
                 'item_name': item.name,
                 'expiry_date': item.effective_expiry_date.isoformat(),
                 'days_until_expiry': days_until_expiry,
+                'location_name': item.storage_location_name,
+                'lot_name': lot_names.get(item.lot_id) if item.lot_id else None,
                 'message_key': (
                     'stats.alerts.expired' if expired else 'stats.alerts.expiring_soon'
                 ),
@@ -251,5 +294,4 @@ async def get_smart_alerts_async(  # noqa: C901 - existing complexity/size
                 'action_param': str(item.id),
             }
         )
-
-    return {'alerts': alerts, 'total_alerts': len(alerts)}
+    return dated

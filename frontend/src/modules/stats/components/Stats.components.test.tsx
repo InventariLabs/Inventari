@@ -826,6 +826,18 @@ describe("StatsExpiryForecast", () => {
     expect(grid?.className).not.toMatch(/(^|\s)grid-cols-3(\s|$)/);
   });
 
+  it("keeps three tiles across until xl, so the label is never broken inside the word at 1024-1279 px", () => {
+    // Six across at lg left a tile's text 91 px at 1024 px and PRZETERMINOWANE
+    // needs 99: the word broke from 1024 to about 1095 px. jsdom lays nothing
+    // out, so the guard is the grid the tiles sit in; the widths were measured
+    // in a browser.
+    render(<StatsExpiryForecast t={t} expiryForecast={expiryForecast} />);
+    const grid = screen.getByText("Expired").closest(".grid");
+    expect(grid?.className).toMatch(/(^|\s)sm:grid-cols-3(\s|$)/);
+    expect(grid?.className).toMatch(/(^|\s)xl:grid-cols-6(\s|$)/);
+    expect(grid?.className).not.toMatch(/(^|\s)(md|lg):grid-cols-[4-9]/);
+  });
+
   it("renders all forecast periods", () => {
     render(<StatsExpiryForecast t={t} expiryForecast={expiryForecast} />);
     // Count values
@@ -1058,6 +1070,54 @@ describe("SmartAlertsPanel", () => {
     expect(
       screen.getByText(/^Expires on .*2026, in 6 days\.$/),
     ).toBeInTheDocument();
+  });
+
+  it("says where each of two same-day alerts of one product lies, and its batch", () => {
+    const twoShelves: SmartAlerts = {
+      total_alerts: 2,
+      alerts: [
+        {
+          ...smartAlerts.alerts[1],
+          location_name: "Shelf A - Top",
+          lot_name: "OR-2611",
+        },
+        { ...smartAlerts.alerts[1], location_name: "Shelf A - Bottom" },
+      ],
+    };
+    render(wrap(<SmartAlertsPanel alerts={twoShelves} t={t} />));
+
+    expect(
+      screen.getByText("Shelf A - Top · Batch OR-2611"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Shelf A - Bottom")).toBeInTheDocument();
+  });
+
+  it.each([
+    ["pl", "Partia OR-2611"],
+    ["de", "Charge OR-2611"],
+    ["fr", "Lot OR-2611"],
+    ["es", "Lote OR-2611"],
+  ] as const)("names the batch in %s", async (language, batch) => {
+    await withLanguage(language, () => {
+      render(
+        wrap(
+          <SmartAlertsPanel
+            alerts={{
+              total_alerts: 1,
+              alerts: [
+                {
+                  ...smartAlerts.alerts[1],
+                  location_name: "Shelf A - Top",
+                  lot_name: "OR-2611",
+                },
+              ],
+            }}
+            t={t}
+          />,
+        ),
+      );
+      expect(screen.getByText(`Shelf A - Top · ${batch}`)).toBeInTheDocument();
+    });
   });
 
   it("paints a warning alert amber, not the neutral grey of an unknown severity", () => {

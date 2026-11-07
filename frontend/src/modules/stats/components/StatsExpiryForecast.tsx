@@ -26,7 +26,10 @@ export function StatsExpiryForecast({ t, expiryForecast }: Props) {
         {t("stats:expiryForecast")}
       </h2>
       {expiryForecast && expiryForecast.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
+        // Six across only from xl: at lg a tile's text box was 91 px wide
+        // and PRZETERMINOWANE needs 99, so the word broke from 1024 to about
+        // 1095 px. Three across divides the six evenly until then.
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-4">
           {expiryForecast.map((forecast) => (
             <div
               key={forecast.period}

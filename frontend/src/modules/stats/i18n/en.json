@@ -70,6 +70,7 @@
         "expired_one": "Expired on {{date}}, {{count}} day ago.",
         "expired_other": "Expired on {{date}}, {{count}} days ago."
       },
+      "batch": "Batch {{lot}}",
       "noAlerts": "No alerts - your inventory looks good!",
       "noData": "Nothing to check yet — add items and alerts will follow"
     },

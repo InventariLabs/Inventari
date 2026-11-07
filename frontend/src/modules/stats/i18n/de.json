@@ -70,6 +70,7 @@
         "expired_one": "Abgelaufen am {{date}}, vor {{count}} Tag.",
         "expired_other": "Abgelaufen am {{date}}, vor {{count}} Tagen."
       },
+      "batch": "Charge {{lot}}",
       "noAlerts": "Keine Benachrichtigungen - Ihr Bestand sieht gut aus!",
       "noData": "Noch nichts zu prüfen — fügen Sie Artikel hinzu, dann folgen die Hinweise"
     },

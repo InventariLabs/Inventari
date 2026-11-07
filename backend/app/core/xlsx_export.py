@@ -10,6 +10,7 @@ the second export ends up without the defusing.
 from __future__ import annotations
 
 import io
+import math
 import tempfile
 from collections.abc import Iterable, Iterator, Sequence
 from datetime import datetime
@@ -33,6 +34,33 @@ MAX_ROWS_PER_SHEET = 1_000_000
 _STREAM_CHUNK = 64 * 1024
 
 
+def _as_written(number: float) -> str:
+    """*number* as the text a cell stores: what the screen showed for it.
+
+    openpyxl writes a float with sixteen significant digits, and sixteen
+    spell the double nearest to 95.35 as 95.34999999999999 — the text a CSV
+    conversion, a script or the file itself then shows beside a screen and a
+    printout that said 95.35. Fifteen is what a spreadsheet keeps, and
+    fifteen read the same double back for every figure typed with up to
+    fifteen digits; a double they cannot carry is written in full instead.
+    """
+    text = f'{number:.15g}'
+    return text if float(text) == number else repr(float(number))
+
+
+def _write_numbers_as_written(worksheet: Any) -> None:
+    """Store every finite float of *worksheet* as :func:`_as_written` spells it.
+
+    The cell stays a number — the text is what the file stores for it, and
+    a spreadsheet reads the same double back.
+    """
+    for row in worksheet.iter_rows():
+        for cell in row:
+            if isinstance(cell.value, float) and math.isfinite(cell.value):
+                cell.value = _as_written(cell.value)
+                cell.data_type = 'n'
+
+
 def to_xlsx_response(
     df: pd.DataFrame,
     *,
@@ -52,6 +80,7 @@ def to_xlsx_response(
         # Every text column here came from a user at some point; openpyxl
         # would type a leading '=' as a formula.
         defuse_worksheet(writer.sheets[sheet_name])
+        _write_numbers_as_written(writer.sheets[sheet_name])
         if readme is not None:
             readme.to_excel(writer, index=False, sheet_name=readme_sheet)
             defuse_worksheet(writer.sheets[readme_sheet])
@@ -66,7 +95,15 @@ def to_xlsx_response(
 
 
 def _defused(sheet: Any, value: Any) -> Any:
-    """The cell for *value*, typed as text when a spreadsheet would run it."""
+    """The cell for *value*, typed as text when a spreadsheet would run it.
+
+    A float is written as :func:`_as_written` spells it, as the table
+    export writes it.
+    """
+    if isinstance(value, float) and math.isfinite(value):
+        number = WriteOnlyCell(sheet, value=_as_written(value))
+        number.data_type = 'n'
+        return number
     if not is_formula_like(value):
         return value
     cell = WriteOnlyCell(sheet, value=value)

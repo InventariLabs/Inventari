@@ -72,6 +72,7 @@
         "expired_one": "Périmé depuis le {{date}}, il y a {{count}} jour.",
         "expired_other": "Périmé depuis le {{date}}, il y a {{count}} jours."
       },
+      "batch": "Lot {{lot}}",
       "noAlerts": "Aucune alerte - votre inventaire a l'air bon !",
       "noData": "Rien à vérifier pour l’instant — ajoutez des articles et les alertes suivront"
     },

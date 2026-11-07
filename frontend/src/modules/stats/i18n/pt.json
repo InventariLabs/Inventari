@@ -72,6 +72,7 @@
         "expired_one": "Expirou em {{date}}, há {{count}} dia.",
         "expired_other": "Expirou em {{date}}, há {{count}} dias."
       },
+      "batch": "Lote {{lot}}",
       "noAlerts": "Sem alertas - seu inventário está em ordem!",
       "noData": "Ainda não há nada para verificar — adicione itens e os alertas aparecerão"
     },

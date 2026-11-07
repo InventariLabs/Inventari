@@ -27819,7 +27819,7 @@
           "Stock Ledger"
         ],
         "summary": "Stock As Of Pdf",
-        "description": "The sheet that goes into a binder.\n\nIt carries the date it is about and the date it was made, because the\nconfusion between those two is the whole reason an audit rejects a\nprintout.",
+        "description": "The sheet that goes into a binder.\n\nIt carries the date it is about and the date it was made, because the\nconfusion between those two is the whole reason an audit rejects a\nprintout \u2014 and the place it was asked about, or a sheet for one shelf\nreads as the whole warehouse.",
         "operationId": "stock_as_of_pdf_api_v1_stock_as_of_export_pdf_get",
         "security": [
           {
@@ -41002,6 +41002,28 @@
               }
             ],
             "title": "Days Until Expiry"
+          },
+          "location_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Name"
+          },
+          "lot_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Name"
           }
         },
         "type": "object",

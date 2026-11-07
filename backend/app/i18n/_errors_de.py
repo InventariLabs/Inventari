@@ -268,6 +268,9 @@ ERRORS_DE: ErrorMessages = {
     'not_found': 'Ressource nicht gefunden',
     'conflict': 'Ressourcenkonflikt',
     'internal_error': 'Ein interner Fehler ist aufgetreten',
+    'text_has_a_null_character': (
+        'Der gesendete Text enthält ein Nullzeichen (U+0000), das sich weder speichern noch suchen lässt. Entfernen Sie es und versuchen Sie es erneut.'
+    ),
     'rate_limit_exceeded': 'Zu viele Anfragen. Versuchen Sie es später erneut.',
     'service_unavailable': 'Dienst vorübergehend nicht verfügbar',
     'stock_take_edit_completed': 'Eine abgeschlossene oder stornierte Inventur kann nicht bearbeitet werden',

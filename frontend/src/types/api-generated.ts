@@ -7567,7 +7567,8 @@ export interface paths {
          *
          *     It carries the date it is about and the date it was made, because the
          *     confusion between those two is the whole reason an audit rejects a
-         *     printout.
+         *     printout — and the place it was asked about, or a sheet for one shelf
+         *     reads as the whole warehouse.
          */
         get: operations["stock_as_of_pdf_api_v1_stock_as_of_export_pdf_get"];
         put?: never;
@@ -11114,6 +11115,10 @@ export interface components {
             expiry_date?: string | null;
             /** Days Until Expiry */
             days_until_expiry?: number | null;
+            /** Location Name */
+            location_name?: string | null;
+            /** Lot Name */
+            lot_name?: string | null;
         };
         /**
          * AnnouncementCreateDTO
