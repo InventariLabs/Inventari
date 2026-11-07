@@ -17,7 +17,8 @@
     "selectLabel": "Zaznacz etykietę {{code}}",
     "freeLabel": "Zwolnij etykietę",
     "freeLabelNamed": "Zwolnij etykietę {{code}}",
-    "freeLabelConfirm": "Etykieta {{code}} przestanie wskazywać produkt {{name}}. Można ją przypisać do innego produktu lub użyć ponownie."
+    "freeLabelConfirm": "Etykieta {{code}} przestanie wskazywać produkt {{name}}. Można ją przypisać do innego produktu lub użyć ponownie.",
+    "freeLabelFailed": "Nie udało się zwolnić etykiety"
   },
   "filters": {
     "statusAll": "Wszystkie statusy",
@@ -199,7 +200,6 @@
   "history": {
     "label": "Etykieta",
     "previouslyUsedFor": "Wcześniej używana dla",
-    "status": "Status",
     "title": "Historia produktu"
   },
   "openScanActions": "Otwórz akcje skanowania",

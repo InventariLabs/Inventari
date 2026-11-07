@@ -15,7 +15,8 @@
     "selectLabel": "Sélectionner l'étiquette {{code}}",
     "freeLabel": "Libérer l’étiquette",
     "freeLabelNamed": "Libérer l’étiquette {{code}}",
-    "freeLabelConfirm": "L’étiquette {{code}} ne désignera plus {{name}}. Elle pourra être attachée à un autre produit ou réutilisée."
+    "freeLabelConfirm": "L’étiquette {{code}} ne désignera plus {{name}}. Elle pourra être attachée à un autre produit ou réutilisée.",
+    "freeLabelFailed": "Impossible de libérer l’étiquette"
   },
   "filters": {
     "statusAll": "Tous les statuts",
@@ -189,7 +190,6 @@
   "history": {
     "label": "Étiquette",
     "previouslyUsedFor": "Précédemment utilisée pour",
-    "status": "Statut",
     "title": "Historique du produit"
   },
   "openScanActions": "Ouvrir les actions de scan",

@@ -110,16 +110,20 @@ describe("BulkEditModal — what the apply sends", () => {
     return { onClose, onSuccess };
   }
 
-  it("refuses to apply with nothing ticked", async () => {
+  it("offers no apply until a field is ticked", async () => {
     const user = userEvent.setup();
     open();
 
-    await user.click(screen.getByRole("button", { name: "Apply changes" }));
+    // Pressable with nothing ticked, the button answered the press with a
+    // toast saying what the subtitle above it already asks for.
+    const apply = screen.getByRole("button", { name: "Apply changes" });
+    expect(apply).toBeDisabled();
 
+    await user.click(screen.getByRole("checkbox", { name: /Brand/ }));
+    expect(apply).toBeEnabled();
+    await user.click(screen.getByRole("checkbox", { name: /Brand/ }));
+    expect(apply).toBeDisabled();
     expect(mocks.mutate).not.toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalledWith(
-      "Select at least one field to change",
-    );
   });
 
   it("sends exactly the ticked fields, the price as a number read with either mark", async () => {
@@ -213,7 +217,9 @@ describe("BulkEditModal — what the apply sends", () => {
     expect(onSuccess).toHaveBeenCalled();
 
     lastOptions().onError?.(new Error("x"));
-    expect(toast.error).toHaveBeenCalledWith("Error during update");
+    expect(toast.error).toHaveBeenCalledWith(
+      "Could not change the selected products",
+    );
   });
 
   it("closes from the cancel button", async () => {

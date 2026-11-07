@@ -199,7 +199,7 @@
     "all_statuses": "Alle",
     "confirm_bulk_retire_one": "{{count}} ausgewähltes Gerät ausmustern?",
     "confirm_bulk_retire_other": "{{count}} ausgewählte Geräte ausmustern?",
-    "confirm_bulk_retire_msg": "Die Geräte werden als ausgemustert markiert und bleiben im Register. Ihr Status wechselt zu „Ausgemustert”.",
+    "confirm_bulk_retire_msg": "Die Geräte werden als ausgemustert markiert und bleiben im Register. Ihr Status wechselt zu „Ausgemustert”. Ein ausgeliehenes Gerät wird nicht ausgemustert — geben Sie es zuerst zurück.",
     "confirm_bulk_purge_one": "{{count}} ausgewähltes Gerät endgültig löschen?",
     "confirm_bulk_purge_other": "{{count}} ausgewählte Geräte endgültig löschen?",
     "confirm_bulk_purge_msg": "Diese Aktion kann nicht rückgängig gemacht werden.",

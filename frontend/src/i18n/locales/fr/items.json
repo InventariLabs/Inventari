@@ -257,7 +257,7 @@
     "successUpdated": "{{count}} produits mis à jour",
     "successUpdated_one": "{{count}} produit mis à jour",
     "successUpdated_other": "{{count}} produits mis à jour",
-    "errorUpdate": "Erreur lors de la mise à jour"
+    "errorUpdate": "Impossible de modifier les produits sélectionnés"
   },
   "fields": {
     "purchase_price": "Prix d'achat à l'unité",
@@ -459,7 +459,8 @@
     "runningLow": "Stock faible",
     "setToCurrent": "Définir sur la quantité actuelle",
     "save": "Définir l'alerte",
-    "scopeNote": "L'alerte appartient au produit : elle se mesure sur tout ce que vous en avez, pas sur ce seul enregistrement."
+    "scopeNote": "L'alerte appartient au produit : elle se mesure sur tout ce que vous en avez, pas sur ce seul enregistrement.",
+    "saveFailed": "Impossible d'enregistrer l'alerte de stock minimum"
   },
   "deletionReasonPlaceholder": "— choisissez un motif —",
   "quickActions": {

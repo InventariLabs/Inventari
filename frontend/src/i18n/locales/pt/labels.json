@@ -15,7 +15,8 @@
     "selectLabel": "Selecionar etiqueta {{code}}",
     "freeLabel": "Liberar a etiqueta",
     "freeLabelNamed": "Liberar a etiqueta {{code}}",
-    "freeLabelConfirm": "A etiqueta {{code}} deixará de apontar para {{name}}. Ela pode ser atribuída a outro produto ou reutilizada."
+    "freeLabelConfirm": "A etiqueta {{code}} deixará de apontar para {{name}}. Ela pode ser atribuída a outro produto ou reutilizada.",
+    "freeLabelFailed": "Não foi possível liberar a etiqueta"
   },
   "filters": {
     "statusAll": "Todos os status",
@@ -187,7 +188,6 @@
   "history": {
     "label": "Etiqueta",
     "previouslyUsedFor": "Usada anteriormente para",
-    "status": "Status",
     "title": "Histórico do produto"
   },
   "openScanActions": "Abrir ações de leitura",
