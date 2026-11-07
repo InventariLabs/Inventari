@@ -14,6 +14,7 @@
   "failuresSinceSuccess_other": "{{count}} nieudanej dostawy od ostatniej udanej.",
   "consecutiveFailures": "Kolejne błędy",
   "test": "Testuj",
+  "testHint": "Wysyła teraz przykładowe zdarzenie. Nieudany test liczy się do progu bezpiecznika tak samo jak prawdziwa wysyłka.",
   "reactivate": "Reaktywuj",
   "thresholdLink": "Ustaw próg błędów",
   "delete": "Usuń",

@@ -359,7 +359,14 @@ class TestProductionAtomicity:
         assert len(cancels) == 1
         entry = cancels[0]
         assert entry.reason == 'Customer pulled the order'
-        assert entry.snapshot == {'old_status': 'DRAFT', 'new_status': 'CANCELLED'}
+        # The order's number is what the journal's Target column names; a
+        # cancel without it showed a uuid fragment beside every other entry's
+        # number.
+        assert entry.snapshot == {
+            'name': body['number'],
+            'old_status': 'DRAFT',
+            'new_status': 'CANCELLED',
+        }
 
     def test_cancel_without_reason_stores_null(
         self,

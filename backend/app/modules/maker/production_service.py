@@ -1278,7 +1278,11 @@ async def cancel_order(
         action=AuditAction.UPDATE,
         target_type=AuditTargetType.MAKER_PRODUCTION_ORDER,
         target_id=order.id,
-        snapshot={'old_status': 'DRAFT', 'new_status': 'CANCELLED'},
+        snapshot={
+            'name': order.number,
+            'old_status': 'DRAFT',
+            'new_status': 'CANCELLED',
+        },
         reason=reason,
     )
     await db.flush()

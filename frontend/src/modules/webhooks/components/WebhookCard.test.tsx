@@ -215,6 +215,17 @@ describe("WebhookCard status", () => {
     expect(screen.getByText("Failing")).toBeInTheDocument();
   });
 
+  it("warns, before the click, that a failed test counts toward the breaker", () => {
+    // A test is a real probe: six clicks against a dead receiver switched an
+    // endpoint off, and nothing on the button said it could.
+    renderCard({});
+
+    expect(screen.getByRole("button", { name: /^Test / })).toHaveAttribute(
+      "title",
+      expect.stringMatching(/counts toward the circuit breaker/),
+    );
+  });
+
   it("names a healthy endpoint as active", () => {
     renderCard({});
 

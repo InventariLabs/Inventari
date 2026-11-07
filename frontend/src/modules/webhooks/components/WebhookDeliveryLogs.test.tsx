@@ -89,6 +89,18 @@ describe("WebhookDeliveryLogs", () => {
       screen.queryByText("Response from the target"),
     ).not.toBeInTheDocument();
   });
+  it("announces that a row opens, and that it has", async () => {
+    // The only sign a row was clickable was that it is a button; the state
+    // it toggles is now spoken too, for readers who do not see the chevron.
+    mockDelivery({ status_code: 500, error_message: "boom" });
+    renderLogs();
+
+    const row = await screen.findByRole("button", { expanded: false });
+    fireEvent.click(row);
+
+    expect(screen.getByRole("button", { expanded: true })).toBe(row);
+  });
+
   it("tells two retries in the same minute apart", async () => {
     // Four attempts all read "20.08.2026, 20:34" — the log is read for the
     // order between them, and the format hid it. The assertion pins the

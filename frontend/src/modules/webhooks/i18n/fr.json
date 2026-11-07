@@ -12,6 +12,7 @@
   "failuresSinceSuccess_other": "{{count}} livraisons échouées depuis la dernière réussie.",
   "consecutiveFailures": "Échecs consécutifs",
   "test": "Test",
+  "testHint": "Envoie maintenant un événement d'exemple. Un test échoué compte dans le seuil du disjoncteur, comme une vraie livraison.",
   "reactivate": "Réactiver",
   "thresholdLink": "Régler le seuil d'échecs",
   "delete": "Supprimer",
