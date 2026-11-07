@@ -105,10 +105,10 @@ class TestAsyncInstallHook:
 
 
 @pytest.mark.unit
-class TestDocumentsModuleNoAsyncioRun:
+class TestWarehouseModuleNoAsyncioRun:
     """The warehouse module must not use asyncio.run() in its install hook."""
 
-    def test_documents_module_uses_async_hook(self):
+    def test_warehouse_module_uses_async_hook(self):
         """Verify the warehouse module source no longer contains asyncio.run."""
         source = (
             Path(__file__).resolve().parent.parent.parent

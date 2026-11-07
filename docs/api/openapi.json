@@ -30710,7 +30710,7 @@
           "Warehouse"
         ],
         "summary": "List Documents Awaiting My Approval",
-        "description": "List documents the current user can act on (PENDING/IN_PROGRESS).\n\nPowers the \"Do akceptacji\" submenu in the Documents module \u2014 approvers\nsee only what they can act on without leaving the document context. The\nsame read fills To do's *Needs a decision* block, so one rule answers\nboth: the approvals module must be on, the reader must hold\n``approvals:approve`` and the open stage must name them. A disabled\nmodule reads as an empty queue; a failed lookup is a 500.",
+        "description": "List documents the current user can act on (PENDING/IN_PROGRESS).\n\nPowers the \"To approve\" submenu in the warehouse module \u2014 approvers\nsee only what they can act on without leaving the document context. The\nsame read fills To do's *Needs a decision* block, so one rule answers\nboth: the approvals module must be on, the reader must hold\n``approvals:approve`` and the open stage must name them. A disabled\nmodule reads as an empty queue; a failed lookup is a 500.",
         "operationId": "list_documents_awaiting_my_approval_api_v1_warehouse_awaiting_my_approval_get",
         "security": [
           {

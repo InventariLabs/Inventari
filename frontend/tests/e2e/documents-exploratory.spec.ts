@@ -5,7 +5,7 @@ import { shownTitle } from "./helpers/document-title";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 
 // ══════════════════════════════════════════════════════════════════════════════
-// DOCUMENTS MODULE — E2E EXPLORATORY / QA TESTS
+// WAREHOUSE MODULE — E2E EXPLORATORY / QA TESTS
 //
 // Focus: user workflows, UI interactions, data integrity, error recovery.
 // Unlike pentest, these assume a good-faith user and look for UX bugs.

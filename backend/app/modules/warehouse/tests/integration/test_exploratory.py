@@ -1,4 +1,4 @@
-"""Documents module — exploratory / QA tests.
+"""Warehouse module — exploratory / QA tests.
 
 These tests simulate real user behavior and try to find bugs in the
 document lifecycle, corrections, returns, WMS, and data integrity.

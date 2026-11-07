@@ -154,11 +154,11 @@ class PartnerDeactivatedPayload(TenantEventPayload):
     partner_id: str
 
 
-# ── Documents module ─────────────────────────────────────────────────────────
+# ── Warehouse module ─────────────────────────────────────────────────────────
 
 
 class DocumentConfirmedPayload(TenantEventPayload):
-    """Module-owned (documents) — lives here until the planned move.
+    """Module-owned (warehouse) — lives here until the planned move.
 
     Each line says what it is about — ``product_id``, ``product_code``,
     ``lot_id`` and ``lot_number`` (where the line names a batch, the id once
@@ -174,7 +174,7 @@ class DocumentConfirmedPayload(TenantEventPayload):
 
 
 class DocumentCompletedPayload(TenantEventPayload):
-    """Module-owned (documents) — lives here until the planned move."""
+    """Module-owned (warehouse) — lives here until the planned move."""
 
     document_id: str
     document_type: str
@@ -182,7 +182,7 @@ class DocumentCompletedPayload(TenantEventPayload):
 
 
 class DocumentCancelledPayload(TenantEventPayload):
-    """Module-owned (documents) — lives here until the planned move."""
+    """Module-owned (warehouse) — lives here until the planned move."""
 
     document_id: str
     document_type: str
@@ -190,7 +190,7 @@ class DocumentCancelledPayload(TenantEventPayload):
 
 
 class DocumentShippedPayload(TenantEventPayload):
-    """Module-owned (documents) — lives here until the planned move.
+    """Module-owned (warehouse) — lives here until the planned move.
 
     A topic of its own rather than keys in ``document.completed``: that one
     fires for every document type and names no document number, and a
