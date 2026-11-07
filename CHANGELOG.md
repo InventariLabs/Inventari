@@ -170,6 +170,14 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- `manage.py db stamp-module` now works on a database that a newer version has
+  already migrated. `db doctor` refuses to start in that state and prints this
+  command as the way out, but the command itself stopped with "Can't locate
+  revision" because it first looked up the revision the database recorded, which
+  the older checkout has no file for. It now replaces the recorded revision
+  without looking it up. The index on `audit_log (organization_id)` is dropped
+  by a migration too: the two composite indexes on the journal serve every read
+  it did.
 - On a phone, the picking and receiving lists show the whole product name and
   the whole batch and location code instead of cutting them: they break at a
   space or a hyphen and inside a code only where it does not fit the column. A

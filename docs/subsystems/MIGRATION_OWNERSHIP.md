@@ -200,6 +200,113 @@ stray import in this repository's chains and on a vanished helper.
 | Architecture lint | `app/core/architecture_lint/` | Module with tables but no `versions/` directory |
 | Frozen imports | `tests/unit/test_migrations_import_no_application_code.py` | A core or module revision importing from `app` other than `app.core.migration_helpers`; `migration_helpers` losing a public name or gaining one nobody froze |
 
+## Revisions on a Table That Already Holds Rows
+
+A revision runs on every installation, including one whose `items`, `stock_moves`
+or `documents` hold millions of rows, and a deploy waits for it: the entrypoint
+migrates before the backend starts. Two statements turn a short revision into a
+long outage, and each has a standard form here.
+
+**A new index on an existing table is built `CONCURRENTLY`.** A plain
+`CREATE INDEX` holds a `SHARE` lock for the whole build, so nobody can write to
+the table meanwhile; the concurrent form does not. It cannot run inside a
+transaction, so it goes in an autocommit block, and it is not transactional: an
+interrupted build leaves an `INVALID` index that `IF NOT EXISTS` would keep
+forever, so the revision drops that leftover first. A table the same revision
+creates is empty — a plain `create_index` is right there, and so is a table
+that cannot grow (a settings table).
+
+```python
+_INDEX = 'ix_widgets_org_name'
+
+
+def _drop_if_invalid(conn) -> None:
+    invalid = conn.exec_driver_sql(
+        'SELECT 1 FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid '
+        'WHERE c.relname = %s AND i.indisvalid = false',
+        (_INDEX,),
+    ).fetchone()
+    if invalid:
+        conn.exec_driver_sql(f'DROP INDEX CONCURRENTLY IF EXISTS {_INDEX}')
+
+
+def upgrade() -> None:
+    with op.get_context().autocommit_block():
+        conn = op.get_bind()
+        _drop_if_invalid(conn)
+        conn.exec_driver_sql(
+            f'CREATE INDEX CONCURRENTLY IF NOT EXISTS {_INDEX} '
+            'ON widgets (organization_id, name)'
+        )
+
+
+def downgrade() -> None:
+    with op.get_context().autocommit_block():
+        op.get_bind().exec_driver_sql(f'DROP INDEX CONCURRENTLY IF EXISTS {_INDEX}')
+```
+
+Dropping an index on a large table takes the same form (`DROP INDEX
+CONCURRENTLY`; the downgrade then builds it back as above). The same applies to
+a unique index: build it `CONCURRENTLY`, after a revision of its own that has
+removed whatever would violate it. The core chain has the pattern in the
+archived `smvmoved01` (`migrations/versions_archive/`) and in `auditidx03`.
+
+**A backfill runs in batches, in a revision of its own.** One `UPDATE` over the
+whole table is one transaction: it locks every row it touches until the end,
+and bloats the table by the size of the table. Update a bounded slice per
+statement instead, each committed on its own, and select the rows still to do
+by the same predicate that keeps a finished row out — that is what ends the
+loop, and what makes an interrupted run resume where it stopped:
+
+```python
+_BATCH = 5000
+
+
+def upgrade() -> None:
+    with op.get_context().autocommit_block():
+        conn = op.get_bind()
+        while True:
+            moved = conn.exec_driver_sql(
+                'UPDATE widgets SET label = lower(name) WHERE id IN ('
+                'SELECT id FROM widgets WHERE label IS NULL ORDER BY id LIMIT %s)',
+                (_BATCH,),
+            ).rowcount
+            if not moved:
+                break
+```
+
+A backfill whose rows cannot be told apart from finished ones by a predicate
+(it rewrites a value to another valid value) gets a marker column, or walks the
+key in order (`WHERE id > :last ORDER BY id LIMIT n`). A revision that must see
+one consistent snapshot, as `ledgertotals02` does under `LOCK TABLE ... SHARE`,
+cannot be batched; it says so in its docstring and is announced in the release
+notes as a revision that blocks writes for as long as it takes. There is no
+helper for either: the application code a revision may import is frozen
+(`tests/unit/test_migrations_import_no_application_code.py`), so the snippets
+above are written out in each revision.
+
+**How the chain reads against this.** Reviewed for a replay on a large database;
+the revisions are listed by what they would hold up there.
+
+- *Core chain, built non-concurrently on a table that grows:* `itemsname01`
+  (`items`, `product_templates`) and `listreads01` (`items` trigram, serial
+  number) — both shipped in 0.11.0 and are `IF NOT EXISTS`, so a database that
+  already ran them is unaffected; a pre-0.11 database stamped onto the baseline
+  runs them once. `archivedat01` (`items`) was still unreleased and is
+  `CONCURRENTLY` now. `ledgertotals02` takes `stock_moves` in `SHARE` mode by
+  design, see above.
+- *Core chain, harmless at any size:* `itemtypes01`, `fknames01` and `locnames02`
+  (catalog-only changes or tables that stay small), `locnames01` (touches only the
+  duplicate names), `fieldwords01` (`categories`), `itemimportjob01`,
+  `ledgertotals01`.
+- *Module chains:* `doc_register_pagination01` (`documents`) and
+  `doc_list_reads01` (`document_lines`) index tables that grow with every
+  document, and `doc_line_unit_backfill01` rewrites `document_lines` in one
+  `UPDATE`; `recipes/003` and `006` (ingredients, picking items) are one `UPDATE`
+  each. They shipped in 0.11.0 and ran on empty or demo-sized databases; they
+  are the ones to rewrite in this form before they could run against a large
+  one, and a revision added from now on follows the section above.
+
 ## Core Migration Chain
 
 The core chain starts with `baseline_002`, which builds the domain-neutral
