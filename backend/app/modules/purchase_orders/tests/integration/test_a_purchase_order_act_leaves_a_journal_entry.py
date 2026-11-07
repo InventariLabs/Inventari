@@ -94,6 +94,44 @@ class TestOrderActsAreJournalled:
         assert snapshot['after']['lines'] == [{'name': 'Widget', 'quantity': '5'}]
         assert 'partner_id' not in snapshot['after']
 
+    def test_round_numbers_are_written_in_fixed_point(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        po_partner: Any,
+        po_org: Any,
+        db_session: Session,
+    ) -> None:
+        # Decimal('10').normalize() is 1E+1; the reader prints what is stored.
+        created = client.post(
+            PO_URL,
+            headers=po_auth_headers,
+            json={
+                'partner_id': str(po_partner.id),
+                'lines': [
+                    {'name': 'Box', 'quantity_ordered': 10, 'unit_price': '20.00'}
+                ],
+            },
+        )
+        assert created.status_code == 201, created.text
+        po = created.json()
+        resp = client.patch(
+            f'{PO_URL}/{po["id"]}',
+            headers=po_auth_headers,
+            json={
+                'lines': [{'name': 'Box', 'quantity_ordered': 1500, 'unit_price': '20'}]
+            },
+        )
+        assert resp.status_code == 200, resp.text
+
+        (entry,) = _entries(db_session, po_org, 'purchase_order', po['id'])
+        assert entry['before']['lines'] == [
+            {'name': 'Box', 'quantity': '10', 'unit_price': '20'}
+        ]
+        assert entry['after']['lines'] == [
+            {'name': 'Box', 'quantity': '1500', 'unit_price': '20'}
+        ]
+
     @pytest.mark.parametrize(
         ('field', 'key', 'old', 'new', 'old_value', 'new_value'),
         [

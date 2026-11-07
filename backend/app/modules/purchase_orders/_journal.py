@@ -10,6 +10,7 @@ when the act is not a field change, a word for what happened.
 
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -21,6 +22,15 @@ from app.core.public_api import core_api
 from app.core.settings_diff import changed_settings_snapshot, journal_config_change
 
 from .models import PurchaseOrder, ReorderRule
+
+
+def _plain(value: Decimal) -> str:
+    """A number without trailing zeros and never in exponent form.
+
+    ``Decimal('10').normalize()`` is ``1E+1`` and is stored as that; the
+    reader prints what is stored, so a round quantity must be written as 10.
+    """
+    return format(value.normalize(), 'f')
 
 
 def _line_state(line: Any, rule_shelves: dict[UUID, str | None]) -> dict[str, Any]:
@@ -35,12 +45,12 @@ def _line_state(line: Any, rule_shelves: dict[UUID, str | None]) -> dict[str, An
     """
     state: dict[str, Any] = {
         'name': line.name,
-        'quantity': line.quantity_ordered.normalize(),
+        'quantity': _plain(line.quantity_ordered),
     }
     if line.unit_price is not None:
-        state['unit_price'] = line.unit_price.normalize()
+        state['unit_price'] = _plain(line.unit_price)
     if line.tax_rate is not None:
-        state['tax_rate'] = line.tax_rate.normalize()
+        state['tax_rate'] = _plain(line.tax_rate)
     if line.product_template is not None:
         state['product'] = line.product_template.name
     if line.uom is not None:
