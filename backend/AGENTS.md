@@ -238,6 +238,10 @@ Every query MUST be scoped to `organization_id`. Never return data without filte
 - **Auto-generate first**: `alembic revision --autogenerate -m "short_description"`, then **review the generated file** — auto-generate can miss renamed columns (shows as drop+add); fix manually.
 - **Naming**: imperative, lowercase: `"add expiry_date to items"`, `"create webhook_logs table"`.
 - **No data migrations in schema files**: backfills get a separate migration file.
+- **Indexes and backfills on a table that already holds rows**: build the index `CONCURRENTLY` (autocommit block,
+  invalid-leftover guard) and update in committed batches, not one `UPDATE` over the table. The template, and
+  which existing revisions fall short of it, is in `docs/subsystems/MIGRATION_OWNERSHIP.md`
+  (*Revisions on a Table That Already Holds Rows*).
 - **Downgrade**: always implement a working `downgrade()` function.
 - **Module tables live in module migrations**: tables defined in `app/modules/<M>/models.py` are created by
   `app/modules/<M>/migrations/versions/`, **never** in core `migrations/versions/baseline_002_full_schema.py` —

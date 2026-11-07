@@ -65,6 +65,8 @@ NGINX_DOTFILES = re.compile(
     re.MULTILINE,
 )
 NGINX_REGEX_LOCATION = re.compile(r'^[ \t]*location ~\*? ', re.MULTILINE)
+# A prefix location, plain or `^~`; `=` and the regex forms start with no `/`.
+NGINX_PREFIX_LOCATION = re.compile(r'^[ \t]*location (\^~ )?(/\S*) \{', re.MULTILINE)
 
 
 def check_caddyfile(text: str) -> list[str]:
@@ -255,6 +257,40 @@ def check_nginx_probe_surface(text: str) -> list[str]:
     return problems
 
 
+def check_nginx_proxy_precedence(text: str) -> list[str]:
+    """Refuse a proxying prefix location that a regex location can take over.
+
+    nginx settles on the longest matching prefix and then, unless that prefix
+    carries ``^~``, asks the regex locations and answers with the first that
+    matches. The static-asset regex matches any path ending in ``.jpg``,
+    ``.png`` or ``.svg``, so a plain ``location /uploads`` sent every stored
+    photo to that block, which looked for it on disk and answered 404 — out
+    of sight behind Caddy, which routes ``/uploads/*`` itself, and every photo
+    lost on a deployment that reaches the frontend container directly. A
+    block that hands paths to another server must therefore be ``^~``.
+
+    ``location /public/`` is the one exception, and it is one by design: it
+    also serves the SPA document to a navigation, so it stays under the
+    regexes the way the SPA fallback does — ``^~`` would let ``/public/.env``
+    asked as text/html bypass the dot-segment 404 and come back ``200
+    index.html``. Its paths are a code or a URL-safe token, never a file name.
+    """
+    code = '\n'.join(line.split('#', 1)[0] for line in text.splitlines()) + '\n'
+    problems: list[str] = []
+    for match in NGINX_PREFIX_LOCATION.finditer(code):
+        if match.group(1):
+            continue
+        block = code[match.end() : code.find('\n    }', match.end())]
+        if 'proxy_pass' in block and not NGINX_NAVIGATION.search(block):
+            path = match.group(2)
+            problems.append(
+                f'nginx.conf: `location {path}` proxies without `^~`, so a regex '
+                f'location answers any {path} path it matches: one ending in '
+                '.jpg or .svg reaches the static-asset block and 404s'
+            )
+    return problems
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--caddyfile', type=Path, default=REPO_ROOT / 'Caddyfile')
@@ -270,6 +306,7 @@ def main(argv: list[str] | None = None) -> int:
         + check_nginx_document_cache(nginx)
         + check_nginx_security_headers(nginx)
         + check_nginx_probe_surface(nginx)
+        + check_nginx_proxy_precedence(nginx)
     )
     for problem in problems:
         print(problem, file=sys.stderr)

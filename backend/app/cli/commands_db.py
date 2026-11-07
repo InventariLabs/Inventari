@@ -465,9 +465,10 @@ def _module_chain_changes(gap, pending) -> bool:
 #: What the core revisions after the baseline remove. A database stamped from
 #: the previous chain still carries these, and the upgrade that follows the
 #: stamp drops them, so their absence from the models is not a reason to refuse
-#: it. Tables, and ``(table, column)`` pairs.
+#: it. Tables, ``(table, column)`` pairs, and indexes on tables that stay.
 _DROPPED_AFTER_BASELINE_TABLES = {'item_type_definitions'}
 _DROPPED_AFTER_BASELINE_COLUMNS = {('items', 'item_type')}
+_DROPPED_AFTER_BASELINE_INDEXES = {'ix_audit_log_organization_id'}
 
 
 #: The indexes the core revisions after the baseline build on tables the
@@ -499,7 +500,8 @@ def _dropped_after_baseline(gap) -> bool:
         ):
             continue
         if kind == 'remove_index' and (
-            entry[1].table.name in _DROPPED_AFTER_BASELINE_TABLES
+            entry[1].name in _DROPPED_AFTER_BASELINE_INDEXES
+            or entry[1].table.name in _DROPPED_AFTER_BASELINE_TABLES
             or any(
                 (entry[1].table.name, column.name) in _DROPPED_AFTER_BASELINE_COLUMNS
                 for column in entry[1].columns
