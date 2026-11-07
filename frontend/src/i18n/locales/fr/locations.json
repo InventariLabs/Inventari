@@ -60,7 +60,8 @@
   "errors": {
     "cannotDelete": "Suppression impossible : retirez ou déplacez d'abord les produits.",
     "cannotArchive": "Impossible d'archiver cet emplacement",
-    "cannotRestore": "Impossible de restaurer l'emplacement"
+    "cannotRestore": "Impossible de restaurer l'emplacement",
+    "createFailed": "Impossible de créer l'emplacement. Réessayez."
   },
   "wizard": {
     "discardTitle": "Abandonner ce nouvel emplacement ?",
@@ -202,7 +203,6 @@
     "step1DescMore": "Nommez l'emplacement que vous ajoutez – ex. Chambre froide, Réception.",
     "parentPlaceholder": "Choisir un emplacement"
   },
-  "unknownError": "Erreur inconnue",
   "edit": {
     "nameLabel": "Nom",
     "qrCodeLabel": "QR code",

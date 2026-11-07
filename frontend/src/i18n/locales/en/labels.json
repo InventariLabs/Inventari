@@ -15,7 +15,8 @@
     "selectLabel": "Select label {{code}}",
     "freeLabel": "Free label",
     "freeLabelNamed": "Free label {{code}}",
-    "freeLabelConfirm": "Label {{code}} will no longer point at {{name}}. It can be attached to another product or reused."
+    "freeLabelConfirm": "Label {{code}} will no longer point at {{name}}. It can be attached to another product or reused.",
+    "freeLabelFailed": "Could not free the label"
   },
   "filters": {
     "statusAll": "All Statuses",
@@ -187,7 +188,6 @@
   "history": {
     "label": "Label",
     "previouslyUsedFor": "Previously used for",
-    "status": "Status",
     "title": "Product history"
   },
   "openScanActions": "Open scan actions",

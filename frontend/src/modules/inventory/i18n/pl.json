@@ -196,7 +196,8 @@
       "message": "Powód zostaje przy partii i jest widoczny obok jej statusu.",
       "label": "Dlaczego",
       "placeholder": "Zawiadomienie dostawcy 41/26 — szkło w słoiku 12",
-      "confirm": "Zmień status"
+      "confirm": "Zmień status",
+      "failed": "Nie udało się zmienić statusu partii"
     },
     "actionsFor": "Akcje dla partii {{name}}",
     "columns": {
