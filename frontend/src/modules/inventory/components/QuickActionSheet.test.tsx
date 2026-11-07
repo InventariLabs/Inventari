@@ -21,21 +21,24 @@ import { formatDate } from "@/utils/formatters";
 // inside whichever test happens to be running, and the console gate fails that
 // one with "a suspended resource finished loading inside a test" — so which
 // test failed depended on how many synchronous tests ran ahead of it. The
-// import only starts when a sheet first renders, so render one here, inside
-// act, and wait for it: the slots are resolved before the first test runs and
-// the order stops mattering.
+// import only starts when a sheet first renders, so render one here and wait
+// for it. The render must stay OUTSIDE act: render() already runs inside an
+// outer act scope, and React defers a nested act's work until that outermost
+// scope exits, so a sheet rendered inside this act is still empty when
+// dynamicImportSettled() runs, nothing is pending, and unmount() cancels the
+// queued render. Rendered outside, the import has started before the wait.
 beforeAll(async () => {
   signInWith(["items:read", "items:write"]);
+  const { unmount } = render(
+    <QuickActionSheet
+      item={{ id: "warm-up", name: "Warm-up", quantity: "1" } as Item}
+      onClose={() => {}}
+    />,
+  );
   await act(async () => {
-    const { unmount } = render(
-      <QuickActionSheet
-        item={{ id: "warm-up", name: "Warm-up", quantity: "1" } as Item}
-        onClose={() => {}}
-      />,
-    );
     await vi.dynamicImportSettled();
-    unmount();
   });
+  unmount();
   signOut();
 });
 
