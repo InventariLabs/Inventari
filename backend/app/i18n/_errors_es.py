@@ -596,6 +596,7 @@ ERRORS_ES: ErrorMessages = {
     'approval_not_stage_approver': 'No eres persona aprobadora de esta etapa.',
     'approval_only_requester_can_cancel': 'Solo quien creó la solicitud puede retirarla.',
     'approval_workflow_inactive': 'El flujo de aprobación de esta solicitud ya no está activo.',
+    'approval_target_not_found': 'Este registro no existe, por lo que no se puede solicitar su aprobación.',
     'approval_request_already_open': 'Ya hay una solicitud de aprobación abierta para este registro.',
     'approval_workflow_no_stages': 'Este flujo de aprobación no tiene etapas configuradas.',
     'approval_workflow_needs_stage': 'Un flujo de aprobación necesita al menos una etapa.',

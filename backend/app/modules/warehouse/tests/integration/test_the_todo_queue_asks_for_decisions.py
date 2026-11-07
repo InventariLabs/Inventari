@@ -308,6 +308,60 @@ class TestTheTodoQueueAsksForDecisions:
         assert approved.status_code == status.HTTP_200_OK, approved.text
         assert _decisions(_todo(client, doc_auth_headers), 'approvals')['total'] == 0
 
+    def test_an_organization_with_no_modules_listed_still_has_its_approvals(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_org: Organization,
+        doc_approval_workflow: ApprovalWorkflow,
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+        doc_stock_item: Item,
+    ) -> None:
+        """An empty module list reads as every default module, here as well.
+
+        The To do used to test the list itself, so an organization that kept
+        the defaults had its approvals module on for every other screen and
+        off for the decisions block.
+        """
+        _set_threshold(client, doc_auth_headers, '100.00')
+        document = _create_document(
+            client,
+            doc_auth_headers,
+            doc_type='IN',
+            partner_id=str(doc_partner.id),
+            target_location_id=str(doc_target_location.id),
+            template_id=str(doc_template.id),
+            item_id=str(doc_stock_item.id),
+            quantity='5',
+            unit_price='50.00',
+        )
+        confirmed = client.patch(
+            f'/api/v1/warehouse/documents/{document["id"]}/confirm',
+            headers=doc_auth_headers,
+        )
+        assert confirmed.json()['status'] == 'PENDING_APPROVAL', confirmed.text
+
+        from app.database import SessionLocal
+
+        original = list(doc_org.enabled_modules or [])
+        with SessionLocal() as other:
+            synced = other.get(Organization, doc_org.id)
+            assert synced is not None
+            synced.enabled_modules = []
+            other.commit()
+        try:
+            todo = _todo(client, doc_auth_headers)
+            _decision(todo, 'approvals', document['id'])
+            assert _decisions(todo, 'approvals')['total'] == 1
+        finally:
+            with SessionLocal() as other:
+                synced = other.get(Organization, doc_org.id)
+                if synced is not None:
+                    synced.enabled_modules = original
+                    other.commit()
+
     def test_a_quarantined_batch_is_a_decision(
         self,
         client: TestClient,

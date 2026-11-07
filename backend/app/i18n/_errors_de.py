@@ -598,6 +598,7 @@ ERRORS_DE: ErrorMessages = {
     'approval_not_stage_approver': 'Sie sind für diese Stufe nicht als genehmigende Person eingetragen.',
     'approval_only_requester_can_cancel': 'Nur die Person, die die Anfrage gestellt hat, kann sie zurückziehen.',
     'approval_workflow_inactive': 'Der Genehmigungsworkflow hinter dieser Anfrage ist nicht mehr aktiv.',
+    'approval_target_not_found': 'Dieser Datensatz existiert nicht, daher kann dafür keine Genehmigung angefragt werden.',
     'approval_request_already_open': 'Für diesen Datensatz ist bereits eine Genehmigungsanfrage offen.',
     'approval_workflow_no_stages': 'Für diesen Genehmigungsworkflow sind keine Stufen konfiguriert.',
     'approval_workflow_needs_stage': 'Ein Genehmigungsworkflow benötigt mindestens eine Stufe.',

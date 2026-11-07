@@ -15,6 +15,22 @@ def h(db_session: Session) -> ModuleTestHelper:
     return ModuleTestHelper(db_session)
 
 
+@pytest.fixture(autouse=True)
+def any_target_may_be_requested(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Let the request route take a made-up target id.
+
+    The route refuses an id that names no record. Most tests here exercise
+    what happens to a request afterwards and raise it over a random id; the
+    check itself is covered, with real documents, where its tests live (they
+    override this fixture).
+    """
+
+    async def accept(*_args: object) -> None:
+        return None
+
+    monkeypatch.setattr('app.modules.approvals.router.require_target_exists', accept)
+
+
 @pytest.fixture
 def approval_org(h: ModuleTestHelper) -> Organization:
     return h.create_org(

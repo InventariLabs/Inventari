@@ -108,24 +108,42 @@ async def documents_needing_approval_async(
 
     The list form of ``document_needs_approval_async``, for a screen that has
     to say before the tap which rows its own action would refuse. Every
-    answer is that function's: the exemption is asked once per requester, who
-    is usually the same person across a page, and the rest is the rule above.
+    answer is that function's, asked in batches: the exemption once per
+    requester, who is usually the same person across a page; the profile's
+    verdict once for all the documents of the people it does not exempt; and
+    the active workflow once, and only when the profile left a document to it.
     """
-    required: set[UUID] = set()
     exemptions: dict[UUID | None, bool] = {}
-    for document_id, requester_id in documents:
+    for _, requester_id in documents:
         if requester_id not in exemptions:
             exemptions[requester_id] = await approvals_api.requester_exempt(
                 db, org_id, _TARGET, requester_id
             )
-        if await document_needs_approval_async(
-            db,
-            org_id,
-            document_id,
-            requester_id=requester_id,
-            requester_exempt=exemptions[requester_id],
-        ):
-            required.add(document_id)
+    covered = [
+        document_id
+        for document_id, requester_id in documents
+        if not exemptions[requester_id]
+    ]
+    sign_offs = await warehouse_documents().documents_sign_off_async(
+        db, org_id, covered
+    )
+    required = {
+        document_id
+        for document_id, sign_off in sign_offs.items()
+        if sign_off == 'required'
+    }
+    # Silence in the profile leaves the document to the workflow: it needs
+    # approval exactly when one is active, which is one answer for them all.
+    left_to_workflow = {
+        document_id
+        for document_id, sign_off in sign_offs.items()
+        if sign_off == 'unspecified'
+    }
+    if (
+        left_to_workflow
+        and await approvals_api.get_active_workflow(db, org_id, _TARGET) is not None
+    ):
+        required |= left_to_workflow
     return required
 
 
