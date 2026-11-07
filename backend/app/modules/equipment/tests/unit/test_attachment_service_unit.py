@@ -12,7 +12,7 @@ import pytest
 
 from app.core.exceptions import NotFoundException
 from app.modules.equipment.attachment_service import (
-    ALLOWED_CONTENT_TYPES,
+    ATTACHMENT_POLICY,
     MAX_FILE_SIZE,
     VALID_FILE_TYPES,
     delete_attachment,
@@ -50,11 +50,11 @@ def _attachment_row(file_path: str) -> MagicMock:
 @pytest.mark.unit
 class TestAttachmentConstants:
     def test_allowed_content_types_includes_pdf(self) -> None:
-        assert 'application/pdf' in ALLOWED_CONTENT_TYPES
+        assert 'application/pdf' in ATTACHMENT_POLICY.content_types
 
     def test_allowed_content_types_includes_images(self) -> None:
-        assert 'image/jpeg' in ALLOWED_CONTENT_TYPES
-        assert 'image/png' in ALLOWED_CONTENT_TYPES
+        assert 'image/jpeg' in ATTACHMENT_POLICY.content_types
+        assert 'image/png' in ATTACHMENT_POLICY.content_types
 
     def test_max_file_size_is_20mb(self) -> None:
         assert MAX_FILE_SIZE == 20 * 1024 * 1024
@@ -324,15 +324,14 @@ class TestUploadSignatureValidation:
 
 
 #: A genuine sample per allowed content type. The point of the table is that
-#: it is derived from ALLOWED_CONTENT_TYPES, so adding a type to the allowlist
-#: without a matching signature fails here instead of in production.
+#: the test below walks the policy's own type list, so adding a type to the
+#: allowlist without a matching signature fails here instead of in production.
 _SAMPLE_BYTES = {
     'application/pdf': b'%PDF-1.4 body',
     'image/jpeg': b'\xff\xd8\xff\xe0 body',
     'image/png': b'\x89PNG\r\n\x1a\n body',
     'image/gif': b'GIF89a body',
     'image/webp': b'RIFF\x00\x00\x00\x00WEBP body',
-    'application/msword': b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1 body',
     'application/vnd.ms-excel': b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1 body',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': (
         b'PK\x03\x04 body'
@@ -341,6 +340,8 @@ _SAMPLE_BYTES = {
         b'PK\x03\x04 body'
     ),
     'text/plain': b'just text',
+    'application/zip': b'PK\x03\x04 body',
+    'application/x-zip-compressed': b'PK\x03\x04 body',
 }
 
 
@@ -353,13 +354,13 @@ class TestEveryAllowedTypeUploads:
     the allowlist promised something the validator refused.
     """
 
-    @pytest.mark.parametrize('content_type', sorted(ALLOWED_CONTENT_TYPES))
+    @pytest.mark.parametrize('content_type', sorted(ATTACHMENT_POLICY.content_types))
     @patch('app.modules.equipment.attachment_service.core_api')
     async def test_a_genuine_file_of_each_allowed_type_is_accepted(
         self, mock_core: Any, content_type: str
     ) -> None:
         assert content_type in _SAMPLE_BYTES, (
-            f'{content_type} was added to ALLOWED_CONTENT_TYPES without a sample'
+            f'{content_type} was added to the allowlist without a sample'
         )
         mock_core.items.get_async = AsyncMock(return_value=MagicMock())
         mock_core.file_storage.save_for_org_async = AsyncMock()

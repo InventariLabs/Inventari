@@ -2,6 +2,7 @@ import { FileText, Download, X, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { ATTACHMENT_FILE_ACCEPT } from "@/module-sdk";
 import type { FieldDefinition } from "@/types";
 
 interface FileFieldProps {
@@ -91,7 +92,7 @@ export function FileField({
         id={inputId}
         type="file"
         className="sr-only"
-        accept="image/*,.pdf,.txt,.zip,.doc,.docx"
+        accept={ATTACHMENT_FILE_ACCEPT}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) {
