@@ -64,6 +64,16 @@ def test_the_module_signing_keys_are_documented_for_the_operator() -> None:
     assert 'MODULE_SIGNING_PUBLIC_KEYS' in _documented_variables()
 
 
+def test_the_default_language_is_documented_for_the_operator() -> None:
+    """An instance run for readers of one language wants its new accounts, and
+    its answers to a request that names no language, in that language.
+    `manage.py user create-admin` without `--lang` promises the account "the
+    instance default", which on this stack was English whatever `.env` said:
+    the development example carried the variable with a note that no compose
+    file forwarded it, and the production template did not name it at all."""
+    assert 'DEFAULT_LANGUAGE' in _documented_variables()
+
+
 def test_every_documented_variable_is_interpolated_by_the_production_stack() -> None:
     compose = (_REPO_ROOT / 'docker-compose.prod.yml').read_text(encoding='utf-8')
     documented = _documented_variables()

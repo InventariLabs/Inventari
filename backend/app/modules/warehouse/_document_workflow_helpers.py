@@ -16,7 +16,11 @@ from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
 from . import document_types as dt
-from ._over_receipt import SURPLUS_CODE, assert_over_receipt_allowed_async
+from ._over_receipt import (
+    SURPLUS_CODE,
+    assert_over_receipt_allowed_async,
+    is_surplus,
+)
 from ._wms_line_utils import _resolve_uom_symbol
 from .document_profile_service import resolve_document_tax_rate
 from .inventory_period_service import check_period_not_closed_async
@@ -156,7 +160,7 @@ def _default_execution_quantities(lines: Iterable[DocumentLine]) -> None:
             # code that says why, even when the delivery itself is full.
             line.discrepancy_code = None
             line.discrepancy_reason = None
-        elif line.done_quantity > line.expected_quantity:
+        elif is_surplus(line, line.done_quantity, line.expected_quantity):
             if not line.discrepancy_code:
                 line.discrepancy_code = SURPLUS_CODE
                 line.discrepancy_reason = None
@@ -266,7 +270,10 @@ def _settle_an_execution_line(
             )
         if done_quantity < line.expected_quantity and not discrepancy_code:
             raise ServiceRejectionError('document_partial_needs_discrepancy_code')
-        if done_quantity > line.expected_quantity and not discrepancy_code:
+        if (
+            is_surplus(line, done_quantity, line.expected_quantity)
+            and not discrepancy_code
+        ):
             discrepancy_code = SURPLUS_CODE
     else:
         # Corrections use signed deltas; bound by absolute expected.

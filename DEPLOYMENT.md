@@ -151,6 +151,12 @@ has published no contact. If you run a modified version, also point
 `SOURCE_CODE_URL` at your own source: AGPL-3.0 §13 requires it, and the About
 screen links it.
 
+`DEFAULT_LANGUAGE` (`en` unless set; `pl`, `de`, `fr` or `es`) is the language
+an account created without one starts in — the administrator of Step 6 too,
+unless `--lang` names another — and the one the server answers a request in
+when the request names no language it speaks. Every user changes their own in
+Settings.
+
 ### Database roles
 
 The database has two roles, and the application uses the weaker one:
