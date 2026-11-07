@@ -223,13 +223,13 @@ export function usePatchCookingHistory(recipeId: string) {
 }
 
 /**
- * The active shopping list's id, under the active-list key so every write to
- * a list (`invalidation.shoppingLists`) refreshes it too.
+ * The open shopping lists, newest first, under the active-list key so every
+ * write to a list (`invalidation.shoppingLists`) refreshes them too.
  */
-export function useActiveShoppingListId() {
+export function useOpenShoppingLists() {
   return useModuleQuery("shopping_lists", {
-    queryKey: [...queryKeys.shoppingLists.active, "id"],
-    queryFn: () => recipesApi.getActiveShoppingListId(),
+    queryKey: [...queryKeys.shoppingLists.active, "open"],
+    queryFn: () => recipesApi.getOpenShoppingLists(),
     staleTime: 30000,
   });
 }

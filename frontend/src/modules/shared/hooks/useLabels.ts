@@ -1,4 +1,5 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import i18n from "@/i18n/config";
 import { useAppMutation } from "@/lib/api/mutationFactory";
 import { labelsApi } from "@/module-sdk";
 import { invalidation } from "@/lib/api/invalidation";
@@ -73,6 +74,9 @@ export function useUnassignLabel() {
       // shows the freed label would offer to free it again.
       invalidation.items(qc);
     },
+    // Both places that free a label leave the failure to the default toast;
+    // without a fallback it read "The action could not be completed."
+    { errorFallback: i18n.t("labels:actions.freeLabelFailed") },
   );
 }
 

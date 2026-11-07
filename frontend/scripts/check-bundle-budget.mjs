@@ -346,6 +346,26 @@ const dist = join(root, "dist");
  * and the audit log already use, which the Equipment archive now reaches
  * through `@/module-sdk`; the SDK is one chunk, and the products screen loads
  * it. That one phone budget moves a step of five, to 615.
+ *
+ * Re-measured 2026-11-07 on the branch that names the open shopping list a
+ * recipe's missing items go to: the development tip alone measures the
+ * receive screen at 460.0 KiB gz, on its 460, and the branch takes it over
+ * the line (still 460.0 at one decimal, the Polish language chunk 142.7
+ * against 142.6). It is copy, not an import: the list picker's label, its
+ * announcement and the sentence for a list request that failed, in the five
+ * languages' recipes files, which the language chunk every first paint loads
+ * carries. That one phone budget moves a step of five, to 465; the other
+ * screens stand under theirs (login 393.4, launcher 408.4, start 623.1,
+ * issue 572.6, history 596.5, products 610.8, app first paint 388.7).
+ * Re-measured 2026-11-07 on the branch that keeps a link's token out of the
+ * copyable error report: the development tip alone measures the receive
+ * screen at 460.0 KiB gz against its 460, and the branch adds 0.1 KiB gz
+ * (receive 460.1, initial 189.1, app first paint 388.8). It is the masking of
+ * the page address in the error details, which ship with the entry because a
+ * chunk that failed to load is the crash they report. That one phone budget
+ * moves a step of five, to 465; the other screens stand under theirs (login
+ * 393.5, launcher 408.5, start 623.2, issue 572.7, history 596.6, products
+ * 610.9).
  */
 const BUDGETS = {
   initial: 245,

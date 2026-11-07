@@ -199,7 +199,7 @@
     "all_statuses": "Todos",
     "confirm_bulk_retire_one": "Dar baixa em {{count}} equipamento selecionado?",
     "confirm_bulk_retire_other": "Dar baixa em {{count}} equipamentos selecionados?",
-    "confirm_bulk_retire_msg": "Os equipamentos serão marcados como baixados e continuarão no cadastro. O status deles muda para Baixado.",
+    "confirm_bulk_retire_msg": "Os equipamentos serão marcados como baixados e continuarão no cadastro. O status deles muda para Baixado. Um equipamento entregue não recebe baixa — devolva-o primeiro.",
     "confirm_bulk_purge_one": "Excluir permanentemente {{count}} equipamento selecionado?",
     "confirm_bulk_purge_other": "Excluir permanentemente {{count}} equipamentos selecionados?",
     "confirm_bulk_purge_msg": "Esta ação não pode ser desfeita.",

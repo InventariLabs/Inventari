@@ -257,7 +257,7 @@
     "successUpdated": "{{count}} Produkte aktualisiert",
     "successUpdated_one": "{{count}} Produkt aktualisiert",
     "successUpdated_other": "{{count}} Produkte aktualisiert",
-    "errorUpdate": "Fehler bei der Aktualisierung"
+    "errorUpdate": "Die ausgewählten Produkte konnten nicht geändert werden"
   },
   "fields": {
     "purchase_price": "Einkaufspreis pro Einheit",
@@ -459,7 +459,8 @@
     "runningLow": "Niedriger Bestand",
     "setToCurrent": "Auf aktuelle Menge setzen",
     "save": "Alarm setzen",
-    "scopeNote": "Der Alarm gehört zum Produkt: Er wird am gesamten Bestand dieses Produkts gemessen, nicht an diesem einen Datensatz."
+    "scopeNote": "Der Alarm gehört zum Produkt: Er wird am gesamten Bestand dieses Produkts gemessen, nicht an diesem einen Datensatz.",
+    "saveFailed": "Der Mindestbestand-Alarm konnte nicht gespeichert werden"
   },
   "deletionReasonPlaceholder": "— Grund wählen —",
   "quickActions": {

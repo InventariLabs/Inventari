@@ -27438,6 +27438,11 @@ export interface components {
              * @default false
              */
             from_order: boolean;
+            /**
+             * Expected Is Count
+             * @default false
+             */
+            expected_is_count: boolean;
             /** Planned Location Id */
             planned_location_id?: string | null;
             /** Planned Location Name */
@@ -28018,6 +28023,8 @@ export interface components {
         };
         /** _GeneratedItem */
         _GeneratedItem: {
+            /** Key */
+            key: string;
             /** Name */
             name: string;
             /** Quantity */

@@ -86336,6 +86336,11 @@
             "title": "From Order",
             "default": false
           },
+          "expected_is_count": {
+            "type": "boolean",
+            "title": "Expected Is Count",
+            "default": false
+          },
           "planned_location_id": {
             "anyOf": [
               {
@@ -87912,6 +87917,10 @@
       },
       "_GeneratedItem": {
         "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
           "name": {
             "type": "string",
             "title": "Name"
@@ -87968,6 +87977,7 @@
         },
         "type": "object",
         "required": [
+          "key",
           "name",
           "quantity"
         ],

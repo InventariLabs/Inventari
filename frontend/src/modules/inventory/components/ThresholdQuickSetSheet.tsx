@@ -40,14 +40,11 @@ export default function ThresholdQuickSetSheet({ item, onClose }: Props) {
             onClose();
           },
           // "Something went wrong" over a refusal sends the reader looking for
-          // an outage instead of an administrator. The server says which it is.
+          // an outage instead of an administrator. The server says which it is;
+          // when it says nothing, the sentence still names the write that
+          // failed.
           onError: (error: unknown) =>
-            toast.error(
-              extractApiError(
-                error,
-                t("common:errors.generic", { defaultValue: "Failed to save" }),
-              ),
-            ),
+            toast.error(extractApiError(error, t("threshold.saveFailed"))),
         },
       ),
     isPending: updateItemMutation.isPending,

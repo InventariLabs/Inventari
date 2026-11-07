@@ -1,10 +1,16 @@
 import { render, screen } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
+import { AxiosError, type AxiosResponse } from "axios";
+import { toast } from "sonner";
 import ThresholdQuickSetSheet from "./ThresholdQuickSetSheet";
 import type { Item } from "@/types";
 
 const mutate = vi.fn();
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}));
 
 vi.mock("@/modules/inventory/hooks/useItemMutations", () => ({
   useUpdateItem: () => ({ mutate, isPending: false }),
@@ -78,6 +84,29 @@ describe("ThresholdQuickSetSheet", () => {
     expect(mutate).toHaveBeenCalledWith(
       { id: "item-1", data: { min_quantity: 0.5 } },
       expect.anything(),
+    );
+  });
+
+  it("names the alert when the save fails without a reason", async () => {
+    const user = userEvent.setup();
+    render(<ThresholdQuickSetSheet item={item} onClose={() => {}} />);
+
+    await user.type(screen.getByTestId("threshold-input"), "2");
+    await user.click(screen.getByRole("button", { name: /set alert|save/i }));
+    const [, options] = mutate.mock.calls[mutate.mock.calls.length - 1] as [
+      unknown,
+      { onError: (error: unknown) => void },
+    ];
+    options.onError(
+      new AxiosError("boom", "ERR_BAD_RESPONSE", undefined, undefined, {
+        status: 500,
+        data: { detail: "Internal Server Error" },
+      } as AxiosResponse),
+    );
+
+    // "Something went wrong" said neither which write failed nor that it did.
+    expect(toast.error).toHaveBeenCalledWith(
+      "Could not save the minimum stock alert",
     );
   });
 });

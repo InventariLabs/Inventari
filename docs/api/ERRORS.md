@@ -748,12 +748,15 @@ Rate limits answer with the same coded object as everything else:
   "detail": {
     "code": "RATE_LIMIT_EXCEEDED",
     "message": "Too many requests. Try again later.",
-    "limit": "10 per 1 minute"
+    "limit": "10 per 1 minute",
+    "lang": "en"
   }
 }
 ```
 
-The response carries the `limit` that was hit in the body. The limiter does
+The response carries the `limit` that was hit in the body. The `message` is in
+the request's language whichever limit refused it — a route's own or the
+default one, which refuses before the route is reached. The limiter does
 not add `X-RateLimit-*` or `Retry-After` headers today; wait before retrying,
 because a request retried inside the same window is refused again.
 

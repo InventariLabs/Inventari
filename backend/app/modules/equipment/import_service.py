@@ -23,6 +23,7 @@ from app.core.file_import import (
     resolve_storage_location_async,
 )
 from app.core.import_sheet import read_rows, row_text
+from app.core.interceptors import InterceptorError
 from app.core.logging import get_logger
 
 from ._import_dedup_service import find_item_by_serial_async
@@ -299,8 +300,15 @@ async def execute_equipment_import(
                 location_cache=location_cache,
                 category_cache=category_cache,
             )
-        except (ValueError, SQLAlchemyError, InvalidOperation) as exc:
-            if isinstance(exc, ValueError) and is_reader_facing_value_error(exc):
+        except (
+            ValueError,
+            SQLAlchemyError,
+            InvalidOperation,
+            InterceptorError,
+        ) as exc:
+            if isinstance(exc, InterceptorError) or (
+                isinstance(exc, ValueError) and is_reader_facing_value_error(exc)
+            ):
                 # A refusal this codebase wrote, in the request's language.
                 errors.append(refusal_row(exc, row=row_num))
             else:

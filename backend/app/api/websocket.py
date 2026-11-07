@@ -23,6 +23,12 @@ USER_CHANNEL_PREFIX = 'notifications:user:'
 #: to disconnect — which for a notification socket is "until the tab closes".
 REVALIDATE_EVERY_SECONDS = 30.0
 
+#: The subprotocol a client offers just ahead of its access token. The browser
+#: WebSocket API cannot set an ``Authorization`` header, but the subprotocols
+#: it offers travel in the ``Sec-WebSocket-Protocol`` header — a header, which
+#: access logs leave out, where the query string goes into every one of them.
+BEARER_SUBPROTOCOL = 'bearer'
+
 
 class NotificationHub:
     """Manages WebSocket connections + Redis Pub/Sub for real-time notifications.
@@ -43,8 +49,10 @@ class NotificationHub:
         if self._redis:
             await self._redis.close()
 
-    async def connect(self, websocket: WebSocket, user_id: str) -> None:
-        await websocket.accept()
+    async def connect(
+        self, websocket: WebSocket, user_id: str, subprotocol: str | None = None
+    ) -> None:
+        await websocket.accept(subprotocol=subprotocol)
         self._connections.setdefault(user_id, set()).add(websocket)
 
     async def disconnect(self, websocket: WebSocket, user_id: str) -> None:
@@ -149,21 +157,27 @@ async def _close_when_credential_dies(
         return
 
 
+def _offered_token(websocket: WebSocket) -> str:
+    """The access token offered as the subprotocol that follows ``bearer``."""
+    offered = list(websocket.scope.get('subprotocols') or [])
+    if len(offered) == 2 and offered[0] == BEARER_SUBPROTOCOL:
+        return offered[1]
+    return ''
+
+
 @router.websocket('/ws/notifications')
 async def notifications_ws(websocket: WebSocket) -> None:
     """WebSocket endpoint for real-time notifications.
 
-    The access token travels in the query string, which means it can land in
-    proxy access logs and browser history — a known trade-off, kept because the
-    browser WebSocket API cannot set an ``Authorization`` header and the
-    alternative (smuggling the token through ``Sec-WebSocket-Protocol``) is
-    awkward on both ends. It is bounded: the token is short-lived, the room is
-    the authenticated user's own, and a leaked entry expires with the token.
-    Reverse proxies in front of this endpoint should keep query strings out of
-    their access logs.
+    The client offers two subprotocols, ``bearer`` and then its JWT access
+    token, and the socket answers with ``bearer``. The token used to travel in
+    the query string, where uvicorn's own log and every proxy's access log
+    wrote it down on each connect, and those logs outlive the token by far.
+    In a header it goes where every other API request already sends one.
+    A ``token`` query parameter is not read: a client still putting it there
+    is refused, so the address never becomes a way in again.
 
     Query params:
-        token   — required JWT access token.
         org_id  — ignored; the WS room is always the authenticated user's id,
                   derived server-side from the user record (a client-supplied
                   org_id must not let a user join another user's room).
@@ -172,7 +186,7 @@ async def notifications_ws(websocket: WebSocket) -> None:
         4001 — missing/invalid token, token revoked, or user record invalid.
         4003 — user is blocked.
     """
-    token = websocket.query_params.get('token', '')
+    token = _offered_token(websocket)
     if not token:
         await websocket.close(code=4001, reason='Missing token')
         return
@@ -224,7 +238,7 @@ async def notifications_ws(websocket: WebSocket) -> None:
 
     user_id = str(resolved_user_id)
 
-    await hub.connect(websocket, user_id)
+    await hub.connect(websocket, user_id, subprotocol=BEARER_SUBPROTOCOL)
     watchdog = asyncio.create_task(
         _close_when_credential_dies(websocket, token, payload)
     )

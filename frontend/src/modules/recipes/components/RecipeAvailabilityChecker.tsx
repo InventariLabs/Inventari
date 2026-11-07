@@ -6,10 +6,11 @@ import { toast } from "sonner";
 import {
   useRecipeAvailability,
   useAddToShoppingList,
-  useActiveShoppingListId,
+  useOpenShoppingLists,
 } from "../hooks/useRecipes";
 import IngredientRow from "./IngredientRow";
 import { Button } from "@/components/ui/Button";
+import { NativeSelect } from "@/components/ui/NativeSelect";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import ServingsSelector from "./ServingsSelector";
 import { Card } from "@/components/ui/Card";
@@ -58,7 +59,12 @@ export default function RecipeAvailabilityChecker({
   const avail = availabilityQuery.data;
 
   const addToShoppingListMutation = useAddToShoppingList(recipeId);
-  const { data: activeListId } = useActiveShoppingListId();
+  const { data: openLists = [], isError: listsFailed } = useOpenShoppingLists();
+  // The newest open list is the default; with several, the reader can name
+  // another. A choice that has since left the open lists falls back to it.
+  const [pickedListId, setPickedListId] = useState<string | null>(null);
+  const targetListId =
+    openLists.find((list) => list.id === pickedListId)?.id ?? openLists[0]?.id;
   // writing to a disabled module succeeded silently — the button
   // confirmed data the user could never reach. Gate the action on the
   // target module being enabled (the API write itself stays permissive so
@@ -73,10 +79,10 @@ export default function RecipeAvailabilityChecker({
     try {
       const result = await addToShoppingListMutation.mutateAsync({
         servings: activeServings,
-        // reuse the active (newest) list instead of letting the
-        // backend create a new one on every click; when there is no active
-        // list the id is omitted and the backend creates the first one.
-        ...(activeListId ? { shopping_list_id: activeListId } : {}),
+        // reuse the chosen (by default the newest) open list instead of
+        // letting the backend create a new one on every click; when there is
+        // no open list the id is omitted and the backend creates the first one.
+        ...(targetListId ? { shopping_list_id: targetListId } : {}),
       });
       // Nothing added because it is all on the list already: "Added 0
       // items" read as "nothing was missing" or as a failure.
@@ -283,25 +289,46 @@ export default function RecipeAvailabilityChecker({
             </div>
 
             {shoppingListsEnabled && canWrite && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleAddToShoppingList}
-                disabled={!hasMissing || addToShoppingListMutation.isPending}
-                title={
-                  !hasMissing
-                    ? t("availability.add_missing_disabled_tooltip")
-                    : undefined
-                }
-                className="shrink-0"
-              >
-                {addToShoppingListMutation.isPending ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <ShoppingCart size={16} />
+              <div className="flex flex-wrap items-end gap-2">
+                {openLists.length > 1 && (
+                  <NativeSelect
+                    label={t("shopping.target_list_label")}
+                    value={targetListId}
+                    onChange={(event) => setPickedListId(event.target.value)}
+                    wrapperClassName="min-w-0 sm:max-w-56"
+                  >
+                    {openLists.map((list) => (
+                      <option key={list.id} value={list.id}>
+                        {list.name}
+                      </option>
+                    ))}
+                  </NativeSelect>
                 )}
-                {t("shopping.add_missing_button")}
-              </Button>
+                {listsFailed && (
+                  <p role="alert" className="text-xs text-on-muted">
+                    {t("shopping.lists_unavailable")}
+                  </p>
+                )}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleAddToShoppingList}
+                  disabled={!hasMissing || addToShoppingListMutation.isPending}
+                  title={
+                    !hasMissing
+                      ? t("availability.add_missing_disabled_tooltip")
+                      : undefined
+                  }
+                  className="shrink-0"
+                >
+                  {addToShoppingListMutation.isPending ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <ShoppingCart size={16} />
+                  )}
+                  {t("shopping.add_missing_button")}
+                </Button>
+              </div>
             )}
           </div>
         </div>

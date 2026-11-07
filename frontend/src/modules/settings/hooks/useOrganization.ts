@@ -14,9 +14,10 @@ import type { Organization } from "@/types";
 import { setOrganizationCountry } from "@/utils/formatters";
 // ─── Queries ─────────────────────────────────────────────────────────────────
 
-export function useOrganization() {
+export function useOrganization(options?: { enabled?: boolean }) {
   return useQuery<Organization>({
     queryKey: queryKeys.organization.detail,
+    enabled: options?.enabled ?? true,
     // The formatters read the organization's country to pick English's
     // regional variant; set it before the data reaches a component, so the
     // first render already writes dates the organization's way.

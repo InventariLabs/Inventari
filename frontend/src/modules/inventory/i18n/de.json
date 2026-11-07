@@ -186,7 +186,8 @@
       "message": "Der Grund bleibt bei der Charge und steht neben ihrem Status.",
       "label": "Warum",
       "placeholder": "Lieferantenmeldung 41/26 — Glas in Glas 12 gefunden",
-      "confirm": "Status ändern"
+      "confirm": "Status ändern",
+      "failed": "Der Status der Charge konnte nicht geändert werden"
     },
     "actionsFor": "Aktionen für Charge {{name}}",
     "columns": {

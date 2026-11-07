@@ -764,6 +764,28 @@ describe("StorageWizard - building a location through all three steps", () => {
     expect(screen.getByRole("button", { name: "Done" })).toBeInTheDocument();
   });
 
+  it("says the location was not created when the server fails without a reason", async () => {
+    const onClose = vi.fn();
+    const user = await openWizard(onClose);
+
+    await user.click(await screen.findByRole("button", { name: "Garage" }));
+    await user.click(await screen.findByRole("button", { name: "Done" }));
+    act(() =>
+      lastCall()[1].onError(
+        new AxiosError("boom", "ERR_BAD_RESPONSE", undefined, undefined, {
+          status: 500,
+          data: { detail: "Internal Server Error" },
+        } as AxiosResponse),
+      ),
+    );
+
+    // "Unknown error" named neither the write nor its outcome.
+    expect(toast.error).toHaveBeenCalledWith(
+      "Could not create the location. Try again.",
+    );
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("asks the types again when 'Try again' is pressed on the third step", async () => {
     typeQuery.error = new Error("down");
     const user = await openWizard();

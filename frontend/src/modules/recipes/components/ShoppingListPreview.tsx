@@ -121,14 +121,13 @@ export function ShoppingListPreview({
                   {t("recipes:meal_planner.buy_now")}
                 </p>
                 <div className="flex flex-wrap gap-1">
-                  {/* Keyed by position, not by name: since grams stopped
-                      being added to pieces one product leaves two lines,
-                      and two chips named "Flour" shared a key. The list is
-                      rebuilt whole from each generation result, so its
-                      position is the one thing that stays true. */}
-                  {buyNow.map((item, index) => (
+                  {/* Keyed by the line's own key from the backend: since grams
+                      stopped being added to pieces one product leaves two
+                      lines, so the name is not unique and a position moves
+                      with the order. */}
+                  {buyNow.map((item) => (
                     <span
-                      key={index}
+                      key={item.key}
                       className="inline-flex items-center gap-1 text-xs bg-surface px-2 py-0.5 rounded border"
                     >
                       {item.name} ({formatQuantityValue(item.quantity)}
@@ -148,9 +147,9 @@ export function ShoppingListPreview({
                   {t("recipes:meal_planner.buy_later")}
                 </p>
                 <div className="flex flex-wrap gap-1">
-                  {buyLater.map((item, index) => (
+                  {buyLater.map((item) => (
                     <span
-                      key={index}
+                      key={item.key}
                       className="inline-flex items-center gap-1 text-xs bg-surface px-2 py-0.5 rounded border border-dashed"
                     >
                       {item.name} ({formatQuantityValue(item.quantity)}

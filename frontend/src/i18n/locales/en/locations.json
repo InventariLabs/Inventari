@@ -60,7 +60,8 @@
   "errors": {
     "cannotDelete": "Cannot delete: first remove or move the products.",
     "cannotArchive": "Cannot archive this location",
-    "cannotRestore": "Could not restore this location"
+    "cannotRestore": "Could not restore this location",
+    "createFailed": "Could not create the location. Try again."
   },
   "wizard": {
     "discardTitle": "Discard this new location?",
@@ -202,7 +203,6 @@
     "step1DescMore": "Name the location you are adding — e.g. Cold Storage, Receiving.",
     "parentPlaceholder": "Choose a location"
   },
-  "unknownError": "Unknown error",
   "edit": {
     "nameLabel": "Name",
     "qrCodeLabel": "QR Code",

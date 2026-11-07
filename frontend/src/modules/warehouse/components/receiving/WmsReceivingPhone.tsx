@@ -120,6 +120,9 @@ function differenceNote(
 ): string | null {
   const gap = line.expected_quantity - quantity;
   if (gap === 0) return null;
+  // A figure somebody typed on the start card is a count, not a promise:
+  // going past it is the true count, nothing to warn about.
+  if (gap < 0 && line.expected_is_count) return null;
   const amount = {
     quantity: formatQuantityLocalized(t, Math.abs(gap), line.uom_symbol),
   };

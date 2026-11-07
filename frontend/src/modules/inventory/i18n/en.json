@@ -186,7 +186,8 @@
       "message": "The reason is kept with the batch and shown beside its status.",
       "label": "Why",
       "placeholder": "Supplier notice 41/26 — glass found in jar 12",
-      "confirm": "Change status"
+      "confirm": "Change status",
+      "failed": "Could not change the batch status"
     },
     "actionsFor": "Actions for batch {{name}}",
     "columns": {

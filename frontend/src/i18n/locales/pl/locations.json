@@ -64,7 +64,8 @@
   "errors": {
     "cannotDelete": "Nie można usunąć: najpierw usuń lub przenieś produkty.",
     "cannotArchive": "Nie można zarchiwizować tego miejsca",
-    "cannotRestore": "Nie udało się przywrócić miejsca"
+    "cannotRestore": "Nie udało się przywrócić miejsca",
+    "createFailed": "Nie udało się utworzyć miejsca. Spróbuj ponownie."
   },
   "wizard": {
     "discardTitle": "Odrzucić nowe miejsce?",
@@ -206,7 +207,6 @@
     "step1DescMore": "Nazwij miejsce, które dodajesz — np. Chłodnia, Przyjęcia.",
     "parentPlaceholder": "Wybierz miejsce"
   },
-  "unknownError": "Nieznany błąd",
   "edit": {
     "nameLabel": "Nazwa",
     "qrCodeLabel": "Kod QR",

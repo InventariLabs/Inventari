@@ -407,7 +407,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
     available_count = 0
     total = len(aggregated)
 
-    for _agg_key, agg in aggregated.items():
+    for agg_key, agg in aggregated.items():
         product: ProductTemplateDTO | None = agg['resolved_template']
         required_qty = agg['quantity']
         ingredient_uom = uoms_by_id.get(agg['uom_id']) if agg['uom_id'] else None
@@ -468,6 +468,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
         )
         to_buy_display.append(
             _GeneratedItem(
+                key=':'.join(agg_key),
                 name=agg['name'],
                 quantity=qty,
                 uom_id=agg['uom_id'],

@@ -60,7 +60,8 @@
   "errors": {
     "cannotDelete": "Não é possível excluir: primeiro remova ou mova os produtos.",
     "cannotArchive": "Não é possível arquivar este local",
-    "cannotRestore": "Não foi possível restaurar este local"
+    "cannotRestore": "Não foi possível restaurar este local",
+    "createFailed": "Não foi possível criar o local. Tente novamente."
   },
   "wizard": {
     "discardTitle": "Descartar este novo local?",
@@ -231,7 +232,6 @@
     "step1DescMore": "Dê nome ao local que você está adicionando — ex.: Câmara fria, Recebimento.",
     "parentPlaceholder": "Escolha um local"
   },
-  "unknownError": "Erro desconhecido",
   "edit": {
     "nameLabel": "Nome",
     "qrCodeLabel": "Código QR",
