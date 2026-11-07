@@ -87876,6 +87876,10 @@
       },
       "_GeneratedItem": {
         "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
           "name": {
             "type": "string",
             "title": "Name"
@@ -87932,6 +87936,7 @@
         },
         "type": "object",
         "required": [
+          "key",
           "name",
           "quantity"
         ],

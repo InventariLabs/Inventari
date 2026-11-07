@@ -54,7 +54,7 @@ const availabilityData: {
 };
 
 const mockAddToShoppingList = vi.fn();
-const mockUseActiveShoppingListId = vi.fn();
+const mockUseOpenShoppingLists = vi.fn();
 
 vi.mock("../hooks/useRecipes", () => ({
   useRecipeAvailability: () => ({
@@ -71,7 +71,7 @@ vi.mock("../hooks/useRecipes", () => ({
     mutateAsync: vi.fn(),
     isPending: false,
   }),
-  useActiveShoppingListId: () => mockUseActiveShoppingListId(),
+  useOpenShoppingLists: () => mockUseOpenShoppingLists(),
 }));
 
 const modulesMock = vi.hoisted(() => ({ shoppingListsEnabled: true }));
@@ -92,7 +92,7 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     // Adding to a shopping list writes through `recipes:write`.
     signInWith(["recipes:read", "recipes:write"]);
     modulesMock.shoppingListsEnabled = true;
-    mockUseActiveShoppingListId.mockReturnValue({ data: null });
+    mockUseOpenShoppingLists.mockReturnValue({ data: [] });
     availabilityData.ingredients = [
       {
         ingredient_id: "i1",
@@ -505,7 +505,9 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
   });
 
   it("reuses the active shopping list instead of creating a new one", async () => {
-    mockUseActiveShoppingListId.mockReturnValue({ data: "active-1" });
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: [{ id: "active-1", name: "Week 30" }],
+    });
     mockAddToShoppingList.mockResolvedValue({
       shopping_list_id: "active-1",
       added_count: 1,
@@ -525,8 +527,52 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     });
   });
 
+  it("names the target list and sends the one picked when several are open", async () => {
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: [
+        { id: "newest", name: "Saturday market" },
+        { id: "older", name: "Bakery run" },
+      ],
+    });
+    mockAddToShoppingList.mockResolvedValue({
+      shopping_list_id: "older",
+      added_count: 1,
+    });
+    render(
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />,
+    );
+    const picker = screen.getByRole("combobox", { name: /add to list/i });
+    // The default is visible: the newest list stands selected.
+    expect(picker).toHaveValue("newest");
+    fireEvent.change(picker, { target: { value: "older" } });
+    fireEvent.click(screen.getByRole("button", { name: /add missing/i }));
+    await vi.waitFor(() => expect(toast.success).toHaveBeenCalled());
+    expect(mockAddToShoppingList).toHaveBeenCalledWith({
+      servings: 4,
+      shopping_list_id: "older",
+    });
+  });
+
+  it("offers no picker while there is only one open list", () => {
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: [{ id: "only", name: "Week 30" }],
+    });
+    render(
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole("combobox", { name: /add to list/i })).toBeNull();
+  });
+
   it("leaves shopping_list_id empty when no active list exists", async () => {
-    mockUseActiveShoppingListId.mockReturnValue({ data: null });
+    mockUseOpenShoppingLists.mockReturnValue({ data: [] });
     mockAddToShoppingList.mockResolvedValue({
       shopping_list_id: "new-1",
       added_count: 1,

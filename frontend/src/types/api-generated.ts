@@ -28009,6 +28009,8 @@ export interface components {
         };
         /** _GeneratedItem */
         _GeneratedItem: {
+            /** Key */
+            key: string;
             /** Name */
             name: string;
             /** Quantity */

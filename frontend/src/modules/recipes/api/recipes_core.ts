@@ -193,17 +193,18 @@ export const recipesCoreApi = {
   },
 
   /**
-   * The list "add to shopping list" puts the ingredients on: the newest
-   * active one, or ``null`` when there is none and the server is to make the
-   * first. Read over the shopping lists' HTTP route — that module is optional
-   * here, and an import of its files cannot be.
+   * The open shopping lists "add to shopping list" can put the ingredients
+   * on, newest first: the first is the one used unless the reader picks
+   * another, and none means the server makes the first. Read over the
+   * shopping lists' HTTP route — that module is optional here, and an import
+   * of its files cannot be.
    */
-  getActiveShoppingListId: async (): Promise<string | null> => {
-    const response = await api.get<{ items: { id: string }[] }>(
+  getOpenShoppingLists: async (): Promise<{ id: string; name: string }[]> => {
+    const response = await api.get<{ items: { id: string; name: string }[] }>(
       "/shopping-lists",
-      { params: { active_only: true, limit: 1 } },
+      { params: { active_only: true, limit: 50 } },
     );
-    return response.data.items[0]?.id ?? null;
+    return response.data.items;
   },
 
   addToShoppingList: async (

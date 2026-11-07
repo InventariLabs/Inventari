@@ -296,6 +296,7 @@
   },
   "shopping": {
     "add_missing_button": "Add missing to shopping list",
+    "target_list_label": "Add to list",
     "added_toast": "Added {{count}} items to list \"{{list}}\"",
     "added_toast_one": "Added 1 item to list \"{{list}}\"",
     "added_toast_other": "Added {{count}} items to list \"{{list}}\"",

@@ -166,6 +166,10 @@ class SuggestedRecipe(BaseModel):
 
 
 class _GeneratedItem(BaseModel):
+    key: str
+    """What tells this line from the others in the same result: the product
+    it was aggregated on and its measure. Names repeat (grams and pieces of
+    one product are two lines), so a client keys its rows by this."""
     name: str
     #: Decimal, not int: a recipe line carries the unit's own step ("0.75
     #: kg"), and the generated list must not claim a whole number the

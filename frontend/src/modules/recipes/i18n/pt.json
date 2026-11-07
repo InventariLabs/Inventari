@@ -293,6 +293,7 @@
   },
   "shopping": {
     "add_missing_button": "Adicionar o que falta à lista de compras",
+    "target_list_label": "Adicionar à lista",
     "added_toast": "{{count}} itens adicionados à lista \"{{list}}\"",
     "added_toast_one": "1 item adicionado à lista \"{{list}}\"",
     "added_toast_other": "{{count}} itens adicionados à lista \"{{list}}\"",

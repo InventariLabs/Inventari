@@ -296,6 +296,7 @@
   },
   "shopping": {
     "add_missing_button": "Ajouter les manquants à la liste de courses",
+    "target_list_label": "Ajouter à la liste",
     "added_toast": "{{count}} articles ajoutés à la liste « {{list}} »",
     "added_toast_one": "1 article ajouté à la liste « {{list}} »",
     "added_toast_other": "{{count}} articles ajoutés à la liste « {{list}} »",
