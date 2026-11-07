@@ -87,7 +87,7 @@ class TestCreateAttachmentRejects:
 
 
 class TestLegacyOfficeFormats:
-    """.doc was on the whitelist but the validator never let one through."""
+    """No attachment takes .doc; .docx is the Word format to use."""
 
     async def test_doc_is_refused_with_a_type_error(self):
         upload = _upload(

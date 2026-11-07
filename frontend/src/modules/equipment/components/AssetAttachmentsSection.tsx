@@ -27,6 +27,7 @@ import {
 import { toast } from "sonner";
 import type { EquipmentAttachment } from "@/modules/equipment/api/equipment";
 import { formatBytes } from "@/utils/formatters";
+import { ATTACHMENT_FILE_ACCEPT } from "@/module-sdk";
 import { webLinkOrNull } from "@/lib/utils";
 import { QueryFailure } from "@/components/ui/QueryResult";
 
@@ -42,10 +43,20 @@ const FILE_TYPE_ICONS: Record<string, React.ReactNode> = {
  * Local storage hands out root-relative `/uploads/...` paths, S3 absolute
  * http(s) URLs. Anything else (`javascript:`, `data:`, protocol-relative
  * `//host`) is not rendered as a link.
+ *
+ * A path is put to the browser's own URL parser, not to a pattern: the
+ * parser drops tabs and newlines and reads `\` as `/` before it resolves,
+ * so `/<tab>/host` begins with a single slash and still opens another site.
+ * Only a path that lands on this origin stays a link.
  */
 function attachmentHrefOrNull(url: string): string | null {
-  if (/^\/(?![/\\])/.test(url)) return url;
-  return webLinkOrNull(url);
+  if (!url.startsWith("/")) return webLinkOrNull(url);
+  const here = window.location.origin;
+  try {
+    return new URL(url, here).origin === here ? url : null;
+  } catch {
+    return null; // `/<tab>/[` and the like: no host the parser accepts
+  }
 }
 
 function isImageContentType(ct: string): boolean {
@@ -160,7 +171,7 @@ export function AssetAttachmentsSection({
               type="file"
               className="hidden"
               onChange={handleFileSelect}
-              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+              accept={ATTACHMENT_FILE_ACCEPT}
             />
             <Button
               variant="outline"
