@@ -289,15 +289,29 @@ says what the release does rather than what changed since them.
   place you had narrowed to, and the spreadsheet, the printout and the
   `search` parameter of `GET /stock-as-of` follow the same text. Its total and
   counts then speak about the matching products only.
+- The stock-on-a-date printout of one place names the place beside its dates,
+  as the way to it ("Main Warehouse › Fridge › Fridge A"), so a filed sheet no
+  longer reads as the whole warehouse. A search that finds nothing says so, on
+  the screen and on the printout, instead of saying that nothing was on the
+  shelf.
+- Spreadsheet exports store a figure as the screen shows it: a value of 95.35
+  was written into the file as 95.34999999999999, which a conversion to CSV or
+  a script reading the file then showed.
+- A search, or any other text a request sends, that holds a null character
+  (U+0000, `%00` in an address) is refused with a 400 in the reader's language,
+  coded `TEXT_HAS_A_NULL_CHARACTER`, instead of ending in a server error.
 - The "Show inventory value" setting says that it also governs the product
   screens, exports and printouts, not only the statistics overview, and a
   profile that hides stock value no longer shows it for a moment while the
   setting is still on its way.
 - Smart alerts state in words how far off an expiry date is ("Expires on
   12.11.2026, in 3 days"), and an alert about a date within the week is amber
-  rather than grey. On a phone the expiry forecast tiles sit two across, so no
-  label breaks inside a word in any of the six languages, and uppercase labels
-  keep their word spaces.
+  rather than grey. An expiry alert names the place its record lies in, and its
+  batch where it has one, so two alerts for one product with one date no longer
+  read the same; `GET /stats/smart-alerts` carries them as `location_name` and
+  `lot_name`. The expiry forecast tiles sit two across on a phone and three
+  across below 1280 px, so no label breaks inside a word in any of the six
+  languages, and uppercase labels keep their word spaces.
 - Two locations can no longer be saved with one name at the same level when two
   people, or a retried request, name them at the same moment: the second is
   refused with the same "already exists at this level" answer a later attempt

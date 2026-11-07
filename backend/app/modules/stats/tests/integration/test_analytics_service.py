@@ -28,6 +28,7 @@ from app.modules.stats.services import (
 )
 from app.services.analytics.forecast import _MIN_WEEKS_FOR_FORECAST
 from tests.integration._purchases import purchase_template, receipt_layer
+from tests.integration._shelf import put_on_shelf
 
 
 @pytest.mark.integration
@@ -299,6 +300,71 @@ class TestStatsAnalyticsService:
         # The expiring milk is still its own alert, and not counted twice.
         soon = [a for a in result['alerts'] if a['type'] == 'EXPIRING_SOON']
         assert [a['item_name'] for a in soon] == ['Milk']
+
+    async def test_two_alerts_of_one_product_on_one_date_say_where_each_one_is(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_household: Organization,
+        async_test_user: User,
+    ) -> None:
+        """Same product, same date, two shelves: the place tells them apart.
+
+        Two records of oregano on two shelves, both going off on the same day,
+        read the same sentence twice in the same colour; the reader could not
+        tell which shelf to go to first. The batch is named where it has one.
+        """
+        from app.models.product_template import ProductTemplate
+        from app.models.stock_lot import StockLot
+
+        db = real_async_db_session
+        today = await core_api.organizations.today_async(db, async_test_household.id)
+        oregano = ProductTemplate(
+            organization_id=async_test_household.id, name='Dried Oregano'
+        )
+        top, bottom = (
+            StorageLocation(
+                organization_id=async_test_household.id,
+                created_by=async_test_user.id,
+                name=name,
+                usage='internal',
+            )
+            for name in ('Shelf A - Top', 'Shelf A - Bottom')
+        )
+        db.add_all([oregano, top, bottom])
+        await db.flush()
+        lot = StockLot(
+            organization_id=async_test_household.id,
+            product_template_id=oregano.id,
+            name='OR-2611',
+        )
+        db.add(lot)
+        await db.flush()
+        for shelf, lot_id in ((top, lot.id), (bottom, None)):
+            await put_on_shelf(
+                db,
+                async_test_user,
+                oregano,
+                shelf.id,
+                1,
+                lot_id=lot_id,
+                expiry_date=today + timedelta(days=3),
+            )
+        await db.flush()
+
+        result = await get_smart_alerts_async(db, async_test_household.id)
+
+        oregano_alerts = sorted(
+            (
+                (a['location_name'], a['lot_name'])
+                for a in result['alerts']
+                if a['item_name'] == 'Dried Oregano' and a['type'] == 'EXPIRING_SOON'
+            ),
+            key=str,
+        )
+        assert oregano_alerts == [
+            ('Shelf A - Bottom', None),
+            ('Shelf A - Top', 'OR-2611'),
+        ]
 
     async def test_smart_alerts_leave_out_what_is_off_the_shelves(
         self,

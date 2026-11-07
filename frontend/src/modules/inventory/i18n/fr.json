@@ -232,6 +232,7 @@
     "cannotAnswer": "Impossible de répondre pour cette date.",
     "empty": {
       "title": "Rien n'était en stock",
+      "titleSearch": "Rien ne correspond à la recherche",
       "description": "À cette date, aucun des produits suivis n'était en stock.",
       "descriptionAt": "{{location}} — ce jour-là, il ne détenait aucun des produits qu'il suit.",
       "descriptionSearch": "Aucun des produits enregistrés ne correspond à « {{search}} » à cette date."

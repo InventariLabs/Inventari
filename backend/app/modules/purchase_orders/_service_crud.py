@@ -429,7 +429,7 @@ async def update_purchase_order(
     # replacement lines' names must resolve on this response, not only on
     # the next read.
     for line in po.lines:
-        await db.refresh(line, ['product_template'])
+        await db.refresh(line, ['product_template', 'uom'])
     await journal_order_act(
         db,
         org_id,

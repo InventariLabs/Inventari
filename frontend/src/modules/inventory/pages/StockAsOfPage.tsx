@@ -337,7 +337,13 @@ export default function StockAsOfPage() {
       ) : rows.length === 0 || !report ? (
         <EmptyState
           icon={Boxes}
-          title={t("inventory:asOf.empty.title")}
+          // A search that finds nothing says nothing about the shelf, which
+          // may have held plenty that day.
+          title={
+            filters.search.trim()
+              ? t("inventory:asOf.empty.titleSearch")
+              : t("inventory:asOf.empty.title")
+          }
           description={
             filters.search.trim()
               ? t("inventory:asOf.empty.descriptionSearch", {

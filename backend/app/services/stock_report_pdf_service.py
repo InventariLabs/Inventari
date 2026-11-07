@@ -27,6 +27,7 @@ class StockReportPdfService(PdfServiceBase):
 
     labels_en = {
         'search': 'Narrowed to',
+        'location': 'Location',
         'title': 'Stock on hand',
         'product': 'Product',
         'quantity': 'Quantity',
@@ -39,9 +40,11 @@ class StockReportPdfService(PdfServiceBase):
         'excluded': 'Rows left out for a foreign currency',
         'unpriced': 'Products with no cost history, left out of the total',
         'nothing': 'Nothing was on the shelf on this date.',
+        'nothing_searched': 'No product matches the search on this date.',
     }
     labels_pl = {
         'search': 'Zawężone do',
+        'location': 'Miejsce',
         'title': 'Stan magazynowy',
         'product': 'Produkt',
         'quantity': 'Ilość',
@@ -54,9 +57,11 @@ class StockReportPdfService(PdfServiceBase):
         'excluded': 'Wiersze pominięte z powodu obcej waluty',
         'unpriced': 'Produkty bez historii kosztów, poza sumą',
         'nothing': 'Na ten dzień nic nie stało na półce.',
+        'nothing_searched': 'Żaden produkt nie pasuje do wyszukiwania w tym dniu.',
     }
     labels_de = {
         'search': 'Eingegrenzt auf',
+        'location': 'Lagerort',
         'title': 'Lagerbestand',
         'product': 'Produkt',
         'quantity': 'Menge',
@@ -69,9 +74,11 @@ class StockReportPdfService(PdfServiceBase):
         'excluded': 'Wegen Fremdwährung ausgelassene Zeilen',
         'unpriced': 'Produkte ohne Kostenhistorie, nicht in der Summe',
         'nothing': 'An diesem Tag lag nichts im Lager.',
+        'nothing_searched': 'An diesem Tag passt kein Produkt zur Suche.',
     }
     labels_fr = {
         'search': 'Limité à',
+        'location': 'Emplacement',
         'title': 'État du stock',
         'product': 'Produit',
         'quantity': 'Quantité',
@@ -84,9 +91,11 @@ class StockReportPdfService(PdfServiceBase):
         'excluded': 'Lignes écartées pour cause de devise étrangère',
         'unpriced': 'Produits sans historique des coûts, hors du total',
         'nothing': "Rien n'était en stock à cette date.",
+        'nothing_searched': 'Aucun produit ne correspond à la recherche à cette date.',
     }
     labels_es = {
         'search': 'Limitado a',
+        'location': 'Ubicación',
         'title': 'Existencias',
         'product': 'Producto',
         'quantity': 'Cantidad',
@@ -99,6 +108,7 @@ class StockReportPdfService(PdfServiceBase):
         'excluded': 'Filas excluidas por moneda extranjera',
         'unpriced': 'Productos sin historial de costes, fuera del total',
         'nothing': 'En esa fecha no había nada en las estanterías.',
+        'nothing_searched': 'Ningún producto coincide con la búsqueda en esta fecha.',
     }
 
 
@@ -112,11 +122,14 @@ async def generate_stock_as_of_pdf(
     *,
     show_value: bool = True,
     search: str | None = None,
+    location: str | None = None,
 ) -> bytes:
     """Render one report. No barcode: the sheet identifies a date.
 
-    A sheet narrowed by a search says so beside its dates: it is filed and
-    read months later, and its total must not read as the whole shelf.
+    A sheet narrowed by a search or to one place says so beside its dates:
+    it is filed and read months later, and its rows must not read as the
+    whole warehouse. *location* is the place as the way to it, so two
+    shelves of one name stay two shelves on paper.
     """
     labels = _svc.get_labels(lang)
     issuer = await build_issuer_context(organization, lang)
@@ -139,9 +152,13 @@ async def generate_stock_as_of_pdf(
                 'label': labels['generated'],
                 'value': format_date_for(lang, report.generated_at, country=country),
             },
+            *([{'label': labels['location'], 'value': location}] if location else []),
             *([{'label': labels['search'], 'value': search}] if search else []),
         ],
         'rows': report.items,
+        # A search that finds nothing says nothing about the shelf, which may
+        # have held plenty that day.
+        'nothing': labels['nothing_searched'] if search else labels['nothing'],
         # A file is the screen in the reader's hands: what the organization's
         # profile withholds there, this sheet must not state here.
         'show_value': show_value,

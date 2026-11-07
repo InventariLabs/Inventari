@@ -229,6 +229,10 @@ class AlertItem(BaseModel):
     usual_frequency_days: int | None = None
     expiry_date: str | None = None
     days_until_expiry: int | None = None
+    #: Where the record of a dated alert lies, and its batch: what tells two
+    #: alerts of one product with one date apart.
+    location_name: str | None = None
+    lot_name: str | None = None
 
 
 class SmartAlertsResponse(BaseModel):

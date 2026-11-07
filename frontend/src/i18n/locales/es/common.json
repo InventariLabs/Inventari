@@ -641,7 +641,11 @@
         "stages": "Etapas",
         "target_type": "Se aplica a",
         "decided_by": "Decidido por",
-        "approvers": "Aprobadores"
+        "approvers": "Aprobadores",
+        "emailed_to": "Enviado por correo a",
+        "imported_from": "Importado desde",
+        "skipped": "Filas omitidas",
+        "approval": "Aprobación"
       },
       "showWholeChange": "Mostrar el cambio completo",
       "showLess": "Mostrar menos",
@@ -755,9 +759,19 @@
         "wms_session_short_pick": "Cerrada con faltante",
         "wms_session_short_receive": "Cerrada con faltante",
         "DAMAGE": "Daño",
-        "QUALITY_HOLD": "Retención de calidad"
+        "QUALITY_HOLD": "Retención de calidad",
+        "approval_requested": "Solicitada",
+        "approval_approved": "Aprobada",
+        "approval_rejected": "Rechazada"
       },
-      "reactivatedAfterBreaker": "Reactivado tras el corte del fusible"
+      "reactivatedAfterBreaker": "Reactivado tras el corte del fusible",
+      "poLine": {
+        "tax": "IVA {{rate}} %",
+        "product": "producto: {{name}}",
+        "reorderRule": "regla de reposición: {{location}}",
+        "reorderRuleUnnamed": "de una regla de reposición",
+        "note": "nota: {{text}}"
+      }
     },
     "shell": {
       "groupAdmin": "Admin",

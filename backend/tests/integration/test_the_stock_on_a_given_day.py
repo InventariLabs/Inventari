@@ -838,6 +838,97 @@ class TestTheReportLeavesTheScreen:
         # block that carries the codes stands or falls with them.
         assert response.content.startswith(b'%PDF')
 
+    async def test_a_sheet_asked_for_one_place_names_that_place(
+        self, real_async_client: AsyncClient, warehouse: _Warehouse
+    ) -> None:
+        # Asked for one aisle, the sheet read "Stock on hand" and not a word
+        # of the aisle: a filed copy looked like the whole warehouse.
+        one_aisle = await real_async_client.get(
+            '/api/v1/stock-as-of/export/pdf',
+            params={
+                'as_of': _NOW.isoformat(),
+                'location_id': str(warehouse.aisle_one.id),
+            },
+            headers=_auth(warehouse.user),
+        )
+        whole = await real_async_client.get(
+            '/api/v1/stock-as-of/export/pdf',
+            params={'as_of': _NOW.isoformat()},
+            headers=_auth(warehouse.user),
+        )
+
+        assert one_aisle.status_code == status.HTTP_200_OK, one_aisle.text
+        assert 'Location Aisle 1' in _pdf_text(one_aisle.content)
+        assert 'Aisle 1' not in _pdf_text(whole.content)
+
+    async def test_the_place_on_the_sheet_is_named_the_way_to_it(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        warehouse: _Warehouse,
+    ) -> None:
+        # Two shelves may share a name; the way to the shelf is what tells a
+        # filed sheet which one it was.
+        db = real_async_db_session
+        shelf = StorageLocation(
+            name='Top shelf',
+            organization_id=warehouse.org.id,
+            parent_id=warehouse.aisle_one.id,
+            created_by=warehouse.user.id,
+        )
+        db.add(shelf)
+        await db.commit()
+
+        response = await real_async_client.get(
+            '/api/v1/stock-as-of/export/pdf',
+            params={'as_of': _NOW.isoformat(), 'location_id': str(shelf.id)},
+            headers=_auth(warehouse.user),
+        )
+
+        assert response.status_code == status.HTTP_200_OK, response.text
+        text = _pdf_text(response.content)
+        assert 'Aisle 1' in text and 'Top shelf' in text
+
+    async def test_the_spreadsheet_writes_the_value_the_screen_shows(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        priced_warehouse: _Warehouse,
+    ) -> None:
+        # 5 at 19.07 is 95.35 on the screen and on the sheet; the spreadsheet
+        # cell held 95.34999999999999.
+        import io
+        import zipfile
+
+        db = real_async_db_session
+        soup = ProductTemplate(
+            name='Tomato soup', organization_id=priced_warehouse.org.id
+        )
+        db.add(soup)
+        await db.flush()
+        await _arrives(
+            db, priced_warehouse, soup, 5, on=_NOW - timedelta(days=30), price='19.07'
+        )
+        await db.commit()
+
+        screen = await _report(
+            real_async_client, priced_warehouse, as_of=_NOW.isoformat()
+        )
+        sheet = await real_async_client.get(
+            '/api/v1/stock-as-of/export/xlsx',
+            params={'as_of': _NOW.isoformat()},
+            headers=_auth(priced_warehouse.user),
+        )
+
+        values = {row['product_name']: row['value'] for row in screen.json()['items']}
+        assert values['Tomato soup'] == '95.35'
+        assert sheet.status_code == status.HTTP_200_OK, sheet.text
+        cells = zipfile.ZipFile(io.BytesIO(sheet.content)).read(
+            'xl/worksheets/sheet1.xml'
+        )
+        assert b'<v>95.35</v>' in cells
+        assert b'95.34999' not in cells
+
     async def test_it_exports_the_same_report_as_a_sheet(
         self, real_async_client: AsyncClient, warehouse: _Warehouse
     ) -> None:

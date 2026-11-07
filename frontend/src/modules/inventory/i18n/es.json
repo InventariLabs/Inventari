@@ -232,6 +232,7 @@
     "cannotAnswer": "No se puede responder para esta fecha.",
     "empty": {
       "title": "No había nada en las estanterías",
+      "titleSearch": "Nada coincide con la búsqueda",
       "description": "En esa fecha ninguno de los productos registrados estaba en existencia.",
       "descriptionAt": "{{location}} — en esa fecha no contenía ninguno de los productos que registra.",
       "descriptionSearch": "Ningún producto registrado coincide con «{{search}}» en esta fecha."
