@@ -154,7 +154,9 @@ test.describe("Maker — recipes → maker bridge (Phase D)", () => {
     expect(recipe.lines).toHaveLength(2);
     const childIds = recipe.lines.map((l) => l.child_template_id);
     expect(childIds).toContain(fruitTemplateId);
-    expect(recipe.lines.every((l) => l.unit === "szt")).toBe(true);
+    // A recipe line always has a unit (the recipe refuses one without), and the
+    // BoM line keeps it: `createRecipe` gave both lines grams.
+    expect(recipe.lines.map((l) => l.unit)).toEqual(["g", "g"]);
 
     // Snapshot is one-way: GET /maker/recipes/{id} carries the stamp; the
     // culinary recipe row is untouched (no back-reference exists by design).
@@ -222,7 +224,8 @@ test.describe("Maker — recipes → maker bridge (Phase D)", () => {
     );
     expect(entry).toBeTruthy();
     expect(entry?.qty_per_batch).toBe("2.0000");
-    expect(entry?.unit).toBe("szt");
+    // The recipe line's own unit, as the bridge copied it.
+    expect(entry?.unit).toBe("g");
 
     // A template used nowhere returns an empty list.
     const unused = await api.createProductTemplate(token, {

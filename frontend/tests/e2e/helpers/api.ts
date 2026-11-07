@@ -2440,6 +2440,7 @@ export class ApiHelper {
       template_id: string;
       location_id: string;
       quantity: number;
+      purchase_price?: string;
     },
   ): Promise<{ id: string; template_id: string }> {
     const response = await this.request.post("/api/v1/items", {
@@ -2449,6 +2450,9 @@ export class ApiHelper {
         template_id: data.template_id,
         quantity: data.quantity,
         location_id: data.location_id,
+        ...(data.purchase_price !== undefined && {
+          purchase_price: data.purchase_price,
+        }),
       },
     });
     if (!response.ok())
@@ -2466,7 +2470,8 @@ export class ApiHelper {
   /**
    * Seed stock for a product template by creating a matching item. Idempotent:
    * returns the existing item id when an item with the same name already has
-   * stock at the same location.
+   * stock at the same location. A `purchase_price` (per unit) gives the stock
+   * a cost; without one the ledger cannot price what is consumed from it.
    */
   async seedStock(
     token: string,
@@ -2475,6 +2480,7 @@ export class ApiHelper {
       product_template_name: string;
       location_id: string;
       quantity: number;
+      purchase_price?: string;
     },
   ): Promise<{ item_id: string }> {
     const item = await this.createItemForTemplate(token, {
@@ -2482,6 +2488,7 @@ export class ApiHelper {
       template_id: data.product_template_id,
       location_id: data.location_id,
       quantity: data.quantity,
+      purchase_price: data.purchase_price,
     });
     return { item_id: item.id };
   }

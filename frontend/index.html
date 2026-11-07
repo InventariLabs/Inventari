@@ -17,7 +17,9 @@
          origin's policy allows it and refuses inline script, so this follows
          the system's colour scheme, not a theme stored by the application.
          Every rule is on `.boot`, which React removes: nothing here may outlive
-         it and compete with the application's own stylesheet. -->
+         it and compete with the application's own stylesheet. It carries the
+         test id of the application's own full-screen loader, because it is the
+         same state: the browser tests wait for both to be gone. -->
     <style>
       .boot { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #fff; font: 600 16px system-ui, sans-serif; color: #059669; }
       .boot i { width: 32px; height: 32px; box-sizing: border-box; border: 3px solid; border-right-color: transparent; border-radius: 50%; animation: boot-spin 1s linear infinite; }
@@ -27,7 +29,7 @@
     </style>
   </head>
   <body>
-    <div id="root"><div class="boot" role="status" aria-label="Loading"><i></i>Inventari</div></div>
+    <div id="root"><div class="boot" data-testid="app-loading" role="status" aria-label="Loading"><i></i>Inventari</div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
