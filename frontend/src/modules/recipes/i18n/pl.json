@@ -324,6 +324,7 @@
   "shopping": {
     "add_missing_button": "Dodaj brakujące do listy zakupów",
     "target_list_label": "Dodaj do listy",
+    "lists_unavailable": "Nie udało się wczytać list; dodane pozycje trafią na nową listę.",
     "added_toast": "Dodano {{count}} pozycji do listy „{{list}}”",
     "added_toast_one": "Dodano 1 pozycję do listy „{{list}}”",
     "added_toast_few": "Dodano {{count}} pozycje do listy „{{list}}”",

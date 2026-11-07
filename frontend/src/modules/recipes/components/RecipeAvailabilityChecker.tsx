@@ -59,7 +59,7 @@ export default function RecipeAvailabilityChecker({
   const avail = availabilityQuery.data;
 
   const addToShoppingListMutation = useAddToShoppingList(recipeId);
-  const { data: openLists = [] } = useOpenShoppingLists();
+  const { data: openLists = [], isError: listsFailed } = useOpenShoppingLists();
   // The newest open list is the default; with several, the reader can name
   // another. A choice that has since left the open lists falls back to it.
   const [pickedListId, setPickedListId] = useState<string | null>(null);
@@ -303,6 +303,11 @@ export default function RecipeAvailabilityChecker({
                       </option>
                     ))}
                   </NativeSelect>
+                )}
+                {listsFailed && (
+                  <p role="alert" className="text-xs text-on-muted">
+                    {t("shopping.lists_unavailable")}
+                  </p>
                 )}
                 <Button
                   variant="secondary"

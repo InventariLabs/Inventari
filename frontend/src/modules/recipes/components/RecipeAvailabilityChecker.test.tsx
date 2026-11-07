@@ -557,6 +557,21 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     });
   });
 
+  it("says the lists could not be loaded instead of passing for none", () => {
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: undefined,
+      isError: true,
+    });
+    render(
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(/could not be loaded/i);
+  });
+
   it("offers no picker while there is only one open list", () => {
     mockUseOpenShoppingLists.mockReturnValue({
       data: [{ id: "only", name: "Week 30" }],
