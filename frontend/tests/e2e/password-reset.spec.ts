@@ -166,9 +166,10 @@ test.describe("Password reset flow", () => {
     await ctx.dispose();
   });
 
-  test("invalid token shows the error message and does not change the password", async ({
+  test("a dead link is refused when the page opens, and the password does not change", async ({
     playwright,
     baseURL,
+    page,
   }) => {
     const ctx = await playwright.request.newContext({ baseURL });
     const api = new ApiHelper(ctx);
@@ -176,6 +177,18 @@ test.describe("Password reset flow", () => {
     // Initial password still works before the bad-reset attempt.
     const before = await api.login(dedicatedEmail(), INITIAL_PASSWORD);
     expect(before.access_token).toBeTruthy();
+
+    // The page asks before it shows a form, so nobody types a password the
+    // link can never save. The server gives a spent, an expired and a forged
+    // token one and the same refusal (the API tests hold it to that), so a
+    // forged token stands in for the spent one here: this backend runs with
+    // TESTING=true, which starts without the Redis store that remembers a
+    // spent token, and a spent one would still be accepted.
+    await page.goto("/reset-password/forged.invalid.token");
+    const refusal = page.getByTestId("reset-invalid-link");
+    await expect(refusal).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('input[type="password"]')).toHaveCount(0);
+    await expect(refusal.locator('a[href="/forgot-password"]')).toBeVisible();
 
     // Try to confirm with a forged token — should be 400.
     const res = await ctx.post("/api/v1/auth/password-reset/confirm", {

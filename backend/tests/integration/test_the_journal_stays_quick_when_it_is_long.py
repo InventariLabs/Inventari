@@ -189,7 +189,6 @@ def _assert_served_by_the_ordering_index(plan: dict, *, either_timeline: bool = 
         assert indexes & {
             'ix_audit_log_org_created_at_id',
             'ix_audit_log_org_type_created_at',
-            'ix_audit_log_created_at',
         }
     else:
         assert 'ix_audit_log_org_created_at_id' in indexes, indexes

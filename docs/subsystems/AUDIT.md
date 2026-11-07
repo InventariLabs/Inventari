@@ -200,9 +200,8 @@ earns its place:
 | `ix_audit_log_org_type_created_at` | `organization_id, target_type, created_at DESC, id` | The journal narrowed to one kind of thing: its page, its count (index-only), and the list of types (loose scan). Without it a rare type means walking the organization's timeline, and the count is a sequential scan. |
 | `ix_audit_log_target` | `target_type, target_id` | The history of one record (`list_for_target_async`): the card of a product, a location, a document. |
 | `ix_audit_log_user_id` | `user_id` | The user filter, and the foreign key's own lookups. |
-| `ix_audit_log_organization_id` | `organization_id` | Foreign key to the organization. **Redundant in practice**: it is the leading column of both composites above, which serve the same lookups. Measured on a million entries over ten organizations, the count of one organization reads 14,286 buffers of heap either way and the narrow index saves 100 buffers of index. A candidate to drop. |
+| ~~`ix_audit_log_organization_id`~~ | `organization_id` | **Dropped** (`auditidx03`, CONCURRENTLY). It was the leading column of both composites above, which serve the same lookups, and every write paid for it. Read from `pg_stat_user_indexes` on a running stack holding 600,000 entries over ten organizations, the planner still chose it for the count of one organization and for filtered counts; without it the same heap is read through the composite: 8,518 buffers of heap either way, about 400 more of index (4%). The foreign key's own lookups lead with the composites too. |
 | ~~`ix_audit_log_created_at`~~ | `created_at` | **Dropped.** Nothing reads the journal by date without an organization, and it was a planner trap: the older-entries seek (`organization_id = ? AND created_at < ?`, newest first) could be planned on it backward with the organization as a filter, reading the other tenants' entries (52,000 rows for a page of 100). The organization is a constant of the query, so it cannot be put in the `ORDER BY` to rule the index out; removing the index is what does. |
 
-The remaining candidate is written down rather than dropped because a drop is
-irreversible on a table this size without a rebuild, and the evidence for it
-belongs to a real instance's `pg_stat_user_indexes`, not to a test database.
+Both candidates are gone. A drop on a table this size is irreversible without a rebuild, so the
+evidence for the second came from a running stack's `pg_stat_user_indexes`, not from a test database.

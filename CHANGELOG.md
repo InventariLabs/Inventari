@@ -68,7 +68,10 @@ says what the release does rather than what changed since them.
   If the sign-in is refused, the form opens with the address filled in.
 - A password-reset link that is spent or expired is refused when the page opens,
   with a link to request a new one, instead of after a new password has been
-  typed. The page asks the new open endpoint `POST /auth/password-reset/check`.
+  typed. The page asks the new open endpoint `POST /auth/password-reset/check`,
+  and says it is checking while the answer is on its way. A request refused
+  for coming too often from one address no longer calls a good link spent:
+  the form stays, and a refused save says to try again later.
   The "this installation does not send email" notice also says that the only
   administrator can reset the password on the server.
 - A confirmed document now keeps your own company's name, tax number and
@@ -170,6 +173,14 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- `manage.py db stamp-module` now works on a database that a newer version has
+  already migrated. `db doctor` refuses to start in that state and prints this
+  command as the way out, but the command itself stopped with "Can't locate
+  revision" because it first looked up the revision the database recorded, which
+  the older checkout has no file for. It now replaces the recorded revision
+  without looking it up. The index on `audit_log (organization_id)` is dropped
+  by a migration too: the two composite indexes on the journal serve every read
+  it did.
 - On a phone, the picking and receiving lists show the whole product name and
   the whole batch and location code instead of cutting them: they break at a
   space or a hyphen and inside a code only where it does not fit the column. A
@@ -553,6 +564,12 @@ says what the release does rather than what changed since them.
   sheet calls the deletion reason by its name rather than "Status". Saving an
   empty service entry marks every missing answer in the app's language,
   instead of stopping at the title with the browser's own message.
+- Stored photos load on an instance that serves the app straight from the
+  frontend container, without the bundled Caddy in front. That container's
+  nginx answered every `/uploads/…` file ending in `.jpg` or `.png` with its own
+  404 instead of asking the backend; a PDF attachment came through. An
+  instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
+  backend itself.
 
 ## v0.11.0 - 2026-11-02
 
