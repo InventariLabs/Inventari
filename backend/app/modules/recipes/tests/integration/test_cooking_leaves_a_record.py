@@ -1,4 +1,4 @@
-"""What cooking leaves behind when there is no document module to ask.
+"""What cooking leaves behind when there is no warehouse module to ask.
 
 In a household profile ``warehouse`` is not enabled, so no RW document is
 written and the organization journal knows nothing about picking. The item's

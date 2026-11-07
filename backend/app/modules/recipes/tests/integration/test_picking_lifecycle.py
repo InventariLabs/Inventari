@@ -1121,7 +1121,7 @@ class TestPickingDocumentRegistration:
         ).first()
         assert doc is None
 
-    def test_documents_module_disabled_creates_no_document(
+    def test_warehouse_module_disabled_creates_no_document(
         self,
         client: TestClient,
         auth_headers: dict[str, str],

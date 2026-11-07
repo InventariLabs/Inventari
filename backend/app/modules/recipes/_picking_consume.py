@@ -104,7 +104,7 @@ async def consume_for_picking(
 
     ``history_changes`` says why the stock left, in the same place a stock take
     says it (``reason`` plus the id of what caused it). In a household profile
-    there is no document module and no organization journal to ask, so the item
+    there is no warehouse module and no organization journal to ask, so the item
     history is the only account of the ubytek there will ever be, and
     ``{'old': 500.0, 'new': 499.0}`` is not an account of anything.
 

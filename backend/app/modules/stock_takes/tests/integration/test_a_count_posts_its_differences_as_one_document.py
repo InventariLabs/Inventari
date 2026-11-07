@@ -277,7 +277,7 @@ class TestACountPostsItsDifferencesAsOneDocument:
         assert report['discrepancies'] == 0
         assert report['status'] == 'completed'
 
-    def test_without_the_documents_module_the_count_closes_as_before(
+    def test_without_the_warehouse_module_the_count_closes_as_before(
         self, client: TestClient, db_session: Session
     ) -> None:
         org, user = _org(

@@ -139,7 +139,7 @@ class TestRegisterPickingAsDocument:
 
         assert result is None
 
-    async def test_documents_module_disabled_returns_none(
+    async def test_warehouse_module_disabled_returns_none(
         self,
         real_async_db_session: AsyncSession,
         pick_doc_org: Organization,
