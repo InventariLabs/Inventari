@@ -64,23 +64,32 @@ def typed_fragment_pattern(text: str) -> str:
 def constraint_name_of(exc: IntegrityError) -> str | None:
     """The constraint an ``IntegrityError`` names, as the driver reports it.
 
-    asyncpg puts it in ``diag.constraint_name``; a driver that does not leaves
-    ``None`` here and ``hit_constraint`` falls back to the message.
+    psycopg puts it in ``diag.constraint_name``. SQLAlchemy's asyncpg adapter
+    re-raises asyncpg's error as its own, without ``diag``, and chains the
+    original: that one carries ``constraint_name``. A driver that gives
+    neither leaves ``None`` here and ``hit_constraint`` falls back to the
+    message.
     """
-    return getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
+    orig = exc.orig
+    named = getattr(getattr(orig, 'diag', None), 'constraint_name', None)
+    return named or getattr(getattr(orig, '__cause__', None), 'constraint_name', None)
 
 
 def hit_constraint(exc: IntegrityError, *names: str) -> bool:
     """Whether an ``IntegrityError`` is one of the named constraints.
 
-    ``constraint_name`` is what asyncpg reports; the string fallback covers
-    drivers that only put it in the message. Anything else stays unmapped:
+    the driver's ``constraint_name`` is what decides; the message is read only when
+    the driver names no constraint. Anything else stays unmapped:
     a refusal must name the rule it refused, not claim a name clash for a
     foreign key that went missing.
     """
     constraint = constraint_name_of(exc)
+    if constraint is not None:
+        # The driver named the rule; the message also quotes the row's values,
+        # so a value spelling another constraint's name must not match here.
+        return constraint in names
     message = str(exc.orig)
-    return any(constraint == name or name in message for name in names)
+    return any(name in message for name in names)
 
 
 def in_ids(column: Any, ids: Iterable[Any]) -> ColumnElement[bool]:

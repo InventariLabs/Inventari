@@ -186,6 +186,13 @@ says what the release does rather than what changed since them.
   without looking it up. The index on `audit_log (organization_id)` is dropped
   by a migration too: the two composite indexes on the journal serve every read
   it did.
+- Refusing a partner that already exists now names its type in the reader's
+  words ("Supplier", "Dostawca") rather than the stored value `SUPPLIER`, in
+  every language, and so does the refusal to confirm an order to a partner that
+  is not a supplier. A rename that loses a race for the name no longer ends the
+  transaction around it, and a duplicate is told apart by the constraint the
+  database reports instead of by text that also quotes the row's values.
+
 - On a phone, the picking and receiving lists show the whole product name and
   the whole batch and location code instead of cutting them: they break at a
   space or a hyphen and inside a code only where it does not fit the column. A

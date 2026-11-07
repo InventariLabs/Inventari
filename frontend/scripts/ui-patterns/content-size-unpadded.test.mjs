@@ -52,7 +52,7 @@ describe("content-size-unpadded", () => {
   });
 
   it("does not take a zero length for a stated height", () => {
-    for (const className of ["py-0", "p-0", "h-0", "min-h-0", "h-px", "h-[0px]", "py-[0rem]"]) {
+    for (const className of ["py-0", "p-0", "h-0", "min-h-0", "h-px", "h-[0px]", "py-[0rem]", "py-0!", "h-0!", "h-[.0px]", "h-[0.0px]"]) {
       expect(
         run(`<Button size="content" className="${className}">Open</Button>`),
         className,

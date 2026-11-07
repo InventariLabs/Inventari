@@ -78,7 +78,9 @@ describe("the toast close button is a target a thumb can land on", () => {
     // measurement in it would be 0x0 with the rule or without. The match is
     // the rule's own block, so a `width: 44px` anywhere else in the file
     // cannot stand in for it.
-    const block = INDEX_CSS.match(
+    // Comments are removed first: a commented-out rule would still match.
+    const css = INDEX_CSS.replace(/\/\*[\s\S]*?\*\//g, "");
+    const block = css.match(
       /\[data-close-button\]\[data-close-button\]\s*\{([^}]*)\}/,
     );
     expect(block, "the close-button rule in index.css").not.toBeNull();
