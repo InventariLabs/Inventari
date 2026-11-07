@@ -24,6 +24,7 @@ from app.core.events import SystemEvent, TenantEventPayload, event_bus
 from app.core.exceptions import NotFoundException
 from app.core.public_api import core_api
 from app.database import dispatch_committed_events
+from app.i18n.service import get_error_message, set_current_lang
 from app.models.category import Category
 from app.models.organization import Organization
 from app.models.partner import Partner
@@ -261,6 +262,22 @@ class TestGetOrgOwnedOr404:
         assert excinfo.value.status_code == 404
         assert excinfo.value.detail['code'] == 'CATEGORY_NOT_FOUND'
 
+    def test_without_a_language_the_refusal_speaks_the_requests(
+        self, db_session: Session, partner_org: Organization
+    ):
+        # The helper defaulted to English and passed that on, so every caller
+        # that left the language out answered a Polish reader in English.
+        set_current_lang('pl')
+        try:
+            with pytest.raises(NotFoundException) as excinfo:
+                get_org_owned_or_404(db_session, Partner, uuid.uuid4(), partner_org.id)
+        finally:
+            set_current_lang('en')
+
+        assert excinfo.value.detail['message'] == get_error_message(
+            'partner_not_found', 'pl'
+        )
+
 
 @pytest.mark.integration
 class TestGetOrgOwnedOr404Async:
@@ -312,6 +329,23 @@ class TestGetOrgOwnedOr404Async:
             )
 
         assert excinfo.value.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_without_a_language_the_refusal_speaks_the_requests(
+        self, real_async_db_session: AsyncSession, async_partner_org: Organization
+    ):
+        set_current_lang('pl')
+        try:
+            with pytest.raises(NotFoundException) as excinfo:
+                await get_org_owned_or_404_async(
+                    real_async_db_session, Partner, uuid.uuid4(), async_partner_org.id
+                )
+        finally:
+            set_current_lang('en')
+
+        assert excinfo.value.detail['message'] == get_error_message(
+            'partner_not_found', 'pl'
+        )
 
 
 class TestGetOrgOwnedRefusesMissingOrg:
