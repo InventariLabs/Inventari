@@ -391,12 +391,13 @@ export default function ModuleStoreCard({
               why part of it is missing, said in the tense that is true. */}
           {!isAlwaysOn && missingCompanionNames && (
             <p className="text-xs text-on-warning mt-1 leading-snug">
-              {t(
-                isEnabled
-                  ? "appStore.optionalCompanionsOffHint"
-                  : "appStore.optionalCompanionsHint",
-                { names: missingCompanionNames },
-              )}
+              {isEnabled
+                ? t("appStore.optionalCompanionsOffHint", {
+                    names: missingCompanionNames,
+                  })
+                : t("appStore.optionalCompanionsHint", {
+                    names: missingCompanionNames,
+                  })}
             </p>
           )}
           <ModuleMetaLine
