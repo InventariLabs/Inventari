@@ -427,6 +427,51 @@ describe("AssetDetailPage — asking for approval", () => {
   });
 });
 
+describe("AssetDetailPage — handing the asset over", () => {
+  it("offers the protocol as a PDF download, and says so in its name", async () => {
+    // The asset's Assignments tab opens a preview under the label
+    // "Protocol"; the toast action downloads the PDF straight away. Two
+    // different actions do not share one label.
+    serveAsset();
+    server.use(
+      http.post("/api/v1/equipment/assignments", () =>
+        HttpResponse.json(
+          {
+            id: "assignment-1",
+            item_id: ITEM_ID,
+            holder_kind: "person",
+            holder_name: "Kasia Kowalska",
+            assigned_to_name: "Kasia Kowalska",
+            checked_out_at: "2026-01-01T00:00:00Z",
+            checked_in_at: null,
+          },
+          { status: 201 },
+        ),
+      ),
+    );
+    renderDetail();
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Check Out" }),
+    );
+    const dialog = await screen.findByRole("dialog");
+    await userEvent.type(
+      await within(dialog).findByLabelText(/assigned to \(name\)/i),
+      "Kasia Kowalska",
+    );
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Check Out" }),
+    );
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    const [, options] = vi.mocked(toast.success).mock.calls[0] as [
+      string,
+      { action: { label: string } },
+    ];
+    expect(options.action.label).toBe("Download PDF");
+  });
+});
+
 /**
  * An archived card is where a restore decision is made: its history stays
  * readable, but the writes the API refuses for an archived record — a new
