@@ -215,6 +215,7 @@ when one is missing.
 | `register_pre_post_check` | stable | stop a posting with your own rule — see `CROSS_MODULE_EXTENSION.md` Pattern 6; the check receives `DocumentToPostDTO` and refuses with `InterceptorError`, or answers `'hold'` to park the document for your module; `on_withdrawn` hears of a cancelled or deleted document |
 | `get_document_state_async` | experimental | where a document stands — its status, who confirmed it, which module holds it — as `DocumentStateDTO` |
 | `document_sign_off_async` | experimental | what the document profile says about signing a document off; read by the approvals module's gate |
+| `documents_sign_off_async` | experimental | `document_sign_off_async` for a page of documents in a fixed number of queries; read by the approvals module's list form of the rule |
 | `fill_line_tax_rates_async` | experimental | put the rate a document line would take — the product's, its category's, then the profile's default — on your module's own priced lines that name none; the purchase orders' lines are priced this way |
 | `hold_document_async` | experimental | park a confirmed document for your module outside a confirmation |
 | `release_document_async` | experimental | let a document your module holds go on, posting it when the one-step action submitted it |
