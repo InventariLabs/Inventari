@@ -45,6 +45,33 @@ describe("WmsReceiveLineRow", () => {
     expect(screen.getByText("Widget")).toBeInTheDocument();
   });
 
+  it("shows the whole name and batch code on a narrow screen instead of cutting them", () => {
+    const name = "Espresso Blend Beans 1 kg Whole Bean";
+    const lot = "LTC-2026-10-ESPRESSO-BLEND-000417";
+    render(
+      <WmsReceiveLineRow
+        line={{
+          ...pendingLine,
+          status: "received",
+          received_quantity: 5,
+          product_name: name,
+          lot_name: lot,
+        }}
+        onUndo={vi.fn()}
+        onShortReceive={vi.fn()}
+        onSkip={vi.fn()}
+        onFullReceive={vi.fn()}
+      />,
+    );
+
+    const nameEl = screen.getByText(name);
+    expect(nameEl).toHaveClass("[overflow-wrap:anywhere]");
+    expect(nameEl).not.toHaveClass("truncate");
+    const lotEl = screen.getByText(lot);
+    expect(lotEl).toHaveClass("[overflow-wrap:anywhere]");
+    expect(lotEl).not.toHaveClass("truncate");
+  });
+
   it("calls a half-received line partially received, not pending", () => {
     // The row showed "2/4 pack" beside a "Pending" badge the moment part of
     // the line had landed — two words for the same line, and the badge was
