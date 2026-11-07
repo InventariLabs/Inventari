@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
 
+from app.models.item import Item
 from app.models.organization import Organization
 from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
@@ -134,3 +135,55 @@ class TestPrintoutFreezesIssuerAndPlaces:
         assert 'Moved Company Ltd' in text
         assert 'New Street 99' in text
         assert 'Renamed Shelf' in text
+
+    @pytest.mark.parametrize('document_type', ['OUT', 'INT'])
+    def test_a_reprint_names_the_source_shelf_it_was_taken_from(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_source_location: StorageLocation,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+        doc_stock_item: Item,
+        document_type: str,
+    ) -> None:
+        """A dispatch or a transfer has a source; a receipt has none to freeze."""
+        doc_source_location.name = 'Original Source'
+        db_session.commit()
+        created = client.post(
+            '/api/v1/warehouse/documents',
+            headers=doc_auth_headers,
+            json={
+                'type': document_type,
+                'partner_id': str(doc_partner.id),
+                'source_location_id': str(doc_source_location.id),
+                'target_location_id': str(doc_target_location.id),
+                'lines': [
+                    {
+                        'item_id': str(doc_stock_item.id),
+                        'product_template_id': str(doc_template.id),
+                        'expected_quantity': 5,
+                    }
+                ],
+            },
+        )
+        assert created.status_code == 201, created.text
+        doc_id = created.json()['id']
+        confirmed = client.patch(
+            f'/api/v1/warehouse/documents/{doc_id}/confirm', headers=doc_auth_headers
+        )
+        assert confirmed.status_code == 200, confirmed.text
+
+        doc_source_location.name = 'Renamed Source'
+        db_session.commit()
+
+        pdf = client.get(
+            f'/api/v1/warehouse/documents/{doc_id}/pdf', headers=doc_auth_headers
+        )
+        assert pdf.status_code == 200
+        text = _text_of(pdf.content)
+
+        assert 'Original Source' in text
+        assert 'Renamed Source' not in text
