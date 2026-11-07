@@ -257,7 +257,7 @@
     "successUpdated": "{{count}} productos actualizados",
     "successUpdated_one": "{{count}} producto actualizado",
     "successUpdated_other": "{{count}} productos actualizados",
-    "errorUpdate": "Error durante la actualización"
+    "errorUpdate": "No se pudieron cambiar los productos seleccionados"
   },
   "fields": {
     "purchase_price": "Precio de compra por unidad",
@@ -459,7 +459,8 @@
     "runningLow": "Stock bajo",
     "setToCurrent": "Establecer en la cantidad actual",
     "save": "Establecer alerta",
-    "scopeNote": "La alerta pertenece al producto: se mide sobre todo lo que tienes de él, no sobre este único registro."
+    "scopeNote": "La alerta pertenece al producto: se mide sobre todo lo que tienes de él, no sobre este único registro.",
+    "saveFailed": "No se pudo guardar la alerta de stock mínimo"
   },
   "deletionReasonPlaceholder": "— elige un motivo —",
   "quickActions": {

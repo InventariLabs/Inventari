@@ -63,6 +63,11 @@ describe(" retire vs archive", () => {
     );
 
     expect(screen.getByText(/remain in the register/)).toBeInTheDocument();
+    // A checked-out asset is refused only after the press ("return the asset
+    // first"); the question says so before it is answered.
+    expect(
+      screen.getByText(/A checked-out asset is not retired — return it first/),
+    ).toBeInTheDocument();
   });
 
   it("archive confirmation moves the asset to the archive", () => {

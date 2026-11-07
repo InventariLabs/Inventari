@@ -68,6 +68,7 @@ export function LotStatusDialog({
       cancelLabel={t("common:form.cancel")}
       confirmDisabled={!reason.trim()}
       onConfirm={() => onConfirm(reason.trim())}
+      errorFallback={t("inventory:lots.reasonDialog.failed")}
       onCancel={onCancel}
     >
       <Textarea

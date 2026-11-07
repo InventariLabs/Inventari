@@ -199,7 +199,7 @@
     "all_statuses": "All",
     "confirm_bulk_retire_one": "Retire {{count}} selected asset?",
     "confirm_bulk_retire_other": "Retire {{count}} selected assets?",
-    "confirm_bulk_retire_msg": "The assets will be marked as retired and remain in the register. Their status changes to Retired.",
+    "confirm_bulk_retire_msg": "The assets will be marked as retired and remain in the register. Their status changes to Retired. A checked-out asset is not retired — return it first.",
     "confirm_bulk_purge_one": "Permanently delete {{count}} selected asset?",
     "confirm_bulk_purge_other": "Permanently delete {{count}} selected assets?",
     "confirm_bulk_purge_msg": "This action cannot be undone.",

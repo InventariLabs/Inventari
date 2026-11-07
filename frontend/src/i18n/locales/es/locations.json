@@ -60,7 +60,8 @@
   "errors": {
     "cannotDelete": "No se puede eliminar: primero retira o mueve los productos.",
     "cannotArchive": "No se puede archivar esta ubicación",
-    "cannotRestore": "No se pudo restaurar la ubicación"
+    "cannotRestore": "No se pudo restaurar la ubicación",
+    "createFailed": "No se pudo crear la ubicación. Inténtalo de nuevo."
   },
   "wizard": {
     "discardTitle": "¿Descartar esta nueva ubicación?",
@@ -208,7 +209,6 @@
     "step1DescMore": "Nombra la ubicación que estás añadiendo – ej. Cámara frigorífica, Recepción.",
     "parentPlaceholder": "Elige una ubicación"
   },
-  "unknownError": "Error desconocido",
   "edit": {
     "nameLabel": "Nombre",
     "qrCodeLabel": "Código QR",

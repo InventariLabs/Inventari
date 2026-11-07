@@ -167,8 +167,12 @@ export function MaintenanceLogModal({
           <p className="text-sm text-on-muted">{itemName}</p>
         </div>
 
+        {/* noValidate: the browser's own check stopped an empty form at the
+            title, in the browser's language and about the title alone, so
+            the answer below — every missing one, at its field — never ran. */}
         <form
           data-testid="maintenance-modal-body"
+          noValidate
           onSubmit={handleSubmit}
           className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 space-y-4 pt-3"
         >

@@ -15,7 +15,8 @@
     "selectLabel": "Etikett {{code}} auswählen",
     "freeLabel": "Etikett freigeben",
     "freeLabelNamed": "Etikett {{code}} freigeben",
-    "freeLabelConfirm": "Das Etikett {{code}} verweist nicht mehr auf {{name}}. Es kann einem anderen Produkt zugewiesen oder wiederverwendet werden."
+    "freeLabelConfirm": "Das Etikett {{code}} verweist nicht mehr auf {{name}}. Es kann einem anderen Produkt zugewiesen oder wiederverwendet werden.",
+    "freeLabelFailed": "Das Etikett konnte nicht freigegeben werden"
   },
   "filters": {
     "statusAll": "Alle Status",
@@ -187,7 +188,6 @@
   "history": {
     "label": "Etikett",
     "previouslyUsedFor": "Zuvor verwendet für",
-    "status": "Status",
     "title": "Produkthistorie"
   },
   "openScanActions": "Scan-Aktionen öffnen",

@@ -515,6 +515,17 @@ says what the release does rather than what changed since them.
   invitation, registration or equipment attestation page the token reads
   `redacted`, so a report pasted into a public issue tracker hands nobody a
   live link.
+- Inventory, location and equipment dialogs say what failed and what they
+  need: creating a location, saving a stock alert, a bulk edit, changing a
+  batch's status and freeing a label name the write that could not be done
+  when the server gives no reason, instead of "Unknown error" or "Something
+  went wrong". The location wizard no longer suggests a name already taken at
+  that level by a location a module owns or one in the archive. Bulk edit's
+  Apply waits until a field is ticked, the bulk Retire question says before
+  you answer that a checked-out asset is not retired, and the archived label's
+  sheet calls the deletion reason by its name rather than "Status". Saving an
+  empty service entry marks every missing answer in the app's language,
+  instead of stopping at the title with the browser's own message.
 
 ## v0.11.0 - 2026-11-02
 

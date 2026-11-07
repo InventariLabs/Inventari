@@ -219,7 +219,7 @@
     "confirm_bulk_retire_few": "Wycofać {{count}} zaznaczone zasoby?",
     "confirm_bulk_retire_many": "Wycofać {{count}} zaznaczonych zasobów?",
     "confirm_bulk_retire_other": "Wycofać {{count}} zaznaczonych zasobów?",
-    "confirm_bulk_retire_msg": "Zasoby zostaną oznaczone jako wycofane i pozostaną w rejestrze. Ich status zmieni się na „Wycofany”.",
+    "confirm_bulk_retire_msg": "Zasoby zostaną oznaczone jako wycofane i pozostaną w rejestrze. Ich status zmieni się na „Wycofany”. Wydany zasób nie zostanie wycofany — najpierw go przyjmij.",
     "confirm_bulk_purge_one": "Trwale usunąć {{count}} zaznaczony zasób?",
     "confirm_bulk_purge_few": "Trwale usunąć {{count}} zaznaczone zasoby?",
     "confirm_bulk_purge_many": "Trwale usunąć {{count}} zaznaczonych zasobów?",
