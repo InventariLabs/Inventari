@@ -1094,6 +1094,7 @@
     "onResumesWebhooks_one": "El envío se reanuda hacia 1 dirección guardada en cuanto se active — la misma de antes de desactivarlo.",
     "onResumesWebhooks_other": "El envío se reanuda hacia {{count}} direcciones guardadas en cuanto se active — las mismas de antes de desactivarlo.",
     "optionalCompanionsHint": "Funciona por sí solo — activar {{names}} añade la integración.",
+    "optionalCompanionsOffHint": "La integración no está disponible aquí mientras no actives {{names}}.",
     "requiresHint": "Active primero {{names}}.",
     "screensMissing": "Faltan las pantallas",
     "screensMissingHint": "Sus páginas no se instalaron aquí, así que activarlo no añade nada que se pueda abrir. Reinstalar el módulo lo completa.",

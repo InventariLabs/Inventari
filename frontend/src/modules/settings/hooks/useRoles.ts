@@ -33,7 +33,12 @@ export interface PermissionDefinition {
  *  module the organisation has enabled. */
 export interface PermissionCatalog {
   system: PermissionDefinition[];
-  modules: Array<{ module: string; permissions: PermissionDefinition[] }>;
+  modules: Array<{
+    module: string;
+    /** The manifest's name; null when the registry does not know the module. */
+    display_name?: string | null;
+    permissions: PermissionDefinition[];
+  }>;
 }
 
 /** Not exported: the shared client lives in @/lib/api/admin — a second

@@ -1092,6 +1092,7 @@
     "onResumesWebhooks_one": "Das Senden wird an 1 gespeicherte Adresse fortgesetzt, sobald das Modul an ist — dieselbe wie vor dem Ausschalten.",
     "onResumesWebhooks_other": "Das Senden wird an {{count}} gespeicherte Adressen fortgesetzt, sobald das Modul an ist — dieselben wie vor dem Ausschalten.",
     "optionalCompanionsHint": "Funktioniert eigenständig — {{names}} zu aktivieren ergänzt die Integration.",
+    "optionalCompanionsOffHint": "Die Integration ist hier nicht verfügbar, solange Sie {{names}} nicht aktivieren.",
     "requiresHint": "Aktivieren Sie zuerst {{names}}.",
     "screensMissing": "Oberfläche fehlt",
     "screensMissingHint": "Seine Seiten wurden hier nicht installiert; das Einschalten fügt nichts hinzu, was sich öffnen ließe. Eine erneute Installation vervollständigt das Modul.",
