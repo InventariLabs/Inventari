@@ -113,7 +113,35 @@ export const test = playwrightTest.extend({
     page.on('requestfailed', (request) => {
       if (request.failure()?.errorText === NETWORK_CHANGED) reload();
     });
+
+    // What the page itself reported while the test ran. A start that ends on a
+    // blank page leaves nothing else to attribute a timeout to: the assertion
+    // only says the element never came. Kept for a failing test only, and
+    // never used to retry or to excuse one.
+    const diagnostics: string[] = [];
+    const note = (kind: string, detail: string) =>
+      diagnostics.push(`${new Date().toISOString()} ${kind} ${detail}`);
+    page.on('pageerror', (error) => note('pageerror', error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') note('console.error', message.text());
+    });
+    page.on('requestfailed', (request) =>
+      note('requestfailed', `${request.method()} ${request.url()} ${request.failure()?.errorText ?? ''}`)
+    );
+    page.on('response', (response) => {
+      if (response.status() >= 400) {
+        note('response', `${response.status()} ${response.request().method()} ${response.url()}`);
+      }
+    });
     await use(page);
+    if (testInfo.status !== testInfo.expectedStatus) {
+      await testInfo.attach('page-diagnostics', {
+        body: diagnostics.length
+          ? diagnostics.join('\n')
+          : 'no page errors, failed requests or 4xx/5xx answers were seen',
+        contentType: 'text/plain'
+      });
+    }
   }
 });
 
