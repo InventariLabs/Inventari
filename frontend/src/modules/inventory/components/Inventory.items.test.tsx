@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { signInWith, signOut } from "@/test/auth";
+import { productTemplatesApi } from "@/lib/api/productTemplates";
 import ItemsEmptyState from "./items/ItemsEmptyState";
 import ItemsPagination from "./items/ItemsPagination";
 import ItemsBulkActionBar from "./items/ItemsBulkActionBar";
@@ -112,6 +113,31 @@ describe("ItemsEmptyState", () => {
     expect(clearBtn).toBeInTheDocument();
     fireEvent.click(clearBtn);
     expect(onClear).toHaveBeenCalled();
+  });
+
+  it("a search that matches only a definition says the product exists", async () => {
+    // Created inside a BOM, the product has no stock, so the list cannot hold
+    // it — and "No results" over a name the reader just made is a false answer.
+    vi.spyOn(productTemplatesApi, "search").mockResolvedValue([
+      { id: "t1", name: "Wosk sojowy" },
+    ] as never);
+    render(
+      <Shell>
+        <ItemsEmptyState
+          hasFilters={true}
+          searchTerm="sojowy"
+          onClearSearch={vi.fn()}
+        />
+      </Shell>,
+    );
+    expect(
+      await screen.findByText(/“Wosk sojowy” is not in a location yet/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/^No results for/)).not.toBeInTheDocument();
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      "/inventory/items/add",
+    );
   });
 
   it("names the hidden module data instead of an empty warehouse", () => {

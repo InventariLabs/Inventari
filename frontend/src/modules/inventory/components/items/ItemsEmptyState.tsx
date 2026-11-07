@@ -20,6 +20,62 @@ interface ItemsEmptyStateProps {
 }
 
 /**
+ * A search that found nothing on the list. The list is of what is held, so a
+ * product that exists only as a definition — one created inside a recipe or
+ * a BOM — is not on it, and "no results" over a name the reader just made is
+ * a false answer. The catalogue knows the name: when it has one, say so and
+ * offer to put it in a location.
+ */
+function SearchEmptyState({
+  searchTerm,
+  onClearSearch,
+  canWrite,
+}: {
+  searchTerm: string;
+  onClearSearch: () => void;
+  canWrite: boolean;
+}) {
+  const { t } = useTranslation("items");
+  const { data: definitions } = useQuery({
+    queryKey: queryKeys.productTemplates.search(searchTerm),
+    queryFn: () => productTemplatesApi.search(searchTerm, 1),
+    staleTime: 30_000,
+  });
+  const definedMatch = definitions?.[0];
+
+  if (definedMatch) {
+    return (
+      <EmptyState
+        icon={Package}
+        title={t("empty.definedMatchTitle", { name: definedMatch.name })}
+        description={t("empty.definedMatchDescription")}
+        primaryAction={
+          canWrite ? (
+            <Link to="/inventory/items/add">
+              <Button size="lg" leftIcon={<Plus size={20} />}>
+                {t("addProduct")}
+              </Button>
+            </Link>
+          ) : undefined
+        }
+      />
+    );
+  }
+  return (
+    <EmptyState
+      icon={SearchX}
+      title={t("empty.noSearchResultsTitle")}
+      description={t("empty.noSearchResultsDescription", { term: searchTerm })}
+      primaryAction={
+        <Button size="lg" onClick={onClearSearch}>
+          {t("empty.clearSearch")}
+        </Button>
+      }
+    />
+  );
+}
+
+/**
  * The three empties of the product list, told apart: a filter that found
  * nothing offers the way back, an organization without products yet is
  * offered its first one, and a list the module-data policy narrowed to zero
@@ -36,10 +92,9 @@ export default function ItemsEmptyState({
 }: ItemsEmptyStateProps) {
   const { t } = useTranslation("items");
   const navigate = useNavigate();
-  const isPureSearch = hasFilters && !!searchTerm && !!onClearSearch;
   // Any other narrowing — a chip, a picker, a module filter — owes the same
   // answer: nothing matches, and here is how to widen the list.
-  const isFiltered = hasFilters && !isPureSearch;
+  const isFiltered = hasFilters;
   // Only an un-narrowed empty list may speak for the module filter: "no
   // results" for a search the reader typed is a different answer.
   const isHidden = !hasFilters && hiddenCount > 0;
@@ -73,34 +128,35 @@ export default function ItemsEmptyState({
     );
   }
 
+  if (hasFilters && searchTerm && onClearSearch) {
+    return (
+      <SearchEmptyState
+        searchTerm={searchTerm}
+        onClearSearch={onClearSearch}
+        canWrite={canWrite}
+      />
+    );
+  }
+
   return (
     <EmptyState
-      icon={isPureSearch || isFiltered ? SearchX : Package}
+      icon={isFiltered ? SearchX : Package}
       title={
-        isPureSearch || isFiltered
+        isFiltered
           ? t("empty.noSearchResultsTitle", {
               defaultValue: "No matching items",
             })
           : t("empty.title")
       }
       description={
-        isPureSearch
-          ? t("empty.noSearchResultsDescription", {
-              defaultValue: `No results for "{{term}}"`,
-              term: searchTerm,
-            })
-          : isFiltered
-            ? t("empty.tryFilters")
-            : !countFailed && (definedCount ?? 0) > 0
-              ? t("empty.definedWithoutStock")
-              : t("empty.addFirst")
+        isFiltered
+          ? t("empty.tryFilters")
+          : !countFailed && (definedCount ?? 0) > 0
+            ? t("empty.definedWithoutStock")
+            : t("empty.addFirst")
       }
       primaryAction={
-        isPureSearch ? (
-          <Button size="lg" onClick={onClearSearch}>
-            {t("empty.clearSearch", { defaultValue: "Clear search" })}
-          </Button>
-        ) : isFiltered ? (
+        isFiltered ? (
           onClearFilters ? (
             <EmptyStateAction
               label={t("empty.clearFilters", {

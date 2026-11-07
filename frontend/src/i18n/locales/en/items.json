@@ -92,6 +92,8 @@
     "tryFilters": "Try changing filters",
     "addFirst": "Add your first product to a location. Export unlocks once there is a product.",
     "definedWithoutStock": "Products that exist only as a definition — for example ones created inside a recipe or a BOM — are listed here once they have stock. Add one to a location to see it.",
+    "definedMatchTitle": "“{{name}}” is not in a location yet",
+    "definedMatchDescription": "A product with this name exists, but only as a definition — for example one created inside a recipe or a BOM. This list shows products once they have stock. Add it to a location to see it here.",
     "noSearchResultsTitle": "No matching products",
     "noSearchResultsDescription": "No results for \"{{term}}\"",
     "clearSearch": "Clear search",
