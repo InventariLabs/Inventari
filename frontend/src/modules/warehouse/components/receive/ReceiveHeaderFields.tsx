@@ -51,6 +51,8 @@ interface Props {
   partnersError: unknown;
   onRetryPartners: () => void;
   onPartnerChange: (id: string) => void;
+  /** Set while the post was refused for want of a partner. */
+  partnerError?: string;
 
   targetLocationId: string;
   onTargetChange: (id: string) => void;
@@ -85,6 +87,7 @@ function PartnerField({
   onPartnerSearch,
   partnersLoading,
   onPartnerChange,
+  partnerError,
 }: Pick<
   Props,
   | "source"
@@ -93,6 +96,7 @@ function PartnerField({
   | "onPartnerSearch"
   | "partnersLoading"
   | "onPartnerChange"
+  | "partnerError"
 >) {
   const { t } = useTranslation("warehouse");
   const [newPartnerName, setNewPartnerName] = useState<string | null>(null);
@@ -122,6 +126,7 @@ function PartnerField({
         createLabel={t("form.createNewPartner")}
         onCreateNew={setNewPartnerName}
         title={t("receive.from")}
+        error={partnerError}
         required
       />
       {newPartnerName !== null && (
@@ -152,6 +157,7 @@ export function ReceiveHeaderFields({
   partnersError,
   onRetryPartners,
   onPartnerChange,
+  partnerError,
   targetLocationId,
   onTargetChange,
   targetError,
@@ -250,7 +256,7 @@ export function ReceiveHeaderFields({
       <p className="text-xs text-on-muted">
         {t("receive.documentNote", { type: t(`types.${docType}`) })}
       </p>
-      <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {partnersEnabled && source !== "internal" && (
           <PartnerField
             source={source}
@@ -259,6 +265,7 @@ export function ReceiveHeaderFields({
             onPartnerSearch={onPartnerSearch}
             partnersLoading={partnersLoading}
             onPartnerChange={onPartnerChange}
+            partnerError={partnerError}
           />
         )}
         <LocationCombobox
