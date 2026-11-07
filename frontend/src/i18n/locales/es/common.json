@@ -721,12 +721,6 @@
         "changed": "Campo {{field}} modificado",
         "required": "obligatorio"
       },
-      "builtInModules": {
-        "core": "Básicos",
-        "locations": "Ubicaciones",
-        "categories": "Categorías",
-        "announcements": "Anuncios"
-      },
       "values": {
         "ALL": "Todos",
         "STORAGE": "Ubicación",

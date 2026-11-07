@@ -566,7 +566,7 @@ describe("AuditLogPage", () => {
       /\b(announcements|categories|core|items|locations)\b/,
     );
     expect(text).toMatch(
-      /Announcements, Categories, Basics, Inventory, Locations/,
+      /Announcements, Categories, Home & Kitchen, Inventory, Locations/,
     );
     expect(text).toMatch(/Workspace mode:\s*—\s*→\s*Equipment/);
   });
