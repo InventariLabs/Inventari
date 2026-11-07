@@ -90,7 +90,7 @@ The status says what class of thing went wrong; the code says which one.
 
 | Status | Codes a client commonly branches on |
 |---|---|
-| 400 | The refusal's own code — `STORAGE_NOT_FOUND`, `ITEM_ALREADY_DELETED`, … (see [Refusal codes](#refusal-codes)). `VALIDATION_ERROR` only where a refusal names no catalogue key |
+| 400 | The refusal's own code — `STORAGE_NOT_FOUND`, `ITEM_ALREADY_DELETED`, … (see [Refusal codes](#refusal-codes)). `VALIDATION_ERROR` only where a refusal names no catalogue key. `TEXT_HAS_A_NULL_CHARACTER` for text that holds U+0000 (`%00` in an address), in any field of any request: the database stores no such character |
 | 401 | `INVALID_CREDENTIALS` (login), `TOKEN_REVOKED` and `TOKEN_ABSOLUTE_EXPIRY` (token refresh), `TOKEN_INVALID`, `INVALID_API_KEY`, `API_KEY_OWNER_INACTIVE`, and `NOT_AUTHENTICATED` (media files under `/uploads` only). The last four carry `WWW-Authenticate: Bearer`; the first three do not. A request with no credential at all to any other authenticated route gets the plain-sentence 401 of the envelope table |
 | 403 | `FORBIDDEN` (permission or missing organization), `API_KEY_SCOPE_REFUSED`, `MODULES_NOT_ENABLED` (the module is switched off for the organization), `USER_BLOCKED`, `API_KEY_CANNOT_CREATE` and its siblings |
 | 404 | `NOT_FOUND`, and one code per resource: `ITEM_NOT_FOUND`, `STORAGE_NOT_FOUND`, `STOCK_TAKE_NOT_FOUND`, `STOCK_LOT_NOT_FOUND`, `RECIPE_NOT_FOUND`, `MEAL_PLAN_NOT_FOUND`, `USER_NOT_FOUND`, `AI_CONNECTION_NOT_FOUND`, … |
