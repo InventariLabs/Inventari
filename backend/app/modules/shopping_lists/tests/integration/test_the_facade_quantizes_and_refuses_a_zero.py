@@ -25,6 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ShoppingListItemCreateDTO
 from app.core.exceptions import ServiceRejectionError
+from app.i18n.service import set_current_lang
 from app.models.user import User
 from app.modules.shopping_lists.models import ShoppingList, ShoppingListItem
 from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
@@ -76,6 +77,60 @@ class TestAddItemsQuantity:
 
         assert refused.value.key == 'shopping_list_item_quantity_rounds_to_zero'
         assert await rows_of(real_async_db_session, shopping_list.id) == []
+
+    @pytest.mark.asyncio
+    async def test_the_zero_refusal_states_the_step_and_the_quantity_in_words(
+        self, real_async_db_session: AsyncSession, async_test_user: User
+    ) -> None:
+        """The sentence is the product: both numbers are written for the
+        reader, in the reader's decimal mark, and the quantity is the one
+        the column would have kept — the same value the CRUD door states."""
+        shopping_list = await a_list(real_async_db_session, async_test_user)
+
+        set_current_lang('pl')
+        try:
+            with pytest.raises(ServiceRejectionError) as refused:
+                await shopping_lists_api.add_items_async(
+                    real_async_db_session,
+                    shopping_list.id,
+                    [ShoppingListItemCreateDTO(name='Flour', quantity=ROUNDS_TO_ZERO)],
+                    _org_of(async_test_user),
+                )
+        finally:
+            set_current_lang('en')
+
+        assert refused.value.kwargs == {'quantity': '0', 'smallest': '0,001'}
+        sentence = refused.value.sentence('pl')
+        assert '.' not in sentence.replace('szt.', '')
+        assert '{' not in sentence
+
+    @pytest.mark.asyncio
+    async def test_the_ceiling_refusal_writes_both_numbers_in_the_readers_mark(
+        self, real_async_db_session: AsyncSession, async_test_user: User
+    ) -> None:
+        shopping_list = await a_list(real_async_db_session, async_test_user)
+
+        set_current_lang('pl')
+        try:
+            with pytest.raises(ServiceRejectionError) as refused:
+                await shopping_lists_api.add_items_async(
+                    real_async_db_session,
+                    shopping_list.id,
+                    [
+                        ShoppingListItemCreateDTO(
+                            name='Flour', quantity=Decimal('1000000000.5')
+                        )
+                    ],
+                    _org_of(async_test_user),
+                )
+        finally:
+            set_current_lang('en')
+
+        assert refused.value.key == 'shopping_list_item_quantity_above_ceiling'
+        sentence = refused.value.sentence('pl')
+        assert '1000000000,5' in sentence
+        assert '999999999,999' in sentence
+        assert '.' not in sentence
 
     @pytest.mark.asyncio
     async def test_a_refusal_answers_the_whole_call_not_the_remainder(

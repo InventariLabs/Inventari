@@ -103,7 +103,11 @@ export { Textarea } from "@/components/ui/Textarea";
 // A quantity field, and the step a unit's precision allows: the same floor
 // the store rounds to, said as a sentence before the server refuses it.
 export { QuantityInput } from "@/components/ui/QuantityInput";
-export { quantityStepMessage, useUomPrecision } from "@/hooks/useUomPrecision";
+export {
+  QUANTITY_STEP,
+  quantityStepMessage,
+  useUomPrecision,
+} from "@/hooks/useUomPrecision";
 export { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 export { EmptyState } from "@/components/ui/EmptyState";
 export { QueryResult } from "@/components/ui/QueryResult";
