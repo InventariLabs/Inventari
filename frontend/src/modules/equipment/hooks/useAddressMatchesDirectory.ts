@@ -31,9 +31,9 @@ export interface AddressCheck {
   holdForWarning: () => Promise<boolean>;
 }
 
-type Register = { items?: Array<{ email?: string | null }> } | undefined;
+type DirectoryAnswer = { items?: Array<{ email?: string | null }> } | undefined;
 
-const knows = (register: Register, lower: string) =>
+const knows = (register: DirectoryAnswer, lower: string) =>
   (register?.items ?? []).some((entry) => entry.email?.toLowerCase() === lower);
 
 /**
