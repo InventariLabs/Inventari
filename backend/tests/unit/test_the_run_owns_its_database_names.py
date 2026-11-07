@@ -12,12 +12,15 @@ on the server and no run ever removed them, so a server accumulates one per
 worker per suite.
 """
 
+import importlib
 from uuid import uuid4
 
 from sqlalchemy import create_engine, text
 
 from app.config import settings
+from app.core import db_isolation
 from app.core.db_isolation import (
+    controller_run_id,
     drop_run_databases,
     isolated_db_url,
     run_scoped_db_name,
@@ -180,3 +183,77 @@ def test_a_database_from_before_the_run_ids_is_left_alone(monkeypatch):
         with admin.connect() as conn:
             conn.execute(text(f'DROP DATABASE IF EXISTS "{legacy}" WITH (FORCE)'))
         admin.dispose()
+
+
+def test_an_id_exported_in_the_shell_is_not_the_runs_id(monkeypatch):
+    """A run mints its own id even when the environment already holds one.
+
+    ``INVENTARI_TEST_RUN_ID`` is natural to export while looking at orphaned
+    databases. Taken with ``setdefault`` it made every run from that shell
+    share one id, and the end-of-run drop of one then took the databases of
+    another that was still going.
+    """
+    monkeypatch.setenv('INVENTARI_TEST_RUN_ID', 'fromshell01')
+    monkeypatch.setattr(db_isolation, '_run_started', False)
+
+    minted = controller_run_id(mint=True)
+
+    assert minted != 'fromshell01', 'the exported id was inherited by a new run'
+    assert controller_run_id() == minted
+    assert controller_run_id(mint=True) == minted, (
+        'a second call in the same process must keep the run id, or the '
+        'databases already named with it would be orphaned'
+    )
+
+
+def test_the_end_of_the_run_drops_the_databases_the_run_made(monkeypatch):
+    """``pytest_sessionfinish`` of the controller removes the run's databases.
+
+    The drop had no test: with it switched off the run left
+    ``inventari_test_r<id>_gw0`` behind and nothing turned red.
+    """
+    suite = importlib.import_module('conftest')
+    run_id = 'finish' + uuid4().hex[:4]
+    mine = f'{suite.DB_NAME_BASE}_r{run_id}_gw0'
+    other = f'{suite.DB_NAME_BASE}_r{uuid4().hex[:10]}_gw0'
+    admin = create_engine(
+        settings.DATABASE_URL.rsplit('/', 1)[0] + '/postgres',
+        isolation_level='AUTOCOMMIT',
+    )
+    try:
+        with admin.connect() as conn:
+            for name in (mine, other):
+                conn.execute(text(f'CREATE DATABASE "{name}"'))
+        monkeypatch.delenv('PYTEST_XDIST_WORKER', raising=False)
+        monkeypatch.setattr(suite, 'TEST_RUN_ID', run_id)
+
+        suite.pytest_sessionfinish(None, 0)
+
+        with admin.connect() as conn:
+            left = {
+                row[0]
+                for row in conn.execute(
+                    text('SELECT datname FROM pg_database WHERE datname IN (:a, :b)'),
+                    {'a': mine, 'b': other},
+                )
+            }
+        assert left == {other}, (
+            "the controller's end of run must drop the run's own databases "
+            f'and only those; left standing: {sorted(left)}'
+        )
+    finally:
+        with admin.connect() as conn:
+            for name in (mine, other):
+                conn.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+        admin.dispose()
+
+
+def test_the_redis_streams_wear_the_run_id():
+    """Two suites on one Redis must not read each other's events.
+
+    The streams were named by the worker alone, so ``gw0`` of one run and
+    ``gw0`` of another shared a stream just as they once shared a database.
+    """
+    suite = importlib.import_module('conftest')
+    assert suite.TEST_RUN_ID in settings.REDIS_STREAM_NAME
+    assert suite.TEST_RUN_ID in settings.REDIS_TASKS_STREAM_NAME

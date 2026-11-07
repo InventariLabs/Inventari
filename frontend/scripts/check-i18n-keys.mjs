@@ -185,12 +185,6 @@ const DYNAMIC_ALLOWLIST = [
   // The set is open on purpose: a code the catalogue does not know stays as
   // it arrived, which is where every one of them was before the lookup.
   { ns: "common", prefix: "settings.audit.values" },
-  // auditChanges.auditModuleName: a module key in an enabled-modules list is
-  // looked up as t(`settings.audit.builtInModules.${key}`) after the App Store
-  // catalogue has no name for it — the four built-in modules the store does
-  // not list. A key the dictionary does not know (a community module) stays
-  // as it arrived.
-  { ns: "common", prefix: "settings.audit.builtInModules" },
   // LabelSettingsSidebar: the preset table carries the catalogue key as data
   // (`{ word: "previewModal.preset.narrow", width, height }`), because the
   // name a reader sees is one word plus two numbers that read the same in

@@ -721,12 +721,6 @@
         "changed": "Changed field {{field}}",
         "required": "required"
       },
-      "builtInModules": {
-        "core": "Basics",
-        "locations": "Locations",
-        "categories": "Categories",
-        "announcements": "Announcements"
-      },
       "values": {
         "ALL": "All",
         "STORAGE": "Location",

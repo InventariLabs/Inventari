@@ -78,6 +78,15 @@
     },
     "items": {
       "name": "Inventario"
+    },
+    "locations": {
+      "name": "Ubicaciones"
+    },
+    "categories": {
+      "name": "Categorías"
+    },
+    "announcements": {
+      "name": "Anuncios"
     }
   },
   "config": {
