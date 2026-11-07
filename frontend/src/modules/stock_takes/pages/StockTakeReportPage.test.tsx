@@ -665,6 +665,15 @@ describe("StockTakeReportPage — quantities carry their unit, the file its proo
       expect(bananaRow).toContain("kg");
       expect(bananaRow).toContain("Kitchen");
       expect(bananaRow).toContain("QA Many User");
+      // An English reader gets the spelled month, never 8/13/2026. The first
+      // captured line also carries the mocked JSON response, so the file's
+      // own rows are the lines after it.
+      const csvRow = captured
+        .split("\n")
+        .slice(1)
+        .find((line) => line.includes("Bananas"));
+      expect(csvRow).toContain("Aug 13, 2026");
+      expect(csvRow).not.toMatch(/\d{1,2}\/\d{1,2}\/\d{4}/);
     } finally {
       vi.unstubAllGlobals();
     }
