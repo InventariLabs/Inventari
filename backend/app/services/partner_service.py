@@ -7,13 +7,14 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.db_utils import escape_ilike, paginate_async
+from app.core.db_utils import escape_ilike, hit_constraint, paginate_async
 from app.core.events import SystemEvent, emit_safe
 from app.core.exceptions import (
     ServiceRejectionError,
     catalogue_refusal,
 )
 from app.core.logging import get_logger
+from app.i18n.service import get_partner_type_label
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.item import Item
 from app.models.partner import Partner
@@ -99,7 +100,9 @@ async def create_async(
     return partner
 
 
-async def _flush_partner_async(db: AsyncSession, partner: Partner) -> None:
+async def _flush_partner_async(
+    db: AsyncSession, partner: Partner, changes: dict | None = None
+) -> None:
     """Write the partner, answering a lost race for its name or code as a refusal.
 
     The look in ``_check_unique_async`` and the write are two statements: two
@@ -107,24 +110,32 @@ async def _flush_partner_async(db: AsyncSession, partner: Partner) -> None:
     wrote, and the second hit the organization's unique key. The savepoint
     keeps the surrounding transaction usable, and the answer is the one a
     request arriving a moment later gets from the look — not a 500.
+
+    *changes* are set on the row inside the savepoint: ``begin_nested`` flushes
+    what is pending before it opens, so a change set beforehand would be written
+    outside it and a lost race would end the whole transaction.
     """
+    changes = changes or {}
     # Read before the savepoint: its rollback expires the row, and a lazy load
     # in the handler below would be I/O outside the event loop's greenlet.
-    name, partner_type, code = partner.name, partner.type, partner.code
+    name = changes.get('name', partner.name)
+    partner_type = get_partner_type_label(changes.get('type', partner.type))
+    code = changes.get('code', partner.code)
     try:
         async with db.begin_nested():
+            for field, value in changes.items():
+                setattr(partner, field, value)
             # Added inside the savepoint, so that its rollback takes a row
             # that lost the race out of the session with it; a no-op for a
             # partner already there.
             db.add(partner)
             await db.flush()
     except IntegrityError as exc:
-        detail = str(exc.orig)
-        if 'uq_partner_org_name_type' in detail:
+        if hit_constraint(exc, 'uq_partner_org_name_type'):
             raise ServiceRejectionError(
                 'partner_name_exists', name=name, partner_type=partner_type
             ) from exc
-        if 'uq_partner_org_code' in detail:
+        if hit_constraint(exc, 'uq_partner_org_code'):
             raise ServiceRejectionError('partner_code_exists', code=code) from exc
         raise
 
@@ -145,7 +156,9 @@ async def _check_unique_async(
         q = q.where(Partner.id != exclude_id)
     if await db.scalar(q) is not None:
         raise ServiceRejectionError(
-            'partner_name_exists', name=name, partner_type=partner_type
+            'partner_name_exists',
+            name=name,
+            partner_type=get_partner_type_label(partner_type),
         )
 
 
@@ -425,10 +438,7 @@ async def update_async(
 
     audited = [f for f in updates if hasattr(partner, f)]
     before = {f: getattr(partner, f) for f in audited}
-    for field, value in updates.items():
-        setattr(partner, field, value)
-
-    await _flush_partner_async(db, partner)
+    await _flush_partner_async(db, partner, updates)
     await db.refresh(partner)
     after = {f: getattr(partner, f) for f in audited}
     await _journal_change_async(db, partner, before, after, user_id)

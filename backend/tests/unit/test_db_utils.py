@@ -485,3 +485,29 @@ def test_hit_constraint_falls_back_to_the_message():
     exc = _integrity_error('violates unique constraint "uq_a"')
     assert hit_constraint(exc, 'uq_a')
     assert not hit_constraint(exc, 'fk_other')
+
+
+def test_hit_constraint_ignores_a_name_only_quoted_in_the_row():
+    """The message quotes the row's values; the driver's name decides."""
+    from app.core.db_utils import hit_constraint
+
+    exc = _integrity_error('Key (code)=(uq_a) already exists', 'uq_code')
+    assert hit_constraint(exc, 'uq_code')
+    assert not hit_constraint(exc, 'uq_a')
+
+
+def test_constraint_name_is_read_from_the_chained_asyncpg_error():
+    """SQLAlchemy's asyncpg adapter has no ``diag``; the cause carries the name."""
+    from sqlalchemy.exc import IntegrityError
+
+    from app.core.db_utils import constraint_name_of, hit_constraint
+
+    class _CauseError(Exception):
+        constraint_name = 'uq_code'
+
+    adapted = Exception('Key (code)=(uq_a) already exists')
+    adapted.__cause__ = _CauseError()
+    exc = IntegrityError('INSERT', {}, adapted)
+    assert constraint_name_of(exc) == 'uq_code'
+    assert hit_constraint(exc, 'uq_code')
+    assert not hit_constraint(exc, 'uq_a')
