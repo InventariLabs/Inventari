@@ -27,6 +27,7 @@ import {
 import { toast } from "sonner";
 import type { EquipmentAttachment } from "@/modules/equipment/api/equipment";
 import { formatBytes } from "@/utils/formatters";
+import { ATTACHMENT_FILE_ACCEPT } from "@/module-sdk";
 import { webLinkOrNull } from "@/lib/utils";
 import { QueryFailure } from "@/components/ui/QueryResult";
 
@@ -170,7 +171,7 @@ export function AssetAttachmentsSection({
               type="file"
               className="hidden"
               onChange={handleFileSelect}
-              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+              accept={ATTACHMENT_FILE_ACCEPT}
             />
             <Button
               variant="outline"

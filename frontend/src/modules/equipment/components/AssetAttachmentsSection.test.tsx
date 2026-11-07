@@ -136,6 +136,17 @@ describe("AssetAttachmentsSection — upload and delete", () => {
     });
   }
 
+  it("offers the old Word format nowhere, since no attachment takes it", async () => {
+    renderSection();
+    await screen.findByText("file-a1.pdf");
+
+    const input = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    expect(input.accept.split(",")).toContain(".docx");
+    expect(input.accept.split(",")).not.toContain(".doc");
+  });
+
   it("uploads the file as the chosen type and refreshes the list", async () => {
     let body = "";
     server.use(
