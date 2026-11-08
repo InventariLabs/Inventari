@@ -302,6 +302,13 @@ says what the release does rather than what changed since them.
   It used to leave the line at the quantity it was first generated with and
   still count the plan as listed. A line already ticked off keeps its quantity,
   and the rest is added as a new line; a line is never lowered.
+- A custom purchase order template now prints the values its editor lists for
+  `{{po_number}}`, `{{po_date}}`, `{{po_status}}`, `{{vendor_name}}`,
+  `{{vendor_tax_id}}`, `{{vendor_address}}`, `{{lines_count}}` and
+  `{{barcode_img}}`. The list advertised them, but the render context the
+  preview and the PDF share never set them, so a layout written against the
+  list came out with those fields blank while the built-in layout printed the
+  same facts under other names.
 - Erasing an account (`manage.py user erase`) also clears the reason an
   operator wrote when blocking it, and finds the person's registration request
   however the address was capitalised when it was typed. The privacy page now

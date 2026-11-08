@@ -8,7 +8,9 @@ from uuid import uuid4
 
 import pytest
 
+from app.core.public_api import core_api
 from app.modules.purchase_orders._po_render_context import build_po_context
+from app.modules.purchase_orders._router_templates import PO_PLACEHOLDERS
 from app.modules.purchase_orders.po_pdf_service import _svc, generate_po_pdf
 
 
@@ -364,3 +366,66 @@ class TestThePrintedOrderSumsTaxByRate:
         html = mock_render.call_args[0][0]
         assert '<table class="tax-by-rate">' in html
         assert '1.75' in html
+
+
+@pytest.mark.unit
+class TestEveryAdvertisedPlaceholderPrints:
+    """The catalogue the editor shows and the render context are one contract.
+
+    A custom layout is written against the placeholder list, so a key the list
+    advertises and the context does not set prints nothing — the layout its
+    author built looks broken while the built-in one works.
+    """
+
+    @staticmethod
+    def _order() -> SimpleNamespace:
+        return SimpleNamespace(
+            id=uuid4(),
+            number='PO/2026/0011',
+            currency='PLN',
+            status='DRAFT',
+            created_at=datetime(2026, 10, 27, 9, 0),
+            scheduled_date=datetime(2026, 10, 28, 9, 0),
+            notes=None,
+            organization=SimpleNamespace(
+                name='Acme Sp. z o.o.',
+                tax_id='PL1234567890',
+                address={
+                    'street': 'Main 1',
+                    'city': 'Warsaw',
+                    'postal_code': '00-001',
+                },
+                country='PL',
+            ),
+            partner=SimpleNamespace(
+                name='Supplier A',
+                tax_id='PL9876543210',
+                address={
+                    'street': 'Side 2',
+                    'city': 'Kraków',
+                    'postal_code': '30-001',
+                },
+            ),
+            lines=[
+                SimpleNamespace(
+                    name='Widget',
+                    product_template=None,
+                    uom=None,
+                    quantity_ordered=Decimal('2'),
+                    quantity_received=Decimal('0'),
+                    unit_price=Decimal('5'),
+                    tax_rate=Decimal('23'),
+                    line_number=1,
+                    notes=None,
+                )
+            ],
+        )
+
+    def test_each_advertised_key_renders_a_value(self) -> None:
+        context = build_po_context(self._order(), lang='en')
+        empty: list[str] = []
+        for placeholder in PO_PLACEHOLDERS:
+            html = core_api.pdf.render_html(f'<p>{placeholder.key}</p>', context)
+            if not html.removeprefix('<p>').removesuffix('</p>'):
+                empty.append(placeholder.key)
+        assert empty == [], f'advertised placeholders printed nothing: {empty}'
