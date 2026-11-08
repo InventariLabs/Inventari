@@ -311,7 +311,7 @@ async def get_org_owned_or_404_async(  # noqa: UP047
     org_id: UUID,
     *,
     resource: str | None = None,
-    lang: Language | None = 'en',
+    lang: Language | None = None,
 ) -> M:
     """Fetch a row by ``(id, organization_id)`` or raise ``NotFoundException``.
 
@@ -319,8 +319,8 @@ async def get_org_owned_or_404_async(  # noqa: UP047
     error message. When omitted it is derived from the table name
     (``'partners'`` -> ``'partner'``); known irregular plurals such as
     ``'categories'`` -> ``'category'`` are mapped automatically.
-    ``lang`` selects the error-message language (pass
-    ``get_current_lang()`` from request-scoped callers).
+    ``lang`` selects the error-message language; left out, the refusal
+    speaks the request's (see ``NotFoundException``).
 
     Raises ``RuntimeError`` when ``org_id`` is ``None`` -- see
     :func:`_require_org_id`.
@@ -347,7 +347,7 @@ def get_org_owned_or_404(  # noqa: UP047
     org_id: UUID,
     *,
     resource: str | None = None,
-    lang: Language | None = 'en',
+    lang: Language | None = None,
 ) -> M:
     """Sync variant of ``get_org_owned_or_404_async``."""
     org_id = _require_org_id(org_id)

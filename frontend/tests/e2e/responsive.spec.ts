@@ -35,9 +35,9 @@ test.describe("Responsive layout — mobile viewport", () => {
   });
 });
 
-// These tests run in the `mobile` project, which may overlap the `module-gate`
-// project: they must not call `enableAllModules` (globalSetup has), or they
-// switch maker back on in the middle of that project's assertions.
+// These tests run in the `mobile` project, which finishes before `module-gate`
+// starts (Playwright runs the projects without dependencies first), so they do
+// not race its assertions. globalSetup has already enabled every module.
 test.describe("Responsive layout — authenticated pages", () => {
   test.use({ viewport: devices["iPhone SE"].viewport });
 

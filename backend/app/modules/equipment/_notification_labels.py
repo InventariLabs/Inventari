@@ -45,7 +45,7 @@ OVERDUE_TITLE: dict[str, str] = {
 }
 OVERDUE_CONTENT: dict[str, str] = {
     'en': '{item}, assigned to {holder}, was due back {days} day(s) ago.',
-    'pl': '{item}, przypisany do {holder}, miał wrócić {days} dni temu.',
+    'pl': '{item}, wydany osobie {holder}, miał wrócić {days} dni temu.',
     'de': '{item}, zugewiesen an {holder}, war vor {days} Tag(en) fällig.',
     'fr': '{item}, attribué à {holder}, devait revenir il y a {days} jour(s).',
     'es': '{item}, asignado a {holder}, debía volver hace {days} día(s).',

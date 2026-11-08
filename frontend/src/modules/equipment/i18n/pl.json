@@ -149,7 +149,7 @@
         "name": "np. Anna Nowak",
         "email": "anna@example.com"
       },
-      "error_person_required": "Wpisz lub wybierz przypisaną osobę",
+      "error_person_required": "Wpisz lub wybierz osobę, która odbiera zasób",
       "return_date_past_error": "Data zwrotu nie może być w przeszłości.",
       "accounts_group": "Konta w tej organizacji",
       "return_date_consequence": "Bez daty zwrotu to wydanie nigdy nie trafi do raportu zaległych zwrotów.",
@@ -518,7 +518,7 @@
       "location": "Wybierz miejsce…",
       "barcode": "Zeskanuj lub wpisz…",
       "select": "Wybierz…",
-      "notes": "Dodatkowe uwagi, informacje o przypisaniu…"
+      "notes": "Dodatkowe uwagi, informacje o wydaniu…"
     },
     "hints": {
       "labelCode": "Wklej kod z wydrukowanej naklejki QR, aby powiązać ją z tym zasobem."

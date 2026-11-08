@@ -62,6 +62,24 @@
     "fr": ["article", "élément"],
     "es": ["elemento"]
   },
+  "handoverWord": {
+    "_why": "Polish names handing an asset over wydać and the record of it wydanie; przypisany do stays only as the label of the field that names the holder, a state and not the act (docs/MODULE_NAMES.md, asset vs equipment vs record). A label (etykieta) is still assigned to an asset: that is not a handover.",
+    "pl": {
+      "retiredStem": "przypis",
+      "holderLabelKeys": [
+        "assignments.checkout_modal.assigned_to_name",
+        "assignments.checkout_modal.assigned_to_email",
+        "attestation.response.assignee",
+        "attestation.public.assignedTo"
+      ],
+      "labelKeys": [
+        "form.labelAssignFailed",
+        "form.labels.noLabel",
+        "bulk.assignQrLabels",
+        "bulk.labelAssignFailed"
+      ]
+    }
+  },
   "featureNames": {
     "myAssets": {
       "en": "My Assets",
