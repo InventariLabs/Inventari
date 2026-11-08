@@ -10,6 +10,7 @@ from typing import Final
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import POSettings
@@ -35,13 +36,23 @@ async def get_or_create_po_settings(
     """Return the org's PO settings, creating a defaults row if absent.
 
     Defaults: no approval threshold, no forced approval.
+
+    Two first reads of one organization can both find no row and both
+    arrive at the insert. A plain ``db.add`` made the second one fail on
+    ``uq_po_settings_org`` — a 500 for whoever opened the order list first.
+    ``ON CONFLICT DO NOTHING`` waits for the other transaction's row and
+    leaves it alone, and the read after it returns whichever row stands.
     """
     settings = await get_po_settings(db, org_id)
     if settings is None:
-        settings = POSettings(organization_id=org_id)
-        db.add(settings)
-        await db.flush()
-        await db.refresh(settings)
+        await db.execute(
+            pg_insert(POSettings)
+            .values(organization_id=org_id)
+            .on_conflict_do_nothing(constraint='uq_po_settings_org')
+        )
+        settings = await get_po_settings(db, org_id)
+        if settings is None:
+            raise RuntimeError(f'PO settings of {org_id} vanished after their insert')
     return settings
 
 

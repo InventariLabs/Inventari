@@ -314,10 +314,12 @@ export class ApiHelper {
       const uoms = await this.request.get("/api/v1/uoms?limit=200", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const grams = ((await uoms.json()).items as Array<{
-        id: string;
-        symbol: string;
-      }>).find((uom) => uom.symbol === "g");
+      const grams = (
+        (await uoms.json()).items as Array<{
+          id: string;
+          symbol: string;
+        }>
+      ).find((uom) => uom.symbol === "g");
       if (!grams) throw new Error("The unit g is not seeded");
       body = {
         ...data,
@@ -1481,6 +1483,36 @@ export class ApiHelper {
     if (!response.ok())
       throw new Error(`Failed to launch campaign: ${await response.text()}`);
     return await response.json();
+  }
+
+  async getCampaign(
+    token: string,
+    campaignId: string,
+  ): Promise<{
+    responses: Array<{ id: string; items: Array<{ status: string }> }>;
+  }> {
+    const response = await this.request.get(
+      `/api/v1/equipment/campaigns/${campaignId}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok())
+      throw new Error(`Failed to read campaign: ${await response.text()}`);
+    return await response.json();
+  }
+
+  /** The public address of one person's attestation, as the campaign page hands it over. */
+  async campaignResponseLink(
+    token: string,
+    campaignId: string,
+    responseId: string,
+  ): Promise<string> {
+    const response = await this.request.get(
+      `/api/v1/equipment/campaigns/${campaignId}/responses/${responseId}/link`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok())
+      throw new Error(`Failed to read the link: ${await response.text()}`);
+    return (await response.json()).url;
   }
 
   // ── Equipment — retire ────────────────────────────────────────────────
