@@ -768,6 +768,82 @@ class TestAlwaysAtHomeAndTheRefresh:
         names = [item['name'] for item in list_r.json()['items']]
         assert names.count('Pierwszy') == 1
 
+    def test_a_line_already_listed_is_raised_when_the_plan_needs_more(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """Updating the list tops an open line up to what the plan asks now.
+
+        The refresh used to skip a line whose name and unit were on the list
+        and record the meals as listed, so 200 g stayed 200 g where 500 g was
+        needed and the plan stopped saying anything was missing.
+        """
+        plan_id = _plan_with(
+            client,
+            auth_headers,
+            db_session,
+            ingredient_names=['Pierwszy'],
+            grams='100',
+        )
+        first = _generate(client, auth_headers, plan_id)
+        raised = client.put(
+            f'{PLAN_URL}/{plan_id}',
+            json={'default_servings': 5},
+            headers=auth_headers,
+        )
+        assert raised.status_code == 200, raised.text
+
+        second = _generate(client, auth_headers, plan_id)
+
+        assert second['shopping_list_id'] == first['shopping_list_id']
+        lines = client.get(
+            f'/api/v1/shopping-lists/{second["shopping_list_id"]}',
+            headers=auth_headers,
+        ).json()['items']
+        assert [(i['name'], Decimal(str(i['quantity']))) for i in lines] == [
+            ('Pierwszy', Decimal('500'))
+        ]
+        assert Decimal(str(second['items'][0]['quantity'])) == Decimal('500')
+
+    def test_a_line_already_bought_keeps_its_quantity_and_the_rest_is_added(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """A ticked-off line is in the basket: only the shortfall is asked for."""
+        plan_id = _plan_with(
+            client,
+            auth_headers,
+            db_session,
+            ingredient_names=['Pierwszy'],
+            grams='100',
+        )
+        first = _generate(client, auth_headers, plan_id)
+        list_url = f'/api/v1/shopping-lists/{first["shopping_list_id"]}'
+        line = client.get(list_url, headers=auth_headers).json()['items'][0]
+        bought = client.patch(
+            f'{list_url}/items/{line["id"]}/purchase', headers=auth_headers
+        )
+        assert bought.status_code == 200, bought.text
+        client.put(
+            f'{PLAN_URL}/{plan_id}',
+            json={'default_servings': 5},
+            headers=auth_headers,
+        )
+
+        _generate(client, auth_headers, plan_id)
+        _generate(client, auth_headers, plan_id)
+
+        lines = client.get(
+            f'{list_url}?purchased_filter=all', headers=auth_headers
+        ).json()['items']
+        assert sorted(
+            (i['is_purchased'], Decimal(str(i['quantity']))) for i in lines
+        ) == [(False, Decimal('300')), (True, Decimal('200'))]
+
     def test_the_plan_says_when_a_meal_is_missing_from_its_list(
         self,
         client: TestClient,

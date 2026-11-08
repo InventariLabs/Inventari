@@ -15,6 +15,7 @@ from sqlalchemy.orm import joinedload
 from app.core.contracts import (
     ProductTemplateDTO,
     ShoppingListItemCreateDTO,
+    ShoppingListItemDTO,
     UomDTO,
 )
 from app.core.contracts.events import RecipeMealPlanGeneratedPayload
@@ -485,17 +486,48 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
         already_listed = await shopping_lists_api.get_list_items_async(
             db, sl.id, org_id
         )
-        existing_keys = {
-            (item.name.strip().lower(), item.uom_id) for item in already_listed
-        }
-        new_items = [
-            item
-            for item in to_buy_items
-            if (item.name.strip().lower(), item.uom_id) not in existing_keys
-        ]
+        lines_by_key: dict[tuple[str, UUID | None], list[ShoppingListItemDTO]] = {}
+        for line in already_listed:
+            lines_by_key.setdefault(
+                (line.name.strip().lower(), line.uom_id), []
+            ).append(line)
+        new_items: list[ShoppingListItemCreateDTO] = []
+        written: list[ShoppingListItemCreateDTO] = []
+        for item in to_buy_items:
+            lines = lines_by_key.get((item.name.strip().lower(), item.uom_id), [])
+            if not lines:
+                new_items.append(item)
+                written.append(item)
+                continue
+            # The list already asks for this goods. What it asks for is the
+            # sum of its lines, bought ones included: a plan that now needs
+            # more tops the shortfall up, on the plan's own open line when
+            # there is one and as a new line otherwise (the first one is
+            # already in the basket). A line is never lowered.
+            shortfall = item.quantity - sum(
+                (line.quantity for line in lines), Decimal(0)
+            )
+            if shortfall <= 0:
+                continue
+            open_line = next(
+                (
+                    line
+                    for line in lines
+                    if not line.is_purchased and line.source == 'meal_plan'
+                ),
+                None,
+            )
+            if open_line is None:
+                new_items.append(item.model_copy(update={'quantity': shortfall}))
+                written.append(new_items[-1])
+            else:
+                raised = open_line.quantity + shortfall
+                await shopping_lists_api.raise_item_quantity_async(
+                    db, sl.id, open_line.id, raised, org_id
+                )
+                written.append(item.model_copy(update={'quantity': raised}))
         if new_items:
             await shopping_lists_api.add_items_async(db, sl.id, new_items, org_id)
-        written = new_items
     else:
         sl = await shopping_lists_api.create_shopping_list_async(
             db,

@@ -297,6 +297,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- "Update list" on a meal plan now raises a line that is already on the list
+  when the plan needs more of it, for example after its servings were increased.
+  It used to leave the line at the quantity it was first generated with and
+  still count the plan as listed. A line already ticked off keeps its quantity,
+  and the rest is added as a new line; a line is never lowered.
 - Erasing an account (`manage.py user erase`) also clears the reason an
   operator wrote when blocking it, and finds the person's registration request
   however the address was capitalised when it was typed. The privacy page now
