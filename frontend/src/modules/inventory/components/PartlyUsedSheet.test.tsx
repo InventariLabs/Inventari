@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
+import { addWeeks, format } from "date-fns";
 import { describe, it, expect, vi } from "vitest";
 
 import { render, screen } from "@/test/utils";
@@ -334,12 +335,12 @@ describe("PartlyUsedSheet — an optional use-by date", () => {
       />,
     );
 
-    await user.type(
-      screen.getByLabelText(/use by after opening/i),
-      "2026-11-20",
-    );
+    await user.click(screen.getByLabelText(/use by after opening/i));
+    await user.click(screen.getAllByTestId("date-preset")[0]);
     await user.click(screen.getByRole("button", { name: /mark as opened/i }));
 
-    expect(onSubmit).toHaveBeenCalledWith({ useBy: "2026-11-20" });
+    expect(onSubmit).toHaveBeenCalledWith({
+      useBy: format(addWeeks(new Date(), 1), "yyyy-MM-dd"),
+    });
   });
 });

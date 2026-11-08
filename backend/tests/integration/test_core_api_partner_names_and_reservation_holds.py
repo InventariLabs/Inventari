@@ -6,7 +6,7 @@ document holds, each had to join core tables directly or walk the
 entity-per-call namespaces one id at a time.
 
 The reads are measured against the real PostgreSQL test DB, like
-``tests/unit/test_db_utils.py`` beside them, because what is under test
+``tests/integration/test_db_utils.py`` beside them, because what is under test
 is the SQL the read builds — its grouping, its sums and its organization
 scope — which a stand-in session cannot answer for. The fixtures come
 from the root ``conftest.py``.

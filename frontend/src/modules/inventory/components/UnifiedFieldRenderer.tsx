@@ -51,13 +51,15 @@ function controlSaysItsError(field: FieldDefinition): boolean {
   if (field.key === "category_id" || field.key === "weight") return false;
   if (field.key === "unit") return true;
   if (
-    ["textarea", "date", "file", "money", "multi-select", "boolean"].includes(
+    ["textarea", "file", "money", "multi-select", "boolean"].includes(
       field.type,
     )
   ) {
     return false;
   }
-  return field.type === "select" || field.key === "barcode";
+  return (
+    field.type === "select" || field.type === "date" || field.key === "barcode"
+  );
 }
 
 export default function UnifiedFieldRenderer({

@@ -58,7 +58,7 @@ describe("CardTitle heading level", () => {
 });
 
 describe("CardFooter", () => {
-  it("sets its actions apart from the card body and keeps the caller's props", () => {
+  it("carries pt-3 and no border (UI_GUIDELINES §1.3) and keeps the caller's props", () => {
     render(
       <CardFooter className="justify-end" data-testid="footer">
         <button type="button">Save</button>
@@ -66,7 +66,8 @@ describe("CardFooter", () => {
     );
 
     const footer = screen.getByTestId("footer");
-    expect(footer).toHaveClass("border-t", "justify-end");
+    expect(footer).toHaveClass("pt-3", "justify-end");
+    expect(footer).not.toHaveClass("border-t");
     expect(footer).toContainElement(
       screen.getByRole("button", { name: "Save" }),
     );

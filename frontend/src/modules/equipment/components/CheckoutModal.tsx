@@ -573,11 +573,6 @@ export function CheckoutModal({
               min={orgToday}
               error={returnDateError}
             />
-            {returnDateError && (
-              <p role="alert" className="text-xs text-red-500 mt-1 ml-1">
-                {returnDateError}
-              </p>
-            )}
             {!form.expected_return_at && !returnDateError && (
               <p className="mt-1 ml-1 text-xs text-on-muted">
                 {t("assignments.checkout_modal.return_date_consequence")}

@@ -259,11 +259,6 @@ export function ReceiveLineRow({
                 error={expiryMissing ? t("receive.expiryNeeded") : undefined}
                 onChange={(value) => onUpdate(line.key, { expiryDate: value })}
               />
-              {expiryMissing && (
-                <p className="pb-2 text-xs text-on-danger">
-                  {t("receive.expiryNeeded")}
-                </p>
-              )}
             </div>
           </td>
         </tr>
