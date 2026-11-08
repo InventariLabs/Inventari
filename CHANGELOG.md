@@ -193,6 +193,9 @@ says what the release does rather than what changed since them.
   list of their own.
 - Module authors can give a quantity input the step the store keeps,
   `QUANTITY_STEP` from `@/module-sdk`, instead of writing `0.001` into the form.
+- Module authors can put a record page of their own into **Recently visited**
+  with `useRecordVisit` from `@/module-sdk`, as the product, asset and recipe
+  pages do.
 
 ### Fixed
 
@@ -645,6 +648,10 @@ says what the release does rather than what changed since them.
   several: **Close** completed nothing, and there was neither **Pack** nor a
   place for the carrier. Both buttons now lead to the delivery's own page,
   which packs it or completes it with the carrier typed on the summary.
+- **Recently visited** on the launcher and the recent list of the command
+  palette fill again: opening a product, an equipment asset or a recipe puts it
+  at the top. Nothing recorded a visit, so both stayed empty however many pages
+  were opened.
 
 ## v0.11.0 - 2026-11-02
 

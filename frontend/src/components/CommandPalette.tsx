@@ -15,7 +15,7 @@ import { useModules } from "@/contexts/ModulesContext";
 import { useModuleLabels } from "@/hooks/useModuleLabels";
 import { moduleRegistry } from "@/lib/moduleRegistry";
 import { resolveModuleTarget } from "@/lib/moduleRegistry/resolveModuleTarget";
-import { getRecentItems } from "@/lib/recentItems";
+import { getRecentItems, RECENT_ITEMS_SCOPE } from "@/lib/recentItems";
 import { useAuthStore } from "@/store/authStore";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { useCommandPaletteSearch } from "@/lib/useCommandPaletteSearch";
@@ -254,11 +254,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     }).name;
   };
 
-  // The second argument has read "default" since it was written: the user
-  // record has never carried an organization id, so the old conditional was
-  // the fallback branch and nothing else.
   const recentItems = user?.id
-    ? getRecentItems(String(user.id), "default")
+    ? getRecentItems(String(user.id), RECENT_ITEMS_SCOPE)
     : [];
 
   const query = deferredSearch.trim();
