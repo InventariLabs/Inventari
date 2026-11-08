@@ -238,6 +238,61 @@ class ShoppingListsAPI:
             await db.refresh(item, ['quantity', 'estimated_price', 'category'])
         return [ShoppingListItemDTO.model_validate(i) for i in created_items]
 
+    async def raise_item_quantity_async(
+        self,
+        db: AsyncSession,
+        list_id: UUID,
+        item_id: UUID,
+        quantity: Decimal,
+        org_id: UUID,
+    ) -> None:
+        """Async: raise an open line of a list of *org_id* to *quantity*.
+
+        For a caller that keeps a line in step with a need that grew (the
+        meal plan's refresh). A line already ticked off is bought and is
+        left alone, and a quantity at or below the line's own is not a
+        raise — the line is never lowered. The same door guards as
+        ``add_items_async``: the stored value is quantized and a zero or an
+        overflow is refused with the same keys.
+        """
+        from app.core.exceptions import ServiceRejectionError
+        from app.i18n.service import stated_quantity
+        from app.modules.shopping_lists.models import ShoppingListItem
+        from app.schemas.validators import (
+            QUANTITY_MAX,
+            QUANTITY_STEP,
+            quantize_quantity,
+        )
+
+        await self._own_list_or_404_async(db, list_id, org_id)
+        await _require_module_enabled(db, org_id)
+
+        stored = quantize_quantity(quantity)
+        if stored is None or stored <= 0:
+            raise ServiceRejectionError(
+                'shopping_list_item_quantity_rounds_to_zero',
+                quantity=stated_quantity(stored if stored is not None else quantity),
+                smallest=stated_quantity(QUANTITY_STEP),
+            )
+        if stored > QUANTITY_MAX:
+            raise ServiceRejectionError(
+                'shopping_list_item_quantity_above_ceiling',
+                quantity=stated_quantity(stored),
+                ceiling=stated_quantity(QUANTITY_MAX),
+            )
+        item = await db.scalar(
+            select(ShoppingListItem)
+            .where(
+                ShoppingListItem.id == item_id,
+                ShoppingListItem.shopping_list_id == list_id,
+                ShoppingListItem.is_purchased.is_(False),
+            )
+            .with_for_update()
+        )
+        if item is not None and stored > item.quantity:
+            item.quantity = stored
+            await db.flush()
+
     async def _own_list_or_404_async(
         self, db: AsyncSession, list_id: UUID, org_id: UUID
     ) -> ShoppingList:

@@ -34,6 +34,7 @@ class ShoppingListItemDTO(BaseModel):
     source: str = 'manual'
     item_id: UUID | None = None
     category_id: UUID | None = None
+    is_purchased: bool = False
 
 
 class ShoppingListItemCreateDTO(BaseModel):
