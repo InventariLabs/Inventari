@@ -22,6 +22,7 @@ import {
 import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
 import { PackageCard } from "./PackageCard";
+import { PACKING_HASH } from "./packingHash";
 import { PackingFooter } from "./PackingFooter";
 import { PackLineSheet } from "./PackLineSheet";
 import { ToPackList } from "./ToPackList";
@@ -73,10 +74,6 @@ interface Props {
   onComplete: (shipment?: ShipmentCreate) => void;
   isCompletePending: boolean;
 }
-
-/** The hash the picking summary's "Pack" leaves, so the step scrolls into
- * view: the sheet closes over a page whose step is further down. */
-export const PACKING_HASH = "#pack";
 
 /**
  * The Pack step of a picked dispatch: packages filled by scan or by tap, the

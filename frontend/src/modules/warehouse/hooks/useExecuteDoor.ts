@@ -1,9 +1,7 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  PACKING_HASH,
-  usePackingStepShown,
-} from "@/modules/warehouse/components/packing/DocumentPackingStep";
+import { usePackingStepShown } from "@/modules/warehouse/components/packing/DocumentPackingStep";
+import { PACKING_HASH } from "@/modules/warehouse/components/packing/packingHash";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
 
 /**

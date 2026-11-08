@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PACKING_HASH } from "@/modules/warehouse/components/packing/DocumentPackingStep";
+import { PACKING_HASH } from "@/modules/warehouse/components/packing/packingHash";
 import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import type { ShipmentDraft } from "@/modules/warehouse/components/shipping/shipmentDraft";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
