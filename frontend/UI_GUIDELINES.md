@@ -698,7 +698,7 @@ Every form control — `Input`, `Textarea`, `NativeSelect`, `Select`, `DateInput
 | Text            | `text-sm`                                                    |
 | Label → control | `space-y-1.5` (6px), owned by the control's own wrapper      |
 | Label display   | `block` — an inline label inherits the wrapper's line-height |
-| Error message   | `text-xs text-red-600 font-medium ml-1`, below the control (`Select` shows it inside its trigger; `DateInput` only reddens its border) |
+| Error message   | `text-xs text-red-600 font-medium ml-1`, below the control (`Select` shows it inside its trigger) |
 
 - **Pass `label` to the control; never hand-roll a `<label>` beside it.** The
   wrapper owns the label-to-field gap — the measured rhythm of 12 / 0 / 19 / 7px
