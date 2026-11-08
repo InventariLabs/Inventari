@@ -170,6 +170,8 @@ says what the release does rather than what changed since them.
 - Module authors can hand an attachment's file picker the types the server
   accepts, `ATTACHMENT_FILE_ACCEPT` from `@/module-sdk`, instead of keeping a
   list of their own.
+- Module authors can give a quantity input the step the store keeps,
+  `QUANTITY_STEP` from `@/module-sdk`, instead of writing `0.001` into the form.
 
 ### Fixed
 
@@ -192,6 +194,11 @@ says what the release does rather than what changed since them.
   is not a supplier. A rename that loses a race for the name no longer ends the
   transaction around it, and a duplicate is told apart by the constraint the
   database reports instead of by text that also quotes the row's values.
+- The shopping list's refusals of a quantity — one that rounds to zero and one
+  above the ceiling — and the "at least" message under a quantity field now
+  write their numbers in the reader's decimal mark ("0,001", not "0.001" in
+  Polish), and the two ways of adding an item state the same rounded value for
+  the same request.
 
 - On a phone, the picking and receiving lists show the whole product name and
   the whole batch and location code instead of cutting them: they break at a
