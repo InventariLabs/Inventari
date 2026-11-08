@@ -10,8 +10,8 @@ Whoever does the shopping. The list is read on a phone, in a shop, usually one-h
 The lists themselves and what is on them, added by hand, suggested from what has run low, what is
 used up often, or what has expired or is about to, and ticking things off as they are bought.
 Recipes and production runs also put entries on the active list. The API keeps an estimated price
-on an entry for a client that sets one; no screen asks for it or shows it, and no suggestion fills
-it in.
+on an entry for a client that sets one, and the entry shows it as a hint; no screen asks for it,
+and no suggestion fills it in.
 
 ## Outside the boundary
 - Ordering from a supplier, with an expected delivery → **purchase_orders** (a list can be turned
