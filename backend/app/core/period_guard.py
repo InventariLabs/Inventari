@@ -10,6 +10,12 @@ registry.
 Graceful degradation: when no guard is registered (warehouse module absent
 or rejected), :func:`check_period_not_closed` is a no-op — period locking is
 a warehouse feature, so without the module there is nothing to enforce.
+
+Once registered, the guard answers for every organization, including one that
+has switched the module off since: closing a month is an accounting act, and
+only reopening it undoes it. Switching the module off does not reopen a closed
+month behind the accountant's back; the organization switches the module on
+again to reopen it.
 """
 
 from __future__ import annotations
