@@ -119,6 +119,13 @@ says what the release does rather than what changed since them.
   logs outlive it; in a header it travels as it does on every other request. A
   client that still sends the token in the address is refused with close code
   4001 and has to offer the two subprotocols instead.
+- **Breaking:** `POST /organizations/my/invitation-code` requires `email`, the
+  address the invitation is for, and answers 422 without it. A code minted
+  without an address opened for whoever held the link, while the invitation
+  screen always sent one and the user guide says an invitation works only for
+  the address it was sent to. A script that issued bearer codes names the
+  invitee instead. Codes already issued without an address keep working until
+  they expire.
 
 ### Added
 

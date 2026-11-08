@@ -890,7 +890,7 @@ class TestInvitationCustomRole:
         invite = client.post(
             '/api/v1/organizations/my/invitation-code',
             headers=auth_headers,
-            json={'role_id': role_id},
+            json={'role_id': role_id, 'email': 'newcomer@example.com'},
         )
         assert invite.status_code == status.HTTP_200_OK
         assert invite.json()['role_id'] == role_id
@@ -938,22 +938,22 @@ class TestInvitationCustomRole:
         first = client.post(
             '/api/v1/organizations/my/invitation-code',
             headers=auth_headers,
-            json={'role_id': role_a},
+            json={'role_id': role_a, 'email': 'anna@example.com'},
         ).json()
         same_role = client.post(
             '/api/v1/organizations/my/invitation-code',
             headers=auth_headers,
-            json={'role_id': role_a},
+            json={'role_id': role_a, 'email': 'anna@example.com'},
         ).json()
         other_role = client.post(
             '/api/v1/organizations/my/invitation-code',
             headers=auth_headers,
-            json={'role_id': role_b},
+            json={'role_id': role_b, 'email': 'anna@example.com'},
         ).json()
         plain_enum = client.post(
             '/api/v1/organizations/my/invitation-code',
             headers=auth_headers,
-            json={'role': 'user'},
+            json={'role': 'user', 'email': 'anna@example.com'},
         ).json()
 
         # Every call mints its own code, and each one carries the role it was
@@ -982,7 +982,7 @@ class TestInvitationCustomRole:
         response = client.post(
             '/api/v1/organizations/my/invitation-code',
             headers=auth_headers,
-            json={'role_id': str(foreign_role.id)},
+            json={'role_id': str(foreign_role.id), 'email': 'anna@example.com'},
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

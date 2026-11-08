@@ -186,7 +186,7 @@ class TestOrganizationMemberLimit:
 
         response = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role': 'user'},
+            json={'role': 'user', 'email': 'anna@example.com'},
             headers=_auth(admin, PL),
         )
 
