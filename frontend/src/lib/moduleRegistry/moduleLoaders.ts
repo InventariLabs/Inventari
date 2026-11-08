@@ -43,5 +43,7 @@ export async function registerModules(enabledModules: string[]): Promise<void> {
       );
     }
   });
-  moduleRegistry.warnOrphanedNav(wanted.map(({ name }) => name));
+  const loaded = wanted.map(({ name }) => name);
+  moduleRegistry.warnOrphanedNav(loaded);
+  moduleRegistry.warnUnmatchedNavOverrides(loaded);
 }

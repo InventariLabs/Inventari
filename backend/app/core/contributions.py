@@ -75,11 +75,16 @@ class ContributionRegistry:
 
     # All known extension points with documentation on expected contribution type.
     # Register unknown points will emit a warning — most likely a typo.
+    #
+    # A stable point is one backend code reads (tests/unit/
+    # test_contribution_registry.py holds every one to a reader). Scan
+    # providers register through ``scan_registry`` and a dashboard widget is
+    # a frontend slot, so ``scan_providers`` and ``dashboard_widgets`` are
+    # not points: listed here, a registration to them was accepted in
+    # silence and reached nothing; unlisted, it warns.
     KNOWN_POINTS: frozenset[str] = frozenset(
         {
-            'scan_providers',  # ScanProvider     — barcode/QR handlers
             'enrichment_providers',  # BaseContribution — item data enrichment (@experimental, no consumer)
-            'dashboard_widgets',  # BaseContribution — dashboard UI (active, equipment contrib)
             'quota_providers',  # QuotaProvider    — SaaS quota enforcement
             'item_interceptors',  # ItemInterceptor  — mutate/block item CRUD operations
             'storage_interceptors',  # StorageInterceptor — mutate/block storage CRUD operations

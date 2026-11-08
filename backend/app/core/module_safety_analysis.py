@@ -61,6 +61,7 @@ from app.core.module_safety import (
     FORBIDDEN_OBJECTS,
     MODULE_IMPORT_SURFACE,
     REPO_SHIPPED_MODULES,
+    SHIPPED_ONLY_OBJECTS,
     SUSPICIOUS_IMPORTS,
     TRUSTED_SHIPPED_MODULES,
 )
@@ -604,11 +605,17 @@ def _resolve_banned(path: str, banned: list[object]) -> str | None:
 def _banned_object_findings(
     module_name: str, references: list[_AppReference]
 ) -> list[SafetyFinding]:
-    """References that resolve to a ``FORBIDDEN_OBJECTS`` entry."""
-    if module_name in TRUSTED_SHIPPED_MODULES or not references:
+    """References that resolve to a ``FORBIDDEN_OBJECTS`` entry, or to a
+    ``SHIPPED_ONLY_OBJECTS`` one from a module this repository does not ship."""
+    dotted_names = (
+        [] if module_name in TRUSTED_SHIPPED_MODULES else [*FORBIDDEN_OBJECTS]
+    )
+    if module_name not in REPO_SHIPPED_MODULES:
+        dotted_names += SHIPPED_ONLY_OBJECTS
+    if not dotted_names or not references:
         return []
     banned: list[object] = []
-    for dotted in FORBIDDEN_OBJECTS:
+    for dotted in dotted_names:
         owner, _, attr = dotted.rpartition('.')
         banned.append(getattr(importlib.import_module(owner), attr))
 

@@ -280,10 +280,12 @@ export interface BulkAction {
  *
  * A closed union rather than `string`: the previous free-form field made every
  * rule a guess, since a typo produced a rule that silently never matched any
- * form. Adding a form here is the deliberate act of opening it to modules.
+ * form. Adding a form here is the deliberate act of opening it to modules,
+ * and a form that is listed has to run the rules (`useModuleValidation`):
+ * `storage_create` and `storage_edit` were listed while no location form ran
+ * a rule, so a module's rule for them was accepted and never ran.
  */
-export type CoreFormName =
-  "item_create" | "item_edit" | "storage_create" | "storage_edit";
+export type CoreFormName = "item_create" | "item_edit";
 
 /**
  * A validation rule a module contributes to a core form.

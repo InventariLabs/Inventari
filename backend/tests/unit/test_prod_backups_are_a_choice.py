@@ -523,6 +523,22 @@ class TestWiring:
         assert '[ -z "$$AGE_RECIPIENT" ]' in command
         assert '--include "*.age"' in command
 
+    def test_the_offsite_copy_sends_each_backup_once_not_its_latest_link(
+        self,
+    ) -> None:
+        """last/ names its newest pair twice: the file and a ``-latest`` link to it.
+
+        Followed (``--copy-links``), each link arrived at the remote as one more
+        full copy of the newest dump and archive. Left alone, rclone sends the
+        files, and ``--skip-links`` keeps it from warning about each link on
+        every hourly pass.
+        """
+        words = ' '.join(_compose()['db-backup-offsite']['command']).split()
+
+        assert '--copy-links' not in words
+        assert '-L' not in words
+        assert '--skip-links' in words
+
     def test_the_offsite_command_refuses_without_a_key_and_copies_only_ciphertext(
         self, tmp_path: Path
     ) -> None:

@@ -245,9 +245,10 @@ class Settings(BaseSettings):
 
     # Community module signing: trusted Ed25519 public keys the
     # installer verifies module packages against. Entries separated by
-    # commas or newlines, each ``key_id=<base64 public key>`` or a bare
-    # base64 key. Empty means nothing is trusted: every package is
-    # unsigned, and installing one needs the explicit --allow-unsigned.
+    # commas or newlines, each ``key_id=<base64 public key>``; an entry
+    # without an id is skipped with a warning. Empty means nothing is
+    # trusted: every package is unsigned, and installing one needs the
+    # explicit --allow-unsigned.
     MODULE_SIGNING_PUBLIC_KEYS: str = ''
 
     model_config = SettingsConfigDict(

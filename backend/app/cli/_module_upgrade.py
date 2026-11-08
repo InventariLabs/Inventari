@@ -45,6 +45,7 @@ from ._module_meta import (
     _load_tracking,
     _parse_module_yaml,
     _save_tracking,
+    _unmet_requirements,
     deployment_steps,
 )
 
@@ -99,10 +100,11 @@ def _check_upgrade_guards(
     installed = tracking[name].get('version', '')
     _check_version_direction(name, installed, meta['version'], force=force)
 
-    for dep in meta.get('requires', []):
-        if not (BACKEND_MODULES_DIR / dep).exists() and dep not in tracking:
-            console.print(f"[red]✗ Required module '{dep}' is not installed.[/]")
-            raise SystemExit(1)
+    for dep in _unmet_requirements(
+        meta.get('requires', []), tracking, BACKEND_MODULES_DIR
+    ):
+        console.print(f"[red]✗ Required module '{dep}' is not installed.[/]")
+        raise SystemExit(1)
 
     for declared, component in (
         (meta['components'].get('backend', True), 'backend'),

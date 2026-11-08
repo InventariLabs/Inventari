@@ -760,10 +760,22 @@ class TestAuthMe:
         assert me.json()['email'] == 'qa@inventari.local'
 
     def test_get_me_unauthorized(self, client):
-        """Tests fetching profile without authorization."""
-        response = client.get('/api/v1/auth/me')
+        """A request with no credential answers the coded envelope.
+
+        The scheme's own refusal was the framework's bare English
+        ``{"detail": "Not authenticated"}``: the one 401 of an authenticated
+        route a client could not branch on, and the one a Polish reader got
+        in English.
+        """
+        response = client.get('/api/v1/auth/me', headers={'Accept-Language': 'pl'})
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.json()['detail'] == {
+            'code': 'NOT_AUTHENTICATED',
+            'message': 'Nie jesteś zalogowany',
+            'lang': 'pl',
+        }
+        assert response.headers['WWW-Authenticate'] == 'Bearer'
 
     def test_get_me_invalid_token(self, client):
         """Tests fetching profile with invalid token."""

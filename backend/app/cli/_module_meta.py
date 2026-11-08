@@ -62,6 +62,28 @@ def _reserved_name_refusal(name: str) -> str | None:
 _VALID_NAME_RE = re.compile(MODULE_NAME_PATTERN)
 
 
+def _unmet_requirements(
+    requires: list[str], tracking: dict, modules_dir: Path
+) -> list[str]:
+    """The names in *requires* this installation has no module for.
+
+    A module directory or a tracking entry answers for a name, and so does an
+    always-on feature (``items``, ``locations``, …): it is part of the
+    platform, has no directory to find, and discovery skips it the same way
+    (``ModuleRegistry._validate_dependencies``) — an installer that asked for
+    a directory refused a package the next start would have loaded.
+    """
+    from app.core.module_safety import ALWAYS_ON_MODULES
+
+    return [
+        dep
+        for dep in requires
+        if dep not in ALWAYS_ON_MODULES
+        and not (modules_dir / dep).exists()
+        and dep not in tracking
+    ]
+
+
 def _resolve_project_dirs() -> tuple[Path, Path, Path]:
     """Return (project_root, backend_modules_dir, frontend_modules_dir).
 

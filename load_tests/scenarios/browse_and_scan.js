@@ -80,8 +80,9 @@ const BARCODES = [
   '9999999999999', '1111111111111',
 ];
 
-// Pagination values — tests OFFSET/LIMIT (API uses skip/limit params)
-const SKIP_VALUES = [0, 0, 0, 20, 40];  // more skip=0 (most common case)
+// Pagination values — tests OFFSET/LIMIT (the API's offset/limit params;
+// it ignores an unknown `skip`, which used to leave every page at offset 0)
+const OFFSET_VALUES = [0, 0, 0, 20, 40];  // more offset=0 (most common case)
 const LIMIT_VALUES = [20, 50, 20, 20, 10];
 
 // Init scope — runs once per VU before the test
@@ -109,14 +110,14 @@ export default function () {
   }
   const headers = authHeaders(vuToken);
 
-  // Randomise skip/limit — simulates scrolling through pages
-  const pageIdx = Math.floor(Math.random() * SKIP_VALUES.length);
-  const skip = SKIP_VALUES[pageIdx];
+  // Randomise offset/limit — simulates scrolling through pages
+  const pageIdx = Math.floor(Math.random() * OFFSET_VALUES.length);
+  const offset = OFFSET_VALUES[pageIdx];
   const limit = LIMIT_VALUES[pageIdx];
 
   group('Browse items with pagination', () => {
     const r = http.get(
-      `${BASE_URL}/api/v1/items?skip=${skip}&limit=${limit}`,
+      `${BASE_URL}/api/v1/items?offset=${offset}&limit=${limit}`,
       { headers, tags: { name: 'items/list' } }
     );
     itemsListDuration.add(r.timings.duration);
@@ -128,7 +129,7 @@ export default function () {
 
   group('Search by phrase', () => {
     const query = encodeURIComponent(SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)]);
-    const r = http.get(`${BASE_URL}/api/v1/items?search=${query}&skip=0&limit=20`, {
+    const r = http.get(`${BASE_URL}/api/v1/items?search=${query}&offset=0&limit=20`, {
       headers,
       tags: { name: 'items/search' },
     });

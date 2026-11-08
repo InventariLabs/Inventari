@@ -205,8 +205,9 @@ while the backend's workers were killed for exceeding theirs.
 
 | Variable | What it sets | Shipped |
 |---|---|---|
-| `BACKEND_MEM_LIMIT` | memory the backend's workers share | `1536m` |
+| `BACKEND_MEM_LIMIT` | memory the backend's workers share | `2g` |
 | `WEB_CONCURRENCY` | gunicorn workers (see `docs/SCALING.md`, "Connection pool math") | `4` |
+| `PGBOUNCER_MAX_CLIENT_CONN` | the connections PgBouncer accepts from the backend; keep it above `WEB_CONCURRENCY` × 50 | `300` |
 | `DB_MEM_LIMIT` | memory the database may use | `2g` |
 | `DB_SHARED_BUFFERS` | PostgreSQL's `shared_buffers`, about a quarter of `DB_MEM_LIMIT` | `512MB` |
 | `DB_EFFECTIVE_CACHE_SIZE` | PostgreSQL's `effective_cache_size`, about the whole of `DB_MEM_LIMIT` | `2GB` |
@@ -214,16 +215,18 @@ while the backend's workers were killed for exceeding theirs.
 What to set, with the rest of the stack (proxy, Redis, the backup service, the
 frontend) and the system taking about 1.5 GB:
 
-| Host | `BACKEND_MEM_LIMIT` | `WEB_CONCURRENCY` | `DB_MEM_LIMIT` | `DB_SHARED_BUFFERS` | `DB_EFFECTIVE_CACHE_SIZE` |
-|---|---|---|---|---|---|
-| 4 GB | `1g` | `2` | `1g` | `256MB` | `1GB` |
-| 8 GB | `3g` | `4` | `3g` | `768MB` | `3GB` |
-| 16 GB | `6g` | `6` | `7g` | `1792MB` | `7GB` |
+| Host | `BACKEND_MEM_LIMIT` | `WEB_CONCURRENCY` | `PGBOUNCER_MAX_CLIENT_CONN` | `DB_MEM_LIMIT` | `DB_SHARED_BUFFERS` | `DB_EFFECTIVE_CACHE_SIZE` |
+|---|---|---|---|---|---|---|
+| 4 GB | `1g` | `2` | `300` | `1g` | `256MB` | `1GB` |
+| 8 GB | `3g` | `4` | `300` | `3g` | `768MB` | `3GB` |
+| 16 GB | `6g` | `6` | `400` | `7g` | `1792MB` | `7GB` |
 
-Raising `WEB_CONCURRENCY` raises the connections the backend opens
-(`docs/SCALING.md`), so change it together with PgBouncer's limits. Those are
-set in `docker-compose.prod.yml` (`MAX_CLIENT_CONN: 300`), not in `.env`, and
-the worst case of six workers is already 6 × 50 = 300 client connections.
+Raising `WEB_CONCURRENCY` raises the connections the backend opens, 50 per
+worker at most (`docs/SCALING.md`, "Connection pool math"), so raise
+`PGBOUNCER_MAX_CLIENT_CONN` with it: six workers open up to 300, which the
+shipped limit of 300 would leave no room above. What PgBouncer opens to the
+database stays its own pool (`DEFAULT_POOL_SIZE: 30` in
+`docker-compose.prod.yml`), so the client limit costs the database nothing.
 
 Python does not give the memory of a large answer back to the system, so a
 worker replaces itself instead: between requests, once it has grown
@@ -234,7 +237,8 @@ worker finishes the request it is answering, the arbiter starts a fresh one,
 and the log says why: `Replacing worker (pid:…)`. The limit
 `BACKEND_MEM_LIMIT` then has to hold `WEB_CONCURRENCY` workers each at their
 start-up size plus the growth allowed — about 450 MB each with the defaults —
-which is what the table's numbers leave room for.
+which is what the shipped `2g` for four workers and the table's numbers leave
+room for.
 
 ## Optional: the Open Food Facts database
 
@@ -242,8 +246,18 @@ The `products-db` and `products-app-role` services sit behind the `food`
 compose profile — the `up -d` commands of the numbered steps do not start
 them, and a deployment following those steps runs nine services, not eleven.
 Enable the profile only if you want the nutrition module's offline barcode
-lookup: add `--profile food` to the `up -d` commands of the numbered steps.
-The two services come up with the rest of the stack, and nothing has to be
+lookup: name it in `.env`,
+
+```env
+COMPOSE_PROFILES=food
+```
+
+(`food,offsite` once the off-host copy below is on too). Compose reads that
+line for every command run next to the file, so the numbered steps,
+*Updating* and *Putting a backup back* reach the two services without a flag.
+A `--profile food` typed on one command reaches them for that command only:
+the next `up -d --force-recreate` leaves them on the old images, and `down`
+leaves them running. The two services come up with the rest of the stack, and nothing has to be
 started from here.
 
 The profile needs three more variables in `.env`. Two of them are the split
@@ -287,8 +301,9 @@ docker compose -f docker-compose.prod.yml up -d --build --scale caddy=0
 
 This starts every service except Caddy, the proxy that publishes ports 80 and
 443 and puts the installation on the internet. It starts last, in Step 6, once
-the administrator exists. With the `food` profile, add `--profile food` here
-and to the `up -d` of Step 6.
+the administrator exists. With `food` in `COMPOSE_PROFILES` (*Optional: the
+Open Food Facts database* below), this command and the one in Step 6 start its
+two services too.
 
 The backend migrates the database before it answers. The loop below returns
 once it does — on the first start, after the images are built, that is about a
@@ -396,6 +411,12 @@ directory's name (`docker volume ls` shows it) and must, before pulling this
 release, either keep that name with `COMPOSE_PROJECT_NAME=<directory>` in `.env`
 or copy each volume of *Volumes* below to its `inventari_` name — otherwise the
 next `up` starts on empty volumes and leaves the data under the old names.
+
+The commands below reach the services of the profiles `.env` names in
+`COMPOSE_PROFILES` (*Optional: the Open Food Facts database*, *Copy off the
+host*). An installation that enabled `food` or `offsite` with `--profile` on
+the command line instead names them there first: step 5 recreates only the
+services of the active profiles, and leaves the others on the old images.
 
 ```bash
 cd /opt/inventari
@@ -799,6 +820,10 @@ db-backup --decrypt -i - <file> < backup-key.txt` below becomes `--entrypoint
 cat db-backup <file>`, and the file names lose `.age`. The names assume the
 default `DB_NAME`, `inventari_db`.
 
+`down` and `up -d` below reach the services of the profiles named in
+`COMPOSE_PROFILES`, as in *Updating*: the off-host copy, among them, is
+stopped while the backup is put back.
+
 ```bash
 # 1. Stop the application, keeping its volumes; start the database alone, with
 #    the application role in place (the dump hands its tables to that role).
@@ -866,13 +891,19 @@ rclone config            # e.g. remote named gdrive, then gdrive:Inventari/prod-
 # 2. Name the destination in .env:
 BACKUP_RCLONE_REMOTE=gdrive:Inventari/prod-backups
 
-# 3. Start it with the profile enabled:
-docker compose -f docker-compose.prod.yml --profile offsite up -d
+# 3. Enable the profile in .env (food,offsite with the food profile), so every
+#    later command — Updating, Putting a backup back — reaches the service too:
+COMPOSE_PROFILES=offsite
+
+# 4. Start it:
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 The remote receives the same `.age` files — the dumps and the archives of the
 uploaded files, already encrypted, so a plain remote is enough and rclone crypt
-would only encrypt them twice. The service re-syncs hourly and logs each pass
+would only encrypt them twice. Each is sent once: the `-latest` names in
+`last/` are links to the newest pair, and the copy skips links rather than
+uploading the pair a second time under those names. The service re-syncs hourly and logs each pass
 at INFO; check the first one with:
 
 ```bash
@@ -1155,7 +1186,7 @@ logging everybody out.
 - [ ] Backup rotation working (`make backup-status` — a recent backup, and whether it is encrypted)
 - [ ] Backups encrypted, or consciously left plain (`AGE_RECIPIENT`, `make backup-key`)
 - [ ] If encrypted: private key stored off the server (password manager) and `make backup-verify` has succeeded once
-- [ ] Off-host copy enabled or consciously skipped (`BACKUP_RCLONE_REMOTE` + `--profile offsite`)
+- [ ] Off-host copy enabled or consciously skipped (`BACKUP_RCLONE_REMOTE` + `offsite` in `COMPOSE_PROFILES`)
 - [ ] Administrator created before the proxy started (see Step 6)
 
 ### Disable SSH password authentication

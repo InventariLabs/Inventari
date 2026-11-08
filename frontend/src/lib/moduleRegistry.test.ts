@@ -192,7 +192,7 @@ describe("ModuleRegistry.getValidationRules", () => {
   });
 
   it("does not return rules for a different form", () => {
-    const rules = moduleRegistry.getValidationRules("storage_create", [
+    const rules = moduleRegistry.getValidationRules("item_edit", [
       "test-rule-mod",
     ]);
     expect(rules).not.toContain(rule);
