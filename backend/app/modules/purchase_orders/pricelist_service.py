@@ -241,16 +241,17 @@ async def list_for_template_async(
 async def cheapest_offers_async(
     db: AsyncSession,
     organization_id: UUID,
-    quantities: dict[UUID, Decimal],
+    wanted: set[tuple[UUID, Decimal]],
     *,
     active_on: date,
-) -> dict[UUID, PartnerPricelist]:
-    """The cheapest offer valid on *active_on*, for each of the products.
+) -> dict[tuple[UUID, Decimal], PartnerPricelist]:
+    """The cheapest offer valid on *active_on*, for each (product, quantity).
 
-    *quantities* maps each product to the quantity about to be bought. A
-    volume price (``min_quantity``) counts only when that quantity reaches
-    it, so a supplier is never proposed on the strength of a price the order
-    would not get.
+    *wanted* holds the pairs about to be bought: one product can be asked
+    for at several quantities, one per reorder rule. A volume price
+    (``min_quantity``) counts only when that quantity reaches it, so a
+    supplier is never proposed on the strength of a price the order would
+    not get.
 
     One query for the whole set, for callers that need a supplier per
     product (the replenishment alerts) and would otherwise ask once per
@@ -258,28 +259,29 @@ async def cheapest_offers_async(
     of a deactivated supplier never counts: an order to it is refused when it
     is confirmed, so the next cheapest offer wins.
     """
-    if not quantities:
+    if not wanted:
         return {}
     stmt = (
         select(PartnerPricelist)
         .options(selectinload(PartnerPricelist.partner))
         .where(
             PartnerPricelist.organization_id == organization_id,
-            PartnerPricelist.product_template_id.in_(list(quantities)),
+            PartnerPricelist.product_template_id.in_({pid for pid, _ in wanted}),
             PartnerPricelist.valid_from <= active_on,
             (PartnerPricelist.valid_to.is_(None))
             | (PartnerPricelist.valid_to >= active_on),
         )
         .order_by(PartnerPricelist.unit_price, PartnerPricelist.id)
     )
-    cheapest: dict[UUID, PartnerPricelist] = {}
+    cheapest: dict[tuple[UUID, Decimal], PartnerPricelist] = {}
     for entry in (await db.scalars(stmt)).all():
-        reached = (
-            entry.min_quantity is None
-            or entry.min_quantity <= quantities[entry.product_template_id]
-        )
-        if reached and entry.partner.is_active:
-            cheapest.setdefault(entry.product_template_id, entry)
+        if not entry.partner.is_active:
+            continue
+        for product_id, quantity in wanted:
+            if product_id == entry.product_template_id and (
+                entry.min_quantity is None or entry.min_quantity <= quantity
+            ):
+                cheapest.setdefault((product_id, quantity), entry)
     return cheapest
 
 

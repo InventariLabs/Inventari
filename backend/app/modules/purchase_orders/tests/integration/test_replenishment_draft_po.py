@@ -327,6 +327,49 @@ class TestReplenishmentDraftPos:
         [po] = resp.json()['created']
         assert po['partner_id'] == str(expected.id)
 
+    def test_each_rule_of_one_product_picks_its_supplier_by_its_own_quantity(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_user: Any,
+        po_storage_type: Any,
+        po_location: Any,
+        po_template: Any,
+        h: Any,
+    ) -> None:
+        # One product is ordered for two locations: the small order stays
+        # below the volume tier, the large one reaches it. The small rule
+        # must not drag the large one away from the supplier it qualifies for.
+        bulk = h.create_partner(
+            po_org, po_user, name='Bulk Only Ltd', email='bulk@example.com'
+        )
+        other = h.create_storage_location(
+            po_org, po_storage_type, po_user, name='Second Warehouse'
+        )
+        small = _rule(
+            db_session, po_org, po_template, po_location, min_qty='10', max_qty='29'
+        )
+        large = _rule(
+            db_session, po_org, po_template, other, min_qty='10', max_qty='1500'
+        )
+        _price(db_session, po_org, bulk, po_template, '2.00', min_quantity='1000')
+
+        alerts = client.get(
+            '/api/v1/purchase-orders/replenishment/alerts', headers=po_auth_headers
+        )
+        by_rule = {a['reorder_rule_id']: a for a in alerts.json()['items']}
+        assert by_rule[str(small.id)]['preferred_partner_id'] is None
+        assert by_rule[str(large.id)]['preferred_partner_id'] == str(bulk.id)
+
+        resp = client.post(
+            URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(large.id)]}
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        [po] = resp.json()['created']
+        assert po['partner_id'] == str(bulk.id)
+
     def test_a_deactivated_supplier_is_never_the_proposed_one(
         self,
         client: TestClient,
