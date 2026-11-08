@@ -1534,6 +1534,7 @@
   "packing": {
     "title": "Verpacken",
     "subtitle": "Optional: Legen Sie die kommissionierte Ware in Pakete, drucken Sie für jedes einen Packzettel und ein Etikett und schließen Sie dann den Warenausgang ab.",
+    "subtitleShipped": "Was versandt wurde, Paket für Paket, mit dem Packzettel und dem Etikett jedes Pakets.",
     "packAll": "Alles in ein Paket",
     "packRest": "Den Rest in ein Paket",
     "addPackage": "Paket hinzufügen",

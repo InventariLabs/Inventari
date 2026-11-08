@@ -16866,7 +16866,8 @@
                 "$ref": "#/components/schemas/InvitationCodeRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -55233,21 +55234,17 @@
             "title": "Role Id"
           },
           "email": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "email"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
+            "format": "email",
             "title": "Email"
           }
         },
         "type": "object",
+        "required": [
+          "email"
+        ],
         "title": "InvitationCodeRequest",
-        "description": "Who the code is for, and what the account redeeming it becomes.\n\n``role`` is the built-in base level; ``role_id`` optionally names an\norg-scoped custom role the join assigns on top of it. ``email`` is the\naddress the code is bound to \u2014 only an account with that address can\nredeem it."
+        "description": "Who the code is for, and what the account redeeming it becomes.\n\n``role`` is the built-in base level; ``role_id`` optionally names an\norg-scoped custom role the join assigns on top of it. ``email`` is the\naddress the code is bound to \u2014 only an account with that address can\nredeem it. It is required: the join holds a code to one address only when\nthe code carries one, so a code minted without it opened for whoever held\nthe link, while the screen and the user guide promised a personal\ninvitation."
       },
       "InvitationCodeResponse": {
         "properties": {
@@ -74071,8 +74068,12 @@
         "properties": {
           "kind": {
             "type": "string",
-            "maxLength": 16,
-            "minLength": 1,
+            "enum": [
+              "LABOR",
+              "PACKAGING",
+              "OVERHEAD",
+              "OTHER"
+            ],
             "title": "Kind"
           },
           "label": {
@@ -74156,8 +74157,12 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 16,
-                "minLength": 1
+                "enum": [
+                  "LABOR",
+                  "PACKAGING",
+                  "OVERHEAD",
+                  "OTHER"
+                ]
               },
               {
                 "type": "null"

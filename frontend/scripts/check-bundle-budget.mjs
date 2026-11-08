@@ -366,6 +366,18 @@ const dist = join(root, "dist");
  * moves a step of five, to 465; the other screens stand under theirs (login
  * 393.5, launcher 408.5, start 623.2, issue 572.7, history 596.6, products
  * 610.9).
+ *
+ * Re-measured 2026-11-08 on the branch that hands a one-document picking
+ * session from a list to the document's page and records visits for
+ * "Recently visited": the development tip alone measures the start screen at
+ * 624.9 KiB gz against its 625, and the branch adds 0.6 KiB gz (start 625.5).
+ * It is the list's picking sheet and its hand-off hook in the To do chunks
+ * (0.4), the module SDK's `useRecordVisit` export (0.1) and the recent list's
+ * scope constant beside the store that clears it (0.1) — code the screen
+ * runs, not an import that walked in. That one phone budget moves a step of
+ * five, to 630; the other screens stand under theirs (login 394.5, launcher
+ * 409.6, receive 462.1, issue 574.7, history 598.6, products 613.4, initial
+ * 189.3, app first paint 389.8).
  */
 const BUDGETS = {
   initial: 245,

@@ -33,7 +33,7 @@ import { PutawaySheet } from "@/modules/warehouse/components/todo/PutawaySheet";
 import { ReplenishSheet } from "@/modules/warehouse/components/todo/ReplenishSheet";
 import { QuarantineBlock } from "@/modules/warehouse/components/todo/QuarantineBlock";
 import { WorkItemRow } from "@/modules/warehouse/components/todo/WorkItemRow";
-import WmsPickingView from "@/modules/warehouse/components/picking/WmsPickingView";
+import { ListPickingSheet } from "@/modules/warehouse/components/picking/ListPickingSheet";
 import {
   MAX_TASKS,
   useDocumentsTodo,
@@ -581,10 +581,9 @@ export default function DocumentsTodoPage() {
         </div>
       )}
       {pickingIds && (
-        <WmsPickingView
-          documentId={pickingIds[0]}
+        <ListPickingSheet
           documentIds={pickingIds}
-          onClose={() => {
+          onLeave={() => {
             setPickingIds(null);
             setSelectedIds(new Set());
           }}

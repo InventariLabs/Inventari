@@ -16,6 +16,9 @@ from ._schemas_bom import BoMLineRead
 ReferenceDirection = Literal['SAVINGS', 'MARGIN']
 AvailabilityCheckScope = Literal['GLOBAL', 'PER_LOCATION']
 CreateOnShortageStrategy = Literal['ALLOW', 'WARN', 'BLOCK']
+#: The fixed costs of a batch the recipe screen offers, names and badges. The
+#: set is closed: a kind the screen cannot name came back to it as a raw code.
+CostLineKind = Literal['LABOR', 'PACKAGING', 'OVERHEAD', 'OTHER']
 
 # ---------------------------------------------------------------------------
 # Recipe CRUD
@@ -70,7 +73,7 @@ class RecipeFromCulinaryCreate(BaseModel):
 class RecipeCostLineCreate(BaseModel):
     """Input for POST /recipes/{id}/cost-lines."""
 
-    kind: str = Field(min_length=1, max_length=16)
+    kind: CostLineKind
     label: str = Field(min_length=1, max_length=120)
     amount: Decimal = Field(max_digits=12, decimal_places=2)
     sort_order: int = 0
@@ -79,7 +82,7 @@ class RecipeCostLineCreate(BaseModel):
 class RecipeCostLineUpdate(BaseModel):
     """Input for PATCH /recipes/{id}/cost-lines/{line_id}."""
 
-    kind: str | None = Field(None, min_length=1, max_length=16)
+    kind: CostLineKind | None = None
     label: str | None = Field(None, min_length=1, max_length=120)
     amount: Decimal | None = Field(None, max_digits=12, decimal_places=2)
     sort_order: int | None = None

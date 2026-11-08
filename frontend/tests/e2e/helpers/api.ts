@@ -615,11 +615,16 @@ export class ApiHelper {
     return Array.isArray(data) ? data : (data.items ?? []);
   }
 
-  async createInvite(token: string): Promise<{ invite_code: string }> {
+  /** An invitation for `email`: only an account with that address joins. */
+  async createInvite(
+    token: string,
+    email: string,
+  ): Promise<{ invite_code: string }> {
     const response = await this.request.post(
       "/api/v1/organizations/my/invitation-code",
       {
         headers: { Authorization: `Bearer ${token}` },
+        data: { email },
       },
     );
     if (!response.ok())

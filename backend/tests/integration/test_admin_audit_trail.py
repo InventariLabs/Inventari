@@ -161,6 +161,7 @@ class TestAdministrativeActionsAreRecorded:
     ):
         response = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
+            json={'email': 'anna@example.com'},
             headers=_auth(admin),
         )
         assert response.status_code == 200

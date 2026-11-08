@@ -48,6 +48,19 @@ async def outsider(real_async_db_session):
     return user
 
 
+async def _a_code_without_an_address(db, organization, admin) -> str:
+    """A code as they were minted before every invitation named its address.
+
+    The API no longer issues one, so the service writes it, the way such a
+    code already sits in the database of an organization that upgrades.
+    """
+    from app.services._org_membership import create_invitation_code
+
+    invitation = await create_invitation_code(db, organization.id, admin.id)
+    await db.commit()
+    return invitation['code']
+
+
 @pytest.fixture
 def sent(monkeypatch):
     """Capture invitation mail instead of sending it, with SMTP pretending to
@@ -74,7 +87,7 @@ class TestInvitationRole:
     ):
         issued = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role': 'manager'},
+            json={'role': 'manager', 'email': outsider.email},
             headers=_auth(admin),
         )
         assert issued.status_code == 200
@@ -103,7 +116,7 @@ class TestInvitationRole:
         """
         issued = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role': 'user'},
+            json={'role': 'user', 'email': admin.email},
             headers=_auth(admin),
         )
         assert issued.status_code == 200
@@ -127,12 +140,12 @@ class TestInvitationRole:
         # permissions of whoever was invited before them.
         first = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role': 'viewer'},
+            json={'role': 'viewer', 'email': 'anna@example.com'},
             headers=_auth(admin),
         )
         second = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role': 'manager'},
+            json={'role': 'manager', 'email': 'tomasz@example.com'},
             headers=_auth(admin),
         )
 
@@ -183,7 +196,7 @@ class TestInvitationRole:
     ):
         response = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role': 'superuser'},
+            json={'role': 'superuser', 'email': 'anna@example.com'},
             headers=_auth(admin),
         )
         assert response.status_code == 400
@@ -196,7 +209,7 @@ class TestInvitationRole:
         # VALIDATION_ERROR on the way out.
         response = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role_id': str(uuid4())},
+            json={'role_id': str(uuid4()), 'email': 'anna@example.com'},
             headers=_auth(admin),
         )
         assert response.status_code == 400
@@ -207,10 +220,29 @@ class TestInvitationRole:
     ):
         response = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
+            json={'email': 'anna@example.com'},
             headers=_auth(admin),
         )
         assert response.status_code == 200
         assert response.json()['role'] == 'user'
+
+    async def test_an_invitation_names_the_address_it_is_for(
+        self, real_async_client, async_test_household, admin
+    ):
+        # The join holds a code to one address only when the code carries
+        # one, so a code minted without an address admitted whoever held the
+        # link. The screen always sent one; the API now asks for it too.
+        response = await real_async_client.post(
+            '/api/v1/organizations/my/invitation-code',
+            json={'role': 'user'},
+            headers=_auth(admin),
+        )
+        assert response.status_code == 422
+
+        listed = await real_async_client.get(
+            '/api/v1/organizations/my/invitations', headers=_auth(admin)
+        )
+        assert listed.json()['items'] == []
 
 
 @pytest.mark.asyncio
@@ -289,19 +321,22 @@ class TestInvitationBinding:
         assert row.used_at is not None
 
     async def test_a_code_issued_without_an_address_still_opens(
-        self, real_async_client, async_test_household, admin, outsider
+        self,
+        real_async_client,
+        real_async_db_session,
+        async_test_household,
+        admin,
+        outsider,
     ):
         # Codes minted before invitations became personal keep working until
         # they expire, so deploying does not invalidate what is in flight.
-        issued = await real_async_client.post(
-            '/api/v1/organizations/my/invitation-code',
-            json={'role': 'user'},
-            headers=_auth(admin),
+        code = await _a_code_without_an_address(
+            real_async_db_session, async_test_household, admin
         )
 
         joined = await real_async_client.post(
             '/api/v1/organizations/join',
-            json={'code': issued.json()['code']},
+            json={'code': code},
             headers=_auth(outsider),
         )
         assert joined.status_code == 200
@@ -618,12 +653,10 @@ class TestInvitationRegistration:
         assert response.status_code == 400
 
     async def test_a_code_issued_without_an_address_still_registers(
-        self, real_async_client, async_test_household, admin
+        self, real_async_client, real_async_db_session, async_test_household, admin
     ):
-        issued = await real_async_client.post(
-            '/api/v1/organizations/my/invitation-code',
-            json={'role': 'user'},
-            headers=_auth(admin),
+        code = await _a_code_without_an_address(
+            real_async_db_session, async_test_household, admin
         )
 
         response = await real_async_client.post(
@@ -632,7 +665,7 @@ class TestInvitationRegistration:
                 'email': 'anna@example.com',
                 'password': 'Password123',
                 'full_name': 'Anna Kowalska',
-                'invite_code': issued.json()['code'],
+                'invite_code': code,
             },
         )
         assert response.status_code == 201
@@ -761,7 +794,7 @@ class TestInvitationList:
         # only be inferred from who turned up among the members.
         issued = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
-            json={'role': 'viewer'},
+            json={'role': 'viewer', 'email': outsider.email},
             headers=_auth(admin),
         )
 

@@ -130,6 +130,20 @@ says what the release does rather than what changed since them.
   logs outlive it; in a header it travels as it does on every other request. A
   client that still sends the token in the address is refused with close code
   4001 and has to offer the two subprotocols instead.
+- **Breaking:** `POST /organizations/my/invitation-code` requires `email`, the
+  address the invitation is for, and answers 422 without it. A code minted
+  without an address opened for whoever held the link, while the invitation
+  screen always sent one and the user guide says an invitation works only for
+  the address it was sent to. A script that issued bearer codes names the
+  invitee instead. Codes already issued without an address keep working until
+  they expire.
+- **Breaking:** a production recipe's fixed cost line takes one of the four
+  kinds the recipe screen offers — `LABOR`, `PACKAGING`, `OVERHEAD` or `OTHER` —
+  and the API answers 422 for any other `kind` on
+  `POST /maker/recipes/{id}/cost-lines` and on its `PATCH`. The API used to
+  store any string up to sixteen characters, which the screen then showed as a
+  raw code it could not name. A client that sent another kind sends `OTHER`
+  and says what it is in the label.
 - **Breaking:** a community module can no longer declare its tables on
   `CoreModelBase` from the module SDK: `module install`, `module validate` and
   module discovery refuse it, however the base is reached. It is Core's own
@@ -263,6 +277,9 @@ says what the release does rather than what changed since them.
   list of their own.
 - Module authors can give a quantity input the step the store keeps,
   `QUANTITY_STEP` from `@/module-sdk`, instead of writing `0.001` into the form.
+- Module authors can put a record page of their own into **Recently visited**
+  with `useRecordVisit` from `@/module-sdk`, as the product, asset and recipe
+  pages do.
 - `module validate` reads a package the way `module new-community` writes it —
   `module.yaml` with `backend/` beside it — and checks its backend laid out the
   way `module install` lands it, so an author can validate before installing.
@@ -748,6 +765,22 @@ says what the release does rather than what changed since them.
   404 instead of asking the backend; a PDF attachment came through. An
   instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
   backend itself.
+- A completed dispatch keeps its **Packing** card, read-only: each package with
+  its packing slip and its label, and the file of all slips when there are
+  several. The card used to close with the document, so a slip to check a
+  returned box against could not be printed again from the screen, although
+  the server still served it.
+- A picking session over one delivery ends with **Pack**, the shipping fields
+  and **Complete and book** however it was opened. Opened from the documents
+  list or the To do region — one ticked delivery, a selection the stock check
+  narrowed to one, or **Resume** on a row — it used to end like a session over
+  several: **Close** completed nothing, and there was neither **Pack** nor a
+  place for the carrier. Both buttons now lead to the delivery's own page,
+  which packs it or completes it with the carrier typed on the summary.
+- **Recently visited** on the launcher and the recent list of the command
+  palette fill again: opening a product, an equipment asset or a recipe puts it
+  at the top. Nothing recorded a visit, so both stayed empty however many pages
+  were opened.
 - On a bucket (S3) backend, an equipment attachment opens through the app's own
   `/uploads/…` address, which checks who is asking, like every other stored
   file. It was handed out as the bucket's bare address.

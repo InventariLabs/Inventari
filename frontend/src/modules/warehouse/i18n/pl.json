@@ -1652,6 +1652,7 @@
   "packing": {
     "title": "Pakowanie",
     "subtitle": "Opcjonalnie: włóż zebrany towar do paczek, wydrukuj list pakowy i etykietę każdej z nich, a potem zrealizuj wydanie.",
+    "subtitleShipped": "Co zostało wysłane, paczka po paczce, z listem pakowym i etykietą każdej.",
     "packAll": "Wszystko w jednej paczce",
     "packRest": "Resztę w jednej paczce",
     "addPackage": "Dodaj paczkę",
