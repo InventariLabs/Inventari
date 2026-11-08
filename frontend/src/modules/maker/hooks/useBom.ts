@@ -17,10 +17,10 @@ import type {
   CostBreakdownResponse,
 } from "@/modules/maker/types/maker";
 
-export function useBomTree(templateId: string | undefined) {
+export function useBomTree(templateId: string | undefined, recipeId?: string) {
   return useQuery<BomTreeResponse>({
-    queryKey: queryKeys.maker.bomTree(templateId ?? ""),
-    queryFn: () => bomApi.getTree(templateId as string),
+    queryKey: queryKeys.maker.bomTree(templateId ?? "", recipeId),
+    queryFn: () => bomApi.getTree(templateId as string, recipeId),
     enabled: !!templateId,
     staleTime: 0,
   });

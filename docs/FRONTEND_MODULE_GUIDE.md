@@ -256,7 +256,7 @@ const { data, isLoading } = useQuery<MyItem[]>({
 | `documentFilterContributors` | `DocumentFilterContributor[]` | No | Filters for the documents lists, answered on the server by the module's registered filter. |
 | `documentActionContributors` | `DocumentActionContributor[]` | No | Buttons for a document's action row. |
 | `useActionItems` | `() => ActionItem[]` | No | Hook returning launcher action items ("Things to do"). |
-| `useStatusBadge` | `() => { count: number; label: string; failed?: boolean } \| null` | No | Hook returning a badge count or read failure for the launcher tile. |
+| `useStatusBadge` | `() => { count: number; labelKey: string; failed?: boolean } \| null` | No | Hook returning a badge count or read failure for the launcher tile; the tile translates `labelKey` with `{ count }`. |
 | `searchProvider` | `SearchProvider` | No | Supplies command-palette results while the module is enabled. |
 
 ---
@@ -625,15 +625,14 @@ moduleRegistry.register({
   name: "warranty_tracker",
   routes: [],
   useStatusBadge: () => {
-    const { t } = useTranslation("warranty_tracker");
     const { data } = useQuery({ queryKey: ["warranties", "count"], queryFn: fetchExpiringCount });
     if (!data) return null;
-    return { count: data, label: t("expiringSoon") };
+    return { count: data, labelKey: "warranty_tracker:expiringSoon" };
   },
 });
 ```
 
-> Both hooks run inside a React component context — you can use `useQuery`, `useState`, etc. They must handle loading/error states internally (return `[]` or `null` while loading). A failed read returns the same shape with `failed: true`: for `useStatusBadge`, `{ count: 0, label, failed: true }`, and the tile says the badge could not be read.
+> Both hooks run inside a React component context — you can use `useQuery`, `useState`, etc. They must handle loading/error states internally (return `[]` or `null` while loading); the tile shows no badge until the hook answers, and nothing times it out. Both hand over an i18n key in full form, never words: the feed translates an action item's `labelKey` with its `labelValues`, the tile a badge's `labelKey` with `{ count }`, so a plural form (`expiringSoon_one` / `_other`) follows the number. A failed read returns the same shape with `failed: true`: for `useStatusBadge`, `{ count: 0, labelKey, failed: true }`, and the tile says the badge could not be read.
 
 ### `useRecordVisit` — "Recently visited"
 
@@ -686,7 +685,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { PageHeaderContext } from "@/hooks/useModulePageHeader";
+import { PageHeaderContext } from "@/module-sdk";
 import IndexPage from "./IndexPage";
 
 function renderPage(setHeader = vi.fn()) {
@@ -750,7 +749,8 @@ vi.mock("@/modules/my_feature/hooks/useMyFeature", () => ({
 4. **Use UI components.** Import `<Button>`, `<Card>`, `<Input>`, `<Badge>` from `@/module-sdk` instead of raw HTML.
 5. **Keep functions small.** ESLint enforces `complexity` ≤ 25 and `max-lines-per-function` ≤ 300; it sets no line limit per file. A component with more than one responsibility splits into sub-components inside `modules/{name}/components/`.
 6. **Never use `any`.** Prefer `unknown` + type guards or proper interfaces.
-7. **Guard module hooks.** Check `enabledModules.includes("module_name")` before calling module-specific API hooks.
+7. **Guard module hooks.** Check `enabledModules.includes("module_name")` (from `useModules()`, exported by `@/module-sdk`) before calling module-specific API hooks.
+8. **Write through `useAppMutation`.** The SDK exports it; it reports a failed write to the reader, which a bare `useMutation` does not.
 
 ---
 

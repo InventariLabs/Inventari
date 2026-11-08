@@ -318,18 +318,17 @@ def _module_filter_conditions(
         if not answer.line_meta_data:
             conditions.append(false())
             continue
-        conditions.append(
-            Document.id.in_(
-                select(DocumentLine.document_id).where(
-                    or_(
-                        *(
-                            DocumentLine.meta_data.contains({module: fragment})
-                            for fragment in answer.line_meta_data
-                        )
-                    )
+        lines = select(DocumentLine.document_id).where(
+            or_(
+                *(
+                    DocumentLine.meta_data.contains({module: fragment})
+                    for fragment in answer.line_meta_data
                 )
             )
         )
+        if answer.lots_only:
+            lines = lines.where(func.coalesce(DocumentLine.batch_number, '') != '')
+        conditions.append(Document.id.in_(lines))
     return conditions
 
 

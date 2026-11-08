@@ -167,7 +167,7 @@ Retrieves a file from storage.
 
 **Returns:** `BytesIO` object containing file content
 
-**Raises:** the built-in `FileNotFoundError` if the file is missing (the providers do not raise the same-named class in `app.core.file_storage.errors`)
+**Raises:** `StoredFileNotFoundError` if the file is missing — a `StorageError` and a built-in `FileNotFoundError` at once, so either handler catches it
 
 **Example:**
 ```python
@@ -233,7 +233,7 @@ Deletes a file from storage.
 **Parameters:**
 - `file_path` (str): Path to the file
 
-**Raises:** the built-in `FileNotFoundError` if the file is missing (local backend only: S3 `DeleteObject` succeeds for a missing key, so the S3 provider does not raise)
+**Raises:** `StoredFileNotFoundError` if the file is missing (local backend only: S3 `DeleteObject` succeeds for a missing key, so the S3 provider does not raise)
 
 **Example:**
 ```python
@@ -298,13 +298,13 @@ assert content.read() == b'version 2'
 ## Error Handling
 
 The service throws the following exceptions (from
-`app.core.file_storage.errors`, except `FileNotFoundError`, below):
+`app.core.file_storage.errors`):
 
 | Exception | When raised |
 |---|---|
 | `StorageError` | Base class for all file-storage errors. Catch this for a generic handler. |
 | `FileStorageConfigError` | `FileStorageService.initialize(...)` was never called, or the config is invalid (e.g. missing `local_path` / S3 credentials). |
-| `FileNotFoundError` | A class of this name is defined here, but the providers raise the built-in `FileNotFoundError` when the requested file does not exist (`get`, `get_url`, and `delete` on the local backend). Catch the built-in. |
+| `StoredFileNotFoundError` | The requested file does not exist (`get`, `get_url`, and `delete` on the local backend). It subclasses both `StorageError` and the built-in `FileNotFoundError`, so `except FileNotFoundError` and `except StorageError` both catch it. |
 
 ```python
 from app.core.file_storage.errors import (

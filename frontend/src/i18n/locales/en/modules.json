@@ -9,8 +9,7 @@
   },
   "modules": {
     "core": {
-      "title": "Home & Kitchen",
-      "desc": "Fridge, Pantry, and basic products."
+      "title": "Home & Kitchen"
     },
     "shopping_lists": {
       "name": "Shopping Lists",

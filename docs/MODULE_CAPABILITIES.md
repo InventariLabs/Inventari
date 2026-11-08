@@ -31,10 +31,12 @@ Module trust is certification and the operator's own responsibility, not confine
 > **Note:** `socket` and `subprocess` are listed in `FORBIDDEN_IMPORT_PREFIXES`
 > (`app/core/module_safety.py`) and rejected outright by the AST validator
 > **before** the capability check, regardless of which capabilities the module
-> declares. The only way past such a ban is a core-granted entry in
-> `CORE_EXEMPTIONS` (which `printing` holds for `subprocess`) — never a
-> manifest capability. No part of `core_api` runs an external process; the only
-> `subprocess` imports in `backend/app` are in CLI tooling.
+> declares. A ban covers the module and the modules inside it, bounded by the
+> dot: `socketserver` is not `socket`. The only way past such a ban is a
+> core-granted entry in `CORE_EXEMPTIONS` — never a manifest capability — and no
+> module holds one for `socket` or `subprocess` today. No part of `core_api` runs
+> an external process; the only `subprocess` imports in `backend/app` are in CLI
+> tooling.
 
 ## Import → Capability Mapping
 
@@ -110,11 +112,11 @@ module, owner and expiry on every block) and the architecture lint keeps the
 list from growing; new code in those modules imports from the SDK too.
 
 > **Note:** a small number of trusted in-repo modules are exempt from specific
-> entries above via `CORE_EXEMPTIONS` (`app/core/module_safety.py`). The
-> current entries: `printing` (`subprocess`, `os`), `vision` (`httpx`), `nutrition`
-> (`os`, `sys`) and `webhooks` (`socket`). Only `nutrition` imports what its entry names;
-> no module in the tree imports the names listed for `printing`, `vision` or `webhooks`.
-> `equipment`, `approvals` and `maker` each read Core models directly
+> entries above via `CORE_EXEMPTIONS` (`app/core/module_safety.py`), and every
+> entry grants an import the scan would refuse without it
+> (`tests/unit/test_the_scan_names_what_it_bans.py`): an unused one would let a
+> later import of that name pass unseen. `equipment`, `approvals` and `maker`
+> each read Core models directly
 > through a declared escape hatch (`app.models.item`, `app.models.user`,
 > and `app.models.stock_quants_from_records` (the records' view, see
 > [ADR-022](adr/ADR-022-one-number-of-stock.md)) plus a type-only
@@ -200,8 +202,7 @@ this repository ships, at their own path, and for no other directory.
 The AST validator checks:
 - Import statements against `FORBIDDEN_IMPORT_PREFIXES` (rejected outright)
 - Remaining imports against the declared `CAPABILITY_MAP` (the matching capability is
-  required, otherwise the import is rejected; `SUSPICIOUS_IMPORTS` only writes a debug log
-  line and refuses nothing)
+  required, otherwise the import is rejected)
 - Calls against `FORBIDDEN_CALLS = {'eval', 'exec', '__import__', 'import_module'}`
 - `open()` calls when `filesystem` is not declared
 

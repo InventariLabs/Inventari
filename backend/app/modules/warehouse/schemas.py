@@ -447,6 +447,11 @@ class DocumentSchema(BaseModel):
     total_gross: Decimal | None
     currency: str | None
     approval: ApprovalSnapshot | None = None
+    #: True while the document waits in PENDING_APPROVAL for a module switched
+    #: off since: that hold has stood down, nobody can decide on it, and the
+    #: document is worked as the confirmed one it was. Transient — set by the
+    #: document read, False everywhere else.
+    hold_stood_down: bool = False
     # The dispatch's hand-over, with its tracking link. Transient — populated
     # by the query service and by completion, from ``document_shipments``.
     shipment: DocumentShipmentSchema | None = None

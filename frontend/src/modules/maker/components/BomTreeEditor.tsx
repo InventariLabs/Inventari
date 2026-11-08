@@ -11,6 +11,9 @@ import type { BomTreeNode } from "@/modules/maker/types/maker";
 
 interface BomTreeEditorProps {
   templateId: string;
+  /** The recipe at the root — a variant's own formula. Without it, the
+   *  template's default recipe. */
+  recipeId?: string;
 }
 
 function shortId(id: string | null | undefined): string {
@@ -125,12 +128,12 @@ function NodeRow({
  * to make it a child of that line's child template (sent as
  * ``new_parent_template_id``). Cycles are detected by the backend.
  */
-export function BomTreeEditor({ templateId }: BomTreeEditorProps) {
+export function BomTreeEditor({ templateId, recipeId }: BomTreeEditorProps) {
   const { t } = useTranslation("maker");
   const [draggedLineId, setDraggedLineId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  const { data, isLoading, error } = useBomTree(templateId);
+  const { data, isLoading, error } = useBomTree(templateId, recipeId);
   const moveMutation = useMoveBomLine(templateId);
 
   function handleDragStart(lineId: string) {

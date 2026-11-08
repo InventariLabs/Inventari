@@ -203,7 +203,8 @@ class TestUsePartially:
                 ItemHistory.item_id == opened.id, ItemHistory.action == 'OPENED'
             )
         )
-        assert details['left'] == 1.5
+        assert isinstance(details['left'], str)
+        assert Decimal(details['left']) == Decimal('1.5')
         assert details['left_unit'] == 'kg'
 
     def test_saying_the_same_amount_twice_takes_nothing_the_second_time(

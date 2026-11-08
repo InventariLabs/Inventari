@@ -38,6 +38,9 @@ class _StubModule:
     ) -> None:
         return None
 
+    def on_enable(self, organization_id: Any, context: Any) -> None:
+        return None
+
 
 @pytest.fixture
 def patched_org_service():

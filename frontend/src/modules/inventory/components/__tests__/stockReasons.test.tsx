@@ -39,7 +39,7 @@ describe("the reasons a thing leaves the inventory", () => {
         onCancel={() => {}}
       />,
     );
-    const inDelete = screen.getByRole("option", { name: "Used" });
+    const inDelete = screen.getByRole("option", { name: "Consumed" });
     expect(inDelete).toHaveValue(STOCK_REASONS.USED);
     unmount();
 
@@ -51,7 +51,7 @@ describe("the reasons a thing leaves the inventory", () => {
         onCancel={() => {}}
       />,
     );
-    const inConsume = screen.getByRole("option", { name: "Used" });
+    const inConsume = screen.getByRole("option", { name: "Consumed" });
     expect(inConsume).toHaveValue(STOCK_REASONS.USED);
   });
 

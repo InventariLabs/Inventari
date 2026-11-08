@@ -36,8 +36,9 @@ address a backend builds for it. A key is:
 
 `core_api.file_storage.save_for_org_async(org, module, relative, ...)` builds the
 prefix itself and returns the full key. The facade rebuilds the prefix on
-every read, so a relative path can never be read outside its
-`<org>/<module>/` namespace.
+every read and refuses a relative path with a `..` segment (`StorageError`),
+so a relative path can never be read outside its `<org>/<module>/`
+namespace.
 
 ### Leaf names
 
@@ -113,11 +114,16 @@ stamped onto the baseline, so nothing re-runs it. `011_image_url_keeps_the_key`
 runs with the Recipes module chain. Neither needs an operator step.
 
 ## Security
-- Path traversal protection.
+- Path traversal protection, twice: the facade refuses a `..` segment in the
+  relative part, and the local provider refuses any path that resolves
+  outside its base directory. The second alone is not a boundary between
+  organizations — every organization's files share that base.
 - No versions kept: saving to an existing path overwrites the file. A cover
   therefore never reuses a name for a different picture: it is saved as
   `cover.<digest of the bytes>.<ext>` (`cover_leaf`), so a replaced picture is a
-  new address and the old file is deleted once the row names the new one.
+  new address. Replacing leaves the previous file where it is — an opened
+  package or a form open since before the replacement may still name it —
+  and only removing the cover deletes the file the row names.
 - Every `/uploads/` read is organization-scoped by an `UploadPathResolver`.
 - A delete never follows the stored reference: it reads only the cover's file name and
   rebuilds the key from the organization and the entity it is serving

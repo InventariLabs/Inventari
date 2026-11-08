@@ -165,7 +165,8 @@ The consumer now awaits the handlers and acknowledges after them, so:
   raises, is written to the delivery log and the message is acknowledged
   for the rest: the retry worker runs that handler alone again, up to
   `MAX_HANDLER_ATTEMPTS` times with doubling backoff, then parks it as
-  `dead` and warns the organization's admins. So a handler must be
+  `dead` and warns the organization's admins (the instance's superusers
+  for an event of no organization). So a handler must be
   idempotent — the contract is in the docstring of `EventBus` in
   `backend/app/core/_event_bus.py`.
 - **Shutdown drains.** `disconnect()` lets the loop finish what it is

@@ -218,8 +218,11 @@ class ModuleManifest(BaseModel):
         description='Module identifier (must match directory name)',
     )
     version: str = Field(
-        pattern=r'^\d+\.\d+\.\d+',
-        description='Semantic version',
+        # Anchored at both ends, as ``app.core.version.parse_version`` is: a
+        # suffix (``0.3.0-beta``, ``1.0.0.5``) validated here and then could
+        # not be compared by the upgrade check or the version ceiling.
+        pattern=r'^\d+\.\d+\.\d+$',
+        description='Version as MAJOR.MINOR.PATCH, numbers only',
     )
     inventari_min_version: str = Field(
         default='',

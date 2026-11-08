@@ -159,17 +159,8 @@ class TestEnableModules:
         with pytest.raises(ModuleLifecycleError):
             await enable_modules_async([boom], ORG_ID, db=None)
 
-    async def test_run_custom_hook_false_skips_on_enable(self):
-        """``run_custom_hook=False`` preserves the historical onboarding
-        behaviour (system hook only)."""
-        a = _make('a')
-        await enable_modules_async([a], ORG_ID, db=None, run_custom_hook=False)
-        assert a.events == [('system_on_enable', ORG_STR, None)]
-        # The custom hook must NOT have been called.
-        assert ('on_enable', ORG_STR, None) not in a.events
-
-    async def test_run_custom_hook_true_default_runs_both(self):
-        """Default behaviour keeps running both hooks."""
+    async def test_every_enable_runs_both_hooks(self):
+        """There is no path that runs the system hook alone any more."""
         a = _make('a')
         await enable_modules_async([a], ORG_ID, db=None)
         assert a.events == [

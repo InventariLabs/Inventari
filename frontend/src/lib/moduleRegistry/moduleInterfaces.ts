@@ -594,11 +594,15 @@ export interface FrontendModule {
    * Called inside a React component context (may use useQuery, etc.).
    * Returns null while loading or when there's nothing to show, and
    * `failed: true` when the read failed (the tile says it could not be read).
-   * Must include internal timeout — if the API doesn't respond within 3s, return null.
+   * The tile shows no badge until the hook answers; nothing times it out.
+   *
+   * `labelKey` is an i18n key in full form (`"inventory:statusBadge.alerts"`),
+   * which the tile translates with `{ count }` — the way an action item's
+   * `labelKey` is translated by the feed, so both hooks hand over a key.
    */
   useStatusBadge?: () => {
     count: number;
-    label: string;
+    labelKey: string;
     failed?: boolean;
   } | null;
 

@@ -17,7 +17,7 @@ fallback, and the technical identifier is never a label.
 1. **Single source of truth for the visible name: the i18n key `modules.<name>.name`**
    in `frontend/src/i18n/locales/*/modules.json`. The key is indexed by the **backend
    module name**, never by a synonym. The one exception is `core`, whose entry is
-   `modules.core.title` and `modules.core.desc`.
+   `modules.core.title` (the audit journal's name for it) and carries no description.
 2. **`display_name` from the backend manifest is only a fallback** — for community modules
    the frontend does not know at build time. For a first-party module, a missing i18n key
    is a bug, not an acceptable state.
@@ -372,7 +372,7 @@ The route stays `/maker/production`.
 ### A module name
 
 1. Edit the row in the module table and get it reviewed (this file is the decision record).
-2. Update `modules.<name>.name` / `.description` (`core`: `title` / `desc`) in all five `modules.json` files and the
+2. Update `modules.<name>.name` / `.description` (`core`: `title` only) in all five `modules.json` files and the
    module's own `launcher.title` (where it has one) in `frontend/src/modules/<module>/i18n/*.json`.
 3. Update `display_name`/description in `backend/app/modules/<module>/manifest.json`
    (fallback only — keep it aligned with the English row).

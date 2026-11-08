@@ -7,6 +7,7 @@ Source: https://docs.pytest.org/en/stable/explanation/goodpractices.html
 
 import asyncio
 import importlib
+import importlib.util
 import os
 import sys
 import tempfile
@@ -145,11 +146,14 @@ _ALL_MODULE_NAMES: list[str] = ['core'] + [
 
 # Ensure all module models are imported so SQLAlchemy can resolve cross-module
 # relationships (e.g. Item.stock_take_items -> StockTakeItem, Item.source_document -> Document).
+# By the module's package (discovery imports app.modules.<name>), not by the
+# module object's class: a define_module() module's class lives in
+# app.core.define_module, so that path imported nothing for most modules. A
+# module without models is skipped; one whose models fail to import fails here.
 for _mod in module_registry.get_all():
-    try:
-        __import__(f'{_mod.__class__.__module__.rsplit(".", 1)[0]}.models')
-    except ImportError:
-        pass
+    _models = f'app.modules.{_mod.metadata.name}.models'
+    if importlib.util.find_spec(_models) is not None:
+        importlib.import_module(_models)
 
 from app import database as app_database
 from app.core.contracts import ModuleModelBase

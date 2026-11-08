@@ -126,3 +126,23 @@ class TestModuleTypeRequired:
     def test_only_the_trust_vocabulary_is_accepted(self):
         with pytest.raises(ValidationError, match='module_type'):
             ModuleManifest(name='demo_mod', version='1.0.0', module_type='premium')
+
+
+def _versioned(version: str) -> ModuleManifest:
+    return ModuleManifest(name='demo_mod', version=version, module_type='community')
+
+
+@pytest.mark.unit
+class TestTheVersionIsOneTheUpgradeCheckReads:
+    """The pattern was anchored at the start only, so ``0.3.0-beta`` and
+    ``1.0.0.5`` validated and then could not be compared: ``parse_version``,
+    which the upgrade check and the version ceiling use, is anchored at both
+    ends."""
+
+    @pytest.mark.parametrize('version', ['0.3.0-beta', '1.0.0.5', '0.3.0 ', '1.0'])
+    def test_refuses_what_parse_version_cannot_read(self, version: str):
+        with pytest.raises(ValidationError):
+            _versioned(version)
+
+    def test_accepts_major_minor_patch(self):
+        assert _versioned('10.20.30').version == '10.20.30'

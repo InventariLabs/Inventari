@@ -362,9 +362,8 @@ def build_equipment_metadata() -> ModuleMetadata:
                 },
             ),
         ],
-        # Default locations moved here from the class-level
-        # ``on_enable``, which onboarding skips. ``system_on_enable`` seeds
-        # these on every enable path.
+        # Default locations are declared rather than written in
+        # ``on_enable``: ``system_on_enable`` seeds them on every enable path.
         default_storage_locations=[
             # Untagged on purpose: the document picker offers unclaimed
             # locations only, and a fresh install whose every room carries

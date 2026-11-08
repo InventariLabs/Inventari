@@ -65,7 +65,10 @@ export { useHasPermission } from "@/hooks/useHasPermission";
 export { useHasRole } from "@/hooks/useHasRole";
 // Whether the signed-in user is the person a record names by e-mail address.
 export { useIsSignedInAs } from "@/hooks/useIsSignedInAs";
-export { useModulePageHeader } from "@/hooks/useModulePageHeader";
+export {
+  PageHeaderContext,
+  useModulePageHeader,
+} from "@/hooks/useModulePageHeader";
 // A record page puts its record into "Recently visited".
 export { useRecordVisit } from "@/hooks/useRecordVisit";
 export type { VisitedRecord } from "@/hooks/useRecordVisit";
@@ -77,6 +80,12 @@ export { useActiveProfile } from "@/hooks/useActiveProfile";
 // A list read that stays quiet while its module is switched off, or while the
 // organization's module set is still loading.
 export { useModuleQuery } from "@/hooks/queries/useModuleQuery";
+// The organization's enabled modules, for guarding a call into another
+// module's API with `enabledModules.includes(...)`.
+export { useModules } from "@/contexts/ModulesContext";
+// Every write: the mutation hook that tells the reader when it fails
+// (frontend/AGENTS.md, "Every failure has an addressee").
+export { useAppMutation } from "@/lib/api/mutationFactory";
 
 // The country list an address or a tax rule is asked from, and the browser
 // locale's guess at one.
@@ -93,6 +102,9 @@ export { SUPPLIER_ROLE_TYPES } from "@/hooks/partnerRoles";
 // The design system. A module builds with these, never with raw HTML controls
 // or its own copy of a dialog.
 export { Badge } from "@/components/ui/Badge";
+// The top of a module's overview: what needs doing, most urgent first.
+export { AttentionCard } from "@/components/ui/AttentionCard";
+export type { AttentionItem } from "@/components/ui/AttentionCard";
 export { Button } from "@/components/ui/Button";
 export { Checkbox } from "@/components/ui/Checkbox";
 export { Input } from "@/components/ui/Input";
@@ -159,4 +171,8 @@ export { useKeysetPaging } from "@/hooks/useKeysetPaging";
 // Generated wire types and the helper a create payload uses when a field may be
 // left to the server's default.
 export type { components } from "@/types/api-generated";
+// The records the contract's own signatures hand a module: a column
+// contributor renders an Item, a slot is given a StorageType or a scanned
+// template.
+export type { Item, ScannedTemplate, StorageType } from "@/types";
 export type { WithServerDefaults } from "@/types/request";

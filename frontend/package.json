@@ -76,7 +76,6 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\"",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:console-baseline": "CONSOLE_BASELINE_WRITE=1 vitest run",
     "test:coverage": "vitest run --coverage",

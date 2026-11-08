@@ -4,8 +4,10 @@ import type { LlmCapability, LlmProvider } from "@/types/ai";
 
 /**
  * Provider descriptor — single source of truth for the provider picker UI.
- * Mirrors backend LlmProvider enum (15 values). Most providers route through
- * the OpenAI-compatible client; only `anthropic` and `google` use native SDKs.
+ * Mirrors backend LlmProvider enum (17 values: sixteen model providers and the
+ * Jina page reader, which has no model client at all). Most providers route
+ * through the OpenAI-compatible client; only `anthropic` and `google` use
+ * native SDKs.
  */
 type ProviderGroup = "cloud" | "aggregator" | "specialist" | "local" | "custom";
 
@@ -15,7 +17,7 @@ interface ProviderDescriptor {
   /**
    * The catalogue key, for the one entry whose name is a description.
    *
-   * Fourteen of the fifteen are brands: OpenAI, Anthropic, DeepSeek and the
+   * Sixteen of the seventeen are brands: OpenAI, Anthropic, DeepSeek and the
    * rest are written the same way in every language, so their `name` is
    * their name. "Custom OpenAI-compatible" is not a brand — it says what
    * the entry is for, and a description belongs in the catalogue like the

@@ -41,7 +41,7 @@ class StorageProvider(ABC):
             FileInfo with metadata
 
         Raises:
-            StorageException: If save fails
+            StorageError: If save fails
         """
         pass
 
@@ -57,8 +57,9 @@ class StorageProvider(ABC):
             File content as BytesIO
 
         Raises:
-            FileNotFoundError: If file doesn't exist
-            StorageException: If retrieval fails
+            StoredFileNotFoundError: If file doesn't exist (a ``StorageError``
+                and a built-in ``FileNotFoundError``)
+            StorageError: If retrieval fails
         """
         pass
 
@@ -71,8 +72,9 @@ class StorageProvider(ABC):
             file_path: Path/key in storage
 
         Raises:
-            FileNotFoundError: If file doesn't exist
-            StorageException: If delete fails
+            StoredFileNotFoundError: If file doesn't exist (a ``StorageError``
+                and a built-in ``FileNotFoundError``)
+            StorageError: If delete fails
         """
         pass
 
@@ -98,6 +100,7 @@ class StorageProvider(ABC):
             Full URL
 
         Raises:
-            FileNotFoundError: If file doesn't exist
+            StoredFileNotFoundError: If file doesn't exist (a ``StorageError``
+                and a built-in ``FileNotFoundError``)
         """
         pass

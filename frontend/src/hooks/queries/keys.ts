@@ -506,8 +506,16 @@ export const queryKeys = {
      * `invalidation.maker` clears. */
     all: ["maker"] as const,
     bom: (templateId: string) => ["maker", "bom", templateId] as const,
-    bomTree: (templateId: string) =>
-      ["maker", "bom", "tree", templateId] as const,
+    /** One recipe's tree; without `recipeId` the key is the prefix every
+     * recipe of the template shares, which is what a move invalidates. */
+    bomTree: (templateId: string, recipeId?: string) =>
+      [
+        "maker",
+        "bom",
+        "tree",
+        templateId,
+        ...(recipeId ? [recipeId] : []),
+      ] as const,
     bomSummary: (templateId: string) =>
       ["maker", "bom", "summary", templateId] as const,
     bomSummaryBatch: (templateIds: string[]) =>

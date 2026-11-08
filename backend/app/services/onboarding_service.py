@@ -63,15 +63,11 @@ async def apply_onboarding_profile_async(
        1. Apply the seed bundle (storage types, default data, UoM) and
           create the starting locations the profile declares.
        2. Enable the profile's default modules via the shared lifecycle
-          executor (``enable_modules_async``). ``run_custom_hook=False``
-          preserves the historical onboarding behaviour, which only ran
-          the framework ``system_on_enable`` hook. The class-level
-          ``on_enable`` is intentionally NOT invoked here — the profile
-          switch service owns that path so the executor can share both
-          hooks without breaking first-run onboarding. Module start data
-          (categories, default storage locations) is therefore seeded by
-          ``system_on_enable`` from the module's metadata declarations, so
-          it arrives identically on every enable path.
+          executor (``enable_modules_async``), which runs the framework
+          ``system_on_enable`` hook — module start data (categories, default
+          storage locations) is seeded from the module's metadata
+          declarations, identically on every enable path — and then the
+          module's own ``on_enable``, as every other enable path does.
        3. Apply the profile's ``module_config`` overrides through the shared
           path, which journals every namespace it moves. Invalid
           config is logged and skipped — the module still gets enabled with
@@ -152,11 +148,10 @@ async def apply_onboarding_profile_async(
                 org.id,
                 db=db,
                 user=user,
-                run_custom_hook=False,
             )
         except ModuleLifecycleError as exc:
             logger.exception(
-                'system_on_enable failed for one of %s',
+                'An enable hook failed for one of %s',
                 [m.metadata.name for m in new_modules],
             )
             raise RuntimeError(str(exc)) from exc

@@ -20,7 +20,10 @@ import pl from "../i18n/pl.json";
  * where the word is not about approval at all: German "freigeben" is also
  * "release" — a document released for execution, a scan session released
  * when idle — and the confirm verb in Polish, which the rule itself lets
- * stand beside "akceptacja".
+ * stand beside "akceptacja". The approvals module's Polish name,
+ * "Zatwierdzenia", is a name and not the word: where a string names the
+ * module (or the settings section that is its), it says what the store and
+ * the launcher say (docs/MODULE_NAMES.md, rule 1).
  */
 const COMPETING: Record<string, RegExp> = {
   pl: /zatwierd/i,
@@ -29,8 +32,9 @@ const COMPETING: Record<string, RegExp> = {
 
 const PINNED: Record<string, string[]> = {
   // "Zatwierdź i wykonaj", "zatwierdź dokument", "Zatwierdź i zamknij" —
-  // the confirm verb, which the rule allows to stand beside "akceptacja".
-  pl: ["Zatwierdź", "zatwierdź"],
+  // the confirm verb, which the rule allows to stand beside "akceptacja";
+  // and the module's name.
+  pl: ["Zatwierdź", "zatwierdź", "Zatwierdzenia"],
   // Releasing is not approving: the document goes to the floor, the idle
   // scan session lets go of its document.
   de: [

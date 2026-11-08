@@ -35,7 +35,6 @@ from .query_service import (
     get_overview_stats,
     get_recent_activity,
     get_rotation_analysis_async,
-    get_shopping_suggestions,
     get_stats_by_category,
     get_stats_by_storage,
 )
@@ -56,7 +55,6 @@ from .schemas import (
     OverviewStats,
     PurchasePatternsResponse,
     ReconciliationResponse,
-    RestockForecastRow,
     RotationAnalysisResponse,
     SmartAlertsResponse,
     StatsConfig,
@@ -211,20 +209,6 @@ async def get_consumption_stats_endpoint(
         ConsumptionStats,
         await get_consumption_stats(db, require_org(current_user), days),
     )
-
-
-@router.get(
-    '/shopping-suggestions', response_model=PaginatedResponse[RestockForecastRow]
-)
-async def get_shopping_suggestions_endpoint(
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
-    current_user: UserContextDTO = Depends(get_current_user_context),
-    db: AsyncSession = Depends(get_async_db, scope='function'),
-) -> PaginatedResponse[RestockForecastRow]:
-    # Built in memory from two reads and merged by product, so sliced here.
-    suggestions = await get_shopping_suggestions(db, require_org(current_user))
-    return PaginatedResponse.from_full_list(suggestions, offset=offset, limit=limit)
 
 
 @router.get('/cost-analysis', response_model=CostAnalysis)

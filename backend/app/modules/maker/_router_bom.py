@@ -246,13 +246,17 @@ async def get_where_used(
 )
 async def get_bom_lines(
     template_id: UUID,
+    recipe_id: UUID | None = Query(
+        None, description='The recipe (variant) to read; the default recipe if omitted'
+    ),
     limit: int = Query(200, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> PaginatedResponse[BoMLineRead]:
-    lines = await list_lines(db, org_id, template_id)
+    """The lines of one recipe of the product: *recipe_id*, else the default."""
+    lines = await list_lines(db, org_id, template_id, recipe_id=recipe_id)
     await _attach_child_names(db, org_id, lines)
     return PaginatedResponse[BoMLineRead].from_full_list(
         [BoMLineRead.model_validate(line) for line in lines],
@@ -306,12 +310,20 @@ async def get_bom_cost_estimate(
 )
 async def get_bom_tree(
     template_id: UUID,
+    recipe_id: UUID | None = Query(
+        None,
+        description='The recipe (variant) at the root; the default recipe if omitted',
+    ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> BomTreeResponse:
-    """Full recursive BOM tree under a parent template (for BomTreeEditor)."""
-    tree = await bom_tree.get_tree(db, org_id, template_id)
+    """Full recursive BOM tree under one recipe of a product (for BomTreeEditor).
+
+    The root is *recipe_id*, else the default recipe; a sub-assembly below
+    is its own default recipe, as a production run explodes it.
+    """
+    tree = await bom_tree.get_tree(db, org_id, template_id, recipe_id=recipe_id)
     tree_lines: list[BoMLine] = []
     _collect_tree_lines(tree, tree_lines)
     await _attach_child_names(db, org_id, tree_lines)

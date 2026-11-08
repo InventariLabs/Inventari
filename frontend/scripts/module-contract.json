@@ -1546,7 +1546,7 @@
                         ]
                       }
                     },
-                    "label": {
+                    "labelKey": {
                       "optional": false,
                       "type": "string"
                     }

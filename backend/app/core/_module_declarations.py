@@ -73,11 +73,10 @@ class StorageTypeDeclaration(BaseModel):
 class StorageLocationDeclaration(BaseModel):
     """Default storage location declared in module metadata.
 
-       Seeded per organization by ``BaseModule.system_on_enable`` — the only
-       hook that runs identically on every enable path (onboarding, profile
-       switch, App Store toggle). Modules must declare their start data here,
-       not in the class-level ``on_enable``, which onboarding intentionally
-    skips.
+    Seeded per organization by ``BaseModule.system_on_enable``, which runs
+    on every enable path (onboarding, profile switch, App Store toggle)
+    before the module's own ``on_enable``. Declared here, the start data is
+    seeded the same way everywhere and needs no code of the module's.
     """
 
     name: str

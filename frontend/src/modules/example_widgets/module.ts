@@ -23,7 +23,7 @@ moduleRegistry.register({
     basePath: "/widgets",
     items: [
       {
-        path: "",
+        path: "/widgets",
         icon: Shapes,
         labelKey: "example_widgets:navigation.widgets",
       },

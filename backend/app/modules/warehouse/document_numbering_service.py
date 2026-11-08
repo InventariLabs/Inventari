@@ -1,12 +1,14 @@
 import re
 from collections.abc import Awaitable, Callable, Iterable
-from datetime import UTC, date, datetime
+from datetime import date
 from typing import cast
 from uuid import UUID, uuid4
 
 from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.public_api import core_api
 
 from . import document_types as dt
 from .document_profile_service import get_profile
@@ -92,8 +94,14 @@ async def _build_prefix(
     being filed under January, while the register — which groups by the same
     date the period guard reads — filed it under December. One document,
     two periods, depending on which of the two you asked.
+
+    A document with no date of its own — and a production run, which never
+    has one — is numbered on the organization's today, the day its period
+    guard and its monthly figures read. The server's UTC date filed a run
+    made after midnight on the local first of January under the year that
+    had just ended.
     """
-    on = document_date or datetime.now(UTC).date()
+    on = document_date or await core_api.organizations.today_async(db, org_id)
     year = on.year
     month = on.month
     type_label = dt.short_code(doc_type)
@@ -348,7 +356,7 @@ async def generate_number(
     ``document_date`` is the date the document is *for* — its scheduled date,
     the one the period guard and the register both read. It decides the year
     and month in the prefix, so a backdated document is filed where it
-    belongs. Absent, the number is dated today.
+    belongs. Absent, the number is dated on the organization's today.
 
     The sequence digits are written last, so every number issued here ends
     on a digit. ``is_temporary_number`` rests on that: it tells a draft's

@@ -24,6 +24,15 @@ Notable differences from the OpenAI-compatible client:
   The flash family honors it; Gemini Pro ignores a zero budget (its
   floor is 128) and keeps thinking — callers sizing ``max_tokens``
   still owe it reasoning headroom there.
+- The limits are the ones every client keeps: a completion waits
+  ``request_timeout`` (the SDK takes milliseconds), a model listing 30 s.
+  Left to itself the SDK waits without end.
+- A provider that cannot be reached raises what the other clients raise
+  (``LlmTransportError``, ``LlmTimeoutError`` when it did not answer in
+  time), so an outage is the documented 503. The SDK is handed an ``httpx``
+  transport for its async calls, so its network failures are ``httpx``'s,
+  as every other client's: left to choose, it takes ``aiohttp`` wherever
+  something else installed it, and raises that library's errors instead.
 
 Lazy import: the SDK is imported inside ``complete()`` so that
 loading this module does not require ``google-genai`` to be
@@ -37,16 +46,40 @@ import asyncio
 import io
 from typing import TYPE_CHECKING, Any
 
+import httpx
+
 from app.core.db_retry import mark_external_effect
 from app.core.llm.base import LlmClient, LlmRequest, LlmResponse
 from app.core.llm.diagnostics import log_answer
-from app.core.llm.errors import classify_provider_refusal, provider_refusal
+from app.core.llm.errors import (
+    classify_provider_refusal,
+    provider_refusal,
+    transport_failure,
+)
+from app.core.llm.timeouts import request_timeout
 from app.core.logging import get_logger
 
 if TYPE_CHECKING:
+    from google.genai.types import HttpOptionsDict
+
     from app.models.ai_connection import AiConnection
 
 logger = get_logger(__name__)
+
+#: The limit on a model listing — the 30 s the other clients' listings keep.
+_LIST_MODELS_TIMEOUT_SECONDS = 30.0
+
+
+def _http_options(seconds: float) -> HttpOptionsDict:
+    """The SDK's ``http_options`` for a call that may take *seconds*.
+
+    The SDK counts in milliseconds. The transport keeps its async calls on
+    ``httpx``, whose failures the shared classifier reads.
+    """
+    return {
+        'timeout': int(seconds * 1000),
+        'async_client_args': {'transport': httpx.AsyncHTTPTransport()},
+    }
 
 
 def _finish_reason_of(response: Any) -> str | None:
@@ -103,7 +136,10 @@ class GoogleClient(LlmClient):
 
         # A client per call: the key rotation that comes with replacing an
         # AiConnection row behaves as expected.
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(
+            api_key=api_key,
+            http_options=_http_options(request_timeout(self.connection_provider)),
+        )
 
         # Strip the 'google/' prefix that OpenRouter-style model names carry.
         # The native SDK rejects 'google/google/gemini-...'.
@@ -224,16 +260,33 @@ class GoogleClient(LlmClient):
                     contents=parts,
                     config=gen_config,
                 )
-            except Exception as retry_exc:  # a refusal is translated, else re-raised
-                refused = self._refusal(retry_exc, 'Gemini API')
-                if refused is not None:
-                    raise refused from retry_exc
+            except (
+                Exception
+            ) as retry_exc:  # a named failure is translated, else re-raised
+                named = self._named_failure(retry_exc, 'Gemini API')
+                if named is not None:
+                    raise named from retry_exc
                 raise
-        except Exception as exc:  # a refusal is translated, else re-raised
-            refused = self._refusal(exc, 'Gemini API')
-            if refused is not None:
-                raise refused from exc
+        except Exception as exc:  # a named failure is translated, else re-raised
+            named = self._named_failure(exc, 'Gemini API')
+            if named is not None:
+                raise named from exc
             raise
+
+    def _named_failure(self, exc: Exception, what: str) -> RuntimeError | None:
+        """The failure the other clients raise for *exc*, or ``None``.
+
+        A transport failure first: left as the SDK raised it, an outage
+        reached the caller as an error no route names — a server error, or,
+        while the SDK spoke ``aiohttp``, an ``OSError`` the vision route reads
+        as an unreadable photograph — instead of the 503 every other
+        provider's outage is.
+        """
+        if isinstance(exc, httpx.TransportError):
+            return transport_failure(
+                exc, connection_name=self.connection_name, model_name=self.model_name
+            )
+        return self._refusal(exc, what)
 
     def _refusal(self, exc: Exception, what: str) -> RuntimeError | None:
         """Translate a classified SDK refusal into the named failure.
@@ -269,17 +322,20 @@ class GoogleClient(LlmClient):
         if not api_key:
             raise RuntimeError('Google connection has no api_key_enc set')
 
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(
+            api_key=api_key,
+            http_options=_http_options(_LIST_MODELS_TIMEOUT_SECONDS),
+        )
 
         models: list[str] = []
         # client.models.list() returns a synchronous Iterable; wrap in
         # to_thread so the async contract holds without blocking the loop.
         try:
             listed = await asyncio.to_thread(lambda: list(client.models.list()))
-        except Exception as exc:  # a refusal is translated, else re-raised
-            refused = self._refusal(exc, 'Gemini list_models')
-            if refused is not None:
-                raise refused from exc
+        except Exception as exc:  # a named failure is translated, else re-raised
+            named = self._named_failure(exc, 'Gemini list_models')
+            if named is not None:
+                raise named from exc
             raise
         for m in listed:
             name = getattr(m, 'name', '') or ''

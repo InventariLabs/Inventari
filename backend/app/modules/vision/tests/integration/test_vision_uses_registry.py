@@ -25,6 +25,11 @@ from app.modules.vision.field_contributions import (
 )
 from app.modules.vision.schemas import VisionExtractResponse
 from app.modules.vision.service import VisionService
+from app.modules.vision.tests.integration._llm_double import jpeg_bytes
+
+#: The service decodes what it sends on (it scales every photograph first),
+#: so the stand-in has to be a picture.
+_JPEG = jpeg_bytes()
 
 
 class Facts(BaseModel):
@@ -98,7 +103,7 @@ async def _extract(
             )
         )
         return await VisionService.extract_from_base64_list(
-            images_base64=[base64.b64encode(b'fake').decode()],
+            images_base64=[base64.b64encode(_JPEG).decode()],
             db=AsyncMock(),
             organization_id=uuid4(),
             user_id=uuid4(),
@@ -136,7 +141,7 @@ async def _extract_as_user(client: AsyncMock) -> VisionExtractResponse:
         ]:
             stack.enter_context(patcher)
         return await VisionService.extract_from_bytes_list(
-            image_bytes_list=[b'fake'],
+            image_bytes_list=[_JPEG],
             db=AsyncMock(),
             organization_id=user.organization_id or uuid4(),
             user_id=user.id,
@@ -169,7 +174,7 @@ class TestVisionUsesRegistry:
                 ]:
                     stack.enter_context(patcher)
                 result = await VisionService.extract_from_base64_list(
-                    images_base64=[base64.b64encode(b'fake').decode()],
+                    images_base64=[base64.b64encode(_JPEG).decode()],
                     db=AsyncMock(),
                     organization_id=uuid4(),
                     user_id=uuid4(),
@@ -237,7 +242,7 @@ class TestVisionUsesRegistry:
                 stack.enter_context(patcher)
             with pytest.raises(LlmPurposeUnboundError):
                 await VisionService.extract_from_base64_list(
-                    images_base64=[base64.b64encode(b'fake').decode()],
+                    images_base64=[base64.b64encode(_JPEG).decode()],
                     db=AsyncMock(),
                     organization_id=uuid4(),
                     user_id=uuid4(),

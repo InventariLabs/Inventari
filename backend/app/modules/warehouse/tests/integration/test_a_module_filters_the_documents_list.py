@@ -62,10 +62,13 @@ def _receipt(
     shelf: StorageLocation,
     item: Item,
     line_meta: dict[str, Any] | None,
+    batch: str | None = None,
 ) -> str:
     line: dict[str, Any] = {'item_id': str(item.id), 'expected_quantity': 1}
     if line_meta is not None:
         line['meta_data'] = line_meta
+    if batch is not None:
+        line['batch_number'] = batch
     created = client.post(
         _URL,
         headers=headers,
@@ -149,6 +152,40 @@ class TestAModuleFiltersTheDocumentsList:
 
         # 'other' carries the same value under another module's name.
         assert ids == {receipts['pl']}
+        assert total == 1
+
+    def test_a_filter_for_lots_counts_only_the_lines_that_carry_one(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        provider: _Answer,
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_item: Item,
+    ) -> None:
+        """A certificate rule checks the lines with a batch, and the filter
+        that lists "certified" documents kept any line carrying a filed number
+        — a non-lot line with one listed its document as certified."""
+
+        def make(batch: str | None) -> str:
+            return _receipt(
+                client,
+                doc_auth_headers,
+                doc_partner,
+                doc_target_location,
+                doc_item,
+                {_MODULE: {'entry': 'PL-1'}},
+                batch,
+            )
+
+        lot, loose, blank = make('LOT-1'), make(None), make('')
+        provider.answer = DocumentFilterDTO(
+            line_meta_data=[{'entry': 'PL-1'}], lots_only=True
+        )
+
+        ids, total = _listed(client, doc_auth_headers, f'{_MODULE}:entered')
+
+        assert ids == {lot}, {'loose': loose in ids, 'blank': blank in ids}
         assert total == 1
 
     def test_an_empty_answer_lists_nothing(

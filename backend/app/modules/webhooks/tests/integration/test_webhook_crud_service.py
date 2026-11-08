@@ -851,6 +851,27 @@ class TestAutoDisabledTrace:
         assert result.is_active is False
         assert result.auto_disabled_at == cut_off_at
 
+    async def test_switching_it_back_on_in_the_form_starts_the_count_again(
+        self, real_async_db_session: AsyncSession, async_test_household: Organization
+    ) -> None:
+        # The edit form and the reactivate button are two doors to one
+        # decision. The form cleared the cut-off and kept the count that
+        # tripped it, so the next single failed delivery cut the channel
+        # off again; the button resets both.
+        ep = await self._endpoint(
+            real_async_db_session,
+            async_test_household.id,
+            is_active=False,
+            consecutive_failures=10,
+            auto_disabled_at=datetime.now(UTC),
+        )
+
+        result = await update_endpoint_async(real_async_db_session, ep, is_active=True)
+
+        assert result.is_active is True
+        assert result.auto_disabled_at is None
+        assert result.consecutive_failures == 0
+
     async def test_reactivating_clears_the_trace(
         self, real_async_db_session: AsyncSession, async_test_household: Organization
     ) -> None:
