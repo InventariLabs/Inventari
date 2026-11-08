@@ -120,14 +120,16 @@ export const ACTION_CONFIG: Record<
   },
 };
 
-function getQuantityChangeIcon(
+export function getQuantityChangeIcon(
   action: string,
   changes: Record<string, unknown> | null,
 ): { icon: typeof Plus; color: string; labelKey: string } {
   if (action === "QUANTITY_CHANGED" && changes) {
-    const oldQty = changes.old as number | undefined;
-    const newQty = changes.new as number | undefined;
-    if (oldQty !== undefined && newQty !== undefined) {
+    // The API writes decimals as strings ("10.000"); compared as text,
+    // "6.000" > "10.000". Read both as numbers.
+    const oldQty = changes.old == null ? NaN : Number(changes.old);
+    const newQty = changes.new == null ? NaN : Number(changes.new);
+    if (!Number.isNaN(oldQty) && !Number.isNaN(newQty)) {
       if (newQty < oldQty) {
         return {
           icon: TrendingDown,

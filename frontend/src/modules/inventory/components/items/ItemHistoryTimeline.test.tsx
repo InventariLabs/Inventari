@@ -5,7 +5,10 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useAuthStore } from "@/store/authStore";
 import { QueryWrapper } from "@/test/queryWrapper";
-import ItemHistoryTimeline, { ACTION_CONFIG } from "./ItemHistoryTimeline";
+import ItemHistoryTimeline, {
+  ACTION_CONFIG,
+  getQuantityChangeIcon,
+} from "./ItemHistoryTimeline";
 import { parseChanges } from "@/modules/inventory/utils/historyChanges";
 import i18n, { withLanguage } from "@/test/mocks/i18n";
 import type { ItemHistory } from "@/types";
@@ -469,6 +472,30 @@ describe("ItemHistoryTimeline — every action has a face", () => {
 // Direct units on the reader itself: the component tests
 // above prove the screen; these prove the branches, including the fallback
 // for a location that no longer exists.
+describe("getQuantityChangeIcon — decimals arrive as strings", () => {
+  it("reads 10.000 → 6.000 as a fall, not as text order", () => {
+    const fall = getQuantityChangeIcon("QUANTITY_CHANGED", {
+      old: "10.000",
+      new: "6.000",
+    });
+    expect(fall.color).toBe("text-red-600");
+  });
+
+  it("reads 9.000 → 10.000 as a rise", () => {
+    const rise = getQuantityChangeIcon("QUANTITY_CHANGED", {
+      old: "9.000",
+      new: "10.000",
+    });
+    expect(rise.color).toBe("text-accent-600");
+  });
+
+  it("keeps numeric payloads working", () => {
+    expect(
+      getQuantityChangeIcon("QUANTITY_CHANGED", { old: 10, new: 6 }).color,
+    ).toBe("text-red-600");
+  });
+});
+
 describe("parseChanges (unit)", () => {
   const t = i18n.getFixedT(null, "items");
   const names = new Map([
