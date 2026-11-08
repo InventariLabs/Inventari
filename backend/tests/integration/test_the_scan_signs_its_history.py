@@ -11,6 +11,7 @@ the one history helper, which fills the column.
 from __future__ import annotations
 
 import uuid
+from decimal import Decimal
 
 import pytest
 from sqlalchemy import select
@@ -145,6 +146,14 @@ class TestTheScanSignsItsHistory:
         assert entry is not None
         assert entry.user_id == async_test_user.id
         assert 'created_by' not in (entry.changes or {})
+        # The exact digits, as every quantity in the history (AUDIT.md).
+        for key, expected in (
+            ('old_quantity', '1'),
+            ('new_quantity', '3'),
+            ('increment', '2'),
+        ):
+            assert isinstance(entry.changes[key], str), key
+            assert Decimal(entry.changes[key]) == Decimal(expected), key
 
     async def test_the_history_screen_names_the_scanner(
         self, real_async_client, real_async_db_session: AsyncSession, async_test_user

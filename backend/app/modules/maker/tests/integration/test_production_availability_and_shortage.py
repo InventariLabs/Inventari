@@ -191,6 +191,19 @@ class TestShortageSettings:
         # WARN: an order over stock still gets created, but with a warning.
         assert body['create_on_shortage_strategy'] == 'WARN'
 
+    def test_the_read_schema_defaults_to_what_the_column_does(self) -> None:
+        """The settings row and the schema that reads it name one default.
+
+        The column defaults to WARN and the read schema said ALLOW, so the
+        published API contract promised a strategy no organization starts
+        with.
+        """
+        from app.modules.maker._schemas_recipes import MakerSettingsRead
+
+        column = MakerModuleSettings.__table__.c.create_on_shortage_strategy
+        field = MakerSettingsRead.model_fields['create_on_shortage_strategy']
+        assert field.default == column.default.arg == 'WARN'
+
     def test_patch_round_trip(
         self,
         client: TestClient,
@@ -740,6 +753,103 @@ class TestCreateShortageStrategy:
         )
         assert resp.status_code == 201
         assert resp.json()['status'] == 'DRAFT'
+
+    def test_block_is_not_lifted_by_a_confirmation(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        db_session: Session,
+        mk_org: Organization,
+        mk_output_loc: StorageLocation,
+    ) -> None:
+        """A confirmation answers a warning; a block is not a question.
+
+        ``confirm_shortage`` exists for the WARN dialog. The screen never
+        sends it under BLOCK, but an API client could, and the draft BLOCK
+        exists to refuse was created.
+        """
+        output = _template(db_session, mk_org, name='Still blocked')
+        ingredient = _template(db_session, mk_org, name='Absent')
+        recipe = _recipe(db_session, mk_org, output.id)
+        _bom_line(
+            db_session,
+            mk_org,
+            recipe_id=recipe.id,
+            parent_id=output.id,
+            child_id=ingredient.id,
+            qty='100',
+        )
+        _set_settings(db_session, mk_org.id, create_on_shortage_strategy='BLOCK')
+
+        resp = client.post(
+            '/api/v1/maker/production/orders',
+            headers=mk_auth_headers,
+            json={
+                'output_template_id': str(output.id),
+                'planned_qty': '1',
+                'output_location_id': str(mk_output_loc.id),
+                'confirm_shortage': True,
+            },
+        )
+
+        assert resp.status_code == 422, resp.text
+        assert resp.json()['detail']['error'] == 'shortage_blocked'
+
+    @pytest.mark.parametrize(
+        ('strategy', 'expected'), [('BLOCK', 422), ('WARN', 201), ('ALLOW', 201)]
+    )
+    def test_a_copy_is_a_plan_the_strategy_has_a_say_over(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        db_session: Session,
+        mk_org: Organization,
+        mk_output_loc: StorageLocation,
+        strategy: str,
+        expected: int,
+    ) -> None:
+        """Duplicating a run over stock is creating one, so BLOCK refuses it.
+
+        The copy never asked: an organization that blocks plans over stock
+        had one in its list from a single click on an old order. WARN lets
+        the copy through — it opens on its own page, which names the
+        shortage.
+        """
+        output = _template(db_session, mk_org, name=f'Copied {strategy}')
+        ingredient = _template(db_session, mk_org, name=f'Gone {strategy}')
+        recipe = _recipe(db_session, mk_org, output.id)
+        _bom_line(
+            db_session,
+            mk_org,
+            recipe_id=recipe.id,
+            parent_id=output.id,
+            child_id=ingredient.id,
+            qty='100',
+        )
+        _set_settings(db_session, mk_org.id, create_on_shortage_strategy='ALLOW')
+        source = client.post(
+            '/api/v1/maker/production/orders',
+            headers=mk_auth_headers,
+            json={
+                'output_template_id': str(output.id),
+                'planned_qty': '1',
+                'output_location_id': str(mk_output_loc.id),
+            },
+        )
+        assert source.status_code == 201, source.text
+        _set_settings(db_session, mk_org.id, create_on_shortage_strategy=strategy)
+
+        resp = client.post(
+            f'/api/v1/maker/production/orders/{source.json()["id"]}/duplicate',
+            headers=mk_auth_headers,
+        )
+
+        assert resp.status_code == expected, resp.text
+        if expected == 422:
+            assert resp.json()['detail']['error'] == 'shortage_blocked'
+        else:
+            assert resp.json()['status'] == 'DRAFT'
+            assert resp.json()['shortage_count'] == 1
 
 
 # ---------------------------------------------------------------------------

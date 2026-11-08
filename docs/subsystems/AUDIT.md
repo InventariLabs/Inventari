@@ -70,7 +70,10 @@ it would leave rows already written showing a bare key.
 
 Quantity history and audit snapshots carry the **exact Decimals as
 strings** — a float there is less precise than the data it describes,
-and the trace must not be the least precise copy of the facts.
+and the trace must not be the least precise copy of the facts. Every
+door that writes a quantity into the item history does: an edit, a use
+and a disposal, a scan that adds to a record, a deletion (whose
+`old_quantity` the restore reads back) and an opened package's `left`.
 
 Two functions in `app/services/audit_service.py`, and the difference
 between them is the whole rule:

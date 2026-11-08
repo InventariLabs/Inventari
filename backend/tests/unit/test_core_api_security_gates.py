@@ -204,6 +204,40 @@ class TestFileStorageOrgScoping:
         assert content == b'data'
         assert service.get.call_args.args[0] == f'{org}/mod_a/labels/x.png'
 
+    @pytest.mark.parametrize(
+        'relative',
+        ['../mod_b/x.png', 'labels/../../mod_b/x.png', 'a/../../../other/x', '..'],
+    )
+    async def test_a_parent_segment_cannot_leave_the_namespace(self, relative):
+        """``..`` would resolve outside ``<org>/<module>/`` on the local disk.
+
+        The local provider only keeps a path inside its base directory, and
+        every organization's files share that base, so the prefix alone is no
+        boundary once the remainder may climb out of it. The path is refused
+        before any storage call.
+        """
+        from app.core.file_storage.errors import StorageError
+        from app.core.public_api import file_storage as fs_mod
+
+        org = uuid.uuid4()
+        service = MagicMock()
+        service.save = AsyncMock()
+        with patch.object(fs_mod, 'FileStorageService', return_value=service):
+            with pytest.raises(StorageError):
+                await fs_mod.CoreFileStorageAPI().save_for_org_async(
+                    org, 'mod_a', relative, b'data'
+                )
+        service.save.assert_not_called()
+
+    def test_a_dot_in_a_name_is_not_a_parent_segment(self):
+        from app.core.public_api.file_storage import CoreFileStorageAPI
+
+        org = uuid.uuid4()
+        assert (
+            CoreFileStorageAPI._scoped_path(org, 'mod_a', 'a/cover..v2.png')
+            == f'{org}/mod_a/a/cover..v2.png'
+        )
+
     def test_module_namespaces_are_disjoint(self):
         """Two modules saving the same relative path for the same org
         land on different storage keys."""

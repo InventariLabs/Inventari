@@ -3678,7 +3678,10 @@ export interface paths {
         };
         /**
          * Get Bom Tree
-         * @description Full recursive BOM tree under a parent template (for BomTreeEditor).
+         * @description Full recursive BOM tree under one recipe of a product (for BomTreeEditor).
+         *
+         *     The root is *recipe_id*, else the default recipe; a sub-assembly below
+         *     is its own default recipe, as a production run explodes it.
          */
         get: operations["get_bom_tree_api_v1_maker_bom_tree__template_id__get"];
         put?: never;
@@ -3758,7 +3761,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Bom Lines */
+        /**
+         * Get Bom Lines
+         * @description The lines of one recipe of the product: *recipe_id*, else the default.
+         */
         get: operations["get_bom_lines_api_v1_maker_bom__template_id__get"];
         put?: never;
         post?: never;
@@ -3893,9 +3899,11 @@ export interface paths {
          * @description Create a DRAFT production order.
          *
          *     respects ``create_on_shortage_strategy`` —
-         *     - ALLOW: always creates (default).
-         *     - WARN: returns 422 with shortage list unless ``confirm_shortage=true``.
-         *     - BLOCK: returns 422 with shortage list, DRAFT never created.
+         *     - ALLOW: always creates.
+         *     - WARN (the default): returns 422 with shortage list unless
+         *       ``confirm_shortage=true``.
+         *     - BLOCK: returns 422 with shortage list, DRAFT never created —
+         *       ``confirm_shortage`` does not lift it.
          */
         post: operations["create_production_order_api_v1_maker_production_orders_post"];
         delete?: never;
@@ -4055,6 +4063,9 @@ export interface paths {
         /**
          * Duplicate Production Order
          * @description Create a fresh DRAFT order seeded from an existing one.
+         *
+         *     A copy is a new plan: under BLOCK the stock has to cover it, and the
+         *     refusal is the creation's own 422 with the shortage list.
          */
         post: operations["duplicate_production_order_api_v1_maker_production_orders__order_id__duplicate_post"];
         delete?: never;
@@ -7489,23 +7500,6 @@ export interface paths {
         };
         /** Get Rotation Analysis */
         get: operations["get_rotation_analysis_api_v1_stats_rotation_analysis_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/stats/shopping-suggestions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Shopping Suggestions Endpoint */
-        get: operations["get_shopping_suggestions_endpoint_api_v1_stats_shopping_suggestions_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -14608,6 +14602,11 @@ export interface components {
             /** Currency */
             currency: string | null;
             approval?: components["schemas"]["ApprovalSnapshot"] | null;
+            /**
+             * Hold Stood Down
+             * @default false
+             */
+            hold_stood_down: boolean;
             shipment?: components["schemas"]["DocumentShipmentSchema"] | null;
             /** Work Stage */
             work_stage?: ("to_start" | "in_progress" | "picked" | "packed" | "ready") | null;
@@ -17150,7 +17149,7 @@ export interface components {
             availability_check_scope: "GLOBAL" | "PER_LOCATION";
             /**
              * Create On Shortage Strategy
-             * @default ALLOW
+             * @default WARN
              * @enum {string}
              */
             create_on_shortage_strategy: "ALLOW" | "WARN" | "BLOCK";
@@ -19214,24 +19213,6 @@ export interface components {
         PaginatedResponse_ReplenishmentAlertDTO_: {
             /** Items */
             items: components["schemas"]["ReplenishmentAlertDTO"][];
-            /** Total */
-            total: number;
-            /** Limit */
-            limit: number;
-            /** Offset */
-            offset: number;
-            /** Has More */
-            has_more: boolean;
-            /**
-             * Total Capped
-             * @default false
-             */
-            total_capped: boolean;
-        };
-        /** PaginatedResponse[RestockForecastRow] */
-        PaginatedResponse_RestockForecastRow_: {
-            /** Items */
-            items: components["schemas"]["RestockForecastRow"][];
             /** Total */
             total: number;
             /** Limit */
@@ -21832,6 +21813,11 @@ export interface components {
             /** Currency */
             currency: string | null;
             approval?: components["schemas"]["ApprovalSnapshot"] | null;
+            /**
+             * Hold Stood Down
+             * @default false
+             */
+            hold_stood_down: boolean;
             shipment?: components["schemas"]["DocumentShipmentSchema"] | null;
             /** Work Stage */
             work_stage?: ("to_start" | "in_progress" | "picked" | "packed" | "ready") | null;
@@ -23803,23 +23789,6 @@ export interface components {
              * @default []
              */
             role_ids: string[];
-        };
-        /** RestockForecastRow */
-        RestockForecastRow: {
-            /** Product Name */
-            product_name: string;
-            /** Category Name */
-            category_name: string;
-            /** Category Code */
-            category_code?: string | null;
-            /** Avg Consumption Rate */
-            avg_consumption_rate: number;
-            /** Days Since Last Purchase */
-            days_since_last_purchase: number;
-            /** Urgency */
-            urgency: string;
-            /** Estimated Days Until Needed */
-            estimated_days_until_needed: number;
         };
         /**
          * ReturnCreate
@@ -35143,7 +35112,10 @@ export interface operations {
     };
     get_bom_tree_api_v1_maker_bom_tree__template_id__get: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description The recipe (variant) at the root; the default recipe if omitted */
+                recipe_id?: string | null;
+            };
             header?: never;
             path: {
                 template_id: string;
@@ -35273,6 +35245,8 @@ export interface operations {
     get_bom_lines_api_v1_maker_bom__template_id__get: {
         parameters: {
             query?: {
+                /** @description The recipe (variant) to read; the default recipe if omitted */
+                recipe_id?: string | null;
                 limit?: number;
                 offset?: number;
             };
@@ -43028,38 +43002,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RotationAnalysisResponse"];
-                };
-            };
-        };
-    };
-    get_shopping_suggestions_endpoint_api_v1_stats_shopping_suggestions_get: {
-        parameters: {
-            query?: {
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResponse_RestockForecastRow_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

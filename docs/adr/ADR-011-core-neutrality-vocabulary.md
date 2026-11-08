@@ -154,8 +154,10 @@ As amended on 2026-10-23:
 - Neutral writes: `backend/app/services/items/move_service.py`
   (`consume_item`, `discard_item`, `_reduce_quantity`).
 - Event shim: removed (*Update 2026-09-21*).
-- Read-path tuple matching: `modules/stats/_analytics_queries.py`,
-  `services/analytics/rotation.py`, `shopping_suggestions_service.py`.
+- Read-path tuple matching: `services/analytics/consumption.py`,
+  `services/analytics/rotation.py`, `shopping_suggestions_service.py`
+  (the statistics module's placeholder shopping suggestions, which matched
+  them too, were removed).
 - Rule text: `backend/AGENTS.md` §4, "Neutral defaults and vocabulary".
 
 ## References

@@ -4,8 +4,8 @@ from typing import Any
 import pytest
 from PIL import Image
 
+from app.modules.vision._image_helpers import compress_image
 from app.modules.vision.schemas import VisionExtractResult, VisionReceiptItem
-from app.modules.vision.service import VisionService
 
 
 def _make_rgb_image(
@@ -28,7 +28,7 @@ def _make_rgba_image(width: int = 100, height: int = 100) -> bytes:
 class TestCompressImage:
     def test_rgb_image_returns_jpeg_bytes(self) -> None:
         image_bytes = _make_rgb_image()
-        result: Any = VisionService._compress_image(image_bytes)
+        result: Any = compress_image(image_bytes)
         assert isinstance(result, bytes)
         assert len(result) > 0
         img = Image.open(io.BytesIO(result))
@@ -36,20 +36,20 @@ class TestCompressImage:
 
     def test_rgba_image_converted_to_rgb(self) -> None:
         image_bytes = _make_rgba_image()
-        result: Any = VisionService._compress_image(image_bytes)
+        result: Any = compress_image(image_bytes)
         img = Image.open(io.BytesIO(result))
         assert img.mode == 'RGB'
 
     def test_large_image_is_resized(self) -> None:
         image_bytes = _make_rgb_image(3000, 3000)
-        result: Any = VisionService._compress_image(image_bytes, max_size=(800, 800))
+        result: Any = compress_image(image_bytes, max_size=(800, 800))
         img = Image.open(io.BytesIO(result))
         assert img.width <= 800
         assert img.height <= 800
 
     def test_small_image_not_resized(self) -> None:
         image_bytes = _make_rgb_image(200, 200)
-        result: Any = VisionService._compress_image(image_bytes, max_size=(800, 800))
+        result: Any = compress_image(image_bytes, max_size=(800, 800))
         img = Image.open(io.BytesIO(result))
         assert img.width == 200
         assert img.height == 200

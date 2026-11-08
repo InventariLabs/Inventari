@@ -59,6 +59,7 @@ from .events import DocumentEvent
 from .models import Document, DocumentLine, DocumentStatus, WmsPickLine, WmsPickSession
 from .packing_service import assert_packed_within_done_async
 from .pre_post_checks import (
+    lift_a_stood_down_hold_async,
     notify_withdrawn_async,
     refuse_while_held_async,
     run_pre_post_checks_async,
@@ -487,6 +488,9 @@ async def _post_the_stock_of(
     """Everything of completing a document up to, not including, the commit."""
     doc = await _get_doc_for_update(db, org_id, doc_id)
     await _check_document_period_open(db, org_id, doc)
+    # A hold whose module was switched off since stands down: the completion
+    # posts the document as the confirmed one it was.
+    await lift_a_stood_down_hold_async(db, org_id, doc, user_id)
     if doc.status not in (
         DocumentStatus.CONFIRMED.value,
         DocumentStatus.PENDING_APPROVAL.value,
@@ -952,18 +956,25 @@ async def post_document_now(
     # second press, a second tab or a retry is told the document has moved
     # on, in words, rather than "cannot confirm a document in COMPLETED
     # status".
-    already = _PRESS_REFUSED_AFTER.get(
-        (await _get_doc_for_update(db, org_id, doc_id)).status
-    )
+    current = await _get_doc_for_update(db, org_id, doc_id)
+    # Parked for a module switched off since, the document is the confirmed
+    # one it was: the press posts it instead of answering that it waits for
+    # an approval nobody can give.
+    lifted = await lift_a_stood_down_hold_async(db, org_id, current, user_id)
+    already = _PRESS_REFUSED_AFTER.get(current.status)
     if already is not None:
         raise ServiceRejectionError(already)
-    doc = await confirm_document(
-        db,
-        org_id,
-        doc_id,
-        user_id,
-        may_exceed_over_receipt=may_exceed_over_receipt,
-        complete_on_approval=True,
+    doc = (
+        current
+        if lifted
+        else await confirm_document(
+            db,
+            org_id,
+            doc_id,
+            user_id,
+            may_exceed_over_receipt=may_exceed_over_receipt,
+            complete_on_approval=True,
+        )
     )
     if tracking is not None:
         _apply_line_tracking(doc, tracking)

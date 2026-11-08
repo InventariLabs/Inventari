@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { PickListButton } from "@/modules/warehouse/components/picking/PickListButton";
 import { DocumentActionButtons } from "@/modules/warehouse/components/DocumentActionButtons";
+import { workingStatus } from "@/modules/warehouse/components/documentApprovalGate";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { extractApiError } from "@/lib/errors";
@@ -12,7 +13,10 @@ import {
   toDocumentView,
   useDocumentContributions,
 } from "@/modules/warehouse/hooks/useDocumentContributions";
-import type { WarehouseDocument } from "@/modules/warehouse/types";
+import {
+  isPickedBeforePosting,
+  type WarehouseDocument,
+} from "@/modules/warehouse/types";
 
 /**
  * The buttons enabled modules add to a document's action row.
@@ -73,25 +77,38 @@ export function ModuleDocumentActions({ doc }: { doc: WarehouseDocument }) {
 
 type HeaderActionsProps = Omit<
   ComponentProps<typeof DocumentActionButtons>,
-  "isDraft" | "isConfirmed" | "docStatus" | "docType"
+  | "isDraft"
+  | "isConfirmed"
+  | "docStatus"
+  | "docType"
+  | "canStartPicking"
+  | "canStartReceiving"
 > & { doc: WarehouseDocument };
 
 /**
  * A document page's action row: the warehouse's own actions, read off the
- * document's state, then what enabled modules add after them.
+ * document's state, then what enabled modules add after them. The state is
+ * the one the document is worked in (`workingStatus`): one parked for a
+ * module switched off since is worked as confirmed.
  */
 export function DocumentHeaderActions({ doc, ...actions }: HeaderActionsProps) {
+  const isConfirmed = workingStatus(doc) === "CONFIRMED";
+  const canStartPicking = isConfirmed && isPickedBeforePosting(doc.type);
   return (
     <div className="flex gap-2 flex-wrap">
       <DocumentActionButtons
         isDraft={doc.status === "DRAFT"}
-        isConfirmed={doc.status === "CONFIRMED"}
-        docStatus={doc.status}
+        isConfirmed={isConfirmed}
+        docStatus={workingStatus(doc)}
         docType={doc.type}
         isReversed={!!doc.reversed_by_id}
+        canStartPicking={canStartPicking}
+        canStartReceiving={
+          isConfirmed && ["IN", "INTERNAL_IN"].includes(doc.type)
+        }
         {...actions}
       />
-      {actions.canStartPicking && (
+      {canStartPicking && (
         <PickListButton documentId={doc.id} number={doc.number} />
       )}
       <ModuleDocumentActions doc={doc} />

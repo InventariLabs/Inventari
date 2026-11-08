@@ -115,7 +115,9 @@ async def _reduce_quantity(
     # reason and a note; without this they travelled as far as the endpoint
     # and stopped there, and the history entry could not answer the one
     # question it is kept for.
-    details: dict[str, object] = {'qty': float(quantity), 'old': float(old_q)}
+    # The exact digits, as every quantity in the history (AUDIT.md): a float
+    # here is less precise than the data it describes.
+    details: dict[str, object] = {'qty': str(quantity), 'old': str(old_q)}
     if reason:
         details['reason'] = reason
     if notes:

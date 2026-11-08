@@ -28,6 +28,12 @@ export interface HistoryUnit {
 }
 
 /**
+ * A quantity as the history holds it: the exact digits as a string, which is
+ * how every quantity is written; a number in rows written before that.
+ */
+type Amount = number | string;
+
+/**
  * An amount written the way the card writes it: with the record's unit.
  *
  * A row's numbers are in the unit of the record they belong to, but the
@@ -36,7 +42,7 @@ export interface HistoryUnit {
  * though still in the reader's number format ("1,5" where the language
  * writes a comma).
  */
-function amountText(amount: number, { t, unit }: ReadContext): string {
+function amountText(amount: Amount, { t, unit }: ReadContext): string {
   return formatQuantityLocalized(t, amount, unit?.symbol, unit?.rounding);
 }
 
@@ -108,8 +114,8 @@ function readQuantityChanged(
   ctx: ReadContext,
 ): string {
   const { t } = ctx;
-  const oldQty = changes.old as number | undefined;
-  const newQty = changes.new as number | undefined;
+  const oldQty = changes.old as Amount | undefined;
+  const newQty = changes.new as Amount | undefined;
   const parts: string[] = [];
   if (oldQty !== undefined && newQty !== undefined) {
     parts.push(`${amountText(oldQty, ctx)} → ${amountText(newQty, ctx)}`);
@@ -147,7 +153,7 @@ function readQuantityChanged(
  * row into an answer.
  */
 function removalText(
-  quantity: number | undefined,
+  quantity: Amount | undefined,
   reason: string | undefined,
   notes: string | undefined,
   ctx: ReadContext,
@@ -166,7 +172,7 @@ function readRemoval(
   ctx: ReadContext,
 ): string {
   return removalText(
-    changes.qty as number | undefined,
+    changes.qty as Amount | undefined,
     changes.reason as string | undefined,
     changes.notes as string | undefined,
     ctx,
@@ -186,7 +192,7 @@ function readDeleted(
   ctx: ReadContext,
 ): string {
   return removalText(
-    changes.old_quantity as number | undefined,
+    changes.old_quantity as Amount | undefined,
     changes.reason as string | undefined,
     changes.notes as string | undefined,
     ctx,
@@ -220,9 +226,9 @@ function readOpened(
   changes: Record<string, unknown>,
   { t }: ReadContext,
 ): string {
-  const left = changes.left as number | undefined;
+  const left = changes.left as Amount | undefined;
   if (left === undefined) return "";
-  if (left === 0) return t("items:history.openedNothingLeft");
+  if (Number(left) === 0) return t("items:history.openedNothingLeft");
   const unit = changes.left_unit as string | undefined;
   return t("items:history.openedLeft", {
     amount: formatQuantityLocalized(t, left, unit),
@@ -319,9 +325,9 @@ function readQuantityIncreasedViaScan(
   ctx: ReadContext,
 ): string {
   const { t } = ctx;
-  const oldQty = changes.old_quantity as number | undefined;
-  const newQty = changes.new_quantity as number | undefined;
-  const increment = changes.increment as number | undefined;
+  const oldQty = changes.old_quantity as Amount | undefined;
+  const newQty = changes.new_quantity as Amount | undefined;
+  const increment = changes.increment as Amount | undefined;
   const parts: string[] = [];
   if (oldQty !== undefined && newQty !== undefined) {
     let step = `${amountText(oldQty, ctx)} → ${amountText(newQty, ctx)}`;

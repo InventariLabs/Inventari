@@ -604,6 +604,14 @@ describe("queryKeys factory", () => {
       expect(queryKeys.maker.bomTree("t1")).not.toEqual(
         queryKeys.maker.bomTree("t2"),
       );
+      // One tree per recipe, under the template's prefix a move invalidates.
+      expect(queryKeys.maker.bomTree("t1", "r1")).toEqual([
+        ...queryKeys.maker.bomTree("t1"),
+        "r1",
+      ]);
+      expect(queryKeys.maker.bomTree("t1", "r1")).not.toEqual(
+        queryKeys.maker.bomTree("t1", "r2"),
+      );
       expect(queryKeys.maker.bomSummary("t1")).not.toEqual(
         queryKeys.maker.bomSummary("t2"),
       );

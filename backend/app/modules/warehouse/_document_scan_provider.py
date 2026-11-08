@@ -25,6 +25,7 @@ from app.core.public_api import core_api
 from app.core.scan_registry import ScanProvider
 
 from .models import Document, DocumentStatus
+from .pre_post_checks import works_as_confirmed_async
 
 logger = get_logger(__name__)
 
@@ -71,11 +72,12 @@ class DocumentScanProvider(ScanProvider):
         # document is real work on the floor — the printout in hand is a
         # receiving or picking list — so it opens into the execution flow;
         # anything finished opens as a preview.
+        # A document parked for a module switched off since is worked as
+        # the confirmed one it was.
         if document.status == DocumentStatus.DRAFT.value:
             mode = 'continue'
-        elif (
-            document.status == DocumentStatus.CONFIRMED.value
-            and document.type in _EXECUTABLE_TYPES
+        elif document.type in _EXECUTABLE_TYPES and await works_as_confirmed_async(
+            db, user.organization_id, document
         ):
             mode = 'execute'
         else:

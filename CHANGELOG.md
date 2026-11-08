@@ -736,6 +736,73 @@ says what the release does rather than what changed since them.
   404 instead of asking the backend; a PDF attachment came through. An
   instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
   backend itself.
+- On a bucket (S3) backend, an equipment attachment opens through the app's own
+  `/uploads/…` address, which checks who is asking, like every other stored
+  file. It was handed out as the bucket's bare address.
+- A module's stored file path with a `..` segment is refused
+  (`StorageError`) instead of resolving outside its `<organization>/<module>/`
+  folder on the local disk. A missing file is a `StorageError` as well as a
+  `FileNotFoundError` (`StoredFileNotFoundError`), so a module that catches
+  the storage contract's own error catches it too.
+- A Google (Gemini) connection keeps the same time limits as every other
+  provider — `LLM_REQUEST_TIMEOUT_SECONDS` for a call, 30 seconds for the model
+  list on the connection test — and a Gemini outage answers 503 with the
+  sentence that names it, as other providers' do. A call used to wait without
+  end, and a network failure read as an unreadable photograph.
+- A label photograph sent to `POST /vision/extract` is fitted into 1200 × 1200
+  px, turned upright, before a model sees it, as the nutrition-table scan
+  already did: an API client that sent a full-size photograph paid for all of
+  it, and a provider with a size limit refused it.
+- A production run completed without a production date is dated on the
+  organization's day, and the closed-period check asks about that day. Around
+  midnight the server's day used to stamp the run, and decide the period, for
+  an organization in another time zone.
+- `GET /stats/consumption` fills `consumption_by_category` — what was used per
+  category, quantity and value, largest value first. It was always an empty
+  list.
+- An organization with more than 500 records gets its forgotten-product alerts
+  from its stalest records. Past that number the alerts came from whichever
+  records the database happened to read first.
+- The maker's "Block" shortage strategy holds against an API request that sends
+  `confirm_shortage`, and duplicating a run the stock cannot cover is refused
+  under it like creating one (422 `shortage_blocked`). `GET /maker/settings`
+  documents `WARN` as the default, which is what a new organization has.
+- The composition tree on a product variant's page shows that variant's
+  ingredients. `GET /maker/bom/{template_id}` and `GET /maker/bom/tree/{template_id}`
+  answer one recipe — `recipe_id=`, else the default one — and so does
+  `maker_api.list_bom_lines_async` (the default recipe); they used to mix every
+  variant's lines.
+- A webhook endpoint switched back on in its edit form starts its failure count
+  again, as the Reactivate button does; the next single failed delivery used to
+  cut it off again. A retried delivery sends the bytes of the first attempt, so
+  its signature is the same too.
+- A use, a disposal, a scan that adds to a record, a deletion and an opened
+  package write their quantities into the product's history as the exact
+  digits, as an edit already did; they wrote floating-point numbers. Rows
+  already written keep their shape, and the history screen reads both.
+- A document with no date of its own, a production run among them, takes the
+  year in its number from the organization's clock, as its period and the
+  monthly figures do. Just after midnight on the local first of January it
+  was numbered into the year that had just ended.
+- A document that waited for an approval when the approvals module was
+  switched off is worked as a confirmed one: its page offers the scanning and
+  the completion again, and the one-step press, a scanning session and a
+  completion take it. Starting that work takes it out of the approval queue
+  for good; a document nobody touches is back in the queue when the module is
+  switched on again. Its read carries `hold_stood_down`.
+
+### Removed
+
+- **Breaking:** `GET /api/v1/stats/shopping-suggestions`. It answered with
+  placeholder figures — a consumption rate of 0 and fixed day counts on every
+  row — and no screen used it. The shopping lists module computes its
+  suggestions from the stock and its history (`GET /api/v1/shopping-lists/suggestions`);
+  a client of the statistics route reads that one instead.
+- The webhook event list no longer offers `item.transferred`,
+  `item.deactivated` and `item.status_changed`: nothing sends them, so an
+  endpoint subscribed to one never received a delivery. A new subscription to
+  one is refused; an endpoint that already names one shows it as withdrawn, and
+  the edit form lets you remove it.
 - `module install`, `module upgrade` and `module validate` refuse what module
   discovery refuses at the next start — a manifest `name` other than the
   module's directory, a `module_type` above `community` on a module from

@@ -6,7 +6,6 @@ This module keeps the public dispatch entry-point, the test-ping helper and
 the secret-encryption helper.
 """
 
-import json
 from datetime import UTC, datetime
 from http import HTTPStatus
 from typing import Any
@@ -32,6 +31,7 @@ from ._webhook_constants import (
     _serialize_payload,
     build_outbound_payload,
     event_name,
+    wire_body,
 )
 from ._webhook_delivery import (
     _attempt_delivery,
@@ -169,7 +169,7 @@ async def dispatch_event(
                 probes.append(
                     (
                         wh,
-                        json.dumps(endpoint_payload).encode(),
+                        wire_body(endpoint_payload),
                         endpoint_payload,
                         delivery_id,
                     )
@@ -296,7 +296,7 @@ async def deliver_test_ping(
             'delivery_id': str(delivery_id),
         }
     )
-    payload_bytes = json.dumps(outbound).encode()
+    payload_bytes = wire_body(outbound)
 
     is_success, status_code, response_body, error_message = await _attempt_delivery(
         webhook, payload_bytes, outbound, delivery_id=str(delivery_id)

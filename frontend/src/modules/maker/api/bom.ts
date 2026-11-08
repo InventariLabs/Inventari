@@ -63,9 +63,15 @@ export const bomApi = {
     return response.data;
   },
 
-  getTree: async (templateId: string): Promise<BomTreeResponse> => {
+  /** The tree under one recipe of the template — `recipeId`, else the
+   *  default recipe. A product's variants each have their own. */
+  getTree: async (
+    templateId: string,
+    recipeId?: string,
+  ): Promise<BomTreeResponse> => {
     const response = await api.get<BomTreeResponse>(
       `/maker/bom/tree/${templateId}`,
+      { params: { recipe_id: recipeId } },
     );
     return response.data;
   },

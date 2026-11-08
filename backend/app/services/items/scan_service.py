@@ -191,9 +191,10 @@ async def _increment_existing_item(
         ItemAction.QUANTITY_INCREASED_VIA_SCAN,
         {
             'barcode': barcode,
-            'old_quantity': float(old_qty),
-            'new_quantity': float(item.quantity),
-            'increment': data.quantity,
+            # The exact digits, as every quantity in the history (AUDIT.md).
+            'old_quantity': str(old_qty),
+            'new_quantity': str(item.quantity),
+            'increment': str(Decimal(str(data.quantity))),
         },
         user_id=current_user.id,
     )

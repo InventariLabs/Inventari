@@ -56,7 +56,6 @@
         "staple": "Missing staples",
         "expiring": "Expiring soon",
         "expired": "Expired",
-        "lowStock": "Low stock",
         "spike": "Price spike"
       },
       "messages": {
