@@ -288,16 +288,19 @@ def test_a_production_month_counts_the_runs_its_list_shows_closed_in_it(
 def test_a_shopping_list_card_counts_the_lines_its_page_lists(read) -> None:
     """The card, the overview's line and the page read one list.
 
-    The overview shows the first active list; the card and the page group
-    that list's lines into bought and still to buy.
+    The overview shows the first active list and links to its page; the
+    card, the line and the page all count the lines of the same answer,
+    ``GET /shopping-lists/{id}``, split on ``is_purchased``. The server gives
+    no second number for them to part from, so the pair holds by
+    construction. What this test holds on the seed is the answer they share:
+    an active list with lines, each marked bought or not. The counting
+    itself is the client's, held in ``DashboardShoppingList.test.tsx``.
     """
     active = read('/shopping-lists', active_only=True, limit=50)['items']
     assert active, 'the seed has to leave a list to shop from'
     lines = read(f'/shopping-lists/{active[0]["id"]}')['items']
     assert lines
-    bought = [line for line in lines if line['is_purchased']]
-    to_buy = [line for line in lines if not line['is_purchased']]
-    assert len(bought) + len(to_buy) == len(lines)
+    assert all(isinstance(line['is_purchased'], bool) for line in lines)
 
 
 def test_a_recipe_tag_chip_counts_the_recipes_it_narrows_to(read) -> None:
