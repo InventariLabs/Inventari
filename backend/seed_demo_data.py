@@ -1774,9 +1774,9 @@ def _ensure_module_catalogues(org_id):
     ``make dev-up && make db-seed-demo`` runs, which left this seeder asking
     for eight categories that had never been created.
 
-    Only the system hook runs (``run_custom_hook=False``), the same half
-    onboarding runs: it copies the declared catalogue and grants the module's
-    default permissions, and does not go on to a module's own on-enable work.
+    The same executor onboarding runs: it copies the declared catalogue,
+    grants the module's default permissions and then runs the module's own
+    ``on_enable``, as every enable path does.
     """
     import asyncio
 
@@ -1797,9 +1797,7 @@ def _ensure_module_catalogues(org_id):
 
         database.init_async_engine()
         async with database.AsyncSessionLocal() as adb:
-            await enable_modules_async(
-                modules, str(org_id), db=adb, run_custom_hook=False
-            )
+            await enable_modules_async(modules, str(org_id), db=adb)
             await adb.commit()
 
     asyncio.run(_seed())

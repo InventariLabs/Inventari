@@ -45,6 +45,9 @@ class _StubRecipesModule:
     ) -> None:
         return None
 
+    def on_enable(self, organization_id: Any, context: Any) -> None:
+        return None
+
 
 @pytest.fixture
 def stubbed_recipes_module(monkeypatch):
@@ -82,6 +85,9 @@ def stubbed_recipes_module(monkeypatch):
             return {}
 
         async def system_on_enable(self, org_id, db, *, user=None) -> None:
+            return None
+
+        def on_enable(self, organization_id, context) -> None:
             return None
 
     from app.core.module_registry import module_registry
