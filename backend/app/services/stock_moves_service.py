@@ -16,6 +16,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import (
     ColumnElement,
     DateTime,
+    Numeric,
     Row,
     Uuid,
     bindparam,
@@ -23,6 +24,7 @@ from sqlalchemy import (
     column,
     exists,
     func,
+    literal,
     literal_column,
     or_,
     select,
@@ -781,7 +783,7 @@ async def list_receipts_for_aging_async(
     product_template_id: UUID,
     *,
     as_of: datetime | None = None,
-    limit: int = 1000,
+    limit: int | None = 1000,
 ) -> list[StockAgeEntryDTO]:
     """Per-receipt aging entries for a product, net of what has left.
 
@@ -792,6 +794,12 @@ async def list_receipts_for_aging_async(
     back-dated for testing or for a specific cutoff. Issues consume the
     receipts oldest business date first, so the buckets' sum is the
     stock a reader can still count — not everything that ever arrived.
+
+    The netting happens in the query, and ``limit`` (``None``: no limit)
+    counts only the receipts that still stand, oldest first. The receipts
+    used to be cut at the limit before the issues were netted off them,
+    so a product with more receipts than that lost the newest ones — the
+    very stock still on the shelf.
     """
     if as_of is None:
         as_of = datetime.now(UTC)
@@ -816,9 +824,15 @@ async def list_receipts_for_aging_async(
             business_date <= as_of,
         )
     )
-    remaining_out = Decimal(str(out_total or 0))
+    consumed = literal(Decimal(str(out_total or 0)), Numeric())
 
-    rows = await db.execute(
+    # What every receipt up to and including this one brought in. A receipt
+    # whose running total does not pass what left has been consumed whole;
+    # the first one past it gives up only the part the issues reached.
+    received_so_far = func.sum(StockMove.quantity).over(
+        order_by=(business_date.asc(), StockMove.id.asc())
+    )
+    receipts = (
         select(
             StockMove.id,
             business_date.label('received_at'),
@@ -827,6 +841,7 @@ async def list_receipts_for_aging_async(
             StockMove.lot_id,
             StockMove.reference_type,
             age_expr.label('days_in_stock'),
+            received_so_far.label('received_so_far'),
         )
         .where(
             StockMove.organization_id == organization_id,
@@ -834,43 +849,30 @@ async def list_receipts_for_aging_async(
             StockMove.from_location_id.is_(None),
             StockMove.state == 'done',
         )
-        .order_by(business_date.asc(), StockMove.id.asc())
-        .limit(limit)
+        .subquery('receipts')
     )
+    left = func.least(receipts.c.quantity, receipts.c.received_so_far - consumed)
+    query = (
+        select(receipts, left.label('left'))
+        .where(receipts.c.received_so_far > consumed)
+        .order_by(receipts.c.received_at.asc(), receipts.c.id.asc())
+    )
+    if limit is not None:
+        query = query.limit(limit)
+    rows = await db.execute(query)
 
-    entries: list[StockAgeEntryDTO] = []
-    for row in rows.all():
-        if remaining_out <= 0:
-            entries.append(
-                StockAgeEntryDTO(
-                    move_id=row.id,
-                    received_at=row.received_at,
-                    quantity=row.quantity,
-                    location_id=row.to_location_id,
-                    lot_id=row.lot_id,
-                    reference_type=row.reference_type,
-                    days_in_stock=int(row.days_in_stock or 0),
-                )
-            )
-            continue
-        # This receipt gives up what the issues before it have consumed,
-        # oldest first; a receipt fully consumed leaves the aging.
-        consumed = min(Decimal(str(row.quantity)), remaining_out)
-        remaining_out -= consumed
-        left = Decimal(str(row.quantity)) - consumed
-        if left > 0:
-            entries.append(
-                StockAgeEntryDTO(
-                    move_id=row.id,
-                    received_at=row.received_at,
-                    quantity=left,
-                    location_id=row.to_location_id,
-                    lot_id=row.lot_id,
-                    reference_type=row.reference_type,
-                    days_in_stock=int(row.days_in_stock or 0),
-                )
-            )
-    return entries
+    return [
+        StockAgeEntryDTO(
+            move_id=row.id,
+            received_at=row.received_at,
+            quantity=row.left,
+            location_id=row.to_location_id,
+            lot_id=row.lot_id,
+            reference_type=row.reference_type,
+            days_in_stock=int(row.days_in_stock or 0),
+        )
+        for row in rows.all()
+    ]
 
 
 async def aggregate_aging_buckets_async(
@@ -886,11 +888,14 @@ async def aggregate_aging_buckets_async(
     Default buckets: 0-30, 31-60, 61-90, 91-180, 180+ days.
     Open-ended upper bound is ``max_days=None``.
     """
+    # Every receipt still standing: a bucket that missed some would no
+    # longer tie back to the shelf.
     entries = await list_receipts_for_aging_async(
         db,
         organization_id,
         product_template_id,
         as_of=as_of,
+        limit=None,
     )
 
     out: list[StockAgeBucketDTO] = []
