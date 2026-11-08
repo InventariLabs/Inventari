@@ -223,18 +223,14 @@ def transport_failure(
     connection_name: str | None = None,
     model_name: str | None = None,
 ) -> LlmTransportError:
-    """Build the transport error for an ``httpx`` failure.
+    """Build the transport error for a failure to hear from the provider.
 
     The exception type is part of the message on purpose: ``ConnectTimeout``,
     ``ConnectError`` and a certificate failure send an administrator to three
     different places, and ``httpx`` says which in the class name rather than
     in the text.
     """
-    import httpx
-
-    if isinstance(exc, httpx.TimeoutException) and not isinstance(
-        exc, httpx.ConnectTimeout
-    ):
+    if _did_not_answer_in_time(exc):
         return LlmTimeoutError(
             f'The model did not answer within the time allowed '
             f'({type(exc).__name__}): {exc}',
@@ -246,6 +242,27 @@ def transport_failure(
         connection_name=connection_name,
         model_name=model_name,
     )
+
+
+def _did_not_answer_in_time(exc: Exception) -> bool:
+    """Whether *exc* says the provider was reached and was still answering.
+
+    ``httpx`` names it with its own timeout types; an SDK on another HTTP
+    stack (the Gemini SDK over ``aiohttp``) raises the standard
+    ``TimeoutError``. Either way a timeout while connecting is an address
+    that did not answer, not a model that was still thinking.
+    """
+    import httpx
+
+    if isinstance(exc, httpx.TimeoutException):
+        return not isinstance(exc, httpx.ConnectTimeout)
+    if not isinstance(exc, TimeoutError):
+        return False
+    try:
+        from aiohttp import ConnectionTimeoutError
+    except ImportError:
+        return True
+    return not isinstance(exc, ConnectionTimeoutError)
 
 
 class LlmPurposeUnboundError(RuntimeError):

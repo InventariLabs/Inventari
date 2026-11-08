@@ -95,22 +95,19 @@ Two settings, because the two kinds of provider are not close:
 
 | Setting | Default | Applies to |
 |---|---|---|
-| `LLM_REQUEST_TIMEOUT_SECONDS` | 60 s | Every hosted provider that `OpenAiCompatibleClient` or `AnthropicClient` serves |
+| `LLM_REQUEST_TIMEOUT_SECONDS` | 60 s | Every hosted provider — the ones `OpenAiCompatibleClient` serves, `anthropic` and `google` |
 | `LLM_LOCAL_REQUEST_TIMEOUT_SECONDS` | 300 s | `ollama`, `lm_studio`, `vllm` |
 
 Which one applies is decided by the connection's `provider`
 (`app/core/llm/timeouts.py`), so a self-hosted install needs no configuration
 to get the longer one; an unknown provider value is treated as remote.
 
-**The `google` provider is the exception: neither setting reaches it.**
-`GoogleClient` builds the native SDK client without a request timeout, and
-the SDK's own default is no limit, so a Gemini call that the provider never
-answers waits until the request is cancelled from outside. The SDK's timeout
-and transport errors also reach the caller as the SDK raised them, not as
-`LlmTransportError` or `LlmTimeoutError` (only 401, 402, 404 and 429
-refusals are translated), so the degrade-on-transport-failure paths described
-below do not catch them. This is a known gap in the client, not a design: if
-your Gemini calls hang, that is why.
+The `google` provider gets the setting through the SDK's own `http_options`
+(which count in milliseconds); left to itself the SDK waits without end. Its
+network failures — `aiohttp` for the async calls where it is installed,
+`httpx` otherwise — are translated into the same `LlmTransportError` and
+`LlmTimeoutError` as every other client's, so a Gemini outage is the same 503
+as any other provider's.
 
 **Why the local default is five minutes.** Measured on an RX 6800 (16 GB
 VRAM, model resident, one 1024 px photograph): `qwen3-vl:8b` at Ollama's
@@ -133,8 +130,7 @@ different places: one to an address or a certificate, the other to this
 setting or to a smaller model.
 
 `list_models`, which backs the connection test, keeps its own 30 s limit on
-the OpenAI-compatible and Anthropic clients (the Google client has none). It
-is a catalogue read that no model runs for, and a local server that cannot
+every client. It is a catalogue read that no model runs for, and a local server that cannot
 list its models in half a minute has a different problem.
 
 An update to an AI connection keeps the stored API key when `api_key` is

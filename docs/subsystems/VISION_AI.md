@@ -23,6 +23,11 @@ a library's copyright page (ISBN).
 The vision module supplies the question — *this is a photograph of a label;
 read what is printed* — and `VisionExtractResult`, which holds identity only:
 name, brand, category, barcode, weight/volume, expiry and production dates.
+It also fits every photograph into 1200 × 1200 px (turned upright by its EXIF
+orientation, re-encoded as JPEG) before Core sends it on, on the label path
+and on a module's own field group alike: the browser shrinks to 1024 px
+already, an API client may not, and a provider bills — some refuse — by the
+size of an image. The endpoint takes up to 10 MB per photograph.
 
 ## Modules contribute their own fields
 
@@ -171,9 +176,7 @@ curl http://localhost:11434/api/create -d \
 It is not free. A bigger window is slower, and the HTTP timeout for a model
 call is bounded (`request_timeout` in `app/core/llm/timeouts.py`: 60 s for a
 hosted provider, `LLM_LOCAL_REQUEST_TIMEOUT_SECONDS`, 300 s by default, for
-Ollama, LM Studio and vLLM) — except on the `google` provider, whose native
-SDK client is built without a timeout and so has no limit at all (see *How
-long a call may take* in `LLM.md`). The measurements below were taken when every
+Ollama, LM Studio and vLLM). The measurements below were taken when every
 provider had a fixed 60 s, which is the timeout their rows name. On modest
 hardware raising the window trades truncated answers for
 `LlmTransportError: ReadTimeout` — which reads like a network fault and is not

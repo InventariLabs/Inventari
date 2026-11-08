@@ -16,6 +16,7 @@ room.
 
 from __future__ import annotations
 
+import asyncio
 import base64
 from collections.abc import Sequence
 from typing import Any
@@ -36,6 +37,12 @@ from .schemas import VisionExtractResponse, VisionExtractResult
 logger = get_logger(__name__)
 
 _PURPOSE = 'vision.extract'
+
+#: The box every photograph is scaled into before a model sees it. A label
+#: is legible far below a phone camera's resolution, and the caller may be an
+#: API client that did not shrink it: a provider bills by the size of an
+#: image, and some refuse one past a few megabytes.
+_MODEL_IMAGE_BOUND = (1200, 1200)
 
 _INSTRUCTIONS = (
     'These photographs all show the same item, or parts of one label on it. '
@@ -97,7 +104,7 @@ class VisionService:
             purpose_key=_PURPOSE,
             schema=schema,
             instructions=instructions,
-            images=list(image_bytes_list),
+            images=await _bounded_for_the_model(image_bytes_list),
             action_type=action_type,
             user_id=user_id,
             disable_reasoning=disable_reasoning,
@@ -137,19 +144,13 @@ class VisionService:
             if isinstance(organization_id, UUID)
             else UUID(organization_id)
         )
-        # A table photographed close up is legible far below full resolution,
-        # and the caller here may be an API client that did not shrink it.
-        compressed = [
-            VisionService._compress_image(image, max_size=(1200, 1200))
-            for image in image_bytes_list
-        ]
         result = await core_api.llm.extract_from_images_async(
             db,
             org_uuid,
             purpose_key=_PURPOSE,
             schema=contribution.schema,
             instructions=contribution.instructions,
-            images=compressed,
+            images=await _bounded_for_the_model(image_bytes_list),
             action_type=action_type,
             user_id=user_id,
         )
@@ -180,6 +181,17 @@ class VisionService:
 # ---------------------------------------------------------------------------
 # Module-private helpers
 # ---------------------------------------------------------------------------
+
+
+async def _bounded_for_the_model(images: Sequence[bytes]) -> list[bytes]:
+    """Every photograph scaled into :data:`_MODEL_IMAGE_BOUND`, as JPEG.
+
+    In a worker thread: decoding a ten-megabyte photograph holds the CPU for
+    a good part of a second, and the event loop has other requests to serve.
+    """
+    return await asyncio.to_thread(
+        lambda: [compress_image(image, _MODEL_IMAGE_BOUND) for image in images]
+    )
 
 
 async def _applicable_contributions(

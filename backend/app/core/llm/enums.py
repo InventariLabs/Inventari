@@ -5,8 +5,9 @@ The string values are load-bearing: persisted in ``ai_connections.provider``
 (``frontend/src/types/ai.ts``). Renaming a value is a breaking change.
 
 Two-level model:
-- ``LlmProvider`` (16 values) — what the user picks in the UI. Mostly
-  OpenAI-compatible providers that differ only by ``api_base_url``.
+- ``LlmProvider`` (17 values) — what the user picks in the UI: sixteen
+  model providers, mostly OpenAI-compatible ones that differ only by
+  ``api_base_url``, and the Jina page reader, which is no model at all.
 - ``LlmProtocol`` (3 values) — the wire protocol the client speaks. The
   factory dispatches on protocol, not provider, so adding a new provider
   that speaks OpenAI-compat is a one-line descriptor change with zero

@@ -1,5 +1,8 @@
-"""OpenAI-compatible LLM client — the workhorse adapter for ``openrouter``
-and ``custom`` (LM Studio / Ollama / vLLM / OpenAI itself).
+"""OpenAI-compatible LLM client — the workhorse adapter for every provider
+that is neither Anthropic nor Google: OpenAI itself, OpenRouter, the
+specialist and regional clouds (Groq, DeepSeek, Mistral, Together, xAI,
+MiniMax, GLM, MiMo), the local runtimes (Ollama, LM Studio, vLLM) and
+``custom`` (``protocol_for`` in ``enums.py`` decides).
 
 The OpenAI chat/completions protocol is the common denominator across all
 \"OpenAI-compatible\" providers. The
