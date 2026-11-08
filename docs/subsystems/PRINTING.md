@@ -64,7 +64,7 @@ under the core reads; a label the module draws itself goes through `printing_api
 | Env var | Description |
 |---|---|
 | `INVENTARI_URL` | Your Inventari instance URL |
-| `INVENTARI_API_KEY` | API key (from Settings → API Keys; "Printing only" reaches nothing else) |
+| `INVENTARI_API_KEY` | API key (from Settings → API Keys; "Printing only" reaches nothing else and drives `serve`; the pool modes `run` and `print-now` need an ordinary key that can read products) |
 | `PRINTER_TYPE` | `brother-p710bt`, `cups`, or `command` |
 | `PRINTER_NAME` | CUPS printer name |
 | `PRINTER_COMMAND` | Custom command template with `{file}` |

@@ -871,6 +871,7 @@ ERRORS_ES: ErrorMessages = {
     'storage_delete_blocked_by_stock': (
         'No se puede eliminar la ubicación: el registro de stock todavía tiene aquí existencias sin ningún registro asociado. Archive esta ubicación o asigne primero esas existencias a un registro.'
     ),
+    'storage_delete_blocked_by_child_name': 'No se puede eliminar la ubicación «{location}»: su ubicación hija «{name}» quedaría, al subir un nivel, junto a otra ubicación con el mismo nombre. Cambie primero el nombre de una de las dos.',
     'storage_name_collision': (
         'Ya existe una ubicación llamada «{name}» en este nivel.'
     ),

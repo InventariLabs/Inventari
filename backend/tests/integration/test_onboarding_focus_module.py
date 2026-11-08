@@ -128,6 +128,11 @@ class TestOnboardingWithAFocusModule:
             headers=_auth(user),
         )
         assert setup.status_code == status.HTTP_409_CONFLICT, setup.text
+        # The same body the focus route answers, context and language included.
+        detail = setup.json()['detail']
+        assert detail['code'] == 'unknown_module'
+        assert detail['module'] == 'no_such_module'
+        assert detail['lang'] == 'en'
 
         focus = await real_async_client.get(FOCUS_URL, headers=_auth(user))
         assert focus.json()['applied'] is False

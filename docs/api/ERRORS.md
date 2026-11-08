@@ -22,7 +22,7 @@ three shapes:
 |---|---|---|
 | **Coded object** | Every refusal the current code raises: `AppException` and its subclasses, the global `ValueError`/`IntegrityError`/LLM handlers, rate limits, unhandled 500s | `{"detail": {"code": "ITEM_NOT_FOUND", "message": "Item not found"}}` |
 | **List of field errors** | A 422 from request validation (a malformed body, query or path) | `{"detail": [{"loc": ["body", "name"], "msg": "Field required", "type": "missing"}]}` |
-| **Plain sentence** | Only the framework answers with one, outside the application's own handlers: a request that carries no credential at all to an authenticated route (401, `Not authenticated`, with `WWW-Authenticate: Bearer`), a path that matches no route (404, `Not Found`) and a method the route does not take (405, `Method Not Allowed`, with `Allow`). The sentence is English and has no code. Application code never raises one: a test refuses any `HTTPException` whose `detail` is a sentence, translated or not | `{"detail": "Not authenticated"}` |
+| **Plain sentence** | Only the framework answers with one, outside the application's own handlers: a path that matches no route (404, `Not Found`) and a method the route does not take (405, `Method Not Allowed`, with `Allow`). The sentence is English and has no code. Application code never raises one: a test refuses any `HTTPException` whose `detail` is a sentence, translated or not | `{"detail": "Not Found"}` |
 
 A client should read the object when `detail` is an object, the list when it
 is an array, and fall back to the string when it is a string — that order is
@@ -91,7 +91,7 @@ The status says what class of thing went wrong; the code says which one.
 | Status | Codes a client commonly branches on |
 |---|---|
 | 400 | The refusal's own code — `STORAGE_NOT_FOUND`, `ITEM_ALREADY_DELETED`, … (see [Refusal codes](#refusal-codes)). `VALIDATION_ERROR` only where a refusal names no catalogue key. `TEXT_HAS_A_NULL_CHARACTER` for text that holds U+0000 (`%00` in an address), in any field of any request: the database stores no such character |
-| 401 | `INVALID_CREDENTIALS` (login), `TOKEN_REVOKED` and `TOKEN_ABSOLUTE_EXPIRY` (token refresh), `TOKEN_INVALID`, `INVALID_API_KEY`, `API_KEY_OWNER_INACTIVE`, and `NOT_AUTHENTICATED` (media files under `/uploads` only). The last four carry `WWW-Authenticate: Bearer`; the first three do not. A request with no credential at all to any other authenticated route gets the plain-sentence 401 of the envelope table |
+| 401 | `INVALID_CREDENTIALS` (login), `TOKEN_REVOKED` and `TOKEN_ABSOLUTE_EXPIRY` (token refresh), `TOKEN_INVALID`, `INVALID_API_KEY`, `API_KEY_OWNER_INACTIVE`, and `NOT_AUTHENTICATED` — a request that carries no credential at all to an authenticated route, and a media file under `/uploads` asked for with neither a bearer token nor the sign-in cookie. The last four carry `WWW-Authenticate: Bearer`; the first three do not |
 | 403 | `FORBIDDEN` (permission or missing organization), `API_KEY_SCOPE_REFUSED`, `MODULES_NOT_ENABLED` (the module is switched off for the organization), `USER_BLOCKED`, `API_KEY_CANNOT_CREATE` and its siblings |
 | 404 | `NOT_FOUND`, and one code per resource: `ITEM_NOT_FOUND`, `STORAGE_NOT_FOUND`, `STOCK_TAKE_NOT_FOUND`, `STOCK_LOT_NOT_FOUND`, `RECIPE_NOT_FOUND`, `MEAL_PLAN_NOT_FOUND`, `USER_NOT_FOUND`, `AI_CONNECTION_NOT_FOUND`, … |
 | 409 | `PERIOD_CLOSED`, `STOCK_STATE_IMPOSSIBLE`, and the conflict's own code: `APPROVAL_REQUIRED`, `RECIPE_IN_USE`, `ROLE_IN_USE`, `PARTNER_CONFLICT`, `SHOPPING_LIST_NOT_EDITABLE`, `RECIPE_NAME_TAKEN`, `AI_CONNECTION_NAME_TAKEN`, `CONNECTION_STILL_BOUND`, … |
@@ -99,7 +99,7 @@ The status says what class of thing went wrong; the code says which one.
 | 422 | the list shape above; a router that refuses one field after validation answers a coded object with a `field` (`VALIDATION_ERROR`, or the refusal's own code such as `WEBHOOK_URL_SCHEME`); an interceptor's veto answers its own code (`INTERCEPTOR_ERROR` on an item update); also `APPROVAL_SCOPE_REQUIRED`, `BULK_SCOPE_TOO_LARGE` and the production shapes described under the envelope |
 | 415 | `FILE_TYPE_NOT_ALLOWED` (attachments) |
 | 429 | `RATE_LIMIT_EXCEEDED`, `AI_USAGE_LIMIT_EXCEEDED`, `DEMO_SANDBOX_CAP_REACHED`, `TOO_MANY_STREAMS` |
-| 500 | `INTERNAL_ERROR` — never carries an exception's own text; the log has it. A PDF that could not be rendered answers `PDF_GENERATION_FAILED` |
+| 500 | `INTERNAL_ERROR` — never carries an exception's own text; the log has it, under the `X-Request-ID` the response carries like every other. A PDF that could not be rendered answers `PDF_GENERATION_FAILED` |
 | 502 | `EMAIL_SEND_FAILED` (the email test), `EMAIL_DELIVERY_FAILED` (a purchase order's email) |
 | 503 | `LLM_PROVIDER_UNREACHABLE`, `LLM_PROVIDER_TIMEOUT`, `LLM_PROVIDER_KEY_REJECTED`, `LLM_PROVIDER_LIMIT`, `LLM_PROVIDER_MODEL_UNKNOWN`, `LLM_PURPOSE_UNBOUND`, `LABEL_RENDERER_UNAVAILABLE`, `VISION_AI_NOT_CONFIGURED`, `DATABASE_NOT_INITIALISED`, `DEMO_SANDBOX_POOL_EMPTY` |
 
@@ -170,8 +170,11 @@ existed, and the table lists them as they appear on the wire: the focus-mode
 refusals and the profile-switch refusals (`unknown_module`, `already_in_focus`,
 `not_in_focus`, `focus_module_always_on`, `focus_module_not_allowed`,
 `module_not_allowed`, `dependency_cycle`, `dependency_closure`). They answer
-`409`, with `code` and `message` only (the context that explains them stays on
-the server), and are sorted after the upper-case codes. Two refusals can share
+`409` with `code`, `message`, `lang` and the context the message is built
+from: `module` (the module refused, or the one whose requirement failed),
+`unknown_modules`, `not_allowed_modules` or `modules` (a list, which the
+message joins with commas), and `missing_dependency`. They are sorted after
+the upper-case codes. Two refusals can share
 a lowercase code (`unknown_module` is both a focus target and a profile entry
 that is not registered; `dependency_cycle` likewise); the message tells them
 apart.
@@ -653,6 +656,7 @@ apart.
 | `STORAGE_CODE_TEMPLATE_INVALID` | The code template '{template}' cannot be used. Write placeholders such as {{zone}}-{{rack:02}}-{{level:02}}, with a separator between them, or a prefix of up to five letters and digits such as LOC |
 | `STORAGE_CODE_TEMPLATE_NOT_TREE` | This warehouse draws random codes: give it a template with placeholders, such as {zone}-{rack:02}-{level:02}, before numbering its locations |
 | `STORAGE_CODE_TEMPLATE_NOT_WAREHOUSE` | A code template belongs to a warehouse, a location at the top of the tree |
+| `STORAGE_DELETE_BLOCKED_BY_CHILD_NAME` | Cannot delete storage location "{location}": its child location "{name}" would end up beside another location with the same name once it moves up a level. Rename one of them first. |
 | `STORAGE_DELETE_BLOCKED_BY_MOVEMENTS` | Cannot delete storage location: {count} stock movements reference it. The movement history is immutable — archive this location instead. |
 | `STORAGE_DELETE_BLOCKED_BY_REFERENCES` | Cannot delete storage location: it is still referenced by other records (constraint "{constraint}"). Archive it instead. |
 | `STORAGE_DELETE_BLOCKED_BY_STOCK` | Cannot delete storage location: the stock register still holds stock here with no record standing on it. Archive this location instead, or bring its stock back to a record first. |

@@ -256,6 +256,10 @@ class RequestIDMiddleware:
 
         # Set contextvar for downstream log correlation
         token = request_id_var.set(rid)
+        # And on the request itself, for the 500 handler: Starlette runs it
+        # outside every middleware, after this one has reset the contextvar
+        # and without passing its answer back through ``send_with_request_id``.
+        scope.setdefault('state', {})['request_id'] = rid
 
         async def send_with_request_id(message: MutableMapping[str, Any]) -> None:
             if message['type'] == 'http.response.start':

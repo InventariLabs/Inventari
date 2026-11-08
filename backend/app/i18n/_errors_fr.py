@@ -873,6 +873,7 @@ ERRORS_FR: ErrorMessages = {
     'storage_delete_blocked_by_stock': (
         'Impossible de supprimer l’emplacement : le registre des stocks y détient encore du stock sans aucun enregistrement associé. Archivez cet emplacement ou rattachez d’abord ce stock à un enregistrement.'
     ),
+    'storage_delete_blocked_by_child_name': "Impossible de supprimer l'emplacement « {location} » : son sous-emplacement « {name} » se retrouverait, une fois remonté d'un niveau, à côté d'un emplacement du même nom. Renommez d'abord l'un des deux.",
     'storage_name_collision': (
         'Un emplacement nommé « {name} » existe déjà à ce niveau.'
     ),
