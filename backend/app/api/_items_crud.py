@@ -13,6 +13,7 @@ from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    require_any_permission,
     require_permission,
 )
 from app.core.exceptions import (
@@ -45,6 +46,13 @@ from app.services.items._query_special import get_item_or_404_async
 
 router = APIRouter()
 
+#: The equipment register's asset card (linked from the list and from
+#: assignment history) opens a record by id through this Core read; the
+#: register's own read admits that card, archived or not. The list that would
+#: hand a role every product still asks ``items:read``, and changing or
+#: deleting a record keeps the Core write keys.
+_READS_ONE_ITEM = require_any_permission(SystemPermission.ITEMS_READ, 'equipment:read')
+
 
 @router.get('/{item_id}', response_model=ItemSchema)
 async def get_item(
@@ -58,7 +66,7 @@ async def get_item(
     ),
     user_storage_ids: list[UUID] = Depends(get_user_storage_ids),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.ITEMS_READ),
+    _: object = _READS_ONE_ITEM,
 ):
     """Product details."""
     return await get_item_or_404_async(

@@ -15,6 +15,7 @@ from app.core.cursor import decode_keyset_cursor, encode_keyset_cursor
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    require_any_permission,
     require_org,
     require_permission,
 )
@@ -49,6 +50,12 @@ from app.services.items._query_special import (
 from app.services.items.low_stock import claimed_tags_for
 
 router = APIRouter()
+
+#: The equipment register's Archive tab lists the records the module archived
+#: through this Core read (``module_scope=equipment``); the register's own
+#: read admits it, as it admits the module's other reads. Restoring and
+#: deleting an archived record keep their Core write keys.
+_READS_ARCHIVED = require_any_permission(SystemPermission.ITEMS_READ, 'equipment:read')
 
 
 @router.get('/aggregates', response_model=ItemAggregates)
@@ -273,7 +280,7 @@ async def get_archived_items(
     user_storage_ids: list[UUID] = Depends(get_user_storage_ids),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.ITEMS_READ),
+    _: object = _READS_ARCHIVED,
 ):
     """Archived (soft-deleted) products, newest archived first, scoped by module context."""
     org_id = require_org(current_user)

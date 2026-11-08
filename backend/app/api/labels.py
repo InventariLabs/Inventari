@@ -15,6 +15,7 @@ from app.core.contracts import (
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    require_any_permission,
     require_org,
     require_permission,
 )
@@ -51,6 +52,12 @@ router = APIRouter()
 # labels. A read-only account generating a second pool puts codes on paper that
 # duplicate ones already stuck to shelves.
 _ITEMS_WRITE = require_permission(SystemPermission.ITEMS_WRITE)
+
+#: The equipment register prints its assets' labels by downloading this sheet
+#: (the register's read admits it, as it admits the register's other reads).
+#: The sheet is a copy of labels already in the pool, not a way to make new
+#: ones: generating, assigning and deleting labels stay behind _ITEMS_WRITE.
+_READS_LABELS = require_any_permission(SystemPermission.ITEMS_READ, 'equipment:read')
 
 
 @router.post(
@@ -395,7 +402,7 @@ async def export_labels_png(
     ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.ITEMS_READ),
+    _: object = _READS_LABELS,
 ):
     """Exports labels as one PNG: each label at its size, in mm, at 300 dpi."""
     org_id = require_org(current_user)

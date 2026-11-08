@@ -1,0 +1,330 @@
+"""A module reader reads the Core registers the module's screens show.
+
+A custom role is a deliberate narrowing, and an administrator may hand one
+out holding a single module's read: ``equipment:read`` for the person who
+keeps the register, ``warehouse:read`` for the one who works the shelves.
+Those screens still ask Core for the registers they display — the location
+tree, the category list, the archive of the module's own records and the
+label sheet — and since every Core read gained a key of its own, each of them
+refused the module's reader with 403.
+
+Measured before the fix with custom roles and the modules enabled:
+
+* ``[equipment:read]`` on ``/equipment/assets`` -> ``GET /categories``,
+  ``GET /locations``, ``GET /items/archived?module_scope=equipment`` and
+  ``GET /labels/pool/export/png`` all 403. The category filter read empty,
+  the Archive tab read "An error occurred", location names were missing and
+  Print labels downloaded nothing.
+* ``[warehouse:read]`` on ``/warehouse/location-settings`` ->
+  ``GET /locations?top_level=true`` 403, so the page found no warehouse and
+  listed nothing to print.
+
+The decision is the print queue's (``app/modules/printing/router.py``): the
+module read admits the Core *reads* its screens make, because the screens are
+useless without them. Writes stay behind the Core write keys — a module that
+shows a location list does not hand out the right to change it.
+"""
+
+import uuid
+
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+
+from app.core.testing import ModuleTestHelper
+from app.models.label_pool import LabelPool
+from app.models.organization import Organization
+from app.models.storage_location import StorageLocation
+from app.models.user import User
+
+pytestmark = pytest.mark.integration
+
+_MODULES = ['core', 'items', 'locations', 'categories', 'equipment', 'warehouse']
+
+_PNG_MAGIC = b'\x89PNG'
+
+
+@pytest.fixture
+def h(db_session: Session) -> ModuleTestHelper:
+    return ModuleTestHelper(db_session)
+
+
+@pytest.fixture
+def org(h: ModuleTestHelper) -> Organization:
+    return h.create_org('Module Reader Org', _MODULES)
+
+
+@pytest.fixture
+def admin(h: ModuleTestHelper, org: Organization) -> User:
+    return h.create_user(org, email=f'mr_admin_{uuid.uuid4().hex[:6]}@test.com')
+
+
+@pytest.fixture
+def warehouse(h: ModuleTestHelper, org: Organization, admin: User) -> StorageLocation:
+    kind = h.create_storage_type('Warehouse', 'WAREHOUSE', organization_id=org.id)
+    place = h.create_storage_location(org, kind, admin, name='Warehouse A')
+    place.short_code = 'WH-A'
+    h.db.commit()
+    return place
+
+
+@pytest.fixture
+def shelf(
+    h: ModuleTestHelper,
+    org: Organization,
+    admin: User,
+    warehouse: StorageLocation,
+) -> StorageLocation:
+    kind = h.create_storage_type('Shelf', 'SHELF', organization_id=org.id)
+    location = h.create_storage_location(
+        org, kind, admin, name='Shelf A', parent_id=warehouse.id
+    )
+    location.short_code = 'SHELF-A'
+    h.db.commit()
+    return location
+
+
+@pytest.fixture
+def archived_asset(
+    client: TestClient,
+    h: ModuleTestHelper,
+    admin: User,
+    shelf: StorageLocation,
+) -> str:
+    """An equipment record in the archive, filed under the module's category."""
+    headers = h.get_auth_headers(admin)
+    category = client.post(
+        '/api/v1/categories',
+        headers=headers,
+        json={'name': 'Laptops', 'context_tag': 'equipment'},
+    )
+    assert category.status_code == 201, category.text
+    created = client.post(
+        '/api/v1/items',
+        headers=headers,
+        json={
+            'name': 'Laptop',
+            'location_id': str(shelf.id),
+            'category_id': category.json()['id'],
+            'quantity': 1,
+        },
+    )
+    assert created.status_code == 201, created.text
+    item_id = created.json()['id']
+    archived = client.delete(f'/api/v1/items/{item_id}', headers=headers)
+    assert archived.status_code == 204, archived.text
+    return item_id
+
+
+@pytest.fixture
+def pool_label(h: ModuleTestHelper, org: Organization, admin: User) -> LabelPool:
+    label = LabelPool(
+        short_code=f'EQ-{uuid.uuid4().hex[:6]}',
+        organization_id=org.id,
+        created_by=admin.id,
+    )
+    h.db.add(label)
+    h.db.commit()
+    return label
+
+
+def _with_role(
+    h: ModuleTestHelper, org: Organization, permissions: list[str]
+) -> dict[str, str]:
+    user = h.create_user(org, email=f'mr_{uuid.uuid4().hex[:8]}@test.com', role='user')
+    h.grant_permissions(user, permissions)
+    return h.get_auth_headers(user)
+
+
+class TestAnEquipmentReaderReadsWhatTheRegisterShows:
+    def test_the_asset_screen_renders_its_categories_locations_and_archive(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        shelf: StorageLocation,
+        archived_asset: str,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        categories = client.get('/api/v1/categories', headers=headers)
+        locations = client.get(
+            '/api/v1/locations', headers=headers, params={'limit': 5}
+        )
+        archived = client.get(
+            '/api/v1/items/archived',
+            headers=headers,
+            params={'module_scope': 'equipment'},
+        )
+
+        assert categories.status_code == 200, categories.text
+        assert locations.status_code == 200, locations.text
+        assert archived.status_code == 200, archived.text
+        assert [row['id'] for row in archived.json()['items']] == [archived_asset]
+
+    def test_the_asset_card_opens_the_registers_record(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        archived_asset: str,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        response = client.get(
+            f'/api/v1/items/{archived_asset}',
+            headers=headers,
+            params={'include_archived': True},
+        )
+
+        assert response.status_code == 200, response.text
+        assert response.json()['id'] == archived_asset
+
+    def test_the_register_downloads_its_labels(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        pool_label: LabelPool,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        response = client.get(
+            '/api/v1/labels/pool/export/png',
+            headers=headers,
+            params={'short_codes': [pool_label.short_code]},
+        )
+
+        assert response.status_code == 200, response.text
+        assert response.content.startswith(_PNG_MAGIC)
+
+    def test_the_register_does_not_gain_the_core_writes(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        category = client.post(
+            '/api/v1/categories', headers=headers, json={'name': 'Printers'}
+        )
+        location = client.post(
+            '/api/v1/locations', headers=headers, json={'name': 'Store room'}
+        )
+
+        assert category.status_code == 403, category.text
+        assert location.status_code == 403, location.text
+
+
+class TestAWarehouseReaderReadsWhatTheCodesPageShows:
+    def test_the_codes_page_finds_and_reads_its_warehouse(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        warehouse: StorageLocation,
+        shelf: StorageLocation,
+    ) -> None:
+        headers = _with_role(h, org, ['warehouse:read'])
+
+        top_level = client.get(
+            '/api/v1/locations',
+            headers=headers,
+            params={'top_level': True, 'counts': False, 'limit': 1},
+        )
+        detail = client.get(f'/api/v1/locations/{warehouse.id}', headers=headers)
+        codes = client.get(f'/api/v1/locations/{warehouse.id}/codes', headers=headers)
+        breadcrumb = client.get(
+            f'/api/v1/locations/{shelf.id}/breadcrumb', headers=headers
+        )
+        contents = client.get(f'/api/v1/locations/{shelf.id}/items', headers=headers)
+
+        assert top_level.status_code == 200, top_level.text
+        assert [row['id'] for row in top_level.json()['items']] == [str(warehouse.id)]
+        assert detail.status_code == 200, detail.text
+        assert codes.status_code == 200, codes.text
+        assert breadcrumb.status_code == 200, breadcrumb.text
+        assert contents.status_code == 200, contents.text
+
+    def test_the_putaway_screen_reads_the_category_list(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+    ) -> None:
+        headers = _with_role(h, org, ['warehouse:read'])
+
+        response = client.get('/api/v1/categories', headers=headers)
+
+        assert response.status_code == 200, response.text
+
+    def test_the_warehouse_does_not_gain_the_core_writes(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+    ) -> None:
+        headers = _with_role(h, org, ['warehouse:read'])
+
+        category = client.post(
+            '/api/v1/categories', headers=headers, json={'name': 'Pallets'}
+        )
+        location = client.post(
+            '/api/v1/locations', headers=headers, json={'name': 'Dock'}
+        )
+
+        assert category.status_code == 403, category.text
+        assert location.status_code == 403, location.text
+
+
+class TestAnUnrelatedReadStillRefusesTheCoreRegisters:
+    def test_a_role_holding_no_relevant_read_is_refused_them_all(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+    ) -> None:
+        headers = _with_role(h, org, ['stock_takes:read'])
+
+        answers = {
+            'GET /categories': client.get('/api/v1/categories', headers=headers),
+            'GET /locations': client.get('/api/v1/locations', headers=headers),
+            'GET /items/archived': client.get(
+                '/api/v1/items/archived', headers=headers
+            ),
+            'GET /labels/pool/export/png': client.get(
+                '/api/v1/labels/pool/export/png', headers=headers
+            ),
+        }
+
+        assert {name: response.status_code for name, response in answers.items()} == (
+            dict.fromkeys(answers, 403)
+        )
+
+
+class TestAModuleReadDoesNotOpenAnotherModulesScreens:
+    def test_a_warehouse_reader_is_refused_the_equipment_register(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+    ) -> None:
+        headers = _with_role(h, org, ['warehouse:read'])
+
+        response = client.get('/api/v1/equipment/assets', headers=headers)
+
+        assert response.status_code == 403, response.text
+
+    def test_a_warehouse_reader_is_refused_a_products_card(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        archived_asset: str,
+    ) -> None:
+        headers = _with_role(h, org, ['warehouse:read'])
+
+        response = client.get(f'/api/v1/items/{archived_asset}', headers=headers)
+
+        assert response.status_code == 403, response.text

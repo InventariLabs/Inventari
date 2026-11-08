@@ -53,6 +53,24 @@ the way sudo-style delegation usually works — is a product decision, not a
 defect, and would change what existing installations can do. It is deliberately
 not implemented.
 
+## A module's read admits the core registers its screens show
+
+A custom role may hold a module's read and not the core reads. The module's
+own screens still show core data: the equipment register names the location
+and category of every asset, lists the module's archived records and prints
+their labels; the warehouse's codes page builds its table from the location
+register. Those core **reads** therefore admit the module's read on the
+routes those screens call (`require_any_permission` next to the core key),
+because a screen whose data cannot load is not a screen the role can use.
+
+The admission is the read only. Creating a category, changing a shelf,
+editing a record or purging an archive keeps the core write key, and the core
+list that hands out everything — `GET /items`, the stock ledger — is not
+opened by a module's read. The full list of the admissions is
+`_NAMED_ALSO_READ_BY_A_MODULE_READ` in
+`backend/tests/integration/test_every_route_asks_for_a_permission.py`, so a
+new one is a change reviewed there rather than a quiet widening.
+
 ## A settings screen opens with the key its API asks for
 
 The settings screens are governed by the granular permissions, not by a
