@@ -2,6 +2,8 @@
 Integration tests for Logistics 2.0 logic (Product Templates, UOM).
 """
 
+from decimal import Decimal
+
 import pytest
 from fastapi import status
 from sqlalchemy import select
@@ -466,6 +468,35 @@ class TestReductionReasonIsRecorded:
         assert len(entries) == 1
         assert entries[0].changes['reason'] == 'DAMAGED'
         assert entries[0].changes['notes'] == 'crushed in transit'
+
+    @pytest.mark.parametrize(
+        ('door', 'action'), [('consume', 'USED'), ('discard', 'DISPOSED')]
+    )
+    def test_the_history_keeps_the_exact_digits(
+        self, client, auth_headers, test_storage_location, db_session, door, action
+    ):
+        """A use and a disposal write the quantities as the exact digits.
+
+        AUDIT.md: quantity history carries the exact Decimals as strings. The
+        edit path did; these two wrote floats, so one product's history held
+        two shapes of the same number.
+        """
+        item_id = self._create_item(
+            client, auth_headers, test_storage_location, f'Exact {door}'
+        )
+
+        response = client.patch(
+            f'/api/v1/items/{item_id}/{door}',
+            headers=auth_headers,
+            json={'quantity': '1', 'reason': 'OTHER'},
+        )
+        assert response.status_code == status.HTTP_200_OK, response.text
+
+        (entry,) = [e for e in self._history(db_session, item_id) if e.action == action]
+        assert isinstance(entry.changes['qty'], str)
+        assert Decimal(entry.changes['qty']) == Decimal('1')
+        assert isinstance(entry.changes['old'], str)
+        assert Decimal(entry.changes['old']) == Decimal('2')
 
     def test_history_stays_quiet_when_no_reason_is_given(
         self, client, auth_headers, test_storage_location, db_session
