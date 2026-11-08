@@ -18,7 +18,7 @@ from ._picking_fefo import (
     needs_disambiguation,
     select_best_item,
 )
-from ._picking_helpers import check_opened_suggestion, is_opened
+from ._picking_helpers import check_opened_suggestion
 from ._picking_lifecycle import terminate_session
 from ._picking_refresh import read_picking_session
 from ._picking_scan import scan_item_in_picking
@@ -47,7 +47,6 @@ __all__ = [
     'cancel_picking_session',
     'check_opened_suggestion',
     'complete_picking_session',
-    'is_opened',
     'needs_disambiguation',
     'read_picking_session',
     'record_cooking_session',
