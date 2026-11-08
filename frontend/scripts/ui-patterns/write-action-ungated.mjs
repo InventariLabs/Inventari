@@ -306,7 +306,7 @@ const EXEMPT = new Map([
  * The pages served without an account, read off the file that serves them.
  *
  * `PublicApp.tsx` says of itself "everything reachable without an account,
- * and nothing else", and `main.tsx` picks between it and `App` before either
+ * and nothing else", and `Root.tsx` picks between it and `App` before either
  * is imported. A page mounted there has no session, so there is no account to
  * ask about and no permission to name — the confirmation link in an
  * attestation e-mail is the whole authorisation.

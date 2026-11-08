@@ -1,7 +1,7 @@
 /**
  * Which addresses are served without an account.
  *
- * `main.tsx` reads this before importing either tree, so the answer has to be
+ * `Root.tsx` reads this before importing either tree, so the answer has to be
  * a pure function of the path — no router, no store, no module registry. Keep
  * the pattern exact rather than a `/public/` prefix: a path that starts with
  * `/public/` but matches nothing here is a mistyped address, and it belongs to
