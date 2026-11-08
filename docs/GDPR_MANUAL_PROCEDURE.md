@@ -53,8 +53,8 @@ touches none of them: see *Records the organization owns*.
 
 | Table | Personal data | Export | Erasure behaviour |
 |---|---|---|---|
-| `users` | `email`, `full_name`, `hashed_password`; `blocking_reason` — free text an operator may have written when blocking the account | yes (`blocking_reason` is not in the query below; add it if set) | email, name and password anonymized in place by `anonymize_user_async`; `blocking_reason` is **not** touched — clear it by hand if it names the person |
-| `registration_requests` | `email`, `full_name` | yes | anonymized by `anonymize_user_async` |
+| `users` | `email`, `full_name`, `hashed_password`; `blocking_reason` — free text an operator may have written when blocking the account | yes | email, name and password anonymized in place by `anonymize_user_async`, `blocking_reason` cleared |
+| `registration_requests` | `email` (as the person typed it), `full_name` | yes | anonymized by `anonymize_user_async`, matched on the address without regard to case |
 | `organization_invitations` | `invited_email` — the address the code was issued for; `created_by`, `used_by_user_id` are UUIDs | yes | `invited_email` anonymized by `anonymize_user_async`; UUIDs kept |
 | `audit_log` | `user_id` (UUID); on member and invitation entries the address itself: `snapshot.name` when a member is created, changed or leaves, `snapshot.invited_email` when an invitation is issued, resent, revoked or accepted; on equipment hand-over entries the holder's name (`snapshot.before.assigned_to` / `snapshot.after.assigned_to`); on partner entries the partner's name and, when a field changed, its old and new value (`snapshot.before` / `snapshot.after`, e.g. `email`, `phone`, `contact_person`) | yes for entries by the person and entries naming the address (member and invitation entries); entries that name a holder or a partner only by name are found with the queries under *Records the organization owns* | **not rewritten by erasure**: the database refuses `UPDATE` and `DELETE` on it (`audit_log_immutable` trigger). Kept only on a legal ground, otherwise redacted by hand — see *Records that keep the address* |
 | `email_jobs` | `to_email`, `subject`; `html_content` quotes the address in the delivered body | yes (`to_email`, `subject`, timestamps) | kept — a copy of mail already delivered; rows deleted on request, see *Records that keep the address* |
@@ -75,11 +75,12 @@ touches none of them: see *Records the organization owns*.
 Run per user (replace `<USER_ID>` / `<EMAIL>`):
 
 ```sql
-SELECT id, email, full_name, created_at, preferred_language, is_active
+SELECT id, email, full_name, created_at, preferred_language, is_active,
+       is_blocked, blocking_reason
 FROM users WHERE id = '<USER_ID>';
 
 SELECT id, email, full_name, created_at, accepted_at, is_rejected
-FROM registration_requests WHERE email = '<EMAIL>';
+FROM registration_requests WHERE lower(email) = lower('<EMAIL>');
 
 SELECT id, action, changes, created_at
 FROM item_history WHERE user_id = '<USER_ID>' ORDER BY created_at;
@@ -145,8 +146,10 @@ Effects (verified by `backend/tests/integration/test_gdpr_erasure.py`):
 
 - `users`: email → `deleted-<uuid>@anonymized.invalid`, `full_name` →
   `Deleted User`, password hash replaced with random bytes,
-  `is_active = false` (all JWT and API-key auth rejected immediately).
-- `registration_requests`: matching rows anonymized, invite token cleared.
+  `blocking_reason` cleared, `is_active = false` (all JWT and API-key auth
+  rejected immediately).
+- `registration_requests`: every request for the address, in whatever case
+  it was typed, anonymized, invite token cleared.
 - `organization_invitations`: every invitation issued for that address has
   `invited_email` set to the same `…@anonymized.invalid` address. The code
   keeps its binding to an address — now one no account can hold, so it opens
@@ -160,10 +163,11 @@ Effects (verified by `backend/tests/integration/test_gdpr_erasure.py`):
   the address do exactly that — see the next section.
 - Outstanding tokens revoked via the token blacklist.
 
-What the command does **not** touch: `users.blocking_reason`, the organization's
-records about the person (`equipment_assignments`, `audit_responses`, `partners`,
-the holder's name in `item_history` and `notifications`), the journal and the
-logs. The next section covers what an operator does about each.
+What the command does **not** touch, on purpose (*Records the organization
+owns*): the organization's records about the person (`equipment_assignments`,
+`audit_responses`, `partners`, the holder's name in `item_history` and
+`notifications`), the journal and the logs. The next two sections cover
+what an operator does about each.
 
 ## Records that keep the address, and what to do with them
 
@@ -277,6 +281,18 @@ exports nor scrubs them on request. The operator does it, in agreement with the
 organization that owns them. On an instance with several organizations add
 `AND organization_id = '<ORG_ID>'` to every query, so one organization's
 records are not read or changed for another.
+
+**Erasure leaves them on purpose.** `manage.py user erase` rewrites the account
+and what belongs to it — the account itself, its registration requests and the
+invitations issued for its address — and stops there. It does not scrub the
+holder of an asset, an attestation answer (its IP address and browser string
+included) or an employee or contact card, even when they carry the same
+address. Those rows are what the organization knows about who holds its
+property: an automatic scrub would erase the custody history of an asset the
+person may still hold, and could not tell whether the organization has a reason
+to keep it. Whether they stay is decided for each request, with the
+organization, by the steps below; the privacy page tells the person that these
+records are not rewritten by the deletion itself and that they can ask for them.
 
 **Export** — match on the address, and on the name where a holder was typed in
 without one (replace `<EMAIL>` and `<FULL NAME>`):

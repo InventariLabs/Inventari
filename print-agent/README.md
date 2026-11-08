@@ -25,7 +25,8 @@ pip install -r requirements.txt
 
 # 2. Configure
 cp .env.example .env
-# Edit .env — set INVENTARI_URL, INVENTARI_API_KEY, PRINTER_TYPE, AGENT_NAME
+# Edit .env — set INVENTARI_URL, INVENTARI_API_KEY (a "Printing only" key
+# for serve; see API Key below), PRINTER_TYPE, AGENT_NAME
 
 # 3. Test printer
 python agent.py test-printer

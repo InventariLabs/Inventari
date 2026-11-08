@@ -110,6 +110,11 @@ describe("PrivacyPage", () => {
     expect(
       screen.getByText(/can remain in records written before the deletion/),
     ).toBeInTheDocument();
+    // ...nor what the organization keeps about the person, which erasure
+    // leaves to the organization on purpose.
+    expect(
+      screen.getByText(/the records the organization keeps about people/),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/anonymous account/)).not.toBeInTheDocument();
     expect(
       screen.queryByRole("heading", { name: "This is a public demo" }),

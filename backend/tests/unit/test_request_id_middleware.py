@@ -101,3 +101,43 @@ class TestRequestIDMiddleware:
         assert rid.encode() != sent
         assert len(rid) == 32  # generated, UUID4 hex
         assert resp.json()['request_id'] == rid
+
+
+async def _crash(request):
+    raise RuntimeError('a defect no handler knows')
+
+
+def _make_crashing_app():
+    """The production layering: the 500 handler sits outside the middleware.
+
+    Starlette runs the ``Exception`` handler in its outermost layer, so the
+    answer it builds never passes back through ``RequestIDMiddleware``.
+    """
+    from app.main import global_exception_handler
+
+    app = Starlette(
+        routes=[Route('/boom', _crash)],
+        exception_handlers={Exception: global_exception_handler},
+    )
+    app.add_middleware(RequestIDMiddleware)
+    return app
+
+
+@pytest.mark.unit
+class TestAServerErrorNamesItsRequest:
+    """The one answer an operator needs the id for most is the 500 itself."""
+
+    def test_the_500_carries_the_id_the_client_sent(self):
+        app = _make_crashing_app()
+        with TestClient(app, raise_server_exceptions=False) as client:
+            resp = client.get('/boom', headers={'X-Request-ID': 'trace-0123456789'})
+        assert resp.status_code == 500
+        assert resp.json()['detail']['code'] == 'INTERNAL_ERROR'
+        assert resp.headers['x-request-id'] == 'trace-0123456789'
+
+    def test_the_500_carries_the_id_the_server_made(self):
+        app = _make_crashing_app()
+        with TestClient(app, raise_server_exceptions=False) as client:
+            resp = client.get('/boom')
+        assert resp.status_code == 500
+        assert len(resp.headers['x-request-id']) == 32

@@ -1709,7 +1709,8 @@ a link to the source code; the rest is for administrators.
 - **API Keys** (with its module on) — **Generate New Key** for scripts and other
   systems: a new key starts read-only; tick a write permission only if the key must
   change data (at most what you can do yourself), or choose **Printing only**
-  for the print agent. Each key's permissions are
+  for the print agent's queue (its blank-label modes need a key that reads
+  products). Each key's permissions are
   listed beside it. A key is shown once and travels in the `X-API-Key` header.
 - **Webhooks** (with its module on) — **Add webhook**: a URL, a signing secret
   and the events that call it, with delivery logs kept 30 days unless
