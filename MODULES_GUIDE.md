@@ -172,9 +172,9 @@ releases. Do not build on them.
 
 ### User-context convention
 
-- **New write methods** take `user: UserContextDTO` (full actor context for interceptors/audit).
+- **New write methods** take `user: UserContextDTO` (full actor context for interceptors/audit). The architecture lint holds it: a public method of a `Core*` facade class whose calls reach a database write and that takes no `UserContextDTO` is an error, unless it is one of the methods written before the rule, listed in `backend/app/core/coreapi_write_user_context_baseline.txt`, which only gets shorter.
 - **Grandfathered convention:** many methods still take the actor as an id (`user_id`, `actor_user_id`, `created_by`) rather than `user: UserContextDTO` — among them the `items` stock ops, `locations.create_async`, `templates`, the `stock` lot-status calls and most partner, product-template and label writes. They are accepted as-is; don't migrate call sites just for this.
-- **System-level methods** without an actor (bootstrap/startup) may use `user_id: UUID | None` — justify in the docstring.
+- **System-level methods** without an actor (bootstrap/startup) take `user: UserContextDTO | None`, `None` standing for the system — justify it in the docstring.
 
 ### Cross-tenant security gates
 
