@@ -134,6 +134,9 @@ def build_po_context(
     status_map = core_api.pdf.get_doc_status_map(lang)
     issuer = issuer or IssuerContext.from_organization(po.organization, lang)
     country = getattr(po.organization, 'country', None)
+    created_at_text = format_date_for(lang, po.created_at, country=country)
+    status_text = status_map.get(po.status, po.status)
+    codes = core_api.pdf.printed_codes(po.number)
     return {
         'po': po,
         'partner': partner_ctx,
@@ -144,7 +147,7 @@ def build_po_context(
         'print_title': labels['document'],
         'print_subtitle': None,
         'print_number': po.number,
-        'print_status': status_map.get(po.status, po.status),
+        'print_status': status_text,
         'print_dates': print_date_rows(
             [
                 (labels['created'], po.created_at),
@@ -159,13 +162,27 @@ def build_po_context(
         'scheduled_date_text': format_date_for(
             lang, po.scheduled_date or po.created_at, country=country
         ),
-        'created_at_text': format_date_for(lang, po.created_at, country=country),
+        'created_at_text': created_at_text,
         'lines': lines_data,
         **_totals(lines_data, labels),
+        # The placeholder catalogue advertises names of its own — a layout
+        # written against the list the editor shows printed every one of
+        # these empty, because the context only held them under the names
+        # above.
+        'po_number': po.number,
+        'po_date': created_at_text,
+        'po_status': status_text,
+        'vendor_name': partner_ctx['name'],
+        'vendor_tax_id': partner_ctx['tax_id'],
+        'vendor_address': partner_ctx['address'],
+        'lines_count': len(lines_data),
         # Same geometry as the warehouse-document families: this one
         # printed the size the documented measurement had already rejected,
         # because it kept its own copy of the rule.
-        **core_api.pdf.printed_codes(po.number),
+        **codes,
+        # The catalogue names the barcode by what it is, not by the family
+        # that draws it.
+        'barcode_img': codes['code128_img'],
         'doc_status_map': status_map,
         # The advertised {{po_title}} placeholder — localized, not an English
         # literal: ``labels['document']`` already carries the title in five
