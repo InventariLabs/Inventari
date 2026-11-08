@@ -532,7 +532,7 @@ E-mail is its own sub-API: `core_api.email.send_async(to_email, subject, html_co
 ### Database Access Exception (CQRS-Lite)
 - Always use `CoreAPI` for all standard reads and writes.
 - You may bypass CoreAPI and use direct DB access **ONLY for heavy, read-only analytics** (e.g., `GROUP BY`, window functions). Keep it in a `*_service.py` file — a convention of this repository; the linter accepts the marker in any module file.
-- To bypass the architecture linter, add `# architecture: allow_direct_db_access` and `# reason: <at least 5 words>` to the file (the position does not matter). In these files any write (`db.commit()`, `db.add(`, `db.delete(`, `db.merge(`, `session.commit()`, `session.add(`, `session.delete(`) is refused — unless the file carries a `# module_writes: <tables>` comment, which lifts the check for the whole file; use it only for tables the module owns.
+- To bypass the architecture linter, add `# architecture: allow_direct_db_access` and `# reason: <at least 5 words>` to the file (the position does not matter). In these files any write (`db.commit()`, `db.add(`, `db.delete(`, `db.merge(`, `session.commit()`, `session.add(`, `session.delete(`) is refused — unless the file carries a `# module_writes: <tables>` comment line, which lifts the check for the whole file. Every name on it must be a model class (or table name) declared in the module's own package; the lint fails a line that names anything else, a Core model included.
 
 ---
 
@@ -812,7 +812,7 @@ moduleRegistry.register({
 });
 ```
 
-`form` is a closed union (`CoreFormName`): `item_create`, `item_edit`, `storage_create`, `storage_edit`. It is not a free string — a typo used to produce a rule that silently matched nothing. Today only the item forms (`item_create`, `item_edit`) run module rules; the type accepts the storage forms, and no storage form runs them yet.
+`form` is a closed union (`CoreFormName`): `item_create` and `item_edit`, the two forms that run module rules. It is not a free string — a typo used to produce a rule that silently matched nothing — and a form is on it only while it runs the rules: the location forms run none, so they are not on it.
 
 **Rules run on submit**, after the form's own validation, and:
 
@@ -1048,9 +1048,14 @@ interface NavOverride {
 }
 ```
 
+`targetPath` is compared with a nav item's `path` as written, so a path no
+item has hides or renames nothing. In development the console names such an
+override once the modules are registered (`[ModuleRegistry] … has
+navOverrides that match no navigation item`).
+
 ### `i18nOverrides` — Replace Terms at Runtime
 
-A module can inject its own translations over the core's, overriding key terms (e.g. "Products" → "Animals"). A key names the namespace it targets — `"inventory:nav.items"` is the `nav.items` entry of the `inventory` namespace — and a key without a prefix targets `common`. A key nobody reads changes nothing and raises no warning, so take the key from the screen's own catalog. **Original translations are remembered and automatically restored when the module is disabled.**
+A module can inject its own translations over the core's, overriding key terms (e.g. "Products" → "Animals"). A key names the namespace it targets — `"inventory:nav.items"` is the `nav.items` entry of the `inventory` namespace — and a key without a prefix targets `common`. A key no catalog has changes nothing; in development the console names it (`[ModuleRegistry] … overrides … translation keys no catalog has`), so take the key from the screen's own catalog. **Original translations are remembered and automatically restored when the module is disabled.**
 
 ```typescript
 moduleRegistry.register({

@@ -90,9 +90,11 @@ guards writes to **Core** tables (`app.models`). This is documented in
 A subtlety: the write check is **substring-based, not table-aware** — it cannot
 statically distinguish `db.add(MyModuleModel())` from `db.add(CoreModel())`. An
 escape-hatch file that both reads Core AND writes its own module tables must
-also declare `# module_writes:` to suppress the write error
-(in `_check_escape_hatch`). This signals intent ("I read Core, I write only my own
-tables") and keeps the audit trail honest.
+also declare `# module_writes: <tables>` on a comment line of its own to suppress
+the write error (in `_check_escape_hatch`). This signals intent ("I read Core, I
+write only my own tables"), and the declaration is checked: every name on the
+line must be a model class (or table name) the module's own package declares,
+or the lint fails — the line cannot lift the ban for a Core model.
 
 ### All writes to Core go through CoreAPI
 
@@ -141,7 +143,8 @@ mutate Core, it calls `core_api.items.update_quantity_async(...)` etc.
 - Linter: `backend/app/core/architecture_lint/_violations.py`
   (`_check_escape_hatch`), `_constants.py`.
 - Notice emission: `_print_escape_hatch_notices` in `_main.py`.
-- Module-local write opt-out: `# module_writes:`, read in `_check_escape_hatch`.
+- Module-local write opt-out: `# module_writes:`, read in `_check_escape_hatch`
+  and held to the module's own tables by `_declared_module_writes`.
 - Rule text: `backend/AGENTS.md` §3 "THE ESCAPE HATCH".
 
 ## References
