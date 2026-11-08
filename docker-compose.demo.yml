@@ -42,7 +42,7 @@ services:
   # one container accepts on the private docker network.
   mailpit:
     profiles: ["demo"]
-    image: axllent/mailpit:v1.31.4
+    image: axllent/mailpit:v1.32.0
     restart: unless-stopped
     command:
       - --smtp-auth-accept-any
