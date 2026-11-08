@@ -10,7 +10,7 @@
  * and the API clients and translations of modules whose data they have no
  * right to see.
  *
- * `main.tsx` now chooses between `PublicApp` and `App` from the path before
+ * `Root.tsx` chooses between `PublicApp` and `App` from the path before
  * either is imported. That separation is invisible in the type checker and in
  * the tests — a single `import` re-joins the two bundles and nothing else
  * would complain — so it is checked here.
