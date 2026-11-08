@@ -202,14 +202,16 @@ class ShoppingListsAPI:
             if stored is None or stored <= 0:
                 raise ServiceRejectionError(
                     'shopping_list_item_quantity_rounds_to_zero',
-                    quantity=item_in.quantity,
+                    quantity=stated_quantity(
+                        stored if stored is not None else item_in.quantity
+                    ),
                     smallest=stated_quantity(QUANTITY_STEP),
                 )
             if stored > QUANTITY_MAX:
                 raise ServiceRejectionError(
                     'shopping_list_item_quantity_above_ceiling',
-                    quantity=item_in.quantity,
-                    ceiling=QUANTITY_MAX,
+                    quantity=stated_quantity(stored),
+                    ceiling=stated_quantity(QUANTITY_MAX),
                 )
             stored_quantities.append(stored)
 

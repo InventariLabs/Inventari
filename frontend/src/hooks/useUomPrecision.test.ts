@@ -1,7 +1,8 @@
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { useUomPrecision } from "./useUomPrecision";
+import i18next from "i18next";
+import { quantityStepMessage, useUomPrecision } from "./useUomPrecision";
 
 const { mockUseFlatUoms } = vi.hoisted(() => ({
   mockUseFlatUoms: { useFlatUoms: vi.fn() },
@@ -90,5 +91,27 @@ describe("useUomPrecision", () => {
 
     expect(result.current.stepString).toBe("any");
     expect(result.current.decimalPlaces).toBe(3);
+  });
+});
+
+describe("quantityStepMessage", () => {
+  it("writes the floor in the reader's decimal mark", async () => {
+    const t = vi.fn((_key: string, options?: Record<string, unknown>) =>
+      String(options?.min),
+    );
+    const precision = {
+      stepString: "0.001",
+      step: 0.001,
+      min: 0.001,
+      isInteger: false,
+      decimalPlaces: 3,
+    };
+    const previous = i18next.language;
+    await i18next.changeLanguage("pl");
+    try {
+      expect(quantityStepMessage("0.0001", precision, t)).toBe("0,001");
+    } finally {
+      await i18next.changeLanguage(previous);
+    }
   });
 });

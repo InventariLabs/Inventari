@@ -55,7 +55,7 @@ def _refuse_if_zero(quantity: Decimal | None, lang: Language | None) -> None:
         raise catalogue_refusal(
             _ZERO_REFUSAL_KEY,
             lang=lang,
-            quantity=quantity,
+            quantity=stated_quantity(quantity, lang),
             smallest=stated_quantity(QUANTITY_STEP, lang),
         )
 

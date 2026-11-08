@@ -32,6 +32,7 @@ import { useDuplicateOrderNavigation } from "@/modules/maker/hooks/useDuplicateO
 import { useCompleteRun } from "@/modules/maker/hooks/useCompleteRun";
 import { usePlannedConsumption } from "@/modules/maker/hooks/usePlannedConsumption";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { QUANTITY_STEP } from "@/module-sdk";
 
 /**
  * The run's stock movements. Reads its own list, so a failed read is said
@@ -337,7 +338,7 @@ export default function ProductionDetailPage() {
               defaultValue: "Actual quantity produced (optional)",
             })}
             type="number"
-            step="0.001"
+            step={QUANTITY_STEP}
             min="0"
             value={actualQty}
             onChange={(e) => setActualQty(e.target.value)}
