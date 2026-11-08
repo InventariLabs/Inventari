@@ -55,6 +55,11 @@ ERRORS_FR: ErrorMessages = {
         'son stock appartient au catalogue et ne peut pas être '
         'modifié pour une seule organisation.'
     ),
+    'unit_weight_of_shared_product': (
+        "Ce produit vient du catalogue partagé : le poids d'une pièce "
+        'appartient au catalogue et ne peut pas être modifié pour une '
+        'seule organisation.'
+    ),
     'piece_unit_missing_from_catalogue': (
         "Le catalogue d'unités de cette installation n'a pas d'unité de "
         'pièce, donc « une quantité de quoi » reste sans réponse. Indiquez '

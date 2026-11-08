@@ -58,6 +58,11 @@ ERRORS_DE: ErrorMessages = {
         'dem Katalog und lässt sich nicht für eine einzelne '
         'Organisation ändern.'
     ),
+    'unit_weight_of_shared_product': (
+        'Dieses Produkt stammt aus dem gemeinsamen Katalog, daher '
+        'gehört das Gewicht eines Stücks dem Katalog und lässt sich '
+        'nicht für eine einzelne Organisation ändern.'
+    ),
     'piece_unit_missing_from_catalogue': (
         'Der Einheitenkatalog dieser Installation enthält keine Stückeinheit, '
         'also gibt es keine Antwort auf „eine Menge wovon“. Geben Sie die '

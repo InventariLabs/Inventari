@@ -23,7 +23,7 @@ without having to reverse-engineer them from code.
 | [ADR-012](ADR-012-rls-deferred-guc-removed.md) | RLS Deferred — Dead Tenant-GUC Code Removed | Accepted |
 | [ADR-013](ADR-013-success-token-vs-profile-accent.md) | `success-*` Is a Separate Semantic Token; Profiles Repaint Only `primary-*`/`accent-*` | Accepted |
 | [ADR-014](ADR-014-storage-hierarchy-fixed-levels.md) | Storage Hierarchy Has Three Fixed Levels | Superseded by ADR-018 |
-| [ADR-015](ADR-015-unit-weight-on-product-template.md) | Unit Weight Belongs to the Product Template, Line Weight Is Computed | Accepted |
+| [ADR-015](ADR-015-unit-weight-on-product-template.md) | Unit Weight Belongs to the Product Template, Line Weight Is Computed | Accepted, amended |
 | [ADR-016](ADR-016-default-piece-unit.md) | A Product Without a Unit Is Counted in Pieces | Accepted, amended |
 | [ADR-017](ADR-017-fiscal-features-are-country-packs.md) | Fiscal Features Are Country Packs, Not Core | Accepted, amended |
 | [ADR-018](ADR-018-storage-hierarchy-unbounded-depth.md) | Storage Hierarchy Has Unbounded Depth | Accepted |

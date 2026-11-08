@@ -55,6 +55,11 @@ ERRORS_ES: ErrorMessages = {
         'orden en que sale su stock es del catálogo y no se puede '
         'cambiar para una sola organización.'
     ),
+    'unit_weight_of_shared_product': (
+        'Este producto procede del catálogo compartido, así que el '
+        'peso de una pieza es del catálogo y no se puede cambiar para '
+        'una sola organización.'
+    ),
     'piece_unit_missing_from_catalogue': (
         'El catálogo de unidades de esta instalación no tiene unidad de '
         'pieza, así que «una cantidad de qué» se queda sin respuesta. Indica '
