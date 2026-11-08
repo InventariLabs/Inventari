@@ -62,8 +62,9 @@ profile, and the To do work item.
 - **No screen for adjustments.** No screen writes an `ADJUSTMENT`: a closed stock take files its
   differences as one completed adjustment — signed deltas, the register's copy of a change the
   count already made, moving nothing itself. The API does accept one: `POST /documents` takes the
-  type from anybody who may write documents, which is how an integration posts one. A hand correction moves stock through **Core — Inventory** and writes no document;
-  a second screen for the same job would be a second answer to disagree with. An adjustment is not
+  type from anybody who may write documents, which is how an integration posts one. A hand
+  correction moves stock through **Core — Inventory** and writes no document; a second screen for
+  the same job would be a second answer to disagree with. An adjustment is not
   corrected: its lines are already differences, so a mistake in one is a new adjustment.
 - **Not a carrier integration.** A shipment records what the carrier was handed and the number to
   follow it by; a tracking link is a web address with the number put in. Nothing here buys a
@@ -87,6 +88,6 @@ threshold and type rule that would hold a document for consent does not hold it:
 stands down and the operation proceeds. While another module that moves stock is on (maker,
 purchase_orders or stock_takes — the household profile carries stock_takes), the moves register
 still shows every movement and names what caused it (by hand, cooking, production, stock take);
-with none of them on, it is not offered, and the product list is the whole record. What is lost is the numbered paper: no receipt
-or dispatch to print, register or correct, and no counterparty on the movement. The household profile
-runs this way on purpose.
+with none of them on, it is not offered, and the product list is the whole record. What is lost
+is the numbered paper: no receipt or dispatch to print, register or correct, and no counterparty on
+the movement. The household profile runs this way on purpose.
