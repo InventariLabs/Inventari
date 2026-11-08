@@ -58,11 +58,11 @@ earliest month —
 `core_api.organizations.today_async` / `.timezone_async`, never the server's
 `date.today()`. So does a run's own day: completing a run with no production
 date asks the period guard about the organization's today and stamps the run
-with that same day. The run number is the exception: it comes from the
-document numbering register (`PR` type, shape `PR/{YEAR}/…` unless the
-organization changed it), which reads its year in UTC, not on this clock.
-`completed_at` itself stays a UTC instant; the clock decides how it is read,
-not how it is stored. See TECHNICAL_DECISIONS.md §19.
+with that same day. The run number comes from the document numbering
+register (`PR` type, shape `PR/{YEAR}/…` unless the organization changed it),
+which takes the year of an undated document — a run is one — from the same
+clock. `completed_at` itself stays a UTC instant; the clock decides how it is
+read, not how it is stored. See TECHNICAL_DECISIONS.md §19.
 
 ## HTTP API (`/api/v1/maker/*` — gated by `require_module('maker')`)
 

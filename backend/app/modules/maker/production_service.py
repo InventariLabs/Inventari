@@ -248,10 +248,11 @@ async def _next_order_number(db: AsyncSession, organization_id: UUID) -> str:
     """Next run number from the organization's document register.
 
     Through the document numbering engine: it holds the advisory lock, the
-    persistent counter and the year rule — the same one every document gets,
-    and it counts in UTC: a run started an hour after midnight on the local
-    first of January is numbered into the year the register says, not the one
-    the window shows.
+    persistent counter and the year rule — the same one every document gets.
+    A run has no document date, so its year is the organization's today, the
+    day its period guard and its monthly result read: a run started an hour
+    after midnight on the local first of January is numbered into the new
+    year.
 
     This used to be a second engine beside it — its own lock, its own prefix
     scan, the shape ``PR/{year}/{seq}`` hardcoded — so an organization that
