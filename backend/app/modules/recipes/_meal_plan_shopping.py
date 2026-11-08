@@ -502,30 +502,13 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
             # The list already asks for this goods. What it asks for is the
             # sum of its lines, bought ones included: a plan that now needs
             # more tops the shortfall up, on the plan's own open line when
-            # there is one and as a new line otherwise (the first one is
-            # already in the basket). A line is never lowered.
-            shortfall = item.quantity - sum(
-                (line.quantity for line in lines), Decimal(0)
+            # there is one and as a new line otherwise. A line is never
+            # lowered.
+            topped_up = await shopping_lists_api.top_up_async(
+                db, sl.id, item, lines, org_id
             )
-            if shortfall <= 0:
-                continue
-            open_line = next(
-                (
-                    line
-                    for line in lines
-                    if not line.is_purchased and line.source == 'meal_plan'
-                ),
-                None,
-            )
-            if open_line is None:
-                new_items.append(item.model_copy(update={'quantity': shortfall}))
-                written.append(new_items[-1])
-            else:
-                raised = open_line.quantity + shortfall
-                await shopping_lists_api.raise_item_quantity_async(
-                    db, sl.id, open_line.id, raised, org_id
-                )
-                written.append(item.model_copy(update={'quantity': raised}))
+            if topped_up is not None:
+                written.append(topped_up)
         if new_items:
             await shopping_lists_api.add_items_async(db, sl.id, new_items, org_id)
     else:

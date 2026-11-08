@@ -40468,6 +40468,11 @@
             "type": "integer",
             "title": "Added Count"
           },
+          "raised_count": {
+            "type": "integer",
+            "title": "Raised Count",
+            "default": 0
+          },
           "list_name": {
             "anyOf": [
               {
@@ -78623,11 +78628,16 @@
             "type": "integer",
             "title": "Added Count",
             "default": 0
+          },
+          "raised_count": {
+            "type": "integer",
+            "title": "Raised Count",
+            "default": 0
           }
         },
         "type": "object",
         "title": "ShortageShoppingListResponse",
-        "description": "Output for POST /production/orders/shortages/shopping-list.\n\nThe result of an action, not a collection: it names the list that was\ntouched and counts the lines added, and carries no rows to page."
+        "description": "Output for POST /production/orders/shortages/shopping-list.\n\nThe result of an action, not a collection: it names the list that was\ntouched and counts the lines added and raised, and carries no rows to page."
       },
       "SkuSchemaResponse": {
         "properties": {
