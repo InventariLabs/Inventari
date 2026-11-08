@@ -409,6 +409,88 @@ class TestReplenishmentDraftPos:
         assert resp.status_code == status.HTTP_201_CREATED
         assert resp.json()['created'][0]['partner_id'] == str(po_partner.id)
 
+    def test_the_line_is_priced_from_a_tier_its_quantity_reaches(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+    ) -> None:
+        # 3.00 with no minimum, 2.00 from 1000 pieces; 15 are needed. The
+        # order is for 15 x 3.00 — the 1000-piece price is not one it can get.
+        rule = _rule(
+            db_session, po_org, po_template, po_location, partner_id=po_partner.id
+        )
+        _price(db_session, po_org, po_partner, po_template, '3.00')
+        _price(db_session, po_org, po_partner, po_template, '2.00', min_quantity='1000')
+        _stock(client, po_auth_headers, po_template, po_location, '5')
+
+        resp = client.post(
+            URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(rule.id)]}
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        line = resp.json()['created'][0]['lines'][0]
+        assert Decimal(line['unit_price']) == Decimal('3.00')
+
+    def test_a_supplier_whose_only_price_is_out_of_reach_is_not_proposed(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+    ) -> None:
+        rule = _rule(db_session, po_org, po_template, po_location, partner_id=None)
+        _price(db_session, po_org, po_partner, po_template, '2.00', min_quantity='1000')
+        _stock(client, po_auth_headers, po_template, po_location, '0')
+
+        alerts = client.get(
+            '/api/v1/purchase-orders/replenishment/alerts', headers=po_auth_headers
+        )
+        [alert] = [
+            a for a in alerts.json()['items'] if a['reorder_rule_id'] == str(rule.id)
+        ]
+        assert alert['preferred_partner_id'] is None
+
+    def test_an_offer_in_the_house_currency_beats_a_smaller_number_in_another(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_user: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+        h: Any,
+    ) -> None:
+        other = 'EUR' if po_org.currency != 'EUR' else 'PLN'
+        abroad = h.create_partner(
+            po_org, po_user, name='Abroad Ltd', email='abroad@example.com'
+        )
+        rule = _rule(db_session, po_org, po_template, po_location, partner_id=None)
+        _price(db_session, po_org, abroad, po_template, '4.00', currency=other)
+        _price(
+            db_session,
+            po_org,
+            po_partner,
+            po_template,
+            '5.00',
+            currency=po_org.currency,
+        )
+        _stock(client, po_auth_headers, po_template, po_location, '0')
+
+        resp = client.post(
+            URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(rule.id)]}
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        assert resp.json()['created'][0]['partner_id'] == str(po_partner.id)
+
     def test_missing_pricelist_leaves_unit_price_null(
         self,
         client: TestClient,

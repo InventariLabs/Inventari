@@ -633,9 +633,17 @@ class TestTheListBehindTheNumber:
             lambda s: get_items(s, async_test_user, only_low_stock=True)
         )
         counts = await get_health_counts_async(db, org_id)
+        # The footer under the chip counts the same rows: the aggregates keep
+        # only_low_stock and take the same used-up branch, so the screen's two
+        # halves cannot part on the product the tile counted.
+        footer = await db.run_sync(
+            lambda s: get_items_aggregates(
+                s, user_organization_id=org_id, only_low_stock=True
+            )
+        )
 
         assert [i.name for i in items] == [oats.name]
-        assert total == counts.low_stock == 1
+        assert footer.count == total == counts.low_stock == 1
 
     def test_the_list_endpoint_takes_the_filter(
         self, client, auth_headers, db_session, test_user, test_storage_location

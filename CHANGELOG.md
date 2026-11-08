@@ -656,6 +656,12 @@ says what the release does rather than what changed since them.
   format. The public attestation page shows its "confirmed" and "already
   returned" ticks in the success colour in every profile, not in the
   profile's accent.
+- On the development stack, installing or upgrading a module while the app is
+  open no longer leaves the page on the error screen until it is reloaded by
+  hand. The files the install writes made the dev server run the app's entry
+  point a second time, which mounted a second copy of the app over the first;
+  the page now reloads by itself, and an edit to the app's own shell updates
+  it in place. A production build was never affected.
 
 ## v0.11.0 - 2026-11-02
 

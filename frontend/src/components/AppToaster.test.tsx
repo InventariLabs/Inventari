@@ -52,15 +52,17 @@ describe("AppToaster — the notification surface", () => {
   });
 });
 
-const MAIN_SOURCE = readFileSync(join(__dirname, "..", "main.tsx"), "utf8");
+// The entry point mounts `Root`, and `Root` draws the providers and the trees.
+const ENTRY_SOURCE = readFileSync(join(__dirname, "..", "main.tsx"), "utf8");
+const ROOT_SOURCE = readFileSync(join(__dirname, "..", "Root.tsx"), "utf8");
 
 describe("the entry point keeps building the notification surface", () => {
   it("renders the surface through AppToaster", () => {
-    expect(MAIN_SOURCE).toMatch(/<AppToaster\s*\/>/);
+    expect(ROOT_SOURCE).toMatch(/<AppToaster\s*\/>/);
   });
 
   it("keeps a second, hand-configured Toaster out of the entry point", () => {
-    expect(MAIN_SOURCE).not.toContain("<Toaster");
+    expect(ENTRY_SOURCE + ROOT_SOURCE).not.toContain("<Toaster");
   });
 });
 
