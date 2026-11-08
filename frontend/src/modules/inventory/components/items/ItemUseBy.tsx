@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { DateInput } from "@/components/ui/DateInput";
 import { itemsApi } from "@/lib/api/items";
 import { invalidation } from "@/lib/api/invalidation";
 import { useAppMutation } from "@/lib/api/mutationFactory";
@@ -31,11 +31,12 @@ export default function ItemUseBy({ item }: { item: Item }) {
 
   return (
     <div className="flex flex-wrap items-end gap-2">
-      <Input
-        type="date"
+      <DateInput
         aria-label={t("items:detail.useBy")}
         value={draft}
-        onChange={(e) => setDraft(e.target.value)}
+        onChange={setDraft}
+        presets={["plus1Week", "plus1Month"]}
+        wrapperClassName="w-52"
       />
       <Button
         size="sm"

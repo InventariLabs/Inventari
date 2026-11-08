@@ -1287,7 +1287,7 @@ describe("WmsPickingView", () => {
         discrepancy_code: "OTHER",
       }),
     );
-    expect(onClose).toHaveBeenCalledWith(true, undefined);
+    expect(onClose).toHaveBeenCalledWith(true, undefined, DOCUMENT_ID);
   });
 
   it("keeps the line when the skip question is declined", async () => {
@@ -1343,10 +1343,11 @@ describe("WmsPickingView", () => {
       screen.getByRole("button", { name: "Complete and book" }),
     );
 
-    expect(onClose).toHaveBeenCalledWith(true, {
-      carrier: "DPD",
-      tracking_number: "X2",
-    });
+    expect(onClose).toHaveBeenCalledWith(
+      true,
+      { carrier: "DPD", tracking_number: "X2" },
+      DOCUMENT_ID,
+    );
   });
 
   it("asks a transfer for no carrier when its picking closes", async () => {
@@ -1366,7 +1367,7 @@ describe("WmsPickingView", () => {
     );
 
     expect(screen.queryByLabelText("Carrier")).not.toBeInTheDocument();
-    expect(onClose).toHaveBeenCalledWith(true, undefined);
+    expect(onClose).toHaveBeenCalledWith(true, undefined, DOCUMENT_ID);
   });
 
   it("reopens on the summary of a session that finished without completing the document", async () => {
@@ -1391,7 +1392,7 @@ describe("WmsPickingView", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Complete and book" }),
     );
-    expect(onClose).toHaveBeenCalledWith(true, undefined);
+    expect(onClose).toHaveBeenCalledWith(true, undefined, DOCUMENT_ID);
   });
 
   it("keeps the dispatch open, as picked, when the summary is left by Escape", async () => {

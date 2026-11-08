@@ -131,7 +131,6 @@ vi.mock("@/modules/warehouse/components/DocumentExecutionPanel", () => ({
 }));
 vi.mock("@/modules/warehouse/components/packing/DocumentPackingStep", () => ({
   DocumentPackingStep: seen.stub("packing"),
-  PACKING_HASH: "#pack",
   usePackingStepShown: () => packing.applies,
 }));
 vi.mock("@/modules/warehouse/components/DocumentExecutionSection", () => ({

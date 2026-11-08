@@ -15960,15 +15960,21 @@ export interface components {
          *     ``role`` is the built-in base level; ``role_id`` optionally names an
          *     org-scoped custom role the join assigns on top of it. ``email`` is the
          *     address the code is bound to — only an account with that address can
-         *     redeem it.
+         *     redeem it. It is required: the join holds a code to one address only when
+         *     the code carries one, so a code minted without it opened for whoever held
+         *     the link, while the screen and the user guide promised a personal
+         *     invitation.
          */
         InvitationCodeRequest: {
             /** Role */
             role?: string;
             /** Role Id */
             role_id?: string | null;
-            /** Email */
-            email?: string | null;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
         };
         /** InvitationCodeResponse */
         InvitationCodeResponse: {
@@ -20188,13 +20194,13 @@ export interface components {
             /** Ingredient Name */
             ingredient_name?: string | null;
             /** Quantity Consumed */
-            quantity_consumed?: number | null;
+            quantity_consumed?: string | null;
             /** Uom Symbol */
             uom_symbol?: string | null;
             /** Item Remaining Quantity */
-            item_remaining_quantity?: number | null;
+            item_remaining_quantity?: string | null;
             /** Ingredient Remaining Quantity */
-            ingredient_remaining_quantity?: number | null;
+            ingredient_remaining_quantity?: string | null;
             /** Message */
             message?: string | null;
             /**
@@ -22751,8 +22757,11 @@ export interface components {
          * @description Input for POST /recipes/{id}/cost-lines.
          */
         RecipeCostLineCreate: {
-            /** Kind */
-            kind: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "LABOR" | "PACKAGING" | "OVERHEAD" | "OTHER";
             /** Label */
             label: string;
             /** Amount */
@@ -22790,7 +22799,7 @@ export interface components {
          */
         RecipeCostLineUpdate: {
             /** Kind */
-            kind?: string | null;
+            kind?: ("LABOR" | "PACKAGING" | "OVERHEAD" | "OTHER") | null;
             /** Label */
             label?: string | null;
             /** Amount */
@@ -26390,7 +26399,7 @@ export interface components {
             /** Ingredient Name */
             ingredient_name: string;
             /** Restored Quantity */
-            restored_quantity: number;
+            restored_quantity: string;
             /** Uom Symbol */
             uom_symbol?: string | null;
         };
@@ -37133,7 +37142,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["InvitationCodeRequest"];
             };

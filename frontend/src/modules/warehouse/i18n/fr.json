@@ -1534,6 +1534,7 @@
   "packing": {
     "title": "Emballage",
     "subtitle": "Facultatif : mettez les marchandises préparées dans des colis, imprimez un bordereau et une étiquette pour chacun, puis terminez l'expédition.",
+    "subtitleShipped": "Ce qui a été expédié, colis par colis, avec le bordereau et l'étiquette de chacun.",
     "packAll": "Tout dans un seul colis",
     "packRest": "Le reste dans un seul colis",
     "addPackage": "Ajouter un colis",

@@ -22,6 +22,7 @@ import {
 import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
 import { PackageCard } from "./PackageCard";
+import { PACKING_HASH } from "./packingHash";
 import { PackingFooter } from "./PackingFooter";
 import { PackLineSheet } from "./PackLineSheet";
 import { ToPackList } from "./ToPackList";
@@ -44,6 +45,10 @@ function packingApplies(document: WarehouseDocument): boolean {
     document.lines.some((line) => Number(line.done_quantity) > 0)
   );
 }
+
+/** A dispatch that has left: its packages, if it had any, are a record. */
+const isShippedDispatch = (document: WarehouseDocument) =>
+  isPackedType(document.type) && document.status === "COMPLETED";
 
 /** The package whose quantity of a line grew between two views, by name. */
 function grownLine(
@@ -70,20 +75,19 @@ interface Props {
   isCompletePending: boolean;
 }
 
-/** The hash the picking summary's "Pack" leaves, so the step scrolls into
- * view: the sheet closes over a page whose step is further down. */
-export const PACKING_HASH = "#pack";
-
 /**
  * The Pack step of a picked dispatch: packages filled by scan or by tap, the
  * slip and the label for each, and the completion that ships them.
  *
- * Shown only between picking and completion: while a picking session is open
- * the goods are still coming off the shelf, and a completed dispatch's
- * packages are a record the document's printouts already carry.
+ * Worked on between picking and completion: while a picking session is open
+ * the goods are still coming off the shelf. Once the dispatch is completed
+ * the packages stay, read-only, with their slips and labels — the slip of a
+ * shipped dispatch is what a returned box is checked against, and the server
+ * prints it after completion too.
  */
 export function DocumentPackingStep(props: Props) {
-  if (!usePackingStepShown(props.document)) return null;
+  const working = usePackingStepShown(props.document);
+  if (!working && !isShippedDispatch(props.document)) return null;
   return <PackingStepBody {...props} />;
 }
 
@@ -173,6 +177,8 @@ function PackingStepBody({ document, onComplete, isCompletePending }: Props) {
     return <InlineQueryError error={error} onRetry={() => void refetch()} />;
   }
   if (!view) return null;
+  // Shipped without packages: there is no record to show.
+  if (!view.editable && packages.length === 0) return null;
 
   const packTapped = (quantity: number) => {
     if (!tapped) return;
@@ -203,7 +209,7 @@ function PackingStepBody({ document, onComplete, isCompletePending }: Props) {
       <div>
         <h2 className="text-lg font-semibold text-on">{t("packing.title")}</h2>
         <p className="text-sm text-on-secondary mt-1">
-          {t("packing.subtitle")}
+          {view.editable ? t("packing.subtitle") : t("packing.subtitleShipped")}
         </p>
       </div>
 
@@ -242,11 +248,13 @@ function PackingStepBody({ document, onComplete, isCompletePending }: Props) {
         </div>
       )}
 
-      <ToPackList
-        lines={remaining}
-        packed={packages.length > 0}
-        onTap={editable ? setTapped : undefined}
-      />
+      {view.editable && (
+        <ToPackList
+          lines={remaining}
+          packed={packages.length > 0}
+          onTap={editable ? setTapped : undefined}
+        />
+      )}
 
       {packages.length > 0 && (
         <ul className="space-y-3" aria-label={t("packing.packages")}>

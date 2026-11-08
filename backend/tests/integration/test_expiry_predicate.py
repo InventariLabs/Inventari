@@ -16,6 +16,7 @@ from decimal import Decimal
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import ContractViolationError
 from app.core.public_api import core_api
 from app.models.item import Item
 from app.services.items._query_get import get_items
@@ -54,7 +55,7 @@ class TestExpiryPredicate:
         db = real_async_db_session
         org_id = async_test_storage_location.organization_id
         loc_id = async_test_storage_location.id
-        today = date.today()
+        today = await core_api.organizations.today_async(db, org_id)
 
         await _make_item(
             db, org_id, loc_id, name='Best before today', expiry_date=today
@@ -75,6 +76,7 @@ class TestExpiryPredicate:
                 db=s,
                 organization_id=org_id,
                 only_expired=True,
+                today=today,
             )
         )
 
@@ -92,7 +94,7 @@ class TestExpiryPredicate:
         db = real_async_db_session
         org_id = async_test_storage_location.organization_id
         loc_id = async_test_storage_location.id
-        today = date.today()
+        today = await core_api.organizations.today_async(db, org_id)
 
         await _make_item(
             db, org_id, loc_id, name='Best before today', expiry_date=today
@@ -120,6 +122,7 @@ class TestExpiryPredicate:
                 db=s,
                 organization_id=org_id,
                 expiring_days=7,
+                today=today,
             )
         )
 
@@ -148,3 +151,29 @@ class TestExpiryPredicate:
 
         assert overview.expired == 0
         assert overview.expiring_soon == 1
+
+    async def test_a_list_cut_by_expiry_refuses_to_guess_the_day(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_storage_location,
+    ):
+        """Which day it is belongs to the organization, and nobody else knows it.
+
+        The expiry predicates used to fall back to the server's ``date.today()``
+        when a caller passed no day, so a caller that forgot the
+        organization's clock cut the list on the server's and passed every
+        test run in UTC. Now there is nothing to fall back on.
+        """
+        org_id = async_test_storage_location.organization_id
+
+        for filters in (
+            {'only_expired': True},
+            {'expiring_days': 7},
+            {'needs_attention': True},
+        ):
+            with pytest.raises(ContractViolationError):
+                await real_async_db_session.run_sync(
+                    lambda s, filters=filters: get_items(
+                        db=s, organization_id=org_id, **filters
+                    )
+                )

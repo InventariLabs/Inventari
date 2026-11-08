@@ -208,17 +208,17 @@ def _reserve_by_location(
     quants: list[Any],
     layout: _Layout,
     lots: dict[UUID, Any],
+    today: date,
 ) -> dict[UUID, Decimal]:
     """Eligible reserve stock of the product, per shelf of the same warehouse.
 
     Only reserve shelves feed a proposal, and a reserve shelf is never
     refilled from another one. Reservations are already taken off by the
-    quants; a batch that is not active, or is past its date, is left out
-    whole.
+    quants; a batch that is not active, or is past its date on the
+    organization's *today*, is left out whole.
     """
     if rule.storage_location_id in layout.reserve_ids:
         return {}
-    today = date.today()
     by_location: dict[UUID, Decimal] = {}
     for quant in quants:
         location_id = quant.location_id
@@ -315,6 +315,10 @@ async def _shortages_async(
     # What it promised is no longer part of the shortage: without that, the
     # same proposal acted on twice would carry the stock twice.
     in_flight = await _in_flight_inbound_async(db, org_id, template_ids)
+    # Whether a batch is past its date is a question about the organization's
+    # day (TECHNICAL_DECISIONS §19): on the server's, an organization a day
+    # ahead of it was offered a batch that had already gone off where it is.
+    today = await core_api.organizations.today_async(db, org_id)
 
     shortages: list[_Shortage] = []
     for rule in rules:
@@ -351,7 +355,7 @@ async def _shortages_async(
                 available=total_available,
                 suggested=_suggested_quantity(rule, total_available),
                 threshold=threshold,
-                by_location=_reserve_by_location(rule, quants, layout, lots),
+                by_location=_reserve_by_location(rule, quants, layout, lots, today),
                 warehouse_root=layout.roots.get(rule.storage_location_id),
             )
         )

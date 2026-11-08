@@ -30,6 +30,14 @@ export interface RecentItem {
 
 const MAX_RECENT_ITEMS = 20;
 
+/**
+ * The organization segment every writer and reader of the list uses. It has
+ * read "default" since the key was invented: the user record has never
+ * carried an organization id. The list is cleared with the identity that
+ * made it (see above).
+ */
+export const RECENT_ITEMS_SCOPE = "default";
+
 function storageKey(userId: string, orgId: string): string {
   return `inventari:recent:${userId}:${orgId}`;
 }

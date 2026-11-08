@@ -634,6 +634,22 @@ moduleRegistry.register({
 
 > Both hooks run inside a React component context — you can use `useQuery`, `useState`, etc. They must handle loading/error states internally (return `[]` or `null` while loading); the tile shows no badge until the hook answers, and nothing times it out. Both hand over an i18n key in full form, never words: the feed translates an action item's `labelKey` with its `labelValues`, the tile a badge's `labelKey` with `{ count }`, so a plural form (`expiringSoon_one` / `_other`) follows the number. A failed read returns the same shape with `failed: true`: for `useStatusBadge`, `{ count: 0, labelKey, failed: true }`, and the tile says the badge could not be read.
 
+### `useRecordVisit` — "Recently visited"
+
+The launcher's **Recently visited** panel and the command palette's recent list show the record
+pages a person opened. A page that shows one record a person comes back to — Core's product page,
+an equipment asset, a recipe — adds it with one call, made before any early return:
+
+```typescript
+import { useRecordVisit } from "@/module-sdk";
+
+const { data: warranty } = useWarranty(id);
+useRecordVisit("warranty_tracker", warranty); // { id, name } once loaded, undefined before
+```
+
+The entry is stored under the page's own address and named by the record's `name`; the list names
+the module the way its launcher tile does. Lists and forms do not call it.
+
 ---
 
 ## Testing a Frontend Module

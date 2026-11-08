@@ -9,6 +9,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { isNotFoundError } from "@/lib/errors";
+import { useRecordVisit } from "@/module-sdk";
 import { AssetStatusBadge } from "@/modules/equipment/components/AssetStatusBadge";
 import { AssetDetailHeaderActions } from "@/modules/equipment/components/AssetDetailHeaderActions";
 import { CheckoutModal } from "@/modules/equipment/components/CheckoutModal";
@@ -52,6 +53,7 @@ export default function AssetDetailPage() {
     error,
     refetch,
   } = useEquipmentAsset(id ?? "");
+  useRecordVisit("equipment", item);
   const retireMutation = useRetireEquipment();
   const archiveMutation = useArchiveEquipment();
   const purgeMutation = usePurgeEquipment();

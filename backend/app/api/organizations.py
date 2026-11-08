@@ -126,12 +126,15 @@ class InvitationCodeRequest(BaseModel):
     ``role`` is the built-in base level; ``role_id`` optionally names an
     org-scoped custom role the join assigns on top of it. ``email`` is the
     address the code is bound to — only an account with that address can
-    redeem it.
+    redeem it. It is required: the join holds a code to one address only when
+    the code carries one, so a code minted without it opened for whoever held
+    the link, while the screen and the user guide promised a personal
+    invitation.
     """
 
     role: str = 'user'
     role_id: UUID | None = None
-    email: EmailStr | None = None
+    email: EmailStr
 
 
 class MemberRoleUpdate(BaseModel):
@@ -295,7 +298,7 @@ async def _mail_the_invitation(
 @limiter.limit('10/hour')
 async def create_invitation_code(
     request: Request,
-    body: InvitationCodeRequest = Body(default_factory=InvitationCodeRequest),
+    body: InvitationCodeRequest,
     current_user: UserContextDTO = Depends(get_current_admin_user),
     db=Depends(get_async_db, scope='function'),
 ):
@@ -324,7 +327,7 @@ async def create_invitation_code(
         current_user.id,
         body.role,
         body.role_id,
-        invited_email=str(body.email) if body.email else None,
+        invited_email=str(body.email),
     )
 
     # Handing out a way into the organization is an administrative act, and

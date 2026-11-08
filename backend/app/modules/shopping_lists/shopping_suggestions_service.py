@@ -2,7 +2,7 @@
 # reason: Complex multi-join GROUP BY analytics for shopping suggestions cannot be expressed through CoreAPI
 """Async shopping suggestion generation — select() + GROUP BY analytics."""
 
-from datetime import date, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any, TypeVar
 from uuid import UUID
@@ -11,6 +11,7 @@ from sqlalchemy import String, func, select
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_shopping_label
 from app.models.item import Item
 from app.models.item_history import CONSUMPTION_ACTIONS, DISPOSAL_ACTIONS, ItemHistory
@@ -134,7 +135,12 @@ async def generate_suggestions(
             )
 
     if include_frequent:
-        thirty_days_ago = date.today() - timedelta(days=30)
+        # Thirty of the organization's own days, as the instant the first of
+        # them began: the history column is a timestamp, and a bare date
+        # against it is midnight UTC (TECHNICAL_DECISIONS §19).
+        thirty_days_ago = await core_api.organizations.window_start_async(
+            db, organization_id, 30
+        )
 
         frequent_result = await db.execute(
             select(
@@ -207,7 +213,11 @@ async def generate_suggestions(
 
     if include_expiring:
         lang = get_current_lang()
-        expiring_threshold = date.today() + timedelta(days=days_for_expiring)
+        # Which day it is where the organization is, not where the server is:
+        # "expires today" turned into "expired yesterday" at the server's
+        # midnight for anyone east of it.
+        today = await core_api.organizations.today_async(db, organization_id)
+        expiring_threshold = today + timedelta(days=days_for_expiring)
 
         expiring_result = await db.execute(
             select(Item)
@@ -223,7 +233,7 @@ async def generate_suggestions(
 
         for item in expiring_result.scalars().all():
             days_left = (
-                (item.effective_expiry_date - date.today()).days
+                (item.effective_expiry_date - today).days
                 if item.effective_expiry_date
                 else 0
             )

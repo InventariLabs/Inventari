@@ -31,6 +31,7 @@ from app.modules.shopping_lists.shopping_suggestions_service import (
     filter_duplicate_suggestions,
     generate_suggestions,
 )
+from tests.integration._far_clock import zone_where_today_differs
 from tests.integration._shelf import anchor_pending_records
 
 
@@ -703,6 +704,46 @@ class TestShoppingSuggestionsService:
         assert suggestions[0].notes == 'Expired 49 days ago'
         assert '-49' not in (suggestions[0].notes or '')
         assert suggestions[0].source == 'auto_expired'
+
+    async def test_the_day_a_thing_goes_off_is_the_organizations_day(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_household: Organization,
+        async_test_storage_location: StorageLocation,
+    ) -> None:
+        """The day a thing goes off is today where the household is.
+
+        The engine counted the days left from the server's ``date.today()``, so
+        for a household a day ahead of the server the yoghurt going off today
+        was "expired 1 days ago", and for one behind it "expires in 1 days".
+        The zone is one whose today differs from the server's right now, so the
+        reverted code fails at any hour.
+        """
+        zone, org_today = zone_where_today_differs()
+        async_test_household.timezone = zone
+        real_async_db_session.add(
+            Item(
+                name='Yoghurt',
+                organization_id=async_test_household.id,
+                storage_location_id=async_test_storage_location.id,
+                quantity=1,
+                expiry_date=org_today,
+            )
+        )
+        await real_async_db_session.commit()
+
+        suggestions = await generate_suggestions(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            include_low_stock=False,
+            include_frequent=False,
+            include_expiring=True,
+            days_for_expiring=7,
+        )
+
+        assert [(s.notes, s.source) for s in suggestions] == [
+            ('Expires today', 'auto_expiring')
+        ]
 
     async def test_combined_suggestions_all_sources(
         self,

@@ -619,6 +619,7 @@ ERRORS_PT: dict[str, str] = {
     'uom_quantity_too_many_decimal_places': 'A unidade {unit} aceita no máximo {places} casa(s) decimal(is), então {quantity} não pode ser salvo. Arredonde a quantidade para essa precisão.',
     'item_unit_cannot_be_removed': 'A unidade {unit} não pode ser removida: uma quantidade sem unidade não diz nada. Escolha outra unidade.',
     'removal_strategy_of_shared_product': 'Este produto vem do catálogo compartilhado, então a ordem de saída do estoque dele é a do catálogo e não pode ser alterada para uma única organização.',
+    'unit_weight_of_shared_product': 'Este produto vem do catálogo compartilhado, então o peso de uma peça é o do catálogo e não pode ser alterado para uma única organização.',
     'piece_unit_missing_from_catalogue': "O catálogo de unidades desta instalação não tem uma unidade de peça, então 'uma quantidade de quê' fica sem resposta. Indique uma unidade explicitamente ou restaure o catálogo de unidades padrão.",
     'stock_as_of_no_history': 'Esta organização não registra movimentações de estoque, então não há histórico para consultar. Os níveis de estoque de hoje são a única resposta possível.',
     'stock_as_of_before_ledger': 'O registro de movimentações começa em {starts_at}. Nada é conhecido antes disso — nem mesmo zero — então um relatório de {as_of} seria um palpite.',

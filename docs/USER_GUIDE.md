@@ -624,7 +624,9 @@ Warehouse module is on; lines you did not count are left alone. It refuses when:
   Administrator roles),
 - a count is more than five times what the system holds, until someone allowed to
   approve stock takes accepts it. A line the system holds nothing of is not
-  measured against this rule.
+  measured against this rule, since five times nothing is no limit; when the
+  count has a tolerance, any number counted on such a line is a difference
+  over it, and waits for a reason and an approval as above.
 
 **Cancel** throws the count away without touching stock. The **report** shows
 perfect matches, differences within tolerance, overstock, understock and lines
@@ -1135,6 +1137,12 @@ there, with what is still **To pack**, until the document is completed — so yo
 can also come back to it later. A session over several documents has no
 **Pack**: its **Close** leaves each of them picked and open.
 
+A session over one document ends this way wherever it was started — on the
+document's page, from a single tick in a list, or with **Resume** on a list
+row. Started from a list, both buttons take you to the document's page:
+**Pack** to its **Packing** step, and **Complete and book** to the page as it
+completes the document with the carrier you typed.
+
 - **Everything in one package** is the common case: one tap puts everything
   picked and not yet packed into a single package (once a package exists the
   button reads **The rest in one package**), and its slip and label are one tap
@@ -1158,9 +1166,10 @@ can also come back to it later. A session over several documents has no
   **All packing slips** gives one PDF with a sheet per package, and appears once
   a dispatch has more than one package.
 - **Complete dispatch** moves the stock. After that the packages are a record
-  of what was shipped and nothing in them changes: download the slips and
-  labels you need before you complete, since **Packing** closes with the
-  document.
+  of what was shipped and nothing in them changes. **Packing** stays on the
+  completed document's page, read-only, with each package's slip and label, so
+  a slip can be downloaded again later — to check a returned box against it,
+  for instance. A dispatch completed without packages shows no **Packing**.
 
 ### 10.5 Shipping
 
@@ -1439,7 +1448,11 @@ authority accepts, which is for the business and its adviser to settle.
   deletes documents, movements or audit entries. Two timers do delete: the
   webhook delivery logs, kept 30 days unless the **Webhooks** settings name
   another period, and archived products, once an organization has set an
-  archive retention period in its settings (none is set by default).
+  archive retention period (none is set by default). No screen sets that
+  period: it is the `archive_retention_days` key of the organization's
+  settings, written through the API (`PUT /organizations`), and a product
+  archived longer than that many days is then deleted for good, through the
+  same checks as **Delete permanently**.
 
 **Corrections.** A completed document is corrected with **New correction**
 (10.3): a new document with a number of its own (`COR` in the default format),
@@ -1626,8 +1639,12 @@ made.
 
 **Partners** is the directory of suppliers, customers, partners that are both,
 service providers, manufacturers and employees — with codes, tax IDs and contact details.
-**New partner** adds one, **Import** reads XLSX or CSV. A partner is deactivated
-rather than deleted. Its details link to its warehouse documents and purchase
+**New partner** adds one, **Import** reads XLSX or CSV. On the screen a partner is
+deactivated rather than deleted. The API can also delete one outright
+(`DELETE /partners/{id}`) while no open purchase order names it: the products,
+documents and orders that named it then name no partner, a document already
+confirmed keeps the details it copied, and the audit log keeps who the partner
+was. Its details link to its warehouse documents and purchase
 orders. Warehouse documents copy the partner's details when they are confirmed, so later
 changes to the partner do not rewrite them.
 

@@ -177,7 +177,7 @@ class TestPickingUnitMismatch:
         assert body['status'] == 'picked'
         # Progress is reported in the recipe's unit, which is what the
         # checklist counts down; the shelf gives up half a piece for it.
-        assert body['quantity_consumed'] == 500.0
+        assert Decimal(body['quantity_consumed']) == Decimal('500')
         assert body['uom_symbol'] == 'g'
         assert body['ingredient_remaining_quantity'] is None
 

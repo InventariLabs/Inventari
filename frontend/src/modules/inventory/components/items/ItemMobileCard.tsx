@@ -641,7 +641,7 @@ function ItemCardQuickActions({
           aria-label={consumeLabel}
         >
           {consumingId === item.id ? (
-            <span className="text-[10px] font-medium">...</span>
+            <span className="text-[10px] font-medium">…</span>
           ) : (
             <CheckCircle size={16} />
           )}

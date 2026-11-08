@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { render, screen, waitFor, within } from "@/test/utils";
+import { render as renderAt } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
+import { ModulesProvider } from "@/contexts/ModulesContext";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
@@ -11,6 +15,7 @@ import {
 import ItemDetailPage from "./ItemDetailPage";
 import { signInWith, signOut } from "@/test/auth";
 import { onePage } from "@/test/mocks/page";
+import { getRecentItems, RECENT_ITEMS_SCOPE } from "@/lib/recentItems";
 
 /** Renders whatever the page puts in the shell header, as ModuleShell does. */
 function PageHeaderHost() {
@@ -146,6 +151,39 @@ describe("ItemDetailPage", () => {
       ),
     );
     enabledModules = [];
+  });
+
+  it("is remembered in Recently visited, under its own address", async () => {
+    // The launcher's panel and the command palette read this list; nothing
+    // wrote to it, so both stayed empty however many products were opened.
+    localStorage.clear();
+    renderAt(
+      <QueryClientProvider
+        client={
+          new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+      >
+        <MemoryRouter initialEntries={["/inventory/items/item-1"]}>
+          <ModulesProvider>
+            <PageHeaderContext.Provider
+              value={{ data: {}, setHeader: () => {} }}
+            >
+              <ItemDetailPage />
+            </PageHeaderContext.Provider>
+          </ModulesProvider>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await screen.findByText("Digitus");
+    expect(getRecentItems("current-user", RECENT_ITEMS_SCOPE)).toEqual([
+      expect.objectContaining({
+        id: "item-1",
+        title: "Rack 42U Open Frame",
+        module: "inventory",
+        path: "/inventory/items/item-1",
+      }),
+    ]);
   });
 
   it("reads out the record, including the fields the sheet never showed", async () => {

@@ -67,7 +67,9 @@ test.describe("Warehouse — shelf labels on the surface", () => {
     ).toBeVisible();
 
     // Step 2: print.
-    await page.getByRole("button", { name: "Print labels for this list" }).click();
+    await page
+      .getByRole("button", { name: "Print labels for this list" })
+      .click();
     const sheet = page.getByRole("dialog", { name: "Location labels" });
     await expect(sheet).toBeVisible();
     await expect(
@@ -82,11 +84,26 @@ test.describe("Warehouse — shelf labels on the surface", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/warehouse/todo");
 
-    await page.getByRole("button", { name: "More" }).click();
-    await page.getByRole("link", { name: "Codes and labels" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Codes and labels", level: 1 }),
-    ).toBeVisible();
+    // A document reload racing the first tap starts the menu closed again, and
+    // it can land at any point of the sequence below. So the whole sequence is
+    // retried from a settled page, not just the tap: open the menu when it is
+    // closed, follow the link, and wait for the screen it leads to.
+    const more = page.getByRole("button", { name: "More" });
+    const heading = page.getByRole("heading", {
+      name: "Codes and labels",
+      level: 1,
+    });
+    await expect(async () => {
+      if (
+        (await more.getAttribute("aria-expanded", { timeout: 2000 })) !== "true"
+      ) {
+        await more.click({ timeout: 2000 });
+      }
+      await page
+        .getByRole("link", { name: "Codes and labels" })
+        .click({ timeout: 2000 });
+      await expect(heading).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 20000 });
     await expect(
       page.getByRole("button", { name: "Print labels for this list" }),
     ).toBeVisible();

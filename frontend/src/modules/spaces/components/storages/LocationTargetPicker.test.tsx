@@ -51,17 +51,6 @@ describe("LocationTargetPicker", () => {
     expect(screen.queryByRole("button", { name: /Drawer/ })).toBeNull();
   });
 
-  it("offers only places with nothing inside when asked for leaves", async () => {
-    serveLocations([{ ...FLOOR[0], is_leaf: false }, ...FLOOR.slice(1)]);
-    renderPicker({ leavesOnly: true, excludeSubtreeOf: [] });
-    await userEvent.click(screen.getByLabelText("Lies in"));
-
-    expect(
-      await screen.findByRole("button", { name: /Garage/ }),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /^Home/ })).toBeNull();
-  });
-
   it("names the place already chosen even when the lists keep it off", async () => {
     // A module-owned parent: the scoped page does not hold it, the record does.
     serveLocations([

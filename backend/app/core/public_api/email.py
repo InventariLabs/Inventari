@@ -2,9 +2,11 @@
 
 Modules must send email through this CoreAPI surface rather than importing
 ``email_service`` directly, so the architecture rule (no ``app.services``
-imports in module code) holds. Uses the global SMTP connection configured via
-environment settings. SMTP is best-effort: callers should treat the boolean
-result as informational and never let an email failure block business logic.
+imports in module code) holds. A mail queued for an organization leaves through
+the server it named in Settings → Email, and through the installation's own
+server when it named none. SMTP is best-effort: callers should treat the
+boolean result as informational and never let an email failure block business
+logic.
 """
 
 from __future__ import annotations

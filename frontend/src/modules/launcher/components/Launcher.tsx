@@ -21,7 +21,7 @@ import { useModules } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import { moduleRegistry, type FrontendModule } from "@/lib/moduleRegistry";
-import { getRecentItems } from "@/lib/recentItems";
+import { getRecentItems, RECENT_ITEMS_SCOPE } from "@/lib/recentItems";
 import { ModuleTile } from "./ModuleTile";
 import { ActionItemsFeed } from "./ActionItemsFeed";
 import { ActiveProfilePill } from "./ActiveProfilePill";
@@ -232,11 +232,7 @@ export default function Launcher() {
       );
 
   const userId = user?.id ? String(user.id) : null;
-  // The segment has read "default" since the key was invented: the user
-  // record has never carried an organization id, so the old conditional was
-  // the fallback branch and nothing else.
-  const orgId = "default";
-  const recentItems = userId ? getRecentItems(userId, orgId) : [];
+  const recentItems = userId ? getRecentItems(userId, RECENT_ITEMS_SCOPE) : [];
   // A visit is stored under the technical module name; the list names it the
   // way the tile above does, as the command palette does.
   const tDyn = makeTDynamic(t);

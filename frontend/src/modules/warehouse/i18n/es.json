@@ -1534,6 +1534,7 @@
   "packing": {
     "title": "Embalaje",
     "subtitle": "Opcional: ponga la mercancía preparada en paquetes, imprima un albarán y una etiqueta para cada uno y luego complete la salida.",
+    "subtitleShipped": "Lo que se envió, paquete a paquete, con el albarán y la etiqueta de cada uno.",
     "packAll": "Todo en un paquete",
     "packRest": "El resto en un paquete",
     "addPackage": "Añadir paquete",

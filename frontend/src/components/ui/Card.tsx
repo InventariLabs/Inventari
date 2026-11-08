@@ -103,13 +103,7 @@ const CardFooter = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "flex items-center pt-4 border-t border-border mt-4",
-      className,
-    )}
-    {...props}
-  />
+  <div className={cn("flex items-center pt-3 mt-3", className)} {...props} />
 );
 CardFooter.displayName = "CardFooter";
 
