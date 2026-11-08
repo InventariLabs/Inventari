@@ -51,7 +51,7 @@ def two_delis(
     org_id = test_user.organization_id
     seeded = Category(name='Deli', code='deli', organization_id=org_id)
     typed = Category(name='Deli', organization_id=org_id)
-    # Low stock for the shopping suggestions: two on the shelf, five wanted.
+    # Low stock: two on the shelf, five wanted.
     template = ProductTemplate(
         name='Salami', organization_id=org_id, min_quantity=Decimal('5')
     )
@@ -177,12 +177,3 @@ class TestCategoryRowsCarryTheirCode:
     ) -> None:
         wasted = _get(client, auth_headers, 'consumption')['most_wasted']
         assert [w['category_code'] for w in wasted if w['name'] == 'Salami'] == ['deli']
-
-    def test_shopping_suggestions_name_the_code(
-        self, client: TestClient, auth_headers: dict[str, str]
-    ) -> None:
-        suggestions = _get(client, auth_headers, 'shopping-suggestions')['items']
-        codes = {
-            s['category_code'] for s in suggestions if s['product_name'] == 'Salami'
-        }
-        assert codes == {'deli'}

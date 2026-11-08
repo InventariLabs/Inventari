@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { AlertTriangle, Clock, ShoppingCart, TrendingUp } from "lucide-react";
+import { AlertTriangle, Clock, ShoppingCart } from "lucide-react";
 import type { SmartAlert, SmartAlerts } from "@/modules/stats/types/analytics";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -16,7 +16,6 @@ const TYPE_TO_I18N_KEY: Record<string, string> = {
   missing_staple: "staple",
   expiring_soon: "expiring",
   expired: "expired",
-  low_stock: "lowStock",
 };
 
 type Translate = SmartAlertsPanelProps["t"];
@@ -71,8 +70,6 @@ const getAlertIcon = (type: string) => {
     case "EXPIRING_SOON":
     case "EXPIRED":
       return <AlertTriangle className="w-5 h-5" />;
-    case "LOW_STOCK":
-      return <TrendingUp className="w-5 h-5" />;
     default:
       return <AlertTriangle className="w-5 h-5" />;
   }

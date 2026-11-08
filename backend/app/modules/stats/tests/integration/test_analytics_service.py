@@ -203,6 +203,116 @@ class TestStatsAnalyticsService:
         assert len(forgotten_alerts) >= 1
         assert any('Forgotten Item' in a.get('item_name', '') for a in forgotten_alerts)
 
+    async def test_past_the_row_ceiling_the_stalest_records_are_the_ones_read(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_household: Organization,
+        async_test_storage_location: StorageLocation,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The candidates are cut at a ceiling, and the cut keeps the stalest.
+
+        The selection had no order, so past the ceiling the forgotten-item
+        alerts came from whichever records the database returned first — an
+        organization with more records than the ceiling could have its one
+        forgotten jar left out for a shelf of fresh ones. The forgotten record
+        is written last here, so a cut in the order the rows were written
+        drops it.
+        """
+        import app.modules.stats._alerts_service as alerts_service
+
+        monkeypatch.setattr(alerts_service, 'MAX_ANALYTICS_ROWS', 3)
+        fresh_ts = datetime.combine(
+            date.today() - timedelta(days=2), datetime.min.time()
+        )
+        old_ts = datetime.combine(
+            date.today() - timedelta(days=90), datetime.min.time()
+        )
+
+        def record(name: str, ts: datetime) -> Item:
+            return Item(
+                organization_id=async_test_household.id,
+                storage_location_id=async_test_storage_location.id,
+                name=name,
+                quantity=Decimal('1'),
+                added_date=ts.date(),
+                updated_at=ts,
+                created_at=ts,
+            )
+
+        for index in range(4):
+            real_async_db_session.add(record(f'Fresh {index}', fresh_ts))
+            await real_async_db_session.flush()
+        real_async_db_session.add(record('Jar at the back', old_ts))
+        await real_async_db_session.flush()
+
+        result = await get_smart_alerts_async(
+            real_async_db_session, async_test_household.id
+        )
+
+        forgotten = [
+            a['item_name'] for a in result['alerts'] if a['type'] == 'FORGOTTEN_ITEM'
+        ]
+        assert forgotten == ['Jar at the back']
+
+    async def test_a_record_handled_lately_is_not_read_as_stale(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_household: Organization,
+        async_test_storage_location: StorageLocation,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The order counts the last history row, as the alert itself does.
+
+        A record whose row was last edited long ago but which somebody used
+        from yesterday is not stale; ordered by the row alone it would take a
+        place under the ceiling from a record that is.
+        """
+        import app.modules.stats._alerts_service as alerts_service
+
+        monkeypatch.setattr(alerts_service, 'MAX_ANALYTICS_ROWS', 1)
+        older_ts = datetime.combine(
+            date.today() - timedelta(days=120), datetime.min.time()
+        )
+        old_ts = datetime.combine(
+            date.today() - timedelta(days=90), datetime.min.time()
+        )
+
+        def record(name: str, ts: datetime) -> Item:
+            return Item(
+                organization_id=async_test_household.id,
+                storage_location_id=async_test_storage_location.id,
+                name=name,
+                quantity=Decimal('1'),
+                added_date=ts.date(),
+                updated_at=ts,
+                created_at=ts,
+            )
+
+        used = record('Used yesterday', older_ts)
+        forgotten = record('Jar at the back', old_ts)
+        real_async_db_session.add_all([used, forgotten])
+        await real_async_db_session.flush()
+        real_async_db_session.add(
+            ItemHistory(
+                organization_id=async_test_household.id,
+                item_id=used.id,
+                action='USED',
+                changes={'qty': '1'},
+                created_at=datetime.now() - timedelta(days=1),
+            )
+        )
+        await real_async_db_session.flush()
+
+        result = await get_smart_alerts_async(
+            real_async_db_session, async_test_household.id
+        )
+
+        forgotten_names = [
+            a['item_name'] for a in result['alerts'] if a['type'] == 'FORGOTTEN_ITEM'
+        ]
+        assert forgotten_names == ['Jar at the back']
+
     async def test_smart_alerts_expiring_items(
         self,
         real_async_db_session: AsyncSession,

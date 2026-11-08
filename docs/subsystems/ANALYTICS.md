@@ -24,17 +24,16 @@
    today, tomorrow, this week (2–7 days), next 2 weeks (7–14), this month (14–30). Cut on
    the organization's own day, not the server's.
 4. **Activity Feed**: Recent inventory events (created, consumed, moved, discarded).
-5. **Consumption Stats**: Quantity and ledger value consumed and wasted over the last `days` days (default 30): the ten most consumed and ten most wasted products and the totals.
-6. **Shopping Suggestions**: Products below their reorder threshold, then products used or discarded within the last week that now sit at or under their minimum, at most 20 rows, higher urgency first.
-7. **Cost Analysis**: What came in (`total_spent`, receipts priced by the valuation layers) and what was thrown away (`total_wasted`) over a `period` (day, week, month or year; the monthly trend always covers six months), with the top five categories by spend and the top five wasted products. Waste appears twice under two distinct names: `waste_event_rate` (share of outflow *events* that were disposals, in `/stats/consumption`) and `waste_value_percentage` (share of spent *value* that went to waste, in `/stats/cost-analysis`).
-8. **Rotation Analysis**: Stock age (average and median days the stock on hand has been sitting — not inventory turnover), slow movers (over 30 and up to 90 days), dead stock (over 90 days). Ages run from `Item.added_date`, and the accompanying values read `Item.purchase_price` — the same attribution gap as By-Storage / By-Category.
-9. **Smart Alerts**: Automated warnings for records nobody has touched in 60 days
+5. **Consumption Stats**: Quantity and ledger value consumed and wasted over the last `days` days (default 30): the ten most consumed and ten most wasted products, the totals, and what was used per category (`consumption_by_category`, quantity and value, largest value first — a quantity summed over a category mixes units, so only the value ranks).
+6. **Cost Analysis**: What came in (`total_spent`, receipts priced by the valuation layers) and what was thrown away (`total_wasted`) over a `period` (day, week, month or year; the monthly trend always covers six months), with the top five categories by spend and the top five wasted products. Waste appears twice under two distinct names: `waste_event_rate` (share of outflow *events* that were disposals, in `/stats/consumption`) and `waste_value_percentage` (share of spent *value* that went to waste, in `/stats/cost-analysis`).
+7. **Rotation Analysis**: Stock age (average and median days the stock on hand has been sitting — not inventory turnover), slow movers (over 30 and up to 90 days), dead stock (over 90 days). Ages run from `Item.added_date`, and the accompanying values read `Item.purchase_price` — the same attribution gap as By-Storage / By-Category.
+8. **Smart Alerts**: Automated warnings for records nobody has touched in 60 days
    (`FORGOTTEN_ITEM`), recurring products overdue for a purchase (`MISSING_STAPLE`) and stock
    expiring within 7 days (`EXPIRING_SOON`, critical at 2 days or fewer). Expired stock and
    stock below its reorder threshold raise no alert; the overview counts them.
-10. **Expense Forecasting**: Predicts future spending based on 90-day history.
-11. **Purchase Patterns**: Identifies recurring products, seasonal products and bulk buying opportunities over the last 180 days.
-12. **Reconciliation**: Compares the shelf (the records summed) against the movement ledger and against the cost layers (see `docs/subsystems/STOCK.md`).
+9. **Expense Forecasting**: Predicts future spending based on 90-day history.
+10. **Purchase Patterns**: Identifies recurring products, seasonal products and bulk buying opportunities over the last 180 days.
+11. **Reconciliation**: Compares the shelf (the records summed) against the movement ledger and against the cost layers (see `docs/subsystems/STOCK.md`).
 
 ## API Endpoints
 
@@ -51,7 +50,6 @@ All endpoints are mounted under `/api/v1/stats`:
 | GET | `/api/v1/stats/expiry-forecast` | Items grouped by expiry window |
 | GET | `/api/v1/stats/activity` | Recent inventory activity feed |
 | GET | `/api/v1/stats/consumption` | Consumption statistics over a period |
-| GET | `/api/v1/stats/shopping-suggestions` | Reorder suggestions for low stock |
 | GET | `/api/v1/stats/cost-analysis` | Spend and waste breakdown (`?period=day\|week\|month\|year`) |
 | GET | `/api/v1/stats/rotation-analysis` | Stock age, slow movers, dead stock |
 | GET | `/api/v1/stats/smart-alerts` | Forgotten products, overdue staples and products expiring soon |

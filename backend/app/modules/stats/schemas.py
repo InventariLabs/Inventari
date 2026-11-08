@@ -119,17 +119,6 @@ class ConsumptionStats(BaseModel):
     consumption_by_category: list[CategoryConsumption]
 
 
-class RestockForecastRow(BaseModel):
-    product_name: str
-    category_name: str
-    #: See CategoryCostItem.category_code.
-    category_code: str | None = None
-    avg_consumption_rate: float
-    days_since_last_purchase: int
-    urgency: str
-    estimated_days_until_needed: int
-
-
 class MonthlyTrendItem(BaseModel):
     month: str
     spent: float
