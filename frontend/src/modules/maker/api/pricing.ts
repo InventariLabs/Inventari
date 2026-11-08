@@ -12,6 +12,7 @@ export const pricingApi = {
     const response = await api.post<PricingResponse>(
       "/maker/pricing/compute",
       req,
+      { readOnly: true },
     );
     return response.data;
   },

@@ -209,6 +209,7 @@
     "deleteSuccess": "Supprimé avec succès",
     "fileAttached": "Fichier joint",
     "fileUploadFailed": "Échec du téléchargement du fichier",
+    "imageRemoveFailed": "Impossible de retirer la photo",
     "fileUploadFailedAttachment": "Échec du téléchargement de la pièce jointe",
     "unitLookupFailed": "Impossible de vérifier l'unité de ce produit. Réessayez d'enregistrer.",
     "quantityClearedOnUnitChange": "Quantité effacée — la nouvelle unité mesure autre chose.",

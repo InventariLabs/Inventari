@@ -209,6 +209,7 @@
     "deleteSuccess": "Eliminado exitosamente",
     "fileAttached": "Archivo adjunto",
     "fileUploadFailed": "Error al subir el archivo",
+    "imageRemoveFailed": "No se pudo quitar la foto",
     "fileUploadFailedAttachment": "Error al subir el archivo adjunto",
     "unitLookupFailed": "No se pudo comprobar en qué unidad se lleva este producto. Intenta guardar de nuevo.",
     "quantityClearedOnUnitChange": "Cantidad borrada: la nueva unidad mide otra cosa.",
