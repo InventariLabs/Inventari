@@ -1,6 +1,8 @@
+import { useId, useState } from "react";
 import { Barcode } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 import { ScanCodeButton } from "./ScanCodeButton";
 import { useGenerateProductCode } from "@/modules/inventory/hooks/useItemMutations";
 import type { FieldDefinition } from "@/types";
@@ -35,11 +37,19 @@ export function BarcodeField({
 }: BarcodeFieldProps) {
   const { t } = useTranslation("items");
   const generate = useGenerateProductCode();
+  const hintId = useId();
   const code = String(value ?? "").trim();
   const empty = code === "";
   // The range the generator draws from: an EAN-13 starting with 20, which
-  // GS1 keeps for a company's own goods.
+  // GS1 keeps for a company's own goods. A code typed by hand can be in it
+  // too — another company's in-store code — so its sentence names no owner.
   const internal = INTERNAL_CODE.test(code);
+  const hint = empty ? "button" : internal ? "code" : null;
+  // Once the hint has stood under the field its place stays, empty, while
+  // the form is open: the first keystroke of a typed code would otherwise
+  // pull everything below the field up by the hint's height.
+  const [hintPlaceKept, keepHintPlace] = useState(hint !== null);
+  if (hint !== null && !hintPlaceKept) keepHintPlace(true);
 
   return (
     <div>
@@ -50,6 +60,7 @@ export function BarcodeField({
             field={field}
             value={value}
             error={error}
+            describedBy={hint ? hintId : undefined}
             onChange={onChange}
           />
         </div>
@@ -73,10 +84,29 @@ export function BarcodeField({
       <div className="mt-2">
         <ScanCodeButton label={t("fields.scanCode")} onCode={onChange} />
       </div>
-      {(empty || internal) && (
-        <p className="text-xs text-on-muted mt-1.5">
-          {t("fields.generateCodeHint")}
-        </p>
+      {hintPlaceKept && (
+        // Both sentences share one cell, so it is as tall as the longer one
+        // and swapping them moves nothing either; the one not in force is
+        // invisible, which also takes it out of the accessibility tree.
+        <div className="grid text-xs text-on-muted mt-1.5">
+          {(
+            [
+              ["button", t("fields.generateCodeHint")],
+              ["code", t("fields.internalCodeHint")],
+            ] as const
+          ).map(([which, sentence]) => (
+            <p
+              key={which}
+              id={hint === which ? hintId : undefined}
+              className={cn(
+                "col-start-1 row-start-1",
+                hint !== which && "invisible",
+              )}
+            >
+              {sentence}
+            </p>
+          ))}
+        </div>
       )}
     </div>
   );

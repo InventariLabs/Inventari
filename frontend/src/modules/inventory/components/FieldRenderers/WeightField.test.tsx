@@ -207,6 +207,25 @@ describe("WeightField", () => {
     ).toBeInTheDocument();
   });
 
+  // The hints stood as plain paragraphs under the input: a screen reader on
+  // the field heard neither what to enter nor the total it adds up to.
+  it("reads its hints to a screen reader as the input's description", () => {
+    render(
+      <WeightField
+        field={field}
+        value="1500"
+        weightUomId="uom-ml"
+        quantity="6"
+        onChange={noop}
+        onUomChange={noop}
+      />,
+    );
+
+    expect(screen.getByRole("spinbutton")).toHaveAccessibleDescription(
+      /^Enter weight or volume of one piece; .* Total for this line: .*ml$/,
+    );
+  });
+
   /**
    * The line total was formatted inside `toLocaleString(undefined, …)`, which
    * reads the *browser's* language: on a Polish screen it handed the shared
