@@ -380,6 +380,68 @@ class TestTheTypeTokenWritesAShortCode:
         assert number.startswith(f'II/{datetime.now(UTC).year}/')
 
 
+@pytest.mark.unit
+class TestAnUndatedNumberReadsTheOrganizationsYear:
+    """A number with no document date takes the organization's year.
+
+    The prefix read the server's UTC date: an organization east of UTC
+    numbering a production run after midnight on its own first of January got
+    the year that had just ended, while the run's period guard and its monthly
+    result already read the new one.
+    """
+
+    @pytest.mark.asyncio
+    async def test_the_year_is_the_organizations(self) -> None:
+        from datetime import date
+
+        db = MagicMock()
+        _stub_db(db, [])
+        org_id = uuid4()
+        new_year = date(datetime.now(UTC).year + 1, 1, 1)
+
+        with (
+            patch(
+                'app.modules.warehouse.document_numbering_service.get_profile',
+                new_callable=AsyncMock,
+                return_value=_make_profile('{TYPE}/{YEAR}/{SEQ:03d}', 3),
+            ),
+            patch(
+                'app.modules.warehouse.document_numbering_service.core_api.organizations.today_async',
+                new_callable=AsyncMock,
+                return_value=new_year,
+            ) as today,
+        ):
+            number = await generate_number(db, org_id, 'IN')
+
+        assert number.startswith(f'IN/{new_year.year}/')
+        today.assert_awaited_once_with(db, org_id)
+
+    @pytest.mark.asyncio
+    async def test_a_dated_document_keeps_its_own_year(self) -> None:
+        from datetime import date
+
+        db = MagicMock()
+        _stub_db(db, [])
+
+        with (
+            patch(
+                'app.modules.warehouse.document_numbering_service.get_profile',
+                new_callable=AsyncMock,
+                return_value=_make_profile('{TYPE}/{YEAR}/{SEQ:03d}', 3),
+            ),
+            patch(
+                'app.modules.warehouse.document_numbering_service.core_api.organizations.today_async',
+                new_callable=AsyncMock,
+            ) as today,
+        ):
+            number = await generate_number(
+                db, uuid4(), 'IN', document_date=date(2024, 12, 31)
+            )
+
+        assert number.startswith('IN/2024/')
+        today.assert_not_awaited()
+
+
 class TestHighestSequenceReadsThePrefix:
     """The prefix is matched, not just measured.
 

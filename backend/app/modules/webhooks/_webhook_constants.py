@@ -55,6 +55,19 @@ def _serialize_payload(payload: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
+def wire_body(payload: dict[str, Any]) -> bytes:
+    """The bytes a delivery sends for *payload* — the same on every attempt.
+
+    The keys are sorted. The delivery row keeps the payload as JSONB, which
+    stores an object's keys in an order of its own, and a retry reads it back
+    from there: written in the order the dict was built, the first attempt and
+    its retries sent the same content as two different byte strings, and the
+    signature, computed over the bytes, differed with them. Sorted, the bytes
+    follow from the content alone, so the row needs no copy of the body.
+    """
+    return json.dumps(payload, sort_keys=True).encode()
+
+
 def event_name(event: SystemEvent | str) -> str:
     """Normalize an event to its wire name.
 

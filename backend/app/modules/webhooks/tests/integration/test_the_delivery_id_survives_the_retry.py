@@ -74,6 +74,7 @@ class _FailingTransport:
                         'method': method,
                         'url': url,
                         'headers': dict(kw.get('headers') or {}),
+                        'raw': bytes(kw.get('content') or b''),
                         'body': json.loads(bytes(kw.get('content') or b'')),
                     }
                 )
@@ -201,6 +202,36 @@ async def test_payload_body_and_row_agree_on_the_delivery_id(
         assert log.delivery_id == _header_of(call), (
             f'attempt {index + 1}: the delivery row stores the id the receiver saw'
         )
+
+
+async def test_a_retry_sends_the_bytes_the_first_attempt_sent(
+    session_factory: SessionFactory,
+    webhook: WebhookEndpoint,
+    sent: list[dict[str, Any]],
+) -> None:
+    """One delivery is one body, byte for byte, on every attempt.
+
+    The signature is computed over the bytes, so a receiver verifying it, or
+    deduplicating on a hash of the body, has to see the same bytes twice. The
+    retry used to rebuild them from the row's JSONB copy, whose keys come back
+    in an order of their own: the same content, other bytes, another
+    signature. The payload here carries keys JSONB reorders — it sorts
+    shorter keys first.
+    """
+    await dispatch_event(
+        SystemEvent.ITEM_CREATED,
+        TenantEventPayload(
+            organization_id=str(webhook.organization_id),
+            zz_longest_key_written_first='x',
+            a='y',
+        ),
+    )
+    await _force_due(session_factory, webhook)
+    async with session_factory() as session:
+        await retry_failed_deliveries(session)
+
+    assert len(sent) == 2, 'the 500 answer must produce exactly one retry'
+    assert sent[1]['raw'] == sent[0]['raw']
 
 
 async def test_ping_header_and_body_carry_one_delivery_id(

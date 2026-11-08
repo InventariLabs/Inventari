@@ -14,22 +14,26 @@ import type {
   ListFilterContributor,
 } from "./moduleInterfaces";
 
-function resolveNavPaths(
+/**
+ * The paths of the nav items a module shows, as written.
+ *
+ * Not resolved against `basePath`: the shell links each item exactly as
+ * written, so a relative path links nowhere, and reading it against the base
+ * here let it pass a check the screen then failed.
+ */
+function shownNavPaths(
   mod: FrontendModule,
   isRegistered: (name: string) => boolean,
 ): string[] {
-  const base = (mod.moduleNav!.basePath || "").replace(/\/$/, "");
   // A nav item that needs a module nobody enabled is not shown, so no route
   // has to answer it (any one of `requiresModules` is enough).
-  const shown = mod.moduleNav!.items.filter(
-    (item) =>
-      !item.requiresModules?.length || item.requiresModules.some(isRegistered),
-  );
-  return shown.map((item) => {
-    if (item.path.startsWith("/")) return item.path;
-    if (item.path === "") return base;
-    return base + "/" + item.path;
-  });
+  return mod
+    .moduleNav!.items.filter(
+      (item) =>
+        !item.requiresModules?.length ||
+        item.requiresModules.some(isRegistered),
+    )
+    .map((item) => item.path);
 }
 
 function matchPathPattern(navPath: string, routePath: string): boolean {
@@ -87,16 +91,25 @@ class ModuleRegistry {
         ...module.routes,
         ...hosted.filter((r) => r.shell === module.name),
       ];
-      const orphanedNav = resolveNavPaths(module, (n) =>
-        this.modules.has(n),
-      ).filter(
-        (p) =>
-          !routes.some(
-            (r) =>
-              r.path === p ||
-              (r.path.includes(":") && matchPathPattern(p, r.path)),
-          ),
-      );
+      const paths = shownNavPaths(module, (n) => this.modules.has(n));
+      const relative = paths.filter((p) => !p.startsWith("/"));
+      if (relative.length > 0) {
+        logger.warn(
+          `[ModuleRegistry] Module "${module.name}" has moduleNav items whose ` +
+            `path is not absolute (the shell links them as written): ` +
+            relative.map((p) => JSON.stringify(p)).join(", "),
+        );
+      }
+      const orphanedNav = paths
+        .filter((p) => p.startsWith("/"))
+        .filter(
+          (p) =>
+            !routes.some(
+              (r) =>
+                r.path === p ||
+                (r.path.includes(":") && matchPathPattern(p, r.path)),
+            ),
+        );
       if (orphanedNav.length > 0) {
         logger.warn(
           `[ModuleRegistry] Module "${module.name}" has moduleNav items ` +

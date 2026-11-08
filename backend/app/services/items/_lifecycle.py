@@ -114,7 +114,9 @@ async def delete_item(
         {
             'reason': reason,
             'notes': notes,
-            'old_quantity': float(old_quantity) if old_quantity else 0.0,
+            # The exact digits, as every quantity in the history (AUDIT.md);
+            # the restore below reads them back.
+            'old_quantity': str(old_quantity) if old_quantity else '0',
         },
         user_id=user.id,
     )
@@ -189,10 +191,11 @@ async def restore_item(
     )
     changes_row = deleted_entry.first()
     if changes_row and changes_row[0]:
+        # A number in rows written before the history kept its digits as
+        # text, a string since; Decimal reads both the same.
         old_qty = changes_row[0].get('old_quantity')
-        if old_qty is not None and old_qty > 0:
-            restore_qty = Decimal(str(old_qty))
-        else:
+        restore_qty = Decimal(str(old_qty)) if old_qty is not None else Decimal('0')
+        if restore_qty <= 0:
             raise ServiceRejectionError('item_restore_quantity_unknown')
     else:
         raise ServiceRejectionError('item_restore_quantity_unknown')

@@ -9,8 +9,7 @@
   },
   "modules": {
     "core": {
-      "title": "Hogar y cocina",
-      "desc": "Nevera, despensa y productos básicos."
+      "title": "Hogar y cocina"
     },
     "shopping_lists": {
       "name": "Listas de compras",

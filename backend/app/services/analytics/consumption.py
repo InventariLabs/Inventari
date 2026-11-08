@@ -18,6 +18,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import (
+    CategoryConsumptionDTO,
     ConsumptionItemDTO,
     ConsumptionStatsDTO,
 )
@@ -60,6 +61,42 @@ def _top_ten(by_product: dict[str, dict], measure: str) -> list[dict]:
         by_product.values(),
         key=lambda line: (-line[measure], line['name'].casefold(), line['name']),
     )[:10]
+
+
+def _by_category(by_product: dict[str, dict]) -> list[CategoryConsumptionDTO]:
+    """The product lines rolled up per category, largest value first.
+
+    Ranked by value, then by name: a quantity summed over a category adds
+    kilograms to pieces, so only the value compares one category with
+    another. The quantity is still the sum the lines carry, as the contract
+    has it.
+    """
+    lines: dict[tuple[str, str | None], dict] = {}
+    for product in by_product.values():
+        key = (product['category'], product['category_code'])
+        line = lines.setdefault(
+            key,
+            {
+                'category': key[0],
+                'category_code': key[1],
+                'total_quantity': 0.0,
+                'total_value': Decimal('0'),
+            },
+        )
+        line['total_quantity'] += product['quantity']
+        line['total_value'] += product['value']
+    ranked = sorted(
+        lines.values(),
+        key=lambda line: (
+            -line['total_value'],
+            line['category'].casefold(),
+            line['category'],
+        ),
+    )
+    return [
+        CategoryConsumptionDTO(**{**line, 'total_value': rounded(line['total_value'])})
+        for line in ranked
+    ]
 
 
 async def get_consumption_stats_async(
@@ -208,5 +245,5 @@ async def get_consumption_stats_async(
         waste_event_rate=waste_event_rate,
         total_consumed_value=rounded(total_consumed_value) if valued else None,
         total_wasted_value=rounded(total_wasted_value) if valued else None,
-        consumption_by_category=[],
+        consumption_by_category=_by_category(consumed_by_product),
     )

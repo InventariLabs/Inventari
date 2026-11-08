@@ -20,7 +20,7 @@ from app.models.user import User
 def _po_event_subscription() -> Iterator[None]:
     """Set up DOCUMENT_CANCELLED + DOCUMENT_COMPLETED event subscriptions for tests.
 
-    In production, this is handled by module.on_startup() during lifespan.
+    In production, this is handled by module.run_startup() during lifespan.
     Tests skip the full startup, so we subscribe manually.
     """
     from app.core.context import ModuleContext

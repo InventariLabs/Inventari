@@ -112,11 +112,7 @@ def validate_payload_against_schema(
         raise ContractViolationError('Schema "properties" must be an object')
     if not isinstance(required, list):
         raise ContractViolationError('Schema "required" must be a list')
-    if SCHEMA_VERSION_KEY in properties:
-        raise ContractViolationError(
-            f"Property {SCHEMA_VERSION_KEY!r} is reserved for core's "
-            'settings schema version stamp'
-        )
+    _refuse_the_reserved_key(schema)
 
     for key in required:
         if key not in payload:
@@ -141,6 +137,28 @@ def validate_payload_against_schema(
             raise SchemaValidationError('settings_field_unknown', field=key)
 
     return cleaned
+
+
+def _refuse_the_reserved_key(schema: object) -> None:
+    """Refuse a schema that declares core's stamp key at any depth.
+
+    Checked over the whole schema, not as the payload walks it: a nested
+    object the payload leaves out was never visited, so its declaration was
+    accepted — and the value dropped on the first save that carried it, since
+    the key is stripped from every level of a payload.
+    """
+    if not isinstance(schema, dict):
+        return
+    properties = schema.get('properties')
+    if isinstance(properties, dict):
+        if SCHEMA_VERSION_KEY in properties:
+            raise ContractViolationError(
+                f"Property {SCHEMA_VERSION_KEY!r} is reserved for core's "
+                'settings schema version stamp'
+            )
+        for prop_schema in properties.values():
+            _refuse_the_reserved_key(prop_schema)
+    _refuse_the_reserved_key(schema.get('items'))
 
 
 def iter_secret_paths(

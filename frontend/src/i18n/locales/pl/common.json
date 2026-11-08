@@ -652,8 +652,8 @@
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",
       "reasons": {
-        "CONSUMED": "Zużyty / skonsumowany",
-        "USED": "Zużyty",
+        "CONSUMED": "Zużyte",
+        "USED": "Zużyte",
         "DISPOSED": "Wyrzucony",
         "DISCARDED": "Wyrzucony",
         "RESTORED": "Przywrócono",

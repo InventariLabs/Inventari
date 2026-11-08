@@ -368,7 +368,6 @@ export const API_ROUTES = [
   "/api/v1/stats/purchase-patterns",
   "/api/v1/stats/reconciliation",
   "/api/v1/stats/rotation-analysis",
-  "/api/v1/stats/shopping-suggestions",
   "/api/v1/stats/smart-alerts",
   "/api/v1/stock-as-of",
   "/api/v1/stock-as-of/export/pdf",

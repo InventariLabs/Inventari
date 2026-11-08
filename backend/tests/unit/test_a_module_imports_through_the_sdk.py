@@ -158,6 +158,29 @@ class TestTheDeclaredSurface:
 
         assert _off_surface(_scan(module)) == ['app']
 
+    @pytest.mark.parametrize(
+        'source',
+        [
+            'from app.core import module_sdk\n',
+            'from app.core import contracts, public_api\n',
+        ],
+        ids=['sdk', 'two-at-once'],
+    )
+    def test_the_package_spelling_of_the_surface_is_the_surface(self, tmp_path, source):
+        """``from app.core import module_sdk`` binds the module that
+        ``import app.core.module_sdk`` binds; the scan refused one spelling and
+        passed the other, as the lint never did for a shipped module."""
+        module = _community_module(tmp_path, **{'router.py': source})
+
+        assert _scan(module) == []
+
+    def test_one_name_off_the_surface_still_refuses_the_import(self, tmp_path):
+        module = _community_module(
+            tmp_path, **{'router.py': 'from app.core import module_sdk, deps\n'}
+        )
+
+        assert _off_surface(_scan(module)) == ['app.core']
+
     def test_the_dot_boundary_is_the_path_boundary(self, tmp_path):
         """``app.core.contracts_x`` is another module, not ``contracts``."""
         module = _community_module(
@@ -259,6 +282,15 @@ class TestTheDoorIntoAShippedModule:
             tmp_path,
             requires=['warehouse'],
             **{'module.py': 'import app.modules.warehouse.warehouse_api\n'},
+        )
+
+        assert _scan(module) == []
+
+    def test_the_package_spelling_is_the_same_door(self, tmp_path):
+        module = _community_module(
+            tmp_path,
+            requires=['warehouse'],
+            **{'module.py': 'from app.modules.warehouse import warehouse_api\n'},
         )
 
         assert _scan(module) == []

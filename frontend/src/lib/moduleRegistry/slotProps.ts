@@ -166,8 +166,9 @@ export interface SlotDataMap {
    */
   settings_module_card: Record<string, never>;
   /**
-   * Slot rendered below the items list on a Storage detail page.
-   * Receives the storage context so modules can render type-specific content.
+   * Slot rendered at the foot of a location's Settings tab, below the
+   * warehouse strip. Receives the location so modules can render
+   * type-specific content.
    * Example: a temperature-tracking module could add a sensor chart for FREEZER/FRIDGE types.
    */
   storage_detail_extra: {

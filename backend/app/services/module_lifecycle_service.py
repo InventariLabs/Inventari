@@ -102,7 +102,6 @@ async def enable_modules_async(
     *,
     db: Any,
     user: Any | None = None,
-    run_custom_hook: bool = True,
 ) -> None:
     """Run enable hooks for ``modules`` in dependency order.
 
@@ -114,9 +113,12 @@ async def enable_modules_async(
         user: Optional ``UserContextDTO`` — passed to the module via
             ``ModuleContext``. Required for modules whose ``on_enable``
             accesses the user (e.g. Equipment).
-        run_custom_hook: When True (default), ``on_enable`` is invoked
-            after ``system_on_enable``. Pass False to run only the
-            system hook (matches the historical onboarding behaviour).
+
+    Every enable path comes through here — onboarding, a profile switch, the
+    store's toggle and the demo seed — and each runs both hooks:
+    ``system_on_enable`` seeds what the module declares, then the module's own
+    ``on_enable``. Onboarding used to run only the first, so a module that
+    seeds in ``on_enable`` left every onboarded organization without it.
     """
     for module in modules:
         # The hooks are the module's own code: run them under its identity so
@@ -127,7 +129,6 @@ async def enable_modules_async(
                 organization_id,
                 db=db,
                 user=user,
-                run_custom_hook=run_custom_hook,
             )
 
 
@@ -137,7 +138,6 @@ async def _enable_one_module(
     *,
     db: Any,
     user: Any | None,
-    run_custom_hook: bool,
 ) -> None:
     try:
         await module.system_on_enable(organization_id, db, user=user)
@@ -147,9 +147,6 @@ async def _enable_one_module(
         ) from exc
 
     await grant_default_permissions(module, organization_id, db)
-
-    if not run_custom_hook:
-        return
 
     context = build_module_context(db, organization_id, user)
     try:

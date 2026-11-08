@@ -8,6 +8,15 @@ from pydantic import BaseModel, Field, HttpUrl, field_validator
 
 from app.core.events import SystemEvent
 
+#: Names in ``SystemEvent`` and the payload registry that nothing emits:
+#: they stand in the core contract, and a webhook subscribed to one never
+#: fires. The catalogue leaves them out, so the form does not offer them and
+#: the API refuses a new subscription; a row that already names one reads as
+#: a withdrawn subscription, which the form lets the administrator remove.
+NEVER_EMITTED: frozenset[str] = frozenset(
+    {'item.transferred', 'item.deactivated', 'item.status_changed'}
+)
+
 
 def valid_event_types() -> set[str]:
     """Event names a webhook may subscribe to.
@@ -28,7 +37,10 @@ def valid_event_types() -> set[str]:
     """
     from app.core.public_api import core_api
 
-    return set(core_api.events.registered_events()) | {e.value for e in SystemEvent}
+    subscribable = set(core_api.events.registered_events()) | {
+        e.value for e in SystemEvent
+    }
+    return subscribable - NEVER_EMITTED
 
 
 # ---------------------------------------------------------------------------

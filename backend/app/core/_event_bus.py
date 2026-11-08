@@ -164,7 +164,8 @@ class EventBus:
     in a log line and an acknowledgement: it is written to the delivery log
     and the retry worker (``app.core.event_delivery_retry``) runs it again —
     that handler alone — up to ``MAX_HANDLER_ATTEMPTS`` times with doubling
-    backoff, then parks it as ``dead`` and warns the organization's admins.
+    backoff, then parks it as ``dead`` and warns the organization's admins
+    (the instance's superusers for an event of no organization).
 
     **The handler contract.** A handler may run more than once for the same
     event, so it must be idempotent: raise *before* its side effect, or make

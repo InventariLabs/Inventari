@@ -9,6 +9,7 @@ from app.core.contracts import AuditAction, AuditTargetType
 from app.core.db_utils import get_org_owned_or_404_async
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.module_sdk import served_url
 from app.core.public_api import core_api
 from app.core.upload_validation import (
     ATTACHMENT_CONTENT_TYPES,
@@ -35,6 +36,17 @@ ATTACHMENT_POLICY = UploadPolicy(
 )
 
 VALID_FILE_TYPES = {'INVOICE', 'WARRANTY', 'PHOTO', 'MANUAL', 'OTHER'}
+
+
+def _served_address(org_id: UUID, file_path: str) -> str:
+    """The address a client loads the file from: the app's own ``/uploads/``.
+
+    Never the backend's: on S3 that is a bare bucket URL, which bypasses the
+    ownership check of the upload route, and which a client keeps after the
+    files have moved. The route resolves this family through
+    ``EquipmentAttachmentResolver``.
+    """
+    return str(served_url(f'{org_id}/equipment/{file_path}'))
 
 
 async def upload_attachment(
@@ -76,9 +88,7 @@ async def upload_attachment(
     await core_api.file_storage.save_for_org_async(
         org_id, 'equipment', file_path, file_content, accepted.stored_type
     )
-    url = await core_api.file_storage.get_url_for_org_async(
-        org_id, 'equipment', file_path
-    )
+    url = _served_address(org_id, file_path)
 
     attachment = EquipmentAttachment(
         organization_id=org_id,
@@ -133,11 +143,9 @@ async def list_attachments(
 
     result = []
     for row in rows:
-        try:
-            url = await core_api.file_storage.get_url_for_org_async(
-                org_id, 'equipment', row.file_path
-            )
-        except FileNotFoundError:
+        if not await core_api.file_storage.exists_for_org_async(
+            org_id, 'equipment', row.file_path
+        ):
             # A row written before the org-scoped move keeps the path it had
             # then (``equipment/<item_id>/<file>``): the scoped read resolves
             # it under a ``<org>/equipment/`` prefix that never existed, and
@@ -161,7 +169,7 @@ async def list_attachments(
                 file_type=row.file_type,
                 content_type=row.content_type,
                 size_bytes=row.size_bytes,
-                url=url,
+                url=_served_address(org_id, row.file_path),
                 uploaded_by=row.uploaded_by,
                 created_at=row.created_at,
             )

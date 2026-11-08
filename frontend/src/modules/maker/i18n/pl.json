@@ -246,7 +246,7 @@
       "cost": "Koszt i wynik",
       "history": "Historia"
     },
-    "sourceRecipe": "Na podstawie przepisu (migawka z {{date}})",
+    "sourceRecipe": "Na podstawie receptury (migawka z {{date}})",
     "setAsDefault": "Ustaw jako domyślną",
     "setDefaultSuccess": "Domyślna receptura ustawiona",
     "setDefaultFailed": "Nie udało się ustawić domyślnej receptury",

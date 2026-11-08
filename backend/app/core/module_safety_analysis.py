@@ -62,7 +62,6 @@ from app.core.module_safety import (
     MODULE_IMPORT_SURFACE,
     REPO_SHIPPED_MODULES,
     SHIPPED_ONLY_OBJECTS,
-    SUSPICIOUS_IMPORTS,
     TRUSTED_SHIPPED_MODULES,
 )
 
@@ -76,7 +75,6 @@ _POLICY_VERSION = repr(
     (
         sorted(FORBIDDEN_IMPORT_PREFIXES),
         sorted(FORBIDDEN_CALLS),
-        sorted(SUSPICIOUS_IMPORTS),
         sorted((k, sorted(v)) for k, v in CAPABILITY_MAP.items()),
         sorted((k, sorted(v)) for k, v in CORE_EXEMPTIONS.items()),
         sorted(TRUSTED_SHIPPED_MODULES),
@@ -168,13 +166,23 @@ def _imported_names(
 
     base = _absolute_base(node, package)
     names = [base]
-    if base and not base.startswith(FORBIDDEN_IMPORT_PREFIXES):
+    if base and not _is_forbidden(base):
         names += [
             f'{base}.{alias.name}'
             for alias in node.names
-            if f'{base}.{alias.name}'.startswith(FORBIDDEN_IMPORT_PREFIXES)
+            if _is_forbidden(f'{base}.{alias.name}')
         ]
     return names
+
+
+def _is_forbidden(name: str) -> bool:
+    """Whether *name* is a ``FORBIDDEN_IMPORT_PREFIXES`` entry or inside one.
+
+    Bounded by the dot, as the capability map is (``_names_module``): a bare
+    prefix match refused ``socketserver`` as ``socket`` and
+    ``subprocess_tee`` as ``subprocess``.
+    """
+    return any(_names_module(name, banned) for banned in FORBIDDEN_IMPORT_PREFIXES)
 
 
 def _absolute_module(node: ast.ImportFrom, rel_path: Path) -> str | None:
@@ -413,7 +421,7 @@ def _app_references(tree: ast.AST, rel_path: Path) -> list[_AppReference]:
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name.startswith(FORBIDDEN_IMPORT_PREFIXES):
+                if _is_forbidden(alias.name):
                     continue
                 root = alias.name.split('.')[0]
                 bindings.setdefault(alias.asname or root, set()).add(
@@ -425,7 +433,7 @@ def _app_references(tree: ast.AST, rel_path: Path) -> list[_AppReference]:
                 continue
             for alias in node.names:
                 target = f'{base}.{alias.name}'
-                if node.level == 0 and target.startswith(FORBIDDEN_IMPORT_PREFIXES):
+                if node.level == 0 and _is_forbidden(target):
                     continue
                 if alias.name != '*':
                     bindings.setdefault(alias.asname or alias.name, set()).add(target)
@@ -788,6 +796,36 @@ def on_module_import_surface(name: str, module_name: str) -> bool:
     return any(name == prefix or name.startswith(prefix + '.') for prefix in allowed)
 
 
+def _stays_on_the_surface(
+    node: ast.Import | ast.ImportFrom,
+    name: str,
+    module_name: str,
+    required_modules: Collection[str],
+) -> bool:
+    """Whether an ``app.`` import *name* reaches only what the module may reach.
+
+    ``from app.core import module_sdk`` names ``app.core``, which is off the
+    surface, and binds ``app.core.module_sdk``, which is on it — the module
+    ``import app.core.module_sdk`` binds. So a ``from`` import whose package is
+    off the surface is judged by what each of its names binds; one name off
+    the surface refuses the statement, under the package's name. A declared
+    door reads the same way (``from app.modules.warehouse import
+    warehouse_api``), as the lint's frozen list already did for a shipped
+    module.
+    """
+
+    def allowed(dotted: str) -> bool:
+        return on_module_import_surface(dotted, module_name) or is_declared_module_door(
+            dotted, required_modules
+        )
+
+    if allowed(name):
+        return True
+    return isinstance(node, ast.ImportFrom) and all(
+        allowed(f'{name}.{alias.name}') for alias in node.names
+    )
+
+
 def is_declared_module_door(name: str, required_modules: Collection[str]) -> bool:
     """Whether *name* is the public API of a shipped module the manifest requires.
 
@@ -799,8 +837,9 @@ def is_declared_module_door(name: str, required_modules: Collection[str]) -> boo
     repository ships (its code was reviewed here; another installed module's
     was not), and only for a module that lists ``<m>`` under ``requires`` —
     the dependency is a written decision, the way the frozen list is one for
-    a shipped module. The rest of that module's tree stays closed, and so
-    does its package (``from app.modules.warehouse import warehouse_api``).
+    a shipped module. The rest of that module's tree stays closed; the
+    package spelling of the door itself (``from app.modules.warehouse import
+    warehouse_api``) is the same door (``_stays_on_the_surface``).
     """
     parts = name.split('.')
     if len(parts) != 4 or parts[:2] != ['app', 'modules']:
@@ -852,7 +891,7 @@ def _scan_import(
         if base_import in exemptions or name in exemptions:
             continue
 
-        if name.startswith(FORBIDDEN_IMPORT_PREFIXES):
+        if _is_forbidden(name):
             # A trusted shipped module may reach internal 'app.' resources;
             # third-party bans (subprocess, socket, ...) still apply to it.
             # The set is the shipped directories, not every name that ever
@@ -878,8 +917,7 @@ def _scan_import(
         if (
             module_name not in REPO_SHIPPED_MODULES
             and (name == 'app' or name.startswith('app.'))
-            and not on_module_import_surface(name, module_name)
-            and not is_declared_module_door(name, required_modules)
+            and not _stays_on_the_surface(node, name, module_name, required_modules)
         ):
             findings.append(
                 SafetyFinding(
@@ -898,11 +936,6 @@ def _scan_import(
                 )
             )
             continue
-
-        if base_import in SUSPICIOUS_IMPORTS or name in SUSPICIOUS_IMPORTS:
-            logger.debug(
-                'Suspicious import %s found, delegating to capability map.', name
-            )
 
         for cap, triggers in CAPABILITY_MAP.items():
             if any(_names_module(name, t) for t in triggers):

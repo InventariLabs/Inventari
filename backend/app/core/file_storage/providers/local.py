@@ -9,6 +9,7 @@ from pathlib import Path
 
 from app.core.logging import get_logger
 
+from ..errors import StoredFileNotFoundError
 from .base import FileInfo, StorageProvider
 
 logger = get_logger(__name__)
@@ -81,7 +82,7 @@ class LocalStorageProvider(StorageProvider):
         full_path = self._get_full_path(file_path)
 
         if not full_path.exists():
-            raise FileNotFoundError(f'File not found: {file_path}')
+            raise StoredFileNotFoundError(f'File not found: {file_path}')
 
         def _read() -> BytesIO:
             with open(full_path, 'rb') as f:
@@ -95,7 +96,7 @@ class LocalStorageProvider(StorageProvider):
         full_path = self._get_full_path(file_path)
 
         if not full_path.exists():
-            raise FileNotFoundError(f'File not found: {file_path}')
+            raise StoredFileNotFoundError(f'File not found: {file_path}')
 
         def _delete() -> None:
             full_path.unlink()
@@ -119,10 +120,10 @@ class LocalStorageProvider(StorageProvider):
         """
         Get URL to file. For local storage, returns a relative path URL.
 
-        In production, use a reverse proxy (Nginx/Caddy) to serve /uploads/*
+        The address is the app's own ``/uploads/<path>`` route, which checks
+        who owns the file before it serves a byte (``app/api/uploads.py``).
         """
         if not await self.exists(file_path):
-            raise FileNotFoundError(f'File not found: {file_path}')
+            raise StoredFileNotFoundError(f'File not found: {file_path}')
 
-        # Return relative URL (assumes reverse proxy serves /uploads/)
         return f'/uploads/{file_path}'

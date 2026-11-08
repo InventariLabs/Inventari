@@ -301,6 +301,41 @@ def test_a_nested_schema_may_not_declare_the_reserved_stamp_key() -> None:
         validate_payload_against_schema({'inner': {}}, schema)
 
 
+@pytest.mark.parametrize(
+    'schema',
+    [
+        {
+            'type': 'object',
+            'properties': {
+                'inner': {
+                    'type': 'object',
+                    'properties': {'__schema_version': {'type': 'integer'}},
+                }
+            },
+        },
+        {
+            'type': 'object',
+            'properties': {
+                'rows': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {'__schema_version': {'type': 'integer'}},
+                    },
+                }
+            },
+        },
+    ],
+    ids=['nested object', 'array of objects'],
+)
+def test_the_reserved_key_is_refused_wherever_the_schema_declares_it(schema) -> None:
+    """Refused only when the payload reached that level, a declaration was
+    accepted while the object was absent — and its value silently dropped on
+    the first save that carried it."""
+    with pytest.raises(ContractViolationError, match='reserved'):
+        validate_payload_against_schema({}, schema)
+
+
 def test_the_stamp_key_in_a_payload_is_ignored_not_refused() -> None:
     schema = {
         'type': 'object',

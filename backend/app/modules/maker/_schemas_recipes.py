@@ -269,7 +269,7 @@ class MakerSettingsRead(BaseModel):
     reference_direction: ReferenceDirection
     allow_overproduction: bool = True
     availability_check_scope: AvailabilityCheckScope = 'GLOBAL'
-    create_on_shortage_strategy: CreateOnShortageStrategy = 'ALLOW'
+    create_on_shortage_strategy: CreateOnShortageStrategy = 'WARN'
     created_at: datetime
     updated_at: datetime
 

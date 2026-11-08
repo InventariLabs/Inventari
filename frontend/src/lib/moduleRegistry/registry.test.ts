@@ -29,7 +29,7 @@ describe("ModuleRegistry.warnOrphanedNav", () => {
       routes: [{ path: "/things/:id", component: Page }],
       moduleNav: {
         basePath: "/things",
-        items: [{ path: "42", labelKey: "x", icon: Home }],
+        items: [{ path: "/things/42", labelKey: "x", icon: Home }],
       },
     });
     moduleRegistry.warnOrphanedNav([name]);
@@ -47,7 +47,7 @@ describe("ModuleRegistry.warnOrphanedNav", () => {
       moduleNav: {
         basePath: "/things",
         // Two segments against a one-segment pattern: not the same route.
-        items: [{ path: "42/extra", labelKey: "x", icon: Home }],
+        items: [{ path: "/things/42/extra", labelKey: "x", icon: Home }],
       },
     });
     moduleRegistry.warnOrphanedNav([name]);
@@ -55,6 +55,26 @@ describe("ModuleRegistry.warnOrphanedNav", () => {
     expect(warn).toHaveBeenCalledTimes(1);
     expect(String(warn.mock.calls[0][0])).toContain(name);
     expect(String(warn.mock.calls[0][0])).toContain("/things/42/extra");
+  });
+
+  it("names a nav item whose path is not absolute, which the shell links as written", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const name = unique("relativenav");
+
+    moduleRegistry.register({
+      name,
+      routes: [{ path: "/things", component: Page }],
+      moduleNav: {
+        basePath: "/things",
+        // Read against the base, "" was "/things" and passed; the shell's
+        // <Link to=""> stays on whatever page is open.
+        items: [{ path: "", labelKey: "x", icon: Home }],
+      },
+    });
+    moduleRegistry.warnOrphanedNav([name]);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toContain("not absolute");
   });
 
   it("stays quiet about a nav item that is hidden because the module it needs is off", () => {

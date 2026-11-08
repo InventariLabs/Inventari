@@ -234,7 +234,7 @@ Backend: `api_keys`, `approvals`, `equipment`, `example_widgets`, `maker`, `nutr
 
 ## 19. Every Day and Month a Report Cuts Is the Organization's
 
-**Decision:** Anything that decides *which day it is* or *which month a figure belongs to* reads the organization's clock — `core_api.organizations.today_async`, `.timezone_async`, `.window_start_async` — never the server's `date.today()`. That covers the core read-models, the equipment warranty and maintenance alerts, the depreciation reference date, the maker module's monthly result (a run's number takes its year from the document numbering register, which reads it in UTC). `compute_book_value` takes `as_of` as a required argument for the same reason: a default of "today" is a default of "the server's today", and nothing on the screen says so.
+**Decision:** Anything that decides *which day it is* or *which month a figure belongs to* reads the organization's clock — `core_api.organizations.today_async`, `.timezone_async`, `.window_start_async` — never the server's `date.today()`. That covers the core read-models, the equipment warranty and maintenance alerts, the depreciation reference date, the maker module's monthly result, and the year in the number of a document that has no date of its own — a production run among them. `compute_book_value` takes `as_of` as a required argument for the same reason: a default of "today" is a default of "the server's today", and nothing on the screen says so.
 
 Timestamps written to the row (`created_at`, `completed_at`, `checked_in_at`) stay UTC instants. The clock decides how an instant is *read*, not how it is stored.
 

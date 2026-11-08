@@ -21,6 +21,7 @@ from uuid import UUID
 # FileStorageService uses __new__-based singleton; calling FileStorageService()
 # in each method is safe and always returns the same initialised instance.
 from app.core.demo_upload_cap import demo_upload_admission
+from app.core.file_storage.errors import StorageError
 from app.core.file_storage.service import FileStorageService
 from app.core.logging import get_logger
 
@@ -35,9 +36,20 @@ class CoreFileStorageAPI:
         """Build an org+module-scoped path: ``<org>/<module>/<file_path>``.
 
         Strips any leading ``/`` from *file_path* so the prefix is always
-        enforced regardless of caller input.
+        enforced regardless of caller input, and refuses a ``..`` segment:
+        the local backend resolves the path on disk, where every
+        organization's files share one base directory, so a remainder that
+        climbs out of the prefix would land in somebody else's namespace.
+
+        Raises:
+            StorageError: *file_path* has a ``..`` segment — a programming
+                error of the caller, which builds the path from its own ids.
         """
         clean = file_path.lstrip('/')
+        if '..' in clean.split('/'):
+            raise StorageError(
+                f'A stored path may not climb out of its namespace: {file_path}'
+            )
         return f'{organization_id}/{module_name}/{clean}'
 
     async def save_for_org_async(

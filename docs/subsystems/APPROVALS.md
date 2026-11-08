@@ -129,8 +129,15 @@ profile that demands approval with **no active workflow** is a configuration
 error: confirming raises `documents_approval_workflow_missing` instead of
 sailing through. With the approvals module switched off, the whole control
 stands down — its check is not asked, its hold does not stand, nothing parks,
-nothing is refused. Cancelling or deleting a document withdraws its open
-request (`on_withdrawn`).
+nothing is refused. A document parked before the module went off is worked
+as the confirmed document it was: its read carries `hold_stood_down: true`,
+and a completion, the one-step press and a scanning session go through on
+it. The door that starts the work takes the hold off — the document is
+CONFIRMED again, with an entry in the journal — and withdraws the request it
+waited on (`on_withdrawn`), so a module switched back on does not ask about
+work already under way. A document nobody touches is left as it is, and
+switching the module back on finds it in the queue. Cancelling or deleting
+a document withdraws its open request (`on_withdrawn`) too.
 
 ## Whose submissions a workflow holds
 

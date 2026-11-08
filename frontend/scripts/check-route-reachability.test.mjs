@@ -11,6 +11,7 @@ import {
   isCovered,
   pathsIn,
   referencesIn,
+  relativeNavPaths,
   settingsInstanceGaps,
   settingsInstances,
   sliceBlock,
@@ -104,6 +105,10 @@ moduleRegistry.register({
     const nav = sliceBlock(MODULE, "moduleNav");
     expect(nav).toMatch(/basePath: "\/warehouse"/);
     expect(pathsIn(sliceBlock(nav, "items"))).toEqual(["/warehouse", ""]);
+  });
+
+  it("names a nav item path that is not absolute, which links nowhere", () => {
+    expect(relativeNavPaths(MODULE)).toEqual([""]);
   });
 
   it("returns null for a key the module does not declare", () => {

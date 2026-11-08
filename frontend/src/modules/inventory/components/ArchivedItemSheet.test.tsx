@@ -72,7 +72,7 @@ describe("ArchivedItemSheet", () => {
     // The stored reason is a vocabulary code; the sheet shows its word.
     expect(
       screen.getByText(
-        (_, el) => el?.textContent?.trim() === "Reason for deletion: Used",
+        (_, el) => el?.textContent?.trim() === "Reason for deletion: Consumed",
       ),
     ).toBeInTheDocument();
   });

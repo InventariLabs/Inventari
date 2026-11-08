@@ -34,7 +34,8 @@ from ._wms_line_utils import (
 )
 from ._wms_session_ops import load_document_async
 from .document_pdf_service import generate_pick_list_pdf_async
-from .models import Document, DocumentLine, DocumentStatus, WmsPickLine, WmsPickSession
+from .models import Document, DocumentLine, WmsPickLine, WmsPickSession
+from .pre_post_checks import works_as_confirmed_async
 
 
 def _row(
@@ -166,7 +167,7 @@ async def dispatch_pick_list_async(
     doc = await load_document_async(db, org_id, document_id, confirmed_only=False)
     if doc is None:
         raise EntityNotFoundError('document')
-    if doc.status != DocumentStatus.CONFIRMED.value:
+    if not await works_as_confirmed_async(db, org_id, doc):
         raise ServiceRejectionError(
             'wms_pick_document_not_confirmed', number=doc.number
         )

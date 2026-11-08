@@ -122,11 +122,11 @@ The signature (`X-Inventari-Signature-256`) covers the **body only**; no header
 is signed. A receiver that wants replay protection therefore reads `timestamp`
 from the signed body — after verifying the signature, never before — and
 refuses a delivery whose timestamp is older than the window it accepts. A
-retry resends the stored body — same `delivery_id`, same `timestamp`, same
-content (the body is kept as JSONB, so its keys may come back in another order
-and the signature, computed over the bytes actually sent, can differ from the
-first attempt's) — which means a retry made after the backoff (up to an hour)
-can arrive older than a short window. A receiver with a
+retry resends the stored body — same `delivery_id`, same `timestamp`, the
+same bytes and so the same signature: the body is written with its keys
+sorted on every attempt, so the JSONB copy the retry reads back gives the
+bytes the first attempt sent — which means a retry made after the backoff (up
+to an hour) can arrive older than a short window. A receiver with a
 tight window should dedup by `delivery_id` first and treat a stale timestamp
 on an id it has not processed as "late", not as "forged".
 

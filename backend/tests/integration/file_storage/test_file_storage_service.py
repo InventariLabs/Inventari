@@ -4,6 +4,7 @@ import io
 
 import pytest
 
+from app.core.file_storage.errors import StorageError
 from app.core.file_storage.providers import (
     LocalStorageProvider,
 )
@@ -40,6 +41,20 @@ class TestLocalStorageProvider:
         """Test retrieving non-existent file."""
         with pytest.raises(FileNotFoundError):
             await temp_storage.get('nonexistent.txt')
+
+    @pytest.mark.asyncio
+    async def test_a_missing_file_is_a_storage_error_as_well(self, temp_storage):
+        """Both handlers a caller may write catch a missing file.
+
+        Every caller in the codebase catches the built-in
+        ``FileNotFoundError``; the storage contract offers ``StorageError`` as
+        the one handler for every storage failure. A missing file has to be
+        both, or the generic handler lets the commonest failure through.
+        """
+        for call in (temp_storage.get, temp_storage.delete, temp_storage.get_url):
+            with pytest.raises(FileNotFoundError) as caught:
+                await call('nonexistent.txt')
+            assert isinstance(caught.value, StorageError), call.__name__
 
     @pytest.mark.asyncio
     async def test_exists(self, temp_storage):

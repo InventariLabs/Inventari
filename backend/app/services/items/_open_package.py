@@ -271,7 +271,8 @@ async def _log_opened(
     if target.id != source.id:
         details['split_from'] = str(source.id)
     if left is not None:
-        details['left'] = float(left)
+        # The exact digits, as every quantity in the history (AUDIT.md).
+        details['left'] = str(left)
         if left_unit:
             details['left_unit'] = left_unit
     await db.flush()
