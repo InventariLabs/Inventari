@@ -298,7 +298,7 @@ the revisions are listed by what they would hold up there.
 - *Core chain, harmless at any size:* `itemtypes01`, `fknames01` and `locnames02`
   (catalog-only changes or tables that stay small), `locnames01` (touches only the
   duplicate names), `fieldwords01` (`categories`), `itemimportjob01`,
-  `ledgertotals01`.
+  `ledgertotals01`, `ledgertotals03` (replaces a trigger function).
 - *Module chains:* `doc_register_pagination01` (`documents`) and
   `doc_list_reads01` (`document_lines`) index tables that grow with every
   document, and `doc_line_unit_backfill01` rewrites `document_lines` in one
