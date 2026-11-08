@@ -39,7 +39,10 @@ def _write_module(tmp_path: Path, name: str, **manifest_fields) -> Path:
             {
                 'name': name,
                 'version': '0.1.0',
-                'module_type': 'official',
+                # Community: a directory the repository does not ship that
+                # claims more is refused for the claim (manifest_refusal),
+                # whatever its floor says.
+                'module_type': 'community',
                 **manifest_fields,
             }
         ),

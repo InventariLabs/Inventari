@@ -23,20 +23,29 @@ from app.core.module_safety_analysis import (
     _is_test_file,
     analyze_module_safety,
 )
+from app.core.module_validator import manifest_refusal
 from app.i18n import MAINTAINED_LANGUAGES
 
 logger = get_logger(__name__)
 
 
 def validate_manifest(module_dir: Path) -> list[str]:
-    """Validate manifest.json using the shared Pydantic schema."""
+    """Validate manifest.json the way module discovery reads it.
+
+    The schema, then the refusals discovery makes from a manifest it could
+    read — the name against the directory, the platform floor and the trust
+    title — from the function discovery itself calls. ``module install`` and
+    ``module upgrade`` run this over the files they just copied, so a package
+    they accept is one the next start loads.
+    """
     try:
-        ModuleManifest.load(module_dir)
-        return []
+        manifest = ModuleManifest.load(module_dir)
     except FileNotFoundError:
         return [f'{module_dir.name}: missing manifest.json']
     except (OSError, TypeError, ValueError) as exc:
         return [f'{module_dir.name}: invalid manifest.json ({exc})']
+    refusal = manifest_refusal(module_dir, manifest)
+    return [f'{module_dir.name}: {refusal}'] if refusal else []
 
 
 def validate_manifest_icon(module_dir: Path) -> list[str]:
@@ -358,6 +367,10 @@ def validate_i18n(module_dir: Path) -> list[tuple[str, str]]:
 
 
 def get_module_dirs(base_path: Path, module_name: str | None) -> list[Path]:
+    """The module directories under *base_path*: an installed backend
+    (``manifest.json``) or a package as an author ships it (``module.yaml``
+    beside ``backend/``), which the caller lays out first
+    (``module_packaging.stage_package_backend``)."""
     if module_name:
         module_dir = base_path / module_name
         return [module_dir] if module_dir.exists() else []
@@ -368,5 +381,8 @@ def get_module_dirs(base_path: Path, module_name: str | None) -> list[Path]:
         if module_dir.is_dir()
         and not module_dir.name.startswith('_')
         and any(module_dir.iterdir())
-        and (module_dir / 'manifest.json').exists()
+        and (
+            (module_dir / 'manifest.json').exists()
+            or (module_dir / 'module.yaml').exists()
+        )
     ]

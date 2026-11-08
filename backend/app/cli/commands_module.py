@@ -294,104 +294,167 @@ def create(module_name: str = typer.Argument(..., help='Name of the new module')
     create_module(module_name)
 
 
-@module_app.command()
-def validate(
-    module: str | None = typer.Option(
-        None, help='Validate only a single module by directory name'
-    ),
-    base_path: str = typer.Option('app/modules', help='Path to modules directory'),
-    allow_core: bool = typer.Option(
-        False, '--allow-core', help='Allow safety violations for core modules'
-    ),
-):
-    """Validate module manifest and import safety rules."""
+def _validate_module_dir(
+    module_dir: Path,
+    *,
+    allow_core: bool,
+    errors: list[str],
+    warnings: list[str],
+) -> bool:
+    """Run every check on one module directory; ``True`` when none failed."""
     from app.cli._module_meta import _reserved_name_refusal
     from app.cli.module_validator import (
-        get_module_dirs,
         skipped_paths,
         validate_deprecated_core_api,
         validate_i18n,
-        validate_importable,
         validate_manifest,
         validate_manifest_icon,
         validate_permission_actions,
         validate_safety,
     )
     from app.core._registry_class import REPO_MODULES_ROOT
+    from app.core.module_manifest_schema import ModuleManifest
+
+    errors_before = len(errors)
+
+    declared_caps: list[str] = []
+    try:
+        manifest = ModuleManifest.load(module_dir)
+        declared_caps = [str(c) for c in manifest.capabilities]
+    except (FileNotFoundError, ValueError, TypeError, json.JSONDecodeError) as exc:
+        logger.warning(
+            'manifest.json unreadable for %s; declared_caps left empty',
+            module_dir,
+            exc_info=exc,
+        )
+
+    # As at discovery, a directory is the repository's own only when it IS
+    # the repository's path, never a same-named directory somewhere else.
+    repo_dir = REPO_MODULES_ROOT / module_dir.name
+    own = repo_dir.exists() and repo_dir.resolve() == module_dir.resolve()
+    # --allow-core spares the scan to the modules this repository ships and
+    # nothing else: a switch that skips it for whatever directory is named
+    # turns the gate an author runs before install into a pass for anything.
+    skip_scan = allow_core and own and module_dir.name in REPO_SHIPPED_MODULES
+    if allow_core and not skip_scan:
+        warnings.append(
+            f'{module_dir.name}: --allow-core covers only the modules this '
+            f'repository ships; the safety scan ran'
+        )
+
+    errors.extend(validate_manifest(module_dir))
+    if not skip_scan:
+        errors.extend(validate_safety(module_dir, declared_caps))
+
+    # The installer refuses a name the core answers to; saying so here
+    # spares the author a module written around it. As at discovery, the
+    # repository's own directories keep their names.
+    if not own:
+        refusal = _reserved_name_refusal(module_dir.name)
+        if refusal is not None:
+            errors.append(refusal)
+
+    # i18n completeness. `validate_i18n` decides from module_type: missing
+    # pl/de/fr/es is an error for core/official and no finding at all for
+    # community, so a community module shipping only en.json passes clean.
+    for severity, message in validate_i18n(module_dir):
+        (errors if severity == 'error' else warnings).append(message)
+
+    # A symlink ends the scan's walk where it points outside the tree, and a
+    # dangling one points nowhere at all, so "clean" would be a report over a
+    # tree nobody read. Each unread shape is named for what it is instead;
+    # links resolved inside the tree are content the walk already read and
+    # are not reported.
+    for skipped in skipped_paths(module_dir):
+        warnings.append(f'{module_dir.name}: not read (symlink): {skipped}')
+
+    # Usage of a method the register retires is a migration debt with a
+    # deadline, not a refusal: the module works until the removal, and the
+    # report is what tells the author to move (warnings only).
+    warnings.extend(validate_deprecated_core_api(module_dir))
+    warnings.extend(validate_manifest_icon(module_dir))
+    warnings.extend(validate_permission_actions(module_dir))
+
+    return len(errors) == errors_before
+
+
+def _laid_out(
+    found: list[Path], staging: Path, errors: list[str], warnings: list[str]
+) -> list[Path]:
+    """The directories to check: an installed backend as it is, and a
+    package as ``module install`` would land its backend."""
+    from app.cli.module_packaging import stage_package_backend
+
+    dirs: list[Path] = []
+    for directory in sorted(found):
+        if not (directory / 'module.yaml').exists():
+            dirs.append(directory)
+            continue
+        try:
+            staged = stage_package_backend(directory, staging)
+        except ValueError as exc:  # OperatorError: what the installer refuses too
+            errors.append(f'{directory.name}: {exc}')
+            continue
+        if staged is None:
+            warnings.append(
+                f'{directory.name}: the package declares no backend, so there is '
+                f'nothing for module discovery to load'
+            )
+            continue
+        dirs.append(staged)
+    return dirs
+
+
+@module_app.command()
+def validate(
+    module: str | None = typer.Option(
+        None,
+        help=(
+            'Validate only a single module by directory name: an installed '
+            'backend, or a package (module.yaml with backend/ beside it)'
+        ),
+    ),
+    base_path: str = typer.Option('app/modules', help='Path to modules directory'),
+    allow_core: bool = typer.Option(
+        False,
+        '--allow-core',
+        help='Skip the safety scan for the modules this repository ships',
+    ),
+):
+    """Validate module manifest and import safety rules."""
+    import tempfile
+
+    from app.cli.module_validator import get_module_dirs, validate_importable
 
     path = Path(base_path)
     if not path.exists():
         console.print(f'[red]Modules path does not exist: {path}[/]')
         raise typer.Exit(code=1)
 
-    module_dirs = get_module_dirs(path, module)
-    if module and not module_dirs:
+    found = get_module_dirs(path, module)
+    if module and not found:
         console.print(f'[red]Module not found: {module}[/]')
         raise typer.Exit(code=1)
 
     all_errors: list[str] = []
     all_warnings: list[str] = []
-    admitted: list[Path] = []
-    for module_dir in sorted(module_dirs):
-        from app.core.module_manifest_schema import ModuleManifest
-
-        errors_before = len(all_errors)
-
-        declared_caps: list[str] = []
-        try:
-            manifest = ModuleManifest.load(module_dir)
-            declared_caps = [str(c) for c in manifest.capabilities]
-        except (FileNotFoundError, ValueError, TypeError, json.JSONDecodeError) as exc:
-            logger.warning(
-                'manifest.json unreadable for %s; declared_caps left empty',
+    with tempfile.TemporaryDirectory(prefix='inventari_validate_') as staging:
+        admitted: list[Path] = []
+        for module_dir in _laid_out(found, Path(staging), all_errors, all_warnings):
+            if _validate_module_dir(
                 module_dir,
-                exc_info=exc,
-            )
+                allow_core=allow_core,
+                errors=all_errors,
+                warnings=all_warnings,
+            ):
+                admitted.append(module_dir)
 
-        manifest_errors = validate_manifest(module_dir)
-        safety_errors = [] if allow_core else validate_safety(module_dir, declared_caps)
-
-        all_errors.extend(manifest_errors)
-        all_errors.extend(safety_errors)
-
-        # The installer refuses a name the core answers to; saying so here
-        # spares the author a module written around it. As at discovery,
-        # the repository's own directories keep their names.
-        repo_dir = REPO_MODULES_ROOT / module_dir.name
-        if not (repo_dir.exists() and repo_dir.resolve() == module_dir.resolve()):
-            refusal = _reserved_name_refusal(module_dir.name)
-            if refusal is not None:
-                all_errors.append(refusal)
-
-        # i18n completeness. `validate_i18n` decides from module_type: missing
-        # pl/de/fr/es is an error for core/official and no finding at all for
-        # community, so a community module shipping only en.json passes clean.
-        for severity, message in validate_i18n(module_dir):
-            (all_errors if severity == 'error' else all_warnings).append(message)
-
-        if len(all_errors) == errors_before:
-            admitted.append(module_dir)
-
-        # A symlink ends the scan's walk where it points outside the tree,
-        # and a dangling one points nowhere at all, so "clean" would be a
-        # report over a tree nobody read. Each unread shape is named for
-        # what it is instead; links resolved inside the tree are content
-        # the walk already read and are not reported.
-        for skipped in skipped_paths(module_dir):
-            all_warnings.append(f'{module_dir.name}: not read (symlink): {skipped}')
-
-        # Usage of a method the register retires is a migration debt with a
-        # deadline, not a refusal: the module works until the removal, and
-        # the report is what tells the author to move (warnings only).
-        all_warnings.extend(validate_deprecated_core_api(module_dir))
-        all_warnings.extend(validate_manifest_icon(module_dir))
-        all_warnings.extend(validate_permission_actions(module_dir))
-
-    # Last, and once for every module the checks above admitted: it starts
-    # an interpreter, and it is the only check that sees a package discovery
-    # will reject on import. Importing runs the package, so a module refused
-    # above — by the safety scan above all — is never imported here.
-    all_errors.extend(validate_importable(admitted))
+        # Last, and once for every module the checks above admitted: it
+        # starts an interpreter, and it is the only check that sees a package
+        # discovery will reject on import. Importing runs the package, so a
+        # module refused above — by the safety scan above all — is never
+        # imported here.
+        all_errors.extend(validate_importable(admitted))
 
     for warning in all_warnings:
         console.print(f'[yellow]![/] {warning}')

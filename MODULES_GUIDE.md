@@ -597,7 +597,7 @@ Backend contribution points are registered via `contribution_registry.register(p
 | `category_interceptors` | `CategoryInterceptor` | `_base_module.py`, the same way |
 | `upload_path_resolvers` | `UploadPathResolver` | `/uploads/{path}` serving route — modules own a path family under `/uploads/` and provide ownership metadata (organization, content_type) so the Core route can serve the file safely |
 
-Two more names are accepted as stable points but no backend code reads them, so registering to them reaches nothing: `scan_providers` (register scan providers with `scan_registry.register(provider, priority)` from `app.core.module_sdk`) and `dashboard_widgets` (a dashboard widget is a frontend `slots` registration).
+Every stable point has a reader in the backend, and a test holds it so. A name outside both tables is not a point: registering to it logs a warning naming the known ones, and nothing reads what was registered. That includes `scan_providers` — register scan providers with `scan_registry.register(provider, priority)` from `app.core.module_sdk` — and `dashboard_widgets`, which is a frontend `slots` registration.
 
 **Experimental points** (no consumer yet — may change before stabilization):
 | Point | Type | Status |
@@ -1311,7 +1311,7 @@ Always run the validation script before submitting a module:
 ```bash
 python manage.py module validate --module my_module
 ```
-Use `--allow-core` only if you are working on official core modules.
+`--allow-core` skips the safety scan for the modules this repository ships, and only for those; a module of yours is scanned with it as without it.
 
 ---
 
