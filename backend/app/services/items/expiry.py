@@ -13,9 +13,10 @@ means 15.08 is still fine. It belongs in the expiring-soon bucket instead, so
 it never falls out of both.
 
 Callers pass *today* — the organization's own day, resolved by whichever
-caller has the org and the database in scope. The ``date.today()`` fallback
-is the server's clock and exists only for callers with no organization to
-ask; every real entry point passes the org's day.
+caller has the org and the database in scope. There is no default: a default
+of "today" is the server's today (TECHNICAL_DECISIONS §19), and a caller that
+forgets the organization's day has to fail rather than quietly cut on the
+server's.
 """
 
 from __future__ import annotations
@@ -31,18 +32,16 @@ from app.models.item import Item
 DEFAULT_EXPIRING_SOON_DAYS = 7
 
 
-def is_expired(today: date | None = None) -> ColumnElement[bool]:
+def is_expired(today: date) -> ColumnElement[bool]:
     """Item is past its expiry date. Today's date does not count as expired."""
-    today = today or date.today()
     expiry = Item.effective_expiry_date
     return and_(expiry.isnot(None), expiry < today)
 
 
 def is_expiring_soon(
-    today: date | None = None, days: int = DEFAULT_EXPIRING_SOON_DAYS
+    today: date, days: int = DEFAULT_EXPIRING_SOON_DAYS
 ) -> ColumnElement[bool]:
     """Item expires within the horizon, today included, and is not expired."""
-    today = today or date.today()
     expiry = Item.effective_expiry_date
     return and_(
         expiry.isnot(None),
@@ -51,15 +50,13 @@ def is_expiring_soon(
     )
 
 
-async def expiry_today_async(db: AsyncSession, organization_id: UUID | None) -> date:
+async def expiry_today_async(db: AsyncSession, organization_id: UUID) -> date:
     """The day this organization's expiry horizon is measured from.
 
     Every caller of the two predicates above needs it and each used to
-    resolve it inline. The fallback to the server's clock is for the
-    callers that have no organization to ask.
+    resolve it inline. A caller with no organization has no day to measure
+    from, and nothing to measure either: it answers before asking.
     """
-    if organization_id is None:
-        return date.today()
     from app.services.analytics._common import org_today_async
 
     return await org_today_async(db, organization_id)

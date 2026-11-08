@@ -821,6 +821,11 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             "its stock leaves in is the catalogue's and cannot be changed "
             'for one organization.'
         ),
+        'unit_weight_of_shared_product': (
+            'This product comes from the shared catalogue, so the weight of '
+            "one piece is the catalogue's and cannot be changed for one "
+            'organization.'
+        ),
         'piece_unit_missing_from_catalogue': (
             "This installation's unit catalogue has no piece unit, so "
             "'a quantity of what' has no answer. Name a unit explicitly, or "
@@ -1853,6 +1858,11 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'Ten produkt pochodzi ze wspólnego katalogu, więc kolejność '
             'wydawania jego zapasu należy do katalogu i nie da się jej '
             'zmienić dla jednej organizacji.'
+        ),
+        'unit_weight_of_shared_product': (
+            'Ten produkt pochodzi ze wspólnego katalogu, więc waga jednej '
+            'sztuki należy do katalogu i nie da się jej zmienić dla jednej '
+            'organizacji.'
         ),
         'piece_unit_missing_from_catalogue': (
             'Katalog jednostek tej instalacji nie ma jednostki sztuki, więc '

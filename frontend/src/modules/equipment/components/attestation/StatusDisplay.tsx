@@ -24,7 +24,7 @@ export function StatusDisplay({
   if (status === "CONFIRMED") {
     return (
       <div className="flex flex-col items-center gap-3 text-center py-4">
-        <CheckCircle size={56} className="text-accent-500" />
+        <CheckCircle size={56} className="text-success-500" />
         <h2 className="text-xl font-semibold text-on">
           {t("attestation.public.statusConfirmed")}
         </h2>
@@ -86,7 +86,7 @@ export function StatusDisplay({
   if (status === "PENDING" && closedReason === "assignment_already_returned") {
     return (
       <div className="flex flex-col items-center gap-3 text-center py-4">
-        <CheckCircle size={56} className="text-accent-500" />
+        <CheckCircle size={56} className="text-success-500" />
         <h2 className="text-xl font-semibold text-on">
           {t("attestation.public.statusAssignmentReturned")}
         </h2>

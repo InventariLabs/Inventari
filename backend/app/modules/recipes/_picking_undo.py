@@ -179,7 +179,7 @@ async def undo_pick(
             },
         )
 
-    restored = float(session_item.quantity_consumed or 0)
+    restored = session_item.quantity_consumed or Decimal('0')
     session_item.status = 'pending'
     session_item.item_id = None
     session_item.quantity_consumed = None

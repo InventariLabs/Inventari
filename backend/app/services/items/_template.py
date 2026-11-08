@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.core.db_utils import get_org_owned_or_404
 from app.core.exceptions import NotFoundException, ServiceRejectionError
+from app.core.money import quantise
 from app.core.product_template_metadata import (
     get_template_nutrition,
     set_template_nutrition,
@@ -61,14 +62,19 @@ def _write_card_product_fields(
 
     Only ever an organization's own card: a shared one (``organization_id IS
     NULL``) is shared by everybody, and changing its threshold or unit weight
-    would change them for everybody. A removal strategy the shared card does
-    not already read is refused rather than dropped (:func:`refuse_a_shared_
-    strategy_change`).
+    would change them for everybody. A removal strategy or a unit weight the
+    shared card does not already read is refused rather than dropped
+    (:func:`refuse_a_shared_strategy_change`, :func:`refuse_a_shared_weight_
+    change`).
     """
     if template.organization_id != org_id:
         if 'removal_strategy' in item_data:
             refuse_a_shared_strategy_change(
                 template.removal_strategy, item_data['removal_strategy']
+            )
+        if item_data.get('weight_value') is not None:
+            refuse_a_shared_weight_change(
+                template, item_data['weight_value'], item_data.get('weight_uom_id')
             )
         return
     # A scan's figures belong to the product too: a recipe reads the product,
@@ -147,6 +153,29 @@ def refuse_a_shared_strategy_change(current: str | None, requested: str | None) 
     """
     if (requested or 'FIFO') != (current or 'FIFO'):
         raise ServiceRejectionError('removal_strategy_of_shared_product')
+
+
+def refuse_a_shared_weight_change(
+    card: ProductTemplate, weight_value: Any, weight_uom_id: UUID | None
+) -> None:
+    """Refuse a unit weight a shared product does not already record.
+
+    The weight of one piece is the product's (ADR-015), and a shared product
+    is every organization's, so it is never written for one of them. Dropping
+    the weight answered "Updated" while the card — and every line weight read
+    from it — kept the old one. The weight the card already records is no
+    change: the form posts its whole state, and a weight sent without a unit
+    is read in the card's own.
+    """
+
+    def measure(value: Any, uom_id: UUID | None) -> tuple[Decimal, UUID | None] | None:
+        if value is None:
+            return None
+        return quantise(Decimal(str(value)), 6), uom_id
+
+    requested = measure(weight_value, weight_uom_id or card.weight_uom_id)
+    if requested != measure(card.weight_value, card.weight_uom_id):
+        raise ServiceRejectionError('unit_weight_of_shared_product')
 
 
 async def resolve_template_for_create_async(

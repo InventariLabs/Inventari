@@ -250,8 +250,19 @@ describe("StorageArchiveDialog", () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Fridge A/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /Cold Storage/ })).toBeNull();
-    // A place with places inside it is not a destination for records.
-    expect(screen.queryByRole("button", { name: /Main Warehouse/ })).toBeNull();
+  });
+
+  it("offers a place with places inside it, since records may live in any place", async () => {
+    // ADR-018: a location that has sublocations can hold records directly,
+    // and the archive accepts any target. Leaving such a place out sent the
+    // reader looking for a shelf below it they never wanted.
+    mockSummary(0, 3);
+    renderDialog();
+    await userEvent.click(await screen.findByRole("combobox"));
+
+    expect(
+      await screen.findByRole("button", { name: /^Main Warehouse/ }),
+    ).toBeInTheDocument();
   });
 
   it("names each target by its path, not by its bare name", async () => {

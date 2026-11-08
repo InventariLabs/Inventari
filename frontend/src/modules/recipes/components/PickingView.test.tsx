@@ -277,6 +277,34 @@ describe("PickingView — tapping an ingredient", () => {
       from_checklist: true,
     });
   });
+
+  it("writes the amount taken the reader's way, without the column's padding", async () => {
+    // The API sends a stock quantity as a decimal string, every digit the
+    // column holds; the toast reads it to a person.
+    mockHook.scan.mockResolvedValue({
+      status: "picked",
+      ingredient_name: "Flour",
+      quantity_consumed: "200.000",
+      uom_symbol: "g",
+    });
+    mockHook.state = activeStateWith([
+      makePickingItem({ ingredient_id: "i1", name: "Flour" }),
+    ]);
+    vi.mocked(toast.success).mockClear();
+
+    render(
+      <QueryWrapper>
+        <PickingView {...defaultProps} />
+      </QueryWrapper>,
+    );
+    await userEvent.click(screen.getByText("Flour"));
+
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith(
+        expect.stringMatching(/^Picked 200 g of Flour$/),
+      ),
+    );
+  });
 });
 
 describe("PickingView — the unlinked notice", () => {

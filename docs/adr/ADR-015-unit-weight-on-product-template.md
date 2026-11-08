@@ -2,7 +2,11 @@
 
 ## Status
 
-Accepted — 2026-08-15
+Accepted — 2026-08-15; amended 2026-11-08. A global template is still never
+written to, but a unit weight sent for an item on one is now refused
+(`UNIT_WEIGHT_OF_SHARED_PRODUCT`) rather than dropped with a success, as a
+removal strategy on a shared product already was; the weight the template
+already records is no change.
 
 ## Context
 
@@ -85,8 +89,9 @@ it next to the value.
   the total is computed during response serialisation, where a lazy load runs
   outside the async greenlet. That is one extra batched SELECT on item
   queries.
-- Items on a **global** template cannot record a unit weight; the write is a
-  no-op by design. Such an item needs its own org template first.
+- Items on a **global** template cannot record a unit weight; the write was a
+  no-op by design, and is refused since the 2026-11-08 amendment. Such an item
+  needs its own org template first.
 - Anyone with data in `items.weight` on another environment must capture it
   before upgrading. The downgrade restores the column, not its values.
 

@@ -633,6 +633,7 @@ class ErrorMessages(TypedDict):
     uom_quantity_too_many_decimal_places: str
     piece_unit_missing_from_catalogue: str
     removal_strategy_of_shared_product: str
+    unit_weight_of_shared_product: str
     ai_connection_not_found: str
     ai_connection_still_bound: str
     ai_connection_name_taken: str

@@ -99,7 +99,7 @@ async def consume_for_picking(
     remaining_needed: Decimal,
     user: Any,
     history_changes: dict[str, Any] | None = None,
-) -> tuple[Decimal, float, Decimal | None]:
+) -> tuple[Decimal, Decimal, Decimal | None]:
     """Decrement the item's quantity and record consumption.
 
     ``history_changes`` says why the stock left, in the same place a stock take
@@ -151,7 +151,9 @@ async def consume_for_picking(
             reason=ItemAction.USED.value,
             item_id=scanned_item.id,
         )
-    return consume_qty, float(available) - float(consume_qty), consumed_valuation_rate
+    # What is left is the number just written, not a float subtraction of it:
+    # 0.3 less 0.1 in floats is 0.19999999999999998 of a shelf.
+    return consume_qty, new_quantity, consumed_valuation_rate
 
 
 def record_session_item_consumption(

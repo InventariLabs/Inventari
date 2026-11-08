@@ -135,7 +135,7 @@ def build_picking_response(
     matched_ingredient: RecipeIngredient,
     session_item: PickingSessionItem | None,
     consume_qty: Decimal,
-    remaining_qty: float,
+    remaining_qty: Decimal,
     quantity_to_consume: Decimal,
     session_complete: bool,
     opened_suggestion: Any,
@@ -152,11 +152,11 @@ def build_picking_response(
         status='picked',
         ingredient_id=matched_ingredient.id,
         ingredient_name=matched_ingredient.name,
-        quantity_consumed=float(consume_qty),
+        quantity_consumed=consume_qty,
         uom_symbol=uom_symbol,
         item_remaining_quantity=remaining_qty,
         ingredient_remaining_quantity=(
-            float(ingredient_remaining) if ingredient_remaining > 0 else None
+            ingredient_remaining if ingredient_remaining > 0 else None
         ),
         session_complete=session_complete,
         message=get_error_message(

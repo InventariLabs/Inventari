@@ -230,7 +230,7 @@ def _register_background_jobs(task_scheduler, event_bus) -> None:
         handler=run_archive_retention_once,
         module_name='core',
     )
-    # stock reconciliation — the three-pair drift check, measured on a
+    # stock reconciliation — the two-pair drift check, measured on a
     # cycle so a silent divergence is a number in the log, and a growing
     # one is a warning to the org's admins.
     task_scheduler.register(

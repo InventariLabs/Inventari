@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Coroutine
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 from typing import Any
@@ -415,3 +415,77 @@ class TestARuleWithNoThresholdIsNotSilentlySkipped:
         assert alerts == []
         assert str(rule.id) in caplog.text
         assert 'minimum' in caplog.text.lower()
+
+
+@pytest.mark.unit
+class TestTheReserveIsDatedOnTheOrganizationsDay:
+    """A reserve batch past its date where the organization is covers nothing.
+
+    The reserve search asked the server's ``date.today()`` whether a batch was
+    still good, so an organization a day ahead of the server was offered, as
+    cover for its pick face, a batch that had gone off on its own calendar.
+    """
+
+    @pytest.mark.parametrize(
+        ('days_ahead', 'cover'),
+        [(0, {'reserve': Decimal('40')}), (1, {})],
+        ids=['the-batch-ends-today-there', 'the-batch-ended-yesterday-there'],
+    )
+    def test_the_batch_is_judged_on_the_organizations_today(
+        self, days_ahead: int, cover: dict[str, Decimal]
+    ) -> None:
+        from app.modules.purchase_orders.replenishment_service import (
+            _shortages_async,
+        )
+
+        server_today = date.today()
+        warehouse, pick, reserve, tpl = uuid4(), uuid4(), uuid4(), uuid4()
+        lot = SimpleNamespace(
+            id=uuid4(), status='active', use_by_date=None, expiry_date=server_today
+        )
+        locations = [
+            SimpleNamespace(id=warehouse, parent_id=None, settings=None),
+            SimpleNamespace(id=pick, parent_id=warehouse, settings=None),
+            SimpleNamespace(
+                id=reserve, parent_id=warehouse, settings={'is_reserve': True}
+            ),
+        ]
+        fake = _FakeDB(
+            {
+                tpl: [
+                    _make_quant(quantity=Decimal('3'), storage_location_id=pick),
+                    SimpleNamespace(
+                        quantity=Decimal('40'),
+                        reserved_quantity=Decimal('0'),
+                        location_id=reserve,
+                        lot_id=lot.id,
+                    ),
+                ]
+            }
+        )
+        rule: Any = _make_rule(product_template_id=tpl, storage_location_id=pick)
+        with (
+            patch(
+                'app.core.public_api.core_api.locations.list_async',
+                AsyncMock(return_value=locations),
+            ),
+            patch(
+                'app.core.public_api.core_api.stock.list_lots_async',
+                AsyncMock(return_value=[lot]),
+            ),
+            patch(
+                'app.core.public_api.core_api.stock.list_quants_async',
+                fake._list_quants,
+            ),
+            patch(
+                'app.core.public_api.core_api.organizations.today_async',
+                AsyncMock(return_value=server_today + timedelta(days=days_ahead)),
+            ),
+        ):
+            shortages, _, _ = _run(_shortages_async(MagicMock(), uuid4(), [rule]))
+
+        names = {reserve: 'reserve'}
+        assert [
+            {names[place]: qty for place, qty in shortage.by_location.items()}
+            for shortage in shortages
+        ] == [cover]
