@@ -202,7 +202,6 @@ export function StorageArchiveDialog({
           value={targetId ?? ""}
           onChange={(id) => setTargetId(id || null)}
           excludeSubtreeOf={[storageId]}
-          leavesOnly
           clearable
           clearLabel={t("locations:edit.archiveTargetNone")}
           placeholder={t("locations:edit.archiveTargetNone")}
