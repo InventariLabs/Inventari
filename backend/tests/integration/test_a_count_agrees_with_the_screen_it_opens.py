@@ -231,24 +231,32 @@ def _flatten(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def test_a_place_counts_the_records_its_products_tab_lists(
     read, hide_module_data: bool
 ) -> None:
-    """The tree, the place cards and the overview's places, against the place.
+    """The tree, the place cards, the overview and a Contents row, against the place.
 
-    Each of them prints ``subtree_items_count`` and opens the place, whose
-    Products tab lists the records standing on it and, with "Include
-    locations inside" ticked, the records of every place below it as well.
+    The first three read ``GET /locations/tree`` and a row of a place's
+    Contents tab reads ``GET /locations?parent_id=``. Each prints
+    ``subtree_items_count`` and opens the place, whose Products tab lists the
+    records standing on it and, with "Include locations inside" ticked, the
+    records of every place below it as well.
     """
-    tree = read(
-        '/locations/tree', exclude_module_contexts=hide_module_data, counts=True
-    )
-    counted = [node for node in _flatten(tree) if node['subtree_items_count']]
+    scope = {'exclude_module_contexts': hide_module_data}
+    tree = _flatten(read('/locations/tree', counts=True, **scope))
+    contents = [
+        row
+        for node in tree
+        if node['children_count']
+        for row in read('/locations', parent_id=node['id'], limit=200, **scope)['items']
+    ]
+    assert contents
+    counted = [row for row in tree + contents if row['subtree_items_count']]
     assert counted
-    for node in counted:
-        path = f'/locations/{node["id"]}/items'
-        assert read(path, limit=1)['total'] == node['items_count'], node['name']
+    for row in counted:
+        path = f'/locations/{row["id"]}/items'
+        assert read(path, limit=1)['total'] == row['items_count'], row['name']
         assert (
             read(path, limit=1, include_inside=True)['total']
-            == node['subtree_items_count']
-        ), node['name']
+            == row['subtree_items_count']
+        ), row['name']
 
 
 def test_an_equipment_location_row_counts_the_assets_its_link_opens(read) -> None:
