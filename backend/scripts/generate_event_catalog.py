@@ -106,20 +106,26 @@ def main() -> int:
     parser.add_argument(
         '--check',
         action='store_true',
-        help='Exit 1 if the committed catalog differs from the generated one.',
+        help='Exit 1 if the committed catalog (--output, or the default path) '
+        'differs from the generated one.',
     )
     args = parser.parse_args()
 
     catalog = build_catalog()
 
     if args.check:
-        if not DEFAULT_OUTPUT.exists():
+        target = Path(args.output) if args.output else DEFAULT_OUTPUT
+        if not target.exists():
             print(
-                f'CHECK FAILED: {DEFAULT_OUTPUT} does not exist — run without --check to generate it.'
+                f'CHECK FAILED: {target} does not exist — run without --check to generate it.'
             )
             return 1
-        if DEFAULT_OUTPUT.read_text() != catalog:
-            print(f'CHECK FAILED: {DEFAULT_OUTPUT} is out of sync — regenerate it.')
+        # Compared the way the drift test compares: the committed file is
+        # written through print() (see Usage), which ends it with one more
+        # newline than the catalog it printed, and an exact comparison failed
+        # on that newline alone.
+        if target.read_text().rstrip() != catalog.rstrip():
+            print(f'CHECK FAILED: {target} is out of sync — regenerate it.')
             return 1
         print('CHECK OK: event catalog is in sync.')
         return 0
