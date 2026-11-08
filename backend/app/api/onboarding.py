@@ -220,11 +220,7 @@ async def onboarding_setup(
         try:
             preview_focus_mode(organization=focus_org, focus_module=focus_module)
         except (FocusModeError, ProfileSwitchError) as exc:
-            raise AppException(
-                status_code=409,
-                code=getattr(exc, 'code', 'focus_mode'),
-                message=str(exc),
-            ) from exc
+            raise exc.conflict() from exc
 
     try:
         applied = await core_api.organizations.apply_onboarding_profile_async(
@@ -305,9 +301,7 @@ async def _enter_chosen_module(
         )
     except (FocusModeError, ProfileSwitchError) as exc:
         await db.rollback()
-        raise AppException(
-            status_code=409, code=getattr(exc, 'code', 'focus_mode'), message=str(exc)
-        ) from exc
+        raise exc.conflict() from exc
     except FocusModeApplyError:
         await db.rollback()
         logger.exception('Entering focus mode during onboarding failed')
@@ -412,11 +406,7 @@ async def switch_profile(
             organization=OrganizationDTO.model_validate(organization),
         )
     except ProfileSwitchError as exc:
-        raise OrgException(
-            code=exc.code,
-            message=str(exc),
-            context=exc.context,
-        ) from exc
+        raise exc.conflict() from exc
     except ProfileSwitchApplyError:
         logger.exception('Profile switch apply failed')
         raise AppException(
@@ -424,15 +414,3 @@ async def switch_profile(
             code='INTERNAL_ERROR',
             message=get_error_message('internal_error', get_current_lang()),
         ) from None
-
-
-class OrgException(AppException):
-    """Profile switch validation error (HTTP 409)."""
-
-    def __init__(self, code: str, message: str, context: object) -> None:
-        super().__init__(
-            status_code=409,
-            code=code,
-            message=message,
-        )
-        self.context = context

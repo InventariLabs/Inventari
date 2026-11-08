@@ -6,7 +6,10 @@ deactivated, which immediately rejects both JWT and API-key auth
 (``identity_service`` checks ``is_active`` on every request), and the
 token family is revoked via the blacklist as defense in depth.
 RegistrationRequest rows (pre-signup email/name) and the invitations
-issued for that address are anonymized too.
+issued for that address are anonymized too. What the organization writes
+about a person — an asset's holder, an attestation answer, a partner card —
+is left on purpose: it is the organization's custody record, which an
+automatic scrub would cut short for an asset the person may still hold.
 
 Rows with audit value (ItemHistory, AuditLog, StockMove.created_by, ...)
 keep pointing at the anonymized user. That UUID is pseudonymised, not
@@ -64,10 +67,17 @@ async def anonymize_user_async(
     user.full_name = 'Deleted User'
     user.hashed_password = secrets.token_hex(32)
     user.is_active = False
+    # Free text an operator wrote when blocking the account; it can name
+    # the person, and a closed account has nobody left to show it to.
+    user.blocking_reason = None
 
     # Pre-signup registration requests carry the raw email and full name.
+    # The request form keeps the address as it was typed, so it is matched
+    # without regard to case, like the invitations below.
     requests = await db.scalars(
-        select(RegistrationRequest).where(RegistrationRequest.email == old_email)
+        select(RegistrationRequest).where(
+            func.lower(RegistrationRequest.email) == old_email.lower()
+        )
     )
     for request in requests:
         request.email = user.email
