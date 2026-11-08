@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
@@ -33,8 +33,12 @@ class InterceptorError(Exception):
         super().__init__(message)
 
 
-class ItemInterceptor(ABC):
+class ItemInterceptor(ABC):  # noqa: B024 — every hook has a default
     """Base class for interceptors that hook into item CRUD operations.
+
+    Every hook has a default that lets the operation through unchanged, as
+    on the storage and category bases, so a subclass overrides only the hooks
+    it needs.
 
     Contract of ``after_*`` hooks: they run after the write has been
     ``flush()``-ed but **before commit**, inside the same DB transaction as
@@ -48,7 +52,6 @@ class ItemInterceptor(ABC):
     #: Lower value = executed first in the pipeline.
     priority: int = 100
 
-    @abstractmethod
     async def before_create(
         self, data: dict[str, Any], context: ModuleContext
     ) -> dict[str, Any]:
@@ -57,9 +60,8 @@ class ItemInterceptor(ABC):
         Receives mutable item data dict. Return the (possibly modified) dict.
         Raise :class:`InterceptorError` to abort the operation.
         """
-        return data  # pragma: no cover
+        return data
 
-    @abstractmethod
     async def before_update(
         self, item_id: UUID, changes: dict[str, Any], context: ModuleContext
     ) -> dict[str, Any]:
@@ -68,7 +70,7 @@ class ItemInterceptor(ABC):
         Receives mutable changes dict. Return the (possibly modified) dict.
         Raise :class:`InterceptorError` to abort the operation.
         """
-        return changes  # pragma: no cover
+        return changes
 
     async def before_delete(  # noqa: B027
         self, item_id: UUID, context: ModuleContext

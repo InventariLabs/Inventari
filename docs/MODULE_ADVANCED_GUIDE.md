@@ -25,7 +25,7 @@ Defined inside your `module.py` class that inherits from `BaseModule` (or via `d
 |---|---|---|
 | `on_startup(context)` | **Every application restart** (backend boot) | Register event listeners, scheduled tasks, interceptors |
 | `on_install(context)` | **Once per installation**, on the first boot that finds the module new to the system (not per organization, and not when it is enabled) | Create module-local DB tables, seed reference data |
-| `on_enable(organization_id, context)` | **Every time** an organization toggles the module ON through the App Store toggle or a profile switch. Onboarding and the demo seed do not call it; they run `system_on_enable`, which seeds the categories and storage locations the module declares | Seed org-specific defaults (storage locations, categories) |
+| `on_enable(organization_id, context)` | **Every time** the module is enabled for an organization: onboarding, a profile switch, the App Store toggle and the demo seed. It runs after `system_on_enable`, which has already seeded the categories and storage locations the module declares | Seed org-specific defaults the declarations cannot express |
 | `on_disable(organization_id, context)` | **Every time** an organization toggles the module OFF | Cleanup org-scoped resources, archive data |
 | `on_upgrade(old_version, context)` | **First boot after the installed version changes** | Reshape stored data a migration cannot express |
 | `on_upgrade_async(old_version, context)` | Same boot, when the reshape needs the database | Await the rewrite inside the upgrade |
@@ -35,10 +35,11 @@ The table covers the hooks a module overrides at the lifecycle events. Three
 more run at the same points: `on_install_async(context)` is the async variant
 of `on_install`, `on_startup_async(context)` the async variant of `on_startup`,
 and `on_modules_ready(context)` runs after every module's startup hooks, for
-code that reads a catalogue other modules fill. The default `on_startup` calls
-`register_services(container)` and `register_contributions()`; a module that
-overrides `on_startup` without calling `super()` loses both, and the
-interceptor wiring with them.
+code that reads a catalogue other modules fill. The framework does its own
+part outside these hooks: before `on_install` it runs the module's migrations,
+and before `on_startup` it calls `register_services(container)` and
+`register_contributions()` and wires the interceptors. An override owes the
+base class no `super()` call and cannot lose any of that by leaving one out.
 
 Every hook that takes an organization receives it as a `UUID`, the same type
 the `core_api` methods take, so a hook passes it straight on instead of
@@ -64,12 +65,10 @@ class MyModule(BaseModule):
 ```python
 class MyModule(BaseModule):
     def on_install(self, context: ModuleContext):
-        """Called once per installation, on the first boot that finds the module new."""
-        super().on_install(context)  # keeps the default: the module's migrations
+        """Called once per installation, after the module's migrations ran."""
 
     def on_startup(self, context: ModuleContext):
-        """Called every time the application starts up."""
-        super().on_startup(context)  # keeps the default: contributions and interceptor wiring
+        """Called every time the application starts up, after the wiring."""
 ```
 
 > **Heads-up:** Routers and services do **not** have access to `ModuleContext`. If you need to emit events from an endpoint, call `core_api.events.emit_async(...)` (or `emit_transactional_async(db, ...)` when the event must commit with the write), and use `core_api.notifications` for in-app triggers.
@@ -243,7 +242,6 @@ from app.core.module_sdk import BaseModule, ModuleContext, SystemEvent
 
 class MyModule(BaseModule):
     def on_startup(self, context: ModuleContext):
-        super().on_startup(context)  # keeps the default contribution and interceptor wiring
         # Subscribe to a system event
         context.subscribe(SystemEvent.ITEM_USED, self._handle_use)
 
@@ -263,7 +261,7 @@ class MyModule(BaseModule):
 **Delivery semantics (since 2026-07):**
 
 - **Production is stream-only and asynchronous.** `emit()` performs a single `XADD` to the Redis stream and returns immediately — handlers do **not** run in the emitting request's process. One consumer-group worker picks each message up and runs the subscribed handlers there.
-- **Delivery is at-least-once, not exactly-once.** A worker that dies after a handler ran but before the ACK leaves the message pending, and the next reclaim pass runs the handlers again; a handler that raises, or outlasts the handler timeout, is retried with backoff and — if it keeps failing — parked as dead, and for an event that belongs to an organization its admins are alerted (an event of no organization is only recorded and logged). Write handlers to tolerate a re-run; an idempotent handler is the only safe shape. Do not rely on the handler running on the same node (or in the same request lifecycle) as the emitter.
+- **Delivery is at-least-once, not exactly-once.** A worker that dies after a handler ran but before the ACK leaves the message pending, and the next reclaim pass runs the handlers again; a handler that raises, or outlasts the handler timeout, is retried with backoff and — if it keeps failing — parked as dead, and the organization's admins are alerted (for an event of no organization, the instance's superusers). Write handlers to tolerate a re-run; an idempotent handler is the only safe shape. Do not rely on the handler running on the same node (or in the same request lifecycle) as the emitter.
 - **No ordering guarantee** between different events, and no handler may assume request-scoped state (current user, request DB session) — handlers run in the consumer's background loop with their own DB session.
 - **No Redis / Redis failure** is a conscious fail-open: events dispatch in-process only (other nodes miss them) and a warning is logged once per process. The fallback and the TESTING dispatch below log a failing handler; only stream deliveries are retried.
 - **TESTING mode** keeps the legacy inline, synchronous dispatch with no stream, so unit/integration tests can `await emit(...)` and assert handler effects immediately.
@@ -337,9 +335,8 @@ class EquipmentInterceptor(ItemInterceptor):
             data["meta_data"]["equipment"] = {"status": "available"}
         return data
 
-    async def before_update(self, item_id, changes: dict, context: ModuleContext) -> dict:
-        return changes  # abstract in the base class, so every item interceptor defines it
-
+    # Every hook has a default that lets the write through, so an interceptor
+    # overrides only the ones it needs.
     async def after_create(self, item_id, data: dict, context: ModuleContext):
         pass  # e.g. enqueue a background job
 
@@ -618,14 +615,17 @@ async def by_zone_then_weight(
 
 
 async def certified(db: AsyncSession, org_id: UUID) -> DocumentFilterDTO:
-    """The documents with a line whose certificate is on file.
+    """The documents with a lot whose certificate is on file.
 
     What the receiving rule asks at posting: a blank number, or one nobody
-    filed, does not make a lot certified. Every number on file is one
-    fragment; a register of thousands would want a narrower question.
+    filed, does not make a lot certified, and a line without a batch is no
+    lot (``lots_only``). Every number on file is one fragment; a register of
+    thousands would want a narrower question.
     """
     numbers = await all_numbers_on_file_async(db, org_id)
-    return DocumentFilterDTO(line_meta_data=[{'number': n} for n in numbers])
+    return DocumentFilterDTO(
+        line_meta_data=[{'number': n} for n in numbers], lots_only=True
+    )
 
 
 def register_seams() -> None:
@@ -656,7 +656,9 @@ confirmation (`CERTIFICATE_NUMBER_TOO_LONG`) and at the filing endpoint
 (422), and the screens' inputs stop at the same length. And every reader of
 the number reads it the same way — blank is none, anything else as written —
 so the `certified` filter keeps exactly the lots the rule would book: those
-whose number is on file, not those that merely carry one.
+whose number is on file, not those that merely carry one — and only lines with
+a batch, as the rule checks only those (`lots_only=True` on the
+`DocumentFilterDTO`).
 
 ### A pick order of its own
 
@@ -681,7 +683,10 @@ default walk — `location_sequence`, the order the locations are numbered — i
 registered the same way and is what runs when nothing is chosen, when the
 chosen name answers no strategy, or when the module behind it is switched off
 for the organization: a disabled module costs the organization its walk, never
-a session that will not start.
+a session that will not start. The organization's choice stores the name
+alone, so a name belongs to the module that registered it first: registering
+a name another module holds (`location_sequence` included) raises
+`ContractViolationError` at import, and the module is refused at discovery.
 
 ### Frontend: the field, the column, the filter and the action
 

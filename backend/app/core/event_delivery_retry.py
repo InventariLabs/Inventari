@@ -5,7 +5,8 @@ its bound) instead of acknowledging the event and forgetting it. This worker
 runs each due row's handler again — that handler alone, never the event's
 other subscribers — and either marks it ``succeeded``, schedules the next
 attempt with doubling backoff, or, after ``MAX_HANDLER_ATTEMPTS``, parks it
-as ``dead`` (the dead-letter queue) and warns the organization's admins.
+as ``dead`` (the dead-letter queue) and warns the organization's admins —
+or, for an event of no organization, the instance's superusers.
 
 Registered as a frequent local scheduled task next to the outbox relay; the
 rows are claimed with ``FOR UPDATE SKIP LOCKED``, so two nodes never run the
@@ -58,45 +59,54 @@ def _payload_of(row: EventDelivery) -> EventPayload:
 
 
 async def _alert_admins(db: AsyncSession, row: EventDelivery) -> list[Any]:
-    """Warn the organization's admins that a handler was given up on.
+    """Warn whoever administers the event's owner that a handler was given up on.
+
+    An organization's event goes to that organization's admins. An event of
+    no organization — one of the installation itself — goes to the instance's
+    superusers: it used to be only recorded and logged, and a log line is
+    read by nobody who could act on it.
 
     Returns the notifications written, for the caller to publish once its
     commit has made them real.
     """
     from app.core.public_api import core_api
+    from app.services.notification_service import notification_service
 
-    if row.organization_id is None:
-        # A non-tenant event has no admins to tell; the row and the log
-        # are the record.
-        return []
     key = NotificationDedupKey(
         meta_type='event_delivery_dead', ref_key='handler', ref_id=row.handler
     )
     since = datetime.now(UTC) - _ALERT_DEDUP_WINDOW
-    if await core_api.notifications.exists_unread_by_meta_async(
+    if await notification_service.exists_unread_by_meta_async(
         db, row.organization_id, key, since
     ):
         return []
+    content = core_api.notifications.localize(
+        _DEAD_CONTENT,
+        handler=row.handler,
+        event=row.event,
+        attempts=row.attempts,
+        # The column holds 1000 characters, and a traceback's message
+        # can be longer; the row keeps it whole.
+        error=(row.last_error or '—')[:300],
+    )
+    meta_data = {
+        'type': 'event_delivery_dead',
+        'handler': row.handler,
+        'event': row.event,
+        'event_id': row.event_id,
+    }
+    if row.organization_id is None:
+        written = await notification_service.notify_superusers_async(
+            db, _DEAD_TITLE, content, type='error', meta_data=meta_data
+        )
+        return [notification_service.to_dto(n) for n in written]
     return await core_api.notifications.notify_org_admins_async(
         db,
         row.organization_id,
         title=_DEAD_TITLE,
-        content=core_api.notifications.localize(
-            _DEAD_CONTENT,
-            handler=row.handler,
-            event=row.event,
-            attempts=row.attempts,
-            # The column holds 1000 characters, and a traceback's message
-            # can be longer; the row keeps it whole.
-            error=(row.last_error or '—')[:300],
-        ),
+        content=content,
         notification_type='error',
-        meta_data={
-            'type': 'event_delivery_dead',
-            'handler': row.handler,
-            'event': row.event,
-            'event_id': row.event_id,
-        },
+        meta_data=meta_data,
     )
 
 

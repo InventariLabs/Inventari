@@ -90,6 +90,43 @@ class TestOnboardingProfileApplication:
         assert 'recipes' in result.enabled_modules
         assert 'shopping_lists' in result.enabled_modules
 
+    async def test_onboarding_runs_the_modules_own_enable_hook(
+        self,
+        real_async_db_session: AsyncSession,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """``on_enable`` says it runs whenever the module is enabled, and
+        onboarding — the way every new organization gets its modules — ran
+        only ``system_on_enable``. A module from outside that seeds its
+        defaults in ``on_enable`` (or ``define_module(seed=)``) left every
+        onboarded organization without them."""
+        from app.core.module_registry import module_registry
+
+        seen: list[uuid.UUID] = []
+        module = module_registry.get('stock_takes')
+        assert module is not None
+        monkeypatch.setattr(
+            module,
+            'on_enable',
+            lambda organization_id, context: seen.append(organization_id),
+        )
+
+        org = Organization(
+            name=f'Test Org {uuid.uuid4().hex[:8]}',
+            enabled_modules=['core'],
+        )
+        real_async_db_session.add(org)
+        await real_async_db_session.flush()
+
+        await apply_onboarding_profile_async(
+            real_async_db_session,
+            org,
+            'clean_core',
+            user=await _onboarder(real_async_db_session, org),
+        )
+
+        assert seen == [org.id]
+
     async def test_service_leaves_the_cache_for_the_caller_to_clear_after_commit(
         self,
         fake_redis: FakeRedis,

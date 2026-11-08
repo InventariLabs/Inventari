@@ -160,14 +160,17 @@ async def by_zone_then_weight(
 
 
 async def certified(db: AsyncSession, org_id: UUID) -> DocumentFilterDTO:
-    """The documents with a line whose certificate is on file.
+    """The documents with a lot whose certificate is on file.
 
     What the receiving rule asks at posting: a blank number, or one nobody
-    filed, does not make a lot certified. Every number on file is one
-    fragment; a register of thousands would want a narrower question.
+    filed, does not make a lot certified, and a line without a batch is no
+    lot (``lots_only``). Every number on file is one fragment; a register of
+    thousands would want a narrower question.
     """
     numbers = await all_numbers_on_file_async(db, org_id)
-    return DocumentFilterDTO(line_meta_data=[{'number': n} for n in numbers])
+    return DocumentFilterDTO(
+        line_meta_data=[{'number': n} for n in numbers], lots_only=True
+    )
 
 
 def register_seams() -> None:

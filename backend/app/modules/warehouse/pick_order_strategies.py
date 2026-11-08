@@ -19,6 +19,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import PickOrderLineDTO
+from app.core.exceptions import ContractViolationError
 from app.core.public_api import core_api
 
 #: ``(db, org_id, lines) -> the same lines in pick order``. The lines carry
@@ -48,9 +49,18 @@ def register_pick_order_strategy(
     The name is the strategy's identity the organization's choice names —
     it is offered in the warehouse settings under
     ``<module>:pickOrderStrategies.<name>`` from *module*'s catalogue.
-    Registering the same name replaces the earlier entry, which keeps module
-    reloads (and tests) from accumulating stale entries.
+    The stored choice is the name alone, so a name belongs to one module: a
+    module registering a name another module holds is refused, where it used
+    to replace the other's strategy (the default walk included) in silence.
+    The same module registering its own name again replaces the entry, which
+    keeps module reloads (and tests) from accumulating stale entries.
     """
+    held = _STRATEGIES.get(name)
+    if held is not None and held[0] != module:
+        raise ContractViolationError(
+            f'Pick-order strategy {name!r} is registered by module '
+            f'{held[0]!r}; module {module!r} must register under another name'
+        )
     _STRATEGIES[name] = (module, strategy)
 
 

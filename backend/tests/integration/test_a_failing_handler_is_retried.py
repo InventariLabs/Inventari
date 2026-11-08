@@ -33,11 +33,14 @@ from app.core._event_types import EventPayload, TenantEventPayload
 from app.core.event_delivery_retry import retry_failed_deliveries
 from app.core.public_api import core_api
 from app.core.testing import ModuleTestHelper
+from app.i18n.service import get_error_message
 from app.models.event_delivery import EventDelivery
 from app.models.notification import Notification
 from app.models.organization import Organization
 
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
+
+_INSTANCE_EVENT = 'test.instance_wide'
 
 
 @pytest.fixture
@@ -82,10 +85,15 @@ async def bus(sessions: Any):
     await bus.disconnect()
 
 
-async def _deliver(bus: EventBus, payload: EventPayload, until: asyncio.Event) -> None:
+async def _deliver(
+    bus: EventBus,
+    payload: EventPayload,
+    until: asyncio.Event,
+    event: str = 'item.created',
+) -> None:
     """Emit through the stream and let the consumer loop take it."""
     with patch.object(settings, 'TESTING', False):
-        await bus.emit('item.created', payload)
+        await bus.emit(event, payload)
         listener = asyncio.create_task(bus.listen())
         await asyncio.wait_for(until.wait(), timeout=5)
         # Let the loop finish the message it is holding (record + ACK).
@@ -331,6 +339,53 @@ class TestAHandlerThatKeepsFailing:
         async with sessions() as db:
             alerts = (await db.execute(select(Notification))).scalars().all()
         assert len(alerts) == 1
+
+    async def test_of_no_organization_is_told_to_the_superusers_once(
+        self, bus: EventBus, sessions: Any, org_with_admin: Organization
+    ):
+        """An installation-wide event has no organization admins to tell, and
+        was only recorded and logged. The instance's superusers can act on it,
+        so they hear about it — in their own language, and once a day per
+        handler, as the admins do."""
+        async with sessions() as db:
+            superuser = await ModuleTestHelper.create_user_async(
+                db, org_with_admin, email=f'root_{uuid.uuid4().hex[:8]}@test.com'
+            )
+            superuser.is_superuser = True
+            superuser.preferred_language = 'pl'
+            await db.commit()
+
+        async def _lose_one() -> None:
+            calls: list[str] = []
+            seen = asyncio.Event()
+            # An event of the installation, not of an organization.
+            bus._listeners[_INSTANCE_EVENT] = [
+                (_failing(calls, seen, times=99), 100, None)
+            ]
+            await _deliver(bus, EventPayload(), seen, _INSTANCE_EVENT)
+            for _ in range(MAX_HANDLER_ATTEMPTS - 1):
+                await _make_due(sessions)
+                await _retry(sessions, bus)
+
+        await _lose_one()
+        await _lose_one()
+
+        rows = await _rows(sessions)
+        assert [r.status for r in rows] == ['dead', 'dead']
+        assert all(r.organization_id is None for r in rows)
+        async with sessions() as db:
+            [alert] = (
+                (
+                    await db.execute(
+                        select(Notification).where(Notification.user_id == superuser.id)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        assert alert.type == 'error'
+        assert alert.meta_data['handler'] == rows[0].handler
+        assert alert.title == get_error_message('event_delivery_dead_title', 'pl')
 
     async def test_that_is_no_longer_subscribed_is_parked_at_once(
         self, bus: EventBus, sessions: Any
