@@ -1,4 +1,4 @@
-"""Two shape checks on tenancy, and a note on what they cannot see.
+"""Shape checks on tenancy, and a note on what they cannot see.
 
 The name says "tenancy", which a reader will take to mean "tenant isolation
 is checked". It is not, and the gap is worth stating where somebody reading a
@@ -10,7 +10,7 @@ That class is caught by tests, one per reference, not by this file. It has
 already been the cause of one real defect (a storage type, an assignee and a
 service partner, all accepted from any organisation).
 
-Two guards:
+Three guards:
 
 1. ``_check_public_api_optional_org`` — forbids
    ``organization_id: UUID | None = None`` in ``app/core/public_api/``
@@ -29,6 +29,12 @@ Two guards:
    (carve-out S-2026-08-01). Remaining justified exceptions live in
    ``app/core/escape_hatch_org_filter_baseline.txt`` and emit ``::notice``;
    new violations emit ``::error``.
+
+3. ``_check_public_api_missing_org`` — a cross-module API method addressed by a
+   row identifier must carry the tenant: an ``organization_id``, an
+   ``OrganizationDTO`` / ``UserContextDTO`` parameter, or a declared
+   ``@without_org_scope('<reason>')``. It reads the signature and the
+   decorator, not the body (see its docstring).
 """
 
 from __future__ import annotations
@@ -160,6 +166,66 @@ def _takes_identifier(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
     return False
 
 
+#: A parameter of one of these types carries the tenant: the organization is
+#: the argument itself (``OrganizationDTO``) or sits on it
+#: (``UserContextDTO.organization_id``), so there is no second id beside it.
+_TENANT_CARRIER_TYPES = frozenset({'OrganizationDTO', 'UserContextDTO'})
+#: The explicit opt-out, ``@without_org_scope('<reason>')``; see
+#: ``app/core/public_api/_scope.py``.
+_OPT_OUT_DECORATOR = 'without_org_scope'
+
+
+def _annotation_type_name(annotation: ast.expr | None) -> str | None:
+    """The bare type name of an annotation, or None for anything fancier.
+
+    ``UserContextDTO``, ``dto.UserContextDTO`` and the quoted spelling are the
+    type itself. ``UserContextDTO | None`` is not: a caller may leave the
+    carrier out, and then nothing names the tenant.
+    """
+    if isinstance(annotation, ast.Constant) and isinstance(annotation.value, str):
+        return annotation.value.rsplit('.', 1)[-1].strip()
+    if isinstance(annotation, ast.Name):
+        return annotation.id
+    if isinstance(annotation, ast.Attribute):
+        return annotation.attr
+    return None
+
+
+def _takes_tenant_carrier(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+    """True when a parameter is annotated as an organization or user context."""
+    return any(
+        _annotation_type_name(arg.annotation) in _TENANT_CARRIER_TYPES
+        for arg, _default in _iter_args_with_defaults(node)
+    )
+
+
+def _has_declared_opt_out(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+    """True when the method wears ``@without_org_scope('<non-blank reason>')``.
+
+    A bare decorator, an empty call, a blank string or a reason computed at
+    import time does not count: the reason is what makes this a decision and
+    not a way to turn the guard off in one line.
+    """
+    for decorator in node.decorator_list:
+        if not isinstance(decorator, ast.Call):
+            continue
+        func = decorator.func
+        name = func.attr if isinstance(func, ast.Attribute) else getattr(func, 'id', '')
+        if name != _OPT_OUT_DECORATOR:
+            continue
+        reason = decorator.args[0] if decorator.args else None
+        for keyword in decorator.keywords:
+            if keyword.arg == 'reason':
+                reason = keyword.value
+        if (
+            isinstance(reason, ast.Constant)
+            and isinstance(reason.value, str)
+            and reason.value.strip()
+        ):
+            return True
+    return False
+
+
 def _iter_cross_module_api_files(
     public_api_dir: Path, modules_dir: Path | None
 ) -> Iterator[Path]:
@@ -201,8 +267,19 @@ def _check_public_api_missing_org(
     it showed: a method fetching a Core row by bare id, with the org check
     living in whichever caller happened to remember, reads as clean.
 
-    Opt-outs, mirroring the convention the optional-org rule already names:
-    an explicit ``include_global`` parameter or a ``_for_user`` suffix.
+    Four shapes are not findings. Three the rule reads from the signature: an
+    ``organization_id`` parameter; an ``OrganizationDTO`` or ``UserContextDTO``
+    parameter, which carries the tenant itself; and the opt-outs the
+    optional-org rule already names, an explicit ``include_global`` parameter
+    or a ``_for_user`` suffix. The fourth is a decision written at the
+    method: ``@without_org_scope('<reason>')`` for rows with no organization
+    column, rows addressed through the user, or a deliberate cross-organization
+    repair.
+
+    What the shapes cannot show is that the body keeps the promise: a method
+    that takes a ``UserContextDTO`` and never reads its organization, or wears
+    the decorator with a reason that is not true, reads as clean. The signature
+    is checked here; whether the call scopes is for the tests of the method.
     """
     entries: list[str] = []
     for py_file in _iter_cross_module_api_files(public_api_dir, modules_dir):
@@ -222,6 +299,8 @@ def _check_public_api_missing_org(
                 continue
             if params & _ORG_PARAM_NAMES or _has_live_opt_out(node):
                 continue
+            if _takes_tenant_carrier(node) or _has_declared_opt_out(node):
+                continue
             if not _takes_identifier(node):
                 continue
             rel = _rel(py_file)
@@ -233,8 +312,10 @@ def _check_public_api_missing_org(
                 f'{node.name}() takes a row identifier and `db` but no '
                 f'`organization_id` — isolation then depends on the calling '
                 f'module passing an id from its own organization (confused '
-                f'deputy). Add the org parameter, or opt out explicitly with '
-                f'`include_global: bool = False` or a `_for_user` suffix.'
+                f'deputy). Add the org parameter, take a UserContextDTO or '
+                f'OrganizationDTO, or opt out explicitly with '
+                f'`include_global: bool = False`, a `_for_user` suffix or '
+                f"`@without_org_scope('<reason>')`."
             )
     return entries
 

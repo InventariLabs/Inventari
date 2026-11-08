@@ -15,8 +15,6 @@ subscribers see the row before they refetch.
 
 from __future__ import annotations
 
-import json
-from collections import defaultdict
 from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
@@ -26,10 +24,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import NotificationDedupKey, NotificationDTO
 from app.core.logging import get_logger
-from app.core.utils import isoformat_or_none
-from app.services.notification_service import NotificationService
+from app.core.public_api._scope import without_org_scope
+from app.services.notification_service import NotificationService, in_language
 
 logger = get_logger(__name__)
+
 
 #: Notification copy, either as one string or as a language table.
 #:
@@ -41,15 +40,12 @@ logger = get_logger(__name__)
 LocalizedText = str | Mapping[str, str]
 
 
-def _in_language(text: LocalizedText, lang: str | None) -> str:
-    if isinstance(text, str):
-        return text
-    return text.get(lang or 'en', text['en'])
-
-
 class CoreNotificationsAPI:
     """Public Core API for creating in-app notifications from modules."""
 
+    @without_org_scope(
+        'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
+    )
     async def create_async(
         self,
         db: AsyncSession,
@@ -73,8 +69,8 @@ class CoreNotificationsAPI:
         notification = await NotificationService.create_notification_async(
             db=db,
             user_id=user_id,
-            title=_in_language(title, lang),
-            content=_in_language(content, lang),
+            title=in_language(title, lang),
+            content=in_language(content, lang),
             type=notification_type,
             link=link,
             meta_data=meta_data,
@@ -95,47 +91,7 @@ class CoreNotificationsAPI:
         but never raised; the row is already persisted and the FE will refetch
         on its next polling cycle.
         """
-        if not notifications:
-            return
-        items: list[NotificationDTO] = (
-            list(notifications) if isinstance(notifications, list) else [notifications]
-        )
-        try:
-            from app.core.events import event_bus
-
-            redis_client = event_bus.redis
-            if redis_client is None:
-                return
-
-            user_ids = [UUID(str(n.user_id)) for n in items]
-            org_ids_by_user = await NotificationService.lookup_user_org_ids_async(
-                db, user_ids
-            )
-
-            for n in items:
-                org_id = org_ids_by_user.get(UUID(str(n.user_id)))
-                if org_id is None:
-                    continue
-                payload = {
-                    'id': str(n.id),
-                    'user_id': str(n.user_id),
-                    'title': n.title,
-                    'content': n.content,
-                    'type': n.type,
-                    'link': n.link,
-                    'is_read': n.is_read,
-                    'created_at': isoformat_or_none(n.created_at),
-                }
-                await redis_client.publish(
-                    f'notifications:user:{n.user_id}',
-                    json.dumps(payload),
-                )
-        except Exception as exc:  # noqa: BLE001 — WS fanout is best-effort
-            logger.warning(
-                '[Notifications] Failed to publish %d notification(s): %s',
-                len(items),
-                exc,
-            )
+        await NotificationService.publish_async(db, notifications)
 
     async def notify_org_admins_async(
         self,
@@ -162,35 +118,15 @@ class CoreNotificationsAPI:
         Returns the persisted notifications so callers can pass them to
         ``publish_async`` after their own ``db.commit()``.
         """
-        from app.services.user_service import UserService
-
-        admins = await UserService.get_organization_admins_async(db, organization_id)
-
-        if not admins:
-            logger.debug(
-                'notify_org_admins_async: no admins found for organization %s',
-                organization_id,
-            )
-            return []
-
-        by_language: dict[str, list[UUID]] = defaultdict(list)
-        for admin in admins:
-            by_language[admin.preferred_language or 'en'].append(admin.id)
-
-        created = []
-        for lang, user_ids in by_language.items():
-            created.extend(
-                await NotificationService.create_notifications_batch_async(
-                    db,
-                    user_ids,
-                    _in_language(title, lang),
-                    _in_language(content, lang),
-                    notification_type,
-                    link,
-                    meta_data,
-                )
-            )
-        return [NotificationService.to_dto(n) for n in created]
+        return await NotificationService.notify_org_admins_async(
+            db,
+            organization_id,
+            title,
+            content,
+            notification_type,
+            link,
+            meta_data,
+        )
 
     @staticmethod
     def localize(table: Mapping[str, str], /, **values: object) -> dict[str, str]:
@@ -253,6 +189,9 @@ class CoreNotificationsAPI:
         )
         return NotificationDTO.model_validate(notification) if notification else None
 
+    @without_org_scope(
+        'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
+    )
     async def update_read_status_async(
         self, db: AsyncSession, notification_id: UUID, user_id: UUID, is_read: bool
     ) -> NotificationDTO | None:
@@ -267,6 +206,9 @@ class CoreNotificationsAPI:
         )
         return NotificationDTO.model_validate(updated) if updated else None
 
+    @without_org_scope(
+        'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
+    )
     async def mark_all_read_async(self, db: AsyncSession, user_id: UUID) -> None:
         """Mark all notifications as read for *user_id*."""
         await NotificationService.mark_all_read_async(db, user_id)
@@ -284,6 +226,9 @@ class CoreNotificationsAPI:
             db, organization_id, ref_key, ref_id
         )
 
+    @without_org_scope(
+        'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
+    )
     async def delete_async(
         self, db: AsyncSession, notification_id: UUID, user_id: UUID
     ) -> bool:

@@ -1,17 +1,32 @@
+import json
+from collections import defaultdict
+from collections.abc import Mapping
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Select, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.contracts import NotificationDedupKey
+from app.core.contracts import NotificationDedupKey, NotificationDTO
 from app.core.db_utils import paginate_async
 from app.core.logging import get_logger
+from app.core.utils import isoformat_or_none
 from app.models.notification import Notification
 from app.models.user import User
 
 logger = get_logger(__name__)
+
+#: Notification copy as the public facade takes it: one string, or a language
+#: table resolved per recipient (the facade documents the contract).
+LocalizedText = str | Mapping[str, str]
+
+
+def in_language(text: LocalizedText, lang: str | None) -> str:
+    if isinstance(text, str):
+        return text
+    return text.get(lang or 'en', text['en'])
 
 
 class NotificationService:
@@ -277,6 +292,115 @@ class NotificationService:
         """Async: delete a notification."""
         await db.delete(notification)
         await db.flush()
+
+    @staticmethod
+    async def publish_async(
+        db: AsyncSession,
+        notifications: NotificationDTO | list[NotificationDTO] | None,
+    ) -> None:
+        """Publish already-committed notifications to the WS hub via Redis.
+
+        Channels are ``notifications:user:{user_id}`` so each delivery is
+        scoped to a single recipient — no cross-user leak. Failures are logged
+        but never raised; the row is already persisted and the FE will refetch
+        on its next polling cycle.
+        """
+        if not notifications:
+            return
+        items: list[NotificationDTO] = (
+            list(notifications) if isinstance(notifications, list) else [notifications]
+        )
+        try:
+            from app.core.events import event_bus
+
+            redis_client = event_bus.redis
+            if redis_client is None:
+                return
+
+            user_ids = [UUID(str(n.user_id)) for n in items]
+            org_ids_by_user = await NotificationService.lookup_user_org_ids_async(
+                db, user_ids
+            )
+
+            for n in items:
+                org_id = org_ids_by_user.get(UUID(str(n.user_id)))
+                if org_id is None:
+                    continue
+                payload = {
+                    'id': str(n.id),
+                    'user_id': str(n.user_id),
+                    'title': n.title,
+                    'content': n.content,
+                    'type': n.type,
+                    'link': n.link,
+                    'is_read': n.is_read,
+                    'created_at': isoformat_or_none(n.created_at),
+                }
+                await redis_client.publish(
+                    f'notifications:user:{n.user_id}',
+                    json.dumps(payload),
+                )
+        except Exception as exc:  # noqa: BLE001 — WS fanout is best-effort
+            logger.warning(
+                '[Notifications] Failed to publish %d notification(s): %s',
+                len(items),
+                exc,
+            )
+
+    @staticmethod
+    async def notify_org_admins_async(
+        db: AsyncSession,
+        organization_id: UUID,
+        title: LocalizedText,
+        content: LocalizedText,
+        notification_type: str = 'info',
+        link: str | None = None,
+        meta_data: dict[str, Any] | None = None,
+    ) -> list[NotificationDTO]:
+        """Notify every member who administers *organization_id*.
+
+        An administrator is whoever holds the authority, not whoever carries
+        the role's name: the built-in level, and any custom role carrying
+        ``admin:access`` or ``system:config:write`` — see
+        ``permissions_service.administrators_async``. Every notice "for the
+        administrators" goes through here, so they all ask the same question.
+
+        ``title`` and ``content`` accept a language table; administrators are
+        then grouped by their ``preferred_language`` and each group gets the
+        text it can read.
+
+        Returns the persisted notifications so callers can pass them to
+        ``publish_async`` after their own ``db.commit()``.
+        """
+        from app.services.user_service import UserService
+
+        admins = await UserService.get_organization_admins_async(db, organization_id)
+
+        if not admins:
+            logger.debug(
+                'notify_org_admins_async: no admins found for organization %s',
+                organization_id,
+            )
+            return []
+
+        by_language: dict[str, list[UUID]] = defaultdict(list)
+        for admin in admins:
+            by_language[admin.preferred_language or 'en'].append(admin.id)
+
+        created = []
+        for lang, user_ids in by_language.items():
+            created.extend(
+                await NotificationService.create_notifications_batch_async(
+                    db,
+                    user_ids,
+                    in_language(title, lang),
+                    in_language(content, lang),
+                    notification_type,
+                    link,
+                    meta_data,
+                )
+            )
+        return [NotificationService.to_dto(n) for n in created]
 
 
 notification_service = NotificationService()

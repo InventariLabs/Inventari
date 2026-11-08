@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AnnouncementCreateDTO, AnnouncementDTO, UserContextDTO
 from app.core.logging import get_logger
+from app.core.public_api._scope import without_org_scope
 from app.services.announcement_service import AnnouncementService
 
 logger = get_logger(__name__)
@@ -31,6 +32,7 @@ class CoreAnnouncementsAPI:
         announcements = await AnnouncementService.list_active_async(db)
         return [AnnouncementDTO.model_validate(a) for a in announcements]
 
+    @without_org_scope('global rows: an announcement has no organization column')
     async def get_by_id_async(
         self, db: AsyncSession, announcement_id: UUID
     ) -> AnnouncementDTO | None:
@@ -58,6 +60,7 @@ class CoreAnnouncementsAPI:
         )
         return AnnouncementDTO.model_validate(announcement)
 
+    @without_org_scope('global rows: an announcement has no organization column')
     async def delete_async(self, db: AsyncSession, announcement_id: UUID) -> bool:
         """Delete an announcement by ID. Returns ``True`` if deleted, ``False`` if not found."""
         announcement = await AnnouncementService.get_by_id_async(db, announcement_id)

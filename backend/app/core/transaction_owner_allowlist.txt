@@ -34,7 +34,7 @@ module_test_plugin.py::module_user
 nutrition/import_parquet.py::import_off_parquet
 outbox_relay.py::relay_outbox_batch
 outbox_relay.py::relay_outbox_once
-public_api/ai_usage.py::CoreAIUsageAPI.log_llm_usage_async
+ai_usage_service.py::log_llm_usage_async
 recipes/migration.py::migrate_all_orgs_recipes_jina_key_async
 recipes/module.py::RecipesModule.on_startup_async
 reconciliation_job.py::run_reconciliation_once

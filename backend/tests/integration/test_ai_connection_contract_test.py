@@ -194,7 +194,7 @@ class TestUsageAccounting:
             _models('some/model'),
             _answering(_GOOD_ANSWER),
             patch(
-                'app.core.public_api.ai_usage.CoreAIUsageAPI.log_llm_usage_async',
+                'app.services.ai_usage_service.log_llm_usage_async',
                 new_callable=AsyncMock,
             ) as logged,
         ):
@@ -210,7 +210,7 @@ class TestUsageAccounting:
             _models('some/model'),
             _answering(_PROSE, _GOOD_ANSWER),
             patch(
-                'app.core.public_api.ai_usage.CoreAIUsageAPI.log_llm_usage_async',
+                'app.services.ai_usage_service.log_llm_usage_async',
                 new_callable=AsyncMock,
             ) as logged,
         ):

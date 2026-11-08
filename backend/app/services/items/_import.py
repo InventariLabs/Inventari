@@ -931,7 +931,7 @@ async def _file_under_the_product_the_code_names(
 async def _import_one_row(
     ctx: _ImportContext, row: pd.Series, row_num: int
 ) -> _RowResult:
-    from app.core.public_api import core_api
+    from app.core.period_guard import check_period_not_closed
     from app.services.analytics._common import org_today_async
 
     name = _cell_text(_row_get(row, ctx.mapping, 'name'))
@@ -966,7 +966,7 @@ async def _import_one_row(
     # runs BEFORE the item exists — a closed period must reject the row
     # before anything is written.
     if ctx.user.organization_id is not None:
-        await core_api.periods.check_not_closed_async(
+        await check_period_not_closed(
             ctx.db,
             ctx.user.organization_id,
             await org_today_async(ctx.db, ctx.user.organization_id),

@@ -235,6 +235,13 @@ core_api.file_storage.delete_for_org_async  # noqa: B018
 core_api.file_storage.exists_for_org_async  # noqa: B018
 core_api.secrets.encrypt_for_module  # noqa: B018
 core_api.secrets.decrypt_for_module  # noqa: B018
+# Documented facade methods that core services used to reach themselves until
+# they went to the services directly; the contract stays (docs/subsystems/
+# CORE_API.md), and modules and their tests still call the settings write.
+core_api.organizations.list_missing_short_id_async  # noqa: B018
+core_api.settings.set_bulk_async  # noqa: B018
+core_api.users.get_by_email_async  # noqa: B018
+core_api.users.get_first_system_user_async  # noqa: B018
 
 # --- Callers the scan reaches, kept for a documented reason ------------------
 # Permission catalog handed to admins by GET /auth/me, which lives in a file

@@ -64,7 +64,8 @@ async def apply_profile_module_config_async(
     if not module_config:
         return []
 
-    from app.core.public_api import core_api
+    from app.services.audit_service import log_action_async
+    from app.services.module_settings_service import write_module_settings_async
 
     changed_modules: list[str] = []
     for module_name, raw_config in module_config.items():
@@ -103,9 +104,7 @@ async def apply_profile_module_config_async(
         namespace = f'module:{module_name}'
         before = copy.deepcopy((organization.settings or {}).get(namespace, {}))
         try:
-            await core_api.settings.set_bulk_async(
-                db, organization.id, module_name, cleaned
-            )
+            await write_module_settings_async(db, organization.id, module_name, cleaned)
         except ValidationException as exc:
             logger.warning(
                 'Profile %s module_config for %s rejected (%s) — skipping',
@@ -115,7 +114,7 @@ async def apply_profile_module_config_async(
             )
             continue
 
-        # ``set_bulk_async`` shallow-merges the payload into the namespace,
+        # ``write_module_settings_async`` shallow-merges the payload into the namespace,
         # so the record it leaves behind is known here without re-reading it
         # — and without assuming the caller's instance is the one the
         # settings API happened to load.
@@ -126,7 +125,7 @@ async def apply_profile_module_config_async(
         if change is None:
             continue
 
-        await core_api.audit_log.log_action_async(
+        await log_action_async(
             db,
             organization_id=organization.id,
             user_id=user_id,

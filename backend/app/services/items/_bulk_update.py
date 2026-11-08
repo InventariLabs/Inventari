@@ -229,14 +229,12 @@ async def bulk_update_items(
     # before the per-item savepoint loop — fail-fast beats partial
     # rejection because callers expect all-or-nothing semantics.
     if (quantity_changed or location_changed) and items:
-        from app.core.public_api import core_api
+        from app.core.period_guard import check_period_not_closed
         from app.services.analytics._common import org_today_async
 
         org_id: UUID | None = items[0].organization_id
         if org_id is not None:
-            await core_api.periods.check_not_closed_async(
-                db, org_id, await org_today_async(db, org_id)
-            )
+            await check_period_not_closed(db, org_id, await org_today_async(db, org_id))
 
     if items and (location_changed or quantity_changed):
         await _lock_the_batch_stock_async(db, items, update_dict)

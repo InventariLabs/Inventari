@@ -200,9 +200,9 @@ async def read_previous_measurement_async(
     db, organization_id: UUID
 ) -> PreviousMeasurementDTO | None:
     """What the previous scheduled pass measured, for the screen to show."""
-    from app.core.public_api import core_api
+    from app.services.module_settings_service import read_module_setting_async
 
-    stored = await core_api.settings.get_async(
+    stored = await read_module_setting_async(
         db, organization_id, 'core', _SIGNATURE_KEY
     )
     return decode_previous_measurement(stored)
@@ -272,11 +272,14 @@ async def _record_pass_and_alert_admins_async(
     clean pass is still stored, so a drift that comes back later is a change
     again and warns.
     """
-    from app.core.public_api import core_api
+    from app.services.module_settings_service import (
+        read_module_setting_async,
+        write_module_settings_async,
+    )
 
     signature = _signature_of(figures)
     previous_signature, _, previous_alert = _decode_measurement(
-        await core_api.settings.get_async(db, organization_id, 'core', _SIGNATURE_KEY)
+        await read_module_setting_async(db, organization_id, 'core', _SIGNATURE_KEY)
     )
     alerted_at = (
         datetime.fromisoformat(previous_alert) if previous_alert else measured_at
@@ -288,7 +291,7 @@ async def _record_pass_and_alert_admins_async(
         elif measured_at - alerted_at >= _STANDING_REMINDER:
             await _warn_admins_async(db, organization_id, figures, standing=True)
             alerted_at = measured_at
-    await core_api.settings.set_bulk_async(
+    await write_module_settings_async(
         db,
         organization_id,
         'core',
@@ -300,9 +303,9 @@ async def _warn_admins_async(
     db, organization_id: UUID, figures: dict, *, standing: bool
 ) -> None:
     """One warning to every admin, in their language: found, or still there."""
-    from app.core.public_api import core_api
+    from app.services.notification_service import NotificationService
 
-    await core_api.notifications.notify_org_admins_async(
+    await NotificationService.notify_org_admins_async(
         db,
         organization_id,
         title=_STANDING_TITLE if standing else _DRIFT_TITLE,
