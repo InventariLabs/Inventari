@@ -91,13 +91,14 @@ class TestInvalidation:
         self, tmp_path: Path
     ):
         """CORE_EXEMPTIONS keys on module name, so the name must matter."""
-        untrusted = _module(tmp_path, 'import subprocess\n', name='community_thing')
-        exempt = _module(tmp_path, 'import subprocess\n', name='printing')
+        source = 'from app.models.item import Item\n'
+        untrusted = _module(tmp_path, source, name='community_thing')
+        exempt = _module(tmp_path, source, name='equipment')
 
-        assert _keys(untrusted), 'a community module may not use subprocess'
-        assert _keys(exempt) == [], 'printing is exempted for subprocess'
+        assert _keys(untrusted), 'a community module may not read Core models'
+        assert _keys(exempt) == [], 'equipment is exempted for app.models.item'
 
-    def test_the_checkout_own_printing_keeps_its_exemption(self):
+    def test_the_checkout_own_equipment_keeps_its_exemption(self):
         """The exemption on the real shipped module, not just on the name."""
         from pathlib import Path
 
@@ -106,13 +107,13 @@ class TestInvalidation:
         own = (
             Path(module_safety_analysis.__file__).resolve().parent.parent
             / 'modules'
-            / 'printing'
+            / 'equipment'
         )
 
         # The manifest's own capabilities, so the scan reads like discovery
         # runs it: what is left is the exemption question and nothing else.
-        assert _keys(own, ['database', 'filesystem', 'process']) == [], (
-            'the repo printing module may shell out'
+        assert _keys(own, ['database']) == [], (
+            'the repo equipment module may read app.models.item'
         )
 
 
