@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { MapPin, Info } from "lucide-react";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { useTranslation } from "react-i18next";
@@ -16,6 +17,8 @@ interface DefaultInputFieldProps {
   uomId?: string;
   uomCategories?: UomCategory[];
   error?: string;
+  /** Id of a hint the caller renders beside the field that describes it. */
+  describedBy?: string;
   onChange: (value: unknown) => void;
 }
 
@@ -30,11 +33,13 @@ export function DefaultInputField({
   quantity,
   uomId,
   uomCategories,
+  describedBy,
   onChange,
 }: DefaultInputFieldProps) {
   const { t } = useTranslation(["items"]);
   const tDyn = makeTDynamic(t);
   const stringVal = String(value ?? "");
+  const quantityHintId = useId();
 
   // The unit comes from the UoM catalogue, never from a symbol carried in
   // form state — that second source is gone.
@@ -62,6 +67,11 @@ export function DefaultInputField({
           // boundary away, so the name is carried here from the same source
           // (`getLabel`) rather than left to the id/htmlFor pairing alone.
           aria-label={getLabel(field, tDyn)}
+          aria-describedby={
+            [field.key === "quantity" ? quantityHintId : null, describedBy]
+              .filter(Boolean)
+              .join(" ") || undefined
+          }
           onChange={(e) => {
             let val: string | null = e.target.value;
             if (field.type === "number") {
@@ -92,7 +102,10 @@ export function DefaultInputField({
 
       {/* Hints */}
       {field.key === "quantity" && (
-        <p className="text-xs text-on-muted mt-1.5 flex items-center gap-1.5 font-medium animate-in slide-in-from-top-1">
+        <p
+          id={quantityHintId}
+          className="text-xs text-on-muted mt-1.5 flex items-center gap-1.5 font-medium animate-in slide-in-from-top-1"
+        >
           <Info size={12} className="text-primary-400" />
           {unit
             ? tDyn(`items:quantityHints.${unit}`, { defaultValue: "" })

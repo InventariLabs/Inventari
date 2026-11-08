@@ -157,6 +157,13 @@ says what the release does rather than what changed since them.
   in the catalogue whose name contains what is typed; picking one writes its
   exact name, which is the match the save attaches the record to. Typing
   "Wax" no longer leaves a second product beside "Soy wax".
+- Under an empty product code field, the product form says what **Generate
+  code** gives: an in-house code starting with 20, from the range GS1 keeps for
+  a company's own goods, valid only inside the organization — goods sold on
+  through other shops need a GTIN from GS1. Under a code in that range it says
+  what such a code is, without claiming the organization made it. A screen
+  reader reads the sentence as the field's description, as it now does the
+  hints under the quantity and the weight.
 - An empty Products list says that products which exist only as a definition,
   such as ones made inside a recipe or a BOM, appear there once they have stock.
 - A module's settings schema may mark an option `requires_modules`: the option
