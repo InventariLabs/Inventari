@@ -35,6 +35,11 @@ export interface AuditLogListResponse {
   limit: number;
   offset: number;
   has_more: boolean;
+  /**
+   * The journal stopped counting at `total` and holds more: the first page
+   * counts only as far as the server's cap, and the cursor carries the flag on.
+   */
+  total_capped?: boolean;
   /** Hand it back as `cursor` for the page that follows; none on the last. */
   next_cursor?: string | null;
 }
