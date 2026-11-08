@@ -881,7 +881,9 @@ says what the release does rather than what changed since them.
   place or an error. The module's read still buys no core write — filing a
   category, changing a shelf and editing a product keep their own keys — and
   it buys no reach past the module's own records: the archive serves them
-  under the module's scope only, and a product card outside it answers 404.
+  under the module's scope only, a product card outside it answers 404, and
+  the label sheet draws only labels assigned to those records, never the free
+  pool.
 
 ### Removed
 

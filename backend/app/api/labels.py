@@ -15,6 +15,7 @@ from app.core.contracts import (
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    module_scopes_held,
     require_any_permission,
     require_org,
     require_permission,
@@ -23,6 +24,7 @@ from app.core.events import SystemEvent
 from app.core.exceptions import (
     AppException,
     ConflictException,
+    ForbiddenException,
     NotFoundException,
     catalogue_refusal,
     map_service_errors,
@@ -55,9 +57,14 @@ _ITEMS_WRITE = require_permission(SystemPermission.ITEMS_WRITE)
 
 #: The equipment register prints its assets' labels by downloading this sheet
 #: (the register's read admits it, as it admits the register's other reads).
-#: The sheet is a copy of labels already in the pool, not a way to make new
-#: ones: generating, assigning and deleting labels stay behind _ITEMS_WRITE.
-_READS_LABELS = require_any_permission(SystemPermission.ITEMS_READ, 'equipment:read')
+#: The same names bound the answer: a holder of the module's read draws the
+#: labels assigned to the module's records and never the free pool, because
+#: the sheet carries the caption of the product a label is assigned to and
+#: marking it printed spends it. The sheet is a copy of labels already in the
+#: pool, not a way to make new ones: generating, assigning and deleting labels
+#: stay behind _ITEMS_WRITE.
+_MODULE_READS = ('equipment:read',)
+_READS_LABELS = require_any_permission(SystemPermission.ITEMS_READ, *_MODULE_READS)
 
 
 @router.post(
@@ -407,9 +414,21 @@ async def export_labels_png(
     """Exports labels as one PNG: each label at its size, in mm, at 300 dpi."""
     org_id = require_org(current_user)
 
+    module_scopes: frozenset[str] | None = None
+    if not current_user.has_permission(SystemPermission.ITEMS_READ):
+        module_scopes = frozenset(module_scopes_held(current_user, _MODULE_READS))
+        if not (label_ids or short_codes):
+            # The free pool belongs to the organization, not to a module: none
+            # of its labels is assigned to one of the module's records, and
+            # printing one spends it. The register prints the labels of the
+            # records its screens show, by id or code.
+            raise ForbiddenException(
+                get_error_message('insufficient_permissions', get_current_lang())
+            )
+
     if label_ids:
         labels_dto = await core_api.labels.list_in_ids_async(
-            db, [UUID(i) for i in label_ids], org_id
+            db, [UUID(i) for i in label_ids], org_id, module_scopes=module_scopes
         )
         labels_map = {str(lbl.id): lbl for lbl in labels_dto}
         labels = []
@@ -418,7 +437,7 @@ async def export_labels_png(
                 labels.append(labels_map[lid])
     elif short_codes:
         labels_dto = await core_api.labels.list_by_short_codes_async(
-            db, short_codes, org_id
+            db, short_codes, org_id, module_scopes=module_scopes
         )
         codes_map = {lbl.short_code: lbl for lbl in labels_dto}
         labels = [codes_map[sc] for sc in short_codes if sc in codes_map]
@@ -431,6 +450,10 @@ async def export_labels_png(
         labels = list(labels_dto)
 
     if not labels:
+        if module_scopes:
+            # Asked for by id or code, and none of them the module's own: the
+            # answer is the card's, whether such a label exists or not.
+            raise NotFoundException('label')
         # Its own code, not VALIDATION_ERROR: the print agent polls this
         # endpoint and an empty pool is its normal state, which it must tell
         # apart from a refusal without reading a translated message.

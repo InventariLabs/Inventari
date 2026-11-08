@@ -213,7 +213,9 @@ _NAMED_ALSO_READ_BY_A_MODULE_READ: dict[str, tuple[str, frozenset[str]]] = {
     # The equipment register's asset card, linked from the list and from
     # assignment history.
     'app.api._items_crud.get_item': (ITEMS, frozenset({'equipment:read'})),
-    # The equipment register's Print labels download.
+    # The equipment register's label download: the card's one label as well
+    # as the list's Print labels. A module's read draws only the labels
+    # assigned to the module's records and never the free pool.
     'app.api.labels.export_labels_png': (ITEMS, frozenset({'equipment:read'})),
     # The warehouse's codes page finds and lists its shelves; the equipment
     # register names the place every asset stands in and opens one to edit.

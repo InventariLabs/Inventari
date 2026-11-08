@@ -26,6 +26,7 @@ shows a location list does not hand out the right to change it.
 """
 
 import uuid
+from datetime import UTC, datetime
 
 import pytest
 from fastapi.testclient import TestClient
@@ -85,35 +86,66 @@ def shelf(
 
 
 @pytest.fixture
+def equipment_category(client: TestClient, h: ModuleTestHelper, admin: User) -> str:
+    """The category that makes a record the equipment module's own."""
+    category = client.post(
+        '/api/v1/categories',
+        headers=h.get_auth_headers(admin),
+        json={'name': 'Laptops', 'context_tag': 'equipment'},
+    )
+    assert category.status_code == 201, category.text
+    return category.json()['id']
+
+
+@pytest.fixture
 def archived_asset(
     client: TestClient,
     h: ModuleTestHelper,
     admin: User,
     shelf: StorageLocation,
+    equipment_category: str,
 ) -> str:
     """An equipment record in the archive, filed under the module's category."""
-    headers = h.get_auth_headers(admin)
-    category = client.post(
-        '/api/v1/categories',
-        headers=headers,
-        json={'name': 'Laptops', 'context_tag': 'equipment'},
-    )
-    assert category.status_code == 201, category.text
     created = client.post(
         '/api/v1/items',
-        headers=headers,
+        headers=h.get_auth_headers(admin),
         json={
             'name': 'Laptop',
             'location_id': str(shelf.id),
-            'category_id': category.json()['id'],
+            'category_id': equipment_category,
             'quantity': 1,
         },
     )
     assert created.status_code == 201, created.text
     item_id = created.json()['id']
-    archived = client.delete(f'/api/v1/items/{item_id}', headers=headers)
+    archived = client.delete(
+        f'/api/v1/items/{item_id}', headers=h.get_auth_headers(admin)
+    )
     assert archived.status_code == 204, archived.text
     return item_id
+
+
+@pytest.fixture
+def live_asset(
+    client: TestClient,
+    h: ModuleTestHelper,
+    admin: User,
+    shelf: StorageLocation,
+    equipment_category: str,
+) -> str:
+    """An equipment record the register lists, and whose label it can print."""
+    created = client.post(
+        '/api/v1/items',
+        headers=h.get_auth_headers(admin),
+        json={
+            'name': 'Live laptop',
+            'location_id': str(shelf.id),
+            'category_id': equipment_category,
+            'quantity': 1,
+        },
+    )
+    assert created.status_code == 201, created.text
+    return created.json()['id']
 
 
 @pytest.fixture
@@ -154,6 +186,7 @@ def archived_plain_item(
 
 @pytest.fixture
 def pool_label(h: ModuleTestHelper, org: Organization, admin: User) -> LabelPool:
+    """A label nobody has assigned, which the free pool offers."""
     label = LabelPool(
         short_code=f'EQ-{uuid.uuid4().hex[:6]}',
         organization_id=org.id,
@@ -162,6 +195,38 @@ def pool_label(h: ModuleTestHelper, org: Organization, admin: User) -> LabelPool
     h.db.add(label)
     h.db.commit()
     return label
+
+
+def _assigned_label(
+    h: ModuleTestHelper, org: Organization, admin: User, item_id: str
+) -> LabelPool:
+    label = LabelPool(
+        short_code=f'EQ-{uuid.uuid4().hex[:6]}',
+        organization_id=org.id,
+        created_by=admin.id,
+        item_id=uuid.UUID(item_id),
+        is_assigned=True,
+        assigned_at=datetime.now(UTC),
+    )
+    h.db.add(label)
+    h.db.commit()
+    return label
+
+
+@pytest.fixture
+def asset_label(
+    h: ModuleTestHelper, org: Organization, admin: User, live_asset: str
+) -> LabelPool:
+    """The label stuck on one of the register's own assets."""
+    return _assigned_label(h, org, admin, live_asset)
+
+
+@pytest.fixture
+def plain_label(
+    h: ModuleTestHelper, org: Organization, admin: User, plain_item: str
+) -> LabelPool:
+    """The label of an ordinary product, which no module claims."""
+    return _assigned_label(h, org, admin, plain_item)
 
 
 def _with_role(
@@ -221,14 +286,14 @@ class TestAnEquipmentReaderReadsWhatTheRegisterShows:
         client: TestClient,
         h: ModuleTestHelper,
         org: Organization,
-        pool_label: LabelPool,
+        asset_label: LabelPool,
     ) -> None:
         headers = _with_role(h, org, ['equipment:read'])
 
         response = client.get(
             '/api/v1/labels/pool/export/png',
             headers=headers,
-            params={'short_codes': [pool_label.short_code]},
+            params={'short_codes': [asset_label.short_code]},
         )
 
         assert response.status_code == 200, response.text
@@ -256,11 +321,12 @@ class TestAnEquipmentReaderReadsWhatTheRegisterShows:
 class TestAnEquipmentReaderReadsOnlyTheRegistersRecords:
     """The module's read bounds the answer to the module's own records.
 
-    The archive and the card are Core routes whose data is not the module's
-    alone: the same route serves every product of the organization. Admitting
-    ``equipment:read`` there without a scope handed a register reader the
-    organization's whole product list by the back door — the archive unscoped
-    and a card by any id. The reach is the module's records.
+    The archive, the card and the label sheet are Core routes whose data is
+    not the module's alone: the same route serves every product of the
+    organization. Admitting ``equipment:read`` there without a scope handed a
+    register reader the organization's whole product list by the back door —
+    the archive unscoped, a card by any id and a label carrying any product's
+    name, with the free pool to spend. The reach is the module's records.
     """
 
     def test_the_equipment_archive_serves_only_the_equipment_scope(
@@ -311,6 +377,54 @@ class TestAnEquipmentReaderReadsOnlyTheRegistersRecords:
 
         assert live.status_code == 404, live.text
         assert archived.status_code == 404, archived.text
+
+    def test_the_label_sheet_draws_only_the_registers_labels(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        asset_label: LabelPool,
+        plain_label: LabelPool,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        own = client.get(
+            '/api/v1/labels/pool/export/png',
+            headers=headers,
+            params={'short_codes': [asset_label.short_code]},
+        )
+        another = client.get(
+            '/api/v1/labels/pool/export/png',
+            headers=headers,
+            params={'short_codes': [plain_label.short_code]},
+        )
+
+        assert own.status_code == 200, own.text
+        assert own.content.startswith(_PNG_MAGIC)
+        assert another.status_code == 404, another.text
+        h.db.refresh(asset_label)
+        h.db.refresh(plain_label)
+        assert asset_label.printed_at is not None
+        assert plain_label.printed_at is None
+
+    def test_the_label_sheet_refuses_the_free_pool(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        pool_label: LabelPool,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        response = client.get(
+            '/api/v1/labels/pool/export/png',
+            headers=headers,
+            params={'count': 3},
+        )
+
+        assert response.status_code == 403, response.text
+        h.db.refresh(pool_label)
+        assert pool_label.printed_at is None
 
 
 class TestAWarehouseReaderReadsWhatTheCodesPageShows:
