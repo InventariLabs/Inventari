@@ -11,6 +11,7 @@ from ._baselines import (
     _load_bare_emit_baseline,
     _load_core_api_model_leak_baseline,
     _load_coreapi_signature_legality_baseline,
+    _load_coreapi_write_user_context_baseline,
     _load_escape_hatch_org_filter_baseline,
     _load_escape_hatch_query_scope_baseline,
     _load_manifest_permission_deferrals,
@@ -70,7 +71,12 @@ from ._quality_checks import (
     _check_toctou_risk,
     collect_toctou_risks,
 )
-from ._quality_checks_audit_coverage import _check_audit_coverage, collect_audit_gaps
+from ._quality_checks_audit_coverage import (
+    _check_audit_coverage,
+    _check_core_api_write_user_context,
+    collect_audit_gaps,
+    collect_core_api_writes_without_user,
+)
 from ._quality_checks_baseline_ratchet import (
     _check_baseline_sizes,
     _check_stale_entries,
@@ -180,6 +186,14 @@ def build_parser() -> argparse.ArgumentParser:
         '--write-bare-emit-baseline',
         action='store_true',
         help='Record the emit call sites that exist today (the ratchet floor).',
+    )
+    parser.add_argument(
+        '--write-coreapi-write-user-context-baseline',
+        action='store_true',
+        help=(
+            'Record the CoreAPI write methods that take no UserContextDTO '
+            'today (the ratchet floor).'
+        ),
     )
     parser.add_argument(
         '--write-request-scope-baseline',
@@ -325,6 +339,10 @@ _BASELINED_SUMMARY: dict[str, tuple[str, str | None]] = {
     'legality': (
         'baselined CoreAPI signature legality finding(s)',
         'app/core/coreapi_signature_legality_baseline.txt',
+    ),
+    'write_user_context': (
+        'baselined CoreAPI write method(s) without the acting user',
+        'app/core/coreapi_write_user_context_baseline.txt',
     ),
     'test_skip': (
         'registered environmental test skip(s)',
@@ -500,6 +518,11 @@ def _stale_baseline_errors() -> list[str]:
             _load_public_api_missing_org_baseline(),
             _collect_public_api_missing_org_keys(PUBLIC_API_ROOT, MODULES_ROOT),
         ),
+        (
+            'coreapi_write_user_context_baseline.txt',
+            _load_coreapi_write_user_context_baseline(),
+            set(collect_core_api_writes_without_user(APP_ROOT)),
+        ),
     )
     return [
         error
@@ -646,6 +669,41 @@ def _write_refusal_ledger() -> int:
     return 0
 
 
+def _write_facade_baselines(args: argparse.Namespace) -> bool:
+    """Write one of the two facade baselines and report whether one was asked for.
+
+    The services that still import the ``core_api`` facade, and the facade's
+    write methods that still take no ``UserContextDTO``: both are ratchet
+    floors over the same surface, kept here so the write-mode dispatcher
+    stays inside its complexity budget.
+    """
+    from ._constants import (
+        COREAPI_WRITE_USER_CONTEXT_BASELINE_FILE,
+        SERVICES_PUBLIC_API_IMPORT_BASELINE_FILE,
+    )
+
+    if args.write_services_facade_baseline:
+        target, what = (
+            SERVICES_PUBLIC_API_IMPORT_BASELINE_FILE,
+            'services facade-import',
+        )
+        keys = set(collect_facade_imports(SERVICES_ROOT))
+        key_format = 'relative/path.py::Class::function'
+    elif args.write_coreapi_write_user_context_baseline:
+        target, what = (
+            COREAPI_WRITE_USER_CONTEXT_BASELINE_FILE,
+            'CoreAPI write-method user-context',
+        )
+        keys = set(collect_core_api_writes_without_user(APP_ROOT))
+        key_format = 'core/public_api/<file>.py::CoreClass.method'
+    else:
+        return False
+    _write_baseline(target, keys, key_format=key_format)
+    print(f'Wrote the {what} baseline with {len(keys)} entries to {target}.')
+    print('Re-run --write-baseline-sizes if the entry count changed.')
+    return True
+
+
 def _run_write_modes(args: argparse.Namespace) -> int | None:
     """Handle the modes that write a file and exit.
 
@@ -716,20 +774,7 @@ def _run_write_modes(args: argparse.Namespace) -> int | None:
         _write_request_scope_baseline()
         return 0
 
-    if args.write_services_facade_baseline:
-        from ._constants import SERVICES_PUBLIC_API_IMPORT_BASELINE_FILE
-
-        keys = set(collect_facade_imports(SERVICES_ROOT))
-        _write_baseline(
-            SERVICES_PUBLIC_API_IMPORT_BASELINE_FILE,
-            keys,
-            key_format='relative/path.py::Class::function',
-        )
-        print(
-            f'Wrote the services facade-import baseline with {len(keys)} '
-            f'entries to {SERVICES_PUBLIC_API_IMPORT_BASELINE_FILE}.'
-        )
-        print('Re-run --write-baseline-sizes if the entry count changed.')
+    if _write_facade_baselines(args):
         return 0
 
     if args.write_baseline_sizes:
@@ -1167,6 +1212,16 @@ def _run_checks() -> int:
         quiet=args.quiet,
     )
 
+    # 20b. Contract shape: a CoreAPI write method takes the acting user
+    # whole (`user: UserContextDTO`); the methods from before the rule are
+    # listed and only leave the list.
+    write_user_errors, baselined['write_user_context'] = _emit_baselined(
+        _check_core_api_write_user_context(
+            APP_ROOT, _load_coreapi_write_user_context_baseline()
+        ),
+        quiet=args.quiet,
+    )
+
     # 21. Test hygiene: an assertion may not accept a success and a refusal
     # at once. Twenty-six such assertions were found in the suite, each one
     # green through every change to the code it was pointed at.
@@ -1253,6 +1308,7 @@ def _run_checks() -> int:
         baseline_ratchet_errors,
         core_isolation_errors,
         legality_errors,
+        write_user_errors,
         permission_errors,
         cross_module_errors,
         test_skip_errors,

@@ -12,11 +12,15 @@ Tests cover:
 
 import asyncio
 import logging
+import re
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from app.core.contributions import ContributionRegistry, QuotaProvider
+
+APP_ROOT = Path(__file__).resolve().parents[2] / 'app'
 
 # ---------------------------------------------------------------------------
 # Known-point registration
@@ -27,9 +31,9 @@ def test_register_to_known_point():
     registry = ContributionRegistry()
     contribution = MagicMock()
 
-    registry.register('scan_providers', contribution)
+    registry.register('upload_path_resolvers', contribution)
 
-    assert contribution in registry.get('scan_providers')
+    assert contribution in registry.get('upload_path_resolvers')
 
 
 def test_register_multiple_to_same_point():
@@ -80,7 +84,7 @@ def test_warning_not_logged_for_known_point(caplog):
     contribution = MagicMock()
 
     with caplog.at_level(logging.WARNING, logger='app.core.contributions'):
-        registry.register('scan_providers', contribution)
+        registry.register('upload_path_resolvers', contribution)
 
     assert not any('unknown' in record.message.lower() for record in caplog.records)
 
@@ -116,7 +120,7 @@ def test_warning_mentions_known_points(caplog):
 
     warning_messages = ' '.join(r.message for r in caplog.records)
     # At least some known points should be mentioned in the warning
-    assert 'scan_providers' in warning_messages or 'quota_providers' in warning_messages
+    assert 'quota_providers' in warning_messages
 
 
 # ---------------------------------------------------------------------------
@@ -184,3 +188,37 @@ def test_all_known_points_are_accessible():
         # Each known point should return an empty list (not raise)
         result = registry.get(point)
         assert isinstance(result, list)
+
+
+def test_every_stable_point_has_a_backend_reader():
+    """A point nothing reads accepts a registration and does nothing with it.
+    ``scan_providers`` and ``dashboard_widgets`` were such points: listed as
+    known, so registering to them was silent, and read by no code."""
+    sources = '\n'.join(
+        path.read_text(encoding='utf-8')
+        for path in APP_ROOT.rglob('*.py')
+        if 'tests' not in path.relative_to(APP_ROOT).parts
+    )
+    stable = (
+        ContributionRegistry.KNOWN_POINTS - ContributionRegistry.EXPERIMENTAL_POINTS
+    )
+
+    unread = sorted(
+        point
+        for point in stable
+        if not re.search(rf"""\.get\(\s*['"]{point}['"]""", sources)
+    )
+
+    assert stable
+    assert unread == [], f'stable contribution points no backend code reads: {unread}'
+
+
+@pytest.mark.parametrize('point', ['scan_providers', 'dashboard_widgets'])
+def test_a_point_without_a_reader_warns(caplog, point):
+    with caplog.at_level(logging.WARNING, logger='app.core.contributions'):
+        ContributionRegistry().register(point, MagicMock())
+
+    assert any(
+        'unknown contribution point' in r.message.lower() and point in r.message
+        for r in caplog.records
+    )

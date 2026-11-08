@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 import sys
 from pathlib import Path
 
@@ -77,7 +78,71 @@ def _iter_forbidden_imports(
     return found
 
 
-def _check_escape_hatch(file_path: Path, source: str) -> str | None:
+#: ``# module_writes: ReorderRule, Other (a note)`` — a comment line of its own,
+#: naming the tables (model classes or table names) before any parenthesis.
+MODULE_WRITES_PATTERN = re.compile(r'^[ \t]*#[ \t]*module_writes:[ \t]*([^(\n]*)', re.M)
+
+
+def _module_tables(module_dir: Path) -> set[str]:
+    """The model classes, and their table names, a module declares itself."""
+    tables: set[str] = set()
+    for py_file in module_dir.rglob('*.py'):
+        if _is_test_file(py_file, module_dir):
+            continue
+        try:
+            tree = ast.parse(py_file.read_text(encoding='utf-8'))
+        except (OSError, SyntaxError, UnicodeDecodeError, ValueError):
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            for stmt in node.body:
+                target: ast.expr
+                value: ast.expr | None
+                if isinstance(stmt, ast.Assign):
+                    target, value = stmt.targets[0], stmt.value
+                elif isinstance(stmt, ast.AnnAssign):
+                    target, value = stmt.target, stmt.value
+                else:
+                    continue
+                if isinstance(target, ast.Name) and target.id == '__tablename__':
+                    tables.add(node.name)
+                    if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                        tables.add(value.value)
+    return tables
+
+
+def _declared_module_writes(file_path: Path, source: str, modules_root: Path) -> bool:
+    """Whether the file lifts the write ban with a ``# module_writes:`` line.
+
+    The marker lifts the ban for the whole file, so it holds only for tables
+    the module owns: every name it gives must be a model class (or a table
+    name) declared in the module's own package. A name from anywhere else —
+    a Core model — is exactly the write the ban exists for, and exits.
+    """
+    match = MODULE_WRITES_PATTERN.search(source)
+    if match is None:
+        return False
+    named = [name.strip() for name in match.group(1).split(',') if name.strip()]
+    module_dir = modules_root / file_path.relative_to(modules_root).parts[0]
+    owned = _module_tables(module_dir)
+    foreign = [name for name in named if name not in owned]
+    if not named or foreign:
+        print(
+            f'::error file={_rel(file_path)},title=Architecture: module_writes names '
+            f'a table the module does not own::'
+            f"'# module_writes:' names {', '.join(foreign) or 'no table'}; it lifts "
+            f'the write ban only for tables declared in app/modules/'
+            f'{module_dir.name}/ (a model class with __tablename__, or that table '
+            f'name). Write to anything else through CoreAPI.'
+        )
+        sys.exit(1)
+    return True
+
+
+def _check_escape_hatch(
+    file_path: Path, source: str, modules_root: Path = MODULES_ROOT
+) -> str | None:
     """
     If the file declares the escape hatch (L2), validate it and return the reason.
     Returns None if no escape hatch is present.
@@ -104,14 +169,15 @@ def _check_escape_hatch(file_path: Path, source: str) -> str | None:
         )
         sys.exit(1)
 
+    module_writes = _declared_module_writes(file_path, source, modules_root)
     for lineno, line in enumerate(source.splitlines(), 1):
         stripped = line.strip()
         if stripped.startswith('#'):
             continue
         for call in FORBIDDEN_WRITES:
             if call in stripped:
-                # module_writes marker allows writes to module-local tables
-                if '# module_writes:' in source:
+                # The module_writes line allows writes to the module's own tables.
+                if module_writes:
                     continue
                 print(
                     f'::error file={_rel(file_path)},line={lineno},title=Architecture: write in read-only file::'
@@ -316,7 +382,7 @@ def find_module_boundary_violations(
         except (OSError, SyntaxError, UnicodeDecodeError):
             continue
 
-        reason = _check_escape_hatch(py_file, source)
+        reason = _check_escape_hatch(py_file, source, root)
         if reason is not None:
             escape_hatch_files.append((py_file, reason))
             continue

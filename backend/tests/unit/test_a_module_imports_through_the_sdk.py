@@ -187,6 +187,49 @@ class TestTheDeclaredSurface:
         assert module_sdk.ModuleModelBase is ModuleModelBase
         assert module_sdk.ModuleModelBase is not Base
 
+    @pytest.mark.parametrize(
+        'source',
+        [
+            'from app.core.module_sdk import CoreModelBase\n',
+            'import app.core.module_sdk\n\n\nBase = app.core.module_sdk.CoreModelBase\n',
+            'import app.core.module_sdk as sdk\n\n\nclass Note(sdk.CoreModelBase):\n'
+            "    __tablename__ = 'notes'\n",
+        ],
+        ids=['from-import', 'attribute', 'module-alias'],
+    )
+    def test_a_community_module_cannot_take_the_core_base(self, tmp_path, source):
+        """The SDK path is on the surface, but the object behind the name is
+        Core's own declarative base: a table declared on it lands in Core's
+        metadata, where Core's autogenerate proposes it as a core migration.
+        The guides send a community module to ``ModuleModelBase``; the scan
+        holds it there, however the base is reached."""
+        module = _community_module(tmp_path, **{'models.py': source})
+
+        findings = _scan(module)
+
+        assert [f.kind for f in findings] == ['forbidden_import'], findings
+        assert findings[0].subject == 'app.core.module_sdk.CoreModelBase'
+
+    def test_the_module_base_stays_open_to_a_community_module(self, tmp_path):
+        module = _community_module(
+            tmp_path,
+            **{'models.py': 'from app.core.module_sdk import ModuleModelBase\n'},
+        )
+
+        assert _scan(module) == []
+
+    def test_a_shipped_module_keeps_the_core_base(self, tmp_path):
+        """``example_widgets`` and ``warehouse`` declare on it: their tables
+        were Core's before the SDK existed."""
+        for name in ('example_widgets', 'warehouse'):
+            module = _community_module(
+                tmp_path,
+                name,
+                **{'models.py': 'from app.core.module_sdk import CoreModelBase\n'},
+            )
+
+            assert _scan(module) == [], name
+
 
 @pytest.mark.unit
 class TestTheDoorIntoAShippedModule:

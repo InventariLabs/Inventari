@@ -8,6 +8,7 @@ from ._constants import (
     BARE_EMIT_BASELINE_FILE,
     CORE_API_MODEL_LEAK_BASELINE_FILE,
     COREAPI_SIGNATURE_LEGALITY_BASELINE_FILE,
+    COREAPI_WRITE_USER_CONTEXT_BASELINE_FILE,
     ESCAPE_HATCH_ORG_FILTER_BASELINE_FILE,
     ESCAPE_HATCH_QUERY_SCOPE_BASELINE_FILE,
     GET_DB_BASELINE_FILE,
@@ -342,6 +343,11 @@ def _load_unread_org_parameter_baseline() -> set[str]:
 
 def _load_coreapi_signature_legality_baseline() -> set[str]:
     return _load_baseline(COREAPI_SIGNATURE_LEGALITY_BASELINE_FILE)
+
+
+def _load_coreapi_write_user_context_baseline() -> set[str]:
+    """CoreAPI write methods from before the rule that one takes the user."""
+    return _load_baseline(COREAPI_WRITE_USER_CONTEXT_BASELINE_FILE)
 
 
 def _load_owned_entries(

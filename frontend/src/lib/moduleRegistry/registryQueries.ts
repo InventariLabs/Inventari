@@ -23,8 +23,8 @@ import type {
   SlotContribution,
   ValidationRule,
 } from "./moduleInterfaces";
-// ActionItem / status badge types come from FrontendModule.useActionItems /
-// useStatusBadge — no standalone types needed.
+// ActionItem types come from FrontendModule.useActionItems — no standalone
+// types needed.
 
 export function applyNavOverrides(
   items: ModuleNavItem[],
@@ -393,22 +393,6 @@ export class RegistryQueries {
     this.modules.forEach((mod) => {
       if (enabledModules.includes(mod.name) && mod.useActionItems) {
         result.push({ moduleName: mod.name, hook: mod.useActionItems });
-      }
-    });
-    return result;
-  }
-
-  getStatusBadgeProviders(enabledModules: string[]): Array<{
-    moduleName: string;
-    hook: NonNullable<FrontendModule["useStatusBadge"]>;
-  }> {
-    const result: Array<{
-      moduleName: string;
-      hook: NonNullable<FrontendModule["useStatusBadge"]>;
-    }> = [];
-    this.modules.forEach((mod) => {
-      if (enabledModules.includes(mod.name) && mod.useStatusBadge) {
-        result.push({ moduleName: mod.name, hook: mod.useStatusBadge });
       }
     });
     return result;

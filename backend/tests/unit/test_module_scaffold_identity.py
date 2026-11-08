@@ -145,7 +145,11 @@ class TestTheScaffoldIsShipped:
         module_generator.create_module('warranty_tracker')
 
         after = _shipped(shipped_tree.read_text())
-        assert after == sorted([*before, 'warranty_tracker'])
+        at = after.index('warranty_tracker')
+        assert after[at + 1] > 'warranty_tracker' > after[at - 1]
+        # No other entry moves: the list is not sorted ('warehouse' sits near
+        # the top), and re-sorting it put every unrelated line in the diff.
+        assert [name for name in after if name != 'warranty_tracker'] == before
 
     def test_nothing_else_in_the_file_changes(self, shipped_tree):
         before = shipped_tree.read_text().splitlines()

@@ -1100,6 +1100,15 @@
                     }
                   ]
                 }
+              },
+              "shell": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "string",
+                    "undefined"
+                  ]
+                }
               }
             }
           }
@@ -1181,6 +1190,15 @@
                 "optional": false,
                 "type": "string"
               },
+              "permission": {
+                "optional": true,
+                "type": {
+                  "union": [
+                    "string",
+                    "undefined"
+                  ]
+                }
+              },
               "title": {
                 "optional": false,
                 "type": "string"
@@ -1236,6 +1254,12 @@
                       "literal": "approval_status_badge"
                     },
                     {
+                      "literal": "dashboard_activity_aside"
+                    },
+                    {
+                      "literal": "dashboard_replenish_action"
+                    },
+                    {
                       "literal": "dashboard_replenish_modal"
                     },
                     {
@@ -1273,6 +1297,9 @@
                     },
                     {
                       "literal": "quick_add_product_info"
+                    },
+                    {
+                      "literal": "recipe_cook_for_stock"
                     },
                     {
                       "literal": "settings_ai_module_config"
@@ -1548,12 +1575,6 @@
                     },
                     {
                       "literal": "item_edit"
-                    },
-                    {
-                      "literal": "storage_create"
-                    },
-                    {
-                      "literal": "storage_edit"
                     }
                   ]
                 }
@@ -1643,6 +1664,12 @@
               "literal": "approval_status_badge"
             },
             {
+              "literal": "dashboard_activity_aside"
+            },
+            {
+              "literal": "dashboard_replenish_action"
+            },
+            {
               "literal": "dashboard_replenish_modal"
             },
             {
@@ -1680,6 +1707,9 @@
             },
             {
               "literal": "quick_add_product_info"
+            },
+            {
+              "literal": "recipe_cook_for_stock"
             },
             {
               "literal": "settings_ai_module_config"
@@ -2509,6 +2539,26 @@
           }
         }
       },
+      "dashboard_activity_aside": {
+        "args": [
+          "string",
+          "never"
+        ],
+        "ext": "Record"
+      },
+      "dashboard_replenish_action": {
+        "obj": {
+          "onOpen": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [],
+                "returns": "void"
+              }
+            }
+          }
+        }
+      },
       "dashboard_replenish_modal": {
         "obj": {
           "isOpen": {
@@ -3206,6 +3256,42 @@
                 "string",
                 "undefined"
               ]
+            }
+          }
+        }
+      },
+      "recipe_cook_for_stock": {
+        "obj": {
+          "onClose": {
+            "optional": false,
+            "type": {
+              "fn": {
+                "params": [],
+                "returns": "void"
+              }
+            }
+          },
+          "open": {
+            "optional": false,
+            "type": "boolean"
+          },
+          "recipe": {
+            "optional": false,
+            "type": {
+              "obj": {
+                "id": {
+                  "optional": false,
+                  "type": "string"
+                },
+                "name": {
+                  "optional": false,
+                  "type": "string"
+                },
+                "servings": {
+                  "optional": false,
+                  "type": "number"
+                }
+              }
             }
           }
         }

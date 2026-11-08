@@ -109,8 +109,9 @@ class AsyncModuleScopedSession:
     in :func:`_inject_org_filter`. The short version: entities, aliases,
     plain tables and org-exposing subqueries/CTEs are filtered; a subquery
     without an ``organization_id`` column raises rather than returning
-    every tenant's rows; an explicit join is passed through untouched, so
-    write its org filter yourself.
+    every tenant's rows; in an explicit join every *selected* entity is
+    filtered and a joined table the statement does not select is not, so
+    write that table's org filter yourself.
     """
 
     def __init__(self, db: AsyncSession, organization_id: UUID) -> None:
