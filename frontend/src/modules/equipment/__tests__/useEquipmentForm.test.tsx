@@ -521,6 +521,31 @@ describe("useEquipmentForm — a photo refused after the asset was saved", () =>
       expect(toast.success).toHaveBeenCalled();
     },
   );
+
+  it("says the photo could not be removed, not that the upload failed, when its removal is refused", async () => {
+    vi.mocked(itemsApi.getById).mockResolvedValue(mockItem({ name: "Laptop" }));
+    vi.mocked(itemsApi.deleteImage).mockRejectedValueOnce(
+      new SessionEndedError(i18next.t("common:errors.sessionEnded")),
+    );
+    const { Wrapper } = makeWrapper();
+    const { result } = renderHook(() => useEquipmentForm("edit-1", {}), {
+      wrapper: Wrapper,
+    });
+    await waitFor(() => expect(result.current.form.name).toBe("Laptop"));
+
+    act(() => {
+      result.current.setDeleteImageFlag(true);
+    });
+    await act(async () => {
+      await result.current.handleSubmit({
+        preventDefault: vi.fn(),
+      } as unknown as React.FormEvent);
+    });
+
+    const shown = vi.mocked(toast.error).mock.calls.map(([m]) => String(m));
+    expect(shown).toEqual([i18next.t("items:messages.imageRemoveFailed")]);
+    expect(itemsApi.uploadImage).not.toHaveBeenCalled();
+  });
 });
 
 describe("useEquipmentForm — edit-mode label & barcode persistence", () => {

@@ -215,7 +215,13 @@ export const organizationsApi = {
   },
 
   testEmail: async (smtpConfig: unknown): Promise<{ message: string }> => {
-    const response = await api.post("/organizations/my/test-email", smtpConfig);
+    const response = await api.post(
+      "/organizations/my/test-email",
+      smtpConfig,
+      {
+        readOnly: true,
+      },
+    );
     return response.data;
   },
 };

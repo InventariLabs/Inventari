@@ -61,7 +61,9 @@ export const productTemplatesApi = {
   generateBarcode: async (): Promise<string> => {
     const { data } = await api.post<
       components["schemas"]["GeneratedProductCode"]
-    >(`/items/product-templates/generate-barcode`);
+    >(`/items/product-templates/generate-barcode`, undefined, {
+      readOnly: true,
+    });
     return data.barcode;
   },
 

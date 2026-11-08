@@ -63,6 +63,7 @@ export const aiConnectionsApi = {
         model_name: data.model_name,
         capabilities: data.capabilities,
       },
+      { readOnly: true },
     );
     return response.data;
   },
