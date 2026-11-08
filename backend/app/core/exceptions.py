@@ -263,6 +263,21 @@ class CodedRejectionError(ServiceRejectionError):
             },
         )
 
+    def conflict(self) -> AppException:
+        """The 409 a route answers this refusal with.
+
+        The code, the sentence in the request language, the language it is
+        written in, and the context beside them — a client that shows which
+        modules were refused reads them as data, not out of the sentence.
+        """
+        lang = get_current_lang()
+        return AppException(
+            status_code=409,
+            code=self.code,
+            message=self.sentence(lang),
+            extra={**self.context, 'lang': lang},
+        )
+
 
 class ContractViolationError(Exception):
     """A caller broke a Core contract; no reader is told anything.

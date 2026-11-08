@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { storagesApi } from "@/lib/api/storages";
 import type { StorageReorgOperation } from "@/lib/api/storages";
 import { invalidation } from "@/lib/api/invalidation";
-import { extractApiError } from "@/lib/errors";
+import { extractApiError, ReadableError } from "@/lib/errors";
 import { useMoveQuestion } from "@/modules/spaces/hooks/useMoveQuestion";
 
 export interface StorageMove {
@@ -52,7 +52,9 @@ export function useStorageMove() {
   const apply = async (operations: StorageReorgOperation[]) => {
     const result = await storagesApi.reorg(operations);
     if (!result.applied) {
-      throw new Error(
+      // The server's reason is a sentence for the reader (it names the place
+      // and the rule); a plain Error would be shown as the generic failure.
+      throw new ReadableError(
         result.rejections[0]?.reason ?? t("locations:move.rejected"),
       );
     }

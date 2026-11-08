@@ -306,6 +306,10 @@ class TestFocusMode:
         detail = response.json()['detail']
         assert detail['code'] == 'unknown_module'
         assert detail['message'] == 'Moduł „no_such_module” nie jest zarejestrowany.'
+        # The module the sentence names travels as data too, with the
+        # language the sentence was written in.
+        assert detail['module'] == 'no_such_module'
+        assert detail['lang'] == 'pl'
 
     async def test_leaving_without_focus_is_refused_in_polish(
         self, real_async_client, real_async_db_session
@@ -454,6 +458,9 @@ class TestProfileSwitchOverHttp:
         assert detail['message'] == (
             'Profil odwołuje się do niezarejestrowanych modułów: ghost'
         )
+        # The list the sentence joins with commas stays a list here.
+        assert detail['unknown_modules'] == ['ghost']
+        assert detail['lang'] == 'pl'
 
 
 class TestModuleDependencyCycle:

@@ -650,6 +650,7 @@ class ErrorMessages(TypedDict):
     category_system_field_label_locked: str
     storage_delete_blocked_by_movements: str
     storage_delete_blocked_by_stock: str
+    storage_delete_blocked_by_child_name: str
     storage_name_collision: str
     stock_as_of_no_history: str
     stock_as_of_before_ledger: str

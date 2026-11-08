@@ -468,6 +468,47 @@ describe("StoragesPage — one screen", () => {
     });
   });
 
+  it("tells the reason the server refused a move, not that it could not move", async () => {
+    server.use(
+      http.post("/api/v1/locations/reorg", () =>
+        HttpResponse.json(
+          {
+            applied: false,
+            created: {},
+            moves: [],
+            rejections: [
+              {
+                index: 0,
+                op: "move",
+                reason:
+                  'A storage location named "Dry Goods" already exists at this level.',
+              },
+            ],
+          },
+          { status: 207 },
+        ),
+      ),
+    );
+    renderPage("/inventory/locations/zone");
+
+    const moveButtons = await screen.findAllByRole("button", {
+      name: "Move to…",
+    });
+    await userEvent.click(moveButtons[0]);
+    const dialog = await screen.findByRole("dialog");
+    await userEvent.click(
+      within(
+        within(dialog).getByRole("tree", { name: "Destination locations" }),
+      ).getByRole("treeitem", { name: /Freezer/ }),
+    );
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'A storage location named "Dry Goods" already exists at this level.',
+      ),
+    );
+  });
+
   it("moves to the destination a label or a short code scanned into the picker names", async () => {
     const reorgs: unknown[] = [];
     server.use(

@@ -86,11 +86,12 @@ Per gunicorn worker the app opens:
 under Postgres `max_connections` with headroom for admin/migration sessions.
 
 Current prod default: `WEB_CONCURRENCY=4`, 1 replica → 200 client
-connections (`MAX_CLIENT_CONN: 300`) → PgBouncer pool 30 → PG max 50. Adding
-replica #2 doubles the client side to 400 — raise `MAX_CLIENT_CONN`
-accordingly and re-check the server-side pool. `MAX_CLIENT_CONN` is set in
-`docker-compose.prod.yml` (`pgbouncer-main`), not from `.env`, so
-`WEB_CONCURRENCY=6` on one replica (300 client connections) already reaches it.
+connections (`MAX_CLIENT_CONN`, 300 unless `PGBOUNCER_MAX_CLIENT_CONN` in
+`.env` says otherwise) → PgBouncer pool 30 → PG max 50. Adding replica #2
+doubles the client side to 400 — raise `PGBOUNCER_MAX_CLIENT_CONN`
+accordingly and re-check the server-side pool. So does `WEB_CONCURRENCY=6`
+on one replica: its 300 client connections reach the shipped limit, which is
+why the 16 GB row of DEPLOYMENT.md's sizing table sets it to 400.
 
 ### 1.4 File storage must be shared
 - Local disk storage (`FILE_STORAGE_BACKEND=local`, `uploads_data` volume)

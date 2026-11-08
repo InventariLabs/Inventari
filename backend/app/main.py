@@ -133,6 +133,8 @@ async def global_exception_handler(request: Request, exc: Exception):
     # A 500 answers in the same envelope as every refusal. The sentence is the
     # catalogue's generic one — an exception's own text names tables, columns
     # and library internals, and belongs in the log above, not on a screen.
+    # The id the operator greps the log for, like every other answer carries.
+    request_id = getattr(request.state, 'request_id', None)
     return JSONResponse(
         status_code=500,
         content={
@@ -141,6 +143,7 @@ async def global_exception_handler(request: Request, exc: Exception):
                 'message': get_error_message('internal_error', lang),
             }
         },
+        headers={'X-Request-ID': request_id} if request_id else None,
     )
 
 
