@@ -1,7 +1,7 @@
 import type { components } from "@/types/api-generated";
 import axios from "axios";
 
-import { api } from "@/lib/api/client";
+import { api, getEveryPage } from "@/lib/api/client";
 
 export type EquipmentAssignment = components["schemas"]["AssignmentSchema"];
 
@@ -14,9 +14,6 @@ export type AssignmentCheckin = components["schemas"]["AssignmentCheckin"];
 // E14: overdue assignments surfaced from /equipment/assignments/overdue.
 export type OverdueAssignmentItem =
   components["schemas"]["OverdueAssignmentItem"];
-
-type OverdueAssignmentListResponse =
-  components["schemas"]["OverdueAssignmentListResponse"];
 
 export const equipmentAssignmentsApi = {
   checkout: async (data: AssignmentCreate): Promise<EquipmentAssignment> => {
@@ -45,17 +42,11 @@ export const equipmentAssignmentsApi = {
     return response.data;
   },
 
-  // List assignments whose expected_return_at has passed without checkin.
-  listOverdueAssignments: async (
-    limit = 20,
-    offset = 0,
-  ): Promise<OverdueAssignmentListResponse> => {
-    const response = await api.get<OverdueAssignmentListResponse>(
-      "/equipment/assignments/overdue",
-      { params: { limit, offset } },
-    );
-    return response.data;
-  },
+  // Every assignment whose expected_return_at has passed without checkin.
+  // The overview counts them all: one page of twenty read 27 late returns
+  // as 20.
+  listOverdueAssignments: (): Promise<OverdueAssignmentItem[]> =>
+    getEveryPage<OverdueAssignmentItem>("/equipment/assignments/overdue"),
 
   getItemAssignmentHistory: async (
     itemId: string,

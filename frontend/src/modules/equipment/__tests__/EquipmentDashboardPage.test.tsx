@@ -1,5 +1,5 @@
 import React from "react";
-import { act, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -122,8 +122,6 @@ interface Served {
   ending?: object[];
   expired?: object[];
   overdue?: object[];
-  /** The server's count of late returns, when it is more than the rows sent. */
-  overdueTotal?: number;
   assignments?: object[];
   totals?: { total_assets: number; retired: number; active: number };
   valued?: number;
@@ -134,7 +132,6 @@ function serve({
   ending = [],
   expired = [],
   overdue = [],
-  overdueTotal = overdue.length,
   assignments = [],
   totals = { total_assets: assets.length, retired: 0, active: 0 },
   valued = 0,
@@ -153,15 +150,20 @@ function serve({
         expired_warranty_alerts: expired,
       }),
     ),
-    http.get("/api/v1/equipment/assignments/overdue", () =>
-      HttpResponse.json({
-        items: overdue,
-        total: overdueTotal,
-        limit: 20,
-        offset: 0,
-        has_more: false,
-      }),
-    ),
+    // Pages the way the endpoint does, so a reader that asks for one page
+    // of a long list gets only that page.
+    http.get("/api/v1/equipment/assignments/overdue", ({ request }) => {
+      const query = new URL(request.url).searchParams;
+      const limit = Number(query.get("limit") ?? 50);
+      const offset = Number(query.get("offset") ?? 0);
+      return HttpResponse.json({
+        items: overdue.slice(offset, offset + limit),
+        total: overdue.length,
+        limit,
+        offset,
+        has_more: offset + limit < overdue.length,
+      });
+    }),
     http.get("/api/v1/equipment/assignments", () =>
       HttpResponse.json({
         items: assignments,
@@ -270,7 +272,7 @@ describe("the equipment overview", () => {
     await settle();
   });
 
-  it("counts every late return in the heading, not only the rows it fetched", async () => {
+  it("counts every late return, past the first twenty, in the heading and the rows", async () => {
     const late = (n: number) => ({
       assignment_id: `asg-${n}`,
       item_id: `late-${n}`,
@@ -286,8 +288,7 @@ describe("the equipment overview", () => {
       days_overdue: n,
     });
     serve({
-      overdue: [late(1), late(2)],
-      overdueTotal: 27,
+      overdue: Array.from({ length: 27 }, (_, i) => late(i + 1)),
       totals: { total_assets: 30, retired: 0, active: 27 },
     });
     renderPage();
@@ -295,6 +296,9 @@ describe("the equipment overview", () => {
     expect(
       await screen.findByRole("heading", { name: "27 assets need attention" }),
     ).toBeInTheDocument();
+    // The rows behind "Show all" are the 27 the heading counts.
+    fireEvent.click(screen.getByRole("button", { name: "Show all 27" }));
+    expect(screen.getByText("Laptop 27")).toBeInTheDocument();
     await settle();
   });
 

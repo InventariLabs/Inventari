@@ -36,7 +36,7 @@ export interface EquipmentAssetListParams {
 
 /**
  * The list's filters as the scope of a bulk action: "everything that
- * matches", not a page of ids. Same five parameters the list takes.
+ * matches", not a page of ids. The same filters the list takes.
  */
 export type AssetFilter = components["schemas"]["AssetFilter"];
 

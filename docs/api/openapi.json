@@ -42337,7 +42337,7 @@
         },
         "type": "object",
         "title": "AssetFilter",
-        "description": "The asset list's filters, as the scope of a bulk action.\n\nThe same six parameters ``GET /equipment/assets`` takes, so \"everything\nthat matches\" means exactly what the reader is looking at."
+        "description": "The asset list's filters, as the scope of a bulk action.\n\nThe filters ``GET /equipment/assets`` takes, so \"everything\nthat matches\" means exactly what the reader is looking at."
       },
       "AssetTimelineEvent": {
         "properties": {

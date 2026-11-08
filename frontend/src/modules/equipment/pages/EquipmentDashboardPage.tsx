@@ -26,17 +26,6 @@ import {
 } from "@/modules/equipment/hooks/useFleetComposition";
 import { useFleetValuation } from "@/modules/equipment/hooks/useValuation";
 
-/** Overdue returns fetched for the card's rows; its heading counts them all. */
-const OVERDUE_LIMIT = 20;
-
-/**
- * The late returns the server counts beyond the rows it sent. The card's rows
- * read at most OVERDUE_LIMIT of them, its heading counts them all.
- */
-function lateBeyond(page: { total: number; items: unknown[] } | undefined) {
-  return page ? Math.max(0, page.total - page.items.length) : 0;
-}
-
 /**
  * EquipmentDashboardPage — the overview at /equipment.
  *
@@ -50,7 +39,9 @@ export default function EquipmentDashboardPage() {
   useAddAssetHeader();
 
   const dashboard = useEquipmentDashboard();
-  const overdue = useOverdueAssignments(OVERDUE_LIMIT);
+  // Every late return, not a first page: the heading, the rows and "Show
+  // all" count the same assets only when the card holds all of them.
+  const overdue = useOverdueAssignments();
   const fleet = useFleetAssets();
   // The widget's own query, read here only for the layout: with nothing to
   // value it draws nothing, and the check-outs take the full width.
@@ -87,7 +78,7 @@ export default function EquipmentDashboardPage() {
   const inFleet = (w: { item_id: string }) => !retired.has(w.item_id);
   const attention = toFleetAttention(
     {
-      overdue: overdue.data?.items ?? [],
+      overdue: overdue.data ?? [],
       warrantyEnding: (warrantyEnding ?? []).filter(inFleet),
       warrantyExpired: (dashboard.data?.expired_warranty_alerts ?? []).filter(
         inFleet,
@@ -118,7 +109,7 @@ export default function EquipmentDashboardPage() {
         <AttentionCard
           items={attention}
           attentionLabel={t("dashboard.attention.heading", {
-            count: attention.length + lateBeyond(overdue.data),
+            count: attention.length,
           })}
           summary={summary}
           // The link opens the whole register, retired assets included (the
