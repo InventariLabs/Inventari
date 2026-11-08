@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
 from app.modules.maker.models import ProductionOrder
+from tests.integration._far_clock import zone_where_today_differs
 
 from .test_production_audit import _seed_run
 
@@ -61,6 +62,42 @@ class TestClosingFacts:
         assert order.production_date is not None
         assert order.completed_at is not None
         assert order.production_date == order.completed_at.date()
+
+    def test_a_run_is_filed_under_the_organizations_day(
+        self,
+        client: TestClient,
+        mk_org: Organization,
+        mk_auth_headers: dict[str, str],
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """The day a run closes is the organization's, not the server's.
+
+        A run with no production date took the UTC date of its completion
+        stamp, and the period guard in front of it asked about the server's
+        ``date.today()`` — so a workshop a day ahead of the server filed
+        today's run under yesterday, in a month it might already have
+        closed. The zone is one whose today differs from the server's right
+        now, so the reverted code fails at any hour.
+        """
+        zone, org_today = zone_where_today_differs()
+        mk_org.timezone = zone
+        db_session.commit()
+        run = _seed_run(
+            db_session, client, mk_org, mk_auth_headers, mk_input_loc, mk_output_loc
+        )
+
+        resp = client.post(
+            f'/api/v1/maker/production/orders/{run["order_id"]}/complete',
+            headers=mk_auth_headers,
+        )
+
+        assert resp.status_code == 200, resp.text
+        order = db_session.execute(
+            select(ProductionOrder).where(ProductionOrder.id == run['order_id'])
+        ).scalar_one()
+        assert order.production_date == org_today
 
     def test_stock_moves_carry_the_unit(
         self,

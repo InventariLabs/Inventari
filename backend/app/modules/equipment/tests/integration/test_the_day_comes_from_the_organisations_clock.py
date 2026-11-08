@@ -13,9 +13,8 @@ around midnight.
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, date, datetime
+from datetime import date
 from decimal import Decimal
-from zoneinfo import ZoneInfo
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,30 +26,14 @@ from app.models.storage_location import StorageLocation
 from app.models.storage_type import StorageType
 from app.models.user import User
 from app.modules.equipment import dashboard_service, depreciation_service
+from tests.integration._far_clock import zone_where_today_differs
 
 pytestmark = pytest.mark.integration
-
-# +14 and −11: whatever the hour, one of them is on a different date than a
-# server running in UTC, so the fixture never has to wait for midnight.
-_CANDIDATE_ZONES = ('Pacific/Kiritimati', 'Pacific/Midway')
-
-
-def _zone_where_today_differs() -> tuple[str, date]:
-    """A zone whose today is not the server's, plus that zone's today."""
-    now = datetime.now(UTC)
-    for name in _CANDIDATE_ZONES:
-        local_today = now.astimezone(ZoneInfo(name)).date()
-        if local_today != date.today():
-            return name, local_today
-    raise AssertionError(
-        'no candidate zone differs from the server day — the server is not '
-        f'running in UTC (now={now.isoformat()}, today={date.today()})'
-    )
 
 
 @pytest.fixture
 async def far_org(real_async_db_session: AsyncSession) -> Organization:
-    zone, _ = _zone_where_today_differs()
+    zone, _ = zone_where_today_differs()
     org = Organization(
         name=f'Far Org {uuid.uuid4().hex[:8]}',
         enabled_modules=['core', 'items', 'equipment'],
@@ -154,7 +137,7 @@ async def test_a_warranty_ending_today_is_read_on_the_organisations_today(
     yesterday (already lapsed, so it moves to the expired list) — the two
     assertions below fail in whichever direction the reverted code errs.
     """
-    _, org_today = _zone_where_today_differs()
+    _, org_today = zone_where_today_differs()
     asset = await _asset(
         real_async_db_session,
         far_org,
@@ -195,7 +178,7 @@ async def test_book_value_is_struck_as_at_the_organisations_day(
     the date the service dates the calculation to. That is what is asserted:
     the organization's day, and provably not the server's.
     """
-    _, org_today = _zone_where_today_differs()
+    _, org_today = zone_where_today_differs()
     asset = await _asset(
         real_async_db_session,
         far_org,

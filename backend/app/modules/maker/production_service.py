@@ -949,9 +949,13 @@ async def complete_production(
     # guard mid-flight — but a refusal after the explosion and the
     # availability question is the guard answering late: asked here, first,
     # the closed month answers before any work, like a document.
-    await core_api.periods.check_not_closed_async(
-        db, organization_id, order.production_date or date.today()
+    # A run with no production date books itself under the day it completes
+    # where the organization is, not where the server is — and the guard asks
+    # about the same day the run is then filed under (TECHNICAL_DECISIONS §19).
+    booked_on = order.production_date or await core_api.organizations.today_async(
+        db, organization_id
     )
+    await core_api.periods.check_not_closed_async(db, organization_id, booked_on)
     actual_qty = await _resolve_actual_qty(db, organization_id, order, actual_qty)
     overproduced = actual_qty > order.planned_qty
     scrap_qty = order.planned_qty - actual_qty
@@ -1021,7 +1025,7 @@ async def complete_production(
     # known to the day — an empty "PRODUCTION DATE —" on a finished run
     # served nobody.
     if order.production_date is None:
-        order.production_date = order.completed_at.date()
+        order.production_date = booked_on
 
     # The run is the event; the four QUANTITY_CHANGE rows the item bridge
     # writes below are its consequences. Without this entry the organization
