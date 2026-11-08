@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -158,6 +159,29 @@ describe("AssetListPage", () => {
     await waitFor(() => {
       expect(requested.some((q) => q.includes("checked_out=true"))).toBe(true);
     });
+  });
+
+  it("asks the server to leave out idle retired assets, and offers to show them again", async () => {
+    const user = userEvent.setup();
+    const requested: string[] = [];
+    server.use(
+      http.get("/api/v1/equipment/assets", ({ request }) => {
+        requested.push(new URL(request.url).search);
+        return HttpResponse.json(firstPageMock);
+      }),
+    );
+    render(<AssetListPage />, {
+      wrapper: createWrapper(["/equipment/assets?hide_retired=1"]),
+    });
+    await waitFor(() =>
+      expect(requested.some((q) => q.includes("hide_retired=true"))).toBe(true),
+    );
+
+    await user.click(
+      await screen.findByRole("button", { name: "Show retired assets" }),
+    );
+    await waitFor(() => expect(requested.at(-1)).not.toContain("hide_retired"));
+    expect(screen.queryByText("Retired hidden")).not.toBeInTheDocument();
   });
 
   it("empty state leads to add-asset and import", async () => {

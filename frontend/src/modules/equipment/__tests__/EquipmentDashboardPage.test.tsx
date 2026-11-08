@@ -122,6 +122,8 @@ interface Served {
   ending?: object[];
   expired?: object[];
   overdue?: object[];
+  /** The server's count of late returns, when it is more than the rows sent. */
+  overdueTotal?: number;
   assignments?: object[];
   totals?: { total_assets: number; retired: number; active: number };
   valued?: number;
@@ -132,6 +134,7 @@ function serve({
   ending = [],
   expired = [],
   overdue = [],
+  overdueTotal = overdue.length,
   assignments = [],
   totals = { total_assets: assets.length, retired: 0, active: 0 },
   valued = 0,
@@ -153,7 +156,7 @@ function serve({
     http.get("/api/v1/equipment/assignments/overdue", () =>
       HttpResponse.json({
         items: overdue,
-        total: overdue.length,
+        total: overdueTotal,
         limit: 20,
         offset: 0,
         has_more: false,
@@ -267,6 +270,34 @@ describe("the equipment overview", () => {
     await settle();
   });
 
+  it("counts every late return in the heading, not only the rows it fetched", async () => {
+    const late = (n: number) => ({
+      assignment_id: `asg-${n}`,
+      item_id: `late-${n}`,
+      item_name: `Laptop ${n}`,
+      item_barcode: null,
+      item_serial: null,
+      item_asset_tag: null,
+      holder_name: "K. Nowak",
+      holder_kind: "person",
+      assigned_to_email: null,
+      checked_out_at: "2026-09-01T08:00:00Z",
+      expected_return_at: "2026-09-19T08:00:00Z",
+      days_overdue: n,
+    });
+    serve({
+      overdue: [late(1), late(2)],
+      overdueTotal: 27,
+      totals: { total_assets: 30, retired: 0, active: 27 },
+    });
+    renderPage();
+
+    expect(
+      await screen.findByRole("heading", { name: "27 assets need attention" }),
+    ).toBeInTheDocument();
+    await settle();
+  });
+
   it("reads a warranty that ends today as today, and one day in the singular", async () => {
     serve({
       ending: [
@@ -361,7 +392,7 @@ describe("the equipment overview", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Laptops" })).toHaveAttribute(
       "href",
-      "/equipment/assets?category=cat-laptops",
+      "/equipment/assets?category=cat-laptops&hide_retired=1",
     );
     expect(screen.getByText("No category")).toBeInTheDocument();
     await settle();

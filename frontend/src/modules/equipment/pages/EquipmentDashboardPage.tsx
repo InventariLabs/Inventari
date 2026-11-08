@@ -26,8 +26,16 @@ import {
 } from "@/modules/equipment/hooks/useFleetComposition";
 import { useFleetValuation } from "@/modules/equipment/hooks/useValuation";
 
-/** Overdue returns fetched for the card. */
+/** Overdue returns fetched for the card's rows; its heading counts them all. */
 const OVERDUE_LIMIT = 20;
+
+/**
+ * The late returns the server counts beyond the rows it sent. The card's rows
+ * read at most OVERDUE_LIMIT of them, its heading counts them all.
+ */
+function lateBeyond(page: { total: number; items: unknown[] } | undefined) {
+  return page ? Math.max(0, page.total - page.items.length) : 0;
+}
 
 /**
  * EquipmentDashboardPage — the overview at /equipment.
@@ -110,7 +118,7 @@ export default function EquipmentDashboardPage() {
         <AttentionCard
           items={attention}
           attentionLabel={t("dashboard.attention.heading", {
-            count: attention.length,
+            count: attention.length + lateBeyond(overdue.data),
           })}
           summary={summary}
           // The link opens the whole register, retired assets included (the

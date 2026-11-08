@@ -218,6 +218,8 @@
     "clear_filters": "Zurücksetzen",
     "clear_filter": "Statusfilter zurücksetzen",
     "clear_checked_out": "Ausgabe-Filter zurücksetzen",
+    "retired_hidden": "Ausgemusterte ausgeblendet",
+    "show_retired": "Ausgemusterte Geräte anzeigen",
     "empty_filtered": "Keine Geräte entsprechen den aktiven Filtern",
     "empty_filtered_status": "Keine Geräte mit Status {{status}}",
     "empty_filtered_checked_out": "Keine Geräte sind ausgegeben",

@@ -218,6 +218,8 @@
     "clear_filters": "Clear",
     "clear_filter": "Clear status filter",
     "clear_checked_out": "Clear checked-out filter",
+    "retired_hidden": "Retired hidden",
+    "show_retired": "Show retired assets",
     "empty_filtered": "No assets match the active filters",
     "empty_filtered_status": "No assets with status {{status}}",
     "empty_filtered_checked_out": "No assets are checked out",

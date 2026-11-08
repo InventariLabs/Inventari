@@ -104,7 +104,7 @@ export function FleetCompositionCard({
                 }
                 href={
                   row.category
-                    ? `/equipment/assets?category=${row.category.id}`
+                    ? `/equipment/assets?category=${row.category.id}&hide_retired=1`
                     : undefined
                 }
                 meta={whereabouts(t, row.segments).join(" · ") || undefined}
