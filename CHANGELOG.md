@@ -138,6 +138,52 @@ says what the release does rather than what changed since them.
   logs the warning of an unknown point: no backend code ever read them. Scan
   providers register with `scan_registry.register`, and a dashboard widget is
   a frontend `slots` registration.
+- **Breaking:** a module's launcher badge (`useStatusBadge`) hands over
+  `labelKey`, an i18n key in full form, instead of `label`, the words; the tile
+  translates it with `{ count }`, the way the "Things to do" feed translates an
+  action item's `labelKey`, so a plural follows the number. A module that
+  returned `{ count, label: t("...") }` returns `{ count, labelKey: "<module>:..." }`.
+  The type no longer promises a three-second timeout nothing enforced: the tile
+  shows no badge until the hook answers.
+- **Breaking:** a module manifest's `version` is three numbers and nothing
+  after them (`MAJOR.MINOR.PATCH`). `0.3.0-beta` or `1.0.0.5` used to validate
+  and then could not be compared by the upgrade check; such a manifest is now
+  refused, and its module numbers itself as three parts.
+- **Breaking:** a pick-order strategy name belongs to the module that
+  registered it first. `warehouse_api.register_pick_order_strategy` raises
+  `ContractViolationError` for a name another module holds, where it used to
+  replace that module's strategy — the default walk included — in silence. A
+  module that reused a name registers its own.
+- A module's `on_enable` (and `define_module(seed=...)`) now runs whenever the
+  module is enabled for an organization, onboarding and the demo seed
+  included; those two ran only the framework's own seeding, so a module that
+  seeds in `on_enable` left every onboarded organization without it.
+- A module no longer has to call `super()` from `on_startup` or `on_install`.
+  The framework registers its services and contributions, wires its
+  interceptors and runs its migrations itself, before the hook; an override
+  that left out `super()` used to start the module without them, or install it
+  without its tables, and say nothing.
+- An item interceptor overrides only the hooks it needs: `before_create` and
+  `before_update` have defaults that let the write through, as they always had
+  on storage and category interceptors, instead of being required.
+- When a handler of an event that belongs to no organization is given up on,
+  the instance's superusers are told, in their own language and once a day per
+  handler, as an organization's admins are for its own events; it used to be
+  only recorded and logged.
+- The safety scan reads a banned import as the module and the modules inside
+  it, bounded by the dot, as it already read capabilities: `socketserver` is no
+  longer refused as `socket`. It accepts `from app.core import module_sdk` (and
+  `from app.modules.<m> import <m>_api` for a declared dependency), which binds
+  the same module as the dotted import it already accepted. The named
+  exemptions that granted nothing are gone — those of `printing`, `vision` and
+  `webhooks` named imports the modules never made, and `nutrition`'s imports
+  its declared capabilities already allow — so a later such import in those
+  modules meets the scan like any other.
+- The reason "Consumed" reads the same everywhere it is shown — the history of
+  a record, the reason asked when one is removed and the audit journal — in
+  every language; three of the four used to say "Used". In Polish, the
+  approvals settings and the document settings call the module by its name,
+  "Zatwierdzenia".
 
 ### Added
 
@@ -204,6 +250,14 @@ says what the release does rather than what changed since them.
 - In development, the browser console names a module's `navOverrides` entry
   whose `targetPath` is no navigation item, and an `i18nOverrides` key that no
   catalog has, since either is accepted and changes nothing on screen.
+- A module's document filter can count only the lines that carry a batch
+  (`DocumentFilterDTO(lots_only=True)`), for a filter that answers for a rule
+  about lots. The lot certificates example uses it, so its "certified" filter
+  lists exactly the receipts its rule would book.
+- `@/module-sdk` exports what its own contract and the guides ask a module to
+  use: the `Item`, `StorageType` and `ScannedTemplate` types its signatures
+  hand over, `useAppMutation`, `useModules`, `PageHeaderContext` for a page
+  test, and the overview's `AttentionCard`.
 
 ### Fixed
 
@@ -671,6 +725,16 @@ says what the release does rather than what changed since them.
   point a second time, which mounted a second copy of the app over the first;
   the page now reloads by itself, and an edit to the app's own shell updates
   it in place. A production build was never affected.
+- A settings schema that declares the reserved `__schema_version` key in a
+  nested object is refused whether or not the saved settings reach that object;
+  it was accepted while the object was absent, and the value was dropped on the
+  first save that carried it.
+- A module navigation item with a relative path (`""`, `"settings"`) is named
+  in the browser console in development, and the scaffolds write the item's
+  full path. The shell links an item exactly as written, so a relative path
+  linked nowhere and marked itself the current page on every screen it did not
+  match, while the reachability check read it against the module's base path
+  and passed it.
 
 ## v0.11.0 - 2026-11-02
 

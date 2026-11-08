@@ -1301,7 +1301,7 @@ describe("AuditLogPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("Used")).toBeInTheDocument();
+    expect(await screen.findByText("Consumed")).toBeInTheDocument();
     expect(screen.queryByText("USED")).not.toBeInTheDocument();
     expect(screen.getByText("Disposed")).toBeInTheDocument();
     expect(screen.queryByText("DISPOSED")).not.toBeInTheDocument();

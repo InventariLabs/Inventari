@@ -650,8 +650,8 @@
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",
       "reasons": {
-        "CONSUMED": "Consumed / Used",
-        "USED": "Used",
+        "CONSUMED": "Consumed",
+        "USED": "Consumed",
         "DISPOSED": "Disposed",
         "DISCARDED": "Disposed",
         "RESTORED": "Restored",

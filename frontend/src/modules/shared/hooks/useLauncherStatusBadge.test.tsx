@@ -32,8 +32,7 @@ function renderBadge() {
           );
           return response.data;
         },
-        labelKey: "badgeTest",
-        labelNs: "common",
+        labelKey: "common:badgeTest",
         staleTime: 0,
         refetchInterval: 60_000,
         extractCount: (data) => data.length,

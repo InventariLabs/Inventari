@@ -251,7 +251,7 @@ moduleRegistry.register({
   moduleNav: {
     basePath: "/my-feature",
     items: [{
-      path: "",
+      path: "/my-feature", // absolute: the shell links it as written
       icon: Star,
       labelKey: "my_feature:navigation.myFeature",
     }],
@@ -791,7 +791,7 @@ moduleRegistry.register({
   useStatusBadge: () => useEquipmentStatusBadge(),
 });
 ```
-`useActionItems` returns `ActionItem[]` for the "Things to do" panel. `useStatusBadge` returns `{ count: number; label: string; failed?: boolean } | null` for the launcher tile — `null` while loading or with nothing to show, `failed: true` when the read failed.
+`useActionItems` returns `ActionItem[]` for the "Things to do" panel. `useStatusBadge` returns `{ count: number; labelKey: string; failed?: boolean } | null` for the launcher tile — `null` while loading or with nothing to show, `failed: true` when the read failed; the tile translates `labelKey` (full form, `"<module>:<key>"`) with `{ count }`, as the feed does an action item's `labelKey`.
 
 ### 9. Validation Rules
 Declare per-field validation for core item creation/edit forms.

@@ -12,8 +12,7 @@ export function useEquipmentStatusBadge() {
   return useLauncherStatusBadge({
     queryKey: queryKeys.equipment.warrantyBadge,
     queryFn: () => equipmentApi.getWarrantyAlerts(),
-    labelKey: "statusBadge.warrantyAlerts",
-    labelNs: "equipment",
+    labelKey: "equipment:statusBadge.warrantyAlerts",
     staleTime: 5 * 60 * 1000,
     refetchInterval: 10 * 60 * 1000,
     extractCount: (data) => data.length,

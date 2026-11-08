@@ -9,8 +9,7 @@
   },
   "modules": {
     "core": {
-      "title": "Casa e cozinha",
-      "desc": "Geladeira, despensa e produtos básicos."
+      "title": "Casa e cozinha"
     },
     "shopping_lists": {
       "name": "Listas de compras",

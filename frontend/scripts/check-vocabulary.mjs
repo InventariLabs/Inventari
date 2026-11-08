@@ -82,7 +82,6 @@ export const RULES = [
     skipKeys: [
       /modules\/warehouse\/i18n\/en\.json::launcher\.title$/,
       /locales\/en\/modules\.json::modules\.warehouse\.name$/,
-      /locales\/en\/storages\.json::settings\.warehouse(?:Hint|Link)?$/,
     ],
   },
   {

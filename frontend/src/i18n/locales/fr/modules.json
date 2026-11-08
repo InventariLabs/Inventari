@@ -9,8 +9,7 @@
   },
   "modules": {
     "core": {
-      "title": "Maison & Cuisine",
-      "desc": "Réfrigérateur, garde-manger et produits de base."
+      "title": "Maison & Cuisine"
     },
     "shopping_lists": {
       "name": "Listes de courses",

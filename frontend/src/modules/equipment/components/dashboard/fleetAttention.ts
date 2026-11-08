@@ -1,5 +1,5 @@
 import type { TFunction } from "i18next";
-import type { AttentionItem } from "@/components/ui/AttentionCard";
+import type { AttentionItem } from "@/module-sdk";
 import { formatDate } from "@/utils/helpers";
 import type { EquipmentAssetItem } from "@/modules/equipment/api/equipment_assets";
 import type { OverdueAssignmentItem } from "@/modules/equipment/api/equipment_assignments";

@@ -7,8 +7,7 @@ export function useDocumentsStatusBadge() {
   return useLauncherStatusBadge({
     queryKey: [...queryKeys.documents.all, "todo-count"],
     queryFn: fetchDocumentsTodoCount,
-    labelKey: "statusBadge.todo",
-    labelNs: "warehouse",
+    labelKey: "warehouse:statusBadge.todo",
     staleTime: 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
     extractCount: (count) => count,

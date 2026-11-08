@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 
 interface StatusBadge {
   count: number;
-  label: string;
+  /** Full-form key, translated here with `{ count }` (FrontendModule.useStatusBadge). */
+  labelKey: string;
   failed?: boolean;
 }
 
@@ -48,6 +49,11 @@ export function ModuleTile({
   const displayName = tDyn(cfg.displayName);
   const description = cfg.description ? tDyn(cfg.description) : undefined;
   const badgeFailed = statusBadge?.failed === true;
+  const hasStatusBadge = statusBadge && statusBadge.count > 0;
+  // The module hands over a key; the words are the reader's language's.
+  const countLabel = hasStatusBadge
+    ? tDyn(statusBadge.labelKey, { count: statusBadge.count })
+    : "";
   const failedNote = t("launcher.badgeUnavailable");
   // The hover title. The link takes its name from its content — the name,
   // the description, the count or the failed note it shows — because an
@@ -55,11 +61,9 @@ export function ModuleTile({
   // can call it by (WCAG 2.5.3).
   const badgeLabel = badgeFailed
     ? `${displayName}, ${failedNote}`
-    : statusBadge && statusBadge.count > 0
-      ? `${displayName}, ${statusBadge.count} ${statusBadge.label}`
+    : hasStatusBadge
+      ? `${displayName}, ${statusBadge.count} ${countLabel}`
       : displayName;
-
-  const hasStatusBadge = statusBadge && statusBadge.count > 0;
   const iconBg = cfg.color ?? "bg-surface-inset";
   const hasColor = !!cfg.color;
 
@@ -121,8 +125,7 @@ export function ModuleTile({
         )}
         {hasStatusBadge && (
           <span className="text-[10px] font-medium text-on-warning leading-tight text-center">
-            {statusBadge.count > 99 ? "99+" : statusBadge.count}{" "}
-            {statusBadge.label}
+            {statusBadge.count > 99 ? "99+" : statusBadge.count} {countLabel}
           </span>
         )}
       </div>
@@ -166,8 +169,7 @@ export function ModuleTile({
         )}
         {hasStatusBadge && (
           <span className="inline-flex items-center gap-1 text-xs font-medium text-on-warning bg-amber-100 rounded-md px-2 py-0.5 mt-2">
-            {statusBadge.count > 99 ? "99+" : statusBadge.count}{" "}
-            {statusBadge.label}
+            {statusBadge.count > 99 ? "99+" : statusBadge.count} {countLabel}
           </span>
         )}
       </div>

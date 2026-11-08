@@ -318,7 +318,7 @@ check-frontend: ## Run frontend typecheck + production build
 # ─── frontend/package.json targets NO make target calls ───────────────────
 # Measured: 52 scripts, 31 called above/here, the rest are deliberate and
 # each of these has a reason to stay out of the automated gates:
-#   dev / preview / test:ui          — interactive sessions, not gates.
+#   dev / preview                    — interactive sessions, not gates.
 #   test / test:run                  — the Makefile drives vitest inside the
 #                                      container directly, with `--coverage`;
 #                                      these are the host-side conveniences.
