@@ -302,9 +302,11 @@ async def create_production_order(
     """Create a DRAFT production order.
 
     respects ``create_on_shortage_strategy`` —
-    - ALLOW: always creates (default).
-    - WARN: returns 422 with shortage list unless ``confirm_shortage=true``.
-    - BLOCK: returns 422 with shortage list, DRAFT never created.
+    - ALLOW: always creates.
+    - WARN (the default): returns 422 with shortage list unless
+      ``confirm_shortage=true``.
+    - BLOCK: returns 422 with shortage list, DRAFT never created —
+      ``confirm_shortage`` does not lift it.
     """
     try:
         order = await production_service.create_order(db, org_id, data, current_user)
@@ -554,8 +556,17 @@ async def duplicate_production_order(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> ProductionOrderRead:
-    """Create a fresh DRAFT order seeded from an existing one."""
-    order = await production_service.duplicate_order(db, org_id, order_id, current_user)
+    """Create a fresh DRAFT order seeded from an existing one.
+
+    A copy is a new plan: under BLOCK the stock has to cover it, and the
+    refusal is the creation's own 422 with the shortage list.
+    """
+    try:
+        order = await production_service.duplicate_order(
+            db, org_id, order_id, current_user
+        )
+    except ShortageBlockedError as exc:
+        raise _shortage_refusal('shortage_blocked', exc) from exc
     await db.refresh(order)
     return await _read_with_uom(db, org_id, order)
 

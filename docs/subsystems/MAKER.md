@@ -56,11 +56,13 @@ effective_qty(line) = batches * qty_per_batch * (1 + yield_loss_pct / 100)
 window (six months by default) opens at local midnight on the first day of its
 earliest month —
 `core_api.organizations.today_async` / `.timezone_async`, never the server's
-`date.today()`. The run number is the exception: it comes from the document
-numbering register (`PR` type, shape `PR/{YEAR}/…` unless the organization
-changed it), which reads its year in UTC, not on this clock. `completed_at`
-itself stays a UTC instant; the clock decides how it is read, not how it is
-stored. See TECHNICAL_DECISIONS.md §19.
+`date.today()`. So does a run's own day: completing a run with no production
+date asks the period guard about the organization's today and stamps the run
+with that same day. The run number is the exception: it comes from the
+document numbering register (`PR` type, shape `PR/{YEAR}/…` unless the
+organization changed it), which reads its year in UTC, not on this clock.
+`completed_at` itself stays a UTC instant; the clock decides how it is read,
+not how it is stored. See TECHNICAL_DECISIONS.md §19.
 
 ## HTTP API (`/api/v1/maker/*` — gated by `require_module('maker')`)
 
@@ -86,9 +88,9 @@ stored. See TECHNICAL_DECISIONS.md §19.
 | `GET /bom/summary?template_ids=` | Batched: has-BoM + line_count + `default_recipe_id` (badges on product lists). |
 | `GET /bom/template-ids` | Every template in the organization that has at least one BoM line — feeds the "BOM" filter on the virtualised product list, which cannot decide row by row from data it has not fetched. |
 | `GET /bom/where-used?template_id=` | The reverse edge — recipes that use a template (JOIN lines→recipes, direct use only, org-scoped, cycles have no effect). |
-| `GET /bom/{template_id}` | Lines of every recipe of the product, not only the default one (adapter; the same lines feed `GET /bom/tree/{template_id}`). |
+| `GET /bom/{template_id}` | Lines of one recipe of the product: `recipe_id=`, else the default recipe (adapter). |
 | `GET /bom/{template_id}/cost-estimate` | Cost of one unit by the default recipe (shared Core estimated stock-unit costs); `qty=` and `recipe_id=` ask for a batch or a variant. |
-| `GET /bom/tree/{template_id}` | Recursive tree (BomTreeEditor). |
+| `GET /bom/tree/{template_id}` | Recursive tree (BomTreeEditor): the root is `recipe_id=` (a variant's page passes its own), else the default recipe; each sub-assembly below is its default recipe, as a run explodes it. |
 | `POST /bom/{line_id}/move` / `DELETE /bom/{line_id}` | Move a line under a different parent / delete a line. |
 
 `POST /bom` and `DELETE /bom/parent/{template_id}` were removed: they addressed
@@ -102,7 +104,7 @@ screen is gone (the route redirects to the catalogue).
 | Endpoint | Description |
 |---|---|
 | `GET /production/orders` | List (status/output/date-range filters, sort, pagination). Each DRAFT row carries `shortage_count`: how many ingredients the planned consumption cannot cover, counted the way completion refuses — the shared `_shortages_from_needs` verdict at the order's own output location, unmeasurable ingredients included. `null` past the draft, and `null` for a draft without a recipe (nothing to forecast from) — null is "no answer", not a clean zero. Deliberately **not** a filter dimension: the count is computed after the page is cut, so filtering on it would break skip/total semantics; moving it into the query layer is a separate, conscious decision. |
-| `POST /production/orders` | DRAFT. Takes a `recipe_id`, or looks up the default by `output_template_id` (no recipe → 400). Honours `create_on_shortage_strategy`: ALLOW / WARN (422 plus the shortage list; re-POST with `confirm_shortage=true`) / BLOCK (422, no DRAFT created). |
+| `POST /production/orders` | DRAFT. Takes a `recipe_id`, or looks up the default by `output_template_id` (no recipe → 400). Honours `create_on_shortage_strategy`: ALLOW / WARN (422 plus the shortage list; re-POST with `confirm_shortage=true`) / BLOCK (422, no DRAFT created — `confirm_shortage` does not lift it). |
 | `POST /production/orders/made` | Record a run that already happened: created and completed in one step (`planned_qty` is what came out). Needs `items:write`. An ingredient the records hold too little of does not refuse the run: what they hold is consumed, the rest becomes the line's `shortfall_qty`, and the ingredient shows up as a count in To do (with `stock_takes` enabled). The shortage strategy is not asked. 422 `insufficient_stock` only for a line whose unit cannot be compared with its stock, 422 `empty_bom` for a recipe with no ingredients. |
 | `POST /production/orders/preview` | Cost dry-run, no stock mutation. |
 | `POST /production/orders/shortages/shopping-list` | Puts what a planned run lacks on the active shopping list (needs `shopping_lists:write`); an ingredient already on the list is not added twice. |
@@ -110,7 +112,7 @@ screen is gone (the route redirects to the catalogue).
 | `POST /production/orders/{id}/complete` | Consumes planned (drawn from the stock records), outputs actual, values the batch, writes `unit_cost_snapshot`/`reference_price_snapshot`/`result_per_unit`/`result_per_batch`. Shortages → 422 with an actionable list (`insufficient_stock`); a recipe with no ingredients → 422 `empty_bom`. Needs `items:write`. |
 | `POST /production/orders/{id}/cancel` | Cancel a DRAFT (optional `reason`, stored as `cancel_reason`). Needs `maker:manage`. |
 | `POST /production/orders/{id}/reverse` | Take a COMPLETED run back: the ingredients return to the records and batches they were taken from, the output leaves its location, and the run is marked REVERSED (it stays on record; the movements of the way back name it). Refused (400) for a run that is not completed or whose output has since left its shelf. Needs `maker:manage` and `items:write`. |
-| `POST /production/orders/{id}/duplicate` | Duplicate as DRAFT (copies `recipe_id`). |
+| `POST /production/orders/{id}/duplicate` | Duplicate as DRAFT (copies `recipe_id`). A copy is a new plan: under BLOCK a copy the stock cannot cover is refused like a creation (422 `shortage_blocked`); under WARN it is created and its page names the shortage. |
 | `GET /production/orders/{id}/stock-moves` | The order's stock moves. |
 | `GET /production/monthly-result?months=` | Aggregates `result_per_unit × actual_qty` per month (dashboard widget). |
 
@@ -144,7 +146,7 @@ data / domain exceptions — a consumer does not have to guard every call):
 
 | Method | Returns |
 |---|---|
-| `list_bom_lines_async(db, org_id, template_id)` | `list[BoMLine]` (ingredients). |
+| `list_bom_lines_async(db, org_id, template_id)` | `list[BoMLine]` — the ingredients of the template's default recipe. |
 | `list_template_ids_with_bom_async(db, org_id)` | `list[UUID]` — templates that have at least one BoM line. |
 | `explode_bom_async(db, org_id, template_id, qty)` | `list[(child_template_id, effective_qty, unit)]` — a flat multi-level explosion. |
 | `compute_total_cost_async(db, org_id, template_id, qty)` | Sum of shared estimated stock-unit cost × effective_qty. |

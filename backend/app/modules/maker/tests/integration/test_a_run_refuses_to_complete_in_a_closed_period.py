@@ -15,6 +15,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 import pytest
 from fastapi.testclient import TestClient
@@ -148,3 +149,45 @@ class TestARunRefusesToCompleteInAClosedPeriod:
 
         assert completed.status_code == 200, completed.text
         assert completed.json()['status'] == 'COMPLETED'
+
+
+class TestARunReadsTheOrganizationsDay:
+    """A run with no production date is dated on the organization's day.
+
+    The guard asked ``date.today()`` — the server's day — and the date the
+    run was stamped with at closing was the UTC date of the instant. Every
+    other stock-writing path asks the organization's clock, so around
+    midnight a run was booked into a day, and at the end of a month into a
+    month, the organization was not in.
+    """
+
+    def test_the_run_is_dated_where_the_organization_is(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        # A zone a whole day apart from UTC at this hour, whichever hour the
+        # suite runs at: twelve hours behind before noon, fourteen ahead after.
+        now = datetime.now(tz=UTC)
+        zone = 'Etc/GMT+12' if now.hour < 12 else 'Etc/GMT-14'
+        org_day = now.astimezone(ZoneInfo(zone)).date()
+        assert org_day != now.date()
+        mk_org.timezone = zone
+        db_session.commit()
+        ingredient, output = _one_ingredient_run(db_session, mk_org)
+        post_on_shelf(client, mk_auth_headers, ingredient, mk_input_loc.id, '2')
+
+        run_id = _draft_run(
+            client, mk_auth_headers, output, mk_input_loc, mk_output_loc
+        )
+        completed = client.post(
+            f'/api/v1/maker/production/orders/{run_id}/complete',
+            headers=mk_auth_headers,
+        )
+
+        assert completed.status_code == 200, completed.text
+        assert completed.json()['production_date'] == org_day.isoformat()

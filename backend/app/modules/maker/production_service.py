@@ -22,7 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
 from uuid import UUID
 
 from sqlalchemy import select
@@ -54,6 +54,9 @@ from ._schemas_production import (
 from ._schemas_recipes import IngredientAvailabilityItem
 from ._valuation_batch import fetch_estimates_batch
 from .models import MakerRecipe, ProductionOrder, ProductionOrderLine
+
+if TYPE_CHECKING:
+    from .availability_service import ShortageItem
 
 logger = get_logger(__name__)
 
@@ -269,11 +272,31 @@ async def _next_order_number(db: AsyncSession, organization_id: UUID) -> str:
     )
 
 
+def _refuse_by_the_strategy(
+    strategy: str, shortages: list[ShortageItem], *, confirmed: bool
+) -> None:
+    """What ``create_on_shortage_strategy`` says about a plan that is short.
+
+    BLOCK refuses whatever the request confirms; WARN refuses until the
+    request confirms it; ALLOW never refuses.
+    """
+    if not shortages:
+        return
+    from .exceptions import ShortageBlockedError, ShortageWarningError
+
+    if strategy == 'BLOCK':
+        raise ShortageBlockedError(shortages)
+    if strategy == 'WARN' and not confirmed:
+        raise ShortageWarningError(shortages)
+
+
 async def create_order(
     db: AsyncSession,
     organization_id: UUID,
     data: ProductionOrderCreate,
     user: UserContextDTO,
+    *,
+    ask_the_strategy: bool = True,
 ) -> ProductionOrder:
     """Persist a new DRAFT order. ``complete_production`` fulfils it later.
 
@@ -283,8 +306,12 @@ async def create_order(
     reader's language claimed honestly).
 
     respects ``create_on_shortage_strategy`` — ALLOW creates
-    always; WARN raises ``ShortageWarning`` (caller returns warning info);
-    BLOCK raises ``ShortageBlocked`` (422 before DRAFT is created).
+    always; WARN raises ``ShortageWarning`` (caller returns warning info)
+    unless ``confirm_shortage`` answers it; BLOCK raises ``ShortageBlocked``
+    (422 before DRAFT is created), whatever the request confirms — a
+    confirmation answers a warning, and a block is not a question.
+    *ask_the_strategy* is ``False`` only for :func:`record_made`: a run that
+    already happened is not a plan the strategy has a say over.
     """
     # Resolve recipe.
     if data.recipe_id is not None:
@@ -336,17 +363,12 @@ async def create_order(
         data.planned_qty,
         location_id=check_location_id,
     )
-    if (
-        settings.create_on_shortage_strategy != 'ALLOW'
-        and shortages
-        and not data.confirm_shortage
-    ):
-        from .exceptions import ShortageBlockedError, ShortageWarningError
-
-        if settings.create_on_shortage_strategy == 'BLOCK':
-            raise ShortageBlockedError(shortages)
-        elif settings.create_on_shortage_strategy == 'WARN':
-            raise ShortageWarningError(shortages)
+    if ask_the_strategy:
+        _refuse_by_the_strategy(
+            settings.create_on_shortage_strategy,
+            shortages,
+            confirmed=data.confirm_shortage,
+        )
 
     obj = ProductionOrder(
         organization_id=organization_id,
@@ -944,14 +966,18 @@ async def complete_production(
       recorded on its line (``record_made``) instead of refusing the run.
     """
     order = await _lock_draft_order(db, organization_id, order_id)
+    # The day the run is booked on: the one it was planned for, else the
+    # organization's today — where it is, not where the server is, as every
+    # other stock-writing path reads it.
+    run_day = order.production_date or await core_api.organizations.today_async(
+        db, organization_id
+    )
     # The period guard every stock-writing path asks. The run already could
     # not slip through — the item bridge under the pipeline trips the same
     # guard mid-flight — but a refusal after the explosion and the
     # availability question is the guard answering late: asked here, first,
     # the closed month answers before any work, like a document.
-    await core_api.periods.check_not_closed_async(
-        db, organization_id, order.production_date or date.today()
-    )
+    await core_api.periods.check_not_closed_async(db, organization_id, run_day)
     actual_qty = await _resolve_actual_qty(db, organization_id, order, actual_qty)
     overproduced = actual_qty > order.planned_qty
     scrap_qty = order.planned_qty - actual_qty
@@ -1019,9 +1045,9 @@ async def complete_production(
     order.completed_by = user.id
     # The date is optional at planning and nobody plans it; at closing it is
     # known to the day — an empty "PRODUCTION DATE —" on a finished run
-    # served nobody.
-    if order.production_date is None:
-        order.production_date = order.completed_at.date()
+    # served nobody. The day the guard asked about, not the UTC date of
+    # ``completed_at``.
+    order.production_date = run_day
 
     # The run is the event; the four QUANTITY_CHANGE rows the item bridge
     # writes below are its consequences. Without this entry the organization
@@ -1076,12 +1102,7 @@ async def record_made(
     ingredient short in the records is taken as far as they go and the rest
     is recorded on its line, which puts the ingredient up for a count.
     """
-    order = await create_order(
-        db,
-        organization_id,
-        data.model_copy(update={'confirm_shortage': True}),
-        user,
-    )
+    order = await create_order(db, organization_id, data, user, ask_the_strategy=False)
     return await complete_production(
         db, organization_id, order.id, user, record_shortfall=True
     )
@@ -1376,6 +1397,11 @@ async def duplicate_order(
     date, notes). The duplicate is always DRAFT — no lines, no produced
     item, no cost snapshot (those are completion-time artefacts). ``notes``
     is prefixed with ``[duplicate]`` to make the copy traceable.
+
+    A copy is a new plan, so ``create_on_shortage_strategy`` is asked as at
+    creation: BLOCK refuses a copy the stock cannot cover. WARN lets it
+    through — the copy opens on its own page, which names the shortage, and
+    a copy is a plan nobody typed the quantities of.
     """
     source = await get_order(db, organization_id, order_id)
     if source is None:
@@ -1401,6 +1427,10 @@ async def duplicate_order(
             source.recipe_id,
             source.planned_qty,
             location_id=check_location_id,
+        )
+        settings = await recipe_service.get_settings(db, organization_id)
+        _refuse_by_the_strategy(
+            settings.create_on_shortage_strategy, shortages, confirmed=True
         )
         short_at_create = bool(shortages)
     dup = ProductionOrder(

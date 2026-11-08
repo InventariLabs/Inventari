@@ -36,7 +36,11 @@ class MakerAPI:
         organization_id: UUID,
         template_id: UUID,
     ) -> list[BoMLine]:
-        """Return the BOM lines for ``template_id`` (ingredients only)."""
+        """The BOM lines of ``template_id``'s default recipe (ingredients only).
+
+        The recipe a production run and a sub-assembly explode — not every
+        variant's lines in one list.
+        """
         return await bom_service.list_lines(db, organization_id, template_id)
 
     async def list_template_ids_with_bom_async(

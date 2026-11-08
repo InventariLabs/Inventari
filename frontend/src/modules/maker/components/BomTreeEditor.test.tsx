@@ -54,6 +54,23 @@ describe("BomTreeEditor", () => {
     vi.clearAllMocks();
   });
 
+  // A product with variants has a formula per variant; the tree on one
+  // variant's page asked for the product and got every variant's lines.
+  it("reads the tree of the recipe it is given", () => {
+    mocks.useBomTree.mockReturnValue({
+      data: { parent_template_id: "tpl-parent", root: tree("a") },
+      isLoading: false,
+      error: null,
+    });
+
+    render(<BomTreeEditor templateId="tpl-parent" recipeId="recipe-variant" />);
+
+    expect(mocks.useBomTree).toHaveBeenCalledWith(
+      "tpl-parent",
+      "recipe-variant",
+    );
+  });
+
   /**
    * The panel has no "below" of its own — ingredients are added in the
    * section above it, and the message used to send the reader looking for a
