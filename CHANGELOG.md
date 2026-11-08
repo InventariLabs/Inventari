@@ -879,6 +879,18 @@ says what the release does rather than what changed since them.
   completion take it. Starting that work takes it out of the approval queue
   for good; a document nobody touches is back in the queue when the module is
   switched on again. Its read carries `hold_stood_down`.
+- A custom role holding only a module's read opens that module's screens
+  whole. Equipment's asset list, filters, archive and asset card read the
+  locations, categories and archived records they show, and its label
+  download answers the register's read; Warehouse's codes page reads the
+  locations it lists and the categories its putaway rules offer. Before, each
+  of those calls answered 403 and the screen showed an empty list, a blank
+  place or an error. The module's read still buys no core write — filing a
+  category, changing a shelf and editing a product keep their own keys — and
+  it buys no reach past the module's own records: the archive serves them
+  under the module's scope only, a product card outside it answers 404, and
+  the label sheet draws only labels assigned to those records, never the free
+  pool.
 
 ### Removed
 

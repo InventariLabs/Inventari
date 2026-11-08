@@ -79,18 +79,34 @@ class CoreLabelsAPI:
         return [LabelPoolDTO.model_validate(label) for label in labels], total
 
     async def list_in_ids_async(
-        self, db: AsyncSession, label_ids: list[UUID], organization_id: UUID
+        self,
+        db: AsyncSession,
+        label_ids: list[UUID],
+        organization_id: UUID,
+        *,
+        module_scopes: frozenset[str] | None = None,
     ) -> list[LabelPoolDTO]:
-        """Return labels whose IDs are in *label_ids* scoped to *organization_id*."""
-        labels = await LabelService.list_in_ids_async(db, label_ids, organization_id)
+        """Return labels whose IDs are in *label_ids* scoped to *organization_id*.
+
+        ``module_scopes`` narrows the answer to labels assigned to a named
+        module's records; ``None`` is the whole pool.
+        """
+        labels = await LabelService.list_in_ids_async(
+            db, label_ids, organization_id, module_scopes=module_scopes
+        )
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
     async def list_by_short_codes_async(
-        self, db: AsyncSession, short_codes: list[str], organization_id: UUID
+        self,
+        db: AsyncSession,
+        short_codes: list[str],
+        organization_id: UUID,
+        *,
+        module_scopes: frozenset[str] | None = None,
     ) -> list[LabelPoolDTO]:
         """Return labels whose short_code is in *short_codes* scoped to *organization_id*."""
         labels = await LabelService.list_by_short_codes_async(
-            db, short_codes, organization_id
+            db, short_codes, organization_id, module_scopes=module_scopes
         )
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
