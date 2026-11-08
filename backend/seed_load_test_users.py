@@ -30,6 +30,7 @@ import argparse
 import csv
 import os
 import sys
+import uuid
 
 # Ensure we run with backend on sys.path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -61,6 +62,7 @@ def clean_k6_users(db, prefix: str, info=print):
         info(f'No users with prefix {prefix} found to delete.')
         return 0
 
+    orgs: dict[uuid.UUID, Organization] = {}
     for user in users:
         # Delete organisation if it was created only for this user
         if user.organization_id:
@@ -70,7 +72,22 @@ def clean_k6_users(db, prefix: str, info=print):
                 .first()
             )
             if org and org.name.startswith('LoadTest Org'):
-                db.delete(org)
+                orgs[org.id] = org
+
+    # users.organization_id and organizations.created_by reference each other,
+    # so the ORM cannot order deleting both in one flush — it aborts with
+    # "Circular dependency detected". Clear the users' side first, then delete
+    # the organizations, then the users: an organization must go before the
+    # user its created_by still points at.
+    for user in users:
+        user.organization_id = None
+    db.flush()
+
+    for org in orgs.values():
+        db.delete(org)
+    db.flush()
+
+    for user in users:
         db.delete(user)
 
     db.commit()
