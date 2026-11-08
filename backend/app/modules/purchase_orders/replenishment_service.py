@@ -371,22 +371,22 @@ async def _compute_alerts_for_rules(
     # list names one: the cheapest current offer is proposed, so the alert
     # does not read "No supplier" beside a price the module itself holds.
     # The rule's own choice always wins.
-    unassigned = sorted(
-        {
-            s.rule.product_template_id
-            for s in shortages
-            if not s.rule.preferred_partner_id
-        },
-        key=str,
-    )
+    # Several rules can stand on one product; the smallest quantity to buy
+    # decides, so no rule is sent to a volume price it would not reach.
+    to_buy: dict[UUID, Decimal] = {}
+    for s in shortages:
+        if not s.rule.preferred_partner_id:
+            left = max(s.suggested - shares.get(s.rule.id, Decimal('0')), Decimal('0'))
+            product_id = s.rule.product_template_id
+            to_buy[product_id] = min(left, to_buy.get(product_id, left))
     offers = (
         await pricelist_service.cheapest_offers_async(
             db,
             org_id,
-            unassigned,
+            to_buy,
             active_on=await core_api.organizations.today_async(db, org_id),
         )
-        if unassigned
+        if to_buy
         else {}
     )
 

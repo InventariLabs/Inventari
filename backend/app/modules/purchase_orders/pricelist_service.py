@@ -241,11 +241,16 @@ async def list_for_template_async(
 async def cheapest_offers_async(
     db: AsyncSession,
     organization_id: UUID,
-    product_template_ids: list[UUID],
+    quantities: dict[UUID, Decimal],
     *,
     active_on: date,
 ) -> dict[UUID, PartnerPricelist]:
     """The cheapest offer valid on *active_on*, for each of the products.
+
+    *quantities* maps each product to the quantity about to be bought. A
+    volume price (``min_quantity``) counts only when that quantity reaches
+    it, so a supplier is never proposed on the strength of a price the order
+    would not get.
 
     One query for the whole set, for callers that need a supplier per
     product (the replenishment alerts) and would otherwise ask once per
@@ -253,14 +258,14 @@ async def cheapest_offers_async(
     of a deactivated supplier never counts: an order to it is refused when it
     is confirmed, so the next cheapest offer wins.
     """
-    if not product_template_ids:
+    if not quantities:
         return {}
     stmt = (
         select(PartnerPricelist)
         .options(selectinload(PartnerPricelist.partner))
         .where(
             PartnerPricelist.organization_id == organization_id,
-            PartnerPricelist.product_template_id.in_(product_template_ids),
+            PartnerPricelist.product_template_id.in_(list(quantities)),
             PartnerPricelist.valid_from <= active_on,
             (PartnerPricelist.valid_to.is_(None))
             | (PartnerPricelist.valid_to >= active_on),
@@ -269,7 +274,11 @@ async def cheapest_offers_async(
     )
     cheapest: dict[UUID, PartnerPricelist] = {}
     for entry in (await db.scalars(stmt)).all():
-        if entry.partner.is_active:
+        reached = (
+            entry.min_quantity is None
+            or entry.min_quantity <= quantities[entry.product_template_id]
+        )
+        if reached and entry.partner.is_active:
             cheapest.setdefault(entry.product_template_id, entry)
     return cheapest
 
