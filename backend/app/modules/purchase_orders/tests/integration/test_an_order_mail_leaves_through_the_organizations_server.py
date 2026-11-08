@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+from app.config import settings
 from app.models.email_job import EmailJob
 from app.services.email_jobs import process_email_jobs_batch
 from tests.integration._shelf import run_in_async_session
@@ -29,20 +30,33 @@ from tests.integration._shelf import run_in_async_session
 pytestmark = pytest.mark.integration
 
 
-@pytest.fixture(autouse=True)
-def production_queue_without_system_smtp(
+def _queue_like_production(
     monkeypatch: pytest.MonkeyPatch, async_engine_fixture: AsyncEngine
 ) -> None:
     """Queue the mail the way production does, with no installation server.
 
-    ``send_email_with_attachment_async`` sends directly under TESTING. The
-    enqueuer opens its own session through ``db_facade``, which reads
-    ``AsyncSessionLocal`` from ``app.database`` — pointed at the test database.
+    ``send_email_with_attachment_async`` sends directly under TESTING, so the
+    mail code reads a copy of the settings with TESTING off and no SMTP of
+    its own. A copy, and only after the client is up: switching the shared
+    settings off TESTING before the app starts brings up its Redis listeners
+    on the test's event loop, and the next test on the worker meets a
+    connection whose loop is closed. The enqueuer opens its own session
+    through ``db_facade``, which reads ``AsyncSessionLocal`` from
+    ``app.database`` — pointed at the test database.
     """
-    monkeypatch.setattr('app.services.email_service.settings.TESTING', False)
-    monkeypatch.setattr('app.services.email_service.settings.INVENTARI_DEMO', False)
-    for name in ('SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD', 'SMTP_ENCRYPTION'):
-        monkeypatch.setattr(f'app.services.email_service.settings.{name}', None)
+    monkeypatch.setattr(
+        'app.services.email_service.settings',
+        settings.model_copy(
+            update={
+                'TESTING': False,
+                'INVENTARI_DEMO': False,
+                'SMTP_HOST': None,
+                'SMTP_USER': None,
+                'SMTP_PASSWORD': None,
+                'SMTP_ENCRYPTION': None,
+            }
+        ),
+    )
     monkeypatch.setattr(
         'app.database.AsyncSessionLocal',
         async_sessionmaker(
@@ -59,7 +73,9 @@ def test_the_supplier_gets_the_order_through_the_organizations_relay(
     po_org: Any,
     po_partner: Any,
     po_template: Any,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    _queue_like_production(monkeypatch, async_engine_fixture)
     po_org.settings = {
         'smtp': {'host': 'relay.example.test', 'port': 25, 'encryption': 'none'}
     }
