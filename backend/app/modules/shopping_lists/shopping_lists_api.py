@@ -287,7 +287,7 @@ class ShoppingListsAPI:
                 ShoppingListItem.shopping_list_id == list_id,
                 ShoppingListItem.is_purchased.is_(False),
             )
-            .with_for_update()
+            .with_for_update(of=ShoppingListItem)
         )
         if item is not None and stored > item.quantity:
             item.quantity = stored
