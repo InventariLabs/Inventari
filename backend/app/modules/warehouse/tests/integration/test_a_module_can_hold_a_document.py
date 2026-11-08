@@ -284,6 +284,162 @@ class TestAModuleCanHoldADocument:
         assert completed.status_code == status.HTTP_200_OK, completed.text
         assert _shelf_quantity(db_session, doc_stock_item) == Decimal('95')
 
+    def _parked_then_switched_off(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        headers: dict[str, str],
+        partner: Partner,
+        shelf: StorageLocation,
+        item: Item,
+    ) -> str:
+        doc_id = _draft(client, headers, partner, shelf, item)
+        _confirm(client, headers, doc_id)
+        assert _document(db_session, doc_id).status == (
+            DocumentStatus.PENDING_APPROVAL.value
+        )
+        doc_org.enabled_modules = [
+            name for name in doc_org.enabled_modules if name != _MODULE
+        ]
+        db_session.commit()
+        return doc_id
+
+    def test_the_one_step_press_posts_a_document_whose_hold_stood_down(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_source_location: StorageLocation,
+        doc_stock_item: Item,
+        quality_hold: _QualityHold,
+    ) -> None:
+        """Parked, then the module goes off: the press posts it as confirmed.
+
+        It answered "waiting for approval" — for a decision nobody could take
+        with the module off — while the completion already went through.
+        """
+        doc_id = self._parked_then_switched_off(
+            client,
+            db_session,
+            doc_org,
+            doc_auth_headers,
+            doc_partner,
+            doc_source_location,
+            doc_stock_item,
+        )
+
+        posted = client.post(
+            f'/api/v1/warehouse/documents/{doc_id}/post', headers=doc_auth_headers
+        )
+
+        assert posted.status_code == status.HTTP_200_OK, posted.text
+        assert _document(db_session, doc_id).status == DocumentStatus.COMPLETED.value
+        assert _shelf_quantity(db_session, doc_stock_item) == Decimal('95')
+        # What it waited on is withdrawn: a module switched back on does not
+        # ask about a document already posted.
+        assert [doc for doc, _ in quality_hold.withdrawn] == [UUID(doc_id)]
+
+    def test_a_scanning_session_starts_on_a_document_whose_hold_stood_down(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_source_location: StorageLocation,
+        doc_stock_item: Item,
+        quality_hold: _QualityHold,
+    ) -> None:
+        """The session start takes the hold off; everything after reads CONFIRMED."""
+        doc_id = self._parked_then_switched_off(
+            client,
+            db_session,
+            doc_org,
+            doc_auth_headers,
+            doc_partner,
+            doc_source_location,
+            doc_stock_item,
+        )
+
+        started = client.post(
+            f'/api/v1/warehouse/documents/{doc_id}/picking/start',
+            headers=doc_auth_headers,
+        )
+
+        assert started.status_code == status.HTTP_201_CREATED, started.text
+        doc = _document(db_session, doc_id)
+        assert doc.status == DocumentStatus.CONFIRMED.value
+        assert doc.held_by is None
+        assert [doc for doc, _ in quality_hold.withdrawn] == [UUID(doc_id)]
+
+    def test_the_document_read_says_the_hold_stood_down(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_source_location: StorageLocation,
+        doc_stock_item: Item,
+        quality_hold: _QualityHold,
+    ) -> None:
+        """The page offers the work only when it reads that the hold is down."""
+        doc_id = _draft(
+            client, doc_auth_headers, doc_partner, doc_source_location, doc_stock_item
+        )
+        _confirm(client, doc_auth_headers, doc_id)
+        url = f'/api/v1/warehouse/documents/{doc_id}'
+        assert client.get(url, headers=doc_auth_headers).json()['hold_stood_down'] is (
+            False
+        )
+
+        doc_org.enabled_modules = [
+            name for name in doc_org.enabled_modules if name != _MODULE
+        ]
+        db_session.commit()
+
+        read = client.get(url, headers=doc_auth_headers).json()
+        assert read['status'] == DocumentStatus.PENDING_APPROVAL.value
+        assert read['hold_stood_down'] is True
+
+    def test_an_untouched_document_waits_again_once_the_module_is_back(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_source_location: StorageLocation,
+        doc_stock_item: Item,
+        quality_hold: _QualityHold,
+    ) -> None:
+        """Switching the module off rewrites nothing: read, it is still parked."""
+        doc_id = self._parked_then_switched_off(
+            client,
+            db_session,
+            doc_org,
+            doc_auth_headers,
+            doc_partner,
+            doc_source_location,
+            doc_stock_item,
+        )
+        client.get(f'/api/v1/warehouse/documents/{doc_id}', headers=doc_auth_headers)
+        doc_org.enabled_modules = [*doc_org.enabled_modules, _MODULE]
+        db_session.commit()
+
+        posted = client.post(
+            f'/api/v1/warehouse/documents/{doc_id}/post', headers=doc_auth_headers
+        )
+
+        assert posted.status_code != status.HTTP_200_OK
+        assert _document(db_session, doc_id).status == (
+            DocumentStatus.PENDING_APPROVAL.value
+        )
+        assert quality_hold.withdrawn == []
+
     def test_cancelling_a_held_document_tells_the_module(
         self,
         client: TestClient,

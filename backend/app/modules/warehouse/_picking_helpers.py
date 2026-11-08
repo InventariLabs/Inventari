@@ -53,6 +53,7 @@ from .models import (
     WmsPickSession,
 )
 from .pick_order_strategies import resolve_pick_order_strategy_async
+from .pre_post_checks import lift_a_stood_down_hold_async
 
 #: Document types a picking session may be started on.
 PICKABLE_TYPES = {'OUT', 'WZ', 'RW', 'INTERNAL_OUT', 'INT', 'MM'}
@@ -121,6 +122,8 @@ async def start_pick_session_over_documents_async(
             raise ServiceRejectionError(
                 'wms_pick_document_not_found', document=str(document_id)
             )
+        # Parked for a module switched off since: worked as confirmed.
+        await lift_a_stood_down_hold_async(db, org_id, doc, user_id)
         if doc.status != DocumentStatus.CONFIRMED.value:
             raise ServiceRejectionError(
                 'wms_pick_document_not_confirmed', number=doc.number

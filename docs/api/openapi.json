@@ -51459,6 +51459,11 @@
               }
             ]
           },
+          "hold_stood_down": {
+            "type": "boolean",
+            "title": "Hold Stood Down",
+            "default": false
+          },
           "shipment": {
             "anyOf": [
               {
@@ -71404,6 +71409,11 @@
                 "type": "null"
               }
             ]
+          },
+          "hold_stood_down": {
+            "type": "boolean",
+            "title": "Hold Stood Down",
+            "default": false
           },
           "shipment": {
             "anyOf": [

@@ -35,7 +35,8 @@ from ._wms_line_utils import (
 )
 from ._wms_session_ops import load_document_async, open_session_holding_async
 from .document_profile_service import get_profile
-from .models import Document, DocumentLine, DocumentStatus
+from .models import Document, DocumentLine
+from .pre_post_checks import works_as_confirmed_async
 
 
 @dataclass(frozen=True)
@@ -124,8 +125,8 @@ async def uncovered_documents_async(
     skip_shelves = await _unpickable_shelves_async(db, org_id)
     found: list[UncoveredDocument] = []
     for document_id in dict.fromkeys(document_ids):
-        doc = await load_document_async(db, org_id, document_id, confirmed_only=True)
-        if doc is None or doc.status != DocumentStatus.CONFIRMED.value:
+        doc = await load_document_async(db, org_id, document_id, confirmed_only=False)
+        if doc is None or not await works_as_confirmed_async(db, org_id, doc):
             continue
         if not dt.is_dispatch(doc.type):
             continue

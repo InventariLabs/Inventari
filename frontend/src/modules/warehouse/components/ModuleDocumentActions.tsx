@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { PickListButton } from "@/modules/warehouse/components/picking/PickListButton";
 import { DocumentActionButtons } from "@/modules/warehouse/components/DocumentActionButtons";
+import { workingStatus } from "@/modules/warehouse/components/documentApprovalGate";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { extractApiError } from "@/lib/errors";
@@ -85,8 +86,8 @@ export function DocumentHeaderActions({ doc, ...actions }: HeaderActionsProps) {
     <div className="flex gap-2 flex-wrap">
       <DocumentActionButtons
         isDraft={doc.status === "DRAFT"}
-        isConfirmed={doc.status === "CONFIRMED"}
-        docStatus={doc.status}
+        isConfirmed={workingStatus(doc) === "CONFIRMED"}
+        docStatus={workingStatus(doc)}
         docType={doc.type}
         isReversed={!!doc.reversed_by_id}
         {...actions}

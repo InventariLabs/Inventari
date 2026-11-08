@@ -14602,6 +14602,11 @@ export interface components {
             /** Currency */
             currency: string | null;
             approval?: components["schemas"]["ApprovalSnapshot"] | null;
+            /**
+             * Hold Stood Down
+             * @default false
+             */
+            hold_stood_down: boolean;
             shipment?: components["schemas"]["DocumentShipmentSchema"] | null;
             /** Work Stage */
             work_stage?: ("to_start" | "in_progress" | "picked" | "packed" | "ready") | null;
@@ -21808,6 +21813,11 @@ export interface components {
             /** Currency */
             currency: string | null;
             approval?: components["schemas"]["ApprovalSnapshot"] | null;
+            /**
+             * Hold Stood Down
+             * @default false
+             */
+            hold_stood_down: boolean;
             shipment?: components["schemas"]["DocumentShipmentSchema"] | null;
             /** Work Stage */
             work_stage?: ("to_start" | "in_progress" | "picked" | "packed" | "ready") | null;

@@ -659,6 +659,20 @@ says what the release does rather than what changed since them.
   again, as the Reactivate button does; the next single failed delivery used to
   cut it off again. A retried delivery sends the bytes of the first attempt, so
   its signature is the same too.
+- A use, a disposal, a scan that adds to a record, a deletion and an opened
+  package write their quantities into the product's history as the exact
+  digits, as an edit already did; they wrote floating-point numbers. Rows
+  already written keep their shape, and the history screen reads both.
+- A document with no date of its own, a production run among them, takes the
+  year in its number from the organization's clock, as its period and the
+  monthly figures do. Just after midnight on the local first of January it
+  was numbered into the year that had just ended.
+- A document that waited for an approval when the approvals module was
+  switched off is worked as a confirmed one: its page offers the scanning and
+  the completion again, and the one-step press, a scanning session and a
+  completion take it. Starting that work takes it out of the approval queue
+  for good; a document nobody touches is back in the queue when the module is
+  switched on again. Its read carries `hold_stood_down`.
 
 ### Removed
 

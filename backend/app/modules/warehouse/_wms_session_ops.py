@@ -66,6 +66,7 @@ from .packing_service import (
     assert_packed_within_quantity_async,
     assert_pick_not_packed_async,
 )
+from .pre_post_checks import lift_a_stood_down_hold_async
 
 #: A direction's gate for the document types a session may start on.
 SupportsDocType = Callable[[str], bool]
@@ -737,12 +738,17 @@ async def start_session_async(
     nothing).
 
     A document waiting for an approval is not CONFIRMED, so it never gets
-    this far: the hold is the gate. Whatever a module wants of the posting
-    itself it says when the session completes the document.
+    this far: the hold is the gate — unless the module it waits for was
+    switched off since, when the hold has stood down and the start lifts it.
+    Whatever a module wants of the posting itself it says when the session
+    completes the document.
     """
     await acquire_advisory_lock(db, f'{direction.lock_prefix}:{document_id}')
-    doc = await load_document_async(db, org_id, document_id, confirmed_only=True)
-    if not doc:
+    doc = await load_document_async(db, org_id, document_id, confirmed_only=False)
+    if doc is not None:
+        # Parked for a module switched off since: worked as confirmed.
+        await lift_a_stood_down_hold_async(db, org_id, doc, user_id)
+    if doc is None or doc.status != DocumentStatus.CONFIRMED.value:
         raise ServiceRejectionError('wms_document_not_confirmed')
 
     if not is_supported(doc.type):
