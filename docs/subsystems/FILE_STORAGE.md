@@ -36,7 +36,7 @@ address a backend builds for it. A key is:
 
 `core_api.file_storage.save_for_org_async(org, module, relative, ...)` builds the
 prefix itself and returns the full key. The facade rebuilds the prefix on
-every read and refuses a relative path with a `..` segment (`ValueError`),
+every read and refuses a relative path with a `..` segment (`StorageError`),
 so a relative path can never be read outside its `<org>/<module>/`
 namespace.
 

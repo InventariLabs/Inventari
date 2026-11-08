@@ -29,9 +29,10 @@ Notable differences from the OpenAI-compatible client:
   Left to itself the SDK waits without end.
 - A provider that cannot be reached raises what the other clients raise
   (``LlmTransportError``, ``LlmTimeoutError`` when it did not answer in
-  time), so an outage is the documented 503. The SDK says it in its HTTP
-  stack's own words — ``aiohttp`` for the async calls when it is installed,
-  ``httpx`` otherwise and for the listing.
+  time), so an outage is the documented 503. The SDK is handed an ``httpx``
+  transport for its async calls, so its network failures are ``httpx``'s,
+  as every other client's: left to choose, it takes ``aiohttp`` wherever
+  something else installed it, and raises that library's errors instead.
 
 Lazy import: the SDK is imported inside ``complete()`` so that
 loading this module does not require ``google-genai`` to be
@@ -45,11 +46,12 @@ import asyncio
 import io
 from typing import TYPE_CHECKING, Any
 
+import httpx
+
 from app.core.db_retry import mark_external_effect
 from app.core.llm.base import LlmClient, LlmRequest, LlmResponse
 from app.core.llm.diagnostics import log_answer
 from app.core.llm.errors import (
-    LlmTransportError,
     classify_provider_refusal,
     provider_refusal,
     transport_failure,
@@ -69,26 +71,15 @@ _LIST_MODELS_TIMEOUT_SECONDS = 30.0
 
 
 def _http_options(seconds: float) -> HttpOptionsDict:
-    """The SDK's ``http_options`` for a call that may take *seconds*."""
-    return {'timeout': int(seconds * 1000)}
+    """The SDK's ``http_options`` for a call that may take *seconds*.
 
-
-def _transport_kinds() -> tuple[type[BaseException], ...]:
-    """What the SDK raises when the provider was never heard from.
-
-    Read when needed rather than at import: ``aiohttp`` is only there when
-    something else installed it, and the SDK uses it for the async calls
-    only then.
+    The SDK counts in milliseconds. The transport keeps its async calls on
+    ``httpx``, whose failures the shared classifier reads.
     """
-    import httpx
-
-    kinds: list[type[BaseException]] = [httpx.TransportError, TimeoutError]
-    try:
-        import aiohttp
-    except ImportError:
-        return tuple(kinds)
-    kinds.append(aiohttp.ClientConnectionError)
-    return tuple(kinds)
+    return {
+        'timeout': int(seconds * 1000),
+        'async_client_args': {'transport': httpx.AsyncHTTPTransport()},
+    }
 
 
 def _finish_reason_of(response: Any) -> str | None:
@@ -285,18 +276,17 @@ class GoogleClient(LlmClient):
     def _named_failure(self, exc: Exception, what: str) -> RuntimeError | None:
         """The failure the other clients raise for *exc*, or ``None``.
 
-        A transport failure first: the SDK's network errors are ``OSError``s,
-        and a router that degrades on ``OSError`` would otherwise tell the
-        reader the photograph was unreadable while the provider was down.
+        A transport failure first: left as the SDK raised it, an outage
+        reached the caller as an error no route names — a server error, or,
+        while the SDK spoke ``aiohttp``, an ``OSError`` the vision route reads
+        as an unreadable photograph — instead of the 503 every other
+        provider's outage is.
         """
-        if isinstance(exc, _transport_kinds()):
-            return self._transport(exc)
+        if isinstance(exc, httpx.TransportError):
+            return transport_failure(
+                exc, connection_name=self.connection_name, model_name=self.model_name
+            )
         return self._refusal(exc, what)
-
-    def _transport(self, exc: Exception) -> LlmTransportError:
-        return transport_failure(
-            exc, connection_name=self.connection_name, model_name=self.model_name
-        )
 
     def _refusal(self, exc: Exception, what: str) -> RuntimeError | None:
         """Translate a classified SDK refusal into the named failure.

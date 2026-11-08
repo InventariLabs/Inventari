@@ -216,13 +216,14 @@ class TestFileStorageOrgScoping:
         boundary once the remainder may climb out of it. The path is refused
         before any storage call.
         """
+        from app.core.file_storage.errors import StorageError
         from app.core.public_api import file_storage as fs_mod
 
         org = uuid.uuid4()
         service = MagicMock()
         service.save = AsyncMock()
         with patch.object(fs_mod, 'FileStorageService', return_value=service):
-            with pytest.raises(ValueError):
+            with pytest.raises(StorageError):
                 await fs_mod.CoreFileStorageAPI().save_for_org_async(
                     org, 'mod_a', relative, b'data'
                 )

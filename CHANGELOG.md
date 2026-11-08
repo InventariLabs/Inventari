@@ -623,7 +623,7 @@ says what the release does rather than what changed since them.
   `/uploads/…` address, which checks who is asking, like every other stored
   file. It was handed out as the bucket's bare address.
 - A module's stored file path with a `..` segment is refused
-  (`ValueError`) instead of resolving outside its `<organization>/<module>/`
+  (`StorageError`) instead of resolving outside its `<organization>/<module>/`
   folder on the local disk. A missing file is a `StorageError` as well as a
   `FileNotFoundError` (`StoredFileNotFoundError`), so a module that catches
   the storage contract's own error catches it too.

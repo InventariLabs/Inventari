@@ -103,11 +103,12 @@ Which one applies is decided by the connection's `provider`
 to get the longer one; an unknown provider value is treated as remote.
 
 The `google` provider gets the setting through the SDK's own `http_options`
-(which count in milliseconds); left to itself the SDK waits without end. Its
-network failures — `aiohttp` for the async calls where it is installed,
-`httpx` otherwise — are translated into the same `LlmTransportError` and
-`LlmTimeoutError` as every other client's, so a Gemini outage is the same 503
-as any other provider's.
+(which count in milliseconds); left to itself the SDK waits without end. The
+client also hands the SDK an `httpx` transport, which keeps it off `aiohttp`
+wherever something else installed that, so its network failures are `httpx`'s
+and are translated into the same `LlmTransportError` and `LlmTimeoutError` as
+every other client's: a Gemini outage is the same 503 as any other
+provider's.
 
 **Why the local default is five minutes.** Measured on an RX 6800 (16 GB
 VRAM, model resident, one 1024 px photograph): `qwen3-vl:8b` at Ollama's

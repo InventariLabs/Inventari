@@ -55,15 +55,6 @@ class VisionService:
     """Label extraction. Static methods — the service holds no state."""
 
     @staticmethod
-    def _compress_image(
-        image_bytes: bytes,
-        max_size: tuple[int, int] = (1600, 1600),
-        quality: int = 85,
-    ) -> bytes:
-        """Compresses image and returns JPEG bytes."""
-        return compress_image(image_bytes, max_size, quality)
-
-    @staticmethod
     async def extract_from_bytes_list(
         image_bytes_list: Sequence[bytes],
         db: AsyncSession,

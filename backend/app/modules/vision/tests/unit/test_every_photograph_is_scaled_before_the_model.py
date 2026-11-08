@@ -20,6 +20,7 @@ import pytest
 from PIL import Image
 
 from app.core.public_api import core_api
+from app.modules.vision._image_helpers import compress_image
 from app.modules.vision.field_contributions import (
     LabelFieldContribution,
     clear_label_fields,
@@ -137,7 +138,7 @@ class TestEveryColourModeCanBeSent:
         buf = io.BytesIO()
         image.save(buf, format='TIFF' if mode == 'CMYK' else 'PNG')
 
-        result = VisionService._compress_image(buf.getvalue(), max_size=(1200, 1200))
+        result = compress_image(buf.getvalue(), max_size=(1200, 1200))
 
         sent = Image.open(io.BytesIO(result))
         assert sent.format == 'JPEG'

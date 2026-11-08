@@ -424,9 +424,10 @@ async def get_document(
     await attach_receipt_plans(db, doc)
     result = DocumentSchema.model_validate(doc)
     result.approval = await _approval_snapshot(db, org_id, doc_id)
-    result.hold_stood_down = doc.status == DocumentStatus.PENDING_APPROVAL.value and (
-        await works_as_confirmed_async(db, org_id, doc)
-    )
+    if doc.status == DocumentStatus.PENDING_APPROVAL.value:
+        result = result.model_copy(
+            update={'hold_stood_down': await works_as_confirmed_async(db, org_id, doc)}
+        )
     # Old approvals overwrote the confirmer with the approver. Recover the
     # original act from the journal, not from the requester (a manual request
     # may have been raised by somebody else). This only enriches the response.

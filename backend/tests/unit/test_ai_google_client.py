@@ -345,9 +345,8 @@ class TestGoogleClientLimits:
         await GoogleClient(_make_connection()).complete(LlmRequest(prompt='hi'))
 
         # The SDK counts in milliseconds.
-        assert fakes['client_cls'].call_args.kwargs['http_options'] == {
-            'timeout': 42_000
-        }
+        options = fakes['client_cls'].call_args.kwargs['http_options']
+        assert options['timeout'] == 42_000
 
     async def test_a_model_listing_waits_thirty_seconds(self, monkeypatch):
         from app.core.llm.google_client import GoogleClient
@@ -356,18 +355,33 @@ class TestGoogleClientLimits:
 
         await GoogleClient(_make_connection()).list_models()
 
-        assert fakes['client_cls'].call_args.kwargs['http_options'] == {
-            'timeout': 30_000
-        }
+        options = fakes['client_cls'].call_args.kwargs['http_options']
+        assert options['timeout'] == 30_000
+
+    async def test_the_sdk_is_kept_on_httpx(self, monkeypatch):
+        """Left to choose, the SDK takes aiohttp wherever something installed it.
+
+        Its async calls then raise aiohttp's errors — ``OSError``s the vision
+        route reads as an unreadable photograph — and nothing here names
+        them. A transport of our own keeps them on httpx, whose failures the
+        shared classifier reads for every provider.
+        """
+        import httpx
+
+        from app.core.llm.base import LlmRequest
+        from app.core.llm.google_client import GoogleClient
+
+        fakes = _install_genai_mock(monkeypatch, response_text='ok')
+
+        await GoogleClient(_make_connection()).complete(LlmRequest(prompt='hi'))
+
+        options = fakes['client_cls'].call_args.kwargs['http_options']
+        transport = options['async_client_args']['transport']
+        assert isinstance(transport, httpx.AsyncHTTPTransport)
 
 
 class TestGoogleClientOutages:
-    """An outage is the transport failure every other client raises.
-
-    The SDK speaks ``aiohttp`` for the async calls when it is installed and
-    ``httpx`` otherwise and for the listing; both raise ``OSError``-shaped
-    errors that the vision router used to read as an unreadable photograph.
-    """
+    """An outage is the transport failure every other client raises."""
 
     async def _complete_raising(self, monkeypatch, exc):
         from app.core.llm.base import LlmRequest
@@ -378,43 +392,35 @@ class TestGoogleClientOutages:
         await GoogleClient(_make_connection()).complete(LlmRequest(prompt='hi'))
 
     async def test_a_refused_connection_cannot_reach_the_provider(self, monkeypatch):
-        import aiohttp
+        import httpx
 
         from app.core.llm.errors import LlmTimeoutError, LlmTransportError
 
         with pytest.raises(LlmTransportError) as caught:
             await self._complete_raising(
-                monkeypatch, aiohttp.ClientConnectionError('connection refused')
+                monkeypatch, httpx.ConnectError('connection refused')
             )
         assert not isinstance(caught.value, LlmTimeoutError)
         assert caught.value.connection_name == 'test'
 
     async def test_an_answer_that_never_came_is_a_timeout(self, monkeypatch):
-        from app.core.llm.errors import LlmTimeoutError
-
-        with pytest.raises(LlmTimeoutError):
-            await self._complete_raising(monkeypatch, TimeoutError())
-
-    async def test_a_timeout_while_connecting_cannot_reach_the_provider(
-        self, monkeypatch
-    ):
-        import aiohttp
-
-        from app.core.llm.errors import LlmTimeoutError, LlmTransportError
-
-        with pytest.raises(LlmTransportError) as caught:
-            await self._complete_raising(
-                monkeypatch, aiohttp.ConnectionTimeoutError('connect')
-            )
-        assert not isinstance(caught.value, LlmTimeoutError)
-
-    async def test_the_httpx_stack_fails_the_same_way(self, monkeypatch):
         import httpx
 
         from app.core.llm.errors import LlmTimeoutError
 
         with pytest.raises(LlmTimeoutError):
             await self._complete_raising(monkeypatch, httpx.ReadTimeout('slow'))
+
+    async def test_a_timeout_while_connecting_cannot_reach_the_provider(
+        self, monkeypatch
+    ):
+        import httpx
+
+        from app.core.llm.errors import LlmTimeoutError, LlmTransportError
+
+        with pytest.raises(LlmTransportError) as caught:
+            await self._complete_raising(monkeypatch, httpx.ConnectTimeout('connect'))
+        assert not isinstance(caught.value, LlmTimeoutError)
 
     async def test_a_listing_that_cannot_reach_the_provider(self, monkeypatch):
         import httpx
