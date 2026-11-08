@@ -116,6 +116,11 @@ async def get_stats_by_category_async(
 ) -> list[CategoryStatsDTO]:
     """Item counts and stock value aggregated per category.
 
+    The value is an estimate: each record's purchase price times its
+    quantity, with the records that carry no price counted apart. A category
+    belongs to the record and a cost layer knows only the product, so the
+    layers have no figure per category to read (VALUATION.md).
+
     A category a vertical module claims stays out unless the organization
     shows module data, as its records stay out of the products list.
     """
