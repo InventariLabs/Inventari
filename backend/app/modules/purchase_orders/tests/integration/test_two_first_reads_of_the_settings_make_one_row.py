@@ -57,6 +57,8 @@ class TestTwoFirstReadsOfTheSettingsMakeOneRow:
             await engine.dispose()
 
         count = await real_async_db_session.scalar(
-            select(func.count(POSettings.id)).where(POSettings.organization_id == org.id)
+            select(func.count(POSettings.id)).where(
+                POSettings.organization_id == org.id
+            )
         )
         assert count == 1
