@@ -20207,13 +20207,13 @@ export interface components {
             /** Ingredient Name */
             ingredient_name?: string | null;
             /** Quantity Consumed */
-            quantity_consumed?: number | null;
+            quantity_consumed?: string | null;
             /** Uom Symbol */
             uom_symbol?: string | null;
             /** Item Remaining Quantity */
-            item_remaining_quantity?: number | null;
+            item_remaining_quantity?: string | null;
             /** Ingredient Remaining Quantity */
-            ingredient_remaining_quantity?: number | null;
+            ingredient_remaining_quantity?: string | null;
             /** Message */
             message?: string | null;
             /**
@@ -26421,7 +26421,7 @@ export interface components {
             /** Ingredient Name */
             ingredient_name: string;
             /** Restored Quantity */
-            restored_quantity: number;
+            restored_quantity: string;
             /** Uom Symbol */
             uom_symbol?: string | null;
         };

@@ -83,7 +83,8 @@ export default function PickingView({
     if (result.status === "picked") {
       toast.success(
         t("picking.scan_result.picked", {
-          quantity: result.quantity_consumed,
+          // A decimal string from the API ("200.000"), written the reader's way.
+          quantity: formatQuantityValue(result.quantity_consumed),
           uom: unitLabel(t, result.uom_symbol),
           ingredient: result.ingredient_name ?? "",
         }),
