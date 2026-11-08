@@ -2,8 +2,8 @@
 
 Currently:
   - backfill stock-moves: translate ItemHistory -> StockMove for WMS orgs.
-  - backfill-category-emoji: populate Category.emoji for high-confidence
-    keyword matches (slice 5 of category visual identity v2).
+  - backfill category-emoji: populate Category.emoji for high-confidence
+    keyword matches.
 """
 
 from __future__ import annotations
@@ -276,8 +276,8 @@ def backfill_category_emoji(
     no-ops because rows with non-NULL ``emoji`` are skipped.
 
     Examples:
-        uv run python -m app.cli.backfill_category_emoji            # dry-run
-        uv run python -m app.cli.backfill_category_emoji --apply    # commit
+        uv run python manage.py backfill category-emoji            # dry-run
+        uv run python manage.py backfill category-emoji --apply    # commit
     """
     bootstrap_db()
 
