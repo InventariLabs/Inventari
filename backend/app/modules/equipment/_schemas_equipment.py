@@ -140,7 +140,7 @@ class BulkEditRequest(BaseModel):
 class AssetFilter(BaseModel):
     """The asset list's filters, as the scope of a bulk action.
 
-    The same five parameters ``GET /equipment/assets`` takes, so "everything
+    The filters ``GET /equipment/assets`` takes, so "everything
     that matches" means exactly what the reader is looking at.
     """
 
@@ -149,6 +149,7 @@ class AssetFilter(BaseModel):
     location_id: UUID | None = None
     status: str | None = None
     checked_out: bool = False
+    hide_retired: bool = False
 
 
 class BulkEditResult(BaseModel):

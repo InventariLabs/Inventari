@@ -1615,6 +1615,7 @@
     "markDone": "Mark as done: {{task}}",
     "deleteTask": "Delete task: {{task}}",
     "showing": "Showing {{shown}} of {{total}}",
+    "waitingSum": "Waiting in all: {{total}} — tasks: {{tasks}}, quarantine holds: {{holds}}",
     "showMore": "Show more",
     "filter": {
       "label": "Show tasks",

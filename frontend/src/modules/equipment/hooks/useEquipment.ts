@@ -35,10 +35,10 @@ export function useActiveAssignments() {
 }
 
 // Surface overdue assignments so the dashboard can flag them.
-export function useOverdueAssignments(limit = 20) {
+export function useOverdueAssignments() {
   return useModuleQuery("equipment", {
-    queryKey: [...queryKeys.equipment.assignments.active, "overdue", limit],
-    queryFn: () => equipmentApi.listOverdueAssignments(limit),
+    queryKey: [...queryKeys.equipment.assignments.active, "overdue"],
+    queryFn: () => equipmentApi.listOverdueAssignments(),
   });
 }
 

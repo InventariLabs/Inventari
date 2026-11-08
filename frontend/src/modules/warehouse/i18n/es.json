@@ -1615,6 +1615,7 @@
     "markDone": "Marcar como hecha: {{task}}",
     "deleteTask": "Eliminar la tarea: {{task}}",
     "showing": "Mostrando {{shown}} de {{total}}",
+    "waitingSum": "En total esperan: {{total}} — tareas: {{tasks}}, existencias en cuarentena: {{holds}}",
     "showMore": "Mostrar más",
     "filter": {
       "label": "Mostrar tareas",

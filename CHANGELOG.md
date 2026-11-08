@@ -879,6 +879,14 @@ says what the release does rather than what changed since them.
   completion take it. Starting that work takes it out of the approval queue
   for good; a document nobody touches is back in the queue when the module is
   switched on again. Its read carries `hold_stood_down`.
+- Three numbers agree with the lists behind them. A category row on the
+  equipment overview leaves out retired assets nobody holds, and the asset list
+  it opens now leaves them out too, under a "Retired hidden" chip that brings
+  them back (`GET /equipment/assets` and the bulk-action scope take
+  `hide_retired`). The overview's attention card reads every late return
+  instead of the first twenty, so 27 late returns no longer read as 20. When the
+  warehouse launcher badge adds quarantine holds to the tasks, To do states that
+  total beside the two parts.
 - A custom role holding only a module's read opens that module's screens
   whole. Equipment's asset list, filters, archive and asset card read the
   locations, categories and archived records they show, and its label

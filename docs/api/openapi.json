@@ -3657,6 +3657,18 @@
             "description": "Only assets with an open EquipmentAssignment (source of truth for \"checked out\")"
           },
           {
+            "name": "hide_retired",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out retired assets nobody holds - the fleet the dashboard counts",
+              "default": false,
+              "title": "Hide Retired"
+            },
+            "description": "Leave out retired assets nobody holds - the fleet the dashboard counts"
+          },
+          {
             "name": "sort",
             "in": "query",
             "required": false,
@@ -42321,11 +42333,16 @@
             "type": "boolean",
             "title": "Checked Out",
             "default": false
+          },
+          "hide_retired": {
+            "type": "boolean",
+            "title": "Hide Retired",
+            "default": false
           }
         },
         "type": "object",
         "title": "AssetFilter",
-        "description": "The asset list's filters, as the scope of a bulk action.\n\nThe same five parameters ``GET /equipment/assets`` takes, so \"everything\nthat matches\" means exactly what the reader is looking at."
+        "description": "The asset list's filters, as the scope of a bulk action.\n\nThe filters ``GET /equipment/assets`` takes, so \"everything\nthat matches\" means exactly what the reader is looking at."
       },
       "AssetTimelineEvent": {
         "properties": {

@@ -1615,6 +1615,7 @@
     "markDone": "Als erledigt markieren: {{task}}",
     "deleteTask": "Aufgabe löschen: {{task}}",
     "showing": "{{shown}} von {{total}} angezeigt",
+    "waitingSum": "Insgesamt offen: {{total}} — Aufgaben: {{tasks}}, Quarantänebestände: {{holds}}",
     "showMore": "Mehr anzeigen",
     "filter": {
       "label": "Aufgaben anzeigen",
