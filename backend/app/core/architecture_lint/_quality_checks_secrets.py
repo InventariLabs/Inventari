@@ -26,12 +26,24 @@ from ._constants import _is_test_file, _rel, _rel_parts
 _APP_WIDE_SECRET_CALLS = (
     ('secrets', 'encrypt'),
     ('secrets', 'decrypt'),
-    ('settings', 'encrypt_app_secret'),
 )
+
+#: The installation-wide helpers themselves, wherever a module reaches them
+#: from — ``core_api.settings.encrypt_app_secret``, ``crypto_service.
+#: encrypt_app_secret``, or the name imported bare — and whether they are
+#: called or handed on: the name is the whole question.
+_APP_WIDE_SECRET_NAMES = frozenset({'encrypt_app_secret', 'decrypt_app_secret'})
 
 
 def _app_wide_secret_call(node: ast.AST) -> str | None:
-    """``core_api.secrets.encrypt(...)`` and friends, by name."""
+    """``core_api.secrets.encrypt(...)``, and any reach for the app-wide helpers."""
+    if isinstance(node, ast.ImportFrom):
+        for alias in node.names:
+            if alias.name in _APP_WIDE_SECRET_NAMES:
+                return alias.name
+        return None
+    if isinstance(node, ast.Attribute) and node.attr in _APP_WIDE_SECRET_NAMES:
+        return node.attr
     if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
         return None
     owner = node.func.value
@@ -68,11 +80,11 @@ def _check_module_secret_binding(modules_root: Path) -> list[str]:
             called = _app_wide_secret_call(node)
             if called is None:
                 continue
-            assert isinstance(node, ast.Call)
+            assert isinstance(node, (ast.Call, ast.Attribute, ast.ImportFrom))
             errors.append(
                 f'::error file={_rel(py_file)},line={node.lineno},'
                 f'title=Architecture: module secret is not bound to its module::'
-                f'core_api.{called}() encrypts with no owner, so the value '
+                f'{called}() encrypts with no owner, so the value '
                 f"reads back as any module's secret. Use "
                 f'core_api.secrets.encrypt_for_module(<module>, value) / '
                 f'decrypt_for_module, or core_api.settings.encrypt_secret('

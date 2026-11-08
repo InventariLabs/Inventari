@@ -576,3 +576,71 @@ class TestSignatureFormat:
             b'version: 1.2.3\n'
             b'sha256: 216fcb782bb39cb9acc7c0068e288803e1f76ac4cdb697895e53ee3ae4a9c523\n'
         )
+
+
+class TestTheTrustedKeySetting:
+    """``MODULE_SIGNING_PUBLIC_KEYS`` takes ``key_id=<key>`` entries only.
+
+    A standard Ed25519 public key is 44 Base64 characters ending in the
+    padding ``=``. Given bare, the parser read that ``=`` as the id
+    separator and skipped an "invalid" empty key; and an id the parser made
+    up for a bare key could never match the id a signature names, so the
+    path that tried was unreachable. A bare entry is now refused by name.
+    """
+
+    def test_a_bare_padded_key_is_not_trusted_and_says_why(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog
+    ) -> None:
+        from app.cli._module_signing import _trusted_keys
+
+        _private, public = _write_keypair(tmp_path, 'publisher')
+        assert public.endswith('=')
+        monkeypatch.setattr(settings, 'MODULE_SIGNING_PUBLIC_KEYS', public)
+
+        assert _trusted_keys() == {}
+        assert 'has no key id' in caplog.text
+        assert 'not valid base64' not in caplog.text
+
+    def test_the_same_key_with_its_id_is_trusted(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The control: the key itself is fine."""
+        from app.cli._module_signing import _trusted_keys
+
+        _private, public = _write_keypair(tmp_path, 'publisher')
+        monkeypatch.setattr(
+            settings, 'MODULE_SIGNING_PUBLIC_KEYS', f'my-releases={public}'
+        )
+
+        assert list(_trusted_keys()) == ['my-releases']
+
+    def test_another_key_under_the_signers_id_is_not_called_tampering(
+        self, tmp_path: Path, install_env: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    ) -> None:
+        """The content is intact; what differs is the key listed under the
+        id. The refusal names both possibilities instead of the one that is
+        not the case here."""
+        source = _make_package(tmp_path)
+        signer_private, _signer_public = _write_keypair(tmp_path, 'signer')
+        _other_private, other_public = _write_keypair(tmp_path, 'other')
+        sign_module(
+            source,
+            {
+                'name': 'probe_mod',
+                'version': '0.1.0',
+                'components': {'backend': True, 'frontend': False},
+            },
+            signer_private,
+            'publisher-1',
+        )
+        monkeypatch.setattr(
+            settings, 'MODULE_SIGNING_PUBLIC_KEYS', f'publisher-1={other_public}'
+        )
+
+        with pytest.raises(SystemExit):
+            module_packaging.install_module(str(source))
+
+        out = capsys.readouterr().out
+        assert "trusts as 'publisher-1'" in out
+        assert 'signed with a different key under that id' in out
+        assert not (install_env / 'probe_mod').exists()

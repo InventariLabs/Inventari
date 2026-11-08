@@ -187,9 +187,15 @@ python manage.py module validate --module my_module
 python manage.py module schema
 ```
 
-`--base-path` points `validate` at another modules directory. `--allow-core` skips the safety
-scan for every module it validates, not only core modules, so a clean report made with it says
-nothing about imports.
+`--base-path` points `validate` at another modules directory: one of installed backends
+(`<name>/manifest.json`), or of packages as `module new-community` writes them (`module.yaml` with
+`backend/` beside it), which it lays out the way `module install` does before checking — under the
+name `module.yaml` gives, without `tests/`. `validate`, `install` and `upgrade` refuse what module
+discovery refuses at the next start: a manifest `name` that differs from the module's directory, a
+`module_type` above `community` on a module the repository does not ship, and a platform floor
+above the running version; a `requires` entry naming an always-on feature (`items`, `locations`,
+`categories`, …) is accepted by all of them. `--allow-core` skips the safety scan for the modules
+this repository ships, at their own path, and for no other directory.
 
 The AST validator checks:
 - Import statements against `FORBIDDEN_IMPORT_PREFIXES` (rejected outright)

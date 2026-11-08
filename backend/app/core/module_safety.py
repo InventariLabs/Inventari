@@ -344,6 +344,15 @@ FORBIDDEN_OBJECTS = (
     'app.core._event_bus.EventBus',
 )
 
+#: Objects only a module this repository ships may hold, compared the same
+#: way. The module SDK re-exports Core's declarative base as
+#: ``CoreModelBase`` for the shipped modules whose tables were Core's before
+#: the SDK existed; ``app.core.module_sdk`` is on the import surface, so the
+#: path alone let a module from outside declare its tables in Core's
+#: metadata, where Core's autogenerate proposes them as a core migration.
+#: A module from outside declares on ``ModuleModelBase``.
+SHIPPED_ONLY_OBJECTS = ('app.database.Base',)
+
 CORE_EXEMPTIONS: dict[str, list[str]] = {
     'printing': ['subprocess', 'os'],
     'vision': ['httpx'],
