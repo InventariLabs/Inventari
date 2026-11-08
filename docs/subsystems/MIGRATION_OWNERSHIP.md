@@ -168,6 +168,12 @@ repair for that timestamp case: core `tzaware01` (archived with the previous
 chain) and one revision in each module chain except `example_widgets` pass it
 the columns their models declare aware, and it alters
 only those the database holds naive, reading the stored values as UTC.
+`example_widgets` needs none: both revisions that have ever created its table,
+its own `001_initial` and the archived core `e4f5a6b7c8d9`, declared the
+timestamps aware from the first version, so no database holds that table
+naive and the `create_table_if_absent` guard skips nothing that needs repair.
+`make new-module` copies this chain, so a repair revision here would also
+land in every new module, where there is nothing to repair.
 
 ## What a Revision May Import
 
