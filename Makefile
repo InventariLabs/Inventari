@@ -177,6 +177,8 @@ lint: ## Check code style with ruff
 	$(BACKEND_EXEC) uv run python manage.py arch lint --quiet
 	@echo "$(BLUE)[INFO]$(NC) Checking dead code (vulture, baseline)..."
 	$(BACKEND_EXEC) uv run python scripts/check_vulture_baseline.py
+	@echo "$(BLUE)[INFO]$(NC) Checking types (mypy, baseline)..."
+	$(BACKEND_EXEC) uv run python scripts/check_mypy_baseline.py
 	@echo "$(BLUE)[INFO]$(NC) Checking licence report freshness..."
 	@python3 backend/scripts/check_licences_fresh.py
 	@echo "$(BLUE)[INFO]$(NC) Checking that every import under app/ is a declared dependency..."
