@@ -126,6 +126,13 @@ says what the release does rather than what changed since them.
   the address it was sent to. A script that issued bearer codes names the
   invitee instead. Codes already issued without an address keep working until
   they expire.
+- **Breaking:** a production recipe's fixed cost line takes one of the four
+  kinds the recipe screen offers — `LABOR`, `PACKAGING`, `OVERHEAD` or `OTHER` —
+  and the API answers 422 for any other `kind` on
+  `POST /maker/recipes/{id}/cost-lines` and on its `PATCH`. The API used to
+  store any string up to sixteen characters, which the screen then showed as a
+  raw code it could not name. A client that sent another kind sends `OTHER`
+  and says what it is in the label.
 
 ### Added
 
