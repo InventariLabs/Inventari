@@ -358,16 +358,6 @@ async def _shortages_async(
     return shortages, layout, lots
 
 
-def _to_buy(shortage: _Shortage, shares: dict[UUID, Decimal]) -> Decimal:
-    """What an order for this rule would be for: what reserve cannot cover.
-
-    A rule the reserve covers in full draws no order; its suggested quantity
-    stands in so a supplier is still named for it.
-    """
-    remaining = shortage.suggested - shares.get(shortage.rule.id, Decimal('0'))
-    return remaining if remaining > 0 else shortage.suggested
-
-
 async def _compute_alerts_for_rules(
     db: AsyncSession,
     org_id: UUID,
@@ -381,10 +371,13 @@ async def _compute_alerts_for_rules(
     # list names one: the cheapest current offer is proposed, so the alert
     # does not read "No supplier" beside a price the module itself holds.
     # The rule's own choice always wins.
-    # The offer is read for the quantity that would be ordered, so a volume
-    # price the order does not reach never names a supplier.
+    # The supplier is chosen against what this rule will really order, so a
+    # volume price counts only for the rule whose order reaches it.
     wanted = {
-        (s.rule.product_template_id, _to_buy(s, shares))
+        (
+            s.rule.product_template_id,
+            max(s.suggested - shares.get(s.rule.id, Decimal('0')), Decimal('0')),
+        )
         for s in shortages
         if not s.rule.preferred_partner_id
     }
@@ -417,7 +410,7 @@ async def _compute_alerts_for_rules(
         proposed_offer = (
             None
             if rule.preferred_partner_id
-            else offers.get((rule.product_template_id, _to_buy(shortage, shares)))
+            else offers.get((rule.product_template_id, remaining))
         )
         if proposed_offer is not None:
             supplier = proposed_offer.partner
