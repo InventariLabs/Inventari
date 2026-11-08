@@ -1,7 +1,7 @@
 from uuid import UUID
 
 import jwt
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, Request, status
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,29 +30,31 @@ class _SessionToken(OAuth2PasswordBearer):
 
     A request that sends only ``X-API-Key`` has no bearer token, and the
     plain scheme would refuse it before the key is ever read.
+
+    A request with neither is refused here, in the coded envelope: the
+    scheme's own refusal (``auto_error``) was the framework's bare English
+    ``{"detail": "Not authenticated"}``, the one 401 of an authenticated
+    route a client could not branch on by ``code``.
     """
 
     async def __call__(self, request: Request) -> str | None:
         if request.headers.get(API_KEY_HEADER):
             return None
-        return await super().__call__(request)
-
-    def make_not_authenticated_error(self) -> HTTPException:
-        """The coded envelope, not the framework's bare English sentence.
-
-        A request with no credential at all was the one refusal of an
-        authenticated route a client could not branch on by ``code``.
-        """
-        return catalogue_status_refusal(
-            'not_authenticated',
-            status.HTTP_401_UNAUTHORIZED,
-            headers={'WWW-Authenticate': 'Bearer'},
-        )
+        token = await super().__call__(request)
+        if token is None:
+            raise catalogue_status_refusal(
+                'not_authenticated',
+                status.HTTP_401_UNAUTHORIZED,
+                headers={'WWW-Authenticate': 'Bearer'},
+            )
+        return token
 
 
 # The scheme keeps its published name: OpenAPI importers key on it.
 oauth2_scheme = _SessionToken(
-    tokenUrl='/api/v1/auth/login', scheme_name='OAuth2PasswordBearer'
+    tokenUrl='/api/v1/auth/login',
+    scheme_name='OAuth2PasswordBearer',
+    auto_error=False,
 )
 api_key_header = APIKeyHeader(
     name=API_KEY_HEADER, scheme_name='ApiKey', auto_error=False
