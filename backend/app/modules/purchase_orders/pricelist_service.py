@@ -8,12 +8,13 @@ Key queries:
 - ``list_for_partner_async`` — all offers from a supplier
 - ``list_for_template_async`` — all suppliers for a product (price
   comparison)
-- ``get_best_price_async`` — lowest unit_price currently valid for a
-  template at a given date (optionally filtered by partner type)
+- ``get_best_price_async`` — the offer that prices a template at a given
+  date and quantity (``pick_offer`` decides among the valid entries)
 """
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import date
 from decimal import Decimal
 from uuid import UUID
@@ -72,6 +73,43 @@ async def _reject_a_second_price_for_the_same_offer(
         )
 
 
+async def house_currency_async(db: AsyncSession, organization_id: UUID) -> str:
+    """The organization's own currency — the one its prices are read in."""
+    from app.core.public_api import core_api
+
+    org = await core_api.organizations.get_async(db, organization_id)
+    return (org.currency if org else None) or 'USD'
+
+
+def pick_offer(
+    entries: Iterable[PartnerPricelist],
+    quantity: Decimal | None,
+    house_currency: str,
+) -> PartnerPricelist | None:
+    """The entry that prices an order of *quantity*, or ``None``.
+
+    Only entries the quantity reaches are candidates — no minimum, or a
+    minimum the quantity has met; a volume price an order is too small for is
+    not a price it can get. Of those, the house currency comes first, so a
+    4.00 in euros never beats 5.00 in the organization's own money on the
+    strength of the number; when nothing is quoted in it, one other currency
+    is chosen whole (alphabetically, as no rate is held), never a mix. Within
+    a currency the lowest unit price wins. ``quantity=None`` considers every
+    entry — an indicative quote with no order in mind.
+    """
+    reached = [
+        e
+        for e in entries
+        if quantity is None or e.min_quantity is None or e.min_quantity <= quantity
+    ]
+    if not reached:
+        return None
+    return min(
+        reached,
+        key=lambda e: (e.currency != house_currency, e.currency, e.unit_price, e.id),
+    )
+
+
 async def create_async(
     db: AsyncSession,
     *,
@@ -118,10 +156,7 @@ async def create_async(
     )
 
     if not currency:
-        from app.core.public_api import core_api
-
-        org = await core_api.organizations.get_async(db, organization_id)
-        currency = (org.currency if org else None) or 'USD'
+        currency = await house_currency_async(db, organization_id)
 
     entry = PartnerPricelist(
         organization_id=organization_id,
@@ -241,37 +276,47 @@ async def list_for_template_async(
 async def cheapest_offers_async(
     db: AsyncSession,
     organization_id: UUID,
-    product_template_ids: list[UUID],
+    wanted: Iterable[tuple[UUID, Decimal]],
     *,
     active_on: date,
-) -> dict[UUID, PartnerPricelist]:
-    """The cheapest offer valid on *active_on*, for each of the products.
+) -> dict[tuple[UUID, Decimal], PartnerPricelist]:
+    """The offer that prices each wanted ``(product, quantity)`` pair.
 
     One query for the whole set, for callers that need a supplier per
     product (the replenishment alerts) and would otherwise ask once per
-    row. A product nobody quotes is simply absent from the result. An offer
-    of a deactivated supplier never counts: an order to it is refused when it
-    is confirmed, so the next cheapest offer wins.
+    row. A pair nobody quotes at that quantity is simply absent from the
+    result. An offer of a deactivated supplier never counts: an order to it
+    is refused when it is confirmed, so the next offer wins. Which offer
+    wins is ``pick_offer``'s call.
     """
-    if not product_template_ids:
+    quantities_by_product: dict[UUID, set[Decimal]] = {}
+    for product_id, quantity in wanted:
+        quantities_by_product.setdefault(product_id, set()).add(quantity)
+    if not quantities_by_product:
         return {}
     stmt = (
         select(PartnerPricelist)
         .options(selectinload(PartnerPricelist.partner))
         .where(
             PartnerPricelist.organization_id == organization_id,
-            PartnerPricelist.product_template_id.in_(product_template_ids),
+            PartnerPricelist.product_template_id.in_(quantities_by_product),
             PartnerPricelist.valid_from <= active_on,
             (PartnerPricelist.valid_to.is_(None))
             | (PartnerPricelist.valid_to >= active_on),
         )
-        .order_by(PartnerPricelist.unit_price, PartnerPricelist.id)
     )
-    cheapest: dict[UUID, PartnerPricelist] = {}
+    entries_by_product: dict[UUID, list[PartnerPricelist]] = {}
     for entry in (await db.scalars(stmt)).all():
         if entry.partner.is_active:
-            cheapest.setdefault(entry.product_template_id, entry)
-    return cheapest
+            entries_by_product.setdefault(entry.product_template_id, []).append(entry)
+    house = await house_currency_async(db, organization_id)
+    offers: dict[tuple[UUID, Decimal], PartnerPricelist] = {}
+    for product_id, quantities in quantities_by_product.items():
+        for quantity in quantities:
+            offer = pick_offer(entries_by_product.get(product_id, []), quantity, house)
+            if offer is not None:
+                offers[(product_id, quantity)] = offer
+    return offers
 
 
 async def get_best_price_async(
@@ -282,7 +327,7 @@ async def get_best_price_async(
     on_date: date | None = None,
     quantity: Decimal | None = None,
 ) -> PartnerPricelist | None:
-    """Return the cheapest currently valid offer for a template.
+    """Return the best currently valid offer for a template, or ``None``.
 
     Used for procurement's current quote. Indicative costs use the registered
     batch provider, which normalizes units and filters to house currency.
@@ -290,9 +335,9 @@ async def get_best_price_async(
     Args:
         on_date: Reference date (defaults to the organization's own day —
             validity windows cut on the org's clock, not the server's).
-        quantity: If set, prefer entries whose ``min_quantity`` <= quantity
-            (volume-pricing tier). Falls back to entries with no
-            min_quantity if no tier matches.
+        quantity: If set, only entries it reaches count (no ``min_quantity``,
+            or a minimum it has met); with none reached the answer is
+            ``None``. See ``pick_offer`` for the choice among them.
     """
     if on_date is not None:
         reference = on_date
@@ -315,21 +360,13 @@ async def get_best_price_async(
             (PartnerPricelist.valid_to.is_(None))
             | (PartnerPricelist.valid_to >= reference),
         )
-        .order_by(PartnerPricelist.unit_price)
     )
-    entries = list((await db.scalars(stmt)).all())
+    entries = (await db.scalars(stmt)).all()
     if not entries:
         return None
-
-    if quantity is not None:
-        tier_matches = [
-            e
-            for e in entries
-            if e.min_quantity is not None and e.min_quantity <= quantity
-        ]
-        if tier_matches:
-            return tier_matches[0]
-    return entries[0]
+    return pick_offer(
+        entries, quantity, await house_currency_async(db, organization_id)
+    )
 
 
 async def update_async(
