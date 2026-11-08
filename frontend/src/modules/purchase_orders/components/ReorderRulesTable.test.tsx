@@ -95,9 +95,15 @@ describe("ReorderRulesTable on a phone", () => {
         within(card).getByRole("button", { name: "Edit Latte cups" }),
       );
       expect(onEdit).toHaveBeenCalledOnce();
+      const del = within(card).getByRole("button", {
+        name: "Delete Latte cups",
+      });
+      // A thumb needs the 44 px floor, not the table's compact 32 px.
+      expect(del).toHaveClass("h-11", "w-11");
+      expect(del).not.toHaveClass("h-8");
       expect(
-        within(card).getByRole("button", { name: "Delete Latte cups" }),
-      ).toBeInTheDocument();
+        within(card).getByRole("button", { name: "Edit Latte cups" }),
+      ).toHaveClass("h-11", "w-11");
     } finally {
       phone.value = false;
     }
