@@ -211,7 +211,6 @@ export default tseslint.config(
       "src/modules/warehouse/components/DocumentMetadataGrid.tsx",
       "src/modules/warehouse/hooks/useDocumentScanner.ts",
       "src/modules/warehouse/hooks/useDocumentWorkspaceState.ts",
-      "src/modules/warehouse/pages/DocumentDetailPage.tsx",
       "src/modules/equipment/pages/AssetListPage.tsx",
       "src/modules/inventory/hooks/useItemForm.ts",
       "src/modules/nutrition/components/FoodAndHealthExtra.tsx",

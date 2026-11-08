@@ -46,7 +46,6 @@ import { useDocumentPartnerOptions } from "@/modules/warehouse/hooks/useDocument
 import { useDocumentPlaceNames } from "@/modules/warehouse/hooks/useDocumentPlaces";
 import {
   cancelReleasesStock,
-  isPickedBeforePosting,
   mayBePlanned,
   UNDOABLE_DOCUMENT_TYPES,
 } from "@/modules/warehouse/types";
@@ -396,7 +395,6 @@ export default function DocumentDetailPage() {
     enabled: isModuleEnabled("approvals"),
   });
   const { data: documentProfile } = useDocumentProfile();
-  // Worked as confirmed when the module it waits for was switched off since.
   const status = doc ? workingStatus(doc) : undefined;
   const gate = useApprovalGate(status, approvalRequirement, approval);
   // One read of the three facts the sentence is built from — see
@@ -478,12 +476,6 @@ export default function DocumentDetailPage() {
           isPlanned={mayBePlanned(doc.type, doc.scheduled_date, todayIso())}
           approvalRequired={facts.required}
           isPdfDownloading={isPdfDownloading}
-          canStartPicking={
-            status === "CONFIRMED" && isPickedBeforePosting(doc.type)
-          }
-          canStartReceiving={
-            status === "CONFIRMED" && ["IN", "INTERNAL_IN"].includes(doc.type)
-          }
           // any active (non-terminal) approval request blocks
           // execution — PENDING alone missed IN_PROGRESS requests.
           {...gate}
@@ -509,7 +501,6 @@ export default function DocumentDetailPage() {
     });
   }, [
     doc,
-    status,
     t,
     setHeader,
     isPdfDownloading,
