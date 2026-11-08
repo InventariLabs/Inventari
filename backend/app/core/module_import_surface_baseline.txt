@@ -229,13 +229,11 @@ stats | owner=core | expires=2027-06-30 | the analytics screens read item models
   app.core.logging
   app.core.modules
   app.core.money
-  app.models
   app.models.category
   app.models.item
   app.models.item_history
   app.models.organization
   app.services.analytics._common
-  app.services.items.low_stock
 
 stock_takes | owner=core | expires=2027-06-30 | the count flow reads item, storage and user models, and the core scope helper, directly; the module predates the SDK. Its warehouse import is the warehouse public API.
   app.core.context

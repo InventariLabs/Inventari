@@ -432,7 +432,8 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
         name='Custom',
         # The old text promised "build your own configuration from scratch",
         # which switching never does: `profile_switch_planner` keeps every
-        # manually enabled module (`manual_kept`) and touches no data at all.
+        # manually enabled module (`manual_kept`) and removes no data — the
+        # mode's seed only adds the rows that are missing.
         description='No industry preset — a neutral base you shape yourself.',
         default_modules=[
             'core',

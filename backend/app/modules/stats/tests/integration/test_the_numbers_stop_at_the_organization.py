@@ -291,17 +291,3 @@ class TestTheDerivedReportsStopThereToo:
         assert data['top_recurring_products'] == []
         assert data['seasonal_products'] == []
         assert data['bulk_opportunities'] == []
-
-    def test_their_shelf_suggests_nothing_to_me(
-        self,
-        client: TestClient,
-        auth_headers: dict[str, str],
-        test_storage_location: StorageLocation,
-        stranger_stock: Item,
-    ) -> None:
-        response = client.get(
-            '/api/v1/stats/shopping-suggestions', headers=auth_headers
-        )
-
-        assert response.status_code == status.HTTP_200_OK, response.text
-        assert response.json()['items'] == []

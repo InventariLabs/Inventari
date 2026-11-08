@@ -34,6 +34,7 @@ class ShoppingListItemDTO(BaseModel):
     source: str = 'manual'
     item_id: UUID | None = None
     category_id: UUID | None = None
+    is_purchased: bool = False
 
 
 class ShoppingListItemCreateDTO(BaseModel):
@@ -419,9 +420,15 @@ class DocumentFilterDTO(BaseModel):
     'C-1'}, {'number': 'C-2'}]`` those with either number, and ``[]`` none.
     The warehouse puts the module's name around each fragment itself, so a
     filter reads its own module's fields and no other's.
+
+    ``lots_only`` counts only the lines that carry a batch (a non-empty
+    ``batch_number``): a filter answering for a rule about lots — "the
+    receipts whose lots are certified" — would otherwise keep a document
+    for a field written on one of its lines that is no lot at all.
     """
 
     line_meta_data: list[dict[str, Any]] = Field(default_factory=list)
+    lots_only: bool = False
 
 
 class PutawayCandidateDTO(BaseModel):

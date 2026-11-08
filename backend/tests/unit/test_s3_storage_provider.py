@@ -17,6 +17,7 @@ from botocore.exceptions import (  # type: ignore[import-untyped]
     ClientError,
 )
 
+from app.core.file_storage.errors import StorageError
 from app.core.file_storage.providers.s3 import S3StorageProvider
 
 
@@ -133,8 +134,10 @@ class TestGet:
         with patch.object(
             provider, '_get_s3_client', AsyncMock(return_value=_async_cm(client))
         ):
-            with pytest.raises(FileNotFoundError):
+            with pytest.raises(FileNotFoundError) as caught:
                 await provider.get('uploads/x')
+        # The handler the storage contract offers catches it as well.
+        assert isinstance(caught.value, StorageError)
 
     async def test_get_propagates_client_error(
         self, provider: S3StorageProvider
@@ -223,8 +226,9 @@ class TestGetUrl:
         with patch.object(
             provider, '_get_s3_client', AsyncMock(return_value=_async_cm(client))
         ):
-            with pytest.raises(FileNotFoundError):
+            with pytest.raises(FileNotFoundError) as caught:
                 await provider.get_url('uploads/x')
+        assert isinstance(caught.value, StorageError)
 
     async def test_get_url_signed(self, provider: S3StorageProvider) -> None:
         client = MagicMock()

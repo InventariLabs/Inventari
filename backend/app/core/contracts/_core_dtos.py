@@ -330,13 +330,14 @@ class ProductTemplateDTO(BaseModel):
     def _extract_weight_uom_safely(cls, data: Any) -> Any:
         """Populate ``weight_uom`` without triggering a lazy load.
 
-        ``weight_uom`` is eager-loaded only by ``get_with_uom_async``.
-        Other readers build this DTO from a plain ORM row whose
-        ``weight_uom`` relationship is lazy and unreachable in an async
-        context (it raises ``MissingGreenlet``). The field carries a
-        private alias so ``from_attributes`` never touches the lazy
-        attribute; we then read it via ``getattr`` and map only the
-        async-IO error to ``None`` (real exceptions propagate).
+        ``weight_uom`` is a ``selectin`` relationship, so a template that
+        came from a query carries it. One that did not — just added to the
+        session, or with its relationships expired by a commit or refresh —
+        would load it lazily, which an async context refuses
+        (``MissingGreenlet``). The field carries a private alias so
+        ``from_attributes`` never touches the attribute directly; we then
+        read it via ``getattr`` and map only the async-IO error to ``None``
+        (real exceptions propagate).
         """
         if isinstance(data, dict):
             # Accept the public field name in dicts too (kwargs construction).

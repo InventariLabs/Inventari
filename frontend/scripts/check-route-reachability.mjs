@@ -37,8 +37,9 @@
  *   3. Collects references across src/** (tests excluded): `to="/x"`,
  *      `to: "/x"` (data objects), `navigate("/x")`, `href="/x"`,
  *      `linkTo: "/x"` (launcher action items), and template-literal variants.
- *      Module nav items count too: `moduleNav.items[].path` resolved against
- *      `basePath`, plus each module's launcher tile target (the same
+ *      Module nav items count too: `moduleNav.items[].path`, which must be
+ *      absolute (a relative one fails the gate: the shell links it as
+ *      written), plus each module's launcher tile target (the same
  *      `launcher.linkTo ?? moduleNav.basePath ?? routes[0].path` chain
  *      `resolveModuleTarget` uses). These are references the regexes cannot
  *      see, because the link is built by the shell from registry data.
@@ -246,6 +247,22 @@ export function pathsIn(block) {
   return [...block.matchAll(/\bpath:\s*"([^"]*)"/g)].map((m) => m[1]);
 }
 
+/**
+ * The nav item paths of one module.ts that are not absolute.
+ *
+ * The shell links each item exactly as written (ModuleShell, MobileModuleNav),
+ * so `""` or `"settings"` links nowhere, and an empty path reads as the
+ * current page on every screen it does not match. This gate used to resolve
+ * such a path against `basePath` and call its route reachable.
+ */
+export function relativeNavPaths(moduleSource) {
+  const navBlock = sliceBlock(moduleSource, "moduleNav");
+  const itemsBlock = navBlock ? sliceBlock(navBlock, "items") : null;
+  return (itemsBlock ? pathsIn(itemsBlock) : []).filter(
+    (p) => !p.startsWith("/"),
+  );
+}
+
 function moduleFiles() {
   const dir = join(SRC, "modules");
   const files = [];
@@ -270,9 +287,12 @@ function readModules() {
   // ends in "/settings") — their settings are reachable through the module,
   // so no link has to name their /settings/modules instance.
   const ownSettingsScreens = new Set();
+  // Nav items written relative to the base: refused, never resolved.
+  const relativeNav = [];
 
   for (const [name, file] of moduleFiles()) {
     const text = readFileSync(file, "utf8");
+    for (const p of relativeNavPaths(text)) relativeNav.push(`${name}: "${p}"`);
 
     const navBlock = sliceBlock(text, "moduleNav");
     const basePath = navBlock
@@ -286,14 +306,9 @@ function readModules() {
     if (navBlock) {
       const itemsBlock = sliceBlock(navBlock, "items");
       for (const p of itemsBlock ? pathsIn(itemsBlock) : []) {
-        if (p.startsWith("/")) references.add(p);
-        else if (p === "") references.add(basePath);
-        else references.add(`${basePath}/${p}`);
-        if (
-          (p.startsWith("/") ? p : `${basePath}/${p}`).endsWith("/settings")
-        ) {
-          ownSettingsScreens.add(name);
-        }
+        if (!p.startsWith("/")) continue; // refused below, links nowhere
+        references.add(p);
+        if (p.endsWith("/settings")) ownSettingsScreens.add(name);
       }
     }
 
@@ -328,7 +343,7 @@ function readModules() {
     // module `routes` DO need this gate.
   }
 
-  return { routes, references, ownSettingsScreens };
+  return { routes, references, ownSettingsScreens, relativeNav };
 }
 
 // ---------------------------------------------------------------------------
@@ -529,7 +544,20 @@ function main() {
     routes: moduleRoutes,
     references: moduleReferences,
     ownSettingsScreens,
+    relativeNav,
   } = readModules();
+
+  if (relativeNav.length > 0) {
+    console.error(
+      `\n✗ moduleNav item path(s) not absolute (${relativeNav.length}):`,
+    );
+    for (const entry of relativeNav) console.error(`  - ${entry}`);
+    console.error(
+      "\nThe shell links a nav item exactly as written: give its full path" +
+        ' (`/widgets`, not `""`).',
+    );
+    process.exit(1);
+  }
 
   // One namespace: a module route and a static route are the same kind of
   // promise to the reader, and the same kind of dead end when nothing links

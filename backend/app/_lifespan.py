@@ -167,7 +167,7 @@ async def _initialize_modules(logger: Logger, event_bus) -> list[str]:
                     # settings/secret/event calls speak for the module.
                     with module_scope(module.metadata.name):
                         await module_registry.check_module_version_async(module, db)
-                        module.on_startup(context)
+                        module.run_startup(context)
                         await module.on_startup_async(context)
                     logger.info(f'Initialized module: {module.metadata.name}')
                 except Exception as exc:  # noqa: BLE001 — startup must continue past per-module failures

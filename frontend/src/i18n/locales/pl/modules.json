@@ -9,8 +9,7 @@
   },
   "modules": {
     "core": {
-      "title": "Dom i Kuchnia",
-      "desc": "Lodówka, Spiżarnia i podstawowe produkty."
+      "title": "Dom i Kuchnia"
     },
     "shopping_lists": {
       "name": "Listy zakupów",

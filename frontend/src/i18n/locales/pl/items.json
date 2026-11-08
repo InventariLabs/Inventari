@@ -59,7 +59,7 @@
     "RETIRED": "Wycofany z użytku",
     "TEST_DATA": "Dane testowe / błędne",
     "OTHER": "Inny",
-    "USED": "Zużyty",
+    "USED": "Zużyte",
     "DISPOSED": "Wyrzucony",
     "ARCHIVED": "Zarchiwizowany"
   },
@@ -414,7 +414,7 @@
       "QUANTITY_INCREASED_VIA_SCAN": "Dodano przez skanowanie",
       "CHECKOUT": "Wydano",
       "CHECKIN": "Przyjęto",
-      "USED": "Skonsumowano",
+      "USED": "Zużyte",
       "DISPOSED": "Wyrzucono",
       "DELETED": "Usunięto",
       "RESTORED": "Przywrócono",

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import type { StorageLocationNode } from "@/types";
 import { TypedSlot } from "@/components/Slot";
-import { AttentionCard } from "@/components/ui/AttentionCard";
+import { AttentionCard } from "@/module-sdk";
 import { Button } from "@/components/ui/Button";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";

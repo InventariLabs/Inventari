@@ -19,8 +19,7 @@ export function useInventoryStatusBadge() {
       itemsApi.getAttentionCounts({
         exclude_module_contexts: excludeModuleContexts,
       }),
-    labelKey: "statusBadge.needsAttention",
-    labelNs: "inventory",
+    labelKey: "inventory:statusBadge.needsAttention",
     staleTime: 2 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
     extractCount: attentionCount,

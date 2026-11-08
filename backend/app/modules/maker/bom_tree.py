@@ -28,10 +28,14 @@ async def get_tree(
     organization_id: UUID,
     parent_template_id: UUID,
     *,
+    recipe_id: UUID | None = None,
     _visited: set[UUID] | None = None,
     _depth: int = 0,
 ) -> dict[str, Any]:
     """Return a recursive tree dict: ``{line, children: [...]}``.
+
+    The root is *recipe_id* (the default recipe without it); every
+    sub-assembly below it is its default recipe, as the explosion walks it.
 
     Each level is bounded by ``bom_service._MAX_DEPTH``; a graph deeper than
     the resolver's limit refuses through the error catalog. A cycle in the
@@ -50,7 +54,9 @@ async def get_tree(
         )
 
     visited = visited | {parent_template_id}
-    lines = await bom_service.list_lines(db, organization_id, parent_template_id)
+    lines = await bom_service.list_lines(
+        db, organization_id, parent_template_id, recipe_id=recipe_id
+    )
 
     children = []
     for line in lines:

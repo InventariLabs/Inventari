@@ -291,6 +291,20 @@ describe("historyChanges OPENED", () => {
       "items:history.openedNothingLeft",
     );
   });
+
+  // The history writes its quantities as the exact digits; a row written
+  // before that holds a number. Both shapes of an emptied package read alike.
+  it("reads an emptied package written as exact digits", () => {
+    expect(parseChanges("OPENED", { left: "0.000" }, tOpened)).toBe(
+      "items:history.openedNothingLeft",
+    );
+  });
+
+  it("reads what is left written as exact digits", () => {
+    expect(
+      parseChanges("OPENED", { left: "1.500", left_unit: "kg" }, tOpened),
+    ).toBe("1.5 kg left");
+  });
 });
 
 describe("ItemAction ↔ READERS contract", () => {

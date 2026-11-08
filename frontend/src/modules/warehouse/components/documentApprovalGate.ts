@@ -35,6 +35,19 @@ function approvalGate(input: ApprovalGateInput): ApprovalGate {
   };
 }
 
+/**
+ * The state a document is worked in. One parked for a module switched off
+ * since (`hold_stood_down`) is worked as the confirmed document it was: the
+ * server starts a session on it and posts it, and its badge still says what
+ * the row holds.
+ */
+export function workingStatus(doc: {
+  status: string;
+  hold_stood_down?: boolean;
+}): string {
+  return doc.hold_stood_down ? "CONFIRMED" : doc.status;
+}
+
 /** Execution the server would refuse is disabled instead of failing late. */
 export function executionBlocked(gate: ApprovalGate): boolean {
   return gate.hasPendingApproval || gate.approvalRequiredNoRequest;

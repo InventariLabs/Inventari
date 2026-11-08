@@ -91,8 +91,8 @@ class InterceptorPipeline:
     This is the global pipeline singleton. Modules register their interceptors
     here during ``on_startup`` / ``register_contributions``.
 
-    The 22 public ``run_*`` hooks are one-line delegations to three
-    shared dispatch primitives instead of 22 duplicated bodies.
+    The public ``run_*`` hooks are one-line delegations to three shared
+    dispatch primitives instead of one duplicated body each.
     """
 
     _item_interceptors: list[ItemInterceptor] = field(default_factory=list)

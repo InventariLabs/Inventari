@@ -289,11 +289,27 @@ class TestItemLifecycleOperations:
         refreshed = await db.run_sync(_refresh)
         assert refreshed.is_deleted is True
 
+        # The deletion keeps the quantity as its exact digits (AUDIT.md), and
+        # the restore reads it back from that shape.
+        def _deleted_entry(s: Session) -> dict:
+            from app.models.item_history import ItemHistory
+
+            return s.scalars(
+                select(ItemHistory.changes).where(
+                    ItemHistory.item_id == item.id, ItemHistory.action == 'DELETED'
+                )
+            ).one()
+
+        changes = await db.run_sync(_deleted_entry)
+        assert isinstance(changes['old_quantity'], str)
+        assert Decimal(changes['old_quantity']) == Decimal('5')
+
         # Restore via the service
         result = await restore_item(db, item=item, user=ctx)
         await db.commit()
 
         assert result.is_deleted is False
+        assert result.quantity == Decimal('5')
 
     async def test_soft_delete_without_a_reason_keeps_none(
         self,

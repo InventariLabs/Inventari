@@ -28,7 +28,7 @@ describe("ModuleRegistry.register", () => {
     expect(moduleRegistry.getAllRegisteredModules()).toContain("test-listed");
   });
 
-  it("does not warn when a moduleNav item has empty path matching basePath route", () => {
+  it("does not warn when a moduleNav item's full path is the basePath route", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const Comp = () => null;
     moduleRegistry.register({
@@ -36,7 +36,7 @@ describe("ModuleRegistry.register", () => {
       routes: [{ path: "/empty-navpath", component: Comp }],
       moduleNav: {
         basePath: "/empty-navpath",
-        items: [{ path: "", icon: Package, labelKey: "x" }],
+        items: [{ path: "/empty-navpath", icon: Package, labelKey: "x" }],
       },
     });
     moduleRegistry.warnOrphanedNav(["test-empty-navpath"]);
@@ -54,7 +54,9 @@ describe("ModuleRegistry.register", () => {
       routes: [],
       moduleNav: {
         basePath: "/orphan-navpath",
-        items: [{ path: "missing", icon: Package, labelKey: "x" }],
+        items: [
+          { path: "/orphan-navpath/missing", icon: Package, labelKey: "x" },
+        ],
       },
     });
     moduleRegistry.warnOrphanedNav(["test-orphan-navpath"]);

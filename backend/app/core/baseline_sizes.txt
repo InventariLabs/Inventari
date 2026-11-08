@@ -18,7 +18,7 @@ get_db_baseline.txt 0
 internal_id_baseline.txt 0
 manifest_permission_deferrals.txt 0
 mixed_status_assert_baseline.txt 0
-module_import_surface_baseline.txt 287
+module_import_surface_baseline.txt 285
 module_migrations_baseline.txt 0
 public_api_missing_org_baseline.txt 0
 raw_http_exception_baseline.txt 0

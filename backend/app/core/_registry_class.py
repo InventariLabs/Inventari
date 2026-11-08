@@ -461,7 +461,7 @@ class ModuleRegistry:
                     )
                     await db.flush()
                     with module_scope(module.metadata.name):
-                        await module.on_install_async(context)
+                        await module.run_install_async(context)
             except IntegrityError:
                 logger.info(
                     f'[ModuleRegistry] Module {module.metadata.name} already '

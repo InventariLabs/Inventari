@@ -69,10 +69,11 @@ class BaseModule(ABC):
     def on_install(self, context: ModuleContext) -> None:
         """Called when the module is installed (first time).
 
-        Default behavior: runs per-module Alembic migrations if
-        ``migrations/`` directory exists. Override to add custom logic.
+        The module's own Alembic migrations (``migrations/``) have already
+        run when this is called: the registry runs them in
+        :meth:`run_install_async`, so an override owes the base class no
+        ``super()`` call. Override to add custom logic.
         """
-        self._run_module_migrations('upgrade')
 
     async def on_install_async(self, context: ModuleContext) -> None:
         """Async variant of ``on_install`` for hooks that need async DB.
@@ -82,6 +83,17 @@ class BaseModule(ABC):
         hook performs async operations.
         """
         self.on_install(context)
+
+    async def run_install_async(self, context: ModuleContext) -> None:
+        """Install the module: its migrations, then its own install hooks.
+
+        The framework's entry point, not a hook. The migrations used to run
+        in the base ``on_install``, so a module overriding the hook without
+        ``super()`` was installed with no tables; outside the hook, what an
+        override does or forgets cannot take them away.
+        """
+        self._run_module_migrations('upgrade')
+        await self.on_install_async(context)
 
     def on_uninstall(self, context: ModuleContext) -> None:
         """Called when the module is uninstalled.
@@ -194,12 +206,27 @@ class BaseModule(ABC):
         """
 
     def on_startup(self, context: ModuleContext) -> None:
-        """Hook called on server startup."""
+        """Hook called on server startup.
+
+        The module's services, contributions and interceptors are already
+        wired when this is called (:meth:`run_startup`), so an override owes
+        the base class no ``super()`` call.
+        """
+
+    def run_startup(self, context: ModuleContext) -> None:
+        """Start the module: the framework's wiring, then its ``on_startup``.
+
+        The framework's entry point, not a hook. The wiring used to live in
+        the base ``on_startup``, and a module overriding the hook without
+        ``super()`` lost its services, its contributions and its
+        interceptors without a word.
+        """
         from app.core.container import service_container
 
         self.register_services(service_container)
         self.register_contributions()
         self._wire_interceptors()
+        self.on_startup(context)
 
     async def on_startup_async(self, context: ModuleContext) -> None:
         """Async hook called on server startup. Override for async DB operations."""
@@ -313,11 +340,11 @@ class BaseModule(ABC):
     ) -> None:
         """Internal framework hook for copying master metadata schemas.
 
-               Runs on every enable path (onboarding, profile switch, App Store
-               toggle) — unlike the class-level ``on_enable``, which onboarding
-               intentionally skips. Modules must declare their per-organization
-               start data in ``metadata`` (categories, default storage locations)
-        so this hook seeds it identically everywhere.
+        Runs on every enable path (onboarding, profile switch, App Store
+        toggle, demo seed), before the module's own ``on_enable``. Modules
+        declare their per-organization start data in ``metadata``
+        (categories, default storage locations) so this hook seeds it
+        identically everywhere.
         """
         from sqlalchemy import select
 
@@ -544,9 +571,12 @@ class BaseModule(ABC):
     def on_enable(
         self, organization_id: UUID, context: ModuleContext
     ) -> Awaitable[None] | None:
-        """Hook called when the module is enabled for a organization.
+        """Hook called when the module is enabled for an organization.
 
-        May return an awaitable — the lifecycle executor awaits it.
+        Every enable path runs it — onboarding, a profile switch, the store's
+        toggle, the demo seed — after ``system_on_enable`` has seeded what the
+        module declares. May return an awaitable — the lifecycle executor
+        awaits it.
         """
 
     def on_disable(

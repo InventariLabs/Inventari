@@ -43,7 +43,10 @@ describe("useEquipmentStatusBadge", () => {
     });
 
     await waitFor(() =>
-      expect(result.current).toEqual({ count: 2, label: "warranty alerts" }),
+      expect(result.current).toEqual({
+        count: 2,
+        labelKey: "equipment:statusBadge.warrantyAlerts",
+      }),
     );
     expect(days).toBeNull();
   });

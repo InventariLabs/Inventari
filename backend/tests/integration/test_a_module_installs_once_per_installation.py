@@ -126,6 +126,37 @@ class TestASecondBoot:
         assert module.installs == 1
 
 
+class _SyncInstallModule(_CountingModule):
+    """Overrides the sync install hook and, like many, forgets ``super()``."""
+
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+        self.migrations: list[str] = []
+
+    def _run_module_migrations(self, action: str) -> None:
+        self.migrations.append(action)
+
+    async def on_install_async(self, context: ModuleContext) -> None:
+        self.on_install(context)
+
+    def on_install(self, context: ModuleContext) -> None:
+        self.installs += 1
+
+
+class TestAnOverrideThatSkipsSuper:
+    """The base ``on_install`` ran the module's migrations; an override that
+    left out ``super()`` installed a module with no tables. The registry runs
+    them itself now, before the hook."""
+
+    async def test_the_migrations_still_run(
+        self, real_async_db_session: AsyncSession
+    ) -> None:
+        module = _SyncInstallModule(f'sync_install_{uuid.uuid4().hex[:8]}')
+        await _boot(module, workers=1)
+        assert module.migrations == ['upgrade']
+        assert module.installs == 1
+
+
 class TestAHookThatFails:
     async def test_it_leaves_no_installation_behind(
         self, module: _CountingModule, real_async_db_session: AsyncSession

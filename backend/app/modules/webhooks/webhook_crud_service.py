@@ -153,6 +153,11 @@ async def update_endpoint_async(
         # erase the cut-off the breaker's once-only journal entry rests on.
         if is_active != endpoint.is_active:
             endpoint.auto_disabled_at = None
+            if is_active:
+                # Switched back on is a fresh start, as the reactivate route
+                # gives one: the count that tripped the breaker, kept, cut the
+                # channel off again at the next single failure.
+                endpoint.consecutive_failures = 0
         endpoint.is_active = is_active
 
     await db.flush()

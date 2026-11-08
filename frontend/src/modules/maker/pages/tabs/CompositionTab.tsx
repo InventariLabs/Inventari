@@ -324,7 +324,10 @@ export function CompositionTab({ recipe }: CompositionTabProps) {
           </p>
           {showTree && (
             <div className="mt-3">
-              <BomTreeEditor templateId={recipe.output_template_id} />
+              <BomTreeEditor
+                templateId={recipe.output_template_id}
+                recipeId={recipe.id}
+              />
             </div>
           )}
         </div>

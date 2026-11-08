@@ -178,6 +178,27 @@ async def test_the_figures_are_the_ones_the_row_by_row_sum_gave(
     assert stats.total_wasted_value == 2.5
 
 
+async def test_the_uses_are_summed_per_category(
+    real_async_db_session: AsyncSession, window: Organization
+) -> None:
+    """What was used, per category: the quantity and the ledger's value.
+
+    The field was in the response and in the contract from the start, and
+    always an empty list. Disposals are not in it, and a record with no
+    category is under "Other", as on the product lines. Ranked by value: a
+    quantity summed over a category adds kilograms to pieces, so only the
+    value compares one category with another.
+    """
+    stats = await get_consumption_stats_async(real_async_db_session, window.id)
+
+    by_category = [
+        (c.category, c.total_quantity, c.total_value)
+        for c in stats.consumption_by_category
+    ]
+    assert by_category == [('Dairy', 3.75, 6.0), ('Other', 0.0, 0.0)]
+    assert stats.consumption_by_category[1].category_code is None
+
+
 async def test_a_row_the_mapping_cannot_name_is_left_out_and_logged(
     real_async_db_session: AsyncSession,
     window: Organization,

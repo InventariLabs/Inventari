@@ -157,14 +157,29 @@ async def list_lines(
     db: AsyncSession,
     organization_id: UUID,
     parent_template_id: UUID,
+    *,
+    recipe_id: UUID | None = None,
 ) -> list[BoMLine]:
-    """Return all BOM lines for a parent template, scoped to the organization."""
-    result = await db.execute(
-        select(BoMLine).where(
-            BoMLine.organization_id == organization_id,
-            BoMLine.parent_template_id == parent_template_id,
-        )
+    """The BOM lines of one recipe of *parent_template_id*, organization-scoped.
+
+    *recipe_id* names the recipe; without it, the product's default recipe —
+    the one the explosion walks for a sub-assembly. A product with variants
+    has a recipe for each, and keyed by the product alone the answer was all
+    of them in one list: the tree on one variant's page showed the other
+    variants' ingredients as its own. A *recipe_id* of another product
+    answers nothing.
+    """
+    stmt = select(BoMLine).where(
+        BoMLine.organization_id == organization_id,
+        BoMLine.parent_template_id == parent_template_id,
     )
+    if recipe_id is not None:
+        stmt = stmt.where(BoMLine.recipe_id == recipe_id)
+    else:
+        stmt = stmt.join(MakerRecipe, MakerRecipe.id == BoMLine.recipe_id).where(
+            MakerRecipe.is_default.is_(True)
+        )
+    result = await db.execute(stmt)
     return list(result.scalars().all())
 
 

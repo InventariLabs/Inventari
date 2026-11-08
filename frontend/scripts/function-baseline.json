@@ -87,11 +87,6 @@
         29
       ]
     },
-    "src/modules/warehouse/pages/DocumentDetailPage.tsx": {
-      "DocumentDetailPage": [
-        26
-      ]
-    },
     "src/modules/webhooks/components/WebhookForm.tsx": {
       "WebhookForm": [
         42
@@ -161,7 +156,7 @@
     },
     "src/modules/warehouse/pages/DocumentDetailPage.tsx": {
       "DocumentDetailPage": [
-        379
+        373
       ]
     }
   }

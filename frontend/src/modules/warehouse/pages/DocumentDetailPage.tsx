@@ -36,6 +36,7 @@ import { DocumentStatusBadge } from "@/modules/warehouse/components/DocumentStat
 import {
   executionPanelVisible,
   useApprovalGate,
+  workingStatus,
 } from "@/modules/warehouse/components/documentApprovalGate";
 import { documentConfirmedAt } from "@/modules/warehouse/components/documentConfirmation";
 import { DocumentStatusTimeline } from "@/modules/warehouse/components/DocumentStatusTimeline";
@@ -45,7 +46,6 @@ import { useDocumentPartnerOptions } from "@/modules/warehouse/hooks/useDocument
 import { useDocumentPlaceNames } from "@/modules/warehouse/hooks/useDocumentPlaces";
 import {
   cancelReleasesStock,
-  isPickedBeforePosting,
   mayBePlanned,
   UNDOABLE_DOCUMENT_TYPES,
 } from "@/modules/warehouse/types";
@@ -395,7 +395,8 @@ export default function DocumentDetailPage() {
     enabled: isModuleEnabled("approvals"),
   });
   const { data: documentProfile } = useDocumentProfile();
-  const gate = useApprovalGate(doc?.status, approvalRequirement, approval);
+  const status = doc ? workingStatus(doc) : undefined;
+  const gate = useApprovalGate(status, approvalRequirement, approval);
   // One read of the three facts the sentence is built from — see
   // `confirmFacts`, kept out of the render so this stays a render.
   const facts = confirmFacts(
@@ -440,7 +441,7 @@ export default function DocumentDetailPage() {
   } = useDocumentActions({
     docId: id,
     doc,
-    docStatus: doc?.status,
+    docStatus: status,
     duplicateMutation,
     confirmMutation: confirmDocument,
     postNowMutation: postDocumentNow,
@@ -475,13 +476,6 @@ export default function DocumentDetailPage() {
           isPlanned={mayBePlanned(doc.type, doc.scheduled_date, todayIso())}
           approvalRequired={facts.required}
           isPdfDownloading={isPdfDownloading}
-          canStartPicking={
-            doc.status === "CONFIRMED" && isPickedBeforePosting(doc.type)
-          }
-          canStartReceiving={
-            doc.status === "CONFIRMED" &&
-            ["IN", "INTERNAL_IN"].includes(doc.type)
-          }
           // any active (non-terminal) approval request blocks
           // execution — PENDING alone missed IN_PROGRESS requests.
           {...gate}
@@ -566,7 +560,7 @@ export default function DocumentDetailPage() {
   }
 
   const isDraft = doc.status === "DRAFT";
-  const isConfirmed = doc.status === "CONFIRMED";
+  const isConfirmed = status === "CONFIRMED";
   const isCorrection = doc.type === "CORRECTION";
   // Approval actions are only meaningful for documents that can still be
   // approved: COMPLETED/CANCELLED are terminal, and the approval history

@@ -1,4 +1,3 @@
-import json
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -22,6 +21,7 @@ from ._webhook_constants import (
     _DELIVERY_STATUS_PENDING_RETRY,
     _DELIVERY_STATUS_SUCCESS,
     _RETRY_BATCH_LIMIT,
+    wire_body,
 )
 from ._webhook_delivery import (
     _attempt_delivery,
@@ -192,7 +192,7 @@ async def retry_failed_deliveries(db: AsyncSession) -> None:
         delivery_id = log.delivery_id or str(uuid.uuid4())
         log.delivery_id = delivery_id
 
-        payload_bytes = json.dumps(log.payload_json, default=str).encode()
+        payload_bytes = wire_body(log.payload_json)
         is_success, status_code, response_body, error_message = await _attempt_delivery(
             webhook, payload_bytes, log.payload_json, delivery_id=delivery_id
         )

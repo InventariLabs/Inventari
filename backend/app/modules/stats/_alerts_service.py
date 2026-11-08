@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import DateTime, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import ColumnElement
@@ -69,45 +69,50 @@ async def get_smart_alerts_async(  # noqa: C901 - existing complexity/size
 
     # Last touched is max(updated_at, last ItemHistory action): a record
     # somebody consumed from is not stale just because the row itself was
-    # not edited. Pulled in a single grouped query rather than per item.
+    # not edited. Read in the same query as the records, grouped once.
     # No action filter and no check, on purpose: whatever kind a row is,
     # somebody handled the record, and that is all "touched" means here.
-    last_action_rows = (
-        await db.execute(
-            select(
-                ItemHistory.item_id.label('item_id'),
-                func.max(ItemHistory.created_at).label('last_action_at'),
-            )
-            .where(ItemHistory.organization_id == organization_id)
-            .group_by(ItemHistory.item_id)
+    last_action = (
+        select(
+            ItemHistory.item_id.label('item_id'),
+            func.max(ItemHistory.created_at).label('last_action_at'),
         )
-    ).all()
-    last_action_map: dict[UUID, datetime] = {
-        row.item_id: row.last_action_at for row in last_action_rows
-    }
-
-    forgotten_items = (
-        await db.scalars(
-            select(Item)
+        .where(ItemHistory.organization_id == organization_id)
+        .group_by(ItemHistory.item_id)
+        .subquery()
+    )
+    # The candidates are cut at a ceiling, so the cut has to keep the ones
+    # the alert is about: the stalest first, by the same "last touched" the
+    # loop below measures (GREATEST skips a NULL). Unordered, past the
+    # ceiling the alerts came from whichever records the database returned.
+    staleness = func.greatest(
+        Item.updated_at,
+        cast(Item.added_date, DateTime(timezone=True)),
+        last_action.c.last_action_at,
+    )
+    forgotten_rows = (
+        await db.execute(
+            select(Item, last_action.c.last_action_at)
             .options(joinedload(Item.category))
+            .outerjoin(last_action, last_action.c.item_id == Item.id)
             .where(
                 Item.organization_id == organization_id,
                 Item.is_deleted.is_(False),
                 shown,
             )
+            .order_by(staleness.asc().nulls_last(), Item.id)
             .limit(MAX_ANALYTICS_ROWS)
         )
     ).all()
 
-    for item in forgotten_items:
+    for item, last_action_at in forgotten_rows:
         candidates: list[datetime] = []
         if item.updated_at is not None:
             candidates.append(_to_naive(item.updated_at))
         if item.added_date is not None:
             candidates.append(datetime.combine(item.added_date, datetime.min.time()))
-        last_action = last_action_map.get(item.id)
-        if last_action is not None:
-            candidates.append(_to_naive(last_action))
+        if last_action_at is not None:
+            candidates.append(_to_naive(last_action_at))
 
         if not candidates:
             continue

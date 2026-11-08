@@ -243,6 +243,28 @@
             }
           ]
         },
+        "run_install_async": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
+        "run_startup": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
         "system_on_disable": {
           "abstract": false,
           "kind": "method",
@@ -1263,7 +1285,7 @@
           ]
         },
         "before_create": {
-          "abstract": true,
+          "abstract": false,
           "kind": "method",
           "params": [
             {
@@ -1332,7 +1354,7 @@
           ]
         },
         "before_update": {
-          "abstract": true,
+          "abstract": false,
           "kind": "method",
           "params": [
             {

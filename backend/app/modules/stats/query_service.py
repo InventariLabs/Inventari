@@ -3,8 +3,8 @@
 Dashboard, consumption, cost, rotation, reconciliation, and forecast
 read-models now delegate to ``core_api.queries`` (Tier 1 neutral
 aggregates). The remaining module-local queries (smart alerts, purchase
-patterns, shopping suggestions) are home-domain business logic that does
-not pass the 3-Vertical Test and correctly stays in the module.
+patterns) are home-domain business logic that does not pass the 3-Vertical
+Test and correctly stays in the module.
 """
 
 from typing import Any
@@ -14,7 +14,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.public_api import core_api
 
-from ._analytics_queries import get_shopping_suggestions
 from .schemas import PreviousMeasurement, ReconciliationResponse
 
 
@@ -133,7 +132,6 @@ __all__ = [
     'get_recent_activity',
     'get_reconciliation',
     'get_rotation_analysis_async',
-    'get_shopping_suggestions',
     'get_stats_by_category',
     'get_stats_by_storage',
 ]

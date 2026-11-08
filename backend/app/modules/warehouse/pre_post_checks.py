@@ -22,7 +22,12 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.contracts import DocumentLineToPostDTO, DocumentToPostDTO
+from app.core.contracts import (
+    AuditAction,
+    AuditTargetType,
+    DocumentLineToPostDTO,
+    DocumentToPostDTO,
+)
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
@@ -173,6 +178,61 @@ async def hold_stands_async(db: AsyncSession, org_id: UUID, doc: Document) -> bo
     return await core_api.organizations.is_module_enabled_async(db, org_id, doc.held_by)
 
 
+async def works_as_confirmed_async(
+    db: AsyncSession, org_id: UUID, doc: Document
+) -> bool:
+    """Whether work may start on *doc* as on a confirmed document.
+
+    A confirmed one, and one parked for a module switched off since: that
+    hold has stood down (``hold_stands_async``), and the document is worked
+    as the confirmed document it was.
+    """
+    if doc.status == DocumentStatus.CONFIRMED.value:
+        return True
+    return doc.status == DocumentStatus.PENDING_APPROVAL.value and not (
+        await hold_stands_async(db, org_id, doc)
+    )
+
+
+async def lift_a_stood_down_hold_async(
+    db: AsyncSession, org_id: UUID, doc: Document, user_id: UUID | None
+) -> bool:
+    """Take a stood-down hold off *doc* as work starts on it; whether it did.
+
+    A module switched off stands down whole: nobody can decide on a document
+    parked for it, and the document is worked as the confirmed one it was.
+    The door that starts that work — a scanning session, the one-step press,
+    a completion — lifts the hold here, so everything downstream reads a
+    CONFIRMED document, and withdraws what the document waited on, so a
+    module switched back on does not ask about work already under way. A
+    document nobody touches keeps waiting where it is: switching the module
+    back on finds it in the queue.
+    """
+    if doc.status != DocumentStatus.PENDING_APPROVAL.value or await hold_stands_async(
+        db, org_id, doc
+    ):
+        return False
+    doc.status = DocumentStatus.CONFIRMED.value
+    doc.held_by = None
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=org_id,
+        user_id=user_id,
+        action=AuditAction.UPDATE,
+        target_type=AuditTargetType.DOCUMENT,
+        target_id=doc.id,
+        snapshot={
+            'number': doc.number,
+            'type': doc.type,
+            'old_status': DocumentStatus.PENDING_APPROVAL.value,
+            'new_status': DocumentStatus.CONFIRMED.value,
+        },
+    )
+    await notify_withdrawn_async(db, org_id, doc.id, user_id)
+    await db.flush()
+    return True
+
+
 async def refuse_while_held_async(
     db: AsyncSession, org_id: UUID, doc: Document
 ) -> None:
@@ -186,9 +246,9 @@ async def notify_withdrawn_async(
 ) -> None:
     """Tell every module that may hold documents that this one is gone.
 
-    The document is cancelled or deleted in the same transaction, so what a
-    module keeps about it — the approvals module's open request — goes with
-    it. A listener that raises takes the withdrawal down with it; one whose
+    The document is cancelled or deleted in the same transaction — or goes
+    on without the hold of a module switched off since — so what a module
+    keeps about it — the approvals module's open request — goes with it. A listener that raises takes the withdrawal down with it; one whose
     follow-up is best-effort catches its own refusal, as the approvals module
     does for a request somebody decided a moment earlier.
     """

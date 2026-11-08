@@ -251,7 +251,7 @@ moduleRegistry.register({
   moduleNav: {
     basePath: "/my-feature",
     items: [{
-      path: "",
+      path: "/my-feature", // absolute: the shell links it as written
       icon: Star,
       labelKey: "my_feature:navigation.myFeature",
     }],
@@ -327,7 +327,6 @@ class MyModule(BaseModule):
         return router
 
     def on_startup(self, context: ModuleContext) -> None:
-        super().on_startup(context)
         # Subscribe to events, register scheduled tasks, etc.
 
     async def on_enable(self, organization_id: UUID, context: ModuleContext) -> None:
@@ -792,7 +791,7 @@ moduleRegistry.register({
   useStatusBadge: () => useEquipmentStatusBadge(),
 });
 ```
-`useActionItems` returns `ActionItem[]` for the "Things to do" panel. `useStatusBadge` returns `{ count: number; label: string; failed?: boolean } | null` for the launcher tile — `null` while loading or with nothing to show, `failed: true` when the read failed.
+`useActionItems` returns `ActionItem[]` for the "Things to do" panel. `useStatusBadge` returns `{ count: number; labelKey: string; failed?: boolean } | null` for the launcher tile — `null` while loading or with nothing to show, `failed: true` when the read failed; the tile translates `labelKey` (full form, `"<module>:<key>"`) with `{ count }`, as the feed does an action item's `labelKey`.
 
 ### 9. Validation Rules
 Declare per-field validation for core item creation/edit forms.
@@ -1282,7 +1281,7 @@ by HTTP method, as `equipment` does.
 > while the platform is on `0.x`. Both rules, and how the floor is enforced, are in
 > [MODULE_VERSIONING.md](docs/MODULE_VERSIONING.md).
 
-> **`module_type` trust levels:** the field is what the store shows for a module this repository ships; every other module is shown as `community` whatever its manifest says, and a module from outside the repository that claims `core`, `official` or `cloud` is refused at discovery. So the field can keep a module from loading but cannot raise its trust, and it does **not** change the import rules. How far the AST safety scan relaxes for a given module is decided by name-keyed tables in `backend/app/core/module_safety.py`: `TRUSTED_SHIPPED_MODULES` (the trusted names that have a directory in this repository) lifts the `app.`-internal import bans, `REPO_SHIPPED_MODULES` exempts the modules this repository ships from the module import-surface rule, and `CORE_EXEMPTIONS` grants named modules specific imports, some of them third-party (`printing` runs `subprocess`, `webhooks` speaks `socket`), which the trusted list alone never allows. Two more things shape the scan: the capabilities a module declares, and a `requires` entry that names a module this repository ships. Files under a `tests/` directory are not scanned. A module can sit on one table, on several, or on none: `vision`, `nutrition`, `equipment`, `approvals` and `maker` carry named exemptions without being on the trusted list, and every module outside the tables meets the full vocabulary whatever its `module_type`. Populating `module_type` honestly is the author's job today — the field is not yet verified against a signature (ADR-019).
+> **`module_type` trust levels:** the field is what the store shows for a module this repository ships; every other module is shown as `community` whatever its manifest says, and a module from outside the repository that claims `core`, `official` or `cloud` is refused at discovery. So the field can keep a module from loading but cannot raise its trust, and it does **not** change the import rules. How far the AST safety scan relaxes for a given module is decided by name-keyed tables in `backend/app/core/module_safety.py`: `TRUSTED_SHIPPED_MODULES` (the trusted names that have a directory in this repository) lifts the `app.`-internal import bans, `REPO_SHIPPED_MODULES` exempts the modules this repository ships from the module import-surface rule, and `CORE_EXEMPTIONS` grants named modules specific imports the scan would otherwise refuse (today Core model paths for `equipment`, `approvals` and `maker`), which the trusted list alone never allows. Two more things shape the scan: the capabilities a module declares, and a `requires` entry that names a module this repository ships. Files under a `tests/` directory are not scanned. A module can sit on one table, on several, or on none: `equipment`, `approvals` and `maker` carry named exemptions without being on the trusted list, and every module outside the tables meets the full vocabulary whatever its `module_type`. Populating `module_type` honestly is the author's job today — the field is not yet verified against a signature (ADR-019).
 
 > **`module_type` and the three trust levels (ADR-019) name different things, and nothing maps one onto the other.** ADR-019 names *who certified* a module — Core (shipped in this repository), Certified (reviewed and signed for the catalog), Foreign (installed from anywhere else) — and that certification is a signature plus identity fields in the tracking file, not a manifest value. The four `module_type` spellings are a label its author writes and the store card prints; the readers in the codebase that decide something from it are the i18n validator (`app/cli/module_validator.py`), where `core` and `official` owe all five languages and the other two owe `en`; the discovery refusal of a module from outside the repository that claims `core`, `official` or `cloud` (`app/core/_registry_class.py`); and the store and `module list` displays (`app/api/modules.py`, `app/cli/commands_module.py`). No level is spelled by this field, and a module's trust does not rise when its author retypes it.
 
@@ -1886,7 +1885,7 @@ the same lock, for a reshape that needs the database.
 ```
 1. _registry_class.py scans backend/app/modules/*/ for manifest.json
 2. Validates manifest via Pydantic schema (ModuleManifest)
-3. AST safety check (forbidden imports/calls) — relaxations come from name-keyed tables in `app/core/module_safety.py`: `TRUSTED_SHIPPED_MODULES` (the in-repo module directories on the core-trust list: the `app.`-internal bans are lifted), `REPO_SHIPPED_MODULES` (shipped modules are exempt from the module import-surface rule) and `CORE_EXEMPTIONS` (per-module named exemptions, which also cover third-party imports — `printing`/`subprocess`, `webhooks`/`socket`); every module outside the tables meets the full ban list
+3. AST safety check (forbidden imports/calls) — relaxations come from name-keyed tables in `app/core/module_safety.py`: `TRUSTED_SHIPPED_MODULES` (the in-repo module directories on the core-trust list: the `app.`-internal bans are lifted), `REPO_SHIPPED_MODULES` (shipped modules are exempt from the module import-surface rule) and `CORE_EXEMPTIONS` (per-module named exemptions, each one an import the scan would refuse without it — they could cover third-party imports too, and none does today); every module outside the tables meets the full ban list
 4. Dependency check — modules with missing required modules are rejected
 5. Instantiates BaseModule (or define_module() output)
 6. Registers routes, interceptors, contribution points, schedules
@@ -1910,7 +1909,7 @@ Modules in `ALWAYS_ON_MODULES` (`core`, `items`, `locations`, `categories`, `sta
 
 ## 📋 Module Capabilities
 
-Capabilities are declared in `manifest.json` and read by the AST safety scan, which matches import statements against them by literal name. How much a module is exempted is decided by the name-keyed tables in `app/core/module_safety.py`: `TRUSTED_SHIPPED_MODULES` (the in-repo module directories on the core-trust list) lifts the `app.`-internal bans, `REPO_SHIPPED_MODULES` exempts the modules this repository ships from the module import-surface rule, and `CORE_EXEMPTIONS` grants named modules specific imports — including third-party ones (`printing`: `subprocess`, `os`; `webhooks`: `socket`).
+Capabilities are declared in `manifest.json` and read by the AST safety scan, which matches import statements against them by literal name. How much a module is exempted is decided by the name-keyed tables in `app/core/module_safety.py`: `TRUSTED_SHIPPED_MODULES` (the in-repo module directories on the core-trust list) lifts the `app.`-internal bans, `REPO_SHIPPED_MODULES` exempts the modules this repository ships from the module import-surface rule, and `CORE_EXEMPTIONS` grants named modules specific imports the scan would refuse without them — today Core model paths only; no module holds a third-party one.
 
 > **⚠️ What the AST validator is, and is not.** It enforces *architecture* — which
 > imports and calls a module may use — so that modules stay inside the contract
@@ -1937,7 +1936,7 @@ Capabilities are declared in `manifest.json` and read by the AST safety scan, wh
 | `process` | `sys` | Interacting with the Python runtime |
 | `database` | `sqlalchemy`, `sqlmodel` | Direct DB access (rarely needed — prefer CoreAPI) |
 
-> `socket`, `subprocess` and `urllib.request` are in `FORBIDDEN_IMPORT_PREFIXES` (`app/core/module_safety.py`) — the AST validator rejects them regardless of declared capabilities, for every module without a named exemption in `CORE_EXEMPTIONS`. Today that covers the in-repo `printing` (`subprocess`, `os`) and `webhooks` (`socket`); a new module cannot read this sentence as an allowance.
+> `socket`, `subprocess` and `urllib.request` are in `FORBIDDEN_IMPORT_PREFIXES` (`app/core/module_safety.py`) — the AST validator rejects them regardless of declared capabilities, for every module without a named exemption in `CORE_EXEMPTIONS`, and no module holds one for these names today; a new module cannot read this sentence as an allowance. The ban is bounded by the dot: `socketserver` is not `socket`.
 
 ### Capability-specific imports
 
