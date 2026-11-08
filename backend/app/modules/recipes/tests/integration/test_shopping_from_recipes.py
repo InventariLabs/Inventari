@@ -410,6 +410,184 @@ class TestARecipeOnTheListTwice:
         assert body['already_listed_count'] == 1
         assert body['list_name']
 
+    def test_a_second_recipe_needing_the_same_goods_tops_the_line_up(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """200 g for one recipe, then 300 g for another: the list asks 500 g.
+
+        The line was dropped as "already listed" whatever the new recipe
+        needed, so the second recipe added nothing and the list stayed short.
+        """
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        cake = _recipe(
+            client,
+            auth_headers,
+            'Cake',
+            [{'name': 'Flour', 'quantity': '300', 'uom_id': grams}],
+        )
+        first = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 1},
+            headers=auth_headers,
+        ).json()
+        list_id = first['shopping_list_id']
+
+        second = client.post(
+            ADD_URL,
+            json={'recipe_ids': [cake], 'servings': 1, 'shopping_list_id': list_id},
+            headers=auth_headers,
+        )
+
+        assert second.status_code == 200, second.text
+        body = second.json()
+        assert (body['added_count'], body['raised_count']) == (0, 1)
+        assert body['already_listed_count'] == 0
+        [line] = client.get(
+            f'/api/v1/shopping-lists/{list_id}/items', headers=auth_headers
+        ).json()['items']
+        assert Decimal(str(line['quantity'])) == Decimal('500')
+        # The line says which recipes it is for, and the note went with it.
+        assert line['note_data']['for_recipe'] == 'Bread, Cake'
+        assert 'Bread, Cake' in line['notes']
+
+        # Either recipe pressed again is covered: nothing is added twice.
+        for recipe_id in (bread, cake):
+            again = client.post(
+                ADD_URL,
+                json={
+                    'recipe_ids': [recipe_id],
+                    'servings': 1,
+                    'shopping_list_id': list_id,
+                },
+                headers=auth_headers,
+            ).json()
+            assert (again['added_count'], again['raised_count']) == (0, 0)
+            assert again['already_listed_count'] == 1
+        [line] = client.get(
+            f'/api/v1/shopping-lists/{list_id}/items', headers=auth_headers
+        ).json()['items']
+        assert Decimal(str(line['quantity'])) == Decimal('500')
+
+    def test_a_recipe_after_the_goods_were_bought_adds_a_new_line(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        cake = _recipe(
+            client,
+            auth_headers,
+            'Cake',
+            [{'name': 'Flour', 'quantity': '300', 'uom_id': grams}],
+        )
+        list_id = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 1},
+            headers=auth_headers,
+        ).json()['shopping_list_id']
+        list_url = f'/api/v1/shopping-lists/{list_id}'
+        line = client.get(f'{list_url}/items', headers=auth_headers).json()['items'][0]
+        client.patch(f'{list_url}/items/{line["id"]}/purchase', headers=auth_headers)
+
+        body = client.post(
+            ADD_URL,
+            json={'recipe_ids': [cake], 'servings': 1, 'shopping_list_id': list_id},
+            headers=auth_headers,
+        ).json()
+
+        assert (body['added_count'], body['raised_count']) == (1, 0)
+        lines = client.get(
+            f'{list_url}?purchased_filter=all', headers=auth_headers
+        ).json()['items']
+        assert sorted(
+            (i['is_purchased'], Decimal(str(i['quantity']))) for i in lines
+        ) == [
+            (False, Decimal('300')),
+            (True, Decimal('200')),
+        ]
+
+    @pytest.mark.parametrize('bought', [False, True])
+    def test_a_press_naming_a_listed_recipe_adds_only_the_new_recipes_need(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        bought: bool,
+    ) -> None:
+        """Bread (200 g) listed, then Bread + Cake (300 g) pressed together.
+
+        Both recipes need 500 g. The press carries the merge of *both*, so
+        topping the line up by all of it asked for 700 g, counting Bread's
+        200 g twice; the line is raised by Cake's 300 g alone. With the
+        Bread line already bought, Cake's 300 g is a new line instead.
+        """
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        cake = _recipe(
+            client,
+            auth_headers,
+            'Cake',
+            [{'name': 'Flour', 'quantity': '300', 'uom_id': grams}],
+        )
+        list_id = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 1},
+            headers=auth_headers,
+        ).json()['shopping_list_id']
+        list_url = f'/api/v1/shopping-lists/{list_id}'
+        if bought:
+            line = client.get(f'{list_url}/items', headers=auth_headers).json()[
+                'items'
+            ][0]
+            client.patch(
+                f'{list_url}/items/{line["id"]}/purchase', headers=auth_headers
+            )
+
+        body = client.post(
+            ADD_URL,
+            json={
+                'recipe_ids': [bread, cake],
+                'servings': 1,
+                'shopping_list_id': list_id,
+            },
+            headers=auth_headers,
+        ).json()
+
+        assert (body['added_count'], body['raised_count']) == (
+            (1, 0) if bought else (0, 1)
+        )
+        lines = client.get(
+            f'{list_url}?purchased_filter=all', headers=auth_headers
+        ).json()['items']
+        assert sum(Decimal(str(i['quantity'])) for i in lines) == Decimal('500')
+        open_lines = [i for i in lines if not i['is_purchased']]
+        assert len(open_lines) == 1
+        # The new line is for Cake only; the raised one for both.
+        assert open_lines[0]['note_data']['for_recipe'] == (
+            'Cake' if bought else 'Bread, Cake'
+        )
+
     def test_the_list_it_creates_is_not_named_after_the_recipe(
         self,
         client: TestClient,
@@ -464,4 +642,7 @@ class TestARecipeOnTheListTwice:
             f'/api/v1/shopping-lists/{body["shopping_list_id"]}/items',
             headers=auth_headers,
         ).json()['items']
-        assert items[0]['note_data'] == {'for_recipe': 'Bread'}
+        assert items[0]['note_data'] == {
+            'for_recipe': 'Bread',
+            'for_recipes': ['Bread'],
+        }

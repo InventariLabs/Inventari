@@ -9,6 +9,7 @@ from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    require_any_permission,
     require_org,
     require_permission,
 )
@@ -37,6 +38,26 @@ from app.services.storage._queries import (
 from app.services.storage_query_service import (
     list_archived_with_details_async,
     list_storages_with_counts_async,
+)
+
+#: The places of a module's screens are the location register's rows, read
+#: under the read of the screen that shows them: the warehouse's codes page
+#: lists and names the shelves (``warehouse:read``), and the equipment
+#: register names the place every asset stands in and lets an editor open it
+#: (``equipment:read``). Reading is the whole of what those screens do with
+#: the register, so their module read admits it; every write on these routes
+#: stays with the location register's own keys (``_WRITE`` in the route
+#: table), and a reader still cannot change a shelf.
+_READS_LOCATIONS = require_any_permission(
+    SystemPermission.STORAGES_READ, 'warehouse:read', 'equipment:read'
+)
+
+#: The reads of the warehouse screens that go past a name: the codes card
+#: asks how the warehouse numbers its shelves and which stickers are stale,
+#: the settings table walks a branch path and lists a shelf's contents. Those
+#: are the warehouse's own work, so only its read joins the register's here.
+_READS_WAREHOUSE_LOCATIONS = require_any_permission(
+    SystemPermission.STORAGES_READ, 'warehouse:read'
 )
 
 
@@ -122,7 +143,7 @@ async def get_storages(
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db=Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.STORAGES_READ),
+    _: object = _READS_LOCATIONS,
 ):
     """One page of the user's storage locations, with item counts.
 
@@ -243,7 +264,7 @@ async def get_storage_breadcrumb(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db=Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.STORAGES_READ),
+    _: object = _READS_WAREHOUSE_LOCATIONS,
 ):
     """Returns ordered path from root to this location."""
     lang = get_current_lang()
@@ -282,7 +303,7 @@ async def get_storage_detail(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db=Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.STORAGES_READ),
+    _: object = _READS_LOCATIONS,
 ):
     """Storage location details."""
     lang = get_current_lang()
@@ -338,7 +359,7 @@ async def get_storage_items(
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db=Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.STORAGES_READ),
+    _: object = _READS_WAREHOUSE_LOCATIONS,
 ):
     """List of products in given storage location."""
     lang = get_current_lang()
@@ -432,7 +453,7 @@ async def get_storage_codes(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db=Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.STORAGES_READ),
+    _: object = _READS_WAREHOUSE_LOCATIONS,
 ):
     """How the warehouse holding this location makes its codes, and which
     locations wait for a new sticker."""

@@ -316,6 +316,13 @@ says what the release does rather than what changed since them.
   It used to leave the line at the quantity it was first generated with and
   still count the plan as listed. A line already ticked off keeps its quantity,
   and the rest is added as a new line; a line is never lowered.
+- A shopping list now tops up a line that is already on it, instead of treating
+  the line as covered whatever its quantity. A recipe added to a list that
+  carries its ingredient raises the line by what that recipe needs (recipes the
+  line was already made for add nothing, so the same recipe again changes
+  nothing), and a production run's shortage raises the listed line when the run
+  needs more. A line already ticked off keeps its quantity and the rest becomes
+  a new line.
 - A custom purchase order template now prints the values its editor lists for
   `{{po_number}}`, `{{po_date}}`, `{{po_status}}`, `{{vendor_name}}`,
   `{{vendor_tax_id}}`, `{{vendor_address}}`, `{{lines_count}}` and
@@ -880,6 +887,18 @@ says what the release does rather than what changed since them.
   instead of the first twenty, so 27 late returns no longer read as 20. When the
   warehouse launcher badge adds quarantine holds to the tasks, To do states that
   total beside the two parts.
+- A custom role holding only a module's read opens that module's screens
+  whole. Equipment's asset list, filters, archive and asset card read the
+  locations, categories and archived records they show, and its label
+  download answers the register's read; Warehouse's codes page reads the
+  locations it lists and the categories its putaway rules offer. Before, each
+  of those calls answered 403 and the screen showed an empty list, a blank
+  place or an error. The module's read still buys no core write — filing a
+  category, changing a shelf and editing a product keep their own keys — and
+  it buys no reach past the module's own records: the archive serves them
+  under the module's scope only, a product card outside it answers 404, and
+  the label sheet draws only labels assigned to those records, never the free
+  pool.
 
 ### Removed
 

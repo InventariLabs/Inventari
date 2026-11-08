@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from typing import Protocol
 from uuid import UUID
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -13,6 +13,8 @@ from app.core.contracts import UserContextDTO
 from app.core.db_utils import acquire_advisory_lock, paginate_async
 from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.module_ownership import claimed_by_module
+from app.core.module_scope import get_context_tags_of
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.label_pool import LabelPool
 from app.schemas.label_pool import LabelCodeItem, LabelPoolCreate
@@ -121,6 +123,28 @@ async def _draw_unused_short_codes_async(
                 f'after {max_attempts_per_code} attempts'
             )
     return drawn
+
+
+def _claimed_by_a_module(query: Select, module_scopes: frozenset[str] | None) -> Select:
+    """Keep the labels whose product one of *module_scopes* claims.
+
+    A module's read reaches the labels assigned to the module's records and
+    no others: the sheet draws the caption of the product a label is
+    assigned to, so the whole pool is the Core read's answer, not a module's.
+    An unassigned label belongs to no module and is dropped here too.
+    """
+    if not module_scopes:
+        return query
+    return query.where(
+        or_(
+            *(
+                LabelPool.assigned_item.has(
+                    claimed_by_module(module, get_context_tags_of(module))
+                )
+                for module in sorted(module_scopes)
+            )
+        )
+    )
 
 
 def _with_assigned_item(labels: list[LabelPool]) -> list[LabelPool]:
@@ -601,11 +625,15 @@ class LabelService:
 
     @staticmethod
     async def list_in_ids_async(
-        db: AsyncSession, label_ids: list[UUID], organization_id: UUID
+        db: AsyncSession,
+        label_ids: list[UUID],
+        organization_id: UUID,
+        *,
+        module_scopes: frozenset[str] | None = None,
     ) -> list[LabelPool]:
         if not label_ids:
             return []
-        result = await db.scalars(
+        query = (
             select(LabelPool)
             .options(joinedload(LabelPool.assigned_item))
             .where(
@@ -613,15 +641,20 @@ class LabelService:
                 LabelPool.organization_id == organization_id,
             )
         )
+        result = await db.scalars(_claimed_by_a_module(query, module_scopes))
         return _with_assigned_item(list(result.unique().all()))
 
     @staticmethod
     async def list_by_short_codes_async(
-        db: AsyncSession, short_codes: list[str], organization_id: UUID
+        db: AsyncSession,
+        short_codes: list[str],
+        organization_id: UUID,
+        *,
+        module_scopes: frozenset[str] | None = None,
     ) -> list[LabelPool]:
         if not short_codes:
             return []
-        result = await db.scalars(
+        query = (
             select(LabelPool)
             .options(joinedload(LabelPool.assigned_item))
             .where(
@@ -629,6 +662,7 @@ class LabelService:
                 LabelPool.organization_id == organization_id,
             )
         )
+        result = await db.scalars(_claimed_by_a_module(query, module_scopes))
         return _with_assigned_item(list(result.unique().all()))
 
     @staticmethod

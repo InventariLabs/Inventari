@@ -414,6 +414,47 @@ class TestBeforeSaving:
             ('Damson Plums', Decimal('4.000'))
         ]
 
+    def test_a_run_that_now_needs_more_raises_the_listed_line(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A line already listed is not "covered" whatever the run now needs.
+
+        The shortfall used to skip any product already on the list, so a run
+        that grew from 20 to 30 left the 4 kg the smaller run asked for.
+        """
+        seed = _plum_butter(
+            db_session, client, org, headers, pantry, plums_on_shelf='18'
+        )
+        url = '/api/v1/maker/production/orders/shortages/shopping-list'
+        first = client.post(
+            url, headers=headers, json=_run(seed['butter'], pantry, '20')
+        )
+        bigger = client.post(
+            url, headers=headers, json=_run(seed['butter'], pantry, '30')
+        )
+        smaller = client.post(
+            url, headers=headers, json=_run(seed['butter'], pantry, '20')
+        )
+
+        assert first.json()['added_count'] == 1
+        assert bigger.json()['added_count'] == 0
+        assert bigger.json()['raised_count'] == 1
+        # A run that needs no more than the list already asks for changes nothing.
+        assert smaller.json()['raised_count'] == 0
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(
+                ShoppingListItem.template_id == seed['plums'].id
+            )
+        ).all()
+        assert [(row.name, row.quantity) for row in rows] == [
+            ('Damson Plums', Decimal('15.000'))
+        ]
+
     def test_nothing_short_touches_no_list(
         self,
         client: TestClient,
@@ -437,6 +478,7 @@ class TestBeforeSaving:
             'shopping_list_id': None,
             'list_name': None,
             'added_count': 0,
+            'raised_count': 0,
         }
 
     def test_a_line_on_a_run_drawn_in_full_records_no_shortfall(

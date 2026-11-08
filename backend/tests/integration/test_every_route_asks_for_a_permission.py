@@ -176,8 +176,6 @@ _NAMED = {
     'app.api._items_queries.get_items_aggregates_endpoint': ITEMS,
     'app.api._items_queries.get_attention_counts_endpoint': ITEMS,
     'app.api._items_queries.get_expiring_items': ITEMS,
-    'app.api._items_queries.get_archived_items': ITEMS,
-    'app.api._items_crud.get_item': ITEMS,
     'app.api._items_import_export.export_items_xlsx': ITEMS,
     'app.api.item_pagination.get_items_history': ITEMS,
     'app.api.item_pagination.get_item_history': ITEMS,
@@ -192,22 +190,63 @@ _NAMED = {
     'app.api.labels.get_label_pool': ITEMS,
     'app.api.labels.get_label_stats': ITEMS,
     'app.api.labels.scan_label': ITEMS,
-    'app.api.labels.export_labels_png': ITEMS,
-    'app.api.storages._reads.get_storages': LOCATIONS,
     'app.api.storages._reads.list_archived_storages': LOCATIONS,
-    'app.api.storages._reads.get_storage_detail': LOCATIONS,
-    'app.api.storages._reads.get_storage_breadcrumb': LOCATIONS,
-    'app.api.storages._reads.get_storage_codes': LOCATIONS,
-    'app.api.storages._reads.get_storage_items': LOCATIONS,
     'app.api.storages._reads.print_storage_label': LOCATIONS,
     'app.api.storages._reads.get_storage_summary': LOCATIONS,
     'app.api.storages._reads.get_storage_tree': LOCATIONS,
     'app.api.storage_types.get_storage_types': LOCATIONS,
     'app.api.storage_types.get_storage_type': LOCATIONS,
-    'app.api.categories.get_categories': CATEGORIES,
     'app.api.categories.get_category': CATEGORIES,
     'app.api.organizations.get_organization_members': ORG,
     'app.api.users.list_org_members': ORG,
+}
+
+#: Named Core reads a module's own screens also make, and the module read that
+#: opens the screen. The Core key still guards the data — a caller holding
+#: neither gets 403 — and the module read joins it on that one route, because
+#: the screen that shows the data is the only way its holder reaches it. The
+#: value names every read the guard admits, so a new alternative is a change
+#: reviewed here and not a quiet widening.
+_NAMED_ALSO_READ_BY_A_MODULE_READ: dict[str, tuple[str, frozenset[str]]] = {
+    # The equipment register's Archive tab.
+    'app.api._items_queries.get_archived_items': (ITEMS, frozenset({'equipment:read'})),
+    # The equipment register's asset card, linked from the list and from
+    # assignment history.
+    'app.api._items_crud.get_item': (ITEMS, frozenset({'equipment:read'})),
+    # The equipment register's label download: the card's one label as well
+    # as the list's Print labels. A module's read draws only the labels
+    # assigned to the module's records and never the free pool.
+    'app.api.labels.export_labels_png': (ITEMS, frozenset({'equipment:read'})),
+    # The warehouse's codes page finds and lists its shelves; the equipment
+    # register names the place every asset stands in and opens one to edit.
+    'app.api.storages._reads.get_storages': (
+        LOCATIONS,
+        frozenset({'equipment:read', 'warehouse:read'}),
+    ),
+    'app.api.storages._reads.get_storage_detail': (
+        LOCATIONS,
+        frozenset({'equipment:read', 'warehouse:read'}),
+    ),
+    # The warehouse's path through a branch, its codes card and a shelf's
+    # contents.
+    'app.api.storages._reads.get_storage_breadcrumb': (
+        LOCATIONS,
+        frozenset({'warehouse:read'}),
+    ),
+    'app.api.storages._reads.get_storage_codes': (
+        LOCATIONS,
+        frozenset({'warehouse:read'}),
+    ),
+    'app.api.storages._reads.get_storage_items': (
+        LOCATIONS,
+        frozenset({'warehouse:read'}),
+    ),
+    # The equipment register's category names and filters; the warehouse's
+    # putaway rules and product pickers.
+    'app.api.categories.get_categories': (
+        CATEGORIES,
+        frozenset({'equipment:read', 'warehouse:read'}),
+    ),
 }
 
 _SAFE = frozenset({'GET', 'HEAD', 'OPTIONS'})
@@ -381,6 +420,31 @@ def misnamed(routes: Iterable[Route], named: dict[str, str]) -> dict[str, object
     }
 
 
+def misnamed_beside_a_module_read(
+    routes: Iterable[Route], named: dict[str, tuple[str, frozenset[str]]]
+) -> dict[str, object]:
+    """Named reads whose guard does not admit exactly the reads it names.
+
+    The Core key has to be on the guard — a route left to a module read alone
+    would answer a role the key catalogue never promised the data to — and
+    every other permission on that guard has to be one the entry names. The
+    reverse holds too: a named module read has to be on the guard, or the
+    entry describes an admission the route never made.
+    """
+    served: dict[str, Route] = {}
+    for route in routes:
+        served.setdefault(route.name, route)
+    wrong: dict[str, object] = {}
+    for name, (core, module_reads) in named.items():
+        route = served.get(name)
+        allowed = {core} | module_reads
+        if route is None:
+            wrong[name] = 'route gone'
+        elif not any(guard == allowed for guard in route.guards):
+            wrong[name] = route.guarded
+    return wrong
+
+
 class TestEveryRouteAsksForAPermission:
     def test_no_route_goes_without_its_guard_unless_named(self) -> None:
         assert not unguarded(_app_routes(), _EXEMPT), (
@@ -408,6 +472,15 @@ class TestEveryRouteAsksForAPermission:
 
     def test_the_named_data_asks_for_its_own_permission(self) -> None:
         wrong = misnamed(_app_routes(), _NAMED)
+
+        assert not wrong, wrong
+
+    def test_a_named_read_admits_the_module_read_of_the_screen_that_shows_it(
+        self,
+    ) -> None:
+        wrong = misnamed_beside_a_module_read(
+            _app_routes(), _NAMED_ALSO_READ_BY_A_MODULE_READ
+        )
 
         assert not wrong, wrong
 

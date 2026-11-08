@@ -282,7 +282,7 @@ function AddShortfallButton({
         mutation.mutate(payload, {
           onSuccess: (result) =>
             toast.success(
-              result.added_count > 0
+              result.added_count + result.raised_count > 0
                 ? t("create.needs.added", { name: result.list_name ?? "" })
                 : t("create.needs.alreadyListed"),
             ),

@@ -10938,6 +10938,11 @@ export interface components {
             shopping_list_id: string;
             /** Added Count */
             added_count: number;
+            /**
+             * Raised Count
+             * @default 0
+             */
+            raised_count: number;
             /** List Name */
             list_name?: string | null;
             /**
@@ -24456,7 +24461,7 @@ export interface components {
          * @description Output for POST /production/orders/shortages/shopping-list.
          *
          *     The result of an action, not a collection: it names the list that was
-         *     touched and counts the lines added, and carries no rows to page.
+         *     touched and counts the lines added and raised, and carries no rows to page.
          */
         ShortageShoppingListResponse: {
             /** Shopping List Id */
@@ -24468,6 +24473,11 @@ export interface components {
              * @default 0
              */
             added_count: number;
+            /**
+             * Raised Count
+             * @default 0
+             */
+            raised_count: number;
         };
         /** SkuSchemaResponse */
         SkuSchemaResponse: {

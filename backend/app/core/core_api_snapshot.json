@@ -2408,6 +2408,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "organization_id",
               "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "module_scopes",
+              "required": false
             }
           ]
         },
@@ -2485,6 +2490,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "organization_id",
               "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "module_scopes",
+              "required": false
             }
           ]
         },
