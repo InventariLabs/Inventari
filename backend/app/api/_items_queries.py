@@ -15,12 +15,15 @@ from app.core.cursor import decode_keyset_cursor, encode_keyset_cursor
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    module_scopes_held,
     require_any_permission,
     require_org,
     require_permission,
 )
+from app.core.exceptions import ForbiddenException
 from app.core.module_ownership import hidden_module_tags_async
 from app.core.public_api import core_api
+from app.i18n.service import get_current_lang, get_error_message
 from app.schemas.item import (
     ArchivedCategoryBrief,
     ArchivedItemListResponse,
@@ -53,9 +56,12 @@ router = APIRouter()
 
 #: The equipment register's Archive tab lists the records the module archived
 #: through this Core read (``module_scope=equipment``); the register's own
-#: read admits it, as it admits the module's other reads. Restoring and
-#: deleting an archived record keep their Core write keys.
-_READS_ARCHIVED = require_any_permission(SystemPermission.ITEMS_READ, 'equipment:read')
+#: read admits it, as it admits the module's other reads. The same names bound
+#: the answer: a holder of the module's read reads that module's records and
+#: no other, so an unscoped ask or another module's scope is refused. Restoring
+#: and deleting an archived record keep their Core write keys.
+_MODULE_READS = ('equipment:read',)
+_READS_ARCHIVED = require_any_permission(SystemPermission.ITEMS_READ, *_MODULE_READS)
 
 
 @router.get('/aggregates', response_model=ItemAggregates)
@@ -284,6 +290,12 @@ async def get_archived_items(
 ):
     """Archived (soft-deleted) products, newest archived first, scoped by module context."""
     org_id = require_org(current_user)
+    if not current_user.has_permission(SystemPermission.ITEMS_READ) and (
+        module_scope not in module_scopes_held(current_user, _MODULE_READS)
+    ):
+        raise ForbiddenException(
+            get_error_message('insufficient_permissions', get_current_lang())
+        )
     claimed_tags: set[str] = set()
     if exclude_module_contexts:
         from app.core.module_scope import get_claimed_context_tags

@@ -880,7 +880,8 @@ says what the release does rather than what changed since them.
   of those calls answered 403 and the screen showed an empty list, a blank
   place or an error. The module's read still buys no core write — filing a
   category, changing a shelf and editing a product keep their own keys — and
-  the full product list is not opened by a module's read.
+  it buys no reach past the module's own records: the archive serves them
+  under the module's scope only, and a product card outside it answers 404.
 
 ### Removed
 

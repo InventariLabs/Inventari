@@ -63,13 +63,25 @@ register. Those core **reads** therefore admit the module's read on the
 routes those screens call (`require_any_permission` next to the core key),
 because a screen whose data cannot load is not a screen the role can use.
 
-The admission is the read only. Creating a category, changing a shelf,
-editing a record or purging an archive keeps the core write key, and the core
-list that hands out everything — `GET /items`, the stock ledger — is not
-opened by a module's read. The full list of the admissions is
+The admission is the read only, and where a route serves records rather than
+a register of the whole organization it is also the reach. `GET /items` and
+the stock ledger are not opened by a module's read; `/items/archived` answers
+a module's reader only under that module's `module_scope` and refuses an
+unscoped ask, and `/items/{id}` answers 404 for a record the module does not
+claim (`claimed_by_module` in `app/core/module_ownership.py` is what "its own"
+means). Creating a category, changing a shelf, editing a record or purging an
+archive keeps the core write key. The full list of the admissions is
 `_NAMED_ALSO_READ_BY_A_MODULE_READ` in
 `backend/tests/integration/test_every_route_asks_for_a_permission.py`, so a
 new one is a change reviewed there rather than a quiet widening.
+
+**Entry vector: not yet.** The admissions name the module reads explicitly
+inside the Core API, so a module from outside this repository whose screens
+read the location or category registers gets nothing without a Core edit, and
+a module that claims records would need one on the two items reads. The
+generic form is wanted — a module's read admitting its own `module_scope`, and
+a declared register read for the reference lists — but not built; the gap is
+tracked on the maintainers' board.
 
 ## A settings screen opens with the key its API asks for
 

@@ -117,6 +117,42 @@ def archived_asset(
 
 
 @pytest.fixture
+def plain_item(
+    client: TestClient,
+    h: ModuleTestHelper,
+    admin: User,
+    shelf: StorageLocation,
+) -> str:
+    """An ordinary product, which no module claims as its own."""
+    created = client.post(
+        '/api/v1/items',
+        headers=h.get_auth_headers(admin),
+        json={
+            'name': 'Plain product',
+            'location_id': str(shelf.id),
+            'quantity': 1,
+        },
+    )
+    assert created.status_code == 201, created.text
+    return created.json()['id']
+
+
+@pytest.fixture
+def archived_plain_item(
+    client: TestClient,
+    h: ModuleTestHelper,
+    admin: User,
+    plain_item: str,
+) -> str:
+    """The ordinary product in the archive, where the register's tab looks."""
+    archived = client.delete(
+        f'/api/v1/items/{plain_item}', headers=h.get_auth_headers(admin)
+    )
+    assert archived.status_code == 204, archived.text
+    return plain_item
+
+
+@pytest.fixture
 def pool_label(h: ModuleTestHelper, org: Organization, admin: User) -> LabelPool:
     label = LabelPool(
         short_code=f'EQ-{uuid.uuid4().hex[:6]}',
@@ -215,6 +251,66 @@ class TestAnEquipmentReaderReadsWhatTheRegisterShows:
 
         assert category.status_code == 403, category.text
         assert location.status_code == 403, location.text
+
+
+class TestAnEquipmentReaderReadsOnlyTheRegistersRecords:
+    """The module's read bounds the answer to the module's own records.
+
+    The archive and the card are Core routes whose data is not the module's
+    alone: the same route serves every product of the organization. Admitting
+    ``equipment:read`` there without a scope handed a register reader the
+    organization's whole product list by the back door — the archive unscoped
+    and a card by any id. The reach is the module's records.
+    """
+
+    def test_the_equipment_archive_serves_only_the_equipment_scope(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        archived_asset: str,
+        archived_plain_item: str,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        unscoped = client.get('/api/v1/items/archived', headers=headers)
+        another_scope = client.get(
+            '/api/v1/items/archived',
+            headers=headers,
+            params={'module_scope': 'food'},
+        )
+        equipment_scope = client.get(
+            '/api/v1/items/archived',
+            headers=headers,
+            params={'module_scope': 'equipment'},
+        )
+
+        assert unscoped.status_code == 403, unscoped.text
+        assert another_scope.status_code == 403, another_scope.text
+        assert equipment_scope.status_code == 200, equipment_scope.text
+        assert [row['id'] for row in equipment_scope.json()['items']] == [
+            archived_asset
+        ]
+
+    def test_the_equipment_card_is_404_for_a_product_outside_the_register(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        plain_item: str,
+        archived_plain_item: str,
+    ) -> None:
+        headers = _with_role(h, org, ['equipment:read'])
+
+        live = client.get(f'/api/v1/items/{plain_item}', headers=headers)
+        archived = client.get(
+            f'/api/v1/items/{archived_plain_item}',
+            headers=headers,
+            params={'include_archived': True},
+        )
+
+        assert live.status_code == 404, live.text
+        assert archived.status_code == 404, archived.text
 
 
 class TestAWarehouseReaderReadsWhatTheCodesPageShows:

@@ -120,6 +120,24 @@ def claimed_by_module(
     )
 
 
+def item_belongs_to_module(
+    item: Item, module_name: str, context_tags: set[str]
+) -> bool:
+    """Whether one loaded record is *module_name*'s own.
+
+    The Python reading of :func:`claimed_by_module`, for a row already read:
+    the category speaks first, and ``module_name`` — or the module's
+    ``meta_data`` namespace — answers only for a record filed under none. The
+    card route already holds its one row; a list asks the database the same
+    question.
+    """
+    if item.category_id is not None:
+        return item.category is not None and item.category.context_tag in context_tags
+    return item.module_name == module_name or (
+        (item.meta_data or {}).get(module_name) is not None
+    )
+
+
 async def hidden_module_tags_async(
     db: AsyncSession, organization_id: UUID
 ) -> set[str] | None:

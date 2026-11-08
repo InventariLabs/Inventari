@@ -425,7 +425,9 @@ def misnamed_beside_a_module_read(
 
     The Core key has to be on the guard — a route left to a module read alone
     would answer a role the key catalogue never promised the data to — and
-    every other permission on that guard has to be one the entry names.
+    every other permission on that guard has to be one the entry names. The
+    reverse holds too: a named module read has to be on the guard, or the
+    entry describes an admission the route never made.
     """
     served: dict[str, Route] = {}
     for route in routes:
@@ -436,7 +438,7 @@ def misnamed_beside_a_module_read(
         allowed = {core} | module_reads
         if route is None:
             wrong[name] = 'route gone'
-        elif not any(core in guard and guard <= allowed for guard in route.guards):
+        elif not any(guard == allowed for guard in route.guards):
             wrong[name] = route.guarded
     return wrong
 
