@@ -13179,7 +13179,7 @@
           "maker"
         ],
         "summary": "Get Bom Tree",
-        "description": "Full recursive BOM tree under a parent template (for BomTreeEditor).",
+        "description": "Full recursive BOM tree under one recipe of a product (for BomTreeEditor).\n\nThe root is *recipe_id*, else the default recipe; a sub-assembly below\nis its own default recipe, as a production run explodes it.",
         "operationId": "get_bom_tree_api_v1_maker_bom_tree__template_id__get",
         "security": [
           {
@@ -13199,6 +13199,25 @@
               "format": "uuid",
               "title": "Template Id"
             }
+          },
+          {
+            "name": "recipe_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The recipe (variant) at the root; the default recipe if omitted",
+              "title": "Recipe Id"
+            },
+            "description": "The recipe (variant) at the root; the default recipe if omitted"
           }
         ],
         "responses": {
@@ -13418,6 +13437,7 @@
           "maker"
         ],
         "summary": "Get Bom Lines",
+        "description": "The lines of one recipe of the product: *recipe_id*, else the default.",
         "operationId": "get_bom_lines_api_v1_maker_bom__template_id__get",
         "security": [
           {
@@ -13437,6 +13457,25 @@
               "format": "uuid",
               "title": "Template Id"
             }
+          },
+          {
+            "name": "recipe_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The recipe (variant) to read; the default recipe if omitted",
+              "title": "Recipe Id"
+            },
+            "description": "The recipe (variant) to read; the default recipe if omitted"
           },
           {
             "name": "limit",
@@ -14041,7 +14080,7 @@
           "maker"
         ],
         "summary": "Create Production Order",
-        "description": "Create a DRAFT production order.\n\nrespects ``create_on_shortage_strategy`` \u2014\n- ALLOW: always creates (default).\n- WARN: returns 422 with shortage list unless ``confirm_shortage=true``.\n- BLOCK: returns 422 with shortage list, DRAFT never created.",
+        "description": "Create a DRAFT production order.\n\nrespects ``create_on_shortage_strategy`` \u2014\n- ALLOW: always creates.\n- WARN (the default): returns 422 with shortage list unless\n  ``confirm_shortage=true``.\n- BLOCK: returns 422 with shortage list, DRAFT never created \u2014\n  ``confirm_shortage`` does not lift it.",
         "operationId": "create_production_order_api_v1_maker_production_orders_post",
         "security": [
           {
@@ -14483,7 +14522,7 @@
           "maker"
         ],
         "summary": "Duplicate Production Order",
-        "description": "Create a fresh DRAFT order seeded from an existing one.",
+        "description": "Create a fresh DRAFT order seeded from an existing one.\n\nA copy is a new plan: under BLOCK the stock has to cover it, and the\nrefusal is the creation's own 422 with the shortage list.",
         "operationId": "duplicate_production_order_api_v1_maker_production_orders__order_id__duplicate_post",
         "security": [
           {
@@ -27596,70 +27635,6 @@
             "ApiKey": []
           }
         ]
-      }
-    },
-    "/api/v1/stats/shopping-suggestions": {
-      "get": {
-        "tags": [
-          "Statistics"
-        ],
-        "summary": "Get Shopping Suggestions Endpoint",
-        "operationId": "get_shopping_suggestions_endpoint_api_v1_stats_shopping_suggestions_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 200,
-              "minimum": 1,
-              "default": 50,
-              "title": "Limit"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "title": "Offset"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_RestockForecastRow_"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/api/v1/stats/smart-alerts": {
@@ -58616,7 +58591,7 @@
               "BLOCK"
             ],
             "title": "Create On Shortage Strategy",
-            "default": "ALLOW"
+            "default": "WARN"
           },
           "created_at": {
             "type": "string",
@@ -63885,47 +63860,6 @@
           "has_more"
         ],
         "title": "PaginatedResponse[ReplenishmentAlertDTO]"
-      },
-      "PaginatedResponse_RestockForecastRow_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/RestockForecastRow"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
-          },
-          "offset": {
-            "type": "integer",
-            "title": "Offset"
-          },
-          "has_more": {
-            "type": "boolean",
-            "title": "Has More"
-          },
-          "total_capped": {
-            "type": "boolean",
-            "title": "Total Capped",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset",
-          "has_more"
-        ],
-        "title": "PaginatedResponse[RestockForecastRow]"
       },
       "PaginatedResponse_RoleDTO_": {
         "properties": {
@@ -76938,55 +76872,6 @@
         ],
         "title": "RequesterScope",
         "description": "Whose submissions a workflow holds.\n\n``everyone``, or the people and roles named \u2014 a role by the id the roles\nlist gives it, the built-in levels included. Anybody else's document,\norder or checkout goes through without an approval. Choosing people and\nnaming nobody is refused rather than read as \"nobody\": a workflow that\nholds nobody is a workflow switched off, and that is a different button."
-      },
-      "RestockForecastRow": {
-        "properties": {
-          "product_name": {
-            "type": "string",
-            "title": "Product Name"
-          },
-          "category_name": {
-            "type": "string",
-            "title": "Category Name"
-          },
-          "category_code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category Code"
-          },
-          "avg_consumption_rate": {
-            "type": "number",
-            "title": "Avg Consumption Rate"
-          },
-          "days_since_last_purchase": {
-            "type": "integer",
-            "title": "Days Since Last Purchase"
-          },
-          "urgency": {
-            "type": "string",
-            "title": "Urgency"
-          },
-          "estimated_days_until_needed": {
-            "type": "integer",
-            "title": "Estimated Days Until Needed"
-          }
-        },
-        "type": "object",
-        "required": [
-          "product_name",
-          "category_name",
-          "avg_consumption_rate",
-          "days_since_last_purchase",
-          "urgency",
-          "estimated_days_until_needed"
-        ],
-        "title": "RestockForecastRow"
       },
       "ReturnCreate": {
         "properties": {
