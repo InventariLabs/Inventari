@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { transformWithOxc } from "vite";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /**
@@ -39,5 +42,31 @@ describe("the entry point", () => {
     await import("./main");
 
     expect(installToastDefaults).toHaveBeenCalledTimes(1);
+  });
+});
+
+/**
+ * The entry module must never be run a second time by a hot update.
+ *
+ * `@vitejs/plugin-react` makes a module accept its own hot updates as soon as
+ * React Refresh registers a component in it, and a lazy component counts.
+ * `main.tsx` used to declare the two lazy trees itself, so every hot update
+ * that climbed to it — a module's files landing under `src/modules` during an
+ * install or an upgrade, an edit to `App.tsx` — ran it again: a second
+ * `createRoot()` on the same container, two React trees writing one DOM, and
+ * the error boundary catching what fell out of them until the page reloaded.
+ *
+ * A module that registers nothing is no boundary, so an update that reaches
+ * it reloads the page instead, with one root. The transform below is the one
+ * the dev server applies, with refresh on.
+ */
+describe("the entry point under hot updates", () => {
+  it("registers no component with React Refresh", async () => {
+    const file = resolve(__dirname, "main.tsx");
+    const { code } = await transformWithOxc(readFileSync(file, "utf8"), file, {
+      jsx: { runtime: "automatic", development: true, refresh: true },
+    });
+
+    expect(code).not.toContain("$RefreshReg$(");
   });
 });
