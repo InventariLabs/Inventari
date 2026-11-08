@@ -323,22 +323,17 @@ function useArchivedListing(listTab: ListTab, search: string) {
 
 export function useAssetListActions() {
   const { t } = useTranslation("equipment");
+  // The filters the address holds, handed on to the page as they are.
+  const address = useAssetListAddress();
   const {
     statusFilter,
-    handleStatusFilter,
     checkedOut,
-    handleCheckedOutChange,
     hideRetired,
-    handleHideRetiredChange,
     locationFilter,
-    handleLocationFilter,
     categoryFilter,
-    setCategoryFilter,
-    clearFiltersAndSearch,
-    clearLocationAndCategory,
     listTab,
     writeListTab,
-  } = useAssetListAddress();
+  } = address;
   const [search, setSearch] = useSearchPhrase();
   const [skip, setSkip] = useState(0);
 
@@ -778,9 +773,9 @@ export function useAssetListActions() {
   };
 
   return {
+    ...address,
     search,
     setSearch,
-    listTab,
     setListTab: (v: string) => {
       const tab = v as ListTab;
       writeListTab(tab);
@@ -814,18 +809,6 @@ export function useAssetListActions() {
     setPurgeTarget,
     bulkEditAction,
     setBulkEditAction,
-    statusFilter,
-    handleStatusFilter,
-    checkedOut,
-    handleCheckedOutChange,
-    hideRetired,
-    handleHideRetiredChange,
-    locationFilter,
-    handleLocationFilter,
-    categoryFilter,
-    setCategoryFilter,
-    clearFiltersAndSearch,
-    clearLocationAndCategory,
     sort,
     sortDir,
     handleSortChange,

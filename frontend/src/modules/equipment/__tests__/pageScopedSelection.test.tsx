@@ -334,7 +334,7 @@ describe("Asset list — the selection can reach past the page", () => {
 
     await waitFor(() => expect(toast.success).toHaveBeenCalled());
     expect(vi.mocked(toast.success).mock.calls[0][0]).toMatch(/61/);
-    expect(body).toEqual({ checked_out: false });
+    expect(body).toEqual({ checked_out: false, hide_retired: false });
   });
 
   it("drops back to the page when a row is unticked", async () => {
