@@ -835,6 +835,9 @@ class TestTheDoorQuantisesAndRefusesTheZero:
         assert code == 'SHOPPING_LIST_ITEM_QUANTITY_ROUNDS_TO_ZERO'
         assert 'najmniejsza zapisywalna ilość' in detail
         assert detail.endswith(stated_quantity(QUANTITY_STEP, 'pl'))
+        # One decimal mark in the sentence, and it is the reader's: the
+        # quantity read "0.000" beside the step's "0,001".
+        assert '.' not in detail
         assert 'countable' not in detail
 
     def test_an_update_to_a_rounding_zero_is_refused(

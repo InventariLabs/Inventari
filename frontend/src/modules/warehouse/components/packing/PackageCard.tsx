@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { downloadBlob } from "@/utils/helpers";
 import { packingApi, type PackageOut } from "@/modules/warehouse/api/packing";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { QUANTITY_STEP } from "@/hooks/useUomPrecision";
 
 interface Props {
   documentId: string;
@@ -148,7 +149,7 @@ export function PackageCard({
           type="number"
           inputMode="decimal"
           min={0}
-          step={0.001}
+          step={QUANTITY_STEP}
           suffix="kg"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}

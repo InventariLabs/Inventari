@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useFlatUoms } from "@/modules/shared/hooks/useUoms";
+import { formatQuantityLocale } from "@/utils/formatters";
 
 export interface UomPrecision {
   /** HTML input step string, e.g. "1", "0.01", "0.001" */
@@ -134,7 +135,9 @@ export function quantityStepMessage(
   if (!Number.isFinite(value)) return "";
 
   if (value < precision.min) {
-    return t("units.validation.belowMin", { min: precision.min });
+    return t("units.validation.belowMin", {
+      min: formatQuantityLocale(precision.min),
+    });
   }
   if (precision.isInteger) {
     return value === Math.trunc(value)

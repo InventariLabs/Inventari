@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
-from decimal import ROUND_UP, Decimal
+from decimal import Decimal
 from typing import TypedDict
 from uuid import UUID
 
@@ -1222,8 +1222,9 @@ async def add_shortages_to_shopping_list(
             ShoppingListItemCreateDTO(
                 name=template.name,
                 # Up, not to the nearest: buying a gram less than the run
-                # needs leaves it short.
-                quantity=missing.quantize(Decimal('0.001'), rounding=ROUND_UP),
+                # needs leaves it short. No unit's step applies to a
+                # shortfall summed across recipes, so the store's own step.
+                quantity=core_api.uoms.round_up(missing, None),
                 uom_id=template.uom_id,
                 template_id=child_id,
                 source='production',

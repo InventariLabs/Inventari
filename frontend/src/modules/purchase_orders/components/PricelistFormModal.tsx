@@ -8,6 +8,7 @@ import { ProductCombobox } from "@/components/ui/ProductCombobox";
 import { Sheet, SheetBody, SheetHeader } from "@/components/ui/Sheet";
 import { CURRENCY_CODES, currencyLabel } from "@/lib/currencies";
 import { todayIso } from "@/utils/formatters";
+import { QUANTITY_STEP } from "@/module-sdk";
 import type { CatalogueSearchResult } from "@/modules/warehouse/moduleApi";
 
 export interface PricelistFormState {
@@ -175,7 +176,7 @@ export function PricelistFormModal({
             label={t("pricelist.minQuantity")}
             type="number"
             min="0"
-            step="0.001"
+            step={QUANTITY_STEP}
             value={form.minQuantity}
             error={submitted ? minQuantityError : undefined}
             onChange={(e) => onChange({ ...form, minQuantity: e.target.value })}
