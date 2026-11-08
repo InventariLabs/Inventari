@@ -35,6 +35,8 @@
     "generateFirst": "Gerar as primeiras etiquetas",
     "itemInUse": "Produto em uso",
     "purposeInUse": "{{purpose}} em uso",
+    "itemDeleted": "Produto (excluído)",
+    "purposeDeleted": "{{purpose}} (excluído)",
     "printedAt": "Impressa em {{date}}",
     "noLabelsFiltered": "Nenhuma etiqueta com este status",
     "noLabelsFilteredSubtitle": "Há etiquetas no conjunto, mas nenhuma está neste estado.",
@@ -51,7 +53,6 @@
     "description": "Descrição (uso interno)",
     "descriptionPlaceholder": "ex.: Para novos produtos na Prateleira A",
     "types": {
-      "product": "Produto",
       "category": "Categoria"
     },
     "prefixPlaceholder": "ex.: SHELF, RACK, BOX"

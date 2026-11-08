@@ -86,6 +86,19 @@ describe("LabelCard", () => {
     expect(screen.getByText("Butter")).toBeInTheDocument();
   });
 
+  it("names an unassigned equipment label by its purpose, not as a product", () => {
+    render(
+      <LabelCard
+        label={makeLabel({ context_tag: "equipment" })}
+        isSelected={false}
+        onToggleSelect={noop}
+        onPreviewSingle={noop}
+        onDelete={noop}
+      />,
+    );
+    expect(screen.getByText("equipment")).toBeInTheDocument();
+  });
+
   it("shows scan count when not assigned", () => {
     render(
       <LabelCard
@@ -292,6 +305,36 @@ describe("LabelRow", () => {
     expect(screen.getByText("Product in use")).toBeInTheDocument();
     expect(screen.getByText("Products")).toBeInTheDocument();
   });
+  it.each([
+    [undefined, "Product (deleted)"],
+    ["equipment", "equipment (deleted)"],
+  ])(
+    "does not describe a deleted item as in use (context %s)",
+    (contextTag, subtitle) => {
+      render(
+        <table>
+          <tbody>
+            <LabelRow
+              label={makeLabel({
+                is_assigned: true,
+                is_item_deleted: true,
+                assigned_item_name: "Old drill",
+                assigned_item_context_tag: contextTag,
+              })}
+              isSelected={false}
+              onToggleSelect={noop}
+              onPreviewSingle={noop}
+              onDelete={noop}
+            />
+          </tbody>
+        </table>,
+      );
+
+      expect(screen.getAllByText("Old drill").length).toBeGreaterThan(0);
+      expect(screen.getByText(subtitle)).toBeInTheDocument();
+      expect(screen.queryByText(/in use/)).not.toBeInTheDocument();
+    },
+  );
 });
 
 // end of test file
