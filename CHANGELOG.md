@@ -638,6 +638,13 @@ says what the release does rather than what changed since them.
   several. The card used to close with the document, so a slip to check a
   returned box against could not be printed again from the screen, although
   the server still served it.
+- A picking session over one delivery ends with **Pack**, the shipping fields
+  and **Complete and book** however it was opened. Opened from the documents
+  list or the To do region — one ticked delivery, a selection the stock check
+  narrowed to one, or **Resume** on a row — it used to end like a session over
+  several: **Close** completed nothing, and there was neither **Pack** nor a
+  place for the carrier. Both buttons now lead to the delivery's own page,
+  which packs it or completes it with the carrier typed on the summary.
 
 ## v0.11.0 - 2026-11-02
 

@@ -18,6 +18,7 @@ import {
   type DocumentTrackingPayload,
   type WarehouseDocument,
 } from "@/modules/warehouse/types";
+import { useHandedOverCompletion } from "./usePickingHandOff";
 import { useReceiptExpiryQuestion } from "./useReceiptExpiryQuestion";
 
 /** Which irreversible step the detail page's confirm dialog is asking about. */
@@ -582,6 +583,9 @@ export function useDocumentActions({
     },
     [docId, completeMutation, reportCompletion, handleCompletionError],
   );
+  // A list's picking sheet that ended over this one document handed its
+  // completion here, with the carrier its summary took.
+  useHandedOverCompletion(doc, handleSessionComplete);
 
   return {
     confirmAction,

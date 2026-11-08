@@ -790,6 +790,80 @@ describe("DocumentsPage", () => {
       expect(screen.getByText("Widget")).toBeInTheDocument();
     });
 
+    it("hands a single ticked dispatch, once picked, to its page to complete", async () => {
+      // The list has none of what completing a dispatch takes — the
+      // questions it can stop on, its Undo, the Pack step — so a session
+      // over one document ends on that document's page, with the carrier.
+      const user = userEvent.setup();
+      server.use(
+        http.post("/api/v1/warehouse/documents/out-1/picking/start", () =>
+          HttpResponse.json({
+            id: "s-1",
+            document_id: "out-1",
+            status: "active",
+            lines: [
+              {
+                id: "l1",
+                document_line_id: "dl-1",
+                document_id: "out-1",
+                document_number: "WZ/2026/001",
+                pick_order: 1,
+                status: "pending",
+                picked_quantity: 0,
+                bin_location: "A-01",
+                product_name: "Widget",
+                lot_name: null,
+                expected_quantity: 1,
+                uom_symbol: "pcs",
+              },
+            ],
+            documents: [],
+            total_lines: 1,
+            picked_lines: 0,
+            pending_lines: 1,
+            shelf_scan_required: false,
+          }),
+        ),
+        http.post(
+          "/api/v1/warehouse/documents/out-1/picking/s-1/short-pick",
+          () =>
+            HttpResponse.json({
+              status: "short_pick_confirmed",
+              line_id: "l1",
+              product_name: "Widget",
+              picked_quantity: 1,
+              expected_quantity: 1,
+              uom_symbol: "pcs",
+              session_complete: true,
+              message: "",
+            }),
+        ),
+      );
+      list(dispatch(1), dispatch(2));
+
+      await renderWithHeader(<DocumentsPage />);
+      await act(async () => {
+        await user.click(screen.getAllByRole("checkbox")[1]);
+      });
+      await act(async () => {
+        await user.click(
+          screen.getByRole("button", { name: "Pick 1 selected" }),
+        );
+      });
+      await user.click(
+        await screen.findByRole("button", { name: "Pick full amount" }),
+      );
+      await user.type(await screen.findByLabelText("Carrier"), "DHL");
+      expect(screen.getByRole("button", { name: "Pack" })).toBeInTheDocument();
+      await user.click(
+        screen.getByRole("button", { name: "Complete and book" }),
+      );
+
+      expect(navigateMock).toHaveBeenCalledWith("/warehouse/documents/out-1", {
+        state: { completeAfterPicking: { shipment: { carrier: "DHL" } } },
+      });
+    });
+
     it("offers nothing to pick when only drafts or receipts are ticked", async () => {
       const user = userEvent.setup();
       list(buildRow(), dispatch(2, { type: "IN" }));

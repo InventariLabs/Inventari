@@ -294,6 +294,86 @@ describe("WmsPickingView over several dispatches", () => {
     expect(onClose).toHaveBeenCalledWith(false, undefined);
   });
 
+  describe("a session over one document, however it was opened", () => {
+    // A list passes the ids it ticked even when it ticked one, and Resume
+    // passes the row's id: the rule is how many documents the session
+    // covers, not whether ids were passed.
+    function oneDocument() {
+      const session = buildSession();
+      session.documents = [doc("doc-1", "WZ/2026/001")];
+      session.lines = [line("l1", "doc-1", "WZ/2026/001", "Widget")];
+      server.use(
+        http.post("/api/v1/warehouse/documents/doc-1/picking/start", () =>
+          HttpResponse.json(session),
+        ),
+        http.post(
+          "/api/v1/warehouse/documents/doc-1/picking/session-1/short-pick",
+          () =>
+            HttpResponse.json({
+              status: "short_pick_confirmed",
+              line_id: "l1",
+              product_name: "Widget",
+              picked_quantity: 1,
+              expected_quantity: 1,
+              uom_symbol: "pcs",
+              session_complete: true,
+              message: "",
+            }),
+        ),
+      );
+    }
+
+    async function pickIt() {
+      await userEvent.click(
+        await screen.findByRole("button", { name: "Pick full amount" }),
+      );
+      await screen.findByText("Picking complete");
+    }
+
+    it("completes the document it was opened from a list over", async () => {
+      oneDocument();
+      const onClose = vi.fn();
+      render(
+        <WmsPickingView
+          documentId="doc-1"
+          documentIds={["doc-1"]}
+          onClose={onClose}
+          onPack={vi.fn()}
+        />,
+      );
+      await pickIt();
+
+      // The shipping box is on the summary, and closing it completes.
+      await userEvent.type(screen.getByLabelText("Carrier"), "DHL");
+      await userEvent.click(
+        screen.getByRole("button", { name: "Complete and book" }),
+      );
+
+      expect(onClose).toHaveBeenCalledWith(true, { carrier: "DHL" }, "doc-1");
+    });
+
+    it("offers Pack, which names the document to pack", async () => {
+      oneDocument();
+      const onPack = vi.fn();
+      render(
+        <WmsPickingView
+          documentId="doc-1"
+          documentIds={["doc-1"]}
+          onClose={vi.fn()}
+          onPack={onPack}
+        />,
+      );
+      await pickIt();
+
+      await userEvent.click(screen.getByRole("button", { name: "Pack" }));
+
+      expect(onPack).toHaveBeenCalledWith(
+        expect.objectContaining({ carrier: "" }),
+        "doc-1",
+      );
+    });
+  });
+
   it("shows the backend's sentence when the start is refused, in the reader's language", async () => {
     server.use(
       http.post(START_PATH, () =>

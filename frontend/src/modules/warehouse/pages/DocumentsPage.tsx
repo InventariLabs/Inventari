@@ -18,7 +18,7 @@ import { BulkActionBar } from "@/modules/warehouse/components/BulkActionBar";
 import { DocumentListItem } from "@/modules/warehouse/components/DocumentListItem";
 import { DocumentsGettingStarted } from "@/modules/warehouse/components/DocumentsGettingStarted";
 import { DocumentsFilters } from "@/modules/warehouse/components/DocumentsFilters";
-import WmsPickingView from "@/modules/warehouse/components/picking/WmsPickingView";
+import { ListPickingSheet } from "@/modules/warehouse/components/picking/ListPickingSheet";
 import { NewDocumentMenu } from "@/modules/warehouse/components/NewDocumentMenu";
 import { useDocumentBulkActions } from "@/modules/warehouse/hooks/useDocumentBulkActions";
 import { useDocumentsList } from "@/modules/warehouse/hooks/useDocumentsList";
@@ -309,10 +309,9 @@ export default function DocumentsPage() {
           ticking another row behind the sheet cannot change it. Held here,
           not in the selection bar, which goes with an emptied list. */}
       {pickingIds && (
-        <WmsPickingView
-          documentId={pickingIds[0]}
+        <ListPickingSheet
           documentIds={pickingIds}
-          onClose={() => {
+          onLeave={() => {
             setPickingIds(null);
             bulk.clearSelection();
           }}

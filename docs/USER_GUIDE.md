@@ -1137,6 +1137,12 @@ there, with what is still **To pack**, until the document is completed — so yo
 can also come back to it later. A session over several documents has no
 **Pack**: its **Close** leaves each of them picked and open.
 
+A session over one document ends this way wherever it was started — on the
+document's page, from a single tick in a list, or with **Resume** on a list
+row. Started from a list, both buttons take you to the document's page:
+**Pack** to its **Packing** step, and **Complete and book** to the page as it
+completes the document with the carrier you typed.
+
 - **Everything in one package** is the common case: one tap puts everything
   picked and not yet packed into a single package (once a package exists the
   button reads **The rest in one package**), and its slip and label are one tap
