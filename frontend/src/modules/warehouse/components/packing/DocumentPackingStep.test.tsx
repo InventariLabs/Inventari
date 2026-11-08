@@ -76,6 +76,9 @@ function packingServer() {
   const picked: Record<string, number> = { bolts: 4, nuts: 2 };
   const names: Record<string, string> = { bolts: "Bolt M8", nuts: "Nut M8" };
   let packages: PackageOut[] = [];
+  // Open while the dispatch is confirmed; its completion closes the packages.
+  let editable = true;
+  let views = 0;
   const requests: string[] = [];
 
   const packed = (lineId: string) =>
@@ -85,7 +88,7 @@ function packingServer() {
       .reduce((sum, ln) => sum + Number(ln.quantity), 0);
 
   const view = (): PackingView => ({
-    editable: true,
+    editable,
     packages: packages.map((p, i) => ({
       ...p,
       number: i + 1,
@@ -147,7 +150,10 @@ function packingServer() {
   };
 
   server.use(
-    http.get(`${BASE}/packages`, () => HttpResponse.json(view())),
+    http.get(`${BASE}/packages`, () => {
+      views += 1;
+      return HttpResponse.json(view());
+    }),
     http.post(`${BASE}/packages`, () => {
       requests.push("create");
       open();
@@ -212,7 +218,14 @@ function packingServer() {
       }),
     ),
   );
-  return { requests };
+  return {
+    requests,
+    views: () => views,
+    /** The dispatch was completed: what was packed is now a record. */
+    complete: () => {
+      editable = false;
+    },
+  };
 }
 
 function renderStep(
@@ -259,12 +272,20 @@ describe("DocumentPackingStep", () => {
         "a dispatch nothing was picked of",
         { lines: [documentLine({ done_quantity: "0" })] },
       ],
-      ["a completed dispatch", { status: "COMPLETED" }],
       ["a receipt", { type: "IN" }],
       ["a transfer", { type: "INT" }],
     ] as const)("not on %s", (_, overrides) => {
       packingServer();
       renderStep(pickedDispatch(overrides as Partial<WarehouseDocument>));
+      expect(screen.queryByText("Packing")).not.toBeInTheDocument();
+    });
+
+    it("not on a completed dispatch that was shipped without packages", async () => {
+      const { views, complete } = packingServer();
+      complete();
+      renderStep(pickedDispatch({ status: "COMPLETED" }));
+      // Asked, and nothing to show: the packing view came back empty.
+      await waitFor(() => expect(views()).toBeGreaterThan(0));
       expect(screen.queryByText("Packing")).not.toBeInTheDocument();
     });
 
@@ -601,6 +622,49 @@ describe("DocumentPackingStep", () => {
       ),
     ).toBeInTheDocument();
     expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it("keeps the slips and labels of a completed dispatch, and nothing to change", async () => {
+    const user = userEvent.setup();
+    const { complete } = packingServer();
+    const { unmount } = renderStep();
+    await user.click(
+      await screen.findByRole("button", { name: "Everything in one package" }),
+    );
+    await screen.findByText("OUT/2026/0042-P1");
+    unmount();
+    complete();
+
+    renderStep(pickedDispatch({ status: "COMPLETED" }));
+
+    // The slip of a shipped dispatch is what a returned box is checked
+    // against, so the packages stay on its page.
+    expect(await screen.findByText("OUT/2026/0042-P1")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "What was shipped, package by package, with the slip and the label of each.",
+      ),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Packing slip" }));
+    await waitFor(() =>
+      expect(downloadBlob).toHaveBeenCalledWith(
+        expect.any(Blob),
+        "packing_slip_OUT-2026-0042-P1.pdf",
+      ),
+    );
+    expect(screen.getByRole("button", { name: "Label" })).toBeInTheDocument();
+    for (const name of [
+      "Add package",
+      "Remove package",
+      "Complete dispatch",
+      /in one package/,
+      /Take Bolt M8/,
+    ]) {
+      expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
+    }
+    expect(
+      screen.queryByText("Everything picked is packed."),
+    ).not.toBeInTheDocument();
   });
 
   it("shows a reader who may not write the packages, and no action", async () => {

@@ -1160,9 +1160,10 @@ can also come back to it later. A session over several documents has no
   **All packing slips** gives one PDF with a sheet per package, and appears once
   a dispatch has more than one package.
 - **Complete dispatch** moves the stock. After that the packages are a record
-  of what was shipped and nothing in them changes: download the slips and
-  labels you need before you complete, since **Packing** closes with the
-  document.
+  of what was shipped and nothing in them changes. **Packing** stays on the
+  completed document's page, read-only, with each package's slip and label, so
+  a slip can be downloaded again later — to check a returned box against it,
+  for instance. A dispatch completed without packages shows no **Packing**.
 
 ### 10.5 Shipping
 

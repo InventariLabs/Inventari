@@ -633,6 +633,11 @@ says what the release does rather than what changed since them.
   404 instead of asking the backend; a PDF attachment came through. An
   instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
   backend itself.
+- A completed dispatch keeps its **Packing** card, read-only: each package with
+  its packing slip and its label, and the file of all slips when there are
+  several. The card used to close with the document, so a slip to check a
+  returned box against could not be printed again from the screen, although
+  the server still served it.
 
 ## v0.11.0 - 2026-11-02
 
