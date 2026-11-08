@@ -236,12 +236,20 @@ def _trusted_keys() -> dict[str, Ed25519PublicKey]:
         entry = entry.strip()
         if not entry:
             continue
-        if '=' in entry:
-            key_id, b64 = entry.split('=', 1)
-            key_id = key_id.strip()
-        else:
-            key_id = f'key{len(keys) + 1}'
-            b64 = entry
+        key_id, _, b64 = (part.strip() for part in entry.partition('='))
+        if not key_id or not b64:
+            # A key without an id is not trusted: a signature names the key it
+            # was made with, and an id this installation made up would never
+            # match it. A bare key also carries its own '=' — the padding of a
+            # 32-byte Ed25519 key — so it reads as an id with no key behind it;
+            # the warning says what is missing rather than call the key
+            # invalid base64.
+            logger.warning(
+                '[module-signing] a MODULE_SIGNING_PUBLIC_KEYS entry has no key '
+                'id — list it as <key_id>=<base64 public key>, with the id the '
+                'publisher signs under; skipped'
+            )
+            continue
         try:
             keys[key_id] = Ed25519PublicKey.from_public_bytes(
                 base64.b64decode(b64.strip())
@@ -351,9 +359,20 @@ def verify_module_signature(
         except InvalidSignature:
             continue
 
-    return SignatureVerification(
-        ok=False,
-        reason='signature does not match the package content — '
-        'the package was modified after signing',
-        outcome='invalid',
-    )
+    # A failed check cannot tell a changed package from a different key: the
+    # same bytes fail both ways. Saying "modified after signing" alone sent an
+    # operator whose installation lists another key under the signer's id
+    # hunting for a tampering that never happened.
+    if key_id is not None:
+        reason = (
+            f'signature does not verify with the key this installation trusts '
+            f'as {key_id!r} — the package was modified after signing, or it was '
+            f'signed with a different key under that id'
+        )
+    else:
+        reason = (
+            'signature matches none of the trusted keys — the package was '
+            'modified after signing, or its signer is not one this '
+            'installation trusts'
+        )
+    return SignatureVerification(ok=False, reason=reason, outcome='invalid')

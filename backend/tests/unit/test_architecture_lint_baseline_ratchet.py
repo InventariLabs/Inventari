@@ -254,6 +254,7 @@ class TestStaleCheckRunsForEveryKeyMatchedBaseline:
             ],
             'collect_twin_keys': {'twin'},
             '_collect_public_api_missing_org_keys': {'missing_org'},
+            'collect_core_api_writes_without_user': {'write_user': ()},
         }
         for name, answer in collectors.items():
             monkeypatch.setattr(_main, name, lambda *args, answer=answer: answer)
@@ -276,6 +277,7 @@ class TestStaleCheckRunsForEveryKeyMatchedBaseline:
             'transaction_rollback_baseline.txt': {'rollback'},
             'sync_async_twin_baseline.txt': {'twin'},
             'public_api_missing_org_baseline.txt': {'missing_org'},
+            'coreapi_write_user_context_baseline.txt': {'write_user'},
         }
 
     def test_a_stale_entry_fails_the_lint_run(self, lint_of_a_scaffolded_copy):

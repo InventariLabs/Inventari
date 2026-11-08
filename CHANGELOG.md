@@ -119,6 +119,25 @@ says what the release does rather than what changed since them.
   logs outlive it; in a header it travels as it does on every other request. A
   client that still sends the token in the address is refused with close code
   4001 and has to offer the two subprotocols instead.
+- **Breaking:** a community module can no longer declare its tables on
+  `CoreModelBase` from the module SDK: `module install`, `module validate` and
+  module discovery refuse it, however the base is reached. It is Core's own
+  declarative base, re-exported for the modules this repository ships, and a
+  table declared on it lands in Core's metadata, where Core's autogenerate
+  proposes it as a core migration. A module that used it declares its tables on
+  `ModuleModelBase` instead, which has a metadata of its own, and creates them
+  in its own migrations (MODULES_GUIDE.md, "Database Migrations").
+- **Breaking:** the core forms a module can contribute validation rules to are
+  `item_create` and `item_edit`. `storage_create` and `storage_edit` were
+  accepted by the type, but no location form ever ran a rule, so a rule
+  registered for them did nothing; a module that declares one removes it.
+- `module validate --allow-core` skips the safety scan only for the modules
+  this repository ships, at their own path; for any other module it scans as
+  without the switch and says so.
+- Registering a contribution to `scan_providers` or `dashboard_widgets` now
+  logs the warning of an unknown point: no backend code ever read them. Scan
+  providers register with `scan_registry.register`, and a dashboard widget is
+  a frontend `slots` registration.
 
 ### Added
 
@@ -179,6 +198,12 @@ says what the release does rather than what changed since them.
   list of their own.
 - Module authors can give a quantity input the step the store keeps,
   `QUANTITY_STEP` from `@/module-sdk`, instead of writing `0.001` into the form.
+- `module validate` reads a package the way `module new-community` writes it —
+  `module.yaml` with `backend/` beside it — and checks its backend laid out the
+  way `module install` lands it, so an author can validate before installing.
+- In development, the browser console names a module's `navOverrides` entry
+  whose `targetPath` is no navigation item, and an `i18nOverrides` key that no
+  catalog has, since either is accepted and changes nothing on screen.
 
 ### Fixed
 
@@ -619,6 +644,27 @@ says what the release does rather than what changed since them.
   404 instead of asking the backend; a PDF attachment came through. An
   instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
   backend itself.
+- `module install`, `module upgrade` and `module validate` refuse what module
+  discovery refuses at the next start — a manifest `name` other than the
+  module's directory, a `module_type` above `community` on a module from
+  outside the repository, and a platform floor above the running version —
+  instead of printing success for a package the restart then rejects. The
+  other way round, they accept a `requires` entry naming an always-on feature
+  (`items`, `locations`, …), which discovery always loaded.
+- A module rejected at startup no longer leaves its permissions behind in the
+  roles editor, the API key dialog and the built-in role defaults.
+- A signing key listed in `MODULE_SIGNING_PUBLIC_KEYS` without an id is skipped
+  with a warning that says the id is missing, where it used to be reported as
+  invalid Base64. A signature that fails against the key listed under the
+  signer's id no longer says the package was modified after signing as if that
+  were certain: it names that, and a different key under the same id, as the
+  two possibilities.
+- A scheduled task registered as persistent on an installation without Redis
+  logs that it runs in the process and that a run missed while the backend is
+  down is not made up.
+- `make new-module` stops at a step that fails instead of carrying on to
+  "SUCCESS", and a second run picks up at that step. `module new-community
+  --language` lists every language it accepts, `pt` included.
 - On the development stack, installing or upgrading a module while the app is
   open no longer leaves the page on the error screen until it is reloaded by
   hand. The files the install writes made the dev server run the app's entry

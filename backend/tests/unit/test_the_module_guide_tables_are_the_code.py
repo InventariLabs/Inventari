@@ -176,7 +176,7 @@ def test_the_trusted_key_setting_reads_every_form_the_guide_says_it_reads(
     """A claim about what a setting accepts is only as good as the value it was
     tried with. The guide's wording is checked against a real, padded key: the
     ``key_id=<key>`` entries it teaches, separated by commas or by newlines, and
-    a bare key only if the guide still says a bare key is accepted."""
+    a bare key, which the guide says is not trusted."""
     first, second = _real_public_key(), _real_public_key()
     for separator in (',', '\n'):
         monkeypatch.setattr(
@@ -188,10 +188,8 @@ def test_the_trusted_key_setting_reads_every_form_the_guide_says_it_reads(
             f'entries separated by {separator!r} must each be trusted'
         )
 
-    if re.search(r'bare\s+base64', _guide(), re.IGNORECASE):
-        monkeypatch.setattr(settings, 'MODULE_SIGNING_PUBLIC_KEYS', first)
-        assert len(_trusted_keys()) == 1, (
-            'MODULES_GUIDE.md says a bare base64 key is accepted, but a real '
-            '(padded) key given without an id trusts nothing: its trailing "=" '
-            'is read as the id separator'
-        )
+    # The guide says a key listed without an id is not trusted, and the
+    # setting agrees for a real, padded key.
+    assert re.search(r'a key listed without one is not\s+trusted', _guide())
+    monkeypatch.setattr(settings, 'MODULE_SIGNING_PUBLIC_KEYS', first)
+    assert _trusted_keys() == {}

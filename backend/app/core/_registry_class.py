@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import select
 
 from app.core.logging import get_logger
-from app.core.module_manifest_schema import ModuleManifest, PermissionDef
+from app.core.module_manifest_schema import PermissionDef
 from app.core.module_safety import (
     REPO_SHIPPED_MODULES,
     TRUSTED_SHIPPED_MODULES,
@@ -46,6 +46,11 @@ class ModuleRegistry:
             module_name=module_name,
             reason=reason,
         )
+        # Discovery registers a manifest's permissions before it scans and
+        # imports the module, so a refusal at any later step has to take them
+        # back: the roles editor, the API key dialog and the built-in role
+        # defaults all read them from here.
+        self._custom_permissions.pop(module_name, None)
         logger.error('Rejected module %s: %s', module_name, reason)
 
     def _reserved_name_refusal(
@@ -73,31 +78,6 @@ class ModuleRegistry:
             'the core mounts its own API routes under it'
         )
         return f'name {module_dir.name!r} is reserved: {reason}'
-
-    @staticmethod
-    def _untrusted_title_refusal(
-        module_dir: Path, manifest: ModuleManifest
-    ) -> str | None:
-        """Why the manifest's trust title is not *module_dir*'s to claim.
-
-        Who stands behind the module is the one fact a store reader cannot
-        guess. Until signatures exist (ADR-019), the registry is the only
-        issuer of first-party standing, and it issues it to the directories
-        the repository ships. A hand-placed directory keeping its manifest's
-        'official' or 'core' would be certifying the file its own dropper
-        wrote. A directory wearing a shipped name never reaches this check
-        unless it is the repository's own path — the reserved-name guard
-        already refused the rest.
-        """
-        if (
-            module_dir.name in REPO_SHIPPED_MODULES
-            or manifest.module_type == 'community'
-        ):
-            return None
-        return (
-            f'untrusted module claims module_type {manifest.module_type!r}; '
-            f'only a directory the repository ships may stand above community'
-        )
 
     @staticmethod
     def _strip_borrowed_author(module_dir: Path, instance: BaseModule) -> None:
@@ -151,13 +131,11 @@ class ModuleRegistry:
                 self._reject(module_dir.name, refusal)
                 continue
 
+            # The name, the platform floor and the trust title: the same
+            # refusals `module validate`, `install` and `upgrade` make
+            # (module_validator.manifest_refusal).
             manifest = _validate_manifest(module_dir, self._reject)
             if manifest is None:
-                continue
-
-            refusal = self._untrusted_title_refusal(module_dir, manifest)
-            if refusal is not None:
-                self._reject(module_dir.name, refusal)
                 continue
 
             # The manifest is the only place these permissions are declared;

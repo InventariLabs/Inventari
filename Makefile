@@ -413,8 +413,12 @@ module-smoke: ## Run comprehensive smoke test on a single module (usage: make mo
 	fi
 	$(BACKEND_EXEC) uv run python manage.py module smoke $(name)
 
+# One shell, `set -e`: a step that fails stops the recipe with its exit code
+# instead of ending in SUCCESS. A half that already exists is skipped, so after
+# a failure a second run picks up at the step that failed.
 new-module: ## Create an in-tree module scaffold (backend + frontend) (usage: make new-module NAME=warranty_tracker)
-	@if [ -n "$(NAME)" ]; then \
+	@set -e; \
+	if [ -n "$(NAME)" ]; then \
 		name="$(NAME)"; \
 	else \
 		read -p "Module name (lowercase, underscores only, e.g. warranty_tracker): " name; \
@@ -425,10 +429,18 @@ new-module: ## Create an in-tree module scaffold (backend + frontend) (usage: ma
 	if ! echo "$$name" | grep -qE '^[a-z][a-z0-9_]+$$'; then \
 		echo "$(RED)[ERROR]$(NC) Invalid name '$$name'. Use lowercase letters, digits and underscores only."; exit 1; \
 	fi; \
-	echo "$(BLUE)[INFO]$(NC) Creating backend scaffold for '$$name'..."; \
-	$(BACKEND_EXEC) uv run python manage.py module create "$$name"; \
-	echo "$(BLUE)[INFO]$(NC) Creating frontend scaffold for '$$name'..."; \
-	docker compose exec frontend node scripts/generate_module.js "$$name"; \
+	if [ -d "backend/app/modules/$$name" ]; then \
+		echo "$(BLUE)[INFO]$(NC) Backend scaffold for '$$name' already exists — skipped."; \
+	else \
+		echo "$(BLUE)[INFO]$(NC) Creating backend scaffold for '$$name'..."; \
+		$(BACKEND_EXEC) uv run python manage.py module create "$$name"; \
+	fi; \
+	if [ -d "frontend/src/modules/$$name" ]; then \
+		echo "$(BLUE)[INFO]$(NC) Frontend scaffold for '$$name' already exists — skipped."; \
+	else \
+		echo "$(BLUE)[INFO]$(NC) Creating frontend scaffold for '$$name'..."; \
+		docker compose exec frontend node scripts/generate_module.js "$$name"; \
+	fi; \
 	echo "$(BLUE)[INFO]$(NC) Recording '$$name' in the module catalog snapshot..."; \
 	node frontend/scripts/check-module-catalog.mjs --sync-backend; \
 	echo "$(BLUE)[INFO]$(NC) Recording its permission labels in the backend key snapshot..."; \

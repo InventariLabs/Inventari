@@ -1,5 +1,6 @@
 import { onCatalogLoaded } from "@/i18n/config";
 import { logger } from "@/utils/logger";
+import { CORE_SECTION_NAV } from "./coreSections";
 import {
   applyI18nOverrides,
   applyThemeOverrides,
@@ -105,6 +106,38 @@ class ModuleRegistry {
     });
   }
 
+  /**
+   * Development aid: names the `navOverrides` of the named modules whose
+   * `targetPath` is no navigation item of the modules registered here.
+   *
+   * An override is matched by path alone, so one that matches nothing is
+   * accepted in silence and hides or renames nothing. Run once the modules
+   * are registered, like `warnOrphanedNav`: the item an override targets may
+   * belong to a module that registers later. A target in a module this
+   * organization has not enabled is named too — in development that is the
+   * question worth asking.
+   */
+  warnUnmatchedNavOverrides(moduleNames: string[]) {
+    if (!import.meta.env.DEV) return;
+    const navPaths = new Set([
+      ...Object.values(CORE_SECTION_NAV).map((item) => item.path),
+      ...[...this.modules.values()].flatMap(
+        (m) => m.moduleNav?.items.map((item) => item.path) ?? [],
+      ),
+    ]);
+    moduleNames.forEach((name) => {
+      const unmatched = (this.modules.get(name)?.navOverrides ?? [])
+        .map((override) => override.targetPath)
+        .filter((path) => !navPaths.has(path));
+      if (unmatched.length > 0) {
+        logger.warn(
+          `[ModuleRegistry] Module "${name}" has navOverrides that match no ` +
+            `navigation item of the modules loaded here: ${unmatched.join(", ")}`,
+        );
+      }
+    });
+  }
+
   getRoutes(enabledModules: string[]) {
     return this.queries.getRoutes(enabledModules);
   }
@@ -154,10 +187,6 @@ class ModuleRegistry {
 
   getActionItemProviders(enabledModules: string[]) {
     return this.queries.getActionItemProviders(enabledModules);
-  }
-
-  getStatusBadgeProviders(enabledModules: string[]) {
-    return this.queries.getStatusBadgeProviders(enabledModules);
   }
 
   applyI18nOverrides(enabledModules: string[]) {

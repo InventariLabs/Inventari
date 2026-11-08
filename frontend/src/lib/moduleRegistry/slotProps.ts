@@ -159,8 +159,9 @@ export interface SlotDataMap {
   /** Slot rendered inside the AI Settings tab for per-module AI configuration. */
   settings_ai_module_config: Record<string, never>;
   /**
-   * Slot rendered on the main Settings page as a standalone card/section.
-   * Use for module-specific admin settings that don't belong to AI/Email tabs.
+   * Slot rendered on the module store (Settings → Modules), below the list of
+   * modules, as a standalone card/section. Use for module-specific admin
+   * settings that don't belong to AI/Email tabs.
    * Example: nutrition module could add a "Food Database" management card.
    */
   settings_module_card: Record<string, never>;
