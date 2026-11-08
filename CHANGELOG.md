@@ -182,6 +182,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- "Update list" on a meal plan now raises a line that is already on the list
+  when the plan needs more of it, for example after its servings were increased.
+  It used to leave the line at the quantity it was first generated with and
+  still count the plan as listed. A line already ticked off keeps its quantity,
+  and the rest is added as a new line; a line is never lowered.
 - When the session has ended, a request that was only asking — a label preview,
   a pasted-lines or sheet read, a price calculation, a match or coverage check,
   a connection, webhook or e-mail test, a generated barcode — now gets the plain
