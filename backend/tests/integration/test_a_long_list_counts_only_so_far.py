@@ -1,6 +1,7 @@
 """A list that grows with the organization counts only so far.
 
-The product list, the stock list and the movement journal counted every row
+The product list, the stock list, the movement journal and the audit journal
+counted every row
 of the answer on every first page: at a hundred thousand products that count
 was most of the page, and it grew with the warehouse. They now stop counting
 one row past ``LIST_COUNT_CAP`` and say so — ``total`` is where the count
@@ -18,6 +19,7 @@ statements instead: the count carries its ``LIMIT``.
 
 from __future__ import annotations
 
+import uuid
 from collections.abc import Iterator
 from typing import Any
 
@@ -26,10 +28,13 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
+import app.api.audit_log as audit_log_api
 import app.api.items as items_api
 import app.api.stock_moves as stock_moves_api
 import app.api.stock_quants as stock_quants_api
+from app.models.audit_log import AuditLog
 
 pytestmark = pytest.mark.integration
 
@@ -159,6 +164,81 @@ class TestTheJournal:
         assert (third['has_more'], len(third['items'])) == (False, 1)
         seen = [m['id'] for page in (first, second, third) for m in page['items']]
         assert len(set(seen)) == _ROWS
+
+
+@pytest.fixture
+def five_journal_entries(
+    db_session: Session, test_user: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Five entries of one kind in the organization's audit journal."""
+    monkeypatch.setattr(audit_log_api, 'LIST_COUNT_CAP', _CAP)
+    for _ in range(_ROWS):
+        db_session.add(
+            AuditLog(
+                organization_id=test_user.organization_id,
+                user_id=test_user.id,
+                action='UPDATE',
+                target_type='counted_entry',
+                target_id=uuid.uuid4(),
+            )
+        )
+    db_session.commit()
+
+
+@pytest.mark.usefixtures('five_journal_entries')
+class TestTheAuditJournal:
+    """The audit journal counted every entry of the organization on its first
+    page while the movement journal stopped at the cap; it stops there too."""
+
+    def test_the_count_stops_at_the_cap_and_rides_the_cursor(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        asked = {'limit': 2, 'target_type': 'counted_entry'}
+        first = _page(client, auth_headers, '/api/v1/audit-log', **asked)
+        second = _page(
+            client,
+            auth_headers,
+            '/api/v1/audit-log',
+            **asked,
+            cursor=first['next_cursor'],
+        )
+        third = _page(
+            client,
+            auth_headers,
+            '/api/v1/audit-log',
+            **asked,
+            cursor=second['next_cursor'],
+        )
+
+        assert _envelope(first) == (_CAP, True, True, 2)
+        assert _envelope(second) == (_CAP, True, True, 2)
+        assert (third['has_more'], len(third['items'])) == (False, 1)
+        seen = [e['id'] for page in (first, second, third) for e in page['items']]
+        assert len(set(seen)) == _ROWS
+
+    def test_the_count_is_limited_to_the_window_and_one_row(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        statements: list[tuple[str, Any]],
+    ) -> None:
+        _page(
+            client,
+            auth_headers,
+            '/api/v1/audit-log',
+            limit=2,
+            target_type='counted_entry',
+        )
+
+        counts = [
+            (sql, params)
+            for sql, params in statements
+            if 'count(*)' in sql.lower() and 'audit_log' in sql
+        ]
+        assert counts, 'the journal took no count at all'
+        for sql, params in counts:
+            assert 'LIMIT' in sql, sql
+            assert _CAP + 1 in tuple(params), (_CAP + 1, params)
 
 
 @pytest.mark.usefixtures('five_products')

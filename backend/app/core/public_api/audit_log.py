@@ -55,6 +55,7 @@ class CoreAuditLogAPI:
         offset: int = 0,
         after: tuple[datetime, UUID] | None = None,
         known_total: int | None = None,
+        count_up_to: int | None = None,
     ) -> tuple[list[AuditLogDTO], int]:
         """Return audit entries for one organization, newest first.
 
@@ -70,7 +71,9 @@ class CoreAuditLogAPI:
 
         The next page is asked for with the last entry of the previous one
         (``after``: its instant and id) rather than a larger ``offset``, and a caller that kept the count from the first page
-        passes it back as ``known_total``.
+        passes it back as ``known_total``. ``count_up_to`` stops the count
+        one entry past it: a total above it means the journal holds more
+        (``db_utils.LIST_COUNT_CAP``).
         """
         entries, total = await audit_service.list_for_org_async(
             db,
@@ -85,6 +88,7 @@ class CoreAuditLogAPI:
             offset=offset,
             after=after,
             known_total=known_total,
+            count_up_to=count_up_to,
         )
         dtos: list[AuditLogDTO] = []
         for entry, user_email in entries:

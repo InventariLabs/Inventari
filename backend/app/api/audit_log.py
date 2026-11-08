@@ -23,6 +23,7 @@ from fastapi import APIRouter, Depends, Query
 from app.api.dependencies import get_current_admin_user
 from app.core.contracts import AuditLogDTO, UserContextDTO
 from app.core.cursor import decode_keyset_cursor, encode_keyset_cursor
+from app.core.db_utils import LIST_COUNT_CAP, count_window
 from app.core.deps import get_async_db, require_org
 from app.core.public_api import core_api
 from app.schemas.pagination import KeysetPaginatedResponse
@@ -67,6 +68,11 @@ async def list_audit_log(
 ):
     org_id = require_org(current_user)
     position = decode_keyset_cursor(cursor) if cursor else None
+    served_before = position.offset if position else offset
+    # The first page counts only so far (``LIST_COUNT_CAP``), as the movement
+    # journal does: every action writes an entry, so the count grew with the
+    # organization's whole history.
+    window = count_window(served_before, limit, LIST_COUNT_CAP)
     # One entry more than asked: whether it exists is the whole of "is there a
     # next page", and no count has to be right for that to be so.
     rows, total = await core_api.audit_log.list_for_org_async(
@@ -82,14 +88,20 @@ async def list_audit_log(
         offset=0 if position else offset,
         after=(position.sort_value, position.row_id) if position else None,
         known_total=position.total if position else None,
+        count_up_to=window,
     )
-    served_before = position.offset if position else offset
+    total_capped = position.total_capped if position else total > window
+    total = min(total, window)
     page = rows[:limit]
     next_cursor = None
     if len(rows) > limit:
         last = page[-1]
         next_cursor = encode_keyset_cursor(
-            last.created_at, last.id, total=total, offset=served_before + len(page)
+            last.created_at,
+            last.id,
+            total=total,
+            offset=served_before + len(page),
+            total_capped=total_capped,
         )
     return KeysetPaginatedResponse.from_keyset(
         items=page,
@@ -97,6 +109,7 @@ async def list_audit_log(
         limit=limit,
         total=total,
         next_cursor=next_cursor,
+        total_capped=total_capped,
     )
 
 

@@ -312,6 +312,7 @@ async def list_for_org_async(
     offset: int = 0,
     after: tuple[datetime, uuid.UUID] | None = None,
     known_total: int | None = None,
+    count_up_to: int | None = None,
 ) -> tuple[list[tuple[AuditLog, str | None]], int]:
     """Return audit entries for one organization, newest first.
 
@@ -337,6 +338,11 @@ async def list_for_org_async(
     ``known_total`` and it is not taken again. Ties on the instant (one batch
     writes its rows together) are broken by id, so a page boundary never
     repeats or loses an entry.
+
+    ``count_up_to`` stops that count one entry past it, so a total above it
+    means the journal holds more (``db_utils.LIST_COUNT_CAP``): every action
+    in the organization writes an entry, and counting them all on each first
+    page grew with the organization's whole history.
     """
     from app.models.user import User
 
@@ -363,12 +369,13 @@ async def list_for_org_async(
     # Hand-rolled rather than paginate_async: the page selects two columns
     # (the row and the joined user e-mail), and that helper takes a select()
     # of a single entity and returns scalars.
+    counted = select(AuditLog.id).where(*conditions)
+    if count_up_to is not None:
+        counted = counted.limit(count_up_to + 1)
     total = (
         known_total
         if known_total is not None
-        else await db.scalar(
-            select(func.count()).select_from(AuditLog).where(*conditions)
-        )
+        else await db.scalar(select(func.count()).select_from(counted.subquery()))
     )
 
     async def read(

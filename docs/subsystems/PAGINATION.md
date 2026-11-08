@@ -144,9 +144,11 @@ sender a wrong figure. A malformed one answers 400.
 
 Counting once is still counting everything: at a hundred thousand products
 the count of the product list, the stock list or a month of stock movements was
-most of the first page, and it grows with the warehouse. Those lists count
-only so far — `db_utils.LIST_COUNT_CAP`, ten thousand rows, two hundred pages
-of fifty — and say where they stopped:
+most of the first page, and it grows with the warehouse. Those lists, and the
+audit journal, which gains an entry for every action taken, count only so far —
+`db_utils.LIST_COUNT_CAP`, ten thousand rows, two hundred pages of fifty — and
+say where they stopped. The archived products (`GET /items/archived`) still
+count in full.
 
 - `paginate_async(..., count_cap=LIST_COUNT_CAP)` stops the count one row past
   `count_window(offset, limit, cap)`: the cap, or as far as the page reaches,
