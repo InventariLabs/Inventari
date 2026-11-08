@@ -176,26 +176,51 @@ describe("ModuleRegistry contributors", () => {
   });
 });
 
-describe("ModuleRegistry status badges", () => {
-  it("hands the launcher the badge hooks of enabled modules that have one", () => {
-    const withBadge = unique("badge");
-    const withoutBadge = unique("nobadge");
-    const hook = () => ({ count: 3, label: "open" });
+describe("ModuleRegistry.warnUnmatchedNavOverrides", () => {
+  it("names an override whose target is no navigation item", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const host = unique("navhost");
+    const overrider = unique("navoverrider");
     moduleRegistry.register({
-      name: withBadge,
-      routes: [],
-      useStatusBadge: hook,
+      name: host,
+      routes: [{ path: `/${host}`, component: Page }],
+      moduleNav: {
+        basePath: `/${host}`,
+        items: [{ path: `/${host}`, labelKey: "nav.host", icon: Home }],
+      },
     });
-    moduleRegistry.register({ name: withoutBadge, routes: [] });
+    moduleRegistry.register({
+      name: overrider,
+      routes: [],
+      navOverrides: [
+        { targetPath: `/${host}`, hidden: true },
+        { targetPath: "/inventory/labels", labelKey: "nav.codes" },
+        { targetPath: "/inventory/lokations", hidden: true },
+      ],
+    });
 
-    const providers = moduleRegistry.getStatusBadgeProviders([
-      withBadge,
-      withoutBadge,
-    ]);
+    moduleRegistry.warnUnmatchedNavOverrides([overrider]);
 
-    expect(providers).toEqual([{ moduleName: withBadge, hook }]);
-    expect(moduleRegistry.getStatusBadgeProviders([withoutBadge])).toEqual([]);
-    expect(moduleRegistry.getStatusBadgeProviders([])).toEqual([]);
+    expect(warn).toHaveBeenCalledTimes(1);
+    const said = String(warn.mock.calls[0][0]);
+    expect(said).toContain(`"${overrider}"`);
+    expect(said).toContain("/inventory/lokations");
+    expect(said).not.toContain(`/${host}`);
+    expect(said).not.toContain("/inventory/labels");
+  });
+
+  it("stays quiet for a module whose overrides all match", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const overrider = unique("navquiet");
+    moduleRegistry.register({
+      name: overrider,
+      routes: [],
+      navOverrides: [{ targetPath: "/inventory/scan", hidden: true }],
+    });
+
+    moduleRegistry.warnUnmatchedNavOverrides([overrider]);
+
+    expect(warn).not.toHaveBeenCalled();
   });
 });
 

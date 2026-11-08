@@ -172,9 +172,9 @@ releases. Do not build on them.
 
 ### User-context convention
 
-- **New write methods** take `user: UserContextDTO` (full actor context for interceptors/audit).
+- **New write methods** take `user: UserContextDTO` (full actor context for interceptors/audit). The architecture lint holds it: a public method of a `Core*` facade class whose calls reach a database write and that takes no `UserContextDTO` is an error, unless it is one of the methods written before the rule, listed in `backend/app/core/coreapi_write_user_context_baseline.txt`, which only gets shorter.
 - **Grandfathered convention:** many methods still take the actor as an id (`user_id`, `actor_user_id`, `created_by`) rather than `user: UserContextDTO` — among them the `items` stock ops, `locations.create_async`, `templates`, the `stock` lot-status calls and most partner, product-template and label writes. They are accepted as-is; don't migrate call sites just for this.
-- **System-level methods** without an actor (bootstrap/startup) may use `user_id: UUID | None` — justify in the docstring.
+- **System-level methods** without an actor (bootstrap/startup) take `user: UserContextDTO | None`, `None` standing for the system — justify it in the docstring.
 
 ### Cross-tenant security gates
 
@@ -532,7 +532,7 @@ E-mail is its own sub-API: `core_api.email.send_async(to_email, subject, html_co
 ### Database Access Exception (CQRS-Lite)
 - Always use `CoreAPI` for all standard reads and writes.
 - You may bypass CoreAPI and use direct DB access **ONLY for heavy, read-only analytics** (e.g., `GROUP BY`, window functions). Keep it in a `*_service.py` file — a convention of this repository; the linter accepts the marker in any module file.
-- To bypass the architecture linter, add `# architecture: allow_direct_db_access` and `# reason: <at least 5 words>` to the file (the position does not matter). In these files any write (`db.commit()`, `db.add(`, `db.delete(`, `db.merge(`, `session.commit()`, `session.add(`, `session.delete(`) is refused — unless the file carries a `# module_writes: <tables>` comment, which lifts the check for the whole file; use it only for tables the module owns.
+- To bypass the architecture linter, add `# architecture: allow_direct_db_access` and `# reason: <at least 5 words>` to the file (the position does not matter). In these files any write (`db.commit()`, `db.add(`, `db.delete(`, `db.merge(`, `session.commit()`, `session.add(`, `session.delete(`) is refused — unless the file carries a `# module_writes: <tables>` comment line, which lifts the check for the whole file. Every name on it must be a model class (or table name) declared in the module's own package; the lint fails a line that names anything else, a Core model included.
 
 ---
 
@@ -597,7 +597,7 @@ Backend contribution points are registered via `contribution_registry.register(p
 | `category_interceptors` | `CategoryInterceptor` | `_base_module.py`, the same way |
 | `upload_path_resolvers` | `UploadPathResolver` | `/uploads/{path}` serving route — modules own a path family under `/uploads/` and provide ownership metadata (organization, content_type) so the Core route can serve the file safely |
 
-Two more names are accepted as stable points but no backend code reads them, so registering to them reaches nothing: `scan_providers` (register scan providers with `scan_registry.register(provider, priority)` from `app.core.module_sdk`) and `dashboard_widgets` (a dashboard widget is a frontend `slots` registration).
+Every stable point has a reader in the backend, and a test holds it so. A name outside both tables is not a point: registering to it logs a warning naming the known ones, and nothing reads what was registered. That includes `scan_providers` — register scan providers with `scan_registry.register(provider, priority)` from `app.core.module_sdk` — and `dashboard_widgets`, which is a frontend `slots` registration.
 
 **Experimental points** (no consumer yet — may change before stabilization):
 | Point | Type | Status |
@@ -812,7 +812,7 @@ moduleRegistry.register({
 });
 ```
 
-`form` is a closed union (`CoreFormName`): `item_create`, `item_edit`, `storage_create`, `storage_edit`. It is not a free string — a typo used to produce a rule that silently matched nothing. Today only the item forms (`item_create`, `item_edit`) run module rules; the type accepts the storage forms, and no storage form runs them yet.
+`form` is a closed union (`CoreFormName`): `item_create` and `item_edit`, the two forms that run module rules. It is not a free string — a typo used to produce a rule that silently matched nothing — and a form is on it only while it runs the rules: the location forms run none, so they are not on it.
 
 **Rules run on submit**, after the form's own validation, and:
 
@@ -1048,9 +1048,14 @@ interface NavOverride {
 }
 ```
 
+`targetPath` is compared with a nav item's `path` as written, so a path no
+item has hides or renames nothing. In development the console names such an
+override once the modules are registered (`[ModuleRegistry] … has
+navOverrides that match no navigation item`).
+
 ### `i18nOverrides` — Replace Terms at Runtime
 
-A module can inject its own translations over the core's, overriding key terms (e.g. "Products" → "Animals"). A key names the namespace it targets — `"inventory:nav.items"` is the `nav.items` entry of the `inventory` namespace — and a key without a prefix targets `common`. A key nobody reads changes nothing and raises no warning, so take the key from the screen's own catalog. **Original translations are remembered and automatically restored when the module is disabled.**
+A module can inject its own translations over the core's, overriding key terms (e.g. "Products" → "Animals"). A key names the namespace it targets — `"inventory:nav.items"` is the `nav.items` entry of the `inventory` namespace — and a key without a prefix targets `common`. A key no catalog has changes nothing; in development the console names it (`[ModuleRegistry] … overrides … translation keys no catalog has`), so take the key from the screen's own catalog. **Original translations are remembered and automatically restored when the module is disabled.**
 
 ```typescript
 moduleRegistry.register({
@@ -1311,7 +1316,7 @@ Always run the validation script before submitting a module:
 ```bash
 python manage.py module validate --module my_module
 ```
-Use `--allow-core` only if you are working on official core modules.
+`--allow-core` skips the safety scan for the modules this repository ships, and only for those; a module of yours is scanned with it as without it.
 
 ---
 

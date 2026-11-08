@@ -209,7 +209,11 @@ describe("POLinesSection product pick", () => {
       await clearProduct();
       await pick(/ground cocoa/i);
 
-      expect(screen.queryByDisplayValue("45.00")).not.toBeInTheDocument();
+      // Both the desktop and the mobile layout render a price input, and the
+      // state may still be settling right after the pick.
+      await waitFor(() =>
+        expect(screen.queryAllByDisplayValue("45.00")).toHaveLength(0),
+      );
     });
 
     it("keeps a price typed over the proposed one when another product is picked", async () => {

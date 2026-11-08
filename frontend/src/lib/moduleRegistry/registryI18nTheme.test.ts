@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import i18n from "i18next";
 
 import type { FrontendModule } from "./moduleInterfaces";
-import { applyI18nOverrides } from "./registryI18nTheme";
+import { applyI18nOverrides, noteCatalogLanded } from "./registryI18nTheme";
 
 /**
  * The unit suite's i18n setup (src/test/mocks/i18n.ts) runs the real i18next
@@ -114,5 +114,57 @@ describe("applyI18nOverrides", () => {
 
     applyI18nOverrides([], h.modules, h.applied, h.saved);
     expect(i18n.t("inventory:nav.items")).toBe("Products");
+  });
+});
+
+describe("an override key that matches nothing", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("is named in development, and a key that exists is not", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const mod = makeModule("test-i18n-unmatched", {
+      en: {
+        "inventory:nav.items": "Assets",
+        "inventory:nav.itemz": "Assets",
+      },
+    });
+    const h = harness(mod);
+
+    applyI18nOverrides([mod.name], h.modules, h.applied, h.saved);
+    applyI18nOverrides([], h.modules, h.applied, h.saved);
+
+    const said = warn.mock.calls.map((call) => String(call[0]));
+    expect(said).toHaveLength(1);
+    expect(said[0]).toContain('"test-i18n-unmatched"');
+    expect(said[0]).toContain("inventory:nav.itemz");
+    expect(said[0]).not.toContain("inventory:nav.items,");
+  });
+
+  it("is read against a catalog that lands after the override applied", () => {
+    // No catalog yet for this language: nothing can be said at apply time,
+    // and nothing is — every key would look missing.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const mod = makeModule("test-i18n-late", {
+      xx: { "latens:title": "Renamed", "latens:titel": "Renamed" },
+    });
+    const h = harness(mod);
+
+    applyI18nOverrides([mod.name], h.modules, h.applied, h.saved);
+    expect(warn).not.toHaveBeenCalled();
+
+    noteCatalogLanded(
+      "xx",
+      "latens",
+      { title: "Original" },
+      h.modules,
+      h.applied,
+      h.saved,
+    );
+    applyI18nOverrides([], h.modules, h.applied, h.saved);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toContain("latens:titel");
   });
 });

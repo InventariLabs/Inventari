@@ -29,10 +29,10 @@ moduleRegistry.register({
       },
     ],
   },
-  // Reference implementation of `bulkActions`: the extension point had a
-  // consumer (ItemsBulkActionBar) but no producer, so nobody writing a module
-  // had an example to copy. Selecting items in inventory now shows this action
-  // whenever example_widgets is enabled.
+  // Reference implementation of `bulkActions`, the one to copy: the extension
+  // point's consumer is ItemsBulkActionBar, and printing contributes the other
+  // action in the tree (product labels). Selecting items in inventory shows
+  // this one whenever example_widgets is enabled.
   //
   // The handler is given identifiers and nothing else, so the action is named
   // after what it can actually deliver. It used to be "Export selected to CSV",
