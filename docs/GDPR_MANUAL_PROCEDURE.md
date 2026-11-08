@@ -163,10 +163,11 @@ Effects (verified by `backend/tests/integration/test_gdpr_erasure.py`):
   the address do exactly that — see the next section.
 - Outstanding tokens revoked via the token blacklist.
 
-What the command does **not** touch: the organization's
-records about the person (`equipment_assignments`, `audit_responses`, `partners`,
-the holder's name in `item_history` and `notifications`), the journal and the
-logs. The next section covers what an operator does about each.
+What the command does **not** touch, on purpose (*Records the organization
+owns*): the organization's records about the person (`equipment_assignments`,
+`audit_responses`, `partners`, the holder's name in `item_history` and
+`notifications`), the journal and the logs. The next two sections cover
+what an operator does about each.
 
 ## Records that keep the address, and what to do with them
 
@@ -280,6 +281,18 @@ exports nor scrubs them on request. The operator does it, in agreement with the
 organization that owns them. On an instance with several organizations add
 `AND organization_id = '<ORG_ID>'` to every query, so one organization's
 records are not read or changed for another.
+
+**Erasure leaves them on purpose.** `manage.py user erase` rewrites the account
+and what belongs to it — the account itself, its registration requests and the
+invitations issued for its address — and stops there. It does not scrub the
+holder of an asset, an attestation answer (its IP address and browser string
+included) or an employee or contact card, even when they carry the same
+address. Those rows are what the organization knows about who holds its
+property: an automatic scrub would erase the custody history of an asset the
+person may still hold, and could not tell whether the organization has a reason
+to keep it. Whether they stay is decided for each request, with the
+organization, by the steps below; the privacy page tells the person that these
+records are not rewritten by the deletion itself and that they can ask for them.
 
 **Export** — match on the address, and on the name where a holder was typed in
 without one (replace `<EMAIL>` and `<FULL NAME>`):

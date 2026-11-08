@@ -6,7 +6,10 @@ deactivated, which immediately rejects both JWT and API-key auth
 (``identity_service`` checks ``is_active`` on every request), and the
 token family is revoked via the blacklist as defense in depth.
 RegistrationRequest rows (pre-signup email/name) and the invitations
-issued for that address are anonymized too.
+issued for that address are anonymized too. What the organization writes
+about a person — an asset's holder, an attestation answer, a partner card —
+is left on purpose: it is the organization's custody record, which an
+automatic scrub would cut short for an asset the person may still hold.
 
 Rows with audit value (ItemHistory, AuditLog, StockMove.created_by, ...)
 keep pointing at the anonymized user. That UUID is pseudonymised, not
