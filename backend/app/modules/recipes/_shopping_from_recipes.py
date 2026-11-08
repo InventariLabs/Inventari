@@ -3,7 +3,8 @@
 One code path serves both callers — the single-recipe button on a recipe
 screen and the multi-recipe picker on a shopping list. Both answer the same
 question ("what do I still have to buy for this?"), so both run the same
-stock check, the same merge and the same skip-what-is-already-listed rule.
+stock check, the same merge and the same top-up rule for what is already
+listed.
 """
 
 from __future__ import annotations
@@ -12,7 +13,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
-from app.core.contracts import ShoppingListItemCreateDTO, ShoppingListItemDTO
+from app.core.contracts import ShoppingListItemCreateDTO, ShoppingListItemDTO, UomDTO
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.public_api import core_api
 from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
@@ -69,7 +70,9 @@ async def collect_shopping_items(
     """Aggregate what the given recipes still need, keyed by (name, unit).
 
     Returns the merged lines and the recipe names they came from — two
-    recipes wanting flour buy flour once, with the amounts added up.
+    recipes wanting flour buy flour once, with the amounts added up. Each
+    line keeps what every recipe contributed (``by_recipe``), so a later
+    press can tell what the recipes a line was not yet made for add.
 
     The amount is the *shortfall*: what the recipe asks for less what the
     shelf already holds, the same arithmetic the meal plan applies. The
@@ -113,12 +116,17 @@ async def collect_shopping_items(
                 merged[key]['quantity'] += quantity
                 if recipe.name not in merged[key]['recipes']:
                     merged[key]['recipes'].append(recipe.name)
+                by_recipe = merged[key]['by_recipe']
+                by_recipe[recipe.name] = by_recipe.get(recipe.name, Decimal(0)) + (
+                    quantity
+                )
             else:
                 merged[key] = {
                     'name': ing.name,
                     'quantity': quantity,
                     'uom_id': ing.required_uom_id,
                     'recipes': [recipe.name],
+                    'by_recipe': {recipe.name: quantity},
                 }
 
     return merged, recipe_names
@@ -148,7 +156,8 @@ async def _put_on_list(
     org_id: UUID,
     list_id: UUID,
     item: ShoppingListItemCreateDTO,
-    recipes: list[str],
+    by_recipe: dict[str, Decimal],
+    uom: UomDTO | None,
     lines: list[ShoppingListItemDTO],
     lang: Language,
 ) -> tuple[Literal['new', 'raised', 'listed'], ShoppingListItemCreateDTO]:
@@ -160,8 +169,10 @@ async def _put_on_list(
 
     A line a recipe wrote carries the recipes it was made for. The same
     recipes pressed again are covered, so a second press stays a no-op; a
-    recipe the line was not made for adds what it needs on top, on the open
-    line or as a new line when the earlier one is already bought. Lines no
+    recipe no line was made for adds what *it* needs on top (``by_recipe``
+    holds each recipe's share, so one the line already covers is not counted
+    again), on the open line or as a new line when the earlier one is
+    already bought. Lines no
     recipe wrote (typed by hand, from a meal plan) carry no such record, so
     the list asks for what the sum of them covers and a larger need adds
     only the difference.
@@ -174,14 +185,24 @@ async def _put_on_list(
         if shortfall <= 0:
             return 'listed', item
         return 'new', item.model_copy(update={'quantity': shortfall})
-    if any(set(recipes) <= set(_recipes_of(line)) for line in recipe_lines):
+    covered = {name for line in recipe_lines for name in _recipes_of(line)}
+    fresh = [name for name in by_recipe if name not in covered]
+    if not fresh:
+        return 'listed', item
+    needed = _round_shopping_qty(sum((by_recipe[n] for n in fresh), Decimal(0)), uom)
+    if needed <= 0:
         return 'listed', item
     open_line = next((line for line in recipe_lines if not line.is_purchased), None)
     if open_line is None:
-        return 'new', item
-    names = [*_recipes_of(open_line)]
-    names.extend(name for name in recipes if name not in names)
-    quantity = open_line.quantity + item.quantity
+        return 'new', item.model_copy(
+            update={
+                'quantity': needed,
+                'notes': _recipe_note(fresh, lang),
+                'note_data': _recipe_note_data(fresh),
+            }
+        )
+    names = [*_recipes_of(open_line), *fresh]
+    quantity = open_line.quantity + needed
     raised = await shopping_lists_api.raise_item_quantity_async(
         db,
         list_id,
@@ -250,7 +271,9 @@ async def add_recipes_to_shopping_list(
     uoms_by_id = {
         uom.id: uom for uom in await core_api.uoms.list_for_org_async(db, org_id)
     }
-    items: list[tuple[ShoppingListItemCreateDTO, list[str]]] = []
+    items: list[
+        tuple[ShoppingListItemCreateDTO, dict[str, Decimal], UomDTO | None]
+    ] = []
     for line in merged.values():
         uom = uoms_by_id.get(line['uom_id']) if line['uom_id'] else None
         qty = _round_shopping_qty(line['quantity'], uom)
@@ -269,7 +292,8 @@ async def add_recipes_to_shopping_list(
                     note_data=_recipe_note_data(line['recipes']),
                     source='recipe',
                 ),
-                line['recipes'],
+                line['by_recipe'],
+                uom,
             )
         )
 
@@ -284,10 +308,10 @@ async def add_recipes_to_shopping_list(
     # nothing and said "Added 0 items", which reads as "nothing was
     # missing" or "it failed" — the count lets the screen say which.
     already_listed = 0
-    for item, recipes in items:
+    for item, by_recipe, uom in items:
         lines = lines_by_key.get((item.name.strip().lower(), item.uom_id), [])
         outcome, placed = await _put_on_list(
-            db, org_id, list_id, item, recipes, lines, lang
+            db, org_id, list_id, item, by_recipe, uom, lines, lang
         )
         if outcome == 'new':
             new_items.append(placed)

@@ -316,6 +316,13 @@ says what the release does rather than what changed since them.
   It used to leave the line at the quantity it was first generated with and
   still count the plan as listed. A line already ticked off keeps its quantity,
   and the rest is added as a new line; a line is never lowered.
+- A shopping list now tops up a line that is already on it, instead of treating
+  the line as covered whatever its quantity. A recipe added to a list that
+  carries its ingredient raises the line by what that recipe needs (recipes the
+  line was already made for add nothing, so the same recipe again changes
+  nothing), and a production run's shortage raises the listed line when the run
+  needs more. A line already ticked off keeps its quantity and the rest becomes
+  a new line.
 - A custom purchase order template now prints the values its editor lists for
   `{{po_number}}`, `{{po_date}}`, `{{po_status}}`, `{{vendor_name}}`,
   `{{vendor_tax_id}}`, `{{vendor_address}}`, `{{lines_count}}` and
@@ -1136,9 +1143,7 @@ lists every public surface and the promise its class makes.
   can be undone. **Cook step by step** shows one instruction at a time with
   timers. A recipe's availability panel puts what is missing or short on the
   shopping list, in the quantity you are short of (the whole amount where the
-  units cannot be compared). Added to a list that already carries an ingredient, the
-  line is topped up by what the recipe needs; the same recipe added again changes
-  nothing. A production run's shortage tops up its lines the same way. With the Production module on, a recipe also
+  units cannot be compared). With the Production module on, a recipe also
   offers **Cook a batch for stock**, which starts a production order.
 - **Estimates read off the ingredients**: nutrition per serving, the cost
   from what the stock cost (else supplier prices, else a price typed on the

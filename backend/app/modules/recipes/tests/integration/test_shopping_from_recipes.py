@@ -522,6 +522,72 @@ class TestARecipeOnTheListTwice:
             (True, Decimal('200')),
         ]
 
+    @pytest.mark.parametrize('bought', [False, True])
+    def test_a_press_naming_a_listed_recipe_adds_only_the_new_recipes_need(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        bought: bool,
+    ) -> None:
+        """Bread (200 g) listed, then Bread + Cake (300 g) pressed together.
+
+        Both recipes need 500 g. The press carries the merge of *both*, so
+        topping the line up by all of it asked for 700 g, counting Bread's
+        200 g twice; the line is raised by Cake's 300 g alone. With the
+        Bread line already bought, Cake's 300 g is a new line instead.
+        """
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        cake = _recipe(
+            client,
+            auth_headers,
+            'Cake',
+            [{'name': 'Flour', 'quantity': '300', 'uom_id': grams}],
+        )
+        list_id = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 1},
+            headers=auth_headers,
+        ).json()['shopping_list_id']
+        list_url = f'/api/v1/shopping-lists/{list_id}'
+        if bought:
+            line = client.get(f'{list_url}/items', headers=auth_headers).json()[
+                'items'
+            ][0]
+            client.patch(
+                f'{list_url}/items/{line["id"]}/purchase', headers=auth_headers
+            )
+
+        body = client.post(
+            ADD_URL,
+            json={
+                'recipe_ids': [bread, cake],
+                'servings': 1,
+                'shopping_list_id': list_id,
+            },
+            headers=auth_headers,
+        ).json()
+
+        assert (body['added_count'], body['raised_count']) == (
+            (1, 0) if bought else (0, 1)
+        )
+        lines = client.get(
+            f'{list_url}?purchased_filter=all', headers=auth_headers
+        ).json()['items']
+        assert sum(Decimal(str(i['quantity'])) for i in lines) == Decimal('500')
+        open_lines = [i for i in lines if not i['is_purchased']]
+        assert len(open_lines) == 1
+        # The new line is for Cake only; the raised one for both.
+        assert open_lines[0]['note_data']['for_recipe'] == (
+            'Cake' if bought else 'Bread, Cake'
+        )
+
     def test_the_list_it_creates_is_not_named_after_the_recipe(
         self,
         client: TestClient,

@@ -1176,9 +1176,10 @@ async def add_shortages_to_shopping_list(
 
     Short by the same verdict completion refuses with, and as much as is
     missing, in each ingredient's stock unit — the unit it is bought and
-    received in. An ingredient already on that list is not added twice, and
-    one whose measure cannot be compared with its stock has no quantity to
-    buy and is left out. Nothing short, nothing touched.
+    received in. An ingredient already on that list is topped up to what the
+    run needs (never lowered), and one whose measure cannot be compared with
+    its stock has no quantity to buy and is left out. Nothing short, nothing
+    touched.
     """
     from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
 
