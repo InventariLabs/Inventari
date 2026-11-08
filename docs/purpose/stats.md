@@ -25,7 +25,10 @@ the overview (`show_inventory_value`).
 
 ## Deliberately not done
 - **No writing, ever.** Every route reads and its only permission is `stats:read`, deliberately:
-  a screen that reports and also changes cannot be trusted to do either.
+  a screen that reports and also changes cannot be trusted to do either. The scheduled
+  reconciliation pass the reconciliation tab compares against is not this module's: it is a Core
+  job, which stores what it measured under a Core setting and warns the organization's
+  administrators when a drift appears or stands. The tab only reads what it stored.
 - **No report builder.** No custom dimensions, no saved queries, no pivot designer.
 - **No scheduled reports by mail.** Reaching a person is the notification subsystem's job.
 - **No prediction sold as fact.** A forecast is labelled as one or it is not shown.

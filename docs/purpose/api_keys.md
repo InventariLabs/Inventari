@@ -38,8 +38,11 @@ key register itself sits behind the settings permission, so no key reaches it ei
 - **No more than the issuer holds.** A key is issued from what its creator holds, so a key can never
   be a way round one's own permissions. Existing keys kept the set they had when per-key lists were
   introduced; only a newly issued key starts read-only.
-- **No administration through a key.** Deleting products, organization settings, AI connections and
-  the key register itself stay with a person signed in.
+- **No administration through a key.** Organization settings, members, AI connections, the
+  installation's configuration and the key register itself stay with a person signed in. Deleting
+  and purging products is not on that list: `items:delete` and `items:purge` are permissions like
+  any other write, ticked on a key only on purpose and only by an issuer who holds them (an
+  administrator, by default).
 - **No third-party app consent.** This is not OAuth; nobody grants anybody anything.
 - **No shared keys.** A key belongs to one account, so that revoking it has a knowable consequence.
 
