@@ -11,9 +11,10 @@ from app.core.deps import (
     require_org,
     require_permission,
 )
-from app.core.exceptions import ConflictException
+from app.core.exceptions import ConflictException, NotFoundException
 from app.core.module_sdk import PaginatedResponse
 
+from ._assets_service import get_asset_async
 from ._overdue_service import list_overdue_assignments
 from .schemas import (
     AssignmentCheckin,
@@ -92,6 +93,10 @@ async def item_assignment_history(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> Any:
+    # The History tab of the card, archived asset included; a record the
+    # register does not list has no history here, not an empty one.
+    if await get_asset_async(db, org_id, item_id, include_archived=True) is None:
+        raise NotFoundException('item')
     rows = await get_item_assignment_history(
         db, org_id, item_id, limit=limit, offset=offset
     )

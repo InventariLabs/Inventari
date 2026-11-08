@@ -3,6 +3,7 @@ Unit tests for attachment_service — validation logic.
 """
 
 import logging
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -11,6 +12,7 @@ from uuid import uuid4
 import pytest
 
 from app.core.exceptions import NotFoundException
+from app.modules.equipment import attachment_service
 from app.modules.equipment.attachment_service import (
     ATTACHMENT_POLICY,
     MAX_FILE_SIZE,
@@ -20,6 +22,14 @@ from app.modules.equipment.attachment_service import (
     list_attachments,
     upload_attachment,
 )
+
+from ._mocked_asset_read import asset_read_through
+
+
+@pytest.fixture(autouse=True)
+def _asset_read_through_the_mock() -> Iterator[None]:
+    with asset_read_through(attachment_service, lambda: attachment_service.core_api):
+        yield
 
 
 @pytest.fixture(autouse=True)

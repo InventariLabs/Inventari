@@ -10,6 +10,7 @@ from app.core.datetimes import parse_iso_date
 from app.core.money import quantise
 from app.core.public_api import core_api
 
+from ._assets_service import get_asset_async
 from ._schemas_equipment import (
     FleetValuation,
     FleetValuationByCategory,
@@ -146,7 +147,7 @@ async def get_asset_valuation_async(
 ) -> dict[str, Any] | None:
     # Reads for the card's Info tab survive the archive. The asset's book
     # value stays a fact about the record an archived asset still is.
-    item = await core_api.items.get_any_async(db, org_id, item_id)
+    item = await get_asset_async(db, org_id, item_id, include_archived=True)
     if not item:
         return None
 

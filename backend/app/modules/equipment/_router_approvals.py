@@ -7,11 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import UserContextDTO
 from app.core.deps import get_async_db, get_current_user_context, require_org
 from app.core.exceptions import ConflictException, NotFoundException, refusal_code
-from app.core.public_api import core_api
 from app.modules.approvals.approvals_api import approvals_api
 from app.modules.approvals.exceptions import ApprovalError as ApprovalsApprovalError
 
 from ._approval_checkout import checkout_request_meta
+from ._assets_service import get_asset_async
 from .schemas import (
     ApprovalActionResponse,
     CheckoutApprovalAsk,
@@ -28,16 +28,13 @@ _TARGET_TYPE = 'equipment_checkout'
 async def _require_item(
     db: AsyncSession, org_id: UUID, item_id: UUID, *, include_archived: bool = False
 ) -> None:
-    """Validate the item exists in the org, else raise NotFoundException.
+    """Validate the item is one of the register's assets, else raise NotFoundException.
 
     ``include_archived`` is for the status read — the card renders for an
     archived asset too. Requesting approval stays live-only: the ask is a
     write about an asset in service, and an archived one is not.
     """
-    if include_archived:
-        item = await core_api.items.get_any_async(db, org_id, item_id)
-    else:
-        item = await core_api.items.get_async(db, org_id, item_id)
+    item = await get_asset_async(db, org_id, item_id, include_archived=include_archived)
     if item is None:
         raise NotFoundException('item')
 

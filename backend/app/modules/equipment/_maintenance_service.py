@@ -15,6 +15,7 @@ from app.core.logging import get_logger
 from app.i18n import Language
 from app.i18n.service import get_current_lang, get_error_message
 
+from ._assets_service import get_asset_async
 from ._unit_identity import audit_identity
 from .models import EquipmentAssignment, EquipmentMaintenanceLog
 from .schemas import MaintenanceLogCreate, MaintenanceLogSchema, MaintenanceLogUpdate
@@ -115,7 +116,7 @@ async def create_log(
     from app.core.public_api import core_api
 
     lang = get_current_lang()
-    item = await core_api.items.get_async(db, org_id, data.item_id)
+    item = await get_asset_async(db, org_id, data.item_id)
     if not item:
         raise NotFoundException('item', lang)
 
@@ -271,7 +272,7 @@ async def retire_item(
     from app.core.public_api import core_api
 
     lang = get_current_lang()
-    item = await core_api.items.get_async(db, org_id, item_id)
+    item = await get_asset_async(db, org_id, item_id)
     if not item:
         raise NotFoundException('item', lang)
 
@@ -325,6 +326,8 @@ async def archive_item(
     from app.core.public_api import core_api
 
     lang = get_current_lang()
+    if await get_asset_async(db, org_id, item_id) is None:
+        raise NotFoundException('item', lang)
     deleted = await core_api.items.soft_delete_async(
         db, org_id, item_id, user, reason='ARCHIVED'
     )
@@ -349,12 +352,10 @@ async def count_item_logs(db: AsyncSession, org_id: UUID, item_id: UUID) -> int:
 async def get_item_logs(
     db: AsyncSession, org_id: UUID, item_id: UUID, limit: int = 50, offset: int = 0
 ) -> list[MaintenanceLogSchema]:
-    from app.core.public_api import core_api
-
     lang = get_current_lang()
     # The Maintenance tab is part of the archived card — the log is the
     # record of what was done to the asset, which archiving does not undo.
-    item = await core_api.items.get_any_async(db, org_id, item_id)
+    item = await get_asset_async(db, org_id, item_id, include_archived=True)
     if not item:
         raise NotFoundException('item', lang)
     result = await db.execute(

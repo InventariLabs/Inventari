@@ -68,9 +68,12 @@ a register of the whole organization it is also the reach. `GET /items` and
 the stock ledger are not opened by a module's read; `/items/archived` answers
 a module's reader only under that module's `module_scope` and refuses an
 unscoped ask, `/items/{id}` answers 404 for a record the module does not
-claim, and the pool label sheet draws only labels assigned to the module's
-records and refuses the free pool (`claimed_by_module` in
-`app/core/module_ownership.py` is what "its own" means). Creating a category,
+claim, and the pool label sheet — downloaded, or sent to a printer through the
+print queue — draws only labels assigned to the module's records and refuses
+the free pool (`claimed_by_module` in `app/core/module_ownership.py` is what
+"its own" means). The module's own routes that name one record keep to the
+same records: the equipment register's per-asset routes answer 404 for a
+product the register does not list, whoever asks. Creating a category,
 changing a shelf, editing a record or purging an archive keeps the core write
 key. The full list of the admissions is
 `_NAMED_ALSO_READ_BY_A_MODULE_READ` in
