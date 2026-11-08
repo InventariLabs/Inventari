@@ -402,6 +402,149 @@ class TestProductTemplateNutritionFromOFF:
 
 
 @pytest.mark.integration
+class TestScanFiguresReachAnExistingProduct:
+    """A scan onto a product that already exists gives that product its figures.
+
+    A recipe reads the product's nutrition, not the record's, so figures left
+    on the record alone never reach it.
+    """
+
+    _SCAN = {
+        'source': 'local_off_db',
+        'off_enriched': True,
+        'nutrition': {'energy_kcal': 321.0, 'proteins': 12.0},
+    }
+
+    async def _scan_onto(self, db, user, storage_location, template, *, named=True):
+        from decimal import Decimal
+
+        from app.schemas.item import ItemCreate
+        from app.services.items import create_item
+
+        item = await create_item(
+            db,
+            ItemCreate(
+                name=template.name,
+                template_id=template.id if named else None,
+                location_id=storage_location.id,
+                quantity=Decimal('1'),
+                metadata=self._SCAN,
+            ),
+            user,
+        )
+        assert item.template_id == template.id
+        await db.refresh(template)
+
+    @pytest.mark.asyncio
+    async def test_a_cleared_nutrition_panel_takes_the_figures(
+        self, real_async_db_session, async_test_storage_location, async_test_user
+    ):
+        """Clearing every field in the editor stores ``{'nutrition': {}}``."""
+        template = ProductTemplate(
+            organization_id=async_test_user.organization_id,
+            name='Own cleared flour',
+            meta_data={'nutrition': {}},
+        )
+        real_async_db_session.add(template)
+        await real_async_db_session.flush()
+
+        await self._scan_onto(
+            real_async_db_session,
+            async_test_user,
+            async_test_storage_location,
+            template,
+        )
+
+        assert get_template_nutrition(template) == {
+            'calories_kcal': 321.0,
+            'protein_g': 12.0,
+        }
+
+    @pytest.mark.asyncio
+    async def test_the_matched_product_takes_the_figures_too(
+        self, real_async_db_session, async_test_storage_location, async_test_user
+    ):
+        """No ``template_id``: the product the name matches is the one given."""
+        template = ProductTemplate(
+            organization_id=async_test_user.organization_id,
+            name='Own matched flour',
+        )
+        real_async_db_session.add(template)
+        await real_async_db_session.flush()
+
+        await self._scan_onto(
+            real_async_db_session,
+            async_test_user,
+            async_test_storage_location,
+            template,
+            named=False,
+        )
+
+        assert get_template_nutrition(template) == {
+            'calories_kcal': 321.0,
+            'protein_g': 12.0,
+        }
+
+    @pytest.mark.asyncio
+    async def test_own_product_without_figures_takes_them(
+        self, real_async_db_session, async_test_storage_location, async_test_user
+    ):
+        template = ProductTemplate(
+            organization_id=async_test_user.organization_id, name='Own plain flour'
+        )
+        real_async_db_session.add(template)
+        await real_async_db_session.flush()
+
+        await self._scan_onto(
+            real_async_db_session,
+            async_test_user,
+            async_test_storage_location,
+            template,
+        )
+
+        nutrition = get_template_nutrition(template)
+        assert nutrition == {'calories_kcal': 321.0, 'protein_g': 12.0}
+
+    @pytest.mark.asyncio
+    async def test_figures_already_on_the_product_stay(
+        self, real_async_db_session, async_test_storage_location, async_test_user
+    ):
+        template = ProductTemplate(
+            organization_id=async_test_user.organization_id,
+            name='Own typed flour',
+            meta_data={'nutrition': {'calories_kcal': 100.0}},
+        )
+        real_async_db_session.add(template)
+        await real_async_db_session.flush()
+
+        await self._scan_onto(
+            real_async_db_session,
+            async_test_user,
+            async_test_storage_location,
+            template,
+        )
+
+        assert get_template_nutrition(template) == {'calories_kcal': 100.0}
+
+    @pytest.mark.asyncio
+    async def test_shared_product_is_never_written_to(
+        self, real_async_db_session, async_test_storage_location, async_test_user
+    ):
+        template = ProductTemplate(organization_id=None, name='Shared plain flour')
+        real_async_db_session.add(template)
+        await real_async_db_session.flush()
+
+        await self._scan_onto(
+            real_async_db_session,
+            async_test_user,
+            async_test_storage_location,
+            template,
+        )
+
+        assert get_template_nutrition(template) is None
+
+
+@pytest.mark.integration
 class TestReductionReasonIsRecorded:
     """The reason a quantity went down survives the request that carried it."""
 
