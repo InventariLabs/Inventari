@@ -24,10 +24,17 @@ _REPO_ROOT = Path(
 )
 
 
-def test_the_production_database_runs_with_jit_off():
-    compose = yaml.safe_load(
-        (_REPO_ROOT / 'docker-compose.prod.yml').read_text(encoding='utf-8')
-    )
+@pytest.mark.parametrize(
+    'compose_file',
+    [
+        'docker-compose.prod.yml',
+        # The warehouse-scale measurement tunes the database "as production
+        # does": measured with JIT on, it timed a compile production never pays.
+        'docker-compose.scale.yml',
+    ],
+)
+def test_the_database_runs_with_jit_off(compose_file: str):
+    compose = yaml.safe_load((_REPO_ROOT / compose_file).read_text(encoding='utf-8'))
     command = compose['services']['db']['command'].split()
     assert '-c' in command
     settings = {command[i + 1] for i, word in enumerate(command) if word == '-c'}

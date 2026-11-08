@@ -581,10 +581,8 @@ async def preview_focus_mode_endpoint(
         plan = preview_focus_mode(
             organization=organization, focus_module=body.module_name
         )
-    except FocusModeError as exc:
-        raise AppException(status_code=409, code=exc.code, message=str(exc)) from exc
-    except ProfileSwitchError as exc:
-        raise AppException(status_code=409, code=exc.code, message=str(exc)) from exc
+    except (FocusModeError, ProfileSwitchError) as exc:
+        raise exc.conflict() from exc
     return FocusModeResponse(
         applied=False,
         focus_module=body.module_name,
@@ -608,10 +606,8 @@ async def enter_focus_mode_endpoint(
             focus_module=body.module_name,
             user=current_user,
         )
-    except FocusModeError as exc:
-        raise AppException(status_code=409, code=exc.code, message=str(exc)) from exc
-    except ProfileSwitchError as exc:
-        raise AppException(status_code=409, code=exc.code, message=str(exc)) from exc
+    except (FocusModeError, ProfileSwitchError) as exc:
+        raise exc.conflict() from exc
     except FocusModeApplyError:
         logger.exception('Entering focus mode failed')
         raise AppException(
@@ -655,7 +651,7 @@ async def exit_focus_mode_endpoint(
             db=db, organization=organization, user=current_user
         )
     except FocusModeError as exc:
-        raise AppException(status_code=409, code=exc.code, message=str(exc)) from exc
+        raise exc.conflict() from exc
     except FocusModeApplyError:
         logger.exception('Leaving focus mode failed')
         raise AppException(
