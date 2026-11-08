@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/Button";
+import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
 import {
   Sheet,
@@ -142,11 +143,11 @@ export default function PartlyUsedSheet({
           </p>
         )}
         <div className="mt-4">
-          <Input
-            type="date"
+          <DateInput
             label={t("stockActions.useByLabel")}
             value={useBy}
-            onChange={(e) => setUseBy(e.target.value)}
+            onChange={setUseBy}
+            presets={["plus1Week", "plus1Month"]}
           />
         </div>
       </SheetBody>

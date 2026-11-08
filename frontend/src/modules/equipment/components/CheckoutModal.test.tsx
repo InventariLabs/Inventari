@@ -32,14 +32,18 @@ vi.mock("@/components/ui/DateInput", () => ({
     label: string;
     value: string;
     min?: string;
+    error?: string;
     onChange: (value: string) => void;
   }) => (
-    <input
-      aria-label={props.label}
-      value={props.value}
-      data-min={props.min}
-      onChange={(e) => props.onChange(e.target.value)}
-    />
+    <>
+      <input
+        aria-label={props.label}
+        value={props.value}
+        data-min={props.min}
+        onChange={(e) => props.onChange(e.target.value)}
+      />
+      {props.error && <p role="alert">{props.error}</p>}
+    </>
   ),
 }));
 

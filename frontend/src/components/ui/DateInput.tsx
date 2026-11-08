@@ -154,6 +154,7 @@ export function DateInput({
   const generatedId = useId();
   const triggerId = id ?? generatedId;
   const panelId = `${triggerId}-panel`;
+  const errorId = `${triggerId}-error`;
 
   const selected = parseValue(value);
   const [focusedDay, setFocusedDay] = useState<Date>(selected ?? today());
@@ -364,6 +365,8 @@ export function DateInput({
       aria-controls={panelId}
       aria-label={ariaLabel}
       aria-required={required}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={error ? errorId : undefined}
       onClick={() => setOpen((o) => !o)}
       className={cn(
         // One control scale (UI_GUIDELINES §2.10) — this trigger was 44px tall
@@ -402,6 +405,15 @@ export function DateInput({
         </label>
       )}
       {control}
+      {error && (
+        <p
+          id={errorId}
+          role="alert"
+          className="text-xs text-red-600 font-medium ml-1"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 

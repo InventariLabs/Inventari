@@ -194,11 +194,6 @@ export function PricelistFormModal({
               error={submitted ? validToError : undefined}
               onChange={(value) => onChange({ ...form, validTo: value })}
             />
-            {submitted && validToError && (
-              <p role="alert" className="text-xs text-red-600 font-medium ml-1">
-                {validToError}
-              </p>
-            )}
           </div>
         </div>
 

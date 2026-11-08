@@ -20,8 +20,8 @@ interface DateInputNavProps {
  *
  * The year arrows are not decoration: with month steps alone, a date three
  * years out costs 36 clicks on the chevron, which is what the shortcut bar
- * above the calendar kept being asked to paper over. Anything within ±5 years
- * is at most three clicks from here.
+ * above the calendar kept being asked to paper over. A year arrow steps one
+ * year a click, so a date three years out is three clicks, not 36.
  */
 export function DateInputNav({
   monthLabel,

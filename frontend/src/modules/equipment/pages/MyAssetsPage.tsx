@@ -235,7 +235,7 @@ export default function MyAssetsPage() {
                     </Link>
                     <p className="text-xs text-on-muted">
                       {formatDate(h.checked_out_at)} —{" "}
-                      {h.checked_in_at ? formatDate(h.checked_in_at) : "..."}
+                      {h.checked_in_at ? formatDate(h.checked_in_at) : "…"}
                     </p>
                   </div>
                   {h.checkin_condition && (

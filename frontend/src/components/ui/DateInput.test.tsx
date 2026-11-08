@@ -205,6 +205,21 @@ describe("DateInput", () => {
     expect(onChange).toHaveBeenCalledWith("2026-08-22");
   });
 
+  it("says why it is invalid, linked to the trigger that carries the red border", () => {
+    render(<DateInput value="" onChange={vi.fn()} error="Pick a day" />);
+
+    const message = screen.getByRole("alert");
+    expect(message).toHaveTextContent("Pick a day");
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "aria-describedby",
+      message.id,
+    );
+  });
+
   it("can be cleared when the field is not required", () => {
     const onChange = vi.fn();
     render(<DateInput value="2026-08-15" onChange={onChange} />);
