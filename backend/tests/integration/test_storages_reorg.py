@@ -428,6 +428,159 @@ class TestStorageReorg:
             assert 'constraint' not in rejection['reason'].lower()
         assert self._get(client, auth_headers, loose.id).json()['parent_id'] is None
 
+    def test_deleting_a_place_names_the_child_that_would_collide(
+        self, client, auth_headers, db_session, test_user
+    ):
+        """The refusal says which child meets which name, not 'references'."""
+        parent = self._make_storage(db_session, test_user, 'Shelf')
+        self._make_storage(db_session, test_user, 'Crate')
+        self._make_storage(db_session, test_user, 'Crate', parent_id=parent.id)
+
+        response = client.delete(f'/api/v1/locations/{parent.id}', headers=auth_headers)
+
+        assert response.status_code == status.HTTP_409_CONFLICT, response.text
+        detail = response.json()['detail']
+        assert detail['code'] == 'STORAGE_DELETE_BLOCKED_BY_CHILD_NAME', detail
+        assert '"Crate"' in detail['message']
+        assert 'referenced' not in detail['message']
+        assert self._get(client, auth_headers, parent.id).status_code == 200
+
+    def test_the_name_collision_on_delete_is_told_in_the_readers_language(
+        self, client, auth_headers, db_session, test_user
+    ):
+        parent = self._make_storage(db_session, test_user, 'Shelf')
+        self._make_storage(db_session, test_user, 'Crate')
+        self._make_storage(db_session, test_user, 'Crate', parent_id=parent.id)
+
+        response = client.delete(
+            f'/api/v1/locations/{parent.id}',
+            headers={**auth_headers, 'Accept-Language': 'de'},
+        )
+
+        assert response.status_code == status.HTTP_409_CONFLICT, response.text
+        message = response.json()['detail']['message']
+        assert '„Crate“' in message
+        assert 'Constraint' not in message
+
+    def test_a_mover_listed_before_its_twin_is_still_refused(
+        self, client, auth_headers, db_session, test_user
+    ):
+        """The clash is found whichever of the two the snapshot lists first."""
+        loose = self._make_storage(db_session, test_user, 'Box')
+        site = self._make_storage(db_session, test_user, 'Site')
+        self._make_storage(db_session, test_user, 'Box', parent_id=site.id)
+        operations = [{'op': 'move', 'id': str(loose.id), 'parent_id': str(site.id)}]
+
+        for dry_run in (True, False):
+            body = client.post(
+                '/api/v1/locations/reorg',
+                headers=auth_headers,
+                json={'operations': operations, 'dry_run': dry_run},
+            ).json()
+            assert body['applied'] is False
+            assert len(body['rejections']) == 1, body
+            reason = body['rejections'][0]['reason']
+            assert '"Box"' in reason
+            assert 'SQL' not in reason and 'constraint' not in reason.lower()
+
+    def test_two_places_moved_onto_one_parent_under_one_name_are_refused(
+        self, client, auth_headers, db_session, test_user
+    ):
+        site = self._make_storage(db_session, test_user, 'Site')
+        first = self._make_storage(db_session, test_user, 'Box')
+        other_parent = self._make_storage(db_session, test_user, 'Other')
+        second = self._make_storage(
+            db_session, test_user, 'Box', parent_id=other_parent.id
+        )
+
+        body = self._reorg(
+            client,
+            auth_headers,
+            [
+                {'op': 'move', 'id': str(first.id), 'parent_id': str(site.id)},
+                {'op': 'move', 'id': str(second.id), 'parent_id': str(site.id)},
+            ],
+        ).json()
+
+        assert body['applied'] is False
+        assert body['rejections'], body
+        assert all('"Box"' in r['reason'] for r in body['rejections'])
+
+    def test_deleting_a_place_while_moving_its_namesake_child_up_applies(
+        self, client, auth_headers, db_session, test_user
+    ):
+        """The final tree holds one 'Box' on the level; the order of the
+        writes on the way there is not the person's business."""
+        parent = self._make_storage(db_session, test_user, 'Box')
+        child = self._make_storage(db_session, test_user, 'Box', parent_id=parent.id)
+        parent_id, child_id = parent.id, child.id
+
+        response = self._reorg(
+            client,
+            auth_headers,
+            [
+                {'op': 'delete', 'id': str(parent_id)},
+                {'op': 'move', 'id': str(child_id), 'parent_id': None},
+            ],
+        )
+
+        body = response.json()
+        assert body['applied'] is True, body
+        assert self._get(client, auth_headers, parent_id).status_code == 404
+        moved = self._get(client, auth_headers, child_id).json()
+        assert moved['parent_id'] is None
+        assert moved['name'] == 'Box'
+
+    def test_swapping_two_namesakes_between_two_parents_applies(
+        self, client, auth_headers, db_session, test_user
+    ):
+        first_parent = self._make_storage(db_session, test_user, 'P1')
+        second_parent = self._make_storage(db_session, test_user, 'P2')
+        first = self._make_storage(
+            db_session, test_user, 'Box', parent_id=first_parent.id
+        )
+        second = self._make_storage(
+            db_session, test_user, 'Box', parent_id=second_parent.id
+        )
+        ids = (first.id, second.id, first_parent.id, second_parent.id)
+
+        body = self._reorg(
+            client,
+            auth_headers,
+            [
+                {'op': 'move', 'id': str(ids[0]), 'parent_id': str(ids[3])},
+                {'op': 'move', 'id': str(ids[1]), 'parent_id': str(ids[2])},
+            ],
+        ).json()
+
+        assert body['applied'] is True, body
+        for node_id, parent_id in ((ids[0], ids[3]), (ids[1], ids[2])):
+            row = self._get(client, auth_headers, node_id).json()
+            assert row['parent_id'] == str(parent_id)
+            assert row['name'] == 'Box'
+
+    def test_a_place_may_be_recreated_under_its_deleted_name(
+        self, client, auth_headers, db_session, test_user
+    ):
+        site = self._make_storage(db_session, test_user, 'Site')
+        old = self._make_storage(db_session, test_user, 'Box', parent_id=site.id)
+
+        body = self._reorg(
+            client,
+            auth_headers,
+            [
+                {'op': 'delete', 'id': str(old.id)},
+                {
+                    'op': 'create',
+                    'temporary_id': 't1',
+                    'name': 'Box',
+                    'parent_id': str(site.id),
+                },
+            ],
+        ).json()
+
+        assert body['applied'] is True, body
+
 
 @pytest.mark.integration
 class TestStorageReorgDepth:

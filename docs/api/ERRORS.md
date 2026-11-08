@@ -653,6 +653,7 @@ apart.
 | `STORAGE_CODE_TEMPLATE_INVALID` | The code template '{template}' cannot be used. Write placeholders such as {{zone}}-{{rack:02}}-{{level:02}}, with a separator between them, or a prefix of up to five letters and digits such as LOC |
 | `STORAGE_CODE_TEMPLATE_NOT_TREE` | This warehouse draws random codes: give it a template with placeholders, such as {zone}-{rack:02}-{level:02}, before numbering its locations |
 | `STORAGE_CODE_TEMPLATE_NOT_WAREHOUSE` | A code template belongs to a warehouse, a location at the top of the tree |
+| `STORAGE_DELETE_BLOCKED_BY_CHILD_NAME` | Cannot delete storage location "{location}": its child location "{name}" would end up beside another location with the same name once it moves up a level. Rename one of them first. |
 | `STORAGE_DELETE_BLOCKED_BY_MOVEMENTS` | Cannot delete storage location: {count} stock movements reference it. The movement history is immutable — archive this location instead. |
 | `STORAGE_DELETE_BLOCKED_BY_REFERENCES` | Cannot delete storage location: it is still referenced by other records (constraint "{constraint}"). Archive it instead. |
 | `STORAGE_DELETE_BLOCKED_BY_STOCK` | Cannot delete storage location: the stock register still holds stock here with no record standing on it. Archive this location instead, or bring its stock back to a record first. |
