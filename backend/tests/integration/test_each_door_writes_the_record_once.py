@@ -56,8 +56,8 @@ def _writes_of_the_number(db: AsyncSession) -> Iterator[list[str]]:
     seen: list[str] = []
 
     def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
-        # A harness may lead the statement with a comment naming who sent it
-        # (the drift detector does); the statement is what follows.
+        # A statement led by a comment naming who sent it is still the
+        # statement that follows the comment.
         text = re.sub(r'^/\*.*?\*/', '', ' '.join(statement.split()), flags=re.S)
         text = text.strip().lower()
         if text.startswith('insert into items ') or (
