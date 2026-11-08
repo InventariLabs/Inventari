@@ -536,15 +536,36 @@ test-e2e: ## Run Playwright E2E tests (restarts backend with TESTING=true)
 	@# The password-reset spec needs the TESTING-only _dev_token route, which
 	@# is only registered when settings.TESTING=true. Run the whole block in
 	@# one shell so the EXIT trap restores the original mode after tests.
+	@# The dev server is restarted too, without its hot-reload channel: Vite
+	@# watches the mounted tree and reloads every open page when a file it
+	@# cannot hot-update changes (an i18n JSON; a checkout, a rebase or a
+	@# commit hook is enough), which fails a spec whose state lives between
+	@# two actions. The trap puts hot reload back for whoever edits next.
 	@set -e; \
 	prev_testing=$$($(DOCKER_COMPOSE) exec -T backend printenv TESTING 2>/dev/null | tr -d '\r' || echo false); \
 	prev_testing=$${prev_testing:-false}; \
+	prev_hmr=$$($(DOCKER_COMPOSE) exec -T frontend printenv VITE_DISABLE_HMR 2>/dev/null | tr -d '\r' || true); \
+	restore() { \
+		if [ "$$prev_testing" != "true" ]; then \
+			echo "$(YELLOW)[INFO]$(NC) Restoring backend to TESTING=$$prev_testing..."; \
+			TESTING=$$prev_testing $(DOCKER_COMPOSE) up -d backend >/dev/null; \
+		fi; \
+		if [ "$$prev_hmr" != "1" ]; then \
+			echo "$(YELLOW)[INFO]$(NC) Restoring the dev server's hot reload..."; \
+			VITE_DISABLE_HMR=$$prev_hmr $(DOCKER_COMPOSE) up -d --no-deps frontend >/dev/null; \
+		fi; \
+	}; \
+	trap restore EXIT; \
 	if [ "$$prev_testing" != "true" ]; then \
 		echo "$(YELLOW)[INFO]$(NC) Restarting backend with TESTING=true..."; \
 		TESTING=true TESTING_ACK_UNSAFE=true $(DOCKER_COMPOSE) up -d backend >/dev/null; \
 		bcid=$$($(DOCKER_COMPOSE) ps -q backend); \
 		n=0; until [ "$$(docker inspect -f '{{.State.Health.Status}}' $$bcid 2>/dev/null)" = "healthy" ] || [ $$n -ge 60 ]; do n=$$((n+1)); sleep 1; done; \
-		trap 'echo "$(YELLOW)[INFO]$(NC) Restoring backend to TESTING='"$$prev_testing"'..."; TESTING='"$$prev_testing"' $(DOCKER_COMPOSE) up -d backend >/dev/null' EXIT; \
+	fi; \
+	if [ "$$prev_hmr" != "1" ]; then \
+		echo "$(YELLOW)[INFO]$(NC) Restarting the dev server without hot reload..."; \
+		VITE_DISABLE_HMR=1 $(DOCKER_COMPOSE) up -d --no-deps frontend >/dev/null; \
+		n=0; until $(DOCKER_COMPOSE) exec -T frontend node -e "fetch('http://127.0.0.1:5173/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))" >/dev/null 2>&1 || [ $$n -ge 90 ]; do n=$$((n+1)); sleep 1; done; \
 	fi; \
 	cd frontend && npx playwright test --reporter=list
 
