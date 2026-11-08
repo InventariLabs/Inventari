@@ -21,6 +21,14 @@ const navigate = vi.hoisted(() => vi.fn());
 vi.mock("react-router-dom", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react-router-dom")>()),
   useNavigate: () => navigate,
+  // Rendered without a router: no list's picking sheet handed anything over.
+  useLocation: () => ({
+    pathname: "/warehouse/documents/doc-1",
+    search: "",
+    hash: "",
+    state: null,
+    key: "default",
+  }),
 }));
 
 vi.mock("@/modules/warehouse/lib/downloadDocumentPdf", () => ({

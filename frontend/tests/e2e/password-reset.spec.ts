@@ -47,9 +47,11 @@ async function createDedicatedUser(
     // Admin creates an invite and registers a user whose password the test
     // is allowed to mutate.
     const adminAuth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    const { invite_code } = await api.createInvite(adminAuth.access_token);
-
     const email = `pwreset-e2e-${randomUUID()}@example.com`;
+    const { invite_code } = await api.createInvite(
+      adminAuth.access_token,
+      email,
+    );
     const registerResp = await ctx.post("/api/v1/auth/register", {
       data: { email, password: INITIAL_PASSWORD, invite_code },
     });

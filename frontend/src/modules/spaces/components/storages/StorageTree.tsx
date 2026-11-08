@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Boxes, ChevronRight } from "lucide-react";
 import { ActionMenu } from "@/components/ui/ActionMenu";
@@ -176,6 +176,63 @@ export function StorageTree({
     !isVirtualUsage(target.usage) &&
     !excludedTargets.has(target.id);
 
+  // The rows are memoized, so what they are handed has to keep its identity
+  // across renders: these forward to the latest closures, which change with
+  // every selection, drag and keystroke. Without them one click redraws every
+  // row of a level with thousands of places.
+  const latest = useRef({
+    onToggle,
+    onSelect,
+    onMoveTo,
+    onOpenSettings,
+    onDragMove,
+    handleKeyDown,
+    canDropOn,
+    draggingId,
+  });
+  latest.current = {
+    onToggle,
+    onSelect,
+    onMoveTo,
+    onOpenSettings,
+    onDragMove,
+    handleKeyDown,
+    canDropOn,
+    draggingId,
+  };
+  const handlers = useMemo<TreeHandlers>(
+    () => ({
+      onToggle: (id) => latest.current.onToggle(id),
+      onSelect: (id) => {
+        setFocusedId(id);
+        latest.current.onSelect(id);
+      },
+      onMoveTo: (id) => latest.current.onMoveTo(id),
+      onOpenSettings: (id) => latest.current.onOpenSettings(id),
+      onKeyDown: (event) => latest.current.handleKeyDown(event),
+      onDragStart: setDraggingId,
+      onDragEnd: () => {
+        setDraggingId(null);
+        setDragOverId(null);
+      },
+      onDragOver: setDragOverId,
+      onDragLeave: (id) =>
+        setDragOverId((current) => (current === id ? null : current)),
+      onDrop: (target) => {
+        const {
+          canDropOn: canDrop,
+          draggingId: dragged,
+          onDragMove: move,
+        } = latest.current;
+        if (canDrop(target) && dragged) move(dragged, target.id);
+        setDraggingId(null);
+        setDragOverId(null);
+      },
+      canDropOn: (target) => latest.current.canDropOn(target),
+    }),
+    [],
+  );
+
   return (
     <div
       ref={treeRef}
@@ -189,52 +246,17 @@ export function StorageTree({
         <TreeLevel
           nodes={nodes}
           level={1}
-          selectedId={selectedId}
-          expanded={expanded}
-          tabStop={tabStop}
           canWrite={canWrite}
-          draggingId={draggingId}
-          dragOverId={dragOverId}
-          onToggle={onToggle}
-          onSelect={(id) => {
-            setFocusedId(id);
-            onSelect(id);
-          }}
-          onMoveTo={onMoveTo}
-          onOpenSettings={onOpenSettings}
-          onKeyDown={handleKeyDown}
-          onDragStart={setDraggingId}
-          onDragEnd={() => {
-            setDraggingId(null);
-            setDragOverId(null);
-          }}
-          onDragOver={setDragOverId}
-          onDragLeave={(id) =>
-            setDragOverId((current) => (current === id ? null : current))
-          }
-          onDrop={(target) => {
-            if (canDropOn(target) && draggingId) {
-              onDragMove(draggingId, target.id);
-            }
-            setDraggingId(null);
-            setDragOverId(null);
-          }}
-          canDropOn={canDropOn}
+          handlers={handlers}
+          view={{ selectedId, expanded, tabStop, draggingId, dragOverId }}
         />
       )}
     </div>
   );
 }
 
-interface TreeLevelProps {
-  nodes: StorageLocationNode[];
-  level: number;
-  selectedId?: string;
-  expanded: Set<string>;
-  tabStop?: string;
-  canWrite: boolean;
-  draggingId: string | null;
-  dragOverId: string | null;
+/** What the rows ask of the tree. Identity-stable, so a row can be memoized. */
+interface TreeHandlers {
   onToggle: (id: string) => void;
   onSelect: (id: string) => void;
   onMoveTo: (id: string) => void;
@@ -248,41 +270,102 @@ interface TreeLevelProps {
   canDropOn: (node: StorageLocationNode) => boolean;
 }
 
-function TreeLevel(props: TreeLevelProps) {
+/** The state that changes with a click or a drag; each row reads its own slice. */
+interface TreeView {
+  selectedId?: string;
+  expanded: Set<string>;
+  tabStop?: string;
+  draggingId: string | null;
+  dragOverId: string | null;
+}
+
+interface TreeLevelProps {
+  nodes: StorageLocationNode[];
+  level: number;
+  canWrite: boolean;
+  handlers: TreeHandlers;
+  view: TreeView;
+}
+
+function TreeLevel({ nodes, level, canWrite, handlers, view }: TreeLevelProps) {
   return (
     <>
-      {props.nodes.map((node) => (
-        <TreeRow key={node.id} node={node} {...props} />
+      {nodes.map((node) => (
+        <TreeRow
+          key={node.id}
+          node={node}
+          level={level}
+          canWrite={canWrite}
+          handlers={handlers}
+          view={view}
+          selected={view.selectedId === node.id}
+          isExpanded={view.expanded.has(node.id)}
+          tabbable={view.tabStop === node.id}
+          dragging={view.draggingId === node.id}
+          dragOver={view.dragOverId === node.id}
+        />
       ))}
     </>
   );
 }
 
-function TreeRow({
+interface TreeRowProps extends Omit<TreeLevelProps, "nodes"> {
+  node: StorageLocationNode;
+  selected: boolean;
+  isExpanded: boolean;
+  tabbable: boolean;
+  dragging: boolean;
+  dragOver: boolean;
+}
+
+/**
+ * A row repaints only when its own look changed. `view` is the whole tree's
+ * state, which only an open branch passes on to its children, so a closed
+ * row ignores it: choosing a row among thousands touches two of them.
+ */
+function sameRow(prev: TreeRowProps, next: TreeRowProps): boolean {
+  return (
+    prev.node === next.node &&
+    prev.level === next.level &&
+    prev.canWrite === next.canWrite &&
+    prev.handlers === next.handlers &&
+    prev.selected === next.selected &&
+    prev.isExpanded === next.isExpanded &&
+    prev.tabbable === next.tabbable &&
+    prev.dragging === next.dragging &&
+    prev.dragOver === next.dragOver &&
+    (!next.isExpanded || prev.view === next.view)
+  );
+}
+
+const TreeRow = memo(function TreeRow({
   node,
   level,
-  selectedId,
-  expanded,
-  tabStop,
   canWrite,
-  draggingId,
-  dragOverId,
-  onToggle,
-  onSelect,
-  onMoveTo,
-  onOpenSettings,
-  onKeyDown,
-  onDragStart,
-  onDragEnd,
-  onDragOver,
-  onDragLeave,
-  onDrop,
-  canDropOn,
-}: TreeLevelProps & { node: StorageLocationNode }) {
+  handlers,
+  view,
+  selected,
+  isExpanded,
+  tabbable,
+  dragging,
+  dragOver,
+}: TreeRowProps) {
+  const {
+    onToggle,
+    onSelect,
+    onMoveTo,
+    onOpenSettings,
+    onKeyDown,
+    onDragStart,
+    onDragEnd,
+    onDragOver,
+    onDragLeave,
+    onDrop,
+    canDropOn,
+  } = handlers;
   const { t } = useTranslation("locations");
   const children = node.children ?? [];
   const hasChildren = hasBranch(node);
-  const isExpanded = expanded.has(node.id);
   const selectable = !isVirtualUsage(node.usage);
 
   return (
@@ -290,10 +373,10 @@ function TreeRow({
       <div
         role="treeitem"
         aria-level={level}
-        aria-selected={selectedId === node.id}
+        aria-selected={selected}
         {...(hasChildren ? { "aria-expanded": isExpanded } : {})}
         data-tree-node={node.id}
-        tabIndex={tabStop === node.id ? 0 : -1}
+        tabIndex={tabbable ? 0 : -1}
         onClick={(event) => {
           // The row's menu renders in a portal, outside this element in the
           // DOM, yet React still bubbles its clicks here. A menu item that
@@ -326,11 +409,11 @@ function TreeRow({
         className={cn(
           "group flex cursor-pointer items-center gap-1 rounded-lg pr-1 text-sm",
           "hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          selectedId === node.id
+          selected
             ? "bg-primary-50 text-primary-800 dark:bg-primary-950/40 dark:text-primary-200"
             : "text-on",
-          dragOverId === node.id && "ring-2 ring-primary-400",
-          draggingId === node.id && "opacity-50",
+          dragOver && "ring-2 ring-primary-400",
+          dragging && "opacity-50",
         )}
         style={{ paddingLeft: `${(level - 1) * 14 + 4}px` }}
       >
@@ -416,26 +499,12 @@ function TreeRow({
           <TreeLevel
             nodes={children}
             level={level + 1}
-            selectedId={selectedId}
-            expanded={expanded}
-            tabStop={tabStop}
             canWrite={canWrite}
-            draggingId={draggingId}
-            dragOverId={dragOverId}
-            onToggle={onToggle}
-            onSelect={onSelect}
-            onMoveTo={onMoveTo}
-            onOpenSettings={onOpenSettings}
-            onKeyDown={onKeyDown}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
-            onDrop={onDrop}
-            canDropOn={canDropOn}
+            handlers={handlers}
+            view={view}
           />
         </div>
       )}
     </>
   );
-}
+}, sameRow);

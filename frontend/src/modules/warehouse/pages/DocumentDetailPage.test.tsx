@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { http, HttpResponse } from "msw";
+import { server } from "@/test/mocks/server";
 import {
   PageHeaderContext,
   type PageHeaderData,
@@ -939,6 +941,12 @@ describe("DocumentDetailPage", () => {
       }),
       isLoading: false,
     } as unknown as ReturnType<typeof documentHooks.useDocument>);
+    // A completed dispatch asks for its packages, to keep their slips.
+    server.use(
+      http.get("/api/v1/warehouse/documents/doc-1/packages", () =>
+        HttpResponse.json({ packages: [], lines: [], editable: false }),
+      ),
+    );
 
     await renderWithRoute();
 

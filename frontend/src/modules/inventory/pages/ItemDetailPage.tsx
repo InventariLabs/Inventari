@@ -5,6 +5,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { extractApiErrorCode, isNotFoundError } from "@/lib/errors";
+import { useRecordVisit } from "@/module-sdk";
 import { useItem } from "@/modules/inventory/hooks/useItems";
 import ItemDetailContent from "@/modules/inventory/components/items/ItemDetailContent";
 
@@ -28,6 +29,7 @@ export default function ItemDetailPage() {
   const { t } = useTranslation(["items"]);
 
   const { data: item, isLoading, isError, error, refetch } = useItem(id ?? "");
+  useRecordVisit("inventory", item);
 
   if (isLoading) return <LoadingSpinner />;
 

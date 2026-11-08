@@ -70,6 +70,7 @@ vi.mock("@/store/authStore", () => ({
 
 vi.mock("@/lib/recentItems", () => ({
   getRecentItems: () => recent.items,
+  RECENT_ITEMS_SCOPE: "default",
 }));
 
 const mockSearch = vi.hoisted(() => vi.fn());

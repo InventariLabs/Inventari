@@ -170,7 +170,7 @@ class TestTheJournalReadsARecipeChange:
         created = client.post(
             f'/api/v1/maker/recipes/{recipe["id"]}/cost-lines',
             headers=mk_auth_headers,
-            json={'kind': 'FIXED', 'label': 'Gaz', 'amount': '3.5'},
+            json={'kind': 'OVERHEAD', 'label': 'Gaz', 'amount': '3.5'},
         )
         assert created.status_code == 201, created.text
 

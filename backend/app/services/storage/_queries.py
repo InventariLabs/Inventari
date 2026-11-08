@@ -308,7 +308,7 @@ async def expiring_counts_by_location_async(
     list and the dashboard draw. A missing organization owns nothing — zero
     counts, never another tenant's rows (same drift as the items count).
     """
-    if not storage_ids:
+    if not storage_ids or organization_id is None:
         return {}
     from app.services.items.expiry import expiry_today_async, is_expiring_soon
 

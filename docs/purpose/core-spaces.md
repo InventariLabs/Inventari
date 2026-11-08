@@ -4,9 +4,11 @@
 "Say where a thing is, in the words of my own building."
 
 ## Whose job
-Whoever puts things away and whoever goes looking for them. The layout itself is drawn once, by an
-administrator or by whoever set the workspace up; the people using it afterwards only pick a place
-from it.
+Whoever puts things away and whoever goes looking for them. The layout is usually drawn once, by
+whoever set the workspace up, but it is not an administrator's alone: adding or renaming a shelf is
+part of putting stock away, so an ordinary member (the built-in User and Manager roles) may write
+locations too, and only a viewer, or a custom role without the locations write permission, just
+picks a place from it.
 
 That split is the sharpest question on any Spaces screen: **is this something the person naming a
 shelf decides, or something the person who designed the layout decided once?**

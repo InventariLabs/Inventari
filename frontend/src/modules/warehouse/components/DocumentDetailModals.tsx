@@ -7,10 +7,8 @@ import { ReturnFormModal } from "@/modules/warehouse/components/ReturnFormModal"
 import WmsPickingView from "@/modules/warehouse/components/picking/WmsPickingView";
 import WmsReceivingView from "@/modules/warehouse/components/receiving/WmsReceivingView";
 import WmsLotExpiryDialog from "@/modules/warehouse/components/receiving/WmsLotExpiryDialog";
-import {
-  isPackedType,
-  PACKING_HASH,
-} from "@/modules/warehouse/components/packing/DocumentPackingStep";
+import { isPackedType } from "@/modules/warehouse/components/packing/DocumentPackingStep";
+import { PACKING_HASH } from "@/modules/warehouse/components/packing/packingHash";
 import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
 

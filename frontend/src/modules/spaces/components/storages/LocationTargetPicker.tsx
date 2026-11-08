@@ -26,8 +26,6 @@ type LocationTargetPickerProps = Omit<
   /** Places that cannot be chosen, nor anything standing inside them: the
    *  place being moved or archived and its whole subtree. */
   excludeSubtreeOf?: readonly string[];
-  /** Only places with nothing standing inside them. */
-  leavesOnly?: boolean;
 };
 
 /** Whether `path` is `inside` or a place below it. Names are unique within a
@@ -51,7 +49,6 @@ export function isInsidePath(path: string | null | undefined, inside: string) {
 export function LocationTargetPicker({
   scope = {},
   excludeSubtreeOf = [],
-  leavesOnly = false,
   value,
   ...rest
 }: LocationTargetPickerProps) {
@@ -70,7 +67,6 @@ export function LocationTargetPicker({
   const offered = (row: StorageLocationSummary) =>
     !excludeSubtreeOf.includes(row.id) &&
     !isVirtualUsage(row.usage) &&
-    (!leavesOnly || row.is_leaf) &&
     !excludedPaths.some((path) => path && isInsidePath(row.full_path, path));
 
   // The exclusions are read from the places being moved: without them the

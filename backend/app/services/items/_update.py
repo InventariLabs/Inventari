@@ -36,7 +36,11 @@ from ._stock_quant import (
     lock_record_stock_async,
 )
 from ._stock_relocation import carry_record_stock_async, lock_shelf_change_async
-from ._template import refuse_a_shared_strategy_change, refuse_sku_in_use_async
+from ._template import (
+    refuse_a_shared_strategy_change,
+    refuse_a_shared_weight_change,
+    refuse_sku_in_use_async,
+)
 from ._unit_choice import (
     keep_in_card_unit_async,
     log_unit_chosen_over_template_async,
@@ -512,8 +516,8 @@ async def _sync_template_fields(
 
     # Only mutate a template owned by this org. A global/shared template
     # (organization_id IS NULL) must never be written here — doing so would
-    # change the threshold or unit weight for every org. Updates on
-    # global-template items are a no-op.
+    # change the threshold or unit weight for every org. A strategy or a unit
+    # weight it does not already read is refused; the rest is left as it is.
     result = await db.scalars(
         select(ProductTemplate).where(
             ProductTemplate.id == item.template_id,
@@ -521,15 +525,21 @@ async def _sync_template_fields(
         ),
     )
     template = cast('ProductTemplate | None', result.first())
-    if template is None and item.template_id and 'removal_strategy' in values:
-        refuse_a_shared_strategy_change(
-            await db.scalar(
-                select(ProductTemplate.removal_strategy).where(
-                    ProductTemplate.id == item.template_id
+    if template is None and item.template_id:
+        # A shared card is never written; what it does not already read is
+        # refused, not dropped behind an "Updated".
+        shared = await db.get(ProductTemplate, item.template_id)
+        if shared is not None:
+            if 'removal_strategy' in values:
+                refuse_a_shared_strategy_change(
+                    shared.removal_strategy, values['removal_strategy']
                 )
-            ),
-            values['removal_strategy'],
-        )
+            if 'weight_value' in values or 'weight_uom_id' in values:
+                refuse_a_shared_weight_change(
+                    shared,
+                    values.get('weight_value', shared.weight_value),
+                    values.get('weight_uom_id'),
+                )
     changed: dict[str, tuple[Any, Any]] = {}
     if template:
         if (

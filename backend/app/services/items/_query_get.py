@@ -13,12 +13,12 @@ from datetime import date
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, case, distinct, func, literal, or_, select, true
+from sqlalchemy import and_, case, distinct, false, func, literal, or_, select, true
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, aliased, lazyload, selectinload
 
 from app.core.db_utils import in_ids, paginate
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import ContractViolationError, NotFoundException
 from app.core.read_scope import keep_loaded
 from app.core.txn_memo import records_locked
 from app.models.item import Item
@@ -174,20 +174,6 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
             item_matches_text(search, organization_id or user_organization_id)
         )
 
-    if expiring_days is not None:
-        from app.services.items.expiry import is_expiring_soon
-
-        # Horizon *and* floor. This copy had only the horizon, so the list
-        # behind the "expiring soon" tile also carried items already past
-        # their date and reported one more than the tile did. The horizon
-        # counts from *today* — the caller's organization's day.
-        query = query.where(is_expiring_soon(today, days=expiring_days))
-
-    if only_expired:
-        from app.services.items.expiry import is_expired
-
-        query = query.where(is_expired(today))
-
     if only_low_stock:
         # The threshold belongs to the product, so what is short is a
         # product; the rows this list then shows are that product's, all
@@ -205,6 +191,65 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
             query = query.where(
                 Item.template_id.in_(low_stock_template_ids(stock_org_id))
             )
+
+    if expiring_days is not None or only_expired or needs_attention:
+        if today is None:
+            # The expiry filters cut on the organization's day
+            # (TECHNICAL_DECISIONS §19), and there is no server day to stand
+            # in for it. A caller with an organization forgot to ask; one
+            # without has an empty scope above and nothing to date.
+            if stock_org_id is not None:
+                raise ContractViolationError(
+                    "An expiry filter needs the organization's today; resolve "
+                    'it with core_api.organizations.today_async and pass it '
+                    'as *today*.'
+                )
+            return query.where(false())
+        query = _apply_dated_filters(
+            query,
+            today=today,
+            expiring_days=expiring_days,
+            only_expired=only_expired,
+            needs_attention=needs_attention,
+            stock_org_id=stock_org_id,
+            claimed_tags=claimed_tags,
+        )
+
+    if source_document_id:
+        query = query.where(Item.source_document_id == source_document_id)
+    # Neutral on purpose: Core narrows to a set of templates, and whoever asks
+    # decides what the set means. "Products with a formula" is maker's
+    # question, and Core does not need to learn it.
+    if template_ids:
+        query = query.where(in_ids(Item.template_id, template_ids))
+
+    return query
+
+
+def _apply_dated_filters(
+    query,
+    *,
+    today: date,
+    expiring_days: int | None,
+    only_expired: bool,
+    needs_attention: bool,
+    stock_org_id: UUID | None,
+    claimed_tags: set[str] | None,
+):
+    """The filters that ask which day it is, cut on the organization's *today*."""
+    if expiring_days is not None:
+        from app.services.items.expiry import is_expiring_soon
+
+        # Horizon *and* floor. This copy had only the horizon, so the list
+        # behind the "expiring soon" tile also carried items already past
+        # their date and reported one more than the tile did. The horizon
+        # counts from *today* — the caller's organization's day.
+        query = query.where(is_expiring_soon(today, days=expiring_days))
+
+    if only_expired:
+        from app.services.items.expiry import is_expired
+
+        query = query.where(is_expired(today))
 
     if needs_attention:
         # What the "needs attention" number counts, as one list: expired,
@@ -231,14 +276,6 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
                 )
             )
         query = query.where(or_(*reasons))
-
-    if source_document_id:
-        query = query.where(Item.source_document_id == source_document_id)
-    # Neutral on purpose: Core narrows to a set of templates, and whoever asks
-    # decides what the set means. "Products with a formula" is maker's
-    # question, and Core does not need to learn it.
-    if template_ids:
-        query = query.where(in_ids(Item.template_id, template_ids))
 
     return query
 

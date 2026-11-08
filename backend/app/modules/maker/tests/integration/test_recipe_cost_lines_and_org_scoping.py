@@ -176,6 +176,47 @@ class TestCostLinesCrud:
         ).json()
         assert detail['cost_lines'] == []
 
+    def test_a_cost_line_is_one_of_the_four_kinds(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        db_session: Session,
+    ) -> None:
+        # The recipe screen offers labour, packaging, overhead and other, and
+        # badges and names exactly those; any other string went in through
+        # the API and came back as a raw code the screen could not name.
+        template = ProductTemplate(organization_id=mk_org.id, name='Wax')
+        db_session.add(template)
+        db_session.commit()
+        db_session.refresh(template)
+        recipe = _create_recipe(client, mk_auth_headers, template.id, name='Bee')
+        url = f'/api/v1/maker/recipes/{recipe["id"]}/cost-lines'
+
+        refused = client.post(
+            url,
+            headers=mk_auth_headers,
+            json={'kind': 'electricity', 'label': 'Kiln', 'amount': '1.00'},
+        )
+        assert refused.status_code == 422
+
+        created = client.post(
+            url,
+            headers=mk_auth_headers,
+            json={'kind': 'OVERHEAD', 'label': 'Kiln', 'amount': '1.00'},
+        ).json()
+        patched = client.patch(
+            f'{url}/{created["id"]}',
+            headers=mk_auth_headers,
+            json={'kind': 'labour'},
+        )
+        assert patched.status_code == 422
+
+        detail = client.get(
+            f'/api/v1/maker/recipes/{recipe["id"]}', headers=mk_auth_headers
+        ).json()
+        assert [line['kind'] for line in detail['cost_lines']] == ['OVERHEAD']
+
     def test_create_cost_line_unknown_recipe_returns_404(
         self,
         client: TestClient,

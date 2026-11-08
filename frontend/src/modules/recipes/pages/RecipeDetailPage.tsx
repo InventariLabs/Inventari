@@ -36,6 +36,7 @@ import { useCanWrite } from "@/hooks/useCanWrite";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
+import { useRecordVisit } from "@/module-sdk";
 import { RecipeHeroCard } from "./RecipeHeroCard";
 import type { RecipeUpdate } from "@/modules/recipes/types/core";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -62,6 +63,7 @@ export default function RecipeDetailPage() {
 
   const recipeQuery = useRecipe(recipeId);
   const recipe = recipeQuery.data;
+  useRecordVisit("recipes", recipe);
 
   const activeServings = servings ?? recipe?.servings ?? 1;
 

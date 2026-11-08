@@ -1534,6 +1534,7 @@
   "packing": {
     "title": "Packing",
     "subtitle": "Optional: put the picked goods into packages, print a slip and a label for each, then complete the dispatch.",
+    "subtitleShipped": "What was shipped, package by package, with the slip and the label of each.",
     "packAll": "Everything in one package",
     "packRest": "The rest in one package",
     "addPackage": "Add package",

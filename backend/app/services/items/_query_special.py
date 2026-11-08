@@ -98,6 +98,10 @@ async def get_expiring_items_async(
     """
     from app.services.items.expiry import expiry_today_async, is_expiring_soon
 
+    # A reader with no organization has no shelves either (its storage scope
+    # is empty) and no day to count the window from.
+    if organization_id is None:
+        return [], 0
     today = await expiry_today_async(db, organization_id)
     query = (
         select(Item)

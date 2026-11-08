@@ -6,6 +6,9 @@ test.describe("Registration & Org Joining — flow", () => {
   let registeredEmail = "";
   let registeredPassword = "";
   let inviteCode = "";
+  // The invitation is for one address, so the account the test registers
+  // uses the address it was sent to.
+  const invitedEmail = `test-${Date.now()}@example.com`;
   let api: ApiHelper;
 
   test.beforeAll(async ({ playwright, baseURL }) => {
@@ -16,7 +19,7 @@ test.describe("Registration & Org Joining — flow", () => {
     let attempt = 0;
     while (!inviteCode && attempt < 3) {
       try {
-        const invite = await api.createInvite(auth.access_token);
+        const invite = await api.createInvite(auth.access_token, invitedEmail);
         inviteCode = invite.invite_code;
       } catch {
         attempt++;
@@ -119,7 +122,7 @@ test.describe("Registration & Org Joining — flow", () => {
   }) => {
     await page.goto(`/register?invite=${inviteCode}`);
 
-    const uniqueEmail = `test-${Date.now()}@example.com`;
+    const uniqueEmail = invitedEmail;
     const password = "SecurePass123!";
     registeredEmail = uniqueEmail;
     registeredPassword = password;

@@ -684,6 +684,7 @@ apart.
 | `TRANSFER_CANNOT_SPLIT_SERIALIZED_RECORD` | A transfer cannot split the serialized record {serial_number}; transfer the whole record. |
 | `TRANSFER_MORE_THAN_THE_RECORD_HOLDS` | The record "{item_name}" holds {available} and the line moves {requested}. Lower the line, or move the rest from another record. |
 | `TRANSFER_NEEDS_TARGET_LOCATION` | The transfer document has no target location. |
+| `UNIT_WEIGHT_OF_SHARED_PRODUCT` | This product comes from the shared catalogue, so the weight of one piece is the catalogue's and cannot be changed for one organization. |
 | `UNKNOWN_BULK_ACTION` | Unknown bulk action: {action} |
 | `UNSUPPORTED_EXPORT_FORMAT` | Unsupported export format: {format} |
 | `UNSUPPORTED_IMPORT_FORMAT` | Unsupported import format: {format} |

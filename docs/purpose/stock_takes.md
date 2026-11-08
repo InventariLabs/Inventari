@@ -17,8 +17,11 @@ Also inside: a session on a location covers the products in every location below
 count of a shelf or rack blocks an overlapping one. A difference beyond the session's tolerance (a
 percentage set on the session) needs a reason, and is applied only once somebody with the approve
 permission accepts it; a counted quantity above five times the system quantity is held back the same
-way. A location that holds stock comes up in To do again once a number of days has passed since its
-last count (setting `count_every_days`, 0 for off). Cycle-count schedules (daily, weekly, monthly or
+way. A line the system holds nothing of has no five-times limit, by intent: there is no figure to
+take a multiple of. With a tolerance set, any count on it is a difference beyond the tolerance and
+waits for the approval all the same; without one it posts as counted, whatever the number. A
+location that holds stock comes up in To do again once a number of days has passed since its last
+count (setting `count_every_days`, 0 for off). Cycle-count schedules (daily, weekly, monthly or
 quarterly; all stock, one location tree or one category; optionally a sample size and a tolerance)
 are made through the API; a due schedule appears in To do and is started from there. Nothing runs
 them on a timer. Purging a product that appears on a count line is refused while the module is on.

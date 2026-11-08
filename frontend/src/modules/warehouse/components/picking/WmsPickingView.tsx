@@ -25,11 +25,20 @@ interface Props {
   documentId: string;
   /** Picks these dispatches in one session; `documentId` is the first. */
   documentIds?: string[];
-  onClose: (completed?: boolean, shipment?: ShipmentCreate) => void;
+  /**
+   * Leaving the summary. `completed` asks the caller to complete the one
+   * document the session covered, which `documentId` names — a list that
+   * opened the sheet needs it, as its selection is not always the session's.
+   */
+  onClose: (
+    completed?: boolean,
+    shipment?: ShipmentCreate,
+    documentId?: string,
+  ) => void;
   /** Invoked when the session start was blocked by the approval engine. */
   onRequestApproval?: () => void | Promise<void>;
   /** Offered on the summary of a dispatch: close without completing, to pack. */
-  onPack?: (shipment: ShipmentDraft) => void;
+  onPack?: (shipment: ShipmentDraft, documentId: string) => void;
 }
 
 // A line holding no batch has none to promise: say so instead of "it expects ".
@@ -408,11 +417,13 @@ function WmsPickingView({
   }
 
   if (state.phase === "completed" && state.session) {
-    // Closing completes the page's document only when the session is that
-    // one document's: a session over several leaves each to be packed and
-    // completed on its own, however it was opened.
+    // Closing completes the document only when the session is that one
+    // document's: a session over several leaves each to be packed and
+    // completed on its own. One document is one, however the sheet was
+    // opened — a list passes the ids it ticked even when it ticked one, and
+    // Resume passes the row's id while the session it resumes may cover more.
     const completesDocument =
-      !documentIds && state.session.documents.length <= 1;
+      (documentIds?.length ?? 1) <= 1 && state.session.documents.length <= 1;
     // The last scan can close the session by itself and nothing has refreshed
     // the document since: a register behind a multi-document session has no
     // handler that refreshes its rows, and the Pack step reads the picked
@@ -432,12 +443,18 @@ function WmsPickingView({
         isLoading={isLoading}
         error={sessionError}
         onClose={(shipment) =>
-          leave(() => onClose(completesDocument, shipment))
+          leave(() =>
+            completesDocument
+              ? onClose(true, shipment, documentId)
+              : onClose(false, shipment),
+          )
         }
         // Left without completing: the document keeps what was picked and
         // waits, as picked, for its Pack step or its own Complete.
         onLeave={() => leave(() => onClose(false))}
-        onPack={onPack && ((shipment) => leave(() => onPack(shipment)))}
+        onPack={
+          onPack && ((shipment) => leave(() => onPack(shipment, documentId)))
+        }
       />
     );
   }

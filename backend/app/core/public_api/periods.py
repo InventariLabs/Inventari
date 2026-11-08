@@ -40,8 +40,10 @@ class CorePeriodsAPI:
         ``PeriodClosedError`` (defined in ``app.core.exceptions``) is a
         subclass of ``ValueError``. Routers must catch it explicitly and map
         to ``HTTP 409 Conflict`` with code ``PERIOD_CLOSED``. For real-time
-        item mutations call with ``date.today()``; for document-scoped calls
-        use the document's scheduled_date.
+        item mutations call with the organization's day
+        (``core_api.organizations.today_async``), never the server's
+        ``date.today()``; for document-scoped calls use the document's
+        scheduled_date.
         """
         await check_period_not_closed(db, organization_id, doc_date)
 

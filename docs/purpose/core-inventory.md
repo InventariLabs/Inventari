@@ -11,9 +11,16 @@ for one, the person writing it off. No role is excluded — a viewer reads the s
 What a thing is (product, category, unit of measure), how much of it there is, and how that changes
 over its life — quantity, lots, expiry, condition. The authoritative stock figure per product,
 location, lot and owner, and the moves register: every movement of stock with what caused it, so
-the question "why is the number what it is" has an answer whichever modules are on. How much of
-that figure documents have already promised, and so what is still available. A product's minimum
-quantity, and the one rule for "running low" that every screen reads.
+the question "why is the number what it is" has an answer. The register is on screen while a
+module that moves stock is on (warehouse, maker, purchase_orders or stock_takes — the household
+profile carries stock_takes); with none of them on, the product list is the whole record and the
+register is not offered. How much of that figure documents have already promised, and so what is
+still available. A product's minimum quantity, and the core rule for "running low": a product is
+low when what stands on its internal locations is at or below that minimum. The products list's
+low-stock filter, the statistics' low-stock figures and alerts, and the shopping suggestions read
+this one rule. A reorder rule of **purchase_orders** is a second, separate threshold — one
+location against the higher of the rule's minimum and its safety stock — and raises its own
+replenishment alerts; the two answer different questions and can disagree about the same product.
 
 ## Outside the boundary
 - Where a thing physically stands, and what kind of place that is → **Core — Spaces**

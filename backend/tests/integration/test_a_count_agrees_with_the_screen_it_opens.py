@@ -15,17 +15,19 @@ from __future__ import annotations
 
 import uuid
 from collections import Counter
-from datetime import date
+from datetime import date, datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import pytest
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
+from app.core.open_package import OPENED_KEY
 from app.models.item import Item
 from app.models.product_template import ProductTemplate
 from app.models.user import User
-from app.services.items.low_stock import low_stock_template_ids
+from app.services.items.low_stock import claimed_tags_for, low_stock_template_ids
 from app.services.token_service import create_access_token
 from tests.integration._demo_world import ids, pooled_sandboxes
 
@@ -39,16 +41,21 @@ def sandbox(demo_world, async_engine_fixture) -> tuple[uuid.UUID, uuid.UUID]:
 
 
 @pytest.fixture
-def read(sandbox, db_session: Session, client):
-    """GET as the sandbox's administrator, handed over the way a visitor gets it."""
+def headers(sandbox, db_session: Session) -> dict[str, str]:
+    """The sandbox's administrator, handed over the way a visitor gets it."""
     _org_id, user_id = sandbox
     admin = db_session.get(User, user_id)
     assert admin is not None
     admin.is_active = True
     db_session.commit()
-    headers = {
+    return {
         'Authorization': f'Bearer {create_access_token(data={"sub": str(user_id)})}'
     }
+
+
+@pytest.fixture
+def read(headers, client):
+    """GET as the sandbox's administrator."""
 
     def get(path: str, **params: Any) -> Any:
         response = client.get(f'/api/v1{path}', headers=headers, params=params)
@@ -64,13 +71,29 @@ def _keep_a_short_product_in_two_records(db: Session, org_id: uuid.UUID) -> None
     One short product held as two records is where a count of products and a
     list of records part: the second record stays under the threshold, which
     moves up with it.
+
+    The seed dates its records at random, and a dated record of a short
+    product parts the two the other way: the shares count it once as dated
+    and again in its product, which cancelled the added record on some runs.
+    The short products' records carry no date here, so the shares summed fall
+    short of the list on every run, not on most.
     """
-    template_id = db.scalars(low_stock_template_ids(org_id)).first()
-    assert template_id is not None, 'the seed has to leave a product short'
+    short = list(db.scalars(low_stock_template_ids(org_id)))
+    # Short whichever way the organization sets its lists, so both settings
+    # of the module data see the added record.
+    visible = list(db.scalars(low_stock_template_ids(org_id, claimed_tags_for(True))))
+    assert visible, 'the seed has to leave a product short'
+    for dated in db.scalars(
+        select(Item).where(Item.organization_id == org_id, Item.template_id.in_(short))
+    ):
+        dated.expiry_date = None
+        meta = dated.meta_data or {}
+        if OPENED_KEY in meta:
+            dated.meta_data = {key: meta[key] for key in meta if key != OPENED_KEY}
     record = db.scalars(
         select(Item).where(
             Item.organization_id == org_id,
-            Item.template_id == template_id,
+            Item.template_id == visible[0],
             Item.is_deleted.is_(False),
             Item.quantity > 0,
         )
@@ -81,7 +104,7 @@ def _keep_a_short_product_in_two_records(db: Session, org_id: uuid.UUID) -> None
     }
     copied.update(id=uuid.uuid4(), quantity=1, label_code=None)
     db.add(Item(**copied))
-    template = db.get(ProductTemplate, template_id)
+    template = db.get(ProductTemplate, visible[0])
     assert template is not None
     template.min_quantity = (template.min_quantity or 0) + 1
     db.commit()
@@ -101,8 +124,10 @@ class TestTheInventoryPath:
         _keep_a_short_product_in_two_records(db_session, sandbox[0])
         scope = {'exclude_module_contexts': hide_module_data}
         counts = read('/items/attention-counts', **scope)
-        assert counts['records'] > 0, 'the seed has to give the card something to say'
-        assert counts['records'] == _list_total(read, needs_attention=True, **scope)
+        listed = _list_total(read, needs_attention=True, **scope)
+        shares = counts['expired'] + counts['expiring_soon'] + counts['low_stock']
+        assert shares < listed, 'the seed has to part the shares from the rows'
+        assert counts['records'] == listed
 
     def test_running_low_is_the_products_its_list_names(
         self, read, sandbox, db_session: Session, hide_module_data: bool
@@ -194,3 +219,157 @@ def test_a_recipe_card_says_what_its_detail_says(read) -> None:
         assert detail['match_percentage'] == pytest.approx(
             recipe['ingredients_available'] / recipe['ingredients_total'], abs=0.01
         ), recipe['name']
+
+
+def _flatten(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        each for node in nodes for each in (node, *_flatten(node.get('children') or []))
+    ]
+
+
+@pytest.mark.parametrize('hide_module_data', [False, True])
+def test_a_place_counts_the_records_its_products_tab_lists(
+    read, hide_module_data: bool
+) -> None:
+    """The tree, the place cards, the overview and a Contents row, against the place.
+
+    The first three read ``GET /locations/tree`` and a row of a place's
+    Contents tab reads ``GET /locations?parent_id=``. Each prints
+    ``subtree_items_count`` and opens the place, whose Products tab lists the
+    records standing on it and, with "Include locations inside" ticked, the
+    records of every place below it as well.
+    """
+    scope = {'exclude_module_contexts': hide_module_data}
+    tree = _flatten(read('/locations/tree', counts=True, **scope))
+    contents = [
+        row
+        for node in tree
+        if node['children_count']
+        for row in read('/locations', parent_id=node['id'], limit=200, **scope)['items']
+    ]
+    assert contents
+    counted = [row for row in tree + contents if row['subtree_items_count']]
+    assert counted
+    for row in counted:
+        path = f'/locations/{row["id"]}/items'
+        assert read(path, limit=1)['total'] == row['items_count'], row['name']
+        assert (
+            read(path, limit=1, include_inside=True)['total']
+            == row['subtree_items_count']
+        ), row['name']
+
+
+def test_an_equipment_location_row_counts_the_assets_its_link_opens(read) -> None:
+    """Read with the scope the module's own locations screen asks for."""
+    rows = read('/locations', module_scope='equipment', counts=True, limit=200)
+    here = [row for row in rows['items'] if row['items_count']]
+    assert here
+    for row in here:
+        listed = read('/equipment/assets', limit=1, location_id=row['id'])['total']
+        assert listed == row['items_count'], row['name']
+
+
+def test_a_production_month_counts_the_runs_its_list_shows_closed_in_it(
+    read,
+) -> None:
+    tz = ZoneInfo(read('/organizations/my').get('timezone') or 'UTC')
+    months = read('/maker/production/monthly-result', months=6)
+    assert any(month['orders'] for month in months), 'the seed has to close a run'
+    runs = read('/maker/production/orders', status='COMPLETED', limit=200)
+    assert runs['total'] == len(runs['items'])
+    closed = Counter(
+        datetime.fromisoformat(run['completed_at']).astimezone(tz).strftime('%Y-%m')
+        for run in runs['items']
+    )
+    for month in months:
+        assert month['orders'] == closed[month['month']], month['month']
+
+
+def test_a_shopping_list_card_counts_the_lines_its_page_lists(read) -> None:
+    """The card, the overview's line and the page read one list.
+
+    The overview shows the first active list and links to its page; the
+    card, the line and the page all count the lines of the same answer,
+    ``GET /shopping-lists/{id}``, split on ``is_purchased``. The server gives
+    no second number for them to part from, so the pair holds by
+    construction. What this test holds on the seed is the answer they share:
+    an active list with lines, each marked bought or not. The counting
+    itself is the client's, held in ``DashboardShoppingList.test.tsx``.
+    """
+    active = read('/shopping-lists', active_only=True, limit=50)['items']
+    assert active, 'the seed has to leave a list to shop from'
+    lines = read(f'/shopping-lists/{active[0]["id"]}')['items']
+    assert lines
+    assert all(isinstance(line['is_purchased'], bool) for line in lines)
+
+
+def test_a_recipe_tag_chip_counts_the_recipes_it_narrows_to(read) -> None:
+    tags = read('/recipes/tags', limit=200)['items']
+    assert tags
+    for tag in tags:
+        narrowed = read('/recipes', tags=tag['name'], limit=1)['total']
+        assert narrowed == tag['count'], tag['name']
+
+
+def test_the_cook_chips_count_recipes_whose_page_says_the_same(
+    read, headers, client
+) -> None:
+    """The chips "Ready to cook" and "Nearly there", against each recipe's page.
+
+    The two chips split one answer of the availability list at a full match;
+    a recipe they place has to read the same on the page it opens. The
+    suite's seed leaves nothing ready, so one recipe is written from a record
+    on the shelf and the first chip has a recipe to count.
+    """
+    record = next(
+        item
+        for item in read('/items', limit=50)['items']
+        if item['template_id'] and item['uom_id'] and float(item['quantity']) >= 2
+    )
+    written = client.post(
+        '/api/v1/recipes',
+        headers=headers,
+        json={
+            'name': 'From the shelf',
+            'ingredients': [
+                {
+                    'name': record['name'],
+                    'template_id': record['template_id'],
+                    'uom_id': record['uom_id'],
+                    'quantity': '1',
+                }
+            ],
+        },
+    )
+    assert written.status_code == 201, written.text
+    near = read('/recipes/available', min_match=0.5, limit=200)['items']
+    ready = [recipe for recipe in near if recipe['match_percentage'] >= 1]
+    assert ready
+    assert len(ready) < len(near), 'the seed has to leave a recipe nearly there'
+    assert len(ready) == read('/recipes/available', limit=1)['total']
+    for recipe in near:
+        page = read(f'/recipes/{recipe["id"]}/availability')['match_percentage']
+        assert page == pytest.approx(recipe['match_percentage']), recipe['name']
+
+
+def test_the_stock_takes_row_counts_the_takes_its_link_lists(
+    read, headers, client
+) -> None:
+    """The seed's one take is finished; a take started on it gives the row a count."""
+    place = next(
+        node
+        for node in _flatten(read('/locations/tree', counts=True))
+        if node['items_count']
+    )
+    started = client.post(
+        '/api/v1/stock-takes',
+        headers=headers,
+        json={'name': 'Spot count', 'location_id': place['id']},
+    )
+    assert started.status_code == 201, started.text
+    row = read('/stock-takes', status_filter='in_progress', limit=5)['total']
+    assert row > 0
+    listed = read('/stock-takes', status_filter='in_progress', limit=50)['items']
+    every = read('/stock-takes', limit=50)['items']
+    assert row == len(listed)
+    assert row == sum(take['status'] == 'in_progress' for take in every)

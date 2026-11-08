@@ -1498,6 +1498,7 @@
   "packing": {
     "title": "Embalagem",
     "subtitle": "Opcional: coloque as mercadorias separadas em volumes, imprima um romaneio e uma etiqueta para cada um e depois conclua a expedição.",
+    "subtitleShipped": "O que foi expedido, pacote a pacote, com o romaneio e a etiqueta de cada um.",
     "packAll": "Tudo em um volume",
     "packRest": "O restante em um volume",
     "addPackage": "Adicionar volume",

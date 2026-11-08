@@ -202,11 +202,14 @@ class PickingScanResponse(BaseModel):
     status: str
     ingredient_id: UUID | None = None
     ingredient_name: str | None = None
-    quantity_consumed: float | None = None
+    # What left the shelf, what the shelf still holds and what the ingredient
+    # still needs are stock quantities: strings on the wire, like every other
+    # (TECHNICAL_DECISIONS §18).
+    quantity_consumed: Decimal | None = None
     uom_symbol: str | None = None
-    item_remaining_quantity: float | None = None
+    item_remaining_quantity: Decimal | None = None
     # How much more of this ingredient is still needed (partial picks); null when fully satisfied.
-    ingredient_remaining_quantity: float | None = None
+    ingredient_remaining_quantity: Decimal | None = None
     message: str | None = None
     session_complete: bool = False
     opened_suggestion: OpenedSuggestion | None = None
@@ -227,5 +230,5 @@ class UndoPickRequest(BaseModel):
 class UndoPickResponse(BaseModel):
     ingredient_id: UUID
     ingredient_name: str
-    restored_quantity: float
+    restored_quantity: Decimal
     uom_symbol: str | None = None

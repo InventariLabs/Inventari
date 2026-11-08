@@ -9,8 +9,9 @@ Whoever does the shopping. The list is read on a phone, in a shop, usually one-h
 ## Inside the boundary
 The lists themselves and what is on them, added by hand, suggested from what has run low, what is
 used up often, or what has expired or is about to, and ticking things off as they are bought.
-Recipes and production runs also put entries on the active list. An entry may carry an estimated
-price — typed in, or copied from a suggestion — so the shopper knows roughly what a thing costs.
+Recipes and production runs also put entries on the active list. The API keeps an estimated price
+on an entry for a client that sets one, and the entry shows it as a hint; no screen asks for it,
+and no suggestion fills it in.
 
 ## Outside the boundary
 - Ordering from a supplier, with an expected delivery → **purchase_orders** (a list can be turned
@@ -26,8 +27,8 @@ price — typed in, or copied from a suggestion — so the shopper knows roughly
 for expiry suggestions (Spaces).
 
 ## Deliberately not done
-- **No budget and no totals.** An entry's estimated price is a hint for that one entry; a list is
-  never summed, compared with a budget or treated as a basket.
+- **No budget and no totals.** A list is never summed, compared with a budget or treated as a
+  basket; an estimated price, where a client stored one, stays a hint for that one entry.
 - **No shops.** No vendor comparison, no branch stock, no delivery integration.
 - **No automatic buying.** A suggestion is offered to a person; nothing leaves this module on its
   own.
