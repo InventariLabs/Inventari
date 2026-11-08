@@ -56,6 +56,7 @@ def _asset_filters(
     storage_id: UUID | None,
     status: str | None,
     checked_out: bool,
+    hide_retired: bool = False,
 ) -> list[ColumnElement[bool]]:
     """The WHERE clauses of the asset list, shared with the bulk-by-filter path.
 
@@ -96,14 +97,20 @@ def _asset_filters(
         )
     if status is not None:
         clauses.append(Item.meta_data['equipment']['equipment_status'].astext == status)
+    held = select(EquipmentAssignment.item_id).where(
+        EquipmentAssignment.organization_id == org_id,
+        EquipmentAssignment.checked_in_at.is_(None),
+    )
     if checked_out:
+        clauses.append(Item.id.in_(held))
+    if hide_retired:
+        # The fleet's own rule: a retired asset is out of it unless somebody
+        # still holds it, and a held one counts as issued.
         clauses.append(
-            Item.id.in_(
-                select(EquipmentAssignment.item_id).where(
-                    EquipmentAssignment.organization_id == org_id,
-                    EquipmentAssignment.checked_in_at.is_(None),
-                )
+            Item.meta_data['equipment']['equipment_status'].astext.is_distinct_from(
+                'RETIRED'
             )
+            | Item.id.in_(held)
         )
     return clauses
 
@@ -117,6 +124,7 @@ async def list_matching_asset_ids_async(
     location_id: UUID | None = None,
     status: str | None = None,
     checked_out: bool = False,
+    hide_retired: bool = False,
 ) -> list[UUID]:
     """Every asset id the list's filters match — the scope of a bulk action.
 
@@ -131,6 +139,7 @@ async def list_matching_asset_ids_async(
         storage_id=location_id,
         status=status,
         checked_out=checked_out,
+        hide_retired=hide_retired,
     )
     rows = await db.execute(select(Item.id).where(*clauses))
     return list(rows.scalars().all())
@@ -145,6 +154,7 @@ async def list_equipment_assets_async(
     storage_id: UUID | None = None,
     status: str | None = None,
     checked_out: bool = False,
+    hide_retired: bool = False,
     sort: str | None = None,
     sort_dir: str = 'desc',
     limit: int = 50,
@@ -163,6 +173,7 @@ async def list_equipment_assets_async(
         storage_id=storage_id,
         status=status,
         checked_out=checked_out,
+        hide_retired=hide_retired,
     )
     query = (
         select(Item)

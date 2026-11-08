@@ -106,6 +106,8 @@ export default function AssetListPage() {
     handleStatusFilter,
     checkedOut,
     handleCheckedOutChange,
+    hideRetired,
+    handleHideRetiredChange,
     locationFilter,
     handleLocationFilter,
     categoryFilter,
@@ -166,7 +168,11 @@ export default function AssetListPage() {
   );
 
   const hasListFilters = Boolean(
-    statusFilter || checkedOut || locationFilter || categoryFilter,
+    statusFilter ||
+    checkedOut ||
+    hideRetired ||
+    locationFilter ||
+    categoryFilter,
   );
   const statusLabel = statusFilter
     ? t(`status.${statusFilter.toLowerCase()}` as const)
@@ -382,6 +388,7 @@ export default function AssetListPage() {
             !search &&
             !statusFilter &&
             !checkedOut &&
+            !hideRetired &&
             !locationFilter &&
             !categoryFilter ? (
             <GettingStarted
@@ -459,6 +466,13 @@ export default function AssetListPage() {
                     label={statusLabel}
                     clearLabel={t("list.clear_filter", "Clear status filter")}
                     onClear={() => handleStatusFilter("")}
+                  />
+                )}
+                {hideRetired && (
+                  <ClearableFilterBadge
+                    label={t("list.retired_hidden")}
+                    clearLabel={t("list.show_retired")}
+                    onClear={() => handleHideRetiredChange(false)}
                   />
                 )}
                 {checkedOut && (

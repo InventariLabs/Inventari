@@ -244,6 +244,8 @@
     "clear_filters": "Wyczyść",
     "clear_filter": "Wyczyść filtr statusu",
     "clear_checked_out": "Wyczyść filtr wydań",
+    "retired_hidden": "Wycofane zasoby ukryte",
+    "show_retired": "Pokaż wycofane zasoby",
     "empty_filtered": "Brak zasobów pasujących do aktywnych filtrów",
     "empty_filtered_status": "Brak zasobów o statusie {{status}}",
     "empty_filtered_checked_out": "Brak wydanych zasobów",

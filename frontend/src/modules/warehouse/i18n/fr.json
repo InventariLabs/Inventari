@@ -1615,6 +1615,7 @@
     "markDone": "Marquer comme fait : {{task}}",
     "deleteTask": "Supprimer la tâche : {{task}}",
     "showing": "{{shown}} sur {{total}} affichées",
+    "waitingSum": "Au total en attente : {{total}} — tâches : {{tasks}}, articles en quarantaine : {{holds}}",
     "showMore": "Afficher plus",
     "filter": {
       "label": "Afficher les tâches",

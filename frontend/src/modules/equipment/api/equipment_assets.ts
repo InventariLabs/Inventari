@@ -26,6 +26,8 @@ export interface EquipmentAssetListParams {
   location_id?: string | null;
   status?: string | null;
   checked_out?: boolean;
+  /** Leave out retired assets nobody holds: the fleet the overview counts. */
+  hide_retired?: boolean;
   sort?: EquipmentSortKey;
   sort_dir?: EquipmentSortDir;
   offset?: number;
@@ -121,6 +123,7 @@ export const equipmentAssetsApi = {
           location_id: params.location_id || undefined,
           status: params.status || undefined,
           checked_out: params.checked_out || undefined,
+          hide_retired: params.hide_retired || undefined,
           sort: params.sort || undefined,
           sort_dir: params.sort_dir || undefined,
           offset: params.offset ?? 0,

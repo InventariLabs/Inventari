@@ -225,6 +225,8 @@
     "clear_filters": "Effacer",
     "clear_filter": "Effacer le filtre de statut",
     "clear_checked_out": "Effacer le filtre des sorties",
+    "retired_hidden": "Retirés masqués",
+    "show_retired": "Afficher les équipements retirés",
     "empty_filtered": "Aucun actif ne correspond aux filtres actifs",
     "empty_filtered_status": "Aucun actif avec le statut {{status}}",
     "empty_filtered_checked_out": "Aucun actif n'est sorti",

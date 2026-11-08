@@ -11612,7 +11612,7 @@ export interface components {
          * AssetFilter
          * @description The asset list's filters, as the scope of a bulk action.
          *
-         *     The same five parameters ``GET /equipment/assets`` takes, so "everything
+         *     The same six parameters ``GET /equipment/assets`` takes, so "everything
          *     that matches" means exactly what the reader is looking at.
          */
         AssetFilter: {
@@ -11626,6 +11626,8 @@ export interface components {
             status?: string | null;
             /** Checked Out */
             checked_out?: boolean;
+            /** Hide Retired */
+            hide_retired?: boolean;
         };
         /**
          * AssetTimelineEvent
@@ -30385,6 +30387,8 @@ export interface operations {
                 status?: string | null;
                 /** @description Only assets with an open EquipmentAssignment (source of truth for "checked out") */
                 checked_out?: boolean;
+                /** @description Leave out retired assets nobody holds - the fleet the dashboard counts */
+                hide_retired?: boolean;
                 /** @description Sort key for the asset list */
                 sort?: ("name" | "created_at" | "purchase_price" | "warranty_until" | "location") | null;
                 /** @description Sort direction */

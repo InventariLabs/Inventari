@@ -33,6 +33,11 @@ async def list_equipment_assets(
         description='Only assets with an open EquipmentAssignment (source of '
         'truth for "checked out")',
     ),
+    hide_retired: bool = Query(
+        False,
+        description='Leave out retired assets nobody holds - the fleet the '
+        'dashboard counts',
+    ),
     sort: Literal['name', 'created_at', 'purchase_price', 'warranty_until', 'location']
     | None = Query(None, description='Sort key for the asset list'),
     sort_dir: Literal['asc', 'desc'] = Query('desc', description='Sort direction'),
@@ -51,6 +56,7 @@ async def list_equipment_assets(
         storage_id=location_id,
         status=status,
         checked_out=checked_out,
+        hide_retired=hide_retired,
         sort=sort,
         sort_dir=sort_dir,
         limit=limit,

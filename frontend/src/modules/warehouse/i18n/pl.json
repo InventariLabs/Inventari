@@ -1733,6 +1733,7 @@
     "markDone": "Oznacz jako zrobione: {{task}}",
     "deleteTask": "Usuń zadanie: {{task}}",
     "showing": "Pokazano {{shown}} z {{total}}",
+    "waitingSum": "Razem czeka: {{total}} — zadania: {{tasks}}, towar w kwarantannie: {{holds}}",
     "showMore": "Pokaż więcej",
     "filter": {
       "label": "Pokaż zadania",
