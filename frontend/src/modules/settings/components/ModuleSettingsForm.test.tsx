@@ -375,6 +375,48 @@ describe("ModuleSettingsForm — a number outside its bounds", () => {
     await waitFor(() => expect(updateSettings).not.toHaveBeenCalled());
   });
 
+  it("says so on the field and does not save when the number cannot be read", async () => {
+    vi.clearAllMocks();
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="equipment"
+        schema={windowSchema}
+        initialValues={{}}
+      />,
+    );
+    // `1e` is not a number: the browser reports the box as empty.
+    fireEvent.change(screen.getByTestId("field-warning_window_days"), {
+      target: { value: "" },
+    });
+
+    expect(screen.getByText("Enter a whole number.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(updateSettings).not.toHaveBeenCalled());
+  });
+
+  it("says so, for a decimal setting too, when the number cannot be read", async () => {
+    vi.clearAllMocks();
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="equipment"
+        schema={{
+          type: "object",
+          properties: {
+            tolerance: { type: "number", default: 0.5, title: "Tolerance" },
+          },
+        }}
+        initialValues={{}}
+      />,
+    );
+    fireEvent.change(screen.getByTestId("field-tolerance"), {
+      target: { value: "" },
+    });
+
+    expect(screen.getByText("Enter a number.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(updateSettings).not.toHaveBeenCalled());
+  });
+
   it("saves once the number is back in range", async () => {
     vi.clearAllMocks();
     renderForm(

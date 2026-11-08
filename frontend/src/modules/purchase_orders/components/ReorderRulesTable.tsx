@@ -95,11 +95,15 @@ export function ReorderRulesTable({
     );
   }
 
-  const actions = (rule: ReorderRule) => (
-    <div className="flex justify-end gap-1">
+  // On a phone the buttons are `icon` (44 px) with room between them; the
+  // table keeps the compact size.
+  const actions = (rule: ReorderRule, touch = false) => (
+    <div
+      className={touch ? "flex justify-end gap-2" : "flex justify-end gap-1"}
+    >
       <Button
         variant="ghost"
-        size="iconSm"
+        size={touch ? "icon" : "iconSm"}
         aria-label={`${t("common:actions.edit")} ${rowName(rule)}`}
         title={t("common:actions.edit")}
         onClick={() => onEdit(rule)}
@@ -108,7 +112,7 @@ export function ReorderRulesTable({
       </Button>
       <Button
         variant="ghostDanger"
-        size="iconSm"
+        size={touch ? "icon" : "iconSm"}
         aria-label={`${t("common:actions.delete")} ${rowName(rule)}`}
         title={t("common:actions.delete")}
         onClick={() => onDelete(rule)}
@@ -174,7 +178,9 @@ export function ReorderRulesTable({
                       {partnerName(rule.preferred_partner_id)}
                     </p>
                   </div>
-                  {!readOnly && <div className="shrink-0">{actions(rule)}</div>}
+                  {!readOnly && (
+                    <div className="shrink-0">{actions(rule, true)}</div>
+                  )}
                 </li>
               );
             })}

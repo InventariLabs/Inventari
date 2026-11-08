@@ -371,22 +371,24 @@ async def _compute_alerts_for_rules(
     # list names one: the cheapest current offer is proposed, so the alert
     # does not read "No supplier" beside a price the module itself holds.
     # The rule's own choice always wins.
-    unassigned = sorted(
-        {
-            s.rule.product_template_id
-            for s in shortages
-            if not s.rule.preferred_partner_id
-        },
-        key=str,
-    )
+    # The supplier is chosen against what this rule will really order, so a
+    # volume price counts only for the rule whose order reaches it.
+    wanted = {
+        (
+            s.rule.product_template_id,
+            max(s.suggested - shares.get(s.rule.id, Decimal('0')), Decimal('0')),
+        )
+        for s in shortages
+        if not s.rule.preferred_partner_id
+    }
     offers = (
         await pricelist_service.cheapest_offers_async(
             db,
             org_id,
-            unassigned,
+            wanted,
             active_on=await core_api.organizations.today_async(db, org_id),
         )
-        if unassigned
+        if wanted
         else {}
     )
 
@@ -406,7 +408,9 @@ async def _compute_alerts_for_rules(
         product = rule.product_template
         supplier = rule.preferred_partner
         proposed_offer = (
-            None if rule.preferred_partner_id else offers.get(rule.product_template_id)
+            None
+            if rule.preferred_partner_id
+            else offers.get((rule.product_template_id, remaining))
         )
         if proposed_offer is not None:
             supplier = proposed_offer.partner
