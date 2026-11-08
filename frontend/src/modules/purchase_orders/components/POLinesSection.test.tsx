@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
@@ -201,7 +201,11 @@ describe("POLinesSection product pick", () => {
       await clearProduct();
       await pick(/ground cocoa/i);
 
-      expect(screen.queryByDisplayValue("45.00")).not.toBeInTheDocument();
+      // Both the desktop and the mobile layout render a price input, and the
+      // state may still be settling right after the pick.
+      await waitFor(() =>
+        expect(screen.queryAllByDisplayValue("45.00")).toHaveLength(0),
+      );
     });
 
     it("keeps a price typed over the proposed one when another product is picked", async () => {
