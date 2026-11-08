@@ -196,6 +196,60 @@ class TestEquipmentAssetsEndpoint:
         assert resp.status_code == 200, resp.text
         assert resp.json()['total'] == 0
 
+    def test_hide_retired_leaves_out_idle_retired_assets_only(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        db_session: Session,
+        eq_org: Organization,
+        eq_storage_location: StorageLocation,
+        eq_category: Category,
+    ) -> None:
+        """The fleet counts a held asset whatever its status says, so the
+        list that opens from a fleet row hides only the retired ones nobody
+        holds."""
+        live = _add_asset(db_session, eq_org, eq_storage_location, eq_category, 'Live')
+        _add_asset(
+            db_session,
+            eq_org,
+            eq_storage_location,
+            eq_category,
+            'Idle retired',
+            status='RETIRED',
+        )
+        held = _add_asset(
+            db_session, eq_org, eq_storage_location, eq_category, 'Held retired'
+        )
+        unset = Item(
+            name='No status yet',
+            organization_id=eq_org.id,
+            storage_location_id=eq_storage_location.id,
+            category_id=eq_category.id,
+            quantity=1,
+            meta_data={'equipment': {}},
+        )
+        db_session.add(unset)
+        db_session.commit()
+        _checkout(client, eq_auth_headers, str(held.id))
+        # Retired while still out: the checkout itself refuses a retired asset.
+        held.meta_data = {'equipment': {'equipment_status': 'RETIRED'}}
+        db_session.commit()
+
+        everything = client.get(ASSETS_URL, headers=eq_auth_headers)
+        assert everything.json()['total'] == 4
+
+        resp = client.get(
+            ASSETS_URL, headers=eq_auth_headers, params={'hide_retired': 'true'}
+        )
+        assert resp.status_code == 200, resp.text
+        body = resp.json()
+        assert body['total'] == 3
+        assert {i['id'] for i in body['items']} == {
+            str(live.id),
+            str(held.id),
+            str(unset.id),
+        }
+
     def test_checked_out_filter_returns_open_assignments_only(
         self,
         client: TestClient,

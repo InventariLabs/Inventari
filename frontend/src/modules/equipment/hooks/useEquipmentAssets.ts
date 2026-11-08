@@ -19,6 +19,7 @@ export function useEquipmentAssets(params: EquipmentAssetListParams = {}) {
         location_id: params.location_id || undefined,
         status: params.status || undefined,
         checked_out: params.checked_out || undefined,
+        hide_retired: params.hide_retired || undefined,
         sort: params.sort,
         sort_dir: params.sort_dir,
         offset: params.offset ?? 0,

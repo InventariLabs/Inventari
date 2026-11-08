@@ -2,6 +2,7 @@ import { Eye, Tag, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useFreeLabel } from "@/modules/inventory/hooks/useFreeLabel";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { useLabelPurposeName } from "@/modules/inventory/hooks/useLabelPurposeName";
@@ -87,11 +88,7 @@ export function LabelRow({
                     first: an asset's label reads "Equipment in use", a
                     product's keeps "Product in use". What the batch was
                     printed for cannot answer — the assignment outlived it. */}
-                {label.assigned_item_context_tag
-                  ? t("status.purposeInUse", {
-                      purpose: purposeName(label.assigned_item_context_tag),
-                    })
-                  : t("status.itemInUse")}
+                {assignmentSubtitle(label, t, purposeName)}
               </span>
             </div>
           ) : (
@@ -165,6 +162,23 @@ export function LabelRow({
       </td>
     </tr>
   );
+}
+
+/** A deleted item keeps its name and kind in the label's history, but is no
+ * longer "in use". */
+function assignmentSubtitle(
+  label: LabelPool,
+  t: TFunction,
+  purposeName: (contextTag?: string | null) => string,
+): string {
+  const tag = label.assigned_item_context_tag;
+  const purpose = tag ? purposeName(tag) : "";
+  if (label.is_item_deleted) {
+    return tag
+      ? t("status.purposeDeleted", { purpose })
+      : t("status.itemDeleted");
+  }
+  return tag ? t("status.purposeInUse", { purpose }) : t("status.itemInUse");
 }
 
 /**

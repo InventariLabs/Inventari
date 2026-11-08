@@ -58,6 +58,54 @@ function emptyHeading(
 }
 
 /**
+ * The chips beside the count that say what narrows the list beyond the
+ * filter panel, each with its own way out. The retired one arrives from the
+ * overview's fleet rows, which leave out retired assets nobody holds.
+ */
+function FilterBadges({
+  statusLabel,
+  onClearStatus,
+  hideRetired,
+  onShowRetired,
+  checkedOut,
+  onClearCheckedOut,
+}: {
+  statusLabel: string;
+  onClearStatus: () => void;
+  hideRetired: boolean;
+  onShowRetired: () => void;
+  checkedOut: boolean;
+  onClearCheckedOut: () => void;
+}) {
+  const { t } = useTranslation("equipment");
+  return (
+    <>
+      {statusLabel && (
+        <ClearableFilterBadge
+          label={statusLabel}
+          clearLabel={t("list.clear_filter", "Clear status filter")}
+          onClear={onClearStatus}
+        />
+      )}
+      {hideRetired && (
+        <ClearableFilterBadge
+          label={t("list.retired_hidden")}
+          clearLabel={t("list.show_retired")}
+          onClear={onShowRetired}
+        />
+      )}
+      {checkedOut && (
+        <ClearableFilterBadge
+          label={t("status.deployed")}
+          clearLabel={t("list.clear_checked_out", "Clear checked-out filter")}
+          onClear={onClearCheckedOut}
+        />
+      )}
+    </>
+  );
+}
+
+/**
  * Whether a chip of the status segment is lit. "Checked Out" is also what the
  * address's checked_out flag asks for, so it lights for that flag, and "All"
  * only when neither narrows the list.
@@ -106,6 +154,8 @@ export default function AssetListPage() {
     handleStatusFilter,
     checkedOut,
     handleCheckedOutChange,
+    hideRetired,
+    handleHideRetiredChange,
     locationFilter,
     handleLocationFilter,
     categoryFilter,
@@ -166,7 +216,11 @@ export default function AssetListPage() {
   );
 
   const hasListFilters = Boolean(
-    statusFilter || checkedOut || locationFilter || categoryFilter,
+    statusFilter ||
+    checkedOut ||
+    hideRetired ||
+    locationFilter ||
+    categoryFilter,
   );
   const statusLabel = statusFilter
     ? t(`status.${statusFilter.toLowerCase()}` as const)
@@ -378,12 +432,7 @@ export default function AssetListPage() {
             <QueryError onRetry={() => refetch()} />
           ) : isLoading ? (
             <LoadingSpinner />
-          ) : items.length === 0 &&
-            !search &&
-            !statusFilter &&
-            !checkedOut &&
-            !locationFilter &&
-            !categoryFilter ? (
+          ) : items.length === 0 && !search && !hasListFilters ? (
             <GettingStarted
               moduleName="equipment"
               icon={Monitor}
@@ -454,23 +503,14 @@ export default function AssetListPage() {
                     defaultValue: `${total} assets`,
                   })}
                 </span>
-                {statusFilter && (
-                  <ClearableFilterBadge
-                    label={statusLabel}
-                    clearLabel={t("list.clear_filter", "Clear status filter")}
-                    onClear={() => handleStatusFilter("")}
-                  />
-                )}
-                {checkedOut && (
-                  <ClearableFilterBadge
-                    label={t("status.deployed")}
-                    clearLabel={t(
-                      "list.clear_checked_out",
-                      "Clear checked-out filter",
-                    )}
-                    onClear={() => handleCheckedOutChange(false)}
-                  />
-                )}
+                <FilterBadges
+                  statusLabel={statusLabel}
+                  onClearStatus={() => handleStatusFilter("")}
+                  hideRetired={hideRetired}
+                  onShowRetired={() => handleHideRetiredChange(false)}
+                  checkedOut={checkedOut}
+                  onClearCheckedOut={() => handleCheckedOutChange(false)}
+                />
               </div>
               {/* Table on desktop, enriched cards on mobile. */}
               <div className="hidden md:block">

@@ -35,6 +35,8 @@
     "generateFirst": "Générer les premières étiquettes",
     "itemInUse": "Produit en cours d'utilisation",
     "purposeInUse": "{{purpose}} en cours d'utilisation",
+    "itemDeleted": "Produit (supprimé)",
+    "purposeDeleted": "{{purpose}} (supprimé)",
     "printedAt": "Imprimé le {{date}}",
     "noLabelsFiltered": "Aucune étiquette avec ce statut",
     "noLabelsFilteredSubtitle": "Le pool contient des étiquettes — aucune dans cet état.",
@@ -51,7 +53,6 @@
     "description": "Description (Usage interne)",
     "descriptionPlaceholder": "ex. Pour les nouveaux produits sur l'étagère A",
     "types": {
-      "product": "Produit",
       "category": "Catégorie"
     },
     "prefixPlaceholder": "ex. ETAGERE, PALETTE, CARTON"

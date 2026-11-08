@@ -136,6 +136,7 @@ function TaskListHeader({
   onFilterChange,
   shown,
   total,
+  quarantine,
   locationChosen,
 }: {
   phone: boolean;
@@ -143,10 +144,13 @@ function TaskListHeader({
   onFilterChange: (filter: Filter) => void;
   shown: number;
   total: number;
+  /** Quarantine holds waiting: the launcher badge adds them to the tasks. */
+  quarantine: { total: number } | undefined;
   /** A location narrows documents and put-away, not every kind of task. */
   locationChosen: boolean;
 }) {
   const { t } = useTranslation("warehouse");
+  const holds = quarantine?.total ?? 0;
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3">
@@ -181,6 +185,13 @@ function TaskListHeader({
       {locationChosen && (
         <p className="border-b border-border px-4 py-2 text-sm text-on-secondary">
           {t("start.warehouse.scopeNote")}
+        </p>
+      )}
+      {/* The badge counts everything, whatever the list is narrowed to: only
+          an un-narrowed list can say the same number. */}
+      {filter === "all" && !locationChosen && holds > 0 && total > 0 && (
+        <p className="border-b border-border px-4 py-2 text-sm tabular-nums text-on-secondary">
+          {t("todo.waitingSum", { total: total + holds, tasks: total, holds })}
         </p>
       )}
     </>
@@ -465,6 +476,7 @@ export default function DocumentsTodoPage() {
                   onFilterChange={setFilterChoice}
                   shown={tasks.length}
                   total={total}
+                  quarantine={quarantine}
                   locationChosen={warehouseId !== null}
                 />
                 {canWrite && membersFailed && (

@@ -1,5 +1,5 @@
 import React from "react";
-import { act, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -150,15 +150,20 @@ function serve({
         expired_warranty_alerts: expired,
       }),
     ),
-    http.get("/api/v1/equipment/assignments/overdue", () =>
-      HttpResponse.json({
-        items: overdue,
+    // Pages the way the endpoint does, so a reader that asks for one page
+    // of a long list gets only that page.
+    http.get("/api/v1/equipment/assignments/overdue", ({ request }) => {
+      const query = new URL(request.url).searchParams;
+      const limit = Number(query.get("limit") ?? 50);
+      const offset = Number(query.get("offset") ?? 0);
+      return HttpResponse.json({
+        items: overdue.slice(offset, offset + limit),
         total: overdue.length,
-        limit: 20,
-        offset: 0,
-        has_more: false,
-      }),
-    ),
+        limit,
+        offset,
+        has_more: offset + limit < overdue.length,
+      });
+    }),
     http.get("/api/v1/equipment/assignments", () =>
       HttpResponse.json({
         items: assignments,
@@ -267,6 +272,36 @@ describe("the equipment overview", () => {
     await settle();
   });
 
+  it("counts every late return, past the first twenty, in the heading and the rows", async () => {
+    const late = (n: number) => ({
+      assignment_id: `asg-${n}`,
+      item_id: `late-${n}`,
+      item_name: `Laptop ${n}`,
+      item_barcode: null,
+      item_serial: null,
+      item_asset_tag: null,
+      holder_name: "K. Nowak",
+      holder_kind: "person",
+      assigned_to_email: null,
+      checked_out_at: "2026-09-01T08:00:00Z",
+      expected_return_at: "2026-09-19T08:00:00Z",
+      days_overdue: n,
+    });
+    serve({
+      overdue: Array.from({ length: 27 }, (_, i) => late(i + 1)),
+      totals: { total_assets: 30, retired: 0, active: 27 },
+    });
+    renderPage();
+
+    expect(
+      await screen.findByRole("heading", { name: "27 assets need attention" }),
+    ).toBeInTheDocument();
+    // The rows behind "Show all" are the 27 the heading counts.
+    fireEvent.click(screen.getByRole("button", { name: "Show all 27" }));
+    expect(screen.getByText("Laptop 27")).toBeInTheDocument();
+    await settle();
+  });
+
   it("reads a warranty that ends today as today, and one day in the singular", async () => {
     serve({
       ending: [
@@ -361,7 +396,7 @@ describe("the equipment overview", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Laptops" })).toHaveAttribute(
       "href",
-      "/equipment/assets?category=cat-laptops",
+      "/equipment/assets?category=cat-laptops&hide_retired=1",
     );
     expect(screen.getByText("No category")).toBeInTheDocument();
     await settle();

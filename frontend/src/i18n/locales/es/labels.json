@@ -35,6 +35,8 @@
     "generateFirst": "Generar las primeras etiquetas",
     "itemInUse": "Producto en uso",
     "purposeInUse": "{{purpose}} en uso",
+    "itemDeleted": "Producto (eliminado)",
+    "purposeDeleted": "{{purpose}} (eliminado)",
     "printedAt": "Impreso el {{date}}",
     "noLabelsFiltered": "No hay etiquetas con este estado",
     "noLabelsFilteredSubtitle": "El grupo tiene etiquetas, pero ninguna en este estado.",
@@ -51,7 +53,6 @@
     "description": "Descripción (Uso interno)",
     "descriptionPlaceholder": "ej. Para productos nuevos en el estante A",
     "types": {
-      "product": "Producto",
       "category": "Categoría"
     },
     "prefixPlaceholder": "ej. ESTANTE, PALE, CAJA"

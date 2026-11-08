@@ -63,6 +63,11 @@ function useAssetListAddress() {
     searchParams.get("checked_out") === "true";
   const locationFilter = searchParams.get("location") ?? "";
   const categoryFilter = searchParams.get("category") ?? "";
+  // The fleet cards link here with the retired assets nobody holds left out,
+  // as they are left out of the numbers the card shows.
+  const hideRetired =
+    searchParams.get("hide_retired") === "1" ||
+    searchParams.get("hide_retired") === "true";
   // Same rule for the tab: it was readable from the address and written
   // nowhere, so a copied archive address opened the active list.
   const listTab: ListTab =
@@ -77,6 +82,7 @@ function useAssetListAddress() {
         if (status) prev.set("status", status);
         else prev.delete("status");
         prev.delete("checked_out");
+        prev.delete("hide_retired");
         return prev;
       },
       { replace: true },
@@ -105,6 +111,17 @@ function useAssetListAddress() {
       (prev) => {
         if (value) prev.set("checked_out", "1");
         else prev.delete("checked_out");
+        return prev;
+      },
+      { replace: true },
+    );
+  }
+
+  function handleHideRetiredChange(value: boolean) {
+    setSearchParams(
+      (prev) => {
+        if (value) prev.set("hide_retired", "1");
+        else prev.delete("hide_retired");
         return prev;
       },
       { replace: true },
@@ -145,14 +162,28 @@ function useAssetListAddress() {
   );
 
   const clearAllFilters = useCallback(
-    () => clearFilterParams(["status", "checked_out", "location", "category"]),
+    () =>
+      clearFilterParams([
+        "status",
+        "checked_out",
+        "hide_retired",
+        "location",
+        "category",
+      ]),
     [clearFilterParams],
   );
   // The empty state's "Clear" undoes everything that narrowed the list,
   // the phrase included, in the one navigation the note above asks for.
   const clearFiltersAndSearch = useCallback(
     () =>
-      clearFilterParams(["status", "checked_out", "location", "category", "q"]),
+      clearFilterParams([
+        "status",
+        "checked_out",
+        "hide_retired",
+        "location",
+        "category",
+        "q",
+      ]),
     [clearFilterParams],
   );
   const clearLocationAndCategory = useCallback(
@@ -184,6 +215,7 @@ function useAssetListAddress() {
     const narrowedByAddress =
       searchParams.get("status") ||
       searchParams.get("checked_out") ||
+      searchParams.get("hide_retired") ||
       searchParams.get("location") ||
       searchParams.get("category");
     if (!narrowedByAddress) return;
@@ -195,6 +227,8 @@ function useAssetListAddress() {
     handleStatusFilter,
     checkedOut,
     handleCheckedOutChange,
+    hideRetired,
+    handleHideRetiredChange,
     locationFilter,
     handleLocationFilter,
     categoryFilter,
@@ -289,20 +323,17 @@ function useArchivedListing(listTab: ListTab, search: string) {
 
 export function useAssetListActions() {
   const { t } = useTranslation("equipment");
+  // The filters the address holds, handed on to the page as they are.
+  const address = useAssetListAddress();
   const {
     statusFilter,
-    handleStatusFilter,
     checkedOut,
-    handleCheckedOutChange,
+    hideRetired,
     locationFilter,
-    handleLocationFilter,
     categoryFilter,
-    setCategoryFilter,
-    clearFiltersAndSearch,
-    clearLocationAndCategory,
     listTab,
     writeListTab,
-  } = useAssetListAddress();
+  } = address;
   const [search, setSearch] = useSearchPhrase();
   const [skip, setSkip] = useState(0);
 
@@ -335,8 +366,16 @@ export function useAssetListActions() {
       location_id: locationFilter || undefined,
       status: statusFilter || undefined,
       checked_out: checkedOut,
+      hide_retired: hideRetired,
     }),
-    [search, categoryFilter, locationFilter, statusFilter, checkedOut],
+    [
+      search,
+      categoryFilter,
+      locationFilter,
+      statusFilter,
+      checkedOut,
+      hideRetired,
+    ],
   );
 
   const { data, isLoading, isError, refetch } = useEquipmentAssets({
@@ -361,6 +400,7 @@ export function useAssetListActions() {
     locationFilter,
     statusFilter,
     checkedOut,
+    hideRetired,
     sort,
     sortDir,
   ]);
@@ -733,9 +773,9 @@ export function useAssetListActions() {
   };
 
   return {
+    ...address,
     search,
     setSearch,
-    listTab,
     setListTab: (v: string) => {
       const tab = v as ListTab;
       writeListTab(tab);
@@ -769,16 +809,6 @@ export function useAssetListActions() {
     setPurgeTarget,
     bulkEditAction,
     setBulkEditAction,
-    statusFilter,
-    handleStatusFilter,
-    checkedOut,
-    handleCheckedOutChange,
-    locationFilter,
-    handleLocationFilter,
-    categoryFilter,
-    setCategoryFilter,
-    clearFiltersAndSearch,
-    clearLocationAndCategory,
     sort,
     sortDir,
     handleSortChange,
