@@ -31,6 +31,8 @@ export const recipesLinkingApi = {
     async (): Promise<IngredientMatchProposalsResponse> => {
       const response = await api.post<IngredientMatchProposalsResponse>(
         "/recipes/ingredients/match-proposals",
+        undefined,
+        { readOnly: true },
       );
       return response.data;
     },

@@ -241,6 +241,7 @@
     "deleteSuccess": "Produkt został usunięty",
     "fileAttached": "Plik załączony",
     "fileUploadFailed": "Nie udało się wgrać pliku",
+    "imageRemoveFailed": "Nie udało się usunąć zdjęcia",
     "fileUploadFailedAttachment": "Nie udało się wgrać pliku załącznika",
     "unitLookupFailed": "Nie udało się sprawdzić, w jakiej jednostce prowadzony jest ten produkt. Spróbuj zapisać ponownie.",
     "quantityClearedOnUnitChange": "Wyczyściliśmy ilość — nowa jednostka mierzy co innego.",

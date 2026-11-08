@@ -307,6 +307,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
         const response = await api.post<AnalyzeResponse>(
           `/warehouse/import/parse-paste`,
           { text },
+          { readOnly: true },
         );
         applyAnalyzeResponse(response.data);
       } catch (error) {

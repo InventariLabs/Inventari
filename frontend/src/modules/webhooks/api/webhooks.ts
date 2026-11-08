@@ -53,6 +53,8 @@ export const webhooksApi = {
   test: async (id: string): Promise<WebhookTestResult> => {
     const response = await api.post<WebhookTestResult>(
       `/webhooks/endpoints/${id}/test`,
+      undefined,
+      { readOnly: true },
     );
     return response.data;
   },

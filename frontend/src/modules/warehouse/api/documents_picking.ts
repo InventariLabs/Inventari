@@ -91,7 +91,11 @@ export const documentsPickingApi = {
   ): Promise<WmsPickUncoveredDocument[]> => {
     const response = await api.post<
       components["schemas"]["WmsPickCoverageOut"]
-    >("/warehouse/picking/coverage", { document_ids: documentIds });
+    >(
+      "/warehouse/picking/coverage",
+      { document_ids: documentIds },
+      { readOnly: true },
+    );
     return response.data.documents;
   },
 

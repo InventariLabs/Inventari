@@ -180,6 +180,15 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- When the session has ended, a request that was only asking — a label preview,
+  a pasted-lines or sheet read, a price calculation, a match or coverage check,
+  a connection, webhook or e-mail test, a generated barcode — now gets the plain
+  sentence that the session has ended, instead of "this was not saved, sign in
+  again and start over", which was false for work that had saved nothing. A
+  module's own request that saves nothing gets the same sentence by passing
+  `{ readOnly: true }` as the request config to the `api` client from
+  `@/module-sdk`. On the equipment form, a refused photo removal after the asset
+  was saved is now reported as that, not as a failed upload.
 - Uploading a product picture that only starts like one — a GIF, PNG or JPEG
   header followed by something else — is now refused as unreadable instead of
   being stored and shown as a broken thumbnail. The equipment note beside the

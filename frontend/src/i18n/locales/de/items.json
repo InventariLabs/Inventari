@@ -209,6 +209,7 @@
     "deleteSuccess": "Erfolgreich gelöscht",
     "fileAttached": "Datei angehängt",
     "fileUploadFailed": "Datei-Upload fehlgeschlagen",
+    "imageRemoveFailed": "Das Foto konnte nicht entfernt werden",
     "fileUploadFailedAttachment": "Upload der Anhangsdatei fehlgeschlagen",
     "unitLookupFailed": "Es konnte nicht geprüft werden, in welcher Einheit dieses Produkt geführt wird. Versuchen Sie das Speichern erneut.",
     "quantityClearedOnUnitChange": "Menge geleert — die neue Einheit misst etwas anderes.",

@@ -212,14 +212,29 @@ export function useEquipmentForm(
   // reported as that — never as the asset "not saved", which would invite a
   // second, duplicate asset.
   const applyImageAfterSave = async (itemId: string) => {
-    try {
-      await image.applyImageChanges(itemId);
-    } catch (err) {
-      toast.error(
-        followUpError(
-          err,
-          t("items:messages.fileUploadFailed", "Failed to upload file"),
-        ),
+    const attempt = async (run: () => Promise<unknown>, fallback: string) => {
+      try {
+        await run();
+        return true;
+      } catch (err) {
+        toast.error(followUpError(err, fallback));
+        return false;
+      }
+    };
+    if (
+      image.deleteImageFlag &&
+      !(await attempt(
+        () => image.removeImage(itemId),
+        t("items:messages.imageRemoveFailed", "Failed to remove the photo"),
+      ))
+    ) {
+      return;
+    }
+    if (image.imageFile) {
+      const file = image.imageFile;
+      await attempt(
+        () => image.uploadImage(itemId, file),
+        t("items:messages.fileUploadFailed", "Failed to upload file"),
       );
     }
   };
