@@ -65,6 +65,7 @@ _LOGGING_ATTR = 'log_action_async'
 _EXECUTE_ATTR = 'execute'
 _WRITE_STATEMENT_MARKERS = ('insert(', 'update(', 'delete(')
 _CORE_API_CLASS_PREFIX = 'Core'
+_USER_CONTEXT_TYPE = 'UserContextDTO'
 _SESSION_PARAM_NAMES = frozenset({'db', 'session', 'sess'})
 
 
@@ -88,6 +89,8 @@ class _Function:
     calls: list[tuple[str, ...]] = field(default_factory=list)
     direct_log: bool = False
     direct_write: bool = False
+    #: A parameter annotated ``UserContextDTO`` — the acting user, whole.
+    takes_user_context: bool = False
 
 
 @dataclass
@@ -180,11 +183,20 @@ def _make_function(
 ) -> _Function:
     if qualname is None:
         qualname = node.name if class_name is None else f'{class_name}.{node.name}'
+    args = node.args
     fn = _Function(
         key=(module_name, qualname),
         rel_path=rel_path,
         lineno=node.lineno,
         class_name=class_name,
+        takes_user_context=any(
+            arg.annotation is not None
+            and any(
+                isinstance(name, ast.Name) and name.id == _USER_CONTEXT_TYPE
+                for name in ast.walk(arg.annotation)
+            )
+            for arg in (*args.posonlyargs, *args.args, *args.kwonlyargs)
+        ),
     )
     session_names = _session_names(node)
     for sub in ast.walk(node):
@@ -644,9 +656,15 @@ def _iter_core_api_sources(index: _AppIndex) -> list[tuple[_Function, str]]:
 
 
 @once_per_run
+def _app_index(app_root: Path) -> _AppIndex:
+    """One index of the tree per run: both collectors below walk it."""
+    return _AppIndex(app_root)
+
+
+@once_per_run
 def collect_audit_gaps(app_root: Path) -> dict[str, AuditCoverageGap]:
     """``{key: gap}`` for every write source that reaches no entry."""
-    index = _AppIndex(app_root)
+    index = _app_index(app_root)
     gaps: dict[str, AuditCoverageGap] = {}
     for fn, label in (*_iter_route_sources(index), *_iter_core_api_sources(index)):
         writes, logs = index.reaches(fn)
@@ -661,6 +679,55 @@ def collect_audit_gaps(app_root: Path) -> dict[str, AuditCoverageGap]:
             kind='core_api' if fn.rel_path.startswith('core/public_api/') else 'route',
         )
     return gaps
+
+
+@once_per_run
+def collect_core_api_writes_without_user(app_root: Path) -> dict[str, AuditCoverageGap]:
+    """``{key: method}`` for every CoreAPI write method that takes no
+    ``UserContextDTO`` — a write as :func:`collect_audit_gaps` reads one."""
+    index = _app_index(app_root)
+    found: dict[str, AuditCoverageGap] = {}
+    for fn, label in _iter_core_api_sources(index):
+        if fn.takes_user_context or not index.reaches(fn)[0]:
+            continue
+        key = f'{fn.rel_path}::{fn.key[1]}'
+        found[key] = AuditCoverageGap(
+            key=key,
+            rel_path=fn.rel_path,
+            lineno=fn.lineno,
+            label=label,
+            kind='core_api',
+        )
+    return found
+
+
+def _check_core_api_write_user_context(
+    app_root: Path, baseline: set[str] | None = None
+) -> list[str]:
+    """A CoreAPI write method takes the acting user, not an id for one.
+
+    The rule the module guide states — a write method takes
+    ``user: UserContextDTO`` — had nothing behind it, and dozens of write
+    methods take ``user_id``, ``actor_user_id`` or ``created_by``: an
+    interceptor or a journal entry downstream then has an id to look up
+    instead of the organization, role and identity the caller already held.
+    The methods written before the rule sit in
+    ``coreapi_write_user_context_baseline.txt`` and only leave it; a new one
+    is an ``::error``.
+    """
+    accepted = baseline or set()
+    findings: list[str] = []
+    for key, method in sorted(collect_core_api_writes_without_user(app_root).items()):
+        severity = 'notice' if key in accepted else 'error'
+        findings.append(
+            f'::{severity} file=app/{method.rel_path},line={method.lineno},'
+            f'title=Architecture: CoreAPI write without the acting user::'
+            f'{method.label} writes and takes no UserContextDTO. A CoreAPI '
+            f'write method takes `user: UserContextDTO` (MODULES_GUIDE.md, '
+            f'"User-context convention"), so the interceptors and the journal '
+            f'read who acted from the call rather than looking an id up.'
+        )
+    return findings
 
 
 def _check_audit_coverage(

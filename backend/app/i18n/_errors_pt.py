@@ -648,6 +648,7 @@ ERRORS_PT: dict[str, str] = {
     'category_system_field_label_locked': 'O nome do campo "{field}" pertence ao catálogo de produtos e não pode ser alterado.',
     'storage_delete_blocked_by_movements': 'Não é possível excluir o local de armazenamento: {count} movimentações de estoque o referenciam. O histórico de movimentações é imutável — arquive este local.',
     'storage_delete_blocked_by_stock': 'Não é possível excluir o local de armazenamento: o registro de estoque ainda guarda estoque aqui sem nenhum registro associado. Arquive este local ou traga o estoque de volta para um registro primeiro.',
+    'storage_delete_blocked_by_child_name': 'Não é possível excluir o local "{location}": o local filho "{name}" ficaria, ao subir um nível, ao lado de outro local com o mesmo nome. Renomeie um dos dois primeiro.',
     'storage_name_collision': 'Já existe um local de armazenamento chamado "{name}" neste nível.',
     'validation_missing': 'Este campo é obrigatório',
     'validation_string_too_long': 'Deve ter no máximo {max_length} caracteres',

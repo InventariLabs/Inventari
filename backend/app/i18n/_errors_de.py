@@ -881,6 +881,7 @@ ERRORS_DE: ErrorMessages = {
     'storage_delete_blocked_by_stock': (
         'Lagerort kann nicht gelöscht werden: Das Bestandsregister führt hier noch Bestand, zu dem kein Datensatz gehört. Archivieren Sie diesen Ort stattdessen oder ordnen Sie den Bestand zuerst einem Datensatz zu.'
     ),
+    'storage_delete_blocked_by_child_name': 'Der Lagerort „{location}“ kann nicht gelöscht werden: Sein untergeordneter Lagerort „{name}“ stünde nach dem Hochrücken neben einem Lagerort mit demselben Namen. Benennen Sie einen von beiden zuerst um.',
     'storage_name_collision': (
         'Ein Lagerort mit dem Namen „{name}“ existiert bereits auf dieser Ebene.'
     ),

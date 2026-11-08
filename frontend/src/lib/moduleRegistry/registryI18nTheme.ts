@@ -1,5 +1,6 @@
 import i18n from "i18next";
 
+import { logger } from "@/utils/logger";
 import type { FrontendModule } from "./moduleInterfaces";
 
 /**
@@ -49,6 +50,50 @@ function setDeep(
     node = node[segment] as Record<string, unknown>;
   }
   node[path[path.length - 1]] = value;
+}
+
+/** Whether *path* leads to a translated string in *bundle*. */
+function hasString(bundle: Record<string, unknown>, path: string[]): boolean {
+  let node: unknown = bundle;
+  for (const segment of path) {
+    if (typeof node !== "object" || node === null || !(segment in node)) {
+      return false;
+    }
+    node = (node as Record<string, unknown>)[segment];
+  }
+  return typeof node === "string";
+}
+
+/**
+ * Development aid: name the override keys *catalog* has no string for.
+ *
+ * *catalog* is the namespace's own translations before any override, so a key
+ * missing from it is one no screen reads: the override is accepted, the badge
+ * says the module changes the interface, and nothing on screen changes — which
+ * is how two examples in the module guide did nothing for whoever copied them.
+ * Checked only once the namespace's catalog is in: a catalog that has not
+ * landed yet would make every key look missing.
+ */
+function warnUnmatchedKeys(
+  module: FrontendModule,
+  language: string,
+  namespace: string,
+  catalog: Record<string, unknown>,
+): void {
+  if (!import.meta.env.DEV || Object.keys(catalog).length === 0) return;
+  const unmatched = Object.keys(module.i18nOverrides?.[language] ?? {}).filter(
+    (key) => {
+      const target = parseOverrideKey(key, "");
+      return target.ns === namespace && !hasString(catalog, target.path);
+    },
+  );
+  if (unmatched.length > 0) {
+    logger.warn(
+      `[ModuleRegistry] Module "${module.name}" overrides ${language} ` +
+        `translation keys no catalog has, so they change nothing: ` +
+        unmatched.join(", "),
+    );
+  }
 }
 
 function groupByNamespace(
@@ -153,22 +198,27 @@ function applyI18nAdd(
       !appliedI18nModules.has(module.name)
     ) {
       targetedNamespaces(module).forEach((langAndNs) => {
+        const sep = langAndNs.indexOf(":");
+        const [language, namespace] = [
+          langAndNs.slice(0, sep),
+          langAndNs.slice(sep + 1),
+        ];
         // The pristine snapshot is taken once, before the first override
         // touches the namespace — later appliers must not overwrite it.
         // structuredClone: getResourceBundle hands back the store's own
         // object graph, which addResourceBundle would then mutate under us.
         if (!savedBundles.has(langAndNs)) {
-          const sep = langAndNs.indexOf(":");
           savedBundles.set(
             langAndNs,
-            structuredClone(
-              i18n.getResourceBundle(
-                langAndNs.slice(0, sep),
-                langAndNs.slice(sep + 1),
-              ) || {},
-            ),
+            structuredClone(i18n.getResourceBundle(language, namespace) || {}),
           );
         }
+        warnUnmatchedKeys(
+          module,
+          language,
+          namespace,
+          savedBundles.get(langAndNs) ?? {},
+        );
       });
       applyModuleI18n(module);
       appliedI18nModules.add(module.name);
@@ -257,6 +307,9 @@ export function noteCatalogLanded(
   savedBundles: Map<string, Record<string, unknown>>,
 ): void {
   const key = `${language}:${namespace}`;
+  // The overrides applied before this language's catalog was in, so this is
+  // the first moment their keys can be read against it.
+  const firstCatalog = Object.keys(savedBundles.get(key) ?? {}).length === 0;
   let targeted = false;
   appliedI18nModules.forEach((moduleName) => {
     const module = modules.get(moduleName);
@@ -264,12 +317,11 @@ export function noteCatalogLanded(
     if (!targetedNamespaces(module).includes(key)) return;
     targeted = true;
     const pristine = savedBundles.get(key);
-    savedBundles.set(
-      key,
-      pristine
-        ? mergeCatalog(structuredClone(pristine), catalog)
-        : structuredClone(catalog),
-    );
+    const merged = pristine
+      ? mergeCatalog(structuredClone(pristine), catalog)
+      : structuredClone(catalog);
+    savedBundles.set(key, merged);
+    if (firstCatalog) warnUnmatchedKeys(module, language, namespace, merged);
   });
   if (targeted) {
     reapplyOverridesForNamespace(namespace, modules, appliedI18nModules);

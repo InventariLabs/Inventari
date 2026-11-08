@@ -18,7 +18,10 @@ from sqlalchemy.orm import Session
 from app.core.db_utils import get_org_owned_or_404
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.money import quantise
-from app.core.product_template_metadata import set_template_nutrition
+from app.core.product_template_metadata import (
+    get_template_nutrition,
+    set_template_nutrition,
+)
 from app.i18n.service import get_current_lang
 from app.models.category import Category
 from app.models.product_template import ProductTemplate
@@ -74,6 +77,17 @@ def _write_card_product_fields(
                 template, item_data['weight_value'], item_data.get('weight_uom_id')
             )
         return
+    # A scan's figures belong to the product too: a recipe reads the product,
+    # not the record. Only a product with none of its own takes them, so a
+    # figure typed on it is never overwritten. A cleared panel is stored as
+    # an empty namespace, which every reader treats as "no figures".
+    if not get_template_nutrition(template):
+        nutrition = extract_nutrition_info_from_off_metadata(
+            item_data.get('meta_data') or {}
+        )
+        if nutrition:
+            set_template_nutrition(template, nutrition)
+            db.add(template)
     if item_data.get('min_quantity') is not None:
         template.min_quantity = float(item_data.get('min_quantity') or 0)
         db.add(template)

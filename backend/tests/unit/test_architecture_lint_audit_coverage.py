@@ -14,6 +14,7 @@ from pathlib import Path
 
 from app.core.architecture_lint._quality_checks_audit_coverage import (
     _check_audit_coverage,
+    _check_core_api_write_user_context,
     collect_audit_gaps,
 )
 
@@ -452,3 +453,56 @@ def test_a_submodule_of_a_package_without_init_is_followed(tmp_path: Path):
     )
 
     assert list(collect_audit_gaps(app)) == ['modules/queue/router.py::claim_job']
+
+
+_WIDGETS_WRITES = """
+from app.core.contracts import UserContextDTO
+
+
+class CoreWidgetsAPI:
+    async def create_async(self, db, org_id, user_id):
+        db.add(object())
+        await db.flush()
+
+    async def rename_async(self, db, widget_id, name, user: UserContextDTO):
+        db.add(object())
+        await db.flush()
+
+    async def archive_async(self, db, widget_id, user: UserContextDTO | None = None):
+        db.add(object())
+        await db.flush()
+
+    async def get_async(self, db, widget_id, user_id):
+        return await db.get(object, widget_id)
+"""
+
+
+class TestACoreApiWriteTakesTheUser:
+    """The rule the module guide states for a new CoreAPI write method."""
+
+    def test_a_write_that_takes_an_id_for_the_user_is_an_error(self, tmp_path: Path):
+        app = _write_app(tmp_path, {'core/public_api/widgets.py': _WIDGETS_WRITES})
+
+        findings = _check_core_api_write_user_context(app)
+
+        assert len(findings) == 1
+        assert findings[0].startswith('::error file=app/core/public_api/widgets.py')
+        assert 'core_api.CoreWidgetsAPI.create_async' in findings[0]
+        assert 'UserContextDTO' in findings[0]
+
+    def test_a_method_from_before_the_rule_is_a_notice(self, tmp_path: Path):
+        app = _write_app(tmp_path, {'core/public_api/widgets.py': _WIDGETS_WRITES})
+
+        findings = _check_core_api_write_user_context(
+            app, {'core/public_api/widgets.py::CoreWidgetsAPI.create_async'}
+        )
+
+        assert [f.split(' ', 1)[0] for f in findings] == ['::notice']
+
+    def test_a_module_api_is_not_the_core_facade(self, tmp_path: Path):
+        app = _write_app(
+            tmp_path,
+            {'modules/widgets/widgets_api.py': _WIDGETS_WRITES},
+        )
+
+        assert _check_core_api_write_user_context(app) == []

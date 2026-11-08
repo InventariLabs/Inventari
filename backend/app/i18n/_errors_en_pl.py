@@ -889,6 +889,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'storage_delete_blocked_by_stock': (
             'Cannot delete storage location: the stock register still holds stock here with no record standing on it. Archive this location instead, or bring its stock back to a record first.'
         ),
+        'storage_delete_blocked_by_child_name': (
+            'Cannot delete storage location "{location}": its child location "{name}" would end up beside another location with the same name once it moves up a level. Rename one of them first.'
+        ),
         'storage_name_collision': (
             'A storage location named "{name}" already exists at this level.'
         ),
@@ -1947,6 +1950,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'validation_boolean': 'Musi być prawdą albo fałszem',
         'validation_identifier': 'Musi być poprawnym identyfikatorem',
         'validation_date': 'Musi być poprawną datą',
+        'storage_delete_blocked_by_child_name': (
+            'Nie można usunąć miejsca „{location}”: jego podrzędne miejsce „{name}” po przeniesieniu piętro wyżej stałoby obok miejsca o tej samej nazwie. Najpierw zmień nazwę jednego z nich.'
+        ),
         'storage_name_collision': (
             'Miejsce o nazwie „{name}" już istnieje na tym poziomie.'
         ),

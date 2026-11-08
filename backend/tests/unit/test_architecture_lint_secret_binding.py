@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from app.core.architecture_lint._quality_checks_secrets import (
     _check_module_secret_binding,
 )
@@ -35,6 +37,30 @@ from app.core.public_api import core_api
 
 def save(secret):
     return core_api.settings.encrypt_app_secret(secret)
+"""
+
+_CRYPTO_SERVICE_ATTRIBUTE = """
+from app.services import crypto_service
+
+
+def save(secret):
+    return crypto_service.encrypt_app_secret(secret)
+"""
+
+_CRYPTO_SERVICE_NAME = """
+from app.services.crypto_service import encrypt_app_secret as seal
+
+
+def save(secret):
+    return seal(secret)
+"""
+
+_HANDED_ON = """
+from app.core.public_api import core_api
+
+
+def sealer():
+    return core_api.settings.encrypt_app_secret
 """
 
 _BOUND = """
@@ -78,6 +104,19 @@ class TestWhatIsRefused:
         findings = _check_module_secret_binding(_module(tmp_path, _APP_WIDE_SETTINGS))
 
         assert len(findings) == 1
+
+    @pytest.mark.parametrize(
+        'source',
+        [_CRYPTO_SERVICE_ATTRIBUTE, _CRYPTO_SERVICE_NAME, _HANDED_ON],
+        ids=['crypto-service-attribute', 'imported-under-another-name', 'handed-on'],
+    )
+    def test_the_app_wide_helper_in_any_form(self, tmp_path: Path, source: str):
+        """The check knew two spellings through the facade; the helper is
+        just as unbound reached from ``crypto_service`` or under an alias."""
+        findings = _check_module_secret_binding(_module(tmp_path, source))
+
+        assert len(findings) == 1
+        assert 'encrypt_app_secret' in findings[0]
 
 
 class TestWhatIsAllowed:

@@ -44,6 +44,24 @@ class TestHelp:
         assert 'validate' in result.output
         assert 'list' in result.output
 
+    def test_the_language_option_names_every_language_the_scaffold_takes(self):
+        """The help listed four languages while the scaffold took five: pt was
+        accepted and never offered."""
+        import re
+
+        from app.i18n import SUPPORTED_LANGUAGES
+
+        result = runner.invoke(
+            app, ['module', 'new-community', '--help'], env={'COLUMNS': '400'}
+        )
+        listed = re.search(r'catalog for \(([^)]*)\)', result.output)
+
+        assert result.exit_code == 0
+        assert listed is not None, result.output
+        assert listed.group(1).split(', ') == [
+            lang for lang in SUPPORTED_LANGUAGES if lang != 'en'
+        ]
+
     def test_arch_help(self):
         result = runner.invoke(app, ['arch', '--help'])
         assert result.exit_code == 0

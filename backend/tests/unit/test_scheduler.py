@@ -237,3 +237,33 @@ class TestCoreSchedulerAPI:
                 core_api.scheduler.unregister_task('w', module_name='webhooks') is True
             )
         mock_unregister.assert_called_once_with('w', 'webhooks')
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(('persistent', 'warns'), [(True, True), (False, False)])
+async def test_a_persistent_task_without_redis_says_it_runs_locally(
+    caplog, persistent, warns
+):
+    """Asked for persistence, given none: the module author and the operator
+    learn it from the log, not from a missed run after a restart."""
+    import logging
+
+    from app.core.scheduler import ScheduledTask
+
+    scheduler = TaskScheduler()
+    assert scheduler._redis is None
+    task = ScheduledTask(
+        name='nightly',
+        interval=timedelta(milliseconds=10),
+        handler=lambda: None,
+        module_name='test',
+        is_persistent=persistent,
+    )
+
+    with (
+        caplog.at_level(logging.WARNING, logger='app.core.scheduler'),
+        patch('app.core.scheduler.asyncio.sleep', new_callable=AsyncMock),
+    ):
+        await scheduler._run_periodic(task)  # not running: returns after the jitter
+
+    assert ('Redis is not connected' in caplog.text) is warns
