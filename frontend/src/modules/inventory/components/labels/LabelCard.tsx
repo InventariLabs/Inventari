@@ -9,6 +9,7 @@ import {
   useLabelStateName,
 } from "@/modules/inventory/hooks/useLabelStateName";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { useLabelPurposeName } from "@/modules/inventory/hooks/useLabelPurposeName";
 
 interface LabelCardProps {
   label: LabelPool;
@@ -30,6 +31,7 @@ export const LabelCard = memo(function LabelCard({
 }: LabelCardProps) {
   const { t } = useTranslation(["labels", "common"]);
   const stateName = useLabelStateName();
+  const purposeName = useLabelPurposeName();
   const state = labelState(label);
 
   return (
@@ -84,7 +86,7 @@ export const LabelCard = memo(function LabelCard({
         ) : (
           label.description ||
           (label.label_type === "GENERIC"
-            ? t("generateModal.types.product")
+            ? purposeName(label.context_tag)
             : label.label_type)
         )}
       </p>

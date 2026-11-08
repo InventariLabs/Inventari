@@ -39,6 +39,8 @@
     "generateFirst": "Generuj pierwsze etykiety",
     "itemInUse": "Produkt w użyciu",
     "purposeInUse": "{{purpose}} w użyciu",
+    "itemDeleted": "Produkt (usunięto)",
+    "purposeDeleted": "{{purpose}} (usunięto)",
     "printedAt": "Wydrukowano {{date}}",
     "noLabelsFiltered": "Brak etykiet o tym statusie",
     "noLabelsFilteredSubtitle": "W puli są etykiety — żadna nie jest w tym stanie.",
@@ -55,7 +57,6 @@
     "description": "Opis (do użytku wewnętrznego)",
     "descriptionPlaceholder": "np. Do nowych produktów na regale A",
     "types": {
-      "product": "Produkt",
       "category": "Kategoria"
     },
     "prefixPlaceholder": "np. REGAL, PALETA, KARTON"

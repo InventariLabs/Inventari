@@ -35,6 +35,8 @@
     "generateFirst": "Erste Etiketten erzeugen",
     "itemInUse": "Produkt in Verwendung",
     "purposeInUse": "{{purpose}} in Verwendung",
+    "itemDeleted": "Produkt (gelöscht)",
+    "purposeDeleted": "{{purpose}} (gelöscht)",
     "printedAt": "Gedruckt am {{date}}",
     "noLabelsFiltered": "Keine Etiketten mit diesem Status",
     "noLabelsFilteredSubtitle": "Im Pool sind Etiketten — keines davon in diesem Zustand.",
@@ -51,7 +53,6 @@
     "description": "Beschreibung (Intern)",
     "descriptionPlaceholder": "z. B. Für neue Produkte in Regal A",
     "types": {
-      "product": "Produkt",
       "category": "Kategorie"
     },
     "prefixPlaceholder": "z. B. REGAL, PALETTE, KARTON"

@@ -35,6 +35,8 @@
     "generateFirst": "Generate the first labels",
     "itemInUse": "Product in use",
     "purposeInUse": "{{purpose}} in use",
+    "itemDeleted": "Product (deleted)",
+    "purposeDeleted": "{{purpose}} (deleted)",
     "printedAt": "Printed at {{date}}",
     "noLabelsFiltered": "No labels with this status",
     "noLabelsFilteredSubtitle": "There are labels in the pool — none of them is in this state.",
@@ -51,7 +53,6 @@
     "description": "Description (Internal use)",
     "descriptionPlaceholder": "e.g. For new products on Shelf A",
     "types": {
-      "product": "Product",
       "category": "Category"
     },
     "prefixPlaceholder": "e.g. SHELF, RACK, BOX"
