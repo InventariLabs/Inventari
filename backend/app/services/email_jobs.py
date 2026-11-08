@@ -63,9 +63,6 @@ async def enqueue_email_job(
         logger.warning('[email-jobs] AsyncSessionLocal unavailable; email dropped')
         return None
 
-    smtp_config_enc = (
-        encrypt_app_secret(json.dumps(smtp_config)) if smtp_config is not None else None
-    )
     failure_notice_enc = (
         encrypt_app_secret(json.dumps(failure_notice))
         if failure_notice is not None
@@ -73,6 +70,25 @@ async def enqueue_email_job(
     )
     try:
         async with db_facade.AsyncSessionLocal() as db:
+            if smtp_config is None and organization_id is not None:
+                # Mail an organization sends leaves through the server it set
+                # up in Settings → Email, whichever caller queued it. The
+                # account mails handed it over themselves; a purchase order, an
+                # approval or an attestation came without one and went out
+                # through the installation's server — or, on an installation
+                # with none, failed "SMTP is not configured" while the
+                # organization's own server stood ready. Settings that name no
+                # server read as none, and the installation's applies.
+                from app.services.auth_service import AuthService
+
+                smtp_config = await AuthService.get_org_smtp_config_async(
+                    db, organization_id
+                )
+            smtp_config_enc = (
+                encrypt_app_secret(json.dumps(smtp_config))
+                if smtp_config is not None
+                else None
+            )
             job = EmailJob(
                 organization_id=organization_id,
                 to_email=to_email,
