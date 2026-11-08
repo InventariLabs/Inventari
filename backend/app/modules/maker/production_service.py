@@ -34,6 +34,7 @@ from app.core.contracts import (
     ItemAction,
     ItemCreateDTO,
     ShoppingListItemCreateDTO,
+    ShoppingListItemDTO,
     UserContextDTO,
 )
 from app.core.cost_estimates import UnitCostEstimate
@@ -1228,30 +1229,42 @@ async def add_shortages_to_shopping_list(
     shopping_list = await shopping_lists_api.active_list_async(
         db, organization_id, user.id, lang
     )
-    listed = {
-        item.template_id
-        for item in await shopping_lists_api.get_list_items_async(
-            db, shopping_list.id, organization_id
-        )
-    }
+    lines_by_template: dict[UUID, list[ShoppingListItemDTO]] = {}
+    for line in await shopping_lists_api.get_list_items_async(
+        db, shopping_list.id, organization_id
+    ):
+        if line.template_id is not None:
+            lines_by_template.setdefault(line.template_id, []).append(line)
     to_buy: list[ShoppingListItemCreateDTO] = []
+    topped_up = 0
     for child_id in short_ids:
         missing = needs.get(child_id, Decimal('0')) - stocks.get(child_id, Decimal('0'))
         template = templates.get(child_id)
-        if missing <= 0 or template is None or child_id in listed:
+        if missing <= 0 or template is None:
             continue
-        to_buy.append(
-            ShoppingListItemCreateDTO(
-                name=template.name,
-                # Up, not to the nearest: buying a gram less than the run
-                # needs leaves it short. No unit's step applies to a
-                # shortfall summed across recipes, so the store's own step.
-                quantity=core_api.uoms.round_up(missing, None),
-                uom_id=template.uom_id,
-                template_id=child_id,
-                source='production',
-            )
+        need = ShoppingListItemCreateDTO(
+            name=template.name,
+            # Up, not to the nearest: buying a gram less than the run
+            # needs leaves it short. No unit's step applies to a
+            # shortfall summed across recipes, so the store's own step.
+            quantity=core_api.uoms.round_up(missing, None),
+            uom_id=template.uom_id,
+            template_id=child_id,
+            source='production',
         )
+        lines = lines_by_template.get(child_id)
+        if not lines:
+            to_buy.append(need)
+        # A product the list already carries asks for the sum of its lines,
+        # bought ones included; a run that now needs more tops the shortfall
+        # up instead of leaving the old quantity.
+        elif (
+            await shopping_lists_api.top_up_async(
+                db, shopping_list.id, need, lines, organization_id
+            )
+            is not None
+        ):
+            topped_up += 1
     added = (
         await shopping_lists_api.add_items_async(
             db, shopping_list.id, to_buy, organization_id
@@ -1263,6 +1276,7 @@ async def add_shortages_to_shopping_list(
         shopping_list_id=shopping_list.id,
         list_name=shopping_list.name,
         added_count=len(added),
+        raised_count=topped_up,
     )
 
 

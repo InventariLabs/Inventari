@@ -213,6 +213,8 @@ export const recipesCoreApi = {
   ): Promise<{
     shopping_list_id: string;
     added_count: number;
+    /** Lines already on the list that the recipe needed more of, topped up. */
+    raised_count?: number;
     /** Missing goods left off because the list already carries them. */
     already_listed_count?: number;
     list_name?: string | null;

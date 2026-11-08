@@ -61,10 +61,12 @@ export default function AddFromRecipesModal({
         recipe_ids: Array.from(selected),
         shopping_list_id: listId,
       });
+      // A line topped up counts as written: the list changed by it.
+      const written = result.added_count + (result.raised_count ?? 0);
       toast.success(
         t("addFromRecipes.success", {
-          count: result.added_count,
-          defaultValue: `Added ${result.added_count} ingredients`,
+          count: written,
+          defaultValue: `Added ${written} ingredients`,
         }),
       );
       // The same goods may already stand on another open list.

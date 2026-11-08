@@ -1136,7 +1136,9 @@ lists every public surface and the promise its class makes.
   can be undone. **Cook step by step** shows one instruction at a time with
   timers. A recipe's availability panel puts what is missing or short on the
   shopping list, in the quantity you are short of (the whole amount where the
-  units cannot be compared). With the Production module on, a recipe also
+  units cannot be compared). Added to a list that already carries an ingredient, the
+  line is topped up by what the recipe needs; the same recipe added again changes
+  nothing. A production run's shortage tops up its lines the same way. With the Production module on, a recipe also
   offers **Cook a batch for stock**, which starts a production order.
 - **Estimates read off the ingredients**: nutrition per serving, the cost
   from what the stock cost (else supplier prices, else a price typed on the

@@ -483,6 +483,29 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 
+  // A line already on the list that the recipe needed more of is topped up:
+  // the list changed, so the toast is not the "already listed" one.
+  it("reports a topped-up line as written, not as already listed", async () => {
+    mockAddToShoppingList.mockResolvedValue({
+      shopping_list_id: "sl1",
+      added_count: 0,
+      raised_count: 1,
+      already_listed_count: 0,
+      list_name: "Shopping list",
+    });
+    render(
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /add missing/i }));
+    await vi.waitFor(() => expect(toast.success).toHaveBeenCalled());
+    expect((toast.success as Mock).mock.calls[0][0]).toContain("1");
+    expect(toast.info).not.toHaveBeenCalled();
+  });
+
   // The same goods on two open lists is two trips for one purchase; the
   // list is still written, and a second toast names where else they stand.
   it("names the other open list that already asks for the same goods", async () => {

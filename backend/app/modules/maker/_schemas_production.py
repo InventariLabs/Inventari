@@ -231,7 +231,7 @@ class ShortageShoppingListResponse(BaseModel):
     """Output for POST /production/orders/shortages/shopping-list.
 
     The result of an action, not a collection: it names the list that was
-    touched and counts the lines added, and carries no rows to page.
+    touched and counts the lines added and raised, and carries no rows to page.
     """
 
     shopping_list_id: UUID | None = None
@@ -239,3 +239,7 @@ class ShortageShoppingListResponse(BaseModel):
 
     list_name: str | None = None
     added_count: int = 0
+    """Lines written new."""
+
+    raised_count: int = 0
+    """Lines already on the list that the run needs more of, topped up."""
