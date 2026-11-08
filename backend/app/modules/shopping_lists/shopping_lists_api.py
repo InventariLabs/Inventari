@@ -17,6 +17,7 @@ from app.core.contracts import (
     ShoppingListDTO,
     ShoppingListItemCreateDTO,
     ShoppingListItemDTO,
+    UomDTO,
 )
 from app.i18n import Language
 from app.i18n.service import get_current_lang, get_error_message
@@ -64,6 +65,39 @@ def _stored_quantity(quantity: Decimal) -> Decimal:
             ceiling=stated_quantity(QUANTITY_MAX),
         )
     return Decimal(stored)
+
+
+async def _cover_async(
+    db: AsyncSession,
+    need: ShoppingListItemCreateDTO,
+    lines: list[ShoppingListItemDTO],
+    org_id: UUID,
+) -> Decimal:
+    """What *lines* ask for, stated in *need*'s unit.
+
+    A line in the need's unit counts as it stands, and one in another unit of
+    the same measure counts converted: 500 g of plums is half a kilogram, not
+    500 of them. A line whose unit does not convert into the need's (pieces
+    against kilograms, or a unit named on one side only) says nothing about
+    how much of the need it covers, so it counts for nothing.
+    """
+    from app.core.public_api import core_api
+
+    cover = Decimal(0)
+    units: dict[UUID, UomDTO | None] = {}
+    for line in lines:
+        if line.uom_id == need.uom_id:
+            cover += line.quantity
+        elif line.uom_id is not None and need.uom_id is not None:
+            for uom_id in (line.uom_id, need.uom_id):
+                if uom_id not in units:
+                    units[uom_id] = await core_api.uoms.get_async(db, uom_id, org_id)
+            converted, comparable = core_api.uoms.convert_quantity(
+                line.quantity, units[line.uom_id], units[need.uom_id]
+            )
+            if comparable:
+                cover += converted
+    return cover
 
 
 class ShoppingListsAPI:
@@ -300,24 +334,35 @@ class ShoppingListsAPI:
         """Async: make a list ask for *need* in total, given the *lines* it has.
 
         *lines* are the list's lines for the same goods (bought ones too);
-        what the list asks for is their sum. A bought line counts as cover:
+        what the list asks for is their sum in *need*'s unit — a line in
+        another unit counts converted, or not at all when its unit does not
+        convert (``_cover_async``). A bought line counts as cover:
         nothing links a bought line to stock, so there is no telling whether
         the goods were put on the shelf, and counting them once is the safe
         side. When *need* exceeds the sum, the open line the same source
-        wrote is raised by the difference (and takes *need*'s notes, which
-        describe the quantity it now asks for), or a new line is written
-        when there is none. Nothing is written when the list already covers
-        the need — a line is never lowered. Returns the line as it now
-        stands, or None when nothing changed.
+        wrote in *need*'s unit is raised by the difference (and takes
+        *need*'s notes, which describe the quantity it now asks for), or a
+        new line is written when there is none. Nothing is written when the
+        list already covers the need — a line is never lowered. Returns the
+        line as it now stands, or None when nothing changed.
         """
-        shortfall = need.quantity - sum((line.quantity for line in lines), Decimal(0))
+        from app.core.public_api import core_api
+
+        # Up to the store's step: a converted line leaves a remainder finer
+        # than the column keeps, and the nearest step could ask for less than
+        # the need, or for a zero the door refuses.
+        shortfall = core_api.uoms.round_up(
+            need.quantity - await _cover_async(db, need, lines, org_id), None
+        )
         if shortfall <= 0:
             return None
         open_line = next(
             (
                 line
                 for line in lines
-                if not line.is_purchased and line.source == need.source
+                if not line.is_purchased
+                and line.source == need.source
+                and line.uom_id == need.uom_id
             ),
             None,
         )

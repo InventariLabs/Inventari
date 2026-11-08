@@ -1257,8 +1257,9 @@ async def add_shortages_to_shopping_list(
         if not lines:
             to_buy.append(need)
         # A product the list already carries asks for the sum of its lines,
-        # bought ones included; a run that now needs more tops the shortfall
-        # up instead of leaving the old quantity.
+        # bought ones included, in the stock unit (a line in grams counts
+        # converted); a run that now needs more tops the shortfall up
+        # instead of leaving the old quantity.
         elif (
             await shopping_lists_api.top_up_async(
                 db, shopping_list.id, need, lines, organization_id
