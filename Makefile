@@ -223,7 +223,11 @@ lint-frontend: ## Check frontend code style with eslint
 	@echo "$(BLUE)[INFO]$(NC) Checking frontend code style with eslint..."
 	docker compose exec frontend npm run lint
 
-check-frontend: ## Run frontend typecheck + production build
+check-frontend: ## Run frontend eslint + prettier, typecheck + production build, and the baseline gates
+	@echo "$(BLUE)[INFO]$(NC) Checking frontend code style with eslint (the pre-commit hook's copy)..."
+	docker compose exec frontend npm run lint
+	@echo "$(BLUE)[INFO]$(NC) Checking frontend formatting with prettier (the pre-commit hook's copy)..."
+	docker compose exec frontend npm run format:check
 	@echo "$(BLUE)[INFO]$(NC) Running frontend typecheck + production build..."
 	docker compose exec frontend npm run build:check
 	@echo "$(BLUE)[INFO]$(NC) Checking i18n key usage against catalogs..."
