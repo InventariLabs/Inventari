@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import RoleDTO, RoleHolderDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.services import permissions_service
 from app.services.builtin_roles import BUILTIN_ROLES, builtin_role_permissions
 
@@ -27,6 +28,7 @@ BUILTIN_ROLE_NAMESPACE = UUID('0f1c4d2e-6b8a-4a1e-9c33-2f6f1a7d5b40')
 class CoreRolesAPI:
     """Public Core API for module-safe role queries."""
 
+    @reads
     async def check_user_permission_async(
         self,
         db: AsyncSession,
@@ -48,6 +50,7 @@ class CoreRolesAPI:
             permission=permission,
         )
 
+    @reads
     async def list_for_user_async(
         self,
         db: AsyncSession,
@@ -64,6 +67,7 @@ class CoreRolesAPI:
         )
         return [RoleDTO.model_validate(r) for r in roles]
 
+    @reads
     async def role_ids_for_user_async(
         self,
         db: AsyncSession,
@@ -88,6 +92,7 @@ class CoreRolesAPI:
         )
         return {uuid5(BUILTIN_ROLE_NAMESPACE, user.role)} | {r.id for r in custom}
 
+    @reads
     async def has_holder_async(
         self,
         db: AsyncSession,
@@ -106,6 +111,7 @@ class CoreRolesAPI:
             db, organization_id=organization_id, permission=permission
         )
 
+    @reads
     async def holders_of_permission_async(
         self,
         db: AsyncSession,
@@ -123,6 +129,7 @@ class CoreRolesAPI:
             db, organization_id=organization_id, permission=permission
         )
 
+    @reads
     async def administrators_async(
         self, db: AsyncSession, *, organization_id: UUID
     ) -> set[UUID]:
@@ -137,6 +144,7 @@ class CoreRolesAPI:
             db, organization_id=organization_id
         )
 
+    @reads
     async def permissions_for_users_async(
         self,
         db: AsyncSession,
@@ -154,6 +162,7 @@ class CoreRolesAPI:
             db, organization_id=organization_id, user_ids=user_ids
         )
 
+    @reads
     async def list_for_org_async(
         self,
         db: AsyncSession,
@@ -208,6 +217,7 @@ class CoreRolesAPI:
             for name in BUILTIN_ROLES
         ]
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -225,6 +235,7 @@ class CoreRolesAPI:
         )
         return RoleDTO.model_validate(role)
 
+    @writes
     async def update_permissions_async(
         self,
         db: AsyncSession,
@@ -242,6 +253,7 @@ class CoreRolesAPI:
         )
         return RoleDTO.model_validate(role)
 
+    @reads
     async def org_role_map_async(
         self,
         db: AsyncSession,
@@ -259,6 +271,7 @@ class CoreRolesAPI:
         )
         return {uid: RoleDTO.model_validate(r) for uid, r in roles.items()}
 
+    @writes
     async def assign_async(
         self,
         db: AsyncSession,
@@ -281,6 +294,7 @@ class CoreRolesAPI:
             actor_user_id=actor_user_id,
         )
 
+    @writes
     async def rename_async(
         self,
         db: AsyncSession,
@@ -295,6 +309,7 @@ class CoreRolesAPI:
         )
         return RoleDTO.model_validate(role)
 
+    @reads
     async def holders_async(
         self,
         db: AsyncSession,
@@ -308,6 +323,7 @@ class CoreRolesAPI:
         )
         return [RoleHolderDTO.model_validate(u) for u in users]
 
+    @writes
     async def delete_async(
         self,
         db: AsyncSession,

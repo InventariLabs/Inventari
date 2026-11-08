@@ -22,11 +22,13 @@ from app.core.contracts import (
     StockQuantDTO,
     StockQuantRowDTO,
 )
+from app.core.public_api._access import reads, writes
 
 
 class CoreStockAPI:
     """Public Core API for WMS stock operations."""
 
+    @writes
     async def take_from_the_records_async(
         self,
         db: AsyncSession,
@@ -108,6 +110,7 @@ class CoreStockAPI:
             for c in breakdown
         ]
 
+    @reads
     async def plan_draw_async(
         self,
         db: AsyncSession,
@@ -185,6 +188,7 @@ class CoreStockAPI:
         ]
 
     @asynccontextmanager
+    @writes
     async def posting_scope_async(self, db: AsyncSession) -> AsyncIterator[None]:
         """The scope an operation that posts many lines runs in.
 
@@ -204,6 +208,7 @@ class CoreStockAPI:
                 yield
 
     @asynccontextmanager
+    @reads
     async def ask_what_each_grain_has_free_once_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> AsyncIterator[None]:
@@ -223,6 +228,7 @@ class CoreStockAPI:
         async with ask_what_each_grain_has_free_once(db, organization_id):
             yield
 
+    @writes
     async def lock_async(
         self,
         db: AsyncSession,
@@ -252,6 +258,7 @@ class CoreStockAPI:
             reserved_for_document_id=reserved_for_document_id,
         )
 
+    @writes
     async def post_movement_async(
         self,
         db: AsyncSession,
@@ -313,6 +320,7 @@ class CoreStockAPI:
             for p in posted
         ]
 
+    @writes
     async def get_or_create_lot_async(
         self,
         db: AsyncSession,
@@ -338,6 +346,7 @@ class CoreStockAPI:
         )
         return lot.id
 
+    @reads
     async def list_quants_async(
         self,
         db: AsyncSession,
@@ -365,6 +374,7 @@ class CoreStockAPI:
             )
         ]
 
+    @reads
     async def quantities_by_shelf_async(
         self,
         db: AsyncSession,
@@ -384,6 +394,7 @@ class CoreStockAPI:
             db, organization_id, storage_location_ids
         )
 
+    @reads
     async def shelf_contents_async(
         self,
         db: AsyncSession,
@@ -403,6 +414,7 @@ class CoreStockAPI:
 
         return await shelf_contents_async(db, organization_id, product_template_ids)
 
+    @reads
     async def list_quant_rows_async(
         self,
         db: AsyncSession,
@@ -433,6 +445,7 @@ class CoreStockAPI:
             count_cap=count_cap,
         )
 
+    @reads
     async def list_lots_async(
         self,
         db: AsyncSession,
@@ -448,6 +461,7 @@ class CoreStockAPI:
             )
         ]
 
+    @reads
     async def get_lot_detail_async(
         self,
         db: AsyncSession,
@@ -458,6 +472,7 @@ class CoreStockAPI:
 
         return await get_lot_detail_async(db, organization_id, lot_id)
 
+    @reads
     async def list_lot_rows_async(
         self,
         db: AsyncSession,
@@ -479,6 +494,7 @@ class CoreStockAPI:
             offset=offset,
         )
 
+    @writes
     async def set_lot_status_async(
         self,
         db: AsyncSession,
@@ -496,6 +512,7 @@ class CoreStockAPI:
         return StockLotDTO.model_validate(lot) if lot is not None else None
 
     @staticmethod
+    @reads
     def resolve_removal_strategy(
         template: object | None,
         override: str | None = None,
@@ -511,6 +528,7 @@ class CoreStockAPI:
 
         return resolve_removal_strategy(cast(Any, template), override=override)
 
+    @writes
     async def quarantine_lot_async(
         self,
         db: AsyncSession,
@@ -534,6 +552,7 @@ class CoreStockAPI:
         lot = await svc(db, organization_id, lot_id, reason, user_id=user_id)
         return StockLotDTO.model_validate(lot) if lot else None
 
+    @writes
     async def release_lot_async(
         self,
         db: AsyncSession,
@@ -552,6 +571,7 @@ class CoreStockAPI:
         lot = await svc(db, organization_id, lot_id, user_id=user_id)
         return StockLotDTO.model_validate(lot) if lot else None
 
+    @writes
     async def reserve_for_document_async(
         self,
         db: AsyncSession,
@@ -594,6 +614,7 @@ class CoreStockAPI:
             require_active_lot=require_active_lot,
         )
 
+    @reads
     async def held_quantity_async(
         self,
         db: AsyncSession,
@@ -621,6 +642,7 @@ class CoreStockAPI:
             document_ids=document_ids,
         )
 
+    @writes
     async def release_unbacked_async(
         self,
         db: AsyncSession,
@@ -657,6 +679,7 @@ class CoreStockAPI:
             document_ids=document_ids,
         )
 
+    @writes
     async def release_for_document_async(
         self,
         db: AsyncSession,
@@ -672,6 +695,7 @@ class CoreStockAPI:
 
         await release_for_document_async(db, organization_id, document_id)
 
+    @reads
     async def find_best_pick_group_for_picking_async(
         self,
         db: AsyncSession,

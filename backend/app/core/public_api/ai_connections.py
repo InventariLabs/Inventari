@@ -33,6 +33,7 @@ from app.core.contracts import (
 from app.core.exceptions import ServiceRejectionError
 from app.core.llm.purpose_registry import all_purposes
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 
 if TYPE_CHECKING:
     from app.services.ai_connection_service import AiConnectionService
@@ -61,18 +62,21 @@ class CoreAIConnectionsAPI:
 
     # -------- read paths -----------------------------------------------------
 
+    @reads
     async def list_async(
         self, db: AsyncSession, org_id: uuid.UUID
     ) -> list[AiConnectionDTO]:
         schemas = await self._service.list_for_org(db, org_id)
         return [_schema_to_dto(s) for s in schemas]
 
+    @reads
     async def get_async(
         self, db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID
     ) -> AiConnectionDTO | None:
         schema = await self._service.get_for_org(db, org_id, conn_id)
         return _schema_to_dto(schema) if schema else None
 
+    @writes
     async def test_connection_async(
         self,
         db: AsyncSession,
@@ -98,6 +102,7 @@ class CoreAIConnectionsAPI:
         )
         return result
 
+    @reads
     async def list_purposes_async(
         self, db: AsyncSession, org_id: uuid.UUID
     ) -> list[AiPurposeDTO]:
@@ -147,6 +152,7 @@ class CoreAIConnectionsAPI:
 
     # -------- write paths ----------------------------------------------------
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -171,6 +177,7 @@ class CoreAIConnectionsAPI:
         )
         return _schema_to_dto(schema)
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -212,6 +219,7 @@ class CoreAIConnectionsAPI:
         )
         return _schema_to_dto(schema) if schema else None
 
+    @writes
     async def delete_async(
         self, db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID
     ) -> bool:
@@ -229,6 +237,7 @@ class CoreAIConnectionsAPI:
         deleted: bool = await self._service.delete(db, org_id, conn_id)
         return deleted
 
+    @writes
     async def set_binding_async(
         self,
         db: AsyncSession,

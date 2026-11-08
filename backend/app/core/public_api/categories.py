@@ -19,6 +19,7 @@ from app.core.contracts import (
     UserContextDTO,
 )
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.services._category_reads import (
     count_items_per_category_async,
     existing_category_ids_async,
@@ -66,6 +67,7 @@ class CoreCategoriesAPI:
     that are visible to the given organisation.
     """
 
+    @reads
     async def list_async(
         self,
         db: AsyncSession,
@@ -76,6 +78,7 @@ class CoreCategoriesAPI:
         dtos = [CategoryDTO.model_validate(category) for category in categories]
         return _stamp_module_ownership(categories, dtos)
 
+    @reads
     async def list_with_filters_async(
         self,
         db: AsyncSession,
@@ -108,6 +111,7 @@ class CoreCategoriesAPI:
                 dto.items_count = counts.get(dto.id, 0)
         return dtos
 
+    @reads
     async def get_by_id_async(
         self,
         db: AsyncSession,
@@ -122,6 +126,7 @@ class CoreCategoriesAPI:
         dto = CategoryDTO.model_validate(category)
         return _stamp_module_ownership([category], [dto])[0]
 
+    @reads
     async def existing_ids_async(
         self,
         db: AsyncSession,
@@ -139,6 +144,7 @@ class CoreCategoriesAPI:
 
         return await existing_category_ids_async(db, organization_id, category_ids)
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -157,6 +163,7 @@ class CoreCategoriesAPI:
         dto = CategoryDTO.model_validate(category)
         return _stamp_module_ownership([category], [dto])[0]
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -180,6 +187,7 @@ class CoreCategoriesAPI:
         dto = CategoryDTO.model_validate(updated)
         return _stamp_module_ownership([updated], [dto])[0]
 
+    @writes
     async def rename_group_async(
         self,
         db: AsyncSession,
@@ -205,6 +213,7 @@ class CoreCategoriesAPI:
             category_ids=category_ids,
         )
 
+    @writes
     async def delete_async(
         self,
         db: AsyncSession,

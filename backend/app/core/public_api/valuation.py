@@ -10,11 +10,13 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cost_estimates import UnitCostEstimate
+from app.core.public_api._access import reads, writes
 
 
 class CoreValuationAPI:
     """Public Core API for inventory valuation operations."""
 
+    @reads
     async def estimate_unit_cost_async(
         self,
         db: AsyncSession,
@@ -49,6 +51,7 @@ class CoreValuationAPI:
                 estimates[tid] = UnitCostEstimate()
         return estimates
 
+    @writes
     async def record_receipt_async(
         self,
         db: AsyncSession,
@@ -105,6 +108,7 @@ class CoreValuationAPI:
             extra_unit_cost=extra_unit_cost,
         )
 
+    @writes
     async def record_unpriced_receipt_async(
         self,
         db: AsyncSession,
@@ -129,6 +133,7 @@ class CoreValuationAPI:
             None,
         )
 
+    @reads
     async def lock_open_layers_async(
         self,
         db: AsyncSession,
@@ -148,6 +153,7 @@ class CoreValuationAPI:
             db, organization_id, product_template_ids
         )
 
+    @writes
     async def record_delivery_async(
         self,
         db: AsyncSession,
@@ -191,6 +197,7 @@ class CoreValuationAPI:
         )
         return posting.cost
 
+    @reads
     async def get_current_rate_async(
         self,
         db: AsyncSession,
@@ -220,6 +227,7 @@ class CoreValuationAPI:
             db, organization_id, product_template_id
         )
 
+    @reads
     async def get_rates_batch_async(
         self,
         db: AsyncSession,

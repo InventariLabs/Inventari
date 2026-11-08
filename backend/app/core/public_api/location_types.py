@@ -20,6 +20,7 @@ from app.core.contracts import (
 )
 from app.core.exceptions import ContractViolationError
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.i18n._types import SUPPORTED_LANGUAGES, Language
 from app.services.storage_type_service import StorageTypeService
 
@@ -47,6 +48,7 @@ def _validate_lang(lang: str | None) -> Language | None:
 class CoreStorageTypesAPI:
     """Public Core API for module-safe location type reads and writes."""
 
+    @reads
     async def list_for_org_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[StorageTypeDTO]:
@@ -60,6 +62,7 @@ class CoreStorageTypesAPI:
         types_ = await StorageTypeService.list_for_org_async(db, organization_id)
         return [StorageTypeDTO.model_validate(t) for t in types_]
 
+    @reads
     async def get_by_id_async(
         self,
         db: AsyncSession,
@@ -82,6 +85,7 @@ class CoreStorageTypesAPI:
         )
         return StorageTypeDTO.model_validate(storage_type) if storage_type else None
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -99,6 +103,7 @@ class CoreStorageTypesAPI:
         )
         return StorageTypeDTO.model_validate(storage_type)
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -122,6 +127,7 @@ class CoreStorageTypesAPI:
         )
         return StorageTypeDTO.model_validate(updated) if updated else None
 
+    @writes
     async def delete_async(
         self, db: AsyncSession, storage_type_id: UUID, user: UserContextDTO
     ) -> bool:

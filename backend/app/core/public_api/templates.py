@@ -14,12 +14,14 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.public_api._access import reads, writes
 from app.core.template_schemas import DocumentTemplateSchema
 
 
 class CoreTemplatesAPI:
     """Public Core API for document template CRUD."""
 
+    @reads
     async def list_async(
         self,
         db: AsyncSession,
@@ -49,6 +51,7 @@ class CoreTemplatesAPI:
             for t in templates
         ]
 
+    @writes
     async def copy_builtin_alongside_async(
         self,
         db: AsyncSession,
@@ -76,6 +79,7 @@ class CoreTemplatesAPI:
         )
         return DocumentTemplateSchema.model_validate(created)
 
+    @reads
     async def get_async(
         self, db: AsyncSession, organization_id: UUID, template_id: UUID, module: str
     ) -> DocumentTemplateSchema | None:
@@ -86,6 +90,7 @@ class CoreTemplatesAPI:
         )
         return DocumentTemplateSchema.model_validate(template) if template else None
 
+    @reads
     async def get_default_async(
         self, db: AsyncSession, organization_id: UUID, module: str, document_type: str
     ) -> DocumentTemplateSchema | None:
@@ -97,6 +102,7 @@ class CoreTemplatesAPI:
         )
         return DocumentTemplateSchema.model_validate(template) if template else None
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -124,6 +130,7 @@ class CoreTemplatesAPI:
         )
         return DocumentTemplateSchema.model_validate(template)
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -160,6 +167,7 @@ class CoreTemplatesAPI:
         )
         return DocumentTemplateSchema.model_validate(template)
 
+    @writes
     async def delete_async(
         self,
         db: AsyncSession,
@@ -175,6 +183,7 @@ class CoreTemplatesAPI:
             db, organization_id, template_id, module, user_id=user_id
         )
 
+    @writes
     async def seed_defaults_async(
         self,
         db: AsyncSession,

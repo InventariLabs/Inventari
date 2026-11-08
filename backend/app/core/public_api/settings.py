@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import ContractViolationError
 from app.core.logging import get_logger
 from app.core.module_identity import refuse_foreign_module
+from app.core.public_api._access import reads, writes
 from app.core.settings_validator import (
     SCHEMA_VERSION_KEY,
     UNSTAMPED_SCHEMA_VERSION,
@@ -63,6 +64,7 @@ class CoreSettingsAPI:
     def _namespace(self, module_name: str) -> str:
         return namespace(module_name)
 
+    @writes
     async def set_bulk_async(
         self,
         db: AsyncSession,
@@ -82,6 +84,7 @@ class CoreSettingsAPI:
         await write_module_settings_async(db, organization_id, module_name, values)
 
     @staticmethod
+    @reads
     def encrypt_secret(module_name: str, value: str) -> str:
         """Return *value* at rest, bound to *module_name*.
 
@@ -116,12 +119,14 @@ class CoreSettingsAPI:
             return value
         return encrypt_module_secret(module_name, value)
 
+    @reads
     async def get_default_org_limits_async(self, db: AsyncSession) -> dict[str, Any]:
         """Async: return default AI/item/member limits for new organizations."""
         from app.services.system_settings_service import get_default_org_limits_async
 
         return await get_default_org_limits_async(db)
 
+    @reads
     async def get_org_limits_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> dict[str, Any]:
@@ -130,6 +135,7 @@ class CoreSettingsAPI:
 
         return await get_org_limits_async(db, organization_id)
 
+    @reads
     async def get_async(
         self,
         db: AsyncSession,
@@ -162,6 +168,7 @@ class CoreSettingsAPI:
             return self._maybe_mask(value)
         return value
 
+    @reads
     async def get_decrypted_async(
         self,
         db: AsyncSession,
@@ -213,6 +220,7 @@ class CoreSettingsAPI:
             return decrypt_module_secret(module_name, value)
         return value
 
+    @reads
     async def list_system_settings_async(
         self, db: AsyncSession
     ) -> list[dict[str, Any]]:
@@ -221,6 +229,7 @@ class CoreSettingsAPI:
 
         return await get_all_settings_async(db)
 
+    @writes
     async def set_system_setting_async(
         self,
         db: AsyncSession,
@@ -238,6 +247,7 @@ class CoreSettingsAPI:
         row = await set_setting_async(db, key, value, updated_by=updated_by)
         return row.key, row.value, row.updated_at
 
+    @reads
     async def get_schema_version_async(
         self,
         db: AsyncSession,
@@ -264,6 +274,7 @@ class CoreSettingsAPI:
         module_settings: JSONObject = org.settings.get(self._namespace(module_name), {})
         return _stored_schema_version(module_settings)
 
+    @writes
     async def migrate_settings_async(
         self,
         db: AsyncSession,

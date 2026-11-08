@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import CursorPaginatedDTO, ItemDTO
 from app.core.cursor import encode_cursor
+from app.core.public_api._access import reads
 from app.services.items import (
     barcode_exists_async,
     count_by_org_async,
@@ -42,6 +43,7 @@ from app.services.items._query_lookup import (
 class CoreItemsReadMixin:
     """Read-only methods for CoreItemsAPI."""
 
+    @reads
     async def get_async(
         self, db: AsyncSession, organization_id: UUID, item_id: UUID
     ) -> ItemDTO | None:
@@ -50,6 +52,7 @@ class CoreItemsReadMixin:
             return None
         return ItemDTO.model_validate(item)
 
+    @reads
     async def existing_ids_async(
         self,
         db: AsyncSession,
@@ -64,6 +67,7 @@ class CoreItemsReadMixin:
         """
         return await existing_item_ids_async(db, organization_id, item_ids)
 
+    @reads
     async def get_for_update_async(
         self, db: AsyncSession, organization_id: UUID, item_id: UUID
     ) -> ItemDTO | None:
@@ -79,6 +83,7 @@ class CoreItemsReadMixin:
             return None
         return ItemDTO.model_validate(item)
 
+    @reads
     async def lock_records_async(
         self, db: AsyncSession, organization_id: UUID, item_ids: Iterable[UUID]
     ) -> None:
@@ -91,6 +96,7 @@ class CoreItemsReadMixin:
         """
         await lock_records_async(db, organization_id, item_ids)
 
+    @reads
     async def get_any_async(
         self, db: AsyncSession, organization_id: UUID, item_id: UUID
     ) -> ItemDTO | None:
@@ -100,6 +106,7 @@ class CoreItemsReadMixin:
             return None
         return ItemDTO.model_validate(item)
 
+    @reads
     async def list_async(
         self,
         db: AsyncSession,
@@ -127,6 +134,7 @@ class CoreItemsReadMixin:
         )
         return [ItemDTO.model_validate(item) for item in items]
 
+    @reads
     async def distinct_uom_ids_for_template_async(
         self,
         db: AsyncSession,
@@ -145,6 +153,7 @@ class CoreItemsReadMixin:
             template_id=template_id,
         )
 
+    @reads
     async def count_async(
         self,
         db: AsyncSession,
@@ -162,6 +171,7 @@ class CoreItemsReadMixin:
             context_tag=context_tag,
         )
 
+    @reads
     async def has_active_barcode_async(
         self,
         db: AsyncSession,
@@ -170,6 +180,7 @@ class CoreItemsReadMixin:
     ) -> bool:
         return await barcode_exists_async(db, organization_id, barcode)
 
+    @reads
     async def list_existing_serials_async(
         self,
         db: AsyncSession,
@@ -178,6 +189,7 @@ class CoreItemsReadMixin:
     ) -> set[str]:
         return await list_existing_serials_async(db, organization_id, serial_numbers)
 
+    @reads
     async def search_cursor_paginated_async(
         self,
         db: AsyncSession,
@@ -215,6 +227,7 @@ class CoreItemsReadMixin:
             has_more=has_more,
         )
 
+    @reads
     async def search_stock_summary_async(
         self,
         db: AsyncSession,
@@ -245,6 +258,7 @@ class CoreItemsReadMixin:
             for item, offered, merged in rows
         ]
 
+    @reads
     async def list_expiring_by_template_async(
         self,
         db: AsyncSession,
@@ -272,6 +286,7 @@ class CoreItemsReadMixin:
             for tid, items in grouped.items()
         }
 
+    @reads
     async def list_by_expiry_async(
         self,
         db: AsyncSession,
@@ -311,6 +326,7 @@ class CoreItemsReadMixin:
         )
         return [ItemDTO.model_validate(item) for item in items]
 
+    @reads
     async def list_with_template_async(
         self,
         db: AsyncSession,
@@ -328,6 +344,7 @@ class CoreItemsReadMixin:
             for tid, items in grouped.items()
         }
 
+    @reads
     async def latest_purchase_prices_async(
         self,
         db: AsyncSession,
@@ -340,6 +357,7 @@ class CoreItemsReadMixin:
         """
         return await latest_purchase_prices_async(db, organization_id, template_ids)
 
+    @reads
     async def inherited_category_async(
         self,
         db: AsyncSession,
@@ -363,6 +381,7 @@ class CoreItemsReadMixin:
             template_id=template_id,
         )
 
+    @reads
     async def find_by_barcode_async(
         self,
         db: AsyncSession,
@@ -391,6 +410,7 @@ class CoreItemsReadMixin:
             return None
         return ItemDTO.model_validate(item)
 
+    @reads
     async def find_stock_row_async(
         self,
         db: AsyncSession,

@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.core.public_api._scope import without_org_scope
 
 if TYPE_CHECKING:
@@ -54,6 +55,7 @@ def _in_org(user: User, organization_id: UUID | None) -> bool:
 class CoreUsersAPI:
     """Public Core API for module-safe user access."""
 
+    @reads
     async def get_async(
         self, db: AsyncSession, organization_id: UUID | None, user_id: UUID
     ) -> UserProfileDTO | None:
@@ -71,6 +73,7 @@ class CoreUsersAPI:
             return None
         return _to_dto(user)
 
+    @reads
     async def get_by_ids_async(
         self, db: AsyncSession, organization_id: UUID | None, user_ids: list[UUID]
     ) -> list[UserProfileDTO]:
@@ -86,6 +89,7 @@ class CoreUsersAPI:
         users = await UserService.get_users_by_ids_async(db, user_ids)
         return [_to_dto(u) for u in users if _in_org(u, organization_id)]
 
+    @reads
     async def get_full_async(
         self, db: AsyncSession, organization_id: UUID | None, user_id: UUID
     ) -> UserDTO | None:
@@ -96,6 +100,7 @@ class CoreUsersAPI:
             return None
         return _to_full_dto(user)
 
+    @reads
     async def get_first_system_user_async(self, db: AsyncSession) -> UserDTO | None:
         """Return the oldest user across ALL organizations (org-less global read).
 
@@ -113,6 +118,7 @@ class CoreUsersAPI:
     @without_org_scope(
         'deliberate cross-organization startup repair of the superuser flag'
     )
+    @writes
     async def promote_superuser_async(
         self, db: AsyncSession, user_id: UUID
     ) -> UserDTO | None:
@@ -124,6 +130,7 @@ class CoreUsersAPI:
             return None
         return _to_full_dto(user)
 
+    @reads
     async def list_org_members_async(
         self,
         db: AsyncSession,
@@ -150,6 +157,7 @@ class CoreUsersAPI:
         )
         return [UserDTO.model_validate(u) for u in users]
 
+    @reads
     async def get_by_email_async(
         self, db: AsyncSession, organization_id: UUID | None, email: str
     ) -> UserDTO | None:
@@ -167,6 +175,7 @@ class CoreUsersAPI:
             return None
         return _to_full_dto(user)
 
+    @reads
     async def get_by_id_in_org_async(
         self, db: AsyncSession, user_id: UUID, organization_id: UUID
     ) -> UserDTO | None:
@@ -176,12 +185,14 @@ class CoreUsersAPI:
         user = await UserService.get_by_id_in_org_async(db, user_id, organization_id)
         return UserDTO.model_validate(user) if user else None
 
+    @reads
     async def count_async(self, db: AsyncSession, organization_id: UUID) -> int:
         """Async: count users in an organization (used by list_all_organizations)."""
         from app.services.user_service import UserService
 
         return await UserService.count_async(db, organization_id)
 
+    @reads
     async def list_all_async(self, db: AsyncSession) -> list[UserDTO]:
         """List all users (superuser view) with organization eagerly loaded."""
         from app.services.user_service import UserService
@@ -221,6 +232,7 @@ class CoreUsersAPI:
             reason=reason,
         )
 
+    @writes
     async def activate_or_deactivate_async(
         self,
         db: AsyncSession,
@@ -252,6 +264,7 @@ class CoreUsersAPI:
         )
         return UserDTO.model_validate(updated) if updated else None
 
+    @writes
     async def block_async(
         self,
         db: AsyncSession,
@@ -289,6 +302,7 @@ class CoreUsersAPI:
         )
         return UserDTO.model_validate(updated) if updated else None
 
+    @writes
     async def unblock_async(
         self,
         db: AsyncSession,

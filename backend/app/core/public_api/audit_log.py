@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AuditAction, AuditLogDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.services import audit_service
 
 logger = get_logger(__name__)
@@ -40,6 +41,7 @@ class CoreAuditLogAPI:
     AGENTS.md Golden Path, modules touch Core data through CoreAPI only.
     """
 
+    @reads
     async def list_for_org_async(
         self,
         db: AsyncSession,
@@ -97,12 +99,14 @@ class CoreAuditLogAPI:
             dtos.append(dto)
         return dtos, total
 
+    @reads
     async def list_target_types_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[str]:
         """The distinct target types this organization's log actually holds."""
         return await audit_service.list_target_types_async(db, organization_id)
 
+    @reads
     async def list_for_target_async(
         self,
         db: AsyncSession,
@@ -122,6 +126,7 @@ class CoreAuditLogAPI:
         )
         return [AuditLogDTO.model_validate(e) for e in entries]
 
+    @writes
     async def log_action_async(
         self,
         db: AsyncSession,

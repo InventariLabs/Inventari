@@ -17,6 +17,7 @@ from app.core.contracts import (
     GlobalAdminStatsDTO,
     UserContextDTO,
 )
+from app.core.public_api._access import reads
 from app.i18n.service import get_current_lang, get_error_message
 
 if TYPE_CHECKING:
@@ -43,6 +44,7 @@ class CoreAdminAPI:
     (cross-tenant surface isolation).
     """
 
+    @reads
     async def list_org_metrics_async(
         self, db: AsyncSession, *, user: UserContextDTO
     ) -> list[AdminOrgMetricsDTO]:
@@ -52,6 +54,7 @@ class CoreAdminAPI:
 
         return await list_org_metrics_async(db)
 
+    @reads
     async def get_global_stats_async(
         self, db: AsyncSession, *, user: UserContextDTO
     ) -> GlobalAdminStatsDTO:

@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AnnouncementCreateDTO, AnnouncementDTO, UserContextDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.core.public_api._scope import without_org_scope
 from app.services.announcement_service import AnnouncementService
 
@@ -22,17 +23,20 @@ logger = get_logger(__name__)
 class CoreAnnouncementsAPI:
     """Public Core API for module-safe announcement reads and writes."""
 
+    @reads
     async def list_all_async(self, db: AsyncSession) -> list[AnnouncementDTO]:
         """Return all announcements (active, expired, future) ordered newest first."""
         announcements = await AnnouncementService.list_all_async(db)
         return [AnnouncementDTO.model_validate(a) for a in announcements]
 
+    @reads
     async def list_active_async(self, db: AsyncSession) -> list[AnnouncementDTO]:
         """Return currently active announcements (now within active window)."""
         announcements = await AnnouncementService.list_active_async(db)
         return [AnnouncementDTO.model_validate(a) for a in announcements]
 
     @without_org_scope('global rows: an announcement has no organization column')
+    @reads
     async def get_by_id_async(
         self, db: AsyncSession, announcement_id: UUID
     ) -> AnnouncementDTO | None:
@@ -40,6 +44,7 @@ class CoreAnnouncementsAPI:
         announcement = await AnnouncementService.get_by_id_async(db, announcement_id)
         return AnnouncementDTO.model_validate(announcement) if announcement else None
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -61,6 +66,7 @@ class CoreAnnouncementsAPI:
         return AnnouncementDTO.model_validate(announcement)
 
     @without_org_scope('global rows: an announcement has no organization column')
+    @writes
     async def delete_async(self, db: AsyncSession, announcement_id: UUID) -> bool:
         """Delete an announcement by ID. Returns ``True`` if deleted, ``False`` if not found."""
         announcement = await AnnouncementService.get_by_id_async(db, announcement_id)
