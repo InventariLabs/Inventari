@@ -249,7 +249,7 @@ const { data, isLoading } = useQuery<MyItem[]>({
 | `theme` | `{ cssVariables: Record<string, string> }` | No | Organization-scoped CSS variables. |
 | `labelPurpose` | `LabelPurposeConfig` | No | Offers a module-owned purpose for generated and scanned labels. |
 | `bulkActions` | `Omit<BulkAction, "moduleName">[]` | No | Actions shown when multiple items are selected (rendered by `ItemsBulkActionBar.tsx`). |
-| `validationRules` | `ValidationRule[]` | No | Validators contributed to core forms (`item_create`, `item_edit`, `storage_create`, `storage_edit`). Run on submit; core errors win; a throwing rule is logged and skipped. See MODULES_GUIDE "Validation Rules". |
+| `validationRules` | `ValidationRule[]` | No | Validators contributed to core forms (`item_create`, `item_edit`). Run on submit; core errors win; a throwing rule is logged and skipped. See MODULES_GUIDE "Validation Rules". |
 | `columnContributors` | `ColumnContributor[]` | No | Additional columns for the Items list table. |
 | `listFilterContributors` | `ListFilterContributor[]` | No | Filter chips for the Items list; the module answers with the template ids the chip narrows to. |
 | `documentColumnContributors` | `DocumentColumnContributor[]` | No | Columns for the warehouse documents lists (History and Documents), keyed by document — see "Contributions to the warehouse documents". |

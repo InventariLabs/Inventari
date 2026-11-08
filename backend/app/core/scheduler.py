@@ -211,6 +211,17 @@ class TaskScheduler:
 
     async def _run_periodic(self, task: ScheduledTask) -> None:
         """Main loop for a single task."""
+        if task.is_persistent and not self._redis:
+            # Persistence is what the module asked for, and without Redis the
+            # task quietly becomes a local one: it runs in this process (in
+            # every worker that has no tick lock to share), and a run missed
+            # while the backend was down is not made up.
+            logger.warning(
+                '[Scheduler] %s asks to be persistent, but Redis is not '
+                'connected: it runs in this process, and a run missed while the '
+                'backend is down is not made up.',
+                task.key,
+            )
         # Initial jitter
         await asyncio.sleep(min(5.0, task.interval.total_seconds() * 0.1))
 

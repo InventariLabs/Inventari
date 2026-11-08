@@ -35,6 +35,7 @@ from ._module_meta import (
     _reserved_name_refusal,
     _run_ast_validation,
     _save_tracking,
+    _unmet_requirements,
     compose_command,
     deployment_steps,
     module_tree_permissions_command,
@@ -236,12 +237,9 @@ def _check_install_guards(
         raise SystemExit(1)
 
     # 6. Dependency check
-    for dep in meta['requires']:
-        dep_backend = BACKEND_MODULES_DIR / dep
-        dep_in_tracking = dep in tracking
-        if not dep_backend.exists() and not dep_in_tracking:
-            console.print(f"[red]✗ Required module '{dep}' is not installed.[/]")
-            raise SystemExit(1)
+    for dep in _unmet_requirements(meta['requires'], tracking, BACKEND_MODULES_DIR):
+        console.print(f"[red]✗ Required module '{dep}' is not installed.[/]")
+        raise SystemExit(1)
 
     # 7. Validate source directories exist
     components = (
@@ -378,6 +376,46 @@ def _refuse_unwritable_module_trees(*, backend: bool, frontend: bool) -> None:
     raise SystemExit(1)
 
 
+def _copy_component(
+    source_dir: Path, walked: list[Path], component: str, dest: Path
+) -> None:
+    """Copy the walked files of one half of the package (``backend`` or
+    ``frontend``) to *dest*, keeping their place inside that half. A
+    ``module.yaml`` is the package's description and never ships."""
+    root = source_dir / component
+    for path in walked:
+        if (
+            path.name == 'module.yaml'
+            or path.relative_to(source_dir).parts[0] != component
+        ):
+            continue
+        target = dest / path.relative_to(root)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target)
+
+
+def stage_package_backend(package_dir: Path, into: Path) -> Path | None:
+    """Lay a package's backend out under *into* the way ``module install`` does.
+
+    Under the name ``module.yaml`` gives it and with the files the install
+    copies (``package_walk``: no ``tests/``, no bytecode, no symlink), so
+    ``module validate`` reads an author's package as the installer and the
+    next start will — a package keeps its manifest in ``backend/``, where no
+    check that reads ``<name>/manifest.json`` looks. ``None`` for a package
+    that declares no backend half; a package the installer cannot read
+    raises ``OperatorError`` with the installer's reason.
+    """
+    meta = _parse_module_yaml(package_dir)
+    if not meta['components'].get('backend', True):
+        return None
+    from ._module_signing import package_walk
+
+    walked, _dropped = package_walk(package_dir, meta)
+    dest = into / meta['name']
+    _copy_component(package_dir, walked, 'backend', dest)
+    return dest
+
+
 def _copy_module_files(
     name: str,
     source_dir: Path,
@@ -409,7 +447,6 @@ def _copy_module_files(
         from ._module_signing import package_walk
 
         walked, dropped = package_walk(source_dir, meta)
-        shipped = [path for path in walked if path.name != 'module.yaml']
         if dropped:
             console.print(
                 f'  [yellow]⚠ {len(dropped)} file(s) under a tests/ directory are not '
@@ -419,24 +456,10 @@ def _copy_module_files(
                 console.print(
                     f'    [yellow]- {path.relative_to(source_dir).as_posix()}[/]'
                 )
-        backend_files = [
-            path
-            for path in shipped
-            if path.relative_to(source_dir).parts[0] == 'backend'
-        ]
-        frontend_files = [
-            path
-            for path in shipped
-            if path.relative_to(source_dir).parts[0] == 'frontend'
-        ]
 
         if has_backend:
             console.print(f'  Copying backend → backend/app/modules/{name}/')
-            for path in backend_files:
-                rel = path.relative_to(source_dir / 'backend')
-                dest = dest_backend / rel
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(path, dest)
+            _copy_component(source_dir, walked, 'backend', dest_backend)
             copied_backend = True
 
             # 9. AST safety validation on the copied files
@@ -465,11 +488,7 @@ def _copy_module_files(
                 )
             else:
                 console.print(f'  Copying frontend → frontend/src/modules/{name}/')
-                for path in frontend_files:
-                    rel = path.relative_to(source_dir / 'frontend')
-                    dest = dest_frontend / rel
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(path, dest)
+                _copy_component(source_dir, walked, 'frontend', dest_frontend)
                 copied_frontend = True
                 console.print('  [green]✓ Frontend files copied.[/]')
 
