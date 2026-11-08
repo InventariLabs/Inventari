@@ -119,6 +119,20 @@ says what the release does rather than what changed since them.
   logs outlive it; in a header it travels as it does on every other request. A
   client that still sends the token in the address is refused with close code
   4001 and has to offer the two subprotocols instead.
+- **Breaking:** the recipe picking answers send their stock quantities as
+  strings, as every other stock quantity in the API does: `quantity_consumed`,
+  `item_remaining_quantity` and `ingredient_remaining_quantity` on a scan, and
+  `restored_quantity` on an undo. A client that read them as numbers parses them
+  as decimals instead. What a shelf has left after a pick is now the number
+  written to the record, not a float subtraction (taking 0.1 kg from 0.3 kg
+  reported 0.19999999999999998). The `recipe.picking_completed` event keeps
+  numbers, as every event payload does.
+- An item edit or a new record that sends a unit weight for a product from the
+  shared catalogue is now refused with `UNIT_WEIGHT_OF_SHARED_PRODUCT`, the way a
+  removal strategy for one already is, instead of answering success and keeping
+  the catalogue's weight. A shared product is every organization's, so one of
+  them cannot weigh it for all. Sending the weight the product already records
+  is not a change, so a form that posts its whole state keeps working.
 
 ### Added
 
@@ -619,6 +633,29 @@ says what the release does rather than what changed since them.
   404 instead of asking the backend; a PDF attachment came through. An
   instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
   backend itself.
+- Which day it is now comes from the organization's clock in the places that
+  still read the server's: the shopping-list suggestions ("expires today",
+  "expired 2 days ago" and the thirty days of consumption they look back on),
+  the reserve stock replenishment offers as cover (a batch past its date where
+  the organization is is no longer offered), and the date a production run
+  with no production date is filed under, which the closed-period check now
+  asks about too. An organization a day ahead of or behind the server saw each
+  of these a day off.
+- A purchase order mailed to the supplier and the mail of the approvals and
+  equipment modules now leave through the mail server the organization set in
+  Settings → Email, as invitations and password resets already did, instead of
+  the installation's own. On an installation without a server of its own, a
+  purchase order and an approval notice no longer fail while the
+  organization's server stands ready; an attestation campaign there still
+  reports that mail is not set up.
+- Archiving a location whose records have to go somewhere now offers every
+  other location as the target, a location with sublocations included; it
+  offered only places with nothing inside them, although records can live in
+  any location.
+- The cooking screen states the amount a pick took in the reader's own number
+  format. The public attestation page shows its "confirmed" and "already
+  returned" ticks in the success colour in every profile, not in the
+  profile's accent.
 
 ## v0.11.0 - 2026-11-02
 
