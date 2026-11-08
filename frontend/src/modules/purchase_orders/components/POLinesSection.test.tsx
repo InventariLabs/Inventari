@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
@@ -191,6 +191,14 @@ describe("POLinesSection product pick", () => {
       await userEvent.click(
         screen.getAllByRole("button", { name: "Clear product" })[0],
       );
+      // Picking an option blurs the input, and the row closes its panel
+      // 200 ms later; the input is gone by then, so until that timer runs the
+      // old panel hangs open with no focus behind it. Typing into the new
+      // input while that timer is still pending races it. Start the next pick
+      // from the settled state instead.
+      await waitFor(() => {
+        expect(screen.queryAllByRole("option")).toHaveLength(0);
+      });
     }
 
     it("drops the price proposed for a product when another one without a price is picked", async () => {
