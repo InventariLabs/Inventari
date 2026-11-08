@@ -25,7 +25,7 @@ const AttestationPublicPage = lazy(
  * warehouse, the recipes and the approvals engine — code they have no account
  * to use and, for the data behind it, no right to see.
  *
- * `main.tsx` picks between this tree and `App` from `window.location` before
+ * `Root.tsx` picks between this tree and `App` from `window.location` before
  * either is imported, so the two never share a bundle. There is no catch-all
  * here on purpose: `isPublicPath` admits only addresses this file serves, and
  * anything else — including a mistyped `/public/…` — goes to `App` and its

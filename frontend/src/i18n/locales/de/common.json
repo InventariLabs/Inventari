@@ -834,6 +834,7 @@
       "outOfRangeMax": "Geben Sie eine Zahl bis {{max}} ein.",
       "outOfRangeSave": "Korrigieren Sie die Einstellung außerhalb des Bereichs und speichern Sie erneut.",
       "notWholeNumber": "Geben Sie eine ganze Zahl ein.",
+      "notANumber": "Geben Sie eine Zahl ein.",
       "loadFailedHint": "Die Einstellungen konnten gerade nicht gelesen werden. Das ist meist vorübergehend.",
       "forbidden": "Moduleinstellungen öffnet nur eine Administratorin oder ein Administrator",
       "forbiddenHint": "Ihr Konto darf das Modul nutzen, aber sein Verhalten nicht ändern. Wenden Sie sich an die Administration Ihrer Organisation.",

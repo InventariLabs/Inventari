@@ -371,22 +371,24 @@ async def _compute_alerts_for_rules(
     # list names one: the cheapest current offer is proposed, so the alert
     # does not read "No supplier" beside a price the module itself holds.
     # The rule's own choice always wins.
-    unassigned = sorted(
-        {
-            s.rule.product_template_id
-            for s in shortages
-            if not s.rule.preferred_partner_id
-        },
-        key=str,
-    )
+    # The supplier is chosen against what this rule will really order, so a
+    # volume price counts only for the rule whose order reaches it.
+    wanted = {
+        (
+            s.rule.product_template_id,
+            max(s.suggested - shares.get(s.rule.id, Decimal('0')), Decimal('0')),
+        )
+        for s in shortages
+        if not s.rule.preferred_partner_id
+    }
     offers = (
         await pricelist_service.cheapest_offers_async(
             db,
             org_id,
-            unassigned,
+            wanted,
             active_on=await core_api.organizations.today_async(db, org_id),
         )
-        if unassigned
+        if wanted
         else {}
     )
 
@@ -406,7 +408,9 @@ async def _compute_alerts_for_rules(
         product = rule.product_template
         supplier = rule.preferred_partner
         proposed_offer = (
-            None if rule.preferred_partner_id else offers.get(rule.product_template_id)
+            None
+            if rule.preferred_partner_id
+            else offers.get((rule.product_template_id, remaining))
         )
         if proposed_offer is not None:
             supplier = proposed_offer.partner
@@ -619,25 +623,6 @@ async def get_reserve_move_plan_async(
     )
 
 
-def _best_offer(
-    entries: list[PartnerPricelist], quantity: Decimal
-) -> PartnerPricelist | None:
-    """Cheapest valid offer for *quantity*, preferring a reached tier.
-
-    ``entries`` comes pre-ordered by unit price (the pricelist service
-    contract), so the first tier the order quantity reaches is also the
-    cheapest one reached.
-    """
-    if not entries:
-        return None
-    tier_matches = [
-        e for e in entries if e.min_quantity is not None and e.min_quantity <= quantity
-    ]
-    if tier_matches:
-        return tier_matches[0]
-    return entries[0]
-
-
 async def _load_rules_by_ids(
     db: AsyncSession, org_id: UUID, rule_ids: list[UUID]
 ) -> dict[UUID, ReorderRule]:
@@ -727,6 +712,7 @@ async def create_draft_pos_from_alerts_async(
         groups.setdefault(partner_id, []).append((rule, alert))
 
     today = await core_api.organizations.today_async(db, org_id)
+    house_currency = await pricelist_service.house_currency_async(db, org_id)
     created: list[PurchaseOrder] = []
     for partner_id, members in groups.items():
         offers = await pricelist_service.list_for_partner_async(
@@ -747,8 +733,10 @@ async def create_draft_pos_from_alerts_async(
                     else alert.suggested_reorder_quantity
                 )
             )
-            offer = _best_offer(
-                offers_by_template.get(rule.product_template_id, []), quantity
+            offer = pricelist_service.pick_offer(
+                offers_by_template.get(rule.product_template_id, []),
+                quantity,
+                house_currency,
             )
             unit_price = None
             uom_id = rule.uom_id

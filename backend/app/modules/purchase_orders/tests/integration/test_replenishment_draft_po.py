@@ -72,6 +72,7 @@ def _price(
     unit_price: str,
     *,
     currency: str = 'PLN',
+    min_quantity: str | None = None,
 ) -> None:
     db_session.add(
         PartnerPricelist(
@@ -80,6 +81,7 @@ def _price(
             product_template_id=template.id,
             unit_price=Decimal(unit_price),
             currency=currency,
+            min_quantity=Decimal(min_quantity) if min_quantity else None,
             valid_from=date.today() - timedelta(days=1),
         )
     )
@@ -279,6 +281,95 @@ class TestReplenishmentDraftPos:
         assert body['skipped'] == []
         assert body['created'][0]['partner_id'] == str(po_partner.id)
 
+    @pytest.mark.parametrize(
+        ('tier_from', 'winner'),
+        [('1000', 'plain'), ('10', 'bulk')],
+        ids=['tier-out-of-reach', 'tier-reached'],
+    )
+    def test_a_volume_price_names_the_supplier_only_when_the_order_reaches_it(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_user: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+        h: Any,
+        tier_from: str,
+        winner: str,
+    ) -> None:
+        # The cheaper offer is a volume price. The proposal passes it over
+        # while the quantity to buy stays below its tier, and the draft order
+        # goes to the supplier whose price applies to what is really ordered.
+        bulk = h.create_partner(
+            po_org, po_user, name='Bulk Only Ltd', email='bulk@example.com'
+        )
+        rule = _rule(db_session, po_org, po_template, po_location, partner_id=None)
+        _price(db_session, po_org, bulk, po_template, '2.00', min_quantity=tier_from)
+        _price(db_session, po_org, po_partner, po_template, '5.00')
+        _stock(client, po_auth_headers, po_template, po_location, '0')
+        expected = bulk if winner == 'bulk' else po_partner
+
+        alerts = client.get(
+            '/api/v1/purchase-orders/replenishment/alerts', headers=po_auth_headers
+        )
+        [alert] = [
+            a for a in alerts.json()['items'] if a['reorder_rule_id'] == str(rule.id)
+        ]
+        assert alert['preferred_partner_id'] == str(expected.id)
+
+        resp = client.post(
+            URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(rule.id)]}
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        [po] = resp.json()['created']
+        assert po['partner_id'] == str(expected.id)
+
+    def test_each_rule_of_one_product_picks_its_supplier_by_its_own_quantity(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_user: Any,
+        po_storage_type: Any,
+        po_location: Any,
+        po_template: Any,
+        h: Any,
+    ) -> None:
+        # One product is ordered for two locations: the small order stays
+        # below the volume tier, the large one reaches it. The small rule
+        # must not drag the large one away from the supplier it qualifies for.
+        bulk = h.create_partner(
+            po_org, po_user, name='Bulk Only Ltd', email='bulk@example.com'
+        )
+        other = h.create_storage_location(
+            po_org, po_storage_type, po_user, name='Second Warehouse'
+        )
+        small = _rule(
+            db_session, po_org, po_template, po_location, min_qty='10', max_qty='29'
+        )
+        large = _rule(
+            db_session, po_org, po_template, other, min_qty='10', max_qty='1500'
+        )
+        _price(db_session, po_org, bulk, po_template, '2.00', min_quantity='1000')
+
+        alerts = client.get(
+            '/api/v1/purchase-orders/replenishment/alerts', headers=po_auth_headers
+        )
+        by_rule = {a['reorder_rule_id']: a for a in alerts.json()['items']}
+        assert by_rule[str(small.id)]['preferred_partner_id'] is None
+        assert by_rule[str(large.id)]['preferred_partner_id'] == str(bulk.id)
+
+        resp = client.post(
+            URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(large.id)]}
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        [po] = resp.json()['created']
+        assert po['partner_id'] == str(bulk.id)
+
     def test_a_deactivated_supplier_is_never_the_proposed_one(
         self,
         client: TestClient,
@@ -311,6 +402,88 @@ class TestReplenishmentDraftPos:
             a for a in alerts.json()['items'] if a['reorder_rule_id'] == str(rule.id)
         ]
         assert alert['preferred_partner_id'] == str(po_partner.id)
+
+        resp = client.post(
+            URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(rule.id)]}
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        assert resp.json()['created'][0]['partner_id'] == str(po_partner.id)
+
+    def test_the_line_is_priced_from_a_tier_its_quantity_reaches(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+    ) -> None:
+        # 3.00 with no minimum, 2.00 from 1000 pieces; 15 are needed. The
+        # order is for 15 x 3.00 — the 1000-piece price is not one it can get.
+        rule = _rule(
+            db_session, po_org, po_template, po_location, partner_id=po_partner.id
+        )
+        _price(db_session, po_org, po_partner, po_template, '3.00')
+        _price(db_session, po_org, po_partner, po_template, '2.00', min_quantity='1000')
+        _stock(client, po_auth_headers, po_template, po_location, '5')
+
+        resp = client.post(
+            URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(rule.id)]}
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        line = resp.json()['created'][0]['lines'][0]
+        assert Decimal(line['unit_price']) == Decimal('3.00')
+
+    def test_a_supplier_whose_only_price_is_out_of_reach_is_not_proposed(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+    ) -> None:
+        rule = _rule(db_session, po_org, po_template, po_location, partner_id=None)
+        _price(db_session, po_org, po_partner, po_template, '2.00', min_quantity='1000')
+        _stock(client, po_auth_headers, po_template, po_location, '0')
+
+        alerts = client.get(
+            '/api/v1/purchase-orders/replenishment/alerts', headers=po_auth_headers
+        )
+        [alert] = [
+            a for a in alerts.json()['items'] if a['reorder_rule_id'] == str(rule.id)
+        ]
+        assert alert['preferred_partner_id'] is None
+
+    def test_an_offer_in_the_house_currency_beats_a_smaller_number_in_another(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_user: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+        h: Any,
+    ) -> None:
+        other = 'EUR' if po_org.currency != 'EUR' else 'PLN'
+        abroad = h.create_partner(
+            po_org, po_user, name='Abroad Ltd', email='abroad@example.com'
+        )
+        rule = _rule(db_session, po_org, po_template, po_location, partner_id=None)
+        _price(db_session, po_org, abroad, po_template, '4.00', currency=other)
+        _price(
+            db_session,
+            po_org,
+            po_partner,
+            po_template,
+            '5.00',
+            currency=po_org.currency,
+        )
+        _stock(client, po_auth_headers, po_template, po_location, '0')
 
         resp = client.post(
             URL, headers=po_auth_headers, json={'reorder_rule_ids': [str(rule.id)]}

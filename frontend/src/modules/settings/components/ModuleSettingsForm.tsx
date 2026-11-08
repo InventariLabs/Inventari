@@ -90,7 +90,8 @@ function toSchemaShape(flat: Record<string, unknown>): Record<string, unknown> {
  *
  * The browser's own bubble answers in the browser's language, not the app's,
  * so the form switches it off (`noValidate`) and says the same thing itself —
- * for the bounds and for the whole-number check `noValidate` takes away too.
+ * for the bounds, for the whole-number check and for a blank or unreadable
+ * number, which `noValidate` takes away too.
  */
 function rangeError(
   field: ModuleSettingsField,
@@ -98,6 +99,13 @@ function rangeError(
   t: (key: string, options?: Record<string, unknown>) => string,
 ): string | null {
   const isNumber = field.type === "integer" || field.type === "number";
+  // A number field hands over "" for a blank box and also for text the browser
+  // cannot read as a number (`1e`) — either way there is nothing to save.
+  if (isNumber && value === "") {
+    return field.type === "integer"
+      ? t("settings.moduleSettings.notWholeNumber")
+      : t("settings.moduleSettings.notANumber");
+  }
   if (!isNumber || typeof value !== "number" || Number.isNaN(value)) {
     return null;
   }
