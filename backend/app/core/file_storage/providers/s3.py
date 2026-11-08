@@ -14,7 +14,7 @@ from botocore.exceptions import (  # type: ignore[import-untyped]
 
 from app.core.logging import get_logger
 
-from ..errors import StorageError
+from ..errors import StorageError, StoredFileNotFoundError
 from .base import FileInfo, StorageProvider
 
 logger = get_logger(__name__)
@@ -149,7 +149,7 @@ class S3StorageProvider(StorageProvider):
                 content = await body.read()
                 return BytesIO(content)
             except client.exceptions.NoSuchKey:
-                raise FileNotFoundError(f'File not found: {file_path}') from None
+                raise StoredFileNotFoundError(f'File not found: {file_path}') from None
             except (BotoCoreError, ClientError) as e:
                 logger.error('Failed to get %s: %s', file_path, e)
                 raise
@@ -287,7 +287,7 @@ class S3StorageProvider(StorageProvider):
             HTTP URL
         """
         if not await self.exists(file_path):
-            raise FileNotFoundError(f'File not found: {file_path}')
+            raise StoredFileNotFoundError(f'File not found: {file_path}')
 
         async with await self._get_s3_client() as client:
             if expires_in_seconds:

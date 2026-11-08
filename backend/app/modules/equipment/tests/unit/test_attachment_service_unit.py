@@ -138,9 +138,6 @@ class TestUploadAttachment:
     async def test_upload_success(self, mock_core: Any) -> None:
         mock_core.items.get_async = AsyncMock(return_value=MagicMock())
         mock_core.file_storage.save_for_org_async = AsyncMock()
-        mock_core.file_storage.get_url_for_org_async = AsyncMock(
-            return_value='http://example.com/file.pdf'
-        )
         db = AsyncMock()
         db.add = MagicMock()  # Session.add() is synchronous
         now = datetime.now(UTC)
@@ -178,9 +175,7 @@ class TestListAttachments:
     @patch('app.modules.equipment.attachment_service.core_api')
     async def test_list_success_empty(self, mock_core: Any) -> None:
         mock_core.items.get_any_async = AsyncMock(return_value=MagicMock())
-        mock_core.file_storage.get_url_for_org_async = AsyncMock(
-            return_value='http://example.com/file.pdf'
-        )
+        mock_core.file_storage.exists_for_org_async = AsyncMock(return_value=True)
         db = AsyncMock()
         db.scalars = AsyncMock(return_value=MagicMock(all=MagicMock(return_value=[])))
         result = await list_attachments(db, uuid4(), uuid4())
@@ -203,8 +198,8 @@ class TestListAttachments:
         orphan_path = f'equipment/{uuid4()}/{uuid4().hex}.pdf'
         orphan = _attachment_row(orphan_path)
         healthy = _attachment_row(f'{uuid4()}/{uuid4().hex}.pdf')
-        mock_core.file_storage.get_url_for_org_async = AsyncMock(
-            side_effect=[FileNotFoundError(orphan_path), 'http://x/f']
+        mock_core.file_storage.exists_for_org_async = AsyncMock(
+            side_effect=[False, True]
         )
         db = AsyncMock()
         db.scalars = AsyncMock(
@@ -216,6 +211,73 @@ class TestListAttachments:
 
         assert [r.id for r in result] == [healthy.id]
         assert any(orphan_path in record.getMessage() for record in caplog.records)
+
+
+@pytest.mark.unit
+class TestTheAddressIsTheAppsOwnRoute:
+    """An attachment is linked through ``/uploads/<key>``, never the backend.
+
+    On S3 the backend's address is a bare bucket URL: it skips the ownership
+    check of the upload route and goes stale when the files move. The storage
+    facade is asked to save and to say whether a file is there, never for an
+    address.
+    """
+
+    @patch('app.modules.equipment.attachment_service.core_api')
+    async def test_an_upload_answers_the_upload_route(self, mock_core: Any) -> None:
+        mock_core.items.get_async = AsyncMock(return_value=MagicMock())
+        mock_core.file_storage.save_for_org_async = AsyncMock()
+        mock_core.file_storage.get_url_for_org_async = AsyncMock(
+            return_value='https://bucket.s3.eu-west-1.amazonaws.com/x'
+        )
+        db = AsyncMock()
+        db.add = MagicMock()
+
+        def _refresh(obj: Any) -> None:
+            obj.id = uuid4()
+            obj.created_at = datetime.now(UTC)
+
+        db.refresh = AsyncMock(side_effect=_refresh)
+        org_id, item_id = uuid4(), uuid4()
+
+        result = await upload_attachment(
+            db,
+            org_id,
+            item_id,
+            uuid4(),
+            b'%PDF-1.4 fake body',
+            'test.pdf',
+            'application/pdf',
+            'INVOICE',
+        )
+
+        stored = mock_core.file_storage.save_for_org_async.call_args.args[2]
+        assert result.url == f'/uploads/{org_id}/equipment/{stored}'
+        assert stored.startswith(f'{item_id}/')
+        mock_core.file_storage.get_url_for_org_async.assert_not_called()
+
+    @patch('app.modules.equipment.attachment_service.core_api')
+    async def test_a_listed_attachment_answers_the_upload_route(
+        self, mock_core: Any
+    ) -> None:
+        mock_core.items.get_any_async = AsyncMock(return_value=MagicMock())
+        mock_core.file_storage.exists_for_org_async = AsyncMock(return_value=True)
+        mock_core.file_storage.get_url_for_org_async = AsyncMock(
+            return_value='https://bucket.s3.eu-west-1.amazonaws.com/x'
+        )
+        row = _attachment_row(f'{uuid4()}/{uuid4().hex}.pdf')
+        db = AsyncMock()
+        db.scalars = AsyncMock(
+            return_value=MagicMock(all=MagicMock(return_value=[row]))
+        )
+        org_id = uuid4()
+
+        result = await list_attachments(db, org_id, uuid4())
+
+        assert [r.url for r in result] == [
+            f'/uploads/{org_id}/equipment/{row.file_path}'
+        ]
+        mock_core.file_storage.get_url_for_org_async.assert_not_called()
 
 
 @pytest.mark.unit
@@ -295,9 +357,6 @@ class TestUploadSignatureValidation:
     ) -> None:
         mock_core.items.get_async = AsyncMock(return_value=MagicMock())
         mock_core.file_storage.save_for_org_async = AsyncMock()
-        mock_core.file_storage.get_url_for_org_async = AsyncMock(
-            return_value='http://x/f'
-        )
         db = AsyncMock()
         db.add = MagicMock()
 
@@ -364,9 +423,6 @@ class TestEveryAllowedTypeUploads:
         )
         mock_core.items.get_async = AsyncMock(return_value=MagicMock())
         mock_core.file_storage.save_for_org_async = AsyncMock()
-        mock_core.file_storage.get_url_for_org_async = AsyncMock(
-            return_value='http://x/f'
-        )
         db = AsyncMock()
         db.add = MagicMock()
 

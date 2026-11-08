@@ -35,9 +35,19 @@ class CoreFileStorageAPI:
         """Build an org+module-scoped path: ``<org>/<module>/<file_path>``.
 
         Strips any leading ``/`` from *file_path* so the prefix is always
-        enforced regardless of caller input.
+        enforced regardless of caller input, and refuses a ``..`` segment:
+        the local backend resolves the path on disk, where every
+        organization's files share one base directory, so a remainder that
+        climbs out of the prefix would land in somebody else's namespace.
+
+        Raises:
+            ValueError: *file_path* has a ``..`` segment.
         """
         clean = file_path.lstrip('/')
+        if '..' in clean.split('/'):
+            raise ValueError(
+                f'A stored path may not climb out of its namespace: {file_path}'
+            )
         return f'{organization_id}/{module_name}/{clean}'
 
     async def save_for_org_async(
