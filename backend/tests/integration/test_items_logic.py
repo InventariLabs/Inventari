@@ -415,7 +415,7 @@ class TestScanFiguresReachAnExistingProduct:
         'nutrition': {'energy_kcal': 321.0, 'proteins': 12.0},
     }
 
-    async def _scan_onto(self, db, user, storage_location, template):
+    async def _scan_onto(self, db, user, storage_location, template, *, named=True):
         from decimal import Decimal
 
         from app.schemas.item import ItemCreate
@@ -425,7 +425,7 @@ class TestScanFiguresReachAnExistingProduct:
             db,
             ItemCreate(
                 name=template.name,
-                template_id=template.id,
+                template_id=template.id if named else None,
                 location_id=storage_location.id,
                 quantity=Decimal('1'),
                 metadata=self._SCAN,
@@ -434,6 +434,56 @@ class TestScanFiguresReachAnExistingProduct:
         )
         assert item.template_id == template.id
         await db.refresh(template)
+
+    @pytest.mark.asyncio
+    async def test_a_cleared_nutrition_panel_takes_the_figures(
+        self, real_async_db_session, async_test_storage_location, async_test_user
+    ):
+        """Clearing every field in the editor stores ``{'nutrition': {}}``."""
+        template = ProductTemplate(
+            organization_id=async_test_user.organization_id,
+            name='Own cleared flour',
+            meta_data={'nutrition': {}},
+        )
+        real_async_db_session.add(template)
+        await real_async_db_session.flush()
+
+        await self._scan_onto(
+            real_async_db_session,
+            async_test_user,
+            async_test_storage_location,
+            template,
+        )
+
+        assert get_template_nutrition(template) == {
+            'calories_kcal': 321.0,
+            'protein_g': 12.0,
+        }
+
+    @pytest.mark.asyncio
+    async def test_the_matched_product_takes_the_figures_too(
+        self, real_async_db_session, async_test_storage_location, async_test_user
+    ):
+        """No ``template_id``: the product the name matches is the one given."""
+        template = ProductTemplate(
+            organization_id=async_test_user.organization_id,
+            name='Own matched flour',
+        )
+        real_async_db_session.add(template)
+        await real_async_db_session.flush()
+
+        await self._scan_onto(
+            real_async_db_session,
+            async_test_user,
+            async_test_storage_location,
+            template,
+            named=False,
+        )
+
+        assert get_template_nutrition(template) == {
+            'calories_kcal': 321.0,
+            'protein_g': 12.0,
+        }
 
     @pytest.mark.asyncio
     async def test_own_product_without_figures_takes_them(

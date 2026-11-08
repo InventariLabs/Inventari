@@ -73,8 +73,9 @@ def _write_card_product_fields(
         return
     # A scan's figures belong to the product too: a recipe reads the product,
     # not the record. Only a product with none of its own takes them, so a
-    # figure typed on it is never overwritten.
-    if get_template_nutrition(template) is None:
+    # figure typed on it is never overwritten. A cleared panel is stored as
+    # an empty namespace, which every reader treats as "no figures".
+    if not get_template_nutrition(template):
         nutrition = extract_nutrition_info_from_off_metadata(
             item_data.get('meta_data') or {}
         )
