@@ -141,7 +141,8 @@ moduleRegistry.register({{
     basePath: '{route}',
     items: [
       {{
-        path: '',
+        // Absolute: the shell links a nav item exactly as written.
+        path: '{route}',
         icon: Package,
         labelKey: '{name}:navigation.title',
       }},

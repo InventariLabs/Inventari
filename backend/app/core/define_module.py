@@ -173,7 +173,6 @@ class _DeclarativeModule(BaseModule):
             self._spec.seed(organization_id, context)
 
     def on_startup(self, context: ModuleContext) -> None:
-        super().on_startup(context)
         if self._spec.schedules:
             _register_schedules(self._spec.schedules, self._spec.metadata.name)
         if self._spec.on_startup_hook is not None:
@@ -193,14 +192,12 @@ class _DeclarativeModule(BaseModule):
             self._spec.register_contributions_hook()
 
     def on_install(self, context: ModuleContext) -> None:
-        super().on_install(context)
         if self._spec.on_install_hook is not None:
             self._spec.on_install_hook(context)
 
     async def on_install_async(self, context: ModuleContext) -> None:
         if self._spec.on_install_async_hook is not None:
-            # Run migrations first, then the async hook (skip sync hook).
-            self._run_module_migrations('upgrade')
+            # The async hook replaces the sync one; the migrations have run.
             await self._spec.on_install_async_hook(context)
         else:
             self.on_install(context)
@@ -253,7 +250,9 @@ def define_module(
     interceptors:
         Optional list of interceptor instances to register.
     seed:
-        Optional ``on_enable(org_id: UUID, context)`` callback for seeding defaults.
+        Optional ``on_enable(org_id: UUID, context)`` callback for seeding
+        defaults; it runs whenever the module is enabled for an organization,
+        onboarding included.
     schedules:
         Optional list of ``ModuleScheduledTask`` instances to register on startup.
     register_services_hook:

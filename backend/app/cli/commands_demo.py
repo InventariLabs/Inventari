@@ -267,7 +267,7 @@ async def _enable_extra_modules(db, org, user) -> None:
     if not modules:
         return
 
-    await enable_modules_async(modules, org.id, db=db, user=user, run_custom_hook=False)
+    await enable_modules_async(modules, org.id, db=db, user=user)
     org.enabled_modules = list(enabled | {m.metadata.name for m in modules})
 
 

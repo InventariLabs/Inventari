@@ -1823,7 +1823,7 @@ products", and one sentence in the bulk-edit window used both nouns in a single
 breath — "applied to all 3 selected products … unchanged for each item".
 
 Guarded by `src/i18n/__tests__/productVocabulary.test.ts` over the core catalogues
-(`items`, `common`, `storages`, `labels` and the `inventory` module in every maintained
+(`items`, `common`, `locations`, `labels` and the `inventory` module in every maintained
 language, `scan` in English only), where
 the noun can only mean the stocked record.
 

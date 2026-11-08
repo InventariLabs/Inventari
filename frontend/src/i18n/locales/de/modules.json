@@ -9,8 +9,7 @@
   },
   "modules": {
     "core": {
-      "title": "Haus & Küche",
-      "desc": "Kühlschrank, Vorratskammer und grundlegende Produkte."
+      "title": "Haus & Küche"
     },
     "shopping_lists": {
       "name": "Einkaufslisten",

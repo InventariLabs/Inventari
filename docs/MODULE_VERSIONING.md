@@ -30,8 +30,8 @@ to fail once the platform reaches 1.0.0, so that the change lifting the ceiling
 deletes it on purpose.
 
 Nothing stops a community module from numbering itself above 0.x: the platform
-checks only that `version` begins with three numeric parts, and says nothing about
-the level. The reasoning is offered, not imposed.
+checks only that `version` is three numeric parts (`MAJOR.MINOR.PATCH`, nothing
+after them, so the upgrade check can compare it), and says nothing about the level. The reasoning is offered, not imposed.
 
 ### The level within 0.x
 

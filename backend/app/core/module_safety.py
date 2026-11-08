@@ -354,10 +354,9 @@ FORBIDDEN_OBJECTS = (
 SHIPPED_ONLY_OBJECTS = ('app.database.Base',)
 
 CORE_EXEMPTIONS: dict[str, list[str]] = {
-    'printing': ['subprocess', 'os'],
-    'vision': ['httpx'],
-    'nutrition': ['os', 'sys'],
-    'webhooks': ['socket'],
+    # Each entry grants an import the scan would refuse without it — no
+    # standing allowance for one a module might make later
+    # (tests/unit/test_the_scan_names_what_it_bans.py).
     'equipment': ['app.models.item'],
     'approvals': ['app.models.user'],
     # Maker: batched read of the records' view for the recipe catalog (escape
@@ -372,15 +371,6 @@ CORE_EXEMPTIONS: dict[str, list[str]] = {
         'app.models.product_template',
     ],
 }
-
-SUSPICIOUS_IMPORTS = (
-    'os',
-    'shutil',
-    'sys',
-    'requests',
-    'httpx',
-    'urllib',
-)
 
 FORBIDDEN_CALLS = (
     'eval',

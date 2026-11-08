@@ -642,7 +642,7 @@
       "showWholeChange": "Mostrar a alteração completa",
       "showLess": "Mostrar menos",
       "reasons": {
-        "CONSUMED": "Consumido / Usado",
+        "CONSUMED": "Consumido",
         "USED": "Consumido",
         "DISPOSED": "Descartado",
         "DISCARDED": "Descartado",

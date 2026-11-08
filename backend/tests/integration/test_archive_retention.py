@@ -81,7 +81,7 @@ class TestArchiveRetention:
         # app lifespan does, so the stock_takes purge blocker is registered.
         stock_takes_module = module_registry.get('stock_takes')
         assert stock_takes_module is not None
-        stock_takes_module.on_startup(
+        stock_takes_module.run_startup(
             ModuleContext(event_bus=event_bus, db=real_async_db_session)
         )
 

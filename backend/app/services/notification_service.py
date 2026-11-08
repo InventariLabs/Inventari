@@ -148,8 +148,8 @@ class NotificationService:
     @staticmethod
     async def notify_superusers_async(
         db: AsyncSession,
-        title: str,
-        content: str,
+        title: LocalizedText,
+        content: LocalizedText,
         type: str = 'info',
         link: str | None = None,
         meta_data: dict | None = None,
@@ -166,30 +166,38 @@ class NotificationService:
         account cannot sign in to decide anything, so it is not told
         either. ``exclude_user_id`` leaves out whoever made the act the notice
         reports: a decision is news to the other superusers, not to the one
-        who has just taken it and was shown the result. Callers must commit,
-        then call
+        who has just taken it and was shown the result. ``title`` and
+        ``content`` accept a language table, resolved per superuser as
+        ``notify_org_admins_async`` does. Callers must commit, then call
         ``core_api.notifications.publish_async(db, notifications)``.
         """
-        query = select(User.id).where(
+        query = select(User.id, User.preferred_language).where(
             User.is_superuser.is_(True), User.is_active.is_(True)
         )
         if exclude_user_id is not None:
             query = query.where(User.id != exclude_user_id)
-        superusers = await db.scalars(query)
-        return await NotificationService.create_notifications_batch_async(
-            db,
-            list(superusers.all()),
-            title=title,
-            content=content,
-            type=type,
-            link=link,
-            meta_data=meta_data,
-        )
+        by_language: dict[str, list[UUID]] = defaultdict(list)
+        for user_id, language in (await db.execute(query)).all():
+            by_language[language or 'en'].append(user_id)
+        created: list[Notification] = []
+        for lang, user_ids in by_language.items():
+            created.extend(
+                await NotificationService.create_notifications_batch_async(
+                    db,
+                    user_ids,
+                    title=in_language(title, lang),
+                    content=in_language(content, lang),
+                    type=type,
+                    link=link,
+                    meta_data=meta_data,
+                )
+            )
+        return created
 
     @staticmethod
     async def exists_unread_by_meta_async(
         db: AsyncSession,
-        organization_id: UUID,
+        organization_id: UUID | None,
         key: NotificationDedupKey,
         since: datetime,
     ) -> bool:
@@ -199,12 +207,19 @@ class NotificationService:
 
         Used by periodic workers to deduplicate alerts on a natural key
         (org + reference + notification type + day) before inserting.
+        ``organization_id=None`` asks the same of the instance's superusers,
+        who hear what belongs to no organization.
         """
+        audience = (
+            User.is_superuser.is_(True)
+            if organization_id is None
+            else User.organization_id == organization_id
+        )
         stmt = (
             select(Notification.id)
             .join(User, Notification.user_id == User.id)
             .where(
-                User.organization_id == organization_id,
+                audience,
                 Notification.is_read.is_(False),
                 Notification.created_at >= since,
                 Notification.meta_data['type'].as_string() == key.meta_type,

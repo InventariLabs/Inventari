@@ -129,6 +129,39 @@ describe("check-module-catalog", () => {
     expect(stderr).toContain("does not close");
   });
 
+  it("fails when a frontend module registers under another name than its manifest", () => {
+    repo = makeRepo();
+    repo.write({
+      [MODULES_API]: api(),
+      ...manifest("warranty_tracker"),
+      [SNAPSHOT]: ["warranty_tracker"],
+      "frontend/src/modules/warranty_tracker/module.ts":
+        'moduleRegistry.register({\n  name: "warrantyTracker",\n  routes: [],\n});\n',
+    });
+
+    const { status, stderr } = run();
+
+    expect(status).toBe(1);
+    expect(stderr).toContain("MODULE-NAME MISMATCH  warranty_tracker");
+    expect(stderr).toContain('"warrantyTracker"');
+  });
+
+  it("passes a frontend module registered under its manifest's name", () => {
+    repo = makeRepo();
+    repo.write({
+      [MODULES_API]: api(),
+      ...manifest("warranty_tracker"),
+      [SNAPSHOT]: ["warranty_tracker"],
+      "frontend/src/modules/warranty_tracker/module.ts":
+        'moduleRegistry.register({\n  name: "warranty_tracker",\n  routes: [],\n});\n',
+      // A frontend-only feature has no manifest to agree with.
+      "frontend/src/modules/launcher/module.ts":
+        'moduleRegistry.register({ name: "launcher", routes: [] });\n',
+    });
+
+    expect(run().status).toBe(0);
+  });
+
   it("reads the snapshot alone, and exits 0, when the backend is not mounted", () => {
     repo = makeRepo();
     repo.write({ [SNAPSHOT]: ["a", "b", "c"] });

@@ -76,7 +76,8 @@ const backendModules = fs
 
 /** Served by /modules/available without a backend module (app/api/modules.py). */
 const VIRTUAL_MODULES = ["partners"] as const;
-/** Always-on, rendered by the onboarding wizard from modules.core.title/desc. */
+/** Always-on; the audit journal names it from modules.core.title
+ *  (auditModuleName). Nothing reads a description of it. */
 const CORE_KEY = "core";
 /** Always-on features the org module list serves without a backend module
  *  (ALWAYS_ON_MODULES in app/core/module_safety.py, minus the names that are
@@ -152,11 +153,11 @@ describe("module name parity", () => {
     expect(problems).toEqual([]);
   });
 
-  it("the always-on core entry has title+desc in all five locales", () => {
+  it("the always-on core entry has a title in all five locales", () => {
     const problems: string[] = [];
     for (const lang of MAINTAINED_LANGUAGES) {
       const entry = modulesCatalogs[lang][CORE_KEY];
-      for (const field of ["title", "desc"] as const) {
+      for (const field of ["title"] as const) {
         const value = dig(entry, field);
         if (typeof value !== "string" || value.trim() === "") {
           problems.push(
@@ -318,8 +319,7 @@ describe("module name parity", () => {
           );
         }
       }
-      const descriptionKey = name === CORE_KEY ? "desc" : "description";
-      const description = dig(modulesCatalogs.en, `${name}.${descriptionKey}`);
+      const description = dig(modulesCatalogs.en, `${name}.description`);
       const cell = cells[columns.indexOf("One-sentence description")];
       if (typeof description === "string" && !cell.startsWith(description)) {
         problems.push(

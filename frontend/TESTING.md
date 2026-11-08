@@ -11,7 +11,6 @@ In the `frontend` directory:
 
 - `npm run test` - Runs tests in watch mode.
 - `npm run test:run` - Runs tests once (useful for CI).
-- `npm run test:ui` - Launches the Vitest graphical interface.
 
 ### E2E Tests (Playwright)
 

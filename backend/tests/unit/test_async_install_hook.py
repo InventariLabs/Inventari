@@ -42,7 +42,7 @@ class _SimpleModule(BaseModule):
     def register_routes(self):
         raise NotImplementedError
 
-    # Override on_install to skip real migrations (unit test)
+    # The install hook proper; the registry runs the migrations before it.
     def on_install(self, context: ModuleContext) -> None:
         if self._sync_hook:
             self._sync_hook(context)

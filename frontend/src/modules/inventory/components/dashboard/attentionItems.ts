@@ -1,6 +1,6 @@
 import type { TFunction } from "i18next";
 import type { Item, LowStockProduct } from "@/types";
-import type { AttentionItem } from "@/components/ui/AttentionCard";
+import type { AttentionItem } from "@/module-sdk";
 import { formatDate, formatDecimalQty } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { quantityText } from "@/modules/shared/hooks/usePartialPackage";

@@ -327,3 +327,34 @@ def test_register_category_interceptor_dedup():
     pipeline.register_category_interceptor(interceptor)
 
     assert len(pipeline._category_interceptors) == 1
+
+
+# ---------------------------------------------------------------------------
+# The three bases agree on what a subclass must write
+# ---------------------------------------------------------------------------
+
+
+class _AfterCreateOnly(ItemInterceptor):
+    """An item interceptor that only needs to hear about a new item."""
+
+    def __init__(self) -> None:
+        self.created: list[object] = []
+
+    async def after_create(self, item_id, data: dict, context) -> None:
+        self.created.append(item_id)
+
+
+@pytest.mark.asyncio
+async def test_an_item_interceptor_may_override_only_an_after_hook():
+    """Storage and category interceptors never had to stub the before hooks;
+    an item interceptor did, or it failed when it was instantiated."""
+    interceptor = _AfterCreateOnly()
+    pipeline = InterceptorPipeline()
+    pipeline.register_item_interceptor(interceptor)
+    ctx = _make_context()
+    item_id = uuid4()
+
+    assert await pipeline.run_before_item_create({'name': 'x'}, ctx) == {'name': 'x'}
+    assert await pipeline.run_before_item_update(item_id, {'q': 1}, ctx) == {'q': 1}
+    await pipeline.run_after_item_create(item_id, {}, ctx)
+    assert interceptor.created == [item_id]
