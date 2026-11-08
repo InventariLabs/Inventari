@@ -34,6 +34,30 @@ VITE_API_URL=http://127.0.0.1:5273 scripts/dev2 make test-e2e
 all optional modules, English UI language, leftover-data cleanup, and baseline
 seed data (`E2E-Kitchen` storage, `E2E-Dairy` category, three items).
 
+## The dev server runs without hot reload during a run
+
+The stacks serve the frontend with the Vite dev server over the mounted
+tree. Vite watches that tree and, when a file it cannot hot-update changes
+(any `src/**/i18n/*.json`, `src/main.tsx`), tells every open page to reload.
+A checkout, a rebase or the commit hook stashing files while a run is going
+is enough, and a spec whose state lives between two actions (tap *More*, then
+wait for the link) fails at random: 2 of 20 runs with a translation file
+touched every few seconds.
+
+`make test-e2e` (and so `make test-e2e-isolated` and the pool stacks'
+wrappers) therefore restarts the dev server with `VITE_DISABLE_HMR=1` for the
+length of the run and puts it back afterwards, the way it already does for
+the backend's `TESTING` mode. With the flag, `frontend/vite.config.ts` sets
+`server.hmr: false`: the pages get no reload channel, while the file watcher
+stays on, so the next page load still serves the file as it is on disk. The
+same 20 runs pass 60 of 60 under the same storm. A person editing code
+outside a run keeps hot reload; one who starts Playwright by hand
+(`npx playwright test`) gets the dev server as it is, so
+`VITE_DISABLE_HMR=1 docker compose up -d --no-deps frontend` first (and
+without the variable afterwards) gives that run the same protection. Not
+affected: CI, where nothing changes the tree during a run, and a production
+build, which has no Vite client.
+
 ## Conventions the specs rely on
 
 - **Route drift is checked against the app, not memory.** When a helper gets

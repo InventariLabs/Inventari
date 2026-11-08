@@ -263,6 +263,9 @@ services:
     restart: always
     environment:
       INVENTARI_REPO_ROOT: /repo
+      # `make test-e2e` sets it to 1 for the length of a run: the dev server
+      # then keeps no hot-reload channel to the pages (frontend/vite.config.ts).
+      VITE_DISABLE_HMR: ${VITE_DISABLE_HMR:-}
     volumes:
       # /app is covered whole on purpose: the container and the host share one
       # `frontend/node_modules`. See frontend/Dockerfile.dev for why there is no
