@@ -94,7 +94,12 @@ def _register_as_shipped(module_name: str) -> None:
         return
     if module_name in names:
         return
-    body = ''.join(f"    '{name}',\n" for name in sorted([*names, module_name]))
+    # In front of the first name that sorts after it, every other line where
+    # it was: re-sorting the list moved entries nobody asked to move (the
+    # list is not in order), and the diff of a new module carried them.
+    at = next((i for i, name in enumerate(names) if name > module_name), len(names))
+    names.insert(at, module_name)
+    body = ''.join(f"    '{name}',\n" for name in names)
     safety_file.write_text(
         text[: block.start(1)] + body + text[block.end(1) :], encoding='utf-8'
     )

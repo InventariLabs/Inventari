@@ -12,7 +12,7 @@ from rich.table import Table
 
 from app.core.logging import get_logger
 from app.core.module_safety import REPO_SHIPPED_MODULES
-from app.i18n import MAINTAINED_LANGUAGES
+from app.i18n import MAINTAINED_LANGUAGES, SUPPORTED_LANGUAGES
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -263,9 +263,10 @@ def new_community(
         '--language',
         '-l',
         help=(
-            'A language besides English to write a catalog for (pl, de, fr, es); '
-            'repeat for several. English is always written and is the only one '
-            'a module has to ship.'
+            'A language besides English to write a catalog for ('
+            + ', '.join(lang for lang in SUPPORTED_LANGUAGES if lang != 'en')
+            + '); repeat for several. English is always written and is the '
+            'only one a module has to ship.'
         ),
     ),
 ):
