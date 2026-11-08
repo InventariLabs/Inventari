@@ -809,6 +809,21 @@ describe("LabelPoolPage", () => {
       };
 
       it("selects a card by clicking it and opens its preview from the eye", async () => {
+        // The preview renders its sheet from the PNG export; answer it and
+        // wait for it, or the request outlives the test's own handlers.
+        const exported: string[] = [];
+        server.use(
+          http.get("/api/v1/labels/pool/export/png", ({ request }) => {
+            exported.push(
+              ...new URL(request.url).searchParams.getAll("label_ids"),
+            );
+            return new HttpResponse(new Blob(["png"]), {
+              headers: { "Content-Type": "image/png" },
+            });
+          }),
+        );
+        window.URL.createObjectURL = vi.fn(() => "blob:preview");
+        window.URL.revokeObjectURL = vi.fn();
         const cards = await openGrid();
 
         fireEvent.click(cards[0]);
@@ -820,6 +835,7 @@ describe("LabelPoolPage", () => {
         expect(
           await screen.findByRole("button", { name: /Download 1 label/i }),
         ).toBeInTheDocument();
+        await waitFor(() => expect(exported).toEqual(["2"]));
       });
 
       it("deletes the card's own label after a confirmation", async () => {
