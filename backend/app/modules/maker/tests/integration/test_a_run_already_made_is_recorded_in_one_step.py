@@ -455,6 +455,63 @@ class TestBeforeSaving:
             ('Damson Plums', Decimal('15.000'))
         ]
 
+    def test_a_line_listed_in_grams_covers_only_its_weight(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """500 g of plums already listed leaves 3.5 kg of a 4 kg shortfall to buy.
+
+        The list's lines were summed whatever their unit, so the 500 g line
+        read as 500 kg of cover and the run's shortfall added nothing.
+        """
+        seed = _plum_butter(
+            db_session, client, org, headers, pantry, plums_on_shelf='18'
+        )
+        kg = db_session.scalars(select(Uom).where(Uom.symbol == 'kg')).first()
+        g = db_session.scalars(select(Uom).where(Uom.symbol == 'g')).first()
+        assert kg is not None and g is not None
+        seed['plums'].uom_id = kg.id
+        db_session.commit()
+        listed = client.post(
+            '/api/v1/shopping-lists', headers=headers, json={'name': 'This week'}
+        )
+        assert listed.status_code == 201, listed.text
+        line = client.post(
+            f'/api/v1/shopping-lists/{listed.json()["id"]}/items',
+            headers=headers,
+            json={
+                'name': 'Damson Plums',
+                'quantity': '500',
+                'uom_id': str(g.id),
+                'template_id': str(seed['plums'].id),
+            },
+        )
+        assert line.status_code == 201, line.text
+        url = '/api/v1/maker/production/orders/shortages/shopping-list'
+        run = _run(seed['butter'], pantry, '20')
+
+        first = client.post(url, headers=headers, json=run)
+        again = client.post(url, headers=headers, json=run)
+
+        assert first.status_code == 200, first.text
+        assert first.json()['shopping_list_id'] == listed.json()['id']
+        # What the screen reads: something went onto the list, then nothing.
+        assert first.json()['added_count'] + first.json()['raised_count'] == 1
+        assert again.json()['added_count'] + again.json()['raised_count'] == 0
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(
+                ShoppingListItem.template_id == seed['plums'].id
+            )
+        ).all()
+        assert sorted((row.quantity, row.uom_id, row.source) for row in rows) == [
+            (Decimal('3.500'), kg.id, 'production'),
+            (Decimal('500.000'), g.id, 'manual'),
+        ]
+
     def test_nothing_short_touches_no_list(
         self,
         client: TestClient,

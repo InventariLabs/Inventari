@@ -322,7 +322,11 @@ says what the release does rather than what changed since them.
   line was already made for add nothing, so the same recipe again changes
   nothing), and a production run's shortage raises the listed line when the run
   needs more. A line already ticked off keeps its quantity and the rest becomes
-  a new line.
+  a new line. A line of the same product in another unit counts as its amount
+  in the unit asked for, so 500 g of plums already listed leaves 3.5 kg of a
+  4 kg production shortage to buy; it used to count as 500 kg, and nothing was
+  added. A line in a unit that does not convert, such as pieces against
+  kilograms, covers nothing.
 - A custom purchase order template now prints the values its editor lists for
   `{{po_number}}`, `{{po_date}}`, `{{po_status}}`, `{{vendor_name}}`,
   `{{vendor_tax_id}}`, `{{vendor_address}}`, `{{lines_count}}` and

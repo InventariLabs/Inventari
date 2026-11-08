@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ShoppingListItemCreateDTO
 from app.core.exceptions import ServiceRejectionError
+from app.models.uom import Uom
 from app.models.user import User
 from app.modules.shopping_lists.models import ShoppingListItem
 from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
@@ -45,6 +46,7 @@ async def a_line(
     *,
     source: str = 'meal_plan',
     note: str | None = 'for 200',
+    uom_id: UUID | None = None,
 ) -> ShoppingListItem:
     """A list with one line on it."""
     shopping_list = await a_list(db, user)
@@ -55,6 +57,7 @@ async def a_line(
             ShoppingListItemCreateDTO(
                 name='Flour',
                 quantity=Decimal(quantity),
+                uom_id=uom_id,
                 source=source,
                 notes=note,
                 note_data={'for': note},
@@ -65,6 +68,17 @@ async def a_line(
     line = await db.get(ShoppingListItem, dto.id)
     assert line is not None
     return line
+
+
+async def unit(db: AsyncSession, symbol: str) -> Uom:
+    """A system unit by its symbol."""
+    found = (
+        await db.scalars(
+            select(Uom).where(Uom.symbol == symbol, Uom.organization_id.is_(None))
+        )
+    ).first()
+    assert found is not None
+    return found
 
 
 @pytest.mark.integration
@@ -267,3 +281,147 @@ class TestTopUp:
 
         rows = await rows_of(real_async_db_session, line.shopping_list_id)
         assert sorted(r.quantity for r in rows) == [Decimal('200'), Decimal('300')]
+
+
+@pytest.mark.integration
+class TestTopUpAcrossUnits:
+    """A line for the same goods in another unit is cover in the need's unit.
+
+    The sum used to add the lines' numbers whatever their unit: 500 g of
+    plums on the list was 500 kg of cover, and a run short of 4 kg put
+    nothing on the list.
+    """
+
+    async def _top_up(
+        self,
+        db: AsyncSession,
+        user: User,
+        line: ShoppingListItem,
+        need: ShoppingListItemCreateDTO,
+    ) -> ShoppingListItemCreateDTO | None:
+        org = _org_of(user)
+        lines = await shopping_lists_api.get_list_items_async(
+            db, line.shopping_list_id, org
+        )
+        return await shopping_lists_api.top_up_async(
+            db, line.shopping_list_id, need, lines, org
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_line_in_grams_covers_its_weight_in_kilograms(
+        self, real_async_db_session: AsyncSession, async_test_user: User
+    ) -> None:
+        db = real_async_db_session
+        grams, kilograms = await unit(db, 'g'), await unit(db, 'kg')
+        line = await a_line(
+            db, async_test_user, '500', source='manual', uom_id=grams.id
+        )
+
+        written = await self._top_up(
+            db,
+            async_test_user,
+            line,
+            ShoppingListItemCreateDTO(
+                name='Flour',
+                quantity=Decimal('4'),
+                uom_id=kilograms.id,
+                source='production',
+            ),
+        )
+
+        assert written is not None
+        assert written.quantity == Decimal('3.5')
+        rows = await rows_of(db, line.shopping_list_id)
+        assert sorted((r.quantity, r.uom_id) for r in rows) == [
+            (Decimal('3.500'), kilograms.id),
+            (Decimal('500.000'), grams.id),
+        ]
+
+    @pytest.mark.asyncio
+    async def test_a_converted_remainder_is_bought_up_to_the_stores_step(
+        self, real_async_db_session: AsyncSession, async_test_user: User
+    ) -> None:
+        """500.6 g leaves 3.4994 kg: the nearest step, 3.499 kg, is 0.4 g short."""
+        db = real_async_db_session
+        grams, kilograms = await unit(db, 'g'), await unit(db, 'kg')
+        line = await a_line(
+            db, async_test_user, '500.6', source='manual', uom_id=grams.id
+        )
+
+        written = await self._top_up(
+            db,
+            async_test_user,
+            line,
+            ShoppingListItemCreateDTO(
+                name='Flour',
+                quantity=Decimal('4'),
+                uom_id=kilograms.id,
+                source='production',
+            ),
+        )
+
+        assert written is not None
+        assert written.quantity == Decimal('3.500')
+        rows = await rows_of(db, line.shopping_list_id)
+        assert sorted((r.quantity, r.uom_id) for r in rows) == [
+            (Decimal('3.500'), kilograms.id),
+            (Decimal('500.600'), grams.id),
+        ]
+
+    @pytest.mark.asyncio
+    async def test_a_line_whose_unit_does_not_convert_is_no_cover(
+        self, real_async_db_session: AsyncSession, async_test_user: User
+    ) -> None:
+        """Three pieces of plums say nothing about kilograms: the whole need is bought."""
+        db = real_async_db_session
+        pieces, kilograms = await unit(db, 'pcs'), await unit(db, 'kg')
+        line = await a_line(db, async_test_user, '3', source='manual', uom_id=pieces.id)
+
+        written = await self._top_up(
+            db,
+            async_test_user,
+            line,
+            ShoppingListItemCreateDTO(
+                name='Flour',
+                quantity=Decimal('4'),
+                uom_id=kilograms.id,
+                source='production',
+            ),
+        )
+
+        assert written is not None
+        assert written.quantity == Decimal('4')
+        rows = await rows_of(db, line.shopping_list_id)
+        assert sorted((r.quantity, r.uom_id) for r in rows) == [
+            (Decimal('3.000'), pieces.id),
+            (Decimal('4.000'), kilograms.id),
+        ]
+
+    @pytest.mark.asyncio
+    async def test_an_open_line_of_the_source_in_another_unit_is_not_raised(
+        self, real_async_db_session: AsyncSession, async_test_user: User
+    ) -> None:
+        """Raising a gram line by a kilogram difference would ask for 503.5 g."""
+        db = real_async_db_session
+        grams, kilograms = await unit(db, 'g'), await unit(db, 'kg')
+        line = await a_line(
+            db, async_test_user, '500', source='production', uom_id=grams.id
+        )
+
+        await self._top_up(
+            db,
+            async_test_user,
+            line,
+            ShoppingListItemCreateDTO(
+                name='Flour',
+                quantity=Decimal('4'),
+                uom_id=kilograms.id,
+                source='production',
+            ),
+        )
+
+        rows = await rows_of(db, line.shopping_list_id)
+        assert sorted((r.quantity, r.uom_id) for r in rows) == [
+            (Decimal('3.500'), kilograms.id),
+            (Decimal('500.000'), grams.id),
+        ]
