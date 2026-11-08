@@ -20,7 +20,7 @@ names before the person moving chooses.
 
 from uuid import UUID, uuid4
 
-from sqlalchemy import func, select
+from sqlalchemy import String, cast, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.context import build_module_context
@@ -262,43 +262,42 @@ def _validate_final_state(plan: _Plan, data: StorageReorgRequest) -> None:
             'This operation would create a cycle in the location hierarchy.',
         )
     created_ids = {plan.temp_to_id[t] for t, _ in plan.creates}
-    sibling_names = {
-        (plan.parent_map.get(node), name)
-        for node, name in plan.name_by_id.items()
-        if node not in created_ids
-    }
+    # Who holds a name on a level in the final tree: every surviving node, so
+    # a twin is found whichever of the two the snapshot happens to list first.
+    holders: dict[tuple[UUID | None, str], set[UUID]] = {}
+    for node, name in plan.name_by_id.items():
+        if node not in created_ids and node not in deleted_set:
+            holders.setdefault((plan.parent_map.get(node), name), set()).add(node)
     for temp_id, create_data in plan.creates:
         key = (create_data.get('parent_id'), create_data['name'])
-        if key in sibling_names:
+        if key in holders:
             create_index = _index_of(data, 'create', temporary_id=temp_id)
-            op = data.operations[create_index]
             _reject(
                 plan,
                 create_index,
-                op,
-                f'A storage location named "{create_data["name"]}" already '
-                'exists under the same parent.',
+                data.operations[create_index],
+                _name_taken_reason(create_data['name']),
             )
-        sibling_names.add(key)
+        holders.setdefault(key, set()).add(plan.temp_to_id[temp_id])
     # A move lands among the siblings of its new parent: a place of the same
-    # name already there is the same refusal a create gets, said before the
-    # write instead of as the index's violation after it.
-    names_on_level: dict[tuple[UUID | None, str], UUID] = {}
-    for node, name in plan.name_by_id.items():
-        if node not in created_ids and node not in deleted_set:
-            names_on_level.setdefault((plan.parent_map.get(node), name), node)
+    # name already there — one that stays, or another one moving in — is the
+    # same refusal a create gets, said before the write instead of as the
+    # index's violation after it.
     for move_id, new_parent in plan.moves:
         name = plan.name_by_id.get(move_id, '')
-        holder = names_on_level.get((new_parent, name))
-        if holder is not None and holder != move_id:
+        if holders.get((new_parent, name), set()) - {move_id}:
             move_index = _index_of(data, 'move', id=move_id)
             _reject(
                 plan,
                 move_index,
                 data.operations[move_index],
-                f'A storage location named "{name}" already '
-                'exists under the same parent.',
+                _name_taken_reason(name),
             )
+
+
+def _name_taken_reason(name: str) -> str:
+    """The refusal for a name already used on the level, in the reader's language."""
+    return get_error_message('storage_name_collision', get_current_lang(), name=name)
 
 
 def _index_of(
@@ -568,6 +567,22 @@ async def _apply_writes(
                 tag_by_parent = {
                     row.id: row.context_tag for row in parent_rows if row.context_tag
                 }
+            # The index refuses a state the batch only passes through (a place
+            # deleted while its namesake child moves up, two namesakes swapping
+            # parents), though the final tree it validated is fine. Every mover
+            # therefore stands under its own id as a name while the tree is
+            # rearranged, and takes its name back once it is.
+            movers = list(dict.fromkeys(move_id for move_id, _ in plan.moves))
+            if movers:
+                await db.execute(
+                    update(StorageLocation)
+                    .where(
+                        StorageLocation.organization_id == org_id,
+                        StorageLocation.id.in_(movers),
+                    )
+                    .values(name=cast(StorageLocation.id, String))
+                    .execution_options(synchronize_session=False)
+                )
             for delete_id in plan.deleted_ids:
                 row = await db.get(StorageLocation, delete_id)
                 if row is None:
@@ -575,6 +590,10 @@ async def _apply_writes(
                         'storage_vanished_during_batch', location=delete_id
                     )
                 await db.delete(row)
+            # Sent now, not with the creates: the unit of work writes inserts
+            # before deletes, and a place created under a deleted namesake's
+            # name would meet it.
+            await db.flush()
             for temp_id, create_data in plan.creates:
                 model_columns = StorageLocation.__table__.columns.keys()
                 final_data = {
@@ -611,6 +630,17 @@ async def _apply_writes(
                     inherited = tag_by_parent.get(new_parent)
                     if inherited:
                         row.context_tag = inherited
+            await db.flush()
+            for move_id in movers:
+                await db.execute(
+                    update(StorageLocation)
+                    .where(
+                        StorageLocation.organization_id == org_id,
+                        StorageLocation.id == move_id,
+                    )
+                    .values(name=plan.name_by_id[move_id])
+                    .execution_options(synchronize_session=False)
+                )
             await _record_relocations(db, user, org_id, plan)
             await _log_batch(db, user, org_id, plan)
             await _emit_events(db, org_id, plan, created_ids)

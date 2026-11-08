@@ -2,9 +2,10 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from uuid import UUID
 
-from sqlalchemy import or_, select, true, update
+from sqlalchemy import and_, or_, select, true, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.core.context import build_module_context
@@ -658,6 +659,35 @@ async def unarchive_storage(
     return storage
 
 
+async def _lifted_child_meeting_a_namesake(
+    db: AsyncSession, storage: StorageLocation
+) -> str | None:
+    """The name of a child that would collide once lifted, or ``None``.
+
+    A child bearing the deleted place's own name does not count: the place
+    gives its name up before the lift.
+    """
+    sibling = aliased(StorageLocation)
+    return await db.scalar(
+        select(StorageLocation.name)
+        .join(
+            sibling,
+            and_(
+                sibling.organization_id == StorageLocation.organization_id,
+                sibling.name == StorageLocation.name,
+                sibling.id != storage.id,
+                sibling.parent_id.is_not_distinct_from(storage.parent_id),
+            ),
+        )
+        .where(
+            StorageLocation.organization_id == storage.organization_id,
+            StorageLocation.parent_id == storage.id,
+        )
+        .order_by(StorageLocation.name)
+        .limit(1)
+    )
+
+
 async def delete_storage(
     db: AsyncSession, storage: StorageLocation, user: UserContextDTO
 ) -> None:
@@ -708,6 +738,18 @@ async def delete_storage(
     # would say so.
     if await locations_holding_stock_async(db, _org_id(user), [storage.id]):
         raise ServiceRejectionError('storage_delete_blocked_by_stock')
+
+    # The children are lifted onto this place's level (below): one that bears
+    # the name of a place already standing there would meet it in the
+    # sibling-name index. Said here, naming the child, instead of as the
+    # index's violation.
+    namesake = await _lifted_child_meeting_a_namesake(db, storage)
+    if namesake is not None:
+        raise ServiceRejectionError(
+            'storage_delete_blocked_by_child_name',
+            location=storage.name,
+            name=namesake,
+        )
 
     # Defense-in-depth: if a StockMove was concurrently inserted after our
     # move_count check (despite the advisory lock, e.g. lock not held by

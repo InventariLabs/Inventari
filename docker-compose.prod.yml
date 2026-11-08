@@ -155,8 +155,10 @@ services:
   # backups; a plain remote is enough, because the payload is ciphertext
   # (rclone crypt would encrypt it twice). Only `*.age` files ever leave the
   # host: it refuses to run without AGE_RECIPIENT, and the filter keeps a
-  # plain dump left from before the key out of the copy too. Enable it with
-  # `--profile offsite` and set up rclone.conf + BACKUP_RCLONE_REMOTE as
+  # plain dump left from before the key out of the copy too. --skip-links: the
+  # -latest names in last/ are links to the newest pair, which is sent once
+  # under its own names, not a second time under those. Enable it with
+  # `offsite` in COMPOSE_PROFILES and set up rclone.conf + BACKUP_RCLONE_REMOTE as
   # described in DEPLOYMENT.md.
   db-backup-offsite:
     image: rclone/rclone:1.75.1
@@ -181,7 +183,7 @@ services:
           exit 1;
         fi;
         while :; do
-          rclone sync /backups "$$BACKUP_RCLONE_REMOTE" --include "*.age" --copy-links --log-level INFO;
+          rclone sync /backups "$$BACKUP_RCLONE_REMOTE" --include "*.age" --skip-links --log-level INFO;
           sleep 3600;
         done
 
@@ -324,7 +326,9 @@ services:
       DB_PORT: 5432
       DB_NAME: "${DB_NAME:-inventari_db}"
       POOL_MODE: transaction
-      MAX_CLIENT_CONN: 300
+      # The backend opens WEB_CONCURRENCY x 50 client connections
+      # (docs/SCALING.md, "Connection pool math"); this must stay above it.
+      MAX_CLIENT_CONN: ${PGBOUNCER_MAX_CLIENT_CONN:-300}
       DEFAULT_POOL_SIZE: 30
       MIN_POOL_SIZE: 4
       RESERVE_POOL_SIZE: 5
@@ -355,9 +359,9 @@ services:
     # BACKEND_WORKER_MAX_GROWTH_MB past its start-up size, or sits idle
     # BACKEND_WORKER_IDLE_RECYCLE_SECONDS more than a quarter over it, is
     # replaced (backend/app/core/worker_recycle.py). The limits follow the
-    # host (DEPLOYMENT.md, "Sizing the services to the host"); the defaults
-    # are what the file always shipped.
-    mem_limit: ${BACKEND_MEM_LIMIT:-1536m}
+    # host (DEPLOYMENT.md, "Sizing the services to the host"); the default
+    # holds the default four workers at the size that section gives one.
+    mem_limit: ${BACKEND_MEM_LIMIT:-2g}
     # --forwarded-allow-ips: trust X-Forwarded-For from Caddy (the only hop;
     # the backend port is not published outside app-network) so
     # request.client.host is the real client IP and rate limiting buckets

@@ -18,8 +18,8 @@ The Open Food Facts data is available under the [Open Database License (ODbL) v1
 
 - The Docker Compose stack is running with the `food` profile enabled. Dev
   starts it with `docker compose --profile food up -d`; a production install
-  enables the profile by adding `--profile food` to the deployment's `up -d`
-  commands — see *Optional: the Open Food Facts database* in
+  enables the profile with `COMPOSE_PROFILES=food` in `.env` — see *Optional:
+  the Open Food Facts database* in
   [DEPLOYMENT.md](../DEPLOYMENT.md#optional-the-open-food-facts-database).
 - **Disk**: about 13 GB free while you import, about 5 GB after. The
   Parquet file is 7.9 GB; it is mounted into the import container, not copied,
@@ -110,7 +110,7 @@ it logs that the products database is not configured and stops.
 Recreate the backend so it picks the variable up — `restart` keeps the old
 environment:
 ```bash
-docker compose -f docker-compose.prod.yml --profile food up -d backend   # production
+docker compose -f docker-compose.prod.yml up -d backend   # production (food in COMPOSE_PROFILES)
 docker compose up -d backend                               # development
 ```
 
