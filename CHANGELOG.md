@@ -182,6 +182,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A custom purchase order template now prints the values its editor lists for
+  `{{po_number}}`, `{{po_date}}`, `{{po_status}}`, `{{vendor_name}}`,
+  `{{vendor_tax_id}}`, `{{vendor_address}}`, `{{lines_count}}` and
+  `{{barcode_img}}`. The list advertised them, but the render context the
+  preview and the PDF share never set them, so a layout written against the
+  list came out with those fields blank while the built-in layout printed the
+  same facts under other names.
 - When the session has ended, a request that was only asking — a label preview,
   a pasted-lines or sheet read, a price calculation, a match or coverage check,
   a connection, webhook or e-mail test, a generated barcode — now gets the plain
