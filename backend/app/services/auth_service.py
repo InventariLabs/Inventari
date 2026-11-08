@@ -459,12 +459,12 @@ class AuthService:
                 # entry, which points at the organization and keeps the code
                 # itself out of it.
                 from app.core.contracts import AuditAction, AuditTargetType
-                from app.core.public_api import core_api
                 from app.services._org_membership import (
                     invitation_role_label_async,
                 )
+                from app.services.audit_service import log_action_async
 
-                await core_api.audit_log.log_action_async(
+                await log_action_async(
                     db,
                     organization_id=invitation.organization_id,
                     user_id=user.id,
@@ -573,9 +573,7 @@ class AuthService:
                         link='/settings#registration-requests',
                     )
                 )
-            from app.core.public_api import core_api
-
-            await core_api.notifications.publish_async(
+            await notification_service.publish_async(
                 db,
                 [notification_service.to_dto(n) for n in admin_notifications],
             )

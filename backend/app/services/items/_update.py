@@ -724,14 +724,14 @@ async def update_quantity(
     move_reference_type: str = 'item',
     move_reference_id: UUID | None = None,
 ) -> Item:
-    from app.core.public_api import core_api
+    from app.core.period_guard import check_period_not_closed
     from app.services.analytics._common import org_today_async
 
     # Inventory period lock. Which day it is decides whether the edit passes
     # at all, so it is the organization's day, not the server's — a
     # warehouse in Auckland was being told the month had closed at 11am.
     if item.organization_id is not None:
-        await core_api.periods.check_not_closed_async(
+        await check_period_not_closed(
             db,
             item.organization_id,
             await org_today_async(db, item.organization_id),

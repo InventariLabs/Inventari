@@ -24,7 +24,6 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app.core.llm.base import LlmResponse
-from app.core.public_api import core_api
 from app.models import Organization
 from app.models.ai_usage_log import AIUsageLog
 
@@ -194,9 +193,8 @@ class TestACounterOutageIsNotAnAnswer:
         list_models, complete = _provider_mocks()
 
         with (
-            patch.object(
-                core_api.ai_usage,
-                'check_limit_async',
+            patch(
+                'app.services.ai_usage_service.check_ai_limit_async',
                 new=AsyncMock(side_effect=RuntimeError('counter is down')),
             ),
             _provider(list_models, complete),

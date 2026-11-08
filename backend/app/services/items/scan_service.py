@@ -151,8 +151,9 @@ async def _increment_existing_item(
     barcode: str,
 ) -> None:
     """Bump quantity on a pre-existing item, write history, emit ITEM_UPDATED."""
-    from app.core.public_api import core_api
+    from app.core.period_guard import check_period_not_closed
     from app.services.analytics._common import org_today_async
+    from app.services.uom_service import validate_quantity_precision_async
 
     # Block inventory increments via barcode scan when the current
     # period is closed — closed by the organization's own day, not the
@@ -160,7 +161,7 @@ async def _increment_existing_item(
     # blocked — see _create_new_item; only mutations to existing stock
     # fall under the period lock.
     if item.organization_id is not None:
-        await core_api.periods.check_not_closed_async(
+        await check_period_not_closed(
             db,
             item.organization_id,
             await org_today_async(db, item.organization_id),
@@ -169,7 +170,7 @@ async def _increment_existing_item(
     # The rescan is one more door that takes a number a person named, and
     # the unit it lands in is the record's: the same gate as a new record.
     if item.uom_id is not None:
-        await core_api.uoms.validate_quantity_precision_async(
+        await validate_quantity_precision_async(
             db, item.uom_id, Decimal(str(data.quantity)), org_id
         )
 

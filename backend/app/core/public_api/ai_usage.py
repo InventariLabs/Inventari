@@ -5,14 +5,10 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from app.core.contracts import GlobalAIUsageStatsDTO, OrgAIUsageStatsDTO, UserContextDTO
-from app.core.exceptions import TooManyRequestsException
-from app.i18n import Language
 from app.i18n.service import get_current_lang, get_error_message
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-
-    from app.services.ai_usage_service import AIUsageLimitExceededError
 
 
 class CoreAIUsageAPI:
@@ -47,17 +43,11 @@ class CoreAIUsageAPI:
         take the feature with it, or an organization cannot scan anything
         because a counter could not be read.
         """
-        from app.core.logging import get_logger
-        from app.services.ai_usage_service import AIUsageLimitExceededError
+        from app.services.ai_usage_service import enforce_ai_limit_async
 
-        try:
-            await self.check_limit_async(db, organization_id, action_type)
-        except AIUsageLimitExceededError as exc:
-            raise _limit_refusal(exc, get_current_lang()) from exc
-        except Exception as exc:  # noqa: BLE001 — best-effort limit check, see the docstring
-            get_logger(__name__).warning(
-                'AI limit check failed (non-blocking): %s', exc
-            )
+        await enforce_ai_limit_async(
+            db, organization_id, action_type, check=self.check_limit_async
+        )
 
     async def estimate_cost_async(
         self,
@@ -140,81 +130,18 @@ class CoreAIUsageAPI:
         key, and the best-effort wrapper would swallow it into a log line.
         Commit first, then log.
         """
-        usage = getattr(response, 'usage', None)
-        if not (db and organization_id and usage):
-            return
-        user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
-        org_uuid = (
-            UUID(organization_id)
-            if isinstance(organization_id, str)
-            else organization_id
+        from app.services.ai_usage_service import log_llm_usage_async
+
+        await log_llm_usage_async(
+            db,
+            user_id,
+            organization_id,
+            response,
+            action_type,
+            client,
+            estimate_cost=self.estimate_cost_async,
+            log_usage=self.log_usage_async,
         )
-        if org_uuid is None:
-            return
-        try:
-            raw = getattr(response, 'raw', None)
-            raw_model = raw.get('model', '') if isinstance(raw, dict) else ''
-            usage_dict: dict[str, Any] = dict(usage)
-            details = usage_dict.get('prompt_tokens_details')
-            prompt_tokens = int(usage_dict.get('prompt_tokens', 0) or 0)
-            completion_tokens = int(usage_dict.get('completion_tokens', 0) or 0)
-            cached_tokens = (
-                int(details.get('cached_tokens', 0) or 0)
-                if isinstance(details, dict)
-                else 0
-            )
-            provider = getattr(client, 'connection_provider', None) or 'unknown'
-            from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
-
-            # The session's ``bind`` attribute is the engine an async
-            # sessionmaker needs; ``get_bind`` hands back the sync facade,
-            # which is not the same thing and would fail later, mid-write.
-            # A session bound to a connection (or unbound) cannot give the
-            # ledger its own transaction — saying so beats guessing with a
-            # cast and losing the row after a one-line log entry.
-            bind = getattr(db, 'bind', None)
-            if not isinstance(bind, AsyncEngine):
-                raise RuntimeError(
-                    'the request session is not engine-bound, so the usage '
-                    'ledger cannot open its own session on the same engine'
-                )
-            ledger_factory = async_sessionmaker(bind=bind, expire_on_commit=False)
-            async with ledger_factory() as ledger_db:
-                provider_cost = usage_dict.get('total_cost') or usage_dict.get('cost')
-                if provider_cost:
-                    actual_cost = float(provider_cost)
-                    cost_is_estimated = False
-                else:
-                    (
-                        actual_cost,
-                        cost_is_estimated,
-                    ) = await self.estimate_cost_async(
-                        ledger_db,
-                        raw_model,
-                        prompt_tokens,
-                        completion_tokens,
-                        cached_tokens,
-                    )
-
-                await self.log_usage_async(
-                    db=ledger_db,
-                    user_id=user_uuid,
-                    organization_id=org_uuid,
-                    model_name=raw_model,
-                    provider=provider,
-                    prompt_tokens=prompt_tokens,
-                    completion_tokens=completion_tokens,
-                    total_tokens=int(usage_dict.get('total_tokens', 0) or 0),
-                    estimated_cost_usd=actual_cost,
-                    cost_is_estimated=cost_is_estimated,
-                    action_type=action_type,
-                )
-                await ledger_db.commit()
-        except Exception as log_err:  # noqa: BLE001 — best-effort logging
-            from app.core.logging import get_logger
-
-            log = get_logger(__name__)
-            log.error('[AI-LOG] Failed to log usage: %s', log_err)
 
     async def count_usage_async(
         self,
@@ -264,26 +191,3 @@ class CoreAIUsageAPI:
         from app.services.ai_usage_stats_service import get_org_ai_stats_async
 
         return await get_org_ai_stats_async(db, organization_id, days=days)
-
-
-def _limit_refusal(
-    exc: AIUsageLimitExceededError, lang: Language
-) -> TooManyRequestsException:
-    """The 429: the cause, the numbers, and the period they count over.
-
-    The numbers travel as fields, not only inside the sentence, so a screen can
-    label them without parsing prose; the sentence itself is the catalogue's
-    and arrives in the reader's language.
-    """
-    return TooManyRequestsException(
-        'AI_USAGE_LIMIT_EXCEEDED',
-        exc.sentence(lang),
-        details={
-            'lang': lang,
-            'limit_key': exc.limit_key,
-            'used': exc.used,
-            'limit': exc.limit,
-            'period_start': exc.period_start.date().isoformat(),
-            'period_end': exc.period_end.date().isoformat(),
-        },
-    )

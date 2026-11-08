@@ -536,8 +536,9 @@ async def archive_storage(
     *move_items_to* when given; without a target, a location that still
     holds items is rejected.
     """
-    from app.core.public_api import core_api
     from app.models.item import Item
+    from app.schemas.item import ItemMove
+    from app.services.items import get_by_id_for_update_async, move_item
     from app.services.storage._queries import (
         descendant_ids_async,
         get_storage_async,
@@ -577,12 +578,16 @@ async def archive_storage(
         )
     for item_id in item_ids:
         assert target is not None  # guaranteed: items exist ⇒ target required
-        await core_api.items.transfer_async(
-            db,
-            org_id,
-            item_id,
-            target.id,
-            user_id=user.id,
+        # Lock the item for the move (it mutates location + stock); two
+        # concurrent transfers of the same item must serialize.
+        item = await get_by_id_for_update_async(db, org_id, item_id)
+        if item is None:
+            continue
+        await move_item(
+            db=db,
+            item=item,
+            move_data=ItemMove(to_location_id=target.id, notes=None),
+            user=UserContextDTO(id=user.id, organization_id=org_id),
         )
 
     settings = dict(storage.settings or {})

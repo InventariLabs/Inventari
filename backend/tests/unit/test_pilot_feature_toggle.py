@@ -5,7 +5,7 @@ The toggle contract:
   1. A module declares a JSON Schema field in `get_settings_schema()`.
   2. A profile declares a preset value in `ProductProfile.module_config`.
   3. During onboarding / switch, the preset is written via
-     `core_api.settings.set_bulk_async` after the module is enabled.
+     `write_module_settings_async` after the module is enabled.
 
 This test asserts all three legs of the contract hold for the
 `recipes.enable_cost_calculation` pilot. It uses stubs so it does not
@@ -158,9 +158,8 @@ async def test_clean_core_has_no_recipe_preset(
 async def test_food_home_preset_is_applied_via_set_bulk(
     stubbed_recipes_module, monkeypatch
 ) -> None:
-    """End-to-end: profile preset reaches core_api.settings.set_bulk_async."""
+    """End-to-end: profile preset reaches the module settings write."""
     from app.core.product_profiles import get_profile
-    from app.core.public_api import core_api
     from app.services import onboarding_service
 
     captured: dict[str, dict[str, object]] = {}
@@ -168,7 +167,10 @@ async def test_food_home_preset_is_applied_via_set_bulk(
     async def fake_set_bulk(db, org_id, module_name, values):
         captured.setdefault(module_name, {}).update(values)
 
-    monkeypatch.setattr(core_api.settings, 'set_bulk_async', fake_set_bulk)
+    monkeypatch.setattr(
+        'app.services.module_settings_service.write_module_settings_async',
+        fake_set_bulk,
+    )
 
     # The profile's starting-location seeding needs a real
     # session; this test is about the config persistence path.

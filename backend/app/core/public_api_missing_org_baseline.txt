@@ -2,36 +2,11 @@
 # no organization_id. Isolation for these rests on the calling module passing
 # an id from its own organization (confused deputy).
 #
-# Reason: grandfathered at the moment the rule was added, so CI stays green
-# while the signatures are fixed. An earlier change shipped the org
-# parameter for users/storages/valuation and removed 13 of the original 26
-# entries; the uoms reads followed and removed two more. This list must only
-# ever shrink — a new entry means a new method shipped without an org, which is
-# exactly what the rule exists to stop.
+# Empty: every method either carries the tenant (an organization_id, an
+# OrganizationDTO or a UserContextDTO parameter), opts out in its signature
+# (include_global, a _for_user suffix), or says at the method why it needs no
+# organization — @without_org_scope('<reason>'), see public_api/_scope.py.
+# A new entry here would mean a new method shipped without an org, which is
+# exactly what the rule exists to stop: fix the method, do not list it.
 #
 # Format: relative/path.py::function_name
-#
-# announcements are global rows with no organization_id column; the id already
-# names the whole scope.
-app/core/public_api/announcements.py::delete_async
-app/core/public_api/announcements.py::get_by_id_async
-#
-# notifications are addressed by user_id, and the user's organization is
-# resolved from that user; there is no org column to filter on.
-app/core/public_api/notifications.py::create_async
-app/core/public_api/notifications.py::delete_async
-app/core/public_api/notifications.py::mark_all_read_async
-app/core/public_api/notifications.py::update_read_status_async
-#
-# takes an OrganizationDTO, so the organization is the argument itself, not a
-# second id beside it.
-app/core/public_api/organizations.py::apply_onboarding_profile_async
-#
-# take a UserContextDTO and scope by user.organization_id inside the call.
-app/core/public_api/location_types.py::delete_async
-app/core/public_api/location_types.py::update_async
-#
-# promotion is a deliberate cross-org superuser operation (startup repair), so
-# an organization parameter would misstate its scope; the explicit opt-out is
-# worth a separate change.
-app/core/public_api/users.py::promote_superuser_async

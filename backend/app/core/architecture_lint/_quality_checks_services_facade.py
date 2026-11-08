@@ -9,10 +9,11 @@ those doors into direct imports (inside the functions, as today, because the
 import cycle is why the facade was used); without a rule, the next change
 quietly brings the facade back.
 
-Every place that still imports the facade is listed, and the list only
-shrinks. A place is keyed ``path::Class::function`` — the innermost function
-holding the import, ``<module>`` at module level — never by line, which moves
-whenever anything above it is edited. Two findings, both blocking:
+The list of places that may still import the facade is empty, and a new line
+in it is a service that went back through the middleman. A place is keyed
+``path::Class::function`` — the innermost function holding the import,
+``<module>`` at module level — never by line, which moves whenever anything
+above it is edited. Two findings, both blocking:
 
 - a place with no entry in ``app/core/services_public_api_import_baseline.txt``
   — import the service it calls directly, inside the function when the

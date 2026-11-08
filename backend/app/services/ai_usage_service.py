@@ -6,6 +6,7 @@
 # CoreAPI contract documented in app/core/public_api/__init__.py.
 
 from calendar import monthrange
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
@@ -13,11 +14,14 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import ServiceRejectionError
+from app.core.exceptions import ServiceRejectionError, TooManyRequestsException
 from app.core.logging import get_logger
+from app.i18n import Language
+from app.i18n.service import get_current_lang
 from app.models.ai_usage_log import AIUsageLog
 from app.models.organization import Organization
 from app.services.system_settings_service import (
+    estimate_cost_async,
     get_default_org_limits_async,
 )
 
@@ -212,3 +216,165 @@ async def count_usage_async(
 
     result = await db.scalar(stmt)
     return result or 0
+
+
+def limit_refusal(
+    exc: AIUsageLimitExceededError, lang: Language
+) -> TooManyRequestsException:
+    """The 429: the cause, the numbers, and the period they count over.
+
+    The numbers travel as fields, not only inside the sentence, so a screen can
+    label them without parsing prose; the sentence itself is the catalogue's
+    and arrives in the reader's language.
+    """
+    return TooManyRequestsException(
+        'AI_USAGE_LIMIT_EXCEEDED',
+        exc.sentence(lang),
+        details={
+            'lang': lang,
+            'limit_key': exc.limit_key,
+            'used': exc.used,
+            'limit': exc.limit,
+            'period_start': exc.period_start.date().isoformat(),
+            'period_end': exc.period_end.date().isoformat(),
+        },
+    )
+
+
+async def enforce_ai_limit_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    action_type: str,
+    *,
+    check: Callable[[AsyncSession, UUID, str], Awaitable[None]] | None = None,
+) -> None:
+    """Gate a billable AI call: over the ceiling it refuses, an outage it ignores.
+
+    The refusal is a 429 whose body carries what the counter measured — how
+    much is used of what limit, which ceiling that was, and the period it
+    applies to. ``AI usage quota exceeded`` was true and useless: it named no
+    cause, no number and no period, so the reader could neither act on it nor
+    report it.
+
+    Best-effort by design: a quota service that is itself down must not take
+    the feature with it, or an organization cannot scan anything because a
+    counter could not be read.
+
+    ``check`` is the counter to ask; the public facade hands in its own
+    ``check_limit_async`` so that stays the one place a caller substitutes it.
+    """
+    try:
+        await (check or check_ai_limit_async)(db, organization_id, action_type)
+    except AIUsageLimitExceededError as exc:
+        raise limit_refusal(exc, get_current_lang()) from exc
+    except Exception as exc:  # noqa: BLE001 — best-effort limit check, see the docstring
+        logger.warning('AI limit check failed (non-blocking): %s', exc)
+
+
+async def log_llm_usage_async(
+    db: Any,
+    user_id: UUID | str | None,
+    organization_id: UUID | str | None,
+    response: Any,
+    action_type: str,
+    client: Any | None = None,
+    *,
+    estimate_cost: Callable[..., Awaitable[tuple[float, bool]]] | None = None,
+    log_usage: Callable[..., Awaitable[object]] | None = None,
+) -> None:
+    """Best-effort LLM usage logging shared by vision/recipes.
+
+    Never crashes the main flow. *response* is an ``LlmResponse``
+    (duck-typed to keep the service free of core/llm imports at module
+    scope). *client* is the adapter that made the call — the ledger
+    reads from it the provider who actually answered.
+
+    The row is a bookkeeping record, not part of the business
+    transaction, so it is written and committed in its own session
+    bound to the same engine: a request that ends in an error response
+    after the provider answered (422 for an unusable answer, 503 for a
+    failed read-back) still leaves behind the tokens it was charged
+    for. A call the provider never answered still writes nothing.
+    A call without a user (connection tests, background jobs) is still
+    a call the organization pays for — the column is nullable on
+    purpose, and withholding the row would blind both the cost stats
+    and the monthly limit to real spend.
+
+    The ledger session sees only data committed before the call: a
+    flow that creates the organization or user inside its own
+    uncommitted transaction and then logs usage would trip the foreign
+    key, and the best-effort wrapper would swallow it into a log line.
+    Commit first, then log.
+
+    ``estimate_cost`` and ``log_usage`` are the two writers to use; the
+    public facade hands in its own methods, so they stay substitutable there.
+    """
+    estimate = estimate_cost or estimate_cost_async
+    write_ledger = log_usage or log_ai_usage_async
+    usage = getattr(response, 'usage', None)
+    if not (db and organization_id and usage):
+        return
+    user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
+    org_uuid = (
+        UUID(organization_id) if isinstance(organization_id, str) else organization_id
+    )
+    if org_uuid is None:
+        return
+    try:
+        raw = getattr(response, 'raw', None)
+        raw_model = raw.get('model', '') if isinstance(raw, dict) else ''
+        usage_dict: dict[str, Any] = dict(usage)
+        details = usage_dict.get('prompt_tokens_details')
+        prompt_tokens = int(usage_dict.get('prompt_tokens', 0) or 0)
+        completion_tokens = int(usage_dict.get('completion_tokens', 0) or 0)
+        cached_tokens = (
+            int(details.get('cached_tokens', 0) or 0)
+            if isinstance(details, dict)
+            else 0
+        )
+        provider = getattr(client, 'connection_provider', None) or 'unknown'
+        from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
+
+        # The session's ``bind`` attribute is the engine an async
+        # sessionmaker needs; ``get_bind`` hands back the sync facade,
+        # which is not the same thing and would fail later, mid-write.
+        # A session bound to a connection (or unbound) cannot give the
+        # ledger its own transaction — saying so beats guessing with a
+        # cast and losing the row after a one-line log entry.
+        bind = getattr(db, 'bind', None)
+        if not isinstance(bind, AsyncEngine):
+            raise RuntimeError(
+                'the request session is not engine-bound, so the usage '
+                'ledger cannot open its own session on the same engine'
+            )
+        ledger_factory = async_sessionmaker(bind=bind, expire_on_commit=False)
+        async with ledger_factory() as ledger_db:
+            provider_cost = usage_dict.get('total_cost') or usage_dict.get('cost')
+            if provider_cost:
+                actual_cost = float(provider_cost)
+                cost_is_estimated = False
+            else:
+                actual_cost, cost_is_estimated = await estimate(
+                    ledger_db,
+                    raw_model,
+                    prompt_tokens,
+                    completion_tokens,
+                    cached_tokens,
+                )
+
+            await write_ledger(
+                db=ledger_db,
+                user_id=user_uuid,
+                organization_id=org_uuid,
+                model_name=raw_model,
+                provider=provider,
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                total_tokens=int(usage_dict.get('total_tokens', 0) or 0),
+                estimated_cost_usd=actual_cost,
+                cost_is_estimated=cost_is_estimated,
+                action_type=action_type,
+            )
+            await ledger_db.commit()
+    except Exception as log_err:  # noqa: BLE001 — best-effort logging
+        logger.error('[AI-LOG] Failed to log usage: %s', log_err)

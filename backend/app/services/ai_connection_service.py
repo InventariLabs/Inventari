@@ -169,12 +169,12 @@ class AiConnectionService:
         refusal is the counter's ``HTTPException`` (429) and travels through
         the router unchanged.
         """
-        from app.core.public_api import core_api
+        from app.services.ai_usage_service import enforce_ai_limit_async
 
         # Same counter, same period, as every other AI call. The refusal is a
         # 429 whose body names the ceiling and carries the numbers; it leaves
         # this service as the HTTPException the router re-raises.
-        await core_api.ai_usage.enforce_limit_async(db, org_id, 'connection_test')
+        await enforce_ai_limit_async(db, org_id, 'connection_test')
 
         from app.core.llm.factory import get_client
 
@@ -334,7 +334,7 @@ class AiConnectionService:
         test people run in a loop against a metered provider.
         """
         from app.core.llm.json_retry import complete_json
-        from app.core.public_api import core_api
+        from app.services.ai_usage_service import log_llm_usage_async
 
         spec = _probe_for(declared_capabilities)
         if spec is None or spec.probe is None:
@@ -358,7 +358,7 @@ class AiConnectionService:
             nonlocal attempts, last_answer
             attempts += 1
             last_answer = getattr(response, 'content', '')
-            await core_api.ai_usage.log_llm_usage_async(
+            await log_llm_usage_async(
                 db=db,
                 user_id=None,
                 organization_id=str(org_id),
@@ -546,10 +546,12 @@ class AiConnectionService:
         """Check *all* registered purposes for a binding that points
         to *conn_id*. Used by the delete guard."""
         from app.core.llm.purpose_registry import all_purposes
-        from app.core.public_api import core_api
+        from app.services._org_reads import get_by_id_async
+        from app.services.crypto_service import decrypt_settings
 
         conn_id_str = str(conn_id)
-        settings = await core_api.organizations.get_settings_async(db, org_id) or {}
+        organization = await get_by_id_async(db, org_id)
+        settings = decrypt_settings(organization.settings or {}) if organization else {}
 
         # Build a quick lookup of any registered purpose key.
         registered_keys = {p.key for p in all_purposes()}

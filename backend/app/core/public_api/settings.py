@@ -14,7 +14,6 @@ sees plaintext secrets. Modules that need the real value at runtime call
 
 from __future__ import annotations
 
-import copy
 from collections.abc import Callable
 from datetime import datetime
 from typing import Any
@@ -22,16 +21,16 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import ContractViolationError, ServiceRejectionError
+from app.core.exceptions import ContractViolationError
 from app.core.logging import get_logger
 from app.core.module_identity import refuse_foreign_module
 from app.core.settings_validator import (
     SCHEMA_VERSION_KEY,
     UNSTAMPED_SCHEMA_VERSION,
     iter_secret_paths,
-    settings_schema_version,
 )
 from app.services.crypto_service import MASKED_VALUE, decrypt_module_secret
+from app.services.module_settings_service import namespace
 
 logger = get_logger(__name__)
 
@@ -61,11 +60,8 @@ class CoreSettingsAPI:
     endpoints; a module endpoint has no business relaying either.
     """
 
-    # Namespace prefix used for all module settings keys
-    _NS_PREFIX = 'module'
-
     def _namespace(self, module_name: str) -> str:
-        return f'{self._NS_PREFIX}:{module_name}'
+        return namespace(module_name)
 
     async def set_bulk_async(
         self,
@@ -81,23 +77,9 @@ class CoreSettingsAPI:
         organization actually saved.
         """
         refuse_foreign_module(module_name, api='core_api.settings.set_bulk_async')
-        from app.services._org_reads import get_by_id_async
+        from app.services.module_settings_service import write_module_settings_async
 
-        org = await get_by_id_async(db, organization_id)
-        if not org:
-            raise ServiceRejectionError('organization_not_found')
-
-        settings = copy.deepcopy(org.settings or {})
-        ns = self._namespace(module_name)
-        if ns not in settings:
-            settings[ns] = {}
-        settings[ns].update(values)
-        # The stamp is core's metadata about the blob, not module data:
-        # written last so it always records the shape this write produced,
-        # whatever the caller passed in.
-        settings[ns][SCHEMA_VERSION_KEY] = self._schema_version_for(module_name)
-        org.settings = settings
-        await db.flush()
+        await write_module_settings_async(db, organization_id, module_name, values)
 
     @staticmethod
     def encrypt_secret(module_name: str, value: str) -> str:
@@ -373,41 +355,17 @@ class CoreSettingsAPI:
 
     @staticmethod
     def _schema_version_for(module_name: str) -> int:
-        """The settings-schema version *module_name* declares, default 1.
+        """The settings-schema version *module_name* declares, default 1."""
+        from app.services.module_settings_service import schema_version_for
 
-        Mirrors :meth:`_secret_paths_for`: a module that is missing or whose
-        schema refuses to load reads as the base version — a broken module
-        must not stop settings from being written.
-        """
-        try:
-            from app.core.module_registry import module_registry
-        except ImportError:
-            return 1
-        instance = module_registry.get(module_name)
-        if instance is None:
-            return 1
-        try:
-            schema = instance.get_settings_schema()
-        except Exception:  # a module's own code; logged, the version reads as 1
-            logger.exception('Failed to load settings schema for %s', module_name)
-            return 1
-        return settings_schema_version(schema)
+        return schema_version_for(module_name)
 
     @staticmethod
     def _without_stamp(module_settings: JSONObject) -> JSONObject:
-        """The stored blob without core's schema-version stamp.
+        """The stored blob without core's schema-version stamp."""
+        from app.services.module_settings_service import without_stamp
 
-        Every read goes through here so the stamp never reaches a module or
-        the frontend, and the per-organization pass hands ``migrate`` the
-        module's data only.
-        """
-        if not module_settings or SCHEMA_VERSION_KEY not in module_settings:
-            return module_settings
-        return {
-            key: value
-            for key, value in module_settings.items()
-            if key != SCHEMA_VERSION_KEY
-        }
+        return without_stamp(module_settings)
 
     @staticmethod
     def _maybe_mask(value: JSONValue) -> JSONValue:

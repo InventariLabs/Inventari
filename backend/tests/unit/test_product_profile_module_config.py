@@ -3,7 +3,7 @@ Unit tests for ProductProfile.module_config application during onboarding.
 
 Profiles may declare ``module_config: {module_name: {key: value}}``.
 After enabling each module, the onboarding service applies those
-overrides via ``core_api.settings.set_bulk_async`` so the org starts
+overrides via ``write_module_settings_async`` so the org starts
 with sensible defaults rather than an empty settings blob.
 
 Settings that fail schema validation are skipped with a log warning —
@@ -107,10 +107,10 @@ async def test_module_config_is_persisted_for_each_module(
     async def fake_set_bulk(db, org_id, module_name, values):
         captured.setdefault(module_name, {}).update(values)
 
-    from app.core.public_api import core_api
+    from app.services import module_settings_service
 
-    original_set_bulk = core_api.settings.set_bulk_async
-    core_api.settings.set_bulk_async = fake_set_bulk  # type: ignore[method-assign]
+    original_set_bulk = module_settings_service.write_module_settings_async
+    module_settings_service.write_module_settings_async = fake_set_bulk  # type: ignore[assignment]
     try:
         db = MagicMock()
         db.run_sync = AsyncMock(side_effect=lambda fn: fn(MagicMock()))
@@ -129,7 +129,7 @@ async def test_module_config_is_persisted_for_each_module(
         )
         assert captured == {'webhooks': {'threshold': 5}}
     finally:
-        core_api.settings.set_bulk_async = original_set_bulk  # type: ignore[method-assign]
+        module_settings_service.write_module_settings_async = original_set_bulk
 
 
 @pytest.mark.asyncio
@@ -164,10 +164,10 @@ async def test_invalid_module_config_is_skipped_not_fatal(
     async def failing_set_bulk(db, org_id, module_name, values):
         raise ValidationException(message='threshold must be <= 100')
 
-    from app.core.public_api import core_api
+    from app.services import module_settings_service
 
-    original_set_bulk = core_api.settings.set_bulk_async
-    core_api.settings.set_bulk_async = failing_set_bulk  # type: ignore[method-assign]
+    original_set_bulk = module_settings_service.write_module_settings_async
+    module_settings_service.write_module_settings_async = failing_set_bulk  # type: ignore[assignment]
     try:
         db = MagicMock()
         db.run_sync = AsyncMock(side_effect=lambda fn: fn(MagicMock()))
@@ -183,7 +183,7 @@ async def test_invalid_module_config_is_skipped_not_fatal(
         assert result is not None
         assert 'webhooks' in result.enabled_modules
     finally:
-        core_api.settings.set_bulk_async = original_set_bulk  # type: ignore[method-assign]
+        module_settings_service.write_module_settings_async = original_set_bulk
 
 
 @pytest.mark.asyncio
@@ -209,10 +209,10 @@ async def test_module_without_schema_skips_config_gracefully(
     async def should_not_be_called(db, org_id, module_name, values):
         raise AssertionError('should not persist for schema-less module')
 
-    from app.core.public_api import core_api
+    from app.services import module_settings_service
 
-    original_set_bulk = core_api.settings.set_bulk_async
-    core_api.settings.set_bulk_async = should_not_be_called  # type: ignore[method-assign]
+    original_set_bulk = module_settings_service.write_module_settings_async
+    module_settings_service.write_module_settings_async = should_not_be_called  # type: ignore[assignment]
     try:
         db = MagicMock()
         db.run_sync = AsyncMock(side_effect=lambda fn: fn(MagicMock()))
@@ -226,4 +226,4 @@ async def test_module_without_schema_skips_config_gracefully(
             db, org, 'test', profile=profile
         )
     finally:
-        core_api.settings.set_bulk_async = original_set_bulk  # type: ignore[method-assign]
+        module_settings_service.write_module_settings_async = original_set_bulk

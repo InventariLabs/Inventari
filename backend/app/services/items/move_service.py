@@ -52,7 +52,7 @@ async def _reduce_quantity(
 ) -> Item:
     """Shared logic for consume and discard operations."""
     from app.core.interceptors import interceptor_pipeline
-    from app.core.public_api import core_api
+    from app.core.period_guard import check_period_not_closed
     from app.services.analytics._common import org_today_async
 
     # Real-time item mutations are guarded by the inventory period, and
@@ -60,7 +60,7 @@ async def _reduce_quantity(
     # not the server's (no scheduled_date context: these are ad-hoc actions,
     # not document-driven).
     if user.organization_id is not None:
-        await core_api.periods.check_not_closed_async(
+        await check_period_not_closed(
             db, user.organization_id, await org_today_async(db, user.organization_id)
         )
 
@@ -178,7 +178,7 @@ async def move_item(
     history_action: ItemAction = ItemAction.MOVED,
     post_the_change: bool = True,
 ) -> Item:
-    from app.core.public_api import core_api
+    from app.core.period_guard import check_period_not_closed
 
     # Block moves during closed inventory periods. The guard runs
     # after target_storage lookup so 404 vs 409 are unambiguous, and the
@@ -186,7 +186,7 @@ async def move_item(
     if user.organization_id is not None:
         from app.services.analytics._common import org_today_async
 
-        await core_api.periods.check_not_closed_async(
+        await check_period_not_closed(
             db,
             user.organization_id,
             await org_today_async(db, user.organization_id),

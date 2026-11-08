@@ -1,5 +1,6 @@
 import os
 import uuid
+from io import BytesIO
 from uuid import UUID
 
 from fastapi import UploadFile
@@ -9,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.core.db_utils import after_commit
+from app.core.demo_upload_cap import demo_upload_admission
 from app.core.file_storage.service import FileStorageService
 from app.core.logging import get_logger
 from app.core.upload_validation import (
@@ -161,8 +163,6 @@ class AttachmentService:
         cannot be, so a record never points at nothing. The journal entry
         rides the row's commit: a file nobody can account for is not filed.
         """
-        from app.core.public_api import core_api
-
         original_filename = os.path.basename(file.filename or 'unnamed')
         declared_type = file.content_type or 'application/octet-stream'
 
@@ -185,13 +185,11 @@ class AttachmentService:
         safe_name = f'{uuid.uuid4().hex}.{accepted.extension}'
 
         try:
-            stored_path = await core_api.file_storage.save_for_org_async(
-                organization_id,
-                _ATTACHMENTS,
-                f'{item_id}/{safe_name}',
-                content,
-                stored_type,
-            )
+            stored_path = f'{organization_id}/{_ATTACHMENTS}/{item_id}/{safe_name}'
+            async with demo_upload_admission(len(content)):
+                await FileStorageService().save(
+                    stored_path, BytesIO(content), stored_type
+                )
         except OSError as e:
             logger.error(f'Failed to store attachment for item {item_id}: {e}')
             raise RuntimeError(get_error_message('internal_error', lang)) from e

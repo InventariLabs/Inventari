@@ -395,6 +395,143 @@ class TestPositionalOnlyParameters:
 
 
 # ---------------------------------------------------------------------------
+# Tenant carriers and explicit opt-outs
+# ---------------------------------------------------------------------------
+
+PUBLIC_API_USER_CONTEXT_CARRIER = """
+from uuid import UUID
+
+class CoreThingsAPI:
+    async def delete_async(self, db, thing_id: UUID, user: UserContextDTO):
+        pass
+
+    async def update_async(self, db, thing_id: UUID, user: 'UserContextDTO'):
+        pass
+"""
+
+PUBLIC_API_ORGANIZATION_CARRIER = """
+class CoreThingsAPI:
+    async def apply_async(self, db, organization: OrganizationDTO, profile_id: str):
+        pass
+
+    async def qualified_async(self, db, organization: dto.OrganizationDTO, profile_id: str):
+        pass
+"""
+
+PUBLIC_API_LOOKALIKE_CARRIERS = """
+from uuid import UUID
+
+class CoreThingsAPI:
+    async def optional_async(
+        self, db, thing_id: UUID, user: UserContextDTO | None = None
+    ):
+        pass
+
+    async def other_dto_async(self, db, thing_id: UUID, user: UserDTO):
+        pass
+
+    async def unannotated_async(self, db, thing_id: UUID, user):
+        pass
+"""
+
+PUBLIC_API_DECLARED_OPT_OUTS = """
+from uuid import UUID
+
+class CoreThingsAPI:
+    @without_org_scope('global rows: the table has no organization column')
+    async def delete_async(self, db, thing_id: UUID):
+        pass
+
+    @without_org_scope(reason='addressed by user, org resolved from the user')
+    async def mark_async(self, db, user_id: UUID):
+        pass
+
+    @scopes.without_org_scope('qualified spelling counts too')
+    async def get_async(self, db, thing_id: UUID):
+        pass
+"""
+
+PUBLIC_API_EMPTY_OPT_OUTS = """
+from uuid import UUID
+
+class CoreThingsAPI:
+    @without_org_scope
+    async def bare_async(self, db, thing_id: UUID):
+        pass
+
+    @without_org_scope()
+    async def no_reason_async(self, db, thing_id: UUID):
+        pass
+
+    @without_org_scope('   ')
+    async def blank_reason_async(self, db, thing_id: UUID):
+        pass
+
+    @without_org_scope(some_variable)
+    async def computed_reason_async(self, db, thing_id: UUID):
+        pass
+
+    @other_decorator('global rows')
+    async def other_async(self, db, thing_id: UUID):
+        pass
+"""
+
+
+class TestTenantCarrierShapes:
+    """A ``UserContextDTO`` / ``OrganizationDTO`` parameter carries the tenant."""
+
+    def test_user_context_parameter_counts_as_the_tenant(self, tmp_path):
+        _write(tmp_path, 'things.py', PUBLIC_API_USER_CONTEXT_CARRIER)
+
+        assert _check_public_api_missing_org(tmp_path, set()) == []
+
+    def test_organization_dto_parameter_counts_as_the_tenant(self, tmp_path):
+        _write(tmp_path, 'things.py', PUBLIC_API_ORGANIZATION_CARRIER)
+
+        assert _check_public_api_missing_org(tmp_path, set()) == []
+
+    def test_lookalikes_do_not_carry_the_tenant(self, tmp_path):
+        _write(tmp_path, 'things.py', PUBLIC_API_LOOKALIKE_CARRIERS)
+
+        entries = _check_public_api_missing_org(tmp_path, set())
+
+        assert len(entries) == 3
+        assert all(entry.startswith('::error') for entry in entries)
+
+
+class TestDeclaredOptOut:
+    """``@without_org_scope('reason')`` is the explicit opt-out, reason required."""
+
+    def test_a_decorator_with_a_reason_silences_the_rule(self, tmp_path):
+        _write(tmp_path, 'things.py', PUBLIC_API_DECLARED_OPT_OUTS)
+
+        assert _check_public_api_missing_org(tmp_path, set()) == []
+
+    def test_an_opt_out_without_a_written_reason_does_not(self, tmp_path):
+        _write(tmp_path, 'things.py', PUBLIC_API_EMPTY_OPT_OUTS)
+
+        entries = _check_public_api_missing_org(tmp_path, set())
+
+        assert len(entries) == 5
+        assert all(entry.startswith('::error') for entry in entries)
+
+    def test_the_runtime_decorator_returns_the_function_unchanged(self):
+        from app.core.public_api._scope import without_org_scope
+
+        def method(db, thing_id):
+            return thing_id
+
+        assert without_org_scope('global rows')(method) is method
+
+    def test_the_real_facade_has_no_open_finding(self):
+        from app.core.architecture_lint._constants import MODULES_ROOT, PUBLIC_API_ROOT
+
+        entries = _check_public_api_missing_org(PUBLIC_API_ROOT, set(), MODULES_ROOT)
+
+        assert entries == []
+
+
+# ---------------------------------------------------------------------------
 # Escape-hatch queries read one statement at a time
 # ---------------------------------------------------------------------------
 

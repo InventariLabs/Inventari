@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserDTO
 from app.core.logging import get_logger
+from app.core.public_api._scope import without_org_scope
 
 if TYPE_CHECKING:
     from app.models.user import User
@@ -109,6 +110,9 @@ class CoreUsersAPI:
             return None
         return _to_full_dto(user)
 
+    @without_org_scope(
+        'deliberate cross-organization startup repair of the superuser flag'
+    )
     async def promote_superuser_async(
         self, db: AsyncSession, user_id: UUID
     ) -> UserDTO | None:

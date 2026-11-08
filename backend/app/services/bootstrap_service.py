@@ -18,8 +18,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.core.logging import get_logger
-from app.core.public_api import core_api
+from app.services._org_reads import list_missing_short_id
 from app.services._org_writes import generate_short_id
+from app.services.user_service import UserService
 
 logger = get_logger(__name__)
 
@@ -55,16 +56,15 @@ async def _bootstrap_inner(db: AsyncSession) -> None:
     from sqlalchemy.exc import ProgrammingError
 
     try:
-        organizations = await core_api.organizations.list_missing_short_id_async(db)
+        organizations = await list_missing_short_id(db)
         if organizations:
             logger.info(
                 '[Bootstrap] found %d organizations without short_id — backfilling',
                 len(organizations),
             )
             for org in organizations:
-                await core_api.organizations.update_async(
-                    db, org.id, short_id=generate_short_id()
-                )
+                org.short_id = generate_short_id()
+            await db.flush()
 
         if settings.INVENTARI_DEMO:
             # The shared demo account is an organization admin by design; a
@@ -72,23 +72,23 @@ async def _bootstrap_inner(db: AsyncSession) -> None:
             pass
         elif settings.SUPERUSER_EMAIL:
             # Bootstrap runs before any organization context exists.
-            owner = await core_api.users.get_by_email_async(
-                db, None, settings.SUPERUSER_EMAIL
+            owner = await UserService.get_user_by_email_async(
+                db, settings.SUPERUSER_EMAIL
             )
             if owner and not owner.is_superuser:
                 logger.info(
                     '[Bootstrap] promoting configured user %s to superuser',
                     owner.email,
                 )
-                await core_api.users.promote_superuser_async(db, owner.id)
+                await UserService.promote_superuser_async(db, owner.id)
         else:
-            first_user = await core_api.users.get_first_system_user_async(db)
+            first_user = await UserService.get_first_by_created_at_async(db, None)
             if first_user and not first_user.is_superuser:
                 logger.info(
                     '[Bootstrap] promoting first system user %s to superuser',
                     first_user.email,
                 )
-                await core_api.users.promote_superuser_async(db, first_user.id)
+                await UserService.promote_superuser_async(db, first_user.id)
     except ProgrammingError as exc:
         # Schema not ready yet (e.g. Alembic mid-migration on first boot).
         logger.warning(

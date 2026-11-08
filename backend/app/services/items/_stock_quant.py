@@ -38,21 +38,32 @@ async def _adopt_card_async(
     :func:`post_opening_balance_async` — and the caller's own delta is the
     movement.
     """
-    from app.core.public_api import core_api
+    from app.services.items._bind_template import bind_item_to_template_async
+    from app.services.items._create import _default_piece_uom_id_async
+    from app.services.items._query_get import get_by_id_async
+    from app.services.items._template import resolve_template_default_async
 
-    adopted = await core_api.product_templates.resolve_default_async(
+    # A minted card inherits the record's unit, or the organization's piece
+    # unit when the record names none, so it can say what it is counted in.
+    uom_id = item.uom_id
+    if uom_id is None:
+        uom_id = await _default_piece_uom_id_async(db, item.organization_id)
+    adopted, _created = await resolve_template_default_async(
         db,
+        {
+            'name': item.name,
+            'brand': item.brand,
+            'barcode': item.barcode,
+            'uom_id': uom_id,
+        },
         item.organization_id,
-        name=item.name,
-        brand=item.brand,
-        barcode=item.barcode,
-        uom_id=item.uom_id,
     )
-    bound = await core_api.items.bind_template_async(
-        db, item.organization_id, item.id, adopted.id, user_id=user_id
-    )
-    if bound is None:
+    live = await get_by_id_async(db, item.organization_id, item.id)
+    if live is None:
         raise ServiceRejectionError('item_not_found')
+    await bind_item_to_template_async(
+        db, live, item.organization_id, adopted.id, user_id=user_id
+    )
     return adopted.id
 
 

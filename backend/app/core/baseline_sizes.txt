@@ -7,7 +7,7 @@
 # covers less than it did.
 architecture_lint_api_imports_baseline.txt 0
 architecture_lint_baseline.txt 0
-audit_coverage_baseline.txt 129
+audit_coverage_baseline.txt 123
 bare_emit_baseline.txt 0
 core_api_model_leak_baseline.txt 0
 coreapi_signature_legality_baseline.txt 0
@@ -19,11 +19,11 @@ manifest_permission_deferrals.txt 0
 mixed_status_assert_baseline.txt 0
 module_import_surface_baseline.txt 287
 module_migrations_baseline.txt 0
-public_api_missing_org_baseline.txt 10
+public_api_missing_org_baseline.txt 0
 raw_http_exception_baseline.txt 0
 refusal_sentences_baseline.txt 0
 request_scope_baseline.txt 26
-services_public_api_import_baseline.txt 20
+services_public_api_import_baseline.txt 0
 sync_async_twin_baseline.txt 12
 test_skip_baseline.txt 0
 toctou_risk_baseline.txt 0
@@ -31,4 +31,4 @@ transaction_ownership_baseline.txt 0
 transaction_rollback_baseline.txt 0
 unread_org_parameter_baseline.txt 1
 value_error_sentences_baseline.txt 26
-vulture_whitelist.py 174
+vulture_whitelist.py 180

@@ -24,13 +24,13 @@ from app.core.contracts import (
     LotStatusEventDTO,
     StockLotDetailDTO,
 )
-from app.core.public_api import core_api
 from app.models.product_template import ProductTemplate
 from app.models.stock_lot import LotStatus, StockLot, effective_status_expression
 from app.models.stock_quants_from_records import stock_quants_from_records
 from app.models.storage_location import StorageLocation
 from app.models.uom import Uom
 from app.models.user import User
+from app.services.audit_service import log_action_async
 
 
 async def get_or_create_lot_async(
@@ -113,7 +113,7 @@ async def _journal_status_async(
     paths alike: whether a batch may be used is a custody act, and a hold
     raised by code is as much a hold as one a person typed.
     """
-    await core_api.audit_log.log_action_async(
+    await log_action_async(
         db,
         organization_id=lot.organization_id,
         user_id=user_id,
