@@ -14,6 +14,17 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- **Breaking:** a request with no credential at all to an authenticated route
+  is answered with the coded error object, `{"detail": {"code":
+  "NOT_AUTHENTICATED", "message": …, "lang": …}}`, in the reader's language,
+  instead of the bare English `{"detail": "Not authenticated"}`. A client that
+  reads an error body in the documented order (the object, then the list, then
+  the string) needs no change; one that compared the string reads `code`
+  instead. The status and the `WWW-Authenticate: Bearer` header are unchanged.
+- The backend's memory limit defaults to `2g` instead of `1536m`, so the four
+  workers it starts by default fit the size DEPLOYMENT.md gives one; at
+  `1536m` a fourth worker could be killed for outgrowing the limit. An
+  installation that sets `BACKEND_MEM_LIMIT` in `.env` keeps its value.
 - **Breaking:** the document product search no longer returns `created_at` on a
   stock hit; it returns `added_date`, the day the record was added — the same
   date the product card shows as "Added on", so the picker and the card no longer
@@ -122,6 +133,14 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- `PGBOUNCER_MAX_CLIENT_CONN` in `.env` sets how many connections PgBouncer
+  accepts from the backend (300 when unset, as before). Six workers open up to
+  300, so DEPLOYMENT.md's 16 GB sizing row now sets it to 400.
+- The 409 refusals of focus mode, of a profile switch and of onboarding with a
+  module chosen carry `lang` and the data their message is built from —
+  `module`, `unknown_modules`, `not_allowed_modules`, `modules` or
+  `missing_dependency` — next to `code` and `message`, so a client can name the
+  refused modules without reading them out of the sentence.
 - Module authors get three more helpers in the module SDK: `hit_constraint`
   (did this integrity error trip one of the named constraints, by the name the
   driver reports with the message text as fallback), `rows_to_csv` (header and
@@ -182,6 +201,25 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Erasing an account (`manage.py user erase`) also clears the reason an
+  operator wrote when blocking it, and finds the person's registration request
+  however the address was capitalised when it was typed. The privacy page now
+  says that the records an organization keeps about people — equipment handed
+  to them, their answers to an equipment check, a contact or employee card — are
+  not rewritten by the deletion, and docs/GDPR_MANUAL_PROCEDURE.md says why and
+  how an operator handles them.
+- A 500 answer carries the `X-Request-ID` header like every other answer, so the
+  log lines of the failed request can be found by it.
+- The off-host backup copy sends each backup once. It followed the `-latest`
+  links in `backups/last/` and uploaded the newest dump and archive a second
+  time under those names; it now skips links, and its next pass removes those
+  copies from the remote.
+- DEPLOYMENT.md's update and restore steps reach the Open Food Facts database
+  and the off-host copy: the guide now enables their profiles with
+  `COMPOSE_PROFILES` in `.env`, which every compose command reads, where a
+  `--profile` typed on one command left the services out of the next update's
+  recreate and out of `down`. An installation that enabled them with
+  `--profile` adds them to `COMPOSE_PROFILES` before its next update.
 - When the session has ended, a request that was only asking — a label preview,
   a pasted-lines or sheet read, a price calculation, a match or coverage check,
   a connection, webhook or e-mail test, a generated barcode — now gets the plain
