@@ -134,6 +134,46 @@ class TestAnonymizeUser:
         with pytest.raises(ValueError, match='not found'):
             await anonymize_user_async(real_async_db_session, uuid.uuid4())
 
+    async def test_a_request_typed_in_another_case_is_scrubbed_too(
+        self, real_async_db_session, async_test_user
+    ):
+        """A request keeps the address as the person typed it.
+
+        The request form stores the address verbatim, so the person who
+        asked as ``Jan@Example.com`` and was later approved or invited as
+        ``jan@example.com`` holds a request erasure must still find — the
+        invitations beside it were already matched without regard to case.
+        """
+        db = real_async_db_session
+        user = async_test_user
+        typed = user.email.upper()
+        request = RegistrationRequest(email=typed, full_name='Typed In Capitals')
+        db.add(request)
+        await db.commit()
+
+        anonymized = await anonymize_user_async(db, user.id)
+        await db.commit()
+
+        await db.refresh(request)
+        assert request.email == anonymized.email
+        assert request.full_name is None
+
+    async def test_the_reason_an_account_was_blocked_is_cleared(
+        self, real_async_db_session, async_test_user
+    ):
+        """The reason is free text an operator wrote about the person."""
+        db = real_async_db_session
+        user = async_test_user
+        user.is_blocked = True
+        user.blocking_reason = f'Repeated misuse reported by {user.full_name}'
+        await db.commit()
+
+        anonymized = await anonymize_user_async(db, user.id)
+        await db.commit()
+
+        await db.refresh(anonymized)
+        assert anonymized.blocking_reason is None
+
 
 @pytest.mark.asyncio
 class TestErasureOfTheRecordsThatKeepAnAddress:

@@ -64,10 +64,17 @@ async def anonymize_user_async(
     user.full_name = 'Deleted User'
     user.hashed_password = secrets.token_hex(32)
     user.is_active = False
+    # Free text an operator wrote when blocking the account; it can name
+    # the person, and a closed account has nobody left to show it to.
+    user.blocking_reason = None
 
     # Pre-signup registration requests carry the raw email and full name.
+    # The request form keeps the address as it was typed, so it is matched
+    # without regard to case, like the invitations below.
     requests = await db.scalars(
-        select(RegistrationRequest).where(RegistrationRequest.email == old_email)
+        select(RegistrationRequest).where(
+            func.lower(RegistrationRequest.email) == old_email.lower()
+        )
     )
     for request in requests:
         request.email = user.email
