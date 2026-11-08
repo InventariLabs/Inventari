@@ -215,13 +215,25 @@ def audit_value(value):
     the encoder would refuse.
 
     A ``Decimal`` -- and a ``float``, by its shortest round-trip digits --
-    becomes its **exact digits as a string**. The journal is
+    becomes its **exact digits as a string**, in plain notation: ``1E-7``
+    is not a shape anybody typed or the screen reads. The journal is
     the account of what the numbers were, and a float is a less precise copy
     of the data it describes -- the same rule the quantity path and
     ``docs/subsystems/AUDIT.md`` state. Use :func:`audit_key` to decide
     whether a value moved; this one only says what it became.
     """
-    return _render(value, decimal=lambda d: str(d))
+    return _render(value, decimal=lambda d: format(d, 'f'))
+
+
+def audit_walk(value):
+    """Render a value like :func:`audit_value`, but leave every number a number.
+
+    For a reading that is still to be compared before it is written: a
+    ``float`` becomes the ``Decimal`` of its shortest digits, a ``Decimal``
+    stays, at any depth. ``audit_key`` then answers whether it moved and
+    ``audit_value`` says what it became, as for any other entry.
+    """
+    return _render(value, decimal=lambda d: d)
 
 
 def audit_key(value):

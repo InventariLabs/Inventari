@@ -76,16 +76,23 @@ Two functions in `app/services/audit_service.py`, and the difference
 between them is the whole rule:
 
 - `audit_value(v)` — **what a value became**, for the snapshot. A
-  `Decimal` becomes its exact digits as a string; UUIDs, dates, enums and
+  `Decimal` becomes its exact digits as a string, and so does a `float`
+  (its shortest round-trip digits), both in plain notation — never
+  `1E-7` or `1E+16`; UUIDs, dates, enums and
   containers are rendered so the JSONB column and the Detail column can
   both take them.
 - `audit_key(v)` — **whether a value moved**, for comparison only, never
-  written down. A `Decimal` compares as a number here: `Decimal('1.000')`
-  and the `1` a form posts are one quantity, and comparing their digits
+  written down. A `Decimal` or a `float` compares as a number here:
+  `Decimal('1.000')`, `1.0` and the `1` a form posts are one quantity, and comparing their digits
   is how the log filled with rows whose every field read `x → x`. A text
   field standing empty and one that was never filled are also one value:
   a form posts its whole state, so `""` beside a NULL column is not a
   change and must not write a line reading `Description: — →`.
+
+A record that is read before it is compared (`record_settings`, which
+modules reach through `app.core.module_sdk`) keeps its numbers as numbers at
+every depth, through `audit_walk`; rendering them to strings first would make
+`3.0` against `3` read as a change.
 
 Rows written before this was one rule keep the shape they were written
 with — the journal is immutable in the database, so there is no migration

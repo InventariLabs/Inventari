@@ -68,6 +68,45 @@ def test_a_number_compares_as_a_number_and_is_written_as_its_digits() -> None:
     ) == {'before': {'rate': '8.00'}, 'after': {'rate': '9.5'}}
 
 
+def test_a_float_compares_as_a_number_like_a_decimal_does() -> None:
+    from decimal import Decimal
+
+    # A JSON setting seeded as 3.0 and posted as 3, or a Float column that
+    # holds 8.0 beside the Decimal a form posts: one number, read twice.
+    assert (
+        changed_settings_snapshot(
+            record_settings({'x': 3.0}), record_settings({'x': 3})
+        )
+        is None
+    )
+    assert (
+        changed_settings_snapshot(
+            record_settings({'x': Decimal('8.00')}), record_settings({'x': 8.0})
+        )
+        is None
+    )
+    # The same answer one level down.
+    assert (
+        changed_settings_snapshot(
+            record_settings({'x': {'limits': [3.0, {'y': 1.50}]}}),
+            record_settings({'x': {'limits': [3, {'y': Decimal('1.5')}]}}),
+        )
+        is None
+    )
+    assert changed_settings_snapshot(
+        record_settings({'x': {'limit': 3.0}}),
+        record_settings({'x': {'limit': 4.5}}),
+    ) == {'before': {'x': {'limit': '3.0'}}, 'after': {'x': {'limit': '4.5'}}}
+
+
+def test_an_extreme_float_is_written_in_plain_digits() -> None:
+    from app.services.audit_service import audit_value
+
+    assert audit_value(0.0000001) == '0.0000001'
+    assert audit_value(1e16) == '10000000000000000'
+    assert audit_value({'min': 1e-7}) == {'min': '0.0000001'}
+
+
 def test_a_structured_value_compares_regardless_of_key_order() -> None:
     before = record_settings(
         {'scope': {'everyone': True, 'role_ids': [], 'user_ids': []}}

@@ -8,7 +8,6 @@ that changed, mask the leaves marked secret, and answer ``None`` when
 nothing moved — a journal records changes, not keystrokes.
 """
 
-from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import inspect
@@ -199,11 +198,12 @@ def record_settings(record: Any) -> dict[str, Any]:
     its string, a JSON column as a walked copy rather than its Python repr.
     A plain mapping passes through with the same rendering.
 
-    A ``Decimal`` alone stays a number until the entry is written. As digits,
-    the ``8.00`` a column holds and the ``8`` a form posts read as a change,
-    and every resave of an untouched rate wrote one.
+    A number -- a ``Decimal`` or a ``float``, at any depth -- stays a number
+    until the entry is written. As digits, the ``8.00`` a column holds and the
+    ``8`` a form posts read as a change, and every resave of an untouched
+    rate wrote one; a float is the same trap (``3.0`` against ``3``).
     """
-    from app.services.audit_service import audit_value
+    from app.services.audit_service import audit_walk
 
     if isinstance(record, dict):
         items: list[tuple[str, Any]] = list(record.items())
@@ -212,10 +212,7 @@ def record_settings(record: Any) -> dict[str, Any]:
             (column.key, getattr(record, column.key))
             for column in inspect(record).mapper.column_attrs
         ]
-    return {
-        key: value if isinstance(value, Decimal) else audit_value(value)
-        for key, value in items
-    }
+    return {key: audit_walk(value) for key, value in items}
 
 
 def changed_settings_snapshot(
