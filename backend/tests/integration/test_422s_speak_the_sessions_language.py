@@ -11,6 +11,8 @@ wording rather than a message nobody wrote.
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 import pytest
 from fastapi import status
 
@@ -107,6 +109,84 @@ def test_an_english_limit_of_one_uses_the_singular_noun():
         lang='en',
     )
     assert message == 'Should have at least 1 character'
+
+
+@pytest.mark.parametrize(
+    ('kind', 'param_name'),
+    [
+        ('greater_than_equal', 'ge'),
+        ('greater_than', 'gt'),
+        ('less_than_equal', 'le'),
+        ('less_than', 'lt'),
+    ],
+)
+@pytest.mark.parametrize(
+    ('lang', 'bound', 'foreign_mark'),
+    [
+        ('pl', '999999999,999', '.'),
+        ('de', '999999999,999', '.'),
+        ('en', '999999999.999', ','),
+    ],
+)
+def test_a_decimal_constraint_bound_follows_the_readers_decimal_mark(
+    kind: str, param_name: str, lang: str, bound: str, foreign_mark: str
+) -> None:
+    """Every le/ge/gt/lt bound is a number the reader compares against.
+
+    The catalogue filled its parameter with pydantic's own ``Decimal``, so a
+    Polish reader was told "mniejsze lub równe 999999999.999" — a dot the
+    screen never writes — while the same list's keyed refusal said
+    999999999,999. One mark per sentence: the reader's.
+    """
+    from app.i18n._validation import translate_validation_error
+
+    message = translate_validation_error(
+        {
+            'type': kind,
+            'msg': f'{kind} bound',
+            'ctx': {param_name: Decimal('999999999.999')},
+        },
+        lang=lang,
+    )
+
+    assert bound in message
+    assert f'999999999{foreign_mark}999' not in message
+
+
+def test_a_whole_number_constraint_bound_keeps_its_scale() -> None:
+    """The mark is the only thing that changes: 128 stays 128, not 128,0."""
+    from app.i18n._validation import translate_validation_error
+
+    message = translate_validation_error(
+        {
+            'type': 'greater_than_equal',
+            'msg': 'greater_than_equal bound',
+            'ctx': {'ge': 128},
+        },
+        lang='pl',
+    )
+
+    assert message == 'Musi być większe lub równe 128'
+
+
+def test_a_decimal_ceiling_reaches_the_client_in_the_readers_mark(
+    client, auth_headers, test_stock_take
+) -> None:
+    """The wire path, not only the function: a stock-take count past the column."""
+    rows = client.get(
+        f'/api/v1/stock-takes/{test_stock_take.id}/items', headers=auth_headers
+    ).json()['items']
+
+    response = client.patch(
+        f'/api/v1/stock-takes/{test_stock_take.id}/items/{rows[0]["id"]}/count',
+        headers={**auth_headers, 'Accept-Language': 'pl'},
+        json={'counted_quantity': 10000000},
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert (
+        response.json()['detail'][0]['msg'] == 'Musi być mniejsze lub równe 9999999,999'
+    )
 
 
 def test_an_unknown_language_choice_answers_in_polish(client):

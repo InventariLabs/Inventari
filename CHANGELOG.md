@@ -327,6 +327,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A translated validation error that names a decimal bound — "must be less
+  than or equal to 999999999.999" — now writes that bound in the reader's
+  decimal mark: a Polish, German, French, Spanish or Portuguese reader sees
+  999999999,999, as the screen's own numbers and the same list's keyed ceiling
+  refusal already did.
 - An approval stage that names the person who raised the request beside people
   who cannot decide it is reported as a dead end instead of as a stage waiting
   its turn: the queue marks the request, the dialog warns before confirming,
