@@ -128,9 +128,7 @@ describe("AddFromRecipesModal", () => {
     await selectAndSubmit();
 
     await waitFor(() =>
-      expect(toast.info).toHaveBeenCalledWith(
-        "Already on this list: 2 ingredients",
-      ),
+      expect(toast.info).toHaveBeenCalledWith("Already on this list"),
     );
     expect(toast.success).not.toHaveBeenCalled();
   });

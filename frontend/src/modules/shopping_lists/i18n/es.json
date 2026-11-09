@@ -88,9 +88,7 @@
     "success": "{{count}} ingredientes añadidos",
     "success_one": "{{count}} ingrediente añadido",
     "success_other": "{{count}} ingredientes añadidos",
-    "alreadyListed": "Ya en esta lista: {{count}} ingredientes",
-    "alreadyListed_one": "Ya en esta lista: {{count}} ingrediente",
-    "alreadyListed_other": "Ya en esta lista: {{count}} ingredientes"
+    "alreadyListed": "Ya en esta lista"
   },
   "card": {
     "saveName": "Guardar nombre",

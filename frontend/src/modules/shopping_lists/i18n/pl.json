@@ -102,11 +102,7 @@
     "success_few": "Dodano {{count}} składniki",
     "success_many": "Dodano {{count}} składników",
     "success_other": "Dodano {{count}} składników",
-    "alreadyListed": "Już na tej liście: {{count}} składników",
-    "alreadyListed_one": "Już na tej liście: {{count}} składnik",
-    "alreadyListed_few": "Już na tej liście: {{count}} składniki",
-    "alreadyListed_many": "Już na tej liście: {{count}} składników",
-    "alreadyListed_other": "Już na tej liście: {{count}} składników"
+    "alreadyListed": "Już na tej liście"
   },
   "card": {
     "saveName": "Zapisz nazwę",

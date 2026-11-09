@@ -68,7 +68,7 @@ export default function AddFromRecipesModal({
         // Nothing added because the list asks for it all already, as the
         // recipe screen says: "Added 0 ingredients" read as "nothing was
         // missing" or as a failure.
-        toast.info(t("addFromRecipes.alreadyListed", { count: listed }));
+        toast.info(t("addFromRecipes.alreadyListed"));
       } else {
         toast.success(
           t("addFromRecipes.success", {
