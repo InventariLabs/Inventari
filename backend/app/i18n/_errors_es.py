@@ -662,6 +662,7 @@ ERRORS_ES: ErrorMessages = {
     'over_receipt_past_ceiling': 'Recibir {quantity} frente a {basis} supera el límite de sobrerecepción del {ceiling} % — nadie puede recibir tanto',
     'document_update_status': 'Solo se pueden actualizar los documentos en estado borrador',
     'document_correction_locked': 'Los documentos de corrección están bloqueados: solo se pueden modificar las notas. Intento de cambio: {fields}. Cancele la corrección y cree una nueva si los datos son incorrectos.',
+    'document_correction_not_duplicable': 'Una corrección no se puede duplicar: rectifica un único documento. Cree en su lugar una nueva corrección de ese documento.',
     'field_cannot_be_cleared': 'Estos campos no se pueden vaciar: {fields}.',
     'ingredient_defaults_unreadable_file': 'No se pudo leer el archivo. La importación espera un archivo .json o .csv con una fila por ingrediente.',
     'onboarding_modules_not_offered': 'El perfil «{profile}» no ofrece estos módulos: {modules}',

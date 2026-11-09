@@ -31795,7 +31795,7 @@
           "Warehouse"
         ],
         "summary": "Duplicate Document",
-        "description": "Create a new DRAFT document as a copy of ``doc_id``.\n\nCopies type, partner, locations, notes, external_reference, a scrap's\nreason, and all lines (expected_quantity, template, name/brand/barcode,\nuom, batch, serial, expiry, unit_price, tax_rate). The duplicate always\nstarts in DRAFT with an identifier of its own \u2014 even if the source is\nCOMPLETED or CANCELLED \u2014 and takes a number when it is confirmed. Done\nquantities are NOT copied.",
+        "description": "Create a new DRAFT document as a copy of ``doc_id``.\n\nCopies type, partner, locations, notes, external_reference, a scrap's or\na return's reason, and all lines (expected_quantity, template,\nname/brand/barcode, uom, batch, serial, expiry, unit_price, tax_rate).\nThe duplicate always starts in DRAFT with an identifier of its own \u2014 even\nif the source is COMPLETED or CANCELLED \u2014 and takes a number when it is\nconfirmed. Done quantities are NOT copied. A copy of a return is a return\nof the same document and is refused when that has too little left to give\nback; a correction is refused (DOCUMENT_CORRECTION_NOT_DUPLICABLE).",
         "operationId": "duplicate_document_api_v1_warehouse_documents__doc_id__duplicate_post",
         "security": [
           {

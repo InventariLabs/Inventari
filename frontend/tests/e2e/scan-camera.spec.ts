@@ -213,9 +213,11 @@ test.describe("Scan — one read per presence on the forms", () => {
     api = new ApiHelper(await playwright.request.newContext({ baseURL }));
     token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
 
-    const storages = await api.listStorages(token);
-    const kitchen =
-      storages.find((s) => s.name === "E2E-Kitchen") ?? storages[0];
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    const kitchen = (await api.createStorage(token, {
+      name: `E2E-Camera-Forms-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    })) as { id: string; short_code: string };
     storageCode = kitchen.short_code;
     // A stocked record the barcode stands for: a document scan then has a
     // line to place, and the equipment form has a product to name.
@@ -477,10 +479,12 @@ test.describe("Scan — execution reads one presence", () => {
   test.beforeAll(async ({ playwright, baseURL }) => {
     api = new ApiHelper(await playwright.request.newContext({ baseURL }));
     token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
-    const storages = await api.listStorages(token);
-    const kitchen =
-      storages.find((s) => s.name === "E2E-Kitchen") ?? storages[0];
-    locationId = kitchen.id;
+    // Its own location, as above.
+    locationId = (
+      await api.createStorage(token, {
+        name: `E2E-Camera-Execution-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
     const partner = await api.createPartner(token, {
       name: `E2E-Camera-Customer-${crypto.randomUUID()}`,
       type: "CUSTOMER",
