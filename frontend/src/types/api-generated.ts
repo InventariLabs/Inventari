@@ -8462,12 +8462,14 @@ export interface paths {
          * Duplicate Document
          * @description Create a new DRAFT document as a copy of ``doc_id``.
          *
-         *     Copies type, partner, locations, notes, external_reference, a scrap's
-         *     reason, and all lines (expected_quantity, template, name/brand/barcode,
-         *     uom, batch, serial, expiry, unit_price, tax_rate). The duplicate always
-         *     starts in DRAFT with an identifier of its own — even if the source is
-         *     COMPLETED or CANCELLED — and takes a number when it is confirmed. Done
-         *     quantities are NOT copied.
+         *     Copies type, partner, locations, notes, external_reference, a scrap's or
+         *     a return's reason, and all lines (expected_quantity, template,
+         *     name/brand/barcode, uom, batch, serial, expiry, unit_price, tax_rate).
+         *     The duplicate always starts in DRAFT with an identifier of its own — even
+         *     if the source is COMPLETED or CANCELLED — and takes a number when it is
+         *     confirmed. Done quantities are NOT copied. A copy of a return is a return
+         *     of the same document and is refused when that has too little left to give
+         *     back; a correction is refused (DOCUMENT_CORRECTION_NOT_DUPLICABLE).
          */
         post: operations["duplicate_document_api_v1_warehouse_documents__doc_id__duplicate_post"];
         delete?: never;

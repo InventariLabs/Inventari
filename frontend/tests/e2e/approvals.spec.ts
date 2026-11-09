@@ -194,6 +194,7 @@ test.describe("Approvals — reject flow", () => {
   let token: string;
   let workflowId: string;
   let requestId: string;
+  let storageId: string;
 
   test.beforeAll(async ({ playwright, baseURL }) => {
     const requestContext = await playwright.request.newContext({ baseURL });
@@ -203,6 +204,13 @@ test.describe("Approvals — reject flow", () => {
 
     await api.toggleModule(token, "approvals", true).catch(() => {});
     await api.toggleModule(token, "warehouse", true).catch(() => {});
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    storageId = (
+      await api.createStorage(token, {
+        name: `E2E-Approvals-Reject-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
 
     await api.cleanupApprovals(token);
 
@@ -225,6 +233,9 @@ test.describe("Approvals — reject flow", () => {
     if (token && workflowId) {
       await api.deleteWorkflow(token, workflowId).catch(() => {});
     }
+    if (token && storageId) {
+      await api.deleteStorage(token, storageId).catch(() => {});
+    }
   });
 
   test("creates workflow for document approval", async () => {
@@ -233,10 +244,6 @@ test.describe("Approvals — reject flow", () => {
 
   test("rejects an approval request via API", async () => {
     // Create a document to trigger approval
-    const storages = await api.listStorages(token);
-    const storageId = storages[0]?.id;
-    if (!storageId) return;
-
     const doc = await api.createIntDocumentWithStock(token, {
       source_location_id: storageId,
       target_location_id: storageId,
@@ -281,6 +288,7 @@ test.describe("Approvals — workflow lifecycle via API", () => {
     let workflowId: string;
     let docId: string;
     let requestId: string;
+    let storageId: string;
 
     test.beforeAll(async ({ playwright, baseURL }) => {
       const requestContext = await playwright.request.newContext({ baseURL });
@@ -290,6 +298,13 @@ test.describe("Approvals — workflow lifecycle via API", () => {
 
       await api.toggleModule(token, "approvals", true).catch(() => {});
       await api.toggleModule(token, "warehouse", true).catch(() => {});
+      // Its own location: the first one of the shared tenant belongs to
+      // whichever parallel spec deletes it first.
+      storageId = (
+        await api.createStorage(token, {
+          name: `E2E-Approvals-MultiStage-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        })
+      ).id;
 
       await api.cleanupApprovals(token);
 
@@ -327,6 +342,9 @@ test.describe("Approvals — workflow lifecycle via API", () => {
       if (token && workflowId) {
         await api.deleteWorkflow(token, workflowId).catch(() => {});
       }
+      if (token && storageId) {
+        await api.deleteStorage(token, storageId).catch(() => {});
+      }
     });
 
     test("creates 2-stage workflow", async () => {
@@ -346,10 +364,6 @@ test.describe("Approvals — workflow lifecycle via API", () => {
     });
 
     test("creates document and requests approval", async () => {
-      const storages = await api.listStorages(token);
-      const storageId = storages[0]?.id;
-      if (!storageId) return;
-
       const doc = await api.createIntDocumentWithStock(token, {
         source_location_id: storageId,
         target_location_id: storageId,

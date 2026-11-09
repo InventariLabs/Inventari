@@ -113,6 +113,7 @@ test.describe("Documents — detail page", () => {
   let api: ApiHelper;
   let token: string;
   let docId: string;
+  let storageId: string;
 
   test.beforeAll(async ({ playwright, baseURL }) => {
     const requestContext = await playwright.request.newContext({ baseURL });
@@ -121,9 +122,13 @@ test.describe("Documents — detail page", () => {
     token = authData.access_token;
     await api.enableAllModules(token);
 
-    const storages = await api.listStorages(token);
-    const storageId = storages[0]?.id;
-    expect(storageId, "the seeded org has a storage location").toBeTruthy();
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    storageId = (
+      await api.createStorage(token, {
+        name: `E2E-Documents-Detail-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
     const doc = await api.createIntDocumentWithStock(token, {
       source_location_id: storageId,
       target_location_id: storageId,
@@ -136,6 +141,9 @@ test.describe("Documents — detail page", () => {
     if (token && docId) {
       await api.cancelDocument(token, docId).catch(() => {});
       await api.deleteDocument(token, docId).catch(() => {});
+    }
+    if (token && storageId) {
+      await api.deleteStorage(token, storageId).catch(() => {});
     }
   });
 
@@ -204,9 +212,13 @@ test.describe("Documents — state transitions via UI", () => {
     token = authData.access_token;
     await api.enableAllModules(token);
 
-    const storages = await api.listStorages(token);
-    storageId = storages[0]?.id;
-    expect(storageId, "the seeded org has a storage location").toBeTruthy();
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    storageId = (
+      await api.createStorage(token, {
+        name: `E2E-Documents-States-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
 
     const doc = await api.createIntDocumentWithStock(token, {
       source_location_id: storageId,
@@ -230,6 +242,9 @@ test.describe("Documents — state transitions via UI", () => {
       if (!token || !id) continue;
       await api.cancelDocument(token, id).catch(() => {});
       await api.deleteDocument(token, id).catch(() => {});
+    }
+    if (token && storageId) {
+      await api.deleteStorage(token, storageId).catch(() => {});
     }
   });
 
@@ -314,15 +329,22 @@ test.describe("Documents — CRUD via API + detail verification", () => {
     token = authData.access_token;
     await api.enableAllModules(token);
 
-    const storages = await api.listStorages(token);
-    storageId = storages[0]?.id || "";
-    expect(storageId, "the seeded org has a storage location").toBeTruthy();
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    storageId = (
+      await api.createStorage(token, {
+        name: `E2E-Documents-CRUD-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
   });
 
   test.afterAll(async () => {
     for (const id of createdDocIds) {
       await api.cancelDocument(token, id).catch(() => {});
       await api.deleteDocument(token, id).catch(() => {});
+    }
+    if (token && storageId) {
+      await api.deleteStorage(token, storageId).catch(() => {});
     }
   });
 
@@ -390,6 +412,7 @@ test.describe("Documents — corrections", () => {
   let api: ApiHelper;
   let token: string;
   let completedDocId: string;
+  let storageId: string;
 
   test.beforeAll(async ({ playwright, baseURL }) => {
     const requestContext = await playwright.request.newContext({ baseURL });
@@ -398,9 +421,13 @@ test.describe("Documents — corrections", () => {
     token = authData.access_token;
     await api.enableAllModules(token);
 
-    const storages = await api.listStorages(token);
-    const storageId = storages[0]?.id;
-    expect(storageId, "the seeded org has a storage location").toBeTruthy();
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    storageId = (
+      await api.createStorage(token, {
+        name: `E2E-Documents-Corrections-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
 
     const item = await api.createItem(token, {
       name: "E2E-Correction-Item",
@@ -432,6 +459,9 @@ test.describe("Documents — corrections", () => {
     if (token && completedDocId) {
       await api.cancelDocument(token, completedDocId).catch(() => {});
       await api.deleteDocument(token, completedDocId).catch(() => {});
+    }
+    if (token && storageId) {
+      await api.deleteStorage(token, storageId).catch(() => {});
     }
   });
 
@@ -486,7 +516,6 @@ test.describe("Documents — register page", () => {
 test.describe("Documents — inline partner creation", () => {
   let api: ApiHelper;
   let token: string;
-  let storageId: string;
   const createdPartnerIds: string[] = [];
 
   test.beforeAll(async ({ playwright, baseURL }) => {
@@ -495,10 +524,6 @@ test.describe("Documents — inline partner creation", () => {
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
     await api.enableAllModules(token);
-
-    const storages = await api.listStorages(token);
-    storageId = storages[0]?.id || "";
-    expect(storageId, "the seeded org has a storage location").toBeTruthy();
   });
 
   test.afterAll(async () => {

@@ -661,6 +661,7 @@ ERRORS_FR: ErrorMessages = {
     'over_receipt_past_ceiling': 'Recevoir {quantity} pour {basis} dépasse le plafond de sur-réception de {ceiling} % — personne ne peut recevoir autant',
     'document_update_status': 'Seuls les documents au statut brouillon peuvent être mis à jour',
     'document_correction_locked': 'Les documents de correction sont verrouillés — seules les notes peuvent être modifiées. Tentative de modification : {fields}. Annulez la correction et créez-en une nouvelle si les données sont erronées.',
+    'document_correction_not_duplicable': 'Une correction ne peut pas être dupliquée : elle rectifie un seul document. Créez plutôt une nouvelle correction de ce document.',
     'field_cannot_be_cleared': 'Ces champs ne peuvent pas être vidés : {fields}.',
     'ingredient_defaults_unreadable_file': "Impossible de lire le fichier. L'import attend un fichier .json ou .csv avec une ligne par ingrédient.",
     'onboarding_modules_not_offered': 'Le profil « {profile} » ne propose pas ces modules : {modules}',

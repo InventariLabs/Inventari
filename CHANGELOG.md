@@ -318,6 +318,18 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A return can be duplicated: Duplicate on a return used to be refused with
+  "Invalid input", and now writes another draft return of the same document,
+  with the return's reason and partner. The copy names that document and counts
+  against what is left to return on it, so it is refused, in the same words as
+  a new return, when too little is left. A return saved from its edit form keeps
+  counting against its original too, and raising its quantity past what is left
+  is refused. Duplicating a correction through the API answers
+  `DOCUMENT_CORRECTION_NOT_DUPLICABLE` instead of "Invalid input", and a copy of
+  a receipt whose line named only a stock record keeps that record, so it can be
+  confirmed without picking the product again.
+- Start and Board name a draft task the way the document's own page does —
+  "Delivery – draft 6CCF" — instead of by its internal `DRAFT-…` identifier.
 - On a stock take, Save on an empty or unreadable count box no longer records a
   count of zero: such a box is not a count, and the line stays uncounted. A
   note typed on, changed on or cleared from a line that is already counted now

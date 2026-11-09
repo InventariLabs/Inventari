@@ -40,6 +40,12 @@ from .document_numbering_service import (
     temporary_number,
 )
 from .document_profile_service import get_or_create_profile, resolve_document_currency
+from .document_return_service import (
+    keep_return_within_left_async,
+    keep_the_copy_a_return_async,
+    relink_return_lines,
+    return_links,
+)
 from .document_validation_service import (
     validate_lines_async,
     validate_lines_data_async,
@@ -705,10 +711,13 @@ async def duplicate_document(
     """Create a new DRAFT document as a copy of ``source_doc_id``.
 
     Copies type, partner, locations, scheduled_date, notes,
-    external_reference, the reason a scrap, a return or a correction was
-    written with, the fields modules keep in ``meta_data``
-    and all lines (expected_quantity, template, name/brand/barcode, uom, batch,
-    serial, expiry, unit_price, tax_rate, ``meta_data``).
+    external_reference, the reason a scrap or a return was written with, the
+    fields modules keep in ``meta_data`` and all lines (expected_quantity,
+    template, name/brand/barcode, uom, batch, serial, expiry, unit_price,
+    tax_rate, ``meta_data``). A copy of a return is a return of the same
+    document, and is refused when that has too little left to give back.
+    A correction is not copied: it restates one document, and a second
+    correction of it is written from that document.
     The new document always starts in DRAFT with an identifier of its own
     — even if the source is COMPLETED or CANCELLED — so it can be edited
     before confirmation, which is where its number is drawn. Done
@@ -720,17 +729,27 @@ async def duplicate_document(
     from . import document_types as dt
     from .schemas import DocumentCreate, DocumentLineCreate
 
+    if dt.is_correction(source.type):
+        raise ServiceRejectionError('document_correction_not_duplicable')
+
     # A receipt copies the product only: the record it lands on is decided
     # when the goods arrive. A document that takes goods off a shelf names the
     # record it takes, and confirming refuses a line that names none — so a
     # copy without it could not be confirmed until every line was picked
-    # again. The record is kept while it is still there; one deleted since is
-    # left out, and confirming names the line that needs a new one.
+    # again. A receipt line that names no product keeps its record for the
+    # same reason: the record is all it says of its goods, and confirming
+    # refuses a receipt line that names neither. The record is kept while it
+    # is still there; one deleted since is left out, and confirming names the
+    # line that needs a new one.
+    named_records = {
+        line.item_id
+        for line in source.lines
+        if line.item_id
+        and (dt.requires_stock_row(source.type) or not line.product_template_id)
+    }
     live_records = (
-        await core_api.items.existing_ids_async(
-            db, org_id, {line.item_id for line in source.lines if line.item_id}
-        )
-        if dt.requires_stock_row(source.type)
+        await core_api.items.existing_ids_async(db, org_id, named_records)
+        if named_records
         else set()
     )
     line_copies = [
@@ -763,7 +782,7 @@ async def duplicate_document(
         external_reference=source.external_reference,
         lines=line_copies,
         # Only a scrap takes its reason through the create schema; a return's
-        # or a correction's reason is a code of its own, copied below.
+        # reason is a code of its own, copied below.
         reason_code=source.reason_code if dt.is_scrap(source.type) else None,
         meta_data=source.meta_data,
     )
@@ -771,6 +790,7 @@ async def duplicate_document(
     if source.reason_code and not dt.is_scrap(source.type):
         copy.reason_code = source.reason_code
         await db.flush()
+    await keep_the_copy_a_return_async(db, org_id, copy, source)
     return copy
 
 
@@ -990,6 +1010,9 @@ async def update_document(
             _refuse_cleared(['lines'])
         await validate_lines_data_async(db, org_id, data.lines, doc.type)
         await validate_unit_prices_async(db, org_id, data.lines, doc.type)
+        # A return's lines give back lines of its original, and the form
+        # does not send that link: read it before the lines are rewritten.
+        links = return_links(doc.lines) if getattr(doc, 'return_of_id', None) else []
         doc.lines.clear()
         await db.flush()
         profile = await get_or_create_profile(db, org_id)
@@ -1009,6 +1032,10 @@ async def update_document(
                 )
             )
         await _apply_line_tax_rates(db, org_id, profile, doc.lines)
+        if links:
+            relink_return_lines(links, doc.lines)
+            await db.flush()
+            await keep_return_within_left_async(db, org_id, doc)
 
     recompute_document_values(doc)
     # The header and the lines are the record's business content: what the
