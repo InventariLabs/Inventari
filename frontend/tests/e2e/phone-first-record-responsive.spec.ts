@@ -47,9 +47,9 @@ const css =
   (selector: string): RecordOf =>
   (page) =>
     page.locator(selector).first();
-/** A document number such as INT/2026/004. */
+/** A document number such as INT/2026/004, or MM/2026/11/0006 when the format carries the month. */
 const documentNumber: RecordOf = (page) =>
-  page.getByText(/^[A-Z]+\/\d{4}\/\d+$/).first();
+  page.getByText(/^[A-Z]+\/\d{4}(?:\/\d{2})?\/\d+$/).first();
 
 // Every list of the main navigation and of the overview cards. The
 // approvals screens need a workflow that holds every document of the
