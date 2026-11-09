@@ -109,6 +109,79 @@ class TestTheConfirmDialogKnowsADeadEnd:
         )
         assert confirm.json()['status'] == DocumentStatus.PENDING_APPROVAL.value
 
+    def test_a_stage_naming_the_requester_beside_someone_without_access_is_a_dead_end(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        doc_user: User,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+    ) -> None:
+        # The door refuses a self-decision, so the asker's own name on the
+        # stage promises nothing: only the other names count.
+        h.set_module_settings(doc_org, 'approvals', {'allow_admin_self_approve': False})
+        blind = h.create_user(doc_org, email='blind@example.com', role='user')
+        _workflow(
+            client,
+            doc_auth_headers,
+            [
+                {
+                    'order': 1,
+                    'role': 'manager',
+                    'label': 'Peer review',
+                    'approver_user_ids': [str(doc_user.id), str(blind.id)],
+                }
+            ],
+        )
+        doc_id = _draft(
+            client, doc_auth_headers, doc_target_location, doc_partner, doc_template
+        )
+
+        told = _requirement(client, doc_auth_headers, doc_id)
+
+        assert told['approval_required'] is True
+        assert told['approval_solvable'] is False
+        assert told['undecidable_reason'] == 'named_approvers_cannot_decide'
+        assert told['undecidable_stage'] == 'Peer review'
+
+    def test_the_self_approval_opt_in_lets_the_requesters_name_count(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        doc_user: User,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+    ) -> None:
+        # ``doc_org`` lets admins decide their own requests by default; the
+        # asker is an admin, so their name on the stage is an approver again.
+        blind = h.create_user(doc_org, email='blind@example.com', role='user')
+        _workflow(
+            client,
+            doc_auth_headers,
+            [
+                {
+                    'order': 1,
+                    'role': 'manager',
+                    'label': 'Peer review',
+                    'approver_user_ids': [str(doc_user.id), str(blind.id)],
+                }
+            ],
+        )
+        doc_id = _draft(
+            client, doc_auth_headers, doc_target_location, doc_partner, doc_template
+        )
+
+        told = _requirement(client, doc_auth_headers, doc_id)
+
+        assert told['approval_solvable'] is True
+        assert told['undecidable_reason'] is None
+
     def test_the_only_holder_of_the_grant_asking_is_called_a_dead_end(
         self,
         client: TestClient,

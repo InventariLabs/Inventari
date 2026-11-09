@@ -318,6 +318,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- An approval stage that names the person who raised the request beside people
+  who cannot decide it is reported as a dead end instead of as a stage waiting
+  its turn: the queue marks the request, the dialog warns before confirming,
+  and the notice offers the way out rather than promising the author a decision
+  the approval door refuses. An organization that lets admins decide their own
+  requests still counts the author's name, and a stage naming the requester
+  alone still advances on its own.
 - A return can be duplicated: Duplicate on a return used to be refused with
   "Invalid input", and now writes another draft return of the same document,
   with the return's reason and partner. The copy names that document and counts

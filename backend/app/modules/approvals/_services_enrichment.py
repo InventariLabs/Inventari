@@ -471,7 +471,7 @@ async def _solvability_by_request(
     for request_id, stage in stages_by_request.items():
         requester_id = requests_by_id[request_id].created_by
         requester_may_decide_own = False
-        if (
+        if requester_id in named_approvers(stage) or (
             approver_holders
             and all(holder == requester_id for holder in approver_holders)
             and requester_id in approver_holders

@@ -264,7 +264,9 @@ async def _stage_verdict_async(
         )
 
     requester_may_decide_own = False
-    if approver_holders is not None and request.created_by in approver_holders:
+    if request.created_by in named or (
+        approver_holders is not None and request.created_by in approver_holders
+    ):
         from ._services_decisions import _may_decide_on_own_request
 
         requester_may_decide_own = await _may_decide_on_own_request(
@@ -283,8 +285,8 @@ async def _stage_verdict_async(
     )
     if approver_holders is not None:
         deciders = set(approver_holders)
-        if not requester_may_decide_own:
-            deciders.discard(request.created_by)
+    if not requester_may_decide_own:
+        deciders.discard(request.created_by)
     return reason, deciders
 
 
