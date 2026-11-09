@@ -110,7 +110,7 @@ async def test_a_file_storage_write_and_delete_mark_the_attempt(tmp_path):
         FileStorageService._provider = previous_provider
 
 
-async def test_an_llm_call_marks_the_attempt():
+async def test_an_llm_call_marks_the_attempt(stub_dns):
     """The provider is billed the moment the call is made, not at commit."""
     from app.core.llm.base import LlmRequest
     from app.core.llm.openai_client import OpenAiCompatibleClient
