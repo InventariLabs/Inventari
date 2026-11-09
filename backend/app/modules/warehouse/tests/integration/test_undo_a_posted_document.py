@@ -516,6 +516,68 @@ class TestUndoAPostedDocument:
         assert record is not None
         assert record.quantity == Decimal('0')
 
+    def test_a_completed_return_of_the_receipt_leaves_the_rest_undoable(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+    ) -> None:
+        """A return of the original is not a use of its stock, like a correction.
+
+        The return is stored original -> return, the other way round from a
+        correction, and its departure used to be counted as some later
+        document drawing on the receipt, so the undo was refused. It
+        reverses what the line has left.
+        """
+        posted = _post(
+            client,
+            doc_auth_headers,
+            _receipt_payload(
+                partner=doc_partner,
+                target=doc_target_location,
+                template=doc_template,
+            ),
+        )
+        returned = client.post(
+            f'/api/v1/warehouse/documents/{posted["id"]}/return',
+            headers=doc_auth_headers,
+            json={
+                'reason_code': 'DAMAGED',
+                'lines': [{'original_line_number': 1, 'return_quantity': '4'}],
+            },
+        )
+        assert returned.status_code == status.HTTP_201_CREATED, returned.text
+        return_id = returned.json()['id']
+        assert (
+            client.patch(
+                f'/api/v1/warehouse/documents/{return_id}/confirm',
+                headers=doc_auth_headers,
+            ).status_code
+            == status.HTTP_200_OK
+        )
+        assert (
+            client.patch(
+                f'/api/v1/warehouse/documents/{return_id}/complete',
+                headers=doc_auth_headers,
+                json={'complete_as_planned': True},
+            ).status_code
+            == status.HTTP_200_OK
+        )
+
+        undone = client.post(
+            f'/api/v1/warehouse/documents/{posted["id"]}/undo', headers=doc_auth_headers
+        )
+        assert undone.status_code == status.HTTP_200_OK, undone.text
+        assert Decimal(undone.json()['lines'][0]['quantity']) == Decimal('-6')
+
+        db_session.expire_all()
+        record = db_session.get(Item, posted['lines'][0]['item_id'])
+        assert record is not None
+        assert record.quantity == Decimal('0')
+
     def test_a_move_is_refused_when_its_stock_left_the_target_shelf(
         self,
         client: TestClient,
