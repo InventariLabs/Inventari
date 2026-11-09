@@ -173,6 +173,63 @@ Not marked **Breaking**, but worth a look before you update:
   stock on the shelf from what they need between them, not each against the
   whole shelf, and a "From recipes" sheet that adds nothing because the list
   already asks for all of it says so.
+- A new community module package can be handed to an AI coding agent.
+  `module new-community` now writes an `AGENTS.md` into the package — what a
+  module may import, the five maintained languages, migrations the package
+  owns, the purpose card, tests and the command that checks the package before
+  install, with links to the full guides at the platform's version — and a
+  `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
+  building a module with an agent: what to give it, which checks refuse its
+  mistakes and how to check the result before installing it.
+- Asking for an approval now warns about a later stage nobody could decide,
+  not only the first. The dialog behind Confirm and Send for approval on a
+  document, and the one on a purchase order, name the first stage that has no
+  possible decider and what ends the wait (grant the named people access to
+  approvals, give someone the permission, or withdraw the request); where every
+  stage can be decided they keep the ordinary sentence. A purchase order whose
+  request was withdrawn and that asks again gets the same warning from its
+  approval card, and the notice for a request stuck at such a stage no longer
+  promises that withdrawing it returns the order to Confirmed.
+- `PGBOUNCER_MAX_CLIENT_CONN` in `.env` sets how many connections PgBouncer
+  accepts from the backend (300 when unset, as before). Six workers open up to
+  300, so DEPLOYMENT.md's 16 GB sizing row now sets it to 400.
+- The 409 refusals of focus mode, of a profile switch and of onboarding with a
+  module chosen carry `lang` and the data their message is built from —
+  `module`, `unknown_modules`, `not_allowed_modules`, `modules` or
+  `missing_dependency` — next to `code` and `message`, so a client can name the
+  refused modules without reading them out of the sentence.
+- A module names the read its launcher badge asks for with
+  `statusBadgePermission` on its `FrontendModule`, and the launcher calls
+  `useStatusBadge` only for a role holding that key; for any other role the
+  tile shows no status instead of "Status could not be read". A module that
+  leaves it out is asked of every role, as before. An action-items hook keeps
+  asking for itself and should do so only when `useHasPermission` grants the
+  read, as `FRONTEND_MODULE_GUIDE.md` now shows.
+- Module authors get three more helpers in the module SDK: `hit_constraint`
+  (did this integrity error trip one of the named constraints, by the name the
+  driver reports with the message text as fallback), `rows_to_csv` (header and
+  rows to CSV text, with every data cell defused against spreadsheet formulas,
+  as the built-in exports do) and `utc_now` (the timezone-aware current moment).
+- `manage.py user create-admin` takes `--lang` (`en`, `pl`, `de`, `fr`, `es` or
+  `pt`) to set the language the account opens in; an unknown code is refused,
+  and without it a new account takes the instance default and an existing one
+  keeps its own. DEPLOYMENT.md and QUICK_DEPLOY.md say how to use the command
+  to get back into an installation without outgoing mail.
+- `manage.py user erase <user id>` erases one person's account on a GDPR
+  erasure request: it shows whose account it is and asks first (`--yes` skips
+  the question), then replaces the address, name and password, closes the
+  account and revokes its sessions in one transaction, and reports
+  "Nothing was erased" with exit code 1 when a step fails, Redis included.
+  It replaces the Python script `docs/GDPR_MANUAL_PROCEDURE.md` asked
+  operators to paste. The procedure also says now that the user id the
+  journal keeps is pseudonymised personal data, not anonymous, and that
+  journal entries naming the person stay only on a legal ground — with the
+  SQL to redact them when there is none.
+- Module authors can ask `@/module-sdk` whether the signed-in user is the person
+  a record names by e-mail address (`useIsSignedInAs`).
+- Module authors can page a list the server pages by cursor with
+  `useKeysetPaging` from `@/module-sdk`: it keeps the cursors of the pages
+  already visited and starts from the first page when the question changes.
 - When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
   list's "From recipes" writes goods that another open shopping list still
   asks for, the answer names them and the list that holds them

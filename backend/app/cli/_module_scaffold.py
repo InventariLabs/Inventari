@@ -361,6 +361,93 @@ def test_a_record_is_kept_for_its_organization(db_session, test_household):
 '''
 
 
+# What an AI coding agent started inside the package needs. The package sits in
+# its own repository, so the repository's AGENTS.md files are out of its sight;
+# this carries the rules an agent breaks first and links the full documents at
+# the version that wrote it, instead of copying them to drift. `{docs}` is that
+# versioned address, `{module}` the module's name.
+_AGENT_INSTRUCTIONS = """\
+# Instructions for AI coding agents — {module}
+
+This is a community module package for [Inventari]({repo}). It lives in its
+own repository and is installed into a running Inventari. These rules are the
+ones agents break first; the full documents are linked at the end.
+
+## What a module may import
+
+- Backend: only `app.core.module_sdk`, `app.core.contracts`,
+  `app.core.public_api` and this package. Never `app.models`, `app.database`
+  or another module's internals: the install-time scan refuses the package.
+- Core data (items, places, stock) is read and written only through
+  `core_api` from `app.core.public_api`. This package's own tables are
+  queried directly.
+- Frontend: import Core UI, `api` and hooks only from `@/module-sdk`.
+- Every route has a permission dependency and is filtered by the caller's
+  organization (`require_org`); a list endpoint answers a
+  `PaginatedResponse`, never a bare list.
+
+## Translations
+
+Nothing the user reads is written into code. Every string goes through a
+catalog: `frontend/i18n/<lang>.json` and `backend/i18n/<lang>.json`. The
+platform maintains five languages: en, pl, de, fr, es. English is the one a
+package must ship; keep every catalog the package has complete, and add the
+others (`module new-community --help` lists the flag) before you offer the
+module to users in those languages.
+
+## Migrations belong to this package
+
+Tables are declared on `ModuleModelBase` and created by revisions in
+`backend/migrations/versions/`, each naming the one before it in
+`down_revision`. A change to `models.py` gets a new revision; never edit one
+that has been installed. Core's tables and migrations are not yours. A column
+pointing at a Core table declares no `ForeignKey` on the model; the migration
+declares the constraint.
+
+## Purpose card
+
+Write a purpose card, `PURPOSE.md` beside `README.md`: seven short headings
+saying whose job the module serves, where it ends and what it deliberately
+does not do (the shape: `docs/purpose/README.md` in the Inventari repository).
+A module contributed to Inventari itself needs it as
+`docs/purpose/<module>.md`, and its lint refuses the module without it.
+
+## Tests
+
+Tests live in `backend/tests/` and never install. Add one for every endpoint
+and every rule you add, and watch it fail before the code that makes it pass.
+Running them, and the frontend type check, takes the staging sequence in
+*Running a community package's tests* of `docs/MODULE_TESTING_GUIDE.md`.
+
+## Check the package before install
+
+From the Inventari checkout, with the package under its `modules-workspace/`
+directory (the backend sees it as `/modules-workspace`):
+
+```bash
+docker compose exec backend uv run python manage.py module validate --base-path /modules-workspace --module {module}
+```
+
+It checks the manifest, the import rules, the catalogs and that the package
+imports at all. Fix what it names; do not widen the manifest or move code
+into a forbidden path to silence it. Raise `version` in `module.yaml` for
+every change you hand over. The package must be signed again after an edit.
+
+## The full documents (Inventari {version})
+
+- [MODULE_QUICKSTART.md]({docs}/MODULE_QUICKSTART.md), Path B: the package's
+  whole life, from scaffold to uninstall
+- [MODULES_GUIDE.md]({docs}/MODULES_GUIDE.md): the architecture and the
+  CoreAPI reference
+- [docs/MODULE_TESTING_GUIDE.md]({docs}/docs/MODULE_TESTING_GUIDE.md)
+- [frontend/UI_GUIDELINES.md]({docs}/frontend/UI_GUIDELINES.md): the visual
+  system a page follows
+- [backend/AGENTS.md]({docs}/backend/AGENTS.md): the rules for work inside
+  Inventari itself. Where it differs from this file (it allows imports a
+  package may not make), this file wins for the package.
+"""
+
+
 def scaffold_community_module(  # noqa: PLR0915 - existing complexity/size
     module_name: str, *, output_dir: str = '.', languages: Iterable[str] = ()
 ) -> None:
@@ -550,6 +637,20 @@ def scaffold_community_module(  # noqa: PLR0915 - existing complexity/size
         f'## Development\n\n'
         f'See [MODULES_GUIDE.md]({GITHUB_REPO_URL}/blob/main/MODULES_GUIDE.md).\n',
     )
+
+    # For an AI coding agent started inside the package; CLAUDE.md only points
+    # at AGENTS.md so the two readers get one set of rules.
+    version = get_platform_version()
+    write(
+        out / 'AGENTS.md',
+        _AGENT_INSTRUCTIONS.format(
+            module=module_name,
+            repo=GITHUB_REPO_URL,
+            version=version,
+            docs=f'{GITHUB_REPO_URL}/blob/v{version}',
+        ),
+    )
+    write(out / 'CLAUDE.md', '@AGENTS.md\n')
 
     console.print(f'\n[green]✓ Package created at {out}/[/]')
     console.print('')

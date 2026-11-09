@@ -1394,7 +1394,10 @@ This creates `./modules-workspace/warranty_tracker/` (the container sees it as
 `/modules-workspace`; without `--output` the command writes into its current
 directory inside the container) with all files pre-filled
 and ready to edit — a directory git ignores and the backend container can see,
-so the install below reaches it and `git add -A` here cannot take it.
+so the install below reaches it and `git add -A` here cannot take it. The
+package includes an `AGENTS.md` (and a `CLAUDE.md` pointing at it) with the
+module rules for an AI coding agent started inside it; see *Building a module
+with an AI coding agent* in MODULE_QUICKSTART.md.
 
 ### Install a community module
 
