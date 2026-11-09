@@ -387,6 +387,17 @@ const dist = join(root, "dist");
  * loads. That one budget moves a step of five, to 395; the other screens stand
  * under theirs (login 394.8, launcher 409.9, start 625.9, receive 462.4, issue
  * 575.0, history 598.9, products 613.8, initial 189.3).
+ *
+ * Re-measured 2026-11-09 on the development line with that branch and the one
+ * that names an already-listed shopping notice without a count together:
+ * neither is over alone (the development tip stood at issue 575.0 against its
+ * 575, this branch alone 575.0, the other 574.9), but the Polish language
+ * chunk both touch compresses less well in the merged tree and the issue
+ * screen measures 575.0 over the line. It is copy in one shared chunk, not an
+ * import that walked in. That one phone budget moves a step of five, to 580;
+ * the others stand under theirs (login 394.8, launcher 409.9, start 625.9,
+ * receive 462.5, history 598.9, products 613.8, app first paint 390.1,
+ * initial 189.3).
  */
 const BUDGETS = {
   initial: 245,
