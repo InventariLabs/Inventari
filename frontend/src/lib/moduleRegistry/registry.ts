@@ -77,6 +77,7 @@ class ModuleRegistry {
 
   /**
    * Warns about nav items of the named modules that no route answers.
+   * `moduleNames` are the modules that are enabled and loaded.
    *
    * Run once the modules are registered rather than as each one registers:
    * a route another module hosts in this one's shell (`ModuleRoute.shell`)
@@ -84,6 +85,11 @@ class ModuleRegistry {
    */
   warnOrphanedNav(moduleNames: string[]) {
     const hosted = [...this.modules.values()].flatMap((m) => m.routes ?? []);
+    // The registry keeps a module it once loaded after the organization
+    // switches it off, so "registered" is not "enabled": the names handed in
+    // are the modules that are on now, and a nav item needing one that is
+    // not among them is not shown.
+    const enabled = new Set(moduleNames);
     moduleNames.forEach((name) => {
       const module = this.modules.get(name);
       if (!module?.moduleNav || !module.routes) return;
@@ -91,7 +97,7 @@ class ModuleRegistry {
         ...module.routes,
         ...hosted.filter((r) => r.shell === module.name),
       ];
-      const paths = shownNavPaths(module, (n) => this.modules.has(n));
+      const paths = shownNavPaths(module, (n) => enabled.has(n));
       const relative = paths.filter((p) => !p.startsWith("/"));
       if (relative.length > 0) {
         logger.warn(
