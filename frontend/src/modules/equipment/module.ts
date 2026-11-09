@@ -226,6 +226,7 @@ moduleRegistry.register({
     defaultPrefix: "EQP",
   },
   useStatusBadge: useEquipmentStatusBadge,
+  statusBadgePermission: "equipment:read",
   // Someone holding a device types the number off its sticker. The core
   // item search reads the serial column, but its results lead to the
   // product screen — which is where assets are deliberately not shown.

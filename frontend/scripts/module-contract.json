@@ -1434,6 +1434,10 @@
           }
         }
       },
+      "statusBadgePermission": {
+        "optional": true,
+        "type": "string"
+      },
       "theme": {
         "optional": true,
         "type": {
