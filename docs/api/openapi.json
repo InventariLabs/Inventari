@@ -54277,6 +54277,29 @@
               }
             ],
             "title": "Available Uom Symbol"
+          },
+          "to_buy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Buy"
+          },
+          "to_buy_uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Buy Uom Symbol"
           }
         },
         "type": "object",

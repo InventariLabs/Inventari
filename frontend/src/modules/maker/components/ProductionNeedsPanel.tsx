@@ -264,10 +264,18 @@ function AddShortfallButton({
   const label =
     short.length === 1
       ? t("create.needs.addOne", {
+          // What the list will hold: the preview's own to-buy figure, on the
+          // ingredient's step — the list is asked for a whole piece when the
+          // run is half a piece short. The raw shortage would promise 1,5
+          // szt. beside a line that writes 2.
+          // What the list will hold: the preview's own to-buy figure, on the
+          // ingredient's step — the list is asked for a whole piece when the
+          // run is half a piece short. The raw shortage would promise 1,5
+          // szt. beside a line that writes 2.
           quantity: formatQuantityLocalized(
             t,
-            short[0].shortage,
-            short[0].uom_symbol,
+            short[0].to_buy ?? short[0].shortage,
+            short[0].to_buy_uom_symbol ?? short[0].uom_symbol,
           ),
           name: short[0].child_template_name ?? "",
         })

@@ -329,8 +329,8 @@ says what the release does rather than what changed since them.
 
 - A production run's shortfall put on the shopping list is rounded up to the
   ingredient's own unit's step, as the recipes module rounds a requirement, so
-  an ingredient counted in pieces that is 1,5 short asks for 2 pieces rather
-  than 1,5.
+  an ingredient counted in pieces that is 1.5 short asks for 2 pieces rather
+  than 1.5 — and the button that puts it there states the same quantity.
 - A translated validation error that names a decimal bound — "must be less
   than or equal to 999999999.999" — now writes that bound in the reader's
   decimal mark: a Polish, German, French, Spanish or Portuguese reader sees

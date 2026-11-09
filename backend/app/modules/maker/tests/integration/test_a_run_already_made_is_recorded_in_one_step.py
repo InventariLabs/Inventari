@@ -426,7 +426,9 @@ class TestBeforeSaving:
 
         The shortfall was rounded to the store's three places whatever the
         ingredient was counted in, so a run half a piece short asked the
-        shopper to buy 1,5 szt. — part of a piece, which no shelf holds.
+        shopper to buy 1,5 szt. — part of a piece, which no shelf holds. The
+        preview says the same quantity, so the button that puts the shortfall
+        on the list states what the list will receive.
         """
         plums = _template(db_session, org, name='Damson Plums')
         pieces = db_session.scalars(select(Uom).where(Uom.symbol == 'pcs')).one()
@@ -454,10 +456,22 @@ class TestBeforeSaving:
         )
         assert line.status_code == 201, line.text
 
+        run = _run(butter, pantry, '1')
+        preview = client.post(
+            '/api/v1/maker/production/orders/preview',
+            headers=headers,
+            json=run,
+        )
+        assert preview.status_code == 200, preview.text
+        [plums_short] = preview.json()['ingredients']
+        assert Decimal(plums_short['shortage']) == Decimal('1.5')
+        assert Decimal(plums_short['to_buy']) == Decimal('2')
+        assert plums_short['to_buy_uom_symbol'] == 'pcs'
+
         response = client.post(
             '/api/v1/maker/production/orders/shortages/shopping-list',
             headers=headers,
-            json=_run(butter, pantry, '1'),
+            json=run,
         )
 
         assert response.status_code == 200, response.text
