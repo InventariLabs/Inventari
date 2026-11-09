@@ -9,7 +9,8 @@ listed.
 
 from __future__ import annotations
 
-from decimal import Decimal
+from collections.abc import Iterable
+from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
@@ -18,14 +19,11 @@ from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.public_api import core_api
 from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
 
+from ._availability import build_stock_context, resolve_template
 from ._constants import localized
 from ._helpers import _round_shopping_qty
 from ._shopping_overlap import lines_listed_elsewhere
-from ._shopping_rule import (
-    load_exclusions,
-    needs_buying,
-    quantity_to_buy,
-)
+from ._shopping_rule import load_exclusions, quantity_to_buy
 from .schemas import AddToShoppingListResponse
 from .services import get_recipe, get_recipe_availability
 
@@ -67,79 +65,105 @@ async def collect_shopping_items(
     scale: Decimal | None,
     lang: Language,
 ) -> tuple[dict[tuple[str, UUID | None], dict[str, Any]], list[str]]:
-    """Aggregate what the given recipes still need, keyed by (name, unit).
+    """Aggregate what the given recipes need, keyed by (name, unit).
 
     Returns the merged lines and the recipe names they came from — two
-    recipes wanting flour buy flour once, with the amounts added up. Each
-    line keeps what every recipe contributed (``by_recipe``), so a later
-    press can tell what the recipes a line was not yet made for add.
+    recipes wanting flour buy flour once. Each line keeps what every recipe
+    asks for (``by_recipe``, the requirement before the shelf), what the
+    shelf holds of it (``available``) and the shortfall of the two
+    (``quantity``), the same arithmetic the meal plan applies: the
+    requirements are summed first and the shelf is subtracted once. Each
+    recipe used to be netted against the whole shelf on its own and the
+    shortfalls added, so 250 g of flour covered Bread's 200 g and Cake's
+    300 g alike and the list asked for 50 g where 250 g were short.
 
-    The amount is the *shortfall*: what the recipe asks for less what the
-    shelf already holds, the same arithmetic the meal plan applies. The
-    list used to ask for the whole recipe even with half of it in the
-    cupboard. Lines the organization marked "Always at home" are left out,
-    by product or by name, as the meal plan already did.
+    A line the shelf covers stays in the answer with a zero shortfall: a
+    list already carrying other recipes' need for the goods may still be
+    short of it. Lines the organization marked "Always at home" are left
+    out, by product or by name, as the meal plan already did.
     """
     merged: dict[tuple[str, UUID | None], dict[str, Any]] = {}
     recipe_names: list[str] = []
     exclusions = await load_exclusions(db, org_id)
-
+    recipes = []
     for recipe_id in recipe_ids:
         recipe = await get_recipe(db, recipe_id, org_id)
         if not recipe:
             raise NotFoundException('recipe', lang)
-        recipe_names.append(recipe.name)
+        recipes.append(recipe)
+    # One reading of the shelf for every recipe, so the goods two recipes
+    # share are found on the same product and counted once.
+    stock = await build_stock_context(
+        db, [ing for recipe in recipes for ing in recipe.ingredients], org_id
+    )
 
+    for recipe in recipes:
+        recipe_names.append(recipe.name)
         effective_servings = servings or recipe.servings
         if scale is not None:
             # A stated multiplier wins over a serving count, and multiplied
             # out it can be fractional — the availability math carries it
             # exactly.
             effective_servings = Decimal(recipe.servings) * scale
-        avail = await get_recipe_availability(db, recipe, org_id, effective_servings)
+        avail = await get_recipe_availability(
+            db, recipe, org_id, effective_servings, context=stock
+        )
 
-        linked_template = {ing.id: ing.template_id for ing in recipe.ingredients}
+        ingredients = {ing.id: ing for ing in recipe.ingredients}
         for ing in avail.ingredients:
-            if not needs_buying(ing.status, ing.quantities_comparable):
-                continue
-            if exclusions.excludes(ing.name, linked_template.get(ing.ingredient_id)):
-                continue
-            quantity = quantity_to_buy(
-                Decimal(str(ing.required_quantity)),
-                Decimal(str(ing.available_quantity or 0)),
-                comparable=ing.quantities_comparable,
-            )
-            if quantity is None or quantity <= 0:
+            source = ingredients[ing.ingredient_id]
+            if exclusions.excludes(ing.name, source.template_id):
                 continue
             key = (ing.name.strip().lower(), ing.required_uom_id)
-            if key in merged:
-                merged[key]['quantity'] += quantity
-                if recipe.name not in merged[key]['recipes']:
-                    merged[key]['recipes'].append(recipe.name)
-                by_recipe = merged[key]['by_recipe']
-                by_recipe[recipe.name] = by_recipe.get(recipe.name, Decimal(0)) + (
-                    quantity
-                )
-            else:
-                merged[key] = {
+            line = merged.setdefault(
+                key,
+                {
                     'name': ing.name,
-                    'quantity': quantity,
                     'uom_id': ing.required_uom_id,
-                    'recipes': [recipe.name],
-                    'by_recipe': {recipe.name: quantity},
-                }
+                    'by_recipe': {},
+                    'shelves': {},
+                },
+            )
+            by_recipe = line['by_recipe']
+            need = Decimal(str(ing.required_quantity))
+            by_recipe[recipe.name] = by_recipe.get(recipe.name, Decimal(0)) + need
+            # The shelf is the product the reading came from: the same
+            # product read for a second recipe is the same goods, not more
+            # of them. Goods found by the ingredient's name cover it as
+            # linked ones do, the way the meal plan deducts them. A reading
+            # whose measure does not meet the recipe's says nothing about
+            # how much it covers, so it counts for nothing and the whole
+            # requirement is bought.
+            product = resolve_template(source, stock)
+            if product is not None and ing.quantities_comparable:
+                line['shelves'][product.id] = Decimal(str(ing.available_quantity or 0))
 
+    for line in merged.values():
+        line['available'] = sum(line.pop('shelves').values(), Decimal(0))
+        line['quantity'] = _shortfall(line['by_recipe'].values(), line['available'])
     return merged, recipe_names
+
+
+def _shortfall(needs: Iterable[Decimal], available: Decimal) -> Decimal:
+    """What *needs* summed lack once *available* is spent on them, never below 0."""
+    total = sum(needs, Decimal(0))
+    return quantity_to_buy(total, available, comparable=True) or Decimal(0)
 
 
 def _recipe_note(recipes: list[str], lang: Language) -> str:
     return localized(_SHOPPING_NOTE_LABELS, lang, name=', '.join(recipes))
 
 
-def _recipe_note_data(recipes: list[str]) -> dict[str, Any]:
+def _recipe_note_data(needs: dict[str, Decimal]) -> dict[str, Any]:
     # ``for_recipe`` is what the list renders; ``for_recipes`` keeps the
-    # names apart, so a later press knows which recipes a line was made for.
-    return {'for_recipe': ', '.join(recipes), 'for_recipes': recipes}
+    # names apart and ``needs`` what each recipe asked for, before the shelf,
+    # so a later press knows what the line already covers.
+    recipes = list(needs)
+    return {
+        'for_recipe': ', '.join(recipes),
+        'for_recipes': recipes,
+        'needs': {name: str(need) for name, need in needs.items()},
+    }
 
 
 def _recipes_of(line: ShoppingListItemDTO) -> list[str]:
@@ -151,69 +175,125 @@ def _recipes_of(line: ShoppingListItemDTO) -> list[str]:
     return [single] if isinstance(single, str) else []
 
 
+def _needs_of(line: ShoppingListItemDTO) -> dict[str, Decimal] | None:
+    """What each recipe asked of *line*, or None for a line that never said.
+
+    A line written before the needs were kept names its recipes only.
+    """
+    needs = (line.note_data or {}).get('needs')
+    if not isinstance(needs, dict):
+        return None
+    recorded: dict[str, Decimal] = {}
+    for name, need in needs.items():
+        try:
+            recorded[str(name)] = Decimal(str(need))
+        except InvalidOperation:
+            continue
+    return recorded
+
+
 async def _put_on_list(
     db: AsyncSession,
     org_id: UUID,
     list_id: UUID,
-    item: ShoppingListItemCreateDTO,
-    by_recipe: dict[str, Decimal],
+    wanted: dict[str, Any],
     uom: UomDTO | None,
     lines: list[ShoppingListItemDTO],
     lang: Language,
-) -> tuple[Literal['new', 'raised', 'listed'], ShoppingListItemCreateDTO]:
-    """Decide what one wanted line does to the *lines* the list has for it.
+) -> tuple[
+    Literal['new', 'raised', 'listed', 'none'], ShoppingListItemCreateDTO | None
+]:
+    """Decide what one *wanted* line does to the *lines* the list has for it.
 
-    ``new``: write the returned line. ``raised``: an open line of these
-    recipes was topped up in place, and the returned line says by how much it
-    now asks. ``listed``: the list already covers it, nothing is written.
+    ``new``: write the returned line. ``raised``: an open recipe line was
+    topped up in place, and the returned line says by how much it now asks.
+    ``listed``: the list already covers it. ``none``: the shelf does.
 
-    A line a recipe wrote carries the recipes it was made for. The same
-    recipes pressed again are covered, so a second press stays a no-op; a
-    recipe no line was made for adds what *it* needs on top (``by_recipe``
-    holds each recipe's share, so one the line already covers is not counted
-    again), on the open line or as a new line when the earlier one is
-    already bought. Lines no
-    recipe wrote (typed by hand, from a meal plan) carry no such record, so
-    the list asks for what the sum of them covers and a larger need adds
-    only the difference.
+    The list asks for what its recipes need in total, less the shelf, and
+    every line it has for the goods counts towards that — bought ones and
+    ones typed by hand too. A line a recipe wrote records each recipe's need
+    (``needs``), so a recipe pressed again at the same need is covered and
+    the press stays a no-op, while one that now needs more (more servings)
+    or finds less on the shelf raises the line by the growth. A recipe the
+    line was made for but not pressed this time keeps its recorded need: the
+    shelf is not given to the pressed one a second time. A line is never
+    lowered.
+
+    A line written before the needs were kept names its recipes only: they
+    stay covered at whatever they need, as they were, and its quantity
+    stands for their need.
     """
-    if not lines:
-        return 'new', item
     recipe_lines = [line for line in lines if line.source == 'recipe']
-    if not recipe_lines:
-        shortfall = item.quantity - sum((line.quantity for line in lines), Decimal(0))
-        if shortfall <= 0:
-            return 'listed', item
-        return 'new', item.model_copy(update={'quantity': shortfall})
-    covered = {name for line in recipe_lines for name in _recipes_of(line)}
-    fresh = [name for name in by_recipe if name not in covered]
-    if not fresh:
-        return 'listed', item
-    needed = _round_shopping_qty(sum((by_recipe[n] for n in fresh), Decimal(0)), uom)
-    if needed <= 0:
-        return 'listed', item
-    open_line = next((line for line in recipe_lines if not line.is_purchased), None)
+    recorded: dict[str, Decimal] = {}
+    unrecorded: set[str] = set()
+    unrecorded_need = Decimal(0)
+    for line in recipe_lines:
+        line_needs = _needs_of(line)
+        if line_needs is None:
+            unrecorded.update(_recipes_of(line))
+            unrecorded_need += line.quantity
+            continue
+        for name, need in line_needs.items():
+            recorded[name] = max(recorded.get(name, Decimal(0)), need)
+    pressed = {
+        name: need
+        for name, need in wanted['by_recipe'].items()
+        if name not in unrecorded
+    }
+    grown = {
+        name: need
+        for name, need in pressed.items()
+        if need > recorded.get(name, Decimal(0))
+    }
+    target = _round_shopping_qty(
+        _shortfall(
+            [*{**recorded, **grown}.values(), unrecorded_need], wanted['available']
+        ),
+        uom,
+    )
+    if target <= 0:
+        return 'none', None
+    listed = sum((line.quantity for line in lines), Decimal(0))
+    shortfall = _round_shopping_qty(target - listed, uom)
+    if not pressed or shortfall <= 0:
+        return 'listed', None
+    # The line is for the recipes whose need grew; a shelf that emptied
+    # under an unchanged need is the pressed recipes' shortfall.
+    added = {
+        name: max(recorded.get(name, Decimal(0)), need)
+        for name, need in (grown or pressed).items()
+    }
+    open_line = next(
+        (
+            line
+            for line in recipe_lines
+            if not line.is_purchased and _needs_of(line) is not None
+        ),
+        None,
+    )
+    item = ShoppingListItemCreateDTO(
+        name=wanted['name'],
+        quantity=shortfall,
+        uom_id=wanted['uom_id'],
+        notes=_recipe_note(list(added), lang),
+        note_data=_recipe_note_data(added),
+        source='recipe',
+    )
     if open_line is None:
-        return 'new', item.model_copy(
-            update={
-                'quantity': needed,
-                'notes': _recipe_note(fresh, lang),
-                'note_data': _recipe_note_data(fresh),
-            }
-        )
-    names = [*_recipes_of(open_line), *fresh]
-    quantity = open_line.quantity + needed
+        return 'new', item
+    needs = {**(_needs_of(open_line) or {}), **added}
+    quantity = open_line.quantity + shortfall
     raised = await shopping_lists_api.raise_item_quantity_async(
         db,
         list_id,
         open_line.id,
         quantity,
         org_id,
-        notes=_recipe_note(names, lang),
-        note_data={**(open_line.note_data or {}), **_recipe_note_data(names)},
+        notes=_recipe_note(list(needs), lang),
+        note_data={**(open_line.note_data or {}), **_recipe_note_data(needs)},
     )
     if not raised:
-        return 'listed', item
+        return 'listed', None
     return 'raised', item.model_copy(update={'quantity': quantity})
 
 
@@ -234,13 +314,10 @@ async def add_recipes_to_shopping_list(
         db, org_id, recipe_ids, servings, scale, lang
     )
 
-    if not merged:
-        if not shopping_list_id:
-            raise ServiceRejectionError('no_missing_ingredients')
-        return AddToShoppingListResponse(
-            shopping_list_id=shopping_list_id,
-            added_count=0,
-        )
+    if not shopping_list_id and not any(
+        line['quantity'] > 0 for line in merged.values()
+    ):
+        raise ServiceRejectionError('no_missing_ingredients')
 
     existing_items: list[ShoppingListItemDTO] = []
     if shopping_list_id:
@@ -271,32 +348,6 @@ async def add_recipes_to_shopping_list(
     uoms_by_id = {
         uom.id: uom for uom in await core_api.uoms.list_for_org_async(db, org_id)
     }
-    items: list[
-        tuple[ShoppingListItemCreateDTO, dict[str, Decimal], UomDTO | None]
-    ] = []
-    for line in merged.values():
-        uom = uoms_by_id.get(line['uom_id']) if line['uom_id'] else None
-        qty = _round_shopping_qty(line['quantity'], uom)
-        if qty <= 0:
-            # A line that rounds to the unit's zero says "buy nothing" —
-            # there is nothing to buy. Skipping it keeps one unmeasurable
-            # ingredient from failing the whole recipe's list.
-            continue
-        items.append(
-            (
-                ShoppingListItemCreateDTO(
-                    name=line['name'],
-                    quantity=qty,
-                    uom_id=line['uom_id'],
-                    notes=_recipe_note(line['recipes'], lang),
-                    note_data=_recipe_note_data(line['recipes']),
-                    source='recipe',
-                ),
-                line['by_recipe'],
-                uom,
-            )
-        )
-
     lines_by_key: dict[tuple[str, UUID | None], list[ShoppingListItemDTO]] = {}
     for existing in existing_items:
         lines_by_key.setdefault(
@@ -308,16 +359,19 @@ async def add_recipes_to_shopping_list(
     # nothing and said "Added 0 items", which reads as "nothing was
     # missing" or "it failed" — the count lets the screen say which.
     already_listed = 0
-    for item, by_recipe, uom in items:
-        lines = lines_by_key.get((item.name.strip().lower(), item.uom_id), [])
+    for key, wanted in merged.items():
+        uom = uoms_by_id.get(wanted['uom_id']) if wanted['uom_id'] else None
+        # A line that rounds to the unit's zero says "buy nothing" — there
+        # is nothing to buy (``none``). Skipping it keeps one unmeasurable
+        # ingredient from failing the whole recipe's list.
         outcome, placed = await _put_on_list(
-            db, org_id, list_id, item, by_recipe, uom, lines, lang
+            db, org_id, list_id, wanted, uom, lines_by_key.get(key, []), lang
         )
-        if outcome == 'new':
+        if outcome == 'new' and placed is not None:
             new_items.append(placed)
-        elif outcome == 'raised':
+        elif outcome == 'raised' and placed is not None:
             raised_items.append(placed)
-        else:
+        elif outcome == 'listed':
             already_listed += 1
     added_items = await shopping_lists_api.add_items_async(
         db, list_id, new_items, org_id

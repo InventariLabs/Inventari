@@ -736,6 +736,7 @@
         "CONFIRMED": "Confirmed",
         "COMPLETED": "Completed",
         "CANCELLED": "Cancelled",
+        "REVERSED": "Undone",
         "PENDING": "Pending",
         "IN_PROGRESS": "In Progress",
         "APPROVED": "Approved",
