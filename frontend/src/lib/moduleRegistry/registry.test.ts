@@ -103,6 +103,34 @@ describe("ModuleRegistry.warnOrphanedNav", () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
+  it("stays quiet about a nav item whose module registered earlier but is now switched off", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const name = unique("gatednav");
+    const guest = unique("guestnav");
+
+    moduleRegistry.register({
+      name,
+      routes: [{ path: "/things", component: Page }],
+      moduleNav: {
+        basePath: "/things",
+        items: [
+          {
+            path: "/things/guest",
+            labelKey: "x",
+            icon: Home,
+            requiresModules: [guest],
+          },
+        ],
+      },
+    });
+    // The registry keeps what it once loaded; only the names handed to the
+    // check say what is enabled now.
+    moduleRegistry.register({ name: guest, routes: [] });
+    moduleRegistry.warnOrphanedNav([name]);
+
+    expect(warn).not.toHaveBeenCalled();
+  });
+
   it("warns again once the module a nav item needs is on but supplies no route", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const name = unique("gatednav");
