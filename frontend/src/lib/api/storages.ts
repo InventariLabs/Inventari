@@ -224,11 +224,17 @@ export const storagesApi = {
 
   getItems: async (
     id: string,
-    { includeInside = false }: { includeInside?: boolean } = {},
+    {
+      includeInside = false,
+      excludeModuleContexts = false,
+    }: { includeInside?: boolean; excludeModuleContexts?: boolean } = {},
   ): Promise<Item[]> => {
+    const params: Record<string, boolean> = {};
+    if (includeInside) params.include_inside = true;
+    if (excludeModuleContexts) params.exclude_module_contexts = true;
     return getEveryPage<Item>(
       `/locations/${id}/items`,
-      includeInside ? { include_inside: true } : undefined,
+      Object.keys(params).length > 0 ? params : undefined,
     );
   },
 

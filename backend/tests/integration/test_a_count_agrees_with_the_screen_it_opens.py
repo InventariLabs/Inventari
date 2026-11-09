@@ -23,9 +23,12 @@ import pytest
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
+from app.core.module_scope import get_claimed_context_tags
 from app.core.open_package import OPENED_KEY
+from app.models.category import Category
 from app.models.item import Item
 from app.models.product_template import ProductTemplate
+from app.models.storage_location import StorageLocation
 from app.models.user import User
 from app.services.items.low_stock import claimed_tags_for, low_stock_template_ids
 from app.services.token_service import create_access_token
@@ -257,6 +260,53 @@ def test_a_place_counts_the_records_its_products_tab_lists(
             read(path, limit=1, include_inside=True)['total']
             == row['subtree_items_count']
         ), row['name']
+
+
+@pytest.mark.parametrize('hide_module_data', [False, True])
+def test_a_place_holding_a_module_record_counts_what_its_tab_lists(
+    read, sandbox, db_session: Session, hide_module_data: bool
+) -> None:
+    """An untagged place that holds one record of a module, read both ways.
+
+    The organization hiding module data drops the record from the counts of
+    the tree and of the place cards; the Products tab of the place has to
+    drop it as well, or the card says two while the tab lists three.
+    """
+    org_id = sandbox[0]
+    module_record = db_session.scalars(
+        select(Item)
+        .join(Category, Item.category_id == Category.id)
+        .where(
+            Item.organization_id == org_id,
+            Item.is_deleted.is_(False),
+            Item.storage_location_id.is_not(None),
+            Category.context_tag.in_(get_claimed_context_tags()),
+        )
+    ).first()
+    assert module_record is not None, 'the seed has to keep a module record'
+    # The record stands where it is; the place loses its module tag, so it is
+    # an ordinary place holding a module's record.
+    place = db_session.get(StorageLocation, module_record.storage_location_id)
+    assert place is not None
+    place.context_tag = None
+    db_session.commit()
+
+    scope = {'exclude_module_contexts': hide_module_data}
+    row = next(
+        each
+        for each in _flatten(read('/locations/tree', counts=True, **scope))
+        if each['id'] == str(place.id)
+    )
+    assert (
+        read(f'/locations/{place.id}/items', limit=1, **scope)['total']
+        == row['items_count']
+    )
+    assert (
+        read(f'/locations/{place.id}/items', limit=1, include_inside=True, **scope)[
+            'total'
+        ]
+        == row['subtree_items_count']
+    )
 
 
 def test_an_equipment_location_row_counts_the_assets_its_link_opens(read) -> None:

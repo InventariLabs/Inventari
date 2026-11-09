@@ -29,6 +29,8 @@ interface StorageProductsTabProps {
   summary: StorageLocationSummary;
   isArchived: boolean;
   canWriteItems: boolean;
+  /** Leave out the records of a module, as the counts next to it do. */
+  excludeModuleContexts?: boolean;
 }
 
 function InsideNote({ summary }: { summary: StorageLocationSummary }) {
@@ -56,6 +58,7 @@ export function StorageProductsTab({
   summary,
   isArchived,
   canWriteItems,
+  excludeModuleContexts = false,
 }: StorageProductsTabProps) {
   const { t } = useTranslation([
     "locations",
@@ -78,7 +81,7 @@ export function StorageProductsTab({
     isError,
     error,
     refetch,
-  } = useStorageItems(storage.id, includeInside);
+  } = useStorageItems(storage.id, includeInside, excludeModuleContexts);
   // Ticking the box keeps the place's own rows up while the wider answer is
   // on its way. They are not the list the box asked for, so the tab says it
   // is still reading rather than show part of the list as the whole of it.

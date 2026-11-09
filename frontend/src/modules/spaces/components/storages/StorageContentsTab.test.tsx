@@ -121,7 +121,7 @@ describe("StorageContentsTab", () => {
       await screen.findByText("Nothing inside this location"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Its 4 products are on the Products tab."),
+      screen.getByText("Its 4 records are on the Products tab."),
     ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: "Show products" }),
@@ -137,9 +137,9 @@ describe("StorageContentsTab", () => {
       await screen.findByText("Nothing inside this location"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("It holds no products and has no locations inside."),
+      screen.getByText("It holds no records and has no locations inside."),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/0 products/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/0 records/)).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Show products" }),
     ).not.toBeInTheDocument();

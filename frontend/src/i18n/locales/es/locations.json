@@ -271,12 +271,14 @@
     "archiveOrDelete": "Archivar o eliminar…"
   },
   "card": {
-    "unit_one": "producto",
-    "unit_other": "productos"
+    "unit_one": "registro",
+    "unit_other": "registros"
   },
   "counts": {
     "inSublocations_one": "{{count}} en sububicaciones",
-    "inSublocations_other": "{{count}} en sububicaciones"
+    "inSublocations_other": "{{count}} en sububicaciones",
+    "recordsInside_one": "{{count}} registro aquí y en sububicaciones",
+    "recordsInside_other": "{{count}} registros aquí y en sububicaciones"
   },
   "stats": {},
   "storageNotFound": "Ubicación no encontrada",
@@ -348,9 +350,9 @@
   },
   "contents": {
     "emptyTitle": "No hay nada dentro de esta ubicación",
-    "emptyDescriptionNone": "No contiene productos ni ubicaciones.",
-    "emptyDescription_one": "Su {{count}} producto está en la pestaña Productos.",
-    "emptyDescription_other": "Sus {{count}} productos están en la pestaña Productos.",
+    "emptyDescriptionNone": "No contiene registros ni ubicaciones.",
+    "emptyDescription_one": "Su {{count}} registro está en la pestaña Productos.",
+    "emptyDescription_other": "Sus {{count}} registros están en la pestaña Productos.",
     "showProducts": "Mostrar productos",
     "selected_one": "{{count}} ubicación seleccionada",
     "selected_other": "{{count}} ubicaciones seleccionadas",
@@ -361,7 +363,7 @@
     "code": "Código",
     "type": "Tipo",
     "inside": "Dentro",
-    "products": "Productos"
+    "products": "Registros"
   },
   "products": {
     "includeInside": "Incluir ubicaciones dentro",
