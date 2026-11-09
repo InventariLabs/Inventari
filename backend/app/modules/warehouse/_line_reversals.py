@@ -26,7 +26,7 @@ from collections.abc import Sequence
 from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import case, func, select
+from sqlalchemy import case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import StockMoveReferenceType
@@ -136,26 +136,25 @@ async def stock_the_document_posted_was_used_async(
     if not posted:
         return False
 
-    # Documents that restate the original: its corrections and returns. Their
-    # movements are the partial reversal the line's remainder already knows
-    # about, not stock something else used.
-    restatements = set(
-        (
-            await db.execute(
-                select(DocumentRelation.source_document_id)
-                .join(Document, Document.id == DocumentRelation.source_document_id)
-                .where(
-                    Document.organization_id == organization_id,
-                    DocumentRelation.target_document_id == original.id,
-                    DocumentRelation.relation_type.in_(
-                        ('corrects', 'returns', 'reverses')
-                    ),
-                )
-            )
+    # Documents that restate the original: its corrections, reversals and
+    # returns. Their movements are the partial reversal the line's remainder
+    # already knows about, not stock something else used. Corrections and
+    # reversals are stored restating -> original, a return original ->
+    # return, so the relation is read from either end and the original is
+    # the one end that is not the answer.
+    relations = await db.execute(
+        select(DocumentRelation.source_document_id, DocumentRelation.target_document_id)
+        .join(Document, Document.id == DocumentRelation.source_document_id)
+        .where(
+            Document.organization_id == organization_id,
+            or_(
+                DocumentRelation.source_document_id == original.id,
+                DocumentRelation.target_document_id == original.id,
+            ),
+            DocumentRelation.relation_type.in_(('corrects', 'returns', 'reverses')),
         )
-        .scalars()
-        .all()
     )
+    restatements = {document_id for pair in relations.all() for document_id in pair}
     restatements.add(original.id)
 
     return await core_api.stock_moves.any_departure_from_groups_async(
