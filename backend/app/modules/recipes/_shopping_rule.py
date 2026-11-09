@@ -9,11 +9,12 @@ never read the organization's "Always at home" exclusions, which the meal
 plan had honoured all along. The meal plan, in turn, had no way to say
 what it left out.
 
-This module holds the shared half: the exclusions, the predicate that
-decides whether an ingredient gets a line at all, and the arithmetic that
-decides how much. Each route keeps its own way of reading the shelf — the
-recipe screen asks the availability checker, the meal plan weighs quants —
-but neither may invent a second answer to what the rule covers.
+This module holds the shared half: the exclusions and the arithmetic that
+decides how much — what the recipes need together, less what the shelf
+covers, so an ingredient gets a line exactly when that is above zero. Each
+route keeps its own way of reading the shelf — the recipe screen asks the
+availability checker, the meal plan weighs quants — but neither may invent a
+second answer to what the rule covers.
 """
 
 from __future__ import annotations
@@ -58,28 +59,6 @@ async def load_exclusions(db: AsyncSession, org_id: UUID) -> ShoppingExclusions:
     return ShoppingExclusions(
         names=frozenset(row[0] for row in rows),
         template_ids=frozenset(row[1] for row in rows if row[1] is not None),
-    )
-
-
-def needs_buying(status: str, comparable: bool) -> bool:
-    """Whether an ingredient's availability leaves it on the list.
-
-    "Not comparable" is not "nothing missing": with the recipe's measure and
-    the shelf's on different scales, nobody can say the stock covers it.
-    "Similar" — goods found by the ingredient's name rather than a link —
-    covers it like any other stock, the way the meal plan has always
-    deducted it and the recipe screen's counters count it as held. Buying
-    it in full put rice on the list under a counter reading "Missing 1",
-    and bought more the more of it the shelf held: 150 g of a name-matched
-    200 g was short by 50 g, while a whole kilo bought all 200 g. The recipe
-    screen's button reads this same predicate, so the door and the list
-    behind it cannot disagree.
-    """
-    return not comparable or status in (
-        'missing',
-        'insufficient',
-        'incomparable',
-        'unknown',
     )
 
 

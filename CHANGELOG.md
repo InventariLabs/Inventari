@@ -318,15 +318,23 @@ says what the release does rather than what changed since them.
   and the rest is added as a new line; a line is never lowered.
 - A shopping list now tops up a line that is already on it, instead of treating
   the line as covered whatever its quantity. A recipe added to a list that
-  carries its ingredient raises the line by what that recipe needs (recipes the
-  line was already made for add nothing, so the same recipe again changes
-  nothing), and a production run's shortage raises the listed line when the run
-  needs more. A line already ticked off keeps its quantity and the rest becomes
-  a new line. A line of the same product in another unit counts as its amount
-  in the unit asked for, so 500 g of plums already listed leaves 3.5 kg of a
-  4 kg production shortage to buy; it used to count as 500 kg, and nothing was
-  added. A line in a unit that does not convert, such as pieces against
-  kilograms, covers nothing.
+  carries its ingredient raises the line by what that recipe needs; a recipe the
+  line was already made for raises it by what it now needs beyond that — more
+  servings, or less of the goods left on the shelf — and the same recipe at the
+  same need changes nothing. A production run's shortage raises the listed line
+  when the run needs more. A line already ticked off keeps its quantity and the
+  rest becomes a new line. A line of the same product in another unit counts as
+  its amount in the unit asked for, so 500 g of plums already listed leaves
+  3.5 kg of a 4 kg production shortage to buy; it used to count as 500 kg, and
+  nothing was added. A line in a unit that does not convert, such as pieces
+  against kilograms, covers nothing.
+- Recipes added to a shopping list together subtract the stock on the shelf
+  from what they need between them, as the meal plan does. Each recipe was
+  weighed against the whole shelf on its own, so 250 g of flour covered both
+  200 g for bread and 300 g for a cake, and the list asked for 50 g where 250 g
+  were missing. When the recipes add nothing because the list already asks for
+  all of it, the list's "From recipes" sheet says so instead of "Added 0
+  ingredients", as the recipe screen does.
 - A custom purchase order template now prints the values its editor lists for
   `{{po_number}}`, `{{po_date}}`, `{{po_status}}`, `{{vendor_name}}`,
   `{{vendor_tax_id}}`, `{{vendor_address}}`, `{{lines_count}}` and
