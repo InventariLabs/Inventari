@@ -240,6 +240,12 @@ export function confirmDialogMessage(
     // approval, the same press only sends it there — say which one this is
     // before the click, not after it.
     if (facts.required) {
+      // Nobody can give the approval yet, so the press is refused outright,
+      // exactly as the confirm dialog says; promising the queue here was a
+      // promise the server disproved.
+      if (!facts.workflowConfigured) {
+        return t("confirmDialog.confirmMessageNoWorkflow");
+      }
       return t("confirmDialog.postNowApprovalMessage");
     }
     // The rule answers for the type and the value it can weigh; an

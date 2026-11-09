@@ -66,6 +66,42 @@ describe("DocumentDetailPage.confirmDialogMessage", () => {
     expect(message).toMatch(/refused/i);
   });
 
+  it("the one-step press with approval required and no workflow says it will be refused", () => {
+    const message = confirmDialogMessage(
+      "postNow",
+      doc,
+      {
+        required: true,
+        workflowConfigured: false,
+        hasThreshold: false,
+        approvalsEnabled: true,
+      },
+      t,
+    );
+
+    // The header button read "Send for approval" and the dialog promised the
+    // queue, while the server refuses the press until someone can approve.
+    expect(message).not.toMatch(/approval queue/i);
+    expect(message).toMatch(/ask your administrator/i);
+    expect(message).toMatch(/refused/i);
+  });
+
+  it("the one-step press with approval required and a workflow still promises the queue", () => {
+    const message = confirmDialogMessage(
+      "postNow",
+      doc,
+      {
+        required: true,
+        workflowConfigured: true,
+        hasThreshold: false,
+        approvalsEnabled: true,
+      },
+      t,
+    );
+
+    expect(message).toMatch(/approval queue/i);
+  });
+
   it("the non-approve case promises neither a queue nor a workflow", () => {
     const message = confirmDialogMessage(
       "confirm",
