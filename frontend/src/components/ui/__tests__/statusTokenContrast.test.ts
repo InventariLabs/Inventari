@@ -15,7 +15,11 @@ import { describe, it, expect } from "vitest";
 
 // `import.meta.url` is an http URL under the jsdom environment; vitest runs
 // with the frontend root as cwd.
-const CSS = readFileSync(resolve(process.cwd(), "src/index.css"), "utf8");
+// Comments stripped: a token or rule that is commented out must not answer.
+const CSS = readFileSync(
+  resolve(process.cwd(), "src/index.css"),
+  "utf8",
+).replace(/\/\*[\s\S]*?\*\//g, "");
 
 function readBlock(selector: string): Record<string, string> {
   // The blocks are `:root {` / `.dark {` at the start of a line; stop at the
