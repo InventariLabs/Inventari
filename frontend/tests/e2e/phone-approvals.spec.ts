@@ -79,7 +79,7 @@ test.describe("Phone approval lists — the first record is above the fold", () 
     {
       name: "warehouse approvals",
       path: "/warehouse/approvals",
-      record: (page) => page.getByText(/^INT\/\d{4}(?:\/\d{2})?\/\d+$/).first(),
+      record: (page) => page.getByText(/^[A-Z]+\/\d{4}(?:\/\d{2})?\/\d+$/).first(),
     },
     {
       name: "approval workflows",
