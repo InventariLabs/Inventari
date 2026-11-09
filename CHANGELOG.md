@@ -12,6 +12,17 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Added
+
+- A new community module package can be handed to an AI coding agent.
+  `module new-community` now writes an `AGENTS.md` into the package — what a
+  module may import, the five maintained languages, migrations the package
+  owns, the purpose card, tests and the command that checks the package before
+  install, with links to the full guides at the platform's version — and a
+  `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
+  building a module with an agent: what to give it, which checks refuse its
+  mistakes and how to check the result before installing it.
+
 ## v0.12.0 - 2026-11-09
 
 The first release after the public 0.11.0, and the first under a fixed rhythm:
@@ -173,14 +184,6 @@ Not marked **Breaking**, but worth a look before you update:
   stock on the shelf from what they need between them, not each against the
   whole shelf, and a "From recipes" sheet that adds nothing because the list
   already asks for all of it says so.
-- A new community module package can be handed to an AI coding agent.
-  `module new-community` now writes an `AGENTS.md` into the package — what a
-  module may import, the five maintained languages, migrations the package
-  owns, the purpose card, tests and the command that checks the package before
-  install, with links to the full guides at the platform's version — and a
-  `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
-  building a module with an agent: what to give it, which checks refuse its
-  mistakes and how to check the result before installing it.
 - Asking for an approval now warns about a later stage nobody could decide,
   not only the first. The dialog behind Confirm and Send for approval on a
   document, and the one on a purchase order, name the first stage that has no
