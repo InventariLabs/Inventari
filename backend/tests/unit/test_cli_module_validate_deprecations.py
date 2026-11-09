@@ -14,6 +14,7 @@ import pytest
 from typer.testing import CliRunner
 
 from app.cli.module_validator import validate_deprecated_core_api
+from app.core._core_api_deprecations import REMOVAL_RELEASE
 from manage import app
 
 runner = CliRunner()
@@ -84,7 +85,7 @@ class TestDeprecatedCoreApiScan:
 
         assert len(findings) == 1
         assert 'core_api.file_storage.save' in findings[0]
-        assert 'removal in release 0.13.0' in findings[0]
+        assert f'removal in release {REMOVAL_RELEASE}' in findings[0]
         assert 'CoreFileStorageAPI.save_for_org_async' in findings[0]
         assert 'store.py:2' in findings[0]
 
@@ -157,4 +158,4 @@ class TestDeprecatedCoreApiScan:
 
         assert result.exit_code == 0, result.output
         assert 'deprecated core_api.file_storage.exists' in result.output
-        assert 'removal in release 0.13.0' in result.output
+        assert f'removal in release {REMOVAL_RELEASE}' in result.output
