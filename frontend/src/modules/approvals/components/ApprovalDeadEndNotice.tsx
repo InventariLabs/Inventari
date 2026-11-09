@@ -76,6 +76,39 @@ export function ApprovalDeadEndNotice(props: ApprovalDeadEndNoticeProps) {
   return <DeadEnd {...props} />;
 }
 
+/**
+ * The people a named dead end blames: the requester is not among them.
+ *
+ * The server already left the requester out of what it reports — the decision
+ * door refuses a self-decision — so a stage naming them beside somebody who
+ * cannot see approvals must not call them unable to decide, nor advise access
+ * they already hold. With the opt-in on, an administrator requester counts and
+ * the request is solvable, so no banner reaches here at all.
+ */
+function blamedApprovers(
+  reason: string | null | undefined,
+  request: DeadEndRequest | undefined,
+  stage: { approver_user_ids?: string[] } | undefined,
+): { ids: string[]; requesterIsNamed: boolean } {
+  const named = stage?.approver_user_ids ?? [];
+  const requesterIsNamed =
+    reason === NAMED && !!request && named.includes(request.created_by);
+  return {
+    ids: requesterIsNamed
+      ? named.filter((id) => id !== request?.created_by)
+      : named,
+    requesterIsNamed,
+  };
+}
+
+/** Whether the self-approval opt-in is a way out of this wait. */
+function offersSelfApproval(
+  reason: string | null | undefined,
+  requesterIsNamed: boolean,
+): boolean {
+  return reason === ONLY_REQUESTER || (reason === NAMED && requesterIsNamed);
+}
+
 function DeadEnd({
   subject,
   request,
@@ -102,7 +135,12 @@ function DeadEnd({
   const memberName = new Map(
     (members ?? []).map((m) => [m.id, m.full_name ?? m.email]),
   );
-  const names = (stage?.approver_user_ids ?? [])
+  const { ids: blamedIds, requesterIsNamed } = blamedApprovers(
+    reason,
+    request,
+    stage,
+  );
+  const names = blamedIds
     .map((id) => memberName.get(id))
     .filter((name): name is string => !!name)
     .join(", ");
@@ -143,7 +181,7 @@ function DeadEnd({
           </>,
         );
       }
-      if (reason === ONLY_REQUESTER) {
+      if (offersSelfApproval(reason, requesterIsNamed)) {
         steps.push(
           <>
             {t("request.deadEndStepAllowSelf")}{" "}
