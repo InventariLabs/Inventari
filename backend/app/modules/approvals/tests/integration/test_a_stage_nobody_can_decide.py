@@ -255,6 +255,104 @@ class TestANamedStageNobodyCanDecide:
 
 
 @pytest.mark.integration
+class TestTheRequesterNamedBesideSomeoneWhoCannotDecide:
+    """A stage naming the asker beside people without access is a dead end.
+
+    The door refuses the asker a self-decision, so their own name on the stage
+    is no authority: only the other names count, unless the organization lets
+    admins decide their own requests.
+    """
+
+    @pytest.fixture
+    def h(self, db_session: Session) -> ModuleTestHelper:
+        return ModuleTestHelper(db_session)
+
+    @pytest.fixture
+    def org(self, h: ModuleTestHelper) -> Organization:
+        return h.create_org('Requester Named Org', ['core', 'approvals'])
+
+    @pytest.fixture
+    def boss(self, h: ModuleTestHelper, org: Organization) -> User:
+        return h.create_user(org, email='boss@example.com', role='admin')
+
+    @pytest.fixture
+    def boss_headers(self, h: ModuleTestHelper, boss: User) -> dict[str, str]:
+        return h.get_auth_headers(boss)
+
+    def _raise_request(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        approvers: list[User],
+    ) -> dict[str, object]:
+        stages = [
+            {
+                'order': 1,
+                'role': 'manager',
+                'label': 'Peer review',
+                'approver_user_ids': [str(user.id) for user in approvers],
+            }
+        ]
+        created = client.post(
+            f'{BASE}/workflows',
+            headers=headers,
+            json=_workflow_payload(stages, allow_undecidable=True),
+        )
+        assert created.status_code == status.HTTP_201_CREATED, created.text
+        requested = client.post(
+            f'{BASE}/requests',
+            headers=headers,
+            json={'target_type': 'document', 'target_id': str(uuid.uuid4())},
+        )
+        assert requested.status_code == status.HTTP_201_CREATED, requested.text
+        enriched = client.get(
+            f'{BASE}/requests/{requested.json()["id"]}', headers=headers
+        )
+        assert enriched.status_code == status.HTTP_200_OK, enriched.text
+        return dict(enriched.json())
+
+    def test_the_request_says_nobody_else_can_decide_it(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        boss: User,
+        boss_headers: dict[str, str],
+    ) -> None:
+        blind = h.create_user(org, email='blind@example.com', role='user')
+        enriched = self._raise_request(client, boss_headers, [boss, blind])
+        assert enriched['solvable'] is False
+        assert enriched['undecidable_reason'] == 'named_approvers_cannot_decide'
+
+    def test_the_organizations_consent_makes_the_requesters_name_count(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        boss: User,
+        boss_headers: dict[str, str],
+    ) -> None:
+        blind = h.create_user(org, email='blind@example.com', role='user')
+        h.set_module_settings(org, 'approvals', {'allow_admin_self_approve': True})
+        enriched = self._raise_request(client, boss_headers, [boss, blind])
+        assert enriched['solvable'] is True
+        assert enriched['undecidable_reason'] is None
+
+    def test_a_second_name_who_can_decide_keeps_the_stage_decidable(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        org: Organization,
+        boss: User,
+        boss_headers: dict[str, str],
+    ) -> None:
+        peer = h.create_user(org, email='peer@example.com', role='manager')
+        enriched = self._raise_request(client, boss_headers, [boss, peer])
+        assert enriched['solvable'] is True
+        assert enriched['undecidable_reason'] is None
+
+
+@pytest.mark.integration
 class TestOnlyTheRequesterHoldsTheGrant:
     """The third dead end: an open stage whose only decider is the asker.
 
