@@ -372,7 +372,11 @@ describe("AppShell — the root clips the side without becoming a scroll contain
  * click.
  */
 describe("AppShell — the notification strip stays under the top bar", () => {
-  const INDEX_CSS = readFileSync(join(__dirname, "..", "index.css"), "utf8");
+  // Comments stripped: a token or rule that is commented out must not answer.
+  const INDEX_CSS = readFileSync(
+    join(__dirname, "..", "index.css"),
+    "utf8",
+  ).replace(/\/\*[\s\S]*?\*\//g, "");
   const tier = (token: string) =>
     Number(new RegExp(`${token}:\\s*(\\d+)`).exec(INDEX_CSS)?.[1]);
   const tierOf = (el: Element) => {
