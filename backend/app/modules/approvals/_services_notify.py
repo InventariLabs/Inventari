@@ -580,14 +580,14 @@ _CLOSED_TITLE: dict[str, str] = {
 _CLOSURE_CONTENT: dict[str, dict[str, str]] = {
     'workflow deactivated': {
         'en': 'The approval workflow was deactivated, so nothing is waiting for a decision any more.',
-        'pl': 'Ścieżka akceptacji została wyłączona, więc nic już nie czeka na decyzję.',
+        'pl': 'Przepływ akceptacji został wyłączony, więc nic już nie czeka na decyzję.',
         'de': 'Der Genehmigungsablauf wurde deaktiviert, es wartet nichts mehr auf eine Entscheidung.',
         'fr': "Le circuit d'approbation a été désactivé : plus rien n'attend de décision.",
         'es': 'El flujo de aprobación se desactivó, así que nada espera una decisión.',
     },
     'workflow deleted': {
         'en': 'The approval workflow was deleted, so nothing is waiting for a decision any more.',
-        'pl': 'Ścieżka akceptacji została usunięta, więc nic już nie czeka na decyzję.',
+        'pl': 'Przepływ akceptacji został usunięty, więc nic już nie czeka na decyzję.',
         'de': 'Der Genehmigungsablauf wurde gelöscht, es wartet nichts mehr auf eine Entscheidung.',
         'fr': "Le circuit d'approbation a été supprimé : plus rien n'attend de décision.",
         'es': 'El flujo de aprobación se eliminó, así que nada espera una decisión.',
@@ -618,7 +618,7 @@ _STILL_REQUIRED_CONTENT: dict[str, str] = {
         'Twój wniosek został zamknięty, ale to nie jest akceptacja. '
         'Akceptacji nadal wymaga: {settings}. Pozycja zatrzyma się przy '
         'zakończeniu, dopóki ustawienie nie zostanie wyczyszczone lub nie '
-        'będzie znów aktywnej ścieżki.'
+        'będzie znów aktywnego przepływu.'
     ),
     'de': (
         'Ihr Antrag wurde geschlossen, aber das ist keine Genehmigung. '
