@@ -820,13 +820,13 @@ PYTEST_LOG := /tmp/inventari-pytest.$(if $(COMPOSE_PROJECT_NAME),$(COMPOSE_PROJE
 # log. The run goes to a file so the recipe can read the exit code and the
 # summary line after the fact — a pipe hands the caller tee's exit code, which
 # is how a run carrying errors was ever pushed as green. The log is removed
-# whatever the verdict; the checker is addressed from $(CURDIR) so the recipe
-# survives `make -C`.
+# whatever the verdict. Recipes run from the Makefile's directory, so the
+# checker's relative path holds under `make -C`.
 define GATED_PYTEST
 $(BACKEND_EXEC) uv run pytest $(1) > $(PYTEST_LOG) 2>&1; \
 rc=$$?; \
 $(2) $(PYTEST_LOG); \
-python3 $(CURDIR)/backend/scripts/check_pytest_summary_errors.py $(PYTEST_LOG); \
+python3 backend/scripts/check_pytest_summary_errors.py $(PYTEST_LOG); \
 summary=$$?; \
 rm -f $(PYTEST_LOG); \
 if [ $$summary -ne 0 ]; then exit 1; fi; \
