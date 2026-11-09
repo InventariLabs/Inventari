@@ -11,6 +11,7 @@ import { useAuthStore } from "@/store/authStore";
 import OnboardingPage from "./OnboardingPage";
 import { OnboardingGuard } from "../components/OnboardingGuard";
 import { onePage } from "@/test/mocks/page";
+import { toast } from "sonner";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn(), loading: vi.fn() },
@@ -1041,6 +1042,51 @@ describe("OnboardingPage — recovering and leaving", () => {
     );
 
     expect(logout).toHaveBeenCalledTimes(1);
+  });
+
+  it("signs the reader out when the session ends while they are on this screen", async () => {
+    asAdmin();
+    const logout = vi.fn().mockResolvedValue(undefined);
+    useAuthStore.setState({ logout });
+    server.use(
+      http.get("*/api/v1/profiles", () => HttpResponse.json(onePage(profiles))),
+      http.get("*/api/v1/organizations/my", () =>
+        HttpResponse.json({ id: "org-1", onboarding_completed: false }),
+      ),
+    );
+    renderAt("/onboarding");
+    await screen.findByRole("button", { name: /Food & Home/i });
+
+    window.dispatchEvent(new CustomEvent("auth:logout"));
+
+    expect(logout).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call an ended session a profile that failed to apply", async () => {
+    asAdmin();
+    useAuthStore.setState({ logout: vi.fn().mockResolvedValue(undefined) });
+    server.use(
+      http.get("*/api/v1/profiles", () => HttpResponse.json(onePage(profiles))),
+      http.get("*/api/v1/organizations/my", () =>
+        HttpResponse.json({ id: "org-1", onboarding_completed: false }),
+      ),
+      http.post("*/api/v1/onboarding/setup", () =>
+        HttpResponse.json({ detail: "expired" }, { status: 401 }),
+      ),
+      http.post("*/api/v1/auth/refresh", () =>
+        HttpResponse.json({ detail: "expired" }, { status: 401 }),
+      ),
+    );
+    renderAt("/onboarding");
+    await userEvent.click(
+      await screen.findByRole("button", { name: /Food & Home/i }),
+    );
+    await finishSetup();
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(toast.error).not.toHaveBeenCalledWith(
+      expect.stringMatching(/failed to apply/i),
+    );
   });
 
   it("signs out from the screen that says setup is not theirs to do", async () => {

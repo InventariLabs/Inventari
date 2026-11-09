@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logging import get_logger
 from app.core.public_api import core_api
 
+from ._assets_service import get_asset_async
 from ._holder import holder_of_parts
 from ._schemas_equipment import AssetTimelineEvent, AssetTimelineResponse
 from .status_machine import resolve_previous_status
@@ -67,7 +68,7 @@ async def get_asset_timeline_async(
     # The timeline is part of the card, and the card outlives the archive:
     # a soft-deleted asset is still linked from history and still renders
     # with Restore/Purge, so its record of what happened must answer too.
-    item = await core_api.items.get_any_async(db, organization_id, item_id)
+    item = await get_asset_async(db, organization_id, item_id, include_archived=True)
     if item is None:
         from app.core.exceptions import NotFoundException
         from app.i18n.service import get_current_lang

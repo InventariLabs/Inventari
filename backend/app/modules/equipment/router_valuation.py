@@ -56,6 +56,15 @@ async def asset_valuation(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> Any:
+    """One asset's purchase price and book value, for its own card.
+
+    Not held to the finance roles of the fleet total above, deliberately: the
+    total is the organization's finances added up, while one asset's price is
+    a fact on its card — the Info tab prints it from the record itself to
+    whoever reads the register, and the overview says a member still sees the
+    value of one asset on its own page. What bounds this read is the asset:
+    a record the register does not list is 404 here.
+    """
     org_id = require_org(current_user)
     from .depreciation_service import get_asset_valuation_async
 

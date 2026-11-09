@@ -2,6 +2,7 @@
 Unit tests for depreciation_service async functions using mock core_api.
 """
 
+from collections.abc import Iterator
 from datetime import date
 from decimal import Decimal
 from typing import Any
@@ -10,12 +11,23 @@ from uuid import uuid4
 
 import pytest
 
+from app.modules.equipment import depreciation_service
 from app.modules.equipment.depreciation_service import (
     _MAX_EQUIPMENT_ITEMS,
     ZERO,
     get_asset_valuation_async,
     get_fleet_valuation_async,
 )
+
+from ._mocked_asset_read import asset_read_through
+
+
+@pytest.fixture(autouse=True)
+def _asset_read_through_the_mock() -> Iterator[None]:
+    with asset_read_through(
+        depreciation_service, lambda: depreciation_service.core_api
+    ):
+        yield
 
 
 def _mock_item(

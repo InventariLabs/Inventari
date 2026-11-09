@@ -565,12 +565,12 @@ class TestAssignmentFlow:
     def test_item_assignment_history_nonexistent_item(
         self, client: TestClient, eq_auth_headers: dict[str, str]
     ) -> None:
-        """Assignment history for non-existent item → empty or 404."""
+        """Assignment history for an id the register does not know → 404."""
         r = client.get(
             f'{EQUIPMENT_URL}/assignments/item/{uuid.uuid4()}',
             headers=eq_auth_headers,
         )
-        assert r.status_code == 200  # Returns empty list
+        assert r.status_code == 404
 
 
 # ══════════════════════════════════════════════════════════════════════════════

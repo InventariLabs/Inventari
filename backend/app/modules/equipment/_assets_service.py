@@ -17,9 +17,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import ColumnElement
 
+from app.core.contracts import ItemDTO
 from app.core.db_utils import escape_ilike, paginate_async
 from app.core.module_ownership import claimed_by_module, standing_location
 from app.core.module_scope import get_context_tags_of
+from app.core.public_api import core_api
 from app.models.item import Item
 
 from ._holder import Holder, holder_of_assignment
@@ -245,3 +247,35 @@ async def list_equipment_assets_async(
                 assigned[assignment.item_id] = holder
 
     return items, total, assigned
+
+
+async def get_asset_async(
+    db: AsyncSession, org_id: UUID, item_id: UUID, *, include_archived: bool = False
+) -> ItemDTO | None:
+    """The record *item_id* names, when it is one of the register's assets.
+
+    Every route of the register that addresses one record by id reads it
+    here. They used to read it as any product of the organization, so a role
+    holding only ``equipment:read`` opened the valuation (name, serial,
+    purchase price), the papers, the histories and the approval state of an
+    ordinary product whose id it knew, and a retire or an archive sent here
+    wrote the register's status into a product or took it off the shelf. The
+    question is the list's own (:func:`claimed_by_module`): a record the
+    register does not list is one its routes do not know — ``None``, which
+    each caller answers with the 404 it gives an id that names nothing.
+
+    ``include_archived`` keeps an archived asset: the card's reads outlive
+    the archive, while a write about an asset in service asks for a live one.
+    """
+    claimed = await db.scalar(
+        select(Item.id).where(
+            Item.id == item_id,
+            Item.organization_id == org_id,
+            claimed_by_module('equipment', get_context_tags_of('equipment')),
+        )
+    )
+    if claimed is None:
+        return None
+    if include_archived:
+        return await core_api.items.get_any_async(db, org_id, item_id)
+    return await core_api.items.get_async(db, org_id, item_id)

@@ -11,6 +11,7 @@ location codes). The print agent's own routes keep ``printing:agent``.
 """
 
 import uuid
+from datetime import UTC, datetime
 from typing import cast
 
 import pytest
@@ -20,6 +21,7 @@ from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from app.core.testing import ModuleTestHelper
+from app.models.category import Category
 from app.models.label_pool import LabelPool
 from app.models.organization import Organization
 from app.models.role import Role, UserRole
@@ -85,6 +87,56 @@ def pool_label(h: ModuleTestHelper, org: Organization, admin: User) -> LabelPool
     h.db.add(label)
     h.db.commit()
     return label
+
+
+def _assigned_label(
+    h: ModuleTestHelper, org: Organization, admin: User, item_id: str
+) -> LabelPool:
+    label = LabelPool(
+        short_code=f'EQ-{uuid.uuid4().hex[:6]}',
+        organization_id=org.id,
+        created_by=admin.id,
+        item_id=uuid.UUID(item_id),
+        is_assigned=True,
+        assigned_at=datetime.now(UTC),
+    )
+    h.db.add(label)
+    h.db.commit()
+    return label
+
+
+@pytest.fixture
+def asset_label(
+    client: TestClient,
+    h: ModuleTestHelper,
+    org: Organization,
+    admin: User,
+    shelf: StorageLocation,
+) -> LabelPool:
+    """The label stuck on one of the equipment register's assets."""
+    category = Category(name='Laptops', organization_id=org.id, context_tag='equipment')
+    h.db.add(category)
+    h.db.commit()
+    created = client.post(
+        '/api/v1/items',
+        headers=h.get_auth_headers(admin),
+        json={
+            'name': 'Register laptop',
+            'location_id': str(shelf.id),
+            'category_id': str(category.id),
+            'quantity': 1,
+        },
+    )
+    assert created.status_code == status.HTTP_201_CREATED, created.text
+    return _assigned_label(h, org, admin, created.json()['id'])
+
+
+@pytest.fixture
+def product_label(
+    h: ModuleTestHelper, org: Organization, admin: User, product_id: str
+) -> LabelPool:
+    """The label of an ordinary product, which no module claims."""
+    return _assigned_label(h, org, admin, product_id)
 
 
 @pytest.fixture
@@ -319,11 +371,17 @@ class TestEveryScreenThatSendsALabelReachesTheQueue:
 
     @pytest.fixture
     def targets(
-        self, product_id: str, shelf: StorageLocation, pool_label: LabelPool
+        self,
+        product_id: str,
+        shelf: StorageLocation,
+        pool_label: LabelPool,
+        asset_label: LabelPool,
     ) -> dict[str, dict[str, list[str]]]:
         return {
             'pool label by code': {'short_codes': [pool_label.short_code]},
             'pool label by id': {'label_ids': [str(pool_label.id)]},
+            'asset label by code': {'short_codes': [asset_label.short_code]},
+            'asset label by id': {'label_ids': [str(asset_label.id)]},
             'product': {'item_ids': [product_id]},
             'shelf': {'location_ids': [str(shelf.id)]},
         }
@@ -341,10 +399,14 @@ class TestEveryScreenThatSendsALabelReachesTheQueue:
 
         answers = self._answers(client, headers, agent_id=agent_id, targets=targets)
 
+        # The register prints the labels of its own assets; a label nobody
+        # has assigned is the organization's pool, not the register's.
         assert answers == {
             'GET /agents': status.HTTP_200_OK,
-            'pool label by code': status.HTTP_201_CREATED,
-            'pool label by id': status.HTTP_201_CREATED,
+            'pool label by code': status.HTTP_400_BAD_REQUEST,
+            'pool label by id': status.HTTP_400_BAD_REQUEST,
+            'asset label by code': status.HTTP_201_CREATED,
+            'asset label by id': status.HTTP_201_CREATED,
             'product': status.HTTP_403_FORBIDDEN,
             'shelf': status.HTTP_403_FORBIDDEN,
         }
@@ -373,6 +435,8 @@ class TestEveryScreenThatSendsALabelReachesTheQueue:
             'GET /agents': status.HTTP_200_OK,
             'pool label by code': status.HTTP_403_FORBIDDEN,
             'pool label by id': status.HTTP_403_FORBIDDEN,
+            'asset label by code': status.HTTP_403_FORBIDDEN,
+            'asset label by id': status.HTTP_403_FORBIDDEN,
             'product': status.HTTP_403_FORBIDDEN,
             'shelf': status.HTTP_201_CREATED,
         }
@@ -394,9 +458,115 @@ class TestEveryScreenThatSendsALabelReachesTheQueue:
             'GET /agents': status.HTTP_200_OK,
             'pool label by code': status.HTTP_201_CREATED,
             'pool label by id': status.HTTP_201_CREATED,
+            'asset label by code': status.HTTP_201_CREATED,
+            'asset label by id': status.HTTP_201_CREATED,
             'product': status.HTTP_201_CREATED,
             'shelf': status.HTTP_403_FORBIDDEN,
         }
+
+
+class TestAnEquipmentReaderQueuesOnlyTheRegistersLabels:
+    """The register's read prints the labels of the register's records.
+
+    The queue admitted ``equipment:read`` for pool labels and resolved them
+    with no module bound, so a role holding only the register's read queued
+    a job carrying any product's name, or a label nobody had assigned. The
+    label sheet download had already learned the bound; the queue draws the
+    same labels now.
+    """
+
+    def _queue(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        agent_id: str,
+        target: dict[str, list[str]],
+    ) -> tuple[int, dict[str, object]]:
+        response = client.post(
+            f'{_BASE}/jobs', json={'agent_id': agent_id, **target}, headers=headers
+        )
+        return response.status_code, response.json()
+
+    def test_a_products_label_and_a_free_label_are_refused(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        db_session: Session,
+        org: Organization,
+        agent_id: str,
+        asset_label: LabelPool,
+        product_label: LabelPool,
+        pool_label: LabelPool,
+    ) -> None:
+        headers = _with_role(h, db_session, org, ['equipment:read'])
+
+        answers = {
+            name: self._queue(client, headers, agent_id, target)[0]
+            for name, target in {
+                'product label by code': {'short_codes': [product_label.short_code]},
+                'product label by id': {'label_ids': [str(product_label.id)]},
+                'free label by code': {'short_codes': [pool_label.short_code]},
+                'free label by id': {'label_ids': [str(pool_label.id)]},
+                'asset label by code': {'short_codes': [asset_label.short_code]},
+            }.items()
+        }
+
+        assert answers == {
+            'product label by code': status.HTTP_400_BAD_REQUEST,
+            'product label by id': status.HTTP_400_BAD_REQUEST,
+            'free label by code': status.HTTP_400_BAD_REQUEST,
+            'free label by id': status.HTTP_400_BAD_REQUEST,
+            'asset label by code': status.HTTP_201_CREATED,
+        }
+
+    def test_a_mixed_ask_queues_the_registers_label_alone(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        db_session: Session,
+        org: Organization,
+        agent_id: str,
+        asset_label: LabelPool,
+        product_label: LabelPool,
+        pool_label: LabelPool,
+    ) -> None:
+        headers = _with_role(h, db_session, org, ['equipment:read'])
+        codes = [
+            product_label.short_code,
+            asset_label.short_code,
+            pool_label.short_code,
+        ]
+
+        by_code = self._queue(client, headers, agent_id, {'short_codes': codes})
+        by_id = self._queue(
+            client,
+            headers,
+            agent_id,
+            {'label_ids': [str(product_label.id), str(asset_label.id)]},
+        )
+
+        for answer, body in (by_code, by_id):
+            assert answer == status.HTTP_201_CREATED, body
+            assert body['count'] == 1
+            assert body['short_codes'] == [asset_label.short_code]
+
+    def test_a_product_reader_still_queues_any_pool_label(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        db_session: Session,
+        org: Organization,
+        agent_id: str,
+        product_label: LabelPool,
+        pool_label: LabelPool,
+    ) -> None:
+        headers = _with_role(h, db_session, org, ['items:read', 'equipment:read'])
+        codes = [product_label.short_code, pool_label.short_code]
+
+        answer, body = self._queue(client, headers, agent_id, {'short_codes': codes})
+
+        assert answer == status.HTTP_201_CREATED, body
+        assert body['count'] == 2
 
 
 class TestAQueuedJobAnswersToTheReadOfItsTarget:

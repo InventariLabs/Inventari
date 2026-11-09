@@ -735,7 +735,7 @@
     "approvalWorkflow": "Przepływ akceptacji",
     "approvalWorkflowHint": "Wymagaj akceptacji przed realizacją dokumentów o wysokiej wartości lub wrażliwych. Decyduje uprawnienie „Akceptacja zgłoszeń”, a nie nazwa roli — akceptować może każda rola, która je niesie, także własna.",
     "approvalHowItWorks": "Te ustawienia mówią, co wymaga akceptacji: typ z listy poniżej albo wartość netto powyżej progu. Kto akceptuje, mówi przepływ dokumentów — a aktywny przepływ przy pustych ustawieniach tutaj oznacza, że czeka każdy potwierdzony dokument. Zamówienia zakupu dzielą to tak samo, wybierając „zawsze” albo kwotę netto zamiast listy typów. Zanim dokument czekający na akceptację będzie można zrealizować i wykonać operacje magazynowe, musi go zaakceptować ktoś z uprawnieniem „Akceptacja zgłoszeń”.",
-    "approvalConsequenceModuleOff": "Przy wyłączonym module Akceptacji żaden dokument nie czeka — potwierdzenie wykonuje się od razu.",
+    "approvalConsequenceModuleOff": "Przy wyłączonym module Zatwierdzenia żaden dokument nie czeka — potwierdzenie wykonuje się od razu.",
     "approvalThreshold": "Próg akceptacji (wartość netto)",
     "approvalThresholdHint": "Dokumenty powyżej tej kwoty będą wymagać akceptacji. Zostaw puste aby wyłączyć.",
     "approvalRequiredForTypes": "Zawsze wymagaj akceptacji dla:",
