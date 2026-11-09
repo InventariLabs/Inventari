@@ -1227,6 +1227,10 @@ async def add_shortages_to_shopping_list(
     templates = await core_api.product_templates.get_many_async(
         db, organization_id, short_ids
     )
+    uoms = {
+        uom.id: uom
+        for uom in await core_api.uoms.list_for_org_async(db, organization_id)
+    }
     shopping_list = await shopping_lists_api.active_list_async(
         db, organization_id, user.id, lang
     )
@@ -1246,9 +1250,13 @@ async def add_shortages_to_shopping_list(
         need = ShoppingListItemCreateDTO(
             name=template.name,
             # Up, not to the nearest: buying a gram less than the run
-            # needs leaves it short. No unit's step applies to a
-            # shortfall summed across recipes, so the store's own step.
-            quantity=core_api.uoms.round_up(missing, None),
+            # needs leaves it short. The step is the ingredient's own —
+            # the list is shopped in its stock unit, so part of a piece
+            # is a piece, as the recipes module rounds a requirement.
+            quantity=core_api.uoms.round_up(
+                missing,
+                uoms.get(template.uom_id) if template.uom_id is not None else None,
+            ),
             uom_id=template.uom_id,
             template_id=child_id,
             source='production',
