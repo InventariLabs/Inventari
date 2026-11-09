@@ -33,6 +33,12 @@ a module to this repository; it is not part of distributing your own package.
 
 ## Path A: In-tree module (core development)
 
+> Working with an AI coding agent? Start it at the repository root: it works
+> from the root [AGENTS.md](AGENTS.md) and [backend/AGENTS.md](backend/AGENTS.md)
+> (and [frontend/AGENTS.md](frontend/AGENTS.md) for the screens), which is where
+> this repository keeps its rules. See
+> [Building a module with an AI coding agent](#building-a-module-with-an-ai-coding-agent).
+
 ### 1. Start a branch and create the scaffold
 
 ```bash
@@ -356,6 +362,8 @@ This creates a **standalone directory** containing both layers:
 warranty_tracker/
 ├── module.yaml          ← unified manifest (version, author, requires)
 ├── README.md
+├── AGENTS.md            ← the module rules for an AI coding agent
+├── CLAUDE.md            ← points at AGENTS.md
 ├── backend/             ← FastAPI module
 └── frontend/            ← React module
 ```
@@ -775,6 +783,55 @@ docker compose restart backend
 
 Your data is kept. [MODULES_GUIDE.md](MODULES_GUIDE.md#when-the-backend-does-not-come-back)
 has the production form of the command.
+
+---
+
+## Building a module with an AI coding agent
+
+An agent can write most of a module, and the platform checks what it writes. It
+needs two things from you and nothing else.
+
+**What to give it.** The scaffold and a paragraph describing the job. Scaffold
+the package as in [Path B](#1-scaffold-the-package) and start the agent inside
+`modules-workspace/warranty_tracker/`. The scaffold wrote `AGENTS.md` there, and
+`CLAUDE.md`, which only points at it, so an agent that reads either file gets
+the same rules: what a module may import, that every string belongs in the
+catalogs of the five maintained languages (en, pl, de, fr, es), that the
+package owns its migrations, that it needs a purpose card, how its tests run
+and which command checks it before install. The paragraph is yours: whose job
+the module serves, what it keeps, what it must never do. Say what it must *not*
+do too — the agent has no way to guess a boundary. For a module inside the
+Inventari source tree (Path A) start the agent at the repository root instead:
+it works from the root `AGENTS.md` and `backend/AGENTS.md`.
+
+**Which gates refuse its mistakes.** An agent is wrong in familiar ways, and
+each of these refuses the work instead of trusting it:
+
+| Gate | What a refusal means |
+|---|---|
+| `module validate`, and the same scan at `module install` | The package imports something a module may not (`app.models`, another module's internals), declares a capability its code does not use, or lacks its English catalog. Move the code behind `core_api` or `module_sdk`; do not widen the manifest. |
+| The same command's import check | The package does not import at all. The fix is in the traceback, not in the validator. |
+| The package's own tests (`backend/tests/`) | A rule the agent was told is not kept. Read the failure, not only the red mark. |
+| Signature check at `module install` | The package changed after it was signed. Sign it again; `--allow-unsigned` does not apply to a package that carries a `module.sig`. |
+| `make lint` and the commit hook (Path A) | A missing purpose card, dead code, an endpoint no screen calls, a string not in a catalog. |
+
+**How a person checks the result before installing it.** Read it as you would
+someone else's pull request, because an install is a trust decision: module code
+runs in-process with full access to the database and the filesystem.
+
+```bash
+docker compose exec backend uv run python manage.py module validate \
+  --base-path /modules-workspace --module warranty_tracker
+```
+
+Then run the package's tests with the sequence in
+[docs/MODULE_TESTING_GUIDE.md](docs/MODULE_TESTING_GUIDE.md) (*Running a
+community package's tests*), and read the diff for the things no gate can see:
+that the module does the job your paragraph describes, that its screens say
+only what you would say to a user, and that nothing reaches beyond the
+organization's own rows. Only then sign it and install it
+(Path B, step 2). A passing validation says the package follows the rules, not
+that it is the module you wanted.
 
 ---
 
