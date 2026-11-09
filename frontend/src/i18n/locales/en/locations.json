@@ -34,9 +34,9 @@
     "storageRestored": "Location restored"
   },
   "detail": {
-    "products": "Products ({{count}})",
-    "products_one": "Products ({{count}})",
-    "products_other": "Products ({{count}})",
+    "records": "Records ({{count}})",
+    "records_one": "Record ({{count}})",
+    "records_other": "Records ({{count}})",
     "table": {
       "product": "Product",
       "category": "Category",

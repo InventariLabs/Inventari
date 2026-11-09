@@ -64,6 +64,25 @@ describe("StorageItemsSection", () => {
     expect(screen.getByText("This location is empty")).toBeInTheDocument();
   });
 
+  it("heads the list with a record count, not a product count", () => {
+    const items = [
+      makeItem({ id: "item-1", name: "Apple Juice" }),
+      makeItem({ id: "item-2", name: "Apple Juice" }),
+      makeItem({ id: "item-3", name: "Apple Juice" }),
+    ];
+    render(
+      <StorageItemsSection
+        {...defaultProps}
+        filteredItems={items}
+        items={items}
+      />,
+      { wrapper },
+    );
+    expect(
+      screen.getByRole("heading", { name: "Records (3)" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders item names when filteredItems provided", () => {
     const items = [
       makeItem({ id: "item-1", name: "Apple Juice" }),

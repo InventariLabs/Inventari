@@ -34,9 +34,9 @@
     "storageRestored": "Lagerort wiederhergestellt"
   },
   "detail": {
-    "products": "Produkte ({{count}})",
-    "products_one": "Produkt ({{count}})",
-    "products_other": "Produkte ({{count}})",
+    "records": "Datensätze ({{count}})",
+    "records_one": "Datensatz ({{count}})",
+    "records_other": "Datensätze ({{count}})",
     "table": {
       "product": "Produkt",
       "category": "Kategorie",

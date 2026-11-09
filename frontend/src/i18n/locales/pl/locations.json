@@ -36,11 +36,11 @@
     "storageRestored": "Miejsce przywrócone"
   },
   "detail": {
-    "products": "Produkty ({{count}})",
-    "products_one": "Produkt ({{count}})",
-    "products_few": "Produkty ({{count}})",
-    "products_many": "Produktów ({{count}})",
-    "products_other": "Produktów ({{count}})",
+    "records": "Rekordy ({{count}})",
+    "records_one": "Rekord ({{count}})",
+    "records_few": "Rekordy ({{count}})",
+    "records_many": "Rekordów ({{count}})",
+    "records_other": "Rekordów ({{count}})",
     "table": {
       "product": "Produkt",
       "category": "Kategoria",
