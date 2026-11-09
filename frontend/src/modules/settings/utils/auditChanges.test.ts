@@ -1396,6 +1396,28 @@ describe("formatAuditValue statuses", () => {
       }
     },
   );
+
+  it.each(Object.entries(CATALOGUES))(
+    "%s names an undone production run as its own screen does",
+    (language, common) => {
+      const values = wordMap(
+        (common as { settings: { audit: { values: unknown } } }).settings.audit
+          .values,
+      );
+      const runs = wordMap(
+        (
+          moduleBundle("maker", language).productionList as Record<
+            string,
+            unknown
+          >
+        ).status,
+      );
+      // The run keeps its row and is marked REVERSED; the journal printed
+      // the code because the catalogue had no word for it.
+      expect(runs.reversed, `${language} maker`).toBeTruthy();
+      expect(values.REVERSED, `${language} REVERSED`).toBe(runs.reversed);
+    },
+  );
 });
 
 describe("auditChanges category field definitions", () => {

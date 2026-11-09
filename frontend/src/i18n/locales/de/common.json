@@ -736,6 +736,7 @@
         "CONFIRMED": "Bestätigt",
         "COMPLETED": "Abgeschlossen",
         "CANCELLED": "Storniert",
+        "REVERSED": "Zurückgenommen",
         "PENDING": "Ausstehend",
         "IN_PROGRESS": "In Bearbeitung",
         "APPROVED": "Genehmigt",
