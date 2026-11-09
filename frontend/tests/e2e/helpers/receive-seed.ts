@@ -170,7 +170,7 @@ export class ReceivingSeed {
   /** The document a result screen links to, read off its own link. */
   async documentLinkedFrom(page: Page): Promise<Record<string, unknown>> {
     const link = page
-      .getByRole("link", { name: /^[A-Z]{2,}\/\d{4}\/\d+$/ })
+      .getByRole("link", { name: /^[A-Z]{2,}\/\d{4}(?:\/\d{2})?\/\d+$/ })
       .first();
     await expect(link).toBeVisible();
     const href = await link.getAttribute("href");
