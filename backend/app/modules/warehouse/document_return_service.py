@@ -44,6 +44,46 @@ async def _beyond_left(
     )
 
 
+async def _record_the_goods_stand_in(
+    db: AsyncSession,
+    org_id: UUID,
+    original: Document,
+    orig_line: DocumentLine,
+    quantity: Decimal,
+) -> UUID | None:
+    """The record a return line takes from: the line's, or the one holding the rest.
+
+    A transfer moves the record its line names to the target shelf. A return
+    of part of it moves that same record back and leaves the rest on the
+    target shelf under a record of its own, so the line's record no longer
+    stands where the goods are, and a second return, or an undo, naming it
+    was refused as taking from the wrong shelf. When the line's record has
+    left the shelf the return takes from, the same goods are looked for
+    there: same card, batch, owner and expiry, holding enough.
+    """
+    if not dt.is_transfer(original.type) or orig_line.item_id is None:
+        return orig_line.item_id
+    shelf = original.target_location_id
+    item = await core_api.items.get_async(db, org_id, orig_line.item_id)
+    if item is None or item.template_id is None or item.location_id == shelf:
+        return orig_line.item_id
+    on_shelf = await core_api.items.list_async(
+        db, org_id, storage_location_id=shelf, template_id=item.template_id
+    )
+    holding = [
+        candidate
+        for candidate in on_shelf
+        if candidate.lot_id == item.lot_id
+        and candidate.owner_id == item.owner_id
+        and candidate.expiry_date == item.expiry_date
+        and not candidate.serial_number
+        and (candidate.quantity or Decimal('0')) >= quantity
+    ]
+    if not holding:
+        return orig_line.item_id
+    return min(holding, key=lambda c: (c.quantity or Decimal('0'), str(c.id))).id
+
+
 async def create_return(
     db: AsyncSession,
     original_id: UUID,
@@ -139,7 +179,9 @@ async def create_return(
 
         new_line = DocumentLine(
             line_number=i,
-            item_id=orig_line.item_id,
+            item_id=await _record_the_goods_stand_in(
+                db, org_id, original, orig_line, return_qty
+            ),
             product_template_id=orig_line.product_template_id,
             name=orig_line.name,
             brand=orig_line.brand,
