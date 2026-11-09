@@ -26,11 +26,12 @@ test.describe("Approvals + Documents — integration flow", () => {
       .setModuleSettings(token, "approvals", { allow_admin_self_approve: true })
       .catch(() => {});
 
-    storageId = process.env.E2E_STORAGE_ID || "";
-    if (!storageId) {
-      const storages = await api.listStorages(token);
-      storageId = storages[0]?.id || "";
-    }
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    const storage = await api.createStorage(token, {
+      name: `E2E-Approvals-Integration-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    });
+    storageId = storage.id;
 
     // Create a real item to reference in document lines
     const item = await api.createItem(token, {
@@ -73,6 +74,9 @@ test.describe("Approvals + Documents — integration flow", () => {
     }
     if (token && testItemId) {
       await api.deleteItem(token, testItemId).catch(() => {});
+    }
+    if (token && storageId) {
+      await api.deleteStorage(token, storageId).catch(() => {});
     }
   });
 
