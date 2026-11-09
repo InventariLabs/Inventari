@@ -30,7 +30,7 @@ export default function StockTakePostingNote({
           {isModuleEnabled("warehouse") ? (
             <Link
               to={`/warehouse/documents/${report.adjustment_document_id}`}
-              className="font-medium text-primary-600 hover:text-primary-700 hover:underline"
+              className="font-medium text-on-primary hover:underline"
             >
               {number}
             </Link>

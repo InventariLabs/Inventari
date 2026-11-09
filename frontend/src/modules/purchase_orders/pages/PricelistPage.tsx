@@ -256,7 +256,7 @@ export default function PricelistPage() {
         <p className="text-xs text-on-muted">
           <Link
             to="/inventory/items"
-            className="text-primary-600 hover:text-primary-700 hover:underline"
+            className="text-on-primary hover:underline"
           >
             {t("productPicker.emptyCatalogHint")}
           </Link>

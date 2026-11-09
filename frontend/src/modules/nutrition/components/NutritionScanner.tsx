@@ -188,7 +188,7 @@ const NutritionScanner: React.FC<Props> = ({
                 // fix it.
                 <Link
                   to="/settings/ai"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline mt-1"
+                  className="inline-flex items-center gap-1 text-sm font-medium text-on-primary hover:underline mt-1"
                 >
                   {t("labels:quickAdd.visionSettingsLink")}
                 </Link>

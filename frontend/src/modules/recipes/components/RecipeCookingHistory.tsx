@@ -222,7 +222,7 @@ export default function RecipeCookingHistory({
                 {documentsEnabled && extractDocumentId(session.notes) && (
                   <Link
                     to={`/warehouse/documents/${extractDocumentId(session.notes)}`}
-                    className="inline-flex items-center gap-1 text-xs text-primary-600 hover:underline mt-1"
+                    className="inline-flex items-center gap-1 text-xs text-on-primary hover:underline mt-1"
                   >
                     <FileText size={12} />
                     {t("history.document_link")}

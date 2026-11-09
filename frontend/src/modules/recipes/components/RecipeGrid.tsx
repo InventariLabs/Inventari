@@ -361,7 +361,7 @@ function RecipeGridEmpty({
           variant="link"
           size="sm"
           onClick={onGoToAllRecipes}
-          className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-primary-600"
+          className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-on-primary"
         >
           {t("recipes:empty.link_ingredients_cta")}
         </Button>
@@ -369,7 +369,7 @@ function RecipeGridEmpty({
       {emptyCase === "available" && (
         <Link
           to="/inventory/items"
-          className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-primary-600 hover:underline"
+          className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-on-primary hover:underline"
         >
           {t("recipes:empty.go_to_inventory")}
         </Link>

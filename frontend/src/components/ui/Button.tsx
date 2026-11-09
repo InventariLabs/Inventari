@@ -43,7 +43,7 @@ const buttonVariants = cva(
         // is the `active:scale` in the base class.
         success:
           "bg-success-800 text-white hover:bg-success-900 active:bg-success-900 shadow-sm",
-        link: "text-primary-600 underline-offset-4 hover:underline",
+        link: "text-on-primary underline-offset-4 hover:underline",
       },
       size: {
         // 44px touch targets below `md:`; desktop keeps its density. Font size

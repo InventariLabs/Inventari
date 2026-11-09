@@ -243,7 +243,7 @@ export default function ItemDetailOverview({
           {item.template_id && recordsMovements(enabledModules) ? (
             <Link
               to={`/inventory/stock?template=${item.template_id}`}
-              className="text-primary-600 hover:text-primary-700 hover:underline"
+              className="text-on-primary hover:underline"
             >
               {t("inventory:stock.seeForProduct")}
             </Link>

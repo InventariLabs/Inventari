@@ -296,7 +296,7 @@ export default function WmsPickingSummary({
               <div className="flex items-center justify-between gap-2">
                 <Link
                   to={`/warehouse/documents/${group.documentId}`}
-                  className="text-sm font-semibold text-primary-600 hover:underline truncate"
+                  className="text-sm font-semibold text-on-primary hover:underline truncate"
                 >
                   {group.number}
                 </Link>

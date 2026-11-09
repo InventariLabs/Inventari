@@ -5,16 +5,14 @@ import { join } from "node:path";
 /**
  * Classes the module used to carry that compile to nothing.
  *
- * `text-on-primary`, `bg-surface-secondary` and `text-on-surface` look like the
- * real tokens but none of them is defined in `tailwind.config.js`, so Tailwind
- * emits no rule and the colour, tint or hover silently does not happen. The
- * theme offers `text-on`, `bg-surface-raised` and `bg-surface-inset` instead.
+ * `bg-surface-secondary` and `text-on-surface` look like the real tokens but
+ * neither is defined in `tailwind.config.js`, so Tailwind emits no rule and
+ * the tint or colour silently does not happen. The theme offers
+ * `bg-surface-raised` and `text-on` instead. `text-on-primary` used to belong
+ * here; it is a real token now (the brand-text colour on a card, read by
+ * `profilePaletteContrast.test.ts`) and recipe links use it.
  */
-const DEAD_TOKENS = [
-  "text-on-primary",
-  "bg-surface-secondary",
-  "text-on-surface",
-];
+const DEAD_TOKENS = ["bg-surface-secondary", "text-on-surface"];
 
 const MODULE_ROOT = join(__dirname);
 

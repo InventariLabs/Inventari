@@ -153,7 +153,7 @@ export function PartnerDetailSheet({
             <DetailRow label={t("fields.email")}>
               <a
                 href={`mailto:${email}`}
-                className="inline-flex items-center gap-1 text-primary-600 hover:underline"
+                className="inline-flex items-center gap-1 text-on-primary hover:underline"
               >
                 <Mail size={13} /> {email}
               </a>
@@ -163,7 +163,7 @@ export function PartnerDetailSheet({
             <DetailRow label={t("fields.phone")}>
               <a
                 href={`tel:${phone}`}
-                className="inline-flex items-center gap-1 text-primary-600 hover:underline"
+                className="inline-flex items-center gap-1 text-on-primary hover:underline"
               >
                 <Phone size={13} /> {phone}
               </a>
@@ -177,7 +177,7 @@ export function PartnerDetailSheet({
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-primary-600 hover:underline"
+                className="inline-flex items-center gap-1 text-on-primary hover:underline"
               >
                 <Globe size={13} /> {website}
               </a>

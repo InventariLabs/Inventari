@@ -144,7 +144,7 @@ export default function RecipeDetailPage() {
                 href={webLinkOrNull(recipe.source_url)!}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-on-primary hover:underline"
               >
                 {t("recipe.source_url")}
                 <ExternalLink size={11} />
