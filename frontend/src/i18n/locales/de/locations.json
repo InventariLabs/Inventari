@@ -34,9 +34,9 @@
     "storageRestored": "Lagerort wiederhergestellt"
   },
   "detail": {
-    "products": "Produkte ({{count}})",
-    "products_one": "Produkt ({{count}})",
-    "products_other": "Produkte ({{count}})",
+    "records": "Datensätze ({{count}})",
+    "records_one": "Datensatz ({{count}})",
+    "records_other": "Datensätze ({{count}})",
     "table": {
       "product": "Produkt",
       "category": "Kategorie",
@@ -259,12 +259,14 @@
     "archiveOrDelete": "Archivieren oder löschen…"
   },
   "card": {
-    "unit_one": "Produkt",
-    "unit_other": "Produkte"
+    "unit_one": "Datensatz",
+    "unit_other": "Datensätze"
   },
   "counts": {
     "inSublocations_one": "{{count}} in Unterorten",
-    "inSublocations_other": "{{count}} in Unterorten"
+    "inSublocations_other": "{{count}} in Unterorten",
+    "recordsInside_one": "{{count}} Datensatz hier und in Unterorten",
+    "recordsInside_other": "{{count}} Datensätze hier und in Unterorten"
   },
   "stats": {},
   "storageNotFound": "Lagerort nicht gefunden",
@@ -336,9 +338,9 @@
   },
   "contents": {
     "emptyTitle": "In diesem Lagerort ist nichts",
-    "emptyDescriptionNone": "Hier sind keine Produkte und keine Lagerorte darin.",
-    "emptyDescription_one": "Sein {{count}} Produkt ist auf der Registerkarte Produkte.",
-    "emptyDescription_other": "Seine {{count}} Produkte sind auf der Registerkarte Produkte.",
+    "emptyDescriptionNone": "Hier sind keine Datensätze und keine Lagerorte darin.",
+    "emptyDescription_one": "Sein {{count}} Datensatz ist auf der Registerkarte Produkte.",
+    "emptyDescription_other": "Seine {{count}} Datensätze sind auf der Registerkarte Produkte.",
     "showProducts": "Produkte anzeigen",
     "selected_one": "{{count}} Lagerort ausgewählt",
     "selected_other": "{{count}} Lagerorte ausgewählt",
@@ -349,7 +351,7 @@
     "code": "Code",
     "type": "Typ",
     "inside": "Darinnen",
-    "products": "Produkte"
+    "products": "Datensätze"
   },
   "products": {
     "includeInside": "Lagerorte darin einschließen",

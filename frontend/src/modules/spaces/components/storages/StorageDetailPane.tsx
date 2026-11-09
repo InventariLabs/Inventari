@@ -310,6 +310,7 @@ export function StorageDetailPane({
             summary={node}
             isArchived={isArchived}
             canWriteItems={canWriteItems}
+            excludeModuleContexts={excludeModuleContexts}
           />
         </TabsContent>
         <TabsContent value="settings" className="pt-4">

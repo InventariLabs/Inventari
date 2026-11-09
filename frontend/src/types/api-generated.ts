@@ -34895,6 +34895,8 @@ export interface operations {
             query?: {
                 /** @description Also the products of every location below this one, at any depth, in one answer. */
                 include_inside?: boolean;
+                /** @description Leave out the records of a vertical module, the way the general lists do, so the place's count and its list agree. */
+                exclude_module_contexts?: boolean;
                 limit?: number;
                 offset?: number;
             };

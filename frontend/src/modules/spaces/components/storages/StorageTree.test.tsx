@@ -228,6 +228,38 @@ describe("StorageTree — branches that have not been read yet", () => {
     );
     expect(onToggle).toHaveBeenCalledWith("wh");
   });
+
+  it("names the unit of the badge: records here and below, not sublocations", () => {
+    render(
+      <StorageTree
+        nodes={[
+          {
+            id: "wh",
+            name: "Warehouse",
+            parent_id: null,
+            usage: "internal",
+            short_code: null,
+            items_count: 3,
+            subtree_items_count: 40,
+            children_count: 12,
+            children: [],
+          },
+        ]}
+        expanded={new Set()}
+        onToggle={vi.fn()}
+        onSelect={vi.fn()}
+        canWrite={false}
+        onMoveTo={vi.fn()}
+        onOpenSettings={vi.fn()}
+        onDragMove={vi.fn()}
+        label="Storage locations"
+      />,
+    );
+
+    expect(
+      screen.getByTitle("40 records here and in sublocations"),
+    ).toHaveTextContent("40");
+  });
 });
 
 describe("StorageTree — rows a writer can act on", () => {

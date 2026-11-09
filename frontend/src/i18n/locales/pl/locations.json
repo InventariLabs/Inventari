@@ -36,11 +36,11 @@
     "storageRestored": "Miejsce przywrócone"
   },
   "detail": {
-    "products": "Produkty ({{count}})",
-    "products_one": "Produkt ({{count}})",
-    "products_few": "Produkty ({{count}})",
-    "products_many": "Produktów ({{count}})",
-    "products_other": "Produktów ({{count}})",
+    "records": "Rekordy ({{count}})",
+    "records_one": "Rekord ({{count}})",
+    "records_few": "Rekordy ({{count}})",
+    "records_many": "Rekordów ({{count}})",
+    "records_other": "Rekordów ({{count}})",
     "table": {
       "product": "Produkt",
       "category": "Kategoria",
@@ -279,16 +279,20 @@
     "archiveOrDelete": "Archiwizuj lub usuń…"
   },
   "card": {
-    "unit_one": "produkt",
-    "unit_few": "produkty",
-    "unit_many": "produktów",
-    "unit_other": "produktów"
+    "unit_one": "rekord",
+    "unit_few": "rekordy",
+    "unit_many": "rekordów",
+    "unit_other": "rekordu"
   },
   "counts": {
     "inSublocations_one": "{{count}} w miejscu podrzędnym",
     "inSublocations_few": "{{count}} w miejscach podrzędnych",
     "inSublocations_many": "{{count}} w miejscach podrzędnych",
-    "inSublocations_other": "{{count}} w miejscach podrzędnych"
+    "inSublocations_other": "{{count}} w miejscach podrzędnych",
+    "recordsInside_one": "{{count}} rekord tutaj i w miejscach podrzędnych",
+    "recordsInside_few": "{{count}} rekordy tutaj i w miejscach podrzędnych",
+    "recordsInside_many": "{{count}} rekordów tutaj i w miejscach podrzędnych",
+    "recordsInside_other": "{{count}} rekordu tutaj i w miejscach podrzędnych"
   },
   "stats": {},
   "storageNotFound": "Nie znaleziono miejsca",
@@ -360,11 +364,11 @@
   },
   "contents": {
     "emptyTitle": "W tym miejscu nic nie ma",
-    "emptyDescriptionNone": "Nie ma tu żadnych produktów ani miejsc w środku.",
-    "emptyDescription_one": "Jego {{count}} produkt jest na karcie Produkty.",
-    "emptyDescription_other": "Jego {{count}} produktów jest na karcie Produkty.",
-    "emptyDescription_few": "Jego {{count}} produkty są na karcie Produkty.",
-    "emptyDescription_many": "Jego {{count}} produktów jest na karcie Produkty.",
+    "emptyDescriptionNone": "Nie ma tu żadnych rekordów ani miejsc w środku.",
+    "emptyDescription_one": "Jego {{count}} rekord jest na karcie Produkty.",
+    "emptyDescription_other": "Jego {{count}} rekordu jest na karcie Produkty.",
+    "emptyDescription_few": "Jego {{count}} rekordy są na karcie Produkty.",
+    "emptyDescription_many": "Jego {{count}} rekordów jest na karcie Produkty.",
     "showProducts": "Pokaż produkty",
     "selected_one": "Wybrano {{count}} miejsce",
     "selected_other": "Wybrano {{count}} miejsc",
@@ -377,7 +381,7 @@
     "code": "Kod",
     "type": "Typ",
     "inside": "W środku",
-    "products": "Produkty"
+    "products": "Rekordy"
   },
   "products": {
     "includeInside": "Uwzględnij miejsca wewnątrz",

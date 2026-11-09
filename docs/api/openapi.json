@@ -12718,6 +12718,18 @@
             "description": "Also the products of every location below this one, at any depth, in one answer."
           },
           {
+            "name": "exclude_module_contexts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out the records of a vertical module, the way the general lists do, so the place's count and its list agree.",
+              "default": false,
+              "title": "Exclude Module Contexts"
+            },
+            "description": "Leave out the records of a vertical module, the way the general lists do, so the place's count and its list agree."
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,

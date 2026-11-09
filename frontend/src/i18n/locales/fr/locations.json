@@ -34,9 +34,9 @@
     "storageRestored": "Emplacement restauré"
   },
   "detail": {
-    "products": "Produits ({{count}})",
-    "products_one": "Produits ({{count}})",
-    "products_other": "Produits ({{count}})",
+    "records": "Enregistrements ({{count}})",
+    "records_one": "Enregistrement ({{count}})",
+    "records_other": "Enregistrements ({{count}})",
     "table": {
       "product": "Produit",
       "category": "Catégorie",
@@ -265,12 +265,14 @@
     "archiveOrDelete": "Archiver ou supprimer…"
   },
   "card": {
-    "unit_one": "produit",
-    "unit_other": "produits"
+    "unit_one": "enregistrement",
+    "unit_other": "enregistrements"
   },
   "counts": {
     "inSublocations_one": "{{count}} dans les sous-emplacements",
-    "inSublocations_other": "{{count}} dans les sous-emplacements"
+    "inSublocations_other": "{{count}} dans les sous-emplacements",
+    "recordsInside_one": "{{count}} enregistrement ici et dans les sous-emplacements",
+    "recordsInside_other": "{{count}} enregistrements ici et dans les sous-emplacements"
   },
   "stats": {},
   "storageNotFound": "Emplacement introuvable",
@@ -342,9 +344,9 @@
   },
   "contents": {
     "emptyTitle": "Rien à l’intérieur de cet emplacement",
-    "emptyDescriptionNone": "Il ne contient aucun produit ni emplacement.",
-    "emptyDescription_one": "Son {{count}} produit est dans l’onglet Produits.",
-    "emptyDescription_other": "Ses {{count}} produits sont dans l’onglet Produits.",
+    "emptyDescriptionNone": "Il ne contient aucun enregistrement ni emplacement.",
+    "emptyDescription_one": "Son {{count}} enregistrement est dans l’onglet Produits.",
+    "emptyDescription_other": "Ses {{count}} enregistrements sont dans l’onglet Produits.",
     "showProducts": "Afficher les produits",
     "selected_one": "{{count}} emplacement sélectionné",
     "selected_other": "{{count}} emplacements sélectionnés",
@@ -355,7 +357,7 @@
     "code": "Code",
     "type": "Type",
     "inside": "À l’intérieur",
-    "products": "Produits"
+    "products": "Enregistrements"
   },
   "products": {
     "includeInside": "Inclure les emplacements à l’intérieur",

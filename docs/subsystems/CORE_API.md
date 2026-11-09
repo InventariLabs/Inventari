@@ -253,8 +253,8 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | Method | Signature | R/W | Description |
 |---|---|---|---|
 | `count_expiring_soon_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, days: int=7) -> int` | READ | Count non-deleted items in *storage_id* expiring within *days*. |
-| `count_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> int` | READ | Count non-deleted items in *storage_id*. |
-| `count_items_in_subtree_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> int` | READ | Count non-deleted items in *storage_id* and all its descendants. |
+| `count_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, claimed_tags: set[str] \| None=None) -> int` | READ | Count non-deleted items in *storage_id* (minus ``claimed_tags``' records). |
+| `count_items_in_subtree_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, claimed_tags: set[str] \| None=None) -> int` | READ | Count non-deleted items in *storage_id* and all its descendants. |
 | `create_async` | `(db: AsyncSession, organization_id: UUID, *, name: str, user_id: UUID, description: str \| None=None, behavior_mode: str \| None=None, context_tag: str \| None=None, usage: str \| None=None, parent_id: UUID \| None=None) -> StorageDTO` | WRITE | Create a storage location. Runs interceptors and emits events. |
 | `descendant_ids_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> list[UUID]` | READ | All storage ids below *storage_id* (excludes the node itself). |
 | `find_by_context_tag_async` | `(db: AsyncSession, organization_id: UUID, context_tag: str) -> StorageDTO \| None` | READ | — |
@@ -266,7 +266,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `list_async` | `(db: AsyncSession, organization_id: UUID, *, context_tag: str \| None=None, usage: str \| None=None, limit: int=200, offset: int=0) -> list[StorageDTO]` | READ | — |
 | `list_by_ids_async` | `(db: AsyncSession, organization_id: UUID, storage_ids: Iterable[UUID]) -> list[StorageDTO]` | READ | The named locations that exist and are not archived, ordered by name. |
 | `list_holding_stock_with_ancestors_async` | `(db: AsyncSession, organization_id: UUID, *, usage: str='internal') -> list[StorageDTO]` | READ | The locations of *usage* holding a live record, with the chains above them. |
-| `list_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, include_inside: bool=False, limit: int \| None=None, offset: int=0) -> list[ItemDTO]` | READ | List non-deleted items in *storage_id* ordered by expiry ascending. |
+| `list_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, include_inside: bool=False, limit: int \| None=None, offset: int=0, claimed_tags: set[str] \| None=None) -> list[ItemDTO]` | READ | List non-deleted items in *storage_id* ordered by expiry ascending. |
 | `list_storage_ids_async` | `(db: AsyncSession, organization_id: UUID) -> list[UUID]` | READ | Return just the IDs of storage locations for *organization_id*. |
 | `scannable_code_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> str \| None` | READ | The code that names *storage_id* when scanned — its own, or its label's. |
 | `subtree_and_ancestors_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> tuple[list[StorageDTO], list[StorageDTO]]` | READ | ``(subtree, ancestors)`` of a location, without reading the rest of the tree. |
