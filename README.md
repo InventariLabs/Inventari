@@ -139,6 +139,11 @@ manifests, a model and migration, an example API endpoint and screen, and
 translation catalogs. You develop the process your users need in that
 package and install it into Inventari.
 
+You can build that package with an AI coding agent: the package carries the
+module rules the agent needs, and Inventari itself is built that way behind
+the same gates, which refuse an agent's mistakes before anything is
+installed. [How to do it](MODULE_QUICKSTART.md#building-a-module-with-an-ai-coding-agent).
+
 [Create your first module](MODULE_QUICKSTART.md) ·
 [Explore the module API](MODULES_GUIDE.md) ·
 [Read the module licensing terms](MODULE_LICENSING.md)

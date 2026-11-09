@@ -64,6 +64,41 @@ class TestTheScaffoldWritesInstructionsForAnAgent:
         assert f'/blob/v{get_platform_version()}/MODULES_GUIDE.md' in text
         assert f'/blob/v{get_platform_version()}/backend/AGENTS.md' in text
 
+    def test_agents_md_says_how_the_frontend_specs_run_and_what_the_staging_may_touch(
+        self, package
+    ):
+        text = (package / 'AGENTS.md').read_text(encoding='utf-8')
+
+        for sentence in (
+            '`frontend/tests/`',
+            'npx vitest run --experimental.fsModuleCache=false',
+            'stops the backend',
+            'does not break',
+        ):
+            assert sentence in text, (
+                f'the generated AGENTS.md no longer says {sentence!r}'
+            )
+
+    def test_agents_md_names_the_components_the_sdk_does_not_export(self, package):
+        text = (package / 'AGENTS.md').read_text(encoding='utf-8')
+
+        for component in ('`Sheet`', '`ListControlBar`', '`DateInput`'):
+            assert component in text, (
+                f'the generated AGENTS.md does not warn that {component} is not in '
+                f'@/module-sdk'
+            )
+
+    def test_agents_md_says_what_the_first_version_is(self, package):
+        text = (package / 'AGENTS.md').read_text(encoding='utf-8')
+
+        assert 'first handover keeps' in text
+
+    def test_the_testing_guide_runs_a_packages_frontend_specs_the_same_way(self):
+        root = Path(os.environ.get('INVENTARI_REPO_ROOT', Path(__file__).parents[3]))
+        guide = (root / 'docs' / 'MODULE_TESTING_GUIDE.md').read_text(encoding='utf-8')
+
+        assert 'npx vitest run --experimental.fsModuleCache=false' in guide
+
     def test_claude_md_only_points_at_agents_md(self, package):
         assert (package / 'CLAUDE.md').read_text(encoding='utf-8') == '@AGENTS.md\n'
 

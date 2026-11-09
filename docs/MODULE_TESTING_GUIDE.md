@@ -99,6 +99,19 @@ rm -rf backend/app/modules/$NAME frontend/src/modules/$NAME
 docker compose start backend
 ```
 
+The package's own frontend specs live in `frontend/tests/` (the installer drops
+that folder, like `backend/tests/`) and run in the same window, between steps 3
+and 4, against the staged half:
+
+```bash
+docker compose exec frontend npx vitest run --experimental.fsModuleCache=false src/modules/$NAME
+```
+
+The flag matters: the test setup collects every module's catalogs with a glob,
+and Vitest's on-disk module cache keeps the result of an earlier run, so a
+package staged afterwards is missing from it and every translated text renders
+as its key.
+
 Run from start to finish, it changes nothing it should not: the staged files
 exist only while no backend process can see them, the test run writes only its
 own test databases, and the backend comes back up on the tree it recognized —
