@@ -27,6 +27,10 @@ import pytest
 
 from app.models.ai_connection import AiConnection
 
+# Creating a connection resolves its host (SSRF guard); the lookup is answered
+# from a table so the tests do not depend on the machine's resolver.
+pytestmark = pytest.mark.usefixtures('stub_dns')
+
 
 @pytest.mark.integration
 class TestAiConnectionsCrud:

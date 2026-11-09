@@ -22,7 +22,7 @@ import pytest
 
 from app.core.llm.openai_client import OpenAiCompatibleClient
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.usefixtures('stub_dns')]
 
 _URL = '/api/v1/ai-connections/test'
 _REFUSED_KEY = 'response_format'
