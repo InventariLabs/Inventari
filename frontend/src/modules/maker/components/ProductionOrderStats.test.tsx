@@ -312,11 +312,15 @@ describe("ProductionOrderStats", () => {
       expect(screen.queryByText(/missing from this total/i)).toBeNull();
     });
 
-    it("states the cost per unit of the output", () => {
-      render(<ProductionOrderStats order={closed([priced])} />);
-      expect(screen.getByText(/per unit produced/i)).toHaveTextContent(
-        "PLN 18.00",
+    it("states the cost per unit the run's output is counted in", () => {
+      render(
+        <ProductionOrderStats
+          order={{ ...closed([priced]), output_uom_symbol: "kg" }}
+        />,
       );
+      const line = screen.getByText(/PLN 18\.00 per/);
+      expect(line).toHaveTextContent("PLN 18.00 per kg");
+      expect(line).not.toHaveTextContent(/produced/i);
     });
   });
 });

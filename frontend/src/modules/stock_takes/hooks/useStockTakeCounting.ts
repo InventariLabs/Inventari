@@ -413,14 +413,17 @@ export function useStockTakeCounting(id: string | undefined) {
    * The reason counts as much as the number does. Left out, picking "Damaged"
    * on a row whose count was already saved changed nothing: the save button
    * stays disabled on a row that agrees with the record, so the reason had no
-   * way to reach the server and no mark to say it had not. */
+   * way to reach the server and no mark to say it had not. The note is the
+   * same: typed or cleared on a counted row, it differs from the record and
+   * only the Save can send it. */
   const isUnsaved = (itemId: string): boolean => {
     const line = getStockTakeItem(itemId);
     const reason = reasons[itemId] ?? { code: "", note: "" };
     return (
       countedAmount(countedQuantities[itemId]) !== savedQuantityOf(itemId) ||
       reason.code !== (line?.discrepancy_reason_code ?? "") ||
-      reason.note.trim() !== (line?.discrepancy_reason ?? "")
+      reason.note.trim() !== (line?.discrepancy_reason ?? "") ||
+      (notes[itemId] ?? "") !== (line?.notes ?? "")
     );
   };
 

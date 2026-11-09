@@ -311,6 +311,16 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On a stock take, Save on an empty or unreadable count box no longer records a
+  count of zero: such a box is not a count, and the line stays uncounted. A
+  note typed on, changed on or cleared from a line that is already counted now
+  makes the line read as unsaved and enables its Save (before, the note could
+  not reach the server and the leave-the-screen warning did not count it), and
+  the note box on a line with a difference stays on screen while its text is
+  deleted.
+- The cost line on a production run's page names the unit the run is counted
+  in ("8.36 per kg") instead of always saying "per unit produced", which was
+  wrong on a run whose output is weighed.
 - "Update list" on a meal plan now raises a line that is already on the list
   when the plan needs more of it, for example after its servings were increased.
   It used to leave the line at the quantity it was first generated with and

@@ -36,6 +36,16 @@ function saveIsDisabled(busyOrSaved: boolean, counted: string): boolean {
   return busyOrSaved || countedAmount(counted) === null;
 }
 
+/** Whether the general note box is drawn: always on a line with no difference,
+ * and on one with a difference only while a note is there to read or clear. */
+function showsGeneralNote(
+  discrepancy: "missing" | "surplus" | null,
+  note: string,
+  line: StockTakeItem | undefined,
+): boolean {
+  return !discrepancy || note !== "" || !!line?.notes;
+}
+
 function malformedCountProps(counted: string, id: string) {
   return isMalformedCount(counted)
     ? { "aria-invalid": true, "aria-describedby": id }
@@ -261,8 +271,11 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
       {/* A line with a difference has the reason field below, with a note of
           its own; a second empty box would ask for the same remark twice. A
           note already on the line — typed before the difference showed — stays
-          here to be read and changed, or the counter believes it was lost. */}
-      {isInProgress && (!discrepancy || note.trim() !== "") && (
+          here to be read and changed, or the counter believes it was lost. It
+          stays while the record still holds one too: emptying the box would
+          otherwise unmount it on the last keystroke, and the deletion could
+          never be saved. */}
+      {isInProgress && showsGeneralNote(discrepancy, note, stockTakeItem) && (
         <div className="mt-3">
           <Input
             type="text"

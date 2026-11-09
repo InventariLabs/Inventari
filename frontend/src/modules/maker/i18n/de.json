@@ -192,7 +192,7 @@
       "overproduced": "Mehrproduktion",
       "resultPerUnit": "({{amount}} pro {{unit}})",
       "totalCostAfterClosing": "Gesamtkosten nach Abschluss",
-      "unitCost": "{{amount}} pro erzeugter Einheit",
+      "unitCost": "{{amount}} pro {{unit}}",
       "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann."
     },

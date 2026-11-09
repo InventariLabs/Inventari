@@ -194,7 +194,7 @@
       "overproduced": "Nadprodukcja",
       "resultPerUnit": "({{amount}} za {{unit}})",
       "totalCostAfterClosing": "Koszt całkowity po zamknięciu",
-      "unitCost": "{{amount}} za wyprodukowaną sztukę",
+      "unitCost": "{{amount}} za {{unit}}",
       "totalCostGap_one": "{{count}} składnik zszedł z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "totalCostGap_few": "{{count}} składniki zeszły z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "totalCostGap_many": "{{count}} składników zeszło z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
