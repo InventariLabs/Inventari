@@ -183,5 +183,6 @@ moduleRegistry.register({
     },
   ],
   useStatusBadge: useInventoryStatusBadge,
+  statusBadgePermission: "items:read",
   useActionItems: useInventoryActionItems,
 });

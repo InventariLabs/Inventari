@@ -19,6 +19,7 @@ from app.core.interceptors import InterceptorError
 from app.core.logging import get_logger
 from app.i18n.service import get_current_lang, get_error_message
 
+from ._assets_service import get_asset_async
 from ._unit_identity import audit_identity
 from .models import EquipmentAssignment
 from .status_machine import resolve_previous_status, validate_transition
@@ -488,8 +489,6 @@ async def bulk_edit_items(
     A savepoint per item is what makes the promise true: a rollback undoes
     that one asset and leaves the transaction usable.
     """
-    from app.core.public_api import core_api
-
     updated = 0
     errors: list[dict[str, str]] = []
     # The screen reuses this path for a single asset, and one asset edited on
@@ -503,7 +502,7 @@ async def bulk_edit_items(
         try:
             async with db.begin_nested():
                 await acquire_advisory_lock(db, f'equipment:bulk_edit:{item_id}')
-                item = await core_api.items.get_async(db, org_id, item_id)
+                item = await get_asset_async(db, org_id, item_id)
                 if not item:
                     raise ServiceRejectionError('item_not_found')
                 if handler is None:

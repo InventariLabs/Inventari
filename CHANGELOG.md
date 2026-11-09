@@ -234,6 +234,13 @@ says what the release does rather than what changed since them.
   `module`, `unknown_modules`, `not_allowed_modules`, `modules` or
   `missing_dependency` — next to `code` and `message`, so a client can name the
   refused modules without reading them out of the sentence.
+- A module names the read its launcher badge asks for with
+  `statusBadgePermission` on its `FrontendModule`, and the launcher calls
+  `useStatusBadge` only for a role holding that key; for any other role the
+  tile shows no status instead of "Status could not be read". A module that
+  leaves it out is asked of every role, as before. An action-items hook keeps
+  asking for itself and should do so only when `useHasPermission` grants the
+  read, as `FRONTEND_MODULE_GUIDE.md` now shows.
 - Module authors get three more helpers in the module SDK: `hit_constraint`
   (did this integrity error trip one of the named constraints, by the name the
   driver reports with the message text as fallback), `rows_to_csv` (header and
@@ -311,6 +318,16 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On a stock take, Save on an empty or unreadable count box no longer records a
+  count of zero: such a box is not a count, and the line stays uncounted. A
+  note typed on, changed on or cleared from a line that is already counted now
+  makes the line read as unsaved and enables its Save (before, the note could
+  not reach the server and the leave-the-screen warning did not count it), and
+  the note box on a line with a difference stays on screen while its text is
+  deleted.
+- The cost line on a production run's page names the unit the run is counted
+  in ("8.36 per kg") instead of always saying "per unit produced", which was
+  wrong on a run whose output is weighed.
 - "Update list" on a meal plan now raises a line that is already on the list
   when the plan needs more of it, for example after its servings were increased.
   It used to leave the line at the quantity it was first generated with and
@@ -911,6 +928,25 @@ says what the release does rather than what changed since them.
   under the module's scope only, a product card outside it answers 404, and
   the label sheet draws only labels assigned to those records, never the free
   pool.
+- The home screen no longer asks for the status of a module the signed-in
+  role cannot read. A custom role holding only the warehouse's read saw
+  "Status could not be read" on the Inventory and Equipment tiles and "Stock
+  takes in progress could not be checked" under To do, because each tile and
+  each To do row asked its module regardless and met a refusal. Such a tile
+  now shows no status and such a row does not appear; the tiles themselves
+  stay.
+- The equipment register's routes that name one asset answer only for the
+  records the register lists: an asset's valuation, attachments, approval
+  state, assignment and maintenance history and timeline, and its check-out,
+  service entry, status change, retirement and archiving. Before, a role
+  holding only `equipment:read` read the name, serial number and purchase
+  price of any product whose id it knew through the asset valuation, and a
+  retirement or an archiving sent through the register changed an ordinary
+  product. Such a record now answers 404, as an id that names nothing does.
+  A print job of pool labels sent with the register's read, and not the
+  product read, likewise takes only labels assigned to the register's
+  records: a product's label or one nobody has assigned is refused as
+  nothing to print, and a mixed request prints the register's labels alone.
 
 ### Removed
 

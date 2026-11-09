@@ -64,7 +64,7 @@ export default function StorageItemsSection({
   return (
     <div>
       <h2 className="text-lg font-semibold text-on mb-4 px-1">
-        {t("locations:detail.products", { count: filteredItems?.length || 0 })}
+        {t("locations:detail.records", { count: filteredItems?.length || 0 })}
       </h2>
 
       <StorageItemsFilters

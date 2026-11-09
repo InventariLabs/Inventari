@@ -34,9 +34,9 @@
     "storageRestored": "Location restored"
   },
   "detail": {
-    "products": "Products ({{count}})",
-    "products_one": "Products ({{count}})",
-    "products_other": "Products ({{count}})",
+    "records": "Records ({{count}})",
+    "records_one": "Record ({{count}})",
+    "records_other": "Records ({{count}})",
     "table": {
       "product": "Product",
       "category": "Category",
@@ -265,12 +265,14 @@
     "archiveOrDelete": "Archive or delete…"
   },
   "card": {
-    "unit_one": "product",
-    "unit_other": "products"
+    "unit_one": "record",
+    "unit_other": "records"
   },
   "counts": {
     "inSublocations_one": "{{count}} in sublocations",
-    "inSublocations_other": "{{count}} in sublocations"
+    "inSublocations_other": "{{count}} in sublocations",
+    "recordsInside_one": "{{count}} record here and in sublocations",
+    "recordsInside_other": "{{count}} records here and in sublocations"
   },
   "stats": {},
   "storageNotFound": "Location not found",
@@ -342,9 +344,9 @@
   },
   "contents": {
     "emptyTitle": "Nothing inside this location",
-    "emptyDescriptionNone": "It holds no products and has no locations inside.",
-    "emptyDescription_one": "Its {{count}} product is on the Products tab.",
-    "emptyDescription_other": "Its {{count}} products are on the Products tab.",
+    "emptyDescriptionNone": "It holds no records and has no locations inside.",
+    "emptyDescription_one": "Its {{count}} record is on the Products tab.",
+    "emptyDescription_other": "Its {{count}} records are on the Products tab.",
     "showProducts": "Show products",
     "selected_one": "{{count}} location selected",
     "selected_other": "{{count}} locations selected",
@@ -355,7 +357,7 @@
     "code": "Code",
     "type": "Type",
     "inside": "Inside",
-    "products": "Products"
+    "products": "Records"
   },
   "products": {
     "includeInside": "Include locations inside",

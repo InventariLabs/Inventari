@@ -2,16 +2,27 @@
 Unit tests for bulk_service — bulk_create_items and bulk_edit_items.
 """
 
+from collections.abc import Iterator
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import UUID, uuid4
 
 import pytest
 
+import app.core.public_api as public_api
 from app.core.contracts import UserContextDTO
+from app.modules.equipment import bulk_service
 from app.modules.equipment._bulk_service import bulk_create_items
 from app.modules.equipment.bulk_service import bulk_edit_items
 from app.modules.equipment.schemas import BulkEquipmentCreate, BulkEquipmentEntry
+
+from ._mocked_asset_read import asset_read_through
+
+
+@pytest.fixture(autouse=True)
+def _asset_read_through_the_mock() -> Iterator[None]:
+    with asset_read_through(bulk_service, lambda: public_api.core_api):
+        yield
 
 
 def _db_mock() -> AsyncMock:

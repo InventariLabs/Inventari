@@ -175,11 +175,13 @@ class CoreStoragesAPI:
         include_inside: bool = False,
         limit: int | None = None,
         offset: int = 0,
+        claimed_tags: set[str] | None = None,
     ) -> list[ItemDTO]:
         """List non-deleted items in *storage_id* ordered by expiry ascending.
 
         ``include_inside`` adds the items of every place below it; ``limit``
-        and ``offset`` slice the answer in the database.
+        and ``offset`` slice the answer in the database. ``claimed_tags``
+        leaves out the records those context tags claim.
         """
         from app.services.storage._queries import list_items_in_location_async
 
@@ -190,24 +192,39 @@ class CoreStoragesAPI:
             include_inside=include_inside,
             limit=limit,
             offset=offset,
+            claimed_tags=claimed_tags,
         )
         return [ItemDTO.model_validate(i) for i in items]
 
     async def count_items_in_location_async(
-        self, db: AsyncSession, organization_id: UUID, storage_id: UUID
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        storage_id: UUID,
+        *,
+        claimed_tags: set[str] | None = None,
     ) -> int:
-        """Count non-deleted items in *storage_id*."""
+        """Count non-deleted items in *storage_id* (minus ``claimed_tags``' records)."""
         from app.services.storage._queries import count_items_in_location_async
 
-        return await count_items_in_location_async(db, organization_id, storage_id)
+        return await count_items_in_location_async(
+            db, organization_id, storage_id, claimed_tags=claimed_tags
+        )
 
     async def count_items_in_subtree_async(
-        self, db: AsyncSession, organization_id: UUID, storage_id: UUID
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        storage_id: UUID,
+        *,
+        claimed_tags: set[str] | None = None,
     ) -> int:
         """Count non-deleted items in *storage_id* and all its descendants."""
         from app.services.storage._queries import count_items_in_subtree_async
 
-        return await count_items_in_subtree_async(db, organization_id, storage_id)
+        return await count_items_in_subtree_async(
+            db, organization_id, storage_id, claimed_tags=claimed_tags
+        )
 
     async def descendant_ids_async(
         self, db: AsyncSession, organization_id: UUID, storage_id: UUID

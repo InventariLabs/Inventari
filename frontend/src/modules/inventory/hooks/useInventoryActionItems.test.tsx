@@ -4,7 +4,7 @@
  * land on the wrong screen.
  */
 import { describe, it, expect, beforeEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import * as React from "react";
@@ -13,6 +13,7 @@ import { server } from "@/test/mocks/server";
 import { onePage } from "@/test/mocks/page";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
+import { signInWith } from "@/test/auth";
 import { useInventoryActionItems } from "./useInventoryActionItems";
 
 const MODULES_WITH_STOCK_TAKES = [
@@ -38,6 +39,7 @@ function renderItems() {
 
 beforeEach(() => {
   useAuthStore.setState({ isAuthenticated: true, isLoading: false });
+  signInWith(["stock_takes:read"]);
   server.resetHandlers();
   server.use(
     http.get("/api/v1/modules/my", () =>
@@ -99,5 +101,26 @@ describe("useInventoryActionItems", () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(result.current).toEqual([]);
     expect(stockTakesRequested).toBe(0);
+  });
+
+  it("asks nothing of a role that cannot read the stock takes", async () => {
+    let stockTakesRequested = 0;
+    signInWith(["warehouse:read"]);
+    server.use(
+      http.get("/api/v1/stock-takes", () => {
+        stockTakesRequested += 1;
+        return HttpResponse.json({ detail: "forbidden" }, { status: 403 });
+      }),
+    );
+
+    const { result } = renderItems();
+
+    // The module is on, but the role holds no read of it: a row saying the
+    // count "could not be checked" would blame a failure that is a rule.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(stockTakesRequested).toBe(0);
+    expect(result.current).toEqual([]);
   });
 });

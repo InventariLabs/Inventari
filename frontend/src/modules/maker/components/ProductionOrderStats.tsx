@@ -63,6 +63,11 @@ function StatTile({
   );
 }
 
+/** The reader's word for the unit a run's output is counted in. */
+function outputUnitName(t: TFunction, symbol: string | null | undefined) {
+  return unitLabel(t, symbol) || t("create.needs.unitFallback");
+}
+
 /** What the cost tile is called: an undone run took nothing and cost nothing now. */
 function totalCostLabel(status: string, t: TFunction): string {
   if (status === "DRAFT") {
@@ -111,6 +116,9 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
           <span className="block">
             {t("detail.card.unitCost", {
               amount: formatMoney(order.unit_cost, currency, i18n.language),
+              // The number is the total divided by the run's output, whatever
+              // that is counted in: a kilogram run costs so much per kilogram.
+              unit: outputUnitName(t, order.output_uom_symbol),
             })}
           </span>
         )}
@@ -205,9 +213,7 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
                   "detail.card.resultPerUnit",
                   {
                     defaultValue: "({{amount}} per {{unit}})",
-                    unit:
-                      unitLabel(t, order.output_uom_symbol) ||
-                      t("create.needs.unitFallback"),
+                    unit: outputUnitName(t, order.output_uom_symbol),
                     amount: formatMoney(
                       order.result_per_unit,
                       currency,

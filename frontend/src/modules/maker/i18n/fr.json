@@ -192,7 +192,7 @@
       "overproduced": "Surproduction",
       "resultPerUnit": "({{amount}} / {{unit}})",
       "totalCostAfterClosing": "Coût total après clôture",
-      "unitCost": "{{amount}} par unité produite",
+      "unitCost": "{{amount}} / {{unit}}",
       "totalCostGap_one": "{{count}} ingrédient a été prélevé sur un stock sans coût, il manque donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
       "totalCostGap_other": "{{count}} ingrédients ont été prélevés sur un stock sans coût, ils manquent donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs."
     },

@@ -355,6 +355,11 @@ async def get_storage_items(
         description='Also the products of every location below this one, at '
         'any depth, in one answer.',
     ),
+    exclude_module_contexts: bool = Query(
+        False,
+        description='Leave out the records of a vertical module, the way the '
+        "general lists do, so the place's count and its list agree.",
+    ),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
@@ -370,12 +375,13 @@ async def get_storage_items(
 
     # A place's products grow with the stock, and with include_inside with the
     # whole subtree: the page is cut in the database, never from a full list.
+    claimed_tags = _resolve_claimed_tags(exclude_module_contexts)
     count_items = (
         core_api.locations.count_items_in_subtree_async
         if include_inside
         else core_api.locations.count_items_in_location_async
     )
-    total = await count_items(db, org_id, location_id)
+    total = await count_items(db, org_id, location_id, claimed_tags=claimed_tags)
     items = await core_api.locations.list_items_in_location_async(
         db,
         org_id,
@@ -383,6 +389,7 @@ async def get_storage_items(
         include_inside=include_inside,
         limit=limit,
         offset=offset,
+        claimed_tags=claimed_tags,
     )
     return PaginatedResponse.from_slice(items, offset=offset, limit=limit, total=total)
 

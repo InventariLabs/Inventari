@@ -17,7 +17,12 @@ import {
   currencyLabel,
 } from "@/lib/currencies";
 import { queryKeys } from "@/hooks/queries/keys";
-import { COUNTRY_CODES, countryFromLocale, countryLabel } from "@/module-sdk";
+import {
+  COUNTRY_CODES,
+  countryFromLocale,
+  countryLabel,
+  extractApiError,
+} from "@/module-sdk";
 import { resolveModuleTarget, moduleRegistry } from "@/lib/moduleRegistry";
 import { useMyModules } from "@/modules/settings/hooks/useModules";
 import { useOrganization } from "@/modules/settings/hooks/useOrganization";
@@ -253,6 +258,15 @@ export default function OnboardingPage() {
   const queryClient = useQueryClient();
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
+  // This screen sits outside the shell, the one other listener of the API
+  // client's "the session is over" signal: without this, an ended session
+  // left the reader here with nobody to send them to the sign-in form. Once
+  // the store forgets the session, the route guard does the redirect.
+  useEffect(() => {
+    const onSessionEnded = () => void logout();
+    window.addEventListener("auth:logout", onSessionEnded);
+    return () => window.removeEventListener("auth:logout", onSessionEnded);
+  }, [logout]);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
   // The two steps: which kind of place this is, then what it starts with.
   const [step, setStep] = useState<"profile" | "modules" | "focus">("profile");
@@ -315,7 +329,9 @@ export default function OnboardingPage() {
         setForbidden(true);
         return;
       }
-      toast.error(t("profileError"));
+      // An ended session carries its own sentence (and the sign-in form
+      // follows); "please try again" would send the reader round a loop.
+      toast.error(extractApiError(error, t("profileError")));
     }
   }
 
