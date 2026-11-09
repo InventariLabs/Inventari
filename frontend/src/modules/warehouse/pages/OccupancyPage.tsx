@@ -191,7 +191,7 @@ export default function OccupancyPage() {
         {t("warehouse:occupancy.intro")}{" "}
         <Link
           to="/warehouse/location-settings"
-          className="font-medium text-primary-600 hover:underline"
+          className="font-medium text-on-primary hover:underline"
         >
           {t("warehouse:occupancy.settingsLink")}
         </Link>

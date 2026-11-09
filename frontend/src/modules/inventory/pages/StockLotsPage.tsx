@@ -202,7 +202,7 @@ export default function StockLotsPage() {
                       <td className="px-4 py-2.5">
                         <Link
                           to={`/inventory/lots/${lot.id}`}
-                          className="text-primary-600 hover:text-primary-700 hover:underline"
+                          className="text-on-primary hover:underline"
                         >
                           {lot.name}
                         </Link>

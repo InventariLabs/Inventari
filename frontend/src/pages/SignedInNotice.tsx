@@ -25,7 +25,7 @@ export function SignedInNotice() {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           to="/"
-          className="inline-flex min-h-11 items-center font-medium text-primary-600 hover:underline md:min-h-0"
+          className="inline-flex min-h-11 items-center font-medium text-on-primary hover:underline md:min-h-0"
         >
           {t("signedInContinue")}
         </Link>

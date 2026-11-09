@@ -33,7 +33,7 @@ export default function StorageMovesSlot({ data }: Props) {
       <p className="mb-4 px-1">
         <Link
           to={`/inventory/stock?location=${data.storageId}`}
-          className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-on-primary hover:underline"
         >
           {t("inventory:stock.seeForLocation")}
           <ArrowUpRight size={14} aria-hidden="true" />

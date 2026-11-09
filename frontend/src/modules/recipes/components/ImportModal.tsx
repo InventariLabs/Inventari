@@ -149,7 +149,7 @@ export function ImportModal({
                 type="button"
                 variant="link"
                 onClick={onShowExample}
-                className="px-0 text-xs text-primary-600 hover:text-primary-700 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
+                className="px-0 text-xs text-on-primary min-h-11 md:min-h-0 min-w-11 md:min-w-0"
               >
                 {showExampleText}
               </Button>

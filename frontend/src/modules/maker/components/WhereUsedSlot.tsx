@@ -75,7 +75,7 @@ export function WhereUsedSlot({ data }: WhereUsedSlotProps) {
               variant="link"
               size="inline"
               type="button"
-              className="text-sm text-primary-600 truncate"
+              className="text-sm text-on-primary truncate"
               data-testid="maker-where-used-link"
               onClick={() => open(item.recipe_id)}
             >

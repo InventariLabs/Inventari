@@ -202,7 +202,7 @@ export default function UnlinkedIngredientsPage() {
         <td className="py-2.5 pr-4 align-middle">
           <Link
             to={`/recipes/${ingredient.recipe_id}`}
-            className="text-sm text-primary-600 hover:underline"
+            className="text-sm text-on-primary hover:underline"
           >
             {ingredient.recipe_name}
           </Link>

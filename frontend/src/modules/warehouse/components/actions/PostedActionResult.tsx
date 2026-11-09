@@ -154,7 +154,7 @@ export function PostedActionResult({
   const number = (
     <Link
       to={`/warehouse/documents/${document.id}`}
-      className="font-semibold text-primary-600 hover:underline"
+      className="font-semibold text-on-primary hover:underline"
     >
       {document.number}
     </Link>

@@ -976,7 +976,7 @@ export default function DocumentRegisterPage() {
               documents it would have listed. */}
           <Link
             to="/warehouse/history"
-            className="text-sm font-medium text-primary-600 hover:underline"
+            className="text-sm font-medium text-on-primary hover:underline"
           >
             {t("register.emptyGoToDocuments")}
           </Link>

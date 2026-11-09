@@ -24,7 +24,7 @@ export function TrackingLink({ trackingNumber, trackingUrl }: Props) {
       rel="noopener noreferrer"
       // Inline, not inline-flex: a number longer than its column wraps
       // inside the text, with the icon after its last character.
-      className="font-mono text-primary-600 hover:underline underline-offset-2"
+      className="font-mono text-on-primary hover:underline underline-offset-2"
       aria-label={t("shipping.trackAria", { number: trackingNumber })}
     >
       {trackingNumber}

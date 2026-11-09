@@ -38,7 +38,7 @@ export function FocusLockGate({ children }: { children: ReactNode }) {
           )}
           <Link
             to="/settings/my-modules"
-            className="text-sm font-medium text-primary-600 hover:underline"
+            className="text-sm font-medium text-on-primary hover:underline"
           >
             {t("focusLock.exit")}
           </Link>
@@ -55,7 +55,7 @@ export function FocusLockGate({ children }: { children: ReactNode }) {
       <p className="text-sm text-on-muted">{t("focusLock.body")}</p>
       <Link
         to="/settings/my-modules"
-        className="inline-block text-sm font-medium text-primary-600 hover:underline"
+        className="inline-block text-sm font-medium text-on-primary hover:underline"
       >
         {t("focusLock.exit")}
       </Link>
