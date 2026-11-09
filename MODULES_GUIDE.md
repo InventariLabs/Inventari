@@ -1239,10 +1239,12 @@ key already says it. A module may declare none when one of these holds:
   endpoint added later arrives closed. `api_keys` is behind `org:settings:write`; `webhooks` is
   behind the administrator check (the built-in admin level or a role holding `admin:access`).
 - **It turns what a member may already read into output, and nothing more.** `printing` renders
-  labels of items and locations the member can see and queues them for a printer; its router is
-  behind the module switch and organization membership. It does declare one key of its own,
-  `printing:agent`, which guards its `/agent/` endpoints — and that key is the whole reach of a
-  key issued with the `printing` scope.
+  labels of items and locations the member can see and queues them for a printer; each of its
+  app routes asks for the read of the screen that sends the label (`items:read`, `locations:read`,
+  `equipment:read` or `warehouse:read`, by kind of label), and a job answers to the read of its
+  target — [`docs/subsystems/PRINTING.md`](docs/subsystems/PRINTING.md) lists them. It does declare
+  one key of its own, `printing:agent`, which guards its `/agent/` endpoints — and that key is the
+  whole reach of a key issued with the `printing` scope.
 
 A module whose endpoints change records of its own, or hand out something a member could not
 read before, declares keys and guards with them — `require_permission('<module>:<action>')`, or
