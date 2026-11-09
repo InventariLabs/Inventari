@@ -15,7 +15,11 @@ import { resolveProfileThemeForMode } from "@/hooks/useProfileTheme";
  * card or raised surface in dark.
  */
 
-const CSS = readFileSync(resolve(process.cwd(), "src/index.css"), "utf8");
+// Comments stripped: a token or rule that is commented out must not answer.
+const CSS = readFileSync(
+  resolve(process.cwd(), "src/index.css"),
+  "utf8",
+).replace(/\/\*[\s\S]*?\*\//g, "");
 const PROFILES = readFileSync(
   resolve(process.cwd(), "../backend/app/core/product_profiles.py"),
   "utf8",
