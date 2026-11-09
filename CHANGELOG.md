@@ -226,6 +226,15 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- Asking for an approval now warns about a later stage nobody could decide,
+  not only the first. The dialog behind Confirm and Send for approval on a
+  document, and the one on a purchase order, name the first stage that has no
+  possible decider and what ends the wait (grant the named people access to
+  approvals, give someone the permission, or withdraw the request); where every
+  stage can be decided they keep the ordinary sentence. A purchase order whose
+  request was withdrawn and that asks again gets the same warning from its
+  approval card, and the notice for a request stuck at such a stage no longer
+  promises that withdrawing it returns the order to Confirmed.
 - `PGBOUNCER_MAX_CLIENT_CONN` in `.env` sets how many connections PgBouncer
   accepts from the backend (300 when unset, as before). Six workers open up to
   300, so DEPLOYMENT.md's 16 GB sizing row now sets it to 400.

@@ -191,6 +191,57 @@ describe("DocumentDetailPage.confirmDialogMessage", () => {
       expect(message).toMatch(/nobody in this organization holds it/i);
     });
 
+    it("the one-step Send for approval dialog names the stage and what ends the wait", () => {
+      const named = confirmDialogMessage(
+        "postNow",
+        doc,
+        {
+          ...base,
+          deadEnd: {
+            reason: "named_approvers_cannot_decide",
+            stage: "Director",
+          },
+        },
+        t,
+      );
+      expect(named).not.toMatch(/once approved, it is posted/i);
+      expect(named).toMatch(/nobody could decide it/i);
+      expect(named).toMatch(/“Director”/);
+      expect(named).toMatch(/given access/i);
+
+      const onlyYou = confirmDialogMessage(
+        "postNow",
+        doc,
+        {
+          ...base,
+          deadEnd: { reason: "only_the_requester_can_decide", stage: "Lead" },
+        },
+        t,
+      );
+      expect(onlyYou).toMatch(/is you/i);
+
+      const nobody = confirmDialogMessage(
+        "postNow",
+        doc,
+        {
+          ...base,
+          deadEnd: { reason: "no_approver_in_organization", stage: "Lead" },
+        },
+        t,
+      );
+      expect(nobody).toMatch(/nobody in this organization holds it/i);
+
+      // Every stage decidable: the ordinary consequence stays.
+      const plain = confirmDialogMessage(
+        "postNow",
+        doc,
+        { ...base, deadEnd: null },
+        t,
+      );
+      expect(plain).toMatch(/once approved, it is posted/i);
+      expect(plain).not.toMatch(/nobody could decide/i);
+    });
+
     it("keeps the plain sentence when the stage can be decided", () => {
       const message = confirmDialogMessage(
         "confirm",
