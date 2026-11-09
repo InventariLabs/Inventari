@@ -20,7 +20,9 @@ import { isSpiceQuantity } from "../utils";
 import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
 
 /**
- * The backend's `needs_buying` predicate, mirrored.
+ * Whether the list behind the button buys this ingredient for this recipe
+ * alone: the backend adds a line exactly when the recipe asks for more than
+ * the shelf covers, and these are the statuses that say so.
  *
  * The button and the list behind it answer one question, so they read one
  * set of statuses. "Not enough" belongs on this side of the line: a short

@@ -33,8 +33,11 @@ def _shelve_grams(
     location: StorageLocation,
     name: str,
     quantity: Decimal,
-) -> ProductTemplate:
-    """A product of *name*, measured in grams, with *quantity* on the shelf."""
+) -> uuid.UUID:
+    """A product of *name*, measured in grams, with *quantity* on the shelf.
+
+    Returns the record that holds it, for a test that uses some of it up.
+    """
     grams = db.execute(text("SELECT id FROM uoms WHERE symbol = 'g'")).fetchone()
     assert grams is not None
     template = ProductTemplate(
@@ -46,12 +49,13 @@ def _shelve_grams(
     db.add(template)
     db.commit()
 
-    async def _put(session: AsyncSession) -> None:
-        await put_on_shelf(session, user, template, location.id, quantity)
+    async def _put(session: AsyncSession) -> uuid.UUID:
+        record = await put_on_shelf(session, user, template, location.id, quantity)
+        return record.id
 
-    run_in_async_session(engine, _put)
+    record_id = run_in_async_session(engine, _put)
     db.expire_all()
-    return template
+    return record_id
 
 
 def _uom_id(db: Session, symbol: str) -> uuid.UUID:
@@ -645,4 +649,285 @@ class TestARecipeOnTheListTwice:
         assert items[0]['note_data'] == {
             'for_recipe': 'Bread',
             'for_recipes': ['Bread'],
+            # What the recipe asked for, before the shelf: a later press
+            # tops the line up by what it needs beyond this.
+            'needs': {'Bread': '500.0'},
         }
+
+
+def _flour_line(
+    client: TestClient, auth_headers: dict[str, str], list_id: str
+) -> Decimal:
+    [line] = client.get(
+        f'/api/v1/shopping-lists/{list_id}/items', headers=auth_headers
+    ).json()['items']
+    return Decimal(str(line['quantity']))
+
+
+class TestALineAsksForWhatItsRecipesNeedNow:
+    """A recipe already named on the line, pressed again when it needs more.
+
+    The line recorded which recipes it was made for but not how much each
+    asked, so a recipe it named was "already listed" whatever it needed now:
+    Bread at three servings left the list at one serving's flour.
+    """
+
+    def test_more_servings_raise_the_line_by_the_growth(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        door = f'{RECIPE_URL}/{bread}/add-to-shopping-list'
+        list_id = client.post(door, json={'servings': 1}, headers=auth_headers).json()[
+            'shopping_list_id'
+        ]
+
+        def press(servings: int) -> dict[str, Any]:
+            response = client.post(
+                door,
+                json={'servings': servings, 'shopping_list_id': list_id},
+                headers=auth_headers,
+            )
+            assert response.status_code == 200, response.text
+            body: dict[str, Any] = response.json()
+            return body
+
+        grown = press(3)
+        assert (grown['added_count'], grown['raised_count']) == (0, 1)
+        assert _flour_line(client, auth_headers, list_id) == Decimal('600')
+
+        # The same need again, or a smaller one, changes nothing.
+        for servings in (3, 1):
+            again = press(servings)
+            assert (again['added_count'], again['raised_count']) == (0, 0)
+            assert again['already_listed_count'] == 1
+        assert _flour_line(client, auth_headers, list_id) == Decimal('600')
+
+    def test_an_emptier_shelf_raises_the_line_by_what_it_no_longer_covers(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_location: StorageLocation,
+        async_engine_fixture: AsyncEngine,
+    ) -> None:
+        """150 g on the shelf: the list asks 50 g; 100 g used: it asks 150 g."""
+        record = _shelve_grams(
+            db_session,
+            async_engine_fixture,
+            test_user,
+            test_storage_location,
+            'Flour',
+            Decimal('150'),
+        )
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        door = f'{RECIPE_URL}/{bread}/add-to-shopping-list'
+        list_id = client.post(door, json={'servings': 1}, headers=auth_headers).json()[
+            'shopping_list_id'
+        ]
+        assert _flour_line(client, auth_headers, list_id) == Decimal('50')
+
+        used = client.patch(
+            f'/api/v1/items/{record}/consume',
+            json={'quantity': 100},
+            headers=auth_headers,
+        )
+        assert used.status_code == 200, used.text
+        body = client.post(
+            door,
+            json={'servings': 1, 'shopping_list_id': list_id},
+            headers=auth_headers,
+        ).json()
+
+        assert (body['added_count'], body['raised_count']) == (0, 1)
+        assert _flour_line(client, auth_headers, list_id) == Decimal('150')
+
+
+class TestRecipesSharingGoodsNetTheShelfOnce:
+    """The shelf is subtracted from what the recipes need together.
+
+    Each recipe's requirement was netted against the whole shelf on its own
+    and the shortfalls summed, so the same flour covered both recipes: Bread
+    (200 g) and Cake (300 g) over 250 g asked for 50 g where 250 g is short.
+    The meal plan sums first and nets once; the recipe doors now do too.
+    """
+
+    def _bread_and_cake(
+        self, client: TestClient, auth_headers: dict[str, str], db_session: Session
+    ) -> tuple[str, str]:
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        cake = _recipe(
+            client,
+            auth_headers,
+            'Cake',
+            [{'name': 'Flour', 'quantity': '300', 'uom_id': grams}],
+        )
+        return bread, cake
+
+    @pytest.mark.parametrize(
+        ('on_shelf', 'listed'),
+        [
+            # Each recipe alone is short.
+            (Decimal('250'), Decimal('250')),
+            # Each recipe alone finds enough; together they do not.
+            (Decimal('400'), Decimal('100')),
+        ],
+    )
+    def test_one_press_nets_the_shelf_against_the_recipes_summed_need(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_location: StorageLocation,
+        async_engine_fixture: AsyncEngine,
+        on_shelf: Decimal,
+        listed: Decimal,
+    ) -> None:
+        _shelve_grams(
+            db_session,
+            async_engine_fixture,
+            test_user,
+            test_storage_location,
+            'Flour',
+            on_shelf,
+        )
+        bread, cake = self._bread_and_cake(client, auth_headers, db_session)
+
+        response = client.post(
+            ADD_URL,
+            json={'recipe_ids': [bread, cake], 'servings': 1},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body['added_count'] == 1
+        assert _flour_line(client, auth_headers, body['shopping_list_id']) == listed
+
+    def test_a_listed_recipe_that_grew_nets_the_shelf_against_the_whole_line(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_location: StorageLocation,
+        async_engine_fixture: AsyncEngine,
+    ) -> None:
+        """Bread + Cake over 250 g, then Bread alone at three servings.
+
+        The line is for both recipes: 600 g + 300 g, less the 250 g on the
+        shelf, is 650 g — Cake's flour stays counted though Cake was not
+        pressed again, and the shelf is not given to Bread a second time.
+        """
+        _shelve_grams(
+            db_session,
+            async_engine_fixture,
+            test_user,
+            test_storage_location,
+            'Flour',
+            Decimal('250'),
+        )
+        bread, cake = self._bread_and_cake(client, auth_headers, db_session)
+        list_id = client.post(
+            ADD_URL,
+            json={'recipe_ids': [bread, cake], 'servings': 1},
+            headers=auth_headers,
+        ).json()['shopping_list_id']
+
+        body = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 3, 'shopping_list_id': list_id},
+            headers=auth_headers,
+        ).json()
+
+        assert (body['added_count'], body['raised_count']) == (0, 1)
+        assert _flour_line(client, auth_headers, list_id) == Decimal('650')
+
+
+class TestALineFromBeforeTheNeedsWereKept:
+    def test_its_recipe_stays_covered_and_another_gets_a_line_of_its_own(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """A line written before each recipe's need was recorded names Bread
+        only. How much of it is Bread's is unknown, so Bread stays covered at
+        whatever it needs, as it was; Cake's 300 g goes on a line of its own
+        rather than onto one whose share nobody can read."""
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '200', 'uom_id': grams}],
+        )
+        cake = _recipe(
+            client,
+            auth_headers,
+            'Cake',
+            [{'name': 'Flour', 'quantity': '300', 'uom_id': grams}],
+        )
+        created = client.post(
+            '/api/v1/shopping-lists', json={'name': 'Week'}, headers=auth_headers
+        )
+        assert created.status_code == 201, created.text
+        list_id = created.json()['id']
+        # The bulk door keeps the source a line says it came from.
+        written = client.post(
+            f'/api/v1/shopping-lists/{list_id}/items/bulk',
+            json=[
+                {
+                    'name': 'Flour',
+                    'quantity': '200',
+                    'uom_id': grams,
+                    'source': 'recipe',
+                    'note_data': {'for_recipe': 'Bread'},
+                }
+            ],
+            headers=auth_headers,
+        )
+        assert written.status_code == 201, written.text
+
+        again = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 3, 'shopping_list_id': list_id},
+            headers=auth_headers,
+        ).json()
+        assert (again['added_count'], again['raised_count']) == (0, 0)
+        assert again['already_listed_count'] == 1
+
+        other = client.post(
+            ADD_URL,
+            json={'recipe_ids': [cake], 'servings': 1, 'shopping_list_id': list_id},
+            headers=auth_headers,
+        ).json()
+        assert (other['added_count'], other['raised_count']) == (1, 0)
+        lines = client.get(
+            f'/api/v1/shopping-lists/{list_id}/items', headers=auth_headers
+        ).json()['items']
+        assert sorted(
+            (i['note_data']['for_recipe'], Decimal(str(i['quantity']))) for i in lines
+        ) == [('Bread', Decimal('200')), ('Cake', Decimal('300'))]
