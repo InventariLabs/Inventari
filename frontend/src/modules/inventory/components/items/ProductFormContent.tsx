@@ -193,7 +193,12 @@ export default function ProductFormContent({
               {suggestExistingProducts && (
                 <ExistingProductSuggestions
                   name={(formData.name as string) ?? ""}
-                  onPick={(picked) => onChange("name", picked)}
+                  onPick={(picked) => {
+                    onChange("name", picked);
+                    // The button that was clicked leaves the page with the
+                    // suggestions; without this focus falls to the body.
+                    document.getElementById("name")?.focus();
+                  }}
                 />
               )}
             </div>
