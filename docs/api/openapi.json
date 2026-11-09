@@ -3,7 +3,7 @@
   "info": {
     "title": "Inventari API",
     "description": "Home Inventory Management API",
-    "version": "0.11.0"
+    "version": "0.12.0"
   },
   "paths": {
     "/": {

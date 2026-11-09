@@ -253,6 +253,18 @@ written by hand (`alembic revision -m "<message>"`). Indexes a migration builds
 by hand, such as trigram searches, are listed in
 `backend/app/core/autogenerate_scope.py` so autogenerate leaves them alone.
 
+### Release rhythm
+
+A minor release goes out every two weeks, on a Monday, whatever has landed
+on `dev` and passed its gates by then. A change that breaks a client, a module
+or an installation ships only in a minor release, is marked **Breaking** in
+`CHANGELOG.md` and says what the affected party must do. A patch release
+(`0.12.1`) is cut only for a security fix, data loss or an upgrade that
+breaks; nothing else waits for one. The maintainers cut the release: they
+turn `## Unreleased` into the version's section, bring the version numbers
+(listed in `AGENTS.md`, "Changelog") to it, add the release database below
+and push `main` and the tag.
+
 ### Upgrading from a released database
 
 A migration that passes on an empty database can still stop an installation
