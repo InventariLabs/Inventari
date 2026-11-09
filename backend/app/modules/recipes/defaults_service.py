@@ -3,9 +3,10 @@
 Handles system defaults (seeded from JSON, organization_id=NULL)
 and per-organisation overrides (organization_id=UUID).
 
-Lookup hierarchy:
-  1. org override (org_id + lang + name_normalized)
-  2. system default (org_id=NULL + lang + name_normalized)
+Lookup hierarchy (``lookup_default``): the name is matched in every language,
+because nutrition data depends on the ingredient, not on the interface
+language. Among the matches an org override beats a system default, and
+within each of those the entry in the current language beats the others.
 """
 
 from __future__ import annotations

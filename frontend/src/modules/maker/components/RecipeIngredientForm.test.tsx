@@ -93,9 +93,14 @@ describe("RecipeIngredientForm", () => {
     render(<RecipeIngredientForm recipeId="r1" outputTemplateId="tpl-out" />);
     await user.click(screen.getByText("pick a product"));
 
-    expect(screen.getByTestId("uom-select").getAttribute("data-hint")).toMatch(
+    expect(screen.getByTestId("uom-convertible-hint").textContent).toMatch(
       /pcs/,
     );
+    // Said at the full row width, not inside the picker's narrow column.
+    expect(screen.getByTestId("uom-convertible-hint").className).toContain(
+      "sm:basis-full",
+    );
+    expect(screen.getByTestId("uom-select").getAttribute("data-hint")).toBe("");
   });
 
   it("drops the hint rather than naming a unit it cannot read when the units failed", async () => {
@@ -106,7 +111,7 @@ describe("RecipeIngredientForm", () => {
     render(<RecipeIngredientForm recipeId="r1" outputTemplateId="tpl-out" />);
     await user.click(screen.getByText("pick a product"));
 
-    expect(screen.getByTestId("uom-select").getAttribute("data-hint")).toBe("");
+    expect(screen.queryByTestId("uom-convertible-hint")).toBeNull();
   });
 
   it("keeps the backend's refusal on screen, next to the line it is about", async () => {

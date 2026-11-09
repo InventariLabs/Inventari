@@ -121,7 +121,7 @@ export function RecipeIngredientForm({
       <h4 className="text-xs uppercase tracking-widest text-on-muted font-medium">
         {t("composition.addIngredient")}
       </h4>
-      <div className="flex flex-col sm:flex-row sm:items-end gap-2">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-2">
         <div className="flex-1 min-w-0">
           {child ? (
             <>
@@ -188,11 +188,6 @@ export function RecipeIngredientForm({
               value={uomId || null}
               onChange={(id) => setUomId(id)}
               convertibleTo={stockUomId}
-              convertibleHint={
-                stockUomId && !unitsFailed
-                  ? t("bom.unitMustBeConvertible", { unit: stockSymbol })
-                  : undefined
-              }
             />
           </div>
         </div>
@@ -205,6 +200,16 @@ export function RecipeIngredientForm({
         >
           {addLine.isPending ? t("bom.adding") : t("bom.add")}
         </Button>
+        {/* Said at the full row width: inside the picker's 8rem column the
+            sentence wrapped to a ribbon of a few words a line. */}
+        {stockUomId && !unitsFailed && (
+          <p
+            className="text-xs text-on-muted sm:basis-full"
+            data-testid="uom-convertible-hint"
+          >
+            {t("bom.unitMustBeConvertible", { unit: stockSymbol })}
+          </p>
+        )}
       </div>
 
       {error && (
