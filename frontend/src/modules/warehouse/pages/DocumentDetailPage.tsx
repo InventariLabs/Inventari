@@ -240,6 +240,12 @@ export function confirmDialogMessage(
     // approval, the same press only sends it there — say which one this is
     // before the click, not after it.
     if (facts.required) {
+      // Nobody can give the approval yet, so the press is refused outright,
+      // exactly as the confirm dialog says; promising the queue here was a
+      // promise the server disproved.
+      if (!facts.workflowConfigured) {
+        return t("confirmDialog.confirmMessageNoWorkflow");
+      }
       // Same verdict the confirm dialog reads: the press parks the document
       // either way, and the sentence must not call a dead end "the queue".
       if (facts.deadEnd) {
