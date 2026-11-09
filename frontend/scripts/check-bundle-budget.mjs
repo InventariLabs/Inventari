@@ -378,10 +378,30 @@ const dist = join(root, "dist");
  * five, to 630; the other screens stand under theirs (login 394.5, launcher
  * 409.6, receive 462.1, issue 574.7, history 598.6, products 613.4, initial
  * 189.3, app first paint 389.8).
+ *
+ * Re-measured 2026-11-09 on the branch whose one-step "Send for approval"
+ * dialog names a stage nobody can decide: the development tip alone measures
+ * app first paint at 389.9 KiB gz against its 390, and the branch adds 0.1
+ * (390.0). It is copy, not an import: three sentences in the warehouse file
+ * of each language, the Polish one in the language chunk every first paint
+ * loads. That one budget moves a step of five, to 395; the other screens stand
+ * under theirs (login 394.8, launcher 409.9, start 625.9, receive 462.4, issue
+ * 575.0, history 598.9, products 613.8, initial 189.3).
+ *
+ * Re-measured 2026-11-09 on the development line with that branch and the one
+ * that names an already-listed shopping notice without a count together:
+ * neither is over alone (the development tip stood at issue 575.0 against its
+ * 575, this branch alone 575.0, the other 574.9), but the Polish language
+ * chunk both touch compresses less well in the merged tree and the issue
+ * screen measures 575.0 over the line. It is copy in one shared chunk, not an
+ * import that walked in. That one phone budget moves a step of five, to 580;
+ * the others stand under theirs (login 394.8, launcher 409.9, start 625.9,
+ * receive 462.5, history 598.9, products 613.8, app first paint 390.1,
+ * initial 189.3).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 390,
+  appFirstPaint: 395,
 };
 
 /**

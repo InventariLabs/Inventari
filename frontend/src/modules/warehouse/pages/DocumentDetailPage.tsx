@@ -240,6 +240,18 @@ export function confirmDialogMessage(
     // approval, the same press only sends it there — say which one this is
     // before the click, not after it.
     if (facts.required) {
+      // Same verdict the confirm dialog reads: the press parks the document
+      // either way, and the sentence must not call a dead end "the queue".
+      if (facts.deadEnd) {
+        const stage = facts.deadEnd.stage ?? "";
+        if (facts.deadEnd.reason === "named_approvers_cannot_decide") {
+          return t("confirmDialog.postNowMessageDeadEndNamed", { stage });
+        }
+        if (facts.deadEnd.reason === "only_the_requester_can_decide") {
+          return t("confirmDialog.postNowMessageDeadEndOnlyYou", { stage });
+        }
+        return t("confirmDialog.postNowMessageDeadEndNoApprover", { stage });
+      }
       return t("confirmDialog.postNowApprovalMessage");
     }
     // The rule answers for the type and the value it can weigh; an
