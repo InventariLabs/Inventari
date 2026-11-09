@@ -65,7 +65,7 @@ async def first_stage_verdict_async(
     # waits at: a later stage nobody can decide parks the request just as
     # surely, one approval later. The first such stage is the one named.
     holders: set[UUID] | None = None
-    may_decide_own = False
+    may_decide_own: bool | None = None
     for stage in ordered:
         if [str(u) for u in (stage.get('approver_user_ids') or [])] == [me]:
             continue
@@ -75,17 +75,19 @@ async def first_stage_verdict_async(
             holders = await core_api.roles.holders_of_permission_async(
                 db, organization_id=org_id, permission=APPROVE_GRANT
             )
-            if holders and holders == {requester_id}:
-                may_decide_own = await _may_decide_on_own_request(
-                    db, org_id, requester_id
-                )
+        # Asked only when the answer can matter — the requester is named on
+        # this stage, or is the one holder of the grant on an open one.
+        if may_decide_own is None and (
+            requester_id in named or (not named and holders == {requester_id})
+        ):
+            may_decide_own = await _may_decide_on_own_request(db, org_id, requester_id)
         reason = cannot_be_decided_reason(
             stage,
             org_has_approver=bool(holders) if not named else True,
             deciders=deciders,
             requester_id=requester_id,
             approver_holders=None if named else holders,
-            requester_may_decide_own=may_decide_own,
+            requester_may_decide_own=bool(may_decide_own),
         )
         if reason is not None:
             return FirstStageVerdict(
