@@ -25,6 +25,7 @@ from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    module_scopes_held,
     require_any_permission,
     require_org,
     require_permission,
@@ -51,8 +52,12 @@ AGENT_PATH = '/agent'
 #: (``equipment:read``); a product's barcode label from the product screens
 #: alone. Printing changes no stock, so a viewer prints too. A label a module
 #: draws itself is queued through ``printing_api`` under that module's read.
+#: A module's read is also the reach of a pool job, as it is of the label
+#: sheet download: the labels assigned to the module's own records, never a
+#: product's label or one nobody has assigned (``_POOL_MODULE_READS``).
 _SHELF_READS = (SystemPermission.STORAGES_READ.value, 'warehouse:read')
-_POOL_READS = (SystemPermission.ITEMS_READ.value, 'equipment:read')
+_POOL_MODULE_READS = ('equipment:read',)
+_POOL_READS = (SystemPermission.ITEMS_READ.value, *_POOL_MODULE_READS)
 _PRODUCT_READS = (SystemPermission.ITEMS_READ.value,)
 
 _READS_PRODUCTS = require_permission(SystemPermission.ITEMS_READ)
@@ -151,11 +156,15 @@ async def queue_job(
     """Send the chosen labels to a printer."""
     read_permissions = _target_reads(payload)
     _require_read(current_user, read_permissions)
+    module_scopes: frozenset[str] | None = None
+    if not current_user.has_permission(SystemPermission.ITEMS_READ):
+        module_scopes = frozenset(module_scopes_held(current_user, _POOL_MODULE_READS))
     job = await queue.queue_job_async(
         db,
         org_id,
         current_user.id,
         read_permissions=read_permissions,
+        module_scopes=module_scopes,
         agent_id=payload.agent_id,
         label_ids=payload.label_ids,
         short_codes=payload.short_codes,

@@ -2137,7 +2137,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Asset Valuation */
+        /**
+         * Asset Valuation
+         * @description One asset's purchase price and book value, for its own card.
+         *
+         *     Not held to the finance roles of the fleet total above, deliberately: the
+         *     total is the organization's finances added up, while one asset's price is
+         *     a fact on its card — the Info tab prints it from the record itself to
+         *     whoever reads the register, and the overview says a member still sees the
+         *     value of one asset on its own page. What bounds this read is the asset:
+         *     a record the register does not list is 404 here.
+         */
         get: operations["asset_valuation_api_v1_equipment__item_id__valuation_get"];
         put?: never;
         post?: never;

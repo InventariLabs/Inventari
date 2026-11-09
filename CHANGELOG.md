@@ -917,6 +917,18 @@ says what the release does rather than what changed since them.
   each To do row asked its module regardless and met a refusal. Such a tile
   now shows no status and such a row does not appear; the tiles themselves
   stay.
+- The equipment register's routes that name one asset answer only for the
+  records the register lists: an asset's valuation, attachments, approval
+  state, assignment and maintenance history and timeline, and its check-out,
+  service entry, status change, retirement and archiving. Before, a role
+  holding only `equipment:read` read the name, serial number and purchase
+  price of any product whose id it knew through the asset valuation, and a
+  retirement or an archiving sent through the register changed an ordinary
+  product. Such a record now answers 404, as an id that names nothing does.
+  A print job of pool labels sent with the register's read, and not the
+  product read, likewise takes only labels assigned to the register's
+  records: a product's label or one nobody has assigned is refused as
+  nothing to print, and a mixed request prints the register's labels alone.
 
 ### Removed
 
