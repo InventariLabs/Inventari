@@ -34,9 +34,9 @@
     "storageRestored": "Local restaurado"
   },
   "detail": {
-    "products": "Produtos ({{count}})",
-    "products_one": "Produtos ({{count}})",
-    "products_other": "Produtos ({{count}})",
+    "records": "Registros ({{count}})",
+    "records_one": "Registro ({{count}})",
+    "records_other": "Registros ({{count}})",
     "table": {
       "product": "Produto",
       "category": "Categoria",
