@@ -156,6 +156,7 @@ for _mod in module_registry.get_all():
         importlib.import_module(_models)
 
 from app import database as app_database
+from app.core._event_bus import event_bus
 from app.core.contracts import ModuleModelBase
 from app.core.contributions import QuotaProvider, contribution_registry
 from app.core.limiter import limiter
@@ -225,6 +226,10 @@ else:
     DB_NAME = run_scoped_db_name(DB_NAME_BASE, None)
     settings.REDIS_STREAM_NAME = f'inventari_stream_{TEST_RUN_ID}'
     settings.REDIS_TASKS_STREAM_NAME = f'inventari_tasks_{TEST_RUN_ID}'
+
+# app.main was imported above, so the event-bus singleton already read the
+# default stream name in its constructor; point it at this run's stream.
+event_bus._stream_name = settings.REDIS_STREAM_NAME
 
 # Force settings.DATABASE_URL to use the direct worker database (bypass PgBouncer for tests)
 TEST_DATABASE_URL = (
