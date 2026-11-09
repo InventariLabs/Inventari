@@ -18,6 +18,7 @@ from app.core.upload_validation import (
 )
 from app.i18n.service import get_current_lang
 
+from ._assets_service import get_asset_async
 from ._unit_identity import audit_identity
 from .models import EquipmentAttachment
 from .schemas import AttachmentSchema
@@ -59,7 +60,7 @@ async def upload_attachment(
     content_type: str,
     file_type: str,
 ) -> AttachmentSchema:
-    item = await core_api.items.get_async(db, org_id, item_id)
+    item = await get_asset_async(db, org_id, item_id)
     if not item:
         raise NotFoundException('item', get_current_lang())
 
@@ -126,7 +127,7 @@ async def list_attachments(
     # A read on the card: an archived asset keeps the papers filed under it
     # — they are exactly what a restore decision is made on. Only the
     # upload path stays live-only below.
-    item = await core_api.items.get_any_async(db, org_id, item_id)
+    item = await get_asset_async(db, org_id, item_id, include_archived=True)
     if not item:
         raise NotFoundException('item', get_current_lang())
 

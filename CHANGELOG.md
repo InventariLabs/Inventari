@@ -903,6 +903,18 @@ says what the release does rather than what changed since them.
   under the module's scope only, a product card outside it answers 404, and
   the label sheet draws only labels assigned to those records, never the free
   pool.
+- The equipment register's routes that name one asset answer only for the
+  records the register lists: an asset's valuation, attachments, approval
+  state, assignment and maintenance history and timeline, and its check-out,
+  service entry, status change, retirement and archiving. Before, a role
+  holding only `equipment:read` read the name, serial number and purchase
+  price of any product whose id it knew through the asset valuation, and a
+  retirement or an archiving sent through the register changed an ordinary
+  product. Such a record now answers 404, as an id that names nothing does.
+  A print job of pool labels sent with the register's read, and not the
+  product read, likewise takes only labels assigned to the register's
+  records: a product's label or one nobody has assigned is refused as
+  nothing to print, and a mixed request prints the register's labels alone.
 
 ### Removed
 
