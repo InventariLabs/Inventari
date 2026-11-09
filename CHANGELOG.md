@@ -336,6 +336,12 @@ says what the release does rather than what changed since them.
   decimal mark: a Polish, German, French, Spanish or Portuguese reader sees
   999999999,999, as the screen's own numbers and the same list's keyed ceiling
   refusal already did.
+- Importing ingredient nutrition data no longer loses the whole file when one
+  row is refused: that row is counted as an error and the rest are saved,
+  where a name too long for its column used to answer 500 and roll back the
+  good rows too. A blank ingredient name is now refused by the form and
+  counted as an error by the import instead of being saved as a nameless entry
+  that matches every other blank name.
 - An approval stage that names the person who raised the request beside people
   who cannot decide it is reported as a dead end instead of as a stage waiting
   its turn: the queue marks the request, the dialog warns before confirming,

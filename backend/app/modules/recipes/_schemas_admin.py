@@ -1,8 +1,15 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    field_validator,
+)
 
 # === Tag Management ===
 
@@ -75,7 +82,20 @@ class IngredientDefaultBase(BaseModel):
 
 
 class IngredientDefaultCreate(IngredientDefaultBase):
-    pass
+    """A row the form or the import writes.
+
+    The same schema validates both doors. The name is what the row is keyed
+    by, and the column holds 255 characters: a blank name normalizes to ''
+    and matches every other nameless row, while a longer one fails the
+    INSERT. Refusing both here keeps the write away from the database. The
+    response schema stays permissive, because rows written before this rule
+    still have to be listed.
+    """
+
+    name: Annotated[
+        str,
+        StringConstraints(strip_whitespace=True, min_length=1, max_length=255),
+    ]
 
 
 class IngredientDefaultSchema(IngredientDefaultBase):
