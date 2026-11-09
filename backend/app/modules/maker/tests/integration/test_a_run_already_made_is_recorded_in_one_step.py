@@ -414,6 +414,74 @@ class TestBeforeSaving:
             ('Damson Plums', Decimal('4.000'))
         ]
 
+    def test_a_shortfall_of_part_of_a_piece_is_listed_as_a_whole_piece(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """The list is shopped in the ingredient's unit: 1.5 pieces is 2 pieces.
+
+        The shortfall was rounded to the store's three places whatever the
+        ingredient was counted in, so a run half a piece short asked the
+        shopper to buy 1,5 szt. — part of a piece, which no shelf holds. The
+        preview says the same quantity, so the button that puts the shortfall
+        on the list states what the list will receive.
+        """
+        plums = _template(db_session, org, name='Damson Plums')
+        pieces = db_session.scalars(select(Uom).where(Uom.symbol == 'pcs')).one()
+        plums.uom_id = pieces.id
+        butter = _template(db_session, org, name='Plum Butter')
+        recipe = client.post(
+            '/api/v1/maker/recipes',
+            headers=headers,
+            json={
+                'output_template_id': str(butter.id),
+                'name': 'Plum butter',
+                'batch_yield_qty': '1',
+                'is_default': True,
+            },
+        )
+        assert recipe.status_code == 201, recipe.text
+        line = client.post(
+            f'/api/v1/maker/recipes/{recipe.json()["id"]}/bom-lines',
+            headers=headers,
+            json={
+                'child_template_id': str(plums.id),
+                'qty_per_batch': '1.5',
+                'unit': 'pcs',
+            },
+        )
+        assert line.status_code == 201, line.text
+
+        run = _run(butter, pantry, '1')
+        preview = client.post(
+            '/api/v1/maker/production/orders/preview',
+            headers=headers,
+            json=run,
+        )
+        assert preview.status_code == 200, preview.text
+        [plums_short] = preview.json()['ingredients']
+        assert Decimal(plums_short['shortage']) == Decimal('1.5')
+        assert Decimal(plums_short['to_buy']) == Decimal('2')
+        assert plums_short['to_buy_uom_symbol'] == 'pcs'
+
+        response = client.post(
+            '/api/v1/maker/production/orders/shortages/shopping-list',
+            headers=headers,
+            json=run,
+        )
+
+        assert response.status_code == 200, response.text
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(ShoppingListItem.template_id == plums.id)
+        ).all()
+        assert [(row.name, row.quantity) for row in rows] == [
+            ('Damson Plums', Decimal('2.000'))
+        ]
+
     def test_a_run_that_now_needs_more_raises_the_listed_line(
         self,
         client: TestClient,

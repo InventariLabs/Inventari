@@ -671,6 +671,8 @@ async def get_recipe_availability(
                 uom_symbol=ing.uom_symbol,
                 convertible=ing.convertible,
                 available_uom_symbol=ing.available_uom_symbol,
+                to_buy=ing.to_buy,
+                to_buy_uom_symbol=ing.to_buy_uom_symbol,
             )
             for ing in result.ingredients
         ],

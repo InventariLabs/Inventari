@@ -15677,6 +15677,10 @@ export interface components {
             convertible: boolean;
             /** Available Uom Symbol */
             available_uom_symbol?: string | null;
+            /** To Buy */
+            to_buy?: string | null;
+            /** To Buy Uom Symbol */
+            to_buy_uom_symbol?: string | null;
         };
         /** IngredientCost */
         IngredientCost: {

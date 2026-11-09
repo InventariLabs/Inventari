@@ -327,6 +327,15 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A production run's shortfall put on the shopping list is rounded up to the
+  ingredient's own unit's step, as the recipes module rounds a requirement, so
+  an ingredient counted in pieces that is 1.5 short asks for 2 pieces rather
+  than 1.5 — and the button that puts it there states the same quantity.
+- A translated validation error that names a decimal bound — "must be less
+  than or equal to 999999999.999" — now writes that bound in the reader's
+  decimal mark: a Polish, German, French, Spanish or Portuguese reader sees
+  999999999,999, as the screen's own numbers and the same list's keyed ceiling
+  refusal already did.
 - Importing ingredient nutrition data no longer loses the whole file when one
   row is refused: that row is counted as an error and the rest are saved,
   where a name too long for its column used to answer 500 and roll back the
