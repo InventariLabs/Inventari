@@ -340,6 +340,14 @@ says what the release does rather than what changed since them.
 - The cost line on a production run's page names the unit the run is counted
   in ("8.36 per kg") instead of always saying "per unit produced", which was
   wrong on a run whose output is weighed.
+- The empty state of the ingredient dictionary no longer promises a fallback
+  to English. It now says what the lookup does: suggestions come from matching
+  entries in any language, the current one first. Readers in French, German,
+  Spanish and Portuguese, whose dictionaries start empty, see it on every
+  installation. In the production module's ingredient form, the sentence about
+  which units are offered now takes the full width of the row instead of a
+  narrow column beside the unit picker.
+
 - "Update list" on a meal plan now raises a line that is already on the list
   when the plan needs more of it, for example after its servings were increased.
   It used to leave the line at the quantity it was first generated with and

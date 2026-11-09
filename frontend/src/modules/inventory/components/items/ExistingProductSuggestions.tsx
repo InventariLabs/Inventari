@@ -42,27 +42,33 @@ export default function ExistingProductSuggestions({ name, onPick }: Props) {
   );
   // A hint that could not be fetched is no hint: the save still attaches to
   // an exact name, so the form goes on without it rather than showing an error.
-  if (isError || typed.length < 2 || others.length === 0) return null;
+  const offered = !isError && typed.length >= 2 && others.length > 0;
 
+  // The region is always in the page and only its content comes and goes: a
+  // live region added together with its text is not reliably announced.
   return (
-    <div
-      className="flex flex-wrap items-center gap-1.5 ml-1"
-      data-testid="items-existing-products"
-    >
-      <span className="text-xs text-on-muted">
-        {t("form.existingProducts")}
-      </span>
-      {others.map((product) => (
-        <Button
-          key={product.id}
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => onPick(product.name)}
+    <div role="status" aria-live="polite">
+      {offered && (
+        <div
+          className="flex flex-wrap items-center gap-1.5 ml-1"
+          data-testid="items-existing-products"
         >
-          {product.name}
-        </Button>
-      ))}
+          <span className="text-xs text-on-muted">
+            {t("form.existingProducts")}
+          </span>
+          {others.map((product) => (
+            <Button
+              key={product.id}
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onPick(product.name)}
+            >
+              {product.name}
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
