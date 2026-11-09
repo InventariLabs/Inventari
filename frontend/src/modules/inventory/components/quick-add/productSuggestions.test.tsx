@@ -50,6 +50,7 @@ describe("existing products offered under the name of a new product", () => {
       </PageHeaderContext.Provider>,
     );
 
+  /** Types a fragment and clicks the suggestion it brings. */
   async function typeAndPick() {
     const user = userEvent.setup();
     const name = await screen.findByLabelText(/product name/i);
@@ -61,23 +62,29 @@ describe("existing products offered under the name of a new product", () => {
       { timeout: 3000 },
     );
     // Heard when it appears, not only seen: the region is the row itself.
-    expect(suggestion.closest("[role='status']")).not.toBeNull();
-
+    const heard = suggestion.closest("[role='status']") !== null;
     await user.click(suggestion);
-    expect(name).toHaveValue("Soy wax");
-    // The button is gone after the pick; focus must not fall to the page.
-    expect(name).toHaveFocus();
+    return { name, heard };
   }
 
   it("on the add page: picks the exact name and keeps focus in the field", async () => {
     open(<AddItemPage />);
 
-    await typeAndPick();
+    const { name, heard } = await typeAndPick();
+
+    expect(heard).toBe(true);
+    expect(name).toHaveValue("Soy wax");
+    // The button is gone after the pick; focus must not fall to the page.
+    expect(name).toHaveFocus();
   });
 
   it("in quick add: picks the exact name and keeps focus in the field", async () => {
     open(<QuickAddModal onClose={() => {}} onSuccess={() => {}} />);
 
-    await typeAndPick();
+    const { name, heard } = await typeAndPick();
+
+    expect(heard).toBe(true);
+    expect(name).toHaveValue("Soy wax");
+    expect(name).toHaveFocus();
   });
 });
