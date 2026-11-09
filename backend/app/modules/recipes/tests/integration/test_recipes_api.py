@@ -732,6 +732,113 @@ class TestIngredientDefaultsRouter:
         assert body['created'] == 1
         assert body['errors'] == 1
 
+    def test_create_refuses_a_blank_name(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """A nameless ingredient is not an ingredient.
+
+        A blank name normalizes to '' and matches every other blank row, so
+        the form must not write one; before, it was saved and listed.
+        """
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults',
+            json={'name': '   ', 'lang': 'en', 'calories_kcal': '100'},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, r.text
+
+    def test_create_refuses_a_name_the_column_cannot_hold(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """The name column holds 255 characters; longer is a 422, not a 500."""
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults',
+            json={'name': 'X' * 256, 'lang': 'en', 'calories_kcal': '100'},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, r.text
+
+    def test_import_counts_a_blank_name_instead_of_saving_it(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """A row the form would refuse is a row error, not a nameless entry."""
+        from io import BytesIO
+
+        payload = b'name,calories_kcal\n   ,100\nRye,330\n'
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': ('defaults.csv', BytesIO(payload), 'text/csv')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_200_OK, r.text
+        assert r.json()['created'] == 1
+        assert r.json()['errors'] == 1
+        listing = client.get(
+            f'{RECIPE_URL}/ingredient-defaults',
+            params={'lang': 'en'},
+            headers=auth_headers,
+        ).json()
+        assert all(item['name'].strip() for item in listing['items'])
+
+    def test_import_counts_a_name_the_column_cannot_hold(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """The repro from the report: a 400-character name used to lose Rye.
+
+        The INSERT for the long name failed after the row was already in the
+        session, the session stayed rolled back, and the commit of the good
+        rows raised 500.
+        """
+        from io import BytesIO
+
+        payload = b'name,calories_kcal\nRye,330\n' + b'X' * 400 + b',100\n'
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': ('defaults.csv', BytesIO(payload), 'text/csv')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_200_OK, r.text
+        assert r.json()['created'] == 1
+        assert r.json()['errors'] == 1
+        lookup = client.get(
+            f'{RECIPE_URL}/ingredient-defaults/lookup',
+            params={'name': 'Rye', 'lang': 'en'},
+            headers=auth_headers,
+        ).json()
+        assert lookup['found'] is True
+
+    def test_import_keeps_the_good_rows_when_the_database_refuses_one(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """Any row the database refuses must not poison the request.
+
+        The savepoint around each row rolls back that row alone; without it
+        the failed INSERT leaves the session rolled back and every later row,
+        and the commit, fails with it.
+        """
+        from io import BytesIO
+
+        payload = b'name,calories_kcal\nRye,330\nOverflow,1234567890\n'
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': ('defaults.csv', BytesIO(payload), 'text/csv')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_200_OK, r.text
+        assert r.json()['created'] == 1
+        assert r.json()['errors'] == 1
+        lookup = client.get(
+            f'{RECIPE_URL}/ingredient-defaults/lookup',
+            params={'name': 'Rye', 'lang': 'en'},
+            headers=auth_headers,
+        ).json()
+        assert lookup['found'] is True
+
     def test_import_accepts_a_file_within_the_cap(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:

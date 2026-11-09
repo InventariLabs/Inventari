@@ -26,6 +26,7 @@ from app.core.module_sdk import rows_to_csv
 from app.i18n.service import get_current_lang, get_error_message
 
 from ._name_matching import normalize_name
+from ._schemas_admin import IngredientDefaultCreate
 from .models import IngredientNutritionDefault
 
 log = get_logger(__name__)
@@ -260,6 +261,12 @@ async def import_defaults(
                 # A CSV cell left empty is "no value", not the number ''.
                 if item.get(field) == '':
                     item[field] = None
+            # The import is the form's second door and writes what the form
+            # writes, so it validates through the same schema: a blank or an
+            # over-long name is a counted row error, not an INSERT the
+            # database refuses after the rest of the file is in the session.
+            validated = IngredientDefaultCreate.model_validate(item)
+            item.update(validated.model_dump(exclude_unset=True))
             normalized = normalize_name(item['name'])
             result = await db.execute(
                 select(IngredientNutritionDefault).where(
@@ -281,7 +288,12 @@ async def import_defaults(
             if reference is not None and _same_numbers(reference, item):
                 summary['unchanged'] += 1
                 continue
-            await upsert_org_default(db, org_id, item)
+            # A row the database still refuses (a number wider than its
+            # column, a constraint) rolls back alone: without the savepoint
+            # the failed INSERT left the session rolled back, and the commit
+            # of the good rows raised 500.
+            async with db.begin_nested():
+                await upsert_org_default(db, org_id, item)
             if override is not None:
                 summary['updated'] += 1
             elif system is not None:

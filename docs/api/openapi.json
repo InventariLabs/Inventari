@@ -54362,6 +54362,8 @@
         "properties": {
           "name": {
             "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
             "title": "Name"
           },
           "lang": {
@@ -54477,7 +54479,8 @@
           "name",
           "calories_kcal"
         ],
-        "title": "IngredientDefaultCreate"
+        "title": "IngredientDefaultCreate",
+        "description": "A row the form or the import writes.\n\nThe same schema validates both doors. The name is what the row is keyed\nby, and the column holds 255 characters: a blank name normalizes to ''\nand matches every other nameless row, while a longer one fails the\nINSERT. Refusing both here keeps the write away from the database. The\nresponse schema stays permissive, because rows written before this rule\nstill have to be listed."
       },
       "IngredientDefaultLookupResponse": {
         "properties": {
