@@ -252,3 +252,77 @@ describe("ApprovalDeadEndNotice — on a workflow", () => {
     expect(within(note).queryByText(/Already waiting here/)).toBeNull();
   });
 });
+
+describe("ApprovalDeadEndNotice — the requester named beside someone who cannot decide", () => {
+  // The server's named dead end already excluded the requester: the decision
+  // door refuses a self-decision, so the person on the stage who cannot decide
+  // is the one beside them. The notice used to call the requester an approver
+  // and advise access they already have.
+  const requestWithRequesterNamed = {
+    ...request,
+    workflow_stages: [
+      {
+        order: 1,
+        role: "manager",
+        label: "Peer review",
+        approver_user_ids: [REQUESTER, NAMED],
+      },
+    ],
+  };
+
+  it("blames only the person who cannot see approvals", async () => {
+    signInWith(["admin:access"], { id: "admin-1" });
+    renderNotice({ request: requestWithRequesterNamed });
+
+    const note = await screen.findByRole("note");
+    expect(
+      await within(note).findByText(
+        "This stage names Bob Blind, and they cannot see approvals.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(note).getByText(/Give Bob Blind access to approvals/),
+    ).toBeInTheDocument();
+    expect(note.textContent).not.toMatch(/Give Rita Requester access/);
+  });
+
+  it("tells a bystander to ask for the others, not the requester", async () => {
+    signInWith(["approvals:read"], { id: "bystander" });
+    renderNotice({ request: requestWithRequesterNamed });
+
+    const note = await screen.findByRole("note");
+    expect(
+      await within(note).findByText(
+        /Ask an administrator to give Bob Blind access to approvals/,
+      ),
+    ).toBeInTheDocument();
+    expect(note.textContent).not.toMatch(/ask an administrator to give rita/i);
+  });
+
+  it("offers an administrator the self-approval switch when the requester is named", async () => {
+    signInWith(["admin:access"], { id: "admin-1" });
+    renderNotice({ request: requestWithRequesterNamed });
+
+    const note = await screen.findByRole("note");
+    expect(
+      await within(note).findByText(
+        /when the requester is an administrator, allow administrators to approve their own requests/,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps that switch out when the requester is not named on the stage", async () => {
+    signInWith(["admin:access"], { id: "admin-1" });
+    renderNotice({});
+
+    const note = await screen.findByRole("note");
+    expect(
+      await within(note).findByText(/Give Bob Blind access to approvals/),
+    ).toBeInTheDocument();
+    expect(
+      within(note).queryByText(
+        /allow administrators to approve their own requests/,
+      ),
+    ).toBeNull();
+  });
+});

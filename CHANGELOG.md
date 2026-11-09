@@ -349,6 +349,12 @@ says what the release does rather than what changed since them.
   the approval door refuses. An organization that lets admins decide their own
   requests still counts the author's name, and a stage naming the requester
   alone still advances on its own.
+- The dead-end notice on an approval request no longer blames the requester for
+  the stage's dead end. A stage listing them beside people who cannot see
+  approvals names only those people, and the access step names only them; an
+  administrator is offered the self-approval setting as another way out. The
+  notification sent for the same case no longer calls a stage naming several
+  people "the person".
 - A return can be duplicated: Duplicate on a return used to be refused with
   "Invalid input", and now writes another draft return of the same document,
   with the return's reason and partner. The copy names that document and counts
