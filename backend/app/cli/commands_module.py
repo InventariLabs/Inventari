@@ -276,6 +276,8 @@ def new_community(
 
         <module_name>/
           module.yaml        — top-level community manifest
+          AGENTS.md          — the module rules for an AI coding agent
+          CLAUDE.md          — points at AGENTS.md
           backend/           — FastAPI module (identical to in-tree module structure)
           frontend/          — React module (identical to in-tree module structure)
 
