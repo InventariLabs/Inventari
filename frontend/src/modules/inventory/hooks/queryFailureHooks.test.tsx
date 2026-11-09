@@ -8,6 +8,7 @@ import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
+import { signInWith } from "@/test/auth";
 import { useHiddenItemCount } from "./useItems";
 import { useInventoryActionItems } from "./useInventoryActionItems";
 import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
@@ -114,6 +115,8 @@ describe("useHiddenItemCount — the probe failed", () => {
 
 describe("useInventoryActionItems — the stock takes request failed", () => {
   it("says the stock takes could not be read instead of claiming none are in progress", async () => {
+    // A role that may read them: for one that may not, nothing is asked.
+    signInWith(["stock_takes:read"]);
     server.use(fail("/api/v1/stock-takes"));
     const { result } = renderHook(() => useInventoryActionItems(), { wrapper });
 

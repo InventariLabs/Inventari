@@ -257,6 +257,7 @@ const { data, isLoading } = useQuery<MyItem[]>({
 | `documentActionContributors` | `DocumentActionContributor[]` | No | Buttons for a document's action row. |
 | `useActionItems` | `() => ActionItem[]` | No | Hook returning launcher action items ("Things to do"). |
 | `useStatusBadge` | `() => { count: number; labelKey: string; failed?: boolean } \| null` | No | Hook returning a badge count or read failure for the launcher tile; the tile translates `labelKey` with `{ count }`. |
+| `statusBadgePermission` | `string` | No | The read the badge's endpoint asks for; the launcher calls `useStatusBadge` only for a role holding it. Omitted, every role is asked. |
 | `searchProvider` | `SearchProvider` | No | Supplies command-palette results while the module is enabled. |
 
 ---
@@ -604,8 +605,14 @@ moduleRegistry.register({
   name: "warranty_tracker",
   routes: [],
   useActionItems: () => {
-    const { data } = useQuery({ queryKey: ["warranties", "expiring"], queryFn: fetchExpiring });
-    if (!data) return [];
+    // Asked for every enabled module: only a role holding the read may ask.
+    const mayRead = useHasPermission("warranty_tracker:read");
+    const { data } = useQuery({
+      queryKey: ["warranties", "expiring"],
+      queryFn: fetchExpiring,
+      enabled: mayRead,
+    });
+    if (!mayRead || !data) return [];
     return [{
       id: "warranties-expiring",
       labelKey: "warranty_tracker:expiringSoon",
@@ -629,10 +636,13 @@ moduleRegistry.register({
     if (!data) return null;
     return { count: data, labelKey: "warranty_tracker:expiringSoon" };
   },
+  // The read the badge's endpoint asks for: the launcher calls the hook only
+  // for a role holding it.
+  statusBadgePermission: "warranty_tracker:read",
 });
 ```
 
-> Both hooks run inside a React component context — you can use `useQuery`, `useState`, etc. They must handle loading/error states internally (return `[]` or `null` while loading); the tile shows no badge until the hook answers, and nothing times it out. Both hand over an i18n key in full form, never words: the feed translates an action item's `labelKey` with its `labelValues`, the tile a badge's `labelKey` with `{ count }`, so a plural form (`expiringSoon_one` / `_other`) follows the number. A failed read returns the same shape with `failed: true`: for `useStatusBadge`, `{ count: 0, labelKey, failed: true }`, and the tile says the badge could not be read.
+> Both hooks run inside a React component context — you can use `useQuery`, `useState`, etc. They must handle loading/error states internally (return `[]` or `null` while loading); the tile shows no badge until the hook answers, and nothing times it out. Both hand over an i18n key in full form, never words: the feed translates an action item's `labelKey` with its `labelValues`, the tile a badge's `labelKey` with `{ count }`, so a plural form (`expiringSoon_one` / `_other`) follows the number. A failed read returns the same shape with `failed: true`: for `useStatusBadge`, `{ count: 0, labelKey, failed: true }`, and the tile says the badge could not be read. The launcher shows a tile for every enabled module, whatever the signed-in role may read, so a role is asked only for what it may read: a badge names the read its endpoint asks for in `statusBadgePermission`, and the launcher calls `useStatusBadge` only for a role holding it (omitted, every role is asked); an action-items hook asks its endpoint only when `useHasPermission` grants the read, and returns `[]` otherwise. A refusal the role was always going to meet is not a failed read, and the tile and the feed must not say it is.
 
 ### `useRecordVisit` — "Recently visited"
 

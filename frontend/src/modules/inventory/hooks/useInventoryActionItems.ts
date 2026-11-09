@@ -2,6 +2,7 @@ import { AlertTriangle, ClipboardList } from "lucide-react";
 import { api } from "@/module-sdk";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useModuleQuery } from "@/hooks/queries/useModuleQuery";
+import { useHasPermission } from "@/hooks/useHasPermission";
 import type { ActionItem } from "@/lib/moduleRegistry";
 
 /**
@@ -13,9 +14,12 @@ import type { ActionItem } from "@/lib/moduleRegistry";
  * has nothing to say, and asking anyway bought a 403 on every launcher load.
  * The endpoint is read with this module's own client: stock takes are
  * optional here, and an import of their files cannot be. Only the total is
- * read.
+ * read. A role without the stock takes' read is not asked either: the
+ * endpoint refuses it, and the row then said the count could not be
+ * checked — a failure that was a rule.
  */
 export function useInventoryActionItems(): ActionItem[] {
+  const mayRead = useHasPermission("stock_takes:read");
   const { data, isError } = useModuleQuery("stock_takes", {
     queryKey: queryKeys.stockTakes.launcherActions,
     queryFn: async () =>
@@ -27,11 +31,13 @@ export function useInventoryActionItems(): ActionItem[] {
     staleTime: 2 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
     retry: 1,
+    extraEnabled: mayRead,
   });
 
   // A failed read is not "nothing in progress": with no card at all the
   // launcher would say exactly that. Say the count could not be taken,
   // pointing at the list that shows the failure in full.
+  if (!mayRead) return [];
   if (isError) {
     return [
       {

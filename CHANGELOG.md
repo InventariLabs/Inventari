@@ -234,6 +234,13 @@ says what the release does rather than what changed since them.
   `module`, `unknown_modules`, `not_allowed_modules`, `modules` or
   `missing_dependency` — next to `code` and `message`, so a client can name the
   refused modules without reading them out of the sentence.
+- A module names the read its launcher badge asks for with
+  `statusBadgePermission` on its `FrontendModule`, and the launcher calls
+  `useStatusBadge` only for a role holding that key; for any other role the
+  tile shows no status instead of "Status could not be read". A module that
+  leaves it out is asked of every role, as before. An action-items hook keeps
+  asking for itself and should do so only when `useHasPermission` grants the
+  read, as `FRONTEND_MODULE_GUIDE.md` now shows.
 - Module authors get three more helpers in the module SDK: `hit_constraint`
   (did this integrity error trip one of the named constraints, by the name the
   driver reports with the message text as fallback), `rows_to_csv` (header and
@@ -903,6 +910,13 @@ says what the release does rather than what changed since them.
   under the module's scope only, a product card outside it answers 404, and
   the label sheet draws only labels assigned to those records, never the free
   pool.
+- The home screen no longer asks for the status of a module the signed-in
+  role cannot read. A custom role holding only the warehouse's read saw
+  "Status could not be read" on the Inventory and Equipment tiles and "Stock
+  takes in progress could not be checked" under To do, because each tile and
+  each To do row asked its module regardless and met a refusal. Such a tile
+  now shows no status and such a row does not appear; the tiles themselves
+  stay.
 - The equipment register's routes that name one asset answer only for the
   records the register lists: an asset's valuation, attachments, approval
   state, assignment and maintenance history and timeline, and its check-out,

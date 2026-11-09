@@ -19,6 +19,7 @@ import { forgetFirstVisits } from "../hooks/useLauncherGreeting";
 import type { ProductProfile, Organization, LauncherCategory } from "@/types";
 import { Home } from "lucide-react";
 import { onePage } from "@/test/mocks/page";
+import { signInWith } from "@/test/auth";
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn(), loading: vi.fn() },
@@ -332,6 +333,53 @@ describe("Launcher (profile-aware)", () => {
     // assertion is on the DOM, not on the class alone.
     expect(sidebar.childElementCount).toBe(0);
     expect(sidebar.className).toContain("empty:hidden");
+  });
+});
+
+describe("Launcher status badges", () => {
+  // What a module's badge hook answers when its endpoint refuses the read.
+  const refused = { count: 0, labelKey: "widgets:statusBadge", failed: true };
+
+  function badgedModule(useStatusBadge: () => typeof refused) {
+    return {
+      ...mod("widgets", "core", "Widgets"),
+      useStatusBadge,
+      statusBadgePermission: "widgets:read",
+    };
+  }
+
+  it("does not ask the status of a module whose read the role does not hold", async () => {
+    // A custom role holding one module's read was asked every other enabled
+    // module's status, met a 403 on each, and every such tile said its status
+    // could not be read. The tile stays; its status is not asked.
+    const useStatusBadge = vi.fn(() => refused);
+    moduleRegistry.getVisibleModules = vi.fn(() => [
+      badgedModule(useStatusBadge),
+    ]);
+    signInWith(["warehouse:read"]);
+    renderLauncher();
+
+    expect(
+      (await screen.findAllByRole("link", { name: /^Widgets/ })).length,
+    ).toBeGreaterThan(0);
+    expect(useStatusBadge).not.toHaveBeenCalled();
+    expect(
+      screen.queryByText(/Status could not be read/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("asks the status of a role holding the read the module names", async () => {
+    const useStatusBadge = vi.fn(() => refused);
+    moduleRegistry.getVisibleModules = vi.fn(() => [
+      badgedModule(useStatusBadge),
+    ]);
+    signInWith(["widgets:read"]);
+    renderLauncher();
+
+    expect(
+      (await screen.findAllByText(/Status could not be read/)).length,
+    ).toBeGreaterThan(0);
+    expect(useStatusBadge).toHaveBeenCalled();
   });
 });
 
