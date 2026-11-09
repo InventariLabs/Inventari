@@ -967,9 +967,23 @@ export class ApiHelper {
     token: string,
     data: Record<string, unknown>,
   ): Promise<{ id: string }> {
+    // The register lists a record filed under a category carrying the
+    // equipment context tag, or — under no category — one whose metadata
+    // holds the module's namespace (`claimed_by_module`, core/module_ownership).
+    // The Add-asset screen always writes `metadata.equipment` (and the module's
+    // item interceptor seeds equipment_status from it), so the helper must too:
+    // a bare name/quantity makes an ordinary product, and every per-record
+    // equipment route now answers 404 for one of those.
+    const metadata = (data.metadata ?? {}) as Record<string, unknown>;
     const response = await this.request.post("/api/v1/items", {
       headers: { Authorization: `Bearer ${token}` },
-      data,
+      data: {
+        ...data,
+        metadata: {
+          ...metadata,
+          equipment: (metadata.equipment ?? {}) as Record<string, unknown>,
+        },
+      },
     });
     if (!response.ok())
       throw new Error(
