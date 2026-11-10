@@ -54,8 +54,12 @@ test.describe("Scan — fake camera", () => {
   }) => {
     await openCamera(page);
     await camera.showQr(labelShortCode);
+    // A QR is a denser matrix than an EAN-13, read by a reader that has only
+    // just started. Every other QR read in this file waits 20 s for it; this
+    // one had the 10 s of the EAN read beside it, and a loaded runner sent no
+    // request inside it.
     await expect
-      .poll(() => camera.scanRequests(), { timeout: 10000 })
+      .poll(() => camera.scanRequests(), { timeout: 20000 })
       .toContain(labelShortCode);
   });
 
