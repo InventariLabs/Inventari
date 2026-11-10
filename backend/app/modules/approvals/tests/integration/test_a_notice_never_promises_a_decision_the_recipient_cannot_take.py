@@ -148,6 +148,34 @@ class TestANamedApproverWithoutAccess:
             assert 'withdraw' in notices[0].content.lower()
             assert notices[0].link == QUEUE_LINK
 
+    def test_a_stage_naming_several_people_is_not_described_in_the_singular(
+        self,
+        client: TestClient,
+        db_session: Session,
+        h: ModuleTestHelper,
+        org: Organization,
+        admin: User,
+        admin_auth: dict[str, str],
+        requester: User,
+        requester_auth: dict[str, str],
+    ) -> None:
+        """Two names, one sentence: "the person it names" was still said."""
+        blind = h.create_user(org, email='blind@example.com', role='user')
+        h.grant_permissions(blind, ['approvals:write'])
+        second = h.create_user(org, email='blind-two@example.com', role='user')
+        h.grant_permissions(second, ['approvals:write'])
+        stage = _named_stage(blind)
+        stage['approver_user_ids'] = [str(blind.id), str(second.id)]
+        _create_workflow(client, admin_auth, [stage], allow_undecidable=True)
+
+        _raise_request(client, requester_auth)
+
+        for who in (requester, admin):
+            notices = _notifications(db_session, who)
+            assert len(notices) == 1, (who.email, [n.content for n in notices])
+            assert 'the person it names' not in notices[0].content
+            assert 'one of them' in notices[0].content
+
     def test_a_custom_administration_role_hears_the_way_out(
         self,
         client: TestClient,
