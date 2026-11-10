@@ -314,6 +314,40 @@ describe("RegisterPage", () => {
     );
   });
 
+  it("keeps an address typed before the invitation answers", async () => {
+    // The lookup is held back so the visitor types first, the way a slow
+    // connection lets them: the prefill must not replace what they typed.
+    let answer!: () => void;
+    const answered = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    server.use(
+      http.get("/public/invitation/ABC123", async () => {
+        await answered;
+        return HttpResponse.json({
+          valid: true,
+          organization_name: "Acme Foods",
+          invited_email: "nowa@example.com",
+        });
+      }),
+    );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register?invite=ABC123"]}>
+          <RegisterPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    fireEvent.change(screen.getByLabelText(/Email address/i), {
+      target: { value: "not-an-email" },
+    });
+    answer();
+
+    expect(await screen.findByText(/Acme Foods/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Email address/i)).toHaveValue("not-an-email");
+  });
+
   it("names the invited role the way the rest of the product does", async () => {
     // The API answers with the key (`user`); "invited ... as user" named a
     // role that exists nowhere else — every other screen says Member.
