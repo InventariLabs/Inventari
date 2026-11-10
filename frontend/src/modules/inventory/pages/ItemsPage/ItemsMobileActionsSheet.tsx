@@ -53,7 +53,7 @@ export function ItemsMobileActionsSheet({
               onClose();
               onImport();
             }}
-            leftIcon={<FileUp size={18} />}
+            leftIcon={<FileUp size={16} />}
             className="w-full justify-start"
           >
             {t("common:actions.import")}
@@ -66,7 +66,7 @@ export function ItemsMobileActionsSheet({
             onExport();
           }}
           disabled={!hasRows}
-          leftIcon={<FileDown size={18} className="text-amber-600" />}
+          leftIcon={<FileDown size={16} className="text-amber-600" />}
           className="w-full justify-start"
         >
           {t("common:actions.export")}
@@ -82,7 +82,7 @@ export function ItemsMobileActionsSheet({
             onClose();
             onOpenCategories();
           }}
-          leftIcon={<Tag size={18} />}
+          leftIcon={<Tag size={16} />}
           className="w-full justify-start"
         >
           {t("common:navigation.categories")}
@@ -94,7 +94,7 @@ export function ItemsMobileActionsSheet({
               onClose();
               onSelectItems();
             }}
-            leftIcon={<CheckSquare size={18} />}
+            leftIcon={<CheckSquare size={16} />}
             className="w-full justify-start"
           >
             {t("items:actions.selectItems")}
