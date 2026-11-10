@@ -10,6 +10,18 @@ const UNKNOWN_EAN = "5901234123457";
 // the reader's crop is computed for.
 test.use({ viewport: { width: 390, height: 844 } });
 
+async function openCamera(page: import("@playwright/test").Page) {
+  // A phone starts the camera by itself; a desktop waits for the button.
+  // The page is the first this test loads, so it gets the 15 s every other
+  // first load in this file gets, not the 5 s default meant for a page
+  // already standing.
+  const video = page.locator("#qr-reader video");
+  const start = page.getByRole("button", { name: "Start Camera" });
+  await expect(video.or(start)).toBeVisible({ timeout: 15000 });
+  if (await start.isVisible()) await start.click();
+  await expect(video).toBeVisible({ timeout: 10000 });
+}
+
 test.describe("Scan — fake camera", () => {
   let labelShortCode: string;
 
@@ -24,18 +36,6 @@ test.describe("Scan — fake camera", () => {
   test.beforeEach(async ({ page, camera: _camera }) => {
     await page.goto("/inventory/scan");
   });
-
-  async function openCamera(page: import("@playwright/test").Page) {
-    // A phone starts the camera by itself; a desktop waits for the button.
-    // The page is the first this test loads, so it gets the 15 s every other
-    // first load in this file gets, not the 5 s default meant for a page
-    // already standing.
-    const video = page.locator("#qr-reader video");
-    const start = page.getByRole("button", { name: "Start Camera" });
-    await expect(video.or(start)).toBeVisible({ timeout: 15000 });
-    if (await start.isVisible()) await start.click();
-    await expect(video).toBeVisible({ timeout: 10000 });
-  }
 
   test("reads an EAN-13 held in front of the camera", async ({
     page,
@@ -146,6 +146,21 @@ test.describe("Scan — fake camera", () => {
     await camera.runFrames(120);
     expect(camera.scanRequests()).toEqual([UNKNOWN_EAN]);
   });
+});
+
+/**
+ * The document scan page, opened as the test's first page. It once sat in the
+ * describe above, whose beforeEach opens the item scan page: the test then
+ * navigated away while that page was still starting its camera and loading
+ * its modules, and WebKit now and then never finished the second navigation
+ * (a timeout, or "WebKit encountered an internal error"). Nothing a user does
+ * looks like that, and both CI failures were that second navigation.
+ */
+test.describe("Scan — fake camera on the document scan page", () => {
+  // `camera` installs the fake before the first navigation.
+  test.beforeEach(async ({ page, camera: _camera }) => {
+    await page.goto("/warehouse/scan");
+  });
 
   test("a code held in view through a turn is looked up once", async ({
     page,
@@ -155,7 +170,6 @@ test.describe("Scan — fake camera", () => {
     // restart forgot the code it had read, and a code still held counted again.
     // The document scan page keeps reading after a read; the item scan page
     // pauses its camera, so it would not show a second reading anyway.
-    await page.goto("/warehouse/scan");
     await openCamera(page);
     await camera.showEan13(UNKNOWN_EAN);
     await expect
@@ -174,7 +188,6 @@ test.describe("Scan — fake camera", () => {
     page,
     camera,
   }) => {
-    await page.goto("/warehouse/scan");
     await openCamera(page);
     await camera.showEan13(UNKNOWN_EAN);
     await expect
