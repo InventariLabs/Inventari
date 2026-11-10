@@ -99,6 +99,21 @@ class TestTheScaffoldWritesInstructionsForAnAgent:
 
         assert 'npx vitest run --experimental.fsModuleCache=false' in guide
 
+    def test_agents_md_and_the_guide_say_which_gates_belong_to_the_checkout(
+        self, package
+    ):
+        root = Path(os.environ.get('INVENTARI_REPO_ROOT', Path(__file__).parents[3]))
+        guide = (root / 'docs' / 'MODULE_TESTING_GUIDE.md').read_text(encoding='utf-8')
+        agents = (package / 'AGENTS.md').read_text(encoding='utf-8')
+
+        for name, text in (('AGENTS.md', agents), ('the testing guide', guide)):
+            for sentence in (
+                '`make check-frontend`',
+                '`check:invalidation`',
+                'checkout',
+            ):
+                assert sentence in text, f'{name} no longer says {sentence!r}'
+
     def test_claude_md_only_points_at_agents_md(self, package):
         assert (package / 'CLAUDE.md').read_text(encoding='utf-8') == '@AGENTS.md\n'
 

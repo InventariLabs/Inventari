@@ -432,6 +432,14 @@ inside this package. Run the vitest specs in its step 3, with
 without the flag a warm cache can hide this package's catalogs from the run,
 and every translated text renders as its key.
 
+Those are the checks a package runs: `module validate`, its own backend tests,
+its own frontend specs and the staged `npx tsc --noEmit`. The repository's own
+`make lint` and `make check-frontend`, and the checks inside them (for example
+`check:invalidation`, the i18n key snapshots and the schema test that reads
+only Core's metadata), read the checkout's tree and are not written for a
+package: a failure there that points at Core files is not this package's to
+fix, and the package must not edit the checkout to quiet it.
+
 ## Check the package before install
 
 From the Inventari checkout, with the package under its `modules-workspace/`
