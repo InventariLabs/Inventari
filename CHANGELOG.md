@@ -23,6 +23,15 @@ says what the release does rather than what changed since them.
   building a module with an agent: what to give it, which checks refuse its
   mistakes and how to check the result before installing it.
 
+### Fixed
+
+- The dead-end notice on an approval request no longer blames the requester for
+  the stage's dead end. A stage listing them beside people who cannot see
+  approvals names only those people, and the access step names only them; an
+  administrator is offered the self-approval setting as another way out. The
+  notification sent for the same case no longer calls a stage naming several
+  people "the person".
+
 ## v0.12.0 - 2026-11-09
 
 The first release after the public 0.11.0, and the first under a fixed rhythm:
@@ -184,55 +193,6 @@ Not marked **Breaking**, but worth a look before you update:
   stock on the shelf from what they need between them, not each against the
   whole shelf, and a "From recipes" sheet that adds nothing because the list
   already asks for all of it says so.
-- Asking for an approval now warns about a later stage nobody could decide,
-  not only the first. The dialog behind Confirm and Send for approval on a
-  document, and the one on a purchase order, name the first stage that has no
-  possible decider and what ends the wait (grant the named people access to
-  approvals, give someone the permission, or withdraw the request); where every
-  stage can be decided they keep the ordinary sentence. A purchase order whose
-  request was withdrawn and that asks again gets the same warning from its
-  approval card, and the notice for a request stuck at such a stage no longer
-  promises that withdrawing it returns the order to Confirmed.
-- `PGBOUNCER_MAX_CLIENT_CONN` in `.env` sets how many connections PgBouncer
-  accepts from the backend (300 when unset, as before). Six workers open up to
-  300, so DEPLOYMENT.md's 16 GB sizing row now sets it to 400.
-- The 409 refusals of focus mode, of a profile switch and of onboarding with a
-  module chosen carry `lang` and the data their message is built from —
-  `module`, `unknown_modules`, `not_allowed_modules`, `modules` or
-  `missing_dependency` — next to `code` and `message`, so a client can name the
-  refused modules without reading them out of the sentence.
-- A module names the read its launcher badge asks for with
-  `statusBadgePermission` on its `FrontendModule`, and the launcher calls
-  `useStatusBadge` only for a role holding that key; for any other role the
-  tile shows no status instead of "Status could not be read". A module that
-  leaves it out is asked of every role, as before. An action-items hook keeps
-  asking for itself and should do so only when `useHasPermission` grants the
-  read, as `FRONTEND_MODULE_GUIDE.md` now shows.
-- Module authors get three more helpers in the module SDK: `hit_constraint`
-  (did this integrity error trip one of the named constraints, by the name the
-  driver reports with the message text as fallback), `rows_to_csv` (header and
-  rows to CSV text, with every data cell defused against spreadsheet formulas,
-  as the built-in exports do) and `utc_now` (the timezone-aware current moment).
-- `manage.py user create-admin` takes `--lang` (`en`, `pl`, `de`, `fr`, `es` or
-  `pt`) to set the language the account opens in; an unknown code is refused,
-  and without it a new account takes the instance default and an existing one
-  keeps its own. DEPLOYMENT.md and QUICK_DEPLOY.md say how to use the command
-  to get back into an installation without outgoing mail.
-- `manage.py user erase <user id>` erases one person's account on a GDPR
-  erasure request: it shows whose account it is and asks first (`--yes` skips
-  the question), then replaces the address, name and password, closes the
-  account and revokes its sessions in one transaction, and reports
-  "Nothing was erased" with exit code 1 when a step fails, Redis included.
-  It replaces the Python script `docs/GDPR_MANUAL_PROCEDURE.md` asked
-  operators to paste. The procedure also says now that the user id the
-  journal keeps is pseudonymised personal data, not anonymous, and that
-  journal entries naming the person stay only on a legal ground — with the
-  SQL to redact them when there is none.
-- Module authors can ask `@/module-sdk` whether the signed-in user is the person
-  a record names by e-mail address (`useIsSignedInAs`).
-- Module authors can page a list the server pages by cursor with
-  `useKeysetPaging` from `@/module-sdk`: it keeps the cursors of the pages
-  already visited and starts from the first page when the question changes.
 - When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
   list's "From recipes" writes goods that another open shopping list still
   asks for, the answer names them and the list that holds them
@@ -240,14 +200,17 @@ Not marked **Breaking**, but worth a look before you update:
   in the panel that stays. The lists are still written as asked.
 - A production run's shortfall put on the shopping list rounds up to the
   ingredient's own unit step, as the recipes module rounds a requirement, so
-  an ingredient counted in pieces that is 1.5 short asks for 2 pieces.
+  an ingredient counted in pieces that is 1.5 short asks for 2 pieces, and the button that puts it there states the same quantity.
 - Asking for an approval warns about a later stage nobody could decide, not
   only the first. The dialogs behind Confirm and Send for approval on a
   document and on a purchase order name the first stage with no possible
   decider and what ends the wait (grant the named people access to approvals,
-  give someone the permission, or withdraw the request). A stage that names
-  the person who raised the request beside people who cannot decide it is a
-  dead end, and is reported as one in the queue, the dialog and the notice.
+  give someone the permission, or withdraw the request). A purchase order
+  whose request was withdrawn and that asks again gets the same warning from
+  its approval card, and the notice for a request stuck at such a stage no
+  longer promises that withdrawing it returns the order to Confirmed. A stage
+  that names the person who raised the request beside people who cannot
+  decide it is a dead end, and is reported as one in the queue, the dialog and the notice.
 - The approval queues show a document's net amount and say that it is net, the
   side the approval threshold is set on, and the notice to an approver names
   the document, who asked and the net amount, in the app and by e-mail. A
@@ -308,8 +271,10 @@ Not marked **Breaking**, but worth a look before you update:
 #### For instance administrators
 
 - `manage.py user create-admin` takes `--lang` (`en`, `pl`, `de`, `fr`, `es`
-  or `pt`) to set the language the account opens in; DEPLOYMENT.md and
-  QUICK_DEPLOY.md say how to use the command to get back into an installation
+  or `pt`) to set the language the account opens in (an unknown code is refused, and
+  without it a new account takes the instance default and an existing one keeps
+  its own); DEPLOYMENT.md
+  and QUICK_DEPLOY.md say how to use the command to get back into an installation
   without outgoing mail.
 - `manage.py user erase <user id>` erases one person's account on a GDPR
   erasure request: it shows whose account it is and asks first (`--yes` skips
@@ -324,12 +289,13 @@ Not marked **Breaking**, but worth a look before you update:
   people (equipment handed to them, their answers to an equipment check, a
   contact or employee card) are not rewritten by the deletion.
 - `PGBOUNCER_MAX_CLIENT_CONN` in `.env` sets how many connections PgBouncer
-  accepts from the backend (300 when unset, as before); DEPLOYMENT.md's 16 GB
-  sizing row sets it to 400.
+  accepts from the backend (300 when unset, as before). Six workers open up to
+  300, so DEPLOYMENT.md's 16 GB sizing row sets it to 400.
 - The 409 refusals of focus mode, of a profile switch and of onboarding with a
   module chosen carry `lang` and the data their message is built from
   (`module`, `unknown_modules`, `not_allowed_modules`, `modules` or
-  `missing_dependency`) next to `code` and `message`.
+  `missing_dependency`) next to `code` and `message`, so a client can name the
+  refused modules without reading them out of the sentence.
 - When a handler of an event that belongs to no organization is given up on,
   the instance's superusers are told, in their own language and once a day per
   handler, as an organization's admins are for its own events.
@@ -343,9 +309,9 @@ Not marked **Breaking**, but worth a look before you update:
 
 - The module SDK gains `hit_constraint` (did this integrity error trip one of
   the named constraints), `rows_to_csv` (rows to CSV text with every data
-  cell defused against spreadsheet formulas) and `utc_now`; `cover_leaf` and
+  cell defused against spreadsheet formulas) and `utc_now` (the timezone-aware current moment); `cover_leaf` and
   `cover_leaf_of` name and read a cover file; the frontend `@/module-sdk`
-  gains `useIsSignedInAs`, `useKeysetPaging` (a list the server pages by
+  gains `useIsSignedInAs` (is the signed-in user the person a record names by e-mail address), `useKeysetPaging` (a list the server pages by
   cursor), `useRecordVisit` (a record page in **Recently visited**),
   `ATTACHMENT_FILE_ACCEPT`, `QUANTITY_STEP`, and the `Item`, `StorageType` and
   `ScannedTemplate` types, `useAppMutation`, `useModules`,
@@ -630,8 +596,10 @@ Not marked **Breaking**, but worth a look before you update:
 #### Production, recipes and meal plans
 
 - Importing ingredient data no longer loses the whole file when one row is
-  refused: the row is counted as an error and the rest are saved, and a blank
-  name is refused rather than saved as a nameless entry. A file with no usable
+  refused: the row is counted as an error and the rest are saved (a name too
+  long for its column used to answer 500 and roll back the good rows too), and a
+  blank name is refused by the form and counted as an error by the import
+  rather than saved as a nameless entry. A file with no usable
   row (an empty sheet, a photo, a bank statement) or that holds no list of
   rows answers with what the import expects in every maintained language,
   instead of a green "0 added" or the parser's own words.
@@ -654,7 +622,9 @@ Not marked **Breaking**, but worth a look before you update:
   new production dialog writes the unit as the rest of the app does, and the
   onboarding card for working with a single module names Production.
 - The empty state of the ingredient dictionary no longer promises a fallback to
-  English, and the sentence about which units are offered takes the full width
+  English: it says suggestions come from matching entries in any language, the
+  current one first, which readers in French, German, Spanish and Portuguese,
+  whose dictionaries start empty, see on every installation. The sentence about which units are offered takes the full width
   of the ingredient form.
 
 #### Equipment
@@ -683,6 +653,9 @@ Not marked **Breaking**, but worth a look before you update:
   not be done instead of "Unknown error", bulk edit's Apply waits until a field
   is ticked, and an empty service entry marks every missing answer in the app's
   language.
+- Module settings with a bounded number (such as the equipment warning window)
+  answer a value out of range in the app's own language rather than in the
+  browser's.
 
 #### Smaller corrections
 
@@ -729,63 +702,6 @@ Not marked **Breaking**, but worth a look before you update:
   generic sentence instead of the statement that failed.
 
 #### Running it
-- A production run's shortfall put on the shopping list is rounded up to the
-  ingredient's own unit's step, as the recipes module rounds a requirement, so
-  an ingredient counted in pieces that is 1.5 short asks for 2 pieces rather
-  than 1.5 — and the button that puts it there states the same quantity.
-- A translated validation error that names a decimal bound — "must be less
-  than or equal to 999999999.999" — now writes that bound in the reader's
-  decimal mark: a Polish, German, French, Spanish or Portuguese reader sees
-  999999999,999, as the screen's own numbers and the same list's keyed ceiling
-  refusal already did.
-- Importing ingredient nutrition data no longer loses the whole file when one
-  row is refused: that row is counted as an error and the rest are saved,
-  where a name too long for its column used to answer 500 and roll back the
-  good rows too. A blank ingredient name is now refused by the form and
-  counted as an error by the import instead of being saved as a nameless entry
-  that matches every other blank name.
-- An approval stage that names the person who raised the request beside people
-  who cannot decide it is reported as a dead end instead of as a stage waiting
-  its turn: the queue marks the request, the dialog warns before confirming,
-  and the notice offers the way out rather than promising the author a decision
-  the approval door refuses. An organization that lets admins decide their own
-  requests still counts the author's name, and a stage naming the requester
-  alone still advances on its own.
-- The dead-end notice on an approval request no longer blames the requester for
-  the stage's dead end. A stage listing them beside people who cannot see
-  approvals names only those people, and the access step names only them; an
-  administrator is offered the self-approval setting as another way out. The
-  notification sent for the same case no longer calls a stage naming several
-  people "the person".
-- A return can be duplicated: Duplicate on a return used to be refused with
-  "Invalid input", and now writes another draft return of the same document,
-  with the return's reason and partner. The copy names that document and counts
-  against what is left to return on it, so it is refused, in the same words as
-  a new return, when too little is left. A return saved from its edit form keeps
-  counting against its original too, and raising its quantity past what is left
-  is refused. Duplicating a correction through the API answers
-  `DOCUMENT_CORRECTION_NOT_DUPLICABLE` instead of "Invalid input", and a copy of
-  a receipt whose line named only a stock record keeps that record, so it can be
-  confirmed without picking the product again.
-- Start and Board name a draft task the way the document's own page does —
-  "Delivery – draft 6CCF" — instead of by its internal `DRAFT-…` identifier.
-- On a stock take, Save on an empty or unreadable count box no longer records a
-  count of zero: such a box is not a count, and the line stays uncounted. A
-  note typed on, changed on or cleared from a line that is already counted now
-  makes the line read as unsaved and enables its Save (before, the note could
-  not reach the server and the leave-the-screen warning did not count it), and
-  the note box on a line with a difference stays on screen while its text is
-  deleted.
-- The cost line on a production run's page names the unit the run is counted
-  in ("8.36 per kg") instead of always saying "per unit produced", which was
-  wrong on a run whose output is weighed.
-- The empty state of the ingredient dictionary no longer promises a fallback
-  to English. It now says what the lookup does: suggestions come from matching
-  entries in any language, the current one first. Readers in French, German,
-  Spanish and Portuguese, whose dictionaries start empty, see it on every
-  installation. In the production module's ingredient form, the sentence about
-  which units are offered now takes the full width of the row instead of a
-  narrow column beside the unit picker.
 
 - DEPLOYMENT.md's update and restore steps reach the Open Food Facts database
   and the off-host copy: the guide enables their profiles with
