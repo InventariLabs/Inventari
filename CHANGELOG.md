@@ -25,6 +25,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On a phone, the camera of the document and purchase-order line editors opens
+  in view. With the Scan switch near the bottom of the form, the camera used to
+  open below the edge of the screen, where nothing seemed to happen, and a
+  phone's browser may not start a video it cannot see, so no code was read
+  until the worker scrolled; the form now brings the switch to the top, with
+  the camera right under it.
 - The dead-end notice on an approval request no longer blames the requester for
   the stage's dead end. A stage listing them beside people who cannot see
   approvals names only those people, and the access step names only them; an

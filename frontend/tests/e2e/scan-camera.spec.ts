@@ -263,8 +263,16 @@ test.describe("Scan — one read per presence on the forms", () => {
       .getByRole("menu", { name: "New document" })
       .getByRole("menuitem", { name: /^Receipt\b/ })
       .click();
-    await page.getByRole("button", { name: "Scan", exact: true }).click();
+    // The switch at the bottom edge of the sheet, where a worker who has
+    // scrolled the setup fields finds it — and where a retried click puts it
+    // too. The camera opens under the switch, so the form has to bring it
+    // into view: WebKit does not start a muted video it counts out of view,
+    // and a reader out of view never gets a frame.
+    const scan = page.getByRole("button", { name: "Scan", exact: true });
+    await scan.evaluate((el) => el.scrollIntoView({ block: "end" }));
+    await scan.click();
     await expectReaderVideo(page);
+    await expect(page.locator("#qr-reader video")).toBeInViewport();
   }
 
   test("the document form adds one piece for a code held in view", async ({
