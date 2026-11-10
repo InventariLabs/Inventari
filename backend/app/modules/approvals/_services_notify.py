@@ -170,29 +170,29 @@ _DEAD_END_TITLE: dict[str, str] = {
 # that person, an open stage by granting anybody.
 _DEAD_END_NAMED_CONTENT: dict[str, str] = {
     'en': (
-        'The request is waiting at stage \u201c{stage}\u201d, but the person it '
-        'names cannot decide it. To unblock it, give that person access to '
-        'approvals, or withdraw the request.'
+        'The request is waiting at stage \u201c{stage}\u201d, but nobody named on it '
+        'can decide it. To unblock it, give one of them access to approvals, or '
+        'withdraw the request.'
     ),
     'pl': (
-        'Wniosek czeka na etapie \u201e{stage}\u201d, ale wskazana osoba nie może '
-        'go zatwierdzić. Aby go odblokować, przyznaj jej dostęp do akceptacji '
+        'Wniosek czeka na etapie \u201e{stage}\u201d, ale nikt z wymienionych osób nie może '
+        'go zatwierdzić. Aby go odblokować, przyznaj którejś z tych osób dostęp do akceptacji '
         'albo wycofaj wniosek.'
     ),
     'de': (
-        'Die Anfrage wartet auf der Stufe \u201e{stage}\u201c, aber die genannte '
-        'Person kann sie nicht entscheiden. Um sie freizugeben, geben Sie dieser '
-        'Person Zugriff auf Genehmigungen, oder ziehen Sie die Anfrage zurück.'
+        'Die Anfrage wartet auf der Stufe \u201e{stage}\u201c, aber niemand der genannten '
+        'Personen kann sie entscheiden. Um sie freizugeben, geben Sie einer dieser Personen '
+        'Zugriff auf Genehmigungen, oder ziehen Sie die Anfrage zurück.'
     ),
     'fr': (
-        "La demande attend à l'étape \u00ab\u00a0{stage}\u00a0\u00bb, mais la "
-        'personne nommée ne peut pas y décider. Pour la débloquer, accordez-lui '
-        "l'accès aux approbations, ou retirez la demande."
+        "La demande attend à l'étape \u00ab\u00a0{stage}\u00a0\u00bb, mais aucune des "
+        "personnes nommées ne peut y décider. Pour la débloquer, accordez l'accès aux "
+        "approbations à l'une de ces personnes, ou retirez la demande."
     ),
     'es': (
-        'La solicitud espera en la etapa \u00ab{stage}\u00bb, pero la persona '
-        'indicada no puede decidirla. Para desbloquearla, concédele acceso a '
-        'aprobaciones, o retira la solicitud.'
+        'La solicitud espera en la etapa \u00ab{stage}\u00bb, pero ninguna de las personas '
+        'indicadas puede decidirla. Para desbloquearla, concede acceso a aprobaciones a una '
+        'de ellas, o retira la solicitud.'
     ),
 }
 _DEAD_END_OPEN_CONTENT: dict[str, str] = {

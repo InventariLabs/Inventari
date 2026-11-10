@@ -729,6 +729,63 @@ Not marked **Breaking**, but worth a look before you update:
   generic sentence instead of the statement that failed.
 
 #### Running it
+- A production run's shortfall put on the shopping list is rounded up to the
+  ingredient's own unit's step, as the recipes module rounds a requirement, so
+  an ingredient counted in pieces that is 1.5 short asks for 2 pieces rather
+  than 1.5 — and the button that puts it there states the same quantity.
+- A translated validation error that names a decimal bound — "must be less
+  than or equal to 999999999.999" — now writes that bound in the reader's
+  decimal mark: a Polish, German, French, Spanish or Portuguese reader sees
+  999999999,999, as the screen's own numbers and the same list's keyed ceiling
+  refusal already did.
+- Importing ingredient nutrition data no longer loses the whole file when one
+  row is refused: that row is counted as an error and the rest are saved,
+  where a name too long for its column used to answer 500 and roll back the
+  good rows too. A blank ingredient name is now refused by the form and
+  counted as an error by the import instead of being saved as a nameless entry
+  that matches every other blank name.
+- An approval stage that names the person who raised the request beside people
+  who cannot decide it is reported as a dead end instead of as a stage waiting
+  its turn: the queue marks the request, the dialog warns before confirming,
+  and the notice offers the way out rather than promising the author a decision
+  the approval door refuses. An organization that lets admins decide their own
+  requests still counts the author's name, and a stage naming the requester
+  alone still advances on its own.
+- The dead-end notice on an approval request no longer blames the requester for
+  the stage's dead end. A stage listing them beside people who cannot see
+  approvals names only those people, and the access step names only them; an
+  administrator is offered the self-approval setting as another way out. The
+  notification sent for the same case no longer calls a stage naming several
+  people "the person".
+- A return can be duplicated: Duplicate on a return used to be refused with
+  "Invalid input", and now writes another draft return of the same document,
+  with the return's reason and partner. The copy names that document and counts
+  against what is left to return on it, so it is refused, in the same words as
+  a new return, when too little is left. A return saved from its edit form keeps
+  counting against its original too, and raising its quantity past what is left
+  is refused. Duplicating a correction through the API answers
+  `DOCUMENT_CORRECTION_NOT_DUPLICABLE` instead of "Invalid input", and a copy of
+  a receipt whose line named only a stock record keeps that record, so it can be
+  confirmed without picking the product again.
+- Start and Board name a draft task the way the document's own page does —
+  "Delivery – draft 6CCF" — instead of by its internal `DRAFT-…` identifier.
+- On a stock take, Save on an empty or unreadable count box no longer records a
+  count of zero: such a box is not a count, and the line stays uncounted. A
+  note typed on, changed on or cleared from a line that is already counted now
+  makes the line read as unsaved and enables its Save (before, the note could
+  not reach the server and the leave-the-screen warning did not count it), and
+  the note box on a line with a difference stays on screen while its text is
+  deleted.
+- The cost line on a production run's page names the unit the run is counted
+  in ("8.36 per kg") instead of always saying "per unit produced", which was
+  wrong on a run whose output is weighed.
+- The empty state of the ingredient dictionary no longer promises a fallback
+  to English. It now says what the lookup does: suggestions come from matching
+  entries in any language, the current one first. Readers in French, German,
+  Spanish and Portuguese, whose dictionaries start empty, see it on every
+  installation. In the production module's ingredient form, the sentence about
+  which units are offered now takes the full width of the row instead of a
+  narrow column beside the unit picker.
 
 - DEPLOYMENT.md's update and restore steps reach the Open Food Facts database
   and the off-host copy: the guide enables their profiles with
