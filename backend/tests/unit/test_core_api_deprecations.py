@@ -468,7 +468,7 @@ def test_warning_names_the_deadline_and_the_replacement(_synthetic_deprecation):
         coroutine.close()
 
     message = str(recorded[0].message)
-    assert '0.13.0' in message
+    assert _core_api_deprecations.REMOVAL_RELEASE in message
     assert 'CoreFileStorageAPI.store_for_org' in message
 
 
