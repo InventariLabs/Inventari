@@ -238,6 +238,7 @@ async def compute_availability(
     recipe_id: UUID,
     *,
     batches: Decimal | None = None,
+    planned_qty: Decimal | None = None,
     location_id: UUID | None = None,
 ) -> AvailabilityResult:
     """Check ingredient availability for producing ``batches`` of a recipe.
@@ -247,6 +248,11 @@ async def compute_availability(
     batches
         Number of batches to check. If None, computes ``max_batches`` only
         (each ingredient shows stock as ``available``, ``needed=0``).
+    planned_qty
+        The output quantity to check, instead of ``batches``. The need is
+        the per-batch need times this, divided by the recipe's yield last:
+        5 planned against a yield of 3 is exactly 5 pieces of a 3-piece
+        line, where 5 / 3 batches times 3 is a trillionth over.
     location_id
         If set, check stock only at this location. Otherwise check globally.
 
@@ -328,7 +334,11 @@ async def compute_availability(
     requested_batches = batches if batches is not None else Decimal('0')
     ingredients: list[IngredientAvailability] = []
     for child_id, per_batch in per_batch_needs.items():
-        needed = per_batch * requested_batches
+        needed = (
+            per_batch * planned_qty / recipe.batch_yield_qty
+            if planned_qty is not None
+            else per_batch * requested_batches
+        )
         available = converted_stocks.get(child_id, Decimal('0'))
         convertible = convertibles.get(child_id, True)
         shortage = max(Decimal('0'), needed - available) if convertible else None
@@ -618,8 +628,11 @@ async def shortage_signals_for_orders(
         if maps is None:
             continue
         needs, line_uom_ids, legacy_units = maps
-        batches = o.planned_qty / yields[o.recipe_id]
-        scaled = {child: qty * batches for child, qty in needs.items()}
+        # Multiply by the plan before dividing by the yield, as the
+        # explosion does: a plan the yield does not divide must not turn
+        # an exact need into one with a trillionth over.
+        planned, batch_yield = o.planned_qty, yields[o.recipe_id]
+        scaled = {child: qty * planned / batch_yield for child, qty in needs.items()}
         signals[o.id] = await _shortages_from_needs(
             db,
             organization_id,
