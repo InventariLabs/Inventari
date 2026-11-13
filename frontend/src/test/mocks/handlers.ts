@@ -1639,7 +1639,11 @@ handlers.push(
     HttpResponse.json(onePage([])),
   ),
   http.get("/api/v1/warehouse/tax-rates/country", () =>
-    HttpResponse.json({ country: null, rates: [] }),
+    HttpResponse.json({
+      country: null,
+      rates: [],
+      require_partner_tax_id: false,
+    }),
   ),
   // A scanning sheet that goes away with its session open pauses it; every
   // test that unmounts one sends this, and only some care.

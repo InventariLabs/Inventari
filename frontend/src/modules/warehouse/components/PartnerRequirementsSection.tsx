@@ -1,10 +1,12 @@
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { useCountryTaxRates } from "@/modules/warehouse/hooks/useTaxRates";
 
 interface PartnerRequirementsSectionProps {
   /** True/False is the profile's own entry; null defers to the country. */
   requireTaxId: boolean | null;
-  onRequireTaxIdChange: (value: boolean) => void;
+  onRequireTaxIdChange: (value: boolean | null) => void;
   titleClassName: string;
   descriptionClassName: string;
 }
@@ -17,6 +19,10 @@ interface PartnerRequirementsSectionProps {
  * way, and the ID itself is stored exactly as typed. Saying both here is
  * cheaper than the reader finding out from a document that confirmed when they
  * expected a refusal.
+ *
+ * With no entry of its own the profile follows the country, and confirmation
+ * answers with the country's rule — so the checkbox shows that rule and says
+ * where it came from, instead of an unchecked box over a refusal.
  */
 export function PartnerRequirementsSection({
   requireTaxId,
@@ -25,6 +31,10 @@ export function PartnerRequirementsSection({
   descriptionClassName,
 }: PartnerRequirementsSectionProps) {
   const { t } = useTranslation("warehouse");
+  const { data: offer } = useCountryTaxRates();
+  const country = offer?.country ?? null;
+  const inherited = requireTaxId === null;
+  const countryRequires = offer?.require_partner_tax_id ?? false;
   return (
     <section className="space-y-6">
       <div>
@@ -34,7 +44,7 @@ export function PartnerRequirementsSection({
         </p>
       </div>
       <Checkbox
-        checked={requireTaxId ?? false}
+        checked={requireTaxId ?? countryRequires}
         onChange={(e) => onRequireTaxIdChange(e.target.checked)}
         className="h-4 w-4 cursor-pointer"
         label={
@@ -46,6 +56,32 @@ export function PartnerRequirementsSection({
           </span>
         }
       />
+      {inherited ? (
+        <p className="-mt-3 text-xs text-on-muted" data-testid="tax-id-source">
+          {country
+            ? t(
+                countryRequires
+                  ? "profile.requirePartnerTaxIdFromCountryYes"
+                  : "profile.requirePartnerTaxIdFromCountryNo",
+                { country },
+              )
+            : t("profile.requirePartnerTaxIdFromNoCountry")}
+        </p>
+      ) : (
+        <div className="-mt-3 flex flex-wrap items-center gap-3">
+          <p className="text-xs text-on-muted" data-testid="tax-id-source">
+            {t("profile.requirePartnerTaxIdOwn")}
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onRequireTaxIdChange(null)}
+          >
+            {t("profile.requirePartnerTaxIdFollowCountry")}
+          </Button>
+        </div>
+      )}
     </section>
   );
 }
