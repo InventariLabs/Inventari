@@ -16,6 +16,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { ReactNode } from "react";
+import { addDays, format } from "date-fns";
 
 import type {
   MealPlan,
@@ -41,10 +42,12 @@ vi.mock("@dnd-kit/core", async (importOriginal) => {
 
 import { MealPlanCalendar } from "./MealPlanCalendar";
 
-// A Monday and the day after — in the future, so no cell is locked and every
-// entry still offers its grip.
-const PLAN_START = "2027-01-04";
-const PLAN_END = "2027-01-05";
+// Tomorrow and the day after, counted from the clock — in the future whenever
+// the suite runs, so no cell is locked and every entry still offers its grip.
+const isoDay = (daysAhead: number) =>
+  format(addDays(new Date(), daysAhead), "yyyy-MM-dd");
+const PLAN_START = isoDay(1);
+const PLAN_END = isoDay(2);
 
 function entry(id: string, date: string): MealPlanEntry {
   return {
@@ -76,8 +79,8 @@ function planWith(entries: MealPlanEntry[]): MealPlan {
     entries,
     daily_nutrition_summary: [],
     created_by: "u1",
-    created_at: "2027-01-04T08:00:00Z",
-    updated_at: "2027-01-04T08:00:00Z",
+    created_at: `${PLAN_START}T08:00:00Z`,
+    updated_at: `${PLAN_START}T08:00:00Z`,
   };
 }
 

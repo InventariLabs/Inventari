@@ -41,6 +41,13 @@ says what the release does rather than what changed since them.
   administrator is offered the self-approval setting as another way out. The
   notification sent for the same case no longer calls a stage naming several
   people "the person".
+- A requirement scaled by a ratio that does not divide evenly no longer asks
+  for one unit more than it needs: five servings of a three-serving recipe
+  that asks for three eggs now ask for five eggs, and planning five of a
+  production recipe that yields three lists five pieces, not six. The
+  production preview's to-buy figure and the line the shortfall writes agree
+  on the quantity, and the add-item dialog of a shopping list writes its
+  quantity ceiling in the reader's decimal mark.
 
 ## v0.12.0 - 2026-11-09
 

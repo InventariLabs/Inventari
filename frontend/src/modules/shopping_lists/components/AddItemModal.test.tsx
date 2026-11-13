@@ -1,5 +1,12 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import i18n from "@/i18n/config";
 import type { MockedFunction } from "vitest";
 import axios, { type AxiosResponse } from "axios";
 import AddItemModal from "./AddItemModal";
@@ -291,9 +298,39 @@ describe("AddItemModal", () => {
     // The form repeats the schema's ceiling sentence (the backend answers
     // with the same words) instead of shipping the overflow to the driver.
     expect(
-      screen.getByText(/above 999999999.999 cannot be stored/i),
+      screen.getByText(/above 999,999,999\.999 cannot be stored/i),
     ).toBeInTheDocument();
     expect(shoppingListsApi.addItem).not.toHaveBeenCalled();
+  });
+
+  it("writes the ceiling in the reader's decimal mark", async () => {
+    // The sentence interpolated the raw constant, so a Polish interface read
+    // "powyżej 999999999.999" — a dot where every other number, and the
+    // server's own refusal for the same field, write a comma.
+    await act(() => i18n.changeLanguage("pl"));
+    try {
+      render(
+        <AddItemModal listId="1" onClose={() => {}} onSuccess={() => {}} />,
+        { wrapper },
+      );
+
+      fireEvent.change(
+        screen.getByPlaceholderText(/np\. Mleko, Chleb, Lody…/i),
+        { target: { value: "Unobtainium" } },
+      );
+      fireEvent.change(screen.getByLabelText(/Ilość/i), {
+        target: { value: "1000000000" },
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: /Dodaj/i }));
+
+      expect(
+        screen.getByText(/powyżej 999\s999\s999,999 nie może zostać zapisana/i),
+      ).toBeInTheDocument();
+      expect(shoppingListsApi.addItem).not.toHaveBeenCalled();
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 
   it("should show the server error message when API fails", async () => {

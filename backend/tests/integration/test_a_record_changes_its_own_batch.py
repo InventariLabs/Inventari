@@ -17,7 +17,7 @@ everywhere else; throwing it away is not.
 """
 
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
@@ -78,7 +78,10 @@ class _Shelf:
                 name=name,
                 expiry_date=expiry,
             )
-            for name, expiry in (('B-01', date(2031, 3, 1)), ('B-02', date(2031, 9, 1)))
+            for name, expiry in (
+                ('B-01', date.today() + timedelta(days=400)),
+                ('B-02', date.today() + timedelta(days=500)),
+            )
         )
         db.add_all([self.early, self.late])
         db.flush()
