@@ -398,6 +398,15 @@ const dist = join(root, "dist");
  * the others stand under theirs (login 394.8, launcher 409.9, start 625.9,
  * receive 462.5, history 598.9, products 613.8, app first paint 390.1,
  * initial 189.3).
+ *
+ * Re-measured 2026-11-13 on the branch where Settings names the country's
+ * partner tax-ID rule: the development line alone measures the launcher at
+ * 409.9 KiB gz against its 410, and the branch adds 0.1 (410.0). It is copy,
+ * not an import: five sentences in the warehouse file of each language, the
+ * Polish one in the language chunk every first paint loads. That one phone
+ * budget moves a step of five, to 415; the other screens stand under theirs
+ * (login 394.9, start 626.1, receive 462.6, issue 575.2, history 599.1,
+ * products 613.9, app first paint 390.2, initial 189.3).
  */
 const BUDGETS = {
   initial: 245,
