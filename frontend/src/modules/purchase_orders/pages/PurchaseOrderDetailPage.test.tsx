@@ -557,14 +557,18 @@ describe("PurchaseOrderDetailPage", () => {
         name: /request approval/i,
       }),
     ).toBeInTheDocument();
+    // The header is filled by the page's effect after the order loads, so its
+    // action bar can arrive after the body's — wait for it rather than read
+    // it the moment the body has one.
+    const moreActions = await within(pageHeader()).findByRole("button", {
+      name: /more actions/i,
+    });
+    // With the header mounted, this counts both places: the way forward is
+    // offered once, and the header adds no second copy.
     expect(
       screen.getAllByRole("button", { name: /request approval/i }),
     ).toHaveLength(1);
-    await userEvent
-      .setup()
-      .click(
-        within(pageHeader()).getByRole("button", { name: /more actions/i }),
-      );
+    await userEvent.setup().click(moreActions);
     expect(
       screen.getByRole("button", { name: /^cancel/i }),
     ).toBeInTheDocument();
