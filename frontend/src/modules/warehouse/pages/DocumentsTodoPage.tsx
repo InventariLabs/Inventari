@@ -576,7 +576,7 @@ export default function DocumentsTodoPage() {
           <div className="flex items-center gap-1">
             <Button
               size="sm"
-              leftIcon={<PackageCheck size={15} />}
+              leftIcon={<PackageCheck size={14} />}
               onClick={() => setPickingIds(pickableIds)}
             >
               {t("bulk.pickSelected", { count: pickableIds.length })}

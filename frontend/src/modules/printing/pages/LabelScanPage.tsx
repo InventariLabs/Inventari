@@ -171,7 +171,7 @@ export default function LabelScanPage() {
                   `/inventory/scan?code=${encodeURIComponent(shortCode)}`,
                 )
               }
-              leftIcon={<Scan size={18} />}
+              leftIcon={<Scan size={16} />}
             >
               {isAssigned
                 ? t("labels:openScanActions", {

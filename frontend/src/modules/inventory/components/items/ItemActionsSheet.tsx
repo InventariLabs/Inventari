@@ -79,7 +79,7 @@ export default function ItemActionsSheet({
         <Button
           variant="ghost"
           className="w-full justify-start"
-          leftIcon={<FileText size={18} />}
+          leftIcon={<FileText size={16} />}
           onClick={() => {
             onClose();
             onViewDetails(item);
@@ -94,7 +94,7 @@ export default function ItemActionsSheet({
             <Button
               variant="ghost"
               className="w-full justify-start"
-              leftIcon={<CheckCircle size={18} />}
+              leftIcon={<CheckCircle size={16} />}
               onClick={() => {
                 onClose();
                 onConsume(item.id);
@@ -106,7 +106,7 @@ export default function ItemActionsSheet({
               <Button
                 variant="ghost"
                 className="w-full justify-start"
-                leftIcon={<Plus size={18} />}
+                leftIcon={<Plus size={16} />}
                 onClick={() => {
                   onClose();
                   onAddOne(item.id);
@@ -118,7 +118,7 @@ export default function ItemActionsSheet({
             <Button
               variant="ghost"
               className="w-full justify-start"
-              leftIcon={<Edit2 size={18} />}
+              leftIcon={<Edit2 size={16} />}
               onClick={() => {
                 onClose();
                 onEdit(item);
@@ -129,7 +129,7 @@ export default function ItemActionsSheet({
             <Button
               variant="ghost"
               className="w-full justify-start"
-              leftIcon={<Move size={18} />}
+              leftIcon={<Move size={16} />}
               onClick={() => {
                 onClose();
                 onMove(item);
@@ -140,7 +140,7 @@ export default function ItemActionsSheet({
             <Button
               variant="ghost"
               className="w-full justify-start"
-              leftIcon={<Bell size={18} />}
+              leftIcon={<Bell size={16} />}
               onClick={() => {
                 onClose();
                 onSetThreshold(item);
@@ -156,7 +156,7 @@ export default function ItemActionsSheet({
             <Button
               variant="ghostDanger"
               className="w-full justify-start"
-              leftIcon={<Trash2 size={18} />}
+              leftIcon={<Trash2 size={16} />}
               onClick={() => {
                 onClose();
                 onDelete(item.id);

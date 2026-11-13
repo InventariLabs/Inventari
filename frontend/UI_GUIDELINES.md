@@ -36,8 +36,9 @@ the message does not: sizes off the type scale (`check-type-scale`),
 field, a destructive action in a neutral variant, a hover-only reveal (`lint:ui`), a `<Sheet>`
 without a scroll layer, a footer with widths on its buttons or two action rows (§4.3 — `lint:ui`),
 a page `<EmptyState>` without a description (`check:empty-state`), `...` in a catalogue string
-(`check-i18n-keys`). A native `input[type=date]` (§2.8) is caught by no gate — review is the only
-check. `npm run scan:ui` reports every detector, blocking or not, and never fails.
+(`check-i18n-keys`), a native `input[type=date]` (§2.8), a hand-written z-index number (§4.1), a raw
+`slate-*` or `emerald-*` class (§1.1) and a `Button` icon off the sizes its button allows (§6 —
+all `lint:ui`). `npm run scan:ui` reports every detector, blocking or not, and never fails.
 
 ---
 
@@ -66,6 +67,10 @@ The `success` token maps to emerald values for every profile. Use `success-*` fo
 buttons, badges, and completion feedback; keep `accent-*` only for profile-tinted positive
 emphasis that is not a status signal (progress bars, highlighted values).
 The only exception is where `emerald` is needed for non-semantic decorative purposes (e.g., checkbox accent color where Tailwind requires a standard color name).
+`success-palette-literal` (`lint:ui`) fails on a raw `emerald-*` / `green-*` class, and
+`slate-palette-literal` (`lint:ui`) on a raw `slate-*` one — the neutral is `gray-*`. A colour the
+user picks as an identity (a category or widget swatch) is neither status nor chrome and says so at
+the call site: `ui-pattern: palette-identity — <why the token would be wrong here>`.
 
 #### Common color combos
 
@@ -141,7 +146,7 @@ rested on size and colour alone and the product read as flat.
 | (none) 400          | Content and data. Digits get `tabular-nums`, not weight.                                              |
 | `font-bold` 700     | **Retired**, except a monospace code — there weight is the only thing separating a serial from prose. |
 
-- **Nothing below `text-sm` may carry `font-semibold`.** A micro-label is the
+- **Nothing below `text-sm` may carry `font-semibold`** (`check-type-scale` fails on it). A micro-label is the
   smaller and lesser of the two label roles; giving it the heavier weight —
   as this table used to — inverts the pair it belongs to.
 - **A monospace code is exempt from both weight rules.** On a serial, SKU or
@@ -667,7 +672,8 @@ import { DateInput } from "@/components/ui/DateInput";
 
 #### ⛔ RULE: Never render `input[type="date"]`
 
-`grep -rn 'type="date"' src --include=*.tsx | grep -v test` must stay empty.
+`grep -rn 'type="date"' src --include=*.tsx | grep -v test` must stay empty — the
+`native-date-input` detector (`lint:ui`) fails on a new one.
 
 ### 2.9 Type scale floor
 
@@ -1042,6 +1048,9 @@ The widths are the two tiers of §3.2a — `<PageContainer>` (1536px) and `<Page
 > **⛔ RULE: Follow this layer system. Do NOT invent new z-index values.**
 >
 > Tokens are defined in `frontend/src/index.css` (`--z-*` block). Always use the CSS variable form (`z-[var(--z-…)]`) — never hardcode numeric values.
+> The `numeric-z-index` detector (`lint:ui`) fails on `z-[100]` and on `zIndex: 30` in a style object;
+> write `zIndex: "var(--z-sticky)"` there. Tailwind's own `z-10`/`z-50` steps stay legal for
+> stacking inside one component, never for a layer that has to beat another component's.
 
 | Layer                           | Token              | Class                       | Components                                                                                               |
 | ------------------------------- | ------------------ | --------------------------- | -------------------------------------------------------------------------------------------------------- |
@@ -1264,7 +1273,7 @@ import { Plus, X, ChevronDown, Loader2 } from "lucide-react";
 
 | Context              | Size prop | strokeWidth |
 | -------------------- | --------- | ----------- |
-| Button icon (any)    | `16`      | `2`         |
+| Button icon (any)    | `16` (`14` on `sm`, `20` on `lg` — §11.4) | `2`         |
 | Navigation icon      | `20-22`   | `2`         |
 | Card header icon     | `24`      | `2`         |
 | Hero/decorative icon | `32`      | `1.5`       |
@@ -1459,7 +1468,10 @@ Buttons in the page header follow a strict hierarchy, **always left-to-right by 
 - **NEVER** override button height with `className="h-12 px-6"` — use `size="lg"` if you truly need larger buttons (rare).
 - **NEVER** use raw `<button>` with inline classes — always `<Button>`.
 - **NEVER** use `size="sm"` for page-level CTAs — `sm` is for inline/table actions only.
-- **All icon sizes in buttons**: `size={16}` for `leftIcon`/`rightIcon`. Not 18, not 20.
+- **All icon sizes in buttons**: `size={16}` for `leftIcon`/`rightIcon`. Not 18, not 20. Two
+  sanctioned exceptions, both by the button's own size: `size="sm"` / `contentSm` (`text-xs`) may
+  use `14`, and `size="lg"` (`text-base`, the prominent phone CTA) may use `20`. The
+  `button-icon-size` detector (`lint:ui`) fails on any other number; icon-only buttons are not read.
 - **Primary CTA always has `leftIcon={<Plus size={16} />}`** when the action is "create/add".
 - **An icon-only button carries `aria-label` _and_ `title` — both, with the same
   words.** With no text inside, there is nothing for the accessibility tree to

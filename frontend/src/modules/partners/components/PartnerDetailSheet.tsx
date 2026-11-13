@@ -343,7 +343,7 @@ function PartnerSheetFooter({
           </>
         )}
       </Button>
-      <Button onClick={() => onEdit(partner)} leftIcon={<Pencil size={15} />}>
+      <Button onClick={() => onEdit(partner)} leftIcon={<Pencil size={16} />}>
         {t("actions.edit")}
       </Button>
     </div>

@@ -260,7 +260,7 @@ export function DocumentsFilters({
           <Button
             variant="outline"
             size="sm"
-            leftIcon={<SlidersHorizontal size={15} />}
+            leftIcon={<SlidersHorizontal size={14} />}
             onClick={() => setFiltersOpen((v) => !v)}
             aria-expanded={filtersOpen}
             className="shrink-0"

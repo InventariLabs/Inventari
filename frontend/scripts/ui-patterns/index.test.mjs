@@ -12,6 +12,7 @@ const here = `${process.cwd()}/scripts/ui-patterns/`;
  */
 const EXPECTED_BLOCKING = [
   "border-weight",
+  "button-icon-size",
   "button-size-override",
   "contrast-wash",
   "content-size-unpadded",
@@ -34,8 +35,11 @@ const EXPECTED_BLOCKING = [
   "label-without-field",
   "money-unformatted",
   "money-without-currency",
+  "native-date-input",
+  "numeric-z-index",
   "overflow-row",
   "sheet-scroll-layer",
+  "slate-palette-literal",
   "success-palette-literal",
   "write-action-ungated",
 ];

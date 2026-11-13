@@ -74,7 +74,7 @@ const REASON_COLORS: Record<string, string> = {
   LOST: "bg-surface-raised text-on",
   RETIRED: "bg-purple-100 text-purple-800",
   TEST_DATA: "bg-teal-100 text-teal-800",
-  OTHER: "bg-slate-100 text-slate-700",
+  OTHER: "bg-gray-100 text-gray-700",
   // Written by module flows (equipment register, storage archive) rather
   // than by a person naming a reason — a neutral state, not a judgement.
   ARCHIVED: "bg-surface-raised text-on",
