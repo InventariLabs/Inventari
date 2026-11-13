@@ -105,6 +105,20 @@ class CoreUomsAPI:
 
         return round_up_to_uom(qty, uom)
 
+    def is_on_step(self, qty: Decimal, uom: UomDTO | None) -> bool:
+        """Whether *qty* already sits on a step of *uom*.
+
+        The counterpart of :meth:`round_up`: a requirement it hands back
+        unchanged was on its step, so no rounding happened and a card has
+        nothing to explain. A quotient's last-place noise does not count
+        against the answer.
+
+        Pure computation (no I/O) — hence sync.
+        """
+        from app.services.uom_service import is_on_uom_step
+
+        return is_on_uom_step(qty, uom)
+
     async def to_canonical_measure_async(
         self,
         db: AsyncSession,

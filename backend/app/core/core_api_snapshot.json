@@ -7074,6 +7074,20 @@
             }
           ]
         },
+        "is_on_step": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "qty",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "uom",
+              "required": true
+            }
+          ]
+        },
         "list_categories_for_org_async": {
           "params": [
             {

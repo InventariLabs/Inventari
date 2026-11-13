@@ -410,6 +410,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `existing_ids_async` | `(db: AsyncSession, uom_ids: set[UUID], organization_id: UUID) -> set[UUID]` | READ | Return the subset of *uom_ids* that exist for *organization_id* — one query. |
 | `get_async` | `(db: AsyncSession, uom_id: UUID, organization_id: UUID) -> UomDTO \| None` | READ | Return the UOM row for *uom_id*, or ``None``. |
 | `get_by_symbol_async` | `(db: AsyncSession, symbol: str, organization_id: UUID, *, include_global: bool=False) -> UomDTO \| None` | READ | Async: return the UOM DTO whose ``symbol`` matches *symbol* exactly, or ``None``. |
+| `is_on_step` | `(qty: Decimal, uom: UomDTO \| None) -> bool` | READ | Whether *qty* already sits on a step of *uom*. |
 | `list_categories_for_org_async` | `(db: AsyncSession, organization_id: UUID) -> list[UomCategoryDTO]` | READ | Return all UOM categories visible to *organization_id* (system + org-specific). |
 | `list_for_org_async` | `(db: AsyncSession, organization_id: UUID) -> list[UomDTO]` | READ | Return all UOM rows visible to *organization_id* (system + org-specific). |
 | `quantity_step` | `(uom: UomDTO \| None) -> Decimal` | READ | The step quantities in *uom* are counted in — its own ``rounding``, |
@@ -591,9 +592,9 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 ## Statistics
 
-- **Total methods:** 310
+- **Total methods:** 311
 - **Namespaces:** 33
-- **Documented methods:** 310 (100%)
-- **READ methods:** 214 (69%)
+- **Documented methods:** 311 (100%)
+- **READ methods:** 215 (69%)
 - **WRITE methods:** 96 (31%)
 
