@@ -405,8 +405,10 @@ and shelf however long the history behind them (at 20 000 products: 67 292
 rows read where the scan read 197 405 movements, and the same 67 292 after
 300 000 more). The triggers are statement-level with transition tables, so
 a posting written in one statement moves each total once, about 70 µs per
-single-row write and 5% on a bulk insert; the insert path takes the totals' rows in key
-order; the removal path does not sort them. A removed movement only subtracts from a row that is still there: a
+single-row write and 5% on a bulk insert. Both halves take the totals' rows in key
+order — the adding one as it writes them, the subtracting one by locking them first
+(`ledgertotals03`) — so two statements over the same groups queue rather than
+deadlock. A removed movement only subtracts from a row that is still there: a
 cascade from the product, the shelf or the organization removes the totals
 together with the movements. No code writes the table — a change to how a
 movement counts belongs in the trigger function, which the test databases

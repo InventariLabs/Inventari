@@ -188,9 +188,12 @@ _baseline_migration = importlib.import_module(
     'migrations.versions.baseline_002_full_schema'
 )
 # The triggers that keep the ledger's totals are a later revision's statements,
-# run the same way.
+# run the same way, and so is the revision that replaced their function since.
 _ledger_totals_migration = importlib.import_module(
     'migrations.versions.ledgertotals01_create_stock_ledger_totals'
+)
+_ledger_totals_key_order_migration = importlib.import_module(
+    'migrations.versions.ledgertotals03_take_removed_totals_in_key_order'
 )
 
 # Lazy imports for module-specific models to avoid import order issues
@@ -546,6 +549,7 @@ def _provision_worker_db(engine) -> None:
             conn.execute(text(statement))
         for statement in _ledger_totals_migration.TRIGGER_SQL:
             conn.execute(text(statement))
+        conn.execute(text(_ledger_totals_key_order_migration.FUNCTION_SQL))
         conn.commit()
     seed_rows = _build_seed_snapshot(engine)
     with engine.connect() as conn:

@@ -10,18 +10,21 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from app.core.public_api._access import reads
 from app.core.utils import pick_by_lang
 
 
 class CorePdfAPI:
     """Public Core API for PDF generation and template rendering."""
 
+    @reads
     def sanitize_html(self, body_html: str) -> str:
         """Strip dangerous tags/attributes from user-authored HTML (nh3)."""
         from app.services.template_engine import sanitize_html
 
         return sanitize_html(body_html)
 
+    @reads
     def render_html(
         self,
         template_html: str | None,
@@ -40,24 +43,28 @@ class CorePdfAPI:
             template_html, context
         )
 
+    @reads
     def render_pdf(self, html: str) -> bytes:
         """Convert rendered HTML to PDF bytes (WeasyPrint)."""
         from app.core.pdf_base_service import PdfServiceBase
 
         return PdfServiceBase.render_to_pdf(html)
 
+    @reads
     def generate_code128_base64(self, value: str) -> str:
         """Code128 barcode as a data-URI image at the standard print geometry."""
         from app.services.pdf_utils import generate_code128_base64
 
         return generate_code128_base64(value)
 
+    @reads
     def generate_qr_base64(self, value: str) -> str:
         """QR code as a data-URI PNG at the standard print geometry."""
         from app.services.pdf_utils import generate_qr_base64
 
         return generate_qr_base64(value)
 
+    @reads
     def printed_codes(self, number: str) -> dict[str, Any]:
         """The code images a printout carries, and the size to print them at.
 
@@ -83,6 +90,7 @@ class CorePdfAPI:
             'qr_size_mm': qr.width_mm,
         }
 
+    @reads
     def format_partner_address(
         self, address: dict[str, Any] | None, lang: str = 'en'
     ) -> str | None:
@@ -95,12 +103,14 @@ class CorePdfAPI:
 
         return format_partner_address(address, lang)
 
+    @reads
     def get_doc_status_map(self, lang: str) -> dict[str, str]:
         """Document status code -> localized label map."""
         from app.services.pdf_utils import get_doc_status_map
 
         return get_doc_status_map(lang)
 
+    @reads
     def common_labels(self, lang: str) -> dict[str, str]:
         """Shared PDF labels (i18n-lite): 5 languages, English fallback."""
         from app.services import pdf_utils
@@ -116,6 +126,7 @@ class CorePdfAPI:
             )
         )
 
+    @reads
     def register_pdf_filters(self, env: Any) -> None:
         """Register standard Jinja2 filters (format_date, format_qty, etc.)."""
         from app.services.pdf_utils import register_pdf_filters

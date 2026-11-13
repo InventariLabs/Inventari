@@ -294,6 +294,9 @@ export default function AuditLogPage() {
   // render, and a dependency that always changes is a memo that never holds.
   const rows: AuditLogEntry[] = useMemo(() => data?.items ?? [], [data]);
   const total = data?.total ?? 0;
+  // The journal counts only as far as the server's cap, as every list that
+  // grows with the organization does; past it the bar says "more than".
+  const totalCapped = data?.total_capped ?? false;
 
   /**
    * A name for an id, from what this page can vouch for.
@@ -573,6 +576,7 @@ export default function AuditLogPage() {
         skip={paging.page * PAGE_SIZE}
         limit={PAGE_SIZE}
         total={total}
+        totalCapped={totalCapped}
         keyset={{ rows: rows.length, hasNext: Boolean(data?.next_cursor) }}
         onPrev={paging.goPrev}
         // The cursor on screen belongs to the page it came with; while the

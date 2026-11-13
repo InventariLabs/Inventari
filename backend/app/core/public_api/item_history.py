@@ -7,12 +7,14 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ItemHistoryDTO
+from app.core.public_api._access import reads, writes
 from app.services.items import log_async as log_item_history_async
 
 
 class CoreItemHistoryAPI:
     """Public Core API for item history write access."""
 
+    @writes
     async def log_async(
         self,
         db: AsyncSession,
@@ -32,6 +34,7 @@ class CoreItemHistoryAPI:
             changes=changes,
         )
 
+    @reads
     async def list_for_item_async(
         self,
         db: AsyncSession,

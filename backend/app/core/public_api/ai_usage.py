@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from app.core.contracts import GlobalAIUsageStatsDTO, OrgAIUsageStatsDTO, UserContextDTO
+from app.core.public_api._access import reads, writes
 from app.i18n.service import get_current_lang, get_error_message
 
 if TYPE_CHECKING:
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
 class CoreAIUsageAPI:
     """Public Core API for AI usage rate-limiting, cost estimation, and logging."""
 
+    @reads
     async def check_limit_async(
         self,
         db: AsyncSession,
@@ -25,6 +27,7 @@ class CoreAIUsageAPI:
 
         await check_ai_limit_async(db, organization_id, action_type)
 
+    @reads
     async def enforce_limit_async(
         self,
         db: AsyncSession,
@@ -49,6 +52,7 @@ class CoreAIUsageAPI:
             db, organization_id, action_type, check=self.check_limit_async
         )
 
+    @reads
     async def estimate_cost_async(
         self,
         db: AsyncSession,
@@ -66,6 +70,7 @@ class CoreAIUsageAPI:
             db, model_name, prompt_tokens, completion_tokens, cache_read_tokens
         )
 
+    @writes
     async def log_usage_async(
         self,
         db: AsyncSession,
@@ -97,6 +102,7 @@ class CoreAIUsageAPI:
             cost_is_estimated=cost_is_estimated,
         )
 
+    @writes
     async def log_llm_usage_async(
         self,
         db: AsyncSession,
@@ -143,6 +149,7 @@ class CoreAIUsageAPI:
             log_usage=self.log_usage_async,
         )
 
+    @reads
     async def count_usage_async(
         self,
         db: AsyncSession,
@@ -161,6 +168,7 @@ class CoreAIUsageAPI:
             db, organization_id, since=since, action_type=action_type
         )
 
+    @reads
     async def get_global_stats_async(
         self,
         db: AsyncSession,
@@ -180,6 +188,7 @@ class CoreAIUsageAPI:
 
         return await get_global_ai_stats_async(db, days=days)
 
+    @reads
     async def get_org_stats_async(
         self,
         db: AsyncSession,

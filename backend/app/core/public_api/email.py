@@ -14,6 +14,7 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
+from app.core.public_api._access import reads, writes
 from app.services.email_service import (
     EmailService,
     email_button,
@@ -26,6 +27,7 @@ class CoreEmailAPI:
     """Public Core API for sending transactional email from modules."""
 
     @staticmethod
+    @reads
     def render_shell(heading: str, body_html: str, footer: str) -> str:
         """The card every transactional email arrives in.
 
@@ -37,16 +39,19 @@ class CoreEmailAPI:
         return email_shell(heading, body_html, footer)
 
     @staticmethod
+    @reads
     def render_button(url: str, label: str) -> str:
         """The one centred call to action these emails carry."""
         return email_button(url, label)
 
     @staticmethod
+    @reads
     def render_fallback_link(intro: str, url: str) -> str:
         """The address spelled out, for a client that shows no button."""
         return email_fallback_link(intro, url)
 
     @staticmethod
+    @reads
     def is_configured() -> bool:
         """Whether a message sent through ``send_async`` could leave at all.
 
@@ -57,6 +62,7 @@ class CoreEmailAPI:
         return EmailService.is_configured()
 
     @staticmethod
+    @writes
     async def send_async(
         to_email: str,
         subject: str,
@@ -90,6 +96,7 @@ class CoreEmailAPI:
         )
 
     @staticmethod
+    @writes
     async def send_with_attachment_async(
         to_email: str,
         subject: str,

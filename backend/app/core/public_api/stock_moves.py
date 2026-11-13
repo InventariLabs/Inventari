@@ -21,11 +21,13 @@ from app.core.contracts import (
     StockMovePostedGroupDTO,
     StockMoveRowDTO,
 )
+from app.core.public_api._access import reads, writes
 
 
 class CoreStockMovesAPI:
     """Public Core API namespace for StockMove records."""
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -68,6 +70,7 @@ class CoreStockMovesAPI:
             completed_at=completed_at,
         )
 
+    @reads
     async def get_async(
         self,
         db: AsyncSession,
@@ -78,6 +81,7 @@ class CoreStockMovesAPI:
 
         return await _get(db, organization_id, move_id)
 
+    @reads
     async def list_by_template_async(
         self,
         db: AsyncSession,
@@ -99,6 +103,7 @@ class CoreStockMovesAPI:
             since=since,
         )
 
+    @reads
     async def list_for_org_async(
         self,
         db: AsyncSession,
@@ -151,6 +156,7 @@ class CoreStockMovesAPI:
             known_total=known_total,
         )
 
+    @reads
     async def list_rows_for_org_async(
         self,
         db: AsyncSession,
@@ -205,6 +211,7 @@ class CoreStockMovesAPI:
             count_up_to=count_up_to,
         )
 
+    @reads
     async def list_by_reference_async(
         self,
         db: AsyncSession,
@@ -226,6 +233,7 @@ class CoreStockMovesAPI:
             offset=offset,
         )
 
+    @reads
     async def count_by_reference_async(
         self,
         db: AsyncSession,
@@ -237,6 +245,7 @@ class CoreStockMovesAPI:
 
         return await _count(db, organization_id, reference_type, reference_id)
 
+    @reads
     async def posted_groups_async(
         self,
         db: AsyncSession,
@@ -255,6 +264,7 @@ class CoreStockMovesAPI:
 
         return await _posted(db, organization_id, reference_type, reference_id)
 
+    @reads
     async def any_departure_async(
         self,
         db: AsyncSession,
@@ -290,6 +300,7 @@ class CoreStockMovesAPI:
             excluded_reference_ids=excluded_reference_ids,
         )
 
+    @reads
     async def any_departure_from_groups_async(
         self,
         db: AsyncSession,
@@ -313,6 +324,7 @@ class CoreStockMovesAPI:
             db, organization_id, groups, excluded_reference_ids=excluded_reference_ids
         )
 
+    @reads
     async def list_recent_async(
         self,
         db: AsyncSession,
@@ -324,6 +336,7 @@ class CoreStockMovesAPI:
 
         return await _list(db, organization_id, limit=limit)
 
+    @reads
     async def list_receipts_for_aging_async(
         self,
         db: AsyncSession,
@@ -345,6 +358,7 @@ class CoreStockMovesAPI:
             limit=limit,
         )
 
+    @reads
     async def aggregate_aging_buckets_async(
         self,
         db: AsyncSession,

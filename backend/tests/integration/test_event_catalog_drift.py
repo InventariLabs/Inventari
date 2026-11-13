@@ -56,3 +56,19 @@ class TestEventCatalogDrift:
             'Regenerate: `docker compose exec -T backend python '
             'scripts/generate_event_catalog.py > docs/subsystems/EVENTS.md`.'
         )
+
+    def test_the_check_mode_agrees_with_this_test(self) -> None:
+        """``--check`` passes on the committed file, as the comparison above does.
+
+        The file is written through print(), which adds a newline the
+        generated catalog does not end with. This test compares without
+        trailing whitespace and passed; ``--check`` compared exactly and
+        reported the committed catalog out of sync.
+        """
+        result = subprocess.run(
+            [sys.executable, str(_GENERATOR_SCRIPT), '--check', '--output', _DOCS_PATH],
+            capture_output=True,
+            text=True,
+            cwd=str(_BACKEND_DIR),
+        )
+        assert result.returncode == 0, result.stdout + result.stderr

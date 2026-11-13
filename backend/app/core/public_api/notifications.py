@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import NotificationDedupKey, NotificationDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.core.public_api._scope import without_org_scope
 from app.services.notification_service import NotificationService, in_language
 
@@ -46,6 +47,7 @@ class CoreNotificationsAPI:
     @without_org_scope(
         'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
     )
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -79,6 +81,7 @@ class CoreNotificationsAPI:
             return None
         return NotificationService.to_dto(notification)  # type: ignore[no-any-return]
 
+    @writes
     async def publish_async(
         self,
         db: AsyncSession,
@@ -93,6 +96,7 @@ class CoreNotificationsAPI:
         """
         await NotificationService.publish_async(db, notifications)
 
+    @writes
     async def notify_org_admins_async(
         self,
         db: AsyncSession,
@@ -129,6 +133,7 @@ class CoreNotificationsAPI:
         )
 
     @staticmethod
+    @reads
     def localize(table: Mapping[str, str], /, **values: object) -> dict[str, str]:
         """Fill one format string per language.
 
@@ -146,6 +151,7 @@ class CoreNotificationsAPI:
         user = await UserService.get_by_id_model_async(db, user_id)
         return user.preferred_language if user else None
 
+    @reads
     async def exists_unread_by_meta_async(
         self,
         db: AsyncSession,
@@ -165,6 +171,7 @@ class CoreNotificationsAPI:
             db, organization_id, key, since
         )
 
+    @reads
     async def list_for_user_async(
         self,
         db: AsyncSession,
@@ -180,6 +187,7 @@ class CoreNotificationsAPI:
         )
         return [NotificationDTO.model_validate(n) for n in notifications]
 
+    @reads
     async def get_by_id_for_user_async(
         self, db: AsyncSession, notification_id: UUID, user_id: UUID
     ) -> NotificationDTO | None:
@@ -192,6 +200,7 @@ class CoreNotificationsAPI:
     @without_org_scope(
         'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
     )
+    @writes
     async def update_read_status_async(
         self, db: AsyncSession, notification_id: UUID, user_id: UUID, is_read: bool
     ) -> NotificationDTO | None:
@@ -209,10 +218,12 @@ class CoreNotificationsAPI:
     @without_org_scope(
         'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
     )
+    @writes
     async def mark_all_read_async(self, db: AsyncSession, user_id: UUID) -> None:
         """Mark all notifications as read for *user_id*."""
         await NotificationService.mark_all_read_async(db, user_id)
 
+    @writes
     async def mark_read_by_meta_async(
         self, db: AsyncSession, organization_id: UUID, ref_key: str, ref_id: str
     ) -> int:
@@ -229,6 +240,7 @@ class CoreNotificationsAPI:
     @without_org_scope(
         'addressed by user_id: the notification belongs to that user, whose organization is resolved from the user'
     )
+    @writes
     async def delete_async(
         self, db: AsyncSession, notification_id: UUID, user_id: UUID
     ) -> bool:

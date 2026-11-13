@@ -638,6 +638,11 @@
               "kind": "KEYWORD_ONLY",
               "name": "known_total",
               "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "count_up_to",
+              "required": false
             }
           ]
         },

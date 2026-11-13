@@ -1,6 +1,8 @@
 # CoreAPI Reference
 
-The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable, module-safe methods for interacting with Core data. Modules must use CoreAPI instead of importing Core models or services directly.
+The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core_api`) is a facade that exposes stable, module-safe methods for interacting with Core data. Modules must use CoreAPI instead of importing Core models or services directly.
+
+**R/W** is declared on each method (`@reads` / `@writes`, `app.core.public_api._access`): WRITE when the call can change what the database or the file store holds, or sends something out of the process (a mail, an event, a notification); READ otherwise, including a read that takes row locks, a render, a computation and a hook registered at import.
 
 **Location:** `backend/app/core/public_api/`
 
@@ -53,12 +55,12 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | Method | Signature | R/W | Description |
 |---|---|---|---|
 | `create_async` | `(db: AsyncSession, org_id: uuid.UUID, data: AiConnectionCreateDTO) -> AiConnectionDTO` | WRITE | — |
-| `delete_async` | `(db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID) -> bool` | WRITE | Delete a connection. Refuses with |
+| `delete_async` | `(db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID) -> bool` | WRITE | Delete a connection. Refuses with :class:`ConnectionStillBoundError` when the row is still the default for some registered purpose. |
 | `get_async` | `(db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID) -> AiConnectionDTO \| None` | READ | — |
 | `list_async` | `(db: AsyncSession, org_id: uuid.UUID) -> list[AiConnectionDTO]` | READ | — |
 | `list_purposes_async` | `(db: AsyncSession, org_id: uuid.UUID) -> list[AiPurposeDTO]` | READ | All registered purposes, with the choice and the verdict apart. |
 | `set_binding_async` | `(db: AsyncSession, org_id: uuid.UUID, purpose_key: str, connection_id: uuid.UUID \| None) -> None` | WRITE | Set *purpose_key* -> *connection_id* for *org_id*. |
-| `test_connection_async` | `(db: AsyncSession, org_id: uuid.UUID, *, connection_id: uuid.UUID \| None=None, provider: str \| None=None, api_key: str \| None=None, api_base_url: str \| None=None, model_name: str \| None=None, capabilities: list[str] \| None=None) -> dict[str, Any]` | READ | Validate credentials, then check the model against the contract. |
+| `test_connection_async` | `(db: AsyncSession, org_id: uuid.UUID, *, connection_id: uuid.UUID \| None=None, provider: str \| None=None, api_key: str \| None=None, api_base_url: str \| None=None, model_name: str \| None=None, capabilities: list[str] \| None=None) -> dict[str, Any]` | WRITE | Validate credentials, then check the model against the contract. |
 | `update_async` | `(db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID, data: AiConnectionUpdateDTO) -> AiConnectionDTO \| None` | WRITE | — |
 
 ---
@@ -103,7 +105,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `list_for_org_async` | `(db: AsyncSession, organization_id: UUID, *, target_type: str \| None=None, target_id: UUID \| None=None, user_id: UUID \| None=None, actor: str \| None=None, since: datetime \| None=None, until: datetime \| None=None, limit: int=500, offset: int=0, after: tuple[datetime, UUID] \| None=None, known_total: int \| None=None) -> tuple[list[AuditLogDTO], int]` | READ | Return audit entries for one organization, newest first. |
+| `list_for_org_async` | `(db: AsyncSession, organization_id: UUID, *, target_type: str \| None=None, target_id: UUID \| None=None, user_id: UUID \| None=None, actor: str \| None=None, since: datetime \| None=None, until: datetime \| None=None, limit: int=500, offset: int=0, after: tuple[datetime, UUID] \| None=None, known_total: int \| None=None, count_up_to: int \| None=None) -> tuple[list[AuditLogDTO], int]` | READ | Return audit entries for one organization, newest first. |
 | `list_for_target_async` | `(db: AsyncSession, organization_id: UUID, target_type: str, target_id: UUID, *, limit: int=200) -> list[AuditLogDTO]` | READ | Return audit entries for one (target_type, target_id), newest first. |
 | `list_target_types_async` | `(db: AsyncSession, organization_id: UUID) -> list[str]` | READ | The distinct target types this organization's log actually holds. |
 | `log_action_async` | `(db: AsyncSession, *, organization_id: UUID, user_id: UUID \| None, action: AuditAction, target_type: str, target_id: UUID, snapshot: dict[str, Any] \| None=None, reason: str \| None=None, meta_data: dict[str, Any] \| None=None) -> None` | WRITE | Module-safe write surface for audit entries. |
@@ -118,12 +120,12 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `count_async` | `(db: AsyncSession, organization_id: UUID, *, is_deleted: bool=False, category_id: UUID \| None=None, context_tag: str \| None=None) -> int` | READ | — |
 | `create_async` | `(db: AsyncSession, organization_id: UUID, data: ItemCreateDTO, user: UserContextDTO, *, source_document_id: UUID \| None=None, history_changes: dict[str, Any] \| None=None, post_the_change: bool=True, unit_confirmed_over_template: bool=False) -> ItemDTO` | WRITE | Create an item through the standard service pipeline. |
 | `distinct_uom_ids_for_template_async` | `(db: AsyncSession, organization_id: UUID, *, template_id: UUID) -> list[UUID \| None]` | READ | Every distinct unit the items of one product carry. |
-| `existing_ids_async` | `(db: AsyncSession, organization_id: UUID, item_ids: set[UUID]) -> set[UUID]` | WRITE | Return the subset of *item_ids* that exist for *organization_id* — one query. |
+| `existing_ids_async` | `(db: AsyncSession, organization_id: UUID, item_ids: set[UUID]) -> set[UUID]` | READ | Return the subset of *item_ids* that exist for *organization_id* — one query. |
 | `find_by_barcode_async` | `(db: AsyncSession, organization_id: UUID, barcode: str, *, quantity_positive: bool=True, for_update: bool=False) -> ItemDTO \| None` | READ | Return the first item with *barcode* in *organization_id*. |
-| `find_stock_row_async` | `(db: AsyncSession, organization_id: UUID, *, barcode: str \| None=None, template_id: UUID \| None=None, expiry_date: date \| None=None, storage_location_id: UUID \| None=None, lot_id: UUID \| None=None, owner_id: UUID \| None=None, for_update: bool=False) -> ItemDTO \| None` | WRITE | Return the record a delivery to this place tops up. |
+| `find_stock_row_async` | `(db: AsyncSession, organization_id: UUID, *, barcode: str \| None=None, template_id: UUID \| None=None, expiry_date: date \| None=None, storage_location_id: UUID \| None=None, lot_id: UUID \| None=None, owner_id: UUID \| None=None, for_update: bool=False) -> ItemDTO \| None` | READ | Return the record a delivery to this place tops up. |
 | `get_any_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID) -> ItemDTO \| None` | READ | Get item including soft-deleted ones (for protocol rendering). |
 | `get_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID) -> ItemDTO \| None` | READ | — |
-| `get_for_update_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID) -> ItemDTO \| None` | WRITE | Return a single item with row-level lock (SELECT ... FOR NO KEY UPDATE). |
+| `get_for_update_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID) -> ItemDTO \| None` | READ | Return a single item with row-level lock (SELECT ... FOR NO KEY UPDATE). |
 | `has_active_barcode_async` | `(db: AsyncSession, organization_id: UUID, barcode: str) -> bool` | READ | — |
 | `inherited_category_async` | `(db: AsyncSession, organization_id: UUID, *, source_category_id: UUID \| None=None, template_id: UUID \| None=None) -> UUID \| None` | READ | The category a new record of this product is filed under. |
 | `latest_purchase_prices_async` | `(db: AsyncSession, organization_id: UUID, template_ids: list[UUID]) -> dict[UUID, Decimal]` | READ | The newest recorded purchase price of each product that has one. |
@@ -132,14 +134,14 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `list_existing_serials_async` | `(db: AsyncSession, organization_id: UUID, serial_numbers: set[str]) -> set[str]` | READ | — |
 | `list_expiring_by_template_async` | `(db: AsyncSession, organization_id: UUID, *, template_ids: set[UUID], expiry_after: date, expiry_before: date) -> dict[UUID, list[ItemDTO]]` | READ | Load items expiring within a date range, grouped by template_id. |
 | `list_with_template_async` | `(db: AsyncSession, organization_id: UUID, template_ids: list[UUID]) -> dict[UUID, list[ItemDTO]]` | READ | Batch-load active items grouped by template_id. |
-| `lock_records_async` | `(db: AsyncSession, organization_id: UUID, item_ids: Iterable[UUID]) -> None` | WRITE | Take the row locks of *item_ids* in one statement. |
+| `lock_records_async` | `(db: AsyncSession, organization_id: UUID, item_ids: Iterable[UUID]) -> None` | READ | Take the row locks of *item_ids* in one statement. |
 | `open_to_take_part_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, *, user_id: UUID) -> ItemDTO \| None` | WRITE | Open the package a part is about to be taken from (writes the opening). |
 | `post_opening_balance_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, *, template_id: UUID, holding: Decimal, user_id: UUID \| None, location_id: UUID \| None=None) -> None` | WRITE | Post what a record held before it had a card as its opening balance. |
 | `purge_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, user: UserContextDTO, reason: str \| None=None) -> bool` | WRITE | — |
 | `search_cursor_paginated_async` | `(db: AsyncSession, organization_id: UUID, *, storage_ids: list[UUID] \| None=None, storage_id: UUID \| None=None, search: str \| None=None, quantity_above: Decimal \| None=None, cursor_ts: datetime \| None=None, cursor_id: UUID \| None=None, limit: int=50) -> CursorPaginatedDTO[ItemDTO]` | READ | Cursor-paginated items list using keyset pagination on created_at. |
-| `search_stock_summary_async` | `(db: AsyncSession, organization_id: UUID, *, storage_ids: list[UUID] \| None=None, search: str \| None=None, quantity_above: Decimal \| None=None, limit: int=50) -> list[tuple[ItemDTO, Decimal, bool]]` | READ | Stock rows for a picker: distinguishable ones individually, |
+| `search_stock_summary_async` | `(db: AsyncSession, organization_id: UUID, *, storage_ids: list[UUID] \| None=None, search: str \| None=None, quantity_above: Decimal \| None=None, limit: int=50) -> list[tuple[ItemDTO, Decimal, bool]]` | READ | Stock rows for a picker: distinguishable ones individually, interchangeable ones summed per (product, shelf). |
 | `soft_delete_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, user: UserContextDTO, reason: str \| None=None, notes: str \| None=None) -> bool` | WRITE | — |
-| `transfer_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, to_storage_location_id: UUID, *, user_id: UUID, source_document_id: UUID \| None=None, notes: str \| None=None, history_changes: dict[str, Any] \| None=None, history_action: ItemAction=<ItemAction.MOVED: 'MOVED'>, post_the_change: bool=True) -> ItemDTO \| None` | WRITE | — |
+| `transfer_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, to_storage_location_id: UUID, *, user_id: UUID, source_document_id: UUID \| None=None, notes: str \| None=None, history_changes: dict[str, Any] \| None=None, history_action: ItemAction=ItemAction.MOVED, post_the_change: bool=True) -> ItemDTO \| None` | WRITE | — |
 | `update_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, data: ItemUpdateDTO, user: UserContextDTO) -> ItemDTO \| None` | WRITE | — |
 | `update_meta_data_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, namespace: str, data: dict[str, Any]) -> ItemDTO \| None` | WRITE | Update item meta_data in a namespaced way. |
 | `update_quantity_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, quantity: Decimal, *, user_id: UUID, source_document_id: UUID \| None=None, history_changes: dict[str, Any] \| None=None, sync_valuation: bool=True, post_the_change: bool=True, lot_id: UUID \| None=None, move_reference_type: str='item', move_reference_id: UUID \| None=None) -> ItemDTO \| None` | WRITE | Set an item's quantity and post the change to the ledger. |
@@ -181,7 +183,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `list_for_org_async` | `(db: AsyncSession, organization_id: UUID, *, unassigned_only: bool=False) -> list[LabelPoolDTO]` | READ | List labels for *organization_id*, optionally filtered to unassigned. |
 | `list_for_org_with_relations_async` | `(db: AsyncSession, organization_id: UUID, *, unassigned_only: bool=False, label_type: str \| None=None, status: str \| None=None, offset: int=0, limit: int \| None=None) -> tuple[list[LabelPoolDTO], int]` | READ | List labels for *organization_id* with eager-loaded assigned_item. |
 | `list_in_ids_async` | `(db: AsyncSession, label_ids: list[UUID], organization_id: UUID, *, module_scopes: frozenset[str] \| None=None) -> list[LabelPoolDTO]` | READ | Return labels whose IDs are in *label_ids* scoped to *organization_id*. |
-| `list_unprinted_unassigned_async` | `(db: AsyncSession, organization_id: UUID, *, limit: int, exclude_ids: list[UUID] \| None=None) -> list[LabelPoolDTO]` | WRITE | List unprinted + unassigned labels for *organization_id*. |
+| `list_unprinted_unassigned_async` | `(db: AsyncSession, organization_id: UUID, *, limit: int, exclude_ids: list[UUID] \| None=None) -> list[LabelPoolDTO]` | READ | List unprinted + unassigned labels for *organization_id*. |
 | `mark_as_printed_by_ids_async` | `(db: AsyncSession, label_ids: list[UUID], organization_id: UUID) -> None` | WRITE | Mark labels as printed by their IDs (scoped to *organization_id*). |
 | `unassign_async` | `(db: AsyncSession, short_code: str, organization_id: UUID, *, user_id: UUID \| None=None) -> LabelPoolDTO \| None` | WRITE | Unassign a label by short_code (returns refreshed DTO, ``None`` when not found). |
 
@@ -192,7 +194,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | Method | Signature | R/W | Description |
 |---|---|---|---|
 | `connection_for_purpose_async` | `(db: AsyncSession, organization_id: UUID, purpose_key: str) -> Any \| None` | READ | Resolve the bound connection **row** for *purpose_key*. |
-| `extract_from_images_async` | `(db: AsyncSession, organization_id: UUID, *, purpose_key: str, schema: type[T], instructions: str, images: Sequence[bytes], action_type: str, user_id: UUID \| str \| None=None, temperature: float=0.2, max_tokens: int=8000, disable_reasoning: bool=True) -> T` | READ | Read *schema* out of *images*, and account for what it cost. |
+| `extract_from_images_async` | `(db: AsyncSession, organization_id: UUID, *, purpose_key: str, schema: type[T], instructions: str, images: Sequence[bytes], action_type: str, user_id: UUID \| str \| None=None, temperature: float=0.2, max_tokens: int=8000, disable_reasoning: bool=True) -> T` | WRITE | Read *schema* out of *images*, and account for what it cost. |
 | `get_client_for_purpose_async` | `(db: AsyncSession, organization_id: UUID, purpose_key: str) -> LlmClient \| None` | READ | Resolve the LLM client bound to *purpose_key* for the organization. |
 | `register_purpose` | `(key: str, capability: LlmCapability, label_key: str, description_key: str, owner_module: str, probe: AiContractProbe \| None=None) -> None` | READ | Register an AI purpose (idempotent; conflict raises ValueError). |
 
@@ -205,7 +207,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `apply_onboarding_profile_async` | `(db: AsyncSession, organization: OrganizationDTO, profile_id: str, user: UserContextDTO \| None=None, currency: str \| None=None, modules: list[str] \| None=None, timezone: str \| None=None, organization_name: str \| None=None, country: str \| None=None, use_country_preset: bool=False) -> OrganizationDTO` | WRITE | Apply a product profile to *organization* (idempotent onboarding). |
 | `get_async` | `(db: AsyncSession, organization_id: UUID) -> OrganizationDTO \| None` | READ | — |
 | `get_name_async` | `(db: AsyncSession, organization_id: UUID) -> str \| None` | READ | Async: return the organization name, or ``None`` if not found. |
-| `get_settings_async` | `(db: AsyncSession, organization_id: UUID) -> dict[str, Any] \| None` | WRITE | — |
+| `get_settings_async` | `(db: AsyncSession, organization_id: UUID) -> dict[str, Any] \| None` | READ | — |
 | `is_module_enabled_async` | `(db: AsyncSession, organization_id: UUID, module_name: str) -> bool` | READ | — |
 | `list_all_async` | `(db: AsyncSession) -> list[OrganizationDTO]` | READ | Async: list all organizations (superadmin only). |
 | `list_missing_short_id_async` | `(db: AsyncSession) -> list[OrganizationDTO]` | READ | List organizations without a short_id (startup repair). |
@@ -233,7 +235,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `list_for_user_async` | `(db: AsyncSession, organization_id: UUID, user_id: UUID) -> list[RoleDTO]` | READ | Return the roles this user holds in the given org. |
 | `org_role_map_async` | `(db: AsyncSession, *, organization_id: UUID, user_ids: list[UUID]) -> dict[UUID, RoleDTO]` | READ | The org-scoped custom role each given user holds, keyed by user id. |
 | `permissions_for_users_async` | `(db: AsyncSession, *, organization_id: UUID, user_ids: list[UUID]) -> dict[UUID, set[str]]` | READ | Every permission each of these people holds, in two queries. |
-| `rename_async` | `(db: AsyncSession, *, organization_id: UUID, role_id: UUID, name: str) -> RoleDTO` | READ | Give an existing org role a new name. |
+| `rename_async` | `(db: AsyncSession, *, organization_id: UUID, role_id: UUID, name: str) -> RoleDTO` | WRITE | Give an existing org role a new name. |
 | `role_ids_for_user_async` | `(db: AsyncSession, organization_id: UUID, user_id: UUID) -> set[UUID]` | READ | Every role this user holds here, the built-in level included. |
 | `update_permissions_async` | `(db: AsyncSession, *, organization_id: UUID, role_id: UUID, permissions: list[str]) -> RoleDTO` | WRITE | Replace the permission set on an existing role. |
 
@@ -289,13 +291,13 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `encrypt_secret` | `(module_name: str, value: str) -> str` | WRITE | Return *value* at rest, bound to *module_name*. |
+| `encrypt_secret` | `(module_name: str, value: str) -> str` | READ | Return *value* at rest, bound to *module_name*. |
 | `get_async` | `(db: AsyncSession, organization_id: UUID, module_name: str, key: str \| None=None, default: JSONValue=None) -> JSONValue` | READ | Async: read a module setting. Secret fields are masked. |
 | `get_decrypted_async` | `(db: AsyncSession, organization_id: UUID, module_name: str, key: str \| None=None, default: JSONValue=None) -> JSONValue` | READ | Async: the plaintext value of one secret field for *module_name*. |
 | `get_default_org_limits_async` | `(db: AsyncSession) -> dict[str, Any]` | READ | Async: return default AI/item/member limits for new organizations. |
 | `get_org_limits_async` | `(db: AsyncSession, organization_id: UUID) -> dict[str, Any]` | READ | Async: return effective AI limits for *organization_id*. |
 | `get_schema_version_async` | `(db: AsyncSession, organization_id: UUID, module_name: str) -> int` | READ | Async: the settings-schema version this organization's blob carries. |
-| `list_system_settings_async` | `(db: AsyncSession) -> list[dict[str, Any]]` | WRITE | Return all global system settings rows (model pricing, default limits). |
+| `list_system_settings_async` | `(db: AsyncSession) -> list[dict[str, Any]]` | READ | Return all global system settings rows (model pricing, default limits). |
 | `migrate_settings_async` | `(db: AsyncSession, module_name: str, migrate: Callable[..., Any]) -> int` | WRITE | Async: rewrite every organization's settings blob for *module_name*. |
 | `set_bulk_async` | `(db: AsyncSession, organization_id: UUID, module_name: str, values: JSONObject) -> None` | WRITE | Async: set multiple module settings at once (shallow merge). |
 | `set_system_setting_async` | `(db: AsyncSession, key: str, value: JSONValue, updated_by: UUID \| None=None) -> tuple[str, JSONValue, datetime \| None]` | WRITE | Upsert a global system setting; invalidates the in-process cache. |
@@ -308,11 +310,11 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 |---|---|---|---|
 | `create_async` | `(db: AsyncSession, category_in: CategoryCreateDTO, user: UserContextDTO) -> CategoryDTO` | WRITE | Create a new category. Returns the created CategoryDTO. |
 | `delete_async` | `(db: AsyncSession, organization_id: UUID, category_id: UUID, user: UserContextDTO) -> bool` | WRITE | Delete a category by ID. Returns ``True`` if deleted, ``False`` if not found. |
-| `existing_ids_async` | `(db: AsyncSession, organization_id: UUID, category_ids: set[UUID]) -> set[UUID]` | WRITE | Return the subset of *category_ids* visible to *organization_id* — one query. |
+| `existing_ids_async` | `(db: AsyncSession, organization_id: UUID, category_ids: set[UUID]) -> set[UUID]` | READ | Return the subset of *category_ids* visible to *organization_id* — one query. |
 | `get_by_id_async` | `(db: AsyncSession, organization_id: UUID, category_id: UUID) -> CategoryDTO \| None` | READ | Return a single category visible to *organization_id*, or ``None``. |
 | `list_async` | `(db: AsyncSession, organization_id: UUID) -> list[CategoryDTO]` | READ | Return all active categories using an AsyncSession. |
 | `list_with_filters_async` | `(db: AsyncSession, organization_id: UUID, *, include_inactive: bool=False, claimed_tags: set[str] \| None=None, with_counts: bool=False) -> list[CategoryDTO]` | READ | List categories visible to *organization_id* with optional filters. |
-| `rename_group_async` | `(db: AsyncSession, organization_id: UUID, *, current_name: str, new_name: str \| None, category_ids: list[UUID] \| None=None, user: UserContextDTO) -> list[UUID]` | READ | Rename a category group, or take it off the categories that carry it. |
+| `rename_group_async` | `(db: AsyncSession, organization_id: UUID, *, current_name: str, new_name: str \| None, category_ids: list[UUID] \| None=None, user: UserContextDTO) -> list[UUID]` | WRITE | Rename a category group, or take it off the categories that carry it. |
 | `update_async` | `(db: AsyncSession, organization_id: UUID, category_id: UUID, category_in: CategoryUpdateDTO, user: UserContextDTO) -> CategoryDTO \| None` | WRITE | Update a category by ID. Returns the updated CategoryDTO or ``None``. |
 
 ---
@@ -334,9 +336,9 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `emit_async` | `(event: SystemEvent \| str, payload: Mapping[str, Any] \| EventPayload) -> None` | READ | Emit an event after validating its payload against the registry. |
-| `emit_transactional_async` | `(db: AsyncSession, event: SystemEvent \| str, payload: Mapping[str, Any] \| EventPayload) -> None` | READ | Outbox-backed emit riding the caller's transaction. |
-| `flush_pending_async` | `(db: AsyncSession) -> None` | READ | Dispatch TESTING-buffered transactional events after ``db.commit()``. |
+| `emit_async` | `(event: SystemEvent \| str, payload: Mapping[str, Any] \| EventPayload) -> None` | WRITE | Emit an event after validating its payload against the registry. |
+| `emit_transactional_async` | `(db: AsyncSession, event: SystemEvent \| str, payload: Mapping[str, Any] \| EventPayload) -> None` | WRITE | Outbox-backed emit riding the caller's transaction. |
+| `flush_pending_async` | `(db: AsyncSession) -> None` | WRITE | Dispatch TESTING-buffered transactional events after ``db.commit()``. |
 | `register_payload` | `(event_name: str, model: type[EventPayload]) -> None` | READ | Declare the payload contract for one of this module's events. |
 | `registered_events` | `() -> dict[str, str]` | READ | Return ``{event_name: payload_type_name}`` for the event catalog. |
 | `subscribe` | `(event: SystemEvent \| str, handler: Callable[[EventPayload], Any], *, org_filter: UUID \| str \| None=None) -> None` | READ | Subscribe to an event with payload coercion and optional org filter. |
@@ -356,7 +358,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `mark_all_read_async` | `(db: AsyncSession, user_id: UUID) -> None` | WRITE | Mark all notifications as read for *user_id*. |
 | `mark_read_by_meta_async` | `(db: AsyncSession, organization_id: UUID, ref_key: str, ref_id: str) -> int` | WRITE | Mark the org's unread notifications about one record as read. |
 | `notify_org_admins_async` | `(db: AsyncSession, organization_id: UUID, title: LocalizedText, content: LocalizedText, notification_type: str='info', link: str \| None=None, meta_data: dict[str, Any] \| None=None) -> list[NotificationDTO]` | WRITE | Notify every member who administers *organization_id*. |
-| `publish_async` | `(db: AsyncSession, notifications: NotificationDTO \| list[NotificationDTO] \| None) -> None` | READ | Publish already-committed notifications to the WS hub via Redis. |
+| `publish_async` | `(db: AsyncSession, notifications: NotificationDTO \| list[NotificationDTO] \| None) -> None` | WRITE | Publish already-committed notifications to the WS hub via Redis. |
 | `update_read_status_async` | `(db: AsyncSession, notification_id: UUID, user_id: UUID, is_read: bool) -> NotificationDTO \| None` | WRITE | Update a notification's read status. Returns the updated DTO or None. |
 
 ---
@@ -375,7 +377,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `get_first_system_user_async` | `(db: AsyncSession) -> UserDTO \| None` | READ | Return the oldest user across ALL organizations (org-less global read). |
 | `get_full_async` | `(db: AsyncSession, organization_id: UUID \| None, user_id: UUID) -> UserDTO \| None` | READ | — |
 | `list_all_async` | `(db: AsyncSession) -> list[UserDTO]` | READ | List all users (superuser view) with organization eagerly loaded. |
-| `list_org_members_async` | `(db: AsyncSession, organization_id: UUID, offset: int=0, limit: int \| None=None, search: str \| None=None) -> list[UserDTO]` | READ | ``offset``/``limit``/``search`` are passed through to |
+| `list_org_members_async` | `(db: AsyncSession, organization_id: UUID, offset: int=0, limit: int \| None=None, search: str \| None=None) -> list[UserDTO]` | READ | ``offset``/``limit``/``search`` are passed through to ``UserService``. |
 | `promote_superuser_async` | `(db: AsyncSession, user_id: UUID) -> UserDTO \| None` | WRITE | Promote a user to superuser (startup repair only). |
 | `unblock_async` | `(db: AsyncSession, organization_id: UUID \| None, user_id: UUID, *, actor_user_id: UUID \| None=None) -> UserDTO \| None` | WRITE | Unblock a user. Returns updated user, or None. |
 
@@ -397,8 +399,8 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `decrypt_for_module` | `(module_name: <class 'str'>, value: <class 'str'>) -> <class 'str'>` | READ | Decrypt *value* written by :meth:`encrypt_for_module`. |
-| `encrypt_for_module` | `(module_name: <class 'str'>, value: <class 'str'>) -> <class 'str'>` | WRITE | Encrypt *value* cryptographically bound to *module_name*. |
+| `decrypt_for_module` | `(module_name: str, value: str) -> str` | READ | Decrypt *value* written by :meth:`encrypt_for_module`. |
+| `encrypt_for_module` | `(module_name: str, value: str) -> str` | READ | Encrypt *value* cryptographically bound to *module_name*. |
 
 ---
 
@@ -413,9 +415,9 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `is_on_step` | `(qty: Decimal, uom: UomDTO \| None) -> bool` | READ | Whether *qty* already sits on a step of *uom*. |
 | `list_categories_for_org_async` | `(db: AsyncSession, organization_id: UUID) -> list[UomCategoryDTO]` | READ | Return all UOM categories visible to *organization_id* (system + org-specific). |
 | `list_for_org_async` | `(db: AsyncSession, organization_id: UUID) -> list[UomDTO]` | READ | Return all UOM rows visible to *organization_id* (system + org-specific). |
-| `quantity_step` | `(uom: UomDTO \| None) -> Decimal` | READ | The step quantities in *uom* are counted in — its own ``rounding``, |
+| `quantity_step` | `(uom: UomDTO \| None) -> Decimal` | READ | The step quantities in *uom* are counted in — its own ``rounding``, floored at the scale the quantity columns keep. |
 | `quantize` | `(qty: Decimal, uom: UomDTO \| None) -> Decimal` | READ | *qty* on the nearest step of *uom* — the rounding a measurement takes. |
-| `round_up` | `(qty: Decimal, uom: UomDTO \| None) -> Decimal` | READ | *qty* on the next step of *uom* at or above it — the rounding a |
+| `round_up` | `(qty: Decimal, uom: UomDTO \| None) -> Decimal` | READ | *qty* on the next step of *uom* at or above it — the rounding a requirement takes, so that needing part of a step never reads as zero. |
 | `to_canonical_measure_async` | `(db: AsyncSession, qty: Decimal, uom: UomDTO \| None) -> tuple[Decimal, str] \| None` | READ | Express *qty* in the reference unit of *uom*'s category. |
 | `to_stock_uom_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID \| None, quantity: Decimal, uom_id: UUID \| None) -> Decimal` | READ | Express *quantity*, stated in *uom_id*, in the product's stock unit. |
 | `validate_quantity_precision_async` | `(db: AsyncSession, uom_id: UUID, quantity: Decimal, organization_id: UUID) -> None` | READ | Async: raise ValueError if quantity violates the precision rules of the given UoM. |
@@ -440,7 +442,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `lookup_by_identity_async` | `(db: AsyncSession, org_id: UUID, *, name: str, brand: str \| None=None, barcode: str \| None=None) -> ProductTemplateDTO \| None` | READ | The card a record of this name, brand and code belongs to, if one does. |
 | `lookup_by_sku_async` | `(db: AsyncSession, org_id: UUID, sku: str) -> ProductTemplateDTO \| None` | READ | Async: find a template by SKU, scoped to org + global templates. |
 | `names_and_units_async` | `(db: AsyncSession, org_id: UUID, template_ids: Iterable[UUID]) -> dict[UUID, tuple[str, str \| None]]` | READ | id -> (name, unit symbol) for many templates, missing ids absent. |
-| `resolve_default_async` | `(db: AsyncSession, org_id: UUID, *, name: str, brand: str \| None=None, barcode: str \| None=None, uom_id: UUID \| None=None) -> ProductTemplateDTO` | READ | The card this product belongs to, minting one when none matches. |
+| `resolve_default_async` | `(db: AsyncSession, org_id: UUID, *, name: str, brand: str \| None=None, barcode: str \| None=None, uom_id: UUID \| None=None) -> ProductTemplateDTO` | WRITE | The card this product belongs to, minting one when none matches. |
 | `search_fuzzy_async` | `(db: AsyncSession, org_id: UUID, query: str, limit: int=10) -> list[ProductTemplateDTO]` | READ | ILIKE search across org + global templates, name-only. |
 | `search_fuzzy_many_async` | `(db: AsyncSession, org_id: UUID, queries: list[str]) -> dict[str, list[ProductTemplateCandidateDTO]]` | READ | Batch name-fragment search: fragment -> the templates containing it. |
 | `search_ranked_async` | `(db: AsyncSession, org_id: UUID, query: str, limit: int=10) -> list[ProductTemplateDTO]` | READ | Search templates with priority ranking: exact barcode > exact SKU > ILIKE name. |
@@ -492,8 +494,8 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 |---|---|---|---|
 | `common_labels` | `(lang: str) -> dict[str, str]` | READ | Shared PDF labels (i18n-lite): 5 languages, English fallback. |
 | `format_partner_address` | `(address: dict[str, Any] \| None, lang: str='en') -> str \| None` | READ | Format a partner address dict as a single-line string. |
-| `generate_code128_base64` | `(value: str) -> str` | WRITE | Code128 barcode as a data-URI image at the standard print geometry. |
-| `generate_qr_base64` | `(value: str) -> str` | WRITE | QR code as a data-URI PNG at the standard print geometry. |
+| `generate_code128_base64` | `(value: str) -> str` | READ | Code128 barcode as a data-URI image at the standard print geometry. |
+| `generate_qr_base64` | `(value: str) -> str` | READ | QR code as a data-URI PNG at the standard print geometry. |
 | `get_doc_status_map` | `(lang: str) -> dict[str, str]` | READ | Document status code -> localized label map. |
 | `printed_codes` | `(number: str) -> dict[str, Any]` | READ | The code images a printout carries, and the size to print them at. |
 | `register_pdf_filters` | `(env: Any) -> None` | READ | Register standard Jinja2 filters (format_date, format_qty, etc.). |
@@ -515,7 +517,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `ask_what_each_grain_has_free_once_async` | `(db: AsyncSession, organization_id: UUID) -> AsyncIterator[None]` | WRITE | A block in which ``post_movement_async`` writes and asks its shortage question once, at the end. |
+| `ask_what_each_grain_has_free_once_async` | `(db: AsyncSession, organization_id: UUID) -> AsyncIterator[None]` | READ | A block in which ``post_movement_async`` writes and asks its shortage question once, at the end. |
 | `find_best_pick_group_for_picking_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, storage_location_id: UUID \| None=None, owner_id: UUID \| None=None, *, except_document_id: UUID \| None=None) -> PickGroupDTO \| None` | READ | The group and lot to plan a picking line from, in the product's removal order. |
 | `get_lot_detail_async` | `(db: AsyncSession, organization_id: UUID, lot_id: UUID) -> StockLotDetailDTO \| None` | READ | — |
 | `get_or_create_lot_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, name: str, is_serial: bool=False, expiry_date: date \| None=None, production_date: date \| None=None, use_by_date: date \| None=None) -> UUID` | WRITE | — |
@@ -529,7 +531,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `post_movement_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal, *, from_location_id: UUID \| None=None, to_location_id: UUID \| None=None, lot_id: UUID \| None=None, owner_id: UUID \| None=None, require_active_lot: bool=True, reference_type: str, reference_id: UUID, created_by: UUID \| None=None, records: Sequence[RecordPostDTO]=()) -> list[QuantConsumptionDTO]` | WRITE | State the records a movement is and write the movement, together. |
 | `posting_scope_async` | `(db: AsyncSession) -> AsyncIterator[None]` | WRITE | The scope an operation that posts many lines runs in. |
 | `quantities_by_shelf_async` | `(db: AsyncSession, organization_id: UUID, storage_location_ids: list[UUID] \| None=None) -> dict[UUID, dict[UUID, Decimal]]` | READ | Shelf -> product -> quantity, batches and owners summed together. |
-| `quarantine_lot_async` | `(db: AsyncSession, organization_id: UUID, lot_id: UUID, reason: str \| None=None, *, user_id: UUID \| None=None) -> StockLotDTO \| None` | READ | Set a lot's status to QUARANTINED — blocks consumption/reservation. |
+| `quarantine_lot_async` | `(db: AsyncSession, organization_id: UUID, lot_id: UUID, reason: str \| None=None, *, user_id: UUID \| None=None) -> StockLotDTO \| None` | WRITE | Set a lot's status to QUARANTINED — blocks consumption/reservation. |
 | `release_for_document_async` | `(db: AsyncSession, organization_id: UUID, document_id: UUID) -> None` | WRITE | Release all reservations for a specific document. |
 | `release_lot_async` | `(db: AsyncSession, organization_id: UUID, lot_id: UUID, *, user_id: UUID \| None=None) -> StockLotDTO \| None` | WRITE | Release a quarantined/held lot back to ACTIVE status. |
 | `release_unbacked_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, location_id: UUID \| None, leaving_quantity: Decimal, *, document_ids: Sequence[UUID] \| None=None) -> Decimal` | WRITE | Release only the hold the remaining stock can no longer cover. |
@@ -557,7 +559,7 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 | `list_receipts_for_aging_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, *, as_of: datetime \| None=None, limit: int=1000) -> list[StockAgeEntryDTO]` | READ | — |
 | `list_recent_async` | `(db: AsyncSession, organization_id: UUID, *, limit: int=200) -> list[StockMoveDTO]` | READ | — |
 | `list_rows_for_org_async` | `(db: AsyncSession, organization_id: UUID, *, product_template_id: UUID \| None=None, location_id: UUID \| None=None, lot_id: UUID \| None=None, reference_type: str \| None=None, reference_id: UUID \| None=None, user_id: UUID \| None=None, direction: str \| None=None, state: str \| None=None, since: datetime \| None=None, until: datetime \| None=None, exclude_module_contexts: bool=False, limit: int=200, offset: int=0, after: tuple[datetime, UUID] \| None=None, known_total: int \| None=None, count_up_to: int \| None=None) -> tuple[list[StockMoveRowDTO], int]` | READ | The same page as :meth:`list_for_org_async`, read as sentences. |
-| `posted_groups_async` | `(db: AsyncSession, organization_id: UUID, reference_type: str, reference_id: UUID) -> list[StockMovePostedGroupDTO]` | WRITE | Every group of stock one source filled, and when it last filled it. |
+| `posted_groups_async` | `(db: AsyncSession, organization_id: UUID, reference_type: str, reference_id: UUID) -> list[StockMovePostedGroupDTO]` | READ | Every group of stock one source filled, and when it last filled it. |
 
 ---
 
@@ -565,13 +567,13 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `copy_builtin_alongside_async` | `(db: AsyncSession, organization_id: UUID, module: str, user_id: UUID, template_id: UUID, built_ins: list[tuple[str, str, str]]) -> DocumentTemplateSchema` | READ | Copy the current built-in next to the organization's own copy. |
+| `copy_builtin_alongside_async` | `(db: AsyncSession, organization_id: UUID, module: str, user_id: UUID, template_id: UUID, built_ins: list[tuple[str, str, str]]) -> DocumentTemplateSchema` | WRITE | Copy the current built-in next to the organization's own copy. |
 | `create_async` | `(db: AsyncSession, organization_id: UUID, module: str, user_id: UUID, name: str, body_html: str, document_type: str='DEFAULT', is_default: bool=False, partials: dict[str, str] \| None=None) -> DocumentTemplateSchema` | WRITE | — |
 | `delete_async` | `(db: AsyncSession, organization_id: UUID, template_id: UUID, module: str, user_id: UUID \| None=None) -> None` | WRITE | Raises ``NotFoundException`` when the template does not exist. |
 | `get_async` | `(db: AsyncSession, organization_id: UUID, template_id: UUID, module: str) -> DocumentTemplateSchema \| None` | READ | — |
 | `get_default_async` | `(db: AsyncSession, organization_id: UUID, module: str, document_type: str) -> DocumentTemplateSchema \| None` | READ | Get the default template for ``(module, document_type)``. |
 | `list_async` | `(db: AsyncSession, organization_id: UUID, module: str, built_ins: list[tuple[str, str, str]] \| None=None) -> list[DocumentTemplateSchema]` | READ | The organization's own templates. |
-| `seed_defaults_async` | `(db: AsyncSession, organization_id: UUID, module: str, user_id: UUID, built_ins: list[tuple[str, str, str]], partials: dict[str, str] \| None=None) -> list[DocumentTemplateSchema]` | READ | Seed built-in templates; existing names are skipped (idempotent). |
+| `seed_defaults_async` | `(db: AsyncSession, organization_id: UUID, module: str, user_id: UUID, built_ins: list[tuple[str, str, str]], partials: dict[str, str] \| None=None) -> list[DocumentTemplateSchema]` | WRITE | Seed built-in templates; existing names are skipped (idempotent). |
 | `update_async` | `(db: AsyncSession, organization_id: UUID, template_id: UUID, module: str, *, name: str \| None=None, body_html: str \| None=None, document_type: str \| None=None, is_default: bool \| None=None, partials: dict[str, str] \| None=None, user_id: UUID \| None=None) -> DocumentTemplateSchema` | WRITE | Raises ``NotFoundException`` when the template does not exist. |
 
 ---
@@ -595,6 +597,6 @@ The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes stable
 - **Total methods:** 311
 - **Namespaces:** 33
 - **Documented methods:** 311 (100%)
-- **READ methods:** 215 (69%)
-- **WRITE methods:** 96 (31%)
+- **READ methods:** 217 (70%)
+- **WRITE methods:** 94 (30%)
 

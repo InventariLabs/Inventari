@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import enum
 import inspect
 import re
 import sys
@@ -77,6 +78,10 @@ def _format_annotation(annotation: Any) -> str:
         return ''
     if annotation is inspect.Signature.empty:
         return ''
+    # A module without ``from __future__ import annotations`` hands over the
+    # class itself, whose str() is "<class 'str'>".
+    if isinstance(annotation, type):
+        return annotation.__name__
 
     s = str(annotation)
     # Strip module prefixes for readability (keep last qualname)
@@ -101,6 +106,19 @@ def next_param_kind(sig: inspect.Signature, name: str) -> Any:
     return None
 
 
+def _format_default(default: Any) -> str:
+    """``=<default>`` as a caller would write it, or nothing without one.
+
+    An enum member is written by its name: its repr,
+    ``<ItemAction.MOVED: 'MOVED'>``, is not something a caller can type.
+    """
+    if default is inspect.Parameter.empty:
+        return ''
+    if isinstance(default, enum.Enum):
+        return f'={type(default).__name__}.{default.name}'
+    return f'={default!r}'
+
+
 def _format_signature(func: Any) -> str:
     """Build a compact signature string for display in the Markdown table."""
     sig = inspect.signature(func)
@@ -117,9 +135,7 @@ def _format_signature(func: Any) -> str:
             params.append('*')
             star_written = True
         ann = _format_annotation(param.annotation)
-        default = (
-            '' if param.default is inspect.Parameter.empty else f'={param.default!r}'
-        )
+        default = _format_default(param.default)
         # Shorten very long repr defaults
         if len(default) > 40:
             default = default[:37] + '...'
@@ -140,60 +156,61 @@ def _format_signature(func: Any) -> str:
     return f'({", ".join(params)}){ret_str}'
 
 
-def _first_line(docstring: str | None) -> str:
-    """Return the first non-empty line of *docstring*, or ``—``."""
+#: What may open the sentence after a full stop: "etc.)" and "e.g. the" do not
+#: end one.
+_NEXT_SENTENCE = re.compile(r'\s+[A-Z`*(]')
+
+
+def _summary(docstring: str | None) -> str:
+    """The docstring's first line, carried on to the end of its sentence, or ``—``.
+
+    The summary used to be the first physical line, so a sentence wrapped onto
+    the next one was cut mid-phrase ("Delete a connection. Refuses with"). A
+    first line that ends a sentence is still the whole summary, second
+    sentence and all ("Link a user to a role. Idempotent."); one that breaks
+    off reads on, within its paragraph, to the first full stop, question or
+    exclamation mark outside brackets that ends its line or is followed by a
+    space and a capital (or a backtick, an asterisk, a bracket).
+    """
     if not docstring:
         return '—'
-    for line in docstring.strip().splitlines():
-        line = line.strip()
-        if line:
-            return line
-    return '—'
+    paragraph = docstring.strip().split('\n\n', 1)[0]
+    lines = [line.strip() for line in paragraph.splitlines() if line.strip()]
+    taken: list[str] = []
+    depth = 0
+    for number, line in enumerate(lines):
+        for index, char in enumerate(line):
+            if char in '([':
+                depth += 1
+            elif char in ')]':
+                depth = max(0, depth - 1)
+            elif char in '.!?' and depth == 0:
+                rest = line[index + 1 :]
+                ends_line = not rest
+                if ends_line or (number > 0 and _NEXT_SENTENCE.match(rest)):
+                    return ' '.join([*taken, line[: index + 1]])
+        taken.append(line)
+    return ' '.join(taken) or '—'
 
 
-def _determine_rw(name: str, doc: str | None) -> str:
-    """Heuristic to classify a method as READ or WRITE based on name and docstring."""
-    lower_name = name.lower()
-    lower_doc = (doc or '').lower()
-    # Explicit signals in docstring, as whole words: ``created_at`` in a
-    # read's docstring is not a write.
-    if re.search(r'\b(writes?|creates?|deletes?|updates?)\b', lower_doc):
-        return 'WRITE'
-    # Signals in method name
-    write_names = {
-        'set',
-        'delete',
-        'create',
-        'update',
-        'send',
-        'notify',
-        'save',
-        'generate',
-        'assign',
-        'unassign',
-        'purge',
-        'block',
-        'unblock',
-        'promote',
-        'toggle',
-        'apply',
-        'mark',
-        'release',
-        'reserve',
-        'record',
-        'encrypt',
-        'transfer',
-        'move',
-        'post',
-        'bind',
-        'activate',
-    }
-    for token in write_names:
-        if token in lower_name:
-            return 'WRITE'
-    if 'log' in lower_name and 'read' not in lower_doc:
-        return 'WRITE'
-    return 'READ'
+def _access_label(owner: str, name: str, func: Any) -> str:
+    """The READ/WRITE label the method declares beside itself.
+
+    Declared with ``reads``/``writes`` (``app.core.public_api._access``),
+    never guessed: the guess read words in the name and the docstring, and
+    called ``existing_ids_async`` a write and a rename a read. A method that
+    declares nothing stops the generator rather than reach the reference
+    with a label nobody chose.
+    """
+    from app.core.public_api._access import declared_access
+
+    access = declared_access(func)
+    if access is None:
+        raise SystemExit(
+            f'core_api.{owner}.{name} declares no access: mark it @reads or '
+            '@writes (app.core.public_api._access).'
+        )
+    return access
 
 
 # ---------------------------------------------------------------------------
@@ -223,11 +240,7 @@ def _namespace_descriptions() -> dict[str, str]:
         if cls is None:
             continue
         doc = inspect.getdoc(cls)
-        if doc:
-            first = doc.strip().split('\n')[0].strip()
-            descs[attr] = first
-        else:
-            descs[attr] = class_name
+        descs[attr] = _summary(doc) if doc else class_name
     return descs
 
 
@@ -240,9 +253,18 @@ def _generate_markdown() -> str:  # noqa: PLR0915 - doc generator with many sect
     lines.append('# CoreAPI Reference')
     lines.append('')
     lines.append(
-        'The **CoreAPI** (`app.core.public_api.core_api`) is a facade that exposes '
+        'The **CoreAPI** (`core_api`, imported with '
+        '`from app.core.public_api import core_api`) is a facade that exposes '
         'stable, module-safe methods for interacting with Core data. Modules must use '
         'CoreAPI instead of importing Core models or services directly.'
+    )
+    lines.append('')
+    lines.append(
+        '**R/W** is declared on each method (`@reads` / `@writes`, '
+        '`app.core.public_api._access`): WRITE when the call can change what the '
+        'database or the file store holds, or sends something out of the process '
+        '(a mail, an event, a notification); READ otherwise, including a read that '
+        'takes row locks, a render, a computation and a hook registered at import.'
     )
     lines.append('')
     lines.append('**Location:** `backend/app/core/public_api/`')
@@ -298,12 +320,11 @@ def _generate_markdown() -> str:  # noqa: PLR0915 - doc generator with many sect
 
         for name, func in methods:
             sig_str = _format_signature(func)
-            doc = inspect.getdoc(func)
-            summary = _first_line(doc)
+            summary = _summary(inspect.getdoc(func))
             # Escape pipe chars inside Markdown table cells
             summary = summary.replace('|', '\\|')
             sig_str = sig_str.replace('|', '\\|')
-            rw = _determine_rw(name, doc)
+            rw = _access_label(attr_name, name, func)
             total_methods += 1
             if rw == 'READ':
                 total_read += 1
@@ -365,7 +386,10 @@ def main() -> int:
             )
             return 1
         existing = target.read_text()
-        if existing == generated:
+        # Compared the way the drift test compares: the committed file is
+        # written through print() (``make generate-api-docs``), which ends it
+        # with one more newline than the text it printed.
+        if existing.rstrip() == generated.rstrip():
             print(f'CHECK OK: {target} is up to date ({len(generated)} chars).')
             return 0
         # Show compact diff hint

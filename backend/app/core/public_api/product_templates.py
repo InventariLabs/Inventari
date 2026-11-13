@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ProductTemplateCandidateDTO, ProductTemplateDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 
 logger = get_logger(__name__)
 
@@ -17,6 +18,7 @@ logger = get_logger(__name__)
 class CoreProductTemplatesAPI:
     """Read and write access to ProductTemplate records for use by modules."""
 
+    @reads
     async def list_for_org_async(
         self,
         db: AsyncSession,
@@ -28,6 +30,7 @@ class CoreProductTemplatesAPI:
         templates = await list_templates_for_org_async(db, org_id, limit=limit)
         return [ProductTemplateDTO.model_validate(t) for t in templates]
 
+    @reads
     async def count_for_org_async(self, db: AsyncSession, org_id: UUID) -> int:
         """Count templates the org can pick from (org-scoped + global).
 
@@ -38,6 +41,7 @@ class CoreProductTemplatesAPI:
 
         return await count_templates_for_org_async(db, org_id)
 
+    @reads
     async def get_async(
         self, db: AsyncSession, org_id: UUID, template_id: UUID
     ) -> ProductTemplateDTO | None:
@@ -48,6 +52,7 @@ class CoreProductTemplatesAPI:
             return None
         return ProductTemplateDTO.model_validate(template)
 
+    @reads
     async def get_many_async(
         self, db: AsyncSession, org_id: UUID, template_ids: list[UUID]
     ) -> dict[UUID, ProductTemplateDTO]:
@@ -63,6 +68,7 @@ class CoreProductTemplatesAPI:
         templates = await list_templates_by_ids_async(db, org_id, template_ids)
         return {t.id: ProductTemplateDTO.model_validate(t) for t in templates}
 
+    @reads
     async def names_and_units_async(
         self, db: AsyncSession, org_id: UUID, template_ids: Iterable[UUID]
     ) -> dict[UUID, tuple[str, str | None]]:
@@ -76,6 +82,7 @@ class CoreProductTemplatesAPI:
 
         return await names_and_units_by_ids_async(db, org_id, template_ids)
 
+    @reads
     async def exists_for_org_async(
         self, db: AsyncSession, org_id: UUID, template_id: UUID
     ) -> bool:
@@ -83,6 +90,7 @@ class CoreProductTemplatesAPI:
 
         return await template_exists_for_org_async(db, org_id, template_id)
 
+    @reads
     async def lookup_by_barcode_async(
         self, db: AsyncSession, org_id: UUID, barcode: str
     ) -> ProductTemplateDTO | None:
@@ -93,6 +101,7 @@ class CoreProductTemplatesAPI:
             return None
         return ProductTemplateDTO.model_validate(template)
 
+    @reads
     async def lookup_by_sku_async(
         self, db: AsyncSession, org_id: UUID, sku: str
     ) -> ProductTemplateDTO | None:
@@ -104,6 +113,7 @@ class CoreProductTemplatesAPI:
             return None
         return ProductTemplateDTO.model_validate(template)
 
+    @reads
     async def lookup_by_identity_async(
         self,
         db: AsyncSession,
@@ -131,6 +141,7 @@ class CoreProductTemplatesAPI:
             return None
         return ProductTemplateDTO.model_validate(template)
 
+    @writes
     async def resolve_default_async(
         self,
         db: AsyncSession,
@@ -165,6 +176,7 @@ class CoreProductTemplatesAPI:
         )
         return ProductTemplateDTO.model_validate(template)
 
+    @writes
     async def create_stub_async(
         self,
         db: AsyncSession,
@@ -178,6 +190,7 @@ class CoreProductTemplatesAPI:
         tpl = await create_stub_template_async(db, org_id, name, barcode, user_id)
         return ProductTemplateDTO.model_validate(tpl)
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -207,6 +220,7 @@ class CoreProductTemplatesAPI:
         )
         return ProductTemplateDTO.model_validate(tpl)
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -236,6 +250,7 @@ class CoreProductTemplatesAPI:
         )
         return ProductTemplateDTO.model_validate(tpl)
 
+    @writes
     async def delete_async(
         self,
         db: AsyncSession,
@@ -247,6 +262,7 @@ class CoreProductTemplatesAPI:
 
         await delete_product_template_async(db, template_id, org_id, user_id)
 
+    @reads
     async def search_ranked_async(
         self,
         db: AsyncSession,
@@ -263,6 +279,7 @@ class CoreProductTemplatesAPI:
         templates = await search_ranked_async(db, org_id, query, limit=limit)
         return [ProductTemplateDTO.model_validate(t) for t in templates]
 
+    @reads
     async def search_fuzzy_async(
         self,
         db: AsyncSession,
@@ -286,6 +303,7 @@ class CoreProductTemplatesAPI:
         templates = await search_fuzzy_async(db, org_id, query, limit=limit)
         return [ProductTemplateDTO.model_validate(t) for t in templates]
 
+    @reads
     async def get_with_uom_async(
         self, db: AsyncSession, org_id: UUID, template_id: UUID
     ) -> ProductTemplateDTO | None:
@@ -301,6 +319,7 @@ class CoreProductTemplatesAPI:
             return None
         return ProductTemplateDTO.model_validate(template)
 
+    @reads
     async def search_fuzzy_many_async(
         self,
         db: AsyncSession,
@@ -320,6 +339,7 @@ class CoreProductTemplatesAPI:
 
         return await search_fuzzy_many_async(db, org_id, queries)
 
+    @reads
     async def list_for_org_with_recipe_usage_async(
         self,
         db: AsyncSession,

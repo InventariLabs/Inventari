@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ItemAction, ItemDTO, UserContextDTO
 from app.core.exceptions import ServiceRejectionError
+from app.core.public_api._access import writes
 from app.schemas.item import ItemMove, ItemQuantityUpdate
 from app.services.items import (
     get_by_id_async,
@@ -22,6 +23,7 @@ from app.services.items._open_package import open_to_take_part_async
 class CoreItemsStockOpsMixin:
     """Stock operation methods for CoreItemsAPI (quantity, transfer, consume, discard, meta_data)."""
 
+    @writes
     async def update_quantity_async(
         self,
         db: AsyncSession,
@@ -75,6 +77,7 @@ class CoreItemsStockOpsMixin:
         )
         return ItemDTO.model_validate(updated)
 
+    @writes
     async def post_opening_balance_async(
         self,
         db: AsyncSession,
@@ -111,6 +114,7 @@ class CoreItemsStockOpsMixin:
             location_id=location_id,
         )
 
+    @writes
     async def transfer_async(
         self,
         db: AsyncSession,
@@ -145,6 +149,7 @@ class CoreItemsStockOpsMixin:
         )
         return ItemDTO.model_validate(moved)
 
+    @writes
     async def update_meta_data_async(
         self,
         db: AsyncSession,
@@ -169,6 +174,7 @@ class CoreItemsStockOpsMixin:
         await db.flush()
         return ItemDTO.model_validate(item)
 
+    @writes
     async def open_to_take_part_async(
         self,
         db: AsyncSession,

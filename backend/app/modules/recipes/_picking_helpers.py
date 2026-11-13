@@ -7,32 +7,6 @@ from ._picking_fefo import expiry_of, is_open_pack
 from .schemas import OpenedSuggestion
 
 
-def is_opened(item: Any, template: Any) -> bool:
-    """Whether the record is an opened package.
-
-    Opening writes a mark on the record, and that mark is the answer. A record
-    that predates the mark is judged the way it always was: its quantity is
-    below the full-pack weight on the card. That comparison is only
-    meaningful when the item's UoM and the template's weight UoM are in the
-    SAME category (e.g. both weight). Comparing pieces against grams flagged
-    nearly every piece-counted item as "opened", so when the categories differ
-    (or are unknown), the record is treated as NOT opened.
-    """
-    if is_open_pack(item):
-        return True
-    weight_value = getattr(template, 'weight_value', None) if template else None
-    if not template or not weight_value:
-        return False
-    # Only compare within the same UoM category; otherwise skip (return False).
-    item_uom_id = getattr(item, 'uom_id', None)
-    tmpl_uom_id = getattr(template, 'weight_uom_id', None)
-    if item_uom_id and tmpl_uom_id and item_uom_id != tmpl_uom_id:
-        # Different UoMs: without an async conversion we cannot compare
-        # meaningfully, so do not claim the item is opened.
-        return False
-    return float(item.quantity) < float(weight_value)
-
-
 def check_opened_suggestion(
     scanned_item: Any,
     all_items: list[Any],
@@ -42,16 +16,19 @@ def check_opened_suggestion(
     Suggests switching to an already-opened pack if the scanned item is still sealed
     and another open pack exists. Returns None when suggestions would be noisy.
 
+    Open means the mark opening writes (``is_open_pack``), the same answer the
+    FEFO order and the candidates' ``opened`` flag give. A record without the
+    mark used to be guessed open when it weighed less than the card's full
+    pack, which took a smaller sealed bag for an open one.
+
     Accepts either ORM ``Item``/``ProductTemplate`` rows or ``ItemDTO``/
     ``ProductTemplateDTO`` (CoreAPI returns the DTO shape). Reads are
     duck-typed via ``getattr`` so the helper stays type-agnostic.
     """
-    if is_opened(scanned_item, template):
+    if is_open_pack(scanned_item):
         return None
 
-    opened = [
-        i for i in all_items if i.id != scanned_item.id and is_opened(i, template)
-    ]
+    opened = [i for i in all_items if i.id != scanned_item.id and is_open_pack(i)]
     if not opened:
         return None
 

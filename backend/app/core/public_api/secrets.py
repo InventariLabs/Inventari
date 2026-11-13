@@ -20,6 +20,7 @@ gone, the ciphertext it produced is still in the database.
 """
 
 from app.core.module_identity import refuse_foreign_module
+from app.core.public_api._access import reads
 from app.services.crypto_service import MASKED_VALUE
 from app.services.crypto_service import decrypt_module_secret as _decrypt_bound
 from app.services.crypto_service import encrypt_module_secret as _encrypt_bound
@@ -31,6 +32,7 @@ class CoreSecretsAPI:
     #: Sentinel returned to callers instead of the raw secret.
     MASKED = MASKED_VALUE
 
+    @reads
     def encrypt_for_module(self, module_name: str, value: str) -> str:
         """Encrypt *value* cryptographically bound to *module_name*.
 
@@ -45,6 +47,7 @@ class CoreSecretsAPI:
         refuse_foreign_module(module_name, api='core_api.secrets.encrypt_for_module')
         return _encrypt_bound(module_name, value)
 
+    @reads
     def decrypt_for_module(self, module_name: str, value: str) -> str:
         """Decrypt *value* written by :meth:`encrypt_for_module`.
 

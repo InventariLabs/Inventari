@@ -50,6 +50,7 @@ from app.core.llm.structured_extraction import (
     read_json,
     unwrap_object,
 )
+from app.core.public_api._access import reads, writes
 
 __all__ = [
     'TRUNCATED_REASONS',
@@ -83,6 +84,7 @@ __all__ = [
 class CoreLlmAPI:
     """Public Core API for LLM purposes and client resolution."""
 
+    @reads
     def register_purpose(
         self,
         key: str,
@@ -120,6 +122,7 @@ class CoreLlmAPI:
             )
         )
 
+    @reads
     async def get_client_for_purpose_async(
         self, db: AsyncSession, organization_id: UUID, purpose_key: str
     ) -> LlmClient | None:
@@ -132,6 +135,7 @@ class CoreLlmAPI:
 
         return await get_client_for_purpose(db, organization_id, purpose_key)
 
+    @reads
     async def connection_for_purpose_async(
         self, db: AsyncSession, organization_id: UUID, purpose_key: str
     ) -> Any | None:
@@ -148,6 +152,7 @@ class CoreLlmAPI:
 
         return await get_connection_for_purpose(db, organization_id, purpose_key)
 
+    @writes
     async def extract_from_images_async[T: BaseModel](
         self,
         db: AsyncSession,

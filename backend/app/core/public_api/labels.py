@@ -14,6 +14,7 @@ from app.core.contracts import (
     UserContextDTO,
 )
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.services.label_service import LabelService, label_caption
 
 logger = get_logger(__name__)
@@ -24,6 +25,7 @@ class CoreLabelsAPI:
 
     # ── read ────────────────────────────────────────────────────────
 
+    @reads
     async def get_by_id_async(
         self, db: AsyncSession, label_id: UUID, organization_id: UUID
     ) -> LabelPoolDTO | None:
@@ -31,6 +33,7 @@ class CoreLabelsAPI:
         label = await LabelService.get_by_id_async(db, label_id, organization_id)
         return LabelPoolDTO.model_validate(label) if label else None
 
+    @reads
     async def get_by_short_code_async(
         self, db: AsyncSession, short_code: str, organization_id: UUID
     ) -> LabelPoolDTO | None:
@@ -40,6 +43,7 @@ class CoreLabelsAPI:
         )
         return LabelPoolDTO.model_validate(label) if label else None
 
+    @reads
     async def list_for_org_async(
         self, db: AsyncSession, organization_id: UUID, *, unassigned_only: bool = False
     ) -> list[LabelPoolDTO]:
@@ -49,6 +53,7 @@ class CoreLabelsAPI:
         )
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
+    @reads
     async def list_for_org_with_relations_async(
         self,
         db: AsyncSession,
@@ -78,6 +83,7 @@ class CoreLabelsAPI:
         )
         return [LabelPoolDTO.model_validate(label) for label in labels], total
 
+    @reads
     async def list_in_ids_async(
         self,
         db: AsyncSession,
@@ -96,6 +102,7 @@ class CoreLabelsAPI:
         )
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
+    @reads
     async def list_by_short_codes_async(
         self,
         db: AsyncSession,
@@ -110,6 +117,7 @@ class CoreLabelsAPI:
         )
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
+    @reads
     async def list_unprinted_unassigned_async(
         self,
         db: AsyncSession,
@@ -124,6 +132,7 @@ class CoreLabelsAPI:
         )
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
+    @reads
     async def get_pool_stats_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> dict[str, Any]:
@@ -132,6 +141,7 @@ class CoreLabelsAPI:
 
     # ── write ───────────────────────────────────────────────────────
 
+    @writes
     async def generate_pool_async(
         self, db: AsyncSession, request: LabelPoolCreateDTO, user: UserContextDTO
     ) -> list[LabelPoolDTO]:
@@ -142,6 +152,7 @@ class CoreLabelsAPI:
         labels = await LabelService.generate_label_pool_async(db, internal, user)
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
+    @writes
     async def create_from_codes_async(
         self,
         db: AsyncSession,
@@ -164,6 +175,7 @@ class CoreLabelsAPI:
         )
         return [LabelPoolDTO.model_validate(label) for label in labels]
 
+    @writes
     async def delete_async(
         self,
         db: AsyncSession,
@@ -184,6 +196,7 @@ class CoreLabelsAPI:
         await LabelService.delete_label_async(db, label, user_id=user_id)
         return True
 
+    @writes
     async def unassign_async(
         self,
         db: AsyncSession,
@@ -204,6 +217,7 @@ class CoreLabelsAPI:
         refreshed = await LabelService.unassign_label_async(db, label, user_id=user_id)
         return LabelPoolDTO.model_validate(refreshed)
 
+    @writes
     async def assign_to_existing_item_async(
         self,
         db: AsyncSession,
@@ -227,6 +241,7 @@ class CoreLabelsAPI:
         )
         return LabelPoolDTO.model_validate(refreshed)
 
+    @reads
     def caption(self, label: LabelPoolDTO) -> str | None:
         """The text printed under a label's QR code when nobody typed one.
 
@@ -235,6 +250,7 @@ class CoreLabelsAPI:
         """
         return label_caption(label)
 
+    @writes
     async def mark_as_printed_by_ids_async(
         self, db: AsyncSession, label_ids: list[UUID], organization_id: UUID
     ) -> None:

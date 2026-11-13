@@ -2,7 +2,7 @@
 
 A module shipped in this tree and a module installed from outside see the same
 application, so they import from the same place. This module re-exports what a
-module may use: the registration helpers, the lifecycle and context types, the
+module may use: the API key scope registration, the lifecycle and context types, the
 interceptor and contribution classes, the HTTP exception surface, the FastAPI
 dependencies, a logger, the model bases, the system event names a subscription
 needs, the migration helpers a revision uses, the field type a scanned code
@@ -29,6 +29,16 @@ The modules shipped before this door existed import Core directly; their
 current reaches are frozen in ``module_import_surface_baseline.txt`` and only
 ever shrink. New code in a module — in this tree or outside it — imports from
 here.
+
+Six registrations stay Core's own for now and are deliberately not re-exported:
+export enrichers (``app.core.export_enrichers``), record placement
+(``app.core.module_ownership``), template ranking (``app.core.template_ranking``),
+supplier prices (``app.core.cost_estimates``), the period guard
+(``app.core.period_guard``) and the label renderers (``app.core.label_rendering``).
+The modules this repository ships register through them by importing Core
+directly; a module installed from outside has no door to them, and a name added
+here would be a promise kept for every release after. CONTRACTS_STABILITY.md
+lists them as in-tree only.
 
 Adding a name is not a breaking change: a module can ignore an export it does
 not use. Removing or renaming one is, because a module importing it stops
