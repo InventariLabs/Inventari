@@ -1,0 +1,394 @@
+{
+  "entries": [
+    {
+      "path": "backend/tests/integration/test_a_batch_can_be_traced.py",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_a_batch_can_be_traced.py",
+      "literal": "date(2027, 1, 31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_a_draft_test_remembers_refusals_for_its_own_organization.py",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_a_package_used_partially_becomes_an_open_record.py",
+      "literal": "date(2027, 1, 31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_a_record_changes_its_own_batch.py",
+      "literal": "date(2031, 3, 1",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_a_record_changes_its_own_batch.py",
+      "literal": "date(2031, 9, 1",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_ai_connection_contract_test.py",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_an_import_refuses_what_it_cannot_save.py",
+      "literal": "2027-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_an_import_refuses_what_it_cannot_save.py",
+      "literal": "date(2027, 12, 31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_export_service.py",
+      "literal": "2027-01-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_the_connection_test_answers_to_the_limit.py",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_the_log_sees_a_bulk_edit_and_a_removal.py",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_what_lies_where.py",
+      "literal": "2030-03-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_what_lies_where.py",
+      "literal": "2032-01-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_what_lies_where.py",
+      "literal": "date(2030, 3, 1",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_what_lies_where.py",
+      "literal": "date(2031, 5, 1",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/integration/test_what_lies_where.py",
+      "literal": "date(2032, 1, 1",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/unit/test_a_suppression_expires.py",
+      "literal": "2027-01-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/unit/test_effective_expiry.py",
+      "literal": "2027-03-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "backend/tests/unit/test_effective_expiry.py",
+      "literal": "date(2026, 12, 1",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/components/ui/DateInput.test.tsx",
+      "literal": "2028-08-15",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/components/ui/DateInput.test.tsx",
+      "literal": "2029-08-15",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/announcements/api/announcements.test.ts",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/AuditCampaignsPage.pagination.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/attestationPublicNamesWhoAsks.test.tsx",
+      "literal": "2026-11-18",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/campaignDetailSetup.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/campaignLaunchFailure.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/campaignListSaysWhoIsAsked.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/campaignRemindersSayWhatHappened.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/campaignResponsesReadable.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/equipmentQueryErrors.test.tsx",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/__tests__/headerButtonsBlockWhileTheyWork.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/components/CreateCampaignModal.test.tsx",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/equipment/components/MaintenanceLogModal.test.tsx",
+      "literal": "2027-04-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/components/QuickActionSheet.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/components/StockActionSheet.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/components/UnifiedFieldRenderer.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/components/items/ItemUseBy.test.tsx",
+      "literal": "2026-11-20",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/components/items/ItemUseBy.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/hooks/useItemForm.test.ts",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/hooks/useQuickAdd.test.tsx",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/hooks/useQuickAdd.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/pages/AddItemPage.test.tsx",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/pages/ScanPage.test.tsx",
+      "literal": "2027-01-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/pages/StockLotPage.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/inventory/pages/StockLotsPage.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/purchase_orders/components/PricelistEntriesTable.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/purchase_orders/pages/PricelistPage.save.test.tsx",
+      "literal": "2031-03-04",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/purchase_orders/pages/PricelistPage.save.test.tsx",
+      "literal": "new Date(2031, 2, 4",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/recipes/components/MealPlanCalendar.keyboardMove.test.tsx",
+      "literal": "2027-01-04",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/recipes/components/MealPlanCalendar.keyboardMove.test.tsx",
+      "literal": "2027-01-05",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/recipes/components/PickingView.candidates.test.tsx",
+      "literal": "2027-01-10",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/recipes/components/PickingView.candidates.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/shared/components/LineItemsEditor/LineItemRow.test.tsx",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/shared/components/LocationContentsSheet.test.tsx",
+      "literal": "2031-05-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/spaces/components/StorageItems/StorageItemsTable.test.tsx",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/components/DocumentLinesEditor.test.tsx",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/components/DocumentQuickAddPanel.fields.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/components/receive/ReceiveLineRow.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/components/receive/receiveDraft.test.ts",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/components/receive/receiveDraft.test.ts",
+      "literal": "2027-02-28",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/components/receive/receiveDraft.test.ts",
+      "literal": "2027-03-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/hooks/__tests__/useWmsPicking.actions.test.tsx",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/hooks/useDocumentActions.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/hooks/useDocumentActions.test.tsx",
+      "literal": "2027-02-28",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/hooks/useDocumentActions.test.tsx",
+      "literal": "2027-04-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/hooks/useDocumentScanner.test.tsx",
+      "literal": "2027-06-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/hooks/useDocumentWorkspaceState.test.ts",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/hooks/useDocumentWorkspaceState.test.ts",
+      "literal": "2027-01-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/pages/DocumentScanPage.test.tsx",
+      "literal": "2031-05-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/pages/ReceiveGoodsPage.test.tsx",
+      "literal": "2027-01-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/pages/ReceiveGoodsPage.test.tsx",
+      "literal": "2027-02-28",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/modules/warehouse/pages/ReceiveGoodsPage.test.tsx",
+      "literal": "2027-03-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/store/formMemoryStore.test.ts",
+      "literal": "2026-12-01",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/utils/__tests__/helpers.test.ts",
+      "literal": "2026-12-24",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/src/utils/__tests__/helpers.test.ts",
+      "literal": "2027-01-02",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/tests/e2e/documents-exploratory.spec.ts",
+      "literal": "2027-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    },
+    {
+      "path": "frontend/tests/e2e/helpers/api.ts",
+      "literal": "2026-12-31",
+      "reason": "Present when the gate was introduced. A fixed calendar value in a fixture; to be rewritten relative to the clock when the file is next changed, and removed from this list then."
+    }
+  ]
+}
