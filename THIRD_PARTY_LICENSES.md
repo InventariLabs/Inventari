@@ -72,7 +72,7 @@ and the static assets the frontend serves.
 | `cssselect2` | 0.9.0 | BSD |  |
 | `Deprecated` | 1.3.1 | MIT |  |
 | `distro` | 1.9.0 | Apache-2.0 |  |
-| `dnspython` | 2.9.0 | ISC |  |
+| `dnspython` | 2.9.2 | ISC |  |
 | `email-validator` | 2.3.0 | Unlicense |  |
 | `et_xmlfile` | 2.0.0 | MIT |  |
 | `fastapi` | 0.141.1 | MIT |  |
