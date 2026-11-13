@@ -1274,14 +1274,18 @@ reason.
   type — `KOR` in the Polish preset), `{YEAR}`, `{MONTH}` and `{SEQ:03d}`
   (the sequence, padded), for example `IN/2026/001`. A number is given out
   when the draft is **confirmed**; year and month come from the scheduled date
-  the document stands on then, so drafts written and thrown away leave no
-  gaps. Each prefix counts on its own: when a format starts writing a
+  the document stands on then, so a draft that was never confirmed uses no
+  number. A number is never handed out again: a document an approver
+  rejected goes back to draft keeping its number, and if that draft is then
+  deleted, the number stays skipped. Each prefix counts on its own: when a format starts writing a
   different code for a type (an organization that numbered scrap documents
   `SCRAP/2026/004` and now numbers `SCR/2026/…`), the new series begins again
   at 001. Numbers already issued are never rewritten.
 - **Periods.** Close a month to freeze it: in a closed month no document can be
   created, edited, confirmed, completed or cancelled, and stock takes cannot be
-  completed. A month can be reopened; both are recorded with who and when.
+  completed. A correction is the exception at the start: it can be created in
+  a closed month, and is refused when it is confirmed or completed, against
+  its own date. A month can be reopened; both are recorded with who and when.
   How these records stand up to an audit is set out in 10.11.
 
 ![The wholesaler's documents on a phone: each with its number, status, date, partner, location and value, the orders being picked with their progress, above the warehouse's bottom bar of Start, Scan, History and More](images/mobile-documents.webp)
@@ -1466,11 +1470,14 @@ with a signed quantity, and moves stock by the difference when it is
 completed. Only quantities can be corrected, and a correction cannot take
 more off a line than is still there. The original stays exactly as it was;
 the two are read together. A correction is subject to the same period check
-as any document.
+as any document when it is confirmed or completed; creating one
+in a closed month is not refused, but it cannot go further until the month
+is reopened.
 
 **Closing a period.** **Period closure** closes a calendar month
 (10.8). In a closed month no document can be created, edited, confirmed,
-completed or cancelled, and no stock take can be completed. Closing and
+completed or cancelled (a correction may be created, but not confirmed or
+completed), and no stock take can be completed. Closing and
 reopening are each recorded with who did it, when, and the note typed at the
 time, and the change appears in the audit log. Reopening is allowed because a
 real mistake sometimes needs it; the record of it is what makes it safe, so
@@ -1498,8 +1505,10 @@ behind it, and who did it.
 counter kept for the number's prefix, the format with the sequence left out
 (10.8). With the default format, `{TYPE}/{YEAR}/{SEQ:03d}`, that counts per
 type and year; a format with `{MONTH}` in it counts per month, and one with
-neither counts in one run for the type. There are no gaps made by drafts that
-were thrown away. A number is unique within the organization and is never
+neither counts in one run for the type. Drafts that were never confirmed use
+no number, but a number once handed out is not given back: a document
+rejected by an approver returns to draft with its number, and deleting that
+draft leaves the number skipped. A number is unique within the organization and is never
 reused or rewritten. A cancelled document keeps its number. The format can be
 changed for future documents; earlier ones keep what they were issued under,
 and a new prefix starts its own count.
