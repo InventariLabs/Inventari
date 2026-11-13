@@ -136,16 +136,6 @@
       "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
     },
     {
-      "path": "backend/app/modules/warehouse/tests/integration/test_imported_dispatch_lines_name_their_stock.py",
-      "literal": "2031-03-31",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
-      "path": "backend/app/modules/warehouse/tests/integration/test_imported_dispatch_lines_name_their_stock.py",
-      "literal": "2031-12-31",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
       "path": "backend/app/modules/warehouse/tests/integration/test_opening_stock_lands_as_one_draft_receipt.py",
       "literal": "2027-12-31",
       "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
@@ -221,28 +211,8 @@
       "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
     },
     {
-      "path": "backend/app/modules/warehouse/tests/integration/test_stock_lot_quarantine.py",
-      "literal": "2026-12-31",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
       "path": "backend/app/modules/warehouse/tests/integration/test_stock_quant.py",
       "literal": "2026-12-31",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
-      "path": "backend/app/modules/warehouse/tests/integration/test_stock_quant_lot_aware_consume.py",
-      "literal": "2026-12-31",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
-      "path": "backend/tests/integration/test_a_batch_can_be_traced.py",
-      "literal": "2027-01-31",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
-      "path": "backend/tests/integration/test_a_batch_can_be_traced.py",
-      "literal": "date(2027, 1, 31",
       "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
     },
     {
@@ -253,16 +223,6 @@
     {
       "path": "backend/tests/integration/test_a_package_used_partially_becomes_an_open_record.py",
       "literal": "date(2027, 1, 31",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
-      "path": "backend/tests/integration/test_a_record_changes_its_own_batch.py",
-      "literal": "date(2031, 3, 1",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
-      "path": "backend/tests/integration/test_a_record_changes_its_own_batch.py",
-      "literal": "date(2031, 9, 1",
       "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
     },
     {
@@ -489,16 +449,6 @@
       "path": "frontend/src/modules/purchase_orders/pages/PricelistPage.save.test.tsx",
       "literal": "new Date(2031, 2, 4",
       "reason": "Audited: this test pins the clock (fake timers, an injected or patched today), so the fixed date sits at a known distance from a known now and cannot be overtaken by the real one."
-    },
-    {
-      "path": "frontend/src/modules/recipes/components/MealPlanCalendar.keyboardMove.test.tsx",
-      "literal": "2027-01-04",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
-    },
-    {
-      "path": "frontend/src/modules/recipes/components/MealPlanCalendar.keyboardMove.test.tsx",
-      "literal": "2027-01-05",
-      "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
     },
     {
       "path": "frontend/src/modules/recipes/components/PickingView.candidates.test.tsx",

@@ -16,6 +16,7 @@ take an import as it takes typed lines: nothing is written until it is saved.
 
 from __future__ import annotations
 
+from datetime import date, timedelta
 from typing import Any, cast
 from uuid import UUID
 
@@ -95,8 +96,8 @@ def _fefo_product_on_two_records(
     template.removal_strategy = 'FEFO'
     db_session.commit()
     for quantity, batch, expiry in (
-        (10, 'L-B', '2031-12-31'),
-        (6, 'L-A', '2031-03-31'),
+        (10, 'L-B', (date.today() + timedelta(days=700)).isoformat()),
+        (6, 'L-A', (date.today() + timedelta(days=400)).isoformat()),
     ):
         _receive(
             client,

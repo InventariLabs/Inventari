@@ -12,6 +12,7 @@ movements name the batch, and no lot-less stock appears anywhere.
 """
 
 import uuid
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
@@ -27,6 +28,9 @@ from app.models.stock_lot import StockLot
 from app.models.stock_move import StockMove
 from app.models.storage_location import StorageLocation
 
+# Far enough ahead that the lot is never expired whenever the suite runs.
+_BEST_BEFORE = (date.today() + timedelta(days=400)).isoformat()
+
 
 def _receive_via_document(
     client: TestClient,
@@ -37,7 +41,7 @@ def _receive_via_document(
     template_id: uuid.UUID,
     quantity: int,
     batch_number: str,
-    expiry_date: str = '2026-12-31',
+    expiry_date: str = _BEST_BEFORE,
 ) -> str:
     """Create + confirm + complete an IN document. Returns the doc id."""
     resp = client.post(
@@ -277,7 +281,7 @@ class TestLotAwareConsumeMove:
                         'product_template_id': str(doc_template.id),
                         'expected_quantity': 6,
                         'batch_number': 'LOT-D',
-                        'expiry_date': '2026-12-31',
+                        'expiry_date': _BEST_BEFORE,
                     }
                 ],
             },
