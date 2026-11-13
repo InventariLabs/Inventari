@@ -195,6 +195,8 @@ lint: ## Check code style with ruff
 	@python3 backend/scripts/check_internal_ids.py --public-tree
 	@echo "$(BLUE)[INFO]$(NC) Checking tests for dates that the clock will overtake..."
 	@python3 backend/scripts/check_time_bombs.py
+	@echo "$(BLUE)[INFO]$(NC) Checking the size budget of the agent instruction files..."
+	@python3 backend/scripts/check_agents_md_budget.py
 	@$(MAKE) --no-print-directory audit
 
 # The messages of the commits a push would publish, read by the same rules the
