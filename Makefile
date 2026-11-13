@@ -356,7 +356,6 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 #   check:field-names:baseline /
 #   check:storage-scope:baseline /
 #   check:category-scope:baseline /
-#   check:query-error-read:baseline /
 #   check:mutate-async:baseline /
 #   check:quantity-render:baseline   — WRITERS that regenerate golden files
 #                                      after an intentional change; their
