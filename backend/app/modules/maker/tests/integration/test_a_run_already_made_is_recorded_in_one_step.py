@@ -482,6 +482,150 @@ class TestBeforeSaving:
             ('Damson Plums', Decimal('2.000'))
         ]
 
+    def test_a_whole_piece_reached_through_the_batch_yield_stays_one_piece(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A plan of five against a recipe yielding three is 5/3 batches.
+
+        Three pieces per batch times 5/3 is five pieces, but the quotient
+        keeps 28 significant digits and the product sits a few units in the
+        last place above five. The requirement rounds up, so the panel's row
+        read five pieces beside a button offering six, and the list received
+        six — a piece the run never needed.
+        """
+        pieces = db_session.scalars(select(Uom).where(Uom.symbol == 'pcs')).one()
+        eggs = _template(db_session, org, name='Eggs')
+        eggs.uom_id = pieces.id
+        db_session.commit()
+        cake = _template(db_session, org, name='Cake')
+        recipe = client.post(
+            '/api/v1/maker/recipes',
+            headers=headers,
+            json={
+                'output_template_id': str(cake.id),
+                'name': 'Cake',
+                'batch_yield_qty': '3',
+                'is_default': True,
+            },
+        )
+        assert recipe.status_code == 201, recipe.text
+        line = client.post(
+            f'/api/v1/maker/recipes/{recipe.json()["id"]}/bom-lines',
+            headers=headers,
+            json={
+                'child_template_id': str(eggs.id),
+                'qty_per_batch': '3',
+                'unit': 'pcs',
+                'uom_id': str(pieces.id),
+            },
+        )
+        assert line.status_code == 201, line.text
+        run = _run(cake, pantry, '5')
+
+        preview = client.post(
+            '/api/v1/maker/production/orders/preview',
+            headers=headers,
+            json=run,
+        )
+
+        assert preview.status_code == 200, preview.text
+        [egg] = preview.json()['ingredients']
+        # The row the panel shows at its own precision still reads five, and
+        # the button offers the five the list is about to hold.
+        assert abs(Decimal(egg['shortage']) - Decimal('5')) < Decimal('0.000001')
+        assert Decimal(egg['to_buy']) == Decimal('5')
+
+        response = client.post(
+            '/api/v1/maker/production/orders/shortages/shopping-list',
+            headers=headers,
+            json=run,
+        )
+
+        assert response.status_code == 200, response.text
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(ShoppingListItem.template_id == eggs.id)
+        ).all()
+        assert [(row.name, row.quantity) for row in rows] == [
+            ('Eggs', Decimal('5.000'))
+        ]
+
+    def test_the_preview_and_the_line_agree_when_the_units_differ(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """An ounce line against a gram shelf: 2 oz less 2.8 g is 53.899 g.
+
+        The preview converts the shortfall back from the recipe's unit, the
+        line writes the difference in the stock unit. The two routes agree
+        exactly, but a hair of division noise on the preview's side used to
+        round one step above the write — the button promised 53.900 g and the
+        list held 53.899 g.
+        """
+        grams = db_session.scalars(select(Uom).where(Uom.symbol == 'g')).one()
+        ounces = db_session.scalars(select(Uom).where(Uom.symbol == 'oz')).one()
+        chocolate = _template(db_session, org, name='Chocolate')
+        chocolate.uom_id = grams.id
+        db_session.commit()
+        post_on_shelf(client, headers, chocolate, pantry.id, '2.8')
+        cake = _template(db_session, org, name='Cake')
+        recipe = client.post(
+            '/api/v1/maker/recipes',
+            headers=headers,
+            json={
+                'output_template_id': str(cake.id),
+                'name': 'Cake',
+                'batch_yield_qty': '1',
+                'is_default': True,
+            },
+        )
+        assert recipe.status_code == 201, recipe.text
+        line = client.post(
+            f'/api/v1/maker/recipes/{recipe.json()["id"]}/bom-lines',
+            headers=headers,
+            json={
+                'child_template_id': str(chocolate.id),
+                'qty_per_batch': '2',
+                'unit': 'oz',
+                'uom_id': str(ounces.id),
+            },
+        )
+        assert line.status_code == 201, line.text
+        run = _run(cake, pantry, '1')
+
+        preview = client.post(
+            '/api/v1/maker/production/orders/preview',
+            headers=headers,
+            json=run,
+        )
+
+        assert preview.status_code == 200, preview.text
+        [short] = preview.json()['ingredients']
+        assert short['to_buy_uom_symbol'] == 'g'
+        assert Decimal(short['to_buy']) == Decimal('53.899')
+
+        response = client.post(
+            '/api/v1/maker/production/orders/shortages/shopping-list',
+            headers=headers,
+            json=run,
+        )
+
+        assert response.status_code == 200, response.text
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(ShoppingListItem.template_id == chocolate.id)
+        ).all()
+        assert [(row.quantity, row.uom_id) for row in rows] == [
+            (Decimal('53.899'), grams.id)
+        ]
+
     def test_a_run_that_now_needs_more_raises_the_listed_line(
         self,
         client: TestClient,
