@@ -610,8 +610,12 @@ jobs:
           echo "===== /tmp/backend.log (last 150 lines) ====="
           tail -n 150 /tmp/backend.log || echo "(no backend.log)"
 
+      # On a green run too: a spec that failed and passed on its retry is the
+      # flake worth reading, and only this report keeps its failed attempt's
+      # screenshot, page snapshot and the retry's trace. Uploaded on failure
+      # alone, the rare flakes left nothing to diagnose them from.
       - name: Upload Playwright report
-        if: failure()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report

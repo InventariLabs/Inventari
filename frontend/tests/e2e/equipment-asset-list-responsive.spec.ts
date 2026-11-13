@@ -38,15 +38,20 @@ test.describe("Equipment — asset list responsive smoke", () => {
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
 
+    // Unique per beforeAll round, not per project: each worker of this file
+    // seeds its own pair, and two workers sharing one tag list each other's
+    // rows in the same search. A sibling's Alpha, created between its two
+    // POSTs, is then the newest row and sorts above this worker's Zulu.
     const scope = workerInfo.project.name;
-    assignee = `E2E Assignee ${scope}`;
-    tag = `responsive-${scope}`;
+    const unique = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+    tag = `responsive-${scope}-${unique}`;
+    assignee = `E2E Assignee ${tag}`;
 
     const storages = await api.listStorages(token);
     const storageId = process.env.E2E_STORAGE_ID || storages[0]?.id || "";
 
     const category = await api.createCategoryIdempotent(token, {
-      name: `E2E-Responsive-${scope}`,
+      name: `E2E-Responsive-${tag}`,
       context_tag: "equipment",
     });
     categoryId = category.id;
@@ -179,8 +184,8 @@ test.describe("Equipment — asset list responsive smoke", () => {
     await page.goto("/equipment/assets");
     await page.getByRole("textbox", { name: "Search assets…" }).fill(tag);
     await searched;
-    // `.first()`: each worker that runs a test of this file seeds its own
-    // pair under the same tag.
+    // `.first()`: kept from when workers shared one tag; the search now lists
+    // this worker's pair alone, so the match is unique either way.
     await page
       .getByRole("checkbox", { name: `Select asset Zulu Laptop ${tag}` })
       .first()

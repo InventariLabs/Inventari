@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Camera,
   CameraOff,
@@ -127,6 +127,24 @@ export function buildGridClass(features: LineItemsEditorFeatures): string {
   return GRID_COLUMN_CLASSES[`${variant},${optional}`];
 }
 
+/**
+ * Brings the lines header to the top of whatever scrolls it when the camera
+ * opens: the camera opens right under the scan switch, and on a phone the
+ * switch can sit at the bottom edge of the sheet, which would leave the
+ * viewfinder below the fold — the worker sees nothing happen, and WebKit does
+ * not start a muted video it counts out of view, so the reader gets no frame.
+ * The header carries `scroll-mt-16` to stay clear of the fixed app bar when
+ * the editor sits in a page rather than a sheet.
+ */
+function useScanHeaderInView(scan: LineItemsScanState | undefined) {
+  const ref = useRef<HTMLDivElement>(null);
+  const open = Boolean(scan?.open);
+  useEffect(() => {
+    if (open) ref.current?.scrollIntoView?.({ block: "start" });
+  }, [open]);
+  return ref;
+}
+
 /** The torch switch, drawn only for a camera that has a torch. */
 function TorchButton({
   scan,
@@ -176,6 +194,7 @@ export function LineItemsEditor({
   >({});
 
   const gridClass = buildGridClass(features);
+  const scanHeaderRef = useScanHeaderInView(scan);
 
   const hasDuplicates = useMemo(() => {
     const seen = new Set<string>();
@@ -205,7 +224,10 @@ export function LineItemsEditor({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div
+        ref={scanHeaderRef}
+        className="flex scroll-mt-16 items-center justify-between"
+      >
         <p className="block text-xs font-medium uppercase text-on-secondary ml-1 tracking-wide">
           {labels.lines} *
         </p>

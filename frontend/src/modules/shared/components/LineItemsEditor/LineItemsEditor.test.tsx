@@ -177,6 +177,25 @@ describe("LineItemsEditor", () => {
     expect(scan.onToggle).toHaveBeenCalledOnce();
   });
 
+  it("brings the scan switch to the top when the camera opens, not before", () => {
+    const scrolled = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+    const props = makeProps();
+    const { rerender } = render(
+      <LineItemsEditor {...props} scan={makeScan()} />,
+    );
+    expect(scrolled).not.toHaveBeenCalled();
+
+    rerender(<LineItemsEditor {...props} scan={makeScan({ open: true })} />);
+    expect(scrolled).toHaveBeenCalledOnce();
+    expect(scrolled).toHaveBeenCalledWith({ block: "start" });
+    // The element scrolled is the header that holds the switch, so the
+    // camera that opens under it starts in view.
+    expect(scrolled.mock.contexts[0]).toContainElement(
+      screen.getByRole("button", { name: "Close scan" }),
+    );
+    scrolled.mockRestore();
+  });
+
   it("shows scanner hint when scan is open", () => {
     const scan = makeScan({ open: true, cameraActive: true });
     const props = makeProps();
