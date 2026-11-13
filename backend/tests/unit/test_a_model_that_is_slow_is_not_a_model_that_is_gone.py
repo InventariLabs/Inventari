@@ -24,7 +24,7 @@ from app.core.llm.errors import LlmTimeoutError, LlmTransportError
 from app.core.llm.openai_client import OpenAiCompatibleClient
 from app.core.llm.timeouts import request_timeout
 
-pytestmark = pytest.mark.unit
+pytestmark = [pytest.mark.unit, pytest.mark.usefixtures('stub_dns')]
 
 
 def _connection(provider: str = 'openrouter'):

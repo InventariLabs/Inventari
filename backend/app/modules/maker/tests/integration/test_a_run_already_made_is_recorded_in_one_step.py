@@ -414,6 +414,316 @@ class TestBeforeSaving:
             ('Damson Plums', Decimal('4.000'))
         ]
 
+    def test_a_shortfall_of_part_of_a_piece_is_listed_as_a_whole_piece(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """The list is shopped in the ingredient's unit: 1.5 pieces is 2 pieces.
+
+        The shortfall was rounded to the store's three places whatever the
+        ingredient was counted in, so a run half a piece short asked the
+        shopper to buy 1,5 szt. — part of a piece, which no shelf holds. The
+        preview says the same quantity, so the button that puts the shortfall
+        on the list states what the list will receive.
+        """
+        plums = _template(db_session, org, name='Damson Plums')
+        pieces = db_session.scalars(select(Uom).where(Uom.symbol == 'pcs')).one()
+        plums.uom_id = pieces.id
+        butter = _template(db_session, org, name='Plum Butter')
+        recipe = client.post(
+            '/api/v1/maker/recipes',
+            headers=headers,
+            json={
+                'output_template_id': str(butter.id),
+                'name': 'Plum butter',
+                'batch_yield_qty': '1',
+                'is_default': True,
+            },
+        )
+        assert recipe.status_code == 201, recipe.text
+        line = client.post(
+            f'/api/v1/maker/recipes/{recipe.json()["id"]}/bom-lines',
+            headers=headers,
+            json={
+                'child_template_id': str(plums.id),
+                'qty_per_batch': '1.5',
+                'unit': 'pcs',
+            },
+        )
+        assert line.status_code == 201, line.text
+
+        run = _run(butter, pantry, '1')
+        preview = client.post(
+            '/api/v1/maker/production/orders/preview',
+            headers=headers,
+            json=run,
+        )
+        assert preview.status_code == 200, preview.text
+        [plums_short] = preview.json()['ingredients']
+        assert Decimal(plums_short['shortage']) == Decimal('1.5')
+        assert Decimal(plums_short['to_buy']) == Decimal('2')
+        assert plums_short['to_buy_uom_symbol'] == 'pcs'
+
+        response = client.post(
+            '/api/v1/maker/production/orders/shortages/shopping-list',
+            headers=headers,
+            json=run,
+        )
+
+        assert response.status_code == 200, response.text
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(ShoppingListItem.template_id == plums.id)
+        ).all()
+        assert [(row.name, row.quantity) for row in rows] == [
+            ('Damson Plums', Decimal('2.000'))
+        ]
+
+    def test_a_whole_piece_reached_through_the_batch_yield_stays_one_piece(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A plan of five against a recipe yielding three is 5/3 batches.
+
+        Three pieces per batch times 5/3 is five pieces, but the quotient
+        keeps 28 significant digits and the product sits a few units in the
+        last place above five. The requirement rounds up, so the panel's row
+        read five pieces beside a button offering six, and the list received
+        six — a piece the run never needed.
+        """
+        pieces = db_session.scalars(select(Uom).where(Uom.symbol == 'pcs')).one()
+        eggs = _template(db_session, org, name='Eggs')
+        eggs.uom_id = pieces.id
+        db_session.commit()
+        cake = _template(db_session, org, name='Cake')
+        recipe = client.post(
+            '/api/v1/maker/recipes',
+            headers=headers,
+            json={
+                'output_template_id': str(cake.id),
+                'name': 'Cake',
+                'batch_yield_qty': '3',
+                'is_default': True,
+            },
+        )
+        assert recipe.status_code == 201, recipe.text
+        line = client.post(
+            f'/api/v1/maker/recipes/{recipe.json()["id"]}/bom-lines',
+            headers=headers,
+            json={
+                'child_template_id': str(eggs.id),
+                'qty_per_batch': '3',
+                'unit': 'pcs',
+                'uom_id': str(pieces.id),
+            },
+        )
+        assert line.status_code == 201, line.text
+        run = _run(cake, pantry, '5')
+
+        preview = client.post(
+            '/api/v1/maker/production/orders/preview',
+            headers=headers,
+            json=run,
+        )
+
+        assert preview.status_code == 200, preview.text
+        [egg] = preview.json()['ingredients']
+        # The row the panel shows at its own precision still reads five, and
+        # the button offers the five the list is about to hold.
+        assert abs(Decimal(egg['shortage']) - Decimal('5')) < Decimal('0.000001')
+        assert Decimal(egg['to_buy']) == Decimal('5')
+
+        response = client.post(
+            '/api/v1/maker/production/orders/shortages/shopping-list',
+            headers=headers,
+            json=run,
+        )
+
+        assert response.status_code == 200, response.text
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(ShoppingListItem.template_id == eggs.id)
+        ).all()
+        assert [(row.name, row.quantity) for row in rows] == [
+            ('Eggs', Decimal('5.000'))
+        ]
+
+    def test_the_preview_and_the_line_agree_when_the_units_differ(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """An ounce line against a gram shelf: 2 oz less 2.8 g is 53.899 g.
+
+        The preview converts the shortfall back from the recipe's unit, the
+        line writes the difference in the stock unit. The two routes agree
+        exactly, but a hair of division noise on the preview's side used to
+        round one step above the write — the button promised 53.900 g and the
+        list held 53.899 g.
+        """
+        grams = db_session.scalars(select(Uom).where(Uom.symbol == 'g')).one()
+        ounces = db_session.scalars(select(Uom).where(Uom.symbol == 'oz')).one()
+        chocolate = _template(db_session, org, name='Chocolate')
+        chocolate.uom_id = grams.id
+        db_session.commit()
+        post_on_shelf(client, headers, chocolate, pantry.id, '2.8')
+        cake = _template(db_session, org, name='Cake')
+        recipe = client.post(
+            '/api/v1/maker/recipes',
+            headers=headers,
+            json={
+                'output_template_id': str(cake.id),
+                'name': 'Cake',
+                'batch_yield_qty': '1',
+                'is_default': True,
+            },
+        )
+        assert recipe.status_code == 201, recipe.text
+        line = client.post(
+            f'/api/v1/maker/recipes/{recipe.json()["id"]}/bom-lines',
+            headers=headers,
+            json={
+                'child_template_id': str(chocolate.id),
+                'qty_per_batch': '2',
+                'unit': 'oz',
+                'uom_id': str(ounces.id),
+            },
+        )
+        assert line.status_code == 201, line.text
+        run = _run(cake, pantry, '1')
+
+        preview = client.post(
+            '/api/v1/maker/production/orders/preview',
+            headers=headers,
+            json=run,
+        )
+
+        assert preview.status_code == 200, preview.text
+        [short] = preview.json()['ingredients']
+        assert short['to_buy_uom_symbol'] == 'g'
+        assert Decimal(short['to_buy']) == Decimal('53.899')
+
+        response = client.post(
+            '/api/v1/maker/production/orders/shortages/shopping-list',
+            headers=headers,
+            json=run,
+        )
+
+        assert response.status_code == 200, response.text
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(ShoppingListItem.template_id == chocolate.id)
+        ).all()
+        assert [(row.quantity, row.uom_id) for row in rows] == [
+            (Decimal('53.899'), grams.id)
+        ]
+
+    def test_a_run_that_now_needs_more_raises_the_listed_line(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A line already listed is not "covered" whatever the run now needs.
+
+        The shortfall used to skip any product already on the list, so a run
+        that grew from 20 to 30 left the 4 kg the smaller run asked for.
+        """
+        seed = _plum_butter(
+            db_session, client, org, headers, pantry, plums_on_shelf='18'
+        )
+        url = '/api/v1/maker/production/orders/shortages/shopping-list'
+        first = client.post(
+            url, headers=headers, json=_run(seed['butter'], pantry, '20')
+        )
+        bigger = client.post(
+            url, headers=headers, json=_run(seed['butter'], pantry, '30')
+        )
+        smaller = client.post(
+            url, headers=headers, json=_run(seed['butter'], pantry, '20')
+        )
+
+        assert first.json()['added_count'] == 1
+        assert bigger.json()['added_count'] == 0
+        assert bigger.json()['raised_count'] == 1
+        # A run that needs no more than the list already asks for changes nothing.
+        assert smaller.json()['raised_count'] == 0
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(
+                ShoppingListItem.template_id == seed['plums'].id
+            )
+        ).all()
+        assert [(row.name, row.quantity) for row in rows] == [
+            ('Damson Plums', Decimal('15.000'))
+        ]
+
+    def test_a_line_listed_in_grams_covers_only_its_weight(
+        self,
+        client: TestClient,
+        org: Organization,
+        headers: dict[str, str],
+        pantry: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """500 g of plums already listed leaves 3.5 kg of a 4 kg shortfall to buy.
+
+        The list's lines were summed whatever their unit, so the 500 g line
+        read as 500 kg of cover and the run's shortfall added nothing.
+        """
+        seed = _plum_butter(
+            db_session, client, org, headers, pantry, plums_on_shelf='18'
+        )
+        kg = db_session.scalars(select(Uom).where(Uom.symbol == 'kg')).first()
+        g = db_session.scalars(select(Uom).where(Uom.symbol == 'g')).first()
+        assert kg is not None and g is not None
+        seed['plums'].uom_id = kg.id
+        db_session.commit()
+        listed = client.post(
+            '/api/v1/shopping-lists', headers=headers, json={'name': 'This week'}
+        )
+        assert listed.status_code == 201, listed.text
+        line = client.post(
+            f'/api/v1/shopping-lists/{listed.json()["id"]}/items',
+            headers=headers,
+            json={
+                'name': 'Damson Plums',
+                'quantity': '500',
+                'uom_id': str(g.id),
+                'template_id': str(seed['plums'].id),
+            },
+        )
+        assert line.status_code == 201, line.text
+        url = '/api/v1/maker/production/orders/shortages/shopping-list'
+        run = _run(seed['butter'], pantry, '20')
+
+        first = client.post(url, headers=headers, json=run)
+        again = client.post(url, headers=headers, json=run)
+
+        assert first.status_code == 200, first.text
+        assert first.json()['shopping_list_id'] == listed.json()['id']
+        # What the screen reads: something went onto the list, then nothing.
+        assert first.json()['added_count'] + first.json()['raised_count'] == 1
+        assert again.json()['added_count'] + again.json()['raised_count'] == 0
+        rows = db_session.scalars(
+            select(ShoppingListItem).where(
+                ShoppingListItem.template_id == seed['plums'].id
+            )
+        ).all()
+        assert sorted((row.quantity, row.uom_id, row.source) for row in rows) == [
+            (Decimal('3.500'), kg.id, 'production'),
+            (Decimal('500.000'), g.id, 'manual'),
+        ]
+
     def test_nothing_short_touches_no_list(
         self,
         client: TestClient,
@@ -437,6 +747,7 @@ class TestBeforeSaving:
             'shopping_list_id': None,
             'list_name': None,
             'added_count': 0,
+            'raised_count': 0,
         }
 
     def test_a_line_on_a_run_drawn_in_full_records_no_shortfall(

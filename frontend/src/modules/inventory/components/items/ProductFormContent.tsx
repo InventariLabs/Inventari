@@ -193,7 +193,12 @@ export default function ProductFormContent({
               {suggestExistingProducts && (
                 <ExistingProductSuggestions
                   name={(formData.name as string) ?? ""}
-                  onPick={(picked) => onChange("name", picked)}
+                  onPick={(picked) => {
+                    onChange("name", picked);
+                    // The button that was clicked leaves the page with the
+                    // suggestions; without this focus falls to the body.
+                    document.getElementById("name")?.focus();
+                  }}
                 />
               )}
             </div>
@@ -245,7 +250,7 @@ export default function ProductFormContent({
                 variant="link"
                 size="sm"
                 onClick={() => onAddStorage("")}
-                leftIcon={<Plus size={12} />}
+                leftIcon={<Plus size={14} />}
                 className="mr-auto px-0 gap-1 text-on-primary"
               >
                 {t("addStorage")}

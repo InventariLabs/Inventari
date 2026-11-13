@@ -2413,6 +2413,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "organization_id",
               "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "module_scopes",
+              "required": false
             }
           ]
         },
@@ -2490,6 +2495,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "organization_id",
               "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "module_scopes",
+              "required": false
             }
           ]
         },
@@ -2856,6 +2866,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "storage_id",
               "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "claimed_tags",
+              "required": false
             }
           ]
         },
@@ -2875,6 +2890,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "storage_id",
               "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "claimed_tags",
+              "required": false
             }
           ]
         },
@@ -3152,6 +3172,11 @@
             {
               "kind": "KEYWORD_ONLY",
               "name": "offset",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "claimed_tags",
               "required": false
             }
           ]
@@ -7051,6 +7076,20 @@
               "kind": "KEYWORD_ONLY",
               "name": "include_global",
               "required": false
+            }
+          ]
+        },
+        "is_on_step": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "qty",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "uom",
+              "required": true
             }
           ]
         },

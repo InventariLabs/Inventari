@@ -212,14 +212,16 @@ jobs:
       # and lets free memory set the limit.
       - name: Tests (coverage)
         if: ${{ !cancelled() }}
-        # The log is read after the run, as `make test-backend` reads it: an
-        # error at setup is not a failed test, and the summary line is where
-        # it shows when the exit code is lost.
+        # The output streams live (a step killed by the job timeout or a
+        # cancel still shows what ran) and is kept in a log that is read
+        # after the run, as `make test-backend` reads it: an error at setup
+        # is not a failed test, and the summary line is where it shows when
+        # the exit code is lost.
+        shell: bash
         run: |
-          rc=0
           log="$RUNNER_TEMP/pytest.log"
-          uv run pytest -n "$(python3 ../scripts/test-workers.py pytest)" -q --tb=short --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70 > "$log" 2>&1 || rc=$?
-          cat "$log"
+          uv run pytest -n "$(python3 ../scripts/test-workers.py pytest)" -q --tb=short --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70 2>&1 | tee "$log"
+          rc=${PIPESTATUS[0]}
           python3 scripts/check_pytest_summary_errors.py "$log" || exit 1
           exit $rc
 
@@ -608,8 +610,12 @@ jobs:
           echo "===== /tmp/backend.log (last 150 lines) ====="
           tail -n 150 /tmp/backend.log || echo "(no backend.log)"
 
+      # On a green run too: a spec that failed and passed on its retry is the
+      # flake worth reading, and only this report keeps its failed attempt's
+      # screenshot, page snapshot and the retry's trace. Uploaded on failure
+      # alone, the rare flakes left nothing to diagnose them from.
       - name: Upload Playwright report
-        if: failure()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report

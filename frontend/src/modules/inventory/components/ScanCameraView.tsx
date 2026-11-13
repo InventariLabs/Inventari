@@ -211,33 +211,6 @@ export default function ScanCameraView({
         )}
       </div>
 
-      {lookupFailure && (
-        <div
-          role="alert"
-          data-testid="scan-lookup-failure"
-          className="absolute inset-x-0 top-0 z-[60] m-3 flex flex-col gap-2 rounded-xl border border-red-200 bg-surface-card p-4 text-left shadow-lg"
-        >
-          <p className="font-mono text-sm font-semibold text-on break-all">
-            {lookupFailure.code}
-          </p>
-          <p className="text-sm text-on-secondary">{lookupFailure.message}</p>
-          <div className="flex flex-wrap gap-2">
-            {lookupFailure.onSearch && (
-              <Button size="sm" onClick={lookupFailure.onSearch}>
-                {tScan("searchForCode")}
-              </Button>
-            )}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onDismissLookupFailure}
-            >
-              {tScan("common:actions.close")}
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Desktop Mode / Camera Not Active Overlay */}
       {!isCameraActive && !scannerError && (
         <div className="absolute inset-0 z-50 bg-surface flex flex-col items-center justify-center p-10 text-center animate-in fade-in">
@@ -254,7 +227,7 @@ export default function ScanCameraView({
             size="lg"
             onClick={onStartCamera}
             className="h-16 px-12 text-xl"
-            leftIcon={<Camera size={24} />}
+            leftIcon={<Camera size={20} />}
           >
             {tScan("startCamera")}
           </Button>
@@ -306,6 +279,35 @@ export default function ScanCameraView({
               <Info size={12} />
               {tScan("supportedFormatsHint")}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Last in the tree: it shares `z-50` with the two overlays above, and
+          between equals the later element paints on top. */}
+      {lookupFailure && (
+        <div
+          role="alert"
+          data-testid="scan-lookup-failure"
+          className="absolute inset-x-0 top-0 z-50 m-3 flex flex-col gap-2 rounded-xl border border-red-200 bg-surface-card p-4 text-left shadow-lg"
+        >
+          <p className="font-mono text-sm font-semibold text-on break-all">
+            {lookupFailure.code}
+          </p>
+          <p className="text-sm text-on-secondary">{lookupFailure.message}</p>
+          <div className="flex flex-wrap gap-2">
+            {lookupFailure.onSearch && (
+              <Button size="sm" onClick={lookupFailure.onSearch}>
+                {tScan("searchForCode")}
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onDismissLookupFailure}
+            >
+              {tScan("common:actions.close")}
+            </Button>
           </div>
         </div>
       )}

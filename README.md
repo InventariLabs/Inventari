@@ -40,7 +40,7 @@ meal planning and equipment custody share the same core, while the warehouse
 module runs receiving, picking, packing and shipping.
 
 **Alpha release:** best for small teams today, with occasional breaking changes
-between releases — see [Alpha Release v0.11.0](#alpha-release-v0110).
+between releases — see [Alpha Release v0.12.0](#alpha-release-v0120).
 
 **Use Inventari:** [try the demo](https://demo.inventari.app),
 [run it locally](#quick-start) or [deploy it on your server](QUICK_DEPLOY.md).
@@ -138,6 +138,11 @@ The generator creates a separate package with backend and frontend code,
 manifests, a model and migration, an example API endpoint and screen, and
 translation catalogs. You develop the process your users need in that
 package and install it into Inventari.
+
+You can build that package with an AI coding agent: the package carries the
+module rules the agent needs, and Inventari itself is built that way behind
+the same gates, which refuse an agent's mistakes before anything is
+installed. [How to do it](MODULE_QUICKSTART.md#building-a-module-with-an-ai-coding-agent).
 
 [Create your first module](MODULE_QUICKSTART.md) ·
 [Explore the module API](MODULES_GUIDE.md) ·
@@ -726,24 +731,29 @@ application-level rate limiting on the login, AI and vision endpoints.
 
 ---
 
-## Alpha Release v0.11.0
+## Alpha Release v0.12.0
 
-Inventari 0.11.0 is an **alpha** release so that people can get to know the
-product. The weeks after release go to technical debt rather than new
-features. The three debts named for them were paid before the release, so
-0.11.0 ships them as its contract: every collection is a page
-(`items`, `total`, `limit`, `offset`, `has_more`, or `next_cursor` on the
-cursor feeds, with the deliberate exceptions marked beside their routes),
-business refusals carry machine-readable codes, and API keys have their own
-header, permissions per key and permission-bound scopes. These three are
-stable from 0.11.0. The rest of the REST API is **experimental** in 0.11: its
-routes and bodies still follow the screens they serve. Contract DTOs, stable
-`core_api` namespaces, the module manifest and the webhook envelope have
-compatibility guards and are the surfaces to build on.
+Inventari 0.12.0 is an **alpha** release so that people can get to know the
+product. Three parts of the REST API have been stable since 0.11.0, each with
+a guard: every collection is a page (`items`, `total`, `limit`, `offset`,
+`has_more`, or `next_cursor` on the cursor feeds, with the deliberate
+exceptions marked beside their routes), business refusals carry
+machine-readable codes, and API keys have their own header, permissions per
+key and permission-bound scopes. The rest of the REST API is **experimental**
+in 0.x: its routes and bodies still follow the screens they serve. Contract
+DTOs, stable `core_api` namespaces, the module manifest and the webhook
+envelope have compatibility guards and are the surfaces to build on.
 The [compatibility policy](docs/subsystems/CONTRACTS_STABILITY.md) lists every
 public surface, its class and the promise that class makes; the
 [error-response contract](docs/api/ERRORS.md) is the one page a client needs
-for the `detail` envelope and its codes.
+for the `detail` envelope and its codes. What 0.12.0 changes, and what an
+installation of 0.11.0 has to do about it, is in the
+[changelog](CHANGELOG.md#v0120---2026-11-09).
+
+**Release rhythm:** a minor release every two weeks, on a Monday. A breaking
+change ships only in a minor release and is marked **Breaking** in the
+changelog with what to do about it; a patch release comes only for a security
+fix, data loss or an upgrade that breaks.
 
 **Production use:** suitable for small teams willing to accept occasional
 breaking changes between alpha releases. For enterprise use, wait for v1.0.

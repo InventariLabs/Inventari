@@ -118,7 +118,7 @@ export function PrintLayoutSelector() {
             {t("profile.issuerEmpty")}{" "}
             <Link
               to="/settings"
-              className="font-semibold text-primary-600 hover:underline"
+              className="font-semibold text-on-primary hover:underline"
             >
               {t("profile.issuerEmptyLink")}
             </Link>

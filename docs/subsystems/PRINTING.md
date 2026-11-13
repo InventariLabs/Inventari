@@ -58,8 +58,11 @@ The product label PNG and the demo sheet ask for `items:read`, the shelf label P
 read. The printers and the queue serve all of those screens, so any of their reads opens them. A job
 keeps the reads of its kind (`read_permissions`; a label another module draws keeps the read that
 module names): a new job is refused without one of them, and the job list and a retry show and
-resend a job only to a holder of one. A community module's own screen sends pool labels and shelves
-under the core reads; a label the module draws itself goes through `printing_api` under its own read.
+resend a job only to a holder of one. A pool job sent with `equipment:read` and not `items:read`
+takes only the labels assigned to the register's own records, as the pool label sheet download does:
+a product's label or a free one is refused as nothing to print. A community module's own screen
+sends pool labels and shelves under the core reads; a label the module draws itself goes through
+`printing_api` under its own read.
 
 | Env var | Description |
 |---|---|

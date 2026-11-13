@@ -11,6 +11,7 @@ their messages take. A type the catalog does not carry keeps pydantic's
 wording: an untranslated but precise sentence beats a silently dropped one.
 """
 
+from decimal import Decimal
 from typing import Any
 
 from app.i18n._types import Language
@@ -18,6 +19,7 @@ from app.i18n.service import (
     get_current_lang,
     get_error_message,
     get_plural_error_message,
+    stated_quantity,
 )
 
 #: pydantic error type → (catalog key, ctx keys the message interpolates).
@@ -52,6 +54,12 @@ _VALUE_ERROR_PREFIX = 'Value error, '
 #: and the catalogue carries the plural forms the language needs.
 _COUNTED_ERROR_TYPES = frozenset({'string_too_long', 'string_too_short'})
 
+#: Templates whose one parameter is a numeric bound pydantic hands over as a
+#: number. The sentence is read beside the screen's own numbers, so the bound
+#: takes the reader's decimal mark — a Polish reader gets "999999999,999",
+#: never the store's dot, which is a wire format, not a word.
+_BOUND_PARAM_NAMES = frozenset({'ge', 'gt', 'le', 'lt'})
+
 
 def translate_validation_error(
     error: dict[str, Any], lang: Language | None = None
@@ -82,6 +90,10 @@ def translate_validation_error(
     key, param_names = template
     ctx = error.get('ctx') or {}
     kwargs = {name: ctx[name] for name in param_names if name in ctx}
+    for name in param_names:
+        bound = kwargs.get(name)
+        if name in _BOUND_PARAM_NAMES and isinstance(bound, (int, float, Decimal)):
+            kwargs[name] = stated_quantity(Decimal(str(bound)), lang)
     if kind in _COUNTED_ERROR_TYPES and param_names and param_names[0] in kwargs:
         return get_plural_error_message(
             key, int(kwargs[param_names[0]]), lang, **kwargs

@@ -7,6 +7,7 @@ the import lint keeps out of ``app.database`` and ``app.models``; modules on
 ``TRUSTED_CORE_MODULES`` may import them directly.
 """
 
+from collections.abc import Iterable
 from typing import Any
 from uuid import UUID
 
@@ -134,6 +135,25 @@ def require_any_permission(
     setattr(_check, GUARDED_PERMISSIONS_ATTR, labels)
 
     return Depends(_check)
+
+
+def module_scopes_held(
+    user_context: UserContextDTO, module_reads: Iterable[str]
+) -> set[str]:
+    """The modules whose read, among *module_reads*, this caller holds.
+
+    A Core route that admits a module's read beside its own key names those
+    reads in one tuple; a role may hold more than one of them. Where the
+    route serves one module's records rather than a register of the whole
+    organization, it bounds the answer to the names this returns: the
+    module's read takes the module's records, never everything the Core key
+    would have served.
+    """
+    return {
+        read.partition(':')[0]
+        for read in module_reads
+        if user_context.has_permission(read)
+    }
 
 
 _SAFE_METHODS = frozenset({'GET', 'HEAD', 'OPTIONS'})

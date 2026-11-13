@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -14,12 +15,73 @@ from app.core.public_api import core_api
 from app.i18n.service import get_unit_label, stated_quantity
 
 from . import document_types as dt
-from ._line_reversals import reversible_quantity_async
+from ._line_reversals import reversible_quantities_async, reversible_quantity_async
 from .document_numbering_service import temporary_number
 from .document_query_service import get_document
 from .models import Document, DocumentLine, DocumentRelation, DocumentStatus
 
 logger = get_logger(__name__)
+
+
+async def _beyond_left(
+    db: AsyncSession,
+    org_id: UUID,
+    original_line: DocumentLine,
+    quantity: Decimal,
+    left: Decimal,
+) -> ServiceRejectionError:
+    """The refusal of a return taking *quantity* of a line that has *left* to give."""
+    unit = ''
+    if original_line.uom_id is not None:
+        uom = await core_api.uoms.get_async(db, original_line.uom_id, org_id)
+        unit = f' {get_unit_label(uom.symbol)}' if uom else ''
+    return ServiceRejectionError(
+        'document_return_quantity_exceeds_left',
+        quantity=f'{stated_quantity(quantity)}{unit}',
+        line=original_line.line_number,
+        left=f'{stated_quantity(left)}{unit}',
+        done=f'{stated_quantity(original_line.done_quantity)}{unit}',
+    )
+
+
+async def _record_the_goods_stand_in(
+    db: AsyncSession,
+    org_id: UUID,
+    original: Document,
+    orig_line: DocumentLine,
+    quantity: Decimal,
+) -> UUID | None:
+    """The record a return line takes from: the line's, or the one holding the rest.
+
+    A transfer moves the record its line names to the target shelf. A return
+    of part of it moves that same record back and leaves the rest on the
+    target shelf under a record of its own, so the line's record no longer
+    stands where the goods are, and a second return, or an undo, naming it
+    was refused as taking from the wrong shelf. When the line's record has
+    left the shelf the return takes from, the same goods are looked for
+    there: same card, batch, owner and expiry, holding enough.
+    """
+    if not dt.is_transfer(original.type) or orig_line.item_id is None:
+        return orig_line.item_id
+    shelf = original.target_location_id
+    item = await core_api.items.get_async(db, org_id, orig_line.item_id)
+    if item is None or item.template_id is None or item.location_id == shelf:
+        return orig_line.item_id
+    on_shelf = await core_api.items.list_async(
+        db, org_id, storage_location_id=shelf, template_id=item.template_id
+    )
+    holding = [
+        candidate
+        for candidate in on_shelf
+        if candidate.lot_id == item.lot_id
+        and candidate.owner_id == item.owner_id
+        and candidate.expiry_date == item.expiry_date
+        and not candidate.serial_number
+        and (candidate.quantity or Decimal('0')) >= quantity
+    ]
+    if not holding:
+        return orig_line.item_id
+    return min(holding, key=lambda c: (c.quantity or Decimal('0'), str(c.id))).id
 
 
 async def create_return(
@@ -113,21 +175,13 @@ async def create_return(
         # returned in full, or corrected away, has nothing left to send back.
         left = await reversible_quantity_async(db, org_id, orig_line)
         if return_qty > left:
-            unit = ''
-            if orig_line.uom_id is not None:
-                uom = await core_api.uoms.get_async(db, orig_line.uom_id, org_id)
-                unit = f' {get_unit_label(uom.symbol)}' if uom else ''
-            raise ServiceRejectionError(
-                'document_return_quantity_exceeds_left',
-                quantity=f'{stated_quantity(return_qty)}{unit}',
-                line=orig_line_num,
-                left=f'{stated_quantity(left)}{unit}',
-                done=f'{stated_quantity(orig_line.done_quantity)}{unit}',
-            )
+            raise await _beyond_left(db, org_id, orig_line, return_qty, left)
 
         new_line = DocumentLine(
             line_number=i,
-            item_id=orig_line.item_id,
+            item_id=await _record_the_goods_stand_in(
+                db, org_id, original, orig_line, return_qty
+            ),
             product_template_id=orig_line.product_template_id,
             name=orig_line.name,
             brand=orig_line.brand,
@@ -212,3 +266,125 @@ async def create_return(
         len(lines),
     )
     return return_doc
+
+
+def _goods(line: DocumentLine) -> tuple[object, ...]:
+    """What a return line gives back, as the edit form sends it again."""
+    return (
+        line.item_id,
+        line.product_template_id,
+        line.batch_number,
+        line.serial_number,
+    )
+
+
+def return_links(
+    lines: Sequence[DocumentLine],
+) -> list[tuple[tuple[object, ...], UUID]]:
+    """The original line each line of a return gives back, read before the lines are rewritten.
+
+    The edit form sends a draft's lines back whole, and the document writes
+    them anew; the link to the line a return gives back is not on the wire,
+    so a return saved from the form stopped counting against its original.
+    """
+    return [
+        (_goods(line), line.corrects_line_id)
+        for line in sorted(lines, key=lambda line: line.line_number)
+        if line.corrects_line_id is not None
+    ]
+
+
+def relink_return_lines(
+    links: list[tuple[tuple[object, ...], UUID]], lines: Sequence[DocumentLine]
+) -> None:
+    """Give each rewritten line the link of the old line that carried the same goods.
+
+    A line whose goods no old line carried stays without one, as a line
+    added to a return always has.
+    """
+    free = list(links)
+    for line in lines:
+        match = next(
+            (i for i, (goods, _) in enumerate(free) if goods == _goods(line)), None
+        )
+        if match is not None:
+            line.corrects_line_id = free.pop(match)[1]
+
+
+async def keep_return_within_left_async(
+    db: AsyncSession, org_id: UUID, return_doc: Document
+) -> None:
+    """Refuse a return draft whose lines give back more than their original has left.
+
+    ``create_return`` asks this line by line before it writes. A return also
+    comes about as a copy of another one, and changes in the edit form; both
+    are asked here, after the draft's lines are flushed, so the remainder
+    counts them as it counts every return not cancelled. Behind the same lock
+    as ``create_return``, so two of them cannot each read "still there".
+    """
+    taken: dict[UUID, Decimal] = {}
+    for line in return_doc.lines:
+        if line.corrects_line_id is not None:
+            taken[line.corrects_line_id] = (
+                taken.get(line.corrects_line_id, Decimal('0')) + line.quantity
+            )
+    if not taken:
+        return
+    originals = (
+        (
+            await db.execute(
+                select(DocumentLine)
+                .join(Document, Document.id == DocumentLine.document_id)
+                .where(
+                    DocumentLine.id.in_(taken),
+                    Document.organization_id == org_id,
+                )
+                .order_by(DocumentLine.line_number)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    if not originals:
+        return
+    await acquire_advisory_lock(db, f'document_return:{originals[0].document_id}')
+    left = await reversible_quantities_async(db, org_id, originals)
+    for original in originals:
+        if left[original.id] < 0:
+            raise await _beyond_left(
+                db,
+                org_id,
+                original,
+                taken[original.id],
+                left[original.id] + taken[original.id],
+            )
+
+
+async def keep_the_copy_a_return_async(
+    db: AsyncSession, org_id: UUID, copy: Document, source: Document
+) -> None:
+    """Make *copy* a return of the document *source* returns, line for line.
+
+    A copy written as an ordinary document named no receipt and took nothing
+    from what was left to return, so returns could add up past what the
+    receipt brought in. It names the same original, its lines give back the
+    lines the source's did, and it is refused when those have too little left.
+    A *source* that returns nothing is left alone.
+    """
+    returned_id = getattr(source, 'return_of_id', None)
+    if returned_id is None:
+        return
+    for copied, line in zip(copy.lines, source.lines, strict=True):
+        copied.corrects_line_id = line.corrects_line_id
+    db.add(
+        DocumentRelation(
+            source_document_id=returned_id,
+            target_document_id=copy.id,
+            relation_type='returns',
+        )
+    )
+    await db.flush()
+    await keep_return_within_left_async(db, org_id, copy)
+    # The answer is a read of the copy, so it carries the pointer a GET does.
+    copy.return_of_id = returned_id  # type: ignore[attr-defined]
+    copy.return_of_number = getattr(source, 'return_of_number', None)  # type: ignore[attr-defined]

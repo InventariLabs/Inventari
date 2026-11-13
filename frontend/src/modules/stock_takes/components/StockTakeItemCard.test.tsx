@@ -242,6 +242,41 @@ describe("StockTakeItemCard — identical records of one product", () => {
     expect(screen.getByTestId("discrepancy-reason-note")).toBeInTheDocument();
   });
 
+  // Deleting the text of that note must not take the box with it: the box
+  // unmounted on the last keystroke and the deletion could never be saved.
+  it("keeps the note box of a line with a difference while its saved note is cleared", () => {
+    render(
+      <StockTakeItemCard
+        itemId="cable-1"
+        item={undefined}
+        stockTakeItem={
+          { item_name: "USB-C Cable 1m", notes: "Dented box" } as StockTakeItem
+        }
+        counted="3"
+        savedCount={3}
+        discrepancy="missing"
+        isSaved={false}
+        isUnsaved={true}
+        isUpdatePending={false}
+        isInProgress={true}
+        blindMode={false}
+        note=""
+        awaitingRecount={false}
+        counts={[]}
+        onRequestRecount={() => {}}
+        reasonCode=""
+        reasonNote=""
+        showReasonErrors={false}
+        onReasonChange={() => {}}
+        onNoteChange={() => {}}
+        onQuantityChange={() => {}}
+        onQuantityStep={() => {}}
+        onSave={() => {}}
+      />,
+    );
+    expect(screen.getByPlaceholderText("Add a note…")).toBeInTheDocument();
+  });
+
   // Typed digit by digit, "1.34.13" is no number: the save button stays
   // disabled for it, and the box has to say why.
   it("says so when the counted quantity is not a number", () => {

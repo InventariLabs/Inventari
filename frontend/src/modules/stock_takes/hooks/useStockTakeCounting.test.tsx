@@ -561,6 +561,44 @@ describe("useStockTakeCounting", () => {
       expect(result.current.isUnsaved("item-1")).toBe(false);
     });
 
+    it("reads a note typed on a counted line as unsaved, and a cleared one too", async () => {
+      server.use(
+        http.get("/api/v1/stock-takes/:id", () =>
+          HttpResponse.json({
+            ...twoListedItems,
+            items: twoListedItems.items.map((line) =>
+              line.item_id === "item-1"
+                ? { ...line, notes: "Dented box" }
+                : line,
+            ),
+          }),
+        ),
+      );
+      const { result } = renderHook(() => useStockTakeCounting("st-1"), {
+        wrapper: createWrapper().wrapper,
+      });
+      await waitFor(() => expect(result.current.countedCount).toBe(1));
+      expect(result.current.isUnsaved("item-1")).toBe(false);
+
+      act(() => {
+        result.current.setNotes((prev) => ({ ...prev, "item-1": "" }));
+      });
+      expect(result.current.isUnsaved("item-1")).toBe(true);
+
+      act(() => {
+        result.current.setNotes((prev) => ({
+          ...prev,
+          "item-1": "Dented box",
+        }));
+      });
+      expect(result.current.isUnsaved("item-1")).toBe(false);
+
+      act(() => {
+        result.current.setNotes((prev) => ({ ...prev, "item-1": "Torn lid" }));
+      });
+      expect(result.current.isUnsaved("item-1")).toBe(true);
+    });
+
     it("holds the navigation gate until it is saved", async () => {
       const { result, unmount } = renderHook(
         () => useStockTakeCounting("st-1"),

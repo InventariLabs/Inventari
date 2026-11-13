@@ -148,6 +148,34 @@ class TestANamedApproverWithoutAccess:
             assert 'withdraw' in notices[0].content.lower()
             assert notices[0].link == QUEUE_LINK
 
+    def test_a_stage_naming_several_people_is_not_described_in_the_singular(
+        self,
+        client: TestClient,
+        db_session: Session,
+        h: ModuleTestHelper,
+        org: Organization,
+        admin: User,
+        admin_auth: dict[str, str],
+        requester: User,
+        requester_auth: dict[str, str],
+    ) -> None:
+        """Two names, one sentence: "the person it names" was still said."""
+        blind = h.create_user(org, email='blind@example.com', role='user')
+        h.grant_permissions(blind, ['approvals:write'])
+        second = h.create_user(org, email='blind-two@example.com', role='user')
+        h.grant_permissions(second, ['approvals:write'])
+        stage = _named_stage(blind)
+        stage['approver_user_ids'] = [str(blind.id), str(second.id)]
+        _create_workflow(client, admin_auth, [stage], allow_undecidable=True)
+
+        _raise_request(client, requester_auth)
+
+        for who in (requester, admin):
+            notices = _notifications(db_session, who)
+            assert len(notices) == 1, (who.email, [n.content for n in notices])
+            assert 'the person it names' not in notices[0].content
+            assert 'one of them' in notices[0].content
+
     def test_a_custom_administration_role_hears_the_way_out(
         self,
         client: TestClient,
@@ -180,6 +208,87 @@ class TestANamedApproverWithoutAccess:
             assert len(notices) == 1, (who.email, [n.content for n in notices])
             assert 'withdraw' in notices[0].content.lower()
         assert _notifications(db_session, blind) == []
+
+
+@pytest.mark.integration
+class TestARequesterNamedOnTheStage:
+    """The asker's own name is no turn: the door refuses a self-decision."""
+
+    def test_the_requester_is_told_the_way_out_not_that_it_is_their_turn(
+        self,
+        client: TestClient,
+        db_session: Session,
+        h: ModuleTestHelper,
+        org: Organization,
+        admin: User,
+        admin_auth: dict[str, str],
+        requester: User,
+        requester_auth: dict[str, str],
+    ) -> None:
+        blind = h.create_user(org, email='blind@example.com', role='user')
+        # The asker can read approvals, which is what made the old rule count
+        # their own name as a decider on the stage.
+        h.grant_permissions(requester, ['approvals:write', 'approvals:read'])
+        _create_workflow(
+            client,
+            admin_auth,
+            [
+                {
+                    'order': 1,
+                    'role': 'manager',
+                    'label': 'Peer review',
+                    'approver_user_ids': [str(requester.id), str(blind.id)],
+                }
+            ],
+        )
+
+        _raise_request(client, requester_auth)
+
+        own = _notifications(db_session, requester)
+        assert len(own) == 1, [n.content for n in own]
+        assert 'Peer review' in own[0].content
+        assert 'withdraw' in own[0].content.lower()
+        assert WAITING not in own[0].content.lower()
+
+        admin_notices = _notifications(db_session, admin)
+        assert len(admin_notices) == 1, [n.content for n in admin_notices]
+        assert 'withdraw' in admin_notices[0].content.lower()
+        assert _notifications(db_session, blind) == []
+
+    def test_a_second_decider_is_told_and_the_requester_is_not(
+        self,
+        client: TestClient,
+        db_session: Session,
+        h: ModuleTestHelper,
+        org: Organization,
+        admin: User,
+        admin_auth: dict[str, str],
+        requester: User,
+        requester_auth: dict[str, str],
+    ) -> None:
+        h.grant_permissions(requester, ['approvals:write', 'approvals:read'])
+        peer = h.create_user(org, email='peer@example.com', role='manager')
+        h.grant_permissions(peer, ['approvals:read'])
+        _create_workflow(
+            client,
+            admin_auth,
+            [
+                {
+                    'order': 1,
+                    'role': 'manager',
+                    'label': 'Peer review',
+                    'approver_user_ids': [str(requester.id), str(peer.id)],
+                }
+            ],
+        )
+
+        _raise_request(client, requester_auth)
+
+        waiting = _notifications(db_session, peer)
+        assert len(waiting) == 1
+        assert WAITING in waiting[0].content.lower()
+        assert _notifications(db_session, requester) == []
+        assert _notifications(db_session, admin) == []
 
 
 @pytest.mark.integration

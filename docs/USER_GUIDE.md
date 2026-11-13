@@ -677,9 +677,12 @@ nutrition and cost without changing the recipe.
 - **Add missing to shopping list** adds the ingredients you lack, in the
   quantity you are short of — what the recipe asks for less what the shelf
   holds — to your newest shopping list (or to a new list named after the
-  recipe). Ingredients marked *Always at Home* are left out, and ones already
-  on the list are not added again. (A "Similar" shelf match buys the whole
-  requirement: a name guess is not a deduction.)
+  recipe). Ingredients marked *Always at Home* are left out. One already on
+  the list is raised only by what the recipe needs beyond it: pressed again at
+  more servings, or with less left on the shelf, the line grows by the
+  difference, and pressed again at the same need it stays as it is. (A
+  "Similar" shelf match buys the whole requirement: a name guess is not a
+  deduction.)
 - **Take from stock** walks you through the ingredients; scan a barcode or tap
   one. **Each pick takes the stock off the shelf at once**, suggesting the
   batch that expires first. **Undo** puts one pick back, **Cancel picking**
@@ -729,7 +732,9 @@ Home* list.
 
 ### 8.5 Shopping lists
 
-**Shopping Lists → New list**, then **Add** items or take them **From recipes**.
+**Shopping Lists → New list**, then **Add** items or take them **From recipes**
+— several at once, with the shelf counted once against what they need
+together.
 
 - Ticking an item marks it **purchased** — it does **not** put anything into
   stock. Bring the shopping in as products (chapter 3) or through a receipt

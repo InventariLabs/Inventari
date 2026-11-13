@@ -26,7 +26,7 @@ export function RelatedScreens({ screens }: { screens: RelatedScreen[] }) {
         <Link
           key={to}
           to={to}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-md text-sm font-medium text-primary-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 md:min-h-0"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-md text-sm font-medium text-on-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 md:min-h-0"
         >
           <Icon size={16} aria-hidden="true" />
           {label}

@@ -38,11 +38,17 @@ export const shoppingListsApi = {
     shopping_list_id: string;
   }): Promise<{
     added_count: number;
+    /** Lines already on the list that the recipes needed more of, topped up. */
+    raised_count?: number;
+    /** Goods the recipes need that the list already asks for in full. */
+    already_listed_count?: number;
     /** Lines written that another open list still asks for too. */
     on_other_lists?: ListedElsewhere[];
   }> => {
     const response = await api.post<{
       added_count: number;
+      raised_count?: number;
+      already_listed_count?: number;
       on_other_lists?: ListedElsewhere[];
     }>("/recipes/shopping-list/add-from-recipes", data);
     return response.data;

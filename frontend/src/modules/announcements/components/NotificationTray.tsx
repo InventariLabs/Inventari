@@ -229,7 +229,7 @@ export default function NotificationTray() {
                                   setIsOpen(false);
                                   if (!n.is_read) markReadMutation.mutate(n.id);
                                 }}
-                                className="text-[10px] font-medium text-primary-600 uppercase hover:text-primary-700 underline underline-offset-4 decoration-2"
+                                className="text-[10px] font-medium text-on-primary uppercase underline underline-offset-4 decoration-2"
                               >
                                 {t("notifications.details")} →
                               </Link>

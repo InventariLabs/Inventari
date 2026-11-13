@@ -101,8 +101,13 @@ export default function RegisterPage() {
       : undefined,
   };
 
+  // The invitation can answer after the visitor has started typing (a slow
+  // connection, a cold API). Prefill only an empty address: an unconditional
+  // set replaced what they had typed with the invited one, silently.
   useEffect(() => {
-    if (invitation?.invited_email) setEmail(invitation.invited_email);
+    if (invitation?.invited_email) {
+      setEmail((current) => current || invitation.invited_email || "");
+    }
   }, [invitation?.invited_email]);
   useEffect(() => {
     if (approvedRequest?.full_name) setFullName(approvedRequest.full_name);

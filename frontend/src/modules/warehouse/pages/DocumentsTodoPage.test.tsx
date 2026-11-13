@@ -1362,6 +1362,29 @@ describe("DocumentsTodoPage", () => {
     expect(screen.queryByText("Nothing waiting")).not.toBeInTheDocument();
   });
 
+  it("adds tasks and quarantine holds into the one number the launcher shows", () => {
+    answer(
+      queue([task(), task({ key: "document:doc-2", source_id: "doc-2" })], {
+        quarantine: {
+          items: [{ lot_id: "lot-1", name: "LOT-41/26", quantity: "8" }],
+          total: 1,
+        },
+      }),
+    );
+    render(<DocumentsTodoPage />);
+
+    expect(
+      screen.getByText("Waiting in all: 3 — tasks: 2, quarantine holds: 1"),
+    ).toBeInTheDocument();
+  });
+
+  it("says no sum when only one of the two is waiting", () => {
+    answer(queue([task()]));
+    render(<DocumentsTodoPage />);
+
+    expect(screen.queryByText(/Waiting in all/)).not.toBeInTheDocument();
+  });
+
   it("offers a read-only account no quarantine action", () => {
     rights.write = false;
     answer(

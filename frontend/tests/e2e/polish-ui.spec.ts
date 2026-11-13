@@ -26,6 +26,7 @@ test.describe("Polish UI on a phone", () => {
   let token: string;
   let listId: string;
   let documentId: string;
+  let storageId: string;
   const listName = `E2E-Lista-${Date.now()}`;
 
   test.beforeAll(async ({ playwright, baseURL }) => {
@@ -46,8 +47,13 @@ test.describe("Polish UI on a phone", () => {
       unit: "pcs",
     });
 
-    // globalSetup seeds a location, so the document always has one.
-    const storageId = (await api.listStorages(token))[0].id;
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    storageId = (
+      await api.createStorage(token, {
+        name: `E2E-Polish-UI-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
     const document = await api.createDocument(token, {
       type: "INT",
       source_location_id: storageId,
@@ -64,6 +70,9 @@ test.describe("Polish UI on a phone", () => {
     if (token && documentId) {
       await api.cancelDocument(token, documentId).catch(() => {});
       await api.deleteDocument(token, documentId).catch(() => {});
+    }
+    if (token && storageId) {
+      await api.deleteStorage(token, storageId).catch(() => {});
     }
   });
 

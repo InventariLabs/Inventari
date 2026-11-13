@@ -13,14 +13,19 @@ from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    module_scopes_held,
+    require_any_permission,
     require_permission,
 )
 from app.core.exceptions import (
     AppException,
     ConflictException,
+    NotFoundException,
     refusal_exception,
 )
 from app.core.interceptors import InterceptorError
+from app.core.module_ownership import item_belongs_to_module
+from app.core.module_scope import get_context_tags_of
 from app.schemas.item import (
     Item as ItemSchema,
 )
@@ -45,6 +50,16 @@ from app.services.items._query_special import get_item_or_404_async
 
 router = APIRouter()
 
+#: The equipment register's asset card (linked from the list and from
+#: assignment history) opens a record by id through this Core read; the
+#: register's own read admits that card, archived or not. The same names bound
+#: the answer: a holder of the module's read opens the module's records only,
+#: and a product outside them is 404 — the card is one record, not a second
+#: door to the whole product list. Changing or deleting a record keeps the
+#: Core write keys.
+_MODULE_READS = ('equipment:read',)
+_READS_ONE_ITEM = require_any_permission(SystemPermission.ITEMS_READ, *_MODULE_READS)
+
 
 @router.get('/{item_id}', response_model=ItemSchema)
 async def get_item(
@@ -57,13 +72,20 @@ async def get_item(
         'asks for it; the live lists never do.',
     ),
     user_storage_ids: list[UUID] = Depends(get_user_storage_ids),
+    current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.ITEMS_READ),
+    _: object = _READS_ONE_ITEM,
 ):
     """Product details."""
-    return await get_item_or_404_async(
+    item = await get_item_or_404_async(
         db, item_id, user_storage_ids, include_archived=include_archived
     )
+    if not current_user.has_permission(SystemPermission.ITEMS_READ) and not any(
+        item_belongs_to_module(item, module, get_context_tags_of(module))
+        for module in module_scopes_held(current_user, _MODULE_READS)
+    ):
+        raise NotFoundException('item')
+    return item
 
 
 @router.put('/{item_id}', response_model=ItemSchema)

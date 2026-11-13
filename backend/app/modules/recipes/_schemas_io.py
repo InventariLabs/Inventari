@@ -83,6 +83,9 @@ class ListedElsewhere(BaseModel):
 class AddToShoppingListResponse(BaseModel):
     shopping_list_id: UUID
     added_count: int
+    #: Lines already on the list that the recipes needed more of, topped up
+    #: in place (``added_count`` counts only the lines written new).
+    raised_count: int = 0
     # Additive field: name of the list items were added to (for toasts).
     # Optional for backward compatibility with older frontends.
     list_name: str | None = None

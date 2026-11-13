@@ -2137,7 +2137,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Asset Valuation */
+        /**
+         * Asset Valuation
+         * @description One asset's purchase price and book value, for its own card.
+         *
+         *     Not held to the finance roles of the fleet total above, deliberately: the
+         *     total is the organization's finances added up, while one asset's price is
+         *     a fact on its card — the Info tab prints it from the record itself to
+         *     whoever reads the register, and the overview says a member still sees the
+         *     value of one asset on its own page. What bounds this read is the asset:
+         *     a record the register does not list is 404 here.
+         */
         get: operations["asset_valuation_api_v1_equipment__item_id__valuation_get"];
         put?: never;
         post?: never;
@@ -8452,12 +8462,14 @@ export interface paths {
          * Duplicate Document
          * @description Create a new DRAFT document as a copy of ``doc_id``.
          *
-         *     Copies type, partner, locations, notes, external_reference, a scrap's
-         *     reason, and all lines (expected_quantity, template, name/brand/barcode,
-         *     uom, batch, serial, expiry, unit_price, tax_rate). The duplicate always
-         *     starts in DRAFT with an identifier of its own — even if the source is
-         *     COMPLETED or CANCELLED — and takes a number when it is confirmed. Done
-         *     quantities are NOT copied.
+         *     Copies type, partner, locations, notes, external_reference, a scrap's or
+         *     a return's reason, and all lines (expected_quantity, template,
+         *     name/brand/barcode, uom, batch, serial, expiry, unit_price, tax_rate).
+         *     The duplicate always starts in DRAFT with an identifier of its own — even
+         *     if the source is COMPLETED or CANCELLED — and takes a number when it is
+         *     confirmed. Done quantities are NOT copied. A copy of a return is a return
+         *     of the same document and is refused when that has too little left to give
+         *     back; a correction is refused (DOCUMENT_CORRECTION_NOT_DUPLICABLE).
          */
         post: operations["duplicate_document_api_v1_warehouse_documents__doc_id__duplicate_post"];
         delete?: never;
@@ -10938,6 +10950,11 @@ export interface components {
             shopping_list_id: string;
             /** Added Count */
             added_count: number;
+            /**
+             * Raised Count
+             * @default 0
+             */
+            raised_count: number;
             /** List Name */
             list_name?: string | null;
             /**
@@ -11612,7 +11629,7 @@ export interface components {
          * AssetFilter
          * @description The asset list's filters, as the scope of a bulk action.
          *
-         *     The same five parameters ``GET /equipment/assets`` takes, so "everything
+         *     The filters ``GET /equipment/assets`` takes, so "everything
          *     that matches" means exactly what the reader is looking at.
          */
         AssetFilter: {
@@ -11626,6 +11643,8 @@ export interface components {
             status?: string | null;
             /** Checked Out */
             checked_out?: boolean;
+            /** Hide Retired */
+            hide_retired?: boolean;
         };
         /**
          * AssetTimelineEvent
@@ -15658,6 +15677,10 @@ export interface components {
             convertible: boolean;
             /** Available Uom Symbol */
             available_uom_symbol?: string | null;
+            /** To Buy */
+            to_buy?: string | null;
+            /** To Buy Uom Symbol */
+            to_buy_uom_symbol?: string | null;
         };
         /** IngredientCost */
         IngredientCost: {
@@ -15676,7 +15699,17 @@ export interface components {
             /** Price Source */
             price_source?: string | null;
         };
-        /** IngredientDefaultCreate */
+        /**
+         * IngredientDefaultCreate
+         * @description A row the form or the import writes.
+         *
+         *     The same schema validates both doors. The name is what the row is keyed
+         *     by, and the column holds 255 characters: a blank name normalizes to ''
+         *     and matches every other nameless row, while a longer one fails the
+         *     INSERT. Refusing both here keeps the write away from the database. The
+         *     response schema stays permissive, because rows written before this rule
+         *     still have to be listed.
+         */
         IngredientDefaultCreate: {
             /** Name */
             name: string;
@@ -24454,7 +24487,7 @@ export interface components {
          * @description Output for POST /production/orders/shortages/shopping-list.
          *
          *     The result of an action, not a collection: it names the list that was
-         *     touched and counts the lines added, and carries no rows to page.
+         *     touched and counts the lines added and raised, and carries no rows to page.
          */
         ShortageShoppingListResponse: {
             /** Shopping List Id */
@@ -24466,6 +24499,11 @@ export interface components {
              * @default 0
              */
             added_count: number;
+            /**
+             * Raised Count
+             * @default 0
+             */
+            raised_count: number;
         };
         /** SkuSchemaResponse */
         SkuSchemaResponse: {
@@ -30385,6 +30423,8 @@ export interface operations {
                 status?: string | null;
                 /** @description Only assets with an open EquipmentAssignment (source of truth for "checked out") */
                 checked_out?: boolean;
+                /** @description Leave out retired assets nobody holds - the fleet the dashboard counts */
+                hide_retired?: boolean;
                 /** @description Sort key for the asset list */
                 sort?: ("name" | "created_at" | "purchase_price" | "warranty_until" | "location") | null;
                 /** @description Sort direction */
@@ -34871,6 +34911,8 @@ export interface operations {
             query?: {
                 /** @description Also the products of every location below this one, at any depth, in one answer. */
                 include_inside?: boolean;
+                /** @description Leave out the records of a vertical module, the way the general lists do, so the place's count and its list agree. */
+                exclude_module_contexts?: boolean;
                 limit?: number;
                 offset?: number;
             };

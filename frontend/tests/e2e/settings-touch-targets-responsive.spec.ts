@@ -56,6 +56,25 @@ for (const screen of SCREENS) {
         timeout: 15000,
       });
 
+      // Measure at rest. A box read while an animation or a transition is
+      // still running is caught mid-way: the settings checkbox is 24px by CSS
+      // and carries `transition-all`, and a frame of its size change reads
+      // 23.88px, which Math.round prints as "24x24" and the floor rejects.
+      // Finite animations must end first; the infinite ones (spinners,
+      // skeleton pulses) never do and are skipped.
+      await page.waitForFunction(
+        () =>
+          document
+            .getAnimations()
+            .every(
+              (a) =>
+                a.playState !== "running" ||
+                a.effect?.getComputedTiming().endTime === Infinity,
+            ),
+        undefined,
+        { timeout: 5000 },
+      );
+
       const small = await page.evaluate(
         ({ floor, primarySelector, primary }) => {
           const selector =

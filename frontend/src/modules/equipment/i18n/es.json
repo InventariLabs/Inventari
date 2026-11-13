@@ -225,6 +225,8 @@
     "clear_filters": "Limpiar",
     "clear_filter": "Borrar filtro de estado",
     "clear_checked_out": "Borrar filtro de prestados",
+    "retired_hidden": "Retirados ocultos",
+    "show_retired": "Mostrar equipos retirados",
     "empty_filtered": "Ningún activo coincide con los filtros activos",
     "empty_filtered_status": "Ningún activo con estado {{status}}",
     "empty_filtered_checked_out": "Ningún activo está prestado",

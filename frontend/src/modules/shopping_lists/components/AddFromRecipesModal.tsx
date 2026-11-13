@@ -61,12 +61,22 @@ export default function AddFromRecipesModal({
         recipe_ids: Array.from(selected),
         shopping_list_id: listId,
       });
-      toast.success(
-        t("addFromRecipes.success", {
-          count: result.added_count,
-          defaultValue: `Added ${result.added_count} ingredients`,
-        }),
-      );
+      // A line topped up counts as written: the list changed by it.
+      const written = result.added_count + (result.raised_count ?? 0);
+      const listed = result.already_listed_count ?? 0;
+      if (written === 0 && listed > 0) {
+        // Nothing added because the list asks for it all already, as the
+        // recipe screen says: "Added 0 ingredients" read as "nothing was
+        // missing" or as a failure.
+        toast.info(t("addFromRecipes.alreadyListed"));
+      } else {
+        toast.success(
+          t("addFromRecipes.success", {
+            count: written,
+            defaultValue: `Added ${written} ingredients`,
+          }),
+        );
+      }
       // The same goods may already stand on another open list.
       const overlap = onOtherListsMessage(t, result.on_other_lists);
       if (overlap) toast.warning(overlap);

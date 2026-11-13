@@ -157,6 +157,14 @@ export default defineConfig({
     port: 5173,
     host: "0.0.0.0",
     allowedHosts: true,
+    // An E2E run sets this (`make test-e2e` restarts the dev server with it).
+    // Vite watches the mounted tree and broadcasts a full reload to every page
+    // when a file it cannot hot-update changes (an i18n JSON, main.tsx) — a
+    // checkout, a rebase or a commit hook stashing files is enough, and a page
+    // reloaded between two actions of a spec fails it at random. Without the
+    // HMR channel the pages are never told; the watcher stays on, so the next
+    // page load still serves the file as it is on disk.
+    hmr: process.env.VITE_DISABLE_HMR === "1" ? false : undefined,
     proxy: {
       "/api": {
         target: process.env.VITE_BACKEND_TARGET || "http://backend:8000",

@@ -3,7 +3,7 @@
   "info": {
     "title": "Inventari API",
     "description": "Home Inventory Management API",
-    "version": "0.11.0"
+    "version": "0.12.0"
   },
   "paths": {
     "/": {
@@ -3657,6 +3657,18 @@
             "description": "Only assets with an open EquipmentAssignment (source of truth for \"checked out\")"
           },
           {
+            "name": "hide_retired",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out retired assets nobody holds - the fleet the dashboard counts",
+              "default": false,
+              "title": "Hide Retired"
+            },
+            "description": "Leave out retired assets nobody holds - the fleet the dashboard counts"
+          },
+          {
             "name": "sort",
             "in": "query",
             "required": false,
@@ -6959,6 +6971,7 @@
           "Equipment"
         ],
         "summary": "Asset Valuation",
+        "description": "One asset's purchase price and book value, for its own card.\n\nNot held to the finance roles of the fleet total above, deliberately: the\ntotal is the organization's finances added up, while one asset's price is\na fact on its card \u2014 the Info tab prints it from the record itself to\nwhoever reads the register, and the overview says a member still sees the\nvalue of one asset on its own page. What bounds this read is the asset:\na record the register does not list is 404 here.",
         "operationId": "asset_valuation_api_v1_equipment__item_id__valuation_get",
         "security": [
           {
@@ -12703,6 +12716,18 @@
               "title": "Include Inside"
             },
             "description": "Also the products of every location below this one, at any depth, in one answer."
+          },
+          {
+            "name": "exclude_module_contexts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out the records of a vertical module, the way the general lists do, so the place's count and its list agree.",
+              "default": false,
+              "title": "Exclude Module Contexts"
+            },
+            "description": "Leave out the records of a vertical module, the way the general lists do, so the place's count and its list agree."
           },
           {
             "name": "limit",
@@ -31770,7 +31795,7 @@
           "Warehouse"
         ],
         "summary": "Duplicate Document",
-        "description": "Create a new DRAFT document as a copy of ``doc_id``.\n\nCopies type, partner, locations, notes, external_reference, a scrap's\nreason, and all lines (expected_quantity, template, name/brand/barcode,\nuom, batch, serial, expiry, unit_price, tax_rate). The duplicate always\nstarts in DRAFT with an identifier of its own \u2014 even if the source is\nCOMPLETED or CANCELLED \u2014 and takes a number when it is confirmed. Done\nquantities are NOT copied.",
+        "description": "Create a new DRAFT document as a copy of ``doc_id``.\n\nCopies type, partner, locations, notes, external_reference, a scrap's or\na return's reason, and all lines (expected_quantity, template,\nname/brand/barcode, uom, batch, serial, expiry, unit_price, tax_rate).\nThe duplicate always starts in DRAFT with an identifier of its own \u2014 even\nif the source is COMPLETED or CANCELLED \u2014 and takes a number when it is\nconfirmed. Done quantities are NOT copied. A copy of a return is a return\nof the same document and is refused when that has too little left to give\nback; a correction is refused (DOCUMENT_CORRECTION_NOT_DUPLICABLE).",
         "operationId": "duplicate_document_api_v1_warehouse_documents__doc_id__duplicate_post",
         "security": [
           {
@@ -40468,6 +40493,11 @@
             "type": "integer",
             "title": "Added Count"
           },
+          "raised_count": {
+            "type": "integer",
+            "title": "Raised Count",
+            "default": 0
+          },
           "list_name": {
             "anyOf": [
               {
@@ -42316,11 +42346,16 @@
             "type": "boolean",
             "title": "Checked Out",
             "default": false
+          },
+          "hide_retired": {
+            "type": "boolean",
+            "title": "Hide Retired",
+            "default": false
           }
         },
         "type": "object",
         "title": "AssetFilter",
-        "description": "The asset list's filters, as the scope of a bulk action.\n\nThe same five parameters ``GET /equipment/assets`` takes, so \"everything\nthat matches\" means exactly what the reader is looking at."
+        "description": "The asset list's filters, as the scope of a bulk action.\n\nThe filters ``GET /equipment/assets`` takes, so \"everything\nthat matches\" means exactly what the reader is looking at."
       },
       "AssetTimelineEvent": {
         "properties": {
@@ -54242,6 +54277,29 @@
               }
             ],
             "title": "Available Uom Symbol"
+          },
+          "to_buy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Buy"
+          },
+          "to_buy_uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Buy Uom Symbol"
           }
         },
         "type": "object",
@@ -54327,6 +54385,8 @@
         "properties": {
           "name": {
             "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
             "title": "Name"
           },
           "lang": {
@@ -54442,7 +54502,8 @@
           "name",
           "calories_kcal"
         ],
-        "title": "IngredientDefaultCreate"
+        "title": "IngredientDefaultCreate",
+        "description": "A row the form or the import writes.\n\nThe same schema validates both doors. The name is what the row is keyed\nby, and the column holds 255 characters: a blank name normalizes to ''\nand matches every other nameless row, while a longer one fails the\nINSERT. Refusing both here keeps the write away from the database. The\nresponse schema stays permissive, because rows written before this rule\nstill have to be listed."
       },
       "IngredientDefaultLookupResponse": {
         "properties": {
@@ -78623,11 +78684,16 @@
             "type": "integer",
             "title": "Added Count",
             "default": 0
+          },
+          "raised_count": {
+            "type": "integer",
+            "title": "Raised Count",
+            "default": 0
           }
         },
         "type": "object",
         "title": "ShortageShoppingListResponse",
-        "description": "Output for POST /production/orders/shortages/shopping-list.\n\nThe result of an action, not a collection: it names the list that was\ntouched and counts the lines added, and carries no rows to page."
+        "description": "Output for POST /production/orders/shortages/shopping-list.\n\nThe result of an action, not a collection: it names the list that was\ntouched and counts the lines added and raised, and carries no rows to page."
       },
       "SkuSchemaResponse": {
         "properties": {

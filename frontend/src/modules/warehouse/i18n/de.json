@@ -250,6 +250,9 @@
     "postNowApprovalTitle": "Beleg zur Genehmigung senden?",
     "postNowMessage": "Das bestätigt den Beleg und bucht die Bestandsbewegung sofort. Stimmt etwas nicht, lässt er sich gleich danach rückgängig machen oder später korrigieren. Fortfahren?",
     "postNowApprovalMessage": "Dadurch wird der Beleg bestätigt und zur Genehmigung gesendet. Nach der Genehmigung wird er ohne weiteren Schritt gebucht. Fortfahren?",
+    "postNowMessageDeadEndNamed": "Der Beleg geht zur Genehmigung, aber niemand könnte sie entscheiden: Die Stufe „{{stage}}“ nennt Personen ohne Zugriff auf Genehmigungen. Er wartet dort, bis die Anfrage zurückgezogen wird oder diese Personen Zugriff erhalten. Fortfahren?",
+    "postNowMessageDeadEndNoApprover": "Der Beleg geht zur Genehmigung, aber niemand könnte sie entscheiden: Die Stufe „{{stage}}“ steht allen mit dem Genehmigungsrecht offen, und niemand in dieser Organisation hat es. Er wartet dort, bis die Anfrage zurückgezogen wird oder jemand das Recht erhält. Fortfahren?",
+    "postNowMessageDeadEndOnlyYou": "Der Beleg geht zur Genehmigung, aber niemand könnte sie entscheiden: Die einzige Person, die auf der Stufe „{{stage}}“ genehmigen kann, sind Sie, und wer eine Anfrage stellt, kann sie nicht selbst entscheiden. Er wartet dort, bis die Anfrage zurückgezogen wird oder jemand anderes das Recht erhält. Fortfahren?",
     "postNowConfirm": "Buchen",
     "postNowApprovalConfirm": "Zur Genehmigung senden",
     "postNowKeep": "Als Entwurf behalten",
@@ -1615,6 +1618,7 @@
     "markDone": "Als erledigt markieren: {{task}}",
     "deleteTask": "Aufgabe löschen: {{task}}",
     "showing": "{{shown}} von {{total}} angezeigt",
+    "waitingSum": "Insgesamt offen: {{total}} — Aufgaben: {{tasks}}, Quarantänebestände: {{holds}}",
     "showMore": "Mehr anzeigen",
     "filter": {
       "label": "Aufgaben anzeigen",

@@ -250,6 +250,9 @@
     "postNowApprovalTitle": "Enviar o documento para aprovação?",
     "postNowMessage": "Isto confirma o documento e lança agora a sua movimentação de estoque. Se algo estiver errado, desfaça logo em seguida — ou corrija depois. Continuar?",
     "postNowApprovalMessage": "Isto confirma o documento e o envia para a fila de aprovação. Depois de aprovado, ele é lançado sem outra etapa. Continuar?",
+    "postNowMessageDeadEndNamed": "O documento segue para aprovação, mas ninguém poderia decidir: a etapa “{{stage}}” indica aprovadores que não conseguem ver aprovações. Ele espera lá até que a solicitação seja retirada ou essas pessoas recebam acesso. Continuar?",
+    "postNowMessageDeadEndNoApprover": "O documento segue para aprovação, mas ninguém poderia decidir: a etapa “{{stage}}” está aberta a qualquer pessoa com a permissão de aprovar, e ninguém nesta organização a possui. Ele espera lá até que a solicitação seja retirada ou alguém receba a permissão. Continuar?",
+    "postNowMessageDeadEndOnlyYou": "O documento segue para aprovação, mas ninguém poderia decidir: a única pessoa que pode aprovar na etapa “{{stage}}” é você, e quem solicita não pode decidir a própria solicitação. Ele espera lá até que a solicitação seja retirada ou outra pessoa receba a permissão. Continuar?",
     "postNowConfirm": "Lançar",
     "postNowApprovalConfirm": "Enviar para aprovação",
     "postNowKeep": "Manter como rascunho",
@@ -1574,6 +1577,7 @@
     "markDone": "Marcar como concluída: {{task}}",
     "deleteTask": "Excluir tarefa: {{task}}",
     "showing": "Mostrando {{shown}} de {{total}}",
+    "waitingSum": "Ao todo à espera: {{total}} — tarefas: {{tasks}}, retenções em quarentena: {{holds}}",
     "showMore": "Mostrar mais",
     "filter": {
       "label": "Mostrar tarefas",

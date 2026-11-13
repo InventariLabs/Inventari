@@ -234,8 +234,13 @@ async def list_items_in_location_async(
     include_inside: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    claimed_tags: set[str] | None = None,
 ) -> list[Item]:
     """List non-deleted items in *storage_id* ordered by expiry ascending.
+
+    ``claimed_tags`` leaves out the records of a module, the way the general
+    screens do when the organization hides module data, so the list and the
+    count of the same place read one set of records.
 
     With ``include_inside`` the places standing below *storage_id*, at any
     depth, are read in the same statement: one ask for the subtree instead of
@@ -256,6 +261,10 @@ async def list_items_in_location_async(
         where.append(in_ids(Item.storage_location_id, scope_ids))
     else:
         where.append(Item.storage_location_id == storage_id)
+    if claimed_tags:
+        from app.core.module_ownership import unclaimed_by_a_module
+
+        where.append(unclaimed_by_a_module(claimed_tags))
     result = await db.scalars(
         select(Item)
         .options(joinedload(Item.category), joinedload(Item.uom))
@@ -268,21 +277,35 @@ async def list_items_in_location_async(
 
 
 async def count_items_in_location_async(
-    db: AsyncSession, organization_id: UUID, storage_id: UUID
+    db: AsyncSession,
+    organization_id: UUID,
+    storage_id: UUID,
+    *,
+    claimed_tags: set[str] | None = None,
 ) -> int:
-    """Count non-deleted items in *storage_id*."""
-    result = await db.scalar(
-        select(func.count(Item.id)).where(
-            Item.organization_id == organization_id,
-            Item.storage_location_id == storage_id,
-            Item.is_deleted.is_(False),
-        )
+    """Count non-deleted items in *storage_id*.
+
+    With ``claimed_tags`` only the records the general list shows are counted
+    (see :func:`list_items_in_location_async`).
+    """
+    stmt = select(func.count(Item.id)).where(
+        Item.organization_id == organization_id,
+        Item.storage_location_id == storage_id,
+        Item.is_deleted.is_(False),
     )
-    return result or 0
+    if claimed_tags:
+        from app.core.module_ownership import unclaimed_by_a_module
+
+        stmt = stmt.where(unclaimed_by_a_module(claimed_tags))
+    return await db.scalar(stmt) or 0
 
 
 async def count_items_in_subtree_async(
-    db: AsyncSession, organization_id: UUID, storage_id: UUID
+    db: AsyncSession,
+    organization_id: UUID,
+    storage_id: UUID,
+    *,
+    claimed_tags: set[str] | None = None,
 ) -> int:
     """Count non-deleted items in *storage_id* and all its descendants.
 
@@ -292,7 +315,9 @@ async def count_items_in_subtree_async(
     scope_ids = [storage_id] + await descendant_ids_async(
         db, organization_id, storage_id
     )
-    counts = await item_counts_by_location_async(db, organization_id, scope_ids)
+    counts = await item_counts_by_location_async(
+        db, organization_id, scope_ids, claimed_tags=claimed_tags
+    )
     return sum(counts.values())
 
 

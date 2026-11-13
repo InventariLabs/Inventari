@@ -141,7 +141,7 @@ export function StockMovesTable({
                   {move.lot_id && move.lot_name ? (
                     <Link
                       to={`/inventory/lots/${move.lot_id}`}
-                      className="text-primary-600 hover:text-primary-700 hover:underline"
+                      className="text-on-primary hover:underline"
                     >
                       {move.lot_name}
                     </Link>

@@ -467,7 +467,7 @@ const TreeRow = memo(function TreeRow({
         />
         <span
           className="shrink-0 rounded-md bg-surface-inset px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-on-secondary"
-          title={t("counts.inSublocations", {
+          title={t("counts.recordsInside", {
             count: node.subtree_items_count,
           })}
         >

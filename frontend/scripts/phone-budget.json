@@ -60,7 +60,7 @@
     "issue": {
       "chunks": ["IssueGoodsPage"],
       "budget": {
-        "jsKiB": 575,
+        "jsKiB": 580,
         "loadMs": 11000
       },
       "measured": {

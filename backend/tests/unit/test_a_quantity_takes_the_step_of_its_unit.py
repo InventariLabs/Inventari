@@ -88,5 +88,25 @@ class TestARequirementTakesTheNextStepUp:
         assert round_up_to_uom(Decimal('3'), _uom('1')) == Decimal('3')
         assert round_up_to_uom(Decimal('2.5'), _uom('0.5')) == Decimal('2.5')
 
+    def test_an_exact_multiple_reached_through_a_quotient_stays_on_its_step(
+        self,
+    ) -> None:
+        # A three-serving recipe cooked for five asks each line for 5/3 of
+        # itself, and the multiplier keeps 28 significant digits: three eggs
+        # times it lands a few units in the last place above five, and the
+        # requirement was rounded up to six. Real quantities are a thousandth
+        # of a step apart at the very least, so this band holds nothing.
+        eggs = _uom('1')
+        scaled = Decimal('3') * (Decimal('5') / Decimal('3'))
+        assert scaled > Decimal('5')
+
+        assert round_up_to_uom(scaled, eggs) == Decimal('5')
+
     def test_nothing_needed_stays_nothing(self) -> None:
         assert round_up_to_uom(Decimal('0'), _uom('1')) == Decimal('0')
+
+    def test_a_part_of_a_step_stays_a_step_however_small(self) -> None:
+        # The band that reads a quotient's last-place noise as "on the step"
+        # must not swallow a requirement that is genuinely below one step:
+        # needing a trillionth of a piece is still needing the piece.
+        assert round_up_to_uom(Decimal('0.0000000000001'), _uom('1')) == Decimal('1')

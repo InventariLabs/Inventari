@@ -7,7 +7,7 @@ other modules import the singleton directly.
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from sqlalchemy import select
@@ -17,6 +17,7 @@ from app.core.contracts import (
     ShoppingListDTO,
     ShoppingListItemCreateDTO,
     ShoppingListItemDTO,
+    UomDTO,
 )
 from app.i18n import Language
 from app.i18n.service import get_current_lang, get_error_message
@@ -36,6 +37,67 @@ async def _require_module_enabled(db: AsyncSession, org_id: UUID) -> None:
         raise PermissionError(
             get_error_message('shopping_lists_module_disabled', get_current_lang())
         )
+
+
+def _stored_quantity(quantity: Decimal) -> Decimal:
+    """The value a line stores for *quantity*, or the keyed refusal.
+
+    The one guard every door of this API writes a quantity through: the
+    column is numeric(12, 3), so the value is quantized first, a zero is
+    refused with the same key as the CRUD door's, and a value past what the
+    column holds answers with a sentence instead of the driver's overflow.
+    """
+    from app.core.exceptions import ServiceRejectionError
+    from app.i18n.service import stated_quantity
+    from app.schemas.validators import QUANTITY_MAX, QUANTITY_STEP, quantize_quantity
+
+    stored = quantize_quantity(quantity)
+    if stored is None or stored <= 0:
+        raise ServiceRejectionError(
+            'shopping_list_item_quantity_rounds_to_zero',
+            quantity=stated_quantity(stored if stored is not None else quantity),
+            smallest=stated_quantity(QUANTITY_STEP),
+        )
+    if stored > QUANTITY_MAX:
+        raise ServiceRejectionError(
+            'shopping_list_item_quantity_above_ceiling',
+            quantity=stated_quantity(stored),
+            ceiling=stated_quantity(QUANTITY_MAX),
+        )
+    return Decimal(stored)
+
+
+async def _cover_async(
+    db: AsyncSession,
+    need: ShoppingListItemCreateDTO,
+    lines: list[ShoppingListItemDTO],
+    org_id: UUID,
+) -> Decimal:
+    """What *lines* ask for, stated in *need*'s unit.
+
+    A line in the need's unit counts as it stands, and one in another unit of
+    the same measure counts converted: 500 g of plums is half a kilogram, not
+    500 of them. A line whose unit does not convert into the need's (pieces
+    against kilograms, or a unit named on one side only) says nothing about
+    how much of the need it covers, so it counts for nothing.
+    """
+    from app.core.public_api import core_api
+
+    cover = Decimal(0)
+    units: dict[UUID, UomDTO | None] = {}
+    for line in lines:
+        if line.uom_id == need.uom_id:
+            cover += line.quantity
+        elif line.uom_id is not None and need.uom_id is not None:
+            for uom_id in (line.uom_id, need.uom_id):
+                if uom_id not in units:
+                    units[uom_id] = await core_api.uoms.get_async(db, uom_id, org_id)
+            converted, comparable = core_api.uoms.convert_quantity(
+                line.quantity, units[line.uom_id], units[need.uom_id]
+            )
+            if comparable:
+                cover += converted
+    return cover
 
 
 class ShoppingListsAPI:
@@ -132,13 +194,7 @@ class ShoppingListsAPI:
         ``db.refresh(item, ['category'])`` answered only the relationship.
         """
         from app.core.exceptions import ServiceRejectionError
-        from app.i18n.service import stated_quantity
         from app.modules.shopping_lists.models import ShoppingListItem
-        from app.schemas.validators import (
-            QUANTITY_MAX,
-            QUANTITY_STEP,
-            quantize_quantity,
-        )
 
         await self._own_list_or_404_async(db, list_id, org_id)
         await _require_module_enabled(db, org_id)
@@ -192,28 +248,8 @@ class ShoppingListsAPI:
                 )
 
         # The twin of _item_crud's zero refusal — same key, same answer,
-        # held at the door this CRUD path never sees. The ceiling rides
-        # here for the same reason: the column is numeric(12, 3), and a
-        # quantity past what it stores would answer with the driver's
-        # overflow instead of a sentence.
-        stored_quantities: list[Decimal] = []
-        for item_in in items:
-            stored = quantize_quantity(item_in.quantity)
-            if stored is None or stored <= 0:
-                raise ServiceRejectionError(
-                    'shopping_list_item_quantity_rounds_to_zero',
-                    quantity=stated_quantity(
-                        stored if stored is not None else item_in.quantity
-                    ),
-                    smallest=stated_quantity(QUANTITY_STEP),
-                )
-            if stored > QUANTITY_MAX:
-                raise ServiceRejectionError(
-                    'shopping_list_item_quantity_above_ceiling',
-                    quantity=stated_quantity(stored),
-                    ceiling=stated_quantity(QUANTITY_MAX),
-                )
-            stored_quantities.append(stored)
+        # held at the door this CRUD path never sees.
+        stored_quantities = [_stored_quantity(item_in.quantity) for item_in in items]
 
         created_items = []
         for item_in, stored in zip(items, stored_quantities, strict=True):
@@ -245,41 +281,29 @@ class ShoppingListsAPI:
         item_id: UUID,
         quantity: Decimal,
         org_id: UUID,
-    ) -> None:
+        *,
+        notes: str | None = None,
+        note_data: dict[str, Any] | None = None,
+    ) -> bool:
         """Async: raise an open line of a list of *org_id* to *quantity*.
 
         For a caller that keeps a line in step with a need that grew (the
-        meal plan's refresh). A line already ticked off is bought and is
-        left alone, and a quantity at or below the line's own is not a
-        raise — the line is never lowered. The same door guards as
-        ``add_items_async``: the stored value is quantized and a zero or an
-        overflow is refused with the same keys.
+        meal plan's refresh, a production run's shortage). A line already
+        ticked off is bought and is left alone, and a quantity at or below
+        the line's own is not a raise — the line is never lowered. The same
+        door guard as ``add_items_async``: the stored value is quantized and
+        a zero or an overflow is refused with the same keys.
+
+        ``notes`` and ``note_data`` replace the line's own when given: they
+        describe the need the line was made from, which is no longer the
+        quantity it now asks for. Returns whether the line was raised.
         """
-        from app.core.exceptions import ServiceRejectionError
-        from app.i18n.service import stated_quantity
         from app.modules.shopping_lists.models import ShoppingListItem
-        from app.schemas.validators import (
-            QUANTITY_MAX,
-            QUANTITY_STEP,
-            quantize_quantity,
-        )
 
         await self._own_list_or_404_async(db, list_id, org_id)
         await _require_module_enabled(db, org_id)
 
-        stored = quantize_quantity(quantity)
-        if stored is None or stored <= 0:
-            raise ServiceRejectionError(
-                'shopping_list_item_quantity_rounds_to_zero',
-                quantity=stated_quantity(stored if stored is not None else quantity),
-                smallest=stated_quantity(QUANTITY_STEP),
-            )
-        if stored > QUANTITY_MAX:
-            raise ServiceRejectionError(
-                'shopping_list_item_quantity_above_ceiling',
-                quantity=stated_quantity(stored),
-                ceiling=stated_quantity(QUANTITY_MAX),
-            )
+        stored = _stored_quantity(quantity)
         item = await db.scalar(
             select(ShoppingListItem)
             .where(
@@ -289,9 +313,75 @@ class ShoppingListsAPI:
             )
             .with_for_update(of=ShoppingListItem)
         )
-        if item is not None and stored > item.quantity:
-            item.quantity = stored
-            await db.flush()
+        if item is None or stored <= item.quantity:
+            return False
+        item.quantity = stored
+        if notes is not None:
+            item.notes = notes
+        if note_data is not None:
+            item.note_data = note_data
+        await db.flush()
+        return True
+
+    async def top_up_async(
+        self,
+        db: AsyncSession,
+        list_id: UUID,
+        need: ShoppingListItemCreateDTO,
+        lines: list[ShoppingListItemDTO],
+        org_id: UUID,
+    ) -> ShoppingListItemCreateDTO | None:
+        """Async: make a list ask for *need* in total, given the *lines* it has.
+
+        *lines* are the list's lines for the same goods (bought ones too);
+        what the list asks for is their sum in *need*'s unit — a line in
+        another unit counts converted, or not at all when its unit does not
+        convert (``_cover_async``). A bought line counts as cover:
+        nothing links a bought line to stock, so there is no telling whether
+        the goods were put on the shelf, and counting them once is the safe
+        side. When *need* exceeds the sum, the open line the same source
+        wrote in *need*'s unit is raised by the difference (and takes
+        *need*'s notes, which describe the quantity it now asks for), or a
+        new line is written when there is none. Nothing is written when the
+        list already covers the need — a line is never lowered. Returns the
+        line as it now stands, or None when nothing changed.
+        """
+        from app.core.public_api import core_api
+
+        # Up to the store's step: a converted line leaves a remainder finer
+        # than the column keeps, and the nearest step could ask for less than
+        # the need, or for a zero the door refuses.
+        shortfall = core_api.uoms.round_up(
+            need.quantity - await _cover_async(db, need, lines, org_id), None
+        )
+        if shortfall <= 0:
+            return None
+        open_line = next(
+            (
+                line
+                for line in lines
+                if not line.is_purchased
+                and line.source == need.source
+                and line.uom_id == need.uom_id
+            ),
+            None,
+        )
+        if open_line is None:
+            written = need.model_copy(update={'quantity': shortfall})
+            await self.add_items_async(db, list_id, [written], org_id)
+            return written
+        raised = open_line.quantity + shortfall
+        if not await self.raise_item_quantity_async(
+            db,
+            list_id,
+            open_line.id,
+            raised,
+            org_id,
+            notes=need.notes,
+            note_data=need.note_data,
+        ):
+            return None
+        return need.model_copy(update={'quantity': raised})
 
     async def _own_list_or_404_async(
         self, db: AsyncSession, list_id: UUID, org_id: UUID

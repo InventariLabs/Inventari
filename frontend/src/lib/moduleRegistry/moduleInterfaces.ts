@@ -586,6 +586,9 @@ export interface FrontendModule {
    * React hook returning action items for the launcher feed ("Things to do").
    * Called inside a React component context (may use useQuery, useState, etc.).
    * Must handle loading/error states internally — return empty array while loading.
+   * Called for every enabled module whatever the role may read: ask the
+   * endpoint only when the role holds the read it guards (`useHasPermission`),
+   * and return an empty array otherwise.
    */
   useActionItems?: () => ActionItem[];
 
@@ -605,6 +608,15 @@ export interface FrontendModule {
     labelKey: string;
     failed?: boolean;
   } | null;
+
+  /**
+   * The read the badge's endpoint asks for (`"equipment:read"`). The launcher
+   * shows the tile of every enabled module, whatever the signed-in role may
+   * read, and calls `useStatusBadge` only for a role holding this key: for
+   * any other role the endpoint would refuse, and the tile would say its
+   * status could not be read. Omitted, the badge is asked of every role.
+   */
+  statusBadgePermission?: string;
 
   /**
    * Search provider for the command palette.

@@ -20,7 +20,9 @@ import { isSpiceQuantity } from "../utils";
 import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
 
 /**
- * The backend's `needs_buying` predicate, mirrored.
+ * Whether the list behind the button buys this ingredient for this recipe
+ * alone: the backend adds a line exactly when the recipe asks for more than
+ * the shelf covers, and these are the statuses that say so.
  *
  * The button and the list behind it answer one question, so they read one
  * set of statuses. "Not enough" belongs on this side of the line: a short
@@ -86,7 +88,9 @@ export default function RecipeAvailabilityChecker({
       });
       // Nothing added because it is all on the list already: "Added 0
       // items" read as "nothing was missing" or as a failure.
-      if (result.added_count === 0 && (result.already_listed_count ?? 0) > 0) {
+      // A line topped up counts as written: the list changed by it.
+      const written = result.added_count + (result.raised_count ?? 0);
+      if (written === 0 && (result.already_listed_count ?? 0) > 0) {
         toast.info(
           t("shopping.already_listed_toast", {
             count: result.already_listed_count,
@@ -98,11 +102,11 @@ export default function RecipeAvailabilityChecker({
       toast.success(
         result.list_name
           ? t("shopping.added_toast", {
-              count: result.added_count,
+              count: written,
               list: result.list_name,
             })
           : t("shopping.added_toast_no_list", {
-              count: result.added_count,
+              count: written,
             }),
       );
       // The same goods may already stand on another open list.

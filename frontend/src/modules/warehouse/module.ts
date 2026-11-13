@@ -82,6 +82,7 @@ moduleRegistry.register({
     linkTo: "/warehouse/todo",
   },
   useStatusBadge: useDocumentsStatusBadge,
+  statusBadgePermission: "warehouse:read",
   routes: [
     // The list this module used to open on now lives in History; the old
     // address keeps working for bookmarks, query string included.

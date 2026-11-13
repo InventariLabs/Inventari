@@ -100,6 +100,13 @@ def cannot_be_decided_reason(
         ):
             return ONLY_THE_REQUESTER_CAN_DECIDE
         return None
+    # The door refuses a self-decision, so the requester's own name on a stage
+    # is no authority unless the organization opted in. A stage naming only
+    # the requester is not judged here: it is skipped before it is ever held.
+    if requester_id is not None and not requester_may_decide_own:
+        others = [user_id for user_id in named if user_id != requester_id]
+        if others:
+            named = others
     if any(user_id in deciders for user_id in named):
         return None
     return NAMED_APPROVERS_CANNOT_DECIDE

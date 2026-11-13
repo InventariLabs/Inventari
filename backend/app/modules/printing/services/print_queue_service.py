@@ -180,14 +180,17 @@ async def _pool_entries_async(
     organization_id: UUID,
     label_ids: list[UUID],
     short_codes: list[str],
+    module_scopes: frozenset[str] | None,
 ) -> list[dict[str, Any]]:
     if label_ids:
-        found = await core_api.labels.list_in_ids_async(db, label_ids, organization_id)
+        found = await core_api.labels.list_in_ids_async(
+            db, label_ids, organization_id, module_scopes=module_scopes
+        )
         by_key = {lbl.id: lbl for lbl in found}
         ordered = [by_key[i] for i in label_ids if i in by_key]
     else:
         found = await core_api.labels.list_by_short_codes_async(
-            db, short_codes, organization_id
+            db, short_codes, organization_id, module_scopes=module_scopes
         )
         by_code = {lbl.short_code: lbl for lbl in found}
         ordered = [by_code[c] for c in short_codes if c in by_code]
@@ -432,6 +435,7 @@ async def queue_job_async(
     user_id: UUID | None,
     *,
     read_permissions: Sequence[str],
+    module_scopes: frozenset[str] | None = None,
     agent_id: UUID | None = None,
     label_ids: list[UUID] | None = None,
     short_codes: list[str] | None = None,
@@ -456,6 +460,9 @@ async def queue_job_async(
     and kept on the job, so the printed strip shows what the person saw when
     they clicked; ``read_permissions`` are the reads those records answer
     to, one of which the queue asks of whoever lists or resends the job.
+    ``module_scopes`` bounds pool labels to those assigned to the named
+    modules' records, for a caller who holds a module's read and not the
+    core one; ``None`` is the whole pool.
     """
     kinds = [bool(label_ids), bool(short_codes), bool(storage_ids), bool(item_ids)]
     if sum(kinds) != 1:
@@ -485,7 +492,7 @@ async def queue_job_async(
             entries = await _storage_entries_async(db, organization_id, storage_ids)
         else:
             entries = await _pool_entries_async(
-                db, organization_id, label_ids or [], short_codes or []
+                db, organization_id, label_ids or [], short_codes or [], module_scopes
             )
         if not entries:
             raise catalogue_refusal('print_job_nothing_to_print')

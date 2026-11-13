@@ -673,6 +673,36 @@ describe("ProductionCreateSheet — already made, in one step", () => {
     );
   });
 
+  it("offers the shortfall at the quantity the list will receive", () => {
+    // The list is shopped in the ingredient's unit and asks for a whole piece
+    // when the run is half a piece short. The button used to promise the raw
+    // 1.5 while the line it wrote held 2.
+    mocks.preview.data = {
+      ...PLUM_PREVIEW,
+      ingredients: [
+        {
+          ...PLUM_PREVIEW.ingredients[0],
+          needed: "1.5",
+          available: "0",
+          shortage: "1.5",
+          uom_symbol: "pcs",
+          to_buy: "2",
+          to_buy_uom_symbol: "pcs",
+        },
+      ],
+    };
+    renderSheet();
+    planInstead();
+    typeQuantity("20");
+    pickStorage("Warehouse");
+
+    expect(
+      screen.getByRole("button", {
+        name: "Add 2 pcs. of Damson Plums to the shopping list",
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("says when nothing is short", () => {
     mocks.preview.data = {
       ...PLUM_PREVIEW,

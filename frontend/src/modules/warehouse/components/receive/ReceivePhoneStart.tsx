@@ -193,7 +193,7 @@ export function ReceivePhoneStart({
         type="button"
         size="lg"
         className="w-full"
-        leftIcon={<ScanLine size={18} />}
+        leftIcon={<ScanLine size={20} />}
         disabled={!door.canWrite || door.starting}
         isLoading={door.starting}
         onClick={door.onStart}

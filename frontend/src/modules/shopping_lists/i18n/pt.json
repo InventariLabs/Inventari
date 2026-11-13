@@ -86,7 +86,8 @@
     "failed": "Não foi possível adicionar os ingredientes das receitas selecionadas",
     "success": "{{count}} ingredientes adicionados",
     "success_one": "{{count}} ingrediente adicionado",
-    "success_other": "{{count}} ingredientes adicionados"
+    "success_other": "{{count}} ingredientes adicionados",
+    "alreadyListed": "Já nesta lista"
   },
   "card": {
     "saveName": "Salvar nome",

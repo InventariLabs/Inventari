@@ -30,7 +30,7 @@ from app.models.user import User
 from app.services.auth_service import get_password_hash
 from app.services.token_service import create_access_token
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.usefixtures('stub_dns')]
 
 ADMIN_PERMISSION = SystemPermission.ORG_SETTINGS_WRITE
 _GUARD_NAME = f'require_{ADMIN_PERMISSION.value.replace(":", "_")}'

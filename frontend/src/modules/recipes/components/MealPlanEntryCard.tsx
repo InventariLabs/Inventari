@@ -46,7 +46,7 @@ export function MealPlanEntryCard({
   const style = {
     transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.4 : 1,
-    zIndex: isDragging ? 30 : undefined,
+    zIndex: isDragging ? "var(--z-sticky)" : undefined,
   };
 
   return (

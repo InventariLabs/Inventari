@@ -192,7 +192,7 @@
       "overproduced": "Overproduced",
       "resultPerUnit": "({{amount}} per {{unit}})",
       "totalCostAfterClosing": "Total cost after closing",
-      "unitCost": "{{amount}} per unit produced",
+      "unitCost": "{{amount}} per {{unit}}",
       "totalCostGap_one": "{{count}} ingredient was drawn from stock with no cost, so it is missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers."
     },

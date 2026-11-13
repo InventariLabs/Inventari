@@ -135,7 +135,7 @@ const ProductInfoDisplay: React.FC<Props> = ({ data }) => {
               type="button"
               variant="link"
               onClick={() => setShowFullIngredients(!showFullIngredients)}
-              className="min-h-11 md:min-h-0 min-w-11 md:min-w-0 justify-start text-[10px] font-medium text-primary-600 uppercase mt-1.5 gap-1"
+              className="min-h-11 md:min-h-0 min-w-11 md:min-w-0 justify-start text-[10px] font-medium text-on-primary uppercase mt-1.5 gap-1"
             >
               {showFullIngredients ? (
                 <>{t("common:actions.lessOptions", { defaultValue: "Less" })}</>

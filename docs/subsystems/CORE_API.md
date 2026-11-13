@@ -179,10 +179,10 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `get_by_id_async` | `(db: AsyncSession, label_id: UUID, organization_id: UUID) -> LabelPoolDTO \| None` | READ | Return a single label by ID scoped to *organization_id*, or ``None``. |
 | `get_by_short_code_async` | `(db: AsyncSession, short_code: str, organization_id: UUID) -> LabelPoolDTO \| None` | READ | Return a single label by short_code scoped to *organization_id*, or ``None``. |
 | `get_pool_stats_async` | `(db: AsyncSession, organization_id: UUID) -> dict[str, Any]` | READ | Return pool stats: total / assigned counts. |
-| `list_by_short_codes_async` | `(db: AsyncSession, short_codes: list[str], organization_id: UUID) -> list[LabelPoolDTO]` | READ | Return labels whose short_code is in *short_codes* scoped to *organization_id*. |
+| `list_by_short_codes_async` | `(db: AsyncSession, short_codes: list[str], organization_id: UUID, *, module_scopes: frozenset[str] \| None=None) -> list[LabelPoolDTO]` | READ | Return labels whose short_code is in *short_codes* scoped to *organization_id*. |
 | `list_for_org_async` | `(db: AsyncSession, organization_id: UUID, *, unassigned_only: bool=False) -> list[LabelPoolDTO]` | READ | List labels for *organization_id*, optionally filtered to unassigned. |
 | `list_for_org_with_relations_async` | `(db: AsyncSession, organization_id: UUID, *, unassigned_only: bool=False, label_type: str \| None=None, status: str \| None=None, offset: int=0, limit: int \| None=None) -> tuple[list[LabelPoolDTO], int]` | READ | List labels for *organization_id* with eager-loaded assigned_item. |
-| `list_in_ids_async` | `(db: AsyncSession, label_ids: list[UUID], organization_id: UUID) -> list[LabelPoolDTO]` | READ | Return labels whose IDs are in *label_ids* scoped to *organization_id*. |
+| `list_in_ids_async` | `(db: AsyncSession, label_ids: list[UUID], organization_id: UUID, *, module_scopes: frozenset[str] \| None=None) -> list[LabelPoolDTO]` | READ | Return labels whose IDs are in *label_ids* scoped to *organization_id*. |
 | `list_unprinted_unassigned_async` | `(db: AsyncSession, organization_id: UUID, *, limit: int, exclude_ids: list[UUID] \| None=None) -> list[LabelPoolDTO]` | READ | List unprinted + unassigned labels for *organization_id*. |
 | `mark_as_printed_by_ids_async` | `(db: AsyncSession, label_ids: list[UUID], organization_id: UUID) -> None` | WRITE | Mark labels as printed by their IDs (scoped to *organization_id*). |
 | `unassign_async` | `(db: AsyncSession, short_code: str, organization_id: UUID, *, user_id: UUID \| None=None) -> LabelPoolDTO \| None` | WRITE | Unassign a label by short_code (returns refreshed DTO, ``None`` when not found). |
@@ -255,8 +255,8 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | Method | Signature | R/W | Description |
 |---|---|---|---|
 | `count_expiring_soon_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, days: int=7) -> int` | READ | Count non-deleted items in *storage_id* expiring within *days*. |
-| `count_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> int` | READ | Count non-deleted items in *storage_id*. |
-| `count_items_in_subtree_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> int` | READ | Count non-deleted items in *storage_id* and all its descendants. |
+| `count_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, claimed_tags: set[str] \| None=None) -> int` | READ | Count non-deleted items in *storage_id* (minus ``claimed_tags``' records). |
+| `count_items_in_subtree_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, claimed_tags: set[str] \| None=None) -> int` | READ | Count non-deleted items in *storage_id* and all its descendants. |
 | `create_async` | `(db: AsyncSession, organization_id: UUID, *, name: str, user_id: UUID, description: str \| None=None, behavior_mode: str \| None=None, context_tag: str \| None=None, usage: str \| None=None, parent_id: UUID \| None=None) -> StorageDTO` | WRITE | Create a storage location. Runs interceptors and emits events. |
 | `descendant_ids_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> list[UUID]` | READ | All storage ids below *storage_id* (excludes the node itself). |
 | `find_by_context_tag_async` | `(db: AsyncSession, organization_id: UUID, context_tag: str) -> StorageDTO \| None` | READ | — |
@@ -268,7 +268,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `list_async` | `(db: AsyncSession, organization_id: UUID, *, context_tag: str \| None=None, usage: str \| None=None, limit: int=200, offset: int=0) -> list[StorageDTO]` | READ | — |
 | `list_by_ids_async` | `(db: AsyncSession, organization_id: UUID, storage_ids: Iterable[UUID]) -> list[StorageDTO]` | READ | The named locations that exist and are not archived, ordered by name. |
 | `list_holding_stock_with_ancestors_async` | `(db: AsyncSession, organization_id: UUID, *, usage: str='internal') -> list[StorageDTO]` | READ | The locations of *usage* holding a live record, with the chains above them. |
-| `list_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, include_inside: bool=False, limit: int \| None=None, offset: int=0) -> list[ItemDTO]` | READ | List non-deleted items in *storage_id* ordered by expiry ascending. |
+| `list_items_in_location_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID, *, include_inside: bool=False, limit: int \| None=None, offset: int=0, claimed_tags: set[str] \| None=None) -> list[ItemDTO]` | READ | List non-deleted items in *storage_id* ordered by expiry ascending. |
 | `list_storage_ids_async` | `(db: AsyncSession, organization_id: UUID) -> list[UUID]` | READ | Return just the IDs of storage locations for *organization_id*. |
 | `scannable_code_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> str \| None` | READ | The code that names *storage_id* when scanned — its own, or its label's. |
 | `subtree_and_ancestors_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> tuple[list[StorageDTO], list[StorageDTO]]` | READ | ``(subtree, ancestors)`` of a location, without reading the rest of the tree. |
@@ -412,6 +412,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `existing_ids_async` | `(db: AsyncSession, uom_ids: set[UUID], organization_id: UUID) -> set[UUID]` | READ | Return the subset of *uom_ids* that exist for *organization_id* — one query. |
 | `get_async` | `(db: AsyncSession, uom_id: UUID, organization_id: UUID) -> UomDTO \| None` | READ | Return the UOM row for *uom_id*, or ``None``. |
 | `get_by_symbol_async` | `(db: AsyncSession, symbol: str, organization_id: UUID, *, include_global: bool=False) -> UomDTO \| None` | READ | Async: return the UOM DTO whose ``symbol`` matches *symbol* exactly, or ``None``. |
+| `is_on_step` | `(qty: Decimal, uom: UomDTO \| None) -> bool` | READ | Whether *qty* already sits on a step of *uom*. |
 | `list_categories_for_org_async` | `(db: AsyncSession, organization_id: UUID) -> list[UomCategoryDTO]` | READ | Return all UOM categories visible to *organization_id* (system + org-specific). |
 | `list_for_org_async` | `(db: AsyncSession, organization_id: UUID) -> list[UomDTO]` | READ | Return all UOM rows visible to *organization_id* (system + org-specific). |
 | `quantity_step` | `(uom: UomDTO \| None) -> Decimal` | READ | The step quantities in *uom* are counted in — its own ``rounding``, floored at the scale the quantity columns keep. |
@@ -593,9 +594,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 310
+- **Total methods:** 311
 - **Namespaces:** 33
-- **Documented methods:** 310 (100%)
-- **READ methods:** 216 (70%)
+- **Documented methods:** 311 (100%)
+- **READ methods:** 217 (70%)
 - **WRITE methods:** 94 (30%)
 

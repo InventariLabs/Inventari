@@ -22,6 +22,7 @@ from app.core.logging import get_logger
 from app.i18n.service import get_current_lang, get_error_message
 
 from ._approval_checkout import ensure_approval_covers_checkout
+from ._assets_service import get_asset_async
 from ._org_day import pin_org_day_end
 from ._unit_identity import audit_identity
 from .bulk_service import CHECKOUT_REFUSALS, row_error
@@ -59,7 +60,7 @@ async def checkout(
     if person == place or (place and data.assigned_to_email):
         raise ServiceRejectionError('equipment_assignment_needs_person_or_location')
 
-    item = await core_api.items.get_async(db, org_id, data.item_id)
+    item = await get_asset_async(db, org_id, data.item_id)
     if not item:
         raise NotFoundException('item', lang)
 

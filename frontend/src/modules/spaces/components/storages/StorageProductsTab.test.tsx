@@ -79,3 +79,32 @@ describe("StorageProductsTab — include locations inside", () => {
     expect(asked[1]).toContain("include_inside=true");
   });
 });
+
+describe("StorageProductsTab — module data hidden", () => {
+  it("asks for the general records only, as the counts beside it do", async () => {
+    const asked: string[] = [];
+    server.use(
+      http.get("/api/v1/locations/:id/items", ({ request }) => {
+        asked.push(new URL(request.url).search);
+        return HttpResponse.json(onePage([item("1", "On the zone")]));
+      }),
+      http.get("/api/v1/locations", () => HttpResponse.json(onePage([]))),
+    );
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <QueryClientProvider client={client}>
+        <StorageProductsTab
+          storage={zone}
+          summary={zoneRow}
+          isArchived={false}
+          canWriteItems
+          excludeModuleContexts
+        />
+      </QueryClientProvider>,
+    );
+    await screen.findByText("On the zone");
+    expect(asked[0]).toContain("exclude_module_contexts=true");
+  });
+});

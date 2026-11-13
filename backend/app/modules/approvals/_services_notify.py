@@ -170,29 +170,29 @@ _DEAD_END_TITLE: dict[str, str] = {
 # that person, an open stage by granting anybody.
 _DEAD_END_NAMED_CONTENT: dict[str, str] = {
     'en': (
-        'The request is waiting at stage \u201c{stage}\u201d, but the person it '
-        'names cannot decide it. To unblock it, give that person access to '
-        'approvals, or withdraw the request.'
+        'The request is waiting at stage \u201c{stage}\u201d, but nobody named on it '
+        'can decide it. To unblock it, give one of them access to approvals, or '
+        'withdraw the request.'
     ),
     'pl': (
-        'Wniosek czeka na etapie \u201e{stage}\u201d, ale wskazana osoba nie może '
-        'go zatwierdzić. Aby go odblokować, przyznaj jej dostęp do akceptacji '
+        'Wniosek czeka na etapie \u201e{stage}\u201d, ale nikt z wymienionych osób nie może '
+        'go zatwierdzić. Aby go odblokować, przyznaj którejś z tych osób dostęp do akceptacji '
         'albo wycofaj wniosek.'
     ),
     'de': (
-        'Die Anfrage wartet auf der Stufe \u201e{stage}\u201c, aber die genannte '
-        'Person kann sie nicht entscheiden. Um sie freizugeben, geben Sie dieser '
-        'Person Zugriff auf Genehmigungen, oder ziehen Sie die Anfrage zurück.'
+        'Die Anfrage wartet auf der Stufe \u201e{stage}\u201c, aber niemand der genannten '
+        'Personen kann sie entscheiden. Um sie freizugeben, geben Sie einer dieser Personen '
+        'Zugriff auf Genehmigungen, oder ziehen Sie die Anfrage zurück.'
     ),
     'fr': (
-        "La demande attend à l'étape \u00ab\u00a0{stage}\u00a0\u00bb, mais la "
-        'personne nommée ne peut pas y décider. Pour la débloquer, accordez-lui '
-        "l'accès aux approbations, ou retirez la demande."
+        "La demande attend à l'étape \u00ab\u00a0{stage}\u00a0\u00bb, mais aucune des "
+        "personnes nommées ne peut y décider. Pour la débloquer, accordez l'accès aux "
+        "approbations à l'une de ces personnes, ou retirez la demande."
     ),
     'es': (
-        'La solicitud espera en la etapa \u00ab{stage}\u00bb, pero la persona '
-        'indicada no puede decidirla. Para desbloquearla, concédele acceso a '
-        'aprobaciones, o retira la solicitud.'
+        'La solicitud espera en la etapa \u00ab{stage}\u00bb, pero ninguna de las personas '
+        'indicadas puede decidirla. Para desbloquearla, concede acceso a aprobaciones a una '
+        'de ellas, o retira la solicitud.'
     ),
 }
 _DEAD_END_OPEN_CONTENT: dict[str, str] = {
@@ -264,7 +264,9 @@ async def _stage_verdict_async(
         )
 
     requester_may_decide_own = False
-    if approver_holders is not None and request.created_by in approver_holders:
+    if request.created_by in named or (
+        approver_holders is not None and request.created_by in approver_holders
+    ):
         from ._services_decisions import _may_decide_on_own_request
 
         requester_may_decide_own = await _may_decide_on_own_request(
@@ -283,8 +285,8 @@ async def _stage_verdict_async(
     )
     if approver_holders is not None:
         deciders = set(approver_holders)
-        if not requester_may_decide_own:
-            deciders.discard(request.created_by)
+    if not requester_may_decide_own:
+        deciders.discard(request.created_by)
     return reason, deciders
 
 
@@ -578,14 +580,14 @@ _CLOSED_TITLE: dict[str, str] = {
 _CLOSURE_CONTENT: dict[str, dict[str, str]] = {
     'workflow deactivated': {
         'en': 'The approval workflow was deactivated, so nothing is waiting for a decision any more.',
-        'pl': 'Ścieżka akceptacji została wyłączona, więc nic już nie czeka na decyzję.',
+        'pl': 'Przepływ akceptacji został wyłączony, więc nic już nie czeka na decyzję.',
         'de': 'Der Genehmigungsablauf wurde deaktiviert, es wartet nichts mehr auf eine Entscheidung.',
         'fr': "Le circuit d'approbation a été désactivé : plus rien n'attend de décision.",
         'es': 'El flujo de aprobación se desactivó, así que nada espera una decisión.',
     },
     'workflow deleted': {
         'en': 'The approval workflow was deleted, so nothing is waiting for a decision any more.',
-        'pl': 'Ścieżka akceptacji została usunięta, więc nic już nie czeka na decyzję.',
+        'pl': 'Przepływ akceptacji został usunięty, więc nic już nie czeka na decyzję.',
         'de': 'Der Genehmigungsablauf wurde gelöscht, es wartet nichts mehr auf eine Entscheidung.',
         'fr': "Le circuit d'approbation a été supprimé : plus rien n'attend de décision.",
         'es': 'El flujo de aprobación se eliminó, así que nada espera una decisión.',
@@ -616,7 +618,7 @@ _STILL_REQUIRED_CONTENT: dict[str, str] = {
         'Twój wniosek został zamknięty, ale to nie jest akceptacja. '
         'Akceptacji nadal wymaga: {settings}. Pozycja zatrzyma się przy '
         'zakończeniu, dopóki ustawienie nie zostanie wyczyszczone lub nie '
-        'będzie znów aktywnej ścieżki.'
+        'będzie znów aktywnego przepływu.'
     ),
     'de': (
         'Ihr Antrag wurde geschlossen, aber das ist keine Genehmigung. '

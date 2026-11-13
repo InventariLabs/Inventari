@@ -728,6 +728,7 @@
         "CONFIRMED": "Confirmado",
         "COMPLETED": "Concluído",
         "CANCELLED": "Cancelado",
+        "REVERSED": "Desfeita",
         "PENDING": "Pendente",
         "IN_PROGRESS": "Em andamento",
         "APPROVED": "Aprovado",
@@ -1346,7 +1347,7 @@
     "unsaved": "Você tem alterações não salvas"
   },
   "shoppingOverlap": {
-    "toast": "Já está noutra lista aberta: {{where}}",
+    "toast": "Já está em outra lista aberta: {{where}}",
     "onList": "{{names}} em «{{list}}»"
   }
 }

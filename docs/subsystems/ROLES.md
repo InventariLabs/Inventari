@@ -53,6 +53,41 @@ the way sudo-style delegation usually works — is a product decision, not a
 defect, and would change what existing installations can do. It is deliberately
 not implemented.
 
+## A module's read admits the core registers its screens show
+
+A custom role may hold a module's read and not the core reads. The module's
+own screens still show core data: the equipment register names the location
+and category of every asset, lists the module's archived records and prints
+their labels; the warehouse's codes page builds its table from the location
+register. Those core **reads** therefore admit the module's read on the
+routes those screens call (`require_any_permission` next to the core key),
+because a screen whose data cannot load is not a screen the role can use.
+
+The admission is the read only, and where a route serves records rather than
+a register of the whole organization it is also the reach. `GET /items` and
+the stock ledger are not opened by a module's read; `/items/archived` answers
+a module's reader only under that module's `module_scope` and refuses an
+unscoped ask, `/items/{id}` answers 404 for a record the module does not
+claim, and the pool label sheet — downloaded, or sent to a printer through the
+print queue — draws only labels assigned to the module's records and refuses
+the free pool (`claimed_by_module` in `app/core/module_ownership.py` is what
+"its own" means). The module's own routes that name one record keep to the
+same records: the equipment register's per-asset routes answer 404 for a
+product the register does not list, whoever asks. Creating a category,
+changing a shelf, editing a record or purging an archive keeps the core write
+key. The full list of the admissions is
+`_NAMED_ALSO_READ_BY_A_MODULE_READ` in
+`backend/tests/integration/test_every_route_asks_for_a_permission.py`, so a
+new one is a change reviewed there rather than a quiet widening.
+
+**Entry vector: not yet.** The admissions name the module reads explicitly
+inside the Core API, so a module from outside this repository whose screens
+read the location or category registers gets nothing without a Core edit, and
+a module that claims records would need one on the two items reads. The
+generic form is wanted — a module's read admitting its own `module_scope`, and
+a declared register read for the reference lists — but not built; the gap is
+tracked on the maintainers' board.
+
 ## A settings screen opens with the key its API asks for
 
 The settings screens are governed by the granular permissions, not by a

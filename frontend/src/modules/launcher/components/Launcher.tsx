@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
@@ -19,7 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useModules } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
-import { useHasPermission } from "@/hooks/useHasPermission";
+import { holdsPermission, useHasPermission } from "@/hooks/useHasPermission";
 import { moduleRegistry, type FrontendModule } from "@/lib/moduleRegistry";
 import { getRecentItems, RECENT_ITEMS_SCOPE } from "@/lib/recentItems";
 import { ModuleTile } from "./ModuleTile";
@@ -72,9 +73,52 @@ function isLauncherCategory(value: unknown): value is LauncherCategory {
   );
 }
 
+type TileStatus = ReturnType<NonNullable<FrontendModule["useStatusBadge"]>>;
+
+/**
+ * The status a tile shows, asked of its module only for a role holding the
+ * read the module names for it (`statusBadgePermission`).
+ *
+ * Every enabled module has a tile, whatever the role may read. A custom role
+ * holding only the warehouse's read was asked the status of every other
+ * module, met a 403 on each, and the Inventory and Equipment tiles said their
+ * status could not be read — a refusal the role was always going to meet,
+ * reported as a failure. The tile stays; its status is not asked.
+ *
+ * The badge hook runs in a component of its own, rendered only when the role
+ * may read, so a change of rights mounts or drops it instead of changing the
+ * hooks one component calls.
+ */
+function WithTileStatus({
+  module,
+  children,
+}: {
+  module: FrontendModule;
+  children: (badge: TileStatus) => ReactNode;
+}) {
+  const user = useAuthStore((s) => s.user);
+  const key = module.statusBadgePermission;
+  const mayAsk = key === undefined || holdsPermission(user, key);
+  if (!module.useStatusBadge || !mayAsk) return <>{children(null)}</>;
+  return (
+    <AskedTileStatus useStatusBadge={module.useStatusBadge}>
+      {children}
+    </AskedTileStatus>
+  );
+}
+
+function AskedTileStatus({
+  useStatusBadge,
+  children,
+}: {
+  useStatusBadge: NonNullable<FrontendModule["useStatusBadge"]>;
+  children: (badge: TileStatus) => ReactNode;
+}) {
+  return <>{children(useStatusBadge())}</>;
+}
+
 /**
  * SortableTile — wraps a module tile with @dnd-kit sortable behaviour.
- * Calls useStatusBadge as a proper hook boundary if present.
  */
 function SortableTile({ module }: { module: FrontendModule }) {
   // The tile's own visible words name the drag, not the module's machine
@@ -100,10 +144,8 @@ function SortableTile({ module }: { module: FrontendModule }) {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 10 : undefined,
+    zIndex: isDragging ? "var(--z-sticky)" : undefined,
   };
-
-  const badge = module.useStatusBadge ? module.useStatusBadge() : null;
 
   // The attributes and the listeners share one node on purpose — the link.
   // Split across two nodes, the node that announces "sortable, press the
@@ -112,13 +154,17 @@ function SortableTile({ module }: { module: FrontendModule }) {
   // The `<li>` only moves: it stays a list item, which is all a list holds.
   return (
     <li ref={setNodeRef} style={style}>
-      <ModuleTile
-        module={module}
-        statusBadge={badge}
-        sortable
-        {...attributes}
-        {...listeners}
-      />
+      <WithTileStatus module={module}>
+        {(badge) => (
+          <ModuleTile
+            module={module}
+            statusBadge={badge}
+            sortable
+            {...attributes}
+            {...listeners}
+          />
+        )}
+      </WithTileStatus>
     </li>
   );
 }
@@ -132,11 +178,11 @@ function SortableTile({ module }: { module: FrontendModule }) {
  * pointing at an element that is never rendered.
  */
 function StaticTile({ module }: { module: FrontendModule }) {
-  const badge = module.useStatusBadge ? module.useStatusBadge() : null;
-
   return (
     <li>
-      <ModuleTile module={module} statusBadge={badge} />
+      <WithTileStatus module={module}>
+        {(badge) => <ModuleTile module={module} statusBadge={badge} />}
+      </WithTileStatus>
     </li>
   );
 }

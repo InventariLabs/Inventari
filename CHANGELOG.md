@@ -12,7 +12,7 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
-### Changed
+### Added
 
 - The audit journal (`GET /audit-log`) counts at most ten thousand entries on
   its first page, as the product, stock and movement lists do: past that,
@@ -25,209 +25,183 @@ says what the release does rather than what changed since them.
   instead of the bare English `{"detail": "Not authenticated"}`. A client that
   reads an error body in the documented order (the object, then the list, then
   the string) needs no change; one that compared the string reads `code`
+- A new community module package can be handed to an AI coding agent.
+  `module new-community` now writes an `AGENTS.md` into the package — what a
+  module may import, the five maintained languages, migrations the package
+  owns, the purpose card, tests and the command that checks the package before
+  install, with links to the full guides at the platform's version — and a
+  `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
+  building a module with an agent: what to give it, which checks refuse its
+  mistakes and how to check the result before installing it.
+
+### Fixed
+
+- The registration form from an invitation keeps the address typed into it.
+  The invited address used to fill the field whenever the invitation check
+  answered, so an address typed before a slow answer was replaced without a
+  word; the field now takes the invited address only while it is empty.
+- On a phone, the camera of the document and purchase-order line editors opens
+  in view. With the Scan switch near the bottom of the form, the camera used to
+  open below the edge of the screen, where nothing seemed to happen, and a
+  phone's browser may not start a video it cannot see, so no code was read
+  until the worker scrolled; the form now brings the switch to the top, with
+  the camera right under it.
+- The dead-end notice on an approval request no longer blames the requester for
+  the stage's dead end. A stage listing them beside people who cannot see
+  approvals names only those people, and the access step names only them; an
+  administrator is offered the self-approval setting as another way out. The
+  notification sent for the same case no longer calls a stage naming several
+  people "the person".
+- A requirement scaled by a ratio that does not divide evenly no longer asks
+  for one unit more than it needs: five servings of a three-serving recipe
+  that asks for three eggs now ask for five eggs, and planning five of a
+  production recipe that yields three lists five pieces, not six. The
+  production preview's to-buy figure and the line the shortfall writes agree
+  on the quantity, and the add-item dialog of a shopping list writes its
+  quantity ceiling in the reader's decimal mark.
+
+## v0.12.0 - 2026-11-09
+
+The first release after the public 0.11.0, and the first under a fixed rhythm:
+a minor release every two weeks, on a Monday. It makes what 0.11.0 shipped
+safer to run and easier to build on, rather than adding a new area.
+
+**For people using it**, the shopping lists and the production module are
+the ones that changed most. A shopping list now tops a line up when a recipe,
+a meal plan or a production run needs more of it, instead of treating the line
+as covered whatever its quantity, and it warns when another open list asks for
+the same goods. Stock takes, returns, receiving and issuing, approvals and the
+equipment register lost the rough edges a pass over every screen found, on a
+phone included: nothing records a count of zero for an empty box any more, a
+return can be duplicated, a saved-twice receipt leaves one draft, and a
+picture replaced on a product shows at once. Recently visited fills again,
+and every refusal, date and number reads in the reader's language and decimal
+mark.
+
+**For instance administrators**, an account can be created and erased from
+the command line (`manage.py user create-admin --lang`, `manage.py user
+erase`), the API key prefix and the default scopes of a new key give away and
+grant less, the notification socket no longer writes its token into access
+logs, an invitation answers every refusal with one sentence, and a few
+operations steps (the update and restore commands, the off-host backup copy,
+the PgBouncer connection count) are corrected. The list of what to do on the
+way from 0.11.0 is below.
+
+**For module authors**, the module rules are stricter where a mistake used to
+pass in silence — a table declared on Core's base, a manifest version that
+cannot be compared, a name taken by another module's pick-order strategy — and
+the module SDK gains the helpers the guides asked authors to write
+themselves: paging by cursor, attachment types, a quantity step, recently
+visited records, a status badge permission and more.
+
+### Upgrading from 0.11.0
+
+Update as DEPLOYMENT.md's *Updating* says; its migration step also renames
+locations that share a name under one parent (see *Fixed*). Fourteen changes break a client, a script or a module, and each says
+what the affected party must do:
+
+**The REST API and its clients**
+
+- **Authentication errors.** A request with no credential at all to an
+  authenticated route answers with the coded error object, `{"detail":
+  {"code": "NOT_AUTHENTICATED", "message": …, "lang": …}}`, in the reader's
+  language, not the bare English `{"detail": "Not authenticated"}`. A client
+  that reads an error body in the documented order (the object, then the list,
+  then the string) needs no change; one that compared the string reads `code`
   instead. The status and the `WWW-Authenticate: Bearer` header are unchanged.
+- **Invitation refusals.** The refusal code `ORGANIZATION_INVITE_WRONG_EMAIL`
+  is no longer sent: an invitation that is used with another address, or is
+  expired, used, withdrawn or unknown, answers `ORGANIZATION_INVITE_INVALID`
+  with one sentence that says what to try. A client that branched on the old
+  code treats the two alike.
+- **Invitation codes need an address.** `POST /organizations/my/invitation-code`
+  requires `email`, the address the invitation is for, and answers 422 without
+  it. A script that issued bearer codes names the invitee instead. Codes
+  already issued without an address keep working until they expire.
+- **Product search hits.** The document product search returns `added_date`
+  (the day the record was added, a date and not a timestamp) instead of
+  `created_at` on a stock hit; a client that read `created_at` reads
+  `added_date`. A hit that totals several interchangeable records says
+  `merged: true`.
+- **Approval notes.** The approve, reject and request-approval routes of
+  documents and purchase orders read the note from the JSON body as
+  `{"notes": "..."}` and no longer read a `notes` query parameter. A client
+  that still sends one moves it to the body, or the note is not recorded.
+- **Notification socket.** `/api/v1/ws/notifications` takes the access token
+  as a subprotocol, not as a `token` query parameter: the client offers
+  `bearer` and then the token (`Sec-WebSocket-Protocol: bearer, <token>`) and
+  the socket answers with `bearer`. A client that still sends the token in
+  the address is refused with close code 4001.
+- **Recipe cost lines.** A production recipe's fixed cost line takes one of
+  `LABOR`, `PACKAGING`, `OVERHEAD` or `OTHER`; `POST
+  /maker/recipes/{id}/cost-lines` and its `PATCH` answer 422 for any other
+  `kind`. A client that sent another kind sends `OTHER` and puts what it is in
+  the label.
+- **Recipe picking quantities.** The recipe picking answers send
+  `quantity_consumed`, `item_remaining_quantity`,
+  `ingredient_remaining_quantity` (a scan) and `restored_quantity` (an undo)
+  as strings, as every other stock quantity in the API does. A client that
+  read them as numbers parses them as decimals. The
+  `recipe.picking_completed` event keeps numbers, as every event payload does.
+- **Shopping suggestions route removed.** `GET /api/v1/stats/shopping-suggestions`
+  answered with placeholder figures and no screen used it. A client reads
+  `GET /api/v1/shopping-lists/suggestions`, which computes them from the stock
+  and its history.
+
+**Module authors**
+
+- **`CoreModelBase`.** A community module can no longer declare its tables on
+  `CoreModelBase` from the module SDK: `module install`, `module validate`
+  and module discovery refuse it, however the base is reached. A table
+  declared on it lands in Core's metadata, where Core's autogenerate proposes
+  it as a core migration. Declare the tables on `ModuleModelBase` and create
+  them in the module's own migrations (MODULES_GUIDE.md, "Database
+  Migrations").
+- **Validation rules.** The core forms a module can contribute validation
+  rules to are `item_create` and `item_edit`. `storage_create` and
+  `storage_edit` were accepted by the type but no location form ever ran a
+  rule; a module that declares one removes it.
+- **Launcher badge.** A module's `useStatusBadge` hands over `labelKey`, an
+  i18n key in full form, instead of `label`; the tile translates it with
+  `{ count }`, so a plural follows the number. A module that returned
+  `{ count, label: t("...") }` returns `{ count, labelKey: "<module>:..." }`.
+- **Manifest version.** A module manifest's `version` is three numbers and
+  nothing after them (`MAJOR.MINOR.PATCH`). `0.3.0-beta` and `1.0.0.5`
+  validated before and could not be compared by the upgrade check; such a
+  manifest is refused and its module numbers itself as three parts.
+- **Pick-order strategy names.** A pick-order strategy name belongs to the
+  module that registered it first. `warehouse_api.register_pick_order_strategy`
+  raises `ContractViolationError` for a name another module holds, where it
+  used to replace that module's strategy, the default walk included, in
+  silence. A module that reused a name registers its own.
+
+Not marked **Breaking**, but worth a look before you update:
+
+- A new API key no longer starts with the permission to read the
+  organization's details and member list. A script that creates a key through
+  `POST /api-keys` without naming a permission gets a key that answers 403 on
+  `/organizations/my/members`; name `org:read` to keep the old behaviour.
+- An API key's shown prefix is `inv_live_` and six characters, where it was
+  eleven, on the API keys page and in the audit log. Existing keys are
+  shortened on upgrade and keep working. Audit entries already written keep
+  the longer prefix, which still begins with the short one, so a script
+  comparing prefixes compares the start.
 - The backend's memory limit defaults to `2g` instead of `1536m`, so the four
-  workers it starts by default fit the size DEPLOYMENT.md gives one; at
-  `1536m` a fourth worker could be killed for outgrowing the limit. An
+  workers it starts by default fit the size DEPLOYMENT.md gives one. An
   installation that sets `BACKEND_MEM_LIMIT` in `.env` keeps its value.
-- **Breaking:** the document product search no longer returns `created_at` on a
-  stock hit; it returns `added_date`, the day the record was added — the same
-  date the product card shows as "Added on", so the picker and the card no longer
-  disagree by a day around midnight. A client that read `created_at` reads
-  `added_date` instead (a date, not a timestamp). A hit that is the total of
-  several interchangeable records now says so with `merged: true`, and the picker
-  tells such rows apart by their product's code rather than by the code of one
-  record in the group. The `location_id` description now says what the search
-  does: a shelf answers with its own records only, a zone also with the shelves
-  below it.
-- A refused invitation now answers with one sentence that says what to try — use
-  the e-mail address the invitation was sent to, or ask for a new one — and the
-  sentence is the same for a wrong address, an expired, a used, a withdrawn and an
-  unknown code, so it still tells nobody which of them it was. The separate
-  "issued for a different address" answer is gone, since it confirmed that a code
-  was live. **Breaking:** the refusal code `ORGANIZATION_INVITE_WRONG_EMAIL`,
-  listed in `docs/api/ERRORS.md` for 0.11.0, is no longer sent; a client that
-  branched on it now receives `ORGANIZATION_INVITE_INVALID`, the code every other
-  refusal of an invitation already carried, and should treat the two alike. The
-  public link check (`GET /public/invitation/{code}`) keeps answering a dead code
-  with a 404 and that same code, but with a sentence of its own that asks for a
-  new link, since the check never sees an address.
-- An API key's shown prefix is now `inv_live_` and six characters instead of
-  eleven, on the API keys page and in the audit log, where it gave away a third
-  of the key's random part to anyone allowed to read the log. Existing keys are
-  shortened on upgrade and keep working, because a key is never looked up by its
-  prefix. Entries already in the audit log keep the longer prefix they were
-  written with, since the log cannot be rewritten; they still begin with the
-  short one, so a script comparing prefixes should compare the start. To take a
-  key's longer prefix out of circulation, issue a new key and revoke the old one.
-- A new API key no longer starts with the permission to read the organization's
-  details and member list ticked. A script that creates a key through
-  `POST /api-keys` without naming any permission now gets a key that cannot read
-  `/organizations/my/members` (it answers 403); name `org:read` explicitly to
-  keep the old behaviour. The key dialog starts with that permission unticked as
-  well.
-- Settings has a "People" entry in its sidebar and phone menu that leads
-  straight to the members and invitations, which used to sit at the foot of
-  General. The webhook dialog lists every event in the interface language and
-  groups the events of modules the organization has not enabled apart.
-- `GET /items/archived` pages by the last record seen, as the stock movement
-  ledger and the audit log do: it answers with `next_cursor`, takes `cursor`
-  for the page after, counts on the first page and carries that count, so a
-  page deep in a long archive costs what the first one does. Records archived
-  at the same instant are ordered by their id, so turning a page no longer
-  shows one of them twice and leaves out another. `offset` still answers and
-  is deprecated. The archive screens of the product list and of Equipment page
-  this way.
-- Creating an account — the first one, by invitation or from an approved
-  request — signs it in and continues to the app, instead of sending the new
-  owner to a sign-in form that asks for the address and password just chosen.
-  If the sign-in is refused, the form opens with the address filled in.
-- A password-reset link that is spent or expired is refused when the page opens,
-  with a link to request a new one, instead of after a new password has been
-  typed. The page asks the new open endpoint `POST /auth/password-reset/check`,
-  and says it is checking while the answer is on its way. A request refused
-  for coming too often from one address no longer calls a good link spent:
-  the form stays, and a refused save says to try again later.
-  The "this installation does not send email" notice also says that the only
-  administrator can reset the password on the server.
-- A confirmed document now keeps your own company's name, tax number and
-  address and the names of the locations it refers to, as it already kept the
-  partner, so a reprint after the company moved or a shelf was renamed shows
-  what the original showed. The record a closed stock take leaves in the
-  register keeps them too. The layout, the document type's settings and the
-  logo are still read when the document is printed, and a document confirmed
-  before this change prints the current details. A module that prints its own
-  documents through the core print identity can freeze the same block with
-  `issuer_snapshot` and `IssuerContext.from_snapshot`.
-- **Breaking:** the approve, reject and request-approval routes of documents
-  and purchase orders read the note from the JSON request body as
-  `{"notes": "..."}`. They no longer read a `notes` query parameter, which
-  put a free-text reason where proxies and access logs keep it; a client that
-  still sends one must move it to the body, or the note is not recorded.
-- The approval queues show a document's net amount and say that it is net, the
-  side the approval threshold is set on. They used to show the gross.
-- A refusal about a closed period names the month as the period screen does
-  ("September 2026"), not "2026-09".
-- A multi-node deployment no longer collects a dead member in the event and
-  task stream groups for every restart: the stream reaper removes consumers that
-  have held nothing for an hour, and a clean shutdown removes the event bus's own
-  at once. The reaper also runs once at startup, so a message a crashed node had
-  read but not finished is redelivered at once when the replacement starts more
-  than a minute later, instead of up to six minutes after the crash.
-  `docs/SCALING.md` says what the delay depends on.
-- The module store in Settings is now headed "Modules", the name of its
-  sidebar entry, and the Statistics settings link carries the module's own
-  name instead of "Analytics". Every settings destination reads the same in the
-  sidebar and in the heading of the page it opens in all languages. Removing a
-  member now asks "Remove <name>?" and says that person loses access at once
-  while the records they created stay.
-- Equipment attachments and the files attached to a product accept one list
-  of file types. The old binary Word format (`.doc`) is refused by both — save
-  it as `.docx` — and Equipment now takes `.zip`, as products always have. The
-  file pickers on both screens no longer offer `.doc`, which the server refused
-  only after the upload. The size limits stay as they were: 20 MB for an
-  equipment attachment, 10 MB for a product's.
-- **Breaking:** the `/api/v1/ws/notifications` WebSocket takes the access token
-  as a subprotocol instead of a `token` query parameter: the client offers
-  `bearer` and then the token (`Sec-WebSocket-Protocol: bearer, <token>`), and
-  the socket answers with `bearer`. In the address, the token was written into
-  the backend's log and every proxy's access log on each connect, and those
-  logs outlive it; in a header it travels as it does on every other request. A
-  client that still sends the token in the address is refused with close code
-  4001 and has to offer the two subprotocols instead.
-- **Breaking:** `POST /organizations/my/invitation-code` requires `email`, the
-  address the invitation is for, and answers 422 without it. A code minted
-  without an address opened for whoever held the link, while the invitation
-  screen always sent one and the user guide says an invitation works only for
-  the address it was sent to. A script that issued bearer codes names the
-  invitee instead. Codes already issued without an address keep working until
-  they expire.
-- **Breaking:** a production recipe's fixed cost line takes one of the four
-  kinds the recipe screen offers — `LABOR`, `PACKAGING`, `OVERHEAD` or `OTHER` —
-  and the API answers 422 for any other `kind` on
-  `POST /maker/recipes/{id}/cost-lines` and on its `PATCH`. The API used to
-  store any string up to sixteen characters, which the screen then showed as a
-  raw code it could not name. A client that sent another kind sends `OTHER`
-  and says what it is in the label.
-- **Breaking:** the recipe picking answers send their stock quantities as
-  strings, as every other stock quantity in the API does: `quantity_consumed`,
-  `item_remaining_quantity` and `ingredient_remaining_quantity` on a scan, and
-  `restored_quantity` on an undo. A client that read them as numbers parses them
-  as decimals instead. What a shelf has left after a pick is now the number
-  written to the record, not a float subtraction (taking 0.1 kg from 0.3 kg
-  reported 0.19999999999999998). The `recipe.picking_completed` event keeps
-  numbers, as every event payload does.
+- An installation that enabled the Open Food Facts database or the off-host
+  backup copy with `--profile` on its commands adds the profiles to
+  `COMPOSE_PROFILES` in `.env` before its next update (see *Fixed*).
+- `GET /items/archived` answers `next_cursor` and takes `cursor`; `offset`
+  still answers and is deprecated.
 - An item edit or a new record that sends a unit weight for a product from the
-  shared catalogue is now refused with `UNIT_WEIGHT_OF_SHARED_PRODUCT`, the way a
-  removal strategy for one already is, instead of answering success and keeping
-  the catalogue's weight. A shared product is every organization's, so one of
-  them cannot weigh it for all. Sending the weight the product already records
-  is not a change, so a form that posts its whole state keeps working.
-- **Breaking:** a community module can no longer declare its tables on
-  `CoreModelBase` from the module SDK: `module install`, `module validate` and
-  module discovery refuse it, however the base is reached. It is Core's own
-  declarative base, re-exported for the modules this repository ships, and a
-  table declared on it lands in Core's metadata, where Core's autogenerate
-  proposes it as a core migration. A module that used it declares its tables on
-  `ModuleModelBase` instead, which has a metadata of its own, and creates them
-  in its own migrations (MODULES_GUIDE.md, "Database Migrations").
-- **Breaking:** the core forms a module can contribute validation rules to are
-  `item_create` and `item_edit`. `storage_create` and `storage_edit` were
-  accepted by the type, but no location form ever ran a rule, so a rule
-  registered for them did nothing; a module that declares one removes it.
-- `module validate --allow-core` skips the safety scan only for the modules
-  this repository ships, at their own path; for any other module it scans as
-  without the switch and says so.
-- Registering a contribution to `scan_providers` or `dashboard_widgets` now
-  logs the warning of an unknown point: no backend code ever read them. Scan
-  providers register with `scan_registry.register`, and a dashboard widget is
-  a frontend `slots` registration.
-- **Breaking:** a module's launcher badge (`useStatusBadge`) hands over
-  `labelKey`, an i18n key in full form, instead of `label`, the words; the tile
-  translates it with `{ count }`, the way the "Things to do" feed translates an
-  action item's `labelKey`, so a plural follows the number. A module that
-  returned `{ count, label: t("...") }` returns `{ count, labelKey: "<module>:..." }`.
-  The type no longer promises a three-second timeout nothing enforced: the tile
-  shows no badge until the hook answers.
-- **Breaking:** a module manifest's `version` is three numbers and nothing
-  after them (`MAJOR.MINOR.PATCH`). `0.3.0-beta` or `1.0.0.5` used to validate
-  and then could not be compared by the upgrade check; such a manifest is now
-  refused, and its module numbers itself as three parts.
-- **Breaking:** a pick-order strategy name belongs to the module that
-  registered it first. `warehouse_api.register_pick_order_strategy` raises
-  `ContractViolationError` for a name another module holds, where it used to
-  replace that module's strategy — the default walk included — in silence. A
-  module that reused a name registers its own.
-- A module's `on_enable` (and `define_module(seed=...)`) now runs whenever the
-  module is enabled for an organization, onboarding and the demo seed
-  included; those two ran only the framework's own seeding, so a module that
-  seeds in `on_enable` left every onboarded organization without it.
-- A module no longer has to call `super()` from `on_startup` or `on_install`.
-  The framework registers its services and contributions, wires its
-  interceptors and runs its migrations itself, before the hook; an override
-  that left out `super()` used to start the module without them, or install it
-  without its tables, and say nothing.
-- An item interceptor overrides only the hooks it needs: `before_create` and
-  `before_update` have defaults that let the write through, as they always had
-  on storage and category interceptors, instead of being required.
-- When a handler of an event that belongs to no organization is given up on,
-  the instance's superusers are told, in their own language and once a day per
-  handler, as an organization's admins are for its own events; it used to be
-  only recorded and logged.
-- The safety scan reads a banned import as the module and the modules inside
-  it, bounded by the dot, as it already read capabilities: `socketserver` is no
-  longer refused as `socket`. It accepts `from app.core import module_sdk` (and
-  `from app.modules.<m> import <m>_api` for a declared dependency), which binds
-  the same module as the dotted import it already accepted. The named
-  exemptions that granted nothing are gone — those of `printing`, `vision` and
-  `webhooks` named imports the modules never made, and `nutrition`'s imports
-  its declared capabilities already allow — so a later such import in those
-  modules meets the scan like any other.
-- The reason "Consumed" reads the same everywhere it is shown — the history of
-  a record, the reason asked when one is removed and the audit journal — in
-  every language; three of the four used to say "Used". In Polish, the
-  approvals settings and the document settings call the module by its name,
-  "Zatwierdzenia".
+  shared catalogue is refused with `UNIT_WEIGHT_OF_SHARED_PRODUCT`; sending the
+  weight the product already records is not a change.
+- Equipment attachments and product files take one list of file types: the
+  old binary Word format (`.doc`) is refused by both, and Equipment takes
+  `.zip`.
+- Webhook endpoints subscribed to `item.transferred`, `item.deactivated` or
+  `item.status_changed` show them as withdrawn; nothing ever sent them.
 
 ### Added
 
@@ -267,55 +241,239 @@ says what the release does rather than what changed since them.
 - Module authors can page a list the server pages by cursor with
   `useKeysetPaging` from `@/module-sdk`: it keeps the cursors of the pages
   already visited and starts from the first page when the question changes.
+#### For people using it
+
+- **Shopping lists** top up a line that is already on them. A recipe added to a
+  list that carries its ingredient raises the line by what that recipe needs;
+  a recipe the line was made for raises it by what it now needs beyond that
+  (more servings, or less of the goods left on the shelf); "Update list" on a
+  meal plan raises a line when the plan needs more; and a production run's
+  shortage raises the listed line when the run needs more. A line already
+  ticked off keeps its quantity and the rest becomes a new line; a line is
+  never lowered. A line of the same product in another unit counts as its
+  amount in the unit asked for, so 500 g of plums already listed leaves 3.5 kg
+  of a 4 kg shortage to buy (it used to count as 500 kg), and a line in a unit
+  that does not convert covers nothing. Recipes added together subtract the
+  stock on the shelf from what they need between them, not each against the
+  whole shelf, and a "From recipes" sheet that adds nothing because the list
+  already asks for all of it says so.
 - When a recipe's "Add missing", a meal plan's "Generate Shopping List" or a
   list's "From recipes" writes goods that another open shopping list still
   asks for, the answer names them and the list that holds them
-  (`on_other_lists`), and the screen says so — in a toast, and on the meal plan
-  page in the panel that stays. The lists are still written as asked; nothing is
-  merged. Goods in another unit are not matched.
+  (`on_other_lists`), and the screen says so in a toast and, on the meal plan,
+  in the panel that stays. The lists are still written as asked.
+- A production run's shortfall put on the shopping list rounds up to the
+  ingredient's own unit step, as the recipes module rounds a requirement, so
+  an ingredient counted in pieces that is 1.5 short asks for 2 pieces, and the button that puts it there states the same quantity.
+- Asking for an approval warns about a later stage nobody could decide, not
+  only the first. The dialogs behind Confirm and Send for approval on a
+  document and on a purchase order name the first stage with no possible
+  decider and what ends the wait (grant the named people access to approvals,
+  give someone the permission, or withdraw the request). A purchase order
+  whose request was withdrawn and that asks again gets the same warning from
+  its approval card, and the notice for a request stuck at such a stage no
+  longer promises that withdrawing it returns the order to Confirmed. A stage
+  that names the person who raised the request beside people who cannot
+  decide it is a dead end, and is reported as one in the queue, the dialog and the notice.
+- The approval queues show a document's net amount and say that it is net, the
+  side the approval threshold is set on, and the notice to an approver names
+  the document, who asked and the net amount, in the app and by e-mail. A
+  write-off is weighed against the threshold at what the goods cost.
 - The name field of a form that creates a product offers the products already
   in the catalogue whose name contains what is typed; picking one writes its
   exact name, which is the match the save attaches the record to. Typing
   "Wax" no longer leaves a second product beside "Soy wax".
 - Under an empty product code field, the product form says what **Generate
-  code** gives: an in-house code starting with 20, from the range GS1 keeps for
-  a company's own goods, valid only inside the organization — goods sold on
-  through other shops need a GTIN from GS1. Under a code in that range it says
-  what such a code is, without claiming the organization made it. A screen
-  reader reads the sentence as the field's description, as it now does the
-  hints under the quantity and the weight.
-- An empty Products list says that products which exist only as a definition,
-  such as ones made inside a recipe or a BOM, appear there once they have stock.
+  code** gives: an in-house code starting with 20, from the range GS1 keeps
+  for a company's own goods, valid only inside the organization. An empty
+  Products list says that products which exist only as a definition, such as
+  ones made inside a recipe or a BOM, appear there once they have stock.
+- The stock-on-a-date report can be narrowed to a product and to the place you
+  had narrowed to; the spreadsheet, the printout and the `search` parameter of
+  `GET /stock-as-of` follow the same text, and a printout of one place names
+  the place beside its dates ("Main Warehouse › Fridge › Fridge A").
+- Smart alerts state how far off an expiry date is ("Expires on 12.11.2026, in
+  3 days"), colour a date within the week amber, and name the place and the
+  batch (`location_name`, `lot_name` in `GET /stats/smart-alerts`).
+- The expiry date picker starts with a week, two weeks and a month. Receive
+  goods and Issue goods can add a supplier or customer that does not exist yet
+  without leaving the form.
+- Settings has a "People" entry in its sidebar and phone menu that leads to
+  the members and invitations; the webhook dialog lists every event in the
+  interface language and sets apart the events of modules the organization has
+  not enabled.
+- A confirmed document keeps your own company's name, tax number and address
+  and the names of the locations it refers to, as it already kept the
+  partner, so a reprint after the company moved or a shelf was renamed shows
+  what the original showed; the record a closed stock take leaves keeps them
+  too. A document confirmed before this prints the current details.
+- Creating an account (the first one, by invitation or from an approved
+  request) signs it in and continues to the app; if the sign-in is refused,
+  the form opens with the address filled in. A password-reset link that is
+  spent or expired is refused when the page opens (`POST
+  /auth/password-reset/check`), with a link to request a new one.
+- A purchase order line picked from the catalogue starts from the price the
+  product last cost, and a custom purchase order template prints the values
+  its editor lists (`{{po_number}}`, `{{vendor_name}}`, `{{barcode_img}}` and
+  the rest).
+- A recipe's page and printout show a dash for a nutrient no ingredient
+  measured, where the sum would have been 0 (a rice dish where only the chicken
+  had values read "Carbs 0.0g"), and "Calories unknown" instead of "0 kcal".
+  The meal plan dialog that has no plan yet says the recipe is added to the
+  first meal of the new plan at once.
+- A low-stock alert for a product with no preferred supplier proposes the
+  supplier of its cheapest current price-list entry, and a draft purchase
+  order made from it goes to that supplier.
 - A module's settings schema may mark an option `requires_modules`: the option
-  is shown only while those modules are enabled. The recipes option "Register
-  production as internal issue documents" uses it, so an organization without
-  the warehouse is no longer offered an option that would do nothing.
+  shows only while those modules are enabled. The recipes option "Register
+  production as internal issue documents" uses it.
 - `POST /warehouse/documents`, which writes a draft, takes an `Idempotency-Key`
   header as `POST /warehouse/documents/post` does: the same key sent again is
-  answered with the draft the first request wrote instead of a second one. A
-  request without the header writes a draft each time, as before.
-- Module authors can hand an attachment's file picker the types the server
-  accepts, `ATTACHMENT_FILE_ACCEPT` from `@/module-sdk`, instead of keeping a
-  list of their own.
-- Module authors can give a quantity input the step the store keeps,
-  `QUANTITY_STEP` from `@/module-sdk`, instead of writing `0.001` into the form.
-- Module authors can put a record page of their own into **Recently visited**
-  with `useRecordVisit` from `@/module-sdk`, as the product, asset and recipe
-  pages do.
-- `module validate` reads a package the way `module new-community` writes it —
-  `module.yaml` with `backend/` beside it — and checks its backend laid out the
-  way `module install` lands it, so an author can validate before installing.
-- In development, the browser console names a module's `navOverrides` entry
-  whose `targetPath` is no navigation item, and an `i18nOverrides` key that no
-  catalog has, since either is accepted and changes nothing on screen.
+  answered with the draft the first request wrote. A request without the
+  header writes a draft each time, as before.
+
+#### For instance administrators
+
+- `manage.py user create-admin` takes `--lang` (`en`, `pl`, `de`, `fr`, `es`
+  or `pt`) to set the language the account opens in (an unknown code is refused, and
+  without it a new account takes the instance default and an existing one keeps
+  its own); DEPLOYMENT.md
+  and QUICK_DEPLOY.md say how to use the command to get back into an installation
+  without outgoing mail.
+- `manage.py user erase <user id>` erases one person's account on a GDPR
+  erasure request: it shows whose account it is and asks first (`--yes` skips
+  the question), replaces the address, name and password, closes the account
+  and revokes its sessions in one transaction, and reports "Nothing was
+  erased" with exit code 1 when a step fails, Redis included. It also clears
+  the reason an operator wrote when blocking the account and finds the
+  person's registration request however the address was capitalised. It
+  replaces the Python script GDPR_MANUAL_PROCEDURE.md asked operators to
+  paste; the procedure says now that the user id the journal keeps is
+  pseudonymised personal data, and that records an organization keeps about
+  people (equipment handed to them, their answers to an equipment check, a
+  contact or employee card) are not rewritten by the deletion.
+- `PGBOUNCER_MAX_CLIENT_CONN` in `.env` sets how many connections PgBouncer
+  accepts from the backend (300 when unset, as before). Six workers open up to
+  300, so DEPLOYMENT.md's 16 GB sizing row sets it to 400.
+- The 409 refusals of focus mode, of a profile switch and of onboarding with a
+  module chosen carry `lang` and the data their message is built from
+  (`module`, `unknown_modules`, `not_allowed_modules`, `modules` or
+  `missing_dependency`) next to `code` and `message`, so a client can name the
+  refused modules without reading them out of the sentence.
+- When a handler of an event that belongs to no organization is given up on,
+  the instance's superusers are told, in their own language and once a day per
+  handler, as an organization's admins are for its own events.
+- A multi-node deployment no longer collects a dead member in the event and
+  task stream groups for every restart: a reaper removes consumers that have
+  held nothing for an hour, a clean shutdown removes the event bus's own at
+  once, and a message a crashed node had read but not finished is redelivered
+  when the replacement starts (`docs/SCALING.md`).
+
+#### For module authors
+
+- The module SDK gains `hit_constraint` (did this integrity error trip one of
+  the named constraints), `rows_to_csv` (rows to CSV text with every data
+  cell defused against spreadsheet formulas) and `utc_now` (the timezone-aware current moment); `cover_leaf` and
+  `cover_leaf_of` name and read a cover file; the frontend `@/module-sdk`
+  gains `useIsSignedInAs` (is the signed-in user the person a record names by e-mail address), `useKeysetPaging` (a list the server pages by
+  cursor), `useRecordVisit` (a record page in **Recently visited**),
+  `ATTACHMENT_FILE_ACCEPT`, `QUANTITY_STEP`, and the `Item`, `StorageType` and
+  `ScannedTemplate` types, `useAppMutation`, `useModules`,
+  `PageHeaderContext` and the overview's `AttentionCard` that its own
+  contract and the guides ask a module to use.
+- A module names the read its launcher badge asks for with
+  `statusBadgePermission` on its `FrontendModule`; the launcher calls
+  `useStatusBadge` only for a role holding that key, and the tile shows no
+  status for any other role instead of "Status could not be read". A module
+  that leaves it out is asked of every role, as before; an action-items hook
+  keeps asking for itself and should do so only when `useHasPermission` grants
+  the read (FRONTEND_MODULE_GUIDE.md shows how).
+- A module that prints its own documents through the core print identity can
+  freeze the issuer block with `issuer_snapshot` and
+  `IssuerContext.from_snapshot`. A module's own request that saves nothing
+  passes `{ readOnly: true }` as the request config to the `api` client from
+  `@/module-sdk`, and gets the plain "session has ended" sentence (see
+  *Fixed*).
+- A module's `on_enable` (and `define_module(seed=...)`) runs whenever the
+  module is enabled for an organization, onboarding and the demo seed
+  included; a module that seeds there no longer leaves every onboarded
+  organization without it. A module no longer has to call `super()` from
+  `on_startup` or `on_install`: the framework registers its services and
+  contributions, wires its interceptors and runs its migrations itself
+  before the hook. An item interceptor overrides only the hooks it needs.
+- `module validate` reads a package the way `module new-community` writes it
+  and checks its backend laid out the way `module install` lands it, and
+  `--allow-core` skips the safety scan only for the modules this repository
+  ships. `module install`, `module upgrade` and `module validate` refuse what
+  discovery refuses at the next start (a manifest `name` other than the
+  directory, a `module_type` above `community` from outside the repository, a
+  platform floor above the running version) instead of printing success, and
+  accept a `requires` entry naming an always-on feature.
 - A module's document filter can count only the lines that carry a batch
-  (`DocumentFilterDTO(lots_only=True)`), for a filter that answers for a rule
-  about lots. The lot certificates example uses it, so its "certified" filter
-  lists exactly the receipts its rule would book.
-- `@/module-sdk` exports what its own contract and the guides ask a module to
-  use: the `Item`, `StorageType` and `ScannedTemplate` types its signatures
-  hand over, `useAppMutation`, `useModules`, `PageHeaderContext` for a page
-  test, and the overview's `AttentionCard`.
+  (`DocumentFilterDTO(lots_only=True)`); the lot certificates example uses it.
+- In development, the browser console names a module's `navOverrides` entry
+  whose `targetPath` is no navigation item, an `i18nOverrides` key that no
+  catalog has, and a navigation item with a relative path; registering a
+  contribution to `scan_providers` or `dashboard_widgets`, which no backend
+  code ever read, logs the warning of an unknown point. The safety scan reads a banned import as the module and the modules inside
+  it, so `socketserver` is no longer refused as `socket`, and accepts `from
+  app.core import module_sdk`.
+
+### Changed
+
+- A refused invitation answers with one sentence that says what to try — use
+  the address the invitation was sent to, or ask for a new one — and the same
+  sentence for a wrong address, an expired, a used, a withdrawn and an unknown
+  code, so it tells nobody which of them it was. The public link check
+  (`GET /public/invitation/{code}`) keeps answering a dead code with a 404 and
+  asks for a new link.
+- `GET /items/archived` pages by the last record seen, as the stock movement
+  ledger and the audit log do: `next_cursor`, `cursor`, a count on the first
+  page, and an order by id for records archived at the same instant, so a page
+  deep in a long archive costs what the first one does and turning a page
+  shows no record twice. The archive screens of the product list and of
+  Equipment page this way.
+- Equipment attachments and the files attached to a product accept one list
+  of file types, and the pickers no longer offer `.doc`, which the server
+  refused only after the upload. The size limits stay: 20 MB for an equipment
+  attachment, 10 MB for a product's.
+- The reason "Consumed" reads the same everywhere it is shown, in every
+  language; the Polish approvals and document settings call the module by its
+  name, "Zatwierdzenia". The module store in Settings is headed "Modules",
+  the Statistics settings link carries the module's own name, and removing a
+  member asks "Remove <name>?" and says that person loses access at once.
+- A refusal about a closed period names the month as the period screen does
+  ("September 2026"). Amounts in a unit that is a word take its plural ("6
+  bottles"). The short-pick dialog says "Cancel" and the picking sheet's main
+  button "Complete picking", as their receiving counterparts do, and the
+  equipment note beside the item actions calls the action "Return".
+- Saving a module's settings, signing in and every refusal use the reader's
+  language: the confirmation after saving a module's settings and after
+  signing in, a "not found" answer on every endpoint (a module's
+  `NotFoundException` raised without a language speaks the request's
+  language), a request refused for the general rate limit (`lang` beside
+  `message`), a bulk edit of an asset's status, a warehouse document import
+  row (which carries its code), and a validation error that names a decimal
+  bound, written in the reader's decimal mark.
+- The audit log writes the quantities and amounts of a production order, its
+  completion, a recipe and its lines, and of an item's creation, use,
+  disposal, deletion and restoration, and the low-stock threshold, as the
+  exact digits the record holds; a production order of 1,234.567 read 1,234.57
+  in the log. The product history does the same for a use, a disposal, a scan
+  that adds to a record, a deletion and an opened package. Entries written
+  before keep their numbers, and the history screen reads both.
+- The journal names the custom role an invitation offers and a print layout by
+  the name the settings screen gives it, and marks the settings a workspace
+  mode writes as "Workspace mode default". A day's activity and History state
+  the stock change of a correction with its sign ("by +1" for taking one piece
+  off an issue).
+- A webhook endpoint switched back on in its edit form starts its failure
+  count again, as Reactivate does; a retried delivery sends the bytes of the
+  first attempt, so its signature is the same. `GET /stats/consumption` fills
+  `consumption_by_category`, which was always empty.
+- The statistics screens count stock rows as records, name products without a
+  category in the reader's language, list the fullest places first and leave
+  out the system's consumed, loss and production places.
 
 ### Fixed
 
@@ -381,573 +539,338 @@ says what the release does rather than what changed since them.
   header followed by something else — is now refused as unreadable instead of
   being stored and shown as a broken thumbnail. The equipment note beside the
   item actions now calls the action "Return", as the button does.
+#### Access and security
 
-- `manage.py db stamp-module` now works on a database that a newer version has
-  already migrated. `db doctor` refuses to start in that state and prints this
-  command as the way out, but the command itself stopped with "Can't locate
-  revision" because it first looked up the revision the database recorded, which
-  the older checkout has no file for. It now replaces the recorded revision
-  without looking it up. The index on `audit_log (organization_id)` is dropped
-  by a migration too: the two composite indexes on the journal serve every read
-  it did.
-- Refusing a partner that already exists now names its type in the reader's
-  words ("Supplier", "Dostawca") rather than the stored value `SUPPLIER`, in
-  every language, and so does the refusal to confirm an order to a partner that
-  is not a supplier. A rename that loses a race for the name no longer ends the
-  transaction around it, and a duplicate is told apart by the constraint the
-  database reports instead of by text that also quotes the row's values.
-- The shopping list's refusals of a quantity — one that rounds to zero and one
-  above the ceiling — and the "at least" message under a quantity field now
-  write their numbers in the reader's decimal mark ("0,001", not "0.001" in
-  Polish), and the two ways of adding an item state the same rounded value for
-  the same request.
-
-- On a phone, the picking and receiving lists show the whole product name and
-  the whole batch and location code instead of cutting them: they break at a
-  space or a hyphen and inside a code only where it does not fit the column. A
-  product name without spaces no longer runs off the edge in the line under the
-  scan field or gives the picking summary a horizontal scrollbar.
-- The Receive goods, Issue goods and Move goods forms refuse a missing value
-  where it is. Receiving without a supplier or customer marks that field and
-  says why under it, as the location field already did, and the sentence is no
-  longer repeated in the footer or on the phone's start panel, so a screen
-  reader announces it once. An error under one field no longer pushes the
-  other fields of its row out of line on any of the three forms.
-- A request refused for exceeding the general rate limit is answered in the
-  request's language: a Polish, German, French or Spanish reader used to get the
-  refusal in English, while one refused by an endpoint's own limit already got
-  it in their language. Both kinds of refusal now carry `lang` beside `message`.
-- `DEFAULT_LANGUAGE` reaches the backend container on both the development and
-  the production stack, and is in `.env.production.example`. It used to be read
-  only by a backend started outside Docker, so an account created without a
-  language — the administrator `manage.py user create-admin` makes without
-  `--lang` — started in English whatever `.env` said.
-- The symbol list in the document and equipment template editors reads as
-  something a template author can use. Examples of record-valued symbols
-  (`totals_by_unit`, `packages`, `pick_lines`) show their fields instead of
-  Python dictionaries with `Decimal(...)` wrappers, the document examples
-  (title, status) are in the editor's language, and the Name hint, the
-  unbalanced-HTML message and the description of a category custom field are
-  translated instead of falling back to English. `GET
-  /warehouse/templates/placeholders` answers in the request language, and a
-  custom-field entry of the equipment placeholder lists carries
-  `custom_field_label` and `custom_field_categories` beside its English
-  description.
-- A module that is switched on now says on its store card when a module it
-  works better with is switched off, as the card already did before the module
-  was switched on. The roles screen names a module with no translation of its
-  own, such as one just made with `make new-module`, by the name in its
-  manifest instead of its technical identifier.
-- The Check Out Asset dialog names an address nobody in the organization uses
-  before it saves it, also when the address is pasted and submitted at once.
-  The check waited for the typing to pause, and a quicker Enter stored the
-  address with no warning ever on screen; such a submit now shows the warning
-  and saves nothing, and the next one saves the asset to that address.
-- A fault while reading the documents awaiting your approval, or a supplier's
-  pricelist for a price suggestion, is now answered as a server error and
-  logged with its traceback. The approval list used to come back empty and the
-  suggestion fell back to the last purchase price, so a fault looked like
-  having nothing to approve, or like the supplier's price.
-- A request whose `X-Request-ID` or `Accept-Language` header carries a byte
-  outside UTF-8 is no longer answered with a 500. A client's `X-Request-ID` is
-  kept only when it is 8 to 64 letters, digits and hyphens, as a UUID or a
-  trace id is; any other value is replaced by one the server makes, which the
-  response returns as before, because the id is written into every log line
-  of the request.
-- A "not found" answer is in the reader's language on every endpoint; many
-  still answered in English. A module's `NotFoundException` raised without a
-  language now speaks the request's language too.
+- A custom role holding only a module's read opens that module's screens
+  whole. Equipment's asset list, filters, archive and card read the locations,
+  categories and archived records they show, its label download answers the
+  register's read, and Warehouse's codes page reads the locations and
+  categories it lists; each of those calls answered 403 before and the screen
+  showed an empty list. The read still buys no core write, and no reach past
+  the module's own records.
+- The equipment register's routes that name one asset (valuation,
+  attachments, approval state, assignment and maintenance history, timeline,
+  check-out, service entry, status change, retirement, archiving) answer only
+  for the records the register lists. A role holding only `equipment:read` used
+  to read the name, serial number and purchase price of any product whose id
+  it knew, and a retirement sent through the register changed an ordinary
+  product; such a record now answers 404. A print job of pool labels sent with
+  the register's read takes only labels assigned to its records.
+- The home screen no longer asks for the status of a module the signed-in role
+  cannot read, so such a tile shows no status and such a To do row does not
+  appear, instead of "Status could not be read".
+- The error details a broken screen offers to copy into a bug report no longer
+  carry the token of the link that opened the page (password reset,
+  invitation, registration, equipment attestation): it reads `redacted`.
+- A module's stored file path with a `..` segment is refused (`StorageError`)
+  instead of resolving outside its folder on the local disk, and a missing file
+  is a `StoredFileNotFoundError`. An equipment attachment on a bucket (S3)
+  backend opens through the app's own `/uploads/…` address, which checks who
+  is asking, instead of the bucket's bare address.
+- A search or any text a request sends that holds a null character is refused
+  with a 400 (`TEXT_HAS_A_NULL_CHARACTER`); a request whose `X-Request-ID` or
+  `Accept-Language` carries a byte outside UTF-8 is no longer answered with a
+  500, and a client's `X-Request-ID` is kept only as 8 to 64 letters, digits
+  and hyphens. A 500 answer carries `X-Request-ID` like every other.
 - Closing or reopening an inventory period refuses a month outside 1–12 or a
-  year outside 2000–2100 with a 422, instead of closing a thirteenth month.
-  Pasted import text is refused with a 422 past the size an imported file may
-  have (50 MB).
-- The consumption report's two top-ten lists, the products used most and the
-  ones whose disposals cost most, put equal products in the order of their
-  names. A tie at the tenth place used to be settled by the order the database
-  returned the rows in, so the same window could name a different tenth product
-  from one reading to the next.
-- Importing ingredient data from a file with no usable row — an empty sheet, a
-  renamed photo, a bank statement with no name column, a list of numbers — now
-  answers with what the import expects instead of a green "0 added" message.
-  A file with some good rows still imports them, and the message turns into a
-  warning when any row had to be skipped.
-- The scanner's Back button now leads to the launcher when the scanner was the
-  first screen of the tab — opened by address, through a printed code's link or
-  after signing in — instead of doing nothing.
-- Refusing an asset's status change from the bulk edit now reads in the language
-  of the session (it was always English) and the row carries a machine code, and
-  the Polish sentence no longer says "zmienić status z". A refused row of a
-  warehouse document import carries its code too, and a database error in a row
-  now shows the generic sentence instead of the statement that failed.
+  year outside 2000–2100; pasted import text past 50 MB is refused with a 422.
+- Uploading a picture that only starts like one is refused as unreadable; a
+  logo uploaded as WebP prints through `{{ issuer.logo }}`; an organization
+  template keeps an `alt`, `title` or `class` beginning with "Data:".
+- A Google (Gemini) connection keeps the same time limits as every other
+  provider (`LLM_REQUEST_TIMEOUT_SECONDS` for a call, 30 seconds for the model
+  list on the connection test) and a Gemini outage answers 503 with the sentence that names it. A
+  label photograph sent to `POST /vision/extract` is fitted into 1200 × 1200
+  px before a model sees it.
+- A module rejected at startup no longer leaves its permissions in the roles
+  editor, the API key dialog and the built-in role defaults. A signing key
+  listed without an id is skipped with a warning that says so, and a failed
+  signature names a different key under the same id as one of the two
+  possibilities.
+
+#### Time and numbers
+
+- Which day it is comes from the organization's clock in the places that still
+  read the server's: the shopping-list suggestions, the reserve stock
+  replenishment offers, the date a production run with no production date is
+  filed under (and the closed-period check on it), and the year in the number
+  of a document with no date of its own. An organization a day ahead of or
+  behind the server saw each of these a day off, and a document was numbered
+  into the old year just after local midnight on 1 January.
+- Spreadsheet exports store a figure as the screen shows it (95.35, not
+  95.34999999999999). A recipe picking leaves what is written to the record
+  on the shelf, not a float subtraction (0.1 kg from 0.3 kg left
+  0.19999999999999998). "Max batches from stock" shows ten as 10, not 1E+1.
+- The shopping list's refusals of a quantity and the "at least" message write
+  their numbers in the reader's decimal mark ("0,001" in Polish), and the two
+  ways of adding an item state the same rounded value for the same request.
+- The consumption report's two top-ten lists order equal products by name, so
+  a tie at the tenth place no longer changes from one reading to the next. An
+  organization with more than 500 records gets its forgotten-product alerts
+  from its stalest records.
+
+#### Stock, products and locations
+
+- On a stock take, Save on an empty or unreadable count box no longer records
+  a count of zero; a note typed on, changed on or cleared from a counted line
+  makes the line read as unsaved and enables Save; and Complete stock take
+  waits until the saved count is back, so it no longer refuses with "one
+  product is still uncounted".
+- Two locations can no longer be saved with one name at the same level by two
+  people, or a retried request, at the same moment, and the database holds the
+  rule too. On upgrade, places that already shared a name under one parent
+  keep both: the newer one is renamed with a number, such as "Cellar (2)".
+  Saving two partners with the same name or code at once is refused with the
+  usual "already exists", and refusing a partner that exists names its type
+  in the reader's words ("Supplier", "Dostawca").
+- Archiving a location whose records have to go somewhere offers every other
+  location as the target, sublocations included. Locations: an address that is
+  not a location identifier shows the same "not found" page as an unknown one,
+  an empty location no longer offers a button to an empty Products tab, the
+  archived locations are reachable from a phone, and the location wizard no
+  longer replaces a name already typed when a chip is pressed or suggests a
+  name taken by a module's location or an archived one.
 - Replacing the photo of a product, an asset or a recipe shows the new picture
-  at once. It used to go on showing the old one until the page was reloaded,
-  because every cover was kept under the same address. Module authors get
-  `cover_leaf` and `cover_leaf_of` in the module SDK to name and read a cover
-  file the same way. A photo picked in the product edit sheet is now saved with
-  Save changes, and Close drops it like any other edit; it used to be stored the
-  moment it was picked and then overwritten by the save.
-- The production Content-Security-Policy admits the web worker that shrinks a
-  photo before it is sent, so choosing a photo no longer logs a policy
-  violation or shrinks it on the page's own thread.
-- On an organization seeded before the option words existed, the "Lactose free"
-  field of the Dairy and Cheese categories now offers its options in the
-  interface language instead of the stored English "No" and "Yes". Options an
-  organization wrote itself keep their words.
-- The stock-on-a-date report can be narrowed to a product: it has a search
-  field, the stock list's "Stock on a date" button carries the search and the
-  place you had narrowed to, and the spreadsheet, the printout and the
-  `search` parameter of `GET /stock-as-of` follow the same text. Its total and
-  counts then speak about the matching products only.
-- The stock-on-a-date printout of one place names the place beside its dates,
-  as the way to it ("Main Warehouse › Fridge › Fridge A"), so a filed sheet no
-  longer reads as the whole warehouse. A search that finds nothing says so, on
-  the screen and on the printout, instead of saying that nothing was on the
-  shelf.
-- Spreadsheet exports store a figure as the screen shows it: a value of 95.35
-  was written into the file as 95.34999999999999, which a conversion to CSV or
-  a script reading the file then showed.
-- A search, or any other text a request sends, that holds a null character
-  (U+0000, `%00` in an address) is refused with a 400 in the reader's language,
-  coded `TEXT_HAS_A_NULL_CHARACTER`, instead of ending in a server error.
-- The "Show inventory value" setting says that it also governs the product
-  screens, exports and printouts, not only the statistics overview, and a
-  profile that hides stock value no longer shows it for a moment while the
-  setting is still on its way.
-- Smart alerts state in words how far off an expiry date is ("Expires on
-  12.11.2026, in 3 days"), and an alert about a date within the week is amber
-  rather than grey. An expiry alert names the place its record lies in, and its
-  batch where it has one, so two alerts for one product with one date no longer
-  read the same; `GET /stats/smart-alerts` carries them as `location_name` and
-  `lot_name`. The expiry forecast tiles sit two across on a phone and three
-  across below 1280 px, so no label breaks inside a word in any of the six
-  languages, and uppercase labels keep their word spaces.
-- Two locations can no longer be saved with one name at the same level when two
-  people, or a retried request, name them at the same moment: the second is
-  refused with the same "already exists at this level" answer a later attempt
-  gets. The database now holds the rule too. On upgrade, places that already
-  shared a name under one parent keep both: the newer one is renamed with a
-  number after its name, for example "Cellar (2)".
-- Add Category opens empty, on the product and the equipment category screens
-  alike. It used to bring back the last name typed, after a cancel and after a
-  save, where saving it again was refused as a duplicate.
-- A product's thumbnail goes back to the picture the product has when the server
-  refuses a new one, and the same file can be picked again. It used to go on
-  showing the refused picture until the form was reopened.
-- A product form whose category list could not be loaded says so and offers a
-  retry, instead of quietly leaving out the fields the category declares.
-- The action sheet opened from a location's products or a scan explains why an
-  asset's actions are worded differently, as the product page does. An account
-  that may not act on the record no longer gets that sentence on either of them.
-- On a document form, a line the price books and past purchases have no price
-  for says so under that line. The sentence below the table now speaks only of
-  the document having no accounting value: as one sentence for every line, it
-  could not be true of two lines in different states.
-- Editing a draft return now offers the kind of partner the goods go back to:
-  suppliers on the return of a receipt, customers on the return of a delivery.
-  The form used to read the partner already on the draft as empty and refuse to
-  save, and a return to a manufacturer was refused by the API as well.
-- The scan confirmation on a document and the unit question on the item form
-  name the unit in the interface language ("szt.", not "pcs").
-- The short-pick dialog says "Cancel" like the short-receive one, and the picking
-  sheet's main button says "Complete picking", matching "Complete receiving".
-- The Polish refusal to finish a document with an open picking or receiving
-  session agrees with the number of sessions.
-- The answers of `PATCH /documents/{id}/confirm`, `.../complete` and
-  `POST /documents/{id}/post` carry `confirmed_by_name` and `completed_by_name`,
-  which were `null` until the document was read again.
-- Printing a list of labels gives a sheet of rows, three labels across, in the
-  preview and in the download alike. It used to be one strip, however long,
-  which the dialog shrank into a grey line of bars. The print queue still sends
-  a printer its strip.
-- Product distribution by location no longer lists archived locations, or a
-  container with no records of its own as if it were an empty shelf, and writes
-  location and category names as they were typed, so the space in "Rack A-01"
-  stays visible.
-- A stock take report shows a surplus in blue, like its Overstock tile, not in
-  the red of an error beside an amber shortfall.
-- Warehouse occupancy no longer suggests a cheese in its search box on every
-  profile, and the statistics page no longer calls a warehouse's stock supplies.
-- Deactivate on a module's card reads as a button.
-- The demo data charges the tax of the organization's country, and none where
-  no country is set, rather than Polish VAT on every order and document.
-- Equipment, small things a regression pass found: adding an asset opens the
-  new asset (a batch opens the asset list) and retiring one keeps you on it;
-  the public attestation page says which organization asks and by what day,
-  and its confirm texts follow the number of assets still open; an import
-  that lost rows says it finished with errors and names the serial numbers it
-  skipped as duplicates; an asset in service with an empty log says nothing
-  is logged for the service yet; the German screen is "Meine Geräte", and the
-  Polish module speaks of issuing (*wydanie*) throughout. The date picker now
-  prints a day the way the rest of the application does.
-- Tapping a screen for the first time now shows a loading sign at once, inside
-  the application's frame, instead of leaving the old screen up for as long as
-  the download takes. The very first open of the application shows the product
-  name and a loading sign instead of a white page.
+  at once (every cover was kept under one address); a photo picked in the
+  product edit sheet is saved with Save changes and dropped by Close; a
+  product's thumbnail returns to its picture when the server refuses a new
+  one. Stored photos load on an instance that serves the app straight from the
+  frontend container without Caddy, which answered every `.jpg` and `.png`
+  under `/uploads/…` with its own 404.
+- The product list keeps its order when you come back (the sort is part of the
+  address), ticking two filter chips quickly keeps both, "expiring soon" and
+  "expired" no longer stay on together over an empty list, and a product's
+  place is blank, not "Unknown", while its name is on its way.
+- A product used up to zero reads "Consumed" and no longer offers "Add 1
+  unit", which was refused after the click. A product name longer than 100
+  characters can be searched, a failed search is reported as failed with a
+  retry, and the product search no longer empties itself on a scroll event.
+  A product form whose category list could not be loaded says so and offers a
+  retry; Add Category opens empty on the product and equipment screens alike.
+- Product distribution by location no longer lists archived locations or a
+  container with no records of its own as an empty shelf. Warehouse
+  occupancy no longer suggests a cheese in its search box on every profile, and
+  the statistics page no longer calls a warehouse's stock supplies. A stock take
+  report shows a surplus in blue, like its Overstock tile.
 - A row of the inventory overview about a date opens the product with its
-  expiry date in view; on a phone it was a long way down the sheet.
-- On a phone, a purchase order's main action sits on its bar rather than in the
-  "..." menu, the new partner sheet keeps Save in view, the statistics tabs fit
-  the screen, and the product suggestions open above the keyboard. A line added
-  to a shopping list from the replenish suggestions keeps its unit, and the
-  analytics tiles say what they count.
-- The product search no longer empties itself while you are using it. Its list
-  used to close and take your text along on a scroll event when nothing had
-  moved, or when the form was still sliding into place as the list opened. It
-  now closes only when a scroll moves a box that was standing still, and stays
-  under the box while the form settles.
-- Warehouse floor papercuts: the carrier typed on the picking summary is
-  still there when packing opens; a camera without a torch no longer offers
-  the light switch; the lot on the receiving expiry sheet and a product's own
-  code on the product form can be read with the camera instead of retyped,
-  and the lot sheet no longer opens with the keyboard over the expiry date; a
-  correction draft describes each line as added to or removed from stock in
-  words, the same way on its line, summary and confirmation; every row of
-  the history keeps its columns aligned; and a write-off ends on a write-off
-  result instead of "Issued".
-- Finishing a stock take right after saving the last count no longer refuses
-  with "one product is still uncounted": Complete stock take now waits until
-  the saved count is back on the screen.
-- Ticking two filter chips quickly on the product list no longer drops the
-  first one from the address, which turned it off a moment later.
-- The product list keeps its order when you come back to it: the sort is part
-  of the address, so Back from a product finds the rows where you left them,
-  and a chip ticked in the same moment as a change of sort stays on after Back
-  too.
-- A product's place on the product list is left blank while its name is still
-  on its way, also after a search, another page or a chip changes the rows; it
-  used to read "Unknown" until the names arrived. A place whose name cannot be
-  loaded still says "Unknown".
+  expiry date in view. On an organization seeded before the option words
+  existed, the "Lactose free" field of the Dairy and Cheese categories offers
+  its options in the interface language.
+- The product label dialog no longer shows "Lot and expiry date" ticked while
+  disabled, and printing a list of labels gives a sheet of rows, three across,
+  in the preview and the download. The scanner's Back button leads to the
+  launcher when the scanner was the first screen of the tab.
+
+#### Documents, warehouse and approvals
+
+- A return can be duplicated: Duplicate used to be refused with "Invalid
+  input" and now writes another draft return of the same document, counted
+  against what is left to return on it and refused in the same words as a new
+  return when too little is left. A return saved from its edit form keeps
+  counting against its original, editing a draft return offers the kind of
+  partner the goods go back to (suppliers for a receipt, customers for a
+  delivery), duplicating a correction through the API answers
+  `DOCUMENT_CORRECTION_NOT_DUPLICABLE`, and a copy of a receipt whose line
+  named only a stock record keeps that record.
 - Saving a receipt as a draft again after the answer was lost on the way back
-  (a phone changing networks) no longer leaves a second draft behind: the
-  answer is the draft the first save wrote.
-- A purchase order's approval panel follows the approvals settings: after
-  "Admins may approve their own requests" is saved, going back to the order
-  offers Approve without a reload.
-- The confirmation after saving a module's settings is worded in the interface
-  language, and the one after signing in in the language of the screen the
-  account opens in, not the device's.
-- The notice to an approver names the document, who asked and the net amount,
-  in the app and by e-mail.
-- Completing a purchase order sends one notice per person; an administrator who
-  raised the order used to get two.
-- A write-off is weighed against the approval threshold at what the goods cost,
-  so one under the threshold raises no approval request and shows no approval
-  step or approver on its page. One whose goods have no recorded cost still
-  needs the approval.
-- A note written when approving or rejecting a purchase order is recorded. The
-  screen sent it in the request body and the server read only the query string,
-  so it was lost.
-- The journal names the custom role an invitation offers, not the built-in level
-  under it, and shows a print layout by the name the settings screen gives it.
-- Saving a supplier price or a reorder rule without a product now marks the
-  product field as required and says so on the field, and a reorder rule whose
-  maximum is below its minimum is refused on the Maximum field in plain words.
-  On a phone, the reorder rules are cards with their figures and actions in
-  view instead of a table that scrolled off the right edge.
-- A low-stock alert for a product with no preferred supplier now proposes the
-  supplier of its cheapest current price-list entry, and a draft purchase order
-  made from it goes to that supplier, instead of reporting "No supplier" beside
-  a price the module holds.
-- The purchase-order approval warning names the approval threshold when the
-  threshold is the requirement left, and a viewer opening the Production or
-  Purchase order settings is told that only an administrator can open them
-  instead of "You can view this" above an empty page.
+  (a phone changing networks) no longer leaves a second draft behind.
+- A completed dispatch keeps its **Packing** card, read-only, with each package's
+  slip and label and the file of all slips; a picking session over one
+  delivery, however it was opened, ends with **Pack**, the shipping fields and
+  **Complete and book** (opened from the documents list, **Close** used to
+  complete nothing and offered neither); the carrier
+  typed on the picking summary is still there when packing opens.
+- A document that waited for an approval when the approvals module was
+  switched off is worked as a confirmed one, and starting that work takes it
+  out of the queue for good (its read carries `hold_stood_down`). A purchase
+  order's approval panel follows the approvals settings without a reload, and
+  a note written when approving or rejecting a purchase order is recorded; it
+  used to be lost between the screen and the server. Completing a purchase
+  order sends one notice per person.
+- The Receive goods, Issue goods and Move goods forms mark a missing value
+  where it is and say why once, and an error under one field no longer pushes
+  its neighbours out of line. A posted receipt says which of its lines have no
+  price, and a document form says so under a line the price books and past
+  purchases have no price for. An issue dated today can be planned from its
+  page.
+- On a phone, the picking and receiving lists show the whole product name and
+  the whole batch and location code, a purchase order's main action sits on
+  its bar, the new partner sheet keeps Save in view, the statistics tabs fit
+  the screen and the product suggestions open above the keyboard.
+- A fault while reading the documents awaiting your approval, or a supplier's
+  pricelist for a price suggestion, is answered as a server error and logged;
+  the list used to come back empty. Exporting the document register to CSV no
+  longer loads every line into memory (20 000 documents of ten lines takes half
+  a second instead of seventeen and 40 MB instead of 1.2 GB), and a period that
+  ends before it starts answers 400.
+- Smaller things on the warehouse floor: a camera without a torch no longer
+  offers the light switch; the lot on the receiving expiry sheet and a
+  product's own code can be read with the camera; the document scan
+  confirmation and the unit question name the unit in the interface language;
+  a correction draft says in words which lines are added to or removed from
+  stock; "Recently visited" on the launcher and the command palette fill again
+  (nothing recorded a visit).
+- A purchase order mailed to the supplier, and the mail of the approvals and
+  equipment modules, leave through the mail server the organization set in
+  Settings → Email, as invitations and password resets already did.
+- Saving a supplier price or a reorder rule without a product marks the field,
+  a maximum below the minimum is refused on the Maximum field, and on a phone
+  the reorder rules are cards. The purchase-order approval warning names the
+  threshold when it is the requirement left, and the message for a missing
+  approval workflow tells a storekeeper to ask the administrator.
+
+#### Production, recipes and meal plans
+
+- Importing ingredient data no longer loses the whole file when one row is
+  refused: the row is counted as an error and the rest are saved (a name too
+  long for its column used to answer 500 and roll back the good rows too), and a
+  blank name is refused by the form and counted as an error by the import
+  rather than saved as a nameless entry. A file with no usable
+  row (an empty sheet, a photo, a bank statement) or that holds no list of
+  rows answers with what the import expects in every maintained language,
+  instead of a green "0 added" or the parser's own words.
+- The maker's "Block" shortage strategy holds against an API request that
+  sends `confirm_shortage`, duplicating a run the stock cannot cover is refused
+  under it (422 `shortage_blocked`), and `GET /maker/settings` documents
+  `WARN` as the default. The composition tree on a variant's page shows that
+  variant's ingredients; `GET /maker/bom/{template_id}` and `GET
+  /maker/bom/tree/{template_id}` answer one recipe (`recipe_id=`, else the
+  default one).
+- A product whose nutrition came from Open Food Facts counts its calories in
+  recipe estimates and the meal plan's daily totals. A recipe ingredient typed
+  by hand whose name has accented letters ("Ryż") finds the product on the shelf
+  ("Ryż 1 kg"). The stock changes a production run and its reversal write carry
+  a reason in the interface language followed by the run's number, the cost
+  line names the unit the run is counted in, and a recipe's page prints its
+  name once.
+- The cooking screen states the amount a pick took in the reader's number
+  format, closing "Take from stock" no longer marks the recipe as cooked, the
+  new production dialog writes the unit as the rest of the app does, and the
+  onboarding card for working with a single module names Production.
+- The empty state of the ingredient dictionary no longer promises a fallback to
+  English: it says suggestions come from matching entries in any language, the
+  current one first, which readers in French, German, Spanish and Portuguese,
+  whose dictionaries start empty, see on every installation. The sentence about which units are offered takes the full width
+  of the ingredient form.
+
+#### Equipment
+
+- Handing an asset back, from "My assets" or its own page, opens a dialog worded
+  for the person returning it, and the holder's history prints days and
+  conditions in the interface language. The Check Out Asset dialog names an
+  address nobody in the organization uses before it saves it, also when the
+  address is pasted and submitted at once.
+- The overview counts a new asset as soon as it is saved, and three numbers
+  agree with the lists behind them: a category row leaves out retired assets
+  nobody holds and the list it opens does too (a "Retired hidden" chip brings
+  them back; `GET /equipment/assets` takes `hide_retired`), and the attention
+  card reads every late return, not the first twenty.
+- Smaller things a regression pass found: adding an asset opens it and
+  retiring one keeps you on it; the public attestation page says which
+  organization asks and by what day and shows its ticks in the success colour;
+  an import that lost rows says so and names the duplicates it skipped;
+  deleting a category says what goes with it; a dispute note names the asset by
+  its serial number; the sheet that issues an asset keeps its buttons in view
+  on a phone; the German screen is "Meine Geräte" and the Polish module speaks
+  of issuing (*wydanie*) throughout; the date picker prints a day the way the
+  rest of the application does.
+- Dialogs say what failed: creating a location, saving a stock alert, a bulk
+  edit, changing a batch's status and freeing a label name the write that could
+  not be done instead of "Unknown error", bulk edit's Apply waits until a field
+  is ticked, and an empty service entry marks every missing answer in the app's
+  language.
 - Module settings with a bounded number (such as the equipment warning window)
   answer a value out of range in the app's own language rather than in the
   browser's.
-- Locations: an address that is not a location identifier shows the same "not
-  found" page as an unknown one, the archive confirmation says that the
-  locations inside stay in the lists, an empty location no longer offers a
-  button to an empty Products tab, the archived locations are reachable from a
-  phone, and Archive and Delete sit at the top of a location's settings. The
-  note about hidden locations tells a member who can turn the setting on
-  instead of sending them to a page that refuses them.
-- Choices drawn by colour alone (the Production settings groups and the
-  tracked fields of a location) now report which option is selected to
-  assistive technology.
-- Equipment categories: deleting one says what goes with it, and the Desktop
-  Computer, Network Device and Peripheral presets have icons of their own. In
-  Polish the Batches status tabs read as plurals. The AI connections page no
-  longer shows its title twice.
-- A recipe's page and printout show a dash for a nutrient no ingredient
-  measured where the sum would have been 0, as the meal plan does. A rice dish
-  where only the chicken had values used to read "Carbs 0.0g".
-- "Max batches from stock" on a bill of materials shows ten as 10, not 1E+1.
-- The day's activity and History state the stock change of a correction: taking
-  one piece off an issue reads "by +1", where it used to read "by −1".
-- A generated community module asks for its own read and write permissions on
-  every route, and its manifest declares them with the usual default roles.
-- A product used up to zero reads "Consumed" in the list and on its page rather
-  than "Consumed (Virtual)", and no longer offers "Add 1 unit", which was
-  refused after the click. Move brings it back to a shelf.
-- Add product shows pieces on its unit button when no unit was chosen, which is
-  what the save has always filed such a product as; it used to read "Choose".
-- Receive goods and Issue goods can add a supplier or customer that does not
-  exist yet without leaving the form.
-- A posted receipt says which of its lines have no price: they are left out of
-  the totals, and that stock has no recorded cost.
-- A dispute note in an attestation names the asset by its serial number when it
-  has one, and the public page says what was confirmed beside what was reported.
-- The message for a missing approval workflow tells a storekeeper to ask the
-  administrator instead of describing the administrator's settings.
-- Amounts in a unit that is a word take its plural ("6 bottles").
-- An issue dated today can be planned from its page, so that picking can start
-  on it without dating it tomorrow first.
-- The audit log now writes the quantities and amounts of a production order,
-  its completion, a recipe and its ingredient and cost lines, and of an item's
-  creation, use, disposal, deletion and restoration, and the low-stock
-  threshold of a product, as the exact digits the record holds. They used to
-  be saved as rounded decimal numbers, so a production order of 1,234.567 read
-  1,234.57 in the log. Saving a value again
-  with other trailing digits ("2.50" over "2.5") still writes no entry. Entries
-  written before this keep the numbers they were saved with.
-- Importing ingredient data from a file the import cannot read, a photo or a
-  JSON file that holds no list of rows for instance, now says what the import
-  expects: a .json or .csv file with one row per ingredient, in every
-  maintained language. It used to repeat the JSON parser's own words.
-- Exporting the document register to CSV no longer loads every line, product
-  and user of the period into memory: a file of 20 000 documents of ten lines
-  takes half a second instead of seventeen and 40 MB instead of 1.2 GB. The
-  file itself is the same, still without a limit on rows. Asked through the API
-  for a period that ends before it starts, the export answers 400 with a sentence
-  saying so instead of an empty file.
-- A product name longer than 100 characters can be searched: the search looks
-  for its opening, and a failed product search is reported as failed, with a
-  button to try again, rather than as "no results". A long name that only
-  shares its opening with an existing product can still be added as new.
-- A product whose nutrition came from Open Food Facts now counts its calories
-  in recipe estimates and in the meal plan's daily totals. They used to go
-  missing while its protein, fat and carbohydrates were counted, and the day
-  lost its totals altogether.
-- A printed recipe whose calories are not known says "Calories unknown" instead
-  of "0 kcal".
-- Signing in right after creating the first account, joining an organization
-  by invitation or finishing an approved request has the address just used
-  filled in.
-- Pressing a name chip in the location wizard or the new-location sheet no
-  longer replaces a name already typed ("Rack A" stays when "Rack" is pressed).
-- A purchase order line picked from the catalogue starts from the price the
-  product last cost, when it has one, even if none of it is left in stock; a
-  price typed on the line is kept, and an order in another currency than the
-  organization's proposes none.
-- The product label dialog no longer shows "Lot and expiry date" ticked while
-  it is disabled for products that have neither, and the explanation of the
-  location codes describes the numbering in words rather than printing the
-  raw template.
-- Handing an asset back, from "My assets" or from the asset's own page, opens a
-  dialog titled and worded for the person returning it (the page's button reads
-  "Return" too, not the manager's "Accept"), and the damaged and needs-repair choices each say
-  which repair entry they open. The holder's assignment history prints both
-  days and the condition in the interface language, and the organization log
-  does the same for the condition of a return.
-- The organization log marks the settings a workspace mode writes when it is
-  chosen as "Workspace mode default" instead of an update the person made.
-- On a phone, the buttons of the sheet that issues an asset stay in view at the
-  foot of the sheet instead of ending below its edge until the form was
-  scrolled, and the notice that an approval is needed sits beside them.
-- The equipment overview counts a new asset as soon as it is saved, also after
-  a batch add, without reloading the page.
-- The new production dialog writes the unit the way the rest of the app does
-  ("szt." rather than "pcs"), and its hint about the recipe's batch no longer
-  ends in two full stops. The audit log names the unit a product template was
-  created with the same way.
-- The stock changes a production run writes, and the ones its reversal writes,
-  carry a reason in the interface language instead of an English sentence,
-  followed by the number of the run, in the audit log and in the item's history.
-- A recipe's page prints its name once, as the page title; the card under it
-  keeps the batch yield and the default badge, and the product made is named
-  under the title only when it is called something else.
-- The onboarding card for working with a single module now names Production,
-  so a person who came to make things can find it.
-- Saving two partners with the same name, or the same code, at the same moment
-  now refuses the second one with the usual "already exists" message instead
-  of failing with a server error.
-- A recipe ingredient typed by hand whose name has accented letters ("Ryż") now
-  finds the product on the shelf ("Ryż 1 kg") instead of reading as missing.
-- The expiry date picker starts with a week, two weeks and a month, so fresh
-  food no longer needs the calendar.
-- The two date chips on the products list, "expiring soon" and "expired", no
-  longer stay on together and show an empty list: turning one on turns the
-  other off.
-- Statistics count stock rows as records instead of pieces, name the products
-  without a category in the reader's language, list the fullest places first
-  and leave out the system's consumed, loss and production places.
-- The meal plan dialog that has no plan yet now says the recipe is added to the
-  first meal of the new plan at once, and closing the "Take from stock" dialog
-  no longer marks the recipe as cooked.
-- The built-in layouts in the document templates' preview are named in the
-  reader's language ("Standard layout", "Pick list"), as the print-layout
-  picker names them, instead of "Standard Template" in every language.
-- An organization template keeps an `alt`, `title` or `class` whose text
-  begins with "Data:" — the Polish label for a date — on the printout and in
-  the editor's preview; the sanitizer used to drop it as if it were a `data:`
-  link. A logo uploaded as WebP now prints through `{{ issuer.logo }}` instead
-  of leaving an empty image.
-- The error details a broken screen offers to copy into a bug report no longer
-  carry the token of the link that opened the page: on a password reset,
-  invitation, registration or equipment attestation page the token reads
-  `redacted`, so a report pasted into a public issue tracker hands nobody a
-  live link.
-- Inventory, location and equipment dialogs say what failed and what they
-  need: creating a location, saving a stock alert, a bulk edit, changing a
-  batch's status and freeing a label name the write that could not be done
-  when the server gives no reason, instead of "Unknown error" or "Something
-  went wrong". The location wizard no longer suggests a name already taken at
-  that level by a location a module owns or one in the archive. Bulk edit's
-  Apply waits until a field is ticked, the bulk Retire question says before
-  you answer that a checked-out asset is not retired, and the archived label's
-  sheet calls the deletion reason by its name rather than "Status". Saving an
-  empty service entry marks every missing answer in the app's language,
-  instead of stopping at the title with the browser's own message.
-- Stored photos load on an instance that serves the app straight from the
-  frontend container, without the bundled Caddy in front. That container's
-  nginx answered every `/uploads/…` file ending in `.jpg` or `.png` with its own
-  404 instead of asking the backend; a PDF attachment came through. An
-  instance behind Caddy was not affected, since Caddy sends `/uploads/*` to the
-  backend itself.
-- A completed dispatch keeps its **Packing** card, read-only: each package with
-  its packing slip and its label, and the file of all slips when there are
-  several. The card used to close with the document, so a slip to check a
-  returned box against could not be printed again from the screen, although
-  the server still served it.
-- A picking session over one delivery ends with **Pack**, the shipping fields
-  and **Complete and book** however it was opened. Opened from the documents
-  list or the To do region — one ticked delivery, a selection the stock check
-  narrowed to one, or **Resume** on a row — it used to end like a session over
-  several: **Close** completed nothing, and there was neither **Pack** nor a
-  place for the carrier. Both buttons now lead to the delivery's own page,
-  which packs it or completes it with the carrier typed on the summary.
-- **Recently visited** on the launcher and the recent list of the command
-  palette fill again: opening a product, an equipment asset or a recipe puts it
-  at the top. Nothing recorded a visit, so both stayed empty however many pages
-  were opened.
-- Which day it is now comes from the organization's clock in the places that
-  still read the server's: the shopping-list suggestions ("expires today",
-  "expired 2 days ago" and the thirty days of consumption they look back on),
-  the reserve stock replenishment offers as cover (a batch past its date where
-  the organization is is no longer offered), and the date a production run
-  with no production date is filed under, which the closed-period check now
-  asks about too. An organization a day ahead of or behind the server saw each
-  of these a day off.
-- A purchase order mailed to the supplier and the mail of the approvals and
-  equipment modules now leave through the mail server the organization set in
-  Settings → Email, as invitations and password resets already did, instead of
-  the installation's own. On an installation without a server of its own, a
-  purchase order and an approval notice no longer fail while the
-  organization's server stands ready; an attestation campaign there still
-  reports that mail is not set up.
-- Archiving a location whose records have to go somewhere now offers every
-  other location as the target, a location with sublocations included; it
-  offered only places with nothing inside them, although records can live in
-  any location.
-- The cooking screen states the amount a pick took in the reader's own number
-  format. The public attestation page shows its "confirmed" and "already
-  returned" ticks in the success colour in every profile, not in the
-  profile's accent.
-- On a bucket (S3) backend, an equipment attachment opens through the app's own
-  `/uploads/…` address, which checks who is asking, like every other stored
-  file. It was handed out as the bucket's bare address.
-- A module's stored file path with a `..` segment is refused
-  (`StorageError`) instead of resolving outside its `<organization>/<module>/`
-  folder on the local disk. A missing file is a `StorageError` as well as a
-  `FileNotFoundError` (`StoredFileNotFoundError`), so a module that catches
-  the storage contract's own error catches it too.
-- A Google (Gemini) connection keeps the same time limits as every other
-  provider — `LLM_REQUEST_TIMEOUT_SECONDS` for a call, 30 seconds for the model
-  list on the connection test — and a Gemini outage answers 503 with the
-  sentence that names it, as other providers' do. A call used to wait without
-  end, and a network failure read as an unreadable photograph.
-- A label photograph sent to `POST /vision/extract` is fitted into 1200 × 1200
-  px, turned upright, before a model sees it, as the nutrition-table scan
-  already did: an API client that sent a full-size photograph paid for all of
-  it, and a provider with a size limit refused it.
-- A production run completed without a production date is dated on the
-  organization's day, and the closed-period check asks about that day. Around
-  midnight the server's day used to stamp the run, and decide the period, for
-  an organization in another time zone.
-- `GET /stats/consumption` fills `consumption_by_category` — what was used per
-  category, quantity and value, largest value first. It was always an empty
-  list.
-- An organization with more than 500 records gets its forgotten-product alerts
-  from its stalest records. Past that number the alerts came from whichever
-  records the database happened to read first.
-- The maker's "Block" shortage strategy holds against an API request that sends
-  `confirm_shortage`, and duplicating a run the stock cannot cover is refused
-  under it like creating one (422 `shortage_blocked`). `GET /maker/settings`
-  documents `WARN` as the default, which is what a new organization has.
-- The composition tree on a product variant's page shows that variant's
-  ingredients. `GET /maker/bom/{template_id}` and `GET /maker/bom/tree/{template_id}`
-  answer one recipe — `recipe_id=`, else the default one — and so does
-  `maker_api.list_bom_lines_async` (the default recipe); they used to mix every
-  variant's lines.
-- A webhook endpoint switched back on in its edit form starts its failure count
-  again, as the Reactivate button does; the next single failed delivery used to
-  cut it off again. A retried delivery sends the bytes of the first attempt, so
-  its signature is the same too.
-- A use, a disposal, a scan that adds to a record, a deletion and an opened
-  package write their quantities into the product's history as the exact
-  digits, as an edit already did; they wrote floating-point numbers. Rows
-  already written keep their shape, and the history screen reads both.
-- A document with no date of its own, a production run among them, takes the
-  year in its number from the organization's clock, as its period and the
-  monthly figures do. Just after midnight on the local first of January it
-  was numbered into the year that had just ended.
-- A document that waited for an approval when the approvals module was
-  switched off is worked as a confirmed one: its page offers the scanning and
-  the completion again, and the one-step press, a scanning session and a
-  completion take it. Starting that work takes it out of the approval queue
-  for good; a document nobody touches is back in the queue when the module is
-  switched on again. Its read carries `hold_stood_down`.
+
+#### Smaller corrections
+
+- When the session has ended, a request that was only asking (a label preview,
+  a pasted-lines or sheet read, a price calculation, a match or coverage check,
+  a connection, webhook or e-mail test, a generated barcode) gets the plain
+  sentence that the session has ended, not "this was not saved, sign in again
+  and start over", which was false for work that had saved nothing. On the
+  equipment form, a refused photo removal after the asset was saved is
+  reported as that, not as a failed upload.
+- The answers of `PATCH /documents/{id}/confirm`, `.../complete` and `POST
+  /documents/{id}/post` carry `confirmed_by_name` and `completed_by_name`,
+  which were `null` until the document was read again. Start and Board name a
+  draft task the way the document's own page does ("Delivery – draft 6CCF"),
+  not by its internal identifier, and the Polish refusal to finish a document
+  with an open picking or receiving session agrees with the number of
+  sessions.
+- The symbol list in the document and equipment template editors reads as
+  something a template author can use: record-valued symbols (`totals_by_unit`,
+  `packages`, `pick_lines`) show their fields instead of Python dictionaries,
+  the examples are in the editor's language, and `GET
+  /warehouse/templates/placeholders` answers in the request language. The
+  built-in layouts in the template preview carry their translated names
+  ("Standard layout", "Pick list").
+- A module that is switched on says on its store card when a module it works
+  better with is switched off, and the roles screen names a module with no
+  translation of its own by the name in its manifest. Deactivate on a module's
+  card reads as a button, and choices drawn by colour alone (the Production
+  settings groups, the tracked fields of a location) report which option is
+  selected to assistive technology.
+- The "Show inventory value" setting says that it also governs the product
+  screens, exports and printouts, and a profile that hides stock value no
+  longer shows it for a moment. Add product shows pieces on its unit button
+  when no unit was chosen, which is what the save has always filed such a
+  product as. The action sheet opened from a location's products or a scan
+  explains why an asset's actions are worded differently, as the product page
+  does, and is silent about it for an account that may not act on the record.
+- The expiry forecast tiles sit two across on a phone and three across below
+  1280 px, so no label breaks inside a word in any of the six languages. In
+  Polish the Batches status tabs read as plurals; the Desktop Computer,
+  Network Device and Peripheral equipment presets have icons; the AI
+  connections page no longer shows its title twice.
+- A row of a warehouse document import that fails in the database shows the
+  generic sentence instead of the statement that failed.
+
+#### Running it
+
+- DEPLOYMENT.md's update and restore steps reach the Open Food Facts database
+  and the off-host copy: the guide enables their profiles with
+  `COMPOSE_PROFILES` in `.env`, which every compose command reads, where a
+  `--profile` typed on one command left the services out of the next update's
+  recreate and out of `down`.
+- The off-host backup copy sends each backup once; it followed the `-latest`
+  links in `backups/last/` and uploaded the newest dump and archive twice under
+  those names, and its next pass removes those copies from the remote.
+- `DEFAULT_LANGUAGE` reaches the backend container on the development and the
+  production stack and is in `.env.production.example`; an account created
+  without a language started in English whatever `.env` said.
+- `manage.py db stamp-module` works on a database a newer version has already
+  migrated, the way `db doctor` tells you to use it. The index on `audit_log
+  (organization_id)` is dropped by a migration; the two composite indexes on
+  the journal serve every read it did.
+- A scheduled task registered as persistent on an installation without Redis
+  logs that it runs in the process and that a missed run is not made up. The
+  production Content-Security-Policy admits the web worker that shrinks a
+  photo before it is sent. The first open of the application shows the
+  product name and a loading sign instead of a white page, and tapping a
+  screen for the first time shows a loading sign at once.
+- `make new-module` stops at a step that fails instead of carrying on to
+  "SUCCESS" and a second run picks up at that step; `module new-community
+  --language` lists every language it accepts; a generated community module
+  asks for its own read and write permissions on every route. On the
+  development stack, installing or upgrading a module while the app is open no
+  longer leaves the page on the error screen until it is reloaded.
+- A settings schema that declares the reserved `__schema_version` key in a
+  nested object is refused whether or not the saved settings reach it. A module
+  navigation item with a relative path is named in the development console and
+  the scaffolds write the full path.
+- Demo data charges the tax of the organization's country, and none where no
+  country is set, instead of Polish VAT on every order and document.
 
 ### Removed
 
-- **Breaking:** `GET /api/v1/stats/shopping-suggestions`. It answered with
-  placeholder figures — a consumption rate of 0 and fixed day counts on every
-  row — and no screen used it. The shopping lists module computes its
-  suggestions from the stock and its history (`GET /api/v1/shopping-lists/suggestions`);
-  a client of the statistics route reads that one instead.
+- `GET /api/v1/stats/shopping-suggestions` (see *Upgrading from 0.11.0*).
 - The webhook event list no longer offers `item.transferred`,
   `item.deactivated` and `item.status_changed`: nothing sends them, so an
   endpoint subscribed to one never received a delivery. A new subscription to
-  one is refused; an endpoint that already names one shows it as withdrawn, and
-  the edit form lets you remove it.
-- `module install`, `module upgrade` and `module validate` refuse what module
-  discovery refuses at the next start — a manifest `name` other than the
-  module's directory, a `module_type` above `community` on a module from
-  outside the repository, and a platform floor above the running version —
-  instead of printing success for a package the restart then rejects. The
-  other way round, they accept a `requires` entry naming an always-on feature
-  (`items`, `locations`, …), which discovery always loaded.
-- A module rejected at startup no longer leaves its permissions behind in the
-  roles editor, the API key dialog and the built-in role defaults.
-- A signing key listed in `MODULE_SIGNING_PUBLIC_KEYS` without an id is skipped
-  with a warning that says the id is missing, where it used to be reported as
-  invalid Base64. A signature that fails against the key listed under the
-  signer's id no longer says the package was modified after signing as if that
-  were certain: it names that, and a different key under the same id, as the
-  two possibilities.
-- A scheduled task registered as persistent on an installation without Redis
-  logs that it runs in the process and that a run missed while the backend is
-  down is not made up.
-- `make new-module` stops at a step that fails instead of carrying on to
-  "SUCCESS", and a second run picks up at that step. `module new-community
-  --language` lists every language it accepts, `pt` included.
-- On the development stack, installing or upgrading a module while the app is
-  open no longer leaves the page on the error screen until it is reloaded by
-  hand. The files the install writes made the dev server run the app's entry
-  point a second time, which mounted a second copy of the app over the first;
-  the page now reloads by itself, and an edit to the app's own shell updates
-  it in place. A production build was never affected.
-- A settings schema that declares the reserved `__schema_version` key in a
-  nested object is refused whether or not the saved settings reach that object;
-  it was accepted while the object was absent, and the value was dropped on the
-  first save that carried it.
-- A module navigation item with a relative path (`""`, `"settings"`) is named
-  in the browser console in development, and the scaffolds write the item's
-  full path. The shell links an item exactly as written, so a relative path
-  linked nowhere and marked itself the current page on every screen it did not
-  match, while the reachability check read it against the module's base path
-  and passed it.
+  one is refused; an endpoint that already names one shows it as withdrawn,
+  and the edit form lets you remove it.
 
 ## v0.11.0 - 2026-11-02
 

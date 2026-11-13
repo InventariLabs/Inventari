@@ -77,7 +77,7 @@ export function InstructionsView({ text }: InstructionsViewProps) {
   // Markdown path
   if (isMarkdown) {
     return (
-      <div className="max-w-none text-sm text-on-secondary leading-relaxed [&_h1]:text-base [&_h1]:font-medium [&_h1]:mt-4 [&_h1]:mb-2 [&_h2]:text-sm [&_h2]:font-medium [&_h2]:mt-3 [&_h2]:mb-1.5 [&_h3]:text-sm [&_h3]:font-medium [&_h3]:mt-2 [&_h3]:mb-1 [&_p]:mb-2 [&_ul]:pl-5 [&_ul]:list-disc [&_ul]:mb-2 [&_ol]:pl-5 [&_ol]:list-decimal [&_ol]:mb-2 [&_li]:mb-0.5 [&_strong]:font-medium [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-amber-300 [&_blockquote]:bg-amber-50 [&_blockquote]:italic [&_blockquote]:text-on-warning [&_blockquote]:text-xs [&_blockquote]:pl-3 [&_blockquote]:py-2 [&_blockquote]:my-2 [&_blockquote]:rounded-r-lg [&_a]:text-primary-600 [&_a]:underline">
+      <div className="max-w-none text-sm text-on-secondary leading-relaxed [&_h1]:text-base [&_h1]:font-medium [&_h1]:mt-4 [&_h1]:mb-2 [&_h2]:text-sm [&_h2]:font-medium [&_h2]:mt-3 [&_h2]:mb-1.5 [&_h3]:text-sm [&_h3]:font-medium [&_h3]:mt-2 [&_h3]:mb-1 [&_p]:mb-2 [&_ul]:pl-5 [&_ul]:list-disc [&_ul]:mb-2 [&_ol]:pl-5 [&_ol]:list-decimal [&_ol]:mb-2 [&_li]:mb-0.5 [&_strong]:font-medium [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-amber-300 [&_blockquote]:bg-amber-50 [&_blockquote]:italic [&_blockquote]:text-on-warning [&_blockquote]:text-xs [&_blockquote]:pl-3 [&_blockquote]:py-2 [&_blockquote]:my-2 [&_blockquote]:rounded-r-lg [&_a]:text-on-primary [&_a]:underline">
         <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{text}</ReactMarkdown>
       </div>
     );

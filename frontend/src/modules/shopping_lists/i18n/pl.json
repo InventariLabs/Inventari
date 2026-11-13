@@ -101,7 +101,8 @@
     "success_one": "Dodano {{count}} składnik",
     "success_few": "Dodano {{count}} składniki",
     "success_many": "Dodano {{count}} składników",
-    "success_other": "Dodano {{count}} składników"
+    "success_other": "Dodano {{count}} składników",
+    "alreadyListed": "Już na tej liście"
   },
   "card": {
     "saveName": "Zapisz nazwę",

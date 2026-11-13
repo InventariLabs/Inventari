@@ -244,6 +244,14 @@ class IngredientAvailabilityItem(BaseModel):
     """Set only when ``convertible`` is false: the unit ``available`` is
     actually counted in, so 100 litres never renders as 100 kilograms."""
 
+    to_buy: Decimal | None = None
+    """What buying the shortage puts on a shopping list: the shortfall
+    rounded up to the ingredient's own stock unit's step, stated in that
+    unit. None when nothing is short, or when no quantity can be stated."""
+
+    to_buy_uom_symbol: str | None = None
+    """The unit ``to_buy`` is counted in — the ingredient's stock unit."""
+
 
 class AvailabilityResponse(BaseModel):
     """Response for GET /maker/recipes/{id}/availability."""

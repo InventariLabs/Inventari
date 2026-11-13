@@ -398,7 +398,7 @@ function NothingToFocusOn({
                     aria-label={t("settings.focus.enableAction", {
                       name: labels.name,
                     })}
-                    className="text-sm font-medium text-primary-600 hover:underline"
+                    className="text-sm font-medium text-on-primary hover:underline"
                   >
                     {t("settings.focus.enableLink")}
                   </Link>

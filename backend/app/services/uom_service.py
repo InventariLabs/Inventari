@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
 from typing import NamedTuple, Protocol
 from uuid import UUID
 
@@ -91,10 +91,28 @@ def quantity_step(uom: UomLike | None) -> Decimal:
     return step if step > QUANTITY_STEP else QUANTITY_STEP
 
 
+#: How far above a step a value may sit and still be on it, measured in steps.
+#: A requirement is usually computed through a quotient — a recipe's servings
+#: ratio, a production run's batch yield — and ``Decimal`` division keeps 28
+#: significant digits, so multiplying it back leaves a remainder a few units
+#: wide in the last place: three eggs times 5/3 is
+#: 5.000000000000000000000000001, and rounding that up to a whole piece asked
+#: for six. Nothing a reader can state lives in this band — quantities are
+#: kept to a thousandth of a step at the very finest — so a value inside it
+#: is the step it is next to, and the rounding has nothing to move.
+_STEP_NOISE = Decimal('1e-12')
+
+
 def _on_step(qty: Decimal, step: Decimal, rounding: str) -> Decimal:
     if step <= 0:
         return qty
-    return (qty / step).quantize(Decimal('1'), rounding=rounding) * step
+    steps = qty / step
+    whole = abs(steps).to_integral_value(rounding=ROUND_FLOOR)
+    # ``whole`` is zero below one step, and part of a step is a step: the
+    # band only excuses a value that is already a multiple of one.
+    if whole and abs(steps) - whole <= _STEP_NOISE:
+        steps = whole if steps >= 0 else -whole
+    return steps.quantize(Decimal('1'), rounding=rounding) * step
 
 
 def quantize_to_uom(qty: Decimal, uom: UomLike | None) -> Decimal:
@@ -117,6 +135,21 @@ def round_up_to_uom(qty: Decimal, uom: UomLike | None) -> Decimal:
     needing the step.
     """
     return _on_step(qty, quantity_step(uom), ROUND_CEILING)
+
+
+def is_on_uom_step(qty: Decimal, uom: UomLike | None) -> bool:
+    """Whether *qty* already sits on one of *uom*'s steps.
+
+    The question :func:`round_up_to_uom` answers by handing *qty* back: a
+    requirement this close to a step is on it, so nothing was rounded and
+    there is nothing for a card to explain. It asks with the same allowance
+    for a quotient's last-place noise (see ``_STEP_NOISE``) — a third of a
+    piece is not on a whole-piece step, five eggs reached through 3 × 5/3 is.
+    """
+    step = quantity_step(uom)
+    if step <= 0:
+        return True
+    return abs(round_up_to_uom(qty, uom) - qty) <= step * _STEP_NOISE
 
 
 class CanonicalMeasure(NamedTuple):

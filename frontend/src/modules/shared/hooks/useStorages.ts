@@ -135,13 +135,20 @@ export function useStorage(id: string) {
 
 /** The products standing in a place; `includeInside` adds those of every
  *  place below it, still one request. */
-export function useStorageItems(storageId: string, includeInside = false) {
+export function useStorageItems(
+  storageId: string,
+  includeInside = false,
+  excludeModuleContexts = false,
+) {
   return useQuery<Item[]>({
     // Under the place's own key, so a change to its products refreshes both.
-    queryKey: includeInside
-      ? [...queryKeys.storages.items(storageId), "inside"]
-      : queryKeys.storages.items(storageId),
-    queryFn: () => storagesApi.getItems(storageId, { includeInside }),
+    queryKey: [
+      ...queryKeys.storages.items(storageId),
+      ...(includeInside ? ["inside"] : []),
+      ...(excludeModuleContexts ? ["general"] : []),
+    ],
+    queryFn: () =>
+      storagesApi.getItems(storageId, { includeInside, excludeModuleContexts }),
     enabled: !!storageId,
     // Ticking the box keeps the list on screen until the wider one arrives.
     placeholderData: keepPreviousData,

@@ -192,7 +192,7 @@ export default function DocumentApprovalsPage() {
             enabledModules.includes("approvals") ? (
               <Link
                 to="/approvals"
-                className="text-sm font-medium text-primary-600 hover:underline"
+                className="text-sm font-medium text-on-primary hover:underline"
               >
                 {t("approvalsQueue.emptyOtherModules")}
               </Link>

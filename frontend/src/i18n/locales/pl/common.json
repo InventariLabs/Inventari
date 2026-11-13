@@ -738,6 +738,7 @@
         "CONFIRMED": "Potwierdzone",
         "COMPLETED": "Zakończone",
         "CANCELLED": "Anulowane",
+        "REVERSED": "Cofnięte",
         "PENDING": "Oczekujący",
         "IN_PROGRESS": "W trakcie",
         "APPROVED": "Zaakceptowany",

@@ -250,6 +250,9 @@
     "postNowApprovalTitle": "Envoyer le document pour approbation ?",
     "postNowMessage": "Cela confirme le document et comptabilise immédiatement le mouvement de stock. En cas d’erreur, annulez-le juste après ou corrigez-le plus tard. Continuer ?",
     "postNowApprovalMessage": "Le document sera confirmé et envoyé pour approbation. Une fois approuvé, il sera comptabilisé sans autre étape. Continuer ?",
+    "postNowMessageDeadEndNamed": "Le document part en approbation, mais personne ne pourrait la trancher : l'étape « {{stage}} » nomme des approbateurs qui n'ont pas accès aux approbations. Il y attend que la demande soit retirée ou que ces personnes reçoivent l'accès. Continuer ?",
+    "postNowMessageDeadEndNoApprover": "Le document part en approbation, mais personne ne pourrait la trancher : l'étape « {{stage}} » est ouverte à quiconque détient le droit d'approuver, et personne dans cette organisation ne l'a. Il y attend que la demande soit retirée ou que quelqu'un reçoive ce droit. Continuer ?",
+    "postNowMessageDeadEndOnlyYou": "Le document part en approbation, mais personne ne pourrait la trancher : la seule personne pouvant approuver à l'étape « {{stage}} » est vous, et un demandeur ne peut pas trancher sa propre demande. Il y attend que la demande soit retirée ou que quelqu'un d'autre reçoive ce droit. Continuer ?",
     "postNowConfirm": "Comptabiliser",
     "postNowApprovalConfirm": "Envoyer pour approbation",
     "postNowKeep": "Garder le brouillon",
@@ -1615,6 +1618,7 @@
     "markDone": "Marquer comme fait : {{task}}",
     "deleteTask": "Supprimer la tâche : {{task}}",
     "showing": "{{shown}} sur {{total}} affichées",
+    "waitingSum": "Au total en attente : {{total}} — tâches : {{tasks}}, articles en quarantaine : {{holds}}",
     "showMore": "Afficher plus",
     "filter": {
       "label": "Afficher les tâches",

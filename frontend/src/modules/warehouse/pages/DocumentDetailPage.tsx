@@ -240,6 +240,24 @@ export function confirmDialogMessage(
     // approval, the same press only sends it there — say which one this is
     // before the click, not after it.
     if (facts.required) {
+      // Nobody can give the approval yet, so the press is refused outright,
+      // exactly as the confirm dialog says; promising the queue here was a
+      // promise the server disproved.
+      if (!facts.workflowConfigured) {
+        return t("confirmDialog.confirmMessageNoWorkflow");
+      }
+      // Same verdict the confirm dialog reads: the press parks the document
+      // either way, and the sentence must not call a dead end "the queue".
+      if (facts.deadEnd) {
+        const stage = facts.deadEnd.stage ?? "";
+        if (facts.deadEnd.reason === "named_approvers_cannot_decide") {
+          return t("confirmDialog.postNowMessageDeadEndNamed", { stage });
+        }
+        if (facts.deadEnd.reason === "only_the_requester_can_decide") {
+          return t("confirmDialog.postNowMessageDeadEndOnlyYou", { stage });
+        }
+        return t("confirmDialog.postNowMessageDeadEndNoApprover", { stage });
+      }
       return t("confirmDialog.postNowApprovalMessage");
     }
     // The rule answers for the type and the value it can weigh; an
@@ -601,7 +619,7 @@ export default function DocumentDetailPage() {
             {doc.status === "PENDING_APPROVAL" && (
               <Link
                 to="/approvals"
-                className="inline-flex min-h-6 items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline md:min-h-0"
+                className="inline-flex min-h-6 items-center gap-1 text-xs font-medium text-on-primary hover:underline md:min-h-0"
               >
                 <ListChecks size={14} />
                 {t("approvalQueueLink")}

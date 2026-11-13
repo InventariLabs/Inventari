@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { test, expect } from "./fixtures/base";
 import { ApiHelper } from "./helpers/api";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
@@ -44,6 +45,22 @@ test.describe("Registration & Org Joining — flow", () => {
     }
   });
 
+  /**
+   * The invitation's registration page, once the invitation has answered: the
+   * page names it and has put the invited address in the field. Typing before
+   * that races the prefill, and a prefill landing inside Playwright's fill —
+   * after it cleared the field, before it typed — left the address twice in
+   * the field ("…@example.comtest-…@example.com"), which the browser refuses
+   * before the form can answer: no redirect, no mismatch message.
+   */
+  async function openInvitation(page: Page) {
+    await page.goto(`/register?invite=${inviteCode}`);
+    await expect(
+      page.getByText(/You were invited to|zaprasza Cię/),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByLabel(/email|e-mail/i)).toHaveValue(invitedEmail);
+  }
+
   test("registration page renders with form fields", async ({ page }) => {
     await page.goto(`/register?invite=${inviteCode}`);
 
@@ -66,7 +83,7 @@ test.describe("Registration & Org Joining — flow", () => {
   test("registration with mismatched passwords shows error", async ({
     page,
   }) => {
-    await page.goto(`/register?invite=${inviteCode}`);
+    await openInvitation(page);
 
     await page
       .getByLabel(/email|e-mail/i)
@@ -93,7 +110,7 @@ test.describe("Registration & Org Joining — flow", () => {
   test("registration with invalid email shows validation error", async ({
     page,
   }) => {
-    await page.goto(`/register?invite=${inviteCode}`);
+    await openInvitation(page);
 
     const emailInput = page.getByLabel(/email|e-mail/i);
     await emailInput.fill("not-an-email");
@@ -120,7 +137,7 @@ test.describe("Registration & Org Joining — flow", () => {
   test("successful registration shows success message or redirects", async ({
     page,
   }) => {
-    await page.goto(`/register?invite=${inviteCode}`);
+    await openInvitation(page);
 
     const uniqueEmail = invitedEmail;
     const password = "SecurePass123!";

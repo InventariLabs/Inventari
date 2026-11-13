@@ -32,7 +32,7 @@ sudo mkdir -p /opt/inventari && sudo chown $USER:$USER /opt/inventari
 cd /opt/inventari
 git clone https://github.com/InventariLabs/Inventari.git .
 git tag --list 'v*' --sort=-v:refname | head -3   # the releases, newest first
-git checkout v0.11.0                                # the one you install
+git checkout v0.12.0                                # the one you install
 ```
 
 A fresh clone stands on `dev`, the branch where work in progress meets — not

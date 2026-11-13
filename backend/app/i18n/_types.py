@@ -516,6 +516,7 @@ class ErrorMessages(TypedDict):
     over_receipt_past_ceiling: str
     document_update_status: str
     document_correction_locked: str
+    document_correction_not_duplicable: str
     field_cannot_be_cleared: str
     ingredient_defaults_unreadable_file: str
     onboarding_modules_not_offered: str

@@ -68,7 +68,7 @@ export function BulkActionBar({
         <Button
           variant="ghost"
           size="sm"
-          leftIcon={<Download size={15} />}
+          leftIcon={<Download size={14} />}
           onClick={onExportCsv}
         >
           {t("warehouse:bulk.exportCsv")}
@@ -84,7 +84,7 @@ export function BulkActionBar({
           <Button
             variant="ghost"
             size="sm"
-            leftIcon={<Printer size={15} />}
+            leftIcon={<Printer size={14} />}
             onClick={onPrint}
             disabled={printableCount === 0 || isPrinting}
             isLoading={isPrinting}
@@ -98,7 +98,7 @@ export function BulkActionBar({
           <Button
             variant="ghost"
             size="sm"
-            leftIcon={<CheckCheck size={15} />}
+            leftIcon={<CheckCheck size={14} />}
             onClick={onConfirmDrafts}
             disabled={draftCount === 0 || isConfirming}
             isLoading={isConfirming}
@@ -110,7 +110,7 @@ export function BulkActionBar({
           <Button
             variant="ghost"
             size="sm"
-            leftIcon={<PackageCheck size={15} />}
+            leftIcon={<PackageCheck size={14} />}
             onClick={() => onPick(pickableIds)}
           >
             {t("warehouse:bulk.pickSelected", { count: pickableIds.length })}
@@ -120,7 +120,7 @@ export function BulkActionBar({
           <Button
             variant="ghost"
             size="sm"
-            leftIcon={<Trash2 size={15} />}
+            leftIcon={<Trash2 size={14} />}
             onClick={onDeleteDrafts}
             disabled={draftCount === 0 || isDeleting}
             isLoading={isDeleting}

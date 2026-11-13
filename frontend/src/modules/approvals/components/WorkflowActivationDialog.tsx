@@ -99,7 +99,7 @@ export function WorkflowActivationDialog({
       {settingsPath && (
         <Link
           to={settingsPath}
-          className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
+          className="text-sm font-medium text-on-primary hover:underline"
         >
           {t("workflows.activateSettingsLink")}
         </Link>

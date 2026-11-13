@@ -193,6 +193,10 @@ lint: ## Check code style with ruff
 	@python3 scripts/test_test_workers.py
 	@echo "$(BLUE)[INFO]$(NC) Checking for identifiers that point at private material..."
 	@python3 backend/scripts/check_internal_ids.py --public-tree
+	@echo "$(BLUE)[INFO]$(NC) Checking tests for dates that the clock will overtake..."
+	@python3 backend/scripts/check_time_bombs.py
+	@echo "$(BLUE)[INFO]$(NC) Checking the size budget of the agent instruction files..."
+	@python3 backend/scripts/check_agents_md_budget.py
 	@$(MAKE) --no-print-directory audit
 
 # The messages of the commits a push would publish, read by the same rules the
@@ -536,15 +540,36 @@ test-e2e: ## Run Playwright E2E tests (restarts backend with TESTING=true)
 	@# The password-reset spec needs the TESTING-only _dev_token route, which
 	@# is only registered when settings.TESTING=true. Run the whole block in
 	@# one shell so the EXIT trap restores the original mode after tests.
+	@# The dev server is restarted too, without its hot-reload channel: Vite
+	@# watches the mounted tree and reloads every open page when a file it
+	@# cannot hot-update changes (an i18n JSON; a checkout, a rebase or a
+	@# commit hook is enough), which fails a spec whose state lives between
+	@# two actions. The trap puts hot reload back for whoever edits next.
 	@set -e; \
 	prev_testing=$$($(DOCKER_COMPOSE) exec -T backend printenv TESTING 2>/dev/null | tr -d '\r' || echo false); \
 	prev_testing=$${prev_testing:-false}; \
+	prev_hmr=$$($(DOCKER_COMPOSE) exec -T frontend printenv VITE_DISABLE_HMR 2>/dev/null | tr -d '\r' || true); \
+	restore() { \
+		if [ "$$prev_testing" != "true" ]; then \
+			echo "$(YELLOW)[INFO]$(NC) Restoring backend to TESTING=$$prev_testing..."; \
+			TESTING=$$prev_testing $(DOCKER_COMPOSE) up -d backend >/dev/null; \
+		fi; \
+		if [ "$$prev_hmr" != "1" ]; then \
+			echo "$(YELLOW)[INFO]$(NC) Restoring the dev server's hot reload..."; \
+			VITE_DISABLE_HMR=$$prev_hmr $(DOCKER_COMPOSE) up -d --no-deps frontend >/dev/null; \
+		fi; \
+	}; \
+	trap restore EXIT; \
 	if [ "$$prev_testing" != "true" ]; then \
 		echo "$(YELLOW)[INFO]$(NC) Restarting backend with TESTING=true..."; \
 		TESTING=true TESTING_ACK_UNSAFE=true $(DOCKER_COMPOSE) up -d backend >/dev/null; \
 		bcid=$$($(DOCKER_COMPOSE) ps -q backend); \
 		n=0; until [ "$$(docker inspect -f '{{.State.Health.Status}}' $$bcid 2>/dev/null)" = "healthy" ] || [ $$n -ge 60 ]; do n=$$((n+1)); sleep 1; done; \
-		trap 'echo "$(YELLOW)[INFO]$(NC) Restoring backend to TESTING='"$$prev_testing"'..."; TESTING='"$$prev_testing"' $(DOCKER_COMPOSE) up -d backend >/dev/null' EXIT; \
+	fi; \
+	if [ "$$prev_hmr" != "1" ]; then \
+		echo "$(YELLOW)[INFO]$(NC) Restarting the dev server without hot reload..."; \
+		VITE_DISABLE_HMR=1 $(DOCKER_COMPOSE) up -d --no-deps frontend >/dev/null; \
+		n=0; until $(DOCKER_COMPOSE) exec -T frontend node -e "fetch('http://127.0.0.1:5173/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))" >/dev/null 2>&1 || [ $$n -ge 90 ]; do n=$$((n+1)); sleep 1; done; \
 	fi; \
 	cd frontend && npx playwright test --reporter=list
 
@@ -799,13 +824,13 @@ PYTEST_LOG := /tmp/inventari-pytest.$(if $(COMPOSE_PROJECT_NAME),$(COMPOSE_PROJE
 # log. The run goes to a file so the recipe can read the exit code and the
 # summary line after the fact — a pipe hands the caller tee's exit code, which
 # is how a run carrying errors was ever pushed as green. The log is removed
-# whatever the verdict; the checker is addressed from $(CURDIR) so the recipe
-# survives `make -C`.
+# whatever the verdict. Recipes run from the Makefile's directory, so the
+# checker's relative path holds under `make -C`.
 define GATED_PYTEST
 $(BACKEND_EXEC) uv run pytest $(1) > $(PYTEST_LOG) 2>&1; \
 rc=$$?; \
 $(2) $(PYTEST_LOG); \
-python3 $(CURDIR)/backend/scripts/check_pytest_summary_errors.py $(PYTEST_LOG); \
+python3 backend/scripts/check_pytest_summary_errors.py $(PYTEST_LOG); \
 summary=$$?; \
 rm -f $(PYTEST_LOG); \
 if [ $$summary -ne 0 ]; then exit 1; fi; \

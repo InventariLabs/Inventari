@@ -12,6 +12,7 @@ from app.core.contracts import (
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    require_any_permission,
     require_org,
     require_permission,
 )
@@ -24,6 +25,15 @@ from app.schemas.category import CategoryGroupRename, CategoryGroupRenameResult
 from app.schemas.pagination import PaginatedResponse
 
 router = APIRouter()
+
+#: The category list is read by two modules' screens as their own reference
+#: data: the equipment register files and filters its records by it, and the
+#: warehouse's putaway rules and product pickers offer it. Their reads admit
+#: the list; filing, renaming and deleting a category stay behind
+#: ``categories:write``.
+_READS_CATEGORIES = require_any_permission(
+    SystemPermission.CATEGORIES_READ, 'equipment:read', 'warehouse:read'
+)
 
 
 def _dedupe_categories(categories: list[CategoryDTO]) -> list[CategoryDTO]:
@@ -52,7 +62,7 @@ async def get_categories(
     ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db=Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.CATEGORIES_READ),
+    _: object = _READS_CATEGORIES,
 ):
     """List of categories with optional module-context filters."""
     claimed_tags: set[str] = set()

@@ -50,7 +50,7 @@ export default function FloorShelf({
         variant="secondary"
         size="lg"
         className="w-full"
-        leftIcon={<MapPin size={18} aria-hidden="true" />}
+        leftIcon={<MapPin size={20} aria-hidden="true" />}
         onClick={onChoose}
       >
         {t("floorShelf.choose")}

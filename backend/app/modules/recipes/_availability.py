@@ -176,11 +176,15 @@ async def get_recipe_availability(
         # The scaled requirement before its unit's step rounds it up. Kept
         # only when the step changes it: the card names it as what the shown
         # number was rounded from, and a requirement already on its step has
-        # nothing to explain.
+        # nothing to explain — including one the multiplier's last-place
+        # noise puts a hair above it, which the step's own answer reads as
+        # on the step.
         unrounded_qty = Decimal(str(ingredient.quantity)) * multiplier
         required_qty = core_api.uoms.round_up(unrounded_qty, ingredient_uom)
         unrounded_reported = (
-            float(unrounded_qty) if unrounded_qty != required_qty else None
+            None
+            if core_api.uoms.is_on_step(unrounded_qty, ingredient_uom)
+            else float(unrounded_qty)
         )
         scaled_orig_qty = None
         if ingredient.original_quantity is not None:

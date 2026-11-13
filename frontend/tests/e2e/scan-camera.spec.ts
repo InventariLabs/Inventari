@@ -10,6 +10,18 @@ const UNKNOWN_EAN = "5901234123457";
 // the reader's crop is computed for.
 test.use({ viewport: { width: 390, height: 844 } });
 
+async function openCamera(page: import("@playwright/test").Page) {
+  // A phone starts the camera by itself; a desktop waits for the button.
+  // The page is the first this test loads, so it gets the 15 s every other
+  // first load in this file gets, not the 5 s default meant for a page
+  // already standing.
+  const video = page.locator("#qr-reader video");
+  const start = page.getByRole("button", { name: "Start Camera" });
+  await expect(video.or(start)).toBeVisible({ timeout: 15000 });
+  if (await start.isVisible()) await start.click();
+  await expect(video).toBeVisible({ timeout: 10000 });
+}
+
 test.describe("Scan — fake camera", () => {
   let labelShortCode: string;
 
@@ -24,18 +36,6 @@ test.describe("Scan — fake camera", () => {
   test.beforeEach(async ({ page, camera: _camera }) => {
     await page.goto("/inventory/scan");
   });
-
-  async function openCamera(page: import("@playwright/test").Page) {
-    // A phone starts the camera by itself; a desktop waits for the button.
-    // The page is the first this test loads, so it gets the 15 s every other
-    // first load in this file gets, not the 5 s default meant for a page
-    // already standing.
-    const video = page.locator("#qr-reader video");
-    const start = page.getByRole("button", { name: "Start Camera" });
-    await expect(video.or(start)).toBeVisible({ timeout: 15000 });
-    if (await start.isVisible()) await start.click();
-    await expect(video).toBeVisible({ timeout: 10000 });
-  }
 
   test("reads an EAN-13 held in front of the camera", async ({
     page,
@@ -54,8 +54,12 @@ test.describe("Scan — fake camera", () => {
   }) => {
     await openCamera(page);
     await camera.showQr(labelShortCode);
+    // A QR is a denser matrix than an EAN-13, read by a reader that has only
+    // just started. Every other QR read in this file waits 20 s for it; this
+    // one had the 10 s of the EAN read beside it, and a loaded runner sent no
+    // request inside it.
     await expect
-      .poll(() => camera.scanRequests(), { timeout: 10000 })
+      .poll(() => camera.scanRequests(), { timeout: 20000 })
       .toContain(labelShortCode);
   });
 
@@ -142,6 +146,21 @@ test.describe("Scan — fake camera", () => {
     await camera.runFrames(120);
     expect(camera.scanRequests()).toEqual([UNKNOWN_EAN]);
   });
+});
+
+/**
+ * The document scan page, opened as the test's first page. It once sat in the
+ * describe above, whose beforeEach opens the item scan page: the test then
+ * navigated away while that page was still starting its camera and loading
+ * its modules, and WebKit now and then never finished the second navigation
+ * (a timeout, or "WebKit encountered an internal error"). Nothing a user does
+ * looks like that, and both CI failures were that second navigation.
+ */
+test.describe("Scan — fake camera on the document scan page", () => {
+  // `camera` installs the fake before the first navigation.
+  test.beforeEach(async ({ page, camera: _camera }) => {
+    await page.goto("/warehouse/scan");
+  });
 
   test("a code held in view through a turn is looked up once", async ({
     page,
@@ -151,7 +170,6 @@ test.describe("Scan — fake camera", () => {
     // restart forgot the code it had read, and a code still held counted again.
     // The document scan page keeps reading after a read; the item scan page
     // pauses its camera, so it would not show a second reading anyway.
-    await page.goto("/warehouse/scan");
     await openCamera(page);
     await camera.showEan13(UNKNOWN_EAN);
     await expect
@@ -170,7 +188,6 @@ test.describe("Scan — fake camera", () => {
     page,
     camera,
   }) => {
-    await page.goto("/warehouse/scan");
     await openCamera(page);
     await camera.showEan13(UNKNOWN_EAN);
     await expect
@@ -213,9 +230,11 @@ test.describe("Scan — one read per presence on the forms", () => {
     api = new ApiHelper(await playwright.request.newContext({ baseURL }));
     token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
 
-    const storages = await api.listStorages(token);
-    const kitchen =
-      storages.find((s) => s.name === "E2E-Kitchen") ?? storages[0];
+    // Its own location: the first one of the shared tenant belongs to
+    // whichever parallel spec deletes it first.
+    const kitchen = (await api.createStorage(token, {
+      name: `E2E-Camera-Forms-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    })) as { id: string; short_code: string };
     storageCode = kitchen.short_code;
     // A stocked record the barcode stands for: a document scan then has a
     // line to place, and the equipment form has a product to name.
@@ -261,8 +280,16 @@ test.describe("Scan — one read per presence on the forms", () => {
       .getByRole("menu", { name: "New document" })
       .getByRole("menuitem", { name: /^Receipt\b/ })
       .click();
-    await page.getByRole("button", { name: "Scan", exact: true }).click();
+    // The switch at the bottom edge of the sheet, where a worker who has
+    // scrolled the setup fields finds it — and where a retried click puts it
+    // too. The camera opens under the switch, so the form has to bring it
+    // into view: WebKit does not start a muted video it counts out of view,
+    // and a reader out of view never gets a frame.
+    const scan = page.getByRole("button", { name: "Scan", exact: true });
+    await scan.evaluate((el) => el.scrollIntoView({ block: "end" }));
+    await scan.click();
     await expectReaderVideo(page);
+    await expect(page.locator("#qr-reader video")).toBeInViewport();
   }
 
   test("the document form adds one piece for a code held in view", async ({
@@ -477,10 +504,12 @@ test.describe("Scan — execution reads one presence", () => {
   test.beforeAll(async ({ playwright, baseURL }) => {
     api = new ApiHelper(await playwright.request.newContext({ baseURL }));
     token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
-    const storages = await api.listStorages(token);
-    const kitchen =
-      storages.find((s) => s.name === "E2E-Kitchen") ?? storages[0];
-    locationId = kitchen.id;
+    // Its own location, as above.
+    locationId = (
+      await api.createStorage(token, {
+        name: `E2E-Camera-Execution-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      })
+    ).id;
     const partner = await api.createPartner(token, {
       name: `E2E-Camera-Customer-${crypto.randomUUID()}`,
       type: "CUSTOMER",

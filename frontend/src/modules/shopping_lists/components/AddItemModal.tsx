@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/Input";
 import { Sheet } from "@/components/ui/Sheet";
 import { UomSelect } from "@/modules/shared/components/UomSelect";
 import { extractApiError } from "@/lib/errors";
+import { formatQuantityLocale } from "@/utils/formatters";
 import {
   QuantityInput,
   quantityStepMessage,
@@ -171,7 +172,11 @@ export default function AddItemModal({ listId, onClose, onSuccess }: Props) {
                   isQtyInvalid
                     ? (formData.quantity ?? 0) > QUANTITY_MAX
                       ? t("addItem.validation.quantityMax", {
-                          max: QUANTITY_MAX,
+                          // The store's ceiling, written the way this reader
+                          // writes numbers: the raw `999999999.999` used to
+                          // print its dot in a Polish interface, beside a
+                          // server refusal that already said `999999999,999`.
+                          max: formatQuantityLocale(QUANTITY_MAX),
                         })
                       : t("addItem.validation.quantityPositive")
                     : undefined

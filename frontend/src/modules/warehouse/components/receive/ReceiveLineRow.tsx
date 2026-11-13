@@ -113,7 +113,7 @@ export function ReceiveLineRow({
               type="button"
               variant="ghost"
               size="inline"
-              className="self-start text-xs text-primary-600 hover:bg-transparent hover:underline"
+              className="self-start text-xs text-on-primary hover:bg-transparent hover:underline"
               aria-expanded={detailsOpen}
               onClick={() => setDetailsOpen((open) => !open)}
             >
@@ -123,7 +123,7 @@ export function ReceiveLineRow({
               type="button"
               variant="ghost"
               size="inline"
-              className="self-start text-xs text-primary-600 hover:bg-transparent hover:underline"
+              className="self-start text-xs text-on-primary hover:bg-transparent hover:underline"
               aria-expanded={heldOpen}
               onClick={() => setHeldOpen((open) => !open)}
             >

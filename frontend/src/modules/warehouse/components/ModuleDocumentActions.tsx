@@ -63,7 +63,7 @@ export function ModuleDocumentActions({ doc }: { doc: WarehouseDocument }) {
             key={id}
             variant="outline"
             size="sm"
-            leftIcon={Icon ? <Icon size={15} /> : undefined}
+            leftIcon={Icon ? <Icon size={14} /> : undefined}
             onClick={() => void press()}
             disabled={running !== null}
           >

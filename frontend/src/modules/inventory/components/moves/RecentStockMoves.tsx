@@ -72,7 +72,7 @@ export function RecentStockMoves({
         {seeAll && (
           <Link
             to={seeAll.to}
-            className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
+            className="inline-flex items-center gap-1 text-sm font-medium text-on-primary hover:underline"
           >
             {seeAll.label}
             <ArrowUpRight size={14} aria-hidden="true" />

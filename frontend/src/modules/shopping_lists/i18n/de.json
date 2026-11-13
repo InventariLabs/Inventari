@@ -87,7 +87,8 @@
     "failed": "Zutaten aus den gewählten Rezepten konnten nicht hinzugefügt werden",
     "success": "{{count}} Zutaten hinzugefügt",
     "success_one": "{{count}} Zutat hinzugefügt",
-    "success_other": "{{count}} Zutaten hinzugefügt"
+    "success_other": "{{count}} Zutaten hinzugefügt",
+    "alreadyListed": "Schon auf dieser Liste"
   },
   "card": {
     "saveName": "Name speichern",

@@ -25,7 +25,11 @@ import { describe, it, expect } from "vitest";
  * that means nothing.
  */
 
-const CSS = readFileSync(resolve(process.cwd(), "src/index.css"), "utf8");
+// Comments stripped: a token or rule that is commented out must not answer.
+const CSS = readFileSync(
+  resolve(process.cwd(), "src/index.css"),
+  "utf8",
+).replace(/\/\*[\s\S]*?\*\//g, "");
 
 function rootBlock(): string {
   const start = CSS.indexOf("\n:root {");

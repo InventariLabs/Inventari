@@ -17,9 +17,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import ColumnElement
 
+from app.core.contracts import ItemDTO
 from app.core.db_utils import escape_ilike, paginate_async
 from app.core.module_ownership import claimed_by_module, standing_location
 from app.core.module_scope import get_context_tags_of
+from app.core.public_api import core_api
 from app.models.item import Item
 
 from ._holder import Holder, holder_of_assignment
@@ -56,6 +58,7 @@ def _asset_filters(
     storage_id: UUID | None,
     status: str | None,
     checked_out: bool,
+    hide_retired: bool = False,
 ) -> list[ColumnElement[bool]]:
     """The WHERE clauses of the asset list, shared with the bulk-by-filter path.
 
@@ -96,14 +99,20 @@ def _asset_filters(
         )
     if status is not None:
         clauses.append(Item.meta_data['equipment']['equipment_status'].astext == status)
+    held = select(EquipmentAssignment.item_id).where(
+        EquipmentAssignment.organization_id == org_id,
+        EquipmentAssignment.checked_in_at.is_(None),
+    )
     if checked_out:
+        clauses.append(Item.id.in_(held))
+    if hide_retired:
+        # The fleet's own rule: a retired asset is out of it unless somebody
+        # still holds it, and a held one counts as issued.
         clauses.append(
-            Item.id.in_(
-                select(EquipmentAssignment.item_id).where(
-                    EquipmentAssignment.organization_id == org_id,
-                    EquipmentAssignment.checked_in_at.is_(None),
-                )
+            Item.meta_data['equipment']['equipment_status'].astext.is_distinct_from(
+                'RETIRED'
             )
+            | Item.id.in_(held)
         )
     return clauses
 
@@ -117,6 +126,7 @@ async def list_matching_asset_ids_async(
     location_id: UUID | None = None,
     status: str | None = None,
     checked_out: bool = False,
+    hide_retired: bool = False,
 ) -> list[UUID]:
     """Every asset id the list's filters match — the scope of a bulk action.
 
@@ -131,6 +141,7 @@ async def list_matching_asset_ids_async(
         storage_id=location_id,
         status=status,
         checked_out=checked_out,
+        hide_retired=hide_retired,
     )
     rows = await db.execute(select(Item.id).where(*clauses))
     return list(rows.scalars().all())
@@ -145,6 +156,7 @@ async def list_equipment_assets_async(
     storage_id: UUID | None = None,
     status: str | None = None,
     checked_out: bool = False,
+    hide_retired: bool = False,
     sort: str | None = None,
     sort_dir: str = 'desc',
     limit: int = 50,
@@ -163,6 +175,7 @@ async def list_equipment_assets_async(
         storage_id=storage_id,
         status=status,
         checked_out=checked_out,
+        hide_retired=hide_retired,
     )
     query = (
         select(Item)
@@ -234,3 +247,35 @@ async def list_equipment_assets_async(
                 assigned[assignment.item_id] = holder
 
     return items, total, assigned
+
+
+async def get_asset_async(
+    db: AsyncSession, org_id: UUID, item_id: UUID, *, include_archived: bool = False
+) -> ItemDTO | None:
+    """The record *item_id* names, when it is one of the register's assets.
+
+    Every route of the register that addresses one record by id reads it
+    here. They used to read it as any product of the organization, so a role
+    holding only ``equipment:read`` opened the valuation (name, serial,
+    purchase price), the papers, the histories and the approval state of an
+    ordinary product whose id it knew, and a retire or an archive sent here
+    wrote the register's status into a product or took it off the shelf. The
+    question is the list's own (:func:`claimed_by_module`): a record the
+    register does not list is one its routes do not know — ``None``, which
+    each caller answers with the 404 it gives an id that names nothing.
+
+    ``include_archived`` keeps an archived asset: the card's reads outlive
+    the archive, while a write about an asset in service asks for a live one.
+    """
+    claimed = await db.scalar(
+        select(Item.id).where(
+            Item.id == item_id,
+            Item.organization_id == org_id,
+            claimed_by_module('equipment', get_context_tags_of('equipment')),
+        )
+    )
+    if claimed is None:
+        return None
+    if include_archived:
+        return await core_api.items.get_any_async(db, org_id, item_id)
+    return await core_api.items.get_async(db, org_id, item_id)

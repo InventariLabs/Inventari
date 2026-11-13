@@ -110,7 +110,7 @@ function DraftActions({
       <>
         <Button
           size="sm"
-          leftIcon={<Check size={15} />}
+          leftIcon={<Check size={14} />}
           onClick={onApplyCorrection}
           disabled={isApplyCorrectionPending || isCompletePending}
         >
@@ -120,7 +120,7 @@ function DraftActions({
           <Button
             variant="ghostDanger"
             size="sm"
-            leftIcon={<Trash2 size={15} />}
+            leftIcon={<Trash2 size={14} />}
             onClick={onDelete}
           >
             {t("warehouse:actions.delete")}
@@ -134,7 +134,7 @@ function DraftActions({
       <Button
         variant="ghost"
         size="sm"
-        leftIcon={<Pencil size={15} />}
+        leftIcon={<Pencil size={14} />}
         onClick={onEdit}
       >
         {t("warehouse:actions.edit")}
@@ -142,7 +142,7 @@ function DraftActions({
       <Button
         size="sm"
         leftIcon={
-          approvalRequired ? <Send size={15} /> : <PackageCheck size={15} />
+          approvalRequired ? <Send size={14} /> : <PackageCheck size={14} />
         }
         onClick={onPostNow}
         disabled={isPostNowPending || isCompletePending}
@@ -168,7 +168,7 @@ function DraftActions({
         <Button
           variant="outline"
           size="sm"
-          leftIcon={<XCircle size={15} />}
+          leftIcon={<XCircle size={14} />}
           onClick={onCancel}
         >
           {t("warehouse:actions.cancelDocument")}
@@ -178,7 +178,7 @@ function DraftActions({
         <Button
           variant="ghostDanger"
           size="sm"
-          leftIcon={<Trash2 size={15} />}
+          leftIcon={<Trash2 size={14} />}
           onClick={onDelete}
         >
           {t("warehouse:actions.delete")}
@@ -350,7 +350,7 @@ export function DocumentActionButtons({
         <>
           <Button
             size="sm"
-            leftIcon={<Check size={15} />}
+            leftIcon={<Check size={14} />}
             onClick={onApplyCorrection}
             disabled={isApplyCorrectionPending || isCompletePending}
           >
@@ -363,7 +363,7 @@ export function DocumentActionButtons({
             <Button
               variant="outline"
               size="sm"
-              leftIcon={<XCircle size={15} />}
+              leftIcon={<XCircle size={14} />}
               onClick={onCancel}
             >
               {t("warehouse:actions.cancel")}
@@ -397,7 +397,7 @@ export function DocumentActionButtons({
               <Button
                 variant="outline"
                 size="sm"
-                leftIcon={<ArrowDownToLine size={15} />}
+                leftIcon={<ArrowDownToLine size={14} />}
                 onClick={onStartReceiving}
                 disabled={blocked}
               >
@@ -410,7 +410,7 @@ export function DocumentActionButtons({
               <Button
                 variant="outline"
                 size="sm"
-                leftIcon={<PackageSearch size={15} />}
+                leftIcon={<PackageSearch size={14} />}
                 onClick={onStartPicking}
                 disabled={blocked}
               >
@@ -421,7 +421,7 @@ export function DocumentActionButtons({
           <span title={executionHint}>
             <Button
               size="sm"
-              leftIcon={<Check size={15} />}
+              leftIcon={<Check size={14} />}
               onClick={onExecute}
               disabled={blocked}
             >
@@ -435,7 +435,7 @@ export function DocumentActionButtons({
           <Button
             variant="outline"
             size="sm"
-            leftIcon={<XCircle size={15} />}
+            leftIcon={<XCircle size={14} />}
             onClick={onCancel}
           >
             {t("warehouse:actions.cancelDocument")}
@@ -449,7 +449,7 @@ export function DocumentActionButtons({
               <Button
                 variant="outline"
                 size="sm"
-                leftIcon={<XCircle size={15} />}
+                leftIcon={<XCircle size={14} />}
                 disabled
               >
                 {t("warehouse:actions.cancelDocument")}
@@ -461,7 +461,7 @@ export function DocumentActionButtons({
         <Button
           variant="outline"
           size="sm"
-          leftIcon={<Undo2 size={15} />}
+          leftIcon={<Undo2 size={14} />}
           onClick={onUndo}
           disabled={isUndoPending}
         >
@@ -472,7 +472,7 @@ export function DocumentActionButtons({
         <Button
           variant="outline"
           size="sm"
-          leftIcon={<CornerDownLeft size={15} />}
+          leftIcon={<CornerDownLeft size={14} />}
           onClick={onReturn}
         >
           {t("warehouse:returns.new")}
@@ -482,7 +482,7 @@ export function DocumentActionButtons({
         <Button
           variant="outline"
           size="sm"
-          leftIcon={<Download size={15} />}
+          leftIcon={<Download size={14} />}
           onClick={onDownloadPdf}
           disabled={isPdfDownloading}
         >
@@ -495,7 +495,7 @@ export function DocumentActionButtons({
         <Button
           variant="ghost"
           size="sm"
-          leftIcon={<Copy size={15} />}
+          leftIcon={<Copy size={14} />}
           onClick={onDuplicate}
           disabled={isDuplicatePending}
         >

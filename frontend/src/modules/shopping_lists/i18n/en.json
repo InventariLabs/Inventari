@@ -87,7 +87,8 @@
     "failed": "Failed to add ingredients from the selected recipes",
     "success": "Added {{count}} ingredients",
     "success_one": "Added {{count}} ingredient",
-    "success_other": "Added {{count}} ingredients"
+    "success_other": "Added {{count}} ingredients",
+    "alreadyListed": "Already on this list"
   },
   "card": {
     "saveName": "Save name",

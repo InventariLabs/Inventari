@@ -1239,10 +1239,12 @@ key already says it. A module may declare none when one of these holds:
   endpoint added later arrives closed. `api_keys` is behind `org:settings:write`; `webhooks` is
   behind the administrator check (the built-in admin level or a role holding `admin:access`).
 - **It turns what a member may already read into output, and nothing more.** `printing` renders
-  labels of items and locations the member can see and queues them for a printer; its router is
-  behind the module switch and organization membership. It does declare one key of its own,
-  `printing:agent`, which guards its `/agent/` endpoints — and that key is the whole reach of a
-  key issued with the `printing` scope.
+  labels of items and locations the member can see and queues them for a printer; each of its
+  app routes asks for the read of the screen that sends the label (`items:read`, `locations:read`,
+  `equipment:read` or `warehouse:read`, by kind of label), and a job answers to the read of its
+  target — [`docs/subsystems/PRINTING.md`](docs/subsystems/PRINTING.md) lists them. It does declare
+  one key of its own, `printing:agent`, which guards its `/agent/` endpoints — and that key is the
+  whole reach of a key issued with the `printing` scope.
 
 A module whose endpoints change records of its own, or hand out something a member could not
 read before, declares keys and guards with them — `require_permission('<module>:<action>')`, or
@@ -1392,7 +1394,10 @@ This creates `./modules-workspace/warranty_tracker/` (the container sees it as
 `/modules-workspace`; without `--output` the command writes into its current
 directory inside the container) with all files pre-filled
 and ready to edit — a directory git ignores and the backend container can see,
-so the install below reaches it and `git add -A` here cannot take it.
+so the install below reaches it and `git add -A` here cannot take it. The
+package includes an `AGENTS.md` (and a `CLAUDE.md` pointing at it) with the
+module rules for an AI coding agent started inside it; see *Building a module
+with an AI coding agent* in MODULE_QUICKSTART.md.
 
 ### Install a community module
 
@@ -1991,7 +1996,7 @@ Run `python manage.py module schema` to export the full JSON Schema for `manifes
 
 ## 📌 Versioning & CoreAPI Stability
 
-The single source of truth for the platform version is the **README release section** (currently **Alpha v0.11.0**). `backend/pyproject.toml` and `frontend/package.json` mirror that version. A release carries the same number into `backend/uv.lock`, `frontend/package-lock.json`, `docs/api/openapi.json` and the README release section, so bump all of them together.
+The single source of truth for the platform version is the **README release section** (currently **Alpha v0.12.0**). `backend/pyproject.toml` and `frontend/package.json` mirror that version. A release carries the same number into `backend/uv.lock`, `frontend/package-lock.json`, `docs/api/openapi.json` and the README release section, so bump all of them together.
 
 - **From 0.11:** contract DTOs, stable `core_api` namespaces, the manifest and webhook envelope have compatible-evolution promises. Stable surfaces follow the additive-only rule and a two-minor-release deprecation window; experimental surfaces may change in a minor release with release notes and migration instructions, without a window.
 - The REST list and pagination envelopes, the error shape and refusal codes, and API keys are **stable from 0.11.0**; the rest of the REST API and the frontend module interface are **experimental in 0.11**. See the [Contracts Stability Policy](docs/subsystems/CONTRACTS_STABILITY.md) for the full surface map, namespace exceptions and guards. Backend facade stability does not imply frontend or HTTP stability.

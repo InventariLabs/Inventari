@@ -192,7 +192,7 @@
       "overproduced": "Superprodução",
       "resultPerUnit": "({{amount}} por {{unit}})",
       "totalCostAfterClosing": "Custo total após o fechamento",
-      "unitCost": "{{amount}} por unidade produzida",
+      "unitCost": "{{amount}} por {{unit}}",
       "totalCostGap_one": "{{count}} ingrediente saiu de estoque sem custo, então fica fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores.",
       "totalCostGap_other": "{{count}} ingredientes saíram de estoque sem custo, então ficam fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores."
     },

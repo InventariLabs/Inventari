@@ -62,6 +62,12 @@ class IngredientAvailability:
     uom_symbol: str | None
     convertible: bool
     available_uom_symbol: str | None = None
+    # What buying the shortfall asks for: the shortage put on the
+    # ingredient's own stock unit's step, up, and stated in that unit — the
+    # quantity a shopping list line will carry. None when nothing is short,
+    # or when the measures have no bridge and so have no quantity to buy.
+    to_buy: Decimal | None = None
+    to_buy_uom_symbol: str | None = None
 
 
 @dataclass(frozen=True)
@@ -329,6 +335,27 @@ async def compute_availability(
 
         recipe_uom = await _get_uom(line_uom_ids.get(child_id))
         template = template_cache.get(child_id)
+        stock_uom = await _get_uom(template.uom_id if template else None)
+
+        # The shopping list is shopped in the ingredient's stock unit, and a
+        # requirement is put on the next step at or above it — needing part of
+        # a piece is needing the piece. The same rule the list's own write
+        # takes, so the button that fills the list states what it will hold.
+        to_buy: Decimal | None = None
+        if shortage is not None and shortage > 0:
+            missing: Decimal | None = shortage
+            if (
+                recipe_uom is not None
+                and stock_uom is not None
+                and recipe_uom.id != stock_uom.id
+            ):
+                missing, ok = core_api.uoms.convert_quantity(
+                    shortage, recipe_uom, stock_uom
+                )
+                if not ok:
+                    missing = None
+            if missing is not None:
+                to_buy = core_api.uoms.round_up(missing, stock_uom)
 
         ingredients.append(
             IngredientAvailability(
@@ -346,6 +373,8 @@ async def compute_availability(
                 available_uom_symbol=stock_uom_symbols.get(child_id)
                 if not convertible
                 else None,
+                to_buy=to_buy,
+                to_buy_uom_symbol=stock_uom.symbol if stock_uom else None,
             )
         )
 

@@ -84,7 +84,7 @@ export function StockQuantsTable({
                       {linkToBatches ? (
                         <Link
                           to={`/inventory/lots/${row.lot_id}`}
-                          className="text-primary-600 hover:text-primary-700 hover:underline"
+                          className="text-on-primary hover:underline"
                         >
                           {row.lot_name}
                         </Link>

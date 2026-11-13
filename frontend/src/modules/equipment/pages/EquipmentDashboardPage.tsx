@@ -26,9 +26,6 @@ import {
 } from "@/modules/equipment/hooks/useFleetComposition";
 import { useFleetValuation } from "@/modules/equipment/hooks/useValuation";
 
-/** Overdue returns fetched for the card. */
-const OVERDUE_LIMIT = 20;
-
 /**
  * EquipmentDashboardPage — the overview at /equipment.
  *
@@ -42,7 +39,9 @@ export default function EquipmentDashboardPage() {
   useAddAssetHeader();
 
   const dashboard = useEquipmentDashboard();
-  const overdue = useOverdueAssignments(OVERDUE_LIMIT);
+  // Every late return, not a first page: the heading, the rows and "Show
+  // all" count the same assets only when the card holds all of them.
+  const overdue = useOverdueAssignments();
   const fleet = useFleetAssets();
   // The widget's own query, read here only for the layout: with nothing to
   // value it draws nothing, and the check-outs take the full width.
@@ -79,7 +78,7 @@ export default function EquipmentDashboardPage() {
   const inFleet = (w: { item_id: string }) => !retired.has(w.item_id);
   const attention = toFleetAttention(
     {
-      overdue: overdue.data?.items ?? [],
+      overdue: overdue.data ?? [],
       warrantyEnding: (warrantyEnding ?? []).filter(inFleet),
       warrantyExpired: (dashboard.data?.expired_warranty_alerts ?? []).filter(
         inFleet,

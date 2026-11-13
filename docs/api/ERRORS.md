@@ -286,6 +286,7 @@ apart.
 | `DOCUMENT_CORRECTION_LINES_REFERENCE_ITEMS` | Correction document lines must reference existing items |
 | `DOCUMENT_CORRECTION_LOCKED` | Correction documents are locked — only notes can be changed. Attempted to change: {fields}. Cancel and create a new correction if the data is wrong. |
 | `DOCUMENT_CORRECTION_MISSING_ORIGINAL` | This correction does not name the document it corrects. |
+| `DOCUMENT_CORRECTION_NOT_DUPLICABLE` | A correction cannot be duplicated: it restates one document. Write a new correction of that document instead. |
 | `DOCUMENT_CORRECTION_NO_LINES` | A correction needs at least one line |
 | `DOCUMENT_CORRECTION_ORIGINAL_NOT_FOUND` | The corrected document {document} was not found. |
 | `DOCUMENT_CORRECTION_REQUIRES_COMPLETED` | Only a completed document can be corrected |

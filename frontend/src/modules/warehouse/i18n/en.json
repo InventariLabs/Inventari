@@ -250,6 +250,9 @@
     "postNowApprovalTitle": "Send this document for approval?",
     "postNowMessage": "This confirms the document and posts its stock movement now. If something is wrong, undo it right after — or correct it later. Continue?",
     "postNowApprovalMessage": "This confirms the document and sends it to the approval queue. Once approved, it is posted without another step. Continue?",
+    "postNowMessageDeadEndNamed": "This sends the document for approval, but nobody could decide it: the stage “{{stage}}” names approvers who cannot see approvals. It waits there until the request is withdrawn or those people are given access. Continue?",
+    "postNowMessageDeadEndNoApprover": "This sends the document for approval, but nobody could decide it: the stage “{{stage}}” is open to anyone holding the approve permission, and nobody in this organization holds it. It waits there until the request is withdrawn or someone is given the permission. Continue?",
+    "postNowMessageDeadEndOnlyYou": "This sends the document for approval, but nobody could decide it: the only person who can approve at the stage “{{stage}}” is you, and a requester cannot decide their own request. It waits there until the request is withdrawn or someone else is given the permission. Continue?",
     "postNowConfirm": "Post",
     "postNowApprovalConfirm": "Send for approval",
     "postNowKeep": "Keep as draft",
@@ -1615,6 +1618,7 @@
     "markDone": "Mark as done: {{task}}",
     "deleteTask": "Delete task: {{task}}",
     "showing": "Showing {{shown}} of {{total}}",
+    "waitingSum": "Waiting in all: {{total}} — tasks: {{tasks}}, quarantine holds: {{holds}}",
     "showMore": "Show more",
     "filter": {
       "label": "Show tasks",
