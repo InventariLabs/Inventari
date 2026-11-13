@@ -46,31 +46,35 @@ export default {
     "ui-pattern: palette-identity — <why the token would be wrong here>.",
 
   run(files) {
-    const findings = [];
-
-    for (const file of files) {
-      // Match in the comment-free text so a doc comment quoting the class
-      // as an example is not read as the mistake; offsets survive blanking,
-      // so the exception lookup below still reads the raw text.
-      const text = withoutComments(file.text);
-
-      PALETTE_LITERAL.lastIndex = 0;
-      let m;
-      while ((m = PALETTE_LITERAL.exec(text)) !== null) {
-        const before = file.text.slice(
-          Math.max(0, m.index - LOOKBEHIND),
-          m.index,
-        );
-        const reason = before.match(EXCEPTION)?.[1] ?? "";
-        if (
-          reason.trim().split(/\s+/).filter(Boolean).length >= MIN_REASON_WORDS
-        )
-          continue;
-
-        findings.push(`${file.path}:${lineAt(text, m.index)}`);
-      }
-    }
-
-    return { considered: files.length, findings };
+    return paletteFindings(files, PALETTE_LITERAL);
   },
 };
+
+/**
+ * Every match of `pattern` outside a comment that does not carry the
+ * `palette-identity` exception — shared with `slate-palette-literal`, which
+ * guards the sibling mistake in the same way.
+ */
+export function paletteFindings(files, pattern) {
+  const findings = [];
+
+  for (const file of files) {
+    // Match in the comment-free text so a doc comment quoting the class
+    // as an example is not read as the mistake; offsets survive blanking,
+    // so the exception lookup below still reads the raw text.
+    const text = withoutComments(file.text);
+
+    pattern.lastIndex = 0;
+    let m;
+    while ((m = pattern.exec(text)) !== null) {
+      const before = file.text.slice(Math.max(0, m.index - LOOKBEHIND), m.index);
+      const reason = before.match(EXCEPTION)?.[1] ?? "";
+      if (reason.trim().split(/\s+/).filter(Boolean).length >= MIN_REASON_WORDS)
+        continue;
+
+      findings.push(`${file.path}:${lineAt(text, m.index)}`);
+    }
+  }
+
+  return { considered: files.length, findings };
+}

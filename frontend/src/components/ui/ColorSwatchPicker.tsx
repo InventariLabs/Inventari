@@ -23,6 +23,8 @@ const SWATCH_STYLES: Record<string, { bg: string; active: string }> = {
   amber: { bg: "bg-amber-400", active: "ring-amber-600" },
   rose: { bg: "bg-rose-400", active: "ring-rose-600" },
   teal: { bg: "bg-teal-400", active: "ring-teal-600" },
+  // ui-pattern: palette-identity — the swatch shows the colour the user is
+  // choosing for a category, so it has to be that colour and not a neutral.
   slate: { bg: "bg-slate-400", active: "ring-slate-600" },
   // Legacy keys — not offered, but shown when already stored.
   purple: { bg: "bg-purple-400", active: "ring-purple-600" },

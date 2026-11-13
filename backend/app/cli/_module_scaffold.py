@@ -382,6 +382,12 @@ ones agents break first; the full documents are linked at the end.
   `core_api` from `app.core.public_api`. This package's own tables are
   queried directly.
 - Frontend: import Core UI, `api` and hooks only from `@/module-sdk`.
+  That is the whole set of components a package may use (`Button`, `Card`,
+  `ConfirmDialog`, `EmptyState`, `Input`, `NativeSelect`, `Badge`,
+  `QueryResult`, `Pagination` and the rest of its exports). The UI guidelines
+  name a few the SDK does not export (`Sheet`, `ListControlBar`, `DateInput`):
+  a package builds its screens without them, for example add and edit on pages
+  of their own, and never reaches into `@/components` for them.
 - Every route has a permission dependency and is filtered by the caller's
   organization (`require_org`); a list endpoint answers a
   `PaginatedResponse`, never a bare list.
@@ -414,10 +420,25 @@ A module contributed to Inventari itself needs it as
 
 ## Tests
 
-Tests live in `backend/tests/` and never install. Add one for every endpoint
-and every rule you add, and watch it fail before the code that makes it pass.
-Running them, and the frontend type check, takes the staging sequence in
-*Running a community package's tests* of `docs/MODULE_TESTING_GUIDE.md`.
+Tests live in `backend/tests/` (pytest) and `frontend/tests/` (vitest), and
+neither installs. Add one for every endpoint and every rule you add, and watch
+it fail before the code that makes it pass. Running them, and the frontend type
+check, takes the staging sequence in *Running a community package's tests* of
+`docs/MODULE_TESTING_GUIDE.md`. The sequence is meant to touch the checkout: it
+stops the backend, copies the package into the checkout for the length of the
+run and takes it away again, so following it does not break the rule to stay
+inside this package. Run the vitest specs in its step 3, with
+`npx vitest run --experimental.fsModuleCache=false src/modules/{module}`:
+without the flag a warm cache can hide this package's catalogs from the run,
+and every translated text renders as its key.
+
+Those are the checks a package runs: `module validate`, its own backend tests,
+its own frontend specs and the staged `npx tsc --noEmit`. The repository's own
+`make lint` and `make check-frontend`, and the checks inside them (for example
+`check:invalidation`, the i18n key snapshots and the schema test that reads
+only Core's metadata), read the checkout's tree and are not written for a
+package: a failure there that points at Core files is not this package's to
+fix, and the package must not edit the checkout to quiet it.
 
 ## Check the package before install
 
@@ -430,8 +451,9 @@ docker compose exec backend uv run python manage.py module validate --base-path 
 
 It checks the manifest, the import rules, the catalogs and that the package
 imports at all. Fix what it names; do not widen the manifest or move code
-into a forbidden path to silence it. Raise `version` in `module.yaml` for
-every change you hand over. The package must be signed again after an edit.
+into a forbidden path to silence it. Once a version has been installed or published, raise `version` in
+`module.yaml` for every change you hand over; the first handover keeps the
+scaffold's 0.1.0. The package must be signed again after an edit.
 
 ## The full documents (Inventari {version})
 

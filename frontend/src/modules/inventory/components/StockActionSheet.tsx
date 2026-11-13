@@ -402,7 +402,7 @@ export default function StockActionSheet({
                   ? ""
                   : "bg-surface-card text-on-secondary hover:border-primary-300 hover:text-primary-700",
               )}
-              leftIcon={<Plus size={18} />}
+              leftIcon={<Plus size={20} />}
             >
               {t("stockActions.addToWarehouse")}
             </Button>

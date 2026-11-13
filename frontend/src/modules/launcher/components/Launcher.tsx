@@ -144,7 +144,7 @@ function SortableTile({ module }: { module: FrontendModule }) {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 10 : undefined,
+    zIndex: isDragging ? "var(--z-sticky)" : undefined,
   };
 
   // The attributes and the listeners share one node on purpose — the link.

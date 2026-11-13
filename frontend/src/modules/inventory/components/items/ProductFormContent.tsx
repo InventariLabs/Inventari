@@ -250,7 +250,7 @@ export default function ProductFormContent({
                 variant="link"
                 size="sm"
                 onClick={() => onAddStorage("")}
-                leftIcon={<Plus size={12} />}
+                leftIcon={<Plus size={14} />}
                 className="mr-auto px-0 gap-1 text-on-primary"
               >
                 {t("addStorage")}

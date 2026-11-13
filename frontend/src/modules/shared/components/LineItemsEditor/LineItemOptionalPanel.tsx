@@ -95,7 +95,7 @@ export function LineItemOptionalPanel({
                 type="button"
                 variant="outline"
                 onClick={onExpiryToggle}
-                leftIcon={<CalendarPlus size={14} />}
+                leftIcon={<CalendarPlus size={16} />}
                 className="w-full justify-start border-dashed px-3 text-xs font-medium"
               >
                 {labels.showExpiryField}

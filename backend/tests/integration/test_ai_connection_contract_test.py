@@ -15,6 +15,8 @@ import pytest
 from app.core.llm.base import LlmResponse
 from app.core.llm.errors import LlmTimeoutError, LlmTransportError
 
+pytestmark = pytest.mark.usefixtures('stub_dns')
+
 _URL = '/api/v1/ai-connections/test'
 
 _GOOD_ANSWER = (

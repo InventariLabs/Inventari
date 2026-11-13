@@ -518,7 +518,7 @@ export default function WmsReceivingPhone({
         <div className="flex items-center justify-between gap-2">
           <Button
             variant="ghost"
-            leftIcon={<ChevronLeft size={18} aria-hidden="true" />}
+            leftIcon={<ChevronLeft size={16} aria-hidden="true" />}
             onClick={leave}
           >
             {t("receiving.phone.back")}

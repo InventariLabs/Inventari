@@ -102,7 +102,7 @@ export default function CategoryCreateModal({
                 },
               )
             }
-            leftIcon={<Plus size={24} />}
+            leftIcon={<Plus size={20} />}
             className="w-full h-16 text-lg rounded-2xl gap-3"
           >
             {t("categories:createCategory")}

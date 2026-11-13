@@ -79,7 +79,7 @@ export default function RolesPage() {
       title: t("settings.rbac.title"),
       subtitle: t("settings.rbac.subtitle"),
       actions: (
-        <Button leftIcon={<Plus size={18} />} onClick={() => setCreating(true)}>
+        <Button leftIcon={<Plus size={16} />} onClick={() => setCreating(true)}>
           {t("settings.rbac.createRole")}
         </Button>
       ),
@@ -153,7 +153,7 @@ export default function RolesPage() {
           description={t("settings.rbac.emptyDescription")}
           primaryAction={
             <Button
-              leftIcon={<Plus size={18} />}
+              leftIcon={<Plus size={16} />}
               onClick={() => setCreating(true)}
             >
               {t("settings.rbac.createRole")}
