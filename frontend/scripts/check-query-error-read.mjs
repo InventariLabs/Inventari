@@ -22,24 +22,21 @@
  * a sibling component, a prose mention or another hook's `isError` does not
  * count. Take `isError` in the pattern that destructures the data and use it.
  *
- * Modes:
- *   node check-query-error-read.mjs                    # report and exit 1
- *   node check-query-error-read.mjs --baseline         # only NEW findings fail
- *   node check-query-error-read.mjs --write-baseline   # snapshot current
- *   node check-query-error-read.mjs --quiet            # exit code only
+ * There is no baseline: every finding fails.
  *
- * Baseline: frontend/scripts/query-error-read-baseline.json (count per site: file, enclosing declaration, hook and destructuring).
- * The goal is an empty baseline; every fix shrinks it.
+ *   node check-query-error-read.mjs           # report and exit 1
+ *   node check-query-error-read.mjs --quiet   # exit code only
  */
-import { readFileSync, readdirSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import ts from "typescript";
 
 import { blankComments } from "./source-text.mjs";
 
 const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
 const SRC = resolve(ROOT, "src");
-const BASELINE_PATH = resolve(ROOT, "scripts/query-error-read-baseline.json");
 
 const EMPTY_DEFAULT = String.raw`(?:\[\]|\{\}|0)(?![\w.])`;
 
@@ -69,10 +66,49 @@ function braced(text, open) {
   return null;
 }
 
+/**
+ * Which characters are code, read from the TypeScript syntax tree: false in
+ * comments, string and regular-expression literals, JSX text and the text
+ * parts of a template literal; true in a template's `${…}` holes. A parser
+ * knows where a quote opens a string and where it is an apostrophe in JSX
+ * text, a regex or a comment, which a character scan cannot tell.
+ */
+function codeMask(text, rel) {
+  const kind = /\.tsx$/.test(rel) ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const tree = ts.createSourceFile(
+    rel,
+    text,
+    ts.ScriptTarget.Latest,
+    false,
+    kind,
+  );
+  const mask = new Array(text.length).fill(true);
+  const blank = (from, to) => mask.fill(false, from, to);
+  const literal = new Set([
+    ts.SyntaxKind.StringLiteral,
+    ts.SyntaxKind.NoSubstitutionTemplateLiteral,
+    ts.SyntaxKind.TemplateHead,
+    ts.SyntaxKind.TemplateMiddle,
+    ts.SyntaxKind.TemplateTail,
+    ts.SyntaxKind.RegularExpressionLiteral,
+    ts.SyntaxKind.JsxText,
+  ]);
+  const visit = (node) => {
+    // Trivia before a node is whitespace and comments.
+    blank(node.pos, node.getStart(tree));
+    if (literal.has(node.kind)) blank(node.getStart(tree), node.end);
+    else ts.forEachChild(node, visit);
+  };
+  visit(tree);
+  blank(tree.endOfFileToken.pos, text.length);
+  return mask;
+}
+
 /** Index of the `)` closing the `(` at `open`; -1 when unclosed. */
-function closingParen(text, open) {
+function closingParen(text, open, isCode) {
   let depth = 0;
   for (let i = open; i < text.length; i++) {
+    if (!isCode[i]) continue;
     if (text[i] === "(") depth++;
     else if (text[i] === ")" && --depth === 0) return i;
   }
@@ -123,7 +159,10 @@ function readableScope(text, scope) {
         hole === undefined ? "" : m,
       ),
     )
-    .replace(/\bconst\s*\{[^;]*?\}\s*(?::[^=;]+)?=\s*(?:\(\s*)?use[A-Z]/g, "use");
+    .replace(
+      /\bconst\s*\{[^;]*?\}\s*(?::[^=;]+)?=\s*(?:\(\s*)?use[A-Z]/g,
+      "use",
+    );
 }
 
 /**
@@ -193,9 +232,15 @@ export function unreadErrorsIn(rel, source) {
     }
   }
 
+  const isCode = codeMask(source, rel);
   const inline = /\buse[A-Z]\w*\s*(?:<[^>()]*>\s*)?\(/g;
-  while ((match = inline.exec(text)) !== null) {
-    const close = closingParen(text, match.index + match[0].length - 1);
+  while ((match = inline.exec(source)) !== null) {
+    if (!isCode[match.index]) continue;
+    const close = closingParen(
+      source,
+      match.index + match[0].length - 1,
+      isCode,
+    );
     if (close === -1) continue;
     const read = new RegExp(
       String.raw`^\s*\.data\b(?:\??\.\w+)*\s*\?\?\s*${EMPTY_DEFAULT}`,
@@ -211,36 +256,8 @@ export function unreadErrorsIn(rel, source) {
   return out;
 }
 
-export function tally(findings) {
-  const counts = new Map();
-  for (const f of findings) {
-    const key = `${f.file} :: ${f.site}`;
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
-  return counts;
-}
-
-export function diffBaseline(findings, baselineCounts) {
-  const current = tally(findings);
-  const base = new Map(Object.entries(baselineCounts ?? {}));
-  const added = [];
-  const fixed = [];
-  for (const [key, count] of current) {
-    const was = base.get(key) ?? 0;
-    if (count > was) added.push({ key, was, now: count });
-  }
-  for (const [key, was] of base) {
-    const now = current.get(key) ?? 0;
-    if (now < was) fixed.push({ key, was, now });
-  }
-  return { added, fixed, current };
-}
-
 function main() {
-  const args = process.argv.slice(2);
-  const useBaseline = args.includes("--baseline");
-  const writeBaseline = args.includes("--write-baseline");
-  const quiet = args.includes("--quiet");
+  const quiet = process.argv.slice(2).includes("--quiet");
 
   const files = walk(SRC)
     .map((f) => relative(SRC, f).split("\\").join("/"))
@@ -249,35 +266,12 @@ function main() {
     unreadErrorsIn(rel, readFileSync(resolve(SRC, rel), "utf8")),
   );
 
-  if (writeBaseline) {
-    writeFileSync(
-      BASELINE_PATH,
-      JSON.stringify(
-        {
-          unread: Object.fromEntries([...tally(findings)].sort()),
-        },
-        null,
-        2,
-      ) + "\n",
-    );
-    console.log(
-      `query-error-read baseline written: ${findings.length} site(s) → scripts/query-error-read-baseline.json`,
-    );
-    process.exit(0);
-  }
-
-  const baseline =
-    useBaseline && existsSync(BASELINE_PATH)
-      ? JSON.parse(readFileSync(BASELINE_PATH, "utf8")).unread
-      : {};
-  const { added, fixed } = diffBaseline(findings, baseline);
-
-  if (added.length > 0) {
+  if (findings.length > 0) {
     console.error(
-      `\nquery-error-read: ${added.length} NEW unread query error site(s)\n`,
+      `\nquery-error-read: ${findings.length} unread query error site(s)\n`,
     );
-    for (const { key, was, now } of added) {
-      console.error(was === 0 ? `  ${key}` : `  ${key}  (${was} → ${now})`);
+    for (const f of findings) {
+      console.error(`  ${f.file}:${f.line} :: ${f.site}`);
     }
     console.error(
       "\nA query's empty default renders as an answer when the request " +
@@ -288,15 +282,7 @@ function main() {
   }
 
   if (!quiet) {
-    const total = [...tally(findings).values()].reduce((a, b) => a + b, 0);
-    console.log(
-      `query-error-read: ${files.length} file(s) scanned, ${total} site(s) (all in the baseline).`,
-    );
-    if (fixed.length > 0) {
-      console.log(
-        `✓ ${fixed.length} baseline entr(y/ies) improved — run --write-baseline to refresh.`,
-      );
-    }
+    console.log(`query-error-read: ${files.length} file(s) scanned, clean.`);
   }
   process.exit(0);
 }

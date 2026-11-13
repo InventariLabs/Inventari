@@ -122,8 +122,8 @@ fell in recipes (43 to 9) and warehouse (58 to 12). The transaction-ownership
 baseline is empty, where October counted commit sites in warehouse, purchase
 orders, api keys, webhooks, partners, approvals and nutrition; the allowlist of
 legal owners holds no module entries, so those sites were fixed rather than
-reclassified. One failed-load site is reported by the query-error gate, in
-recipes. Open work grew in the tracker: approvals and maker both gained open
+reclassified. The query-error gate reports no failed-load site (the last one,
+in recipes, was fixed). Open work grew in the tracker: approvals and maker both gained open
 defects since October, and the two items the October record named for them are
 still open or not shown closed (see their rows). Test-to-source ratios moved by a
 few tenths in most modules; nutrition's backend ratio is higher because the

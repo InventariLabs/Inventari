@@ -24,8 +24,9 @@ export function TagsPanel({
   // panel title — so the open state is owned here.
   const [mergeOpen, setMergeOpen] = useState(false);
   // Same cached query TagManager reads — merging needs something to merge
-  // away, so the toggle waits for the first tag.
-  const hasTags = (useRecipeTags().data ?? []).length > 0;
+  // away, so the toggle waits for the first tag. A failed load shows no
+  // toggle, and TagManager beside it shows the failure itself.
+  const hasTags = Boolean(useRecipeTags().data?.length);
 
   if (!isOpen) return null;
 

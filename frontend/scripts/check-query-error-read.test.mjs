@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { diffBaseline, unreadErrorsIn } from "./check-query-error-read.mjs";
+import { unreadErrorsIn } from "./check-query-error-read.mjs";
 
 /**
  * The gate flags a defaulted query result whose error the same destructuring
  * never takes. These cases pin both directions: the shapes that must fire,
- * and the ones that must not, so the baseline stays a list of real gaps.
+ * and the ones that must not, so every finding is a real gap.
  */
 
 const rel = "modules/things/pages/ThingsPage.tsx";
@@ -67,21 +67,6 @@ describe("check-query-error-read", () => {
     expect(unreadErrorsIn(rel, "const { data = [] } = props;")).toEqual([]);
   });
 
-  it("fails only on sites the baseline does not hold", () => {
-    const findings = [{ file: "a.tsx", line: 1, site: "useA { data = [] }" }];
-    const key = "a.tsx :: useA { data = [] }";
-    expect(diffBaseline(findings, { [key]: 1 }).added).toEqual([]);
-    expect(diffBaseline(findings, {}).added).toEqual([
-      { key, was: 0, now: 1 },
-    ]);
-  });
-
-  it("does not let a new site in a file inherit a fixed one's allowance", () => {
-    const swapped = [{ file: "a.tsx", line: 9, site: "useB { data = [] }" }];
-    const old = { "a.tsx :: useA { data = [] }": 1 };
-    expect(diffBaseline(swapped, old).added).toHaveLength(1);
-  });
-
   it("does not take another component's read for this query's", () => {
     const source = [
       "function Good() {",
@@ -97,16 +82,6 @@ describe("check-query-error-read", () => {
     expect(unreadErrorsIn(rel, source)).toMatchObject([
       { line: 7, site: expect.stringContaining("Bad ::") },
     ]);
-  });
-
-  it("names the enclosing declaration, so a replacement is a new site", () => {
-    const at = (name) =>
-      unreadErrorsIn(rel, `function ${name}() {\n  const { data = [] } = useThings();\n}`);
-    const old = Object.fromEntries(
-      [...new Set(at("Old").map((f) => `${f.file} :: ${f.site}`))].map((k) => [k, 1]),
-    );
-    expect(diffBaseline(at("Old"), old).added).toEqual([]);
-    expect(diffBaseline(at("New"), old).added).toHaveLength(1);
   });
 
   it("does not take another query's isError, or template text, for a read", () => {
@@ -136,7 +111,10 @@ describe("check-query-error-read", () => {
       unreadErrorsIn(rel, "const scopes = useThings().data?.scopes ?? [];"),
     ).toMatchObject([{ line: 1, site: "<module> :: useThings().data" }]);
     expect(
-      unreadErrorsIn(rel, "const has = (useThings({ a: f(1) }).data ?? []).length;"),
+      unreadErrorsIn(
+        rel,
+        "const has = (useThings({ a: f(1) }).data ?? []).length;",
+      ),
     ).toHaveLength(1);
     expect(unreadErrorsIn(rel, "const n = useThings().data?.total;")).toEqual(
       [],
@@ -164,5 +142,68 @@ describe("check-query-error-read", () => {
     expect(unreadErrorsIn(rel, source)).toMatchObject([
       { line: 2, site: "Bad :: useB data" },
     ]);
+  });
+
+  it("finds the end of an inline call past a parenthesis in a quoted argument", () => {
+    for (const arg of ['")"', '"("', "')'", "`)`"]) {
+      expect(
+        unreadErrorsIn(rel, `const a = useThings(${arg}).data ?? [];`),
+      ).toHaveLength(1);
+    }
+    expect(
+      unreadErrorsIn(rel, 'const a = useThings(f(")")).data ?? [];'),
+    ).toHaveLength(1);
+  });
+
+  it("does not read a mention of an inline query in a literal as code", () => {
+    const mentions = [
+      'const text = "useThings().data ?? []";',
+      "const text = 'useThings().data ?? []';",
+      "const text = `useThings().data ?? []`;",
+      'const text = `say "${name}": useThings().data ?? []`;',
+    ];
+    for (const source of mentions) {
+      expect(unreadErrorsIn(rel, source)).toEqual([]);
+    }
+  });
+
+  it("still sees an inline query inside a template expression", () => {
+    expect(
+      unreadErrorsIn(
+        rel,
+        "const text = `n: ${(useThings().data ?? []).length}`;",
+      ),
+    ).toHaveLength(1);
+    expect(
+      unreadErrorsIn(rel, "const text = `a ${`b ${useThings().data ?? []}`}`;"),
+    ).toHaveLength(1);
+  });
+
+  it("does not let a quote in JSX text, a regex or a comment hide a later read", () => {
+    const read =
+      "export function Z() { const b = useThings().data ?? []; return b; }";
+    const before = [
+      "export function Y() { return <p>Don't worry</p>; }",
+      'export const csv = /[",\n]/;',
+      "// it's a comment\nconst a = `${`x`}`; /* don't */",
+      "const msg = `${a ? `it's` : 'b'}`; // don't",
+    ];
+    for (const lead of before) {
+      expect(unreadErrorsIn("x.tsx", `${lead}\n${read}`)).toHaveLength(1);
+    }
+  });
+
+  it("sees an inline read through a comment in the chain", () => {
+    const shapes = [
+      "useThings() /* why */ .data ?? []",
+      "useThings() // why\n  .data ?? []",
+      "useThings().data /* why */ ?? []",
+      "useThings().data ?? /* none */ []",
+    ];
+    for (const read of shapes) {
+      expect(
+        unreadErrorsIn(rel, `export function Z() { const b = ${read}; }`),
+      ).toHaveLength(1);
+    }
   });
 });
