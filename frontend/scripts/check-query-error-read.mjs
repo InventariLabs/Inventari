@@ -245,7 +245,7 @@ export function unreadErrorsIn(rel, source) {
     const read = new RegExp(
       String.raw`^\s*\.data\b(?:\??\.\w+)*\s*\?\?\s*${EMPTY_DEFAULT}`,
     );
-    if (!read.test(source.slice(close + 1))) continue;
+    if (!read.test(text.slice(close + 1))) continue;
     const scope = scopeOf(text, match.index);
     out.push({
       file: rel,

@@ -192,4 +192,18 @@ describe("check-query-error-read", () => {
       expect(unreadErrorsIn("x.tsx", `${lead}\n${read}`)).toHaveLength(1);
     }
   });
+
+  it("sees an inline read through a comment in the chain", () => {
+    const shapes = [
+      "useThings() /* why */ .data ?? []",
+      "useThings() // why\n  .data ?? []",
+      "useThings().data /* why */ ?? []",
+      "useThings().data ?? /* none */ []",
+    ];
+    for (const read of shapes) {
+      expect(
+        unreadErrorsIn(rel, `export function Z() { const b = ${read}; }`),
+      ).toHaveLength(1);
+    }
+  });
 });
