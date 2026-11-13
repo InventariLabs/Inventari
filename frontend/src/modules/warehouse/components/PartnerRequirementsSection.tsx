@@ -58,14 +58,11 @@ export function PartnerRequirementsSection({
       />
       {inherited ? (
         <p className="-mt-3 text-xs text-on-muted" data-testid="tax-id-source">
-          {country
-            ? t(
-                countryRequires
-                  ? "profile.requirePartnerTaxIdFromCountryYes"
-                  : "profile.requirePartnerTaxIdFromCountryNo",
-                { country },
-              )
-            : t("profile.requirePartnerTaxIdFromNoCountry")}
+          {!country
+            ? t("profile.requirePartnerTaxIdFromNoCountry")
+            : countryRequires
+              ? t("profile.requirePartnerTaxIdFromCountryYes", { country })
+              : t("profile.requirePartnerTaxIdFromCountryNo", { country })}
         </p>
       ) : (
         <div className="-mt-3 flex flex-wrap items-center gap-3">
