@@ -189,3 +189,48 @@ def test_exact_stock_through_a_sub_assembly_lists_clean_and_completes(
         f'{ORDERS}/{created.json()["id"]}/complete', headers=mk_auth_headers
     )
     assert completed.status_code == 200, completed.text
+
+
+def test_recipe_availability_counts_the_batch_exact_stock_covers(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    db_session: Session,
+    mk_org: Organization,
+    mk_input_loc: StorageLocation,
+) -> None:
+    """The BOM card: 5 eggs hold three cakes, and asking for three is no shortage."""
+    cake = _template(db_session, mk_org, name='Cake')
+    batter = _template(db_session, mk_org, name='Batter')
+    egg = _template(db_session, mk_org, name='Egg')
+    cake_recipe = _recipe(db_session, mk_org, cake.id, batch_yield_qty='1')
+    _bom_line(
+        db_session,
+        mk_org,
+        recipe_id=cake_recipe.id,
+        parent_id=cake.id,
+        child_id=batter.id,
+    )
+    batter_recipe = _recipe(db_session, mk_org, batter.id, batch_yield_qty='3')
+    _bom_line(
+        db_session,
+        mk_org,
+        recipe_id=batter_recipe.id,
+        parent_id=batter.id,
+        child_id=egg.id,
+        qty='5',
+    )
+    _stock(client, mk_auth_headers, egg, mk_input_loc, '5')
+    url = f'/api/v1/maker/recipes/{cake_recipe.id}/availability'
+
+    without = client.get(url, headers=mk_auth_headers)
+    assert without.status_code == 200, without.text
+    assert Decimal(without.json()['max_batches']) == 3
+
+    asked = client.get(f'{url}?batches=3', headers=mk_auth_headers)
+    assert asked.status_code == 200, asked.text
+    assert not EXPONENT.search(asked.text)
+    body = asked.json()
+    assert body['has_shortage'] is False
+    (line,) = body['ingredients']
+    assert Decimal(line['needed']) == 5
+    assert Decimal(line['to_buy'] or '0') == 0

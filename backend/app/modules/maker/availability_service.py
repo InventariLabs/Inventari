@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from decimal import ROUND_FLOOR, Decimal
+from decimal import ROUND_FLOOR, ROUND_HALF_UP, Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -101,6 +101,10 @@ class ShortageItem:
     uom_symbol: str | None
     convertible: bool = True
     available_uom_symbol: str | None = None
+
+
+#: Last-place noise of a batch count: stock over a rounded per-batch need.
+_BATCH_NOISE = Decimal('1e-12')
 
 
 async def _get_available_stock_batch(
@@ -213,9 +217,15 @@ async def _measure_stock_against_recipe(
         # hand is "none", not a negative number of batches. Quantised, because
         # a division keeps the exponent it landed on and ten batches went out
         # on the wire as "1E+1".
+        quotient = converted / per_batch
+        # A nested recipe's per-batch need is a rounded third, and stock that
+        # holds exactly three batches divides to 2.999…9 — the batch the
+        # stock covers must not be dropped for the last place of a quotient.
+        nearest = quotient.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+        if abs(quotient - nearest) <= _BATCH_NOISE:
+            quotient = nearest
         ingredient_max = max(
-            Decimal('0'),
-            (converted / per_batch).quantize(Decimal('1'), rounding=ROUND_FLOOR),
+            Decimal('0'), quotient.quantize(Decimal('1'), rounding=ROUND_FLOOR)
         )
         if max_batches is None or ingredient_max < max_batches:
             max_batches = ingredient_max
@@ -241,13 +251,14 @@ async def compute_availability(
     planned_qty: Decimal | None = None,
     location_id: UUID | None = None,
 ) -> AvailabilityResult:
-    """Check ingredient availability for producing ``batches`` of a recipe.
+    """Check ingredient availability for a plan or a batch count of a recipe.
 
     Parameters
     ----------
     batches
-        Number of batches to check. If None, computes ``max_batches`` only
-        (each ingredient shows stock as ``available``, ``needed=0``).
+        Number of batches to check, taken as ``batches`` times the batch
+        yield and exploded at that quantity. If None, computes ``max_batches``
+        only (each ingredient shows stock as ``available``, ``needed=0``).
     planned_qty
         The output quantity to check, instead of ``batches``. The recipe is
         exploded at this quantity, so 5 planned against a yield of 3 is
@@ -332,8 +343,11 @@ async def compute_availability(
 
     # A plan is exploded at its own quantity: a sub-assembly whose yield does
     # not divide the plan has a per-batch need that is already rounded, and
-    # scaling it back is a trillionth over exactly what the stock holds. The
-    # one-batch explosion above stays for ``max_batches`` and for a batch count.
+    # scaling it back is a trillionth over exactly what the stock holds. A
+    # batch count is the same plan, batches times the yield. The one-batch
+    # explosion above stays for ``max_batches`` alone.
+    if planned_qty is None and batches is not None:
+        planned_qty = batches * recipe.batch_yield_qty
     planned_needs: dict[UUID, Decimal] | None = None
     if planned_qty is not None:
         planned_needs, _uom_ids, _units = _aggregate_needs(
@@ -343,13 +357,13 @@ async def compute_availability(
         )
 
     # Build ingredient list.
-    requested_batches = batches if batches is not None else Decimal('0')
     ingredients: list[IngredientAvailability] = []
-    for child_id, per_batch in per_batch_needs.items():
+    for child_id in per_batch_needs:
+        # No plan and no batch count: stock only, nothing is needed.
         needed = (
             planned_needs.get(child_id, Decimal('0'))
             if planned_needs is not None
-            else per_batch * requested_batches
+            else Decimal('0')
         )
         available = converted_stocks.get(child_id, Decimal('0'))
         convertible = convertibles.get(child_id, True)
@@ -456,9 +470,9 @@ def _aggregate_needs(
     """Aggregate exploded leaves into per-template requirements.
 
     Kept from :func:`compute_shortage_list` when the listing's batched
-    count needed the same aggregation: one explosion per recipe, scaled
-    per order, answering with the same needs maps the per-order path
-    builds.
+    count needed the same aggregation: the needs of one explosion (a
+    plan at its own quantity), answering with the same needs maps the
+    per-order path builds.
     """
     needs: dict[UUID, Decimal] = {}
     line_uom_ids: dict[UUID, UUID | None] = {}
