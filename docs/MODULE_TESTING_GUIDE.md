@@ -99,6 +99,26 @@ rm -rf backend/app/modules/$NAME frontend/src/modules/$NAME
 docker compose start backend
 ```
 
+The package's own frontend specs live in `frontend/tests/` (the installer drops
+that folder, like `backend/tests/`) and run in the same window, between steps 3
+and 4, against the staged half:
+
+```bash
+docker compose exec frontend npx vitest run --experimental.fsModuleCache=false src/modules/$NAME
+```
+
+The flag matters: the test setup collects every module's catalogs with a glob,
+and Vitest's on-disk module cache keeps the result of an earlier run, so a
+package staged afterwards is missing from it and every translated text renders
+as its key.
+
+These are the checks a package runs: `module validate`, its own backend tests,
+its own frontend specs and the staged `npx tsc --noEmit`. The repository's
+`make lint` and `make check-frontend`, and the checks inside them (for example
+`check:invalidation`, the i18n key snapshots and the schema test that reads
+only Core's metadata), read the checkout's tree and are not written for a
+package; a failure there that points at Core files is not the package's to fix.
+
 Run from start to finish, it changes nothing it should not: the staged files
 exist only while no backend process can see them, the test run writes only its
 own test databases, and the backend comes back up on the tree it recognized —

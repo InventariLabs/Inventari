@@ -44,6 +44,8 @@ const COLOR_CLASSES: Record<CategoryColorKey | LegacyColorKey, string> = {
   amber: "bg-amber-100 text-amber-800 border-amber-200",
   rose: "bg-rose-100 text-rose-700 border-rose-200",
   teal: "bg-teal-100 text-teal-700 border-teal-200",
+  // ui-pattern: palette-identity — slate is one of the colours the user picks
+  // for a category, a named identity and not the product's neutral grey.
   slate: "bg-slate-100 text-slate-700 border-slate-200",
   purple: "bg-purple-100 text-purple-700 border-purple-200",
   pink: "bg-pink-100 text-pink-700 border-pink-200",

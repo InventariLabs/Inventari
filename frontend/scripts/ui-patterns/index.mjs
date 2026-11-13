@@ -15,6 +15,7 @@
  * comment — it is what both consumers print.
  */
 import borderWeight from "./border-weight.mjs";
+import buttonIconSize from "./button-icon-size.mjs";
 import buttonSizeOverride from "./button-size-override.mjs";
 import contrastWash from "./contrast-wash.mjs";
 import contentSizeUnpadded from "./content-size-unpadded.mjs";
@@ -36,14 +37,18 @@ import heavyWeight from "./heavy-weight.mjs";
 import labelLineBox from "./label-line-box.mjs";
 import labelWithoutField from "./label-without-field.mjs";
 import moneyUnformatted from "./money-unformatted.mjs";
+import nativeDateInput from "./native-date-input.mjs";
+import numericZIndex from "./numeric-z-index.mjs";
 import moneyWithoutCurrency from "./money-without-currency.mjs";
 import overflowRow from "./overflow-row.mjs";
 import sheetScrollLayer from "./sheet-scroll-layer.mjs";
+import slatePaletteLiteral from "./slate-palette-literal.mjs";
 import successPaletteLiteral from "./success-palette-literal.mjs";
 import writeActionUngated from "./write-action-ungated.mjs";
 
 export const DETECTORS = [
   borderWeight,
+  buttonIconSize,
   buttonSizeOverride,
   contrastWash,
   contentSizeUnpadded,
@@ -68,6 +73,9 @@ export const DETECTORS = [
   labelWithoutField,
   moneyUnformatted,
   moneyWithoutCurrency,
+  nativeDateInput,
+  numericZIndex,
+  slatePaletteLiteral,
   successPaletteLiteral,
   writeActionUngated,
 ];
@@ -346,9 +354,20 @@ export const DETECTORS = [
  * tile whose figure is its only content — is outside the rule's shapes or
  * takes the call-site marker with a sentence reason.
  */
+/**
+ * `native-date-input`, `numeric-z-index`, `slate-palette-literal` and
+ * `button-icon-size` join at zero in the change that wrote them. They are the
+ * rules UI_GUIDELINES marked ⛔ with a grep or a table row and no gate: the
+ * date field and the numeric z-index had already been drained by hand, one
+ * `slate-*` and four drag handlers remained, and the button icon sizes had 50
+ * call sites off the table (18/20 on a standard button, 12/15 on a small one).
+ * The two sizes the table now sanctions — 14 on `sm`, 20 on `lg` — are the
+ * rule's own exceptions, so they are not findings and need no marker.
+ */
 export const BLOCKING = new Set([
   "border-weight",
   "content-size-unpadded",
+  "button-icon-size",
   "button-size-override",
   "contrast-wash",
   "destructive-as-neutral",
@@ -370,8 +389,11 @@ export const BLOCKING = new Set([
   "label-without-field",
   "money-unformatted",
   "money-without-currency",
+  "native-date-input",
+  "numeric-z-index",
   "overflow-row",
   "sheet-scroll-layer",
+  "slate-palette-literal",
   "success-palette-literal",
   "write-action-ungated",
 ]);

@@ -128,7 +128,7 @@ and the static assets the frontend serves.
 | `six` | 1.17.0 | MIT |  |
 | `slowapi` | 0.1.10 | MIT |  |
 | `sniffio` | 1.3.1 | MIT OR Apache-2.0 |  |
-| `soupsieve` | 2.9.1 | MIT |  |
+| `soupsieve` | 4.1 | MIT |  |
 | `SQLAlchemy` | 2.0.51 | MIT |  |
 | `sse-starlette` | 3.4.11 | BSD-3-Clause |  |
 | `starlette` | 1.3.1 | BSD-3-Clause |  |
