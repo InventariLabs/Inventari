@@ -12,6 +12,7 @@ from app.core.contracts import (
     UserContextDTO,
 )
 from app.core.exceptions import ContractViolationError
+from app.core.public_api._access import writes
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.services.items import (
     bind_item_to_template_async,
@@ -27,6 +28,7 @@ from app.services.items import (
 class CoreItemsWritesMixin:
     """Write methods for CoreItemsAPI (create, update, delete, purge)."""
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -77,6 +79,7 @@ class CoreItemsWritesMixin:
         )
         return ItemDTO.model_validate(item)
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -93,6 +96,7 @@ class CoreItemsWritesMixin:
         updated = await update_item(db=db, item=item, item_in=item_update, user=user)
         return ItemDTO.model_validate(updated)
 
+    @writes
     async def bind_template_async(
         self,
         db: AsyncSession,
@@ -135,6 +139,7 @@ class CoreItemsWritesMixin:
         )
         return ItemDTO.model_validate(item)
 
+    @writes
     async def soft_delete_async(
         self,
         db: AsyncSession,
@@ -151,6 +156,7 @@ class CoreItemsWritesMixin:
         await delete_item(db, item, user, reason=reason, notes=notes)
         return True
 
+    @writes
     async def purge_async(
         self,
         db: AsyncSession,

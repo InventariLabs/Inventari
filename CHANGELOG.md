@@ -22,6 +22,14 @@ says what the release does rather than what changed since them.
   `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
   building a module with an agent: what to give it, which checks refuse its
   mistakes and how to check the result before installing it.
+- The audit journal (`GET /audit-log`) counts at most ten thousand entries on
+  its first page, as the product, stock and movement lists do: past that,
+  `total` is where the count stopped and `total_capped` is true, and the
+  settings screen's pager says "more than 10000". The cursor carries both to
+  the later pages.
+- `core_api.audit_log.list_for_org_async` takes `count_up_to`, which stops the
+  count one entry past it, the way `core_api.stock_moves.list_rows_for_org_async`
+  already does.
 
 ### Fixed
 
@@ -48,6 +56,25 @@ says what the release does rather than what changed since them.
   production preview's to-buy figure and the line the shortfall writes agree
   on the quantity, and the add-item dialog of a shopping list writes its
   quantity ceiling in the reader's decimal mark.
+
+- The stock aging of a product with more than a thousand receipts
+  (`core_api.stock_moves.aggregate_aging_buckets_async` and
+  `list_receipts_for_aging_async`) counts the stock still on the shelf. The
+  receipts were cut at a thousand, oldest first, before what left was netted
+  off them, so the newest stock, the part still on the shelf, dropped out of
+  the buckets.
+- Recipe picking no longer offers a sealed pack lighter than the card's full
+  pack as the open one to cook from: a pack is open when opening it marked it
+  so, which is what the picking order and the candidate list already went by.
+- Two deletions of shelves, batches, partners or users that had stock
+  movements over the same products can no longer deadlock on the ledger's
+  per-shelf totals: the database now takes those rows in one order whether a
+  movement is added or taken away.
+- The core API reference (`docs/subsystems/CORE_API.md`) labels each method
+  READ or WRITE by what it does, as the method declares it, instead of by
+  words in its name; about two dozen methods were labelled the wrong way
+  round. Summaries no longer stop mid-sentence, and types and enum defaults
+  print as a caller writes them.
 
 ## v0.12.0 - 2026-11-09
 

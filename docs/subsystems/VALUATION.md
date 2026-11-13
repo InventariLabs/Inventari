@@ -112,6 +112,14 @@ fallback applies. Core imports no feature module to do this.
 A record's `purchase_price` does not supply a second valuation mechanism:
 prices belong to receipt layers. A manually entered recipe ingredient price
 remains that module's final fallback, outside the shared product policy.
+Two reports are estimates from it, and say so: the stock value per category on
+the dashboard (`get_stats_by_category_async`, `app/services/analytics/dashboard.py`)
+and the spend per category in the cost report (`_compute_category_costs_async`,
+`app/services/analytics/cost.py`). Both multiply each record's purchase price by
+its quantity, mark their rows `value_source: purchase_price` and count the
+records that carry none (`unpriced_count`). A category belongs to the record, while a layer knows
+only the product, so the layers have no figure per category to give; neither
+report is read back into the cost history.
 Completed production still costs its consumed FIFO layers; estimates never
 write accounting cost history.
 

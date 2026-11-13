@@ -98,6 +98,55 @@ class TestPeriodCloseIsolation:
         assert detail['code'] == 'PERIOD_CLOSED'
         assert 'closed' in detail['message'].lower()
 
+    def test_a_closed_month_stays_closed_once_the_module_is_switched_off(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_storage_location: StorageLocation,
+        test_category: Any,
+        test_user: Any,
+        db_session: Session,
+    ) -> None:
+        """Switching the warehouse module off does not reopen a closed month.
+
+        Closing a month is an accounting act and only reopening it undoes it;
+        an organization that switched the module off afterwards would
+        otherwise have its closed books open again without a trace. The guard
+        is the module's, registered once it has loaded, and it answers for
+        every organization (VALUATION.md, the inventory period lock).
+        """
+        from app.models.item import Item as _Item
+        from app.models.organization import Organization
+
+        item = _Item(
+            organization_id=test_user.organization_id,
+            storage_location_id=test_storage_location.id,
+            category_id=test_category.id,
+            name='Closed Month, Module Off',
+            quantity=5,
+        )
+        db_session.add(item)
+        db_session.commit()
+        db_session.refresh(item)
+
+        _close_current_period(client, auth_headers)
+        organization = db_session.get(Organization, test_user.organization_id)
+        assert organization is not None
+        enabled = list(organization.enabled_modules or [])
+        organization.enabled_modules = [m for m in enabled if m != 'warehouse'] or [
+            'inventory'
+        ]
+        db_session.commit()
+        assert not organization.is_module_enabled('warehouse')
+
+        resp = client.patch(
+            f'/api/v1/items/{item.id}/consume',
+            headers=auth_headers,
+            json={'quantity': 1, 'reason': 'test'},
+        )
+        assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
+        assert resp.json()['detail']['code'] == 'PERIOD_CLOSED'
+
     def test_move_after_period_close_returns_409(
         self,
         client: TestClient,

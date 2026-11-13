@@ -59,6 +59,7 @@ from app.core.contracts import (
     RotationAnalysisDTO,
     StorageStatsDTO,
 )
+from app.core.public_api._access import reads
 
 _ANALYTICS_CACHE_TTL_SECONDS = 300
 
@@ -66,6 +67,7 @@ _ANALYTICS_CACHE_TTL_SECONDS = 300
 class CoreQueriesAPI:
     """Public Core API namespace for analytics read-models."""
 
+    @reads
     async def get_overview_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> OverviewDTO:
@@ -85,6 +87,7 @@ class CoreQueriesAPI:
             deserializer=OverviewDTO.model_validate_json,
         )
 
+    @reads
     async def get_low_stock_products_async(
         self,
         db: AsyncSession,
@@ -106,6 +109,7 @@ class CoreQueriesAPI:
             db, organization_id, limit, exclude_module_contexts, offset
         )
 
+    @reads
     async def count_low_stock_products_async(
         self,
         db: AsyncSession,
@@ -126,6 +130,7 @@ class CoreQueriesAPI:
             db, organization_id, claimed_tags_for(exclude_module_contexts)
         )
 
+    @reads
     async def get_stats_by_storage_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[StorageStatsDTO]:
@@ -134,6 +139,7 @@ class CoreQueriesAPI:
 
         return await _get(db, organization_id)
 
+    @reads
     async def get_stats_by_category_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[CategoryStatsDTO]:
@@ -142,6 +148,7 @@ class CoreQueriesAPI:
 
         return await _get(db, organization_id)
 
+    @reads
     async def get_expiry_forecast_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[ExpiryBucketDTO]:
@@ -150,6 +157,7 @@ class CoreQueriesAPI:
 
         return await _get(db, organization_id)
 
+    @reads
     async def get_recent_activity_async(
         self, db: AsyncSession, organization_id: UUID, *, limit: int = 10
     ) -> list[ActivityDTO]:
@@ -158,6 +166,7 @@ class CoreQueriesAPI:
 
         return await _get(db, organization_id, limit)
 
+    @reads
     async def get_consumption_stats_async(
         self, db: AsyncSession, organization_id: UUID, *, days: int = 30
     ) -> ConsumptionStatsDTO:
@@ -168,6 +177,7 @@ class CoreQueriesAPI:
 
         return await _get(db, organization_id, days)
 
+    @reads
     async def get_cost_summary_async(
         self, db: AsyncSession, organization_id: UUID, *, period: str = 'month'
     ) -> CostSummaryDTO:
@@ -176,6 +186,7 @@ class CoreQueriesAPI:
 
         return await _get(db, organization_id, period)
 
+    @reads
     async def get_rotation_analysis_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> RotationAnalysisDTO:
@@ -197,6 +208,7 @@ class CoreQueriesAPI:
             deserializer=RotationAnalysisDTO.model_validate_json,
         )
 
+    @reads
     async def get_reconciliation_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> ReconciliationDTO:
@@ -207,6 +219,7 @@ class CoreQueriesAPI:
 
         return await _get(db, organization_id)
 
+    @reads
     async def get_reconciliation_previous_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> PreviousMeasurementDTO | None:
@@ -221,6 +234,7 @@ class CoreQueriesAPI:
 
         return await read_previous_measurement_async(db, organization_id)
 
+    @reads
     async def get_expense_forecast_async(
         self, db: AsyncSession, organization_id: UUID, *, period: str = 'month'
     ) -> ExpenseForecastDTO:
@@ -242,6 +256,7 @@ class CoreQueriesAPI:
             deserializer=ExpenseForecastDTO.model_validate_json,
         )
 
+    @reads
     async def get_partner_display_names_async(
         self,
         db: AsyncSession,
@@ -265,6 +280,7 @@ class CoreQueriesAPI:
 
         return await _display_names(db, organization_id, partner_ids)
 
+    @reads
     async def get_storage_display_names_async(
         self,
         db: AsyncSession,
@@ -286,6 +302,7 @@ class CoreQueriesAPI:
 
         return await _display_names(db, organization_id, storage_ids)
 
+    @reads
     async def get_reservations_held_by_documents_async(
         self,
         db: AsyncSession,

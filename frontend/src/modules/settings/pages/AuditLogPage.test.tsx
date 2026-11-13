@@ -389,6 +389,27 @@ describe("AuditLogPage", () => {
     );
   });
 
+  it("says the journal holds more than it counted", async () => {
+    // A journal counts only as far as the cap: the bar says "more than",
+    // not a total the server never reached.
+    server.use(
+      http.get("/api/v1/audit-log", () =>
+        HttpResponse.json({
+          items: [MAKER_RECIPE_ENTRY],
+          total: 10000,
+          total_capped: true,
+          limit: 100,
+          offset: 0,
+          has_more: true,
+          next_cursor: "after-100",
+        }),
+      ),
+    );
+    renderPage();
+
+    expect(await screen.findByText("more than 10000")).toBeInTheDocument();
+  });
+
   it("starts again from the first page when a filter changes", async () => {
     const calls: URL[] = [];
     server.use(

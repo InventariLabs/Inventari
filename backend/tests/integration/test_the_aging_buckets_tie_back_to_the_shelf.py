@@ -19,7 +19,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from sqlalchemy import update
+from sqlalchemy import insert, update
 
 from app.core.public_api import core_api
 from app.models.product_template import ProductTemplate
@@ -198,3 +198,68 @@ class TestTheAgingBucketsTieBackToTheShelf:
         # A report about the 23rd says the same thing in December: on that
         # day the ten were still there.
         assert _total(buckets) == Decimal('10')
+
+    async def test_a_product_with_more_receipts_than_a_page_still_ties_back(
+        self,
+        real_async_db_session,
+        async_test_household,
+        async_test_storage_location,
+    ):
+        """What is left is the newest stock, however many receipts came first.
+
+        The receipts were read oldest first and cut at a thousand before the
+        issues were netted off them, so the receipts that still stood on the
+        shelf — the newest — were the ones cut. 1,005 single units received
+        and the first 1,000 issued left five on the shelf and none in the
+        buckets.
+        """
+        db = real_async_db_session
+        template = await self._template(db, async_test_household.id)
+        received = 1005
+        start = AS_OF - timedelta(days=received + 10)
+        await db.execute(
+            insert(StockMove),
+            [
+                {
+                    'id': uuid.uuid4(),
+                    'organization_id': async_test_household.id,
+                    'product_template_id': template.id,
+                    'to_location_id': async_test_storage_location.id,
+                    'quantity': Decimal('1'),
+                    'state': 'done',
+                    'created_at': start + timedelta(days=day),
+                    'completed_at': start + timedelta(days=day),
+                }
+                for day in range(received)
+            ],
+        )
+        await _move(
+            db,
+            async_test_household.id,
+            template.id,
+            quantity=Decimal('1000'),
+            at=AS_OF - timedelta(days=1),
+            from_location_id=async_test_storage_location.id,
+        )
+        await db.commit()
+
+        buckets = {
+            b.label: b.quantity
+            for b in await core_api.stock_moves.aggregate_aging_buckets_async(
+                db,
+                organization_id=async_test_household.id,
+                product_template_id=template.id,
+                as_of=AS_OF,
+            )
+        }
+        # The last five receipts, 11 to 15 days old.
+        assert buckets['0-30'] == Decimal('5')
+        assert sum(buckets.values(), Decimal('0')) == Decimal('5')
+
+        entries = await core_api.stock_moves.list_receipts_for_aging_async(
+            db,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            as_of=AS_OF,
+        )
+        assert [e.days_in_stock for e in entries] == [15, 14, 13, 12, 11]

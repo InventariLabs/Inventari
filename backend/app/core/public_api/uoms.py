@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UomCategoryDTO, UomDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads
 
 logger = get_logger(__name__)
 
@@ -16,6 +17,7 @@ logger = get_logger(__name__)
 class CoreUomsAPI:
     """Public Core API for module-safe UOM reads."""
 
+    @reads
     async def get_by_symbol_async(
         self,
         db: AsyncSession,
@@ -38,6 +40,7 @@ class CoreUomsAPI:
         )
         return UomDTO.model_validate(uom) if uom else None
 
+    @reads
     async def get_async(
         self, db: AsyncSession, uom_id: UUID, organization_id: UUID
     ) -> UomDTO | None:
@@ -53,6 +56,7 @@ class CoreUomsAPI:
         uom = await get_uom_async(db, uom_id, organization_id)
         return UomDTO.model_validate(uom) if uom else None
 
+    @reads
     async def existing_ids_async(
         self, db: AsyncSession, uom_ids: set[UUID], organization_id: UUID
     ) -> set[UUID]:
@@ -61,6 +65,7 @@ class CoreUomsAPI:
 
         return await existing_uom_ids_async(db, uom_ids, organization_id)
 
+    @reads
     def convert_quantity(
         self, qty: Decimal, source: UomDTO | None, target: UomDTO | None
     ) -> tuple[Decimal, bool]:
@@ -73,6 +78,7 @@ class CoreUomsAPI:
 
         return convert_quantity(qty, source, target)
 
+    @reads
     def quantity_step(self, uom: UomDTO | None) -> Decimal:
         """The step quantities in *uom* are counted in — its own ``rounding``,
         floored at the scale the quantity columns keep.
@@ -83,6 +89,7 @@ class CoreUomsAPI:
 
         return quantity_step(uom)
 
+    @reads
     def quantize(self, qty: Decimal, uom: UomDTO | None) -> Decimal:
         """*qty* on the nearest step of *uom* — the rounding a measurement takes.
 
@@ -95,6 +102,7 @@ class CoreUomsAPI:
 
         return quantize_to_uom(qty, uom)
 
+    @reads
     def round_up(self, qty: Decimal, uom: UomDTO | None) -> Decimal:
         """*qty* on the next step of *uom* at or above it — the rounding a
         requirement takes, so that needing part of a step never reads as zero.
@@ -105,6 +113,7 @@ class CoreUomsAPI:
 
         return round_up_to_uom(qty, uom)
 
+    @reads
     def is_on_step(self, qty: Decimal, uom: UomDTO | None) -> bool:
         """Whether *qty* already sits on a step of *uom*.
 
@@ -119,6 +128,7 @@ class CoreUomsAPI:
 
         return is_on_uom_step(qty, uom)
 
+    @reads
     async def to_canonical_measure_async(
         self,
         db: AsyncSession,
@@ -136,6 +146,7 @@ class CoreUomsAPI:
         measure = await to_canonical_measure_async(db, qty, uom)
         return (measure.amount, measure.symbol) if measure else None
 
+    @reads
     async def to_stock_uom_async(
         self,
         db: AsyncSession,
@@ -155,6 +166,7 @@ class CoreUomsAPI:
             db, organization_id, product_template_id, quantity, uom_id
         )
 
+    @reads
     async def validate_quantity_precision_async(
         self,
         db: AsyncSession,
@@ -173,6 +185,7 @@ class CoreUomsAPI:
             db, uom_id, quantity, organization_id
         )
 
+    @reads
     async def list_for_org_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[UomDTO]:
@@ -182,6 +195,7 @@ class CoreUomsAPI:
         uoms = await list_uoms_for_org_async(db, organization_id)
         return [UomDTO.model_validate(u) for u in uoms]
 
+    @reads
     async def list_categories_for_org_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[UomCategoryDTO]:

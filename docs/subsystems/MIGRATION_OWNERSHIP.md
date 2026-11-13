@@ -168,6 +168,12 @@ repair for that timestamp case: core `tzaware01` (archived with the previous
 chain) and one revision in each module chain except `example_widgets` pass it
 the columns their models declare aware, and it alters
 only those the database holds naive, reading the stored values as UTC.
+`example_widgets` needs none: both revisions that have ever created its table,
+its own `001_initial` and the archived core `e4f5a6b7c8d9`, declared the
+timestamps aware from the first version, so no database holds that table
+naive and the `create_table_if_absent` guard skips nothing that needs repair.
+`make new-module` copies this chain, so a repair revision here would also
+land in every new module, where there is nothing to repair.
 
 ## What a Revision May Import
 
@@ -298,7 +304,7 @@ the revisions are listed by what they would hold up there.
 - *Core chain, harmless at any size:* `itemtypes01`, `fknames01` and `locnames02`
   (catalog-only changes or tables that stay small), `locnames01` (touches only the
   duplicate names), `fieldwords01` (`categories`), `itemimportjob01`,
-  `ledgertotals01`.
+  `ledgertotals01`, `ledgertotals03` (replaces a trigger function).
 - *Module chains:* `doc_register_pagination01` (`documents`) and
   `doc_list_reads01` (`document_lines`) index tables that grow with every
   document, and `doc_line_unit_backfill01` rewrites `document_lines` in one

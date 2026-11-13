@@ -33,6 +33,7 @@ from app.core.contracts.events import (
 )
 from app.core.exceptions import ContractViolationError
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 
 logger = get_logger(__name__)
 
@@ -75,6 +76,7 @@ def _build_payload(
 class CoreEventsAPI:
     """Public Core API for validated event emission and subscription."""
 
+    @writes
     async def emit_async(
         self,
         event: SystemEvent | str,
@@ -94,6 +96,7 @@ class CoreEventsAPI:
         validated = _build_payload(event_name, payload)
         await event_bus.emit(event_name, validated)
 
+    @writes
     async def emit_transactional_async(
         self,
         db: AsyncSession,
@@ -111,10 +114,12 @@ class CoreEventsAPI:
         validated = _build_payload(event_name, payload)
         await event_bus.emit_transactional(db, event_name, validated)
 
+    @writes
     async def flush_pending_async(self, db: AsyncSession) -> None:
         """Dispatch TESTING-buffered transactional events after ``db.commit()``."""
         await event_bus.flush_pending(db)
 
+    @reads
     def subscribe(
         self,
         event: SystemEvent | str,
@@ -157,6 +162,7 @@ class CoreEventsAPI:
             event_name, wrapper, org_filter=org, name=handler_name(handler)
         )
 
+    @reads
     def register_payload(self, event_name: str, model: type[EventPayload]) -> None:
         """Declare the payload contract for one of this module's events.
 
@@ -176,6 +182,7 @@ class CoreEventsAPI:
         """
         register_payload(event_name, model)
 
+    @reads
     def registered_events(self) -> dict[str, str]:
         """Return ``{event_name: payload_type_name}`` for the event catalog.
 

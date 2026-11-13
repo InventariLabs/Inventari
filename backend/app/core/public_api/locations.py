@@ -6,11 +6,13 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ItemDTO, StorageDTO
+from app.core.public_api._access import reads, writes
 
 
 class CoreStoragesAPI:
     """Public Core API for module-safe location access."""
 
+    @reads
     def label_caption(self, storage: StorageDTO) -> str | None:
         """The text under the QR code of this location's label.
 
@@ -25,6 +27,7 @@ class CoreStoragesAPI:
 
         return storage_label_caption(storage, label_shows_description(storage))
 
+    @reads
     async def get_async(
         self,
         db: AsyncSession,
@@ -38,6 +41,7 @@ class CoreStoragesAPI:
             return None
         return StorageDTO.model_validate(storage)
 
+    @reads
     async def find_by_scanned_code_async(
         self,
         db: AsyncSession,
@@ -55,6 +59,7 @@ class CoreStoragesAPI:
             return None
         return StorageDTO.model_validate(loc)
 
+    @reads
     async def scannable_code_async(
         self,
         db: AsyncSession,
@@ -66,6 +71,7 @@ class CoreStoragesAPI:
 
         return await scannable_code_async(db, organization_id, storage_id)
 
+    @reads
     async def find_by_context_tag_async(
         self,
         db: AsyncSession,
@@ -79,6 +85,7 @@ class CoreStoragesAPI:
             return None
         return StorageDTO.model_validate(loc)
 
+    @reads
     async def list_async(
         self,
         db: AsyncSession,
@@ -101,6 +108,7 @@ class CoreStoragesAPI:
         )
         return [StorageDTO.model_validate(s) for s in storages]
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -138,6 +146,7 @@ class CoreStoragesAPI:
         storage = await create_storage(db=db, storage_in=storage_in, user=user)
         return StorageDTO.model_validate(storage)
 
+    @reads
     async def list_storage_ids_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[UUID]:
@@ -146,6 +155,7 @@ class CoreStoragesAPI:
 
         return await list_storage_ids_async(db, organization_id)
 
+    @reads
     async def get_with_type_async(
         self,
         db: AsyncSession,
@@ -158,6 +168,7 @@ class CoreStoragesAPI:
         storage = await get_storage_with_type_async(db, organization_id, storage_id)
         return StorageDTO.model_validate(storage) if storage else None
 
+    @reads
     async def item_counts_by_location_async(
         self, db: AsyncSession, organization_id: UUID, storage_ids: list[UUID]
     ) -> dict[UUID, int]:
@@ -166,6 +177,7 @@ class CoreStoragesAPI:
 
         return await item_counts_by_location_async(db, organization_id, storage_ids)
 
+    @reads
     async def list_items_in_location_async(
         self,
         db: AsyncSession,
@@ -196,6 +208,7 @@ class CoreStoragesAPI:
         )
         return [ItemDTO.model_validate(i) for i in items]
 
+    @reads
     async def count_items_in_location_async(
         self,
         db: AsyncSession,
@@ -211,6 +224,7 @@ class CoreStoragesAPI:
             db, organization_id, storage_id, claimed_tags=claimed_tags
         )
 
+    @reads
     async def count_items_in_subtree_async(
         self,
         db: AsyncSession,
@@ -226,6 +240,7 @@ class CoreStoragesAPI:
             db, organization_id, storage_id, claimed_tags=claimed_tags
         )
 
+    @reads
     async def descendant_ids_async(
         self, db: AsyncSession, organization_id: UUID, storage_id: UUID
     ) -> list[UUID]:
@@ -239,6 +254,7 @@ class CoreStoragesAPI:
 
         return await descendant_ids_async(db, organization_id, storage_id)
 
+    @reads
     async def list_holding_stock_with_ancestors_async(
         self, db: AsyncSession, organization_id: UUID, *, usage: str = 'internal'
     ) -> list[StorageDTO]:
@@ -256,6 +272,7 @@ class CoreStoragesAPI:
         rows = await _list(db, organization_id, usage=usage)
         return [StorageDTO.model_validate(s) for s in rows]
 
+    @reads
     async def list_by_ids_async(
         self, db: AsyncSession, organization_id: UUID, storage_ids: Iterable[UUID]
     ) -> list[StorageDTO]:
@@ -265,6 +282,7 @@ class CoreStoragesAPI:
         rows = await list_storages_by_ids_async(db, organization_id, storage_ids)
         return [StorageDTO.model_validate(s) for s in rows]
 
+    @reads
     async def subtree_and_ancestors_async(
         self, db: AsyncSession, organization_id: UUID, storage_id: UUID
     ) -> tuple[list[StorageDTO], list[StorageDTO]]:
@@ -285,6 +303,7 @@ class CoreStoragesAPI:
             [StorageDTO.model_validate(s) for s in ancestors],
         )
 
+    @reads
     async def count_expiring_soon_async(
         self,
         db: AsyncSession,

@@ -24,11 +24,13 @@ from app.core.exceptions import (
     PeriodClosedError,  # re-exported for convenience
 )
 from app.core.period_guard import check_period_not_closed
+from app.core.public_api._access import reads
 
 
 class CorePeriodsAPI:
     """Public Core API namespace for inventory period guards."""
 
+    @reads
     async def check_not_closed_async(
         self,
         db: AsyncSession,

@@ -3,7 +3,7 @@
 Covers pure functions extracted from the picking service:
 - _should_auto_skip: spice/auto-skip heuristic
 - select_best_item: FEFO selection
-- is_opened: opened-pack detection
+- check_opened_suggestion: the open pack offered instead of a sealed one
 - needs_disambiguation: multi-location detection
 """
 
@@ -22,7 +22,6 @@ from app.modules.recipes._picking_helpers import check_opened_suggestion
 from app.modules.recipes._picking_session_helpers import _match_ingredient
 from app.modules.recipes.picking_service import (
     _should_auto_skip,
-    is_opened,
     needs_disambiguation,
     select_best_item,
 )
@@ -62,13 +61,6 @@ def _mock_item(
     item.meta_data = {'opened': {'at': '2026-10-01T09:00:00+00:00'}} if opened else None
     item.id = uuid4()
     return item
-
-
-def _mock_template(weight_value: Any = None, weight_uom_id: Any = None) -> MagicMock:
-    tpl = MagicMock()
-    tpl.weight_value = weight_value
-    tpl.weight_uom_id = weight_uom_id
-    return tpl
 
 
 # ---------------------------------------------------------------------------
@@ -246,61 +238,6 @@ class TestOpenPackFirst:
 
 
 # ---------------------------------------------------------------------------
-# is_opened
-# ---------------------------------------------------------------------------
-
-
-class TestIsOpened:
-    def test_below_full_weight_is_opened(self) -> None:
-        item = _mock_item(quantity=200)
-        tpl = _mock_template(weight_value=500)
-        assert is_opened(item, tpl) is True
-
-    def test_at_full_weight_is_not_opened(self) -> None:
-        item = _mock_item(quantity=500)
-        tpl = _mock_template(weight_value=500)
-        assert is_opened(item, tpl) is False
-
-    def test_no_template_not_opened(self) -> None:
-        item = _mock_item(quantity=200)
-        assert is_opened(item, None) is False
-
-    def test_template_no_weight_not_opened(self) -> None:
-        item = _mock_item(quantity=200)
-        tpl = _mock_template(weight_value=None)
-        assert is_opened(item, tpl) is False
-
-    def test_cross_uom_category_not_opened(self) -> None:
-        """Comparing pieces (pcs) against weight (g) is meaningless, so a
-        piece-counted item below the template's gram weight must NOT be flagged
-        as opened when the UoMs differ."""
-        item = _mock_item(quantity=2, uom_id=uuid4())  # pieces
-        tpl = _mock_template(weight_value=500, weight_uom_id=uuid4())  # grams
-        assert is_opened(item, tpl) is False
-
-    def test_the_open_mark_is_the_answer_whatever_the_quantity(self) -> None:
-        """A record opening marked is open though its quantity is not below the
-        card's weight, and though the card records no weight at all."""
-        item = _mock_item(quantity=1, opened=True, uom_id=uuid4())
-        assert is_opened(item, _mock_template(weight_value=500)) is True
-        assert is_opened(item, None) is True
-
-    def test_an_unmarked_record_keeps_the_old_reading(self) -> None:
-        shared_uom = uuid4()
-        item = _mock_item(quantity=200, uom_id=shared_uom)
-        tpl = _mock_template(weight_value=500, weight_uom_id=shared_uom)
-        assert is_opened(item, tpl) is True
-
-    def test_same_uom_below_weight_is_opened(self) -> None:
-        """When item and template share the same UoM, the direct comparison
-        applies (regression guard: the category check must not over-restrict)."""
-        shared_uom = uuid4()
-        item = _mock_item(quantity=200, uom_id=shared_uom)
-        tpl = _mock_template(weight_value=500, weight_uom_id=shared_uom)
-        assert is_opened(item, tpl) is True
-
-
-# ---------------------------------------------------------------------------
 # check_opened_suggestion (regression: ProductTemplateDTO must carry weight_uom)
 # ---------------------------------------------------------------------------
 
@@ -323,7 +260,9 @@ class TestCheckOpenedSuggestion:
             weight_uom=weight_uom,
         )
         sealed = _mock_item(quantity=1000)  # full pack — sealed
-        opened = _mock_item(quantity=200, expiry_date=date.today() + timedelta(days=5))
+        opened = _mock_item(
+            quantity=200, expiry_date=date.today() + timedelta(days=5), opened=True
+        )
         opened.location_name = 'Shelf A'
 
         suggestion = check_opened_suggestion(sealed, [sealed, opened], template)
@@ -342,6 +281,33 @@ class TestCheckOpenedSuggestion:
         )
         sealed = _mock_item(quantity=1000)
         assert check_opened_suggestion(sealed, [sealed], template) is None
+
+    def test_a_smaller_sealed_pack_is_not_taken_for_an_open_one(self) -> None:
+        """Only the mark opening writes makes a pack open.
+
+        A sealed pack lighter than the card's full weight — a 400 g bag on a
+        card that says 1 kg — was guessed open, so the scan offered it as the
+        open pack to cook from, and a scan of that bag offered no open pack at
+        all because it was taken for one itself.
+        """
+        weight_uom = UomDTO(id=uuid4(), category_id=uuid4(), name='gram', symbol='g')
+        template = ProductTemplateDTO(
+            id=uuid4(),
+            organization_id=uuid4(),
+            name='Flour 1kg',
+            weight_value=1000.0,
+            weight_uom=weight_uom,
+        )
+        full = _mock_item(quantity=1000)
+        smaller = _mock_item(quantity=400)
+        smaller.location_name = 'Shelf B'
+        assert check_opened_suggestion(full, [full, smaller], template) is None
+
+        opened = _mock_item(quantity=300, opened=True)
+        opened.location_name = 'Shelf A'
+        suggestion = check_opened_suggestion(smaller, [smaller, opened], template)
+        assert suggestion is not None
+        assert suggestion.opened_item_id == opened.id
 
     def test_no_weight_uom_returns_none(self) -> None:
         template = ProductTemplateDTO(

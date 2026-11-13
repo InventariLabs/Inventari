@@ -11,6 +11,7 @@ from app.core.contracts import (
     PartnerUpdateDTO,
     UserContextDTO,
 )
+from app.core.public_api._access import reads, writes
 from app.schemas.partner import PartnerCreate, PartnerUpdate
 from app.services import partner_service
 
@@ -18,6 +19,7 @@ from app.services import partner_service
 class CorePartnersAPI:
     """Public Core API for modules needing read/write access to Partners."""
 
+    @reads
     async def get_async(
         self, db: AsyncSession, org_id: uuid.UUID, partner_id: uuid.UUID
     ) -> PartnerDTO | None:
@@ -26,6 +28,7 @@ class CorePartnersAPI:
             return None
         return PartnerDTO.model_validate(partner)
 
+    @reads
     async def list_async(
         self,
         db: AsyncSession,
@@ -40,6 +43,7 @@ class CorePartnersAPI:
         )
         return [PartnerDTO.model_validate(p) for p in partners]
 
+    @reads
     async def ids_named_like_async(
         self,
         db: AsyncSession,
@@ -56,6 +60,7 @@ class CorePartnersAPI:
         """
         return await partner_service.ids_named_like_async(db, org_id, term)
 
+    @reads
     async def list_by_email_async(
         self, db: AsyncSession, org_id: uuid.UUID, email: str
     ) -> builtins.list[PartnerDTO]:
@@ -65,6 +70,7 @@ class CorePartnersAPI:
         exact = [p for p in partners if p.email == email]
         return [PartnerDTO.model_validate(p) for p in exact]
 
+    @writes
     async def create_async(
         self,
         db: AsyncSession,
@@ -83,6 +89,7 @@ class CorePartnersAPI:
         )
         return PartnerDTO.model_validate(partner)
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -106,6 +113,7 @@ class CorePartnersAPI:
             return None
         return PartnerDTO.model_validate(partner)
 
+    @writes
     async def deactivate_async(
         self,
         db: AsyncSession,
@@ -126,6 +134,7 @@ class CorePartnersAPI:
             return None
         return PartnerDTO.model_validate(partner)
 
+    @writes
     async def activate_async(
         self,
         db: AsyncSession,

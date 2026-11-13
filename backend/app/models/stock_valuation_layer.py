@@ -67,8 +67,10 @@ class CostBasis:
     UNKNOWN = 'unknown'
     #: An outflow, valued at what the layers it actually consumed cost.
     #: One formula, applied consistently, as IAS 2 asks. Outgoing rows written
-    #: before this existed are marked ``average`` and stay that way: they were
-    #: valued at the average of the layers on hand, which is what they say.
+    #: before this existed were valued at the average of the layers on hand,
+    #: yet they are marked ``stated``: the migration that added the column
+    #: gave every row already there that one value, inflows and outflows
+    #: alike, and could not tell them apart afterwards.
     FIFO = 'fifo'
 
 

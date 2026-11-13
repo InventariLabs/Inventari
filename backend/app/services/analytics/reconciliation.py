@@ -6,9 +6,9 @@ Two pairs are compared, because two pairs can quietly disagree:
   hydrated with its full quantity while the movement recorded only the
   delta carries that gap from its past (ADR-004, superseded by ADR-022).
   Measured so its size is a number, not an assumption.
-- The cost layers against the shelf — stock that arrived without a
-  priced receipt has no layer; the gap is the hole the unpriced-
-  receipt answer left open on purpose, now counted.
+- The cost layers against the shelf, in quantity. Stock that arrived
+  without a price still gets a layer (``average`` or ``unknown``), so a
+  gap is stock the two disagree about, not stock nobody priced.
 
 "The shelf" is the records' view (``stock_quants_from_records``). The report
 compared two more pairs while there was a quant table — the records against
@@ -200,11 +200,12 @@ def _shelf_by_template(shelf: CTE) -> CTE:
 def _layer_totals(organization_id: UUID) -> CTE:
     """What the cost layers still hold, per template.
 
-    Stock that arrived without a priced receipt carries no layer (its cost
-    basis says ``unknown`` only once a rate existed to fall back on) — the
-    pair against the shelf measures how much of the shelf the cost history
-    does not cover, which is the hole the unpriced-receipt work left open on
-    purpose.
+    Every arrival carries a layer, priced or not: one nobody priced is
+    posted at the organization's average rate (``average``) or, with no
+    rate to fall back on, at no known cost (``unknown``). So the pair
+    against the shelf compares quantities only — a gap is stock the layers
+    and the shelf disagree about, not stock without a price, which this
+    pair cannot see.
     """
     return (
         select(

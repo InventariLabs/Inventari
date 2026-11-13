@@ -16,11 +16,13 @@ from datetime import timedelta
 from typing import Any
 
 from app.core.module_identity import refuse_foreign_module
+from app.core.public_api._access import reads
 
 
 class CoreSchedulerAPI:
     """Public Core API for periodic task registration."""
 
+    @reads
     def register_task(
         self,
         name: str,
@@ -51,6 +53,7 @@ class CoreSchedulerAPI:
             is_persistent=is_persistent,
         )
 
+    @reads
     def unregister_task(self, name: str, *, module_name: str) -> bool:
         """Unregister a periodic task. Returns True when the task existed.
 

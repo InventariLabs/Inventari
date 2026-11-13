@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AuditAction, AuditLogDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads, writes
 from app.services import audit_service
 
 logger = get_logger(__name__)
@@ -40,6 +41,7 @@ class CoreAuditLogAPI:
     AGENTS.md Golden Path, modules touch Core data through CoreAPI only.
     """
 
+    @reads
     async def list_for_org_async(
         self,
         db: AsyncSession,
@@ -55,6 +57,7 @@ class CoreAuditLogAPI:
         offset: int = 0,
         after: tuple[datetime, UUID] | None = None,
         known_total: int | None = None,
+        count_up_to: int | None = None,
     ) -> tuple[list[AuditLogDTO], int]:
         """Return audit entries for one organization, newest first.
 
@@ -70,7 +73,9 @@ class CoreAuditLogAPI:
 
         The next page is asked for with the last entry of the previous one
         (``after``: its instant and id) rather than a larger ``offset``, and a caller that kept the count from the first page
-        passes it back as ``known_total``.
+        passes it back as ``known_total``. ``count_up_to`` stops the count
+        one entry past it: a total above it means the journal holds more
+        (``db_utils.LIST_COUNT_CAP``).
         """
         entries, total = await audit_service.list_for_org_async(
             db,
@@ -85,6 +90,7 @@ class CoreAuditLogAPI:
             offset=offset,
             after=after,
             known_total=known_total,
+            count_up_to=count_up_to,
         )
         dtos: list[AuditLogDTO] = []
         for entry, user_email in entries:
@@ -93,12 +99,14 @@ class CoreAuditLogAPI:
             dtos.append(dto)
         return dtos, total
 
+    @reads
     async def list_target_types_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> list[str]:
         """The distinct target types this organization's log actually holds."""
         return await audit_service.list_target_types_async(db, organization_id)
 
+    @reads
     async def list_for_target_async(
         self,
         db: AsyncSession,
@@ -118,6 +126,7 @@ class CoreAuditLogAPI:
         )
         return [AuditLogDTO.model_validate(e) for e in entries]
 
+    @writes
     async def log_action_async(
         self,
         db: AsyncSession,

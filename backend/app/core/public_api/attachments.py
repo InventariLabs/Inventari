@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ItemAttachmentDTO, ItemDTO
 from app.core.logging import get_logger
+from app.core.public_api._access import reads
 
 logger = get_logger(__name__)
 
@@ -21,6 +22,7 @@ logger = get_logger(__name__)
 class CoreAttachmentsAPI:
     """Public Core API for module-safe ItemAttachment access."""
 
+    @reads
     async def find_by_file_path_async(
         self, db: AsyncSession, file_path: str, organization_id: UUID
     ) -> ItemAttachmentDTO | None:
@@ -36,6 +38,7 @@ class CoreAttachmentsAPI:
         )
         return ItemAttachmentDTO.model_validate(attachment) if attachment else None
 
+    @reads
     async def get_item_with_storage_async(
         self, db: AsyncSession, item_id: UUID, organization_id: UUID
     ) -> ItemDTO | None:
@@ -51,6 +54,7 @@ class CoreAttachmentsAPI:
         )
         return ItemDTO.model_validate(item) if item else None
 
+    @reads
     async def get_attachment_with_item_async(
         self, db: AsyncSession, attachment_id: UUID, organization_id: UUID
     ) -> ItemAttachmentDTO | None:

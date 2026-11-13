@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import OrganizationDTO, UserContextDTO
 from app.core.exceptions import ContractViolationError, ServiceRejectionError
+from app.core.public_api._access import reads, writes
 from app.services._org_reads import DEFERRED_DTO_COLUMNS
 from app.services.crypto_service import decrypt_settings
 
@@ -33,6 +34,7 @@ class CoreOrganizationsAPI:
     ) -> None:
         await db.refresh(org, list(self.deferred_dto_columns))
 
+    @reads
     async def today_async(self, db: AsyncSession, organization_id: UUID) -> date:
         """What day it is where this organization is.
 
@@ -45,6 +47,7 @@ class CoreOrganizationsAPI:
 
         return await org_today_async(db, organization_id)
 
+    @reads
     async def timezone_async(self, db: AsyncSession, organization_id: UUID) -> tzinfo:
         """The organization's own clock.
 
@@ -56,6 +59,7 @@ class CoreOrganizationsAPI:
 
         return await org_timezone_async(db, organization_id)
 
+    @reads
     async def window_start_async(
         self, db: AsyncSession, organization_id: UUID, days: int
     ) -> datetime:
@@ -69,6 +73,7 @@ class CoreOrganizationsAPI:
 
         return await org_window_start_async(db, organization_id, days)
 
+    @reads
     async def get_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> OrganizationDTO | None:
@@ -82,6 +87,7 @@ class CoreOrganizationsAPI:
         await self._refresh_deferred_async(db, org)
         return OrganizationDTO.model_validate(org)
 
+    @reads
     async def get_settings_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> dict[str, Any] | None:
@@ -94,6 +100,7 @@ class CoreOrganizationsAPI:
             return None
         return decrypt_settings(organization.settings or {})
 
+    @reads
     async def get_name_async(
         self, db: AsyncSession, organization_id: UUID
     ) -> str | None:
@@ -105,6 +112,7 @@ class CoreOrganizationsAPI:
         organization = await get_by_id_async(db, organization_id)
         return organization.name if organization else None
 
+    @reads
     async def is_module_enabled_async(
         self,
         db: AsyncSession,
@@ -117,6 +125,7 @@ class CoreOrganizationsAPI:
 
         return await is_module_enabled_async(db, organization_id, module_name)
 
+    @writes
     async def update_async(
         self,
         db: AsyncSession,
@@ -152,6 +161,7 @@ class CoreOrganizationsAPI:
         await self._refresh_deferred_async(db, org)
         return OrganizationDTO.model_validate(org)
 
+    @reads
     async def list_missing_short_id_async(
         self, db: AsyncSession
     ) -> list[OrganizationDTO]:
@@ -163,6 +173,7 @@ class CoreOrganizationsAPI:
         orgs = await list_missing_short_id(db)
         return [OrganizationDTO.model_validate(o) for o in orgs]
 
+    @reads
     async def list_all_async(self, db: AsyncSession) -> list[OrganizationDTO]:
         """Async: list all organizations (superadmin only)."""
         from app.services._org_reads import (
@@ -172,6 +183,7 @@ class CoreOrganizationsAPI:
         orgs = await list_all_async(db)
         return [OrganizationDTO.model_validate(o) for o in orgs]
 
+    @writes
     async def apply_onboarding_profile_async(
         self,
         db: AsyncSession,
@@ -217,6 +229,7 @@ class CoreOrganizationsAPI:
             )
         return result
 
+    @writes
     async def toggle_module_async(
         self,
         db: AsyncSession,

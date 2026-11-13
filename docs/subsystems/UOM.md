@@ -98,9 +98,10 @@ measured unit have no package to open.
 ### Cooking prefers the open pack and opens the sealed one it takes from
 
 The mark above (`meta_data.opened.at`, read through `app/core/open_package.py`) is
-what picking calls an opened pack. A record without the mark is judged the way it
-was before the mark existed: its quantity below the card's full-pack weight, in
-the same unit. Recipe picking orders stock by date first and, on the same date,
+what picking calls an opened pack, and the only thing: the FEFO order, the
+candidates' `opened` flag and the open-pack suggestion all read it. A record without
+the mark is sealed, whatever it weighs — a sealed bag lighter than the card's full
+pack is a smaller bag, not an open one. Recipe picking orders stock by date first and, on the same date,
 puts an open pack before a sealed one and only then the larger quantity. When a
 sealed pack expires EARLIER than the open one, the scan does not pick for the
 cook: the candidates list carries `opened` and `opened_at` beside their dates, the

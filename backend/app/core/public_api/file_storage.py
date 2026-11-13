@@ -18,12 +18,14 @@ from __future__ import annotations
 from io import BytesIO
 from uuid import UUID
 
-# FileStorageService uses __new__-based singleton; calling FileStorageService()
-# in each method is safe and always returns the same initialised instance.
 from app.core.demo_upload_cap import demo_upload_admission
 from app.core.file_storage.errors import StorageError
 from app.core.file_storage.service import FileStorageService
 from app.core.logging import get_logger
+
+# FileStorageService uses __new__-based singleton; calling FileStorageService()
+# in each method is safe and always returns the same initialised instance.
+from app.core.public_api._access import reads, writes
 
 logger = get_logger(__name__)
 
@@ -52,6 +54,7 @@ class CoreFileStorageAPI:
             )
         return f'{organization_id}/{module_name}/{clean}'
 
+    @writes
     async def save_for_org_async(
         self,
         organization_id: UUID,
@@ -70,6 +73,7 @@ class CoreFileStorageAPI:
             await service.save(scoped, BytesIO(content), content_type)
         return scoped
 
+    @reads
     async def get_for_org_async(
         self, organization_id: UUID, module_name: str, file_path: str
     ) -> bytes:
@@ -78,6 +82,7 @@ class CoreFileStorageAPI:
         buf: BytesIO = await FileStorageService().get(scoped)
         return buf.read()
 
+    @reads
     async def get_url_for_org_async(
         self,
         organization_id: UUID,
@@ -89,6 +94,7 @@ class CoreFileStorageAPI:
         scoped = self._scoped_path(organization_id, module_name, file_path)
         return await FileStorageService().get_url(scoped, expires_in)
 
+    @writes
     async def delete_for_org_async(
         self, organization_id: UUID, module_name: str, file_path: str
     ) -> None:
@@ -96,6 +102,7 @@ class CoreFileStorageAPI:
         scoped = self._scoped_path(organization_id, module_name, file_path)
         await FileStorageService().delete(scoped)
 
+    @reads
     async def exists_for_org_async(
         self, organization_id: UUID, module_name: str, file_path: str
     ) -> bool:
