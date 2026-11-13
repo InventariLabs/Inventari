@@ -13,7 +13,7 @@ ledger, which already narrows by batch.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from uuid import uuid4
 
@@ -33,6 +33,9 @@ from app.models.uom import Uom, UomCategory
 from app.models.user import User
 from app.services.token_service import create_access_token
 from tests.integration._shelf import put_on_shelf
+
+# Best-before ahead of the clock, so the batch stays active whenever the suite runs.
+_EXPIRY = date.today() + timedelta(days=400)
 
 
 def _auth(user: User) -> dict[str, str]:
@@ -118,7 +121,7 @@ async def batch(real_async_db_session: AsyncSession) -> _Batch:
         organization_id=fixture.org.id,
         product_template_id=fixture.flour.id,
         name='L-2026-04',
-        expiry_date=date(2027, 1, 31),
+        expiry_date=_EXPIRY,
         production_date=date(2026, 4, 2),
     )
     fixture.other_lot = StockLot(
@@ -161,7 +164,7 @@ class TestTheBatchNamesItself:
         assert response.status_code == status.HTTP_200_OK
         body = response.json()
         assert body['name'] == 'L-2026-04'
-        assert body['expiry_date'] == '2027-01-31'
+        assert body['expiry_date'] == _EXPIRY.isoformat()
         assert body['production_date'] == '2026-04-02'
         assert body['status'] == LotStatus.ACTIVE
 
