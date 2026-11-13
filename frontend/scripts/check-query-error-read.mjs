@@ -31,6 +31,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import ts from "typescript";
+
 import { blankComments } from "./source-text.mjs";
 
 const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
@@ -65,38 +67,40 @@ function braced(text, open) {
 }
 
 /**
- * Which characters are code: false inside a `'`/`"` string and in the text of
- * a template literal, true in a template's `${…}` holes (nested ones too).
- * Quotes themselves count as literal. Comments are already blanked.
+ * Which characters are code, read from the TypeScript syntax tree: false in
+ * comments, string and regular-expression literals, JSX text and the text
+ * parts of a template literal; true in a template's `${…}` holes. A parser
+ * knows where a quote opens a string and where it is an apostrophe in JSX
+ * text, a regex or a comment, which a character scan cannot tell.
  */
-function codeMask(text) {
-  const mask = new Array(text.length).fill(false);
-  // "code" frames carry the brace depth of their hole (null at top level).
-  const stack = [{ kind: "code", depth: null }];
-  for (let i = 0; i < text.length; i++) {
-    const top = stack[stack.length - 1];
-    const c = text[i];
-    if (top.kind === "code") {
-      if (c === "'" || c === '"') {
-        stack.push({ kind: c });
-      } else if (c === "`") {
-        stack.push({ kind: "tpl" });
-      } else {
-        mask[i] = true;
-        if (top.depth !== null) {
-          if (c === "{") top.depth++;
-          else if (c === "}" && top.depth-- === 0) stack.pop();
-        }
-      }
-    } else if (c === "\\") {
-      i++;
-    } else if (top.kind === "tpl" && c === "$" && text[i + 1] === "{") {
-      stack.push({ kind: "code", depth: 0 });
-      i++;
-    } else if (c === (top.kind === "tpl" ? "`" : top.kind)) {
-      stack.pop();
-    }
-  }
+function codeMask(text, rel) {
+  const kind = /\.tsx$/.test(rel) ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const tree = ts.createSourceFile(
+    rel,
+    text,
+    ts.ScriptTarget.Latest,
+    false,
+    kind,
+  );
+  const mask = new Array(text.length).fill(true);
+  const blank = (from, to) => mask.fill(false, from, to);
+  const literal = new Set([
+    ts.SyntaxKind.StringLiteral,
+    ts.SyntaxKind.NoSubstitutionTemplateLiteral,
+    ts.SyntaxKind.TemplateHead,
+    ts.SyntaxKind.TemplateMiddle,
+    ts.SyntaxKind.TemplateTail,
+    ts.SyntaxKind.RegularExpressionLiteral,
+    ts.SyntaxKind.JsxText,
+  ]);
+  const visit = (node) => {
+    // Trivia before a node is whitespace and comments.
+    blank(node.pos, node.getStart(tree));
+    if (literal.has(node.kind)) blank(node.getStart(tree), node.end);
+    else ts.forEachChild(node, visit);
+  };
+  visit(tree);
+  blank(tree.endOfFileToken.pos, text.length);
   return mask;
 }
 
@@ -228,16 +232,20 @@ export function unreadErrorsIn(rel, source) {
     }
   }
 
-  const isCode = codeMask(text);
+  const isCode = codeMask(source, rel);
   const inline = /\buse[A-Z]\w*\s*(?:<[^>()]*>\s*)?\(/g;
-  while ((match = inline.exec(text)) !== null) {
+  while ((match = inline.exec(source)) !== null) {
     if (!isCode[match.index]) continue;
-    const close = closingParen(text, match.index + match[0].length - 1, isCode);
+    const close = closingParen(
+      source,
+      match.index + match[0].length - 1,
+      isCode,
+    );
     if (close === -1) continue;
     const read = new RegExp(
       String.raw`^\s*\.data\b(?:\??\.\w+)*\s*\?\?\s*${EMPTY_DEFAULT}`,
     );
-    if (!read.test(text.slice(close + 1))) continue;
+    if (!read.test(source.slice(close + 1))) continue;
     const scope = scopeOf(text, match.index);
     out.push({
       file: rel,

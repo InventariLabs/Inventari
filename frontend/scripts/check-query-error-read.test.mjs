@@ -178,4 +178,18 @@ describe("check-query-error-read", () => {
       unreadErrorsIn(rel, "const text = `a ${`b ${useThings().data ?? []}`}`;"),
     ).toHaveLength(1);
   });
+
+  it("does not let a quote in JSX text, a regex or a comment hide a later read", () => {
+    const read =
+      "export function Z() { const b = useThings().data ?? []; return b; }";
+    const before = [
+      "export function Y() { return <p>Don't worry</p>; }",
+      'export const csv = /[",\n]/;',
+      "// it's a comment\nconst a = `${`x`}`; /* don't */",
+      "const msg = `${a ? `it's` : 'b'}`; // don't",
+    ];
+    for (const lead of before) {
+      expect(unreadErrorsIn("x.tsx", `${lead}\n${read}`)).toHaveLength(1);
+    }
+  });
 });

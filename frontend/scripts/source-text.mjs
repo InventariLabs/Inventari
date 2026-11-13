@@ -16,7 +16,8 @@
  * inside `` `count: ${useStorages().length}` `` disappears. That trades a
  * false alarm for a false silence, which is the worse of the two: an alarm
  * argues with you, a silence agrees with you. A gate that needs to tell code
- * from prose needs a parser, not one more pass of blanking.
+ * from prose needs a parser, not one more pass of blanking: the
+ * query-error-read gate reads the TypeScript syntax tree for that.
  */
 
 /**

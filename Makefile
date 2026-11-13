@@ -267,7 +267,7 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:storage-scope
 	@echo "$(BLUE)[INFO]$(NC) Checking every category query states its scope (baseline)..."
 	docker compose exec frontend npm run check:category-scope
-	@echo "$(BLUE)[INFO]$(NC) Checking no failed load reads as an empty answer (baseline)..."
+	@echo "$(BLUE)[INFO]$(NC) Checking no failed load reads as an empty answer..."
 	docker compose exec frontend npm run check:query-error-read
 	@echo "$(BLUE)[INFO]$(NC) Checking every mutateAsync refusal reaches the reader (baseline)..."
 	docker compose exec frontend npm run check:mutate-async
