@@ -1145,7 +1145,11 @@ async def preview_production(
         db, organization_id, context_location_id=data.output_location_id
     )
     availability = await compute_availability(
-        db, organization_id, recipe.id, batches=batches, location_id=check_location_id
+        db,
+        organization_id,
+        recipe.id,
+        planned_qty=data.planned_qty,
+        location_id=check_location_id,
     )
     preview.ingredients = [
         IngredientAvailabilityItem.model_validate(ingredient, from_attributes=True)

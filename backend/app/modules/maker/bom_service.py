@@ -332,8 +332,9 @@ async def explode(
     Uses the default recipe for *template_id*. Cycles raise ``ValueError``.
     Depth is bounded to ``_MAX_DEPTH`` levels.
 
-    Batch math: ``batches = qty / recipe.batch_yield_qty``;
-    per-line ``effective_qty = batches * qty_per_batch * (1 + yield_loss_pct/100)``.
+    Batch math: per-line
+    ``effective_qty = qty * qty_per_batch * (1 + yield_loss_pct/100) / recipe.batch_yield_qty``,
+    the division last so a need that is exact stays exact.
     For migrated recipes (yield=1) the result is identical to the legacy
     per-unit formula.
     """
@@ -358,9 +359,8 @@ async def explode_with_uom(
     recipe = await find_default_recipe(db, organization_id, template_id)
     if recipe is None:
         return []
-    batches = Decimal(str(qty)) / recipe.batch_yield_qty
     return await _explode_recipe(
-        db, organization_id, recipe, batches, depth=0, _seen=None
+        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None
     )
 
 
@@ -401,33 +401,35 @@ async def explode_by_recipe_with_uom(
     stock units correctly.
     """
     recipe = await resolve_recipe(db, organization_id, recipe_id)
-    batches = Decimal(str(qty)) / recipe.batch_yield_qty
     return await _explode_recipe(
-        db, organization_id, recipe, batches, depth=0, _seen=None
+        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None
     )
 
 
 async def explode_by_recipes_with_uom(
     db: AsyncSession,
     organization_id: UUID,
-    recipe_ids: Iterable[UUID],
-) -> dict[UUID, list[tuple[UUID, Decimal, str, UUID | None]]]:
-    """Explode many recipes, one batch each, in one round of queries.
+    plans: Iterable[tuple[UUID, Decimal]],
+) -> dict[tuple[UUID, Decimal], list[tuple[UUID, Decimal, str, UUID | None]]]:
+    """Explode many ``(recipe, output quantity)`` plans in one round of queries.
 
     The per-recipe exploder pays a recipe read, a lines load and a
     child-recipe lookup per call — the price of one order's check, but a
     page of drafts with a recipe each turned it into a round-trip per row.
     Here the page's recipes arrive in one select and the shared child
     cache is warmed a level at a time for the whole set, so the cost grows
-    with the page's depth, not its row count. The per-recipe result is
-    what ``explode_by_recipe_with_uom`` returns at one batch; a recipe
-    this organization does not have gets no entry.
+    with the page's depth, not its row count. Each plan is exploded at its
+    own quantity, as ``explode_by_recipe_with_uom`` would: a sub-assembly's
+    per-batch need is not exact when its yield does not divide it, so a
+    need scaled from a one-batch explosion would carry that noise. A plan
+    whose recipe this organization does not have gets no entry.
     """
-    ids = list(dict.fromkeys(recipe_ids))
-    if not ids:
+    wanted = list(dict.fromkeys(plans))
+    if not wanted:
         return {}
     stmt = select(MakerRecipe).where(
-        MakerRecipe.id.in_(ids), MakerRecipe.organization_id == organization_id
+        MakerRecipe.id.in_({recipe_id for recipe_id, _qty in wanted}),
+        MakerRecipe.organization_id == organization_id,
     )
     tops = {recipe.id: recipe for recipe in (await db.scalars(stmt)).all()}
 
@@ -436,16 +438,17 @@ async def explode_by_recipes_with_uom(
     child_cache = await _warm_child_cache(db, organization_id, tops.values())
 
     return {
-        recipe_id: await _explode_recipe(
+        (recipe_id, qty): await _explode_recipe(
             db,
             organization_id,
-            recipe,
-            Decimal('1'),
+            tops[recipe_id],
+            qty,
             depth=0,
             _seen=None,
             _child_cache=child_cache,
         )
-        for recipe_id, recipe in tops.items()
+        for recipe_id, qty in wanted
+        if recipe_id in tops
     }
 
 
@@ -453,7 +456,7 @@ async def _explode_recipe(
     db: AsyncSession,
     organization_id: UUID,
     recipe: MakerRecipe,
-    batches: Decimal,
+    qty: Decimal,
     *,
     depth: int,
     _seen: set[UUID] | None,
@@ -495,19 +498,23 @@ async def _explode_recipe(
 
     flat: list[tuple[UUID, Decimal, str, UUID | None]] = []
     for line in recipe.lines:
+        # The division by the batch yield comes last: planned 5 of a recipe
+        # yielding 3 at 3 per batch is 5 * 3 / 3 = 5, where 5 / 3 * 3 is
+        # 5.000000000000000000000000001 and reads as a shortage against
+        # exactly five on the shelf.
         effective_qty = (
-            batches
+            qty
             * line.qty_per_batch
             * (Decimal('1') + line.yield_loss_pct / Decimal('100'))
+            / recipe.batch_yield_qty
         )
         child_recipe = child_recipes.get(line.child_template_id)
         if child_recipe is not None:
-            child_batches = effective_qty / child_recipe.batch_yield_qty
             sub = await _explode_recipe(
                 db,
                 organization_id,
                 child_recipe,
-                child_batches,
+                effective_qty,
                 depth=depth + 1,
                 _seen=seen_with_self,
                 _child_cache=_child_cache,
@@ -616,12 +623,11 @@ async def explode_recipes_in_stock_units(
         if not recipe.batch_yield_qty:
             flats[recipe.id] = []
             continue
-        batches = Decimal(str(qty)) / recipe.batch_yield_qty
         flats[recipe.id] = await _explode_recipe(
             db,
             organization_id,
             recipe,
-            batches,
+            Decimal(str(qty)),
             depth=0,
             _seen=None,
             _child_cache=child_cache,

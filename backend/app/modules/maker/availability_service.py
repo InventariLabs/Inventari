@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from decimal import ROUND_FLOOR, Decimal
+from decimal import ROUND_FLOOR, ROUND_HALF_UP, Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -101,6 +101,10 @@ class ShortageItem:
     uom_symbol: str | None
     convertible: bool = True
     available_uom_symbol: str | None = None
+
+
+#: Last-place noise of a batch count: stock over a rounded per-batch need.
+_BATCH_NOISE = Decimal('1e-12')
 
 
 async def _get_available_stock_batch(
@@ -213,9 +217,15 @@ async def _measure_stock_against_recipe(
         # hand is "none", not a negative number of batches. Quantised, because
         # a division keeps the exponent it landed on and ten batches went out
         # on the wire as "1E+1".
+        quotient = converted / per_batch
+        # A nested recipe's per-batch need is a rounded third, and stock that
+        # holds exactly three batches divides to 2.999…9 — the batch the
+        # stock covers must not be dropped for the last place of a quotient.
+        nearest = quotient.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+        if abs(quotient - nearest) <= _BATCH_NOISE:
+            quotient = nearest
         ingredient_max = max(
-            Decimal('0'),
-            (converted / per_batch).quantize(Decimal('1'), rounding=ROUND_FLOOR),
+            Decimal('0'), quotient.quantize(Decimal('1'), rounding=ROUND_FLOOR)
         )
         if max_batches is None or ingredient_max < max_batches:
             max_batches = ingredient_max
@@ -238,15 +248,22 @@ async def compute_availability(
     recipe_id: UUID,
     *,
     batches: Decimal | None = None,
+    planned_qty: Decimal | None = None,
     location_id: UUID | None = None,
 ) -> AvailabilityResult:
-    """Check ingredient availability for producing ``batches`` of a recipe.
+    """Check ingredient availability for a plan or a batch count of a recipe.
 
     Parameters
     ----------
     batches
-        Number of batches to check. If None, computes ``max_batches`` only
-        (each ingredient shows stock as ``available``, ``needed=0``).
+        Number of batches to check, taken as ``batches`` times the batch
+        yield and exploded at that quantity. If None, computes ``max_batches``
+        only (each ingredient shows stock as ``available``, ``needed=0``).
+    planned_qty
+        The output quantity to check, instead of ``batches``. The recipe is
+        exploded at this quantity, so 5 planned against a yield of 3 is
+        exactly 5 pieces of a 3-piece line at any depth, where 5 / 3 batches
+        times 3 is a trillionth over.
     location_id
         If set, check stock only at this location. Otherwise check globally.
 
@@ -324,11 +341,30 @@ async def compute_availability(
     max_batches = stock.max_batches
     has_unknown = stock.has_unknown
 
+    # A plan is exploded at its own quantity: a sub-assembly whose yield does
+    # not divide the plan has a per-batch need that is already rounded, and
+    # scaling it back is a trillionth over exactly what the stock holds. A
+    # batch count is the same plan, batches times the yield. The one-batch
+    # explosion above stays for ``max_batches`` alone.
+    if planned_qty is None and batches is not None:
+        planned_qty = batches * recipe.batch_yield_qty
+    planned_needs: dict[UUID, Decimal] | None = None
+    if planned_qty is not None:
+        planned_needs, _uom_ids, _units = _aggregate_needs(
+            await bom_service.explode_by_recipe_with_uom(
+                db, organization_id, recipe_id, planned_qty
+            )
+        )
+
     # Build ingredient list.
-    requested_batches = batches if batches is not None else Decimal('0')
     ingredients: list[IngredientAvailability] = []
-    for child_id, per_batch in per_batch_needs.items():
-        needed = per_batch * requested_batches
+    for child_id in per_batch_needs:
+        # No plan and no batch count: stock only, nothing is needed.
+        needed = (
+            planned_needs.get(child_id, Decimal('0'))
+            if planned_needs is not None
+            else Decimal('0')
+        )
         available = converted_stocks.get(child_id, Decimal('0'))
         convertible = convertibles.get(child_id, True)
         shortage = max(Decimal('0'), needed - available) if convertible else None
@@ -434,9 +470,9 @@ def _aggregate_needs(
     """Aggregate exploded leaves into per-template requirements.
 
     Kept from :func:`compute_shortage_list` when the listing's batched
-    count needed the same aggregation: one explosion per recipe, scaled
-    per order, answering with the same needs maps the per-order path
-    builds.
+    count needed the same aggregation: the needs of one explosion (a
+    plan at its own quantity), answering with the same needs maps the
+    per-order path builds.
     """
     needs: dict[UUID, Decimal] = {}
     line_uom_ids: dict[UUID, UUID | None] = {}
@@ -570,32 +606,31 @@ async def shortage_signals_for_orders(
             settings.availability_check_scope, None, order.output_storage_location_id
         )
 
-    # One recipe round for the page, at one batch. Needs scale linearly
-    # with the batches an order plans, so the per-order figures are the
-    # unit needs times its batches — the same multiplication the per-order
-    # explosion performs, without repeating it per row. A recipe whose
+    # One recipe round for the page, each order exploded at its own plan:
+    # a need scaled from a one-batch explosion carries the rounded per-batch
+    # figure of any sub-assembly the yield does not divide, and a run with
+    # exactly enough stock would read as a trillionth short. A recipe whose
     # yield cannot scale a plan has no explosion to give (as before).
-    recipe_ids = {o.recipe_id for o in drafts}
-    explodable = {
-        recipe_id
-        for recipe_id in recipe_ids
-        if recipe_id is not None and (yields.get(recipe_id) or Decimal('0')) > 0
+    plans = {
+        (o.recipe_id, o.planned_qty)
+        for o in drafts
+        if o.recipe_id is not None and (yields.get(o.recipe_id) or Decimal('0')) > 0
     }
-    unit_needs: dict[
-        UUID,
+    needs_by_plan: dict[
+        tuple[UUID, Decimal],
         tuple[dict[UUID, Decimal], dict[UUID, UUID | None], dict[UUID, str | None]],
     ] = {}
-    for recipe_id, flat in (
-        await bom_service.explode_by_recipes_with_uom(db, organization_id, explodable)
+    for plan, flat in (
+        await bom_service.explode_by_recipes_with_uom(db, organization_id, plans)
     ).items():
         if flat:
-            unit_needs[recipe_id] = _aggregate_needs(flat)
+            needs_by_plan[plan] = _aggregate_needs(flat)
 
     stocks_by_scope: dict[UUID | None, dict[UUID, Decimal]] = {}
     children_by_scope: dict[UUID | None, set[UUID]] = {}
     for o in drafts:
         assert o.recipe_id is not None  # drafts is filtered on recipe_id
-        maps = unit_needs.get(o.recipe_id)
+        maps = needs_by_plan.get((o.recipe_id, o.planned_qty))
         if maps is None:
             continue
         children_by_scope.setdefault(_scope(o), set()).update(maps[0])
@@ -606,7 +641,7 @@ async def shortage_signals_for_orders(
 
     templates: dict[UUID, ProductTemplateDTO] | None = None
     uom_cache: dict[UUID, UomDTO | None] = {}
-    all_children = sorted({c for m in unit_needs.values() for c in m[0]})
+    all_children = sorted({c for m in needs_by_plan.values() for c in m[0]})
     if all_children:
         templates = await core_api.product_templates.get_many_async(
             db, organization_id, all_children
@@ -614,16 +649,14 @@ async def shortage_signals_for_orders(
     signals: dict[UUID, list[ShortageItem]] = {}
     for o in drafts:
         assert o.recipe_id is not None  # drafts is filtered on recipe_id
-        maps = unit_needs.get(o.recipe_id)
+        maps = needs_by_plan.get((o.recipe_id, o.planned_qty))
         if maps is None:
             continue
         needs, line_uom_ids, legacy_units = maps
-        batches = o.planned_qty / yields[o.recipe_id]
-        scaled = {child: qty * batches for child, qty in needs.items()}
         signals[o.id] = await _shortages_from_needs(
             db,
             organization_id,
-            needs=scaled,
+            needs=needs,
             line_uom_ids=line_uom_ids,
             legacy_units=legacy_units,
             stocks=stocks_by_scope[_scope(o)],
