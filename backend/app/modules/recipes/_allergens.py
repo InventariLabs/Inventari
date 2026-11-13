@@ -216,7 +216,7 @@ _PLANT_MILK_EN_RE = re.compile(
 # goes. "Masło orzechowe" is peanut butter, so it becomes the peanut keyword.
 _NON_DAIRY_BUTTER_EN_RE = re.compile(
     r'\b(peanut|almond|cashew|hazelnut|walnut|pistachio|macadamia|sesame|coconut'
-    r'|sunflower|apple|cocoa|cacao|shea|nut)(?: seed)?[ -]butter\b(?!\s+[a-z])'
+    r'|sunflower|apple|cocoa|cacao|shea|nut)(?:[ -]seed)?[ -]butter\b(?!\s+[a-z])'
 )
 _NON_DAIRY_BUTTER_PL_RE = re.compile(
     r'\bmaslo (orzechowe|kakaowe|shea|migdalowe|sezamowe|kokosowe'
@@ -228,7 +228,7 @@ _NON_DAIRY_BUTTER_PL_RE = re.compile(
 # "ziemniak" (potato) and drop the tree nuts of "orzechy ziemniaki".
 _PL_PEANUT_RE = re.compile(r'\b(?:orzech|orzesz)\w* ziemn(?:e|a|y|ego|ej|ych|ym|ymi)\b')
 # "Groundnut" and "ground nuts" are British English for peanuts.
-_GROUNDNUT_RE = re.compile(r'\bground ?nuts?\b')
+_GROUNDNUT_RE = re.compile(r'\bground[ -]?nuts?\b')
 # Bare "nut"/"nuts" as a word: the substring sits in coconut, donut and nutmeg,
 # and "nuts" also closes peanuts, so it cannot be a plain keyword.
 _NUT_WORD_RE = re.compile(r'\bnuts?\b')

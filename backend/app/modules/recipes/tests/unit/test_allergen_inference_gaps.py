@@ -20,7 +20,17 @@ def test_a_milk_adjective_reads_milk(name: str) -> None:
 
 
 @pytest.mark.parametrize(
-    'name', ['Groundnuts', 'Groundnut oil', 'Ground nuts', 'Ground nut', 'Groundnut']
+    'name',
+    [
+        'Groundnuts',
+        'Groundnut oil',
+        'Ground nuts',
+        'Ground nut',
+        'Groundnut',
+        'Ground-nut',
+        'Ground-nut oil',
+        'Ground-nuts',
+    ],
 )
 def test_a_groundnut_reads_peanuts_and_not_tree_nuts(name: str) -> None:
     assert infer_allergens(name) == ['peanuts']
@@ -50,3 +60,9 @@ def test_every_polish_peanut_form_still_reads_peanuts_only(name: str) -> None:
 def test_a_sunflower_seed_butter_is_no_dairy() -> None:
     assert infer_allergens('Sunflower seed butter') == []
     assert infer_allergens('Sunflower seed butter cookies') == ['milk']
+
+
+def test_a_hyphenated_sunflower_seed_butter_is_no_dairy() -> None:
+    assert infer_allergens('Sunflower-seed butter') == []
+    assert infer_allergens('Sunflower-seed-butter') == []
+    assert infer_allergens('Sunflower-seed butter cookies') == ['milk']
