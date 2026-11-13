@@ -78,7 +78,7 @@ export default defineConfig({
       // removes organization-wide rows (the built-in templates) that a second
       // project running it side by side would pull from under it.
       testIgnore:
-        /((warehouse-location-)?workspace-mode|maker-module-gate|approvals(-integration)?|announcement-publish|example-module|warehouse-office-output|phone-first-record-responsive)\.spec\.ts/,
+        /((warehouse-location-)?workspace-mode|maker-module-gate|approvals(-integration)?|announcement-publish|example-module|warehouse-office-output|warehouse-reduced-rates|phone-first-record-responsive)\.spec\.ts/,
     },
     {
       // Opt-in by file name: a spec whose name ends in `responsive` runs on
@@ -189,7 +189,7 @@ export default defineConfig({
       // its posts.
       name: "value-tracking",
       use: { ...devices["Desktop Chrome"] },
-      testMatch: /warehouse-office-output\.spec\.ts/,
+      testMatch: /(warehouse-office-output|warehouse-reduced-rates)\.spec\.ts/,
       dependencies: [
         "chromium",
         "mobile",

@@ -13598,6 +13598,8 @@ export interface components {
             country: string | null;
             /** Rates */
             rates: components["schemas"]["CountryRateOffer"][];
+            /** Require Partner Tax Id */
+            require_partner_tax_id: boolean;
         };
         /**
          * CreateReceiptFromPO

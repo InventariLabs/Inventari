@@ -47657,12 +47657,17 @@
             },
             "type": "array",
             "title": "Rates"
+          },
+          "require_partner_tax_id": {
+            "type": "boolean",
+            "title": "Require Partner Tax Id"
           }
         },
         "type": "object",
         "required": [
           "country",
-          "rates"
+          "rates",
+          "require_partner_tax_id"
         ],
         "title": "CountryRatesOut"
       },

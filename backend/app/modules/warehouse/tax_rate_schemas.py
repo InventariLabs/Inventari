@@ -45,6 +45,9 @@ class CountryRateOffer(BaseModel):
 class CountryRatesOut(BaseModel):
     country: str | None
     rates: list[CountryRateOffer]
+    #: Whether the country's law has a document name its partner's tax id —
+    #: what a profile with no entry of its own inherits.
+    require_partner_tax_id: bool
 
 
 class NameTaxRate(BaseModel):

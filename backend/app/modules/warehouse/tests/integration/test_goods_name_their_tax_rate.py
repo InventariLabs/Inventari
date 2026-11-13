@@ -154,7 +154,31 @@ class TestTheCountryOffersItsRates:
         doc_org.country = 'BR'
         db_session.commit()
         offer = client.get(f'{RATES}/country', headers=doc_auth_headers)
-        assert offer.json() == {'country': 'BR', 'rates': []}
+        assert offer.json() == {
+            'country': 'BR',
+            'rates': [],
+            'require_partner_tax_id': False,
+        }
+
+    @pytest.mark.parametrize(
+        ('country', 'required'),
+        [('FR', True), ('PL', True), ('DE', False), (None, False)],
+    )
+    def test_the_offer_says_whether_the_country_requires_a_partner_tax_id(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_org: Organization,
+        db_session: Session,
+        country: str | None,
+        required: bool,
+    ) -> None:
+        """The Settings checkbox shows the country's rule when the profile
+        states none; fails without the fix with a missing key."""
+        doc_org.country = country
+        db_session.commit()
+        offer = client.get(f'{RATES}/country', headers=doc_auth_headers)
+        assert offer.json()['require_partner_tax_id'] is required
 
     def test_a_zero_rate_is_a_rate(
         self, client: TestClient, doc_auth_headers: dict[str, str]
