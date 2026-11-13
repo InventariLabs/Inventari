@@ -121,3 +121,34 @@ def test_the_committed_allowlist_is_well_formed(gate: ModuleType) -> None:
     raw = (_SCRIPT.with_name('time-bomb-allowlist.json')).read_text(encoding='utf-8')
     _, problems = gate.load_allowlist(raw)
     assert problems == []
+
+
+@pytest.mark.parametrize(
+    'path',
+    [
+        'backend/tests/unit/test_x.py',
+        'backend/app/modules/warehouse/tests/integration/test_x.py',
+        'backend/app/core/tests/test_x.py',
+        'backend/app/services/test_x.py',
+        'frontend/src/modules/a/B.test.tsx',
+        'frontend/scripts/check-x.test.mjs',
+        'frontend/tests/e2e/x.spec.ts',
+    ],
+)
+def test_every_root_a_test_runner_collects_from_is_scanned(
+    gate: ModuleType, path: str
+) -> None:
+    """Module-local suites and the lint scripts' own tests are tests too."""
+    assert gate._BACKEND_TEST.match(path) or gate._FRONTEND_TEST.match(path)
+
+
+@pytest.mark.parametrize(
+    'path',
+    [
+        'backend/app/modules/warehouse/service.py',
+        'backend/scripts/check_time_bombs.py',
+        'frontend/scripts/check-x.mjs',
+    ],
+)
+def test_production_code_is_not_scanned(gate: ModuleType, path: str) -> None:
+    assert not (gate._BACKEND_TEST.match(path) or gate._FRONTEND_TEST.match(path))

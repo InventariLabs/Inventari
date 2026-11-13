@@ -47,14 +47,19 @@ from typing import NamedTuple
 _ROOT = Path(__file__).resolve().parents[2]
 _ALLOWLIST = Path(__file__).with_name('time-bomb-allowlist.json')
 
-# Test files only. Backend tests are Python files under backend/tests;
-# frontend tests are ``*.test.ts(x)`` anywhere in src, and everything under
-# frontend/tests (the Playwright specs and their helpers).
+# Test files only, and every root a gate collects them from. Backend: what
+# pytest.ini's ``testpaths`` names — Python files under backend/tests, under
+# any ``tests`` directory inside backend/app (module-local suites), and
+# ``test_*.py`` beside the code. Frontend: ``*.test.ts(x)`` anywhere in src,
+# the ``*.test.mjs`` of the lint scripts, and everything under frontend/tests
+# (the Playwright specs and their helpers).
 _SENTINEL_YEAR = 2099
 
-_BACKEND_TEST = re.compile(r'^backend/tests/.+\.py$')
+_BACKEND_TEST = re.compile(
+    r'^backend/(?:tests/.+|app/(?:.+/)?tests/.+|app/(?:.+/)?test_[^/]+)\.py$'
+)
 _FRONTEND_TEST = re.compile(
-    r'^frontend/(?:src/.+\.(?:test|spec)\.tsx?|tests/.+\.tsx?)$'
+    r'^frontend/(?:src/.+\.(?:test|spec)\.tsx?|scripts/.+\.test\.mjs|tests/.+\.tsx?)$'
 )
 
 _ISO = re.compile(r'(?<![\d-])(\d{4})-(\d{2})-(\d{2})(?![\d-]\d)')
@@ -132,7 +137,7 @@ def check(
 
 def _tracked_test_files() -> dict[str, str]:
     names = subprocess.run(
-        ['git', 'ls-files', '-z', '--', 'backend/tests', 'frontend'],
+        ['git', 'ls-files', '-z', '--', 'backend/tests', 'backend/app', 'frontend'],
         cwd=_ROOT,
         check=True,
         capture_output=True,
