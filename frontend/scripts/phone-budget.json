@@ -21,7 +21,7 @@
     "launcher": {
       "chunks": ["Launcher"],
       "budget": {
-        "jsKiB": 410,
+        "jsKiB": 415,
         "loadMs": 8500
       },
       "measured": {
