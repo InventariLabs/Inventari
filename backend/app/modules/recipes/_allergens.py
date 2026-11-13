@@ -214,11 +214,19 @@ _PLANT_MILK_EN_RE = re.compile(
 # Butter that is no dairy: the nut or fat it is made of stays, the dairy word
 # goes. "Masło orzechowe" is peanut butter, so it becomes the peanut keyword.
 _NON_DAIRY_BUTTER_EN_RE = re.compile(
-    r'\b(peanut|almond|cashew|hazelnut|cocoa|cacao|shea|nut) butter\b(?!\s+[a-z])'
+    r'\b(peanut|almond|cashew|hazelnut|walnut|pistachio|macadamia|sesame|coconut'
+    r'|sunflower|apple|cocoa|cacao|shea|nut)[ -]butter\b(?!\s+[a-z])'
 )
 _NON_DAIRY_BUTTER_PL_RE = re.compile(
-    r'\bmaslo (orzechowe|kakaowe|shea|migdalowe|z orzechow ziemnych)\b(?!\s+[a-z])'
+    r'\bmaslo (orzechowe|kakaowe|shea|migdalowe|sezamowe|kokosowe'
+    r'|z orzechow \w+|z orzeszki ziemne)\b(?!\s+[a-z])'
 )
+# Both Polish spellings of a peanut ("orzeszki ziemne", "orzechy ziemne") are
+# one keyword; the second would otherwise read "orzech" as a tree nut.
+_PL_PEANUT_RE = re.compile(r'\b(?:orzech|orzesz)\w* ziemn\w*')
+# Bare "nut"/"nuts" as a word: the substring sits in coconut, donut and nutmeg,
+# and "nuts" also closes peanuts, so it cannot be a plain keyword.
+_NUT_WORD_RE = re.compile(r'\bnuts?\b')
 _PL_MILK_PLANT = (
     r'(kokosow\w*|sojow\w*|migdalow\w*|owsian\w*|ryzow\w*|orzechow\w*|roslinn\w*)'
 )
@@ -260,8 +268,8 @@ def infer_allergens(name: str) -> list[str]:
     normalized = normalize_name(name)
     if not normalized:
         return []
-    normalized = _without_plant_milk(normalized)
-    found: set[str] = set()
+    normalized = _without_plant_milk(_PL_PEANUT_RE.sub('orzeszki ziemne', normalized))
+    found: set[str] = {'nuts'} if _NUT_WORD_RE.search(normalized) else set()
     for keyword in _SORTED_KEYWORDS:
         if keyword in normalized:
             found |= _ALLERGEN_NAME_MAP[keyword]
