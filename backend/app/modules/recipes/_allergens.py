@@ -115,6 +115,7 @@ _ALLERGEN_NAME_MAP: dict[str, set[str]] = {
     'tamari': {'soy'},
     # milk
     'mleko': {'milk'},
+    'mleczn': {'milk'},
     'milk': {'milk'},
     'smietan': {'milk'},
     'cream': {'milk'},
@@ -215,15 +216,19 @@ _PLANT_MILK_EN_RE = re.compile(
 # goes. "Masło orzechowe" is peanut butter, so it becomes the peanut keyword.
 _NON_DAIRY_BUTTER_EN_RE = re.compile(
     r'\b(peanut|almond|cashew|hazelnut|walnut|pistachio|macadamia|sesame|coconut'
-    r'|sunflower|apple|cocoa|cacao|shea|nut)[ -]butter\b(?!\s+[a-z])'
+    r'|sunflower|apple|cocoa|cacao|shea|nut)(?: seed)?[ -]butter\b(?!\s+[a-z])'
 )
 _NON_DAIRY_BUTTER_PL_RE = re.compile(
     r'\bmaslo (orzechowe|kakaowe|shea|migdalowe|sezamowe|kokosowe'
     r'|z orzechow \w+|z orzeszki ziemne)\b(?!\s+[a-z])'
 )
 # Both Polish spellings of a peanut ("orzeszki ziemne", "orzechy ziemne") are
-# one keyword; the second would otherwise read "orzech" as a tree nut.
-_PL_PEANUT_RE = re.compile(r'\b(?:orzech|orzesz)\w* ziemn\w*')
+# one keyword; the second would otherwise read "orzech" as a tree nut. The
+# adjective is matched by its endings, not "ziemn\w*", which would also take
+# "ziemniak" (potato) and drop the tree nuts of "orzechy ziemniaki".
+_PL_PEANUT_RE = re.compile(r'\b(?:orzech|orzesz)\w* ziemn(?:e|a|y|ego|ej|ych|ym|ymi)\b')
+# "Groundnut" and "ground nuts" are British English for peanuts.
+_GROUNDNUT_RE = re.compile(r'\bground ?nuts?\b')
 # Bare "nut"/"nuts" as a word: the substring sits in coconut, donut and nutmeg,
 # and "nuts" also closes peanuts, so it cannot be a plain keyword.
 _NUT_WORD_RE = re.compile(r'\bnuts?\b')
@@ -268,6 +273,7 @@ def infer_allergens(name: str) -> list[str]:
     normalized = normalize_name(name)
     if not normalized:
         return []
+    normalized = _GROUNDNUT_RE.sub('peanut', normalized)
     normalized = _without_plant_milk(_PL_PEANUT_RE.sub('orzeszki ziemne', normalized))
     found: set[str] = {'nuts'} if _NUT_WORD_RE.search(normalized) else set()
     for keyword in _SORTED_KEYWORDS:
