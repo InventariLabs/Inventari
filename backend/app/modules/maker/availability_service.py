@@ -249,10 +249,10 @@ async def compute_availability(
         Number of batches to check. If None, computes ``max_batches`` only
         (each ingredient shows stock as ``available``, ``needed=0``).
     planned_qty
-        The output quantity to check, instead of ``batches``. The need is
-        the per-batch need times this, divided by the recipe's yield last:
-        5 planned against a yield of 3 is exactly 5 pieces of a 3-piece
-        line, where 5 / 3 batches times 3 is a trillionth over.
+        The output quantity to check, instead of ``batches``. The recipe is
+        exploded at this quantity, so 5 planned against a yield of 3 is
+        exactly 5 pieces of a 3-piece line at any depth, where 5 / 3 batches
+        times 3 is a trillionth over.
     location_id
         If set, check stock only at this location. Otherwise check globally.
 
@@ -330,13 +330,25 @@ async def compute_availability(
     max_batches = stock.max_batches
     has_unknown = stock.has_unknown
 
+    # A plan is exploded at its own quantity: a sub-assembly whose yield does
+    # not divide the plan has a per-batch need that is already rounded, and
+    # scaling it back is a trillionth over exactly what the stock holds. The
+    # one-batch explosion above stays for ``max_batches`` and for a batch count.
+    planned_needs: dict[UUID, Decimal] | None = None
+    if planned_qty is not None:
+        planned_needs, _uom_ids, _units = _aggregate_needs(
+            await bom_service.explode_by_recipe_with_uom(
+                db, organization_id, recipe_id, planned_qty
+            )
+        )
+
     # Build ingredient list.
     requested_batches = batches if batches is not None else Decimal('0')
     ingredients: list[IngredientAvailability] = []
     for child_id, per_batch in per_batch_needs.items():
         needed = (
-            per_batch * planned_qty / recipe.batch_yield_qty
-            if planned_qty is not None
+            planned_needs.get(child_id, Decimal('0'))
+            if planned_needs is not None
             else per_batch * requested_batches
         )
         available = converted_stocks.get(child_id, Decimal('0'))
@@ -580,32 +592,31 @@ async def shortage_signals_for_orders(
             settings.availability_check_scope, None, order.output_storage_location_id
         )
 
-    # One recipe round for the page, at one batch. Needs scale linearly
-    # with the batches an order plans, so the per-order figures are the
-    # unit needs times its batches — the same multiplication the per-order
-    # explosion performs, without repeating it per row. A recipe whose
+    # One recipe round for the page, each order exploded at its own plan:
+    # a need scaled from a one-batch explosion carries the rounded per-batch
+    # figure of any sub-assembly the yield does not divide, and a run with
+    # exactly enough stock would read as a trillionth short. A recipe whose
     # yield cannot scale a plan has no explosion to give (as before).
-    recipe_ids = {o.recipe_id for o in drafts}
-    explodable = {
-        recipe_id
-        for recipe_id in recipe_ids
-        if recipe_id is not None and (yields.get(recipe_id) or Decimal('0')) > 0
+    plans = {
+        (o.recipe_id, o.planned_qty)
+        for o in drafts
+        if o.recipe_id is not None and (yields.get(o.recipe_id) or Decimal('0')) > 0
     }
-    unit_needs: dict[
-        UUID,
+    needs_by_plan: dict[
+        tuple[UUID, Decimal],
         tuple[dict[UUID, Decimal], dict[UUID, UUID | None], dict[UUID, str | None]],
     ] = {}
-    for recipe_id, flat in (
-        await bom_service.explode_by_recipes_with_uom(db, organization_id, explodable)
+    for plan, flat in (
+        await bom_service.explode_by_recipes_with_uom(db, organization_id, plans)
     ).items():
         if flat:
-            unit_needs[recipe_id] = _aggregate_needs(flat)
+            needs_by_plan[plan] = _aggregate_needs(flat)
 
     stocks_by_scope: dict[UUID | None, dict[UUID, Decimal]] = {}
     children_by_scope: dict[UUID | None, set[UUID]] = {}
     for o in drafts:
         assert o.recipe_id is not None  # drafts is filtered on recipe_id
-        maps = unit_needs.get(o.recipe_id)
+        maps = needs_by_plan.get((o.recipe_id, o.planned_qty))
         if maps is None:
             continue
         children_by_scope.setdefault(_scope(o), set()).update(maps[0])
@@ -616,7 +627,7 @@ async def shortage_signals_for_orders(
 
     templates: dict[UUID, ProductTemplateDTO] | None = None
     uom_cache: dict[UUID, UomDTO | None] = {}
-    all_children = sorted({c for m in unit_needs.values() for c in m[0]})
+    all_children = sorted({c for m in needs_by_plan.values() for c in m[0]})
     if all_children:
         templates = await core_api.product_templates.get_many_async(
             db, organization_id, all_children
@@ -624,19 +635,14 @@ async def shortage_signals_for_orders(
     signals: dict[UUID, list[ShortageItem]] = {}
     for o in drafts:
         assert o.recipe_id is not None  # drafts is filtered on recipe_id
-        maps = unit_needs.get(o.recipe_id)
+        maps = needs_by_plan.get((o.recipe_id, o.planned_qty))
         if maps is None:
             continue
         needs, line_uom_ids, legacy_units = maps
-        # Multiply by the plan before dividing by the yield, as the
-        # explosion does: a plan the yield does not divide must not turn
-        # an exact need into one with a trillionth over.
-        planned, batch_yield = o.planned_qty, yields[o.recipe_id]
-        scaled = {child: qty * planned / batch_yield for child, qty in needs.items()}
         signals[o.id] = await _shortages_from_needs(
             db,
             organization_id,
-            needs=scaled,
+            needs=needs,
             line_uom_ids=line_uom_ids,
             legacy_units=legacy_units,
             stocks=stocks_by_scope[_scope(o)],
