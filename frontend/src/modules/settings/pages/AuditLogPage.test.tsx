@@ -1086,6 +1086,45 @@ describe("AuditLogPage", () => {
     expect(csv).toContain("IN/2026/009");
   });
 
+  it("keeps the sub-collections a deleted collection took in the file", async () => {
+    server.use(
+      http.get("/api/v1/audit-log", () =>
+        HttpResponse.json({
+          ...EMPTY_PAGE,
+          total: 1,
+          items: [
+            {
+              id: "a11",
+              organization_id: "o1",
+              user_id: "u1",
+              user_email: "admin@example.com",
+              action: "HARD_DELETE",
+              target_type: "recipe_collection",
+              target_id: "cac73194-0000-0000-0000-000000000001",
+              snapshot: { name: "Obiady" },
+              reason: null,
+              meta_data: {
+                removed_collections: [
+                  { id: "c-2", name: "Makarony" },
+                  { id: "c-3", name: "Carbonara" },
+                ],
+              },
+              created_at: "2026-09-02T20:52:00Z",
+            },
+          ],
+        }),
+      ),
+    );
+    const csv = await captureCsv(async () => {
+      renderPage();
+      await screen.findByText("Obiady");
+      await exportCsv();
+    });
+
+    expect(csv).toContain("removed_collections");
+    expect(csv).toContain("Makarony; Carbonara");
+  });
+
   it("names the changed paths inside a document, not the document twice", async () => {
     // One row took half a screen: a product's nutrition data from a food
     // database, printed whole before the arrow and whole after it.

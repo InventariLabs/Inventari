@@ -1,6 +1,5 @@
 import { devices } from "@playwright/test";
-import { test, expect } from "./fixtures/base";
-import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
+import { test, expect } from "./fixtures/auth";
 
 test.describe("Responsive layout — mobile viewport", () => {
   test.use({ viewport: devices["iPhone SE"].viewport });
@@ -41,21 +40,7 @@ test.describe("Responsive layout — mobile viewport", () => {
 test.describe("Responsive layout — authenticated pages", () => {
   test.use({ viewport: devices["iPhone SE"].viewport });
 
-  test("items list is scrollable on mobile", async ({ page, request }) => {
-    const { ApiHelper } = await import("./helpers/api");
-    const api = new ApiHelper(request);
-    const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    await page.context().addCookies([
-      {
-        name: "refresh_token",
-        value: auth.refresh_token,
-        domain: "localhost",
-        path: "/",
-        httpOnly: true,
-        secure: false,
-        sameSite: "Lax" as const,
-      },
-    ]);
+  test("items list is scrollable on mobile", async ({ page, authenticatedPage }) => {
     await page.goto("/inventory/items");
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
     const content = page.locator('main, [role="main"], #root > div').first();
@@ -66,74 +51,38 @@ test.describe("Responsive layout — authenticated pages", () => {
     expect(overflow).toBe(false);
   });
 
-  test("navigation hamburger/drawer opens on mobile", async ({
+  test("module switcher opens on mobile", async ({
     page,
-    request,
+    authenticatedPage,
   }) => {
-    const { ApiHelper } = await import("./helpers/api");
-    const api = new ApiHelper(request);
-    const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    await page.context().addCookies([
-      {
-        name: "refresh_token",
-        value: auth.refresh_token,
-        domain: "localhost",
-        path: "/",
-        httpOnly: true,
-        secure: false,
-        sameSite: "Lax" as const,
-      },
-    ]);
-
-    await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/inventory/items");
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
 
-    const bodyOrMain = page.locator("body").first();
-    await expect(bodyOrMain).toBeVisible({ timeout: 15000 });
-
-    const hamburger = page.getByRole("button", { name: /menu/i }).or(
-      page.locator('button[aria-label*="menu" i]').first()
-    ).first();
-    const hamburgerVisible = await hamburger.isVisible({ timeout: 5000 }).catch(() => false);
-    if (!hamburgerVisible) return;
-
-    await hamburger.click();
-    const drawer = page.locator('[role="dialog"], nav, aside, [class*="drawer"], [class*="sidebar"]').first();
-    const drawerVisible = await drawer.isVisible({ timeout: 5000 }).catch(() => false);
-    if (drawerVisible) return;
+    // The phone header has no hamburger: modules are reached from the switcher.
+    const switcher = page.getByRole("button", { name: /Switch module/ });
+    await expect(switcher).toBeVisible({ timeout: 10000 });
+    await switcher.click();
+    await expect(page.getByRole("menuitem", { name: "Warehouse" })).toBeVisible(
+      { timeout: 5000 },
+    );
   });
 
-  test("modal opens as bottom sheet on mobile", async ({ page, request }) => {
-    const { ApiHelper } = await import("./helpers/api");
-    const api = new ApiHelper(request);
-    const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    await page.context().addCookies([
-      {
-        name: "refresh_token",
-        value: auth.refresh_token,
-        domain: "localhost",
-        path: "/",
-        httpOnly: true,
-        secure: false,
-        sameSite: "Lax",
-      },
-    ]);
+  test("adding a product opens a form that fits the phone", async ({
+    page,
+    authenticatedPage,
+  }) => {
     await page.goto("/inventory/items");
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
-    const addBtn = page
-      .getByRole("button", { name: /add|dodaj|new|nowy|create/i })
-      .first();
-    if (!(await addBtn.isVisible({ timeout: 10000 }).catch(() => false))) return;
+    const addBtn = page.getByRole("button", { name: "Add product" });
+    await expect(addBtn).toBeVisible({ timeout: 10000 });
     await addBtn.click();
 
-    const modal = page
-      .locator('[role="dialog"], [class*="sheet"], [class*="modal"]')
-      .first();
-    const modalVisible = await modal.isVisible({ timeout: 10000 }).catch(() => false);
-    if (!modalVisible) return;
-    const box = await modal.boundingBox();
-    if (!box) return;
-    expect(box.width).toBeGreaterThan(0);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "New Product" }),
+    ).toBeVisible({ timeout: 10000 });
+    const overflow = await page.evaluate(
+      () => document.body.scrollWidth > document.body.clientWidth,
+    );
+    expect(overflow).toBe(false);
   });
 });

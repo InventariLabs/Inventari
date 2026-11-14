@@ -171,7 +171,10 @@ test.describe("Approvals + Documents — integration flow", () => {
   test("completes the document", async () => {
     const approval = await api.getDocumentApproval(token, docId);
     const approvalStatus = (approval as Record<string, unknown>)?.status;
-    if (approvalStatus === "IN_PROGRESS") return;
+    test.skip(
+      approvalStatus === "IN_PROGRESS",
+      "a leftover multi-stage workflow still waits for its next stage",
+    );
     const result = await api.completeDocument(token, docId);
     expect(result).toBeTruthy();
 

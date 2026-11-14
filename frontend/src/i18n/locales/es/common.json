@@ -767,6 +767,7 @@
         "approval_rejected": "Rechazada"
       },
       "reactivatedAfterBreaker": "Reactivado tras el corte del fusible",
+      "removedCollections": "Subcolecciones eliminadas: {{names}}",
       "poLine": {
         "tax": "IVA {{rate}} %",
         "product": "producto: {{name}}",

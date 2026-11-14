@@ -767,6 +767,7 @@
         "approval_rejected": "Abgelehnt"
       },
       "reactivatedAfterBreaker": "Nach der Abschaltung durch den Schutzschalter wieder aktiviert",
+      "removedCollections": "Entfernte Unterkollektionen: {{names}}",
       "poLine": {
         "tax": "{{rate}} % Steuer",
         "product": "Produkt: {{name}}",

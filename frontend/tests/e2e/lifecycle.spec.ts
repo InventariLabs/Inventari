@@ -145,10 +145,7 @@ test.describe("Item lifecycle — full state machine", () => {
     const editBtn = itemRow
       .getByRole("button", { name: /edit|zmień|aktualizuj/i })
       .first();
-    const editVisible = await editBtn
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (!editVisible) return;
+    await expect(editBtn).toBeVisible({ timeout: 5000 });
 
     await editBtn.click();
 

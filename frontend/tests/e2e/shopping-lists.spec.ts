@@ -54,11 +54,7 @@ test.describe("Shopping Lists — flow", () => {
     await page.goto(`/shopping-lists/${seedListId}`);
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
     const seeded = page.getByText("E2E-Item-Seed");
-    const visible = await seeded.isVisible({ timeout: 10000 }).catch(() => false);
-    if (!visible) {
-      await expect(page.locator("body")).not.toContainText(/error|błąd/i);
-      return;
-    }
+    await expect(seeded).toBeVisible({ timeout: 10000 });
   });
 
   test("creates a new shopping list via UI", async ({

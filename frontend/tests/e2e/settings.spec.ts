@@ -59,8 +59,7 @@ test.describe("Settings — organization & user preferences", () => {
       .locator("button")
       .filter({ hasText: /^(EN|PL)$/ })
       .first();
-    if (!(await langBtn.isVisible({ timeout: 5000 }).catch(() => false)))
-      return;
+    await expect(langBtn).toBeVisible({ timeout: 5000 });
     await langBtn.click();
     await page
       .getByRole("menuitem")
@@ -114,27 +113,14 @@ test.describe("Settings — organization & user preferences", () => {
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    const moduleHeading = page.getByRole("heading", {
-      level: 2,
-      name: /module management|moduły|modules/i,
-    });
-    if (
-      !(await moduleHeading.isVisible({ timeout: 10000 }).catch(() => false))
-    ) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 10000,
-      });
-      return;
-    }
-    const toggleSwitch = page.locator('[data-testid="module-toggle"]').first();
-    const toggleVisible = await toggleSwitch
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (!toggleVisible) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 10000,
-      });
-    }
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Modules" }),
+    ).toBeVisible({ timeout: 10000 });
+    // Every module card carries its own switch: Deactivate while it is on.
+    const toggleSwitch = page
+      .getByRole("button", { name: /^(Deactivate|Activate)$/ })
+      .first();
+    await expect(toggleSwitch).toBeVisible({ timeout: 5000 });
   });
 
   test("saves settings without errors", async ({ page, authenticatedPage }) => {

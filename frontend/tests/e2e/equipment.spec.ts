@@ -153,7 +153,7 @@ test.describe("Equipment — assets & seeding", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!assetId) return;
+    expect(assetId, "assetId set by an earlier step of this spec").toBeTruthy();
     await expect(assetId).toBeTruthy();
     await page.goto(`/equipment/${assetId}`);
 
@@ -380,7 +380,7 @@ test.describe("Equipment — valuation", () => {
   });
 
   test("asset valuation API returns depreciable data", async () => {
-    if (!assetId) return;
+    expect(assetId, "assetId set by an earlier step of this spec").toBeTruthy();
     const val = await api.getAssetValuation(token, assetId);
     expect(val).toBeTruthy();
     expect(val.is_depreciable).toBe(true);
@@ -430,7 +430,7 @@ test.describe("Equipment — valuation", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!assetId) return;
+    expect(assetId, "assetId set by an earlier step of this spec").toBeTruthy();
     await page.goto(`/equipment/${assetId}`);
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
@@ -443,6 +443,8 @@ test.describe("Equipment — valuation", () => {
 // ── New: checkout/checkin, maintenance, models, campaigns, retire ──────
 
 test.describe("Equipment — checkout/checkin flow", () => {
+  test.describe.configure({ mode: "serial" });
+
   let api: ApiHelper;
   let token: string;
   let assetId: string;
@@ -472,7 +474,10 @@ test.describe("Equipment — checkout/checkin flow", () => {
   });
 
   test("creates asset and checks it out via API", async () => {
-    if (!storageId) return;
+    expect(
+      storageId,
+      "storageId set by an earlier step of this spec",
+    ).toBeTruthy();
     const item = await api.createEquipmentItem(token, {
       name: "E2E-Checkout-Asset",
       quantity: 1,
@@ -496,7 +501,10 @@ test.describe("Equipment — checkout/checkin flow", () => {
   });
 
   test("checks in asset via API", async () => {
-    if (!assignmentId) return;
+    expect(
+      assignmentId,
+      "assignmentId set by an earlier step of this spec",
+    ).toBeTruthy();
     const result = await api.checkinAsset(token, assignmentId, {
       checkin_notes: "E2E checkin test",
       checkin_condition: "GOOD",
@@ -509,7 +517,7 @@ test.describe("Equipment — checkout/checkin flow", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!assetId) return;
+    expect(assetId, "assetId set by an earlier step of this spec").toBeTruthy();
     await page.goto(`/equipment/${assetId}`);
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
@@ -549,7 +557,10 @@ test.describe("Equipment — checkout from detail header", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!storageId) return;
+    expect(
+      storageId,
+      "storageId set by an earlier step of this spec",
+    ).toBeTruthy();
     const item = await api.createEquipmentItem(token, {
       name: "E2E-Header-Checkout-Asset",
       quantity: 1,
@@ -619,7 +630,7 @@ test.describe("Equipment — maintenance logs", () => {
   });
 
   test("adds maintenance log via API", async () => {
-    if (!assetId) return;
+    expect(assetId, "assetId set by an earlier step of this spec").toBeTruthy();
     const log = await api.addMaintenanceLog(token, {
       item_id: assetId,
       maintenance_type: "INSPECTION",
@@ -633,14 +644,14 @@ test.describe("Equipment — maintenance logs", () => {
   });
 
   test("lists maintenance logs for asset", async () => {
-    if (!assetId) return;
+    expect(assetId, "assetId set by an earlier step of this spec").toBeTruthy();
     const logs = await api.listMaintenanceLogs(token, assetId);
     expect(Array.isArray(logs)).toBe(true);
     expect(logs.length).toBeGreaterThan(0);
   });
 
   test("edits maintenance log via API", async () => {
-    if (!logId) return;
+    expect(logId, "logId set by an earlier step of this spec").toBeTruthy();
     const updated = await api.editMaintenanceLog(token, logId, {
       title: "E2E Updated Inspection",
       cost: 150.0,
@@ -652,7 +663,7 @@ test.describe("Equipment — maintenance logs", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!assetId) return;
+    expect(assetId, "assetId set by an earlier step of this spec").toBeTruthy();
     await page.goto(`/equipment/${assetId}`);
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
@@ -701,7 +712,7 @@ test.describe("Equipment — models CRUD", () => {
   });
 
   test("updates model via API", async () => {
-    if (!modelId) return;
+    expect(modelId, "modelId set by an earlier step of this spec").toBeTruthy();
     const updated = await api.updateModel(token, modelId, {
       name: "E2E-Updated-Model",
     });
@@ -709,7 +720,7 @@ test.describe("Equipment — models CRUD", () => {
   });
 
   test("clones model via API", async () => {
-    if (!modelId) return;
+    expect(modelId, "modelId set by an earlier step of this spec").toBeTruthy();
     try {
       const cloned = await api.cloneModel(token, modelId);
       expect(cloned.id).toBeTruthy();
@@ -735,6 +746,8 @@ test.describe("Equipment — models CRUD", () => {
 });
 
 test.describe("Equipment — campaigns", () => {
+  test.describe.configure({ mode: "serial" });
+
   let api: ApiHelper;
   let token: string;
   let campaignId: string;
@@ -769,7 +782,10 @@ test.describe("Equipment — campaigns", () => {
   });
 
   test("launches campaign via API", async () => {
-    if (!campaignId) return;
+    expect(
+      campaignId,
+      "campaignId set by an earlier step of this spec",
+    ).toBeTruthy();
     try {
       const result = await api.launchCampaign(token, campaignId);
       expect(result).toBeTruthy();
@@ -815,7 +831,10 @@ test.describe("Equipment — retire", () => {
   });
 
   test("creates and retires asset via API", async () => {
-    if (!storageId) return;
+    expect(
+      storageId,
+      "storageId set by an earlier step of this spec",
+    ).toBeTruthy();
     const item = await api.createEquipmentItem(token, {
       name: "E2E-Retire-Asset",
       quantity: 1,
@@ -834,7 +853,10 @@ test.describe("Equipment — retire", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!storageId) return;
+    expect(
+      storageId,
+      "storageId set by an earlier step of this spec",
+    ).toBeTruthy();
     // Self-contained: creates its own asset instead of relying on test order
     // (a retry re-runs only this test, leaving the shared assetId empty).
     const name = `E2E-Archive-Detail-${Date.now()}`;

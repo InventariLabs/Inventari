@@ -98,7 +98,7 @@ test.describe("Categories — CRUD flow", () => {
       .getByRole("button", { name: /edit|edytuj/i })
       .first();
 
-    if ((await editBtn.count()) === 0) return;
+    await expect(editBtn).toHaveCount(1);
     await editBtn.click({ force: true });
 
     const input = page.locator('input[required], input[name="name"]').first();

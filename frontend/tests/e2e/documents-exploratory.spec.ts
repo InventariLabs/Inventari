@@ -81,7 +81,7 @@ test.describe("Documents Exploratory — Full User Workflow", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!storageId) return;
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
     const doc = await api.createDocument(token, {
       type: "INT",
       source_location_id: storageId,
@@ -116,27 +116,31 @@ test.describe("Documents Exploratory — Full User Workflow", () => {
     page,
     authenticatedPage,
   }) => {
-    if (!storageId) return;
-    const uniqueName = `Exploratory-${Date.now()}`;
-    const doc = await api.createDocument(token, {
-      type: "INT",
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
+    // The list is the history of what moved goods: a draft is not in it, so
+    // the document is executed first, and found by a product only it holds.
+    const lineName = `Exploratory-${Date.now()}`;
+    const created = await api.createIntDocumentWithStock(token, {
       source_location_id: storageId,
       target_location_id: storageId,
-      notes: uniqueName,
-      lines: [{ name: "Search Item", expected_quantity: 1 }],
+      lines: [{ name: lineName, expected_quantity: 1 }],
     });
-    cleanupIds.push(doc.id);
+    cleanupIds.push(created.id);
+    await api.confirmDocument(token, created.id);
+    await api.completeDocument(token, created.id);
+    const doc = await api.getDocument(token, created.id);
 
     await page.goto("/warehouse");
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    const searchInput = page.getByPlaceholder(/search|szukaj/i).first();
-    if (!(await searchInput.isVisible({ timeout: 5000 }).catch(() => false)))
-      return;
+    const searchInput = page.getByRole("textbox", {
+      name: "Product, partner or document number",
+    });
+    await expect(searchInput).toBeVisible({ timeout: 5000 });
 
-    await searchInput.fill(doc.number);
+    await searchInput.fill(lineName);
     // The document should appear in filtered results. Wait for the number to
     // render (the list search is debounced) instead of a fixed sleep, which
     // raced under CI load and produced a flaky failure.
@@ -321,7 +325,7 @@ test.describe("Documents Exploratory — Form Edge Cases", () => {
   });
 
   test("creating document with many lines via API", async () => {
-    if (!storageId) return;
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
     const lines = Array.from({ length: 15 }, (_, i) => ({
       name: `Line-Item-${i}`,
       expected_quantity: i + 1,
@@ -337,7 +341,7 @@ test.describe("Documents Exploratory — Form Edge Cases", () => {
   });
 
   test("document with special characters in notes via API", async () => {
-    if (!storageId) return;
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
     const doc = await api.createDocument(token, {
       type: "INT",
       source_location_id: storageId,
@@ -350,7 +354,7 @@ test.describe("Documents Exploratory — Form Edge Cases", () => {
   });
 
   test("document with all line fields via API", async () => {
-    if (!storageId) return;
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
     const doc = await api.createDocument(token, {
       type: "INT",
       source_location_id: storageId,
@@ -376,7 +380,7 @@ test.describe("Documents Exploratory — Form Edge Cases", () => {
   });
 
   test("confirm document via API shows correct status", async () => {
-    if (!storageId) return;
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
     const doc = await api.createIntDocumentWithStock(token, {
       source_location_id: storageId,
       target_location_id: storageId,
@@ -389,7 +393,7 @@ test.describe("Documents Exploratory — Form Edge Cases", () => {
   });
 
   test("cancel document via API shows correct status", async () => {
-    if (!storageId) return;
+    expect(storageId, "the spec created its own storage location").toBeTruthy();
     const doc = await api.createDocument(token, {
       type: "INT",
       source_location_id: storageId,

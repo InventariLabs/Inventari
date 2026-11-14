@@ -239,7 +239,7 @@ test.describe("Approvals — reject flow", () => {
   });
 
   test("creates workflow for document approval", async () => {
-    if (!workflowId) return;
+    expect(workflowId, "the workflow the setup created").toBeTruthy();
   });
 
   test("rejects an approval request via API", async () => {
@@ -256,18 +256,16 @@ test.describe("Approvals — reject flow", () => {
       await api.requestDocumentApproval(token, doc.id);
       const approval = await api.getDocumentApproval(token, doc.id);
       const reqId = (approval as Record<string, unknown>)?.request_id as string;
-      if (!reqId) return;
+      expect(reqId, "the approval request of the document").toBeTruthy();
 
       const rejected = await api.rejectRequest(token, reqId, {
         notes: "E2E rejection test",
       });
       expect(rejected).toBeTruthy();
       expect(rejected.status).toBe("REJECTED");
-    } catch {
-      // If approval request creation fails, test passes as skipped
+    } finally {
+      await api.cancelDocument(token, doc.id).catch(() => {});
     }
-
-    await api.cancelDocument(token, doc.id).catch(() => {});
     await api.deleteDocument(token, doc.id).catch(() => {});
   });
 });
@@ -348,7 +346,7 @@ test.describe("Approvals — workflow lifecycle via API", () => {
     });
 
     test("creates 2-stage workflow", async () => {
-      if (!workflowId) return;
+      expect(workflowId, "the workflow the setup created").toBeTruthy();
       // stages may not be immediately visible — poll briefly
       let stages: Array<Record<string, unknown>> = [];
       for (let i = 0; i < 5; i++) {
@@ -373,17 +371,14 @@ test.describe("Approvals — workflow lifecycle via API", () => {
 
       await api.confirmDocument(token, docId);
 
-      try {
-        await api.requestDocumentApproval(token, docId);
-        const approval = await api.getDocumentApproval(token, docId);
-        requestId = (approval as Record<string, unknown>)?.request_id as string;
-      } catch {
-        // Approval request may not be created
-      }
+      await api.requestDocumentApproval(token, docId);
+      const approval = await api.getDocumentApproval(token, docId);
+      requestId = (approval as Record<string, unknown>)?.request_id as string;
+      expect(requestId, "the approval request of the document").toBeTruthy();
     });
 
     test("verifies approval is pending at stage 1", async () => {
-      if (!requestId) return;
+      expect(requestId, "the approval request of the document").toBeTruthy();
       const req = await api.getRequest(token, requestId);
       expect(req.current_stage).toBe(1);
       expect(req.total_stages).toBe(2);
@@ -391,17 +386,13 @@ test.describe("Approvals — workflow lifecycle via API", () => {
     });
 
     test("approves stage 1 — status stays PENDING (stage 2)", async () => {
-      if (!requestId) return;
-      try {
-        await api.approveRequest(token, requestId, {
-          notes: "Stage 1 approved",
-        });
-        const req = await api.getRequest(token, requestId);
-        expect(req.current_stage).toBe(2);
-        expect(req.status).toBe("PENDING");
-      } catch {
-        // If approval fails (e.g., permissions), skip
-      }
+      expect(requestId, "the approval request of the document").toBeTruthy();
+      await api.approveRequest(token, requestId, {
+        notes: "Stage 1 approved",
+      });
+      const req = await api.getRequest(token, requestId);
+      expect(req.current_stage).toBe(2);
+      expect(req.status).toBe("PENDING");
     });
   });
 
@@ -449,7 +440,7 @@ test.describe("Approvals — workflow lifecycle via API", () => {
     });
 
     test("updates workflow name via API", async () => {
-      if (!workflowId) return;
+      expect(workflowId, "the workflow the setup created").toBeTruthy();
       const updated = await api.updateWorkflow(token, workflowId, {
         name: "E2E-Updated-Workflow",
       });
@@ -457,7 +448,7 @@ test.describe("Approvals — workflow lifecycle via API", () => {
     });
 
     test("verifies updated workflow via get", async () => {
-      if (!workflowId) return;
+      expect(workflowId, "the workflow the setup created").toBeTruthy();
       const wf = await api.getWorkflow(token, workflowId);
       expect(wf.name).toBe("E2E-Updated-Workflow");
     });

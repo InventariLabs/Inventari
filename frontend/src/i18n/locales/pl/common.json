@@ -769,6 +769,7 @@
         "approval_rejected": "Odrzucono"
       },
       "reactivatedAfterBreaker": "Wznowione po odcięciu przez bezpiecznik",
+      "removedCollections": "Usunięte podkolekcje: {{names}}",
       "poLine": {
         "tax": "VAT {{rate}}%",
         "product": "produkt: {{name}}",
