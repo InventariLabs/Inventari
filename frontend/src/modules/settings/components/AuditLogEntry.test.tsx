@@ -218,3 +218,35 @@ describe("AuditDetail — the document behind the row", () => {
     expect(screen.queryByText("Document:")).toBeNull();
   });
 });
+
+describe("AuditDetail — the sub-collections a deleted collection took", () => {
+  const deletion = (meta: Record<string, unknown> | null): AuditLogEntry => ({
+    ...quantityRow(meta),
+    action: "HARD_DELETE",
+    target_type: "recipe_collection",
+    snapshot: { name: "Obiady" },
+    reason: null,
+  });
+
+  it("names every sub-collection that went with it", () => {
+    renderDetail(
+      deletion({
+        removed_collections: [
+          { id: "c-2", name: "Makarony" },
+          { id: "c-3", name: "Carbonara" },
+        ],
+      }),
+    );
+
+    expect(
+      screen.getByText("Sub-collections removed: Makarony, Carbonara"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows nothing extra when none went", () => {
+    renderDetail(deletion(null));
+
+    expect(screen.queryByText(/Sub-collections removed/)).toBeNull();
+    expect(screen.getByText("—")).toBeInTheDocument();
+  });
+});

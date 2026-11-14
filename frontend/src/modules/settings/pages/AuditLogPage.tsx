@@ -57,6 +57,7 @@ import {
   AuditLogEntryCard,
   AuditTarget,
   apiKeyActor,
+  removedCollectionNames,
   targetTypeLabel,
 } from "@/modules/settings/components/AuditLogEntry";
 import { useModuleSettingTitles } from "@/modules/settings/hooks/useModuleSettingTitles";
@@ -174,6 +175,7 @@ function auditLogCsv(rows: AuditLogEntry[]): string {
     "target_label",
     "reason",
     "snapshot",
+    "removed_collections",
   ];
   const pickName = (r: AuditLogEntry): string =>
     snapshotIdentity(r.snapshot) ?? "";
@@ -189,6 +191,7 @@ function auditLogCsv(rows: AuditLogEntry[]): string {
     pickName(r),
     r.reason ?? "",
     r.snapshot ? JSON.stringify(r.snapshot) : "",
+    removedCollectionNames(r).join("; "),
   ]);
   return toCsv([header, ...body]);
 }
