@@ -51,7 +51,7 @@ function Source({ entry }: { entry: LotTraceEntry }) {
         <span className="block text-xs text-on-muted">{kind}</span>
       )}
       {href ? (
-        <Link to={href} className="text-sm text-primary-600 hover:underline">
+        <Link to={href} className="text-sm text-on-primary hover:underline">
           {label}
         </Link>
       ) : (
@@ -71,7 +71,7 @@ function Made({ entry }: { entry: LotTraceEntry }) {
           {t("inventory:lot.trace.madeInto")}{" "}
           <Link
             to={`/inventory/lots/${made.lot_id}`}
-            className="text-primary-600 hover:underline"
+            className="text-on-primary hover:underline"
           >
             {made.lot_name}
           </Link>
@@ -177,7 +177,7 @@ function LotSteps({
           {t("inventory:lot.trace.madeFrom", { lot: madeFromName })}{" "}
           <Link
             to={`/inventory/lots/${lot.lot_id}`}
-            className="font-medium text-primary-600 hover:underline"
+            className="font-medium text-on-primary hover:underline"
           >
             {lot.lot_name}
           </Link>
