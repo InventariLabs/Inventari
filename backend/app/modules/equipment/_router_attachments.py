@@ -80,7 +80,7 @@ async def delete_attachment(
     org_id: UUID = Depends(require_org),
 ) -> None:
     file_path = await attachment_service.delete_attachment(
-        db, org_id, attachment_id, current_user.id
+        db, org_id, item_id, attachment_id, current_user.id
     )
     # After the response, which is after the session committed the row away:
     # a request that fails first never deletes the file its row still names.
