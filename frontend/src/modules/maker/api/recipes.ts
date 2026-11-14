@@ -131,6 +131,56 @@ export const recipeApi = {
     return response.data;
   },
 
+  /** Type the price of an ingredient the records do not price; null clears it. */
+  setIngredientPrice: async (
+    templateId: string,
+    unitPrice: string | null,
+  ): Promise<{ product_template_id: string; unit_price: string | null }> => {
+    const response = await api.put<{
+      product_template_id: string;
+      unit_price: string | null;
+    }>(`/maker/recipes/ingredient-prices/${templateId}`, {
+      unit_price: unitPrice,
+    });
+    return response.data;
+  },
+
+  /**
+   * Add a record of an ingredient the formula needs, at what it cost.
+   *
+   * The core door a person uses to enter stock: one record on a shelf, its
+   * movement and its cost layer written in the same call. Reachable from the
+   * formula page so a missing ingredient is one dialog away.
+   */
+  addIngredientStock: async (data: {
+    name: string;
+    template_id: string;
+    location_id: string;
+    quantity: string;
+    purchase_price: string | null;
+  }): Promise<void> => {
+    await api.post("/items", {
+      ...data,
+      purchase_price: data.purchase_price === "" ? null : data.purchase_price,
+    });
+  },
+
+  /** Raise a draft purchase order for one batch's missing ingredients. */
+  orderShortages: async (
+    recipeId: string,
+  ): Promise<{
+    purchase_order_id: string | null;
+    number: string | null;
+    added_count: number;
+  }> => {
+    const response = await api.post<{
+      purchase_order_id: string | null;
+      number: string | null;
+      added_count: number;
+    }>(`/maker/recipes/${recipeId}/shortages/purchase-order`);
+    return response.data;
+  },
+
   getAvailability: async (
     recipeId: string,
     params?: { batches?: string; location_id?: string },

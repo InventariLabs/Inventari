@@ -46,6 +46,11 @@ class ProductionOrderLineRead(BaseModel):
     source_location_id: UUID | None
     unit_cost_snapshot: Decimal | None
     cost_source: str | None
+    #: What the formula predicted for this ingredient when the run closed:
+    #: its standard quantity for the output that came out, at the estimated
+    #: rate. ``None`` on runs that closed before the estimate was kept.
+    estimated_qty: Decimal | None = None
+    estimated_unit_cost_snapshot: Decimal | None = None
     # What the records lacked of ``consumed_qty`` on a run recorded after the
     # fact (None when the run drew it all) — the ingredient is due a count.
     shortfall_qty: Decimal | None = None
@@ -95,6 +100,9 @@ class ProductionOrderRead(BaseModel):
     output_location_id: UUID
     status: str
     total_cost: Decimal | None
+    #: The cost the formula predicted when the run closed, beside the cost
+    #: it actually carried — the two figures the page puts side by side.
+    estimated_total_cost: Decimal | None = None
     production_date: date | None
     notes: str | None
     created_by: UUID | None
@@ -222,6 +230,8 @@ class ProductionPreviewResponse(CostBreakdownResponse):
     has_shortage: bool = False
     batch_yield_qty: Decimal | None = None
     fixed_cost: Decimal = Decimal('0')
+    #: The batch's labour, from the timed steps at the organization's rate.
+    labour_cost: Decimal = Decimal('0')
     unit_cost: Decimal | None = None
     reference_price: Decimal | None = None
     result_per_unit: Decimal | None = None

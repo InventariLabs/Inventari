@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { useCanManage } from "@/hooks/useCanWrite";
@@ -87,6 +88,7 @@ export function MakerSettingsPanel() {
   const [allowOver, setAllowOver] = useState(true);
   const [scope, setScope] = useState<AvailabilityCheckScope>("GLOBAL");
   const [strategy, setStrategy] = useState<CreateOnShortageStrategy>("ALLOW");
+  const [hourlyRate, setHourlyRate] = useState("0");
   const [initialized, setInitialized] = useState(false);
 
   // Sync local state when settings load.
@@ -95,6 +97,7 @@ export function MakerSettingsPanel() {
     setAllowOver(settings.allow_overproduction);
     setScope(settings.availability_check_scope);
     setStrategy(settings.create_on_shortage_strategy);
+    setHourlyRate(settings.labor_hourly_rate ?? "0");
     setInitialized(true);
   }
 
@@ -295,6 +298,41 @@ export function MakerSettingsPanel() {
               data-testid="maker-settings-scope-per-location"
             >
               {t("settings.scopePerLocation")}
+            </Button>
+          </div>
+        </Card>
+
+        {/* Labour rate — what the timed steps cost */}
+        <Card className="p-4">
+          <h3 className="text-sm font-semibold text-on mb-1">
+            {t("settings.laborHourlyRate")}
+          </h3>
+          <p className="text-xs text-on-muted mb-3">
+            {t("settings.laborHourlyRateHint")}
+          </p>
+          <div className="flex items-end gap-2">
+            <Input
+              wrapperClassName="w-32"
+              type="number"
+              min="0"
+              step="0.01"
+              value={hourlyRate}
+              onChange={(e) => setHourlyRate(e.target.value)}
+              aria-label={t("settings.laborHourlyRate")}
+              data-testid="maker-settings-labor-rate"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                const value = hourlyRate.trim();
+                if (value === "" || Number.isNaN(Number(value))) return;
+                handleSave({ labor_hourly_rate: value });
+              }}
+              disabled={updateMutation.isPending}
+              data-testid="maker-settings-labor-rate-save"
+            >
+              {t("common:actions.save")}
             </Button>
           </div>
         </Card>

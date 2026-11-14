@@ -35,6 +35,24 @@ def _register_work_item_provider() -> None:
 _register_work_item_provider()
 
 
+def _register_typed_prices() -> None:
+    """Let Core's estimate policy ask the prices typed on a product.
+
+    The table is this module's; the order of the answers — layers, then a
+    supplier's quote, then a typed price — is Core's. A feature that wants
+    its own source plugs in the same way, which is why the port lives in
+    Core beside the supplier one.
+    """
+    from app.core.cost_estimates import register_typed_price_provider
+
+    from .ingredient_prices import typed_rates_async
+
+    register_typed_price_provider(typed_rates_async)
+
+
+_register_typed_prices()
+
+
 module = define_module(
     router_factory=_get_router,
     interceptors=_get_interceptors(),

@@ -324,3 +324,32 @@ describe("ProductionOrderStats", () => {
     });
   });
 });
+
+describe("ProductionOrderStats — the estimate beside the actual", () => {
+  it("shows what the formula predicted when the run closed", () => {
+    render(
+      <ProductionOrderStats
+        order={order({
+          status: "COMPLETED",
+          actual_qty: "10",
+          total_cost: "50.00",
+          estimated_total_cost: "48.20",
+        })}
+      />,
+    );
+    expect(screen.getByText("Estimated at completion")).toBeInTheDocument();
+    expect(screen.getByText("PLN 48.20")).toBeInTheDocument();
+    expect(screen.getByText("Actual difference: PLN 1.80")).toBeInTheDocument();
+  });
+
+  it("shows no estimate on a run that closed before one was kept", () => {
+    render(
+      <ProductionOrderStats
+        order={order({ status: "COMPLETED", actual_qty: "10" })}
+      />,
+    );
+    expect(
+      screen.queryByText("Estimated at completion"),
+    ).not.toBeInTheDocument();
+  });
+});

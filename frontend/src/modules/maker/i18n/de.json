@@ -194,7 +194,9 @@
       "totalCostAfterClosing": "Gesamtkosten nach Abschluss",
       "unitCost": "{{amount}} pro {{unit}}",
       "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
-      "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann."
+      "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
+      "estimatedAtCompletion": "Schätzung bei Abschluss",
+      "estimatedDifference": "Tatsächliche Abweichung: {{amount}}"
     },
     "ingredients": "Verbrauchte Zutaten",
     "emptyLines": "Für diesen Lauf wurden keine Zutaten erfasst.",
@@ -225,7 +227,10 @@
       "saveFailed": "Zeile konnte nicht aktualisiert werden",
       "shortLabel": "fehlt",
       "unmeasurableShort": "fehlt — mit der Bestandseinheit nicht vergleichbar",
-      "shortfall": "{{quantity}} nicht im Bestand erfasst — zu zählen"
+      "shortfall": "{{quantity}} nicht im Bestand erfasst — zu zählen",
+      "estimated": "Gesch. {{amount}}",
+      "priceEffect": "aus Preis {{amount}}",
+      "qtyEffect": "aus Menge {{amount}}"
     },
     "edit": "Bearbeiten",
     "save": "Speichern",
@@ -279,7 +284,9 @@
       "deleteConfirm": {
         "title": "Kostenposition löschen?",
         "description": "\"{{label}}\" aus den Fixkosten entfernen?"
-      }
+      },
+      "labourFromSteps": "Arbeitszeit aus den Schritten",
+      "labourTime": "{{minutes}} Min. zum Stundensatz"
     },
     "history": {
       "title": "Produktionsverlauf",
@@ -319,7 +326,11 @@
     },
     "notFound": "Fertigungsauftrag nicht gefunden",
     "plannedShortageHint_one": "Der geplante Verbrauch übersteigt den Bestand — {{count}} Zutat fehlt. Der Abschluss dieser Produktion wird abgelehnt.",
-    "plannedShortageHint_other": "Der geplante Verbrauch übersteigt den Bestand — {{count}} Zutaten fehlen. Der Abschluss dieser Produktion wird abgelehnt."
+    "plannedShortageHint_other": "Der geplante Verbrauch übersteigt den Bestand — {{count}} Zutaten fehlen. Der Abschluss dieser Produktion wird abgelehnt.",
+    "processStepMinutes": "{{minutes}} Min.",
+    "processStepMinutesLabel": "Minuten für Schritt {{number}}",
+    "minutesShort": "Min.",
+    "minutesPlaceholder": "Min."
   },
   "bom": {
     "childLabel": "Zutat",
@@ -360,7 +371,13 @@
       "duplicateIngredient": "Diese Formel enthält die Zutat bereits.",
       "removeIngredient": "Zutat konnte nicht entfernt werden",
       "yieldInvalid": "Die Menge, die die Formel ergibt, muss größer als null sein."
-    }
+    },
+    "typedPrice": "Eingetragener Preis",
+    "typedPriceHint": "Gilt, wenn es keinen Lagerkostenwert und keinen Lieferantenpreis gibt. Am Produkt gespeichert, damit jede Formel mit dieser Zutat gleich rechnet.",
+    "setPrice": "Preis festlegen",
+    "editPrice": "Preis ändern",
+    "priceSaved": "Preis gespeichert",
+    "priceSaveFailed": "Preis konnte nicht gespeichert werden"
   },
   "tree": {
     "title": "Mehrstufige Stückliste",
@@ -467,7 +484,9 @@
     "whereReferenceDirection": "So heißt das Ergebnis auf den Formelkarten, in Aufträgen und in der Monatsübersicht.",
     "immediateNote": "Jede Auswahl wird sofort gespeichert. Es gibt kein Rückgängig — stellen Sie sie ebenso zurück.",
     "advanced": "Erweitert",
-    "advancedHint": "Regeln für Fehlmengen und Überproduktion. Die Standardwerte passen für eine kleine Werkstatt."
+    "advancedHint": "Regeln für Fehlmengen und Überproduktion. Die Standardwerte passen für eine kleine Werkstatt.",
+    "laborHourlyRate": "Stundensatz für eigene Arbeit",
+    "laborHourlyRateHint": "Die Arbeit einer Formel ist die Zeit ihrer Schritte zu diesem Satz. Null heißt, Arbeit kostet in Schätzungen nichts."
   },
   "availability": {
     "maxBatches": "Max. Chargen aus Bestand",
@@ -536,5 +555,28 @@
       "label": "Ersparnis ggü. Ladenpreis",
       "definition": "Ladenpreis minus Herstellkosten"
     }
+  },
+  "shortage": {
+    "title": "Für diese Formel fehlen Zutaten im Bestand",
+    "body": "Nicht im Bestand: {{names}}.",
+    "unmeasurable": "Einheiten lassen sich nicht mit dem Bestand vergleichen",
+    "missing": "es fehlen {{quantity}}",
+    "addStock": "Bestand hinzufügen",
+    "order": "Fehlendes bestellen",
+    "nothingToOrder": "Alles ist vorrätig — nichts bestellt.",
+    "ordered": "Bestellentwurf {{number}} mit {{lines}} Positionen angelegt.",
+    "orderFailed": "Bestellung konnte nicht angelegt werden",
+    "addStockTitle": "Vorhandenen Bestand hinzufügen",
+    "addStockHint": "Ein Eintrag pro Zutat: Menge und Einkaufspreis. Jeder legt einen Bestandseintrag zu diesem Preis an.",
+    "location": "Ort",
+    "noLocations": "Kein Ort verfügbar",
+    "needs": "Bedarf {{quantity}}",
+    "quantity": "Menge",
+    "price": "Preis pro Einheit",
+    "priceHint": "Optional — legt eine Kostenebene an.",
+    "stockFallbackName": "Zutat",
+    "addStockSave": "Bestand hinzufügen ({{saved}})",
+    "stockSaved": "Bestand gespeichert.",
+    "stockSaveFailed": "Bestand konnte nicht gespeichert werden."
   }
 }

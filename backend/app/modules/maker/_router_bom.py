@@ -67,11 +67,14 @@ async def _attach_child_names(
     ids = {line.child_template_id for line in lines}
     if not ids:
         return
+    from .ingredient_prices import typed_rates_async
+
     templates = await core_api.product_templates.list_for_org_async(
         db, org_id, limit=10_000
     )
     names = {t.id: t.name for t in templates}
     images = {t.id: t.image_url for t in templates}
+    typed_prices = await typed_rates_async(db, org_id, list(ids))
     for line in lines:
         # ``child_template_name``/``child_template_image_url`` are transient,
         # non-persisted attributes that ``BoMLineRead.model_validate()``
@@ -80,6 +83,9 @@ async def _attach_child_names(
         # Table form).
         setattr(line, 'child_template_name', names.get(line.child_template_id))  # noqa: B010
         setattr(line, 'child_template_image_url', images.get(line.child_template_id))  # noqa: B010
+        # The typed price is the product's, read for the whole page in one
+        # query rather than per line.
+        setattr(line, 'typed_unit_price', typed_prices.get(line.child_template_id))  # noqa: B010
 
 
 def _collect_tree_lines(node: dict[str, Any], acc: list[BoMLine]) -> None:

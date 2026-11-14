@@ -30,6 +30,11 @@ class BoMLineRead(BaseModel):
     # The ingredient's picture is its product's picture — same source of
     # truth the catalog rows use.
     child_template_image_url: str | None = None
+    # The price typed once on the product, for an ingredient the stock
+    # records and the suppliers do not price. It is the fallback the shared
+    # estimate asks last; the line carries it so the formula's own screen can
+    # show it and offer to set it.
+    typed_unit_price: Decimal | None = None
 
 
 class BoMTemplateIdsResponse(BaseModel):

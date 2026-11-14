@@ -132,3 +132,40 @@ async def compute_unit_cost(
         db, organization_id, template_id, planned_qty, recipe_id
     )
     return total / planned_qty if total > 0 else Decimal('0')
+
+
+def process_minutes(recipe: MakerRecipe) -> Decimal:
+    """How long the formula's steps take, in minutes.
+
+    A step saved before steps carried durations has no time and adds none.
+    """
+    total = Decimal('0')
+    for step in recipe.process_steps or []:
+        if not isinstance(step, dict):
+            continue
+        minutes = step.get('minutes')
+        if minutes is not None:
+            total += Decimal(str(minutes))
+    return total
+
+
+def labour_cost_per_batch(recipe: MakerRecipe, hourly_rate: Decimal | None) -> Decimal:
+    """The batch's own labour: its steps' time at the organization's rate.
+
+    Zero is a real answer — nobody timed the steps, or nobody named a rate.
+    The caller shows the line only when it is above zero, so an untimed
+    formula does not claim its labour was free.
+    """
+    if hourly_rate is None or hourly_rate <= 0:
+        return Decimal('0')
+    minutes = process_minutes(recipe)
+    if minutes <= 0:
+        return Decimal('0')
+    from app.core.money import quantise
+
+    return quantise(minutes / Decimal('60') * hourly_rate, 2)
+
+
+def fixed_cost_per_batch(recipe: MakerRecipe) -> Decimal:
+    """The fixed cost lines of one batch, summed."""
+    return sum((line.amount for line in recipe.cost_lines), Decimal('0'))

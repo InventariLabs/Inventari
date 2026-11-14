@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { useCanManage } from "@/hooks/useCanWrite";
 import { useUpdateMakerRecipe } from "@/modules/maker/hooks/useRecipes";
@@ -14,12 +15,27 @@ interface RecipeProcessStepsProps {
   recipe: MakerRecipe;
 }
 
+/** A step while it is being edited: the time is a text field too. */
+interface DraftStep {
+  text: string;
+  minutes: string;
+}
+
+function toDraft(steps: MakerRecipe["process_steps"]): DraftStep[] {
+  return (steps ?? []).map((step) => ({
+    text: step.text,
+    minutes: step.minutes ?? "",
+  }));
+}
+
 /**
  * Ordered how-to steps for a recipe.
  *
  * The edit affordance is a labelled button, not a bare pencil icon: the
  * section used to look read-only, so nobody found the only way to write
- * the process down.
+ * the process down. Each step carries how long it takes, because that time
+ * at the production settings' hourly rate is the batch's labour cost — the
+ * line the cost tab shows beside the fixed ones.
  */
 export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
   const { t } = useTranslation("maker");
@@ -29,8 +45,9 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
   // with everybody.
   const canManage = useCanManage("maker");
   // null = not editing; otherwise the draft step list.
-  const [draft, setDraft] = useState<string[] | null>(null);
+  const [draft, setDraft] = useState<DraftStep[] | null>(null);
   const [newStep, setNewStep] = useState("");
+  const [newMinutes, setNewMinutes] = useState("");
 
   const steps = recipe.process_steps ?? [];
 
@@ -39,7 +56,12 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
     // A step edited down to nothing is a deletion the operator started and
     // did not finish — saving a blank line would show as an empty numbered
     // row forever.
-    const cleaned = draft.map((step) => step.trim()).filter(Boolean);
+    const cleaned = draft
+      .filter((step) => step.text.trim() !== "")
+      .map((step) => ({
+        text: step.text.trim(),
+        minutes: step.minutes.trim() === "" ? null : step.minutes.trim(),
+      }));
     try {
       await updateRecipe.mutateAsync({
         recipeId: recipe.id,
@@ -47,6 +69,7 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
       });
       setDraft(null);
       setNewStep("");
+      setNewMinutes("");
       toast.success(t("detail.processStepsSaved"));
     } catch (err) {
       toast.error(extractApiError(err, t("detail.processStepsSaveFailed")));
@@ -55,8 +78,9 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
 
   function addStep() {
     if (draft === null || newStep.trim() === "") return;
-    setDraft([...draft, newStep.trim()]);
+    setDraft([...draft, { text: newStep.trim(), minutes: newMinutes.trim() }]);
     setNewStep("");
+    setNewMinutes("");
   }
 
   return (
@@ -70,7 +94,7 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => setDraft(steps)}
+              onClick={() => setDraft(toDraft(steps))}
               leftIcon={
                 steps.length === 0 ? <Plus size={14} /> : <Pencil size={14} />
               }
@@ -85,7 +109,7 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={save}
+                onClick={() => void save()}
                 disabled={updateRecipe.isPending}
                 data-testid="maker-steps-save"
               >
@@ -97,6 +121,7 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
                 onClick={() => {
                   setDraft(null);
                   setNewStep("");
+                  setNewMinutes("");
                 }}
                 aria-label={t("common:actions.cancel")}
               >
@@ -118,7 +143,17 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
                 <span className="text-on-muted font-medium w-5 flex-shrink-0">
                   {idx + 1}.
                 </span>
-                <span className="whitespace-pre-wrap">{step}</span>
+                <span className="whitespace-pre-wrap flex-1">{step.text}</span>
+                {step.minutes !== null && step.minutes !== undefined && (
+                  <span
+                    className="shrink-0 text-xs text-on-muted tabular-nums"
+                    data-testid={`maker-step-minutes-${idx}`}
+                  >
+                    {t("detail.processStepMinutes", {
+                      minutes: step.minutes,
+                    })}
+                  </span>
+                )}
               </li>
             ))}
           </ol>
@@ -137,10 +172,12 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
                   bin beside it, so fixing a typo in a multi-line instruction
                   meant deleting it and typing the whole thing again. */}
               <Textarea
-                value={step}
+                value={step.text}
                 onChange={(e) =>
                   setDraft(
-                    draft.map((s, i) => (i === idx ? e.target.value : s)),
+                    draft.map((s, i) =>
+                      i === idx ? { ...s, text: e.target.value } : s,
+                    ),
                   )
                 }
                 rows={2}
@@ -151,6 +188,28 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
                 })}
                 data-testid={`maker-steps-edit-${idx}`}
               />
+              <Input
+                wrapperClassName="w-20"
+                type="number"
+                min="0"
+                step="1"
+                value={step.minutes}
+                onChange={(e) =>
+                  setDraft(
+                    draft.map((s, i) =>
+                      i === idx ? { ...s, minutes: e.target.value } : s,
+                    ),
+                  )
+                }
+                className="text-sm"
+                aria-label={t("detail.processStepMinutesLabel", {
+                  number: idx + 1,
+                })}
+                data-testid={`maker-steps-minutes-${idx}`}
+              />
+              <span className="shrink-0 text-xs text-on-muted pt-2.5">
+                {t("detail.minutesShort")}
+              </span>
               {/* ui-pattern: destructive-as-neutral — the list being edited
                   is a draft in local state; nothing leaves the recipe until
                   the whole set is saved */}
@@ -183,6 +242,19 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
               className="text-sm min-h-16 resize-y"
               aria-label={t("detail.processStepsAdd")}
               data-testid="maker-steps-input"
+            />
+            <Input
+              wrapperClassName="w-20"
+              type="number"
+              min="0"
+              step="1"
+              value={newMinutes}
+              onChange={(e) => setNewMinutes(e.target.value)}
+              placeholder={t("detail.minutesPlaceholder")}
+              aria-label={t("detail.processStepMinutesLabel", {
+                number: draft.length + 1,
+              })}
+              data-testid="maker-steps-minutes-input"
             />
             <Button
               size="sm"

@@ -7,7 +7,7 @@ from decimal import Decimal
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas.pagination import PaginatedResponse
 
@@ -19,6 +19,25 @@ CreateOnShortageStrategy = Literal['ALLOW', 'WARN', 'BLOCK']
 #: The fixed costs of a batch the recipe screen offers, names and badges. The
 #: set is closed: a kind the screen cannot name came back to it as a raw code.
 CostLineKind = Literal['LABOR', 'PACKAGING', 'OVERHEAD', 'OTHER']
+
+
+class ProcessStep(BaseModel):
+    """One step of a formula's process, and how long it takes.
+
+    A step used to be a bare sentence, so a formula that took two hours to
+    make said nothing about the two hours and its labour could only be a
+    lump sum typed per batch. The duration is optional: a step nobody timed
+    still reads, and costs no labour.
+    """
+
+    text: str = Field(min_length=1, max_length=2000)
+    minutes: Decimal | None = Field(None, ge=0, max_digits=8, decimal_places=2)
+
+    @field_validator('text', mode='before')
+    @classmethod
+    def _strip_text(cls, value: object) -> object:
+        return value.strip() if isinstance(value, str) else value
+
 
 # ---------------------------------------------------------------------------
 # Recipe CRUD
@@ -34,7 +53,10 @@ class RecipeCreate(BaseModel):
         Decimal('1'), gt=0, max_digits=12, decimal_places=4
     )
     batch_yield_uom_id: UUID | None = None
-    process_steps: list[str] | None = None
+    #: Accepts a bare sentence as well as a step object, so a caller written
+    #: before steps carried durations keeps working; the service normalises
+    #: both to objects before the row is written.
+    process_steps: list[ProcessStep | str] | None = None
     reference_price: Decimal | None = Field(None, max_digits=12, decimal_places=2)
     is_default: bool = False
     source_recipe_id: UUID | None = None
@@ -46,7 +68,10 @@ class RecipeUpdate(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=200)
     batch_yield_qty: Decimal | None = Field(None, gt=0, max_digits=12, decimal_places=4)
     batch_yield_uom_id: UUID | None = None
-    process_steps: list[str] | None = None
+    #: Accepts a bare sentence as well as a step object, so a caller written
+    #: before steps carried durations keeps working; the service normalises
+    #: both to objects before the row is written.
+    process_steps: list[ProcessStep | str] | None = None
     reference_price: Decimal | None = Field(None, max_digits=12, decimal_places=2)
     is_default: bool | None = None
 
@@ -101,6 +126,24 @@ class RecipeCostLineRead(BaseModel):
     sort_order: int
 
 
+class IngredientPriceUpdate(BaseModel):
+    """Input for PUT /recipes/ingredient-prices/{template_id}.
+
+    The price is per stock unit in the organization's money. ``None`` clears
+    it: an estimate that then finds nothing says so again, rather than
+    reading a stale number somebody meant to remove.
+    """
+
+    unit_price: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=4)
+
+
+class IngredientPriceRead(BaseModel):
+    """Output for PUT /recipes/ingredient-prices/{template_id}."""
+
+    product_template_id: UUID
+    unit_price: Decimal | None
+
+
 class BoMLineCreateForRecipe(BaseModel):
     """Input for POST /recipes/{id}/bom-lines — add an ingredient.
 
@@ -142,7 +185,7 @@ class RecipeRead(BaseModel):
     name: str
     batch_yield_qty: Decimal
     batch_yield_uom_id: UUID | None
-    process_steps: list[str] | None
+    process_steps: list[ProcessStep] | None
     reference_price: Decimal | None
     is_default: bool
     source_recipe_id: UUID | None
@@ -157,6 +200,10 @@ class RecipeRead(BaseModel):
     a bare number next to ingredients that all carry a measure."""
 
     cost_lines: list[RecipeCostLineRead] = Field(default_factory=list)
+    #: The batch's labour, from the timed steps at the organization's hourly
+    #: rate. Computed, never stored on the recipe: changing the rate or a
+    #: step's duration changes it, and a stored copy would disagree.
+    labour_cost: Decimal | None = None
     # Ingredient lines (BOM) — populated on detail reads.
     lines: list[BoMLineRead] = Field(default_factory=list)
     # AVCO-based cost estimate for one unit of output (None without a BOM).
@@ -253,6 +300,18 @@ class IngredientAvailabilityItem(BaseModel):
     """The unit ``to_buy`` is counted in — the ingredient's stock unit."""
 
 
+class ShortagePurchaseOrderResponse(BaseModel):
+    """Output for POST /recipes/{id}/shortages/purchase-order.
+
+    None when the batch is covered: nothing is ordered then, and no empty
+    document is left behind for somebody to cancel.
+    """
+
+    purchase_order_id: UUID | None = None
+    number: str | None = None
+    added_count: int = 0
+
+
 class AvailabilityResponse(BaseModel):
     """Response for GET /maker/recipes/{id}/availability."""
 
@@ -281,6 +340,9 @@ class MakerSettingsRead(BaseModel):
     allow_overproduction: bool = True
     availability_check_scope: AvailabilityCheckScope = 'GLOBAL'
     create_on_shortage_strategy: CreateOnShortageStrategy = 'WARN'
+    #: What an hour of the organization's own work costs. A formula's labour
+    #: is its steps' minutes at this rate; zero means nobody named one.
+    labor_hourly_rate: Decimal = Decimal('0')
     created_at: datetime
     updated_at: datetime
 
@@ -292,3 +354,6 @@ class MakerSettingsUpdate(BaseModel):
     allow_overproduction: bool | None = None
     availability_check_scope: AvailabilityCheckScope | None = None
     create_on_shortage_strategy: CreateOnShortageStrategy | None = None
+    labor_hourly_rate: Decimal | None = Field(
+        None, ge=0, max_digits=12, decimal_places=2
+    )

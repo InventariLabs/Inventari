@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { http, HttpResponse } from "msw";
@@ -53,6 +53,7 @@ beforeEach(() => {
         allow_overproduction: true,
         availability_check_scope: "GLOBAL",
         create_on_shortage_strategy: "ALLOW",
+        labor_hourly_rate: "0",
       }),
     ),
   );
@@ -189,5 +190,35 @@ describe("MakerSettingsPanel", () => {
       "aria-pressed",
       "false",
     );
+  });
+});
+
+describe("MakerSettingsPanel — the rate the timed steps cost", () => {
+  it("saves the hourly rate for own work", async () => {
+    signInWith(["maker:read", "maker:write", "maker:manage"]);
+    let sent: Record<string, unknown> | null = null;
+    server.use(
+      http.patch("/api/v1/maker/settings", async ({ request }) => {
+        sent = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({
+          reference_direction: "SAVINGS",
+          allow_overproduction: true,
+          availability_check_scope: "GLOBAL",
+          create_on_shortage_strategy: "ALLOW",
+          labor_hourly_rate: "30.00",
+        });
+      }),
+    );
+    renderPanel();
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: /advanced/i, expanded: false }),
+    );
+    fireEvent.change(await screen.findByTestId("maker-settings-labor-rate"), {
+      target: { value: "30" },
+    });
+    fireEvent.click(screen.getByTestId("maker-settings-labor-rate-save"));
+
+    await waitFor(() => expect(sent).toEqual({ labor_hourly_rate: "30" }));
   });
 });

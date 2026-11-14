@@ -33,6 +33,23 @@ vi.mock("@/modules/maker/hooks/useRecipes", () => ({
   }),
   useDeleteMakerRecipe: () => ({ mutate: deleteMutate, isPending: false }),
   useUpdateMakerRecipe: () => ({ mutate: updateMutate, isPending: false }),
+  useMakerRecipeAvailability: () => ({ data: undefined }),
+  useOrderRecipeShortages: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+  useAddIngredientStock: () => ({ mutateAsync: vi.fn(), isPending: false }),
+}));
+
+// Purchasing is off in these tests: the shortage notice's order button is
+// the other flow, covered where that notice is tested.
+vi.mock("@/contexts/ModulesContext", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/contexts/ModulesContext")>()),
+  useModules: () => ({
+    isModuleEnabled: () => false,
+    enabledModules: [],
+    isLoading: false,
+  }),
 }));
 
 vi.mock("@/modules/maker/components/AvailabilityBadge", () => ({

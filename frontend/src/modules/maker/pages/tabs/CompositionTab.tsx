@@ -24,6 +24,7 @@ import {
 import { BomTreeEditor } from "@/modules/maker/components/BomTreeEditor";
 import { BatchYieldEditor } from "@/modules/maker/components/BatchYieldEditor";
 import { RecipeIngredientForm } from "@/modules/maker/components/RecipeIngredientForm";
+import { IngredientPriceEditor } from "@/modules/maker/components/IngredientPriceEditor";
 import { YieldLossNote } from "@/modules/maker/components/YieldLossNote";
 import { RecipeProcessSteps } from "@/modules/maker/components/RecipeProcessSteps";
 import { useFlatUoms } from "@/modules/shared/hooks/useUoms";
@@ -276,6 +277,17 @@ export function CompositionTab({ recipe }: CompositionTabProps) {
                             </Button>
                           </>
                         )}
+                      </div>
+                      {/* The price typed on the product, for an ingredient
+                          the records and the suppliers do not price. Kept on
+                          its own line so a long product name still reads. */}
+                      <div className="basis-full flex justify-end">
+                        <IngredientPriceEditor
+                          templateId={line.child_template_id}
+                          unit={line.unit}
+                          price={line.typed_unit_price ?? null}
+                          canManage={canManage}
+                        />
                       </div>
                     </>
                   )}

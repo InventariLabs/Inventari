@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Coins,
   Calendar,
+  Target,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { formatMoney } from "@/utils/formatters";
@@ -83,6 +84,46 @@ function totalCostLabel(status: string, t: TFunction): string {
   return t("detail.card.totalCost", { defaultValue: "Total cost" });
 }
 
+/**
+ * What the formula predicted when the run closed, beside the actual cost.
+ *
+ * Its own component so the stats row above stays a row of tiles: the
+ * presence checks and the difference sentence would otherwise each add a
+ * branch to the function that lays the row out.
+ */
+function EstimatedCostTile({ order }: { order: ProductionOrder }) {
+  const { t, i18n } = useTranslation("maker");
+  const currency = useOrganizationCurrency();
+  if (
+    order.estimated_total_cost === null ||
+    order.estimated_total_cost === undefined
+  ) {
+    return null;
+  }
+  const difference =
+    order.total_cost === null || order.total_cost === undefined
+      ? null
+      : Number(order.total_cost) - Number(order.estimated_total_cost);
+  return (
+    <StatTile
+      label={t("detail.card.estimatedAtCompletion", {
+        defaultValue: "Estimated at completion",
+      })}
+      icon={<Target size={18} />}
+      note={
+        difference === null
+          ? undefined
+          : t("detail.card.estimatedDifference", {
+              defaultValue: "Actual difference: {{amount}}",
+              amount: formatMoney(difference, currency, i18n.language),
+            })
+      }
+    >
+      {formatMoney(order.estimated_total_cost, currency, i18n.language)}
+    </StatTile>
+  );
+}
+
 export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
   const { t, i18n } = useTranslation("maker");
   const resultTerm = useResultTerms();
@@ -156,6 +197,7 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
             formatMoney(order.total_cost, currency, i18n.language)
           )}
         </StatTile>
+        <EstimatedCostTile order={order} />
         <StatTile
           label={t("detail.card.created", { defaultValue: "Created" })}
           icon={<Calendar size={14} />}

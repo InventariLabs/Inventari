@@ -303,6 +303,7 @@ Stability classes are the ones above; a vector is listed with the file that owns
 | Record placement | lets a module say where its records stand while they are away from their home location | `backend/app/core/module_ownership.py` (`register_record_placement`); in-tree only, as for export enrichers |
 | Template ranking | orders product templates by a module's usage ranking | `backend/app/core/template_ranking.py` (`register_template_ranker`); in-tree only, as for export enrichers |
 | Supplier prices | supplies organization-scoped supplier prices to cost estimates | `backend/app/core/cost_estimates.py` (`register_supplier_price_provider`); in-tree only, as for export enrichers |
+| Typed prices | supplies organization-scoped, per-product prices typed by hand to cost estimates, asked after the supplier quotes | `backend/app/core/cost_estimates.py` (`register_typed_price_provider`); in-tree only, as for export enrichers |
 | Period guard | supplies the closed-period check that Core's stock-changing paths call | `backend/app/core/period_guard.py` (`register_period_guard`); in-tree only, as for export enrichers |
 | Product profiles | bundles modules and seed data for a kind of organization | `backend/app/core/product_profiles.py` |
 | `core_api` and its queries | reads and writes Core data through the facade; read models in `core_api.queries` | `backend/app/core/public_api/`, `backend/app/core/public_api/queries.py`; [CORE_API.md](CORE_API.md) |

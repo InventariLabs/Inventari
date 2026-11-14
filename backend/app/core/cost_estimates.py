@@ -20,7 +20,7 @@ class UnitCostEstimate:
 
     unit_cost: Decimal | None = None
     currency: str | None = None
-    source: Literal['layers', 'supplier', 'unknown'] = 'unknown'
+    source: Literal['layers', 'supplier', 'typed', 'unknown'] = 'unknown'
 
 
 SupplierPriceProvider = Callable[
@@ -42,3 +42,29 @@ async def supplier_rates_async(
     if _supplier_provider is None or not ids:
         return {}
     return await _supplier_provider(db, organization_id, ids, currency)
+
+
+TypedPriceProvider = Callable[
+    [AsyncSession, UUID, list[UUID]], Awaitable[dict[UUID, Decimal]]
+]
+_typed_provider: TypedPriceProvider | None = None
+
+
+def register_typed_price_provider(provider: TypedPriceProvider) -> None:
+    """Register the feature-owned reader of prices typed on a product.
+
+    The last answer the estimate policy asks, after the cost layers and a
+    supplier's quote. A feature that prices products by hand owns the table
+    and registers the reader; Core keeps the order of the answers.
+    """
+    global _typed_provider
+    _typed_provider = provider
+
+
+async def typed_rates_async(
+    db: AsyncSession, organization_id: UUID, ids: list[UUID]
+) -> dict[UUID, Decimal]:
+    """Read typed prices, or no prices when the installation has no provider."""
+    if _typed_provider is None or not ids:
+        return {}
+    return await _typed_provider(db, organization_id, ids)

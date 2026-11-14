@@ -171,3 +171,28 @@ describe("CostLinesEditor", () => {
     expect(screen.queryByText(/PLN 0[.,]00/)).toBeNull();
   });
 });
+
+describe("CostLinesEditor — the computed labour line", () => {
+  it("shows the batch's labour from the timed steps beside the fixed lines", () => {
+    render(
+      <CostLinesEditor
+        recipeId="r-1"
+        lines={lines}
+        labourCost="22.50"
+        labourMinutes={45}
+      />,
+    );
+    const row = screen.getByTestId("maker-computed-labour");
+    expect(row.textContent).toContain("Labour from the process steps");
+    expect(row.textContent).toContain("45 min");
+    expect(row.textContent).toContain("PLN");
+    expect(row.textContent).toContain("22.50");
+  });
+
+  it("leaves the row out when no step was timed, instead of claiming free labour", () => {
+    render(<CostLinesEditor recipeId="r-1" lines={lines} labourCost="0" />);
+    expect(
+      screen.queryByTestId("maker-computed-labour"),
+    ).not.toBeInTheDocument();
+  });
+});

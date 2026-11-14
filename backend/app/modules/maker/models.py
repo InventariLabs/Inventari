@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     Boolean,
@@ -76,7 +76,11 @@ class MakerRecipe(Base):
         ForeignKey('uoms.id'),
         nullable=True,
     )
-    process_steps: Mapped[list[str] | None] = mapped_column(JSONB, nullable=True)
+    #: One object per step (``{text, minutes}``). A bare sentence saved
+    #: before steps carried durations was normalised to ``minutes: null``.
+    process_steps: Mapped[list[dict[str, Any]] | None] = mapped_column(
+        JSONB, nullable=True
+    )
     reference_price: Mapped[Decimal | None] = mapped_column(
         Numeric(12, 2),
         nullable=True,
@@ -283,6 +287,10 @@ class ProductionOrder(Base):
         default='DRAFT',
     )
     total_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    #: What the formula predicted this run would cost, read when it closed —
+    #: the figure the actual cost is measured against. NULL on runs that
+    #: closed before the estimate was kept.
+    estimated_total_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
     # financial result snapshot at completion — self-contained per
     # order (survives recipe edits/deletes). Legacy orders (recipe_id=None)
     # keep NULL values; the FE renders "—".
@@ -362,11 +370,66 @@ class ProductionOrderLine(Base):
     source_location_id: Mapped[uuid.UUID | None] = synonym('source_storage_location_id')
     unit_cost_snapshot: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
     cost_source: Mapped[str | None] = mapped_column(String(16))
+    #: The formula's standard quantity for this ingredient on the output
+    #: that came out, and the estimated rate it was priced at when the run
+    #: closed. The guess the actual beside it is measured against.
+    estimated_qty: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    estimated_unit_cost_snapshot: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
     # The part of ``consumed_qty`` the records did not hold, in the same unit,
     # on a run recorded after the fact: the goods were used, so the records
     # were wrong, and the ingredient is due a count. NULL on a run that drew
     # everything it consumed.
     shortfall_qty: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+
+
+class MakerIngredientPrice(Base):
+    """A price typed once for an ingredient the records do not price.
+
+    A product made an hour ago has no cost layer and no supplier quote, so
+    every estimate that asks what the formula costs answers zero — a number
+    nobody can plan from. The price typed on the product is that
+    organisation's own fallback, one per product and never per formula: two
+    formulas that share an ingredient share what it costs.
+
+    It is the last answer the estimate policy asks, after the layers (what
+    the stock actually cost) and a supplier's quote (a live offer). A
+    product can be a global catalogue row shared by every organisation, so
+    the price lives here rather than on ``product_templates``.
+    """
+
+    __tablename__ = 'maker_ingredient_prices'
+    __table_args__ = (
+        UniqueConstraint(
+            'organization_id',
+            'product_template_id',
+            name='uq_maker_price_org_template',
+        ),
+        Index('ix_maker_price_org', 'organization_id'),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    product_template_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('product_templates.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    #: Per stock unit, in the organization's money — the same unit the
+    #: layers and the supplier prices are held in.
+    unit_price: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
 
 
 class MakerModuleSettings(Base):
@@ -407,6 +470,16 @@ class MakerModuleSettings(Base):
         nullable=False,
         default='WARN',
         server_default='WARN',
+    )
+    #: What an hour of the organization's own work costs. A craft producer
+    #: prices a batch from the time the steps take, not from a lump sum
+    #: typed per batch, so a formula's labour is its steps' minutes at this
+    #: rate. Zero means nobody has named a rate, and labour costs nothing.
+    labor_hourly_rate: Mapped[Decimal] = mapped_column(
+        Numeric(12, 2),
+        nullable=False,
+        default=Decimal('0'),
+        server_default='0',
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

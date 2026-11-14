@@ -45,14 +45,17 @@ from app.core.money import quantise
 from app.core.public_api import core_api
 from app.i18n import Language
 
-from . import bom_service, recipe_service, stock_consumption
+from . import bom_service, cost_rollup, recipe_service, stock_consumption
 from ._schemas_production import (
     ProductionOrderCreate,
     ProductionOrderUpdate,
     ProductionPreviewResponse,
     ShortageShoppingListResponse,
 )
-from ._schemas_recipes import IngredientAvailabilityItem
+from ._schemas_recipes import (
+    IngredientAvailabilityItem,
+    ShortagePurchaseOrderResponse,
+)
 from ._valuation_batch import fetch_estimates_batch
 from .models import MakerRecipe, ProductionOrder, ProductionOrderLine
 
@@ -603,30 +606,50 @@ async def _assert_stock_is_available(
         raise InsufficientStockError(shortages, short_at_create=order.short_at_create)
 
 
-async def _fixed_cost_and_recipe(
+async def _recipe_for_order(
     db: AsyncSession, organization_id: UUID, order: ProductionOrder
-) -> tuple[Decimal, MakerRecipe | None]:
-    """Fixed cost lines: Σ amount × batches.
-
-    The recipe row travels back with the total — the result snapshot
-    needs it.
-    """
+) -> MakerRecipe | None:
+    """The run's formula, read once for both its costs and its snapshot."""
     if order.recipe_id is None:
-        return Decimal('0'), None
-
+        return None
     recipe_result = await db.execute(
         select(MakerRecipe).where(
             MakerRecipe.id == order.recipe_id,
             MakerRecipe.organization_id == organization_id,
         )
     )
-    recipe = recipe_result.scalar_one_or_none()
+    return recipe_result.scalar_one_or_none()
+
+
+async def _batch_overheads_and_recipe(
+    db: AsyncSession, organization_id: UUID, order: ProductionOrder
+) -> tuple[Decimal, Decimal, MakerRecipe | None]:
+    """What the batch costs besides its ingredients — fixed lines and labour.
+
+    Fixed cost lines are Σ amount × batches. Labour is the formula's timed
+    steps at the organization's hourly rate, the same figure the formula
+    page and the preview show, so a run recorded after the fact carries the
+    cost the plan promised it would.
+
+    The recipe row travels back with the totals — the result snapshot
+    needs it, and so does the estimate kept beside the actual.
+    """
+    recipe = await _recipe_for_order(db, organization_id, order)
+    if recipe is None:
+        return Decimal('0'), Decimal('0'), None
+
     total_fixed_cost = Decimal('0')
-    if recipe is not None and recipe.batch_yield_qty > 0:
+    total_labour_cost = Decimal('0')
+    if recipe.batch_yield_qty > 0:
         batches = order.planned_qty / recipe.batch_yield_qty
         for cl in recipe.cost_lines:
             total_fixed_cost += cl.amount * batches
-    return total_fixed_cost, recipe
+        settings = await recipe_service.get_settings(db, organization_id)
+        total_labour_cost = (
+            cost_rollup.labour_cost_per_batch(recipe, settings.labor_hourly_rate)
+            * batches
+        )
+    return total_fixed_cost, total_labour_cost, recipe
 
 
 def _snapshot_financial_result(
@@ -910,11 +933,48 @@ async def _receive_output(
     )
 
 
+async def _estimated_material_at_completion(
+    db: AsyncSession,
+    organization_id: UUID,
+    flat: list[tuple[UUID, Decimal, str]],
+    actual_qty: Decimal,
+    planned_qty: Decimal,
+) -> tuple[Decimal, list[tuple[Decimal | None, Decimal]]]:
+    """What the formula said the run's ingredients should cost.
+
+    The estimate is asked at closing, not frozen when the order was
+    created: the formula may have changed while the order was open, and the
+    comparison the page makes is between what this run was expected to cost
+    and what it did cost.
+
+    The quantity is the standard one for the output that came out — the
+    formula's line for the batch scaled by ``actual / planned`` — so a run
+    that produced less than it planned shows the extra material it spent as
+    a quantity difference, not as a price difference it did not have.
+
+    Returns the material total and, per line of *flat*, the estimated rate
+    and the standard quantity, in the same order the order lines are
+    written.
+    """
+    estimates = await fetch_estimates_batch(db, organization_id, flat)
+    ratio = actual_qty / planned_qty if planned_qty > 0 else Decimal('0')
+    total = Decimal('0')
+    per_line: list[tuple[Decimal | None, Decimal]] = []
+    for child_id, child_qty, _unit in flat:
+        rate = estimates.get(child_id, UnitCostEstimate()).unit_cost
+        standard_qty = child_qty * ratio
+        if rate is not None:
+            total += rate * standard_qty
+        per_line.append((rate, standard_qty))
+    return total, per_line
+
+
 def _write_order_lines(
     db: AsyncSession,
     order: ProductionOrder,
     flat: list[tuple[UUID, Decimal, str]],
     consumption: Consumption,
+    estimates: list[tuple[Decimal | None, Decimal]] | None = None,
 ) -> None:
     """One line per ingredient, at what that ingredient actually cost.
 
@@ -931,6 +991,9 @@ def _write_order_lines(
             if records
             else None
         )
+        estimated_rate, estimated_qty = (
+            estimates[index] if estimates is not None else (None, None)
+        )
         db.add(
             ProductionOrderLine(
                 production_order_id=order.id,
@@ -941,6 +1004,8 @@ def _write_order_lines(
                 unit_cost_snapshot=rate,
                 cost_source='fifo' if rate is not None else 'none',
                 shortfall_qty=consumption.shortfalls.get(index),
+                estimated_qty=estimated_qty,
+                estimated_unit_cost_snapshot=estimated_rate,
             )
         )
 
@@ -961,8 +1026,12 @@ async def complete_production(
     - ``actual_qty`` defaults to ``planned_qty`` when omitted (backward compat).
     - ``actual_qty`` must be > 0; zero outputs = cancel + write-off.
     - ``actual > planned`` gated by ``settings.allow_overproduction``.
-    - Fixed cost lines on the recipe are included in ``total_cost``.
+    - Fixed cost lines and the formula's labour are included in
+      ``total_cost``.
     - ``unit_cost = total_cost / actual_qty``.
+    - The formula's own estimate is kept beside the actual cost, with each
+      line's standard quantity and rate, so the page can say whether a
+      difference came from a price or from a quantity.
     - ``record_shortfall``: the run already happened, so an ingredient the
       records hold too little of is taken as far as they go and the rest is
       recorded on its line (``record_made``) instead of refusing the run.
@@ -997,6 +1066,12 @@ async def complete_production(
         organization_id,
         context_location_id=order.output_storage_location_id,
     )
+    # The formula's answer is read before anything leaves the shelf: it is
+    # the promise this run is measured against, and the rates behind it do
+    # not move because the run consumed the layers they described.
+    estimated_material_cost, line_estimates = await _estimated_material_at_completion(
+        db, organization_id, flat, actual_qty, order.planned_qty
+    )
     await _assert_stock_is_available(
         db,
         organization_id,
@@ -1023,9 +1098,14 @@ async def complete_production(
         record_shortfall=record_shortfall,
     )
     total_material_cost = consumption.cost
-    total_fixed_cost, recipe = await _fixed_cost_and_recipe(db, organization_id, order)
+    total_fixed_cost, total_labour_cost, recipe = await _batch_overheads_and_recipe(
+        db, organization_id, order
+    )
 
-    total_cost = total_material_cost + total_fixed_cost
+    total_cost = total_material_cost + total_fixed_cost + total_labour_cost
+    order.estimated_total_cost = quantise(
+        estimated_material_cost + total_fixed_cost + total_labour_cost, 2
+    )
     unit_cost = (
         total_cost / actual_qty if actual_qty > 0 and total_cost > 0 else Decimal('0')
     )
@@ -1036,7 +1116,7 @@ async def complete_production(
     _snapshot_financial_result(order, recipe, unit_cost, uncosted=uncosted)
 
     await _receive_output(db, organization_id, order, actual_qty, unit_cost, user)
-    _write_order_lines(db, order, flat, consumption)
+    _write_order_lines(db, order, flat, consumption, line_estimates)
 
     order.status = 'COMPLETED'
     order.total_cost = total_cost
@@ -1119,8 +1199,9 @@ async def preview_production(
 
     The shortages are judged where completion judges them: the scope the
     run's own output location resolves to. The cost per unit adds the
-    recipe's fixed costs the way completion does (``_fixed_cost_and_recipe``),
-    so the figure the person saves on is the figure the run records.
+    recipe's fixed costs and its labour the way completion does
+    (``_batch_overheads_and_recipe``), so the figure the person saves on is
+    the figure the run records.
     """
     from . import cost_breakdown
     from .availability_service import compute_availability, resolve_check_location
@@ -1159,7 +1240,11 @@ async def preview_production(
     preview.fixed_cost = quantise(
         sum((line.amount for line in recipe.cost_lines), Decimal('0')) * batches
     )
-    total = breakdown.total_cost + preview.fixed_cost
+    settings = await recipe_service.get_settings(db, organization_id)
+    preview.labour_cost = quantise(
+        cost_rollup.labour_cost_per_batch(recipe, settings.labor_hourly_rate) * batches
+    )
+    total = breakdown.total_cost + preview.fixed_cost + preview.labour_cost
     if total > 0:
         preview.unit_cost = quantise(total / data.planned_qty, 4)
         if recipe.reference_price is not None:
@@ -1167,6 +1252,108 @@ async def preview_production(
                 recipe.reference_price - total / data.planned_qty
             )
     return preview
+
+
+async def create_shortage_purchase_order(
+    db: AsyncSession,
+    organization_id: UUID,
+    recipe_id: UUID,
+    user: UserContextDTO,
+) -> ShortagePurchaseOrderResponse:
+    """Order what one batch of a formula's ingredients the records lack.
+
+    The recipe page answers "what is missing for a batch" with the same
+    availability verdict completion refuses on, and offers the next click:
+    a draft purchase order, one line per short ingredient, as much as is
+    missing rounded up to the ingredient's own buying step. The price is
+    the one typed on the product where somebody typed one; a line without
+    a price is still an order line, and the buyer fills it in.
+
+    Nothing short, nothing ordered: the response names no order rather than
+    leaving an empty draft nobody asked for.
+    """
+    from app.core.contracts import PurchaseOrderCreateInput, PurchaseOrderLineInput
+    from app.modules.purchase_orders.purchase_orders_api import purchase_orders_api
+
+    from .availability_service import (
+        _get_available_stock_batch,
+        compute_shortage_list,
+        resolve_check_location,
+    )
+    from .ingredient_prices import typed_rates_async
+
+    recipe = await bom_service.resolve_recipe(db, organization_id, recipe_id)
+    check_location_id = await resolve_check_location(
+        db, organization_id, context_location_id=None
+    )
+    shortages = await compute_shortage_list(
+        db,
+        organization_id,
+        recipe.id,
+        recipe.batch_yield_qty,
+        location_id=check_location_id,
+    )
+    short_ids = [
+        item.child_template_id
+        for item in shortages
+        if item.shortage is not None and item.shortage > 0
+    ]
+    if not short_ids:
+        return ShortagePurchaseOrderResponse()
+
+    needs: dict[UUID, Decimal] = {}
+    for child_id, child_qty, _unit in await bom_service.explode_in_stock_units(
+        db,
+        organization_id,
+        recipe.output_template_id,
+        recipe.batch_yield_qty,
+        recipe_id=recipe.id,
+    ):
+        needs[child_id] = needs.get(child_id, Decimal('0')) + child_qty
+    stocks = await _get_available_stock_batch(
+        db, organization_id, short_ids, location_id=check_location_id
+    )
+    templates = await core_api.product_templates.get_many_async(
+        db, organization_id, short_ids
+    )
+    uoms = {
+        uom.id: uom
+        for uom in await core_api.uoms.list_for_org_async(db, organization_id)
+    }
+    typed_prices = await typed_rates_async(db, organization_id, short_ids)
+
+    lines: list[PurchaseOrderLineInput] = []
+    for child_id in short_ids:
+        missing = needs.get(child_id, Decimal('0')) - stocks.get(child_id, Decimal('0'))
+        template = templates.get(child_id)
+        if missing <= 0 or template is None:
+            continue
+        lines.append(
+            PurchaseOrderLineInput(
+                product_template_id=child_id,
+                name=template.name,
+                quantity_ordered=core_api.uoms.round_up(
+                    missing,
+                    uoms.get(template.uom_id) if template.uom_id is not None else None,
+                ),
+                uom_id=template.uom_id,
+                unit_price=typed_prices.get(child_id),
+            )
+        )
+    if not lines:
+        return ShortagePurchaseOrderResponse()
+
+    order = await purchase_orders_api.create_purchase_order_async(
+        db,
+        organization_id,
+        PurchaseOrderCreateInput(lines=lines),
+        user.id,
+    )
+    return ShortagePurchaseOrderResponse(
+        purchase_order_id=order.id,
+        number=order.number,
+        added_count=len(lines),
+    )
 
 
 async def add_shortages_to_shopping_list(

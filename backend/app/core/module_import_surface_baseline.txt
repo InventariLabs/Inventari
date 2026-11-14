@@ -85,7 +85,7 @@ equipment | owner=core | expires=2027-06-30 | equipment screens use the core sca
   app.schemas.item
   app.schemas.pagination
 
-maker | owner=core | expires=2027-06-30 | the recipe catalogue reads core cost and stock helpers directly; the module predates the SDK. Its recipes, shopping-lists, stock-takes and warehouse imports are those modules' public APIs.
+maker | owner=core | expires=2027-06-30 | the recipe catalogue reads core cost and stock helpers directly; the module predates the SDK. Its recipes, purchase-orders, shopping-lists, stock-takes and warehouse imports are those modules' public APIs.
   app.core.context
   app.core.cost_estimates
   app.core.db_facade
@@ -102,6 +102,7 @@ maker | owner=core | expires=2027-06-30 | the recipe catalogue reads core cost a
   app.i18n.service
   app.models.product_template
   app.models.stock_quants_from_records
+  app.modules.purchase_orders.purchase_orders_api
   app.modules.recipes.recipes_api
   app.modules.shopping_lists.shopping_lists_api
   app.modules.stock_takes.stock_takes_api

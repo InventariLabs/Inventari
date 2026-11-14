@@ -58,6 +58,14 @@ interface Row {
   plannedDraws?: PlannedDraw[];
   /** Closed run recorded after the fact: what the records did not hold. */
   shortfall?: string | null;
+  /** The formula's guess when the run closed: the standard quantity for the
+   * output that came out, at the rate the estimate gave it. */
+  estimatedQty?: string | null;
+  estimatedUnitCost?: string | null;
+  /** What the difference between the estimate and the actual came from: a
+   * different price per unit, or more/less material than the output needed. */
+  priceEffect?: number | null;
+  qtyEffect?: number | null;
 }
 
 function fromLine(line: ProductionOrderLine): Row {
@@ -76,7 +84,52 @@ function fromLine(line: ProductionOrderLine): Row {
     locationId: line.source_location_id,
     locationName: line.source_location_name,
     shortfall: line.shortfall_qty,
+    estimatedQty: line.estimated_qty,
+    estimatedUnitCost: line.estimated_unit_cost_snapshot,
+    ...effectsOf(line),
   };
+}
+
+/**
+ * Split the difference between the estimate and the actual into the part
+ * that came from a price and the part that came from a quantity.
+ *
+ * The identity is exact: estimated (rate × standard qty) + price effect +
+ * quantity effect = actual (rate × consumed qty). A run that produced less
+ * than it planned consumed its full planned ingredients, so the standard
+ * quantity for what came out is lower and the extra material reads as a
+ * quantity difference; one that produced more reads as a saving there.
+ */
+function effectsOf(line: ProductionOrderLine): {
+  priceEffect: number | null;
+  qtyEffect: number | null;
+} {
+  const actualRate = line.unit_cost_snapshot;
+  const estimatedRate = line.estimated_unit_cost_snapshot;
+  if (actualRate === null || estimatedRate === null) {
+    return { priceEffect: null, qtyEffect: null };
+  }
+  const consumed = Number(line.consumed_qty);
+  const standardQty =
+    line.estimated_qty === null || line.estimated_qty === undefined
+      ? null
+      : Number(line.estimated_qty);
+  return {
+    priceEffect: (Number(actualRate) - Number(estimatedRate)) * consumed,
+    qtyEffect:
+      standardQty === null
+        ? null
+        : (consumed - standardQty) * Number(estimatedRate),
+  };
+}
+
+function formatSigned(
+  value: number,
+  currency: string | null | undefined,
+  language: string,
+) {
+  const prefix = value > 0 ? "+" : "";
+  return `${prefix}${formatMoney(value, currency, language)}`;
 }
 
 function fromEntry(entry: CostBreakdownEntry): Row {
@@ -270,6 +323,57 @@ export function ProductionIngredientsTable({
                         ? "—"
                         : formatMoney(row.lineCost, currency, i18n.language)}
                     </div>
+                    {/* The estimate kept when the run closed, and what the
+                        difference came from. Only rows that carry one show
+                        it: a run that closed before the estimate was kept
+                        has nothing to compare, and an invented zero would
+                        read as a perfect guess. */}
+                    {row.estimatedUnitCost !== null &&
+                      row.estimatedUnitCost !== undefined &&
+                      row.estimatedQty !== null &&
+                      row.estimatedQty !== undefined && (
+                        <div
+                          className="text-xs text-on-muted mt-0.5 space-y-0.5"
+                          data-testid="maker-line-estimate"
+                        >
+                          <div>
+                            {t("detail.line.estimated", {
+                              amount: formatMoney(
+                                Number(row.estimatedUnitCost) *
+                                  Number(row.estimatedQty),
+                                currency,
+                                i18n.language,
+                              ),
+                            })}
+                          </div>
+                          {row.priceEffect !== null &&
+                            row.priceEffect !== undefined &&
+                            Math.abs(row.priceEffect) >= 0.005 && (
+                              <div data-testid="maker-line-price-effect">
+                                {t("detail.line.priceEffect", {
+                                  amount: formatSigned(
+                                    row.priceEffect,
+                                    currency,
+                                    i18n.language,
+                                  ),
+                                })}
+                              </div>
+                            )}
+                          {row.qtyEffect !== null &&
+                            row.qtyEffect !== undefined &&
+                            Math.abs(row.qtyEffect) >= 0.005 && (
+                              <div data-testid="maker-line-qty-effect">
+                                {t("detail.line.qtyEffect", {
+                                  amount: formatSigned(
+                                    row.qtyEffect,
+                                    currency,
+                                    i18n.language,
+                                  ),
+                                })}
+                              </div>
+                            )}
+                        </div>
+                      )}
                   </div>
                 </div>
               );

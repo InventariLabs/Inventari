@@ -155,6 +155,7 @@ def _to_read(
         output_location_id=order.output_storage_location_id,
         status=order.status,
         total_cost=order.total_cost,
+        estimated_total_cost=order.estimated_total_cost,
         production_date=order.production_date,
         notes=order.notes,
         created_by=order.created_by,
