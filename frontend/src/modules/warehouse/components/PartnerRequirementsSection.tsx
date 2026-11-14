@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -32,6 +33,8 @@ export function PartnerRequirementsSection({
 }: PartnerRequirementsSectionProps) {
   const { t } = useTranslation("warehouse");
   const { data: offer } = useCountryTaxRates();
+  const sourceId = useId();
+  const offerKnown = offer !== undefined;
   const country = offer?.country ?? null;
   const inherited = requireTaxId === null;
   const countryRequires = offer?.require_partner_tax_id ?? false;
@@ -45,6 +48,7 @@ export function PartnerRequirementsSection({
       </div>
       <Checkbox
         checked={requireTaxId ?? countryRequires}
+        aria-describedby={sourceId}
         onChange={(e) => onRequireTaxIdChange(e.target.checked)}
         className="h-4 w-4 cursor-pointer"
         label={
@@ -57,16 +61,26 @@ export function PartnerRequirementsSection({
         }
       />
       {inherited ? (
-        <p className="-mt-3 text-xs text-on-muted" data-testid="tax-id-source">
-          {!country
-            ? t("profile.requirePartnerTaxIdFromNoCountry")
-            : countryRequires
-              ? t("profile.requirePartnerTaxIdFromCountryYes", { country })
-              : t("profile.requirePartnerTaxIdFromCountryNo", { country })}
+        <p
+          id={sourceId}
+          className="-mt-3 text-xs text-on-muted"
+          data-testid="tax-id-source"
+        >
+          {!offerKnown
+            ? t("profile.requirePartnerTaxIdFromUnknownCountry")
+            : !country
+              ? t("profile.requirePartnerTaxIdFromNoCountry")
+              : countryRequires
+                ? t("profile.requirePartnerTaxIdFromCountryYes", { country })
+                : t("profile.requirePartnerTaxIdFromCountryNo", { country })}
         </p>
       ) : (
         <div className="-mt-3 flex flex-wrap items-center gap-3">
-          <p className="text-xs text-on-muted" data-testid="tax-id-source">
+          <p
+            id={sourceId}
+            className="text-xs text-on-muted"
+            data-testid="tax-id-source"
+          >
             {t("profile.requirePartnerTaxIdOwn")}
           </p>
           <Button

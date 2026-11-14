@@ -19,7 +19,7 @@ from app.core.modules import require_module
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang
 
-from .country_tax_rules import get_country_rule
+from .country_tax_rules import country_requires_partner_tax_id
 from .tax_rate_assignment_service import (
     country_rate_offer,
     list_category_assignments_async,
@@ -127,10 +127,9 @@ async def country_rates(
 ) -> CountryRatesOut:
     """The standard and reduced rates the organization's country knows."""
     country = await _org_country(db, require_org(current_user))
-    rule = get_country_rule(country)
     return CountryRatesOut(
         country=country,
-        require_partner_tax_id=rule.require_partner_tax_id if rule else False,
+        require_partner_tax_id=country_requires_partner_tax_id(country),
         rates=[
             CountryRateOffer(name=name, rate=rate, is_standard=is_standard)
             for name, rate, is_standard in country_rate_offer(country)

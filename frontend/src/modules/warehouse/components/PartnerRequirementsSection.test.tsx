@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/utils";
 import { PartnerRequirementsSection } from "./PartnerRequirementsSection";
 
@@ -8,11 +8,21 @@ const fixtures = vi.hoisted(() => ({
     country: "FR" as string | null,
     require_partner_tax_id: true,
     rates: [],
-  },
+  } as
+    | {
+        country: string | null;
+        require_partner_tax_id: boolean;
+        rates: never[];
+      }
+    | undefined,
+  isError: false,
 }));
 
 vi.mock("@/modules/warehouse/hooks/useTaxRates", () => ({
-  useCountryTaxRates: () => ({ data: fixtures.offer, isError: false }),
+  useCountryTaxRates: () => ({
+    data: fixtures.offer,
+    isError: fixtures.isError,
+  }),
 }));
 
 const renderSection = (requireTaxId: boolean | null) => {
@@ -32,6 +42,35 @@ const box = () =>
   screen.getByRole("checkbox", { name: /require partner tax id/i });
 
 describe("PartnerRequirementsSection", () => {
+  beforeEach(() => {
+    fixtures.isError = false;
+  });
+
+  it("does not claim there is no country while the offer is loading", () => {
+    fixtures.offer = undefined;
+    renderSection(null);
+    const source = screen.getByTestId("tax-id-source");
+    expect(source).toHaveTextContent("could not be read yet");
+    expect(source).not.toHaveTextContent("No country is set");
+  });
+
+  it("does not claim there is no country when the offer failed", () => {
+    fixtures.offer = undefined;
+    fixtures.isError = true;
+    renderSection(null);
+    expect(screen.getByTestId("tax-id-source")).not.toHaveTextContent(
+      "No country is set",
+    );
+  });
+
+  it("ties the sentence naming the source to the checkbox", () => {
+    fixtures.offer = { country: "FR", require_partner_tax_id: true, rates: [] };
+    renderSection(null);
+    expect(box()).toHaveAccessibleDescription(
+      expect.stringContaining("Following the country (FR)"),
+    );
+  });
+
   it("shows the country's requirement when the profile has no entry", () => {
     fixtures.offer = { country: "FR", require_partner_tax_id: true, rates: [] };
     renderSection(null);

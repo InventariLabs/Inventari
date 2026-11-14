@@ -696,6 +696,7 @@
     "requirePartnerTaxIdFromCountryYes": "Según el país ({{country}}): se exige el ID fiscal del socio. Marque o desmarque para fijarlo en este perfil.",
     "requirePartnerTaxIdFromCountryNo": "Según el país ({{country}}): no se exige el ID fiscal del socio. Marque o desmarque para fijarlo en este perfil.",
     "requirePartnerTaxIdFromNoCountry": "La organización no tiene país, por lo que no se exige ID fiscal. Marque para exigirlo en este perfil.",
+    "requirePartnerTaxIdFromUnknownCountry": "Aún no se ha podido leer el país de la organización, por lo que no se sabe qué exige. Marque para exigir el ID fiscal en este perfil.",
     "requirePartnerTaxIdOwn": "Fijado en este perfil, sea cual sea el país.",
     "requirePartnerTaxIdFollowCountry": "Volver a seguir el país",
     "applyPresetConfirmTitle": "¿Aplicar esta plantilla?",

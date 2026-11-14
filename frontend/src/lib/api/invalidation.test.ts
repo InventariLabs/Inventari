@@ -169,6 +169,15 @@ describe("invalidation helpers", () => {
       expect(keys).toContainEqual(queryKeys.organization.detail);
       expect(keys).toContainEqual(queryKeys.organization.members);
     });
+
+    it("invalidates what the country supplies, so Warehouse settings read the new one without a reload", () => {
+      const qc = makeClient();
+      invalidation.organization(qc);
+      const keys = (qc.invalidateQueries as unknown as Mock).mock.calls.map(
+        (c) => (c[0] as { queryKey: unknown }).queryKey,
+      );
+      expect(keys).toContainEqual(queryKeys.documents.taxRatesCountry);
+    });
   });
 
   describe("notifications()", () => {
