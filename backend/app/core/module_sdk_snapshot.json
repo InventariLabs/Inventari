@@ -1477,6 +1477,39 @@
         }
       }
     },
+    "LotTraceSource": {
+      "bases": [
+        "ABC"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {
+        "describe_async": {
+          "abstract": true,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "reference_ids",
+              "required": true
+            }
+          ]
+        },
+        "transforms": {
+          "kind": "attribute"
+        }
+      }
+    },
     "ModuleContext": {
       "bases": [
         "object"
@@ -3367,6 +3400,16 @@
         {
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "permissions",
+          "required": true
+        }
+      ]
+    },
+    "register_lot_trace_source": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "source",
           "required": true
         }
       ]

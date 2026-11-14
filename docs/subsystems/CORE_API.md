@@ -595,9 +595,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 311
+- **Total methods:** 312
 - **Namespaces:** 33
-- **Documented methods:** 311 (100%)
-- **READ methods:** 217 (70%)
+- **Documented methods:** 312 (100%)
+- **READ methods:** 218 (70%)
 - **WRITE methods:** 94 (30%)
 
