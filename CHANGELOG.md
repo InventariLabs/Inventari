@@ -33,6 +33,9 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The recipe list's Next page button shows the next page. With more than
+  fifty recipes the page asked the server for the page start under a name it
+  does not read, so page 2 showed page 1 again; it now sends `offset`.
 - The registration form from an invitation keeps the address typed into it.
   The invited address used to fill the field whenever the invitation check
   answered, so an address typed before a slow answer was replaced without a

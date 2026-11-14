@@ -341,7 +341,7 @@ export default function RecipesPage() {
     search: search || undefined,
     tags: tagsParam,
     collection_id: activeCollectionId ?? undefined,
-    skip: page * PAGE_SIZE,
+    offset: page * PAGE_SIZE,
     limit: PAGE_SIZE,
     sort,
   });
@@ -349,7 +349,7 @@ export default function RecipesPage() {
     search: search || undefined,
     tags: tagsParam,
     is_favorite: true,
-    skip: page * PAGE_SIZE,
+    offset: page * PAGE_SIZE,
     limit: PAGE_SIZE,
     sort,
   });
