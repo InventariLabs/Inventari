@@ -2,6 +2,7 @@ import { describe, it, expect, vi, type Mock } from "vitest";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { invalidation } from "./invalidation";
 import { queryKeys } from "@/hooks/queries/keys";
+import { attentionCountsQuery } from "@/modules/shared/hooks/useAttentionCounts";
 
 const makeClient = () => {
   const client = new QueryClient({
@@ -27,7 +28,7 @@ describe("invalidation helpers", () => {
       const qc = new QueryClient();
       for (const hidden of [true, false]) {
         qc.setQueryData([...queryKeys.stats.lowStock, hidden], []);
-        qc.setQueryData([...queryKeys.stats.launcherBadge, hidden], {});
+        qc.setQueryData(attentionCountsQuery(hidden).queryKey, {});
       }
       invalidation.items(qc);
       for (const hidden of [true, false]) {
@@ -36,7 +37,7 @@ describe("invalidation helpers", () => {
             ?.isInvalidated,
         ).toBe(true);
         expect(
-          qc.getQueryState([...queryKeys.stats.launcherBadge, hidden])
+          qc.getQueryState(attentionCountsQuery(hidden).queryKey)
             ?.isInvalidated,
         ).toBe(true);
       }

@@ -16,7 +16,11 @@ import { type ReactNode } from "react";
 import { tokenStore } from "@/lib/api/client";
 import { queryKeys } from "@/hooks/queries/keys";
 
-import { useNotificationsWebSocket } from "@/modules/announcements/hooks/useNotificationsWebSocket";
+import {
+  useNotificationsSocketLive,
+  useNotificationsWebSocket,
+} from "@/modules/announcements/hooks/useNotificationsWebSocket";
+import { useNotifications } from "@/modules/announcements/hooks/useNotifications";
 
 class FakeWebSocket {
   static readonly CONNECTING = 0;
@@ -330,5 +334,84 @@ describe("useNotificationsWebSocket", () => {
       "bearer",
       "rotated-token",
     ]);
+  });
+
+  describe("polling beside the socket", () => {
+    const pollingOf = (queryClient: QueryClient) => {
+      const query = queryClient
+        .getQueryCache()
+        .find({ queryKey: queryKeys.notifications.all });
+      return query?.observers[0]?.options.refetchInterval;
+    };
+
+    function renderBoth() {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      );
+      const view = renderHook(
+        () => {
+          useNotificationsWebSocket();
+          return {
+            live: useNotificationsSocketLive(),
+            notifications: useNotifications(),
+          };
+        },
+        { wrapper },
+      );
+      return { queryClient, ...view };
+    }
+
+    it("polls while the socket is not open and stops once it is", async () => {
+      const { queryClient, result } = renderBoth();
+      await flush();
+      expect(result.current.live).toBe(false);
+      expect(pollingOf(queryClient)).toBe(5 * 60 * 1000);
+
+      act(() => FakeWebSocket.instances[0].dispatch("open", {}));
+      expect(result.current.live).toBe(true);
+      expect(pollingOf(queryClient)).toBe(false);
+    });
+
+    it("polls again when the socket drops", async () => {
+      const { queryClient, result } = renderBoth();
+      await flush();
+      const socket = FakeWebSocket.instances[0];
+      act(() => socket.dispatch("open", {}));
+      act(() => socket.dispatch("close", { code: 1006 }));
+
+      expect(result.current.live).toBe(false);
+      expect(pollingOf(queryClient)).toBe(5 * 60 * 1000);
+    });
+
+    it("asks once for what the gap swallowed when a dropped socket comes back", async () => {
+      vi.useFakeTimers();
+      try {
+        const { queryClient } = renderBoth();
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0);
+        });
+        const spy = vi.spyOn(queryClient, "invalidateQueries");
+        const first = FakeWebSocket.instances[0];
+        act(() => first.dispatch("open", {}));
+        // The first connection has no gap behind it.
+        expect(spy).not.toHaveBeenCalled();
+
+        act(() => first.dispatch("close", { code: 1006 }));
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(2_000);
+        });
+        act(() => FakeWebSocket.instances[1].dispatch("open", {}));
+        expect(spy).toHaveBeenCalledWith({
+          queryKey: queryKeys.notifications.all,
+        });
+      } finally {
+        vi.useRealTimers();
+      }
+    });
   });
 });

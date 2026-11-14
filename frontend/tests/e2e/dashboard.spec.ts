@@ -1,4 +1,8 @@
 import { test, expect } from "./fixtures/auth";
+import { countApiReads } from "./helpers/request-budget";
+
+/** Measured at 13 reads on a fresh install, with headroom for one more module tile: raise it with a reason. */
+const LAUNCHER_READ_BUDGET = 16;
 
 test.describe("Dashboard — overview & widgets", () => {
   test.beforeEach(async ({ page, authenticatedPage }) => {
@@ -110,5 +114,27 @@ test.describe("Dashboard — overview & widgets", () => {
     await expect(slLink).toBeVisible({ timeout: 10000 });
     await slLink.click();
     await expect(page).toHaveURL(/\/shopping-lists/);
+  });
+
+  test("opening the launcher asks each endpoint once, within a budget", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    // Every tile's badge adds its own read, so a module that polls or keys
+    // its query apart from a screen that already holds the answer shows here
+    // as a repeated address or a count past the ceiling.
+    const tally = countApiReads(page);
+    await page.goto("/launcher");
+    await page
+      .waitForLoadState("networkidle", { timeout: 15000 })
+      .catch(() => {});
+    await expect(page.locator("#launcher-modules-heading")).toBeAttached({
+      timeout: 10000,
+    });
+
+    expect(tally.repeated(), tally.reads.join("\n")).toEqual({});
+    expect(tally.reads.length, tally.reads.join("\n")).toBeLessThanOrEqual(
+      LAUNCHER_READ_BUDGET,
+    );
   });
 });

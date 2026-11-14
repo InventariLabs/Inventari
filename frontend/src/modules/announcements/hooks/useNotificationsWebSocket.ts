@@ -28,7 +28,7 @@
  * existing ``useNotifications`` hook and is the SSOT for the UI state.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { tokenStore } from "@/lib/api/client";
@@ -44,6 +44,33 @@ const WS_PATH = "/api/v1/ws/notifications";
 const BEARER_SUBPROTOCOL = "bearer";
 const RECONNECT_BASE_MS = 1_000;
 const RECONNECT_MAX_MS = 30_000;
+
+/**
+ * Whether the notifications socket is open right now. `useNotifications`
+ * reads it to stop polling while pushes arrive: a poll beside a live socket
+ * asks the server every few minutes for what it would have been told.
+ */
+let socketLive = false;
+const liveListeners = new Set<() => void>();
+
+function setSocketLive(next: boolean): void {
+  if (socketLive === next) return;
+  socketLive = next;
+  liveListeners.forEach((listener) => listener());
+}
+
+function subscribeSocketLive(listener: () => void): () => void {
+  liveListeners.add(listener);
+  return () => liveListeners.delete(listener);
+}
+
+export function useNotificationsSocketLive(): boolean {
+  return useSyncExternalStore(
+    subscribeSocketLive,
+    () => socketLive,
+    () => false,
+  );
+}
 
 /**
  * Resolve the absolute WebSocket URL for the current origin.
@@ -119,6 +146,7 @@ export function useNotificationsWebSocket(
       // is ours": the close event that follows must not be read as a dropped
       // connection, and the socket it belongs to is no longer the live one.
       generationRef.current += 1;
+      setSocketLive(false);
       const socket = socketRef.current;
       socketRef.current = null;
       if (!socket) return;
@@ -160,7 +188,16 @@ export function useNotificationsWebSocket(
       socketRef.current = socket;
 
       socket.addEventListener("open", () => {
+        if (generationRef.current !== generation) return;
+        // Pushes sent while the socket was down were never delivered, and
+        // the poll that covered the gap stops now: ask once for the gap.
+        if (reconnectAttemptRef.current > 0) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.notifications.all,
+          });
+        }
         reconnectAttemptRef.current = 0;
+        setSocketLive(true);
       });
 
       socket.addEventListener("message", (event) => {
@@ -180,6 +217,7 @@ export function useNotificationsWebSocket(
         // speaks for the connection.
         if (generationRef.current !== generation) return;
         socketRef.current = null;
+        setSocketLive(false);
         if (!enabledRef.current) return;
         if (!shouldReconnect(event)) return;
 

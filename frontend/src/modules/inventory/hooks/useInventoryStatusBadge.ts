@@ -1,6 +1,7 @@
-import { itemsApi } from "@/lib/api/items";
-import { attentionCount } from "@/modules/shared/hooks/useAttentionCounts";
-import { queryKeys } from "@/hooks/queries/keys";
+import {
+  attentionCount,
+  attentionCountsQuery,
+} from "@/modules/shared/hooks/useAttentionCounts";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
 import { useLauncherStatusBadge } from "@/modules/shared/hooks/useLauncherStatusBadge";
 
@@ -14,11 +15,9 @@ import { useLauncherStatusBadge } from "@/modules/shared/hooks/useLauncherStatus
 export function useInventoryStatusBadge() {
   const excludeModuleContexts = !useShowModuleData();
   return useLauncherStatusBadge({
-    queryKey: [...queryKeys.stats.launcherBadge, excludeModuleContexts],
-    queryFn: () =>
-      itemsApi.getAttentionCounts({
-        exclude_module_contexts: excludeModuleContexts,
-      }),
+    // The dashboard heading and the statistics health card ask the same
+    // question under this same key: one request, not one per reader.
+    ...attentionCountsQuery(excludeModuleContexts),
     labelKey: "inventory:statusBadge.needsAttention",
     staleTime: 2 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,

@@ -2,7 +2,11 @@ import { test, expect } from "./fixtures/auth";
 import type { Locator, Page, Request } from "@playwright/test";
 import { ApiHelper } from "./helpers/api";
 import { expectApiOk } from "./helpers/page-load";
+import { countApiReads } from "./helpers/request-budget";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
+
+/** Measured at 21 reads on a fresh install, with headroom for a couple more: raise it with a reason. */
+const ITEM_LIST_READ_BUDGET = 25;
 
 test.describe("Items — CRUD flow", () => {
   let api: ApiHelper;
@@ -129,6 +133,26 @@ test.describe("Items — CRUD flow", () => {
     ).toBeVisible({
       timeout: 15000,
     });
+  });
+
+  test("opening the item list asks each endpoint once, within a budget", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    // The beforeEach already opened the list; open it again with the count on.
+    const tally = countApiReads(page);
+    await page.goto("/inventory/items");
+    await page
+      .waitForLoadState("networkidle", { timeout: 15000 })
+      .catch(() => {});
+    await expect(
+      page.getByTestId("item-name").filter({ hasText: expiringName }),
+    ).toBeVisible({ timeout: 15000 });
+
+    expect(tally.repeated(), tally.reads.join("\n")).toEqual({});
+    expect(tally.reads.length, tally.reads.join("\n")).toBeLessThanOrEqual(
+      ITEM_LIST_READ_BUDGET,
+    );
   });
 
   test("adds a new item", async ({ page, authenticatedPage }) => {

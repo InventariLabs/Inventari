@@ -3,6 +3,21 @@ import { itemsApi } from "@/lib/api/items";
 import type { AttentionCounts } from "@/types";
 import { queryKeys } from "@/hooks/queries/keys";
 
+/** The query behind {@link useAttentionCounts}: key and fetch, shared. */
+export function attentionCountsQuery(excludeModuleContexts: boolean) {
+  return {
+    queryKey: [
+      ...queryKeys.items.all,
+      "attention-counts",
+      excludeModuleContexts,
+    ] as const,
+    queryFn: () =>
+      itemsApi.getAttentionCounts({
+        exclude_module_contexts: excludeModuleContexts,
+      }),
+  };
+}
+
 /**
  * What needs attention, from the one place that answers it.
  *
@@ -11,24 +26,15 @@ import { queryKeys } from "@/hooks/queries/keys";
  * is the rule the purchasing engine reads. The inventory dashboard's
  * heading and the statistics health card both read this hook, so one
  * organization has one number rather than two independent computations
- * of the same concept.
+ * of the same concept. The launcher tile's badge reads it too, through
+ * `attentionCountsQuery`, under the same key: one request serves all three.
  *
  * `excludeModuleContexts` is the organization's "show module data"
  * setting, passed the way the item list passes it: both screens narrow to
  * the same rows, so a heading never counts a record the list would hide.
  */
 export function useAttentionCounts(excludeModuleContexts: boolean) {
-  return useQuery<AttentionCounts>({
-    queryKey: [
-      ...queryKeys.items.all,
-      "attention-counts",
-      excludeModuleContexts,
-    ],
-    queryFn: () =>
-      itemsApi.getAttentionCounts({
-        exclude_module_contexts: excludeModuleContexts,
-      }),
-  });
+  return useQuery<AttentionCounts>(attentionCountsQuery(excludeModuleContexts));
 }
 
 /**
