@@ -268,6 +268,20 @@ describe("check-module-boundaries", () => {
     ).toEqual(["inventory → @/lib/api/client"]);
   });
 
+  it("lets a module declare its own slot, and only that, through the slot map", () => {
+    const declaration =
+      'export {};\ndeclare module "@/lib/moduleRegistry/slotProps" {\n  interface SlotDataMap { my_slot: { id: string } }\n}\n';
+    expect(coreImports("notes/slots.d.ts", declaration)).toEqual([]);
+    // An import of the same file is still Core internals.
+    expect(
+      coreImports(
+        "notes/slots.d.ts",
+        declaration +
+          'import type { DocumentMetaData } from "@/lib/moduleRegistry/slotProps";',
+      ),
+    ).toEqual(["notes → @/lib/moduleRegistry/slotProps"]);
+  });
+
   it("reports a core import written as a relative path", () => {
     // A valid relative specifier lands on the same file the alias names, and
     // the gate records it as the same dependency.

@@ -6,7 +6,6 @@ import {
   Route,
   Navigate,
   useLocation,
-  useParams,
   type RouteObject,
 } from "react-router-dom";
 import {
@@ -27,6 +26,11 @@ import {
   type ModuleRoute,
   type SettingsSection,
 } from "./lib/moduleRegistry";
+import {
+  LEGACY_REDIRECTS,
+  LEGACY_SETTINGS_REDIRECTS,
+  LegacyRedirectTo,
+} from "./lib/legacyRedirects";
 import { registerModules } from "./lib/moduleRegistry/moduleLoaders";
 import { shellRoutes } from "./lib/moduleRegistry/shellRoutes";
 import { RootRedirect, LauncherRoute } from "./components/RootRedirect";
@@ -91,12 +95,6 @@ import AppShell from "./components/AppShell";
 import ModuleShell from "./components/ModuleShell";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { OnboardingGuard } from "@/modules/onboarding/components/OnboardingGuard";
-
-/** Redirect that preserves query-string and hash (e.g. /items?location_id=X → /inventory/items?location_id=X). */
-function RedirectPreserving({ to }: { to: string }) {
-  const { search, hash } = useLocation();
-  return <Navigate to={`${to}${search}${hash}`} replace />;
-}
 
 /** Relative path of an absolute route path within a module base path. */
 function relPath(absolutePath: string, basePath: string): string {
@@ -446,37 +444,22 @@ export function appRouteTree(
         <Route path="settings" element={<SettingsShell />}>
           <Route index element={<SettingsGeneralSection />} />
           <Route path="my-modules" element={<SettingsMyModulesSection />} />
-          {/* "My modules" is one screen for the module set and the
-                single-module toggles; the two addresses that used to hold one
-                half each survive so a bookmark still lands on the whole. */}
-          <Route
-            path="workspace"
-            element={<Navigate to="/settings/my-modules" replace />}
-          />
-          <Route
-            path="focus"
-            element={<Navigate to="/settings/my-modules" replace />}
-          />
           <Route path="about" element={<SettingsAboutSection />} />
           <Route path="profile" element={<SettingsProfileSection />} />
-          {/* The whole content of this page was a sentence and a button
-                pointing at /apps — which is also where the sidebar has always
-                linked. The address survives for bookmarks. */}
-          <Route path="modules" element={<Navigate to="/apps" replace />} />
           <Route path="modules/:name" element={<ModuleSettingsPage />} />
           <Route path="ai" element={<SettingsAiSection />} />
           <Route path="email" element={<SettingsEmailSection />} />
-          {/* "Developer" held the mail server and the AI connections under a
-                name that described neither. The address survives as an alias so
-                a bookmark still lands somewhere. */}
-          <Route
-            path="developer"
-            element={<Navigate to="/settings/ai" replace />}
-          />
           <Route path="audit-log" element={<AuditLogPage />} />
           {/* Access & Roles — the RBAC matrix; admin-only by default
                 (settingsAccess.ts denies what is not explicitly member-listed). */}
           <Route path="roles" element={<RolesPage />} />
+          {LEGACY_SETTINGS_REDIRECTS.map((alias) => (
+            <Route
+              key={alias.from}
+              path={alias.from}
+              element={<LegacyRedirectTo {...alias} />}
+            />
+          ))}
           {/* Module-contributed settings sections */}
           {settingsSections.map((section) => (
             <Route
@@ -487,70 +470,14 @@ export function appRouteTree(
           ))}
         </Route>
 
-        {/* --- Backward-compatibility redirect aliases --- */}
-        {/* Webhooks lived on a flat route as well as in settings. The flat
-              one had no PageHeaderContext above it, so its header — carrying
-              the only "Add webhook" button once the list was non-empty — went
-              nowhere. One screen, one address: the settings one, which is
-              where the sidebar has always pointed. */}
-        <Route
-          path="webhooks"
-          element={<Navigate to="/settings/webhooks" replace />}
-        />
-        {/* Inventory paths */}
-        <Route
-          path="items"
-          element={<RedirectPreserving to="/inventory/items" />}
-        />
-        <Route
-          path="items/add"
-          element={<Navigate to="/inventory/items/add" replace />}
-        />
-        <Route path="items/:id" element={<ItemsIdRedirect />} />
-        <Route
-          path="categories"
-          element={<Navigate to="/inventory/categories" replace />}
-        />
-        <Route
-          path="scan"
-          element={<RedirectPreserving to="/inventory/scan" />}
-        />
-        {/* The address a printed QR opens (see backend scan_links): one
-              letter, because every byte of it is a module on the label. */}
-        <Route path="s/*" element={<ShortScanRedirect />} />
-        {/* Spaces paths (storages now live under /inventory) */}
-        <Route
-          path="storages"
-          element={<Navigate to="/inventory/locations" replace />}
-        />
-        <Route path="storages/:id" element={<StoragesIdRedirect />} />
-        {/* Labels path (now under /inventory) */}
-        <Route
-          path="labels"
-          element={<Navigate to="/inventory/labels" replace />}
-        />
-        {/* Stats paths (now under /inventory/stats) */}
-        <Route
-          path="stats"
-          element={<Navigate to="/inventory/stats" replace />}
-        />
-        <Route
-          path="stats/inventory"
-          element={<Navigate to="/inventory/stats" replace />}
-        />
-        <Route
-          path="stats/analytics"
-          element={<Navigate to="/inventory/stats/analytics" replace />}
-        />
-        {/* Stock takes paths (now under /inventory/stock-takes) */}
-        <Route
-          path="stock-takes"
-          element={<Navigate to="/inventory/stock-takes" replace />}
-        />
-        <Route
-          path="stock-takes/:id/counting"
-          element={<StockTakesIdRedirect />}
-        />
+        {/* Backward-compatibility redirect aliases: a table, see legacyRedirects */}
+        {LEGACY_REDIRECTS.map((alias) => (
+          <Route
+            key={alias.from}
+            path={alias.from}
+            element={<LegacyRedirectTo {...alias} />}
+          />
+        ))}
 
         {/* 404 inside AppShell */}
         <Route path="*" element={<NotFoundPage />} />
@@ -580,12 +507,6 @@ export function createAppRoutes(
   ).map((route) => ({ ...route, errorElement: <ErrorPage /> }));
 }
 
-/** Dynamic redirect for /storages/:id → /inventory/locations/:id */
-function StoragesIdRedirect() {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={`/inventory/locations/${id ?? ""}`} replace />;
-}
-
 /** Renders a route only while one of the modules it needs is enabled; else the 404. */
 function RouteGate({
   requiresModules,
@@ -602,45 +523,6 @@ function RouteGate({
     return <NotFoundPage />;
   }
   return <>{children}</>;
-}
-
-/** Dynamic redirect for /stock-takes/:id/counting → /inventory/stock-takes/:id/counting */
-function StockTakesIdRedirect() {
-  const { id } = useParams<{ id: string }>();
-  return (
-    <Navigate to={`/inventory/stock-takes/${id ?? ""}/counting`} replace />
-  );
-}
-
-/**
- * `/s/<code>` → the scanner, with the code as `?code=`. A catch-all rather
- * than `:code`, so a document number keeps its slashes (`/s/IN/2026/0001`).
- */
-function ShortScanRedirect() {
-  const code = useParams()["*"] ?? "";
-  return (
-    <Navigate
-      to={
-        code
-          ? `/inventory/scan?code=${encodeURIComponent(code)}`
-          : "/inventory/scan"
-      }
-      replace
-    />
-  );
-}
-
-/** Dynamic redirect for the legacy /items/:id → /inventory/items/{id}. */
-function ItemsIdRedirect() {
-  const { id } = useParams<{ id: string }>();
-  return (
-    <Navigate
-      to={
-        id ? `/inventory/items/${encodeURIComponent(id)}` : "/inventory/items"
-      }
-      replace
-    />
-  );
 }
 
 export default App;

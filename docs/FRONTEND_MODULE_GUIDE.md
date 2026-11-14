@@ -393,6 +393,38 @@ moduleRegistry.register({
 >
 > **SlotDataMap types** live in `frontend/src/lib/moduleRegistry/slotProps.ts`. Import `type { SlotDataMap }` for compile-time checking.
 
+### A slot of your own
+
+A screen of your module can offer a place other modules fill. Declare its data
+shape from your module, in a `.d.ts` beside `module.ts`, and render it with
+`TypedSlot` — `slotProps.ts` stays untouched:
+
+```typescript
+// warranty_tracker/slots.d.ts
+export {};
+
+declare module "@/lib/moduleRegistry/slotProps" {
+  interface SlotDataMap {
+    warranty_card_extra: { warrantyId: string };
+  }
+}
+```
+
+```tsx
+<TypedSlot name="warranty_card_extra" data={{ warrantyId: warranty.id }} />
+```
+
+Keep the `export {};` line: a file with no top-level import or export is a
+script, and TypeScript then reads the block as a declaration that *replaces*
+`slotProps` instead of merging into it — your slot is refused and the core
+slots disappear from every file that uses them. The type-check compiles this
+exact form (`slotAugmentation.fixture.d.ts`).
+
+This is the one specifier outside `@/module-sdk` the boundary check lets a module
+write, and only as that `declare module` line: TypeScript merges an interface
+through the module that declares it, which a re-export cannot carry. Prefix the
+slot name with your module's name so two modules cannot pick the same one.
+
 ### A field of your own on a document
 
 The two document form slots are how a module adds a field to a warehouse
@@ -502,9 +534,41 @@ moduleRegistry.register({
 
 ---
 
+## Query Keys
+
+Keep your module's TanStack Query keys in `warranty_tracker/queryKeys.ts`,
+beside your hooks, and import them from there:
+
+```typescript
+export const warrantyKeys = {
+  all: ["warranty_tracker"] as const,
+  list: (filters: unknown) => ["warranty_tracker", "list", filters] as const,
+  detail: (id: string) => ["warranty_tracker", "detail", id] as const,
+};
+```
+
+Start every key with your module's name, so a prefix invalidation
+(`invalidateQueries({ queryKey: warrantyKeys.all })`) reaches your queries and
+nobody else's. Do not add a namespace to `hooks/queries/keys.ts`: it is Core's
+file, every module PR would edit it, and a test fails on a new top-level
+namespace there.
+
+---
+
+## Retiring one of your module's addresses
+
+`lib/legacyRedirects.tsx` is a table of addresses Core itself once answered (the
+inventory tree, the settings tabs). It is not where a module's own address goes
+when the module moves a page: mount the forwarding route in the module, as a
+`routes` entry whose `component` renders a `<Navigate>`. Core's table stays
+closed to modules on purpose, so no module PR edits it.
+
+---
+
 ## Settings Sections
 
-Add a dedicated settings page for your module inside the Settings shell.
+Add a dedicated settings page for your module inside the Settings shell. The
+route is mounted from this contribution; `App.tsx` is not edited.
 
 ```typescript
 const MySettingsPage = lazy(() => import("./pages/SettingsPage"));
