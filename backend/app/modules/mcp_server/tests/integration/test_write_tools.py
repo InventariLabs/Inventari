@@ -10,11 +10,13 @@ from __future__ import annotations
 
 from decimal import Decimal
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
+from app.core.public_api import core_api
 from app.models.audit_log import AuditLog
 from app.models.item import Item
 from app.models.item_history import ItemHistory
@@ -144,6 +146,35 @@ class TestCreateItem:
         assert 'PERMISSION_REQUIRED' in _refusal(result)
         assert (
             db_session.scalars(select(Item).where(Item.name == 'MCP No Write')).first()
+            is None
+        )
+
+    def test_a_negative_quantity_is_refused_readably(
+        self,
+        mcp_tool,
+        db_session: Session,
+        mcp_write_key: str,
+        shelf: StorageLocation,
+    ) -> None:
+        """The refusal names the code, where the DTO's refusal was a bare error.
+
+        A negative quantity never reaches the DTO: the tool refuses it with
+        QUANTITY_INVALID, so the model is told what was wrong instead of
+        reading "Error executing tool create_item".
+        """
+        result = mcp_tool(
+            mcp_write_key,
+            'create_item',
+            {
+                'name': 'MCP Negative',
+                'quantity': -2,
+                'location_id': str(shelf.id),
+            },
+        )
+
+        assert 'QUANTITY_INVALID' in _refusal(result)
+        assert (
+            db_session.scalars(select(Item).where(Item.name == 'MCP Negative')).first()
             is None
         )
 
@@ -376,3 +407,87 @@ class TestCorrectStock:
         )
 
         assert 'ITEM_NOT_FOUND' in _refusal(result)
+
+    def test_a_correction_committed_before_the_lock_is_the_baseline(
+        self,
+        mcp_tool,
+        db_session: Session,
+        mcp_org: Organization,
+        mcp_user: User,
+        mcp_write_key: str,
+        item: Item,
+        monkeypatch,
+    ) -> None:
+        """The difference is measured under the lock, not on the pre-lock read.
+
+        Another operator's correction takes the record from 5 to 7 and
+        commits between this call's first read and its lock. The correction
+        to 3 is then a change of -4 everywhere it is written: the movement,
+        the register's line, the answer's previous quantity and the journal's
+        before. Measured on the pre-lock read it was -2 in the register and
+        in the answer beside a ledger that moved -4 — one document with the
+        wrong sign for a change nobody made.
+        """
+        mcp_org.enabled_modules = [*(mcp_org.enabled_modules or []), 'warehouse']
+        db_session.commit()
+
+        first_read = core_api.items.get_async
+        committed = False
+
+        async def read_then_another_correction(db, organization_id, item_id):
+            nonlocal committed
+            found = await first_read(db, organization_id, item_id)
+            if not committed:
+                committed = True
+                # A connection of its own, so the change commits for real
+                # while this request's transaction is open and has read.
+                async with AsyncSession(bind=db.bind, expire_on_commit=False) as other:
+                    await core_api.items.update_quantity_async(
+                        other,
+                        organization_id,
+                        item_id,
+                        Decimal('7'),
+                        user_id=mcp_user.id,
+                        move_reference_type='adjustment',
+                        move_reference_id=uuid4(),
+                    )
+                    await other.commit()
+            return found
+
+        monkeypatch.setattr(core_api.items, 'get_async', read_then_another_correction)
+
+        result = mcp_tool(
+            mcp_write_key,
+            'correct_stock',
+            {'item_id': str(item.id), 'quantity': 3, 'reason': 'Counted three'},
+        )
+
+        payload = _structured(result)
+        assert Decimal(str(payload['previous_quantity'])) == Decimal('7')
+        assert payload['register_document_id'] is not None
+
+        db_session.expire_all()
+        moves = db_session.scalars(
+            select(StockMove).where(
+                StockMove.reference_id == UUID(payload['reference'])
+            )
+        ).all()
+        assert len(moves) == 1
+        assert Decimal(str(moves[0].quantity)) == Decimal('4')
+
+        lines = db_session.scalars(
+            select(DocumentLine).where(
+                DocumentLine.document_id == UUID(payload['register_document_id'])
+            )
+        ).all()
+        assert len(lines) == 1
+        assert Decimal(str(lines[0].quantity)) == Decimal('-4')
+
+        call = next(
+            row
+            for row in _audit_rows(db_session, mcp_org, item.id)
+            if (row.meta_data or {}).get('tool') == 'correct_stock'
+        )
+        assert call.snapshot is not None
+        assert Decimal(call.snapshot['before']['quantity']) == Decimal('7')
+        assert Decimal(str(_record(db_session, item.id).quantity)) == Decimal('3')

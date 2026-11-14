@@ -45,6 +45,18 @@ _CREATE = ToolAnnotations(destructiveHint=False, idempotentHint=False)
 _CORRECT = ToolAnnotations(destructiveHint=True, idempotentHint=False)
 
 
+def _refuse_a_negative_quantity(quantity: Decimal) -> None:
+    """Refuse a negative quantity with a code the model can act on.
+
+    Left to the create DTO — or to the quantity update's own schema — a
+    negative number raises a validation error inside the tool, and the
+    transport answers a bare "Error executing tool ..." that says neither what
+    was wrong nor what to send instead.
+    """
+    if quantity < 0:
+        raise refusal('QUANTITY_INVALID', 'quantity_not_negative')
+
+
 async def _journal_the_call_async(
     db: AsyncSession,
     identity: McpIdentity,
@@ -140,6 +152,7 @@ def register_write_tools(server: MCPServer) -> None:
         """Create one stock record, with its opening movement and history."""
         identity = current_identity()
         identity.require('items:write')
+        _refuse_a_negative_quantity(quantity)
         call_id = uuid4()
         data = ItemCreateDTO(
             name=name,
@@ -229,8 +242,7 @@ def register_write_tools(server: MCPServer) -> None:
         reason = (reason or '').strip()
         if not reason:
             raise refusal('REASON_REQUIRED', 'reason_required')
-        if quantity < 0:
-            raise refusal('QUANTITY_INVALID', 'quantity_not_negative')
+        _refuse_a_negative_quantity(quantity)
         call_id = uuid4()
         async with request_session() as db:
             item = await core_api.items.get_async(db, identity.organization_id, item_id)
@@ -240,13 +252,41 @@ def register_write_tools(server: MCPServer) -> None:
             # Every group this call writes is locked first, in one order, so
             # two corrections of the same product and shelf wait for each
             # other instead of deadlocking (backend/AGENTS.md, Stock Posting
-            # Rules). A record with no product card joins no group.
+            # Rules). A record with no product card joins no group. The keys
+            # come from this read because the lock is what serializes them;
+            # the numbers below do not, and are read again under it.
             keys = (
                 [(item.template_id, item.location_id)]
                 if item.template_id is not None
                 else []
             )
             await core_api.stock.lock_async(db, identity.organization_id, keys=keys)
+
+            # What the answer and the register measure their difference
+            # against is the quantity that stands once this call holds the
+            # record, not the one it read before waiting for the lock. Two
+            # corrections racing for one record used to be measured on the
+            # pre-lock read: the ledger posted the real change while the
+            # register carried a line for a difference nobody made, with the
+            # wrong sign.
+            item = await core_api.items.get_for_update_async(
+                db, identity.organization_id, item_id
+            )
+            if item is None:
+                raise refusal('ITEM_NOT_FOUND', 'item_not_found', item_id=str(item_id))
+            # A record that moved to another product or shelf while this call
+            # waited now writes a group this call has not locked; that group
+            # is locked here too, before the first write.
+            groups_now = (
+                [(item.template_id, item.location_id)]
+                if item.template_id is not None
+                else []
+            )
+            new_groups = [key for key in groups_now if key not in keys]
+            if new_groups:
+                await core_api.stock.lock_async(
+                    db, identity.organization_id, keys=new_groups
+                )
 
             updated = await core_api.items.update_quantity_async(
                 db,

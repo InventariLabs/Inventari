@@ -29,22 +29,27 @@ changes stock and the demo is what there is to change.
    then **MCP Server**.
 
 3. **Issue a key.** Open **Settings → API Keys → Generate new key**. Name it
-   something you will recognize, tick **Use the MCP endpoint**, **Items read**
-   and **Items write**, and copy the key — it is shown once.
+   something you will recognize, tick **Use the MCP endpoint**, **Read products
+   and stock levels** and **Add products and change stock levels**, and copy the
+   key — it is shown once.
 
 4. **Add the server to Claude Code**, replacing `<key>` with the key and
    `8000` with the port the API answers on:
 
    ```bash
-   claude mcp add --transport http inventari http://localhost:8000/api/v1/mcp-server/mcp --header "Authorization: Bearer <key>"
-   ```
-
-   Claude Code can send the key in its own header too; this is the form Core
-   does not mark Deprecation:
-
-   ```bash
    claude mcp add --transport http inventari http://localhost:8000/api/v1/mcp-server/mcp --header "X-API-Key: <key>"
    ```
+
+   `X-API-Key` is the header Core accepts without a warning. A client that can
+   send no header other than `Authorization` still works with
+   `Authorization: Bearer <key>`, and Core marks that form `Deprecation`.
+
+   On a **development** stack the address printed on the module page goes
+   through the frontend's proxy, which hands the API an internal host name; the
+   endpoint answers that `421 Invalid Host header`. Point the client at the
+   API's own port instead — `http://localhost:8000/api/v1/mcp-server/mcp` in the
+   default compose file. A production reverse proxy passes the public host
+   through, so there the address the page prints is the right one.
 
 5. **Ask the agent to use it.** For example:
 
@@ -60,9 +65,10 @@ changes stock and the demo is what there is to change.
    name the reason and the API key's prefix. When **Warehouse** is on, its
    register holds one completed ADJUSTMENT document for the correction.
 
-If this installation answers on a public address, add that host under
-**Settings → MCP Server → Allowed hosts**; the endpoint refuses an unknown
-`Host` header just as the browser would.
+If this installation answers on a public address, allow that host first: open
+**Apps → MCP Server** and follow its **MCP Server settings** link, then add the
+host under **Allowed hosts**. The endpoint refuses an unknown `Host` header just
+as the browser would.
 
 The walk above was measured from `make demo-reset` to the agent's answer on a
 development stack: 45 seconds on 2026-11-14, with the correction registered as
@@ -95,7 +101,10 @@ layer, the item history and the journal entry beside it.
 Rules):
 
 1. every `(product template, shelf)` group the call touches is locked with
-   `core_api.stock.lock_async` before the first write;
+   `core_api.stock.lock_async` before the first write, and the record is then
+   read again under its own row lock: the difference the answer and the
+   register carry is measured on the quantity that stands when the call holds
+   the record, never on the read it took before waiting for the lock;
 2. one `core_api.items.update_quantity_async` sets the quantity and posts the
    movement and the cost layer, with `move_reference_type='adjustment'` and
    the call's UUID as the reference; the history row carries
