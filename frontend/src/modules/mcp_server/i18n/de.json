@@ -1,0 +1,32 @@
+{
+  "title": "MCP-Server",
+  "description": "Verbinden Sie einen KI-Agenten über das Model Context Protocol mit diesem Arbeitsbereich.",
+  "subtitle": "Was ein KI-Agent hier lesen kann und wie er sich verbindet.",
+  "endpoint": {
+    "label": "Endpunkt",
+    "hint": "Richten Sie Ihren MCP-Client auf diese Adresse."
+  },
+  "connect": {
+    "title": "So verbinden Sie",
+    "createKey": "Legen Sie unter API-Schlüssel einen Schlüssel an und geben Sie ihm die Berechtigung MCP-Endpunkt verwenden.",
+    "pointClient": "Senden Sie den Schlüssel im Header X-API-Key (oder als Bearer-Token) an die Adresse oben.",
+    "allowHost": "Antwortet die Installation unter einer öffentlichen Adresse, tragen Sie deren Host bei den erlaubten Hosts in den Moduleinstellungen ein."
+  },
+  "links": {
+    "apiKeys": "API-Schlüssel"
+  },
+  "navigation": {
+    "title": "MCP-Server"
+  },
+  "permissions": {
+    "use": "MCP-Endpunkt verwenden",
+    "useDesc": "Ohne sie erreicht ein Schlüssel weder den MCP-Endpunkt noch seine Werkzeugliste"
+  },
+  "settings": {
+    "allowedHosts": "Erlaubte Hosts",
+    "allowedHostsDesc": "Host-Header, die der MCP-Endpunkt neben localhost akzeptiert. Ein Wert pro Zeile.",
+    "allowedOrigins": "Erlaubte Origins",
+    "allowedOriginsDesc": "Origin-Header, die der MCP-Endpunkt neben localhost akzeptiert. Ein Wert pro Zeile.",
+    "open": "MCP-Server-Einstellungen"
+  }
+}

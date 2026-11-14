@@ -1,9 +1,10 @@
 [
   "approvals",
-  "warehouse",
   "equipment",
+  "mcp_server",
   "recipes",
   "stats",
   "stock_takes",
+  "warehouse",
   "webhooks"
 ]

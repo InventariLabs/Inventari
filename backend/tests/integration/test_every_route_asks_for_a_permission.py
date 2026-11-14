@@ -78,6 +78,11 @@ _OPEN = {
     'POST /api/v1/auth/registration-request': 'before sign-in',
     'GET /api/v1/auth/registration-link/{token}': 'before sign-in',
     'POST /api/v1/auth/register-complete': 'before sign-in',
+    # The MCP transport is an ASGI app with its own key authentication: every
+    # request resolves the bearer key, checks mcp_server:use, the key's
+    # organization and the module switch in `McpAuthMiddleware`, before the
+    # SDK sees it. A FastAPI guard cannot reach a mounted ASGI transport.
+    'POST /api/v1/mcp-server/mcp': 'authenticated in the MCP middleware',
     'POST /api/v1/auth/login': 'signing in',
     'POST /api/v1/auth/refresh': 'the session renewing itself',
     'POST /api/v1/auth/logout': "ending the caller's own session",

@@ -19,6 +19,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.testclient import TestClient
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from starlette.routing import Route
 
 import app.core.limiter as limiter_module
 from app.core.limiter import rate_limit_exceeded_handler
@@ -431,3 +432,57 @@ class TestIssuedKeysBehindASpentSender:
             issued_list.issued.add('inv_live_expired')
             await client.get('/api/v1/items', headers={'X-API-Key': 'inv_live_expired'})
         assert lookups.count('inv_live_expired') == 2
+
+
+@pytest.fixture
+def app_with_plain_route() -> FastAPI:
+    """A plain Starlette ``Route`` on a router, limited to 2/minute.
+
+    FastAPI keeps an included router as an ``_IncludedRouter`` node and the
+    ``Route`` it carries has an endpoint but the included context does not —
+    the shape the MCP endpoint has, where the lookup skipped it and the default
+    limits guarded nothing behind the transport.
+    """
+    limiter = Limiter(
+        key_func=lambda request: 'route-bucket',
+        storage_uri='memory://',
+        default_limits=['2/minute'],
+    )
+
+    async def transport(scope, receive, send):
+        from starlette.responses import Response
+
+        await Response('ok')(scope, receive, send)
+
+    # A class instance, not a function: Starlette reads that as an ASGI app
+    # (the module's `AtRootPath` is the same shape), while a function would be
+    # called as a request handler.
+    class Transport:
+        __name__ = 'mcp_endpoint'
+
+        async def __call__(self, scope, receive, send):
+            await transport(scope, receive, send)
+
+    router = APIRouter()
+    router.routes.append(Route('/mcp', endpoint=Transport(), methods=['POST']))
+
+    app = FastAPI()
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
+    app.add_middleware(RouterAwareSlowAPIMiddleware)
+    app.include_router(router, prefix='/api/v1/mcp-server')
+    return app
+
+
+class TestAPlainStarletteRoute:
+    def test_the_route_is_a_handler(self, app_with_plain_route):
+        handler = find_route_handler(
+            app_with_plain_route.routes, _scope('/api/v1/mcp-server/mcp', 'POST')
+        )
+        assert handler is not None
+
+    def test_the_default_limit_reaches_the_route(self, app_with_plain_route):
+        with TestClient(app_with_plain_route) as client:
+            for _ in range(2):
+                assert client.post('/api/v1/mcp-server/mcp').status_code == 200
+            assert client.post('/api/v1/mcp-server/mcp').status_code == 429

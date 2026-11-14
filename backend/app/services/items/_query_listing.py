@@ -117,6 +117,8 @@ async def list_by_expiry_async(
     storage_usage: str | None = None,
     order: str = 'asc',
     include_nulls_last: bool = True,
+    expiry_after: date | None = None,
+    expiry_before: date | None = None,
     limit: int = 500,
 ) -> list[Item]:
     """List active items sorted by ``expiry_date`` (FEFO picking order).
@@ -135,6 +137,11 @@ async def list_by_expiry_async(
         include_nulls_last: When True, items with NULL expiry sort last regardless
             of order direction. Matches the legacy DB-level ``ORDER BY
             expiry_date ASC NULLS LAST`` behavior used by recipes.
+        expiry_after: Optional inclusive lower bound on the effective expiry
+            date. A caller reading one window filters here, so ``limit`` counts
+            the rows in the window rather than whatever sits before it.
+        expiry_before: Optional inclusive upper bound on the effective expiry
+            date.
         limit: Safety cap (default 500).
 
     Returns:
@@ -164,6 +171,10 @@ async def list_by_expiry_async(
         query = query.join(
             StorageLocation, Item.storage_location_id == StorageLocation.id
         ).where(StorageLocation.usage == storage_usage)
+    if expiry_after is not None:
+        query = query.where(Item.effective_expiry_date >= expiry_after)
+    if expiry_before is not None:
+        query = query.where(Item.effective_expiry_date <= expiry_before)
 
     sort_col = (
         Item.effective_expiry_date.asc()

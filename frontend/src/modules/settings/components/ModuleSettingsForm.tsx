@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/NativeSelect";
@@ -9,6 +9,7 @@ import { useHasPermission } from "@/hooks/useHasPermission";
 import {
   PageSaveProvider,
   SettingsSaveBar,
+  Textarea,
   usePageSavePart,
   useUnderPageSave,
 } from "@/module-sdk";
@@ -32,6 +33,18 @@ type FormState = Record<string, unknown>;
 function cloneValue(value: unknown): unknown {
   if (value === undefined || value === null) return value;
   return JSON.parse(JSON.stringify(value));
+}
+
+/**
+ * A list setting's payload: the editor's lines, trimmed with blank ones
+ * dropped. The editor keeps a blank line while it is typed so Enter can start
+ * the next value; the list itself should not carry that draft line.
+ */
+function cleanList(value: unknown): unknown {
+  if (!Array.isArray(value)) return value;
+  return value
+    .map((entry) => (typeof entry === "string" ? entry.trim() : entry))
+    .filter((entry) => entry !== "");
 }
 
 function applyDefaults(
@@ -223,7 +236,7 @@ function ModuleSettingsFields({
 
   function buildPayload(): FormState {
     const payload: FormState = {};
-    for (const { path } of fields) {
+    for (const { path, field } of fields) {
       const raw = values[path];
       const edited = secretEdited.has(path);
       if (edited && (raw === "" || raw === undefined || raw === null)) {
@@ -232,7 +245,7 @@ function ModuleSettingsFields({
       if (isMasked(raw) && !edited) {
         continue;
       }
-      payload[path] = raw;
+      payload[path] = field.type === "array" ? cleanList(raw) : raw;
     }
     return toSchemaShape(payload);
   }
@@ -305,6 +318,9 @@ interface FieldRowProps {
 
 function FieldRow({ path, field, value, onChange }: FieldRowProps) {
   const { t } = useTranslation("common");
+  // The array editor renders its description under the box; the id keeps the
+  // sentence attached to the field for a screen reader.
+  const descriptionId = useId();
   // schema-provided i18n keys win; literals are the fallback so
   // modules without keys keep rendering exactly as before.
   const label =
@@ -319,6 +335,29 @@ function FieldRow({ path, field, value, onChange }: FieldRowProps) {
       t(field.description_key, { defaultValue: field.description })) ||
     field.description;
   const isSecret = field.format === "secret";
+
+  if (field.type === "array") {
+    // The schema's array editor: one value per line. The lines stay as typed
+    // (a trailing blank line included) so Enter can start the next one; the
+    // payload trims and drops empty lines on save.
+    const lines = Array.isArray(value) ? value.map(String).join("\n") : "";
+    return (
+      <Card className="p-4">
+        <Textarea
+          label={label}
+          data-testid={`field-${path}`}
+          aria-describedby={description ? descriptionId : undefined}
+          value={lines}
+          onChange={(e) => onChange(e.target.value.split("\n"))}
+        />
+        {description && (
+          <p id={descriptionId} className="mt-1 text-xs text-on-muted">
+            {description}
+          </p>
+        )}
+      </Card>
+    );
+  }
 
   if (field.enum) {
     return (

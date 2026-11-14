@@ -46,6 +46,8 @@ export interface ModuleSettingsField {
   properties?: Record<string, ModuleSettingsField>;
   required?: string[];
   additionalProperties?: boolean;
+  /** The element schema of an `array` setting (the editor reads its type). */
+  items?: ModuleSettingsField;
 }
 
 export const modulesApi = {

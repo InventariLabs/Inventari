@@ -61,6 +61,7 @@ from app.core._interceptor_base import (
 from app.core._module_declarations import ModuleMetadata
 from app.core._require_module import require_module
 from app.core.api_key_auth import register_api_key_scope
+from app.core.audit_actor import audit_actor_scope, current_actor
 from app.core.context import ModuleContext
 from app.core.contracts import ModuleModelBase
 from app.core.contributions import (
@@ -123,13 +124,16 @@ from app.schemas.pagination import (
     PaginatedResponse,
 )
 from app.schemas.validators import ScannedCode
+from app.services.identity_service import get_current_user
 
 # Deliberately absent, so a module author does not read this file as "everything
-# Core has": the sync ``get_db`` and ``get_current_user`` (the async session and
-# the ``UserContextDTO`` are the supported pair), ``read_only_post`` (a Core
-# route-shape declaration), the ORM models, ``app.config`` and the core helpers
-# that carry Core's own policy (money, barcodes, file storage). A module asks
-# ``core_api`` for data and reads settings through the module settings API.
+# Core has": the sync ``get_db`` (the async session and the ``UserContextDTO``
+# are the supported pair, and ``get_current_user`` is exported for a module
+# that authenticates its own ASGI transport rather than a FastAPI route),
+# ``read_only_post`` (a Core route-shape declaration), the ORM models,
+# ``app.config`` and the core helpers that carry Core's own policy (money,
+# barcodes, file storage). A module asks ``core_api`` for data and reads
+# settings through the module settings API.
 #
 # Two declarative bases, two owners. ``ModuleModelBase`` (from the contracts)
 # is a base of the module's own: its metadata holds only the module's tables,
@@ -175,6 +179,8 @@ __all__ = [
     'SystemEvent',
     'UploadPathResolver',
     'ValidationException',
+    'audit_actor_scope',
+    'current_actor',
     'contribution_registry',
     'convert_naive_timestamps_to_utc',
     'cover_extension',
@@ -186,6 +192,7 @@ __all__ = [
     'general_rows',
     'get_async_db',
     'get_current_lang',
+    'get_current_user',
     'get_current_user_context',
     'get_logger',
     'get_module_error_message',

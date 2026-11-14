@@ -86,6 +86,10 @@
     },
     "announcements": {
       "name": "Ogłoszenia"
+    },
+    "mcp_server": {
+      "name": "Serwer MCP",
+      "description": "Pozwól agentowi AI czytać tę przestrzeń przez Model Context Protocol, kluczem, który widzi tylko to, co może."
     }
   },
   "config": {

@@ -16,7 +16,7 @@ from typing import Any
 
 import pytest
 from fastapi import status
-from httpx import Response
+from httpx2 import Response
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 

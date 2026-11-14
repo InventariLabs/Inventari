@@ -10,7 +10,7 @@ back or answer it, instead of meeting "now held by" on those buttons.
 """
 
 import uuid
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from fastapi import status
@@ -43,7 +43,7 @@ def dispatch(
     doc_org: Organization,
     db_session: Session,
     async_engine_fixture: AsyncEngine,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """A confirmed dispatch of two products, a session open over it."""
     other = h.create_template(doc_org, name='Second Product', barcode='5901234123464')
     lines = []
@@ -90,7 +90,7 @@ def dispatch(
 
 
 def _skip(
-    client: TestClient, headers: dict[str, str], d: dict[str, object], key: str
+    client: TestClient, headers: dict[str, str], d: dict[str, Any], key: str
 ) -> None:
     resp = client.post(
         f'{_DOCS}/{d["doc_id"]}/picking/{d["session_id"]}/skip',
@@ -104,7 +104,7 @@ def test_scanning_a_skipped_product_says_it_was_skipped(
     client: TestClient,
     doc_auth_headers: dict[str, str],
     doc_template: ProductTemplate,
-    dispatch: dict[str, object],
+    dispatch: dict[str, Any],
 ) -> None:
     _skip(client, doc_auth_headers, dispatch, 'first')
 
@@ -124,7 +124,7 @@ def test_scanning_a_picked_product_still_says_already_picked(
     client: TestClient,
     doc_auth_headers: dict[str, str],
     doc_template: ProductTemplate,
-    dispatch: dict[str, object],
+    dispatch: dict[str, Any],
 ) -> None:
     base = f'{_DOCS}/{dispatch["doc_id"]}/picking/{dispatch["session_id"]}'
     picked = client.post(
@@ -150,7 +150,7 @@ def test_a_colleague_opening_the_finished_summary_can_take_the_skip_back(
     doc_org: Organization,
     doc_auth_headers: dict[str, str],
     doc_template: ProductTemplate,
-    dispatch: dict[str, object],
+    dispatch: dict[str, Any],
 ) -> None:
     base = f'{_DOCS}/{dispatch["doc_id"]}/picking/{dispatch["session_id"]}'
     picked = client.post(
@@ -191,7 +191,7 @@ def test_a_colleague_can_answer_the_skipped_line_on_the_summary(
     doc_org: Organization,
     doc_auth_headers: dict[str, str],
     doc_template: ProductTemplate,
-    dispatch: dict[str, object],
+    dispatch: dict[str, Any],
 ) -> None:
     base = f'{_DOCS}/{dispatch["doc_id"]}/picking/{dispatch["session_id"]}'
     client.post(
@@ -225,7 +225,7 @@ def test_completing_with_a_skipped_line_unanswered_is_refused_even_as_planned(
     client: TestClient,
     doc_auth_headers: dict[str, str],
     doc_template: ProductTemplate,
-    dispatch: dict[str, object],
+    dispatch: dict[str, Any],
 ) -> None:
     base = f'{_DOCS}/{dispatch["doc_id"]}/picking/{dispatch["session_id"]}'
     client.post(

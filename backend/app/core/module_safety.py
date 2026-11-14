@@ -40,6 +40,7 @@ TRUSTED_CORE_MODULES = {
 REPO_SHIPPED_MODULES = {
     'api_keys',
     'approvals',
+    'mcp_server',
     'warehouse',
     'equipment',
     'example_widgets',

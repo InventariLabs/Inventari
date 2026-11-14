@@ -1,19 +1,21 @@
-import { describe, it, expect } from "vitest";
+import { beforeAll, describe, it, expect } from "vitest";
 
 import { MODULE_PATHS } from "./modulePaths";
 import { moduleRegistry } from "./registry";
 
 // Every module registers itself on import; the table exists so that a reader
 // who has NOT imported them (NotFoundPage, an organization with the module
-// switched off) can still tell which module owns a path.
-const loaders = import.meta.glob<unknown>("../../modules/*/module.ts", {
-  eager: true,
-});
+// switched off) can still tell which module owns a path. The loaders are
+// awaited rather than eager: registration then happens in this file's hook,
+// not as a side effect of how Vite transformed the glob at import time.
+const loaders = import.meta.glob<unknown>("../../modules/*/module.ts");
 
 describe("MODULE_PATHS", () => {
-  it("agrees with every module's own routes", () => {
-    void loaders;
+  beforeAll(async () => {
+    await Promise.all(Object.values(loaders).map((load) => load()));
+  });
 
+  it("agrees with every module's own routes", () => {
     const names = moduleRegistry.getAllRegisteredModules();
     expect(names.length).toBeGreaterThan(0);
 

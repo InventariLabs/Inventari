@@ -296,6 +296,8 @@ class CoreItemsReadMixin:
         location_id: UUID | None = None,
         storage_usage: str | None = None,
         order: str = 'asc',
+        expiry_after: date | None = None,
+        expiry_before: date | None = None,
         limit: int = 500,
     ) -> list[ItemDTO]:
         """List active items sorted by ``expiry_date`` (FEFO picking order).
@@ -313,6 +315,11 @@ class CoreItemsReadMixin:
                 ``usage`` (e.g. ``"INTERNAL"`` for cost estimation that
                 excludes customer-side stock).
             order: ``"asc"`` for FEFO (earliest first), ``"desc"`` for LIFO.
+            expiry_after: Optional inclusive lower bound on the effective
+                expiry date; a window reader filters here so ``limit`` counts
+                the window rather than the rows before it.
+            expiry_before: Optional inclusive upper bound on the effective
+                expiry date.
             limit: Safety cap (default 500).
         """
         items = await list_by_expiry_async(
@@ -322,6 +329,8 @@ class CoreItemsReadMixin:
             location_id=location_id,
             storage_usage=storage_usage,
             order=order,
+            expiry_after=expiry_after,
+            expiry_before=expiry_before,
             limit=limit,
         )
         return [ItemDTO.model_validate(item) for item in items]

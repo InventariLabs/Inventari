@@ -41,6 +41,10 @@ const GLOBAL_SETTINGS_EXCEPTIONS = new Set([
   "approvals",
   "stats",
   "stock_takes",
+  // An integration, configured once from Settings → Modules: the endpoint's
+  // allowed hosts and origins are installation plumbing, not a screen a
+  // person opens while working with stock.
+  "mcp_server",
 ]);
 
 const MODULES_REQUIRING_OWN_SETTINGS = MODULES_WITH_SETTINGS_SCHEMA.filter(

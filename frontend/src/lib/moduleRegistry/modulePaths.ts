@@ -91,6 +91,7 @@ export const MODULE_PATHS: Readonly<Record<string, ModulePaths>> = {
     ],
   },
   launcher: { basePath: null, paths: ["/"] },
+  mcp_server: { basePath: "/mcp-server", paths: ["/mcp-server"] },
   maker: {
     basePath: "/maker",
     paths: [

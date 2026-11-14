@@ -109,6 +109,7 @@ class _ModuleSpec:
     register_contributions_hook: Callable[[], None] | None = None
     on_startup_hook: Callable[[ModuleContext], None] | None = None
     on_startup_async_hook: Callable[[ModuleContext], Awaitable[None]] | None = None
+    on_shutdown_async_hook: Callable[[ModuleContext], Awaitable[None]] | None = None
     on_install_hook: Callable[[ModuleContext], None] | None = None
     on_install_async_hook: Callable[[ModuleContext], Awaitable[None]] | None = None
     on_uninstall_hook: Callable[[ModuleContext], None] | None = None
@@ -182,6 +183,10 @@ class _DeclarativeModule(BaseModule):
         if self._spec.on_startup_async_hook is not None:
             await self._spec.on_startup_async_hook(context)
 
+    async def on_shutdown_async(self, context: ModuleContext) -> None:
+        if self._spec.on_shutdown_async_hook is not None:
+            await self._spec.on_shutdown_async_hook(context)
+
     def register_services(self, container: ServiceContainer) -> None:
         if self._spec.register_services_hook is not None:
             self._spec.register_services_hook(container)
@@ -229,6 +234,7 @@ def define_module(
     register_contributions_hook: Callable[[], None] | None = None,
     on_startup_hook: Callable[[ModuleContext], None] | None = None,
     on_startup_async_hook: Callable[[ModuleContext], Awaitable[None]] | None = None,
+    on_shutdown_async_hook: Callable[[ModuleContext], Awaitable[None]] | None = None,
     on_install_hook: Callable[[ModuleContext], None] | None = None,
     on_install_async_hook: Callable[[ModuleContext], Awaitable[None]] | None = None,
     on_uninstall_hook: Callable[[ModuleContext], None] | None = None,
@@ -263,6 +269,9 @@ def define_module(
         Optional ``on_startup(context)`` override — called *after* default wiring.
     on_startup_async_hook:
         Optional async ``on_startup_async(context)`` override.
+    on_shutdown_async_hook:
+        Optional async ``on_shutdown_async(context)`` override, called when the
+        application stops so a resource the startup hook opened can be closed.
     on_install_hook:
         Optional ``on_install(context)`` override — called when module is installed.
         Runs *after* the default migration step. If not set, only migrations run.
@@ -315,6 +324,7 @@ def define_module(
             register_contributions_hook=register_contributions_hook,
             on_startup_hook=on_startup_hook,
             on_startup_async_hook=on_startup_async_hook,
+            on_shutdown_async_hook=on_shutdown_async_hook,
             on_install_hook=on_install_hook,
             on_install_async_hook=on_install_async_hook,
             on_uninstall_hook=on_uninstall_hook,

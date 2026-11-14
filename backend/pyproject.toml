@@ -44,6 +44,9 @@ dependencies = [
     "markupsafe>=3.0.3",  # escape() is what keeps a name out of the email's markup
     "sse-starlette>=2.0.0",
     "babel>=2.18.0",
+    "mcp>=2.3,<3",
+    "mcp-types>=2.3.0",  # the SDK's wire models and ToolAnnotations
+    "httpx2>=2.16.0",  # Starlette TestClient types responses with it; mcp requires it at runtime
 ]
 
 [build-system]
@@ -744,6 +747,11 @@ ignore_decorators = [
     "@event_bus*",
     "@event.listens_for",
     "@*.on_*",
+    # The MCP SDK's registration decorators: `@server.tool(...)` and
+    # `@server.resource(...)` put the function in the transport's catalogue, so
+    # no Python call site names it and a client reaches it over JSON-RPC.
+    "@server.tool",
+    "@server.resource",
     "@field_validator",
     "@model_validator",
     "@field_serializer",

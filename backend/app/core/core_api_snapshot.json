@@ -1754,6 +1754,16 @@
             },
             {
               "kind": "KEYWORD_ONLY",
+              "name": "expiry_after",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "expiry_before",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
               "name": "limit",
               "required": false
             }

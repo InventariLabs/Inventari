@@ -86,6 +86,10 @@
     },
     "announcements": {
       "name": "Ankündigungen"
+    },
+    "mcp_server": {
+      "name": "MCP-Server",
+      "description": "Lassen Sie einen KI-Agenten diesen Arbeitsbereich über das Model Context Protocol lesen — mit einem Schlüssel, der nur sieht, was er darf."
     }
   },
   "config": {

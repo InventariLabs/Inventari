@@ -1,0 +1,32 @@
+{
+  "title": "Servidor MCP",
+  "description": "Conecte un agente de IA a este espacio de trabajo mediante el Model Context Protocol.",
+  "subtitle": "Lo que un agente de IA puede leer aquí y cómo conectarlo.",
+  "endpoint": {
+    "label": "Punto de acceso",
+    "hint": "Indica esta dirección en tu cliente MCP."
+  },
+  "connect": {
+    "title": "Para conectar",
+    "createKey": "Crea una clave API en Claves API y dale el permiso Usar el punto de acceso MCP.",
+    "pointClient": "Envía la clave en la cabecera X-API-Key (o como token Bearer) a la dirección de arriba.",
+    "allowHost": "Si la instalación responde en una dirección pública, añade su host a los hosts permitidos en los ajustes del módulo."
+  },
+  "links": {
+    "apiKeys": "Claves API"
+  },
+  "navigation": {
+    "title": "Servidor MCP"
+  },
+  "permissions": {
+    "use": "Usar el punto de acceso MCP",
+    "useDesc": "Sin ella, una clave no llega al punto de acceso MCP ni a la lista de sus herramientas"
+  },
+  "settings": {
+    "allowedHosts": "Hosts permitidos",
+    "allowedHostsDesc": "Cabeceras Host que acepta el punto de acceso MCP, además de localhost. Un valor por línea.",
+    "allowedOrigins": "Orígenes permitidos",
+    "allowedOriginsDesc": "Cabeceras Origin que acepta el punto de acceso MCP, además de localhost. Un valor por línea.",
+    "open": "Ajustes del servidor MCP"
+  }
+}

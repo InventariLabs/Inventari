@@ -46,8 +46,16 @@ def find_route_handler(
     """Return the endpoint that will serve ``scope``, or None if none matches."""
     for route_context in iter_route_contexts(list(routes)):
         match, _ = route_context.matches(scope)
-        if match == RouteMatch.FULL and route_context.endpoint is not None:
-            return route_context.endpoint
+        if match != RouteMatch.FULL:
+            continue
+        # FastAPI stores a plain Starlette Route as an effective context whose
+        # own ``endpoint`` is unset; the built route carries it. Asking only the
+        # context skipped that shape, and the default limits guarded nothing
+        # behind the plain Route the MCP endpoint serves through.
+        effective = getattr(route_context, 'starlette_route', None)
+        endpoint = route_context.endpoint or getattr(effective, 'endpoint', None)
+        if endpoint is not None:
+            return endpoint
     return None
 
 
