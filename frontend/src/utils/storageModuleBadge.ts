@@ -11,7 +11,7 @@ const NOT_A_MODULE = "\u0000";
  * says which module it belongs to.
  *
  * The module's display name comes from the translation catalogues
- * (modules.<tag>.name — AGENTS.md §4, "Module display names"). A tag with no
+ * (modules.<tag>.name — frontend/AGENTS.md §4, "Module display names"). A tag with no
  * entry there is not a module — the backend also gives a food-behaviour
  * location the tag "food", which names a kind of place, not an owner — and a
  * badge saying "Module: food" would claim an owner that does not exist. Such

@@ -260,7 +260,7 @@ export type DocumentLineCreate = components["schemas"]["DocumentLineCreate"];
 export type DocumentCreate = components["schemas"]["DocumentCreate"];
 
 // An alias, not a copy: the update payload is a partial PATCH whose keys the
-// server reads for presence (backend AGENTS.md §2b), and the wire already
+// server reads for presence (backend/AGENTS.md §2b), and the wire already
 // types every field `| null` — a null is how the screen says "clear this".
 export type DocumentUpdate = components["schemas"]["DocumentUpdate"];
 

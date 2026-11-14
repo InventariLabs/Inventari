@@ -1573,7 +1573,7 @@ describe("DocumentDetailPage", () => {
 
     // `undefined` drops the key on the wire and the server reads that as
     // "leave it alone" — the save answered "updated" over an unchanged note
-    // (backend AGENTS.md §2b).
+    // (backend/AGENTS.md §2b).
     expect(mutate).toHaveBeenCalledWith(
       { id: "doc-1", data: { notes: null } },
       expect.anything(),
