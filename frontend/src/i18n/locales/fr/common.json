@@ -701,6 +701,7 @@
         "document_template": "Modèle de document",
         "recipe": "Recette",
         "meal_plan": "Plan de repas",
+        "recipe_collection": "Collection de recettes",
         "shopping_list": "Liste de courses",
         "equipment_model": "Modèle d'équipement (historique)",
         "cycle_count_schedule": "Planning de comptage cyclique",

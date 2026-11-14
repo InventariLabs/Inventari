@@ -701,6 +701,7 @@
         "document_template": "Document template",
         "recipe": "Recipe",
         "meal_plan": "Meal plan",
+        "recipe_collection": "Recipe collection",
         "shopping_list": "Shopping list",
         "equipment_model": "Equipment model (historical)",
         "cycle_count_schedule": "Cycle count schedule",

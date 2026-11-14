@@ -256,8 +256,8 @@ class AuditTargetType(StrEnum):
     **What does not belong.** Somebody's own working note — a recipe, a meal
     plan, a shopping list. Those change weekly, belong to the person who
     wrote them, and would bury the four kinds above in noise. Deleting one
-    still logs, under the deletion rule: ``RECIPE``, ``MEAL_PLAN`` and
-    ``SHOPPING_LIST`` below name the three, and a deletion is the only entry
+    still logs, under the deletion rule: ``RECIPE``, ``MEAL_PLAN``,
+    ``RECIPE_COLLECTION`` and ``SHOPPING_LIST`` below name them, and a deletion is the only entry
     any of them ever writes.
 
     **The line against item history.** The two answer different questions and
@@ -320,6 +320,7 @@ class AuditTargetType(StrEnum):
     # therefore travels in the snapshot.
     RECIPE = 'recipe'
     MEAL_PLAN = 'meal_plan'
+    RECIPE_COLLECTION = 'recipe_collection'
     SHOPPING_LIST = 'shopping_list'
 
     # Custody

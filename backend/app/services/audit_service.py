@@ -80,6 +80,7 @@ _ANALYTICS_NEUTRAL_TARGETS: frozenset[str] = frozenset(
         # Working notes — the only entries these ever write are deletions.
         AuditTargetType.RECIPE,
         AuditTargetType.MEAL_PLAN,
+        AuditTargetType.RECIPE_COLLECTION,
         AuditTargetType.SHOPPING_LIST,
     )
 )
