@@ -250,6 +250,88 @@ class TestStockAndLots:
         payload = _structured(result)
         assert payload['shelf_count'] == 1
 
+    def test_a_cut_answer_says_how_many_it_cut(
+        self,
+        client: TestClient,
+        mcp_key: str,
+        db_session: Session,
+        mcp_org: Organization,
+        shelf,
+        item: Item,
+    ) -> None:
+        """The answer names the total and that limit cut it, not only the page.
+
+        It used to read the whole quant list and slice it silently: a caller
+        with 200 rows and limit 1 had no way to know 199 were missing.
+        """
+        from app.models.product_template import ProductTemplate
+
+        other = ProductTemplate(organization_id=mcp_org.id, name='Other Product')
+        db_session.add(other)
+        db_session.flush()
+        second = Item(
+            organization_id=mcp_org.id,
+            storage_location_id=shelf.id,
+            template_id=other.id,
+            name='Other Product',
+            quantity=Decimal('2'),
+        )
+        db_session.add(second)
+        anchor_pending_records(db_session)
+        db_session.commit()
+
+        result = _tool(client, mcp_key, 'get_stock_levels', {'limit': 1})
+
+        payload = _structured(result)
+        assert len(payload['rows']) == 1
+        assert payload['total'] == 2
+        assert payload['has_more'] is True
+
+    def test_a_whole_answer_is_not_marked_as_cut(
+        self, client: TestClient, mcp_key: str, item: Item
+    ) -> None:
+        result = _tool(client, mcp_key, 'get_stock_levels', {'limit': 10})
+
+        payload = _structured(result)
+        assert len(payload['rows']) == 1
+        assert payload['total'] == 1
+        assert payload['has_more'] is False
+
+    def test_an_opened_package_is_judged_by_its_use_by_date(
+        self,
+        client: TestClient,
+        mcp_key: str,
+        db_session: Session,
+        mcp_org: Organization,
+        shelf,
+    ) -> None:
+        """A use-by inside the window is in the window, whatever the batch says.
+
+        The query filters on the effective expiry (the earlier of the batch
+        date and the use-by), but the answer filtered again on the raw batch
+        date: an opened jar with a use-by in three days was missing from
+        items while the forecast and GET /items/expiring counted it.
+        """
+        use_by = date.today() + timedelta(days=3)
+        opened = Item(
+            organization_id=mcp_org.id,
+            storage_location_id=shelf.id,
+            name='Open jam',
+            quantity=Decimal('1'),
+            expiry_date=date.today() + timedelta(days=220),
+            meta_data={'opened': {'use_by': use_by.isoformat()}},
+        )
+        db_session.add(opened)
+        anchor_pending_records(db_session)
+        db_session.commit()
+
+        result = _tool(client, mcp_key, 'get_expiring_soon', {'days': 7})
+
+        payload = _structured(result)
+        row = next(row for row in payload['items'] if row['item_id'] == str(opened.id))
+        assert row['expiry_date'] == use_by.isoformat()
+        assert row['days_left'] == 3
+
     def test_the_window_is_not_cut_from_the_expired_rows(
         self,
         client: TestClient,

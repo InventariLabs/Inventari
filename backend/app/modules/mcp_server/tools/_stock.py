@@ -10,6 +10,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp_types import ToolAnnotations
 from pydantic import Field
 
+from app.core.module_sdk import effective_expiry
 from app.core.public_api import core_api
 
 from .._db import request_session
@@ -73,7 +74,9 @@ def register_stock_tools(server: MCPServer) -> None:
                     )
                     for template_id, quantity in totals.get(shelf_id, {}).items()
                 ]
-                return StockLevelsResult(shelf_totals=shelf_totals)
+                return StockLevelsResult(
+                    shelf_totals=shelf_totals, total=len(shelf_totals)
+                )
             quants = await core_api.stock.list_quants_async(
                 db,
                 identity.organization_id,
@@ -92,7 +95,9 @@ def register_stock_tools(server: MCPServer) -> None:
                     available_quantity=quant.available_quantity,
                 )
                 for quant in quants[:limit]
-            ]
+            ],
+            total=len(quants),
+            has_more=len(quants) > limit,
         )
 
     @server.tool(
@@ -192,24 +197,33 @@ def register_stock_tools(server: MCPServer) -> None:
                 expiry_before=today + timedelta(days=days),
                 limit=_EXPIRY_LOOKUP_CAP,
             )
-            items = [
-                ExpiringItem(
-                    item_id=item.id,
-                    name=item.name,
-                    quantity=item.quantity,
-                    uom_symbol=item.uom_symbol,
-                    shelf_id=item.location_id,
-                    shelf_name=item.location_name,
-                    expiry_date=item.expiry_date,
-                    days_left=(item.expiry_date - today).days
-                    if item.expiry_date is not None
-                    else None,
-                    lot_id=item.lot_id,
+            # The window is the effective expiry — the batch date or the
+            # opened package's use-by, whichever is earlier — because that is
+            # what the query filtered on and what the provider's screens,
+            # forecast and GET /items/expiring report. Judging by the raw
+            # batch date here dropped an opened jar whose use-by was inside
+            # the window while the same answer's forecast counted it.
+            window_end = today + timedelta(days=days)
+            items = []
+            for item in rows:
+                expiry = effective_expiry(item.expiry_date, item.meta_data)
+                if expiry is None or not today <= expiry <= window_end:
+                    continue
+                items.append(
+                    ExpiringItem(
+                        item_id=item.id,
+                        name=item.name,
+                        quantity=item.quantity,
+                        uom_symbol=item.uom_symbol,
+                        shelf_id=item.location_id,
+                        shelf_name=item.location_name,
+                        expiry_date=expiry,
+                        days_left=(expiry - today).days,
+                        lot_id=item.lot_id,
+                    )
                 )
-                for item in rows
-                if item.expiry_date is not None
-                and today <= item.expiry_date <= today + timedelta(days=days)
-            ][:limit]
+                if len(items) == limit:
+                    break
             forecast = await core_api.queries.get_expiry_forecast_async(
                 db, identity.organization_id
             )

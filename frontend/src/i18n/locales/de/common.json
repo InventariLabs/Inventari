@@ -599,6 +599,7 @@
         "old_target_location_id": "Bisheriges Regal",
         "original_number": "Originalbeleg",
         "reason_code": "Grundcode",
+        "reason_text": "Begründungstext",
         "recount_requested": "Nachzählung angefordert",
         "sample_size": "Stichprobengröße",
         "schedule": "Zyklusplan",

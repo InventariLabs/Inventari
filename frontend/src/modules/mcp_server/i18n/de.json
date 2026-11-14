@@ -1,7 +1,7 @@
 {
   "title": "MCP-Server",
   "description": "Verbinden Sie einen KI-Agenten über das Model Context Protocol mit diesem Arbeitsbereich.",
-  "subtitle": "Was ein KI-Agent hier lesen kann und wie er sich verbindet.",
+  "subtitle": "Die Adresse, der Schlüssel und die Hosts, auf denen dieser Arbeitsbereich antwortet.",
   "endpoint": {
     "label": "Endpunkt",
     "hint": "Richten Sie Ihren MCP-Client auf diese Adresse."

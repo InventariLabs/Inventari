@@ -103,6 +103,32 @@ class ItemDetail(BaseModel):
     )
 
 
+class CorrectStockResult(BaseModel):
+    """What one correction did: the record, and what it was posted as."""
+
+    item: ItemView
+    previous_quantity: Decimal | None = Field(
+        None, description='The quantity the record held before the correction.'
+    )
+    quantity: Decimal = Field(description='The quantity the record holds now.')
+    reference: UUID = Field(
+        description=(
+            'The correction id; the movement and the register document carry '
+            'it as their reference.'
+        ),
+    )
+    register_document_id: UUID | None = Field(
+        None,
+        description=(
+            'The adjustment document the register kept, when the Warehouse '
+            'module is on and the quantity changed; None otherwise.'
+        ),
+    )
+    register_document_number: str | None = Field(
+        None, description='The adjustment document number, when one was written.'
+    )
+
+
 class LocationNode(BaseModel):
     """One location, with its children when a tree was asked for."""
 
@@ -182,6 +208,17 @@ class StockLevelsResult(BaseModel):
             'Per-product totals for one whole shelf, when the call named a '
             'shelf and no product.'
         ),
+    )
+    total: int = Field(
+        0,
+        description=(
+            'How many rows match the filters, before limit cut the answer. '
+            'Equal to rows when nothing was cut.'
+        ),
+    )
+    has_more: bool = Field(
+        False,
+        description='True when limit cut the answer; ask again with a larger limit.',
     )
 
 
@@ -273,9 +310,18 @@ class ExpiringItem(BaseModel):
     uom_symbol: str | None = None
     shelf_id: UUID | None = None
     shelf_name: str | None = None
-    expiry_date: date | None = None
+    expiry_date: date | None = Field(
+        None,
+        description=(
+            'The date the record is judged by: the batch expiry, or the '
+            "opened package's use-by when that is earlier."
+        ),
+    )
     days_left: int | None = Field(
-        None, description='Calendar days from today; 0 is today, negative is overdue.'
+        None,
+        description=(
+            'Calendar days from today to expiry_date; 0 is today, negative is overdue.'
+        ),
     )
     lot_id: UUID | None = None
 

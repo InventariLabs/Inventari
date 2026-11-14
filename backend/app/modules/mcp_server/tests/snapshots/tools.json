@@ -1,5 +1,5 @@
 {
-  "module_version": "0.1.0",
+  "module_version": "0.2.0",
   "resources": [
     {
       "_meta": null,
@@ -1610,6 +1610,12 @@
           }
         },
         "properties": {
+          "has_more": {
+            "default": false,
+            "description": "True when limit cut the answer; ask again with a larger limit.",
+            "title": "Has More",
+            "type": "boolean"
+          },
           "rows": {
             "description": "Quant rows when the call was narrowed by product or shelf.",
             "items": {
@@ -1625,6 +1631,12 @@
             },
             "title": "Shelf Totals",
             "type": "array"
+          },
+          "total": {
+            "default": 0,
+            "description": "How many rows match the filters, before limit cut the answer. Equal to rows when nothing was cut.",
+            "title": "Total",
+            "type": "integer"
           }
         },
         "title": "StockLevelsResult",
@@ -2050,7 +2062,7 @@
                   }
                 ],
                 "default": null,
-                "description": "Calendar days from today; 0 is today, negative is overdue.",
+                "description": "Calendar days from today to expiry_date; 0 is today, negative is overdue.",
                 "title": "Days Left"
               },
               "expiry_date": {
@@ -2064,6 +2076,7 @@
                   }
                 ],
                 "default": null,
+                "description": "The date the record is judged by: the batch expiry, or the opened package's use-by when that is earlier.",
                 "title": "Expiry Date"
               },
               "item_id": {
@@ -2229,6 +2242,727 @@
         "type": "object"
       },
       "title": "Read expiring stock"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": null,
+        "readOnlyHint": null,
+        "title": null
+      },
+      "description": "Create one stock record and put its quantity on a shelf: a new product, a new batch of one, or a unit of something. The record gets its opening movement and its history row, so it counts as stock from this call on. Name the product with name, or point at an existing product card with template_id to avoid a duplicate. Use correct_stock to change a quantity that already exists; use search_items first when the product may already be on a shelf. Example: create_item(name=\"Olive oil\", quantity=6, location_id=\"<a shelf id>\").",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "barcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The package barcode, when there is one.",
+            "title": "Barcode"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The product brand.",
+            "title": "Brand"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The category to file the product under.",
+            "title": "Category Id"
+          },
+          "expiry_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The batch expiry date, when it has one.",
+            "title": "Expiry Date"
+          },
+          "location_id": {
+            "description": "The shelf the stock stands on.",
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Namespaced metadata; a module reads its own key.",
+            "title": "Metadata"
+          },
+          "name": {
+            "description": "What the record is; a product or a unit name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "1",
+            "description": "How much arrives (0 or more).",
+            "title": "Quantity"
+          },
+          "serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A serial number, for a record tracked by one.",
+            "title": "Serial Number"
+          },
+          "template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The product card to attach the record to; omit to match one by name or barcode, or to create one.",
+            "title": "Template Id"
+          }
+        },
+        "required": [
+          "name",
+          "location_id"
+        ],
+        "title": "create_itemArguments",
+        "type": "object"
+      },
+      "name": "create_item",
+      "outputSchema": {
+        "description": "One stock record as an agent reads it.",
+        "properties": {
+          "barcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Barcode"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Brand"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Category Id"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Created At"
+          },
+          "expiry_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expiry Date"
+          },
+          "id": {
+            "description": "The record id; pass it to get_item.",
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The batch this stock is in.",
+            "title": "Lot Id"
+          },
+          "meta_data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Meta Data"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Quantity on this record, in the unit of uom_symbol.",
+            "title": "Quantity"
+          },
+          "serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Serial Number"
+          },
+          "shelf_id": {
+            "description": "The location the record stands on.",
+            "format": "uuid",
+            "title": "Shelf Id",
+            "type": "string"
+          },
+          "shelf_location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The shelf path, when the Core resolves one.",
+            "title": "Shelf Location"
+          },
+          "shelf_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Shelf Name"
+          },
+          "template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The product template this record belongs to.",
+            "title": "Template Id"
+          },
+          "template_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Template Name"
+          },
+          "uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Uom Symbol"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "shelf_id"
+        ],
+        "title": "ItemView",
+        "type": "object"
+      },
+      "title": "Create a stock record"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": null,
+        "readOnlyHint": null,
+        "title": null
+      },
+      "description": "Set one stock record to the quantity that is actually on the shelf, with a reason the journal can show. This writes the movement and cost layer and, when the Warehouse module is on, one adjustment document in the register; the record history and the organization log carry the reason. It is destructive: the quantity replaces what the record held. Use it after a count, never to receive or issue goods \u2014 a receipt or issue is a document, not a correction. A reason is required. Example: correct_stock(item_id=\"<id>\", quantity=4, reason=\"Two bottles broke in the cold room\").",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "item_id": {
+            "description": "The record id from search_items.",
+            "format": "uuid",
+            "title": "Item Id",
+            "type": "string"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "description": "The quantity the shelf actually holds.",
+            "title": "Quantity"
+          },
+          "reason": {
+            "description": "Why the quantity changes; kept in the record history and the organization journal.",
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "quantity",
+          "reason"
+        ],
+        "title": "correct_stockArguments",
+        "type": "object"
+      },
+      "name": "correct_stock",
+      "outputSchema": {
+        "$defs": {
+          "ItemView": {
+            "description": "One stock record as an agent reads it.",
+            "properties": {
+              "barcode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Barcode"
+              },
+              "brand": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Brand"
+              },
+              "category_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Category Id"
+              },
+              "created_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Created At"
+              },
+              "expiry_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expiry Date"
+              },
+              "id": {
+                "description": "The record id; pass it to get_item.",
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "lot_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The batch this stock is in.",
+                "title": "Lot Id"
+              },
+              "meta_data": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Meta Data"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Quantity on this record, in the unit of uom_symbol.",
+                "title": "Quantity"
+              },
+              "serial_number": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Serial Number"
+              },
+              "shelf_id": {
+                "description": "The location the record stands on.",
+                "format": "uuid",
+                "title": "Shelf Id",
+                "type": "string"
+              },
+              "shelf_location": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The shelf path, when the Core resolves one.",
+                "title": "Shelf Location"
+              },
+              "shelf_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Shelf Name"
+              },
+              "template_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The product template this record belongs to.",
+                "title": "Template Id"
+              },
+              "template_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Template Name"
+              },
+              "uom_symbol": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Uom Symbol"
+              },
+              "updated_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Updated At"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "shelf_id"
+            ],
+            "title": "ItemView",
+            "type": "object"
+          }
+        },
+        "description": "What one correction did: the record, and what it was posted as.",
+        "properties": {
+          "item": {
+            "$ref": "#/$defs/ItemView"
+          },
+          "previous_quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The quantity the record held before the correction.",
+            "title": "Previous Quantity"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "description": "The quantity the record holds now.",
+            "title": "Quantity"
+          },
+          "reference": {
+            "description": "The correction id; the movement and the register document carry it as their reference.",
+            "format": "uuid",
+            "title": "Reference",
+            "type": "string"
+          },
+          "register_document_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The adjustment document the register kept, when the Warehouse module is on and the quantity changed; None otherwise.",
+            "title": "Register Document Id"
+          },
+          "register_document_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The adjustment document number, when one was written.",
+            "title": "Register Document Number"
+          }
+        },
+        "required": [
+          "item",
+          "quantity",
+          "reference"
+        ],
+        "title": "CorrectStockResult",
+        "type": "object"
+      },
+      "title": "Correct a stock quantity"
     }
   ]
 }

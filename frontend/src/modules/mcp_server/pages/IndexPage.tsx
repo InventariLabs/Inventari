@@ -3,12 +3,15 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Card, useModulePageHeader } from "@/module-sdk";
 
-/** The address an MCP client posts to; the module serves it from its router. */
-const ENDPOINT = "/api/v1/mcp-server/mcp";
+/** The path an MCP client posts to; the module serves it from its router. */
+const ENDPOINT_PATH = "/api/v1/mcp-server/mcp";
 
 export default function IndexPage() {
   const { t } = useTranslation("mcp_server");
   const { setHeader } = useModulePageHeader();
+  // A client is configured with a whole address, not a path: the reader
+  // copies this line into a command that cannot infer the origin.
+  const endpoint = `${window.location.origin}${ENDPOINT_PATH}`;
 
   useEffect(() => {
     setHeader({ title: t("title"), subtitle: t("subtitle") });
@@ -25,7 +28,7 @@ export default function IndexPage() {
           {t("endpoint.label")}
         </p>
         <code className="mt-1 block break-all rounded-lg bg-surface-raised px-3 py-2 text-sm text-on">
-          {ENDPOINT}
+          {endpoint}
         </code>
         <p className="mt-2 text-xs text-on-muted">{t("endpoint.hint")}</p>
       </Card>
