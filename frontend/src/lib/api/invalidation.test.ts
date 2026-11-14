@@ -296,8 +296,8 @@ describe("invalidation helpers", () => {
         });
         const listKeys = [
           queryKeys.recipes.all(),
-          queryKeys.recipes.all({ search: "soup", skip: 0, limit: 20 }),
-          queryKeys.recipes.all({ is_favorite: true, skip: 20, limit: 20 }),
+          queryKeys.recipes.all({ search: "soup", offset: 0, limit: 20 }),
+          queryKeys.recipes.all({ is_favorite: true, offset: 20, limit: 20 }),
         ];
         const before = [
           { id: "r-1", ingredients_available: 2, ingredients_total: 2 },

@@ -19,7 +19,7 @@ export function useRecipes(params?: {
   tags?: string;
   is_favorite?: boolean;
   collection_id?: string;
-  skip?: number;
+  offset?: number;
   limit?: number;
   sort?: string;
 }) {

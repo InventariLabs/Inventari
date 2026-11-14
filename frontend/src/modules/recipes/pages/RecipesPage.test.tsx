@@ -122,6 +122,49 @@ describe("RecipesPage", () => {
     });
   });
 
+  it("shows the second page when Next page is pressed", async () => {
+    const row = (n: number) => ({
+      id: `r-${n}`,
+      name: `Recipe ${n}`,
+      tags: [],
+      is_favorite: false,
+      servings: 2,
+      prep_time: 10,
+      cook_time: 0,
+      ingredients_count: 1,
+      image_url: null,
+      created_at: new Date().toISOString(),
+    });
+    // The endpoint reads `offset`; a request that names the start any other
+    // way gets the first page again, which is how the bug looked on screen.
+    server.use(
+      http.get("/api/v1/recipes", ({ request }) => {
+        const offset = Number(
+          new URL(request.url).searchParams.get("offset") ?? 0,
+        );
+        const start = offset === 0 ? 1 : 51;
+        const count = offset === 0 ? 50 : 8;
+        return HttpResponse.json({
+          items: Array.from({ length: count }, (_, i) => row(start + i)),
+          total: 58,
+        });
+      }),
+    );
+
+    const user = userEvent.setup();
+    render(<RecipesPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("Recipe 1")).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Recipe 51")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("Recipe 1")).not.toBeInTheDocument();
+  });
+
   it("shows only favorites in favorites tab", async () => {
     server.use(
       http.get("/api/v1/recipes", ({ request }) => {
