@@ -42,14 +42,15 @@ export function blankComments(text) {
   };
   // Where we are: code, or inside a `'`/`"` string or a template literal.
   // A `${` inside a template opens a hole — code again, with its braces
-  // counted until the matching `}` returns us to the template string.
+  // counted until the matching `}` returns us to the template string. A hole
+  // is a frame of its own (`{ depth }`), so a template nested in a hole
+  // keeps its own hole and the outer one resumes where it stopped.
   const stack = ["code"];
-  let holeDepth = -1;
   let i = 0;
   while (i < n) {
     const ctx = stack[stack.length - 1];
     const c = text[i];
-    if (ctx === "'" || ctx === '"' || (ctx === "tpl" && holeDepth === -1)) {
+    if (ctx === "'" || ctx === '"' || ctx === "tpl") {
       if (c === "\\") {
         i += 2;
         continue;
@@ -57,7 +58,7 @@ export function blankComments(text) {
       if (ctx === "tpl") {
         if (c === "`") stack.pop();
         else if (c === "$" && text[i + 1] === "{") {
-          holeDepth = 0;
+          stack.push({ depth: 0 });
           i += 2;
           continue;
         }
@@ -86,9 +87,12 @@ export function blankComments(text) {
       }
       continue;
     }
-    if (ctx === "tpl" && holeDepth >= 0) {
-      if (c === "{") holeDepth++;
-      else if (c === "}") holeDepth--;
+    if (typeof ctx === "object") {
+      if (c === "{") ctx.depth++;
+      else if (c === "}") {
+        if (ctx.depth === 0) stack.pop();
+        else ctx.depth--;
+      }
     }
     i++;
   }
