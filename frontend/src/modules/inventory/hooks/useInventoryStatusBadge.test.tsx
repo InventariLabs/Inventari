@@ -12,13 +12,14 @@ import * as React from "react";
 import { server } from "@/test/mocks/server";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
+import { useAttentionCounts } from "@/modules/shared/hooks/useAttentionCounts";
 import { useInventoryStatusBadge } from "./useInventoryStatusBadge";
 
-function renderBadge() {
-  const client = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return renderHook(() => useInventoryStatusBadge(), {
+function renderBadge(
+  client = new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+  hook: () => unknown = useInventoryStatusBadge,
+) {
+  return renderHook(hook as typeof useInventoryStatusBadge, {
     wrapper: ({ children }: { children: React.ReactNode }) => (
       <QueryClientProvider client={client}>
         <ModulesProvider>{children}</ModulesProvider>
@@ -76,5 +77,29 @@ describe("useInventoryStatusBadge", () => {
     const { result } = renderBadge();
 
     await waitFor(() => expect(result.current?.count).toBe(3));
+  });
+
+  it("shares one request with the dashboard heading that reads the same counts", async () => {
+    // The tile and the heading used to hold the same answer under two keys:
+    // two requests per launcher visit and two per dashboard visit.
+    const asked = serve(true);
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    const { result } = renderBadge(client, () => ({
+      badge: useInventoryStatusBadge(),
+      heading: useAttentionCounts(false),
+    }));
+
+    await waitFor(() => {
+      const value = result.current as unknown as {
+        badge: { count: number } | null;
+        heading: { data?: { records: number } };
+      };
+      expect(value.badge?.count).toBe(3);
+      expect(value.heading.data?.records).toBe(3);
+    });
+    expect(asked).toEqual(["false"]);
   });
 });

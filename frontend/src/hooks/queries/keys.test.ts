@@ -97,11 +97,6 @@ describe("queryKeys factory", () => {
         "stats",
         "purchase-patterns",
       ]);
-      expect(queryKeys.stats.launcherBadge).toEqual([
-        "stats",
-        "overview",
-        "launcher-badge",
-      ]);
       // Under `overview`, so the writes that invalidate it refresh the rows.
       expect(queryKeys.stats.lowStock).toEqual([
         "stats",

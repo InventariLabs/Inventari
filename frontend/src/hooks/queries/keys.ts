@@ -101,7 +101,6 @@ export const queryKeys = {
     purchasePatterns: ["stats", "purchase-patterns"] as const,
     config: ["stats", "config"] as const,
     reconciliation: ["stats", "reconciliation"] as const,
-    launcherBadge: ["stats", "overview", "launcher-badge"] as const,
     // Under `overview` on purpose: every write that moves stock already
     // invalidates that prefix, and the short-product rows must follow it.
     lowStock: ["stats", "overview", "low-stock"] as const,
