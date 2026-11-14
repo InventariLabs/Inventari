@@ -18,7 +18,13 @@ says what the release does rather than what changed since them.
   at `/api/v1/mcp-server/mcp`, authenticated with an API key that holds
   `mcp_server:use` and acts only in the key's organization. Seven read tools
   and two resources answer from the same CoreAPI calls the screens use, so the
-  stock number and the tenant scope stay in one place. The key travels in
+  stock number and the tenant scope stay in one place. Two guarded write tools
+  complete the loop: `create_item` opens a record through the create service,
+  and `correct_stock` sets a counted quantity through the stock posting rules —
+  a locked group, one write that posts the movement and the cost layer, the
+  register's copy when Warehouse is on, and a required reason in the record's
+  history and the organization journal. Both need `items:write`, and the
+  module's README carries a Claude Code quickstart. The key travels in
   `X-API-Key`, which the endpoint and the rest of the API both accept; an
   organization lists the hosts and origins its deployment answers on in the
   module's settings card, and every other `Host`/`Origin` is refused.

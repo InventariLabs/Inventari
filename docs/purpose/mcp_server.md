@@ -1,7 +1,7 @@
 # MCP Server
 
 ## Job
-"Let the agent I already use read my inventory without me copying numbers into it."
+"Let the agent I already use work with my inventory without me copying numbers into it."
 
 ## Whose job
 The person who issues the API key. The agent is theirs to connect and disconnect; the workspace
@@ -11,10 +11,14 @@ administrator only decides whether the module is on and which roles may hold `mc
 The Model Context Protocol over Streamable HTTP, revision 2026-07-28, at one endpoint
 (`/api/v1/mcp-server/mcp`). A request authenticates with an API key from **API Keys**, acts only in
 the key's organization, and sees what that key's permission list allows: `items:read` for stock,
-batches and expiry, `locations:read` for the location tree. The seven read tools (`search_items`,
-`get_item`, `list_locations`, `get_location_tree`, `get_stock_levels`, `list_lots`,
-`get_expiring_soon`) and the two resources (workspace overview, location tree) answer from CoreAPI,
-so the stock number, the tenant scope and the journal actor stay in one place.
+batches and expiry, `locations:read` for the location tree, `items:write` for the two writes. The
+seven read tools (`search_items`, `get_item`, `list_locations`, `get_location_tree`,
+`get_stock_levels`, `list_lots`, `get_expiring_soon`) and the two resources (workspace overview,
+location tree) answer from CoreAPI, so the stock number, the tenant scope and the journal actor stay
+in one place. The two guarded writes do the same: `create_item` opens a record through the create
+service, with its opening movement and history reason, and `correct_stock` follows the stock-take
+posting path — the group locked, one quantity write that posts the movement, the register's copy
+through **Warehouse**, the reason in the history and the organization journal.
 
 The host and origin allow-list is part of the boundary: an organization names the deployed hosts it
 answers on, and the SDK's transport security refuses every other `Host`/`Origin`.
@@ -33,9 +37,10 @@ identity the tool handlers read.
 and the SDK's transport security.
 
 ## Deliberately not done
-- **No write tools yet.** Phase 1 is read-only. A write needs the stock posting rules (a lock, a
-  movement, the register copy) and a required reason; it lands as its own reviewed change, not as
-  an extra method on a read tool.
+- **No document writes.** A receipt, an issue or a transfer is a document with its own screen,
+  approval and printout, and it stays in **Warehouse**. The two writes here are the smallest pair
+  that lets an agent correct what it was asked about: a new record and a counted quantity with a
+  reason. They are not a second document workflow.
 - **No administrative tools.** A key cannot list users, change settings, manage modules or issue
   other keys through MCP, so a leaked key cannot escalate through the endpoint.
 - **No OAuth in phase 1.** The bearer API key is the documented deviation for a self-hosted
