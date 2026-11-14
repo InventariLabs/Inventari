@@ -67,4 +67,20 @@ describe("blankComments", () => {
     const inTemplateText = "const s = `a /* x */ b`;";
     expect(blankComments(inTemplateText)).toBe(inTemplateText);
   });
+
+  it("keeps blanking after a template nested in a template hole", () => {
+    // The hole's brace depth used to be one variable shared by every
+    // template, so the inner template's hole closed the outer one in the
+    // wrong frame and every later comment was left as text.
+    const nested = "const a = `${t(`x`)}`;\n{/* it is a comment */}\n";
+    expect(blankComments(nested)).toBe(
+      nested.replace("/* it is a comment */", " ".repeat(21)),
+    );
+    // The outer hole resumes after the inner template: braces and a comment
+    // inside it are still read as code, and the text after it as a string.
+    const resumes = "const a = `${f(`${g({ k: 1 })}`) /* c */} /* kept */`;\n// gone\n";
+    expect(blankComments(resumes)).toBe(
+      resumes.replace("/* c */", "       ").replace("// gone", "       "),
+    );
+  });
 });
