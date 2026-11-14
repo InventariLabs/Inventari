@@ -422,9 +422,12 @@ describe("CheckoutModal — to a location, and the return date", () => {
     fireEvent.change(screen.getByLabelText("Expected Return Date"), {
       target: { value: "2000-01-01" },
     });
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "The return date cannot be in the past.",
-    );
+    // Picked out by its text: once the member lookup settles, the
+    // unmatched-address hint is a second alert, and this test is about the
+    // date refusal, not about which alerts are mounted.
+    expect(
+      screen.getByText("The return date cannot be in the past."),
+    ).toHaveAttribute("role", "alert");
     await user.click(screen.getByRole("button", { name: "Check Out" }));
     expect(postedCheckout).toBeNull();
   });
