@@ -165,6 +165,27 @@ class TestOneSessionWalkedTwoDispatches:
         )
 
 
+class TestEveryDispatchDrawsFromAnExactShelf:
+    def test_no_dispatch_names_a_place_with_shelves_under_it(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        """A place with shelves under it is a zone, and a zone is drawn by plan.
+
+        A dispatch from a zone splits each line over whichever shelves below
+        it hold the product, in the product's removal order, so where random
+        placement put the stock decided which shelves the walk visited: now
+        two, now three. The demo's dispatches name a shelf, and the walk is
+        the same on every seed.
+        """
+        for doc in _dispatches(db_session, seeded):
+            under = (
+                db_session.query(StorageLocation.id)
+                .filter(StorageLocation.parent_id == doc.source_location_id)
+                .count()
+            )
+            assert under == 0, f'{doc.number} draws from a place with {under} under it'
+
+
 class TestOneDispatchWentOutInTwoBoxes:
     def _packed(self, db: Session, org_id: uuid.UUID) -> tuple[Document, list]:
         packages = (
