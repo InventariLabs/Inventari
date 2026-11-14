@@ -138,6 +138,21 @@ function discrepancyCodeOf(row: AuditLogEntry): string | null {
   return typeof code === "string" && code !== "" ? code : null;
 }
 
+/**
+ * The names of the sub-collections a deleted recipe collection took with it,
+ * from `meta_data.removed_collections` — a list of `{id, name}`. The row
+ * names only the collection that was deleted; the children went in the same
+ * cascade and nothing else in the log says they ever existed.
+ */
+export function removedCollectionNames(row: AuditLogEntry): string[] {
+  const removed = row.meta_data?.removed_collections;
+  if (!Array.isArray(removed)) return [];
+  return removed.flatMap((entry) => {
+    const name = (entry as { name?: unknown } | null)?.name;
+    return typeof name === "string" && name !== "" ? [name] : [];
+  });
+}
+
 export function targetTypeLabel(
   targetType: string,
   t: (key: string) => string,
@@ -388,6 +403,7 @@ export function AuditDetail({
   // sentence the row reads as a plain update over a channel that was never
   // off.
   const reactivated = row.meta_data?.reactivated_after_circuit_breaker;
+  const removedCollections = removedCollectionNames(row);
   return (
     <div className="flex flex-col gap-0.5">
       <AuditChanges
@@ -409,6 +425,13 @@ export function AuditDetail({
           {t("common:settings.audit.reactivatedAfterBreaker")}
         </span>
       )}
+      {removedCollections.length > 0 && (
+        <span className="text-on-muted">
+          {t("common:settings.audit.removedCollections", {
+            names: removedCollections.join(", "),
+          })}
+        </span>
+      )}
       {code && (
         <span className="text-on-muted">
           {t(`stock_takes:reasons.discrepancy.codes.${code}`, {
@@ -416,9 +439,12 @@ export function AuditDetail({
           })}
         </span>
       )}
-      {!changes.length && !row.reason && !code && !reactivated && !document && (
-        <>—</>
-      )}
+      {!changes.length &&
+        !row.reason &&
+        !code &&
+        !reactivated &&
+        !document &&
+        removedCollections.length === 0 && <>—</>}
     </div>
   );
 }

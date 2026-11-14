@@ -767,6 +767,7 @@
         "approval_rejected": "Rejetée"
       },
       "reactivatedAfterBreaker": "Réactivé après la coupure du disjoncteur",
+      "removedCollections": "Sous-collections supprimées : {{names}}",
       "poLine": {
         "tax": "TVA {{rate}} %",
         "product": "produit : {{name}}",

@@ -759,6 +759,7 @@
         "approval_rejected": "Rejeitada"
       },
       "reactivatedAfterBreaker": "Reativado depois que o disjuntor o cortou",
+      "removedCollections": "Subcoleções removidas: {{names}}",
       "poLine": {
         "tax": "IVA {{rate}}%",
         "product": "produto: {{name}}",

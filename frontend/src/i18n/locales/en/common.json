@@ -767,6 +767,7 @@
         "approval_rejected": "Rejected"
       },
       "reactivatedAfterBreaker": "Reactivated after the circuit breaker cut it off",
+      "removedCollections": "Sub-collections removed: {{names}}",
       "poLine": {
         "tax": "{{rate}}% tax",
         "product": "product: {{name}}",
