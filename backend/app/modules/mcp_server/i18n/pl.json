@@ -1,5 +1,5 @@
 {
-  "auth_required": "Ten endpoint wymaga klucza API: wyślij go jako 'Authorization: Bearer <klucz>'.",
+  "auth_required": "Ten endpoint wymaga klucza API: wyślij go w nagłówku 'X-API-Key'.",
   "permission_required": "Ten klucz API nie ma uprawnienia mcp_server:use.",
   "module_disabled": "Moduł Serwer MCP jest wyłączony dla tej organizacji.",
   "organization_required": "Wywołanie MCP działa w organizacji, a ten klucz nie należy do żadnej.",
@@ -7,5 +7,7 @@
   "call_without_identity": "To wywołanie narzędzia nie ma uwierzytelnionej przestrzeni roboczej.",
   "item_not_found": "W tej przestrzeni nie ma wpisu o id {item_id}.",
   "location_not_found": "W tej przestrzeni nie ma lokalizacji o id {location_id}.",
-  "lot_not_found": "W tej przestrzeni nie ma partii o id {lot_id}."
+  "lot_not_found": "W tej przestrzeni nie ma partii o id {lot_id}.",
+  "reason_required": "Korekta wymaga powodu: napisz, dlaczego ilość się zmienia.",
+  "quantity_not_negative": "Ilość na stanie nie może być ujemna."
 }

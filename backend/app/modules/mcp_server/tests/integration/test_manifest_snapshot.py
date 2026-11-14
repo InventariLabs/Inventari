@@ -61,4 +61,6 @@ async def test_the_catalogue_is_deterministic() -> None:
         'get_stock_levels',
         'list_lots',
         'get_expiring_soon',
+        'create_item',
+        'correct_stock',
     ]

@@ -2635,6 +2635,21 @@
         }
       ]
     },
+    "effective_expiry": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "expiry_date",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "meta_data",
+          "required": true
+        }
+      ]
+    },
     "general_rows": {
       "kind": "function",
       "params": [

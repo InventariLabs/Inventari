@@ -7,7 +7,8 @@ interceptor and contribution classes, the HTTP exception surface, the FastAPI
 dependencies, a logger, the model bases, the system event names a subscription
 needs, the migration helpers a revision uses, the field type a scanned code
 arrives in, the pagination envelopes with the helper that pages a query
-into one, and the helper that writes a location's path. Anything under ``app.`` that is not
+into one, the helper that writes a location's path, and the effective-expiry
+rule an opened package is judged by. Anything under ``app.`` that is not
 re-exported here is Core's own business: it may be renamed, split or deleted
 between releases.
 
@@ -114,6 +115,7 @@ from app.core.migration_helpers import (
     relation_exists,
 )
 from app.core.module_ownership import general_rows, hidden_module_tags_async
+from app.core.open_package import effective_expiry
 from app.core.scan_registry import ScanProvider, scan_registry
 from app.core.settings_diff import journal_config_change, record_settings
 from app.database import Base as CoreModelBase
@@ -189,6 +191,7 @@ __all__ = [
     'create_index_if_absent',
     'create_table_if_absent',
     'define_module',
+    'effective_expiry',
     'general_rows',
     'get_async_db',
     'get_current_lang',

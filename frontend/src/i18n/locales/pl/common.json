@@ -601,6 +601,7 @@
         "old_target_location_id": "Poprzednia półka",
         "original_number": "Dokument pierwotny",
         "reason_code": "Kod powodu",
+        "reason_text": "Treść powodu",
         "recount_requested": "Zażądano ponownego liczenia",
         "sample_size": "Wielkość próby",
         "schedule": "Harmonogram",

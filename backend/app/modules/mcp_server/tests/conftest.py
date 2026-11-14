@@ -112,6 +112,14 @@ def mcp_key(db_session: Session, mcp_org: Organization, mcp_user: User) -> str:
 
 
 @pytest.fixture
+def mcp_write_key(db_session: Session, mcp_org: Organization, mcp_user: User) -> str:
+    """The read key plus the one write permission the two write tools check."""
+    return issue_key(
+        db_session, mcp_org, mcp_user, permissions=[*KEY_PERMISSIONS, 'items:write']
+    )
+
+
+@pytest.fixture
 def mcp_org_b(db_session: Session) -> Organization:
     return _make_org(db_session, 'MCP Elsewhere')
 
@@ -226,6 +234,37 @@ _META = {
     'io.modelcontextprotocol/protocolVersion': _PROTOCOL,
     'io.modelcontextprotocol/clientCapabilities': {},
 }
+
+
+@pytest.fixture
+def mcp_tool(client):
+    """Call one tool and return its result, in the 2026-07-28 wire shape."""
+
+    def call(key: str, name: str, arguments: dict | None = None) -> dict:
+        response = client.post(
+            '/api/v1/mcp-server/mcp',
+            json={
+                'jsonrpc': '2.0',
+                'id': 3,
+                'method': 'tools/call',
+                'params': {
+                    'name': name,
+                    'arguments': arguments or {},
+                    '_meta': dict(_META),
+                },
+            },
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {key}',
+                'Mcp-Protocol-Version': _PROTOCOL,
+                'Mcp-Method': 'tools/call',
+                'Mcp-Name': name,
+            },
+        )
+        assert response.status_code == 200, response.text
+        return response.json()['result']
+
+    return call
 
 
 @pytest.fixture
