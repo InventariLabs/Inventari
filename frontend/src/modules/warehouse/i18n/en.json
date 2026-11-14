@@ -983,6 +983,7 @@
         "notes": "Free-text notes recorded on the document",
         "lines": "The lines, for {% for line in document.lines %} — each carries name, quantity, done_quantity, uom and the value columns"
       },
+      "documents": "Pick list only: the dispatches on the sheet — number and the Code128 of it (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "True when the document is a correction",
       "is_external": "True for documents with a partner (IN, PZ, OUT, WZ)",
       "is_external_in": "True for receipts (IN, PZ)",
@@ -998,12 +999,14 @@
         "address": "Issuing organization address, country name localised",
         "logo": "Issuing organization logo (embedded data URI)"
       },
+      "packages": "Packing slip only: the packages printed, one sheet each — number, count, code, code128_img, weight_kg and lines",
       "partner": {
         "name": "Partner (supplier/customer) name",
         "code": "Partner code",
         "tax_id": "Partner tax ID (VAT/NIP number)",
         "address": "Partner address, country name localised"
       },
+      "pick_lines": "Pick list only: the lines in walk order — shelf_code, shelf_name, quantity, unit, name, sku, lot and document_number",
       "print_dates": "Date stamps worth printing, as [{label, value}] — a stamp that repeats the one above it is left out",
       "print_number": "The document number, as the shared header prints it",
       "print_status": "Localised status, as the shared header prints it",
@@ -1019,6 +1022,7 @@
       "show_value_columns": "True when price/value columns are printed",
       "source_location": "Name of the location the stock is taken from (empty for receipts)",
       "target_location": "Name of the location the stock goes to (empty for issues)",
+      "tax_by_rate": "Net, tax and gross grouped by tax rate — [{rate, net, tax, gross}], highest rate first; empty when no tax is printed",
       "total_done": "Sum of done quantities across all lines",
       "total_expected": "Sum of expected quantities across all lines",
       "totals_by_unit": "Quantity totals grouped by unit — [{symbol, expected, done}] — one entry per unit; quantities in different units have no common sum, so a layout printing a total prints these"

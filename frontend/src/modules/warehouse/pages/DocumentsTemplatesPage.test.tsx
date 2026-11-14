@@ -487,6 +487,22 @@ describe("DocumentsTemplatesPage — the dialog and the badge speak the document
             key: "{{document.number}}",
             description: "The document number, as the register knows it",
           },
+          {
+            key: "{{documents}}",
+            description: "Pick list only: the dispatches on the sheet",
+          },
+          {
+            key: "{{packages}}",
+            description: "Packing slip only: the packages printed",
+          },
+          {
+            key: "{{pick_lines}}",
+            description: "Pick list only: the lines in walk order",
+          },
+          {
+            key: "{{tax_by_rate}}",
+            description: "Net, tax and gross grouped by tax rate",
+          },
         ]),
       ),
     );
@@ -506,6 +522,22 @@ describe("DocumentsTemplatesPage — the dialog and the badge speak the document
           "Wysokość, z jaką musi się wydrukować kod kreskowy, w milimetrach",
         ],
         ["{{document.number}}", "Numer dokumentu, taki jak w rejestrze"],
+        [
+          "{{documents}}",
+          "Tylko lista kompletacyjna: wydania na arkuszu — numer i jego kod Code128 (code128_img, code128_width_mm, code128_height_mm)",
+        ],
+        [
+          "{{packages}}",
+          "Tylko list pakowy: drukowane paczki, po jednej na arkusz — number, count, code, code128_img, weight_kg i lines",
+        ],
+        [
+          "{{pick_lines}}",
+          "Tylko lista kompletacyjna: pozycje w kolejności obchodu — shelf_code, shelf_name, quantity, unit, name, sku, lot i document_number",
+        ],
+        [
+          "{{tax_by_rate}}",
+          "Netto, podatek i brutto pogrupowane według stawki podatku — [{rate, net, tax, gross}], od najwyższej stawki; puste, gdy podatek nie jest drukowany",
+        ],
       ]) {
         const symbol = (await screen.findByText(key)).closest("button");
         expect(symbol).toHaveAttribute("title", polish);

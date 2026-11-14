@@ -82,6 +82,10 @@ const PLACEHOLDER_DESCRIPTIONS = [
   { key: "{{doc_title}}", descriptionKey: "templates.placeholders.doc_title" },
   { key: "{{doc_type}}", descriptionKey: "templates.placeholders.doc_type" },
   {
+    key: "{{documents}}",
+    descriptionKey: "templates.placeholders.documents",
+  },
+  {
     key: "{{document.number}}",
     descriptionKey: "templates.placeholders.document.number",
   },
@@ -112,6 +116,10 @@ const PLACEHOLDER_DESCRIPTIONS = [
   {
     key: "{{document.lines}}",
     descriptionKey: "templates.placeholders.document.lines",
+  },
+  {
+    key: "{{packages}}",
+    descriptionKey: "templates.placeholders.packages",
   },
   {
     key: "{{is_correction}}",
@@ -219,6 +227,10 @@ const PLACEHOLDER_DESCRIPTIONS = [
     descriptionKey: "templates.placeholders.show_line_status",
   },
   {
+    key: "{{pick_lines}}",
+    descriptionKey: "templates.placeholders.pick_lines",
+  },
+  {
     key: "{{show_payment}}",
     descriptionKey: "templates.placeholders.show_payment",
   },
@@ -237,6 +249,10 @@ const PLACEHOLDER_DESCRIPTIONS = [
   {
     key: "{{target_location}}",
     descriptionKey: "templates.placeholders.target_location",
+  },
+  {
+    key: "{{tax_by_rate}}",
+    descriptionKey: "templates.placeholders.tax_by_rate",
   },
   {
     key: "{{total_done}}",

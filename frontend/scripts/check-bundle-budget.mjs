@@ -407,6 +407,15 @@ const dist = join(root, "dist");
  * budget moves a step of five, to 415; the other screens stand under theirs
  * (login 394.9, start 626.1, receive 462.6, issue 575.2, history 599.1,
  * products 613.9, app first paint 390.2, initial 189.3).
+ *
+ * Re-measured 2026-11-14 on the branch that gives four document symbols a
+ * description in each language: the development line alone measures the login
+ * screen at 394.9 KiB gz against its 395, and the branch adds 0.2 (395.1). It
+ * is copy, not an import: four sentences in the warehouse file of each
+ * language, the Polish one in the language chunk every first paint loads.
+ * That one phone budget moves a step of five, to 400; the other screens stand
+ * under theirs (launcher 410.3, start 626.4, receive 462.8, issue 575.4,
+ * history 599.4, products 614.1, app first paint 390.4, initial 189.3).
  */
 const BUDGETS = {
   initial: 245,
