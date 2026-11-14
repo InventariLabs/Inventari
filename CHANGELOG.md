@@ -55,6 +55,12 @@ says what the release does rather than what changed since them.
   importing the module's internals. The dead-code check reads every module's
   `moduleApi.ts` as published surface, and no longer reports a name in it that
   nothing in this repository imports.
+- A batch's trace for a recall: from a batch, the receipts that brought it in
+  and the deliveries that sent it out, each with its partner, address, date and
+  quantity — one step back and one step forward, as food law asks. A production
+  run can name the batch its output goes into, and the trace follows it on to
+  that batch and its own customers. The trace exports as a spreadsheet to hand
+  to an inspector.
 
 ### Fixed
 
@@ -884,12 +890,6 @@ lists every public surface and the promise its class makes.
   expiry — and a category gives the products created under it their starting
   setting.
 - **A journal of every movement**, and the stock as it stood on any past date.
-- **A batch's trace for a recall**: from a batch, the receipts that brought it
-  in and the deliveries that sent it out, each with its partner, address,
-  date and quantity — one step back and one step forward, as food law asks. A
-  production run that names the batch of what it makes leads on to that
-  batch and its own customers. The trace exports as a spreadsheet to hand to
-  an inspector.
 - **Stock takes**: count a location from a phone or a desk, blind if the
   counter should not see what is expected, shelf by shelf with the phone's
   camera; **Close location** counts what nobody found as zero. A count that
