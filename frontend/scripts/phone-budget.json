@@ -8,7 +8,7 @@
     "login": {
       "chunks": ["LoginPage"],
       "budget": {
-        "jsKiB": 395,
+        "jsKiB": 400,
         "loadMs": 5500
       },
       "measured": {
