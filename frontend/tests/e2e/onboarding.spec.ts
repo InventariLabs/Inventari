@@ -61,12 +61,6 @@ test.describe("Onboarding — setup wizard", () => {
       .isVisible({ timeout: 10000 })
       .catch(() => false);
 
-    if (!hasAction && !hasSkip) {
-      const hasAnyButton = await page.locator("button").first().isVisible({ timeout: 5000 }).catch(() => false);
-      expect(hasAnyButton || true).toBeTruthy();
-      return;
-    }
-
     expect(hasAction || hasSkip).toBeTruthy();
   });
 });

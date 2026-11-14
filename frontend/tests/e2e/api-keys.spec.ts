@@ -137,7 +137,10 @@ test.describe("API Keys — CRUD flow", () => {
       page.getByRole("heading", { level: 1, name: /api keys/i }),
     ).toBeVisible({ timeout: 15000 });
 
-    if (!listKeyName) return;
+    expect(
+      listKeyName,
+      "listKeyName set by an earlier step of this spec",
+    ).toBeTruthy();
     const row = page
       .getByRole("row")
       .filter({ hasText: listKeyName })
@@ -153,7 +156,10 @@ test.describe("API Keys — CRUD flow", () => {
       page.getByRole("heading", { level: 1, name: /api keys/i }),
     ).toBeVisible({ timeout: 15000 });
 
-    if (!revokeKeyName) return;
+    expect(
+      revokeKeyName,
+      "revokeKeyName set by an earlier step of this spec",
+    ).toBeTruthy();
     const row = page
       .getByRole("row")
       .filter({ hasText: revokeKeyName })

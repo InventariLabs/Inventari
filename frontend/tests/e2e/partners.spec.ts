@@ -80,14 +80,14 @@ test.describe("Partners — CRUD flow", () => {
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    const partnerVisible = await page
-      .getByText(delName)
-      .first()
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!partnerVisible) {
+    try {
+      await expect(page.getByText(delName).first()).toBeVisible({
+        timeout: 10000,
+      });
+    } catch (error) {
+      // The partner this test made does not outlive a failing check.
       await api.deletePartner(token, partner.id).catch(() => {});
-      return;
+      throw error;
     }
 
     const partnerRow = page
@@ -152,8 +152,7 @@ test.describe("Partners — extended actions (API)", () => {
     const deactivateResp = await api.request.patch(`/api/v1/partners/${partnerId}/deactivate`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
-    // If deactivate fails (e.g. partner already deleted), skip gracefully
-    if (!deactivateResp.ok()) return;
+    expect(deactivateResp.ok()).toBe(true);
 
     // Then reactivate
     const activateResp = await api.request.patch(`/api/v1/partners/${partnerId}/activate`, {

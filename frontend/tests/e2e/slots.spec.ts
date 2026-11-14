@@ -28,14 +28,14 @@ test.describe("UI Slots — verification", () => {
     const addBtn = page
       .getByRole("button", { name: /add product|add item/i })
       .first();
-    if (!(await addBtn.isVisible({ timeout: 10000 }).catch(() => false))) return;
+    await expect(addBtn).toBeVisible({ timeout: 10000 });
     await addBtn.click();
     await page.locator('[role="dialog"], form, #quick-add-form').first().waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
 
     const formOrDialog = page
       .locator('[role="dialog"], form, #quick-add-form')
       .first();
-    if (!(await formOrDialog.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(formOrDialog).toBeVisible({ timeout: 5000 });
 
     await expect(
       page.locator('[role="alert"]').filter({ hasText: /error|błąd/i }),

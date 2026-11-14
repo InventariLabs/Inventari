@@ -92,10 +92,7 @@ test.describe("Stock Takes — inventory counting flow", () => {
         name: /new stock take|create|start|utwórz|zacznij|rozpocznij/i,
       })
       .first();
-    const btnVisible = await createBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!btnVisible) return;
+    await expect(createBtn).toBeVisible({ timeout: 10000 });
     await createBtn.click();
 
     await page
@@ -116,10 +113,7 @@ test.describe("Stock Takes — inventory counting flow", () => {
     authenticatedPage,
   }) => {
     const countingLink = page.locator('a[href*="/counting"]').first();
-    const linkVisible = await countingLink
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!linkVisible) return;
+    await expect(countingLink).toBeVisible({ timeout: 10000 });
     const href = await countingLink.getAttribute("href");
     expect(href).toBeTruthy();
 
@@ -131,14 +125,7 @@ test.describe("Stock Takes — inventory counting flow", () => {
     const countingInput = page.locator(
       '[data-testid="stock-take-counting-input"]',
     );
-    const inputVisible = await countingInput
-      .isVisible({ timeout: 15000 })
-      .catch(() => false);
-    if (!inputVisible) {
-      await expect(page.locator("body")).not.toContainText(/error|błąd/i);
-      return;
-    }
-    await expect(countingInput).toBeVisible();
+    await expect(countingInput).toBeVisible({ timeout: 15000 });
   });
 
   test("complete button is enabled on active stock take", async ({
@@ -146,22 +133,16 @@ test.describe("Stock Takes — inventory counting flow", () => {
     authenticatedPage,
   }) => {
     const countingLink = page.locator('a[href*="/counting"]').first();
-    const linkVisible = await countingLink
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (!linkVisible) return;
+    await expect(countingLink).toBeVisible({ timeout: 5000 });
     const href = await countingLink.getAttribute("href");
-    if (!href) return;
+    expect(href, "the counting link carries an href").toBeTruthy();
     await page.goto(href);
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
     const completeBtn = page.locator('[data-testid="stock-take-complete-btn"]');
-    const btnVisible = await completeBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!btnVisible) return;
+    await expect(completeBtn).toBeVisible({ timeout: 10000 });
     await expect(completeBtn).toBeEnabled();
   });
 
@@ -170,22 +151,16 @@ test.describe("Stock Takes — inventory counting flow", () => {
     authenticatedPage,
   }) => {
     const countingLink = page.locator('a[href*="/counting"]').first();
-    const linkVisible = await countingLink
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (!linkVisible) return;
+    await expect(countingLink).toBeVisible({ timeout: 5000 });
     const href = await countingLink.getAttribute("href");
-    if (!href) return;
+    expect(href, "the counting link carries an href").toBeTruthy();
     await page.goto(href);
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
     const cancelBtn = page.locator('[data-testid="stock-take-cancel-btn"]');
-    const btnVisible = await cancelBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!btnVisible) return;
+    await expect(cancelBtn).toBeVisible({ timeout: 10000 });
     await expect(cancelBtn).toBeEnabled();
   });
 

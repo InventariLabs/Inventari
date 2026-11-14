@@ -58,10 +58,7 @@ test.describe("Webhooks — management & testing", () => {
 
   test("opens add webhook modal", async ({ page, authenticatedPage }) => {
     const addBtn = page.locator('[data-testid="webhooks-add-btn"]').first();
-    const addBtnVisible = await addBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!addBtnVisible) return;
+    await expect(addBtn).toBeVisible({ timeout: 10000 });
     await addBtn.click();
 
     await expect(page.locator('[role="dialog"]')).toBeVisible({
@@ -72,26 +69,19 @@ test.describe("Webhooks — management & testing", () => {
   test("creates a new webhook via UI", async ({ page, authenticatedPage }) => {
     const uniqueName = `E2E-Webhook-UI-${Date.now()}`;
     const addBtn = page.locator('[data-testid="webhooks-add-btn"]').first();
-    const addBtnVisible = await addBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!addBtnVisible) return;
+    await expect(addBtn).toBeVisible({ timeout: 10000 });
     await addBtn.click();
 
     const modal = page.locator('[role="dialog"]');
     await expect(modal).toBeVisible({ timeout: 10000 });
 
-    const nameInput = modal.getByPlaceholder(/home assistant|name|nazwa/i);
-    const nameVisible = await nameInput
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (!nameVisible) return;
+    const nameInput = modal.getByLabel(/Name/i);
+    await expect(nameInput).toBeVisible({ timeout: 5000 });
     await nameInput.fill(uniqueName);
 
-    const urlInput = modal.locator('input[type="url"]').first();
-    if (await urlInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await urlInput.fill("https://example.com/webhook-ui");
-    }
+    const urlInput = modal.getByLabel(/Target URL/i);
+    await expect(urlInput).toBeVisible({ timeout: 5000 });
+    await urlInput.fill("https://example.com/webhook-ui");
 
     const firstEventOption = modal
       .locator('label:has(input[type="checkbox"])')
@@ -113,19 +103,13 @@ test.describe("Webhooks — management & testing", () => {
       .locator('tr, li, [role="row"], div[class*="rounded-xl"]')
       .filter({ hasText: seedWebhookName })
       .first();
-    const rowVisible = await webhookRow
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!rowVisible) return;
+    await expect(webhookRow).toBeVisible({ timeout: 10000 });
 
     const editBtn = webhookRow.getByRole("button", {
       name: /edit|edytuj|pen/i,
     });
 
-    const editVisible = await editBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!editVisible) return;
+    await expect(editBtn).toBeVisible({ timeout: 10000 });
     await editBtn.click();
 
     const dialog = page.locator('[role="dialog"]');
@@ -153,40 +137,33 @@ test.describe("Webhooks — management & testing", () => {
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    const webhookRow = page
-      .locator('tr, li, [role="row"], div[class*="rounded-xl"]')
-      .filter({ hasText: delName })
-      .first();
-    const rowVisible = await webhookRow
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!rowVisible) {
+    try {
+      const webhookRow = page
+        .locator('tr, li, [role="row"], div[class*="rounded-xl"]')
+        .filter({ hasText: delName })
+        .first();
+      await expect(webhookRow).toBeVisible({ timeout: 10000 });
+
+      const deleteBtn = webhookRow.getByRole("button", {
+        name: /delete|usuń|remove/i,
+      });
+      await expect(deleteBtn).toBeVisible({ timeout: 10000 });
+      await deleteBtn.click();
+
+      const confirmBtn = page
+        .getByRole("button", { name: /confirm|delete|usuń|tak/i })
+        .last();
+      if (await confirmBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+        await confirmBtn.click();
+      }
+
+      await expect(page.locator("body").getByText(delName)).toHaveCount(0, {
+        timeout: 10000,
+      });
+    } finally {
+      // Whatever the UI did, the webhook this test made does not outlive it.
       await api.deleteWebhook(token, toDelete.id).catch(() => {});
-      return;
     }
-
-    const deleteBtn = webhookRow.getByRole("button", {
-      name: /delete|usuń|remove/i,
-    });
-    const delBtnVisible = await deleteBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!delBtnVisible) {
-      await api.deleteWebhook(token, toDelete.id).catch(() => {});
-      return;
-    }
-    await deleteBtn.click();
-
-    const confirmBtn = page
-      .getByRole("button", { name: /confirm|delete|usuń|tak/i })
-      .last();
-    if (await confirmBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await confirmBtn.click();
-    }
-
-    await expect(page.locator("body").getByText(delName)).toHaveCount(0, {
-      timeout: 10000,
-    });
   });
 
   test("tests webhook delivery (ping)", async ({ page, authenticatedPage }) => {
@@ -194,19 +171,13 @@ test.describe("Webhooks — management & testing", () => {
       .locator('tr, li, [role="row"], div[class*="rounded-xl"]')
       .filter({ hasText: seedWebhookName })
       .first();
-    const rowVisible = await webhookRow
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!rowVisible) return;
+    await expect(webhookRow).toBeVisible({ timeout: 10000 });
 
     const testBtn = webhookRow.getByRole("button", {
       name: /test|ping|send|wyślij/i,
     });
 
-    const testBtnVisible = await testBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!testBtnVisible) return;
+    await expect(testBtn).toBeVisible({ timeout: 10000 });
     await testBtn.click();
 
     const statusMessage = page.getByText(
@@ -223,19 +194,13 @@ test.describe("Webhooks — management & testing", () => {
       .locator('tr, li, [role="row"], div[class*="rounded-xl"]')
       .filter({ hasText: seedWebhookName })
       .first();
-    const rowVisible = await webhookRow
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!rowVisible) return;
+    await expect(webhookRow).toBeVisible({ timeout: 10000 });
 
     const historyBtn = webhookRow.getByRole("button", {
       name: /history|logs|delivery|historia/i,
     });
 
-    const historyBtnVisible = await historyBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!historyBtnVisible) return;
+    await expect(historyBtn).toBeVisible({ timeout: 10000 });
     await historyBtn.click();
 
     const logsArea = page

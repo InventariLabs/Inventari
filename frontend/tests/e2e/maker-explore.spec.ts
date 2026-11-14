@@ -173,7 +173,7 @@ test.describe.serial("Maker exploratory", () => {
       const newBtn = page
         .getByRole("button", { name: /new production/i })
         .first();
-      if ((await newBtn.count()) === 0) return;
+      await expect(newBtn).toHaveCount(1);
       await newBtn.click();
 
       const dialog = page.locator('[role="dialog"]').first();

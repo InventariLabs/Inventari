@@ -104,79 +104,29 @@ test.describe("Stats — analytics & reporting", () => {
         '.recharts-responsive-container, canvas, svg[class*="chart"], [class*="recharts"]',
       )
       .first();
-    const chartVisible = await chart
-      .isVisible({ timeout: 15000 })
-      .catch(() => false);
-    if (!chartVisible) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 15000,
-      });
-      return;
-    }
-    await expect(chart).toBeVisible();
+    await expect(chart).toBeVisible({ timeout: 15000 });
   });
 
-  test("navigates to analytics tab and renders content", async ({
+  test("navigates to the reconciliation page", async ({
     page,
     authenticatedPage,
   }) => {
-    const analyticsTab = page.getByRole("link", { name: /analytics/i }).first();
-    const tabVisible = await analyticsTab
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!tabVisible) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 15000,
-      });
-      return;
-    }
-    await analyticsTab.click();
-    await page
-      .waitForLoadState("networkidle", { timeout: 15000 })
-      .catch(() => {});
-
-    const heading = page.locator("h1, h2, h3").first();
-    await expect(heading).toBeVisible({ timeout: 10000 });
-  });
-
-  test("low stock alerts section is present", async ({
-    page,
-    authenticatedPage,
-  }) => {
-    const analyticsTab = page.getByRole("link", { name: /analytics/i }).first();
-    const tabVisible = await analyticsTab
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!tabVisible) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 15000,
-      });
-      return;
-    }
-    await analyticsTab.click();
-
-    await expect(page.locator("h1, h2, h3").first()).toBeVisible({
+    const reconciliation = page
+      .getByRole("link", { name: "Reconciliation", exact: true })
+      .first();
+    await expect(reconciliation).toBeVisible({ timeout: 10000 });
+    await reconciliation.click();
+    await expect(page).toHaveURL(/\/inventory\/stats\/reconciliation/);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible({
       timeout: 10000,
     });
   });
 
-  test("forecasting or predictions section is visible", async ({
+  test("the running-low signal is present", async ({
     page,
     authenticatedPage,
   }) => {
-    const analyticsTab = page.getByRole("link", { name: /analytics/i }).first();
-    const tabVisible = await analyticsTab
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!tabVisible) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 15000,
-      });
-      return;
-    }
-    await analyticsTab.click();
-
-    await expect(page.locator("h1, h2, h3").first()).toBeVisible({
+    await expect(page.getByRole("link", { name: /Running Low/ })).toBeVisible({
       timeout: 10000,
     });
   });
