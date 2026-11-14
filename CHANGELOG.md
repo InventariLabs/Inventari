@@ -33,6 +33,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Deleting a recipe collection now leaves a row in the audit journal, as
+  deleting a recipe or a meal plan does. The row names the collection, who
+  deleted it and any sub-collections that went with it, and appears in the
+  journal's filter as "Recipe collection". Renaming or filing recipes under a
+  collection still writes nothing.
 - The recipe list's Next page button shows the next page. With more than
   fifty recipes the page asked the server for the page start under a name it
   does not read, so page 2 showed page 1 again; it now sends `offset`.

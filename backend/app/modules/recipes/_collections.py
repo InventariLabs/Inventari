@@ -9,8 +9,10 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.contracts import AuditAction, AuditTargetType
 from app.core.exceptions import ConflictException, ServiceRejectionError
 from app.core.module_sdk import hit_constraint
+from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
 from .models import RecipeCollection, RecipeCollectionMember
@@ -202,8 +204,30 @@ async def update_collection_async(
     return collection
 
 
-async def delete_collection_async(
+async def _descendants_async(
     db: AsyncSession, org_id: UUID, collection_id: UUID
+) -> list[RecipeCollection]:
+    """Every sub-collection under *collection_id*, level by level."""
+    found: list[RecipeCollection] = []
+    level = [collection_id]
+    while level:
+        rows = (
+            await db.scalars(
+                select(RecipeCollection)
+                .where(
+                    RecipeCollection.organization_id == org_id,
+                    RecipeCollection.parent_id.in_(level),
+                )
+                .order_by(RecipeCollection.name)
+            )
+        ).all()
+        found.extend(rows)
+        level = [row.id for row in rows]
+    return found
+
+
+async def delete_collection_async(
+    db: AsyncSession, org_id: UUID, collection_id: UUID, user_id: UUID
 ) -> bool:
     collection = await db.scalar(
         select(RecipeCollection).where(
@@ -213,6 +237,30 @@ async def delete_collection_async(
     )
     if collection is None:
         return False
+    # The collection and everything under it is gone for good once the
+    # request commits, so the deletion takes a row in the organization journal
+    # (see ``AuditTargetType``: a working note's edits write nothing, its
+    # deletion does). The sub-collections that go with it ride in the entry,
+    # because no other table keeps their names. Same transaction as the delete.
+    removed = await _descendants_async(db, org_id, collection.id)
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=org_id,
+        user_id=user_id,
+        action=AuditAction.HARD_DELETE,
+        target_type=AuditTargetType.RECIPE_COLLECTION,
+        target_id=collection.id,
+        snapshot={'name': collection.name},
+        meta_data=(
+            {
+                'removed_collections': [
+                    {'id': str(child.id), 'name': child.name} for child in removed
+                ]
+            }
+            if removed
+            else None
+        ),
+    )
     # Children and members are removed via cascade (DB-level ondelete=CASCADE
     # plus ORM cascade for in-session deletes).
     await db.delete(collection)

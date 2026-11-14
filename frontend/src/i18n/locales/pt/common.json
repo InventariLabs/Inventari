@@ -693,6 +693,7 @@
         "document_template": "Modelo de documento",
         "recipe": "Receita",
         "meal_plan": "Plano de refeições",
+        "recipe_collection": "Coleção de receitas",
         "shopping_list": "Lista de compras",
         "equipment_model": "Modelo de equipamento (histórico)",
         "cycle_count_schedule": "Agendamento de contagem cíclica",

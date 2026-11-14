@@ -264,6 +264,7 @@
     "product_template",
     "purchase_order",
     "recipe",
+    "recipe_collection",
     "role",
     "shopping_list",
     "stock_lot",

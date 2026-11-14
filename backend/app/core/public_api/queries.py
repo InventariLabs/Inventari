@@ -29,7 +29,8 @@ defined over stock, catalogue and custody facts, so the journal writer
 skips the invalidation for entries about things none of them reads:
 who may access the organization (``org_member``, ``role``,
 ``invitation``, ``api_key``, ``webhook_endpoint``) and somebody's own
-working note (``recipe``, ``meal_plan``, ``shopping_list``). Adding a
+working note (``recipe``, ``meal_plan``, ``recipe_collection``,
+``shopping_list``). Adding a
 cached read-model that reads any of those means taking the target back
 out of ``_ANALYTICS_NEUTRAL_TARGETS`` in ``app/services/audit_service``
 — ``tests/integration/test_stats_cache_invalidation.py`` fails until

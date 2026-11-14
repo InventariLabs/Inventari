@@ -96,7 +96,9 @@ def register_collection_routes(router: APIRouter) -> None:
         db: AsyncSession = Depends(get_async_db, scope='function'),
         org_id: UUID = Depends(require_org),
     ) -> None:
-        deleted = await delete_collection_async(db, org_id, collection_id)
+        deleted = await delete_collection_async(
+            db, org_id, collection_id, current_user.id
+        )
         if not deleted:
             raise catalogue_status_refusal(
                 'recipe_not_found', status.HTTP_404_NOT_FOUND

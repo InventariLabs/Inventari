@@ -309,6 +309,7 @@ def test_the_skip_list_is_a_decision_and_is_pinned() -> None:
             AuditTargetType.WEBHOOK_ENDPOINT.value,
             AuditTargetType.RECIPE.value,
             AuditTargetType.MEAL_PLAN.value,
+            AuditTargetType.RECIPE_COLLECTION.value,
             AuditTargetType.SHOPPING_LIST.value,
         }
     )
