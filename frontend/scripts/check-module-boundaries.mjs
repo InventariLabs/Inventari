@@ -172,6 +172,23 @@ export function edgesIn(files, readFile) {
 /** The one specifier a module may use to reach Core. */
 export const MODULE_SDK = "@/module-sdk";
 
+/**
+ * The one other specifier a module may write: the declaration that adds its
+ * own slot to `SlotDataMap`,
+ *
+ *     export {};
+ *     declare module "@/lib/moduleRegistry/slotProps" {
+ *       interface SlotDataMap { my_slot: { … } }
+ *     }
+ *
+ * TypeScript merges an interface only through the module that declares it, so
+ * the SDK's re-export cannot carry it. It is a type-level extension point the
+ * SDK documents, not an import of Core internals, and it spares a module that
+ * renders a place for others to fill from editing `slotProps.ts`.
+ */
+const SLOT_AUGMENTATION_RE =
+  /declare\s+module\s+["']@\/lib\/moduleRegistry\/slotProps["']/g;
+
 const CORE_ALIAS_RE = /["'`](?![^"'`\n]*\$\{)@\/([A-Za-z0-9_./-]+)["'`]/g;
 
 /**
@@ -226,6 +243,7 @@ function canonicalCoreSpecifier(rel, specifier) {
 export function coreImports(rel, text) {
   const owner = rel.split("/")[0];
   const found = new Set();
+  text = text.replace(SLOT_AUGMENTATION_RE, "");
   for (const match of text.matchAll(CORE_ALIAS_RE)) {
     const path = match[1];
     if (`@/${path}` === MODULE_SDK || path.startsWith("modules/")) continue;
