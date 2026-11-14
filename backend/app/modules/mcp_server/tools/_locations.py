@@ -13,28 +13,10 @@ from app.core.public_api import core_api
 
 from .._db import request_session
 from .._identity import current_identity, refusal
+from .._location_tree import build_tree, list_all_locations
 from ..schemas import LocationNode, LocationsResult, LocationTreeResult
 
 _READ_ONLY = ToolAnnotations(readOnlyHint=True, idempotentHint=True)
-
-
-def _tree(nodes: list[LocationNode]) -> list[LocationNode]:
-    """Turn a flat, name-ordered location list into roots with subtrees.
-
-    A location whose parent is not in the list (an archived ancestor, or a
-    subtree read that starts below it) is a root of what was read: the reader
-    asked for these locations, and dropping them would make the answer a
-    silently smaller tree.
-    """
-    by_id = {node.id: node for node in nodes}
-    roots: list[LocationNode] = []
-    for node in nodes:
-        parent = by_id.get(node.parent_id) if node.parent_id is not None else None
-        if parent is None or parent is node:
-            roots.append(node)
-        else:
-            parent.children.append(node)
-    return roots
 
 
 def register_location_tools(server: MCPServer) -> None:
@@ -120,12 +102,8 @@ def register_location_tools(server: MCPServer) -> None:
                         location_id=str(root_id),
                     )
                 return LocationTreeResult(
-                    roots=_tree([LocationNode.from_dto(row) for row in subtree]),
+                    roots=build_tree([LocationNode.from_dto(row) for row in subtree]),
                     ancestors=[LocationNode.from_dto(row) for row in ancestors],
                 )
-            rows = await core_api.locations.list_async(
-                db, identity.organization_id, limit=500
-            )
-        return LocationTreeResult(
-            roots=_tree([LocationNode.from_dto(row) for row in rows])
-        )
+            nodes = await list_all_locations(db, identity.organization_id)
+        return LocationTreeResult(roots=build_tree(nodes))

@@ -1,17 +1,22 @@
-"""The six read tools and two resources, and the tenant/permission line they hold."""
+"""The seven read tools and two resources, and the tenant/permission line they hold."""
 
 from __future__ import annotations
 
 import json
+from datetime import date, timedelta
 from decimal import Decimal
 
+import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 
 from app.models.item import Item
 from app.models.organization import Organization
 from app.models.stock_lot import StockLot
+from app.models.storage_location import StorageLocation
 from app.models.user import User
 from app.modules.mcp_server.tests.conftest import issue_key
+from tests.integration._shelf import anchor_pending_records
 
 
 def _tool(client: TestClient, key: str, name: str, arguments: dict):
@@ -129,6 +134,43 @@ class TestLocations:
         roots = _structured(result)['roots']
         assert [root['id'] for root in roots] == [str(shelf.id)]
 
+    def test_the_whole_tree_is_read_past_one_core_page(
+        self,
+        client: TestClient,
+        mcp_key: str,
+        db_session: Session,
+        mcp_org: Organization,
+        mcp_user: User,
+    ) -> None:
+        """The tree is every location, not the first page of them.
+
+        The CoreAPI listing is capped per request; the whole-tree read used one
+        request and answered a smaller tree with nothing saying so.
+        """
+        zone = StorageLocation(
+            organization_id=mcp_org.id, created_by=mcp_user.id, name='Zone'
+        )
+        db_session.add(zone)
+        db_session.flush()
+        db_session.add_all(
+            [
+                StorageLocation(
+                    organization_id=mcp_org.id,
+                    created_by=mcp_user.id,
+                    name=f'Shelf {index:03d}',
+                    parent_id=zone.id,
+                )
+                for index in range(501)
+            ]
+        )
+        db_session.commit()
+
+        result = _tool(client, mcp_key, 'get_location_tree', {})
+
+        roots = _structured(result)['roots']
+        assert len(roots) == 1
+        assert len(roots[0]['children']) == 501
+
     def test_get_location_tree_refuses_an_unknown_id(
         self, client: TestClient, mcp_key: str
     ) -> None:
@@ -208,6 +250,44 @@ class TestStockAndLots:
         payload = _structured(result)
         assert payload['shelf_count'] == 1
 
+    def test_the_window_is_not_cut_from_the_expired_rows(
+        self,
+        client: TestClient,
+        db_session: Session,
+        mcp_org: Organization,
+        mcp_user: User,
+        shelf: StorageLocation,
+        item: Item,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The cap counts the window, not the oldest rows before it.
+
+        With the cap forced to one row, the single row read must be the one in
+        the window. Reading the FEFO list and filtering afterwards read the
+        expired row instead and answered an empty window.
+        """
+        from app.modules.mcp_server.tools import _stock
+
+        expired = Item(
+            organization_id=mcp_org.id,
+            storage_location_id=shelf.id,
+            name='Expired olive oil',
+            quantity=Decimal('1'),
+            expiry_date=date.today() - timedelta(days=30),
+        )
+        db_session.add(expired)
+        anchor_pending_records(db_session)
+        db_session.flush()
+        db_session.commit()
+        # The stale row sorts before the live one.
+        raw = issue_key(db_session, mcp_org, mcp_user)
+        monkeypatch.setattr(_stock, '_EXPIRY_LOOKUP_CAP', 1)
+
+        result = _tool(client, raw, 'get_expiring_soon', {'days': 7})
+
+        payload = _structured(result)
+        assert [row['item_id'] for row in payload['items']] == [str(item.id)]
+
 
 class TestPermissions:
     def test_a_key_without_items_read_can_read_locations_but_not_stock(
@@ -284,7 +364,7 @@ class TestTenantIsolation:
 
 class TestResources:
     def test_the_overview_counts_only_this_workspace(
-        self, client: TestClient, mcp_key: str, item: Item
+        self, client: TestClient, mcp_key: str, item: Item, item_b: Item
     ) -> None:
         response = client.post(
             '/api/v1/mcp-server/mcp',
@@ -311,7 +391,8 @@ class TestResources:
         assert response.status_code == 200, response.text
         contents = response.json()['result']['contents']
         overview = json.loads(contents[0]['text'])
-        assert overview['total_items'] >= 1
+        # Org B holds one record too; a count of two would cross the boundary.
+        assert overview['total_items'] == 1
 
     def test_the_location_tree_is_the_workspace_tree(
         self, client: TestClient, mcp_key: str, shelf

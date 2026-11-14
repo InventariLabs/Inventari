@@ -207,6 +207,47 @@ class TestCoreItemsListByExpiry:
         result = await core_api.items.list_by_expiry_async(db, org_id)
         assert [item.name for item in result] == ['Active']
 
+    async def test_filters_by_an_expiry_window(
+        self, real_async_db_session: AsyncSession, async_test_storage_location
+    ):
+        """A window is bounded in the query, so the cap counts the window.
+
+        A caller that read the capped list and filtered afterwards spent the
+        cap on the oldest rows — a workspace with more expired stock than the
+        cap answered an empty window.
+        """
+        db = real_async_db_session
+        org_id = async_test_storage_location.organization_id
+        loc_id = async_test_storage_location.id
+        today = date.today()
+        await _make_item(
+            db,
+            org_id,
+            loc_id,
+            name='Expired',
+            expiry_date=today - timedelta(days=30),
+        )
+        await _make_item(
+            db, org_id, loc_id, name='Due', expiry_date=today + timedelta(days=2)
+        )
+        await _make_item(
+            db,
+            org_id,
+            loc_id,
+            name='Later',
+            expiry_date=today + timedelta(days=30),
+        )
+        await db.commit()
+
+        result = await core_api.items.list_by_expiry_async(
+            db,
+            org_id,
+            expiry_after=today,
+            expiry_before=today + timedelta(days=7),
+            limit=1,
+        )
+        assert [item.name for item in result] == ['Due']
+
     async def test_org_scoping(
         self, real_async_db_session: AsyncSession, async_test_storage_location
     ):

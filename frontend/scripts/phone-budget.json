@@ -73,7 +73,7 @@
     "history": {
       "chunks": ["DocumentHistoryPage"],
       "budget": {
-        "jsKiB": 600,
+        "jsKiB": 605,
         "loadMs": 8000
       },
       "measured": {

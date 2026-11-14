@@ -14,6 +14,25 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- The MCP Server module serves the Model Context Protocol over Streamable HTTP
+  at `/api/v1/mcp-server/mcp`, authenticated with an API key that holds
+  `mcp_server:use` and acts only in the key's organization. Seven read tools
+  and two resources answer from the same CoreAPI calls the screens use, so the
+  stock number and the tenant scope stay in one place. The key travels in
+  `X-API-Key`, which the endpoint and the rest of the API both accept; an
+  organization lists the hosts and origins its deployment answers on in the
+  module's settings card, and every other `Host`/`Origin` is refused.
+- A module can close what it opened: `BaseModule.on_shutdown_async` runs at
+  application shutdown in the reverse of the startup order, so a task group,
+  connection or exit stack started by the module is closed with the app, and
+  `define_module(on_shutdown_async_hook=)` wires it. `app.core.module_sdk`
+  exports `get_current_user`, `audit_actor_scope` and `current_actor` for a
+  module that authenticates its own ASGI transport or names its actor in the
+  journal. `core_api.items.list_by_expiry_async` takes `expiry_after` and
+  `expiry_before`, so a caller reading one expiry window filters the query
+  instead of reading a capped list and discarding rows after it. The app-level
+  default rate limit now keys a plain Starlette route as it does a FastAPI
+  endpoint, so a transport served that way is counted per API key.
 - A new community module package can be handed to an AI coding agent.
   `module new-community` now writes an `AGENTS.md` into the package — what a
   module may import, the five maintained languages, migrations the package

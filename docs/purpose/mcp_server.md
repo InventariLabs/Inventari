@@ -11,7 +11,7 @@ administrator only decides whether the module is on and which roles may hold `mc
 The Model Context Protocol over Streamable HTTP, revision 2026-07-28, at one endpoint
 (`/api/v1/mcp-server/mcp`). A request authenticates with an API key from **API Keys**, acts only in
 the key's organization, and sees what that key's permission list allows: `items:read` for stock,
-batches and expiry, `locations:read` for the location tree. The six read tool families (`search_items`,
+batches and expiry, `locations:read` for the location tree. The seven read tools (`search_items`,
 `get_item`, `list_locations`, `get_location_tree`, `get_stock_levels`, `list_lots`,
 `get_expiring_soon`) and the two resources (workspace overview, location tree) answer from CoreAPI,
 so the stock number, the tenant scope and the journal actor stay in one place.

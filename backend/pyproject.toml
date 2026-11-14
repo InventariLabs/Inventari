@@ -747,6 +747,11 @@ ignore_decorators = [
     "@event_bus*",
     "@event.listens_for",
     "@*.on_*",
+    # The MCP SDK's registration decorators: `@server.tool(...)` and
+    # `@server.resource(...)` put the function in the transport's catalogue, so
+    # no Python call site names it and a client reaches it over JSON-RPC.
+    "@server.tool",
+    "@server.resource",
     "@field_validator",
     "@model_validator",
     "@field_serializer",

@@ -17,24 +17,13 @@ from app.core.public_api import core_api
 
 from ._db import request_session
 from ._identity import MODULE_NAME, current_identity
-from .schemas import LocationNode, LocationTreeResult
+from ._location_tree import build_tree, list_all_locations
+from .schemas import LocationTreeResult
 
 
 def _resource_refusal(key: str, **kwargs: object) -> ResourceError:
     message = get_module_error_message(MODULE_NAME, key, get_current_lang(), **kwargs)
     return ResourceError(message)
-
-
-def _tree(nodes: list[LocationNode]) -> list[LocationNode]:
-    by_id = {node.id: node for node in nodes}
-    roots: list[LocationNode] = []
-    for node in nodes:
-        parent = by_id.get(node.parent_id) if node.parent_id is not None else None
-        if parent is None or parent is node:
-            roots.append(node)
-        else:
-            parent.children.append(node)
-    return roots
 
 
 def register_resources(server: MCPServer) -> None:
@@ -86,9 +75,5 @@ def register_resources(server: MCPServer) -> None:
                 'insufficient_permission', permission='locations:read'
             ) from exc
         async with request_session() as db:
-            rows = await core_api.locations.list_async(
-                db, identity.organization_id, limit=500
-            )
-        return LocationTreeResult(
-            roots=_tree([LocationNode.from_dto(row) for row in rows])
-        ).model_dump(mode='json')
+            nodes = await list_all_locations(db, identity.organization_id)
+        return LocationTreeResult(roots=build_tree(nodes)).model_dump(mode='json')

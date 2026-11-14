@@ -2,11 +2,16 @@
 
 The MCP transport is an ASGI app, not a FastAPI route, so neither the app's
 dependencies nor `require_module` run for it. This middleware is that gate:
-it resolves the `Authorization: Bearer` key through the same identity path
-every other API-key request takes (`identity_service.get_current_user`, which
-includes the owner-membership check and the credential-change marker), asks for
+it resolves the key through the same identity path every other API-key request
+takes (`identity_service.get_current_user`, which includes the
+owner-membership check and the credential-change marker), asks for
 `mcp_server:use`, refuses a module the organization has switched off, and only
 then lets the SDK transport see the request.
+
+The key travels in its own `X-API-Key` header, which Core accepts and the MCP
+endpoint therefore does too. `Authorization: Bearer` is still honoured for an
+MCP client that can send no other header; Core marks such a request
+`Deprecation`, so a client that can send the key's own header is steered to it.
 
 The key's own permission list, the key's organization and the key's actor are
 put on an `McpIdentity` for the tool handlers. Nothing about them comes from
@@ -27,6 +32,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp, Receive, Scope, Send
 
+from app.core.contracts import API_KEY_HEADER
 from app.core.module_sdk import (
     AppException,
     audit_actor_scope,
@@ -87,7 +93,11 @@ def _string_list(value: object) -> list[str]:
     return [entry for entry in value if isinstance(entry, str) and entry]
 
 
-def _bearer_key(request: Request) -> str | None:
+def _request_key(request: Request) -> str | None:
+    """The key from its own header, or the Bearer form MCP clients default to."""
+    own = request.headers.get(API_KEY_HEADER, '').strip()
+    if own:
+        return own
     header = request.headers.get('authorization', '')
     scheme, separator, value = header.partition(' ')
     if not separator or scheme.lower() != 'bearer':
@@ -170,7 +180,7 @@ class McpAuthMiddleware:
             return
 
         request = Request(scope, receive)
-        raw_key = _bearer_key(request)
+        raw_key = _request_key(request)
         if raw_key is None:
             await _refusal_response(
                 _auth_refusal('MCP_AUTH_REQUIRED', 'auth_required')

@@ -1,6 +1,20 @@
 {
   "title": "MCP Server",
   "description": "Connect an AI agent to this workspace with an API key, over the Model Context Protocol.",
+  "subtitle": "What an AI agent can read here, and how to connect one.",
+  "endpoint": {
+    "label": "Endpoint",
+    "hint": "Point your MCP client at this address."
+  },
+  "connect": {
+    "title": "To connect",
+    "createKey": "Create an API key in API Keys and give it the permission Use the MCP endpoint.",
+    "pointClient": "Send the key in the X-API-Key header (or as a Bearer token) to the address above.",
+    "allowHost": "If this installation answers on a public address, add its host to the allowed hosts in the module settings."
+  },
+  "links": {
+    "apiKeys": "API Keys"
+  },
   "navigation": {
     "title": "MCP Server"
   },
@@ -10,9 +24,9 @@
   },
   "settings": {
     "allowedHosts": "Allowed hosts",
-    "allowedHostsDesc": "Host headers the MCP endpoint accepts, besides localhost.",
+    "allowedHostsDesc": "Host headers the MCP endpoint accepts, besides localhost. One value per line.",
     "allowedOrigins": "Allowed origins",
-    "allowedOriginsDesc": "Origin headers the MCP endpoint accepts, besides localhost.",
+    "allowedOriginsDesc": "Origin headers the MCP endpoint accepts, besides localhost. One value per line.",
     "open": "MCP Server settings"
   }
 }

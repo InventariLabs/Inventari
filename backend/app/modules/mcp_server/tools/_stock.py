@@ -180,15 +180,16 @@ def register_stock_tools(server: MCPServer) -> None:
             today = await core_api.organizations.today_async(
                 db, identity.organization_id
             )
-            # The Core call returns the FEFO order from the oldest date and caps
-            # at 500; filter to the window after it, then cut the requested page.
-            # A workspace with more than 500 dated rows sees the oldest first,
-            # which is the half a waste check needs.
+            # The window is a filter on the query, not a cut of a capped list:
+            # a workspace whose oldest rows are already expired used to spend
+            # the whole cap on them and answer an empty window.
             rows = await core_api.items.list_by_expiry_async(
                 db,
                 identity.organization_id,
                 location_id=shelf_id,
                 order='asc',
+                expiry_after=today,
+                expiry_before=today + timedelta(days=days),
                 limit=_EXPIRY_LOOKUP_CAP,
             )
             items = [

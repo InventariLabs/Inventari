@@ -19,6 +19,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.testclient import TestClient
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from starlette.routing import Route
 
 import app.core.limiter as limiter_module
 from app.core.limiter import rate_limit_exceeded_handler
@@ -434,52 +435,54 @@ class TestIssuedKeysBehindASpentSender:
 
 
 @pytest.fixture
-def app_with_mount() -> FastAPI:
-    """An ASGI app mounted behind ``FastAPI.mount``, limited to 2/minute.
+def app_with_plain_route() -> FastAPI:
+    """A plain Starlette ``Route`` on a router, limited to 2/minute.
 
-    A mounted endpoint has no ``route.endpoint``, like an included router, so
-    the stock lookup skipped it and the default limits guarded nothing behind
-    the mount — the shape the MCP endpoint has.
+    FastAPI keeps an included router as an ``_IncludedRouter`` node and the
+    ``Route`` it carries has an endpoint but the included context does not —
+    the shape the MCP endpoint has, where the lookup skipped it and the default
+    limits guarded nothing behind the transport.
     """
     limiter = Limiter(
-        key_func=lambda request: 'mounted-bucket',
+        key_func=lambda request: 'route-bucket',
         storage_uri='memory://',
         default_limits=['2/minute'],
     )
 
-    class MountedApp:
-        async def __call__(self, scope, receive, send):
-            from starlette.responses import Response
+    async def transport(scope, receive, send):
+        from starlette.responses import Response
 
-            await Response('ok')(scope, receive, send)
+        await Response('ok')(scope, receive, send)
+
+    # A class instance, not a function: Starlette reads that as an ASGI app
+    # (the module's `AtRootPath` is the same shape), while a function would be
+    # called as a request handler.
+    class Transport:
+        __name__ = 'mcp_endpoint'
+
+        async def __call__(self, scope, receive, send):
+            await transport(scope, receive, send)
+
+    router = APIRouter()
+    router.routes.append(Route('/mcp', endpoint=Transport(), methods=['POST']))
 
     app = FastAPI()
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
     app.add_middleware(RouterAwareSlowAPIMiddleware)
-    app.mount('/mcp', app=MountedApp())
+    app.include_router(router, prefix='/api/v1/mcp-server')
     return app
 
 
-class TestAMountedEndpoint:
-    def test_the_mount_is_a_handler(self, app_with_mount):
-        handler = find_route_handler(app_with_mount.routes, _scope('/mcp/', 'POST'))
+class TestAPlainStarletteRoute:
+    def test_the_route_is_a_handler(self, app_with_plain_route):
+        handler = find_route_handler(
+            app_with_plain_route.routes, _scope('/api/v1/mcp-server/mcp', 'POST')
+        )
         assert handler is not None
 
-    def test_the_default_limit_reaches_behind_the_mount(self, app_with_mount):
-        with TestClient(app_with_mount) as client:
+    def test_the_default_limit_reaches_the_route(self, app_with_plain_route):
+        with TestClient(app_with_plain_route) as client:
             for _ in range(2):
-                assert client.post('/mcp').status_code == 200
-            assert client.post('/mcp').status_code == 429
-
-    def test_two_mounts_do_not_share_a_bucket(self, app_with_mount):
-        from starlette.responses import Response
-
-        class Other:
-            async def __call__(self, scope, receive, send):
-                await Response('ok')(scope, receive, send)
-
-        app_with_mount.mount('/other', app=Other())
-        first = find_route_handler(app_with_mount.routes, _scope('/mcp/', 'POST'))
-        second = find_route_handler(app_with_mount.routes, _scope('/other/', 'POST'))
-        assert first.__name__ != second.__name__
+                assert client.post('/api/v1/mcp-server/mcp').status_code == 200
+            assert client.post('/api/v1/mcp-server/mcp').status_code == 429

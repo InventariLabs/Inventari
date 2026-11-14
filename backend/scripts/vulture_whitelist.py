@@ -61,14 +61,6 @@ from app.modules.approvals.target_types import TargetType
 from app.modules.equipment.models import AuditCampaign, AuditResponse
 from app.modules.equipment.module import EquipmentModule
 from app.modules.maker.maker_api import maker_api
-from app.modules.mcp_server.resources import locations_tree, org_overview
-from app.modules.mcp_server.tools._items import get_item, search_items
-from app.modules.mcp_server.tools._locations import get_location_tree, list_locations
-from app.modules.mcp_server.tools._stock import (
-    get_expiring_soon,
-    get_stock_levels,
-    list_lots,
-)
 from app.modules.purchase_orders.models import PurchaseOrder
 from app.modules.purchase_orders.module import PurchaseOrdersModule
 from app.modules.purchase_orders.purchase_orders_api import purchase_orders_api
@@ -420,18 +412,3 @@ StockLotDetailDTO.status_history  # noqa: B018
 # product_unit_symbol onto PutawayCapacityOut and the only reader is the
 # documents location card (frontend), which the scan does not follow.
 PutawayCapacityOut.product_unit_symbol  # noqa: B018
-
-
-# --- MCP tools and resources registered by decorator ------------------------
-# `@server.tool(...)` / `@server.resource(...)` record the function in the
-# SDK's catalogue; no Python call site ever names them, and clients reach them
-# over JSON-RPC.
-search_items  # noqa: B018
-get_item  # noqa: B018
-list_locations  # noqa: B018
-get_location_tree  # noqa: B018
-get_stock_levels  # noqa: B018
-list_lots  # noqa: B018
-get_expiring_soon  # noqa: B018
-org_overview  # noqa: B018
-locations_tree  # noqa: B018

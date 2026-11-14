@@ -156,6 +156,48 @@ describe("ModuleSettingsForm with a nested schema", () => {
   });
 });
 
+describe("ModuleSettingsForm — an array setting", () => {
+  const listSchema: ModuleSettingsSchema = {
+    type: "object",
+    properties: {
+      allowed_hosts: {
+        type: "array",
+        items: { type: "string" },
+        title: "Allowed hosts",
+        description: "Host headers the endpoint accepts.",
+        default: [],
+      },
+    },
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("shows a stored list one per line and saves the lines as a list", async () => {
+    renderForm(
+      <ModuleSettingsForm
+        moduleName="mcp_server"
+        schema={listSchema}
+        initialValues={{ allowed_hosts: ["old.example.org"] }}
+      />,
+    );
+
+    const field = screen.getByTestId("field-allowed_hosts");
+    expect(field).toHaveValue("old.example.org");
+    fireEvent.change(field, {
+      target: { value: "inventari.example.org\n\n mcp.example.org \n" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(updateSettings).toHaveBeenCalled());
+    // A string here is what the API refuses with SETTINGS_VALUE_NOT_ARRAY.
+    expect(updateSettings.mock.calls[0][1]).toEqual({
+      allowed_hosts: ["inventari.example.org", "mcp.example.org"],
+    });
+  });
+});
+
 describe("ModuleSettingsForm — a refused save", () => {
   it("shows the server's own sentence instead of failing silently", async () => {
     const sentence =

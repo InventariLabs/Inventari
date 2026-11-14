@@ -416,6 +416,14 @@ const dist = join(root, "dist");
  * That one phone budget moves a step of five, to 400; the other screens stand
  * under theirs (launcher 410.3, start 626.4, receive 462.8, issue 575.4,
  * history 599.4, products 614.1, app first paint 390.4, initial 189.3).
+ * Re-measured 2026-11-14 on the branch that adds the MCP Server module: the
+ * development line alone measures history at 599.4 KiB gz against its 600,
+ * and the new module's catalogue copy — its name and one sentence in the core
+ * modules file of each language, the Polish one in the language chunk every
+ * first paint loads — takes the merged tree to 600.1. That one phone budget
+ * moves a step of five, to 605; the other screens stand under theirs
+ * (login 395.9, launcher 411.1, start 627.2, receive 463.6, issue 576.2,
+ * products 614.9, app first paint 391.2, initial 189.4).
  */
 const BUDGETS = {
   initial: 245,

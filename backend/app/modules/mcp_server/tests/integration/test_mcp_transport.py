@@ -39,6 +39,7 @@ def rpc(
     host: str | None = None,
     origin: str | None = None,
     protocol: str = _PROTOCOL,
+    own_header: bool = False,
 ):
     headers = {
         'Content-Type': 'application/json',
@@ -46,7 +47,10 @@ def rpc(
         'Mcp-Method': method,
     }
     if key is not None:
-        headers['Authorization'] = f'Bearer {key}'
+        if own_header:
+            headers['X-API-Key'] = key
+        else:
+            headers['Authorization'] = f'Bearer {key}'
     if name is not None:
         headers['Mcp-Name'] = name
     if host is not None:
@@ -86,6 +90,20 @@ class TestAuthentication:
 
         assert response.status_code == 401
         assert response.headers['www-authenticate'].startswith('Bearer')
+
+    def test_the_key_own_header_is_accepted_without_a_deprecation_notice(
+        self, client: TestClient, mcp_key: str
+    ) -> None:
+        """A client that can set a header uses X-API-Key, the non-deprecated form.
+
+        Core marks a Bearer API key `Deprecation`; the endpoint honoured only
+        Bearer, so every answer carried a notice telling the client's maintainer
+        to switch to a header this endpoint refused. It accepts it now.
+        """
+        response = rpc(client, mcp_key, 'tools/list', own_header=True)
+
+        assert response.status_code == 200, response.text
+        assert 'deprecation' not in response.headers
 
     def test_a_key_without_the_use_permission_is_refused(
         self,
