@@ -696,6 +696,7 @@
     "requirePartnerTaxIdFromCountryYes": "Gemäß Land ({{country}}): Die Steuer-ID des Partners ist erforderlich. Zum Festlegen für dieses Profil an- oder abwählen.",
     "requirePartnerTaxIdFromCountryNo": "Gemäß Land ({{country}}): Die Steuer-ID des Partners ist nicht erforderlich. Zum Festlegen für dieses Profil an- oder abwählen.",
     "requirePartnerTaxIdFromNoCountry": "Für die Organisation ist kein Land festgelegt, daher ist keine Steuer-ID erforderlich. Anwählen, um sie für dieses Profil zu verlangen.",
+    "requirePartnerTaxIdFromUnknownCountry": "Das Land der Organisation konnte noch nicht gelesen werden, daher ist unbekannt, was es verlangt. Anwählen, um die Steuer-ID für dieses Profil zu verlangen.",
     "requirePartnerTaxIdOwn": "Für dieses Profil festgelegt, unabhängig vom Land.",
     "requirePartnerTaxIdFollowCountry": "Wieder dem Land folgen",
     "applyPresetConfirmTitle": "Diese Vorlage anwenden?",

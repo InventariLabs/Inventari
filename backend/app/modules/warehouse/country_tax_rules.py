@@ -105,3 +105,14 @@ def get_country_rule(country: str | None) -> CountryTaxRule | None:
     if not country:
         return None
     return COUNTRY_RULES.get(country.upper())
+
+
+def country_requires_partner_tax_id(country: str | None) -> bool:
+    """Whether the country's documents demand a partner's tax id.
+
+    The one place that default is read: the offer the settings screen shows
+    and the check at confirmation both ask here, so they cannot drift apart.
+    A country with no row, or no country at all, requires nothing.
+    """
+    rule = get_country_rule(country)
+    return rule.require_partner_tax_id if rule else False

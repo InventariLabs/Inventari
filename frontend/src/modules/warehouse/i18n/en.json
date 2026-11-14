@@ -696,6 +696,7 @@
     "requirePartnerTaxIdFromCountryYes": "Following the country ({{country}}): a partner's tax ID is required. Tick or untick to set it for this profile instead.",
     "requirePartnerTaxIdFromCountryNo": "Following the country ({{country}}): a partner's tax ID is not required. Tick or untick to set it for this profile instead.",
     "requirePartnerTaxIdFromNoCountry": "No country is set for the organization, so no tax ID is required. Tick to require it for this profile.",
+    "requirePartnerTaxIdFromUnknownCountry": "The organization's country could not be read yet, so what it requires is not known. Tick to require the tax ID for this profile.",
     "requirePartnerTaxIdOwn": "Set for this profile, whatever the country says.",
     "requirePartnerTaxIdFollowCountry": "Follow the country again",
     "applyPresetConfirmTitle": "Apply this preset?",

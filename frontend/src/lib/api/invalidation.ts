@@ -165,6 +165,11 @@ export const invalidation = {
   organization(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: queryKeys.organization.detail });
     queryClient.invalidateQueries({ queryKey: queryKeys.organization.members });
+    // The country is part of the organization, and the rate offer and the
+    // partner tax-ID rule Warehouse settings show are read from it.
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.documents.taxRatesCountry,
+    });
   },
 
   /**

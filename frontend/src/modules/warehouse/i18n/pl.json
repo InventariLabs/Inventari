@@ -772,6 +772,7 @@
     "requirePartnerTaxIdFromCountryYes": "Zgodnie z krajem ({{country}}): NIP partnera jest wymagany. Zaznacz lub odznacz, żeby ustawić to osobno dla tego profilu.",
     "requirePartnerTaxIdFromCountryNo": "Zgodnie z krajem ({{country}}): NIP partnera nie jest wymagany. Zaznacz lub odznacz, żeby ustawić to osobno dla tego profilu.",
     "requirePartnerTaxIdFromNoCountry": "Organizacja nie ma ustawionego kraju, więc NIP nie jest wymagany. Zaznacz, żeby wymagać go w tym profilu.",
+    "requirePartnerTaxIdFromUnknownCountry": "Kraju organizacji jeszcze nie udało się odczytać, więc nie wiadomo, czego wymaga. Zaznacz, żeby wymagać NIP-u w tym profilu.",
     "requirePartnerTaxIdOwn": "Ustawione w tym profilu, niezależnie od kraju.",
     "requirePartnerTaxIdFollowCountry": "Wróć do reguły kraju",
     "applyPresetConfirmTitle": "Zastosować ten szablon?",

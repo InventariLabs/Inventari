@@ -21,7 +21,7 @@ from app.core.async_utils import await_if_awaitable
 from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 
-from .country_tax_rules import get_country_rule
+from .country_tax_rules import country_requires_partner_tax_id, get_country_rule
 from .document_validation_service import validate_location_async
 from .models import DocumentProfile, TaxHandling
 from .models.profile import DEFAULT_NUMBER_PADDING, DEFAULT_NUMBERING_FORMAT
@@ -298,8 +298,7 @@ async def resolve_partner_tax_id_required(
     if profile.require_partner_tax_id is not None:
         return profile.require_partner_tax_id
     org = await core_api.organizations.get_async(db, org_id)
-    rule = get_country_rule(org.country if org else None)
-    return rule.require_partner_tax_id if rule else False
+    return country_requires_partner_tax_id(org.country if org else None)
 
 
 async def apply_preset(db: Any, org_id: UUID, preset_name: str) -> DocumentProfile:

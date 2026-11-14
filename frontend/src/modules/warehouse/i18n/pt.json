@@ -692,6 +692,7 @@
     "requirePartnerTaxIdFromCountryYes": "Seguindo o país ({{country}}): o ID fiscal do parceiro é exigido. Marque ou desmarque para defini-lo neste perfil.",
     "requirePartnerTaxIdFromCountryNo": "Seguindo o país ({{country}}): o ID fiscal do parceiro não é exigido. Marque ou desmarque para defini-lo neste perfil.",
     "requirePartnerTaxIdFromNoCountry": "A organização não tem país definido, então nenhum ID fiscal é exigido. Marque para exigi-lo neste perfil.",
+    "requirePartnerTaxIdFromUnknownCountry": "O país da organização ainda não pôde ser lido, então não se sabe o que ele exige. Marque para exigir o ID fiscal neste perfil.",
     "requirePartnerTaxIdOwn": "Definido neste perfil, seja qual for o país.",
     "requirePartnerTaxIdFollowCountry": "Voltar a seguir o país",
     "applyPresetConfirmTitle": "Aplicar esta predefinição?",
