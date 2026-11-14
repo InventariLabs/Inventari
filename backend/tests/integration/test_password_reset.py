@@ -300,6 +300,7 @@ class TestPasswordReset:
             )
             assert reset.status_code == 200
 
+            client.cookies.clear()
             client.cookies.set('refresh_token', stolen_refresh)
             assert client.post('/api/v1/auth/refresh').status_code == 401
 
@@ -437,6 +438,7 @@ class TestTokenTypeSeparation:
         )
         access_token = login.json()['access_token']
 
+        client.cookies.clear()
         client.cookies.set('refresh_token', access_token)
         assert client.post('/api/v1/auth/refresh').status_code == 401
 

@@ -1,9 +1,9 @@
 [
   "api_keys",
   "approvals",
-  "warehouse",
   "equipment",
   "maker",
+  "mcp_server",
   "nutrition",
   "partners",
   "printing",
@@ -13,5 +13,6 @@
   "stats",
   "stock_takes",
   "vision",
+  "warehouse",
   "webhooks"
 ]

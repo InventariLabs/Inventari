@@ -46,9 +46,46 @@ def find_route_handler(
     """Return the endpoint that will serve ``scope``, or None if none matches."""
     for route_context in iter_route_contexts(list(routes)):
         match, _ = route_context.matches(scope)
-        if match == RouteMatch.FULL and route_context.endpoint is not None:
-            return route_context.endpoint
+        if match != RouteMatch.FULL:
+            continue
+        # FastAPI stores a plain Starlette Route or Mount as an effective
+        # context whose own ``endpoint`` is unset; the built route carries it.
+        # Asking only the context skipped both shapes, and the default limits
+        # guarded nothing behind a mount.
+        effective = getattr(route_context, 'starlette_route', None)
+        endpoint = route_context.endpoint or getattr(effective, 'endpoint', None)
+        if endpoint is not None:
+            return endpoint
+        if (
+            getattr(effective, 'app', None) is not None
+            or getattr(route_context, 'app', None) is not None
+        ):
+            path = getattr(effective, 'path', None) or route_context.path or '/'
+            return _MountedEndpoint(path)
     return None
+
+
+class _MountedEndpoint:
+    """The callable a mounted ASGI app stands for in the limiter's lookup.
+
+    slowapi keys a bucket by ``module.qualname`` when ``key_style='endpoint'``
+    and reads ``__module__``/``__name__`` off the handler; a Starlette ``Mount``
+    has no function to hand over, so this object carries the same two names,
+    one set per mount path.
+    """
+
+    def __init__(self, path: str) -> None:
+        self.__module__ = __name__
+        self.__name__ = 'mounted' + ''.join(
+            f'_{segment}' if segment else '_root'
+            for segment in path.strip('/').replace('-', '_').split('/')
+        )
+
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
+        """Never called: slowapi reads the names for its bucket and skips the call."""
+        raise RuntimeError(
+            'a mounted endpoint is served by the router, not called here'
+        )
 
 
 # A sender out of lookups (``app.core.limiter``) may still carry an issued key

@@ -345,6 +345,7 @@ class TestBuildSnapshot:
             'register_contributions_hook',
             'on_startup_hook',
             'on_startup_async_hook',
+            'on_shutdown_async_hook',
             'on_install_hook',
             'on_install_async_hook',
             'on_uninstall_hook',

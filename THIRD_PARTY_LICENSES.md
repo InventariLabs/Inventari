@@ -40,7 +40,7 @@ and the static assets the frontend serves.
 * The print agent in `print-agent/`, which is part of this repository and
   carries its own `LICENSE`.
 
-## Backend runtime (104 packages)
+## Backend runtime (114 packages)
 
 | Package | Version | Licence | Note |
 |---|---|---|---|
@@ -84,20 +84,27 @@ and the static assets the frontend serves.
 | `gunicorn` | 26.2.0 | MIT |  |
 | `h11` | 0.16.0 | MIT |  |
 | `httpcore` | 1.0.9 | BSD-3-Clause |  |
+| `httpcore2` | 2.16.0 | BSD-3-Clause |  |
 | `httptools` | 0.8.0 | MIT |  |
 | `httpx` | 0.28.1 | BSD |  |
+| `httpx2` | 2.16.0 | BSD-3-Clause |  |
 | `idna` | 3.18 | BSD-3-Clause |  |
 | `Jinja2` | 3.1.6 | BSD |  |
 | `jmespath` | 1.1.0 | MIT |  |
+| `jsonschema` | 4.26.0 | MIT |  |
+| `jsonschema-specifications` | 2025.9.1 | MIT |  |
 | `limits` | 5.8.0 | MIT |  |
 | `Mako` | 1.4.3 | MIT |  |
 | `markdown-it-py` | 4.2.0 | MIT |  |
 | `MarkupSafe` | 3.0.3 | BSD-3-Clause |  |
+| `mcp` | 2.3.0 | MIT |  |
+| `mcp-types` | 2.3.0 | MIT |  |
 | `mdurl` | 0.1.2 | MIT |  |
 | `multidict` | 6.9.1 | Apache-2.0 |  |
 | `nh3` | 0.3.7 | MIT |  |
 | `numpy` | 2.5.1 | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 |  |
 | `openpyxl` | 3.1.5 | MIT |  |
+| `opentelemetry-api` | 1.45.2 | Apache-2.0 |  |
 | `packaging` | 26.3 | Apache-2.0 OR BSD-2-Clause |  |
 | `pandas` | 3.0.6 | BSD |  |
 | `pillow` | 13.0.0 | MIT-CMU |  |
@@ -121,8 +128,10 @@ and the static assets the frontend serves.
 | `PyYAML` | 6.0.3 | MIT |  |
 | `qrcode` | 8.2 | BSD-3-Clause | exception: ships a bogus "License :: Other/Proprietary License" classifier next to "BSD License"; upstream LICENSE is BSD-3-Clause |
 | `redis` | 8.1.0 | MIT |  |
+| `referencing` | 0.37.0 | MIT |  |
 | `requests` | 2.34.2 | Apache-2.0 |  |
 | `rich` | 15.0.0 | MIT |  |
+| `rpds-py` | 2026.9.1 | MIT |  |
 | `s3transfer` | 0.14.0 | Apache-2.0 |  |
 | `shellingham` | 1.5.4 | ISC |  |
 | `six` | 1.17.0 | MIT |  |
@@ -135,6 +144,7 @@ and the static assets the frontend serves.
 | `tenacity` | 9.1.4 | Apache-2.0 |  |
 | `tinycss2` | 1.5.1 | BSD |  |
 | `tinyhtml5` | 2.1.0 | MIT |  |
+| `truststore` | 0.10.5 | MIT |  |
 | `typer` | 0.27.2 | MIT |  |
 | `typing-inspection` | 0.4.2 | MIT |  |
 | `typing_extensions` | 4.16.0 | PSF-2.0 |  |

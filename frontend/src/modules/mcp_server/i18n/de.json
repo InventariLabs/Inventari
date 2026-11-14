@@ -1,0 +1,18 @@
+{
+  "title": "MCP-Server",
+  "description": "Verbinden Sie einen KI-Agenten über das Model Context Protocol mit diesem Arbeitsbereich.",
+  "navigation": {
+    "title": "MCP-Server"
+  },
+  "permissions": {
+    "use": "MCP-Endpunkt verwenden",
+    "useDesc": "Ohne sie erreicht ein Schlüssel weder den MCP-Endpunkt noch seine Werkzeugliste"
+  },
+  "settings": {
+    "allowedHosts": "Erlaubte Hosts",
+    "allowedHostsDesc": "Host-Header, die der MCP-Endpunkt neben localhost akzeptiert.",
+    "allowedOrigins": "Erlaubte Origins",
+    "allowedOriginsDesc": "Origin-Header, die der MCP-Endpunkt neben localhost akzeptiert.",
+    "open": "MCP-Server-Einstellungen"
+  }
+}

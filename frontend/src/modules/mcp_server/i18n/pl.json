@@ -1,0 +1,18 @@
+{
+  "title": "Serwer MCP",
+  "description": "Połącz agenta AI z tą przestrzenią kluczem API, przez Model Context Protocol.",
+  "navigation": {
+    "title": "Serwer MCP"
+  },
+  "permissions": {
+    "use": "Korzystanie z endpointu MCP",
+    "useDesc": "Bez tego klucz nie dotrze do endpointu MCP ani nie wylistuje jego narzędzi"
+  },
+  "settings": {
+    "allowedHosts": "Dozwolone hosty",
+    "allowedHostsDesc": "Nagłówki Host akceptowane przez endpoint MCP, poza localhost.",
+    "allowedOrigins": "Dozwolone originy",
+    "allowedOriginsDesc": "Nagłówki Origin akceptowane przez endpoint MCP, poza localhost.",
+    "open": "Ustawienia serwera MCP"
+  }
+}

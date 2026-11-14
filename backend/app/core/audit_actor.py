@@ -19,7 +19,7 @@ request, so a name set in one can neither outlive it nor reach the next.
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextvars import ContextVar
 
 #: The key an entry's ``meta_data`` carries its actor under. Reserved: the
@@ -52,7 +52,7 @@ def current_actor() -> dict[str, str] | None:
     return _actor.get()
 
 
-async def audit_actor_scope() -> AsyncIterator[None]:
+async def audit_actor_scope() -> AsyncGenerator[None]:
     """One actor context per request: empty at the start, dropped at the end.
 
     Declared on the app (``app.main``) rather than on the endpoints that write

@@ -1,0 +1,32 @@
+{
+  "name": "mcp_server",
+  "module_type": "official",
+  "version": "0.1.0",
+  "inventari_min_version": "0.11.0",
+  "category": "integrations",
+  "display_name": "MCP Server",
+  "description": "Exposes the workspace to AI agents over the Model Context Protocol (Streamable HTTP, API-key authentication, six read tools).",
+  "icon": "server",
+  "requires": [
+    "api_keys"
+  ],
+  "capabilities": [
+    "database"
+  ],
+  "has_settings_schema": true,
+  "permissions": [
+    {
+      "key": "mcp_server:use",
+      "label_key": "mcp_server:permissions.use",
+      "description_key": "mcp_server:permissions.useDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    }
+  ],
+  "permission_action_exceptions": {
+    "mcp_server:use": "the transport gate: it admits a key to the MCP endpoint and tools/list, not to any stored record. The read tools check items:read and locations:read themselves."
+  }
+}

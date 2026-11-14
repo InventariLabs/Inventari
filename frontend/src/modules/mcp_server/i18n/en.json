@@ -1,0 +1,18 @@
+{
+  "title": "MCP Server",
+  "description": "Connect an AI agent to this workspace with an API key, over the Model Context Protocol.",
+  "navigation": {
+    "title": "MCP Server"
+  },
+  "permissions": {
+    "use": "Use the MCP endpoint",
+    "useDesc": "A key without it cannot reach the MCP endpoint or list its tools"
+  },
+  "settings": {
+    "allowedHosts": "Allowed hosts",
+    "allowedHostsDesc": "Host headers the MCP endpoint accepts, besides localhost.",
+    "allowedOrigins": "Allowed origins",
+    "allowedOriginsDesc": "Origin headers the MCP endpoint accepts, besides localhost.",
+    "open": "MCP Server settings"
+  }
+}

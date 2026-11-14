@@ -324,6 +324,29 @@ async def _start_services(
     return hub_task, failed_modules
 
 
+async def _shutdown_modules(logger: Logger) -> None:
+    """Close what the modules opened, in the reverse of the startup order.
+
+    ``on_shutdown_async`` is called even when startup skipped the module hooks
+    (TESTING): a module that starts a long-lived resource lazily, on first use,
+    has no startup hook to close it, and a resource left running past the
+    application is the leak that hook exists for. One module's failure must not
+    strand the rest.
+    """
+    from app.core.context import ModuleContext
+    from app.core.events import event_bus
+    from app.core.module_identity import module_scope
+    from app.core.module_registry import module_registry
+
+    context = ModuleContext(event_bus=event_bus)
+    for module in reversed(module_registry.get_all()):
+        try:
+            with module_scope(module.metadata.name):
+                await module.on_shutdown_async(context)
+        except Exception as exc:  # noqa: BLE001 — one module must not stop the rest
+            logger.error('Failed to shut down module %s: %s', module.metadata.name, exc)
+
+
 async def _run_shutdown(hub_task: asyncio.Task | None, async_engine) -> None:
     """Tear down in the reverse order of startup.
 
@@ -333,6 +356,7 @@ async def _run_shutdown(hub_task: asyncio.Task | None, async_engine) -> None:
     """
     from app.api.websocket import hub as notification_hub
     from app.core.events import event_bus
+    from app.core.logging import get_logger
     from app.core.scheduler import task_scheduler
 
     if hub_task is not None:
@@ -342,6 +366,7 @@ async def _run_shutdown(hub_task: asyncio.Task | None, async_engine) -> None:
         except asyncio.CancelledError:
             pass
     await task_scheduler.stop_all_async()
+    await _shutdown_modules(get_logger('app'))
     await notification_hub.disconnect_redis()
     await event_bus.disconnect()
 

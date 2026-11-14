@@ -451,6 +451,7 @@ how to add your own.
 | **API Keys** | Personal access tokens for machine-to-machine authentication (Home Assistant, Make, n8n, Zapier, custom scripts) |
 | **Webhooks** | Outbound HTTP notifications for inventory events |
 | **Label Printing** | Label pool management and QR and barcode PNG generation, printed through the print agent |
+| **MCP Server** | Read-only Model Context Protocol endpoint for AI agents, authenticated with an API key |
 | **Nutrition Info** | Enriches product data from Open Food Facts |
 | **Photo Recognition** | Recognizes products from photographs using AI |
 

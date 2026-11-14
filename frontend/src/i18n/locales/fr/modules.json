@@ -86,6 +86,10 @@
     },
     "announcements": {
       "name": "Annonces"
+    },
+    "mcp_server": {
+      "name": "Serveur MCP",
+      "description": "Laissez un agent IA lire cet espace de travail par le Model Context Protocol, avec une clé qui ne voit que ce qu'elle peut."
     }
   },
   "config": {

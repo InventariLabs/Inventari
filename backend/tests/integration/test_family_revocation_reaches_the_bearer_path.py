@@ -67,12 +67,16 @@ class TestARevokedFamilyStopsAnsweringOnBearer:
 
         # Rotate, then replay the consumed cookie once the grace window has
         # run out — the sequence that means "someone else has this cookie".
+        client.cookies.clear()
+        client.cookies.clear()
         client.cookies.set('refresh_token', refresh)
         client.post('/api/v1/auth/refresh')
         key = f'{token_blacklist.PREFIX}{refresh}'
         blacklist_on.store[key] = str(
             int(blacklist_on.store[key]) - REFRESH_REUSE_GRACE_SECONDS - 5
         )
+        client.cookies.clear()
+        client.cookies.clear()
         client.cookies.set('refresh_token', refresh)
         client.post('/api/v1/auth/refresh')
 

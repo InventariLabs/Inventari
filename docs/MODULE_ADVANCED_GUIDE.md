@@ -31,11 +31,13 @@ Defined inside your `module.py` class that inherits from `BaseModule` (or via `d
 | `on_upgrade_async(old_version, context)` | Same boot, when the reshape needs the database | Await the rewrite inside the upgrade |
 | `on_uninstall(context)` | **Once ever** when the module is removed from the system | Drop module tables, purge data |
 
-The table covers the hooks a module overrides at the lifecycle events. Three
+The table covers the hooks a module overrides at the lifecycle events. Four
 more run at the same points: `on_install_async(context)` is the async variant
 of `on_install`, `on_startup_async(context)` the async variant of `on_startup`,
-and `on_modules_ready(context)` runs after every module's startup hooks, for
-code that reads a catalogue other modules fill. The framework does its own
+`on_shutdown_async(context)` runs when the application stops (the place to
+close a resource that `on_startup_async` opened), and `on_modules_ready(context)`
+runs after every module's startup hooks, for code that reads a catalogue other
+modules fill. The framework does its own
 part outside these hooks: before `on_install` it runs the module's migrations,
 and before `on_startup` it calls `register_services(container)` and
 `register_contributions()` and wires the interceptors. An override owes the

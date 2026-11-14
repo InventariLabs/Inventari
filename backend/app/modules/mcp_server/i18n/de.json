@@ -1,0 +1,11 @@
+{
+  "auth_required": "Dieser Endpunkt braucht einen API-Schlüssel: senden Sie ihn als 'Authorization: Bearer <Schlüssel>'.",
+  "permission_required": "Dieser API-Schlüssel hat die Berechtigung mcp_server:use nicht.",
+  "module_disabled": "Das Modul MCP-Server ist für diese Organisation ausgeschaltet.",
+  "organization_required": "Ein MCP-Aufruf handelt in einer Organisation, und dieser Schlüssel gehört zu keiner.",
+  "insufficient_permission": "Dieser API-Schlüssel hat die Berechtigung {permission} nicht.",
+  "call_without_identity": "Dieser Werkzeugaufruf hat keinen authentifizierten Arbeitsbereich.",
+  "item_not_found": "In diesem Arbeitsbereich gibt es keinen Eintrag mit der ID {item_id}.",
+  "location_not_found": "In diesem Arbeitsbereich gibt es keinen Standort mit der ID {location_id}.",
+  "lot_not_found": "In diesem Arbeitsbereich gibt es keine Charge mit der ID {lot_id}."
+}

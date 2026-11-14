@@ -56,6 +56,10 @@ def _login(client, user) -> str:
 
 
 def _refresh_with(client, cookie: str):
+    # Replace the jar's cookie, not add beside it: the client used to keep one
+    # cookie per name, and the HTTP client Starlette now uses can keep the
+    # login's rotated cookie next to the replay and send both.
+    client.cookies.clear()
     client.cookies.set('refresh_token', cookie)
     return client.post('/api/v1/auth/refresh')
 

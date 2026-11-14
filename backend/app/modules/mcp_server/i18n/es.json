@@ -1,0 +1,11 @@
+{
+  "auth_required": "Este punto de acceso necesita una clave API: envíela como 'Authorization: Bearer <clave>'.",
+  "permission_required": "Esta clave API no tiene el permiso mcp_server:use.",
+  "module_disabled": "El módulo Servidor MCP está desactivado para esta organización.",
+  "organization_required": "Una llamada MCP actúa en una organización, y esta clave no pertenece a ninguna.",
+  "insufficient_permission": "Esta clave API no tiene el permiso {permission}.",
+  "call_without_identity": "Esta llamada de herramienta no tiene un espacio de trabajo autenticado.",
+  "item_not_found": "En este espacio de trabajo no hay ningún registro con id {item_id}.",
+  "location_not_found": "En este espacio de trabajo no hay ninguna ubicación con id {location_id}.",
+  "lot_not_found": "En este espacio de trabajo no hay ningún lote con id {lot_id}."
+}

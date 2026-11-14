@@ -6,7 +6,7 @@ from typing import Any, cast
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from httpx import Response
+from httpx2 import Response
 from sqlalchemy.orm import Session
 
 from app.core.testing import ModuleTestHelper
@@ -55,7 +55,7 @@ class TestDocumentApprovalWorkflow:
             f'/api/v1/warehouse/documents/{doc_id}/confirm', headers=auth_headers
         )
         assert resp.status_code == status.HTTP_200_OK, resp.text
-        return resp  # type: ignore[no-any-return]
+        return resp
 
     @staticmethod
     def _set_profile_threshold(
@@ -98,7 +98,7 @@ class TestDocumentApprovalWorkflow:
             json={'notes': notes} if notes else None,
         )
         assert resp.status_code == status.HTTP_200_OK, resp.text
-        return resp  # type: ignore[no-any-return]
+        return resp
 
     @staticmethod
     def _approve_doc(
@@ -108,7 +108,7 @@ class TestDocumentApprovalWorkflow:
             f'/api/v1/approvals/documents/{doc_id}/approve', headers=auth_headers
         )
         assert resp.status_code == status.HTTP_200_OK, resp.text
-        return resp  # type: ignore[no-any-return]
+        return resp
 
     @staticmethod
     def _add_workflow(client: TestClient, auth_headers: dict[str, str]) -> None:

@@ -1,0 +1,18 @@
+{
+  "title": "Serveur MCP",
+  "description": "Connectez un agent IA à cet espace de travail par le Model Context Protocol.",
+  "navigation": {
+    "title": "Serveur MCP"
+  },
+  "permissions": {
+    "use": "Utiliser le point d'accès MCP",
+    "useDesc": "Sans elle, une clé n'atteint ni le point d'accès MCP ni la liste de ses outils"
+  },
+  "settings": {
+    "allowedHosts": "Hôtes autorisés",
+    "allowedHostsDesc": "En-têtes Host acceptés par le point d'accès MCP, en plus de localhost.",
+    "allowedOrigins": "Origines autorisées",
+    "allowedOriginsDesc": "En-têtes Origin acceptés par le point d'accès MCP, en plus de localhost.",
+    "open": "Paramètres du serveur MCP"
+  }
+}

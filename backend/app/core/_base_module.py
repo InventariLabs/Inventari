@@ -232,6 +232,18 @@ class BaseModule(ABC):
         """Async hook called on server startup. Override for async DB operations."""
         pass
 
+    async def on_shutdown_async(self, context: ModuleContext) -> None:
+        """Async hook called when the server stops, in reverse module order.
+
+        For an async resource a module started in ``on_startup_async`` and has
+        to close again — a task group, a connection, an ``AsyncExitStack``.
+        Startup skips the module hooks in TESTING mode, so a module that owns
+        something long-lived must also start it lazily on first use; this hook
+        is called even when startup was skipped, so whatever was started is
+        closed with the application.
+        """
+        pass
+
     def on_modules_ready(self, context: ModuleContext) -> None:
         """Hook called after every module's startup hooks have run.
 

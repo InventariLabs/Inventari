@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
-from httpx import Response
+from httpx2 import Response
 from sqlalchemy.orm import Session
 
 from app.models.organization import Organization
@@ -23,7 +23,7 @@ def _create_rate(
     **kwargs: Any,
 ) -> Response:
     payload = {'name': name, 'rate': rate, **kwargs}
-    return client.post(TAX_RATES_URL, json=payload, headers=auth_headers)  # type: ignore[no-any-return]
+    return client.post(TAX_RATES_URL, json=payload, headers=auth_headers)
 
 
 class TestTaxRateCRUD:

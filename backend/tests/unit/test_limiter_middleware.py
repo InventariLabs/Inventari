@@ -431,3 +431,55 @@ class TestIssuedKeysBehindASpentSender:
             issued_list.issued.add('inv_live_expired')
             await client.get('/api/v1/items', headers={'X-API-Key': 'inv_live_expired'})
         assert lookups.count('inv_live_expired') == 2
+
+
+@pytest.fixture
+def app_with_mount() -> FastAPI:
+    """An ASGI app mounted behind ``FastAPI.mount``, limited to 2/minute.
+
+    A mounted endpoint has no ``route.endpoint``, like an included router, so
+    the stock lookup skipped it and the default limits guarded nothing behind
+    the mount — the shape the MCP endpoint has.
+    """
+    limiter = Limiter(
+        key_func=lambda request: 'mounted-bucket',
+        storage_uri='memory://',
+        default_limits=['2/minute'],
+    )
+
+    class MountedApp:
+        async def __call__(self, scope, receive, send):
+            from starlette.responses import Response
+
+            await Response('ok')(scope, receive, send)
+
+    app = FastAPI()
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
+    app.add_middleware(RouterAwareSlowAPIMiddleware)
+    app.mount('/mcp', app=MountedApp())
+    return app
+
+
+class TestAMountedEndpoint:
+    def test_the_mount_is_a_handler(self, app_with_mount):
+        handler = find_route_handler(app_with_mount.routes, _scope('/mcp/', 'POST'))
+        assert handler is not None
+
+    def test_the_default_limit_reaches_behind_the_mount(self, app_with_mount):
+        with TestClient(app_with_mount) as client:
+            for _ in range(2):
+                assert client.post('/mcp').status_code == 200
+            assert client.post('/mcp').status_code == 429
+
+    def test_two_mounts_do_not_share_a_bucket(self, app_with_mount):
+        from starlette.responses import Response
+
+        class Other:
+            async def __call__(self, scope, receive, send):
+                await Response('ok')(scope, receive, send)
+
+        app_with_mount.mount('/other', app=Other())
+        first = find_route_handler(app_with_mount.routes, _scope('/mcp/', 'POST'))
+        second = find_route_handler(app_with_mount.routes, _scope('/other/', 'POST'))
+        assert first.__name__ != second.__name__

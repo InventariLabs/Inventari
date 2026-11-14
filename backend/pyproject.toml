@@ -44,6 +44,9 @@ dependencies = [
     "markupsafe>=3.0.3",  # escape() is what keeps a name out of the email's markup
     "sse-starlette>=2.0.0",
     "babel>=2.18.0",
+    "mcp>=2.3,<3",
+    "mcp-types>=2.3.0",  # the SDK's wire models and ToolAnnotations
+    "httpx2>=2.16.0",  # Starlette TestClient types responses with it; mcp requires it at runtime
 ]
 
 [build-system]

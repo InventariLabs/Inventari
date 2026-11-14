@@ -157,6 +157,17 @@
             }
           ]
         },
+        "on_shutdown_async": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "context",
+              "required": true
+            }
+          ]
+        },
         "on_startup": {
           "abstract": false,
           "kind": "method",
@@ -2381,6 +2392,10 @@
       "kind": "class",
       "members": {}
     },
+    "audit_actor_scope": {
+      "kind": "function",
+      "params": []
+    },
     "contribution_registry": {
       "kind": "value",
       "members": {
@@ -2526,6 +2541,10 @@
         }
       ]
     },
+    "current_actor": {
+      "kind": "function",
+      "params": []
+    },
     "define_module": {
       "kind": "function",
       "params": [
@@ -2572,6 +2591,11 @@
         {
           "kind": "KEYWORD_ONLY",
           "name": "on_startup_async_hook",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "on_shutdown_async_hook",
           "required": false
         },
         {
@@ -2628,6 +2652,31 @@
     "get_current_lang": {
       "kind": "function",
       "params": []
+    },
+    "get_current_user": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "request",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "token",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "api_key",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "db",
+          "required": false
+        }
+      ]
     },
     "get_current_user_context": {
       "kind": "function",

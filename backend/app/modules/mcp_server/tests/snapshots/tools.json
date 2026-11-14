@@ -1,0 +1,2234 @@
+{
+  "module_version": "0.1.0",
+  "resources": [
+    {
+      "_meta": null,
+      "annotations": {
+        "audience": [
+          "assistant"
+        ],
+        "lastModified": null,
+        "priority": 0.8
+      },
+      "description": "Inventory health for the key's workspace: number of items and locations, expiring soon and expired counts, low stock, stock value and whether the value is a lower bound. Read it before a broad question about the workspace.",
+      "icons": null,
+      "mimeType": "application/json",
+      "name": "org-overview",
+      "size": null,
+      "title": "Workspace overview",
+      "uri": "inventari://org/overview"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "audience": [
+          "assistant"
+        ],
+        "lastModified": null,
+        "priority": 0.6
+      },
+      "description": "The workspace location hierarchy: every shelf, zone and room with its parent, nested into roots. Read it before naming a shelf id in a tool call.",
+      "icons": null,
+      "mimeType": "application/json",
+      "name": "locations-tree",
+      "size": null,
+      "title": "Location tree",
+      "uri": "inventari://locations/tree"
+    }
+  ],
+  "tools": [
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": null,
+        "idempotentHint": true,
+        "openWorldHint": null,
+        "readOnlyHint": true,
+        "title": null
+      },
+      "description": "Find stock in this workspace by product name, or by a barcode when the text is one. Returns stock on hand grouped into rows a picker can choose from; interchangeable records (same product, shelf and no date or serial) are one row with the total. When nothing is on hand, returns catalogue records matching the text, so a product with no stock is still found. Use get_item for one record; use list_locations first when you need a shelf id. Example: search_items(query=\"olive oil\").",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 20,
+            "description": "Maximum rows to answer with (1-50).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Product name, or a barcode to look up.",
+            "title": "Query",
+            "type": "string"
+          },
+          "shelf_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only stock on this shelf (a location id).",
+            "title": "Shelf Id"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "search_itemsArguments",
+        "type": "object"
+      },
+      "name": "search_items",
+      "outputSchema": {
+        "$defs": {
+          "ItemView": {
+            "description": "One stock record as an agent reads it.",
+            "properties": {
+              "barcode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Barcode"
+              },
+              "brand": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Brand"
+              },
+              "category_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Category Id"
+              },
+              "created_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Created At"
+              },
+              "expiry_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expiry Date"
+              },
+              "id": {
+                "description": "The record id; pass it to get_item.",
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "lot_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The batch this stock is in.",
+                "title": "Lot Id"
+              },
+              "meta_data": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Meta Data"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Quantity on this record, in the unit of uom_symbol.",
+                "title": "Quantity"
+              },
+              "serial_number": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Serial Number"
+              },
+              "shelf_id": {
+                "description": "The location the record stands on.",
+                "format": "uuid",
+                "title": "Shelf Id",
+                "type": "string"
+              },
+              "shelf_location": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The shelf path, when the Core resolves one.",
+                "title": "Shelf Location"
+              },
+              "shelf_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Shelf Name"
+              },
+              "template_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The product template this record belongs to.",
+                "title": "Template Id"
+              },
+              "template_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Template Name"
+              },
+              "uom_symbol": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Uom Symbol"
+              },
+              "updated_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Updated At"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "shelf_id"
+            ],
+            "title": "ItemView",
+            "type": "object"
+          },
+          "StockRow": {
+            "description": "A row of stock; interchangeable records are one row with a total.",
+            "properties": {
+              "barcode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Barcode"
+              },
+              "brand": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Brand"
+              },
+              "category_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Category Id"
+              },
+              "created_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Created At"
+              },
+              "expiry_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expiry Date"
+              },
+              "id": {
+                "description": "The record id; pass it to get_item.",
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "lot_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The batch this stock is in.",
+                "title": "Lot Id"
+              },
+              "merged": {
+                "description": "True when several interchangeable records were summed into this row.",
+                "title": "Merged",
+                "type": "boolean"
+              },
+              "meta_data": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Meta Data"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "offered_quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "description": "What this row can offer: the record quantity, or the group total.",
+                "title": "Offered Quantity"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Quantity on this record, in the unit of uom_symbol.",
+                "title": "Quantity"
+              },
+              "serial_number": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Serial Number"
+              },
+              "shelf_id": {
+                "description": "The location the record stands on.",
+                "format": "uuid",
+                "title": "Shelf Id",
+                "type": "string"
+              },
+              "shelf_location": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The shelf path, when the Core resolves one.",
+                "title": "Shelf Location"
+              },
+              "shelf_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Shelf Name"
+              },
+              "template_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The product template this record belongs to.",
+                "title": "Template Id"
+              },
+              "template_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Template Name"
+              },
+              "uom_symbol": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Uom Symbol"
+              },
+              "updated_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Updated At"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "shelf_id",
+              "offered_quantity",
+              "merged"
+            ],
+            "title": "StockRow",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "query": {
+            "description": "The search text as received.",
+            "title": "Query",
+            "type": "string"
+          },
+          "records": {
+            "description": "Catalogue records when no stock row matched \u2014 a product with no stock, or a barcode looked up directly.",
+            "items": {
+              "$ref": "#/$defs/ItemView"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "stock": {
+            "description": "Stock on hand that matches, newest first.",
+            "items": {
+              "$ref": "#/$defs/StockRow"
+            },
+            "title": "Stock",
+            "type": "array"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "SearchItemsResult",
+        "type": "object"
+      },
+      "title": "Search stock"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": null,
+        "idempotentHint": true,
+        "openWorldHint": null,
+        "readOnlyHint": true,
+        "title": null
+      },
+      "description": "Read one stock record by id: quantity, shelf, product, batch, expiry and namespaced metadata, plus the batch details when the record names a batch. Use the id from search_items. Refuses when the record is not in this workspace.",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "item_id": {
+            "description": "The record id from search_items.",
+            "format": "uuid",
+            "title": "Item Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id"
+        ],
+        "title": "get_itemArguments",
+        "type": "object"
+      },
+      "name": "get_item",
+      "outputSchema": {
+        "$defs": {
+          "ItemView": {
+            "description": "One stock record as an agent reads it.",
+            "properties": {
+              "barcode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Barcode"
+              },
+              "brand": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Brand"
+              },
+              "category_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Category Id"
+              },
+              "created_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Created At"
+              },
+              "expiry_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expiry Date"
+              },
+              "id": {
+                "description": "The record id; pass it to get_item.",
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "lot_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The batch this stock is in.",
+                "title": "Lot Id"
+              },
+              "meta_data": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Meta Data"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Quantity on this record, in the unit of uom_symbol.",
+                "title": "Quantity"
+              },
+              "serial_number": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Serial Number"
+              },
+              "shelf_id": {
+                "description": "The location the record stands on.",
+                "format": "uuid",
+                "title": "Shelf Id",
+                "type": "string"
+              },
+              "shelf_location": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The shelf path, when the Core resolves one.",
+                "title": "Shelf Location"
+              },
+              "shelf_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Shelf Name"
+              },
+              "template_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The product template this record belongs to.",
+                "title": "Template Id"
+              },
+              "template_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Template Name"
+              },
+              "uom_symbol": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Uom Symbol"
+              },
+              "updated_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Updated At"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "shelf_id"
+            ],
+            "title": "ItemView",
+            "type": "object"
+          },
+          "LotLocationView": {
+            "properties": {
+              "location_id": {
+                "format": "uuid",
+                "title": "Location Id",
+                "type": "string"
+              },
+              "location_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Location Name"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "title": "Quantity"
+              },
+              "reserved_quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "title": "Reserved Quantity"
+              }
+            },
+            "required": [
+              "location_id",
+              "quantity",
+              "reserved_quantity"
+            ],
+            "title": "LotLocationView",
+            "type": "object"
+          },
+          "LotStatusEventView": {
+            "properties": {
+              "at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "At"
+              },
+              "by_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "By Name"
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Reason"
+              },
+              "status": {
+                "title": "Status",
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "title": "LotStatusEventView",
+            "type": "object"
+          },
+          "LotView": {
+            "description": "A batch with its dates, state and what stands where.",
+            "properties": {
+              "expiry_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expiry Date"
+              },
+              "id": {
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "locations": {
+                "items": {
+                  "$ref": "#/$defs/LotLocationView"
+                },
+                "title": "Locations",
+                "type": "array"
+              },
+              "meta_data": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Meta Data"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "on_hand": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "default": "0",
+                "description": "Total pieces of this batch still on shelves.",
+                "title": "On Hand"
+              },
+              "product_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Product Name"
+              },
+              "product_template_id": {
+                "format": "uuid",
+                "title": "Product Template Id",
+                "type": "string"
+              },
+              "production_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Production Date"
+              },
+              "status": {
+                "description": "active, quarantined, held, expired or recalled",
+                "title": "Status",
+                "type": "string"
+              },
+              "status_history": {
+                "items": {
+                  "$ref": "#/$defs/LotStatusEventView"
+                },
+                "title": "Status History",
+                "type": "array"
+              },
+              "status_reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status Reason"
+              },
+              "uom_symbol": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Uom Symbol"
+              },
+              "use_by_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Best-before; FEFO reads use_by_date before expiry_date.",
+                "title": "Use By Date"
+              }
+            },
+            "required": [
+              "id",
+              "product_template_id",
+              "name",
+              "status"
+            ],
+            "title": "LotView",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "item": {
+            "$ref": "#/$defs/ItemView"
+          },
+          "lot": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/LotView"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The batch, when the record names one."
+          }
+        },
+        "required": [
+          "item"
+        ],
+        "title": "ItemDetail",
+        "type": "object"
+      },
+      "title": "Read one stock record"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": null,
+        "idempotentHint": true,
+        "openWorldHint": null,
+        "readOnlyHint": true,
+        "title": null
+      },
+      "description": "List the shelves, zones and other locations of this workspace, flat, in name order, with each location parent_id. Use it to find a shelf id for search_items, get_stock_levels or get_expiring_soon, or to see the whole hierarchy as a flat page. Use get_location_tree for the hierarchy nested. Filter with usage when you only want internal stock, for example. Example: list_locations(usage=\"internal\").",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 200,
+            "description": "Maximum locations to answer with (1-500).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "description": "How many locations to skip.",
+            "title": "Offset",
+            "type": "integer"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only locations with this usage (internal, customer, production).",
+            "title": "Usage"
+          }
+        },
+        "title": "list_locationsArguments",
+        "type": "object"
+      },
+      "name": "list_locations",
+      "outputSchema": {
+        "$defs": {
+          "LocationNode": {
+            "description": "One location, with its children when a tree was asked for.",
+            "properties": {
+              "behavior_mode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Tracking mode: STOCK, EXPIRY or FREEZING.",
+                "title": "Behavior Mode"
+              },
+              "children": {
+                "items": {
+                  "$ref": "#/$defs/LocationNode"
+                },
+                "title": "Children",
+                "type": "array"
+              },
+              "context_tag": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Context Tag"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "id": {
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "parent_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The parent location; None for a top-level location.",
+                "title": "Parent Id"
+              },
+              "short_code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Short Code"
+              },
+              "usage": {
+                "description": "e.g. internal, customer, production",
+                "title": "Usage",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "usage"
+            ],
+            "title": "LocationNode",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "has_more": {
+            "default": false,
+            "description": "True when the page hit the requested limit.",
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "locations": {
+            "description": "The locations, flat, in name order.",
+            "items": {
+              "$ref": "#/$defs/LocationNode"
+            },
+            "title": "Locations",
+            "type": "array"
+          }
+        },
+        "title": "LocationsResult",
+        "type": "object"
+      },
+      "title": "List locations"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": null,
+        "idempotentHint": true,
+        "openWorldHint": null,
+        "readOnlyHint": true,
+        "title": null
+      },
+      "description": "Read locations as a tree: roots with their children. Without root_id it is the whole workspace hierarchy; with root_id it is that location and everything below it, plus its ancestors as a breadcrumb. Use it when a person says \"the cold room\" or \"aisle 3\" and you need the shelves under it. Example: get_location_tree(root_id=\"<a zone id>\").",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "root_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Read this location and everything below it; omit for the whole tree.",
+            "title": "Root Id"
+          }
+        },
+        "title": "get_location_treeArguments",
+        "type": "object"
+      },
+      "name": "get_location_tree",
+      "outputSchema": {
+        "$defs": {
+          "LocationNode": {
+            "description": "One location, with its children when a tree was asked for.",
+            "properties": {
+              "behavior_mode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Tracking mode: STOCK, EXPIRY or FREEZING.",
+                "title": "Behavior Mode"
+              },
+              "children": {
+                "items": {
+                  "$ref": "#/$defs/LocationNode"
+                },
+                "title": "Children",
+                "type": "array"
+              },
+              "context_tag": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Context Tag"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "id": {
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "parent_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The parent location; None for a top-level location.",
+                "title": "Parent Id"
+              },
+              "short_code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Short Code"
+              },
+              "usage": {
+                "description": "e.g. internal, customer, production",
+                "title": "Usage",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "usage"
+            ],
+            "title": "LocationNode",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "ancestors": {
+            "description": "When a subtree was asked for: its ancestors, nearest first.",
+            "items": {
+              "$ref": "#/$defs/LocationNode"
+            },
+            "title": "Ancestors",
+            "type": "array"
+          },
+          "roots": {
+            "description": "Top-level locations with their subtrees.",
+            "items": {
+              "$ref": "#/$defs/LocationNode"
+            },
+            "title": "Roots",
+            "type": "array"
+          }
+        },
+        "title": "LocationTreeResult",
+        "type": "object"
+      },
+      "title": "Read the location tree"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": null,
+        "idempotentHint": true,
+        "openWorldHint": null,
+        "readOnlyHint": true,
+        "title": null
+      },
+      "description": "Read quantities per product, shelf and batch. Narrow by product template, or by shelf. A shelf with no product filter answers per-product totals for the whole shelf; otherwise every quant row is returned (one row per product/batch/owner). Use search_items when you are looking for a record to act on; use this when you need the numbers. Example: get_stock_levels(shelf_id=\"<id>\").",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 200,
+            "description": "Maximum quant rows to answer with (1-1000).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "product_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only this product template.",
+            "title": "Product Template Id"
+          },
+          "shelf_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only this shelf; alone, it answers per-product totals.",
+            "title": "Shelf Id"
+          }
+        },
+        "title": "get_stock_levelsArguments",
+        "type": "object"
+      },
+      "name": "get_stock_levels",
+      "outputSchema": {
+        "$defs": {
+          "ShelfTotal": {
+            "properties": {
+              "location_id": {
+                "format": "uuid",
+                "title": "Location Id",
+                "type": "string"
+              },
+              "product_template_id": {
+                "format": "uuid",
+                "title": "Product Template Id",
+                "type": "string"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "description": "Every batch and owner on the shelf, summed.",
+                "title": "Quantity"
+              }
+            },
+            "required": [
+              "location_id",
+              "product_template_id",
+              "quantity"
+            ],
+            "title": "ShelfTotal",
+            "type": "object"
+          },
+          "StockLevelRow": {
+            "description": "One quant: a product in a batch, on a shelf, for one owner.",
+            "properties": {
+              "available_quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "title": "Available Quantity"
+              },
+              "location_id": {
+                "format": "uuid",
+                "title": "Location Id",
+                "type": "string"
+              },
+              "lot_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Lot Id"
+              },
+              "owner_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Owner Id"
+              },
+              "product_template_id": {
+                "format": "uuid",
+                "title": "Product Template Id",
+                "type": "string"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "title": "Quantity"
+              },
+              "reserved_quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "title": "Reserved Quantity"
+              }
+            },
+            "required": [
+              "product_template_id",
+              "location_id",
+              "quantity",
+              "reserved_quantity",
+              "available_quantity"
+            ],
+            "title": "StockLevelRow",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "rows": {
+            "description": "Quant rows when the call was narrowed by product or shelf.",
+            "items": {
+              "$ref": "#/$defs/StockLevelRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "shelf_totals": {
+            "description": "Per-product totals for one whole shelf, when the call named a shelf and no product.",
+            "items": {
+              "$ref": "#/$defs/ShelfTotal"
+            },
+            "title": "Shelf Totals",
+            "type": "array"
+          }
+        },
+        "title": "StockLevelsResult",
+        "type": "object"
+      },
+      "title": "Read stock levels"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": null,
+        "idempotentHint": true,
+        "openWorldHint": null,
+        "readOnlyHint": true,
+        "title": null
+      },
+      "description": "List batches with their status and dates (use_by_date, expiry_date, production_date), newest first, or read one batch by lot_id. FEFO reads use_by_date before expiry_date. Use it for a recall or before choosing stock to issue. Example: list_lots(status=\"quarantined\").",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 50,
+            "description": "Maximum batches per page (1-200).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Read this batch instead of listing.",
+            "title": "Lot Id"
+          },
+          "offset": {
+            "default": 0,
+            "description": "How many batches to skip.",
+            "title": "Offset",
+            "type": "integer"
+          },
+          "product_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only batches of this product template.",
+            "title": "Product Template Id"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only batches in this state: active, quarantined, held, expired, recalled.",
+            "title": "Status"
+          }
+        },
+        "title": "list_lotsArguments",
+        "type": "object"
+      },
+      "name": "list_lots",
+      "outputSchema": {
+        "$defs": {
+          "LotLocationView": {
+            "properties": {
+              "location_id": {
+                "format": "uuid",
+                "title": "Location Id",
+                "type": "string"
+              },
+              "location_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Location Name"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "title": "Quantity"
+              },
+              "reserved_quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "title": "Reserved Quantity"
+              }
+            },
+            "required": [
+              "location_id",
+              "quantity",
+              "reserved_quantity"
+            ],
+            "title": "LotLocationView",
+            "type": "object"
+          },
+          "LotStatusEventView": {
+            "properties": {
+              "at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "At"
+              },
+              "by_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "By Name"
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Reason"
+              },
+              "status": {
+                "title": "Status",
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "title": "LotStatusEventView",
+            "type": "object"
+          },
+          "LotView": {
+            "description": "A batch with its dates, state and what stands where.",
+            "properties": {
+              "expiry_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expiry Date"
+              },
+              "id": {
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "locations": {
+                "items": {
+                  "$ref": "#/$defs/LotLocationView"
+                },
+                "title": "Locations",
+                "type": "array"
+              },
+              "meta_data": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Meta Data"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "on_hand": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  }
+                ],
+                "default": "0",
+                "description": "Total pieces of this batch still on shelves.",
+                "title": "On Hand"
+              },
+              "product_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Product Name"
+              },
+              "product_template_id": {
+                "format": "uuid",
+                "title": "Product Template Id",
+                "type": "string"
+              },
+              "production_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Production Date"
+              },
+              "status": {
+                "description": "active, quarantined, held, expired or recalled",
+                "title": "Status",
+                "type": "string"
+              },
+              "status_history": {
+                "items": {
+                  "$ref": "#/$defs/LotStatusEventView"
+                },
+                "title": "Status History",
+                "type": "array"
+              },
+              "status_reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status Reason"
+              },
+              "uom_symbol": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Uom Symbol"
+              },
+              "use_by_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Best-before; FEFO reads use_by_date before expiry_date.",
+                "title": "Use By Date"
+              }
+            },
+            "required": [
+              "id",
+              "product_template_id",
+              "name",
+              "status"
+            ],
+            "title": "LotView",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/LotView"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The batch when lot_id was given."
+          },
+          "items": {
+            "description": "The page of batches when no lot_id was given.",
+            "items": {
+              "$ref": "#/$defs/LotView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "default": 0,
+            "description": "How many batches match the filters.",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "title": "LotsResult",
+        "type": "object"
+      },
+      "title": "List batches"
+    },
+    {
+      "_meta": null,
+      "annotations": {
+        "destructiveHint": null,
+        "idempotentHint": true,
+        "openWorldHint": null,
+        "readOnlyHint": true,
+        "title": null
+      },
+      "description": "List stock expiring within N days (default 7), earliest first, with how many days are left. Also returns the workspace six-bucket expiry forecast, and, when a shelf is named, how many items expire there in the window. Use it for \"what should we use first\" and for waste checks. Example: get_expiring_soon(days=3).",
+      "execution": null,
+      "icons": null,
+      "inputSchema": {
+        "properties": {
+          "days": {
+            "default": 7,
+            "description": "Window length in days from today (0-365).",
+            "title": "Days",
+            "type": "integer"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Maximum rows to answer with (1-200).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "shelf_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only this shelf, and count it.",
+            "title": "Shelf Id"
+          }
+        },
+        "title": "get_expiring_soonArguments",
+        "type": "object"
+      },
+      "name": "get_expiring_soon",
+      "outputSchema": {
+        "$defs": {
+          "ExpiringItem": {
+            "properties": {
+              "days_left": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Calendar days from today; 0 is today, negative is overdue.",
+                "title": "Days Left"
+              },
+              "expiry_date": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expiry Date"
+              },
+              "item_id": {
+                "format": "uuid",
+                "title": "Item Id",
+                "type": "string"
+              },
+              "lot_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Lot Id"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Quantity"
+              },
+              "shelf_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Shelf Id"
+              },
+              "shelf_name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Shelf Name"
+              },
+              "uom_symbol": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Uom Symbol"
+              }
+            },
+            "required": [
+              "item_id",
+              "name"
+            ],
+            "title": "ExpiringItem",
+            "type": "object"
+          },
+          "ExpiryBucketView": {
+            "properties": {
+              "count": {
+                "title": "Count",
+                "type": "integer"
+              },
+              "period": {
+                "description": "e.g. Today, This week, This month",
+                "title": "Period",
+                "type": "string"
+              }
+            },
+            "required": [
+              "period",
+              "count"
+            ],
+            "title": "ExpiryBucketView",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "forecast": {
+            "description": "The organization-wide six-bucket expiry forecast.",
+            "items": {
+              "$ref": "#/$defs/ExpiryBucketView"
+            },
+            "title": "Forecast",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/ExpiringItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "shelf_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "How many items expire in the window on the named shelf.",
+            "title": "Shelf Count"
+          },
+          "shelf_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Shelf Id"
+          },
+          "today": {
+            "format": "date",
+            "title": "Today",
+            "type": "string"
+          }
+        },
+        "required": [
+          "days",
+          "today"
+        ],
+        "title": "ExpiringSoonResult",
+        "type": "object"
+      },
+      "title": "Read expiring stock"
+    }
+  ]
+}
