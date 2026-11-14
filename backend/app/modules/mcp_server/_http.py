@@ -29,10 +29,12 @@ from .tools import register_tools
 _MANIFEST = json.loads(Path(__file__).with_name('manifest.json').read_text('utf-8'))
 
 _INSTRUCTIONS = """\
-Read tools for an Inventari workspace. Search stock with search_items, then read
-one record, the shelves it can stand on, its stock levels, its batches and what
-expires soon. Every tool acts in the workspace the API key belongs to; a tool
-may refuse when the key does not hold the read permission it needs.
+Tools for an Inventari workspace. Search stock with search_items, then read one
+record, the shelves it can stand on, its stock levels, its batches and what
+expires soon. create_item starts a new record with its opening movement;
+correct_stock sets an existing record to the quantity a count found, with a
+reason the journal keeps. Every tool acts in the workspace the API key belongs
+to; a tool refuses when the key does not hold the permission it needs.
 """
 
 

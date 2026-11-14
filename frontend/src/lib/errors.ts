@@ -21,8 +21,8 @@ export function extractApiError(error: unknown, fallback: string): string {
     // message, a stack summary, the fault injector's own sentence. Handing it
     // to the person at the screen tells them nothing they can act on and, in a
     // debug build, shows them the inside of the machine. A business rule speaks
-    // through a 4xx (AGENTS.md, "Error Handling Rules"), and that detail is a
-    // translated sentence meant to be read.
+    // through a 4xx (backend/AGENTS.md §3, "Error Handling Rules"), and that
+    // detail is a translated sentence meant to be read.
     if ((error.response?.status ?? 0) >= 500) return fallback;
 
     const detail = error.response?.data?.detail;

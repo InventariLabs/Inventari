@@ -366,5 +366,13 @@ The `api_keys` module is the canonical reference for the module migration patter
 - **No native enum types.** An enumerated column is `varchar` with a
   `CHECK (<column> IN (...))` constraint, never `postgresql.ENUM` / `CREATE
   TYPE`. A label added to a native type later needs `ALTER TYPE ... ADD VALUE`,
-  which cannot run in the migration's transaction; a text column's next label is
-  a constraint swap. `test_no_native_enum_types_exist.py` enforces it.
+  which cannot run in the migration's transaction, in every installation, and a
+  renamed one is a type rebuild; a text column's next label is a constraint swap.
+  The `CHECK` lists the PyEnum members' **values** (lowercase for a `StrEnum`), and
+  the model column persists those same values:
+  `Enum(MyEnum, values_callable=lambda x: [e.value for e in x], native_enum=False,
+  length=20, create_constraint=True, name='ck_<table>_<column>')` — a plain
+  `Enum(MyEnum)` would send member **names** (`'DAILY'`), so keep
+  `values_callable`. `test_no_native_enum_types_exist.py` enforces it, on a native
+  `Enum` column in the models and on any enum type a migration chain leaves in the
+  database.

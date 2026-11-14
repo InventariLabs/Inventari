@@ -3,7 +3,7 @@
  *
  * Read-only: movements are recorded by the services that move stock, never
  * posted from here. The types come from the generated schema rather than
- * being written twice (AGENTS.md: `api-generated.ts` is the contract).
+ * being written twice (frontend/AGENTS.md §1: `api-generated.ts` is the contract).
  */
 import axios from "axios";
 import { api } from "./client";

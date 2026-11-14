@@ -84,6 +84,10 @@ class TestAuthentication:
         assert response.status_code == 401
         assert response.headers['www-authenticate'].startswith('Bearer')
         assert response.json()['detail']['code'] == 'MCP_AUTH_REQUIRED'
+        # The key has its own header, and Core marks the Bearer form
+        # Deprecation; the refusal has to name the header the client should
+        # send, not one whose answer tells its maintainer to switch.
+        assert 'X-API-Key' in response.json()['detail']['message']
 
     def test_an_unknown_key_is_refused(self, client: TestClient) -> None:
         response = rpc(client, 'inv_live_nosuchkey00000000', 'tools/list')
@@ -219,14 +223,31 @@ class TestTheWire:
             'get_stock_levels',
             'list_lots',
             'get_expiring_soon',
+            'create_item',
+            'correct_stock',
         ]
 
-    def test_every_tool_is_marked_read_only(
+    def test_the_read_tools_are_read_only_and_the_writes_say_so(
         self, client: TestClient, mcp_key: str
     ) -> None:
-        tools = rpc(client, mcp_key, 'tools/list').json()['result']['tools']
+        tools = {
+            tool['name']: tool
+            for tool in rpc(client, mcp_key, 'tools/list').json()['result']['tools']
+        }
+        read_names = [
+            'search_items',
+            'get_item',
+            'list_locations',
+            'get_location_tree',
+            'get_stock_levels',
+            'list_lots',
+            'get_expiring_soon',
+        ]
 
-        assert all(tool['annotations']['readOnlyHint'] for tool in tools)
+        assert all(tools[name]['annotations']['readOnlyHint'] for name in read_names)
+        assert tools['create_item']['annotations'].get('readOnlyHint') is not True
+        assert tools['create_item']['annotations']['destructiveHint'] is False
+        assert tools['correct_stock']['annotations']['destructiveHint'] is True
 
     def test_a_mismatched_method_header_is_a_protocol_error(
         self, client: TestClient, mcp_key: str

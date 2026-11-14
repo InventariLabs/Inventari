@@ -209,6 +209,7 @@ Backend: `api_keys`, `approvals`, `equipment`, `example_widgets`, `maker`, `nutr
 *   **Design system consistency:** TailwindCSS with design tokens and a `src/components/ui/` library (Button, Card, Input, Badge, etc.) ensures visual consistency. ESLint refuses a raw `<h1>`, `<button>`, `<input>` or `<select>` in a module page; the components in `src/components/ui/` take their place.
 *   **Modular frontend:** Each frontend module is a `src/modules/<name>/` directory with a `module.ts`, adding `pages/`, `components/`, `hooks/` and `api/` where it needs them. Most mirror a backend module of the same name; six (`announcements`, `inventory`, `launcher`, `partners`, `settings`, `spaces`) do not. Cross-module imports are minimized.
 *   **No service worker:** the build ships none — `vite-plugin-pwa` was removed, so there is no offline cache and no installability. `src/main.tsx` keeps its unregister block so an installation that caught a worker from an earlier build drops it on the next visit; nothing replaces a worker nobody registers again.
+*   **TypeScript 7 compiles, the API stays on 6.** TS 7 ships no programmatic API, and the tools that still need one — `typescript-eslint`, knip, and the two scripts that read source with the compiler API (`lint-i18n-raw.mjs`, `check-on-error-refusals.mjs`) — check the major version. So `npx tsc` is the native compiler via the `@typescript/native` alias, while `typescript` itself is aliased to `@typescript/typescript6`: that is the API those tools import, and the version an editor resolves. `openapi-typescript`'s `^5.x` peer predates TS 6, so that one peer is pinned to the same alias under `overrides`; both aliases and the override collapse back into one `typescript` when TS 7.1 ships an API.
 
 ## 17. One Document Date
 
@@ -252,3 +253,12 @@ Timestamps written to the row (`created_at`, `completed_at`, `checked_in_at`) st
 *   **The chain is shared history.** Every deployment replays the same files; changing what a step did silently splits the fleet into databases that ran the old step and databases that will run the new one, with no record of the difference.
 *   **The narrow window is real.** A precision guard once needed a table to exist for fresh databases migrated by the core chain alone; the edit was operationally a no-op on every database that had already passed the guarded step, and the reviewer verified exactly that. Naming the window — no-op on migrated databases, or a new migration — beats an unwritten rule that each case re-litigates.
 *   **The burden of proof belongs to the editor.** "It seemed harmless" is not a guard. The commit that edits a released file is the one place a reader will look; if the no-op argument cannot be written there in one sentence, the edit is not in the window.
+
+## 21. Frontend Types Come from the OpenAPI Schema
+
+**Decision:** `frontend/src/types/api-generated.ts`, generated from the backend's OpenAPI schema, is the truth about what arrives. A frontend type for a schema is an alias of it; a hand-written copy under another name is a mirror that `check:mirrors` compares field by field; a type that copies no schema says so in its comment. The three states and their gates are in `frontend/AGENTS.md` §1.
+
+**Rationale:**
+*   **Nothing used to compare the two.** The hand-written interfaces in `src/types/*` are older and far more widely imported than the generated file, so `tsc` stayed green over declarations that were simply wrong.
+*   **Both directions cost real defects.** `DocumentLine.quantity` was typed `number` where the backend serialises a Decimal as text (decision 18): an addition became string concatenation, and two plus three read `2.0003`. A category field whose hand-written copy narrowed a plain string to three food values made every comparison against a category from another vertical answer "no", silently.
+*   **An alias cannot get either wrong.** That is why the direction of travel is towards the alias, and why a mirror is a stop on the way rather than the destination.

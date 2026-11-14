@@ -599,6 +599,7 @@
         "old_target_location_id": "Previous shelf",
         "original_number": "Original document",
         "reason_code": "Reason code",
+        "reason_text": "Reason text",
         "recount_requested": "Recount requested",
         "sample_size": "Sample size",
         "schedule": "Schedule",

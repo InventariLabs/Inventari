@@ -329,8 +329,8 @@ export function DocumentActionButtons({
   // Cancel and delete: the backend checks warehouse:manage, and a test there
   // says so in as many words. This asked for the role names instead, so a
   // custom role holding the key was refused by the screen and accepted by the
-  // API — the two have to name the same right (AGENTS.md "gate on a
-  // permission, never on a role name").
+  // API — the two have to name the same right (backend/AGENTS.md §7,
+  // "gate on a permission, never on a role name").
   const canManage = useCanManage("warehouse");
   // Cancelling a document that has already been confirmed is what releases
   // the stock it reserved, and the API does it for anyone holding

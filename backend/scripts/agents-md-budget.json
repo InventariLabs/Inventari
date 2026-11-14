@@ -1,9 +1,9 @@
 {
   "unit": "bytes",
-  "measured_on": "c21ce4d85",
+  "measured_on": "128f8522f",
   "limits": {
-    "AGENTS.md": 17565,
-    "backend/AGENTS.md": 31910,
-    "frontend/AGENTS.md": 14079
+    "AGENTS.md": 17511,
+    "backend/AGENTS.md": 26763,
+    "frontend/AGENTS.md": 11695
   }
 }

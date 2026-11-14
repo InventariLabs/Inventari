@@ -89,7 +89,7 @@
     },
     "mcp_server": {
       "name": "Serveur MCP",
-      "description": "Laissez un agent IA lire cet espace de travail par le Model Context Protocol, avec une clé qui ne voit que ce qu'elle peut."
+      "description": "Laissez un agent IA travailler avec cet espace de travail via le Model Context Protocol, avec une clé qui ne voit que ce qu'elle peut."
     }
   },
   "config": {

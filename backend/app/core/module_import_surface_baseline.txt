@@ -108,6 +108,9 @@ maker | owner=core | expires=2027-06-30 | the recipe catalogue reads core cost a
   app.modules.warehouse.warehouse_api
   app.schemas.pagination
 
+mcp_server | owner=core | expires=2027-06-30 | the correction writes the register's copy through the warehouse public API, the one cross-module door its plan names.
+  app.modules.warehouse.warehouse_api
+
 nutrition | owner=core | expires=2027-06-30 | the label and scan code uses core barcode and cache helpers directly; the module predates the SDK. Its vision import is the vision public API.
   app.core.barcode
   app.core.container

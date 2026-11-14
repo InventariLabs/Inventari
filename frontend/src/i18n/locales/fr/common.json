@@ -599,6 +599,7 @@
         "old_target_location_id": "Ancien emplacement",
         "original_number": "Document original",
         "reason_code": "Code du motif",
+        "reason_text": "Texte de la raison",
         "recount_requested": "Recomptage demandé",
         "sample_size": "Taille de l'échantillon",
         "schedule": "Planning",

@@ -29,6 +29,19 @@ counted record, under the anchor lock of the group it settles. There is no
 second number to keep in step, so there is no path map to maintain; the rule
 is the one in `backend/AGENTS.md`.
 
+The model holds whatever modules are enabled. An organization without a
+module that reads the register (`consumes_stock_quant` — today warehouse,
+maker, purchase_orders, stock_takes) keeps the same movements; only the
+screens that show them stay behind that list, so a household sees no change.
+The stock a shelf held before the register knew it was posted once as an
+opening balance (archived `openbal01`, movement
+`reference_type='opening_balance'`). A record that predates its card adopts it
+on its first change — or on an edit that writes a field to its card — and posts
+what it held as an opening (`opening_balance` movement, layer), then the change
+as a movement of its own.
+A record that changes shelves takes its stock with it through one call,
+`_stock_relocation.carry_record_stock_async`, whichever door wrote the shelf.
+
 No negative stock at the DB level (`CHECK quantity >= 0` on items) —
 stricter than Odoo's default, and deliberate.
 
@@ -58,6 +71,9 @@ below) take the same lock first, so the order holds whoever locks first. A
 group an operation did not name up front and locks later is taken after the
 others; two such operations can close a circle, which the database breaks by
 aborting one of them — nothing is written wrong.
+
+Production runs do not take these locks: they are serialized per organization
+by the maker settings lock.
 
 Anchors are not deleted: a group that once had stock keeps its row, and only
 a cascade from the product, the shelf or the organization removes it.

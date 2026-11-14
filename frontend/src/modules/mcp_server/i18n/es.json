@@ -1,7 +1,7 @@
 {
   "title": "Servidor MCP",
   "description": "Conecte un agente de IA a este espacio de trabajo mediante el Model Context Protocol.",
-  "subtitle": "Lo que un agente de IA puede leer aquí y cómo conectarlo.",
+  "subtitle": "La dirección, la clave y los hosts en los que responde este espacio de trabajo.",
   "endpoint": {
     "label": "Punto de acceso",
     "hint": "Indica esta dirección en tu cliente MCP."
