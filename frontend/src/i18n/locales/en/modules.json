@@ -89,7 +89,7 @@
     },
     "mcp_server": {
       "name": "MCP Server",
-      "description": "Let an AI agent read this workspace over the Model Context Protocol, with a key that sees only what it may."
+      "description": "Let an AI agent work with this workspace over the Model Context Protocol, with a key that sees only what it may."
     }
   },
   "config": {

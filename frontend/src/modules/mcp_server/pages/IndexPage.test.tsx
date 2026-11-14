@@ -20,7 +20,11 @@ describe("MCP Server page", () => {
       screen.getByText(/Connect an AI agent to this workspace/),
     ).toBeInTheDocument();
     // The page has to say where to connect, not only that the module exists.
-    expect(screen.getByText("/api/v1/mcp-server/mcp")).toBeInTheDocument();
+    // A client is configured with a whole address; a bare path cannot be
+    // pasted into the command the reader runs.
+    const endpoint = `${window.location.origin}/api/v1/mcp-server/mcp`;
+    expect(screen.getByText(endpoint)).toBeInTheDocument();
+    expect(endpoint.startsWith("http")).toBe(true);
     expect(
       screen.getByText(/Send the key in the X-API-Key header/),
     ).toBeInTheDocument();

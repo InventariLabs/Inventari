@@ -1,7 +1,7 @@
 {
   "title": "MCP Server",
   "description": "Connect an AI agent to this workspace with an API key, over the Model Context Protocol.",
-  "subtitle": "What an AI agent can read here, and how to connect one.",
+  "subtitle": "How to connect an AI agent to this workspace.",
   "endpoint": {
     "label": "Endpoint",
     "hint": "Point your MCP client at this address."
