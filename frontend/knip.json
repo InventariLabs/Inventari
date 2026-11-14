@@ -6,6 +6,10 @@
     "tests/e2e/**/*.spec.ts",
     "src/**/*.test.{ts,tsx}", // vitest specs scattered inside src/
     "src/modules/*/module.ts", // registry entry points (side-effect registration)
+    // A module's published surface (check-module-boundaries.mjs): its names are
+    // a contract with the modules that import them, in this tree or outside
+    // it, and a new module's file stays empty until a second module needs one.
+    "src/modules/*/moduleApi.ts",
     // Public surface, not dead code: the design system and the module
     // registry are consumed ad-hoc by any module — treat as entry points so
     // their exports count as public API.

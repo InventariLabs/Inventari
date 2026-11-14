@@ -51,7 +51,7 @@ This writes two directories and changes six files:
 
 ```
 backend/app/modules/warranty_tracker/   ← a working copy of the reference module
-frontend/src/modules/warranty_tracker/  ← module.ts, pages/IndexPage.tsx, i18n/*.json, and empty components/, hooks/ and types/ folders
+frontend/src/modules/warranty_tracker/  ← module.ts, an empty moduleApi.ts, pages/IndexPage.tsx, i18n/*.json, and empty components/, hooks/ and types/ folders
 backend/app/core/module_safety.py       ← the module joins REPO_SHIPPED_MODULES
 frontend/scripts/module-catalog.json    ← the store's catalog snapshot learns it
 frontend/scripts/i18n-backend-keys.json ← the snapshot of the labels the backend sends learns its permissions

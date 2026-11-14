@@ -4,9 +4,11 @@
  * Usage: node scripts/generate_module.mjs <module_name>
  *
  * Auto-generates a fresh module under src/modules/<module_name>/ with all
- * boilerplate files: module.ts, pages/IndexPage.tsx, i18n/*.json and types.
+ * boilerplate files: module.ts, moduleApi.ts, pages/IndexPage.tsx, i18n/*.json
+ * and types.
  *   src/modules/{name}/
  *     module.ts
+ *     moduleApi.ts (empty: what other modules may import from this one)
  *     pages/IndexPage.tsx
  *     components/  (empty, .gitkeep)
  *     hooks/       (empty, .gitkeep)
@@ -122,6 +124,19 @@ moduleRegistry.register({
 });
 `;
 
+// The one file check:boundaries lets another module import, written empty so
+// the first module to depend on this one finds the door instead of reaching
+// past it.
+const moduleApiTs = `/**
+ * What the ${name} module publishes to the modules that depend on it.
+ *
+ * \`check:boundaries\` counts every import of a module's internals as an edge;
+ * this file is the one it lets through. A name is added here when a second
+ * module needs it, and removing or renaming one is a breaking change for
+ * them (docs/FRONTEND_MODULE_GUIDE.md, "Depending on another module").
+ */
+`;
+
 // The shell renders a module page's title: the page hands it over through
 // useModulePageHeader instead of drawing a heading of its own.
 const indexPageTsx = `import { useEffect } from "react";
@@ -209,6 +224,7 @@ const esJson = makeI18nJson({
 console.log(`\nGenerating frontend scaffold for module "${name}"...`);
 
 write("module.ts", moduleTs);
+write("moduleApi.ts", moduleApiTs);
 write("pages/IndexPage.tsx", indexPageTsx);
 touch("components/.gitkeep");
 touch("hooks/.gitkeep");

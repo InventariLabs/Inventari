@@ -13,7 +13,7 @@ make new-module
 # Enter a name, e.g.  warranty_tracker
 ```
 
-This creates `frontend/src/modules/warranty_tracker/` with boilerplate `module.ts`, `pages/IndexPage.tsx`, and i18n files.
+This creates `frontend/src/modules/warranty_tracker/` with boilerplate `module.ts`, `pages/IndexPage.tsx`, i18n files, and an empty `moduleApi.ts` — the one file other modules may import from yours ([Depending on another module](#depending-on-another-module-its-moduleapits)).
 
 ### 2. Write your page
 
@@ -168,7 +168,8 @@ module's files. Three ways in, in order of preference:
    ```
 
    Add a name to a module's `moduleApi.ts` when a second module needs it, never
-   to save a path. A module you depend on only optionally is reached through a
+   to save a path. `make new-module` writes the file empty, so the module's
+   first dependant finds the door rather than reaching past it. A module you depend on only optionally is reached through a
    slot, not through its `moduleApi.ts` — an import cannot be optional.
 3. **Your own screens.** Build what you need in your module, from `@/module-sdk`.
 
