@@ -400,6 +400,8 @@ shape from your module, in a `.d.ts` beside `module.ts`, and render it with
 
 ```typescript
 // warranty_tracker/slots.d.ts
+export {};
+
 declare module "@/lib/moduleRegistry/slotProps" {
   interface SlotDataMap {
     warranty_card_extra: { warrantyId: string };
@@ -410,6 +412,12 @@ declare module "@/lib/moduleRegistry/slotProps" {
 ```tsx
 <TypedSlot name="warranty_card_extra" data={{ warrantyId: warranty.id }} />
 ```
+
+Keep the `export {};` line: a file with no top-level import or export is a
+script, and TypeScript then reads the block as a declaration that *replaces*
+`slotProps` instead of merging into it — your slot is refused and the core
+slots disappear from every file that uses them. The type-check compiles this
+exact form (`slotAugmentation.fixture.d.ts`).
 
 This is the one specifier outside `@/module-sdk` the boundary check lets a module
 write, and only as that `declare module` line: TypeScript merges an interface
@@ -543,6 +551,16 @@ Start every key with your module's name, so a prefix invalidation
 nobody else's. Do not add a namespace to `hooks/queries/keys.ts`: it is Core's
 file, every module PR would edit it, and a test fails on a new top-level
 namespace there.
+
+---
+
+## Retiring one of your module's addresses
+
+`lib/legacyRedirects.tsx` is a table of addresses Core itself once answered (the
+inventory tree, the settings tabs). It is not where a module's own address goes
+when the module moves a page: mount the forwarding route in the module, as a
+`routes` entry whose `component` renders a `<Navigate>`. Core's table stays
+closed to modules on purpose, so no module PR edits it.
 
 ---
 

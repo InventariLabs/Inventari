@@ -95,7 +95,8 @@ const IndexPage = lazy(() => import("./pages/IndexPage"));
 // Everything this module adds to the app is declared here or in a file it
 // reaches: routes and nav below, a settings page as \`settingsSections\`, query
 // keys in a queryKeys.ts beside the hooks (never in Core's keys.ts), and
-// a slot of its own through a \`declare module\` in a slots.d.ts. Core's
+// a slot of its own through a \`declare module\` in a slots.d.ts (which
+// starts with \`export {};\`, or it replaces the slot map instead of merging). Core's
 // App.tsx, keys.ts and slotProps.ts are not edited — docs/FRONTEND_MODULE_GUIDE.md.
 moduleRegistry.register({
   name: "${name}",

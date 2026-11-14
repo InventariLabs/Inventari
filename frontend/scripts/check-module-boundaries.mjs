@@ -176,6 +176,7 @@ export const MODULE_SDK = "@/module-sdk";
  * The one other specifier a module may write: the declaration that adds its
  * own slot to `SlotDataMap`,
  *
+ *     export {};
  *     declare module "@/lib/moduleRegistry/slotProps" {
  *       interface SlotDataMap { my_slot: { … } }
  *     }

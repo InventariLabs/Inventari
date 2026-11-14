@@ -270,7 +270,7 @@ describe("check-module-boundaries", () => {
 
   it("lets a module declare its own slot, and only that, through the slot map", () => {
     const declaration =
-      'declare module "@/lib/moduleRegistry/slotProps" {\n  interface SlotDataMap { my_slot: { id: string } }\n}\n';
+      'export {};\ndeclare module "@/lib/moduleRegistry/slotProps" {\n  interface SlotDataMap { my_slot: { id: string } }\n}\n';
     expect(coreImports("notes/slots.d.ts", declaration)).toEqual([]);
     // An import of the same file is still Core internals.
     expect(
