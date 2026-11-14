@@ -299,14 +299,16 @@ class TestDeleteAttachment:
             return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
         )
         with pytest.raises(NotFoundException):
-            await delete_attachment(db, uuid4(), uuid4(), uuid4())
+            await delete_attachment(db, uuid4(), uuid4(), uuid4(), uuid4())
 
     @patch('app.modules.equipment.attachment_service.core_api')
     async def test_delete_drops_the_row_and_leaves_the_file_to_the_caller(
         self, mock_core: Any, journal: AsyncMock
     ) -> None:
+        item_id = uuid4()
         attachment = MagicMock()
         attachment.file_path = 'a/b.pdf'
+        attachment.item_id = item_id
         db = AsyncMock()
         db.execute = AsyncMock(
             return_value=MagicMock(
@@ -315,7 +317,8 @@ class TestDeleteAttachment:
         )
         mock_core.file_storage.delete_for_org_async = AsyncMock()
         mock_core.items.get_any_async = AsyncMock(return_value=None)
-        assert await delete_attachment(db, uuid4(), uuid4(), uuid4()) == 'a/b.pdf'
+        path = await delete_attachment(db, uuid4(), item_id, uuid4(), uuid4())
+        assert path == 'a/b.pdf'
         journal.assert_awaited_once()
         db.delete.assert_awaited_once_with(attachment)
         db.flush.assert_awaited_once()

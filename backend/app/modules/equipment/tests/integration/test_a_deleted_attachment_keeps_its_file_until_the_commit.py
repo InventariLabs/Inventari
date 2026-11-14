@@ -88,7 +88,7 @@ async def test_a_rollback_after_the_delete_keeps_both_the_row_and_the_file(
     assert stored is not None
 
     returned = await attachment_service.delete_attachment(
-        db, org_id, uploaded.id, user_id
+        db, org_id, item_id, uploaded.id, user_id
     )
     await db.rollback()
 
@@ -158,7 +158,9 @@ async def test_papers_filed_and_removed_leave_the_asset_a_journal_entry(
         'application/pdf',
         'WARRANTY',
     )
-    path = await attachment_service.delete_attachment(db, org_id, uploaded.id, user_id)
+    path = await attachment_service.delete_attachment(
+        db, org_id, item_id, uploaded.id, user_id
+    )
 
     rows = (
         await db.scalars(

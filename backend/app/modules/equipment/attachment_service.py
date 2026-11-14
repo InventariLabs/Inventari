@@ -179,9 +179,13 @@ async def list_attachments(
 
 
 async def delete_attachment(
-    db: AsyncSession, org_id: UUID, attachment_id: UUID, user_id: UUID
+    db: AsyncSession, org_id: UUID, item_id: UUID, attachment_id: UUID, user_id: UUID
 ) -> str:
     """Drop the attachment's row and return the path of its stored file.
+
+    Only the asset the attachment is filed under can remove it: under any
+    other asset id the attachment does not exist, and the refusal is the same
+    404 as for an id nobody ever issued.
 
     The journal entry goes in with the row: the file is about to be gone for
     good, and the entry is all that says the asset ever had it.
@@ -199,6 +203,8 @@ async def delete_attachment(
         resource='attachment',
         lang=get_current_lang(),
     )
+    if attachment.item_id != item_id:
+        raise NotFoundException('attachment', get_current_lang())
 
     file_path = attachment.file_path
     # An archived asset keeps its papers, so its papers can be removed too.
