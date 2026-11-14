@@ -34,7 +34,11 @@ says what the release does rather than what changed since them.
   `define_module(on_shutdown_async_hook=)` wires it. `app.core.module_sdk`
   exports `get_current_user`, `audit_actor_scope` and `current_actor` for a
   module that authenticates its own ASGI transport or names its actor in the
-  journal. `core_api.items.list_by_expiry_async` takes `expiry_after` and
+  journal, and `effective_expiry`, the day a package really stops being fit to
+  use — the batch's date or the use-by an opening wrote, whichever is earlier —
+  so a module reading an expiry window can judge a package by the date the
+  screens, the forecast and `GET /items/expiring` report.
+  `core_api.items.list_by_expiry_async` takes `expiry_after` and
   `expiry_before`, so a caller reading one expiry window filters the query
   instead of reading a capped list and discarding rows after it. The app-level
   default rate limit now keys a plain Starlette route as it does a FastAPI
