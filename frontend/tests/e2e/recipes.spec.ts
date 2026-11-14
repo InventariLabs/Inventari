@@ -585,7 +585,7 @@ test.describe("Recipes — meal planner (API)", () => {
   });
 
   test("POST /meal-plans/{id}/entries adds an entry", async () => {
-    if (!planId) return;
+    expect(planId, "planId set by an earlier step of this spec").toBeTruthy();
     const today = new Date().toISOString().split("T")[0];
     const entry = await api.addMealPlanEntry(token, planId, {
       date: today,

@@ -677,32 +677,23 @@ test.describe("Recipes — exploratory: recipe deletion from detail", () => {
     const heading = page.getByRole("heading", { name: recipeName, level: 1 });
     await expect(heading).toBeVisible({ timeout: 10000 });
 
-    const contentArea = heading.locator("../../../..");
-    const headerRow = contentArea.locator("> div").nth(1);
-    const deleteBtn = headerRow.getByRole("button", { name: "Delete" });
+    // Delete sits behind the header's "More actions" menu, not on the header.
+    await page.getByRole("button", { name: /more actions/i }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Delete" })
+      .click();
 
-    if (await deleteBtn.count()) {
-      await deleteBtn.click();
-      await page
-        .getByText(/cannot be undone/i)
-        .waitFor({ state: "visible", timeout: 2000 })
-        .catch(() => {});
-
-      const confirmText = page.getByText(/cannot be undone/i);
-      if (await confirmText.isVisible({ timeout: 2000 }).catch(() => false)) {
-        const delBtn = page
-          .getByRole("button", { name: /delete|confirm/i })
-          .last();
-        await delBtn.click();
-        await page
-          .getByText(/cannot be undone/i)
-          .waitFor({ state: "hidden", timeout: 10000 })
-          .catch(() => {});
-      }
-    } else {
-      await api.deleteRecipe(token, recipe.id).catch(() => {});
-      return;
-    }
+    await expect(page.getByText(/cannot be undone/i)).toBeVisible({
+      timeout: 5000,
+    });
+    await page
+      .getByRole("button", { name: /delete|confirm/i })
+      .last()
+      .click();
+    await expect(page.getByText(/cannot be undone/i)).toBeHidden({
+      timeout: 10000,
+    });
 
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })

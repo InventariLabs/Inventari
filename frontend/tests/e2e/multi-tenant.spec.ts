@@ -52,12 +52,15 @@ test.describe("Multi-tenant — data isolation between organizations", () => {
     const ctx = await playwright.request.newContext({ baseURL });
     const secondApi = new ApiHelper(ctx);
 
-    let tokenB: string;
+    let tokenB = "";
     try {
       const authB = await secondApi.login("user2@example.com", "user2password");
       tokenB = authB.access_token;
     } catch {
-      return;
+      // Nothing in the E2E seed creates a second organization, so the
+      // isolation check cannot run here: say so in the report instead of
+      // passing without looking.
+      test.skip(true, "no second-organization account exists in this stack");
     }
 
     const resp = await ctx.get("/api/v1/items", {
