@@ -30,6 +30,12 @@ says what the release does rather than what changed since them.
 - `core_api.audit_log.list_for_org_async` takes `count_up_to`, which stops the
   count one entry past it, the way `core_api.stock_moves.list_rows_for_org_async`
   already does.
+- `make new-module` writes an empty `moduleApi.ts` into the new frontend
+  module: the one file `check:boundaries` lets another module import from it,
+  so the first module that depends on it adds a name there instead of
+  importing the module's internals. The dead-code check reads every module's
+  `moduleApi.ts` as published surface, and no longer reports a name in it that
+  nothing in this repository imports.
 
 ### Fixed
 

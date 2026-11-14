@@ -4,7 +4,11 @@ import { mkdtempSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import * as prettier from "prettier";
-import { coreImports } from "./check-module-boundaries.mjs";
+import {
+  coreImports,
+  crossings,
+  MODULE_API_FILE,
+} from "./check-module-boundaries.mjs";
 
 const SCRIPT = join(import.meta.dirname, "generate_module.js");
 
@@ -41,11 +45,21 @@ describe("generate_module", () => {
 
   // knip fails check-frontend on a file nothing imports: the scaffold wrote a
   // types/index.ts holding only a comment. Every TypeScript file it writes is
-  // reached from module.ts, the file the shell discovers.
-  it("writes no TypeScript file that module.ts does not reach", () => {
+  // reached from a file knip.json names as an entry: module.ts, which the
+  // shell discovers, or moduleApi.ts, which other modules import.
+  it("writes no TypeScript file that knip cannot reach", () => {
+    const knip = readFileSync(
+      join(import.meta.dirname, "..", "knip.json"),
+      "utf8",
+    );
+    const entries = ["module.ts", `${MODULE_API_FILE}.ts`];
+    for (const entry of entries) {
+      expect(knip).toContain(`"src/modules/*/${entry}"`);
+    }
+
     const files = Object.fromEntries(generate("warranty_tracker"));
-    const reached = new Set(["module.ts"]);
-    const queue = ["module.ts"];
+    const reached = new Set(entries);
+    const queue = [...entries];
     while (queue.length > 0) {
       const from = queue.pop();
       for (const match of files[from].matchAll(
@@ -63,6 +77,31 @@ describe("generate_module", () => {
     }
     const typescript = Object.keys(files).filter((path) => /\.tsx?$/.test(path));
     expect(typescript.filter((path) => !reached.has(path))).toEqual([]);
+  });
+
+  // check:boundaries lets another module in through one file and counts any
+  // other path into the module as an edge. A module created without that file
+  // leaves its first dependant to work out where the door goes, and the
+  // nearest guess is the deep import the gate refuses.
+  it("writes the one file other modules may import it through", () => {
+    const files = Object.fromEntries(generate("warranty_tracker"));
+    const door = files[`${MODULE_API_FILE}.ts`];
+    expect(door).toBeDefined();
+
+    // Empty: a name goes in when a second module needs it.
+    expect(door).not.toMatch(/^export\b/m);
+
+    const modules = new Set(["purchase_orders", "warranty_tracker"]);
+    const into = (path) =>
+      crossings(
+        "purchase_orders/pages/X.tsx",
+        `import { a } from "@/modules/warranty_tracker/${path}";`,
+        modules,
+      );
+    expect(into(MODULE_API_FILE)).toEqual([]);
+    expect(into("pages/IndexPage")).toEqual([
+      "purchase_orders/pages/X.tsx → warranty_tracker",
+    ]);
   });
 
   // A scaffold the formatter rejects fails its author's first commit: the
