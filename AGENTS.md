@@ -114,12 +114,11 @@ writes it and the reviewer checks it.
 - **Test-Driven Development (TDD):** Tests are the specification. Write the failing test FIRST, implement the minimal code to pass, refactor only once green. The red–green loop runs **the test you are writing** — one file or a `-k <expr>`, seconds each — never the suite (see *The Mandatory Gate*).
 - **Commits are rollback points, not measurements**, so a commit has no test gate of its own (see *The Mandatory Gate*).
 - **The smallest change that does the job.** First ask whether the change needs to exist at all;
-  when it does not, say so in one sentence instead of building it. Then read the flow the change
-  touches end to end; reuse what the codebase already has before writing something new, and a
-  dependency already installed before adding one — a new dependency only when a few lines cannot
-  do the job; fix a defect in the shared function every caller goes through rather than at the one
-  call site a report names; and add no abstraction, option or file that has no second caller. This
-  never overrides the rules that keep data correct and the product usable: organization scoping,
+  if not, say so in one sentence instead of building it. Then read the flow it touches end to end;
+  reuse what the codebase has, and a dependency already installed (a new one only when a few lines
+  cannot do the job); fix a defect in the shared function every caller goes through, not at the one
+  call site a report names; add no abstraction, option or file without a second caller. This never
+  overrides the rules that keep data correct and the product usable: organization scoping,
   transaction ownership and the stock posting rules (`backend/AGENTS.md`), TDD and a test that
   fails without the fix, the five maintained languages, accessibility, and the coverage floors.
 
@@ -171,9 +170,9 @@ your branch does not touch is not a reason to run everything again: run that one
 if it fails the same way on `dev`, or its assertion depends on an order nothing guarantees, it is a
 defect of its own — report it in the branch rather than re-running the suite until it passes.
 
-- **Do not run ruff or prettier by hand.** The pre-commit hook runs them whole-tree on every commit
-  that stages Python or frontend sources (only `--no-verify` skips it, and then `make lint` /
-  `make check-frontend` are yours). `tsc` is yours because the hook does **not** cover it.
+- **Do not run ruff or prettier by hand** — the hook does (rule 6, "Pre-commit"; after
+  `--no-verify`, `make lint` / `make check-frontend` are yours). `tsc` is yours: the hook does
+  **not** cover it.
 
 **Do NOT push if the pre-push gate fails.** A green subset never licenses a push — a scoped run
 cannot see cross-module regressions. CI on `dev` reports only after the push has landed, so a
