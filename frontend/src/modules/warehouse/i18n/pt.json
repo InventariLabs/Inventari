@@ -964,6 +964,7 @@
         "notes": "Notas de texto livre registradas no documento",
         "lines": "As linhas, para {% for line in document.lines %} — cada uma traz name, quantity, done_quantity, uom e as colunas de valor"
       },
+      "documents": "Apenas lista de separação: as expedições da folha — número e o seu Code128 (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "Verdadeiro quando o documento é uma correção",
       "is_external": "Verdadeiro para documentos com parceiro (IN, PZ, OUT, WZ)",
       "is_external_in": "Verdadeiro para recebimentos (IN, PZ)",
@@ -979,12 +980,14 @@
         "address": "Endereço da organização emissora, com o nome do país localizado",
         "logo": "Logotipo da organização emissora (data URI incorporado)"
       },
+      "packages": "Apenas guia de embalagem: os volumes impressos, um por folha — number, count, code, code128_img, weight_kg e lines",
       "partner": {
         "name": "Nome do parceiro (fornecedor/cliente)",
         "code": "Código do parceiro",
         "tax_id": "Identificação fiscal do parceiro (CNPJ/VAT/NIP)",
         "address": "Endereço do parceiro, com o nome do país localizado"
       },
+      "pick_lines": "Apenas lista de separação: as linhas por ordem de percurso — shelf_code, shelf_name, quantity, unit, name, sku, lot e document_number",
       "print_dates": "Datas que valem a pena imprimir, como [{label, value}] — uma data que repete a de cima é omitida",
       "print_number": "O número do documento, como o cabeçalho compartilhado o imprime",
       "print_status": "Status localizado, como o cabeçalho compartilhado o imprime",
@@ -1000,6 +1003,7 @@
       "show_value_columns": "Verdadeiro quando as colunas de preço/valor são impressas",
       "source_location": "Nome do local de onde o estoque é retirado (vazio nos recebimentos)",
       "target_location": "Nome do local para onde o estoque vai (vazio nas expedições)",
+      "tax_by_rate": "Líquido, imposto e bruto agrupados por taxa de imposto — [{rate, net, tax, gross}], taxa mais alta primeiro; vazio quando não se imprime imposto",
       "total_done": "Soma das quantidades executadas em todas as linhas",
       "total_expected": "Soma das quantidades esperadas em todas as linhas",
       "totals_by_unit": "Totais de quantidade agrupados por unidade — [{symbol, expected, done}] — uma entrada por unidade; quantidades em unidades diferentes não têm soma comum, então um layout que imprime um total imprime estes"

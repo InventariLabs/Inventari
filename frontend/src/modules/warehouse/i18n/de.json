@@ -982,6 +982,7 @@
         "notes": "Freitext-Notizen zum Beleg",
         "lines": "Die Positionen, für {% for line in document.lines %} — jede hat name, quantity, done_quantity, uom und die Wertspalten"
       },
+      "documents": "Nur Pickliste: die Lieferungen auf dem Blatt — Nummer und ihr Code128 (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "Wahr, wenn der Beleg eine Korrektur ist",
       "is_external": "Wahr für Belege mit Geschäftspartner (IN, PZ, OUT, WZ)",
       "is_external_in": "Wahr für Wareneingänge (IN, PZ)",
@@ -997,12 +998,14 @@
         "address": "Adresse der ausstellenden Organisation, Ländername übersetzt",
         "logo": "Logo der ausstellenden Organisation (eingebettete Data-URI)"
       },
+      "packages": "Nur Packschein: die gedruckten Packstücke, je eines pro Blatt — number, count, code, code128_img, weight_kg und lines",
       "partner": {
         "name": "Name des Geschäftspartners (Lieferant/Kunde)",
         "code": "Code des Geschäftspartners",
         "tax_id": "Steuernummer des Geschäftspartners (USt-IdNr.)",
         "address": "Adresse des Geschäftspartners, Ländername übersetzt"
       },
+      "pick_lines": "Nur Pickliste: die Positionen in Laufreihenfolge — shelf_code, shelf_name, quantity, unit, name, sku, lot und document_number",
       "print_dates": "Druckenswerte Datumsangaben als [{label, value}] — eine, die die vorige wiederholt, entfällt",
       "print_number": "Die Belegnummer, wie der gemeinsame Kopf sie druckt",
       "print_status": "Übersetzter Status, wie der gemeinsame Kopf ihn druckt",
@@ -1018,6 +1021,7 @@
       "show_value_columns": "Wahr, wenn Preis-/Wertspalten gedruckt werden",
       "source_location": "Name des Quelllagerorts (leer bei Eingängen)",
       "target_location": "Name des Ziellagerorts (leer bei Ausgängen)",
+      "tax_by_rate": "Netto, Steuer und Brutto nach Steuersatz gruppiert — [{rate, net, tax, gross}], höchster Satz zuerst; leer, wenn keine Steuer gedruckt wird",
       "total_done": "Summe der erledigten Mengen aller Positionen",
       "total_expected": "Summe der erwarteten Mengen aller Positionen",
       "totals_by_unit": "Mengensummen je Einheit — [{symbol, expected, done}] — ein Eintrag pro Einheit; Mengen in verschiedenen Einheiten haben keine gemeinsame Summe, also druckt ein Layout mit Summe diese"

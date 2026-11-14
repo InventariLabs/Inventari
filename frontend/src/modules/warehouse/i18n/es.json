@@ -982,6 +982,7 @@
         "notes": "Notas libres registradas en el documento",
         "lines": "Las líneas, para {% for line in document.lines %} — cada una lleva name, quantity, done_quantity, uom y las columnas de valor"
       },
+      "documents": "Solo lista de picking: los envíos de la hoja — número y su Code128 (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "Verdadero cuando el documento es una corrección",
       "is_external": "Verdadero para documentos con un socio (IN, PZ, OUT, WZ)",
       "is_external_in": "Verdadero para recepciones (IN, PZ)",
@@ -997,12 +998,14 @@
         "address": "Dirección de la organización emisora, con el nombre del país traducido",
         "logo": "Logotipo de la organización emisora (data URI incrustada)"
       },
+      "packages": "Solo albarán de embalaje: los bultos impresos, uno por hoja — number, count, code, code128_img, weight_kg y lines",
       "partner": {
         "name": "Nombre del socio (proveedor/cliente)",
         "code": "Código del socio",
         "tax_id": "NIF del socio (número de IVA)",
         "address": "Dirección del socio, con el nombre del país traducido"
       },
+      "pick_lines": "Solo lista de picking: las líneas en orden de recorrido — shelf_code, shelf_name, quantity, unit, name, sku, lot y document_number",
       "print_dates": "Fechas que vale la pena imprimir, como [{label, value}] — se omite la que repite la anterior",
       "print_number": "El número del documento, tal como lo imprime la cabecera común",
       "print_status": "Estado traducido, tal como lo imprime la cabecera común",
@@ -1018,6 +1021,7 @@
       "show_value_columns": "Verdadero cuando se imprimen las columnas de precio/valor",
       "source_location": "Nombre de la ubicación de origen (vacío en las recepciones)",
       "target_location": "Nombre de la ubicación de destino (vacío en las salidas)",
+      "tax_by_rate": "Neto, impuesto y bruto agrupados por tipo impositivo — [{rate, net, tax, gross}], primero el tipo más alto; vacío si no se imprime impuesto",
       "total_done": "Suma de las cantidades realizadas en todas las líneas",
       "total_expected": "Suma de las cantidades esperadas en todas las líneas",
       "totals_by_unit": "Totales de cantidad por unidad — [{symbol, expected, done}] — una entrada por unidad; cantidades en unidades distintas no tienen suma común, así que un diseño que imprime un total imprime estos"

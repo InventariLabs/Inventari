@@ -1068,6 +1068,7 @@
         "notes": "Uwagi zapisane w dokumencie",
         "lines": "Pozycje, do {% for line in document.lines %} — każda ma name, quantity, done_quantity, uom i kolumny wartości"
       },
+      "documents": "Tylko lista kompletacyjna: wydania na arkuszu — numer i jego kod Code128 (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "Prawda, gdy dokument jest korektą",
       "is_external": "Prawda dla dokumentów z kontrahentem (IN, PZ, OUT, WZ)",
       "is_external_in": "Prawda dla przyjęć (IN, PZ)",
@@ -1083,12 +1084,14 @@
         "address": "Adres organizacji wystawiającej, nazwa kraju w języku wydruku",
         "logo": "Logo organizacji wystawiającej (osadzone jako data URI)"
       },
+      "packages": "Tylko list pakowy: drukowane paczki, po jednej na arkusz — number, count, code, code128_img, weight_kg i lines",
       "partner": {
         "name": "Nazwa kontrahenta (dostawcy lub odbiorcy)",
         "code": "Kod kontrahenta",
         "tax_id": "NIP kontrahenta (numer VAT/NIP)",
         "address": "Adres kontrahenta, nazwa kraju w języku wydruku"
       },
+      "pick_lines": "Tylko lista kompletacyjna: pozycje w kolejności obchodu — shelf_code, shelf_name, quantity, unit, name, sku, lot i document_number",
       "print_dates": "Daty warte wydruku, jako [{label, value}] — data powtarzająca poprzednią jest pomijana",
       "print_number": "Numer dokumentu, tak jak drukuje go wspólny nagłówek",
       "print_status": "Status w języku wydruku, tak jak drukuje go wspólny nagłówek",
@@ -1104,6 +1107,7 @@
       "show_value_columns": "Prawda, gdy drukowane są kolumny cen i wartości",
       "source_location": "Nazwa miejsca źródłowego (pusta przy przyjęciach)",
       "target_location": "Nazwa miejsca docelowego (pusta przy wydaniach)",
+      "tax_by_rate": "Netto, podatek i brutto pogrupowane według stawki podatku — [{rate, net, tax, gross}], od najwyższej stawki; puste, gdy podatek nie jest drukowany",
       "total_done": "Suma zrealizowanych ilości ze wszystkich pozycji",
       "total_expected": "Suma oczekiwanych ilości ze wszystkich pozycji",
       "totals_by_unit": "Sumy ilości według jednostki — [{symbol, expected, done}] — po jednej na jednostkę; ilości w różnych jednostkach nie mają wspólnej sumy, więc układ drukujący sumę drukuje te"
