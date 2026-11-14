@@ -2591,7 +2591,15 @@ def _create_documents_demo(
     equip_price = {t[0]: t[5] for t in EQUIPMENT_TEMPLATES}
     food = [t for t, _cat in food_templates][:8]
     equip = [t for t, _cat in equip_templates][:2]
-    leaves = _get_food_leaf_locations(locations)
+    # Exact shelves only: a place with shelves under it is a zone, and a
+    # dispatch from a zone is split over whichever shelves below hold the
+    # product, in removal order. That put the walk's lines wherever random
+    # placement left the older stock instead of on the stands the receipts
+    # filled.
+    parents = {loc.parent_id for loc in locations.values()}
+    leaves = [
+        loc for loc in _get_food_leaf_locations(locations) if loc.id not in parents
+    ]
     equip_leaves = _get_equip_leaf_locations(locations)
     if len(leaves) < 2 or not food or not equip or not partners:
         return 0, []
