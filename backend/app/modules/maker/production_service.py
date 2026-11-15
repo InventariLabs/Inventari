@@ -921,13 +921,16 @@ async def _receive_output(
     run_day: date,
     best_before: date | None,
     lot_name: str | None = None,
+    cost_comes_at_the_finish: bool = False,
 ) -> tuple[UUID, UUID | None]:
     """Put the produced goods on the shelf (output = actual), in their batch.
 
     *lot_name* names the batch of a portion of a run that is filled in parts;
     without it the run's own batch applies. *run_day* is the day the goods
     came out. Answers the record the goods were put on and the cost layer
-    they opened.
+    they opened. *cost_comes_at_the_finish* is for a portion: when nothing it
+    was made of carried a price, its layer is posted as not yet known instead
+    of at the rate of the product's older stock, and the finish states it.
     """
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
@@ -1031,6 +1034,7 @@ async def _receive_output(
         product_template_id=order.output_template_id,
         quantity=actual_qty,
         unit_cost=unit_cost if unit_cost > 0 else None,
+        unpriced_stays_unknown=cost_comes_at_the_finish,
     )
     return produced_item.id, layer_id
 
@@ -1461,7 +1465,10 @@ async def record_portion(
     Bottling part of a vat is output: it is on the shelf from that day, with
     its own batch, while the run stays open. A portion is booked at what the
     ingredients cost per unit planned; the run's overheads and the rest of its
-    cost arrive with the closing quantity (:func:`finish_production`).
+    cost arrive with the closing quantity (:func:`finish_production`). A
+    portion of ingredients nobody priced reads as not yet known until then,
+    never at the rate of the older stock of the same product: the finish puts
+    the run's cost on it, and a borrowed rate would sit under that cost.
     """
     order = await _lock_order(
         db,
@@ -1505,6 +1512,7 @@ async def record_portion(
             db, organization_id, order.output_template_id, day, None
         ),
         lot_name=lot_name,
+        cost_comes_at_the_finish=True,
     )
     portion = ProductionPortion(
         organization_id=organization_id,

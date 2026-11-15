@@ -197,6 +197,7 @@ class ValuationService:
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
+        unpriced_stays_unknown: bool = False,
     ) -> StockValuationLayer | None:
         """Async: record receipt by template_id (Public API helper).
 
@@ -221,6 +222,7 @@ class ValuationService:
             document_date,
             reverses_line_id=reverses_line_id,
             extra_unit_cost=extra_unit_cost,
+            unpriced_stays_unknown=unpriced_stays_unknown,
         )
 
     @staticmethod
@@ -268,6 +270,7 @@ class ValuationService:
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
+        unpriced_stays_unknown: bool = False,
     ) -> StockValuationLayer | None:
         """Post a receipt layer. ``unit_cost=None`` means nobody named a price.
 
@@ -280,6 +283,12 @@ class ValuationService:
         still posted, marked ``unknown``: the quantity is real even where the
         value is not known, and "unknown" is an answer a report can act on
         where "0.00" is not.
+
+        *unpriced_stays_unknown* is for a caller that will state the cost
+        itself later (a revaluation of this layer): the layer is then posted
+        ``unknown`` whatever the rate of the older stock is, because that rate
+        is not what these goods cost and a cost added on top of it would
+        double-count.
 
         *extra_unit_cost* is the line's share of the freight, duty and
         insurance the delivery arrived with, per unit. It rides on whatever
@@ -323,8 +332,12 @@ class ValuationService:
             # fallback rate is the organization's own, kept in its own money,
             # whatever currency the document happened to be written in.
             currency = None
-            unit_cost = await ValuationService._avco_rate_async(
-                db, template, organization_id
+            unit_cost = (
+                None
+                if unpriced_stays_unknown
+                else await ValuationService._avco_rate_async(
+                    db, template, organization_id
+                )
             )
             if unit_cost is None:
                 unit_cost = Decimal('0')

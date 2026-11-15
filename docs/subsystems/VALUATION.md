@@ -112,7 +112,7 @@ on the receipt's layer with `core_api.valuation.add_value_to_layer_async`.
 *amount* is for the whole receipt; the units already drained left at the cost
 they had, so only the units still on the layer carry their share. A layer takes
 such a cost once (a second call places nothing), and a layer nobody priced
-(`unknown`) that takes one has a `stated` cost from then on.
+(`unknown`) that takes one has a `stated` cost from then on. A receipt that will be given its cost this way is posted with `unpriced_stays_unknown` on `record_receipt_async`: with no price it is `unknown` instead of taking the rate of the product's older stock, which the added cost would otherwise sit on top of.
 
 The layer reads what it is worth now, which is what the stock value, the
 rates and the next drain need. A report about an earlier instant must not read

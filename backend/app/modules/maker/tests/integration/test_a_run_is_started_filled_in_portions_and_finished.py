@@ -735,6 +735,47 @@ def test_a_run_of_unpriced_ingredients_with_a_fixed_cost_reads_alike_everywhere(
     assert winery.worth_on(before_the_finish) == Decimal('0.00')
 
 
+def test_unpriced_portions_do_not_borrow_the_rate_of_the_older_stock_of_the_output(
+    winery: _Winery,
+) -> None:
+    # Garden grapes nobody priced, and two bottles of last year's wine on the
+    # shelf at 5.00. The portions carry no cost of their own, so they must not
+    # be valued at the rate of those older bottles: the finish would then add
+    # the run's cost on top of a cost it never had. What the run cost -- the
+    # corks, 1.00 -- is what ends up on its two bottles, as a one-step
+    # completion posts it.
+    shelf_id = winery.db.scalar(
+        select(Item.location_id).where(Item.template_id == winery.grapes.id)
+    )
+    assert shelf_id is not None
+    winery.sell(winery.grapes, '10')
+    post_on_shelf(winery.client, winery.headers, winery.grapes, shelf_id, 10)
+    post_on_shelf(
+        winery.client,
+        winery.headers,
+        winery.wine,
+        winery.cellar.id,
+        2,
+        purchase_price='5.00',
+    )
+    winery.add_fixed_cost('Corks', '0.50')
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W2'})
+    # Between the portions and the finish nobody can say what they cost.
+    assert winery.stock_value() == 10.0
+
+    finished = winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert Decimal(str(done['total_cost'])) == Decimal('1.00')
+    assert Decimal(str(done['unit_cost_snapshot'])) == Decimal('0.50')
+    assert winery.stock_value() == 11.0
+    assert winery.worth_on(datetime.now(UTC)) == Decimal('11.00')
+
+
 def test_a_run_whose_portions_share_a_batch_is_taken_back(winery: _Winery) -> None:
     # Portions nobody named a batch for all go into the run's own: taking the
     # first off the shelf must not read as stock having left the batch the

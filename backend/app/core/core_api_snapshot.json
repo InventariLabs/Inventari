@@ -7721,6 +7721,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "extra_unit_cost",
               "required": false
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "unpriced_stays_unknown",
+              "required": false
             }
           ]
         },

@@ -102,6 +102,65 @@ class TestCoreValuationReceiptContract:
         )
         assert isinstance(result, UUID)
 
+    async def test_an_unpriced_receipt_takes_the_rate_unless_it_stays_unknown(
+        self, real_async_db_session: AsyncSession, async_test_household
+    ):
+        """A receipt nobody priced borrows the product's rate, or waits unpriced.
+
+        The default is the rate of what is on hand. A caller that will state the
+        cost itself asks for ``unpriced_stays_unknown``, and the layer is then
+        posted unknown whatever the older stock is worth.
+        """
+        from sqlalchemy import select
+
+        from app.models.stock_valuation_layer import StockValuationLayer
+
+        template = await real_async_db_session.run_sync(
+            lambda db: _make_valuation_template(db, async_test_household.id)
+        )
+        await core_api.valuation.record_receipt_async(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            quantity=Decimal('2'),
+            unit_cost=Decimal('5.50'),
+        )
+
+        borrowed = await core_api.valuation.record_receipt_async(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            quantity=Decimal('1'),
+            unit_cost=None,
+        )
+        waiting = await core_api.valuation.record_receipt_async(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            quantity=Decimal('1'),
+            unit_cost=None,
+            unpriced_stays_unknown=True,
+        )
+
+        layers = {
+            layer.id: layer
+            for layer in (
+                await real_async_db_session.scalars(
+                    select(StockValuationLayer).where(
+                        StockValuationLayer.id.in_([borrowed, waiting])
+                    )
+                )
+            )
+        }
+        assert (layers[borrowed].cost_basis, layers[borrowed].total_value) == (
+            'average',
+            Decimal('5.50'),
+        )
+        assert (layers[waiting].cost_basis, layers[waiting].total_value) == (
+            'unknown',
+            Decimal('0.00'),
+        )
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio

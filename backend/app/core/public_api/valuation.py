@@ -70,6 +70,7 @@ class CoreValuationAPI:
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
+        unpriced_stays_unknown: bool = False,
     ) -> UUID | None:
         """Record a receipt into the cost history; answers the layer it opened.
 
@@ -98,6 +99,12 @@ class CoreValuationAPI:
         and insurance. It is added to the cost the line has - the stated price,
         or the organization's rate where nobody stated one - and never turns
         an unpriced line into a stated one.
+
+        Pass ``unpriced_stays_unknown`` where ``unit_cost=None`` should not
+        borrow the organization's rate for the product: the layer is posted
+        ``unknown`` and waits for the caller to state its cost
+        (``add_value_to_layer_async``) — the portion of a production run that
+        is filled before the run's cost is known.
         """
         from app.services.valuation_service import ValuationService
 
@@ -112,6 +119,7 @@ class CoreValuationAPI:
             document_date=document_date,
             reverses_line_id=reverses_line_id,
             extra_unit_cost=extra_unit_cost,
+            unpriced_stays_unknown=unpriced_stays_unknown,
         )
         return layer.id if layer is not None else None
 
