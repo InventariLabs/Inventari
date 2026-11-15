@@ -23,6 +23,7 @@ function renderEditor(
         templateId="tpl-lye"
         unit="kg"
         price={null}
+        inUse
         canManage
         {...props}
       />
@@ -65,6 +66,19 @@ describe("IngredientPriceEditor", () => {
     const figure = screen.getByTestId("maker-ingredient-typed-price");
     expect(figure.textContent).toContain("8.25");
     expect(figure.textContent).toContain("/ kg");
+    expect(
+      screen.queryByTestId("maker-ingredient-typed-price-unused"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("says when the typed price is not the one the estimate uses", () => {
+    // The layer and the supplier quote answer first, so a typed price can sit
+    // on a product while another number prices the line. Shown plainly, the
+    // card read as if the typed price were the cost.
+    renderEditor({ price: "8.25", inUse: false });
+    expect(
+      screen.getByTestId("maker-ingredient-typed-price-unused"),
+    ).toHaveTextContent(/stock cost or supplier price/i);
   });
 
   it("clears the price instead of leaving a stale number behind", async () => {

@@ -6,21 +6,23 @@ or shrank kept quoting the same labour — and a run never showed what the
 work cost. The rate is the organization's; the time is each step's.
 """
 
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
+from app.modules.maker.models import MakerRecipe
 from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
 
 def _template(db: Session, org: Organization, name: str) -> ProductTemplate:
-    import uuid
-
     template = ProductTemplate(
         organization_id=org.id, name=name, sku=f'SKU-{uuid.uuid4().hex[:8]}'
     )
@@ -218,6 +220,51 @@ def test_a_step_saved_as_a_bare_sentence_still_reads(
         {'text': 'Pour', 'minutes': None},
     ]
     assert body['labour_cost'] == '0'
+
+
+def test_a_step_stored_before_durations_still_reads(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_org: Organization,
+    db_session: Session,
+) -> None:
+    """A formula saved before this branch opens instead of failing to read.
+
+    The write path above normalises as it saves, so it cannot stand in for
+    the rows already in a released database: those hold bare sentences and
+    were never rewritten by that path. The row is written straight in the
+    old shape, as a released install has it, and both the formula and the
+    catalogue must read it.
+    """
+    output = _template(db_session, mk_org, 'Salve')
+    recipe = client.post(
+        '/api/v1/maker/recipes',
+        headers=mk_auth_headers,
+        json={
+            'output_template_id': str(output.id),
+            'name': 'Salve from before',
+            'process_steps': [{'text': 'Melt', 'minutes': '15'}],
+        },
+    )
+    assert recipe.status_code == 201, recipe.text
+    recipe_id = recipe.json()['id']
+    db_session.execute(
+        update(MakerRecipe)
+        .where(MakerRecipe.id == uuid.UUID(recipe_id))
+        .values(process_steps=['Melt the wax', '', 'Pour'])
+    )
+    db_session.commit()
+
+    detail = client.get(f'/api/v1/maker/recipes/{recipe_id}', headers=mk_auth_headers)
+    assert detail.status_code == 200, detail.text
+    assert detail.json()['process_steps'] == [
+        {'text': 'Melt the wax', 'minutes': None},
+        {'text': 'Pour', 'minutes': None},
+    ]
+
+    catalogue = client.get('/api/v1/maker/recipes', headers=mk_auth_headers)
+    assert catalogue.status_code == 200, catalogue.text
+    assert recipe_id in [item['id'] for item in catalogue.json()['items']]
 
 
 def test_the_preview_prices_the_labour_before_anything_is_saved(

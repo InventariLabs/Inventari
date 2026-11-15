@@ -194,7 +194,12 @@ describe("MakerSettingsPanel", () => {
 });
 
 describe("MakerSettingsPanel — the rate the timed steps cost", () => {
-  it("saves the hourly rate for own work", async () => {
+  it("keeps the rate out of the Advanced shortage rules and saves it on leaving the field", async () => {
+    // The rate prices every formula, so it is not a shortage rule; it sat in
+    // the collapsed Advanced section, which sent a reader with timed steps
+    // and a zero rate looking for it in the wrong place. It also had a Save
+    // of its own beside controls that save as they are used — two save
+    // models on one page. It now saves when the field is left.
     signInWith(["maker:read", "maker:write", "maker:manage"]);
     let sent: Record<string, unknown> | null = null;
     server.use(
@@ -211,13 +216,14 @@ describe("MakerSettingsPanel — the rate the timed steps cost", () => {
     );
     renderPanel();
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: /advanced/i, expanded: false }),
-    );
-    fireEvent.change(await screen.findByTestId("maker-settings-labor-rate"), {
-      target: { value: "30" },
-    });
-    fireEvent.click(screen.getByTestId("maker-settings-labor-rate-save"));
+    const rate = await screen.findByTestId("maker-settings-labor-rate");
+    expect(rate).toBeVisible();
+    expect(
+      screen.queryByTestId("maker-settings-labor-rate-save"),
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(rate, { target: { value: "30" } });
+    fireEvent.blur(rate);
 
     await waitFor(() => expect(sent).toEqual({ labor_hourly_rate: "30" }));
   });

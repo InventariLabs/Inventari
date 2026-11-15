@@ -435,12 +435,6 @@ async def get_recipe(
     typed_prices = await typed_rates_async(
         db, org_id, [line.child_template_id for line in lines]
     )
-    line_reads = [
-        BoMLineRead.model_validate(line).model_copy(
-            update={'typed_unit_price': typed_prices.get(line.child_template_id)}
-        )
-        for line in lines
-    ]
 
     # Cheap cost estimate per unit of output (None without a BOM). The
     # batch's own fixed lines and the time its steps take belong in it: a
@@ -450,8 +444,9 @@ async def get_recipe(
     settings = await recipe_service.get_settings(db, org_id)
     labour_cost = cost_rollup.labour_cost_per_batch(recipe, settings.labor_hourly_rate)
     estimated_unit_cost = None
+    material = None
     if lines:
-        material_cost = await cost_rollup.compute_total_cost(
+        material = await cost_rollup.compute_cost_rollup(
             db,
             org_id,
             recipe.output_template_id,
@@ -459,10 +454,26 @@ async def get_recipe(
             recipe_id=recipe.id,
         )
         batch_total = (
-            material_cost + cost_rollup.fixed_cost_per_batch(recipe) + labour_cost
+            material.total + cost_rollup.fixed_cost_per_batch(recipe) + labour_cost
         )
         if recipe.batch_yield_qty > 0:
             estimated_unit_cost = batch_total / recipe.batch_yield_qty
+
+    line_reads = [
+        BoMLineRead.model_validate(line).model_copy(
+            update={
+                'typed_unit_price': typed_prices.get(line.child_template_id),
+                # The estimate asks the layers and a supplier quote first;
+                # only the last answer is the typed price. The card says so
+                # rather than showing a price that was not the one used.
+                'typed_unit_price_in_use': (
+                    material is not None
+                    and material.sources.get(line.child_template_id) == 'typed'
+                ),
+            }
+        )
+        for line in lines
+    ]
 
     data = {
         k: v

@@ -434,16 +434,6 @@ const dist = join(root, "dist");
  * That one phone budget moves a step of five, to 620; the other screens stand
  * under theirs (login 396.3, launcher 411.4, start 627.5, receive 463.9,
  * issue 576.6, history 600.5, app first paint 391.5, initial 189.4).
-
- * Re-measured 2026-11-15 on the branch that costs a new production formula
- * on the day it is written: its copy (the typed ingredient price, the step
- * durations, the computed labour line, the estimate beside a run's actual
- * cost and the shortage notice with its two answers) lands in the language
- * chunk every first paint loads. The screen it was measured on is products
- * (615.8 against its 615), because that chunk is part of its first paint;
- * the other screens stand under their ceilings (login 396.6, launcher
- * 411.7, start 627.9, receive 464.3, issue 577.0, history 600.9). That one
- * phone budget moves one step of five, to 620.
  */
 const BUDGETS = {
   initial: 245,

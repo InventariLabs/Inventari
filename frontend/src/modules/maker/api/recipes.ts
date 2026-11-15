@@ -11,6 +11,7 @@ import type {
   RecipeCostLineUpdate,
   RecipeCreateInput,
   RecipeUpdate,
+  ShortagePurchaseOrderResponse,
 } from "@/modules/maker/types/maker";
 
 export interface BomLineUpdate {
@@ -168,16 +169,10 @@ export const recipeApi = {
   /** Raise a draft purchase order for one batch's missing ingredients. */
   orderShortages: async (
     recipeId: string,
-  ): Promise<{
-    purchase_order_id: string | null;
-    number: string | null;
-    added_count: number;
-  }> => {
-    const response = await api.post<{
-      purchase_order_id: string | null;
-      number: string | null;
-      added_count: number;
-    }>(`/maker/recipes/${recipeId}/shortages/purchase-order`);
+  ): Promise<ShortagePurchaseOrderResponse> => {
+    const response = await api.post<ShortagePurchaseOrderResponse>(
+      `/maker/recipes/${recipeId}/shortages/purchase-order`,
+    );
     return response.data;
   },
 

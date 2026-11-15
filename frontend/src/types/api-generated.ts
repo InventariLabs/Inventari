@@ -12272,6 +12272,11 @@ export interface components {
             child_template_image_url?: string | null;
             /** Typed Unit Price */
             typed_unit_price?: string | null;
+            /**
+             * Typed Unit Price In Use
+             * @default false
+             */
+            typed_unit_price_in_use: boolean;
         };
         /**
          * BoMLineUpdate
@@ -24781,7 +24786,8 @@ export interface components {
          * ShortagePurchaseOrderResponse
          * @description Output for POST /recipes/{id}/shortages/purchase-order.
          *
-         *     None when the batch is covered: nothing is ordered then, and no empty
+         *     None when the batch is covered, or when an open order already expects
+         *     what is short: nothing is ordered then, and no empty or duplicate
          *     document is left behind for somebody to cancel.
          */
         ShortagePurchaseOrderResponse: {
@@ -24794,6 +24800,11 @@ export interface components {
              * @default 0
              */
             added_count: number;
+            /**
+             * Already Ordered Count
+             * @default 0
+             */
+            already_ordered_count: number;
         };
         /**
          * ShortageShoppingListResponse

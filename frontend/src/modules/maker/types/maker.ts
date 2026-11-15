@@ -85,6 +85,9 @@ export type RecipeCatalogItem = components["schemas"]["RecipeCatalogItem"];
 export type RecipeCatalogResponse =
   components["schemas"]["RecipeCatalogResponse"];
 
+export type ShortagePurchaseOrderResponse =
+  components["schemas"]["ShortagePurchaseOrderResponse"];
+
 export type MakerSettings = components["schemas"]["MakerSettingsRead"];
 export type ReferenceDirection = MakerSettings["reference_direction"];
 export type AvailabilityCheckScope = MakerSettings["availability_check_scope"];

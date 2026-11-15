@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { act, render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { CostLinesEditor } from "./CostLinesEditor";
 import type { RecipeCostLine } from "@/modules/maker/types/maker";
 
@@ -36,8 +37,14 @@ const lines: RecipeCostLine[] = [
   },
 ];
 
-function renderEditor() {
-  render(<CostLinesEditor recipeId="r-1" lines={lines} />);
+function renderEditor(
+  props: Partial<React.ComponentProps<typeof CostLinesEditor>> = {},
+) {
+  render(
+    <MemoryRouter>
+      <CostLinesEditor recipeId="r-1" lines={lines} {...props} />
+    </MemoryRouter>,
+  );
 }
 
 describe("CostLinesEditor", () => {
@@ -157,7 +164,7 @@ describe("CostLinesEditor", () => {
   });
 
   it("does not print the amount twice when a single line is the whole sum", () => {
-    render(<CostLinesEditor recipeId="r-1" lines={lines.slice(0, 1)} />);
+    renderEditor({ lines: lines.slice(0, 1) });
 
     expect(screen.getAllByText("PLN 12.50")).toHaveLength(1);
   });
@@ -165,7 +172,7 @@ describe("CostLinesEditor", () => {
   it("offers no total while no line exists — the caption says that instead", () => {
     // A 0.00 over "No fixed costs set" would read as a fact about costs;
     // the caption alone is the answer an empty section gives.
-    render(<CostLinesEditor recipeId="r-1" lines={[]} />);
+    renderEditor({ lines: [] });
 
     expect(screen.getByText("No fixed costs set")).toBeInTheDocument();
     expect(screen.queryByText(/PLN 0[.,]00/)).toBeNull();
@@ -174,14 +181,7 @@ describe("CostLinesEditor", () => {
 
 describe("CostLinesEditor — the computed labour line", () => {
   it("shows the batch's labour from the timed steps beside the fixed lines", () => {
-    render(
-      <CostLinesEditor
-        recipeId="r-1"
-        lines={lines}
-        labourCost="22.50"
-        labourMinutes={45}
-      />,
-    );
+    renderEditor({ labourCost: "22.50", labourMinutes: 45 });
     const row = screen.getByTestId("maker-computed-labour");
     expect(row.textContent).toContain("Labour from the process steps");
     expect(row.textContent).toContain("45 min");
@@ -190,9 +190,21 @@ describe("CostLinesEditor — the computed labour line", () => {
   });
 
   it("leaves the row out when no step was timed, instead of claiming free labour", () => {
-    render(<CostLinesEditor recipeId="r-1" lines={lines} labourCost="0" />);
+    renderEditor({ labourCost: "0" });
     expect(
       screen.queryByTestId("maker-computed-labour"),
     ).not.toBeInTheDocument();
+  });
+
+  it("points at the hourly rate when the steps are timed but nothing prices them", () => {
+    // At a zero rate the line is absent, which read as "this formula has no
+    // labour" — the rate was two screens away under Advanced.
+    renderEditor({ labourCost: "0", labourMinutes: 45 });
+    const hint = screen.getByTestId("maker-labour-rate-hint");
+    expect(hint).toHaveTextContent(/45 min/);
+    expect(hint).toHaveTextContent(/hourly rate/i);
+    expect(
+      screen.getByRole("link", { name: /production settings/i }),
+    ).toHaveAttribute("href", "/maker/settings");
   });
 });

@@ -35,6 +35,11 @@ class BoMLineRead(BaseModel):
     # estimate asks last; the line carries it so the formula's own screen can
     # show it and offer to set it.
     typed_unit_price: Decimal | None = None
+    #: Whether the estimate actually used that price. The cost layers and a
+    #: supplier quote answer first, so a typed price can sit on a product
+    #: while the line is costed by something else — and a card that showed it
+    #: plainly beside a different figure read as if it were in use.
+    typed_unit_price_in_use: bool = False
 
 
 class BoMTemplateIdsResponse(BaseModel):

@@ -286,6 +286,7 @@ export function CompositionTab({ recipe }: CompositionTabProps) {
                           templateId={line.child_template_id}
                           unit={line.unit}
                           price={line.typed_unit_price ?? null}
+                          inUse={line.typed_unit_price_in_use ?? false}
                           canManage={canManage}
                         />
                       </div>

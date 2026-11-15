@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
@@ -190,6 +191,24 @@ export function CostLinesEditor({
             </div>
           </div>
         )}
+
+      {/* Timed steps but no labour line: the rate is zero or unset, and the
+          line's absence used to read as "this formula has no labour". Say
+          where the rate lives instead of leaving the reader to guess. */}
+      {(labourMinutes ?? 0) > 0 && !(Number(labourCost) > 0) && (
+        <p
+          className="text-xs text-on-muted"
+          data-testid="maker-labour-rate-hint"
+        >
+          {t("detail.cost.labourRateMissing", { minutes: labourMinutes ?? 0 })}{" "}
+          <Link
+            to="/maker/settings"
+            className="text-accent-600 hover:underline"
+          >
+            {t("detail.cost.labourRateLink")}
+          </Link>
+        </p>
+      )}
 
       {lines.length === 0 && draft === null && !(Number(labourCost) > 0) ? (
         <p className="text-sm text-on-muted">{t("detail.cost.noFixed")}</p>

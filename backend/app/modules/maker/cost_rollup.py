@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from uuid import UUID
 
@@ -29,6 +29,10 @@ class CostRollup:
     total: Decimal
     ingredient_count: int
     unrated_count: int
+    #: Which answer priced each ingredient — 'layers', 'supplier', 'typed' or
+    #: 'unknown'. A caller showing a fallback price needs to know whether the
+    #: estimate actually reached it.
+    sources: dict[UUID, str] = field(default_factory=dict)
 
 
 async def compute_cost_rollup(
@@ -89,13 +93,20 @@ def _rollup_from_flat(
 ) -> CostRollup:
     total = Decimal('0')
     unrated = 0
+    sources: dict[UUID, str] = {}
     for child_id, child_qty, _unit in flat:
-        rate = rates.get(child_id, UnitCostEstimate()).unit_cost
-        if rate is None:
+        estimate = rates.get(child_id, UnitCostEstimate())
+        sources[child_id] = estimate.source
+        if estimate.unit_cost is None:
             unrated += 1
         else:
-            total += rate * child_qty
-    return CostRollup(total=total, ingredient_count=len(flat), unrated_count=unrated)
+            total += estimate.unit_cost * child_qty
+    return CostRollup(
+        total=total,
+        ingredient_count=len(flat),
+        unrated_count=unrated,
+        sources=sources,
+    )
 
 
 async def compute_total_cost(

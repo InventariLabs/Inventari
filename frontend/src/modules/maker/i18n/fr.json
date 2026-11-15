@@ -290,7 +290,9 @@
         "description": "Retirer « {{label}} » des coûts fixes ?"
       },
       "labourFromSteps": "Main-d'œuvre issue des étapes",
-      "labourTime": "{{minutes}} min au taux horaire"
+      "labourTime": "{{minutes}} min au taux horaire",
+      "labourRateMissing": "Les étapes durent {{minutes}} min. Réglez le taux horaire dans les réglages de production pour valoriser ce temps.",
+      "labourRateLink": "Réglages de production"
     },
     "history": {
       "title": "Historique de production",
@@ -378,6 +380,7 @@
       "yieldInvalid": "La quantité que donne la formule doit être supérieure à zéro."
     },
     "typedPrice": "Prix saisi",
+    "typedPriceUnused": "non utilisée — le coût du stock ou le prix fournisseur passe d’abord",
     "typedPriceHint": "Utilisé quand il n'y a ni coût de stock ni prix fournisseur. Enregistré sur le produit, donc chaque formule qui l'utilise le compte pareil.",
     "setPrice": "Définir le prix",
     "editPrice": "Modifier le prix",
@@ -569,6 +572,7 @@
     "addStock": "Ajouter le stock",
     "order": "Commander le manquant",
     "nothingToOrder": "Tout est en stock — rien à commander.",
+    "alreadyOrdered": "Tout ce qui manque figure déjà sur une commande d’achat ouverte — rien de nouveau n’a été commandé.",
     "ordered": "Brouillon de commande {{number}} créé avec {{lines}} lignes.",
     "orderFailed": "Impossible de créer la commande",
     "addStockTitle": "Ajouter le stock que vous avez",
@@ -583,6 +587,7 @@
     "addStockSave": "Ajouter le stock ({{saved}})",
     "stockSaved": "Stock enregistré.",
     "stockSaveFailed": "Impossible d'enregistrer le stock.",
+    "stockSavePartial": "{{saved}} sur {{total}} enregistrés. Le reste est encore dans la feuille.",
     "locationsFailed": "Impossible de charger les emplacements"
   }
 }

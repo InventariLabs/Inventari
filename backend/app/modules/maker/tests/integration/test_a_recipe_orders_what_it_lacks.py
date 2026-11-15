@@ -160,3 +160,81 @@ def test_a_batch_the_records_cover_orders_nothing(
     assert response.json()['purchase_order_id'] is None
     assert response.json()['added_count'] == 0
     assert db_session.execute(select(PurchaseOrder)).scalars().all() == []
+
+
+def test_a_second_click_does_not_order_the_same_shortage_again(
+    client: TestClient,
+    headers: dict[str, str],
+    org: Organization,
+    db_session: Session,
+) -> None:
+    """An open order is what the next click remembers.
+
+    Neither click moves stock, so the same shortage is computed both times
+    and the second used to raise an identical draft. The quantity an open
+    order already expects comes off the shortfall, so the second click
+    orders nothing and says the ingredient is already on its way.
+    """
+    lye, recipe_id = _soap_recipe(client, headers, db_session, org)
+
+    first = client.post(
+        f'/api/v1/maker/recipes/{recipe_id}/shortages/purchase-order',
+        headers=headers,
+    )
+    assert first.status_code == 200, first.text
+    assert first.json()['purchase_order_id'] is not None
+    assert first.json()['already_ordered_count'] == 0
+
+    second = client.post(
+        f'/api/v1/maker/recipes/{recipe_id}/shortages/purchase-order',
+        headers=headers,
+    )
+    assert second.status_code == 200, second.text
+    assert second.json()['purchase_order_id'] is None
+    assert second.json()['added_count'] == 0
+    assert second.json()['already_ordered_count'] == 1
+    assert len(db_session.execute(select(PurchaseOrder)).scalars().all()) == 1
+
+
+def test_an_open_order_covers_only_what_it_expects(
+    client: TestClient,
+    headers: dict[str, str],
+    org: Organization,
+    db_session: Session,
+) -> None:
+    """A partial open order leaves the rest to be ordered, not duplicated.
+
+    The batch needs 1.5 kg and an open draft expects 1 kg of it: the click
+    orders the missing half kilogram, and the line it does not re-raise
+    stays a single line.
+    """
+    lye, recipe_id = _soap_recipe(client, headers, db_session, org)
+    partial = client.post(
+        '/api/v1/purchase-orders',
+        headers=headers,
+        json={
+            'lines': [
+                {
+                    'product_template_id': str(lye.id),
+                    'name': lye.name,
+                    'quantity_ordered': '1',
+                }
+            ]
+        },
+    )
+    assert partial.status_code == 201, partial.text
+
+    response = client.post(
+        f'/api/v1/maker/recipes/{recipe_id}/shortages/purchase-order',
+        headers=headers,
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body['purchase_order_id'] is not None
+    assert body['added_count'] == 1
+    assert body['already_ordered_count'] == 0
+
+    order = db_session.execute(
+        select(PurchaseOrder).where(PurchaseOrder.id == body['purchase_order_id'])
+    ).scalar_one()
+    assert order.lines[0].quantity_ordered == Decimal('0.5')

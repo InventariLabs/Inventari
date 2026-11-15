@@ -44114,6 +44114,11 @@
               }
             ],
             "title": "Typed Unit Price"
+          },
+          "typed_unit_price_in_use": {
+            "type": "boolean",
+            "title": "Typed Unit Price In Use",
+            "default": false
           }
         },
         "type": "object",
@@ -79420,11 +79425,16 @@
             "type": "integer",
             "title": "Added Count",
             "default": 0
+          },
+          "already_ordered_count": {
+            "type": "integer",
+            "title": "Already Ordered Count",
+            "default": 0
           }
         },
         "type": "object",
         "title": "ShortagePurchaseOrderResponse",
-        "description": "Output for POST /recipes/{id}/shortages/purchase-order.\n\nNone when the batch is covered: nothing is ordered then, and no empty\ndocument is left behind for somebody to cancel."
+        "description": "Output for POST /recipes/{id}/shortages/purchase-order.\n\nNone when the batch is covered, or when an open order already expects\nwhat is short: nothing is ordered then, and no empty or duplicate\ndocument is left behind for somebody to cancel."
       },
       "ShortageShoppingListResponse": {
         "properties": {

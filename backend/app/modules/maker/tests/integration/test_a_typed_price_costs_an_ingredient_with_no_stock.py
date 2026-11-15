@@ -21,6 +21,7 @@ from app.core.public_api import core_api
 from app.models.organization import Organization
 from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
+from app.models.storage_location import StorageLocation
 from app.models.user import User
 from app.modules.maker.cost_breakdown import compute_breakdown
 from app.modules.maker.cost_rollup import compute_cost_rollup
@@ -28,6 +29,7 @@ from app.modules.maker.models import BoMLine, MakerIngredientPrice, MakerRecipe
 from app.modules.purchase_orders.models import PartnerPricelist
 from app.modules.recipes.cost_service import get_recipe_cost
 from app.modules.recipes.models.recipe import Recipe, RecipeIngredient
+from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
@@ -229,6 +231,9 @@ def test_the_recipe_editor_types_a_price_and_the_line_reads_it_back(
     detail = client.get(f'/api/v1/maker/recipes/{recipe_id}', headers=mk_auth_headers)
     assert detail.status_code == 200, detail.text
     assert detail.json()['lines'][0]['typed_unit_price'] == '8.2500'
+    # Nothing else prices the ingredient, so the estimate reached the typed
+    # price and the card may say it is the one in use.
+    assert detail.json()['lines'][0]['typed_unit_price_in_use'] is True
     # The estimate the recipe detail prints is the typed price at the line's
     # quantity, not a zero nobody can plan from.
     assert detail.json()['estimated_unit_cost'] == '0.412500'
@@ -242,3 +247,73 @@ def test_the_recipe_editor_types_a_price_and_the_line_reads_it_back(
     assert cleared.json()['unit_price'] is None
     detail = client.get(f'/api/v1/maker/recipes/{recipe_id}', headers=mk_auth_headers)
     assert detail.json()['lines'][0]['typed_unit_price'] is None
+
+
+def test_a_typed_price_the_layers_outrank_is_marked_unused(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_org: Organization,
+    mk_input_loc: StorageLocation,
+    db_session: Session,
+) -> None:
+    """A typed price beside a stock cost is shown, but not as the one used.
+
+    The card said "Typed price: 8.00" while the estimate read the 7.50 layer,
+    so the number a reader saw beside the line was not the number that priced
+    it. The line now says whether the estimate actually reached the fallback.
+    """
+    from app.modules.maker.tests.integration.conftest import post_bom_line
+
+    output = ProductTemplate(organization_id=mk_org.id, name='Salve')
+    ingredient = ProductTemplate(organization_id=mk_org.id, name='Oil')
+    db_session.add_all([output, ingredient])
+    db_session.commit()
+    db_session.refresh(output)
+    db_session.refresh(ingredient)
+
+    recipe = client.post(
+        '/api/v1/maker/recipes',
+        headers=mk_auth_headers,
+        json={
+            'output_template_id': str(output.id),
+            'name': 'Salve',
+            'batch_yield_qty': '10',
+        },
+    )
+    assert recipe.status_code == 201, recipe.text
+    recipe_id = recipe.json()['id']
+    line = post_bom_line(
+        client,
+        mk_auth_headers,
+        db_session,
+        mk_org.id,
+        {
+            'parent_template_id': str(output.id),
+            'child_template_id': str(ingredient.id),
+            'qty_per_batch': '0.5',
+            'unit': 'kg',
+        },
+    )
+    assert line.status_code == 201, line.text
+    post_on_shelf(
+        client,
+        mk_auth_headers,
+        ingredient,
+        mk_input_loc.id,
+        '10',
+        purchase_price='7.50',
+    )
+    typed = client.put(
+        f'/api/v1/maker/recipes/ingredient-prices/{ingredient.id}',
+        headers=mk_auth_headers,
+        json={'unit_price': '8.25'},
+    )
+    assert typed.status_code == 200, typed.text
+
+    body = client.get(
+        f'/api/v1/maker/recipes/{recipe_id}', headers=mk_auth_headers
+    ).json()
+    assert body['lines'][0]['typed_unit_price'] == '8.2500'
+    assert body['lines'][0]['typed_unit_price_in_use'] is False
+    # The layer of 7.50 per kilogram prices the line: 0.5 kg, ten to a batch.
+    assert body['estimated_unit_cost'] == '0.375000'

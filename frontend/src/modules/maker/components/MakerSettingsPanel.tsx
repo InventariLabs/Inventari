@@ -152,6 +152,17 @@ export function MakerSettingsPanel() {
     });
   }
 
+  function saveRate(value: string) {
+    const saved = settings?.labor_hourly_rate ?? "0";
+    const trimmed = value.trim();
+    if (trimmed === "" || Number.isNaN(Number(trimmed))) {
+      setHourlyRate(saved);
+      return;
+    }
+    if (trimmed === saved) return;
+    handleSave({ labor_hourly_rate: trimmed }, () => setHourlyRate(saved));
+  }
+
   return (
     // No heading of its own: the module page header already names this screen,
     // and two "Maker settings" titles stacked is one title too many.
@@ -209,6 +220,33 @@ export function MakerSettingsPanel() {
         >
           {resultTerms(t, direction).definition}
         </p>
+      </Card>
+
+      {/* Labour rate — what the timed steps cost. Not a shortage rule: it
+          prices every formula, so it stays beside the result direction
+          instead of behind the Advanced disclosure. It saves when the field
+          is left, the same one save model the switches use. */}
+      <Card className="p-4">
+        <h3 className="text-sm font-semibold text-on mb-1">
+          {t("settings.laborHourlyRate")}
+        </h3>
+        <p className="text-xs text-on-muted mb-3">
+          {t("settings.laborHourlyRateHint")}
+        </p>
+        <Input
+          wrapperClassName="w-32"
+          type="number"
+          min="0"
+          step="0.01"
+          value={hourlyRate}
+          onChange={(e) => setHourlyRate(e.target.value)}
+          onBlur={(e) => saveRate(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur();
+          }}
+          aria-label={t("settings.laborHourlyRate")}
+          data-testid="maker-settings-labor-rate"
+        />
       </Card>
 
       <AdvancedSection>
@@ -298,41 +336,6 @@ export function MakerSettingsPanel() {
               data-testid="maker-settings-scope-per-location"
             >
               {t("settings.scopePerLocation")}
-            </Button>
-          </div>
-        </Card>
-
-        {/* Labour rate — what the timed steps cost */}
-        <Card className="p-4">
-          <h3 className="text-sm font-semibold text-on mb-1">
-            {t("settings.laborHourlyRate")}
-          </h3>
-          <p className="text-xs text-on-muted mb-3">
-            {t("settings.laborHourlyRateHint")}
-          </p>
-          <div className="flex items-end gap-2">
-            <Input
-              wrapperClassName="w-32"
-              type="number"
-              min="0"
-              step="0.01"
-              value={hourlyRate}
-              onChange={(e) => setHourlyRate(e.target.value)}
-              aria-label={t("settings.laborHourlyRate")}
-              data-testid="maker-settings-labor-rate"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                const value = hourlyRate.trim();
-                if (value === "" || Number.isNaN(Number(value))) return;
-                handleSave({ labor_hourly_rate: value });
-              }}
-              disabled={updateMutation.isPending}
-              data-testid="maker-settings-labor-rate-save"
-            >
-              {t("common:actions.save")}
             </Button>
           </div>
         </Card>

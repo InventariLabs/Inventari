@@ -290,7 +290,9 @@
         "description": "¿Quitar «{{label}}» de los costes fijos?"
       },
       "labourFromSteps": "Mano de obra de los pasos",
-      "labourTime": "{{minutes}} min a la tarifa por hora"
+      "labourTime": "{{minutes}} min a la tarifa por hora",
+      "labourRateMissing": "Los pasos duran {{minutes}} min. Define la tarifa por hora en los ajustes de producción para valorar ese tiempo.",
+      "labourRateLink": "Ajustes de producción"
     },
     "history": {
       "title": "Historial de producción",
@@ -378,6 +380,7 @@
       "yieldInvalid": "Lo que rinde la fórmula debe ser mayor que cero."
     },
     "typedPrice": "Precio escrito",
+    "typedPriceUnused": "sin usar: primero responde el coste del stock o el precio del proveedor",
     "typedPriceHint": "Se usa cuando no hay coste de existencias ni precio de proveedor. Se guarda en el producto, así que cada fórmula que lo usa lo valora igual.",
     "setPrice": "Fijar precio",
     "editPrice": "Editar precio",
@@ -569,6 +572,7 @@
     "addStock": "Añadir existencias",
     "order": "Pedir lo que falta",
     "nothingToOrder": "Todo está en existencias: no se pidió nada.",
+    "alreadyOrdered": "Todo lo que falta ya está en un pedido de compra abierto: no se pidió nada nuevo.",
     "ordered": "Borrador de pedido {{number}} creado con {{lines}} líneas.",
     "orderFailed": "No se pudo crear el pedido",
     "addStockTitle": "Añadir las existencias que tienes",
@@ -583,6 +587,7 @@
     "addStockSave": "Añadir existencias ({{saved}})",
     "stockSaved": "Existencias guardadas.",
     "stockSaveFailed": "No se pudieron guardar las existencias.",
+    "stockSavePartial": "Guardados {{saved}} de {{total}}. El resto sigue en la hoja.",
     "locationsFailed": "No se pudieron cargar las ubicaciones"
   }
 }

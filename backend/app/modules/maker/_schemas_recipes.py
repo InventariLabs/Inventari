@@ -187,6 +187,29 @@ class RecipeRead(BaseModel):
     batch_yield_uom_id: UUID | None
     process_steps: list[ProcessStep] | None
     reference_price: Decimal | None
+
+    @field_validator('process_steps', mode='before')
+    @classmethod
+    def _step_rows_written_before_time(cls, value: object) -> object:
+        """Read a row whose steps are still bare sentences.
+
+        ``018`` rewrites those rows, but an older process still writing steps
+        during a deploy can store one afterwards, and a formula that no longer
+        opens is worse than one whose steps have no duration. The write path
+        normalises the same shape; this is the read side of that promise.
+        """
+        if not isinstance(value, list):
+            return value
+        steps: list[object] = []
+        for step in value:
+            if isinstance(step, str):
+                text = step.strip()
+                if text:
+                    steps.append({'text': text, 'minutes': None})
+            else:
+                steps.append(step)
+        return steps
+
     is_default: bool
     source_recipe_id: UUID | None
     source_snapshot_at: datetime | None
@@ -303,13 +326,18 @@ class IngredientAvailabilityItem(BaseModel):
 class ShortagePurchaseOrderResponse(BaseModel):
     """Output for POST /recipes/{id}/shortages/purchase-order.
 
-    None when the batch is covered: nothing is ordered then, and no empty
+    None when the batch is covered, or when an open order already expects
+    what is short: nothing is ordered then, and no empty or duplicate
     document is left behind for somebody to cancel.
     """
 
     purchase_order_id: UUID | None = None
     number: str | None = None
     added_count: int = 0
+    #: Short ingredients an open order already expects. Nothing new is
+    #: ordered for them, so the notice can say so instead of raising a
+    #: second identical draft.
+    already_ordered_count: int = 0
 
 
 class AvailabilityResponse(BaseModel):

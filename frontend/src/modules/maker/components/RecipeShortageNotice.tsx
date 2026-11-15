@@ -70,7 +70,11 @@ export function RecipeShortageNotice({
     try {
       const result = await orderShortages.mutateAsync(recipeId);
       if (result.purchase_order_id === null) {
-        toast.success(t("shortage.nothingToOrder"));
+        toast.success(
+          (result.already_ordered_count ?? 0) > 0
+            ? t("shortage.alreadyOrdered")
+            : t("shortage.nothingToOrder"),
+        );
       } else {
         toast.success(
           t("shortage.ordered", {
@@ -197,6 +201,13 @@ function AddIngredientStockSheet({
   const addStock = useAddIngredientStock();
   const [locationId, setLocationId] = useState("");
   const [rows, setRows] = useState<Record<string, StockRow>>({});
+  // Rows already written when a later one failed. A retry must not enter
+  // them a second time — the stock would count twice — so they leave the
+  // sheet as they land.
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const remaining = items.filter(
+    (item) => !savedIds.includes(item.child_template_id),
+  );
 
   // A new batch of rows each time the sheet opens; a stale quantity from the
   // previous visit would be entered twice by a double click. The sheet is
@@ -222,16 +233,17 @@ function AddIngredientStockSheet({
     setLocationId(locations[0].id);
   }, [locationId, locations]);
 
-  const rowsToSave = items.filter((item) => {
+  const rowsToSave = remaining.filter((item) => {
     const row = rows[item.child_template_id];
     return row !== undefined && Number(row.quantity) > 0;
   });
 
   async function save() {
     if (locationId === "") return;
+    const toSave = rowsToSave;
     let saved = 0;
     try {
-      for (const item of rowsToSave) {
+      for (const item of toSave) {
         const row = rows[item.child_template_id];
         await addStock.mutateAsync({
           name: item.child_template_name ?? t("shortage.stockFallbackName"),
@@ -241,13 +253,18 @@ function AddIngredientStockSheet({
           purchase_price: row.price.trim() === "" ? null : row.price.trim(),
         });
         saved += 1;
+        setSavedIds((prev) => [...prev, item.child_template_id]);
       }
       toast.success(t("shortage.stockSaved"));
       onClose();
     } catch (err) {
-      // The rows already written stay written; the message says how many
-      // landed so the user knows what is left to enter.
-      toast.error(extractApiError(err, t("shortage.stockSaveFailed")));
+      // The rows already written stay written and leave the sheet, so a
+      // retry enters only what is left; the message says how many landed.
+      toast.error(
+        saved > 0
+          ? t("shortage.stockSavePartial", { saved, total: toSave.length })
+          : extractApiError(err, t("shortage.stockSaveFailed")),
+      );
     }
   }
 
@@ -294,7 +311,7 @@ function AddIngredientStockSheet({
         </NativeSelect>
 
         <div className="space-y-2">
-          {items.map((item) => {
+          {remaining.map((item) => {
             const row = rows[item.child_template_id] ?? {
               quantity: "",
               price: "",

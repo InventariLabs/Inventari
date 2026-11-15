@@ -136,3 +136,78 @@ describe("RecipeShortageNotice", () => {
     expect(toastSuccess).toHaveBeenCalled();
   });
 });
+
+describe("RecipeShortageNotice — a retry and a second order", () => {
+  beforeEach(() => {
+    orderShortages.mockReset();
+    addStock.mockReset();
+    toastSuccess.mockReset();
+    toastError.mockReset();
+    signInWith([
+      "maker:read",
+      "maker:write",
+      "maker:manage",
+      "items:write",
+      "purchase_orders:write",
+    ]);
+  });
+
+  afterEach(() => {
+    signOut();
+  });
+
+  it("keeps only the rows that did not save when a later one fails", async () => {
+    // Every row was kept after a failure, so the retry entered the stock that
+    // had already been saved a second time. The saved rows leave the sheet.
+    addStock
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("boom"))
+      .mockResolvedValueOnce(undefined);
+    const twoIngredients: AvailabilityResponse = {
+      ...availability,
+      ingredients: [
+        availability.ingredients[0],
+        {
+          ...availability.ingredients[0],
+          child_template_id: "tpl-oil",
+          child_template_name: "Oil",
+        },
+      ],
+    };
+    renderNotice({ availability: twoIngredients });
+    fireEvent.click(screen.getByTestId("maker-recipe-add-stock"));
+    fireEvent.click(screen.getByTestId("maker-add-stock-save"));
+
+    await waitFor(() => expect(addStock).toHaveBeenCalledTimes(2));
+    expect(toastError).toHaveBeenCalledWith(
+      "Saved 1 of 2. The rest is still in the sheet.",
+    );
+    // The failed ingredient is the only one left, so a retry cannot enter
+    // the saved one again.
+    const rows = screen.getAllByTestId("maker-add-stock-row");
+    expect(rows).toHaveLength(1);
+    expect(rows[0].textContent).toContain("Oil");
+    expect(rows[0].textContent).not.toContain("Lye");
+
+    fireEvent.click(screen.getByTestId("maker-add-stock-save"));
+    await waitFor(() => expect(addStock).toHaveBeenCalledTimes(3));
+    expect(addStock.mock.calls[2][0].template_id).toBe("tpl-oil");
+  });
+
+  it("says the shortage is already on an open order instead of ordering it again", async () => {
+    orderShortages.mockResolvedValue({
+      purchase_order_id: null,
+      number: null,
+      added_count: 0,
+      already_ordered_count: 1,
+    });
+    renderNotice();
+    fireEvent.click(screen.getByTestId("maker-recipe-order-shortage"));
+
+    await waitFor(() =>
+      expect(toastSuccess).toHaveBeenCalledWith(
+        expect.stringMatching(/already on an open purchase order/i),
+      ),
+    );
+  });
+});

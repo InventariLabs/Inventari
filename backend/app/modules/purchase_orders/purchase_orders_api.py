@@ -465,6 +465,63 @@ class PurchaseOrdersAPI:
             )
         return ordered
 
+    async def outstanding_ordered_quantities_async(
+        self,
+        db: AsyncSession,
+        org_id: UUID,
+        product_template_ids: list[UUID],
+    ) -> dict[UUID, Decimal]:
+        """What open orders still expect of each product, in stock units.
+
+        A DRAFT, a parked or a CONFIRMED order has not fully arrived, so its
+        outstanding quantity is already being bought and a caller computing a
+        shortage must not order it again. Cancelled and completed orders
+        answer nothing. ``quantity_received`` is taken off: what has arrived
+        is stock already, and counting the whole line would count it twice.
+        Lines written in another unit are converted to the product's stock
+        unit, the unit a formula's shortage is stated in.
+        """
+        from sqlalchemy import select
+
+        from app.core.public_api import core_api
+        from app.modules.purchase_orders.models import (
+            PurchaseOrder,
+            PurchaseOrderLine,
+        )
+
+        if not product_template_ids:
+            return {}
+
+        rows = await db.execute(
+            select(
+                PurchaseOrderLine.product_template_id,
+                PurchaseOrderLine.quantity_ordered,
+                PurchaseOrderLine.quantity_received,
+                PurchaseOrderLine.uom_id,
+            )
+            .join(
+                PurchaseOrder, PurchaseOrder.id == PurchaseOrderLine.purchase_order_id
+            )
+            .where(
+                PurchaseOrder.organization_id == org_id,
+                PurchaseOrder.status.in_(('DRAFT', 'PENDING_APPROVAL', 'CONFIRMED')),
+                PurchaseOrderLine.product_template_id.in_(product_template_ids),
+            )
+            .order_by(PurchaseOrderLine.id)
+        )
+        outstanding: dict[UUID, Decimal] = {}
+        for template_id, ordered, received, uom_id in rows.all():
+            remaining = Decimal(str(ordered or 0)) - Decimal(str(received or 0))
+            if remaining <= 0 or template_id is None:
+                continue
+            in_stock_unit = await core_api.uoms.to_stock_uom_async(
+                db, org_id, template_id, remaining, uom_id
+            )
+            outstanding[template_id] = (
+                outstanding.get(template_id, Decimal('0')) + in_stock_unit
+            )
+        return outstanding
+
     async def get_line_labels_async(
         self,
         db: AsyncSession,

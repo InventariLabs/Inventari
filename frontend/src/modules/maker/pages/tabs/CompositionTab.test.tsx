@@ -122,6 +122,7 @@ const line: BomLine = {
   notes: null,
   created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",
+  typed_unit_price_in_use: false,
 };
 
 const recipe: MakerRecipe = {

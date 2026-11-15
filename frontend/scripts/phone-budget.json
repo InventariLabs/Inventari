@@ -6,9 +6,7 @@
   },
   "screens": {
     "login": {
-      "chunks": [
-        "LoginPage"
-      ],
+      "chunks": ["LoginPage"],
       "budget": {
         "jsKiB": 400,
         "loadMs": 5500
@@ -21,9 +19,7 @@
       }
     },
     "launcher": {
-      "chunks": [
-        "Launcher"
-      ],
+      "chunks": ["Launcher"],
       "budget": {
         "jsKiB": 415,
         "loadMs": 8500
@@ -36,9 +32,7 @@
       }
     },
     "start": {
-      "chunks": [
-        "DocumentsTodoPage"
-      ],
+      "chunks": ["DocumentsTodoPage"],
       "budget": {
         "jsKiB": 630,
         "loadMs": 8000
@@ -51,9 +45,7 @@
       }
     },
     "receive": {
-      "chunks": [
-        "ReceiveGoodsPage"
-      ],
+      "chunks": ["ReceiveGoodsPage"],
       "budget": {
         "jsKiB": 465,
         "loadMs": 10000
@@ -66,9 +58,7 @@
       }
     },
     "issue": {
-      "chunks": [
-        "IssueGoodsPage"
-      ],
+      "chunks": ["IssueGoodsPage"],
       "budget": {
         "jsKiB": 580,
         "loadMs": 11000
@@ -81,9 +71,7 @@
       }
     },
     "history": {
-      "chunks": [
-        "DocumentHistoryPage"
-      ],
+      "chunks": ["DocumentHistoryPage"],
       "budget": {
         "jsKiB": 605,
         "loadMs": 8000
@@ -96,9 +84,7 @@
       }
     },
     "products": {
-      "chunks": [
-        "ItemsPage"
-      ],
+      "chunks": ["ItemsPage"],
       "budget": {
         "jsKiB": 620,
         "loadMs": 7500

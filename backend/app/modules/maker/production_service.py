@@ -1285,8 +1285,12 @@ async def create_shortage_purchase_order(
     the one typed on the product where somebody typed one; a line without
     a price is still an order line, and the buyer fills it in.
 
-    Nothing short, nothing ordered: the response names no order rather than
-    leaving an empty draft nobody asked for.
+    What an open order already expects is not bought again: the pages
+    behind this click do not move stock, so a second click would otherwise
+    raise a second identical order for the same shortage. Only the
+    remainder is ordered, and when an open order covers everything the
+    response says how many ingredients it holds instead of leaving an
+    empty draft nobody asked for.
     """
     from app.core.contracts import PurchaseOrderCreateInput, PurchaseOrderLineInput
     from app.modules.purchase_orders.purchase_orders_api import purchase_orders_api
@@ -1337,19 +1341,27 @@ async def create_shortage_purchase_order(
         for uom in await core_api.uoms.list_for_org_async(db, organization_id)
     }
     typed_prices = await typed_rates_async(db, organization_id, short_ids)
+    on_order = await purchase_orders_api.outstanding_ordered_quantities_async(
+        db, organization_id, short_ids
+    )
 
     lines: list[PurchaseOrderLineInput] = []
+    already_ordered = 0
     for child_id in short_ids:
         missing = needs.get(child_id, Decimal('0')) - stocks.get(child_id, Decimal('0'))
         template = templates.get(child_id)
         if missing <= 0 or template is None:
+            continue
+        remaining = missing - on_order.get(child_id, Decimal('0'))
+        if remaining <= 0:
+            already_ordered += 1
             continue
         lines.append(
             PurchaseOrderLineInput(
                 product_template_id=child_id,
                 name=template.name,
                 quantity_ordered=core_api.uoms.round_up(
-                    missing,
+                    remaining,
                     uoms.get(template.uom_id) if template.uom_id is not None else None,
                 ),
                 uom_id=template.uom_id,
@@ -1357,7 +1369,7 @@ async def create_shortage_purchase_order(
             )
         )
     if not lines:
-        return ShortagePurchaseOrderResponse()
+        return ShortagePurchaseOrderResponse(already_ordered_count=already_ordered)
 
     order = await purchase_orders_api.create_purchase_order_async(
         db,
@@ -1369,6 +1381,7 @@ async def create_shortage_purchase_order(
         purchase_order_id=order.id,
         number=order.number,
         added_count=len(lines),
+        already_ordered_count=already_ordered,
     )
 
 

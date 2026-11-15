@@ -290,7 +290,9 @@
         "description": "\"{{label}}\" aus den Fixkosten entfernen?"
       },
       "labourFromSteps": "Arbeitszeit aus den Schritten",
-      "labourTime": "{{minutes}} Min. zum Stundensatz"
+      "labourTime": "{{minutes}} Min. zum Stundensatz",
+      "labourRateMissing": "Die Schritte dauern {{minutes}} Min. Legen Sie den Stundensatz in den Produktionseinstellungen fest, um diese Zeit zu bewerten.",
+      "labourRateLink": "Produktionseinstellungen"
     },
     "history": {
       "title": "Produktionsverlauf",
@@ -378,6 +380,7 @@
       "yieldInvalid": "Die Menge, die die Formel ergibt, muss größer als null sein."
     },
     "typedPrice": "Eingetragener Preis",
+    "typedPriceUnused": "nicht verwendet — Lagerkosten oder Lieferantenpreis gelten zuerst",
     "typedPriceHint": "Gilt, wenn es keinen Lagerkostenwert und keinen Lieferantenpreis gibt. Am Produkt gespeichert, damit jede Formel mit dieser Zutat gleich rechnet.",
     "setPrice": "Preis festlegen",
     "editPrice": "Preis ändern",
@@ -569,6 +572,7 @@
     "addStock": "Bestand hinzufügen",
     "order": "Fehlendes bestellen",
     "nothingToOrder": "Alles ist vorrätig — nichts bestellt.",
+    "alreadyOrdered": "Alles Fehlende steht bereits auf einer offenen Bestellung — nichts Neues bestellt.",
     "ordered": "Bestellentwurf {{number}} mit {{lines}} Positionen angelegt.",
     "orderFailed": "Bestellung konnte nicht angelegt werden",
     "addStockTitle": "Vorhandenen Bestand hinzufügen",
@@ -583,6 +587,7 @@
     "addStockSave": "Bestand hinzufügen ({{saved}})",
     "stockSaved": "Bestand gespeichert.",
     "stockSaveFailed": "Bestand konnte nicht gespeichert werden.",
+    "stockSavePartial": "{{saved}} von {{total}} gespeichert. Der Rest bleibt im Formular.",
     "locationsFailed": "Orte konnten nicht geladen werden"
   }
 }

@@ -294,7 +294,9 @@
         "description": "Usunąć „{{label}}” z kosztów stałych?"
       },
       "labourFromSteps": "Praca z czasu kroków",
-      "labourTime": "{{minutes}} min według stawki godzinowej"
+      "labourTime": "{{minutes}} min według stawki godzinowej",
+      "labourRateMissing": "Kroki zajmują {{minutes}} min. Ustaw stawkę godzinową w ustawieniach produkcji, aby wycenić ten czas.",
+      "labourRateLink": "Ustawienia produkcji"
     },
     "history": {
       "title": "Historia produkcji",
@@ -384,6 +386,7 @@
       "yieldInvalid": "Ilość, którą daje receptura, musi być większa od zera."
     },
     "typedPrice": "Cena wpisana",
+    "typedPriceUnused": "nieużywana — najpierw odpowiada koszt zapasu lub cena dostawcy",
     "typedPriceHint": "Używana, gdy nie ma kosztu zapasu ani ceny dostawcy. Zapisana przy produkcie, więc każda receptura z tym składnikiem liczy ją tak samo.",
     "setPrice": "Ustaw cenę",
     "editPrice": "Zmień cenę",
@@ -589,6 +592,7 @@
     "addStock": "Dodaj zapas",
     "order": "Zamów brakujące",
     "nothingToOrder": "Wszystko jest w magazynie — nic nie zamówiono.",
+    "alreadyOrdered": "Wszystko, czego brakuje, jest już na otwartym zamówieniu zakupu — nic nowego nie zamówiono.",
     "ordered": "Utworzono szkic zamówienia {{number}} (pozycje: {{lines}}).",
     "orderFailed": "Nie udało się utworzyć zamówienia",
     "addStockTitle": "Dodaj zapas, który masz",
@@ -603,6 +607,7 @@
     "addStockSave": "Dodaj zapas ({{saved}})",
     "stockSaved": "Zapas zapisany.",
     "stockSaveFailed": "Nie udało się zapisać zapasu.",
+    "stockSavePartial": "Zapisano {{saved}} z {{total}}. Reszta wciąż jest w arkuszu.",
     "locationsFailed": "Nie udało się wczytać miejsc"
   }
 }

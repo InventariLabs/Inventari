@@ -14,6 +14,12 @@ interface IngredientPriceEditorProps {
   /** The unit the price is per, as the line states it. */
   unit: string;
   price: string | null;
+  /**
+   * Whether the estimate actually priced the line with the typed price.
+   * The cost layers and a supplier quote answer first, so the card says when
+   * the number it shows is not the one in use.
+   */
+  inUse: boolean;
   canManage: boolean;
 }
 
@@ -30,6 +36,7 @@ export function IngredientPriceEditor({
   templateId,
   unit,
   price,
+  inUse,
   canManage,
 }: IngredientPriceEditorProps) {
   const { t, i18n } = useTranslation("maker");
@@ -95,12 +102,23 @@ export function IngredientPriceEditor({
   return (
     <span className="inline-flex items-center gap-1 text-xs">
       {hasPrice ? (
-        <span
-          className="tabular-nums text-on-secondary"
-          data-testid="maker-ingredient-typed-price"
-        >
-          {t("composition.typedPrice")}:{" "}
-          {formatMoney(price, currency, i18n.language)} / {unit}
+        <span className="inline-flex flex-wrap items-center gap-1">
+          <span
+            className="tabular-nums text-on-secondary"
+            data-testid="maker-ingredient-typed-price"
+          >
+            {t("composition.typedPrice")}:{" "}
+            {formatMoney(price, currency, i18n.language)} / {unit}
+          </span>
+          {!inUse && (
+            <span
+              className="text-on-muted"
+              data-testid="maker-ingredient-typed-price-unused"
+              title={t("composition.typedPriceHint")}
+            >
+              · {t("composition.typedPriceUnused")}
+            </span>
+          )}
         </span>
       ) : null}
       {canManage && (

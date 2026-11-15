@@ -72,7 +72,7 @@ read, not how it is stored. See TECHNICAL_DECISIONS.md §19.
 | Endpoint | Description |
 |---|---|
 | `GET /recipes` | Card catalogue (search/sort/pagination; `output_template_id=` narrows to one product's recipes). `unit_cost` = total cost / quantity of the most recent COMPLETED order of that recipe (one batched query, no N+1), with `uncosted_ingredients`; a recipe never run carries `estimated_unit_cost` instead; also `stock_qty`, `last_produced_at`, `ingredient_count`, `result`. |
-| `GET /recipes/{id}` | Detail: lines (each carrying its product's `typed_unit_price`) + fixed costs + `labour_cost` (the steps' time at the hourly rate) + `estimated_unit_cost` (materials from the shared Core estimate — layer-average rate, then a supplier offer, then the typed price — plus fixed costs and labour, per unit) + `source_recipe_id`/`source_snapshot_at`. |
+| `GET /recipes/{id}` | Detail: lines (each carrying its product's `typed_unit_price`, and `typed_unit_price_in_use` — whether the estimate actually reached that fallback, since the layers and a supplier quote answer first) + fixed costs + `labour_cost` (the steps' time at the hourly rate) + `estimated_unit_cost` (materials from the shared Core estimate — layer-average rate, then a supplier offer, then the typed price — plus fixed costs and labour, per unit) + `source_recipe_id`/`source_snapshot_at`. |
 | `POST /recipes` | Create (a template's first recipe becomes the default automatically). `source_recipe_id` stamps `source_snapshot_at`. |
 | `POST /recipes/from-recipe` | **The recipes→maker bridge**: snapshots a culinary recipe into a maker recipe plus BoM lines built from ingredients that carry a `template_id` (free-text ingredients are skipped). Idempotent per (output_template_id, source_recipe_id). A culinary recipe that does not exist in the organization returns a plain 404. |
 | `PATCH/DELETE /recipes/{id}` | Update / delete (deleting the default promotes the oldest remaining recipe; a recipe that a production order references cannot be deleted, 409). |
@@ -80,7 +80,7 @@ read, not how it is stored. See TECHNICAL_DECISIONS.md §19.
 | `PATCH/DELETE /recipes/{id}/bom-lines[/{line_id}]` | Edit a line in place (qty/uom/yield_loss/notes) / remove it. |
 | `POST/PATCH/DELETE /recipes/{id}/cost-lines[/{line_id}]` | Fixed costs. |
 | `PUT /recipes/ingredient-prices/{template_id}` | Type (or clear, with `unit_price: null`) a product's per-unit price. `maker:manage`: it is an input to the formula's costing, like the formula itself. |
-| `POST /recipes/{id}/shortages/purchase-order` | Raise a draft purchase order for one batch's missing ingredients, one line per short ingredient at its typed price. `purchase_orders` must be on; needs `purchase_orders:write`; returns no order when the batch is covered. |
+| `POST /recipes/{id}/shortages/purchase-order` | Raise a draft purchase order for one batch's missing ingredients, one line per short ingredient at its typed price. What an open order (DRAFT, PENDING_APPROVAL, CONFIRMED) already expects comes off the shortfall, so a second click does not order the same shortage twice; `already_ordered_count` says how many ingredients it covered. `purchase_orders` must be on; needs `purchase_orders:write`; returns no order when the batch is covered or already on order. |
 | `GET /recipes/{id}/availability?batches=&location_id=` | Per-ingredient {needed, available, shortage, uom, convertible} plus `max_batches`. Honours `availability_check_scope` (GLOBAL/PER_LOCATION); `location_id` overrides it. |
 
 ### BoM (legacy adapters and reverse lookup)
@@ -120,6 +120,13 @@ and the batch's labour is the sum of those minutes at
 `maker_module_settings.labor_hourly_rate`. The recipe detail, the catalogue,
 the production preview and a completed run all use the same helper, so the
 computed labour line on the cost tab and the run's actual cost agree.
+
+A formula's `process_steps` are objects (`{text, minutes}`). Steps saved
+before the duration existed are migrated when the module upgrades — a bare
+sentence becomes `{text, minutes: null}`, and blank sentences are dropped as
+the write path drops them — while the reader also normalises an old-shaped
+row, so a process still writing the old shape during a deploy cannot make a
+formula unreadable.
 
 ### Estimate against actual
 
