@@ -30,7 +30,13 @@ says what the release does rather than what changed since them.
   warehouse does not look poorer between start and finish. New endpoints: `POST
   /maker/production/orders/{id}/start`, `/portions` and `/finish`, and `PUT
   .../steps/{index}`; modules that report a stock value can register a reader
-  with `register_work_in_progress_provider`.
+  with `register_work_in_progress_provider`. For module authors, the valuation
+  API also gains `add_value_to_layer_async` (a cost that arrives after the
+  receipt, once per layer and dated from the day it is added, so an as-of
+  report about an earlier instant reads what it did then), a `record_receipt_async`
+  that answers the layer it opened, and `unpriced_stays_unknown` for a caller
+  that will state the cost itself later instead of borrowing the older stock's
+  rate.
 - A BOM line can be marked **Always make fresh**: an ingredient that has a BOM
   of its own is then made through it every time and never taken from stock.
 

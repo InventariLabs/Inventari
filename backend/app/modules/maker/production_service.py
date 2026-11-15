@@ -922,6 +922,7 @@ async def _receive_output(
     best_before: date | None,
     lot_name: str | None = None,
     cost_comes_at_the_finish: bool = False,
+    a_zero_cost_is_stated: bool = False,
 ) -> tuple[UUID, UUID | None]:
     """Put the produced goods on the shelf (output = actual), in their batch.
 
@@ -931,6 +932,10 @@ async def _receive_output(
     they opened. *cost_comes_at_the_finish* is for a portion: when nothing it
     was made of carried a price, its layer is posted as not yet known instead
     of at the rate of the product's older stock, and the finish states it.
+    *a_zero_cost_is_stated* is for goods whose share of a run that did cost
+    something is nothing — the portions already carry all of it: the layer is
+    posted at a stated zero, not as "nobody named a price", which Core would
+    answer with the rate of the older stock.
     """
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
@@ -1033,7 +1038,7 @@ async def _receive_output(
         organization_id=organization_id,
         product_template_id=order.output_template_id,
         quantity=actual_qty,
-        unit_cost=unit_cost if unit_cost > 0 else None,
+        unit_cost=unit_cost if unit_cost > 0 or a_zero_cost_is_stated else None,
         unpriced_stays_unknown=cost_comes_at_the_finish,
     )
     return produced_item.id, layer_id
@@ -1669,6 +1674,7 @@ async def finish_production(
                 db, organization_id, order.output_template_id, day, None
             ),
             lot_name=lot_name,
+            a_zero_cost_is_stated=total_cost > 0,
         )
         db.add(
             ProductionPortion(

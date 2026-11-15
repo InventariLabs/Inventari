@@ -57,6 +57,7 @@ class _Winery:
         self.db = db
         self.client = client
         self.headers = headers
+        self.shelf = shelf
         self.cellar = cellar
         self.grapes = self._template(org, 'Grapes')
         self.wine = self._template(org, 'Wine')
@@ -774,6 +775,65 @@ def test_unpriced_portions_do_not_borrow_the_rate_of_the_older_stock_of_the_outp
     assert Decimal(str(done['unit_cost_snapshot'])) == Decimal('0.50')
     assert winery.stock_value() == 11.0
     assert winery.worth_on(datetime.now(UTC)) == Decimal('11.00')
+
+
+def test_a_closing_quantity_above_the_plan_is_stated_at_zero_not_at_the_average(
+    winery: _Winery,
+) -> None:
+    # The portions already carry the whole cost of the run (two grapes, 6.00)
+    # and one bottle more comes out with the finish. That bottle's share is
+    # nothing, and nothing is a price: it must not read as "nobody named one"
+    # and be valued at the rate of the bottles beside it, which put 3.00 on
+    # the shelf that the run never cost.
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'P1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'P2'})
+
+    finished = winery.post(
+        order_id, 'finish', {'actual_qty': '3', 'output_lot_name': 'P3'}
+    )
+
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert Decimal(str(done['total_cost'])) == Decimal('6.00')
+    assert done['overproduced'] is True
+    # 30.00 of grapes before, 6.00 of them in the wine, 6.00 the wine cost.
+    assert winery.stock_value() == 30.0
+    assert winery.worth_on(datetime.now(UTC)) == Decimal('30.00')
+
+
+def test_a_closing_quantity_after_portions_booked_a_rounding_hair_too_much_is_not_borrowed(
+    winery: _Winery,
+) -> None:
+    # Two currency units of grape over three planned bottles is 0.6667 a
+    # portion, and three portions book 2.0001: the closing bottle's share of
+    # the rest is below zero. It is stated as zero, never valued at the rate
+    # of the other bottles, and the shelf holds the run's cost to the cent.
+    winery.sell(winery.grapes, '10')
+    winery.set_yield('3')
+    post_on_shelf(
+        winery.client,
+        winery.headers,
+        winery.grapes,
+        winery.shelf.id,
+        10,
+        purchase_price='2.00',
+    )
+    order_id = winery.draft('3')
+    winery.post(order_id, 'start')
+    for name in ('R1', 'R2', 'R3'):
+        winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': name})
+
+    finished = winery.post(
+        order_id, 'finish', {'actual_qty': '4', 'output_lot_name': 'R4'}
+    )
+
+    assert finished.status_code == 200, finished.text
+    assert Decimal(str(finished.json()['total_cost'])) == Decimal('2.00')
+    # 20.00 of grapes, 2.00 of them in the wine, 2.00 the wine cost -- within
+    # the cent the portions' per-unit rounding leaves.
+    assert Decimal('19.99') <= Decimal(str(winery.stock_value())) <= Decimal('20.01')
 
 
 def test_a_run_whose_portions_share_a_batch_is_taken_back(winery: _Winery) -> None:
