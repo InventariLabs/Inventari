@@ -350,7 +350,11 @@ async def get_bom_tree(
         for node in sub_assemblies:
             if node.line is not None:
                 node.line = node.line.model_copy(
-                    update={'stock_on_hand': pool.on_hand(node.line.child_template_id)}
+                    update={
+                        'stock_on_hand': pool.on_hand_in(
+                            node.line.child_template_id, node.line.uom_id
+                        )
+                    }
                 )
     return BomTreeResponse(
         parent_template_id=template_id,

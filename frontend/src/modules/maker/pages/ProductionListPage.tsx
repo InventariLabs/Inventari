@@ -64,22 +64,25 @@ function listStateOf(
 
 /**
  * The card's cost line. A snapshot only a completed run can write — drafts
- * read the dash honestly.
+ * read the dash honestly. A run in progress has taken its ingredients but has
+ * no total yet, so it reads what it has taken so far, as its page does.
  */
 function CardCost({
-  totalCost,
+  order,
   currency,
   language,
 }: {
-  totalCost: string | null;
+  order: ProductionOrder;
   currency: string | undefined;
   language: string;
 }) {
   const { t } = useTranslation("maker");
+  const inProgress = order.status === "IN_PROGRESS";
+  const amount = inProgress ? order.material_cost : order.total_cost;
   return (
     <div className="text-on-muted text-xs mt-1">
-      {t("productionList.card.cost")}:{" "}
-      {totalCost === null ? "—" : formatMoney(totalCost, currency, language)}
+      {inProgress ? t("detail.card.takenSoFar") : t("productionList.card.cost")}
+      : {amount == null ? "—" : formatMoney(amount, currency, language)}
     </div>
   );
 }
@@ -386,7 +389,7 @@ export default function ProductionListPage() {
                     )}
                   </div>
                   <CardCost
-                    totalCost={order.total_cost}
+                    order={order}
                     currency={currency}
                     language={i18n.language}
                   />

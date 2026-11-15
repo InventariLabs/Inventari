@@ -106,6 +106,22 @@ class StockPool:
         """What the shelf holds of *template_id*, in its own stock unit."""
         return self._loaded.stock.get(template_id, Decimal('0'))
 
+    def on_hand_in(self, template_id: UUID, line_uom_id: UUID | None) -> Decimal | None:
+        """What the shelf holds of *template_id*, in the unit a line names.
+
+        ``None`` when the line's unit has no bridge to the stock's: the same
+        case in which :meth:`take` takes nothing.
+        """
+        qty = self.on_hand(template_id)
+        stock_uom_id = self._loaded.stock_uom_ids.get(template_id)
+        if line_uom_id is None or stock_uom_id is None or line_uom_id == stock_uom_id:
+            return qty
+        uoms = self._loaded.uoms or {}
+        converted, ok = core_api.uoms.convert_quantity(
+            qty, uoms.get(stock_uom_id), uoms.get(line_uom_id)
+        )
+        return converted if ok else None
+
     def take(
         self, template_id: UUID, qty: Decimal, line_uom_id: UUID | None
     ) -> Decimal:

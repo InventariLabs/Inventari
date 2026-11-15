@@ -55,7 +55,7 @@ function NodeRow({
   return (
     <div className="space-y-1">
       <div
-        className="flex items-center gap-2 p-2 rounded-md hover:bg-surface-raised border border-transparent hover:border-border transition-colors text-sm"
+        className="flex flex-wrap items-center gap-x-2 gap-y-1 p-2 rounded-md hover:bg-surface-raised border border-transparent hover:border-border transition-colors text-sm"
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         draggable
         onDragStart={(e) => {

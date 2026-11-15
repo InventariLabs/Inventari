@@ -243,7 +243,7 @@ def test_a_run_is_finished_on_a_later_day_with_what_it_actually_made(
 ) -> None:
     order_id = winery.draft()
     winery.post(order_id, 'start')
-    later = (date.today() - timedelta(days=0)).isoformat()
+    later = (date.today() - timedelta(days=1)).isoformat()
 
     finished = winery.post(
         order_id, 'finish', {'actual_qty': '3', 'finished_on': later}
@@ -256,6 +256,49 @@ def test_a_run_is_finished_on_a_later_day_with_what_it_actually_made(
     # What the start took divided by what came out.
     assert Decimal(str(done['unit_cost'])) == Decimal('4')
     assert winery.on_shelf(winery.wine) == Decimal('3')
+
+
+def test_a_run_whose_portions_hold_its_whole_output_cannot_lose_its_cost(
+    winery: _Winery,
+) -> None:
+    # Two grapes were taken for two planned bottles but only one came out, and
+    # it is already on the shelf as a portion: booked at 3.00, the run's other
+    # 3.00 has nowhere to go unless the last quantity is put on the shelf by
+    # the finish itself.
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1'})
+    before = winery.stock_value()
+
+    refused = winery.post(order_id, 'finish', {'actual_qty': '1'})
+
+    assert refused.status_code == 400, refused.text
+    assert winery.stock_value() == before
+
+
+def test_the_last_bottles_put_on_the_shelf_by_the_finish_carry_the_rest_of_the_cost(
+    winery: _Winery,
+) -> None:
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1'})
+
+    finished = winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    assert finished.status_code == 200, finished.text
+    assert Decimal(str(finished.json()['total_cost'])) == Decimal('6.00')
+    # 30.00 before the run: nothing is lost between start and finish.
+    assert winery.stock_value() == 30.0
+
+
+def test_a_portion_cannot_take_the_run_above_its_plan(winery: _Winery) -> None:
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+
+    refused = winery.post(order_id, 'portions', {'qty': '3'})
+
+    assert refused.status_code == 400, refused.text
+    assert winery.on_shelf(winery.wine) == Decimal('0')
 
 
 def test_a_run_cannot_finish_with_less_than_its_portions(winery: _Winery) -> None:

@@ -435,6 +435,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_start_not_draft': 'This production order already has status {status} — only a draft can be started.',
         'production_run_not_in_progress': 'This production run has status {status} — only a run in progress can be filled in portions, ticked off or finished.',
         'production_finish_below_portions': 'This run has already put {made} on the shelf in portions, so it cannot finish with less than that.',
+        'production_portion_above_plan': 'A portion cannot take the run above its plan ({planned}) — what comes out beyond it is put on the shelf when the run finishes.',
+        'production_finish_needs_closing_quantity': "The run's cost does not fit in its portions ({made} already on the shelf): when finishing, enter a total above {made} so the rest of the cost is booked on it.",
         'production_cancel_has_portions': 'This run has already put output on the shelf in portions, so it cannot be cancelled — finish it instead.',
         'production_step_not_found': 'This run has no such step.',
         'production_update_not_draft': (
@@ -1485,6 +1487,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_start_not_draft': 'To zlecenie produkcyjne ma już status {status} — rozpocząć można tylko wersję roboczą.',
         'production_run_not_in_progress': 'To zlecenie produkcyjne ma status {status} — porcjami, krokami i zakończeniem można zająć się tylko w zleceniu w toku.',
         'production_finish_below_portions': 'To zlecenie odłożyło już na półkę {made} w porcjach, więc nie może się zakończyć mniejszą ilością.',
+        'production_portion_above_plan': 'Porcja nie może wynieść zlecenia ponad plan ({planned}) — to, co wyjdzie ponad niego, trafia na półkę przy zakończeniu.',
+        'production_finish_needs_closing_quantity': 'Koszt zlecenia nie mieści się w porcjach ({made} już na półce): przy zakończeniu podaj łączną ilość większą niż {made}, żeby reszta kosztu została na niej zaksięgowana.',
         'production_cancel_has_portions': 'To zlecenie odłożyło już wyrób na półkę w porcjach, więc nie można go anulować — zakończ je.',
         'production_step_not_found': 'To zlecenie nie ma takiego kroku.',
         'production_update_not_draft': (

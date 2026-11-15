@@ -328,6 +328,19 @@ describe("ProductionListPage run numbers", () => {
 
     expect(screen.queryByTestId("maker-order-number")).not.toBeInTheDocument();
   });
+
+  it("reads what a run in progress has taken so far, not a dash", () => {
+    listData = {
+      items: [{ ...order, status: "IN_PROGRESS", material_cost: "9.00" }],
+      total: 1,
+      limit: 50,
+      offset: 0,
+      has_more: false,
+    };
+    renderPage();
+
+    expect(screen.getByText(/Taken so far:/)).toHaveTextContent(/9[.,]00/);
+  });
 });
 
 describe("ProductionListPage — the card carries the shortage", () => {

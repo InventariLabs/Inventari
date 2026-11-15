@@ -467,7 +467,7 @@ async def _recipe_name(
     return result.scalar_one_or_none()
 
 
-async def _lock_draft_order(
+async def _lock_order(
     db: AsyncSession,
     organization_id: UUID,
     order_id: UUID,
@@ -1174,7 +1174,7 @@ async def complete_production(
       records hold too little of is taken as far as they go and the rest is
       recorded on its line (``record_made``) instead of refusing the run.
     """
-    order = await _lock_draft_order(db, organization_id, order_id)
+    order = await _lock_order(db, organization_id, order_id)
     # The day the run is booked on: the one it was planned for, else today.
     run_day = await _run_day(db, organization_id, order.production_date)
     actual_qty = await _resolve_actual_qty(db, organization_id, order, actual_qty)
@@ -1290,7 +1290,7 @@ async def start_production(
     the day each was done. The output comes later, in portions or all at once
     (:func:`record_portion`, :func:`finish_production`).
     """
-    order = await _lock_draft_order(
+    order = await _lock_order(
         db,
         organization_id,
         order_id,
@@ -1376,7 +1376,7 @@ async def record_portion(
     ingredients cost per unit planned; the run's overheads and the rest of its
     cost arrive with the closing quantity (:func:`finish_production`).
     """
-    order = await _lock_draft_order(
+    order = await _lock_order(
         db,
         organization_id,
         order_id,
@@ -1390,9 +1390,14 @@ async def record_portion(
         (portion.qty for portion in await list_portions(db, organization_id, order_id)),
         Decimal('0'),
     )
-    settings = await recipe_service.get_settings(db, organization_id, for_update=True)
-    if already + qty > order.planned_qty and not settings.allow_overproduction:
-        raise ServiceRejectionError('production_overproduction_disabled')
+    # A portion is booked at what the ingredients cost per unit planned, so the
+    # portions can never hold more value than the start took. Output above the
+    # plan comes out with the closing quantity, which carries the rest of the
+    # cost and answers to the overproduction setting.
+    if already + qty > order.planned_qty:
+        raise ServiceRejectionError(
+            'production_portion_above_plan', planned=_stored_qty(order.planned_qty)
+        )
     unit_cost = (
         (order.material_cost or Decimal('0')) / order.planned_qty
         if order.planned_qty > 0
@@ -1442,7 +1447,7 @@ async def finish_production(
     and its unit cost divides that by everything that came out. The closing
     quantity carries the part of the cost the portions did not.
     """
-    order = await _lock_draft_order(
+    order = await _lock_order(
         db,
         organization_id,
         order_id,
@@ -1494,11 +1499,19 @@ async def finish_production(
     )
 
     closing_qty = total_actual - made
-    if closing_qty > 0:
-        booked = sum(
-            (portion.qty * (portion.unit_cost or Decimal('0')) for portion in portions),
-            Decimal('0'),
+    booked = sum(
+        (portion.qty * (portion.unit_cost or Decimal('0')) for portion in portions),
+        Decimal('0'),
+    )
+    if closing_qty <= 0 and abs(total_cost - booked) >= Decimal('0.01'):
+        # What the portions took into the cost layers is less than the run
+        # cost, and nothing is left to carry the rest: the shelf would end up
+        # worth less than the run did. The last quantity is put on the shelf
+        # by the finish, which books the rest on it.
+        raise ServiceRejectionError(
+            'production_finish_needs_closing_quantity', made=_stored_qty(made)
         )
+    if closing_qty > 0:
         closing_unit_cost = max(Decimal('0'), (total_cost - booked) / closing_qty)
         item_id = await _receive_output(
             db,
@@ -1551,7 +1564,7 @@ async def tick_step(
     A run that takes weeks is followed by its steps: racked on this day,
     filtered on that. *done_on* ``None`` clears the tick.
     """
-    order = await _lock_draft_order(
+    order = await _lock_order(
         db,
         organization_id,
         order_id,

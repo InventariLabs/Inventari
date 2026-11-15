@@ -45,8 +45,9 @@ class BoMLineRead(BaseModel):
     #: plainly beside a different figure read as if it were in use.
     typed_unit_price_in_use: bool = False
     #: For an ingredient that has a recipe of its own: what its stock holds
-    #: now, in the stock's unit — the part of a run a shelf covers before
-    #: the recipe is used. Null for an ingredient with no recipe.
+    #: now, in the line's unit — the part of a run a shelf covers before
+    #: the recipe is used. Null for an ingredient with no recipe, or when the
+    #: line's unit has no bridge to the stock's.
     stock_on_hand: Decimal | None = None
 
 

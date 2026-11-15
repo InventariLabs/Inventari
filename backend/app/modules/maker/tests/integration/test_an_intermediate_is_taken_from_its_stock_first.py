@@ -22,6 +22,7 @@ from app.models.item import Item
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
+from app.models.uom import Uom
 from app.modules.maker.models import BoMLine, MakerRecipe
 from tests.integration._shelf import post_on_shelf
 
@@ -284,6 +285,39 @@ def test_the_recipe_tree_names_what_the_shelf_holds_of_an_intermediate(
     assert dough_node['line']['make_fresh'] is False
     (flour_node,) = dough_node['children']
     assert flour_node['line']['stock_on_hand'] is None
+
+
+def test_the_recipe_tree_reads_what_the_shelf_holds_in_the_lines_own_unit(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_org: Organization,
+    mk_input_loc: StorageLocation,
+    db_session: Session,
+) -> None:
+    kg = db_session.scalars(select(Uom).where(Uom.symbol == 'kg')).first()
+    g = db_session.scalars(select(Uom).where(Uom.symbol == 'g')).first()
+    assert kg is not None
+    assert g is not None
+    sauce = _template(db_session, mk_org, 'Sauce')
+    sauce.uom_id = kg.id
+    dish = _template(db_session, mk_org, 'Dish')
+    tomato = _template(db_session, mk_org, 'Tomato')
+    _recipe(db_session, mk_org, sauce, [(tomato, '1', False)])
+    recipe = _recipe(db_session, mk_org, dish, [(sauce, '200', False)])
+    db_session.query(BoMLine).filter(
+        BoMLine.recipe_id == recipe.id, BoMLine.child_template_id == sauce.id
+    ).update({'uom_id': g.id, 'unit': 'g'})
+    db_session.commit()
+    post_on_shelf(
+        client, mk_auth_headers, sauce, mk_input_loc.id, '2', purchase_price='5'
+    )
+
+    tree = client.get(f'{API}/bom/tree/{dish.id}', headers=mk_auth_headers)
+
+    assert tree.status_code == 200, tree.text
+    (sauce_node,) = tree.json()['root']['children']
+    # Two kilograms on the shelf, read against a line that counts in grams.
+    assert Decimal(str(sauce_node['line']['stock_on_hand'])) == Decimal('2000')
 
 
 def test_a_line_is_marked_fresh_through_the_recipe_endpoint(

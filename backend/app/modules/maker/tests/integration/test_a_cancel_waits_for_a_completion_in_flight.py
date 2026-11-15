@@ -29,7 +29,7 @@ from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
 from app.modules.maker.models import ProductionOrder
-from app.modules.maker.production_service import _lock_draft_order, cancel_order
+from app.modules.maker.production_service import _lock_order, cancel_order
 
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 
@@ -73,7 +73,7 @@ async def test_a_cancel_arriving_during_a_completion_is_refused(
     try:
         async with factory() as completing, factory() as cancelling:
             # The completion's first move: the run is locked and leaves DRAFT.
-            held = await _lock_draft_order(completing, org_id, order_id)
+            held = await _lock_order(completing, org_id, order_id)
             held.status = 'COMPLETED'
             await completing.flush()
 

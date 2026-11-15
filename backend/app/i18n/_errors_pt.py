@@ -378,6 +378,8 @@ ERRORS_PT: dict[str, str] = {
     'production_start_not_draft': 'Esta ordem de produção já está com status {status} — somente um rascunho pode ser iniciado.',
     'production_run_not_in_progress': 'Esta ordem de produção está com status {status} — somente uma ordem em andamento pode receber porções, ter etapas marcadas ou ser concluída.',
     'production_finish_below_portions': 'Esta ordem já colocou {made} no estoque em porções, então não pode terminar com menos.',
+    'production_portion_above_plan': 'Uma porção não pode levar a ordem acima do planejado ({planned}); o excedente entra no estoque ao concluir.',
+    'production_finish_needs_closing_quantity': 'O custo desta ordem não cabe nas porções ({made} já no estoque): ao concluir, informe uma quantidade total maior que {made} para que o restante do custo seja lançado nela.',
     'production_cancel_has_portions': 'Esta ordem já colocou produção no estoque em porções, então não pode ser cancelada — conclua-a.',
     'production_step_not_found': 'Esta ordem não tem essa etapa.',
     'production_update_not_draft': 'Esta ordem de produção já está com status {status} — somente um rascunho pode ser editado.',
