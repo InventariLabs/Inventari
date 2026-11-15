@@ -15,8 +15,6 @@ export interface IngredientBatchQuery {
   recipe_id?: string | null;
 }
 
-const ORDERS = "/maker/production/orders";
-
 /**
  * A run's batches: the output's shelf life, hold and record, the batches its
  * ingredients are taken from, and the files filed under it.
@@ -52,26 +50,33 @@ export const batchesApi = {
   },
 
   hold: async (orderId: string, reason: string): Promise<OutputBatch> => {
-    const response = await api.post<OutputBatch>(`${ORDERS}/${orderId}/hold`, {
-      reason,
-    });
+    const response = await api.post<OutputBatch>(
+      `/maker/production/orders/${orderId}/hold`,
+      {
+        reason,
+      },
+    );
     return response.data;
   },
 
   release: async (orderId: string): Promise<OutputBatch> => {
     const response = await api.post<OutputBatch>(
-      `${ORDERS}/${orderId}/release`,
+      `/maker/production/orders/${orderId}/release`,
     );
     return response.data;
   },
 
   record: async (orderId: string): Promise<BatchRecord> => {
-    const response = await api.get<BatchRecord>(`${ORDERS}/${orderId}/record`);
+    const response = await api.get<BatchRecord>(
+      `/maker/production/orders/${orderId}/record`,
+    );
     return response.data;
   },
 
   attachments: async (orderId: string): Promise<ProductionAttachment[]> =>
-    getEveryPage<ProductionAttachment>(`${ORDERS}/${orderId}/attachments`),
+    getEveryPage<ProductionAttachment>(
+      `/maker/production/orders/${orderId}/attachments`,
+    ),
 
   uploadAttachment: async (
     orderId: string,
@@ -80,7 +85,7 @@ export const batchesApi = {
     const form = new FormData();
     form.append("file", file);
     const response = await api.post<ProductionAttachment>(
-      `${ORDERS}/${orderId}/attachments`,
+      `/maker/production/orders/${orderId}/attachments`,
       form,
     );
     return response.data;
@@ -90,6 +95,8 @@ export const batchesApi = {
     orderId: string,
     attachmentId: string,
   ): Promise<void> => {
-    await api.delete(`${ORDERS}/${orderId}/attachments/${attachmentId}`);
+    await api.delete(
+      `/maker/production/orders/${orderId}/attachments/${attachmentId}`,
+    );
   },
 };

@@ -626,7 +626,7 @@
       "releasedToast": "The batch is released and can be used again.",
       "holdFailed": "The batch’s state could not be changed.",
       "holdTitle": "Put this batch on hold?",
-      "holdMessage": "A batch on hold stays on its shelf, but no run, pick or dispatch takes from it until it is released.",
+      "holdMessage": "A batch on hold stays in its location, but no run, pick or dispatch takes from it until it is released.",
       "holdReason": "Why is it held?"
     }
   },
@@ -640,7 +640,7 @@
     "actual": "Made",
     "location": "Put away at",
     "ingredients": "Ingredients and their batches",
-    "noBatchTaken": "Nothing was taken off the shelves.",
+    "noBatchTaken": "Nothing was removed from stock.",
     "batchLine": "{{batch}} — {{qty}} (best before {{date}})",
     "shortfall": "{{qty}} more was used than the records held.",
     "costs": "Costs",
@@ -666,7 +666,7 @@
     "deleteFailed": "The file could not be removed.",
     "deleteFile": "Remove {{name}}",
     "confirmDeleteTitle": "Remove this file?",
-    "confirmDeleteMessage": "{{name}} is taken off the run and deleted."
+    "confirmDeleteMessage": "{{name}} is deleted from the run."
   },
   "shelfLife": {
     "label": "Shelf life",
