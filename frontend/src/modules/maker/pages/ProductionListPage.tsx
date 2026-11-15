@@ -219,6 +219,7 @@ export default function ProductionListPage() {
       (order) =>
         (order.output_template_name ?? "").toLowerCase().includes(needle) ||
         (order.number ?? "").toLowerCase().includes(needle) ||
+        (order.output_lot_name ?? "").toLowerCase().includes(needle) ||
         (order.output_template_id ?? "").toLowerCase().includes(needle),
     );
   }, [orders, search]);
@@ -399,6 +400,16 @@ export default function ProductionListPage() {
                     currency={currency}
                     language={i18n.language}
                   />
+                  {order.output_lot_name && (
+                    <div
+                      className="text-on-secondary text-xs mt-1"
+                      data-testid="maker-order-batch"
+                    >
+                      {t("productionList.card.batch", {
+                        batch: order.output_lot_name,
+                      })}
+                    </div>
+                  )}
                   <div className="text-on-muted text-xs mt-1 flex items-center gap-1">
                     <Calendar size={12} />
                     {formatDate(order.created_at)}

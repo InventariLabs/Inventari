@@ -74,7 +74,7 @@ def _target_reads(payload: schemas.PrintJobCreate) -> tuple[str, ...]:
     """The reads that may send this job's labels, by the kind it names."""
     if payload.location_ids:
         return _SHELF_READS
-    if payload.item_ids:
+    if payload.item_ids or payload.lot_ids:
         return _PRODUCT_READS
     return _POOL_READS
 
@@ -170,6 +170,7 @@ async def queue_job(
         short_codes=payload.short_codes,
         storage_ids=payload.location_ids,
         item_ids=payload.item_ids,
+        lot_ids=payload.lot_ids,
         caption=payload.caption,
         qr_only=payload.qr_only,
         show_code=payload.show_code,
@@ -224,6 +225,33 @@ async def product_labels_png(
             'X-Labels-With-Details': str(with_details),
         },
     )
+
+
+@router.post(
+    '/lot-labels/png',
+    response_model=None,
+    responses={200: {'content': {'image/png': {}}}},
+    dependencies=[_READS_PRODUCTS],
+)
+async def lot_labels_png(
+    payload: schemas.LotLabelExport,
+    org_id: UUID = Depends(require_org),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> StreamingResponse:
+    """The batches' labels as one PNG: product, batch code in bars, made and best-before."""
+    from app.modules.printing.services.product_label_service import (
+        DOWNLOAD_SHEET_COLUMNS,
+        generate_product_label_batch_png,
+    )
+
+    labels = await queue.lot_labels_async(db, org_id, payload.lot_ids)
+    if not labels:
+        raise catalogue_refusal('print_job_nothing_to_print')
+    labels = [label for label in labels for _ in range(payload.copies)]
+    png = generate_product_label_batch_png(
+        labels, payload.width_mm, payload.height_mm, columns=DOWNLOAD_SHEET_COLUMNS
+    )
+    return StreamingResponse(io.BytesIO(png), media_type='image/png')
 
 
 @router.post(

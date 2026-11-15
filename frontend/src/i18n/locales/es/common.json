@@ -649,6 +649,8 @@
         "skipped": "Filas omitidas",
         "approval": "Aprobación",
         "labor_hourly_rate": "Tarifa por hora de la mano de obra",
+        "shelf_life_days_before": "Vida útil antes (días)",
+        "shelf_life_days_after": "Vida útil después (días)",
         "typed_unit_price_before": "Precio escrito antes",
         "typed_unit_price_after": "Precio escrito después",
         "done_on": "Hecho el",

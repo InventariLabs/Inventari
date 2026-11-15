@@ -45,6 +45,33 @@ export type ProductionOrderFinish =
 export type ProductionPortionCreate =
   components["schemas"]["ProductionPortionCreate"];
 
+/** A run already made, with the best-before and the ingredient batches its
+ * closing decides. */
+export type ProductionMadeCreate =
+  components["schemas"]["ProductionMadeCreate"];
+
+/** One batch an ingredient is taken from, and how much — the person's choice. */
+export type IngredientLotChoice = components["schemas"]["IngredientLotChoice"];
+
+/** Per ingredient: what the run needs, the draw it makes, the batches on offer. */
+export type IngredientBatchPlan = components["schemas"]["IngredientBatchPlan"];
+
+export type IngredientBatchPlanResponse =
+  components["schemas"]["IngredientBatchPlanResponse"];
+
+/** The printed batch record of a completed run. */
+export type BatchRecord = components["schemas"]["BatchRecordRead"];
+
+/** A photo or a file filed under a run. */
+export type ProductionAttachment =
+  components["schemas"]["ProductionAttachmentRead"];
+
+/** The run's output batch after a hold or a release. */
+export type OutputBatch = components["schemas"]["OutputBatchRead"];
+
+/** A product's shelf life in days, as the maker keeps it. */
+export type ShelfLife = components["schemas"]["ShelfLifeRead"];
+
 export type ProductionOrderListResponse =
   components["schemas"]["ProductionOrderListResponse"];
 
@@ -139,5 +166,9 @@ export type RecipeCreateInput = WithServerDefaults<
 >;
 export type ProductionOrderCreateInput = WithServerDefaults<
   ProductionOrderCreate,
+  "confirm_shortage"
+>;
+export type ProductionMadeCreateInput = WithServerDefaults<
+  ProductionMadeCreate,
   "confirm_shortage"
 >;

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { defaultBestBefore } from "@/modules/maker/lib/bestBefore";
+import { todayIso } from "@/utils/formatters";
 import { ProductionCreateSheet } from "./ProductionCreateSheet";
 import { QueryWrapper } from "@/test/queryWrapper";
 import { useFormGuardStore } from "@/store/formGuardStore";
@@ -65,6 +67,12 @@ vi.mock("@/modules/maker/hooks/useRecipes", async (importOriginal) => ({
 
 vi.mock("@/contexts/ModulesContext", () => ({
   useModules: () => ({ isModuleEnabled: () => true }),
+}));
+const activeProfile = vi.hoisted(() => ({
+  seed_profile: "clean_core" as string | null,
+}));
+vi.mock("@/hooks/useActiveProfile", () => ({
+  useActiveProfile: () => activeProfile,
 }));
 vi.mock("@/hooks/useCanWrite", () => ({
   useCanWrite: () => true,
@@ -624,6 +632,27 @@ describe("ProductionCreateSheet — already made, in one step", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save as made" }));
 
     expect(mocks.madeMutate.mock.calls[1][0].output_lot_name).toBe("B-01");
+  });
+
+  it("dates the batch today plus the shelf life, and never asks a home for a batch code", () => {
+    activeProfile.seed_profile = "food_home";
+    mocks.preview.data = { ...PLUM_PREVIEW, shelf_life_days: 10 };
+    try {
+      renderSheet();
+      typeQuantity("20");
+      pickStorage("Warehouse");
+
+      expect(
+        screen.queryByLabelText("Batch of the output (optional)"),
+      ).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Save as made" }));
+
+      const payload = mocks.madeMutate.mock.calls[0][0];
+      expect(payload.best_before).toBe(defaultBestBefore(todayIso(), 10));
+      expect(payload.output_lot_name).toBeNull();
+    } finally {
+      activeProfile.seed_profile = "clean_core";
+    }
   });
 
   it("shows need, have and short before saving, and says the shortfall gets counted", () => {

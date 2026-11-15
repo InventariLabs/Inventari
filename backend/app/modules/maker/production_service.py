@@ -45,8 +45,17 @@ from app.core.money import quantise
 from app.core.public_api import core_api
 from app.i18n import Language
 
-from . import bom_service, cost_rollup, recipe_service, stock_consumption
+from . import (
+    bom_service,
+    cost_rollup,
+    ingredient_batches,
+    output_batch,
+    recipe_service,
+    stock_consumption,
+)
+from ._schemas_batches import IngredientLotChoice
 from ._schemas_production import (
+    ProductionMadeCreate,
     ProductionOrderCreate,
     ProductionOrderUpdate,
     ProductionPreviewResponse,
@@ -718,29 +727,44 @@ class Consumption:
     shortfalls: dict[int, Decimal] = field(default_factory=dict)
 
 
-async def _takeable_per_child(
+async def _takeable(
     db: AsyncSession,
     organization_id: UUID,
     flat: list[tuple[UUID, Decimal, str]],
     location_id: UUID | None,
-) -> dict[UUID, Decimal]:
-    """How much of each ingredient the draw could take, at most its need.
+    chosen: ingredient_batches.ChosenParts,
+) -> dict[tuple[UUID, UUID | None], Decimal]:
+    """How much the draw could take of each ingredient and batch, at most its need.
 
-    The plan the taking call itself follows (``plan_draw_async``), asked
-    under the locks the run already holds, so what it names is what the draw
-    can take: a short plan names what there is.
+    Keyed by (ingredient, batch): ``None`` for an ingredient nobody chose a
+    batch for, whose need goes to the removal order. The plan the taking
+    call itself follows (``plan_draw_async``), asked under the locks the run
+    already holds, so what it names is what the draw can take: a short plan
+    names what there is.
     """
-    needs: dict[UUID, Decimal] = {}
+    needs: dict[tuple[UUID, UUID | None], Decimal] = {}
     for child_id, child_qty, _unit in flat:
-        needs[child_id] = needs.get(child_id, Decimal('0')) + child_qty
-    takeable: dict[UUID, Decimal] = {}
-    for child_id, need in needs.items():
-        takes = await core_api.stock.plan_draw_async(
-            db, organization_id, child_id, location_id, need, any_owner=True
-        )
-        takeable[child_id] = min(
-            need, sum((take.consumed for take in takes), Decimal('0'))
-        )
+        if child_id in chosen:
+            continue
+        unchosen: tuple[UUID, UUID | None] = (child_id, None)
+        needs[unchosen] = needs.get(unchosen, Decimal('0')) + child_qty
+    for child_id, queue in chosen.items():
+        for chosen_lot, qty in queue:
+            key: tuple[UUID, UUID | None] = (child_id, chosen_lot)
+            needs[key] = needs.get(key, Decimal('0')) + qty
+    takeable: dict[tuple[UUID, UUID | None], Decimal] = {}
+    for (child_id, lot_id), need in needs.items():
+        free: Decimal
+        if lot_id is not None:
+            free = await ingredient_batches.free_in_batch(
+                db, organization_id, child_id, lot_id, location_id
+            )
+        else:
+            takes = await core_api.stock.plan_draw_async(
+                db, organization_id, child_id, location_id, need, any_owner=True
+            )
+            free = sum((take.consumed for take in takes), Decimal('0'))
+        takeable[(child_id, lot_id)] = min(need, free)
     return takeable
 
 
@@ -753,6 +777,7 @@ async def _consume_ingredients(
     *,
     location_id: UUID | None = None,
     record_shortfall: bool = False,
+    chosen: ingredient_batches.ChosenParts | None = None,
 ) -> Consumption:
     """Take every exploded ingredient out of stock and off the books.
 
@@ -766,7 +791,12 @@ async def _consume_ingredients(
     shortfall. The shortfall is valued at the ingredient's estimated cost —
     the goods were used, and a run of goods the records never held would
     otherwise cost nothing.
+
+    *chosen* holds the batches the person chose, checked already
+    (``ingredient_batches.resolve_choices``): an ingredient in it is taken
+    from those batches and no other; the rest go by the removal order.
     """
+    chosen = chosen or {}
     outcome = Consumption()
     consumed_per_child = outcome.records
     cost_sums: dict[UUID, Decimal] = {}
@@ -791,7 +821,7 @@ async def _consume_ingredients(
         ),
     )
     takeable = (
-        await _takeable_per_child(db, organization_id, flat, location_id)
+        await _takeable(db, organization_id, flat, location_id, chosen)
         if record_shortfall
         else None
     )
@@ -801,64 +831,74 @@ async def _consume_ingredients(
         else {}
     )
     for index, (child_template_id, child_qty, _unit) in enumerate(flat):
-        draw = child_qty
-        if takeable is not None:
-            draw = min(child_qty, takeable.get(child_template_id, Decimal('0')))
-            takeable[child_template_id] = (
-                takeable.get(child_template_id, Decimal('0')) - draw
-            )
-            if draw < child_qty:
-                shortfall = child_qty - draw
-                outcome.shortfalls[index] = shortfall
-                rate = estimates.get(child_template_id, UnitCostEstimate()).unit_cost
-                if rate is not None:
-                    outcome.cost += rate * shortfall
-                    cost_sums[child_template_id] = (
-                        cost_sums.get(child_template_id, Decimal('0'))
-                        + rate * shortfall
+        consumed_per_child.setdefault(child_template_id, [])
+        child_template = None
+        for lot_id, part_qty in ingredient_batches.parts_for_line(
+            chosen, child_template_id, child_qty
+        ):
+            draw = part_qty
+            if takeable is not None:
+                key = (child_template_id, lot_id)
+                draw = min(part_qty, takeable.get(key, Decimal('0')))
+                takeable[key] = takeable.get(key, Decimal('0')) - draw
+                if draw < part_qty:
+                    shortfall = part_qty - draw
+                    outcome.shortfalls[index] = (
+                        outcome.shortfalls.get(index, Decimal('0')) + shortfall
                     )
-                    qty_sums[child_template_id] = (
-                        qty_sums.get(child_template_id, Decimal('0')) + shortfall
-                    )
-        if draw <= 0:
-            consumed_per_child.setdefault(child_template_id, [])
-            continue
-        child_template = await core_api.product_templates.get_async(
-            db, organization_id, child_template_id
-        )
-        records = await stock_consumption.consume_across_locations(
-            db,
-            organization_id,
-            child_template_id,
-            draw,
-            child_template=child_template,
-            history_changes=history_changes,
-            user_id=user.id,
-            reference_id=order.id,
-            location_id=location_id,
-        )
-        consumed_per_child.setdefault(child_template_id, []).extend(records)
-        # And off the cost ledger. The draw above does not touch valuation,
-        # and the record write it does is a bare quantity change — so a run
-        # would raise a layer for what it made and lower none for what it
-        # ate, counting the same stock twice. The picking path in recipes
-        # has always posted its own; this is the same call.
-        consumed_qty = sum((rec.consumed_qty for rec in records), Decimal('0'))
-        cost = await core_api.valuation.record_delivery_async(
-            db,
-            organization_id,
-            child_template_id,
-            consumed_qty,
-            reason=ItemAction.USED.value,
-        )
-        outcome.cost += cost or Decimal('0')
-        if cost is not None:
-            cost_sums[child_template_id] = (
-                cost_sums.get(child_template_id, Decimal('0')) + cost
+                    rate = estimates.get(
+                        child_template_id, UnitCostEstimate()
+                    ).unit_cost
+                    if rate is not None:
+                        outcome.cost += rate * shortfall
+                        cost_sums[child_template_id] = (
+                            cost_sums.get(child_template_id, Decimal('0'))
+                            + rate * shortfall
+                        )
+                        qty_sums[child_template_id] = (
+                            qty_sums.get(child_template_id, Decimal('0')) + shortfall
+                        )
+            if draw <= 0:
+                continue
+            if child_template is None:
+                child_template = await core_api.product_templates.get_async(
+                    db, organization_id, child_template_id
+                )
+            records = await stock_consumption.consume_across_locations(
+                db,
+                organization_id,
+                child_template_id,
+                draw,
+                child_template=child_template,
+                history_changes=history_changes,
+                user_id=user.id,
+                reference_id=order.id,
+                location_id=location_id,
+                lot_id=lot_id,
             )
-            qty_sums[child_template_id] = (
-                qty_sums.get(child_template_id, Decimal('0')) + consumed_qty
+            consumed_per_child[child_template_id].extend(records)
+            # And off the cost ledger. The draw above does not touch
+            # valuation, and the record write it does is a bare quantity
+            # change — so a run would raise a layer for what it made and
+            # lower none for what it ate, counting the same stock twice. The
+            # picking path in recipes has always posted its own; this is the
+            # same call.
+            consumed_qty = sum((rec.consumed_qty for rec in records), Decimal('0'))
+            cost = await core_api.valuation.record_delivery_async(
+                db,
+                organization_id,
+                child_template_id,
+                consumed_qty,
+                reason=ItemAction.USED.value,
             )
+            outcome.cost += cost or Decimal('0')
+            if cost is not None:
+                cost_sums[child_template_id] = (
+                    cost_sums.get(child_template_id, Decimal('0')) + cost
+                )
+                qty_sums[child_template_id] = (
+                    qty_sums.get(child_template_id, Decimal('0')) + consumed_qty
+                )
     # Per unit, for the line snapshots. The total above is kept exact: an
     # ingredient whose cost does not divide evenly by its quantity would
     # otherwise make the lines and the order total disagree by the remainder.
@@ -878,14 +918,16 @@ async def _receive_output(
     unit_cost: Decimal,
     user: UserContextDTO,
     *,
+    run_day: date,
+    best_before: date | None,
     lot_name: str | None = None,
-    made_on: date | None = None,
 ) -> tuple[UUID, UUID | None]:
-    """Put the produced goods on the shelf (output = actual).
+    """Put the produced goods on the shelf (output = actual), in their batch.
 
-    *lot_name* and *made_on* name a portion of a run that is filled in
-    parts; without them the run's own batch and day apply. Answers the record
-    the goods were put on and the cost layer they opened.
+    *lot_name* names the batch of a portion of a run that is filled in parts;
+    without it the run's own batch applies. *run_day* is the day the goods
+    came out. Answers the record the goods were put on and the cost layer
+    they opened.
     """
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
@@ -916,19 +958,26 @@ async def _receive_output(
         db, organization_id, template_id=order.output_template_id
     )
     # The batch the person named for the output, opened on first use: two
-    # runs naming the same batch fill one batch, the way two receipts do.
-    batch_name = lot_name or order.output_lot_name
-    output_lot_id = (
-        await core_api.stock.get_or_create_lot_async(
-            db,
-            organization_id,
-            order.output_template_id,
-            batch_name,
-            production_date=made_on or order.production_date,
+    # runs naming the same batch fill one batch, the way two receipts do. A
+    # run nobody named a batch for names its own, under the card's lock the
+    # run took from the top — every run's output is a batch a recall can
+    # follow. The batch is dated with the day the goods came out and its
+    # best-before; a batch that already exists keeps the dates it was opened
+    # with.
+    if not order.output_lot_name:
+        order.output_lot_name = await output_batch.next_batch_name(
+            db, organization_id, order.output_template_id, run_day
         )
-        if batch_name
-        else None
+    output_lot_id = await core_api.stock.get_or_create_lot_async(
+        db,
+        organization_id,
+        order.output_template_id,
+        lot_name or order.output_lot_name,
+        production_date=run_day,
+        expiry_date=best_before,
     )
+    if lot_name is None or order.output_lot_id is None:
+        order.output_lot_id = output_lot_id
     produced_item = await core_api.items.create_async(
         db,
         organization_id,
@@ -942,6 +991,9 @@ async def _receive_output(
             description=template.description if template else None,
             purchase_price=unit_cost if unit_cost > 0 else None,
             lot_id=output_lot_id,
+            # The record's date is the batch's, as a receipt writes it: FEFO,
+            # the expiry views and To do read made goods like received ones.
+            expiry_date=best_before,
         ),
         user=user,
         post_the_change=False,
@@ -1071,6 +1123,7 @@ async def _take_for_run(
     *,
     estimate_qty: Decimal,
     record_shortfall: bool,
+    ingredient_lots: list[IngredientLotChoice] | None = None,
 ) -> _Taken:
     """Take a run's ingredients off the records and write its lines.
 
@@ -1110,6 +1163,14 @@ async def _take_for_run(
         check_location_id,
         record_shortfall=record_shortfall,
     )
+    chosen = await ingredient_batches.resolve_choices(
+        db,
+        organization_id,
+        flat,
+        ingredient_lots or [],
+        check_location_id,
+        record_shortfall=record_shortfall,
+    )
 
     # Consume first, then cost. The material cost is what the cost ledger
     # actually gave up for these ingredients, which is only known once the
@@ -1127,6 +1188,7 @@ async def _take_for_run(
         user,
         location_id=check_location_id,
         record_shortfall=record_shortfall,
+        chosen=chosen,
     )
     _write_order_lines(db, order, flat, consumption, line_estimates)
     return _Taken(flat, consumption, estimated_material_cost)
@@ -1156,6 +1218,8 @@ async def complete_production(
     *,
     actual_qty: Decimal | None = None,
     record_shortfall: bool = False,
+    best_before: date | None = None,
+    ingredient_lots: list[IngredientLotChoice] | None = None,
 ) -> ProductionOrder:
     """Execute the full atomic production pipeline (see module docstring).
 
@@ -1173,11 +1237,18 @@ async def complete_production(
     - ``record_shortfall``: the run already happened, so an ingredient the
       records hold too little of is taken as far as they go and the rest is
       recorded on its line (``record_made``) instead of refusing the run.
+    - ``best_before``: the output batch's date, else the run's day plus the
+      product's shelf life (``output_batch.best_before_for_run``).
+    - ``ingredient_lots``: the batches the person chose for ingredients;
+      the run takes exactly those (``ingredient_batches.resolve_choices``).
     """
     order = await _lock_order(db, organization_id, order_id)
     # The day the run is booked on: the one it was planned for, else today.
     run_day = await _run_day(db, organization_id, order.production_date)
     actual_qty = await _resolve_actual_qty(db, organization_id, order, actual_qty)
+    output_best_before = await output_batch.best_before_for_run(
+        db, organization_id, order.output_template_id, run_day, best_before
+    )
     overproduced = actual_qty > order.planned_qty
     scrap_qty = order.planned_qty - actual_qty
 
@@ -1188,6 +1259,7 @@ async def complete_production(
         user,
         estimate_qty=actual_qty,
         record_shortfall=record_shortfall,
+        ingredient_lots=ingredient_lots,
     )
     total_material_cost = taken.consumption.cost
     total_fixed_cost, total_labour_cost, recipe = await _batch_overheads_and_recipe(
@@ -1207,7 +1279,16 @@ async def complete_production(
     )
     _snapshot_financial_result(order, recipe, unit_cost, uncosted=uncosted)
 
-    await _receive_output(db, organization_id, order, actual_qty, unit_cost, user)
+    await _receive_output(
+        db,
+        organization_id,
+        order,
+        actual_qty,
+        unit_cost,
+        user,
+        run_day=run_day,
+        best_before=output_best_before,
+    )
 
     order.status = 'COMPLETED'
     order.total_cost = total_cost
@@ -1413,8 +1494,11 @@ async def record_portion(
         qty,
         unit_cost,
         user,
+        run_day=day,
+        best_before=await output_batch.best_before_for_run(
+            db, organization_id, order.output_template_id, day, None
+        ),
         lot_name=lot_name,
-        made_on=day,
     )
     portion = ProductionPortion(
         organization_id=organization_id,
@@ -1558,8 +1642,11 @@ async def finish_production(
             closing_qty,
             closing_unit_cost,
             user,
+            run_day=day,
+            best_before=await output_batch.best_before_for_run(
+                db, organization_id, order.output_template_id, day, None
+            ),
             lot_name=lot_name,
-            made_on=day,
         )
         db.add(
             ProductionPortion(
@@ -1637,7 +1724,7 @@ async def tick_step(
 async def record_made(
     db: AsyncSession,
     organization_id: UUID,
-    data: ProductionOrderCreate,
+    data: ProductionMadeCreate,
     user: UserContextDTO,
 ) -> ProductionOrder:
     """Record a run that has already happened: one step, create and complete.
@@ -1652,7 +1739,13 @@ async def record_made(
     """
     order = await create_order(db, organization_id, data, user, ask_the_strategy=False)
     return await complete_production(
-        db, organization_id, order.id, user, record_shortfall=True
+        db,
+        organization_id,
+        order.id,
+        user,
+        record_shortfall=True,
+        best_before=data.best_before,
+        ingredient_lots=data.ingredient_lots,
     )
 
 

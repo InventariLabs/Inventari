@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
 import { useCompleteProduction } from "@/modules/maker/hooks/useProduction";
+import { useBatchChoice } from "@/modules/maker/hooks/useBatchChoice";
+import { defaultBestBefore } from "@/modules/maker/lib/bestBefore";
+import { todayIso } from "@/utils/formatters";
 import {
   parseEmptyBomError,
   parseShortageError,
@@ -27,8 +30,38 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
   const navigate = useNavigate();
   const completeMutation = useCompleteProduction();
 
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirm, setShowConfirmState] = useState(false);
   const [actualQty, setActualQty] = useState("");
+  // The output batch's best-before, proposed from the run's day and the
+  // product's shelf life each time the dialog opens; the person may change it.
+  const [bestBefore, setBestBefore] = useState("");
+  // The batches the ingredients come from — asked only while the dialog is
+  // open on a draft, since a closed run has taken its batches already.
+  const batchQuery = useMemo(
+    () =>
+      showConfirm && order && order.status === "DRAFT"
+        ? {
+            output_template_id: order.output_template_id,
+            planned_qty: String(order.planned_qty),
+            output_location_id: order.output_location_id,
+            recipe_id: order.recipe_id ?? null,
+          }
+        : null,
+    [showConfirm, order],
+  );
+  const batches = useBatchChoice(batchQuery);
+
+  function setShowConfirm(open: boolean) {
+    if (open && order) {
+      setBestBefore(
+        defaultBestBefore(
+          order.production_date ?? todayIso(),
+          order.shelf_life_days,
+        ),
+      );
+    }
+    setShowConfirmState(open);
+  }
   const [shortages, setShortages] = useState<ShortageEntry[] | null>(null);
   // Whether the refused run was born over stock — recorded by the server at
   // creation, so the dialog says "never enough" when it is true and "ran
@@ -37,8 +70,11 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
 
   function complete() {
     if (!order) return;
-    const payload =
-      actualQty.trim() !== "" ? { actual_qty: actualQty.trim() } : undefined;
+    const payload = {
+      ...(actualQty.trim() !== "" && { actual_qty: actualQty.trim() }),
+      ...(bestBefore && { best_before: bestBefore }),
+      ...(batches.payload.length > 0 && { ingredient_lots: batches.payload }),
+    };
 
     completeMutation.mutate(
       { orderId: order.id, data: payload },
@@ -91,6 +127,9 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
     setShowConfirm,
     actualQty,
     setActualQty,
+    bestBefore,
+    setBestBefore,
+    batches,
     shortages,
     setShortages,
     shortAtCreate,

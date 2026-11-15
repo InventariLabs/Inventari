@@ -179,6 +179,10 @@
     "withoutCode_other": "{{count}} dos produtos escolhidos não têm código e ficaram de fora. Gere um no formulário de cada um.",
     "previewAlt": "Visualização das etiquetas de produtos"
   },
+  "batchLabel": {
+    "title": "Etiquetas de lote",
+    "previewAlt": "Pré-visualização de uma etiqueta de lote"
+  },
   "locationLabel": {
     "title": "Etiquetas de locais",
     "qr": "QR ao lado das barras, para a câmera do celular",

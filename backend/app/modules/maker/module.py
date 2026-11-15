@@ -80,8 +80,23 @@ def _register_work_in_progress() -> None:
 _register_work_in_progress()
 
 
+def _register_contributions() -> None:
+    """Let ``/uploads/`` serve a run's files to its own organization."""
+    from typing import cast
+
+    from app.core.module_sdk import BaseContribution, contribution_registry
+
+    from .resolvers import ProductionAttachmentResolver
+
+    contribution_registry.register(
+        'upload_path_resolvers',
+        cast(BaseContribution, ProductionAttachmentResolver()),
+    )
+
+
 module = define_module(
     router_factory=_get_router,
     interceptors=_get_interceptors(),
+    register_contributions_hook=_register_contributions,
     consumes_stock_quant=True,
 )

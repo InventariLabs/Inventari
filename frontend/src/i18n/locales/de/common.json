@@ -649,6 +649,8 @@
         "skipped": "Übersprungene Zeilen",
         "approval": "Genehmigung",
         "labor_hourly_rate": "Stundensatz der Arbeit",
+        "shelf_life_days_before": "Haltbarkeit vorher (Tage)",
+        "shelf_life_days_after": "Haltbarkeit nachher (Tage)",
         "typed_unit_price_before": "Eingetragener Preis vorher",
         "typed_unit_price_after": "Eingetragener Preis nachher",
         "done_on": "Erledigt am",

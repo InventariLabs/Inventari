@@ -10,10 +10,12 @@ const RecipeCatalogPage = lazy(() => import("./pages/RecipeCatalogPage"));
 const RecipeDetailPage = lazy(() => import("./pages/RecipeDetailPage"));
 const ProductionListPage = lazy(() => import("./pages/ProductionListPage"));
 const ProductionDetailPage = lazy(() => import("./pages/ProductionDetailPage"));
+const BatchRecordPage = lazy(() => import("./pages/BatchRecordPage"));
 const MakerSettingsPage = lazy(() => import("./pages/MakerSettingsPage"));
 const BomLegacyRedirect = lazy(() => import("./pages/BomLegacyRedirect"));
 const BoMEntrySlot = lazy(() => import("./components/BoMEntrySlot"));
 const WhereUsedSlot = lazy(() => import("./components/WhereUsedSlot"));
+const ShelfLifeSlot = lazy(() => import("./components/ShelfLifeSlot"));
 const CookForStockSlot = lazy(() => import("./components/CookForStockModal"));
 
 moduleRegistry.register({
@@ -76,6 +78,10 @@ moduleRegistry.register({
     { path: "/maker/recipes/:recipeId", component: RecipeDetailPage },
     { path: "/maker/production", component: ProductionListPage },
     { path: "/maker/production/:orderId", component: ProductionDetailPage },
+    {
+      path: "/maker/production/:orderId/record",
+      component: BatchRecordPage,
+    },
     { path: "/maker/settings", component: MakerSettingsPage },
     // Removed screen, kept as a redirect for saved links.
     { path: "/maker/bom", component: BomLegacyRedirect },
@@ -85,6 +91,11 @@ moduleRegistry.register({
       slot: "item_edit_extra",
       component: slotComponent(BoMEntrySlot),
       priority: 20,
+    },
+    {
+      slot: "item_edit_extra",
+      component: slotComponent(ShelfLifeSlot),
+      priority: 25,
     },
     {
       slot: "item_edit_extra",

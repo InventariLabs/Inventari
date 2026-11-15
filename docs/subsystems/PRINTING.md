@@ -15,6 +15,9 @@ The printing system is split into two tiers:
   A label of W × H mm is one file, W × H mm at 300 dpi, stating its resolution
   (`label_geometry.raster_for`). The download, the preview and a print job carry that same file;
   nothing about a printer changes how a label is drawn.
+- **Batch labels**: `POST /api/v1/printing/lot-labels/png` draws a batch's label — the product's
+  name, the batch's own code in bars, the day it was made and its best-before. A batch label goes
+  up to 200 copies (a run prints one per unit it made); every other label stops at 20.
 - **Export API**: `GET /api/v1/labels/pool/export/png` — returns a PNG batch of unprinted labels (or the ones named by `label_ids` / `short_codes`) and marks them as printed, unless `mark_printed=false`; with nothing unprinted it answers 400 `NO_LABELS_AVAILABLE`.
 - **Print queue**: `app.modules.printing` — **Send to printer** in the app creates a print job for a
   registered agent; the agent claims it, fetches its image, prints it and reports the outcome. The
@@ -51,6 +54,7 @@ The app's side asks for the read of the screen that sends the label, by kind of 
 |---|---|---|
 | A product's barcode label (`item_ids`) | a product's card, the product list | `items:read` |
 | A pool label (`label_ids`, `short_codes`) | Labels; the equipment register's asset list and its batch of new assets | `items:read` or `equipment:read` |
+| A batch label (`lot_ids`) — the product, the batch code in Code 128, made and best-before | a completed production run | `items:read` |
 | A shelf (`location_ids`) | a location card; the warehouse's scan sheet and location codes | `locations:read` or `warehouse:read` |
 | A dispatch's package | its package card, through the warehouse | `warehouse:read` |
 

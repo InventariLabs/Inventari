@@ -239,7 +239,6 @@ export default tseslint.config(
       "src/modules/equipment/hooks/useAssetListActions.ts",
       "src/modules/equipment/pages/AssetListPage.tsx",
       "src/modules/inventory/pages/ItemsPage.tsx",
-      "src/modules/maker/pages/ProductionDetailPage.tsx",
       "src/modules/inventory/pages/LabelPoolPage.tsx",
       "src/modules/recipes/components/PickingActivePhase.tsx",
       "src/modules/recipes/components/RecipeForm.tsx",

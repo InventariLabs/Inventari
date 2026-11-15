@@ -6,6 +6,7 @@ import { useAppMutation } from "@/lib/api/mutationFactory";
 import type {
   ProductionOrder,
   ProductionOrderComplete,
+  ProductionMadeCreateInput,
   ProductionOrderCreateInput,
   ProductionOrderFinish,
   ProductionOrderStart,
@@ -74,7 +75,7 @@ export function useProductionPreview(
 export function useRecordMadeProduction() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: ProductionOrderCreateInput) =>
+    mutationFn: (data: ProductionMadeCreateInput) =>
       productionApi.recordMade(data),
     onSuccess: (order: ProductionOrder) => {
       invalidation.maker(queryClient, order.id);

@@ -3870,6 +3870,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maker/production/ingredient-batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Plan Ingredient Batches
+         * @description Which batches each ingredient of a run would be taken from, read-only.
+         *
+         *     The run as its form or its draft names it: the product, the recipe
+         *     (its default when left out), the quantity and where the output goes.
+         *     Answers the draw the run makes when nobody chooses, and every batch the
+         *     person may choose instead — at the scope the run draws under.
+         */
+        get: operations["plan_ingredient_batches_api_v1_maker_production_ingredient_batches_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maker/production/monthly-result": {
         parameters: {
             query?: never;
@@ -4015,6 +4040,50 @@ export interface paths {
         patch: operations["update_production_order_api_v1_maker_production_orders__order_id__patch"];
         trace?: never;
     };
+    "/api/v1/maker/production/orders/{order_id}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Run Attachments
+         * @description The photos and files filed under the run, newest first.
+         */
+        get: operations["list_run_attachments_api_v1_maker_production_orders__order_id__attachments_get"];
+        put?: never;
+        /**
+         * Upload Run Attachment
+         * @description File a photo or a document under the run, within a product attachment's limits.
+         */
+        post: operations["upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/orders/{order_id}/attachments/{attachment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Run Attachment
+         * @description Take a file off the run; the stored file goes once the removal is committed.
+         */
+        delete: operations["delete_run_attachment_api_v1_maker_production_orders__order_id__attachments__attachment_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maker/production/orders/{order_id}/cancel": {
         parameters: {
             query?: never;
@@ -4106,6 +4175,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maker/production/orders/{order_id}/hold": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Hold Output Batch
+         * @description Put the run's output batch on hold until it is released.
+         */
+        post: operations["hold_output_batch_api_v1_maker_production_orders__order_id__hold_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maker/production/orders/{order_id}/portions": {
         parameters: {
             query?: never;
@@ -4120,6 +4209,46 @@ export interface paths {
          * @description Put a portion of an in-progress run's output on the shelf, on its day.
          */
         post: operations["record_production_portion_api_v1_maker_production_orders__order_id__portions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/orders/{order_id}/record": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Batch Record
+         * @description The printable batch record of a completed run.
+         */
+        get: operations["get_batch_record_api_v1_maker_production_orders__order_id__record_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/orders/{order_id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Release Output Batch
+         * @description Release the run's held output batch back into use.
+         */
+        post: operations["release_output_batch_api_v1_maker_production_orders__order_id__release_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4213,6 +4342,33 @@ export interface paths {
          */
         get: operations["get_production_stock_moves_api_v1_maker_production_orders__order_id__stock_moves_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/shelf-lives/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Shelf Life
+         * @description How many days the product keeps once made (None: nobody said).
+         */
+        get: operations["get_shelf_life_api_v1_maker_production_shelf_lives__template_id__get"];
+        /**
+         * Set Shelf Life
+         * @description Set the product's shelf life in days, or clear it with ``null``.
+         *
+         *     A fact about the product, so it lands in the organization journal with
+         *     both sides, as a typed price does.
+         */
+        put: operations["set_shelf_life_api_v1_maker_production_shelf_lives__template_id__put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5432,6 +5588,26 @@ export interface paths {
          *     says how many were.
          */
         post: operations["location_labels_png_api_v1_printing_location_labels_png_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/printing/lot-labels/png": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Lot Labels Png
+         * @description The batches' labels as one PNG: product, batch code in bars, made and best-before.
+         */
+        post: operations["lot_labels_png_api_v1_printing_lot_labels_png_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -12258,6 +12434,107 @@ export interface components {
              */
             available: boolean;
         };
+        /**
+         * BatchRecordBatch
+         * @description What a run took of one ingredient from one batch.
+         */
+        BatchRecordBatch: {
+            /** Lot Id */
+            lot_id?: string | null;
+            /** Lot Name */
+            lot_name?: string | null;
+            /** Expiry Date */
+            expiry_date?: string | null;
+            /** Quantity */
+            quantity: string;
+        };
+        /**
+         * BatchRecordIngredient
+         * @description One ingredient of the batch record, with the batches it came from.
+         */
+        BatchRecordIngredient: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Template Name */
+            template_name?: string | null;
+            /** Unit */
+            unit: string;
+            /** Consumed Qty */
+            consumed_qty: string;
+            /** Shortfall Qty */
+            shortfall_qty?: string | null;
+            /** Unit Cost */
+            unit_cost?: string | null;
+            /** Cost */
+            cost?: string | null;
+            /** Batches */
+            batches?: components["schemas"]["BatchRecordBatch"][];
+        };
+        /**
+         * BatchRecordRead
+         * @description Everything the printed batch record of a completed run says.
+         */
+        BatchRecordRead: {
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /** Number */
+            number?: string | null;
+            /** Status */
+            status: string;
+            /** Output Template Name */
+            output_template_name?: string | null;
+            /** Recipe Name */
+            recipe_name?: string | null;
+            /** Output Uom Symbol */
+            output_uom_symbol?: string | null;
+            /** Planned Qty */
+            planned_qty: string;
+            /** Actual Qty */
+            actual_qty?: string | null;
+            /** Scrap Qty */
+            scrap_qty?: string | null;
+            /** Output Lot Name */
+            output_lot_name?: string | null;
+            /** Output Lot Status */
+            output_lot_status?: string | null;
+            /** Production Date */
+            production_date?: string | null;
+            /** Best Before */
+            best_before?: string | null;
+            /** Output Location Name */
+            output_location_name?: string | null;
+            /** Ingredients */
+            ingredients?: components["schemas"]["BatchRecordIngredient"][];
+            /** Material Cost */
+            material_cost?: string | null;
+            /** Total Cost */
+            total_cost?: string | null;
+            /** Estimated Total Cost */
+            estimated_total_cost?: string | null;
+            /** Unit Cost */
+            unit_cost?: string | null;
+            /** Created By Name */
+            created_by_name?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed By Name */
+            completed_by_name?: string | null;
+            /** Completed At */
+            completed_at?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Attachments */
+            attachments?: components["schemas"]["ProductionAttachmentRead"][];
+        };
         /** BestItemSchema */
         BestItemSchema: {
             /**
@@ -12636,6 +12913,11 @@ export interface components {
         Body_upload_recipe_image_api_v1_recipes__recipe_id__image_post: {
             /** Image */
             image: string;
+        };
+        /** Body_upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post */
+        Body_upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post: {
+            /** File */
+            file: string;
         };
         /**
          * BomMoveRequest
@@ -15893,6 +16175,73 @@ export interface components {
             /** To Buy Uom Symbol */
             to_buy_uom_symbol?: string | null;
         };
+        /**
+         * IngredientBatchDraw
+         * @description A part of an ingredient's need, from one batch (``None``: stock without one).
+         */
+        IngredientBatchDraw: {
+            /** Lot Id */
+            lot_id?: string | null;
+            /** Lot Name */
+            lot_name?: string | null;
+            /** Expiry Date */
+            expiry_date?: string | null;
+            /** Quantity */
+            quantity: string;
+        };
+        /**
+         * IngredientBatchOption
+         * @description A batch of the ingredient the run may take from, and how much it has free.
+         */
+        IngredientBatchOption: {
+            /**
+             * Lot Id
+             * Format: uuid
+             */
+            lot_id: string;
+            /** Lot Name */
+            lot_name: string;
+            /** Expiry Date */
+            expiry_date?: string | null;
+            /** Production Date */
+            production_date?: string | null;
+            /** Available */
+            available: string;
+        };
+        /**
+         * IngredientBatchPlan
+         * @description Which batches an ingredient of the run will be taken from.
+         *
+         *     ``plan`` is the draw the run makes when nobody chooses — the product's
+         *     removal order, earliest best-before first under FEFO — and ``batches``
+         *     every batch the person may choose instead. Held, recalled and expired
+         *     batches are in neither. Quantities are in the ingredient's stock unit.
+         */
+        IngredientBatchPlan: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Template Name */
+            template_name?: string | null;
+            /** Uom Symbol */
+            uom_symbol?: string | null;
+            /** Needed */
+            needed: string;
+            /** Plan */
+            plan?: components["schemas"]["IngredientBatchDraw"][];
+            /** Batches */
+            batches?: components["schemas"]["IngredientBatchOption"][];
+        };
+        /**
+         * IngredientBatchPlanResponse
+         * @description Output for POST /production/orders/ingredient-batches.
+         */
+        IngredientBatchPlanResponse: {
+            /** Ingredients */
+            ingredients?: components["schemas"]["IngredientBatchPlan"][];
+        };
         /** IngredientCost */
         IngredientCost: {
             /** Ingredient Name */
@@ -16017,6 +16366,28 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /**
+         * IngredientLotChoice
+         * @description One batch an ingredient is taken from, and how much of it.
+         *
+         *     The quantity is in the ingredient's stock unit, the unit the batch plan
+         *     answers in. The choices of one ingredient add up to what the run takes
+         *     of it.
+         */
+        IngredientLotChoice: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /**
+             * Lot Id
+             * Format: uuid
+             */
+            lot_id: string;
+            /** Quantity */
+            quantity: number | string;
         };
         /** IngredientMatchProposal */
         IngredientMatchProposal: {
@@ -17206,6 +17577,24 @@ export interface components {
             message: string;
         };
         /**
+         * LotLabelExport
+         * @description Batches whose labels to draw, and how: the preview and download.
+         *
+         *     A run prints one label per unit it made, so a batch label goes up to
+         *     ``LOT_LABEL_MAX_COPIES`` copies of its one batch, where other labels stop
+         *     at 20.
+         */
+        LotLabelExport: {
+            /** Lot Ids */
+            lot_ids: string[];
+            /** Width Mm */
+            width_mm?: number;
+            /** Height Mm */
+            height_mm?: number;
+            /** Copies */
+            copies?: number;
+        };
+        /**
          * LotLocationDTO
          * @description How much of one batch is standing in one place.
          */
@@ -18380,6 +18769,31 @@ export interface components {
             /** Print Page Size */
             print_page_size?: string | null;
         };
+        /**
+         * OutputBatchHold
+         * @description Input for POST /production/orders/{id}/hold: why the batch is held.
+         *
+         *     A reason of spaces says nothing; the batch's history keeps it trimmed.
+         */
+        OutputBatchHold: {
+            /** Reason */
+            reason: string;
+        };
+        /**
+         * OutputBatchRead
+         * @description The run's output batch as it stands after a hold or a release.
+         */
+        OutputBatchRead: {
+            /**
+             * Lot Id
+             * Format: uuid
+             */
+            lot_id: string;
+            /** Lot Name */
+            lot_name: string;
+            /** Status */
+            status: string;
+        };
         /** OverdueAssignmentItem */
         OverdueAssignmentItem: {
             /**
@@ -19407,6 +19821,24 @@ export interface components {
         PaginatedResponse_ProductProfile_: {
             /** Items */
             items: components["schemas"]["ProductProfile"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+        };
+        /** PaginatedResponse[ProductionAttachmentRead] */
+        PaginatedResponse_ProductionAttachmentRead_: {
+            /** Items */
+            items: components["schemas"]["ProductionAttachmentRead"][];
             /** Total */
             total: number;
             /** Limit */
@@ -20891,6 +21323,8 @@ export interface components {
             location_ids?: string[];
             /** Item Ids */
             item_ids?: string[];
+            /** Lot Ids */
+            lot_ids?: string[];
             /** Details */
             details?: boolean;
             /** Caption */
@@ -21353,6 +21787,74 @@ export interface components {
             uom_symbol?: string | null;
         };
         /**
+         * ProductionAttachmentRead
+         * @description A file filed under a run.
+         */
+        ProductionAttachmentRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Production Order Id
+             * Format: uuid
+             */
+            production_order_id: string;
+            /** Original Name */
+            original_name: string;
+            /** Content Type */
+            content_type: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Url */
+            url: string;
+            /** Uploaded By */
+            uploaded_by?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ProductionMadeCreate
+         * @description Input for POST /production/orders/made — a run that already happened.
+         *
+         *     Besides the run, what closing it decides: the output batch's
+         *     best-before (the run's day plus the product's shelf life when left
+         *     out) and, per ingredient, the batches it was taken from (the removal
+         *     order when left out).
+         */
+        ProductionMadeCreate: {
+            /**
+             * Output Template Id
+             * Format: uuid
+             */
+            output_template_id: string;
+            /** Recipe Id */
+            recipe_id?: string | null;
+            /** Planned Qty */
+            planned_qty: number | string;
+            /**
+             * Output Location Id
+             * Format: uuid
+             */
+            output_location_id: string;
+            /** Production Date */
+            production_date?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Output Lot Name */
+            output_lot_name?: string | null;
+            /** Confirm Shortage */
+            confirm_shortage?: boolean;
+            /** Best Before */
+            best_before?: string | null;
+            /** Ingredient Lots */
+            ingredient_lots?: components["schemas"]["IngredientLotChoice"][];
+        };
+        /**
          * ProductionOrderCancel
          * @description Optional request body for POST /orders/{id}/cancel.
          *
@@ -21374,6 +21876,10 @@ export interface components {
         ProductionOrderComplete: {
             /** Actual Qty */
             actual_qty?: number | string | null;
+            /** Best Before */
+            best_before?: string | null;
+            /** Ingredient Lots */
+            ingredient_lots?: components["schemas"]["IngredientLotChoice"][];
         };
         /**
          * ProductionOrderCreate
@@ -21538,6 +22044,14 @@ export interface components {
             notes: string | null;
             /** Output Lot Name */
             output_lot_name?: string | null;
+            /** Output Lot Id */
+            output_lot_id?: string | null;
+            /** Output Lot Status */
+            output_lot_status?: string | null;
+            /** Best Before */
+            best_before?: string | null;
+            /** Shelf Life Days */
+            shelf_life_days?: number | null;
             /** Created By */
             created_by: string | null;
             /** Completed By */
@@ -21711,6 +22225,8 @@ export interface components {
             reference_price?: string | null;
             /** Result Per Unit */
             result_per_unit?: string | null;
+            /** Shelf Life Days */
+            shelf_life_days?: number | null;
         };
         /**
          * ProductionStepRead
@@ -24613,6 +25129,27 @@ export interface components {
             closed_at: string;
             /** Counted As Zero */
             counted_as_zero: number;
+        };
+        /**
+         * ShelfLifeRead
+         * @description A product's shelf life in days, ``None`` when nobody named one.
+         */
+        ShelfLifeRead: {
+            /**
+             * Product Template Id
+             * Format: uuid
+             */
+            product_template_id: string;
+            /** Shelf Life Days */
+            shelf_life_days: number | null;
+        };
+        /**
+         * ShelfLifeUpdate
+         * @description Input for PUT /production/shelf-lives/{template_id}; ``None`` clears it.
+         */
+        ShelfLifeUpdate: {
+            /** Shelf Life Days */
+            shelf_life_days?: number | null;
         };
         /**
          * ShipmentCreate
@@ -36028,6 +36565,40 @@ export interface operations {
             };
         };
     };
+    plan_ingredient_batches_api_v1_maker_production_ingredient_batches_get: {
+        parameters: {
+            query: {
+                output_template_id: string;
+                planned_qty: number | string;
+                output_location_id: string;
+                recipe_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IngredientBatchPlanResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_monthly_result_api_v1_maker_production_monthly_result_get: {
         parameters: {
             query?: {
@@ -36138,7 +36709,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProductionOrderCreate"];
+                "application/json": components["schemas"]["ProductionMadeCreate"];
             };
         };
         responses: {
@@ -36294,6 +36865,105 @@ export interface operations {
             };
         };
     };
+    list_run_attachments_api_v1_maker_production_orders__order_id__attachments_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_ProductionAttachmentRead_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductionAttachmentRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_run_attachment_api_v1_maker_production_orders__order_id__attachments__attachment_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     cancel_production_order_api_v1_maker_production_orders__order_id__cancel_post: {
         parameters: {
             query?: never;
@@ -36430,6 +37100,41 @@ export interface operations {
             };
         };
     };
+    hold_output_batch_api_v1_maker_production_orders__order_id__hold_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutputBatchHold"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutputBatchRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     record_production_portion_api_v1_maker_production_orders__order_id__portions_post: {
         parameters: {
             query?: never;
@@ -36452,6 +37157,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProductionOrderRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_batch_record_api_v1_maker_production_orders__order_id__record_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchRecordRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    release_output_batch_api_v1_maker_production_orders__order_id__release_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutputBatchRead"];
                 };
             };
             /** @description Validation Error */
@@ -36588,6 +37355,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedResponse_ProductionStockMoveRead_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_shelf_life_api_v1_maker_production_shelf_lives__template_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShelfLifeRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_shelf_life_api_v1_maker_production_shelf_lives__template_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShelfLifeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShelfLifeRead"];
                 };
             };
             /** @description Validation Error */
@@ -38834,6 +39667,40 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LocationLabelExport"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "image/png": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lot_labels_png_api_v1_printing_lot_labels_png_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotLabelExport"];
             };
         };
         responses: {

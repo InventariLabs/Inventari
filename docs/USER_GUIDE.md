@@ -1675,6 +1675,42 @@ The ***result* by month** widget on **Production → BOMs** — named after the 
 difference between the reference price and the real cost of everything you
 made.
 
+### 12.3 Batches, dates and labels
+
+Every run puts what it made into a batch. Name it in **Batch of the output (optional)**
+when you start the run, or leave the field empty and the run names one itself
+from its day and a counter — `20261115-1`, then `20261115-2` for the second run
+of that product that day. The batch carries the day the run was made and a
+**Best before** date: the product's **Shelf life** — set in days on the
+product's card, for a product that has a BOM — added to that day. Closing a
+run, or saving one as already made, proposes that date; change it if this batch
+keeps for less or longer. The stock the run puts away carries the same date, so
+the expiry lists, To do and the earliest-date-first order treat it like goods
+you received.
+
+Before the run closes, **Ingredient batches** shows, ingredient by ingredient,
+the batch it will be taken from — the earliest best-before first. Pick another
+from the list, or **Scan a batch label** and the batch is chosen for the
+ingredient it belongs to. The run then takes exactly those batches; if one of
+them no longer has enough, the run is refused and says which.
+
+A finished run shows its batch with the day it was made and its best-before:
+
+- **Print batch labels** prints one label per unit made — the product, the
+  batch code in bars, the production date and the best-before — on a printer
+  or as a PNG; the number of labels can be changed.
+- **Batch record** opens one page with the BOM, the planned and the actual
+  quantity, every ingredient with the batches and quantities taken, the costs,
+  who planned and who closed the run, the notes and the files. **Print** sends
+  it to A4.
+- **Put on hold** stops the batch from being used — no run, pick or dispatch
+  takes from it — until **Release**. The reason goes into the batch's history.
+- **Photos and files** — **Add a file** files a photo or a document under the
+  run, up to 10 MB, in the types a product's attachments take.
+
+At home the run speaks of jars: **Print jar labels**, and a best-before date.
+The batch code is still assigned and printed, but no screen asks for it.
+
 ---
 
 ## 13. Partners and approvals

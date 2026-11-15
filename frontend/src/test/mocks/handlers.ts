@@ -8,6 +8,21 @@ export const handlers = [
     HttpResponse.json({ preset: null }),
   ),
 
+  // A production run has no files and its ingredients no batches to choose
+  // from unless a test says so.
+  http.get("*/api/v1/maker/production/orders/:orderId/attachments", () =>
+    HttpResponse.json(onePage([])),
+  ),
+  http.get("*/api/v1/maker/production/ingredient-batches", () =>
+    HttpResponse.json({ ingredients: [] }),
+  ),
+  http.get("*/api/v1/maker/production/shelf-lives/:templateId", ({ params }) =>
+    HttpResponse.json({
+      product_template_id: params.templateId,
+      shelf_life_days: null,
+    }),
+  ),
+
   // Stock covers every dispatch unless a test says otherwise.
   http.post("/api/v1/warehouse/picking/coverage", () =>
     HttpResponse.json({ documents: [] }),

@@ -25,10 +25,16 @@ from app.core.module_sdk import PaginatedResponse
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
-from . import availability_service, production_reversal, production_service
+from . import (
+    availability_service,
+    output_batch,
+    production_reversal,
+    production_service,
+)
 from ._router_bom import _attach_child_names
 from ._schemas_production import (
     MonthlyResultItem,
+    ProductionMadeCreate,
     ProductionOrderCancel,
     ProductionOrderComplete,
     ProductionOrderCreate,
@@ -131,7 +137,7 @@ async def _read_with_uom(
         if order.status in ('IN_PROGRESS', 'COMPLETED', 'REVERSED')
         else []
     )
-    return _to_read(
+    read = _to_read(
         order,
         lines=lines,
         portions=portions,
@@ -144,6 +150,19 @@ async def _read_with_uom(
             else None
         ),
     )
+    # The batch as it stands now — a hold placed since the run closed shows
+    # here — and the shelf life a closing run counts its best-before from.
+    batch: dict[str, object] = {
+        'shelf_life_days': await output_batch.get_shelf_life_async(
+            db, org_id, order.output_template_id
+        )
+    }
+    if order.output_lot_id is not None:
+        lot = await core_api.stock.get_lot_detail_async(db, org_id, order.output_lot_id)
+        if lot is not None:
+            batch['output_lot_status'] = lot.status
+            batch['best_before'] = lot.expiry_date or lot.use_by_date
+    return read.model_copy(update=batch)
 
 
 def _to_read(
@@ -173,6 +192,7 @@ def _to_read(
         production_date=order.production_date,
         notes=order.notes,
         output_lot_name=order.output_lot_name,
+        output_lot_id=order.output_lot_id,
         created_by=order.created_by,
         completed_by=order.completed_by,
         created_at=order.created_at,
@@ -348,7 +368,7 @@ async def create_production_order(
 )
 @map_service_errors
 async def record_made_production(
-    data: ProductionOrderCreate,
+    data: ProductionMadeCreate,
     # The run opens a core Item for its output, like completing one does.
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
     current_user: UserContextDTO = Depends(get_current_user_context),
@@ -399,7 +419,11 @@ async def preview_production(
     No consume, no output item, no stock movement — what the person sees
     before saving a run as made or as planned.
     """
-    return await production_service.preview_production(db, org_id, data)
+    preview = await production_service.preview_production(db, org_id, data)
+    preview.shelf_life_days = await output_batch.get_shelf_life_async(
+        db, org_id, data.output_template_id
+    )
+    return preview
 
 
 @router.post(
@@ -451,7 +475,13 @@ async def complete_production_order(
     """
     try:
         order = await production_service.complete_production(
-            db, org_id, order_id, current_user, actual_qty=data.actual_qty
+            db,
+            org_id,
+            order_id,
+            current_user,
+            actual_qty=data.actual_qty,
+            best_before=data.best_before,
+            ingredient_lots=data.ingredient_lots,
         )
     except InsufficientStockError as exc:
         raise _shortage_refusal(

@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas.pagination import PaginatedResponse
 
+from ._schemas_batches import IngredientLotChoice
 from ._schemas_breakdown import CostBreakdownResponse
 from ._schemas_recipes import IngredientAvailabilityItem
 
@@ -41,6 +42,21 @@ class ProductionOrderCreate(BaseModel):
         if value is None:
             return None
         return value.strip() or None
+
+
+class ProductionMadeCreate(ProductionOrderCreate):
+    """Input for POST /production/orders/made — a run that already happened.
+
+    Besides the run, what closing it decides: the output batch's
+    best-before (the run's day plus the product's shelf life when left
+    out) and, per ingredient, the batches it was taken from (the removal
+    order when left out).
+    """
+
+    best_before: date | None = None
+    ingredient_lots: list[IngredientLotChoice] = Field(
+        default_factory=list, max_length=500
+    )
 
 
 class ProductionOrderLineRead(BaseModel):
@@ -138,6 +154,14 @@ class ProductionOrderRead(BaseModel):
     production_date: date | None
     notes: str | None
     output_lot_name: str | None = None
+    #: The batch the output went into (completed runs), its state — ``held``
+    #: or ``quarantined`` while on hold — and its best-before.
+    output_lot_id: UUID | None = None
+    output_lot_status: str | None = None
+    best_before: date | None = None
+    #: The output product's shelf life in days: what a best-before is
+    #: counted from when the run closes. On the single-order read only.
+    shelf_life_days: int | None = None
     created_by: UUID | None
     completed_by: UUID | None
     created_at: datetime
@@ -235,6 +259,14 @@ class ProductionOrderComplete(BaseModel):
     """
 
     actual_qty: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=3)
+    #: The output batch's best-before; left out, the run's day plus the
+    #: product's shelf life.
+    best_before: date | None = None
+    #: The batches the person chose for ingredients; an ingredient left out
+    #: is taken in the product's removal order.
+    ingredient_lots: list[IngredientLotChoice] = Field(
+        default_factory=list, max_length=500
+    )
 
 
 class ProductionOrderStart(BaseModel):
@@ -337,6 +369,9 @@ class ProductionPreviewResponse(CostBreakdownResponse):
     unit_cost: Decimal | None = None
     reference_price: Decimal | None = None
     result_per_unit: Decimal | None = None
+    #: The output product's shelf life in days, for the best-before the
+    #: form proposes.
+    shelf_life_days: int | None = None
 
 
 class ShortageShoppingListResponse(BaseModel):

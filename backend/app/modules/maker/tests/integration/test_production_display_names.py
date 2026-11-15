@@ -158,9 +158,12 @@ class TestOrderDisplayNames:
         assert len(moves) == 2
         names = {move['product_template_name'] for move in moves}
         assert names == {'Strawberries', 'Jam'}
-        # No lot on this run, so the field is present and empty rather than
-        # missing — the UI decides what to render from it.
-        assert all(move['lot_code'] is None for move in moves)
+        # The strawberries had no batch, so their field is present and empty
+        # rather than missing — the UI decides what to render from it. The
+        # jam went into the batch the run named for itself.
+        lots = {move['product_template_name']: move['lot_code'] for move in moves}
+        assert lots['Strawberries'] is None
+        assert lots['Jam']
 
     def test_stock_moves_carry_location_names(
         self,
