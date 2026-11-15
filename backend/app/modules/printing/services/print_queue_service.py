@@ -349,7 +349,7 @@ async def lot_labels_async(
             ProductLabel(
                 name=lot.product_name or lot.name,
                 code=lot.name,
-                details=' · '.join(parts) or None,
+                details='\n'.join(parts) or None,
             )
         )
     return labels

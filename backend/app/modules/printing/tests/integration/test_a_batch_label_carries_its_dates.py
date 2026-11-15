@@ -111,7 +111,7 @@ def test_a_queued_batch_label_says_when_it_was_made_and_until_when_it_keeps(
     assert stored is not None
     label: dict[str, Any] = stored.labels[0]
     assert (label['name'], label['short_code']) == ('Plum jam', '20261102-1')
-    assert label['details'] == 'Made Nov 2, 2026 · Best before May 1, 2027'
+    assert label['details'] == 'Made Nov 2, 2026\nBest before May 1, 2027'
 
 
 def test_other_labels_still_stop_at_twenty_copies(

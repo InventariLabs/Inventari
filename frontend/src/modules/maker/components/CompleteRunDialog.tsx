@@ -55,7 +55,9 @@ export function CompleteRunDialog({
       {bomIsEmpty && (
         <EmptyBomNotice recipeId={order.recipe_id} className="mt-2" />
       )}
-      <div className="space-y-4 py-2">
+      {/* The dialog keeps its title and its buttons in view; a run with
+          many ingredients kept in batches scrolls between them. */}
+      <div className="space-y-4 py-2 max-h-[55vh] overflow-y-auto pr-1">
         <div className="space-y-2">
           <Input
             label={t("detail.completeConfirm.actualQtyLabel", {

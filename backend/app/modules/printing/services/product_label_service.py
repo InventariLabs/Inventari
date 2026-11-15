@@ -81,7 +81,7 @@ class ProductLabel(NamedTuple):
     code: str
     #: The lot and expiry line, already in the reader's language; None
     #: when the record has neither or the person left them off. A shelf
-    #: label's location name.
+    #: label's location name. A newline starts another line under it.
     details: str | None = None
     #: What a QR square at the label's left end carries, when the label has
     #: one: a phone camera reads it where a 1D scanner reads the bars.
@@ -227,8 +227,12 @@ def _draw(
     text_size = max(MIN_FONT_PX, round(raster.height_px * TEXT_RATIO))
     text_line = round(text_size * LINE_SPACING)
     if label.details:
-        bottom -= text_line
-        _draw_centred(draw, label.details, left, bottom, width, text_size)
+        # A line each, the last at the bottom: a batch label says the day it
+        # was made and its best-before on two lines, where one would clip the
+        # date a reader needs most.
+        for line in reversed(label.details.split('\n')):
+            bottom -= text_line
+            _draw_centred(draw, line, left, bottom, width, text_size)
     if label.name != label.code:
         bottom -= text_line
         _draw_centred(draw, label.code, left, bottom, width, text_size)
