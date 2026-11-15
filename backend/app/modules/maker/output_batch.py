@@ -184,7 +184,7 @@ async def hold_output_async(
     """
     _order, lot_id = await _output_lot_or_refuse(db, organization_id, order_id)
     lot = await core_api.stock.quarantine_lot_async(
-        db, organization_id, lot_id, reason, user_id=user.id
+        db, organization_id, lot_id, reason.strip() if reason else None, user_id=user.id
     )
     if lot is None:
         raise EntityNotFoundError('stock_lot', str(lot_id))

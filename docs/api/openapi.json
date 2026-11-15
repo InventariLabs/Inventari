@@ -59654,7 +59654,7 @@
               "format": "uuid"
             },
             "type": "array",
-            "maxItems": 20,
+            "maxItems": 1,
             "minItems": 1,
             "title": "Lot Ids"
           },
@@ -59685,7 +59685,7 @@
           "lot_ids"
         ],
         "title": "LotLabelExport",
-        "description": "Batches whose labels to draw, and how: the preview and download.\n\nA run prints one label per unit it made, so a batch label goes up to\n``LOT_LABEL_MAX_COPIES`` copies, where other labels stop at 20."
+        "description": "Batches whose labels to draw, and how: the preview and download.\n\nA run prints one label per unit it made, so a batch label goes up to\n``LOT_LABEL_MAX_COPIES`` copies of its one batch, where other labels stop\nat 20."
       },
       "LotLocationDTO": {
         "properties": {
@@ -62931,6 +62931,7 @@
             "type": "string",
             "maxLength": 500,
             "minLength": 1,
+            "pattern": "\\S",
             "title": "Reason"
           }
         },
@@ -62939,7 +62940,7 @@
           "reason"
         ],
         "title": "OutputBatchHold",
-        "description": "Input for POST /production/orders/{id}/hold: why the batch is held."
+        "description": "Input for POST /production/orders/{id}/hold: why the batch is held.\n\nA reason of spaces says nothing; the batch's history keeps it trimmed."
       },
       "OutputBatchRead": {
         "properties": {
@@ -69302,7 +69303,7 @@
               "format": "uuid"
             },
             "type": "array",
-            "maxItems": 20,
+            "maxItems": 1,
             "title": "Lot Ids"
           },
           "details": {

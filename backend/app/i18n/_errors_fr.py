@@ -589,6 +589,7 @@ ERRORS_FR: ErrorMessages = {
     'storage_code_template_not_warehouse': "Un modèle de code appartient à un entrepôt, un emplacement en haut de l'arbre",
     'print_job_not_claimed': "Cette tâche d'impression n'est pas imprimée par cette imprimante",
     'print_job_not_retryable': "Seule une tâche d'impression en échec peut être renvoyée",
+    'print_job_too_many_copies': "Au plus {limit} copies d'une étiquette à la fois.",
     'print_job_one_target': "Envoyez un seul type d'étiquettes : étiquettes du stock par identifiant, par code, ou emplacements.",
     'webhook_admin_only': 'Seuls les administrateurs peuvent gérer les webhooks',
     'approvals_manage_admin_only': "Seuls les administrateurs et gestionnaires peuvent modifier les flux d'approbation",

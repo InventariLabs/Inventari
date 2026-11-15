@@ -130,7 +130,8 @@ def test_other_labels_still_stop_at_twenty_copies(
         json={'lot_ids': [str(batch.id)], 'copies': 201},
     )
 
-    assert too_many.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, too_many.text
+    assert too_many.status_code == status.HTTP_400_BAD_REQUEST, too_many.text
+    assert too_many.json()['detail']['code'] == 'PRINT_JOB_TOO_MANY_COPIES'
     assert batch_too_many.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 

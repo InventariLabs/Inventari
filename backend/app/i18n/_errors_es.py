@@ -590,6 +590,7 @@ ERRORS_ES: ErrorMessages = {
     'storage_code_template_not_warehouse': 'Una plantilla de códigos pertenece a un almacén, una ubicación en la cima del árbol',
     'print_job_not_claimed': 'Esta impresora no está imprimiendo este trabajo',
     'print_job_not_retryable': 'Solo se puede reenviar un trabajo de impresión fallido',
+    'print_job_too_many_copies': 'Como máximo {limit} copias de una etiqueta a la vez.',
     'print_job_one_target': 'Envía un solo tipo de etiqueta: etiquetas del grupo por id, etiquetas del grupo por código o ubicaciones.',
     'webhook_admin_only': 'Solo los administradores pueden gestionar webhooks',
     'approvals_manage_admin_only': 'Solo administradores y gerentes pueden modificar los flujos de aprobación',

@@ -30,7 +30,11 @@ from app.core.public_api import core_api
 from app.core.utils import pick_by_lang
 from app.i18n.service import get_current_lang, get_error_message
 from app.modules.printing.models import PrintAgent, PrintJob
-from app.modules.printing.schemas import PROTOCOL_MIN_VERSION, PROTOCOL_VERSION
+from app.modules.printing.schemas import (
+    LABEL_MAX_COPIES,
+    PROTOCOL_MIN_VERSION,
+    PROTOCOL_VERSION,
+)
 from app.modules.printing.services.label_geometry import LABEL_DPI
 
 if TYPE_CHECKING:
@@ -554,6 +558,10 @@ async def queue_job_async(
     ]
     if sum(kinds) != 1:
         raise catalogue_refusal('print_job_one_target')
+    if not lot_ids and copies > LABEL_MAX_COPIES:
+        # A batch prints one label per unit a run made; every other kind
+        # stops at twenty copies of each.
+        raise catalogue_refusal('print_job_too_many_copies', limit=LABEL_MAX_COPIES)
     agent = await _target_agent_async(db, organization_id, agent_id)
     if item_ids or lot_ids or (storage_ids and bars):
         if item_ids:

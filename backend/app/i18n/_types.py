@@ -448,6 +448,7 @@ class ErrorMessages(TypedDict):
     print_job_not_claimed: str
     print_job_not_retryable: str
     print_job_one_target: str
+    print_job_too_many_copies: str
     webhook_admin_only: str
     approvals_manage_admin_only: str
     approvals_action_admin_only: str

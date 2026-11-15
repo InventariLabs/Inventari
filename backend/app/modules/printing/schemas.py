@@ -1,10 +1,10 @@
 """Request and response shapes of the print queue."""
 
 from datetime import datetime
-from typing import Literal, Self
+from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 JobStatus = Literal['queued', 'printing', 'printed', 'failed']
 
@@ -22,12 +22,6 @@ PROTOCOL_MIN_VERSION = 1
 LABEL_MAX_COPIES = 20
 #: Copies of a batch label: a run prints one for every unit it made.
 LOT_LABEL_MAX_COPIES = 200
-
-
-def _batch_labels_fit(lot_ids: list[UUID], copies: int) -> None:
-    """Batch labels in one sheet or job: at most ``LOT_LABEL_MAX_COPIES`` in all."""
-    if lot_ids and len(lot_ids) * copies > LOT_LABEL_MAX_COPIES:
-        raise ValueError(f'at most {LOT_LABEL_MAX_COPIES} batch labels at once')
 
 
 class PrintAgentRegister(BaseModel):
@@ -79,9 +73,9 @@ class PrintJobCreate(BaseModel):
     short_codes: list[str] = Field(default_factory=list, max_length=200)
     location_ids: list[UUID] = Field(default_factory=list, max_length=200)
     item_ids: list[UUID] = Field(default_factory=list, max_length=200)
-    #: Batches, as batch labels: the product, the batch code in bars, the day
-    #: it was made and its best-before.
-    lot_ids: list[UUID] = Field(default_factory=list, max_length=20)
+    #: A batch, as batch labels: the product, the batch code in bars, the day
+    #: it was made and its best-before. One batch a job: a run prints its own.
+    lot_ids: list[UUID] = Field(default_factory=list, max_length=1)
     #: A product label's lot and expiry line, printed when the record has them.
     details: bool = True
     #: The same options the label download offers, so a strip sent to the
@@ -92,7 +86,7 @@ class PrintJobCreate(BaseModel):
     #: The short code printed small under the QR, as the download offers it.
     show_code: bool = False
     #: Up to 20 of each label; a batch label up to 200 — one for every
-    #: unit a run made (``_copies_fit_the_kind``).
+    #: unit a run made. The queue refuses more than 20 of any other kind.
     copies: int = Field(1, ge=1, le=LOT_LABEL_MAX_COPIES)
     #: The size of every label in the job: the preview's, so the printer
     #: gets the label the person looked at, not a size of its own. The bounds
@@ -104,14 +98,6 @@ class PrintJobCreate(BaseModel):
     bars: bool = False
     #: With ``bars``: a QR beside the bars as well.
     qr: bool = False
-
-    @model_validator(mode='after')
-    def _copies_fit_the_kind(self) -> Self:
-        """A batch's labels go one per unit made; any other kind up to 20 each."""
-        if not self.lot_ids and self.copies > LABEL_MAX_COPIES:
-            raise ValueError(f'copies must be at most {LABEL_MAX_COPIES}')
-        _batch_labels_fit(self.lot_ids, self.copies)
-        return self
 
 
 class PrintJobResponse(BaseModel):
@@ -186,18 +172,14 @@ class LotLabelExport(BaseModel):
     """Batches whose labels to draw, and how: the preview and download.
 
     A run prints one label per unit it made, so a batch label goes up to
-    ``LOT_LABEL_MAX_COPIES`` copies, where other labels stop at 20.
+    ``LOT_LABEL_MAX_COPIES`` copies of its one batch, where other labels stop
+    at 20.
     """
 
-    lot_ids: list[UUID] = Field(..., min_length=1, max_length=20)
+    lot_ids: list[UUID] = Field(..., min_length=1, max_length=1)
     width_mm: float = Field(50.0, ge=10.0, le=300.0)
     height_mm: float = Field(24.0, ge=5.0, le=300.0)
     copies: int = Field(1, ge=1, le=LOT_LABEL_MAX_COPIES)
-
-    @model_validator(mode='after')
-    def _labels_fit(self) -> Self:
-        _batch_labels_fit(self.lot_ids, self.copies)
-        return self
 
 
 class LocationLabelExport(BaseModel):

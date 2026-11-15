@@ -460,6 +460,7 @@ ERRORS_PT: dict[str, str] = {
     'storage_code_template_not_warehouse': 'Um modelo de código pertence a um armazém, um local no topo da árvore',
     'print_job_not_claimed': 'Este trabalho de impressão não está sendo impresso por esta impressora',
     'print_job_not_retryable': 'Somente um trabalho de impressão com falha pode ser reenviado',
+    'print_job_too_many_copies': 'No máximo {limit} cópias de uma etiqueta de uma vez.',
     'print_job_one_target': 'Envie exatamente um tipo de etiqueta: etiquetas do pool por id, etiquetas do pool por código ou locais de armazenamento.',
     'webhook_admin_only': 'Somente administradores podem gerenciar webhooks',
     'approvals_manage_admin_only': 'Somente administradores e gerentes podem modificar fluxos de aprovação',

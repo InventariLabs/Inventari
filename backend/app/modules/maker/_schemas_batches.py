@@ -6,7 +6,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 
 class ShelfLifeUpdate(BaseModel):
@@ -36,17 +36,12 @@ class IngredientLotChoice(BaseModel):
 
 
 class OutputBatchHold(BaseModel):
-    """Input for POST /production/orders/{id}/hold: why the batch is held."""
+    """Input for POST /production/orders/{id}/hold: why the batch is held.
 
-    reason: str = Field(min_length=1, max_length=500)
+    A reason of spaces says nothing; the batch's history keeps it trimmed.
+    """
 
-    @field_validator('reason')
-    @classmethod
-    def _not_only_spaces(cls, value: str) -> str:
-        stripped = value.strip()
-        if not stripped:
-            raise ValueError('reason is empty')
-        return stripped
+    reason: str = Field(min_length=1, max_length=500, pattern=r'\S')
 
 
 class OutputBatchRead(BaseModel):

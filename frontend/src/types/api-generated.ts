@@ -17479,7 +17479,8 @@ export interface components {
          * @description Batches whose labels to draw, and how: the preview and download.
          *
          *     A run prints one label per unit it made, so a batch label goes up to
-         *     ``LOT_LABEL_MAX_COPIES`` copies, where other labels stop at 20.
+         *     ``LOT_LABEL_MAX_COPIES`` copies of its one batch, where other labels stop
+         *     at 20.
          */
         LotLabelExport: {
             /** Lot Ids */
@@ -18669,6 +18670,8 @@ export interface components {
         /**
          * OutputBatchHold
          * @description Input for POST /production/orders/{id}/hold: why the batch is held.
+         *
+         *     A reason of spaces says nothing; the batch's history keeps it trimmed.
          */
         OutputBatchHold: {
             /** Reason */

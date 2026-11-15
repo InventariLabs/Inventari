@@ -592,6 +592,7 @@ ERRORS_DE: ErrorMessages = {
     'storage_code_template_not_warehouse': 'Eine Codevorlage gehört zu einem Lager, einem Lagerort an der Spitze des Baums',
     'print_job_not_claimed': 'Dieser Druckauftrag wird nicht von diesem Drucker gedruckt',
     'print_job_not_retryable': 'Nur ein fehlgeschlagener Druckauftrag kann erneut gesendet werden',
+    'print_job_too_many_copies': 'Höchstens {limit} Kopien eines Etiketts auf einmal.',
     'print_job_one_target': 'Senden Sie genau eine Art von Etiketten: Pool-Etiketten nach ID, Pool-Etiketten nach Code oder Lagerorte.',
     'webhook_admin_only': 'Nur Administratoren können Webhooks verwalten',
     'approvals_manage_admin_only': 'Nur Administratoren und Manager können Genehmigungsworkflows ändern',
