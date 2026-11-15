@@ -499,8 +499,12 @@ class StockAsOfReportDTO(BaseModel):
     #: Rows left out of the total because their currency is not the
     #: organization's — two currencies do not add.
     excluded_currency_rows: int = 0
-    #: The value of every row, whichever page ``items`` holds.
+    #: The value of every row, whichever page ``items`` holds, plus what
+    #: production runs that were started and not yet finished still held.
     total_value: Decimal | None = None
+    #: The part of ``total_value`` that belongs to no row: what runs under way
+    #: held that day. None when there was none.
+    work_in_progress_value: Decimal | None = None
     #: One page of the rows, in name order: ``limit`` of them from
     #: ``offset``, out of ``total``. The files carry every row.
     items: list[StockAsOfRowDTO] = []

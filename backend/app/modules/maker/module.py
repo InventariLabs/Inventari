@@ -68,6 +68,18 @@ def _register_lot_trace_source() -> None:
 _register_lot_trace_source()
 
 
+def _register_work_in_progress() -> None:
+    """Let Core's stock value count what a started run still holds."""
+    from app.core.module_sdk import register_work_in_progress_provider
+
+    from .work_in_progress import work_in_progress_value_async
+
+    register_work_in_progress_provider(work_in_progress_value_async)
+
+
+_register_work_in_progress()
+
+
 module = define_module(
     router_factory=_get_router,
     interceptors=_get_interceptors(),

@@ -81,6 +81,7 @@ def _line_shape(line: BoMLine, uom_symbol: str | None = None) -> dict[str, Any]:
         'qty_per_batch': quantise_or_none(line.qty_per_batch, 4),
         'uom': uom_symbol,
         'yield_loss_pct': quantise_or_none(line.yield_loss_pct, 2),
+        'make_fresh': line.make_fresh,
         'notes': line.notes,
     }
 
@@ -708,6 +709,7 @@ async def add_bom_line(
         uom_id=data.uom_id,
         unit=data.unit,
         yield_loss_pct=data.yield_loss_pct,
+        make_fresh=data.make_fresh,
         notes=data.notes,
     )
     db.add(line)
@@ -789,6 +791,8 @@ async def update_bom_line(
         line.uom_id = data.uom_id
     if data.yield_loss_pct is not None:
         line.yield_loss_pct = data.yield_loss_pct
+    if data.make_fresh is not None:
+        line.make_fresh = data.make_fresh
     if data.notes is not None:
         line.notes = data.notes
 

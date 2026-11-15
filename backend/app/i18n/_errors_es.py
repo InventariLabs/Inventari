@@ -485,10 +485,12 @@ ERRORS_ES: ErrorMessages = {
     'production_reverse_output_used': (
         'Esta producción no se puede deshacer: parte de lo que fabricó ya salió de su ubicación. Registre en su lugar una corrección de stock de lo que queda.'
     ),
-    'production_cancel_not_draft': (
-        'Esta orden de producción ya tiene el estado {status} — solo se puede '
-        'cancelar un borrador.'
-    ),
+    'production_cancel_not_draft': 'Esta orden de producción ya tiene el estado {status} — solo se puede cancelar un borrador o una orden en curso.',
+    'production_start_not_draft': 'Esta orden de producción ya tiene el estado {status} — solo se puede iniciar un borrador.',
+    'production_run_not_in_progress': 'Esta orden de producción tiene el estado {status} — solo una orden en curso admite porciones, pasos marcados o finalizarse.',
+    'production_finish_below_portions': 'Esta orden ya ha puesto {made} en el almacén en porciones, así que no puede terminar con menos.',
+    'production_cancel_has_portions': 'Esta orden ya ha puesto producción en el almacén en porciones, así que no se puede cancelar — termínela en su lugar.',
+    'production_step_not_found': 'Esta orden no tiene ese paso.',
     'production_update_not_draft': (
         'Esta orden de producción ya tiene el estado {status} — solo se puede '
         'editar un borrador.'

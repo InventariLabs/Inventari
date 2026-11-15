@@ -57,7 +57,13 @@ from ._schemas_recipes import (
     ShortagePurchaseOrderResponse,
 )
 from ._valuation_batch import fetch_estimates_batch
-from .models import MakerRecipe, ProductionOrder, ProductionOrderLine
+from .models import (
+    MakerRecipe,
+    ProductionOrder,
+    ProductionOrderLine,
+    ProductionPortion,
+)
+from .stock_first import StockPool
 
 if TYPE_CHECKING:
     from .availability_service import ShortageItem
@@ -462,12 +468,19 @@ async def _recipe_name(
 
 
 async def _lock_draft_order(
-    db: AsyncSession, organization_id: UUID, order_id: UUID
+    db: AsyncSession,
+    organization_id: UUID,
+    order_id: UUID,
+    *,
+    expected: str = 'DRAFT',
+    refusal: str = 'production_complete_not_draft',
 ) -> ProductionOrder:
-    """Load the order FOR UPDATE and refuse anything that is not a DRAFT.
+    """Load the order FOR UPDATE and refuse anything that is not *expected*.
 
     The status guard is a read-modify-write transition, so concurrent
-    completes must serialize (TOCTOU guard).
+    completes must serialize (TOCTOU guard). *expected* is ``DRAFT`` for the
+    transitions that begin a run and ``IN_PROGRESS`` for the ones that
+    continue it; *refusal* is the sentence for the other statuses.
     """
     result = await db.execute(
         select(ProductionOrder)
@@ -482,13 +495,11 @@ async def _lock_draft_order(
         raise EntityNotFoundError(
             'production_order', f'Production order {order_id} not found'
         )
-    if order.status != 'DRAFT':
+    if order.status != expected:
         # A double-tap on "complete" is an ordinary day, not a programming
         # mistake: the status the order actually carries explains the
         # refusal, and it answers in the reader's language.
-        raise ServiceRejectionError(
-            'production_complete_not_draft', status=order.status
-        )
+        raise ServiceRejectionError(refusal, status=order.status)
     return order
 
 
@@ -514,7 +525,10 @@ async def _resolve_actual_qty(
 
 
 async def _explode_planned_consumption(
-    db: AsyncSession, organization_id: UUID, order: ProductionOrder
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    pool: StockPool,
 ) -> list[tuple[UUID, Decimal, str]]:
     """Explode what the run consumes: full planned consumption.
 
@@ -532,7 +546,9 @@ async def _explode_planned_consumption(
     recipe, consumption uses THAT recipe's lines (previously the default
     recipe was used here while fixed costs read order.recipe_id — the two
     could diverge). Nested sub-assemblies keep the default-recipe lookup
-    (documented design).
+    (documented design), and an intermediate on the shelf is taken from the
+    *pool* first: only the part its stock does not cover is exploded through
+    its recipe.
 
     Quantities come back **in each ingredient's stock unit**, converted here so
     that consumption, cost and the order lines cannot disagree about what the
@@ -551,6 +567,7 @@ async def _explode_planned_consumption(
         order.output_template_id,
         order.planned_qty,
         recipe_id=order.recipe_id,
+        pool=pool,
     )
 
     # A run that explodes to nothing would still create the output item and
@@ -860,8 +877,16 @@ async def _receive_output(
     actual_qty: Decimal,
     unit_cost: Decimal,
     user: UserContextDTO,
-) -> None:
-    """Put the produced goods on the shelf (output = actual)."""
+    *,
+    lot_name: str | None = None,
+    made_on: date | None = None,
+) -> UUID:
+    """Put the produced goods on the shelf (output = actual).
+
+    *lot_name* and *made_on* name a portion of a run that is filled in
+    parts; without them the run's own batch and day apply. Answers the record
+    the goods were put on.
+    """
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
     )
@@ -892,15 +917,16 @@ async def _receive_output(
     )
     # The batch the person named for the output, opened on first use: two
     # runs naming the same batch fill one batch, the way two receipts do.
+    batch_name = lot_name or order.output_lot_name
     output_lot_id = (
         await core_api.stock.get_or_create_lot_async(
             db,
             organization_id,
             order.output_template_id,
-            order.output_lot_name,
-            production_date=order.production_date,
+            batch_name,
+            production_date=made_on or order.production_date,
         )
-        if order.output_lot_name
+        if batch_name
         else None
     )
     produced_item = await core_api.items.create_async(
@@ -920,7 +946,8 @@ async def _receive_output(
         user=user,
         post_the_change=False,
     )
-    order.produced_item_id = produced_item.id
+    if order.produced_item_id is None:
+        order.produced_item_id = produced_item.id
     await core_api.stock.post_movement_async(
         db,
         organization_id,
@@ -947,6 +974,7 @@ async def _receive_output(
         quantity=actual_qty,
         unit_cost=unit_cost if unit_cost > 0 else None,
     )
+    return produced_item.id
 
 
 async def _estimated_material_at_completion(
@@ -1026,6 +1054,100 @@ def _write_order_lines(
         )
 
 
+@dataclass
+class _Taken:
+    """What beginning a run took: the flat plan, its consumption and estimate."""
+
+    flat: list[tuple[UUID, Decimal, str]]
+    consumption: Consumption
+    estimated_material_cost: Decimal
+
+
+async def _take_for_run(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    user: UserContextDTO,
+    *,
+    estimate_qty: Decimal,
+    record_shortfall: bool,
+) -> _Taken:
+    """Take a run's ingredients off the records and write its lines.
+
+    The one place a run's consumption is decided, for a run completed in one
+    step and for one that is started now and finished later. *estimate_qty*
+    is the output the formula's estimate is scaled to — the actual quantity
+    where it is known, the planned one when the run is only starting.
+
+    One answer for the two doors: the availability check and the draw read
+    the same resolved scope, so a run is judged on the stock it may
+    actually take — PER_LOCATION checks and eats the run's own output
+    shelf, GLOBAL checks and eats the whole organisation. Two sets here
+    meant a run passing on its shelf while eating the far corner. The same
+    pool answers how much of an intermediate the shelf covers, so the plan
+    the check judged is the plan the draw takes.
+    """
+    from .availability_service import resolve_check_location
+
+    check_location_id = await resolve_check_location(
+        db,
+        organization_id,
+        context_location_id=order.output_storage_location_id,
+    )
+    flat = await _explode_planned_consumption(
+        db, organization_id, order, StockPool(db, organization_id, check_location_id)
+    )
+    # The formula's answer is read before anything leaves the shelf: it is
+    # the promise this run is measured against, and the rates behind it do
+    # not move because the run consumed the layers they described.
+    estimated_material_cost, line_estimates = await _estimated_material_at_completion(
+        db, organization_id, flat, estimate_qty, order.planned_qty
+    )
+    await _assert_stock_is_available(
+        db,
+        organization_id,
+        order,
+        check_location_id,
+        record_shortfall=record_shortfall,
+    )
+
+    # Consume first, then cost. The material cost is what the cost ledger
+    # actually gave up for these ingredients, which is only known once the
+    # layers have been drained — and it is not the average of the layers
+    # standing beforehand, which is what this used to charge. A manufacturing
+    # order in Odoo and ERPNext values its output at the real cost of the
+    # components it consumed, and after the outgoing layer is posted at its
+    # FIFO cost the two figures stop agreeing. An ingredient the ledger
+    # cannot price contributes nothing, exactly as a missing rate did.
+    consumption = await _consume_ingredients(
+        db,
+        organization_id,
+        order,
+        flat,
+        user,
+        location_id=check_location_id,
+        record_shortfall=record_shortfall,
+    )
+    _write_order_lines(db, order, flat, consumption, line_estimates)
+    return _Taken(flat, consumption, estimated_material_cost)
+
+
+async def _run_day(db: AsyncSession, organization_id: UUID, day: date | None) -> date:
+    """The day a step of a run is booked on, and the period guard's verdict.
+
+    The one named, else the organization's today — where it is, not where the
+    server is, as every other stock-writing path reads it. The period guard
+    every stock-writing path asks: the run already could not slip through —
+    the item bridge under the pipeline trips the same guard mid-flight — but
+    a refusal after the explosion and the availability question is the guard
+    answering late: asked here, first, the closed month answers before any
+    work, like a document.
+    """
+    run_day = day or await core_api.organizations.today_async(db, organization_id)
+    await core_api.periods.check_not_closed_async(db, organization_id, run_day)
+    return run_day
+
+
 async def complete_production(
     db: AsyncSession,
     organization_id: UUID,
@@ -1053,86 +1175,39 @@ async def complete_production(
       recorded on its line (``record_made``) instead of refusing the run.
     """
     order = await _lock_draft_order(db, organization_id, order_id)
-    # The day the run is booked on: the one it was planned for, else the
-    # organization's today — where it is, not where the server is, as every
-    # other stock-writing path reads it.
-    run_day = order.production_date or await core_api.organizations.today_async(
-        db, organization_id
-    )
-    # The period guard every stock-writing path asks. The run already could
-    # not slip through — the item bridge under the pipeline trips the same
-    # guard mid-flight — but a refusal after the explosion and the
-    # availability question is the guard answering late: asked here, first,
-    # the closed month answers before any work, like a document.
-    await core_api.periods.check_not_closed_async(db, organization_id, run_day)
+    # The day the run is booked on: the one it was planned for, else today.
+    run_day = await _run_day(db, organization_id, order.production_date)
     actual_qty = await _resolve_actual_qty(db, organization_id, order, actual_qty)
     overproduced = actual_qty > order.planned_qty
     scrap_qty = order.planned_qty - actual_qty
 
-    flat = await _explode_planned_consumption(db, organization_id, order)
-    # One answer for the two doors: the availability check and the draw
-    # read the same resolved scope, so a run is judged on the stock it may
-    # actually take — PER_LOCATION checks and eats the run's own output
-    # shelf, GLOBAL checks and eats the whole organisation. Two sets here
-    # meant a run passing on its shelf while eating the far corner.
-    from .availability_service import resolve_check_location
-
-    check_location_id = await resolve_check_location(
-        db,
-        organization_id,
-        context_location_id=order.output_storage_location_id,
-    )
-    # The formula's answer is read before anything leaves the shelf: it is
-    # the promise this run is measured against, and the rates behind it do
-    # not move because the run consumed the layers they described.
-    estimated_material_cost, line_estimates = await _estimated_material_at_completion(
-        db, organization_id, flat, actual_qty, order.planned_qty
-    )
-    await _assert_stock_is_available(
+    taken = await _take_for_run(
         db,
         organization_id,
         order,
-        check_location_id,
-        record_shortfall=record_shortfall,
-    )
-
-    # Consume first, then cost. The material cost is what the cost ledger
-    # actually gave up for these ingredients, which is only known once the
-    # layers have been drained — and it is not the average of the layers
-    # standing beforehand, which is what this used to charge. A manufacturing
-    # order in Odoo and ERPNext values its output at the real cost of the
-    # components it consumed, and after the outgoing layer is posted at its
-    # FIFO cost the two figures stop agreeing. An ingredient the ledger
-    # cannot price contributes nothing, exactly as a missing rate did.
-    consumption = await _consume_ingredients(
-        db,
-        organization_id,
-        order,
-        flat,
         user,
-        location_id=check_location_id,
+        estimate_qty=actual_qty,
         record_shortfall=record_shortfall,
     )
-    total_material_cost = consumption.cost
+    total_material_cost = taken.consumption.cost
     total_fixed_cost, total_labour_cost, recipe = await _batch_overheads_and_recipe(
         db, organization_id, order
     )
 
     total_cost = total_material_cost + total_fixed_cost + total_labour_cost
     order.estimated_total_cost = quantise(
-        estimated_material_cost + total_fixed_cost + total_labour_cost, 2
+        taken.estimated_material_cost + total_fixed_cost + total_labour_cost, 2
     )
     unit_cost = (
         total_cost / actual_qty if actual_qty > 0 and total_cost > 0 else Decimal('0')
     )
     uncosted = any(
-        child_template_id not in consumption.unit_costs
-        for child_template_id, _qty, _unit in flat
+        child_template_id not in taken.consumption.unit_costs
+        for child_template_id, _qty, _unit in taken.flat
     )
     _snapshot_financial_result(order, recipe, unit_cost, uncosted=uncosted)
 
     await _receive_output(db, organization_id, order, actual_qty, unit_cost, user)
-    _write_order_lines(db, order, flat, consumption, line_estimates)
 
     order.status = 'COMPLETED'
     order.total_cost = total_cost
@@ -1146,12 +1221,103 @@ async def complete_production(
     # served nobody. The day the guard asked about, not the UTC date of
     # ``completed_at``.
     order.production_date = run_day
+    await _journal_closed(
+        db, organization_id, order, user, 'DRAFT', actual_qty, total_cost
+    )
+    await db.flush()
+    logger.info(
+        'Production order %s completed (output=%s, planned=%s, actual=%s, cost=%s)',
+        order.id,
+        order.output_template_id,
+        order.planned_qty,
+        actual_qty,
+        total_cost,
+    )
+    return order
 
-    # The run is the event; the four QUANTITY_CHANGE rows the item bridge
-    # writes below are its consequences. Without this entry the organization
-    # log held a closed run that never appeared to have happened — and the
-    # answer to "why did the wax go down" lived only inside the module, on
-    # the order screen you had to know to open.
+
+async def _journal_closed(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    user: UserContextDTO,
+    old_status: str,
+    actual_qty: Decimal,
+    total_cost: Decimal,
+) -> None:
+    """The run is the event; the QUANTITY_CHANGE rows the item bridge writes
+    are its consequences. Without this entry the organization log held a
+    closed run that never appeared to have happened — and the answer to "why
+    did the wax go down" lived only inside the module, on the order screen
+    you had to know to open."""
+    output = await core_api.product_templates.get_async(
+        db, organization_id, order.output_template_id
+    )
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=organization_id,
+        user_id=user.id,
+        action=AuditAction.UPDATE,
+        target_type=AuditTargetType.MAKER_PRODUCTION_ORDER,
+        target_id=order.id,
+        snapshot={
+            'name': order.number,
+            'old_status': old_status,
+            'new_status': 'COMPLETED',
+            'output': output.name if output else None,
+            'quantity': _stored_qty(actual_qty),
+            'total_cost': quantise(total_cost, 2),
+        },
+    )
+
+
+async def start_production(
+    db: AsyncSession,
+    organization_id: UUID,
+    order_id: UUID,
+    user: UserContextDTO,
+    *,
+    started_on: date | None = None,
+) -> ProductionOrder:
+    """Begin a run that will be finished later: take the ingredients now.
+
+    Wine, cheese, beer and ferments are made over days or weeks, so a run is
+    not always "planned, then done in one moment". Starting it takes the
+    ingredients off the records at once — the same draw, the same lines and
+    the same stock-first split as a completion — and leaves the run
+    ``IN_PROGRESS`` with what they cost kept as its work in progress. The
+    process steps of the formula are copied onto the run to be ticked off with
+    the day each was done. The output comes later, in portions or all at once
+    (:func:`record_portion`, :func:`finish_production`).
+    """
+    order = await _lock_draft_order(
+        db,
+        organization_id,
+        order_id,
+        refusal='production_start_not_draft',
+    )
+    day = await _run_day(db, organization_id, started_on)
+    taken = await _take_for_run(
+        db,
+        organization_id,
+        order,
+        user,
+        estimate_qty=order.planned_qty,
+        record_shortfall=False,
+    )
+    recipe = await _recipe_for_order(db, organization_id, order)
+    order.status = 'IN_PROGRESS'
+    order.started_on = day
+    order.started_at = datetime.now(tz=UTC)
+    order.material_cost = quantise(taken.consumption.cost, 2)
+    order.steps = [
+        {
+            'text': step.get('text'),
+            'minutes': step.get('minutes'),
+            'done_on': None,
+        }
+        for step in (recipe.process_steps or [] if recipe is not None else [])
+    ]
     output = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
     )
@@ -1165,22 +1331,254 @@ async def complete_production(
         snapshot={
             'name': order.number,
             'old_status': 'DRAFT',
-            'new_status': 'COMPLETED',
+            'new_status': 'IN_PROGRESS',
             'output': output.name if output else None,
-            'quantity': _stored_qty(actual_qty),
-            'total_cost': quantise(total_cost, 2),
+            'started_on': day.isoformat(),
+            'material_cost': quantise(taken.consumption.cost, 2),
         },
     )
-
     await db.flush()
-    logger.info(
-        'Production order %s completed (output=%s, planned=%s, actual=%s, cost=%s)',
-        order.id,
-        order.output_template_id,
-        order.planned_qty,
-        actual_qty,
-        total_cost,
+    return order
+
+
+async def list_portions(
+    db: AsyncSession, organization_id: UUID, order_id: UUID
+) -> list[ProductionPortion]:
+    """The portions of a run, in the order they came out."""
+    return list(
+        (
+            await db.scalars(
+                select(ProductionPortion)
+                .where(
+                    ProductionPortion.organization_id == organization_id,
+                    ProductionPortion.production_order_id == order_id,
+                )
+                .order_by(ProductionPortion.made_on, ProductionPortion.created_at)
+            )
+        ).all()
     )
+
+
+async def record_portion(
+    db: AsyncSession,
+    organization_id: UUID,
+    order_id: UUID,
+    user: UserContextDTO,
+    *,
+    qty: Decimal,
+    made_on: date | None = None,
+    lot_name: str | None = None,
+) -> ProductionPortion:
+    """Put one portion of an in-progress run's output on the shelf.
+
+    Bottling part of a vat is output: it is on the shelf from that day, with
+    its own batch, while the run stays open. A portion is booked at what the
+    ingredients cost per unit planned; the run's overheads and the rest of its
+    cost arrive with the closing quantity (:func:`finish_production`).
+    """
+    order = await _lock_draft_order(
+        db,
+        organization_id,
+        order_id,
+        expected='IN_PROGRESS',
+        refusal='production_run_not_in_progress',
+    )
+    day = await _run_day(db, organization_id, made_on)
+    if qty <= 0:
+        raise ServiceRejectionError('production_actual_qty_must_be_positive')
+    already = sum(
+        (portion.qty for portion in await list_portions(db, organization_id, order_id)),
+        Decimal('0'),
+    )
+    settings = await recipe_service.get_settings(db, organization_id, for_update=True)
+    if already + qty > order.planned_qty and not settings.allow_overproduction:
+        raise ServiceRejectionError('production_overproduction_disabled')
+    unit_cost = (
+        (order.material_cost or Decimal('0')) / order.planned_qty
+        if order.planned_qty > 0
+        else Decimal('0')
+    )
+    item_id = await _receive_output(
+        db,
+        organization_id,
+        order,
+        qty,
+        unit_cost,
+        user,
+        lot_name=lot_name,
+        made_on=day,
+    )
+    portion = ProductionPortion(
+        organization_id=organization_id,
+        production_order_id=order.id,
+        qty=qty,
+        made_on=day,
+        lot_name=lot_name or order.output_lot_name,
+        item_id=item_id,
+        unit_cost=quantise(unit_cost, 4),
+        created_by=user.id,
+    )
+    db.add(portion)
+    await db.flush()
+    return portion
+
+
+async def finish_production(
+    db: AsyncSession,
+    organization_id: UUID,
+    order_id: UUID,
+    user: UserContextDTO,
+    *,
+    actual_qty: Decimal | None = None,
+    finished_on: date | None = None,
+    lot_name: str | None = None,
+) -> ProductionOrder:
+    """Close an in-progress run: the output and the cost it ended up with.
+
+    *actual_qty* is what the whole run made, portions included; what is still
+    to come out of it is the difference, put on the shelf now. Omitted, it is
+    what was planned (or what the portions already add up to, if more).
+    The run's cost is what the start took plus its fixed costs and labour,
+    and its unit cost divides that by everything that came out. The closing
+    quantity carries the part of the cost the portions did not.
+    """
+    order = await _lock_draft_order(
+        db,
+        organization_id,
+        order_id,
+        expected='IN_PROGRESS',
+        refusal='production_run_not_in_progress',
+    )
+    day = await _run_day(db, organization_id, finished_on)
+    portions = await list_portions(db, organization_id, order_id)
+    made = sum((portion.qty for portion in portions), Decimal('0'))
+    total_actual = (
+        actual_qty if actual_qty is not None else max(order.planned_qty, made)
+    )
+    if total_actual <= 0:
+        raise ServiceRejectionError('production_actual_qty_must_be_positive')
+    if total_actual < made:
+        raise ServiceRejectionError(
+            'production_finish_below_portions', made=_stored_qty(made)
+        )
+    settings = await recipe_service.get_settings(db, organization_id, for_update=True)
+    if total_actual > order.planned_qty and not settings.allow_overproduction:
+        raise ServiceRejectionError('production_overproduction_disabled')
+
+    lines = await list_lines(db, organization_id, order.id)
+    material_cost = order.material_cost or Decimal('0')
+    fixed_cost, labour_cost, recipe = await _batch_overheads_and_recipe(
+        db, organization_id, order
+    )
+    total_cost = material_cost + fixed_cost + labour_cost
+    ratio = total_actual / order.planned_qty
+    estimated_material = Decimal('0')
+    for line in lines:
+        # The estimate was kept at the planned size when the run started; the
+        # standard quantity for what came out is that, scaled.
+        if line.estimated_qty is not None:
+            line.estimated_qty = line.estimated_qty * ratio
+            if line.estimated_unit_cost_snapshot is not None:
+                estimated_material += (
+                    line.estimated_unit_cost_snapshot * line.estimated_qty
+                )
+    order.estimated_total_cost = quantise(
+        estimated_material + fixed_cost + labour_cost, 2
+    )
+    unit_cost = total_cost / total_actual if total_cost > 0 else Decimal('0')
+    _snapshot_financial_result(
+        order,
+        recipe,
+        unit_cost,
+        uncosted=any(line.unit_cost_snapshot is None for line in lines),
+    )
+
+    closing_qty = total_actual - made
+    if closing_qty > 0:
+        booked = sum(
+            (portion.qty * (portion.unit_cost or Decimal('0')) for portion in portions),
+            Decimal('0'),
+        )
+        closing_unit_cost = max(Decimal('0'), (total_cost - booked) / closing_qty)
+        item_id = await _receive_output(
+            db,
+            organization_id,
+            order,
+            closing_qty,
+            closing_unit_cost,
+            user,
+            lot_name=lot_name,
+            made_on=day,
+        )
+        db.add(
+            ProductionPortion(
+                organization_id=organization_id,
+                production_order_id=order.id,
+                qty=closing_qty,
+                made_on=day,
+                lot_name=lot_name or order.output_lot_name,
+                item_id=item_id,
+                unit_cost=quantise(closing_unit_cost, 4),
+                created_by=user.id,
+            )
+        )
+
+    order.status = 'COMPLETED'
+    order.total_cost = total_cost
+    order.actual_qty = total_actual
+    order.overproduced = total_actual > order.planned_qty
+    order.scrap_qty = order.planned_qty - total_actual
+    order.completed_at = datetime.now(tz=UTC)
+    order.completed_by = user.id
+    order.production_date = day
+    await _journal_closed(
+        db, organization_id, order, user, 'IN_PROGRESS', total_actual, total_cost
+    )
+    await db.flush()
+    return order
+
+
+async def tick_step(
+    db: AsyncSession,
+    organization_id: UUID,
+    order_id: UUID,
+    index: int,
+    done_on: date | None,
+    user: UserContextDTO,
+) -> ProductionOrder:
+    """Mark one process step of an in-progress run done on a day, or undone.
+
+    A run that takes weeks is followed by its steps: racked on this day,
+    filtered on that. *done_on* ``None`` clears the tick.
+    """
+    order = await _lock_draft_order(
+        db,
+        organization_id,
+        order_id,
+        expected='IN_PROGRESS',
+        refusal='production_run_not_in_progress',
+    )
+    steps = [dict(step) for step in (order.steps or [])]
+    if not 0 <= index < len(steps):
+        raise ServiceRejectionError('production_step_not_found')
+    steps[index]['done_on'] = done_on.isoformat() if done_on else None
+    # A new list: the column is JSONB, and an in-place edit of the loaded
+    # value is not a change the session sees.
+    order.steps = steps
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=organization_id,
+        user_id=user.id,
+        action=AuditAction.UPDATE,
+        target_type=AuditTargetType.MAKER_PRODUCTION_ORDER,
+        target_id=order.id,
+        snapshot={
+            'name': order.number,
+            'step': steps[index].get('text'),
+            'done_on': steps[index]['done_on'],
+        },
+    )
+    await db.flush()
     return order
 
 
@@ -1228,6 +1626,7 @@ async def preview_production(
         data.output_template_id,
         data.planned_qty,
         recipe_id=data.recipe_id,
+        output_location_id=data.output_location_id,
     )
     preview = ProductionPreviewResponse(**breakdown.model_dump())
     if breakdown.recipe_id is None:
@@ -1328,6 +1727,7 @@ async def create_shortage_purchase_order(
         recipe.output_template_id,
         recipe.batch_yield_qty,
         recipe_id=recipe.id,
+        pool=StockPool(db, organization_id, check_location_id),
     ):
         needs[child_id] = needs.get(child_id, Decimal('0')) + child_qty
     stocks = await _get_available_stock_batch(
@@ -1439,6 +1839,7 @@ async def add_shortages_to_shopping_list(
         data.output_template_id,
         data.planned_qty,
         recipe_id=recipe.id,
+        pool=StockPool(db, organization_id, check_location_id),
     ):
         needs[child_id] = needs.get(child_id, Decimal('0')) + child_qty
     stocks = await _get_available_stock_batch(
@@ -1518,7 +1919,14 @@ async def cancel_order(
     *,
     reason: str | None = None,
 ) -> ProductionOrder:
-    """Cancel a DRAFT order. COMPLETED orders are immutable.
+    """Cancel a DRAFT order or one that is in progress. COMPLETED orders are immutable.
+
+    A run in progress has already taken its ingredients: cancelling it puts
+    them back, on the records and in the batches they came from, through the
+    same way back a completed run is undone by
+    (:func:`production_reversal.put_ingredients_back`). A run that has already
+    put portions on the shelf is closed instead — what it made would have to
+    be taken off first.
 
     The optional ``reason`` is stored inline (``cancel_reason``) and mirrored
     to the global audit log so the trail survives even if the order row is
@@ -1532,8 +1940,15 @@ async def cancel_order(
     # Re-read under the row lock a completion takes, so a cancel that arrives
     # mid-completion waits for it and sees the run is no longer a draft.
     await db.refresh(order, with_for_update=True)
-    if order.status != 'DRAFT':
+    if order.status not in ('DRAFT', 'IN_PROGRESS'):
         raise ServiceRejectionError('production_cancel_not_draft', status=order.status)
+    old_status = order.status
+    if old_status == 'IN_PROGRESS':
+        from . import production_reversal
+
+        if await list_portions(db, organization_id, order.id):
+            raise ServiceRejectionError('production_cancel_has_portions')
+        await production_reversal.put_ingredients_back(db, organization_id, order, user)
     order.status = 'CANCELLED'
     order.completed_at = datetime.now(tz=UTC)
     order.completed_by = user.id
@@ -1547,7 +1962,7 @@ async def cancel_order(
         target_id=order.id,
         snapshot={
             'name': order.number,
-            'old_status': 'DRAFT',
+            'old_status': old_status,
             'new_status': 'CANCELLED',
         },
         reason=reason,

@@ -20,6 +20,7 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
 from app.core.module_ownership import general_rows, outside_module_products
 from app.core.money import quantise
+from app.core.work_in_progress import work_in_progress_value_async
 from app.models import Item, Organization, StorageLocation
 
 logger = get_logger(__name__)
@@ -256,8 +257,12 @@ async def stock_value_async(
                 StockValuationLayer.currency != org_currency,
             )
         )
+        # What a run that is under way took off the layers and has not yet
+        # put back is still the organization's: a started run does not make
+        # the warehouse worth less until it finishes.
+        in_production = await work_in_progress_value_async(db, org_id)
         return (
-            float(value or 0),
+            float(value or 0) + float(in_production),
             VALUE_FROM_LAYERS,
             int(excluded or 0),
             VALUE_SCOPE_ORGANIZATION,

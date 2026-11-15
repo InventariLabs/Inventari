@@ -210,6 +210,17 @@ class BoMLine(Base):
         nullable=False,
         default=Decimal('0'),
     )
+    #: An ingredient that has a recipe of its own is taken from its own stock
+    #: first and made only for what the stock does not cover. A line marked
+    #: fresh is always made through its recipe and never taken from stock —
+    #: the dough that must be mixed on the day. Meaningless on a line whose
+    #: ingredient has no recipe.
+    make_fresh: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default='false',
+    )
     notes: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -339,9 +350,69 @@ class ProductionOrder(Base):
         server_default='false',
     )
 
+    #: The day the run was started, when it was started before it was
+    #: finished: its ingredients left the records that day. NULL on a run
+    #: that was completed in one step.
+    started_on: Mapped[date | None] = mapped_column(Date())
+    #: The moment the run was started, for the as-of valuation: the work in
+    #: progress is held from this instant until the run closes.
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: What the ingredients taken at the start cost, in the organisation's
+    #: money — the work in progress the run holds until it finishes. Set
+    #: when the run starts and kept after, so the finish divides it by what
+    #: came out. NULL on a run completed in one step.
+    material_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    #: The formula's process steps as the run began, one object per step
+    #: (``{text, minutes, done_on}``). The steps are ticked on the run with
+    #: the day each was done; a copy, so a later edit of the formula does
+    #: not move a run that is under way.
+    steps: Mapped[list[dict[str, Any]] | None] = mapped_column(JSONB, nullable=True)
+
     # ORM relationship (no schema column — FK is output_template_id).
     # lazy='selectin' batches the load so list/detail avoid N+1.
     output_template: Mapped[ProductTemplate] = relationship(lazy='selectin')
+
+
+class ProductionPortion(Base):
+    """One portion of a run's output, put on the shelf before the run closes.
+
+    A vat bottled over three days is three portions of one run. Each has its
+    own day and batch; the run's actual quantity is their sum once it closes.
+    """
+
+    __tablename__ = 'maker_production_portions'
+    __table_args__ = (Index('ix_prod_portion_order', 'production_order_id'),)
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    production_order_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('maker_production_orders.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    qty: Mapped[Decimal] = mapped_column(Numeric(12, 3), nullable=False)
+    #: The day the portion came out.
+    made_on: Mapped[date] = mapped_column(Date(), nullable=False)
+    lot_name: Mapped[str | None] = mapped_column(String(100))
+    #: The record the portion opened on the shelf.
+    item_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('items.id', ondelete='SET NULL'),
+        nullable=True,
+    )
+    #: What the portion was booked at per unit, so the closing portion can
+    #: carry the rest of the run's cost.
+    unit_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('users.id'),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
 
 
 class ProductionOrderLine(Base):

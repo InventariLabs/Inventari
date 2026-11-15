@@ -361,6 +361,11 @@ class ErrorMessages(TypedDict):
     production_reverse_not_completed: str
     production_reverse_output_used: str
     production_cancel_not_draft: str
+    production_start_not_draft: str
+    production_run_not_in_progress: str
+    production_finish_below_portions: str
+    production_cancel_has_portions: str
+    production_step_not_found: str
     production_update_not_draft: str
     production_actual_qty_must_be_positive: str
     production_overproduction_disabled: str

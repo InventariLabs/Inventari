@@ -4084,6 +4084,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maker/production/orders/{order_id}/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish Production Order
+         * @description Finish an in-progress order: the rest of its output, its final cost.
+         *
+         *     ``actual_qty`` is what the whole run made, portions included.
+         */
+        post: operations["finish_production_order_api_v1_maker_production_orders__order_id__finish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/orders/{order_id}/portions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record Production Portion
+         * @description Put a portion of an in-progress run's output on the shelf, on its day.
+         */
+        post: operations["record_production_portion_api_v1_maker_production_orders__order_id__portions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maker/production/orders/{order_id}/reverse": {
         parameters: {
             query?: never;
@@ -4102,6 +4144,50 @@ export interface paths {
          *     not completed and for one whose output has since left its shelf.
          */
         post: operations["reverse_production_order_api_v1_maker_production_orders__order_id__reverse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/orders/{order_id}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Production Order
+         * @description Start a DRAFT order: take its ingredients now, finish it later.
+         *
+         *     The run reads ``IN_PROGRESS`` until it is finished, in portions or at
+         *     once. Refuses like completion does — 422 with the shortage list when
+         *     the ingredients are not there, ``empty_bom`` for a recipe with no lines.
+         */
+        post: operations["start_production_order_api_v1_maker_production_orders__order_id__start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/orders/{order_id}/steps/{index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Tick Production Step
+         * @description Mark a process step of an in-progress run done on a day (null clears it).
+         */
+        put: operations["tick_production_step_api_v1_maker_production_orders__order_id__steps__index__put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -12218,6 +12304,8 @@ export interface components {
             uom_id?: string | null;
             /** Yield Loss Pct */
             yield_loss_pct?: number | string;
+            /** Make Fresh */
+            make_fresh?: boolean;
             /** Notes */
             notes?: string | null;
         };
@@ -12254,6 +12342,11 @@ export interface components {
             unit: string;
             /** Yield Loss Pct */
             yield_loss_pct: string;
+            /**
+             * Make Fresh
+             * @default false
+             */
+            make_fresh: boolean;
             /** Notes */
             notes: string | null;
             /**
@@ -12277,6 +12370,8 @@ export interface components {
              * @default false
              */
             typed_unit_price_in_use: boolean;
+            /** Stock On Hand */
+            stock_on_hand?: string | null;
         };
         /**
          * BoMLineUpdate
@@ -12289,6 +12384,8 @@ export interface components {
             uom_id?: string | null;
             /** Yield Loss Pct */
             yield_loss_pct?: number | string | null;
+            /** Make Fresh */
+            make_fresh?: boolean | null;
             /** Notes */
             notes?: string | null;
         };
@@ -21306,6 +21403,23 @@ export interface components {
             confirm_shortage?: boolean;
         };
         /**
+         * ProductionOrderFinish
+         * @description Optional request body for POST /orders/{id}/finish.
+         *
+         *     ``actual_qty`` is what the whole run made, portions already put on the
+         *     shelf included; the rest of it is put on the shelf now. ``finished_on``
+         *     is the day it closed and ``output_lot_name`` the batch of that closing
+         *     quantity.
+         */
+        ProductionOrderFinish: {
+            /** Actual Qty */
+            actual_qty?: number | string | null;
+            /** Finished On */
+            finished_on?: string | null;
+            /** Output Lot Name */
+            output_lot_name?: string | null;
+        };
+        /**
          * ProductionOrderLineRead
          * @description Snapshot of one consumed ingredient at completion time.
          */
@@ -21456,6 +21570,25 @@ export interface components {
             result_per_batch?: string | null;
             /** Lines */
             lines?: components["schemas"]["ProductionOrderLineRead"][];
+            /** Started On */
+            started_on?: string | null;
+            /** Material Cost */
+            material_cost?: string | null;
+            /** Steps */
+            steps?: components["schemas"]["ProductionStepRead"][];
+            /** Portions */
+            portions?: components["schemas"]["ProductionPortionRead"][];
+        };
+        /**
+         * ProductionOrderStart
+         * @description Optional request body for POST /orders/{id}/start.
+         *
+         *     ``started_on`` is the day the ingredients were taken; the organization's
+         *     today when omitted.
+         */
+        ProductionOrderStart: {
+            /** Started On */
+            started_on?: string | null;
         };
         /**
          * ProductionOrderUpdate
@@ -21471,6 +21604,47 @@ export interface components {
             production_date?: string | null;
             /** Notes */
             notes?: string | null;
+        };
+        /**
+         * ProductionPortionCreate
+         * @description Request body for POST /orders/{id}/portions — output before the run closes.
+         */
+        ProductionPortionCreate: {
+            /** Qty */
+            qty: number | string;
+            /** Made On */
+            made_on?: string | null;
+            /** Output Lot Name */
+            output_lot_name?: string | null;
+        };
+        /**
+         * ProductionPortionRead
+         * @description One portion of a run's output, put on the shelf on its own day.
+         */
+        ProductionPortionRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Qty */
+            qty: string;
+            /**
+             * Made On
+             * Format: date
+             */
+            made_on: string;
+            /** Lot Name */
+            lot_name?: string | null;
+            /** Item Id */
+            item_id?: string | null;
+            /** Unit Cost */
+            unit_cost?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /**
          * ProductionPreviewResponse
@@ -21530,6 +21704,28 @@ export interface components {
             reference_price?: string | null;
             /** Result Per Unit */
             result_per_unit?: string | null;
+        };
+        /**
+         * ProductionStepRead
+         * @description One process step of a run in progress: its text, time and the day it was done.
+         */
+        ProductionStepRead: {
+            /** Text */
+            text?: string | null;
+            /** Minutes */
+            minutes?: number | null;
+            /** Done On */
+            done_on?: string | null;
+        };
+        /**
+         * ProductionStepTick
+         * @description Request body for PUT /orders/{id}/steps/{index} — a step done on a day.
+         *
+         *     ``done_on`` null clears the tick.
+         */
+        ProductionStepTick: {
+            /** Done On */
+            done_on?: string | null;
         };
         /**
          * ProductionStockMoveRead
@@ -24931,6 +25127,8 @@ export interface components {
             excluded_currency_rows: number;
             /** Total Value */
             total_value?: string | null;
+            /** Work In Progress Value */
+            work_in_progress_value?: string | null;
             /**
              * Items
              * @default []
@@ -36190,6 +36388,76 @@ export interface operations {
             };
         };
     };
+    finish_production_order_api_v1_maker_production_orders__order_id__finish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ProductionOrderFinish"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductionOrderRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_production_portion_api_v1_maker_production_orders__order_id__portions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductionPortionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductionOrderRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     reverse_production_order_api_v1_maker_production_orders__order_id__reverse_post: {
         parameters: {
             query?: never;
@@ -36200,6 +36468,77 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductionOrderRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_production_order_api_v1_maker_production_orders__order_id__start_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ProductionOrderStart"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductionOrderRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tick_production_step_api_v1_maker_production_orders__order_id__steps__index__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductionStepTick"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

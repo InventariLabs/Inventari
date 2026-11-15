@@ -431,10 +431,12 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_reverse_output_used': (
             'This run cannot be undone: some of what it made has already left its location. Record a stock correction for what is left instead.'
         ),
-        'production_cancel_not_draft': (
-            'This production order already has status {status} — only a draft '
-            'can be cancelled.'
-        ),
+        'production_cancel_not_draft': 'This production order already has status {status} — only a draft or a run in progress can be cancelled.',
+        'production_start_not_draft': 'This production order already has status {status} — only a draft can be started.',
+        'production_run_not_in_progress': 'This production run has status {status} — only a run in progress can be filled in portions, ticked off or finished.',
+        'production_finish_below_portions': 'This run has already put {made} on the shelf in portions, so it cannot finish with less than that.',
+        'production_cancel_has_portions': 'This run has already put output on the shelf in portions, so it cannot be cancelled — finish it instead.',
+        'production_step_not_found': 'This run has no such step.',
         'production_update_not_draft': (
             'This production order already has status {status} — only a draft '
             'can be edited.'
@@ -1479,10 +1481,12 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_reverse_output_used': (
             'Tego przebiegu nie można cofnąć: część tego, co wyprodukował, zeszła już z półki. Zamiast tego zapisz korektę stanu tego, co zostało.'
         ),
-        'production_cancel_not_draft': (
-            'To zlecenie produkcyjne ma już status {status} — anulować można '
-            'tylko wersję roboczą.'
-        ),
+        'production_cancel_not_draft': 'To zlecenie produkcyjne ma już status {status} — anulować można tylko wersję roboczą albo zlecenie w toku.',
+        'production_start_not_draft': 'To zlecenie produkcyjne ma już status {status} — rozpocząć można tylko wersję roboczą.',
+        'production_run_not_in_progress': 'To zlecenie produkcyjne ma status {status} — porcjami, krokami i zakończeniem można zająć się tylko w zleceniu w toku.',
+        'production_finish_below_portions': 'To zlecenie odłożyło już na półkę {made} w porcjach, więc nie może się zakończyć mniejszą ilością.',
+        'production_cancel_has_portions': 'To zlecenie odłożyło już wyrób na półkę w porcjach, więc nie można go anulować — zakończ je.',
+        'production_step_not_found': 'To zlecenie nie ma takiego kroku.',
         'production_update_not_draft': (
             'To zlecenie produkcyjne ma już status {status} — edytować można '
             'tylko wersję roboczą.'

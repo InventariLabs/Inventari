@@ -305,7 +305,7 @@ class TestRunRefusals:
         assert resp.status_code == 400, resp.text
         assert _message(resp) == (
             'To zlecenie produkcyjne ma już status CANCELLED — anulować można '
-            'tylko wersję roboczą.'
+            'tylko wersję roboczą albo zlecenie w toku.'
         )
 
     def test_editing_a_cancelled_order_speaks_polish(

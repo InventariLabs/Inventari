@@ -120,6 +120,7 @@ from app.core.module_ownership import general_rows, hidden_module_tags_async
 from app.core.open_package import effective_expiry
 from app.core.scan_registry import ScanProvider, scan_registry
 from app.core.settings_diff import journal_config_change, record_settings
+from app.core.work_in_progress import register_work_in_progress_provider
 from app.database import Base as CoreModelBase
 from app.i18n.service import get_current_lang, get_module_error_message
 from app.schemas.pagination import (
@@ -212,6 +213,7 @@ __all__ = [
     'record_settings',
     'register_api_key_scope',
     'register_lot_trace_source',
+    'register_work_in_progress_provider',
     'relation_exists',
     'require_module',
     'require_org',

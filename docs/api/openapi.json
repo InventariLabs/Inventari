@@ -14593,6 +14593,132 @@
         }
       }
     },
+    "/api/v1/maker/production/orders/{order_id}/finish": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Finish Production Order",
+        "description": "Finish an in-progress order: the rest of its output, its final cost.\n\n``actual_qty`` is what the whole run made, portions included.",
+        "operationId": "finish_production_order_api_v1_maker_production_orders__order_id__finish_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductionOrderFinish",
+                "default": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductionOrderRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/orders/{order_id}/portions": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Record Production Portion",
+        "description": "Put a portion of an in-progress run's output on the shelf, on its day.",
+        "operationId": "record_production_portion_api_v1_maker_production_orders__order_id__portions_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductionPortionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductionOrderRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/maker/production/orders/{order_id}/reverse": {
       "post": {
         "tags": [
@@ -14622,6 +14748,141 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductionOrderRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/orders/{order_id}/start": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Start Production Order",
+        "description": "Start a DRAFT order: take its ingredients now, finish it later.\n\nThe run reads ``IN_PROGRESS`` until it is finished, in portions or at\nonce. Refuses like completion does \u2014 422 with the shortage list when\nthe ingredients are not there, ``empty_bom`` for a recipe with no lines.",
+        "operationId": "start_production_order_api_v1_maker_production_orders__order_id__start_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductionOrderStart",
+                "default": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductionOrderRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/orders/{order_id}/steps/{index}": {
+      "put": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Tick Production Step",
+        "description": "Mark a process step of an in-progress run done on a day (null clears it).",
+        "operationId": "tick_production_step_api_v1_maker_production_orders__order_id__steps__index__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          },
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Index"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductionStepTick"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -43990,6 +44251,11 @@
             "title": "Yield Loss Pct",
             "default": "0"
           },
+          "make_fresh": {
+            "type": "boolean",
+            "title": "Make Fresh",
+            "default": false
+          },
           "notes": {
             "anyOf": [
               {
@@ -44060,6 +44326,11 @@
             "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
             "title": "Yield Loss Pct"
           },
+          "make_fresh": {
+            "type": "boolean",
+            "title": "Make Fresh",
+            "default": false
+          },
           "notes": {
             "anyOf": [
               {
@@ -44119,6 +44390,18 @@
             "type": "boolean",
             "title": "Typed Unit Price In Use",
             "default": false
+          },
+          "stock_on_hand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock On Hand"
           }
         },
         "type": "object",
@@ -44183,6 +44466,17 @@
               }
             ],
             "title": "Yield Loss Pct"
+          },
+          "make_fresh": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make Fresh"
           },
           "notes": {
             "anyOf": [
@@ -69540,6 +69834,53 @@
         "title": "ProductionOrderCreate",
         "description": "Input for POST /production/orders \u2014 DRAFT order to fulfil later.\n\nNote: there is no ``input_storage_location_id`` \u2014 ingredients can be\ndrawn from multiple locations. Resolution happens at completion time\nvia ``stock_consumption.consume_across_locations``."
       },
+      "ProductionOrderFinish": {
+        "properties": {
+          "actual_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,9}|(?=[\\d.]{1,13}0*$)\\d{0,9}\\.\\d{0,3}0*$)"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Qty"
+          },
+          "finished_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished On"
+          },
+          "output_lot_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Name"
+          }
+        },
+        "type": "object",
+        "title": "ProductionOrderFinish",
+        "description": "Optional request body for POST /orders/{id}/finish.\n\n``actual_qty`` is what the whole run made, portions already put on the\nshelf included; the rest of it is put on the shelf now. ``finished_on``\nis the day it closed and ``output_lot_name`` the batch of that closing\nquantity."
+      },
       "ProductionOrderLineRead": {
         "properties": {
           "id": {
@@ -70045,6 +70386,44 @@
             },
             "type": "array",
             "title": "Lines"
+          },
+          "started_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started On"
+          },
+          "material_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Material Cost"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/ProductionStepRead"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "portions": {
+            "items": {
+              "$ref": "#/components/schemas/ProductionPortionRead"
+            },
+            "type": "array",
+            "title": "Portions"
           }
         },
         "type": "object",
@@ -70065,6 +70444,25 @@
         ],
         "title": "ProductionOrderRead",
         "description": "Output for GET/POST /production/orders/{id}."
+      },
+      "ProductionOrderStart": {
+        "properties": {
+          "started_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started On"
+          }
+        },
+        "type": "object",
+        "title": "ProductionOrderStart",
+        "description": "Optional request body for POST /orders/{id}/start.\n\n``started_on`` is the day the ingredients were taken; the organization's\ntoday when omitted."
       },
       "ProductionOrderUpdate": {
         "properties": {
@@ -70112,6 +70510,121 @@
         "type": "object",
         "title": "ProductionOrderUpdate",
         "description": "Request body for PATCH /orders/{id} \u2014 all fields optional.\n\nOnly DRAFT orders can be updated; ``status``, ``output_template_id``\nand ``output_storage_location_id`` are immutable after creation."
+      },
+      "ProductionPortionCreate": {
+        "properties": {
+          "qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,9}|(?=[\\d.]{1,13}0*$)\\d{0,9}\\.\\d{0,3}0*$)"
+              }
+            ],
+            "title": "Qty"
+          },
+          "made_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made On"
+          },
+          "output_lot_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "qty"
+        ],
+        "title": "ProductionPortionCreate",
+        "description": "Request body for POST /orders/{id}/portions \u2014 output before the run closes."
+      },
+      "ProductionPortionRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "qty": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Qty"
+          },
+          "made_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Made On"
+          },
+          "lot_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Name"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "qty",
+          "made_on",
+          "created_at"
+        ],
+        "title": "ProductionPortionRead",
+        "description": "One portion of a run's output, put on the shelf on its own day."
       },
       "ProductionPreviewResponse": {
         "properties": {
@@ -70260,6 +70773,66 @@
         ],
         "title": "ProductionPreviewResponse",
         "description": "Output for POST /production/orders/preview \u2014 what a run would take and cost.\n\nThe breakdown, plus what the person deciding needs before saving: each\ningredient's need against what the records hold where the run would draw\n(``ingredients``, judged like completion judges), the recipe's batch size,\nand the cost per unit with the recipe's fixed costs and the result against\nits reference price."
+      },
+      "ProductionStepRead": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes"
+          },
+          "done_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done On"
+          }
+        },
+        "type": "object",
+        "title": "ProductionStepRead",
+        "description": "One process step of a run in progress: its text, time and the day it was done."
+      },
+      "ProductionStepTick": {
+        "properties": {
+          "done_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done On"
+          }
+        },
+        "type": "object",
+        "title": "ProductionStepTick",
+        "description": "Request body for PUT /orders/{id}/steps/{index} \u2014 a step done on a day.\n\n``done_on`` null clears the tick."
       },
       "ProductionStockMoveRead": {
         "properties": {
@@ -79692,6 +80265,18 @@
               }
             ],
             "title": "Total Value"
+          },
+          "work_in_progress_value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work In Progress Value"
           },
           "items": {
             "items": {
