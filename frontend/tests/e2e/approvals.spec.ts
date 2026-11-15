@@ -204,6 +204,11 @@ test.describe("Approvals — reject flow", () => {
 
     await api.toggleModule(token, "approvals", true).catch(() => {});
     await api.toggleModule(token, "warehouse", true).catch(() => {});
+    // The admin both raises and decides these requests; separation of duties
+    // is off for this single-user spec, as in the other approvals files.
+    await api
+      .setModuleSettings(token, "approvals", { allow_admin_self_approve: true })
+      .catch(() => {});
     // Its own location: the first one of the shared tenant belongs to
     // whichever parallel spec deletes it first.
     storageId = (
@@ -253,10 +258,11 @@ test.describe("Approvals — reject flow", () => {
     await api.confirmDocument(token, doc.id);
 
     try {
-      await api.requestDocumentApproval(token, doc.id);
+      // The workflow the setup created is active, so the confirmation itself
+      // raises the request; asking again would meet the one-open rule.
       const approval = await api.getDocumentApproval(token, doc.id);
-      const reqId = (approval as Record<string, unknown>)?.request_id as string;
-      expect(reqId, "the approval request of the document").toBeTruthy();
+      const reqId = (approval as Record<string, unknown>)?.id as string;
+      expect(reqId, "the request the confirmation raised").toBeTruthy();
 
       const rejected = await api.rejectRequest(token, reqId, {
         notes: "E2E rejection test",
@@ -296,6 +302,14 @@ test.describe("Approvals — workflow lifecycle via API", () => {
 
       await api.toggleModule(token, "approvals", true).catch(() => {});
       await api.toggleModule(token, "warehouse", true).catch(() => {});
+      // The admin both raises and decides these requests; separation of
+      // duties is off for this single-user spec, as in the other approvals
+      // files.
+      await api
+        .setModuleSettings(token, "approvals", {
+          allow_admin_self_approve: true,
+        })
+        .catch(() => {});
       // Its own location: the first one of the shared tenant belongs to
       // whichever parallel spec deletes it first.
       storageId = (
@@ -371,10 +385,12 @@ test.describe("Approvals — workflow lifecycle via API", () => {
 
       await api.confirmDocument(token, docId);
 
-      await api.requestDocumentApproval(token, docId);
+      // The active workflow sends the document for approval as it is
+      // confirmed, at its first stage; a manual request would be the second
+      // one the one-open rule refuses.
       const approval = await api.getDocumentApproval(token, docId);
-      requestId = (approval as Record<string, unknown>)?.request_id as string;
-      expect(requestId, "the approval request of the document").toBeTruthy();
+      requestId = (approval as Record<string, unknown>)?.id as string;
+      expect(requestId, "the request the confirmation raised").toBeTruthy();
     });
 
     test("verifies approval is pending at stage 1", async () => {
@@ -385,14 +401,16 @@ test.describe("Approvals — workflow lifecycle via API", () => {
       expect(req.status).toBe("PENDING");
     });
 
-    test("approves stage 1 — status stays PENDING (stage 2)", async () => {
+    test("approves stage 1 — the request moves on to stage 2", async () => {
       expect(requestId, "the approval request of the document").toBeTruthy();
       await api.approveRequest(token, requestId, {
         notes: "Stage 1 approved",
       });
       const req = await api.getRequest(token, requestId);
       expect(req.current_stage).toBe(2);
-      expect(req.status).toBe("PENDING");
+      // Still waiting on somebody, but no longer at its first stage: the
+      // queue filters on both, and only IN_PROGRESS names this state.
+      expect(req.status).toBe("IN_PROGRESS");
     });
   });
 
