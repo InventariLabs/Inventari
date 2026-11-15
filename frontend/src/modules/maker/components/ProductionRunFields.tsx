@@ -10,6 +10,9 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useFormGuard } from "@/module-sdk";
 import { ProductSearchInput } from "@/modules/maker/components/ProductSearchInput";
 import { SelectedProductCard } from "@/modules/maker/components/SelectedProductCard";
+import { IngredientBatchPicker } from "@/modules/maker/components/IngredientBatchPicker";
+import { useIsHomeProfile } from "@/modules/maker/hooks/useIsHomeProfile";
+import { todayIso } from "@/utils/formatters";
 import type { ProductionForm } from "@/modules/maker/hooks/useProductionSheet";
 import type { ProductionMode } from "@/modules/maker/types/maker";
 
@@ -29,6 +32,7 @@ export function ProductionRunFields({
   onShowPricing,
 }: ProductionRunFieldsProps) {
   const { t } = useTranslation("maker");
+  const home = useIsHomeProfile();
   // What the reader typed goes with a navigation the palette or a tab
   // starts over the sheet; the guard asks first. Saving leaves by its own
   // navigation, which the guard does not stand in.
@@ -82,15 +86,42 @@ export function ProductionRunFields({
       {locationField}
 
       {/* A named batch is what lets a recall of an ingredient follow this
-          run on to the customers of what it made. */}
-      <Input
-        label={t("create.outputLotLabel")}
-        description={t("create.outputLotHint")}
-        value={form.outputLotName}
-        onChange={(e) => form.setOutputLotName(e.target.value)}
-        maxLength={100}
-        data-testid="maker-create-output-lot-input"
-      />
+          run on to the customers of what it made. A run nobody names one
+          for names its own, so a home is never asked. */}
+      {!home && (
+        <Input
+          label={t("create.outputLotLabel")}
+          description={t("create.outputLotHint")}
+          value={form.outputLotName}
+          onChange={(e) => form.setOutputLotName(e.target.value)}
+          maxLength={100}
+          data-testid="maker-create-output-lot-input"
+        />
+      )}
+
+      {form.mode === "made" && (
+        <div className="space-y-1">
+          <DateInput
+            id="maker-create-best-before"
+            label={t("batches.bestBeforeLabel")}
+            value={form.bestBefore}
+            onChange={form.setBestBefore}
+            min={todayIso()}
+            presets={["plus6Months", "plus1Year"]}
+          />
+          <p className="text-xs text-on-muted">
+            {form.shelfLifeDays
+              ? t("batches.bestBeforeFromShelfLife", {
+                  count: form.shelfLifeDays,
+                })
+              : t(
+                  home
+                    ? "batches.bestBeforeNoShelfLifeHome"
+                    : "batches.bestBeforeNoShelfLife",
+                )}
+          </p>
+        </div>
+      )}
 
       {form.mode === "planned" && (
         <DateInput
@@ -125,6 +156,8 @@ export function ProductionRunFields({
           {t("pricing.openButton")}
         </Button>
       </div>
+
+      {form.mode === "made" && <IngredientBatchPicker choice={form.batches} />}
 
       <Textarea
         wrapperClassName="space-y-2"

@@ -179,6 +179,10 @@
     "withoutCode_other": "{{count}} der gewählten Produkte haben keinen Code und werden ausgelassen. Erzeugen Sie einen im Produktformular.",
     "previewAlt": "Vorschau der Produktetiketten"
   },
+  "batchLabel": {
+    "title": "Chargenetiketten",
+    "previewAlt": "Vorschau eines Chargenetiketts"
+  },
   "locationLabel": {
     "title": "Regaletiketten",
     "qr": "QR-Code neben den Strichen, für die Handykamera",

@@ -11,7 +11,6 @@ import { Card } from "@/components/ui/Card";
 import { InlineQueryError, QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { CancelRunButton } from "@/modules/maker/components/CancelRunButton";
 import { ReverseRunAction } from "@/modules/maker/components/ReverseRunAction";
@@ -21,7 +20,9 @@ import { ProductionIngredientsTable } from "@/modules/maker/components/Productio
 import { ProductionStockMovesTable } from "@/modules/maker/components/ProductionStockMovesTable";
 import { ProductionOrderStats } from "@/modules/maker/components/ProductionOrderStats";
 import { ShortageModal } from "@/modules/maker/components/ShortageModal";
-import { EmptyBomNotice } from "@/modules/maker/components/EmptyBomNotice";
+import { CompleteRunDialog } from "@/modules/maker/components/CompleteRunDialog";
+import { OutputBatchCard } from "@/modules/maker/components/OutputBatchCard";
+import { RunAttachmentsSection } from "@/modules/maker/components/RunAttachmentsSection";
 import { formatDecimalQty } from "@/utils/formatters";
 import {
   useCancelProduction,
@@ -32,7 +33,6 @@ import { useDuplicateOrderNavigation } from "@/modules/maker/hooks/useDuplicateO
 import { useCompleteRun } from "@/modules/maker/hooks/useCompleteRun";
 import { usePlannedConsumption } from "@/modules/maker/hooks/usePlannedConsumption";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
-import { QUANTITY_STEP } from "@/module-sdk";
 
 /**
  * The run's stock movements. Reads its own list, so a failed read is said
@@ -82,16 +82,13 @@ export default function ProductionDetailPage() {
   } = usePlannedConsumption(order);
   const cancelMutation = useCancelProduction();
   const { duplicate, isDuplicating } = useDuplicateOrderNavigation();
+  const completeRun = useCompleteRun(order);
   const {
-    showConfirm: showCompleteConfirm,
     setShowConfirm: setShowCompleteConfirm,
-    actualQty,
-    setActualQty,
     shortages: completeShortages,
     setShortages: setCompleteShortages,
     shortAtCreate,
-    complete: handleComplete,
-  } = useCompleteRun(order);
+  } = completeRun;
 
   useEffect(() => {
     setHeader({
@@ -241,6 +238,7 @@ export default function ProductionDetailPage() {
       ) : (
         <>
           <ProductionOrderStats order={order} />
+          <OutputBatchCard order={order} />
 
           {order.notes && (
             <Card className="p-4">
@@ -307,59 +305,13 @@ export default function ProductionDetailPage() {
 
       <OrderStockMoves orderId={orderId} />
 
-      <ConfirmDialog
-        open={showCompleteConfirm}
-        title={t("detail.completeConfirm.title", {
-          defaultValue: "Complete production run?",
-        })}
-        message={t("detail.completeConfirm.description", {
-          defaultValue:
-            "This consumes the listed ingredients and produces the output. This action cannot be undone.",
-        })}
-        confirmLabel={t("detail.complete", { defaultValue: "Complete run" })}
-        cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
-        confirmDisabled={bomIsEmpty}
-        onConfirm={() => {
-          setShowCompleteConfirm(false);
-          handleComplete();
-        }}
-        onCancel={() => {
-          setShowCompleteConfirm(false);
-          setActualQty("");
-        }}
-        variant="default"
-      >
-        {bomIsEmpty && (
-          <EmptyBomNotice recipeId={order.recipe_id} className="mt-2" />
-        )}
-        <div className="space-y-2 py-2">
-          <Input
-            label={t("detail.completeConfirm.actualQtyLabel", {
-              defaultValue: "Actual quantity produced (optional)",
-            })}
-            type="number"
-            step={QUANTITY_STEP}
-            min="0"
-            value={actualQty}
-            onChange={(e) => setActualQty(e.target.value)}
-            // A placeholder the reader can type over: formatted like the
-            // header says it, not the raw string off the wire ("100.000"
-            // with a dot in a comma locale).
-            placeholder={formatQuantityLocalized(
-              t,
-              order.planned_qty,
-              order.output_uom_symbol,
-            )}
-            data-testid="maker-complete-actual-qty-input"
-          />
-          <p className="text-xs text-on-muted">
-            {t("detail.completeConfirm.actualQtyHint", {
-              defaultValue:
-                "Leave empty to use planned quantity. Enter less for scrap, more for overproduction. Ingredients are consumed as planned regardless of the actual quantity.",
-            })}
-          </p>
-        </div>
-      </ConfirmDialog>
+      <RunAttachmentsSection orderId={order.id} />
+
+      <CompleteRunDialog
+        order={order}
+        run={completeRun}
+        bomIsEmpty={bomIsEmpty}
+      />
 
       <ShortageModal
         open={completeShortages !== null}

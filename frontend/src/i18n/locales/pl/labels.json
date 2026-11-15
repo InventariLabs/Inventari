@@ -189,6 +189,10 @@
     "withoutCode_other": "{{count}} z wybranych produktów nie ma kodu i zostaje pominiętych. Wygeneruj go w formularzu produktu.",
     "previewAlt": "Podgląd etykiet produktów"
   },
+  "batchLabel": {
+    "title": "Etykiety partii",
+    "previewAlt": "Podgląd jednej etykiety partii"
+  },
   "locationLabel": {
     "title": "Etykiety miejsc",
     "qr": "Kod QR obok kresek, dla aparatu telefonu",

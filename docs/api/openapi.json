@@ -13897,6 +13897,104 @@
         }
       }
     },
+    "/api/v1/maker/production/ingredient-batches": {
+      "get": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Plan Ingredient Batches",
+        "description": "Which batches each ingredient of a run would be taken from, read-only.\n\nThe run as its form or its draft names it: the product, the recipe\n(its default when left out), the quantity and where the output goes.\nAnswers the draw the run makes when nobody chooses, and every batch the\nperson may choose instead \u2014 at the scope the run draws under.",
+        "operationId": "plan_ingredient_batches_api_v1_maker_production_ingredient_batches_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "output_template_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Output Template Id"
+            }
+          },
+          {
+            "name": "planned_qty",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0.0
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,9}|(?=[\\d.]{1,13}0*$)\\d{0,9}\\.\\d{0,3}0*$)"
+                }
+              ],
+              "title": "Planned Qty"
+            }
+          },
+          {
+            "name": "output_location_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Output Location Id"
+            }
+          },
+          {
+            "name": "recipe_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recipe Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientBatchPlanResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/maker/production/monthly-result": {
       "get": {
         "tags": [
@@ -14162,7 +14260,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProductionOrderCreate"
+                "$ref": "#/components/schemas/ProductionMadeCreate"
               }
             }
           },
@@ -14415,6 +14513,199 @@
         }
       }
     },
+    "/api/v1/maker/production/orders/{order_id}/attachments": {
+      "get": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "List Run Attachments",
+        "description": "The photos and files filed under the run, newest first.",
+        "operationId": "list_run_attachments_api_v1_maker_production_orders__order_id__attachments_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_ProductionAttachmentRead_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Upload Run Attachment",
+        "description": "File a photo or a document under the run, within a product attachment's limits.",
+        "operationId": "upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductionAttachmentRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/orders/{order_id}/attachments/{attachment_id}": {
+      "delete": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Delete Run Attachment",
+        "description": "Take a file off the run; the stored file goes once the removal is committed.",
+        "operationId": "delete_run_attachment_api_v1_maker_production_orders__order_id__attachments__attachment_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          },
+          {
+            "name": "attachment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Attachment Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/maker/production/orders/{order_id}/cancel": {
       "post": {
         "tags": [
@@ -14511,7 +14802,9 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ProductionOrderComplete",
-                "default": {}
+                "default": {
+                  "ingredient_lots": []
+                }
               }
             }
           }
@@ -14576,6 +14869,175 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProductionOrderRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/orders/{order_id}/hold": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Hold Output Batch",
+        "description": "Put the run's output batch on hold until it is released.",
+        "operationId": "hold_output_batch_api_v1_maker_production_orders__order_id__hold_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutputBatchHold"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputBatchRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/orders/{order_id}/record": {
+      "get": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Get Batch Record",
+        "description": "The printable batch record of a completed run.",
+        "operationId": "get_batch_record_api_v1_maker_production_orders__order_id__record_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRecordRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/orders/{order_id}/release": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Release Output Batch",
+        "description": "Release the run's held output batch back into use.",
+        "operationId": "release_output_batch_api_v1_maker_production_orders__order_id__release_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputBatchRead"
                 }
               }
             }
@@ -14705,6 +15167,120 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaginatedResponse_ProductionStockMoveRead_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/shelf-lives/{template_id}": {
+      "get": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Get Shelf Life",
+        "description": "How many days the product keeps once made (None: nobody said).",
+        "operationId": "get_shelf_life_api_v1_maker_production_shelf_lives__template_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShelfLifeRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Set Shelf Life",
+        "description": "Set the product's shelf life in days, or clear it with ``null``.\n\nA fact about the product, so it lands in the organization journal with\nboth sides, as a typed price does.",
+        "operationId": "set_shelf_life_api_v1_maker_production_shelf_lives__template_id__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShelfLifeUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShelfLifeRead"
                 }
               }
             }
@@ -18670,6 +19246,55 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/LocationLabelExport"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "image/png": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/printing/lot-labels/png": {
+      "post": {
+        "tags": [
+          "Label Printing"
+        ],
+        "summary": "Lot Labels Png",
+        "description": "The batches' labels as one PNG: product, batch code in bars, made and best-before.",
+        "operationId": "lot_labels_png_api_v1_printing_lot_labels_png_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotLabelExport"
               }
             }
           },
@@ -43865,6 +44490,400 @@
         ],
         "title": "AvailableEventResponse"
       },
+      "BatchRecordBatch": {
+        "properties": {
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "lot_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Name"
+          },
+          "expiry_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiry Date"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quantity"
+        ],
+        "title": "BatchRecordBatch",
+        "description": "What a run took of one ingredient from one batch."
+      },
+      "BatchRecordIngredient": {
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Template Id"
+          },
+          "template_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Name"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "consumed_qty": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Consumed Qty"
+          },
+          "shortfall_qty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shortfall Qty"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost"
+          },
+          "batches": {
+            "items": {
+              "$ref": "#/components/schemas/BatchRecordBatch"
+            },
+            "type": "array",
+            "title": "Batches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_id",
+          "unit",
+          "consumed_qty"
+        ],
+        "title": "BatchRecordIngredient",
+        "description": "One ingredient of the batch record, with the batches it came from."
+      },
+      "BatchRecordRead": {
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Order Id"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "output_template_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Template Name"
+          },
+          "recipe_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Name"
+          },
+          "output_uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Uom Symbol"
+          },
+          "planned_qty": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Planned Qty"
+          },
+          "actual_qty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Qty"
+          },
+          "scrap_qty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scrap Qty"
+          },
+          "output_lot_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Name"
+          },
+          "output_lot_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Status"
+          },
+          "production_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Production Date"
+          },
+          "best_before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Before"
+          },
+          "output_location_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Location Name"
+          },
+          "ingredients": {
+            "items": {
+              "$ref": "#/components/schemas/BatchRecordIngredient"
+            },
+            "type": "array",
+            "title": "Ingredients"
+          },
+          "material_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Material Cost"
+          },
+          "total_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Cost"
+          },
+          "estimated_total_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Total Cost"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed By Name"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/ProductionAttachmentRead"
+            },
+            "type": "array",
+            "title": "Attachments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "order_id",
+          "status",
+          "planned_qty",
+          "created_at"
+        ],
+        "title": "BatchRecordRead",
+        "description": "Everything the printed batch record of a completed run says."
+      },
       "BestItemSchema": {
         "properties": {
           "item_id": {
@@ -44837,6 +45856,20 @@
           "image"
         ],
         "title": "Body_upload_recipe_image_api_v1_recipes__recipe_id__image_post"
+      },
+      "Body_upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_run_attachment_api_v1_maker_production_orders__order_id__attachments_post"
       },
       "BomMoveRequest": {
         "properties": {
@@ -54570,6 +55603,177 @@
         "title": "IngredientAvailabilityItem",
         "description": "Per-ingredient availability in an availability check."
       },
+      "IngredientBatchDraw": {
+        "properties": {
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "lot_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Name"
+          },
+          "expiry_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiry Date"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quantity"
+        ],
+        "title": "IngredientBatchDraw",
+        "description": "A part of an ingredient's need, from one batch (``None``: stock without one)."
+      },
+      "IngredientBatchOption": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lot Id"
+          },
+          "lot_name": {
+            "type": "string",
+            "title": "Lot Name"
+          },
+          "expiry_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiry Date"
+          },
+          "production_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Production Date"
+          },
+          "available": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "lot_name",
+          "available"
+        ],
+        "title": "IngredientBatchOption",
+        "description": "A batch of the ingredient the run may take from, and how much it has free."
+      },
+      "IngredientBatchPlan": {
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Template Id"
+          },
+          "template_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Name"
+          },
+          "uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uom Symbol"
+          },
+          "needed": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Needed"
+          },
+          "plan": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientBatchDraw"
+            },
+            "type": "array",
+            "title": "Plan"
+          },
+          "batches": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientBatchOption"
+            },
+            "type": "array",
+            "title": "Batches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_id",
+          "needed"
+        ],
+        "title": "IngredientBatchPlan",
+        "description": "Which batches an ingredient of the run will be taken from.\n\n``plan`` is the draw the run makes when nobody chooses \u2014 the product's\nremoval order, earliest best-before first under FEFO \u2014 and ``batches``\nevery batch the person may choose instead. Held, recalled and expired\nbatches are in neither. Quantities are in the ingredient's stock unit."
+      },
+      "IngredientBatchPlanResponse": {
+        "properties": {
+          "ingredients": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientBatchPlan"
+            },
+            "type": "array",
+            "title": "Ingredients"
+          }
+        },
+        "type": "object",
+        "title": "IngredientBatchPlanResponse",
+        "description": "Output for POST /production/orders/ingredient-batches."
+      },
       "IngredientCost": {
         "properties": {
           "ingredient_name": {
@@ -55031,6 +56235,41 @@
           "updated_at"
         ],
         "title": "IngredientDefaultSchema"
+      },
+      "IngredientLotChoice": {
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Template Id"
+          },
+          "lot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lot Id"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,10}|(?=[\\d.]{1,17}0*$)\\d{0,10}\\.\\d{0,6}0*$)"
+              }
+            ],
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_id",
+          "lot_id",
+          "quantity"
+        ],
+        "title": "IngredientLotChoice",
+        "description": "One batch an ingredient is taken from, and how much of it.\n\nThe quantity is in the ingredient's stock unit, the unit the batch plan\nanswers in. The choices of one ingredient add up to what the run takes\nof it."
       },
       "IngredientMatchProposal": {
         "properties": {
@@ -58407,6 +59646,47 @@
         ],
         "title": "LogoutResponse"
       },
+      "LotLabelExport": {
+        "properties": {
+          "lot_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Lot Ids"
+          },
+          "width_mm": {
+            "type": "number",
+            "maximum": 300.0,
+            "minimum": 10.0,
+            "title": "Width Mm",
+            "default": 50.0
+          },
+          "height_mm": {
+            "type": "number",
+            "maximum": 300.0,
+            "minimum": 5.0,
+            "title": "Height Mm",
+            "default": 24.0
+          },
+          "copies": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Copies",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_ids"
+        ],
+        "title": "LotLabelExport",
+        "description": "Batches whose labels to draw, and how: the preview and download.\n\nA run prints one label per unit it made, so a batch label goes up to\n``LOT_LABEL_MAX_COPIES`` copies, where other labels stop at 20."
+      },
       "LotLocationDTO": {
         "properties": {
           "location_id": {
@@ -61645,6 +62925,47 @@
         "type": "object",
         "title": "OrganizationUpdate"
       },
+      "OutputBatchHold": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "OutputBatchHold",
+        "description": "Input for POST /production/orders/{id}/hold: why the batch is held."
+      },
+      "OutputBatchRead": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lot Id"
+          },
+          "lot_name": {
+            "type": "string",
+            "title": "Lot Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "lot_name",
+          "status"
+        ],
+        "title": "OutputBatchRead",
+        "description": "The run's output batch as it stands after a hold or a release."
+      },
       "OverdueAssignmentItem": {
         "properties": {
           "assignment_id": {
@@ -64064,6 +65385,47 @@
           "has_more"
         ],
         "title": "PaginatedResponse[ProductProfile]"
+      },
+      "PaginatedResponse_ProductionAttachmentRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProductionAttachmentRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[ProductionAttachmentRead]"
       },
       "PaginatedResponse_ProductionStockMoveRead_": {
         "properties": {
@@ -67934,6 +69296,15 @@
             "maxItems": 200,
             "title": "Item Ids"
           },
+          "lot_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Lot Ids"
+          },
           "details": {
             "type": "boolean",
             "title": "Details",
@@ -67963,7 +69334,7 @@
           },
           "copies": {
             "type": "integer",
-            "maximum": 20.0,
+            "maximum": 200.0,
             "minimum": 1.0,
             "title": "Copies",
             "default": 1
@@ -69410,6 +70781,173 @@
         "title": "ProductTemplateStockResponse",
         "description": "How much of one product the organization has on its shelves.\n\nThe number a threshold is measured against, so the screen that sets\none can name it. That screen used to show the quantity of the single\nrecord the reader had opened, and offered to copy it into a field\ngoverning the product as a whole."
       },
+      "ProductionAttachmentRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "production_order_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Production Order Id"
+          },
+          "original_name": {
+            "type": "string",
+            "title": "Original Name"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "uploaded_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uploaded By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "production_order_id",
+          "original_name",
+          "content_type",
+          "size_bytes",
+          "url",
+          "created_at"
+        ],
+        "title": "ProductionAttachmentRead",
+        "description": "A file filed under a run."
+      },
+      "ProductionMadeCreate": {
+        "properties": {
+          "output_template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Output Template Id"
+          },
+          "recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Id"
+          },
+          "planned_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,9}|(?=[\\d.]{1,13}0*$)\\d{0,9}\\.\\d{0,3}0*$)"
+              }
+            ],
+            "title": "Planned Qty"
+          },
+          "output_location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Output Location Id"
+          },
+          "production_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Production Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "output_lot_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Name"
+          },
+          "confirm_shortage": {
+            "type": "boolean",
+            "title": "Confirm Shortage",
+            "default": false
+          },
+          "best_before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Before"
+          },
+          "ingredient_lots": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientLotChoice"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Ingredient Lots"
+          }
+        },
+        "type": "object",
+        "required": [
+          "output_template_id",
+          "planned_qty",
+          "output_location_id"
+        ],
+        "title": "ProductionMadeCreate",
+        "description": "Input for POST /production/orders/made \u2014 a run that already happened.\n\nBesides the run, what closing it decides: the output batch's\nbest-before (the run's day plus the product's shelf life when left\nout) and, per ingredient, the batches it was taken from (the removal\norder when left out)."
+      },
       "ProductionOrderCancel": {
         "properties": {
           "reason": {
@@ -69446,6 +70984,26 @@
               }
             ],
             "title": "Actual Qty"
+          },
+          "best_before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Before"
+          },
+          "ingredient_lots": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientLotChoice"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Ingredient Lots"
           }
         },
         "type": "object",
@@ -69857,6 +71415,52 @@
             ],
             "title": "Output Lot Name"
           },
+          "output_lot_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Id"
+          },
+          "output_lot_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Status"
+          },
+          "best_before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Before"
+          },
+          "shelf_life_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shelf Life Days"
+          },
           "created_by": {
             "anyOf": [
               {
@@ -70247,6 +71851,17 @@
               }
             ],
             "title": "Result Per Unit"
+          },
+          "shelf_life_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shelf Life Days"
           }
         },
         "type": "object",
@@ -78351,6 +79966,53 @@
         ],
         "title": "ShelfClosed",
         "description": "The answer to closing a shelf: how many rows it counted as none."
+      },
+      "ShelfLifeRead": {
+        "properties": {
+          "product_template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Template Id"
+          },
+          "shelf_life_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shelf Life Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_template_id",
+          "shelf_life_days"
+        ],
+        "title": "ShelfLifeRead",
+        "description": "A product's shelf life in days, ``None`` when nobody named one."
+      },
+      "ShelfLifeUpdate": {
+        "properties": {
+          "shelf_life_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 36500.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shelf Life Days"
+          }
+        },
+        "type": "object",
+        "title": "ShelfLifeUpdate",
+        "description": "Input for PUT /production/shelf-lives/{template_id}; ``None`` clears it."
       },
       "ShipmentCreate": {
         "properties": {

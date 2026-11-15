@@ -4,6 +4,7 @@ import type {
   ProductionOrder,
   ProductionOrderCancel,
   ProductionOrderComplete,
+  ProductionMadeCreateInput,
   ProductionOrderCreateInput,
   ProductionOrderListResponse,
   ProductionOrderUpdate,
@@ -111,7 +112,7 @@ export const productionApi = {
 
   /** A run that already happened, created and completed in one step. */
   recordMade: async (
-    data: ProductionOrderCreateInput,
+    data: ProductionMadeCreateInput,
   ): Promise<ProductionOrder> => {
     const response = await api.post<ProductionOrder>(
       "/maker/production/orders/made",

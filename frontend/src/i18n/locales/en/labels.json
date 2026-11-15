@@ -179,6 +179,10 @@
     "withoutCode_other": "{{count}} of the chosen products have no code and are left out. Generate one on their form.",
     "previewAlt": "Preview of the product labels"
   },
+  "batchLabel": {
+    "title": "Batch labels",
+    "previewAlt": "Preview of one batch label"
+  },
   "locationLabel": {
     "title": "Location labels",
     "qr": "QR beside the bars, for a phone camera",

@@ -180,6 +180,10 @@
     "withoutCode_other": "{{count}} de los productos elegidos no tienen código y se omiten. Genere uno en su formulario.",
     "previewAlt": "Vista previa de las etiquetas de producto"
   },
+  "batchLabel": {
+    "title": "Etiquetas de lote",
+    "previewAlt": "Vista previa de una etiqueta de lote"
+  },
   "locationLabel": {
     "title": "Etiquetas de ubicación",
     "qr": "QR junto a las barras, para la cámara del teléfono",

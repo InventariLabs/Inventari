@@ -33,27 +33,50 @@ const PRESETS = [
 interface BarcodeLabelSheetProps {
   target: BarcodeLabelTarget;
   onClose: () => void;
+  /** How many of each label to start from — a run's batch, one per unit. */
+  initialCopies?: number;
+  /** The sheet's title when the screen words it its own way ("Jar labels"). */
+  title?: string;
 }
 
+function targetCount(target: BarcodeLabelTarget): number {
+  if ("storageIds" in target) return target.storageIds.length;
+  if ("lotIds" in target) return target.lotIds.length;
+  return target.itemIds.length;
+}
+
+/** Copies of one label: a batch prints one per unit a run made. */
+const MAX_COPIES = 20;
+const MAX_BATCH_COPIES = 200;
+
 /**
- * Labels with bars for a selection — products', or shelves' with the code
- * large in Code 128: the preview is the file the download gives, and "Send to
- * printer" queues the same labels for an agent.
+ * Labels with bars for a selection — products', shelves' with the code large
+ * in Code 128, or batches' with the batch code in bars: the preview is the
+ * file the download gives (a batch's one label, which the download repeats),
+ * and "Send to printer" queues the same labels for an agent.
  */
-export function BarcodeLabelSheet({ target, onClose }: BarcodeLabelSheetProps) {
+export function BarcodeLabelSheet({
+  target,
+  onClose,
+  initialCopies = 1,
+  title: givenTitle,
+}: BarcodeLabelSheetProps) {
   const { t } = useTranslation(["labels", "common"]);
   const defaultWidth = useSettingsStore((s) => s.defaultLabelWidth);
   const defaultHeight = useSettingsStore((s) => s.defaultLabelHeight);
   const [options, setOptions] = useState<BarcodeLabelOptions>({
     width: defaultWidth,
     height: defaultHeight,
-    copies: 1,
+    copies: initialCopies,
     details: true,
     qr: false,
   });
   const [downloading, setDownloading] = useState(false);
   const shelves = "storageIds" in target;
-  const count = shelves ? target.storageIds.length : target.itemIds.length;
+  const batches = "lotIds" in target;
+  const products = "itemIds" in target;
+  const maxCopies = batches ? MAX_BATCH_COPIES : MAX_COPIES;
+  const count = targetCount(target);
   const preview = useBarcodeLabelPreview(
     target,
     options,
@@ -61,15 +84,24 @@ export function BarcodeLabelSheet({ target, onClose }: BarcodeLabelSheetProps) {
   );
   const printable = (count - preview.withoutCode) * options.copies;
   // Spelled out, not built: the i18n gate reads the keys a file names.
-  const title = shelves
-    ? t("labels:locationLabel.title")
-    : t("labels:productLabel.title");
+  let title = t("labels:productLabel.title");
+  let previewAlt = t("labels:productLabel.previewAlt");
+  let fileName = "product-labels.png";
+  if (shelves) {
+    title = t("labels:locationLabel.title");
+    previewAlt = t("labels:locationLabel.previewAlt");
+    fileName = "shelf-labels.png";
+  } else if (batches) {
+    title = givenTitle ?? t("labels:batchLabel.title");
+    previewAlt = t("labels:batchLabel.previewAlt");
+    fileName = "batch-labels.png";
+  }
 
   const download = async () => {
     setDownloading(true);
     try {
       const { blob } = await fetchBarcodeLabels(target, options);
-      downloadBlob(blob, shelves ? "shelf-labels.png" : "product-labels.png");
+      downloadBlob(blob, fileName);
     } catch (error) {
       toast.error(extractApiError(error, t("labels:errorDownloading")));
     } finally {
@@ -124,20 +156,21 @@ export function BarcodeLabelSheet({ target, onClose }: BarcodeLabelSheetProps) {
             label={t("labels:previewModal.copies")}
             type="number"
             min={1}
-            max={20}
+            max={maxCopies}
             value={options.copies}
             onChange={(e) =>
               setOptions((o) => ({
                 ...o,
                 copies: Math.min(
-                  20,
+                  maxCopies,
                   Math.max(1, parseInt(e.target.value) || 1),
                 ),
               }))
             }
+            data-testid="label-sheet-copies-input"
           />
         </div>
-        {shelves ? (
+        {shelves && (
           <Checkbox
             id="location-label-qr"
             label={t("labels:locationLabel.qr")}
@@ -146,7 +179,8 @@ export function BarcodeLabelSheet({ target, onClose }: BarcodeLabelSheetProps) {
               setOptions((o) => ({ ...o, qr: e.target.checked }))
             }
           />
-        ) : (
+        )}
+        {products && (
           <div className="space-y-1">
             <Checkbox
               id="product-label-details"
@@ -181,11 +215,7 @@ export function BarcodeLabelSheet({ target, onClose }: BarcodeLabelSheetProps) {
           ) : preview.url ? (
             <img
               src={preview.url}
-              alt={
-                shelves
-                  ? t("labels:locationLabel.previewAlt")
-                  : t("labels:productLabel.previewAlt")
-              }
+              alt={previewAlt}
               className="block max-w-full h-auto bg-white shadow-md border border-border"
             />
           ) : (
@@ -207,9 +237,8 @@ export function BarcodeLabelSheet({ target, onClose }: BarcodeLabelSheetProps) {
               copies: options.copies,
               width: options.width,
               height: options.height,
-              ...(shelves
-                ? { bars: true, qr: options.qr }
-                : { details: options.details }),
+              ...(shelves && { bars: true, qr: options.qr }),
+              ...(products && { details: options.details }),
             }}
             onSent={onClose}
           />
