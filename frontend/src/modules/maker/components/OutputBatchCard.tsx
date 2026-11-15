@@ -14,17 +14,21 @@ import { formatDate } from "@/utils/formatters";
 import { BarcodeLabelSheet } from "@/modules/shared/components/BarcodeLabelSheet";
 import { useOutputBatchStatus } from "@/modules/maker/hooks/useBatches";
 import { useIsHomeProfile } from "@/modules/maker/hooks/useIsHomeProfile";
+import { runBatches } from "@/modules/maker/lib/runBatches";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 
 /** Batch labels a run offers to print: one per unit it made, within the
  *  printing module's two hundred. */
 const MAX_LABELS = 200;
 
-/** One label per unit made: a run of twelve jars prints twelve. */
+/** One label per unit made: a run of twelve jars prints twelve. The sheet
+ *  asks for the copies of every batch, so a run in several batches starts
+ *  from its units spread over them. */
 export function labelsForRun(order: ProductionOrder): number {
   const made = Number(order.actual_qty ?? order.planned_qty);
   if (!Number.isFinite(made) || made <= 0) return 1;
-  return Math.min(MAX_LABELS, Math.max(1, Math.ceil(made)));
+  const batches = Math.max(1, runBatches(order).length);
+  return Math.min(MAX_LABELS, Math.max(1, Math.ceil(made / batches)));
 }
 
 const HELD = new Set(["quarantined", "held"]);
@@ -56,9 +60,11 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
   const [printing, setPrinting] = useState(false);
   const [asking, setAsking] = useState(false);
   const [reason, setReason] = useState("");
-  if (!order.output_lot_id) return null;
-  const lotId = order.output_lot_id;
-  const held = HELD.has(order.output_lot_status ?? "");
+  const batches = runBatches(order);
+  if (batches.length === 0) return null;
+  const several = batches.length > 1;
+  const anyHeld = batches.some((batch) => HELD.has(batch.status));
+  const allHeld = batches.every((batch) => HELD.has(batch.status));
 
   function putOnHold() {
     hold.mutate(reason.trim(), {
@@ -86,30 +92,60 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
           <h2 className="text-xs uppercase tracking-widest text-on-muted font-medium">
             {home ? t("batches.card.titleHome") : t("batches.card.title")}
           </h2>
-          <p
-            className={
-              home
-                ? "text-xs text-on-muted font-mono"
-                : "text-base text-on font-semibold font-mono"
-            }
-            data-testid="maker-output-batch-code"
-          >
-            {home
-              ? t("batches.card.codeHome", { code: order.output_lot_name })
-              : order.output_lot_name}
-          </p>
+          {!several && (
+            <p
+              className={
+                home
+                  ? "text-xs text-on-muted font-mono"
+                  : "text-base text-on font-semibold font-mono"
+              }
+              data-testid="maker-output-batch-code"
+            >
+              {home
+                ? t("batches.card.codeHome", { code: batches[0].lot_name })
+                : batches[0].lot_name}
+            </p>
+          )}
           <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
             <dt className="text-on-muted">{t("batches.card.madeOn")}</dt>
             <dd className="text-on">
               {order.production_date ? formatDate(order.production_date) : "—"}
             </dd>
-            <dt className="text-on-muted">{t("batches.bestBeforeLabel")}</dt>
-            <dd className="text-on" data-testid="maker-output-best-before">
-              {order.best_before ? formatDate(order.best_before) : "—"}
-            </dd>
+            {!several && (
+              <>
+                <dt className="text-on-muted">
+                  {t("batches.bestBeforeLabel")}
+                </dt>
+                <dd className="text-on" data-testid="maker-output-best-before">
+                  {batches[0].best_before
+                    ? formatDate(batches[0].best_before)
+                    : "—"}
+                </dd>
+              </>
+            )}
           </dl>
+          {several && (
+            <ul
+              className="space-y-1 text-sm"
+              data-testid="maker-output-batches"
+            >
+              {batches.map((batch) => (
+                <li
+                  key={batch.lot_id}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1"
+                >
+                  <span className="font-mono text-on">{batch.lot_name}</span>
+                  <span className="text-on-muted">
+                    {t("batches.bestBeforeLabel")}:{" "}
+                    {batch.best_before ? formatDate(batch.best_before) : "—"}
+                  </span>
+                  <StatusNote status={batch.status} />
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <StatusNote status={order.output_lot_status} />
+        {!several && <StatusNote status={batches[0].status} />}
       </div>
       <div className="flex flex-wrap gap-2">
         <Button
@@ -132,7 +168,7 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
         >
           {t("batches.card.record")}
         </Button>
-        {canManage && !held && (
+        {canManage && !allHeld && (
           <Button
             variant="outline"
             size="sm"
@@ -144,7 +180,7 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
             {t("batches.card.hold")}
           </Button>
         )}
-        {canManage && held && (
+        {canManage && anyHeld && (
           <Button
             variant="outline"
             size="sm"
@@ -159,7 +195,7 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
       </div>
       {printing && (
         <BarcodeLabelSheet
-          target={{ lotIds: [lotId] }}
+          target={{ lotIds: batches.map((batch) => batch.lot_id) }}
           initialCopies={labelsForRun(order)}
           title={home ? t("batches.card.jarLabelsTitle") : undefined}
           onClose={() => setPrinting(false)}

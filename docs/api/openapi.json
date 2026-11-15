@@ -14956,7 +14956,7 @@
           "maker"
         ],
         "summary": "Hold Output Batch",
-        "description": "Put the run's output batch on hold until it is released.",
+        "description": "Put every batch of the run's output on hold until it is released.",
         "operationId": "hold_output_batch_api_v1_maker_production_orders__order_id__hold_post",
         "security": [
           {
@@ -15135,7 +15135,7 @@
           "maker"
         ],
         "summary": "Release Output Batch",
-        "description": "Release the run's held output batch back into use.",
+        "description": "Release the run's held output batches back into use.",
         "operationId": "release_output_batch_api_v1_maker_production_orders__order_id__release_post",
         "security": [
           {
@@ -44987,6 +44987,13 @@
             ],
             "title": "Output Lot Status"
           },
+          "output_batches": {
+            "items": {
+              "$ref": "#/components/schemas/RunBatchRead"
+            },
+            "type": "array",
+            "title": "Output Batches"
+          },
           "production_date": {
             "anyOf": [
               {
@@ -63256,6 +63263,13 @@
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "batches": {
+            "items": {
+              "$ref": "#/components/schemas/RunBatchRead"
+            },
+            "type": "array",
+            "title": "Batches"
           }
         },
         "type": "object",
@@ -63265,7 +63279,7 @@
           "status"
         ],
         "title": "OutputBatchRead",
-        "description": "The run's output batch as it stands after a hold or a release."
+        "description": "The run's output batch as it stands after a hold or a release.\n\n``lot_id``, ``lot_name`` and ``status`` are the run's own batch, the first\nits output went into; a run filled in portions has more, all of them in\n``batches``, which a hold and a release act on together."
       },
       "OverdueAssignmentItem": {
         "properties": {
@@ -71798,6 +71812,13 @@
             ],
             "title": "Best Before"
           },
+          "output_batches": {
+            "items": {
+              "$ref": "#/components/schemas/RunBatchRead"
+            },
+            "type": "array",
+            "title": "Output Batches"
+          },
           "shelf_life_days": {
             "anyOf": [
               {
@@ -80270,6 +80291,43 @@
           "location"
         ],
         "title": "RotationItem"
+      },
+      "RunBatchRead": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lot Id"
+          },
+          "lot_name": {
+            "type": "string",
+            "title": "Lot Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "best_before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Before"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "lot_name",
+          "status"
+        ],
+        "title": "RunBatchRead",
+        "description": "One batch a run's output was filed under, as it stands now."
       },
       "SavingsOpportunity": {
         "properties": {

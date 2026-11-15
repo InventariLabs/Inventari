@@ -54,6 +54,39 @@ const record: BatchRecord = {
   ],
 };
 
+describe("BatchRecordSheet for a run filled in portions", () => {
+  it("names every batch the output was filed under, with its best-before", () => {
+    render(
+      <BatchRecordSheet
+        record={{
+          ...record,
+          output_lot_name: "WA",
+          output_batches: [
+            {
+              lot_id: "a",
+              lot_name: "WA",
+              status: "active",
+              best_before: "2026-11-10",
+            },
+            {
+              lot_id: "b",
+              lot_name: "WB",
+              status: "active",
+              best_before: "2026-12-01",
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("maker-record-batches")).toHaveTextContent(
+      "WA, WB",
+    );
+    // Each batch keeps its own date: WB does not borrow WA's.
+    expect(screen.getAllByText(/WB/)).toHaveLength(2);
+  });
+});
+
 describe("BatchRecordSheet", () => {
   it("names every ingredient with the batch and quantity it came from", () => {
     render(<BatchRecordSheet record={record} />);

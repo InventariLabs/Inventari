@@ -69,6 +69,9 @@ export type ProductionAttachment =
 /** The run's output batch after a hold or a release. */
 export type OutputBatch = components["schemas"]["OutputBatchRead"];
 
+/** One batch a run's output was filed under, as it stands now. */
+export type RunBatch = components["schemas"]["RunBatchRead"];
+
 /** A product's shelf life in days, as the maker keeps it. */
 export type ShelfLife = components["schemas"]["ShelfLifeRead"];
 

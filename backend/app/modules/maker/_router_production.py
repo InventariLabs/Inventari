@@ -158,10 +158,13 @@ async def _read_with_uom(
         )
     }
     if order.output_lot_id is not None:
-        lot = await core_api.stock.get_lot_detail_async(db, org_id, order.output_lot_id)
-        if lot is not None:
-            batch['output_lot_status'] = lot.status
-            batch['best_before'] = lot.expiry_date or lot.use_by_date
+        lots = await output_batch.lots_of_run_async(db, org_id, order)
+        batch['output_batches'] = output_batch.run_batch_reads(lots)
+        if lots:
+            # The run's own batch, first of them: what a screen that speaks of
+            # one batch reads.
+            batch['output_lot_status'] = lots[0].status
+            batch['best_before'] = lots[0].expiry_date or lots[0].use_by_date
     return read.model_copy(update=batch)
 
 

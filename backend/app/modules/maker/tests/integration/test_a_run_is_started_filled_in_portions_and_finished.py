@@ -24,6 +24,7 @@ from app.core.testing import ModuleTestHelper
 from app.models.item import Item
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
+from app.models.stock_lot import StockLot
 from app.models.storage_location import StorageLocation
 from app.modules.maker.models import BoMLine, MakerRecipe, MakerRecipeCostLine
 from tests.integration._shelf import post_on_shelf
@@ -161,6 +162,26 @@ class _Winery:
         value = self.client.get('/api/v1/stats/overview', headers=self.headers)
         assert value.status_code == 200, value.text
         return float(value.json()['total_value'])
+
+    def worth_on(self, instant: datetime) -> Decimal:
+        """What the as-of valuation says the warehouse was worth at *instant*."""
+        report = self.client.get(
+            '/api/v1/stock-as-of',
+            headers=self.headers,
+            params={'as_of': instant.isoformat()},
+        )
+        assert report.status_code == 200, report.text
+        return Decimal(str(report.json()['total_value']))
+
+    def batches(self, template: ProductTemplate) -> dict[str, str]:
+        """Every batch of the product, with its state."""
+        self.db.expire_all()
+        return {
+            lot.name: lot.status
+            for lot in self.db.scalars(
+                select(StockLot).where(StockLot.product_template_id == template.id)
+            )
+        }
 
 
 @pytest.fixture
@@ -572,3 +593,178 @@ def test_a_finished_run_with_portions_is_taken_back_portion_by_portion(
     assert reversed_run.json()['status'] == 'REVERSED'
     assert winery.on_shelf(winery.wine) == Decimal('0')
     assert winery.on_shelf(winery.grapes) == Decimal('10')
+
+
+def test_every_batch_a_run_filled_belongs_to_the_run(winery: _Winery) -> None:
+    order_id = winery.draft('3')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'WA'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'WB'})
+    finished = winery.post(
+        order_id, 'finish', {'actual_qty': '3', 'output_lot_name': 'WC'}
+    )
+    assert finished.status_code == 200, finished.text
+
+    # The run names the batches its output went into — not one made up for it.
+    detail = winery.client.get(
+        f'{API}/orders/{order_id}', headers=winery.headers
+    ).json()
+    assert [batch['lot_name'] for batch in detail['output_batches']] == [
+        'WA',
+        'WB',
+        'WC',
+    ]
+    assert detail['output_lot_name'] == 'WA'
+    assert set(winery.batches(winery.wine)) == {'WA', 'WB', 'WC'}
+
+    held = winery.post(order_id, 'hold', {'reason': 'Cloudy'})
+
+    assert held.status_code == 200, held.text
+    assert {batch['status'] for batch in held.json()['batches']} == {'quarantined'}
+    assert set(winery.batches(winery.wine).values()) == {'quarantined'}
+    detail = winery.client.get(
+        f'{API}/orders/{order_id}', headers=winery.headers
+    ).json()
+    assert {batch['status'] for batch in detail['output_batches']} == {'quarantined'}
+
+    record = winery.client.get(
+        f'{API}/orders/{order_id}/record', headers=winery.headers
+    )
+    assert record.status_code == 200, record.text
+    assert [batch['lot_name'] for batch in record.json()['output_batches']] == [
+        'WA',
+        'WB',
+        'WC',
+    ]
+
+    released = winery.post(order_id, 'release')
+
+    assert released.status_code == 200, released.text
+    assert set(winery.batches(winery.wine).values()) == {'active'}
+
+
+def test_a_run_whose_portions_name_no_batch_files_them_under_its_own(
+    winery: _Winery,
+) -> None:
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    detail = winery.client.get(
+        f'{API}/orders/{order_id}', headers=winery.headers
+    ).json()
+
+    names = winery.batches(winery.wine)
+    assert len(names) == 1
+    assert [batch['lot_name'] for batch in detail['output_batches']] == list(names)
+    assert detail['output_lot_name'] == next(iter(names))
+
+
+def test_the_cent_a_cost_does_not_divide_into_stays_on_a_bottle_still_there(
+    winery: _Winery,
+) -> None:
+    # One grape (3.00) makes three bottles and the corks cost 1.00: the rest of
+    # the cost, 1.00, does not split into three equal cents. Every bottle is on
+    # the shelf, so the run's whole cost is in stock and none of it is said to
+    # have left.
+    winery.set_yield('3')
+    winery.add_fixed_cost('Corks', '1.00')
+    order_id = winery.draft('3')
+    winery.post(order_id, 'start')
+    for name in ('W1', 'W2', 'W3'):
+        winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': name})
+
+    finished = winery.post(order_id, 'finish')
+
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert Decimal(str(done['total_cost'])) == Decimal('4.00')
+    assert Decimal(str(done['unshelved_cost'] or 0)) == Decimal('0')
+    # 30.00 of grapes before, 3.00 of them in the wine, 4.00 the wine cost.
+    assert winery.stock_value() == 31.0
+
+
+def test_the_value_a_finish_adds_is_dated_from_the_finish(winery: _Winery) -> None:
+    winery.add_fixed_cost('Corks', '0.50')
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W2'})
+    before_the_finish = datetime.now(UTC)
+    worth_then = winery.worth_on(before_the_finish)
+
+    winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    # A report about an instant before the finish says what it said then: the
+    # corks' cost is not in the past.
+    assert worth_then == Decimal('30.00')
+    assert winery.worth_on(before_the_finish) == worth_then
+    # And the shelf now holds it, in the live figure and in the report alike.
+    assert winery.stock_value() == 31.0
+    assert winery.worth_on(datetime.now(UTC)) == Decimal('31.00')
+
+
+def test_a_run_of_unpriced_ingredients_with_a_fixed_cost_reads_alike_everywhere(
+    winery: _Winery,
+) -> None:
+    # The grapes on the shelf were never priced, so the portions open layers
+    # nobody can put a cost on; the corks are the one cost the run knows. Once
+    # the finish puts it on those layers, the live figure and the report agree.
+    shelf_id = winery.db.scalar(
+        select(Item.location_id).where(Item.template_id == winery.grapes.id)
+    )
+    assert shelf_id is not None
+    winery.sell(winery.grapes, '10')
+    post_on_shelf(winery.client, winery.headers, winery.grapes, shelf_id, 10)
+    winery.add_fixed_cost('Corks', '0.50')
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W2'})
+    before_the_finish = datetime.now(UTC)
+
+    finished = winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    assert finished.status_code == 200, finished.text
+    assert winery.stock_value() == 1.0
+    assert winery.worth_on(datetime.now(UTC)) == Decimal('1.00')
+    # Before the finish nobody could put a cost on the wine, and it still reads
+    # that way: the cost the finish placed is not in the past.
+    assert winery.worth_on(before_the_finish) == Decimal('0.00')
+
+
+def test_a_run_whose_portions_share_a_batch_is_taken_back(winery: _Winery) -> None:
+    # Portions nobody named a batch for all go into the run's own: taking the
+    # first off the shelf must not read as stock having left the batch the
+    # next one is in.
+    order_id = winery.draft('3')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.post(order_id, 'finish', {'actual_qty': '3'})
+    assert len(winery.batches(winery.wine)) == 1
+
+    reversed_run = winery.post(order_id, 'reverse')
+
+    assert reversed_run.status_code == 200, reversed_run.text
+    assert reversed_run.json()['status'] == 'REVERSED'
+    assert winery.on_shelf(winery.wine) == Decimal('0')
+    assert winery.on_shelf(winery.grapes) == Decimal('10')
+
+
+def test_a_run_whose_portion_has_left_the_shelf_is_not_taken_back(
+    winery: _Winery,
+) -> None:
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.post(order_id, 'finish', {'actual_qty': '2'})
+    winery.sell(winery.wine, '1')
+
+    refused = winery.post(order_id, 'reverse')
+
+    assert refused.status_code == 400, refused.text
+    assert winery.on_shelf(winery.wine) == Decimal('1')

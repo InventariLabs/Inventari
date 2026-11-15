@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas.pagination import PaginatedResponse
 
-from ._schemas_batches import IngredientLotChoice
+from ._schemas_batches import IngredientLotChoice, RunBatchRead
 from ._schemas_breakdown import CostBreakdownResponse
 from ._schemas_recipes import IngredientAvailabilityItem
 
@@ -159,6 +159,10 @@ class ProductionOrderRead(BaseModel):
     output_lot_id: UUID | None = None
     output_lot_status: str | None = None
     best_before: date | None = None
+    #: Every batch the output was filed under, the run's own first: a run
+    #: filled in portions has one per name its portions were filed under.
+    #: On the single-order read only.
+    output_batches: list[RunBatchRead] = Field(default_factory=list)
     #: The output product's shelf life in days: what a best-before is
     #: counted from when the run closes. On the single-order read only.
     shelf_life_days: int | None = None

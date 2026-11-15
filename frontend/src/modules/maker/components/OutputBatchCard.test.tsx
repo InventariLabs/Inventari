@@ -118,6 +118,88 @@ describe("OutputBatchCard", () => {
   });
 });
 
+const filledInPortions = {
+  ...run,
+  actual_qty: "12",
+  output_lot_id: "lot-a",
+  output_lot_name: "WA",
+  output_batches: [
+    {
+      lot_id: "lot-a",
+      lot_name: "WA",
+      status: "active",
+      best_before: "2026-05-01",
+    },
+    {
+      lot_id: "lot-b",
+      lot_name: "WB",
+      status: "active",
+      best_before: "2026-06-01",
+    },
+    {
+      lot_id: "lot-c",
+      lot_name: "WC",
+      status: "active",
+      best_before: null,
+    },
+  ],
+} as unknown as ProductionOrder;
+
+describe("OutputBatchCard for a run filled in portions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    profile.seed_profile = "clean_core";
+    mocks.canManage = true;
+  });
+
+  it("names every batch the output was filed under, each with its own date", () => {
+    render(<OutputBatchCard order={filledInPortions} />);
+
+    const list = screen.getByTestId("maker-output-batches");
+    expect(list).toHaveTextContent("WA");
+    expect(list).toHaveTextContent("WB");
+    expect(list).toHaveTextContent("WC");
+    expect(screen.queryByTestId("maker-output-batch-code")).toBeNull();
+  });
+
+  it("prints the labels of every batch, the units spread over them", () => {
+    render(<OutputBatchCard order={filledInPortions} />);
+
+    fireEvent.click(screen.getByTestId("maker-print-batch-labels"));
+
+    expect(screen.getByTestId("label-sheet")).toHaveTextContent(
+      "lot-a,lot-b,lot-c|4|",
+    );
+  });
+
+  it("offers a hold while one batch is not held, and a release while one is", () => {
+    const mixed = {
+      ...filledInPortions,
+      output_batches: filledInPortions.output_batches?.map((batch, index) =>
+        index === 0 ? { ...batch, status: "quarantined" } : batch,
+      ),
+    } as ProductionOrder;
+    render(<OutputBatchCard order={mixed} />);
+
+    expect(screen.getByTestId("maker-hold-batch")).toBeInTheDocument();
+    expect(screen.getByTestId("maker-release-batch")).toBeInTheDocument();
+  });
+
+  it("offers only a release once every batch is held", () => {
+    const held = {
+      ...filledInPortions,
+      output_batches: filledInPortions.output_batches?.map((batch) => ({
+        ...batch,
+        status: "quarantined",
+      })),
+    } as ProductionOrder;
+    render(<OutputBatchCard order={held} />);
+
+    expect(screen.queryByTestId("maker-hold-batch")).toBeNull();
+    expect(screen.getByTestId("maker-release-batch")).toBeInTheDocument();
+  });
+});
+
 describe("labels a run offers", () => {
   it("rounds a part of a unit up and stops at two hundred", () => {
     expect(labelsForRun({ ...run, actual_qty: "12.5" })).toBe(13);

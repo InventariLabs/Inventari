@@ -22,10 +22,12 @@ says what the release does rather than what changed since them.
   batch; the BOM's process steps are ticked with the day each was done; **Finish
   run** closes it on a later day at the quantity the whole run made, and its
   unit cost divides what the start took by what came out. Cancelling a run in
-  progress gives the ingredients back to the batches they came from. What a
-  started run took is counted as work in progress in the stock value and in the
-  as-of valuation (`work_in_progress_value`), so the warehouse does not look
-  poorer between start and finish. New endpoints: `POST
+  progress gives the ingredients back to the batches they came from. A run
+  filled in portions can end up with several batches: its page and its batch
+  record name them all, their labels print together, and a hold or a release
+  acts on every one. What a started run took is counted as work in progress in
+  the stock value and in the as-of valuation (`work_in_progress_value`), so the
+  warehouse does not look poorer between start and finish. New endpoints: `POST
   /maker/production/orders/{id}/start`, `/portions` and `/finish`, and `PUT
   .../steps/{index}`; modules that report a stock value can register a reader
   with `register_work_in_progress_provider`.

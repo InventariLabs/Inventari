@@ -16,6 +16,7 @@ import type { ProductionOrder } from "@/modules/maker/types/maker";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
 import { CostFigure } from "@/modules/maker/components/CostFigure";
+import { runBatchNames } from "@/modules/maker/lib/runBatches";
 
 interface ProductionOrderStatsProps {
   order: ProductionOrder;
@@ -149,8 +150,8 @@ function RunDayTile({ order }: { order: ProductionOrder }) {
       valueClass="text-on font-medium"
       // The batch the run put its output into, beside the day it made it.
       note={
-        order.output_lot_name
-          ? `${t("detail.card.outputLot")}: ${order.output_lot_name}`
+        runBatchNames(order)
+          ? `${t("detail.card.outputLot")}: ${runBatchNames(order)}`
           : undefined
       }
     >

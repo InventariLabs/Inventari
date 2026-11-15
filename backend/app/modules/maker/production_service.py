@@ -959,25 +959,31 @@ async def _receive_output(
     )
     # The batch the person named for the output, opened on first use: two
     # runs naming the same batch fill one batch, the way two receipts do. A
-    # run nobody named a batch for names its own, under the card's lock the
-    # run took from the top — every run's output is a batch a recall can
-    # follow. The batch is dated with the day the goods came out and its
-    # best-before; a batch that already exists keeps the dates it was opened
-    # with.
-    if not order.output_lot_name:
-        order.output_lot_name = await output_batch.next_batch_name(
+    # portion nobody named a batch for goes into the run's own, and a run
+    # nobody named one for makes one up, under the card's lock the run took
+    # from the top — every run's output is a batch a recall can follow. The
+    # batch is dated with the day the goods came out and its best-before; a
+    # batch that already exists keeps the dates it was opened with.
+    #
+    # The run's own batch is the first one its output went into, named as that
+    # batch is: a run filled in portions under names of its own never carries
+    # a made-up one that no batch answers to.
+    batch_name = lot_name or order.output_lot_name
+    if not batch_name:
+        batch_name = await output_batch.next_batch_name(
             db, organization_id, order.output_template_id, run_day
         )
     output_lot_id = await core_api.stock.get_or_create_lot_async(
         db,
         organization_id,
         order.output_template_id,
-        lot_name or order.output_lot_name,
+        batch_name,
         production_date=run_day,
         expiry_date=best_before,
     )
-    if lot_name is None or order.output_lot_id is None:
+    if order.output_lot_id is None:
         order.output_lot_id = output_lot_id
+        order.output_lot_name = batch_name
     produced_item = await core_api.items.create_async(
         db,
         organization_id,
@@ -1527,17 +1533,25 @@ async def _place_the_rest_of_the_cost(
 
     The rest is spread over the portions by quantity, and each share goes on
     the layer its portion opened, for the units of it still on the shelf.
-    Answers what could not be placed: the units that were sold or used
-    before the run closed took their share of the cost with them. Nothing
-    here refuses the finish, whatever else is in the product's cost history.
+    Shares are whole cents and add up to the rest: each portion takes its
+    part of what is left, so the cent a division leaves over lands on the
+    last portion, the one most likely to still be on the shelf. Answers what
+    could not be placed — only what belongs to units sold or used before the
+    run closed, which took their share of the cost with them. Nothing here
+    refuses the finish, whatever else is in the product's cost history.
     """
-    made = sum((portion.qty for portion in portions), Decimal('0'))
+    rest = quantise(rest)
+    left = rest
+    units_left = sum((portion.qty for portion in portions), Decimal('0'))
     placed = Decimal('0')
     for portion in portions:
+        share = quantise(left * portion.qty / units_left)
+        left -= share
+        units_left -= portion.qty
         if portion.layer_id is None:
             continue
         placed += await core_api.valuation.add_value_to_layer_async(
-            db, organization_id, portion.layer_id, rest * portion.qty / made, user=user
+            db, organization_id, portion.layer_id, share, user=user
         )
     return max(Decimal('0'), rest - placed)
 

@@ -4186,7 +4186,7 @@ export interface paths {
         put?: never;
         /**
          * Hold Output Batch
-         * @description Put the run's output batch on hold until it is released.
+         * @description Put every batch of the run's output on hold until it is released.
          */
         post: operations["hold_output_batch_api_v1_maker_production_orders__order_id__hold_post"];
         delete?: never;
@@ -4246,7 +4246,7 @@ export interface paths {
         put?: never;
         /**
          * Release Output Batch
-         * @description Release the run's held output batch back into use.
+         * @description Release the run's held output batches back into use.
          */
         post: operations["release_output_batch_api_v1_maker_production_orders__order_id__release_post"];
         delete?: never;
@@ -12503,6 +12503,8 @@ export interface components {
             output_lot_name?: string | null;
             /** Output Lot Status */
             output_lot_status?: string | null;
+            /** Output Batches */
+            output_batches?: components["schemas"]["RunBatchRead"][];
             /** Production Date */
             production_date?: string | null;
             /** Best Before */
@@ -18782,6 +18784,10 @@ export interface components {
         /**
          * OutputBatchRead
          * @description The run's output batch as it stands after a hold or a release.
+         *
+         *     ``lot_id``, ``lot_name`` and ``status`` are the run's own batch, the first
+         *     its output went into; a run filled in portions has more, all of them in
+         *     ``batches``, which a hold and a release act on together.
          */
         OutputBatchRead: {
             /**
@@ -18793,6 +18799,8 @@ export interface components {
             lot_name: string;
             /** Status */
             status: string;
+            /** Batches */
+            batches?: components["schemas"]["RunBatchRead"][];
         };
         /** OverdueAssignmentItem */
         OverdueAssignmentItem: {
@@ -22050,6 +22058,8 @@ export interface components {
             output_lot_status?: string | null;
             /** Best Before */
             best_before?: string | null;
+            /** Output Batches */
+            output_batches?: components["schemas"]["RunBatchRead"][];
             /** Shelf Life Days */
             shelf_life_days?: number | null;
             /** Created By */
@@ -24996,6 +25006,23 @@ export interface components {
             quantity: number;
             /** Location */
             location: string;
+        };
+        /**
+         * RunBatchRead
+         * @description One batch a run's output was filed under, as it stands now.
+         */
+        RunBatchRead: {
+            /**
+             * Lot Id
+             * Format: uuid
+             */
+            lot_id: string;
+            /** Lot Name */
+            lot_name: string;
+            /** Status */
+            status: string;
+            /** Best Before */
+            best_before?: string | null;
         };
         /** SavingsOpportunity */
         SavingsOpportunity: {

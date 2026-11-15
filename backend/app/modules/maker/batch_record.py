@@ -21,7 +21,7 @@ from app.core.exceptions import EntityNotFoundError, ServiceRejectionError
 from app.core.money import quantise
 from app.core.public_api import core_api
 
-from . import production_attachments, production_service
+from . import output_batch, production_attachments, production_service
 from ._schemas_batches import (
     BatchRecordBatch,
     BatchRecordIngredient,
@@ -139,13 +139,10 @@ async def build_batch_record(
             )
         )
 
-    output_lot = (
-        await core_api.stock.get_lot_detail_async(
-            db, organization_id, order.output_lot_id
-        )
-        if order.output_lot_id is not None
-        else None
-    )
+    # Every batch the output was filed under, the run's own first: the record
+    # names all of them, and speaks of the first where it has room for one.
+    output_lots = await output_batch.lots_of_run_async(db, organization_id, order)
+    output_lot = output_lots[0] if output_lots else None
     recipe_name = (
         await db.scalar(
             select(MakerRecipe.name).where(
@@ -190,6 +187,7 @@ async def build_batch_record(
         scrap_qty=order.scrap_qty,
         output_lot_name=order.output_lot_name,
         output_lot_status=output_lot.status if output_lot else None,
+        output_batches=output_batch.run_batch_reads(output_lots),
         production_date=order.production_date,
         best_before=(
             (output_lot.expiry_date or output_lot.use_by_date) if output_lot else None

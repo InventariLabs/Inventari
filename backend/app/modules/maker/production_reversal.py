@@ -160,6 +160,10 @@ async def _take_the_outputs_off(
 
     A run filled in portions opened a record per portion; each comes off its
     own. A run completed in one step has the one record it opened.
+
+    Every record is checked before any comes off: portions share the batch
+    they were filed under, and taking the first one off is a departure from
+    that batch that the next one must not read as stock having left it.
     """
     history = _history(order)
     portions = (
@@ -169,28 +173,24 @@ async def _take_the_outputs_off(
             .order_by(ProductionPortion.created_at)
         )
     ).all()
-    if not portions:
-        await _take_the_output_off(
-            db,
-            organization_id,
-            order,
-            user,
-            history,
-            item_id=order.produced_item_id,
-            made=order.actual_qty or Decimal('0'),
-            since=order.completed_at or order.created_at,
+    entries = (
+        [(portion.item_id, portion.qty, portion.created_at) for portion in portions]
+        if portions
+        else [
+            (
+                order.produced_item_id,
+                order.actual_qty or Decimal('0'),
+                order.completed_at or order.created_at,
+            )
+        ]
+    )
+    for item_id, made, since in entries:
+        await _check_the_output_is_there(
+            db, organization_id, order, item_id=item_id, made=made, since=since
         )
-        return
-    for portion in portions:
+    for item_id, made, _since in entries:
         await _take_the_output_off(
-            db,
-            organization_id,
-            order,
-            user,
-            history,
-            item_id=portion.item_id,
-            made=portion.qty,
-            since=portion.created_at,
+            db, organization_id, order, user, history, item_id=item_id, made=made
         )
 
 
@@ -202,18 +202,16 @@ def _history(order: ProductionOrder) -> dict[str, str]:
     }
 
 
-async def _take_the_output_off(
+async def _check_the_output_is_there(
     db: AsyncSession,
     organization_id: UUID,
     order: ProductionOrder,
-    user: UserContextDTO,
-    history: dict[str, str],
     *,
     item_id: UUID | None,
     made: Decimal,
     since: datetime,
 ) -> None:
-    """Take a quantity of the run's output off the record the run opened for it."""
+    """Refuse the reversal when a quantity of the run's output is no longer where it was put."""
     produced = (
         await core_api.items.get_for_update_async(db, organization_id, item_id)
         if item_id is not None
@@ -234,6 +232,26 @@ async def _take_the_output_off(
             excluded_reference_ids=[order.id],
         )
     ):
+        raise ServiceRejectionError('production_reverse_output_used')
+
+
+async def _take_the_output_off(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    user: UserContextDTO,
+    history: dict[str, str],
+    *,
+    item_id: UUID | None,
+    made: Decimal,
+) -> None:
+    """Take a quantity of the run's output off the record the run opened for it."""
+    produced = (
+        await core_api.items.get_for_update_async(db, organization_id, item_id)
+        if item_id is not None
+        else None
+    )
+    if produced is None:
         raise ServiceRejectionError('production_reverse_output_used')
     await core_api.stock.post_movement_async(
         db,
