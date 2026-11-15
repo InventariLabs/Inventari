@@ -8,8 +8,6 @@ import {
   type DocumentApprovalTrace,
 } from "@/modules/warehouse/components/documentConfirmation";
 
-export type { DocumentApprovalTrace };
-
 interface DocumentStatusTimelineProps {
   status: string;
   createdAt: string | null;

@@ -281,7 +281,7 @@ and the static assets the frontend serves.
 | `d3-time` | 3.1.0 | ISC |  |
 | `d3-time-format` | 4.1.0 | ISC |  |
 | `d3-timer` | 3.0.1 | ISC |  |
-| `date-fns` | 3.6.0 | MIT |  |
+| `date-fns` | 4.4.0 | MIT |  |
 | `debug` | 4.4.3 | MIT |  |
 | `decimal.js-light` | 2.5.1 | MIT |  |
 | `decode-named-character-reference` | 1.3.0 | MIT |  |
