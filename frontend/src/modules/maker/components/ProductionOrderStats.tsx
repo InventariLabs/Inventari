@@ -212,6 +212,12 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
           })}
           valueSize="text-base"
           valueClass="text-on font-medium"
+          // The batch the run put its output into, beside the day it made it.
+          note={
+            order.output_lot_name
+              ? `${t("detail.card.outputLot")}: ${order.output_lot_name}`
+              : undefined
+          }
         >
           {order.production_date ? formatDate(order.production_date) : "—"}
         </StatTile>

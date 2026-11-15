@@ -7702,6 +7702,55 @@ export interface paths {
         patch: operations["set_stock_lot_status_api_v1_stock_lots__lot_id__patch"];
         trace?: never;
     };
+    "/api/v1/stock-lots/{lot_id}/trace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Trace Stock Lot
+         * @description Who supplied the batch and who it went to — and the same for what was made of it.
+         *
+         *     One step back and one step forward, the way a recall asks: each document
+         *     or run that brought the batch in or sent it out, with its partner, date
+         *     and quantity. A production run that consumed the batch leads to the batch
+         *     it made, whose own trace follows.
+         */
+        get: operations["trace_stock_lot_api_v1_stock_lots__lot_id__trace_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-lots/{lot_id}/trace/export/xlsx": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Stock Lot Trace Xlsx
+         * @description The trace as a spreadsheet to hand to an inspector.
+         *
+         *     The data sheet is a row per crossing; the second sheet says which batch
+         *     the file is about and when it was made, because a file forwarded twice
+         *     loses the screen it came from.
+         */
+        get: operations["export_stock_lot_trace_xlsx_api_v1_stock_lots__lot_id__trace_export_xlsx_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stock-moves": {
         parameters: {
             query?: never;
@@ -17124,6 +17173,116 @@ export interface components {
             reason: string;
         };
         /**
+         * LotTraceDTO
+         * @description A batch's trace for a recall: the batch first, then what was made of it.
+         *
+         *     ``lots`` is breadth-first: the batch asked about, then every batch a
+         *     production run made from it, then theirs. ``truncated`` says the walk
+         *     stopped at its limit — the reader is told rather than handed a trace that
+         *     looks complete.
+         */
+        LotTraceDTO: {
+            /**
+             * Lot Id
+             * Format: uuid
+             */
+            lot_id: string;
+            /** Lots */
+            lots: components["schemas"]["LotTraceLotDTO"][];
+            /**
+             * Truncated
+             * @default false
+             */
+            truncated: boolean;
+        };
+        /**
+         * LotTraceEntryDTO
+         * @description One source that brought the batch in or sent it out, netted.
+         *
+         *     Every movement of the batch under one reference is summed: a run undone
+         *     nets to nothing and is not listed, and a delivery picked from three shelves
+         *     is one line. Movements between two shelves of the organization are not
+         *     here at all — the goods stayed in the house.
+         */
+        LotTraceEntryDTO: {
+            /** Direction */
+            direction: string;
+            /** Reference Type */
+            reference_type?: string | null;
+            /** Reference Id */
+            reference_id?: string | null;
+            /** Label */
+            label?: string | null;
+            /** Partner Id */
+            partner_id?: string | null;
+            /** Partner Name */
+            partner_name?: string | null;
+            /** Partner Address */
+            partner_address?: string | null;
+            /**
+             * Moved At
+             * Format: date-time
+             */
+            moved_at: string;
+            /** Quantity */
+            quantity: string;
+            /**
+             * Produced
+             * @default []
+             */
+            produced: components["schemas"]["LotTraceProducedLotDTO"][];
+        };
+        /**
+         * LotTraceLotDTO
+         * @description One batch's step back and step forward.
+         */
+        LotTraceLotDTO: {
+            /**
+             * Lot Id
+             * Format: uuid
+             */
+            lot_id: string;
+            /** Lot Name */
+            lot_name: string;
+            /** Product Name */
+            product_name?: string | null;
+            /** Uom Symbol */
+            uom_symbol?: string | null;
+            /** Expiry Date */
+            expiry_date?: string | null;
+            /** Made From Lot Id */
+            made_from_lot_id?: string | null;
+            /**
+             * Received
+             * @default []
+             */
+            received: components["schemas"]["LotTraceEntryDTO"][];
+            /**
+             * Sent
+             * @default []
+             */
+            sent: components["schemas"]["LotTraceEntryDTO"][];
+        };
+        /**
+         * LotTraceProducedLotDTO
+         * @description A batch a transforming source made, and how much of it.
+         */
+        LotTraceProducedLotDTO: {
+            /**
+             * Lot Id
+             * Format: uuid
+             */
+            lot_id: string;
+            /** Lot Name */
+            lot_name: string;
+            /** Product Name */
+            product_name?: string | null;
+            /** Uom Symbol */
+            uom_symbol?: string | null;
+            /** Quantity */
+            quantity: string;
+        };
+        /**
          * LowStockProduct
          * @description One product the tile's low-stock number counts — see ``low_stock``.
          */
@@ -21136,6 +21295,8 @@ export interface components {
             production_date?: string | null;
             /** Notes */
             notes?: string | null;
+            /** Output Lot Name */
+            output_lot_name?: string | null;
             /** Confirm Shortage */
             confirm_shortage?: boolean;
         };
@@ -21251,6 +21412,8 @@ export interface components {
             production_date: string | null;
             /** Notes */
             notes: string | null;
+            /** Output Lot Name */
+            output_lot_name?: string | null;
             /** Created By */
             created_by: string | null;
             /** Completed By */
@@ -43487,6 +43650,71 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StockLotDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trace_stock_lot_api_v1_stock_lots__lot_id__trace_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotTraceDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_stock_lot_trace_xlsx_api_v1_stock_lots__lot_id__trace_export_xlsx_get: {
+        parameters: {
+            query?: {
+                /** @description The reader's own IANA time zone, so the sheet agrees with the screen it was exported from. Falls back to the organization. */
+                tz?: string | null;
+            };
+            header?: never;
+            path: {
+                lot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

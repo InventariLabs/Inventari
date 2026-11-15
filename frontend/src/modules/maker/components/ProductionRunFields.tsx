@@ -7,6 +7,7 @@ import { ChoiceGroup } from "@/components/ui/ChoiceGroup";
 import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import { useFormGuard } from "@/module-sdk";
 import { ProductSearchInput } from "@/modules/maker/components/ProductSearchInput";
 import { SelectedProductCard } from "@/modules/maker/components/SelectedProductCard";
 import type { ProductionForm } from "@/modules/maker/hooks/useProductionSheet";
@@ -28,6 +29,15 @@ export function ProductionRunFields({
   onShowPricing,
 }: ProductionRunFieldsProps) {
   const { t } = useTranslation("maker");
+  // What the reader typed goes with a navigation the palette or a tab
+  // starts over the sheet; the guard asks first. Saving leaves by its own
+  // navigation, which the guard does not stand in.
+  useFormGuard(
+    form.qty !== "" ||
+      form.notes.trim() !== "" ||
+      form.outputLotName.trim() !== "",
+    t("create.guardName"),
+  );
 
   return (
     <div className="space-y-5 min-w-0">
@@ -70,6 +80,17 @@ export function ProductionRunFields({
       />
 
       {locationField}
+
+      {/* A named batch is what lets a recall of an ingredient follow this
+          run on to the customers of what it made. */}
+      <Input
+        label={t("create.outputLotLabel")}
+        description={t("create.outputLotHint")}
+        value={form.outputLotName}
+        onChange={(e) => form.setOutputLotName(e.target.value)}
+        maxLength={100}
+        data-testid="maker-create-output-lot-input"
+      />
 
       {form.mode === "planned" && (
         <DateInput

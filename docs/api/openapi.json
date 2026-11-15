@@ -28328,6 +28328,127 @@
         }
       }
     },
+    "/api/v1/stock-lots/{lot_id}/trace": {
+      "get": {
+        "tags": [
+          "Stock Ledger"
+        ],
+        "summary": "Trace Stock Lot",
+        "description": "Who supplied the batch and who it went to \u2014 and the same for what was made of it.\n\nOne step back and one step forward, the way a recall asks: each document\nor run that brought the batch in or sent it out, with its partner, date\nand quantity. A production run that consumed the batch leads to the batch\nit made, whose own trace follows.",
+        "operationId": "trace_stock_lot_api_v1_stock_lots__lot_id__trace_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotTraceDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock-lots/{lot_id}/trace/export/xlsx": {
+      "get": {
+        "tags": [
+          "Stock Ledger"
+        ],
+        "summary": "Export Stock Lot Trace Xlsx",
+        "description": "The trace as a spreadsheet to hand to an inspector.\n\nThe data sheet is a row per crossing; the second sheet says which batch\nthe file is about and when it was made, because a file forwarded twice\nloses the screen it came from.",
+        "operationId": "export_stock_lot_trace_xlsx_api_v1_stock_lots__lot_id__trace_export_xlsx_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lot Id"
+            }
+          },
+          {
+            "name": "tz",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The reader's own IANA time zone, so the sheet agrees with the screen it was exported from. Falls back to the organization.",
+              "title": "Tz"
+            },
+            "description": "The reader's own IANA time zone, so the sheet agrees with the screen it was exported from. Falls back to the organization."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/stock-moves": {
       "get": {
         "tags": [
@@ -58399,6 +58520,266 @@
         "title": "LotStatusUpdate",
         "description": "Where the batch stands, and what the person was told.\n\nThe reason is required, for releases as much as for holds. Both halves\nof that were argued: releasing a batch is a decision somebody will be\nasked about, and one rule is easier to keep than a table of which\ntransitions need explaining. The friction is a sentence of typing, and\nit buys the one thing a status alone cannot say \u2014 why.\n\nEnforced here rather than in the service, because the module paths\n(``quarantine_lot_async`` / ``release_lot_async``) are code acting on a\nrule, not a person making a call, and have nobody to ask."
       },
+      "LotTraceDTO": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lot Id"
+          },
+          "lots": {
+            "items": {
+              "$ref": "#/components/schemas/LotTraceLotDTO"
+            },
+            "type": "array",
+            "title": "Lots"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "lots"
+        ],
+        "title": "LotTraceDTO",
+        "description": "A batch's trace for a recall: the batch first, then what was made of it.\n\n``lots`` is breadth-first: the batch asked about, then every batch a\nproduction run made from it, then theirs. ``truncated`` says the walk\nstopped at its limit \u2014 the reader is told rather than handed a trace that\nlooks complete."
+      },
+      "LotTraceEntryDTO": {
+        "properties": {
+          "direction": {
+            "type": "string",
+            "title": "Direction"
+          },
+          "reference_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Type"
+          },
+          "reference_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Id"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "partner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Id"
+          },
+          "partner_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Name"
+          },
+          "partner_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Address"
+          },
+          "moved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Moved At"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          },
+          "produced": {
+            "items": {
+              "$ref": "#/components/schemas/LotTraceProducedLotDTO"
+            },
+            "type": "array",
+            "title": "Produced",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "direction",
+          "moved_at",
+          "quantity"
+        ],
+        "title": "LotTraceEntryDTO",
+        "description": "One source that brought the batch in or sent it out, netted.\n\nEvery movement of the batch under one reference is summed: a run undone\nnets to nothing and is not listed, and a delivery picked from three shelves\nis one line. Movements between two shelves of the organization are not\nhere at all \u2014 the goods stayed in the house."
+      },
+      "LotTraceLotDTO": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lot Id"
+          },
+          "lot_name": {
+            "type": "string",
+            "title": "Lot Name"
+          },
+          "product_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Name"
+          },
+          "uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uom Symbol"
+          },
+          "expiry_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiry Date"
+          },
+          "made_from_lot_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made From Lot Id"
+          },
+          "received": {
+            "items": {
+              "$ref": "#/components/schemas/LotTraceEntryDTO"
+            },
+            "type": "array",
+            "title": "Received",
+            "default": []
+          },
+          "sent": {
+            "items": {
+              "$ref": "#/components/schemas/LotTraceEntryDTO"
+            },
+            "type": "array",
+            "title": "Sent",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "lot_name"
+        ],
+        "title": "LotTraceLotDTO",
+        "description": "One batch's step back and step forward."
+      },
+      "LotTraceProducedLotDTO": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lot Id"
+          },
+          "lot_name": {
+            "type": "string",
+            "title": "Lot Name"
+          },
+          "product_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Name"
+          },
+          "uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uom Symbol"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "lot_name",
+          "quantity"
+        ],
+        "title": "LotTraceProducedLotDTO",
+        "description": "A batch a transforming source made, and how much of it."
+      },
       "LowStockProduct": {
         "properties": {
           "template_id": {
@@ -69127,6 +69508,18 @@
             ],
             "title": "Notes"
           },
+          "output_lot_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Name"
+          },
           "confirm_shortage": {
             "type": "boolean",
             "title": "Confirm Shortage",
@@ -69447,6 +69840,17 @@
               }
             ],
             "title": "Notes"
+          },
+          "output_lot_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Lot Name"
           },
           "created_by": {
             "anyOf": [

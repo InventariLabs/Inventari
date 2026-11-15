@@ -129,6 +129,19 @@
     "empty": {
       "title": "Unter dieser Charge wurde nichts erfasst",
       "description": "Eingänge, Ausgänge und Umlagerungen mit dieser Charge erscheinen hier."
+    },
+    "trace": {
+      "heading": "Rückverfolgung für einen Rückruf",
+      "caption": "Wer diese Charge geliefert hat und an wen sie ging, mit Datum und Menge. Umlagerungen zwischen eigenen Orten sind ausgelassen; ein Produktionsauftrag führt zur Charge, die er hergestellt hat.",
+      "cameIn": "Eingegangen",
+      "wentOut": "Ausgegangen",
+      "nothingCameIn": "Unter dieser Charge ist nichts von außen eingegangen.",
+      "nothingWentOut": "Davon ist noch nichts ausgegangen.",
+      "noPartner": "Kein Partner angegeben",
+      "unknownSource": "Unbekannte Quelle",
+      "madeInto": "Verarbeitet zu",
+      "madeFrom": "Hergestellt aus {{lot}}:",
+      "truncated": "Aus dieser Charge wurden mehr Chargen hergestellt, als eine Rückverfolgung erfasst. Öffnen Sie jede Charge oben, um den Rest zu verfolgen."
     }
   },
   "stock": {

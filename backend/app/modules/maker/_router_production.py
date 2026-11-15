@@ -158,6 +158,7 @@ def _to_read(
         estimated_total_cost=order.estimated_total_cost,
         production_date=order.production_date,
         notes=order.notes,
+        output_lot_name=order.output_lot_name,
         created_by=order.created_by,
         completed_by=order.completed_by,
         created_at=order.created_at,

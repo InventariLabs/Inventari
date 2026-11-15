@@ -531,9 +531,9 @@ export function useItemForm({
         const strValue = value as string;
         if (name === "uom_id") {
           // A unit the matched product is not counted in is a deliberate
-          // choice, and the server will not take it unconfirmed (AGENTS.md
-          // §4). Asking here keeps the refusal from being the first the
-          // reader hears of it. See `useUnitChoice`.
+          // choice, and the server will not take it unconfirmed
+          // (docs/subsystems/UOM.md). Asking here keeps the refusal from being
+          // the first the reader hears of it. See `useUnitChoice`.
           askIfDifferent(strValue);
           setFormData((prev) => {
             // The quantity converts from the unit the form is holding, read

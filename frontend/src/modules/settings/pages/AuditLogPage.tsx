@@ -203,8 +203,8 @@ function auditLogCsv(rows: AuditLogEntry[]): string {
  * Either failing leaves its select with nothing to offer, which the page says.
  *
  * The members query is local — settings owns its own member picker rather
- * than importing useOrgMembers from the approvals module (AGENTS.md: respect
- * module boundaries).
+ * than importing useOrgMembers from the approvals module (frontend/AGENTS.md §2:
+ * a module's internals are off-limits).
  */
 function useAuditFilterLookups() {
   const targetTypesQuery = useAuditTargetTypes();

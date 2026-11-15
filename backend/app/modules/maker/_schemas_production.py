@@ -6,7 +6,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas.pagination import PaginatedResponse
 
@@ -28,9 +28,19 @@ class ProductionOrderCreate(BaseModel):
     output_location_id: UUID
     production_date: date | None = None
     notes: str | None = Field(None, max_length=500)
+    #: The batch the output goes into; empty puts it on the shelf unbatched.
+    output_lot_name: str | None = Field(None, max_length=100)
     # when create_on_shortage_strategy=WARN, the FE re-POSTs
     # with this flag set to confirm despite the shortage list.
     confirm_shortage: bool = False
+
+    @field_validator('output_lot_name')
+    @classmethod
+    def _blank_is_no_batch(cls, value: str | None) -> str | None:
+        """A batch name of spaces names no batch."""
+        if value is None:
+            return None
+        return value.strip() or None
 
 
 class ProductionOrderLineRead(BaseModel):
@@ -105,6 +115,7 @@ class ProductionOrderRead(BaseModel):
     estimated_total_cost: Decimal | None = None
     production_date: date | None
     notes: str | None
+    output_lot_name: str | None = None
     created_by: UUID | None
     completed_by: UUID | None
     created_at: datetime

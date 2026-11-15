@@ -29,6 +29,19 @@ counted record, under the anchor lock of the group it settles. There is no
 second number to keep in step, so there is no path map to maintain; the rule
 is the one in `backend/AGENTS.md`.
 
+The model holds whatever modules are enabled. An organization without a
+module that reads the register (`consumes_stock_quant` — today warehouse,
+maker, purchase_orders, stock_takes) keeps the same movements; only the
+screens that show them stay behind that list, so a household sees no change.
+The stock a shelf held before the register knew it was posted once as an
+opening balance (archived `openbal01`, movement
+`reference_type='opening_balance'`). A record that predates its card adopts it
+on its first change — or on an edit that writes a field to its card — and posts
+what it held as an opening (`opening_balance` movement, layer), then the change
+as a movement of its own.
+A record that changes shelves takes its stock with it through one call,
+`_stock_relocation.carry_record_stock_async`, whichever door wrote the shelf.
+
 No negative stock at the DB level (`CHECK quantity >= 0` on items) —
 stricter than Odoo's default, and deliberate.
 
@@ -58,6 +71,9 @@ below) take the same lock first, so the order holds whoever locks first. A
 group an operation did not name up front and locks later is taken after the
 others; two such operations can close a circle, which the database breaks by
 aborting one of them — nothing is written wrong.
+
+Production runs do not take these locks: they are serialized per organization
+by the maker settings lock.
 
 Anchors are not deleted: a group that once had stock keeps its row, and only
 a cascade from the product, the shelf or the organization removes it.
@@ -323,6 +339,29 @@ a snapshot for the audit trail, and the ledger points at the count instead
 of restating it. So the path to a reason is: ledger row → stock-take
 report → the line, which shows the reason code and the free text beside
 the two numbers.
+
+### A batch's trace reads the ledger by source
+
+`GET /stock-lots/{id}/trace` (`app/services/lot_trace_service.py`) answers a
+recall's two questions — who supplied the batch and who it went to — from
+the ledger alone. Every movement of the batch under one
+`(reference_type, reference_id)` nets into one entry, in when positive and
+out when negative: a receipt landed on two locations is one line, a run
+undone (its inverse posted under the same reference) is none. A movement
+with both ends set never left the organization and is not read at all, which
+also keeps a multi-line transfer of several batches out of the trace.
+
+Core cannot name a document, so the module that wrote a reference type names
+it, through `register_lot_trace_source` (`app/core/lot_trace.py`, exported by
+the module SDK): a number and a partner per reference. The warehouse module
+names its documents with the partner snapshot they took when confirmed; the
+trace falls back to the partner record for a document that has none. A
+source that declares `transforms = True` turns batches into others under one
+reference — maker's production runs — and the trace follows each batch that
+came in under such a reference, netted the same way, to its own trace, up to
+50 batches. A reference nobody names still appears, with its kind, date and
+quantity. A run's output is a batch only when the run named one
+(`output_lot_name`); without it the trace stops at the run.
 
 ## Aging says what is still on the shelf
 

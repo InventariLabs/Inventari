@@ -88,7 +88,7 @@ describe("ConsumeDialog", () => {
     const user = userEvent.setup();
     const onConfirm = renderDialog();
 
-    // AGENTS.md: USED over CONSUMED, DISPOSED over DISCARDED. The backend
+    // backend/AGENTS.md §4: USED over CONSUMED, DISPOSED over DISCARDED. The backend
     // still reads the old values on rows that already carry them.
     await user.selectOptions(screen.getByRole("combobox"), "DISPOSED");
     await user.click(screen.getByRole("button", { name: "Remove 1" }));

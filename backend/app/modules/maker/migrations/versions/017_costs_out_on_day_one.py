@@ -13,8 +13,8 @@ hold:
   when the run closed, kept beside what it actually cost so the page can say
   whether a difference came from price or from quantity.
 
-Revision ID: 016_costs_out_on_day_one
-Revises: 015_default_result_margin
+Revision ID: 017_costs_out_on_day_one
+Revises: 016_add_output_lot_name
 Create Date: 2026-11-14
 """
 
@@ -23,8 +23,8 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = '016_costs_out_on_day_one'
-down_revision: str | None = '015_default_result_margin'
+revision: str = '017_costs_out_on_day_one'
+down_revision: str | None = '016_add_output_lot_name'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

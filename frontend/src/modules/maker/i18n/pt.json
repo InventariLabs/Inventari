@@ -82,6 +82,9 @@
     "storageEmpty": "Nenhum local encontrado",
     "notesLabel": "Observações (opcional)",
     "notesPlaceholder": "Observações internas sobre esta produção…",
+    "outputLotLabel": "Lote do produto fabricado (opcional)",
+    "outputLotHint": "Dê nome a um lote para que a recolha de um ingrediente chegue, por esta ordem, a quem recebeu o que ela fabricou. Deixe vazio se não controla lotes.",
+    "guardName": "A ordem de produção",
     "hints": {
       "product": "Escolha um produto final para habilitar a prévia.",
       "quantity": "Informe uma quantidade planejada maior que zero para habilitar a prévia.",
@@ -181,6 +184,7 @@
       "confirm": "Sim, desfazer produção"
     },
     "card": {
+      "outputLot": "Lote do produto fabricado",
       "totalCost": "Custo total",
       "totalCostUndone": "Custo antes de desfazer a produção",
       "created": "Criada em",

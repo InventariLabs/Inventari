@@ -59,7 +59,6 @@ export { effectiveExpiry } from "@/utils/effectiveExpiry";
 
 // What the signed-in user may do, and the page header ModuleShell renders.
 export { useCanWrite } from "@/hooks/useCanWrite";
-export { useFormGuard } from "@/hooks/useFormGuard";
 // A single permission key, for a right another module's manifest declares —
 // a screen offering an approval decision asks `approvals:approve` here.
 export { useHasPermission } from "@/hooks/useHasPermission";
@@ -78,6 +77,8 @@ export type { VisitedRecord } from "@/hooks/useRecordVisit";
 export { hasHistoryToPop } from "@/hooks/useShellBack";
 // The product profile the organization runs, for wording that follows it.
 export { useActiveProfile } from "@/hooks/useActiveProfile";
+// A form holding typed work asks before a tab or the palette leaves it.
+export { useFormGuard } from "@/hooks/useFormGuard";
 // A list read that stays quiet while its module is switched off, or while the
 // organization's module set is still loading.
 export { useModuleQuery } from "@/hooks/queries/useModuleQuery";

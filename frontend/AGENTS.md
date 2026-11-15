@@ -7,26 +7,15 @@ Applies to everything under `frontend/` — read together with the root [`AGENTS
 ## 🎨 Frontend Engineering Standards (React / TypeScript)
 
 ### 1. The "No-Any" Policy (Type Safety)
-`any` is strictly forbidden in new code. Use `unknown` if the type is truly dynamic, or proper Interfaces/Types.
-
-- **i18next casting:** Prefer static keys (`t('common:actions.save')`) or ``t(`status.${status}` as const)`` — never `t(key as any)`.
-- **Form Data:** Avoid `parseFloat(value as any)`. Use `Number(value)` or `parseFloat(String(value))`.
-- **API Responses:** Always define an Interface for API data. Use `useQuery<Item[]>(...)` instead of `useQuery<any[]>(...)`.
+`any` is refused by eslint (`@typescript-eslint/no-explicit-any`): use `unknown`, a static i18n key
+(``t(`status.${status}` as const)``) or a type from the API schema below.
 
 #### Hand-written types and the wire
 
 `src/types/api-generated.ts` is generated from the backend's OpenAPI schema
-and is the truth about what arrives. The hand-written interfaces in
-`src/types/*` are older and far more widely imported, and nothing used to
-compare the two — so `tsc` stayed green over declarations that were simply
-wrong. Both directions have cost real defects: `DocumentLine.quantity` typed
-`number` where the backend serialises a Decimal as text (an addition became
-string concatenation, and two plus three read `2.0003`), and a category
-field whose hand-written copy narrowed a plain string to three food values
-(every comparison against a category from another vertical answered "no",
-silently).
-
-Three states, in order of preference:
+and is the truth about what arrives; a hand-written interface in `src/types/*`
+can drift from it while `tsc` stays green (the defects that cost:
+`docs/TECHNICAL_DECISIONS.md` §21). Three states, in order of preference:
 
 1. **Alias.** `export type Item = components["schemas"]["Item"]` — the
    schema's own name, the schema's own shape, nothing in between. Nothing can
@@ -67,10 +56,7 @@ it; do not put a frontend shape under a wire name to keep the gate quiet.
 
 **Quantities and money follow `docs/TECHNICAL_DECISIONS.md` §18.** A stock
 quantity or an amount of money crosses the API as a string, never a JSON
-number, and §18 lists what deliberately stays a float (a product's unit weight,
-the reorder threshold, the analytics estimates). An alias cannot get this
-wrong; a hand-written copy can, and `DocumentLine.quantity` was exactly that
-mistake.
+number; §18 lists what deliberately stays a float.
 
 ### 2. UI Development Workflow
 Follow the **"Component-First, Isolation-Second"** pattern to minimize visual bugs:
@@ -93,8 +79,7 @@ Follow the **"Component-First, Isolation-Second"** pattern to minimize visual bu
       `PurposeBindingSelect`) — import them, don't duplicate them. `useModules` is not among them: it
       lives in `src/contexts/ModulesContext.tsx`. Everything else under `settings/` is
       its own screens, and stays off-limits like any other module's internals.
-4.  **Visual Consistency:** Strictly follow `UI_GUIDELINES.md` — `success-*` (never `emerald-*`, never `accent-*`) for success states, `<Button>`/`<Input>`/`<Card>` from `ui/` instead of raw HTML tags, and the Z-Index Layer System (§4.1).
-5.  **Responsive-First:** A new modal or sheet is a `<Sheet>` (UI_GUIDELINES §4.3), which is a bottom sheet on a phone and centred on a desktop by itself.
+4.  **Visual Consistency and dialogs:** `UI_GUIDELINES.md` §0 (the components, the colours, `<Sheet>` for every modal).
 
 ### 3. Server State Management (TanStack Query)
 - **Hooks over Inline Queries:** Move `useQuery` and `useMutation` logic from Components to dedicated hooks (e.g., `src/modules/recipes/hooks/useRecipes.ts`).
@@ -112,14 +97,9 @@ Follow the **"Component-First, Isolation-Second"** pattern to minimize visual bu
 - **Tailwind:** Use `cn(...)` utility (from `src/lib/utils.ts`) for conditional classes.
 - **Lucide Icons:** sizes per context (16 in buttons, and the rest) come from `UI_GUIDELINES.md` §6 "Icon Guidelines"; don't pick one here. Default `strokeWidth` is `2`.
 - **Translations:** NEVER hardcode Polish or English strings in `.tsx` files. Use `i18n` keys.
-- **TypeScript 7 compiles, the API stays on 6.** TS 7 ships no programmatic API, and the tools
-  that still need one — `typescript-eslint`, knip, and the two scripts that read source with the
-  compiler API (`lint-i18n-raw.mjs`, `check-on-error-refusals.mjs`) — check the major version. So
-  `npx tsc` is the native compiler via the `@typescript/native` alias, while `typescript` itself is
-  aliased to `@typescript/typescript6`: that is the API those tools import, and the version an
-  editor resolves. `openapi-typescript`'s `^5.x` peer predates TS 6, so that one peer is pinned to
-  the same alias under `overrides`; both aliases and the override collapse back into one
-  `typescript` when TS 7.1 ships an API.
+- **TypeScript 7 compiles, the API stays on 6:** `npx tsc` is `@typescript/native`, `typescript` is
+  aliased to `@typescript/typescript6` for the tools that import the compiler API — keep both
+  aliases (why, and when they collapse: `docs/TECHNICAL_DECISIONS.md` §16).
 - **5-language support:** All modules MUST provide translations in the 5 maintained languages: **en, pl, de, fr, es**. The community `pt` catalogue (`LANGUAGES` in `src/i18n/languages.ts`) may lag; a key it lacks reads English. Every new or updated `i18n` key in `en.json` MUST be accompanied by corresponding entries in `pl.json`, `de.json`, `fr.json`, and `es.json`. Do not ship partial translations.
 - **Module display names:** the user-visible name of a module lives in `frontend/src/i18n/locales/*/modules.json` under `modules.<technical_name>.name` (single source of truth; manifest `display_name` is only a fallback for community modules). The approved cross-language name table and the naming glossary are in `docs/MODULE_NAMES.md` — change names there first, not in code.
 - **Workspace mode names:** the user-visible name and description of a product profile live in `frontend/src/i18n/locales/*/common.json` under `profiles.<profile_id>.name` / `.description` (single source of truth). Components resolve them through `useProfileLabels`, never by reading `profile.name`. The approved cross-language table lives in `docs/MODULE_NAMES.md` § "Workspace mode names".
@@ -129,18 +109,8 @@ Follow the **"Component-First, Isolation-Second"** pattern to minimize visual bu
 - **Import order** (a convention — no formatter or lint rule enforces it): React → external libs → `@/components/ui` / `@/lib` → `@/modules` → relative (same module).
 
 ### 6. Timers Must Be Owned
-- **`setTimeout`/`setInterval` live inside a `useEffect`/`useLayoutEffect`, or they are owned**: the id
-  held in a ref, re-arms clear the previous timer, and an unmount effect clears whatever is pending.
-  The local ESLint rule `local-rules/timers-in-effects` default-denies every timer outside an effect;
-  a file where timers are genuinely owned goes into `frontend/scripts/timer-exceptions.json` with a
-  reason that names the owner.
-- **Exceptions are counted per site.** An entry declares `sites` — the exact number of unowned timer
-  sites its reason covers — and the rule flags every site beyond that number, so adding a new unowned
-  timer to a listed file still turns the gate red.
-- **"It only touches the DOM" is not a safety reason.** The failure this rule exists for is a timer
-  firing after a test-environment teardown — and after teardown `document` disappears exactly like
-  `window`, so a DOM-only callback dies there just as hard. Name the owner, or move the timer into an
-  effect.
+`setTimeout`/`setInterval` outside an effect are refused by eslint `local-rules/timers-in-effects`,
+whose message says how to own one; exceptions go in `frontend/scripts/timer-exceptions.json`, counted per site.
 
 ---
 
@@ -174,6 +144,8 @@ If you generate any of these patterns, correct them immediately:
 | ❌ Anti-Pattern | ✅ Correct Pattern |
 |---|---|
 | Unconditional `useModuleHook()` (e.g. `useStatsOverview`) | Guard with `enabledModules.includes('module_name')` first |
-| `<h1>`, own page header, or ad-hoc `<ArrowLeft>` back link in a module page | Use `useModulePageHeader()` (with `backTo`) — the shell renders title, actions, and back arrow |
-| `<PageContainer>` in a module page | Remove — shell handles padding, just return `<div className="space-y-6">` |
-| Raw `<input>`/`<select>` for search/filter, `<Tabs>`+`<Input>` combos, or custom per-page filter bars | Use `<ListControlBar>` (`search`, `primaryTabs`, `secondaryFilters`, `filterButton`) |
+| Own page header or ad-hoc `<ArrowLeft>` back link in a module page | Use `useModulePageHeader()` (with `backTo`) — the shell renders title, actions, and back arrow |
+| `<Tabs>`+`<Input>` combos or custom per-page filter bars | Use `<ListControlBar>` (`search`, `primaryTabs`, `secondaryFilters`, `filterButton`) |
+
+`<h1>`, `<PageContainer>` and raw `<input>`/`<select>`/`<button>` in a module page are refused by eslint
+(`no-restricted-syntax` / `no-restricted-imports` in `eslint.config.js`), each with its replacement in the message.

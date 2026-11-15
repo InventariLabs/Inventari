@@ -25,7 +25,7 @@ const RECIPES_URL_FETCH_PURPOSE_KEY = "recipes.url_fetch";
  * a field that asked a cook what a rate limit is.
  *
  * The connections themselves belong to the installation, not to this module,
- * so they come from the `settings` shared layer (AGENTS.md, Module-First File
+ * so they come from the `settings` shared layer (frontend/AGENTS.md §2, Module-First File
  * Placement). Copying the select here to avoid the import would give the two
  * screens two implementations of one setting.
  */

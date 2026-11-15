@@ -10,3 +10,12 @@ export function useStockLot(lotId: string) {
     enabled: Boolean(lotId),
   });
 }
+
+/** The batch's suppliers and customers, and those of what was made of it. */
+export function useLotTrace(lotId: string) {
+  return useQuery({
+    queryKey: queryKeys.stockLots.trace(lotId),
+    queryFn: () => stockLotsApi.trace(lotId),
+    enabled: Boolean(lotId),
+  });
+}

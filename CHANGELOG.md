@@ -86,6 +86,12 @@ says what the release does rather than what changed since them.
   duration. Writers may still send plain strings, which are stored as steps
   with no duration; a reader of `GET /maker/recipes/{id}` or of the catalogue
   must read `step.text` instead of the string itself.
+- A batch's trace for a recall: from a batch, the receipts that brought it in
+  and the deliveries that sent it out, each with its partner, address, date and
+  quantity — one step back and one step forward, as food law asks. A production
+  run can name the batch its output goes into, and the trace follows it on to
+  that batch and its own customers. The trace exports as a spreadsheet to hand
+  to an inspector.
 
 ### Fixed
 

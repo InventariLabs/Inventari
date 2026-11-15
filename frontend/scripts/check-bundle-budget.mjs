@@ -425,6 +425,16 @@ const dist = join(root, "dist");
  * (login 395.9, launcher 411.1, start 627.2, receive 463.6, issue 576.2,
  * products 614.9, app first paint 391.2, initial 189.4).
  *
+ * Re-measured 2026-11-14 on the branch that traces a batch to its suppliers
+ * and customers: the development line alone measures products at 614.9 KiB gz
+ * against its 615, and the branch's copy — the trace's headings, empty states
+ * and truncation notice, and the production run's output-batch field, in six
+ * languages — sits in the module language files the language chunk every first
+ * paint loads carries and takes the merged tree to 615.2. No import walked in.
+ * That one phone budget moves a step of five, to 620; the other screens stand
+ * under theirs (login 396.3, launcher 411.4, start 627.5, receive 463.9,
+ * issue 576.6, history 600.5, app first paint 391.5, initial 189.4).
+
  * Re-measured 2026-11-15 on the branch that costs a new production formula
  * on the day it is written: its copy (the typed ingredient price, the step
  * durations, the computed labour line, the estimate beside a run's actual

@@ -11,6 +11,9 @@ export type StockLotDetail = components["schemas"]["StockLotDetailDTO"];
 export type StockLotsPage =
   components["schemas"]["PaginatedResponse_StockLotDetailDTO_"];
 export type LotStatus = components["schemas"]["LotStatus"];
+export type LotTrace = components["schemas"]["LotTraceDTO"];
+export type LotTraceLot = components["schemas"]["LotTraceLotDTO"];
+export type LotTraceEntry = components["schemas"]["LotTraceEntryDTO"];
 
 export interface StockLotFilters {
   product_template_id?: string;
@@ -32,6 +35,25 @@ export const stockLotsApi = {
     }
     const response = await api.get<StockLotsPage>("/stock-lots", { params });
     return response.data;
+  },
+
+  /**
+   * Who supplied the batch and who it went to, and the same for each batch
+   * a production run made of it — one step back, one step forward.
+   */
+  trace: async (lotId: string): Promise<LotTrace> => {
+    const response = await api.get<LotTrace>(`/stock-lots/${lotId}/trace`);
+    return response.data;
+  },
+
+  /** The trace as a spreadsheet, in the reader's clock. */
+  exportTrace: async (lotId: string): Promise<Blob> => {
+    const response = await api.get(`/stock-lots/${lotId}/trace/export/xlsx`, {
+      // The screen prints dates in the browser's zone; the sheet agrees.
+      params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone },
+      responseType: "blob",
+    });
+    return response.data as Blob;
   },
 
   /**

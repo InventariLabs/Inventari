@@ -53,6 +53,21 @@ def _register_typed_prices() -> None:
 _register_typed_prices()
 
 
+def _register_lot_trace_source() -> None:
+    """Make a production run a hop in a batch's recall trace.
+
+    At import, like the provider above; Core's trace calls it for the runs
+    it finds in the ledger.
+    """
+    from app.core.module_sdk import register_lot_trace_source
+    from app.modules.maker.lot_trace_source import ProductionLotTraceSource
+
+    register_lot_trace_source(ProductionLotTraceSource())
+
+
+_register_lot_trace_source()
+
+
 module = define_module(
     router_factory=_get_router,
     interceptors=_get_interceptors(),

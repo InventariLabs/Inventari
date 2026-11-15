@@ -18,6 +18,7 @@ export const queryKeys = {
     all: ["stock-lots"] as const,
     list: (filters: unknown) => ["stock-lots", "list", filters] as const,
     detail: (lotId: string) => ["stock-lots", lotId] as const,
+    trace: (lotId: string) => ["stock-lots", lotId, "trace"] as const,
   },
   stockQuants: {
     /** Every quant query at once — what a stock write invalidates. */

@@ -25,6 +25,21 @@ def _register_period_guard() -> None:
 _register_period_guard()
 
 
+def _register_lot_trace_source() -> None:
+    """Name the documents a batch crossed in, for its recall trace.
+
+    Core's trace finds the movements and must not read the documents table;
+    the module says what each document is. At import, like the guard above.
+    """
+    from app.core.module_sdk import register_lot_trace_source
+    from app.modules.warehouse.lot_trace_source import DocumentLotTraceSource
+
+    register_lot_trace_source(DocumentLotTraceSource())
+
+
+_register_lot_trace_source()
+
+
 def _approvals_installed() -> bool:
     """Whether the approvals package ships with this installation.
 

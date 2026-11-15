@@ -18,6 +18,8 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+const traceSpy = vi.hoisted(() => vi.fn());
+
 let lot: Record<string, unknown> | undefined = {
   id: "lot-1",
   organization_id: "org",
@@ -62,6 +64,17 @@ vi.mock("@/modules/inventory/hooks/useStockLot", () => ({
     error: { isAxiosError: true, response: { status: 404 } },
     refetch: vi.fn(),
   }),
+  // The recall trace has its own tests (LotTrace.test.tsx); here it only has
+  // to be asked for the batch on the screen.
+  useLotTrace: (lotId: string) => {
+    traceSpy(lotId);
+    return {
+      data: { lot_id: lotId, lots: [], truncated: false },
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    };
+  },
 }));
 
 const mutateAsync = vi.hoisted(() => vi.fn(() => Promise.resolve()));
@@ -139,6 +152,15 @@ describe("StockLotPage", () => {
     expect(movesSpy).toHaveBeenCalledWith(
       expect.objectContaining({ lot_id: "lot-1" }),
     );
+  });
+
+  it("asks for this batch's recall trace", () => {
+    traceSpy.mockClear();
+
+    renderPage();
+
+    expect(traceSpy).toHaveBeenCalledWith("lot-1");
+    expect(screen.getByText("Trace for a recall")).toBeInTheDocument();
   });
 
   it("treats a fully shipped batch as a normal end, not a gap", () => {

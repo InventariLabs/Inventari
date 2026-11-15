@@ -129,6 +129,19 @@
     "empty": {
       "title": "Rien n'a été enregistré sous ce lot",
       "description": "Les réceptions, sorties et transferts nommant ce lot apparaîtront ici."
+    },
+    "trace": {
+      "heading": "Traçabilité pour un rappel",
+      "caption": "Qui a fourni ce lot et à qui il est parti, avec dates et quantités. Les déplacements entre vos propres emplacements sont omis ; un ordre de production mène au lot qu'il a fabriqué.",
+      "cameIn": "Entré",
+      "wentOut": "Sorti",
+      "nothingCameIn": "Rien n'est entré de l'extérieur sous ce lot.",
+      "nothingWentOut": "Rien n'en est encore sorti.",
+      "noPartner": "Aucun partenaire indiqué",
+      "unknownSource": "Source inconnue",
+      "madeInto": "Transformé en",
+      "madeFrom": "Fabriqué à partir de {{lot}} :",
+      "truncated": "Plus de lots ont été fabriqués à partir de celui-ci qu'une traçabilité n'en suit. Ouvrez chaque lot ci-dessus pour suivre le reste."
     }
   },
   "stock": {
