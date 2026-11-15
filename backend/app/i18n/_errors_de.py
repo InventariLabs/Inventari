@@ -492,7 +492,7 @@ ERRORS_DE: ErrorMessages = {
     'production_run_not_in_progress': 'Dieser Produktionsauftrag hat den Status {status} — nur ein laufender Auftrag kann in Teilmengen gemeldet, abgehakt oder beendet werden.',
     'production_finish_below_portions': 'Dieser Auftrag hat bereits {made} in Teilmengen ins Lager gebracht und kann daher nicht mit weniger abgeschlossen werden.',
     'production_portion_above_plan': 'Eine Teilmenge darf den Auftrag nicht über die geplante Menge {planned} hinausheben — Mehrmengen kommen beim Abschließen ins Lager.',
-    'production_finish_needs_closing_quantity': 'Der Auftrag hat Kosten, die die Teilmengen ({made} im Lager) nicht tragen: Bringen Sie beim Abschließen eine Gesamtmenge über {made} ins Lager, damit der Rest der Kosten darauf verbucht wird.',
+    'production_finish_last_portion_used': 'Die Kosten dieses Auftrags lassen sich nicht auf die letzte Teilmenge verbuchen: Sie hat das Lager bereits verlassen. Schließen Sie den Auftrag mit einer Gesamtmenge über der der Teilmengen ab.',
     'production_cancel_has_portions': 'Dieser Auftrag hat bereits Erzeugnisse in Teilmengen ins Lager gebracht und kann nicht storniert werden — schließen Sie ihn stattdessen ab.',
     'production_step_not_found': 'Dieser Auftrag hat keinen solchen Schritt.',
     'production_update_not_draft': (

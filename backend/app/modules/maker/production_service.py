@@ -1398,10 +1398,13 @@ async def record_portion(
         raise ServiceRejectionError(
             'production_portion_above_plan', planned=_stored_qty(order.planned_qty)
         )
-    unit_cost = (
+    # The rate the portion is stored at is the rate its layer is posted at, so
+    # the finish adds up the same figure the shelf holds.
+    unit_cost = quantise(
         (order.material_cost or Decimal('0')) / order.planned_qty
         if order.planned_qty > 0
-        else Decimal('0')
+        else Decimal('0'),
+        4,
     )
     item_id = await _receive_output(
         db,
@@ -1420,12 +1423,55 @@ async def record_portion(
         made_on=day,
         lot_name=lot_name or order.output_lot_name,
         item_id=item_id,
-        unit_cost=quantise(unit_cost, 4),
+        unit_cost=unit_cost,
         created_by=user.id,
     )
     db.add(portion)
     await db.flush()
     return portion
+
+
+async def _book_the_rest_on_the_last_portion(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    portions: list[ProductionPortion],
+    rest: Decimal,
+    user: UserContextDTO,
+) -> None:
+    """Put the part of the run's cost the portions did not carry on the last one.
+
+    Core cannot revalue a cost layer, so the portion's quantity is taken off
+    the layers and put back in one, worth what the take-off cost plus *rest*:
+    the shelf ends up worth exactly what it did plus the rest, whichever
+    layers the take-off drained. The quantity on the shelf does not move. When
+    the layers cannot cover the portion — it has been sold or used since — the
+    rest has nowhere to go and the run is refused.
+    """
+    last = max(portions, key=lambda portion: portion.created_at)
+    await core_api.stock.lock_async(
+        db,
+        organization_id,
+        keys=[(order.output_template_id, order.output_storage_location_id)],
+    )
+    cost = await core_api.valuation.record_delivery_async(
+        db,
+        organization_id,
+        order.output_template_id,
+        last.qty,
+        item_id=last.item_id,
+    )
+    if cost is None:
+        raise ServiceRejectionError('production_finish_last_portion_used')
+    new_unit_cost = max(Decimal('0'), (cost + rest) / last.qty)
+    await core_api.valuation.record_receipt_async(
+        db,
+        organization_id=organization_id,
+        product_template_id=order.output_template_id,
+        quantity=last.qty,
+        unit_cost=new_unit_cost if new_unit_cost > 0 else None,
+    )
+    last.unit_cost = quantise(new_unit_cost, 4)
 
 
 async def finish_production(
@@ -1504,12 +1550,12 @@ async def finish_production(
         Decimal('0'),
     )
     if closing_qty <= 0 and abs(total_cost - booked) >= Decimal('0.01'):
-        # What the portions took into the cost layers is less than the run
-        # cost, and nothing is left to carry the rest: the shelf would end up
-        # worth less than the run did. The last quantity is put on the shelf
-        # by the finish, which books the rest on it.
-        raise ServiceRejectionError(
-            'production_finish_needs_closing_quantity', made=_stored_qty(made)
+        # The portions already hold everything that came out, yet they were
+        # booked at what the ingredients cost per unit planned: a yield
+        # shortfall, fixed costs, labour or a rounding cent are still to be
+        # put on the shelf. They go on the last portion's layer.
+        await _book_the_rest_on_the_last_portion(
+            db, organization_id, order, portions, total_cost - booked, user
         )
     if closing_qty > 0:
         closing_unit_cost = max(Decimal('0'), (total_cost - booked) / closing_qty)

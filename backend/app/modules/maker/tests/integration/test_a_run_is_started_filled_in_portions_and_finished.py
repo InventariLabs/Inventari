@@ -25,7 +25,7 @@ from app.models.item import Item
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
-from app.modules.maker.models import BoMLine, MakerRecipe
+from app.modules.maker.models import BoMLine, MakerRecipe, MakerRecipeCostLine
 from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
@@ -124,6 +124,38 @@ class _Winery:
         return self.client.post(
             f'{API}/orders/{order_id}/{action}', headers=self.headers, json=body or {}
         )
+
+    def add_fixed_cost(self, label: str, amount: str) -> None:
+        recipe = self.db.scalars(select(MakerRecipe)).one()
+        self.db.add(
+            MakerRecipeCostLine(
+                organization_id=recipe.organization_id,
+                recipe_id=recipe.id,
+                kind='other',
+                label=label,
+                amount=Decimal(amount),
+            )
+        )
+        self.db.commit()
+
+    def set_yield(self, qty: str) -> None:
+        recipe = self.db.scalars(select(MakerRecipe)).one()
+        recipe.batch_yield_qty = Decimal(qty)
+        self.db.commit()
+
+    def sell(self, template: ProductTemplate, qty: str) -> None:
+        """Take a quantity of the product off its shelf, the way a dispatch would."""
+        self.db.expire_all()
+        item = self.db.scalars(
+            select(Item).where(Item.template_id == template.id, Item.quantity > 0)
+        ).first()
+        assert item is not None
+        moved = self.client.patch(
+            f'/api/v1/items/{item.id}/consume',
+            headers=self.headers,
+            json={'quantity': qty},
+        )
+        assert moved.status_code == 200, moved.text
 
     def stock_value(self) -> float:
         value = self.client.get('/api/v1/stats/overview', headers=self.headers)
@@ -258,22 +290,76 @@ def test_a_run_is_finished_on_a_later_day_with_what_it_actually_made(
     assert winery.on_shelf(winery.wine) == Decimal('3')
 
 
-def test_a_run_whose_portions_hold_its_whole_output_cannot_lose_its_cost(
+def test_a_run_whose_portions_hold_its_whole_output_keeps_its_cost(
     winery: _Winery,
 ) -> None:
     # Two grapes were taken for two planned bottles but only one came out, and
-    # it is already on the shelf as a portion: booked at 3.00, the run's other
-    # 3.00 has nowhere to go unless the last quantity is put on the shelf by
-    # the finish itself.
+    # it is already on the shelf as a portion booked at 3.00: the run's other
+    # 3.00 goes on that portion when the run finishes.
     order_id = winery.draft('2')
     winery.post(order_id, 'start')
     winery.post(order_id, 'portions', {'qty': '1'})
-    before = winery.stock_value()
+
+    finished = winery.post(order_id, 'finish', {'actual_qty': '1'})
+
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert Decimal(str(done['total_cost'])) == Decimal('6.00')
+    assert Decimal(str(done['unit_cost'])) == Decimal('6')
+    assert winery.on_shelf(winery.wine) == Decimal('1')
+    assert winery.stock_value() == 30.0
+
+
+def test_a_run_filled_to_its_plan_carries_its_fixed_costs_on_its_last_portion(
+    winery: _Winery,
+) -> None:
+    winery.add_fixed_cost('Corks', '0.50')
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W2'})
+
+    finished = winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert Decimal(str(done['total_cost'])) == Decimal('7.00')
+    assert winery.on_shelf(winery.wine) == Decimal('2')
+    # The two grapes left the shelf worth 6.00; the wine holds 7.00 with corks.
+    assert winery.stock_value() == 31.0
+
+
+def test_a_cost_that_does_not_divide_to_four_places_still_adds_up_at_the_finish(
+    winery: _Winery,
+) -> None:
+    # One grape (3.00) for 700 bottles is 0.00428... a bottle, which the
+    # portions store at four places: the portions add up to 3.01 and the
+    # finish puts the cent right instead of refusing.
+    winery.set_yield('700')
+    order_id = winery.draft('700')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '300'})
+    winery.post(order_id, 'portions', {'qty': '400'})
+
+    finished = winery.post(order_id, 'finish', {'actual_qty': '700'})
+
+    assert finished.status_code == 200, finished.text
+    assert Decimal(str(finished.json()['total_cost'])) == Decimal('3.00')
+    assert abs(winery.stock_value() - 30.0) < 0.011
+
+
+def test_a_run_cannot_book_its_rest_on_a_last_portion_that_has_left_the_shelf(
+    winery: _Winery,
+) -> None:
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.sell(winery.wine, '1')
 
     refused = winery.post(order_id, 'finish', {'actual_qty': '1'})
 
     assert refused.status_code == 400, refused.text
-    assert winery.stock_value() == before
+    assert winery.post(order_id, 'cancel').status_code == 400
 
 
 def test_the_last_bottles_put_on_the_shelf_by_the_finish_carry_the_rest_of_the_cost(

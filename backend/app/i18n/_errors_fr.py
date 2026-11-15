@@ -489,7 +489,7 @@ ERRORS_FR: ErrorMessages = {
     'production_run_not_in_progress': 'Cet ordre de fabrication a le statut {status} — seul un ordre en cours peut recevoir des portions, des étapes cochées ou être terminé.',
     'production_finish_below_portions': 'Cet ordre a déjà mis {made} en stock par portions ; il ne peut donc pas se terminer avec moins.',
     'production_portion_above_plan': "Une portion ne peut pas amener l'ordre au-delà du prévu ({planned}) ; le surplus est mis en stock à la clôture.",
-    'production_finish_needs_closing_quantity': 'Le coût de cet ordre ne tient pas dans les portions ({made} déjà en stock) : à la clôture, indiquez une quantité totale supérieure à {made} pour que le reste du coût y soit porté.',
+    'production_finish_last_portion_used': "Le coût de cet ordre ne peut pas être porté sur la dernière portion : elle a déjà quitté le stock. Terminez l'ordre avec une quantité totale supérieure à celle des portions.",
     'production_cancel_has_portions': 'Cet ordre a déjà mis une partie de sa production en stock par portions ; il ne peut pas être annulé — terminez-le plutôt.',
     'production_step_not_found': "Cet ordre n'a pas cette étape.",
     'production_update_not_draft': (

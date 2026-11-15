@@ -365,7 +365,7 @@ class ErrorMessages(TypedDict):
     production_run_not_in_progress: str
     production_finish_below_portions: str
     production_portion_above_plan: str
-    production_finish_needs_closing_quantity: str
+    production_finish_last_portion_used: str
     production_cancel_has_portions: str
     production_step_not_found: str
     production_update_not_draft: str

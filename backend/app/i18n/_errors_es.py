@@ -490,7 +490,7 @@ ERRORS_ES: ErrorMessages = {
     'production_run_not_in_progress': 'Esta orden de producción tiene el estado {status} — solo una orden en curso admite porciones, pasos marcados o finalizarse.',
     'production_finish_below_portions': 'Esta orden ya ha puesto {made} en el almacén en porciones, así que no puede terminar con menos.',
     'production_portion_above_plan': 'Una porción no puede llevar la orden por encima de lo planificado ({planned}); lo que sobre se pone en el almacén al terminar.',
-    'production_finish_needs_closing_quantity': 'El coste de esta orden no cabe en las porciones ({made} ya en el almacén): al terminar, indique una cantidad total mayor que {made} para que el resto del coste se asiente en ella.',
+    'production_finish_last_portion_used': 'El coste de esta orden no se puede asentar en la última porción: ya ha salido del almacén. Termine la orden con una cantidad total mayor que la de las porciones.',
     'production_cancel_has_portions': 'Esta orden ya ha puesto producción en el almacén en porciones, así que no se puede cancelar — termínela en su lugar.',
     'production_step_not_found': 'Esta orden no tiene ese paso.',
     'production_update_not_draft': (
