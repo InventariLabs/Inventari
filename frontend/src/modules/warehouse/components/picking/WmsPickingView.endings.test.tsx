@@ -330,9 +330,12 @@ describe("the screens a session ending changes", () => {
           within(covered).getByText(/Lines 1\/1 done/),
         ).toBeInTheDocument(),
       );
-      expect(within(covered).getByText("Packing")).toBeInTheDocument();
+      // The dispatch's own state is read again after the count is.
+      expect(await within(covered).findByText("Packing")).toBeInTheDocument();
       expect(
-        within(covered).getByRole("button", { name: "Complete dispatch" }),
+        await within(covered).findByRole("button", {
+          name: "Complete dispatch",
+        }),
       ).toBeInTheDocument();
     }
   });

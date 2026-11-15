@@ -50,7 +50,7 @@ console.warn = (...args: unknown[]) => {
 
 configure({ asyncUtilTimeout: 5000 });
 
-beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "warn" }));
 
 beforeEach(() => {
   gate.beginTest(expect.getState().testPath ?? "");

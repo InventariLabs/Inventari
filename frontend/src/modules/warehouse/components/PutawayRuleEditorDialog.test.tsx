@@ -733,9 +733,12 @@ describe("PutawayRuleEditorDialog on the rule's targets", () => {
     const items = within(await screen.findByRole("list")).getAllByRole(
       "listitem",
     );
-    expect(items[0]).toHaveTextContent("12 / 50 kg");
+    // The list stands before the reads that fill its rows have answered.
+    await waitFor(() => expect(items[0]).toHaveTextContent("12 / 50 kg"));
     // A shelf without the product's limit says so — and what may stand there.
-    expect(items[1]).toHaveTextContent("No limit · different products");
+    await waitFor(() =>
+      expect(items[1]).toHaveTextContent("No limit · different products"),
+    );
   });
 
   it("says a target is almost full and what a delivery larger than what still fits does", async () => {
@@ -765,7 +768,9 @@ describe("PutawayRuleEditorDialog on the rule's targets", () => {
     const items = within(await screen.findByRole("list")).getAllByRole(
       "listitem",
     );
-    expect(items[0]).toHaveTextContent("46 / 50 kg — almost full");
+    await waitFor(() =>
+      expect(items[0]).toHaveTextContent("46 / 50 kg — almost full"),
+    );
     expect(
       screen.getByText(
         /a delivery larger than what still fits goes to the next one/i,
@@ -879,7 +884,9 @@ describe("PutawayRuleEditorDialog on the rule's targets", () => {
     const items = within(await screen.findByRole("list")).getAllByRole(
       "listitem",
     );
-    expect(items[1]).toHaveTextContent("No limit · One product only");
+    await waitFor(() =>
+      expect(items[1]).toHaveTextContent("No limit · One product only"),
+    );
   });
 
   it("does not call a target unlimited while its limits could not be read", async () => {
@@ -938,11 +945,11 @@ describe("PutawayRuleEditorDialog on the rule's targets", () => {
     // The shelf that already holds a limit invites an edit with "Set";
     // one that holds none invites the limit with "Set limit".
     expect(
-      within(items[0]).getByRole("button", {
+      await within(items[0]).findByRole("button", {
         name: "Set the limit for Cold Store",
       }),
     ).toHaveTextContent("Set");
-    const setLimit = within(items[1]).getByRole("button", {
+    const setLimit = await within(items[1]).findByRole("button", {
       name: "Set the limit for Rack C-2",
     });
     expect(setLimit).toHaveTextContent("Set limit");
@@ -985,7 +992,9 @@ describe("PutawayRuleEditorDialog on the rule's targets", () => {
     const items = within(await screen.findByRole("list")).getAllByRole(
       "listitem",
     );
-    expect(items[0]).toHaveTextContent("46 / 50 kg — almost full");
+    await waitFor(() =>
+      expect(items[0]).toHaveTextContent("46 / 50 kg — almost full"),
+    );
 
     await user.click(
       within(items[0]).getByRole("button", {

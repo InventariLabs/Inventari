@@ -836,7 +836,10 @@ describe("WmsPickingView", () => {
     scanWithHardwareScanner("1234567890123", document.body);
 
     await waitFor(() => expect(bodies).toHaveLength(1));
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    // The wait runs inside act: the answer to the one request lands in it.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
     expect(bodies).toHaveLength(1);
   });
 

@@ -367,7 +367,9 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
     );
 
     expect(await screen.findByText("Visible Item")).toBeInTheDocument();
-    expect(screen.getByText(/2 products are hidden/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/2 products are hidden/),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /open settings/i }),
     ).toBeInTheDocument();
