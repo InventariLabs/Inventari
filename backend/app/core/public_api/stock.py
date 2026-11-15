@@ -12,6 +12,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import (
+    LotTraceDTO,
     PickGroupDTO,
     QuantConsumptionDTO,
     RecordPostDTO,
@@ -471,6 +472,20 @@ class CoreStockAPI:
         from app.services._stock_lot_ops import get_lot_detail_async
 
         return await get_lot_detail_async(db, organization_id, lot_id)
+
+    @reads
+    async def trace_lot_async(
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        lot_id: UUID,
+        *,
+        lang: str = 'en',
+    ) -> LotTraceDTO | None:
+        """The batch's suppliers and customers, and those of what was made of it."""
+        from app.services.lot_trace_service import trace_lot_async
+
+        return await trace_lot_async(db, organization_id, lot_id, lang=lang)
 
     @reads
     async def list_lot_rows_async(

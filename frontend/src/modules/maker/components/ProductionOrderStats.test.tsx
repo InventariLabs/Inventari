@@ -47,6 +47,11 @@ describe("ProductionOrderStats", () => {
     expect(screen.getByText("Production date")).toBeInTheDocument();
   });
 
+  it("names the batch the run put its output into, beside its day", () => {
+    render(<ProductionOrderStats order={order({ output_lot_name: "B-01" })} />);
+    expect(screen.getByText("Output batch: B-01")).toBeInTheDocument();
+  });
+
   it("calls the closed figure a total cost", () => {
     render(<ProductionOrderStats order={order({ status: "COMPLETED" })} />);
     expect(screen.getByText("Total cost")).toBeInTheDocument();

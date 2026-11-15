@@ -77,6 +77,8 @@ export type { VisitedRecord } from "@/hooks/useRecordVisit";
 export { hasHistoryToPop } from "@/hooks/useShellBack";
 // The product profile the organization runs, for wording that follows it.
 export { useActiveProfile } from "@/hooks/useActiveProfile";
+// A form holding typed work asks before a tab or the palette leaves it.
+export { useFormGuard } from "@/hooks/useFormGuard";
 // A list read that stays quiet while its module is switched off, or while the
 // organization's module set is still loading.
 export { useModuleQuery } from "@/hooks/queries/useModuleQuery";

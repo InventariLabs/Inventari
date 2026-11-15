@@ -82,6 +82,9 @@
     "storageEmpty": "Ninguna ubicación coincide",
     "notesLabel": "Notas (opcional)",
     "notesPlaceholder": "Notas internas sobre esta orden…",
+    "outputLotLabel": "Lote del producto fabricado (opcional)",
+    "outputLotHint": "Nombra un lote para que la retirada de un ingrediente llegue, a través de esta orden, a quienes recibieron lo fabricado. Déjalo vacío si no llevas lotes.",
+    "guardName": "La orden de producción",
     "hints": {
       "product": "Selecciona un producto de salida para activar la vista previa.",
       "quantity": "Introduce una cantidad prevista mayor que cero para activar la vista previa.",
@@ -181,6 +184,7 @@
       "confirm": "Sí, deshacer producción"
     },
     "card": {
+      "outputLot": "Lote del producto fabricado",
       "totalCost": "Coste total",
       "totalCostUndone": "Coste antes de deshacer la producción",
       "created": "Creada",

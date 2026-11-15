@@ -129,6 +129,19 @@
     "empty": {
       "title": "Nada foi registrado neste lote",
       "description": "Recebimentos, saídas e transferências que citarem este lote aparecerão aqui."
+    },
+    "trace": {
+      "heading": "Rastreio para uma recolha",
+      "caption": "Quem forneceu este lote e para quem foi, com datas e quantidades. Movimentos entre os seus próprios locais ficam de fora; uma ordem de produção leva ao lote que fabricou.",
+      "cameIn": "Entrou",
+      "wentOut": "Saiu",
+      "nothingCameIn": "Nada entrou de fora com este lote.",
+      "nothingWentOut": "Nada dele saiu ainda.",
+      "noPartner": "Sem parceiro indicado",
+      "unknownSource": "Origem desconhecida",
+      "madeInto": "Transformado em",
+      "madeFrom": "Fabricado a partir de {{lot}}:",
+      "truncated": "Foram fabricados mais lotes a partir deste do que um rastreio acompanha. Abra cada lote acima para rastrear o resto."
     }
   },
   "stock": {

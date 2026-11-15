@@ -65,6 +65,12 @@ says what the release does rather than what changed since them.
   importing the module's internals. The dead-code check reads every module's
   `moduleApi.ts` as published surface, and no longer reports a name in it that
   nothing in this repository imports.
+- A batch's trace for a recall: from a batch, the receipts that brought it in
+  and the deliveries that sent it out, each with its partner, address, date and
+  quantity — one step back and one step forward, as food law asks. A production
+  run can name the batch its output goes into, and the trace follows it on to
+  that batch and its own customers. The trace exports as a spreadsheet to hand
+  to an inspector.
 
 ### Fixed
 

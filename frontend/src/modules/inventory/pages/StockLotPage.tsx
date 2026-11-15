@@ -36,6 +36,7 @@ import {
 } from "../components/lots/LotStatusDialog";
 import type { LotStatus } from "@/lib/api/stockLots";
 import { RecentStockMoves } from "../components/moves/RecentStockMoves";
+import { LotTrace } from "../components/lots/LotTrace";
 
 /** Held, quarantined and recalled all mean "do not ship it" — say which. */
 const STATUS_TONE: Record<string, "success" | "warning" | "danger"> = {
@@ -231,6 +232,10 @@ export default function StockLotPage() {
           </Card>
         )}
       </section>
+
+      {/* The recall question, by supplier and customer: what an inspector
+          is handed. The full ledger stays below it for everything else. */}
+      <LotTrace lotId={lot.id} />
 
       <section>
         <h2 className="text-lg font-semibold text-on mb-4 px-1">

@@ -135,6 +135,19 @@
     "empty": {
       "title": "Pod tą partią nic nie zapisano",
       "description": "Przyjęcia, wydania i przesunięcia wskazujące tę partię pojawią się tutaj."
+    },
+    "trace": {
+      "heading": "Ślad do wycofania",
+      "caption": "Kto dostarczył tę partię i do kogo trafiła, z datami i ilościami. Przesunięcia między własnymi miejscami są pominięte; zlecenie produkcji prowadzi do partii, którą wytworzyło.",
+      "cameIn": "Przyszło",
+      "wentOut": "Wyszło",
+      "nothingCameIn": "Pod tą partią nic nie przyszło z zewnątrz.",
+      "nothingWentOut": "Nic z niej jeszcze nie wyszło.",
+      "noPartner": "Bez partnera",
+      "unknownSource": "Nieznane źródło",
+      "madeInto": "Wytworzono",
+      "madeFrom": "Wytworzone z {{lot}}:",
+      "truncated": "Z tej partii wytworzono więcej partii, niż obejmuje jeden ślad. Otwórz każdą partię powyżej, by prześledzić resztę."
     }
   },
   "stock": {

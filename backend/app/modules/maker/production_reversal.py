@@ -150,7 +150,7 @@ async def _take_the_output_off(
             organization_id,
             product_template_id=order.output_template_id,
             from_location_id=order.output_storage_location_id,
-            lot_id=None,
+            lot_id=produced.lot_id,
             owner_id=None,
             since=order.completed_at or order.created_at,
             excluded_reference_ids=[order.id],
@@ -163,6 +163,10 @@ async def _take_the_output_off(
         order.output_template_id,
         made,
         from_location_id=order.output_storage_location_id,
+        # The batch the run put the output into: the movement says the same
+        # batch the record it takes from is in.
+        lot_id=produced.lot_id,
+        require_active_lot=False,
         reference_type=_REFERENCE_TYPE,
         reference_id=order.id,
         created_by=user.id,

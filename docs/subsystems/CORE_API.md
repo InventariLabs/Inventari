@@ -540,6 +540,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `set_lot_status_async` | `(db: AsyncSession, organization_id: UUID, lot_id: UUID, status: str, reason: str \| None=None, user_id: UUID \| None=None) -> StockLotDTO \| None` | WRITE | — |
 | `shelf_contents_async` | `(db: AsyncSession, organization_id: UUID, product_template_ids: Collection[UUID]=()) -> list[ShelfContentsDTO]` | READ | What stands on every shelf, told in one row per shelf. |
 | `take_from_the_records_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, storage_location_id: UUID \| None, quantity: Decimal, lot_id: UUID \| None=None, owner_id: UUID \| None=None, *, require_active_lot: bool=True, any_owner: bool=False, removal_strategy: str \| None=None, user_id: UUID \| None=None, source_document_id: UUID \| None=None, history_changes: dict[str, Any] \| None=None, reference_type: str \| None=None, reference_id: UUID \| None=None) -> list[QuantConsumptionDTO]` | WRITE | Take ``quantity`` off the records the draw plan names, one write each. |
+| `trace_lot_async` | `(db: AsyncSession, organization_id: UUID, lot_id: UUID, *, lang: str='en') -> LotTraceDTO \| None` | READ | The batch's suppliers and customers, and those of what was made of it. |
 
 ---
 
@@ -594,9 +595,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 311
+- **Total methods:** 312
 - **Namespaces:** 33
-- **Documented methods:** 311 (100%)
-- **READ methods:** 217 (70%)
+- **Documented methods:** 312 (100%)
+- **READ methods:** 218 (70%)
 - **WRITE methods:** 94 (30%)
 

@@ -528,6 +528,14 @@ expiry date are ever picked for an outgoing document. A batch's page shows
 where it is, everything that happened to it, and every decision about its
 state.
 
+**Trace for a recall** on the batch's page answers what a recall asks: under
+**Came in**, the receipts that brought the batch in, and under **Went out**,
+the deliveries and production runs that sent it out — each with its document,
+partner and address, date and quantity. Moves between your own locations are
+left out. A production run that named the **Batch of the output** leads to
+that batch, and its own deliveries follow below. **Export** downloads the
+same trace as a spreadsheet to hand to an inspector.
+
 Which batch leaves first is set on the product, under **Which stock leaves
 first** in its **Edit product** form: **FIFO** sends out what came in first,
 **FEFO** what expires first, whenever it came in. A product with neither set

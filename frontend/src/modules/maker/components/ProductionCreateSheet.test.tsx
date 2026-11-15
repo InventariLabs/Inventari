@@ -3,6 +3,7 @@ import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ProductionCreateSheet } from "./ProductionCreateSheet";
 import { QueryWrapper } from "@/test/queryWrapper";
+import { useFormGuardStore } from "@/store/formGuardStore";
 
 const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
@@ -599,6 +600,30 @@ describe("ProductionCreateSheet — already made, in one step", () => {
         "Costs you 7.95 zł per pcs. · 159.00 zł in total",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("asks before a navigation throws away what was typed", () => {
+    renderSheet();
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    typeQuantity("20");
+
+    expect(useFormGuardStore.getState().dirtyForm).toBe("The production run");
+  });
+
+  it("sends the batch named for the output, and none when the field is left empty", () => {
+    renderSheet();
+    typeQuantity("20");
+    pickStorage("Warehouse");
+    fireEvent.click(screen.getByRole("button", { name: "Save as made" }));
+    expect(mocks.madeMutate.mock.calls[0][0].output_lot_name).toBeNull();
+
+    fireEvent.change(screen.getByLabelText("Batch of the output (optional)"), {
+      target: { value: "  B-01 " },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save as made" }));
+
+    expect(mocks.madeMutate.mock.calls[1][0].output_lot_name).toBe("B-01");
   });
 
   it("shows need, have and short before saving, and says the shortfall gets counted", () => {

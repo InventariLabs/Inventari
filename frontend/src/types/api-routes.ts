@@ -374,6 +374,8 @@ export const API_ROUTES = [
   "/api/v1/stock-as-of/export/xlsx",
   "/api/v1/stock-lots",
   "/api/v1/stock-lots/{lot_id}",
+  "/api/v1/stock-lots/{lot_id}/trace",
+  "/api/v1/stock-lots/{lot_id}/trace/export/xlsx",
   "/api/v1/stock-moves",
   "/api/v1/stock-moves/export/xlsx",
   "/api/v1/stock-quants",
