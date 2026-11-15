@@ -42,12 +42,13 @@ this index does not follow, and a write that touches no session-scoped
 method (an ORM attribute set that relies on the caller's commit, with no
 ``flush`` anywhere) is not recognised as a write at all.
 
-Findings ride a reasoned baseline — ``audit_coverage_baseline.txt``, one
-owned entry per key, ``<key> | owner=<who> | expires=<date> | <reason>`` —
-whose size the ratchet in ``baseline_sizes.txt`` records. A path that
-cannot journal by design (login, read-marking, a working note, an outbox
-row) belongs there with the reason; a path that simply lost its entry is
-debt, and the reason names its follow-up.
+Findings ride two reasoned lists, whose sizes the ratchet in
+``baseline_sizes.txt`` records. A path that cannot journal by design (login,
+read-marking, a working note, an outbox row) belongs in
+``audit_coverage_allowlist.txt``, ``<key> | <reason>``, with no date: the
+decision does not lapse. A path that simply lost its entry is debt, in
+``audit_coverage_baseline.txt``, ``<key> | owner=<who> | expires=<date> |
+<reason>``, and the reason names its follow-up; a passed date warns.
 """
 
 from __future__ import annotations
@@ -743,7 +744,8 @@ def _check_audit_coverage(
             f'title=Architecture: write without a journal entry::'
             f'{gap.label} writes and no log_action_async is reachable in its '
             f'module or Core. Call it where the act is written — the entry '
-            f'rides the same transaction — or add a reasoned entry to '
-            f'app/core/audit_coverage_baseline.txt.'
+            f'rides the same transaction. A path that cannot journal by design '
+            f'takes "<key> | <reason>" in app/core/audit_coverage_allowlist.txt; '
+            f'one that will is debt, dated, in app/core/audit_coverage_baseline.txt.'
         )
     return findings

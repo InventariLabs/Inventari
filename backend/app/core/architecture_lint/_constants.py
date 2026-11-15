@@ -58,6 +58,7 @@ ESCAPE_HATCH_QUERY_SCOPE_BASELINE_FILE = (
 PUBLIC_API_MISSING_ORG_BASELINE_FILE = CORE_DIR / 'public_api_missing_org_baseline.txt'
 UNREAD_ORG_PARAMETER_BASELINE_FILE = CORE_DIR / 'unread_org_parameter_baseline.txt'
 AUDIT_COVERAGE_BASELINE_FILE = CORE_DIR / 'audit_coverage_baseline.txt'
+AUDIT_COVERAGE_ALLOWLIST_FILE = CORE_DIR / 'audit_coverage_allowlist.txt'
 COREAPI_WRITE_USER_CONTEXT_BASELINE_FILE = (
     CORE_DIR / 'coreapi_write_user_context_baseline.txt'
 )

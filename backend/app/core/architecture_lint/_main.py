@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import argparse
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 
 from app.cli.module_validator import validate_i18n
 
 from ._baselines import (
+    _load_audit_coverage_allowlist,
     _load_audit_coverage_baseline,
+    _load_audit_coverage_debt,
     _load_bare_emit_baseline,
     _load_core_api_model_leak_baseline,
     _load_coreapi_signature_legality_baseline,
@@ -365,8 +367,9 @@ _BASELINED_SUMMARY: dict[str, tuple[str, str | None]] = {
         'app/core/services_public_api_import_baseline.txt',
     ),
     'audit_coverage': (
-        'baselined write path(s) without a journal entry',
-        'app/core/audit_coverage_baseline.txt',
+        'write path(s) without a journal entry, by design or as dated debt '
+        '(audit_coverage_baseline.txt)',
+        'app/core/audit_coverage_allowlist.txt',
     ),
 }
 
@@ -448,6 +451,21 @@ def _print_failure_summary(
     print(ARCHITECTURE_LINT_HELP)
 
 
+def _fails_the_run(findings: Sequence[object]) -> bool:
+    """Whether a check's findings fail the run: anything but a ``::warning``.
+
+    A warning is printed — an annotation in CI, a line in ``make lint`` and
+    in the pre-commit hook — and refuses nothing. It is the shape a dated
+    exception takes once its date passes (``_baselines._expired``), and the
+    shape of what a scan could not read. A finding that is not an annotation
+    line (the forbidden-import check hands back objects) always fails.
+    """
+    return any(
+        not (isinstance(entry, str) and entry.startswith('::warning'))
+        for entry in findings
+    )
+
+
 def _emit(entries: Iterable[str]) -> list[str]:
     """Print a check's findings and hand them back for the error tally."""
     printed = list(entries)
@@ -472,6 +490,7 @@ def _stale_baseline_errors() -> list[str]:
         for site in _collect_transaction_sites([SERVICES_ROOT, CORE_DIR, MODULES_ROOT])
         if site.owner_key not in allow
     ]
+    audit_gaps = set(collect_audit_gaps(APP_ROOT))
     checks = (
         (
             'toctou_risk_baseline.txt',
@@ -484,9 +503,14 @@ def _stale_baseline_errors() -> list[str]:
             set(collect_bare_emits(APP_ROOT)),
         ),
         (
+            'audit_coverage_allowlist.txt',
+            _load_audit_coverage_allowlist()[0],
+            audit_gaps,
+        ),
+        (
             'audit_coverage_baseline.txt',
-            _load_audit_coverage_baseline()[0],
-            set(collect_audit_gaps(APP_ROOT)),
+            _load_audit_coverage_debt()[0],
+            audit_gaps,
         ),
         (
             'raw_http_exception_baseline.txt',
@@ -1275,7 +1299,7 @@ def _run_checks() -> int:
     )
     audit_errors += _emit(audit_baseline_errors)
 
-    blocking = [
+    blocking: list[Sequence[object]] = [
         violations,
         mixed_status_errors,
         tx_errors,
@@ -1313,7 +1337,7 @@ def _run_checks() -> int:
         cross_module_errors,
         test_skip_errors,
     ]
-    if not any(blocking):
+    if not any(_fails_the_run(group) for group in blocking):
         _print_pass_summary(
             escape_hatch_files=escape_hatch_files,
             api_import_baseline=api_import_baseline,
