@@ -147,12 +147,15 @@ says what the release does rather than what changed since them.
   step with no duration, so nothing has to be re-entered.
 - The frontend's exception registers no longer fail `make check-frontend` and
   CI on a calendar day. In `frontend/scripts/integration-only.json` (API
-  routes with no screen) and `frontend/scripts/suppressions.json` (silenced
-  frontend findings), an exception that is right by design carries no date,
-  and a date that has passed on one that waits for a fix prints a warning and
-  refuses nothing. A route entry names its `verdict`: a module author
-  recording an API-only route writes `"verdict": "integration-only"` with a
-  reason and an owner, and no `expires`.
+  routes with no screen), `frontend/scripts/suppressions.json` (silenced
+  frontend findings) and `frontend/scripts/invalidation-keys-baseline.json`
+  (query keys outside `hooks/queries/keys.ts`), an exception that is right by
+  design carries no date, and a date that has passed on one that waits for a
+  fix prints a warning and refuses nothing. An entry names its `verdict`: a
+  module author recording an API-only route writes
+  `"verdict": "integration-only"` with a reason and an owner, and no
+  `expires`, and a query-key entry is `by-design` or `to-fold`, the latter
+  with an `expiry`.
 
 ### Fixed
 
