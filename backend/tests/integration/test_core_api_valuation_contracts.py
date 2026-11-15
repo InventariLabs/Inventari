@@ -10,6 +10,7 @@ effects visible after commit".
 from __future__ import annotations
 
 from decimal import Decimal
+from uuid import UUID
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +40,7 @@ def _make_valuation_template(db, organization_id):
 class TestCoreValuationReceiptContract:
     """`record_receipt_async` accepts and persists data."""
 
-    async def test_record_receipt_async_returns_none(
+    async def test_record_receipt_async_returns_the_layer_it_opened(
         self, real_async_db_session: AsyncSession, async_test_household
     ):
         def _make_template(db):
@@ -54,7 +55,7 @@ class TestCoreValuationReceiptContract:
             quantity=Decimal('10.0'),
             unit_cost=Decimal('5.50'),
         )
-        assert result is None
+        assert isinstance(result, UUID)
 
     async def test_record_receipt_async_sets_this_organizations_rate(
         self, real_async_db_session: AsyncSession, async_test_household
@@ -99,7 +100,81 @@ class TestCoreValuationReceiptContract:
             quantity=Decimal('5.0'),
             unit_cost=Decimal('3.00'),
         )
-        assert result is None
+        assert isinstance(result, UUID)
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+class TestCoreValuationAddValueContract:
+    """`add_value_to_layer_async` puts a cost found later on what is still there."""
+
+    async def test_only_the_units_still_on_the_layer_carry_the_value(
+        self, real_async_db_session: AsyncSession, async_test_household, async_test_user
+    ):
+        from app.core.contracts import UserContextDTO
+        from app.models.stock_valuation_layer import StockValuationLayer
+
+        template = await real_async_db_session.run_sync(
+            lambda db: _make_valuation_template(db, async_test_household.id)
+        )
+        layer_id = await core_api.valuation.record_receipt_async(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            quantity=Decimal('4'),
+            unit_cost=Decimal('2.00'),
+        )
+        await core_api.valuation.record_delivery_async(
+            real_async_db_session, async_test_household.id, template.id, Decimal('1')
+        )
+        user = UserContextDTO(
+            id=async_test_user.id, organization_id=async_test_household.id
+        )
+
+        # 4.00 is for the four units received; one has left, so three share 3.00.
+        placed = await core_api.valuation.add_value_to_layer_async(
+            real_async_db_session,
+            async_test_household.id,
+            layer_id,
+            Decimal('4.00'),
+            user=user,
+        )
+
+        assert placed == Decimal('3.00')
+        layer = await real_async_db_session.get(StockValuationLayer, layer_id)
+        assert layer.remaining_qty == Decimal('3')
+        assert layer.unit_cost == Decimal('3.0000')
+
+    async def test_a_layer_that_is_empty_takes_nothing(
+        self, real_async_db_session: AsyncSession, async_test_household, async_test_user
+    ):
+        from app.core.contracts import UserContextDTO
+
+        template = await real_async_db_session.run_sync(
+            lambda db: _make_valuation_template(db, async_test_household.id)
+        )
+        layer_id = await core_api.valuation.record_receipt_async(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            quantity=Decimal('2'),
+            unit_cost=Decimal('2.00'),
+        )
+        await core_api.valuation.record_delivery_async(
+            real_async_db_session, async_test_household.id, template.id, Decimal('2')
+        )
+
+        placed = await core_api.valuation.add_value_to_layer_async(
+            real_async_db_session,
+            async_test_household.id,
+            layer_id,
+            Decimal('1.00'),
+            user=UserContextDTO(
+                id=async_test_user.id, organization_id=async_test_household.id
+            ),
+        )
+
+        assert placed == Decimal('0')
 
 
 @pytest.mark.integration

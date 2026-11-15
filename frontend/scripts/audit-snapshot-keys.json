@@ -3,7 +3,7 @@
   "note": "Field names the backend declares for audit snapshots — literal snapshot keys, the schema/model intersections its payload-driven writers declare via AUDIT_PAYLOAD_SCHEMA, and the literal key sets of the journal_config_change funnel; \"target-types\" is the value set of AuditTargetType. Refresh with make sync-audit-fields; do not edit by hand.",
   "declarations-read": 11,
   "uncovered-writer-files": [],
-  "key-count": 240,
+  "key-count": 241,
   "keys": [
     "address",
     "adjusted_items",
@@ -39,6 +39,7 @@
     "copied_from_builtin",
     "corrects_number",
     "cost",
+    "cost_added",
     "cost_kind",
     "counted_items",
     "counted_quantity",
