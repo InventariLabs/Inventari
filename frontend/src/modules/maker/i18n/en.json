@@ -662,10 +662,13 @@
       "record": "Batch record",
       "hold": "Put on hold",
       "release": "Release",
-      "heldToast": "The batch is on hold. Nothing takes from it until it is released.",
-      "releasedToast": "The batch is released and can be used again.",
+      "heldToast_one": "The batch is on hold. Nothing takes from it until it is released.",
+      "heldToast_other": "The batches are on hold. Nothing takes from them until they are released.",
+      "releasedToast_one": "The batch is released and can be used again.",
+      "releasedToast_other": "The batches are released and can be used again.",
       "holdFailed": "The batch’s state could not be changed.",
-      "holdTitle": "Put this batch on hold?",
+      "holdTitle_one": "Put this batch on hold?",
+      "holdTitle_other": "Put these batches on hold?",
       "holdMessage": "A batch on hold stays in its location, but no run, pick or dispatch takes from it until it is released.",
       "holdReason": "Why is it held?"
     }

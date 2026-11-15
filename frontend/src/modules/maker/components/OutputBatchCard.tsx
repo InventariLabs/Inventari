@@ -69,7 +69,7 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
   function putOnHold() {
     hold.mutate(reason.trim(), {
       onSuccess: () => {
-        toast.success(t("batches.card.heldToast"));
+        toast.success(t("batches.card.heldToast", { count: batches.length }));
         setReason("");
       },
       onError: (err) =>
@@ -78,8 +78,10 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
   }
 
   function releaseBatch() {
+    const released = batches.filter((batch) => HELD.has(batch.status)).length;
     release.mutate(undefined, {
-      onSuccess: () => toast.success(t("batches.card.releasedToast")),
+      onSuccess: () =>
+        toast.success(t("batches.card.releasedToast", { count: released })),
       onError: (err) =>
         toast.error(extractApiError(err, t("batches.card.holdFailed"))),
     });
@@ -215,7 +217,7 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
       )}
       <ConfirmDialog
         open={asking}
-        title={t("batches.card.holdTitle")}
+        title={t("batches.card.holdTitle", { count: batches.length })}
         message={t("batches.card.holdMessage")}
         confirmLabel={t("batches.card.hold")}
         cancelLabel={t("create.cancel")}

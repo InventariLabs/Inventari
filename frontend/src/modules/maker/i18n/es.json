@@ -662,10 +662,13 @@
       "record": "Registro del lote",
       "hold": "Retener",
       "release": "Liberar",
-      "heldToast": "El lote está retenido. No se tomará nada de él hasta que se libere.",
-      "releasedToast": "El lote está liberado y puede volver a usarse.",
+      "heldToast_one": "El lote está retenido. No se tomará nada de él hasta que se libere.",
+      "heldToast_other": "Los lotes están retenidos. No se tomará nada de ellos hasta que se liberen.",
+      "releasedToast_one": "El lote está liberado y puede volver a usarse.",
+      "releasedToast_other": "Los lotes están liberados y pueden volver a usarse.",
       "holdFailed": "No se pudo cambiar el estado del lote.",
-      "holdTitle": "¿Retener este lote?",
+      "holdTitle_one": "¿Retener este lote?",
+      "holdTitle_other": "¿Retener estos lotes?",
       "holdMessage": "Un lote retenido sigue en su estante, pero ninguna producción, preparación ni envío toma de él hasta que se libere.",
       "holdReason": "¿Por qué se retiene?"
     }

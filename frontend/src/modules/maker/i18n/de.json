@@ -662,10 +662,13 @@
       "record": "Chargenprotokoll",
       "hold": "Sperren",
       "release": "Freigeben",
-      "heldToast": "Die Charge ist gesperrt. Nichts wird daraus entnommen, bis sie freigegeben ist.",
-      "releasedToast": "Die Charge ist freigegeben und kann wieder verwendet werden.",
+      "heldToast_one": "Die Charge ist gesperrt. Nichts wird daraus entnommen, bis sie freigegeben ist.",
+      "heldToast_other": "Die Chargen sind gesperrt. Nichts wird daraus entnommen, bis sie freigegeben sind.",
+      "releasedToast_one": "Die Charge ist freigegeben und kann wieder verwendet werden.",
+      "releasedToast_other": "Die Chargen sind freigegeben und können wieder verwendet werden.",
       "holdFailed": "Der Zustand der Charge konnte nicht geändert werden.",
-      "holdTitle": "Diese Charge sperren?",
+      "holdTitle_one": "Diese Charge sperren?",
+      "holdTitle_other": "Diese Chargen sperren?",
       "holdMessage": "Eine gesperrte Charge bleibt im Regal, aber kein Lauf, keine Kommissionierung und kein Versand entnimmt daraus, bis sie freigegeben ist.",
       "holdReason": "Warum wird sie gesperrt?"
     }

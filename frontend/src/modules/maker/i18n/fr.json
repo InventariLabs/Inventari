@@ -662,10 +662,13 @@
       "record": "Fiche de lot",
       "hold": "Bloquer",
       "release": "Libérer",
-      "heldToast": "Le lot est bloqué. Rien n'y sera pris tant qu'il n'est pas libéré.",
-      "releasedToast": "Le lot est libéré et peut de nouveau être utilisé.",
+      "heldToast_one": "Le lot est bloqué. Rien n'y sera pris tant qu'il n'est pas libéré.",
+      "heldToast_other": "Les lots sont bloqués. Rien n'y sera pris tant qu'ils ne sont pas libérés.",
+      "releasedToast_one": "Le lot est libéré et peut de nouveau être utilisé.",
+      "releasedToast_other": "Les lots sont libérés et peuvent de nouveau être utilisés.",
       "holdFailed": "L'état du lot n'a pas pu être modifié.",
-      "holdTitle": "Bloquer ce lot ?",
+      "holdTitle_one": "Bloquer ce lot ?",
+      "holdTitle_other": "Bloquer ces lots ?",
       "holdMessage": "Un lot bloqué reste sur son étagère, mais aucune fabrication, préparation ni expédition n'y prend tant qu'il n'est pas libéré.",
       "holdReason": "Pourquoi est-il bloqué ?"
     }
