@@ -427,6 +427,20 @@ async def get_recipe(
     lines = list(recipe.lines)
     cost_lines = list(recipe.cost_lines)
     await _attach_child_names(db, org_id, lines)
+    # The typed price is the product's, read for the page in one query, and
+    # carried on the line the editor shows. It is not an attribute of the
+    # ORM row, so the read is built rather than stamped on the instance.
+    from .ingredient_prices import typed_rates_async
+
+    typed_prices = await typed_rates_async(
+        db, org_id, [line.child_template_id for line in lines]
+    )
+    line_reads = [
+        BoMLineRead.model_validate(line).model_copy(
+            update={'typed_unit_price': typed_prices.get(line.child_template_id)}
+        )
+        for line in lines
+    ]
 
     # Cheap cost estimate per unit of output (None without a BOM). The
     # batch's own fixed lines and the time its steps take belong in it: a
@@ -459,7 +473,7 @@ async def get_recipe(
         **data,
         output_template_name=name,
         batch_yield_uom_symbol=await _output_uom_symbol(db, org_id, recipe),
-        lines=lines,
+        lines=line_reads,
         cost_lines=cost_lines,
         labour_cost=labour_cost,
         estimated_unit_cost=estimated_unit_cost,
