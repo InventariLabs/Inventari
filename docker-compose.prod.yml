@@ -161,7 +161,7 @@ services:
   # `offsite` in COMPOSE_PROFILES and set up rclone.conf + BACKUP_RCLONE_REMOTE as
   # described in DEPLOYMENT.md.
   db-backup-offsite:
-    image: rclone/rclone:1.75.1
+    image: rclone/rclone:1.76.0
     profiles: ["offsite"]
     restart: unless-stopped
     environment:
@@ -261,7 +261,7 @@ services:
   # written by Redis 7.4 ("Can't handle RDB format version 12"). DEPLOYMENT.md
   # has the procedure, including what losing the blacklist means.
   redis:
-    image: valkey/valkey:9.1.2-alpine
+    image: valkey/valkey:9.1.3-alpine
     restart: unless-stopped
     mem_limit: 512m
     # These instances hold the JWT blacklist and the rate-limit
@@ -294,7 +294,7 @@ services:
   # never drop revoked tokens (fail-open) or limiter buckets. Small footprint
   # is intentional — these keys are tiny and TTL-bound.
   redis-critical:
-    image: valkey/valkey:9.1.2-alpine
+    image: valkey/valkey:9.1.3-alpine
     restart: unless-stopped
     mem_limit: 96m
     command: >
@@ -317,7 +317,7 @@ services:
       retries: 5
 
   pgbouncer-main:
-    image: edoburu/pgbouncer:v1.25.2-p0
+    image: edoburu/pgbouncer:v1.26.1-p0
     restart: unless-stopped
     environment:
       DB_USER: "${DB_APP_USER:-inventari_app}"
