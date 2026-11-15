@@ -25,8 +25,12 @@ import ast
 import importlib
 from pathlib import Path
 
-#: Suppression lists live beside the code they cover, in ``app/core/``.
-_BASELINE_GLOBS = ('*_baseline.txt', '*_deferrals.txt')
+#: Suppression lists live beside the code they cover, in ``app/core/``. The
+#: audit-coverage allowlist is counted although it is no debt: each line is a
+#: write the journal gate no longer inspects, so it grows by the same visible
+#: act. (``transaction_owner_allowlist.txt`` is not: a legal owner of a
+#: transaction is not a gap in the gate.)
+_BASELINE_GLOBS = ('*_baseline.txt', '*_deferrals.txt', 'audit_coverage_allowlist.txt')
 
 
 def _entry_count(path: Path) -> int:

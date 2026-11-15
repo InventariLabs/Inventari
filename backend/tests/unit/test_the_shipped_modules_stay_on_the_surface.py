@@ -225,10 +225,11 @@ class TestTheFrozenSurface:
 
 @pytest.mark.unit
 class TestTheCommittedList:
-    def test_the_baseline_parses_and_has_not_expired(self):
-        modules, errors = _load_module_import_surface_baseline()
+    def test_the_baseline_parses(self):
+        """Whatever the date: a block past its review date warns, it does not fail."""
+        modules, findings = _load_module_import_surface_baseline()
 
-        assert errors == []
+        assert [f for f in findings if not f.startswith('::warning')] == []
         assert modules, 'the baseline lists no module — the gate covers nothing'
 
     def test_every_shipped_module_with_a_core_import_has_a_block(self):
@@ -246,8 +247,13 @@ class TestTheCommittedList:
 
 
 @pytest.mark.unit
-def test_an_expired_block_fails(tmp_path, monkeypatch):
-    """A decision that never comes back is how a gap goes quiet."""
+def test_an_expired_block_warns_and_still_holds(tmp_path, monkeypatch):
+    """A decision that never comes back is how a gap goes quiet — so it warns.
+
+    It does not fail: a date in the code would refuse whoever commits that
+    day, an outside contributor who cannot settle the block included, and
+    every released version would turn red for good once the day passed.
+    """
     baseline = tmp_path / 'module_import_surface_baseline.txt'
     baseline.write_text(
         'demo | owner=core | expires=2020-01-01 | because the demo module is old\n'
@@ -259,11 +265,12 @@ def test_an_expired_block_fails(tmp_path, monkeypatch):
         baseline,
     )
 
-    modules, errors = _load_module_import_surface_baseline()
+    modules, findings = _load_module_import_surface_baseline()
 
-    assert modules == {}
-    assert len(errors) == 1
-    assert 'expired' in errors[0]
+    assert modules == {'demo': {'app.core.deps'}}
+    assert len(findings) == 1
+    assert findings[0].startswith('::warning')
+    assert 'expired' in findings[0]
 
 
 @pytest.mark.unit
