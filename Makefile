@@ -299,7 +299,7 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:api-types-mirror
 	@echo "$(BLUE)[INFO]$(NC) Checking the backend's unit-label mirror against the screen..."
 	docker compose exec frontend npm run check:units-labels
-	@echo "$(BLUE)[INFO]$(NC) Checking every suppression has an owner and a live date..."
+	@echo "$(BLUE)[INFO]$(NC) Checking every suppression has an owner and a reason..."
 	docker compose exec frontend npm run check:suppressions
 	@echo "$(BLUE)[INFO]$(NC) Checking no baselined function grew past its frozen complexity or length..."
 	docker compose exec frontend npm run check:function-baseline

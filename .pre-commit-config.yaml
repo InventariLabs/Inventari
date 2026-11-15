@@ -39,11 +39,12 @@ repos:
       #       mypy-baseline.json, knip, the reachability baselines (files,
       #       routes, focus), module boundaries, i18n keys: their gate fails
       #       on NEW findings and never watches the size of the list itself;
-      #   (b) registries with an owner and a date — suppressions.json,
+      #   (b) registries with an owner and a reason — suppressions.json,
       #       integration-only.json, and the reserved-surface section of
       #       vulture_whitelist.py: their gate does not compare findings at
-      #       all, it demands an owner, a reason and a date (a passed date
-      #       fails the two frontend registers; the arch lint only warns);
+      #       all, it demands an owner and a reason, and a date on an entry
+      #       that waits for a fix (a passed date warns in all three and
+      #       refuses nothing; an entry right by design carries no date);
       #   (c) a counter — invalidation-keys-baseline.json holds a bare number
       #       (literalKeyCount) and fails when it grows;
       #   (d) the rest of vulture_whitelist.py: counted from the parsed file

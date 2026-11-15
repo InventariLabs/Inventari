@@ -313,8 +313,9 @@ which the page above has.) The scaffold's router answers `GET`/`POST /api/v1/war
 and `GET`/`PATCH`/`DELETE /api/v1/warranty-tracker/{widget_id}`; the page in
 step 4 calls the first. Wire the others into the screens that need them,
 delete the routes the module does not need, or record an API-only route in
-`frontend/scripts/integration-only.json` with a reason, an owner and an
-expiry. Before the push comes the
+`frontend/scripts/integration-only.json` with a reason, an owner and the
+verdict `integration-only` (no date: an API-only route is right by design).
+Before the push comes the
 full gate in [CONTRIBUTING.md](CONTRIBUTING.md) (*Making Changes*): the backend
 suite with its coverage floors, the type check and the frontend tests.
 

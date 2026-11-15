@@ -1,8 +1,12 @@
 /**
- * The register only works if it cannot be satisfied by a half-filled entry —
- * an owner with no date, or a date long past, is the state this gate exists to
- * end.
+ * The register only works if it cannot be satisfied by a half-filled entry: a
+ * suppression with nobody's name or no reason on it is the state this gate
+ * exists to end. A date is what an entry that waits for a fix carries, and a
+ * passed one warns — it never refuses whoever happens to commit that day.
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -58,13 +62,20 @@ describe("auditRegister", () => {
   const suppression = [
     { id: "baseline::a.ts", source: "baseline", entry: "a.ts" },
   ];
+  const audit = (record) =>
+    auditRegister(
+      suppression,
+      { suppressions: { "baseline::a.ts": record } },
+      TODAY,
+    );
 
   it("accepts a complete record", () => {
-    const register = { suppressions: { "baseline::a.ts": complete } };
-    expect(auditRegister(suppression, register, TODAY)).toEqual({
-      errors: [],
-      stale: [],
-    });
+    expect(audit(complete)).toEqual({ errors: [], warnings: [], stale: [] });
+  });
+
+  it("accepts a record with no date: an exception right by design", () => {
+    const { expires: _undated, ...byDesign } = complete;
+    expect(audit(byDesign)).toEqual({ errors: [], warnings: [], stale: [] });
   });
 
   it("refuses a suppression with no record at all", () => {
@@ -73,30 +84,19 @@ describe("auditRegister", () => {
     expect(errors[0]).toContain("no record in suppressions.json");
   });
 
-  it("refuses a record missing an owner, a reason or a date", () => {
-    const missing = (over) =>
-      auditRegister(
-        suppression,
-        { suppressions: { "baseline::a.ts": { ...complete, ...over } } },
-        TODAY,
-      ).errors;
+  it("refuses a record missing an owner or a reason, or a date that is not one", () => {
+    const missing = (over) => audit({ ...complete, ...over }).errors;
     expect(missing({ owner: undefined })[0]).toContain("names nobody");
     expect(missing({ reason: undefined })[0]).toContain("gives no reason");
-    expect(missing({ expires: undefined })[0]).toContain("YYYY-MM-DD");
+    expect(missing({ expires: "soon" })[0]).toContain("YYYY-MM-DD");
   });
 
-  it("refuses a record past its date and names who owed the answer", () => {
-    const { errors } = auditRegister(
-      suppression,
-      {
-        suppressions: {
-          "baseline::a.ts": { ...complete, expires: "2026-01-01" },
-        },
-      },
-      TODAY,
-    );
-    expect(errors[0]).toContain("expired on 2026-01-01");
-    expect(errors[0]).toContain("maintainers");
+  it("warns on a record past its date, names who owed the answer, and refuses nothing", () => {
+    const { errors, warnings } = audit({ ...complete, expires: "2026-01-01" });
+    expect(errors).toEqual([]);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain("expired on 2026-01-01");
+    expect(warnings[0]).toContain("maintainers");
   });
 
   it("reports a record that no longer silences anything, without failing", () => {
@@ -107,5 +107,22 @@ describe("auditRegister", () => {
     );
     expect(errors).toEqual([]);
     expect(stale).toEqual(["baseline::gone.ts"]);
+  });
+});
+
+describe("suppressions.json as committed", () => {
+  const register = JSON.parse(
+    readFileSync(join(import.meta.dirname, "suppressions.json"), "utf8"),
+  );
+  const live = Object.keys(register.suppressions).map((id) => {
+    const [source, entry] = id.split("::");
+    return { id, source, entry };
+  });
+
+  // Past every date it could carry: a passed date may only warn.
+  it("refuses none of its records on any later day", () => {
+    expect(
+      auditRegister(live, register, new Date("2099-12-31")).errors,
+    ).toEqual([]);
   });
 });
