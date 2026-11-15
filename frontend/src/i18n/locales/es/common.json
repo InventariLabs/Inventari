@@ -408,6 +408,7 @@
         "copied_from_builtin": "Copiado de una plantilla integrada",
         "copied_from_culinary_recipe": "Copiado de una receta",
         "cost": "Coste",
+        "cost_added": "Coste añadido",
         "cost_line": "Línea de coste",
         "cost_line_added": "Línea de coste añadida",
         "cost_line_removed": "Línea de coste eliminada",
@@ -651,7 +652,12 @@
         "shelf_life_days_before": "Vida útil antes (días)",
         "shelf_life_days_after": "Vida útil después (días)",
         "typed_unit_price_before": "Precio escrito antes",
-        "typed_unit_price_after": "Precio escrito después"
+        "typed_unit_price_after": "Precio escrito después",
+        "done_on": "Hecho el",
+        "make_fresh": "Fabricar siempre fresco",
+        "material_cost": "Coste de los materiales retirados",
+        "started_on": "Iniciado el",
+        "step": "Paso"
       },
       "showWholeChange": "Mostrar el cambio completo",
       "showLess": "Mostrar menos",

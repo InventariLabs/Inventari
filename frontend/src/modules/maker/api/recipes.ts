@@ -18,6 +18,7 @@ export interface BomLineUpdate {
   qty_per_batch?: string;
   uom_id?: string | null;
   yield_loss_pct?: string;
+  make_fresh?: boolean;
   notes?: string | null;
 }
 
@@ -27,6 +28,7 @@ export interface BomLineCreate {
   unit: string;
   uom_id?: string | null;
   yield_loss_pct?: string;
+  make_fresh?: boolean;
   notes?: string | null;
 }
 

@@ -406,6 +406,7 @@
         "copied_from_builtin": "Copiado de um modelo integrado",
         "copied_from_culinary_recipe": "Copiado da receita",
         "cost": "Custo",
+        "cost_added": "Custo adicionado",
         "cost_line": "Linha de custo",
         "cost_line_added": "Linha de custo adicionada",
         "cost_line_removed": "Linha de custo removida",

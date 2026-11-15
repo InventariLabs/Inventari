@@ -42,6 +42,7 @@ from ._schemas_bom import (
     WhereUsedItem,
 )
 from ._schemas_breakdown import CostBreakdownResponse
+from .availability_service import resolve_check_location
 from .bom_service import (
     list_lines,
     list_parents,
@@ -50,6 +51,7 @@ from .bom_service import (
 )
 from .maker_api import maker_api
 from .models import BoMLine, MakerRecipe
+from .stock_first import StockPool
 
 router = APIRouter(prefix='/bom', tags=['maker'])
 
@@ -89,6 +91,14 @@ def _collect_tree_lines(node: dict[str, Any], acc: list[BoMLine]) -> None:
         acc.append(line)
     for child in node.get('children', []):
         _collect_tree_lines(child, acc)
+
+
+def _sub_assembly_nodes(node: BomTreeNode, acc: list[BomTreeNode]) -> None:
+    """The nodes of a tree whose ingredient is itself made from a recipe."""
+    if node.line is not None and node.children:
+        acc.append(node)
+    for child in node.children:
+        _sub_assembly_nodes(child, acc)
 
 
 @router.get(
@@ -328,6 +338,24 @@ async def get_bom_tree(
     _collect_tree_lines(tree, tree_lines)
     await _attach_child_names(db, org_id, tree_lines)
     root_node = BomTreeNode.model_validate(tree)
+    # What the shelf holds of each intermediate: a run takes that first and
+    # makes only the rest through the recipe the tree shows below it.
+    sub_assemblies: list[BomTreeNode] = []
+    _sub_assembly_nodes(root_node, sub_assemblies)
+    if sub_assemblies:
+        pool = StockPool(db, org_id, await resolve_check_location(db, org_id))
+        await pool.ensure(
+            node.line.child_template_id for node in sub_assemblies if node.line
+        )
+        for node in sub_assemblies:
+            if node.line is not None:
+                node.line = node.line.model_copy(
+                    update={
+                        'stock_on_hand': pool.on_hand_in(
+                            node.line.child_template_id, node.line.uom_id
+                        )
+                    }
+                )
     return BomTreeResponse(
         parent_template_id=template_id,
         root=root_node,

@@ -487,10 +487,13 @@ ERRORS_DE: ErrorMessages = {
     'production_reverse_output_used': (
         'Dieser Lauf kann nicht rückgängig gemacht werden: Ein Teil seiner Erzeugnisse hat den Lagerplatz bereits verlassen. Erfassen Sie stattdessen eine Bestandskorrektur für den Rest.'
     ),
-    'production_cancel_not_draft': (
-        'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein '
-        'Entwurf kann storniert werden.'
-    ),
+    'production_cancel_not_draft': 'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein Entwurf oder ein laufender Auftrag kann storniert werden.',
+    'production_start_not_draft': 'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein Entwurf kann gestartet werden.',
+    'production_run_not_in_progress': 'Dieser Produktionsauftrag hat den Status {status} — nur ein laufender Auftrag kann in Teilmengen gemeldet, abgehakt oder beendet werden.',
+    'production_finish_below_portions': 'Dieser Auftrag hat bereits {made} in Teilmengen ins Lager gebracht und kann daher nicht mit weniger abgeschlossen werden.',
+    'production_portion_above_plan': 'Eine Teilmenge darf den Auftrag nicht über die geplante Menge {planned} hinausheben — Mehrmengen kommen beim Abschließen ins Lager.',
+    'production_cancel_has_portions': 'Dieser Auftrag hat bereits Erzeugnisse in Teilmengen ins Lager gebracht und kann nicht storniert werden — schließen Sie ihn stattdessen ab.',
+    'production_step_not_found': 'Dieser Auftrag hat keinen solchen Schritt.',
     'production_update_not_draft': (
         'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein '
         'Entwurf kann bearbeitet werden.'

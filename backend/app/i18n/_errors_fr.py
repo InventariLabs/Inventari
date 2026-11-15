@@ -484,10 +484,13 @@ ERRORS_FR: ErrorMessages = {
     'production_reverse_output_used': (
         "Cette production ne peut pas être annulée : une partie de ce qu'elle a fabriqué a déjà quitté son emplacement. Enregistrez plutôt une correction de stock pour ce qui reste."
     ),
-    'production_cancel_not_draft': (
-        'Cet ordre de fabrication a déjà le statut {status} — seul un '
-        'brouillon peut être annulé.'
-    ),
+    'production_cancel_not_draft': 'Cet ordre de fabrication a déjà le statut {status} — seul un brouillon ou un ordre en cours peut être annulé.',
+    'production_start_not_draft': 'Cet ordre de fabrication a déjà le statut {status} — seul un brouillon peut être démarré.',
+    'production_run_not_in_progress': 'Cet ordre de fabrication a le statut {status} — seul un ordre en cours peut recevoir des portions, des étapes cochées ou être terminé.',
+    'production_finish_below_portions': 'Cet ordre a déjà mis {made} en stock par portions ; il ne peut donc pas se terminer avec moins.',
+    'production_portion_above_plan': "Une portion ne peut pas amener l'ordre au-delà du prévu ({planned}) ; le surplus est mis en stock à la clôture.",
+    'production_cancel_has_portions': 'Cet ordre a déjà mis une partie de sa production en stock par portions ; il ne peut pas être annulé — terminez-le plutôt.',
+    'production_step_not_found': "Cet ordre n'a pas cette étape.",
     'production_update_not_draft': (
         'Cet ordre de fabrication a déjà le statut {status} — seul un '
         'brouillon peut être modifié.'

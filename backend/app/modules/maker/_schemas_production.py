@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas.pagination import PaginatedResponse
 
-from ._schemas_batches import IngredientLotChoice
+from ._schemas_batches import IngredientLotChoice, RunBatchRead
 from ._schemas_breakdown import CostBreakdownResponse
 from ._schemas_recipes import IngredientAvailabilityItem
 
@@ -85,6 +85,28 @@ class ProductionOrderLineRead(BaseModel):
     source_location_name: str | None = None
 
 
+class ProductionStepRead(BaseModel):
+    """One process step of a run in progress: its text, time and the day it was done."""
+
+    text: str | None = None
+    minutes: int | None = None
+    done_on: date | None = None
+
+
+class ProductionPortionRead(BaseModel):
+    """One portion of a run's output, put on the shelf on its own day."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    qty: Decimal
+    made_on: date
+    lot_name: str | None = None
+    item_id: UUID | None = None
+    unit_cost: Decimal | None = None
+    created_at: datetime
+
+
 class ShortageItemRead(BaseModel):
     """One blocked ingredient — the refusal's own row.
 
@@ -137,6 +159,10 @@ class ProductionOrderRead(BaseModel):
     output_lot_id: UUID | None = None
     output_lot_status: str | None = None
     best_before: date | None = None
+    #: Every batch the output was filed under, the run's own first: a run
+    #: filled in portions has one per name its portions were filed under.
+    #: On the single-order read only.
+    output_batches: list[RunBatchRead] = Field(default_factory=list)
     #: The output product's shelf life in days: what a best-before is
     #: counted from when the run closes. On the single-order read only.
     shelf_life_days: int | None = None
@@ -174,6 +200,18 @@ class ProductionOrderRead(BaseModel):
     result_per_unit: Decimal | None = None
     result_per_batch: Decimal | None = None
     lines: list[ProductionOrderLineRead] = Field(default_factory=list)
+    #: The day a run that is finished later was started, and what its
+    #: ingredients cost — its work in progress until it closes. Null on a run
+    #: completed in one step.
+    started_on: date | None = None
+    material_cost: Decimal | None = None
+    #: What of the run's cost could not go on the shelf because its output left
+    #: it before the run closed. Null unless the run was filled in portions.
+    unshelved_cost: Decimal | None = None
+    #: The process steps of a run that was started, with the day each was done.
+    steps: list[ProductionStepRead] = Field(default_factory=list)
+    #: The output put on the shelf so far, portion by portion.
+    portions: list[ProductionPortionRead] = Field(default_factory=list)
 
 
 class ProductionStockMoveRead(BaseModel):
@@ -233,6 +271,63 @@ class ProductionOrderComplete(BaseModel):
     ingredient_lots: list[IngredientLotChoice] = Field(
         default_factory=list, max_length=500
     )
+
+
+class ProductionOrderStart(BaseModel):
+    """Optional request body for POST /orders/{id}/start.
+
+    ``started_on`` is the day the ingredients were taken; the organization's
+    today when omitted.
+    """
+
+    started_on: date | None = None
+
+
+class ProductionOrderFinish(BaseModel):
+    """Optional request body for POST /orders/{id}/finish.
+
+    ``actual_qty`` is what the whole run made, portions already put on the
+    shelf included; the rest of it is put on the shelf now. ``finished_on``
+    is the day it closed and ``output_lot_name`` the batch of that closing
+    quantity.
+    """
+
+    actual_qty: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=3)
+    finished_on: date | None = None
+    output_lot_name: str | None = Field(None, max_length=100)
+
+    @field_validator('output_lot_name')
+    @classmethod
+    def _blank_is_no_batch(cls, value: str | None) -> str | None:
+        """A batch name of spaces names no batch."""
+        if value is None:
+            return None
+        return value.strip() or None
+
+
+class ProductionPortionCreate(BaseModel):
+    """Request body for POST /orders/{id}/portions — output before the run closes."""
+
+    qty: Decimal = Field(gt=0, max_digits=12, decimal_places=3)
+    made_on: date | None = None
+    output_lot_name: str | None = Field(None, max_length=100)
+
+    @field_validator('output_lot_name')
+    @classmethod
+    def _blank_is_no_batch(cls, value: str | None) -> str | None:
+        """A batch name of spaces names no batch."""
+        if value is None:
+            return None
+        return value.strip() or None
+
+
+class ProductionStepTick(BaseModel):
+    """Request body for PUT /orders/{id}/steps/{index} — a step done on a day.
+
+    ``done_on`` null clears the tick.
+    """
+
+    done_on: date | None = None
 
 
 class ProductionOrderUpdate(BaseModel):

@@ -46,7 +46,8 @@
       "draft": "Entwurf",
       "completed": "Abgeschlossen",
       "cancelled": "Storniert",
-      "reversed": "Zurückgenommen"
+      "reversed": "Zurückgenommen",
+      "in_progress": "In Arbeit"
     },
     "duplicate": "Duplizieren",
     "viewRecipe": "Formel anzeigen",
@@ -198,10 +199,12 @@
       "resultPerUnit": "({{amount}} pro {{unit}})",
       "totalCostAfterClosing": "Gesamtkosten nach Abschluss",
       "unitCost": "{{amount}} pro {{unit}}",
+      "unshelvedCost": "{{amount}} der Kosten dieses Auftrags liegen nicht im Lager: Die Ware wurde verkauft oder verbraucht, bevor der Auftrag abgeschlossen wurde.",
       "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "estimatedAtCompletion": "Schätzung bei Abschluss",
-      "estimatedDifference": "Tatsächliche Abweichung: {{amount}}"
+      "estimatedDifference": "Tatsächliche Abweichung: {{amount}}",
+      "takenSoFar": "Bisher entnommen"
     },
     "ingredients": "Verbrauchte Zutaten",
     "emptyLines": "Für diesen Lauf wurden keine Zutaten erfasst.",
@@ -396,7 +399,11 @@
     "error": "Baum konnte nicht geladen werden",
     "moved": "Zeile verschoben",
     "moveError": "Verschieben fehlgeschlagen",
-    "dropHint": "Ziehen zum Verschieben"
+    "dropHint": "Ziehen zum Verschieben",
+    "onHand": "{{qty}} vorrätig",
+    "makeFresh": "Immer frisch herstellen",
+    "makeFreshHint": "Ein Lauf stellt diese Zutat jedes Mal nach ihrer Formel her, statt zuerst zu nehmen, was im Regal liegt.",
+    "makeFreshFailed": "Die Zeile konnte nicht geändert werden"
   },
   "pricing": {
     "title": "Verkaufspreisrechner",
@@ -591,6 +598,39 @@
     "stockSavePartial": "{{saved}} von {{total}} gespeichert. Der Rest bleibt im Formular.",
     "locationsFailed": "Orte konnten nicht geladen werden"
   },
+  "progress": {
+    "start": "Lauf starten",
+    "startConfirm": {
+      "title": "Diesen Lauf starten?",
+      "description": "Die Zutaten verlassen heute den Bestand, der Lauf bleibt aber offen. Das Erzeugnis können Sie in Teilmengen einlagern und den Lauf an einem späteren Tag abschließen."
+    },
+    "startDay": "Starttag",
+    "startSuccess": "Lauf gestartet — die Zutaten sind entnommen",
+    "startFailed": "Der Lauf konnte nicht gestartet werden",
+    "startedOn": "Gestartet",
+    "finish": "Lauf abschließen",
+    "finishConfirm": {
+      "title": "Diesen Lauf abschließen?",
+      "description": "Was aus dem Lauf noch kommt, wird jetzt eingelagert, und der Lauf schließt mit seinen Kosten ab."
+    },
+    "finishQty": "Menge des gesamten Laufs (optional)",
+    "finishQtyHint": "Bereits eingelagerte Teilmengen zählen mit. Leer lassen, um die geplante Menge zu übernehmen.",
+    "finishDay": "Abschlusstag",
+    "finishSuccess": "Lauf abgeschlossen",
+    "finishFailed": "Der Lauf konnte nicht abgeschlossen werden",
+    "portions": "Bisheriger Output",
+    "noPortions": "Es wurde noch nichts eingelagert.",
+    "portionQty": "Teilmenge",
+    "portionDay": "Tag",
+    "portionLot": "Charge (optional)",
+    "addPortion": "Teilmenge hinzufügen",
+    "portionAdded": "Teilmenge eingelagert",
+    "portionFailed": "Die Teilmenge konnte nicht hinzugefügt werden",
+    "steps": "Schritte",
+    "stepDay": "Tag, an dem „{{step}}“ erledigt wurde",
+    "stepFailed": "Der Schritt konnte nicht gespeichert werden",
+    "cancelConfirm": "Beim Stornieren gehen die Zutaten, die dieser Lauf entnommen hat, in ihren Bestand zurück — in die Chargen, aus denen sie kamen. Ein Lauf, der schon Erzeugnisse eingelagert hat, wird stattdessen abgeschlossen."
+  },
   "batches": {
     "heading": "Chargen der Zutaten",
     "hint": "Jede Zutat wird aus der Charge mit dem frühesten Mindesthaltbarkeitsdatum genommen, außer Sie wählen eine andere. Scannen Sie ein Chargenetikett, um sie zu wählen.",
@@ -622,10 +662,13 @@
       "record": "Chargenprotokoll",
       "hold": "Sperren",
       "release": "Freigeben",
-      "heldToast": "Die Charge ist gesperrt. Nichts wird daraus entnommen, bis sie freigegeben ist.",
-      "releasedToast": "Die Charge ist freigegeben und kann wieder verwendet werden.",
+      "heldToast_one": "Die Charge ist gesperrt. Nichts wird daraus entnommen, bis sie freigegeben ist.",
+      "heldToast_other": "Die Chargen sind gesperrt. Nichts wird daraus entnommen, bis sie freigegeben sind.",
+      "releasedToast_one": "Die Charge ist freigegeben und kann wieder verwendet werden.",
+      "releasedToast_other": "Die Chargen sind freigegeben und können wieder verwendet werden.",
       "holdFailed": "Der Zustand der Charge konnte nicht geändert werden.",
-      "holdTitle": "Diese Charge sperren?",
+      "holdTitle_one": "Diese Charge sperren?",
+      "holdTitle_other": "Diese Chargen sperren?",
       "holdMessage": "Eine gesperrte Charge bleibt im Regal, aber kein Lauf, keine Kommissionierung und kein Versand entnimmt daraus, bis sie freigegeben ist.",
       "holdReason": "Warum wird sie gesperrt?"
     }

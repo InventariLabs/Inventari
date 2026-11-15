@@ -42,6 +42,7 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
   const { t, i18n } = useTranslation("maker");
   const currency = useOrganizationCurrency();
   const unit = record.output_uom_symbol ?? null;
+  const batches = record.output_batches ?? [];
   const money = (value: string | number | null | undefined) =>
     value === null || value === undefined
       ? "—"
@@ -68,13 +69,26 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
       <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <Fact label={t("record.recipe")}>{record.recipe_name ?? "—"}</Fact>
         <Fact label={t("record.batch")}>
-          <span className="font-mono">{record.output_lot_name ?? "—"}</span>
+          <span className="font-mono" data-testid="maker-record-batches">
+            {batches.length > 0
+              ? batches.map((batch) => batch.lot_name).join(", ")
+              : (record.output_lot_name ?? "—")}
+          </span>
         </Fact>
         <Fact label={t("batches.card.madeOn")}>
           {record.production_date ? formatDate(record.production_date) : "—"}
         </Fact>
         <Fact label={t("batches.bestBeforeLabel")}>
-          {record.best_before ? formatDate(record.best_before) : "—"}
+          {batches.length > 1
+            ? batches.map((batch) => (
+                <span key={batch.lot_id} className="block">
+                  <span className="font-mono">{batch.lot_name}</span>{" "}
+                  {batch.best_before ? formatDate(batch.best_before) : "—"}
+                </span>
+              ))
+            : record.best_before
+              ? formatDate(record.best_before)
+              : "—"}
         </Fact>
         <Fact label={t("record.planned")}>{qty(record.planned_qty)}</Fact>
         <Fact label={t("record.actual")}>{qty(record.actual_qty)}</Fact>

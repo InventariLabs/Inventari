@@ -408,6 +408,7 @@
         "copied_from_builtin": "Copied from a built-in template",
         "copied_from_culinary_recipe": "Copied from recipe",
         "cost": "Cost",
+        "cost_added": "Cost added",
         "cost_line": "Cost line",
         "cost_line_added": "Cost line added",
         "cost_line_removed": "Cost line removed",
@@ -651,7 +652,12 @@
         "shelf_life_days_before": "Shelf life before (days)",
         "shelf_life_days_after": "Shelf life after (days)",
         "typed_unit_price_before": "Typed price before",
-        "typed_unit_price_after": "Typed price after"
+        "typed_unit_price_after": "Typed price after",
+        "done_on": "Done on",
+        "make_fresh": "Always make fresh",
+        "material_cost": "Cost of materials taken",
+        "started_on": "Started on",
+        "step": "Step"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",

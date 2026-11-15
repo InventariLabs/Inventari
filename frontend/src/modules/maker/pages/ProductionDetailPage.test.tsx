@@ -73,6 +73,10 @@ vi.mock("@/modules/maker/hooks/useProduction", () => ({
   }),
   useCompleteProduction: () => ({ mutate: completeMutate, isPending: false }),
   useCancelProduction: () => ({ mutate: vi.fn(), isPending: false }),
+  useStartProduction: () => ({ mutate: vi.fn(), isPending: false }),
+  useFinishProduction: () => ({ mutate: vi.fn(), isPending: false }),
+  useAddPortion: () => ({ mutate: vi.fn(), isPending: false }),
+  useTickStep: () => ({ mutate: vi.fn(), isPending: false }),
   useReverseProduction: () => ({ mutate: reverseMutate, isPending: false }),
   useDuplicateProductionOrder: () => ({
     mutate: duplicateMutate,

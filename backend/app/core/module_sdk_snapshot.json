@@ -3535,6 +3535,16 @@
         }
       ]
     },
+    "register_work_in_progress_provider": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "provider",
+          "required": true
+        }
+      ]
+    },
     "relation_exists": {
       "kind": "function",
       "params": [

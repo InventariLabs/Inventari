@@ -1620,8 +1620,10 @@ batch yields. The first BOM of a product becomes its **Default**.
 
 - **Composition** — **Add ingredient**: the product, how much per batch, the
   unit, and under **More** a **Yield loss %** for what is lost along the way.
-  **Multi-level view** shows BOMs used inside other BOMs. **Process steps**
-  describe the work.
+  **Multi-level view** shows BOMs used inside other BOMs, and for an ingredient
+  that has a BOM of its own it says how much is on the shelf; tick **Always make
+  fresh** on it to make it every time instead of using that stock (see 12.2).
+  **Process steps** describe the work.
 - **Cost & result** — the materials at what they cost you now, fixed costs per
   batch (labour, packaging, overhead), and a **reference price** to compare
   with: a shop price (*Savings vs shop price*) or your selling price (*Margin*), as set in
@@ -1646,6 +1648,26 @@ materials used are always the full planned amount. A quantity above the plan is
 refused unless **Allow overproduction** is on in the Production settings. The run's cost is what those
 exact materials cost when they came in (FIFO), plus the fixed costs, and the
 product enters stock at that cost per unit.
+
+An ingredient that has a BOM of its own — the dough in the bread, a sauce in a
+dish — is taken from its own stock first, and only what the stock does not
+cover is made from its BOM. The preview, the shortage list and the run itself
+all work out the same split, so a run is not short of flour for dough that is
+already on the shelf. Tick **Always make fresh** on the line in the multi-level
+view to make that ingredient every time.
+
+**Start run** is for work that takes days — wine, cheese, beer, ferments. It
+takes the materials off the shelves on the day you name and leaves the run **In
+progress**; the run shows in To do until it is finished. Under **Output so far**,
+**Add portion** puts part of the output on the shelf with its own day and batch
+(bottling part of a vat), and the **Steps** of the BOM are ticked with the day
+each was done. **Finish run** takes the quantity the whole run made, portions
+included, and the day it closed; the run's cost is what the start took plus the
+fixed costs, divided by everything that came out; the cost the portions did not carry lands on what is put on the shelf at the finish, or on the portions already on the shelf when they hold the whole output. Portions made of ingredients that were never priced read as not yet valued until the finish, which puts the run's cost on them; they are not valued at what older bottles of the same product cost. A part of the cost whose bottles were sold before the run closed has nowhere to go; the run says under its cost how much of it is no longer in stock, and closes anyway. What a run in progress took is
+still counted in the stock value, so the warehouse does not look poorer while
+the batch matures. **Cancel run** on a run in progress gives the materials back
+to the batches they came from — unless it has already put portions on the
+shelf, in which case finish it instead.
 
 ![A finished production run in dark mode: 11.4 kg of plum butter made from a 12 kg plan with 0.6 kg of scrap, a total cost of $95.36 and a margin of $109.90, the damson plums, sugar and cinnamon it consumed at their FIFO cost, and the stock moves it made](images/production-run-dark.webp)
 
@@ -1683,6 +1705,9 @@ A finished run shows its batch with the day it was made and its best-before:
   it to A4.
 - **Put on hold** stops the batch from being used — no run, pick or dispatch
   takes from it — until **Release**. The reason goes into the batch's history.
+  A run filled in portions can have several batches, one per name its portions
+  were put under: the page lists them all, each with a button for its own
+  labels, and a hold and a release act on all of them.
 - **Photos and files** — **Add a file** files a photo or a document under the
   run, up to 10 MB, in the types a product's attachments take.
 

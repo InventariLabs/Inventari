@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import (
     AuditAction,
     AuditTargetType,
+    StockLotDTO,
     SystemPermission,
     UserContextDTO,
 )
@@ -144,6 +145,17 @@ async def plan_ingredient_batches(
     )
 
 
+def _output_batches_read(lots: list[StockLotDTO]) -> OutputBatchRead:
+    """The answer of a hold or a release: the run's own batch, then all of them."""
+    own = lots[0]
+    return OutputBatchRead(
+        lot_id=own.id,
+        lot_name=own.name,
+        status=own.status,
+        batches=output_batch.run_batch_reads(lots),
+    )
+
+
 @router.post(
     '/orders/{order_id}/hold',
     response_model=OutputBatchRead,
@@ -157,11 +169,11 @@ async def hold_output_batch(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> OutputBatchRead:
-    """Put the run's output batch on hold until it is released."""
-    lot = await output_batch.hold_output_async(
+    """Put every batch of the run's output on hold until it is released."""
+    lots = await output_batch.hold_output_async(
         db, org_id, order_id, current_user, data.reason
     )
-    return OutputBatchRead(lot_id=lot.id, lot_name=lot.name, status=lot.status)
+    return _output_batches_read(lots)
 
 
 @router.post(
@@ -176,9 +188,9 @@ async def release_output_batch(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> OutputBatchRead:
-    """Release the run's held output batch back into use."""
-    lot = await output_batch.release_output_async(db, org_id, order_id, current_user)
-    return OutputBatchRead(lot_id=lot.id, lot_name=lot.name, status=lot.status)
+    """Release the run's held output batches back into use."""
+    lots = await output_batch.release_output_async(db, org_id, order_id, current_user)
+    return _output_batches_read(lots)
 
 
 @router.get('/orders/{order_id}/record', response_model=BatchRecordRead)

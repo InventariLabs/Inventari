@@ -9,6 +9,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.contracts import UserContextDTO
 from app.core.cost_estimates import UnitCostEstimate
 from app.core.public_api._access import reads, writes
 
@@ -69,8 +70,9 @@ class CoreValuationAPI:
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
-    ) -> None:
-        """Record a receipt into the cost history.
+        unpriced_stays_unknown: bool = False,
+    ) -> UUID | None:
+        """Record a receipt into the cost history; answers the layer it opened.
 
         Pass ``currency`` when the price came in one — a supplier's, say.
         Left out, the layer is written in the organization's own, which is
@@ -97,10 +99,16 @@ class CoreValuationAPI:
         and insurance. It is added to the cost the line has - the stated price,
         or the organization's rate where nobody stated one - and never turns
         an unpriced line into a stated one.
+
+        Pass ``unpriced_stays_unknown`` where ``unit_cost=None`` should not
+        borrow the organization's rate for the product: the layer is posted
+        ``unknown`` and waits for the caller to state its cost
+        (``add_value_to_layer_async``) — the portion of a production run that
+        is filled before the run's cost is known.
         """
         from app.services.valuation_service import ValuationService
 
-        await ValuationService.record_receipt_by_id_async(
+        layer = await ValuationService.record_receipt_by_id_async(
             db,
             organization_id,
             product_template_id,
@@ -111,7 +119,56 @@ class CoreValuationAPI:
             document_date=document_date,
             reverses_line_id=reverses_line_id,
             extra_unit_cost=extra_unit_cost,
+            unpriced_stays_unknown=unpriced_stays_unknown,
         )
+        return layer.id if layer is not None else None
+
+    @writes
+    async def add_value_to_layer_async(
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        layer_id: UUID,
+        amount: Decimal,
+        *,
+        user: UserContextDTO,
+    ) -> Decimal:
+        """Put more value on a receipt layer that is already on the books.
+
+        For a cost that is only known after the goods were received — the
+        corks and labour of a production run whose bottles were put on the
+        shelf before it closed. *amount* is the value of the whole receipt;
+        only the part that belongs to the units still on the layer goes on
+        it, because the units that left took their cost with them. Answers
+        what was placed — zero when nothing of the layer is left, it was
+        already given a cost this way (a receipt's cost is closed once), or
+        the layer is not this organization's.
+
+        The cost dates from now: a report about an earlier instant reads the
+        layer as it was. A layer that carried no cost, because nobody priced
+        the goods, has a stated one from then on.
+        """
+        from app.core.contracts import AuditAction, AuditTargetType
+        from app.core.public_api import core_api
+        from app.services.valuation_service import ValuationService
+
+        placed, template_id = await ValuationService.add_value_to_layer_async(
+            db, organization_id, layer_id, amount
+        )
+        if template_id is not None and placed > 0:
+            # The cost of the product's stock went up by an act nobody can read
+            # off a receipt: say what was added, and on whose word.
+            await core_api.audit_log.log_action_async(
+                db,
+                organization_id=organization_id,
+                user_id=user.id,
+                action=AuditAction.UPDATE,
+                target_type=AuditTargetType.PRODUCT_TEMPLATE,
+                target_id=template_id,
+                snapshot={'cost_added': str(placed)},
+                reason='receipt_cost_added',
+            )
+        return placed
 
     @writes
     async def record_unpriced_receipt_async(

@@ -11,6 +11,7 @@ nothing was recorded in is more dangerous than one that names the boundary.
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, time
+from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -27,6 +28,7 @@ from app.core.deps import (
 )
 from app.core.exceptions import catalogue_refusal
 from app.core.public_api import core_api
+from app.core.work_in_progress import work_in_progress_value_async
 from app.core.xlsx_export import to_xlsx_response
 from app.i18n.service import get_current_lang
 from app.services.analytics._common import (
@@ -108,6 +110,14 @@ async def _build_report(
         search=search,
     )
     organization = await core_api.organizations.get_async(db, org_id)
+    # What a started production run still holds is the organization's on that
+    # date, though its ingredients already left the layers. It has no shelf, so
+    # a report narrowed to one location does not include it.
+    in_production = (
+        await work_in_progress_value_async(db, org_id, as_of)
+        if page.total_value is not None and location_id is None and not search
+        else Decimal('0')
+    )
 
     report = StockAsOfReportDTO(
         as_of=as_of,
@@ -117,7 +127,10 @@ async def _build_report(
         currency=org_currency,
         value_source=VALUE_FROM_LAYERS if page.total_value is not None else None,
         excluded_currency_rows=page.excluded,
-        total_value=page.total_value,
+        total_value=(
+            page.total_value + in_production if page.total_value is not None else None
+        ),
+        work_in_progress_value=in_production if in_production else None,
         items=page.rows,
         total=page.total,
         limit=limit,

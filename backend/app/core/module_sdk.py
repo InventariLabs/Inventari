@@ -128,6 +128,7 @@ from app.core.upload_validation import (
     UploadMessages,
     UploadPolicy,
 )
+from app.core.work_in_progress import register_work_in_progress_provider
 from app.database import Base as CoreModelBase
 from app.i18n.service import get_current_lang, get_module_error_message
 from app.schemas.pagination import (
@@ -226,6 +227,7 @@ __all__ = [
     'record_settings',
     'register_api_key_scope',
     'register_lot_trace_source',
+    'register_work_in_progress_provider',
     'relation_exists',
     'require_module',
     'require_org',

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test/utils";
+import { act, fireEvent, render, screen } from "@/test/utils";
 import {
   OutputBatchCard,
   labelsForRun,
@@ -11,6 +11,11 @@ const mocks = vi.hoisted(() => ({
   hold: vi.fn(),
   release: vi.fn(),
   canManage: true,
+  toastSuccess: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: { success: mocks.toastSuccess, error: vi.fn() },
 }));
 
 vi.mock("@/hooks/useActiveProfile", () => ({
@@ -88,6 +93,14 @@ describe("OutputBatchCard", () => {
     expect(mocks.hold).toHaveBeenCalledWith("Cloudy", expect.anything());
   });
 
+  it("asks about one batch when the run holds one", () => {
+    render(<OutputBatchCard order={run} />);
+
+    fireEvent.click(screen.getByTestId("maker-hold-batch"));
+
+    expect(screen.getByText("Put this batch on hold?")).toBeInTheDocument();
+  });
+
   it("offers a release for a batch on hold, and no second hold", () => {
     render(
       <OutputBatchCard order={{ ...run, output_lot_status: "quarantined" }} />,
@@ -115,6 +128,137 @@ describe("OutputBatchCard", () => {
     render(<OutputBatchCard order={{ ...run, output_lot_id: null }} />);
 
     expect(screen.queryByTestId("maker-output-batch-card")).toBeNull();
+  });
+});
+
+const filledInPortions = {
+  ...run,
+  actual_qty: "12",
+  output_lot_id: "lot-a",
+  output_lot_name: "WA",
+  output_batches: [
+    {
+      lot_id: "lot-a",
+      lot_name: "WA",
+      status: "active",
+      best_before: "2026-05-01",
+    },
+    {
+      lot_id: "lot-b",
+      lot_name: "WB",
+      status: "active",
+      best_before: "2026-06-01",
+    },
+    {
+      lot_id: "lot-c",
+      lot_name: "WC",
+      status: "active",
+      best_before: null,
+    },
+  ],
+} as unknown as ProductionOrder;
+
+describe("OutputBatchCard for a run filled in portions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    profile.seed_profile = "clean_core";
+    mocks.canManage = true;
+  });
+
+  it("names every batch the output was filed under, each with its own date", () => {
+    render(<OutputBatchCard order={filledInPortions} />);
+
+    const list = screen.getByTestId("maker-output-batches");
+    expect(list).toHaveTextContent("WA");
+    expect(list).toHaveTextContent("WB");
+    expect(list).toHaveTextContent("WC");
+    expect(screen.queryByTestId("maker-output-batch-code")).toBeNull();
+  });
+
+  it("prints the labels of one batch at a time, the units spread over them", () => {
+    render(<OutputBatchCard order={filledInPortions} />);
+
+    // The label sheet takes one batch: each one has its own button.
+    expect(screen.getAllByTestId("maker-print-batch-labels")).toHaveLength(3);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Print batch labels: WB" }),
+    );
+
+    expect(screen.getByTestId("label-sheet")).toHaveTextContent("lot-b|4|");
+  });
+
+  it("offers a hold while one batch is not held, and a release while one is", () => {
+    const mixed = {
+      ...filledInPortions,
+      output_batches: filledInPortions.output_batches?.map((batch, index) =>
+        index === 0 ? { ...batch, status: "quarantined" } : batch,
+      ),
+    } as ProductionOrder;
+    render(<OutputBatchCard order={mixed} />);
+
+    expect(screen.getByTestId("maker-hold-batch")).toBeInTheDocument();
+    expect(screen.getByTestId("maker-release-batch")).toBeInTheDocument();
+  });
+
+  it("asks about the batches, not about one, when the run holds several", () => {
+    render(<OutputBatchCard order={filledInPortions} />);
+
+    fireEvent.click(screen.getByTestId("maker-hold-batch"));
+
+    expect(screen.getByText("Put these batches on hold?")).toBeInTheDocument();
+  });
+
+  it("says the batches are on hold once it is done", () => {
+    render(<OutputBatchCard order={filledInPortions} />);
+    fireEvent.click(screen.getByTestId("maker-hold-batch"));
+    fireEvent.change(screen.getByTestId("maker-hold-reason"), {
+      target: { value: "Cloudy" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Put on hold" }));
+
+    act(() => mocks.hold.mock.calls[0][1].onSuccess());
+
+    expect(mocks.toastSuccess).toHaveBeenCalledWith(
+      expect.stringMatching(/^The batches are on hold/),
+    );
+  });
+
+  it("counts only the batches that were on hold when it says they are released", () => {
+    const held = (count: number) =>
+      ({
+        ...filledInPortions,
+        output_batches: filledInPortions.output_batches?.map((batch, index) =>
+          index < count ? { ...batch, status: "quarantined" } : batch,
+        ),
+      }) as ProductionOrder;
+    const { unmount } = render(<OutputBatchCard order={held(1)} />);
+    fireEvent.click(screen.getByTestId("maker-release-batch"));
+    mocks.release.mock.calls[0][1].onSuccess();
+    expect(mocks.toastSuccess).toHaveBeenLastCalledWith(
+      expect.stringMatching(/^The batch is released/),
+    );
+    unmount();
+
+    render(<OutputBatchCard order={held(2)} />);
+    fireEvent.click(screen.getByTestId("maker-release-batch"));
+    mocks.release.mock.calls[1][1].onSuccess();
+    expect(mocks.toastSuccess).toHaveBeenLastCalledWith(
+      expect.stringMatching(/^The batches are released/),
+    );
+  });
+
+  it("offers only a release once every batch is held", () => {
+    const held = {
+      ...filledInPortions,
+      output_batches: filledInPortions.output_batches?.map((batch) => ({
+        ...batch,
+        status: "quarantined",
+      })),
+    } as ProductionOrder;
+    render(<OutputBatchCard order={held} />);
+
+    expect(screen.queryByTestId("maker-hold-batch")).toBeNull();
+    expect(screen.getByTestId("maker-release-batch")).toBeInTheDocument();
   });
 });
 

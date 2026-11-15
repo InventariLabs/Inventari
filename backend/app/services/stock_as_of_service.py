@@ -61,7 +61,11 @@ from app.core.money import quantise
 from app.models.item import Item
 from app.models.product_template import ProductTemplate
 from app.models.stock_move import StockMove, StockMoveState
-from app.models.stock_valuation_layer import StockValuationLayer, layer_dated_at
+from app.models.stock_valuation_layer import (
+    CostBasis,
+    StockValuationLayer,
+    layer_dated_at,
+)
 from app.models.uom import Uom
 from app.services.stock_quants_service import searched_products
 from app.services.storage._queries import descendant_ids_async
@@ -254,6 +258,11 @@ def _values_as_of(organization_id: UUID, as_of: datetime, org_currency: str) -> 
     a product is worth what its priced layers still hold on the date, which
     is the figure the dashboard and the list footer give for the same layers.
 
+    A layer that took a cost after it was posted — a production run's corks
+    and labour, known when the run closed — reads what it was worth before
+    that moment for an instant earlier than it (``revalued_at``): the report
+    about an instant says the same on the day it is asked and a month later.
+
     Layers are cut on the date they are about — their document's date, and
     their write date only when there is no document — so a receipt booked
     today for last week lands in last week, on both sides of the report.
@@ -276,12 +285,20 @@ def _values_as_of(organization_id: UUID, as_of: datetime, org_currency: str) -> 
         .group_by(layer.product_template_id)
         .subquery('delivered')
     )
+    # A cost added to a receipt after it was posted (``revalued_at``) is not in
+    # the past: for an instant before it the layer reads what it did then.
+    not_yet_revalued = layer.revalued_at > as_of
     receipts = (
         select(
             layer.product_template_id,
             layer.quantity,
-            layer.unit_cost,
-            layer.carries_a_cost.label('priced'),
+            case(
+                (not_yet_revalued, layer.unit_cost_before), else_=layer.unit_cost
+            ).label('unit_cost'),
+            case(
+                (not_yet_revalued, layer.cost_basis_before != CostBasis.UNKNOWN),
+                else_=layer.carries_a_cost,
+            ).label('priced'),
             func.sum(layer.quantity)
             .over(
                 partition_by=layer.product_template_id,

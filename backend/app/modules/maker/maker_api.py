@@ -114,7 +114,8 @@ class MakerAPI:
         organization_id: UUID,
         query: WorkItemQueryDTO,
     ) -> tuple[list[WorkItemDTO], int]:
-        """Draft production runs planned for ``query.date_to`` or earlier.
+        """Draft production runs planned for ``query.date_to`` or earlier, and
+        every run that was started and is not finished.
 
         To do's provider for this module. A run with no planned day is not
         work for any particular day and stays out. Oldest day first;
@@ -132,10 +133,12 @@ class MakerAPI:
             ProductionOrder.production_date.is_not(None),
             ProductionOrder.production_date <= query.date_to,
         )
-        wanted = planned
+        # A run that was started is work until it is finished, whatever day
+        # it was planned for.
+        wanted = or_(planned, ProductionOrder.status == 'IN_PROGRESS')
         if query.done_since is not None:
             wanted = or_(
-                planned,
+                wanted,
                 and_(
                     ProductionOrder.status == 'COMPLETED',
                     ProductionOrder.completed_at >= query.done_since,
@@ -173,7 +176,13 @@ class MakerAPI:
                 kind='produce',
                 source_kind='production_order',
                 source_id=order.id,
-                state='done' if order.status == 'COMPLETED' else 'todo',
+                state=(
+                    'done'
+                    if order.status == 'COMPLETED'
+                    else 'in_progress'
+                    if order.status == 'IN_PROGRESS'
+                    else 'todo'
+                ),
                 due_date=order.production_date,
                 number=order.number,
                 subject=order.output_template.name,

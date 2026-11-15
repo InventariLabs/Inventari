@@ -112,6 +112,7 @@ vi.mock("@/modules/maker/components/ProductSearchInput", () => ({
 const line: BomLine = {
   id: "line-1",
   organization_id: "org-1",
+  recipe_id: "recipe-1",
   parent_template_id: "tpl-1",
   child_template_id: "tpl-oats",
   child_template_name: "Oats",
@@ -119,6 +120,7 @@ const line: BomLine = {
   uom_id: "uom-kg",
   unit: "kg",
   yield_loss_pct: "0.00",
+  make_fresh: false,
   notes: null,
   created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",

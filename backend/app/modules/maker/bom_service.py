@@ -10,7 +10,7 @@ The legacy ``parent_template_id`` column is kept as a denormalised copy of
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Awaitable, Callable, Iterable
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -23,6 +23,7 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 
 from .models import BoMLine, MakerRecipe
+from .stock_first import StockPool
 
 _MAX_DEPTH = 10
 
@@ -347,6 +348,8 @@ async def explode_with_uom(
     organization_id: UUID,
     template_id: UUID,
     qty: Decimal,
+    *,
+    pool: StockPool | None = None,
 ) -> list[tuple[UUID, Decimal, str, UUID | None]]:
     """Like :func:`explode` but keeps each leaf's line ``uom_id``.
 
@@ -360,7 +363,7 @@ async def explode_with_uom(
     if recipe is None:
         return []
     return await _explode_recipe(
-        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None
+        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None, pool=pool
     )
 
 
@@ -393,6 +396,8 @@ async def explode_by_recipe_with_uom(
     organization_id: UUID,
     recipe_id: UUID,
     qty: Decimal,
+    *,
+    pool: StockPool | None = None,
 ) -> list[tuple[UUID, Decimal, str, UUID | None]]:
     """Like ``explode_by_recipe`` but keeps each leaf's line ``uom_id``.
 
@@ -402,15 +407,49 @@ async def explode_by_recipe_with_uom(
     """
     recipe = await resolve_recipe(db, organization_id, recipe_id)
     return await _explode_recipe(
-        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None
+        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None, pool=pool
     )
+
+
+async def exploder_for(
+    db: AsyncSession, organization_id: UUID, recipe: MakerRecipe
+) -> Callable[
+    [Decimal, StockPool | None], Awaitable[list[tuple[UUID, Decimal, str, UUID | None]]]
+]:
+    """An explosion of one recipe that can be asked again without the database.
+
+    The child recipes are resolved once, so a caller that asks for many
+    quantities — the search for how many batches the shelf supports — pays
+    for the walk only, not for a round of lookups per question.
+    """
+    child_cache = await _warm_child_cache(db, organization_id, [recipe])
+
+    async def explode(
+        qty: Decimal, pool: StockPool | None
+    ) -> list[tuple[UUID, Decimal, str, UUID | None]]:
+        return await _explode_recipe(
+            db,
+            organization_id,
+            recipe,
+            qty,
+            depth=0,
+            _seen=None,
+            _child_cache=child_cache,
+            pool=pool,
+        )
+
+    return explode
 
 
 async def explode_by_recipes_with_uom(
     db: AsyncSession,
     organization_id: UUID,
-    plans: Iterable[tuple[UUID, Decimal]],
-) -> dict[tuple[UUID, Decimal], list[tuple[UUID, Decimal, str, UUID | None]]]:
+    plans: Iterable[tuple[UUID, Decimal, UUID | None]],
+    *,
+    pools: dict[UUID | None, StockPool] | None = None,
+) -> dict[
+    tuple[UUID, Decimal, UUID | None], list[tuple[UUID, Decimal, str, UUID | None]]
+]:
     """Explode many ``(recipe, output quantity)`` plans in one round of queries.
 
     The per-recipe exploder pays a recipe read, a lines load and a
@@ -423,12 +462,16 @@ async def explode_by_recipes_with_uom(
     per-batch need is not exact when its yield does not divide it, so a
     need scaled from a one-batch explosion would carry that noise. A plan
     whose recipe this organization does not have gets no entry.
+
+    A plan is ``(recipe, output quantity, stock scope)``; *pools* maps a scope
+    to the stock an intermediate is taken from, and each plan spends its own
+    fork of it — the plans of a page are independent questions, not one run.
     """
     wanted = list(dict.fromkeys(plans))
     if not wanted:
         return {}
     stmt = select(MakerRecipe).where(
-        MakerRecipe.id.in_({recipe_id for recipe_id, _qty in wanted}),
+        MakerRecipe.id.in_({recipe_id for recipe_id, _qty, _scope in wanted}),
         MakerRecipe.organization_id == organization_id,
     )
     tops = {recipe.id: recipe for recipe in (await db.scalars(stmt)).all()}
@@ -438,7 +481,7 @@ async def explode_by_recipes_with_uom(
     child_cache = await _warm_child_cache(db, organization_id, tops.values())
 
     return {
-        (recipe_id, qty): await _explode_recipe(
+        (recipe_id, qty, scope): await _explode_recipe(
             db,
             organization_id,
             tops[recipe_id],
@@ -446,8 +489,9 @@ async def explode_by_recipes_with_uom(
             depth=0,
             _seen=None,
             _child_cache=child_cache,
+            pool=pools[scope].fork() if pools is not None and scope in pools else None,
         )
-        for recipe_id, qty in wanted
+        for recipe_id, qty, scope in wanted
         if recipe_id in tops
     }
 
@@ -461,7 +505,16 @@ async def _explode_recipe(
     depth: int,
     _seen: set[UUID] | None,
     _child_cache: dict[UUID, MakerRecipe | None] | None = None,
+    pool: StockPool | None = None,
 ) -> list[tuple[UUID, Decimal, str, UUID | None]]:
+    """Flatten one recipe at *qty* of its output.
+
+    With a *pool*, an ingredient that has a recipe of its own is taken from
+    its stock first: what the shelf covers is a leaf at that ingredient, and
+    only the rest is exploded through its recipe. A line marked ``make_fresh``
+    never asks the pool. Without a pool every sub-assembly is exploded whole,
+    as the catalogue's formula cost reads it.
+    """
     # Depth is reachable: nothing bounds nesting on the write side (unlike
     # cycles, which ``ensure_no_cycle`` refuses at every door), so a chain
     # built past the limit refuses in the reader's language here and in
@@ -496,6 +549,14 @@ async def _explode_recipe(
         )
         child_recipes = dict(found)
 
+    if pool is not None:
+        await pool.ensure(
+            line.child_template_id
+            for line in recipe.lines
+            if child_recipes.get(line.child_template_id) is not None
+            and not line.make_fresh
+        )
+
     flat: list[tuple[UUID, Decimal, str, UUID | None]] = []
     for line in recipe.lines:
         # The division by the batch yield comes last: planned 5 of a recipe
@@ -510,6 +571,13 @@ async def _explode_recipe(
         )
         child_recipe = child_recipes.get(line.child_template_id)
         if child_recipe is not None:
+            if pool is not None and not line.make_fresh:
+                taken = pool.take(line.child_template_id, effective_qty, line.uom_id)
+                if taken > 0:
+                    flat.append((line.child_template_id, taken, line.unit, line.uom_id))
+                effective_qty -= taken
+                if effective_qty <= 0:
+                    continue
             sub = await _explode_recipe(
                 db,
                 organization_id,
@@ -518,6 +586,7 @@ async def _explode_recipe(
                 depth=depth + 1,
                 _seen=seen_with_self,
                 _child_cache=_child_cache,
+                pool=pool,
             )
             if sub:
                 flat.extend(sub)
@@ -714,6 +783,8 @@ async def explode_in_stock_units(
     template_id: UUID,
     qty: Decimal,
     recipe_id: UUID | None = None,
+    *,
+    pool: StockPool | None = None,
 ) -> list[tuple[UUID, Decimal, str]]:
     """Explode a bill of materials and answer in each ingredient's stock unit.
 
@@ -728,8 +799,8 @@ async def explode_in_stock_units(
     answer for everything downstream of a formula.
     """
     flat = (
-        await explode_by_recipe_with_uom(db, organization_id, recipe_id, qty)
+        await explode_by_recipe_with_uom(db, organization_id, recipe_id, qty, pool=pool)
         if recipe_id is not None
-        else await explode_with_uom(db, organization_id, template_id, qty)
+        else await explode_with_uom(db, organization_id, template_id, qty, pool=pool)
     )
     return await _in_stock_units(db, organization_id, flat)

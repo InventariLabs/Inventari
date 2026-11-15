@@ -408,6 +408,7 @@
         "copied_from_builtin": "Copié depuis un modèle intégré",
         "copied_from_culinary_recipe": "Copié depuis une recette",
         "cost": "Coût",
+        "cost_added": "Coût ajouté",
         "cost_line": "Ligne de coût",
         "cost_line_added": "Ligne de coût ajoutée",
         "cost_line_removed": "Ligne de coût retirée",
@@ -651,7 +652,12 @@
         "shelf_life_days_before": "Durée de conservation avant (jours)",
         "shelf_life_days_after": "Durée de conservation après (jours)",
         "typed_unit_price_before": "Prix saisi avant",
-        "typed_unit_price_after": "Prix saisi après"
+        "typed_unit_price_after": "Prix saisi après",
+        "done_on": "Fait le",
+        "make_fresh": "Toujours fabriquer frais",
+        "material_cost": "Coût des matières prélevées",
+        "started_on": "Démarré le",
+        "step": "Étape"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",

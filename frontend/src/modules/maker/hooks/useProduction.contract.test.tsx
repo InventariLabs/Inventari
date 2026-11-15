@@ -5,11 +5,13 @@ import type { ReactNode } from "react";
 import { recordRequests } from "@/test/requestLog";
 import { queryKeys } from "@/hooks/queries/keys";
 import {
+  useAddPortion,
   useAddShortagesToShoppingList,
   useCancelProduction,
   useCompleteProduction,
   useCreateProductionOrder,
   useDuplicateProductionOrder,
+  useFinishProduction,
   useMakerMonthlyResult,
   useOrderStockMoves,
   useProductionOrder,
@@ -17,6 +19,8 @@ import {
   useProductionPreview,
   useRecordMadeProduction,
   useReverseProduction,
+  useStartProduction,
+  useTickStep,
   useUpdateProductionOrder,
 } from "./useProduction";
 
@@ -176,6 +180,46 @@ describe("production writes", () => {
       "o1",
       { method: "POST", path: "/maker/production/orders/o1/reverse" },
     ],
+    [
+      "useStartProduction",
+      useStartProduction,
+      { orderId: "o1", data: { started_on: "2026-11-10" } },
+      {
+        method: "POST",
+        path: "/maker/production/orders/o1/start",
+        body: { started_on: "2026-11-10" },
+      },
+    ],
+    [
+      "useAddPortion",
+      useAddPortion,
+      { orderId: "o1", data: { qty: "2", output_lot_name: "B1" } },
+      {
+        method: "POST",
+        path: "/maker/production/orders/o1/portions",
+        body: { qty: "2", output_lot_name: "B1" },
+      },
+    ],
+    [
+      "useFinishProduction",
+      useFinishProduction,
+      { orderId: "o1", data: { actual_qty: "4", finished_on: "2026-11-12" } },
+      {
+        method: "POST",
+        path: "/maker/production/orders/o1/finish",
+        body: { actual_qty: "4", finished_on: "2026-11-12" },
+      },
+    ],
+    [
+      "useTickStep",
+      useTickStep,
+      { orderId: "o1", index: 1, doneOn: "2026-11-11" },
+      {
+        method: "PUT",
+        path: "/maker/production/orders/o1/steps/1",
+        body: { done_on: "2026-11-11" },
+      },
+    ],
   ];
 
   it.each(cases)(
@@ -200,6 +244,13 @@ describe("production writes", () => {
     ["completing", () => useCompleteProduction(), { orderId: "o1" }],
     ["recording a run made", () => useRecordMadeProduction(), draft],
     ["reversing", () => useReverseProduction(), "o1"],
+    ["starting", () => useStartProduction(), { orderId: "o1" }],
+    [
+      "putting a portion of",
+      () => useAddPortion(),
+      { orderId: "o1", data: { qty: "1" } },
+    ],
+    ["finishing", () => useFinishProduction(), { orderId: "o1" }],
   ])(
     "%s a run refreshes the stock screens it wrote to",
     async (_n, hook, vars) => {
@@ -215,6 +266,16 @@ describe("production writes", () => {
       ).toBe(true);
     },
   );
+
+  it("refreshes the stock screens when a run that took ingredients is cancelled", async () => {
+    recordRequests(() => ({ id: "o1", material_cost: "12.00" }));
+    seed(queryKeys.stockQuants.all);
+    const { result } = renderHook(() => useCancelProduction(), { wrapper });
+    await act(() => result.current.mutateAsync({ orderId: "o1" }));
+    expect(client.getQueryState(queryKeys.stockQuants.all)?.isInvalidated).toBe(
+      true,
+    );
+  });
 
   it("leaves the stock screens alone when a run is only cancelled", async () => {
     recordRequests(() => order);

@@ -7521,6 +7521,35 @@
     "valuation": {
       "class": "CoreValuationAPI",
       "methods": {
+        "add_value_to_layer_async": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "layer_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "amount",
+              "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "user",
+              "required": true
+            }
+          ]
+        },
         "estimate_unit_cost_async": {
           "params": [
             {
@@ -7691,6 +7720,11 @@
             {
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "extra_unit_cost",
+              "required": false
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "unpriced_stays_unknown",
               "required": false
             }
           ]

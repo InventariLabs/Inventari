@@ -19,16 +19,19 @@ export default function BatchRecordPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const { setHeader } = useModulePageHeader();
   const { data: record, isLoading, error, refetch } = useBatchRecord(orderId);
+  const batchNames = record?.output_batches?.length
+    ? record.output_batches.map((batch) => batch.lot_name).join(", ")
+    : record?.output_lot_name;
 
   useEffect(() => {
     setHeader({
       title: t("record.title"),
-      subtitle: record?.output_lot_name
-        ? t("record.subtitle", { batch: record.output_lot_name })
+      subtitle: batchNames
+        ? t("record.subtitle", { batch: batchNames })
         : undefined,
       backTo: orderId ? `/maker/production/${orderId}` : "/maker/production",
     });
-  }, [record, orderId, t, setHeader]);
+  }, [batchNames, orderId, t, setHeader]);
 
   if (error && isNotFoundError(error)) {
     return (

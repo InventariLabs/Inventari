@@ -16,6 +16,7 @@ from app.core.deps import (
     require_permission,
 )
 from app.core.exceptions import (
+    ForbiddenException,
     NotFoundException,
     UnprocessableException,
     map_service_errors,
@@ -37,11 +38,17 @@ from ._schemas_production import (
     ProductionOrderCancel,
     ProductionOrderComplete,
     ProductionOrderCreate,
+    ProductionOrderFinish,
     ProductionOrderLineRead,
     ProductionOrderListResponse,
     ProductionOrderRead,
+    ProductionOrderStart,
     ProductionOrderUpdate,
+    ProductionPortionCreate,
+    ProductionPortionRead,
     ProductionPreviewResponse,
+    ProductionStepRead,
+    ProductionStepTick,
     ProductionStockMoveRead,
     ShortageItemRead,
     ShortageShoppingListResponse,
@@ -53,7 +60,7 @@ from .exceptions import (
     ShortageError,
     ShortageWarningError,
 )
-from .models import ProductionOrder, ProductionOrderLine
+from .models import ProductionOrder, ProductionOrderLine, ProductionPortion
 
 router = APIRouter(prefix='/production', tags=['maker'])
 
@@ -125,9 +132,15 @@ async def _read_with_uom(
         db, org_id, [order]
     )
     items = shortage_signals.get(order.id)
+    portions = (
+        await production_service.list_portions(db, org_id, order.id)
+        if order.status in ('IN_PROGRESS', 'COMPLETED', 'REVERSED')
+        else []
+    )
     read = _to_read(
         order,
         lines=lines,
+        portions=portions,
         produced_item_name=produced_item_name,
         output_uom_symbol=symbols.get(order.output_template_id),
         shortage_count=len(items) if items is not None else None,
@@ -145,10 +158,13 @@ async def _read_with_uom(
         )
     }
     if order.output_lot_id is not None:
-        lot = await core_api.stock.get_lot_detail_async(db, org_id, order.output_lot_id)
-        if lot is not None:
-            batch['output_lot_status'] = lot.status
-            batch['best_before'] = lot.expiry_date or lot.use_by_date
+        lots = await output_batch.lots_of_run_async(db, org_id, order)
+        batch['output_batches'] = output_batch.run_batch_reads(lots)
+        if lots:
+            # The run's own batch, first of them: what a screen that speaks of
+            # one batch reads.
+            batch['output_lot_status'] = lots[0].status
+            batch['best_before'] = lots[0].expiry_date or lots[0].use_by_date
     return read.model_copy(update=batch)
 
 
@@ -159,6 +175,7 @@ def _to_read(
     output_uom_symbol: str | None = None,
     shortage_count: int | None = None,
     shortage_items: list[ShortageItemRead] | None = None,
+    portions: list[ProductionPortion] | None = None,
 ) -> ProductionOrderRead:
     line_rows = lines if lines is not None else []
     return ProductionOrderRead(
@@ -202,6 +219,13 @@ def _to_read(
         result_per_unit=order.result_per_unit,
         result_per_batch=order.result_per_batch,
         lines=[ProductionOrderLineRead.model_validate(line) for line in line_rows],
+        started_on=order.started_on,
+        material_cost=order.material_cost,
+        unshelved_cost=order.unshelved_cost,
+        steps=[ProductionStepRead.model_validate(step) for step in order.steps or []],
+        portions=[
+            ProductionPortionRead.model_validate(portion) for portion in portions or []
+        ],
     )
 
 
@@ -477,6 +501,129 @@ async def complete_production_order(
     return await _read_with_uom(db, org_id, order)
 
 
+async def _read_after(
+    db: AsyncSession, org_id: UUID, order: ProductionOrder
+) -> ProductionOrderRead:
+    """The run as the page reads it after a step moved it — lines and names too."""
+    await db.refresh(order)
+    lines = await production_service.list_lines(db, org_id, order.id)
+    await _attach_child_names(db, org_id, lines)
+    await _attach_source_location_names(db, org_id, lines)
+    return await _read_with_uom(db, org_id, order, lines=lines)
+
+
+@router.post(
+    '/orders/{order_id}/start',
+    response_model=ProductionOrderRead,
+)
+@map_service_errors
+async def start_production_order(
+    order_id: UUID,
+    data: ProductionOrderStart = ProductionOrderStart(),
+    # Starting takes the ingredients off their records, as completing does.
+    _: object = require_permission(SystemPermission.ITEMS_WRITE),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> ProductionOrderRead:
+    """Start a DRAFT order: take its ingredients now, finish it later.
+
+    The run reads ``IN_PROGRESS`` until it is finished, in portions or at
+    once. Refuses like completion does — 422 with the shortage list when
+    the ingredients are not there, ``empty_bom`` for a recipe with no lines.
+    """
+    try:
+        order = await production_service.start_production(
+            db, org_id, order_id, current_user, started_on=data.started_on
+        )
+    except InsufficientStockError as exc:
+        raise _shortage_refusal(
+            'insufficient_stock', exc, short_at_create=exc.short_at_create
+        ) from exc
+    except EmptyBillOfMaterialsError as exc:
+        raise _empty_bom_refusal(exc) from exc
+    return await _read_after(db, org_id, order)
+
+
+@router.post(
+    '/orders/{order_id}/portions',
+    response_model=ProductionOrderRead,
+    status_code=201,
+)
+@map_service_errors
+async def record_production_portion(
+    order_id: UUID,
+    data: ProductionPortionCreate,
+    _: object = require_permission(SystemPermission.ITEMS_WRITE),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> ProductionOrderRead:
+    """Put a portion of an in-progress run's output on the shelf, on its day."""
+    await production_service.record_portion(
+        db,
+        org_id,
+        order_id,
+        current_user,
+        qty=data.qty,
+        made_on=data.made_on,
+        lot_name=data.output_lot_name,
+    )
+    order = await production_service.get_order(db, org_id, order_id)
+    if order is None:
+        raise NotFoundException('production_order', get_current_lang())
+    return await _read_after(db, org_id, order)
+
+
+@router.post(
+    '/orders/{order_id}/finish',
+    response_model=ProductionOrderRead,
+)
+@map_service_errors
+async def finish_production_order(
+    order_id: UUID,
+    data: ProductionOrderFinish = ProductionOrderFinish(),
+    _: object = require_permission(SystemPermission.ITEMS_WRITE),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> ProductionOrderRead:
+    """Finish an in-progress order: the rest of its output, its final cost.
+
+    ``actual_qty`` is what the whole run made, portions included.
+    """
+    order = await production_service.finish_production(
+        db,
+        org_id,
+        order_id,
+        current_user,
+        actual_qty=data.actual_qty,
+        finished_on=data.finished_on,
+        lot_name=data.output_lot_name,
+    )
+    return await _read_after(db, org_id, order)
+
+
+@router.put(
+    '/orders/{order_id}/steps/{index}',
+    response_model=ProductionOrderRead,
+)
+@map_service_errors
+async def tick_production_step(
+    order_id: UUID,
+    index: int,
+    data: ProductionStepTick,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> ProductionOrderRead:
+    """Mark a process step of an in-progress run done on a day (null clears it)."""
+    order = await production_service.tick_step(
+        db, org_id, order_id, index, data.done_on, current_user
+    )
+    return await _read_after(db, org_id, order)
+
+
 @router.post(
     '/orders/{order_id}/cancel',
     response_model=ProductionOrderRead,
@@ -493,6 +640,17 @@ async def cancel_production_order(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> ProductionOrderRead:
+    # A run in progress gives its ingredients back to their records, as
+    # starting it took them: items work, beside the manager's call.
+    existing = await production_service.get_order(db, org_id, order_id)
+    if (
+        existing is not None
+        and existing.status == 'IN_PROGRESS'
+        and not current_user.has_permission(SystemPermission.ITEMS_WRITE)
+    ):
+        raise ForbiddenException(
+            get_error_message('insufficient_permissions', get_current_lang())
+        )
     order = await production_service.cancel_order(
         db, org_id, order_id, current_user, reason=data.reason
     )
