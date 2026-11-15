@@ -15,7 +15,7 @@ marker (reserved for modules needing read-only Core access) does not apply here.
 import uuid
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import date
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -197,6 +197,7 @@ class ValuationService:
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
+        unpriced_stays_unknown: bool = False,
     ) -> StockValuationLayer | None:
         """Async: record receipt by template_id (Public API helper).
 
@@ -221,6 +222,7 @@ class ValuationService:
             document_date,
             reverses_line_id=reverses_line_id,
             extra_unit_cost=extra_unit_cost,
+            unpriced_stays_unknown=unpriced_stays_unknown,
         )
 
     @staticmethod
@@ -268,6 +270,7 @@ class ValuationService:
         document_date: date | None = None,
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
+        unpriced_stays_unknown: bool = False,
     ) -> StockValuationLayer | None:
         """Post a receipt layer. ``unit_cost=None`` means nobody named a price.
 
@@ -280,6 +283,12 @@ class ValuationService:
         still posted, marked ``unknown``: the quantity is real even where the
         value is not known, and "unknown" is an answer a report can act on
         where "0.00" is not.
+
+        *unpriced_stays_unknown* is for a caller that will state the cost
+        itself later (a revaluation of this layer): the layer is then posted
+        ``unknown`` whatever the rate of the older stock is, because that rate
+        is not what these goods cost and a cost added on top of it would
+        double-count.
 
         *extra_unit_cost* is the line's share of the freight, duty and
         insurance the delivery arrived with, per unit. It rides on whatever
@@ -323,8 +332,12 @@ class ValuationService:
             # fallback rate is the organization's own, kept in its own money,
             # whatever currency the document happened to be written in.
             currency = None
-            unit_cost = await ValuationService._avco_rate_async(
-                db, template, organization_id
+            unit_cost = (
+                None
+                if unpriced_stays_unknown
+                else await ValuationService._avco_rate_async(
+                    db, template, organization_id
+                )
             )
             if unit_cost is None:
                 unit_cost = Decimal('0')
@@ -384,6 +397,57 @@ class ValuationService:
         await db.flush()
 
         return svl
+
+    @staticmethod
+    async def add_value_to_layer_async(
+        db: AsyncSession,
+        organization_id: UUID,
+        layer_id: UUID,
+        amount: Decimal,
+    ) -> tuple[Decimal, UUID | None]:
+        """Raise the cost of what is left of a receipt layer by its share of *amount*.
+
+        *amount* is for the whole receipt. The units already drained left at
+        the cost they had; the units still there carry their share, spread on
+        the layer's per-unit cost. Answers what was placed (cents), zero when
+        the layer is empty, was already revalued, or is not found in this
+        organization, with the product the layer belongs to.
+
+        The cost of a receipt is closed once: the layer keeps what it read
+        before and the moment it was revalued, and a report about an earlier
+        instant reads the layer as it was. A layer nobody priced
+        (``unknown``) that takes a cost has a stated one from then on.
+        """
+        layer = await db.scalar(
+            select(StockValuationLayer)
+            .where(
+                StockValuationLayer.id == layer_id,
+                StockValuationLayer.organization_id == organization_id,
+                StockValuationLayer.direction == 'IN',
+            )
+            .with_for_update()
+        )
+        if (
+            layer is None
+            or layer.remaining_qty <= 0
+            or layer.quantity <= 0
+            or layer.revalued_at is not None
+        ):
+            return Decimal('0'), None
+        placed = quantise(amount * layer.remaining_qty / layer.quantity)
+        if placed <= 0:
+            return Decimal('0'), None
+        layer.revalued_at = datetime.now(UTC)
+        layer.unit_cost_before = layer.unit_cost
+        layer.cost_basis_before = layer.cost_basis
+        layer.unit_cost = quantise(
+            layer.unit_cost + placed / layer.remaining_qty, COST_PLACES
+        )
+        layer.total_value = layer.total_value + placed
+        if layer.cost_basis == CostBasis.UNKNOWN:
+            layer.cost_basis = CostBasis.STATED
+        await db.flush()
+        return placed, layer.product_template_id
 
     @staticmethod
     async def _avco_rate_async(

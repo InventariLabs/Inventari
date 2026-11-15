@@ -410,6 +410,7 @@
         "copied_from_builtin": "Skopiowano z szablonu wbudowanego",
         "copied_from_culinary_recipe": "Skopiowano z przepisu",
         "cost": "Koszt",
+        "cost_added": "Dodany koszt",
         "cost_line": "Pozycja kosztowa",
         "cost_line_added": "Dodana linia kosztu",
         "cost_line_removed": "Usunięta linia kosztu",
@@ -653,7 +654,12 @@
         "shelf_life_days_before": "Okres przydatności przed (dni)",
         "shelf_life_days_after": "Okres przydatności po (dni)",
         "typed_unit_price_before": "Cena wpisana przed",
-        "typed_unit_price_after": "Cena wpisana po"
+        "typed_unit_price_after": "Cena wpisana po",
+        "done_on": "Wykonano dnia",
+        "make_fresh": "Zawsze rób świeże",
+        "material_cost": "Koszt pobranych materiałów",
+        "started_on": "Rozpoczęto dnia",
+        "step": "Krok"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",

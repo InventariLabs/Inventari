@@ -16,6 +16,7 @@ moves list and the moves register show the way out and the way back together.
 
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -33,7 +34,7 @@ from app.core.contracts import (
 from app.core.exceptions import EntityNotFoundError, ServiceRejectionError
 from app.core.public_api import core_api
 
-from .models import ProductionOrder, ProductionOrderLine
+from .models import ProductionOrder, ProductionOrderLine, ProductionPortion
 
 _REFERENCE_TYPE = 'maker_production'
 
@@ -81,31 +82,9 @@ async def reverse_production(
         await core_api.organizations.today_async(db, organization_id),
     )
 
-    moves = await core_api.stock_moves.list_by_reference_async(
-        db, organization_id, _REFERENCE_TYPE, order.id, limit=10_000
-    )
-    # Every card the reversal writes, sorted, before the first write — the
-    # discipline the run itself follows on the way in.
-    await core_api.stock.lock_async(
-        db,
-        organization_id,
-        keys=sorted(
-            {(move.product_template_id, None) for move in moves}
-            | {(order.output_template_id, None)}
-        ),
-    )
-    history = {
-        'reason': 'production_run_reversed',
-        'production_order_id': str(order.id),
-        'production_order_number': order.number or str(order.id),
-    }
-    await _take_the_output_off(db, organization_id, order, user, history)
-    rates = await _ingredient_rates(db, order.id)
-    for move in moves:
-        if move.from_location_id is not None and move.to_location_id is None:
-            await _put_the_ingredient_back(
-                db, organization_id, order, move, user, history, rates
-            )
+    moves = await _lock_the_run_cards(db, organization_id, order)
+    await _take_the_outputs_off(db, organization_id, order, user)
+    await put_ingredients_back(db, organization_id, order, user, moves=moves)
 
     order.status = 'REVERSED'
     await core_api.audit_log.log_action_async(
@@ -125,20 +104,117 @@ async def reverse_production(
     return order
 
 
-async def _take_the_output_off(
+async def _lock_the_run_cards(
+    db: AsyncSession, organization_id: UUID, order: ProductionOrder
+) -> list[StockMoveDTO]:
+    """The run's movements, with every card they touch locked, sorted.
+
+    The discipline the run itself follows on the way in: every card the
+    reversal writes is locked before its first write.
+    """
+    moves = await core_api.stock_moves.list_by_reference_async(
+        db, organization_id, _REFERENCE_TYPE, order.id, limit=10_000
+    )
+    await core_api.stock.lock_async(
+        db,
+        organization_id,
+        keys=sorted(
+            {(move.product_template_id, None) for move in moves}
+            | {(order.output_template_id, None)}
+        ),
+    )
+    return moves
+
+
+async def put_ingredients_back(
     db: AsyncSession,
     organization_id: UUID,
     order: ProductionOrder,
     user: UserContextDTO,
-    history: dict[str, str],
+    *,
+    moves: list[StockMoveDTO] | None = None,
 ) -> None:
-    """Take the run's output off the record the run opened for it."""
-    made = order.actual_qty or Decimal('0')
-    produced = (
-        await core_api.items.get_for_update_async(
-            db, organization_id, order.produced_item_id
+    """Return every draw of the run to the shelf, batch and date it came from.
+
+    Read back from the movements the run wrote. Used by the way back from a
+    completed run and by cancelling a run that never finished.
+    """
+    if moves is None:
+        moves = await _lock_the_run_cards(db, organization_id, order)
+    history = _history(order)
+    rates = await _ingredient_rates(db, order.id)
+    for move in moves:
+        if move.from_location_id is not None and move.to_location_id is None:
+            await _put_the_ingredient_back(
+                db, organization_id, order, move, user, history, rates
+            )
+
+
+async def _take_the_outputs_off(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    user: UserContextDTO,
+) -> None:
+    """Take everything the run put on the shelf off again.
+
+    A run filled in portions opened a record per portion; each comes off its
+    own. A run completed in one step has the one record it opened.
+
+    Every record is checked before any comes off: portions share the batch
+    they were filed under, and taking the first one off is a departure from
+    that batch that the next one must not read as stock having left it.
+    """
+    history = _history(order)
+    portions = (
+        await db.scalars(
+            select(ProductionPortion)
+            .where(ProductionPortion.production_order_id == order.id)
+            .order_by(ProductionPortion.created_at)
         )
-        if order.produced_item_id is not None
+    ).all()
+    entries = (
+        [(portion.item_id, portion.qty, portion.created_at) for portion in portions]
+        if portions
+        else [
+            (
+                order.produced_item_id,
+                order.actual_qty or Decimal('0'),
+                order.completed_at or order.created_at,
+            )
+        ]
+    )
+    for item_id, made, since in entries:
+        await _check_the_output_is_there(
+            db, organization_id, order, item_id=item_id, made=made, since=since
+        )
+    for item_id, made, _since in entries:
+        await _take_the_output_off(
+            db, organization_id, order, user, history, item_id=item_id, made=made
+        )
+
+
+def _history(order: ProductionOrder) -> dict[str, str]:
+    return {
+        'reason': 'production_run_reversed',
+        'production_order_id': str(order.id),
+        'production_order_number': order.number or str(order.id),
+    }
+
+
+async def _check_the_output_is_there(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    *,
+    item_id: UUID | None,
+    made: Decimal,
+    since: datetime,
+) -> None:
+    """Refuse the reversal when a quantity of the run's output is no longer where it was put."""
+    produced = (
+        await core_api.items.get_for_update_async(db, organization_id, item_id)
+        if item_id is not None
         else None
     )
     if (
@@ -152,10 +228,30 @@ async def _take_the_output_off(
             from_location_id=order.output_storage_location_id,
             lot_id=produced.lot_id,
             owner_id=None,
-            since=order.completed_at or order.created_at,
+            since=since,
             excluded_reference_ids=[order.id],
         )
     ):
+        raise ServiceRejectionError('production_reverse_output_used')
+
+
+async def _take_the_output_off(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    user: UserContextDTO,
+    history: dict[str, str],
+    *,
+    item_id: UUID | None,
+    made: Decimal,
+) -> None:
+    """Take a quantity of the run's output off the record the run opened for it."""
+    produced = (
+        await core_api.items.get_for_update_async(db, organization_id, item_id)
+        if item_id is not None
+        else None
+    )
+    if produced is None:
         raise ServiceRejectionError('production_reverse_output_used')
     await core_api.stock.post_movement_async(
         db,

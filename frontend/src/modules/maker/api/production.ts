@@ -6,6 +6,9 @@ import type {
   ProductionOrderComplete,
   ProductionMadeCreateInput,
   ProductionOrderCreateInput,
+  ProductionOrderFinish,
+  ProductionOrderStart,
+  ProductionPortionCreate,
   ProductionOrderListResponse,
   ProductionOrderUpdate,
   StockMove,
@@ -72,6 +75,55 @@ export const productionApi = {
     const response = await api.post<ProductionOrder>(
       `/maker/production/orders/${orderId}/complete`,
       data ?? {},
+    );
+    return response.data;
+  },
+
+  /** Takes the ingredients now; the run is finished later. */
+  start: async (
+    orderId: string,
+    data?: ProductionOrderStart,
+  ): Promise<ProductionOrder> => {
+    const response = await api.post<ProductionOrder>(
+      `/maker/production/orders/${orderId}/start`,
+      data ?? {},
+    );
+    return response.data;
+  },
+
+  /** Puts part of an in-progress run's output on the shelf. */
+  addPortion: async (
+    orderId: string,
+    data: ProductionPortionCreate,
+  ): Promise<ProductionOrder> => {
+    const response = await api.post<ProductionOrder>(
+      `/maker/production/orders/${orderId}/portions`,
+      data,
+    );
+    return response.data;
+  },
+
+  /** Closes an in-progress run: the rest of its output and its final cost. */
+  finish: async (
+    orderId: string,
+    data?: ProductionOrderFinish,
+  ): Promise<ProductionOrder> => {
+    const response = await api.post<ProductionOrder>(
+      `/maker/production/orders/${orderId}/finish`,
+      data ?? {},
+    );
+    return response.data;
+  },
+
+  /** Marks one process step done on a day, or clears it (`done_on` null). */
+  tickStep: async (
+    orderId: string,
+    index: number,
+    doneOn: string | null,
+  ): Promise<ProductionOrder> => {
+    const response = await api.put<ProductionOrder>(
+      `/maker/production/orders/${orderId}/steps/${index}`,
+      { done_on: doneOn },
     );
     return response.data;
   },

@@ -160,6 +160,9 @@ class BoMLineCreateForRecipe(BaseModel):
     yield_loss_pct: Decimal = Field(
         Decimal('0'), ge=0, le=100, max_digits=5, decimal_places=2
     )
+    #: An ingredient with a recipe of its own is made fresh on every run and
+    #: never taken from its stock. The default takes stock first.
+    make_fresh: bool = False
     notes: str | None = Field(None, max_length=500)
 
 
@@ -171,6 +174,7 @@ class BoMLineUpdate(BaseModel):
     yield_loss_pct: Decimal | None = Field(
         None, ge=0, le=100, max_digits=5, decimal_places=2
     )
+    make_fresh: bool | None = None
     notes: str | None = Field(None, max_length=500)
 
 

@@ -1921,7 +1921,7 @@ class TestCancelOrder:
             real_async_db_session, prod_org.id, order.id, prod_ctx
         )
 
-        with pytest.raises(ValueError, match='only a draft can be cancelled'):
+        with pytest.raises(ValueError, match='can be cancelled'):
             await production_service.cancel_order(
                 real_async_db_session, prod_org.id, order.id, prod_ctx
             )

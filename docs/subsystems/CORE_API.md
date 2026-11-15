@@ -583,21 +583,22 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
+| `add_value_to_layer_async` | `(db: AsyncSession, organization_id: UUID, layer_id: UUID, amount: Decimal, *, user: UserContextDTO) -> Decimal` | WRITE | Put more value on a receipt layer that is already on the books. |
 | `estimate_unit_cost_async` | `(db: AsyncSession, organization_id: UUID, product_template_ids: list[UUID]) -> dict[UUID, UnitCostEstimate]` | READ | Estimate stock-unit costs: priced layers, supplier offers, unknown. |
 | `get_current_rate_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID) -> Decimal \| None` | READ | Return the template's layer-average valuation rate, or None. |
 | `get_rates_batch_async` | `(db: AsyncSession, organization_id: UUID, product_template_ids: list[UUID]) -> dict[UUID, Decimal \| None]` | READ | Return ``{template_id: layer-average valuation rate}`` for *product_template_ids*. |
 | `lock_open_layers_async` | `(db: AsyncSession, organization_id: UUID, product_template_ids: Iterable[UUID]) -> None` | READ | Lock and read the cost layers of these products in one statement. |
 | `record_delivery_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal, document_line_id: UUID \| None=None, reason: str \| None=None, item_id: UUID \| None=None, reverses_line_id: UUID \| None=None) -> Decimal \| None` | WRITE | Take stock off the receipt layers and post what it was worth. |
-| `record_receipt_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal, unit_cost: Decimal \| None, document_line_id: UUID \| None=None, currency: str \| None=None, document_date: date \| None=None, reverses_line_id: UUID \| None=None, extra_unit_cost: Decimal=Decimal('0')) -> None` | WRITE | Record a receipt into the cost history. |
+| `record_receipt_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal, unit_cost: Decimal \| None, document_line_id: UUID \| None=None, currency: str \| None=None, document_date: date \| None=None, reverses_line_id: UUID \| None=None, extra_unit_cost: Decimal=Decimal('0'), unpriced_stays_unknown: bool=False) -> UUID \| None` | WRITE | Record a receipt into the cost history; answers the layer it opened. |
 | `record_unpriced_receipt_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal) -> None` | WRITE | Record stock arriving with nobody having named a price. |
 
 ---
 
 ## Statistics
 
-- **Total methods:** 312
+- **Total methods:** 313
 - **Namespaces:** 33
-- **Documented methods:** 312 (100%)
+- **Documented methods:** 313 (100%)
 - **READ methods:** 218 (70%)
-- **WRITE methods:** 94 (30%)
+- **WRITE methods:** 95 (30%)
 

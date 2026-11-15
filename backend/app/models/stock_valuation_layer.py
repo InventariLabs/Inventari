@@ -217,6 +217,22 @@ class StockValuationLayer(Base):
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
+    #: When a cost that was only known later was put on what was left of this
+    #: receipt (``ValuationService.add_value_to_layer_async``), NULL on a layer
+    #: nobody revalued. The layer then reads what it is worth now; a report
+    #: about an instant before this one reads what it was, from the two
+    #: columns below — the added cost belongs to the day it became known, not
+    #: to the day the goods came in.
+    revalued_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    #: What ``unit_cost`` and ``cost_basis`` were just before that revaluation.
+    unit_cost_before: Mapped[Decimal | None] = mapped_column(
+        Numeric(12, 4), nullable=True
+    )
+    cost_basis_before: Mapped[str | None] = mapped_column(String(10), nullable=True)
+
     @hybrid_property
     def carries_a_cost(self) -> bool:
         """Whether ``unit_cost`` is a cost anybody knows.

@@ -480,12 +480,23 @@ _ADDED_AFTER_BASELINE_INDEXES = {
     'uq_storage_locations_org_root_name',
 }
 
+#: The same for the columns those revisions add, as ``(table, column)`` pairs.
+_ADDED_AFTER_BASELINE_COLUMNS = {
+    ('stock_valuation_layers', 'revalued_at'),
+    ('stock_valuation_layers', 'unit_cost_before'),
+    ('stock_valuation_layers', 'cost_basis_before'),
+}
+
 
 def _added_after_baseline(gap) -> bool:
-    """Whether one ``compare_metadata`` entry is an index a later revision builds."""
+    """Whether one ``compare_metadata`` entry is an index or a column a later revision adds."""
     entries = gap if isinstance(gap, list) else [gap]
     return all(
-        entry[0] == 'add_index' and entry[1].name in _ADDED_AFTER_BASELINE_INDEXES
+        (entry[0] == 'add_index' and entry[1].name in _ADDED_AFTER_BASELINE_INDEXES)
+        or (
+            entry[0] == 'add_column'
+            and (entry[2], entry[3].name) in _ADDED_AFTER_BASELINE_COLUMNS
+        )
         for entry in entries
     )
 

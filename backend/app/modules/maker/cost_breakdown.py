@@ -27,6 +27,7 @@ from ._schemas_breakdown import (
 )
 from ._valuation_batch import fetch_estimates_batch
 from .models import MakerRecipe
+from .stock_first import StockPool
 
 
 async def compute_breakdown(
@@ -35,6 +36,8 @@ async def compute_breakdown(
     template_id: UUID,
     qty: Decimal,
     recipe_id: UUID | None = None,
+    *,
+    output_location_id: UUID | None = None,
 ) -> CostBreakdownResponse:
     """Resolve the multi-level BOM and compute per-ingredient cost & percentage.
 
@@ -85,8 +88,21 @@ async def compute_breakdown(
     # The same stock units the rates are held in, so a row's `unit_cost` x
     # `consumed_qty` adds up to its `cost` for the reader. The quantity is
     # shown in the unit it will actually leave the shelf in.
+    from .availability_service import resolve_check_location
+
     flat = await bom_service.explode_in_stock_units(
-        db, organization_id, template_id, qty, recipe_id=resolved_recipe_id
+        db,
+        organization_id,
+        template_id,
+        qty,
+        recipe_id=resolved_recipe_id,
+        pool=StockPool(
+            db,
+            organization_id,
+            await resolve_check_location(
+                db, organization_id, context_location_id=output_location_id
+            ),
+        ),
     )
     estimates = await fetch_estimates_batch(db, organization_id, flat)
     rates = {tid: estimate.unit_cost for tid, estimate in estimates.items()}

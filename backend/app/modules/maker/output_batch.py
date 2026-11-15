@@ -28,7 +28,11 @@ from app.core.db_utils import acquire_advisory_lock
 from app.core.exceptions import EntityNotFoundError, ServiceRejectionError
 from app.core.public_api import core_api
 
-from .models import MakerShelfLife, ProductionOrder
+from ._schemas_batches import RunBatchRead
+from .models import MakerShelfLife, ProductionOrder, ProductionPortion
+
+#: The states a batch is on hold in.
+HELD_STATUSES = frozenset({'quarantined', 'held'})
 
 
 async def shelf_lives_async(
@@ -154,9 +158,9 @@ async def next_batch_name(
     return f'{prefix}-{counter}'
 
 
-async def _output_lot_or_refuse(
+async def _order_with_output_or_refuse(
     db: AsyncSession, organization_id: UUID, order_id: UUID
-) -> tuple[ProductionOrder, UUID]:
+) -> ProductionOrder:
     order = await db.scalar(
         select(ProductionOrder).where(
             ProductionOrder.organization_id == organization_id,
@@ -167,7 +171,55 @@ async def _output_lot_or_refuse(
         raise EntityNotFoundError('production_order', str(order_id))
     if order.output_lot_id is None:
         raise ServiceRejectionError('production_output_batch_missing')
-    return order, order.output_lot_id
+    return order
+
+
+async def lots_of_run_async(
+    db: AsyncSession, organization_id: UUID, order: ProductionOrder
+) -> list[StockLotDTO]:
+    """Every batch the run's output was filed under, the run's own first.
+
+    A run filled in portions files each portion under the batch its person
+    named, and its closing quantity under one more, so the output is not one
+    batch: the run's page, its record, its labels and its hold all speak of
+    every one of them. A run completed in one step has exactly one.
+    """
+    if order.output_lot_id is None:
+        return []
+    names = (
+        await db.scalars(
+            select(ProductionPortion.lot_name)
+            .where(
+                ProductionPortion.organization_id == organization_id,
+                ProductionPortion.production_order_id == order.id,
+            )
+            .order_by(ProductionPortion.made_on, ProductionPortion.created_at)
+        )
+    ).all()
+    lots = await core_api.stock.list_lots_async(
+        db, organization_id, order.output_template_id
+    )
+    by_name = {lot.name: lot for lot in lots}
+    own = next((lot for lot in lots if lot.id == order.output_lot_id), None)
+    found: dict[UUID, StockLotDTO] = {own.id: own} if own is not None else {}
+    for name in names:
+        lot = by_name.get(name or '')
+        if lot is not None:
+            found.setdefault(lot.id, lot)
+    return list(found.values())
+
+
+def run_batch_reads(lots: list[StockLotDTO]) -> list[RunBatchRead]:
+    """The batches of a run as the screens read them."""
+    return [
+        RunBatchRead(
+            lot_id=lot.id,
+            lot_name=lot.name,
+            status=lot.status,
+            best_before=lot.expiry_date or lot.use_by_date,
+        )
+        for lot in lots
+    ]
 
 
 async def hold_output_async(
@@ -176,19 +228,27 @@ async def hold_output_async(
     order_id: UUID,
     user: UserContextDTO,
     reason: str | None,
-) -> StockLotDTO:
-    """Put the run's output batch on hold — Core's quarantine.
+) -> list[StockLotDTO]:
+    """Put every batch of the run's output on hold — Core's quarantine.
 
     A held batch stays on its shelf and is offered to no draw: no other
-    run's ingredients, no dispatch, no pick, until it is released.
+    run's ingredients, no dispatch, no pick, until it is released. The
+    run's own batch comes first in the answer.
     """
-    _order, lot_id = await _output_lot_or_refuse(db, organization_id, order_id)
-    lot = await core_api.stock.quarantine_lot_async(
-        db, organization_id, lot_id, reason.strip() if reason else None, user_id=user.id
-    )
-    if lot is None:
-        raise EntityNotFoundError('stock_lot', str(lot_id))
-    return lot
+    order = await _order_with_output_or_refuse(db, organization_id, order_id)
+    held: list[StockLotDTO] = []
+    for lot in await lots_of_run_async(db, organization_id, order):
+        quarantined = await core_api.stock.quarantine_lot_async(
+            db,
+            organization_id,
+            lot.id,
+            reason.strip() if reason else None,
+            user_id=user.id,
+        )
+        if quarantined is None:
+            raise EntityNotFoundError('stock_lot', str(lot.id))
+        held.append(quarantined)
+    return held
 
 
 async def release_output_async(
@@ -196,12 +256,22 @@ async def release_output_async(
     organization_id: UUID,
     order_id: UUID,
     user: UserContextDTO,
-) -> StockLotDTO:
-    """Release the run's output batch back into use — Core's release."""
-    _order, lot_id = await _output_lot_or_refuse(db, organization_id, order_id)
-    lot = await core_api.stock.release_lot_async(
-        db, organization_id, lot_id, user_id=user.id
-    )
-    if lot is None:
-        raise EntityNotFoundError('stock_lot', str(lot_id))
-    return lot
+) -> list[StockLotDTO]:
+    """Release the batches of the run's output that are on hold — Core's release.
+
+    A batch of the run that is not on hold keeps the state it is in: a
+    recalled one is not a hold this button put there.
+    """
+    order = await _order_with_output_or_refuse(db, organization_id, order_id)
+    released: list[StockLotDTO] = []
+    for lot in await lots_of_run_async(db, organization_id, order):
+        if lot.status not in HELD_STATUSES:
+            released.append(lot)
+            continue
+        freed = await core_api.stock.release_lot_async(
+            db, organization_id, lot.id, user_id=user.id
+        )
+        if freed is None:
+            raise EntityNotFoundError('stock_lot', str(lot.id))
+        released.append(freed)
+    return released

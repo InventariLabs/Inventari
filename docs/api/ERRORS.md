@@ -544,16 +544,22 @@ apart.
 | `PRODUCTION_BATCH_OF_ANOTHER_PRODUCT` | Batch {batch} is not a batch of {ingredient}. |
 | `PRODUCTION_BATCH_SHORT` | Batch {batch} of {ingredient} has {available} free, not the {chosen} chosen — it may be on hold, reserved or used up. |
 | `PRODUCTION_BEST_BEFORE_BEFORE_MADE` | The best-before date {best_before} is before the day the run was made ({made}). |
-| `PRODUCTION_CANCEL_NOT_DRAFT` | This production order already has status {status} — only a draft can be cancelled. |
+| `PRODUCTION_CANCEL_HAS_PORTIONS` | This run has already put output on the shelf in portions, so it cannot be cancelled — finish it instead. |
+| `PRODUCTION_CANCEL_NOT_DRAFT` | This production order already has status {status} — only a draft or a run in progress can be cancelled. |
 | `PRODUCTION_COMPLETE_NOT_DRAFT` | This production order already has status {status} — only a draft can be completed. |
+| `PRODUCTION_FINISH_BELOW_PORTIONS` | This run has already put {made} on the shelf in portions, so it cannot finish with less than that. |
 | `PRODUCTION_NO_RECIPE` | No BOM for this product — create a BOM first |
 | `PRODUCTION_OUTPUT_BATCH_MISSING` | This run put its output in no batch, so there is no batch to hold or release. |
 | `PRODUCTION_OVERPRODUCTION_DISABLED` | Overproduction is disabled in settings — this order cannot produce more than planned. |
+| `PRODUCTION_PORTION_ABOVE_PLAN` | A portion cannot take the run above its plan ({planned}) — what comes out beyond it is put on the shelf when the run finishes. |
 | `PRODUCTION_RECIPE_NOT_FOUND` | BOM {recipe_id} not found in this organization |
 | `PRODUCTION_RECIPE_PRODUCT_MISMATCH` | This BOM does not belong to this product |
 | `PRODUCTION_RECORD_NOT_COMPLETED` | A batch record exists only for a completed run. |
 | `PRODUCTION_REVERSE_NOT_COMPLETED` | This production run is {status}, so there is nothing to take back — only a completed run can be undone. |
 | `PRODUCTION_REVERSE_OUTPUT_USED` | This run cannot be undone: some of what it made has already left its location. Record a stock correction for what is left instead. |
+| `PRODUCTION_RUN_NOT_IN_PROGRESS` | This production run has status {status} — only a run in progress can be filled in portions, ticked off or finished. |
+| `PRODUCTION_START_NOT_DRAFT` | This production order already has status {status} — only a draft can be started. |
+| `PRODUCTION_STEP_NOT_FOUND` | This run has no such step. |
 | `PRODUCTION_UPDATE_NOT_DRAFT` | This production order already has status {status} — only a draft can be edited. |
 | `PRODUCT_LABEL_NO_CODE` | Nothing to print: none of the chosen products has a code. Generate one on the product form |
 | `PRODUCT_LABEL_TOO_NARROW` | The code {code} does not fit a label {width} mm wide: its bars need one at least {needed} mm wide. Choose a wider label size |

@@ -16,12 +16,16 @@ class BoMLineRead(BaseModel):
 
     id: UUID
     organization_id: UUID
+    #: The recipe the line belongs to — the one its edit is addressed to.
+    recipe_id: UUID
     parent_template_id: UUID
     child_template_id: UUID
     qty_per_batch: Decimal
     uom_id: UUID | None = None
     unit: str
     yield_loss_pct: Decimal
+    #: Always made through its own recipe, never taken from its stock.
+    make_fresh: bool = False
     notes: str | None
     created_at: datetime
     updated_at: datetime
@@ -40,6 +44,11 @@ class BoMLineRead(BaseModel):
     #: while the line is costed by something else — and a card that showed it
     #: plainly beside a different figure read as if it were in use.
     typed_unit_price_in_use: bool = False
+    #: For an ingredient that has a recipe of its own: what its stock holds
+    #: now, in the line's unit — the part of a run a shelf covers before
+    #: the recipe is used. Null for an ingredient with no recipe, or when the
+    #: line's unit has no bridge to the stock's.
+    stock_on_hand: Decimal | None = None
 
 
 class BoMTemplateIdsResponse(BaseModel):

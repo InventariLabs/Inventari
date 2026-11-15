@@ -46,7 +46,8 @@
       "draft": "Borrador",
       "completed": "Completado",
       "cancelled": "Cancelado",
-      "reversed": "Deshecha"
+      "reversed": "Deshecha",
+      "in_progress": "En curso"
     },
     "duplicate": "Duplicar",
     "viewRecipe": "Ver fórmula",
@@ -198,10 +199,12 @@
       "resultPerUnit": "({{amount}} por {{unit}})",
       "totalCostAfterClosing": "Coste total tras el cierre",
       "unitCost": "{{amount}} por {{unit}}",
+      "unshelvedCost": "{{amount}} del coste de esta orden no está en el almacén: la producción se vendió o se usó antes de cerrar la orden.",
       "totalCostGap_one": "{{count}} ingrediente salió de un stock sin coste, por lo que falta en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
       "totalCostGap_other": "{{count}} ingredientes salieron de un stock sin coste, por lo que faltan en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
       "estimatedAtCompletion": "Estimado al cerrar",
-      "estimatedDifference": "Diferencia real: {{amount}}"
+      "estimatedDifference": "Diferencia real: {{amount}}",
+      "takenSoFar": "Retirado hasta ahora"
     },
     "ingredients": "Ingredientes consumidos",
     "emptyLines": "No se registró ningún ingrediente para esta orden.",
@@ -396,7 +399,11 @@
     "error": "No se pudo cargar el árbol",
     "moved": "Línea movida",
     "moveError": "Movimiento fallido",
-    "dropHint": "Arrastrar para mover"
+    "dropHint": "Arrastrar para mover",
+    "onHand": "{{qty}} en stock",
+    "makeFresh": "Fabricar siempre fresco",
+    "makeFreshHint": "Una orden fabrica este ingrediente cada vez con su fórmula, en lugar de tomar primero lo que hay en el almacén.",
+    "makeFreshFailed": "No se pudo cambiar la línea"
   },
   "pricing": {
     "title": "Calculadora de precio de venta",
@@ -591,6 +598,39 @@
     "stockSavePartial": "Guardados {{saved}} de {{total}}. El resto sigue en la hoja.",
     "locationsFailed": "No se pudieron cargar las ubicaciones"
   },
+  "progress": {
+    "start": "Iniciar orden",
+    "startConfirm": {
+      "title": "¿Iniciar esta orden?",
+      "description": "Los ingredientes salen hoy del stock, pero la orden sigue abierta. Puede poner la producción en el almacén por porciones y terminarla otro día."
+    },
+    "startDay": "Día de inicio",
+    "startSuccess": "Orden iniciada — ingredientes retirados",
+    "startFailed": "No se pudo iniciar la orden",
+    "startedOn": "Iniciada",
+    "finish": "Terminar orden",
+    "finishConfirm": {
+      "title": "¿Terminar esta orden?",
+      "description": "Lo que aún falta por salir de la orden se pone ahora en el almacén, y la orden se cierra a su coste."
+    },
+    "finishQty": "Cantidad de toda la orden (opcional)",
+    "finishQtyHint": "Las porciones ya en el almacén cuentan. Déjelo vacío para usar la cantidad prevista.",
+    "finishDay": "Día de fin",
+    "finishSuccess": "Orden terminada",
+    "finishFailed": "No se pudo terminar la orden",
+    "portions": "Producción hasta ahora",
+    "noPortions": "Todavía no se ha puesto nada en el almacén.",
+    "portionQty": "Porción",
+    "portionDay": "Día",
+    "portionLot": "Lote (opcional)",
+    "addPortion": "Añadir porción",
+    "portionAdded": "Porción puesta en el almacén",
+    "portionFailed": "No se pudo añadir la porción",
+    "steps": "Pasos",
+    "stepDay": "Día en que se hizo «{{step}}»",
+    "stepFailed": "No se pudo guardar el paso",
+    "cancelConfirm": "Cancelar devuelve al stock los ingredientes que retiró esta orden, en los lotes de donde salieron. Una orden que ya puso producción en el almacén se termina en su lugar."
+  },
   "batches": {
     "heading": "Lotes de los ingredientes",
     "hint": "Cada ingrediente se toma del lote con la fecha de consumo preferente más próxima, salvo que elija otro. Escanee la etiqueta de un lote para elegirlo.",
@@ -622,10 +662,13 @@
       "record": "Registro del lote",
       "hold": "Retener",
       "release": "Liberar",
-      "heldToast": "El lote está retenido. No se tomará nada de él hasta que se libere.",
-      "releasedToast": "El lote está liberado y puede volver a usarse.",
+      "heldToast_one": "El lote está retenido. No se tomará nada de él hasta que se libere.",
+      "heldToast_other": "Los lotes están retenidos. No se tomará nada de ellos hasta que se liberen.",
+      "releasedToast_one": "El lote está liberado y puede volver a usarse.",
+      "releasedToast_other": "Los lotes están liberados y pueden volver a usarse.",
       "holdFailed": "No se pudo cambiar el estado del lote.",
-      "holdTitle": "¿Retener este lote?",
+      "holdTitle_one": "¿Retener este lote?",
+      "holdTitle_other": "¿Retener estos lotes?",
       "holdMessage": "Un lote retenido sigue en su estante, pero ninguna producción, preparación ni envío toma de él hasta que se libere.",
       "holdReason": "¿Por qué se retiene?"
     }

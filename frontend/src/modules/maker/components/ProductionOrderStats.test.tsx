@@ -358,3 +358,41 @@ describe("ProductionOrderStats — the estimate beside the actual", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("ProductionOrderStats — cost whose output left the shelf", () => {
+  const lines = [
+    { child_template_name: "Grapes", unit_cost_snapshot: "3.00" },
+  ] as unknown as ProductionOrder["lines"];
+
+  it("says which part of the cost could not go on the shelf", () => {
+    render(
+      <ProductionOrderStats
+        order={order({
+          status: "COMPLETED",
+          actual_qty: "2",
+          total_cost: "7.00",
+          lines,
+          unshelved_cost: "0.50",
+        })}
+      />,
+    );
+    expect(
+      screen.getByText(/PLN 0\.50 of this run's cost is not in stock/),
+    ).toBeInTheDocument();
+  });
+
+  it("says nothing when all of the cost is on the shelf", () => {
+    render(
+      <ProductionOrderStats
+        order={order({
+          status: "COMPLETED",
+          actual_qty: "2",
+          total_cost: "7.00",
+          lines,
+          unshelved_cost: "0.00",
+        })}
+      />,
+    );
+    expect(screen.queryByText(/not in stock/)).not.toBeInTheDocument();
+  });
+});

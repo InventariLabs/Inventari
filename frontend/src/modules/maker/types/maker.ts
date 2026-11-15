@@ -10,7 +10,8 @@ export type BomTreeNode = components["schemas"]["BomTreeNode"];
 
 export type BomTreeResponse = components["schemas"]["BomTreeResponse"];
 
-export type ProductionStatus = "DRAFT" | "COMPLETED" | "CANCELLED" | "REVERSED";
+export type ProductionStatus =
+  "DRAFT" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "REVERSED";
 
 export type ProductionOrderLine =
   components["schemas"]["ProductionOrderLineRead"];
@@ -35,6 +36,15 @@ export type ProductionOrderCancel =
 export type ProductionOrderComplete =
   components["schemas"]["ProductionOrderComplete"];
 
+export type ProductionOrderStart =
+  components["schemas"]["ProductionOrderStart"];
+
+export type ProductionOrderFinish =
+  components["schemas"]["ProductionOrderFinish"];
+
+export type ProductionPortionCreate =
+  components["schemas"]["ProductionPortionCreate"];
+
 /** A run already made, with the best-before and the ingredient batches its
  * closing decides. */
 export type ProductionMadeCreate =
@@ -58,6 +68,9 @@ export type ProductionAttachment =
 
 /** The run's output batch after a hold or a release. */
 export type OutputBatch = components["schemas"]["OutputBatchRead"];
+
+/** One batch a run's output was filed under, as it stands now. */
+export type RunBatch = components["schemas"]["RunBatchRead"];
 
 /** A product's shelf life in days, as the maker keeps it. */
 export type ShelfLife = components["schemas"]["ShelfLifeRead"];

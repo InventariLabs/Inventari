@@ -46,7 +46,8 @@
       "draft": "Brouillon",
       "completed": "Terminé",
       "cancelled": "Annulé",
-      "reversed": "Contrepassé"
+      "reversed": "Contrepassé",
+      "in_progress": "En cours"
     },
     "duplicate": "Dupliquer",
     "viewRecipe": "Voir la formule",
@@ -198,10 +199,12 @@
       "resultPerUnit": "({{amount}} / {{unit}})",
       "totalCostAfterClosing": "Coût total après clôture",
       "unitCost": "{{amount}} / {{unit}}",
+      "unshelvedCost": "{{amount}} du coût de cet ordre ne figure pas en stock : la production a été vendue ou utilisée avant la clôture de l'ordre.",
       "totalCostGap_one": "{{count}} ingrédient a été prélevé sur un stock sans coût, il manque donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
       "totalCostGap_other": "{{count}} ingrédients ont été prélevés sur un stock sans coût, ils manquent donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
       "estimatedAtCompletion": "Estimation à la clôture",
-      "estimatedDifference": "Écart réel : {{amount}}"
+      "estimatedDifference": "Écart réel : {{amount}}",
+      "takenSoFar": "Prélevé jusqu’ici"
     },
     "ingredients": "Ingrédients consommés",
     "emptyLines": "Aucun ingrédient n'a été enregistré pour cet ordre.",
@@ -396,7 +399,11 @@
     "error": "Impossible de charger l'arbre",
     "moved": "Ligne déplacée",
     "moveError": "Échec du déplacement",
-    "dropHint": "Glisser pour déplacer"
+    "dropHint": "Glisser pour déplacer",
+    "onHand": "{{qty}} en stock",
+    "makeFresh": "Toujours fabriquer frais",
+    "makeFreshHint": "Une production fabrique cet ingrédient à chaque fois selon sa formule, au lieu de prendre d’abord ce qui est en stock.",
+    "makeFreshFailed": "Impossible de modifier la ligne"
   },
   "pricing": {
     "title": "Calculateur de prix de vente",
@@ -591,6 +598,39 @@
     "stockSavePartial": "{{saved}} sur {{total}} enregistrés. Le reste est encore dans la feuille.",
     "locationsFailed": "Impossible de charger les emplacements"
   },
+  "progress": {
+    "start": "Démarrer l’ordre",
+    "startConfirm": {
+      "title": "Démarrer cet ordre ?",
+      "description": "Les ingrédients sortent du stock aujourd’hui, mais l’ordre reste ouvert. Vous pouvez mettre la production en stock par portions et la terminer un autre jour."
+    },
+    "startDay": "Jour de démarrage",
+    "startSuccess": "Ordre démarré — les ingrédients sont prélevés",
+    "startFailed": "Impossible de démarrer l’ordre",
+    "startedOn": "Démarré",
+    "finish": "Terminer l’ordre",
+    "finishConfirm": {
+      "title": "Terminer cet ordre ?",
+      "description": "Ce qui reste à sortir de l’ordre est mis en stock maintenant, et l’ordre se clôt à son coût."
+    },
+    "finishQty": "Quantité fabriquée par l’ordre entier (facultatif)",
+    "finishQtyHint": "Les portions déjà en stock comptent. Laissez vide pour reprendre la quantité prévue.",
+    "finishDay": "Jour de fin",
+    "finishSuccess": "Ordre terminé",
+    "finishFailed": "Impossible de terminer l’ordre",
+    "portions": "Production à ce jour",
+    "noPortions": "Rien n’a encore été mis en stock.",
+    "portionQty": "Portion",
+    "portionDay": "Jour",
+    "portionLot": "Lot (facultatif)",
+    "addPortion": "Ajouter une portion",
+    "portionAdded": "Portion mise en stock",
+    "portionFailed": "Impossible d’ajouter la portion",
+    "steps": "Étapes",
+    "stepDay": "Jour où « {{step}} » a été fait",
+    "stepFailed": "Impossible d’enregistrer l’étape",
+    "cancelConfirm": "L’annulation remet les ingrédients prélevés par cet ordre dans leur stock, dans les lots d’où ils venaient. Un ordre qui a déjà mis de la production en stock se termine à la place."
+  },
   "batches": {
     "heading": "Lots des ingrédients",
     "hint": "Chaque ingrédient est pris dans le lot à la date de durabilité la plus proche, sauf si vous en choisissez un autre. Scannez l'étiquette d'un lot pour le choisir.",
@@ -622,10 +662,13 @@
       "record": "Fiche de lot",
       "hold": "Bloquer",
       "release": "Libérer",
-      "heldToast": "Le lot est bloqué. Rien n'y sera pris tant qu'il n'est pas libéré.",
-      "releasedToast": "Le lot est libéré et peut de nouveau être utilisé.",
+      "heldToast_one": "Le lot est bloqué. Rien n'y sera pris tant qu'il n'est pas libéré.",
+      "heldToast_other": "Les lots sont bloqués. Rien n'y sera pris tant qu'ils ne sont pas libérés.",
+      "releasedToast_one": "Le lot est libéré et peut de nouveau être utilisé.",
+      "releasedToast_other": "Les lots sont libérés et peuvent de nouveau être utilisés.",
       "holdFailed": "L'état du lot n'a pas pu être modifié.",
-      "holdTitle": "Bloquer ce lot ?",
+      "holdTitle_one": "Bloquer ce lot ?",
+      "holdTitle_other": "Bloquer ces lots ?",
       "holdMessage": "Un lot bloqué reste sur son étagère, mais aucune fabrication, préparation ni expédition n'y prend tant qu'il n'est pas libéré.",
       "holdReason": "Pourquoi est-il bloqué ?"
     }

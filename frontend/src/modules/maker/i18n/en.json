@@ -46,7 +46,8 @@
       "draft": "Draft",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "reversed": "Undone"
+      "reversed": "Undone",
+      "in_progress": "In progress"
     },
     "duplicate": "Duplicate",
     "viewRecipe": "View BOM",
@@ -198,10 +199,12 @@
       "resultPerUnit": "({{amount}} per {{unit}})",
       "totalCostAfterClosing": "Total cost after closing",
       "unitCost": "{{amount}} per {{unit}}",
+      "unshelvedCost": "{{amount}} of this run's cost is not in stock: its output was sold or used before the run closed.",
       "totalCostGap_one": "{{count}} ingredient was drawn from stock with no cost, so it is missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "estimatedAtCompletion": "Estimated at completion",
-      "estimatedDifference": "Actual difference: {{amount}}"
+      "estimatedDifference": "Actual difference: {{amount}}",
+      "takenSoFar": "Taken so far"
     },
     "ingredients": "Consumed ingredients",
     "emptyLines": "No ingredients were recorded for this run.",
@@ -396,7 +399,11 @@
     "error": "Failed to load tree",
     "moved": "Line moved",
     "moveError": "Move failed",
-    "dropHint": "Drag to move"
+    "dropHint": "Drag to move",
+    "onHand": "{{qty}} on hand",
+    "makeFresh": "Always make fresh",
+    "makeFreshHint": "A run makes this ingredient from its own BOM every time instead of taking what is in stock first.",
+    "makeFreshFailed": "Could not change the line"
   },
   "pricing": {
     "title": "Sale price calculator",
@@ -591,6 +598,39 @@
     "stockSavePartial": "Saved {{saved}} of {{total}}. The rest is still in the sheet.",
     "locationsFailed": "Could not load the locations"
   },
+  "progress": {
+    "start": "Start run",
+    "startConfirm": {
+      "title": "Start this run?",
+      "description": "The ingredients leave your stock today, but the run stays open. You can add the output in portions and finish it on a later day."
+    },
+    "startDay": "Day it started",
+    "startSuccess": "Run started — the ingredients are taken",
+    "startFailed": "Could not start the run",
+    "startedOn": "Started",
+    "finish": "Finish run",
+    "finishConfirm": {
+      "title": "Finish this run?",
+      "description": "What is still to come out of the run is added to stock now, and the run closes at what it cost."
+    },
+    "finishQty": "Quantity the whole run made (optional)",
+    "finishQtyHint": "Portions already added count. Leave empty to use the planned quantity.",
+    "finishDay": "Day it finished",
+    "finishSuccess": "Run finished",
+    "finishFailed": "Could not finish the run",
+    "portions": "Output so far",
+    "noPortions": "No output has been added yet.",
+    "portionQty": "Portion",
+    "portionDay": "Day",
+    "portionLot": "Batch (optional)",
+    "addPortion": "Add portion",
+    "portionAdded": "Portion added to stock",
+    "portionFailed": "Could not add the portion",
+    "steps": "Steps",
+    "stepDay": "Day “{{step}}” was done",
+    "stepFailed": "Could not save the step",
+    "cancelConfirm": "Cancelling gives the ingredients this run took back to their stock, in the batches they came from. A run that has already added output in portions is finished instead."
+  },
   "batches": {
     "heading": "Ingredient batches",
     "hint": "Each ingredient is taken from the batch with the earliest best-before unless you choose another. Scan a batch label to choose it.",
@@ -622,10 +662,13 @@
       "record": "Batch record",
       "hold": "Put on hold",
       "release": "Release",
-      "heldToast": "The batch is on hold. Nothing takes from it until it is released.",
-      "releasedToast": "The batch is released and can be used again.",
+      "heldToast_one": "The batch is on hold. Nothing takes from it until it is released.",
+      "heldToast_other": "The batches are on hold. Nothing takes from them until they are released.",
+      "releasedToast_one": "The batch is released and can be used again.",
+      "releasedToast_other": "The batches are released and can be used again.",
       "holdFailed": "The batch’s state could not be changed.",
-      "holdTitle": "Put this batch on hold?",
+      "holdTitle_one": "Put this batch on hold?",
+      "holdTitle_other": "Put these batches on hold?",
       "holdMessage": "A batch on hold stays in its location, but no run, pick or dispatch takes from it until it is released.",
       "holdReason": "Why is it held?"
     }

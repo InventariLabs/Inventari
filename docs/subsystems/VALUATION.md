@@ -92,6 +92,37 @@ And a rate averages only the layers that carry a cost. An `unknown` layer
 holds 0.00 where nobody named a price; averaged in, it handed the next
 priceless receipt a zero to borrow as the organization's own rate.
 
+## Work in progress
+
+A started production run takes its ingredients off the layers at once and puts
+nothing back until it finishes. The stock value would drop by what they cost
+and return on the day the run ends. A feature that holds such work registers
+a reader (`register_work_in_progress_provider`, `app/core/work_in_progress.py`,
+exported by the module SDK) that answers the value held at a moment; Core adds
+it to the stock value (`stock_value_async`) and to the as-of valuation
+(`StockAsOfReportDTO.work_in_progress_value`, included in `total_value`). The
+amount belongs to no product row and no shelf, so a report narrowed to a
+location or a search leaves it out.
+
+## A cost added after the receipt
+
+A cost that is only known after goods were received — the corks and labour of a
+production run whose bottles went on the shelf before the run closed — is put
+on the receipt's layer with `core_api.valuation.add_value_to_layer_async`.
+*amount* is for the whole receipt; the units already drained left at the cost
+they had, so only the units still on the layer carry their share. A layer takes
+such a cost once (a second call places nothing), and a layer nobody priced
+(`unknown`) that takes one has a `stated` cost from then on. A receipt that will be given its cost this way is posted with `unpriced_stays_unknown` on `record_receipt_async`: with no price it is `unknown` instead of taking the rate of the product's older stock, which the added cost would otherwise sit on top of.
+
+The layer reads what it is worth now, which is what the stock value, the
+rates and the next drain need. A report about an earlier instant must not read
+a cost that was not yet known, so the write also keeps `revalued_at` and what
+the layer read just before (`unit_cost_before`, `cost_basis_before`); the as-of
+valuation takes those for an instant before `revalued_at`. The report about an
+instant therefore says the same on the day it is asked and in a month: the added
+cost belongs to the day it became known, not to the day the goods came in. The
+journal says what was added on the product (`cost_added`).
+
 ## Cost basis
 
 ### Estimates share one price policy

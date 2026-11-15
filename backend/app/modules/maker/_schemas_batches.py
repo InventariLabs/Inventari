@@ -44,12 +44,27 @@ class OutputBatchHold(BaseModel):
     reason: str = Field(min_length=1, max_length=500, pattern=r'\S')
 
 
-class OutputBatchRead(BaseModel):
-    """The run's output batch as it stands after a hold or a release."""
+class RunBatchRead(BaseModel):
+    """One batch a run's output was filed under, as it stands now."""
 
     lot_id: UUID
     lot_name: str
     status: str
+    best_before: date | None = None
+
+
+class OutputBatchRead(BaseModel):
+    """The run's output batch as it stands after a hold or a release.
+
+    ``lot_id``, ``lot_name`` and ``status`` are the run's own batch, the first
+    its output went into; a run filled in portions has more, all of them in
+    ``batches``, which a hold and a release act on together.
+    """
+
+    lot_id: UUID
+    lot_name: str
+    status: str
+    batches: list[RunBatchRead] = Field(default_factory=list)
 
 
 class IngredientBatchDraw(BaseModel):
@@ -143,6 +158,8 @@ class BatchRecordRead(BaseModel):
     scrap_qty: Decimal | None = None
     output_lot_name: str | None = None
     output_lot_status: str | None = None
+    #: Every batch the output was filed under, the run's own first.
+    output_batches: list[RunBatchRead] = Field(default_factory=list)
     production_date: date | None = None
     best_before: date | None = None
     output_location_name: str | None = None

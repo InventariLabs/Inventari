@@ -18,10 +18,11 @@ I have the ingredients?").
 | Table | Role |
 |---|---|
 | `maker_recipes` | Production recipe for a product template. Several variants per product, **at most 1 default** (partial unique index). `source_recipe_id` = bare UUID with no FK — a soft stamp from a culinary recipe. |
-| `maker_bom_lines` | BoM line: ingredient units per batch (`qty_per_batch`), `uom_id`, `yield_loss_pct`. Unique `(recipe_id, child_template_id)`. `parent_template_id` denormalises `recipe.output_template_id` (the invariant is enforced on every write). |
+| `maker_bom_lines` | BoM line: ingredient units per batch (`qty_per_batch`), `uom_id`, `yield_loss_pct`, `make_fresh` (an ingredient with a recipe is made through it every time instead of taken from stock first). Unique `(recipe_id, child_template_id)`. `parent_template_id` denormalises `recipe.output_template_id` (the invariant is enforced on every write). |
 | `maker_recipe_cost_lines` | Fixed batch costs (labour, packaging, overhead). |
 | `maker_ingredient_prices` | A price typed once on a product, org-scoped: the last answer a cost estimate asks, after the layers and supplier quotes. One row per product, shared by every formula that uses it. |
-| `maker_production_orders` | Production order: DRAFT → COMPLETED / CANCELLED, and COMPLETED → REVERSED when a finished run is taken back. Holds a snapshot of the financial result. |
+| `maker_production_orders` | Production order: DRAFT → COMPLETED / CANCELLED, DRAFT → IN_PROGRESS → COMPLETED / CANCELLED for a run started and finished apart, and COMPLETED → REVERSED when a finished run is taken back. Holds a snapshot of the financial result; for a started run also `started_on` / `started_at`, `material_cost` (what the start took — the run's work in progress) and `steps` (the formula's process steps copied at the start, each with `done_on`). |
+| `maker_production_portions` | One portion of an in-progress run's output: quantity, day, batch, the record it opened and the unit cost it was booked at. The closing quantity of `finish` is a portion too. |
 | `maker_production_order_lines` | Per-ingredient consumption audit recorded on completion. |
 | `maker_module_settings` | The `*_module_settings` pattern (org_id PK, typed columns), including `labor_hourly_rate` — what an hour of the organization's own work costs. |
 | `maker_shelf_lives` | How many days a product keeps once made, one row per organization and product (a product can be a catalogue row shared by every organization, so the fact lives here, as a typed price does). |
@@ -38,8 +39,19 @@ effective_qty(line) = batches * qty_per_batch * (1 + yield_loss_pct / 100)
   records across every location (`core_api.stock.take_from_the_records_async`);
   under `availability_check_scope=PER_LOCATION` only from the run's output
   location, the set the availability check judged.
-- **Sub-assembly** — an ingredient with a default recipe → exploded recursively
-  (virtual, no WIP), depth-limited (`_MAX_DEPTH = 10`).
+- **Sub-assembly** — an ingredient with a default recipe → what its own stock
+  covers is taken from the shelf first and only the rest is exploded
+  recursively, depth-limited (`_MAX_DEPTH = 10`). `stock_first.StockPool` is
+  the one answer to "how much of this intermediate can a run take": the
+  explosion asks it line by line, and availability (`max_batches` is searched
+  for, since the need is no longer proportional to the batches), the preview
+  and cost breakdown, the shortage list and purchase/shopping-list needs, the
+  recipe tree (`stock_on_hand` per sub-assembly line) and completion all
+  explode through it, under the scope the availability check resolves. The pool
+  is spent as it is asked, so two lines naming one intermediate do not count the
+  same stock twice. A line with `make_fresh` never asks it. The catalogue's
+  per-batch formula cost (`cost_rollup`) still explodes whole: it prices the
+  formula, not the shelf.
 - `complete` requires `actual_qty > 0`; consumption is against **planned**,
   output against **actual**; `actual > planned` is possible only with
   `allow_overproduction=true` (sets the `overproduced` flag); `actual < planned`
@@ -154,8 +166,12 @@ equals the actual material cost.
 | `POST /production/orders/shortages/shopping-list` | Puts what a planned run lacks on the active shopping list (needs `shopping_lists:write`); an ingredient already on the list is not added twice. |
 | `GET/PATCH /production/orders/{id}` | Detail (with the result snapshot) / update a DRAFT. Every door that answers with a single order — create, update, duplicate and the read — builds it through one constructor, so a draft carries the same `shortage_count` and `shortage_items` whichever way it came. A draft also carries `shortage_items` — the refusal's own list, the rows behind `shortage_count` — so the page marks every ingredient completion would refuse on instead of recomputing a forecast that could disagree. |
 | `POST /production/orders/{id}/complete` | Consumes planned (drawn from the stock records), outputs actual, values the batch, writes `unit_cost_snapshot`/`reference_price_snapshot`/`result_per_unit`/`result_per_batch`, and keeps the formula's own answer beside it: `estimated_total_cost` on the order and `estimated_qty`/`estimated_unit_cost_snapshot` per line. Shortages → 422 with an actionable list (`insufficient_stock`); a recipe with no ingredients → 422 `empty_bom`. Needs `items:write`. |
-| `POST /production/orders/{id}/cancel` | Cancel a DRAFT (optional `reason`, stored as `cancel_reason`). Needs `maker:manage`. |
-| `POST /production/orders/{id}/reverse` | Take a COMPLETED run back: the ingredients return to the records and batches they were taken from, the output leaves its location, and the run is marked REVERSED (it stays on record; the movements of the way back name it). Refused (400) for a run that is not completed or whose output has since left its shelf. Needs `maker:manage` and `items:write`. |
+| `POST /production/orders/{id}/start` | Start a DRAFT: the same draw, lines and stock-first split as `complete`, at the start. The run becomes `IN_PROGRESS` with `started_on` (optional body, default today), `started_at`, `material_cost` and its `steps`. Valued as work in progress until it closes: Core adds the registered providers' value (`app.core.work_in_progress`, this module's reader is `work_in_progress.py`) to the stock value and to `GET /stock-as-of` (`work_in_progress_value`, left out under a location or search filter). Same refusals as `complete`. Needs `items:write`. |
+| `POST /production/orders/{id}/portions` | Put a portion of an IN_PROGRESS run's output on the shelf: `qty`, `made_on`, `output_lot_name`. Booked at `material_cost / planned_qty`; the portion carries its share of the work in progress into the cost layers. The portions together cannot go above `planned_qty` (400); output above the plan comes out with `finish`. A portion whose ingredients carried no price is posted as not yet known (`unknown`, `unpriced_stays_unknown` on `core_api.valuation.record_receipt_async`), never at the rate of the product's older stock: until the finish its stock reads no value, and the finish puts the run's cost (fixed costs, labour) on it. A run that has no cost at all leaves such portions `unknown`. Needs `items:write`. |
+| `POST /production/orders/{id}/finish` | Close an IN_PROGRESS run. `actual_qty` is what the whole run made, portions included (default: the plan, or the portions if more); the difference is put on the shelf as the closing portion at the rest of the run's cost (material + fixed costs + labour) — when the portions already carry all of it (output above the plan, or a rounding hair booked too much) that share is a stated zero, never "no price", which Core would value at the rate of the product's older stock. `unit_cost` = total / actual. Refused when `actual_qty` is below the portions. When the portions already hold the whole output, the part of the cost they were not booked at (yield shortfall, fixed costs, labour, a rounding cent) is added to the cost layers the portions opened (`core_api.valuation.add_value_to_layer_async`), spread by quantity in whole cents that add up to the rest (the cent a division leaves over lands on the last portion) and only for the units still on the shelf; the value is dated from the finish — a report about an instant before it reads what it did then (`docs/subsystems/VALUATION.md`, *A cost added after the receipt*). What belongs to units that were sold or used before the close is kept on the run as `unshelved_cost` and never refuses the finish. Needs `items:write`. |
+| `PUT /production/orders/{id}/steps/{index}` | Tick a step of an IN_PROGRESS run with `done_on`, or clear it with null. Journalled. |
+| `POST /production/orders/{id}/cancel` | Cancel a DRAFT or an IN_PROGRESS run (optional `reason`, stored as `cancel_reason`). An in-progress run gives its ingredients back through the same way back `reverse` uses (`production_reversal.put_ingredients_back`); refused once it has portions. Needs `maker:manage`, and `items:write` for a run in progress. |
+| `POST /production/orders/{id}/reverse` | Take a COMPLETED run back: the ingredients return to the records and batches they were taken from, the output leaves its location (every portion of a run filled in portions, each off its own record; every record is checked before any comes off, because portions share the batch they were filed under), and the run is marked REVERSED (it stays on record; the movements of the way back name it). Refused (400) for a run that is not completed or whose output has since left its shelf. Needs `maker:manage` and `items:write`. |
 | `POST /production/orders/{id}/duplicate` | Duplicate as DRAFT (copies `recipe_id`). A copy is a new plan: under BLOCK a copy the stock cannot cover is refused like a creation (422 `shortage_blocked`); under WARN it is created and its page names the shortage. |
 | `GET /production/orders/{id}/stock-moves` | The order's stock moves. |
 | `GET /production/monthly-result?months=` | Aggregates `result_per_unit × actual_qty` per month (dashboard widget). |
@@ -177,7 +193,11 @@ client-side; the detail page reads `shortage_items` from the order payload.
 ### The output batch, its dates and the ingredients' batches
 
 Every completed run files its output under a batch (`output_lot_name`,
-`output_lot_id`). A run nobody named a batch for names its own from its day and
+`output_lot_id`). A run filled in portions files each portion under the batch
+its person named (a portion nobody named a batch for goes into the run's own),
+so its output may be several batches: `output_lot_*` is the run's own — the
+first one its output went into, named as that batch is — and `output_batches`
+lists them all, the run's own first. A run nobody named a batch for names its own from its day and
 a counter, unique among the product's batches in the organization
 (`20261115-1`, `20261115-2`, …) — computed under the output card's lock the
 run takes from the top, so two runs of one product closing at once count on
@@ -212,12 +232,14 @@ dates belong to the batch, not to the product card.
 |---|---|
 | `GET/PUT /production/shelf-lives/{template_id}` | A product's shelf life in days (`null` clears it). The write needs `maker:manage` and is journalled on the product. |
 | `GET /production/ingredient-batches?output_template_id=&planned_qty=&output_location_id=&recipe_id=` | The batch plan above, read-only. |
-| `POST /production/orders/{id}/hold` / `…/release` | Hold the run's output batch (`reason` required) or release it — Core's quarantine and release, journalled on the batch. Needs `maker:manage`; refused for a run that filed no batch. |
+| `POST /production/orders/{id}/hold` / `…/release` | Hold every batch of the run's output (`reason` required) or release those on hold — Core's quarantine and release, journalled on each batch; the answer lists them all in `batches`. A batch that is not on hold keeps its state on a release. Needs `maker:manage`; refused for a run that filed no batch. |
 | `GET /production/orders/{id}/record` | The batch record of a completed run: formula, quantities, every ingredient with the batches taken (read from the run's movements), costs, who and when, notes and files. 400 for a run that never completed. |
 | `GET/POST /production/orders/{id}/attachments`, `DELETE …/{attachment_id}` | A run's photos and files, at a product attachment's limits (10 MB, the attachment types, the bytes checked against the declared type); each file filed or removed is a journal entry on the run. Writing needs `items:write`. |
 
 The detail read of an order carries `output_lot_id`, `output_lot_status` (the
-batch's state now — a hold shows), `best_before` and the output product's
+run's own batch's state now — a hold shows), `best_before`, `output_batches`
+(every batch the output was filed under, each with its state and best-before;
+the batch record carries the same list) and the output product's
 `shelf_life_days`; the preview carries `shelf_life_days` too. Batch labels
 print through the printing module's batch target (`lot_ids`,
 `POST /printing/lot-labels/png`): the product, the batch code in bars, the

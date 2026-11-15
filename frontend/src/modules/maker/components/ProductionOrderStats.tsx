@@ -16,6 +16,7 @@ import type { ProductionOrder } from "@/modules/maker/types/maker";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
 import { CostFigure } from "@/modules/maker/components/CostFigure";
+import { runBatchNames } from "@/modules/maker/lib/runBatches";
 
 interface ProductionOrderStatsProps {
   order: ProductionOrder;
@@ -76,6 +77,9 @@ function totalCostLabel(status: string, t: TFunction): string {
       defaultValue: "Total cost after closing",
     });
   }
+  if (status === "IN_PROGRESS") {
+    return t("detail.card.takenSoFar");
+  }
   if (status === "REVERSED") {
     return t("detail.card.totalCostUndone", {
       defaultValue: "Cost before the run was undone",
@@ -124,6 +128,53 @@ function EstimatedCostTile({ order }: { order: ProductionOrder }) {
   );
 }
 
+/**
+ * The day a run is about: the one it was started on while it is under way,
+ * the production date once it has closed — beside the batch it put its output
+ * into.
+ */
+function RunDayTile({ order }: { order: ProductionOrder }) {
+  const { t } = useTranslation("maker");
+  const underWay = order.status === "IN_PROGRESS";
+  const day = underWay ? order.started_on : order.production_date;
+  return (
+    <StatTile
+      label={
+        underWay
+          ? t("progress.startedOn")
+          : t("detail.card.productionDate", {
+              defaultValue: "Production date",
+            })
+      }
+      valueSize="text-base"
+      valueClass="text-on font-medium"
+      // The batch the run put its output into, beside the day it made it.
+      note={
+        runBatchNames(order)
+          ? `${t("detail.card.outputLot")}: ${runBatchNames(order)}`
+          : undefined
+      }
+    >
+      {day ? formatDate(day) : "—"}
+    </StatTile>
+  );
+}
+
+/** The part of a closed run's cost whose output left the shelf before it closed. */
+function UnshelvedCostNote({ order }: { order: ProductionOrder }) {
+  const { t, i18n } = useTranslation("maker");
+  const currency = useOrganizationCurrency();
+  const amount = Number(order.unshelved_cost ?? 0);
+  if (amount <= 0) return null;
+  return (
+    <p className="text-sm text-amber-700 dark:text-amber-400">
+      {t("detail.card.unshelvedCost", {
+        amount: formatMoney(amount, currency, i18n.language),
+      })}
+    </p>
+  );
+}
+
 export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
   const { t, i18n } = useTranslation("maker");
   const resultTerm = useResultTerms();
@@ -150,6 +201,10 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
   const hasOtherCosts = Number(order.total_cost) > 0;
   const priced = Math.max(closedLines.length - unpriced, hasOtherCosts ? 1 : 0);
   const gapId = "production-total-gap";
+  // A run in progress has no total yet: what its ingredients cost is the
+  // figure it holds until it closes.
+  const shownCost =
+    order.status === "IN_PROGRESS" ? order.material_cost : order.total_cost;
   const costNote =
     closedLines.length > 0 && (order.unit_cost != null || unpriced > 0) ? (
       <>
@@ -187,14 +242,14 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
         >
           {closedLines.length > 0 ? (
             <CostFigure
-              value={order.total_cost ?? null}
+              value={shownCost ?? null}
               priced={priced}
               unpriced={unpriced}
               announce={false}
               describedBy={gapId}
             />
           ) : (
-            formatMoney(order.total_cost, currency, i18n.language)
+            formatMoney(shownCost, currency, i18n.language)
           )}
         </StatTile>
         <EstimatedCostTile order={order} />
@@ -206,22 +261,9 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
         >
           {formatDateTime(order.created_at)}
         </StatTile>
-        <StatTile
-          label={t("detail.card.productionDate", {
-            defaultValue: "Production date",
-          })}
-          valueSize="text-base"
-          valueClass="text-on font-medium"
-          // The batch the run put its output into, beside the day it made it.
-          note={
-            order.output_lot_name
-              ? `${t("detail.card.outputLot")}: ${order.output_lot_name}`
-              : undefined
-          }
-        >
-          {order.production_date ? formatDate(order.production_date) : "—"}
-        </StatTile>
+        <RunDayTile order={order} />
       </div>
+      <UnshelvedCostNote order={order} />
 
       {/* Actual / scrap / overproduced stats (completed orders only) */}
       {order.status === "COMPLETED" && order.actual_qty && (

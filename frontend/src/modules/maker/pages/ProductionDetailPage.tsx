@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { Hammer, CheckCircle2, ExternalLink, Copy, Pencil } from "lucide-react";
+import { Hammer, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { extractApiError, isNotFoundError } from "@/lib/errors";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
@@ -12,9 +12,9 @@ import { InlineQueryError, QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Textarea } from "@/components/ui/Textarea";
-import { CancelRunButton } from "@/modules/maker/components/CancelRunButton";
-import { ReverseRunAction } from "@/modules/maker/components/ReverseRunAction";
-import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
+import { ProductionRunActions } from "@/modules/maker/components/ProductionRunActions";
+import { RunPortions } from "@/modules/maker/components/RunPortions";
+import { RunSteps } from "@/modules/maker/components/RunSteps";
 import { OrderEditForm } from "@/modules/maker/components/OrderEditForm";
 import { ProductionIngredientsTable } from "@/modules/maker/components/ProductionIngredientsTable";
 import { ProductionStockMovesTable } from "@/modules/maker/components/ProductionStockMovesTable";
@@ -88,6 +88,7 @@ export default function ProductionDetailPage() {
     shortages: completeShortages,
     setShortages: setCompleteShortages,
     shortAtCreate,
+    showShortage,
   } = completeRun;
 
   useEffect(() => {
@@ -179,48 +180,17 @@ export default function ProductionDetailPage() {
           <Hammer size={14} />
           {order.number ?? order.id.slice(0, 8)}
         </div>
-        {/* flex-wrap, not smaller buttons: the row holds the status badge
-            and up to four actions, and on a phone it used to run past the
-            edge under an overflow-hidden ancestor — "Complete run" cut
-            mid-label, "Duplicate" invisible. Same pattern as
-            DocumentActionButtons. */}
-        <div className="flex flex-wrap items-center gap-3">
-          <ProductionStatusBadge status={order.status} />
-          {isDraft && (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditing((v) => !v)}
-                leftIcon={<Pencil size={16} />}
-                data-testid="maker-detail-edit-button"
-              >
-                {t("detail.edit", { defaultValue: "Edit" })}
-              </Button>
-              <CancelRunButton
-                canManage={canManage}
-                canWrite={canWrite}
-                onCancel={() => setShowCancelConfirm(true)}
-              />
-              <Button
-                onClick={() => setShowCompleteConfirm(true)}
-                leftIcon={<CheckCircle2 size={16} />}
-                data-testid="maker-detail-complete-button"
-              >
-                {t("detail.complete", { defaultValue: "Complete run" })}
-              </Button>
-            </>
-          )}
-          <ReverseRunAction order={order} />
-          <Button
-            variant="outline"
-            onClick={() => duplicate(order.id)}
-            disabled={isDuplicating}
-            leftIcon={<Copy size={16} />}
-            data-testid="maker-detail-duplicate-button"
-          >
-            {t("detail.duplicate", { defaultValue: "Duplicate" })}
-          </Button>
-        </div>
+        <ProductionRunActions
+          order={order}
+          canManage={canManage}
+          canWrite={canWrite}
+          isDuplicating={isDuplicating}
+          onEdit={() => setIsEditing((v) => !v)}
+          onCancel={() => setShowCancelConfirm(true)}
+          onComplete={() => setShowCompleteConfirm(true)}
+          onDuplicate={() => duplicate(order.id)}
+          onShortage={showShortage}
+        />
       </div>
 
       {isEditing && isDraft ? (
@@ -250,6 +220,13 @@ export default function ProductionDetailPage() {
               </p>
             </Card>
           )}
+        </>
+      )}
+
+      {order.status === "IN_PROGRESS" && (
+        <>
+          <RunSteps order={order} canWrite={canWrite} />
+          <RunPortions order={order} canWrite={canWrite} />
         </>
       )}
 
@@ -336,10 +313,14 @@ export default function ProductionDetailPage() {
         title={t("detail.cancelConfirm.title", {
           defaultValue: "Cancel production run?",
         })}
-        message={t("detail.cancelConfirm.description", {
-          defaultValue:
-            "Cancelling marks this draft as cancelled. No stock will be moved.",
-        })}
+        message={
+          order.status === "IN_PROGRESS"
+            ? t("progress.cancelConfirm")
+            : t("detail.cancelConfirm.description", {
+                defaultValue:
+                  "Cancelling marks this draft as cancelled. No stock will be moved.",
+              })
+        }
         confirmLabel={t("detail.cancelConfirm.confirm", {
           defaultValue: "Yes, cancel run",
         })}

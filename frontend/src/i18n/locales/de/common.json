@@ -408,6 +408,7 @@
         "copied_from_builtin": "Von einer eingebauten Vorlage kopiert",
         "copied_from_culinary_recipe": "Kopiert aus Rezept",
         "cost": "Kosten",
+        "cost_added": "Hinzugefügte Kosten",
         "cost_line": "Kostenposition",
         "cost_line_added": "Kostenposition hinzugefügt",
         "cost_line_removed": "Kostenposition entfernt",
@@ -651,7 +652,12 @@
         "shelf_life_days_before": "Haltbarkeit vorher (Tage)",
         "shelf_life_days_after": "Haltbarkeit nachher (Tage)",
         "typed_unit_price_before": "Eingetragener Preis vorher",
-        "typed_unit_price_after": "Eingetragener Preis nachher"
+        "typed_unit_price_after": "Eingetragener Preis nachher",
+        "done_on": "Erledigt am",
+        "make_fresh": "Immer frisch herstellen",
+        "material_cost": "Kosten der entnommenen Materialien",
+        "started_on": "Gestartet am",
+        "step": "Schritt"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",
