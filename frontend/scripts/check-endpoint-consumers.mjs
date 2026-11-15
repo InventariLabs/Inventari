@@ -22,8 +22,13 @@
  *   node check-endpoint-consumers.mjs        # full report, exit 1
  *   node check-endpoint-consumers.mjs --list # print unclaimed routes only
  *
- * There is no baseline: integration-only.json IS the record, and it carries an
- * owner and an expiry per entry so a deferral cannot go quiet.
+ * There is no baseline: integration-only.json IS the record. Every entry
+ * carries a reason and an owner, so a deferral cannot go quiet, and a verdict.
+ * An integration-only entry is right by design and carries no date. The other
+ * verdicts wait for a fix and carry one, and a passed date warns without
+ * refusing: a date in the code refuses whoever commits that day, not whoever
+ * owns the entry — in a public repository an outside contributor who cannot
+ * settle it — and every released version would turn red for good after it.
  */
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { resolve, relative, join } from "node:path";
@@ -142,34 +147,57 @@ export function unclaimedRoutes(routes, calls) {
     .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
+// The one verdict that is a resting state. The others wait for a fix: the UI
+// gets built, the route goes, or the product question gets an answer.
+const BY_DESIGN = "integration-only";
+const WAITING = ["to-wire", "to-delete", "to-decide"];
+
 /**
- * Read the register of routes that intentionally have no UI.
+ * Read the register of routes that have no UI.
  *
- * Every entry needs a reason, an owner and an expiry, for the reason the
- * backend's permission deferrals do: a suppression with nobody's name on it
- * outlives the question it was standing in for.
+ * Every entry needs a reason and an owner, for the reason the backend's
+ * permission deferrals do: a suppression with nobody's name on it outlives the
+ * question it was standing in for. Only an entry that waits for a fix is
+ * dated, and once the date passes it warns and keeps claiming its route.
  */
 export function readRegister(raw, today) {
   const errors = [];
+  const warnings = [];
   const claimed = new Set();
   for (const [route, entry] of Object.entries(raw.routes ?? {})) {
     const where = `integration-only.json → "${route}"`;
+    const before = errors.length;
     if (!entry?.reason) errors.push(`${where}: no reason given.`);
     if (!entry?.owner)
       errors.push(
         `${where}: names nobody. An unowned entry is how a gap goes quiet.`,
       );
-    const expires = entry?.expires ? new Date(entry.expires) : null;
-    if (!expires || Number.isNaN(expires.valueOf()))
-      errors.push(`${where}: expires must be a YYYY-MM-DD date.`);
-    else if (expires < today)
+    const verdict = entry?.verdict;
+    if (verdict === BY_DESIGN) {
+      if (entry.expires != null)
+        errors.push(
+          `${where}: an integration-only entry is right by design and carries no date. ` +
+            `Date it only with a verdict that waits for a fix (${WAITING.join(", ")}).`,
+        );
+    } else if (WAITING.includes(verdict)) {
+      const expires = entry.expires ? new Date(entry.expires) : null;
+      if (!expires || Number.isNaN(expires.valueOf()))
+        errors.push(
+          `${where}: a ${verdict} entry waits for a fix, so expires must be a YYYY-MM-DD date.`,
+        );
+      else if (expires < today)
+        warnings.push(
+          `${where} (${verdict}) expired on ${entry.expires} — ${entry.owner} was to settle it. ` +
+            "Settle it, or move the date in a commit that says what was deferred and why. Nothing is refused.",
+        );
+    } else {
       errors.push(
-        `${where}: expired on ${entry.expires} — ${entry.owner ?? "nobody"} was to decide: build the UI, or delete the route.`,
+        `${where}: verdict must be one of ${[BY_DESIGN, ...WAITING].join(", ")}.`,
       );
-    if (entry?.reason && entry?.owner && expires && expires >= today)
-      claimed.add(route);
+    }
+    if (errors.length === before) claimed.add(route);
   }
-  return { claimed, errors };
+  return { claimed, errors, warnings };
 }
 
 function main() {
@@ -183,7 +211,7 @@ function main() {
   const raw = existsSync(REGISTER_FILE)
     ? JSON.parse(readFileSync(REGISTER_FILE, "utf8"))
     : { routes: {} };
-  const { claimed, errors } = readRegister(raw, new Date());
+  const { claimed, errors, warnings } = readRegister(raw, new Date());
 
   if (process.argv.includes("--list")) {
     for (const route of unclaimed) console.log(route);
@@ -200,10 +228,16 @@ function main() {
     for (const route of missing) console.error(`  - ${route}`);
     console.error(
       "\nEither wire the route into the UI, or record the decision in " +
-        "frontend/scripts/integration-only.json with a reason, an owner and an expiry.",
+        "frontend/scripts/integration-only.json with a reason, an owner and a " +
+        "verdict, and a date unless the verdict is integration-only.",
     );
   }
   for (const error of errors) console.error(`  - ${error}`);
+  // A workflow command, so CI shows it as an annotation; locally it is a line.
+  for (const warning of warnings)
+    console.log(
+      `::warning file=frontend/scripts/integration-only.json,title=Route without UI past its date::${warning}`,
+    );
   if (stale.length > 0) {
     console.log(
       `\n${stale.length} entr(y/ies) in integration-only.json now have a caller and can be removed:`,
@@ -213,7 +247,8 @@ function main() {
 
   if (missing.length > 0 || errors.length > 0) process.exit(1);
   console.log(
-    `Every one of the ${routes.filter(isVersionedApi).length} API routes is either called from the UI or recorded as integration-only.`,
+    `Every one of the ${routes.filter(isVersionedApi).length} API routes is either called from the UI or recorded as integration-only` +
+      (warnings.length ? ` (${warnings.length} entr(y/ies) past their date, above).` : "."),
   );
   process.exit(0);
 }

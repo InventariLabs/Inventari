@@ -9,32 +9,31 @@
     "  to-delete        — superseded by a route the UI already calls",
     "  to-decide        — the product question is open",
     "",
-    "Only integration-only is a resting state. The other three are scheduled",
-    "work, and `expires` is what schedules it: past that date the gate fails and",
-    "names the owner. An entry with no reason, no owner or no date is refused."
+    "Only integration-only is a resting state, and it carries no date: an",
+    "exception right by design is re-read in review, not on a day. The other",
+    "three wait for a fix and carry `expires`; past that date the gate warns and",
+    "names the owner, and refuses nothing. An entry with no reason, no owner or",
+    "no known verdict is refused, and so is a dated integration-only entry or an",
+    "undated one of the other three."
   ],
   "routes": {
     "/api/v1/admin/stats/activity": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Installation-wide admin activity metrics. No frontend screen renders them; they are read through the API."
+      "verdict": "integration-only",
+      "reason": "Installation-wide activity timeline, for the instance's superuser. The app's screens are scoped to one organization and have no installation view; the hosted service's admin dashboard reads the same numbers through core_api.admin, so these routes serve an operator's scripts."
     },
     "/api/v1/admin/stats/ai-usage": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Token and cost accounting per AI purpose. No frontend screen renders it; it is read through the API."
+      "verdict": "integration-only",
+      "reason": "Token and cost accounting per AI purpose across the installation, for the instance's superuser. The app's screens are scoped to one organization and have no installation view; the hosted service's admin dashboard reads the same numbers through core_api.admin, so these routes serve an operator's scripts."
     },
     "/api/v1/admin/stats/summary": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Installation-wide counts across organizations. No frontend screen renders them; they are read through the API."
+      "verdict": "integration-only",
+      "reason": "Installation-wide counts across organizations, for the instance's superuser. The app's screens are scoped to one organization and have no installation view; the hosted service's admin dashboard reads the same numbers through core_api.admin, so these routes serve an operator's scripts."
     },
     "/api/v1/warehouse/documents/lookup/{number}": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
       "verdict": "integration-only",
       "reason": "Finds a document by its printed number. The document scanner resolves numbers through the scan registry instead, so this route serves external systems that hold a number from a printout and need the record."
     },
@@ -49,18 +48,6 @@
       "expires": "2026-11-30",
       "verdict": "to-wire",
       "reason": "Read, update and delete of one document type's configuration. No settings screen calls it."
-    },
-    "/api/v1/warehouse/tax-rates": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Tax rate dictionary, create and list. No settings screen calls it; document lines carry the rate as entered."
-    },
-    "/api/v1/warehouse/tax-rates/{rate_id}": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Read, update and delete for the tax rate dictionary. No screen calls it."
     },
     "/api/v1/warehouse/tax-summary": {
       "owner": "maintainers",
@@ -82,7 +69,6 @@
     },
     "/api/v1/items/cursor-page": {
       "owner": "maintainers",
-      "expires": "2027-08-31",
       "verdict": "integration-only",
       "reason": "Cursor pagination over items for external consumers and large exports. The UI pages by offset because it shows page numbers, which a cursor cannot provide. Both are canonical envelopes per AGENTS.md."
     },
@@ -124,7 +110,6 @@
     },
     "/api/v1/organizations/current/defaults": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
       "verdict": "integration-only",
       "reason": "Operator lever: re-seeds the product profile's starting locations for an organization that lacks them. Enabled modules seed their own locations through system_on_enable, so no screen calls it."
     },
@@ -136,31 +121,26 @@
     },
     "/api/v1/printing/agent/jobs/{job_id}/image": {
       "owner": "printing",
-      "expires": "2027-06-30",
       "verdict": "integration-only",
       "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
     },
     "/api/v1/printing/agent/jobs/{job_id}/report": {
       "owner": "printing",
-      "expires": "2027-06-30",
       "verdict": "integration-only",
       "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
     },
     "/api/v1/printing/agent/register": {
       "owner": "printing",
-      "expires": "2027-06-30",
       "verdict": "integration-only",
       "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
     },
     "/api/v1/printing/agent/{agent_id}/claim": {
       "owner": "printing",
-      "expires": "2027-06-30",
       "verdict": "integration-only",
       "reason": "Called by the Inventari Print Agent (print-agent/agent.py, serve mode) on the machine next to a printer, never by the browser; a key with the printing scope reaches these paths and nothing else."
     },
     "/api/v1/profiles/{profile_id}": {
       "owner": "maintainers",
-      "expires": "2027-08-31",
       "verdict": "integration-only",
       "reason": "One product profile by id. The onboarding and settings screens list profiles and apply one; the packaging CLI is what addresses a single profile."
     },
@@ -178,7 +158,6 @@
     },
     "/api/v1/purchase-orders/{po_id}/create-receipt": {
       "owner": "maintainers",
-      "expires": "2027-08-31",
       "verdict": "integration-only",
       "reason": "Builds a confirmed receipt for an order in one call, for scripts and integrations that hand the floor a receipt to scan. The order screen receives through the one-screen receive, which posts with POST /warehouse/documents/post."
     },
@@ -196,13 +175,11 @@
     },
     "/api/v1/recipes/import": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "The commit step of recipe import. The UI calls /recipes/import/preview only and has no confirm action that calls this route."
+      "verdict": "integration-only",
+      "reason": "Imports a recipe from JSON or a URL in one call, with no review step, for scripts. The import screen previews through /recipes/import/preview, lets the user correct the draft, and saves it through POST /recipes."
     },
     "/api/v1/recipes/ingredient-defaults/seed": {
       "owner": "maintainers",
-      "expires": "2027-08-31",
       "verdict": "integration-only",
       "reason": "Seeds the starter ingredient-to-product mapping for an organization. An operator lever, like the seed-defaults routes in purchase orders and equipment."
     },
@@ -211,12 +188,6 @@
       "expires": "2026-11-30",
       "verdict": "to-wire",
       "reason": "Adds several meal plan entries in one call. The planner adds entries one request at a time."
-    },
-    "/api/v1/recipes/meal-plans/{plan_id}/entries/{entry_id}/cook": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Starts a picking session from a planned meal. The meal planner has no cook action that calls it."
     },
     "/api/v1/roles/users/{user_id}/{role_id}": {
       "owner": "maintainers",
@@ -244,15 +215,8 @@
     },
     "/api/v1/stats/overview/stream": {
       "owner": "maintainers",
-      "expires": "2027-08-31",
       "verdict": "integration-only",
       "reason": "Server-sent stream of the overview numbers, for a wallboard or an external dashboard. The dashboard polls the plain /stats/overview instead."
-    },
-    "/api/v1/stats/shopping-suggestions": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "Shopping suggestions from consumption history. The shopping lists module computes its own suggestions and the UI reads those."
     },
     "/api/v1/stock-takes/cycle-count-schedules": {
       "owner": "maintainers",
@@ -276,7 +240,7 @@
       "owner": "maintainers",
       "expires": "2026-11-30",
       "verdict": "to-wire",
-      "reason": "Read, update and delete one storage type. The UI lists and creates storage types but does not call this route."
+      "reason": "Read, update and delete one storage type. The UI lists storage types to pick one for a location, and has no screen that creates, corrects or deletes a type."
     }
   }
 }

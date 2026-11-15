@@ -3,6 +3,9 @@
  * consumed, tighten them and every parameterised call looks orphaned. These
  * cases pin the shapes an earlier version of the gate got wrong.
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -103,38 +106,102 @@ describe("readRegister", () => {
   const entry = (over) => ({
     routes: {
       "/api/v1/x": {
-        reason: "Print agent polls it.",
+        reason: "No screen reads it yet.",
         owner: "maintainers",
+        verdict: "to-wire",
         expires: "2026-12-31",
         ...over,
       },
     },
   });
+  const byDesign = () => {
+    const raw = entry({
+      verdict: "integration-only",
+      reason: "The print agent polls it.",
+    });
+    delete raw.routes["/api/v1/x"].expires;
+    return raw;
+  };
 
-  it("accepts a complete entry", () => {
-    const { claimed, errors } = readRegister(entry(), today);
+  it("accepts a dated entry that waits for a fix", () => {
+    const { claimed, errors, warnings } = readRegister(entry(), today);
+    expect([...claimed]).toEqual(["/api/v1/x"]);
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+  });
+
+  it("accepts an integration-only entry with no date: it is right by design", () => {
+    const { claimed, errors } = readRegister(byDesign(), today);
     expect([...claimed]).toEqual(["/api/v1/x"]);
     expect(errors).toEqual([]);
   });
 
-  it("refuses an entry with no owner, no reason or no expiry", () => {
-    expect(
-      readRegister(entry({ owner: undefined }), today).errors,
-    ).toHaveLength(1);
-    expect(
-      readRegister(entry({ reason: undefined }), today).errors,
-    ).toHaveLength(1);
-    expect(
-      readRegister(entry({ expires: undefined }), today).errors,
-    ).toHaveLength(1);
+  it("refuses an entry with no owner or no reason, and stops claiming it", () => {
+    for (const over of [{ owner: undefined }, { reason: undefined }]) {
+      const { claimed, errors } = readRegister(entry(over), today);
+      expect(errors).toHaveLength(1);
+      expect(claimed.size).toBe(0);
+    }
   });
 
-  it("refuses an entry past its date, and stops claiming the route", () => {
-    const { claimed, errors } = readRegister(
+  it("refuses a date on an entry by design, and none on one that waits", () => {
+    const dated = readRegister(
+      entry({ verdict: "integration-only" }),
+      today,
+    ).errors;
+    expect(dated).toHaveLength(1);
+    expect(dated[0]).toContain("carries no date");
+    for (const verdict of ["to-wire", "to-delete", "to-decide"]) {
+      const undated = readRegister(
+        entry({ verdict, expires: undefined }),
+        today,
+      ).errors;
+      expect(undated).toHaveLength(1);
+      expect(undated[0]).toContain("YYYY-MM-DD");
+    }
+  });
+
+  it("refuses an entry with no verdict or one it does not know", () => {
+    for (const verdict of [undefined, "later"]) {
+      const { errors } = readRegister(entry({ verdict }), today);
+      expect(errors).toHaveLength(1);
+      expect(errors[0]).toContain("verdict");
+    }
+  });
+
+  it("warns on an entry past its date, names its owner, and keeps claiming the route", () => {
+    const { claimed, errors, warnings } = readRegister(
       entry({ expires: "2026-01-01" }),
       today,
     );
-    expect(claimed.size).toBe(0);
-    expect(errors[0]).toContain("expired");
+    expect(errors).toEqual([]);
+    expect([...claimed]).toEqual(["/api/v1/x"]);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain("expired on 2026-01-01");
+    expect(warnings[0]).toContain("maintainers");
   });
+});
+
+describe("integration-only.json as committed", () => {
+  const raw = JSON.parse(
+    readFileSync(join(import.meta.dirname, "integration-only.json"), "utf8"),
+  );
+  const dates = Object.values(raw.routes)
+    .map((entry) => entry.expires)
+    .filter(Boolean)
+    .sort();
+  const dayAfterTheLast = new Date(dates.at(-1));
+  dayAfterTheLast.setUTCDate(dayAfterTheLast.getUTCDate() + 1);
+
+  // A passed date may only warn, so the register stays whole the day after
+  // its last date and on any day after that.
+  it.each([dayAfterTheLast, new Date("2099-12-31")])(
+    "claims every route it lists and refuses nothing on %s",
+    (day) => {
+      const { claimed, errors, warnings } = readRegister(raw, day);
+      expect(errors).toEqual([]);
+      expect(claimed.size).toBe(Object.keys(raw.routes).length);
+      expect(warnings).toHaveLength(dates.length);
+    },
+  );
 });

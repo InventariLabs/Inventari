@@ -1,16 +1,18 @@
 {
   "_comment": [
-    "Everything the frontend gates are currently told to ignore, and who owes",
-    "an answer by when.",
+    "Everything the frontend gates are currently told to ignore, who answers",
+    "for it, and why.",
     "",
     "Keys are '<source>::<entry>'. The register is never written by a",
-    "--write-baseline run, so regenerating a baseline cannot lose it."
+    "--write-baseline run, so regenerating a baseline cannot lose it.",
+    "",
+    "An entry right by design carries no date. One that waits for a fix carries",
+    "`expires`; past it the gate warns and names the owner, and refuses nothing."
   ],
   "suppressions": {
     "knip.json:ignore::src/types/api-generated.ts": {
       "owner": "maintainers",
-      "expires": "2027-08-31",
-      "reason": "Structural: generated from the backend schema and checked in for the type checker, so nothing imports it at runtime. Dated anyway — a permanent exemption still deserves a yearly look."
+      "reason": "Structural: generated from the backend schema and checked in for the type checker, so nothing imports it at runtime."
     }
   }
 }

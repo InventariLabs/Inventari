@@ -301,7 +301,7 @@ jobs:
       - name: API routes have a caller or a recorded reason
         run: npm run check:consumers
 
-      - name: Suppressions have an owner and a live date
+      - name: Suppressions have an owner and a reason
         run: npm run check:suppressions
 
       # See the backend job: a failed gate must not hide the build's result.
