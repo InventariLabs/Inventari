@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { useCanManage } from "@/hooks/useCanWrite";
+import { useFormGuard } from "@/module-sdk";
 import { useUpdateMakerRecipe } from "@/modules/maker/hooks/useRecipes";
 import type { MakerRecipe } from "@/modules/maker/types/maker";
 
@@ -50,6 +51,9 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
   const [newMinutes, setNewMinutes] = useState("");
 
   const steps = recipe.process_steps ?? [];
+  // The editor holds two fields per step — the text and its time — so leaving
+  // the page mid-edit asks before the whole set is thrown away.
+  useFormGuard(draft !== null, t("detail.processStepsGuard"));
 
   async function save() {
     if (draft === null) return;

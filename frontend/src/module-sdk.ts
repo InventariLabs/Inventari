@@ -59,6 +59,7 @@ export { effectiveExpiry } from "@/utils/effectiveExpiry";
 
 // What the signed-in user may do, and the page header ModuleShell renders.
 export { useCanWrite } from "@/hooks/useCanWrite";
+export { useFormGuard } from "@/hooks/useFormGuard";
 // A single permission key, for a right another module's manifest declares —
 // a screen offering an approval decision asks `approvals:approve` here.
 export { useHasPermission } from "@/hooks/useHasPermission";

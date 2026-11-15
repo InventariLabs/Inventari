@@ -330,7 +330,8 @@
     "processStepMinutes": "{{minutes}} min",
     "processStepMinutesLabel": "Minutes de l'étape {{number}}",
     "minutesShort": "min",
-    "minutesPlaceholder": "min"
+    "minutesPlaceholder": "min",
+    "processStepsGuard": "Les étapes du procédé"
   },
   "bom": {
     "childLabel": "Ingrédient",

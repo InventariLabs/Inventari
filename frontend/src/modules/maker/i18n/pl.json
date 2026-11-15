@@ -336,7 +336,8 @@
     "processStepMinutes": "{{minutes}} min",
     "processStepMinutesLabel": "Minuty kroku {{number}}",
     "minutesShort": "min",
-    "minutesPlaceholder": "min"
+    "minutesPlaceholder": "min",
+    "processStepsGuard": "Kroki procesu"
   },
   "bom": {
     "childLabel": "Składnik",

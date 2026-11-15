@@ -330,7 +330,8 @@
     "processStepMinutes": "{{minutes}} Min.",
     "processStepMinutesLabel": "Minuten für Schritt {{number}}",
     "minutesShort": "Min.",
-    "minutesPlaceholder": "Min."
+    "minutesPlaceholder": "Min.",
+    "processStepsGuard": "Die Prozessschritte"
   },
   "bom": {
     "childLabel": "Zutat",
