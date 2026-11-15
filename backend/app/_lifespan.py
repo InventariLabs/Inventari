@@ -6,6 +6,7 @@ TokenBlacklist, cache) and module lifecycle hooks.
 """
 
 import asyncio
+import gc
 from contextlib import asynccontextmanager
 from logging import Logger
 from typing import TYPE_CHECKING
@@ -320,6 +321,16 @@ async def _start_services(
     from app.core.dev_guard import run_dev_guard
 
     run_dev_guard()
+    # What startup built — modules, routes, mappers, schemas, close to nine
+    # hundred thousand objects — lives as long as the worker, and a full
+    # collection walked all of it: two to three hundred milliseconds, set off
+    # most often by the requests that allocate most, which put the tail of
+    # the location tree over its budget with no count in it at all. Frozen,
+    # it is no longer the collector's to walk. Not under TESTING (returned
+    # above): each test enters the lifespan again, and every earlier test's
+    # leftovers would be frozen.
+    gc.collect()
+    gc.freeze()
     logger.info('[Startup] All startup tasks complete.')
     return hub_task, failed_modules
 

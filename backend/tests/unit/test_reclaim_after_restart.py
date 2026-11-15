@@ -84,6 +84,9 @@ def _startup_steps(calls: list[str], *, reclaim_error: Exception | None = None):
         ),
         patch('app.core.dev_guard.run_dev_guard', guard),
         patch('app.config.settings.TESTING', False),
+        # A worker freezes what startup built; this process is a test worker,
+        # whose later tests' garbage must stay collectable.
+        patch('app._lifespan.gc.freeze'),
     ]
 
 

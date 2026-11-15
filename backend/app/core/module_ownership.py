@@ -37,17 +37,32 @@ def unclaimed_by_a_module(claimed_tags: set[str]) -> ColumnElement[bool]:
     form never required a category — was indistinguishable from an ordinary
     product. The equipment module had already learned to ask two questions
     about its own records; the core still asked one.
+
+    The category side is asked as "not among the categories a module
+    claims", one set read once, rather than as "its category is not a
+    module's", a lookup correlated with each record. The two keep and drop
+    the same records — a filed record always has its category row — and the
+    database runs both as one hashed set, but the planner priced the
+    correlated form per record: counting what stands below a warehouse it
+    walked every record through an index instead of reading the table, and
+    the count cost more than three times what the same count cost without
+    the filter.
+    The set never correlates with the statement it sits in, even one that
+    joins ``categories`` itself.
     """
     claimed_modules = get_claimed_modules()
     if not claimed_tags and not claimed_modules:
         return true()
 
+    claimed_categories = (
+        select(Category.id)
+        .where(Category.context_tag.in_(claimed_tags))
+        .correlate(None)
+    )
     return or_(
-        Item.category.has(
-            or_(
-                Category.context_tag.is_(None),
-                Category.context_tag.notin_(claimed_tags),
-            )
+        and_(
+            Item.category_id.isnot(None),
+            Item.category_id.notin_(claimed_categories),
         ),
         and_(
             Item.category_id.is_(None),

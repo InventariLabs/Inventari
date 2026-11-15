@@ -97,6 +97,18 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The locations list and the location tree answer within their screens'
+  budget in a large warehouse. A page holding a warehouse or the containers
+  above its shelves, and the first levels of the tree, count every record
+  below them, and the filter that leaves out a module's records made the
+  database visit those records one by one: at a hundred thousand products
+  such a page took 0.6 to 0.8 s at the 95th percentile, and now takes about
+  0.2 s, with the same numbers on every screen that prints them.
+- A server worker no longer stalls for two or three hundred milliseconds now
+  and then while Python's garbage collector walks everything the application
+  built at startup. Those objects live as long as the worker and are now left
+  out of collection once startup is done, which took the slow tail off the
+  reads that allocate most, the location tree among them.
 - Deleting a recipe collection now leaves a row in the audit journal, as
   deleting a recipe or a meal plan does. The row names the collection, who
   deleted it and any sub-collections that went with it, and appears in the
