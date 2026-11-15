@@ -9,8 +9,8 @@ its own recipe and never taken from its stock. Every existing line gets
 ``maker_production_portions`` holds those portions. All of it is NULL / empty
 on runs completed in one step.
 
-Revision ID: 019_staged_runs_and_stock_first
-Revises: 018_backfill_process_steps
+Revision ID: 020_staged_runs_and_stock_first
+Revises: 019_output_batch_and_papers
 Create Date: 2026-11-15
 """
 
@@ -20,8 +20,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = '019_staged_runs_and_stock_first'
-down_revision: str | None = '018_backfill_process_steps'
+revision: str = '020_staged_runs_and_stock_first'
+down_revision: str | None = '019_output_batch_and_papers'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
