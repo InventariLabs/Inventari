@@ -259,10 +259,11 @@ describe("StatsPage", () => {
       signInWith(["admin:access"]);
       render(<StatsPage />, { wrapper: Wrapper });
 
-      const settings = await screen.findByRole("link", {
-        name: /module settings/i,
-      });
-      const overview = screen.getByRole("link", { name: /overview/i });
+      await screen.findByRole("link", { name: /module settings/i });
+      // The nav is drawn again as the page's reads settle, so the links are
+      // read from what stands once the tabs are there, not from the first draw.
+      const overview = await screen.findByRole("link", { name: /overview/i });
+      const settings = screen.getByRole("link", { name: /module settings/i });
       const track = overview.parentElement as HTMLElement;
       expect(track.className).toContain("overflow-x-auto");
       expect(track).not.toContainElement(settings);

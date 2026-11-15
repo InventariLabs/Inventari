@@ -367,8 +367,10 @@ describe("StoragesPage — one screen", () => {
     const path = await screen.findByRole("navigation", {
       name: "Location path",
     });
+    // The path is read apart from the place itself, so its segments are
+    // not there the moment the navigation is.
     await userEvent.click(
-      within(path).getByRole("button", { name: "Pantry Building" }),
+      await within(path).findByRole("button", { name: "Pantry Building" }),
     );
 
     expect(
@@ -815,7 +817,9 @@ describe("StoragesPage — one screen", () => {
     expect(
       await screen.findByRole("heading", { name: "Shelf A" }),
     ).toBeInTheDocument();
-    const backButtons = screen.getAllByRole("button", { name: "Dry Goods" });
+    const backButtons = await screen.findAllByRole("button", {
+      name: "Dry Goods",
+    });
     expect(backButtons.length).toBeGreaterThan(0);
     const path = screen.getByRole("navigation", { name: "Location path" });
     expect(
@@ -1265,7 +1269,7 @@ describe("StoragesPage — one screen", () => {
     renderPage("/inventory/locations/leaf");
     await screen.findByRole("heading", { name: "Shelf A" });
 
-    const back = screen.getAllByRole("button", { name: "Dry Goods" });
+    const back = await screen.findAllByRole("button", { name: "Dry Goods" });
     await userEvent.click(back[0]);
 
     expect(

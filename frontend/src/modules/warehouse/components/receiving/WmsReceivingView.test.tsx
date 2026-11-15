@@ -553,7 +553,9 @@ describe("WmsReceivingView", () => {
     // used to arrive as two separate keys and confirm nothing.
     scanIntoField("A", field as HTMLInputElement, "Tab");
     await waitFor(() => expect(bodies).toHaveLength(1));
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    });
 
     const quantity = screen.getByRole("spinbutton", { name: "Quantity" });
     scanIntoField("A", quantity as HTMLInputElement);

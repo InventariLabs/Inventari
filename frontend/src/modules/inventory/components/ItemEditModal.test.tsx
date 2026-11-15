@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@/test/utils";
+import { act, render, screen, fireEvent, waitFor } from "@/test/utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
@@ -862,7 +862,9 @@ describe("ItemEditModal — a category list that failed", () => {
         HttpResponse.json({ detail: "boom" }, { status: 500 }),
       ),
     );
-    await client?.invalidateQueries({ queryKey: queryKeys.categories.all });
+    await act(async () => {
+      await client?.invalidateQueries({ queryKey: queryKeys.categories.all });
+    });
 
     expect(await screen.findByText("refresh failed")).toBeInTheDocument();
     expect(screen.getByLabelText("Asset Tag")).toBeInTheDocument();

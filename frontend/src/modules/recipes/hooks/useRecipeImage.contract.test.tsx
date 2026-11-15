@@ -22,6 +22,11 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 
 beforeEach(() => {
   client = new QueryClient();
+  // The test client collects an unobserved query at once (see
+  // mocks/reactQuery). The list seeded below has no observer, and the
+  // assertion reads it after the request answered: how fast the mock server
+  // answers must not decide whether it is still there to be read.
+  client.setQueryDefaults(queryKeys.recipes.all(), { gcTime: Infinity });
 });
 
 /**

@@ -525,7 +525,9 @@ describe("CategoriesPage — module data kept out of the list", () => {
     renderPage(queryClient);
 
     await waitFor(() => expect(screen.getByText("Dairy")).toBeInTheDocument());
-    expect(screen.getByText(/8 categories are hidden/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/8 categories are hidden/),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /open settings/i }),
     ).toBeInTheDocument();
@@ -545,7 +547,9 @@ describe("CategoriesPage — module data kept out of the list", () => {
 
     renderPage(queryClient);
     await waitFor(() => expect(screen.getByText("Dairy")).toBeInTheDocument());
-    expect(screen.getByText(/8 categories are hidden/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/8 categories are hidden/),
+    ).toBeInTheDocument();
 
     fireEvent.change(screen.getByPlaceholderText(/search categories/i), {
       target: { value: "Dairy" },

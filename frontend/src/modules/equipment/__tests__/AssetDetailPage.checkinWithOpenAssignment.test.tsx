@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -158,7 +158,9 @@ describe("AssetDetailPage — check-in with open assignment", () => {
     renderPage();
     await screen.findByText("Serial Number", {}, { timeout: 5000 });
     // Give the assignments query a beat to settle before asserting absence.
-    await new Promise((r) => setTimeout(r, 100));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 100));
+    });
     expect(
       screen.queryByRole("button", { name: /^return$/i }),
     ).not.toBeInTheDocument();

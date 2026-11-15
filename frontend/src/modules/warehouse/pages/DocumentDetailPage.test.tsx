@@ -966,6 +966,12 @@ describe("DocumentDetailPage", () => {
       data: buildDocument({ status: "COMPLETED" }),
       isLoading: false,
     } as unknown as ReturnType<typeof documentHooks.useDocument>);
+    // A completed dispatch asks for its packages whether or not it shipped.
+    server.use(
+      http.get("/api/v1/warehouse/documents/doc-1/packages", () =>
+        HttpResponse.json({ packages: [], lines: [], editable: false }),
+      ),
+    );
 
     await renderWithRoute();
 

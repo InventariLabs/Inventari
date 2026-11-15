@@ -178,13 +178,24 @@ describe("a 401 against a refresh that keeps failing", () => {
   it("makes one refresh attempt per request and coalesces a burst", async () => {
     let refreshes = 0;
     let asks = 0;
+    // The refresh answers only once all three requests have reached the
+    // server, as they do on a real network where the burst is in flight
+    // together. Without the wait, how many requests the mock server has seen
+    // by the time the refresh fails is a matter of microtask ordering inside
+    // the interceptor, and the test would measure that instead of the client.
+    let burstArrived!: () => void;
+    const allArrived = new Promise<void>((resolve) => {
+      burstArrived = resolve;
+    });
     server.use(
       http.get("*/api/v1/things", () => {
         asks += 1;
+        if (asks === 3) burstArrived();
         return HttpResponse.json({ detail: "stale token" }, { status: 401 });
       }),
-      http.post("*/api/v1/auth/refresh", () => {
+      http.post("*/api/v1/auth/refresh", async () => {
         refreshes += 1;
+        if (refreshes === 1) await allArrived;
         return new HttpResponse(null, { status: 503 });
       }),
     );
