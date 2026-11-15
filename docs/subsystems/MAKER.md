@@ -24,6 +24,8 @@ I have the ingredients?").
 | `maker_production_orders` | Production order: DRAFT → COMPLETED / CANCELLED, and COMPLETED → REVERSED when a finished run is taken back. Holds a snapshot of the financial result. |
 | `maker_production_order_lines` | Per-ingredient consumption audit recorded on completion. |
 | `maker_module_settings` | The `*_module_settings` pattern (org_id PK, typed columns), including `labor_hourly_rate` — what an hour of the organization's own work costs. |
+| `maker_shelf_lives` | How many days a product keeps once made, one row per organization and product (a product can be a catalogue row shared by every organization, so the fact lives here, as a typed price does). |
+| `maker_production_attachments` | Photos and files filed under a run; the files live under the organization's `maker/` storage folder and `/uploads/` serves them through `ProductionAttachmentResolver`. |
 
 ## Batch math
 
@@ -171,6 +173,55 @@ units once per page, and decides scope through the same `_resolve_scope` rule
 the single-order check uses — the settings read unlocked (`for_update=False`),
 so a GET never queues behind a maker write. No screen recomputes the forecast
 client-side; the detail page reads `shortage_items` from the order payload.
+
+### The output batch, its dates and the ingredients' batches
+
+Every completed run files its output under a batch (`output_lot_name`,
+`output_lot_id`). A run nobody named a batch for names its own from its day and
+a counter, unique among the product's batches in the organization
+(`20261115-1`, `20261115-2`, …) — computed under the output card's lock the
+run takes from the top, so two runs of one product closing at once count on
+from each other. The batch is opened with the run's day as `production_date`
+and a best-before (`expiry_date`) of that day plus the product's shelf life
+(`maker_shelf_lives`), unless the person closing the run names another
+(`best_before` on completion and on `/orders/made`); a date before the run's
+day is refused. The output record carries the same `expiry_date`, as a receipt
+writes it, so FEFO, the expiry views and To do read made goods like received
+ones. A batch that already existed keeps the dates it was opened with.
+
+Before closing, `GET /production/ingredient-batches` answers per leaf
+ingredient what the run needs (stock unit), the draw it makes when nobody
+chooses (`plan_draw_async`, the product's removal order, at the scope the run
+draws under) and every batch with stock free to take. Held, recalled and
+expired batches are in neither. A completion or a run recorded as made may send
+`ingredient_lots` — `(template_id, lot_id, quantity)` — and the run then takes
+exactly those batches: the choices of one ingredient must add up to its need
+(compared at four places), a batch must belong to the ingredient, and on a
+completion a batch that cannot give its part is refused before anything is
+drawn (`production_batch_short`). A run recorded as made takes what a chosen
+batch has and records the rest as the line's shortfall. The screen sends the
+default plan back when every part of it names a batch, so the run takes what
+the person saw.
+
+The shelf life is the maker's own fact about a product. A module that dates
+its output another way opens its batch with its own dates through
+`core_api.stock.get_or_create_lot_async` and never reads this table; the
+dates belong to the batch, not to the product card.
+
+| Endpoint | Description |
+|---|---|
+| `GET/PUT /production/shelf-lives/{template_id}` | A product's shelf life in days (`null` clears it). The write needs `maker:manage` and is journalled on the product. |
+| `GET /production/ingredient-batches?output_template_id=&planned_qty=&output_location_id=&recipe_id=` | The batch plan above, read-only. |
+| `POST /production/orders/{id}/hold` / `…/release` | Hold the run's output batch (`reason` required) or release it — Core's quarantine and release, journalled on the batch. Needs `maker:manage`; refused for a run that filed no batch. |
+| `GET /production/orders/{id}/record` | The batch record of a completed run: formula, quantities, every ingredient with the batches taken (read from the run's movements), costs, who and when, notes and files. 400 for a run that never completed. |
+| `GET/POST /production/orders/{id}/attachments`, `DELETE …/{attachment_id}` | A run's photos and files, at a product attachment's limits (10 MB, the attachment types, the bytes checked against the declared type); each file filed or removed is a journal entry on the run. Writing needs `items:write`. |
+
+The detail read of an order carries `output_lot_id`, `output_lot_status` (the
+batch's state now — a hold shows), `best_before` and the output product's
+`shelf_life_days`; the preview carries `shelf_life_days` too. Batch labels
+print through the printing module's batch target (`lot_ids`,
+`POST /printing/lot-labels/png`): the product, the batch code in bars, the
+production date and the best-before, up to two hundred copies.
 
 ### Other
 
