@@ -377,7 +377,7 @@ describe("ProductionOrderStats — cost whose output left the shelf", () => {
       />,
     );
     expect(
-      screen.getByText(/PLN 0\.50 of this run's cost is not on the shelf/),
+      screen.getByText(/PLN 0\.50 of this run's cost is not in stock/),
     ).toBeInTheDocument();
   });
 
@@ -393,6 +393,6 @@ describe("ProductionOrderStats — cost whose output left the shelf", () => {
         })}
       />,
     );
-    expect(screen.queryByText(/not on the shelf/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/not in stock/)).not.toBeInTheDocument();
   });
 });

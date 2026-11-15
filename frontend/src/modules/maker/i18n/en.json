@@ -198,7 +198,7 @@
       "resultPerUnit": "({{amount}} per {{unit}})",
       "totalCostAfterClosing": "Total cost after closing",
       "unitCost": "{{amount}} per {{unit}}",
-      "unshelvedCost": "{{amount}} of this run's cost is not on the shelf: its output was sold or used before the run closed.",
+      "unshelvedCost": "{{amount}} of this run's cost is not in stock: its output was sold or used before the run closed.",
       "totalCostGap_one": "{{count}} ingredient was drawn from stock with no cost, so it is missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "estimatedAtCompletion": "Estimated at completion",

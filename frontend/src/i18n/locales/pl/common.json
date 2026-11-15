@@ -410,6 +410,7 @@
         "copied_from_builtin": "Skopiowano z szablonu wbudowanego",
         "copied_from_culinary_recipe": "Skopiowano z przepisu",
         "cost": "Koszt",
+        "cost_added": "Dodany koszt",
         "cost_line": "Pozycja kosztowa",
         "cost_line_added": "Dodana linia kosztu",
         "cost_line_removed": "Usunięta linia kosztu",

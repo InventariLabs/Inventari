@@ -408,6 +408,7 @@
         "copied_from_builtin": "Copiado de una plantilla integrada",
         "copied_from_culinary_recipe": "Copiado de una receta",
         "cost": "Coste",
+        "cost_added": "Coste añadido",
         "cost_line": "Línea de coste",
         "cost_line_added": "Línea de coste añadida",
         "cost_line_removed": "Línea de coste eliminada",

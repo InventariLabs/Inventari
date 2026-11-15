@@ -408,6 +408,7 @@
         "copied_from_builtin": "Copié depuis un modèle intégré",
         "copied_from_culinary_recipe": "Copié depuis une recette",
         "cost": "Coût",
+        "cost_added": "Coût ajouté",
         "cost_line": "Ligne de coût",
         "cost_line_added": "Ligne de coût ajoutée",
         "cost_line_removed": "Ligne de coût retirée",

@@ -408,6 +408,7 @@
         "copied_from_builtin": "Von einer eingebauten Vorlage kopiert",
         "copied_from_culinary_recipe": "Kopiert aus Rezept",
         "cost": "Kosten",
+        "cost_added": "Hinzugefügte Kosten",
         "cost_line": "Kostenposition",
         "cost_line_added": "Kostenposition hinzugefügt",
         "cost_line_removed": "Kostenposition entfernt",
