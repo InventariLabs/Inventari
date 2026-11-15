@@ -137,7 +137,8 @@ def test_the_batch_is_dated_by_the_run_day_and_the_shelf_life(
     jam: dict[str, ProductTemplate],
 ) -> None:
     _set_shelf_life(client, mk_auth_headers, jam['jam'], 180)
-    made_on = date(2026, 11, 2)
+    # A few days back, so the batch is still in date whenever the suite runs.
+    made_on = date.today() - timedelta(days=3)
 
     run = _made(
         client,
@@ -182,17 +183,18 @@ def test_the_person_closing_the_run_names_another_best_before(
     )
     assert draft.status_code == 201, draft.text
 
+    keeps_until = date(2026, 11, 12)
     done = client.post(
         f'{ORDERS}/{draft.json()["id"]}/complete',
         headers=mk_auth_headers,
-        json={'best_before': '2026-12-24'},
+        json={'best_before': keeps_until.isoformat()},
     )
 
     assert done.status_code == 200, done.text
-    assert done.json()['best_before'] == '2026-12-24'
+    assert done.json()['best_before'] == keeps_until.isoformat()
     db_session.expire_all()
     record = db_session.get(Item, UUID(done.json()['produced_item_id']))
-    assert record is not None and record.expiry_date == date(2026, 12, 24)
+    assert record is not None and record.expiry_date == keeps_until
 
 
 def test_a_best_before_before_the_run_day_is_refused(

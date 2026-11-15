@@ -43,8 +43,8 @@ const run = {
   status: "COMPLETED",
   planned_qty: "12",
   actual_qty: "12",
-  production_date: "2026-11-02",
-  best_before: "2027-05-01",
+  production_date: "2025-11-02",
+  best_before: "2026-05-01",
   output_lot_id: "lot-1",
   output_lot_name: "20261102-1",
   output_lot_status: "active",
@@ -64,7 +64,7 @@ describe("OutputBatchCard", () => {
       "20261102-1",
     );
     expect(screen.getByTestId("maker-output-best-before")).toHaveTextContent(
-      /2027/,
+      /2026/,
     );
   });
 

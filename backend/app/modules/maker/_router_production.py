@@ -139,15 +139,17 @@ async def _read_with_uom(
     )
     # The batch as it stands now — a hold placed since the run closed shows
     # here — and the shelf life a closing run counts its best-before from.
+    batch: dict[str, object] = {
+        'shelf_life_days': await output_batch.get_shelf_life_async(
+            db, org_id, order.output_template_id
+        )
+    }
     if order.output_lot_id is not None:
         lot = await core_api.stock.get_lot_detail_async(db, org_id, order.output_lot_id)
         if lot is not None:
-            read.output_lot_status = lot.status
-            read.best_before = lot.expiry_date or lot.use_by_date
-    read.shelf_life_days = await output_batch.get_shelf_life_async(
-        db, org_id, order.output_template_id
-    )
-    return read
+            batch['output_lot_status'] = lot.status
+            batch['best_before'] = lot.expiry_date or lot.use_by_date
+    return read.model_copy(update=batch)
 
 
 def _to_read(

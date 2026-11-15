@@ -688,7 +688,7 @@ describe("ProductionDetailPage — closing a run dates its batch and names its i
     );
     currentOrder = {
       ...draftOrder,
-      production_date: "2026-11-02",
+      production_date: "2025-11-02",
       shelf_life_days: 30,
     };
     completeMutate.mockClear();
@@ -707,7 +707,7 @@ describe("ProductionDetailPage — closing a run dates its batch and names its i
       {
         orderId: "ord-1",
         data: {
-          best_before: "2026-12-02",
+          best_before: "2025-12-02",
           ingredient_lots: [
             { template_id: "tpl-honey", lot_id: "late", quantity: "6" },
           ],

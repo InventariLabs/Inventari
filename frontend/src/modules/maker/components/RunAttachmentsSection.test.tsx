@@ -18,7 +18,7 @@ const photo = {
   content_type: "image/png",
   size_bytes: 2048,
   url: "/uploads/org/maker/ord-1/a.png",
-  created_at: "2026-11-15T10:00:00Z",
+  created_at: "2026-11-01T10:00:00Z",
 };
 
 describe("RunAttachmentsSection", () => {

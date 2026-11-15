@@ -146,7 +146,7 @@ describe("BarcodeLabelSheet — batch labels", () => {
               id: "a-1",
               name: "kitchen",
               printer_type: "brother-p710bt",
-              last_seen_at: "2026-11-15T10:00:00Z",
+              last_seen_at: "2026-11-01T10:00:00Z",
               online: true,
             },
           ]),

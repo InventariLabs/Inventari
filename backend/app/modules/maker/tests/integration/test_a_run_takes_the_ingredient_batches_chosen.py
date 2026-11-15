@@ -11,7 +11,7 @@ be put on hold from the run and released later.
 from __future__ import annotations
 
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import Any
 
@@ -71,13 +71,13 @@ class _Kitchen:
             organization_id=org.id,
             product_template_id=self.honey.id,
             name='H-EARLY',
-            expiry_date=date(2027, 1, 1),
+            expiry_date=date.today() + timedelta(days=60),
         )
         self.late = StockLot(
             organization_id=org.id,
             product_template_id=self.honey.id,
             name='H-LATE',
-            expiry_date=date(2028, 1, 1),
+            expiry_date=date.today() + timedelta(days=400),
         )
         db.add_all([self.early, self.late])
         db.commit()

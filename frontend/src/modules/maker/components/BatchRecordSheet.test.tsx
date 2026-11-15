@@ -28,7 +28,7 @@ const record: BatchRecord = {
         {
           lot_id: "f-07",
           lot_name: "F-07",
-          expiry_date: "2027-03-01",
+          expiry_date: "2026-03-01",
           quantity: "1",
         },
       ],

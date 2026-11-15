@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import io
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
@@ -84,7 +84,8 @@ def run_id(
         organization_id=mk_org.id,
         product_template_id=flour.id,
         name='F-07',
-        expiry_date=date(2027, 3, 1),
+        # Still in date whenever the suite runs: an expired batch is not drawn.
+        expiry_date=date.today() + timedelta(days=100),
     )
     db_session.add(lot)
     db_session.commit()
