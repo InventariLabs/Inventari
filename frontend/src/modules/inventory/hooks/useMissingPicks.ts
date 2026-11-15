@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import type { StorageLocationSummary } from "@/types";
 import type { ItemFormData } from "./useItemForm";
 
 interface UseMissingPicksProps {
@@ -68,5 +67,3 @@ export function useMissingPicks({
     toast.info(t("items:validation.categoryUnavailable"));
   }, [categories, formData.category_id, setFormData, remembered.categoryId, t]);
 }
-
-export type { StorageLocationSummary };

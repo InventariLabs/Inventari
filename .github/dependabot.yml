@@ -93,6 +93,11 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: 'lucide-react'
         update-types: ['version-update:semver-major']
+      # jsdom 30 (the version measured) made private the internals vitest's Blob bridge reads, which
+      # breaks the upload, label-preview and download specs. Stays on 27 until
+      # that is fixed upstream or worked around in the test setup.
+      - dependency-name: 'jsdom'
+        update-types: ['version-update:semver-major']
 
   # ── Docker (backend image) ─────────────────────────────────────
   - package-ecosystem: docker
