@@ -21,6 +21,17 @@ measured is the work the statement does — the blocks it touches in
 ``items`` for each record it reads — and not a clock: a clock measures the
 machine.
 
+The mirror predicate, "the category is one this module claims", had the same
+shape on the module-scoped path — the equipment locations page's count — and
+got the same plan: the planner walked the warehouse record by record to find
+the module's few. It now reads the claimed categories once and names them in
+the statement, so the count reads the records rather than weighing every one
+of them. A module's records are a minority spread through the warehouse, so
+there the assertion is the shape of the read — an Index Scan hands the heap
+back one record at a time, a bitmap or a sequential scan reads its pages
+once — and not the number of blocks, which both plans touch when every page
+holds a record of the module.
+
 The fixture is one warehouse of four zones and forty shelves, and two
 neighbors on the same table, at a size where the per-record walk is the
 plan the old filter got.
@@ -83,6 +94,7 @@ class _Warehouse:
         self.location_ids: list[UUID]
         self.shelf_ids: list[UUID]
         self.expected: dict[UUID, int]
+        self.claimed_expected: dict[UUID, int]
 
 
 async def _warehouse_of(
@@ -169,11 +181,13 @@ async def warehouse(real_async_db_session: AsyncSession) -> _Warehouse:
     # own rule rather than read back through the code under test.
     shelf_count = len(fixture.shelf_ids)
     fixture.expected = {}
+    fixture.claimed_expected = {}
     for n in range(1, _RECORDS + 1):
-        if n % _CLAIMED_EVERY in (0, 1):
-            continue
         shelf = fixture.shelf_ids[(n * 7919) % shelf_count]
-        fixture.expected[shelf] = fixture.expected.get(shelf, 0) + 1
+        if n % _CLAIMED_EVERY in (0, 1):
+            fixture.claimed_expected[shelf] = fixture.claimed_expected.get(shelf, 0) + 1
+        else:
+            fixture.expected[shelf] = fixture.expected.get(shelf, 0) + 1
 
     # Left uncommitted on purpose, as in the items list's plan test: the
     # locks keep an autovacuum that began before the seed from replacing
@@ -212,9 +226,13 @@ async def _plan_of(db: AsyncSession, statement: str, parameters: Any) -> dict:
 
 
 async def _counted(
-    db: AsyncSession, warehouse: _Warehouse
+    db: AsyncSession, warehouse: _Warehouse, *, module_scope: str | None = None
 ) -> tuple[dict[UUID, int], tuple[str, Any]]:
-    """The general screens' count of every place, and the statement it ran."""
+    """The screens' count of every place, and the statement it ran.
+
+    Without *module_scope* it is the general screens' count, narrowed the way
+    ``GET /items`` narrows; with one, the module's own screen's count.
+    """
     emitted: list[tuple[str, Any]] = []
 
     def _capture(conn, cursor, statement, parameters, context, executemany):
@@ -224,16 +242,44 @@ async def _counted(
     engine = db.get_bind()
     event.listen(engine, 'before_cursor_execute', _capture)
     try:
-        counts = await item_counts_by_location_async(
-            db,
-            warehouse.org_id,
-            warehouse.location_ids,
-            claimed_tags={'equipment'},
-        )
+        if module_scope is None:
+            counts = await item_counts_by_location_async(
+                db,
+                warehouse.org_id,
+                warehouse.location_ids,
+                claimed_tags={'equipment'},
+            )
+        else:
+            counts = await item_counts_by_location_async(
+                db,
+                warehouse.org_id,
+                warehouse.location_ids,
+                module_scope=module_scope,
+            )
     finally:
         event.remove(engine, 'before_cursor_execute', _capture)
     assert len(emitted) == 1, emitted
     return counts, emitted[0]
+
+
+def _assert_read_in_table_order(plan: dict) -> None:
+    """Every record read from a page of the table, not visited on its own."""
+    reads = [node for node in _nodes(plan) if node.get('Relation Name') == 'items']
+    assert reads, _shape(plan)
+    # A parallel read reports its rows per worker and its blocks for all
+    # of them together, so the rows are multiplied back by the loops.
+    records = sum(
+        (node['Actual Rows'] + node.get('Rows Removed by Filter', 0))
+        * node['Actual Loops']
+        for node in reads
+    )
+    blocks = sum(
+        node['Shared Hit Blocks'] + node['Shared Read Blocks'] for node in reads
+    )
+    # A read in the table's own order touches a block for every page of
+    # records — dozens of records each. The walk by location touched a
+    # block for every record it counted.
+    assert blocks * 4 < records, (blocks, records, _shape(plan))
 
 
 class TestTheWholeWarehouseIsCountedInOneRead:
@@ -242,27 +288,50 @@ class TestTheWholeWarehouseIsCountedInOneRead:
     ) -> None:
         db = real_async_db_session
         _, emitted = await _counted(db, warehouse)
-        plan = await _plan_of(db, *emitted)
-
-        reads = [node for node in _nodes(plan) if node.get('Relation Name') == 'items']
-        assert reads, _shape(plan)
-        # A parallel read reports its rows per worker and its blocks for all
-        # of them together, so the rows are multiplied back by the loops.
-        records = sum(
-            (node['Actual Rows'] + node.get('Rows Removed by Filter', 0))
-            * node['Actual Loops']
-            for node in reads
-        )
-        blocks = sum(
-            node['Shared Hit Blocks'] + node['Shared Read Blocks'] for node in reads
-        )
-        # A read in the table's own order touches a block for every page of
-        # records — dozens of records each. The walk by location touched a
-        # block for every record it counted.
-        assert blocks * 4 < records, (blocks, records, _shape(plan))
+        _assert_read_in_table_order(await _plan_of(db, *emitted))
 
     async def test_the_count_leaves_out_the_modules_records(
         self, real_async_db_session: AsyncSession, warehouse: _Warehouse
     ) -> None:
         counts, _ = await _counted(real_async_db_session, warehouse)
         assert counts == warehouse.expected
+
+
+class TestTheModulesOwnRecordsAreCountedInOneRead:
+    """The equipment locations page asks the same count, narrowed to its records.
+
+    Its filter is the mirror of the general one — "is this record ours" — and
+    used to ask the category question correlated with every record. The
+    planner priced that per record and walked the warehouse through the
+    organization index, visiting a record at a time; named as the values they
+    are, the claimed categories let it read the records in the table's own
+    order.
+    """
+
+    async def test_each_record_is_read_from_its_page_not_visited_on_its_own(
+        self, real_async_db_session: AsyncSession, warehouse: _Warehouse
+    ) -> None:
+        db = real_async_db_session
+        _, emitted = await _counted(db, warehouse, module_scope='equipment')
+        plan = await _plan_of(db, *emitted)
+        nodes = list(_nodes(plan))
+
+        reads = [node for node in nodes if node.get('Relation Name') == 'items']
+        assert reads, _shape(plan)
+        # An Index Scan hands the heap back a record at a time. A count of
+        # what a module keeps below a warehouse reads the pages once — in the
+        # table's order, or through a bitmap of them.
+        assert 'Index Scan' not in [node['Node Type'] for node in reads], _shape(plan)
+        # The module's categories are values the count read once, not a table
+        # read for every record it weighs.
+        assert 'categories' not in {node.get('Relation Name') for node in nodes}, (
+            _shape(plan)
+        )
+
+    async def test_the_count_names_only_the_modules_records(
+        self, real_async_db_session: AsyncSession, warehouse: _Warehouse
+    ) -> None:
+        counts, _ = await _counted(
+            real_async_db_session, warehouse, module_scope='equipment'
+        )
+        assert counts == warehouse.claimed_expected

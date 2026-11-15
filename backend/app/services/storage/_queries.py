@@ -171,7 +171,11 @@ async def item_counts_by_location_async(
     # ``standing_location``). Every other count reads the home.
     where: ColumnElement[UUID] = Item.storage_location_id.expression
     if module_scope is not None:
-        from app.core.module_ownership import claimed_by_module, standing_location
+        from app.core.module_ownership import (
+            claimed_by_module,
+            claimed_category_ids_async,
+            standing_location,
+        )
 
         where = standing_location(module_scope, organization_id)
     stmt = (
@@ -186,7 +190,16 @@ async def item_counts_by_location_async(
         tags = get_context_tags_of(module_scope)
         if not tags:
             return {}
-        stmt = stmt.where(claimed_by_module(module_scope, tags))
+        # The categories this module claims, read once and written into the
+        # statement as values. Asked through the categories table, the
+        # predicate is correlated with the record, and the planner priced a
+        # whole warehouse's count that way — one visit to the table for every
+        # record it weighed. It is the read the general screens' mirror takes,
+        # and it answers the same question.
+        category_ids = await claimed_category_ids_async(
+            db, organization_id, module_scope
+        )
+        stmt = stmt.where(claimed_by_module(module_scope, tags, category_ids))
     elif claimed_tags:
         from app.core.module_ownership import unclaimed_by_a_module
 
