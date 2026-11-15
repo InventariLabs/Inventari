@@ -2,7 +2,8 @@
 /**
  * check-suppressions.mjs
  *
- * Every active suppression needs an owner and an expiry date.
+ * Every active suppression needs an owner and a reason, and one that waits for
+ * a fix needs a date as well.
  *
  * This is the cure for the cause rather than the symptom. knip.json carried
  * the comment "Reserved scaffolding for planned slices — do NOT delete without
@@ -21,7 +22,13 @@
  * still standing, and one that drops an entry leaves a record this gate
  * reports as removable.
  *
- *   node check-suppressions.mjs        # fail on unowned, undated or expired
+ * A suppression that is right by design (a generated file nothing imports)
+ * carries no date. A passed date warns and refuses nothing: a date in the
+ * code refuses whoever commits that day, not whoever owns the entry — in a
+ * public repository an outside contributor who cannot settle it — and every
+ * released version would turn red for good after it.
+ *
+ *   node check-suppressions.mjs        # fail on unrecorded, unowned or unreasoned; warn on a passed date
  *   node check-suppressions.mjs --list # print what is currently silenced
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -123,13 +130,14 @@ export function collectSuppressions(sources, load) {
 
 export function auditRegister(suppressions, register, today) {
   const errors = [];
+  const warnings = [];
   const recorded = register.suppressions ?? {};
   for (const { id, source, entry } of suppressions) {
     const record = recorded[id];
     if (!record) {
       errors.push(
         `${source} silences "${entry}" with no record in suppressions.json. ` +
-          `Add { "owner", "expires", "reason" } under "${id}" — or remove the suppression.`,
+          `Add { "owner", "reason" } under "${id}", and "expires" if it waits for a fix — or remove the suppression.`,
       );
       continue;
     }
@@ -137,20 +145,23 @@ export function auditRegister(suppressions, register, today) {
       errors.push(`suppressions.json → "${id}": names nobody.`);
     if (!record.reason)
       errors.push(`suppressions.json → "${id}": gives no reason.`);
-    const expires = record.expires ? new Date(record.expires) : null;
-    if (!expires || Number.isNaN(expires.valueOf()))
+    if (record.expires == null) continue; // right by design
+    const expires = new Date(record.expires);
+    if (Number.isNaN(expires.valueOf()))
       errors.push(
-        `suppressions.json → "${id}": expires must be a YYYY-MM-DD date.`,
+        `suppressions.json → "${id}": expires must be a YYYY-MM-DD date, ` +
+          "or absent when the suppression is right by design.",
       );
     else if (expires < today)
-      errors.push(
-        `suppressions.json → "${id}": expired on ${record.expires} — ` +
-          `${record.owner ?? "nobody"} was to decide. Resolve it or move the date with a reason.`,
+      warnings.push(
+        `suppressions.json → "${id}" expired on ${record.expires} — ` +
+          `${record.owner ?? "nobody"} was to decide. Resolve it, or move the date ` +
+          "in a commit that says what was deferred and why. Nothing is refused.",
       );
   }
   const live = new Set(suppressions.map((s) => s.id));
   const stale = Object.keys(recorded).filter((id) => !live.has(id));
-  return { errors, stale };
+  return { errors, warnings, stale };
 }
 
 function main() {
@@ -168,7 +179,11 @@ function main() {
   const register = existsSync(REGISTER_PATH)
     ? JSON.parse(readFileSync(REGISTER_PATH, "utf8"))
     : { suppressions: {} };
-  const { errors, stale } = auditRegister(suppressions, register, new Date());
+  const { errors, warnings, stale } = auditRegister(
+    suppressions,
+    register,
+    new Date(),
+  );
 
   if (stale.length > 0) {
     console.log(
@@ -177,16 +192,23 @@ function main() {
     for (const id of stale) console.log(`  - ${id}`);
   }
 
+  // A workflow command, so CI shows it as an annotation; locally it is a line.
+  for (const warning of warnings)
+    console.log(
+      `::warning file=frontend/scripts/suppressions.json,title=Suppression past its date::${warning}`,
+    );
+
   if (errors.length > 0) {
     console.error(
-      `\nSuppressions without an owner or a date (${errors.length}):`,
+      `\nSuppressions without a record, an owner or a reason (${errors.length}):`,
     );
     for (const error of errors) console.error(`  - ${error}`);
     process.exit(1);
   }
 
   console.log(
-    `Every one of the ${suppressions.length} active suppression(s) has an owner and a live date.`,
+    `Every one of the ${suppressions.length} active suppression(s) has an owner and a reason` +
+      (warnings.length ? ` (${warnings.length} past their date, above).` : "."),
   );
   process.exit(0);
 }
