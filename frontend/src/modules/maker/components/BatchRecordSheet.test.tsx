@@ -72,7 +72,7 @@ describe("BatchRecordSheet for a run filled in portions", () => {
               lot_id: "b",
               lot_name: "WB",
               status: "active",
-              best_before: "2026-12-01",
+              best_before: "2026-11-09",
             },
           ],
         }}
