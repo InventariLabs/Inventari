@@ -577,6 +577,7 @@
     "stockFallbackName": "Ingrédient",
     "addStockSave": "Ajouter le stock ({{saved}})",
     "stockSaved": "Stock enregistré.",
-    "stockSaveFailed": "Impossible d'enregistrer le stock."
+    "stockSaveFailed": "Impossible d'enregistrer le stock.",
+    "locationsFailed": "Impossible de charger les emplacements"
   }
 }

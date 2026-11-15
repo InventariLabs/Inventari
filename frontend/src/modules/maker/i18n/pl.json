@@ -597,6 +597,7 @@
     "stockFallbackName": "Składnik",
     "addStockSave": "Dodaj zapas ({{saved}})",
     "stockSaved": "Zapas zapisany.",
-    "stockSaveFailed": "Nie udało się zapisać zapasu."
+    "stockSaveFailed": "Nie udało się zapisać zapasu.",
+    "locationsFailed": "Nie udało się wczytać miejsc"
   }
 }

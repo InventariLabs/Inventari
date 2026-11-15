@@ -648,7 +648,10 @@
         "emailed_to": "Wysłano e-mailem do",
         "imported_from": "Zaimportowano z",
         "skipped": "Pominięte wiersze",
-        "approval": "Akceptacja"
+        "approval": "Akceptacja",
+        "labor_hourly_rate": "Stawka godzinowa pracy",
+        "typed_unit_price_before": "Cena wpisana przed",
+        "typed_unit_price_after": "Cena wpisana po"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",

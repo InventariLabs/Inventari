@@ -646,7 +646,10 @@
         "emailed_to": "Emailed to",
         "imported_from": "Imported from",
         "skipped": "Rows skipped",
-        "approval": "Approval"
+        "approval": "Approval",
+        "labor_hourly_rate": "Hourly labour rate",
+        "typed_unit_price_before": "Typed price before",
+        "typed_unit_price_after": "Typed price after"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",

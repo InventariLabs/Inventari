@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { Sheet, SheetBody, SheetFooter } from "@/components/ui/Sheet";
 import { extractApiError } from "@/lib/errors";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useStorages } from "@/modules/shared/hooks/useStorages";
 import {
   useAddIngredientStock,
@@ -187,7 +187,13 @@ function AddIngredientStockSheet({
   items,
 }: AddIngredientStockSheetProps) {
   const { t } = useTranslation("maker");
-  const { data: locations = [], isLoading: locationsLoading } = useStorages();
+  // A general picker: the stock goes on the shelves the organization keeps
+  // things in, not on a module's virtual counterparts.
+  const {
+    data: locations = [],
+    isLoading: locationsLoading,
+    isError: locationsFailed,
+  } = useStorages(undefined, { excludeModuleContexts: true });
   const addStock = useAddIngredientStock();
   const [locationId, setLocationId] = useState("");
   const [rows, setRows] = useState<Record<string, StockRow>>({});
@@ -269,11 +275,16 @@ function AddIngredientStockSheet({
           label={t("shortage.location")}
           value={locationId}
           onChange={(e) => setLocationId(e.target.value)}
+          error={locationsFailed ? t("shortage.locationsFailed") : undefined}
           disabled={locationsLoading || locations.length === 0}
           data-testid="maker-add-stock-location"
         >
           {locations.length === 0 && (
-            <option value="">{t("shortage.noLocations")}</option>
+            <option value="">
+              {locationsFailed
+                ? t("shortage.locationsFailed")
+                : t("shortage.noLocations")}
+            </option>
           )}
           {locations.map((location) => (
             <option key={location.id} value={location.id}>
@@ -328,7 +339,7 @@ function AddIngredientStockSheet({
                     data-testid="maker-add-stock-quantity"
                   />
                   <span className="text-xs text-on-muted pb-2.5">
-                    {item.to_buy_uom_symbol ?? item.uom_symbol ?? ""}
+                    {unitLabel(t, item.to_buy_uom_symbol ?? item.uom_symbol)}
                   </span>
                   <Input
                     wrapperClassName="w-28"
@@ -362,7 +373,10 @@ function AddIngredientStockSheet({
         <Button
           onClick={() => void save()}
           disabled={
-            addStock.isPending || locationId === "" || rowsToSave.length === 0
+            addStock.isPending ||
+            locationsFailed ||
+            locationId === "" ||
+            rowsToSave.length === 0
           }
           data-testid="maker-add-stock-save"
         >

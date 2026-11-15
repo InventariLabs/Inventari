@@ -577,6 +577,7 @@
     "stockFallbackName": "Ingrediente",
     "addStockSave": "Añadir existencias ({{saved}})",
     "stockSaved": "Existencias guardadas.",
-    "stockSaveFailed": "No se pudieron guardar las existencias."
+    "stockSaveFailed": "No se pudieron guardar las existencias.",
+    "locationsFailed": "No se pudieron cargar las ubicaciones"
   }
 }

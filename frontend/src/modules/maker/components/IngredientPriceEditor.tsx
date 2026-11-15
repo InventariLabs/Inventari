@@ -108,7 +108,7 @@ export function IngredientPriceEditor({
           size="sm"
           variant="ghost"
           onClick={() => setDraft(price ?? "")}
-          className="h-7 px-1.5 text-xs text-on-muted"
+          className="text-on-muted"
           aria-label={
             hasPrice ? t("composition.editPrice") : t("composition.setPrice")
           }

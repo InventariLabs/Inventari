@@ -577,6 +577,7 @@
     "stockFallbackName": "Ingredient",
     "addStockSave": "Add stock ({{saved}})",
     "stockSaved": "Stock saved.",
-    "stockSaveFailed": "Failed to save the stock."
+    "stockSaveFailed": "Failed to save the stock.",
+    "locationsFailed": "Could not load the locations"
   }
 }

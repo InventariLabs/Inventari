@@ -577,6 +577,7 @@
     "stockFallbackName": "Zutat",
     "addStockSave": "Bestand hinzufügen ({{saved}})",
     "stockSaved": "Bestand gespeichert.",
-    "stockSaveFailed": "Bestand konnte nicht gespeichert werden."
+    "stockSaveFailed": "Bestand konnte nicht gespeichert werden.",
+    "locationsFailed": "Orte konnten nicht geladen werden"
   }
 }
