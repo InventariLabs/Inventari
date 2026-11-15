@@ -255,9 +255,9 @@ shell_command  # noqa: B018
 # Everything above says "the caller exists, the scanner cannot see it" — a
 # claim a grep settles. Everything here says something else: "there is no
 # caller, and there is not meant to be one yet". That cannot be grepped, so
-# each line carries an owner and a date, checked by the architecture lint. A
-# silenced name with no caller and no deadline is how a dead API goes on
-# being reported as alive.
+# each line carries an owner and a date, checked by the architecture lint,
+# which warns once the date passes and refuses nothing. A silenced name with
+# no caller and no deadline is how a dead API goes on being reported as alive.
 #
 # Format: <name>, then the B018 suppression comment, then
 # "# owner=<who> expires=<YYYY-MM-DD> <reason>" as the lines below show.

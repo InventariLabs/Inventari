@@ -21,9 +21,11 @@
 #     <app path>
 #
 # The check fails on a path that is not listed under its module, on a module
-# without a block, on an entry whose import is gone (the list only shrinks),
-# and on an expired block. Moving an import to the SDK is the way a path
-# leaves this file — an additive change the SDK snapshot covers.
+# without a block, and on an entry whose import is gone (the list only
+# shrinks). A block past its date warns and refuses nothing: the owner moves
+# the date in a commit that says what was deferred and why. Moving an import
+# to the SDK is the way a path leaves this file — an additive change the SDK
+# snapshot covers.
 api_keys | owner=core | expires=2027-06-30 | API key issuance and verification use the core auth and token helpers directly; the module predates the SDK.
   app.core.api_key_auth
   app.core.db_utils

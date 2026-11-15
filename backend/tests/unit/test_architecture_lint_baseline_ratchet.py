@@ -270,6 +270,7 @@ class TestStaleCheckRunsForEveryKeyMatchedBaseline:
         assert seen == {
             'toctou_risk_baseline.txt': {'toctou'},
             'bare_emit_baseline.txt': {'bare_emit'},
+            'audit_coverage_allowlist.txt': {'audit'},
             'audit_coverage_baseline.txt': {'audit'},
             'raw_http_exception_baseline.txt': {'raw_http'},
             'request_scope_baseline.txt': {'request_scope'},

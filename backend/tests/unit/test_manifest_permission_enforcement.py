@@ -115,7 +115,6 @@ def test_enforcement_in_a_test_file_does_not_count(tmp_path):
         ('stats:read', 'malformed'),
         ('stats:read | owner= | expires=2099-01-01 | why', 'names nobody'),
         ('stats:read | owner=me | expires=soon | why', 'unreadable expiry'),
-        ('stats:read | owner=me | expires=2020-01-01 | why', 'expired'),
         ('stats:read | owner=me | expires=2099-01-01 |', 'malformed'),
     ],
 )
@@ -133,6 +132,23 @@ def test_deferral_list_refuses_a_suppression_that_hides(
     assert keys == set()
     assert len(errors) == 1
     assert expected_error in errors[0]
+
+
+def test_a_deferral_past_its_date_warns_and_still_holds(tmp_path, monkeypatch):
+    from app.core.architecture_lint import _baselines
+
+    path = tmp_path / 'deferrals.txt'
+    path.write_text(
+        'stats:read | owner=me | expires=2020-01-01 | why\n', encoding='utf-8'
+    )
+    monkeypatch.setattr(_baselines, 'MANIFEST_PERMISSION_DEFERRALS_FILE', path)
+
+    keys, findings = _baselines._load_manifest_permission_deferrals(date(2026, 8, 23))
+
+    assert keys == {'stats:read'}
+    assert len(findings) == 1
+    assert findings[0].startswith('::warning')
+    assert 'expired' in findings[0]
 
 
 def test_a_well_formed_deferral_is_accepted(tmp_path, monkeypatch):

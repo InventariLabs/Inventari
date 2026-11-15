@@ -4,6 +4,7 @@ from datetime import date
 from pathlib import Path
 
 from ._constants import (
+    AUDIT_COVERAGE_ALLOWLIST_FILE,
     AUDIT_COVERAGE_BASELINE_FILE,
     BARE_EMIT_BASELINE_FILE,
     CORE_API_MODEL_LEAK_BASELINE_FILE,
@@ -128,7 +129,7 @@ def _load_toctou_risk_baseline(
     justification nobody re-read. One of them said the only real race was
     serialised by an advisory lock which, when the sentence was written,
     hashed its key with Python's per-process ``hash()`` and serialised
-    nothing. The entry was green, reviewed, and false. Hence the expiry: a
+    nothing. The entry was green, reviewed, and false. Hence the date: a
     premise has to be re-checked, not merely recorded.
     """
     return _load_owned_entries(
@@ -143,8 +144,9 @@ def _parse_surface_block_header(
 ) -> tuple[str | None, list[str]]:
     """Validate one ``<module> | owner= | expires= | reason`` line.
 
-    Returns the module name and any errors. ``None`` means the block is void:
-    its paths cannot be trusted to a module whose header is not a decision.
+    Returns the module name and any findings. ``None`` means the block is
+    void: its paths cannot be trusted to a module whose header is not a
+    decision. A block past its date is still a decision — it warns and holds.
     """
     parts = [part.strip() for part in raw.split('|')]
     if len(parts) < 4 or not parts[3]:
@@ -177,11 +179,15 @@ def _parse_surface_block_header(
             f'expected YYYY-MM-DD.'
         ]
     if deadline < today:
-        return None, [
-            f'::error file=app/core/{rel},line={lineno},title=Architecture: '
-            f'module surface entry expired::'
-            f"Entry '{module}' expired on {deadline.isoformat()} — "
-            f'{owner[len("owner=") :]} was to recheck the premise it rests on.'
+        return module, [
+            _expired(
+                f'app/core/{rel}',
+                lineno,
+                'module surface entry',
+                module,
+                deadline,
+                owner[len('owner=') :],
+            )
         ]
     return module, []
 
@@ -202,10 +208,10 @@ def _load_module_import_surface_baseline(
     core helpers they need directly — and another module through that
     module's public API — and the set of paths it reaches is frozen as it
     stands. The block lists every path, so a new import shows up twice — in
-    the check and in this file's diff. Owner and expiry are mandatory for the
-    same reason they are on every other suppression list: a known gap without
-    either goes quiet, and a line that outlives its premise reads as a
-    decision nobody is re-checking.
+    the check and in this file's diff. Owner and date are mandatory for the
+    same reason they are on every other debt list: a known gap without either
+    goes quiet, and a line that outlives its premise reads as a decision
+    nobody is re-checking — so a passed date warns (:func:`_expired`).
     """
     if not MODULE_IMPORT_SURFACE_BASELINE_FILE.exists():
         return {}, []
@@ -252,19 +258,80 @@ def _load_module_import_surface_baseline(
     return modules, errors
 
 
-def _load_audit_coverage_baseline() -> tuple[set[str], list[str]]:
-    """Write paths that reach no journal entry, each with a reason and a date.
+def _load_audit_coverage_baseline(
+    today: date | None = None,
+) -> tuple[set[str], list[str]]:
+    """Write paths that reach no journal entry, from both of their lists.
 
-    Two kinds share the list because the gate cannot tell them apart: a path
-    that cannot journal by design (login runs before a session; a working
-    note is nobody's record but its author's) and a path that simply lost its
-    entry. The reason says which is which, and the expiry makes the decision
-    come back.
+    The gate cannot tell the two kinds apart, so the lists do. A path that
+    cannot journal by design (login runs before a session; a working note is
+    nobody's record but its author's) sits in ``audit_coverage_allowlist.txt``
+    with its reason and no date: the decision does not lapse, and adding one
+    is a line in the diff with its reason beside it. A path that simply lost
+    its entry is debt, in ``audit_coverage_baseline.txt`` with an owner and a
+    date that warns once it passes.
     """
+    by_design, design_findings = _load_audit_coverage_allowlist()
+    debt, debt_findings = _load_audit_coverage_debt(today)
+    return by_design | debt, design_findings + debt_findings
+
+
+def _load_audit_coverage_debt(
+    today: date | None = None,
+) -> tuple[set[str], list[str]]:
+    """Write paths that should journal and do not yet: owned, dated debt."""
     return _load_owned_entries(
         AUDIT_COVERAGE_BASELINE_FILE,
         noun='audit coverage baseline entry',
+        today=today,
     )
+
+
+def _load_audit_coverage_allowlist() -> tuple[set[str], list[str]]:
+    """Write paths that do not journal by design, each with its reason.
+
+    Format, one entry per line::
+
+        <key> | <reason>
+
+    No owner and no date, on purpose: an exception that is right by design
+    does not become wrong on a day, and a date on it either forces a re-read
+    nobody planned or is decoration someone re-dates under pressure. What
+    keeps it honest is the reason, which is mandatory, and the diff that adds
+    it. A dated line is refused here: a date marks debt, and debt goes in
+    ``audit_coverage_baseline.txt``.
+    """
+    path = AUDIT_COVERAGE_ALLOWLIST_FILE
+    if not path.exists():
+        return set(), []
+
+    noun = 'audit coverage allowlist entry'
+    keys: set[str] = set()
+    errors: list[str] = []
+    rel = path.name
+    for lineno, raw in enumerate(
+        path.read_text(encoding='utf-8').splitlines(), start=1
+    ):
+        line = raw.strip()
+        if not line or line.startswith('#'):
+            continue
+        key, _, reason = (part.strip() for part in line.partition('|'))
+        if not reason:
+            errors.append(
+                f'::error file=app/core/{rel},line={lineno},title=Architecture: malformed {noun}::'
+                f'Expected "<key> | <reason>", got: {line}'
+            )
+            continue
+        if any(field.strip().startswith('expires=') for field in reason.split('|')[:2]):
+            errors.append(
+                f'::error file=app/core/{rel},line={lineno},title=Architecture: dated {noun}::'
+                f"Entry '{key}' carries a date. An exception by design has none; "
+                f'one that waits for a fix is debt — move it to '
+                f'app/core/{AUDIT_COVERAGE_BASELINE_FILE.name}.'
+            )
+            continue
+        keys.add(key)
+    return keys, errors
 
 
 def _load_transaction_ownership_baseline() -> set[str]:
@@ -319,8 +386,10 @@ def _load_escape_hatch_org_filter_baseline() -> set[str]:
     return _load_baseline(ESCAPE_HATCH_ORG_FILTER_BASELINE_FILE)
 
 
-def _load_escape_hatch_query_scope_baseline() -> tuple[set[str], list[str]]:
-    """Per-query escape-hatch suppressions, each with an owner and an expiry.
+def _load_escape_hatch_query_scope_baseline(
+    today: date | None = None,
+) -> tuple[set[str], list[str]]:
+    """Per-query escape-hatch suppressions, each with an owner and a date.
 
     Unlike its file-level sibling this list names a single function, so an
     entry cannot quietly cover a query added next to it later.
@@ -328,6 +397,7 @@ def _load_escape_hatch_query_scope_baseline() -> tuple[set[str], list[str]]:
     return _load_owned_entries(
         ESCAPE_HATCH_QUERY_SCOPE_BASELINE_FILE,
         noun='escape-hatch query-scope baseline entry',
+        today=today,
     )
 
 
@@ -356,20 +426,21 @@ def _load_owned_entries(
     noun: str,
     today: date | None = None,
 ) -> tuple[set[str], list[str]]:
-    """Read a suppression list where every entry names an owner and a date.
+    """Read a debt list where every entry names an owner and a date.
 
     Format, one entry per line::
 
         <key> | owner=<who> | expires=<YYYY-MM-DD> | <reason>
 
-    A suppression with no owner and no expiry is how a known gap goes quiet
+    A suppression with no owner and no date is how a known gap goes quiet
     for months, and a written reason nobody re-reads is worse than no check
     at all: a green gate standing on a premise that stopped being true is
     more convincing than a red one. Both fields are mandatory and both are
-    checked here, so the list cannot outlive the decision it was waiting for.
+    checked here. A date that has passed warns and the entry still holds
+    (:func:`_expired` says why it refuses nothing).
 
-    *noun* names the kind of entry in the error text, because the reader of a
-    failing build needs to know which list to open.
+    *noun* names the kind of entry in the finding, because the reader of a
+    build needs to know which list to open.
     """
     if not path.exists():
         return set(), []
@@ -414,13 +485,39 @@ def _load_owned_entries(
             continue
         if deadline < today:
             errors.append(
-                f'::error file=app/core/{rel},line={lineno},title=Architecture: {noun} expired::'
-                f"Entry '{key}' expired on {deadline.isoformat()} — {owner[len('owner=') :]} was to "
-                f'recheck the premise it rests on.'
+                _expired(
+                    f'app/core/{rel}',
+                    lineno,
+                    noun,
+                    key,
+                    deadline,
+                    owner[len('owner=') :],
+                )
             )
-            continue
         keys.add(key)
     return keys, errors
+
+
+def _expired(
+    where: str, lineno: int, noun: str, key: str, deadline: date, owner: str
+) -> str:
+    """The ``::warning`` a dated exception gives once its date has passed.
+
+    A warning, not an error, and the entry keeps holding. A date in the code
+    refuses whoever commits that day, not whoever owns the entry: in a
+    public repository that is an outside contributor who cannot settle the
+    entry, and every released version would turn red for good the day after.
+    Under that pressure the line gets re-dated anyway, which records nothing.
+    So the date reminds — in the pre-commit hook, ``make lint`` and CI — and
+    the owner settles the entry or moves the date in a commit that says what
+    was deferred and why.
+    """
+    return (
+        f'::warning file={where},line={lineno},title=Architecture: {noun} expired::'
+        f"Entry '{key}' expired on {deadline.isoformat()} — {owner} was to "
+        f'recheck the premise it rests on. Settle it, or move the date in a '
+        f'commit that says what was deferred and why. Nothing is refused.'
+    )
 
 
 def _load_test_skip_baseline(

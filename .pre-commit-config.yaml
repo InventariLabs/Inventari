@@ -29,10 +29,11 @@ repos:
       # ratchet (baseline_sizes.txt) wants to catch at commit time, and with
       # types: [python] alone it slipped through to CI. The file patterns
       # mirror the ratchet's own _BASELINE_GLOBS (*_baseline.txt,
-      # *_deferrals.txt).
+      # *_deferrals.txt, audit_coverage_allowlist.txt), and reach the
+      # transaction owner allowlist the lint also reads.
       # Coverage rule: the size ratchet (baseline_sizes.txt;
       # --write-baseline-sizes to lower it after paying debt) covers ONLY the
-      # architectural baselines in app/core — both name patterns above. Every
+      # architectural lists in app/core — the name patterns above. Every
       # other suppression list in this repo falls into one of THREE kinds:
       #   (a) differential baselines — vulture-baseline.txt,
       #       mypy-baseline.json, knip, the reachability baselines (files,
@@ -41,17 +42,21 @@ repos:
       #   (b) registries with an owner and a date — suppressions.json,
       #       integration-only.json, and the reserved-surface section of
       #       vulture_whitelist.py: their gate does not compare findings at
-      #       all, it demands an owner, a reason and an unexpired date;
+      #       all, it demands an owner, a reason and a date (a passed date
+      #       fails the two frontend registers; the arch lint only warns);
       #   (c) a counter — invalidation-keys-baseline.json holds a bare number
       #       (literalKeyCount) and fails when it grows;
       #   (d) the rest of vulture_whitelist.py: counted from the parsed file
       #       in baseline_sizes.txt, so growth fails like a counter.
       - id: architecture-lint
         name: architecture boundaries
-        entry: docker compose exec -T backend uv run python manage.py arch lint
+        # verbose: a passing run prints too, so an exception whose date has
+        # passed reaches the committer as a warning instead of refusing them.
+        entry: docker compose exec -T backend uv run python manage.py arch lint --quiet
         language: system
-        files: (\.py$|/app/core/[^/]*(baseline|deferrals)[^/]*\.txt$)
+        files: (\.py$|/app/core/[^/]*(baseline|deferrals|allowlist)[^/]*\.txt$)
         pass_filenames: false
+        verbose: true
 
       - id: mypy
         name: mypy baseline (backend)

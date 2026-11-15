@@ -6,7 +6,7 @@ section says something else: "there is no caller and there is not meant to be
 one yet", the module extension surface a community module might one day
 import. That claim cannot be checked by grep, which is exactly why it needs
 an owner and a date: a silenced name with no caller and no deadline is how a
-dead API stays reported as alive.
+dead API stays reported as alive. A passed date warns; it refuses no commit.
 
 The section is marked in the file itself, and every name inside it needs a
 trailing ``owner=<who> expires=<YYYY-MM-DD> <reason>``.
@@ -17,6 +17,8 @@ from __future__ import annotations
 import re
 from datetime import date
 from pathlib import Path
+
+from ._baselines import _expired
 
 #: The whitelist marks the section by hand; everything between these two
 #: lines is held to the rule.
@@ -72,10 +74,16 @@ def _check_reserved_surface(
             )
             continue
         if deadline < today:
+            # Whether anything still needs the name is the premise to recheck;
+            # deleting the name lets vulture speak.
             errors.append(
-                f'::error file={rel},line={lineno},title=Architecture: reserved surface expired::'
-                f"'{name}' expired on {deadline.isoformat()} — "
-                f'{marker.group("owner")} was to decide whether anything still '
-                f'needs it. Renew the date or delete the name and let vulture speak.'
+                _expired(
+                    rel,
+                    lineno,
+                    'reserved surface name',
+                    name,
+                    deadline,
+                    marker.group('owner'),
+                )
             )
     return errors
