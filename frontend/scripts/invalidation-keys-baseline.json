@@ -1,9 +1,26 @@
 {
+  "_comment": [
+    "Files that still hold a query key outside hooks/queries/keys.ts, and what",
+    "was decided about each.",
+    "",
+    "`verdict` is the triage bucket:",
+    "  by-design — the file cannot root the key (a prop forwarded from a",
+    "              module contributor) and carries no date",
+    "  to-fold   — the local mini-registry waits to be folded into",
+    "              hooks/queries/keys.ts, and carries `expiry`; past that",
+    "              date the gate warns and names the owner, and refuses",
+    "              nothing",
+    "",
+    "`count` may only fall. An entry with no reason, no owner or no known",
+    "verdict is refused, and so is a dated by-design entry or an undated",
+    "to-fold one."
+  ],
   "exceptions": [
     {
       "file": "src/modules/approvals/hooks/useApprovalRequests.ts",
       "count": 5,
       "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "verdict": "to-fold",
       "owner": "jerzy",
       "expiry": "2027-01-08"
     },
@@ -11,13 +28,7 @@
       "file": "src/modules/approvals/hooks/useApprovalWorkflows.ts",
       "count": 4,
       "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
-      "owner": "jerzy",
-      "expiry": "2027-01-08"
-    },
-    {
-      "file": "src/modules/warehouse/hooks/useExtraCosts.ts",
-      "count": 3,
-      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "verdict": "to-fold",
       "owner": "jerzy",
       "expiry": "2027-01-08"
     },
@@ -25,6 +36,7 @@
       "file": "src/modules/example_widgets/hooks/useWidgets.ts",
       "count": 4,
       "reason": "example module with its own QUERY_KEY constant; moves to keys.ts when the example is rewritten",
+      "verdict": "to-fold",
       "owner": "jerzy",
       "expiry": "2027-01-08"
     },
@@ -32,13 +44,14 @@
       "file": "src/modules/inventory/hooks/useModuleListFilters.ts",
       "count": 1,
       "reason": "key forwarded from a module contributor prop, not built here",
-      "owner": "jerzy",
-      "expiry": "2027-01-08"
+      "verdict": "by-design",
+      "owner": "jerzy"
     },
     {
       "file": "src/modules/recipes/hooks/useIngredientDefaults.ts",
       "count": 5,
       "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "verdict": "to-fold",
       "owner": "jerzy",
       "expiry": "2027-01-08"
     },
@@ -46,6 +59,7 @@
       "file": "src/modules/recipes/hooks/useUnitConversions.ts",
       "count": 4,
       "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "verdict": "to-fold",
       "owner": "jerzy",
       "expiry": "2027-01-08"
     },
@@ -53,6 +67,14 @@
       "file": "src/modules/shared/hooks/useLauncherStatusBadge.ts",
       "count": 1,
       "reason": "key forwarded from a typed QueryKey prop, not built here",
+      "verdict": "by-design",
+      "owner": "jerzy"
+    },
+    {
+      "file": "src/modules/warehouse/hooks/useExtraCosts.ts",
+      "count": 3,
+      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
+      "verdict": "to-fold",
       "owner": "jerzy",
       "expiry": "2027-01-08"
     }

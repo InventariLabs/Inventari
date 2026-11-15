@@ -26,13 +26,25 @@
  *     mini-registry (`const sabKeys = { all: [...] }`). The registry cannot
  *     check what such a key says, so each file that still has one is listed
  *     in `invalidation-keys-baseline.json` with a count, a reason, an owner
- *     and an expiry. The count may only fall; raising it, or adding a file,
+ *     and a verdict. The count may only fall; raising it, or adding a file,
  *     is `--write-baseline` plus a reason written by hand. A local registry
  *     never widens the set of roots a key is checked against.
  *
+ * `verdict` is the triage bucket. `by-design` is a resting state — the file
+ * cannot root the key, a prop forwarded from a module contributor — and
+ * carries no date. `to-fold` waits for the fix, the local registry folded
+ * into `hooks/queries/keys.ts`, and carries an expiry; past that date the
+ * entry warns and keeps holding. A date in the code refuses whoever commits
+ * that day, not whoever owns the entry — in a public repository that is an
+ * outside contributor who cannot settle it — and under that pressure the
+ * line gets re-dated, which records nothing. An entry with no reason, no
+ * owner or no known verdict is refused, and so is a dated `by-design` entry
+ * or an undated `to-fold` one.
+ *
  * Modes:
  *   node check-invalidation-keys.mjs            # report and exit 1 on findings
- *   node check-invalidation-keys.mjs --quiet    # exit code only
+ *   node check-invalidation-keys.mjs --quiet    # exit code only; a passed
+ *                                               # date still prints
  *   node check-invalidation-keys.mjs --write-baseline
  */
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -187,18 +199,23 @@ function isInvalidation(node) {
   );
 }
 
-/** The failures a run produces: what the tree holds, against what the
+// The one verdict that is a resting state. The other waits for a fix.
+const BY_DESIGN = "by-design";
+const TO_FOLD = "to-fold";
+
+/** The verdicts a run produces: what the tree holds, against what the
  * baseline tolerates. Pure, so the rules can be exercised without a tree. */
-export function invalidationKeyFailures({
+export function invalidationKeyReport({
   literals,
   foreign,
   phantoms,
   baseline,
   today = new Date().toISOString().slice(0, 10),
 }) {
-  const failures = [];
+  const errors = [];
+  const warnings = [];
   if (phantoms.length > 0) {
-    failures.push(
+    errors.push(
       `${phantoms.length} invalidation key(s) match no registered query:\n` +
         phantoms.map((p) => `  ${p}`).join("\n") +
         "\n  React Query matches by prefix, so this invalidates nothing and " +
@@ -206,7 +223,7 @@ export function invalidationKeyFailures({
     );
   }
   if (literals.length > 0) {
-    failures.push(
+    errors.push(
       `${literals.length} literal key(s) spelled out at a call site:\n` +
         literals.map((l) => `  ${l}`).join("\n") +
         "\n  A key written here is a key the registry cannot check — add it " +
@@ -224,13 +241,13 @@ export function invalidationKeyFailures({
     const exception = allowed.get(file);
     const where = entries.map((e) => `${file}:${e.line} (${e.root})`).join(", ");
     if (!exception) {
-      failures.push(
+      errors.push(
         `key(s) not rooted at ${REGISTRY}: ${where}. A key held in a variable ` +
           "or a local registry is invisible to the registry — build it from " +
           "hooks/queries/keys.ts.",
       );
     } else if (entries.length !== exception.count) {
-      failures.push(
+      errors.push(
         `${file} has ${entries.length} key(s) not rooted at ${REGISTRY}, ` +
           `baseline ${exception.count}: ${where}. Fix the count in the ` +
           "baseline (a fall is progress; a rise needs a reason).",
@@ -239,25 +256,45 @@ export function invalidationKeyFailures({
   }
   for (const exception of baseline.exceptions ?? []) {
     if (!byFile.has(exception.file)) {
-      failures.push(
+      errors.push(
         `baseline entry ${exception.file} no longer matches any foreign key — remove it.`,
       );
     }
   }
   for (const exception of baseline.exceptions ?? []) {
-    for (const field of ["reason", "owner", "expiry"]) {
-      if (!exception[field]) {
-        failures.push(`baseline entry ${exception.file} has no ${field}.`);
+    const where = `baseline entry ${exception.file}`;
+    if (!exception.reason) errors.push(`${where} has no reason.`);
+    if (!exception.owner) errors.push(`${where} has no owner.`);
+    if (exception.verdict === BY_DESIGN) {
+      if (exception.expiry != null) {
+        errors.push(
+          `${where} is ${BY_DESIGN} and carries no date — drop the expiry, or ` +
+            `give it a verdict that waits for a fix (${TO_FOLD}).`,
+        );
       }
-    }
-    if (exception.expiry && exception.expiry < today) {
-      failures.push(
-        `baseline entry ${exception.file} expired on ${exception.expiry} — ` +
-          "pay it off or renew it with a reason.",
+    } else if (exception.verdict === TO_FOLD) {
+      const dated = /^\d{4}-\d{2}-\d{2}$/.test(exception.expiry ?? "");
+      if (!dated) {
+        errors.push(
+          `${where} is ${TO_FOLD} and waits for a fix, so expiry must be a ` +
+            "YYYY-MM-DD date.",
+        );
+      } else if (exception.expiry < today) {
+        warnings.push(
+          `${where} (${TO_FOLD}) expired on ${exception.expiry} — ` +
+            `${exception.owner} was to fold it into hooks/queries/keys.ts. ` +
+            "Settle it, or move the date in a commit that says what was " +
+            "deferred and why. Nothing is refused.",
+        );
+      }
+    } else {
+      errors.push(
+        `${where} needs a verdict: ${BY_DESIGN}, or ${TO_FOLD} for one that ` +
+          "waits for a fix.",
       );
     }
   }
-  return failures;
+  return { errors, warnings };
 }
 
 function main() {
@@ -301,35 +338,48 @@ function main() {
         file,
         count,
         reason: known.get(file)?.reason ?? "",
+        verdict: known.get(file)?.verdict ?? "",
         owner: known.get(file)?.owner ?? "",
-        expiry: known.get(file)?.expiry ?? "",
+        // A verdict right by design carries no date; keeping an empty
+        // `expiry` there would read as one the author forgot to fill in.
+        ...(known.get(file)?.expiry ? { expiry: known.get(file).expiry } : {}),
       }));
-    writeFileSync(BASELINE, `${JSON.stringify({ exceptions }, null, 2)}\n`);
+    writeFileSync(
+      BASELINE,
+      `${JSON.stringify({ _comment: previous._comment, exceptions }, null, 2)}\n`,
+    );
     console.log(
       `invalidation-keys: baseline written (${exceptions.length} file(s)). ` +
-        "New entries need a reason, an owner and an expiry written by hand.",
+        "New entries need a reason, an owner and a verdict written by hand; " +
+        `a ${TO_FOLD} entry also needs an expiry.`,
     );
     process.exit(0);
   }
 
   const baseline = JSON.parse(readFileSync(BASELINE, "utf8"));
-  const failures = invalidationKeyFailures({
+  const { errors, warnings } = invalidationKeyReport({
     literals,
     foreign,
     phantoms,
     baseline,
   });
 
-  if (failures.length > 0) {
-    for (const failure of failures)
-      console.error(`\ninvalidation-keys: ${failure}`);
+  // A workflow command, so CI shows it as an annotation; locally it is a line.
+  for (const warning of warnings)
+    console.log(
+      `::warning file=frontend/scripts/invalidation-keys-baseline.json,title=Invalidation key exception past its date::${warning}`,
+    );
+
+  if (errors.length > 0) {
+    for (const error of errors) console.error(`\ninvalidation-keys: ${error}`);
     process.exit(1);
   }
 
   if (!process.argv.includes("--quiet")) {
     console.log(
       `invalidation-keys: no literal keys; ${foreign.length} key(s) outside ` +
-        `${REGISTRY} in ${baseline.exceptions.length} baselined file(s).`,
+        `${REGISTRY} in ${baseline.exceptions.length} baselined file(s)` +
+        (warnings.length ? ` (${warnings.length} past its date, above).` : "."),
     );
   }
   process.exit(0);

@@ -45,8 +45,11 @@ repos:
       #       all, it demands an owner and a reason, and a date on an entry
       #       that waits for a fix (a passed date warns in all three and
       #       refuses nothing; an entry right by design carries no date);
-      #   (c) a counter — invalidation-keys-baseline.json holds a bare number
-      #       (literalKeyCount) and fails when it grows;
+      #   (c) a differential baseline with a verdict per entry —
+      #       invalidation-keys-baseline.json: a count per file that may only
+      #       fall, and an entry carrying a reason, an owner and a verdict; a
+      #       by-design entry carries no date and a to-fold one does, and a
+      #       passed date warns in make check-frontend and refuses nothing;
       #   (d) the rest of vulture_whitelist.py: counted from the parsed file
       #       in baseline_sizes.txt, so growth fails like a counter.
       - id: architecture-lint
