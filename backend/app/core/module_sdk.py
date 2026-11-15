@@ -120,6 +120,14 @@ from app.core.module_ownership import general_rows, hidden_module_tags_async
 from app.core.open_package import effective_expiry
 from app.core.scan_registry import ScanProvider, scan_registry
 from app.core.settings_diff import journal_config_change, record_settings
+from app.core.upload_validation import (
+    ATTACHMENT_CONTENT_TYPES,
+    FileSignatureMismatchError,
+    FileTooLargeError,
+    FileTypeNotAllowedError,
+    UploadMessages,
+    UploadPolicy,
+)
 from app.database import Base as CoreModelBase
 from app.i18n.service import get_current_lang, get_module_error_message
 from app.schemas.pagination import (
@@ -150,6 +158,7 @@ from app.services.identity_service import get_current_user
 # repository uses ``ModuleModelBase``.
 
 __all__ = [
+    'ATTACHMENT_CONTENT_TYPES',
     'AppException',
     'BaseContribution',
     'BaseModule',
@@ -159,6 +168,9 @@ __all__ = [
     'CoreModelBase',
     'CursorPaginatedResponse',
     'EntityNotFoundError',
+    'FileSignatureMismatchError',
+    'FileTooLargeError',
+    'FileTypeNotAllowedError',
     'ForbiddenException',
     'InterceptorError',
     'InterceptorPipeline',
@@ -182,7 +194,9 @@ __all__ = [
     'StockUnavailableError',
     'StorageInterceptor',
     'SystemEvent',
+    'UploadMessages',
     'UploadPathResolver',
+    'UploadPolicy',
     'ValidationException',
     'audit_actor_scope',
     'current_actor',

@@ -299,6 +299,62 @@ _EXPIRY_WORD = {
 }
 
 
+_MADE_WORD = {'en': 'Made', 'pl': 'Prod.', 'de': 'Herg.', 'fr': 'Fab.', 'es': 'Fab.'}
+_BEST_BEFORE_WORD = {
+    'en': 'Best before',
+    'pl': 'Najlepiej przed',
+    'de': 'MHD',
+    'fr': 'DDM',
+    'es': 'Cons. pref.',
+}
+
+
+async def lot_labels_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    lot_ids: list[UUID],
+) -> list[ProductLabel]:
+    """The labels of these batches, in the order asked.
+
+    A batch label names the product, carries the batch's own code in bars —
+    what a scan at the next step looks the batch up by — and says the day
+    the batch was made and its best-before. A batch whose name no barcode
+    can carry, or one of another organization, is left out; none left is
+    the caller's refusal.
+    """
+    from app.modules.printing.services.product_label_service import (
+        ProductLabel,
+        symbology,
+    )
+
+    lang = get_current_lang()
+    labels: list[ProductLabel] = []
+    for lot_id in lot_ids:
+        lot = await core_api.stock.get_lot_detail_async(db, organization_id, lot_id)
+        if lot is None or symbology(lot.name) is None:
+            continue
+        parts = []
+        if lot.production_date:
+            parts.append(
+                f'{pick_by_lang(lang, **_MADE_WORD)} '
+                f'{format_date_for(lang, lot.production_date)}'
+            )
+        best_before = lot.expiry_date or lot.use_by_date
+        if best_before:
+            parts.append(
+                f'{pick_by_lang(lang, **_BEST_BEFORE_WORD)} '
+                f'{format_date_for(lang, best_before)}'
+            )
+        labels.append(
+            ProductLabel(
+                name=lot.product_name or lot.name,
+                code=lot.name,
+                details=' · '.join(parts) or None,
+            )
+        )
+    return labels
+
+
 def _details_line(lot_name: str | None, expiry: date | None, lang: str) -> str | None:
     """The lot and expiry line in *lang*, or None when the record has neither."""
     parts = []
@@ -429,6 +485,29 @@ async def _product_entries_async(
     ]
 
 
+async def _lot_entries_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    lot_ids: list[UUID],
+    *,
+    copies: int,
+) -> list[dict[str, Any]]:
+    labels = await lot_labels_async(db, organization_id, lot_ids)
+    if not labels:
+        raise catalogue_refusal('print_job_nothing_to_print')
+    return [
+        {
+            'kind': 'product',
+            'label_id': None,
+            'short_code': label.code,
+            'name': label.name,
+            'details': label.details,
+        }
+        for label in labels
+        for _ in range(copies)
+    ]
+
+
 async def queue_job_async(
     db: AsyncSession,
     organization_id: UUID,
@@ -441,6 +520,7 @@ async def queue_job_async(
     short_codes: list[str] | None = None,
     storage_ids: list[UUID] | None = None,
     item_ids: list[UUID] | None = None,
+    lot_ids: list[UUID] | None = None,
     caption: str | None = None,
     qr_only: bool = False,
     show_code: bool = False,
@@ -454,7 +534,8 @@ async def queue_job_async(
     """Queue the chosen labels for one printer.
 
     Exactly one kind of target: pool labels (by id or short code), storage
-    locations, or products (their barcode labels). Storage locations print
+    locations, products (their barcode labels), or batches (a batch label:
+    the product, the batch code in bars, made and best-before). Storage locations print
     their QR label, or with ``bars`` their code as Code 128 (``qr`` adds the
     square beside it). What each label says, and its size, is resolved now
     and kept on the job, so the printed strip shows what the person saw when
@@ -464,14 +545,24 @@ async def queue_job_async(
     modules' records, for a caller who holds a module's read and not the
     core one; ``None`` is the whole pool.
     """
-    kinds = [bool(label_ids), bool(short_codes), bool(storage_ids), bool(item_ids)]
+    kinds = [
+        bool(label_ids),
+        bool(short_codes),
+        bool(storage_ids),
+        bool(item_ids),
+        bool(lot_ids),
+    ]
     if sum(kinds) != 1:
         raise catalogue_refusal('print_job_one_target')
     agent = await _target_agent_async(db, organization_id, agent_id)
-    if item_ids or (storage_ids and bars):
+    if item_ids or lot_ids or (storage_ids and bars):
         if item_ids:
             entries = await _product_entries_async(
                 db, organization_id, item_ids, details=details, copies=copies
+            )
+        elif lot_ids:
+            entries = await _lot_entries_async(
+                db, organization_id, lot_ids, copies=copies
             )
         else:
             entries = await _location_entries_async(

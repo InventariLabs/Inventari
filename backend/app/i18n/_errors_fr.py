@@ -504,6 +504,13 @@ ERRORS_FR: ErrorMessages = {
         "pas combien retirer de l'étagère — corrigez d'abord l'unité de la ligne de formule."
     ),
     'production_short_of_stock': "Pas assez d'ingrédients en stock pour cet ordre de fabrication.",
+    'production_best_before_before_made': 'La date de durabilité minimale {best_before} précède le jour de fabrication ({made}).',
+    'production_batch_not_an_ingredient': "{ingredient} n'est pas un ingrédient de cette fabrication.",
+    'production_batch_of_another_product': "Le lot {batch} n'est pas un lot de {ingredient}.",
+    'production_batch_choice_mismatch': 'Les lots choisis pour {ingredient} donnent {chosen}, mais la fabrication en consomme {needed}.',
+    'production_batch_short': 'Le lot {batch} de {ingredient} a {available} de libre, et non les {chosen} choisis — il est peut-être bloqué, réservé ou épuisé.',
+    'production_output_batch_missing': "Cette fabrication n'a placé sa production dans aucun lot : il n'y a pas de lot à bloquer ou à libérer.",
+    'production_record_not_completed': "Une fiche de lot n'existe que pour une fabrication terminée.",
     'output_template_not_found': 'Modèle de sortie introuvable',
     'purchase_order_not_found': 'Bon de commande introuvable',
     'reorder_rule_not_found': 'Règle de réapprovisionnement introuvable',

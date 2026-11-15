@@ -1,5 +1,9 @@
 {
   "names": {
+    "ATTACHMENT_CONTENT_TYPES": {
+      "kind": "value",
+      "type": "frozenset"
+    },
     "AppException": {
       "bases": [
         "HTTPException"
@@ -619,6 +623,30 @@
           "required": false
         }
       ],
+      "kind": "class",
+      "members": {}
+    },
+    "FileSignatureMismatchError": {
+      "bases": [
+        "FileTypeNotAllowedError"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {}
+    },
+    "FileTooLargeError": {
+      "bases": [
+        "UploadRejectedError"
+      ],
+      "init": [],
+      "kind": "class",
+      "members": {}
+    },
+    "FileTypeNotAllowedError": {
+      "bases": [
+        "UploadRejectedError"
+      ],
+      "init": [],
       "kind": "class",
       "members": {}
     },
@@ -2366,6 +2394,30 @@
         }
       }
     },
+    "UploadMessages": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "type_not_allowed",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "too_large",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "signature_mismatch",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
     "UploadPathResolver": {
       "bases": [
         "BaseContribution"
@@ -2393,6 +2445,60 @@
               "required": true
             }
           ]
+        }
+      }
+    },
+    "UploadPolicy": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "max_bytes",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "content_types",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "extensions",
+          "required": false
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "check": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "content",
+              "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "declared_type",
+              "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "messages",
+              "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "filename",
+              "required": false
+            }
+          ]
+        },
+        "extensions": {
+          "kind": "attribute"
         }
       }
     },

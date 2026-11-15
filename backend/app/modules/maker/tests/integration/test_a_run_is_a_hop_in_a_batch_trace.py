@@ -2,8 +2,8 @@
 
 A recall of an ingredient reaches the customers of what was made from it
 only if the run's output is a batch of its own. A run names that batch
-(``output_lot_name``); the output lands in it, and the trace of the
-ingredient's batch follows the run there. A run taken back nets to nothing on
+(``output_lot_name``), or names one for itself when nobody did; the output
+lands in it, and the trace of the ingredient's batch follows the run there. A run taken back nets to nothing on
 both sides and leaves the trace.
 """
 
@@ -165,7 +165,7 @@ def test_the_ingredients_trace_follows_the_run_to_the_bread(
     assert [entry['label'] for entry in bread['received']] == [run['number']]
 
 
-def test_a_run_without_a_batch_still_shows_where_the_ingredient_went(
+def test_a_run_nobody_named_a_batch_for_leads_the_trace_to_its_own(
     client: TestClient,
     mk_auth_headers: dict[str, str],
     mk_output_loc: StorageLocation,
@@ -175,11 +175,12 @@ def test_a_run_without_a_batch_still_shows_where_the_ingredient_went(
 
     trace = _trace(client, mk_auth_headers, bakery.flour_lot.id)
 
-    # The run is still the step forward; there is just no batch to follow.
+    # The run named a batch for itself, so the recall still reaches the bread.
     [hop] = trace['lots'][0]['sent']
     assert hop['label'] == run['number']
-    assert hop['produced'] == []
-    assert len(trace['lots']) == 1
+    [made] = hop['produced']
+    assert made['lot_name'] == run['output_lot_name']
+    assert trace['lots'][1]['lot_name'] == run['output_lot_name']
 
 
 def test_a_run_taken_back_leaves_the_trace(

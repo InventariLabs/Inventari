@@ -505,6 +505,13 @@ ERRORS_ES: ErrorMessages = {
         'no se sabe cuánto retirar del estante: corrija antes la unidad de la línea de la fórmula.'
     ),
     'production_short_of_stock': 'No hay suficientes ingredientes en stock para esta orden de producción.',
+    'production_best_before_before_made': 'La fecha de consumo preferente {best_before} es anterior al día de fabricación ({made}).',
+    'production_batch_not_an_ingredient': '{ingredient} no es un ingrediente de esta producción.',
+    'production_batch_of_another_product': 'El lote {batch} no es un lote de {ingredient}.',
+    'production_batch_choice_mismatch': 'Los lotes elegidos para {ingredient} dan {chosen}, pero la producción consume {needed}.',
+    'production_batch_short': 'El lote {batch} de {ingredient} tiene {available} libre, no los {chosen} elegidos: puede estar retenido, reservado o agotado.',
+    'production_output_batch_missing': 'Esta producción no dejó su resultado en ningún lote, así que no hay lote que retener ni liberar.',
+    'production_record_not_completed': 'El registro de lote solo existe para una producción terminada.',
     'output_template_not_found': 'Plantilla de salida no encontrada',
     'purchase_order_not_found': 'Orden de compra no encontrada',
     'reorder_rule_not_found': 'Regla de reposición no encontrada',

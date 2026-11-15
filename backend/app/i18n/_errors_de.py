@@ -507,6 +507,13 @@ ERRORS_DE: ErrorMessages = {
         'unklar, wie viel aus dem Regal zu nehmen ist — korrigieren Sie zuerst die Einheit der Formelzeile.'
     ),
     'production_short_of_stock': 'Für diesen Produktionsauftrag sind nicht genügend Zutaten auf Lager.',
+    'production_best_before_before_made': 'Das Mindesthaltbarkeitsdatum {best_before} liegt vor dem Herstellungstag ({made}).',
+    'production_batch_not_an_ingredient': '{ingredient} ist keine Zutat dieses Laufs.',
+    'production_batch_of_another_product': 'Die Charge {batch} ist keine Charge von {ingredient}.',
+    'production_batch_choice_mismatch': 'Die für {ingredient} gewählten Chargen ergeben {chosen}, der Lauf verbraucht aber {needed}.',
+    'production_batch_short': 'Die Charge {batch} von {ingredient} hat {available} frei, nicht die gewählten {chosen} — sie ist vielleicht gesperrt, reserviert oder verbraucht.',
+    'production_output_batch_missing': 'Dieser Lauf hat sein Erzeugnis in keine Charge gelegt, es gibt also keine Charge zu sperren oder freizugeben.',
+    'production_record_not_completed': 'Ein Chargenprotokoll gibt es nur für einen abgeschlossenen Lauf.',
     'output_template_not_found': 'Ausgabevorlage nicht gefunden',
     'purchase_order_not_found': 'Bestellung nicht gefunden',
     'reorder_rule_not_found': 'Nachbestellregel nicht gefunden',

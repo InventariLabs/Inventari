@@ -366,6 +366,13 @@ class ErrorMessages(TypedDict):
     production_overproduction_disabled: str
     production_ingredient_unmeasurable: str
     production_short_of_stock: str
+    production_best_before_before_made: str
+    production_batch_not_an_ingredient: str
+    production_batch_of_another_product: str
+    production_batch_choice_mismatch: str
+    production_batch_short: str
+    production_output_batch_missing: str
+    production_record_not_completed: str
     output_template_not_found: str
     purchase_order_not_found: str
     reorder_rule_not_found: str

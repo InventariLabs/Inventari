@@ -282,7 +282,11 @@ def test_the_output_record_and_its_group_stand_on_the_same_grain(
     db_session: Session,
     async_engine_fixture: AsyncEngine,
 ) -> None:
-    """Pins the output as it is: no batch on the record, none on its group."""
+    """Pins the output as it is: the run's own batch on the record and its group.
+
+    A run nobody named a batch for names its own, so the output is never
+    unbatched; the record and its group still stand on one grain.
+    """
     shelf = _Shelf(db_session, mk_org, mk_input_loc, mk_user, async_engine_fixture)
     shelf.stock('5')
     db_session.commit()
@@ -302,7 +306,7 @@ def test_the_output_record_and_its_group_stand_on_the_same_grain(
     ).all()
     assert [tuple(row) for row in records] == [tuple(row) for row in groups]
     assert len(records) == 1
-    assert records[0].lot_id is None
+    assert records[0].lot_id is not None
 
 
 def _also_eats(
