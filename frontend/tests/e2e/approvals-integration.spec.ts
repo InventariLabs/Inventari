@@ -129,20 +129,12 @@ test.describe("Approvals + Documents — integration flow", () => {
     expect(result).toBeTruthy();
   });
 
-  test("requests approval for the document", async () => {
-    try {
-      const approval = await api.requestDocumentApproval(token, docId);
-      expect(approval).toBeTruthy();
-    } catch (e: unknown) {
-      // If there's a stale request for this doc from a previous run, approve it
-      const existingApproval = await api.getDocumentApproval(token, docId);
-      if (existingApproval?.id) {
-        // Already has an approval request — acceptable
-        expect(existingApproval.id).toBeTruthy();
-      } else {
-        throw e;
-      }
-    }
+  test("confirming the document raised an approval request", async () => {
+    // The workflow is active, so the confirmation itself raises the request;
+    // asking again would meet the one-open rule and test a refusal.
+    const approval = await api.getDocumentApproval(token, docId);
+    expect(approval?.id, "the request the confirmation raised").toBeTruthy();
+    expect(approval?.status).toBe("PENDING");
   });
 
   test("verifies approval request exists", async () => {

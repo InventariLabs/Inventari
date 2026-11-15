@@ -199,6 +199,9 @@ test("reduced rates run from Settings to the per-rate totals of a receipt", asyn
   await form.getByRole("combobox", { name: /partner/i }).click();
   await page.getByRole("button", { name: supplier.name, exact: true }).click();
   await form.getByRole("combobox", { name: /to location/i }).click();
+  // The picker draws thirty places and narrows the rest on the server as
+  // the reader types, so a tenant with many locations needs the name typed.
+  await page.getByPlaceholder(/search location/i).fill(shelf.name);
   await page.getByRole("button", { name: shelf.name, exact: true }).click();
 
   const addLine = async (index: number, name: string, price: string) => {
