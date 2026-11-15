@@ -44,7 +44,9 @@ export default function RecipeDetailPage() {
   const canOrderPurchases = useCanWrite("purchase_orders");
   const { isModuleEnabled } = useModules();
   const canOrder = isModuleEnabled("purchase_orders") && canOrderPurchases;
-  const { data: availability } = useMakerRecipeAvailability(recipeId);
+  // One batch: the notice names what a run of this formula would lack. The
+  // endpoint asks for no batches unless told, and zero of them needs nothing.
+  const { data: availability } = useMakerRecipeAvailability(recipeId, "1");
   const [activeTab, setActiveTab] = useState<TabKey>("composition");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
