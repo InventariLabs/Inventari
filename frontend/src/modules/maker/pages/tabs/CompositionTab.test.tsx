@@ -3,6 +3,7 @@ import { signInWith, signOut } from "@/test/auth";
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import { CompositionTab } from "./CompositionTab";
 import { withLanguage } from "@/test/mocks/i18n";
+import { QueryWrapper } from "@/test/queryWrapper";
 import type { BomLine, MakerRecipe } from "@/modules/maker/types/maker";
 import type { ProductSearchResult } from "@/modules/warehouse/api/documents_products";
 
@@ -26,6 +27,10 @@ vi.mock("@/modules/maker/hooks/useRecipes", () => ({
   }),
   useDeleteBomLine: () => ({
     mutateAsync: deleteBomLineMutate,
+    isPending: false,
+  }),
+  useSetIngredientPrice: () => ({
+    mutateAsync: vi.fn(),
     isPending: false,
   }),
 }));
@@ -117,6 +122,7 @@ const line: BomLine = {
   notes: null,
   created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",
+  typed_unit_price_in_use: false,
 };
 
 const recipe: MakerRecipe = {
@@ -126,7 +132,10 @@ const recipe: MakerRecipe = {
   name: "Granola Bars",
   batch_yield_qty: "5",
   batch_yield_uom_id: null,
-  process_steps: ["Heat oven", "Mix dry ingredients"],
+  process_steps: [
+    { text: "Heat oven", minutes: null },
+    { text: "Mix dry ingredients", minutes: null },
+  ],
   reference_price: null,
   is_default: true,
   source_recipe_id: null,
@@ -140,7 +149,11 @@ const recipe: MakerRecipe = {
 };
 
 function renderTab(overrides: Partial<MakerRecipe> = {}) {
-  render(<CompositionTab recipe={{ ...recipe, ...overrides }} />);
+  render(
+    <QueryWrapper>
+      <CompositionTab recipe={{ ...recipe, ...overrides }} />
+    </QueryWrapper>,
+  );
 }
 
 describe("CompositionTab yield editing", () => {
@@ -436,7 +449,12 @@ describe("CompositionTab process steps editing", () => {
 
     expect(updateRecipeMutate).toHaveBeenCalledWith({
       recipeId: "r-1",
-      data: { process_steps: ["Heat oven", "Bake for 20 min"] },
+      data: {
+        process_steps: [
+          { text: "Heat oven", minutes: null },
+          { text: "Bake for 20 min", minutes: null },
+        ],
+      },
     });
   });
 
@@ -462,7 +480,7 @@ describe("CompositionTab process steps editing", () => {
 
     expect(updateRecipeMutate).toHaveBeenCalledWith({
       recipeId: "r-1",
-      data: { process_steps: [longStep] },
+      data: { process_steps: [{ text: longStep, minutes: null }] },
     });
   });
 

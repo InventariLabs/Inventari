@@ -198,7 +198,9 @@
       "totalCostAfterClosing": "Total cost after closing",
       "unitCost": "{{amount}} per {{unit}}",
       "totalCostGap_one": "{{count}} ingredient was drawn from stock with no cost, so it is missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
-      "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers."
+      "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
+      "estimatedAtCompletion": "Estimated at completion",
+      "estimatedDifference": "Actual difference: {{amount}}"
     },
     "ingredients": "Consumed ingredients",
     "emptyLines": "No ingredients were recorded for this run.",
@@ -229,7 +231,10 @@
       "saveFailed": "Failed to update line",
       "shortLabel": "short",
       "unmeasurableShort": "short — units cannot be compared with stock",
-      "shortfall": "{{quantity}} not in the records — due a count"
+      "shortfall": "{{quantity}} not in the records — due a count",
+      "estimated": "Est. {{amount}}",
+      "priceEffect": "from price {{amount}}",
+      "qtyEffect": "from quantity {{amount}}"
     },
     "edit": "Edit",
     "save": "Save",
@@ -283,7 +288,11 @@
       "deleteConfirm": {
         "title": "Delete cost line?",
         "description": "Remove \"{{label}}\" from fixed costs?"
-      }
+      },
+      "labourFromSteps": "Labour from the process steps",
+      "labourTime": "{{minutes}} min at the hourly rate",
+      "labourRateMissing": "The steps take {{minutes}} min. Set the hourly rate in production settings to cost that time.",
+      "labourRateLink": "Production settings"
     },
     "history": {
       "title": "Production history",
@@ -323,7 +332,12 @@
     },
     "notFound": "Production order not found",
     "plannedShortageHint_one": "Planned consumption exceeds stock — {{count}} ingredient short. Completing this production will be refused.",
-    "plannedShortageHint_other": "Planned consumption exceeds stock — {{count}} ingredients short. Completing this production will be refused."
+    "plannedShortageHint_other": "Planned consumption exceeds stock — {{count}} ingredients short. Completing this production will be refused.",
+    "processStepMinutes": "{{minutes}} min",
+    "processStepMinutesLabel": "Minutes for step {{number}}",
+    "minutesShort": "min",
+    "minutesPlaceholder": "min",
+    "processStepsGuard": "The process steps"
   },
   "bom": {
     "childLabel": "Ingredient product",
@@ -364,7 +378,14 @@
       "duplicateIngredient": "This BOM already lists that ingredient.",
       "removeIngredient": "Failed to remove the ingredient",
       "yieldInvalid": "How much the BOM makes must be greater than zero."
-    }
+    },
+    "typedPrice": "Typed price",
+    "typedPriceUnused": "not used — a stock cost or supplier price answers first",
+    "typedPriceHint": "Used when there is no stock cost and no supplier price. Stored with the product, so every BOM that uses it costs it the same.",
+    "setPrice": "Set price",
+    "editPrice": "Edit price",
+    "priceSaved": "Price saved",
+    "priceSaveFailed": "Failed to save the price"
   },
   "tree": {
     "title": "Multi-level BOM",
@@ -471,7 +492,9 @@
     "whereReferenceDirection": "The result is named this way on BOM cards, production orders and the monthly summary.",
     "immediateNote": "Each choice saves as you make it. There is no undo — set it back the same way.",
     "advanced": "Advanced",
-    "advancedHint": "Rules for shortages and overproduction. The defaults suit a small workshop."
+    "advancedHint": "Rules for shortages and overproduction. The defaults suit a small workshop.",
+    "laborHourlyRate": "Hourly rate for own work",
+    "laborHourlyRateHint": "A BOM's labour is its timed steps at this rate. Zero means labour costs nothing in estimates."
   },
   "availability": {
     "maxBatches": "Max batches from stock",
@@ -540,5 +563,31 @@
       "label": "Savings vs shop price",
       "definition": "Shop price minus the cost to make it"
     }
+  },
+  "shortage": {
+    "title": "This BOM needs ingredients the records do not hold",
+    "body": "Not in the records: {{names}}.",
+    "unmeasurable": "units cannot be compared with the stock",
+    "missing": "missing {{quantity}}",
+    "addStock": "Add stock",
+    "order": "Order the missing",
+    "nothingToOrder": "Everything is in stock — nothing was ordered.",
+    "alreadyOrdered": "Everything short is already on an open purchase order — nothing new was ordered.",
+    "ordered": "Draft purchase order {{number}} created with {{lines}} lines.",
+    "orderFailed": "Failed to create the purchase order",
+    "addStockTitle": "Add the stock you have",
+    "addStockHint": "One entry per ingredient: the quantity and what it cost. Each one opens a stock record at that price.",
+    "location": "Location",
+    "noLocations": "No location available",
+    "needs": "needs {{quantity}}",
+    "quantity": "Quantity",
+    "price": "Price per unit",
+    "priceHint": "Optional — opens a cost layer.",
+    "stockFallbackName": "Ingredient",
+    "addStockSave": "Add stock ({{saved}})",
+    "stockSaved": "Stock saved.",
+    "stockSaveFailed": "Failed to save the stock.",
+    "stockSavePartial": "Saved {{saved}} of {{total}}. The rest is still in the sheet.",
+    "locationsFailed": "Could not load the locations"
   }
 }

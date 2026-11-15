@@ -65,12 +65,35 @@ says what the release does rather than what changed since them.
   importing the module's internals. The dead-code check reads every module's
   `moduleApi.ts` as published surface, and no longer reports a name in it that
   nothing in this repository imports.
+- A production formula costs out on the day it is written. An ingredient with
+  no stock and no supplier quote can be given a price per unit on its card;
+  the price belongs to the product and every estimate asks it after the cost
+  layers and the supplier quotes. Each process step carries how long it takes,
+  production settings carry an hourly rate for the organization's own work,
+  and the formula's labour is its steps' time at that rate — shown as a
+  computed line beside the fixed costs, and included in the estimate, the
+  preview and a run's actual cost. A completed run keeps the formula's answer
+  beside what it cost, and each ingredient says whether the difference came
+  from a price or from a quantity. A formula whose ingredients the records do
+  not hold says so at the top of its page, and from there the stock can be
+  entered (quantity and price) or ordered as a draft purchase order when
+  purchasing is on.
 - A batch's trace for a recall: from a batch, the receipts that brought it in
   and the deliveries that sent it out, each with its partner, address, date and
   quantity — one step back and one step forward, as food law asks. A production
   run can name the batch its output goes into, and the trace follows it on to
   that batch and its own customers. The trace exports as a spreadsheet to hand
   to an inspector.
+
+### Changed
+
+- **Breaking:** a production formula's `process_steps` are objects
+  (`{text, minutes}`) rather than bare sentences, so a step can carry its
+  duration. Writers may still send plain strings, which are stored as steps
+  with no duration; a reader of `GET /maker/recipes/{id}` or of the catalogue
+  must read `step.text` instead of the string itself. Steps stored by an
+  earlier version are rewritten by the module's upgrade: a sentence becomes a
+  step with no duration, so nothing has to be re-entered.
 
 ### Fixed
 

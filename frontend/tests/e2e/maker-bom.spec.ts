@@ -109,10 +109,15 @@ test.describe("Maker — recipe catalog & formula detail", () => {
     authenticatedPage,
   }) => {
     await page.goto(`/maker/recipes/${recipe.id}`);
-    await expect(page.getByText(seedChild.name, { exact: true })).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(page.getByText(seedChild.id, { exact: true })).toHaveCount(0);
+    // Scoped to the tab: the shortage notice above it names the same
+    // ingredient, and an unscoped exact match now finds both.
+    const composition = page.getByRole("tabpanel", { name: "Composition" });
+    await expect(
+      composition.getByText(seedChild.name, { exact: true }),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(
+      composition.getByText(seedChild.id, { exact: true }),
+    ).toHaveCount(0);
   });
 
   test("editing a line qty in the Composition tab persists (PATCH bom-line)", async ({

@@ -29,7 +29,7 @@ class CoreValuationAPI:
         zero is a price, not a missing rate. This is for forecasts only:
         accounting must keep using the costs of the layers actually consumed.
         """
-        from app.core.cost_estimates import supplier_rates_async
+        from app.core.cost_estimates import supplier_rates_async, typed_rates_async
         from app.core.public_api import core_api
 
         ids = list(dict.fromkeys(product_template_ids))
@@ -40,6 +40,9 @@ class CoreValuationAPI:
         rates = await self.get_rates_batch_async(db, organization_id, ids)
         missing = [tid for tid in ids if rates.get(tid) is None]
         supplier = await supplier_rates_async(db, organization_id, missing, currency)
+        typed = await typed_rates_async(
+            db, organization_id, [tid for tid in missing if tid not in supplier]
+        )
         estimates = {}
         for tid in ids:
             rate = rates.get(tid)
@@ -47,6 +50,8 @@ class CoreValuationAPI:
                 estimates[tid] = UnitCostEstimate(rate, currency, 'layers')
             elif tid in supplier:
                 estimates[tid] = UnitCostEstimate(supplier[tid], currency, 'supplier')
+            elif tid in typed:
+                estimates[tid] = UnitCostEstimate(typed[tid], currency, 'typed')
             else:
                 estimates[tid] = UnitCostEstimate()
         return estimates

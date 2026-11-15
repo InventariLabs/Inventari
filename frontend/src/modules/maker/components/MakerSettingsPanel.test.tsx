@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { http, HttpResponse } from "msw";
@@ -53,6 +53,7 @@ beforeEach(() => {
         allow_overproduction: true,
         availability_check_scope: "GLOBAL",
         create_on_shortage_strategy: "ALLOW",
+        labor_hourly_rate: "0",
       }),
     ),
   );
@@ -189,5 +190,41 @@ describe("MakerSettingsPanel", () => {
       "aria-pressed",
       "false",
     );
+  });
+});
+
+describe("MakerSettingsPanel — the rate the timed steps cost", () => {
+  it("keeps the rate out of the Advanced shortage rules and saves it on leaving the field", async () => {
+    // The rate prices every formula, so it is not a shortage rule; it sat in
+    // the collapsed Advanced section, which sent a reader with timed steps
+    // and a zero rate looking for it in the wrong place. It also had a Save
+    // of its own beside controls that save as they are used — two save
+    // models on one page. It now saves when the field is left.
+    signInWith(["maker:read", "maker:write", "maker:manage"]);
+    let sent: Record<string, unknown> | null = null;
+    server.use(
+      http.patch("/api/v1/maker/settings", async ({ request }) => {
+        sent = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({
+          reference_direction: "SAVINGS",
+          allow_overproduction: true,
+          availability_check_scope: "GLOBAL",
+          create_on_shortage_strategy: "ALLOW",
+          labor_hourly_rate: "30.00",
+        });
+      }),
+    );
+    renderPanel();
+
+    const rate = await screen.findByTestId("maker-settings-labor-rate");
+    expect(rate).toBeVisible();
+    expect(
+      screen.queryByTestId("maker-settings-labor-rate-save"),
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(rate, { target: { value: "30" } });
+    fireEvent.blur(rate);
+
+    await waitFor(() => expect(sent).toEqual({ labor_hourly_rate: "30" }));
   });
 });

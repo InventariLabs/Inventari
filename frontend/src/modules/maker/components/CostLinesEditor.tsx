@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
@@ -24,6 +25,13 @@ import type {
 interface CostLinesEditorProps {
   recipeId: string;
   lines: RecipeCostLine[];
+  /**
+   * The batch's labour, from the timed steps at the organization's hourly
+   * rate. Computed by the server, so this line and the estimate agree.
+   */
+  labourCost?: string | null;
+  /** How many minutes the labour is for, when the formula was timed. */
+  labourMinutes?: number;
 }
 
 interface DraftLine {
@@ -51,7 +59,12 @@ const EMPTY_DRAFT: DraftLine = {
   amount: "",
 };
 
-export function CostLinesEditor({ recipeId, lines }: CostLinesEditorProps) {
+export function CostLinesEditor({
+  recipeId,
+  lines,
+  labourCost,
+  labourMinutes,
+}: CostLinesEditorProps) {
   const { t, i18n } = useTranslation("maker");
   const currency = useOrganizationCurrency();
   const { mutateAsync: addLine } = useAddCostLine();
@@ -152,7 +165,52 @@ export function CostLinesEditor({ recipeId, lines }: CostLinesEditorProps) {
         </div>
       </div>
 
-      {lines.length === 0 && draft === null ? (
+      {/* The computed labour line sits beside the fixed ones: it is part of
+          what the batch costs, but nobody types it — it is the steps' time at
+          the rate in production settings. Read-only, and only while there is
+          something to read: an untimed formula says so by leaving the row
+          out, not by claiming its labour was free. */}
+      {labourCost !== null &&
+        labourCost !== undefined &&
+        Number(labourCost) > 0 && (
+          <div
+            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2 rounded-lg bg-accent-50/40 border border-accent-200/60 dark:bg-accent-900/10 dark:border-accent-800/40"
+            data-testid="maker-computed-labour"
+          >
+            <Badge variant="info">{t("detail.cost.kind.LABOR")}</Badge>
+            <span className="flex-1 min-w-[7rem] truncate text-sm text-on">
+              {t("detail.cost.labourFromSteps")}
+            </span>
+            <div className="ml-auto flex items-center gap-2">
+              <span className="text-xs text-on-muted">
+                {t("detail.cost.labourTime", { minutes: labourMinutes ?? 0 })}
+              </span>
+              <span className="text-sm font-medium text-on">
+                {formatMoney(labourCost, currency, i18n.language)}
+              </span>
+            </div>
+          </div>
+        )}
+
+      {/* Timed steps but no labour line: the rate is zero or unset, and the
+          line's absence used to read as "this formula has no labour". Say
+          where the rate lives instead of leaving the reader to guess. */}
+      {(labourMinutes ?? 0) > 0 && !(Number(labourCost) > 0) && (
+        <p
+          className="text-xs text-on-muted"
+          data-testid="maker-labour-rate-hint"
+        >
+          {t("detail.cost.labourRateMissing", { minutes: labourMinutes ?? 0 })}{" "}
+          <Link
+            to="/maker/settings"
+            className="text-accent-600 hover:underline"
+          >
+            {t("detail.cost.labourRateLink")}
+          </Link>
+        </p>
+      )}
+
+      {lines.length === 0 && draft === null && !(Number(labourCost) > 0) ? (
         <p className="text-sm text-on-muted">{t("detail.cost.noFixed")}</p>
       ) : (
         <div className="space-y-2">

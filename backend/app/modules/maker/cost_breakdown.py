@@ -133,6 +133,7 @@ async def compute_breakdown(
                 cost_source={
                     'layers': 'avco',
                     'supplier': 'supplier',
+                    'typed': 'typed',
                     'unknown': 'none',
                 }[estimates.get(child_id, UnitCostEstimate()).source],
                 child_template_name=template_names.get(child_id),

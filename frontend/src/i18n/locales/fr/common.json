@@ -646,7 +646,10 @@
         "emailed_to": "Envoyé par e-mail à",
         "imported_from": "Importé depuis",
         "skipped": "Lignes ignorées",
-        "approval": "Approbation"
+        "approval": "Approbation",
+        "labor_hourly_rate": "Taux horaire de la main-d'œuvre",
+        "typed_unit_price_before": "Prix saisi avant",
+        "typed_unit_price_after": "Prix saisi après"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",

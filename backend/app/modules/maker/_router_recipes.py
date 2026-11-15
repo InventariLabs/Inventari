@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.contracts import UserContextDTO
+from app.core.contracts import AuditAction, AuditTargetType, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
@@ -28,10 +28,11 @@ from app.core.exceptions import (
     map_service_errors,
 )
 from app.core.module_sdk import journal_config_change, record_settings
+from app.core.modules import require_module
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
-from . import cost_rollup, recipe_service, stock_consumption
+from . import cost_rollup, production_service, recipe_service, stock_consumption
 from ._router_bom import _attach_child_names
 from ._schemas_bom import BoMLineRead
 from ._schemas_recipes import (
@@ -39,6 +40,8 @@ from ._schemas_recipes import (
     BoMLineCreateForRecipe,
     BoMLineUpdate,
     IngredientAvailabilityItem,
+    IngredientPriceRead,
+    IngredientPriceUpdate,
     MakerSettingsRead,
     MakerSettingsUpdate,
     RecipeBridgeRead,
@@ -51,6 +54,7 @@ from ._schemas_recipes import (
     RecipeFromCulinaryCreate,
     RecipeRead,
     RecipeUpdate,
+    ShortagePurchaseOrderResponse,
 )
 from .exceptions import DuplicateBomLineError, RecipeInUseError
 from .models import MakerRecipe
@@ -130,6 +134,7 @@ async def update_maker_settings(
         allow_overproduction=data.allow_overproduction,
         availability_check_scope=data.availability_check_scope,
         create_on_shortage_strategy=data.create_on_shortage_strategy,
+        labor_hourly_rate=data.labor_hourly_rate,
     )
     await db.refresh(settings)
     # Whether a run may go ahead short of ingredients, or make more than
@@ -145,6 +150,7 @@ async def update_maker_settings(
             'allow_overproduction',
             'availability_check_scope',
             'create_on_shortage_strategy',
+            'labor_hourly_rate',
         },
         before=before,
         after=settings,
@@ -255,6 +261,7 @@ async def list_recipes(
         )
         return uom_symbols.get(uom_id) if uom_id else None
 
+    settings = await recipe_service.get_settings(db, org_id)
     items = []
     for recipe in recipes:
         last_run = last_costs.get(recipe.id)
@@ -272,11 +279,22 @@ async def list_recipes(
             # the run's 4.2000 and read as a different precision, not a
             # different time.
             rollup = estimates.get(recipe.id)
-            if recipe.batch_yield_qty and rollup is not None and rollup.total > 0:
-                estimated_unit_cost = (rollup.total / recipe.batch_yield_qty).quantize(
+            # The estimate is the cost of the batch, not of its ingredients:
+            # the fixed lines and the labour the steps take are what the
+            # price has to cover too. A formula whose only cost is its
+            # labour still has a number to show.
+            batch_total = (
+                rollup.total
+                + cost_rollup.fixed_cost_per_batch(recipe)
+                + cost_rollup.labour_cost_per_batch(recipe, settings.labor_hourly_rate)
+                if rollup is not None
+                else Decimal('0')
+            )
+            if recipe.batch_yield_qty and batch_total > 0:
+                estimated_unit_cost = (batch_total / recipe.batch_yield_qty).quantize(
                     Decimal('0.0001')
                 )
-                estimated_uncosted = rollup.unrated_count
+                estimated_uncosted = rollup.unrated_count if rollup else 0
         result = None
         # A margin measured against a cost that left ingredients out is
         # overstated by exactly what was left out, and it is the number
@@ -322,6 +340,77 @@ async def list_recipes(
 # ---------------------------------------------------------------------------
 
 
+@router.post(
+    '/{recipe_id}/shortages/purchase-order',
+    response_model=ShortagePurchaseOrderResponse,
+    dependencies=[
+        Depends(require_module('purchase_orders')),
+        require_permission('purchase_orders:write'),
+    ],
+)
+async def order_recipe_shortages(
+    recipe_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> ShortagePurchaseOrderResponse:
+    """Raise a draft purchase order for one batch's missing ingredients.
+
+    The recipe page offers this beside the notice that its ingredients are
+    not on the shelf; the order is the answer when the user does not have
+    the goods to enter instead. Purchasing must be on and the account able
+    to write orders.
+    """
+    return await production_service.create_shortage_purchase_order(
+        db, org_id, recipe_id, current_user
+    )
+
+
+@router.put(
+    '/ingredient-prices/{template_id}',
+    response_model=IngredientPriceRead,
+    dependencies=[require_permission('maker:manage')],
+)
+async def set_ingredient_price(
+    template_id: UUID,
+    data: IngredientPriceUpdate,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> IngredientPriceRead:
+    """Type the price of an ingredient the records do not price.
+
+    The price belongs to the product, not to one formula: two formulas that
+    share an ingredient share what it costs. The shared estimate asks it
+    last — a cost layer is what the stock actually cost, a supplier's quote
+    is a live offer, and a typed price is the organization's own answer for
+    a product it has never bought.
+    """
+    from . import ingredient_prices
+
+    # The price is a fact about the product, so it lands in the organization
+    # journal with both sides — the same reason a template's own edit does.
+    before = await ingredient_prices.get_typed_price_async(db, org_id, template_id)
+    price = await ingredient_prices.set_typed_price_async(
+        db, org_id, template_id, data.unit_price
+    )
+    template = await core_api.product_templates.get_async(db, org_id, template_id)
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=org_id,
+        user_id=current_user.id,
+        action=AuditAction.UPDATE,
+        target_type=AuditTargetType.PRODUCT_TEMPLATE,
+        target_id=template_id,
+        snapshot={
+            'name': template.name if template else None,
+            'typed_unit_price_before': str(before) if before is not None else None,
+            'typed_unit_price_after': str(price) if price is not None else None,
+        },
+    )
+    return IngredientPriceRead(product_template_id=template_id, unit_price=price)
+
+
 @router.get('/{recipe_id}', response_model=RecipeRead)
 async def get_recipe(
     recipe_id: UUID,
@@ -338,17 +427,53 @@ async def get_recipe(
     lines = list(recipe.lines)
     cost_lines = list(recipe.cost_lines)
     await _attach_child_names(db, org_id, lines)
+    # The typed price is the product's, read for the page in one query, and
+    # carried on the line the editor shows. It is not an attribute of the
+    # ORM row, so the read is built rather than stamped on the instance.
+    from .ingredient_prices import typed_rates_async
 
-    # Cheap AVCO cost estimate per unit of output (None without a BOM).
+    typed_prices = await typed_rates_async(
+        db, org_id, [line.child_template_id for line in lines]
+    )
+
+    # Cheap cost estimate per unit of output (None without a BOM). The
+    # batch's own fixed lines and the time its steps take belong in it: a
+    # number that leaves them out understates every price somebody sets
+    # against it, and this is the figure the catalogue and the cost tab
+    # both read as "what one unit costs to make".
+    settings = await recipe_service.get_settings(db, org_id)
+    labour_cost = cost_rollup.labour_cost_per_batch(recipe, settings.labor_hourly_rate)
     estimated_unit_cost = None
+    material = None
     if lines:
-        estimated_unit_cost = await cost_rollup.compute_unit_cost(
+        material = await cost_rollup.compute_cost_rollup(
             db,
             org_id,
             recipe.output_template_id,
             recipe.batch_yield_qty,
             recipe_id=recipe.id,
         )
+        batch_total = (
+            material.total + cost_rollup.fixed_cost_per_batch(recipe) + labour_cost
+        )
+        if recipe.batch_yield_qty > 0:
+            estimated_unit_cost = batch_total / recipe.batch_yield_qty
+
+    line_reads = [
+        BoMLineRead.model_validate(line).model_copy(
+            update={
+                'typed_unit_price': typed_prices.get(line.child_template_id),
+                # The estimate asks the layers and a supplier quote first;
+                # only the last answer is the typed price. The card says so
+                # rather than showing a price that was not the one used.
+                'typed_unit_price_in_use': (
+                    material is not None
+                    and material.sources.get(line.child_template_id) == 'typed'
+                ),
+            }
+        )
+        for line in lines
+    ]
 
     data = {
         k: v
@@ -359,8 +484,9 @@ async def get_recipe(
         **data,
         output_template_name=name,
         batch_yield_uom_symbol=await _output_uom_symbol(db, org_id, recipe),
-        lines=lines,
+        lines=line_reads,
         cost_lines=cost_lines,
+        labour_cost=labour_cost,
         estimated_unit_cost=estimated_unit_cost,
     )
 

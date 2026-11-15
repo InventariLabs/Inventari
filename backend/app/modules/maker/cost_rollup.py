@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from uuid import UUID
 
@@ -29,6 +29,10 @@ class CostRollup:
     total: Decimal
     ingredient_count: int
     unrated_count: int
+    #: Which answer priced each ingredient — 'layers', 'supplier', 'typed' or
+    #: 'unknown'. A caller showing a fallback price needs to know whether the
+    #: estimate actually reached it.
+    sources: dict[UUID, str] = field(default_factory=dict)
 
 
 async def compute_cost_rollup(
@@ -89,13 +93,20 @@ def _rollup_from_flat(
 ) -> CostRollup:
     total = Decimal('0')
     unrated = 0
+    sources: dict[UUID, str] = {}
     for child_id, child_qty, _unit in flat:
-        rate = rates.get(child_id, UnitCostEstimate()).unit_cost
-        if rate is None:
+        estimate = rates.get(child_id, UnitCostEstimate())
+        sources[child_id] = estimate.source
+        if estimate.unit_cost is None:
             unrated += 1
         else:
-            total += rate * child_qty
-    return CostRollup(total=total, ingredient_count=len(flat), unrated_count=unrated)
+            total += estimate.unit_cost * child_qty
+    return CostRollup(
+        total=total,
+        ingredient_count=len(flat),
+        unrated_count=unrated,
+        sources=sources,
+    )
 
 
 async def compute_total_cost(
@@ -132,3 +143,40 @@ async def compute_unit_cost(
         db, organization_id, template_id, planned_qty, recipe_id
     )
     return total / planned_qty if total > 0 else Decimal('0')
+
+
+def process_minutes(recipe: MakerRecipe) -> Decimal:
+    """How long the formula's steps take, in minutes.
+
+    A step saved before steps carried durations has no time and adds none.
+    """
+    total = Decimal('0')
+    for step in recipe.process_steps or []:
+        if not isinstance(step, dict):
+            continue
+        minutes = step.get('minutes')
+        if minutes is not None:
+            total += Decimal(str(minutes))
+    return total
+
+
+def labour_cost_per_batch(recipe: MakerRecipe, hourly_rate: Decimal | None) -> Decimal:
+    """The batch's own labour: its steps' time at the organization's rate.
+
+    Zero is a real answer — nobody timed the steps, or nobody named a rate.
+    The caller shows the line only when it is above zero, so an untimed
+    formula does not claim its labour was free.
+    """
+    if hourly_rate is None or hourly_rate <= 0:
+        return Decimal('0')
+    minutes = process_minutes(recipe)
+    if minutes <= 0:
+        return Decimal('0')
+    from app.core.money import quantise
+
+    return quantise(minutes / Decimal('60') * hourly_rate, 2)
+
+
+def fixed_cost_per_batch(recipe: MakerRecipe) -> Decimal:
+    """The fixed cost lines of one batch, summed."""
+    return sum((line.amount for line in recipe.cost_lines), Decimal('0'))

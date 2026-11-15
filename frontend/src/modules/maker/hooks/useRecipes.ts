@@ -128,6 +128,50 @@ export function useUpdateBomLine() {
   );
 }
 
+/** Type (or clear) the price of an ingredient the records do not price. */
+export function useSetIngredientPrice() {
+  return useAppMutation(
+    ({
+      templateId,
+      unitPrice,
+    }: {
+      templateId: string;
+      unitPrice: string | null;
+    }) => recipeApi.setIngredientPrice(templateId, unitPrice),
+    (queryClient) => invalidation.maker(queryClient),
+  );
+}
+
+/** Add a stock record (quantity and price) for an ingredient the formula lacks. */
+export function useAddIngredientStock() {
+  return useAppMutation(
+    (data: {
+      name: string;
+      template_id: string;
+      location_id: string;
+      quantity: string;
+      purchase_price: string | null;
+    }) => recipeApi.addIngredientStock(data),
+    (queryClient) => {
+      invalidation.maker(queryClient);
+      queryClient.invalidateQueries({ queryKey: queryKeys.items.all });
+    },
+  );
+}
+
+/** Raise a draft purchase order for what one batch of the formula lacks. */
+export function useOrderRecipeShortages() {
+  return useAppMutation(
+    (recipeId: string) => recipeApi.orderShortages(recipeId),
+    (queryClient) => {
+      invalidation.maker(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.purchaseOrders.all,
+      });
+    },
+  );
+}
+
 export function useMakerSettings() {
   return useModuleQuery("maker", {
     queryKey: queryKeys.maker.recipeSettings,

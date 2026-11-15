@@ -5,7 +5,8 @@ import { BookOpen, FlaskConical, Star, Trash2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { extractApiError, isNotFoundError } from "@/lib/errors";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
-import { useCanManage } from "@/hooks/useCanWrite";
+import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
+import { useModules } from "@/contexts/ModulesContext";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { QueryError } from "@/components/ui/QueryResult";
@@ -15,9 +16,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import {
   useDeleteMakerRecipe,
   useMakerRecipe,
+  useMakerRecipeAvailability,
   useUpdateMakerRecipe,
 } from "@/modules/maker/hooks/useRecipes";
 import { AvailabilityBadge } from "@/modules/maker/components/AvailabilityBadge";
+import { RecipeShortageNotice } from "@/modules/maker/components/RecipeShortageNotice";
 import { CompositionTab } from "@/modules/maker/pages/tabs/CompositionTab";
 import { CostResultTab } from "@/modules/maker/pages/tabs/CostResultTab";
 import { HistoryTab } from "@/modules/maker/pages/tabs/HistoryTab";
@@ -34,6 +37,16 @@ export default function RecipeDetailPage() {
   // A formula decides what production takes from stock, so writing it —
   // including deleting it — belongs to maker:manage, not to the floor.
   const canManage = useCanManage("maker");
+  // Two ways out of a missing ingredient, each gated by the door it uses:
+  // a stock record needs items:write, and an order needs purchasing on and
+  // its own write right.
+  const canAddStock = useCanWrite("items");
+  const canOrderPurchases = useCanWrite("purchase_orders");
+  const { isModuleEnabled } = useModules();
+  const canOrder = isModuleEnabled("purchase_orders") && canOrderPurchases;
+  // One batch: the notice names what a run of this formula would lack. The
+  // endpoint asks for no batches unless told, and zero of them needs nothing.
+  const { data: availability } = useMakerRecipeAvailability(recipeId, "1");
   const [activeTab, setActiveTab] = useState<TabKey>("composition");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -182,6 +195,16 @@ export default function RecipeDetailPage() {
           )}
         </div>
       </Card>
+
+      {/* At the top, before the tabs: a formula whose ingredients the
+          records do not hold says so on arrival, and the two answers —
+          enter the stock, or order it — are on the same notice. */}
+      <RecipeShortageNotice
+        recipeId={recipe.id}
+        availability={availability}
+        canAddStock={canAddStock}
+        canOrder={canOrder}
+      />
 
       <Tabs
         defaultValue="composition"

@@ -91,7 +91,13 @@ class TestRecipeCrud:
         assert resp.status_code == 200
         body = resp.json()
         assert body['name'] == 'Lavender Soap'
-        assert body['process_steps'] == ['Melt', 'Pour', 'Cure 4 weeks']
+        # A sentence saved before steps carried time reads back as a step
+        # with no duration: one shape for the row, whichever client wrote it.
+        assert body['process_steps'] == [
+            {'text': 'Melt', 'minutes': None},
+            {'text': 'Pour', 'minutes': None},
+            {'text': 'Cure 4 weeks', 'minutes': None},
+        ]
 
     def test_get_recipe_not_found_returns_404(
         self,

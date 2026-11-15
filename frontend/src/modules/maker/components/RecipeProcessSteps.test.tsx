@@ -20,10 +20,15 @@ vi.mock("sonner", () => ({
 const recipe = {
   id: "r-1",
   name: "Granola",
-  process_steps: ["Mix the oats", "Bake for 20 minutes"],
+  process_steps: [
+    { text: "Mix the oats", minutes: "10" },
+    { text: "Bake for 20 minutes", minutes: "20" },
+  ],
 } as unknown as MakerRecipe;
 
-function renderSteps(steps: string[] = recipe.process_steps ?? []) {
+function renderSteps(
+  steps: MakerRecipe["process_steps"] = recipe.process_steps ?? [],
+) {
   render(<RecipeProcessSteps recipe={{ ...recipe, process_steps: steps }} />);
   fireEvent.click(screen.getByTestId("maker-steps-edit"));
 }
@@ -40,7 +45,7 @@ describe("RecipeProcessSteps in-place editing", () => {
     signOut();
   });
 
-  it("edits a step where it stands, keeping its position", async () => {
+  it("edits a step where it stands, keeping its position and time", async () => {
     renderSteps();
     fireEvent.change(screen.getByTestId("maker-steps-edit-1"), {
       target: { value: "Bake for 25 minutes" },
@@ -49,8 +54,8 @@ describe("RecipeProcessSteps in-place editing", () => {
 
     await waitFor(() => expect(updateRecipe).toHaveBeenCalled());
     expect(updateRecipe.mock.calls[0][0].data.process_steps).toEqual([
-      "Mix the oats",
-      "Bake for 25 minutes",
+      { text: "Mix the oats", minutes: "10" },
+      { text: "Bake for 25 minutes", minutes: "20" },
     ]);
   });
 
@@ -62,9 +67,10 @@ describe("RecipeProcessSteps in-place editing", () => {
     fireEvent.click(screen.getByTestId("maker-steps-save"));
 
     await waitFor(() => expect(updateRecipe).toHaveBeenCalled());
-    expect(updateRecipe.mock.calls[0][0].data.process_steps[0]).toBe(
-      "Mix the oats\nthen the honey",
-    );
+    expect(updateRecipe.mock.calls[0][0].data.process_steps[0]).toEqual({
+      text: "Mix the oats\nthen the honey",
+      minutes: "10",
+    });
   });
 
   it("drops a step emptied out rather than saving a blank row", async () => {
@@ -76,7 +82,27 @@ describe("RecipeProcessSteps in-place editing", () => {
 
     await waitFor(() => expect(updateRecipe).toHaveBeenCalled());
     expect(updateRecipe.mock.calls[0][0].data.process_steps).toEqual([
-      "Bake for 20 minutes",
+      { text: "Bake for 20 minutes", minutes: "20" },
     ]);
+  });
+
+  it("saves a step with no time as a step nobody timed", async () => {
+    renderSteps([{ text: "Rest", minutes: null }]);
+    fireEvent.click(screen.getByTestId("maker-steps-save"));
+
+    await waitFor(() => expect(updateRecipe).toHaveBeenCalled());
+    expect(updateRecipe.mock.calls[0][0].data.process_steps).toEqual([
+      { text: "Rest", minutes: null },
+    ]);
+  });
+
+  it("shows how long a step takes beside it", () => {
+    render(<RecipeProcessSteps recipe={recipe} />);
+    expect(screen.getByTestId("maker-step-minutes-0").textContent).toBe(
+      "10 min",
+    );
+    expect(screen.getByTestId("maker-step-minutes-1").textContent).toBe(
+      "20 min",
+    );
   });
 });

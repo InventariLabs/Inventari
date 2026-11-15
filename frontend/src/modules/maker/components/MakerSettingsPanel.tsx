@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { useCanManage } from "@/hooks/useCanWrite";
@@ -87,6 +88,7 @@ export function MakerSettingsPanel() {
   const [allowOver, setAllowOver] = useState(true);
   const [scope, setScope] = useState<AvailabilityCheckScope>("GLOBAL");
   const [strategy, setStrategy] = useState<CreateOnShortageStrategy>("ALLOW");
+  const [hourlyRate, setHourlyRate] = useState("0");
   const [initialized, setInitialized] = useState(false);
 
   // Sync local state when settings load.
@@ -95,6 +97,7 @@ export function MakerSettingsPanel() {
     setAllowOver(settings.allow_overproduction);
     setScope(settings.availability_check_scope);
     setStrategy(settings.create_on_shortage_strategy);
+    setHourlyRate(settings.labor_hourly_rate ?? "0");
     setInitialized(true);
   }
 
@@ -147,6 +150,17 @@ export function MakerSettingsPanel() {
         resetState?.();
       },
     });
+  }
+
+  function saveRate(value: string) {
+    const saved = settings?.labor_hourly_rate ?? "0";
+    const trimmed = value.trim();
+    if (trimmed === "" || Number.isNaN(Number(trimmed))) {
+      setHourlyRate(saved);
+      return;
+    }
+    if (trimmed === saved) return;
+    handleSave({ labor_hourly_rate: trimmed }, () => setHourlyRate(saved));
   }
 
   return (
@@ -206,6 +220,33 @@ export function MakerSettingsPanel() {
         >
           {resultTerms(t, direction).definition}
         </p>
+      </Card>
+
+      {/* Labour rate — what the timed steps cost. Not a shortage rule: it
+          prices every formula, so it stays beside the result direction
+          instead of behind the Advanced disclosure. It saves when the field
+          is left, the same one save model the switches use. */}
+      <Card className="p-4">
+        <h3 className="text-sm font-semibold text-on mb-1">
+          {t("settings.laborHourlyRate")}
+        </h3>
+        <p className="text-xs text-on-muted mb-3">
+          {t("settings.laborHourlyRateHint")}
+        </p>
+        <Input
+          wrapperClassName="w-32"
+          type="number"
+          min="0"
+          step="0.01"
+          value={hourlyRate}
+          onChange={(e) => setHourlyRate(e.target.value)}
+          onBlur={(e) => saveRate(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur();
+          }}
+          aria-label={t("settings.laborHourlyRate")}
+          data-testid="maker-settings-labor-rate"
+        />
       </Card>
 
       <AdvancedSection>

@@ -202,7 +202,9 @@
       "totalCostGap_one": "{{count}} składnik zszedł z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "totalCostGap_few": "{{count}} składniki zeszły z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "totalCostGap_many": "{{count}} składników zeszło z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
-      "totalCostGap_other": "{{count}} składnika zeszło z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców."
+      "totalCostGap_other": "{{count}} składnika zeszło z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
+      "estimatedAtCompletion": "Szacunek przy zamknięciu",
+      "estimatedDifference": "Różnica rzeczywista: {{amount}}"
     },
     "ingredients": "Zużyte składniki",
     "emptyLines": "Dla tego zlecenia nie zapisano żadnych składników.",
@@ -233,7 +235,10 @@
       "saveFailed": "Nie udało się zaktualizować pozycji",
       "shortLabel": "brakuje",
       "unmeasurableShort": "brak — nie da się porównać z jednostką stanu",
-      "shortfall": "{{quantity}} poza ewidencją — do policzenia"
+      "shortfall": "{{quantity}} poza ewidencją — do policzenia",
+      "estimated": "Szac. {{amount}}",
+      "priceEffect": "z ceny {{amount}}",
+      "qtyEffect": "z ilości {{amount}}"
     },
     "edit": "Edytuj",
     "save": "Zapisz",
@@ -287,7 +292,11 @@
       "deleteConfirm": {
         "title": "Usunąć linię kosztów?",
         "description": "Usunąć „{{label}}” z kosztów stałych?"
-      }
+      },
+      "labourFromSteps": "Praca z czasu kroków",
+      "labourTime": "{{minutes}} min według stawki godzinowej",
+      "labourRateMissing": "Kroki zajmują {{minutes}} min. Ustaw stawkę godzinową w ustawieniach produkcji, aby wycenić ten czas.",
+      "labourRateLink": "Ustawienia produkcji"
     },
     "history": {
       "title": "Historia produkcji",
@@ -329,7 +338,12 @@
     "plannedShortageHint_one": "Planowane zużycie przekracza stan — brakuje {{count}} składnika. Zakończenie zlecenia zostanie odrzucone.",
     "plannedShortageHint_few": "Planowane zużycie przekracza stan — brakuje {{count}} składników. Zakończenie zlecenia zostanie odrzucone.",
     "plannedShortageHint_many": "Planowane zużycie przekracza stan — brakuje {{count}} składników. Zakończenie zlecenia zostanie odrzucone.",
-    "plannedShortageHint_other": "Planowane zużycie przekracza stan — brakuje {{count}} składnika. Zakończenie zlecenia zostanie odrzucone."
+    "plannedShortageHint_other": "Planowane zużycie przekracza stan — brakuje {{count}} składnika. Zakończenie zlecenia zostanie odrzucone.",
+    "processStepMinutes": "{{minutes}} min",
+    "processStepMinutesLabel": "Minuty kroku {{number}}",
+    "minutesShort": "min",
+    "minutesPlaceholder": "min",
+    "processStepsGuard": "Kroki procesu"
   },
   "bom": {
     "childLabel": "Składnik",
@@ -370,7 +384,14 @@
       "duplicateIngredient": "Ten składnik jest już w recepturze.",
       "removeIngredient": "Nie udało się usunąć składnika",
       "yieldInvalid": "Ilość, którą daje receptura, musi być większa od zera."
-    }
+    },
+    "typedPrice": "Cena wpisana",
+    "typedPriceUnused": "nieużywana — najpierw odpowiada koszt zapasu lub cena dostawcy",
+    "typedPriceHint": "Używana, gdy nie ma kosztu zapasu ani ceny dostawcy. Zapisana przy produkcie, więc każda receptura z tym składnikiem liczy ją tak samo.",
+    "setPrice": "Ustaw cenę",
+    "editPrice": "Zmień cenę",
+    "priceSaved": "Cena zapisana",
+    "priceSaveFailed": "Nie udało się zapisać ceny"
   },
   "tree": {
     "title": "Wielopoziomowy BOM",
@@ -483,7 +504,9 @@
     "whereReferenceDirection": "Tak nazywa się wynik na kartach receptur, w zleceniach i w podsumowaniu miesięcy.",
     "immediateNote": "Każdy wybór zapisuje się od razu. Nie ma cofnięcia — ustaw z powrotem tak samo.",
     "advanced": "Zaawansowane",
-    "advancedHint": "Zasady dla braków i nadprodukcji. Ustawienia domyślne pasują do małej pracowni."
+    "advancedHint": "Zasady dla braków i nadprodukcji. Ustawienia domyślne pasują do małej pracowni.",
+    "laborHourlyRate": "Stawka godzinowa własnej pracy",
+    "laborHourlyRateHint": "Praca przy recepturze to czas jej kroków według tej stawki. Zero oznacza, że praca nie kosztuje w szacunkach."
   },
   "availability": {
     "maxBatches": "Maks. partii ze stanu",
@@ -560,5 +583,31 @@
       "label": "Oszczędność wobec sklepu",
       "definition": "Cena w sklepie minus koszt wytworzenia"
     }
+  },
+  "shortage": {
+    "title": "Do tej receptury brakuje składników w magazynie",
+    "body": "Nie ma w zapisach: {{names}}.",
+    "unmeasurable": "nie da się porównać jednostek z zapasem",
+    "missing": "brakuje {{quantity}}",
+    "addStock": "Dodaj zapas",
+    "order": "Zamów brakujące",
+    "nothingToOrder": "Wszystko jest w magazynie — nic nie zamówiono.",
+    "alreadyOrdered": "Wszystko, czego brakuje, jest już na otwartym zamówieniu zakupu — nic nowego nie zamówiono.",
+    "ordered": "Utworzono szkic zamówienia {{number}} (pozycje: {{lines}}).",
+    "orderFailed": "Nie udało się utworzyć zamówienia",
+    "addStockTitle": "Dodaj zapas, który masz",
+    "addStockHint": "Jeden wpis na składnik: ilość i cena zakupu. Każdy otwiera zapis zapasu po tej cenie.",
+    "location": "Miejsce",
+    "noLocations": "Brak dostępnego miejsca",
+    "needs": "potrzeba {{quantity}}",
+    "quantity": "Ilość",
+    "price": "Cena za jednostkę",
+    "priceHint": "Opcjonalna — otwiera warstwę kosztu.",
+    "stockFallbackName": "Składnik",
+    "addStockSave": "Dodaj zapas ({{saved}})",
+    "stockSaved": "Zapas zapisany.",
+    "stockSaveFailed": "Nie udało się zapisać zapasu.",
+    "stockSavePartial": "Zapisano {{saved}} z {{total}}. Reszta wciąż jest w arkuszu.",
+    "locationsFailed": "Nie udało się wczytać miejsc"
   }
 }

@@ -15,6 +15,7 @@ import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 
 const deleteMutate = vi.fn();
 const updateMutate = vi.fn();
+const availabilityArgs = vi.hoisted(() => ({ calls: [] as unknown[][] }));
 
 let currentRecipe: MakerRecipe | undefined;
 let currentCanManage = true;
@@ -33,6 +34,26 @@ vi.mock("@/modules/maker/hooks/useRecipes", () => ({
   }),
   useDeleteMakerRecipe: () => ({ mutate: deleteMutate, isPending: false }),
   useUpdateMakerRecipe: () => ({ mutate: updateMutate, isPending: false }),
+  useMakerRecipeAvailability: (...args: unknown[]) => {
+    availabilityArgs.calls.push(args);
+    return { data: undefined };
+  },
+  useOrderRecipeShortages: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+  useAddIngredientStock: () => ({ mutateAsync: vi.fn(), isPending: false }),
+}));
+
+// Purchasing is off in these tests: the shortage notice's order button is
+// the other flow, covered where that notice is tested.
+vi.mock("@/contexts/ModulesContext", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/contexts/ModulesContext")>()),
+  useModules: () => ({
+    isModuleEnabled: () => false,
+    enabledModules: [],
+    isLoading: false,
+  }),
 }));
 
 vi.mock("@/modules/maker/components/AvailabilityBadge", () => ({
@@ -198,5 +219,18 @@ describe("RecipeDetailPage — toast speaks for the set-default result", () => {
     call?.[1]?.onSuccess?.();
 
     expect(toast.success).toHaveBeenCalled();
+  });
+});
+
+describe("RecipeDetailPage — what a batch would lack", () => {
+  it("asks for one batch, because zero batches need nothing", () => {
+    availabilityArgs.calls.length = 0;
+    currentRecipe = baseRecipe;
+    currentCanManage = false;
+    renderPage();
+    expect(availabilityArgs.calls[0]?.[0]).toBe("rec-1");
+    // The endpoint's own default is no batches; without this the notice was
+    // handed an empty need and a short BOM read as a covered one.
+    expect(availabilityArgs.calls[0]?.[1]).toBe("1");
   });
 });

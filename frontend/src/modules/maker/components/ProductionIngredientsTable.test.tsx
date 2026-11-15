@@ -49,6 +49,9 @@ const t = (key: string, opts?: Record<string, unknown>) => {
   if (key === "detail.line.shortLabel") return "short";
   if (key === "detail.line.unmeasurableShort")
     return "short — units cannot be compared with stock";
+  if (key === "detail.line.estimated") return `Est. ${opts?.amount}`;
+  if (key === "detail.line.priceEffect") return `from price ${opts?.amount}`;
+  if (key === "detail.line.qtyEffect") return `from quantity ${opts?.amount}`;
   // Unit symbols resolve through common:units.<symbol> with the symbol as
   // the default; a stub that echoed the key would corrupt every quantity.
   if (key.startsWith("common:units.")) return String(opts?.defaultValue ?? key);
@@ -273,5 +276,39 @@ describe("ProductionIngredientsTable — a run recorded after the fact", () => {
     expect(
       screen.queryByTestId("maker-line-shortfall"),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("ProductionIngredientsTable — the estimate beside each ingredient", () => {
+  it("says whether the difference came from a price or from a quantity", () => {
+    const estimated: ProductionOrderLine = {
+      id: "line-est",
+      production_order_id: "order-1",
+      child_template_id: "tpl-wax",
+      child_template_name: "Soy wax",
+      consumed_qty: "10",
+      unit: "kg",
+      unit_cost_snapshot: "5",
+      cost_source: "fifo",
+      estimated_qty: "8",
+      estimated_unit_cost_snapshot: "2",
+    } as unknown as ProductionOrderLine;
+
+    render(<ProductionIngredientsTable lines={[estimated]} />);
+
+    const cell = screen.getByTestId("maker-line-estimate");
+    // 8 standard kg at 2.00 estimated, against 10 kg at 5.00 actually paid.
+    expect(cell.textContent).toContain("Est. $16.00");
+    expect(screen.getByTestId("maker-line-price-effect").textContent).toContain(
+      "from price +$30.00",
+    );
+    expect(screen.getByTestId("maker-line-qty-effect").textContent).toContain(
+      "from quantity +$4.00",
+    );
+  });
+
+  it("shows no estimate on a run that closed before one was kept", () => {
+    render(<ProductionIngredientsTable lines={[line]} />);
+    expect(screen.queryByTestId("maker-line-estimate")).not.toBeInTheDocument();
   });
 });

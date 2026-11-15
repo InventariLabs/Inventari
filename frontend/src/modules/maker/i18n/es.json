@@ -198,7 +198,9 @@
       "totalCostAfterClosing": "Coste total tras el cierre",
       "unitCost": "{{amount}} por {{unit}}",
       "totalCostGap_one": "{{count}} ingrediente salió de un stock sin coste, por lo que falta en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
-      "totalCostGap_other": "{{count}} ingredientes salieron de un stock sin coste, por lo que faltan en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores."
+      "totalCostGap_other": "{{count}} ingredientes salieron de un stock sin coste, por lo que faltan en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
+      "estimatedAtCompletion": "Estimado al cerrar",
+      "estimatedDifference": "Diferencia real: {{amount}}"
     },
     "ingredients": "Ingredientes consumidos",
     "emptyLines": "No se registró ningún ingrediente para esta orden.",
@@ -229,7 +231,10 @@
       "saveFailed": "No se pudo actualizar la línea",
       "shortLabel": "faltan",
       "unmeasurableShort": "faltan — no comparable con la unidad de existencias",
-      "shortfall": "{{quantity}} fuera de las existencias registradas — por contar"
+      "shortfall": "{{quantity}} fuera de las existencias registradas — por contar",
+      "estimated": "Est. {{amount}}",
+      "priceEffect": "por precio {{amount}}",
+      "qtyEffect": "por cantidad {{amount}}"
     },
     "edit": "Editar",
     "save": "Guardar",
@@ -283,7 +288,11 @@
       "deleteConfirm": {
         "title": "¿Eliminar línea de coste?",
         "description": "¿Quitar «{{label}}» de los costes fijos?"
-      }
+      },
+      "labourFromSteps": "Mano de obra de los pasos",
+      "labourTime": "{{minutes}} min a la tarifa por hora",
+      "labourRateMissing": "Los pasos duran {{minutes}} min. Define la tarifa por hora en los ajustes de producción para valorar ese tiempo.",
+      "labourRateLink": "Ajustes de producción"
     },
     "history": {
       "title": "Historial de producción",
@@ -323,7 +332,12 @@
     },
     "notFound": "Orden de producción no encontrada",
     "plannedShortageHint_one": "El consumo planeado supera las existencias — falta {{count}} ingrediente. El cierre de esta producción será rechazado.",
-    "plannedShortageHint_other": "El consumo planeado supera las existencias — faltan {{count}} ingredientes. El cierre de esta producción será rechazado."
+    "plannedShortageHint_other": "El consumo planeado supera las existencias — faltan {{count}} ingredientes. El cierre de esta producción será rechazado.",
+    "processStepMinutes": "{{minutes}} min",
+    "processStepMinutesLabel": "Minutos del paso {{number}}",
+    "minutesShort": "min",
+    "minutesPlaceholder": "min",
+    "processStepsGuard": "Los pasos del proceso"
   },
   "bom": {
     "childLabel": "Ingrediente",
@@ -364,7 +378,14 @@
       "duplicateIngredient": "Esta fórmula ya incluye ese ingrediente.",
       "removeIngredient": "No se pudo quitar el ingrediente",
       "yieldInvalid": "Lo que rinde la fórmula debe ser mayor que cero."
-    }
+    },
+    "typedPrice": "Precio escrito",
+    "typedPriceUnused": "sin usar: primero responde el coste del stock o el precio del proveedor",
+    "typedPriceHint": "Se usa cuando no hay coste de existencias ni precio de proveedor. Se guarda en el producto, así que cada fórmula que lo usa lo valora igual.",
+    "setPrice": "Fijar precio",
+    "editPrice": "Editar precio",
+    "priceSaved": "Precio guardado",
+    "priceSaveFailed": "No se pudo guardar el precio"
   },
   "tree": {
     "title": "Lista de materiales multinivel",
@@ -471,7 +492,9 @@
     "whereReferenceDirection": "Así se llama el resultado en las fichas de fórmulas, las órdenes de producción y el resumen mensual.",
     "immediateNote": "Cada elección se guarda al momento. No hay deshacer: vuelve a cambiarla igual.",
     "advanced": "Avanzado",
-    "advancedHint": "Reglas para faltantes y sobreproducción. Los valores por defecto sirven para un taller pequeño."
+    "advancedHint": "Reglas para faltantes y sobreproducción. Los valores por defecto sirven para un taller pequeño.",
+    "laborHourlyRate": "Tarifa por hora del trabajo propio",
+    "laborHourlyRateHint": "La mano de obra de una fórmula es el tiempo de sus pasos a esta tarifa. Cero significa que la mano de obra no cuesta nada en las estimaciones."
   },
   "availability": {
     "maxBatches": "Máx. lotes del stock",
@@ -540,5 +563,31 @@
       "label": "Ahorro frente a la tienda",
       "definition": "Precio en tienda menos el coste de fabricación"
     }
+  },
+  "shortage": {
+    "title": "Faltan ingredientes para esta fórmula",
+    "body": "No están en el inventario: {{names}}.",
+    "unmeasurable": "las unidades no se pueden comparar con el inventario",
+    "missing": "faltan {{quantity}}",
+    "addStock": "Añadir existencias",
+    "order": "Pedir lo que falta",
+    "nothingToOrder": "Todo está en existencias: no se pidió nada.",
+    "alreadyOrdered": "Todo lo que falta ya está en un pedido de compra abierto: no se pidió nada nuevo.",
+    "ordered": "Borrador de pedido {{number}} creado con {{lines}} líneas.",
+    "orderFailed": "No se pudo crear el pedido",
+    "addStockTitle": "Añadir las existencias que tienes",
+    "addStockHint": "Una fila por ingrediente: cantidad y precio de compra. Cada una abre un registro de existencias a ese precio.",
+    "location": "Ubicación",
+    "noLocations": "No hay ubicación disponible",
+    "needs": "necesita {{quantity}}",
+    "quantity": "Cantidad",
+    "price": "Precio por unidad",
+    "priceHint": "Opcional: abre una capa de coste.",
+    "stockFallbackName": "Ingrediente",
+    "addStockSave": "Añadir existencias ({{saved}})",
+    "stockSaved": "Existencias guardadas.",
+    "stockSaveFailed": "No se pudieron guardar las existencias.",
+    "stockSavePartial": "Guardados {{saved}} de {{total}}. El resto sigue en la hoja.",
+    "locationsFailed": "No se pudieron cargar las ubicaciones"
   }
 }

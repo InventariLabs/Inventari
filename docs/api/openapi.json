@@ -14933,6 +14933,69 @@
         ]
       }
     },
+    "/api/v1/maker/recipes/ingredient-prices/{template_id}": {
+      "put": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Set Ingredient Price",
+        "description": "Type the price of an ingredient the records do not price.\n\nThe price belongs to the product, not to one formula: two formulas that\nshare an ingredient share what it costs. The shared estimate asks it\nlast \u2014 a cost layer is what the stock actually cost, a supplier's quote\nis a live offer, and a typed price is the organization's own answer for\na product it has never bought.",
+        "operationId": "set_ingredient_price_api_v1_maker_recipes_ingredient_prices__template_id__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngredientPriceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientPriceRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/maker/recipes/{recipe_id}": {
       "get": {
         "tags": [
@@ -15539,6 +15602,59 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/recipes/{recipe_id}/shortages/purchase-order": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Order Recipe Shortages",
+        "description": "Raise a draft purchase order for one batch's missing ingredients.\n\nThe recipe page offers this beside the notice that its ingredients are\nnot on the shelf; the order is the answer when the user does not have\nthe goods to enter instead. Purchasing must be on and the account able\nto write orders.",
+        "operationId": "order_recipe_shortages_api_v1_maker_recipes__recipe_id__shortages_purchase_order_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recipe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recipe Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShortagePurchaseOrderResponse"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -43986,6 +44102,23 @@
               }
             ],
             "title": "Child Template Image Url"
+          },
+          "typed_unit_price": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Typed Unit Price"
+          },
+          "typed_unit_price_in_use": {
+            "type": "boolean",
+            "title": "Typed Unit Price In Use",
+            "default": false
           }
         },
         "type": "object",
@@ -54991,6 +55124,57 @@
         ],
         "title": "IngredientNutrition"
       },
+      "IngredientPriceRead": {
+        "properties": {
+          "product_template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Template Id"
+          },
+          "unit_price": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_template_id",
+          "unit_price"
+        ],
+        "title": "IngredientPriceRead",
+        "description": "Output for PUT /recipes/ingredient-prices/{template_id}."
+      },
+      "IngredientPriceUpdate": {
+        "properties": {
+          "unit_price": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,8}|(?=[\\d.]{1,13}0*$)\\d{0,8}\\.\\d{0,4}0*$)"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price"
+          }
+        },
+        "type": "object",
+        "title": "IngredientPriceUpdate",
+        "description": "Input for PUT /recipes/ingredient-prices/{template_id}.\n\nThe price is per stock unit in the organization's money. ``None`` clears\nit: an estimate that then finds nothing says so again, rather than\nreading a stale number somebody meant to remove."
+      },
       "IngredientTemplateLink": {
         "properties": {
           "ingredient_id": {
@@ -59042,6 +59226,12 @@
             "title": "Create On Shortage Strategy",
             "default": "WARN"
           },
+          "labor_hourly_rate": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Labor Hourly Rate",
+            "default": "0"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -59121,6 +59311,22 @@
               }
             ],
             "title": "Create On Shortage Strategy"
+          },
+          "labor_hourly_rate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,10}|(?=[\\d.]{1,13}0*$)\\d{0,10}\\.\\d{0,2}0*$)"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Labor Hourly Rate"
           }
         },
         "type": "object",
@@ -67944,6 +68150,66 @@
         ],
         "title": "PrintJobResponse"
       },
+      "ProcessStep-Input": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "minutes": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,6}|(?=[\\d.]{1,9}0*$)\\d{0,6}\\.\\d{0,2}0*$)"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ProcessStep",
+        "description": "One step of a formula's process, and how long it takes.\n\nA step used to be a bare sentence, so a formula that took two hours to\nmake said nothing about the two hours and its labour could only be a\nlump sum typed per batch. The duration is optional: a step nobody timed\nstill reads, and costs no labour."
+      },
+      "ProcessStep-Output": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "minutes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,6}|(?=[\\d.]{1,9}0*$)\\d{0,6}\\.\\d{0,2}0*$)"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ProcessStep",
+        "description": "One step of a formula's process, and how long it takes.\n\nA step used to be a bare sentence, so a formula that took two hours to\nmake said nothing about the two hours and its labour could only be a\nlump sum typed per batch. The duration is optional: a step nobody timed\nstill reads, and costs no labour."
+      },
       "ProductLabelExport": {
         "properties": {
           "item_ids": {
@@ -69335,6 +69601,30 @@
             ],
             "title": "Cost Source"
           },
+          "estimated_qty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Qty"
+          },
+          "estimated_unit_cost_snapshot": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Unit Cost Snapshot"
+          },
           "shortfall_qty": {
             "anyOf": [
               {
@@ -69520,6 +69810,18 @@
               }
             ],
             "title": "Total Cost"
+          },
+          "estimated_total_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Total Cost"
           },
           "production_date": {
             "anyOf": [
@@ -69902,6 +70204,12 @@
             "type": "string",
             "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
             "title": "Fixed Cost",
+            "default": "0"
+          },
+          "labour_cost": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Labour Cost",
             "default": "0"
           },
           "unit_cost": {
@@ -73872,7 +74180,7 @@
             "anyOf": [
               {
                 "items": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ProcessStep-Output"
                 },
                 "type": "array"
               },
@@ -73960,6 +74268,18 @@
             },
             "type": "array",
             "title": "Cost Lines"
+          },
+          "labour_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Labour Cost"
           },
           "lines": {
             "items": {
@@ -75533,7 +75853,7 @@
             "anyOf": [
               {
                 "items": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ProcessStep-Output"
                 },
                 "type": "array"
               },
@@ -75621,6 +75941,18 @@
             },
             "type": "array",
             "title": "Cost Lines"
+          },
+          "labour_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Labour Cost"
           },
           "lines": {
             "items": {
@@ -79063,6 +79395,46 @@
         ],
         "title": "ShortageItemRead",
         "description": "One blocked ingredient \u2014 the refusal's own row.\n\nMirrors ``availability_service.ShortageItem`` so the order page can\nread the exact list completion refuses with, instead of recomputing a\nforecast that could disagree with it. ``shortage`` is null when the\nline's measure and the stock's have no bridge: the ingredient still\nblocks the run, but as \"nobody can tell\", not as a quantity."
+      },
+      "ShortagePurchaseOrderResponse": {
+        "properties": {
+          "purchase_order_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purchase Order Id"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "added_count": {
+            "type": "integer",
+            "title": "Added Count",
+            "default": 0
+          },
+          "already_ordered_count": {
+            "type": "integer",
+            "title": "Already Ordered Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "ShortagePurchaseOrderResponse",
+        "description": "Output for POST /recipes/{id}/shortages/purchase-order.\n\nNone when the batch is covered, or when an open order already expects\nwhat is short: nothing is ordered then, and no empty or duplicate\ndocument is left behind for somebody to cancel."
       },
       "ShortageShoppingListResponse": {
         "properties": {
@@ -88612,7 +88984,14 @@
             "anyOf": [
               {
                 "items": {
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ProcessStep-Input"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
                 },
                 "type": "array"
               },
@@ -88710,7 +89089,14 @@
             "anyOf": [
               {
                 "items": {
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ProcessStep-Input"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
                 },
                 "type": "array"
               },

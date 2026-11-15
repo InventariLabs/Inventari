@@ -20,9 +20,10 @@ I have the ingredients?").
 | `maker_recipes` | Production recipe for a product template. Several variants per product, **at most 1 default** (partial unique index). `source_recipe_id` = bare UUID with no FK — a soft stamp from a culinary recipe. |
 | `maker_bom_lines` | BoM line: ingredient units per batch (`qty_per_batch`), `uom_id`, `yield_loss_pct`. Unique `(recipe_id, child_template_id)`. `parent_template_id` denormalises `recipe.output_template_id` (the invariant is enforced on every write). |
 | `maker_recipe_cost_lines` | Fixed batch costs (labour, packaging, overhead). |
+| `maker_ingredient_prices` | A price typed once on a product, org-scoped: the last answer a cost estimate asks, after the layers and supplier quotes. One row per product, shared by every formula that uses it. |
 | `maker_production_orders` | Production order: DRAFT → COMPLETED / CANCELLED, and COMPLETED → REVERSED when a finished run is taken back. Holds a snapshot of the financial result. |
 | `maker_production_order_lines` | Per-ingredient consumption audit recorded on completion. |
-| `maker_module_settings` | The `*_module_settings` pattern (org_id PK, typed columns). |
+| `maker_module_settings` | The `*_module_settings` pattern (org_id PK, typed columns), including `labor_hourly_rate` — what an hour of the organization's own work costs. |
 
 ## Batch math
 
@@ -71,13 +72,15 @@ read, not how it is stored. See TECHNICAL_DECISIONS.md §19.
 | Endpoint | Description |
 |---|---|
 | `GET /recipes` | Card catalogue (search/sort/pagination; `output_template_id=` narrows to one product's recipes). `unit_cost` = total cost / quantity of the most recent COMPLETED order of that recipe (one batched query, no N+1), with `uncosted_ingredients`; a recipe never run carries `estimated_unit_cost` instead; also `stock_qty`, `last_produced_at`, `ingredient_count`, `result`. |
-| `GET /recipes/{id}` | Detail: lines + fixed costs + `estimated_unit_cost` (shared Core estimate: layer-average rate, then a usable supplier offer) + `source_recipe_id`/`source_snapshot_at`. |
+| `GET /recipes/{id}` | Detail: lines (each carrying its product's `typed_unit_price`, and `typed_unit_price_in_use` — whether the estimate actually reached that fallback, since the layers and a supplier quote answer first) + fixed costs + `labour_cost` (the steps' time at the hourly rate) + `estimated_unit_cost` (materials from the shared Core estimate — layer-average rate, then a supplier offer, then the typed price — plus fixed costs and labour, per unit) + `source_recipe_id`/`source_snapshot_at`. |
 | `POST /recipes` | Create (a template's first recipe becomes the default automatically). `source_recipe_id` stamps `source_snapshot_at`. |
 | `POST /recipes/from-recipe` | **The recipes→maker bridge**: snapshots a culinary recipe into a maker recipe plus BoM lines built from ingredients that carry a `template_id` (free-text ingredients are skipped). Idempotent per (output_template_id, source_recipe_id). A culinary recipe that does not exist in the organization returns a plain 404. |
 | `PATCH/DELETE /recipes/{id}` | Update / delete (deleting the default promotes the oldest remaining recipe; a recipe that a production order references cannot be deleted, 409). |
 | `POST /recipes/{id}/bom-lines` | Add an ingredient to that recipe (the parent comes from the recipe; a duplicate returns 409, a self-reference 400). |
 | `PATCH/DELETE /recipes/{id}/bom-lines[/{line_id}]` | Edit a line in place (qty/uom/yield_loss/notes) / remove it. |
 | `POST/PATCH/DELETE /recipes/{id}/cost-lines[/{line_id}]` | Fixed costs. |
+| `PUT /recipes/ingredient-prices/{template_id}` | Type (or clear, with `unit_price: null`) a product's per-unit price. `maker:manage`: it is an input to the formula's costing, like the formula itself. |
+| `POST /recipes/{id}/shortages/purchase-order` | Raise a draft purchase order for one batch's missing ingredients, one line per short ingredient at its typed price. What an open order (DRAFT, PENDING_APPROVAL, CONFIRMED) already expects comes off the shortfall, so a second click does not order the same shortage twice; `already_ordered_count` says how many ingredients it covered. `purchase_orders` must be on; needs `purchase_orders:write`; returns no order when the batch is covered or already on order. |
 | `GET /recipes/{id}/availability?batches=&location_id=` | Per-ingredient {needed, available, shortage, uom, convertible} plus `max_batches`. Honours `availability_check_scope` (GLOBAL/PER_LOCATION); `location_id` overrides it. |
 
 ### BoM (legacy adapters and reverse lookup)
@@ -99,6 +102,45 @@ product the write went somewhere other than where the operator was looking.
 Line writes go through `POST /recipes/{id}/bom-lines`, and the `/maker/bom`
 screen is gone (the route redirects to the catalogue).
 
+### What a new formula costs on day one
+
+A product made an hour ago has no cost layer and no supplier quote, so every
+ingredient of a new formula used to price at zero and the formula's margin
+said nothing. Three inputs now close that gap, and the estimate policy keeps
+one order: **cost layers** (what the stock actually cost), then a **supplier
+quote** (a live offer, registered by the purchase-orders module through
+`register_supplier_price_provider`), then the **typed price** — one per
+product per organization in `maker_ingredient_prices`, written from the
+formula's ingredient card or bought through the shortage notice. A typed
+price is a fallback, never an override: a product with stock or a quote is
+costed by what the records say.
+
+Labour is the formula's own: each process step carries an optional duration,
+and the batch's labour is the sum of those minutes at
+`maker_module_settings.labor_hourly_rate`. The recipe detail, the catalogue,
+the production preview and a completed run all use the same helper, so the
+computed labour line on the cost tab and the run's actual cost agree.
+
+A formula's `process_steps` are objects (`{text, minutes}`). Steps saved
+before the duration existed are migrated when the module upgrades — a bare
+sentence becomes `{text, minutes: null}`, and blank sentences are dropped as
+the write path drops them — while the reader also normalises an old-shaped
+row, so a process still writing the old shape during a deploy cannot make a
+formula unreadable.
+
+### Estimate against actual
+
+Completion reads the formula's answer before anything leaves the shelf — the
+shared estimate over the same exploded list, at the standard quantity for
+the output that actually came out (`formula qty × actual / planned`) — and
+keeps it on the order (`estimated_total_cost`) and per line
+(`estimated_qty`, `estimated_unit_cost_snapshot`). The page shows the two
+totals side by side, and splits each ingredient's difference into a **price**
+component (`(actual rate − estimated rate) × consumed qty`) and a
+**quantity** component (`(consumed qty − standard qty) × estimated rate`).
+The identity is exact: estimated material + price effect + quantity effect
+equals the actual material cost.
+
 ### Production orders
 
 | Endpoint | Description |
@@ -109,7 +151,7 @@ screen is gone (the route redirects to the catalogue).
 | `POST /production/orders/preview` | Cost dry-run, no stock mutation. |
 | `POST /production/orders/shortages/shopping-list` | Puts what a planned run lacks on the active shopping list (needs `shopping_lists:write`); an ingredient already on the list is not added twice. |
 | `GET/PATCH /production/orders/{id}` | Detail (with the result snapshot) / update a DRAFT. Every door that answers with a single order — create, update, duplicate and the read — builds it through one constructor, so a draft carries the same `shortage_count` and `shortage_items` whichever way it came. A draft also carries `shortage_items` — the refusal's own list, the rows behind `shortage_count` — so the page marks every ingredient completion would refuse on instead of recomputing a forecast that could disagree. |
-| `POST /production/orders/{id}/complete` | Consumes planned (drawn from the stock records), outputs actual, values the batch, writes `unit_cost_snapshot`/`reference_price_snapshot`/`result_per_unit`/`result_per_batch`. Shortages → 422 with an actionable list (`insufficient_stock`); a recipe with no ingredients → 422 `empty_bom`. Needs `items:write`. |
+| `POST /production/orders/{id}/complete` | Consumes planned (drawn from the stock records), outputs actual, values the batch, writes `unit_cost_snapshot`/`reference_price_snapshot`/`result_per_unit`/`result_per_batch`, and keeps the formula's own answer beside it: `estimated_total_cost` on the order and `estimated_qty`/`estimated_unit_cost_snapshot` per line. Shortages → 422 with an actionable list (`insufficient_stock`); a recipe with no ingredients → 422 `empty_bom`. Needs `items:write`. |
 | `POST /production/orders/{id}/cancel` | Cancel a DRAFT (optional `reason`, stored as `cancel_reason`). Needs `maker:manage`. |
 | `POST /production/orders/{id}/reverse` | Take a COMPLETED run back: the ingredients return to the records and batches they were taken from, the output leaves its location, and the run is marked REVERSED (it stays on record; the movements of the way back name it). Refused (400) for a run that is not completed or whose output has since left its shelf. Needs `maker:manage` and `items:write`. |
 | `POST /production/orders/{id}/duplicate` | Duplicate as DRAFT (copies `recipe_id`). A copy is a new plan: under BLOCK a copy the stock cannot cover is refused like a creation (422 `shortage_blocked`); under WARN it is created and its page names the shortage. |
@@ -134,7 +176,7 @@ client-side; the detail page reads `shortage_items` from the order payload.
 
 | Endpoint | Description |
 |---|---|
-| `GET /settings` / `PATCH /settings` | `maker_module_settings` (reference, overproduction, availability scope, shortage strategy). |
+| `GET /settings` / `PATCH /settings` | `maker_module_settings` (reference, overproduction, availability scope, shortage strategy, hourly labour rate). |
 | `GET /breakdown/{template_id}?qty=` | Per-ingredient cost breakdown (optional `recipe_id=`). |
 | `POST /pricing/compute`, `GET/PUT /pricing/margin/{template_id}` | Price calculator / reference margin. |
 
@@ -168,6 +210,7 @@ Org-scoped; `None` for a missing recipe, so the bridge degrades to a 404.
 | `allow_overproduction` | `true` | Whether `actual > planned` is allowed on complete. |
 | `availability_check_scope` | `GLOBAL` | `GLOBAL`/`PER_LOCATION` — the default context for availability checks. |
 | `create_on_shortage_strategy` | `WARN` | `ALLOW`/`WARN`/`BLOCK` — what happens when a DRAFT is created despite shortages. |
+| `labor_hourly_rate` | `0` | What an hour of the organization's own work costs; a batch's labour is its steps' minutes at this rate. `0` means an untimed or unpriced formula costs no labour. |
 
 ## Stock
 

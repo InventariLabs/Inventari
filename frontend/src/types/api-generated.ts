@@ -4184,6 +4184,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maker/recipes/ingredient-prices/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Ingredient Price
+         * @description Type the price of an ingredient the records do not price.
+         *
+         *     The price belongs to the product, not to one formula: two formulas that
+         *     share an ingredient share what it costs. The shared estimate asks it
+         *     last — a cost layer is what the stock actually cost, a supplier's quote
+         *     is a live offer, and a typed price is the organization's own answer for
+         *     a product it has never bought.
+         */
+        put: operations["set_ingredient_price_api_v1_maker_recipes_ingredient_prices__template_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maker/recipes/{recipe_id}": {
         parameters: {
             query?: never;
@@ -4299,6 +4325,31 @@ export interface paths {
         head?: never;
         /** Update Cost Line */
         patch: operations["update_cost_line_api_v1_maker_recipes__recipe_id__cost_lines__line_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/maker/recipes/{recipe_id}/shortages/purchase-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Order Recipe Shortages
+         * @description Raise a draft purchase order for one batch's missing ingredients.
+         *
+         *     The recipe page offers this beside the notice that its ingredients are
+         *     not on the shelf; the order is the answer when the user does not have
+         *     the goods to enter instead. Purchasing must be on and the account able
+         *     to write orders.
+         */
+        post: operations["order_recipe_shortages_api_v1_maker_recipes__recipe_id__shortages_purchase_order_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/maker/settings": {
@@ -12219,6 +12270,13 @@ export interface components {
             child_template_name?: string | null;
             /** Child Template Image Url */
             child_template_image_url?: string | null;
+            /** Typed Unit Price */
+            typed_unit_price?: string | null;
+            /**
+             * Typed Unit Price In Use
+             * @default false
+             */
+            typed_unit_price_in_use: boolean;
         };
         /**
          * BoMLineUpdate
@@ -15892,6 +15950,31 @@ export interface components {
             has_data: boolean;
             nutrition: components["schemas"]["NutritionSummary"] | null;
         };
+        /**
+         * IngredientPriceRead
+         * @description Output for PUT /recipes/ingredient-prices/{template_id}.
+         */
+        IngredientPriceRead: {
+            /**
+             * Product Template Id
+             * Format: uuid
+             */
+            product_template_id: string;
+            /** Unit Price */
+            unit_price: string | null;
+        };
+        /**
+         * IngredientPriceUpdate
+         * @description Input for PUT /recipes/ingredient-prices/{template_id}.
+         *
+         *     The price is per stock unit in the organization's money. ``None`` clears
+         *     it: an estimate that then finds nothing says so again, rather than
+         *     reading a stale number somebody meant to remove.
+         */
+        IngredientPriceUpdate: {
+            /** Unit Price */
+            unit_price?: number | string | null;
+        };
         /** IngredientTemplateLink */
         IngredientTemplateLink: {
             /**
@@ -17354,6 +17437,11 @@ export interface components {
              */
             create_on_shortage_strategy: "ALLOW" | "WARN" | "BLOCK";
             /**
+             * Labor Hourly Rate
+             * @default 0
+             */
+            labor_hourly_rate: string;
+            /**
              * Created At
              * Format: date-time
              */
@@ -17377,6 +17465,8 @@ export interface components {
             availability_check_scope?: ("GLOBAL" | "PER_LOCATION") | null;
             /** Create On Shortage Strategy */
             create_on_shortage_strategy?: ("ALLOW" | "WARN" | "BLOCK") | null;
+            /** Labor Hourly Rate */
+            labor_hourly_rate?: number | string | null;
         };
         /**
          * MarginResponse
@@ -20780,6 +20870,36 @@ export interface components {
             finished_at: string | null;
         };
         /**
+         * ProcessStep
+         * @description One step of a formula's process, and how long it takes.
+         *
+         *     A step used to be a bare sentence, so a formula that took two hours to
+         *     make said nothing about the two hours and its labour could only be a
+         *     lump sum typed per batch. The duration is optional: a step nobody timed
+         *     still reads, and costs no labour.
+         */
+        "ProcessStep-Input": {
+            /** Text */
+            text: string;
+            /** Minutes */
+            minutes?: number | string | null;
+        };
+        /**
+         * ProcessStep
+         * @description One step of a formula's process, and how long it takes.
+         *
+         *     A step used to be a bare sentence, so a formula that took two hours to
+         *     make said nothing about the two hours and its labour could only be a
+         *     lump sum typed per batch. The duration is optional: a step nobody timed
+         *     still reads, and costs no labour.
+         */
+        "ProcessStep-Output": {
+            /** Text */
+            text: string;
+            /** Minutes */
+            minutes?: string | null;
+        };
+        /**
          * ProductLabelExport
          * @description Products whose barcode labels to draw, and how: the preview and download.
          */
@@ -21215,6 +21335,10 @@ export interface components {
             unit_cost_snapshot: string | null;
             /** Cost Source */
             cost_source: string | null;
+            /** Estimated Qty */
+            estimated_qty?: string | null;
+            /** Estimated Unit Cost Snapshot */
+            estimated_unit_cost_snapshot?: string | null;
             /** Shortfall Qty */
             shortfall_qty?: string | null;
             /** Child Template Name */
@@ -21287,6 +21411,8 @@ export interface components {
             status: string;
             /** Total Cost */
             total_cost: string | null;
+            /** Estimated Total Cost */
+            estimated_total_cost?: string | null;
             /** Production Date */
             production_date: string | null;
             /** Notes */
@@ -21393,6 +21519,11 @@ export interface components {
              * @default 0
              */
             fixed_cost: string;
+            /**
+             * Labour Cost
+             * @default 0
+             */
+            labour_cost: string;
             /** Unit Cost */
             unit_cost?: string | null;
             /** Reference Price */
@@ -22731,7 +22862,7 @@ export interface components {
             /** Batch Yield Uom Id */
             batch_yield_uom_id: string | null;
             /** Process Steps */
-            process_steps: string[] | null;
+            process_steps: components["schemas"]["ProcessStep-Output"][] | null;
             /** Reference Price */
             reference_price: string | null;
             /** Is Default */
@@ -22756,6 +22887,8 @@ export interface components {
             batch_yield_uom_symbol?: string | null;
             /** Cost Lines */
             cost_lines?: components["schemas"]["RecipeCostLineRead"][];
+            /** Labour Cost */
+            labour_cost?: string | null;
             /** Lines */
             lines?: components["schemas"]["BoMLineRead"][];
             /** Estimated Unit Cost */
@@ -23297,7 +23430,7 @@ export interface components {
             /** Batch Yield Uom Id */
             batch_yield_uom_id: string | null;
             /** Process Steps */
-            process_steps: string[] | null;
+            process_steps: components["schemas"]["ProcessStep-Output"][] | null;
             /** Reference Price */
             reference_price: string | null;
             /** Is Default */
@@ -23322,6 +23455,8 @@ export interface components {
             batch_yield_uom_symbol?: string | null;
             /** Cost Lines */
             cost_lines?: components["schemas"]["RecipeCostLineRead"][];
+            /** Labour Cost */
+            labour_cost?: string | null;
             /** Lines */
             lines?: components["schemas"]["BoMLineRead"][];
             /** Estimated Unit Cost */
@@ -24646,6 +24781,30 @@ export interface components {
             convertible: boolean;
             /** Available Uom Symbol */
             available_uom_symbol?: string | null;
+        };
+        /**
+         * ShortagePurchaseOrderResponse
+         * @description Output for POST /recipes/{id}/shortages/purchase-order.
+         *
+         *     None when the batch is covered, or when an open order already expects
+         *     what is short: nothing is ordered then, and no empty or duplicate
+         *     document is left behind for somebody to cancel.
+         */
+        ShortagePurchaseOrderResponse: {
+            /** Purchase Order Id */
+            purchase_order_id?: string | null;
+            /** Number */
+            number?: string | null;
+            /**
+             * Added Count
+             * @default 0
+             */
+            added_count: number;
+            /**
+             * Already Ordered Count
+             * @default 0
+             */
+            already_ordered_count: number;
         };
         /**
          * ShortageShoppingListResponse
@@ -28300,7 +28459,7 @@ export interface components {
             /** Batch Yield Uom Id */
             batch_yield_uom_id?: string | null;
             /** Process Steps */
-            process_steps?: string[] | null;
+            process_steps?: (components["schemas"]["ProcessStep-Input"] | string)[] | null;
             /** Reference Price */
             reference_price?: number | string | null;
             /** Is Default */
@@ -28320,7 +28479,7 @@ export interface components {
             /** Batch Yield Uom Id */
             batch_yield_uom_id?: string | null;
             /** Process Steps */
-            process_steps?: string[] | null;
+            process_steps?: (components["schemas"]["ProcessStep-Input"] | string)[] | null;
             /** Reference Price */
             reference_price?: number | string | null;
             /** Is Default */
@@ -36198,6 +36357,41 @@ export interface operations {
             };
         };
     };
+    set_ingredient_price_api_v1_maker_recipes_ingredient_prices__template_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IngredientPriceUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IngredientPriceRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_recipe_api_v1_maker_recipes__recipe_id__get: {
         parameters: {
             query?: never;
@@ -36516,6 +36710,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RecipeCostLineRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    order_recipe_shortages_api_v1_maker_recipes__recipe_id__shortages_purchase_order_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                recipe_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShortagePurchaseOrderResponse"];
                 };
             };
             /** @description Validation Error */

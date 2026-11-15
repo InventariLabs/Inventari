@@ -189,6 +189,35 @@ async def get_recipe(
     return result.scalar_one_or_none()
 
 
+def _normalise_process_steps(steps: list[Any] | None) -> list[dict[str, Any]] | None:
+    """One shape for the row, however the caller wrote a step.
+
+    A sentence and a step object mean the same thing — the sentence is a
+    step nobody timed — and the stored shape must not depend on which
+    client saved it, or the reader cannot tell what a list of strings and a
+    list of objects are. Blank sentences are dropped, as the screen always
+    dropped them.
+    """
+    if steps is None:
+        return None
+    normalised: list[dict[str, Any]] = []
+    for step in steps:
+        if isinstance(step, str):
+            text, minutes = step.strip(), None
+        else:
+            text = step.text.strip()
+            minutes = step.minutes
+        if not text:
+            continue
+        normalised.append(
+            {
+                'text': text,
+                'minutes': str(minutes) if minutes is not None else None,
+            }
+        )
+    return normalised
+
+
 async def create_recipe(
     db: AsyncSession,
     organization_id: UUID,
@@ -214,7 +243,7 @@ async def create_recipe(
         name=data.name,
         batch_yield_qty=data.batch_yield_qty,
         batch_yield_uom_id=data.batch_yield_uom_id,
-        process_steps=data.process_steps,
+        process_steps=_normalise_process_steps(data.process_steps),
         reference_price=data.reference_price,
         is_default=is_default,
         source_recipe_id=data.source_recipe_id,
@@ -389,7 +418,7 @@ async def update_recipe(
     if data.batch_yield_uom_id is not None:
         recipe.batch_yield_uom_id = data.batch_yield_uom_id
     if data.process_steps is not None:
-        recipe.process_steps = data.process_steps
+        recipe.process_steps = _normalise_process_steps(data.process_steps)
     if data.reference_price is not None:
         recipe.reference_price = data.reference_price
     if data.is_default is True and not recipe.is_default:
@@ -1096,6 +1125,7 @@ async def update_settings(
     allow_overproduction: bool | None = None,
     availability_check_scope: str | None = None,
     create_on_shortage_strategy: str | None = None,
+    labor_hourly_rate: Decimal | None = None,
 ) -> MakerModuleSettings:
     settings = await get_settings(db, organization_id, for_update=True)
     if reference_direction is not None:
@@ -1106,5 +1136,7 @@ async def update_settings(
         settings.availability_check_scope = availability_check_scope
     if create_on_shortage_strategy is not None:
         settings.create_on_shortage_strategy = create_on_shortage_strategy
+    if labor_hourly_rate is not None:
+        settings.labor_hourly_rate = labor_hourly_rate
     await db.flush()
     return settings

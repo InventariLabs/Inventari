@@ -1055,3 +1055,90 @@ class TestEquipmentAttestationDowngrade:
             'a grouped response with no items cannot be represented in the old '
             'schema and must be dropped rather than block the downgrade'
         )
+
+
+@pytest.mark.integration
+class TestMakerMigration018ProcessStepsBackfill:
+    """Backfill of 018: steps stored as sentences become step objects.
+
+    A formula saved before steps carried durations holds a JSON array of
+    bare sentences, while the reader now expects ``{text, minutes}``. The
+    schema change alone leaves the row unreadable, so this builds the maker
+    schema at 017, stores rows in both shapes plus a null, upgrades to head
+    and asserts the rewrite — blank sentences dropped, as the write path has
+    always dropped them, and rows already in the new shape left alone.
+    """
+
+    def test_string_steps_become_objects(self, isolated_db_url):
+        _create_core_tables(isolated_db_url, 'maker', MAKER_TABLES)
+        run_module_migrations(
+            'maker',
+            'upgrade',
+            db_url=isolated_db_url,
+            revision='017_costs_out_on_day_one',
+        )
+
+        org_id, template_id = uuid.uuid4(), uuid.uuid4()
+        old_id, new_id, null_id, blank_id = (uuid.uuid4() for _ in range(4))
+        rows = [
+            (old_id, 'Old salve', '["Melt the wax", "", "Pour"]'),
+            (
+                new_id,
+                'Timed salve',
+                '[{"text": "Mix", "minutes": "15"}]',
+            ),
+            (null_id, 'Untouched salve', 'null'),
+            (blank_id, 'Empty salve', '[""]'),
+        ]
+
+        engine = create_engine(isolated_db_url)
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    'INSERT INTO organizations '
+                    '(id, name, enabled_modules, settings, created_at) '
+                    "VALUES (:id, 'Backfill Org', '[]'::json, '{}'::json, NOW())"
+                ),
+                {'id': org_id},
+            )
+            conn.execute(
+                text(
+                    'INSERT INTO product_templates '
+                    '(id, organization_id, name, created_at, updated_at) '
+                    "VALUES (:id, :org, 'Salve', NOW(), NOW())"
+                ),
+                {'id': template_id, 'org': org_id},
+            )
+            for recipe_id, name, steps in rows:
+                conn.execute(
+                    text(
+                        'INSERT INTO maker_recipes '
+                        '(id, organization_id, output_template_id, name, '
+                        ' process_steps) '
+                        'VALUES (:id, :org, :template, :name, '
+                        '        CAST(:steps AS jsonb))'
+                    ),
+                    {
+                        'id': recipe_id,
+                        'org': org_id,
+                        'template': template_id,
+                        'name': name,
+                        'steps': steps,
+                    },
+                )
+
+        run_module_migrations('maker', 'upgrade', db_url=isolated_db_url)
+
+        with engine.connect() as conn:
+            stored = dict(
+                conn.execute(text('SELECT id, process_steps FROM maker_recipes')).all()
+            )
+        engine.dispose()
+
+        assert stored[old_id] == [
+            {'text': 'Melt the wax', 'minutes': None},
+            {'text': 'Pour', 'minutes': None},
+        ]
+        assert stored[new_id] == [{'text': 'Mix', 'minutes': '15'}]
+        assert stored[null_id] is None
+        assert stored[blank_id] == []
