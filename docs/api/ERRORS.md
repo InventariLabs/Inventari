@@ -542,8 +542,10 @@ apart.
 | `PRODUCTION_CANCEL_NOT_DRAFT` | This production order already has status {status} — only a draft or a run in progress can be cancelled. |
 | `PRODUCTION_COMPLETE_NOT_DRAFT` | This production order already has status {status} — only a draft can be completed. |
 | `PRODUCTION_FINISH_BELOW_PORTIONS` | This run has already put {made} on the shelf in portions, so it cannot finish with less than that. |
+| `PRODUCTION_FINISH_NEEDS_CLOSING_QUANTITY` | The run's cost does not fit in its portions ({made} already on the shelf): when finishing, enter a total above {made} so the rest of the cost is booked on it. |
 | `PRODUCTION_NO_RECIPE` | No BOM for this product — create a BOM first |
 | `PRODUCTION_OVERPRODUCTION_DISABLED` | Overproduction is disabled in settings — this order cannot produce more than planned. |
+| `PRODUCTION_PORTION_ABOVE_PLAN` | A portion cannot take the run above its plan ({planned}) — what comes out beyond it is put on the shelf when the run finishes. |
 | `PRODUCTION_RECIPE_NOT_FOUND` | BOM {recipe_id} not found in this organization |
 | `PRODUCTION_RECIPE_PRODUCT_MISMATCH` | This BOM does not belong to this product |
 | `PRODUCTION_REVERSE_NOT_COMPLETED` | This production run is {status}, so there is nothing to take back — only a completed run can be undone. |
