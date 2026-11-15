@@ -132,8 +132,13 @@ class CoreValuationAPI:
         shelf before it closed. *amount* is the value of the whole receipt;
         only the part that belongs to the units still on the layer goes on
         it, because the units that left took their cost with them. Answers
-        what was placed — zero when nothing of the layer is left, or the
-        layer is not this organization's.
+        what was placed — zero when nothing of the layer is left, it was
+        already given a cost this way (a receipt's cost is closed once), or
+        the layer is not this organization's.
+
+        The cost dates from now: a report about an earlier instant reads the
+        layer as it was. A layer that carried no cost, because nobody priced
+        the goods, has a stated one from then on.
         """
         from app.core.contracts import AuditAction, AuditTargetType
         from app.core.public_api import core_api
@@ -153,7 +158,7 @@ class CoreValuationAPI:
                 target_type=AuditTargetType.PRODUCT_TEMPLATE,
                 target_id=template_id,
                 snapshot={'cost_added': str(placed)},
-                reason='production_cost_added_to_stock',
+                reason='receipt_cost_added',
             )
         return placed
 

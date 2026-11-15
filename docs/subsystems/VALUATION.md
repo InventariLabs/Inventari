@@ -104,6 +104,25 @@ it to the stock value (`stock_value_async`) and to the as-of valuation
 amount belongs to no product row and no shelf, so a report narrowed to a
 location or a search leaves it out.
 
+## A cost added after the receipt
+
+A cost that is only known after goods were received — the corks and labour of a
+production run whose bottles went on the shelf before the run closed — is put
+on the receipt's layer with `core_api.valuation.add_value_to_layer_async`.
+*amount* is for the whole receipt; the units already drained left at the cost
+they had, so only the units still on the layer carry their share. A layer takes
+such a cost once (a second call places nothing), and a layer nobody priced
+(`unknown`) that takes one has a `stated` cost from then on.
+
+The layer reads what it is worth now, which is what the stock value, the
+rates and the next drain need. A report about an earlier instant must not read
+a cost that was not yet known, so the write also keeps `revalued_at` and what
+the layer read just before (`unit_cost_before`, `cost_basis_before`); the as-of
+valuation takes those for an instant before `revalued_at`. The report about an
+instant therefore says the same on the day it is asked and in a month: the added
+cost belongs to the day it became known, not to the day the goods came in. The
+journal says what was added on the product (`cost_added`).
+
 ## Cost basis
 
 ### Estimates share one price policy

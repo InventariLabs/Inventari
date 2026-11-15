@@ -15,7 +15,7 @@ marker (reserved for modules needing read-only Core access) does not apply here.
 import uuid
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import date
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -397,8 +397,13 @@ class ValuationService:
         *amount* is for the whole receipt. The units already drained left at
         the cost they had; the units still there carry their share, spread on
         the layer's per-unit cost. Answers what was placed (cents), zero when
-        the layer is empty or not found in this organization, with the product
-        the layer belongs to.
+        the layer is empty, was already revalued, or is not found in this
+        organization, with the product the layer belongs to.
+
+        The cost of a receipt is closed once: the layer keeps what it read
+        before and the moment it was revalued, and a report about an earlier
+        instant reads the layer as it was. A layer nobody priced
+        (``unknown``) that takes a cost has a stated one from then on.
         """
         layer = await db.scalar(
             select(StockValuationLayer)
@@ -409,13 +414,25 @@ class ValuationService:
             )
             .with_for_update()
         )
-        if layer is None or layer.remaining_qty <= 0 or layer.quantity <= 0:
+        if (
+            layer is None
+            or layer.remaining_qty <= 0
+            or layer.quantity <= 0
+            or layer.revalued_at is not None
+        ):
             return Decimal('0'), None
         placed = quantise(amount * layer.remaining_qty / layer.quantity)
+        if placed <= 0:
+            return Decimal('0'), None
+        layer.revalued_at = datetime.now(UTC)
+        layer.unit_cost_before = layer.unit_cost
+        layer.cost_basis_before = layer.cost_basis
         layer.unit_cost = quantise(
             layer.unit_cost + placed / layer.remaining_qty, COST_PLACES
         )
         layer.total_value = layer.total_value + placed
+        if layer.cost_basis == CostBasis.UNKNOWN:
+            layer.cost_basis = CostBasis.STATED
         await db.flush()
         return placed, layer.product_template_id
 

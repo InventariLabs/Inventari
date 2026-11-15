@@ -176,6 +176,84 @@ class TestCoreValuationAddValueContract:
 
         assert placed == Decimal('0')
 
+    async def test_a_layer_takes_a_cost_once_and_remembers_what_it_read_before(
+        self, real_async_db_session: AsyncSession, async_test_household, async_test_user
+    ):
+        from app.core.contracts import UserContextDTO
+        from app.models.stock_valuation_layer import StockValuationLayer
+
+        template = await real_async_db_session.run_sync(
+            lambda db: _make_valuation_template(db, async_test_household.id)
+        )
+        layer_id = await core_api.valuation.record_receipt_async(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            quantity=Decimal('2'),
+            unit_cost=Decimal('2.00'),
+        )
+        user = UserContextDTO(
+            id=async_test_user.id, organization_id=async_test_household.id
+        )
+
+        async def add(amount: str) -> Decimal:
+            return await core_api.valuation.add_value_to_layer_async(
+                real_async_db_session,
+                async_test_household.id,
+                layer_id,
+                Decimal(amount),
+                user=user,
+            )
+
+        assert await add('1.00') == Decimal('1.00')
+        layer = await real_async_db_session.get(StockValuationLayer, layer_id)
+        assert layer.unit_cost == Decimal('2.5000')
+        assert layer.unit_cost_before == Decimal('2.0000')
+        assert layer.cost_basis_before == layer.cost_basis
+        assert layer.revalued_at is not None
+
+        # The cost of a receipt is closed once: a second one is not placed, and
+        # what the first one recorded stays what the layer read before it.
+        assert await add('1.00') == Decimal('0')
+        await real_async_db_session.refresh(layer)
+        assert layer.unit_cost == Decimal('2.5000')
+        assert layer.unit_cost_before == Decimal('2.0000')
+
+    async def test_a_layer_nobody_priced_has_a_stated_cost_once_it_takes_one(
+        self, real_async_db_session: AsyncSession, async_test_household, async_test_user
+    ):
+        from app.core.contracts import UserContextDTO
+        from app.models.stock_valuation_layer import CostBasis, StockValuationLayer
+
+        template = await real_async_db_session.run_sync(
+            lambda db: _make_valuation_template(db, async_test_household.id)
+        )
+        layer_id = await core_api.valuation.record_receipt_async(
+            db=real_async_db_session,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            quantity=Decimal('2'),
+            unit_cost=None,
+        )
+        layer = await real_async_db_session.get(StockValuationLayer, layer_id)
+        assert layer.cost_basis == CostBasis.UNKNOWN
+
+        await core_api.valuation.add_value_to_layer_async(
+            real_async_db_session,
+            async_test_household.id,
+            layer_id,
+            Decimal('1.00'),
+            user=UserContextDTO(
+                id=async_test_user.id, organization_id=async_test_household.id
+            ),
+        )
+
+        await real_async_db_session.refresh(layer)
+        assert layer.cost_basis == CostBasis.STATED
+        assert layer.cost_basis_before == CostBasis.UNKNOWN
+        assert layer.unit_cost == Decimal('0.5000')
+        assert layer.unit_cost_before == Decimal('0.0000')
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio
