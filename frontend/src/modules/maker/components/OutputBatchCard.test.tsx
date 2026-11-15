@@ -162,14 +162,16 @@ describe("OutputBatchCard for a run filled in portions", () => {
     expect(screen.queryByTestId("maker-output-batch-code")).toBeNull();
   });
 
-  it("prints the labels of every batch, the units spread over them", () => {
+  it("prints the labels of one batch at a time, the units spread over them", () => {
     render(<OutputBatchCard order={filledInPortions} />);
 
-    fireEvent.click(screen.getByTestId("maker-print-batch-labels"));
-
-    expect(screen.getByTestId("label-sheet")).toHaveTextContent(
-      "lot-a,lot-b,lot-c|4|",
+    // The label sheet takes one batch: each one has its own button.
+    expect(screen.getAllByTestId("maker-print-batch-labels")).toHaveLength(3);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Print batch labels: WB" }),
     );
+
+    expect(screen.getByTestId("label-sheet")).toHaveTextContent("lot-b|4|");
   });
 
   it("offers a hold while one batch is not held, and a release while one is", () => {

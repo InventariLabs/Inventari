@@ -1706,8 +1706,8 @@ A finished run shows its batch with the day it was made and its best-before:
 - **Put on hold** stops the batch from being used — no run, pick or dispatch
   takes from it — until **Release**. The reason goes into the batch's history.
   A run filled in portions can have several batches, one per name its portions
-  were put under: the page lists them all, the labels print for each, and a hold
-  and a release act on all of them.
+  were put under: the page lists them all, each with a button for its own
+  labels, and a hold and a release act on all of them.
 - **Photos and files** — **Add a file** files a photo or a document under the
   run, up to 10 MB, in the types a product's attachments take.
 

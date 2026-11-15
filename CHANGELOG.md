@@ -24,8 +24,8 @@ says what the release does rather than what changed since them.
   unit cost divides what the start took by what came out. Cancelling a run in
   progress gives the ingredients back to the batches they came from. A run
   filled in portions can end up with several batches: its page and its batch
-  record name them all, their labels print together, and a hold or a release
-  acts on every one. What a started run took is counted as work in progress in
+  record name them all, each has its own labels to print, and a hold or a
+  release acts on every one. What a started run took is counted as work in progress in
   the stock value and in the as-of valuation (`work_in_progress_value`), so the
   warehouse does not look poorer between start and finish. New endpoints: `POST
   /maker/production/orders/{id}/start`, `/portions` and `/finish`, and `PUT

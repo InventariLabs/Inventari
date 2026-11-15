@@ -57,7 +57,7 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
   const home = useIsHomeProfile();
   const canManage = useCanManage("maker");
   const { hold, release } = useOutputBatchStatus(order.id);
-  const [printing, setPrinting] = useState(false);
+  const [printing, setPrinting] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
   const [reason, setReason] = useState("");
   const batches = runBatches(order);
@@ -140,6 +140,16 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
                     {batch.best_before ? formatDate(batch.best_before) : "—"}
                   </span>
                   <StatusNote status={batch.status} />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`${t("batches.card.printLabels")}: ${batch.lot_name}`}
+                    title={`${t("batches.card.printLabels")}: ${batch.lot_name}`}
+                    onClick={() => setPrinting(batch.lot_id)}
+                    data-testid="maker-print-batch-labels"
+                  >
+                    <Printer size={16} />
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -148,17 +158,19 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
         {!several && <StatusNote status={batches[0].status} />}
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          leftIcon={<Printer size={16} />}
-          onClick={() => setPrinting(true)}
-          data-testid="maker-print-batch-labels"
-        >
-          {home
-            ? t("batches.card.printJarLabels")
-            : t("batches.card.printLabels")}
-        </Button>
+        {!several && (
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Printer size={16} />}
+            onClick={() => setPrinting(batches[0].lot_id)}
+            data-testid="maker-print-batch-labels"
+          >
+            {home
+              ? t("batches.card.printJarLabels")
+              : t("batches.card.printLabels")}
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"
@@ -195,10 +207,10 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
       </div>
       {printing && (
         <BarcodeLabelSheet
-          target={{ lotIds: batches.map((batch) => batch.lot_id) }}
+          target={{ lotIds: [printing] }}
           initialCopies={labelsForRun(order)}
           title={home ? t("batches.card.jarLabelsTitle") : undefined}
-          onClose={() => setPrinting(false)}
+          onClose={() => setPrinting(null)}
         />
       )}
       <ConfirmDialog
