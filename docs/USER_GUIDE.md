@@ -1663,7 +1663,7 @@ progress**; the run shows in To do until it is finished. Under **Output so far**
 (bottling part of a vat), and the **Steps** of the BOM are ticked with the day
 each was done. **Finish run** takes the quantity the whole run made, portions
 included, and the day it closed; the run's cost is what the start took plus the
-fixed costs, divided by everything that came out; the cost the portions did not carry lands on what is put on the shelf at the finish, or on the last portion when the portions already hold the whole output. What a run in progress took is
+fixed costs, divided by everything that came out; the cost the portions did not carry lands on what is put on the shelf at the finish, or on the portions already on the shelf when they hold the whole output. A part of the cost whose bottles were sold before the run closed has nowhere to go; the run says so under its cost (**Not on the shelf**) and closes anyway. What a run in progress took is
 still counted in the stock value, so the warehouse does not look poorer while
 the batch matures. **Cancel run** on a run in progress gives the materials back
 to the batches they came from — unless it has already put portions on the

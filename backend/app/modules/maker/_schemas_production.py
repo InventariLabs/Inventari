@@ -177,6 +177,9 @@ class ProductionOrderRead(BaseModel):
     #: completed in one step.
     started_on: date | None = None
     material_cost: Decimal | None = None
+    #: What of the run's cost could not go on the shelf because its output left
+    #: it before the run closed. Null unless the run was filled in portions.
+    unshelved_cost: Decimal | None = None
     #: The process steps of a run that was started, with the day each was done.
     steps: list[ProductionStepRead] = Field(default_factory=list)
     #: The output put on the shelf so far, portion by portion.

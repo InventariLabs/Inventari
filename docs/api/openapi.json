@@ -70417,6 +70417,18 @@
             ],
             "title": "Material Cost"
           },
+          "unshelved_cost": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unshelved Cost"
+          },
           "steps": {
             "items": {
               "$ref": "#/components/schemas/ProductionStepRead"

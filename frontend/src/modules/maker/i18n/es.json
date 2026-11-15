@@ -198,6 +198,7 @@
       "resultPerUnit": "({{amount}} por {{unit}})",
       "totalCostAfterClosing": "Coste total tras el cierre",
       "unitCost": "{{amount}} por {{unit}}",
+      "unshelvedCost": "{{amount}} del coste de esta orden no está en el almacén: la producción se vendió o se usó antes de cerrar la orden.",
       "totalCostGap_one": "{{count}} ingrediente salió de un stock sin coste, por lo que falta en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
       "totalCostGap_other": "{{count}} ingredientes salieron de un stock sin coste, por lo que faltan en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
       "estimatedAtCompletion": "Estimado al cerrar",

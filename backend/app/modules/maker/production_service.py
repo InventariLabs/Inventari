@@ -880,12 +880,12 @@ async def _receive_output(
     *,
     lot_name: str | None = None,
     made_on: date | None = None,
-) -> UUID:
+) -> tuple[UUID, UUID | None]:
     """Put the produced goods on the shelf (output = actual).
 
     *lot_name* and *made_on* name a portion of a run that is filled in
     parts; without them the run's own batch and day apply. Answers the record
-    the goods were put on.
+    the goods were put on and the cost layer they opened.
     """
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
@@ -967,14 +967,14 @@ async def _receive_output(
     # quantity real and the value absent, which breaks the equality between
     # the shelf and the sum of the layers: the same hole the receipt path
     # closed, still open on the way out of production.
-    await core_api.valuation.record_receipt_async(
+    layer_id = await core_api.valuation.record_receipt_async(
         db,
         organization_id=organization_id,
         product_template_id=order.output_template_id,
         quantity=actual_qty,
         unit_cost=unit_cost if unit_cost > 0 else None,
     )
-    return produced_item.id
+    return produced_item.id, layer_id
 
 
 async def _estimated_material_at_completion(
@@ -1406,7 +1406,7 @@ async def record_portion(
         else Decimal('0'),
         4,
     )
-    item_id = await _receive_output(
+    item_id, layer_id = await _receive_output(
         db,
         organization_id,
         order,
@@ -1424,6 +1424,7 @@ async def record_portion(
         lot_name=lot_name or order.output_lot_name,
         item_id=item_id,
         unit_cost=unit_cost,
+        layer_id=layer_id,
         created_by=user.id,
     )
     db.add(portion)
@@ -1431,47 +1432,30 @@ async def record_portion(
     return portion
 
 
-async def _book_the_rest_on_the_last_portion(
+async def _place_the_rest_of_the_cost(
     db: AsyncSession,
     organization_id: UUID,
-    order: ProductionOrder,
     portions: list[ProductionPortion],
     rest: Decimal,
     user: UserContextDTO,
-) -> None:
-    """Put the part of the run's cost the portions did not carry on the last one.
+) -> Decimal:
+    """Put the part of the run's cost the portions did not carry on their layers.
 
-    Core cannot revalue a cost layer, so the portion's quantity is taken off
-    the layers and put back in one, worth what the take-off cost plus *rest*:
-    the shelf ends up worth exactly what it did plus the rest, whichever
-    layers the take-off drained. The quantity on the shelf does not move. When
-    the layers cannot cover the portion — it has been sold or used since — the
-    rest has nowhere to go and the run is refused.
+    The rest is spread over the portions by quantity, and each share goes on
+    the layer its portion opened, for the units of it still on the shelf.
+    Answers what could not be placed: the units that were sold or used
+    before the run closed took their share of the cost with them. Nothing
+    here refuses the finish, whatever else is in the product's cost history.
     """
-    last = max(portions, key=lambda portion: portion.created_at)
-    await core_api.stock.lock_async(
-        db,
-        organization_id,
-        keys=[(order.output_template_id, order.output_storage_location_id)],
-    )
-    cost = await core_api.valuation.record_delivery_async(
-        db,
-        organization_id,
-        order.output_template_id,
-        last.qty,
-        item_id=last.item_id,
-    )
-    if cost is None:
-        raise ServiceRejectionError('production_finish_last_portion_used')
-    new_unit_cost = max(Decimal('0'), (cost + rest) / last.qty)
-    await core_api.valuation.record_receipt_async(
-        db,
-        organization_id=organization_id,
-        product_template_id=order.output_template_id,
-        quantity=last.qty,
-        unit_cost=new_unit_cost if new_unit_cost > 0 else None,
-    )
-    last.unit_cost = quantise(new_unit_cost, 4)
+    made = sum((portion.qty for portion in portions), Decimal('0'))
+    placed = Decimal('0')
+    for portion in portions:
+        if portion.layer_id is None:
+            continue
+        placed += await core_api.valuation.add_value_to_layer_async(
+            db, organization_id, portion.layer_id, rest * portion.qty / made, user=user
+        )
+    return max(Decimal('0'), rest - placed)
 
 
 async def finish_production(
@@ -1549,17 +1533,25 @@ async def finish_production(
         (portion.qty * (portion.unit_cost or Decimal('0')) for portion in portions),
         Decimal('0'),
     )
-    if closing_qty <= 0 and abs(total_cost - booked) >= Decimal('0.01'):
+    if closing_qty <= 0 and total_cost - booked >= Decimal('0.01'):
         # The portions already hold everything that came out, yet they were
         # booked at what the ingredients cost per unit planned: a yield
         # shortfall, fixed costs, labour or a rounding cent are still to be
-        # put on the shelf. They go on the last portion's layer.
-        await _book_the_rest_on_the_last_portion(
-            db, organization_id, order, portions, total_cost - booked, user
+        # put on the shelf, on the layers the portions opened.
+        await core_api.stock.lock_async(
+            db,
+            organization_id,
+            keys=[(order.output_template_id, order.output_storage_location_id)],
+        )
+        order.unshelved_cost = quantise(
+            await _place_the_rest_of_the_cost(
+                db, organization_id, portions, total_cost - booked, user
+            ),
+            2,
         )
     if closing_qty > 0:
         closing_unit_cost = max(Decimal('0'), (total_cost - booked) / closing_qty)
-        item_id = await _receive_output(
+        item_id, layer_id = await _receive_output(
             db,
             organization_id,
             order,
@@ -1578,6 +1570,7 @@ async def finish_production(
                 lot_name=lot_name or order.output_lot_name,
                 item_id=item_id,
                 unit_cost=quantise(closing_unit_cost, 4),
+                layer_id=layer_id,
                 created_by=user.id,
             )
         )

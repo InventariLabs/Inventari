@@ -436,7 +436,6 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_run_not_in_progress': 'This production run has status {status} — only a run in progress can be filled in portions, ticked off or finished.',
         'production_finish_below_portions': 'This run has already put {made} on the shelf in portions, so it cannot finish with less than that.',
         'production_portion_above_plan': 'A portion cannot take the run above its plan ({planned}) — what comes out beyond it is put on the shelf when the run finishes.',
-        'production_finish_last_portion_used': "The run's cost cannot be booked on its last portion: it has already left the shelf. Finish the run with a total above what the portions add up to.",
         'production_cancel_has_portions': 'This run has already put output on the shelf in portions, so it cannot be cancelled — finish it instead.',
         'production_step_not_found': 'This run has no such step.',
         'production_update_not_draft': (
@@ -1488,7 +1487,6 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_run_not_in_progress': 'To zlecenie produkcyjne ma status {status} — porcjami, krokami i zakończeniem można zająć się tylko w zleceniu w toku.',
         'production_finish_below_portions': 'To zlecenie odłożyło już na półkę {made} w porcjach, więc nie może się zakończyć mniejszą ilością.',
         'production_portion_above_plan': 'Porcja nie może wynieść zlecenia ponad plan ({planned}) — to, co wyjdzie ponad niego, trafia na półkę przy zakończeniu.',
-        'production_finish_last_portion_used': 'Kosztu zlecenia nie da się zaksięgować na ostatniej porcji: zeszła już z półki. Zakończ zlecenie z łączną ilością większą niż suma porcji.',
         'production_cancel_has_portions': 'To zlecenie odłożyło już wyrób na półkę w porcjach, więc nie można go anulować — zakończ je.',
         'production_step_not_found': 'To zlecenie nie ma takiego kroku.',
         'production_update_not_draft': (

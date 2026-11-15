@@ -21579,6 +21579,8 @@ export interface components {
             started_on?: string | null;
             /** Material Cost */
             material_cost?: string | null;
+            /** Unshelved Cost */
+            unshelved_cost?: string | null;
             /** Steps */
             steps?: components["schemas"]["ProductionStepRead"][];
             /** Portions */

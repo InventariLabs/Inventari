@@ -198,6 +198,7 @@ def _to_read(
         lines=[ProductionOrderLineRead.model_validate(line) for line in line_rows],
         started_on=order.started_on,
         material_cost=order.material_cost,
+        unshelved_cost=order.unshelved_cost,
         steps=[ProductionStepRead.model_validate(step) for step in order.steps or []],
         portions=[
             ProductionPortionRead.model_validate(portion) for portion in portions or []

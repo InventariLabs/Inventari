@@ -386,6 +386,40 @@ class ValuationService:
         return svl
 
     @staticmethod
+    async def add_value_to_layer_async(
+        db: AsyncSession,
+        organization_id: UUID,
+        layer_id: UUID,
+        amount: Decimal,
+    ) -> tuple[Decimal, UUID | None]:
+        """Raise the cost of what is left of a receipt layer by its share of *amount*.
+
+        *amount* is for the whole receipt. The units already drained left at
+        the cost they had; the units still there carry their share, spread on
+        the layer's per-unit cost. Answers what was placed (cents), zero when
+        the layer is empty or not found in this organization, with the product
+        the layer belongs to.
+        """
+        layer = await db.scalar(
+            select(StockValuationLayer)
+            .where(
+                StockValuationLayer.id == layer_id,
+                StockValuationLayer.organization_id == organization_id,
+                StockValuationLayer.direction == 'IN',
+            )
+            .with_for_update()
+        )
+        if layer is None or layer.remaining_qty <= 0 or layer.quantity <= 0:
+            return Decimal('0'), None
+        placed = quantise(amount * layer.remaining_qty / layer.quantity)
+        layer.unit_cost = quantise(
+            layer.unit_cost + placed / layer.remaining_qty, COST_PLACES
+        )
+        layer.total_value = layer.total_value + placed
+        await db.flush()
+        return placed, layer.product_template_id
+
+    @staticmethod
     async def _avco_rate_async(
         db: AsyncSession, template: ProductTemplate, organization_id: UUID
     ) -> Decimal | None:

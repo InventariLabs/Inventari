@@ -362,6 +362,10 @@ class ProductionOrder(Base):
     #: when the run starts and kept after, so the finish divides it by what
     #: came out. NULL on a run completed in one step.
     material_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    #: The part of a closed run's cost that could not go on the shelf: the
+    #: run's output was sold or used before the run closed, and its cost left
+    #: with it. NULL on a run that was not filled in portions.
+    unshelved_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
     #: The formula's process steps as the run began, one object per step
     #: (``{text, minutes, done_on}``). The steps are ticked on the run with
     #: the day each was done; a copy, so a later edit of the formula does
@@ -404,6 +408,12 @@ class ProductionPortion(Base):
     #: What the portion was booked at per unit, so the closing portion can
     #: carry the rest of the run's cost.
     unit_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    #: The cost layer the portion opened: where the rest of the run's cost is
+    #: placed when the run closes with its whole output already on the shelf.
+    layer_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('stock_valuation_layers.id', ondelete='SET NULL'),
+        nullable=True,
+    )
     created_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey('users.id'),
         nullable=True,

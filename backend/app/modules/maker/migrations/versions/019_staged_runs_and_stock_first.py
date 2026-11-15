@@ -46,6 +46,10 @@ def upgrade() -> None:
     )
     op.add_column(
         'maker_production_orders',
+        sa.Column('unshelved_cost', sa.Numeric(12, 2), nullable=True),
+    )
+    op.add_column(
+        'maker_production_orders',
         sa.Column('steps', postgresql.JSONB(), nullable=True),
     )
     op.create_table(
@@ -73,6 +77,12 @@ def upgrade() -> None:
             nullable=True,
         ),
         sa.Column('unit_cost', sa.Numeric(12, 4), nullable=True),
+        sa.Column(
+            'layer_id',
+            sa.Uuid(),
+            sa.ForeignKey('stock_valuation_layers.id', ondelete='SET NULL'),
+            nullable=True,
+        ),
         sa.Column('created_by', sa.Uuid(), sa.ForeignKey('users.id'), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     )
@@ -85,6 +95,7 @@ def downgrade() -> None:
     op.drop_index('ix_prod_portion_order', table_name='maker_production_portions')
     op.drop_table('maker_production_portions')
     op.drop_column('maker_production_orders', 'steps')
+    op.drop_column('maker_production_orders', 'unshelved_cost')
     op.drop_column('maker_production_orders', 'material_cost')
     op.drop_column('maker_production_orders', 'started_at')
     op.drop_column('maker_production_orders', 'started_on')

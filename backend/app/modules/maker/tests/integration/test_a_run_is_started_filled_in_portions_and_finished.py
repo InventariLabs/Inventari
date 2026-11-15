@@ -348,18 +348,67 @@ def test_a_cost_that_does_not_divide_to_four_places_still_adds_up_at_the_finish(
     assert abs(winery.stock_value() - 30.0) < 0.011
 
 
-def test_a_run_cannot_book_its_rest_on_a_last_portion_that_has_left_the_shelf(
+def test_a_run_whose_output_has_left_the_shelf_closes_and_says_what_it_could_not_place(
     winery: _Winery,
 ) -> None:
+    winery.add_fixed_cost('Corks', '0.50')
     order_id = winery.draft('2')
     winery.post(order_id, 'start')
-    winery.post(order_id, 'portions', {'qty': '1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W2'})
     winery.sell(winery.wine, '1')
 
-    refused = winery.post(order_id, 'finish', {'actual_qty': '1'})
+    finished = winery.post(order_id, 'finish', {'actual_qty': '2'})
 
-    assert refused.status_code == 400, refused.text
-    assert winery.post(order_id, 'cancel').status_code == 400
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert Decimal(str(done['total_cost'])) == Decimal('7.00')
+    # The two grapes (6.00) and the corks (1.00) cost 7.00; the bottle that is
+    # still on the shelf holds its half of the run's cost, the sold one's half
+    # of the corks is the part that could not go on the shelf.
+    assert Decimal(str(done['unshelved_cost'])) == Decimal('0.50')
+    assert winery.stock_value() == 24.0 + 3.0 + 0.5
+
+
+def test_a_run_whose_output_was_all_sold_still_closes(winery: _Winery) -> None:
+    winery.add_fixed_cost('Corks', '0.50')
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W2'})
+    winery.sell(winery.wine, '1')
+    winery.sell(winery.wine, '1')
+
+    finished = winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert done['status'] == 'COMPLETED'
+    assert Decimal(str(done['unshelved_cost'])) == Decimal('1.00')
+
+
+def test_older_unpriced_stock_of_the_output_does_not_stop_the_finish(
+    winery: _Winery,
+) -> None:
+    # Two bottles of the same wine were entered earlier with no price. They
+    # are in the cost history of the product; the run's rest of cost goes on
+    # the run's own bottles, not on them, and the finish is not refused.
+    post_on_shelf(winery.client, winery.headers, winery.wine, winery.cellar.id, 2)
+    winery.add_fixed_cost('Corks', '0.50')
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W1'})
+    winery.post(order_id, 'portions', {'qty': '1', 'output_lot_name': 'W2'})
+
+    finished = winery.post(order_id, 'finish')
+
+    assert finished.status_code == 200, finished.text
+    done = finished.json()
+    assert Decimal(str(done['total_cost'])) == Decimal('7.00')
+    assert Decimal(str(done['unshelved_cost'])) == Decimal('0.00')
+    # 8 grapes left at 3.00 = 24.00, the wine of the run is worth 7.00, the
+    # two older bottles carry no value.
+    assert winery.stock_value() == 24.0 + 7.0
 
 
 def test_the_last_bottles_put_on_the_shelf_by_the_finish_carry_the_rest_of_the_cost(

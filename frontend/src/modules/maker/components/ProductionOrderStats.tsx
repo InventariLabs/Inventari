@@ -159,6 +159,21 @@ function RunDayTile({ order }: { order: ProductionOrder }) {
   );
 }
 
+/** The part of a closed run's cost whose output left the shelf before it closed. */
+function UnshelvedCostNote({ order }: { order: ProductionOrder }) {
+  const { t, i18n } = useTranslation("maker");
+  const currency = useOrganizationCurrency();
+  const amount = Number(order.unshelved_cost ?? 0);
+  if (amount <= 0) return null;
+  return (
+    <p className="text-sm text-amber-700 dark:text-amber-400">
+      {t("detail.card.unshelvedCost", {
+        amount: formatMoney(amount, currency, i18n.language),
+      })}
+    </p>
+  );
+}
+
 export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
   const { t, i18n } = useTranslation("maker");
   const resultTerm = useResultTerms();
@@ -247,6 +262,7 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
         </StatTile>
         <RunDayTile order={order} />
       </div>
+      <UnshelvedCostNote order={order} />
 
       {/* Actual / scrap / overproduced stats (completed orders only) */}
       {order.status === "COMPLETED" && order.actual_qty && (

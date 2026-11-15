@@ -198,6 +198,7 @@
       "resultPerUnit": "({{amount}} pro {{unit}})",
       "totalCostAfterClosing": "Gesamtkosten nach Abschluss",
       "unitCost": "{{amount}} pro {{unit}}",
+      "unshelvedCost": "{{amount}} der Kosten dieses Auftrags liegen nicht im Lager: Die Ware wurde verkauft oder verbraucht, bevor der Auftrag abgeschlossen wurde.",
       "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "estimatedAtCompletion": "Schätzung bei Abschluss",
