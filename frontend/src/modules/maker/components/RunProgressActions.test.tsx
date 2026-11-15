@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { FinishRunAction, StartRunAction } from "./RunProgressActions";
+import { FinishRunAction } from "./FinishRunAction";
+import { StartRunAction } from "./StartRunAction";
 import { todayIso } from "@/utils/formatters";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 

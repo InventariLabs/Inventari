@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/Button";
 import { CancelRunButton } from "@/modules/maker/components/CancelRunButton";
 import { ReverseRunAction } from "@/modules/maker/components/ReverseRunAction";
 import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
-import {
-  FinishRunAction,
-  StartRunAction,
-} from "@/modules/maker/components/RunProgressActions";
+import { FinishRunAction } from "@/modules/maker/components/FinishRunAction";
+import { StartRunAction } from "@/modules/maker/components/StartRunAction";
 import type {
   ProductionOrder,
   ShortageEntry,

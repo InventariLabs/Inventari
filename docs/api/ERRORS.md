@@ -538,14 +538,19 @@ apart.
 | `PRINT_JOB_NOTHING_TO_PRINT` | Nothing to print: none of the chosen labels was found |
 | `PRINT_JOB_ONE_TARGET` | Send exactly one kind of label: pool labels by id, pool labels by code, or storage locations. |
 | `PRODUCTION_ACTUAL_QTY_MUST_BE_POSITIVE` | The produced quantity must be greater than zero. |
-| `PRODUCTION_CANCEL_NOT_DRAFT` | This production order already has status {status} — only a draft can be cancelled. |
+| `PRODUCTION_CANCEL_HAS_PORTIONS` | This run has already put output on the shelf in portions, so it cannot be cancelled — finish it instead. |
+| `PRODUCTION_CANCEL_NOT_DRAFT` | This production order already has status {status} — only a draft or a run in progress can be cancelled. |
 | `PRODUCTION_COMPLETE_NOT_DRAFT` | This production order already has status {status} — only a draft can be completed. |
+| `PRODUCTION_FINISH_BELOW_PORTIONS` | This run has already put {made} on the shelf in portions, so it cannot finish with less than that. |
 | `PRODUCTION_NO_RECIPE` | No BOM for this product — create a BOM first |
 | `PRODUCTION_OVERPRODUCTION_DISABLED` | Overproduction is disabled in settings — this order cannot produce more than planned. |
 | `PRODUCTION_RECIPE_NOT_FOUND` | BOM {recipe_id} not found in this organization |
 | `PRODUCTION_RECIPE_PRODUCT_MISMATCH` | This BOM does not belong to this product |
 | `PRODUCTION_REVERSE_NOT_COMPLETED` | This production run is {status}, so there is nothing to take back — only a completed run can be undone. |
 | `PRODUCTION_REVERSE_OUTPUT_USED` | This run cannot be undone: some of what it made has already left its location. Record a stock correction for what is left instead. |
+| `PRODUCTION_RUN_NOT_IN_PROGRESS` | This production run has status {status} — only a run in progress can be filled in portions, ticked off or finished. |
+| `PRODUCTION_START_NOT_DRAFT` | This production order already has status {status} — only a draft can be started. |
+| `PRODUCTION_STEP_NOT_FOUND` | This run has no such step. |
 | `PRODUCTION_UPDATE_NOT_DRAFT` | This production order already has status {status} — only a draft can be edited. |
 | `PRODUCT_LABEL_NO_CODE` | Nothing to print: none of the chosen products has a code. Generate one on the product form |
 | `PRODUCT_LABEL_TOO_NARROW` | The code {code} does not fit a label {width} mm wide: its bars need one at least {needed} mm wide. Choose a wider label size |
