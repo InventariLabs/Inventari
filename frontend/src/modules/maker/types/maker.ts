@@ -45,10 +45,6 @@ export type ProductionOrderFinish =
 export type ProductionPortionCreate =
   components["schemas"]["ProductionPortionCreate"];
 
-export type ProductionPortion = components["schemas"]["ProductionPortionRead"];
-
-export type ProductionStep = components["schemas"]["ProductionStepRead"];
-
 export type ProductionOrderListResponse =
   components["schemas"]["ProductionOrderListResponse"];
 

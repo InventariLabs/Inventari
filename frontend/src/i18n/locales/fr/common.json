@@ -649,7 +649,12 @@
         "approval": "Approbation",
         "labor_hourly_rate": "Taux horaire de la main-d'œuvre",
         "typed_unit_price_before": "Prix saisi avant",
-        "typed_unit_price_after": "Prix saisi après"
+        "typed_unit_price_after": "Prix saisi après",
+        "done_on": "Fait le",
+        "make_fresh": "Toujours fabriquer frais",
+        "material_cost": "Coût des matières prélevées",
+        "started_on": "Démarré le",
+        "step": "Étape"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",

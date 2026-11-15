@@ -400,7 +400,7 @@
     "dropHint": "Drag to move",
     "onHand": "{{qty}} on hand",
     "makeFresh": "Always make fresh",
-    "makeFreshHint": "A run makes this ingredient from its own BOM every time instead of taking what is on the shelf first.",
+    "makeFreshHint": "A run makes this ingredient from its own BOM every time instead of taking what is in stock first.",
     "makeFreshFailed": "Could not change the line"
   },
   "pricing": {
@@ -600,7 +600,7 @@
     "start": "Start run",
     "startConfirm": {
       "title": "Start this run?",
-      "description": "The ingredients leave your stock today, but the run stays open. You can put the output on the shelf in portions and finish it on a later day."
+      "description": "The ingredients leave your stock today, but the run stays open. You can add the output in portions and finish it on a later day."
     },
     "startDay": "Day it started",
     "startSuccess": "Run started — the ingredients are taken",
@@ -609,24 +609,24 @@
     "finish": "Finish run",
     "finishConfirm": {
       "title": "Finish this run?",
-      "description": "What is still to come out of the run is put on the shelf now, and the run closes at what it cost."
+      "description": "What is still to come out of the run is added to stock now, and the run closes at what it cost."
     },
     "finishQty": "Quantity the whole run made (optional)",
-    "finishQtyHint": "Portions already on the shelf count. Leave empty to use the planned quantity.",
+    "finishQtyHint": "Portions already added count. Leave empty to use the planned quantity.",
     "finishDay": "Day it finished",
     "finishSuccess": "Run finished",
     "finishFailed": "Could not finish the run",
     "portions": "Output so far",
-    "noPortions": "Nothing has been put on the shelf yet.",
+    "noPortions": "No output has been added yet.",
     "portionQty": "Portion",
     "portionDay": "Day",
     "portionLot": "Batch (optional)",
     "addPortion": "Add portion",
-    "portionAdded": "Portion put on the shelf",
+    "portionAdded": "Portion added to stock",
     "portionFailed": "Could not add the portion",
     "steps": "Steps",
     "stepDay": "Day “{{step}}” was done",
     "stepFailed": "Could not save the step",
-    "cancelConfirm": "Cancelling gives the ingredients this run took back to their stock, in the batches they came from. A run that has already put output on the shelf is finished instead."
+    "cancelConfirm": "Cancelling gives the ingredients this run took back to their stock, in the batches they came from. A run that has already added output in portions is finished instead."
   }
 }

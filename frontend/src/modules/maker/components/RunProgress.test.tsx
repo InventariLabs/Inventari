@@ -34,9 +34,9 @@ const order = (over: Partial<ProductionOrder> = {}): ProductionOrder =>
 beforeEach(() => vi.clearAllMocks());
 
 describe("RunPortions", () => {
-  it("says nothing has been put on the shelf yet", () => {
+  it("says no output has been added yet", () => {
     render(<RunPortions order={order()} canWrite />);
-    expect(screen.getByText(/nothing has been put on the shelf/i)).toBeTruthy();
+    expect(screen.getByText(/no output has been added/i)).toBeTruthy();
   });
 
   it("lists each portion with its day and batch", () => {
