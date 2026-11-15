@@ -10,7 +10,8 @@ export type BomTreeNode = components["schemas"]["BomTreeNode"];
 
 export type BomTreeResponse = components["schemas"]["BomTreeResponse"];
 
-export type ProductionStatus = "DRAFT" | "COMPLETED" | "CANCELLED" | "REVERSED";
+export type ProductionStatus =
+  "DRAFT" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "REVERSED";
 
 export type ProductionOrderLine =
   components["schemas"]["ProductionOrderLineRead"];
@@ -34,6 +35,19 @@ export type ProductionOrderCancel =
 
 export type ProductionOrderComplete =
   components["schemas"]["ProductionOrderComplete"];
+
+export type ProductionOrderStart =
+  components["schemas"]["ProductionOrderStart"];
+
+export type ProductionOrderFinish =
+  components["schemas"]["ProductionOrderFinish"];
+
+export type ProductionPortionCreate =
+  components["schemas"]["ProductionPortionCreate"];
+
+export type ProductionPortion = components["schemas"]["ProductionPortionRead"];
+
+export type ProductionStep = components["schemas"]["ProductionStepRead"];
 
 export type ProductionOrderListResponse =
   components["schemas"]["ProductionOrderListResponse"];

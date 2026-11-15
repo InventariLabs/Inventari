@@ -7,6 +7,9 @@ import type {
   ProductionOrder,
   ProductionOrderComplete,
   ProductionOrderCreateInput,
+  ProductionOrderFinish,
+  ProductionOrderStart,
+  ProductionPortionCreate,
   ProductionOrderUpdate,
   ProductionStatus,
 } from "@/modules/maker/types/maker";
@@ -139,13 +142,96 @@ export function useCompleteProduction() {
   });
 }
 
+/** What a run that writes stock refreshes: the run, the records and the quants. */
+function refreshAfterStockWrite(
+  queryClient: ReturnType<typeof useQueryClient>,
+  order: ProductionOrder,
+) {
+  invalidation.maker(queryClient, order.id);
+  invalidation.items(queryClient);
+  queryClient.invalidateQueries({ queryKey: queryKeys.stockQuants.all });
+}
+
+/** Start a draft: its ingredients leave the records now, the run stays open. */
+export function useStartProduction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      data,
+    }: {
+      orderId: string;
+      data?: ProductionOrderStart;
+    }) => productionApi.start(orderId, data),
+    onSuccess: (order: ProductionOrder) =>
+      refreshAfterStockWrite(queryClient, order),
+  });
+}
+
+/** One portion of an in-progress run's output, onto the shelf. */
+export function useAddPortion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      data,
+    }: {
+      orderId: string;
+      data: ProductionPortionCreate;
+    }) => productionApi.addPortion(orderId, data),
+    onSuccess: (order: ProductionOrder) =>
+      refreshAfterStockWrite(queryClient, order),
+  });
+}
+
+/** Close an in-progress run at the quantity the whole of it made. */
+export function useFinishProduction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      data,
+    }: {
+      orderId: string;
+      data?: ProductionOrderFinish;
+    }) => productionApi.finish(orderId, data),
+    onSuccess: (order: ProductionOrder) =>
+      refreshAfterStockWrite(queryClient, order),
+  });
+}
+
+/** Tick a process step of an in-progress run with the day it was done. */
+export function useTickStep() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      index,
+      doneOn,
+    }: {
+      orderId: string;
+      index: number;
+      doneOn: string | null;
+    }) => productionApi.tickStep(orderId, index, doneOn),
+    onSuccess: (order: ProductionOrder) => {
+      invalidation.maker(queryClient, order.id);
+    },
+  });
+}
+
 export function useCancelProduction() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ orderId, reason }: { orderId: string; reason?: string }) =>
       productionApi.cancel(orderId, reason ? { reason } : undefined),
     onSuccess: (order: ProductionOrder) => {
-      invalidation.maker(queryClient, order.id);
+      // A run that was in progress gives its ingredients back to their
+      // records — it holds what they cost; a cancelled draft moved no stock.
+      if (order.material_cost != null) {
+        refreshAfterStockWrite(queryClient, order);
+      } else {
+        invalidation.maker(queryClient, order.id);
+      }
     },
   });
 }

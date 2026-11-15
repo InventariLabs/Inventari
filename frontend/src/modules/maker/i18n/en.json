@@ -45,7 +45,8 @@
       "draft": "Draft",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "reversed": "Undone"
+      "reversed": "Undone",
+      "in_progress": "In progress"
     },
     "duplicate": "Duplicate",
     "viewRecipe": "View BOM",
@@ -200,7 +201,8 @@
       "totalCostGap_one": "{{count}} ingredient was drawn from stock with no cost, so it is missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "estimatedAtCompletion": "Estimated at completion",
-      "estimatedDifference": "Actual difference: {{amount}}"
+      "estimatedDifference": "Actual difference: {{amount}}",
+      "takenSoFar": "Taken so far"
     },
     "ingredients": "Consumed ingredients",
     "emptyLines": "No ingredients were recorded for this run.",
@@ -395,7 +397,11 @@
     "error": "Failed to load tree",
     "moved": "Line moved",
     "moveError": "Move failed",
-    "dropHint": "Drag to move"
+    "dropHint": "Drag to move",
+    "onHand": "{{qty}} on hand",
+    "makeFresh": "Always make fresh",
+    "makeFreshHint": "A run makes this ingredient from its own BOM every time instead of taking what is on the shelf first.",
+    "makeFreshFailed": "Could not change the line"
   },
   "pricing": {
     "title": "Sale price calculator",
@@ -589,5 +595,38 @@
     "stockSaveFailed": "Failed to save the stock.",
     "stockSavePartial": "Saved {{saved}} of {{total}}. The rest is still in the sheet.",
     "locationsFailed": "Could not load the locations"
+  },
+  "progress": {
+    "start": "Start run",
+    "startConfirm": {
+      "title": "Start this run?",
+      "description": "The ingredients leave your stock today, but the run stays open. You can put the output on the shelf in portions and finish it on a later day."
+    },
+    "startDay": "Day it started",
+    "startSuccess": "Run started — the ingredients are taken",
+    "startFailed": "Could not start the run",
+    "startedOn": "Started",
+    "finish": "Finish run",
+    "finishConfirm": {
+      "title": "Finish this run?",
+      "description": "What is still to come out of the run is put on the shelf now, and the run closes at what it cost."
+    },
+    "finishQty": "Quantity the whole run made (optional)",
+    "finishQtyHint": "Portions already on the shelf count. Leave empty to use the planned quantity.",
+    "finishDay": "Day it finished",
+    "finishSuccess": "Run finished",
+    "finishFailed": "Could not finish the run",
+    "portions": "Output so far",
+    "noPortions": "Nothing has been put on the shelf yet.",
+    "portionQty": "Portion",
+    "portionDay": "Day",
+    "portionLot": "Batch (optional)",
+    "addPortion": "Add portion",
+    "portionAdded": "Portion put on the shelf",
+    "portionFailed": "Could not add the portion",
+    "steps": "Steps",
+    "stepDay": "Day “{{step}}” was done",
+    "stepFailed": "Could not save the step",
+    "cancelConfirm": "Cancelling gives the ingredients this run took back to their stock, in the batches they came from. A run that has already put output on the shelf is finished instead."
   }
 }

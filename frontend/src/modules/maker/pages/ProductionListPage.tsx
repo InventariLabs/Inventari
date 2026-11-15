@@ -33,6 +33,7 @@ import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
 const STATUS_FILTERS: (ProductionStatus | "ALL")[] = [
   "ALL",
   "DRAFT",
+  "IN_PROGRESS",
   "COMPLETED",
   "CANCELLED",
 ];

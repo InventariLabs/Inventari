@@ -47,7 +47,8 @@
       "draft": "Szkic",
       "completed": "Zakończone",
       "cancelled": "Anulowane",
-      "reversed": "Cofnięte"
+      "reversed": "Cofnięte",
+      "in_progress": "W toku"
     },
     "duplicate": "Duplikuj",
     "viewRecipe": "Zobacz recepturę",
@@ -204,7 +205,8 @@
       "totalCostGap_many": "{{count}} składników zeszło z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "totalCostGap_other": "{{count}} składnika zeszło z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "estimatedAtCompletion": "Szacunek przy zamknięciu",
-      "estimatedDifference": "Różnica rzeczywista: {{amount}}"
+      "estimatedDifference": "Różnica rzeczywista: {{amount}}",
+      "takenSoFar": "Pobrane dotąd"
     },
     "ingredients": "Zużyte składniki",
     "emptyLines": "Dla tego zlecenia nie zapisano żadnych składników.",
@@ -401,7 +403,11 @@
     "error": "Nie udało się wczytać drzewa",
     "moved": "Pozycja przeniesiona",
     "moveError": "Przeniesienie nie powiodło się",
-    "dropHint": "Przeciągnij, aby przenieść"
+    "dropHint": "Przeciągnij, aby przenieść",
+    "onHand": "{{qty}} na stanie",
+    "makeFresh": "Zawsze rób świeże",
+    "makeFreshHint": "Zlecenie za każdym razem robi ten składnik z jego receptury, zamiast najpierw brać to, co leży na półce.",
+    "makeFreshFailed": "Nie udało się zmienić linii"
   },
   "pricing": {
     "title": "Kalkulator ceny sprzedaży",
@@ -609,5 +615,38 @@
     "stockSaveFailed": "Nie udało się zapisać zapasu.",
     "stockSavePartial": "Zapisano {{saved}} z {{total}}. Reszta wciąż jest w arkuszu.",
     "locationsFailed": "Nie udało się wczytać miejsc"
+  },
+  "progress": {
+    "start": "Rozpocznij zlecenie",
+    "startConfirm": {
+      "title": "Rozpocząć to zlecenie?",
+      "description": "Składniki schodzą dziś ze stanu, ale zlecenie zostaje otwarte. Wyrób możesz odkładać na półkę porcjami i zakończyć zlecenie innego dnia."
+    },
+    "startDay": "Dzień rozpoczęcia",
+    "startSuccess": "Zlecenie rozpoczęte — składniki pobrane",
+    "startFailed": "Nie udało się rozpocząć zlecenia",
+    "startedOn": "Rozpoczęte",
+    "finish": "Zakończ zlecenie",
+    "finishConfirm": {
+      "title": "Zakończyć to zlecenie?",
+      "description": "To, co jeszcze zostało do odebrania ze zlecenia, trafia teraz na półkę, a zlecenie zamyka się po swoim koszcie."
+    },
+    "finishQty": "Ilość, jaką wyszło z całego zlecenia (opcjonalnie)",
+    "finishQtyHint": "Porcje już odłożone na półkę się liczą. Zostaw puste, aby przyjąć ilość planowaną.",
+    "finishDay": "Dzień zakończenia",
+    "finishSuccess": "Zlecenie zakończone",
+    "finishFailed": "Nie udało się zakończyć zlecenia",
+    "portions": "Dotychczasowy wyrób",
+    "noPortions": "Nic nie trafiło jeszcze na półkę.",
+    "portionQty": "Porcja",
+    "portionDay": "Dzień",
+    "portionLot": "Partia (opcjonalnie)",
+    "addPortion": "Dodaj porcję",
+    "portionAdded": "Porcja odłożona na półkę",
+    "portionFailed": "Nie udało się dodać porcji",
+    "steps": "Kroki",
+    "stepDay": "Dzień wykonania kroku „{{step}}”",
+    "stepFailed": "Nie udało się zapisać kroku",
+    "cancelConfirm": "Anulowanie oddaje składniki pobrane przez to zlecenie do ich stanu, w partiach, z których pochodziły. Zlecenie, które odłożyło już wyrób na półkę, trzeba zakończyć."
   }
 }

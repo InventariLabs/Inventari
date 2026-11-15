@@ -92,6 +92,18 @@ And a rate averages only the layers that carry a cost. An `unknown` layer
 holds 0.00 where nobody named a price; averaged in, it handed the next
 priceless receipt a zero to borrow as the organization's own rate.
 
+## Work in progress
+
+A started production run takes its ingredients off the layers at once and puts
+nothing back until it finishes. The stock value would drop by what they cost
+and return on the day the run ends. A feature that holds such work registers
+a reader (`register_work_in_progress_provider`, `app/core/work_in_progress.py`,
+exported by the module SDK) that answers the value held at a moment; Core adds
+it to the stock value (`stock_value_async`) and to the as-of valuation
+(`StockAsOfReportDTO.work_in_progress_value`, included in `total_value`). The
+amount belongs to no product row and no shelf, so a report narrowed to a
+location or a search leaves it out.
+
 ## Cost basis
 
 ### Estimates share one price policy

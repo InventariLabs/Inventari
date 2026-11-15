@@ -45,7 +45,8 @@
       "draft": "Brouillon",
       "completed": "Terminé",
       "cancelled": "Annulé",
-      "reversed": "Contrepassé"
+      "reversed": "Contrepassé",
+      "in_progress": "En cours"
     },
     "duplicate": "Dupliquer",
     "viewRecipe": "Voir la formule",
@@ -200,7 +201,8 @@
       "totalCostGap_one": "{{count}} ingrédient a été prélevé sur un stock sans coût, il manque donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
       "totalCostGap_other": "{{count}} ingrédients ont été prélevés sur un stock sans coût, ils manquent donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
       "estimatedAtCompletion": "Estimation à la clôture",
-      "estimatedDifference": "Écart réel : {{amount}}"
+      "estimatedDifference": "Écart réel : {{amount}}",
+      "takenSoFar": "Prélevé jusqu’ici"
     },
     "ingredients": "Ingrédients consommés",
     "emptyLines": "Aucun ingrédient n'a été enregistré pour cet ordre.",
@@ -395,7 +397,11 @@
     "error": "Impossible de charger l'arbre",
     "moved": "Ligne déplacée",
     "moveError": "Échec du déplacement",
-    "dropHint": "Glisser pour déplacer"
+    "dropHint": "Glisser pour déplacer",
+    "onHand": "{{qty}} en stock",
+    "makeFresh": "Toujours fabriquer frais",
+    "makeFreshHint": "Une production fabrique cet ingrédient à chaque fois selon sa formule, au lieu de prendre d’abord ce qui est en stock.",
+    "makeFreshFailed": "Impossible de modifier la ligne"
   },
   "pricing": {
     "title": "Calculateur de prix de vente",
@@ -589,5 +595,38 @@
     "stockSaveFailed": "Impossible d'enregistrer le stock.",
     "stockSavePartial": "{{saved}} sur {{total}} enregistrés. Le reste est encore dans la feuille.",
     "locationsFailed": "Impossible de charger les emplacements"
+  },
+  "progress": {
+    "start": "Démarrer l’ordre",
+    "startConfirm": {
+      "title": "Démarrer cet ordre ?",
+      "description": "Les ingrédients sortent du stock aujourd’hui, mais l’ordre reste ouvert. Vous pouvez mettre la production en stock par portions et la terminer un autre jour."
+    },
+    "startDay": "Jour de démarrage",
+    "startSuccess": "Ordre démarré — les ingrédients sont prélevés",
+    "startFailed": "Impossible de démarrer l’ordre",
+    "startedOn": "Démarré",
+    "finish": "Terminer l’ordre",
+    "finishConfirm": {
+      "title": "Terminer cet ordre ?",
+      "description": "Ce qui reste à sortir de l’ordre est mis en stock maintenant, et l’ordre se clôt à son coût."
+    },
+    "finishQty": "Quantité fabriquée par l’ordre entier (facultatif)",
+    "finishQtyHint": "Les portions déjà en stock comptent. Laissez vide pour reprendre la quantité prévue.",
+    "finishDay": "Jour de fin",
+    "finishSuccess": "Ordre terminé",
+    "finishFailed": "Impossible de terminer l’ordre",
+    "portions": "Production à ce jour",
+    "noPortions": "Rien n’a encore été mis en stock.",
+    "portionQty": "Portion",
+    "portionDay": "Jour",
+    "portionLot": "Lot (facultatif)",
+    "addPortion": "Ajouter une portion",
+    "portionAdded": "Portion mise en stock",
+    "portionFailed": "Impossible d’ajouter la portion",
+    "steps": "Étapes",
+    "stepDay": "Jour où « {{step}} » a été fait",
+    "stepFailed": "Impossible d’enregistrer l’étape",
+    "cancelConfirm": "L’annulation remet les ingrédients prélevés par cet ordre dans leur stock, dans les lots d’où ils venaient. Un ordre qui a déjà mis de la production en stock se termine à la place."
   }
 }

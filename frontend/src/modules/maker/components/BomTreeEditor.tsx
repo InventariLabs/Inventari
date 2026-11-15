@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/Card";
 import { extractApiError } from "@/lib/errors";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { useBomTree, useMoveBomLine } from "@/modules/maker/hooks/useBom";
+import { useCanManage } from "@/hooks/useCanWrite";
+import { MakeFreshToggle } from "@/modules/maker/components/MakeFreshToggle";
 import { YieldLossNote } from "@/modules/maker/components/YieldLossNote";
 import type { BomTreeNode } from "@/modules/maker/types/maker";
 
@@ -28,6 +30,7 @@ interface NodeRowProps {
   onDropOnNode: (targetLineId: string) => void;
   collapsed: Record<string, boolean>;
   toggleCollapse: (lineId: string) => void;
+  canManage: boolean;
 }
 
 function NodeRow({
@@ -37,6 +40,7 @@ function NodeRow({
   onDropOnNode,
   collapsed,
   toggleCollapse,
+  canManage,
 }: NodeRowProps) {
   const { t } = useTranslation("maker");
   const hasChildren = node.children.length > 0;
@@ -101,9 +105,10 @@ function NodeRow({
           {formatQuantityLocalized(t, line.qty_per_batch, line.unit)}
         </span>
         <YieldLossNote pct={line.yield_loss_pct} />
+        {hasChildren && <MakeFreshToggle line={line} canManage={canManage} />}
         <Move
           size={12}
-          className="ml-auto text-on-muted opacity-40"
+          className={`${hasChildren ? "" : "ml-auto "}text-on-muted opacity-40`}
           aria-label={t("tree.dropHint")}
         />
       </div>
@@ -117,6 +122,7 @@ function NodeRow({
             onDropOnNode={onDropOnNode}
             collapsed={collapsed}
             toggleCollapse={toggleCollapse}
+            canManage={canManage}
           />
         ))}
     </div>
@@ -130,6 +136,9 @@ function NodeRow({
  */
 export function BomTreeEditor({ templateId, recipeId }: BomTreeEditorProps) {
   const { t } = useTranslation("maker");
+  // The tree is the manager's view of the formula; the flag it toggles
+  // decides what a run takes off the shelf.
+  const canManage = useCanManage("maker");
   const [draggedLineId, setDraggedLineId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
@@ -218,6 +227,7 @@ export function BomTreeEditor({ templateId, recipeId }: BomTreeEditorProps) {
               onDropOnNode={handleDropOnNode}
               collapsed={collapsed}
               toggleCollapse={toggleCollapse}
+              canManage={canManage}
             />
           ))}
         </div>

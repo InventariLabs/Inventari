@@ -79,7 +79,14 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
     );
   }
 
+  /** A refusal from another door (starting the run) opens the same dialog. */
+  function showShortage(entries: ShortageEntry[], born: boolean) {
+    setShortages(entries);
+    setShortAtCreate(born);
+  }
+
   return {
+    showShortage,
     showConfirm,
     setShowConfirm,
     actualQty,

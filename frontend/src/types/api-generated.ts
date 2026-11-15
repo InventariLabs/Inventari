@@ -12325,6 +12325,11 @@ export interface components {
              */
             organization_id: string;
             /**
+             * Recipe Id
+             * Format: uuid
+             */
+            recipe_id: string;
+            /**
              * Parent Template Id
              * Format: uuid
              */

@@ -4,6 +4,7 @@ import type { ProductionStatus } from "@/modules/maker/types/maker";
 
 const COLOR_BY_STATUS: Record<ProductionStatus, string | undefined> = {
   DRAFT: "bg-amber-100 text-amber-700 border-amber-200",
+  IN_PROGRESS: "bg-blue-100 text-on-info border-blue-200",
   COMPLETED: "bg-accent-100 text-accent-700 border-accent-200",
   CANCELLED: "bg-surface-raised text-on-secondary border-border",
   REVERSED: "bg-surface-raised text-on-secondary border-border",

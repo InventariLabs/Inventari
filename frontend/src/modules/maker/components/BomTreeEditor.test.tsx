@@ -1,11 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { BomTreeEditor } from "./BomTreeEditor";
 import { withLanguage } from "@/test/mocks/i18n";
 import type { BomLine, BomTreeNode } from "@/modules/maker/types/maker";
 
 const mocks = vi.hoisted(() => ({
   useBomTree: vi.fn(),
+  updateLine: vi.fn(),
+  canManage: true,
+}));
+
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanManage: () => mocks.canManage,
+}));
+
+vi.mock("@/modules/maker/hooks/useRecipes", () => ({
+  useUpdateBomLine: () => ({ mutate: mocks.updateLine, isPending: false }),
 }));
 
 vi.mock("@/modules/maker/hooks/useBom", () => ({
@@ -129,6 +139,65 @@ describe("BomTreeEditor", () => {
 
       expect(screen.getByText("2,5 szt.")).toBeInTheDocument();
       expect(screen.queryByText(/2\.5\s+pcs/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("an ingredient that has a BOM of its own", () => {
+    const withSubAssembly = (over: Partial<BomLine>): BomTreeNode => ({
+      line: null,
+      children: [
+        {
+          line: {
+            ...line("dough"),
+            recipe_id: "recipe-bread",
+            make_fresh: false,
+            stock_on_hand: "3",
+            ...over,
+          } as BomLine,
+          children: [{ line: line("flour"), children: [] }],
+        },
+      ],
+    });
+
+    it("says what the shelf holds of it, taken before it is made", () => {
+      renderTree(withSubAssembly({}));
+
+      expect(screen.getByTestId("maker-tree-on-hand")).toHaveTextContent(
+        /3.* on hand/i,
+      );
+    });
+
+    it("stops saying so once the line is made fresh every time", () => {
+      renderTree(withSubAssembly({ make_fresh: true }));
+
+      expect(screen.queryByTestId("maker-tree-on-hand")).toBeNull();
+      expect(screen.getByLabelText(/always make fresh/i)).toBeChecked();
+    });
+
+    it("marks the line fresh on the recipe the line belongs to", () => {
+      renderTree(withSubAssembly({}));
+
+      fireEvent.click(screen.getByTestId("maker-tree-make-fresh-dough"));
+
+      expect(mocks.updateLine.mock.calls[0][0]).toEqual({
+        recipeId: "recipe-bread",
+        lineId: "dough",
+        data: { make_fresh: true },
+      });
+    });
+
+    it("leaves the flag to the manager", () => {
+      mocks.canManage = false;
+      renderTree(withSubAssembly({}));
+
+      expect(screen.getByTestId("maker-tree-make-fresh-dough")).toBeDisabled();
+      mocks.canManage = true;
+    });
+
+    it("offers no toggle on a plain ingredient", () => {
+      renderTree(tree("a"));
+
+      expect(screen.queryByLabelText(/always make fresh/i)).toBeNull();
     });
   });
 });

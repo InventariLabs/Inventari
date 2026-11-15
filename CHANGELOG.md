@@ -14,6 +14,24 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A production run can be started, filled in portions and finished on
+  different days, for wine, cheese, beer, ferments and anything else that
+  matures. **Start run** takes the ingredients off the records on the day you
+  name and leaves the run *In progress* (in the list, on its page and in To
+  do); **Add portion** puts part of the output on the shelf with its own day and
+  batch; the BOM's process steps are ticked with the day each was done; **Finish
+  run** closes it on a later day at the quantity the whole run made, and its
+  unit cost divides what the start took by what came out. Cancelling a run in
+  progress gives the ingredients back to the batches they came from. What a
+  started run took is counted as work in progress in the stock value and in the
+  as-of valuation (`work_in_progress_value`), so the warehouse does not look
+  poorer between start and finish. New endpoints: `POST
+  /maker/production/orders/{id}/start`, `/portions` and `/finish`, and `PUT
+  .../steps/{index}`; modules that report a stock value can register a reader
+  with `register_work_in_progress_provider`.
+- A BOM line can be marked **Always make fresh**: an ingredient that has a BOM
+  of its own is then made through it every time and never taken from stock.
+
 - The MCP Server module serves the Model Context Protocol over Streamable HTTP
   at `/api/v1/mcp-server/mcp`, authenticated with an API key that holds
   `mcp_server:use` and acts only in the key's organization. Seven read tools
@@ -87,6 +105,13 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- An ingredient that has a BOM of its own is now taken from its own stock first,
+  and only the part that stock does not cover is made through its BOM — the
+  dough made yesterday is used before flour is taken again. The availability
+  check, the preview and cost estimate, the shortage list, the shopping and
+  purchase suggestions, the multi-level view and the run itself agree on that
+  split. Existing lines take stock first after the upgrade; mark a line
+  **Always make fresh** to keep the earlier behaviour of making it every time.
 - **Breaking:** a production formula's `process_steps` are objects
   (`{text, minutes}`) rather than bare sentences, so a step can carry its
   duration. Writers may still send plain strings, which are stored as steps

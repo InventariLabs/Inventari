@@ -16,6 +16,8 @@ class BoMLineRead(BaseModel):
 
     id: UUID
     organization_id: UUID
+    #: The recipe the line belongs to — the one its edit is addressed to.
+    recipe_id: UUID
     parent_template_id: UUID
     child_template_id: UUID
     qty_per_batch: Decimal
