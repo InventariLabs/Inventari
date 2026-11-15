@@ -537,13 +537,21 @@ apart.
 | `PRICELIST_VALID_TO_BEFORE_VALID_FROM` | valid_to ({valid_to}) must be >= valid_from ({valid_from}) |
 | `PRINT_JOB_NOTHING_TO_PRINT` | Nothing to print: none of the chosen labels was found |
 | `PRINT_JOB_ONE_TARGET` | Send exactly one kind of label: pool labels by id, pool labels by code, or storage locations. |
+| `PRINT_JOB_TOO_MANY_COPIES` | Up to {limit} copies of a label at once. |
 | `PRODUCTION_ACTUAL_QTY_MUST_BE_POSITIVE` | The produced quantity must be greater than zero. |
+| `PRODUCTION_BATCH_CHOICE_MISMATCH` | The batches chosen for {ingredient} give {chosen}, but the run takes {needed}. |
+| `PRODUCTION_BATCH_NOT_AN_INGREDIENT` | {ingredient} is not an ingredient of this run. |
+| `PRODUCTION_BATCH_OF_ANOTHER_PRODUCT` | Batch {batch} is not a batch of {ingredient}. |
+| `PRODUCTION_BATCH_SHORT` | Batch {batch} of {ingredient} has {available} free, not the {chosen} chosen — it may be on hold, reserved or used up. |
+| `PRODUCTION_BEST_BEFORE_BEFORE_MADE` | The best-before date {best_before} is before the day the run was made ({made}). |
 | `PRODUCTION_CANCEL_NOT_DRAFT` | This production order already has status {status} — only a draft can be cancelled. |
 | `PRODUCTION_COMPLETE_NOT_DRAFT` | This production order already has status {status} — only a draft can be completed. |
 | `PRODUCTION_NO_RECIPE` | No BOM for this product — create a BOM first |
+| `PRODUCTION_OUTPUT_BATCH_MISSING` | This run put its output in no batch, so there is no batch to hold or release. |
 | `PRODUCTION_OVERPRODUCTION_DISABLED` | Overproduction is disabled in settings — this order cannot produce more than planned. |
 | `PRODUCTION_RECIPE_NOT_FOUND` | BOM {recipe_id} not found in this organization |
 | `PRODUCTION_RECIPE_PRODUCT_MISMATCH` | This BOM does not belong to this product |
+| `PRODUCTION_RECORD_NOT_COMPLETED` | A batch record exists only for a completed run. |
 | `PRODUCTION_REVERSE_NOT_COMPLETED` | This production run is {status}, so there is nothing to take back — only a completed run can be undone. |
 | `PRODUCTION_REVERSE_OUTPUT_USED` | This run cannot be undone: some of what it made has already left its location. Record a stock correction for what is left instead. |
 | `PRODUCTION_UPDATE_NOT_DRAFT` | This production order already has status {status} — only a draft can be edited. |

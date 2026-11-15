@@ -12,6 +12,9 @@ import {
   useRecordMadeProduction,
 } from "@/modules/maker/hooks/useProduction";
 import { parseShortageError } from "@/modules/maker/lib/shortageError";
+import { defaultBestBefore } from "@/modules/maker/lib/bestBefore";
+import { useBatchChoice } from "@/modules/maker/hooks/useBatchChoice";
+import type { IngredientBatchQuery } from "@/modules/maker/api/batches";
 import type { ProductOption } from "@/modules/maker/api/products";
 import type {
   ProductionMode,
@@ -82,6 +85,19 @@ function buildPayload({
   };
 }
 
+/** The run the ingredient batch plan is asked for, once the form names one. */
+function batchQueryOf(
+  payload: ProductionOrderCreateInput | null,
+): IngredientBatchQuery | null {
+  if (!payload) return null;
+  return {
+    output_template_id: payload.output_template_id,
+    planned_qty: String(payload.planned_qty),
+    output_location_id: payload.output_location_id,
+    recipe_id: payload.recipe_id ?? null,
+  };
+}
+
 /**
  * The production sheet's form: what is being recorded, where, how much, and
  * the live preview of what that run takes.
@@ -105,9 +121,13 @@ export function useProductionForm(
   const [productionDate, setProductionDate] = useState(todayIso);
   const [notes, setNotes] = useState("");
   const [outputLotName, setOutputLotName] = useState("");
+  // The best-before the person typed; null follows the proposal (today plus
+  // the product's shelf life) until they change it.
+  const [typedBestBefore, setBestBefore] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) return;
+    setBestBefore(null);
     setMode("made");
     setSelected(null);
     setQty("");
@@ -165,6 +185,14 @@ export function useProductionForm(
     [previewKey],
   );
   const preview = useProductionPreview(open ? previewPayload : null);
+  // A run already made says which batches it took; a plan decides that when
+  // it closes.
+  const batches = useBatchChoice(
+    open && mode === "made" ? batchQueryOf(previewPayload) : null,
+  );
+  const bestBefore =
+    typedBestBefore ??
+    defaultBestBefore(todayIso(), preview.data?.shelf_life_days);
 
   const unit = preview.data?.planned_uom_symbol ?? selected?.uom_symbol ?? null;
   // The recipe is written per batch; the person writes what came out.
@@ -195,6 +223,10 @@ export function useProductionForm(
     setNotes,
     outputLotName,
     setOutputLotName,
+    bestBefore,
+    setBestBefore,
+    shelfLifeDays: preview.data?.shelf_life_days ?? null,
+    batches,
     requirements,
     canPreview: requirements.length === 0,
     payload,
@@ -263,7 +295,12 @@ export function useProductionSave(
       return;
     }
     if (form.mode === "made") {
-      madeMutation.mutate(payload, {
+      const made = {
+        ...payload,
+        best_before: form.bestBefore || null,
+        ingredient_lots: form.batches.payload,
+      };
+      madeMutation.mutate(made, {
         onSuccess: (order) => finish(order.id, t("create.successMade")),
         onError: (err) => refuse(err, false),
       });

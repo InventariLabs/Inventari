@@ -45,6 +45,7 @@ async def consume_across_locations(
     user_id: UUID,
     reference_id: UUID,
     location_id: UUID | None = None,
+    lot_id: UUID | None = None,
 ) -> list[ConsumptionRecord]:
     """Consume ``quantity`` of a template from available stock.
 
@@ -52,7 +53,8 @@ async def consume_across_locations(
     draw under: None draws on every location the organization has (the
     GLOBAL scope — the behaviour this function was born with), a location
     narrows the draw to that shelf, so the run eats exactly the stock it
-    was checked against and not a batch the check never saw.
+    was checked against and not a batch the check never saw. ``lot_id``
+    takes that batch and no other — the batch the person chose for it.
 
     Order and refusal are Core's: FEFO by earliest expiry or use-by date,
     FIFO by age otherwise, and a ``ValueError`` before anything is
@@ -90,6 +92,7 @@ async def consume_across_locations(
             product_template_id,
             location_id,
             quantity,
+            lot_id=lot_id,
             removal_strategy=getattr(child_template, 'removal_strategy', None),
             any_owner=True,
             history_changes=history_changes,

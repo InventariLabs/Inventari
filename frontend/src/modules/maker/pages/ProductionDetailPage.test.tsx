@@ -24,6 +24,8 @@ vi.mock("sonner", () => ({
 import { toast } from "sonner";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { withLanguage } from "@/test/mocks/i18n";
+import { http, HttpResponse } from "msw";
+import { server } from "@/test/mocks/server";
 
 const draftOrder: ProductionOrder = {
   id: "ord-1",
@@ -660,5 +662,58 @@ describe("ProductionDetailPage — the draft says when its quantities are read",
       screen.getByText(/consumed as planned regardless/i),
     ).toBeInTheDocument();
     currentPlanned = undefined;
+  });
+});
+
+describe("ProductionDetailPage — closing a run dates its batch and names its ingredients' batches", () => {
+  it("proposes the best-before from the shelf life and sends it with the batch chosen", async () => {
+    server.use(
+      http.get("*/api/v1/maker/production/ingredient-batches", () =>
+        HttpResponse.json({
+          ingredients: [
+            {
+              template_id: "tpl-honey",
+              template_name: "Honey",
+              uom_symbol: "kg",
+              needed: "6",
+              plan: [{ lot_id: "early", lot_name: "H-EARLY", quantity: "6" }],
+              batches: [
+                { lot_id: "early", lot_name: "H-EARLY", available: "10" },
+                { lot_id: "late", lot_name: "H-LATE", available: "10" },
+              ],
+            },
+          ],
+        }),
+      ),
+    );
+    currentOrder = {
+      ...draftOrder,
+      production_date: "2025-11-02",
+      shelf_life_days: 30,
+    };
+    completeMutate.mockClear();
+    renderPage();
+
+    fireEvent.click(screen.getByTestId("maker-detail-complete-button"));
+    const scan = await screen.findByTestId("maker-batch-scan-input");
+    fireEvent.change(scan, { target: { value: "H-LATE" } });
+    fireEvent.keyDown(scan, { key: "Enter" });
+    const confirmButtons = screen.getAllByRole("button", {
+      name: "Complete run",
+    });
+    fireEvent.click(confirmButtons[confirmButtons.length - 1]);
+
+    expect(completeMutate).toHaveBeenCalledWith(
+      {
+        orderId: "ord-1",
+        data: {
+          best_before: "2025-12-02",
+          ingredient_lots: [
+            { template_id: "tpl-honey", lot_id: "late", quantity: "6" },
+          ],
+        },
+      },
+      expect.anything(),
+    );
   });
 });

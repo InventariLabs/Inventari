@@ -84,6 +84,24 @@ says what the release does rather than what changed since them.
   run can name the batch its output goes into, and the trace follows it on to
   that batch and its own customers. The trace exports as a spreadsheet to hand
   to an inspector.
+- A production run files its output under a dated batch. A run nobody named a
+  batch for names its own from its day and a counter, unique among the
+  product's batches. The batch carries the day the run was made and a
+  best-before of that day plus the product's shelf life — set in days on the
+  card of a product that has a BOM — which the person closing the run may
+  change; the stock it puts away carries the same date, so the expiry lists,
+  To do and the earliest-date-first order treat made goods like received ones.
+  Before a run closes, its screen shows which batch each ingredient will be
+  taken from and lets the person pick another from a list or by scanning its
+  label; the run then takes exactly those batches. A finished run prints
+  labels for its batch — the product, the batch code in bars, the production
+  date and the best-before, one per unit made — opens a one-page batch record
+  that prints on A4 and reads on a phone, puts the batch on hold and releases
+  it, and keeps photos and files filed under it. At home the run speaks of
+  jars and a best-before date and never asks for a batch code. The printing
+  module draws batch labels (`lot_ids`, `POST /printing/lot-labels/png`, up to
+  two hundred copies), and the module SDK exports the upload policy a module
+  checks its own attachments with.
 
 ### Changed
 

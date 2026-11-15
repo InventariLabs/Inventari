@@ -19,13 +19,15 @@ export type PrintJob = components["schemas"]["PrintJobResponse"];
 export type PrintJobStatus = PrintJob["status"];
 
 /** What to print: exactly one kind of target. `itemIds` prints products'
- *  barcode labels; `packageLabel` one package of a dispatch, whose label the
- *  warehouse words and queues. */
+ *  barcode labels; `lotIds` batch labels (the product, the batch code in
+ *  bars, made and best-before); `packageLabel` one package of a dispatch,
+ *  whose label the warehouse words and queues. */
 export type PrintTarget =
   | { labelIds: string[] }
   | { shortCodes: string[] }
   | { storageIds: string[] }
   | { itemIds: string[] }
+  | { lotIds: string[] }
   | { packageLabel: { documentId: string; packageId: string } };
 
 /** The label download's options, so the printed strip matches the file. */
@@ -52,6 +54,7 @@ function targetBody(target: Exclude<PrintTarget, { packageLabel: unknown }>) {
   if ("labelIds" in target) return { label_ids: target.labelIds };
   if ("shortCodes" in target) return { short_codes: target.shortCodes };
   if ("itemIds" in target) return { item_ids: target.itemIds };
+  if ("lotIds" in target) return { lot_ids: target.lotIds };
   return { location_ids: target.storageIds };
 }
 

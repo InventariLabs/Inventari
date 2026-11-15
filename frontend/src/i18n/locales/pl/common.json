@@ -650,6 +650,8 @@
         "skipped": "Pominięte wiersze",
         "approval": "Akceptacja",
         "labor_hourly_rate": "Stawka godzinowa pracy",
+        "shelf_life_days_before": "Okres przydatności przed (dni)",
+        "shelf_life_days_after": "Okres przydatności po (dni)",
         "typed_unit_price_before": "Cena wpisana przed",
         "typed_unit_price_after": "Cena wpisana po"
       },

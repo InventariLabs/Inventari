@@ -546,6 +546,18 @@ export const queryKeys = {
     /** What a run on the production sheet would take and cost, per form state. */
     productionPreview: (payload: unknown) =>
       ["maker", "production-preview", payload] as const,
+    /** The batches each ingredient of a run would be taken from. */
+    ingredientBatches: (query: unknown) =>
+      ["maker", "ingredient-batches", query] as const,
+    /** A completed run's batch record; under the run's own key. */
+    batchRecord: (orderId: string) =>
+      ["maker", "production", orderId, "record"] as const,
+    /** The photos and files filed under a run. */
+    runAttachments: (orderId: string) =>
+      ["maker", "production", orderId, "attachments"] as const,
+    /** A product's shelf life in days, as the maker keeps it. */
+    shelfLife: (templateId: string) =>
+      ["maker", "shelf-life", templateId] as const,
     breakdown: (templateId: string, qty: string, recipeId?: string | null) =>
       ["maker", "breakdown", templateId, qty, recipeId ?? null] as const,
     /** Placeholder for a breakdown query that is disabled until a template is chosen. */

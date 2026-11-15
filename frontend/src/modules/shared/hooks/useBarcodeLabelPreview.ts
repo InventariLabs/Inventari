@@ -2,10 +2,25 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api/client";
 import { extractApiError } from "@/lib/errors";
 
-/** Whose labels with bars: products', or shelves' — a location's code in
- *  Code 128 for a 1D scanner. */
+/** Whose labels with bars: products', shelves' — a location's code in
+ *  Code 128 for a 1D scanner — or batches', the batch's own code in bars
+ *  with the day it was made and its best-before. */
 export type BarcodeLabelTarget =
-  { itemIds: string[] } | { storageIds: string[] };
+  { itemIds: string[] } | { storageIds: string[] } | { lotIds: string[] };
+
+type TargetKind = "items" | "storages" | "lots";
+
+function targetKind(target: BarcodeLabelTarget): TargetKind {
+  if ("itemIds" in target) return "items";
+  if ("lotIds" in target) return "lots";
+  return "storages";
+}
+
+function targetOf(kind: TargetKind, ids: string[]): BarcodeLabelTarget {
+  if (kind === "items") return { itemIds: ids };
+  if (kind === "lots") return { lotIds: ids };
+  return { storageIds: ids };
+}
 
 export interface BarcodeLabelOptions {
   width: number;
@@ -27,7 +42,35 @@ export interface BarcodeLabelFile {
 }
 
 function targetIds(target: BarcodeLabelTarget): string[] {
-  return "itemIds" in target ? target.itemIds : target.storageIds;
+  if ("itemIds" in target) return target.itemIds;
+  if ("lotIds" in target) return target.lotIds;
+  return target.storageIds;
+}
+
+function postLabels(target: BarcodeLabelTarget, options: BarcodeLabelOptions) {
+  const size = {
+    width_mm: options.width,
+    height_mm: options.height,
+    copies: options.copies,
+  };
+  const asBlob = { responseType: "blob" } as const;
+  if ("itemIds" in target)
+    return api.post<Blob>(
+      "/printing/product-labels/png",
+      { item_ids: target.itemIds, details: options.details, ...size },
+      asBlob,
+    );
+  if ("lotIds" in target)
+    return api.post<Blob>(
+      "/printing/lot-labels/png",
+      { lot_ids: target.lotIds, ...size },
+      asBlob,
+    );
+  return api.post<Blob>(
+    "/printing/location-labels/png",
+    { location_ids: target.storageIds, qr: options.qr, ...size },
+    asBlob,
+  );
 }
 
 /** The labels as one PNG — the preview and the download. */
@@ -35,23 +78,7 @@ export async function fetchBarcodeLabels(
   target: BarcodeLabelTarget,
   options: BarcodeLabelOptions,
 ): Promise<BarcodeLabelFile> {
-  const size = {
-    width_mm: options.width,
-    height_mm: options.height,
-    copies: options.copies,
-  };
-  const response =
-    "itemIds" in target
-      ? await api.post<Blob>(
-          "/printing/product-labels/png",
-          { item_ids: target.itemIds, details: options.details, ...size },
-          { responseType: "blob" },
-        )
-      : await api.post<Blob>(
-          "/printing/location-labels/png",
-          { location_ids: target.storageIds, qr: options.qr, ...size },
-          { responseType: "blob" },
-        );
+  const response = await postLabels(target, options);
   const withDetails = response.headers["x-labels-with-details"];
   return {
     blob: response.data,
@@ -89,9 +116,12 @@ export function useBarcodeLabelPreview(
   });
   const [url, setUrl] = useState<string | null>(null);
   const currentUrl = useRef<string | null>(null);
-  const kind = "itemIds" in target ? "items" : "storages";
+  const kind = targetKind(target);
   const ids = targetIds(target).join(",");
-  const { width, height, copies, details, qr } = options;
+  // A batch prints one label per unit made — up to two hundred of the same
+  // label. The preview shows one; the download and the printer get them all.
+  const { width, height, details, qr } = options;
+  const copies = kind === "lots" ? 1 : options.copies;
 
   useEffect(() => {
     if (ids === "" || width <= 0 || height <= 0) return;
@@ -100,10 +130,13 @@ export function useBarcodeLabelPreview(
 
     const timer = setTimeout(() => {
       const chosen = ids.split(",");
-      fetchBarcodeLabels(
-        kind === "items" ? { itemIds: chosen } : { storageIds: chosen },
-        { width, height, copies, details, qr },
-      )
+      fetchBarcodeLabels(targetOf(kind, chosen), {
+        width,
+        height,
+        copies,
+        details,
+        qr,
+      })
         .then(({ blob, withoutCode, withDetails }) => {
           if (cancelled) return;
           const previous = currentUrl.current;

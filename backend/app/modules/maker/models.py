@@ -14,6 +14,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     Numeric,
     String,
     UniqueConstraint,
@@ -308,6 +309,12 @@ class ProductionOrder(Base):
     # named batch is what lets a recall of an ingredient follow the run to
     # the goods it made and on to their customers.
     output_lot_name: Mapped[str | None] = mapped_column(String(100))
+    #: The batch the output went into, set when the run completes: the one
+    #: named above, or the one the run named for itself when nobody did.
+    output_lot_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('stock_lots.id', ondelete='SET NULL'),
+        nullable=True,
+    )
     created_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey('users.id'),
         nullable=True,
@@ -434,6 +441,85 @@ class MakerIngredientPrice(Base):
         nullable=False,
         default=utc_now,
         onupdate=utc_now,
+    )
+
+
+class MakerShelfLife(Base):
+    """How many days a product keeps once made, in one organization.
+
+    A run dates its output batch from it: best before is the run's day plus
+    these days, which the person closing the run may change. One row per
+    product and organization, for the reason the typed prices are kept here:
+    a product can be a catalogue row shared by every organization.
+    """
+
+    __tablename__ = 'maker_shelf_lives'
+    __table_args__ = (
+        UniqueConstraint(
+            'organization_id',
+            'product_template_id',
+            name='uq_maker_shelf_life_org_template',
+        ),
+        CheckConstraint('shelf_life_days > 0', name='ck_maker_shelf_life_positive'),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    product_template_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('product_templates.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    shelf_life_days: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+
+class ProductionAttachment(Base):
+    """A photo or a file filed under a production run."""
+
+    __tablename__ = 'maker_production_attachments'
+    __table_args__ = (
+        Index(
+            'ix_maker_attachment_order',
+            'organization_id',
+            'production_order_id',
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    production_order_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('maker_production_orders.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    #: Relative to the organization's ``maker`` folder: ``<order>/<uuid>.<ext>``.
+    file_path: Mapped[str] = mapped_column(String(500), nullable=False)
+    original_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
+    uploaded_by: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('users.id', ondelete='SET NULL'),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
     )
 
 
