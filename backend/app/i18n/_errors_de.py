@@ -470,6 +470,8 @@ ERRORS_DE: ErrorMessages = {
     ),
     'cost_line_not_found': 'Kostenposition nicht gefunden',
     'production_order_not_found': 'Produktionsauftrag nicht gefunden',
+    'production_needs_scope': 'Der Bedarf geplanter Aufträge wird für einen Auftrag oder für beide Enden eines Zeitraums gelesen',
+    'production_needs_period_reversed': 'Der Zeitraum endet, bevor er beginnt',
     'production_no_recipe': (
         'Keine Formel für dieses Produkt — legen Sie zuerst eine Formel an'
     ),

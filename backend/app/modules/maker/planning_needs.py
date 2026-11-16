@@ -37,6 +37,7 @@ from app.core.contracts import (
     UomDTO,
     UserContextDTO,
 )
+from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 from app.i18n import Language
 
@@ -215,6 +216,19 @@ def _claim_in_queue(
     return tally
 
 
+def ensure_scope(
+    date_from: date | None, date_to: date | None, order_id: UUID | None
+) -> None:
+    """Refuse a request that names neither one run nor a whole period, or both."""
+    if date_from is not None and date_to is not None:
+        if order_id is not None:
+            raise ServiceRejectionError('production_needs_scope')
+        if date_from > date_to:
+            raise ServiceRejectionError('production_needs_period_reversed')
+    elif order_id is None or date_from is not None or date_to is not None:
+        raise ServiceRejectionError('production_needs_scope')
+
+
 def _selector(
     date_from: date | None, date_to: date | None, order_id: UUID | None
 ) -> Callable[[ProductionOrder], bool]:
@@ -253,6 +267,7 @@ async def needs_for(
     (the order ``planning_service`` queues them in), so ``in_stock`` is what
     is left for the period, not what the shelf holds today.
     """
+    ensure_scope(date_from, date_to, order_id)
     queue = await planning_service.queued_drafts(db, organization_id)
 
     selected = _selector(date_from, date_to, order_id)

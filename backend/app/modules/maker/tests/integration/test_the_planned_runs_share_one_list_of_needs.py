@@ -473,3 +473,37 @@ class TestOrderingWhatIsMissing:
         assert run['name'] == 'Dough'
         assert Decimal(run['planned_qty']) == Decimal('5')
         assert run['production_date'] == _MONDAY.isoformat()
+
+
+class TestTheScopeOfARequest:
+    def test_a_request_naming_nothing_is_refused(
+        self, client: TestClient, headers: dict[str, str]
+    ) -> None:
+        response = client.get(f'{_API}/needs', headers=headers)
+
+        assert response.status_code == 400, response.text
+
+    def test_half_a_period_is_refused(
+        self, client: TestClient, headers: dict[str, str]
+    ) -> None:
+        response = client.get(
+            f'{_API}/needs',
+            headers=headers,
+            params={'date_from': _MONDAY.isoformat()},
+        )
+
+        assert response.status_code == 400, response.text
+
+    def test_a_period_that_ends_before_it_starts_is_refused(
+        self, client: TestClient, headers: dict[str, str]
+    ) -> None:
+        response = client.get(
+            f'{_API}/needs',
+            headers=headers,
+            params={
+                'date_from': _MONDAY.isoformat(),
+                'date_to': (_MONDAY - timedelta(days=1)).isoformat(),
+            },
+        )
+
+        assert response.status_code == 400, response.text

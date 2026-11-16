@@ -468,6 +468,8 @@ ERRORS_ES: ErrorMessages = {
     ),
     'cost_line_not_found': 'Línea de coste no encontrada',
     'production_order_not_found': 'Orden de producción no encontrada',
+    'production_needs_scope': 'Las necesidades de las órdenes planificadas se leen para una orden, o para los dos extremos de un periodo',
+    'production_needs_period_reversed': 'El periodo termina antes de empezar',
     'production_no_recipe': (
         'No hay fórmula para este producto — cree primero una fórmula'
     ),

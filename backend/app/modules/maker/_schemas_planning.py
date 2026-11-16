@@ -7,7 +7,7 @@ from decimal import Decimal
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict
 
 
 class ExpectedDeliveryRead(BaseModel):
@@ -59,18 +59,6 @@ class NeedsScope(BaseModel):
     order_id: UUID | None = None
     date_from: date | None = None
     date_to: date | None = None
-
-    @model_validator(mode='after')
-    def _one_or_the_other(self) -> NeedsScope:
-        start, end = self.date_from, self.date_to
-        if start is not None and end is not None:
-            if self.order_id is not None:
-                raise ValueError('Name one run, or both ends of a period.')
-            if start > end:
-                raise ValueError('The period ends before it starts.')
-        elif self.order_id is None or start is not None or end is not None:
-            raise ValueError('Name one run, or both ends of a period.')
-        return self
 
 
 class OrderedLineRead(BaseModel):

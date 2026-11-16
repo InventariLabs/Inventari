@@ -16,7 +16,7 @@ from app.core.deps import (
     require_org,
     require_permission,
 )
-from app.core.exceptions import UnprocessableException, map_service_errors
+from app.core.exceptions import map_service_errors
 from app.core.modules import require_module
 from app.i18n.service import get_current_lang
 
@@ -41,6 +41,7 @@ def _row(row: planning_needs.NeedRow) -> NeedRowRead:
 
 
 @router.get('', response_model=NeedsRead)
+@map_service_errors
 async def get_combined_needs(
     date_from: date_type | None = Query(None),
     date_to: date_type | None = Query(None),
@@ -55,16 +56,8 @@ async def get_combined_needs(
     expect (with their dates) and what is still missing. ``on_order`` is null
     while purchasing is off.
     """
-    try:
-        scope = NeedsScope(order_id=order_id, date_from=date_from, date_to=date_to)
-    except ValueError as exc:
-        raise UnprocessableException('needs_scope', str(exc)) from exc
     view = await planning_needs.needs_for(
-        db,
-        org_id,
-        date_from=scope.date_from,
-        date_to=scope.date_to,
-        order_id=scope.order_id,
+        db, org_id, date_from=date_from, date_to=date_to, order_id=order_id
     )
     return NeedsRead(
         rows=[_row(r) for r in view.rows],

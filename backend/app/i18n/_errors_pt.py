@@ -368,6 +368,8 @@ ERRORS_PT: dict[str, str] = {
     'bom_depth_exceeded': 'Esta lista de materiais está aninhada em mais de {max_depth} níveis — profunda demais para ser resolvida.',
     'cost_line_not_found': 'Linha de custo não encontrada',
     'production_order_not_found': 'Ordem de produção não encontrada',
+    'production_needs_scope': 'As necessidades das ordens planeadas leem-se para uma ordem ou para os dois extremos de um período',
+    'production_needs_period_reversed': 'O período termina antes de começar',
     'production_no_recipe': 'Não há lista de materiais para este produto — crie uma lista de materiais primeiro',
     'production_recipe_not_found': 'Lista de materiais {recipe_id} não encontrada nesta organização',
     'production_recipe_product_mismatch': 'Esta lista de materiais não pertence a este produto',
