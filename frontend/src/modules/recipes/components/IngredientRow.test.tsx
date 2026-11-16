@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import IngredientRow from "./IngredientRow";
 import { signInWith, signOut } from "@/test/auth";
+import { renderWithProviders } from "@/test/utils";
 import type { IngredientAvailability } from "@/modules/recipes/types/core";
+import type { Uom, UomCategory } from "@/types";
 
 // Linking and the exclusion toggle are `recipes:write` on the API; the row
 // asks `useCanWrite` before offering them.
@@ -34,6 +36,35 @@ vi.mock("../hooks/useRecipes", () => ({
     isPending: false,
   }),
 }));
+
+// Which unit a correction can bridge from is the UoM catalogue's answer: a
+// product counted in pieces gets a per-piece weight, a product kept by weight
+// or volume does not. The row asks the same catalogue the product form asks.
+const catalogue = vi.hoisted(() => ({ categories: [] as UomCategory[] }));
+vi.mock("@/modules/shared/hooks/useUoms", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/modules/shared/hooks/useUoms")>();
+  return { ...actual, useUoms: () => ({ data: catalogue.categories }) };
+});
+
+function uomCatalogue(...categories: string[][]) {
+  catalogue.categories = categories.map(([name, ...symbols], index) => ({
+    id: `cat-${index}`,
+    name,
+    uoms: symbols.map((symbol): Uom => {
+      return {
+        id: `uom-${symbol}`,
+        category_id: `cat-${index}`,
+        name: symbol,
+        symbol,
+        factor: "1",
+        is_reference: true,
+        is_system: true,
+        rounding: "0.01",
+      };
+    }),
+  }));
+}
 
 const base: IngredientAvailability = {
   ingredient_id: "i1",
@@ -479,6 +510,67 @@ describe("IngredientRow — measures that cannot be compared", () => {
     expect(screen.getByTestId("not-comparable").textContent).toContain(
       "weight or volume per piece",
     );
+  });
+
+  it.each([
+    ["Weight", "kg"],
+    ["Volume", "l"],
+  ])(
+    "does not send a line in pieces to a field the %s product's form hides",
+    (category, unit) => {
+      // The product is kept in a continuous unit: its form hides the
+      // per-piece weight (one stock unit already *is* that measure), so the
+      // link named a field the reader would never find. The correction that
+      // exists is the line's own amount, given in the stock's measure.
+      uomCatalogue([category, unit], ["Unit", "pcs"]);
+      const weighed: IngredientAvailability = {
+        ...incomparable,
+        name: "Towar luzem",
+        required_quantity: 1,
+        required_uom: "pcs",
+        available_quantity: 2,
+        available_uom: unit,
+        best_item: {
+          item_id: `item-${unit}`,
+          available_quantity: 2,
+          uom_symbol: unit,
+          expiry_date: null,
+          location: "Shelf A",
+          fefo_days_left: null,
+          expired: false,
+        },
+      };
+
+      render(<IngredientRow ingredient={weighed} />);
+
+      const note = screen.getByTestId("not-comparable");
+      expect(note.textContent).toContain(`Stock is kept in ${unit}`);
+      expect(note.textContent).not.toContain("weight or volume per piece");
+      // No link: the product's form cannot record what one piece of it holds.
+      expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    },
+  );
+
+  it("still points at the per-piece field when the product is counted", () => {
+    uomCatalogue(["Weight", "kg"], ["Unit", "pcs"]);
+    const counted: IngredientAvailability = {
+      ...incomparable,
+      best_item: {
+        item_id: "item-pcs",
+        available_quantity: 7,
+        uom_symbol: "pcs",
+        expiry_date: null,
+        location: null,
+        fefo_days_left: null,
+        expired: false,
+      },
+    };
+
+    renderWithProviders(<IngredientRow ingredient={counted} />);
+
+    expect(
+      screen.getByRole("link", { name: /weight or volume per piece/i }),
+    ).toHaveAttribute("href", "/inventory/items/item-pcs");
   });
 
   it("marks the row as uncomparable rather than in stock", () => {

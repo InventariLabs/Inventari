@@ -62,6 +62,7 @@
     "insufficient": "No alcanza",
     "short_of": "{{available}} en stock de los {{required}} necesarios",
     "not_comparable_hint": "Las existencias se cuentan en otra medida. Anota el peso o volumen por pieza en el producto para poder compararlas.",
+    "not_comparable_measured": "El stock se lleva en {{unit}} — las piezas no se pueden comparar con él. Anota la cantidad de esta línea en {{unit}} en su lugar.",
     "fefo_expiry": "Vida útil corta: {{date}}",
     "expired_since": "Caducado el {{date}}",
     "fractional_hint": "Cantidad fraccionaria – ajustar porciones",

@@ -62,6 +62,7 @@
     "insufficient": "Zu wenig",
     "short_of": "{{available}} vorhanden von {{required}} benötigt",
     "not_comparable_hint": "Der Bestand wird in einer anderen Maßeinheit geführt. Hinterlege Gewicht oder Volumen pro Stück am Produkt, damit beide vergleichbar werden.",
+    "not_comparable_measured": "Der Bestand wird in {{unit}} geführt — Stücke lassen sich damit nicht vergleichen. Geben Sie die Menge dieser Position stattdessen in {{unit}} an.",
     "fefo_expiry": "Kurze Haltbarkeit: {{date}}",
     "expired_since": "Abgelaufen am {{date}}",
     "fractional_hint": "Bruchmenge – Portionen anpassen",
