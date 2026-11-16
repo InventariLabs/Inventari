@@ -1727,8 +1727,8 @@ label** section:
   product's name suggests: **Confirm the suggestion**, **Contains none**, or
   **Choose allergens** to tick them. A suggestion counts for nothing until it
   is confirmed. **May contain** is ticked the same way.
-- For a made product, **From the BOM** lists the allergens its ingredients
-  bring, each with the ingredient that brings it.
+- For a made product, **From the default BOM** names that BOM and lists the
+  allergens its ingredients bring, each with the ingredient that brings it.
 
 The **Label** tab of a BOM computes the made product's label from it:
 
@@ -1749,7 +1749,9 @@ The **Label** tab of a BOM computes the made product's label from it:
 Every part is computed, and the screens say it is yours to check before it
 goes on a package. On the label sheet of a made product, or of its batch, tick
 **Ingredients and allergens** to print the list (allergens in capitals) under
-the name. It is never printed smaller than the letter the EU regulation allows
+the name. A batch's label reads the BOM its run was made by, which need not be
+the default; a batch two BOMs went into gets no list, since neither is its
+own. It is never printed smaller than the letter the EU regulation allows
 on a small package; a label too small for it is refused and asks for a larger
 size.
 

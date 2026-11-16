@@ -305,9 +305,11 @@ class TestTheIngredientList:
         assert label['unchecked'] == []
 
         # The cake's card shows the same allergens as derived, with what
-        # brings each, beside the one it declares itself.
+        # brings each, beside the one it declares itself — and names the
+        # formula it read them from, as a product may have several.
         card = client.get(f'{FACTS}/{cake.id}', headers=mk_auth_headers).json()
         assert card['recipe_id'] == str(recipe.id)
+        assert card['recipe_name'] == 'Plum cake batch'
         assert card['allergens'] == ['sesame']
         assert [a['allergen'] for a in card['derived_allergens']] == [
             'gluten',

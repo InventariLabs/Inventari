@@ -110,6 +110,7 @@ describe("LabelFactsSlot", () => {
         product_template_id: "tpl-cake",
         allergens: ["sesame"],
         recipe_id: "recipe-cake",
+        recipe_name: "Cake, without nuts",
         derived_allergens: [
           {
             allergen: "gluten",
@@ -134,6 +135,11 @@ describe("LabelFactsSlot", () => {
     const derived = screen.getByTestId("maker-label-derived");
     expect(derived).toHaveTextContent("Gluten — from Wheat flour");
     expect(derived).toHaveTextContent("Sesame — declared on the product");
+    // A product may have several BOMs: the card names the one it read.
+    expect(screen.getByText("From the default BOM")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Cake, without nuts" }),
+    ).toHaveAttribute("href", "/maker/recipes/recipe-cake");
     expect(
       screen.getByText(/Computed from the BOM and its ingredients' cards/),
     ).toBeInTheDocument();

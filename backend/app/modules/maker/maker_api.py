@@ -226,20 +226,23 @@ class MakerAPI:
         organization_id: UUID,
         template_id: UUID,
         lang: str,
+        lot_id: UUID | None = None,
     ) -> str | None:
         """A made product's ingredient list and allergens, as a label prints them.
 
-        Computed from the product's default recipe (``labelling.py``), in
-        *lang*, allergens in capitals. None for a product nobody makes, and
-        while the module is off: a label printed then carries no list rather
-        than one computed from a formula nobody is looking after.
+        Computed in *lang*, allergens in capitals, from the formula the runs
+        that filled the batch *lot_id* used, else from the product's default
+        (``labelling.compose_for_label_async``). None for a product nobody
+        makes, for a batch two formulas filled, and while the module is off:
+        a label printed then carries no list rather than one computed from a
+        formula nobody is looking after.
         """
         if not await core_api.organizations.is_module_enabled_async(
             db, organization_id, 'maker'
         ):
             return None
-        composition = await labelling.compose_default_async(
-            db, organization_id, template_id
+        composition = await labelling.compose_for_label_async(
+            db, organization_id, template_id, lot_id
         )
         return None if composition is None else labelling.label_text(composition, lang)
 

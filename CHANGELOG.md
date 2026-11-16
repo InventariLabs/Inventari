@@ -142,12 +142,13 @@ says what the release does rather than what changed since them.
   and what nothing says the weight of, and gives the nutrition declaration per
   100 g of what the batch yields — energy, fat, saturates, carbohydrate, sugars,
   protein, salt — leaving a figure unknown and naming the ingredient that lacks
-  it rather than counting it as zero. A made product's card shows the same
-  allergens, each with what brings it. The product label and the batch label
-  can print the list and the allergens (`composition` on
-  `POST /printing/product-labels/png`, `/lot-labels/png` and print jobs) no
-  smaller than the 0.9 mm letter the regulation allows on a small package, and
-  refuse a label too small for them. Every screen says the result is computed
+  it rather than counting it as zero. A made product's card names its default
+  BOM and shows that BOM's allergens, each with what brings it. The product
+  label and the batch label can print the list and the allergens
+  (`composition` on `POST /printing/product-labels/png`, `/lot-labels/png` and
+  print jobs) no smaller than the 0.9 mm letter the regulation allows on a
+  small package, and refuse a label too small for them; a batch's label reads
+  the BOM its run used, not the product's default. Every screen says the result is computed
   and the producer's to check. A product's nutrition figures gain saturates.
   New endpoints: `GET/PUT /maker/labelling/products/{template_id}` and
   `GET /maker/labelling/recipes/{recipe_id}`; the module SDK exports

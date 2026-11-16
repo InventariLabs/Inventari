@@ -756,7 +756,7 @@
       "done": "Done",
       "none": "None",
       "ownAllergens": "Declared on this product",
-      "fromRecipe": "From the BOM",
+      "fromRecipe": "From the default BOM",
       "saved": "Label saved",
       "saveFailed": "Could not save the label"
     },

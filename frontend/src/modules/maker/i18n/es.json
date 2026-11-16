@@ -756,7 +756,7 @@
       "done": "Listo",
       "none": "Ninguno",
       "ownAllergens": "Declarados en este producto",
-      "fromRecipe": "De la fórmula",
+      "fromRecipe": "De la fórmula predeterminada",
       "saved": "Etiqueta guardada",
       "saveFailed": "No se pudo guardar la etiqueta"
     },

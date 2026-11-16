@@ -784,7 +784,7 @@
       "done": "Gotowe",
       "none": "Brak",
       "ownAllergens": "Zadeklarowane na tym produkcie",
-      "fromRecipe": "Z receptury",
+      "fromRecipe": "Z receptury domyślnej",
       "saved": "Etykieta zapisana",
       "saveFailed": "Nie udało się zapisać etykiety"
     },

@@ -756,7 +756,7 @@
       "done": "Fertig",
       "none": "Keine",
       "ownAllergens": "Am Produkt selbst angegeben",
-      "fromRecipe": "Aus der Formel",
+      "fromRecipe": "Aus der Standardformel",
       "saved": "Etikett gespeichert",
       "saveFailed": "Das Etikett konnte nicht gespeichert werden"
     },

@@ -17364,7 +17364,9 @@ export interface components {
          *
          *     ``suggested_allergens`` is what the product's name suggests, for a person
          *     to confirm. ``derived_*`` come from the product's default recipe when it
-         *     is made (``recipe_id``), each with the ingredients that bring it.
+         *     is made (``recipe_id``, named ``recipe_name``: a product may have several,
+         *     and a batch made by another is labelled from that one), each with the
+         *     ingredients that bring it.
          */
         LabelFactsRead: {
             /**
@@ -17382,6 +17384,8 @@ export interface components {
             suggested_allergens: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
             /** Recipe Id */
             recipe_id?: string | null;
+            /** Recipe Name */
+            recipe_name?: string | null;
             /** Derived Allergens */
             derived_allergens?: components["schemas"]["LabelAllergen"][];
             /** Derived May Contain */

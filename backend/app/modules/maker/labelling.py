@@ -42,7 +42,7 @@ from dataclasses import dataclass, field
 from decimal import ROUND_HALF_UP, Decimal
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ProductTemplateDTO, UomDTO
@@ -53,7 +53,7 @@ from app.core.public_api import core_api
 from app.modules.recipes.recipes_api import recipes_api
 
 from . import bom_service
-from .models import MakerLabelFacts, MakerRecipe
+from .models import MakerLabelFacts, MakerRecipe, ProductionOrder, ProductionPortion
 
 #: The 14 allergens of the food regulation, in the order every list shows.
 ALLERGEN_KEYS: tuple[str, ...] = recipes_api.ALLERGEN_KEYS
@@ -522,14 +522,70 @@ async def compose_async(
     )
 
 
-async def compose_default_async(
-    db: AsyncSession, organization_id: UUID, template_id: UUID
+async def compose_for_label_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    template_id: UUID,
+    lot_id: UUID | None = None,
 ) -> Composition | None:
-    """The label of *template_id* from its default recipe; None when not made."""
-    recipe = await bom_service.find_default_recipe(db, organization_id, template_id)
+    """The label of *template_id*, or of its batch *lot_id*; None when not made.
+
+    A product may have several formulas, and a run records the one it used:
+    a batch is labelled from the formula of the runs that filed their output
+    under it. A batch no run filled — goods received, a batch opened by
+    hand, or a product label with no batch — is labelled from the default
+    formula, the one the product's card speaks of. A batch runs of two
+    formulas filled holds what both put in and no single list is its own: it
+    gets none, and its label carries no list rather than a wrong one.
+    """
+    used = await _formulas_of_batch_async(db, organization_id, template_id, lot_id)
+    if len(used) > 1:
+        return None
+    if used:
+        recipe = await db.scalar(
+            select(MakerRecipe).where(
+                MakerRecipe.organization_id == organization_id,
+                MakerRecipe.id == used.pop(),
+            )
+        )
+    else:
+        recipe = await bom_service.find_default_recipe(db, organization_id, template_id)
     if recipe is None or not recipe.lines:
         return None
     return await compose_async(db, organization_id, recipe)
+
+
+async def _formulas_of_batch_async(
+    db: AsyncSession, organization_id: UUID, template_id: UUID, lot_id: UUID | None
+) -> set[UUID]:
+    """The formulas of the runs whose output is in the batch *lot_id*.
+
+    A run's output is in its own batch and, when it was filled in portions,
+    in each batch a portion named. A run undone took its output back off the
+    shelf; a run from before runs kept their formula names none.
+    """
+    if lot_id is None:
+        return set()
+    lot = await core_api.stock.get_lot_detail_async(db, organization_id, lot_id)
+    if lot is None:
+        return set()
+    portioned = select(ProductionPortion.production_order_id).where(
+        ProductionPortion.organization_id == organization_id,
+        ProductionPortion.lot_name == lot.name,
+    )
+    rows = await db.scalars(
+        select(ProductionOrder.recipe_id).where(
+            ProductionOrder.organization_id == organization_id,
+            ProductionOrder.output_template_id == template_id,
+            ProductionOrder.status != 'REVERSED',
+            ProductionOrder.recipe_id.is_not(None),
+            or_(
+                ProductionOrder.output_lot_id == lot_id,
+                ProductionOrder.id.in_(portioned),
+            ),
+        )
+    )
+    return {recipe_id for recipe_id in rows if recipe_id is not None}
 
 
 # --- The label's words ------------------------------------------------------

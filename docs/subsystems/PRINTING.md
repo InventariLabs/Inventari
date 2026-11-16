@@ -20,7 +20,8 @@ The printing system is split into two tiers:
   up to 200 copies (a run prints one per unit it made); every other label stops at 20.
 - **A made product's ingredient list**: with `composition`, a product label and a batch label
   carry the made product's ingredient list and allergens (the production module's
-  `maker_api.label_text_async`, computed from the product's BOM) as a block under the name.
+  `maker_api.label_text_async`, computed from the BOM the batch was made by — a product label
+  from its record's batch — else from the product's default BOM) as a block under the name.
   `X-Labels-With-Composition` counts the labels that have one, whether or not they print it. The
   block is set as large as the label leaves room for and never below the 0.9 mm x-height
   Regulation 1169/2011 allows on a small package; a list that does not fit is refused

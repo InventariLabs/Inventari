@@ -756,7 +756,7 @@
       "done": "Terminé",
       "none": "Aucun",
       "ownAllergens": "Déclarés sur ce produit",
-      "fromRecipe": "De la formule",
+      "fromRecipe": "De la formule par défaut",
       "saved": "Étiquette enregistrée",
       "saveFailed": "Impossible d'enregistrer l'étiquette"
     },

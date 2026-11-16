@@ -343,7 +343,7 @@ async def lot_labels_async(
         lot = await core_api.stock.get_lot_detail_async(db, organization_id, lot_id)
         if lot is None or symbology(lot.name) is None:
             continue
-        text = await texts.of(lot.product_template_id)
+        text = await texts.of(lot.product_template_id, lot.id)
         parts = []
         if lot.production_date:
             parts.append(
@@ -368,28 +368,29 @@ async def lot_labels_async(
 
 
 class _CompositionTexts:
-    """A made product's ingredient list for its labels, asked once a product.
+    """A made product's ingredient list for its labels, asked once a batch.
 
-    The list is the maker module's, computed from the product's formula;
-    without that module a label carries none. ``found`` counts the labels
-    asked about that have one.
+    The list is the maker module's, computed from the formula the batch was
+    made by, else the product's default; without that module a label carries
+    none. ``found`` counts the labels asked about that have one.
     """
 
     def __init__(self, db: AsyncSession, organization_id: UUID, lang: str) -> None:
         self.db, self.organization_id, self.lang = db, organization_id, lang
-        self.texts: dict[UUID, str | None] = {}
+        self.texts: dict[tuple[UUID, UUID | None], str | None] = {}
         self.found = 0
 
-    async def of(self, template_id: UUID | None) -> str | None:
+    async def of(self, template_id: UUID | None, lot_id: UUID | None) -> str | None:
         from app.modules.maker.maker_api import maker_api
 
         if template_id is None:
             return None
-        if template_id not in self.texts:
-            self.texts[template_id] = await maker_api.label_text_async(
-                self.db, self.organization_id, template_id, self.lang
+        key = (template_id, lot_id)
+        if key not in self.texts:
+            self.texts[key] = await maker_api.label_text_async(
+                self.db, self.organization_id, template_id, self.lang, lot_id
             )
-        text = self.texts[template_id]
+        text = self.texts[key]
         self.found += text is not None
         return text
 
@@ -462,7 +463,7 @@ async def product_labels_async(
             continue
         line = _record_details(item, lots, lang)
         with_details += line is not None
-        text = await texts.of(item.template_id)
+        text = await texts.of(item.template_id, item.lot_id)
         labels.append(
             ProductLabel(
                 name=item.name,

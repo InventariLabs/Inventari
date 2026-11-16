@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { Tag } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -271,21 +272,32 @@ function AllergenEditor({
   );
 }
 
-/** A made product's allergens as its BOM brings them, and whose they are. */
+/**
+ * A made product's allergens as its default BOM brings them, and whose they
+ * are. The BOM is named: a product may have several, and a batch made by
+ * another one is labelled from the one it was made by.
+ */
 function FromRecipe({ facts }: { facts: LabelFacts }) {
   const { t } = useTranslation("maker");
   if (!facts.recipe_id) return null;
   const derived = facts.derived_allergens ?? [];
   return (
     <>
-      {derived.length > 0 && (
-        <div className="space-y-1">
-          <p className="text-xs font-medium uppercase text-on-secondary tracking-wide ml-1">
-            {t("labelling.card.fromRecipe")}
-          </p>
+      <div className="space-y-1">
+        <p className="text-xs font-medium uppercase text-on-secondary tracking-wide ml-1">
+          {t("labelling.card.fromRecipe")}
+        </p>
+        <Link
+          to={`/maker/recipes/${facts.recipe_id}`}
+          className="ml-1 text-sm font-medium underline"
+          data-testid="maker-label-recipe"
+        >
+          {facts.recipe_name}
+        </Link>
+        {derived.length > 0 && (
           <DerivedAllergens entries={derived} testId="maker-label-derived" />
-        </div>
-      )}
+        )}
+      </div>
       <p className="text-xs text-on-muted">{t("labelling.computedNote")}</p>
     </>
   );

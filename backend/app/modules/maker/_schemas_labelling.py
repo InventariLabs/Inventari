@@ -61,7 +61,9 @@ class LabelFactsRead(BaseModel):
 
     ``suggested_allergens`` is what the product's name suggests, for a person
     to confirm. ``derived_*`` come from the product's default recipe when it
-    is made (``recipe_id``), each with the ingredients that bring it.
+    is made (``recipe_id``, named ``recipe_name``: a product may have several,
+    and a batch made by another is labelled from that one), each with the
+    ingredients that bring it.
     """
 
     product_template_id: UUID
@@ -70,6 +72,7 @@ class LabelFactsRead(BaseModel):
     may_contain: list[AllergenKey]
     suggested_allergens: list[AllergenKey]
     recipe_id: UUID | None = None
+    recipe_name: str | None = None
     derived_allergens: list[LabelAllergen] = Field(default_factory=list)
     derived_may_contain: list[LabelAllergen] = Field(default_factory=list)
 

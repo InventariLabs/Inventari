@@ -59545,6 +59545,17 @@
             ],
             "title": "Recipe Id"
           },
+          "recipe_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Name"
+          },
           "derived_allergens": {
             "items": {
               "$ref": "#/components/schemas/LabelAllergen"
@@ -59569,7 +59580,7 @@
           "suggested_allergens"
         ],
         "title": "LabelFactsRead",
-        "description": "What a product's card says for its label, and what its recipe adds.\n\n``suggested_allergens`` is what the product's name suggests, for a person\nto confirm. ``derived_*`` come from the product's default recipe when it\nis made (``recipe_id``), each with the ingredients that bring it."
+        "description": "What a product's card says for its label, and what its recipe adds.\n\n``suggested_allergens`` is what the product's name suggests, for a person\nto confirm. ``derived_*`` come from the product's default recipe when it\nis made (``recipe_id``, named ``recipe_name``: a product may have several,\nand a batch made by another is labelled from that one), each with the\ningredients that bring it."
       },
       "LabelFactsUpdate": {
         "properties": {

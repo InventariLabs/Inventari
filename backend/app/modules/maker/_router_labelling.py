@@ -104,6 +104,7 @@ async def _facts_read(
             )
         ),
         recipe_id=recipe.id if composition is not None and recipe else None,
+        recipe_name=recipe.name if composition is not None and recipe else None,
         derived_allergens=_allergens(composition.allergens) if composition else [],
         derived_may_contain=_allergens(composition.may_contain) if composition else [],
     )

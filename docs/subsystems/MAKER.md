@@ -293,7 +293,7 @@ compose its own text.
 
 | Endpoint | Description |
 |---|---|
-| `GET /labelling/products/{template_id}` | A product's `label_name`, `allergens` (null: not checked), `may_contain`, `suggested_allergens` (from its name), and for a made product its default recipe's `recipe_id`, `derived_allergens` and `derived_may_contain`, each with its sources. |
+| `GET /labelling/products/{template_id}` | A product's `label_name`, `allergens` (null: not checked), `may_contain`, `suggested_allergens` (from its name), and for a made product its default recipe's `recipe_id` and `recipe_name`, `derived_allergens` and `derived_may_contain`, each with its sources. |
 | `PUT /labelling/products/{template_id}` | Keep them (`maker:manage`); an unknown allergen key is a 422, everything empty clears the row. Journalled on the product with both sides. |
 | `GET /labelling/recipes/{recipe_id}` | The label that recipe computes: `ingredients` (tree, `weight_g` per batch, `emphasised`), `text`, `allergens`, `may_contain`, `unchecked`, `unweighed`, `yield_weight_g`, `nutrition`. |
 
@@ -320,7 +320,7 @@ data / domain exceptions — a consumer does not have to guard every call):
 | `compute_unit_cost_async(db, org_id, template_id, planned_qty)` | Unit cost (0 with no ingredients). |
 | `get_breakdown_async(db, org_id, template_id, qty)` | `CostBreakdownResponse` (read-only). |
 | `complete_production_async(db, org_id, order_id, user, actual_qty=None)` | Executes a DRAFT (consumption → production → valuation). |
-| `label_text_async(db, org_id, template_id, lang)` | `str \| None` — a made product's ingredient list and allergens as a label prints them, from its default recipe; None for a product nobody makes and while the module is off. The printing module's product and batch labels print it. |
+| `label_text_async(db, org_id, template_id, lang, lot_id=None)` | `str \| None` — a made product's ingredient list and allergens as a label prints them. A batch (`lot_id`) is read from the recipe of the runs that filed their output under it (`recipe_id`, through `output_lot_id` or a portion's `lot_name`), which need not be the default; a batch no run filled, or no batch, from the default recipe. None for a product nobody makes, for a batch runs of two recipes filled (no single list is its own), and while the module is off. The printing module's product and batch labels print it. |
 | `list_work_items_async(db, org_id, query)` | `(list[WorkItemDTO], total)` — To do's provider for this module, registered with the warehouse module: draft runs planned for the day or earlier, and the counts owed for runs recorded after the fact. |
 
 **What it uses from `recipes_api`:** `recipes_api.get_recipe_snapshot_async(db,
