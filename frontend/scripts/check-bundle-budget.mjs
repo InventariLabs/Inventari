@@ -434,10 +434,24 @@ const dist = join(root, "dist");
  * That one phone budget moves a step of five, to 620; the other screens stand
  * under theirs (login 396.3, launcher 411.4, start 627.5, receive 463.9,
  * issue 576.6, history 600.5, app first paint 391.5, initial 189.4).
+ *
+ * Re-measured 2026-11-16 on the branch that computes a made product's
+ * ingredient list, allergens and nutrition from its BOM: with the branch's
+ * language files set back to the development line's, the tree measures app
+ * first paint at 394.6 KiB gz (login 399.3, launcher 414.4, issue 579.6), and
+ * the branch's copy — the fourteen allergens' names, the label section of a
+ * product's card, the BOM's Label tab and the nutrition words, in five
+ * languages, plus the label sheet's one option — adds 1.0 to every screen
+ * through the language chunk each first paint loads (app first paint 395.6,
+ * login 400.3, launcher 415.5, issue 580.6). The code adds nothing to these
+ * screens; no import walked in. Those four budgets move a step of five (app
+ * first paint 400, login 405, launcher 420, issue 585); the other screens
+ * stand under theirs (start 631.5, receive 468.0, history 604.5, products
+ * 619.5, initial 189.5).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 395,
+  appFirstPaint: 400,
 };
 
 /**
