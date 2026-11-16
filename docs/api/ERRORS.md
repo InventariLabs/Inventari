@@ -548,6 +548,8 @@ apart.
 | `PRODUCTION_CANCEL_NOT_DRAFT` | This production order already has status {status} — only a draft or a run in progress can be cancelled. |
 | `PRODUCTION_COMPLETE_NOT_DRAFT` | This production order already has status {status} — only a draft can be completed. |
 | `PRODUCTION_FINISH_BELOW_PORTIONS` | This run has already put {made} on the shelf in portions, so it cannot finish with less than that. |
+| `PRODUCTION_NEEDS_PERIOD_REVERSED` | The period ends before it starts |
+| `PRODUCTION_NEEDS_SCOPE` | The needs of planned runs are read for one run, or for both ends of a period |
 | `PRODUCTION_NO_RECIPE` | No BOM for this product — create a BOM first |
 | `PRODUCTION_OUTPUT_BATCH_MISSING` | This run put its output in no batch, so there is no batch to hold or release. |
 | `PRODUCTION_OVERPRODUCTION_DISABLED` | Overproduction is disabled in settings — this order cannot produce more than planned. |
