@@ -71,6 +71,7 @@
     "insufficient": "Za mało",
     "short_of": "Na stanie {{available}} z potrzebnych {{required}}",
     "not_comparable_hint": "Stan jest liczony w innej mierze. Wpisz wagę lub objętość sztuki w produkcie, żeby dało się je porównać.",
+    "not_comparable_measured": "Stan jest liczony w {{unit}} — sztuk nie da się do niego przyłożyć. Podaj ilość tej pozycji w {{unit}} zamiast tego.",
     "fefo_expiry": "Krótki termin: {{date}}",
     "expired_since": "Po terminie od {{date}}",
     "fractional_hint": "Ułamkowa ilość — zmień liczbę porcji",

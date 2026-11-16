@@ -23,6 +23,14 @@ vi.mock("../hooks/useMealPlans", () => ({
   useDeleteShoppingExclusion: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
+// The ingredient row asks the UoM catalogue whether the shelf's unit is
+// counted, and this tree renders without the app's query client.
+vi.mock("@/modules/shared/hooks/useUoms", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/modules/shared/hooks/useUoms")>();
+  return { ...actual, useUoms: () => ({ data: [] }) };
+});
+
 const availabilityData: {
   recipe_id: string;
   servings: number;
