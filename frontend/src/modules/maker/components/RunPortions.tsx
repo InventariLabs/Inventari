@@ -89,36 +89,40 @@ export function RunPortions({
         </ul>
       )}
       {canWrite && (
-        <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-5">
-          <Input
-            label={t("progress.portionQty")}
-            type="number"
-            step={QUANTITY_STEP}
-            min="0"
-            value={qty}
-            onChange={(e) => setQty(e.target.value)}
-            data-testid="maker-portion-qty-input"
-          />
-          <DateInput
-            label={t("progress.portionDay")}
-            value={day}
-            max={todayIso()}
-            onChange={setDay}
-          />
-          <Input
-            label={t("progress.portionLot")}
-            value={lot}
-            maxLength={100}
-            onChange={(e) => setLot(e.target.value)}
-            data-testid="maker-portion-lot-input"
-          />
-          <BestBeforeField
-            id="maker-portion-best-before"
-            value={bestBefore.value}
-            onChange={bestBefore.set}
-            min={day || undefined}
-            shelfLifeDays={order.shelf_life_days}
-          />
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-3">
+            <Input
+              label={t("progress.portionQty")}
+              type="number"
+              step={QUANTITY_STEP}
+              min="0"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+              data-testid="maker-portion-qty-input"
+            />
+            <DateInput
+              label={t("progress.portionDay")}
+              value={day}
+              max={todayIso()}
+              onChange={setDay}
+            />
+            <Input
+              label={t("progress.portionLot")}
+              value={lot}
+              maxLength={100}
+              onChange={(e) => setLot(e.target.value)}
+              data-testid="maker-portion-lot-input"
+            />
+          </div>
+          <div className="sm:max-w-xs">
+            <BestBeforeField
+              id="maker-portion-best-before"
+              value={bestBefore.value}
+              onChange={bestBefore.set}
+              min={day || undefined}
+              shelfLifeDays={order.shelf_life_days}
+            />
+          </div>
           <Button
             variant="outline"
             leftIcon={<Plus size={16} />}
