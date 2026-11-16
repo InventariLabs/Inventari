@@ -183,6 +183,10 @@ class _Tally:
     #: What the runs before the period asked for beyond the shelf: it was
     #: spoken for by whatever is on its way, so the period cannot count it.
     overflow: dict[UUID, Decimal] = field(default_factory=dict)
+    #: Per ingredient, what each run of the period asks for and on which day.
+    asked: dict[UUID, list[tuple[tuple[bool, date], Decimal]]] = field(
+        default_factory=dict
+    )
     start_left: dict[UUID | None, dict[UUID, Decimal]] | None = None
 
 
@@ -219,6 +223,9 @@ def _claim_in_queue(
             if in_period:
                 tally.needed[tid] = tally.needed.get(tid, Decimal('0')) + claimed
                 tally.scopes_used.setdefault(tid, set()).add(scope)
+                tally.asked.setdefault(tid, []).append(
+                    (planning_service.planned_day(order), claimed)
+                )
                 tally.first_run.setdefault(tid, order)
                 if need.has_recipe:
                     tally.has_recipe.add(tid)
@@ -232,6 +239,31 @@ def _claim_in_queue(
                 )
             stock[tid] = max(Decimal('0'), on_hand - claimed)
     return tally
+
+
+def _planned_supply(
+    made: list[tuple[tuple[bool, date], Decimal]],
+    asked: list[tuple[tuple[bool, date], Decimal]],
+) -> Decimal:
+    """How much of what the period asks a planned run makes in time for it.
+
+    A run's output is there for the runs planned on its day or after it, the
+    same day included whatever the creation order; a run planned later makes
+    nothing for the ones before it.
+    """
+    events = [(day, 0, qty) for day, qty in made] + [
+        (day, 1, qty) for day, qty in asked
+    ]
+    supply = Decimal('0')
+    taken = Decimal('0')
+    for _day, kind, qty in sorted(events, key=lambda e: (e[0], e[1])):
+        if kind == 0:
+            supply += qty
+        else:
+            used = min(qty, supply)
+            supply -= used
+            taken += used
+    return taken
 
 
 def _after_earlier_claims(
@@ -319,6 +351,10 @@ async def needs_for(
     view = NeedsView(purchasing=await purchasing_enabled(db, organization_id))
     if last is None:
         return view
+    # Runs planned on the day of the last one count as supply for it, though
+    # they were created after it and so stand behind it in the queue.
+    last_day = planning_service.planned_day(queue[last])
+    makers = [o for o in queue if planning_service.planned_day(o) <= last_day]
     queue = queue[: last + 1]
     view.run_count = sum(1 for o in queue if selected(o))
 
@@ -370,12 +406,11 @@ async def needs_for(
     start_left = tally.start_left
 
     opening = start_left or {}
-    planned_runs: dict[UUID, Decimal] = {}
-    for order in queue:
+    made: dict[UUID, list[tuple[tuple[bool, date], Decimal]]] = {}
+    for order in makers:
         if order.output_template_id in needed:
-            planned_runs[order.output_template_id] = (
-                planned_runs.get(order.output_template_id, Decimal('0'))
-                + order.planned_qty
+            made.setdefault(order.output_template_id, []).append(
+                (planning_service.planned_day(order), order.planned_qty)
             )
     open_lines: list[OpenOrderLineDTO] = (
         await _open_orders(db, organization_id, sorted(needed))
@@ -416,7 +451,11 @@ async def needs_for(
                 deliveries=deliveries,
                 purchasing=view.purchasing,
                 freshly_made=fresh.get(tid, Decimal('0')),
-                planned=max(Decimal('0'), planned_runs.get(tid, Decimal('0')) - unmet),
+                planned=max(
+                    Decimal('0'),
+                    _planned_supply(made.get(tid, []), tally.asked.get(tid, []))
+                    - unmet,
+                ),
                 makes=tid in has_recipe,
                 first_run=first_run[tid],
             )

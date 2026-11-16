@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
 from typing import Literal
 from uuid import UUID
@@ -106,19 +107,32 @@ async def queued_drafts(
     )
 
 
+def planned_day(order: ProductionOrder) -> tuple[bool, date]:
+    """Where a run stands on the calendar; a run with no planned day is last.
+
+    What a run makes is there for the runs planned on its day or after it —
+    the same day included, whatever order they were created in.
+    """
+    day = order.production_date
+    return (day is None, day or date.min)
+
+
 def _expected_output(
     queue: list[ProductionOrder],
     scope_of: Callable[[ProductionOrder], UUID | None],
-) -> dict[UUID | None, dict[UUID, Decimal]]:
-    """What the draft runs will make, per scope: supply for the runs that use it.
+) -> dict[tuple[bool, date], dict[UUID | None, dict[UUID, Decimal]]]:
+    """What the draft runs will make, per planned day and scope.
 
     A sub-assembly that a draft run already makes is not made again by the run
     that needs it, so the pool and the shelf both count it, in the scope of
-    the run that makes it.
+    the run that makes it — from the run's planned day on, for the runs that
+    come on that day or after it, not for the ones before.
     """
-    expected: dict[UUID | None, dict[UUID, Decimal]] = {}
+    expected: dict[tuple[bool, date], dict[UUID | None, dict[UUID, Decimal]]] = {}
     for order in queue:
-        per_scope = expected.setdefault(scope_of(order), {})
+        per_scope = expected.setdefault(planned_day(order), {}).setdefault(
+            scope_of(order), {}
+        )
         per_scope[order.output_template_id] = (
             per_scope.get(order.output_template_id, Decimal('0')) + order.planned_qty
         )
@@ -132,6 +146,37 @@ def _add_expected(
     for template_id, qty in expected.items():
         if template_id in children:
             left[template_id] = left.get(template_id, Decimal('0')) + qty
+
+
+async def _explode_by_day(
+    db: AsyncSession,
+    organization_id: UUID,
+    queue: list[ProductionOrder],
+    expected: dict[tuple[bool, date], dict[UUID | None, dict[UUID, Decimal]]],
+    shelves: dict[UUID | None, _Shelf],
+    scope_of: Callable[[ProductionOrder], UUID | None],
+) -> list[list[tuple[UUID, Decimal, str, UUID | None]] | None]:
+    """Explode the queue one planned day at a time, in queue order.
+
+    What the runs of a day make is put on the pool just before that day's
+    runs explode, so it serves them and the days after, never the runs
+    planned before it.
+    """
+    flats: list[list[tuple[UUID, Decimal, str, UUID | None]] | None] = []
+    for day, per_scope in expected.items():
+        for scope, per_template in per_scope.items():
+            for template_id, qty in per_template.items():
+                shelves[scope].pool.expect(template_id, qty)
+        flats += await bom_service.explode_in_sequence(
+            db,
+            organization_id,
+            [
+                (o.recipe_id, o.planned_qty, shelves[scope_of(o)].pool)
+                for o in queue
+                if planned_day(o) == day and o.recipe_id is not None
+            ],
+        )
+    return flats
 
 
 async def coverage_for_drafts(
@@ -178,19 +223,7 @@ async def coverage_for_drafts(
             shelves[scope] = _Shelf(StockPool(db, organization_id, scope))
 
     expected = _expected_output(queue, _scope)
-    for scope, per_template in expected.items():
-        for template_id, qty in per_template.items():
-            shelves[scope].pool.expect(template_id, qty)
-
-    flats = await bom_service.explode_in_sequence(
-        db,
-        organization_id,
-        [
-            (o.recipe_id, o.planned_qty, shelves[_scope(o)].pool)
-            for o in queue
-            if o.recipe_id is not None
-        ],
-    )
+    flats = await _explode_by_day(db, organization_id, queue, expected, shelves, _scope)
 
     # One stock read per scope and one template read for the whole queue, so
     # the cost grows with the number of scopes, not with the number of runs.
@@ -204,7 +237,6 @@ async def coverage_for_drafts(
         shelves[scope].left = await _get_available_stock_batch(
             db, organization_id, sorted(children), location_id=scope
         )
-        _add_expected(shelves[scope].left, expected[scope], children)
     all_children = sorted(set().union(*children_by_scope.values()))
     templates: dict[UUID, ProductTemplateDTO] = (
         await core_api.product_templates.get_many_async(
@@ -216,7 +248,16 @@ async def coverage_for_drafts(
 
     uom_cache: dict[UUID, UomDTO | None] = {}
     result: dict[UUID, PlanCoverage] = {}
+    day_reached: tuple[bool, date] | None = None
     for order, flat in zip(queue, flats, strict=True):
+        if planned_day(order) != day_reached:
+            day_reached = planned_day(order)
+            for scope, per_template in expected[day_reached].items():
+                _add_expected(
+                    shelves[scope].left,
+                    per_template,
+                    children_by_scope.get(scope, set()),
+                )
         if not flat:
             continue
         shelf = shelves[_scope(order)]

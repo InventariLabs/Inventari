@@ -399,6 +399,62 @@ class TestTheCombinedList:
         assert coverage[dough_run['id']] == 'covered'
         assert coverage[bread_run['id']] == 'covered'
 
+    def test_a_run_planned_after_its_consumer_is_no_supply_for_it(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        dough = _template(db_session, org, 'Dough', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, dough, flour)
+        _recipe(db_session, org, bread, dough)
+        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, dough, shelf, '5', _MONDAY + timedelta(days=3))
+
+        listed = client.get(f'{_API}/orders', headers=headers).json()['items']
+        coverage = {row['id']: row['coverage'] for row in listed}
+        rows = {r['name']: r for r in _week(client, headers)['rows']}
+
+        # The dough is made three days after the bread needs it: it is no
+        # supply for the bread, and the list says so as well.
+        assert coverage[bread_run['id']] == 'short'
+        assert Decimal(rows['Dough']['planned']) == Decimal('0')
+        assert Decimal(rows['Dough']['missing']) == Decimal('5')
+
+    def test_a_run_planned_the_same_day_counts_whatever_was_created_first(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        dough = _template(db_session, org, 'Dough', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, dough, flour)
+        _recipe(db_session, org, bread, dough)
+        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, dough, shelf, '5', _MONDAY)
+
+        one_run = client.get(
+            f'{_API}/needs', headers=headers, params={'order_id': bread_run['id']}
+        ).json()
+        week = _week(client, headers)
+
+        # Asked for the bread alone or for the whole week, the dough run of
+        # the same day is what the bread waits for.
+        for body in (one_run, week):
+            row = {r['name']: r for r in body['rows']}['Dough']
+            assert Decimal(row['planned']) == Decimal('5')
+            assert Decimal(row['missing']) == Decimal('0')
+
 
 class TestOrderingWhatIsMissing:
     def _scope(self) -> dict[str, str]:
