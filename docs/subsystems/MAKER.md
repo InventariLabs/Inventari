@@ -210,7 +210,10 @@ counted again by the week after it. A draft run of a sub-assembly is supply for
 the runs that use it: the coverage walk counts its planned quantity on the
 shelf of the run that makes it (`StockPool.expect`) instead of exploding the
 sub-assembly down to raw materials a second time, and the needs list shows it
-as `planned`, which lowers what is missing.
+as `planned`, which lowers what is missing. It is supply only from its
+planned day on: for the runs planned the same day (whatever was created first)
+and the days after, never for a run planned before it, which still explodes the
+sub-assembly down to raw materials.
 
 | Endpoint | Description |
 |---|---|
