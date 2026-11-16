@@ -414,6 +414,44 @@ class TestARecipeOnTheListTwice:
         assert body['already_listed_count'] == 1
         assert body['list_name']
 
+    def test_a_completed_list_is_not_written_to(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """The card used to preselect a finished list and write onto it."""
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '500', 'uom_id': grams}],
+        )
+        done = client.post(
+            '/api/v1/shopping-lists', json={'name': 'Done'}, headers=auth_headers
+        ).json()['id']
+        frozen = client.put(
+            f'/api/v1/shopping-lists/{done}',
+            json={'status': 'completed'},
+            headers=auth_headers,
+        )
+        assert frozen.status_code == 200, frozen.text
+
+        response = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 1, 'shopping_list_id': done},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 400, response.text
+        assert response.json()['detail']['code'] == 'SHOPPING_LIST_NOT_WRITABLE'
+        items = client.get(
+            f'/api/v1/shopping-lists/{done}/items?purchased_filter=all',
+            headers=auth_headers,
+        )
+        assert items.json()['items'] == []
+
     def test_a_second_recipe_needing_the_same_goods_tops_the_line_up(
         self,
         client: TestClient,

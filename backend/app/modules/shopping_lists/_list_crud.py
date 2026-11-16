@@ -76,6 +76,7 @@ async def list_shopping_lists(
     db: AsyncSession,
     org_id: UUID,
     active_only: bool = True,
+    status: ShoppingListStatus | None = None,
     offset: int = 0,
     limit: int = 50,
 ) -> tuple[list[ShoppingList], int]:
@@ -84,6 +85,8 @@ async def list_shopping_lists(
         # "Active" here means live, not deleted: a completed list is frozen
         # but still readable, while an archived one left every screen.
         stmt = stmt.where(ShoppingList.status != ShoppingListStatus.ARCHIVED.value)
+    if status is not None:
+        stmt = stmt.where(ShoppingList.status == status.value)
     return await paginate_async(
         db,
         stmt.order_by(ShoppingList.created_at.desc(), ShoppingList.id),

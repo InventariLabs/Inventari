@@ -25405,6 +25405,12 @@ export interface components {
             /** Priority */
             priority?: number | null;
         };
+        /**
+         * ShoppingListStatus
+         * @description explicit state machine for shopping lists.
+         * @enum {string}
+         */
+        ShoppingListStatus: "active" | "completed" | "archived";
         /** ShoppingListUpdate */
         ShoppingListUpdate: {
             /** Name */
@@ -43773,6 +43779,8 @@ export interface operations {
                 limit?: number;
                 /** @description Only active lists */
                 active_only?: boolean;
+                /** @description Only lists in this state. ``active`` is the one a new item can go on: a completed list is frozen, an archived one is gone. */
+                status?: components["schemas"]["ShoppingListStatus"] | null;
             };
             header?: never;
             path?: never;
