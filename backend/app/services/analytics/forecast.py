@@ -217,6 +217,7 @@ async def get_expense_forecast_async(
             .where(
                 StockValuationLayer.organization_id == organization_id,
                 StockValuationLayer.direction == 'IN',
+                StockValuationLayer.internal.is_(False),
                 outside_module_products(
                     StockValuationLayer.product_template_id, organization_id, hidden
                 ),

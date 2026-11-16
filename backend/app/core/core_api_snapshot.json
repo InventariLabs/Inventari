@@ -7731,6 +7731,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "unpriced_stays_unknown",
               "required": false
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "internal",
+              "required": false
             }
           ]
         },

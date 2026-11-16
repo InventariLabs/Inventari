@@ -1048,6 +1048,7 @@ async def _receive_output(
         quantity=actual_qty,
         unit_cost=unit_cost if unit_cost > 0 or a_zero_cost_is_stated else None,
         unpriced_stays_unknown=cost_comes_at_the_finish,
+        internal=True,
     )
     return produced_item.id, layer_id
 

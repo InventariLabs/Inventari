@@ -209,6 +209,14 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The cost analysis no longer counts a production run's product, or the
+  ingredients put back when a run is undone, as money spent. They were added
+  to the purchases they came from, so the same grapes were counted when
+  bought and again as wine, and the waste percentage was measured against the
+  inflated total. Total spent, the monthly trend and the weekly spending
+  behind the forecast now add up only what came in from outside. Receipts
+  posted before this release cannot be told apart and keep counting.
+
 - The public attestation page declares the language it is written in
   (`<html lang>`), as the rest of the application does, so a screen reader
   pronounces a Polish page in Polish. Choosing a language before signing in no

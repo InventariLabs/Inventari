@@ -198,6 +198,7 @@ class ValuationService:
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
         unpriced_stays_unknown: bool = False,
+        internal: bool = False,
     ) -> StockValuationLayer | None:
         """Async: record receipt by template_id (Public API helper).
 
@@ -223,6 +224,7 @@ class ValuationService:
             reverses_line_id=reverses_line_id,
             extra_unit_cost=extra_unit_cost,
             unpriced_stays_unknown=unpriced_stays_unknown,
+            internal=internal,
         )
 
     @staticmethod
@@ -271,6 +273,7 @@ class ValuationService:
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
         unpriced_stays_unknown: bool = False,
+        internal: bool = False,
     ) -> StockValuationLayer | None:
         """Post a receipt layer. ``unit_cost=None`` means nobody named a price.
 
@@ -307,6 +310,11 @@ class ValuationService:
         rate, for the same reason. A line that posted no outflow -- a receipt
         being corrected upwards -- is not a reversal, and its stated price
         stands.
+
+        *internal* marks goods that come from the organization's own books --
+        a production run's output, ingredients put back -- so that what was
+        spent is not counted a second time. A return (*reverses_line_id*) is
+        always one.
         """
         if quantity <= 0:
             return None
@@ -382,6 +390,7 @@ class ValuationService:
             currency=currency,
             cost_basis=cost_basis,
             document_date=document_date,
+            internal=internal or reversed_cost is not None,
         )
         batch = current_batch(db)
         if batch is not None:
