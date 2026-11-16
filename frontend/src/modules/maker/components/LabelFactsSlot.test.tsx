@@ -169,6 +169,23 @@ describe("LabelFactsSlot", () => {
     expect(screen.queryByTestId("maker-label-unchecked")).toBeNull();
   });
 
+  it("says the answer is missing when the card's label could not be read", async () => {
+    server.use(
+      http.get("*/api/v1/maker/labelling/products/:id", () =>
+        HttpResponse.json({ detail: "down" }, { status: 500 }),
+      ),
+      http.get("*/api/v1/maker/bom/where-used", () =>
+        HttpResponse.json({ items: [] }),
+      ),
+    );
+    render(<LabelFactsSlot data={{ item }} />);
+
+    expect(
+      await screen.findByTestId("maker-label-facts", {}, { timeout: 5000 }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+  });
+
   it("stays away from a product no formula touches", async () => {
     serve(unchecked, 0);
     render(<LabelFactsSlot data={{ item }} />);

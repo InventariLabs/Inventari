@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/module-sdk";
 import { Input } from "@/components/ui/Input";
+import { InlineQueryError } from "@/components/ui/QueryResult";
 import { useCanManage } from "@/hooks/useCanWrite";
 import { extractApiError } from "@/lib/errors";
 import { useWhereUsed } from "@/modules/maker/hooks/useBom";
@@ -197,6 +198,26 @@ function AllergenSummary({
   );
 }
 
+/** The section's heading over a read that failed, with its retry. */
+function LabelReadFailed({
+  error,
+  onRetry,
+}: {
+  error: unknown;
+  onRetry: () => void;
+}) {
+  const { t } = useTranslation("maker");
+  return (
+    <section className="mt-3 space-y-1.5" data-testid="maker-label-facts">
+      <h4 className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-on-muted font-medium">
+        <Tag size={13} aria-hidden="true" />
+        {t("labelling.card.title")}
+      </h4>
+      <InlineQueryError error={error} onRetry={onRetry} />
+    </section>
+  );
+}
+
 /** Whether the card has a label to speak of: a made product, one a BOM
  *  uses, or one that already has facts. */
 function hasLabel(facts: LabelFacts, usedIn: number): boolean {
@@ -285,15 +306,31 @@ export function LabelFactsSlot({ data }: LabelFactsSlotProps) {
   const { t } = useTranslation("maker");
   const canManage = useCanManage("maker");
   const templateId = data?.item?.template_id ?? null;
-  const { data: facts } = useLabelFacts(templateId);
-  const { data: whereUsed } = useWhereUsed(templateId ?? undefined);
+  const factsQuery = useLabelFacts(templateId);
+  const whereUsedQuery = useWhereUsed(templateId ?? undefined);
+  const { data: facts } = factsQuery;
+  const { data: whereUsed, isError: whereUsedFailed } = whereUsedQuery;
   const save = useSetLabelFacts(templateId ?? "");
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
   const savedName = facts?.label_name ?? "";
   useEffect(() => setName(savedName), [savedName]);
 
-  if (!templateId || !facts) return null;
+  if (!templateId) return null;
+  // Nothing rendered means "no label to speak of"; a failed read must not
+  // pass for it, so it says the answer is missing.
+  if (factsQuery.isError || whereUsedFailed) {
+    return (
+      <LabelReadFailed
+        error={factsQuery.error ?? whereUsedQuery.error}
+        onRetry={() => {
+          void factsQuery.refetch();
+          void whereUsedQuery.refetch();
+        }}
+      />
+    );
+  }
+  if (!facts) return null;
   if (!hasLabel(facts, whereUsed?.items.length ?? 0)) return null;
 
   const commit = async (change: Partial<LabelFactsUpdate>) => {
