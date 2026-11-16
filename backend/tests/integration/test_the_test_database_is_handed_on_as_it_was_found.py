@@ -151,18 +151,20 @@ def test_starting_a_module_for_every_test_does_not_pile_up_listeners() -> None:
 def test_a_factory_set_on_the_facade_stops_shadowing_the_live_one(
     monkeypatch,
 ) -> None:
-    """A facade patched directly keeps the patch's leftover for the next test.
+    """A name left set on the facade is taken off, so the live one shows again.
 
-    ``monkeypatch.setattr`` on the facade restores by setting the value it
-    read, so the facade then holds a real attribute — once the engine of an
-    earlier client's lifespan, whose pool belongs to a closed event loop. A
-    later webhook test pointed ``app.database`` at its own engine, reached
-    that pool through the facade and failed with "attached to a different
-    loop", on whichever worker the files happened to meet.
+    A real attribute on the facade — the engine of an earlier client's
+    lifespan, whose pool belongs to a closed event loop — shadows the
+    forwarding to ``app.database``. A later webhook test pointed
+    ``app.database`` at its own engine, reached that pool through the facade
+    and failed with "attached to a different loop", on whichever worker the
+    files happened to meet. pytest used to leave such an attribute behind when
+    ``monkeypatch.setattr(..., raising=False)`` was undone over a forwarded
+    name; since 9.2 it does not, so the leftover is set directly here, the way
+    any test that assigns to the facade leaves it.
     """
     left_over = object()
-    with monkeypatch.context() as patch:
-        patch.setattr(db_facade, 'AsyncSessionLocal', left_over, raising=False)
+    db_facade.AsyncSessionLocal = left_over
     own = object()
     monkeypatch.setattr(app.database, 'AsyncSessionLocal', own)
     assert db_facade.AsyncSessionLocal is not own
