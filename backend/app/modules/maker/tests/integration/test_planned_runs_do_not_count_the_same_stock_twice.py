@@ -202,3 +202,36 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
         rows = _by_id(client, mk_auth_headers)
 
         assert rows[made['id']]['coverage'] is None
+
+    def test_moving_a_run_to_another_day_moves_it_in_the_queue(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        bread = self._world(
+            client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
+        )
+        first = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _DAY)
+        second = _plan(
+            client,
+            mk_auth_headers,
+            bread.id,
+            mk_output_loc.id,
+            '6',
+            _DAY + timedelta(days=1),
+        )
+
+        moved = client.patch(
+            f'/api/v1/maker/production/orders/{second["id"]}',
+            headers=mk_auth_headers,
+            json={'production_date': (_DAY - timedelta(days=1)).isoformat()},
+        )
+        assert moved.status_code == 200, moved.text
+        rows = _by_id(client, mk_auth_headers)
+
+        assert rows[second['id']]['coverage'] == 'covered'
+        assert rows[first['id']]['coverage'] == 'partial'
