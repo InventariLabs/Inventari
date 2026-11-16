@@ -78,6 +78,7 @@ async def _restore_single_item(
                 item.template_id,
                 consumed,
                 rate,
+                internal=True,
             )
         else:
             await core_api.valuation.record_unpriced_receipt_async(

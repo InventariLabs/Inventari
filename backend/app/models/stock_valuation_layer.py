@@ -217,6 +217,17 @@ class StockValuationLayer(Base):
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
+    #: Whether the goods came from the organization's own books rather than
+    #: from outside: a product a production run put on the shelf, ingredients
+    #: put back when it was undone, a return taken at what the goods had cost.
+    #: Such a layer holds stock and value, but nobody was paid for it — the
+    #: money was spent when the ingredients were bought. The reports of what
+    #: was spent leave these out; every other reader treats them like any
+    #: receipt.
+    internal: Mapped[bool] = mapped_column(
+        default=False, server_default=text('false'), nullable=False
+    )
+
     #: When a cost that was only known later was put on what was left of this
     #: receipt (``ValuationService.add_value_to_layer_async``), NULL on a layer
     #: nobody revalued. The layer then reads what it is worth now; a report
