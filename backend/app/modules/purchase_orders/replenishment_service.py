@@ -362,6 +362,24 @@ async def _shortages_async(
     return shortages, layout, lots
 
 
+async def _templates_made_here_async(
+    db: AsyncSession, org_id: UUID, template_ids: set[UUID]
+) -> set[UUID]:
+    """Which of *template_ids* the organization makes from a recipe of its own.
+
+    Asked of production through its public API, and only while production is
+    on: without it nothing is made here and every shortage is a purchase.
+    """
+    if not template_ids or not await core_api.organizations.is_module_enabled_async(
+        db, org_id, 'maker'
+    ):
+        return set()
+    from app.modules.maker.maker_api import maker_api
+
+    with_recipe = set(await maker_api.list_template_ids_with_bom_async(db, org_id))
+    return template_ids & with_recipe
+
+
 async def _compute_alerts_for_rules(
     db: AsyncSession,
     org_id: UUID,
@@ -396,6 +414,9 @@ async def _compute_alerts_for_rules(
         else {}
     )
 
+    made_here = await _templates_made_here_async(
+        db, org_id, {s.rule.product_template_id for s in shortages}
+    )
     alerts: list[ReplenishmentAlertDTO] = []
     for shortage in shortages:
         rule = shortage.rule
@@ -411,9 +432,10 @@ async def _compute_alerts_for_rules(
         remaining = max(shortage.suggested - share, Decimal('0'))
         product = rule.product_template
         supplier = rule.preferred_partner
+        make_instead = rule.product_template_id in made_here
         proposed_offer = (
             None
-            if rule.preferred_partner_id
+            if rule.preferred_partner_id or make_instead
             else offers.get((rule.product_template_id, remaining))
         )
         if proposed_offer is not None:
@@ -436,8 +458,15 @@ async def _compute_alerts_for_rules(
                 ),
                 proposed_move_quantity=float(proposed),
                 remaining_to_buy=float(remaining),
-                preferred_partner_id=supplier.id if supplier else None,
-                preferred_partner_name=supplier.name if supplier else None,
+                # A product the organization makes is produced, not bought:
+                # no supplier is proposed even when the rule names one.
+                preferred_partner_id=(
+                    supplier.id if supplier and not make_instead else None
+                ),
+                preferred_partner_name=(
+                    supplier.name if supplier and not make_instead else None
+                ),
+                make_instead=make_instead,
             )
         )
 
@@ -485,10 +514,31 @@ async def replenishment_work_items_async(
     rule_by_id = {rule.id: rule for rule in rules}
     items: list[WorkItemDTO] = []
     for alert in await _compute_alerts_for_rules(db, org_id, rules):
-        if alert.proposed_move_quantity <= 0:
-            continue
         rule = rule_by_id[alert.reorder_rule_id]
         target = rule.storage_location
+        if alert.make_instead:
+            # What the shelf cannot be filled with from reserve is made, and
+            # the task opens the production screen on it, not a purchase.
+            to_make = Decimal(str(alert.remaining_to_buy or 0))
+            if to_make > 0:
+                items.append(
+                    WorkItemDTO(
+                        kind='produce',
+                        source_kind='production_proposal',
+                        source_id=rule.id,
+                        subject=alert.product_name,
+                        count=to_make,
+                        unit=rule.uom_symbol,
+                        place=target.name if target is not None else None,
+                        next_action='produce',
+                        action_href=(
+                            f'/maker/production?plan={rule.product_template_id}'
+                            f'&quantity={to_make.normalize():f}'
+                        ),
+                    )
+                )
+        if alert.proposed_move_quantity <= 0:
+            continue
         items.append(
             WorkItemDTO(
                 kind='replenish',
@@ -688,6 +738,15 @@ async def create_draft_pos_from_alerts_async(
                     reorder_rule_id=rule.id,
                     product_name=rule.product_name,
                     reason='not_alerting',
+                )
+            )
+            continue
+        if alert.make_instead:
+            skipped.append(
+                ReplenishmentDraftSkipped(
+                    reorder_rule_id=rule.id,
+                    product_name=rule.product_name,
+                    reason='made_here',
                 )
             )
             continue

@@ -614,7 +614,8 @@ class ReplenishmentDraftSkipped(BaseModel):
     at or above the minimum right now), ``covered_by_reserve`` (the
     proposed internal move covers the whole shortage, so there is nothing
     to buy), ``no_supplier`` (neither the rule nor the price list names
-    a supplier; reported, never turned into an empty order).
+    a supplier; reported, never turned into an empty order), ``made_here``
+    (the product has a recipe: it is produced, not bought).
     """
 
     reorder_rule_id: UUID

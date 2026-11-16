@@ -136,6 +136,10 @@ class ReplenishmentAlertDTO(BaseModel):
     # alert without one as "no supplier" instead of offering a draft PO.
     preferred_partner_id: UUID | None = None
     preferred_partner_name: str | None = None
+    #: The product has a recipe the organization makes it by: the alert says
+    #: to produce it, not to buy it, and no supplier or draft order is
+    #: proposed for it. False while the production module is off.
+    make_instead: bool = False
 
 
 class ReplenishmentMoveLineDTO(BaseModel):
