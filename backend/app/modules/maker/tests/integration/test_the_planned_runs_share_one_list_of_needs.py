@@ -36,7 +36,7 @@ from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_MONDAY = date(2031, 3, 3)
+_MONDAY = date.today() + timedelta(days=30)
 _API = '/api/v1/maker/production'
 
 

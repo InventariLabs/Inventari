@@ -23,7 +23,8 @@ const order = (id: string, day: string, coverage: "covered" | "partial") =>
     coverage,
   }) as unknown as ProductionOrder;
 
-const period = planPeriod("week", new Date("2031-03-05T12:00:00"));
+const period = planPeriod("week", new Date());
+const [monday, tuesday, wednesday] = period.days;
 
 function renderCalendar(canWrite: boolean) {
   return render(
@@ -31,10 +32,7 @@ function renderCalendar(canWrite: boolean) {
       <PlanCalendar
         period={period}
         canWrite={canWrite}
-        orders={[
-          order("a", "2031-03-03", "covered"),
-          order("b", "2031-03-04", "partial"),
-        ]}
+        orders={[order("a", monday, "covered"), order("b", tuesday, "partial")]}
       />
     </MemoryRouter>,
   );
@@ -45,20 +43,20 @@ describe("PlanCalendar", () => {
 
   it("lays the week out by day with each run's coverage", () => {
     renderCalendar(true);
-    const monday = screen.getByTestId("maker-plan-day-2031-03-03");
-    expect(within(monday).getByText("Bread a")).toBeInTheDocument();
-    expect(within(monday).getByText("Covered")).toBeInTheDocument();
-    const tuesday = screen.getByTestId("maker-plan-day-2031-03-04");
-    expect(within(tuesday).getByText("Partly covered")).toBeInTheDocument();
+    const firstDay = screen.getByTestId(`maker-plan-day-${monday}`);
+    expect(within(firstDay).getByText("Bread a")).toBeInTheDocument();
+    expect(within(firstDay).getByText("Covered")).toBeInTheDocument();
+    const secondDay = screen.getByTestId(`maker-plan-day-${tuesday}`);
+    expect(within(secondDay).getByText("Partly covered")).toBeInTheDocument();
   });
 
   it("hides the empty days from a phone, which reads the grid as a list by day", () => {
     renderCalendar(true);
-    expect(screen.getByTestId("maker-plan-day-2031-03-05").className).toContain(
-      "hidden md:block",
-    );
     expect(
-      screen.getByTestId("maker-plan-day-2031-03-03").className,
+      screen.getByTestId(`maker-plan-day-${wednesday}`).className,
+    ).toContain("hidden md:block");
+    expect(
+      screen.getByTestId(`maker-plan-day-${monday}`).className,
     ).not.toContain("hidden");
   });
 

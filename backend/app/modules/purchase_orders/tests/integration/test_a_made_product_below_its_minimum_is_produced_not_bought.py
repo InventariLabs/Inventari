@@ -10,6 +10,7 @@ With production off nothing is made here and the shortage is a purchase.
 from __future__ import annotations
 
 import uuid
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import Any, cast
 
@@ -24,6 +25,8 @@ from app.modules.purchase_orders.models import ReorderRule
 from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
+
+_LATER = (date.today() + timedelta(days=365)).isoformat()
 
 
 def _world(
@@ -148,7 +151,7 @@ class TestAMadeProductBelowItsMinimum:
         response = client.get(
             '/api/v1/warehouse/todo',
             headers=headers,
-            params={'date_to': '2031-01-01', 'limit': 50},
+            params={'date_to': _LATER, 'limit': 50},
         )
 
         assert response.status_code == status.HTTP_200_OK, response.text
@@ -178,7 +181,7 @@ class TestAMadeProductBelowItsMinimum:
         todo = client.get(
             '/api/v1/warehouse/todo',
             headers=headers,
-            params={'date_to': '2031-01-01', 'limit': 50},
+            params={'date_to': _LATER, 'limit': 50},
         ).json()
 
         assert alert['make_instead'] is False

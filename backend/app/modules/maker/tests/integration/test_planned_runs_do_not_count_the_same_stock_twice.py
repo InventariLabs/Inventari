@@ -25,7 +25,7 @@ from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_DAY = date(2031, 3, 3)
+_DAY = date.today() + timedelta(days=30)
 
 
 def _plan(

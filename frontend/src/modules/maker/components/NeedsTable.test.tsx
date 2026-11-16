@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { NeedsTable } from "./NeedsTable";
 import type { NeedsView } from "@/modules/maker/types/maker";
 
+const nextWeek = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+
 const row = {
   template_id: "t-1",
   name: "Flour",
@@ -14,7 +16,7 @@ const row = {
     {
       purchase_order_id: "po-1",
       number: "PO-1",
-      expected_date: "2031-03-04",
+      expected_date: nextWeek,
       quantity: "3",
     },
   ],
