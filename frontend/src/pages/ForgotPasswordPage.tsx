@@ -43,7 +43,9 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout
+      title={t("reset.title", { defaultValue: "Forgot your password?" })}
+    >
       <Card className="p-6 sm:p-8 shadow-lg">
         <Link
           to="/login"

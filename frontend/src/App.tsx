@@ -16,7 +16,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useTranslation } from "react-i18next";
+import { useDocumentLanguage } from "./hooks/useDocumentLanguage";
 import { useAuthStore } from "./store/authStore";
 import { useModules } from "./contexts/ModulesContext";
 import { FocusLockGate } from "./components/FocusLockGate";
@@ -181,15 +181,8 @@ function App({ initialEntries }: AppProps = {}) {
   } = useModules();
 
   // The document's language follows the language on screen from the first
-  // route, whatever route it is. index.html ships `lang="en"` for whatever
-  // reads the document before React mounts, and a signed-out visitor meets
-  // a Polish form on /login before any shell exists — left alone, a screen
-  // reader pronounced that form in English phonetics and the browser
-  // offered to translate the page it was already showing.
-  const { i18n } = useTranslation();
-  useEffect(() => {
-    document.documentElement.lang = i18n.language?.substring(0, 2) ?? "en";
-  }, [i18n.language]);
+  // route, whatever route it is (see the hook).
+  useDocumentLanguage();
 
   // Modules register here, not at import time: importing a module.ts drags
   // in that module's registration code and its API layer, and none of it

@@ -26,7 +26,7 @@ export default function PrivacyPage() {
   const initStatus = useInitStatus();
 
   return (
-    <AuthLayout>
+    <AuthLayout title={t("privacy.title")}>
       <Card className="p-6 sm:p-8 border border-transparent shadow-lg">
         <h2 className="text-xl font-semibold text-on mb-3 leading-none">
           {t("privacy.title")}

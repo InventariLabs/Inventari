@@ -105,7 +105,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout title={t("login.title", { defaultValue: "Welcome back" })}>
       <Card className="p-6 sm:p-8 border border-transparent shadow-lg">
         {initStatus?.is_demo && (
           <DemoEntry

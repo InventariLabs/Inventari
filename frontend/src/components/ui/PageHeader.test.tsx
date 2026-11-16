@@ -108,3 +108,16 @@ describe("PageHeader back arrow", () => {
     );
   });
 });
+
+describe("PageHeader document title", () => {
+  afterEach(() => {
+    document.title = "Inventari";
+  });
+
+  it("names the tab after the heading and drops it with the page", () => {
+    const { unmount } = renderHeader();
+    expect(document.title).toBe("Recipes · Inventari");
+    unmount();
+    expect(document.title).toBe("Inventari");
+  });
+});

@@ -3,8 +3,11 @@ import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { PackageSearch } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 interface AuthLayoutProps {
+  /** What the screen is for, in the language on screen — the tab's title. */
+  title: string;
   children: ReactNode;
 }
 
@@ -18,8 +21,9 @@ interface AuthLayoutProps {
  *
  * Replaces 4 copies of the same layout markup across auth pages.
  */
-export function AuthLayout({ children }: AuthLayoutProps) {
+export function AuthLayout({ title, children }: AuthLayoutProps) {
   const { t } = useTranslation("auth");
+  useDocumentTitle(title);
 
   return (
     <div className="min-h-screen flex bg-surface">

@@ -22,6 +22,7 @@ import {
   countryFromLocale,
   countryLabel,
   extractApiError,
+  useDocumentTitle,
 } from "@/module-sdk";
 import { resolveModuleTarget, moduleRegistry } from "@/lib/moduleRegistry";
 import { useMyModules } from "@/modules/settings/hooks/useModules";
@@ -390,9 +391,11 @@ export default function OnboardingPage() {
   }
 
   const closed = whyClosed(org, user, settingUp.current);
+  const shutOut = forbidden || closed === "not-admin";
+  useDocumentTitle(shutOut ? t("forbiddenTitle") : t(STEP_COPY[step].title));
   if (closed === "done") return <Navigate to="/" replace />;
 
-  if (forbidden || closed === "not-admin") {
+  if (shutOut) {
     return <ForbiddenScreen onSignOut={() => void logout()} />;
   }
 

@@ -128,6 +128,12 @@ says what the release does rather than what changed since them.
   module draws batch labels (`lot_ids`, `POST /printing/lot-labels/png`, up to
   two hundred copies), and the module SDK exports the upload policy a module
   checks its own attachments with.
+- Every page names its browser tab, bookmark and history entry, in the
+  language on screen: `Products · Inventari` instead of `Inventari` for all of
+  them, and the title follows the page on every navigation. A screen reader
+  announces it when the page changes. The sign-in, registration, password
+  reset, privacy, invitation, set-up and attestation screens have titles of
+  their own.
 
 ### Changed
 
@@ -159,6 +165,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The public attestation page declares the language it is written in
+  (`<html lang>`), as the rest of the application does, so a screen reader
+  pronounces a Polish page in Polish. Choosing a language before signing in no
+  longer tries to save it to an account that does not exist, and no longer logs
+  an error in the console; the choice is still kept for the next sign-in.
 - The locations list and the location tree answer within their screens'
   budget in a large warehouse. A page holding a warehouse or the containers
   above its shelves, and the first levels of the tree, count every record

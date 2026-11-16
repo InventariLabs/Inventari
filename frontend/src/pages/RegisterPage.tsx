@@ -222,7 +222,7 @@ export default function RegisterPage() {
 
   if (isSubmitted && !token && !isFirstUser) {
     return (
-      <AuthLayout>
+      <AuthLayout title={t("requestSubmitted")}>
         <Card className="p-6 sm:p-8 border border-transparent shadow-lg">
           <div className="mb-8 text-center sm:text-left">
             <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto sm:mx-0 mb-4">
@@ -247,7 +247,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title={getTitle()}>
       <Card className="p-6 sm:p-8 border border-transparent shadow-lg">
         <div className="mb-8 text-center sm:text-left">
           <h2 className="text-xl font-semibold text-on mb-3 leading-none">

@@ -20,6 +20,7 @@ import {
 } from "@/lib/errors";
 import { Loader2, Home, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useDocumentTitle } from "@/module-sdk";
 import { Button } from "@/components/ui/Button";
 
 /**
@@ -140,6 +141,7 @@ export default function JoinOrganizationPage() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuthStore();
   const { t } = useTranslation("common");
+  useDocumentTitle(t("settings.organization.joining"));
 
   const code = searchParams.get("code") ?? token ?? null;
   const [error, setError] = useState<string | null>(null);

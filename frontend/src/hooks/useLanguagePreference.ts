@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { authApi } from "@/lib/api/auth";
+import { useAuthStore } from "@/store/authStore";
 import { rememberLanguageChoice } from "@/i18n/languageChoice";
 import { resolveLang, type Language } from "@/i18n/languages";
 import { logger } from "@/utils/logger";
@@ -19,22 +20,29 @@ export function useLanguagePreference(): {
   changeLanguage: (next: Language) => Promise<void>;
 } {
   const { i18n } = useTranslation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const language = resolveLang((i18n.language || "en").substring(0, 2));
 
   const changeLanguage = useCallback(
     async (next: Language) => {
       i18n.changeLanguage(next);
+      if (!isAuthenticated) {
+        // Nobody to save it for: the account call would only answer 401 and
+        // log an error for a refusal that is expected. Hold the choice for
+        // the next sign-in.
+        rememberLanguageChoice(next);
+        return;
+      }
       try {
         await authApi.updateLanguage(next);
       } catch (error) {
-        // Signed out (the selector is on the sign-in screen too), or the call
-        // failed: hold the choice so the next sign-in adopts it instead of
-        // replacing it with the account's stored preference.
+        // The save failed: hold the choice so the next sign-in adopts it
+        // instead of replacing it with the account's stored preference.
         rememberLanguageChoice(next);
         logger.error("Failed to save language preference:", error);
       }
     },
-    [i18n],
+    [i18n, isAuthenticated],
   );
 
   return { language, changeLanguage };

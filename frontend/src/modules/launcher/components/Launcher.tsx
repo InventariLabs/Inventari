@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { useDocumentTitle } from "@/module-sdk";
 import { Link } from "react-router-dom";
 import {
   Clock,
@@ -289,6 +290,8 @@ export default function Launcher() {
 
   const isAdmin = useHasPermission("admin:access");
   const greeting = useLauncherGreeting();
+  // The greeting changes with the hour; the tab names the page.
+  useDocumentTitle(t("launcher:launcher.title"));
 
   return (
     <div className="max-w-screen-2xl mx-auto space-y-6 pb-32 pt-2">

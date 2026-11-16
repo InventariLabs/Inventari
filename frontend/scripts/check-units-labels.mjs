@@ -43,11 +43,12 @@
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { maintainedLanguages } from "./maintained-languages.mjs";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const BACKEND_UNITS = resolve(ROOT, "../backend/app/i18n/_units.py");
 const LOCALES = resolve(ROOT, "src/i18n/locales");
-const LANGUAGES = ["en", "pl", "de", "es", "fr"];
+const LANGUAGES = maintainedLanguages(ROOT);
 
 /** `{'sym': 'label', ...}` pairs of one language block in _units.py. */
 export function parseBackendBlock(text, language) {

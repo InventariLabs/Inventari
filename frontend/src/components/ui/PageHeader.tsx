@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useNavLeaveGuard } from "@/hooks/useNavLeaveGuard";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import type { PageHeaderData } from "@/hooks/useModulePageHeader";
 
 interface PageHeaderProps extends PageHeaderData {
@@ -38,6 +39,9 @@ export function PageHeader({
       }
     });
   };
+
+  // The heading is the page's name; the tab, bookmark and history say it too.
+  useDocumentTitle(typeof title === "string" ? title : null);
 
   if (!title && !actions && !backTo) return null;
 

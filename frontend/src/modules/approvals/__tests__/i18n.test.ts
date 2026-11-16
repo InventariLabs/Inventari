@@ -1,11 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import en from "../i18n/en.json";
-import pl from "../i18n/pl.json";
-import de from "../i18n/de.json";
-import fr from "../i18n/fr.json";
-import es from "../i18n/es.json";
+import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
 
 const APPROVALS_DIR = join(__dirname, "..");
 
@@ -55,16 +51,22 @@ function flattenKeys(obj: Record<string, unknown>, prefix = ""): Set<string> {
 const PLURAL_SUFFIX_RE = /_(zero|one|two|few|many|other)$/;
 const stripPlural = (key: string) => key.replace(PLURAL_SUFFIX_RE, "");
 
-const languages: Record<string, Record<string, unknown>> = {
-  en,
-  pl,
-  de,
-  fr,
-  es,
-};
+// Every maintained language, from the one declaration of them — a language
+// added as maintained is held to parity here with no edit.
+const files = import.meta.glob<{ default: Record<string, unknown> }>(
+  "../i18n/*.json",
+  { eager: true },
+);
+const languages: Record<string, Record<string, unknown>> = Object.fromEntries(
+  MAINTAINED_LANGUAGES.map((lang) => [
+    lang,
+    files[`../i18n/${lang}.json`].default,
+  ]),
+);
+const en = languages.en;
 
 describe("approvals i18n parity", () => {
-  it("all five locales are present", () => {
+  it("every maintained locale is present", () => {
     for (const name of Object.keys(languages)) {
       expect(languages[name]).toBeDefined();
     }
