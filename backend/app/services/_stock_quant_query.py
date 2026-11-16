@@ -117,6 +117,7 @@ async def list_quants_async(
     storage_location_id: UUID | None = None,
     product_template_ids: list[UUID] | None = None,
     storage_location_ids: list[UUID] | None = None,
+    drawable_only: bool = False,
 ) -> list[Row[Any]]:
     """What stands on the shelves, as the records tell it.
 
@@ -134,6 +135,11 @@ async def list_quants_async(
     ``product_template_ids`` is the batch twin of ``product_template_id``
     (callers resolving many templates must not issue one query each), and
     ``storage_location_ids`` the same twin of ``storage_location_id``.
+
+    ``drawable_only`` keeps out the batches a draw refuses — held,
+    quarantined, recalled or past their date (``active_lot_predicate``) —
+    for a reader that promises what can be taken, so that its answer and the
+    draw's agree.
     """
     from app.models.stock_quants_from_records import stock_quants_from_records
 
@@ -142,6 +148,8 @@ async def list_quants_async(
         view.c.organization_id == organization_id,
         view.c.storage_location_id.is_not(None),
     )
+    if drawable_only:
+        stmt = stmt.where(active_lot_predicate(view.c.lot_id))
     if product_template_id:
         stmt = stmt.where(view.c.product_template_id == product_template_id)
     elif product_template_ids:
