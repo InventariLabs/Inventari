@@ -30,4 +30,19 @@ describe("useDocumentTitle", () => {
     renderHook(() => useDocumentTitle(undefined));
     expect(document.title).toBe("Inventari");
   });
+
+  it("hands the tab back to the holder that is still mounted", () => {
+    renderHook(() => useDocumentTitle("Purchase Orders"));
+    const inner = renderHook(() => useDocumentTitle("Order not found"));
+    expect(document.title).toBe("Order not found · Inventari");
+    inner.unmount();
+    expect(document.title).toBe("Purchase Orders · Inventari");
+  });
+
+  it("keeps the newer title when an older holder unmounts late", () => {
+    const older = renderHook(() => useDocumentTitle("Order not found"));
+    renderHook(() => useDocumentTitle("Purchase Orders"));
+    older.unmount();
+    expect(document.title).toBe("Purchase Orders · Inventari");
+  });
 });

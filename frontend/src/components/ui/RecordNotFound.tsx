@@ -42,8 +42,10 @@ export function RecordNotFound({
   icon = SearchX,
 }: RecordNotFoundProps) {
   const navigate = useNavigate();
-  // The shell's PageHeader is empty on these nested paths, so the sentence
-  // naming what is missing is the only heading the tab can follow.
+  // Some detail screens keep the shell's PageHeader above this block, others
+  // leave it empty; either way the sentence naming what is missing names the
+  // tab, and the hook hands the tab back to a header still mounted when this
+  // block goes away.
   useDocumentTitle(title);
   return (
     <EmptyState

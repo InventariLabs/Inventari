@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { render, renderHook, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { RecordNotFound } from "./RecordNotFound";
 
 const navigate = vi.fn();
@@ -36,6 +37,14 @@ describe("RecordNotFound", () => {
     expect(document.title).toBe("Document not found · Inventari");
     unmount();
     expect(document.title).toBe("Inventari");
+  });
+
+  it("leaves the tab with the page header that stays when the not-found screen goes", () => {
+    document.title = "Inventari";
+    renderHook(() => useDocumentTitle("Purchase Orders"));
+    const { unmount } = renderIt();
+    unmount();
+    expect(document.title).toBe("Purchase Orders · Inventari");
   });
 
   it("offers one way onwards, and it leads to the list", async () => {
