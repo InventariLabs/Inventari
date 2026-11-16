@@ -129,6 +129,7 @@ async def _get_available_stock_batch(
         organization_id,
         storage_location_id=location_id,
         product_template_ids=template_ids,
+        drawable_only=True,
     )
     totals: dict[UUID, Decimal] = {}
     for q in quants:

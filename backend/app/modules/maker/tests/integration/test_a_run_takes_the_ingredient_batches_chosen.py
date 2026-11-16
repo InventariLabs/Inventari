@@ -359,8 +359,10 @@ def test_a_held_output_batch_is_offered_to_no_other_run(
     refused = client.post(
         f'{ORDERS}/{draft.json()["id"]}/complete', headers=mk_auth_headers
     )
-    # Refused, whatever the words: the batch on hold is not taken.
-    assert refused.status_code >= 400, refused.text
+    # The batch on hold is not taken, and the refusal is the shortage list
+    # the dialog reads, not a raw stock error.
+    assert refused.status_code == 422, refused.text
+    assert refused.json()['detail']['error'] == 'insufficient_stock', refused.text
     assert (
         client.get(f'{ORDERS}/{draft.json()["id"]}', headers=mk_auth_headers).json()[
             'status'

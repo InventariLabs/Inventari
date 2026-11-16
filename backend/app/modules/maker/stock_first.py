@@ -83,6 +83,7 @@ class StockPool:
             self._org,
             storage_location_id=self._location_id,
             product_template_ids=missing,
+            drawable_only=True,
         )
         for quant in quants:
             if quant.available_quantity > 0:
