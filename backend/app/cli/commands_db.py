@@ -485,6 +485,7 @@ _ADDED_AFTER_BASELINE_COLUMNS = {
     ('stock_valuation_layers', 'revalued_at'),
     ('stock_valuation_layers', 'unit_cost_before'),
     ('stock_valuation_layers', 'cost_basis_before'),
+    ('stock_valuation_layers', 'internal'),
 }
 
 

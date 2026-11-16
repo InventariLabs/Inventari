@@ -79,7 +79,7 @@ def _complete_a_run(
     output_id: UUID,
     input_loc: StorageLocation,
     output_loc: StorageLocation,
-) -> None:
+) -> str:
     created = client.post(
         '/api/v1/maker/production/orders',
         headers=headers,
@@ -96,6 +96,7 @@ def _complete_a_run(
         headers=headers,
     )
     assert completed.status_code == 200, completed.text
+    return str(created.json()['id'])
 
 
 def _card(db: Session, org_id: UUID, template_id: UUID) -> Item:
@@ -175,3 +176,51 @@ def test_a_run_from_priceless_ingredients_opens_a_silent_card(
 
     card = _card(db_session, mk_org.id, output.id)
     assert card.purchase_price is None
+
+
+def test_a_run_and_its_reversal_do_not_count_as_spending(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_org: Organization,
+    mk_input_loc: StorageLocation,
+    mk_output_loc: StorageLocation,
+    db_session: Session,
+) -> None:
+    """Ten bought at 2.50 are 25.00 spent, whatever the run does with them.
+
+    The run's product and the ingredients a reversal puts back are receipt
+    layers too; summed with the purchase they made the same money count two
+    and three times on the cost screen.
+    """
+    ingredient = _template(db_session, mk_org, 'Flour the ledger priced')
+    output = _template(db_session, mk_org, 'Output')
+    _recipe(db_session, mk_org, output_id=output.id, child_id=ingredient.id)
+    post_on_shelf(
+        client,
+        mk_auth_headers,
+        ingredient,
+        mk_input_loc.id,
+        10,
+        purchase_price='2.50',
+    )
+
+    def spent() -> float:
+        response = client.get('/api/v1/stats/cost-analysis', headers=mk_auth_headers)
+        assert response.status_code == 200, response.text
+        total: float = response.json()['total_spent']
+        return total
+
+    run_id = _complete_a_run(
+        client,
+        mk_auth_headers,
+        output_id=output.id,
+        input_loc=mk_input_loc,
+        output_loc=mk_output_loc,
+    )
+    assert spent() == 25.0
+
+    reversed_run = client.post(
+        f'/api/v1/maker/production/orders/{run_id}/reverse', headers=mk_auth_headers
+    )
+    assert reversed_run.status_code == 200, reversed_run.text
+    assert spent() == 25.0
