@@ -18,6 +18,13 @@ The printing system is split into two tiers:
 - **Batch labels**: `POST /api/v1/printing/lot-labels/png` draws a batch's label — the product's
   name, the batch's own code in bars, the day it was made and its best-before. A batch label goes
   up to 200 copies (a run prints one per unit it made); every other label stops at 20.
+- **A made product's ingredient list**: with `composition`, a product label and a batch label
+  carry the made product's ingredient list and allergens (the production module's
+  `maker_api.label_text_async`, computed from the product's BOM) as a block under the name.
+  `X-Labels-With-Composition` counts the labels that have one, whether or not they print it. The
+  block is set as large as the label leaves room for and never below the 0.9 mm x-height
+  Regulation 1169/2011 allows on a small package; a list that does not fit is refused
+  (`product_label_composition_does_not_fit`, naming the size) rather than printed smaller or cut.
 - **Export API**: `GET /api/v1/labels/pool/export/png` — returns a PNG batch of unprinted labels (or the ones named by `label_ids` / `short_codes`) and marks them as printed, unless `mark_printed=false`; with nothing unprinted it answers 400 `NO_LABELS_AVAILABLE`.
 - **Print queue**: `app.modules.printing` — **Send to printer** in the app creates a print job for a
   registered agent; the agent claims it, fetches its image, prints it and reports the outcome. The

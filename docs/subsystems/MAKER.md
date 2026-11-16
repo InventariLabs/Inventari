@@ -26,6 +26,7 @@ I have the ingredients?").
 | `maker_production_order_lines` | Per-ingredient consumption audit recorded on completion. |
 | `maker_module_settings` | The `*_module_settings` pattern (org_id PK, typed columns), including `labor_hourly_rate` — what an hour of the organization's own work costs. |
 | `maker_shelf_lives` | How many days a product keeps once made, one row per organization and product (a product can be a catalogue row shared by every organization, so the fact lives here, as a typed price does). |
+| `maker_label_facts` | What a product's label says of it, one row per organization and product: `label_name` (the name it goes under in an ingredient list), `allergens` (the EU keys a person confirmed; NULL until someone checked, which is not the same as an empty list) and `may_contain`. A made product's list is computed from these facts on its ingredients. |
 | `maker_production_attachments` | Photos and files filed under a run; the files live under the organization's `maker/` storage folder and `/uploads/` serves them through `ProductionAttachmentResolver`. |
 
 ## Batch math
@@ -245,6 +246,57 @@ print through the printing module's batch target (`lot_ids`,
 `POST /printing/lot-labels/png`): the product, the batch code in bars, the
 production date and the best-before, up to two hundred copies.
 
+### A made product's label
+
+`labelling.py` computes a made product's label from a recipe and its
+ingredients' label facts, the way EU Regulation 1169/2011 asks a food
+producer to write it:
+
+- **Ingredient list** — each line weighed as used: `qty_per_batch × (1 +
+  yield_loss_pct / 100)` in grams, converted through the line's unit (a
+  weight directly; a count or a volume through the card's `weight_value`,
+  what one stock unit weighs). Heaviest first; equal weights by name, so two
+  reads print the same list; a line nothing says the weight of is named in
+  `unweighed` and listed last. An ingredient with a default recipe is a
+  compound ingredient: its own list follows it in brackets, ordered by its
+  own weights, every level down (the same depth limit and cycle refusal as an
+  explosion). An ingredient goes under its `label_name`, else its product
+  name, and is emphasised when its card names an allergen.
+- **Allergens** — every allergen any ingredient's card (at any level,
+  intermediates included) confirms, each with the ingredients that bring it;
+  one declared on the made product itself is kept (`declared_on_product`).
+  A leaf nobody has checked is named in `unchecked` with what its name
+  suggests (`recipes_api.infer_allergens`) — a suggestion is never counted.
+  **May contain** collects the ingredients' and the product's own, minus what
+  the product already contains.
+- **Nutrition per 100 g** — from the figures on the ingredients' cards
+  (`meta_data['nutrition']`: `calories_kcal`, `fat_g`, `saturated_fat_g`,
+  `carbs_g`, `sugar_g`, `protein_g`, `salt_g`, per 100 g). A made ingredient
+  is read through its recipe: what its lines put in, divided by what its
+  batch weighs (`batch_yield_qty` in grams). The top level divides by what
+  the batch yields, so the water a bake loses concentrates the figures as it
+  does in the product. A figure an ingredient lacks makes that figure unknown
+  and names the ingredient (`missing`); it is never counted as zero. kJ is
+  kcal × 4.184; energy is rounded to a whole number, salt to a hundredth,
+  the rest to a tenth. With no figure on any ingredient there is no
+  declaration (`nutrition: null`).
+- **Label text** — `label_text` writes "Ingredients: …" with the allergens in
+  capitals (a one-colour label keeps them where bold may not survive), a
+  "Contains: …" sentence only for an allergen declared on the product that no
+  ingredient brings, and "May contain: …".
+
+Where another rule set plugs in: the label name is free text, so an INCI
+name goes in it; the allergens and the composing are the food regulation's.
+A module with its own labelling rules (cosmetics, wine) has no seam here
+yet — it would read the same facts and recipe tree through `maker_api` and
+compose its own text.
+
+| Endpoint | Description |
+|---|---|
+| `GET /labelling/products/{template_id}` | A product's `label_name`, `allergens` (null: not checked), `may_contain`, `suggested_allergens` (from its name), and for a made product its default recipe's `recipe_id`, `derived_allergens` and `derived_may_contain`, each with its sources. |
+| `PUT /labelling/products/{template_id}` | Keep them (`maker:manage`); an unknown allergen key is a 422, everything empty clears the row. Journalled on the product with both sides. |
+| `GET /labelling/recipes/{recipe_id}` | The label that recipe computes: `ingredients` (tree, `weight_g` per batch, `emphasised`), `text`, `allergens`, `may_contain`, `unchecked`, `unweighed`, `yield_weight_g`, `nutrition`. |
+
 ### Other
 
 | Endpoint | Description |
@@ -268,12 +320,16 @@ data / domain exceptions — a consumer does not have to guard every call):
 | `compute_unit_cost_async(db, org_id, template_id, planned_qty)` | Unit cost (0 with no ingredients). |
 | `get_breakdown_async(db, org_id, template_id, qty)` | `CostBreakdownResponse` (read-only). |
 | `complete_production_async(db, org_id, order_id, user, actual_qty=None)` | Executes a DRAFT (consumption → production → valuation). |
+| `label_text_async(db, org_id, template_id, lang)` | `str \| None` — a made product's ingredient list and allergens as a label prints them, from its default recipe; None for a product nobody makes and while the module is off. The printing module's product and batch labels print it. |
 | `list_work_items_async(db, org_id, query)` | `(list[WorkItemDTO], total)` — To do's provider for this module, registered with the warehouse module: draft runs planned for the day or earlier, and the counts owed for runs recorded after the fact. |
 
 **What it uses from `recipes_api`:** `recipes_api.get_recipe_snapshot_async(db,
 org_id, recipe_id)` returns a `RecipeSnapshot` (ingredients with `template_id`,
 `quantity`, `uom_id`, `uom_symbol`), consumed by `POST /recipes/from-recipe`.
 Org-scoped; `None` for a missing recipe, so the bridge degrades to a 404.
+`recipes_api.infer_allergens(name)` and `recipes_api.ALLERGEN_KEYS` give the
+label facts their suggestions and their closed list of keys; pure, so they
+answer whether the recipes module is on.
 
 ## Module settings (`maker_module_settings`)
 

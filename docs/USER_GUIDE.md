@@ -1714,6 +1714,45 @@ A finished run shows its batch with the day it was made and its best-before:
 At home the run speaks of jars: **Print jar labels**, and a best-before date.
 The batch code is still assigned and printed, but no screen asks for it.
 
+### 12.4 Ingredients, allergens and nutrition on the label
+
+The card of a product that goes into a BOM, or is made by one, has an **On the
+label** section:
+
+- **Name in an ingredient list** — what the product is called on a label: a
+  legal food name (*Wheat flour* for *Flour T550*), or an INCI name for a
+  cosmetic. Left empty, the list uses the product's own name.
+- **Allergens** — the 14 allergens of the EU food regulation. Until someone
+  has checked, the card says **Allergens not checked yet** and offers what the
+  product's name suggests: **Confirm the suggestion**, **Contains none**, or
+  **Choose allergens** to tick them. A suggestion counts for nothing until it
+  is confirmed. **May contain** is ticked the same way.
+- For a made product, **From the BOM** lists the allergens its ingredients
+  bring, each with the ingredient that brings it.
+
+The **Label** tab of a BOM computes the made product's label from it:
+
+- **Ingredients, heaviest first** — each as much as the batch uses, its loss
+  included, the allergens in bold; an ingredient that is itself made (the
+  dough in a cake) is followed by its own ingredients in brackets. An
+  ingredient written in pieces needs the card's weight of one piece to be
+  placed; until then it is named and listed last. Ingredients nobody has
+  checked for allergens are named too.
+- **Contains** and **May contain** — every allergen of every level, with the
+  ingredients that bring it; one ticked on the made product itself is kept.
+- **Nutrition per 100 g** — energy, fat, saturates, carbohydrate, sugars,
+  protein and salt, from the figures on the ingredients' cards (the **Food &
+  Health Info** section), per 100 g of what one batch yields: give the BOM's yield
+  in a weight, or the product's weight per piece. An ingredient without a
+  figure is named and the figure shown as not known — never counted as zero.
+
+Every part is computed, and the screens say it is yours to check before it
+goes on a package. On the label sheet of a made product, or of its batch, tick
+**Ingredients and allergens** to print the list (allergens in capitals) under
+the name. It is never printed smaller than the letter the EU regulation allows
+on a small package; a label too small for it is refused and asks for a larger
+size.
+
 ---
 
 ## 13. Partners and approvals
