@@ -131,9 +131,9 @@ def batch(db_session: Session, org: Organization, jam: ProductTemplate) -> Stock
     lot = StockLot(
         organization_id=org.id,
         product_template_id=jam.id,
-        name='20261116-1',
-        production_date=date(2026, 11, 16),
-        expiry_date=date(2027, 5, 16),
+        name='20251116-1',
+        production_date=date(2025, 11, 16),
+        expiry_date=date(2026, 5, 16),
     )
     db_session.add(lot)
     db_session.commit()
@@ -202,7 +202,7 @@ def test_a_batch_label_prints_the_list_under_the_name(
     # Fails without the change: the header is not sent.
     assert plain.headers['X-Labels-With-Composition'] == '1'
     assert listed.content != plain.content
-    assert read_bars(listed.content) == barcode_modules('20261116-1')
+    assert read_bars(listed.content) == barcode_modules('20251116-1')
 
 
 def test_a_queued_batch_label_keeps_the_list(
@@ -231,7 +231,7 @@ def test_a_queued_batch_label_keeps_the_list(
     assert stored is not None
     label: dict[str, Any] = stored.labels[0]
     assert label['composition'] == _LIST
-    assert label['details'] == 'Made Nov 16, 2026\nBest before May 16, 2027'
+    assert label['details'] == 'Made Nov 16, 2025\nBest before May 16, 2026'
 
 
 def test_the_made_products_own_label_prints_the_list(
