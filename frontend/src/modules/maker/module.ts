@@ -16,6 +16,7 @@ const BomLegacyRedirect = lazy(() => import("./pages/BomLegacyRedirect"));
 const BoMEntrySlot = lazy(() => import("./components/BoMEntrySlot"));
 const WhereUsedSlot = lazy(() => import("./components/WhereUsedSlot"));
 const ShelfLifeSlot = lazy(() => import("./components/ShelfLifeSlot"));
+const LabelFactsSlot = lazy(() => import("./components/LabelFactsSlot"));
 const CookForStockSlot = lazy(() => import("./components/CookForStockModal"));
 
 moduleRegistry.register({
@@ -96,6 +97,11 @@ moduleRegistry.register({
       slot: "item_edit_extra",
       component: slotComponent(ShelfLifeSlot),
       priority: 25,
+    },
+    {
+      slot: "item_edit_extra",
+      component: slotComponent(LabelFactsSlot),
+      priority: 27,
     },
     {
       slot: "item_edit_extra",

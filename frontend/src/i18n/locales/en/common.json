@@ -657,7 +657,10 @@
         "make_fresh": "Always make fresh",
         "material_cost": "Cost of materials taken",
         "started_on": "Started on",
-        "step": "Step"
+        "step": "Step",
+        "label_name": "Name in an ingredient list",
+        "allergens": "Allergens",
+        "may_contain": "May contain"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",

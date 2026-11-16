@@ -253,7 +253,8 @@
     "tabs": {
       "composition": "Composition",
       "cost": "Cost & result",
-      "history": "History"
+      "history": "History",
+      "label": "Label"
     },
     "sourceRecipe": "Based on a recipe (snapshot from {{date}})",
     "setAsDefault": "Set as default",
@@ -719,5 +720,77 @@
     "saved": "Shelf life saved",
     "saveFailed": "The shelf life could not be saved.",
     "invalid": "Type a whole number of days, 1 or more."
+  },
+  "labelling": {
+    "contains": "Contains",
+    "mayContain": "May contain",
+    "from": "from {{names}}",
+    "declaredOnProduct": "declared on the product",
+    "computedNote": "Computed from the BOM and its ingredients' cards. It is yours to check before it goes on a label.",
+    "allergens": {
+      "gluten": "Gluten",
+      "crustaceans": "Crustaceans",
+      "eggs": "Eggs",
+      "fish": "Fish",
+      "peanuts": "Peanuts",
+      "soy": "Soy",
+      "milk": "Milk",
+      "nuts": "Nuts",
+      "celery": "Celery",
+      "mustard": "Mustard",
+      "sesame": "Sesame",
+      "sulphites": "Sulphites",
+      "lupin": "Lupin",
+      "molluscs": "Molluscs"
+    },
+    "card": {
+      "title": "On the label",
+      "labelName": "Name in an ingredient list",
+      "labelNameHint": "A legal food name, or an INCI name for a cosmetic. Left empty, the list uses the product's own name.",
+      "unchecked": "Allergens not checked yet.",
+      "suggested": "The name suggests: {{allergens}}.",
+      "confirmSuggestion": "Confirm the suggestion",
+      "containsNone": "Contains none",
+      "choose": "Choose allergens",
+      "change": "Change allergens",
+      "done": "Done",
+      "none": "None",
+      "fromRecipe": "From the BOM",
+      "saved": "Label saved",
+      "saveFailed": "Could not save the label"
+    },
+    "tab": {
+      "ingredients": "Ingredients, heaviest first",
+      "noIngredients": "This BOM has no ingredients yet.",
+      "noAllergens": "No ingredient's card names an allergen.",
+      "unchecked": "Not checked for allergens yet:",
+      "uncheckedSuggests": "{{name}} (the name suggests {{allergens}})",
+      "unweighed": "Nothing says what these weigh, so the list puts them last: {{names}}. Give the card the weight of one unit, or write the line in a weight.",
+      "nutrition": "Nutrition per 100 g",
+      "nutritionNone": "No ingredient's card carries nutrition figures, so there is no declaration yet.",
+      "perYield": "Per 100 g of the {{weight}} g one batch yields.",
+      "yieldUnknown": "What one batch weighs is not known: give the BOM's yield in a weight, or the product's weight per unit.",
+      "notKnown": "not known",
+      "missing": "Not counted as zero, so a figure is not known:",
+      "missingLine": "{{name}} has no figure for {{nutrients}}"
+    },
+    "nutrients": {
+      "energy": "Energy",
+      "fat": "Fat",
+      "saturates": "of which saturates",
+      "carbohydrate": "Carbohydrate",
+      "sugars": "of which sugars",
+      "protein": "Protein",
+      "salt": "Salt"
+    },
+    "figures": {
+      "energy": "energy",
+      "fat": "fat",
+      "saturates": "saturates",
+      "carbohydrate": "carbohydrate",
+      "sugars": "sugars",
+      "protein": "protein",
+      "salt": "salt"
+    }
   }
 }

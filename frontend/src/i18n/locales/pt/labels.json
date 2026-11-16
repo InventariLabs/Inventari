@@ -228,5 +228,9 @@
       "printed": "Impressa",
       "failed": "Falhou"
     }
+  },
+  "composition": {
+    "label": "Ingredientes e alergênicos",
+    "note": "Calculado a partir da fórmula do produto; confira antes de a etiqueta ir para uma embalagem. Uma lista precisa de uma etiqueta maior que um código sozinho."
   }
 }

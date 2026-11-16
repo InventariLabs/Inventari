@@ -659,7 +659,10 @@
         "make_fresh": "Zawsze rób świeże",
         "material_cost": "Koszt pobranych materiałów",
         "started_on": "Rozpoczęto dnia",
-        "step": "Krok"
+        "step": "Krok",
+        "label_name": "Nazwa na liście składników",
+        "allergens": "Alergeny",
+        "may_contain": "Może zawierać"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",

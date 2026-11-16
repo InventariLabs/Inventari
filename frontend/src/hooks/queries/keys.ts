@@ -558,6 +558,14 @@ export const queryKeys = {
     /** A product's shelf life in days, as the maker keeps it. */
     shelfLife: (templateId: string) =>
       ["maker", "shelf-life", templateId] as const,
+    /** Everything a label shows: a product's facts and every recipe's label. */
+    labelAll: ["maker", "label"] as const,
+    /** A product's label name, allergens and may-contain list. */
+    labelFacts: (templateId: string) =>
+      ["maker", "label", "product", templateId] as const,
+    /** What a recipe makes of its ingredients' label facts. */
+    recipeLabel: (recipeId: string) =>
+      ["maker", "label", "recipe", recipeId] as const,
     breakdown: (templateId: string, qty: string, recipeId?: string | null) =>
       ["maker", "breakdown", templateId, qty, recipeId ?? null] as const,
     /** Placeholder for a breakdown query that is disabled until a template is chosen. */

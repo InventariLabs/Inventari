@@ -253,7 +253,8 @@
     "tabs": {
       "composition": "Zusammensetzung",
       "cost": "Kosten & Ergebnis",
-      "history": "Verlauf"
+      "history": "Verlauf",
+      "label": "Etikett"
     },
     "sourceRecipe": "Basierend auf einem Rezept (Momentaufnahme vom {{date}})",
     "setAsDefault": "Als Standard festlegen",
@@ -719,5 +720,77 @@
     "saved": "Haltbarkeit gespeichert",
     "saveFailed": "Die Haltbarkeit konnte nicht gespeichert werden.",
     "invalid": "Geben Sie eine ganze Zahl von Tagen ein, mindestens 1."
+  },
+  "labelling": {
+    "contains": "Enthält",
+    "mayContain": "Kann enthalten",
+    "from": "aus {{names}}",
+    "declaredOnProduct": "am Produkt angegeben",
+    "computedNote": "Aus der Formel und den Karten ihrer Zutaten berechnet. Prüfen Sie es, bevor es auf ein Etikett kommt.",
+    "allergens": {
+      "gluten": "Gluten",
+      "crustaceans": "Krebstiere",
+      "eggs": "Eier",
+      "fish": "Fisch",
+      "peanuts": "Erdnüsse",
+      "soy": "Soja",
+      "milk": "Milch",
+      "nuts": "Schalenfrüchte",
+      "celery": "Sellerie",
+      "mustard": "Senf",
+      "sesame": "Sesam",
+      "sulphites": "Sulfite",
+      "lupin": "Lupinen",
+      "molluscs": "Weichtiere"
+    },
+    "card": {
+      "title": "Auf dem Etikett",
+      "labelName": "Name im Zutatenverzeichnis",
+      "labelNameHint": "Eine rechtliche Bezeichnung des Lebensmittels oder ein INCI-Name für Kosmetik. Leer verwendet das Verzeichnis den Namen des Produkts.",
+      "unchecked": "Allergene noch nicht geprüft.",
+      "suggested": "Der Name legt nahe: {{allergens}}.",
+      "confirmSuggestion": "Vorschlag bestätigen",
+      "containsNone": "Enthält keine",
+      "choose": "Allergene wählen",
+      "change": "Allergene ändern",
+      "done": "Fertig",
+      "none": "Keine",
+      "fromRecipe": "Aus der Formel",
+      "saved": "Etikett gespeichert",
+      "saveFailed": "Das Etikett konnte nicht gespeichert werden"
+    },
+    "tab": {
+      "ingredients": "Zutaten, die schwerste zuerst",
+      "noIngredients": "Diese Formel hat noch keine Zutaten.",
+      "noAllergens": "Keine Zutatenkarte nennt ein Allergen.",
+      "unchecked": "Noch nicht auf Allergene geprüft:",
+      "uncheckedSuggests": "{{name}} (der Name legt {{allergens}} nahe)",
+      "unweighed": "Nichts sagt, was diese wiegen, deshalb stehen sie zuletzt: {{names}}. Geben Sie auf der Karte das Gewicht einer Einheit an oder schreiben Sie die Zeile in einem Gewicht.",
+      "nutrition": "Nährwerte je 100 g",
+      "nutritionNone": "Keine Zutatenkarte enthält Nährwerte, daher gibt es noch keine Nährwertdeklaration.",
+      "perYield": "Je 100 g der {{weight}} g, die eine Charge ergibt.",
+      "yieldUnknown": "Was eine Charge wiegt, ist nicht bekannt: Geben Sie die Ausbeute der Formel als Gewicht an oder das Gewicht einer Einheit des Produkts.",
+      "notKnown": "nicht bekannt",
+      "missing": "Nicht als null gezählt, daher ist ein Wert nicht bekannt:",
+      "missingLine": "{{name}} hat keinen Wert für {{nutrients}}"
+    },
+    "nutrients": {
+      "energy": "Energie",
+      "fat": "Fett",
+      "saturates": "davon gesättigte Fettsäuren",
+      "carbohydrate": "Kohlenhydrate",
+      "sugars": "davon Zucker",
+      "protein": "Eiweiß",
+      "salt": "Salz"
+    },
+    "figures": {
+      "energy": "Energie",
+      "fat": "Fett",
+      "saturates": "gesättigte Fettsäuren",
+      "carbohydrate": "Kohlenhydrate",
+      "sugars": "Zucker",
+      "protein": "Eiweiß",
+      "salt": "Salz"
+    }
   }
 }

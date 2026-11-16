@@ -75,6 +75,16 @@ export type RunBatch = components["schemas"]["RunBatchRead"];
 /** A product's shelf life in days, as the maker keeps it. */
 export type ShelfLife = components["schemas"]["ShelfLifeRead"];
 
+/** What a product's card says for its label, and what its recipe adds. */
+export type LabelFacts = components["schemas"]["LabelFactsRead"];
+export type LabelFactsUpdate = components["schemas"]["LabelFactsUpdate"];
+
+/** A made product's label as one recipe computes it. */
+export type RecipeLabel = components["schemas"]["RecipeLabelRead"];
+export type LabelIngredient = components["schemas"]["LabelIngredient"];
+export type LabelAllergen = components["schemas"]["LabelAllergen"];
+export type LabelNutrition = components["schemas"]["LabelNutrition"];
+
 export type ProductionOrderListResponse =
   components["schemas"]["ProductionOrderListResponse"];
 

@@ -75,6 +75,7 @@ const NutritionScanner: React.FC<Props> = ({
           calories_kcal: extractedData.energy_kcal as number | undefined,
           protein_g: extractedData.proteins as number | undefined,
           fat_g: extractedData.fat as number | undefined,
+          saturated_fat_g: extractedData.saturated_fat as number | undefined,
           carbs_g: extractedData.carbohydrates as number | undefined,
           fiber_g: extractedData.fiber as number | undefined,
           sugar_g: extractedData.sugars as number | undefined,
