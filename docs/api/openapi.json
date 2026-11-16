@@ -14514,6 +14514,40 @@
             }
           },
           {
+            "name": "planned_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Planned From"
+            }
+          },
+          {
+            "name": "planned_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Planned To"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "required": false,
@@ -63248,6 +63282,11 @@
             "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
             "title": "Missing"
           },
+          "planned": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Planned"
+          },
           "action": {
             "type": "string",
             "enum": [
@@ -63291,6 +63330,7 @@
           "on_order",
           "expected",
           "missing",
+          "planned",
           "action"
         ],
         "title": "NeedRowRead",

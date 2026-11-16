@@ -835,6 +835,7 @@
       "onOrder": "Bestellt",
       "missing": "Fehlt",
       "make": "Herstellen",
+      "planned": "Geplant: {{qty}}",
       "noDate": "ohne Datum",
       "emptyTitle": "In diesem Zeitraum sind keine Aufträge geplant",
       "emptyDescription": "Planen Sie einen Auftrag mit Tag, dann erscheint hier, was er braucht.",

@@ -235,3 +235,41 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
 
         assert rows[second['id']]['coverage'] == 'covered'
         assert rows[first['id']]['coverage'] == 'partial'
+
+    def test_the_list_filters_runs_by_their_planned_day_not_when_they_were_made(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        # Runs are made today and planned weeks ahead: the plan screen asks
+        # for a period of planned days, and the creation date has nothing to
+        # say about it.
+        bread = self._world(
+            client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
+        )
+        inside = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '1', _DAY)
+        _plan(
+            client,
+            mk_auth_headers,
+            bread.id,
+            mk_output_loc.id,
+            '1',
+            _DAY + timedelta(days=20),
+        )
+        _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '1', None)
+
+        listed = client.get(
+            '/api/v1/maker/production/orders',
+            headers=mk_auth_headers,
+            params={
+                'planned_from': _DAY.isoformat(),
+                'planned_to': (_DAY + timedelta(days=6)).isoformat(),
+            },
+        )
+
+        assert listed.status_code == 200, listed.text
+        assert [row['id'] for row in listed.json()['items']] == [inside['id']]

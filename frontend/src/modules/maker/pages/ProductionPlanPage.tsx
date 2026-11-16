@@ -43,8 +43,8 @@ export default function ProductionPlanPage() {
   const runs = useProductionOrders({
     status: "DRAFT",
     sort: "oldest",
-    date_from: period.from,
-    date_to: period.to,
+    planned_from: period.from,
+    planned_to: period.to,
     limit: 200,
   });
   const scope = { date_from: period.from, date_to: period.to };

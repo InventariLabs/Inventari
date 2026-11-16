@@ -835,6 +835,7 @@
       "onOrder": "On order",
       "missing": "Missing",
       "make": "Make",
+      "planned": "Planned: {{qty}}",
       "noDate": "no date",
       "emptyTitle": "No runs planned in this period",
       "emptyDescription": "Plan a run with a day, and what it needs shows up here.",

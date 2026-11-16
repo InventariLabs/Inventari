@@ -122,6 +122,8 @@ async def list_orders(
     sort: str = 'newest',
     date_from: date | None = None,
     date_to: date | None = None,
+    planned_from: date | None = None,
+    planned_to: date | None = None,
     offset: int = 0,
     limit: int = 50,
 ) -> tuple[list[ProductionOrder], int]:
@@ -129,7 +131,9 @@ async def list_orders(
 
     Returns ``(items, total)`` so the router can build a paginated envelope.
     ``sort`` is one of: newest, oldest, cost_desc. Date range applies to
-    ``created_at`` (inclusive on both ends).
+    ``created_at`` (inclusive on both ends); ``planned_from`` / ``planned_to``
+    bound the planned ``production_date`` instead, so a run with no planned
+    day is in no such period.
     """
     base_where = [ProductionOrder.organization_id == organization_id]
     if output_template_id is not None:
@@ -140,6 +144,10 @@ async def list_orders(
         base_where.append(ProductionOrder.created_at >= date_from)
     if date_to is not None:
         base_where.append(ProductionOrder.created_at <= date_to)
+    if planned_from is not None:
+        base_where.append(ProductionOrder.production_date >= planned_from)
+    if planned_to is not None:
+        base_where.append(ProductionOrder.production_date <= planned_to)
 
     stmt = select(ProductionOrder).where(*base_where)
     if sort == 'oldest':

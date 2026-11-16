@@ -14,6 +14,7 @@ for it alone.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Literal
@@ -105,6 +106,34 @@ async def queued_drafts(
     )
 
 
+def _expected_output(
+    queue: list[ProductionOrder],
+    scope_of: Callable[[ProductionOrder], UUID | None],
+) -> dict[UUID | None, dict[UUID, Decimal]]:
+    """What the draft runs will make, per scope: supply for the runs that use it.
+
+    A sub-assembly that a draft run already makes is not made again by the run
+    that needs it, so the pool and the shelf both count it, in the scope of
+    the run that makes it.
+    """
+    expected: dict[UUID | None, dict[UUID, Decimal]] = {}
+    for order in queue:
+        per_scope = expected.setdefault(scope_of(order), {})
+        per_scope[order.output_template_id] = (
+            per_scope.get(order.output_template_id, Decimal('0')) + order.planned_qty
+        )
+    return expected
+
+
+def _add_expected(
+    left: dict[UUID, Decimal], expected: dict[UUID, Decimal], children: set[UUID]
+) -> None:
+    """Put what planned runs will make on the shelf the coverage reads."""
+    for template_id, qty in expected.items():
+        if template_id in children:
+            left[template_id] = left.get(template_id, Decimal('0')) + qty
+
+
 async def coverage_for_drafts(
     db: AsyncSession, organization_id: UUID
 ) -> dict[UUID, PlanCoverage]:
@@ -148,6 +177,11 @@ async def coverage_for_drafts(
         if scope not in shelves:
             shelves[scope] = _Shelf(StockPool(db, organization_id, scope))
 
+    expected = _expected_output(queue, _scope)
+    for scope, per_template in expected.items():
+        for template_id, qty in per_template.items():
+            shelves[scope].pool.expect(template_id, qty)
+
     flats = await bom_service.explode_in_sequence(
         db,
         organization_id,
@@ -170,6 +204,7 @@ async def coverage_for_drafts(
         shelves[scope].left = await _get_available_stock_batch(
             db, organization_id, sorted(children), location_id=scope
         )
+        _add_expected(shelves[scope].left, expected[scope], children)
     all_children = sorted(set().union(*children_by_scope.values()))
     templates: dict[UUID, ProductTemplateDTO] = (
         await core_api.product_templates.get_many_async(

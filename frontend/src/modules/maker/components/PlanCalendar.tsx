@@ -142,7 +142,7 @@ function MoveRunSheet({
         })}
         onClose={onClose}
       />
-      <SheetBody>
+      <SheetBody className="p-5">
         <DateInput
           label={t("planning.move.day")}
           value={day}

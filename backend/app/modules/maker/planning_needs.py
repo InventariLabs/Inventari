@@ -71,6 +71,10 @@ class NeedRow:
     on_order: Decimal | None
     expected: list[ExpectedDelivery]
     missing: Decimal
+    #: What draft runs of the ingredient itself already bring, once the runs
+    #: before the period have taken their share: a sub-assembly that is
+    #: planned is not missing.
+    planned: Decimal
     #: ``make`` for an ingredient that has a recipe of its own.
     action: NeedAction
     #: The first planned day, and the output shelf, of the runs that need it.
@@ -130,6 +134,7 @@ def _need_row(
     deliveries: list[ExpectedDelivery],
     purchasing: bool,
     freshly_made: Decimal,
+    planned: Decimal,
     makes: bool,
     first_run: ProductionOrder,
 ) -> NeedRow:
@@ -137,13 +142,17 @@ def _need_row(
 
     A line that never takes the sub-assembly from the shelf needs it made
     whatever is in stock (*freshly_made*); the rest of the need is covered by
-    the stock first and by the open orders after it.
+    the stock first and by the open orders after it. Runs already planned of
+    the ingredient itself (*planned*) cover what is still missing after that.
     """
     on_order = (
         sum((d.quantity for d in deliveries), Decimal('0')) if purchasing else None
     )
     covered_by = in_stock + (on_order or Decimal('0'))
-    missing = max(Decimal('0'), needed - freshly_made - covered_by) + freshly_made
+    missing = max(
+        Decimal('0'),
+        max(Decimal('0'), needed - freshly_made - covered_by) + freshly_made - planned,
+    )
     uom = uoms.get(template.uom_id) if template and template.uom_id else None
     return NeedRow(
         template_id=tid,
@@ -154,6 +163,7 @@ def _need_row(
         on_order=on_order,
         expected=deliveries,
         missing=missing,
+        planned=planned,
         action='make' if makes else 'buy',
         needed_by=first_run.production_date,
         output_location_id=first_run.output_storage_location_id,
@@ -170,6 +180,9 @@ class _Tally:
     scopes_used: dict[UUID, set[UUID | None]] = field(default_factory=dict)
     first_run: dict[UUID, ProductionOrder] = field(default_factory=dict)
     unmeasured: set[UUID] = field(default_factory=set)
+    #: What the runs before the period asked for beyond the shelf: it was
+    #: spoken for by whatever is on its way, so the period cannot count it.
+    overflow: dict[UUID, Decimal] = field(default_factory=dict)
     start_left: dict[UUID | None, dict[UUID, Decimal]] | None = None
 
 
@@ -212,8 +225,39 @@ def _claim_in_queue(
                     if need.make_fresh:
                         tally.fresh[tid] = tally.fresh.get(tid, Decimal('0')) + claimed
             stock = left[scope]
-            stock[tid] = max(Decimal('0'), stock.get(tid, Decimal('0')) - claimed)
+            on_hand = stock.get(tid, Decimal('0'))
+            if not in_period and claimed > on_hand:
+                tally.overflow[tid] = tally.overflow.get(tid, Decimal('0')) + (
+                    claimed - on_hand
+                )
+            stock[tid] = max(Decimal('0'), on_hand - claimed)
     return tally
+
+
+def _after_earlier_claims(
+    deliveries: list[ExpectedDelivery], claimed: Decimal
+) -> tuple[list[ExpectedDelivery], Decimal]:
+    """What the earlier runs left of the deliveries, and what they claimed beyond them.
+
+    The runs before the period ask for more than the shelf had; what is on
+    its way goes to them first, the earliest delivery first, as the shelf does.
+    """
+    left: list[ExpectedDelivery] = []
+    for delivery in sorted(
+        deliveries, key=lambda d: (d.expected_date is None, d.expected_date or date.min)
+    ):
+        taken = min(claimed, delivery.quantity)
+        claimed -= taken
+        if delivery.quantity > taken:
+            left.append(
+                ExpectedDelivery(
+                    delivery.purchase_order_id,
+                    delivery.number,
+                    delivery.expected_date,
+                    delivery.quantity - taken,
+                )
+            )
+    return left, claimed
 
 
 def ensure_scope(
@@ -326,6 +370,13 @@ async def needs_for(
     start_left = tally.start_left
 
     opening = start_left or {}
+    planned_runs: dict[UUID, Decimal] = {}
+    for order in queue:
+        if order.output_template_id in needed:
+            planned_runs[order.output_template_id] = (
+                planned_runs.get(order.output_template_id, Decimal('0'))
+                + order.planned_qty
+            )
     open_lines: list[OpenOrderLineDTO] = (
         await _open_orders(db, organization_id, sorted(needed))
         if view.purchasing and needed
@@ -342,6 +393,19 @@ async def needs_for(
             ),
             Decimal('0'),
         )
+        deliveries, unmet = _after_earlier_claims(
+            [
+                ExpectedDelivery(
+                    purchase_order_id=line.purchase_order_id,
+                    number=line.number,
+                    expected_date=line.expected_date,
+                    quantity=line.outstanding_quantity,
+                )
+                for line in open_lines
+                if line.product_template_id == tid
+            ],
+            tally.overflow.get(tid, Decimal('0')),
+        )
         view.rows.append(
             _need_row(
                 tid,
@@ -349,18 +413,10 @@ async def needs_for(
                 uoms,
                 needed=needed[tid],
                 in_stock=in_stock,
-                deliveries=[
-                    ExpectedDelivery(
-                        purchase_order_id=line.purchase_order_id,
-                        number=line.number,
-                        expected_date=line.expected_date,
-                        quantity=line.outstanding_quantity,
-                    )
-                    for line in open_lines
-                    if line.product_template_id == tid
-                ],
+                deliveries=deliveries,
                 purchasing=view.purchasing,
                 freshly_made=fresh.get(tid, Decimal('0')),
+                planned=max(Decimal('0'), planned_runs.get(tid, Decimal('0')) - unmet),
                 makes=tid in has_recipe,
                 first_run=first_run[tid],
             )

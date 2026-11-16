@@ -18787,6 +18787,8 @@ export interface components {
             expected: components["schemas"]["ExpectedDeliveryRead"][];
             /** Missing */
             missing: string;
+            /** Planned */
+            planned: string;
             /**
              * Action
              * @enum {string}
@@ -37355,6 +37357,8 @@ export interface operations {
                 sort?: string;
                 date_from?: string | null;
                 date_to?: string | null;
+                planned_from?: string | null;
+                planned_to?: string | null;
                 skip?: number;
                 limit?: number;
             };

@@ -291,6 +291,8 @@ async def list_production_orders(
     sort: str = Query('newest', pattern='^(newest|oldest|cost_desc)$'),
     date_from: date_type | None = Query(None),
     date_to: date_type | None = Query(None),
+    planned_from: date_type | None = Query(None),
+    planned_to: date_type | None = Query(None),
     # ``skip`` stays the wire name: the maker screens send it and the REST
     # query shipped with 0.11. Everything below the router says ``offset``.
     skip: int = Query(0, ge=0),
@@ -307,6 +309,8 @@ async def list_production_orders(
         sort=sort,
         date_from=date_from,
         date_to=date_to,
+        planned_from=planned_from,
+        planned_to=planned_to,
         offset=skip,
         limit=limit,
     )

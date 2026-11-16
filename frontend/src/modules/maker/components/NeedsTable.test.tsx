@@ -21,6 +21,7 @@ const row = {
     },
   ],
   missing: "5",
+  planned: "0",
   action: "buy" as const,
 };
 
@@ -63,5 +64,20 @@ describe("NeedsTable", () => {
       />,
     );
     expect(screen.getByText("Make")).toBeInTheDocument();
+  });
+
+  it("says how much of a sub-assembly is already planned, and nothing otherwise", () => {
+    render(
+      <NeedsTable
+        view={view({
+          rows: [
+            { ...row, name: "Dough", action: "make", planned: "5" },
+            { ...row, template_id: "t-2", name: "Salt" },
+          ],
+        })}
+      />,
+    );
+    expect(screen.getAllByText(/Planned:/)).toHaveLength(1);
+    expect(screen.getByText("Planned: 5 kg")).toBeInTheDocument();
   });
 });

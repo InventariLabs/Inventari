@@ -36,6 +36,8 @@ class NeedRowRead(BaseModel):
     on_order: Decimal | None
     expected: list[ExpectedDeliveryRead]
     missing: Decimal
+    #: What draft runs of the ingredient itself already bring.
+    planned: Decimal
     #: ``make`` for an ingredient with a recipe of its own: its missing part is
     #: proposed as a planned run of it, not as a purchase.
     action: Literal['buy', 'make']

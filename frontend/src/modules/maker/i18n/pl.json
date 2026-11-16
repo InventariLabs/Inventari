@@ -863,6 +863,7 @@
       "onOrder": "Zamówione",
       "missing": "Brakuje",
       "make": "Do wyprodukowania",
+      "planned": "Zaplanowane: {{qty}}",
       "noDate": "bez daty",
       "emptyTitle": "Brak zleceń zaplanowanych w tym okresie",
       "emptyDescription": "Zaplanuj zlecenie z dniem, a to, czego potrzebuje, pojawi się tutaj.",

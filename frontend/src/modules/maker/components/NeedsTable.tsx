@@ -68,6 +68,11 @@ function NeedsRow({ row, purchasing }: { row: NeedRow; purchasing: boolean }) {
             {t("planning.needs.make")}
           </Badge>
         )}
+        {Number(row.planned) > 0 && (
+          <div className="text-xs font-normal text-on-secondary">
+            {t("planning.needs.planned", { qty: qty(row.planned) })}
+          </div>
+        )}
       </td>
       <td className="px-3 py-2 text-right tabular-nums">{qty(row.needed)}</td>
       <td className="px-3 py-2 text-right tabular-nums">{qty(row.in_stock)}</td>

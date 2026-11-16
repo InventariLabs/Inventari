@@ -835,6 +835,7 @@
       "onOrder": "Commandé",
       "missing": "Manquant",
       "make": "À fabriquer",
+      "planned": "Planifié : {{qty}}",
       "noDate": "sans date",
       "emptyTitle": "Aucun ordre planifié sur cette période",
       "emptyDescription": "Planifiez un ordre avec un jour, et ce dont il a besoin apparaît ici.",

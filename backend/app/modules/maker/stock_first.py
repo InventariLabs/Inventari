@@ -103,6 +103,16 @@ class StockPool:
                 for uom in await core_api.uoms.list_for_org_async(self._db, self._org)
             }
 
+    def expect(self, template_id: UUID, qty: Decimal) -> None:
+        """Count *qty* of *template_id* as on the shelf: a planned run will make it.
+
+        Meant for a planning view, before the first explosion reads the pool:
+        a sub-assembly that a draft run already makes is not made again by the
+        run that needs it. The stock read by :meth:`ensure` is added to it.
+        """
+        loaded = self._loaded
+        loaded.stock[template_id] = loaded.stock.get(template_id, Decimal('0')) + qty
+
     def on_hand(self, template_id: UUID) -> Decimal:
         """What the shelf holds of *template_id*, in its own stock unit."""
         return self._loaded.stock.get(template_id, Decimal('0'))

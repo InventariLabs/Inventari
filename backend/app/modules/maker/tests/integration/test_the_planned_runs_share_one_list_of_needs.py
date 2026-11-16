@@ -296,6 +296,109 @@ class TestTheCombinedList:
         )
         assert ordered.status_code in (403, 404), ordered.text
 
+    def test_what_is_on_order_is_spent_once_across_periods(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        # Five coming for the first week. A run of the week after it must not
+        # read the same five as its own: the earlier run spends them first,
+        # as it spends the shelf.
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, bread, flour)
+        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '3', _MONDAY + timedelta(days=7))
+        _on_order(db_session, org, user, flour, '5', _MONDAY)
+
+        first = _week(client, headers)
+        second = client.get(
+            f'{_API}/needs',
+            headers=headers,
+            params={
+                'date_from': (_MONDAY + timedelta(days=7)).isoformat(),
+                'date_to': (_MONDAY + timedelta(days=13)).isoformat(),
+            },
+        ).json()
+
+        (first_row,) = first['rows']
+        assert Decimal(first_row['on_order']) == Decimal('5')
+        assert Decimal(first_row['missing']) == Decimal('0')
+        (row,) = second['rows']
+        assert Decimal(row['on_order']) == Decimal('0')
+        assert row['expected'] == []
+        assert Decimal(row['missing']) == Decimal('3')
+
+    def test_a_planned_run_of_the_intermediate_is_what_the_need_waits_for(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        dough = _template(db_session, org, 'Dough', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, dough, flour)
+        _recipe(db_session, org, bread, dough)
+        post_on_shelf(client, headers, flour, shelf.id, '5')
+        _run(client, headers, bread, shelf, '5', _MONDAY)
+        scope = {
+            'date_from': _MONDAY.isoformat(),
+            'date_to': (_MONDAY + timedelta(days=6)).isoformat(),
+        }
+
+        planned = client.post(
+            f'{_API}/needs/plan-intermediates', headers=headers, json=scope
+        )
+        again = client.post(
+            f'{_API}/needs/plan-intermediates', headers=headers, json=scope
+        )
+        body = _week(client, headers)
+
+        assert len(planned.json()['runs']) == 1
+        assert again.json()['runs'] == []
+        rows = {r['name']: r for r in body['rows']}
+        assert Decimal(rows['Dough']['planned']) == Decimal('5')
+        assert Decimal(rows['Dough']['missing']) == Decimal('0')
+        # The dough run needs the flour once, and the shelf holds it.
+        assert Decimal(rows['Flour']['needed']) == Decimal('5')
+        assert Decimal(rows['Flour']['missing']) == Decimal('0')
+
+    def test_the_run_that_makes_the_intermediate_is_not_counted_short_twice(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        dough = _template(db_session, org, 'Dough', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, dough, flour)
+        _recipe(db_session, org, bread, dough)
+        post_on_shelf(client, headers, flour, shelf.id, '5')
+        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
+        dough_run = _run(client, headers, dough, shelf, '5', _MONDAY)
+
+        listed = client.get(f'{_API}/orders', headers=headers).json()['items']
+        coverage = {row['id']: row['coverage'] for row in listed}
+
+        # Five flour, five dough from it, five bread from the dough: all of it
+        # is met. Bread used to explode the dough down to flour again and
+        # claim the same five the dough run claims.
+        assert coverage[dough_run['id']] == 'covered'
+        assert coverage[bread_run['id']] == 'covered'
+
 
 class TestOrderingWhatIsMissing:
     def _scope(self) -> dict[str, str]:
