@@ -121,7 +121,10 @@ function AllergenSummary({
   const { t } = useTranslation("maker");
   const name = useAllergenName();
   const names = (keys: string[]) => keys.map(name).join(", ");
-  if (facts.allergens === null || facts.allergens === undefined) {
+  // A made product's allergens come from its BOM; what its own card adds is
+  // a declaration on top, which nobody owes before the product can be made.
+  const made = Boolean(facts.recipe_id);
+  if (!made && (facts.allergens === null || facts.allergens === undefined)) {
     const suggested = facts.suggested_allergens;
     return (
       <div className="space-y-2" data-testid="maker-label-unchecked">
@@ -160,9 +163,11 @@ function AllergenSummary({
   }
   return (
     <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm items-baseline">
-      <dt className="text-on-muted">{t("labelling.contains")}</dt>
+      <dt className="text-on-muted">
+        {made ? t("labelling.card.ownAllergens") : t("labelling.contains")}
+      </dt>
       <dd className="text-on" data-testid="maker-label-contains">
-        {facts.allergens.length > 0
+        {facts.allergens && facts.allergens.length > 0
           ? names(facts.allergens)
           : t("labelling.card.none")}
       </dd>
@@ -217,7 +222,11 @@ function AllergenEditor({
   return (
     <div className="space-y-3">
       <AllergenChoice
-        legend={t("labelling.contains")}
+        legend={
+          facts.recipe_id
+            ? t("labelling.card.ownAllergens")
+            : t("labelling.contains")
+        }
         value={contains}
         disabled={disabled}
         onToggle={(key) => onSave({ allergens: toggled(contains, key) })}

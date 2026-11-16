@@ -755,6 +755,7 @@
       "change": "Modifier les allergènes",
       "done": "Terminé",
       "none": "Aucun",
+      "ownAllergens": "Déclarés sur ce produit",
       "fromRecipe": "De la formule",
       "saved": "Étiquette enregistrée",
       "saveFailed": "Impossible d'enregistrer l'étiquette"
@@ -772,7 +773,8 @@
       "yieldUnknown": "Le poids d'un lot n'est pas connu : donnez le rendement de la formule en poids, ou le poids d'une unité du produit.",
       "notKnown": "inconnu",
       "missing": "Non compté comme zéro, une valeur n'est donc pas connue :",
-      "missingLine": "{{name}} n'a pas de valeur pour {{nutrients}}"
+      "missingLine": "{{name}} n'a pas de valeur pour {{nutrients}}",
+      "missingAll": "{{name}} n'a pas de valeurs nutritionnelles"
     },
     "nutrients": {
       "energy": "Énergie",

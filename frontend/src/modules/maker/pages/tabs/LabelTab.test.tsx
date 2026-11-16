@@ -91,6 +91,19 @@ const label: RecipeLabel = {
     salt: "0.00",
     missing: [
       { template_id: "tpl-plums", name: "Plums", nutrients: ["saturates"] },
+      {
+        template_id: "tpl-vanilla",
+        name: "Vanilla pod",
+        nutrients: [
+          "energy_kcal",
+          "fat",
+          "saturates",
+          "carbohydrate",
+          "sugars",
+          "protein",
+          "salt",
+        ],
+      },
     ],
   },
 };
@@ -152,9 +165,9 @@ describe("LabelTab", () => {
     expect(table).toHaveTextContent("Energy1,098 kJ / 263 kcal");
     expect(table).toHaveTextContent("of which saturatesnot known");
     expect(table).toHaveTextContent("Salt0 g");
-    expect(screen.getByTestId("maker-label-missing")).toHaveTextContent(
-      "Plums has no figure for saturates",
-    );
+    const missing = screen.getByTestId("maker-label-missing");
+    expect(missing).toHaveTextContent("Plums has no figure for saturates");
+    expect(missing).toHaveTextContent("Vanilla pod has no figures");
     expect(
       screen.getByText("Per 100 g of the 900 g one batch yields."),
     ).toBeInTheDocument();

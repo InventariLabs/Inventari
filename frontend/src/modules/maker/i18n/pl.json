@@ -783,6 +783,7 @@
       "change": "Zmień alergeny",
       "done": "Gotowe",
       "none": "Brak",
+      "ownAllergens": "Zadeklarowane na tym produkcie",
       "fromRecipe": "Z receptury",
       "saved": "Etykieta zapisana",
       "saveFailed": "Nie udało się zapisać etykiety"
@@ -800,7 +801,8 @@
       "yieldUnknown": "Nie wiadomo, ile waży jedna partia: podaj wydajność receptury w jednostce wagi albo wagę sztuki produktu.",
       "notKnown": "nieznana",
       "missing": "Brak nie liczy się jako zero, więc część wartości jest nieznana:",
-      "missingLine": "{{name}} nie ma wartości: {{nutrients}}"
+      "missingLine": "{{name}} nie ma wartości: {{nutrients}}",
+      "missingAll": "{{name}} nie ma wartości odżywczych"
     },
     "nutrients": {
       "energy": "Wartość energetyczna",

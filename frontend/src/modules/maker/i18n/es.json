@@ -755,6 +755,7 @@
       "change": "Cambiar alérgenos",
       "done": "Listo",
       "none": "Ninguno",
+      "ownAllergens": "Declarados en este producto",
       "fromRecipe": "De la fórmula",
       "saved": "Etiqueta guardada",
       "saveFailed": "No se pudo guardar la etiqueta"
@@ -772,7 +773,8 @@
       "yieldUnknown": "No se sabe cuánto pesa un lote: indique el rendimiento de la fórmula en peso, o el peso de una unidad del producto.",
       "notKnown": "desconocido",
       "missing": "No se cuenta como cero, así que un valor no se conoce:",
-      "missingLine": "{{name}} no tiene valor de {{nutrients}}"
+      "missingLine": "{{name}} no tiene valor de {{nutrients}}",
+      "missingAll": "{{name}} no tiene valores nutricionales"
     },
     "nutrients": {
       "energy": "Valor energético",

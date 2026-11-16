@@ -191,12 +191,14 @@ function NutritionTable({ label }: { label: RecipeLabel }) {
           {t("labelling.tab.missing")}{" "}
           {nutrition.missing
             .map((gap) =>
-              t("labelling.tab.missingLine", {
-                name: gap.name,
-                nutrients: gap.nutrients
-                  .map((key) => names[key] ?? key)
-                  .join(", "),
-              }),
+              gap.nutrients.length >= Object.keys(names).length
+                ? t("labelling.tab.missingAll", { name: gap.name })
+                : t("labelling.tab.missingLine", {
+                    name: gap.name,
+                    nutrients: gap.nutrients
+                      .map((key) => names[key] ?? key)
+                      .join(", "),
+                  }),
             )
             .join("; ")}
         </p>

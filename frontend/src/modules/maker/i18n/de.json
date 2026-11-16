@@ -755,6 +755,7 @@
       "change": "Allergene ändern",
       "done": "Fertig",
       "none": "Keine",
+      "ownAllergens": "Am Produkt selbst angegeben",
       "fromRecipe": "Aus der Formel",
       "saved": "Etikett gespeichert",
       "saveFailed": "Das Etikett konnte nicht gespeichert werden"
@@ -772,7 +773,8 @@
       "yieldUnknown": "Was eine Charge wiegt, ist nicht bekannt: Geben Sie die Ausbeute der Formel als Gewicht an oder das Gewicht einer Einheit des Produkts.",
       "notKnown": "nicht bekannt",
       "missing": "Nicht als null gezählt, daher ist ein Wert nicht bekannt:",
-      "missingLine": "{{name}} hat keinen Wert für {{nutrients}}"
+      "missingLine": "{{name}} hat keinen Wert für {{nutrients}}",
+      "missingAll": "{{name}} hat keine Nährwerte"
     },
     "nutrients": {
       "energy": "Energie",

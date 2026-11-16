@@ -127,7 +127,11 @@ describe("LabelFactsSlot", () => {
     );
     render(<LabelFactsSlot data={{ item }} />);
 
-    const derived = await screen.findByTestId("maker-label-derived");
+    expect(await screen.findByTestId("maker-label-contains")).toHaveTextContent(
+      "Sesame",
+    );
+    expect(screen.getByText("Declared on this product")).toBeInTheDocument();
+    const derived = screen.getByTestId("maker-label-derived");
     expect(derived).toHaveTextContent("Gluten — from Wheat flour");
     expect(derived).toHaveTextContent("Sesame — declared on the product");
     expect(
@@ -150,6 +154,19 @@ describe("LabelFactsSlot", () => {
         may_contain: [],
       }),
     );
+  });
+
+  it("does not ask a made product to check what its BOM already answers", async () => {
+    serve(
+      { ...unchecked, recipe_id: "recipe-cake", suggested_allergens: [] },
+      0,
+    );
+    render(<LabelFactsSlot data={{ item }} />);
+
+    expect(await screen.findByTestId("maker-label-contains")).toHaveTextContent(
+      "None",
+    );
+    expect(screen.queryByTestId("maker-label-unchecked")).toBeNull();
   });
 
   it("stays away from a product no formula touches", async () => {

@@ -755,6 +755,7 @@
       "change": "Change allergens",
       "done": "Done",
       "none": "None",
+      "ownAllergens": "Declared on this product",
       "fromRecipe": "From the BOM",
       "saved": "Label saved",
       "saveFailed": "Could not save the label"
@@ -772,7 +773,8 @@
       "yieldUnknown": "What one batch weighs is not known: give the BOM's yield in a weight, or the product's weight per unit.",
       "notKnown": "not known",
       "missing": "Not counted as zero, so a figure is not known:",
-      "missingLine": "{{name}} has no figure for {{nutrients}}"
+      "missingLine": "{{name}} has no figure for {{nutrients}}",
+      "missingAll": "{{name}} has no figures"
     },
     "nutrients": {
       "energy": "Energy",
