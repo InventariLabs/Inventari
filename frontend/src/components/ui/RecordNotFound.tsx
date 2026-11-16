@@ -2,6 +2,7 @@ import { SearchX, type LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 /**
  * The screen a detail route shows when its record is not there.
@@ -41,6 +42,9 @@ export function RecordNotFound({
   icon = SearchX,
 }: RecordNotFoundProps) {
   const navigate = useNavigate();
+  // The shell's PageHeader is empty on these nested paths, so the sentence
+  // naming what is missing is the only heading the tab can follow.
+  useDocumentTitle(title);
   return (
     <EmptyState
       icon={icon}

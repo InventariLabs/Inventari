@@ -30,6 +30,14 @@ describe("RecordNotFound", () => {
     expect(screen.getByText("Document not found")).toBeInTheDocument();
   });
 
+  it("names the tab after what was not found, and hands the title back on leaving", () => {
+    document.title = "Inventari";
+    const { unmount } = renderIt();
+    expect(document.title).toBe("Document not found · Inventari");
+    unmount();
+    expect(document.title).toBe("Inventari");
+  });
+
   it("offers one way onwards, and it leads to the list", async () => {
     const user = userEvent.setup();
     renderIt();
