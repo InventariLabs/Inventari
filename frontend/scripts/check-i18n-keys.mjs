@@ -87,6 +87,7 @@ import { createHash } from "node:crypto";
 import { resolve, relative, join, basename } from "node:path";
 
 import { shorthandPermissionKeys } from "./manifest-permission-keys.mjs";
+import { maintainedLanguages } from "./maintained-languages.mjs";
 
 const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
 const SRC = resolve(ROOT, "src");
@@ -115,7 +116,7 @@ const PLURAL_SNAPSHOT_PATH = resolve(
   ROOT,
   process.env.I18N_PLURAL_SNAPSHOT ?? "scripts/i18n-plural-snapshot.json",
 );
-const LANGUAGES = ["en", "pl", "de", "fr", "es"];
+const LANGUAGES = maintainedLanguages(ROOT);
 const DEFAULT_NS = "common";
 const PLURAL_SUFFIXES = ["_zero", "_one", "_two", "_few", "_many", "_other"];
 const SKIP_PATH_PARTS = [

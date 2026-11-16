@@ -1,5 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useModules } from "@/contexts/ModulesContext";
 import { moduleRegistry, resolveModuleTarget } from "@/lib/moduleRegistry";
 import { FocusLockGate } from "@/components/FocusLockGate";
@@ -15,6 +17,11 @@ const LauncherPage = lazy(
  * Launcher reachable when the root redirects to the focused module.
  */
 export function LauncherRoute() {
+  // Named here and not in the page: the greeting on the page changes with the
+  // hour, and the page would have to reach Core's hook through the module SDK,
+  // which weighs the launcher's first screen on a phone.
+  const { t } = useTranslation("launcher");
+  useDocumentTitle(t("launcher.title"));
   return (
     <Suspense fallback={<LoadingSpinner fullScreen />}>
       <FocusLockGate>

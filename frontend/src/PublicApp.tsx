@@ -7,12 +7,27 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
+import { useTranslation } from "react-i18next";
+
+import { useDocumentLanguage } from "@/hooks/useDocumentLanguage";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorPage from "@/pages/ErrorPage";
 
 const AttestationPublicPage = lazy(
   () => import("@/modules/equipment/pages/AttestationPublicPage"),
 );
+
+/**
+ * The attestation page, named in the tab in the language it speaks. Here and
+ * not in the page: a module reaches Core through `@/module-sdk`, and the SDK
+ * is the application's door, which this tree must not open.
+ */
+function AttestationRoute() {
+  const { t } = useTranslation("equipment");
+  useDocumentTitle(t("attestation.public.pageTitle"));
+  return <AttestationPublicPage />;
+}
 
 /**
  * Everything reachable without an account, and nothing else.
@@ -45,11 +60,14 @@ export default function PublicApp({
    */
   initialEntries?: string[];
 } = {}) {
+  // The attestation page speaks the language of `?lang=` or the browser, and
+  // the document has to say so (see the hook).
+  useDocumentLanguage();
   const router = useMemo(() => {
     const routes = createRoutesFromElements(
       <Route
         path="/public/attestation/:token"
-        element={<AttestationPublicPage />}
+        element={<AttestationRoute />}
         errorElement={<ErrorPage />}
       />,
     );

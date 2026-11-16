@@ -1,27 +1,27 @@
 import { describe, expect, it } from "vitest";
 
-import en from "../i18n/en.json";
-import pl from "../i18n/pl.json";
-import de from "../i18n/de.json";
-import fr from "../i18n/fr.json";
-import es from "../i18n/es.json";
+import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
 
 /**
- * Enforces 5-language key parity for the ``purchase_orders`` module
- * locale catalog. Mirrors ``coreLocaleParity.test.ts`` so a missing
+ * Enforces key parity across the maintained languages for the
+ * ``purchase_orders`` module locale catalog. Mirrors ``coreLocaleParity.test.ts`` so a missing
  * PL key is caught at test time instead of silently falling back to
  * English in production.
  */
 
 type Catalog = Record<string, unknown>;
 
-const catalogs: Record<string, Catalog> = {
-  en: en as unknown as Catalog,
-  pl: pl as unknown as Catalog,
-  de: de as unknown as Catalog,
-  fr: fr as unknown as Catalog,
-  es: es as unknown as Catalog,
-};
+// Every maintained language, from the one declaration of them — a language
+// added as maintained is held to parity here with no edit.
+const files = import.meta.glob<{ default: Catalog }>("../i18n/*.json", {
+  eager: true,
+});
+const catalogs: Record<string, Catalog> = Object.fromEntries(
+  MAINTAINED_LANGUAGES.map((lang) => [
+    lang,
+    files[`../i18n/${lang}.json`].default,
+  ]),
+);
 
 function flatKeys(node: unknown, prefix: string[] = []): string[] {
   if (node == null) return [];
@@ -37,9 +37,9 @@ function flatKeys(node: unknown, prefix: string[] = []): string[] {
   return [];
 }
 
-const LANGUAGES = ["pl", "de", "fr", "es"] as const;
+const LANGUAGES = MAINTAINED_LANGUAGES.filter((lang) => lang !== "en");
 
-describe("purchase_orders — 5-language key parity", () => {
+describe("purchase_orders — key parity across the maintained languages", () => {
   const enKeys = new Set(flatKeys(catalogs.en));
 
   for (const lang of LANGUAGES) {

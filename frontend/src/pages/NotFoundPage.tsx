@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { FileQuestion, PlugZap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { buttonVariants } from "@/components/ui/Button";
 import { useModules } from "@/contexts/ModulesContext";
 import { MODULE_PATHS } from "@/lib/moduleRegistry/modulePaths";
@@ -46,6 +47,10 @@ export default function NotFoundPage() {
     }
     return null;
   }, [location.pathname, enabledModules]);
+
+  useDocumentTitle(
+    isDisabledModule ? t("notFound.moduleNotEnabled") : t("notFound.title"),
+  );
 
   if (isDisabledModule) {
     // `modules.<name>.name`, the single source of truth (docs/MODULE_NAMES.md).

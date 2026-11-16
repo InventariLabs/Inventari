@@ -69,6 +69,8 @@ export {
   PageHeaderContext,
   useModulePageHeader,
 } from "@/hooks/useModulePageHeader";
+// A page that draws its own heading names the tab after it: `<page> · Inventari`.
+export { useDocumentTitle } from "@/hooks/useDocumentTitle";
 // A record page puts its record into "Recently visited".
 export { useRecordVisit } from "@/hooks/useRecordVisit";
 export type { VisitedRecord } from "@/hooks/useRecordVisit";

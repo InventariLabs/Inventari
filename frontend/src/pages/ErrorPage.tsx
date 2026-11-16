@@ -1,6 +1,7 @@
 import { useRouteError, isRouteErrorResponse, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { logger } from "@/utils/logger";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { AlertTriangle } from "lucide-react";
 import ErrorDetails from "@/components/ErrorDetails";
 import { isStaleChunkError } from "@/lib/staleChunk";
@@ -30,6 +31,10 @@ export default function ErrorPage() {
   // not a defect: it gets a sentence and a reload, not a bug report.
   const stale = isStaleChunkError(error);
   if (!stale) logger.error(error);
+  const heading = t(
+    stale ? "errors.newVersionTitle" : "errors.somethingWentWrong",
+  );
+  useDocumentTitle(heading);
 
   return (
     <div
@@ -40,9 +45,7 @@ export default function ErrorPage() {
         <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6">
           <AlertTriangle size={32} />
         </div>
-        <h1 className="text-2xl font-semibold text-on mb-2">
-          {t(stale ? "errors.newVersionTitle" : "errors.somethingWentWrong")}
-        </h1>
+        <h1 className="text-2xl font-semibold text-on mb-2">{heading}</h1>
         <p className="text-on-secondary mb-6">
           {stale
             ? t("errors.newVersionBody")

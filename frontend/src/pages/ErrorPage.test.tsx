@@ -57,6 +57,18 @@ describe("ErrorPage", () => {
     });
   });
 
+  it("names the tab after its heading and gives the title back on leaving", () => {
+    const { unmount } = render(
+      <MemoryRouter>
+        <ErrorPage />
+      </MemoryRouter>,
+    );
+
+    expect(document.title).toBe("Something went wrong · Inventari");
+    unmount();
+    expect(document.title).toBe("Inventari");
+  });
+
   it("names the same three keys the error boundary names", () => {
     render(
       <MemoryRouter>

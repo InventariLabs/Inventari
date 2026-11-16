@@ -43,6 +43,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { maintainedLanguages } from "./maintained-languages.mjs";
 
 // `import.meta.dirname`, not `new URL("..", import.meta.url)`: under vitest
 // vite rewrites that expression as an asset URL, and its path is not this
@@ -56,7 +57,7 @@ const BASELINE_PATH = resolve(
   ROOT,
   process.env.AUDIT_FIELDS_BASELINE ?? "scripts/audit-fields-baseline.json",
 );
-const LANGUAGES = ["en", "pl", "de", "fr", "es"];
+const LANGUAGES = maintainedLanguages(ROOT);
 /** Where `auditFieldLabel` looks a segment up — see utils/auditChanges.ts.
  *
  * `AUDIT_LOCALES_DIR` hands the gate another set of catalogues (same shape,

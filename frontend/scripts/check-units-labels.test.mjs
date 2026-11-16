@@ -104,6 +104,10 @@ describe("check-units-labels", () => {
       const files = {
         "backend/app/i18n/_units.py": `UNIT_LABELS = {\n${mirror}\n}\n`,
         "frontend/src/modules/.keep": "",
+        // The gate reads the languages it checks from the tree's declaration.
+        "frontend/src/i18n/languages.ts": languages
+          .map((l) => `{ code: "${l}", name: "X", fullName: "X", flag: "x" },`)
+          .join("\n"),
       };
       for (const l of languages) {
         files[`frontend/src/i18n/locales/${l}/common.json`] = {
@@ -111,7 +115,10 @@ describe("check-units-labels", () => {
         };
       }
       repo.write(files);
-      return runGate(repo, "check-units-labels.mjs", { args });
+      return runGate(repo, "check-units-labels.mjs", {
+        args,
+        siblings: ["maintained-languages.mjs"],
+      });
     };
 
     it("names the drift under --quiet, which silences only the success line", () => {
