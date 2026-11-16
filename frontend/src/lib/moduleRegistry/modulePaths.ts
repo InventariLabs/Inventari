@@ -98,6 +98,7 @@ export const MODULE_PATHS: Readonly<Record<string, ModulePaths>> = {
       "/maker",
       "/maker/recipes/:recipeId",
       "/maker/production",
+      "/maker/production/plan",
       "/maker/production/:orderId",
       "/maker/production/:orderId/record",
       "/maker/settings",
