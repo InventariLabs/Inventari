@@ -76,18 +76,16 @@ def _status(
     return 'short'
 
 
-async def coverage_for_drafts(
+async def queued_drafts(
     db: AsyncSession, organization_id: UUID
-) -> dict[UUID, PlanCoverage]:
-    """The coverage of every draft run that has a recipe to measure.
+) -> list[ProductionOrder]:
+    """Every draft run with a recipe, in the order they claim the shelf.
 
-    One queue for the organization: each availability scope (the whole
-    organization, or a run's own output shelf under PER_LOCATION) has its
-    own stock, spent by the drafts that are measured in it. Drafts without a
-    recipe, with an empty formula or with a yield that cannot scale a plan
-    have nothing to forecast and get no entry.
+    By planned day, then by creation; a run with no planned day waits behind
+    every dated one. The one ordering both the coverage and the combined needs
+    read, so they cannot disagree about who goes first.
     """
-    drafts = list(
+    return list(
         (
             await db.scalars(
                 select(ProductionOrder)
@@ -105,6 +103,20 @@ async def coverage_for_drafts(
             )
         ).all()
     )
+
+
+async def coverage_for_drafts(
+    db: AsyncSession, organization_id: UUID
+) -> dict[UUID, PlanCoverage]:
+    """The coverage of every draft run that has a recipe to measure.
+
+    One queue for the organization: each availability scope (the whole
+    organization, or a run's own output shelf under PER_LOCATION) has its
+    own stock, spent by the drafts that are measured in it. Drafts without a
+    recipe, with an empty formula or with a yield that cannot scale a plan
+    have nothing to forecast and get no entry.
+    """
+    drafts = await queued_drafts(db, organization_id)
     if not drafts:
         return {}
 

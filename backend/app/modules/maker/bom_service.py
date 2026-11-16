@@ -11,6 +11,7 @@ The legacy ``parent_template_id`` column is kept as a denormalised copy of
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Iterable
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -494,6 +495,58 @@ async def explode_by_recipes_with_uom(
         for recipe_id, qty, scope in wanted
         if recipe_id in tops
     }
+
+
+@dataclass(frozen=True)
+class DirectNeed:
+    """One formula line scaled to a plan: what the run asks of an ingredient.
+
+    ``has_recipe`` says the ingredient is itself made by a recipe — a
+    sub-assembly the run takes from its stock or makes — and ``make_fresh``
+    that the line never takes it from the shelf.
+    """
+
+    child_template_id: UUID
+    qty: Decimal
+    uom_id: UUID | None
+    unit: str
+    has_recipe: bool
+    make_fresh: bool
+
+
+async def direct_needs(
+    db: AsyncSession,
+    organization_id: UUID,
+    recipe_id: UUID,
+    qty: Decimal,
+) -> list[DirectNeed]:
+    """The lines of one recipe at *qty* of its output, one level deep.
+
+    Where an explosion walks a sub-assembly down to its raw materials, this
+    stops at it: a planner asking what a week of runs needs wants "dough",
+    and the question of the dough's flour is the dough run's own. The scaling
+    is the explosion's (yield loss and batch yield included).
+    """
+    recipe = await resolve_recipe(db, organization_id, recipe_id)
+    children = await _find_default_recipes_batch(
+        db, organization_id, (line.child_template_id for line in recipe.lines)
+    )
+    return [
+        DirectNeed(
+            child_template_id=line.child_template_id,
+            qty=(
+                Decimal(str(qty))
+                * line.qty_per_batch
+                * (Decimal('1') + line.yield_loss_pct / Decimal('100'))
+                / recipe.batch_yield_qty
+            ),
+            uom_id=line.uom_id,
+            unit=line.unit,
+            has_recipe=line.child_template_id in children,
+            make_fresh=line.make_fresh,
+        )
+        for line in recipe.lines
+    ]
 
 
 async def explode_in_sequence(

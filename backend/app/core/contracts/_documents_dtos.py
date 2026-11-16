@@ -201,6 +201,22 @@ class PartnerPricelistDTO(BaseModel):
     updated_at: datetime | None = None
 
 
+class OpenOrderLineDTO(BaseModel):
+    """What one open purchase order line still expects, in the product's stock unit.
+
+    A planner reading a shortage wants not only how much is already on order
+    but when it is due, so a line comes with its order's number and expected
+    date. ``expected_date`` is ``None`` when the order carries none.
+    """
+
+    product_template_id: UUID
+    purchase_order_id: UUID
+    number: str
+    status: str
+    expected_date: date | None = None
+    outstanding_quantity: Decimal
+
+
 class PurchaseOrderLineInput(BaseModel):
     """One line of a cross-module Purchase Order creation request.
 

@@ -1974,8 +1974,6 @@ async def add_shortages_to_shopping_list(
     its stock has no quantity to buy and is left out. Nothing short, nothing
     touched.
     """
-    from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
-
     from .availability_service import (
         _get_available_stock_batch,
         compute_shortage_list,
@@ -2018,6 +2016,41 @@ async def add_shortages_to_shopping_list(
     stocks = await _get_available_stock_batch(
         db, organization_id, short_ids, location_id=check_location_id
     )
+    return await put_missing_on_shopping_list(
+        db,
+        organization_id,
+        user,
+        lang,
+        [
+            (
+                child_id,
+                needs.get(child_id, Decimal('0')) - stocks.get(child_id, Decimal('0')),
+            )
+            for child_id in short_ids
+        ],
+    )
+
+
+async def put_missing_on_shopping_list(
+    db: AsyncSession,
+    organization_id: UUID,
+    user: UserContextDTO,
+    lang: Language,
+    missing_by_template: list[tuple[UUID, Decimal]],
+) -> ShortageShoppingListResponse:
+    """Write what is missing, per ingredient in its stock unit, on the list being filled.
+
+    The one door a shortage reaches the shopping list through — a planned run's
+    own shortage and an order that found no supplier to buy from both come here.
+    An ingredient already on that list is topped up to what is missing (never
+    lowered); nothing missing, nothing touched.
+    """
+    from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
+
+    wanted = [(tid, qty) for tid, qty in missing_by_template if qty > 0]
+    if not wanted:
+        return ShortageShoppingListResponse()
+    short_ids = [tid for tid, _qty in wanted]
     templates = await core_api.product_templates.get_many_async(
         db, organization_id, short_ids
     )
@@ -2036,10 +2069,9 @@ async def add_shortages_to_shopping_list(
             lines_by_template.setdefault(line.template_id, []).append(line)
     to_buy: list[ShoppingListItemCreateDTO] = []
     topped_up = 0
-    for child_id in short_ids:
-        missing = needs.get(child_id, Decimal('0')) - stocks.get(child_id, Decimal('0'))
+    for child_id, missing in wanted:
         template = templates.get(child_id)
-        if missing <= 0 or template is None:
+        if template is None:
             continue
         need = ShoppingListItemCreateDTO(
             name=template.name,
