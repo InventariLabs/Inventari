@@ -191,6 +191,34 @@ the single-order check uses — the settings read unlocked (`for_update=False`),
 so a GET never queues behind a maker write. No screen recomputes the forecast
 client-side; the detail page reads `shortage_items` from the order payload.
 
+### Planning across runs
+
+Each draft read its availability alone, so two drafts that each needed six of
+ten flour both read as covered. `planning_service` reads the drafts as one queue
+(`queued_drafts`: planned day, then creation, a run with no day behind every
+dated one) and measures each against what the runs before it leave. The queue
+is per availability scope (`_resolve_scope`) and spends the same `StockPool` the
+explosion takes an intermediate from, through `bom_service.explode_in_sequence`
+(one recipe round for the queue, each plan spending the pool it is handed —
+unlike `explode_by_recipes_with_uom`, whose plans are independent questions).
+
+| Endpoint | Description |
+|---|---|
+| `GET /production/orders`, `GET /production/orders/{id}` | A draft also carries `coverage` (`covered`, `partial` — some of what it needs is there — or `short` — none of it) and `coverage_items`, the ingredients that fall short of what is left for it. `shortage_count` / `shortage_items` stay completion's verdict on the shelf as it stands; the two answer different questions, and a draft behind another in the queue can be `partial` while completion would still let it through. |
+| `GET /production/needs?date_from&date_to` or `?order_id` | The combined needs of the draft runs planned in a period (or of one run), one level deep (`bom_service.direct_needs`): per ingredient `needed`, `in_stock` (what is left after the runs queued before the period took theirs), `on_order` with `expected` (open purchase order lines and their dates) and `missing`, all in the ingredient's stock unit. With purchasing off `on_order` is `null` and `expected` empty — the column does not exist, which is not "nothing on order". An ingredient that has a recipe of its own is `action: make`, otherwise `buy`; a line marked make-fresh never counts the shelf. Ingredients whose unit cannot be compared with stock come back in `unmeasured`, not in the figures. |
+| `POST /production/needs/order` | Needs `purchase_orders:write` and the module on. One DRAFT purchase order per supplier, each missing `buy` ingredient from its cheapest current price (compared per stock unit) in the supplier's own unit, rounded up to a whole step and to the supplier's minimum; those nobody offers go to the shopping list (`put_missing_on_shopping_list`, the one door the run's own shortage uses too), or come back as `unplaced` when that module is off. A `make` ingredient is never bought: it comes back in `to_make`. Open orders count as on order, so ordering twice orders once. |
+| `POST /production/needs/plan-intermediates` | A DRAFT run of each missing `make` ingredient, on the day it is first needed, for the missing quantity. The shortage strategy is not asked: the shortfall is the point. |
+
+Purchasing is reached only through `purchase_orders_api`
+(`list_open_order_lines_async`, `list_supplier_prices_for_template_async`,
+`create_purchase_order_async`); the other way round, purchasing asks
+`maker_api.list_template_ids_with_bom_async` which products have a recipe: a
+reorder alert for such a product carries `make_instead`, proposes no supplier,
+and To do gets a `produce` task (`source_kind: production_proposal`) opening
+`/maker/production?plan=<product>&quantity=<n>`. With either module off the
+other keeps working: no on-order column and no ordering without purchasing, a
+purchase proposal as before without production.
+
 ### The output batch, its dates and the ingredients' batches
 
 Every completed run files its output under a batch (`output_lot_name`,
