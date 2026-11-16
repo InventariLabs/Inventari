@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import UserContextDTO, WorkItemDTO, WorkItemQueryDTO
 from app.core.public_api import core_api
 
-from . import bom_service, cost_breakdown, cost_rollup, production_service
+from . import bom_service, cost_breakdown, cost_rollup, labelling, production_service
 from ._schemas_breakdown import CostBreakdownResponse
 from .models import BoMLine, ProductionOrder, ProductionOrderLine
 
@@ -219,6 +219,29 @@ class MakerAPI:
         return await production_service.complete_production(
             db, organization_id, order_id, user, actual_qty=actual_qty
         )
+
+    async def label_text_async(
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        template_id: UUID,
+        lang: str,
+    ) -> str | None:
+        """A made product's ingredient list and allergens, as a label prints them.
+
+        Computed from the product's default recipe (``labelling.py``), in
+        *lang*, allergens in capitals. None for a product nobody makes, and
+        while the module is off: a label printed then carries no list rather
+        than one computed from a formula nobody is looking after.
+        """
+        if not await core_api.organizations.is_module_enabled_async(
+            db, organization_id, 'maker'
+        ):
+            return None
+        composition = await labelling.compose_default_async(
+            db, organization_id, template_id
+        )
+        return None if composition is None else labelling.label_text(composition, lang)
 
 
 async def _shortfall_counts(

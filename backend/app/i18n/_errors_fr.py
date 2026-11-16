@@ -585,6 +585,7 @@ ERRORS_FR: ErrorMessages = {
     'product_label_no_code': "Rien à imprimer : aucun des produits choisis n'a de code. Générez-en un dans le formulaire du produit",
     'product_label_too_narrow': 'Le code {code} ne tient pas sur une étiquette de {width} mm de large : ses barres demandent au moins {needed} mm. Choisissez une étiquette plus large',
     'product_label_too_short': "L'étiquette de {height} mm de haut est trop basse : après le nom et le texte, il reste trop peu de hauteur aux barres du code {code} pour qu'un lecteur les voie. Choisissez une étiquette plus haute",
+    'product_label_composition_does_not_fit': 'La liste des ingrédients ne tient pas sur une étiquette de {width} × {height} mm dans la plus petite lettre que la loi autorise sur un emballage. Choisissez une étiquette plus grande',
     'storage_code_template_invalid': "Le modèle de code « {template} » n'est pas utilisable. Écrivez des champs comme {{zone}}-{{rack:02}}-{{level:02}}, avec un séparateur entre eux, ou un préfixe d'au plus cinq lettres et chiffres comme LOC",
     'storage_code_template_not_tree': 'Cet entrepôt tire des codes au hasard : donnez-lui un modèle avec des champs, comme {zone}-{rack:02}-{level:02}, avant de numéroter ses emplacements',
     'storage_code_parent_not_numbered': "Cet emplacement ne peut pas être numéroté seul : les emplacements au-dessus n'ont pas encore leurs codes du modèle, ou il est plus profond que le modèle ne va. Numérotez d'abord le niveau au-dessus",

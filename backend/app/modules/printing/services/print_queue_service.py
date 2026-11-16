@@ -317,14 +317,19 @@ async def lot_labels_async(
     db: AsyncSession,
     organization_id: UUID,
     lot_ids: list[UUID],
-) -> list[ProductLabel]:
-    """The labels of these batches, in the order asked.
+    *,
+    composition: bool = False,
+) -> tuple[list[ProductLabel], int]:
+    """The labels of these batches, in the order asked, and a count.
 
     A batch label names the product, carries the batch's own code in bars —
     what a scan at the next step looks the batch up by — and says the day
     the batch was made and its best-before. A batch whose name no barcode
     can carry, or one of another organization, is left out; none left is
-    the caller's refusal.
+    the caller's refusal. With ``composition`` a made product's batch also
+    carries its ingredient list and allergens; the count is how many labels
+    have one to carry, whether or not they print it — the screen offers the
+    option only when some do.
     """
     from app.modules.printing.services.product_label_service import (
         ProductLabel,
@@ -333,10 +338,12 @@ async def lot_labels_async(
 
     lang = get_current_lang()
     labels: list[ProductLabel] = []
+    texts = _CompositionTexts(db, organization_id, lang)
     for lot_id in lot_ids:
         lot = await core_api.stock.get_lot_detail_async(db, organization_id, lot_id)
         if lot is None or symbology(lot.name) is None:
             continue
+        text = await texts.of(lot.product_template_id)
         parts = []
         if lot.production_date:
             parts.append(
@@ -354,9 +361,37 @@ async def lot_labels_async(
                 name=lot.product_name or lot.name,
                 code=lot.name,
                 details='\n'.join(parts) or None,
+                composition=text if composition else None,
             )
         )
-    return labels
+    return labels, texts.found
+
+
+class _CompositionTexts:
+    """A made product's ingredient list for its labels, asked once a product.
+
+    The list is the maker module's, computed from the product's formula;
+    without that module a label carries none. ``found`` counts the labels
+    asked about that have one.
+    """
+
+    def __init__(self, db: AsyncSession, organization_id: UUID, lang: str) -> None:
+        self.db, self.organization_id, self.lang = db, organization_id, lang
+        self.texts: dict[UUID, str | None] = {}
+        self.found = 0
+
+    async def of(self, template_id: UUID | None) -> str | None:
+        from app.modules.maker.maker_api import maker_api
+
+        if template_id is None:
+            return None
+        if template_id not in self.texts:
+            self.texts[template_id] = await maker_api.label_text_async(
+                self.db, self.organization_id, template_id, self.lang
+            )
+        text = self.texts[template_id]
+        self.found += text is not None
+        return text
 
 
 def _details_line(lot_name: str | None, expiry: date | None, lang: str) -> str | None:
@@ -377,12 +412,14 @@ async def product_labels_async(
     item_ids: list[UUID],
     *,
     details: bool = True,
-) -> tuple[list[ProductLabel], int, int]:
-    """The labels of these products, in the order asked, and two counts.
+    composition: bool = False,
+) -> tuple[list[ProductLabel], int, int, int]:
+    """The labels of these products, in the order asked, and three counts.
 
-    The counts are how many have no code and how many carry a lot or an
-    expiry date, whether or not ``details`` prints them: the screen offers
-    the option only when some do.
+    The counts are how many have no code, how many carry a lot or an expiry
+    date and how many a made product's ingredient list, whether or not
+    ``details`` and ``composition`` print them: the screen offers each
+    option only when some labels have it.
 
     The code is the one a scan finds the product by: the record's own, else
     its product's barcode, else its SKU. A record with none of them, or with
@@ -416,6 +453,7 @@ async def product_labels_async(
     labels: list[ProductLabel] = []
     without_code = 0
     with_details = 0
+    texts = _CompositionTexts(db, organization_id, lang)
     for item in items:
         template = templates.get(item.template_id) if item.template_id else None
         code = item.barcode or (template and (template.barcode or template.sku))
@@ -424,10 +462,16 @@ async def product_labels_async(
             continue
         line = _record_details(item, lots, lang)
         with_details += line is not None
+        text = await texts.of(item.template_id)
         labels.append(
-            ProductLabel(name=item.name, code=code, details=line if details else None)
+            ProductLabel(
+                name=item.name,
+                code=code,
+                details=line if details else None,
+                composition=text if composition else None,
+            )
         )
-    return labels, without_code, with_details
+    return labels, without_code, with_details, texts.found
 
 
 def _record_details(
@@ -468,10 +512,11 @@ async def _product_entries_async(
     item_ids: list[UUID],
     *,
     details: bool,
+    composition: bool,
     copies: int,
 ) -> list[dict[str, Any]]:
-    labels, _, _ = await product_labels_async(
-        db, organization_id, item_ids, details=details
+    labels, _, _, _ = await product_labels_async(
+        db, organization_id, item_ids, details=details, composition=composition
     )
     if not labels:
         raise catalogue_refusal('product_label_no_code')
@@ -483,6 +528,7 @@ async def _product_entries_async(
             'short_code': label.code,
             'name': label.name,
             'details': label.details,
+            'composition': label.composition,
         }
         for label in labels
         for _ in range(copies)
@@ -494,9 +540,12 @@ async def _lot_entries_async(
     organization_id: UUID,
     lot_ids: list[UUID],
     *,
+    composition: bool,
     copies: int,
 ) -> list[dict[str, Any]]:
-    labels = await lot_labels_async(db, organization_id, lot_ids)
+    labels, _ = await lot_labels_async(
+        db, organization_id, lot_ids, composition=composition
+    )
     if not labels:
         raise catalogue_refusal('print_job_nothing_to_print')
     return [
@@ -506,6 +555,7 @@ async def _lot_entries_async(
             'short_code': label.code,
             'name': label.name,
             'details': label.details,
+            'composition': label.composition,
         }
         for label in labels
         for _ in range(copies)
@@ -529,6 +579,7 @@ async def queue_job_async(
     qr_only: bool = False,
     show_code: bool = False,
     details: bool = True,
+    composition: bool = False,
     copies: int = 1,
     width_mm: float = 50.0,
     height_mm: float = 24.0,
@@ -566,11 +617,16 @@ async def queue_job_async(
     if item_ids or lot_ids or (storage_ids and bars):
         if item_ids:
             entries = await _product_entries_async(
-                db, organization_id, item_ids, details=details, copies=copies
+                db,
+                organization_id,
+                item_ids,
+                details=details,
+                composition=composition,
+                copies=copies,
             )
         elif lot_ids:
             entries = await _lot_entries_async(
-                db, organization_id, lot_ids, copies=copies
+                db, organization_id, lot_ids, composition=composition, copies=copies
             )
         else:
             entries = await _location_entries_async(
@@ -833,7 +889,11 @@ def _bars_label(entry: dict[str, Any]) -> ProductLabel:
     from app.modules.printing.services.product_label_service import ProductLabel
 
     return ProductLabel(
-        entry['name'], entry['short_code'], entry.get('details'), entry.get('qr')
+        entry['name'],
+        entry['short_code'],
+        entry.get('details'),
+        entry.get('qr'),
+        entry.get('composition'),
     )
 
 

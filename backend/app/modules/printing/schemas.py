@@ -78,6 +78,9 @@ class PrintJobCreate(BaseModel):
     lot_ids: list[UUID] = Field(default_factory=list, max_length=1)
     #: A product label's lot and expiry line, printed when the record has them.
     details: bool = True
+    #: A made product's ingredient list and allergens, on its product or
+    #: batch label, when the product has a formula to compute them from.
+    composition: bool = False
     #: The same options the label download offers, so a strip sent to the
     #: printer matches the file: one caption for every label instead of each
     #: label's own, the code alone, and several copies of each label.
@@ -166,6 +169,8 @@ class ProductLabelExport(BaseModel):
     copies: int = Field(1, ge=1, le=20)
     #: The lot and expiry line, printed when the record has them.
     details: bool = True
+    #: A made product's ingredient list and allergens, when it has a formula.
+    composition: bool = False
 
 
 class LotLabelExport(BaseModel):
@@ -180,6 +185,8 @@ class LotLabelExport(BaseModel):
     width_mm: float = Field(50.0, ge=10.0, le=300.0)
     height_mm: float = Field(24.0, ge=5.0, le=300.0)
     copies: int = Field(1, ge=1, le=LOT_LABEL_MAX_COPIES)
+    #: The made product's ingredient list and allergens, when it has a formula.
+    composition: bool = False
 
 
 class LocationLabelExport(BaseModel):
