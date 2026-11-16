@@ -7,6 +7,7 @@ import {
   useActiveShoppingList,
   useQuickAddToShoppingList,
 } from "./useShoppingLists";
+import { shoppingListsApi } from "@/modules/shopping_lists/api/shopping-lists";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
@@ -56,6 +57,22 @@ describe("useActiveShoppingList", () => {
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.name).toBe("Weekly Shopping");
+  });
+
+  it("asks only for lists a new item can go on, never a completed one", async () => {
+    let asked: URLSearchParams | undefined;
+    server.use(
+      http.get("/api/v1/shopping-lists", ({ request }) => {
+        asked = new URL(request.url).searchParams;
+        return HttpResponse.json(onePage([mockList]));
+      }),
+    );
+    const { result } = renderHook(() => useActiveShoppingList(), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(asked?.get("status")).toBe("active");
+    expect(asked?.has("active_only")).toBe(false);
   });
 
   it("returns null when no active list", async () => {
@@ -109,5 +126,39 @@ describe("useQuickAddToShoppingList", () => {
     act(() => result.current.mutate({ name: "Milk", quantity: 2, unit: "l" }));
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it("picks its list among active ones, so a completed newest list is not the target", async () => {
+    let asked: URLSearchParams | undefined;
+    server.use(
+      http.get("/api/v1/shopping-lists", ({ request }) => {
+        asked = new URL(request.url).searchParams;
+        return HttpResponse.json(onePage([mockList]));
+      }),
+    );
+    const { result } = renderHook(() => useQuickAddToShoppingList(), {
+      wrapper: createWrapper(),
+    });
+    act(() => result.current.mutate({ name: "Milk" }));
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(asked?.get("status")).toBe("active");
+    expect(asked?.has("active_only")).toBe(false);
+  });
+});
+
+describe("shoppingListsApi.ensureActiveList", () => {
+  it("looks for an active list, not just an unarchived one", async () => {
+    let asked: URLSearchParams | undefined;
+    server.use(
+      http.get("/api/v1/shopping-lists", ({ request }) => {
+        asked = new URL(request.url).searchParams;
+        return HttpResponse.json(onePage([mockList]));
+      }),
+    );
+    await expect(shoppingListsApi.ensureActiveList()).resolves.toBe(
+      mockList.id,
+    );
+    expect(asked?.get("status")).toBe("active");
+    expect(asked?.has("active_only")).toBe(false);
   });
 });

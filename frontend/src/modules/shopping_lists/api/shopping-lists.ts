@@ -54,6 +54,13 @@ export const shoppingListsApi = {
     return response.data;
   },
 
+  /** The lists a new item can go on, newest first. A completed list is
+   *  frozen and an archived one is gone, so every "put this on the list"
+   *  door asks this, never `getAll`, which still returns completed lists. */
+  getTargets: async (): Promise<ShoppingList[]> => {
+    return getEveryPage<ShoppingList>("/shopping-lists", { status: "active" });
+  },
+
   getAll: async (activeOnly: boolean = true): Promise<ShoppingList[]> => {
     return getEveryPage<ShoppingList>("/shopping-lists", {
       active_only: activeOnly,
@@ -162,7 +169,7 @@ export const shoppingListsApi = {
    *  Nothing calls this while a reader is merely looking: a preview
    *  creates nothing, and this runs when they have chosen to buy. */
   ensureActiveList: async (): Promise<string> => {
-    const active = await shoppingListsApi.getAll(true);
+    const active = await shoppingListsApi.getTargets();
     if (active[0]?.id) return active[0].id;
     const created = await shoppingListsApi.create({});
     return created.id;
