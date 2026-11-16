@@ -62,6 +62,7 @@
     "insufficient": "Insuficiente",
     "short_of": "{{available}} em estoque dos {{required}} necessários",
     "not_comparable_hint": "O estoque é contado em outra medida. Informe o peso ou volume por peça no produto para compará-los.",
+    "not_comparable_measured": "O estoque é mantido em {{unit}} — peças não podem ser medidas contra ele. Informe a quantidade desta linha em {{unit}} em vez disso.",
     "fefo_expiry": "Validade curta: {{date}}",
     "expired_since": "Vencido em {{date}}",
     "fractional_hint": "Quantidade fracionada — ajuste as porções",

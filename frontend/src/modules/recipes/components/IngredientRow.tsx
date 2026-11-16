@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import type { IngredientAvailability } from "@/modules/recipes/types/core";
+import type { UomCategory } from "@/types";
+import { useUoms } from "@/modules/shared/hooks/useUoms";
 import IngredientLinkButton from "./IngredientLinkButton";
 import { ExclusionGate } from "./ExclusionGate";
 import { fmtQty, isFractionalCountable } from "../utils";
@@ -53,11 +55,45 @@ const statusLabel: Record<string, string> = {
   not_comparable: "availability.not_comparable_status",
 };
 
+/**
+ * The category the shelf's unit belongs to.
+ *
+ * Availability names a record's unit by symbol (`available_uom`), as the
+ * whole warehouse surface does, and the symbol is not a key: the first unit
+ * answering to it wins. Only the category is asked for, and units of one
+ * category share their scale.
+ */
+function uomCategoryOfSymbol(
+  categories: UomCategory[] | undefined,
+  symbol: string | null | undefined,
+): string | null {
+  if (!symbol) return null;
+  for (const group of categories ?? []) {
+    if (group.uoms?.some((unit) => unit.symbol === symbol)) {
+      return group.name;
+    }
+  }
+  return null;
+}
+
 const IngredientRow = memo(function IngredientRow({
   ingredient,
   recipeId,
 }: Props) {
   const { t } = useTranslation("recipes");
+  // The shelf's own unit decides which correction exists. A record kept in a
+  // weight or volume unit carries that measure in its quantity, so the
+  // product form hides the per-piece weight (computeFieldDefinitions) — there
+  // is nothing left for it to hold. The bridge recipes convert through is a
+  // counted product's field, and a weighed product's form never draws it, so
+  // sending the reader there named a field they could not reach.
+  const { data: uomCategories } = useUoms();
+  const stockedCategory = uomCategoryOfSymbol(
+    uomCategories,
+    ingredient.available_uom,
+  );
+  const stockedByMeasure =
+    stockedCategory === "Weight" || stockedCategory === "Volume";
   const showsBothReadings =
     !ingredient.quantities_comparable && ingredient.available_quantity != null;
   // What the dot stands for. "Found, but the measures cannot meet" is its own
@@ -159,6 +195,11 @@ const IngredientRow = memo(function IngredientRow({
   // optional-nullable and the row says it twice at most.
   const availableReading = `${fmtQty(ingredient.available_quantity ?? 0)}${unitLabel(ingredient.available_uom)}`;
   const requiredReading = `${fmtQty(ingredient.required_quantity)}${unitLabel(ingredient.required_uom)}`;
+  const stockedUnit = ingredient.available_uom
+    ? t(`common:units.${ingredient.available_uom}`, {
+        defaultValue: ingredient.available_uom,
+      })
+    : "";
 
   const renderMeta = () => {
     if (
@@ -200,15 +241,21 @@ const IngredientRow = memo(function IngredientRow({
               available: availableReading,
               required: requiredReading,
             })}{" "}
-            {ingredient.best_item ? (
+            {!ingredient.best_item ? (
+              t("availability.not_comparable_hint")
+            ) : stockedByMeasure ? (
+              // Nothing on the product's form can bridge a weighed record to
+              // pieces, so the link led to a field it hides. The correction
+              // that does work is on the line itself: its amount, given in
+              // the shelf's own measure.
+              t("availability.not_comparable_measured", { unit: stockedUnit })
+            ) : (
               <Link
                 to={`/inventory/items/${ingredient.best_item.item_id}`}
                 className="underline underline-offset-2"
               >
                 {t("availability.not_comparable_fix")}
               </Link>
-            ) : (
-              t("availability.not_comparable_hint")
             )}
           </span>
         )}
