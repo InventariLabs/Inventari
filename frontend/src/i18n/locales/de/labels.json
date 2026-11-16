@@ -228,5 +228,9 @@
       "printed": "Gedruckt",
       "failed": "Fehlgeschlagen"
     }
+  },
+  "composition": {
+    "label": "Zutaten und Allergene",
+    "note": "Aus der Formel des Produkts berechnet; prüfen Sie es, bevor das Etikett auf eine Verpackung kommt. Ein Verzeichnis braucht ein größeres Etikett als ein Code allein."
   }
 }

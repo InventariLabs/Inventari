@@ -14,6 +14,7 @@ export function NutritionValuesGrid({
     calories_kcal: t("energy"),
     protein_g: t("proteins"),
     fat_g: t("fat"),
+    saturated_fat_g: t("saturatedFat"),
     carbs_g: t("carbohydrates"),
     fiber_g: t("fiber"),
     sugar_g: t("sugars"),

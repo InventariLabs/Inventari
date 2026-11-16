@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { BookOpen, FlaskConical, Star, Trash2, Wallet } from "lucide-react";
+import {
+  BookOpen,
+  FlaskConical,
+  Star,
+  Tag,
+  Trash2,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
 import { extractApiError, isNotFoundError } from "@/lib/errors";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
@@ -24,10 +31,11 @@ import { RecipeShortageNotice } from "@/modules/maker/components/RecipeShortageN
 import { CompositionTab } from "@/modules/maker/pages/tabs/CompositionTab";
 import { CostResultTab } from "@/modules/maker/pages/tabs/CostResultTab";
 import { HistoryTab } from "@/modules/maker/pages/tabs/HistoryTab";
+import { LabelTab } from "@/modules/maker/pages/tabs/LabelTab";
 import { formatDate } from "@/utils/helpers";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 
-type TabKey = "composition" | "cost" | "history";
+type TabKey = "composition" | "cost" | "label" | "history";
 
 export default function RecipeDetailPage() {
   const { recipeId } = useParams<{ recipeId: string }>();
@@ -218,6 +226,9 @@ export default function RecipeDetailPage() {
           <TabsTrigger value="cost" icon={<Wallet size={16} />}>
             {t("detail.tabs.cost")}
           </TabsTrigger>
+          <TabsTrigger value="label" icon={<Tag size={16} />}>
+            {t("detail.tabs.label")}
+          </TabsTrigger>
           <TabsTrigger value="history" icon={<BookOpen size={16} />}>
             {t("detail.tabs.history")}
           </TabsTrigger>
@@ -228,6 +239,9 @@ export default function RecipeDetailPage() {
         </TabsContent>
         <TabsContent value="cost">
           <CostResultTab recipe={recipe} />
+        </TabsContent>
+        <TabsContent value="label">
+          <LabelTab recipe={recipe} />
         </TabsContent>
         <TabsContent value="history">
           <HistoryTab recipe={recipe} />

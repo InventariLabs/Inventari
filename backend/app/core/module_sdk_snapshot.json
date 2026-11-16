@@ -3500,6 +3500,41 @@
         }
       ]
     },
+    "pick_by_lang": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "en",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "pl",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "de",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fr",
+          "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "es",
+          "required": false
+        }
+      ]
+    },
     "record_settings": {
       "kind": "function",
       "params": [

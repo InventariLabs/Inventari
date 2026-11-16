@@ -126,7 +126,7 @@ nutrition | owner=core | expires=2027-06-30 | the label and scan code uses core 
   app.modules.vision.vision_api
   app.schemas.label_pool
 
-printing | owner=core | expires=2027-06-30 | the print queue and label rendering use core helpers directly; the module predates the SDK.
+printing | owner=core | expires=2027-06-30 | the print queue and label rendering use core helpers directly; the module predates the SDK. A made product's label asks production for its ingredient list through maker_api: the list is computed from the product's formula, which production owns; printing only lays it out.
   app.config
   app.core.barcode
   app.core.datetimes
@@ -141,6 +141,7 @@ printing | owner=core | expires=2027-06-30 | the print queue and label rendering
   app.core.utils
   app.database
   app.i18n.service
+  app.modules.maker.maker_api
 
 purchase_orders | owner=core | expires=2027-06-30 | purchasing uses core money, PDF, import and template helpers directly; the module predates the SDK. Its approvals and warehouse imports are those modules' public APIs, exceptions and schemas.
   app.core.context

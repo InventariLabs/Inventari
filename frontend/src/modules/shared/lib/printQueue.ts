@@ -40,6 +40,9 @@ export interface PrintOptions {
   copies?: number;
   /** A product label's lot and expiry line. */
   details?: boolean;
+  /** A made product's ingredient list and allergens, on its product or
+   *  batch label. */
+  composition?: boolean;
   /** Storage locations as shelf labels: the code in Code 128, not a QR. */
   bars?: boolean;
   /** With `bars`: a QR beside them as well. */
@@ -48,6 +51,21 @@ export interface PrintOptions {
    *  fits this label to it. */
   width?: number;
   height?: number;
+}
+
+/** The options as the job request names them; the ones nobody set stay out. */
+function optionsBody(options: PrintOptions | undefined) {
+  return {
+    caption: options?.caption || null,
+    qr_only: options?.qrOnly ?? false,
+    show_code: options?.showCode ?? false,
+    copies: options?.copies ?? 1,
+    ...(options?.details !== undefined && { details: options.details }),
+    ...(options?.composition && { composition: true }),
+    ...(options?.bars && { bars: true, qr: options.qr ?? false }),
+    width_mm: options?.width ?? 50,
+    height_mm: options?.height ?? 24,
+  };
 }
 
 function targetBody(target: Exclude<PrintTarget, { packageLabel: unknown }>) {
@@ -91,16 +109,7 @@ export const printQueueApi = {
     const response = await api.post<PrintJob>("/printing/jobs", {
       ...targetBody(vars.target),
       agent_id: vars.agentId ?? null,
-      caption: vars.options?.caption || null,
-      qr_only: vars.options?.qrOnly ?? false,
-      show_code: vars.options?.showCode ?? false,
-      copies: vars.options?.copies ?? 1,
-      ...(vars.options?.details !== undefined && {
-        details: vars.options.details,
-      }),
-      ...(vars.options?.bars && { bars: true, qr: vars.options.qr ?? false }),
-      width_mm: vars.options?.width ?? 50,
-      height_mm: vars.options?.height ?? 24,
+      ...optionsBody(vars.options),
     });
     return response.data;
   },

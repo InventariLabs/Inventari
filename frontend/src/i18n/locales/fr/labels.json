@@ -230,5 +230,9 @@
       "printed": "Imprimé",
       "failed": "Échec"
     }
+  },
+  "composition": {
+    "label": "Ingrédients et allergènes",
+    "note": "Calculé à partir de la formule du produit ; à vous de le vérifier avant que l'étiquette n'aille sur un emballage. Une liste demande une étiquette plus grande qu'un code seul."
   }
 }

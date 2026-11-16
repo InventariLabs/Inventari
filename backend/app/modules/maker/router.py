@@ -13,6 +13,7 @@ from app.core.modules import require_module
 from ._router_batches import router as batches_router
 from ._router_bom import router as bom_router
 from ._router_breakdown import router as breakdown_router
+from ._router_labelling import router as labelling_router
 from ._router_pricing import router as pricing_router
 from ._router_production import router as production_router
 from ._router_recipes import router as recipes_router
@@ -30,4 +31,5 @@ router.include_router(maker_settings_router)
 router.include_router(production_router)
 router.include_router(batches_router)
 router.include_router(breakdown_router)
+router.include_router(labelling_router)
 router.include_router(pricing_router)

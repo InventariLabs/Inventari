@@ -242,5 +242,9 @@
       "printed": "Wydrukowane",
       "failed": "Błąd"
     }
+  },
+  "composition": {
+    "label": "Składniki i alergeny",
+    "note": "Wyliczone z receptury produktu; sprawdź je, zanim etykieta trafi na opakowanie. Lista potrzebuje większej etykiety niż sam kod."
   }
 }

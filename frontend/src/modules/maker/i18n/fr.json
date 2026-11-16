@@ -253,7 +253,8 @@
     "tabs": {
       "composition": "Composition",
       "cost": "Coût & résultat",
-      "history": "Historique"
+      "history": "Historique",
+      "label": "Étiquette"
     },
     "sourceRecipe": "Basé sur une recette (instantané du {{date}})",
     "setAsDefault": "Définir par défaut",
@@ -719,5 +720,79 @@
     "saved": "Durée de conservation enregistrée",
     "saveFailed": "La durée de conservation n'a pas pu être enregistrée.",
     "invalid": "Saisissez un nombre entier de jours, 1 ou plus."
+  },
+  "labelling": {
+    "contains": "Contient",
+    "mayContain": "Peut contenir",
+    "from": "de {{names}}",
+    "declaredOnProduct": "déclaré sur le produit",
+    "computedNote": "Calculé à partir de la formule et des fiches de ses ingrédients. C'est à vous de le vérifier avant qu'il n'aille sur une étiquette.",
+    "allergens": {
+      "gluten": "Gluten",
+      "crustaceans": "Crustacés",
+      "eggs": "Œufs",
+      "fish": "Poisson",
+      "peanuts": "Arachides",
+      "soy": "Soja",
+      "milk": "Lait",
+      "nuts": "Fruits à coque",
+      "celery": "Céleri",
+      "mustard": "Moutarde",
+      "sesame": "Sésame",
+      "sulphites": "Sulfites",
+      "lupin": "Lupin",
+      "molluscs": "Mollusques"
+    },
+    "card": {
+      "title": "Sur l'étiquette",
+      "labelName": "Nom dans une liste des ingrédients",
+      "labelNameHint": "Une dénomination légale de la denrée, ou un nom INCI pour un cosmétique. Vide, la liste reprend le nom du produit.",
+      "unchecked": "Allergènes pas encore vérifiés.",
+      "suggested": "Le nom suggère : {{allergens}}.",
+      "confirmSuggestion": "Confirmer la suggestion",
+      "containsNone": "N'en contient aucun",
+      "choose": "Choisir les allergènes",
+      "change": "Modifier les allergènes",
+      "done": "Terminé",
+      "none": "Aucun",
+      "ownAllergens": "Déclarés sur ce produit",
+      "fromRecipe": "De la formule par défaut",
+      "saved": "Étiquette enregistrée",
+      "saveFailed": "Impossible d'enregistrer l'étiquette"
+    },
+    "tab": {
+      "ingredients": "Ingrédients, du plus lourd au plus léger",
+      "noIngredients": "Cette formule n'a pas encore d'ingrédients.",
+      "noAllergens": "Aucune fiche d'ingrédient ne nomme d'allergène.",
+      "unchecked": "Allergènes pas encore vérifiés :",
+      "uncheckedSuggests": "{{name}} (le nom suggère {{allergens}})",
+      "unweighed": "Rien ne dit ce qu'ils pèsent, la liste les met donc en dernier : {{names}}. Donnez sur la fiche le poids d'une unité, ou écrivez la ligne en poids.",
+      "nutrition": "Valeurs nutritionnelles pour 100 g",
+      "nutritionNone": "Aucune fiche d'ingrédient ne porte de valeurs nutritionnelles, il n'y a donc pas encore de déclaration.",
+      "perYield": "Pour 100 g des {{weight}} g que donne un lot.",
+      "yieldUnknown": "Le poids d'un lot n'est pas connu : donnez le rendement de la formule en poids, ou le poids d'une unité du produit.",
+      "notKnown": "inconnu",
+      "missing": "Non compté comme zéro, une valeur n'est donc pas connue :",
+      "missingLine": "{{name}} n'a pas de valeur pour {{nutrients}}",
+      "missingAll": "{{name}} n'a pas de valeurs nutritionnelles"
+    },
+    "nutrients": {
+      "energy": "Énergie",
+      "fat": "Matières grasses",
+      "saturates": "dont acides gras saturés",
+      "carbohydrate": "Glucides",
+      "sugars": "dont sucres",
+      "protein": "Protéines",
+      "salt": "Sel"
+    },
+    "figures": {
+      "energy": "énergie",
+      "fat": "matières grasses",
+      "saturates": "acides gras saturés",
+      "carbohydrate": "glucides",
+      "sugars": "sucres",
+      "protein": "protéines",
+      "salt": "sel"
+    }
   }
 }

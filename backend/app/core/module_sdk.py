@@ -128,6 +128,7 @@ from app.core.upload_validation import (
     UploadMessages,
     UploadPolicy,
 )
+from app.core.utils import pick_by_lang
 from app.core.work_in_progress import register_work_in_progress_provider
 from app.database import Base as CoreModelBase
 from app.i18n.service import get_current_lang, get_module_error_message
@@ -224,6 +225,7 @@ __all__ = [
     'journal_config_change',
     'map_service_errors',
     'paginate_async',
+    'pick_by_lang',
     'record_settings',
     'register_api_key_scope',
     'register_lot_trace_source',

@@ -657,7 +657,10 @@
         "make_fresh": "Toujours fabriquer frais",
         "material_cost": "Coût des matières prélevées",
         "started_on": "Démarré le",
-        "step": "Étape"
+        "step": "Étape",
+        "label_name": "Nom dans une liste des ingrédients",
+        "allergens": "Allergènes",
+        "may_contain": "Peut contenir"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",

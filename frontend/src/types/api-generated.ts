@@ -3826,6 +3826,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maker/labelling/products/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Label Facts
+         * @description A product's label facts, what its name suggests and what its recipe adds.
+         */
+        get: operations["get_label_facts_api_v1_maker_labelling_products__template_id__get"];
+        /**
+         * Set Label Facts
+         * @description Keep the product's label name, allergens and may-contain list.
+         *
+         *     A fact about the product, so it lands in the organization journal with
+         *     both sides, as its shelf life does.
+         */
+        put: operations["set_label_facts_api_v1_maker_labelling_products__template_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/labelling/recipes/{recipe_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Recipe Label
+         * @description The ingredient list, allergens and nutrition this recipe makes.
+         *
+         *     Computed on every read from the recipe and its ingredients' cards; the
+         *     producer checks it before it goes on a label.
+         */
+        get: operations["get_recipe_label_api_v1_maker_labelling_recipes__recipe_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maker/pricing/compute": {
         parameters: {
             query?: never;
@@ -5606,6 +5656,9 @@ export interface paths {
         /**
          * Lot Labels Png
          * @description The batches' labels as one PNG: product, batch code in bars, made and best-before.
+         *
+         *     With ``composition`` a made product's batch also carries its ingredient
+         *     list and allergens; ``X-Labels-With-Composition`` says how many have one.
          */
         post: operations["lot_labels_png_api_v1_printing_lot_labels_png_post"];
         delete?: never;
@@ -17233,6 +17286,22 @@ export interface components {
             next_cursor?: string | null;
         };
         /**
+         * LabelAllergen
+         * @description One allergen of a made product: the ingredients that bring it, and
+         *     whether the product's own card declares it.
+         */
+        LabelAllergen: {
+            /**
+             * Allergen
+             * @enum {string}
+             */
+            allergen: "gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs";
+            /** Sources */
+            sources: components["schemas"]["LabelIngredientRef"][];
+            /** Declared On Product */
+            declared_on_product: boolean;
+        };
+        /**
          * LabelAssignRequest
          * @description Data for quick product addition via scan
          */
@@ -17290,6 +17359,54 @@ export interface components {
             description?: string | null;
         };
         /**
+         * LabelFactsRead
+         * @description What a product's card says for its label, and what its recipe adds.
+         *
+         *     ``suggested_allergens`` is what the product's name suggests, for a person
+         *     to confirm. ``derived_*`` come from the product's default recipe when it
+         *     is made (``recipe_id``, named ``recipe_name``: a product may have several,
+         *     and a batch made by another is labelled from that one), each with the
+         *     ingredients that bring it.
+         */
+        LabelFactsRead: {
+            /**
+             * Product Template Id
+             * Format: uuid
+             */
+            product_template_id: string;
+            /** Label Name */
+            label_name: string | null;
+            /** Allergens */
+            allergens: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[] | null;
+            /** May Contain */
+            may_contain: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
+            /** Suggested Allergens */
+            suggested_allergens: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
+            /** Recipe Id */
+            recipe_id?: string | null;
+            /** Recipe Name */
+            recipe_name?: string | null;
+            /** Derived Allergens */
+            derived_allergens?: components["schemas"]["LabelAllergen"][];
+            /** Derived May Contain */
+            derived_may_contain?: components["schemas"]["LabelAllergen"][];
+        };
+        /**
+         * LabelFactsUpdate
+         * @description Input for PUT /labelling/products/{template_id}.
+         *
+         *     ``allergens`` set to ``null`` says nobody has checked them; an empty list
+         *     says the product contains none. Leaving everything empty clears the card.
+         */
+        LabelFactsUpdate: {
+            /** Label Name */
+            label_name?: string | null;
+            /** Allergens */
+            allergens?: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[] | null;
+            /** May Contain */
+            may_contain?: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
+        };
+        /**
          * LabelFromCodesRequest
          * @description Create labels with explicit short_codes (e.g. equipment serials).
          *
@@ -17303,6 +17420,84 @@ export interface components {
             label_type?: string;
             /** Context Tag */
             context_tag?: string | null;
+        };
+        /**
+         * LabelIngredient
+         * @description One entry of an ingredient list, heaviest first.
+         *
+         *     ``weight_g`` is what the parent's batch uses, its loss included; null when
+         *     nothing says what the ingredient weighs. ``emphasised``: its card names an
+         *     allergen. ``children``: a made ingredient's own list, in brackets.
+         */
+        LabelIngredient: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Name */
+            name: string;
+            /** Weight G */
+            weight_g: string | null;
+            /** Emphasised */
+            emphasised: boolean;
+            /** Children */
+            children?: components["schemas"]["LabelIngredient"][];
+        };
+        /**
+         * LabelIngredientRef
+         * @description An ingredient named beside an allergen, a missing figure or a doubt.
+         */
+        LabelIngredientRef: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Name */
+            name: string;
+        };
+        /**
+         * LabelNutrientGap
+         * @description An ingredient without some of the figures the declaration needs.
+         */
+        LabelNutrientGap: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Name */
+            name: string;
+            /** Nutrients */
+            nutrients: string[];
+        };
+        /**
+         * LabelNutrition
+         * @description The nutrition declaration per 100 g of the made product.
+         *
+         *     A figure is null when an ingredient lacks it (named in ``missing``), when
+         *     an ingredient cannot be weighed, or when the batch's weight is not known.
+         */
+        LabelNutrition: {
+            /** Energy Kj */
+            energy_kj: string | null;
+            /** Energy Kcal */
+            energy_kcal: string | null;
+            /** Fat */
+            fat: string | null;
+            /** Saturates */
+            saturates: string | null;
+            /** Carbohydrate */
+            carbohydrate: string | null;
+            /** Sugars */
+            sugars: string | null;
+            /** Protein */
+            protein: string | null;
+            /** Salt */
+            salt: string | null;
+            /** Missing */
+            missing: components["schemas"]["LabelNutrientGap"][];
         };
         /**
          * LabelPoolCreateDTO
@@ -17444,6 +17639,21 @@ export interface components {
         LabelUnassignResponse: {
             /** Message */
             message: string;
+        };
+        /**
+         * LabelUnchecked
+         * @description An ingredient nobody has checked for allergens, and what its name suggests.
+         */
+        LabelUnchecked: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Name */
+            name: string;
+            /** Suggested Allergens */
+            suggested_allergens: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
         };
         /**
          * LanguageUpdate
@@ -17595,6 +17805,8 @@ export interface components {
             height_mm?: number;
             /** Copies */
             copies?: number;
+            /** Composition */
+            composition?: boolean;
         };
         /**
          * LotLocationDTO
@@ -21335,6 +21547,8 @@ export interface components {
             lot_ids?: string[];
             /** Details */
             details?: boolean;
+            /** Composition */
+            composition?: boolean;
             /** Caption */
             caption?: string | null;
             /** Qr Only */
@@ -21458,6 +21672,8 @@ export interface components {
             copies?: number;
             /** Details */
             details?: boolean;
+            /** Composition */
+            composition?: boolean;
         };
         /**
          * ProductProfile
@@ -24010,6 +24226,42 @@ export interface components {
             allergens?: string[];
             /** Id */
             id?: string | null;
+        };
+        /**
+         * RecipeLabelRead
+         * @description A made product's label, computed from one recipe.
+         *
+         *     ``text`` is the list and the allergens as a label prints them (allergens
+         *     in capitals). ``yield_weight_g`` is what the batch weighs when it comes
+         *     out; null when neither the recipe's yield nor the product's card says.
+         *     ``nutrition`` is null when no ingredient carries a figure.
+         */
+        RecipeLabelRead: {
+            /**
+             * Recipe Id
+             * Format: uuid
+             */
+            recipe_id: string;
+            /**
+             * Output Template Id
+             * Format: uuid
+             */
+            output_template_id: string;
+            /** Ingredients */
+            ingredients: components["schemas"]["LabelIngredient"][];
+            /** Text */
+            text: string | null;
+            /** Allergens */
+            allergens: components["schemas"]["LabelAllergen"][];
+            /** May Contain */
+            may_contain: components["schemas"]["LabelAllergen"][];
+            /** Unchecked */
+            unchecked: components["schemas"]["LabelUnchecked"][];
+            /** Unweighed */
+            unweighed: components["schemas"]["LabelIngredientRef"][];
+            /** Yield Weight G */
+            yield_weight_g: string | null;
+            nutrition: components["schemas"]["LabelNutrition"] | null;
         };
         /**
          * RecipeList
@@ -36486,6 +36738,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CostBreakdownResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_label_facts_api_v1_maker_labelling_products__template_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelFactsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_label_facts_api_v1_maker_labelling_products__template_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LabelFactsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelFactsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_recipe_label_api_v1_maker_labelling_recipes__recipe_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                recipe_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecipeLabelRead"];
                 };
             };
             /** @description Validation Error */

@@ -134,6 +134,7 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
     { key: "calories_kcal", label: String(t("energy")), unit: "kcal" },
     { key: "protein_g", label: String(t("proteins")), unit: "g" },
     { key: "fat_g", label: String(t("fat")), unit: "g" },
+    { key: "saturated_fat_g", label: String(t("saturatedFat")), unit: "g" },
     { key: "carbs_g", label: String(t("carbohydrates")), unit: "g" },
     {
       key: "fiber_g",
