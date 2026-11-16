@@ -3,18 +3,29 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
-from .labelling import ALLERGEN_KEYS
-
-
-def _known(keys: list[str]) -> list[str]:
-    unknown = sorted(set(keys) - set(ALLERGEN_KEYS))
-    if unknown:
-        raise ValueError(f'Unknown allergen keys: {", ".join(unknown)}')
-    return keys
+#: The 14 allergens of EU Regulation 1169/2011 (``labelling.ALLERGEN_KEYS``,
+#: the culinary module's keys), spelled out so the schema refuses any other.
+AllergenKey = Literal[
+    'gluten',
+    'crustaceans',
+    'eggs',
+    'fish',
+    'peanuts',
+    'soy',
+    'milk',
+    'nuts',
+    'celery',
+    'mustard',
+    'sesame',
+    'sulphites',
+    'lupin',
+    'molluscs',
+]
 
 
 class LabelFactsUpdate(BaseModel):
@@ -25,18 +36,8 @@ class LabelFactsUpdate(BaseModel):
     """
 
     label_name: str | None = Field(None, max_length=255)
-    allergens: list[str] | None = Field(None, max_length=14)
-    may_contain: list[str] = Field(default_factory=list, max_length=14)
-
-    @field_validator('allergens')
-    @classmethod
-    def _allergens_known(cls, value: list[str] | None) -> list[str] | None:
-        return None if value is None else _known(value)
-
-    @field_validator('may_contain')
-    @classmethod
-    def _may_contain_known(cls, value: list[str]) -> list[str]:
-        return _known(value)
+    allergens: list[AllergenKey] | None = Field(None, max_length=14)
+    may_contain: list[AllergenKey] = Field(default_factory=list, max_length=14)
 
 
 class LabelIngredientRef(BaseModel):
@@ -50,7 +51,7 @@ class LabelAllergen(BaseModel):
     """One allergen of a made product: the ingredients that bring it, and
     whether the product's own card declares it."""
 
-    allergen: str
+    allergen: AllergenKey
     sources: list[LabelIngredientRef]
     declared_on_product: bool
 
@@ -65,9 +66,9 @@ class LabelFactsRead(BaseModel):
 
     product_template_id: UUID
     label_name: str | None
-    allergens: list[str] | None
-    may_contain: list[str]
-    suggested_allergens: list[str]
+    allergens: list[AllergenKey] | None
+    may_contain: list[AllergenKey]
+    suggested_allergens: list[AllergenKey]
     recipe_id: UUID | None = None
     derived_allergens: list[LabelAllergen] = Field(default_factory=list)
     derived_may_contain: list[LabelAllergen] = Field(default_factory=list)
@@ -93,7 +94,7 @@ class LabelUnchecked(BaseModel):
 
     template_id: UUID
     name: str
-    suggested_allergens: list[str]
+    suggested_allergens: list[AllergenKey]
 
 
 class LabelNutrientGap(BaseModel):

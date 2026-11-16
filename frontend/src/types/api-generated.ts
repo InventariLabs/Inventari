@@ -17291,8 +17291,11 @@ export interface components {
          *     whether the product's own card declares it.
          */
         LabelAllergen: {
-            /** Allergen */
-            allergen: string;
+            /**
+             * Allergen
+             * @enum {string}
+             */
+            allergen: "gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs";
             /** Sources */
             sources: components["schemas"]["LabelIngredientRef"][];
             /** Declared On Product */
@@ -17372,11 +17375,11 @@ export interface components {
             /** Label Name */
             label_name: string | null;
             /** Allergens */
-            allergens: string[] | null;
+            allergens: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[] | null;
             /** May Contain */
-            may_contain: string[];
+            may_contain: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
             /** Suggested Allergens */
-            suggested_allergens: string[];
+            suggested_allergens: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
             /** Recipe Id */
             recipe_id?: string | null;
             /** Derived Allergens */
@@ -17395,9 +17398,9 @@ export interface components {
             /** Label Name */
             label_name?: string | null;
             /** Allergens */
-            allergens?: string[] | null;
+            allergens?: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[] | null;
             /** May Contain */
-            may_contain?: string[];
+            may_contain?: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
         };
         /**
          * LabelFromCodesRequest
@@ -17646,7 +17649,7 @@ export interface components {
             /** Name */
             name: string;
             /** Suggested Allergens */
-            suggested_allergens: string[];
+            suggested_allergens: ("gluten" | "crustaceans" | "eggs" | "fish" | "peanuts" | "soy" | "milk" | "nuts" | "celery" | "mustard" | "sesame" | "sulphites" | "lupin" | "molluscs")[];
         };
         /**
          * LanguageUpdate

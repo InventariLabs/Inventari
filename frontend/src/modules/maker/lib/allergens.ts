@@ -19,7 +19,7 @@ export const ALLERGEN_KEYS = [
   "molluscs",
 ] as const;
 
-type AllergenKey = (typeof ALLERGEN_KEYS)[number];
+export type AllergenKey = (typeof ALLERGEN_KEYS)[number];
 
 const isAllergenKey = (key: string): key is AllergenKey =>
   (ALLERGEN_KEYS as readonly string[]).includes(key);

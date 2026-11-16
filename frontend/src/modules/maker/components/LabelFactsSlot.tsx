@@ -12,7 +12,11 @@ import {
   useLabelFacts,
   useSetLabelFacts,
 } from "@/modules/maker/hooks/useLabelling";
-import { ALLERGEN_KEYS, useAllergenName } from "@/modules/maker/lib/allergens";
+import {
+  ALLERGEN_KEYS,
+  type AllergenKey,
+  useAllergenName,
+} from "@/modules/maker/lib/allergens";
 import type {
   LabelAllergen,
   LabelFacts,
@@ -32,7 +36,7 @@ function asUpdate(facts: LabelFacts): LabelFactsUpdate {
   };
 }
 
-function toggled(list: string[], key: string): string[] {
+function toggled(list: AllergenKey[], key: AllergenKey): AllergenKey[] {
   return list.includes(key) ? list.filter((k) => k !== key) : [...list, key];
 }
 
@@ -44,9 +48,9 @@ function AllergenChoice({
   onToggle,
 }: {
   legend: string;
-  value: string[];
+  value: AllergenKey[];
   disabled: boolean;
-  onToggle: (key: string) => void;
+  onToggle: (key: AllergenKey) => void;
 }) {
   const name = useAllergenName();
   const id = useId();

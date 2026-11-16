@@ -59180,6 +59180,22 @@
         "properties": {
           "allergen": {
             "type": "string",
+            "enum": [
+              "gluten",
+              "crustaceans",
+              "eggs",
+              "fish",
+              "peanuts",
+              "soy",
+              "milk",
+              "nuts",
+              "celery",
+              "mustard",
+              "sesame",
+              "sulphites",
+              "lupin",
+              "molluscs"
+            ],
             "title": "Allergen"
           },
           "sources": {
@@ -59445,7 +59461,23 @@
             "anyOf": [
               {
                 "items": {
-                  "type": "string"
+                  "type": "string",
+                  "enum": [
+                    "gluten",
+                    "crustaceans",
+                    "eggs",
+                    "fish",
+                    "peanuts",
+                    "soy",
+                    "milk",
+                    "nuts",
+                    "celery",
+                    "mustard",
+                    "sesame",
+                    "sulphites",
+                    "lupin",
+                    "molluscs"
+                  ]
                 },
                 "type": "array"
               },
@@ -59457,14 +59489,46 @@
           },
           "may_contain": {
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "gluten",
+                "crustaceans",
+                "eggs",
+                "fish",
+                "peanuts",
+                "soy",
+                "milk",
+                "nuts",
+                "celery",
+                "mustard",
+                "sesame",
+                "sulphites",
+                "lupin",
+                "molluscs"
+              ]
             },
             "type": "array",
             "title": "May Contain"
           },
           "suggested_allergens": {
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "gluten",
+                "crustaceans",
+                "eggs",
+                "fish",
+                "peanuts",
+                "soy",
+                "milk",
+                "nuts",
+                "celery",
+                "mustard",
+                "sesame",
+                "sulphites",
+                "lupin",
+                "molluscs"
+              ]
             },
             "type": "array",
             "title": "Suggested Allergens"
@@ -59525,7 +59589,23 @@
             "anyOf": [
               {
                 "items": {
-                  "type": "string"
+                  "type": "string",
+                  "enum": [
+                    "gluten",
+                    "crustaceans",
+                    "eggs",
+                    "fish",
+                    "peanuts",
+                    "soy",
+                    "milk",
+                    "nuts",
+                    "celery",
+                    "mustard",
+                    "sesame",
+                    "sulphites",
+                    "lupin",
+                    "molluscs"
+                  ]
                 },
                 "type": "array",
                 "maxItems": 14
@@ -59538,7 +59618,23 @@
           },
           "may_contain": {
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "gluten",
+                "crustaceans",
+                "eggs",
+                "fish",
+                "peanuts",
+                "soy",
+                "milk",
+                "nuts",
+                "celery",
+                "mustard",
+                "sesame",
+                "sulphites",
+                "lupin",
+                "molluscs"
+              ]
             },
             "type": "array",
             "maxItems": 14,
@@ -60233,7 +60329,23 @@
           },
           "suggested_allergens": {
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "gluten",
+                "crustaceans",
+                "eggs",
+                "fish",
+                "peanuts",
+                "soy",
+                "milk",
+                "nuts",
+                "celery",
+                "mustard",
+                "sesame",
+                "sulphites",
+                "lupin",
+                "molluscs"
+              ]
             },
             "type": "array",
             "title": "Suggested Allergens"

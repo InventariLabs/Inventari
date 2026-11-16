@@ -13,7 +13,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import Mapping
 from decimal import Decimal
-from typing import Any
+from typing import Any, get_args
 
 import pytest
 from fastapi.testclient import TestClient
@@ -24,7 +24,9 @@ from app.models.audit_log import AuditLog
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.uom import Uom
+from app.modules.maker._schemas_labelling import AllergenKey
 from app.modules.maker.models import BoMLine, MakerRecipe
+from app.modules.recipes.recipes_api import recipes_api
 
 pytestmark = pytest.mark.integration
 
@@ -168,6 +170,11 @@ class TestTheProductCardCarriesItsAllergens:
         water = _product(db_session, mk_org, 'Water', uom=_uom(db_session, 'g'))
         db_session.commit()
         assert _facts(client, mk_auth_headers, water, allergens=[])['allergens'] == []
+
+    def test_the_schema_knows_the_same_allergens_as_the_inference(self) -> None:
+        # The request schema spells the 14 keys out; they must stay the ones
+        # the culinary inference suggests and the screens name.
+        assert get_args(AllergenKey) == recipes_api.ALLERGEN_KEYS
 
     def test_an_unknown_allergen_is_refused(
         self,
