@@ -108,6 +108,18 @@ export type ProductionPreviewResponse =
 export type ShortageShoppingListResponse =
   components["schemas"]["ShortageShoppingListResponse"];
 
+/** How far the shelf covers a planned run once the runs before it took theirs. */
+export type PlanCoverage = NonNullable<ProductionOrder["coverage"]>;
+
+/** The combined needs of the planned runs of a period, or of one run. */
+export type NeedsView = components["schemas"]["NeedsRead"];
+export type NeedRow = components["schemas"]["NeedRowRead"];
+/** Which runs a needs request is about: one run, or the runs of a period. */
+export type NeedsScope = components["schemas"]["NeedsScope"];
+export type OrderMissingResult = components["schemas"]["OrderMissingRead"];
+export type PlanIntermediatesResult =
+  components["schemas"]["PlanIntermediatesRead"];
+
 // ---------------------------------------------------------------------------
 // Recipes
 // ---------------------------------------------------------------------------

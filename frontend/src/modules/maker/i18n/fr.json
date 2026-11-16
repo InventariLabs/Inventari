@@ -6,7 +6,8 @@
   "navigation": {
     "production": "Ordres de fabrication",
     "catalog": "Formules",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "plan": "Plan"
   },
   "productionList": {
     "title": "Ordres de fabrication",
@@ -793,6 +794,75 @@
       "sugars": "sucres",
       "protein": "protéines",
       "salt": "sel"
+    }
+  },
+  "coverage": {
+    "covered": "Couvert",
+    "partial": "Partiellement couvert",
+    "short": "Insuffisant"
+  },
+  "planning": {
+    "title": "Plan de production",
+    "subtitle": "Les ordres planifiés par jour, et tout ce qu'ils demandent dans une seule liste.",
+    "previous": "Période précédente",
+    "next": "Période suivante",
+    "view": {
+      "label": "Période",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "move": {
+      "button": "Déplacer",
+      "aria": "Déplacer {{name}} à un autre jour",
+      "title": "Déplacer {{name}}",
+      "day": "Nouveau jour",
+      "now": "Actuellement prévu le {{date}}.",
+      "save": "Déplacer",
+      "cancel": "Annuler",
+      "failed": "L'ordre n'a pas pu être déplacé."
+    },
+    "coverage": {
+      "title": "Place dans le plan",
+      "coveredNote": "Après les ordres planifiés avant lui, le stock couvre encore cet ordre.",
+      "shortNote": "Après les ordres planifiés avant lui, le stock ne suffit pas pour cet ordre. Il reste pour lui :",
+      "leftOf": "{{left}} restant sur {{needed}}"
+    },
+    "needs": {
+      "title": "Ce dont les ordres planifiés ont besoin",
+      "ingredient": "Ingrédient",
+      "needed": "Besoin",
+      "inStock": "En stock",
+      "onOrder": "Commandé",
+      "missing": "Manquant",
+      "make": "À fabriquer",
+      "noDate": "sans date",
+      "emptyTitle": "Aucun ordre planifié sur cette période",
+      "emptyDescription": "Planifiez un ordre avec un jour, et ce dont il a besoin apparaît ici.",
+      "unmeasured": "Non comptés, leurs unités ne se comparent pas au stock : {{names}}."
+    },
+    "order": {
+      "button": "Commander le manquant",
+      "created_one": "{{count}} brouillon de commande créé",
+      "created_many": "{{count}} brouillons de commande créés",
+      "created_other": "{{count}} brouillons de commande créés",
+      "listed_one": "{{count}} ingrédient ajouté à la liste de courses",
+      "listed_many": "{{count}} ingrédients ajoutés à la liste de courses",
+      "listed_other": "{{count}} ingrédients ajoutés à la liste de courses",
+      "toMake_one": "{{count}} ingrédient à fabriquer, pas à acheter",
+      "toMake_many": "{{count}} ingrédients à fabriquer, pas à acheter",
+      "toMake_other": "{{count}} ingrédients à fabriquer, pas à acheter",
+      "unplaced_one": "{{count}} ingrédient sans fournisseur ni liste",
+      "unplaced_many": "{{count}} ingrédients sans fournisseur ni liste",
+      "unplaced_other": "{{count}} ingrédients sans fournisseur ni liste",
+      "nothing": "Rien à commander.",
+      "failed": "La commande n'a pas pu être passée."
+    },
+    "intermediates": {
+      "button": "Planifier les ordres du manquant",
+      "planned_one": "{{count}} ordre planifié",
+      "planned_many": "{{count}} ordres planifiés",
+      "planned_other": "{{count}} ordres planifiés",
+      "failed": "Les ordres n'ont pas pu être planifiés."
     }
   }
 }

@@ -6,7 +6,8 @@
   "navigation": {
     "production": "Zlecenia",
     "catalog": "Receptury",
-    "settings": "Ustawienia"
+    "settings": "Ustawienia",
+    "plan": "Plan"
   },
   "productionList": {
     "title": "Zlecenia produkcyjne",
@@ -821,6 +822,80 @@
       "sugars": "cukry",
       "protein": "białko",
       "salt": "sól"
+    }
+  },
+  "coverage": {
+    "covered": "Pokryte",
+    "partial": "Częściowo pokryte",
+    "short": "Brakuje"
+  },
+  "planning": {
+    "title": "Plan produkcji",
+    "subtitle": "Zaplanowane zlecenia według dni i wszystko, czego potrzebują, na jednej liście.",
+    "previous": "Poprzedni okres",
+    "next": "Następny okres",
+    "view": {
+      "label": "Okres",
+      "week": "Tydzień",
+      "month": "Miesiąc"
+    },
+    "move": {
+      "button": "Przenieś",
+      "aria": "Przenieś {{name}} na inny dzień",
+      "title": "Przenieś {{name}}",
+      "day": "Nowy dzień",
+      "now": "Teraz zaplanowane na {{date}}.",
+      "save": "Przenieś",
+      "cancel": "Anuluj",
+      "failed": "Nie udało się przenieść zlecenia."
+    },
+    "coverage": {
+      "title": "Miejsce w planie",
+      "coveredNote": "Po zleceniach zaplanowanych przed nim zapas nadal pokrywa to zlecenie.",
+      "shortNote": "Po zleceniach zaplanowanych przed nim zapasu brakuje na to zlecenie. Zostaje dla niego:",
+      "leftOf": "zostało {{left}} z {{needed}}"
+    },
+    "needs": {
+      "title": "Czego potrzebują zaplanowane zlecenia",
+      "ingredient": "Składnik",
+      "needed": "Potrzeba",
+      "inStock": "Na stanie",
+      "onOrder": "Zamówione",
+      "missing": "Brakuje",
+      "make": "Do wyprodukowania",
+      "noDate": "bez daty",
+      "emptyTitle": "Brak zleceń zaplanowanych w tym okresie",
+      "emptyDescription": "Zaplanuj zlecenie z dniem, a to, czego potrzebuje, pojawi się tutaj.",
+      "unmeasured": "Nie liczone, ich jednostek nie da się porównać ze stanem: {{names}}."
+    },
+    "order": {
+      "button": "Zamów brakujące",
+      "created_one": "Utworzono {{count}} szkic zamówienia",
+      "created_few": "Utworzono {{count}} szkice zamówień",
+      "created_many": "Utworzono {{count}} szkiców zamówień",
+      "created_other": "Utworzono {{count}} szkiców zamówień",
+      "listed_one": "{{count}} składnik trafił na listę zakupów",
+      "listed_few": "{{count}} składniki trafiły na listę zakupów",
+      "listed_many": "{{count}} składników trafiło na listę zakupów",
+      "listed_other": "{{count}} składników trafiło na listę zakupów",
+      "toMake_one": "{{count}} składnik do wyprodukowania, nie do kupienia",
+      "toMake_few": "{{count}} składniki do wyprodukowania, nie do kupienia",
+      "toMake_many": "{{count}} składników do wyprodukowania, nie do kupienia",
+      "toMake_other": "{{count}} składników do wyprodukowania, nie do kupienia",
+      "unplaced_one": "{{count}} składnik nie ma dostawcy ani listy",
+      "unplaced_few": "{{count}} składniki nie mają dostawcy ani listy",
+      "unplaced_many": "{{count}} składników nie ma dostawcy ani listy",
+      "unplaced_other": "{{count}} składników nie ma dostawcy ani listy",
+      "nothing": "Nie ma czego zamawiać.",
+      "failed": "Nie udało się złożyć zamówienia."
+    },
+    "intermediates": {
+      "button": "Zaplanuj zlecenia brakujących",
+      "planned_one": "Zaplanowano {{count}} zlecenie",
+      "planned_few": "Zaplanowano {{count}} zlecenia",
+      "planned_many": "Zaplanowano {{count}} zleceń",
+      "planned_other": "Zaplanowano {{count}} zleceń",
+      "failed": "Nie udało się zaplanować zleceń."
     }
   }
 }

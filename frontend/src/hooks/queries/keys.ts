@@ -537,6 +537,10 @@ export const queryKeys = {
         ? (["maker", "production", params] as const)
         : (["maker", "production"] as const),
     productionDetail: (id: string) => ["maker", "production", id] as const,
+    /** One product the production screens name by id. */
+    product: (templateId: string) => ["maker", "product", templateId] as const,
+    /** The combined needs of a period's (or one run's) planned runs. */
+    needs: (scope: unknown) => ["maker", "production", "needs", scope] as const,
     /** The order's stock-move feed, read beside the order itself — reached
      * by `invalidation.maker` through the `maker.all` prefix. */
     productionStockMoves: (orderId?: string) =>

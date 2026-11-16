@@ -6,7 +6,8 @@
   "navigation": {
     "production": "Produktionsläufe",
     "catalog": "Formeln",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "plan": "Plan"
   },
   "productionList": {
     "title": "Produktionsaufträge",
@@ -793,6 +794,70 @@
       "sugars": "Zucker",
       "protein": "Eiweiß",
       "salt": "Salz"
+    }
+  },
+  "coverage": {
+    "covered": "Gedeckt",
+    "partial": "Teilweise gedeckt",
+    "short": "Fehlt"
+  },
+  "planning": {
+    "title": "Produktionsplan",
+    "subtitle": "Geplante Aufträge nach Tag und alles, was sie brauchen, in einer Liste.",
+    "previous": "Voriger Zeitraum",
+    "next": "Nächster Zeitraum",
+    "view": {
+      "label": "Zeitraum",
+      "week": "Woche",
+      "month": "Monat"
+    },
+    "move": {
+      "button": "Verschieben",
+      "aria": "{{name}} auf einen anderen Tag verschieben",
+      "title": "{{name}} verschieben",
+      "day": "Neuer Tag",
+      "now": "Derzeit geplant für {{date}}.",
+      "save": "Verschieben",
+      "cancel": "Abbrechen",
+      "failed": "Der Auftrag konnte nicht verschoben werden."
+    },
+    "coverage": {
+      "title": "Platz im Plan",
+      "coveredNote": "Nach den davor geplanten Aufträgen deckt der Bestand diesen Auftrag noch.",
+      "shortNote": "Nach den davor geplanten Aufträgen reicht der Bestand für diesen Auftrag nicht. Dafür bleibt:",
+      "leftOf": "{{left}} von {{needed}} übrig"
+    },
+    "needs": {
+      "title": "Was die geplanten Aufträge brauchen",
+      "ingredient": "Zutat",
+      "needed": "Benötigt",
+      "inStock": "Auf Lager",
+      "onOrder": "Bestellt",
+      "missing": "Fehlt",
+      "make": "Herstellen",
+      "noDate": "ohne Datum",
+      "emptyTitle": "In diesem Zeitraum sind keine Aufträge geplant",
+      "emptyDescription": "Planen Sie einen Auftrag mit Tag, dann erscheint hier, was er braucht.",
+      "unmeasured": "Nicht gezählt, ihre Einheiten lassen sich nicht mit dem Bestand vergleichen: {{names}}."
+    },
+    "order": {
+      "button": "Fehlendes bestellen",
+      "created_one": "{{count}} Bestellentwurf erstellt",
+      "created_other": "{{count}} Bestellentwürfe erstellt",
+      "listed_one": "{{count}} Zutat auf die Einkaufsliste gesetzt",
+      "listed_other": "{{count}} Zutaten auf die Einkaufsliste gesetzt",
+      "toMake_one": "{{count}} Zutat wird hergestellt, nicht gekauft",
+      "toMake_other": "{{count}} Zutaten werden hergestellt, nicht gekauft",
+      "unplaced_one": "{{count}} Zutat hat weder Lieferanten noch Liste",
+      "unplaced_other": "{{count}} Zutaten haben weder Lieferanten noch Liste",
+      "nothing": "Nichts zu bestellen.",
+      "failed": "Die Bestellung konnte nicht aufgegeben werden."
+    },
+    "intermediates": {
+      "button": "Aufträge für Fehlendes planen",
+      "planned_one": "{{count}} Auftrag geplant",
+      "planned_other": "{{count}} Aufträge geplant",
+      "failed": "Die Aufträge konnten nicht geplant werden."
     }
   }
 }

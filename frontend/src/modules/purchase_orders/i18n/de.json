@@ -287,7 +287,9 @@
     "minPositive": "Min muss größer als 0 sein — das ist die Schwelle, die die Regel auslöst",
     "count_one": "Regel",
     "count_other": "Regeln",
-    "overCapacity": "Regel gespeichert. Hinweis: Sie verlangt {{max}} pro Nachschub — mehr als das Regal fasst ({{capacity}})."
+    "overCapacity": "Regel gespeichert. Hinweis: Sie verlangt {{max}} pro Nachschub — mehr als das Regal fasst ({{capacity}}).",
+    "madeHere": "Wird selbst hergestellt",
+    "planRun": "Auftrag planen"
   },
   "productPicker": {
     "search": "Produkt suchen…",

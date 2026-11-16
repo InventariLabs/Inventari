@@ -17,6 +17,7 @@ import { RunPortions } from "@/modules/maker/components/RunPortions";
 import { RunSteps } from "@/modules/maker/components/RunSteps";
 import { OrderEditForm } from "@/modules/maker/components/OrderEditForm";
 import { ProductionIngredientsTable } from "@/modules/maker/components/ProductionIngredientsTable";
+import { RunCoverageCard } from "@/modules/maker/components/RunCoverageCard";
 import { ProductionStockMovesTable } from "@/modules/maker/components/ProductionStockMovesTable";
 import { ProductionOrderStats } from "@/modules/maker/components/ProductionOrderStats";
 import { ShortageModal } from "@/modules/maker/components/ShortageModal";
@@ -229,6 +230,8 @@ export default function ProductionDetailPage() {
           <RunPortions order={order} canWrite={canWrite} />
         </>
       )}
+
+      <RunCoverageCard order={order} />
 
       <ProductionIngredientsTable
         lines={completedLines}

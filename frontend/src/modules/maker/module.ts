@@ -1,5 +1,10 @@
 import { createElement, lazy } from "react";
-import { Hammer, FlaskConical, SlidersHorizontal } from "lucide-react";
+import {
+  CalendarDays,
+  Hammer,
+  FlaskConical,
+  SlidersHorizontal,
+} from "lucide-react";
 import { moduleRegistry, slotComponent } from "@/lib/moduleRegistry";
 import { useBomSummaryForTemplates } from "@/modules/maker/hooks/useBom";
 import { queryKeys } from "@/hooks/queries/keys";
@@ -9,6 +14,7 @@ import { HasBoMBadge } from "./components/HasBoMBadge";
 const RecipeCatalogPage = lazy(() => import("./pages/RecipeCatalogPage"));
 const RecipeDetailPage = lazy(() => import("./pages/RecipeDetailPage"));
 const ProductionListPage = lazy(() => import("./pages/ProductionListPage"));
+const ProductionPlanPage = lazy(() => import("./pages/ProductionPlanPage"));
 const ProductionDetailPage = lazy(() => import("./pages/ProductionDetailPage"));
 const BatchRecordPage = lazy(() => import("./pages/BatchRecordPage"));
 const MakerSettingsPage = lazy(() => import("./pages/MakerSettingsPage"));
@@ -64,6 +70,14 @@ moduleRegistry.register({
         mobileBar: true,
       },
       {
+        path: "/maker/production/plan",
+        icon: CalendarDays,
+        labelKey: "maker:navigation.plan",
+        titleKey: "maker:planning.title",
+        subtitleKey: "maker:planning.subtitle",
+        order: 30,
+      },
+      {
         // Settings sit last in the module bar, always (UI_GUIDELINES §2.14).
         path: "/maker/settings",
         icon: SlidersHorizontal,
@@ -78,6 +92,7 @@ moduleRegistry.register({
     { path: "/maker", component: RecipeCatalogPage },
     { path: "/maker/recipes/:recipeId", component: RecipeDetailPage },
     { path: "/maker/production", component: ProductionListPage },
+    { path: "/maker/production/plan", component: ProductionPlanPage },
     { path: "/maker/production/:orderId", component: ProductionDetailPage },
     {
       path: "/maker/production/:orderId/record",

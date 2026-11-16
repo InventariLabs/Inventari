@@ -6,7 +6,8 @@
   "navigation": {
     "production": "Órdenes de producción",
     "catalog": "Fórmulas",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "plan": "Plan"
   },
   "productionList": {
     "title": "Órdenes de producción",
@@ -793,6 +794,75 @@
       "sugars": "azúcares",
       "protein": "proteínas",
       "salt": "sal"
+    }
+  },
+  "coverage": {
+    "covered": "Cubierto",
+    "partial": "Cubierto en parte",
+    "short": "Falta"
+  },
+  "planning": {
+    "title": "Plan de producción",
+    "subtitle": "Las órdenes planificadas por día, y todo lo que necesitan en una sola lista.",
+    "previous": "Periodo anterior",
+    "next": "Periodo siguiente",
+    "view": {
+      "label": "Periodo",
+      "week": "Semana",
+      "month": "Mes"
+    },
+    "move": {
+      "button": "Mover",
+      "aria": "Mover {{name}} a otro día",
+      "title": "Mover {{name}}",
+      "day": "Nuevo día",
+      "now": "Ahora planificada para el {{date}}.",
+      "save": "Mover",
+      "cancel": "Cancelar",
+      "failed": "No se pudo mover la orden."
+    },
+    "coverage": {
+      "title": "Lugar en el plan",
+      "coveredNote": "Tras las órdenes planificadas antes, el stock aún cubre esta orden.",
+      "shortNote": "Tras las órdenes planificadas antes, el stock no alcanza para esta orden. Le queda:",
+      "leftOf": "quedan {{left}} de {{needed}}"
+    },
+    "needs": {
+      "title": "Lo que necesitan las órdenes planificadas",
+      "ingredient": "Ingrediente",
+      "needed": "Necesario",
+      "inStock": "En stock",
+      "onOrder": "Pedido",
+      "missing": "Falta",
+      "make": "Fabricar",
+      "noDate": "sin fecha",
+      "emptyTitle": "No hay órdenes planificadas en este periodo",
+      "emptyDescription": "Planifique una orden con un día y lo que necesita aparecerá aquí.",
+      "unmeasured": "No contados, sus unidades no se pueden comparar con el stock: {{names}}."
+    },
+    "order": {
+      "button": "Pedir lo que falta",
+      "created_one": "{{count}} borrador de pedido creado",
+      "created_many": "{{count}} borradores de pedido creados",
+      "created_other": "{{count}} borradores de pedido creados",
+      "listed_one": "{{count}} ingrediente añadido a la lista de la compra",
+      "listed_many": "{{count}} ingredientes añadidos a la lista de la compra",
+      "listed_other": "{{count}} ingredientes añadidos a la lista de la compra",
+      "toMake_one": "{{count}} ingrediente para fabricar, no para comprar",
+      "toMake_many": "{{count}} ingredientes para fabricar, no para comprar",
+      "toMake_other": "{{count}} ingredientes para fabricar, no para comprar",
+      "unplaced_one": "{{count}} ingrediente sin proveedor ni lista",
+      "unplaced_many": "{{count}} ingredientes sin proveedor ni lista",
+      "unplaced_other": "{{count}} ingredientes sin proveedor ni lista",
+      "nothing": "Nada que pedir.",
+      "failed": "No se pudo hacer el pedido."
+    },
+    "intermediates": {
+      "button": "Planificar órdenes de lo que falta",
+      "planned_one": "{{count}} orden planificada",
+      "planned_many": "{{count}} órdenes planificadas",
+      "planned_other": "{{count}} órdenes planificadas",
+      "failed": "No se pudieron planificar las órdenes."
     }
   }
 }

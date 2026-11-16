@@ -26,6 +26,10 @@ export interface PreselectedProduct {
   output_template_id: string;
   name: string;
   recipe_id?: string | null;
+  /** A quantity to start the form with, e.g. what a reorder alert asks to make. */
+  quantity?: string;
+  /** Opens the form as a plan rather than as a run already made. */
+  mode?: ProductionMode;
 }
 
 function preselectedOption(product: PreselectedProduct): ProductOption {
@@ -146,8 +150,10 @@ export function useProductionForm(
   // Pre-select the output product when the sheet was opened from a
   // formula card. The product stays changeable via the Change button.
   useEffect(() => {
-    if (open && preselectedProduct)
-      setSelected(preselectedOption(preselectedProduct));
+    if (!open || !preselectedProduct) return;
+    setSelected(preselectedOption(preselectedProduct));
+    if (preselectedProduct.quantity) setQty(preselectedProduct.quantity);
+    if (preselectedProduct.mode) setMode(preselectedProduct.mode);
   }, [open, preselectedProduct]);
 
   const parsedQty = Number(qty);

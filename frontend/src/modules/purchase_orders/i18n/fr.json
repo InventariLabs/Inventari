@@ -287,7 +287,9 @@
     "minPositive": "Le minimum doit être supérieur à 0 — c'est le seuil qui déclenche la règle",
     "count_one": "règle",
     "count_other": "règles",
-    "overCapacity": "Règle enregistrée. Attention : elle demande {{max}} par réapprovisionnement — plus que l’étagère ne contient ({{capacity}})."
+    "overCapacity": "Règle enregistrée. Attention : elle demande {{max}} par réapprovisionnement — plus que l’étagère ne contient ({{capacity}}).",
+    "madeHere": "Fabriqué ici",
+    "planRun": "Planifier un ordre"
   },
   "productPicker": {
     "search": "Rechercher un produit…",

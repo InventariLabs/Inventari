@@ -287,7 +287,9 @@
     "minPositive": "Min must be greater than 0 — it is the threshold that makes the rule fire",
     "count_one": "rule",
     "count_other": "rules",
-    "overCapacity": "Rule saved. Note: it wants {{max}} per replenishment — more than the shelf holds ({{capacity}})."
+    "overCapacity": "Rule saved. Note: it wants {{max}} per replenishment — more than the shelf holds ({{capacity}}).",
+    "madeHere": "Made here",
+    "planRun": "Plan a run"
   },
   "productPicker": {
     "search": "Search product…",

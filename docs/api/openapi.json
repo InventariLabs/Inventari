@@ -14221,6 +14221,202 @@
         }
       }
     },
+    "/api/v1/maker/production/needs": {
+      "get": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Get Combined Needs",
+        "description": "What the planned runs of a period (or one run) need, in one list.\n\nPer ingredient: what is needed, what is in stock once the runs planned\nbefore the period have taken theirs, what open purchase orders still\nexpect (with their dates) and what is still missing. ``on_order`` is null\nwhile purchasing is off.",
+        "operationId": "get_combined_needs_api_v1_maker_production_needs_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "order_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeedsRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maker/production/needs/order": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Order Missing",
+        "description": "Order what is missing: a draft purchase order per supplier.\n\nEach ingredient goes to the supplier with the lowest price, in that\nsupplier's unit. Ingredients nobody offers go to the shopping list;\ningredients with a recipe of their own come back as ``to_make`` \u2014 they are\nplanned as runs, not bought.",
+        "operationId": "order_missing_api_v1_maker_production_needs_order_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NeedsScope"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderMissingRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/maker/production/needs/plan-intermediates": {
+      "post": {
+        "tags": [
+          "Production",
+          "maker"
+        ],
+        "summary": "Plan Intermediates",
+        "description": "Plan a run of each missing intermediate product, on the day it is first needed.",
+        "operationId": "plan_intermediates_api_v1_maker_production_needs_plan_intermediates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NeedsScope"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanIntermediatesRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/maker/production/orders": {
       "get": {
         "tags": [
@@ -54844,6 +55040,45 @@
         "type": "object",
         "title": "EquipmentModelUpdate"
       },
+      "ExpectedDeliveryRead": {
+        "properties": {
+          "purchase_order_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Purchase Order Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "expected_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Date"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "purchase_order_id",
+          "number",
+          "expected_date",
+          "quantity"
+        ],
+        "title": "ExpectedDeliveryRead",
+        "description": "An open purchase order line that will bring some of an ingredient."
+      },
       "ExpenseForecastResponse": {
         "properties": {
           "forecast_period": {
@@ -62950,6 +63185,195 @@
         ],
         "title": "NameTaxRate"
       },
+      "NeedRowRead": {
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Template Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uom Symbol"
+          },
+          "needed": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Needed"
+          },
+          "in_stock": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "In Stock"
+          },
+          "on_order": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "On Order"
+          },
+          "expected": {
+            "items": {
+              "$ref": "#/components/schemas/ExpectedDeliveryRead"
+            },
+            "type": "array",
+            "title": "Expected"
+          },
+          "missing": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Missing"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "buy",
+              "make"
+            ],
+            "title": "Action"
+          },
+          "needed_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needed By"
+          },
+          "output_location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Location Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_id",
+          "name",
+          "uom_symbol",
+          "needed",
+          "in_stock",
+          "on_order",
+          "expected",
+          "missing",
+          "action"
+        ],
+        "title": "NeedRowRead",
+        "description": "One ingredient of the combined list, in its own stock unit."
+      },
+      "NeedsRead": {
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/NeedRowRead"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "purchasing": {
+            "type": "boolean",
+            "title": "Purchasing"
+          },
+          "run_count": {
+            "type": "integer",
+            "title": "Run Count"
+          },
+          "unmeasured": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unmeasured"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows",
+          "purchasing",
+          "run_count",
+          "unmeasured"
+        ],
+        "title": "NeedsRead",
+        "description": "Output for GET /production/needs."
+      },
+      "NeedsScope": {
+        "properties": {
+          "order_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          },
+          "date_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date From"
+          },
+          "date_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date To"
+          }
+        },
+        "type": "object",
+        "title": "NeedsScope",
+        "description": "Which runs a needs request is about: one run, or the runs of a period."
+      },
       "NotificationDTO": {
         "properties": {
           "id": {
@@ -63333,6 +63757,132 @@
         ],
         "title": "OpeningStockImportResponse",
         "description": "What an opening-stock sheet became: one draft receipt, or nothing.\n\n``document_id`` is None when no row could be read \u2014 no draft is left\nbehind for the reader to find empty. The counts and the refused rows\ntake the shape every spreadsheet import reports."
+      },
+      "OrderMissingRead": {
+        "properties": {
+          "purchase_orders": {
+            "items": {
+              "$ref": "#/components/schemas/OrderedPurchaseRead"
+            },
+            "type": "array",
+            "title": "Purchase Orders"
+          },
+          "shopping_list_added": {
+            "type": "integer",
+            "title": "Shopping List Added",
+            "default": 0
+          },
+          "shopping_list_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shopping List Name"
+          },
+          "unplaced": {
+            "items": {
+              "$ref": "#/components/schemas/NeedRowRead"
+            },
+            "type": "array",
+            "title": "Unplaced"
+          },
+          "to_make": {
+            "items": {
+              "$ref": "#/components/schemas/NeedRowRead"
+            },
+            "type": "array",
+            "title": "To Make"
+          }
+        },
+        "type": "object",
+        "required": [
+          "purchase_orders",
+          "unplaced",
+          "to_make"
+        ],
+        "title": "OrderMissingRead",
+        "description": "Output for POST /production/needs/order \u2014 what ordering the missing did."
+      },
+      "OrderedLineRead": {
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Template Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          },
+          "uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uom Symbol"
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_id",
+          "name",
+          "quantity",
+          "uom_symbol"
+        ],
+        "title": "OrderedLineRead"
+      },
+      "OrderedPurchaseRead": {
+        "properties": {
+          "purchase_order_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Purchase Order Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "partner_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Partner Id"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/OrderedLineRead"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "purchase_order_id",
+          "number",
+          "partner_id",
+          "lines"
+        ],
+        "title": "OrderedPurchaseRead"
       },
       "Organization": {
         "properties": {
@@ -69768,6 +70318,86 @@
         "title": "PlaceholderInfo",
         "description": "A field a template author can print in a user template.\n\n``key`` is the literal Jinja2 expression (e.g. ``{{partner.name}}``),\n``example`` a representative rendered value, ``possibly_empty`` marks\nfields that are absent for some documents, and ``document_types`` names\nthe document types the field belongs to (``None`` = any type). A category\ncustom field also carries its ``custom_field_label`` and the\n``custom_field_categories`` that define it, apart from the English\n``description``, so a client can phrase the sentence in its own language."
       },
+      "PlanIntermediatesRead": {
+        "properties": {
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/PlannedIntermediateRead"
+            },
+            "type": "array",
+            "title": "Runs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "runs"
+        ],
+        "title": "PlanIntermediatesRead",
+        "description": "Output for POST /production/needs/plan-intermediates."
+      },
+      "PlannedIntermediateRead": {
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Order Id"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Template Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "planned_qty": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Planned Qty"
+          },
+          "production_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Production Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "order_id",
+          "number",
+          "template_id",
+          "name",
+          "planned_qty",
+          "production_date"
+        ],
+        "title": "PlannedIntermediateRead"
+      },
       "PreviewIngredient": {
         "properties": {
           "name": {
@@ -72681,6 +73311,36 @@
               }
             ],
             "title": "Shortage Items"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "covered",
+                  "partial",
+                  "short"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          },
+          "coverage_items": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ShortageItemRead"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage Items"
           },
           "unit_cost_snapshot": {
             "anyOf": [
@@ -80389,6 +81049,11 @@
               }
             ],
             "title": "Preferred Partner Name"
+          },
+          "make_instead": {
+            "type": "boolean",
+            "title": "Make Instead",
+            "default": false
           }
         },
         "type": "object",
@@ -80475,7 +81140,7 @@
           "reason"
         ],
         "title": "ReplenishmentDraftSkipped",
-        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (neither the rule nor the price list names\na supplier; reported, never turned into an empty order)."
+        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (neither the rule nor the price list names\na supplier; reported, never turned into an empty order), ``made_here``\n(the product has a recipe: it is produced, not bought)."
       },
       "ReplenishmentMoveLineDTO": {
         "properties": {

@@ -59,6 +59,14 @@ export const makerProductsApi = {
     return response.data.map(toOption);
   },
 
+  /** One product, by id. */
+  get: async (templateId: string): Promise<ProductOption> => {
+    const response = await api.get<ProductTemplateResponse>(
+      `/items/product-templates/${templateId}`,
+    );
+    return toOption(response.data);
+  },
+
   /**
    * Create a product from the formula sheet. Name and unit together are the
    * whole record here: without a unit every number the module later shows —
