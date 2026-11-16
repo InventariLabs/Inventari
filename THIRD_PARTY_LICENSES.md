@@ -51,12 +51,12 @@ and the static assets the frontend serves.
 | `aiohttp` | 3.14.5 | Apache-2.0 AND MIT |  |
 | `aioitertools` | 0.13.0 | MIT |  |
 | `aiosignal` | 1.4.0 | Apache-2.0 |  |
-| `alembic` | 1.20.0 | MIT |  |
+| `alembic` | 1.20.1 | MIT |  |
 | `annotated-doc` | 0.0.5 | MIT |  |
 | `annotated-types` | 0.8.0 | MIT |  |
 | `anyascii` | 0.3.3 | ISC |  |
 | `anyio` | 4.14.2 | MIT |  |
-| `asyncpg` | 0.31.0 | Apache-2.0 |  |
+| `asyncpg` | 0.32.0 | Apache-2.0 |  |
 | `attrs` | 26.1.0 | MIT |  |
 | `babel` | 2.18.0 | BSD |  |
 | `bcrypt` | 5.0.0 | Apache-2.0 |  |
@@ -68,18 +68,18 @@ and the static assets the frontend serves.
 | `cffi` | 2.1.0 | MIT-0 |  |
 | `charset-normalizer` | 3.4.9 | MIT |  |
 | `click` | 8.4.2 | BSD-3-Clause |  |
-| `cryptography` | 50.0.0 | Apache-2.0 OR BSD-3-Clause |  |
+| `cryptography` | 50.0.2 | Apache-2.0 OR BSD-3-Clause |  |
 | `cssselect2` | 0.9.0 | BSD |  |
 | `Deprecated` | 1.3.1 | MIT |  |
 | `distro` | 1.9.0 | Apache-2.0 |  |
 | `dnspython` | 2.9.2 | ISC |  |
 | `email-validator` | 2.3.0 | Unlicense |  |
 | `et_xmlfile` | 2.0.0 | MIT |  |
-| `fastapi` | 0.141.1 | MIT |  |
+| `fastapi` | 0.163.1 | MIT |  |
 | `fonttools` | 4.63.0 | MIT |  |
 | `frozenlist` | 1.8.0 | Apache-2.0 |  |
 | `google-auth` | 2.56.2 | Apache-2.0 |  |
-| `google-genai` | 2.25.0 | Apache-2.0 |  |
+| `google-genai` | 2.34.0 | Apache-2.0 |  |
 | `greenlet` | 3.5.4 | MIT AND PSF-2.0 |  |
 | `gunicorn` | 26.2.0 | MIT |  |
 | `h11` | 0.16.0 | MIT |  |
@@ -96,7 +96,7 @@ and the static assets the frontend serves.
 | `limits` | 5.8.0 | MIT |  |
 | `Mako` | 1.4.3 | MIT |  |
 | `markdown-it-py` | 4.2.0 | MIT |  |
-| `MarkupSafe` | 3.0.3 | BSD-3-Clause |  |
+| `MarkupSafe` | 3.0.4 | BSD-3-Clause |  |
 | `mcp` | 2.3.0 | MIT |  |
 | `mcp-types` | 2.3.0 | MIT |  |
 | `mdurl` | 0.1.2 | MIT |  |
@@ -106,24 +106,24 @@ and the static assets the frontend serves.
 | `openpyxl` | 3.1.5 | MIT |  |
 | `opentelemetry-api` | 1.45.2 | Apache-2.0 |  |
 | `packaging` | 26.3 | Apache-2.0 OR BSD-2-Clause |  |
-| `pandas` | 3.0.6 | BSD |  |
+| `pandas` | 3.1.1 | BSD-3-Clause |  |
 | `pillow` | 13.0.0 | MIT-CMU |  |
 | `propcache` | 0.5.2 | Apache-2.0 |  |
 | `psycopg2-binary` | 2.9.13 | LGPL |  |
-| `pyarrow` | 25.0.1 | Apache-2.0 |  |
+| `pyarrow` | 26.0.1 | Apache-2.0 |  |
 | `pyasn1` | 0.6.5 | BSD-2-Clause |  |
 | `pyasn1_modules` | 0.4.2 | BSD |  |
 | `pycparser` | 3.0 | BSD-3-Clause |  |
-| `pydantic` | 2.13.5 | MIT |  |
-| `pydantic-settings` | 2.15.0 | MIT |  |
-| `pydantic_core` | 2.46.5 | MIT |  |
+| `pydantic` | 2.14.3 | MIT |  |
+| `pydantic-settings` | 2.16.3 | MIT |  |
+| `pydantic_core` | 2.50.4 | MIT |  |
 | `pydyf` | 0.12.1 | BSD |  |
 | `Pygments` | 2.20.0 | BSD-2-Clause |  |
-| `PyJWT` | 2.15.0 | MIT |  |
+| `PyJWT` | 2.15.1 | MIT |  |
 | `pyphen` | 0.17.2 | MPL-1.1 | exception: tri-licensed GPL-2.0+/LGPL-2.1+/MPL-1.1 — we take MPL-1.1, so a naive substring match on "GPL" must not read this as a blocker |
 | `python-barcode` | 0.16.1 | MIT |  |
 | `python-dateutil` | 2.9.0.post0 | BSD OR Apache-2.0 |  |
-| `python-dotenv` | 1.2.3 | BSD-3-Clause |  |
+| `python-dotenv` | 1.2.4 | BSD-3-Clause |  |
 | `python-multipart` | 0.0.32 | Apache-2.0 |  |
 | `PyYAML` | 6.0.3 | MIT |  |
 | `qrcode` | 8.2 | BSD-3-Clause | exception: ships a bogus "License :: Other/Proprietary License" classifier next to "BSD License"; upstream LICENSE is BSD-3-Clause |
@@ -139,14 +139,14 @@ and the static assets the frontend serves.
 | `sniffio` | 1.3.1 | MIT OR Apache-2.0 |  |
 | `soupsieve` | 4.1 | MIT |  |
 | `SQLAlchemy` | 2.0.51 | MIT |  |
-| `sse-starlette` | 3.4.11 | BSD-3-Clause |  |
-| `starlette` | 1.3.1 | BSD-3-Clause |  |
+| `sse-starlette` | 3.7.0 | BSD-3-Clause |  |
+| `starlette` | 1.10.0 | BSD-3-Clause |  |
 | `tenacity` | 9.1.4 | Apache-2.0 |  |
 | `tinycss2` | 1.5.1 | BSD |  |
 | `tinyhtml5` | 2.1.0 | MIT |  |
 | `truststore` | 0.10.5 | MIT |  |
 | `typer` | 0.27.2 | MIT |  |
-| `typing-inspection` | 0.4.2 | MIT |  |
+| `typing-inspection` | 0.4.5 | MIT |  |
 | `typing_extensions` | 4.16.0 | PSF-2.0 |  |
 | `urllib3` | 2.8.0 | MIT |  |
 | `uvicorn` | 0.52.1 | BSD-3-Clause |  |

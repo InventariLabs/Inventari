@@ -1,7 +1,7 @@
 {
   "name": "mcp_server",
   "module_type": "official",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "inventari_min_version": "0.11.0",
   "category": "integrations",
   "display_name": "MCP Server",

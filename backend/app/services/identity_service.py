@@ -4,6 +4,7 @@ import jwt
 from fastapi import Depends, Request, status
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import HTTPConnection
 
 from app.config import settings
 from app.core.audit_actor import set_api_key_actor
@@ -37,7 +38,7 @@ class _SessionToken(OAuth2PasswordBearer):
     route a client could not branch on by ``code``.
     """
 
-    async def __call__(self, request: Request) -> str | None:
+    async def __call__(self, request: HTTPConnection) -> str | None:
         if request.headers.get(API_KEY_HEADER):
             return None
         token = await super().__call__(request)
