@@ -356,7 +356,10 @@ class CoreStockAPI:
         storage_location_id: UUID | None = None,
         product_template_ids: list[UUID] | None = None,
         storage_location_ids: list[UUID] | None = None,
+        drawable_only: bool = False,
     ) -> list[StockQuantDTO]:
+        """The quants of the shelves; ``drawable_only`` leaves out the batches a
+        draw would refuse (held, quarantined, recalled, expired)."""
         from app.services._stock_quant_query import list_quants_async
 
         # The rows speak the view's columns; the DTO speaks the API's name for
@@ -372,6 +375,7 @@ class CoreStockAPI:
                 storage_location_id,
                 product_template_ids,
                 storage_location_ids,
+                drawable_only,
             )
         ]
 
