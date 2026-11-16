@@ -822,9 +822,9 @@
       "failed": "The run could not be moved."
     },
     "coverage": {
-      "title": "Place in the plan",
-      "coveredNote": "After the runs planned before it, the shelf still covers this run.",
-      "shortNote": "After the runs planned before it, the shelf falls short of this run. Left for it:",
+      "title": "Position in the plan",
+      "coveredNote": "After the runs planned before it, the stock still covers this run.",
+      "shortNote": "After the runs planned before it, the stock falls short of this run. Left for it:",
       "leftOf": "{{left}} left of {{needed}}"
     },
     "needs": {

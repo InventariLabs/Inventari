@@ -128,7 +128,14 @@ function MoveRunSheet({
   }
   const changed = !!order && day !== "" && day !== order.production_date;
   return (
-    <Sheet open={order !== null} onClose={onClose} maxWidth="sm">
+    <Sheet
+      open={order !== null}
+      onClose={onClose}
+      maxWidth="sm"
+      aria-label={t("planning.move.title", {
+        name: order?.output_template_name ?? order?.number ?? "",
+      })}
+    >
       <SheetHeader
         title={t("planning.move.title", {
           name: order?.output_template_name ?? order?.number ?? "",
