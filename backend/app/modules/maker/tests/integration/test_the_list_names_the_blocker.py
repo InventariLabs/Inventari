@@ -362,9 +362,11 @@ class TestTheListNamesTheBlocker:
         listed = client.get('/api/v1/maker/production/orders', headers=mk_auth_headers)
         assert listed.status_code == 200, listed.text
 
-        # One resolution for the whole page. An explosion per row asks once
-        # per recipe — six here — and that per-row cost is what this pins.
-        assert len(calls) == 1, [len(batch) for batch in calls]
+        # Two resolutions for the whole page: one for the shortage signal and
+        # one for the plan's queue of drafts. An explosion per row asks once
+        # per recipe — six here, twelve with the plan — and that per-row cost
+        # is what this pins.
+        assert len(calls) == 2, [len(batch) for batch in calls]
 
     def test_the_listing_does_not_take_the_settings_write_lock(
         self,

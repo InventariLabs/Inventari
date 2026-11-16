@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -193,6 +194,15 @@ class ProductionOrderRead(BaseModel):
     # refusal carries, so the page that names the blocker can name every
     # ingredient it comes from.
     shortage_items: list[ShortageItemRead] | None = None
+    # Drafts only: how far the shelf covers the run once the runs planned
+    # before it (by planned day, then creation) have taken their share —
+    # ``covered``, ``partial`` or ``short`` — and the ingredients that fall
+    # short against what is left for it. Where ``shortage_count`` is the
+    # verdict completion gives on the shelf as it stands, this is the plan's:
+    # two runs that each fit on the shelf alone are not both covered. Null for
+    # orders past the draft and for drafts with nothing to measure.
+    coverage: Literal['covered', 'partial', 'short'] | None = None
+    coverage_items: list[ShortageItemRead] | None = None
     # financial result snapshot at completion (null for legacy
     # orders without a recipe, or when the recipe had no reference price).
     unit_cost_snapshot: Decimal | None = None

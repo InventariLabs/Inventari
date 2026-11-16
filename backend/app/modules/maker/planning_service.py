@@ -1,0 +1,231 @@
+"""Planned runs measured against one shelf, one after another.
+
+A draft's own availability check reads the shelf as if it were the only run
+there. Two drafts that each need six of ten flour then both read as covered,
+while together they need twelve. Planning reads the drafts as a queue: by
+planned day, then by creation, each run counts only what the runs before it
+left. A run with no planned day waits behind every dated one.
+
+This is a planning view, not completion's verdict. Completion judges the shelf
+as it is when the run is closed (``availability_service``), and a draft that is
+behind another in the queue is still completable while the shelf holds enough
+for it alone.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from decimal import Decimal
+from typing import Literal
+from uuid import UUID
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.contracts import ProductTemplateDTO, UomDTO
+from app.core.public_api import core_api
+
+from . import bom_service, recipe_service
+from .availability_service import (
+    ShortageItem,
+    _aggregate_needs,
+    _get_available_stock_batch,
+    _resolve_scope,
+    _shortages_from_needs,
+)
+from .models import MakerRecipe, ProductionOrder
+from .stock_first import StockPool
+
+CoverageStatus = Literal['covered', 'partial', 'short']
+
+
+@dataclass(frozen=True)
+class PlanCoverage:
+    """How far the shelf, after the runs queued before this one, covers it.
+
+    ``items`` are the ingredients that fall short, stated against what was
+    left for this run — the same row shape the shortage list carries.
+    """
+
+    status: CoverageStatus
+    items: list[ShortageItem] = field(default_factory=list)
+
+
+class _Shelf:
+    """What is left of the stock of one availability scope as runs claim it."""
+
+    def __init__(self, pool: StockPool) -> None:
+        self.pool = pool
+        self.left: dict[UUID, Decimal] = {}
+
+
+def _status(
+    needs: dict[UUID, Decimal], shortages: list[ShortageItem]
+) -> CoverageStatus:
+    """Covered, partly covered, or short, from the ingredients that fall short.
+
+    Partly covered means some of what the run needs is there — an ingredient
+    that is fully met, or short but not at nothing. Short means none of it is.
+    """
+    if not shortages:
+        return 'covered'
+    if len(shortages) < len(needs):
+        return 'partial'
+    if any(item.convertible and item.available > 0 for item in shortages):
+        return 'partial'
+    return 'short'
+
+
+async def coverage_for_drafts(
+    db: AsyncSession, organization_id: UUID
+) -> dict[UUID, PlanCoverage]:
+    """The coverage of every draft run that has a recipe to measure.
+
+    One queue for the organization: each availability scope (the whole
+    organization, or a run's own output shelf under PER_LOCATION) has its
+    own stock, spent by the drafts that are measured in it. Drafts without a
+    recipe, with an empty formula or with a yield that cannot scale a plan
+    have nothing to forecast and get no entry.
+    """
+    drafts = list(
+        (
+            await db.scalars(
+                select(ProductionOrder)
+                .where(
+                    ProductionOrder.organization_id == organization_id,
+                    ProductionOrder.status == 'DRAFT',
+                    ProductionOrder.recipe_id.is_not(None),
+                )
+                .order_by(
+                    ProductionOrder.production_date.asc().nulls_last(),
+                    ProductionOrder.created_at,
+                    ProductionOrder.number,
+                    ProductionOrder.id,
+                )
+            )
+        ).all()
+    )
+    if not drafts:
+        return {}
+
+    yields = {
+        row[0]: row[1]
+        for row in (
+            await db.execute(
+                select(MakerRecipe.id, MakerRecipe.batch_yield_qty).where(
+                    MakerRecipe.id.in_({o.recipe_id for o in drafts}),
+                    MakerRecipe.organization_id == organization_id,
+                )
+            )
+        ).all()
+    }
+    queue = [o for o in drafts if (yields.get(o.recipe_id) or Decimal('0')) > 0]
+    if not queue:
+        return {}
+
+    settings = await recipe_service.get_settings(db, organization_id, for_update=False)
+
+    def _scope(order: ProductionOrder) -> UUID | None:
+        return _resolve_scope(
+            settings.availability_check_scope, None, order.output_storage_location_id
+        )
+
+    shelves: dict[UUID | None, _Shelf] = {}
+    for order in queue:
+        scope = _scope(order)
+        if scope not in shelves:
+            shelves[scope] = _Shelf(StockPool(db, organization_id, scope))
+
+    flats = await bom_service.explode_in_sequence(
+        db,
+        organization_id,
+        [
+            (o.recipe_id, o.planned_qty, shelves[_scope(o)].pool)
+            for o in queue
+            if o.recipe_id is not None
+        ],
+    )
+
+    # One stock read per scope and one template read for the whole queue, so
+    # the cost grows with the number of scopes, not with the number of runs.
+    children_by_scope: dict[UUID | None, set[UUID]] = {}
+    for order, flat in zip(queue, flats, strict=True):
+        if flat:
+            children_by_scope.setdefault(_scope(order), set()).update(
+                child_id for child_id, _qty, _unit, _uom in flat
+            )
+    for scope, children in children_by_scope.items():
+        shelves[scope].left = await _get_available_stock_batch(
+            db, organization_id, sorted(children), location_id=scope
+        )
+    all_children = sorted(set().union(*children_by_scope.values()))
+    templates: dict[UUID, ProductTemplateDTO] = (
+        await core_api.product_templates.get_many_async(
+            db, organization_id, all_children
+        )
+        if all_children
+        else {}
+    )
+
+    uom_cache: dict[UUID, UomDTO | None] = {}
+    result: dict[UUID, PlanCoverage] = {}
+    for order, flat in zip(queue, flats, strict=True):
+        if not flat:
+            continue
+        shelf = shelves[_scope(order)]
+        needs, line_uom_ids, legacy_units = _aggregate_needs(flat)
+
+        shortages = await _shortages_from_needs(
+            db,
+            organization_id,
+            needs=needs,
+            line_uom_ids=line_uom_ids,
+            legacy_units=legacy_units,
+            stocks=shelf.left,
+            templates=templates,
+            uom_cache=uom_cache,
+        )
+        result[order.id] = PlanCoverage(_status(needs, shortages), shortages)
+
+        # The run claims what it needs, in each ingredient's own stock unit,
+        # so the next one in the queue is measured against what remains.
+        for child_id, needed in needs.items():
+            template = templates.get(child_id)
+            claimed = await _in_stock_unit(
+                db,
+                organization_id,
+                needed,
+                line_uom_ids.get(child_id),
+                template.uom_id if template else None,
+                uom_cache,
+            )
+            if claimed is None:
+                continue
+            shelf.left[child_id] = max(
+                Decimal('0'), shelf.left.get(child_id, Decimal('0')) - claimed
+            )
+    return result
+
+
+async def _in_stock_unit(
+    db: AsyncSession,
+    organization_id: UUID,
+    qty: Decimal,
+    line_uom_id: UUID | None,
+    stock_uom_id: UUID | None,
+    uom_cache: dict[UUID, UomDTO | None],
+) -> Decimal | None:
+    """``qty`` in the ingredient's stock unit; ``None`` when no bridge exists."""
+    if line_uom_id is None or stock_uom_id is None or line_uom_id == stock_uom_id:
+        return qty
+    units: list[UomDTO | None] = []
+    for uom_id in (line_uom_id, stock_uom_id):
+        if uom_id not in uom_cache:
+            uom_cache[uom_id] = await core_api.uoms.get_async(
+                db, uom_id, organization_id
+            )
+        units.append(uom_cache[uom_id])
+    if units[0] is None or units[1] is None:
+        return qty
+    converted, ok = core_api.uoms.convert_quantity(qty, units[0], units[1])
+    return converted if ok else None

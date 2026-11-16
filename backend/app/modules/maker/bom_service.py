@@ -496,6 +496,46 @@ async def explode_by_recipes_with_uom(
     }
 
 
+async def explode_in_sequence(
+    db: AsyncSession,
+    organization_id: UUID,
+    plans: list[tuple[UUID, Decimal, StockPool | None]],
+) -> list[list[tuple[UUID, Decimal, str, UUID | None]] | None]:
+    """Explode ``(recipe, output quantity, pool)`` plans one after another.
+
+    Where :func:`explode_by_recipes_with_uom` answers independent questions
+    (each plan spends a fork of its pool), these plans are one queue: a plan
+    spends the very pool it is handed, so the intermediate a plan takes from
+    the shelf is no longer there for the next plan that shares that pool.
+    The recipes and the children's default recipes are read once for the
+    whole queue. A plan whose recipe the organization does not have answers
+    ``None`` in its place.
+    """
+    if not plans:
+        return []
+    stmt = select(MakerRecipe).where(
+        MakerRecipe.id.in_({recipe_id for recipe_id, _qty, _pool in plans}),
+        MakerRecipe.organization_id == organization_id,
+    )
+    tops = {recipe.id: recipe for recipe in (await db.scalars(stmt)).all()}
+    child_cache = await _warm_child_cache(db, organization_id, tops.values())
+    return [
+        await _explode_recipe(
+            db,
+            organization_id,
+            tops[recipe_id],
+            qty,
+            depth=0,
+            _seen=None,
+            _child_cache=child_cache,
+            pool=pool,
+        )
+        if recipe_id in tops
+        else None
+        for recipe_id, qty, pool in plans
+    ]
+
+
 async def _explode_recipe(
     db: AsyncSession,
     organization_id: UUID,
