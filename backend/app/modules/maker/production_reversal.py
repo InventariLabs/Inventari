@@ -391,4 +391,5 @@ async def _put_the_ingredient_back(
         move.product_template_id,
         move.quantity,
         rates.get(move.product_template_id),
+        internal=True,
     )

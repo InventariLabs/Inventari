@@ -71,6 +71,7 @@ class CoreValuationAPI:
         reverses_line_id: UUID | None = None,
         extra_unit_cost: Decimal = Decimal('0'),
         unpriced_stays_unknown: bool = False,
+        internal: bool = False,
     ) -> UUID | None:
         """Record a receipt into the cost history; answers the layer it opened.
 
@@ -105,6 +106,12 @@ class CoreValuationAPI:
         ``unknown`` and waits for the caller to state its cost
         (``add_value_to_layer_async``) — the portion of a production run that
         is filled before the run's cost is known.
+
+        Pass ``internal`` where the goods come out of the organization's own
+        books rather than from a supplier -- a production run's output,
+        ingredients put back: the layer holds stock and value like any other,
+        but what was spent is not counted a second time. A return
+        (``reverses_line_id``) is always one.
         """
         from app.services.valuation_service import ValuationService
 
@@ -120,6 +127,7 @@ class CoreValuationAPI:
             reverses_line_id=reverses_line_id,
             extra_unit_cost=extra_unit_cost,
             unpriced_stays_unknown=unpriced_stays_unknown,
+            internal=internal,
         )
         return layer.id if layer is not None else None
 

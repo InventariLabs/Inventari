@@ -84,6 +84,11 @@ async def _compute_total_spent_async(
     same population: what arrived in the window, priced by the layers,
     in the organization's money.
 
+    Goods the organization's own books posted to themselves -- a production
+    run's product, ingredients put back -- are not receipts from outside and
+    are left out: the money was spent when the ingredients were bought, and
+    counting the product too counted it twice.
+
     That last clause is a filter, not a figure of speech. The rewrite onto
     the ledger dropped the ``storage_ids`` this used to be narrowed by and
     put nothing in its place, so every tenant was handed the sum of all of
@@ -98,6 +103,7 @@ async def _compute_total_spent_async(
         select(func.coalesce(func.sum(StockValuationLayer.total_value), 0)).where(
             StockValuationLayer.organization_id == organization_id,
             StockValuationLayer.direction == 'IN',
+            StockValuationLayer.internal.is_(False),
             outside_module_products(
                 StockValuationLayer.product_template_id, organization_id, hidden_tags
             ),
@@ -350,7 +356,11 @@ async def _compute_monthly_trend_async(
             month_label.label('month'),
             func.coalesce(func.sum(StockValuationLayer.total_value), 0).label('spent'),
         )
-        .where(*in_window, StockValuationLayer.direction == 'IN')
+        .where(
+            *in_window,
+            StockValuationLayer.direction == 'IN',
+            StockValuationLayer.internal.is_(False),
+        )
         .group_by(month_label)
     )
     monthly_spent_map = {
