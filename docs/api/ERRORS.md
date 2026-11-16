@@ -634,6 +634,7 @@ apart.
 | `SHOPPING_LIST_ITEM_TEMPLATE_UNKNOWN` | Unknown product template (template_id: {template_id}) — the template does not exist |
 | `SHOPPING_LIST_ITEM_UOM_UNKNOWN` | Unknown unit of measure (uom_id: {uom_id}) — the unit does not exist |
 | `SHOPPING_LIST_NOTHING_TO_CONVERT` | No convertible items (all lack a product template) |
+| `SHOPPING_LIST_NOT_WRITABLE` | This shopping list is {status} and cannot be modified. Reactivate it first. |
 | `SHORT_CODES_TAKEN` | short_code(s) already in use in this org: {codes} |
 | `SHORT_CODE_DUPLICATE_IN_REQUEST` | Duplicate short_code in request: {short_code} |
 | `SHORT_CODE_INVALID_FORMAT` | Invalid code format |

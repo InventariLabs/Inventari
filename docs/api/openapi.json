@@ -27287,6 +27287,24 @@
               "title": "Active Only"
             },
             "description": "Only active lists"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ShoppingListStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only lists in this state. ``active`` is the one a new item can go on: a completed list is frozen, an archived one is gone.",
+              "title": "Status"
+            },
+            "description": "Only lists in this state. ``active`` is the one a new item can go on: a completed list is frozen, an archived one is gone."
           }
         ],
         "responses": {
@@ -82153,6 +82171,16 @@
         },
         "type": "object",
         "title": "ShoppingListItemUpdate"
+      },
+      "ShoppingListStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "completed",
+          "archived"
+        ],
+        "title": "ShoppingListStatus",
+        "description": "explicit state machine for shopping lists."
       },
       "ShoppingListUpdate": {
         "properties": {

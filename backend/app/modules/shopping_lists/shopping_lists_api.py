@@ -194,10 +194,20 @@ class ShoppingListsAPI:
         ``db.refresh(item, ['category'])`` answered only the relationship.
         """
         from app.core.exceptions import ServiceRejectionError
-        from app.modules.shopping_lists.models import ShoppingListItem
+        from app.modules.shopping_lists.models import (
+            ShoppingListItem,
+            ShoppingListStatus,
+        )
 
-        await self._own_list_or_404_async(db, list_id, org_id)
+        shopping_list = await self._own_list_or_404_async(db, list_id, org_id)
         await _require_module_enabled(db, org_id)
+        # The list's own endpoint freezes a completed or archived list; this
+        # door serves the recipe card, the meal plan and production runs, and
+        # used to write onto a list the reader had already finished.
+        if shopping_list.status != ShoppingListStatus.ACTIVE.value:
+            raise ServiceRejectionError(
+                'shopping_list_not_writable', status=shopping_list.status
+            )
 
         from app.core.public_api import core_api
 
