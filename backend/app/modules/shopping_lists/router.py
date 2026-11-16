@@ -20,6 +20,7 @@ from app.i18n.service import get_current_lang, get_error_message
 from ._po_convert import convert_list_to_po_async
 from .models import ShoppingList as ShoppingListModel
 from .models import ShoppingListItem as ShoppingListItemModel
+from .models import ShoppingListStatus
 from .schemas import (
     ConvertToPORequest,
     ConvertToPOResponse,
@@ -82,12 +83,20 @@ async def get_shopping_lists(
     offset: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     active_only: bool = Query(True, description='Only active lists'),
+    status_filter: ShoppingListStatus | None = Query(
+        None,
+        alias='status',
+        description=(
+            'Only lists in this state. ``active`` is the one a new item can go '
+            'on: a completed list is frozen, an archived one is gone.'
+        ),
+    ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> Any:
     org_id = require_org(current_user)
     lists, total = await list_shopping_lists(
-        db, org_id, active_only, offset=offset, limit=limit
+        db, org_id, active_only, status=status_filter, offset=offset, limit=limit
     )
     return PaginatedResponse.from_slice(lists, offset=offset, limit=limit, total=total)
 

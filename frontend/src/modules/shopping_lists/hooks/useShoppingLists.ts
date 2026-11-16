@@ -14,7 +14,7 @@ export function useActiveShoppingList() {
   return useModuleQuery<ShoppingListWithItems | null>("shopping_lists", {
     queryKey: queryKeys.shoppingLists.active,
     queryFn: async () => {
-      const lists = await shoppingListsApi.getAll(true);
+      const lists = await shoppingListsApi.getTargets();
       if (lists.length === 0) return null;
       return await shoppingListsApi.getById(lists[0].id);
     },
@@ -42,7 +42,7 @@ export function useQuickAddToShoppingList() {
       unit?: string;
       item_id?: string;
     }) => {
-      const lists = await shoppingListsApi.getAll(true);
+      const lists = await shoppingListsApi.getTargets();
       let listId: string;
       if (lists.length === 0) {
         const newList = await shoppingListsApi.create({
