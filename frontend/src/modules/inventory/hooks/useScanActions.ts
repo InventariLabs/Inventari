@@ -83,7 +83,7 @@ export function useScanAddToShoppingList() {
     async ({ templateName }: { templateName: string }) => {
       const { data: active } = await api.get<{ items: { id: string }[] }>(
         "/shopping-lists",
-        { params: { active_only: true, limit: 1 } },
+        { params: { status: "active", limit: 1 } },
       );
       let listId = active.items[0]?.id;
       if (!listId) {

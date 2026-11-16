@@ -35,7 +35,7 @@ describe("useScanAddToShoppingList", () => {
     server.use(
       http.get("/api/v1/shopping-lists", ({ request }) => {
         const asked = new URL(request.url).searchParams;
-        expect(asked.get("active_only")).toBe("true");
+        expect(asked.get("status")).toBe("active");
         return HttpResponse.json(page([{ id: "list-1" }]));
       }),
       http.post("/api/v1/shopping-lists", () => {

@@ -186,7 +186,7 @@ describe("useOpenShoppingLists", () => {
       { id: "active-1", name: "Week 30" },
       { id: "active-0", name: "Party" },
     ]);
-    expect(asked?.get("active_only")).toBe("true");
+    expect(asked?.get("status")).toBe("active");
   });
 
   it("answers an empty list when none is open, so the server makes one", async () => {
