@@ -61,7 +61,11 @@ export default function RecipeAvailabilityChecker({
   const avail = availabilityQuery.data;
 
   const addToShoppingListMutation = useAddToShoppingList(recipeId);
-  const { data: openLists = [], isError: listsFailed } = useOpenShoppingLists();
+  const {
+    data: openLists = [],
+    isError: listsFailed,
+    isLoading: listsLoading,
+  } = useOpenShoppingLists();
   // The newest open list is the default; with several, the reader can name
   // another. A choice that has since left the open lists falls back to it.
   const [pickedListId, setPickedListId] = useState<string | null>(null);
@@ -307,7 +311,13 @@ export default function RecipeAvailabilityChecker({
                   variant="secondary"
                   size="sm"
                   onClick={handleAddToShoppingList}
-                  disabled={!hasMissing || addToShoppingListMutation.isPending}
+                  // Until the open lists are known the target is unknown: a click
+                  // now would omit the list id and start a new list.
+                  disabled={
+                    !hasMissing ||
+                    addToShoppingListMutation.isPending ||
+                    listsLoading
+                  }
                   title={
                     !hasMissing
                       ? t("availability.add_missing_disabled_tooltip")

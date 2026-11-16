@@ -614,6 +614,24 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     });
   });
 
+  it("keeps Add missing disabled until the open lists have loaded", () => {
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    });
+    render(
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />,
+    );
+    const button = screen.getByRole("button", { name: /add missing/i });
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(mockAddToShoppingList).not.toHaveBeenCalled();
+  });
+
   it("says the lists could not be loaded instead of passing for none", () => {
     mockUseOpenShoppingLists.mockReturnValue({
       data: undefined,

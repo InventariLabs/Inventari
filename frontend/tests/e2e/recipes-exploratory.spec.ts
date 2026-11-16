@@ -1003,17 +1003,23 @@ test.describe("Recipes — follow-ups", () => {
       .catch(() => {});
     await page.getByRole("button", { name: /cooking history/i }).click();
 
-    // EN medium date = "Aug 2, 2026"; allow ±1 day for TZ edge cases
-    const fmt = new Intl.DateTimeFormat("en", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+    // The app prints the date in the organization's regional form: "Nov 7,
+    // 2026" for the US, "7 Nov 2026" elsewhere. Accept either order, and
+    // allow ±1 day for TZ edge cases.
+    const candidates = ["en-US", "en-GB"].flatMap((locale) => {
+      const fmt = new Intl.DateTimeFormat(locale, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      return [-1, 0, 1].map((offset) =>
+        fmt.format(new Date(Date.now() + offset * 86400000)),
+      );
     });
-    const candidates = [-1, 0, 1].map((offset) =>
-      fmt.format(new Date(Date.now() + offset * 86400000)),
+    const month = "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
+    const datePattern = new RegExp(
+      `${month} \\d{1,2}, \\d{4}|\\d{1,2} ${month} \\d{4}`,
     );
-    const datePattern =
-      /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{4}/;
     const entry = page.getByText(datePattern).first();
     await expect(entry).toBeVisible({ timeout: 10000 });
     const entryText = (await entry.textContent()) ?? "";
