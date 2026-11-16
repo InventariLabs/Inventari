@@ -15435,7 +15435,9 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ProductionOrderStart",
-                "default": {}
+                "default": {
+                  "ingredient_lots": []
+                }
               }
             }
           }
@@ -72172,6 +72174,18 @@
               }
             ],
             "title": "Output Lot Name"
+          },
+          "best_before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Before"
           }
         },
         "type": "object",
@@ -72820,6 +72834,14 @@
               }
             ],
             "title": "Started On"
+          },
+          "ingredient_lots": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientLotChoice"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Ingredient Lots"
           }
         },
         "type": "object",
@@ -72911,6 +72933,18 @@
               }
             ],
             "title": "Output Lot Name"
+          },
+          "best_before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Before"
           }
         },
         "type": "object",

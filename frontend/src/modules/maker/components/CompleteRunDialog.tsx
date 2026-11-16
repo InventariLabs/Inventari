@@ -1,13 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
+import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
 import { EmptyBomNotice } from "@/modules/maker/components/EmptyBomNotice";
 import { IngredientBatchPicker } from "@/modules/maker/components/IngredientBatchPicker";
 import type { useCompleteRun } from "@/modules/maker/hooks/useCompleteRun";
-import { useIsHomeProfile } from "@/modules/maker/hooks/useIsHomeProfile";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 
 interface CompleteRunDialogProps {
@@ -27,7 +26,6 @@ export function CompleteRunDialog({
   bomIsEmpty,
 }: CompleteRunDialogProps) {
   const { t } = useTranslation("maker");
-  const home = useIsHomeProfile();
   const anyShort = run.batches.short.size > 0;
   return (
     <ConfirmDialog
@@ -85,27 +83,13 @@ export function CompleteRunDialog({
             })}
           </p>
         </div>
-        <div className="space-y-1">
-          <DateInput
-            id="maker-complete-best-before"
-            label={t("batches.bestBeforeLabel")}
-            value={run.bestBefore}
-            onChange={run.setBestBefore}
-            min={order.production_date ?? undefined}
-            presets={["plus6Months", "plus1Year"]}
-          />
-          <p className="text-xs text-on-muted">
-            {order.shelf_life_days
-              ? t("batches.bestBeforeFromShelfLife", {
-                  count: order.shelf_life_days,
-                })
-              : t(
-                  home
-                    ? "batches.bestBeforeNoShelfLifeHome"
-                    : "batches.bestBeforeNoShelfLife",
-                )}
-          </p>
-        </div>
+        <BestBeforeField
+          id="maker-complete-best-before"
+          value={run.bestBefore}
+          onChange={run.setBestBefore}
+          min={order.production_date ?? undefined}
+          shelfLifeDays={order.shelf_life_days}
+        />
         <IngredientBatchPicker choice={run.batches} />
       </div>
     </ConfirmDialog>

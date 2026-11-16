@@ -10,6 +10,8 @@ import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
 import { formatDate } from "@/utils/helpers";
 import { todayIso } from "@/utils/formatters";
+import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
+import { useProposedBestBefore } from "@/modules/maker/hooks/useProposedBestBefore";
 import { useAddPortion } from "@/modules/maker/hooks/useProduction";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 
@@ -30,6 +32,7 @@ export function RunPortions({
   const [qty, setQty] = useState("");
   const [day, setDay] = useState(todayIso());
   const [lot, setLot] = useState("");
+  const bestBefore = useProposedBestBefore(day, order.shelf_life_days);
 
   function add() {
     addPortion.mutate(
@@ -39,6 +42,7 @@ export function RunPortions({
           qty: qty.trim(),
           made_on: day || undefined,
           output_lot_name: lot.trim() || undefined,
+          best_before: bestBefore.value || undefined,
         },
       },
       {
@@ -46,6 +50,7 @@ export function RunPortions({
           toast.success(t("progress.portionAdded"));
           setQty("");
           setLot("");
+          bestBefore.reset();
         },
         onError: (err) =>
           toast.error(extractApiError(err, t("progress.portionFailed"))),
@@ -84,7 +89,7 @@ export function RunPortions({
         </ul>
       )}
       {canWrite && (
-        <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-5">
           <Input
             label={t("progress.portionQty")}
             type="number"
@@ -106,6 +111,13 @@ export function RunPortions({
             maxLength={100}
             onChange={(e) => setLot(e.target.value)}
             data-testid="maker-portion-lot-input"
+          />
+          <BestBeforeField
+            id="maker-portion-best-before"
+            value={bestBefore.value}
+            onChange={bestBefore.set}
+            min={day || undefined}
+            shelfLifeDays={order.shelf_life_days}
           />
           <Button
             variant="outline"
