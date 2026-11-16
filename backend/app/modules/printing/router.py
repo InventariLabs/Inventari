@@ -175,6 +175,7 @@ async def queue_job(
         qr_only=payload.qr_only,
         show_code=payload.show_code,
         details=payload.details,
+        composition=payload.composition,
         copies=payload.copies,
         width_mm=payload.width_mm,
         height_mm=payload.height_mm,
@@ -206,10 +207,20 @@ async def product_labels_png(
     )
 
     # X-Labels-With-Details counts the labels that carry a lot or an expiry
-    # date whether or not they print it: the screen offers the option only
-    # when some do.
-    labels, without_code, with_details = await queue.product_labels_async(
-        db, org_id, payload.item_ids, details=payload.details
+    # date whether or not they print it, X-Labels-With-Composition those of a
+    # made product with an ingredient list: the screen offers each option
+    # only when some do.
+    (
+        labels,
+        without_code,
+        with_details,
+        with_composition,
+    ) = await queue.product_labels_async(
+        db,
+        org_id,
+        payload.item_ids,
+        details=payload.details,
+        composition=payload.composition,
     )
     if not labels:
         raise catalogue_refusal('product_label_no_code')
@@ -223,6 +234,7 @@ async def product_labels_png(
         headers={
             'X-Labels-Without-Code': str(without_code),
             'X-Labels-With-Details': str(with_details),
+            'X-Labels-With-Composition': str(with_composition),
         },
     )
 
@@ -238,20 +250,30 @@ async def lot_labels_png(
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> StreamingResponse:
-    """The batches' labels as one PNG: product, batch code in bars, made and best-before."""
+    """The batches' labels as one PNG: product, batch code in bars, made and best-before.
+
+    With ``composition`` a made product's batch also carries its ingredient
+    list and allergens; ``X-Labels-With-Composition`` says how many have one.
+    """
     from app.modules.printing.services.product_label_service import (
         DOWNLOAD_SHEET_COLUMNS,
         generate_product_label_batch_png,
     )
 
-    labels = await queue.lot_labels_async(db, org_id, payload.lot_ids)
+    labels, with_composition = await queue.lot_labels_async(
+        db, org_id, payload.lot_ids, composition=payload.composition
+    )
     if not labels:
         raise catalogue_refusal('print_job_nothing_to_print')
     labels = [label for label in labels for _ in range(payload.copies)]
     png = generate_product_label_batch_png(
         labels, payload.width_mm, payload.height_mm, columns=DOWNLOAD_SHEET_COLUMNS
     )
-    return StreamingResponse(io.BytesIO(png), media_type='image/png')
+    return StreamingResponse(
+        io.BytesIO(png),
+        media_type='image/png',
+        headers={'X-Labels-With-Composition': str(with_composition)},
+    )
 
 
 @router.post(

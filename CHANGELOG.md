@@ -134,6 +134,31 @@ says what the release does rather than what changed since them.
   announces it when the page changes. The sign-in, registration, password
   reset, privacy, invitation, set-up and attestation screens have titles of
   their own.
+- A made product's ingredient list, allergens and nutrition come from its BOM
+  and go on its label. A product's card carries, with Production on, the name
+  it goes under in an ingredient list (a legal food name, or an INCI name for a
+  cosmetic), the 14 EU allergens and a may-contain list; what the product's
+  name suggests is offered for a person to confirm, and nothing counts as an
+  allergen until someone has. A BOM's new **Label** tab writes the ingredient
+  list heaviest first as used (a line's loss included; equal weights by name),
+  a made ingredient with its own ingredients in brackets and the allergens in
+  bold; it collects every allergen of every level with the ingredients that
+  bring it (one declared on the product itself is kept), lists what the product
+  may contain and does not already, names what nobody has checked for allergens
+  and what nothing says the weight of, and gives the nutrition declaration per
+  100 g of what the batch yields — energy, fat, saturates, carbohydrate, sugars,
+  protein, salt — leaving a figure unknown and naming the ingredient that lacks
+  it rather than counting it as zero. A made product's card names its default
+  BOM and shows that BOM's allergens, each with what brings it. The product
+  label and the batch label can print the list and the allergens
+  (`composition` on `POST /printing/product-labels/png`, `/lot-labels/png` and
+  print jobs) no smaller than the 0.9 mm letter the regulation allows on a
+  small package, and refuse a label too small for them; a batch's label reads
+  the BOM its run used, not the product's default. Every screen says the result is computed
+  and the producer's to check. A product's nutrition figures gain saturates.
+  New endpoints: `GET/PUT /maker/labelling/products/{template_id}` and
+  `GET /maker/labelling/recipes/{recipe_id}`; the module SDK exports
+  `pick_by_lang`.
 
 ### Changed
 

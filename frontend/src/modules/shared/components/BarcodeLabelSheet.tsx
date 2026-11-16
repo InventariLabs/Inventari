@@ -70,6 +70,7 @@ export function BarcodeLabelSheet({
     copies: initialCopies,
     details: true,
     qr: false,
+    composition: false,
   });
   const [downloading, setDownloading] = useState(false);
   const shelves = "storageIds" in target;
@@ -198,6 +199,22 @@ export function BarcodeLabelSheet({
             )}
           </div>
         )}
+        {(products || batches) && (preview.withComposition ?? 0) > 0 && (
+          <div className="space-y-1">
+            <Checkbox
+              id="label-composition"
+              label={t("labels:composition.label")}
+              checked={options.composition}
+              onChange={(e) =>
+                setOptions((o) => ({ ...o, composition: e.target.checked }))
+              }
+              data-testid="label-sheet-composition"
+            />
+            <p className="text-sm text-on-muted">
+              {t("labels:composition.note")}
+            </p>
+          </div>
+        )}
         {preview.withoutCode > 0 && (
           <p className="text-sm text-on-warning bg-amber-100 rounded-lg px-3 py-2">
             {shelves
@@ -239,6 +256,9 @@ export function BarcodeLabelSheet({
               height: options.height,
               ...(shelves && { bars: true, qr: options.qr }),
               ...(products && { details: options.details }),
+              ...((products || batches) && {
+                composition: options.composition,
+              }),
             }}
             onSent={onClose}
           />

@@ -257,7 +257,8 @@
     "tabs": {
       "composition": "Skład",
       "cost": "Koszt i wynik",
-      "history": "Historia"
+      "history": "Historia",
+      "label": "Etykieta"
     },
     "sourceRecipe": "Na podstawie receptury (migawka z {{date}})",
     "setAsDefault": "Ustaw jako domyślną",
@@ -747,5 +748,79 @@
     "saved": "Okres przydatności zapisany",
     "saveFailed": "Nie udało się zapisać okresu przydatności.",
     "invalid": "Wpisz pełną liczbę dni, co najmniej 1."
+  },
+  "labelling": {
+    "contains": "Zawiera",
+    "mayContain": "Może zawierać",
+    "from": "z: {{names}}",
+    "declaredOnProduct": "zadeklarowane na produkcie",
+    "computedNote": "Wyliczone z receptury i kart jej składników. Sprawdź je, zanim trafią na etykietę.",
+    "allergens": {
+      "gluten": "Gluten",
+      "crustaceans": "Skorupiaki",
+      "eggs": "Jaja",
+      "fish": "Ryby",
+      "peanuts": "Orzeszki ziemne",
+      "soy": "Soja",
+      "milk": "Mleko",
+      "nuts": "Orzechy",
+      "celery": "Seler",
+      "mustard": "Gorczyca",
+      "sesame": "Sezam",
+      "sulphites": "Siarczyny",
+      "lupin": "Łubin",
+      "molluscs": "Mięczaki"
+    },
+    "card": {
+      "title": "Na etykiecie",
+      "labelName": "Nazwa na liście składników",
+      "labelNameHint": "Prawna nazwa żywności albo nazwa INCI kosmetyku. Puste pole: lista użyje nazwy produktu.",
+      "unchecked": "Alergeny jeszcze niesprawdzone.",
+      "suggested": "Nazwa podpowiada: {{allergens}}.",
+      "confirmSuggestion": "Potwierdź podpowiedź",
+      "containsNone": "Nie zawiera żadnych",
+      "choose": "Wybierz alergeny",
+      "change": "Zmień alergeny",
+      "done": "Gotowe",
+      "none": "Brak",
+      "ownAllergens": "Zadeklarowane na tym produkcie",
+      "fromRecipe": "Z receptury domyślnej",
+      "saved": "Etykieta zapisana",
+      "saveFailed": "Nie udało się zapisać etykiety"
+    },
+    "tab": {
+      "ingredients": "Składniki, od najcięższego",
+      "noIngredients": "Ta receptura nie ma jeszcze składników.",
+      "noAllergens": "Karta żadnego składnika nie wskazuje alergenu.",
+      "unchecked": "Alergeny jeszcze niesprawdzone:",
+      "uncheckedSuggests": "{{name}} (nazwa podpowiada: {{allergens}})",
+      "unweighed": "Nic nie mówi, ile ważą, więc lista stawia je na końcu: {{names}}. Podaj na karcie wagę jednej sztuki albo zapisz pozycję w jednostce wagi.",
+      "nutrition": "Wartość odżywcza w 100 g",
+      "nutritionNone": "Karta żadnego składnika nie ma wartości odżywczych, więc deklaracji jeszcze nie ma.",
+      "perYield": "W 100 g z {{weight}} g, które daje jedna partia.",
+      "yieldUnknown": "Nie wiadomo, ile waży jedna partia: podaj wydajność receptury w jednostce wagi albo wagę sztuki produktu.",
+      "notKnown": "nieznana",
+      "missing": "Brak nie liczy się jako zero, więc część wartości jest nieznana:",
+      "missingLine": "{{name}} nie ma wartości: {{nutrients}}",
+      "missingAll": "{{name}} nie ma wartości odżywczych"
+    },
+    "nutrients": {
+      "energy": "Wartość energetyczna",
+      "fat": "Tłuszcz",
+      "saturates": "w tym kwasy tłuszczowe nasycone",
+      "carbohydrate": "Węglowodany",
+      "sugars": "w tym cukry",
+      "protein": "Białko",
+      "salt": "Sól"
+    },
+    "figures": {
+      "energy": "wartość energetyczna",
+      "fat": "tłuszcz",
+      "saturates": "kwasy tłuszczowe nasycone",
+      "carbohydrate": "węglowodany",
+      "sugars": "cukry",
+      "protein": "białko",
+      "salt": "sól"
+    }
   }
 }

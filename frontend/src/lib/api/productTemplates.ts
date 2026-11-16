@@ -6,6 +6,7 @@ export interface ProductTemplateNutritionInfo {
   calories_kcal?: number | null;
   protein_g?: number | null;
   fat_g?: number | null;
+  saturated_fat_g?: number | null;
   carbs_g?: number | null;
   fiber_g?: number | null;
   sugar_g?: number | null;

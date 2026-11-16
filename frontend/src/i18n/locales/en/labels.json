@@ -228,5 +228,9 @@
       "printed": "Printed",
       "failed": "Failed"
     }
+  },
+  "composition": {
+    "label": "Ingredients and allergens",
+    "note": "Computed from the product's BOM; yours to check before the label goes on a package. A list needs a larger label than a code alone."
   }
 }

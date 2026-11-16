@@ -657,7 +657,10 @@
         "make_fresh": "Immer frisch herstellen",
         "material_cost": "Kosten der entnommenen Materialien",
         "started_on": "Gestartet am",
-        "step": "Schritt"
+        "step": "Schritt",
+        "label_name": "Name im Zutatenverzeichnis",
+        "allergens": "Allergene",
+        "may_contain": "Kann enthalten"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",

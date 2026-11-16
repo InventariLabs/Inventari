@@ -1301,11 +1301,12 @@ describe("StoragesPage — one screen", () => {
       await screen.findByRole("heading", { name: "Shelf A" }),
     ).toBeInTheDocument();
 
-    // The name inside the row.
+    // The name inside the row. The path's ancestors arrive after the
+    // heading, so the button is waited for, not read at once.
     await userEvent.click(
-      within(
+      await within(
         screen.getByRole("navigation", { name: "Location path" }),
-      ).getByRole("button", { name: "Dry Goods" }),
+      ).findByRole("button", { name: "Dry Goods" }),
     );
     await userEvent.click(
       await within(await screen.findByRole("table")).findByRole("button", {
@@ -1318,9 +1319,9 @@ describe("StoragesPage — one screen", () => {
 
     // The phone's full-width row.
     await userEvent.click(
-      within(
+      await within(
         screen.getByRole("navigation", { name: "Location path" }),
-      ).getByRole("button", { name: "Dry Goods" }),
+      ).findByRole("button", { name: "Dry Goods" }),
     );
     await userEvent.click(
       await screen.findByRole("button", { name: /^Shelf A\s*SA/ }),

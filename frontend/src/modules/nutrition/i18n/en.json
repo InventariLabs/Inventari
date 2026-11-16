@@ -11,6 +11,7 @@
   "energy": "energy",
   "proteins": "proteins",
   "fat": "fat",
+  "saturatedFat": "saturates",
   "fiber": "fiber",
   "levels": {
     "sugars": {

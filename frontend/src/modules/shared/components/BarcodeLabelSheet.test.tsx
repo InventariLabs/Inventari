@@ -193,3 +193,83 @@ describe("BarcodeLabelSheet — batch labels", () => {
     expect(queued).toMatchObject({ lot_ids: ["lot-1"], copies: 48 });
   });
 });
+
+describe("BarcodeLabelSheet — a made product's ingredient list", () => {
+  let previewed: Record<string, unknown> | null;
+  let queued: Record<string, unknown> | null;
+
+  const serve = (withComposition: string | null) => {
+    window.URL.createObjectURL = vi.fn(() => "blob:batch");
+    window.URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get("/api/v1/printing/agents", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              id: "a-1",
+              name: "kitchen",
+              printer_type: "cups",
+              last_seen_at: "2026-11-01T10:00:00Z",
+              online: true,
+            },
+          ]),
+        ),
+      ),
+      http.post("/api/v1/printing/lot-labels/png", async ({ request }) => {
+        previewed = (await request.json()) as Record<string, unknown>;
+        return new HttpResponse(new Uint8Array([0x89, 0x50]), {
+          headers: {
+            "Content-Type": "image/png",
+            ...(withComposition !== null && {
+              "X-Labels-With-Composition": withComposition,
+            }),
+          },
+        });
+      }),
+      http.post("/api/v1/printing/jobs", async ({ request }) => {
+        queued = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({ id: "job-1" }, { status: 201 });
+      }),
+    );
+  };
+  const listBox = () =>
+    screen.queryByRole("checkbox", { name: "Ingredients and allergens" });
+
+  beforeEach(() => {
+    previewed = null;
+    queued = null;
+  });
+
+  it("offers the list for a made product's batch, previews it and sends it", async () => {
+    serve("1");
+    const onClose = vi.fn();
+    render(
+      <BarcodeLabelSheet target={{ lotIds: ["lot-1"] }} onClose={onClose} />,
+    );
+
+    await screen.findByAltText("Preview of one batch label");
+    expect(previewed).toMatchObject({ composition: false });
+    expect(
+      screen.getByText(/Computed from the product's BOM; yours to check/),
+    ).toBeInTheDocument();
+
+    await userEvent.click(listBox() as HTMLElement);
+    await waitFor(() => expect(previewed).toMatchObject({ composition: true }));
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Send to printer" }),
+    );
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(queued).toMatchObject({ lot_ids: ["lot-1"], composition: true });
+  });
+
+  it("does not offer a list a product without a recipe does not have", async () => {
+    serve("0");
+    render(
+      <BarcodeLabelSheet target={{ lotIds: ["lot-1"] }} onClose={vi.fn()} />,
+    );
+
+    await screen.findByAltText("Preview of one batch label");
+    expect(listBox()).toBeNull();
+  });
+});

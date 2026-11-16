@@ -1,5 +1,12 @@
 """Rendering a product label: the name, the product's code in bars, lot and expiry.
 
+A made product's label and its batch's may also carry the ingredient list
+and the allergens, as a block of text under the name. It is set as large as
+the label leaves room for and never smaller than the letter EU Regulation
+1169/2011 allows on a small package (Art. 13 and Annex IV: an x-height of
+0.9 mm); a list that does not fit at that size is refused, naming the label
+size, rather than printed too small to be lawful or cut short.
+
 A pool label carries a QR that opens a scan address; a product label carries
 the product's own code as a 1D barcode, the thing a receiving or picking scan
 looks the product up by. A code that is a valid EAN-13 (a manufacturer's, or
@@ -59,6 +66,11 @@ NAME_MAX_LINES = 2
 #: The code's digits and the lot line, as a fraction of the label's height.
 TEXT_RATIO = 0.1
 
+#: The least x-height of the ingredient list, in millimetres: the letter EU
+#: Regulation 1169/2011 allows on a package whose largest side is under
+#: 80 cm² (Annex IV); a larger package asks 1.2 mm, a larger label.
+COMPOSITION_MIN_X_HEIGHT_MM = 0.9
+
 #: The least height the bars may have, in millimetres: shorter than this a
 #: handheld scanner's beam misses them.
 MIN_BAR_MM = 5.0
@@ -86,6 +98,8 @@ class ProductLabel(NamedTuple):
     #: What a QR square at the label's left end carries, when the label has
     #: one: a phone camera reads it where a 1D scanner reads the bars.
     qr: str | None = None
+    #: A made product's ingredient list and allergens, under the name.
+    composition: str | None = None
 
 
 def symbology(code: str) -> str | None:
@@ -240,10 +254,72 @@ def _draw(
 
     kind = symbology(label.code)
     modules = barcode_modules(label.code)
+    if label.composition:
+        bars_px = math.ceil(MIN_BAR_MM * raster.px_per_mm) if modules is not None else 0
+        top = (
+            _draw_composition(
+                draw,
+                label.composition,
+                (left, top, width, bottom - bars_px - gap - top),
+                raster,
+                text_size,
+                (width_mm, height_mm),
+            )
+            + gap
+        )
     if kind is not None and modules is not None:
         _require_height(label.code, height_mm, raster, bottom - top)
         _draw_bars(draw, modules, _QUIET_ZONES[kind], left, top, width, bottom - top)
     return img
+
+
+def _draw_composition(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    box: tuple[int, int, int, int],
+    raster: Raster,
+    ceiling: int,
+    size_mm: tuple[float, float],
+) -> int:
+    """The ingredient list under the name, left-aligned; returns its bottom.
+
+    As large as the room above the bars allows, up to the label's text size,
+    and never under the legal x-height; a list that does not fit even then
+    is refused in the reader's language, naming the label's size.
+    """
+    left, top, width, room = box
+    floor = _x_height_size(COMPOSITION_MIN_X_HEIGHT_MM * raster.px_per_mm)
+
+    def lines_at(size: int) -> list[str] | None:
+        font = _font(size)
+        lines = _wrapped_lines(draw, text, font, width, split_long_words=True)
+        fits = len(lines) * round(size * LINE_SPACING) <= room
+        return lines if fits and not _overflows(draw, lines, font, width) else None
+
+    for size in range(max(ceiling, floor), floor - 1, -1):
+        lines = lines_at(size)
+        if lines is None:
+            continue
+        step = round(size * LINE_SPACING)
+        for line in lines:
+            draw.text((left, top), line, fill=0, font=_font(size))
+            top += step
+        return top
+    raise catalogue_refusal(
+        'product_label_composition_does_not_fit',
+        width=f'{size_mm[0]:g}',
+        height=f'{size_mm[1]:g}',
+    )
+
+
+def _x_height_size(x_height_px: float) -> int:
+    """The smallest size of the label face whose letter x is *x_height_px* tall."""
+    size = MIN_FONT_PX
+    while True:
+        bbox = _font(size).getbbox('x')
+        if bbox[3] - bbox[1] >= x_height_px:
+            return size
+        size += 1
 
 
 def _qr_square(payload: str, side_px: int) -> Image.Image:

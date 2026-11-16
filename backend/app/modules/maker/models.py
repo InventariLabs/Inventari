@@ -567,6 +567,58 @@ class MakerShelfLife(Base):
     )
 
 
+class MakerLabelFacts(Base):
+    """What a product's label says of it, in one organization.
+
+    The name it goes under in an ingredient list (a legal food name, an INCI
+    name), the allergens it contains and the ones it may contain. A made
+    product's list and allergens are computed from its recipe out of these
+    facts on each ingredient (``labelling.py``). One row per product and
+    organization, for the reason the shelf lives are kept here: a product can
+    be a catalogue row shared by every organization.
+    """
+
+    __tablename__ = 'maker_label_facts'
+    __table_args__ = (
+        UniqueConstraint(
+            'organization_id',
+            'product_template_id',
+            name='uq_maker_label_facts_org_template',
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    product_template_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('product_templates.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    #: The name the product goes under in an ingredient list; None reads the
+    #: product's own name.
+    label_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    #: The allergen keys a person confirmed. None: nobody has checked yet,
+    #: which is not the same answer as an empty list (checked, none).
+    allergens: Mapped[list[str] | None] = mapped_column(JSONB, nullable=True)
+    #: Allergens the product may carry by cross-contact ("may contain").
+    may_contain: Mapped[list[str]] = mapped_column(
+        JSONB, nullable=False, default=list, server_default=text("'[]'::jsonb")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+
 class ProductionAttachment(Base):
     """A photo or a file filed under a production run."""
 

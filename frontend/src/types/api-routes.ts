@@ -181,6 +181,8 @@ export const API_ROUTES = [
   "/api/v1/maker/bom/{template_id}",
   "/api/v1/maker/bom/{template_id}/cost-estimate",
   "/api/v1/maker/breakdown/{template_id}",
+  "/api/v1/maker/labelling/products/{template_id}",
+  "/api/v1/maker/labelling/recipes/{recipe_id}",
   "/api/v1/maker/pricing/compute",
   "/api/v1/maker/pricing/margin/{template_id}",
   "/api/v1/maker/production/ingredient-batches",

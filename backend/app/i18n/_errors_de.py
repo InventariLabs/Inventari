@@ -588,6 +588,7 @@ ERRORS_DE: ErrorMessages = {
     'product_label_no_code': 'Nichts zu drucken: keines der gewählten Produkte hat einen Code. Erzeugen Sie einen im Produktformular',
     'product_label_too_narrow': 'Der Code {code} passt nicht auf ein {width} mm breites Etikett: seine Striche brauchen mindestens {needed} mm. Wählen Sie ein breiteres Etikett',
     'product_label_too_short': 'Das {height} mm hohe Etikett ist zu niedrig: nach Name und Text bleibt den Strichen des Codes {code} zu wenig Höhe für einen Scanner. Wählen Sie ein höheres Etikett',
+    'product_label_composition_does_not_fit': 'Das Zutatenverzeichnis passt in der kleinsten Schrift, die das Gesetz auf einer Verpackung erlaubt, nicht auf ein Etikett von {width} × {height} mm. Wählen Sie ein größeres Etikett',
     'storage_code_template_invalid': 'Die Codevorlage „{template}“ ist nicht verwendbar. Schreiben Sie Platzhalter wie {{zone}}-{{rack:02}}-{{level:02}} mit einem Trennzeichen dazwischen oder ein Präfix aus höchstens fünf Buchstaben und Ziffern wie LOC',
     'storage_code_template_not_tree': 'Dieses Lager vergibt zufällige Codes: Geben Sie ihm eine Vorlage mit Platzhaltern wie {zone}-{rack:02}-{level:02}, bevor Sie seine Lagerorte nummerieren',
     'storage_code_parent_not_numbered': 'Dieser Lagerort lässt sich nicht für sich nummerieren: Die Plätze darüber tragen noch keine Codes der Vorlage, oder er liegt tiefer, als die Vorlage reicht. Nummerieren Sie zuerst die Ebene darüber',

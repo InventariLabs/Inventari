@@ -26,6 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.product_template import ProductTemplate
 
+from ._allergens import ALLERGEN_KEYS, infer_allergens
 from .models.recipe import Recipe, RecipeIngredient
 
 
@@ -61,6 +62,20 @@ class RecipeSnapshot:
 
 class RecipesAPI:
     """Public API for the recipes module."""
+
+    #: The 14 allergens of EU Regulation 1169/2011, Annex II, by the stable
+    #: keys every screen and export of this module uses.
+    ALLERGEN_KEYS: tuple[str, ...] = ALLERGEN_KEYS
+
+    @staticmethod
+    def infer_allergens(name: str) -> list[str]:
+        """The allergens an ingredient's name suggests (Polish and English).
+
+        A suggestion, never a fact: the name says nothing of what a supplier
+        put in, so a caller shows it for a person to confirm. Pure — it
+        reads no table, so it answers the same whether this module is on.
+        """
+        return infer_allergens(name)
 
     @staticmethod
     async def list_templates_with_recipe_usage_async(

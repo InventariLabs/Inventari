@@ -561,6 +561,7 @@ apart.
 | `PRODUCTION_START_NOT_DRAFT` | This production order already has status {status} — only a draft can be started. |
 | `PRODUCTION_STEP_NOT_FOUND` | This run has no such step. |
 | `PRODUCTION_UPDATE_NOT_DRAFT` | This production order already has status {status} — only a draft can be edited. |
+| `PRODUCT_LABEL_COMPOSITION_DOES_NOT_FIT` | The ingredient list does not fit a label {width} × {height} mm at the smallest letter the law allows on a package. Choose a larger label size |
 | `PRODUCT_LABEL_NO_CODE` | Nothing to print: none of the chosen products has a code. Generate one on the product form |
 | `PRODUCT_LABEL_TOO_NARROW` | The code {code} does not fit a label {width} mm wide: its bars need one at least {needed} mm wide. Choose a wider label size |
 | `PRODUCT_LABEL_TOO_SHORT` | The label {height} mm tall is too short: after the name and the text, the bars of the code {code} are left too little height for a scanner to read. Choose a taller label size |

@@ -30,6 +30,9 @@ export interface BarcodeLabelOptions {
   details: boolean;
   /** A shelf label's QR beside the bars, for a phone camera. */
   qr: boolean;
+  /** A made product's ingredient list and allergens, on a product's or a
+   *  batch's label. */
+  composition: boolean;
 }
 
 export interface BarcodeLabelFile {
@@ -39,6 +42,9 @@ export interface BarcodeLabelFile {
   /** Products among the printed ones that have a lot or an expiry date to
    *  print, or null when the server does not say (shelf labels). */
   withDetails: number | null;
+  /** Labels of a made product, which have an ingredient list to print, or
+   *  null when the server does not say (shelf labels). */
+  withComposition: number | null;
 }
 
 function targetIds(target: BarcodeLabelTarget): string[] {
@@ -57,13 +63,18 @@ function postLabels(target: BarcodeLabelTarget, options: BarcodeLabelOptions) {
   if ("itemIds" in target)
     return api.post<Blob>(
       "/printing/product-labels/png",
-      { item_ids: target.itemIds, details: options.details, ...size },
+      {
+        item_ids: target.itemIds,
+        details: options.details,
+        composition: options.composition,
+        ...size,
+      },
       asBlob,
     );
   if ("lotIds" in target)
     return api.post<Blob>(
       "/printing/lot-labels/png",
-      { lot_ids: target.lotIds, ...size },
+      { lot_ids: target.lotIds, composition: options.composition, ...size },
       asBlob,
     );
   return api.post<Blob>(
@@ -80,10 +91,13 @@ export async function fetchBarcodeLabels(
 ): Promise<BarcodeLabelFile> {
   const response = await postLabels(target, options);
   const withDetails = response.headers["x-labels-with-details"];
+  const withComposition = response.headers["x-labels-with-composition"];
   return {
     blob: response.data,
     withoutCode: Number(response.headers["x-labels-without-code"] ?? 0),
     withDetails: withDetails === undefined ? null : Number(withDetails),
+    withComposition:
+      withComposition === undefined ? null : Number(withComposition),
   };
 }
 
@@ -92,6 +106,7 @@ interface BarcodeLabelPreview {
   url: string | null;
   withoutCode: number;
   withDetails: number | null;
+  withComposition: number | null;
   isLoading: boolean;
   /** The server's sentence when it refused, e.g. none of them has a code. */
   error: string | null;
@@ -111,6 +126,7 @@ export function useBarcodeLabelPreview(
   const [state, setState] = useState<Omit<BarcodeLabelPreview, "url">>({
     withoutCode: 0,
     withDetails: null,
+    withComposition: null,
     isLoading: false,
     error: null,
   });
@@ -120,7 +136,7 @@ export function useBarcodeLabelPreview(
   const ids = targetIds(target).join(",");
   // A batch prints one label per unit made — up to two hundred of the same
   // label. The preview shows one; the download and the printer get them all.
-  const { width, height, details, qr } = options;
+  const { width, height, details, qr, composition } = options;
   const copies = kind === "lots" ? 1 : options.copies;
 
   useEffect(() => {
@@ -136,23 +152,33 @@ export function useBarcodeLabelPreview(
         copies,
         details,
         qr,
+        composition,
       })
-        .then(({ blob, withoutCode, withDetails }) => {
+        .then(({ blob, withoutCode, withDetails, withComposition }) => {
           if (cancelled) return;
           const previous = currentUrl.current;
           currentUrl.current = URL.createObjectURL(blob);
           setUrl(currentUrl.current);
           if (previous) URL.revokeObjectURL(previous);
-          setState({ withoutCode, withDetails, isLoading: false, error: null });
+          setState({
+            withoutCode,
+            withDetails,
+            withComposition,
+            isLoading: false,
+            error: null,
+          });
         })
         .catch((error: unknown) => {
           if (cancelled) return;
-          setState({
+          // What the labels have to print is still known: a list that does
+          // not fit this size keeps its option, so it can be turned off.
+          setState((s) => ({
             withoutCode: 0,
             withDetails: null,
+            withComposition: s.withComposition,
             isLoading: false,
             error: extractApiError(error, failedText),
-          });
+          }));
         });
     }, 400);
 
@@ -160,7 +186,7 @@ export function useBarcodeLabelPreview(
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [kind, ids, width, height, copies, details, qr, failedText]);
+  }, [kind, ids, width, height, copies, details, qr, composition, failedText]);
 
   useEffect(
     () => () => {
