@@ -73,6 +73,21 @@ describe("LabelScanPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("names the tab after the unknown code's heading, not 'Inventari'", async () => {
+    server.use(
+      http.get(
+        "/api/v1/labels/scan/STM-0001",
+        () => new HttpResponse(null, { status: 404 }),
+      ),
+    );
+
+    renderPage();
+
+    await screen.findByText(/no label matches this code/i);
+    expect(document.title).toMatch(/ · Inventari$/);
+    expect(document.title).not.toBe("Inventari");
+  });
+
   it("does not offer a new label when the lookup failed", async () => {
     // This screen is the only entry a printed QR code has. "Create a new label"
     // after a 500 puts a second sticker on a thing that already carries one.

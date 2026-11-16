@@ -14,8 +14,20 @@ import { QueryError } from "@/components/ui/QueryResult";
 import { apiErrorStatus, isNotFoundError } from "@/lib/errors";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { useCanWrite } from "@/hooks/useCanWrite";
+import { useDocumentTitle } from "@/module-sdk";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { useLabelScan } from "@/modules/printing/hooks/useLabelScan";
+
+/** The label's code once known; the "not found" heading when it is not. */
+function scanTitle(
+  code: string | undefined,
+  labelCode: string | undefined,
+  error: unknown,
+  notFound: string,
+): string | undefined {
+  if (error && !isNotFoundError(error)) return code;
+  return error || !labelCode ? notFound : labelCode;
+}
 
 export default function LabelScanPage() {
   const { code } = useParams<{ code: string }>();
@@ -32,6 +44,12 @@ export default function LabelScanPage() {
   const canWrite = useCanWrite("items");
 
   const { data, isLoading, error, refetch } = useLabelScan(code!);
+  // The screen draws its own headings outside PageHeader, so it names itself.
+  useDocumentTitle(
+    isLoading
+      ? null
+      : scanTitle(code, data?.label_code, error, t("labels:scanNotFound")),
+  );
   // A printed QR code opens this screen in a fresh tab, as the first entry
   // of its history — popping it did nothing, and the one button on the dead
   // end did not move. With nothing to go back to, Back goes home.
