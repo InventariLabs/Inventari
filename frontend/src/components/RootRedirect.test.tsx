@@ -207,5 +207,7 @@ describe("RootRedirect", () => {
     render(<LauncherRoute />, { wrapper });
     expect(await screen.findByTestId("launcher")).toBeInTheDocument();
     expect(screen.queryByText("FALLBACK PAGE")).not.toBeInTheDocument();
+    // The home names its tab, whatever greeting the page itself shows.
+    expect(document.title).toBe("Home · Inventari");
   });
 });
