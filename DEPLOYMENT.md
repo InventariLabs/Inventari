@@ -996,7 +996,7 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    sudo mkdir -p backups/restore
    docker run --rm -e RCLONE_CONFIG=/config/rclone.conf \
      -v "$PWD/rclone.conf":/config/rclone.conf:ro -v "$PWD/backups/restore":/data \
-     rclone/rclone:1.75.1 copy gdrive:Inventari/prod-backups/last /data
+     rclone/rclone:1.76.0 copy gdrive:Inventari/prod-backups/last /data
    ```
    From the old disk, copy its `backups/last/` there instead.
 6. **Follow *Putting a backup back*** above with `FROM=restore`, from step 1.
@@ -1136,7 +1136,7 @@ mappings seen in `docker-compose.yml` are dev-only conveniences.
 
 ## Cache and token store: Valkey, not Redis
 
-The `redis` and `redis-critical` services run **`valkey/valkey:9.1.2-alpine`**
+The `redis` and `redis-critical` services run **`valkey/valkey:9.1.3-alpine`**
 (BSD-3-Clause, Linux Foundation). Redis has been RSALv2/SSPLv1 since 7.4, which
 is not an open-source licence — Valkey is the fork that stayed permissive, and
 it speaks the same protocol, so `REDIS_URL`, `REDIS_CRITICAL_URL` and every
@@ -1156,7 +1156,7 @@ docker compose -f docker-compose.prod.yml up -d
 Coming from Valkey 8 the volumes stay: 9.1 loads an 8.1.9 RDB in place
 (measured with 9.1.1 on the dev stack, 2026-09-26 — `BGSAVE` on 8.1.9, then a
 restart on 9.1.1 with the same volume, all keys present and no RDB error in
-the log; 9.1.2 is a patch release of the same line).
+the log; 9.1.3 is a patch release of the same line).
 
 What is lost with those volumes: the response cache and the rate-limit counters
 (both rebuild themselves) and **the JWT blacklist**. Without the blacklist,
