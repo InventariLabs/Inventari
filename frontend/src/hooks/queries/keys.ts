@@ -27,6 +27,8 @@ export const queryKeys = {
   },
   stockAsOf: {
     report: (query: unknown) => ["stock-as-of", query] as const,
+    /** The value statement of a period: the on-a-date report's sibling. */
+    movement: (query: unknown) => ["stock-value-movement", query] as const,
   },
   items: {
     all: ["items"] as const,

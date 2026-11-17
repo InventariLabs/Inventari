@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/hooks/queries/keys";
 import {
   stockValueMovementApi,
   type StockValueMovementQuery,
@@ -13,7 +14,7 @@ import {
  */
 export function useStockValueMovement(query: StockValueMovementQuery) {
   return useQuery({
-    queryKey: ["stock-value-movement", query],
+    queryKey: queryKeys.stockAsOf.movement(query),
     queryFn: () => stockValueMovementApi.get(query),
     enabled: Boolean(query.date_from && query.date_to),
     retry: false,
