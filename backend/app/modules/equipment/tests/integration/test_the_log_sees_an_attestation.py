@@ -182,10 +182,22 @@ class TestTheLogSeesAHoldersAnswer:
         assert entry.user_id is None
         assert entry.action == 'UPDATE'
         assert entry.snapshot is not None
-        assert entry.snapshot['answer'] == 'confirmed'
+        assert entry.snapshot['answer'] == 'CONFIRMED'
         assert entry.snapshot['holder'] == 'Alice'
         assert entry.snapshot['holder_email'] == 'alice@example.com'
-        assert [a['name'] for a in entry.snapshot['assets']] == [eq_item.name]
+        # The row is about the campaign, by name, and says who answered so
+        # the screen does not read it as an unknown user.
+        assert entry.snapshot['name'] == 'Q3 attestation'
+        assert entry.meta_data is not None
+        assert entry.meta_data['actor'] == {
+            'type': 'holder',
+            'name': 'Alice',
+            'email': 'alice@example.com',
+        }
+        # Names the asset the way every equipment entry does: a holder of two
+        # laptops that share a name must be able to say which one.
+        assert len(entry.snapshot['assets']) == 1
+        assert entry.snapshot['assets'][0].startswith(eq_item.name)
 
         # The same link opened again answers nothing new.
         before = len(_entries(db_session, eq_org.id))
@@ -213,8 +225,9 @@ class TestTheLogSeesAHoldersAnswer:
         entry = _entries(db_session, eq_org.id)[-1]
         assert entry.user_id is None
         assert entry.snapshot is not None
-        assert entry.snapshot['answer'] == 'disputed'
+        assert entry.snapshot['answer'] == 'DISPUTED'
         assert entry.snapshot['dispute_type'] == 'MISSING'
         assert entry.snapshot['reason'] == 'Left in the van'
         assert entry.snapshot['holder'] == 'Alice'
-        assert [a['name'] for a in entry.snapshot['assets']] == [eq_item.name]
+        assert len(entry.snapshot['assets']) == 1
+        assert entry.snapshot['assets'][0].startswith(eq_item.name)

@@ -183,6 +183,10 @@ says what the release does rather than what changed since them.
   New endpoints: `GET/PUT /maker/labelling/products/{template_id}` and
   `GET /maker/labelling/recipes/{recipe_id}`; the module SDK exports
   `pick_by_lang`.
+- For module authors: `core_api.items.update_async` takes an optional `bulk`
+  flag that marks the edit's journal entry as one of a batch, and
+  `core_api.ai_connections.set_binding_async` an optional `user` it names in
+  the entry it writes. Callers that pass neither are unchanged.
 
 ### Changed
 
@@ -316,16 +320,13 @@ says what the release does rather than what changed since them.
   bulk location move is marked as one of a batch like the other batch edits.
 - Clearing the purchased lines of a shopping list keeps what was bought in the
   list's purchase history, as archiving the list already did.
-- For module authors: `core_api.items.update_async` takes an optional `bulk`
-  flag that marks the edit's journal entry as one of a batch, and
-  `core_api.ai_connections.set_binding_async` an optional `user` it names in
-  the entry it writes. Callers that pass neither are unchanged.
 
 ### Removed
 
-- `POST /api/v1/recipes/ingredient-defaults/seed`. It deduplicated and seeded
-  the ingredient defaults of every organization on the installation, and any
-  member of one organization could call it; the module already does that work
+- **Breaking:** `POST /api/v1/recipes/ingredient-defaults/seed`. It
+  deduplicated and seeded the ingredient defaults of every organization on the
+  installation, and any member of one organization could call it. A script
+  that called it needs to do nothing: the recipes module does the same work
   once at start-up.
 
 ## v0.12.0 - 2026-11-09

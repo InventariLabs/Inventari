@@ -98,7 +98,8 @@ class CoreSettingsAPI:
         # this door leaves the same entry. No user travels with the call —
         # a module writes from an event or a job as often as from a request
         # — so the entry names the module and, for an API-key request, the
-        # key (``log_action_async`` adds it).
+        # key (``log_action_async`` adds it); with neither it says the system
+        # acted, not that the actor is unknown.
         change = changed_settings_snapshot(
             before, after, set(self._secret_paths_for(module_name))
         )
@@ -111,6 +112,7 @@ class CoreSettingsAPI:
                 target_type=AuditTargetType.MODULE,
                 target_id=organization_id,
                 snapshot={'name': module_name, **change},
+                meta_data={'actor': {'type': 'system'}},
             )
 
     @staticmethod

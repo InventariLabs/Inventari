@@ -109,7 +109,8 @@ async def _journal_the_answer(
     *,
     answer: str,
     assets: list[AuditResponseItem],
-    extra: dict[str, str] | None = None,
+    dispute_type: str | None = None,
+    reason: str | None = None,
 ) -> None:
     """Write down that a holder answered for the assets they hold.
 
@@ -117,9 +118,22 @@ async def _journal_the_answer(
     it missing, damaged or the wrong one, is custody: it changes what the
     organization knows about an object in the world. Before this it lived
     on the response row and the asset's timeline only. The page has no
-    session, so the entry has no user; it names the holder the response was
-    sent to, and the campaign it answers.
+    session, so the entry has no user; the holder the response was sent to
+    is its actor (``meta_data.actor``), and the campaign it answers is the
+    entry's name.
     """
+    snapshot = {
+        'name': response.campaign.name if response.campaign else None,
+        'answer': answer,
+        'response_id': str(response.id),
+        'holder': response.assignee_name,
+        'holder_email': response.assignee_email,
+        # Name and serial, as every other equipment entry names an asset:
+        # a holder of two laptops that share a name must say which.
+        'assets': [_asset_label(a) for a in assets],
+        'dispute_type': dispute_type,
+        'reason': reason,
+    }
     await core_api.audit_log.log_action_async(
         db,
         organization_id=response.organization_id,
@@ -127,16 +141,13 @@ async def _journal_the_answer(
         action=AuditAction.UPDATE,
         target_type=AuditTargetType.EQUIPMENT_ATTESTATION,
         target_id=response.campaign_id,
-        snapshot={
-            'answer': answer,
-            'campaign': response.campaign.name if response.campaign else None,
-            'response_id': str(response.id),
-            'holder': response.assignee_name,
-            'holder_email': response.assignee_email,
-            'assets': [
-                {'item_id': str(a.item_id), 'name': a.item_name} for a in assets
-            ],
-            **(extra or {}),
+        snapshot={k: v for k, v in snapshot.items() if v is not None},
+        meta_data={
+            'actor': {
+                'type': 'holder',
+                'name': response.assignee_name,
+                'email': response.assignee_email,
+            }
         },
     )
 
@@ -170,7 +181,7 @@ async def confirm_response(
             confirmed.append(item)
     _settle(response, answered_without_items='CONFIRMED')
     await db.flush()
-    await _journal_the_answer(db, response, answer='confirmed', assets=confirmed)
+    await _journal_the_answer(db, response, answer='CONFIRMED', assets=confirmed)
     await db.refresh(response)
     return response
 
@@ -254,9 +265,10 @@ async def dispute_response(
     await _journal_the_answer(
         db,
         response,
-        answer='disputed',
+        answer='DISPUTED',
         assets=[target] if target is not None else [],
-        extra={'dispute_type': dispute_type, 'reason': reason},
+        dispute_type=dispute_type,
+        reason=reason,
     )
     await _tell_the_admins(db, response, target, reason)
     await db.refresh(response)

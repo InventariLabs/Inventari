@@ -11,7 +11,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useAuthStore } from "@/store/authStore";
-import { AuditDetail, AuditTarget } from "./AuditLogEntry";
+import { AuditActor, AuditDetail, AuditTarget } from "./AuditLogEntry";
 import { tFor } from "@/test/mocks/i18n";
 import type { AuditLogEntry } from "@/types/core";
 
@@ -248,5 +248,31 @@ describe("AuditDetail — the sub-collections a deleted collection took", () => 
 
     expect(screen.queryByText(/Sub-collections removed/)).toBeNull();
     expect(screen.getByText("—")).toBeInTheDocument();
+  });
+});
+
+describe("AuditActor — a holder answering from the public link", () => {
+  const answer = (actor: Record<string, unknown> | null): AuditLogEntry => ({
+    ...quantityRow(actor ? { actor } : null),
+    user_id: null,
+    user_email: null,
+  });
+
+  it("names the holder instead of an unknown user", () => {
+    render(
+      <AuditActor
+        row={answer({ type: "holder", name: "Alicja", email: "a@example.com" })}
+        t={tFor("common")}
+      />,
+    );
+
+    expect(screen.getByText("Alicja")).toBeInTheDocument();
+    expect(screen.queryByText("Unknown user")).toBeNull();
+  });
+
+  it("still says unknown when no actor was recorded", () => {
+    render(<AuditActor row={answer(null)} t={tFor("common")} />);
+
+    expect(screen.getByText("Unknown user")).toBeInTheDocument();
   });
 });

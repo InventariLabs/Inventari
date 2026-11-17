@@ -220,7 +220,7 @@ async def _change_status(
                 'before': {'assigned_to': active.assigned_to_name},
                 'after': {
                     'assigned_to': None,
-                    'closed_by': 'retired_status',
+                    'closed_by': 'RETIRED',
                 },
             },
             bulk=bulk,

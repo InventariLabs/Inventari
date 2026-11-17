@@ -60,5 +60,9 @@ async def test_the_new_organizations_first_entry_names_the_approving_operator(
     assert entry.target_id == new_org_id
     assert entry.user_id == user.id
     assert entry.snapshot is not None
-    assert entry.snapshot['registration'] == 'approved'
+    assert entry.snapshot['registration'] == 'APPROVED'
     assert entry.snapshot['approved_by_id'] == str(operator.id)
+    # An account outside the new organization: its admin cannot resolve the
+    # id, so the entry says who it was.
+    assert entry.snapshot['approved_by_name'] == operator.full_name
+    assert entry.snapshot['approved_by_email'] == operator.email

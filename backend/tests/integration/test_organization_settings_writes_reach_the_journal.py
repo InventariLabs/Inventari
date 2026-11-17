@@ -76,6 +76,7 @@ class TestSettingsWritesReachTheJournal:
         assert entry.user_id == async_test_user.id
         assert entry.target_id == async_test_household.id
         assert entry.snapshot['after']['sku_schema']['prefix'] == 'WH'
+        assert entry.snapshot['name'] == async_test_household.name
 
         # The same schema again changes nothing, and the journal records
         # changes, not keystrokes.
@@ -111,6 +112,8 @@ class TestSettingsWritesReachTheJournal:
         )
         assert entry.snapshot['name'] == 'webhooks'
         assert entry.snapshot['after']['delivery_timeout_seconds'] == 7
+        # No account travels with the call: the entry says the system acted.
+        assert entry.meta_data == {'actor': {'type': 'system'}}
 
     async def test_binding_a_purpose_names_the_connection_and_the_user(
         self,
@@ -140,8 +143,15 @@ class TestSettingsWritesReachTheJournal:
         )
         assert entry.user_id == async_test_user.id
         assert entry.snapshot['purpose'] == 'vision.extract'
-        assert entry.snapshot['before'] == {'connection_id': None}
-        assert entry.snapshot['after'] == {'connection_id': conn_id}
+        assert entry.snapshot['name'] == async_test_household.name
+        assert entry.snapshot['before'] == {
+            'connection_id': None,
+            'connection_name': None,
+        }
+        assert entry.snapshot['after'] == {
+            'connection_id': conn_id,
+            'connection_name': 'Pool A',
+        }
 
     async def test_a_connection_is_journalled_without_its_key(
         self,
@@ -173,6 +183,9 @@ class TestSettingsWritesReachTheJournal:
         assert [r.action for r in rows] == ['CREATE', 'UPDATE', 'HARD_DELETE']
         assert {str(r.target_id) for r in rows} == {conn_id}
         assert rows[1].snapshot['before'] == {'name': 'Pool A'}
-        assert rows[1].snapshot['after'] == {'name': 'Pool B', 'api_key': 'replaced'}
+        assert rows[1].snapshot['after'] == {
+            'name': 'Pool B',
+            'api_key': 'ROTATED_VALUE',
+        }
         assert rows[2].snapshot['name'] == 'Pool B'
         assert 'NEVER-JOURNALLED' not in ''.join(str(r.snapshot) for r in rows)

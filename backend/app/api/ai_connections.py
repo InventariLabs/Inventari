@@ -80,6 +80,7 @@ from app.core.public_api.llm import (
     LlmTransportError,
     classify_provider_refusal,
 )
+from app.core.settings_diff import ROTATED_VALUE
 from app.i18n.service import get_current_lang, get_error_message
 from app.schemas.ai_connection import (
     SetBindingRequest,
@@ -116,7 +117,7 @@ def _connection_snapshot(conn: AiConnectionDTO) -> dict[str, object]:
     }
 
 
-def _connection_changes(
+def _connection_change_snapshot(
     before: AiConnectionDTO, after: AiConnectionDTO, key_replaced: bool
 ) -> dict[str, object] | None:
     """Before/after of the fields an edit moved, ``None`` when it moved none."""
@@ -128,7 +129,7 @@ def _connection_changes(
         'before': {f: getattr(before, f) for f in moved},
         'after': {
             **{f: getattr(after, f) for f in moved},
-            **({'api_key': 'replaced'} if key_replaced else {}),
+            **({'api_key': ROTATED_VALUE} if key_replaced else {}),
         },
     }
 
@@ -382,7 +383,7 @@ async def update_connection(
         ) from exc
     if result is None or before is None:
         raise NotFoundException(resource='ai_connection')
-    changes = _connection_changes(
+    changes = _connection_change_snapshot(
         before,
         result,
         key_replaced='api_key' in data.model_fields_set

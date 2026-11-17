@@ -501,6 +501,16 @@ class AuthService:
             from app.core.contracts import AuditAction, AuditTargetType
             from app.services.audit_service import log_action_async
 
+            operator = (
+                await db.get(User, registration_request.approved_by_id)
+                if registration_request is not None
+                and registration_request.approved_by_id
+                else None
+            )
+            # The operator is an account outside the new organization, so its
+            # admin cannot resolve an id: the entry carries the name and the
+            # address the operator had at the time (AUDIT.md, "A reference is
+            # written with its name").
             await log_action_async(
                 db,
                 organization_id=organization.id,
@@ -512,16 +522,13 @@ class AuthService:
                     'name': organization.name,
                     'short_id': organization.short_id,
                     'registration': (
-                        'approved'
+                        'APPROVED'
                         if registration_request is not None
-                        else 'first_account'
+                        else 'FIRST_ACCOUNT'
                     ),
-                    'approved_by_id': (
-                        str(registration_request.approved_by_id)
-                        if registration_request is not None
-                        and registration_request.approved_by_id
-                        else None
-                    ),
+                    'approved_by_id': str(operator.id) if operator else None,
+                    'approved_by_name': operator.full_name if operator else None,
+                    'approved_by_email': operator.email if operator else None,
                 },
             )
 
