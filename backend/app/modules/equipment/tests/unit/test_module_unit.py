@@ -24,10 +24,12 @@ class TestEquipmentModule:
     def test_register_contributions(self) -> None:
         with patch('app.core.contributions.contribution_registry') as mock_reg:
             EquipmentModule().register_contributions()
-            # Registers item_interceptors + upload_path_resolvers.
-            assert mock_reg.register.call_count == 2
+            # Registers item_interceptors + storage_interceptors +
+            # upload_path_resolvers.
+            assert mock_reg.register.call_count == 3
             points = [c.args[0] for c in mock_reg.register.call_args_list]
             assert 'item_interceptors' in points
+            assert 'storage_interceptors' in points
             assert 'upload_path_resolvers' in points
 
     def test_on_startup_registers_tasks(self) -> None:

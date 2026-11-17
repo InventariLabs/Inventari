@@ -3,14 +3,18 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.core.context import ModuleContext
-from app.core.interceptors import InterceptorError, ItemInterceptor
+from app.core.interceptors import InterceptorError, ItemInterceptor, StorageInterceptor
 from app.core.logging import get_logger
 from app.core.module_scope import get_context_tags_of
 from app.core.public_api import core_api
-from app.i18n.service import get_current_lang, get_error_message
+from app.i18n.service import (
+    get_current_lang,
+    get_error_message,
+    get_module_error_message,
+)
 
 logger = get_logger(__name__)
 
@@ -172,3 +176,42 @@ class EquipmentItemInterceptor(ItemInterceptor):
                 get_error_message('equipment_still_assigned', get_current_lang()),
                 error_code='EQUIPMENT_ASSIGNED',
             )
+
+
+class CheckoutPlaceStorageGuard(StorageInterceptor):
+    """Veto deleting a place any assignment was ever checked out to.
+
+    ``EquipmentAssignment.checkout_location_id`` is ``ON DELETE SET NULL``, so
+    a delete after the return would blank the holder line of that past
+    checkout in the asset's timeline. The assignment is the asset's own
+    history, like a stock move is the register's: the place is archived, not
+    deleted, once it appears in it — open or closed.
+    """
+
+    priority = 40
+
+    async def before_delete(self, storage_id: UUID, context: ModuleContext) -> None:
+        db = context._db
+        if db is None or not context.organization_id:
+            return
+
+        from .models import EquipmentAssignment
+
+        count = await db.scalar(
+            select(func.count())
+            .select_from(EquipmentAssignment)
+            .where(
+                EquipmentAssignment.organization_id == context.organization_id,
+                EquipmentAssignment.checkout_location_id == storage_id,
+            )
+        )
+        if not count:
+            return
+
+        raise InterceptorError(
+            get_module_error_message(
+                'equipment', 'storage_delete_blocked_by_checkouts'
+            ),
+            error_code='STORAGE_HAS_EQUIPMENT_CHECKOUTS',
+            details={'checkouts': count},
+        )
