@@ -686,7 +686,9 @@
         "purpose": "Przeznaczenie",
         "registration": "Rejestracja",
         "response_id": "Odpowiedź (identyfikator)",
-        "sku_schema": "Schemat SKU"
+        "sku_schema": "Schemat SKU",
+        "body_html": "Treść szablonu",
+        "reset_to_builtin": "Zresetowany do szablonu wbudowanego"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",

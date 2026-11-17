@@ -684,7 +684,9 @@
         "purpose": "Finalidad",
         "registration": "Registro",
         "response_id": "ID de la respuesta",
-        "sku_schema": "Esquema de SKU"
+        "sku_schema": "Esquema de SKU",
+        "body_html": "Contenido de la plantilla",
+        "reset_to_builtin": "Restablecida a la plantilla integrada"
       },
       "showWholeChange": "Mostrar el cambio completo",
       "showLess": "Mostrar menos",

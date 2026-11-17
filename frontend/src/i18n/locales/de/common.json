@@ -684,7 +684,9 @@
         "purpose": "Verwendungszweck",
         "registration": "Registrierung",
         "response_id": "Antwort-ID",
-        "sku_schema": "SKU-Schema"
+        "sku_schema": "SKU-Schema",
+        "body_html": "Vorlageninhalt",
+        "reset_to_builtin": "Auf eingebaute Vorlage zurückgesetzt"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",

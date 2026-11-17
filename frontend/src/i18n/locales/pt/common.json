@@ -644,7 +644,9 @@
         "emailed_to": "Enviado por e-mail para",
         "imported_from": "Importado de",
         "skipped": "Linhas ignoradas",
-        "approval": "Aprovação"
+        "approval": "Aprovação",
+        "body_html": "Conteúdo do modelo",
+        "reset_to_builtin": "Reposto no modelo integrado"
       },
       "showWholeChange": "Mostrar a alteração completa",
       "showLess": "Mostrar menos",

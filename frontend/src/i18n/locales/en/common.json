@@ -684,7 +684,9 @@
         "purpose": "Purpose",
         "registration": "Registration",
         "response_id": "Response",
-        "sku_schema": "SKU schema"
+        "sku_schema": "SKU schema",
+        "body_html": "Template body",
+        "reset_to_builtin": "Reset to built-in template"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",
