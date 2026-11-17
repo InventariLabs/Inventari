@@ -310,7 +310,7 @@ class TestStockAndLots:
         The query filters on the effective expiry (the earlier of the batch
         date and the use-by), but the answer filtered again on the raw batch
         date: an opened jar with a use-by in three days was missing from
-        items while the forecast and GET /items/expiring counted it.
+        items while the forecast and the expiring_days filter counted it.
         """
         use_by = date.today() + timedelta(days=3)
         opened = Item(
