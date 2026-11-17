@@ -205,8 +205,8 @@ nothing but that sandbox.
    the MCP endpoint**, and — if the agent may change stock — **Add products and
    change stock levels**. **Read products and stock levels** is ticked
    already; leave it ticked. Copy the key: it is shown once.
-3. Add the server to the agent. **Apps → MCP Server** prints the address; on
-   the public demo, with Claude Code:
+3. Add the server to the agent. The **MCP Server** tile on the launcher opens a
+   page that prints the address; on the public demo, with Claude Code:
 
    ```bash
    claude mcp add --transport http inventari-demo https://demo.inventari.app/api/v1/mcp-server/mcp --header "X-API-Key: <key>"
@@ -220,8 +220,11 @@ nothing but that sandbox.
    reason and the key's prefix, and **Warehouse** holds one completed
    adjustment document for the correction.
 
-The tools, the permission each needs and how a correction is posted are in
-the MCP Server module's
+Walked on a stack running in demo mode on 2026-11-17, with the rate limiter
+at the production default: from **Try the demo** to the agent's answer took
+about two and a half minutes, and the correction was registered as
+`ADJ/2026/001`. The tools, the permission each needs and how a correction is
+posted are in the MCP Server module's
 [README](../backend/app/modules/mcp_server/README.md#tools).
 
 **What it allows, and what it does not.**
