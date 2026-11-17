@@ -194,20 +194,9 @@ class ShoppingListsAPI:
         ``db.refresh(item, ['category'])`` answered only the relationship.
         """
         from app.core.exceptions import ServiceRejectionError
-        from app.modules.shopping_lists.models import (
-            ShoppingListItem,
-            ShoppingListStatus,
-        )
+        from app.modules.shopping_lists.models import ShoppingListItem
 
-        shopping_list = await self._own_list_or_404_async(db, list_id, org_id)
-        await _require_module_enabled(db, org_id)
-        # The list's own endpoint freezes a completed or archived list; this
-        # door serves the recipe card, the meal plan and production runs, and
-        # used to write onto a list the reader had already finished.
-        if shopping_list.status != ShoppingListStatus.ACTIVE.value:
-            raise ServiceRejectionError(
-                'shopping_list_not_writable', status=shopping_list.status
-            )
+        await self._writable_list_or_refuse_async(db, list_id, org_id)
 
         from app.core.public_api import core_api
 
@@ -302,7 +291,8 @@ class ShoppingListsAPI:
         ticked off is bought and is left alone, and a quantity at or below
         the line's own is not a raise — the line is never lowered. The same
         door guard as ``add_items_async``: the stored value is quantized and
-        a zero or an overflow is refused with the same keys.
+        a zero or an overflow is refused with the same keys, and so is a list
+        that is completed or archived (``shopping_list_not_writable``).
 
         ``notes`` and ``note_data`` replace the line's own when given: they
         describe the need the line was made from, which is no longer the
@@ -310,8 +300,7 @@ class ShoppingListsAPI:
         """
         from app.modules.shopping_lists.models import ShoppingListItem
 
-        await self._own_list_or_404_async(db, list_id, org_id)
-        await _require_module_enabled(db, org_id)
+        await self._writable_list_or_refuse_async(db, list_id, org_id)
 
         stored = _stored_quantity(quantity)
         item = await db.scalar(
@@ -392,6 +381,26 @@ class ShoppingListsAPI:
         ):
             return None
         return need.model_copy(update={'quantity': raised})
+
+    async def _writable_list_or_refuse_async(
+        self, db: AsyncSession, list_id: UUID, org_id: UUID
+    ) -> ShoppingList:
+        """The caller's list, when it is open to writes: every write door asks here.
+
+        The list's own endpoints freeze a completed or archived list; these
+        doors serve the recipe card, the meal plan and production runs, and
+        used to write onto a list the reader had already finished — a new
+        line through ``add_items_async``, a raised quantity through
+        ``raise_item_quantity_async`` (and so through ``top_up_async``).
+        """
+        from app.core.exceptions import ServiceRejectionError
+        from app.modules.shopping_lists.models import ShoppingListStatus
+
+        shopping_list = await self._own_list_or_404_async(db, list_id, org_id)
+        await _require_module_enabled(db, org_id)
+        if shopping_list.status != ShoppingListStatus.ACTIVE.value:
+            raise ServiceRejectionError('shopping_list_not_writable')
+        return shopping_list
 
     async def _own_list_or_404_async(
         self, db: AsyncSession, list_id: UUID, org_id: UUID

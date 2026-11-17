@@ -807,6 +807,44 @@ class TestAlwaysAtHomeAndTheRefresh:
         ]
         assert Decimal(str(second['items'][0]['quantity'])) == Decimal('500')
 
+    def test_a_completed_list_keeps_its_quantity_when_the_plan_needs_more(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """A finished list is the reader's record: the refresh is refused, not applied."""
+        plan_id = _plan_with(
+            client,
+            auth_headers,
+            db_session,
+            ingredient_names=['Pierwszy'],
+            grams='100',
+        )
+        first = _generate(client, auth_headers, plan_id)
+        list_url = f'/api/v1/shopping-lists/{first["shopping_list_id"]}'
+        db_session.execute(
+            text('UPDATE shopping_lists SET status = :s WHERE id = :i'),
+            {'s': 'completed', 'i': first['shopping_list_id']},
+        )
+        db_session.commit()
+        client.put(
+            f'{PLAN_URL}/{plan_id}',
+            json={'default_servings': 5},
+            headers=auth_headers,
+        )
+
+        refused = client.post(
+            f'{PLAN_URL}/{plan_id}/generate-shopping-list', headers=auth_headers
+        )
+
+        assert refused.status_code == 400, refused.text
+        assert refused.json()['detail']['code'] == 'SHOPPING_LIST_NOT_WRITABLE'
+        lines = client.get(list_url, headers=auth_headers).json()['items']
+        assert [(i['name'], Decimal(str(i['quantity']))) for i in lines] == [
+            ('Pierwszy', Decimal('200'))
+        ]
+
     def test_a_line_already_bought_keeps_its_quantity_and_the_rest_is_added(
         self,
         client: TestClient,

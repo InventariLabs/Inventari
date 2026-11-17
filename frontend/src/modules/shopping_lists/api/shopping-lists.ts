@@ -81,7 +81,7 @@ export const shoppingListsApi = {
 
   update: async (
     id: string,
-    data: { name?: string },
+    data: { name?: string; status?: string },
   ): Promise<ShoppingList> => {
     const response = await api.put<ShoppingList>(`/shopping-lists/${id}`, data);
     return response.data;

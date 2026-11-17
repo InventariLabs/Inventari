@@ -21,6 +21,12 @@
   },
   "completed": "Erledigt",
   "detail": {
+    "completedTitle": "Diese Liste ist erledigt",
+    "archivedTitle": "Diese Liste ist archiviert",
+    "frozenHint": "Solange das so bleibt, lassen sich keine Einträge hinzufügen, abhaken oder entfernen.",
+    "reactivate": "Wieder aktivieren",
+    "reactivated": "Liste wieder aktiviert",
+    "errorReactivate": "Die Liste konnte nicht wieder aktiviert werden",
     "purchased": "gekauft",
     "addItem": "Artikel hinzufügen",
     "clearPurchased": "Gekaufte löschen ({{count}})",

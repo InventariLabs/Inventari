@@ -452,6 +452,41 @@ class TestARecipeOnTheListTwice:
         )
         assert items.json()['items'] == []
 
+    def test_the_refusal_of_a_completed_list_reads_in_the_readers_language(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        """The sentence named the list's status as the raw stored word."""
+        grams = str(_uom_id(db_session, 'g'))
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [{'name': 'Flour', 'quantity': '500', 'uom_id': grams}],
+        )
+        done = client.post(
+            '/api/v1/shopping-lists', json={'name': 'Done'}, headers=auth_headers
+        ).json()['id']
+        client.put(
+            f'/api/v1/shopping-lists/{done}',
+            json={'status': 'completed'},
+            headers=auth_headers,
+        )
+
+        response = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 1, 'shopping_list_id': done},
+            headers={**auth_headers, 'Accept-Language': 'pl'},
+        )
+
+        assert response.status_code == 400, response.text
+        assert response.json()['detail']['message'] == (
+            'Ta lista zakupów nie jest już otwarta i nie można jej zmieniać. '
+            'Najpierw ją reaktywuj.'
+        )
+
     def test_a_second_recipe_needing_the_same_goods_tops_the_line_up(
         self,
         client: TestClient,

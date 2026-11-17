@@ -194,11 +194,7 @@ async def _require_writable_list(
     if getattr(shopping_list, 'status', 'active') in ('completed', 'archived'):
         raise ConflictException(
             'SHOPPING_LIST_NOT_EDITABLE',
-            get_error_message(
-                'shopping_list_not_writable',
-                lang,
-                status=shopping_list.status,
-            ),
+            get_error_message('shopping_list_not_writable', lang),
         )
     return shopping_list
 

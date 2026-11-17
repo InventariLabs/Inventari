@@ -193,6 +193,17 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A completed or archived shopping list is a closed record and is no longer
+  written to. It is no longer offered or preselected as the place for new
+  items — the recipe card, the scan add, the product quick action, the
+  inventory dashboard card and Replenish All all pick the newest active list
+  — and adding to it from a recipe, or refreshing a meal plan's list so that a
+  line of it asks for more, is refused with "Reactivate it first" instead of
+  changing it. `GET /api/v1/shopping-lists` takes a `status` filter
+  (`active`, `completed` or `archived`). The page of a completed or archived
+  list now says so and offers **Reactivate** in place of Add, From recipes and
+  the other changes, and the refusal names no status word, so it reads the
+  same in every language.
 - The cost analysis no longer counts a production run's product, or the
   ingredients put back when a run is undone, as money spent. They were added
   to the purchases they came from, so the same grapes were counted when
