@@ -136,6 +136,10 @@ class ReplenishmentAlertDTO(BaseModel):
     # alert without one as "no supplier" instead of offering a draft PO.
     preferred_partner_id: UUID | None = None
     preferred_partner_name: str | None = None
+    #: The product has a recipe the organization makes it by: the alert says
+    #: to produce it, not to buy it, and no supplier or draft order is
+    #: proposed for it. False while the production module is off.
+    make_instead: bool = False
 
 
 class ReplenishmentMoveLineDTO(BaseModel):
@@ -199,6 +203,22 @@ class PartnerPricelistDTO(BaseModel):
     notes: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+
+class OpenOrderLineDTO(BaseModel):
+    """What one open purchase order line still expects, in the product's stock unit.
+
+    A planner reading a shortage wants not only how much is already on order
+    but when it is due, so a line comes with its order's number and expected
+    date. ``expected_date`` is ``None`` when the order carries none.
+    """
+
+    product_template_id: UUID
+    purchase_order_id: UUID
+    number: str
+    status: str
+    expected_date: date | None = None
+    outstanding_quantity: Decimal
 
 
 class PurchaseOrderLineInput(BaseModel):

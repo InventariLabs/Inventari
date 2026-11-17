@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { DuplicateOrderButton } from "./DuplicateOrderButton";
 import { Card } from "@/components/ui/Card";
+import { ProductionCoverageBadge } from "@/modules/maker/components/ProductionCoverageBadge";
 import { ProductionShortageSignal } from "@/modules/maker/components/ProductionShortageSignal";
 import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
@@ -123,6 +124,7 @@ export function ProductionTable({
                   </td>
                   <td className="px-3 py-2.5">
                     <ProductionStatusBadge status={order.status} />
+                    <ProductionCoverageBadge coverage={order.coverage} />
                     {/* The grid card names the blocker; the row the planner
                         scans in a hurry may not say less. */}
                     <ProductionShortageSignal count={order.shortage_count} />

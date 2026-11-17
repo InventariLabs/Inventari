@@ -35,6 +35,7 @@ const ALERT_WITH_SUPPLIER: ReplenishmentAlert = {
   remaining_to_buy: 0,
   preferred_partner_id: "p-1",
   preferred_partner_name: "ACME",
+  make_instead: false,
 };
 
 const ALERT_WITHOUT_SUPPLIER: ReplenishmentAlert = {
@@ -202,5 +203,32 @@ describe("ReorderAlertsCard draft-PO action", () => {
     expect(toast.info).toHaveBeenCalledWith(
       "1 alert skipped (covered by reserve, no supplier, or no shortage)",
     );
+  });
+
+  it("says a made product is produced, with no supplier and no draft order", () => {
+    render(
+      <ReorderAlertsCard
+        alerts={[
+          {
+            ...ALERT_WITHOUT_SUPPLIER,
+            product_name: "Bread",
+            make_instead: true,
+            remaining_to_buy: 17,
+          },
+        ]}
+        locationName={locationName}
+        canWrite
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(screen.getByText("Made here")).toBeInTheDocument();
+    expect(screen.queryByText("No supplier")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Plan a run" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Create draft POs" }),
+    ).not.toBeInTheDocument();
   });
 });

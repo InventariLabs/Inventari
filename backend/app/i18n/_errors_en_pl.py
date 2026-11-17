@@ -414,6 +414,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         ),
         'cost_line_not_found': 'Cost line not found',
         'production_order_not_found': 'Production order not found',
+        'production_needs_scope': 'The needs of planned runs are read for one run, or for both ends of a period',
+        'production_needs_period_reversed': 'The period ends before it starts',
         'production_no_recipe': ('No BOM for this product — create a BOM first'),
         'production_recipe_not_found': (
             'BOM {recipe_id} not found in this organization'
@@ -1474,6 +1476,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         ),
         'cost_line_not_found': 'Pozycja kosztowa nie została znaleziona',
         'production_order_not_found': 'Zlecenie produkcyjne nie zostało znalezione',
+        'production_needs_scope': 'Potrzeby zaplanowanych zleceń czyta się dla jednego zlecenia albo dla obu końców okresu',
+        'production_needs_period_reversed': 'Okres kończy się przed swoim początkiem',
         'production_no_recipe': (
             'Brak receptury dla tego produktu — najpierw utwórz recepturę'
         ),

@@ -28,6 +28,7 @@ from app.i18n.service import get_current_lang, get_error_message
 from . import (
     availability_service,
     output_batch,
+    planning_service,
     production_reversal,
     production_service,
 )
@@ -132,6 +133,7 @@ async def _read_with_uom(
         db, org_id, [order]
     )
     items = shortage_signals.get(order.id)
+    plan_coverage = await _plan_coverage_of(db, org_id, [order])
     portions = (
         await production_service.list_portions(db, org_id, order.id)
         if order.status in ('IN_PROGRESS', 'COMPLETED', 'REVERSED')
@@ -143,6 +145,7 @@ async def _read_with_uom(
         portions=portions,
         produced_item_name=produced_item_name,
         output_uom_symbol=symbols.get(order.output_template_id),
+        plan_coverage=plan_coverage.get(order.id),
         shortage_count=len(items) if items is not None else None,
         shortage_items=(
             [ShortageItemRead.model_validate(item) for item in items]
@@ -168,6 +171,20 @@ async def _read_with_uom(
     return read.model_copy(update=batch)
 
 
+async def _plan_coverage_of(
+    db: AsyncSession, org_id: UUID, orders: list[ProductionOrder]
+) -> dict[UUID, planning_service.PlanCoverage]:
+    """The plan's coverage of the drafts among *orders* (nothing for the rest).
+
+    The queue a draft is measured in is every draft of the organization, not
+    the page, so a run on page two still counts the runs before it; the
+    lookup returns before touching the database when no draft is asked for.
+    """
+    if not any(o.status == 'DRAFT' for o in orders):
+        return {}
+    return await planning_service.coverage_for_drafts(db, org_id)
+
+
 def _to_read(
     order: ProductionOrder,
     lines: list[ProductionOrderLine] | None = None,
@@ -176,6 +193,7 @@ def _to_read(
     shortage_count: int | None = None,
     shortage_items: list[ShortageItemRead] | None = None,
     portions: list[ProductionPortion] | None = None,
+    plan_coverage: planning_service.PlanCoverage | None = None,
 ) -> ProductionOrderRead:
     line_rows = lines if lines is not None else []
     return ProductionOrderRead(
@@ -214,6 +232,12 @@ def _to_read(
         ),
         shortage_count=shortage_count,
         shortage_items=shortage_items,
+        coverage=plan_coverage.status if plan_coverage is not None else None,
+        coverage_items=(
+            [ShortageItemRead.model_validate(item) for item in plan_coverage.items]
+            if plan_coverage is not None
+            else None
+        ),
         unit_cost_snapshot=order.unit_cost_snapshot,
         reference_price_snapshot=order.reference_price_snapshot,
         result_per_unit=order.result_per_unit,
@@ -267,6 +291,8 @@ async def list_production_orders(
     sort: str = Query('newest', pattern='^(newest|oldest|cost_desc)$'),
     date_from: date_type | None = Query(None),
     date_to: date_type | None = Query(None),
+    planned_from: date_type | None = Query(None),
+    planned_to: date_type | None = Query(None),
     # ``skip`` stays the wire name: the maker screens send it and the REST
     # query shipped with 0.11. Everything below the router says ``offset``.
     skip: int = Query(0, ge=0),
@@ -283,6 +309,8 @@ async def list_production_orders(
         sort=sort,
         date_from=date_from,
         date_to=date_to,
+        planned_from=planned_from,
+        planned_to=planned_to,
         offset=skip,
         limit=limit,
     )
@@ -294,11 +322,13 @@ async def list_production_orders(
     shortage_signals = await availability_service.shortage_signals_for_orders(
         db, org_id, list(orders)
     )
+    plan_coverage = await _plan_coverage_of(db, org_id, list(orders))
     return ProductionOrderListResponse.from_slice(
         items=[
             _to_read(
                 o,
                 output_uom_symbol=order_uom_symbols.get(o.output_template_id),
+                plan_coverage=plan_coverage.get(o.id),
                 shortage_count=(
                     len(items)
                     if (items := shortage_signals.get(o.id)) is not None

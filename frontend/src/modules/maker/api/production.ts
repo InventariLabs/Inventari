@@ -23,6 +23,8 @@ export const productionApi = {
     sort?: string;
     date_from?: string;
     date_to?: string;
+    planned_from?: string;
+    planned_to?: string;
     skip?: number;
     limit?: number;
   }): Promise<ProductionOrderListResponse> => {

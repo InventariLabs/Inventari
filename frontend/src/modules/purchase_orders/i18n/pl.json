@@ -301,7 +301,9 @@
     "count_few": "reguły",
     "count_many": "reguł",
     "count_other": "reguł",
-    "overCapacity": "Reguła zapisana. Uwaga: chce {{max}} przy uzupełnianiu — więcej, niż mieści półka ({{capacity}})."
+    "overCapacity": "Reguła zapisana. Uwaga: chce {{max}} przy uzupełnianiu — więcej, niż mieści półka ({{capacity}}).",
+    "madeHere": "Produkowane u nas",
+    "planRun": "Zaplanuj zlecenie"
   },
   "productPicker": {
     "search": "Szukaj produktu…",

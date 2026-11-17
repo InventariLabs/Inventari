@@ -1,6 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, ArrowRightLeft, ShoppingCart } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRightLeft,
+  Hammer,
+  ShoppingCart,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -103,12 +108,14 @@ export function ReorderAlertsCard({
                 })}
               </span>
               <span className="text-xs text-on-secondary">
-                {alert.remaining_to_buy === 0
-                  ? t("reorderRules.coveredByReserve")
-                  : alert.remaining_to_buy != null &&
-                    t("reorderRules.remainingToBuy", {
-                      quantity: formatDecimalQty(alert.remaining_to_buy),
-                    })}
+                {alert.make_instead
+                  ? null
+                  : alert.remaining_to_buy === 0
+                    ? t("reorderRules.coveredByReserve")
+                    : alert.remaining_to_buy != null &&
+                      t("reorderRules.remainingToBuy", {
+                        quantity: formatDecimalQty(alert.remaining_to_buy),
+                      })}
               </span>
               {alert.proposed_move_quantity > 0 && canWrite && (
                 <Button
@@ -124,7 +131,9 @@ export function ReorderAlertsCard({
                   {t("reorderRules.replenish")}
                 </Button>
               )}
-              {alert.preferred_partner_name ? (
+              {alert.make_instead ? (
+                <MakeInsteadAction alert={alert} canWrite={canWrite} />
+              ) : alert.preferred_partner_name ? (
                 <span className="text-xs text-on-muted">
                   {t("reorderRules.alertSupplier", {
                     supplier: alert.preferred_partner_name,
@@ -138,5 +147,42 @@ export function ReorderAlertsCard({
         </ul>
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * A product the organization makes is produced, not bought: the alert says so
+ * and, for an account that may plan runs, opens the production screen on the
+ * product with what the shelf is missing.
+ */
+function MakeInsteadAction({
+  alert,
+  canWrite,
+}: {
+  alert: ReplenishmentAlert;
+  canWrite: boolean;
+}) {
+  const { t } = useTranslation("purchase_orders");
+  const navigate = useNavigate();
+  const quantity = alert.remaining_to_buy ?? alert.suggested_reorder_quantity;
+  return (
+    <>
+      <Badge variant="info">{t("reorderRules.madeHere")}</Badge>
+      {canWrite && quantity > 0 && (
+        <Button
+          size="sm"
+          variant="outline"
+          leftIcon={<Hammer size={14} />}
+          onClick={() =>
+            navigate(
+              `/maker/production?plan=${alert.product_template_id}` +
+                `&quantity=${quantity}`,
+            )
+          }
+        >
+          {t("reorderRules.planRun")}
+        </Button>
+      )}
+    </>
   );
 }

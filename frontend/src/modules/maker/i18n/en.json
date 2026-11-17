@@ -6,7 +6,8 @@
   "navigation": {
     "production": "Runs",
     "catalog": "BOMs",
-    "settings": "Settings"
+    "settings": "Settings",
+    "plan": "Plan"
   },
   "productionList": {
     "title": "Production runs",
@@ -793,6 +794,71 @@
       "sugars": "sugars",
       "protein": "protein",
       "salt": "salt"
+    }
+  },
+  "coverage": {
+    "covered": "Covered",
+    "partial": "Partly covered",
+    "short": "Short"
+  },
+  "planning": {
+    "title": "Production plan",
+    "subtitle": "Planned runs by day, and everything they need in one list.",
+    "previous": "Previous period",
+    "next": "Next period",
+    "view": {
+      "label": "Period",
+      "week": "Week",
+      "month": "Month"
+    },
+    "move": {
+      "button": "Move",
+      "aria": "Move {{name}} to another day",
+      "title": "Move {{name}}",
+      "day": "New day",
+      "now": "Planned for {{date}} now.",
+      "save": "Move",
+      "cancel": "Cancel",
+      "failed": "The run could not be moved."
+    },
+    "coverage": {
+      "title": "Position in the plan",
+      "coveredNote": "After the runs planned before it, the stock still covers this run.",
+      "shortNote": "After the runs planned before it, the stock falls short of this run. Left for it:",
+      "leftOf": "{{left}} left of {{needed}}"
+    },
+    "needs": {
+      "title": "What the planned runs need",
+      "ingredient": "Ingredient",
+      "needed": "Needed",
+      "inStock": "In stock",
+      "onOrder": "On order",
+      "missing": "Missing",
+      "make": "Make",
+      "planned": "Planned: {{qty}}",
+      "noDate": "no date",
+      "emptyTitle": "No runs planned in this period",
+      "emptyDescription": "Plan a run with a day, and what it needs shows up here.",
+      "unmeasured": "Not counted, their units cannot be compared with stock: {{names}}."
+    },
+    "order": {
+      "button": "Order what is missing",
+      "created_one": "{{count}} draft order created",
+      "created_other": "{{count}} draft orders created",
+      "listed_one": "{{count}} ingredient put on the shopping list",
+      "listed_other": "{{count}} ingredients put on the shopping list",
+      "toMake_one": "{{count}} ingredient to make, not buy",
+      "toMake_other": "{{count}} ingredients to make, not buy",
+      "unplaced_one": "{{count}} ingredient has no supplier and no list",
+      "unplaced_other": "{{count}} ingredients have no supplier and no list",
+      "nothing": "Nothing to order.",
+      "failed": "The order could not be placed."
+    },
+    "intermediates": {
+      "button": "Plan runs of what is missing",
+      "planned_one": "{{count}} run planned",
+      "planned_other": "{{count}} runs planned",
+      "failed": "The runs could not be planned."
     }
   }
 }

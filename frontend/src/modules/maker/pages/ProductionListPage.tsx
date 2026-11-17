@@ -15,6 +15,7 @@ import { useDuplicateOrderNavigation } from "@/modules/maker/hooks/useDuplicateO
 import { DuplicateOrderButton } from "@/modules/maker/components/DuplicateOrderButton";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
+import { usePlanFromLink } from "@/modules/maker/hooks/usePlanFromLink";
 import { ProductionCreateSheet } from "@/modules/maker/components/ProductionCreateSheet";
 import { ProductionListFilters } from "@/modules/maker/components/ProductionListFilters";
 import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
@@ -26,6 +27,7 @@ import type {
 import { formatDate } from "@/utils/helpers";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatMoney } from "@/utils/formatters";
+import { ProductionCoverageBadge } from "@/modules/maker/components/ProductionCoverageBadge";
 import { ProductionShortageSignal } from "@/modules/maker/components/ProductionShortageSignal";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
@@ -170,6 +172,7 @@ export default function ProductionListPage() {
   );
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const { planned, clearPlan } = usePlanFromLink();
   const [sort, setSort] = useState("newest");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -395,6 +398,7 @@ export default function ProductionListPage() {
                     language={i18n.language}
                   />
                   <ProductionShortageSignal count={order.shortage_count} />
+                  <ProductionCoverageBadge coverage={order.coverage} />
                   <CardResult
                     order={order}
                     currency={currency}
@@ -455,12 +459,16 @@ export default function ProductionListPage() {
       />
 
       <ProductionCreateSheet
-        open={showCreate}
-        onClose={() => setShowCreate(false)}
+        open={showCreate || planned !== undefined}
+        onClose={() => {
+          setShowCreate(false);
+          clearPlan();
+        }}
         onSuccess={(orderId) => {
           setShowCreate(false);
           navigate(`/maker/production/${orderId}`);
         }}
+        preselectedProduct={planned}
       />
     </div>
   );

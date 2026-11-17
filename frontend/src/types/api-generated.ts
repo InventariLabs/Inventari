@@ -3969,6 +3969,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maker/production/needs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Combined Needs
+         * @description What the planned runs of a period (or one run) need, in one list.
+         *
+         *     Per ingredient: what is needed, what is in stock once the runs planned
+         *     before the period have taken theirs, what open purchase orders still
+         *     expect (with their dates) and what is still missing. ``on_order`` is null
+         *     while purchasing is off.
+         */
+        get: operations["get_combined_needs_api_v1_maker_production_needs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/needs/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Order Missing
+         * @description Order what is missing: a draft purchase order per supplier.
+         *
+         *     Each ingredient goes to the supplier with the lowest price, in that
+         *     supplier's unit. Ingredients nobody offers go to the shopping list;
+         *     ingredients with a recipe of their own come back as ``to_make`` — they are
+         *     planned as runs, not bought.
+         */
+        post: operations["order_missing_api_v1_maker_production_needs_order_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maker/production/needs/plan-intermediates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Plan Intermediates
+         * @description Plan a run of each missing intermediate product, on the day it is first needed.
+         */
+        post: operations["plan_intermediates_api_v1_maker_production_needs_plan_intermediates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maker/production/orders": {
         parameters: {
             query?: never;
@@ -15672,6 +15742,23 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /**
+         * ExpectedDeliveryRead
+         * @description An open purchase order line that will bring some of an ingredient.
+         */
+        ExpectedDeliveryRead: {
+            /**
+             * Purchase Order Id
+             * Format: uuid
+             */
+            purchase_order_id: string;
+            /** Number */
+            number: string;
+            /** Expected Date */
+            expected_date: string | null;
+            /** Quantity */
+            quantity: string;
+        };
         /** ExpenseForecastResponse */
         ExpenseForecastResponse: {
             /** Forecast Period */
@@ -18676,6 +18763,68 @@ export interface components {
             /** Tax Rate Id */
             tax_rate_id: string | null;
         };
+        /**
+         * NeedRowRead
+         * @description One ingredient of the combined list, in its own stock unit.
+         */
+        NeedRowRead: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Name */
+            name: string | null;
+            /** Uom Symbol */
+            uom_symbol: string | null;
+            /** Needed */
+            needed: string;
+            /** In Stock */
+            in_stock: string;
+            /** On Order */
+            on_order: string | null;
+            /** Expected */
+            expected: components["schemas"]["ExpectedDeliveryRead"][];
+            /** Missing */
+            missing: string;
+            /** Planned */
+            planned: string;
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "buy" | "make";
+            /** Needed By */
+            needed_by?: string | null;
+            /** Output Location Id */
+            output_location_id?: string | null;
+        };
+        /**
+         * NeedsRead
+         * @description Output for GET /production/needs.
+         */
+        NeedsRead: {
+            /** Rows */
+            rows: components["schemas"]["NeedRowRead"][];
+            /** Purchasing */
+            purchasing: boolean;
+            /** Run Count */
+            run_count: number;
+            /** Unmeasured */
+            unmeasured: string[];
+        };
+        /**
+         * NeedsScope
+         * @description Which runs a needs request is about: one run, or the runs of a period.
+         */
+        NeedsScope: {
+            /** Order Id */
+            order_id?: string | null;
+            /** Date From */
+            date_from?: string | null;
+            /** Date To */
+            date_to?: string | null;
+        };
         /** NotificationDTO */
         NotificationDTO: {
             /**
@@ -18798,6 +18947,56 @@ export interface components {
             unmatched: number;
             /** Stubs Created */
             stubs_created: number;
+        };
+        /**
+         * OrderMissingRead
+         * @description Output for POST /production/needs/order — what ordering the missing did.
+         */
+        OrderMissingRead: {
+            /** Purchase Orders */
+            purchase_orders: components["schemas"]["OrderedPurchaseRead"][];
+            /**
+             * Shopping List Added
+             * @default 0
+             */
+            shopping_list_added: number;
+            /** Shopping List Name */
+            shopping_list_name?: string | null;
+            /** Unplaced */
+            unplaced: components["schemas"]["NeedRowRead"][];
+            /** To Make */
+            to_make: components["schemas"]["NeedRowRead"][];
+        };
+        /** OrderedLineRead */
+        OrderedLineRead: {
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Name */
+            name: string | null;
+            /** Quantity */
+            quantity: string;
+            /** Uom Symbol */
+            uom_symbol: string | null;
+        };
+        /** OrderedPurchaseRead */
+        OrderedPurchaseRead: {
+            /**
+             * Purchase Order Id
+             * Format: uuid
+             */
+            purchase_order_id: string;
+            /** Number */
+            number: string;
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+            /** Lines */
+            lines: components["schemas"]["OrderedLineRead"][];
         };
         /** Organization */
         Organization: {
@@ -21321,6 +21520,35 @@ export interface components {
             custom_field_categories?: string[] | null;
         };
         /**
+         * PlanIntermediatesRead
+         * @description Output for POST /production/needs/plan-intermediates.
+         */
+        PlanIntermediatesRead: {
+            /** Runs */
+            runs: components["schemas"]["PlannedIntermediateRead"][];
+        };
+        /** PlannedIntermediateRead */
+        PlannedIntermediateRead: {
+            /**
+             * Order Id
+             * Format: uuid
+             */
+            order_id: string;
+            /** Number */
+            number: string | null;
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+            /** Name */
+            name: string | null;
+            /** Planned Qty */
+            planned_qty: string;
+            /** Production Date */
+            production_date: string | null;
+        };
+        /**
          * PreviewIngredient
          * @description Parsed ingredient returned inside a recipe import preview.
          */
@@ -22307,6 +22535,10 @@ export interface components {
             shortage_count?: number | null;
             /** Shortage Items */
             shortage_items?: components["schemas"]["ShortageItemRead"][] | null;
+            /** Coverage */
+            coverage?: ("covered" | "partial" | "short") | null;
+            /** Coverage Items */
+            coverage_items?: components["schemas"]["ShortageItemRead"][] | null;
             /** Unit Cost Snapshot */
             unit_cost_snapshot?: string | null;
             /** Reference Price Snapshot */
@@ -24938,6 +25170,11 @@ export interface components {
             preferred_partner_id?: string | null;
             /** Preferred Partner Name */
             preferred_partner_name?: string | null;
+            /**
+             * Make Instead
+             * @default false
+             */
+            make_instead: boolean;
         };
         /**
          * ReplenishmentDraftPosCreate
@@ -24970,7 +25207,8 @@ export interface components {
          *     at or above the minimum right now), ``covered_by_reserve`` (the
          *     proposed internal move covers the whole shortage, so there is nothing
          *     to buy), ``no_supplier`` (neither the rule nor the price list names
-         *     a supplier; reported, never turned into an empty order).
+         *     a supplier; reported, never turned into an empty order), ``made_here``
+         *     (the product has a recipe: it is produced, not bought).
          */
         ReplenishmentDraftSkipped: {
             /**
@@ -37018,6 +37256,105 @@ export interface operations {
             };
         };
     };
+    get_combined_needs_api_v1_maker_production_needs_get: {
+        parameters: {
+            query?: {
+                date_from?: string | null;
+                date_to?: string | null;
+                order_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NeedsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    order_missing_api_v1_maker_production_needs_order_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NeedsScope"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderMissingRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_intermediates_api_v1_maker_production_needs_plan_intermediates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NeedsScope"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanIntermediatesRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_production_orders_api_v1_maker_production_orders_get: {
         parameters: {
             query?: {
@@ -37026,6 +37363,8 @@ export interface operations {
                 sort?: string;
                 date_from?: string | null;
                 date_to?: string | null;
+                planned_from?: string | null;
+                planned_to?: string | null;
                 skip?: number;
                 limit?: number;
             };

@@ -143,7 +143,7 @@ printing | owner=core | expires=2027-06-30 | the print queue and label rendering
   app.i18n.service
   app.modules.maker.maker_api
 
-purchase_orders | owner=core | expires=2027-06-30 | purchasing uses core money, PDF, import and template helpers directly; the module predates the SDK. Its approvals and warehouse imports are those modules' public APIs, exceptions and schemas.
+purchase_orders | owner=core | expires=2027-06-30 | purchasing uses core money, PDF, import and template helpers directly; the module predates the SDK. Its approvals and warehouse imports are those modules' public APIs, exceptions and schemas. A reorder alert for a product production makes asks production, through maker_api, which products have a formula: whether to make or buy is production's knowledge, purchasing only words the alert.
   app.core.context
   app.core.cost_estimates
   app.core.datetimes
@@ -171,6 +171,7 @@ purchase_orders | owner=core | expires=2027-06-30 | purchasing uses core money, 
   app.modules.approvals.approvals_api
   app.modules.approvals.exceptions
   app.modules.approvals.schemas
+  app.modules.maker.maker_api
   app.modules.warehouse.warehouse_api
   app.schemas.pagination
   app.schemas.partner

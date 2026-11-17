@@ -17,6 +17,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import (
+    OpenOrderLineDTO,
     PartnerPricelistDTO,
     PurchaseOrderCreateInput,
     PurchaseOrderDTO,
@@ -521,6 +522,83 @@ class PurchaseOrdersAPI:
                 outstanding.get(template_id, Decimal('0')) + in_stock_unit
             )
         return outstanding
+
+    async def list_open_order_lines_async(
+        self,
+        db: AsyncSession,
+        org_id: UUID,
+        product_template_ids: list[UUID],
+    ) -> list[OpenOrderLineDTO]:
+        """The open order lines that still expect these products, soonest first.
+
+        The lines :meth:`outstanding_ordered_quantities_async` adds up, one by
+        one and with their order's number and expected date: a draft, a parked
+        or a confirmed order, what has not arrived yet, in the product's stock
+        unit. Lines with nothing outstanding are left out; an order with no
+        date comes last.
+        """
+        from sqlalchemy import select
+
+        from app.core.public_api import core_api
+        from app.modules.purchase_orders.models import (
+            PurchaseOrder,
+            PurchaseOrderLine,
+        )
+
+        if not product_template_ids:
+            return []
+        rows = await db.execute(
+            select(
+                PurchaseOrderLine.product_template_id,
+                PurchaseOrderLine.quantity_ordered,
+                PurchaseOrderLine.quantity_received,
+                PurchaseOrderLine.uom_id,
+                PurchaseOrder.id,
+                PurchaseOrder.number,
+                PurchaseOrder.status,
+                PurchaseOrder.scheduled_date,
+            )
+            .join(
+                PurchaseOrder, PurchaseOrder.id == PurchaseOrderLine.purchase_order_id
+            )
+            .where(
+                PurchaseOrder.organization_id == org_id,
+                PurchaseOrder.status.in_(('DRAFT', 'PENDING_APPROVAL', 'CONFIRMED')),
+                PurchaseOrderLine.product_template_id.in_(product_template_ids),
+            )
+            .order_by(
+                PurchaseOrder.scheduled_date.asc().nulls_last(),
+                PurchaseOrder.number,
+                PurchaseOrderLine.id,
+            )
+        )
+        lines: list[OpenOrderLineDTO] = []
+        for (
+            template_id,
+            ordered,
+            received,
+            uom_id,
+            po_id,
+            number,
+            status,
+            due,
+        ) in rows.all():
+            remaining = Decimal(str(ordered or 0)) - Decimal(str(received or 0))
+            if remaining <= 0 or template_id is None:
+                continue
+            lines.append(
+                OpenOrderLineDTO(
+                    product_template_id=template_id,
+                    purchase_order_id=po_id,
+                    number=number,
+                    status=status,
+                    expected_date=due,
+                    outstanding_quantity=await core_api.uoms.to_stock_uom_async(
+                        db, org_id, template_id, remaining, uom_id
+                    ),
+                )
+            )
+        return lines
 
     async def get_line_labels_async(
         self,

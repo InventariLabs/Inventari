@@ -14,6 +14,27 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- Planning several production runs at once. A planned run no longer reads the
+  shelf as if it were the only one on it: the draft runs are counted one after
+  another, by planned day and then by creation, so two runs that each fit on
+  the shelf are not both shown as covered — the run list and a run's page say
+  **covered**, **partly covered** or **short**. A new **Plan** screen in
+  Production shows the planned runs of a week or a month by day (a list by day
+  on a phone), moves a run to another day, and lists everything those runs need
+  in one place: in stock, on order in open purchase orders with their expected
+  dates (the column is absent while purchasing is off), and still missing.
+  **Order what is missing** raises one draft purchase order per supplier from
+  each ingredient's best price in the supplier's own unit, sends ingredients
+  with no supplier to the shopping list, and proposes an ingredient that has a
+  recipe of its own as a planned run instead of a purchase. A run that uses
+  such an ingredient counts on what the shelf holds of it and on runs of it
+  planned for its day or earlier — never on a run planned after it — and the
+  run list and the needs list say the same about it. What is on order or
+  planned is spent once: a delivery ordered for one week, or a run planned for
+  it, is not counted again by a later one. A product you make that falls below
+  its reorder minimum is now proposed as a production run, in To do and in the
+  reorder alerts, and no longer as a purchase.
+
 - A production run can be started, filled in portions and finished on
   different days, for wine, cheese, beer, ferments and anything else that
   matures. **Start run** takes the ingredients off the records on the day you

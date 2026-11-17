@@ -355,6 +355,8 @@ class ErrorMessages(TypedDict):
     cost_line_not_found: str
     production_order_not_found: str
     production_no_recipe: str
+    production_needs_scope: str
+    production_needs_period_reversed: str
     production_recipe_not_found: str
     production_recipe_product_mismatch: str
     production_complete_not_draft: str

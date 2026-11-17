@@ -287,7 +287,9 @@
     "minPositive": "El mínimo debe ser mayor que 0 — es el umbral que activa la regla",
     "count_one": "regla",
     "count_other": "reglas",
-    "overCapacity": "Regla guardada. Atención: quiere {{max}} por reabastecimiento — más de lo que admite la ubicación ({{capacity}})."
+    "overCapacity": "Regla guardada. Atención: quiere {{max}} por reabastecimiento — más de lo que admite la ubicación ({{capacity}}).",
+    "madeHere": "Se fabrica aquí",
+    "planRun": "Planificar una orden"
   },
   "productPicker": {
     "search": "Buscar producto…",
