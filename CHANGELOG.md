@@ -214,6 +214,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The first `make dev-up` on a machine that has no images yet no longer
+  fails with a duplicate-type error from a module's migration. The backend's
+  first start and the bootstrap's own `db upgrade` migrated the same empty
+  database at the same time, the container restarted and the bootstrap
+  stopped with `Error 137`; `manage.py db upgrade` now waits for the lock the
+  backend takes while it migrates, so the two run one after the other.
+
 - A completed or archived shopping list is a closed record and is no longer
   written to. It is no longer offered or preselected as the place for new
   items — the recipe card, the scan add, the product quick action, the
