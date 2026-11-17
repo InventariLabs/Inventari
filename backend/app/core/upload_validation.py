@@ -181,8 +181,15 @@ async def read_import_file(file: UploadFile, lang: Language | None = None) -> by
 MAX_UPLOAD_IMAGE_PIXELS = 60_000_000
 
 
-class ImageUnreadableError(ValueError):
-    """The bytes are not a picture this server will decode."""
+class ImageUnreadableError(ServiceRejectionError):
+    """The bytes are not a picture this server will decode.
+
+    Answered as ``image_unreadable`` wherever it is not caught. What Pillow
+    said, when it said anything, is the ``__cause__``.
+    """
+
+    def __init__(self) -> None:
+        super().__init__('image_unreadable')
 
 
 def decode_image(content: bytes) -> Image.Image:
@@ -198,14 +205,12 @@ def decode_image(content: bytes) -> Image.Image:
         picture = Image.open(io.BytesIO(content))
         width, height = picture.size
         if width * height > MAX_UPLOAD_IMAGE_PIXELS:
-            raise ImageUnreadableError(
-                f'{width} x {height} is more than {MAX_UPLOAD_IMAGE_PIXELS} pixels'
-            )
+            raise ImageUnreadableError
         picture.load()
     except ImageUnreadableError:
         raise
     except (OSError, SyntaxError, ValueError, Image.DecompressionBombError) as exc:
-        raise ImageUnreadableError(str(exc)) from exc
+        raise ImageUnreadableError from exc
     return picture
 
 

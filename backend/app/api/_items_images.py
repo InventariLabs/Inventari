@@ -22,11 +22,7 @@ from app.core.exceptions import AppException, catalogue_refusal
 from app.core.file_reference import cover_leaf, cover_leaf_of, served_url
 from app.core.file_signature import validate_signature
 from app.core.public_api import core_api
-from app.core.upload_validation import (
-    ImageUnreadableError,
-    decode_image,
-    read_capped_upload,
-)
+from app.core.upload_validation import decode_image, read_capped_upload
 from app.i18n.service import get_current_lang, get_error_message
 from app.schemas._common import ImageUploadResponse
 from app.schemas.item import ItemUpdate
@@ -90,11 +86,9 @@ async def upload_item_image(
     validate_signature(content, image.content_type)
     # The signature says what the file claims to be, not that it is one: a
     # header followed by text passed it and then showed a broken thumbnail.
-    # Decoding it also bounds what it decodes to — see decode_image.
-    try:
-        await asyncio.to_thread(decode_image, content)
-    except ImageUnreadableError as exc:
-        raise catalogue_refusal('image_unreadable') from exc
+    # Decoding it also bounds what it decodes to; either refusal is
+    # `image_unreadable` (decode_image).
+    await asyncio.to_thread(decode_image, content)
 
     # Derive the extension from the validated MIME type rather than
     # from the client-supplied filename — the name is attacker data and only
