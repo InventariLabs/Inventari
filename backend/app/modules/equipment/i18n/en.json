@@ -1,5 +1,6 @@
 {
   "campaign_cannot_delete_launched": "A launched campaign cannot be deleted — cancel it instead.",
   "campaign_already_completed": "Campaign is already completed.",
-  "campaign_already_cancelled": "Campaign is already cancelled."
+  "campaign_already_cancelled": "Campaign is already cancelled.",
+  "storage_delete_blocked_by_checkouts": "This place cannot be deleted: equipment was checked out to it, and the asset's history names it. Archive it instead."
 }

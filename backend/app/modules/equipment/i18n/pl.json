@@ -1,5 +1,6 @@
 {
   "campaign_cannot_delete_launched": "Nie można usunąć rozpoczętej kampanii — zamiast tego ją anuluj.",
   "campaign_already_completed": "Kampania jest już zakończona.",
-  "campaign_already_cancelled": "Kampania jest już anulowana."
+  "campaign_already_cancelled": "Kampania jest już anulowana.",
+  "storage_delete_blocked_by_checkouts": "Nie można usunąć tego miejsca: wydano do niego sprzęt, a historia zasobu je wskazuje. Zamiast tego je zarchiwizuj."
 }
