@@ -316,6 +316,11 @@ class _Offer:
     uom_id: UUID | None
     quantity: Decimal  # what to order, in the offer's unit
     per_stock_unit: Decimal  # price per one stock unit, to compare offers
+    reached: bool = True  # the shortage reaches the offer's minimum quantity
+
+    @property
+    def total(self) -> Decimal:
+        return self.quantity * self.unit_price
 
 
 def _best_offer(
@@ -332,6 +337,11 @@ def _best_offer(
     quoted in it one other currency is chosen whole (alphabetically), so a
     4.00 in euros never beats 5.00 in zloty on the strength of the number.
 
+    A volume price the shortage does not reach is no price for it: it is
+    passed over for the cheapest offer the shortage does reach, and taken
+    only when the whole order it forces costs less than that one (or when
+    no offer is reached, then the cheapest order in total).
+
     A supplier sells in its own unit (a 25 kg sack), and the quantity to order
     is the missing quantity expressed in it, put up to a whole step of that
     unit and to the supplier's minimum. An offer in a unit that has no bridge
@@ -339,7 +349,7 @@ def _best_offer(
     over.
     """
     stock_uom = uoms.get(template.uom_id) if template.uom_id else None
-    best: _Offer | None = None
+    offers: list[_Offer] = []
     for entry in prices:
         offer_uom = uoms.get(entry.uom_id) if entry.uom_id else None
         if offer_uom is None or stock_uom is None or offer_uom.id == stock_uom.id:
@@ -359,26 +369,31 @@ def _best_offer(
                 entry.uom_id,
             )
         quantity = core_api.uoms.round_up(quantity, offer_uom or stock_uom)
+        reached = entry.min_quantity is None or quantity >= entry.min_quantity
         if entry.min_quantity is not None:
             quantity = max(quantity, entry.min_quantity)
-        offer = _Offer(
-            entry.partner_id,
-            entry.unit_price,
-            entry.currency,
-            unit_uom,
-            quantity,
-            per_stock,
+        offers.append(
+            _Offer(
+                entry.partner_id,
+                entry.unit_price,
+                entry.currency,
+                unit_uom,
+                quantity,
+                per_stock,
+                reached,
+            )
         )
-        if best is None or _offer_rank(offer, house_currency) < _offer_rank(
-            best, house_currency
-        ):
-            best = offer
-    return best
-
-
-def _offer_rank(offer: _Offer, house_currency: str) -> tuple[bool, str, Decimal]:
-    """House currency, then currency, then the price per stock unit."""
-    return (offer.currency != house_currency, offer.currency, offer.per_stock_unit)
+    if not offers:
+        return None
+    # One currency whole: the house one if anyone quotes in it.
+    currency = min((o.currency for o in offers), key=lambda c: (c != house_currency, c))
+    pool = [o for o in offers if o.currency == currency]
+    within_reach = [o for o in pool if o.reached]
+    best = min(within_reach, key=lambda o: o.per_stock_unit) if within_reach else None
+    cheaper = [
+        o for o in pool if not o.reached and (best is None or o.total < best.total)
+    ]
+    return min(cheaper, key=lambda o: o.total) if cheaper else best
 
 
 @dataclass
@@ -419,10 +434,12 @@ async def order_missing(
     date_to: date | None = None,
     order_id: UUID | None = None,
 ) -> OrderMissingResult:
-    """Order what the combined list says is missing: one draft order per supplier.
+    """Order what the combined list says is missing: a draft order per supplier and currency.
 
     Each missing ingredient goes to the supplier whose price is lowest per
-    stock unit, in that supplier's unit. An ingredient nobody offers goes to
+    stock unit, in that supplier's unit, the organization's own currency
+    first; a supplier quoting in two currencies gets one order for each.
+    An ingredient nobody offers goes to
     the shopping list. One that has a recipe of its own is not bought: it is
     returned as something to make. Nothing missing, nothing created.
     """
