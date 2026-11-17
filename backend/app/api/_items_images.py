@@ -1,5 +1,4 @@
 import asyncio
-import io
 from uuid import UUID
 
 from fastapi import (
@@ -9,7 +8,6 @@ from fastapi import (
     UploadFile,
     status,
 )
-from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_user_storage_ids
@@ -24,7 +22,11 @@ from app.core.exceptions import AppException, catalogue_refusal
 from app.core.file_reference import cover_leaf, cover_leaf_of, served_url
 from app.core.file_signature import validate_signature
 from app.core.public_api import core_api
-from app.core.upload_validation import read_capped_upload
+from app.core.upload_validation import (
+    ImageUnreadableError,
+    decode_image,
+    read_capped_upload,
+)
 from app.i18n.service import get_current_lang, get_error_message
 from app.schemas._common import ImageUploadResponse
 from app.schemas.item import ItemUpdate
@@ -37,16 +39,6 @@ from app.services.items._query_special import get_item_or_404_async
 _MAX_IMAGE_BYTES = 10 * 1024 * 1024
 
 router = APIRouter()
-
-
-def _decodes(content: bytes) -> bool:
-    """Whether the bytes are a picture, not only a file that starts like one."""
-    try:
-        with Image.open(io.BytesIO(content)) as picture:
-            picture.load()
-    except (OSError, SyntaxError, ValueError, Image.DecompressionBombError):
-        return False
-    return True
 
 
 #: The extension comes from the validated MIME, never from the
@@ -98,8 +90,11 @@ async def upload_item_image(
     validate_signature(content, image.content_type)
     # The signature says what the file claims to be, not that it is one: a
     # header followed by text passed it and then showed a broken thumbnail.
-    if not await asyncio.to_thread(_decodes, content):
-        raise catalogue_refusal('image_unreadable')
+    # Decoding it also bounds what it decodes to — see decode_image.
+    try:
+        await asyncio.to_thread(decode_image, content)
+    except ImageUnreadableError as exc:
+        raise catalogue_refusal('image_unreadable') from exc
 
     # Derive the extension from the validated MIME type rather than
     # from the client-supplied filename — the name is attacker data and only

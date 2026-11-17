@@ -10,6 +10,7 @@ import pytest
 from fastapi import status
 from starlette.testclient import TestClient
 
+from app.core import upload_validation
 from app.modules.vision.tests.integration._llm_double import (
     answering,
     answering_without_connection,
@@ -438,3 +439,49 @@ class TestTheProviderRefusalNamesTheKey:
             )
         assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
         assert 'key' in response.json()['detail']['message'].lower()
+
+
+@pytest.mark.integration
+class TestAPhotographTheServerWillNotDecode:
+    """The file is the problem, so the answer points at the file.
+
+    A few-kilobyte PNG can describe a canvas that takes half a gigabyte to
+    decode, and scaling a photograph for the model decodes it first. That
+    canvas is refused before its pixels are, as on every other picture
+    upload; so is a file that only starts like a picture, which used to come
+    back as an internal error.
+    """
+
+    def test_a_canvas_past_the_bound_is_refused_before_the_model_is_asked(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        # The bound is Core's; set low so a real 8 x 8 photograph stands in.
+        monkeypatch.setattr(upload_validation, 'MAX_UPLOAD_IMAGE_PIXELS', 63)
+        double = answering('{"name": "Milk"}')
+        with patch_client(double):
+            response = client.post(
+                '/api/v1/vision/extract',
+                headers=auth_headers,
+                files={'images': ('label.jpg', _JPEG_BYTES, 'image/jpeg')},
+                data={'location_type': 'PANTRY'},
+            )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+        assert response.json()['detail']['code'] == 'IMAGE_UNREADABLE'
+        assert double.complete.await_count == 0
+
+    def test_a_file_that_only_starts_like_a_picture_is_refused_the_same_way(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        with patch_client(answering('{"name": "Milk"}')):
+            response = client.post(
+                '/api/v1/vision/extract-nutrition',
+                headers=auth_headers,
+                files={
+                    'file': ('table.jpg', b'\xff\xd8\xff' + b'x' * 64, 'image/jpeg')
+                },
+            )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+        assert response.json()['detail']['code'] == 'IMAGE_UNREADABLE'

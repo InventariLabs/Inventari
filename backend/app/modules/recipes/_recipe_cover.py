@@ -25,7 +25,7 @@ from uuid import UUID
 
 import httpx
 from fastapi import HTTPException
-from PIL import Image, ImageOps, UnidentifiedImageError
+from PIL import Image, ImageOps
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AppException
@@ -34,6 +34,7 @@ from app.core.logging import get_logger
 from app.core.module_sdk import cover_leaf
 from app.core.public_api import core_api
 from app.core.ssrf_guard import validate_webhook_url
+from app.core.upload_validation import ImageUnreadableError, decode_image
 
 log = get_logger(__name__)
 
@@ -72,12 +73,11 @@ def _reencode(content: bytes, content_type: str) -> tuple[bytes, str]:
     """The same picture, written by us, at most `MAX_COVER_WIDTH` wide.
 
     Raises :class:`CoverUnreadableError` when the bytes are not an image the
-    library can read.
+    library can read, or describe more pixels than an upload may decode.
     """
     try:
-        opened = Image.open(io.BytesIO(content))
-        opened.load()
-    except (UnidentifiedImageError, OSError) as exc:
+        opened = decode_image(content)
+    except ImageUnreadableError as exc:
         raise CoverUnreadableError(str(exc)) from exc
     # The tag is dropped below, so turn the pixels it described first.
     image: Image.Image = ImageOps.exif_transpose(opened)

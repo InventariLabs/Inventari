@@ -1,8 +1,10 @@
 """What an upload may be, asked once.
 
-Two halves. The first is the import-sheet gate: extension, size, and the
+Three parts. The first is the import-sheet gate: extension, size, and the
 decompressed size of a spreadsheet, for the endpoints that read files into
-pandas. The second is the attachment policy below.
+pandas. The second is its counterpart for pictures, ``decode_image``: the
+decoded size of an uploaded image, for every path that decodes one. The
+third is the attachment policy below.
 
 Two attachment services used to answer the same question apart: item
 attachments (10 MB, their own MIME list, the extension read off the
@@ -21,6 +23,7 @@ import zipfile
 from dataclasses import dataclass
 
 from fastapi import HTTPException, UploadFile
+from PIL import Image
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.file_signature import resolve_mime, validate_signature
@@ -164,6 +167,46 @@ async def read_import_file(file: UploadFile, lang: Language | None = None) -> by
     ):
         raise ServiceRejectionError('file_too_large')
     return content
+
+
+#: The most pixels an uploaded picture may decode to. The byte limit on the
+#: file does not bound this: a PNG of a few hundred kilobytes can describe a
+#: canvas of 12000 x 12000, which Pillow holds in some 570 MB. Pillow's own
+#: guard (``Image.MAX_IMAGE_PIXELS``, about 89 million) only warns up to twice
+#: its limit and refuses above it. Sixty million clears the largest ordinary
+#: phone photograph — a 50-megapixel sensor writes 8160 x 6144 — and holds a
+#: decoded picture to about 240 MB. The browser shrinks what it uploads to
+#: 1600 px a side, so the bound is met by API clients and by covers fetched
+#: from other servers.
+MAX_UPLOAD_IMAGE_PIXELS = 60_000_000
+
+
+class ImageUnreadableError(ValueError):
+    """The bytes are not a picture this server will decode."""
+
+
+def decode_image(content: bytes) -> Image.Image:
+    """The picture in *content*, decoded, once its canvas is known to fit.
+
+    The canvas is read off the header before a pixel is decoded, so a file
+    whose canvas is past :data:`MAX_UPLOAD_IMAGE_PIXELS` costs nothing to
+    refuse. Pillow reports a file that is not a picture, or not a whole one,
+    in several classes; each is raised here as :class:`ImageUnreadableError`,
+    which is all a caller needs to catch.
+    """
+    try:
+        picture = Image.open(io.BytesIO(content))
+        width, height = picture.size
+        if width * height > MAX_UPLOAD_IMAGE_PIXELS:
+            raise ImageUnreadableError(
+                f'{width} x {height} is more than {MAX_UPLOAD_IMAGE_PIXELS} pixels'
+            )
+        picture.load()
+    except ImageUnreadableError:
+        raise
+    except (OSError, SyntaxError, ValueError, Image.DecompressionBombError) as exc:
+        raise ImageUnreadableError(str(exc)) from exc
+    return picture
 
 
 class UploadRejectedError(ValueError):

@@ -93,3 +93,29 @@ class TestTheItemImageEndpoint:
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+
+    def test_a_picture_with_more_pixels_than_may_be_decoded_is_refused(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_item,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The bytes are capped above; what they decode to is capped too.
+
+        A few-kilobyte PNG can describe a canvas that takes half a gigabyte
+        to decode. The bound is Core's, set low here so a 4 x 4 picture
+        stands in for one.
+        """
+        from app.core import upload_validation
+
+        monkeypatch.setattr(upload_validation, 'MAX_UPLOAD_IMAGE_PIXELS', 15)
+
+        response = client.post(
+            f'/api/v1/items/{test_item.id}/image',
+            headers=auth_headers,
+            files={'image': ('wide.jpg', _jpeg(), 'image/jpeg')},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+        assert response.json()['detail']['code'] == 'IMAGE_UNREADABLE'

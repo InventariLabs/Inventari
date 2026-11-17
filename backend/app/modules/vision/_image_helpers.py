@@ -12,6 +12,8 @@ import io
 
 from PIL import Image, ImageOps
 
+from app.core.upload_validation import decode_image
+
 
 def compress_image(
     image_bytes: bytes,
@@ -19,7 +21,9 @@ def compress_image(
     quality: int = 85,
 ) -> bytes:
     """Compress and resize an image, returning JPEG bytes."""
-    img: Image.Image = Image.open(io.BytesIO(image_bytes))
+    # Decoded with a bound on its canvas: scaling the photograph down takes
+    # all of its pixels first.
+    img: Image.Image = decode_image(image_bytes)
 
     # A phone stores a portrait photograph sideways and says so in EXIF; the
     # JPEG written below carries no EXIF, so the turn is applied here or the
