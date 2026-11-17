@@ -15,8 +15,14 @@ enabled first.
 
 ## Quickstart: Claude Code
 
-The walk below starts from a disposable demo instance, because a correction
-changes stock and the demo is what there is to change.
+**On the public demo** there is nothing to install: open
+[demo.inventari.app](https://demo.inventari.app), click **Try the demo**, and
+follow [Connect an AI agent](../../../../docs/DEMO.md#connect-an-ai-agent) —
+both modules are already on in the sandbox you are given, and the key you
+issue there reaches nothing but that sandbox.
+
+The walk below starts from a disposable demo instance of your own, because a
+correction changes stock and the demo is what there is to change.
 
 1. **Rebuild the demo** (destructive: it drops the database and seeds it
    again). The command prints the administrator's e-mail and password.
@@ -25,19 +31,22 @@ changes stock and the demo is what there is to change.
    make demo-reset
    ```
 
-2. **Switch the modules on.** Sign in, open **Apps**, and enable **API Keys**,
-   then **MCP Server**.
+2. **Sign in.** The demo reset switches **API Keys** and **MCP Server** on.
+   On any other instance, open **Apps** and enable **API Keys**, then **MCP
+   Server**.
 
 3. **Issue a key.** Open **Settings → API Keys → Generate new key**. Name it
-   something you will recognize, tick **Use the MCP endpoint**, **Read products
-   and stock levels** and **Add products and change stock levels**, and copy the
-   key — it is shown once.
+   something you will recognize and tick **Use the MCP endpoint** and **Add
+   products and change stock levels**. **Read products and stock levels** is
+   ticked already, as on every new key — leave it ticked; clicking it clears
+   it. Copy the key — it is shown once.
 
-4. **Add the server to Claude Code**, replacing `<key>` with the key and
-   `8000` with the port the API answers on:
+4. **Add the server to Claude Code**, replacing `<key>` with the key. `8005` is
+   the port the default compose file publishes the API on; use yours if you
+   changed it:
 
    ```bash
-   claude mcp add --transport http inventari http://localhost:8000/api/v1/mcp-server/mcp --header "X-API-Key: <key>"
+   claude mcp add --transport http inventari http://localhost:8005/api/v1/mcp-server/mcp --header "X-API-Key: <key>"
    ```
 
    `X-API-Key` is the header Core accepts without a warning. A client that can
@@ -47,9 +56,10 @@ changes stock and the demo is what there is to change.
    On a **development** stack the address printed on the module page goes
    through the frontend's proxy, which hands the API an internal host name; the
    endpoint answers that `421 Invalid Host header`. Point the client at the
-   API's own port instead — `http://localhost:8000/api/v1/mcp-server/mcp` in the
-   default compose file. A production reverse proxy passes the public host
-   through, so there the address the page prints is the right one.
+   API's own port instead — `http://localhost:8005/api/v1/mcp-server/mcp` in the
+   default compose file, which publishes the API's port 8000 on the host's
+   8005. A production reverse proxy passes the public host through, so there
+   the address the page prints is the right one.
 
 5. **Ask the agent to use it.** For example:
 
@@ -68,7 +78,8 @@ changes stock and the demo is what there is to change.
 If this installation answers on a public address, allow that host first: open
 **Apps → MCP Server** and follow its **MCP Server settings** link, then add the
 host under **Allowed hosts**. The endpoint refuses an unknown `Host` header just
-as the browser would.
+as the browser would. On a demo instance the seed does this for every
+organization it creates, from `FRONTEND_URL`.
 
 The walk above was measured from `make demo-reset` to the agent's answer on a
 development stack: 45 seconds on 2026-11-14, with the correction registered as

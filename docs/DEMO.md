@@ -6,8 +6,9 @@ organization of their own: a temporary administrator account over the seed
 described [below](#what-visitors-see) — stock on shelves, documents, assets,
 recipes. Other visitors cannot open it, but the mail it sends lands in
 [an inbox every visitor reads](#no-email-leaves-the-demo). The same browser
-comes back to it, and the nightly rebuild wipes it. The rest of this page is
-for running an instance like it.
+comes back to it, and the nightly rebuild wipes it. An AI agent can be
+[connected to it](#connect-an-ai-agent) with a key issued there. The rest of
+this page is for running an instance like it.
 
 A demo is a database strangers write to. Within a week of going public it
 holds half-finished documents, partners called "test", and an item named
@@ -187,6 +188,80 @@ One key serves every visitor, so it is bounded twice:
 - **At the provider.** Set a spending cap on the key in the provider's
   console. It is the bound that holds whatever the application does — a bug,
   a concurrent burst slipping past the count, or a key reused elsewhere.
+
+## Connect an AI agent
+
+A visitor can point an AI agent of their own — Claude Code, or any client
+that speaks the Model Context Protocol — at their sandbox, and watch it search
+a product, read its stock and post a correction. The demo publishes no key
+for this, and has none to publish: every visitor is the administrator of an
+organization of their own, so the key is one they issue there, and it reaches
+nothing but that sandbox.
+
+**For a visitor, about ten minutes:**
+
+1. Open the demo and click **Try the demo**.
+2. Open **Settings → API Keys → Generate new key**. Give it a name, tick **Use
+   the MCP endpoint**, and — if the agent may change stock — **Add products and
+   change stock levels**. **Read products and stock levels** is ticked
+   already; leave it ticked. Copy the key: it is shown once.
+3. Add the server to the agent. **Apps → MCP Server** prints the address; on
+   the public demo, with Claude Code:
+
+   ```bash
+   claude mcp add --transport http inventari-demo https://demo.inventari.app/api/v1/mcp-server/mcp --header "X-API-Key: <key>"
+   ```
+
+4. Ask it, for example: *Search this workspace for olive oil, tell me how much
+   stands on which shelf, then correct one record to one less than it shows
+   and say why.* The agent calls `search_items`, then `correct_stock` with a
+   reason.
+5. Open the record: its history and the organization's journal name the
+   reason and the key's prefix, and **Warehouse** holds one completed
+   adjustment document for the correction.
+
+The tools, the permission each needs and how a correction is posted are in
+the MCP Server module's
+[README](../backend/app/modules/mcp_server/README.md#tools).
+
+**What it allows, and what it does not.**
+
+- **Reads and writes stay in the sandbox.** A key belongs to the organization
+  it was issued in: it reads that sandbox's stock, and `create_item` and
+  `correct_stock` change only that sandbox — like everything a visitor types,
+  until the nightly rebuild, which deletes the sandbox and every key issued in
+  it. **Start over** gives the visitor a new organization; a key issued in the
+  old one goes on reaching only the old one.
+- **The key decides what the agent may do.** A key without **Add products and
+  change stock levels** reads and cannot write, and nothing administrative
+  (users, modules, settings, other keys) is reachable through a key at all.
+- **What the agent reads goes to the model the visitor chose.** The agent runs
+  on the visitor's machine with the visitor's model provider: every answer the
+  endpoint gives — product names, quantities, shelves — is sent to that
+  provider as part of the conversation. The demo's own AI key
+  ([above](#ai-on-the-demo)) is not involved, and an agent's calls do not count
+  against `DEMO_AI_REQUESTS_MONTHLY`.
+
+**The limits a visitor's agent meets.**
+
+- **200 requests a minute per key** — the application's general limit
+  (`RATE_LIMIT_PER_IP`), which counts an API-key request against the key, not
+  the address. The production compose file passes neither `LOAD_TESTING` (which
+  switches the limiter off, as the development stacks do) nor a different limit
+  to the backend, so the demo runs with it on. A call past it is answered 429
+  and can be repeated a minute later.
+- **At most 50 rows per search.** `search_items` answers up to 50 rows;
+  `get_stock_levels` says how many there are in all and whether there are
+  more.
+- **One address.** The endpoint answers on the address the demo is published
+  at, and refuses any other `Host` with 421. The seed saves that host as the
+  sandbox's allowed host in **MCP Server**'s settings, taken from
+  `FRONTEND_URL`, which `docker-compose.demo.yml` sets to `https://${DOMAIN}`
+  for the service that seeds.
+
+**For the operator** there is nothing to configure: every organization the
+rebuild and the pool create — yours and each visitor's — has **API Keys** and
+**MCP Server** switched on and the demo's host allowed.
 
 ## Every visitor gets an organization of their own
 
