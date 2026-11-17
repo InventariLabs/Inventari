@@ -180,7 +180,6 @@ _NAMED = {
     'app.api.items.get_items': ITEMS,
     'app.api._items_queries.get_items_aggregates_endpoint': ITEMS,
     'app.api._items_queries.get_attention_counts_endpoint': ITEMS,
-    'app.api._items_queries.get_expiring_items': ITEMS,
     'app.api._items_import_export.export_items_xlsx': ITEMS,
     'app.api.item_pagination.get_items_history': ITEMS,
     'app.api.item_pagination.get_item_history': ITEMS,

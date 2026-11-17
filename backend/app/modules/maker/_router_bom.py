@@ -33,7 +33,6 @@ from . import bom_tree, cost_breakdown, recipe_service
 from ._schemas_bom import (
     BoMLineRead,
     BomMoveRequest,
-    BoMParentItem,
     BoMSummaryItem,
     BoMSummaryResponse,
     BoMTemplateIdsResponse,
@@ -45,7 +44,6 @@ from ._schemas_breakdown import CostBreakdownResponse
 from .availability_service import resolve_check_location
 from .bom_service import (
     list_lines,
-    list_parents,
     list_where_used,
     summarize_lines,
 )
@@ -99,41 +97,6 @@ def _sub_assembly_nodes(node: BomTreeNode, acc: list[BomTreeNode]) -> None:
         acc.append(node)
     for child in node.children:
         _sub_assembly_nodes(child, acc)
-
-
-@router.get(
-    '/parents',
-    response_model=PaginatedResponse[BoMParentItem],
-)
-async def get_bom_parents(
-    limit: int = Query(200, ge=1, le=1000),
-    offset: int = Query(0, ge=0),
-    current_user: UserContextDTO = Depends(get_current_user_context),
-    db: AsyncSession = Depends(get_async_db, scope='function'),
-    org_id: UUID = Depends(require_org),
-) -> PaginatedResponse[BoMParentItem]:
-    """List all recipes in the organization (parents that have >=1 BOM line)."""
-    rows = await list_parents(db, org_id)
-    if not rows:
-        return PaginatedResponse[BoMParentItem].from_full_list(
-            [], offset=offset, limit=limit
-        )
-    templates = await core_api.product_templates.list_for_org_async(
-        db, org_id, limit=10_000
-    )
-    names = {t.id: t.name for t in templates}
-    items = [
-        BoMParentItem(
-            template_id=tid,
-            name=names.get(tid, str(tid)),
-            line_count=count,
-        )
-        for tid, count in rows
-    ]
-    items.sort(key=lambda item: item.name)
-    return PaginatedResponse[BoMParentItem].from_full_list(
-        items, offset=offset, limit=limit
-    )
 
 
 @router.get(

@@ -30,7 +30,6 @@ core/public_api/product_templates.py::CoreProductTemplatesAPI.create_stub_async
 core/public_api/product_templates.py::CoreProductTemplatesAPI.delete_async
 core/public_api/product_templates.py::CoreProductTemplatesAPI.resolve_default_async
 core/public_api/product_templates.py::CoreProductTemplatesAPI.update_async
-core/public_api/roles.py::CoreRolesAPI.assign_async
 core/public_api/roles.py::CoreRolesAPI.create_async
 core/public_api/roles.py::CoreRolesAPI.delete_async
 core/public_api/roles.py::CoreRolesAPI.rename_async

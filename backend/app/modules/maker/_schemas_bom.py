@@ -72,14 +72,6 @@ class BoMSummaryResponse(BaseModel):
     items: list[BoMSummaryItem]
 
 
-class BoMParentItem(BaseModel):
-    """One recipe in the parents list — a template that has a BOM."""
-
-    template_id: UUID
-    name: str
-    line_count: int
-
-
 class WhereUsedItem(BaseModel):
     """One recipe whose BOM consumes a given child template."""
 

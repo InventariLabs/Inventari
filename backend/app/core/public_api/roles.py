@@ -272,29 +272,6 @@ class CoreRolesAPI:
         return {uid: RoleDTO.model_validate(r) for uid, r in roles.items()}
 
     @writes
-    async def assign_async(
-        self,
-        db: AsyncSession,
-        organization_id: UUID,
-        user_id: UUID,
-        role_id: UUID,
-        actor_user_id: UUID,
-    ) -> bool:
-        """Link a user to a role. Idempotent.
-
-        Returns ``True`` when the link is newly created, ``False`` when
-        the link already existed. Raises ``ValueError`` if the role
-        does not exist or belongs to another organization.
-        """
-        return await permissions_service.assign_role_async(
-            db,
-            organization_id=organization_id,
-            user_id=user_id,
-            role_id=role_id,
-            actor_user_id=actor_user_id,
-        )
-
-    @writes
     async def rename_async(
         self,
         db: AsyncSession,

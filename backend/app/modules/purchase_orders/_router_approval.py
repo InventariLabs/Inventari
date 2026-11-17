@@ -11,7 +11,6 @@ how the PO state machine reacts:
   request; PO flips PENDING_APPROVAL → CONFIRMED
 - POST   /api/v1/purchase-orders/{po_id}/reject — reject; PO returns to
   DRAFT so the requester can edit and re-submit
-- GET    /api/v1/purchase-orders/{po_id}/approval — active request
 - GET    /api/v1/purchase-orders/{po_id}/approval-requirement — what
   confirming would do, and whether anybody could decide it
 
@@ -36,7 +35,6 @@ from app.core.deps import (
 )
 from app.core.exceptions import NotFoundException
 from app.i18n.service import get_current_lang
-from app.modules.approvals.approvals_api import approvals_api
 from app.modules.approvals.schemas import (
     ApprovalRequestSchema,
     ApproveRequest,
@@ -120,17 +118,3 @@ def register_approval_routes(router: APIRouter) -> None:
     ) -> PurchaseOrderApprovalRequirement:
         po = await _get_po_or_404(db, org_id, po_id)
         return await confirm_approval_requirement(db, org_id, po, current_user.id)
-
-    @router.get('/{po_id}/approval', response_model=ApprovalRequestSchema | None)
-    async def get_approval_endpoint(
-        po_id: UUID,
-        current_user: UserContextDTO = Depends(get_current_user_context),
-        db: AsyncSession = Depends(get_async_db, scope='function'),
-        org_id: UUID = Depends(require_org),
-    ) -> Any:
-        await _get_po_or_404(db, org_id, po_id)
-        pending = await approvals_api.list_requests(
-            db, org_id, target_type='purchase_order'
-        )
-        matching = [r for r in pending if r.target_id == po_id]
-        return matching[0] if matching else None

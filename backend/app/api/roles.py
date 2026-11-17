@@ -214,58 +214,6 @@ async def update_role_permissions(
     return role
 
 
-@router.post('/users/{user_id}/{role_id}')
-async def assign_role_to_user(
-    user_id: UUID,
-    role_id: UUID,
-    current_user: UserContextDTO = Depends(get_current_user_context),
-    db: AsyncSession = Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.SYSTEM_CONFIG_WRITE),
-):
-    org_id = require_org(current_user)
-    created = await core_api.roles.assign_async(
-        db,
-        organization_id=org_id,
-        user_id=user_id,
-        role_id=role_id,
-        actor_user_id=current_user.id,
-    )
-    if created:
-        # Filed under the member, the way the other path that hands somebody a
-        # custom role is (`PUT /organizations/my/members/{id}/role`): the
-        # question the journal is opened with is who may do what, and the
-        # answer is about a person. Flat, not before/after — the member did
-        # not hold this role a moment ago, so there is no earlier value to
-        # print, and a lone `after` reads as "—" in the Detail column. The
-        # permissions travel with it because the role they name is editable
-        # afterwards, and the entry has to keep saying what was handed over
-        # on the day it was handed over.
-        from app.services.user_service import UserService
-
-        role = await _role_snapshot(db, org_id, role_id)
-        member = await UserService.get_by_id_in_org_async(db, user_id, org_id)
-        await _journal(
-            db,
-            current_user,
-            org_id,
-            action=AuditAction.UPDATE,
-            target_id=user_id,
-            target_type=AuditTargetType.ORG_MEMBER,
-            snapshot={
-                'name': member.email if member else str(user_id),
-                # The name, not the id. The reading side resolves a `role_id`
-                # against the roles that exist *now*, and a role can be
-                # deleted — after which the entry recording who was given it
-                # would read as eight characters of a dead id. The journal is
-                # opened months later, and a row has to be legible without
-                # opening the record it names.
-                'role_name': role['name'],
-                'permissions': role['permissions'],
-            },
-        )
-    return {'created': created}
-
-
 @router.patch('/{role_id}', response_model=RoleDTO)
 async def rename_role(
     role_id: UUID,

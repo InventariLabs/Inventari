@@ -1,6 +1,6 @@
 """Three readers of "expires within N days", one window.
 
-The storage detail summary, the storages list and ``/items/expiring`` each
+The storage detail summary, the storages list and the items list each
 had a window of their own. The list and the counter agreed on the floor;
 the detail summary had none, so a shelf holding one item that expired last
 month reported it as expiring soon — while the same item was already
@@ -16,11 +16,13 @@ from __future__ import annotations
 from datetime import timedelta
 
 import pytest
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.item import Item
 from app.models.organization import Organization
-from app.services.items._query_special import get_expiring_items_async
+from app.models.storage_location import StorageLocation
+from app.services.items._query_get import _apply_item_filters
 from app.services.items.expiry import expiry_today_async
 from app.services.storage._queries import (
     count_expiring_soon_async,
@@ -71,13 +73,22 @@ class TestTheExpiringWindowIsOneWindow:
             db, async_test_household, async_test_storage_location, async_test_category
         )
 
-        rows, _total = await get_expiring_items_async(
-            db,
-            [async_test_storage_location.id],
-            organization_id=async_test_household.id,
-            days=DAYS,
+        # The items list's own filter, which is what `expiring_days=` asks for.
+        listed = set(
+            (
+                await db.execute(
+                    _apply_item_filters(
+                        select(Item.id).join(
+                            StorageLocation,
+                            Item.storage_location_id == StorageLocation.id,
+                        ),
+                        organization_id=async_test_household.id,
+                        expiring_days=DAYS,
+                        today=await expiry_today_async(db, async_test_household.id),
+                    )
+                )
+            ).scalars()
         )
-        listed = {row.id for row in rows}
         assert items['today'].id in listed
         assert items['last day'].id in listed
         assert items['yesterday'].id not in listed, 'expired is its own bucket'

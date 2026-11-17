@@ -18,13 +18,15 @@ from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from app.models.item import Item
 from app.models.organization import Organization
+from app.models.storage_location import StorageLocation
 from app.services.analytics._common import org_today_async
-from app.services.items._query_special import get_expiring_items_async
+from app.services.items._query_get import _apply_item_filters
 from app.services.storage._queries import (
     count_expiring_soon_async,
     expiring_counts_by_location_async,
@@ -92,13 +94,21 @@ class TestExpiryBucketsUseTheOrganizationsClock:
         db.add_all([probe, control])
         await db.flush()
 
-        rows, _total = await get_expiring_items_async(
-            db,
-            [async_test_storage_location.id],
-            organization_id=org.id,
-            days=7,
+        ids = set(
+            (
+                await db.execute(
+                    _apply_item_filters(
+                        select(Item.id).join(
+                            StorageLocation,
+                            Item.storage_location_id == StorageLocation.id,
+                        ),
+                        organization_id=org.id,
+                        expiring_days=7,
+                        today=org_today,
+                    )
+                )
+            ).scalars()
         )
-        ids = {row.id for row in rows}
 
         assert control.id in ids, 'control row must always be inside the horizon'
         assert (probe.id in ids) == org_is_ahead
