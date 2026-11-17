@@ -1289,6 +1289,7 @@
     "nextPage": "Następna strona",
     "editNamed": "Edytuj: {{name}}",
     "deleteNamed": "Usuń: {{name}}",
+    "archiveNamed": "Archiwizuj: {{name}}",
     "cloneNamed": "Powiel: {{name}}",
     "closeToast": "Zamknij powiadomienie",
     "toastsRegion": "Powiadomienia"

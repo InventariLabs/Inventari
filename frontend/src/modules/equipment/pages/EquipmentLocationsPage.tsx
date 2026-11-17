@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { locationPathBelowName } from "@/utils/helpers";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
+import { Plus, Pencil, Trash2, MapPin, Archive } from "lucide-react";
 import { toast } from "sonner";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
@@ -23,6 +23,7 @@ import {
   useCreateStorageHierarchy,
   useUpdateStorage,
   useDeleteStorage,
+  useArchiveStorage,
 } from "@/modules/shared/hooks/useStorageMutations";
 import { locationDeleteConsequences } from "@/modules/shared/lib/locationDelete";
 import { queryKeys } from "@/hooks/queries/keys";
@@ -135,6 +136,69 @@ function LocationForm({
   );
 }
 
+/**
+ * The row's verbs. Archive sits beside Delete only where the place holds
+ * nothing: the server refuses to delete a place an asset was ever checked out
+ * to — a history no count shows — and names archiving as the way out, so the
+ * screen carries that verb. A place with records in it keeps the disabled
+ * Delete and its reason; archiving it would ask where they go.
+ */
+function LocationActions({
+  name,
+  blocking,
+  deleting,
+  archiving,
+  onEdit,
+  onArchive,
+  onDelete,
+}: {
+  name: string;
+  blocking: number;
+  deleting: boolean;
+  archiving: boolean;
+  onEdit: () => void;
+  onArchive: () => void;
+  onDelete: () => void;
+}) {
+  const { t } = useTranslation(["equipment", "common"]);
+  const refusal = t("locations.cannotDeleteHolding", { count: blocking });
+  return (
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onEdit}
+        aria-label={t("common:a11y.editNamed", { name })}
+      >
+        <Pencil size={16} />
+      </Button>
+      {blocking === 0 && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onArchive}
+          disabled={archiving}
+          aria-label={t("common:a11y.archiveNamed", { name })}
+        >
+          <Archive size={16} />
+        </Button>
+      )}
+      <Button
+        variant="ghostDanger"
+        size="icon"
+        onClick={onDelete}
+        disabled={deleting || blocking > 0}
+        title={blocking > 0 ? refusal : undefined}
+        aria-label={
+          blocking > 0 ? refusal : t("common:a11y.deleteNamed", { name })
+        }
+      >
+        <Trash2 size={16} />
+      </Button>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
@@ -202,6 +266,10 @@ export default function EquipmentLocationsPage() {
 
   const deleteMutation = useDeleteStorage(t("locations.deleteFailed"));
 
+  const archiveMutation = useArchiveStorage(
+    t("locations:errors.cannotArchive"),
+  );
+
   const { confirm, confirmDialogProps } = useConfirm();
 
   // Location is a required field of every record standing in one, so the API
@@ -253,6 +321,28 @@ export default function EquipmentLocationsPage() {
     deleteMutation.mutate(loc.id, {
       onSuccess: () => {
         toast.success(t("locations.deleted"));
+        invalidate();
+      },
+    });
+  };
+
+  // The server refuses to delete a place an asset was ever checked out to,
+  // returned or not, and names archiving as the way out. That history is no
+  // record standing here, so the row's count cannot warn of it; the screen
+  // carries the verb the refusal names. Only for a place holding nothing:
+  // archiving one with records in it asks where they go, and the row already
+  // says to move them first.
+  const handleArchive = async (loc: StorageLocationSummary) => {
+    const ok = await confirm({
+      title: t("locations:edit.archiveTitle"),
+      message: `${t("locations:edit.archiveConfirmEmpty")} ${t("locations:edit.archiveReversible")}`,
+      variant: "danger",
+      confirmLabel: t("locations:edit.archive"),
+    });
+    if (!ok) return;
+    archiveMutation.mutate(loc.id, {
+      onSuccess: () => {
+        toast.success(t("locations:messages.storageArchived"));
         invalidate();
       },
     });
@@ -431,45 +521,15 @@ export default function EquipmentLocationsPage() {
                       )}
                     </div>
                     {canWrite && (
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setEditingId(loc.id)}
-                          aria-label={t("common:a11y.editNamed", {
-                            name: loc.name,
-                          })}
-                        >
-                          <Pencil size={16} />
-                        </Button>
-                        <Button
-                          variant="ghostDanger"
-                          size="icon"
-                          onClick={() => handleDelete(loc)}
-                          disabled={
-                            deleteMutation.isPending ||
-                            recordsBlockingDelete(loc) > 0
-                          }
-                          title={
-                            recordsBlockingDelete(loc) > 0
-                              ? t("locations.cannotDeleteHolding", {
-                                  count: recordsBlockingDelete(loc),
-                                })
-                              : undefined
-                          }
-                          aria-label={
-                            recordsBlockingDelete(loc) > 0
-                              ? t("locations.cannotDeleteHolding", {
-                                  count: recordsBlockingDelete(loc),
-                                })
-                              : t("common:a11y.deleteNamed", {
-                                  name: loc.name,
-                                })
-                          }
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
+                      <LocationActions
+                        name={loc.name}
+                        blocking={recordsBlockingDelete(loc)}
+                        deleting={deleteMutation.isPending}
+                        archiving={archiveMutation.isPending}
+                        onEdit={() => setEditingId(loc.id)}
+                        onArchive={() => handleArchive(loc)}
+                        onDelete={() => handleDelete(loc)}
+                      />
                     )}
                   </div>
                 </CardContent>

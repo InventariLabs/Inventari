@@ -342,3 +342,71 @@ describe("the count on a scoped row", () => {
     expect(refused).toBeDisabled();
   });
 });
+
+describe("archiving the place the delete will refuse", () => {
+  // A place an asset was checked out to and returned from holds no record, so
+  // its row shows no count and Delete is live — and the server refuses the
+  // delete and names archiving as the way out. The row has to carry that verb.
+  const ARCHIVE_LOCATIONS = [
+    {
+      ...base,
+      id: "loc-history",
+      name: "Review Room",
+      context_tag: "equipment",
+      items_count: 0,
+      total_items_count: 0,
+    },
+    {
+      ...base,
+      id: "loc-busy",
+      name: "Desk 14",
+      context_tag: "equipment",
+      items_count: 1,
+      total_items_count: 1,
+    },
+  ] as unknown as StorageLocationSummary[];
+
+  let archived: string[];
+
+  beforeEach(() => {
+    archived = [];
+    server.resetHandlers();
+    server.use(
+      http.get("/api/v1/locations", () =>
+        HttpResponse.json(onePage(ARCHIVE_LOCATIONS)),
+      ),
+      http.post("/api/v1/locations/:id/archive", ({ params }) => {
+        archived.push(String(params.id));
+        return HttpResponse.json({ id: params.id });
+      }),
+    );
+  });
+
+  it("archives a place that holds nothing, after asking", async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Review Room")).toBeInTheDocument();
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Archive Review Room" }),
+    );
+    expect(archived).toEqual([]);
+    fireEvent.click(await screen.findByRole("button", { name: "Archive" }));
+
+    await waitFor(() => expect(archived).toEqual(["loc-history"]));
+  });
+
+  it("offers no archive over a place that still holds a record", async () => {
+    // Archiving such a place needs a target for what stands in it; the row's
+    // answer is the one it already gives: move it first.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Desk 14")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Archive Desk 14" }),
+    ).toBeNull();
+  });
+});
