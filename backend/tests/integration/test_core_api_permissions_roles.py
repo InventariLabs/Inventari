@@ -18,11 +18,6 @@ Contract for permissions:
 Contract for roles:
     - list_for_user_async returns all roles (system + org-scoped) the
       user holds in the given organization.
-    - assign_async links a user to a role; idempotent (re-assigning an
-      existing link is a no-op rather than an error).
-    - assign_async validates that the role belongs to the given
-      organization (org-scoping guard) — assigning a role from org A
-      to a user in org B raises ValueError.
 """
 
 from __future__ import annotations
@@ -312,111 +307,6 @@ class TestCoreRolesAPI:
             db, async_test_household.id, async_test_user.id
         )
         assert result == []
-
-    async def test_assign_async_creates_user_role_link(
-        self,
-        real_async_db_session,
-        async_test_household,
-        async_test_user,
-    ):
-        """Assigning a role makes it appear in list_for_user_async."""
-        db = real_async_db_session
-        role = await _make_role(
-            db,
-            async_test_household.id,
-            name='admin-role',
-            permissions=['items:read', 'items:write'],
-        )
-
-        await core_api.roles.assign_async(
-            db,
-            async_test_household.id,
-            async_test_user.id,
-            role.id,
-            actor_user_id=async_test_user.id,
-        )
-        await db.commit()
-
-        roles = await core_api.roles.list_for_user_async(
-            db, async_test_household.id, async_test_user.id
-        )
-        assert any(r.id == role.id for r in roles)
-
-    async def test_assign_async_is_idempotent(
-        self,
-        real_async_db_session,
-        async_test_household,
-        async_test_user,
-    ):
-        """Assigning the same role twice does not create duplicates and
-        does not raise."""
-        db = real_async_db_session
-        role = await _make_role(
-            db,
-            async_test_household.id,
-            name='dup-test',
-            permissions=['items:read'],
-        )
-
-        for _ in range(3):
-            await core_api.roles.assign_async(
-                db,
-                async_test_household.id,
-                async_test_user.id,
-                role.id,
-                actor_user_id=async_test_user.id,
-            )
-        await db.commit()
-
-        roles = await core_api.roles.list_for_user_async(
-            db, async_test_household.id, async_test_user.id
-        )
-        assert len(roles) == 1
-        assert roles[0].id == role.id
-
-    async def test_assign_async_rejects_role_from_different_org(
-        self,
-        real_async_db_session,
-        async_test_household,
-        async_test_user,
-    ):
-        """Assigning a role that belongs to another org → ValueError."""
-        db = real_async_db_session
-        from ._core_api_helpers import make_other_org
-
-        other_org = await db.run_sync(make_other_org)
-        other_role = await _make_role(
-            db,
-            other_org.id,
-            name='other-admin',
-            permissions=['items:read'],
-        )
-
-        with pytest.raises(ValueError, match='organization'):
-            await core_api.roles.assign_async(
-                db,
-                async_test_household.id,
-                async_test_user.id,
-                other_role.id,
-                actor_user_id=async_test_user.id,
-            )
-
-    async def test_assign_async_for_unknown_role_raises_value_error(
-        self,
-        real_async_db_session,
-        async_test_household,
-        async_test_user,
-    ):
-        """Assigning a non-existent role_id → ValueError (not silent no-op)."""
-        db = real_async_db_session
-        with pytest.raises(ValueError, match='not found'):
-            await core_api.roles.assign_async(
-                db,
-                async_test_household.id,
-                async_test_user.id,
-                uuid4(),
-                actor_user_id=async_test_user.id,
-            )
 
     async def test_dto_includes_permissions_list(
         self,
