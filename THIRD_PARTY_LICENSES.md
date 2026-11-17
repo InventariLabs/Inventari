@@ -159,7 +159,7 @@ and the static assets the frontend serves.
 | `yarl` | 1.25.1 | Apache-2.0 |  |
 | `zopfli` | 0.4.3 | Apache-2.0 |  |
 
-## Frontend production bundle (304 packages)
+## Frontend production bundle (303 packages)
 
 | Package | Version | Licence | Note |
 |---|---|---|---|
@@ -181,36 +181,35 @@ and the static assets the frontend serves.
 | `@nodelib/fs.stat` | 2.0.5 | MIT |  |
 | `@nodelib/fs.walk` | 1.2.8 | MIT |  |
 | `@radix-ui/number` | 1.1.3 | MIT |  |
-| `@radix-ui/primitive` | 1.1.7 | MIT |  |
-| `@radix-ui/react-alert-dialog` | 1.1.23 | MIT |  |
-| `@radix-ui/react-arrow` | 1.1.15 | MIT |  |
-| `@radix-ui/react-collection` | 1.1.15 | MIT |  |
+| `@radix-ui/primitive` | 1.2.0 | MIT |  |
+| `@radix-ui/react-alert-dialog` | 1.2.1 | MIT |  |
+| `@radix-ui/react-arrow` | 1.1.17 | MIT |  |
+| `@radix-ui/react-collection` | 1.2.0 | MIT |  |
 | `@radix-ui/react-compose-refs` | 1.1.5 | MIT |  |
-| `@radix-ui/react-context` | 1.2.2 | MIT |  |
-| `@radix-ui/react-dialog` | 1.1.23 | MIT |  |
-| `@radix-ui/react-direction` | 1.1.4 | MIT |  |
-| `@radix-ui/react-dismissable-layer` | 1.1.19 | MIT |  |
-| `@radix-ui/react-focus-guards` | 1.1.6 | MIT |  |
-| `@radix-ui/react-focus-scope` | 1.1.16 | MIT |  |
+| `@radix-ui/react-context` | 1.3.0 | MIT |  |
+| `@radix-ui/react-dialog` | 1.3.1 | MIT |  |
+| `@radix-ui/react-direction` | 1.2.0 | MIT |  |
+| `@radix-ui/react-dismissable-layer` | 1.2.1 | MIT |  |
+| `@radix-ui/react-focus-guards` | 1.2.0 | MIT |  |
+| `@radix-ui/react-focus-scope` | 1.3.1 | MIT |  |
 | `@radix-ui/react-id` | 1.1.4 | MIT |  |
-| `@radix-ui/react-popover` | 1.1.23 | MIT |  |
-| `@radix-ui/react-popper` | 1.3.7 | MIT |  |
-| `@radix-ui/react-portal` | 1.1.17 | MIT |  |
-| `@radix-ui/react-presence` | 1.1.10 | MIT |  |
-| `@radix-ui/react-primitive` | 2.1.10 | MIT |  |
-| `@radix-ui/react-roving-focus` | 1.1.19 | MIT |  |
-| `@radix-ui/react-select` | 2.3.7 | MIT |  |
-| `@radix-ui/react-slot` | 1.3.3 | MIT |  |
-| `@radix-ui/react-tabs` | 1.1.21 | MIT |  |
-| `@radix-ui/react-use-callback-ref` | 1.1.4 | MIT |  |
-| `@radix-ui/react-use-controllable-state` | 1.2.6 | MIT |  |
+| `@radix-ui/react-popover` | 1.3.1 | MIT |  |
+| `@radix-ui/react-popper` | 1.4.0 | MIT |  |
+| `@radix-ui/react-portal` | 1.2.0 | MIT |  |
+| `@radix-ui/react-presence` | 1.1.11 | MIT |  |
+| `@radix-ui/react-primitive` | 2.2.0 | MIT |  |
+| `@radix-ui/react-roving-focus` | 1.2.1 | MIT |  |
+| `@radix-ui/react-select` | 2.4.1 | MIT |  |
+| `@radix-ui/react-slot` | 1.5.0 | MIT |  |
+| `@radix-ui/react-tabs` | 1.2.1 | MIT |  |
+| `@radix-ui/react-use-callback-ref` | 1.1.5 | MIT |  |
+| `@radix-ui/react-use-controllable-state` | 1.3.0 | MIT |  |
 | `@radix-ui/react-use-effect-event` | 0.0.5 | MIT |  |
 | `@radix-ui/react-use-is-hydrated` | 0.1.3 | MIT |  |
 | `@radix-ui/react-use-layout-effect` | 1.1.4 | MIT |  |
-| `@radix-ui/react-use-previous` | 1.1.4 | MIT |  |
 | `@radix-ui/react-use-rect` | 1.1.4 | MIT |  |
-| `@radix-ui/react-use-size` | 1.1.4 | MIT |  |
-| `@radix-ui/react-visually-hidden` | 1.2.11 | MIT |  |
+| `@radix-ui/react-use-size` | 1.1.5 | MIT |  |
+| `@radix-ui/react-visually-hidden` | 1.2.13 | MIT |  |
 | `@radix-ui/rect` | 1.1.3 | MIT |  |
 | `@reduxjs/toolkit` | 2.12.0 | MIT |  |
 | `@standard-schema/spec` | 1.1.0 | MIT |  |
