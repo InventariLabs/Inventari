@@ -23,7 +23,7 @@
   "detail": {
     "completedTitle": "This list is done",
     "archivedTitle": "This list is archived",
-    "frozenHint": "Items can't be added, ticked off or removed while it stays that way.",
+    "frozenHint": "Nothing can be added, ticked off or removed while it stays that way.",
     "reactivate": "Reactivate",
     "reactivated": "List reactivated",
     "errorReactivate": "Failed to reactivate the list",
