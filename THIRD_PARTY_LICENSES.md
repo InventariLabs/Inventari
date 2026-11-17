@@ -344,7 +344,7 @@ and the static assets the frontend serves.
 | `lines-and-columns` | 1.2.4 | MIT |  |
 | `longest-streak` | 3.1.0 | MIT |  |
 | `loose-envify` | 1.4.0 | MIT |  |
-| `lucide-react` | 1.48.0 | ISC |  |
+| `lucide-react` | 1.74.0 | ISC |  |
 | `math-intrinsics` | 1.1.0 | MIT |  |
 | `mdast-util-from-markdown` | 2.0.3 | MIT |  |
 | `mdast-util-mdx-expression` | 2.0.1 | MIT |  |
