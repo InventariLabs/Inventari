@@ -243,6 +243,22 @@ def seeded_organization(
 DEMO_ADDRESS = 'https://demo.example.org'
 
 
+def _forget_the_app_pool_connections() -> None:
+    """Drop the connections the build left in the application's own async pool.
+
+    Module seeders open ``global_session()`` on the application's engine, and
+    ``run_in_async_session`` runs them on a loop of its own that closes when
+    the build ends. A client already started by the test pools those
+    connections on that dead loop, and the first request to reach the pool
+    fails with "attached to a different loop". The connections are abandoned
+    rather than closed: closing one needs the loop that opened it.
+    """
+    from app import database
+
+    if database.async_engine is not None:
+        database.async_engine.sync_engine.dispose(close=False)
+
+
 def pooled_sandboxes(async_engine: Any) -> Callable[[Session], list[list[str]]]:
     """A build for two sandboxes made the way ``demo fill-pool`` makes one.
 
@@ -276,6 +292,7 @@ def pooled_sandboxes(async_engine: Any) -> Callable[[Session], list[list[str]]]:
                     ),
                 )
                 opened.append([str(org_id), str(user_id)])
+        _forget_the_app_pool_connections()
         return opened
 
     return build
