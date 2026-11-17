@@ -341,20 +341,12 @@ class Item(Base):
         nullable=True,
     )
 
-    # A handle for a path that does not exist yet. Nothing writes this
-    # column: no caller's ``source_document_id`` reaches it — document
-    # executors do pass the parameter into ``create_item_async``, which
-    # spends it on the ItemHistory row alone
-    # (``services/items/_create.py``) — the UI offers no way to set it, and
-    # production holds zero populated rows, measured org-wide. Provenance is answered today by
-    # ``ItemHistory.source_document_id``, one row per event, and a
-    # COMPLETED document can be neither cancelled nor deleted, so the
-    # ``SET NULL`` here fires only under raw SQL. Populating it is a
-    # decision to make when a creation-from-document path is actually
-    # built — which document of a line's life is "the" source, and whether
-    # one column may speak for events ItemHistory already records — and
-    # the first populated row silently arms the ``source_document_id``
-    # filter on the items list endpoints.
+    # Nothing writes this column: document executors hand their
+    # ``source_document_id`` to ``create_item_async``, which spends it on the
+    # ItemHistory row alone. Provenance is answered by
+    # ``ItemHistory.source_document_id``, one row per event, and that is what
+    # the ``source_document_id`` filter on the items list endpoints reads;
+    # this column is not consulted by it.
     source_document_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey('documents.id', ondelete='SET NULL'),
         nullable=True,
