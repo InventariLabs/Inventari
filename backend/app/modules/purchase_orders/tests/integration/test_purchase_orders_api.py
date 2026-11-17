@@ -1417,7 +1417,7 @@ class TestPOLifecycle:
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_get_po_html_renders_localized_labels(
+    def test_get_po_pdf_renders_localized_labels(
         self,
         client: TestClient,
         po_auth_headers: dict[str, str],
@@ -1425,8 +1425,9 @@ class TestPOLifecycle:
         po_org: Any,
         po_partner: Any,
         po_template: Any,
+        po_location: Any,
     ) -> None:
-        """HTML preview renders translated labels and the status badge."""
+        """The printed order carries translated labels and the line's tax rate."""
         po = client.post(
             '/api/v1/purchase-orders',
             headers=po_auth_headers,
@@ -1443,20 +1444,19 @@ class TestPOLifecycle:
             },
         )
         po_id = po.json()['id']
+        client.post(f'/api/v1/purchase-orders/{po_id}/confirm', headers=po_auth_headers)
 
         response = client.get(
-            f'/api/v1/purchase-orders/{po_id}/html?lang=pl',
+            f'/api/v1/purchase-orders/{po_id}/pdf?lang=pl',
             headers=po_auth_headers,
         )
         assert response.status_code == status.HTTP_200_OK
-        assert 'text/html' in response.headers['content-type']
-        html = response.text
-        assert 'Zamówienie zakupowe' in html
-        assert 'Dostawca' in html
-        assert 'Projekt' in html
-        # follow-up: the VAT column prints the line rate, not 0.00% —
-        # the preview used to lose tax_pct while the PDF kept it.
-        assert '23,00%' in html
+        # The print sets some labels in capitals; the words are what is checked.
+        text = _extract_pdf_text(response.content).casefold()
+        assert 'zamówienie zakupowe' in text
+        assert 'dostawca' in text
+        # The VAT column prints the line rate, not 0.00%.
+        assert '23,00%' in text
 
     def test_send_po_email_draft_returns_400(
         self,

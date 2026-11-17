@@ -289,7 +289,7 @@ class TestPlaceholders:
         self, client: TestClient, eq_auth_headers: dict[str, str]
     ) -> None:
         response = client.get(
-            '/api/v1/equipment/protocol/placeholders',
+            '/api/v1/equipment/templates/placeholders',
             headers=eq_auth_headers,
         )
         assert response.status_code == status.HTTP_200_OK
