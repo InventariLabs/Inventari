@@ -578,7 +578,10 @@ describe("useStockTakeCounting", () => {
         wrapper: createWrapper().wrapper,
       });
       await waitFor(() => expect(result.current.countedCount).toBe(1));
-      expect(result.current.isUnsaved("item-1")).toBe(false);
+      // The hook settles the saved note a tick after the count appears.
+      await waitFor(() =>
+        expect(result.current.isUnsaved("item-1")).toBe(false),
+      );
 
       act(() => {
         result.current.setNotes((prev) => ({ ...prev, "item-1": "" }));

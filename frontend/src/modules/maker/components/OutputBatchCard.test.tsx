@@ -31,6 +31,15 @@ vi.mock("@/modules/maker/hooks/useBatches", () => ({
     release: { mutate: mocks.release, isPending: false },
   }),
 }));
+vi.mock("@/modules/shared/hooks/useUoms", () => ({
+  useUoms: () => ({
+    data: [
+      { id: "c1", name: "Unit", uoms: [{ id: "u1", symbol: "pcs" }] },
+      { id: "c2", name: "Weight", uoms: [{ id: "u2", symbol: "g" }] },
+      { id: "c3", name: "Volume", uoms: [{ id: "u3", symbol: "ml" }] },
+    ],
+  }),
+}));
 vi.mock("@/modules/shared/components/BarcodeLabelSheet", () => ({
   BarcodeLabelSheet: (props: {
     target: { lotIds: string[] };
@@ -267,4 +276,27 @@ describe("labels a run offers", () => {
     expect(labelsForRun({ ...run, actual_qty: "12.5" })).toBe(13);
     expect(labelsForRun({ ...run, actual_qty: "5000" })).toBe(200);
   });
+
+  it("starts a run counted in pieces at one label per piece", () => {
+    render(
+      <OutputBatchCard
+        order={{ ...run, actual_qty: "12", output_uom_symbol: "pcs" }}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("maker-print-batch-labels"));
+    expect(screen.getByTestId("label-sheet")).toHaveTextContent("|12|");
+  });
+
+  it.each(["g", "ml"])(
+    "starts a run kept in %s at one label, not one per gram",
+    (symbol) => {
+      render(
+        <OutputBatchCard
+          order={{ ...run, actual_qty: "1000", output_uom_symbol: symbol }}
+        />,
+      );
+      fireEvent.click(screen.getByTestId("maker-print-batch-labels"));
+      expect(screen.getByTestId("label-sheet")).toHaveTextContent("|1|");
+    },
+  );
 });

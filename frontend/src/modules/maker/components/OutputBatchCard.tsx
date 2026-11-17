@@ -14,8 +14,10 @@ import { formatDate } from "@/utils/formatters";
 import { BarcodeLabelSheet } from "@/modules/shared/components/BarcodeLabelSheet";
 import { useOutputBatchStatus } from "@/modules/maker/hooks/useBatches";
 import { useIsHomeProfile } from "@/modules/maker/hooks/useIsHomeProfile";
+import { useUoms } from "@/modules/shared/hooks/useUoms";
 import { runBatches } from "@/modules/maker/lib/runBatches";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
+import type { UomCategory } from "@/types";
 
 /** Batch labels a run offers to print: one per unit it made, within the
  *  printing module's two hundred. */
@@ -23,12 +25,28 @@ const MAX_LABELS = 200;
 
 /** One label per unit made: a run of twelve jars prints twelve. The sheet
  *  asks for the copies of every batch, so a run in several batches starts
- *  from its units spread over them. */
-export function labelsForRun(order: ProductionOrder): number {
+ *  from its units spread over them. A run kept in a weight or a volume has no
+ *  count of packages to start from, so it starts at one label. */
+export function labelsForRun(order: ProductionOrder, measured = false): number {
+  if (measured) return 1;
   const made = Number(order.actual_qty ?? order.planned_qty);
   if (!Number.isFinite(made) || made <= 0) return 1;
   const batches = Math.max(1, runBatches(order).length);
   return Math.min(MAX_LABELS, Math.max(1, Math.ceil(made / batches)));
+}
+
+/** Whether the run's output unit is a weight or a volume, found by its symbol
+ *  because the run carries no unit id. */
+function isMeasuredOutput(
+  categories: UomCategory[] | undefined,
+  symbol: string | null | undefined,
+): boolean {
+  if (!symbol) return false;
+  return (categories ?? []).some(
+    (cat) =>
+      (cat.name === "Weight" || cat.name === "Volume") &&
+      cat.uoms?.some((u) => u.symbol === symbol),
+  );
 }
 
 const HELD = new Set(["quarantined", "held"]);
@@ -57,11 +75,13 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
   const home = useIsHomeProfile();
   const canManage = useCanManage("maker");
   const { hold, release } = useOutputBatchStatus(order.id);
+  const { data: uomCategories } = useUoms();
   const [printing, setPrinting] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
   const [reason, setReason] = useState("");
   const batches = runBatches(order);
   if (batches.length === 0) return null;
+  const measured = isMeasuredOutput(uomCategories, order.output_uom_symbol);
   const several = batches.length > 1;
   const anyHeld = batches.some((batch) => HELD.has(batch.status));
   const allHeld = batches.every((batch) => HELD.has(batch.status));
@@ -210,7 +230,7 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
       {printing && (
         <BarcodeLabelSheet
           target={{ lotIds: [printing] }}
-          initialCopies={labelsForRun(order)}
+          initialCopies={labelsForRun(order, measured)}
           title={home ? t("batches.card.jarLabelsTitle") : undefined}
           onClose={() => setPrinting(null)}
         />
