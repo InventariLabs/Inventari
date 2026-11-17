@@ -620,6 +620,72 @@ class TestPurchaseOrdersAPIPricelist:
         assert dtos[0].unit_price == Decimal('10')
         assert dtos[1].unit_price == Decimal('20')
 
+    async def test_the_comparison_lists_the_house_currency_before_another(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_household: Organization,
+        async_test_user: User,
+    ) -> None:
+        """EUR 4.00 is not "cheaper" than 5.00 in the house currency.
+
+        The list used to be one sort by the bare number, so a quote in another
+        currency stood above the house's own on the strength of its digits.
+        """
+        db = real_async_db_session
+        template = ProductTemplate(
+            organization_id=async_test_household.id,
+            name='Mixed Currency Compare',
+            sku=f'SKU-MCC-{uuid4().hex[:8]}',
+        )
+        abroad = Partner(
+            organization_id=async_test_household.id,
+            name='Abroad',
+            type='SUPPLIER',
+            created_by=async_test_user.id,
+        )
+        local = Partner(
+            organization_id=async_test_household.id,
+            name='Local',
+            type='SUPPLIER',
+            created_by=async_test_user.id,
+        )
+        db.add_all([template, abroad, local])
+        await db.flush()
+
+        from app.modules.purchase_orders.pricelist_service import create_async
+        from app.modules.purchase_orders.purchase_orders_api import purchase_orders_api
+
+        house = async_test_household.currency
+        foreign = 'EUR' if house != 'EUR' else 'GBP'
+        await create_async(
+            db,
+            organization_id=async_test_household.id,
+            partner_id=abroad.id,
+            product_template_id=template.id,
+            unit_price=Decimal('4'),
+            currency=foreign,
+            valid_from=date(2026, 1, 1),
+        )
+        await create_async(
+            db,
+            organization_id=async_test_household.id,
+            partner_id=local.id,
+            product_template_id=template.id,
+            unit_price=Decimal('5'),
+            currency=house,
+            valid_from=date(2026, 1, 1),
+        )
+        await db.commit()
+
+        dtos = await purchase_orders_api.list_supplier_prices_for_template_async(
+            db, async_test_household.id, template.id
+        )
+
+        assert [(d.currency, d.unit_price) for d in dtos] == [
+            (house, Decimal('5')),
+            (foreign, Decimal('4')),
+        ]
+
     async def test_get_best_price_for_competing_suppliers(
         self,
         real_async_db_session: AsyncSession,

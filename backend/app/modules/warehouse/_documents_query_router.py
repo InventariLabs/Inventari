@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -274,6 +275,11 @@ async def get_price_hint(
     partner_id: UUID | None = Query(
         None, description='Partner id for supplier pricelist lookup'
     ),
+    quantity: Decimal | None = Query(
+        None,
+        gt=0,
+        description='Line quantity; a volume price it does not reach is not offered',
+    ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
@@ -300,14 +306,19 @@ async def get_price_hint(
         # A switched-off orders module is ``None`` above, and an empty
         # pricelist is an empty list: what the lookup raises is a defect, and
         # falling through to the last purchase would suggest another price.
-        offers = await orders.list_pricelist_for_partner_async(
+        # The offer this line can get: valid today, a quantity tier it
+        # reaches (a line with no quantity yet is one unit), the house
+        # currency before another. The cheapest number over the whole list
+        # named a tier the supplier would not charge and a price that had
+        # expired.
+        best = await orders.get_best_offer_for_partner_async(
             db,
             org_id,
             partner_id,
-            product_template_id=template_id,
+            template_id,
+            quantity=quantity if quantity is not None else Decimal('1'),
         )
-        if offers:
-            best = min(offers, key=lambda o: o.unit_price)
+        if best is not None:
             return PriceHintResponse(
                 unit_price=best.unit_price,
                 tax_rate=tax_rate,

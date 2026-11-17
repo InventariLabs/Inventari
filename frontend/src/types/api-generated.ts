@@ -48930,6 +48930,8 @@ export interface operations {
                 template_id: string;
                 /** @description Partner id for supplier pricelist lookup */
                 partner_id?: string | null;
+                /** @description Line quantity; a volume price it does not reach is not offered */
+                quantity?: number | string | null;
             };
             header?: never;
             path?: never;

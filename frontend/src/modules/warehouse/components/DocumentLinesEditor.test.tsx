@@ -387,6 +387,52 @@ describe("DocumentLinesEditor — what it keeps from a price suggestion", () => 
     });
   });
 
+  it("asks for the price of the quantity the line already carries", async () => {
+    // A volume price the line does not reach is not the line's price.
+    priceHint.mockResolvedValue({ unit_price: 3, tax_rate: null });
+
+    await selectTheProduct(vi.fn());
+
+    await vi.waitFor(() =>
+      expect(priceHint).toHaveBeenCalledWith(
+        expect.objectContaining({ template_id: "tmpl-1", quantity: 5 }),
+      ),
+    );
+  });
+
+  it("keeps a quote in another currency out of the document's price field", async () => {
+    // The number would be stored under the document's own currency.
+    priceHint.mockResolvedValue({
+      unit_price: 4,
+      tax_rate: 23,
+      currency: "EUR",
+    });
+    const onUpdateLine = vi.fn();
+    const reported = vi.fn();
+
+    await selectTheProduct(onUpdateLine, reported);
+
+    await vi.waitFor(() =>
+      expect(onUpdateLine).toHaveBeenCalledWith(0, { tax_rate: "23" }),
+    );
+    expect(reported).toHaveBeenCalledWith(expect.any(String), false);
+  });
+
+  it("fills a quote in the document's own currency", async () => {
+    priceHint.mockResolvedValue({
+      unit_price: 4,
+      tax_rate: null,
+      currency: "PLN",
+    });
+    const onUpdateLine = vi.fn();
+
+    await selectTheProduct(onUpdateLine);
+
+    await vi.waitFor(() =>
+      expect(onUpdateLine).toHaveBeenCalledWith(0, { unit_price: "4" }),
+    );
+  });
+
   it("reports a kept promise when the suggestion carries a price", async () => {
     // The empty-price warning promises a suggestion; whether that promise
     // can be kept is exactly what the editor learns here and passes up.

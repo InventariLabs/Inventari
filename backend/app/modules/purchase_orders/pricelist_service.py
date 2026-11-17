@@ -81,6 +81,16 @@ async def house_currency_async(db: AsyncSession, organization_id: UUID) -> str:
     return (org.currency if org else None) or 'USD'
 
 
+def _offer_order(entry: PartnerPricelist, house_currency: str) -> tuple[object, ...]:
+    """Sort key of an offer: house currency, then currency, then price."""
+    return (
+        entry.currency != house_currency,
+        entry.currency,
+        entry.unit_price,
+        entry.id,
+    )
+
+
 def pick_offer(
     entries: Iterable[PartnerPricelist],
     quantity: Decimal | None,
@@ -104,10 +114,7 @@ def pick_offer(
     ]
     if not reached:
         return None
-    return min(
-        reached,
-        key=lambda e: (e.currency != house_currency, e.currency, e.unit_price, e.id),
-    )
+    return min(reached, key=lambda e: _offer_order(e, house_currency))
 
 
 async def create_async(
@@ -248,6 +255,11 @@ async def list_for_template_async(
 ) -> list[PartnerPricelist]:
     """All supplier offers for one product (price comparison view).
 
+    Ordered the way ``pick_offer`` chooses: the organization's own currency
+    first, then any other currency whole, the lowest unit price first within
+    each. Unit prices in different currencies are not comparable as numbers,
+    and no rate is held to make them so.
+
     Args:
         active_on: If set, only include entries valid on that date.
     """
@@ -269,8 +281,9 @@ async def list_for_template_async(
             (PartnerPricelist.valid_to.is_(None))
             | (PartnerPricelist.valid_to >= active_on),
         )
-    stmt = stmt.order_by(PartnerPricelist.unit_price, PartnerPricelist.id)
-    return list((await db.scalars(stmt)).all())
+    entries = list((await db.scalars(stmt)).all())
+    house = await house_currency_async(db, organization_id)
+    return sorted(entries, key=lambda e: _offer_order(e, house))
 
 
 async def cheapest_offers_async(
@@ -326,6 +339,7 @@ async def get_best_price_async(
     *,
     on_date: date | None = None,
     quantity: Decimal | None = None,
+    partner_id: UUID | None = None,
 ) -> PartnerPricelist | None:
     """Return the best currently valid offer for a template, or ``None``.
 
@@ -338,6 +352,7 @@ async def get_best_price_async(
         quantity: If set, only entries it reaches count (no ``min_quantity``,
             or a minimum it has met); with none reached the answer is
             ``None``. See ``pick_offer`` for the choice among them.
+        partner_id: If set, only that supplier's entries are considered.
     """
     if on_date is not None:
         reference = on_date
@@ -361,6 +376,8 @@ async def get_best_price_async(
             | (PartnerPricelist.valid_to >= reference),
         )
     )
+    if partner_id is not None:
+        stmt = stmt.where(PartnerPricelist.partner_id == partner_id)
     entries = (await db.scalars(stmt)).all()
     if not entries:
         return None
