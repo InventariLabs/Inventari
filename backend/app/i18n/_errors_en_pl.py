@@ -861,6 +861,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'a printout carries. Export it as a spreadsheet instead, or pick '
             'one location to narrow it.'
         ),
+        'stock_value_period_reversed': (
+            'The period ends before it starts. Pick an end date on or after the start date.'
+        ),
         'equipment_still_assigned': (
             'The asset is still checked out to someone. Check it in first.'
         ),
@@ -1916,6 +1919,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'Pozycji w raporcie: {total} — wydruk mieści najwyżej {limit}. '
             'Wyeksportuj raport jako arkusz albo wybierz jedno miejsce, aby '
             'go zawęzić.'
+        ),
+        'stock_value_period_reversed': (
+            'Okres kończy się przed swoim początkiem. Wybierz datę końca nie wcześniejszą niż data początku.'
         ),
         'equipment_deploy_requires_checkout': (
             'Zasób staje się wydany przez wydanie go osobie. '

@@ -85,6 +85,9 @@ ERRORS_DE: ErrorMessages = {
         'die ein Ausdruck fasst. Exportieren Sie ihn als Tabelle oder wählen '
         'Sie einen Lagerort, um ihn einzugrenzen.'
     ),
+    'stock_value_period_reversed': (
+        'Der Zeitraum endet vor seinem Beginn. Wählen Sie ein Enddatum, das nicht vor dem Startdatum liegt.'
+    ),
     'item_create_failed': 'Artikel konnte nicht erstellt werden',
     'item_update_failed': 'Artikel konnte nicht aktualisiert werden',
     'item_delete_failed': 'Artikel konnte nicht gelöscht werden',

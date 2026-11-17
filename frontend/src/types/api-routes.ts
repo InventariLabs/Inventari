@@ -405,6 +405,8 @@ export const API_ROUTES = [
   "/api/v1/stock-takes/{stock_take_id}/locations/{location_id}/close",
   "/api/v1/stock-takes/{stock_take_id}/report",
   "/api/v1/stock-takes/{stock_take_id}/status",
+  "/api/v1/stock-value-movement",
+  "/api/v1/stock-value-movement/export/xlsx",
   "/api/v1/uoms",
   "/api/v1/uoms/categories",
   "/api/v1/users",

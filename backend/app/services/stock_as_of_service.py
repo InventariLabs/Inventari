@@ -59,6 +59,7 @@ from app.core.module_ownership import (
 )
 from app.core.money import quantise
 from app.models.item import Item
+from app.models.item_history import ItemAction
 from app.models.product_template import ProductTemplate
 from app.models.stock_move import StockMove, StockMoveState
 from app.models.stock_valuation_layer import (
@@ -543,5 +544,113 @@ async def report_async(
         total=head.total,
         unpriced=head.total - head.stated,
         total_value=total_value,
+        excluded=excluded,
+    )
+
+
+@dataclass(frozen=True)
+class LayerMovements:
+    """What the cost layers say moved the stock's value inside a period.
+
+    Signed as they change the value: receipts are positive, issues negative.
+    ``excluded`` counts the receipts left out because they are priced in a
+    currency that is not the organization's.
+    """
+
+    receipts: Decimal
+    internal_receipts: Decimal
+    used: Decimal
+    disposed: Decimal
+    other_issues: Decimal
+    excluded: int
+
+
+async def layer_movements_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    after: datetime,
+    until: datetime,
+    *,
+    org_currency: str,
+) -> LayerMovements:
+    """The layers dated after *after* and up to *until*, told apart by what
+    they are: what came in (from outside, or from the organization's own
+    books) and what left, by the reason it left.
+
+    The cut is the one the stock-on-a-date report makes — the date a layer is
+    about, ``> after`` and ``<= until`` — so a period's movements and the two
+    dates' values are measured with one ruler: whatever the first date's
+    value counted is not counted again, and whatever the last date's value
+    counts is counted here or in neither.
+
+    The same products stay off it as off that report (those a module owns,
+    unless the organization shows module data), and an outflow is read at
+    what it was posted at — what the layers it drained cost — never
+    recomputed.
+    """
+    layer = StockValuationLayer
+    hidden_tags = await hidden_module_tags_async(db, organization_id)
+    dated = _layer_dated_at()
+    in_period = (
+        layer.organization_id == organization_id,
+        dated > after,
+        dated <= until,
+        outside_module_products(
+            layer.product_template_id, organization_id, hidden_tags
+        ),
+    )
+    rows = (
+        await db.execute(
+            select(
+                layer.direction,
+                layer.internal,
+                layer.reason,
+                func.sum(layer.total_value),
+            )
+            .where(
+                *in_period,
+                # Two currencies do not add: a receipt in another one is
+                # counted below, and left out here as it is from the value.
+                (layer.direction == 'OUT')
+                | (layer.currency.is_(None))
+                | (layer.currency == org_currency),
+            )
+            .group_by(layer.direction, layer.internal, layer.reason)
+        )
+    ).all()
+
+    zero = Decimal('0')
+    receipts = internal = used = disposed = other = zero
+    for direction, is_internal, reason, total in rows:
+        total = total or zero
+        if direction == 'IN':
+            if is_internal:
+                internal += total
+            else:
+                receipts += total
+        elif reason == ItemAction.USED.value:
+            used -= total
+        elif reason == ItemAction.DISPOSED.value:
+            disposed -= total
+        else:
+            other -= total
+
+    excluded = int(
+        await db.scalar(
+            select(func.count()).where(
+                *in_period,
+                layer.direction == 'IN',
+                layer.currency.is_not(None),
+                layer.currency != org_currency,
+            )
+        )
+        or 0
+    )
+    return LayerMovements(
+        receipts=quantise(receipts),
+        internal_receipts=quantise(internal),
+        used=quantise(used),
+        disposed=quantise(disposed),
+        other_issues=quantise(other),
         excluded=excluded,
     )

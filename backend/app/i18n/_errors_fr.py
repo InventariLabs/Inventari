@@ -82,6 +82,9 @@ ERRORS_FR: ErrorMessages = {
         'qu’une impression peut contenir. Exportez-le en tableur ou '
         'choisissez un emplacement pour le restreindre.'
     ),
+    'stock_value_period_reversed': (
+        'La période se termine avant de commencer. Choisissez une date de fin qui ne précède pas la date de début.'
+    ),
     'item_create_failed': "Échec de la création de l'article",
     'item_update_failed': "Échec de la mise à jour de l'article",
     'item_delete_failed': "Échec de la suppression de l'article",
