@@ -88,8 +88,8 @@ def test_births_that_are_not_purchases_are_not_counted(
         *args,
         why={
             'reason': 'document_execution',
-            'document_type': 'transfer',
-            'document_number': 'TR/1',
+            'document_type': 'INT',
+            'document_number': 'INT/2026/001',
         },
     )
     _born(*args, why={'reason': 'stock_take_adjustment'})
@@ -105,10 +105,20 @@ def test_births_that_are_not_purchases_are_not_counted(
         },
     )
     _born(*args, why={'reason': 'mcp_create'})
+    # Typed in a unit other than the card's and confirmed: the history row
+    # says which unit was chosen, not that the record is anything but bought.
+    _born(
+        *args,
+        why={
+            'reason': 'unit_chosen_over_template',
+            'template_uom': 'kg',
+            'chosen_uom': 'g',
+        },
+    )
 
     row = _row(client, auth_headers, 'Olive oil')
 
-    assert row['total_purchases_last_6_months'] == 3
+    assert row['total_purchases_last_6_months'] == 4
 
 
 def test_price_volatility_reads_the_purchases_the_count_reads(

@@ -41,7 +41,9 @@ def _born_as_a_purchase(organization_id: UUID) -> ColumnElement[bool]:
     scanned, added by an AI agent, or received on a warehouse receipt (a
     document of type ``IN``). Entered by hand, imported and scanned births say
     nothing about why in their history; the agent's add and the receipt say so
-    and are let through by name. Every other way a record comes to exist (a
+    and are let through by name, and so is the note that a unit other than the
+    card's was chosen, which says how the quantity was typed, not why the
+    record exists. Every other way a record comes to exist (a
     production run's output, the remainder of a split transfer, a stock
     count's surplus, an opened package, a reversed run's ingredient) carries
     some other reason, so it leaves the record out and a new kind of birth
@@ -55,7 +57,7 @@ def _born_as_a_purchase(organization_id: UUID) -> ColumnElement[bool]:
             ItemHistory.item_id == Item.id,
             ItemHistory.action == ItemAction.CREATED.value,
             reason.isnot(None),
-            reason != 'mcp_create',
+            reason.notin_(('mcp_create', 'unit_chosen_over_template')),
             ~and_(
                 reason == 'document_execution',
                 ItemHistory.changes['document_type'].as_string() == 'IN',
