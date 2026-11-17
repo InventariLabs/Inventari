@@ -214,10 +214,10 @@ and the static assets the frontend serves.
 | `@reduxjs/toolkit` | 2.12.0 | MIT |  |
 | `@standard-schema/spec` | 1.1.0 | MIT |  |
 | `@standard-schema/utils` | 0.3.0 | MIT |  |
-| `@tanstack/query-core` | 5.104.0 | MIT |  |
-| `@tanstack/react-query` | 5.104.0 | MIT |  |
-| `@tanstack/react-virtual` | 3.14.13 | MIT |  |
-| `@tanstack/virtual-core` | 3.17.11 | MIT |  |
+| `@tanstack/query-core` | 5.108.0 | MIT |  |
+| `@tanstack/react-query` | 5.108.0 | MIT |  |
+| `@tanstack/react-virtual` | 3.14.26 | MIT |  |
+| `@tanstack/virtual-core` | 3.19.11 | MIT |  |
 | `@types/d3-array` | 3.2.2 | MIT |  |
 | `@types/d3-color` | 3.1.3 | MIT |  |
 | `@types/d3-ease` | 3.0.2 | MIT |  |
@@ -323,7 +323,7 @@ and the static assets the frontend serves.
 | `html5-qrcode` | 2.3.8 | Apache-2.0 |  |
 | `https-proxy-agent` | 5.0.1 | MIT |  |
 | `i18next` | 26.4.2 | MIT |  |
-| `i18next-browser-languagedetector` | 8.2.1 | MIT |  |
+| `i18next-browser-languagedetector` | 8.3.1 | MIT |  |
 | `immer` | 11.1.18 | MIT |  |
 | `inline-style-parser` | 0.2.7 | MIT |  |
 | `internmap` | 2.0.3 | ISC |  |
@@ -462,9 +462,9 @@ and the static assets the frontend serves.
 | `vfile` | 6.0.3 | MIT |  |
 | `vfile-message` | 4.0.3 | MIT |  |
 | `victory-vendor` | 37.3.6 | MIT AND ISC |  |
-| `web-vitals` | 6.2.2 | Apache-2.0 |  |
+| `web-vitals` | 6.2.3 | Apache-2.0 |  |
 | `yaml` | 2.9.1 | ISC |  |
-| `zustand` | 5.0.15 | MIT |  |
+| `zustand` | 5.1.0 | MIT |  |
 | `zwitch` | 2.0.4 | MIT |  |
 
 ## Backend and backup images — system layer
