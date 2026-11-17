@@ -704,6 +704,7 @@
         "stock_take_adjustment": "Correction d'inventaire",
         "production_run": "Ordre de fabrication",
         "production_run_reversed": "Ordre de fabrication annulé",
+        "package_opened": "Emballage ouvert",
         "circuit_breaker": "Désactivé par le disjoncteur après des échecs de livraison répétés"
       },
       "targetTypes": {

@@ -94,19 +94,21 @@ def test_births_that_are_not_purchases_are_not_counted(
     )
     _born(*args, why={'reason': 'stock_take_adjustment'})
     _born(*args, why={'reason': 'production_run_reversed'})
-    # Bought on a receipt: a purchase like the one entered by hand.
+    # Bought on a receipt (the warehouse writes the document type IN) or
+    # added by an AI agent: purchases like the one entered by hand.
     _born(
         *args,
         why={
             'reason': 'document_execution',
-            'document_type': 'receipt',
-            'document_number': 'GR/1',
+            'document_type': 'IN',
+            'document_number': 'IN/2026/001',
         },
     )
+    _born(*args, why={'reason': 'mcp_create'})
 
     row = _row(client, auth_headers, 'Olive oil')
 
-    assert row['total_purchases_last_6_months'] == 2
+    assert row['total_purchases_last_6_months'] == 3
 
 
 def test_price_volatility_reads_the_purchases_the_count_reads(

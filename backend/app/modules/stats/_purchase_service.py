@@ -38,12 +38,14 @@ def _born_as_a_purchase(organization_id: UUID) -> ColumnElement[bool]:
     """True for a record whose birth was a purchase, not a move of goods.
 
     A purchase is positively recognisable: it is entered by hand, imported,
-    scanned, or received on a receipt, and none of those says why in the
-    birth's history except the receipt. Every other way a record comes to
-    exist (a production run's output, the remainder of a split transfer, a
-    stock count's surplus, an opened package, a reversed run's ingredient)
-    carries a reason, so a reason that is not a receipt leaves the record out
-    and a new kind of birth stays out without being listed here.
+    scanned, added by an AI agent, or received on a warehouse receipt (a
+    document of type ``IN``). Entered by hand, imported and scanned births say
+    nothing about why in their history; the agent's add and the receipt say so
+    and are let through by name. Every other way a record comes to exist (a
+    production run's output, the remainder of a split transfer, a stock
+    count's surplus, an opened package, a reversed run's ingredient) carries
+    some other reason, so it leaves the record out and a new kind of birth
+    stays out without being listed here.
     """
     reason = ItemHistory.changes['reason'].as_string()
     return (
@@ -53,9 +55,10 @@ def _born_as_a_purchase(organization_id: UUID) -> ColumnElement[bool]:
             ItemHistory.item_id == Item.id,
             ItemHistory.action == ItemAction.CREATED.value,
             reason.isnot(None),
+            reason != 'mcp_create',
             ~and_(
                 reason == 'document_execution',
-                ItemHistory.changes['document_type'].as_string() == 'receipt',
+                ItemHistory.changes['document_type'].as_string() == 'IN',
             ),
         )
         .exists()
