@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderWithProviders, screen } from "@/test/utils";
+import { renderWithProviders, screen, waitFor } from "@/test/utils";
+import userEvent from "@testing-library/user-event";
 import {
   useAiConnections,
   useAiPurposes,
@@ -127,5 +128,52 @@ describe("the camera sentence promises only what the registry vouched for", () =
     expect(
       screen.getByRole("button", { name: /take product photo/i }),
     ).toBeEnabled();
+  });
+});
+
+describe("the photo picker is reachable by a driver", () => {
+  const bound = () =>
+    vi.mocked(useAiPurposes).mockReturnValue({
+      data: [purpose("vision.extract", "conn-1", true)],
+      isSuccess: true,
+    } as never);
+
+  it("keeps a file input in the document that a file can be handed to", async () => {
+    bound();
+    const onAnalyze = vi.fn().mockResolvedValue(false);
+    renderWithProviders(
+      <VisionTab
+        onAnalyze={onAnalyze}
+        onEnterManually={vi.fn()}
+        isAnalyzing={false}
+      />,
+    );
+
+    const input = screen.getByTestId("vision-photo-input");
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute("type", "file");
+    expect(input).toHaveAttribute("accept", "image/*");
+
+    const photo = new File(["x"], "label.png", { type: "image/png" });
+    await userEvent.upload(input, photo);
+
+    // The chosen photo becomes a preview, and Analyze hands it on.
+    const analyze = await screen.findByRole("button", { name: /analyze/i });
+    await waitFor(() => expect(analyze).toBeEnabled());
+    await userEvent.click(analyze);
+    expect(onAnalyze).toHaveBeenCalledWith([photo]);
+  });
+
+  it("opens the same input from the camera button", async () => {
+    bound();
+    renderTab();
+    const input = screen.getByTestId("vision-photo-input");
+    const click = vi.spyOn(input, "click");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /take product photo/i }),
+    );
+
+    expect(click).toHaveBeenCalledTimes(1);
   });
 });
