@@ -181,6 +181,47 @@ class TestImageRecognitionFollowsTheServersModel:
         )
 
 
+class TestTheMcpEndpointAnswersOnTheDemoAddress:
+    """An agent pointed at the demo reaches its sandbox, not a 421.
+
+    The MCP endpoint admits loopback and the hosts the organization saved, and
+    a sandbox is seeded before its visitor exists, so the seed saves the one
+    host a visitor's agent will send: the demo's own, from ``FRONTEND_URL``.
+    """
+
+    async def _saved_hosts(
+        self, db: AsyncSession, address: str, monkeypatch: pytest.MonkeyPatch
+    ) -> object:
+        from app.config import settings
+        from app.services.module_settings_service import read_module_setting_async
+
+        org, _user = await _an_organization(db, modules=['core', 'items'])
+        monkeypatch.setattr(settings, 'FRONTEND_URL', address)
+
+        await commands_demo.allow_the_demo_address_async(db, org.id)
+
+        return await read_module_setting_async(
+            db, org.id, 'mcp_server', 'allowed_hosts'
+        )
+
+    async def test_the_published_host_is_allowed(
+        self, real_async_db_session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+    ):
+        hosts = await self._saved_hosts(
+            real_async_db_session, 'https://Demo.Example.org', monkeypatch
+        )
+        assert hosts == ['demo.example.org']
+
+    async def test_a_local_address_adds_nothing(
+        self, real_async_db_session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+    ):
+        """A local ``make demo-reset`` serves on loopback, which is admitted anyway."""
+        hosts = await self._saved_hosts(
+            real_async_db_session, 'http://localhost:5173', monkeypatch
+        )
+        assert hosts is None
+
+
 class TestTheRebuildTimeIsRecorded:
     """The instance says how old it is without anyone reading container logs."""
 
